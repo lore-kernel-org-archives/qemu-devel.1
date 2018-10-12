@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39847)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gB1Hh-0001qi-Nt
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 13:31:37 -0400
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gB1Hl-0001rT-5s
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 13:31:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gB1Hd-0000Fi-TX
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 13:31:33 -0400
-Received: from mail.uni-paderborn.de ([131.234.142.9]:55440)
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gB1Hh-0000JG-T7
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 13:31:37 -0400
+Received: from mail.uni-paderborn.de ([131.234.142.9]:38644)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
-	id 1gB1Hc-0008W0-Oi
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 13:31:29 -0400
+	id 1gB1Hf-00005A-P1
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 13:31:33 -0400
 From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Date: Fri, 12 Oct 2018 19:30:35 +0200
-Message-Id: <20181012173047.25420-17-kbastian@mail.uni-paderborn.de>
+Date: Fri, 12 Oct 2018 19:30:36 +0200
+Message-Id: <20181012173047.25420-18-kbastian@mail.uni-paderborn.de>
 In-Reply-To: <20181012173047.25420-1-kbastian@mail.uni-paderborn.de>
 References: <20181012173047.25420-1-kbastian@mail.uni-paderborn.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 16/28] target/riscv: Convert quadrant 1 of RVXC
+Subject: [Qemu-devel] [PATCH 17/28] target/riscv: Convert quadrant 2 of RVXC
  insns to decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -30,394 +30,387 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: mjc@sifive.com, palmer@sifive.com, sagark@eecs.berkeley.edu, kbastian@mail.uni-paderborn.de
 Cc: qemu-devel@nongnu.org, peer.adelt@hni.uni-paderborn.de, Alistair.Francis@wdc.com
 
+This also removes all functions that now became obsolete.
+
 Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Signed-off-by: Peer Adelt <peer.adelt@hni.uni-paderborn.de>
 ---
- target/riscv/insn16.decode              |  43 +++++++
- target/riscv/insn_trans/trans_rvc.inc.c | 150 ++++++++++++++++++++++++
- target/riscv/translate.c                | 118 +------------------
- 3 files changed, 194 insertions(+), 117 deletions(-)
+ target/riscv/insn16.decode              |  34 +++++-
+ target/riscv/insn_trans/trans_rvc.inc.c | 107 +++++++++++++++++
+ target/riscv/translate.c                | 151 +-----------------------
+ 3 files changed, 139 insertions(+), 153 deletions(-)
 
 diff --git a/target/riscv/insn16.decode b/target/riscv/insn16.decode
-index 558c0c41f0..29dade0fa1 100644
+index 29dade0fa1..138290c450 100644
 --- a/target/riscv/insn16.decode
 +++ b/target/riscv/insn16.decode
-@@ -22,28 +22,53 @@
+@@ -20,6 +20,7 @@
+ %rd        7:5
+ %rs1_3     7:3                !function=ex_rvc_register
  %rs2_3     2:3                !function=ex_rvc_register
++%rs2_5     2:5
  
  # Immediates:
-+%imm_ci        12:s1 2:5
- %nzuimm_ciw    7:4 11:2 5:1 6:1   !function=ex_shift_2
- %uimm_cl_d     5:2 10:3           !function=ex_shift_3
- %uimm_cl_w     5:1 10:3 6:1       !function=ex_shift_2
-+%imm_cb        12:s1 5:2 2:1 10:2 3:2 !function=ex_shift_1
-+%imm_cj        12:s1 8:1 9:2 6:1 7:1 2:1 11:1 3:3 !function=ex_shift_1
-+
-+%nzuimm_6bit   12:1 2:5
-+
-+%imm_addi16sp  12:s1 3:2 5:1 2:1 6:1 !function=ex_shift_4
-+%imm_lui       12:s1 2:5             !function=ex_shift_12
-+
+ %imm_ci        12:s1 2:5
+@@ -30,12 +31,14 @@
+ %imm_cj        12:s1 8:1 9:2 6:1 7:1 2:1 11:1 3:3 !function=ex_shift_1
  
+ %nzuimm_6bit   12:1 2:5
++%uimm_6bit_ld 2:3 12:1 5:2           !function=ex_shift_3
++%uimm_6bit_lw 2:2 12:1 4:3           !function=ex_shift_2
++%uimm_6bit_sd 7:3 10:3               !function=ex_shift_3
++%uimm_6bit_sw 7:2 9:4                !function=ex_shift_2
  
+ %imm_addi16sp  12:s1 3:2 5:1 2:1 6:1 !function=ex_shift_4
+ %imm_lui       12:s1 2:5             !function=ex_shift_12
+ 
+-
+-
  # Argument sets:
  &cl               rs1 rd
  &cl_dw     uimm   rs1 rd
-+&ci        imm        rd
- &ciw       nzuimm     rd
- &cs               rs1 rs2
- &cs_dw     uimm   rs1 rs2
-+&cb        imm    rs1
-+&cr               rd  rs2
-+&c_j       imm
-+&c_shift   shamt      rd
-+
+@@ -47,11 +50,15 @@
+ &cr               rd  rs2
+ &c_j       imm
+ &c_shift   shamt      rd
+-
++&c_ld      uimm  rd
++&c_sd      uimm  rs2
  
-+&c_addi16sp_lui  imm_lui imm_addi16sp rd
+ &c_addi16sp_lui  imm_lui imm_addi16sp rd
++&c_flwsp_ldsp    uimm_flwsp uimm_ldsp rd
++&c_fswsp_sdsp    uimm_fswsp uimm_sdsp rs2
  
  # Formats 16:
-+@ci        ... . ..... .....  .. &ci     imm=%imm_ci                  %rd
++@cr        ....  ..... .....  .. &cr                      rs2=%rs2_5  %rd
+ @ci        ... . ..... .....  .. &ci     imm=%imm_ci                  %rd
  @ciw       ...   ........ ... .. &ciw    nzuimm=%nzuimm_ciw           rd=%rs2_3
  @cl_d      ... ... ... .. ... .. &cl_dw  uimm=%uimm_cl_d  rs1=%rs1_3  rd=%rs2_3
- @cl_w      ... ... ... .. ... .. &cl_dw  uimm=%uimm_cl_w  rs1=%rs1_3  rd=%rs2_3
- @cl        ... ... ... .. ... .. &cl                      rs1=%rs1_3  rd=%rs2_3
- @cs        ... ... ... .. ... .. &cs                      rs1=%rs1_3  rs2=%rs2_3
-+@cs_2      ... ... ... .. ... .. &cr                      rd=%rs1_3   rs2=%rs2_3
- @cs_d      ... ... ... .. ... .. &cs_dw  uimm=%uimm_cl_d  rs1=%rs1_3  rs2=%rs2_3
- @cs_w      ... ... ... .. ... .. &cs_dw  uimm=%uimm_cl_w  rs1=%rs1_3  rs2=%rs2_3
-+@cb        ... ... ... .. ... .. &cb     imm=%imm_cb      rs1=%rs1_3
-+@cj        ...    ........... .. &c_j    imm=%imm_cj
+@@ -64,9 +71,19 @@
+ @cb        ... ... ... .. ... .. &cb     imm=%imm_cb      rs1=%rs1_3
+ @cj        ...    ........... .. &c_j    imm=%imm_cj
  
-+@c_addi16sp_lui ... .  ..... ..... .. &c_addi16sp_lui %imm_lui %imm_addi16sp %rd
++@c_ld      ... . .....  ..... .. &c_ld     uimm=%uimm_6bit_ld  %rd
++@c_lw      ... . .....  ..... .. &c_ld     uimm=%uimm_6bit_lw  %rd
++@c_sd      ... . .....  ..... .. &c_sd     uimm=%uimm_6bit_sd  rs2=%rs2_5
++@c_sw      ... . .....  ..... .. &c_sd     uimm=%uimm_6bit_sw  rs2=%rs2_5
 +
-+@c_shift        ... . .. ... ..... .. &c_shift rd=%rs1_3 shamt=%nzuimm_6bit
-+
-+@c_andi         ... . .. ... ..... .. &ci imm=%imm_ci rd=%rs1_3
+ @c_addi16sp_lui ... .  ..... ..... .. &c_addi16sp_lui %imm_lui %imm_addi16sp %rd
++@c_flwsp_ldsp   ... .  ..... ..... .. &c_flwsp_ldsp uimm_flwsp=%uimm_6bit_lw \
++    uimm_ldsp=%uimm_6bit_ld %rd
++@c_fswsp_sdsp   ... .  ..... ..... .. &c_fswsp_sdsp uimm_fswsp=%uimm_6bit_sw \
++    uimm_sdsp=%uimm_6bit_sd rs2=%rs2_5
  
- # *** RV64C Standard Extension (Quadrant 0) ***
- c_addi4spn        000    ........ ... 00 @ciw
-@@ -53,3 +78,21 @@ c_flw_ld          011  --- ... -- ... 00 @cl    #Note: Must parse uimm manually
- c_fsd             101  ... ... .. ... 00 @cs_d
- c_sw              110  ... ... .. ... 00 @cs_w
- c_fsw_sd          111  --- ... -- ... 00 @cs    #Note: Must parse uimm manually
+ @c_shift        ... . .. ... ..... .. &c_shift rd=%rs1_3 shamt=%nzuimm_6bit
++@c_shift2       ... . .. ... ..... .. &c_shift rd=%rd    shamt=%nzuimm_6bit
+ 
+ @c_andi         ... . .. ... ..... .. &ci imm=%imm_ci rd=%rs1_3
+ 
+@@ -96,3 +113,14 @@ c_addw            100 1 11 ... 01 ... 01 @cs_2
+ c_j               101     ........... 01 @cj
+ c_beqz            110  ... ...  ..... 01 @cb
+ c_bnez            111  ... ...  ..... 01 @cb
 +
-+# *** RV64C Standard Extension (Quadrant 1) ***
-+c_addi            000 .  .....  ..... 01 @ci
-+c_jal_addiw       001 .  .....  ..... 01 @ci #Note: parse rd and/or imm manually
-+c_li              010 .  .....  ..... 01 @ci
-+c_addi16sp_lui    011 .  .....  ..... 01 @c_addi16sp_lui # shares opc with C.LUI
-+c_srli            100 . 00 ...  ..... 01 @c_shift
-+c_srai            100 . 01 ...  ..... 01 @c_shift
-+c_andi            100 . 10 ...  ..... 01 @c_andi
-+c_sub             100 0 11 ... 00 ... 01 @cs_2
-+c_xor             100 0 11 ... 01 ... 01 @cs_2
-+c_or              100 0 11 ... 10 ... 01 @cs_2
-+c_and             100 0 11 ... 11 ... 01 @cs_2
-+c_subw            100 1 11 ... 00 ... 01 @cs_2
-+c_addw            100 1 11 ... 01 ... 01 @cs_2
-+c_j               101     ........... 01 @cj
-+c_beqz            110  ... ...  ..... 01 @cb
-+c_bnez            111  ... ...  ..... 01 @cb
++# *** RV64C Standard Extension (Quadrant 2) ***
++c_slli            000 .  .....  ..... 10 @c_shift2
++c_fldsp           001 .  .....  ..... 10 @c_ld
++c_lwsp            010 .  .....  ..... 10 @c_lw
++c_flwsp_ldsp      011 .  .....  ..... 10 @c_flwsp_ldsp #C.LDSP:RV64;C.FLWSP:RV32
++c_jr_mv           100 0  .....  ..... 10 @cr
++c_ebreak_jalr_add 100 1  .....  ..... 10 @cr
++c_fsdsp           101   ......  ..... 10 @c_sd
++c_swsp            110 .  .....  ..... 10 @c_sw
++c_fswsp_sdsp      111 .  .....  ..... 10 @c_fswsp_sdsp #C.SDSP:RV64;C.FSWSP:RV32
 diff --git a/target/riscv/insn_trans/trans_rvc.inc.c b/target/riscv/insn_trans/trans_rvc.inc.c
-index f8ad2db527..74cb4dad0a 100644
+index 74cb4dad0a..b98c18d99e 100644
 --- a/target/riscv/insn_trans/trans_rvc.inc.c
 +++ b/target/riscv/insn_trans/trans_rvc.inc.c
-@@ -87,3 +87,153 @@ static bool trans_c_fsw_sd(DisasContext *ctx, arg_c_fsw_sd *a, uint16_t insn)
-     return trans_sd(ctx, &arg, insn);
- #endif
+@@ -237,3 +237,110 @@ static bool trans_c_bnez(DisasContext *ctx, arg_c_bnez *a, uint16_t insn)
+     arg_bne arg = { .rs1 = a->rs1, .rs2 = 0, .imm = a->imm };
+     return trans_bne(ctx, &arg, insn);
  }
 +
-+static bool trans_c_addi(DisasContext *ctx, arg_c_addi *a, uint16_t insn)
++static bool trans_c_slli(DisasContext *ctx, arg_c_slli *a, uint16_t insn)
 +{
-+    if (a->imm == 0) {
++    if (a->shamt == 0) {
++        /* Reserved in ISA */
++        gen_exception_illegal(ctx);
 +        return true;
 +    }
-+    arg_addi arg = { .rd = a->rd, .rs1 = a->rd, .imm = a->imm };
-+    return trans_addi(ctx, &arg, insn);
++
++#ifdef TARGET_RISCV32
++    /* Ensure, that shamt[5] is zero for RV32 */
++    if (a->shamt >= 32) {
++        gen_exception_illegal(ctx);
++        return true;
++    }
++#endif
++
++    arg_slli arg = { .rd = a->rd, .rs1 = a->rd, .shamt = a->shamt };
++    return trans_slli(ctx, &arg, insn);
 +}
 +
-+static bool trans_c_jal_addiw(DisasContext *ctx, arg_c_jal_addiw *a,
++static bool trans_c_fldsp(DisasContext *ctx, arg_c_fldsp *a, uint16_t insn)
++{
++    arg_fld arg = { .rd = a->rd, .rs1 = 2, .imm = a->uimm };
++    return trans_fld(ctx, &arg, insn);
++}
++
++static bool trans_c_lwsp(DisasContext *ctx, arg_c_lwsp *a, uint16_t insn)
++{
++    arg_lw arg = { .rd = a->rd, .rs1 = 2, .imm = a->uimm };
++    return trans_lw(ctx, &arg, insn);
++}
++
++static bool trans_c_flwsp_ldsp(DisasContext *ctx, arg_c_flwsp_ldsp *a,
 +        uint16_t insn)
 +{
 +#ifdef TARGET_RISCV32
-+    /* C.JAL */
-+    arg_c_j *tmp = g_new0(arg_c_j, 1);
-+    extract_cj(tmp, insn);
-+    arg_jal arg = { .rd = 1, .imm = a->imm };
-+    return trans_jal(ctx, &arg, insn);
++    /* C.FLWSP */
++    arg_flw arg_flw = { .rd = a->rd, .rs1 = 2, .imm = a->uimm_flwsp };
++    return trans_flw(ctx, &arg_flw, insn);
 +#else
-+    /* C.ADDIW */
-+    arg_addiw arg = { .rd = a->rd, .rs1 = a->rd, .imm = a->imm };
-+    return trans_addiw(ctx, &arg, insn);
++    /* C.LDSP */
++    arg_ld arg_ld = { .rd = a->rd, .rs1 = 2, .imm = a->uimm_ldsp };
++    return trans_ld(ctx, &arg_ld, insn);
 +#endif
++    return false;
 +}
 +
-+static bool trans_c_li(DisasContext *ctx, arg_c_li *a, uint16_t insn)
++static bool trans_c_jr_mv(DisasContext *ctx, arg_c_jr_mv *a, uint16_t insn)
 +{
-+    if (a->rd == 0) {
-+        return true;
-+    }
-+    arg_addi arg = { .rd = a->rd, .rs1 = 0, .imm = a->imm };
-+    return trans_addi(ctx, &arg, insn);
-+}
-+
-+static bool trans_c_addi16sp_lui(DisasContext *ctx, arg_c_addi16sp_lui *a,
-+        uint16_t insn)
-+{
-+    if (a->rd == 2) {
-+        /* C.ADDI16SP */
-+        arg_addi arg = { .rd = 2, .rs1 = 2, .imm = a->imm_addi16sp };
-+        return trans_addi(ctx, &arg, insn);
-+    } else if (a->imm_lui != 0) {
-+        if (a->rd == 0) {
-+            return true;
-+        }
-+        /* C.LUI */
-+        arg_lui arg = { .rd = a->rd, .imm = a->imm_lui };
-+        return trans_lui(ctx, &arg, insn);
++    if (a->rd != 0 && a->rs2 == 0) {
++        /* C.JR */
++        arg_jalr arg = { .rd = 0, .rs1 = a->rd, .imm = 0 };
++        return trans_jalr(ctx, &arg, insn);
++    } else if (a->rd != 0 && a->rs2 != 0) {
++        /* C.MV */
++        arg_add arg = { .rd = a->rd, .rs1 = 0, .rs2 = a->rs2 };
++        return trans_add(ctx, &arg, insn);
 +    }
 +    return false;
 +}
 +
-+static bool trans_c_srli(DisasContext *ctx, arg_c_srli *a, uint16_t insn)
++static bool trans_c_ebreak_jalr_add(DisasContext *ctx, arg_c_ebreak_jalr_add *a,
++        uint16_t insn)
 +{
-+    if (a->shamt == 0) {
-+        /* Reserved in ISA */
-+        gen_exception_illegal(ctx);
-+        return true;
++    if (a->rd == 0 && a->rs2 == 0) {
++        /* C.EBREAK */
++        arg_ebreak arg = { };
++        return trans_ebreak(ctx, &arg, insn);
++    } else if (a->rd != 0) {
++        if (a->rs2 == 0) {
++            /* C.JALR */
++            arg_jalr arg = { .rd = 1, .rs1 = a->rd, .imm = 0 };
++            return trans_jalr(ctx, &arg, insn);
++        } else {
++            /* C.ADD */
++            arg_add arg = { .rd = a->rd, .rs1 = a->rd, .rs2 = a->rs2 };
++            return trans_add(ctx, &arg, insn);
++        }
 +    }
++    return false;
++}
++
++static bool trans_c_fsdsp(DisasContext *ctx, arg_c_fsdsp *a, uint16_t insn)
++{
++    arg_fsd arg = { .rs1 = 2, .rs2 = a->rs2, .imm = a->uimm };
++    return trans_fsd(ctx, &arg, insn);
++}
++
++static bool trans_c_swsp(DisasContext *ctx, arg_c_swsp *a, uint16_t insn)
++{
++    arg_sw arg = { .rs1 = 2, .rs2 = a->rs2, .imm = a->uimm };
++    return trans_sw(ctx, &arg, insn);
++}
++
++static bool trans_c_fswsp_sdsp(DisasContext *ctx, arg_c_fswsp_sdsp *a,
++        uint16_t insn)
++{
 +#ifdef TARGET_RISCV32
-+    /* Ensure, that shamt[5] is zero for RV32 */
-+    if (a->shamt >= 32) {
-+        gen_exception_illegal(ctx);
-+        return true;
-+    }
++    /* C.FSWSP */
++    arg_fsw a_fsw = { .rs1 = a->rs2, .rs2 = 2, .imm = a->uimm_fswsp };
++    return trans_fsw(ctx, &a_fsw, insn);
 +#endif
-+
-+    arg_srli arg = { .rd = a->rd, .rs1 = a->rd, .shamt = a->shamt };
-+    return trans_srli(ctx, &arg, insn);
-+}
-+
-+static bool trans_c_srai(DisasContext *ctx, arg_c_srai *a, uint16_t insn)
-+{
-+    if (a->shamt == 0) {
-+        /* Reserved in ISA */
-+        gen_exception_illegal(ctx);
-+        return true;
-+    }
-+#ifdef TARGET_RISCV32
-+    /* Ensure, that shamt[5] is zero for RV32 */
-+    if (a->shamt >= 32) {
-+        gen_exception_illegal(ctx);
-+        return true;
-+    }
-+#endif
-+
-+    arg_srai arg = { .rd = a->rd, .rs1 = a->rd, .shamt = a->shamt };
-+    return trans_srai(ctx, &arg, insn);
-+}
-+
-+static bool trans_c_andi(DisasContext *ctx, arg_c_andi *a, uint16_t insn)
-+{
-+    arg_andi arg = { .rd = a->rd, .rs1 = a->rd, .imm = a->imm };
-+    return trans_andi(ctx, &arg, insn);
-+}
-+
-+static bool trans_c_sub(DisasContext *ctx, arg_c_sub *a, uint16_t insn)
-+{
-+    arg_sub arg = { .rd = a->rd, .rs1 = a->rd, .rs2 = a->rs2 };
-+    return trans_sub(ctx, &arg, insn);
-+}
-+
-+static bool trans_c_xor(DisasContext *ctx, arg_c_xor *a, uint16_t insn)
-+{
-+    arg_xor arg = { .rd = a->rd, .rs1 = a->rd, .rs2 = a->rs2 };
-+    return trans_xor(ctx, &arg, insn);
-+}
-+
-+static bool trans_c_or(DisasContext *ctx, arg_c_or *a, uint16_t insn)
-+{
-+    arg_or arg = { .rd = a->rd, .rs1 = a->rd, .rs2 = a->rs2 };
-+    return trans_or(ctx, &arg, insn);
-+}
-+
-+static bool trans_c_and(DisasContext *ctx, arg_c_and *a, uint16_t insn)
-+{
-+    arg_and arg = { .rd = a->rd, .rs1 = a->rd, .rs2 = a->rs2 };
-+    return trans_and(ctx, &arg, insn);
-+}
-+
-+static bool trans_c_subw(DisasContext *ctx, arg_c_subw *a, uint16_t insn)
-+{
-+    arg_subw arg = { .rd = a->rd, .rs1 = a->rd, .rs2 = a->rs2 };
-+    return trans_subw(ctx, &arg, insn);
-+}
-+
-+static bool trans_c_addw(DisasContext *ctx, arg_c_addw *a, uint16_t insn)
-+{
-+    arg_addw arg = { .rd = a->rd, .rs1 = a->rd, .rs2 = a->rs2 };
-+    return trans_addw(ctx, &arg, insn);
-+}
-+
-+static bool trans_c_j(DisasContext *ctx, arg_c_j *a, uint16_t insn)
-+{
-+    arg_jal arg = { .rd = 0, .imm = a->imm };
-+    return trans_jal(ctx, &arg, insn);
-+}
-+
-+static bool trans_c_beqz(DisasContext *ctx, arg_c_beqz *a, uint16_t insn)
-+{
-+    arg_beq arg = { .rs1 = a->rs1, .rs2 = 0, .imm = a->imm };
-+    return trans_beq(ctx, &arg, insn);
-+}
-+
-+static bool trans_c_bnez(DisasContext *ctx, arg_c_bnez *a, uint16_t insn)
-+{
-+    arg_bne arg = { .rs1 = a->rs1, .rs2 = 0, .imm = a->imm };
-+    return trans_bne(ctx, &arg, insn);
++    /* C.SDSP */
++    arg_sd a_sd = { .rs1 = 2, .rs2 = a->rs2, .imm = a->uimm_sdsp };
++    return trans_sd(ctx, &a_sd, insn);
 +}
 diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-index a4bf7f98ab..3d2146c9b2 100644
+index 3d2146c9b2..6b4a0430fd 100644
 --- a/target/riscv/translate.c
 +++ b/target/riscv/translate.c
-@@ -713,120 +713,6 @@ static void gen_system(CPURISCVState *env, DisasContext *ctx, uint32_t opc,
+@@ -613,65 +613,6 @@ static void gen_store(DisasContext *ctx, uint32_t opc, int rs1, int rs2,
+     tcg_temp_free(dat);
+ }
+ 
+-static void gen_fp_load(DisasContext *ctx, uint32_t opc, int rd,
+-        int rs1, target_long imm)
+-{
+-    TCGv t0;
+-
+-    if (!(ctx->flags & TB_FLAGS_FP_ENABLE)) {
+-        gen_exception_illegal(ctx);
+-        return;
+-    }
+-
+-    t0 = tcg_temp_new();
+-    gen_get_gpr(t0, rs1);
+-    tcg_gen_addi_tl(t0, t0, imm);
+-
+-    switch (opc) {
+-    case OPC_RISC_FLW:
+-        tcg_gen_qemu_ld_i64(cpu_fpr[rd], t0, ctx->mem_idx, MO_TEUL);
+-        /* RISC-V requires NaN-boxing of narrower width floating point values */
+-        tcg_gen_ori_i64(cpu_fpr[rd], cpu_fpr[rd], 0xffffffff00000000ULL);
+-        break;
+-    case OPC_RISC_FLD:
+-        tcg_gen_qemu_ld_i64(cpu_fpr[rd], t0, ctx->mem_idx, MO_TEQ);
+-        break;
+-    default:
+-        gen_exception_illegal(ctx);
+-        break;
+-    }
+-    tcg_temp_free(t0);
+-}
+-
+-static void gen_fp_store(DisasContext *ctx, uint32_t opc, int rs1,
+-        int rs2, target_long imm)
+-{
+-    TCGv t0;
+-
+-    if (!(ctx->flags & TB_FLAGS_FP_ENABLE)) {
+-        gen_exception_illegal(ctx);
+-        return;
+-    }
+-
+-    t0 = tcg_temp_new();
+-    gen_get_gpr(t0, rs1);
+-    tcg_gen_addi_tl(t0, t0, imm);
+-
+-    switch (opc) {
+-    case OPC_RISC_FSW:
+-        tcg_gen_qemu_st_i64(cpu_fpr[rs2], t0, ctx->mem_idx, MO_TEUL);
+-        break;
+-    case OPC_RISC_FSD:
+-        tcg_gen_qemu_st_i64(cpu_fpr[rs2], t0, ctx->mem_idx, MO_TEQ);
+-        break;
+-    default:
+-        gen_exception_illegal(ctx);
+-        break;
+-    }
+-
+-    tcg_temp_free(t0);
+-}
+-
+ static void gen_set_rm(DisasContext *ctx, int rm)
+ {
+     TCGv_i32 t0;
+@@ -713,95 +654,6 @@ static void gen_system(CPURISCVState *env, DisasContext *ctx, uint32_t opc,
      }
  }
  
--static void decode_RV32_64C1(CPURISCVState *env, DisasContext *ctx)
+-static void decode_RV32_64C2(CPURISCVState *env, DisasContext *ctx)
 -{
+-    uint8_t rd, rs2;
 -    uint8_t funct3 = extract32(ctx->opcode, 13, 3);
--    uint8_t rd_rs1 = GET_C_RS1(ctx->opcode);
--    uint8_t rs1s, rs2s;
--    uint8_t funct2;
+-
+-
+-    rd = GET_RD(ctx->opcode);
 -
 -    switch (funct3) {
--    case 0:
--        /* C.ADDI -> addi rd, rd, nzimm[5:0] */
--        gen_arith_imm(ctx, OPC_RISC_ADDI, rd_rs1, rd_rs1,
--                      GET_C_IMM(ctx->opcode));
+-    case 0: /* C.SLLI -> slli rd, rd, shamt[5:0]
+-               C.SLLI64 -> */
+-        gen_arith_imm(ctx, OPC_RISC_SLLI, rd, rd, GET_C_ZIMM(ctx->opcode));
 -        break;
--    case 1:
--#if defined(TARGET_RISCV64)
--        /* C.ADDIW (RV64/128) -> addiw rd, rd, imm[5:0]*/
--        gen_arith_imm(ctx, OPC_RISC_ADDIW, rd_rs1, rd_rs1,
--                      GET_C_IMM(ctx->opcode));
--#else
--        /* C.JAL(RV32) -> jal x1, offset[11:1] */
--        gen_jal(env, ctx, 1, GET_C_J_IMM(ctx->opcode));
--#endif
+-    case 1: /* C.FLDSP(RV32/64DC) -> fld rd, offset[8:3](x2) */
+-        gen_fp_load(ctx, OPC_RISC_FLD, rd, 2, GET_C_LDSP_IMM(ctx->opcode));
 -        break;
--    case 2:
--        /* C.LI -> addi rd, x0, imm[5:0]*/
--        gen_arith_imm(ctx, OPC_RISC_ADDI, rd_rs1, 0, GET_C_IMM(ctx->opcode));
+-    case 2: /* C.LWSP -> lw rd, offset[7:2](x2) */
+-        gen_load(ctx, OPC_RISC_LW, rd, 2, GET_C_LWSP_IMM(ctx->opcode));
 -        break;
 -    case 3:
--        if (rd_rs1 == 2) {
--            /* C.ADDI16SP -> addi x2, x2, nzimm[9:4]*/
--            gen_arith_imm(ctx, OPC_RISC_ADDI, 2, 2,
--                          GET_C_ADDI16SP_IMM(ctx->opcode));
--        } else if (rd_rs1 != 0) {
--            /* C.LUI (rs1/rd =/= {0,2}) -> lui rd, nzimm[17:12]*/
--            tcg_gen_movi_tl(cpu_gpr[rd_rs1],
--                            GET_C_IMM(ctx->opcode) << 12);
--        }
+-#if defined(TARGET_RISCV64)
+-        /* C.LDSP(RVC64) -> ld rd, offset[8:3](x2) */
+-        gen_load(ctx, OPC_RISC_LD, rd, 2, GET_C_LDSP_IMM(ctx->opcode));
+-#else
+-        /* C.FLWSP(RV32FC) -> flw rd, offset[7:2](x2) */
+-        gen_fp_load(ctx, OPC_RISC_FLW, rd, 2, GET_C_LWSP_IMM(ctx->opcode));
+-#endif
 -        break;
 -    case 4:
--        funct2 = extract32(ctx->opcode, 10, 2);
--        rs1s = GET_C_RS1S(ctx->opcode);
--        switch (funct2) {
--        case 0: /* C.SRLI(RV32) -> srli rd', rd', shamt[5:0] */
--            gen_arith_imm(ctx, OPC_RISC_SHIFT_RIGHT_I, rs1s, rs1s,
--                               GET_C_ZIMM(ctx->opcode));
--            /* C.SRLI64(RV128) */
--            break;
--        case 1:
--            /* C.SRAI -> srai rd', rd', shamt[5:0]*/
--            gen_arith_imm(ctx, OPC_RISC_SHIFT_RIGHT_I, rs1s, rs1s,
--                            GET_C_ZIMM(ctx->opcode) | 0x400);
--            /* C.SRAI64(RV128) */
--            break;
--        case 2:
--            /* C.ANDI -> andi rd', rd', imm[5:0]*/
--            gen_arith_imm(ctx, OPC_RISC_ANDI, rs1s, rs1s,
--                          GET_C_IMM(ctx->opcode));
--            break;
--        case 3:
--            funct2 = extract32(ctx->opcode, 5, 2);
--            rs2s = GET_C_RS2S(ctx->opcode);
--            switch (funct2) {
--            case 0:
--                /* C.SUB -> sub rd', rd', rs2' */
--                if (extract32(ctx->opcode, 12, 1) == 0) {
--                    gen_arith(ctx, OPC_RISC_SUB, rs1s, rs1s, rs2s);
--                }
--#if defined(TARGET_RISCV64)
--                else {
--                    gen_arith(ctx, OPC_RISC_SUBW, rs1s, rs1s, rs2s);
--                }
--#endif
--                break;
--            case 1:
--                /* C.XOR -> xor rs1', rs1', rs2' */
--                if (extract32(ctx->opcode, 12, 1) == 0) {
--                    gen_arith(ctx, OPC_RISC_XOR, rs1s, rs1s, rs2s);
--                }
--#if defined(TARGET_RISCV64)
--                else {
--                    /* C.ADDW (RV64/128) */
--                    gen_arith(ctx, OPC_RISC_ADDW, rs1s, rs1s, rs2s);
--                }
--#endif
--                break;
--            case 2:
--                /* C.OR -> or rs1', rs1', rs2' */
--                gen_arith(ctx, OPC_RISC_OR, rs1s, rs1s, rs2s);
--                break;
--            case 3:
--                /* C.AND -> and rs1', rs1', rs2' */
--                gen_arith(ctx, OPC_RISC_AND, rs1s, rs1s, rs2s);
--                break;
+-        rs2 = GET_C_RS2(ctx->opcode);
+-
+-        if (extract32(ctx->opcode, 12, 1) == 0) {
+-            if (rs2 == 0) {
+-                /* C.JR -> jalr x0, rs1, 0*/
+-                gen_jalr(env, ctx, OPC_RISC_JALR, 0, rd, 0);
+-            } else {
+-                /* C.MV -> add rd, x0, rs2 */
+-                gen_arith(ctx, OPC_RISC_ADD, rd, 0, rs2);
 -            }
--            break;
+-        } else {
+-            if (rd == 0) {
+-                /* C.EBREAK -> ebreak*/
+-                gen_system(env, ctx, OPC_RISC_ECALL, 0, 0, 0x1);
+-            } else {
+-                if (rs2 == 0) {
+-                    /* C.JALR -> jalr x1, rs1, 0*/
+-                    gen_jalr(env, ctx, OPC_RISC_JALR, 1, rd, 0);
+-                } else {
+-                    /* C.ADD -> add rd, rd, rs2 */
+-                    gen_arith(ctx, OPC_RISC_ADD, rd, rd, rs2);
+-                }
+-            }
 -        }
 -        break;
 -    case 5:
--        /* C.J -> jal x0, offset[11:1]*/
--        gen_jal(env, ctx, 0, GET_C_J_IMM(ctx->opcode));
+-        /* C.FSDSP -> fsd rs2, offset[8:3](x2)*/
+-        gen_fp_store(ctx, OPC_RISC_FSD, 2, GET_C_RS2(ctx->opcode),
+-                     GET_C_SDSP_IMM(ctx->opcode));
+-        /* C.SQSP */
 -        break;
--    case 6:
--        /* C.BEQZ -> beq rs1', x0, offset[8:1]*/
--        rs1s = GET_C_RS1S(ctx->opcode);
--        gen_branch(env, ctx, OPC_RISC_BEQ, rs1s, 0, GET_C_B_IMM(ctx->opcode));
+-    case 6: /* C.SWSP -> sw rs2, offset[7:2](x2)*/
+-        gen_store(ctx, OPC_RISC_SW, 2, GET_C_RS2(ctx->opcode),
+-                  GET_C_SWSP_IMM(ctx->opcode));
 -        break;
 -    case 7:
--        /* C.BNEZ -> bne rs1', x0, offset[8:1]*/
--        rs1s = GET_C_RS1S(ctx->opcode);
--        gen_branch(env, ctx, OPC_RISC_BNE, rs1s, 0, GET_C_B_IMM(ctx->opcode));
+-#if defined(TARGET_RISCV64)
+-        /* C.SDSP(Rv64/128) -> sd rs2, offset[8:3](x2)*/
+-        gen_store(ctx, OPC_RISC_SD, 2, GET_C_RS2(ctx->opcode),
+-                  GET_C_SDSP_IMM(ctx->opcode));
+-#else
+-        /* C.FSWSP(RV32) -> fsw rs2, offset[7:2](x2) */
+-        gen_fp_store(ctx, OPC_RISC_FSW, 2, GET_C_RS2(ctx->opcode),
+-                     GET_C_SWSP_IMM(ctx->opcode));
+-#endif
 -        break;
 -    }
 -}
 -
- static void decode_RV32_64C2(CPURISCVState *env, DisasContext *ctx)
- {
-     uint8_t rd, rs2;
-@@ -910,9 +796,6 @@ static void decode_RV32_64C(CPURISCVState *env, DisasContext *ctx)
-     uint8_t op = extract32(ctx->opcode, 0, 2);
- 
-     switch (op) {
--    case 1:
--        decode_RV32_64C1(env, ctx);
+-static void decode_RV32_64C(CPURISCVState *env, DisasContext *ctx)
+-{
+-    uint8_t op = extract32(ctx->opcode, 0, 2);
+-
+-    switch (op) {
+-    case 2:
+-        decode_RV32_64C2(env, ctx);
 -        break;
-     case 2:
-         decode_RV32_64C2(env, ctx);
-         break;
-@@ -927,6 +810,7 @@ static void decode_RV32_64C(CPURISCVState *env, DisasContext *ctx)
- EX_SH(1)
- EX_SH(2)
- EX_SH(3)
-+EX_SH(4)
- EX_SH(12)
- 
- static int64_t ex_rvc_register(int reg)
+-    }
+-}
+-
+ #define EX_SH(amount) \
+     static int64_t ex_shift_##amount(int imm) \
+     {                                         \
+@@ -868,8 +720,7 @@ static void decode_opc(CPURISCVState *env, DisasContext *ctx)
+         } else {
+             ctx->pc_succ_insn = ctx->base.pc_next + 2;
+             if (!decode_insn16(ctx, ctx->opcode)) {
+-                /* fall back to old decoder */
+-                decode_RV32_64C(env, ctx);
++                gen_exception_illegal(ctx);
+             }
+         }
+     } else {
 -- 
 2.19.1
