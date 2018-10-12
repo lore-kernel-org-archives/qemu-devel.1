@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gAyeP-00083T-94
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 10:42:52 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1gAyeT-00086I-Re
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 10:42:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gAyeO-00030e-JP
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 10:42:49 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1gAyeS-000364-U1
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 10:42:53 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 12 Oct 2018 15:42:30 +0100
-Message-Id: <20181012144235.19646-6-peter.maydell@linaro.org>
+Date: Fri, 12 Oct 2018 15:42:34 +0100
+Message-Id: <20181012144235.19646-10-peter.maydell@linaro.org>
 In-Reply-To: <20181012144235.19646-1-peter.maydell@linaro.org>
 References: <20181012144235.19646-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 05/10] target/arm: ISR_EL1 bits track virtual
- interrupts if IMO/FMO set
+Subject: [Qemu-devel] [PATCH 09/10] target/arm: Get IL bit correct for v7
+ syndrome values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,57 +25,69 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-The A/I/F bits in ISR_EL1 should track the virtual interrupt
-status, not the physical interrupt status, if the associated
-HCR_EL2.AMO/IMO/FMO bit is set. Implement this, rather than
-always showing the physical interrupt status.
+For the v7 version of the Arm architecture, the IL bit in
+syndrome register values where the field is not valid was
+defined to be UNK/SBZP. In v8 this is RES1, which is what
+QEMU currently implements. Handle the desired v7 behaviour
+by squashing the IL bit for the affected cases:
+ * EC == EC_UNCATEGORIZED
+ * prefetch aborts
+ * data aborts where ISV is 0
 
-We don't currently implement anything to do with external
-aborts, so this applies only to the I and F bits (though it
-ought to be possible for the outer guest to present a virtual
-external abort to the inner guest, even if QEMU doesn't
-emulate physical external aborts, so there is missing
-functionality in this area).
+(The fourth case listed in the v8 Arm ARM DDI 0487C.a in
+section G7.2.70, "illegal state exception", can't happen
+on a v7 CPU.)
+
+This deals with a corner case noted in a comment.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/helper.c | 22 ++++++++++++++++++----
- 1 file changed, 18 insertions(+), 4 deletions(-)
+ target/arm/internals.h |  7 ++-----
+ target/arm/helper.c    | 14 ++++++++++++++
+ 2 files changed, 16 insertions(+), 5 deletions(-)
 
+diff --git a/target/arm/internals.h b/target/arm/internals.h
+index 516f9454e9b..cd8bc1ec3d4 100644
+--- a/target/arm/internals.h
++++ b/target/arm/internals.h
+@@ -286,11 +286,8 @@ static inline uint32_t syn_get_ec(uint32_t syn)
+ /* Utility functions for constructing various kinds of syndrome value.
+  * Note that in general we follow the AArch64 syndrome values; in a
+  * few cases the value in HSR for exceptions taken to AArch32 Hyp
+- * mode differs slightly, so if we ever implemented Hyp mode then the
+- * syndrome value would need some massaging on exception entry.
+- * (One example of this is that AArch64 defaults to IL bit set for
+- * exceptions which don't specifically indicate information about the
+- * trapping instruction, whereas AArch32 defaults to IL bit clear.)
++ * mode differs slightly, and we fix this up when populating HSR in
++ * arm_cpu_do_interrupt_aarch32_hyp().
+  */
+ static inline uint32_t syn_uncategorized(void)
+ {
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 84b40031b6f..65e431e03b3 100644
+index 0b89804961b..0b659171b07 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -1328,12 +1328,26 @@ static uint64_t isr_read(CPUARMState *env, const ARMCPRegInfo *ri)
-     CPUState *cs = ENV_GET_CPU(env);
-     uint64_t ret = 0;
+@@ -8299,6 +8299,20 @@ static void arm_cpu_do_interrupt_aarch32_hyp(CPUState *cs)
+     }
  
--    if (cs->interrupt_request & CPU_INTERRUPT_HARD) {
--        ret |= CPSR_I;
-+    if (arm_hcr_el2_imo(env)) {
-+        if (cs->interrupt_request & CPU_INTERRUPT_VIRQ) {
-+            ret |= CPSR_I;
-+        }
-+    } else {
-+        if (cs->interrupt_request & CPU_INTERRUPT_HARD) {
-+            ret |= CPSR_I;
-+        }
-     }
--    if (cs->interrupt_request & CPU_INTERRUPT_FIQ) {
--        ret |= CPSR_F;
+     if (cs->exception_index != EXCP_IRQ && cs->exception_index != EXCP_FIQ) {
 +
-+    if (arm_hcr_el2_fmo(env)) {
-+        if (cs->interrupt_request & CPU_INTERRUPT_VFIQ) {
-+            ret |= CPSR_F;
++        if (!arm_feature(env, ARM_FEATURE_V8)) {
++            /*
++             * QEMU syndrome values are v8-style. v7 has the IL bit
++             * UNK/SBZP for "field not valid" cases, where v8 uses RES1.
++             * If this is a v7 CPU, squash the IL bit in those cases.
++             */
++            if (cs->exception_index == EXCP_PREFETCH_ABORT ||
++                (cs->exception_index == EXCP_DATA_ABORT &&
++                 !(env->exception.syndrome & ARM_EL_ISV)) ||
++                syn_get_ec(env->exception.syndrome) == EC_UNCATEGORIZED) {
++                env->exception.syndrome &= ~ARM_EL_IL;
++            }
 +        }
-+    } else {
-+        if (cs->interrupt_request & CPU_INTERRUPT_FIQ) {
-+            ret |= CPSR_F;
-+        }
+         env->cp15.esr_el[2] = env->exception.syndrome;
      }
-+
-     /* External aborts are not possible in QEMU so A bit is always clear */
-     return ret;
- }
+ 
 -- 
 2.19.0
