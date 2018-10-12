@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33725)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34228)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gAxMp-00069Z-30
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:20:35 -0400
+	(envelope-from <kraxel@redhat.com>) id 1gAxNw-0006q3-Dk
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:21:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gAxMk-0000xl-68
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:20:35 -0400
-Received: from mail-eopbgr710131.outbound.protection.outlook.com
-	([40.107.71.131]:10698
-	helo=NAM05-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1gAxMj-0000sG-TP
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:20:30 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Fri, 12 Oct 2018 13:20:22 +0000
-Message-ID: <BN6PR2201MB1251243FFA7380819EA36213C6E20@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <1539256947-22807-1-git-send-email-aleksandar.markovic@rt-rk.com>,
-	<1539256947-22807-4-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1539256947-22807-4-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4 03/22] elf: Add Mips_elf_abiflags_v0
- structure
+	(envelope-from <kraxel@redhat.com>) id 1gAxNs-0002Xv-4I
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:21:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34160)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gAxNr-0002X3-Tt
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:21:40 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3FDC7307D874
+	for <qemu-devel@nongnu.org>; Fri, 12 Oct 2018 13:21:39 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Fri, 12 Oct 2018 15:21:33 +0200
+Message-Id: <20181012132135.12313-2-kraxel@redhat.com>
+In-Reply-To: <20181012132135.12313-1-kraxel@redhat.com>
+References: <20181012132135.12313-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL 1/3] gtk: Don't vte_terminal_set_encoding() on
+ new VTE versions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,16 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, "laurent@vivier.eu" <laurent@vivier.eu>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-> From: Stefan Markovic <smarkovic@wavecomp.com>
->
-> Add Mips_elf_abiflags_v0 structure to elf.h. The source of information
-> is kernel header arch/mips/include/asm/elf.h.
->=20
-> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
-> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> ---
+From: Kevin Wolf <kwolf@redhat.com>
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>=
+The function vte_terminal_set_encoding() is deprecated since VTE 0.54,
+so stop calling it from that version on. This fixes a build error
+because of our use of warning flags [-Werror=deprecated-declarations].
+
+Fixes: https://bugs.launchpad.net/bugs/1794939
+Reported-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Message-id: 20181011153039.2324-1-kwolf@redhat.com
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ ui/gtk.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/ui/gtk.c b/ui/gtk.c
+index 3ddb5fe162..1d68276253 100644
+--- a/ui/gtk.c
++++ b/ui/gtk.c
+@@ -1951,13 +1951,15 @@ static GSList *gd_vc_vte_init(GtkDisplayState *s, VirtualConsole *vc,
+     g_signal_connect(vc->vte.terminal, "commit", G_CALLBACK(gd_vc_in), vc);
+ 
+     /* The documentation says that the default is UTF-8, but actually it is
+-     * 7-bit ASCII at least in VTE 0.38.
+-     */
++     * 7-bit ASCII at least in VTE 0.38. The function is deprecated since
++     * VTE 0.54 (only UTF-8 is supported now). */
++#if !VTE_CHECK_VERSION(0, 54, 0)
+ #if VTE_CHECK_VERSION(0, 38, 0)
+     vte_terminal_set_encoding(VTE_TERMINAL(vc->vte.terminal), "UTF-8", NULL);
+ #else
+     vte_terminal_set_encoding(VTE_TERMINAL(vc->vte.terminal), "UTF-8");
+ #endif
++#endif
+ 
+     vte_terminal_set_scrollback_lines(VTE_TERMINAL(vc->vte.terminal), -1);
+     vte_terminal_set_size(VTE_TERMINAL(vc->vte.terminal),
+-- 
+2.9.3
