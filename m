@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36482)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gAxUy-0004XT-H5
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:29:01 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1gAxVT-0004zG-9S
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:29:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gAxUv-0005VC-Ck
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:29:00 -0400
-Received: from mail-bn3nam04on070b.outbound.protection.outlook.com
-	([2a01:111:f400:fe4e::70b]:58848
-	helo=NAM04-BN3-obe.outbound.protection.outlook.com)
+	(envelope-from <amarkovic@wavecomp.com>) id 1gAxVP-0006R8-7J
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:29:31 -0400
+Received: from mail-by2nam03on0107.outbound.protection.outlook.com
+	([104.47.42.107]:13151
+	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1gAxUv-0005Tq-82
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:28:57 -0400
+	id 1gAxVO-0006JB-5o
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:29:27 -0400
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Fri, 12 Oct 2018 13:28:52 +0000
-Message-ID: <BN6PR2201MB1251B12CF7FC6CF63C3AA890C6E20@BN6PR2201MB1251.namprd22.prod.outlook.com>
+Date: Fri, 12 Oct 2018 13:29:19 +0000
+Message-ID: <BN6PR2201MB125184BFC1A36808078E33BEC6E20@BN6PR2201MB1251.namprd22.prod.outlook.com>
 References: <1539256947-22807-1-git-send-email-aleksandar.markovic@rt-rk.com>,
-	<1539256947-22807-6-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1539256947-22807-6-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1539256947-22807-7-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1539256947-22807-7-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4 05/22] target/mips: Add CPO PWField
+Subject: Re: [Qemu-devel] [PATCH v4 06/22] target/mips: Add CPO PWSize
  register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -37,8 +37,7 @@ Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, "richard.henderson@linaro.org
 
 > From: Yongbok Kim <yongbok.kim@mips.com>
 >=20
-> Add PWField register (CP0 Register 5, Select 6).
->=20
+> Add PWSize register (CP0 Register 5, Select 7).
 
 Please bump version_id and minimum_version_id of vmstate_mips_cpu in machin=
 e.c.
