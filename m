@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54395)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gB0Va-0007s5-Vl
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 12:41:51 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gB0Vd-0007uQ-LV
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 12:41:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gB0VV-0002ql-9o
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 12:41:50 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:45958 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gB0Vd-0002yK-01
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 12:41:53 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:46248 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gB0VV-0001ne-1t
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 12:41:45 -0400
+	id 1gB0Vc-0002wg-Ob
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 12:41:52 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Fri, 12 Oct 2018 18:39:10 +0200
-Message-Id: <1539362376-12010-3-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Fri, 12 Oct 2018 18:39:13 +0200
+Message-Id: <1539362376-12010-6-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1539362376-12010-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1539362376-12010-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v5 02/28] elf: Add MIPS_ABI_FP_XXX constants
+Subject: [Qemu-devel] [PATCH v5 05/28] linux-user: Add infrastructure for
+ handling MIPS-specific prctl()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,34 +30,34 @@ Cc: aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, 
 
 From: Stefan Markovic <smarkovic@wavecomp.com>
 
-Add MIPS_ABI_FP_XXX constants to elf.h. The source of information
-is kernel header arch/mips/include/asm/elf.h.
+Add infrastructure for handling MIPS-specific prctl(). This is,
+for now, just an empty placeholder. The real handling will be
+implemented in subsequent patches.
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- include/elf.h | 8 ++++++++
+ linux-user/syscall.c | 8 ++++++++
  1 file changed, 8 insertions(+)
 
-diff --git a/include/elf.h b/include/elf.h
-index decf210..eb5958d 100644
---- a/include/elf.h
-+++ b/include/elf.h
-@@ -87,6 +87,14 @@ typedef int64_t  Elf64_Sxword;
- #define EF_MIPS_MACH_LS3A     0x00a20000  /* ST Microelectronics Loongson 3A */
- #define EF_MIPS_MACH          0x00ff0000  /* EF_MIPS_MACH_xxx selection mask */
- 
-+#define MIPS_ABI_FP_ANY       0x0         /* FP ABI doesn't matter           */
-+#define MIPS_ABI_FP_DOUBLE    0x1         /* -mdouble-float                  */
-+#define MIPS_ABI_FP_SINGLE    0x2         /* -msingle-float                  */
-+#define MIPS_ABI_FP_SOFT      0x3         /* -msoft-float                    */
-+#define MIPS_ABI_FP_OLD_64    0x4         /* -mips32r2 -mfp64                */
-+#define MIPS_ABI_FP_XX        0x5         /* -mfpxx                          */
-+#define MIPS_ABI_FP_64        0x6         /* -mips32r2 -mfp64                */
-+#define MIPS_ABI_FP_64A       0x7         /* -mips32r2 -mfp64 -mno-odd-spreg */
- 
- /* These constants define the different elf file types */
- #define ET_NONE   0
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index ae3c0df..d2cc971 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -9347,6 +9347,14 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+             return ret;
+         }
+ #endif
++#ifdef TARGET_MIPS
++        case TARGET_PR_GET_FP_MODE:
++            /* TODO: Implement TARGET_PR_SET_FP_MODE handling.*/
++            return -TARGET_EINVAL;
++        case TARGET_PR_SET_FP_MODE:
++            /* TODO: Implement TARGET_PR_GET_FP_MODE handling.*/
++            return -TARGET_EINVAL;
++#endif /* MIPS */
+ #ifdef TARGET_AARCH64
+         case TARGET_PR_SVE_SET_VL:
+             /*
 -- 
 2.7.4
