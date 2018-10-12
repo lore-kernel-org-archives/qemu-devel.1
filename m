@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36166)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36482)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gAxTv-0003ge-2T
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:27:59 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1gAxUy-0004XT-H5
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:29:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gAxTp-0003q7-Jf
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:27:54 -0400
-Received: from mail-cys01nam02on0129.outbound.protection.outlook.com
-	([104.47.37.129]:52149
-	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
+	(envelope-from <amarkovic@wavecomp.com>) id 1gAxUv-0005VC-Ck
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:29:00 -0400
+Received: from mail-bn3nam04on070b.outbound.protection.outlook.com
+	([2a01:111:f400:fe4e::70b]:58848
+	helo=NAM04-BN3-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1gAxTp-0003oh-6G
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:27:49 -0400
+	id 1gAxUv-0005Tq-82
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:28:57 -0400
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Fri, 12 Oct 2018 13:27:44 +0000
-Message-ID: <BN6PR2201MB1251DFAF0C8F0C8C38C6B0B0C6E20@BN6PR2201MB1251.namprd22.prod.outlook.com>
+Date: Fri, 12 Oct 2018 13:28:52 +0000
+Message-ID: <BN6PR2201MB1251B12CF7FC6CF63C3AA890C6E20@BN6PR2201MB1251.namprd22.prod.outlook.com>
 References: <1539256947-22807-1-git-send-email-aleksandar.markovic@rt-rk.com>,
-	<1539256947-22807-5-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1539256947-22807-5-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1539256947-22807-6-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1539256947-22807-6-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4 04/22] target/mips: Add CPO PWBase
+Subject: Re: [Qemu-devel] [PATCH v4 05/22] target/mips: Add CPO PWField
  register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -37,20 +37,11 @@ Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, "richard.henderson@linaro.org
 
 > From: Yongbok Kim <yongbok.kim@mips.com>
 >=20
-> Add PWBase register (CP0 Register 5, Select 5).
+> Add PWField register (CP0 Register 5, Select 6).
 >=20
-> The PWBase register contains the Page Table Base virtual address.
->
-> This register is required for the hardware page walker feature. It
-> exists only if Config3 PW bit is set to 1.
->=20
-> Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
-> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> ---
 
-The only problem with this and subsequent register-related patches is that
-they do not bump version_id and minimum_version_id of vmstate_mips_cpu
-in machine.c, and they should.
+Please bump version_id and minimum_version_id of vmstate_mips_cpu in machin=
+e.c.
 
 Other than this:
 
