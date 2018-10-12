@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42340)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48075)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gAzda-0002LH-SP
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 11:46:04 -0400
+	(envelope-from <alistair23@gmail.com>) id 1gB03a-0001E8-Lo
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 12:12:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gAzdZ-0002dx-Ja
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 11:46:02 -0400
-Received: from mail-oi1-x232.google.com ([2607:f8b0:4864:20::232]:35995)
+	(envelope-from <alistair23@gmail.com>) id 1gB03Z-0002j4-V7
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 12:12:54 -0400
+Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:41576)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gAzdZ-0002aP-6W
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 11:46:01 -0400
-Received: by mail-oi1-x232.google.com with SMTP id p125-v6so10204996oic.3
-	for <qemu-devel@nongnu.org>; Fri, 12 Oct 2018 08:45:59 -0700 (PDT)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1gB03X-0002cy-OC
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 12:12:53 -0400
+Received: by mail-lf1-x142.google.com with SMTP id q39-v6so9703550lfi.8
+	for <qemu-devel@nongnu.org>; Fri, 12 Oct 2018 09:12:49 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20181012123851.30856-1-kraxel@redhat.com>
-References: <20181012123851.30856-1-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 12 Oct 2018 16:45:37 +0100
-Message-ID: <CAFEAcA_fibacs0NzpMX-wtcTw2GnqNuGE1kBLeXznBq7nks4hQ@mail.gmail.com>
+References: <cover.1538683492.git.alistair.francis@wdc.com>
+	<5dd21056229d12a1af8d65e9208f4de43ba4a2ae.camel@redhat.com>
+	<892d54c5-2851-74ec-bdf2-286c1665c44f@gmail.com>
+	<7d54ec114745b00b82601875416ccfe6a5f9fe6f.camel@redhat.com>
+	<CAKmqyKNTTu+5KyTMBHw5-+UMa7qnm9EaowxHj8NLxED98m1MKw@mail.gmail.com>
+	<d9e6d7979143130092b5b96602885c1acaca9b52.camel@redhat.com>
+In-Reply-To: <d9e6d7979143130092b5b96602885c1acaca9b52.camel@redhat.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 12 Oct 2018 09:12:21 -0700
+Message-ID: <CAKmqyKMTzYswJ74WEOQAQrisCdMDQ9Nf6NMEdUKLcUMCN7XLgg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/5] Vga 20181012 patches
+Subject: Re: [Qemu-devel] [PATCH v5 0/5] Connect a PCIe host and graphics
+ support to RISC-V
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,76 +34,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Andrea Bolognani <abologna@redhat.com>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, stephen@eideticom.com, "Richard W.M. Jones" <rjones@redhat.com>
 
-On 12 October 2018 at 13:38, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> The following changes since commit 75e50c80e051423a6f55a34ee4a1eec842444a5b:
+On Fri, Oct 12, 2018 at 6:46 AM Andrea Bolognani <abologna@redhat.com> wrote:
 >
->   Merge remote-tracking branch 'remotes/armbru/tags/pull-misc-2018-10-10' into staging (2018-10-11 10:43:37 +0100)
+> On Thu, 2018-10-11 at 10:40 -0700, Alistair Francis wrote:
+> > On Wed, Oct 10, 2018 at 11:00 PM Andrea Bolognani <abologna@redhat.com> wrote:
+> > > The gpex-pcihost device was introduced at the same time as
+> > > aarch64/virt gained PCI support, so we can probe the binary[1] and,
+> > > if the device is present, we know that aarch64/virt guests will be
+> > > able to use PCI. We cannot do the same for RISC-V for obvious
+> > > reasons: the device is already there :)
+> >
+> > The device shouldn't exist in the RISC-V QEMU binary though until
+> > after this patch series. So it should have the same effect.
 >
-> are available in the git repository at:
+> Duh! I just checked and *of course* you're right!
 >
->   git://git.kraxel.org/qemu tags/vga-20181012-pull-request
+> Problem solved then :)
+
+Does that mean you have it working?
+
+Alistair
+
 >
-> for you to fetch changes up to b398f03c60bb5739ae68c161c315c7cce8ef2fde:
+> --
+> Andrea Bolognani / Red Hat / Virtualization
 >
->   hw/display/cirrus_vga: Move "isa-cirrus-vga" device into a separate file (2018-10-12 13:50:38 +0200)
->
-> ----------------------------------------------------------------
-> vga: config tweaks, edid updates, qxl bugfix.
->
-> ----------------------------------------------------------------
->
-> Gerd Hoffmann (4):
->   display: add separate config option for bochs-display
->   bochs-display: wire up edid support
->   qxl: check qxl_phys2virt return value
->   i2c: switch ddc to use the new edid generator
->
-> Thomas Huth (1):
->   hw/display/cirrus_vga: Move "isa-cirrus-vga" device into a separate
->     file
-
-Hi. This generates new clang runtime sanitizer errors:
-
-QTEST_QEMU_BINARY=sh4-softmmu/qemu-system-sh4 QTEST_QEMU_IMG=qemu-img
-MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
-gtester -k --verbose -m=quick tests/endianness-test tests/qmp-test
-tests/qmp-cmd-test tests/device-introspect-test tests/cdrom-test
-tests/machine-none-test tests/qom-test tests/test-hmp
-TEST: tests/endianness-test... (pid=19412)
-  /sh4/endianness/r2d:
-/home/petmay01/linaro/qemu-for-merges/hw/display/edid-generate.c:226:5:
-runtime error: store to misaligned address 0x55bc89d7cffe for type
-'uint32_t' (aka 'unsigned int'), which requires 4 byte alignment
-0x55bc89d7cffe: note: pointer points here
- 00 00 00 00 00 00  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-00 00 00 00 00 00 00 00  00 00
-             ^
-
-which are caused by this line in edid_desc_timing():
-
-    *(uint32_t *)(desc) = cpu_to_le32(clock / 10000);
-
-Casting to some pointer type like this is almost never right;
-you want instead to just use one of our existing utility
-functions for "store to arbitrary memory with correct
-endianness and handling alignment". In this case that's
-    stl_le_p(desc, clock / 10000);
-
-This also failed to pass 'make check' on SPARC with lots of
-bus errors, which are almost certainly the same misaligned
-access problem.
-
-There seem to be other instances of the problem in the
-same file, eg
-    *(uint16_t *)(edid +  8) = cpu_to_be16(vendor_id);
-    *(uint16_t *)(edid + 10) = cpu_to_le16(model_nr);
-    *(uint32_t *)(edid + 12) = cpu_to_le32(serial_nr);
-
-
-Could you fix all these and resubmit, please?
-
-thanks
--- PMM
