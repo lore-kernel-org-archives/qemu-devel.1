@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38101)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39635)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gB585-0004EE-99
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 17:37:54 -0400
+	(envelope-from <philmd@redhat.com>) id 1gB5F0-0005TZ-OI
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 17:45:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gB581-0006Wb-5U
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 17:37:53 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:45186)
+	(envelope-from <philmd@redhat.com>) id 1gB5Ex-0005Cx-Gz
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 17:45:02 -0400
+Received: from mail-wr1-f53.google.com ([209.85.221.53]:41835)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gB57z-0006Uq-VU
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 17:37:48 -0400
-Received: by mail-wr1-f68.google.com with SMTP id q5-v6so14839645wrw.12
-	for <qemu-devel@nongnu.org>; Fri, 12 Oct 2018 14:37:46 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gB5Ex-0005CT-9J
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 17:44:59 -0400
+Received: by mail-wr1-f53.google.com with SMTP id x12-v6so14834185wru.8
+	for <qemu-devel@nongnu.org>; Fri, 12 Oct 2018 14:44:59 -0700 (PDT)
 References: <20181012165347.2117-1-crosa@redhat.com>
-	<20181012165347.2117-3-crosa@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <04621063-c4ff-2955-f8d5-2e86a73f2e1f@redhat.com>
-Date: Fri, 12 Oct 2018 23:37:43 +0200
+Message-ID: <ec6694c9-a8f0-7a9d-ee04-224a1f67e67c@redhat.com>
+Date: Fri, 12 Oct 2018 23:44:55 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181012165347.2117-3-crosa@redhat.com>
+In-Reply-To: <20181012165347.2117-1-crosa@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 2/3] Acceptance tests: add make rule for
- running them
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 0/3] Bootstrap Python venv and
+ acceptance/functional tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,154 +34,133 @@ To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
 Cc: Laszlo Ersek <lersek@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Caio Carrara <ccarrara@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <pmathieu@redhat.com>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
 On 12/10/2018 18:53, Cleber Rosa wrote:
-> The acceptance (aka functional, aka Avocado-based) tests are
-> Python files located in "tests/acceptance" that need to be run
-> with the Avocado libs and test runner.
+> TL;DR
+> =====
 > 
-> Let's provide a convenient way for QEMU developers to run them,
-> by making use of the tests-venv with the required setup.
+> Allow acceptance tests to be run with `make check-acceptance`.
 > 
-> Also, while the Avocado test runner will take care of creating a
-> location to save test results to, it was understood that it's better
-> if the results are kept within the build tree.
+> Details
+> =======
 > 
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> ---
+> This introduces a Python virtual environment that will be setup within
+> the QEMU build directory, that will contain the exact environment that
+> tests may require.
+> 
+> There's one current caveat: it requires Python 3, as it's based on the
+> venv module.  This was based on some discussions and perception about
+> standardizing on Python 3, but can easily be made to accommodate Python
+> 2 as well.
+> 
+> Example of bootstrap and test execution on Travis-CI:
+> 
+> https://travis-ci.org/qemu/qemu/jobs/439331028#L2508
+
+If you activate Travis on your github account, you can test that in your
+namespace without having to open zombie pull requests there... A simple
+push to your repository will trigger a full Travis build.
+
+This is how I use it btw, canceling the jobs I'm not interested in, to
+quickly run the others.
+i.e. https://travis-ci.org/philmd/qemu/jobs/439573299#L5600
+
+> 
+>    ...
+>       VENV    /home/travis/build/qemu/qemu/tests/venv
+>       MKDIR   /home/travis/build/qemu/qemu/tests/results
+>       PIP     /home/travis/build/qemu/qemu/tests/venv-requirements.txt
+>       AVOCADO tests/acceptance
+>     JOB ID     : 920e4fcf55a1782f1ae77bee64b20ccdc2e1111d
+>     JOB LOG    : /home/travis/build/qemu/qemu/tests/results/job-2018-10-09T21.42-920e4fc/job.log
+>      (1/6) /home/travis/build/qemu/qemu/tests/acceptance/boot_linux_console.py:BootLinuxConsole.test:  PASS (3.57 s)
+>      (2/6) /home/travis/build/qemu/qemu/tests/acceptance/version.py:Version.test_qmp_human_info_version:  PASS (0.04 s)
+>      (3/6) /home/travis/build/qemu/qemu/tests/acceptance/vnc.py:Vnc.test_no_vnc:  PASS (0.04 s)
+>      (4/6) /home/travis/build/qemu/qemu/tests/acceptance/vnc.py:Vnc.test_no_vnc_change_password:  PASS (0.04 s)
+>      (5/6) /home/travis/build/qemu/qemu/tests/acceptance/vnc.py:Vnc.test_vnc_change_password_requires_a_password:  PASS (0.04 s)
+>      (6/6) /home/travis/build/qemu/qemu/tests/acceptance/vnc.py:Vnc.test_vnc_change_password:  PASS (0.04 s)
+>     RESULTS    : PASS 6 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | CANCEL 0
+>     JOB TIME   : 3.90 s
+>    ...
+> 
+> Changes from v3:
+> ================
+> 
+>  * Fixed typo in commit message (s/requiment/requirement/).  (Eric)
+> 
+> Changes from v2:
+> ================
+> 
+>  * Make the $(TESTS_VENV_DIR) target depend on the
+>    venv-requirements.txt file, and touch $(TESTS_VENV_DIR) after venv
+>    runs.  With this, updates on the file are reflected on the
+>    venv. (Philippe)
+> 
+>  * Run pip with "python -m pip".  It may have been installed reusing
+>    the system wide packages, and then the script may not be available
+>    on the venv. (Philippe)
+> 
+>  * Dropped Python version on Travis, and using the version supplied
+>    by the distro (3.4). (Philippe)
+> 
+>  * Added "python3.4-venv" package requirement on Travis. (Philippe)
+> 
+>  * Added variable (AVOCADO_SHOW) with logging streams to be shown
+>    while running the acceptance tests.  By default it's set to none,
+>    the equivalent of the quiet mode used on previous versions.
+>    (Philippe)
+> 
+>  * On Travis, set the AVOCADO_SHOW variable to "app", so that the
+>    individual test results can be easily seen.  (Philippe)
+> 
+> Ideas discussed, but not implemented:
+> 
+>   * Run pip with "$(PYTHON) -m pip -q install ..." because it points
+>     to the system wide Python installation. (Philippe)
+> 
+>   * Drop the "--system-site-packages" flag.  Waiting on another round
+>     of tests to determine if they are really the cause of some package
+>     installation problems.
+> 
+> Changes from v1:
+> ================
+> 
+>  * TESTS_VENV_REQ (the path of "venv-requirements.txt") now points to
+>    the source path ($SRC_PATH instead of $BUILD_DIR)
+> 
+>  * Create the venv with "--system-site-packages", which allows the
+>    reuse of packages (and no additional downloads) in case there's a
+>    package installed system wide providing the same package and
+>    version.
+> 
+>  * Run Avocado with "python -m avocado".  It may have been installed
+>    reusing the system wide packages, and then the script may not
+>    be available on the venv.
+> 
+>  * Improved documentation describing the Python 3, venv and pip
+>    requirements.
+> 
+>  * Updated avocado-framework requirement to latest released version
+>    (65.0)
+> 
+>  * (New commit) Added support for running the acceptance tests on
+>    Travis.
+> 
+> Ideas discussed, but not implemented:
+> 
+>  * Install external packages such as python3-pip on Debian based
+>    systems, deemed too invasive on developer's systems.
+> 
+>  * Allow the use of Python 2, and consequently the "virtualenv"
+>    module.
+> 
+> Cleber Rosa (3):
+>   Bootstrap Python venv for tests
+>   Acceptance tests: add make rule for running them
+>   Travis support for the acceptance tests
+> 
+>  .travis.yml                 |  5 +++++
 >  docs/devel/testing.rst      | 35 ++++++++++++++++++++++++++++++-----
->  tests/Makefile.include      | 21 +++++++++++++++++++--
->  tests/venv-requirements.txt |  1 +
->  3 files changed, 50 insertions(+), 7 deletions(-)
+>  tests/Makefile.include      | 37 +++++++++++++++++++++++++++++++++++++
+>  tests/venv-requirements.txt |  4 ++++
+>  4 files changed, 76 insertions(+), 5 deletions(-)
+>  create mode 100644 tests/venv-requirements.txt
 > 
-> diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
-> index 727c4019b5..b992a2961d 100644
-> --- a/docs/devel/testing.rst
-> +++ b/docs/devel/testing.rst
-> @@ -545,10 +545,31 @@ Tests based on ``avocado_qemu.Test`` can easily:
->     - http://avocado-framework.readthedocs.io/en/latest/api/test/avocado.html#avocado.Test
->     - http://avocado-framework.readthedocs.io/en/latest/api/utils/avocado.utils.html
->  
-> -Installation
-> -------------
-> +Running tests
-> +-------------
->  
-> -To install Avocado and its dependencies, run:
-> +You can run the acceptance tests simply by executing:
-> +
-> +.. code::
-> +
-> +  make check-acceptance
-> +
-> +This involves the automatic creation of Python virtual environment
-> +within the build tree (at ``tests/venv``) which will have all the
-> +right dependencies, and will save tests results also within the
-> +build tree (at ``tests/results``).
-
-Missing: how to activate the virtualenv.
-
-> +
-> +Note: the build environment must be using a Python 3 stack, and have
-> +the ``venv`` and ``pip`` packages installed.  If necessary, make sure
-> +``configure`` is called with ``--python=`` and that those modules are
-> +available.  On Debian and Ubuntu based systems, depending on the
-> +specific version, they may be on packages named ``python3-venv`` and
-> +``python3-pip``.
-> +
-> +Manual Installation
-> +-------------------
-> +
-> +To manually install Avocado and its dependencies, run:
->  
->  .. code::
->  
-> @@ -689,11 +710,15 @@ The exact QEMU binary to be used on QEMUMachine.
->  Uninstalling Avocado
->  --------------------
->  
-> -If you've followed the installation instructions above, you can easily
-> -uninstall Avocado.  Start by listing the packages you have installed::
-> +If you've followed the manual installation instructions above, you can
-> +easily uninstall Avocado.  Start by listing the packages you have
-> +installed::
->  
->    pip list --user
->  
->  And remove any package you want with::
->  
->    pip uninstall <package_name>
-> +
-> +If you've used ``make check-acceptance``, the Python virtual environment where
-> +Avocado is installed will be cleaned up as part of ``make check-clean``.
-
-Add a line about deactivating the venv?
-
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index b66180efa1..75547fc947 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -11,6 +11,7 @@ check-help:
->  	@echo " $(MAKE) check-qapi-schema    Run QAPI schema tests"
->  	@echo " $(MAKE) check-block          Run block tests"
->  	@echo " $(MAKE) check-tcg            Run TCG tests"
-> +	@echo " $(MAKE) check-acceptance     Run all acceptance (functional) tests"
->  	@echo " $(MAKE) check-report.html    Generates an HTML test report"
->  	@echo " $(MAKE) check-venv           Creates a Python venv for tests"
->  	@echo " $(MAKE) check-clean          Clean the tests"
-> @@ -1020,10 +1021,15 @@ check-decodetree:
->  
->  # Python venv for running tests
->  
-> -.PHONY: check-venv
-> +.PHONY: check-venv check-acceptance
->  
->  TESTS_VENV_DIR=$(BUILD_DIR)/tests/venv
->  TESTS_VENV_REQ=$(SRC_PATH)/tests/venv-requirements.txt
-> +TESTS_RESULTS_DIR=$(BUILD_DIR)/tests/results
-> +# Controls the output generated by Avocado when running tests.
-> +# Any number of command separated loggers are accepted.  For more
-> +# information please refer to "avocado --help".
-> +AVOCADO_SHOW=none
->  
->  $(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
->  	$(call quiet-command, \
-> @@ -1034,8 +1040,19 @@ $(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
->              PIP, $(TESTS_VENV_REQ))
->  	$(call quiet-command, touch $@)
->  
-> +$(TESTS_RESULTS_DIR):
-> +	$(call quiet-command, mkdir -p $@, \
-> +            MKDIR, $@)
-> +
->  check-venv: $(TESTS_VENV_DIR)
->  
-> +check-acceptance: check-venv $(TESTS_RESULTS_DIR)
-> +	$(call quiet-command, \
-> +            $(TESTS_VENV_DIR)/bin/python -m avocado \
-> +            --show=$(AVOCADO_SHOW) run --job-results-dir=$(TESTS_RESULTS_DIR) \
-> +            --failfast=on $(SRC_PATH)/tests/acceptance, \
-> +            "AVOCADO", "tests/acceptance")
-> +
->  # Consolidated targets
->  
->  .PHONY: check-qapi-schema check-qtest check-unit check check-clean
-> @@ -1049,7 +1066,7 @@ check-clean:
->  	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
->  	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y)) $(check-qtest-generic-y))
->  	rm -f tests/test-qapi-gen-timestamp
-> -	rm -rf $(TESTS_VENV_DIR)
-> +	rm -rf $(TESTS_VENV_DIR) $(TESTS_RESULTS_DIR)
->  
->  clean: check-clean
->  
-> diff --git a/tests/venv-requirements.txt b/tests/venv-requirements.txt
-> index d39f9d1576..64c6e27a94 100644
-> --- a/tests/venv-requirements.txt
-> +++ b/tests/venv-requirements.txt
-> @@ -1,3 +1,4 @@
->  # Add Python module requirements, one per line, to be installed
->  # in the tests/venv Python virtual environment. For more info,
->  # refer to: https://pip.pypa.io/en/stable/user_guide/#id1
-> +avocado-framework==65.0
-> 
-
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
