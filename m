@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36104)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36166)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gAxTk-0003Yz-Un
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:27:45 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1gAxTv-0003ge-2T
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:27:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gAxTj-0003i5-TD
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:27:44 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:43648)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gAxTj-0003h9-F5
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:27:43 -0400
-Received: by mail-oi1-x244.google.com with SMTP id s69-v6so9830099oie.10
-	for <qemu-devel@nongnu.org>; Fri, 12 Oct 2018 06:27:43 -0700 (PDT)
+	(envelope-from <amarkovic@wavecomp.com>) id 1gAxTp-0003q7-Jf
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:27:54 -0400
+Received: from mail-cys01nam02on0129.outbound.protection.outlook.com
+	([104.47.37.129]:52149
+	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1gAxTp-0003oh-6G
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:27:49 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Fri, 12 Oct 2018 13:27:44 +0000
+Message-ID: <BN6PR2201MB1251DFAF0C8F0C8C38C6B0B0C6E20@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <1539256947-22807-1-git-send-email-aleksandar.markovic@rt-rk.com>,
+	<1539256947-22807-5-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1539256947-22807-5-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <d8b39811-4584-f05c-6f6d-6e8c8cd8ac3f@greensocs.com>
-References: <20181002142443.30976-1-damien.hedde@greensocs.com>
-	<20181002142443.30976-8-damien.hedde@greensocs.com>
-	<7621d3ab-7cfe-0dca-bc0e-dad913052b25@redhat.com>
-	<d8b39811-4584-f05c-6f6d-6e8c8cd8ac3f@greensocs.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 12 Oct 2018 14:27:22 +0100
-Message-ID: <CAFEAcA-=pUuPg4u9wQgmh=YemSdbqO7moSH5ZcjRcBx+oQLzaA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 7/9] hw/misc/zynq_slcr: add clock
- generation for uarts
+Subject: Re: [Qemu-devel] [PATCH v4 04/22] target/mips: Add CPO PWBase
+ register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,21 +32,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Damien Hedde <damien.hedde@greensocs.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, Alistair Francis <alistair@alistair23.me>, Mark Burton <mark.burton@greensocs.com>, Sai Pavan Boddu <saipava@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, konrad@adacore.com, Luc Michel <luc.michel@greensocs.com>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, "laurent@vivier.eu" <laurent@vivier.eu>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>
 
-On 12 October 2018 at 14:24, Damien Hedde <damien.hedde@greensocs.com> wrote:
-> I'm wondering if in such a case (a fixed frequency base clock), we
-> should have a way to change the frequency through command line ? (In
-> order to start the machine with, for example, a 50MHz base clock).
-> But I don't know what's the right way to do it and if it needs some kind
-> of special support in the clock object or in the machine object, like a
-> frequency property.
+> From: Yongbok Kim <yongbok.kim@mips.com>
+>=20
+> Add PWBase register (CP0 Register 5, Select 5).
+>=20
+> The PWBase register contains the Page Table Base virtual address.
+>
+> This register is required for the hardware page walker feature. It
+> exists only if Config3 PW bit is set to 1.
+>=20
+> Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> ---
 
-New command line arguments are a complexity you don't want to get in to.
-Just have the board model the frequency at whatever it typically is.
-It seems vanishingly rare that a user would really care to model the
-board frequency as something different.
+The only problem with this and subsequent register-related patches is that
+they do not bump version_id and minimum_version_id of vmstate_mips_cpu
+in machine.c, and they should.
 
-thanks
--- PMM
+Other than this:
+
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>=
