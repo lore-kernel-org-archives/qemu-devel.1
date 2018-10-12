@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49333)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gAwjM-0007UI-Rr
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 08:39:51 -0400
+	(envelope-from <philmd@redhat.com>) id 1gAwmJ-0001Sy-R9
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 08:42:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gAwjM-0000HP-3y
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 08:39:48 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:41190)
+	(envelope-from <philmd@redhat.com>) id 1gAwmE-0004VA-RU
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 08:42:51 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:36461)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gAwjL-0000Gs-LP
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 08:39:48 -0400
-Received: by mail-oi1-x244.google.com with SMTP id l197-v6so9729467oib.8
-	for <qemu-devel@nongnu.org>; Fri, 12 Oct 2018 05:39:47 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gAwmE-0004Sl-JB
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 08:42:46 -0400
+Received: by mail-wm1-f66.google.com with SMTP id a8-v6so12754187wmf.1
+	for <qemu-devel@nongnu.org>; Fri, 12 Oct 2018 05:42:46 -0700 (PDT)
+References: <20181012115013.29555-1-fli@suse.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <5feafdb1-9590-0077-31e7-6e95725cbdd0@redhat.com>
+Date: Fri, 12 Oct 2018 14:42:43 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181012100101.29058-1-cohuck@redhat.com>
-References: <20181012100101.29058-1-cohuck@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 12 Oct 2018 13:39:26 +0100
-Message-ID: <CAFEAcA_=2uB7SXQONWJvBX-ziB2m8fqzpbh_=zdaOhB4wW4s6Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/8] s390x updates
+In-Reply-To: <20181012115013.29555-1-fli@suse.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] ui/vnc.c: polish vnc_init_func
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +29,192 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Fei Li <fli@suse.com>, qemu-devel@nongnu.org, armbru@redhat.com
 
-On 12 October 2018 at 11:00, Cornelia Huck <cohuck@redhat.com> wrote:
-> The following changes since commit 75e50c80e051423a6f55a34ee4a1eec842444a5b:
->
->   Merge remote-tracking branch 'remotes/armbru/tags/pull-misc-2018-10-10' into staging (2018-10-11 10:43:37 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/cohuck/qemu tags/s390x-20181012
->
-> for you to fetch changes up to 0161215d435ef5680c4623bcbdfe89ce5b35cf42:
->
->   hw/s390x: Include the tod-qemu also for builds with --disable-tcg (2018-10-12 11:32:19 +0200)
->
-> ----------------------------------------------------------------
-> More s390x updates:
-> - introduce support for vfio-ap (s390 crypto devices), including a
->   Linux headers update to get the new interfaces
-> - the usual fixing + cleanup
->
-> ----------------------------------------------------------------
+Hi Fei,
 
-Applied, thanks.
+On 12/10/2018 13:50, Fei Li wrote:
+> Add a new Error parameter for vnc_display_init() to handle errors
+> in its caller: vnc_init_func(), just like vnc_display_open() does.
+> And let its callees propagate the Error, like init_keyboard_layout().
+> 
+> Signed-off-by: Fei Li <fli@suse.com>
+> ---
+>  include/ui/console.h |  2 +-
+>  ui/curses.c          |  4 +++-
+>  ui/keymaps.c         | 11 ++++++-----
+>  ui/keymaps.h         |  2 +-
+>  ui/sdl.c             |  4 +++-
+>  ui/vnc.c             | 16 +++++++++++-----
+>  6 files changed, 25 insertions(+), 14 deletions(-)
+> 
+> diff --git a/include/ui/console.h b/include/ui/console.h
+> index fb969caf70..c17803c530 100644
+> --- a/include/ui/console.h
+> +++ b/include/ui/console.h
+> @@ -453,7 +453,7 @@ void qemu_display_early_init(DisplayOptions *opts);
+>  void qemu_display_init(DisplayState *ds, DisplayOptions *opts);
+>  
+>  /* vnc.c */
+> -void vnc_display_init(const char *id);
+> +void vnc_display_init(const char *id, Error **errp);
+>  void vnc_display_open(const char *id, Error **errp);
+>  void vnc_display_add_client(const char *id, int csock, bool skipauth);
+>  int vnc_display_password(const char *id, const char *password);
+> diff --git a/ui/curses.c b/ui/curses.c
+> index 59d819fd4d..60c0962334 100644
+> --- a/ui/curses.c
+> +++ b/ui/curses.c
+> @@ -28,6 +28,7 @@
+>  #include <termios.h>
+>  #endif
+>  
+> +#include "qapi/error.h"
+>  #include "qemu-common.h"
+>  #include "ui/console.h"
+>  #include "ui/input.h"
+> @@ -421,7 +422,8 @@ static void curses_keyboard_setup(void)
+>          keyboard_layout = "en-us";
+>  #endif
+>      if(keyboard_layout) {
+> -        kbd_layout = init_keyboard_layout(name2keysym, keyboard_layout);
+> +        kbd_layout = init_keyboard_layout(name2keysym, keyboard_layout,
+> +                                          &error_fatal);
+>          if (!kbd_layout)
+>              exit(1);
 
--- PMM
+So you can now remove those 2 lines.
+
+>      }
+> diff --git a/ui/keymaps.c b/ui/keymaps.c
+> index 43fe604724..52d432e856 100644
+> --- a/ui/keymaps.c
+> +++ b/ui/keymaps.c
+> @@ -27,6 +27,7 @@
+>  #include "sysemu/sysemu.h"
+>  #include "trace.h"
+>  #include "qemu/error-report.h"
+> +#include "qapi/error.h"
+>  
+>  struct keysym2code {
+>      uint32_t count;
+> @@ -81,7 +82,7 @@ static void add_keysym(char *line, int keysym, int keycode, kbd_layout_t *k)
+>  
+>  static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
+>                                             const char *language,
+> -                                           kbd_layout_t *k)
+> +                                           kbd_layout_t *k, Error **errp)
+>  {
+>      FILE *f;
+>      char * filename;
+> @@ -94,7 +95,7 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
+>      f = filename ? fopen(filename, "r") : NULL;
+>      g_free(filename);
+>      if (!f) {
+> -        fprintf(stderr, "Could not read keymap file: '%s'\n", language);
+> +        error_setg(errp, "could not read keymap file: '%s'", language);
+>          return NULL;
+>      }
+>  
+> @@ -118,7 +119,7 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
+>              continue;
+>          }
+>          if (!strncmp(line, "include ", 8)) {
+> -            parse_keyboard_layout(table, line + 8, k);
+> +            parse_keyboard_layout(table, line + 8, k, errp);
+>          } else {
+>              int offset = 0;
+>              while (line[offset] != 0 &&
+> @@ -170,9 +171,9 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
+>  
+>  
+>  kbd_layout_t *init_keyboard_layout(const name2keysym_t *table,
+> -                                   const char *language)
+> +                                   const char *language, Error **errp)
+>  {
+> -    return parse_keyboard_layout(table, language, NULL);
+> +    return parse_keyboard_layout(table, language, NULL, errp);
+>  }
+>  
+>  
+> diff --git a/ui/keymaps.h b/ui/keymaps.h
+> index 0693588225..98213a4191 100644
+> --- a/ui/keymaps.h
+> +++ b/ui/keymaps.h
+> @@ -53,7 +53,7 @@ typedef struct {
+>  typedef struct kbd_layout_t kbd_layout_t;
+>  
+>  kbd_layout_t *init_keyboard_layout(const name2keysym_t *table,
+> -                                   const char *language);
+> +                                   const char *language, Error **errp);
+>  int keysym2scancode(kbd_layout_t *k, int keysym,
+>                      bool shift, bool altgr, bool ctrl);
+>  int keycode_is_keypad(kbd_layout_t *k, int keycode);
+> diff --git a/ui/sdl.c b/ui/sdl.c
+> index a5fd503c25..b33df70f4d 100644
+> --- a/ui/sdl.c
+> +++ b/ui/sdl.c
+> @@ -29,6 +29,7 @@
+>  #include <SDL.h>
+>  #include <SDL_syswm.h>
+>  
+> +#include "qapi/error.h"
+>  #include "qemu-common.h"
+>  #include "qemu/cutils.h"
+>  #include "ui/console.h"
+> @@ -917,7 +918,8 @@ static void sdl1_display_init(DisplayState *ds, DisplayOptions *o)
+>          keyboard_layout = "en-us";
+>  #endif
+>      if(keyboard_layout) {
+> -        kbd_layout = init_keyboard_layout(name2keysym, keyboard_layout);
+> +        kbd_layout = init_keyboard_layout(name2keysym, keyboard_layout,
+> +                                          &error_fatal);
+>          if (!kbd_layout)
+>              exit(1);
+>      }
+> diff --git a/ui/vnc.c b/ui/vnc.c
+> index cf221c83cc..03c70b16f6 100644
+> --- a/ui/vnc.c
+> +++ b/ui/vnc.c
+> @@ -3205,7 +3205,7 @@ static const DisplayChangeListenerOps dcl_ops = {
+>      .dpy_cursor_define    = vnc_dpy_cursor_define,
+>  };
+>  
+> -void vnc_display_init(const char *id)
+> +void vnc_display_init(const char *id, Error **errp)
+>  {
+>      VncDisplay *vd;
+>  
+> @@ -3222,13 +3222,14 @@ void vnc_display_init(const char *id)
+>  
+>      if (keyboard_layout) {
+>          trace_vnc_key_map_init(keyboard_layout);
+> -        vd->kbd_layout = init_keyboard_layout(name2keysym, keyboard_layout);
+> +        vd->kbd_layout = init_keyboard_layout(name2keysym,
+> +                                              keyboard_layout, errp);
+>      } else {
+> -        vd->kbd_layout = init_keyboard_layout(name2keysym, "en-us");
+> +        vd->kbd_layout = init_keyboard_layout(name2keysym, "en-us", errp);
+>      }
+>  
+>      if (!vd->kbd_layout) {
+> -        exit(1);
+> +        return;
+>      }
+>  
+>      vd->share_policy = VNC_SHARE_POLICY_ALLOW_EXCLUSIVE;
+> @@ -4079,7 +4080,12 @@ int vnc_init_func(void *opaque, QemuOpts *opts, Error **errp)
+>      char *id = (char *)qemu_opts_id(opts);
+>  
+>      assert(id);
+> -    vnc_display_init(id);
+> +    vnc_display_init(id, &local_err);
+> +    if (local_err) {
+> +        error_prepend(&local_err, "Failed to init VNC server: ");
+> +        error_propagate(errp, local_err);
+> +        return -1;
+> +    }
+>      vnc_display_open(id, &local_err);
+>      if (local_err != NULL) {
+>          error_reportf_err(local_err, "Failed to start VNC server: ");
+> 
