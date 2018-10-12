@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42966)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gB1RY-0001SU-B3
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 13:41:45 -0400
+	(envelope-from <alistair23@gmail.com>) id 1gB1cF-0001TT-Cg
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 13:52:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gB1RV-0000V6-4W
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 13:41:44 -0400
-Received: from mail-pf1-x429.google.com ([2607:f8b0:4864:20::429]:35520)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gB1RU-0000Qd-Id
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 13:41:40 -0400
-Received: by mail-pf1-x429.google.com with SMTP id l17-v6so6553436pff.2
-	for <qemu-devel@nongnu.org>; Fri, 12 Oct 2018 10:41:37 -0700 (PDT)
-References: <20181012032431.32693-1-david@gibson.dropbear.id.au>
-	<20181012032431.32693-2-david@gibson.dropbear.id.au>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <364642df-1e17-dbea-1cec-a5cf6c606b27@linaro.org>
-Date: Fri, 12 Oct 2018 10:41:33 -0700
+	(envelope-from <alistair23@gmail.com>) id 1gB1cE-00010n-8U
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 13:52:47 -0400
 MIME-Version: 1.0
-In-Reply-To: <20181012032431.32693-2-david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 1/5] virtio-balloon: Remove unnecessary
- MADV_WILLNEED on deflate
+References: <20181011021931.4249-1-edgar.iglesias@gmail.com>
+	<20181011021931.4249-7-edgar.iglesias@gmail.com>
+In-Reply-To: <20181011021931.4249-7-edgar.iglesias@gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 12 Oct 2018 10:52:17 -0700
+Message-ID: <CAKmqyKPZViCp6=Fv7iiNDw1xB6rf9LoF6-biK6=SpKBG1z__Tw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 06/12] net: cadence_gem: Add support for
+ selecting the DMA MemoryRegion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,25 +23,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, dhildenb@redhat.com, imammedo@redhat.com, ehabkost@redhat.com
-Cc: pbonzini@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mst@redhat.com
+To: Edgar Iglesias <edgar.iglesias@gmail.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, figlesia@xilinx.com, Peter Maydell <peter.maydell@linaro.org>, Stefano Stabellini <sstabellini@kernel.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>, Francisco Iglesias <frasse.iglesias@gmail.com>, Alistair Francis <alistair@alistair23.me>, Richard Henderson <richard.henderson@linaro.org>, KONRAD Frederic <frederic.konrad@adacore.com>, philmd@redhat.com
 
-On 10/11/18 8:24 PM, David Gibson wrote:
-> When the balloon is inflated, we discard memory place in it using madvise()
-> with MADV_DONTNEED.  And when we deflate it we use MADV_WILLNEED, which
-> sounds like it makes sense but is actually unnecessary.
-> 
-> The misleadingly named MADV_DONTNEED just discards the memory in question,
-> it doesn't set any persistent state on it in-kernel; all that's necessary
-> to bring the memory back is to touch it.
+On Wed, Oct 10, 2018 at 7:27 PM Edgar E. Iglesias
+<edgar.iglesias@gmail.com> wrote:
+>
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+>
+> Add support for selecting the Memory Region that the GEM
+> will do DMA to.
+>
+> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-Isn't the point of deflate to free up host memory, for use by other guests or
-whatever?
+Alistair
 
-If you do nothing upon deflate, then that doesn't actually happen.  It seems to
-me that this is backward and you should use DONTNEED on deflate and then
-inflate should do nothing.
-
-
-r~
+> ---
+>  hw/net/cadence_gem.c         | 59 ++++++++++++++++++++++--------------
+>  include/hw/net/cadence_gem.h |  2 ++
+>  2 files changed, 39 insertions(+), 22 deletions(-)
+>
+> diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
+> index 759c1d71e0..a40f136285 100644
+> --- a/hw/net/cadence_gem.c
+> +++ b/hw/net/cadence_gem.c
+> @@ -28,6 +28,7 @@
+>  #include "hw/net/cadence_gem.h"
+>  #include "qapi/error.h"
+>  #include "qemu/log.h"
+> +#include "sysemu/dma.h"
+>  #include "net/checksum.h"
+>
+>  #ifdef CADENCE_GEM_ERR_DEBUG
+> @@ -835,9 +836,9 @@ static void gem_get_rx_desc(CadenceGEMState *s, int q)
+>  {
+>      DB_PRINT("read descriptor 0x%x\n", (unsigned)s->rx_desc_addr[q]);
+>      /* read current descriptor */
+> -    cpu_physical_memory_read(s->rx_desc_addr[q],
+> -                             (uint8_t *)s->rx_desc[q],
+> -                             sizeof(uint32_t) * gem_get_desc_len(s, true));
+> +    address_space_read(&s->dma_as, s->rx_desc_addr[q], MEMTXATTRS_UNSPECIFIED,
+> +                       (uint8_t *)s->rx_desc[q],
+> +                       sizeof(uint32_t) * gem_get_desc_len(s, true));
+>
+>      /* Descriptor owned by software ? */
+>      if (rx_desc_get_ownership(s->rx_desc[q]) == 1) {
+> @@ -956,10 +957,10 @@ static ssize_t gem_receive(NetClientState *nc, const uint8_t *buf, size_t size)
+>                  rx_desc_get_buffer(s->rx_desc[q]));
+>
+>          /* Copy packet data to emulated DMA buffer */
+> -        cpu_physical_memory_write(rx_desc_get_buffer(s, s->rx_desc[q]) +
+> +        address_space_write(&s->dma_as, rx_desc_get_buffer(s, s->rx_desc[q]) +
+>                                                                    rxbuf_offset,
+> -                                  rxbuf_ptr,
+> -                                  MIN(bytes_to_copy, rxbufsize));
+> +                            MEMTXATTRS_UNSPECIFIED, rxbuf_ptr,
+> +                            MIN(bytes_to_copy, rxbufsize));
+>          rxbuf_ptr += MIN(bytes_to_copy, rxbufsize);
+>          bytes_to_copy -= MIN(bytes_to_copy, rxbufsize);
+>
+> @@ -993,9 +994,10 @@ static ssize_t gem_receive(NetClientState *nc, const uint8_t *buf, size_t size)
+>          }
+>
+>          /* Descriptor write-back.  */
+> -        cpu_physical_memory_write(s->rx_desc_addr[q],
+> -                                  (uint8_t *)s->rx_desc[q],
+> -                                  sizeof(uint32_t) * gem_get_desc_len(s, true));
+> +        address_space_write(&s->dma_as, s->rx_desc_addr[q],
+> +                            MEMTXATTRS_UNSPECIFIED,
+> +                            (uint8_t *)s->rx_desc[q],
+> +                            sizeof(uint32_t) * gem_get_desc_len(s, true));
+>
+>          /* Next descriptor */
+>          if (rx_desc_get_wrap(s->rx_desc[q])) {
+> @@ -1099,9 +1101,9 @@ static void gem_transmit(CadenceGEMState *s)
+>          packet_desc_addr = s->tx_desc_addr[q];
+>
+>          DB_PRINT("read descriptor 0x%" HWADDR_PRIx "\n", packet_desc_addr);
+> -        cpu_physical_memory_read(packet_desc_addr,
+> -                                 (uint8_t *)desc,
+> -                                 sizeof(uint32_t) * gem_get_desc_len(s, false));
+> +        address_space_read(&s->dma_as, packet_desc_addr,
+> +                           MEMTXATTRS_UNSPECIFIED, (uint8_t *)desc,
+> +                           sizeof(uint32_t) * gem_get_desc_len(s, false));
+>          /* Handle all descriptors owned by hardware */
+>          while (tx_desc_get_used(desc) == 0) {
+>
+> @@ -1133,8 +1135,9 @@ static void gem_transmit(CadenceGEMState *s)
+>              /* Gather this fragment of the packet from "dma memory" to our
+>               * contig buffer.
+>               */
+> -            cpu_physical_memory_read(tx_desc_get_buffer(s, desc), p,
+> -                                     tx_desc_get_length(desc));
+> +            address_space_read(&s->dma_as, tx_desc_get_buffer(s, desc),
+> +                               MEMTXATTRS_UNSPECIFIED,
+> +                               p, tx_desc_get_length(desc));
+>              p += tx_desc_get_length(desc);
+>              total_bytes += tx_desc_get_length(desc);
+>
+> @@ -1145,13 +1148,15 @@ static void gem_transmit(CadenceGEMState *s)
+>                  /* Modify the 1st descriptor of this packet to be owned by
+>                   * the processor.
+>                   */
+> -                cpu_physical_memory_read(s->tx_desc_addr[q],
+> -                                         (uint8_t *)desc_first,
+> -                                         sizeof(desc_first));
+> +                address_space_read(&s->dma_as, s->tx_desc_addr[q],
+> +                                   MEMTXATTRS_UNSPECIFIED,
+> +                                   (uint8_t *)desc_first,
+> +                                   sizeof(desc_first));
+>                  tx_desc_set_used(desc_first);
+> -                cpu_physical_memory_write(s->tx_desc_addr[q],
+> -                                          (uint8_t *)desc_first,
+> -                                          sizeof(desc_first));
+> +                address_space_write(&s->dma_as, s->tx_desc_addr[q],
+> +                                  MEMTXATTRS_UNSPECIFIED,
+> +                                  (uint8_t *)desc_first,
+> +                                   sizeof(desc_first));
+>                  /* Advance the hardware current descriptor past this packet */
+>                  if (tx_desc_get_wrap(desc)) {
+>                      s->tx_desc_addr[q] = s->regs[GEM_TXQBASE];
+> @@ -1204,8 +1209,9 @@ static void gem_transmit(CadenceGEMState *s)
+>                  packet_desc_addr += 4 * gem_get_desc_len(s, false);
+>              }
+>              DB_PRINT("read descriptor 0x%" HWADDR_PRIx "\n", packet_desc_addr);
+> -            cpu_physical_memory_read(packet_desc_addr, (uint8_t *)desc,
+> -                                sizeof(uint32_t) * gem_get_desc_len(s, false));
+> +            address_space_read(&s->dma_as, packet_desc_addr,
+> +                              MEMTXATTRS_UNSPECIFIED, (uint8_t *)desc,
+> +                              sizeof(uint32_t) * gem_get_desc_len(s, false));
+>          }
+>
+>          if (tx_desc_get_used(desc)) {
+> @@ -1500,6 +1506,9 @@ static void gem_realize(DeviceState *dev, Error **errp)
+>      CadenceGEMState *s = CADENCE_GEM(dev);
+>      int i;
+>
+> +    address_space_init(&s->dma_as,
+> +                       s->dma_mr ? s->dma_mr : get_system_memory(), "dma");
+> +
+>      if (s->num_priority_queues == 0 ||
+>          s->num_priority_queues > MAX_PRIORITY_QUEUES) {
+>          error_setg(errp, "Invalid num-priority-queues value: %" PRIx8,
+> @@ -1537,6 +1546,12 @@ static void gem_init(Object *obj)
+>                            "enet", sizeof(s->regs));
+>
+>      sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->iomem);
+> +
+> +    object_property_add_link(obj, "dma", TYPE_MEMORY_REGION,
+> +                             (Object **)&s->dma_mr,
+> +                             qdev_prop_allow_set_link_before_realize,
+> +                             OBJ_PROP_LINK_STRONG,
+> +                             &error_abort);
+>  }
+>
+>  static const VMStateDescription vmstate_cadence_gem = {
+> diff --git a/include/hw/net/cadence_gem.h b/include/hw/net/cadence_gem.h
+> index 00dbf4f72e..5426961d91 100644
+> --- a/include/hw/net/cadence_gem.h
+> +++ b/include/hw/net/cadence_gem.h
+> @@ -45,6 +45,8 @@ typedef struct CadenceGEMState {
+>
+>      /*< public >*/
+>      MemoryRegion iomem;
+> +    MemoryRegion *dma_mr;
+> +    AddressSpace dma_as;
+>      NICState *nic;
+>      NICConf conf;
+>      qemu_irq irq[MAX_PRIORITY_QUEUES];
+> --
+> 2.17.1
+>
+>
