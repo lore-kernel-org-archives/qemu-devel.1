@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36912)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37297)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gAxVl-0005EZ-Ay
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:29:49 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1gAxXP-0006WP-Gh
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:31:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gAxVh-0006ve-80
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:29:49 -0400
-Received: from mail-by2nam03on0103.outbound.protection.outlook.com
-	([104.47.42.103]:26592
-	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
+	(envelope-from <amarkovic@wavecomp.com>) id 1gAxXM-0001Ku-7r
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:31:31 -0400
+Received: from mail-eopbgr700100.outbound.protection.outlook.com
+	([40.107.70.100]:61022
+	helo=NAM04-SN1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1gAxVg-0006tJ-K1
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:29:44 -0400
+	id 1gAxXJ-0001CN-M2
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:31:26 -0400
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Fri, 12 Oct 2018 13:29:41 +0000
-Message-ID: <BN6PR2201MB12513689A5EE57DB457C1C39C6E20@BN6PR2201MB1251.namprd22.prod.outlook.com>
+Date: Fri, 12 Oct 2018 13:31:21 +0000
+Message-ID: <BN6PR2201MB1251B47B1AB6B238DBAF0625C6E20@BN6PR2201MB1251.namprd22.prod.outlook.com>
 References: <1539256947-22807-1-git-send-email-aleksandar.markovic@rt-rk.com>,
-	<1539256947-22807-8-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1539256947-22807-8-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1539256947-22807-9-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1539256947-22807-9-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4 07/22] target/mips: Add CPO PWCtl
- register
+Subject: Re: [Qemu-devel] [PATCH v4 08/22] target/mips: Implement hardware
+ page table walker
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,10 +37,13 @@ Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, "richard.henderson@linaro.org
 
 > From: Yongbok Kim <yongbok.kim@mips.com>
 >=20
-> Add PWCtl register (CP0 Register 5, Select 6).
+> Implement hardware page table walker.
 
-Please bump version_id and minimum_version_id of vmstate_mips_cpu in machin=
-e.c.
+What is missing is initialization of PWField and PWsize register.
+
+This initialization is very well documented, and it should be straightforwa=
+rd.
+Probably the best dobne in a separate patch.
 
 Other than this:
 
