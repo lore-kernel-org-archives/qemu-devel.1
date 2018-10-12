@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45377)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45394)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gAuFt-0000on-9V
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 06:01:14 -0400
+	(envelope-from <cohuck@redhat.com>) id 1gAuFw-0000pP-2k
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 06:01:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gAuFp-0007Hd-5k
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 06:01:13 -0400
+	(envelope-from <cohuck@redhat.com>) id 1gAuFt-0007RO-KX
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 06:01:15 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Fri, 12 Oct 2018 12:00:53 +0200
-Message-Id: <20181012100101.29058-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 0/8] s390x updates
+Date: Fri, 12 Oct 2018 12:00:54 +0200
+Message-Id: <20181012100101.29058-2-cohuck@redhat.com>
+In-Reply-To: <20181012100101.29058-1-cohuck@redhat.com>
+References: <20181012100101.29058-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PULL 1/8] target/s390x/excp_helper: Remove DPRINTF()
+ macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,73 +23,136 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
 
-The following changes since commit 75e50c80e051423a6f55a34ee4a1eec842444a5b:
+From: Thomas Huth <thuth@redhat.com>
 
-  Merge remote-tracking branch 'remotes/armbru/tags/pull-misc-2018-10-10' into staging (2018-10-11 10:43:37 +0100)
+Debug macros that are disabled by default should be avoided (since the
+code bit-rots quite easily). Thus turn these debug prints into proper
+qemu_log_mask(CPU_LOG_xxx, ...) statements instead. The DPRINTF statements
+in do_[ext|io|mchk]_interrupt can even be removed completely since we can
+log the information in a central place, s390_cpu_do_interrupt, instead.
 
-are available in the Git repository at:
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <1538751601-7433-1-git-send-email-thuth@redhat.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+ target/s390x/excp_helper.c | 48 +++++++++++-----------------------------------
+ 1 file changed, 11 insertions(+), 37 deletions(-)
 
-  git://github.com/cohuck/qemu tags/s390x-20181012
-
-for you to fetch changes up to 0161215d435ef5680c4623bcbdfe89ce5b35cf42:
-
-  hw/s390x: Include the tod-qemu also for builds with --disable-tcg (2018-10-12 11:32:19 +0200)
-
-----------------------------------------------------------------
-More s390x updates:
-- introduce support for vfio-ap (s390 crypto devices), including a
-  Linux headers update to get the new interfaces
-- the usual fixing + cleanup
-
-----------------------------------------------------------------
-
-Cornelia Huck (1):
-  linux-headers: update
-
-Thomas Huth (2):
-  target/s390x/excp_helper: Remove DPRINTF() macro
-  hw/s390x: Include the tod-qemu also for builds with --disable-tcg
-
-Tony Krowiak (5):
-  s390x/cpumodel: Set up CPU model for AP device support
-  s390x/kvm: enable AP instruction interpretation for guest
-  s390x/ap: base Adjunct Processor (AP) object model
-  s390x/vfio: ap: Introduce VFIO AP device
-  s390: doc: detailed specifications for AP virtualization
-
- MAINTAINERS                            |  16 +
- default-configs/s390x-softmmu.mak      |   1 +
- docs/vfio-ap.txt                       | 825 +++++++++++++++++++++++++++++++++
- hw/s390x/Makefile.objs                 |   4 +-
- hw/s390x/ap-bridge.c                   |  78 ++++
- hw/s390x/ap-device.c                   |  38 ++
- hw/s390x/s390-virtio-ccw.c             |   4 +
- hw/vfio/Makefile.objs                  |   1 +
- hw/vfio/ap.c                           | 181 ++++++++
- include/hw/s390x/ap-bridge.h           |  19 +
- include/hw/s390x/ap-device.h           |  22 +
- include/hw/vfio/vfio-common.h          |   1 +
- include/standard-headers/linux/input.h |   9 +-
- linux-headers/asm-arm/kvm.h            |  13 +
- linux-headers/asm-arm64/kvm.h          |  13 +
- linux-headers/asm-s390/kvm.h           |   2 +
- linux-headers/asm-x86/kvm.h            |   1 +
- linux-headers/linux/kvm.h              |   2 +
- linux-headers/linux/vfio.h             |   2 +
- linux-headers/linux/vhost.h            |   2 +-
- target/s390x/cpu_features.c            |   3 +
- target/s390x/cpu_features_def.h        |   3 +
- target/s390x/cpu_models.c              |   2 +
- target/s390x/excp_helper.c             |  48 +-
- target/s390x/gen-features.c            |   3 +
- target/s390x/kvm.c                     |  19 +
- 26 files changed, 1269 insertions(+), 43 deletions(-)
- create mode 100644 docs/vfio-ap.txt
- create mode 100644 hw/s390x/ap-bridge.c
- create mode 100644 hw/s390x/ap-device.c
- create mode 100644 hw/vfio/ap.c
- create mode 100644 include/hw/s390x/ap-bridge.h
- create mode 100644 include/hw/s390x/ap-device.h
-
+diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
+index cd76c3163a..2a33222f7e 100644
+--- a/target/s390x/excp_helper.c
++++ b/target/s390x/excp_helper.c
+@@ -33,23 +33,6 @@
+ #include "hw/s390x/s390_flic.h"
+ #endif
+ 
+-/* #define DEBUG_S390 */
+-/* #define DEBUG_S390_STDOUT */
+-
+-#ifdef DEBUG_S390
+-#ifdef DEBUG_S390_STDOUT
+-#define DPRINTF(fmt, ...) \
+-    do { fprintf(stderr, fmt, ## __VA_ARGS__); \
+-         if (qemu_log_separate()) { qemu_log(fmt, ##__VA_ARGS__); } } while (0)
+-#else
+-#define DPRINTF(fmt, ...) \
+-    do { qemu_log(fmt, ## __VA_ARGS__); } while (0)
+-#endif
+-#else
+-#define DPRINTF(fmt, ...) \
+-    do { } while (0)
+-#endif
+-
+ void QEMU_NORETURN tcg_s390_program_interrupt(CPUS390XState *env, uint32_t code,
+                                               int ilen, uintptr_t ra)
+ {
+@@ -128,8 +111,8 @@ int s390_cpu_handle_mmu_fault(CPUState *cs, vaddr orig_vaddr, int size,
+     uint64_t asc;
+     int prot;
+ 
+-    DPRINTF("%s: address 0x%" VADDR_PRIx " rw %d mmu_idx %d\n",
+-            __func__, orig_vaddr, rw, mmu_idx);
++    qemu_log_mask(CPU_LOG_MMU, "%s: addr 0x%" VADDR_PRIx " rw %d mmu_idx %d\n",
++                  __func__, orig_vaddr, rw, mmu_idx);
+ 
+     vaddr = orig_vaddr;
+ 
+@@ -158,8 +141,9 @@ int s390_cpu_handle_mmu_fault(CPUState *cs, vaddr orig_vaddr, int size,
+     if (!address_space_access_valid(&address_space_memory, raddr,
+                                     TARGET_PAGE_SIZE, rw,
+                                     MEMTXATTRS_UNSPECIFIED)) {
+-        DPRINTF("%s: raddr %" PRIx64 " > ram_size %" PRIx64 "\n", __func__,
+-                (uint64_t)raddr, (uint64_t)ram_size);
++        qemu_log_mask(CPU_LOG_MMU,
++                      "%s: raddr %" PRIx64 " > ram_size %" PRIx64 "\n",
++                      __func__, (uint64_t)raddr, (uint64_t)ram_size);
+         trigger_pgm_exception(env, PGM_ADDRESSING, ILEN_AUTO);
+         return 1;
+     }
+@@ -217,8 +201,10 @@ static void do_program_interrupt(CPUS390XState *env)
+         break;
+     }
+ 
+-    qemu_log_mask(CPU_LOG_INT, "%s: code=0x%x ilen=%d\n",
+-                  __func__, env->int_pgm_code, ilen);
++    qemu_log_mask(CPU_LOG_INT,
++                  "%s: code=0x%x ilen=%d psw: %" PRIx64 " %" PRIx64 "\n",
++                  __func__, env->int_pgm_code, ilen, env->psw.mask,
++                  env->psw.addr);
+ 
+     lowcore = cpu_map_lowcore(env);
+ 
+@@ -240,10 +226,6 @@ static void do_program_interrupt(CPUS390XState *env)
+ 
+     cpu_unmap_lowcore(lowcore);
+ 
+-    DPRINTF("%s: %x %x %" PRIx64 " %" PRIx64 "\n", __func__,
+-            env->int_pgm_code, ilen, env->psw.mask,
+-            env->psw.addr);
+-
+     load_psw(env, mask, addr);
+ }
+ 
+@@ -334,9 +316,6 @@ static void do_ext_interrupt(CPUS390XState *env)
+ 
+     cpu_unmap_lowcore(lowcore);
+ 
+-    DPRINTF("%s: %" PRIx64 " %" PRIx64 "\n", __func__,
+-            env->psw.mask, env->psw.addr);
+-
+     load_psw(env, mask, addr);
+ }
+ 
+@@ -365,8 +344,6 @@ static void do_io_interrupt(CPUS390XState *env)
+     cpu_unmap_lowcore(lowcore);
+     g_free(io);
+ 
+-    DPRINTF("%s: %" PRIx64 " %" PRIx64 "\n", __func__, env->psw.mask,
+-            env->psw.addr);
+     load_psw(env, mask, addr);
+ }
+ 
+@@ -408,9 +385,6 @@ static void do_mchk_interrupt(CPUS390XState *env)
+ 
+     cpu_unmap_lowcore(lowcore);
+ 
+-    DPRINTF("%s: %" PRIx64 " %" PRIx64 "\n", __func__,
+-            env->psw.mask, env->psw.addr);
+-
+     load_psw(env, mask, addr);
+ }
+ 
+@@ -421,8 +395,8 @@ void s390_cpu_do_interrupt(CPUState *cs)
+     CPUS390XState *env = &cpu->env;
+     bool stopped = false;
+ 
+-    qemu_log_mask(CPU_LOG_INT, "%s: %d at pc=%" PRIx64 "\n",
+-                  __func__, cs->exception_index, env->psw.addr);
++    qemu_log_mask(CPU_LOG_INT, "%s: %d at psw=%" PRIx64 ":%" PRIx64 "\n",
++                  __func__, cs->exception_index, env->psw.mask, env->psw.addr);
+ 
+ try_deliver:
+     /* handle machine checks */
 -- 
 2.14.4
