@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49043)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49040)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gAwif-0006uV-W7
+	(envelope-from <kraxel@redhat.com>) id 1gAwif-0006uS-W5
 	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 08:39:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gAwiY-0007bH-Cq
+	(envelope-from <kraxel@redhat.com>) id 1gAwiY-0007c9-S0
 	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 08:39:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33434)
+Received: from mx1.redhat.com ([209.132.183.28]:57048)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gAwiY-0007Zg-5b
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gAwiY-0007aW-Hp
 	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 08:38:58 -0400
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 12 Oct 2018 14:38:47 +0200
-Message-Id: <20181012123851.30856-2-kraxel@redhat.com>
+Date: Fri, 12 Oct 2018 14:38:48 +0200
+Message-Id: <20181012123851.30856-3-kraxel@redhat.com>
 In-Reply-To: <20181012123851.30856-1-kraxel@redhat.com>
 References: <20181012123851.30856-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 1/5] display: add separate config option for
- bochs-display
+Subject: [Qemu-devel] [PULL 2/5] bochs-display: wire up edid support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,43 +26,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-This allows modern architectures which don't care about vga
-compatibility (risc-v for example) build bochs-display without
-including all vga emulation too.
-
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-id: 20181005160147.892-2-kraxel@redhat.com
+Message-id: 20181005160147.892-3-kraxel@redhat.com
 ---
- default-configs/pci.mak  | 1 +
- hw/display/Makefile.objs | 2 +-
- 2 files changed, 2 insertions(+), 1 deletion(-)
+ hw/display/bochs-display.c | 13 +++++++++++++
+ hw/display/Makefile.objs   |  1 +
+ 2 files changed, 14 insertions(+)
 
-diff --git a/default-configs/pci.mak b/default-configs/pci.mak
-index de53d20ac6..6c7be12779 100644
---- a/default-configs/pci.mak
-+++ b/default-configs/pci.mak
-@@ -44,5 +44,6 @@ CONFIG_SDHCI=y
- CONFIG_EDU=y
- CONFIG_VGA=y
- CONFIG_VGA_PCI=y
-+CONFIG_BOCHS_DISPLAY=y
- CONFIG_IVSHMEM_DEVICE=$(CONFIG_IVSHMEM)
- CONFIG_ROCKER=y
+diff --git a/hw/display/bochs-display.c b/hw/display/bochs-display.c
+index 09d8944a1b..3d439eb240 100644
+--- a/hw/display/bochs-display.c
++++ b/hw/display/bochs-display.c
+@@ -9,6 +9,7 @@
+ #include "hw/hw.h"
+ #include "hw/pci/pci.h"
+ #include "hw/display/bochs-vbe.h"
++#include "hw/display/edid.h"
+ 
+ #include "qapi/error.h"
+ 
+@@ -35,9 +36,13 @@ typedef struct BochsDisplayState {
+     MemoryRegion     mmio;
+     MemoryRegion     vbe;
+     MemoryRegion     qext;
++    MemoryRegion     edid;
+ 
+     /* device config */
+     uint64_t         vgamem;
++    bool             enable_edid;
++    qemu_edid_info   edid_info;
++    uint8_t          edid_blob[256];
+ 
+     /* device registers */
+     uint16_t         vbe_regs[VBE_DISPI_INDEX_NB];
+@@ -283,6 +288,12 @@ static void bochs_display_realize(PCIDevice *dev, Error **errp)
+     pci_register_bar(&s->pci, 0, PCI_BASE_ADDRESS_MEM_PREFETCH, &s->vram);
+     pci_register_bar(&s->pci, 2, PCI_BASE_ADDRESS_SPACE_MEMORY, &s->mmio);
+ 
++    if (s->enable_edid) {
++        qemu_edid_generate(s->edid_blob, sizeof(s->edid_blob), &s->edid_info);
++        qemu_edid_region_io(&s->edid, obj, s->edid_blob, sizeof(s->edid_blob));
++        memory_region_add_subregion(&s->mmio, 0, &s->edid);
++    }
++
+     if (pci_bus_is_express(pci_get_bus(dev))) {
+         dev->cap_present |= QEMU_PCI_CAP_EXPRESS;
+         ret = pcie_endpoint_cap_init(dev, 0x80);
+@@ -325,6 +336,8 @@ static void bochs_display_exit(PCIDevice *dev)
+ 
+ static Property bochs_display_properties[] = {
+     DEFINE_PROP_SIZE("vgamem", BochsDisplayState, vgamem, 16 * MiB),
++    DEFINE_PROP_BOOL("edid", BochsDisplayState, enable_edid, false),
++    DEFINE_EDID_PROPERTIES(BochsDisplayState, edid_info),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
 diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
-index 780a76b9f0..2a0de16a55 100644
+index 2a0de16a55..2e1b1bcd22 100644
 --- a/hw/display/Makefile.objs
 +++ b/hw/display/Makefile.objs
-@@ -14,11 +14,11 @@ common-obj-$(CONFIG_SSD0323) += ssd0323.o
- common-obj-$(CONFIG_XEN) += xenfb.o
- 
- common-obj-$(CONFIG_VGA_PCI) += vga-pci.o
--common-obj-$(CONFIG_VGA_PCI) += bochs-display.o
- common-obj-$(CONFIG_VGA_PCI) += edid-region.o
- common-obj-$(CONFIG_VGA_ISA) += vga-isa.o
+@@ -19,6 +19,7 @@ common-obj-$(CONFIG_VGA_ISA) += vga-isa.o
  common-obj-$(CONFIG_VGA_ISA_MM) += vga-isa-mm.o
  common-obj-$(CONFIG_VMWARE_VGA) += vmware_vga.o
-+common-obj-$(CONFIG_BOCHS_DISPLAY) += bochs-display.o
+ common-obj-$(CONFIG_BOCHS_DISPLAY) += bochs-display.o
++common-obj-$(CONFIG_BOCHS_DISPLAY) += edid-region.o
  
  common-obj-$(CONFIG_BLIZZARD) += blizzard.o
  common-obj-$(CONFIG_EXYNOS4) += exynos4210_fimd.o
