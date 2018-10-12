@@ -1,31 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53565)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gAyXt-0006fU-3Q
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 10:36:05 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1gAyeJ-0007xJ-MR
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 10:42:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gAyXn-0001ek-Jr
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 10:36:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33243)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gAyXn-0001ak-An
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 10:35:59 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7C2FD3002094
-	for <qemu-devel@nongnu.org>; Fri, 12 Oct 2018 14:35:56 +0000 (UTC)
-Date: Fri, 12 Oct 2018 16:35:54 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181012163554.6e54d717@redhat.com>
-In-Reply-To: <20181008173125.19678-15-armbru@redhat.com>
-References: <20181008173125.19678-1-armbru@redhat.com>
-	<20181008173125.19678-15-armbru@redhat.com>
+	(envelope-from <pm215@archaic.org.uk>) id 1gAyeI-0002oR-Pn
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 10:42:43 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 12 Oct 2018 15:42:25 +0100
+Message-Id: <20181012144235.19646-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 14/31] numa: Fix QMP command set-numa-node
- error handling
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 00/10] target/arm: more HCR bits,
+ improve syndrome reporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,96 +20,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-On Mon,  8 Oct 2018 19:31:08 +0200
-Markus Armbruster <armbru@redhat.com> wrote:
+I'm currently trying to track down why my AArch32 Hyp mode
+test images don't work, and thought I'd start by patching
+a few of the holes we have in our implementation. (Haven't
+found the problem yet, sadly.)
 
-> Calling error_report() in a function that takes an Error ** argument
-> is suspicious.  parse_numa_node() does that, and then exit()s.  It
-> also passes &error_fatal to machine_set_cpu_numa_node().  Both wrong.
-> Attempting to configure numa when the machine doesn't support it kills
-> the VM:
-> 
->     $ qemu-system-x86_64 -nodefaults -S -display none -M none -preconfig -qmp stdio
->     {"QMP": {"version": {"qemu": {"micro": 50, "minor": 0, "major": 3}, "package": "v3.0.0-837-gc5e4e49258"}, "capabilities": []}}
->     {"execute": "qmp_capabilities"}
->     {"return": {}}
->     {"execute": "set-numa-node", "arguments": {"type": "node"}}
->     NUMA is not supported by this machine-type
->     $ echo $?
->     1
-> 
-> Messed up when commit 64c2a8f6d3f and 7c88e65d9e9 (v2.10.0) added
-> incorrect error handling right next to correct examples.  Latent bug
-> until commit f3be67812c2 (v3.0.0) made it accessible via QMP.  Fairly
-> harmless in practice, because it's limited to RUN_STATE_PRECONFIG.
-> The fix is obvious: replace error_report(); exit() by error_setg();
-> return.
-> 
-> This affects parse_numa_node()'s other caller
-> numa_complete_configuration(): since it ignores errors, the "NUMA is
-> not supported by this machine-type" is now ignored, too.  But that
-> error is as unexpected there as any other.  Change it to abort on
-> error instead.
-> 
-> Fixes: f3be67812c226162f86ce92634bd913714445420
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> 
-> fixup! numa: Fix QMP command set-numa-node error handling
-> ---
->  numa.c | 13 +++++++++----
->  1 file changed, 9 insertions(+), 4 deletions(-)
-> 
-> diff --git a/numa.c b/numa.c
-> index 81542d4ebb..1d7c49ad43 100644
-> --- a/numa.c
-> +++ b/numa.c
-> @@ -60,6 +60,7 @@ NodeInfo numa_info[MAX_NODES];
->  static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
->                              Error **errp)
->  {
-> +    Error *err = NULL;
->      uint16_t nodenr;
->      uint16List *cpus = NULL;
->      MachineClass *mc = MACHINE_GET_CLASS(ms);
-> @@ -82,8 +83,8 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
->      }
->  
->      if (!mc->cpu_index_to_instance_props || !mc->get_default_cpu_node_id) {
-> -        error_report("NUMA is not supported by this machine-type");
-> -        exit(1);
-> +        error_setg(errp, "NUMA is not supported by this machine-type");
-> +        return;
->      }
->      for (cpus = node->cpus; cpus; cpus = cpus->next) {
->          CpuInstanceProperties props;
-> @@ -97,7 +98,11 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
->          props = mc->cpu_index_to_instance_props(ms, cpus->value);
->          props.node_id = nodenr;
->          props.has_node_id = true;
-> -        machine_set_cpu_numa_node(ms, &props, &error_fatal);
-> +        machine_set_cpu_numa_node(ms, &props, &err);
-> +        if (err) {
-> +            error_propagate(errp, err);
-> +            return;
-> +        }
->      }
->  
->      if (node->has_mem && node->has_memdev) {
-> @@ -367,7 +372,7 @@ void numa_complete_configuration(MachineState *ms)
->      if (ms->ram_slots > 0 && nb_numa_nodes == 0 &&
->          mc->auto_enable_numa_with_memhp) {
->              NumaNodeOptions node = { };
-> -            parse_numa_node(ms, &node, NULL);
-> +            parse_numa_node(ms, &node, &error_abort);
-it won't affect machines with numa support /i.e. no change/,
-but if machine that doesn't support numa, gets here it fine for it to die.
+This patchset:
+ * implements HCR.{FB,DC,VI,VF,PTW}
+ * fixes ISR_EL1 in the virtual-interrupts case
+ * fixes some syndrome reporting corner cases where AArch32
+   or v7 differ from AArch64/v8
+ * throws in a couple of minor code cleanups
 
->      }
->  
->      assert(max_numa_nodeid <= MAX_NODES);
+The remaining unimplemented HCR trap bits (as of v8.0) are:
+ * TID0 TID1 TID2 TID3 TIDCP TAC TSW TPC TPU TTLB TVM TRVM TDZ
+   -- these are all "trap on various system register accesses"
+ * AMO VA
+   -- these require support for presenting the guest with a
+      virtual asynchronous abort/SError
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+(We also don't yet implement HCR.TASE, which is interesting
+because it requires trapping ASIMD-but-not-FP, which we don't
+currently have support for in translate.c. This would also
+be needed for CPACR.ASEDIS.)
+
+thanks
+-- PMM
+
+Peter Maydell (10):
+  target/arm: Improve debug logging of AArch32 exception return
+  target/arm: Make switch_mode() file-local
+  target/arm: Implement HCR.FB
+  target/arm: Implement HCR.DC
+  target/arm: ISR_EL1 bits track virtual interrupts if IMO/FMO set
+  target/arm: Implement HCR.VI and VF
+  target/arm: Implement HCR.PTW
+  target/arm: New utility function to extract EC from syndrome
+  target/arm: Get IL bit correct for v7 syndrome values
+  target/arm: Report correct syndrome for FP/SIMD traps to Hyp mode
+
+ target/arm/internals.h |  45 +++++-
+ target/arm/helper.c    | 347 ++++++++++++++++++++++++++++++-----------
+ target/arm/kvm64.c     |   2 +-
+ target/arm/op_helper.c |   2 +-
+ target/arm/translate.c |  15 +-
+ 5 files changed, 302 insertions(+), 109 deletions(-)
+
+-- 
+2.19.0
