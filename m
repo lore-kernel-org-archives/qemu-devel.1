@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38853)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39479)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gB1DA-0000DF-JL
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 13:26:53 -0400
+	(envelope-from <eblake@redhat.com>) id 1gB1Gl-0001J0-3B
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 13:30:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gB1D7-0002Fq-GD
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 13:26:52 -0400
-Date: Fri, 12 Oct 2018 13:26:45 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181012132542-mutt-send-email-mst@kernel.org>
-References: <20181012032431.32693-1-david@gibson.dropbear.id.au>
+	(envelope-from <eblake@redhat.com>) id 1gB1Gj-0007vC-1v
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 13:30:34 -0400
+References: <20181012115532.12645-1-kwolf@redhat.com>
+	<20181012115532.12645-7-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <6bbb47e8-675f-5058-4138-fc99d77d6d85@redhat.com>
+Date: Fri, 12 Oct 2018 12:30:14 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181012032431.32693-1-david@gibson.dropbear.id.au>
-Subject: Re: [Qemu-devel] [RFC 0/5] Improve balloon handling of pagesizes
- other than 4kiB
+In-Reply-To: <20181012115532.12645-7-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 6/8] curl: Support auto-read-only option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,35 +24,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: dhildenb@redhat.com, imammedo@redhat.com, ehabkost@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
 
-On Fri, Oct 12, 2018 at 02:24:26PM +1100, David Gibson wrote:
-> The virtio-balloon devices was never really thought out for cases
-> other than 4kiB pagesize on both guest and host.  It works in some
-> cases, but in others can be ineffectual or even cause guest memory
-> corruption.
+On 10/12/18 6:55 AM, Kevin Wolf wrote:
+> If read-only=off, but auto-read-only=on is given, just degrade to
+> read-only.
 > 
-> This series makes a handful of preliminary cleanups, then makes a
-> change to safely, though not perfectly, handle cases with non 4kiB
-> pagesizes.
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>   block/curl.c | 8 ++++----
+>   1 file changed, 4 insertions(+), 4 deletions(-)
 
-BTW do you want to add an interface to specify the page size?
-I can see either host or guest or both supporting that.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-
-
-> David Gibson (5):
->   virtio-balloon: Remove unnecessary MADV_WILLNEED on deflate
->   virtio-balloon: Corrections to address verification
->   virtio-balloon: Rework ballon_page() interface
->   virtio-balloon: Use ram_block_discard_range() instead of raw madvise()
->   virtio-balloon: Safely handle BALLOON_PAGE_SIZE < host page size
-> 
->  hw/virtio/virtio-balloon.c         | 100 ++++++++++++++++++++++++-----
->  include/hw/virtio/virtio-balloon.h |   3 +
->  2 files changed, 87 insertions(+), 16 deletions(-)
-> 
-> -- 
-> 2.17.1
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
