@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42821)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43526)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gAs7f-0007y0-Pb
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 03:44:36 -0400
+	(envelope-from <david@redhat.com>) id 1gAs9Y-0000P3-7K
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 03:46:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gAs7c-0000QD-IV
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 03:44:35 -0400
+	(envelope-from <david@redhat.com>) id 1gAs9S-0001GJ-0A
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 03:46:31 -0400
 References: <20181012032431.32693-1-david@gibson.dropbear.id.au>
-	<20181012032431.32693-3-david@gibson.dropbear.id.au>
+	<20181012032431.32693-4-david@gibson.dropbear.id.au>
 From: David Hildenbrand <david@redhat.com>
-Message-ID: <0ea22284-a019-4d6b-9951-976174248d5a@redhat.com>
-Date: Fri, 12 Oct 2018 09:44:25 +0200
+Message-ID: <ecd2b2b6-38ea-8c0c-02b0-c35e9b72f4ae@redhat.com>
+Date: Fri, 12 Oct 2018 09:46:16 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181012032431.32693-3-david@gibson.dropbear.id.au>
+In-Reply-To: <20181012032431.32693-4-david@gibson.dropbear.id.au>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 2/5] virtio-balloon: Corrections to address
- verification
+Subject: Re: [Qemu-devel] [RFC 3/5] virtio-balloon: Rework ballon_page()
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,60 +29,61 @@ To: David Gibson <david@gibson.dropbear.id.au>, dhildenb@redhat.com, imammedo@re
 Cc: mst@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 On 12/10/2018 05:24, David Gibson wrote:
-> The virtio-balloon device's verification of the address given to it by the
-> guest has a number of faults:
->     * The addresses here are guest physical addresses, which should be
->       'hwaddr' rather than 'ram_addr_t' (the distinction is admittedly
->       pretty subtle and confusing)
->     * We don't check for section.mr being NULL, which is the main way that
->       memory_region_find() reports basic failures.  We really need to check
->       that before looking at any other section fields, because
->       memory_region_find() doesn't initialize them on the failure path
->     * We're passing a length of '1' to memory_region_find(), but really the
->       guest is requesting that we put the entire page into the balloon,
->       so it makes more sense to call it with BALLOON_PAGE_SIZE
+> This replaces the balloon_page() internal interface with
+> ballon_inflate_page(), with a slightly different interface.  The new
+> interface will make future alterations simpler.
 > 
 > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 > ---
->  hw/virtio/virtio-balloon.c | 17 ++++++++++-------
->  1 file changed, 10 insertions(+), 7 deletions(-)
+>  hw/virtio/virtio-balloon.c | 17 +++++++----------
+>  1 file changed, 7 insertions(+), 10 deletions(-)
 > 
 > diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-> index 6ec4bcf4e1..e8611aab0e 100644
+> index e8611aab0e..7229afad6e 100644
 > --- a/hw/virtio/virtio-balloon.c
 > +++ b/hw/virtio/virtio-balloon.c
-> @@ -221,17 +221,20 @@ static void virtio_balloon_handle_output(VirtIODevice *vdev, VirtQueue *vq)
->          }
+> @@ -33,11 +33,11 @@
+>  
+>  #define BALLOON_PAGE_SIZE  (1 << VIRTIO_BALLOON_PFN_SHIFT)
+>  
+> -static void balloon_page(void *addr, int deflate)
+> +static void balloon_inflate_page(VirtIOBalloon *balloon,
+> +                                 MemoryRegion *mr, hwaddr offset)
+>  {
+> -    if (!qemu_balloon_is_inhibited() && !deflate) {
+> -        qemu_madvise(addr, BALLOON_PAGE_SIZE, QEMU_MADV_DONTNEED);
+> -    }
+> +    void *addr = memory_region_get_ram_ptr(mr) + offset;
+
+I prefer an empty line here
+
+> +    qemu_madvise(addr, BALLOON_PAGE_SIZE, QEMU_MADV_DONTNEED);
+>  }
+>  
+>  static const char *balloon_stat_names[] = {
+> @@ -222,7 +222,6 @@ static void virtio_balloon_handle_output(VirtIODevice *vdev, VirtQueue *vq)
 >  
 >          while (iov_to_buf(elem->out_sg, elem->out_num, offset, &pfn, 4) == 4) {
-> -            ram_addr_t pa;
-> -            ram_addr_t addr;
-> +            hwaddr pa;
-> +            hwaddr addr;
+>              hwaddr pa;
+> -            hwaddr addr;
 >              int p = virtio_ldl_p(vdev, &pfn);
 >  
-> -            pa = (ram_addr_t) p << VIRTIO_BALLOON_PFN_SHIFT;
-> +            pa = (hwaddr) p << VIRTIO_BALLOON_PFN_SHIFT;
->              offset += 4;
+>              pa = (hwaddr) p << VIRTIO_BALLOON_PFN_SHIFT;
+> @@ -244,11 +243,9 @@ static void virtio_balloon_handle_output(VirtIODevice *vdev, VirtQueue *vq)
 >  
-> -            /* FIXME: remove get_system_memory(), but how? */
-
-Should we leave that fixme? (on the other hand, virtio-balloon operates
-on all system mamory, so I also don't really see a way around this ...)
-
-> -            section = memory_region_find(get_system_memory(), pa, 1);
-> -            if (!int128_nz(section.size) ||
-> -                !memory_region_is_ram(section.mr) ||
-> +            section = memory_region_find(get_system_memory(), pa,
-> +                                         BALLOON_PAGE_SIZE);
-> +            if (!section.mr) {
-> +                trace_virtio_balloon_bad_addr(pa);
-> +                continue;
+>              trace_virtio_balloon_handle_output(memory_region_name(section.mr),
+>                                                 pa);
+> -            /* Using memory_region_get_ram_ptr is bending the rules a bit, but
+> -               should be OK because we only want a single page.  */
+> -            addr = section.offset_within_region;
+> -            balloon_page(memory_region_get_ram_ptr(section.mr) + addr,
+> -                         !!(vq == s->dvq));
+> +            if (!qemu_balloon_is_inhibited() && vq != s->dvq) {
+> +                balloon_inflate_page(s, section.mr, section.offset_within_region);
 > +            }
-> +            if (!memory_region_is_ram(section.mr) ||
->                  memory_region_is_rom(section.mr) ||
->                  memory_region_is_romd(section.mr)) {
->                  trace_virtio_balloon_bad_addr(pa);
+>              memory_region_unref(section.mr);
+>          }
+>  
 > 
 
 Reviewed-by: David Hildenbrand <david@redhat.com>
