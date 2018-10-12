@@ -1,19 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35539)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuchenlin@synology.com>) id 1gAtQw-00021v-SN
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 05:08:35 -0400
+	(envelope-from <kraxel@redhat.com>) id 1gAtit-00050p-T7
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 05:27:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuchenlin@synology.com>) id 1gAtQp-0007Yv-AN
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 05:08:32 -0400
-Received: from synology.com ([59.124.61.242]:45417)
+	(envelope-from <kraxel@redhat.com>) id 1gAtip-0001VO-UI
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 05:27:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48918)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuchenlin@synology.com>)
-	id 1gAtQc-0007NG-DY
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 05:08:19 -0400
-From: yuchenlin@synology.com
-Date: Fri, 12 Oct 2018 17:07:52 +0800
-Message-Id: <20181012090752.31891-1-yuchenlin@synology.com>
-Subject: [Qemu-devel] [PATCH] vhost-scsi: prevent using uninitialized vqs
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gAtio-0001V5-Hv
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 05:27:03 -0400
+Date: Fri, 12 Oct 2018 11:27:00 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20181012092700.np256rvz6octswia@sirius.home.kraxel.org>
+References: <20181009131052.18500-1-lhrazky@redhat.com>
+	<20181009131052.18500-2-lhrazky@redhat.com>
+	<1539113618.12871.122.camel@redhat.com>
+	<1539189387.16655.63.camel@redhat.com>
+	<20181011122757.gsynkctea7reqnik@sirius.home.kraxel.org>
+	<1539263541.16655.110.camel@redhat.com>
+	<20181011134336.w55g5ts6kln6cgtt@sirius.home.kraxel.org>
+	<1539268208.16655.144.camel@redhat.com>
+	<20181011150944.5qfaflgkcekdlz3o@sirius.home.kraxel.org>
+	<1539272266.16655.154.camel@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1539272266.16655.154.camel@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Spice-devel] [RFC PATCH spice 1/2] QXL interface:
+ add functions to identify monitors in the guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,43 +37,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, yuchenlin <yuchenlin@synology.com>, Forrest Liu <forrestl@synology.com>
+To: =?utf-8?B?THVrw6HFoSBIcsOhemvDvQ==?= <lhrazky@redhat.com>
+Cc: Jonathon Jongsma <jjongsma@redhat.com>, spice-devel@lists.freedesktop.org, qemu-devel@nongnu.org
 
-From: yuchenlin <yuchenlin@synology.com>
+On Thu, Oct 11, 2018 at 05:37:46PM +0200, Luk=C3=A1=C5=A1 Hr=C3=A1zk=C3=BD=
+ wrote:
+> On Thu, 2018-10-11 at 17:09 +0200, Gerd Hoffmann wrote:
+> > > > Ok.  We probably should fix interface_client_monitors_config() to=
+ use
+> > > > the channel_id instead of qemu_console_get_head() then.
+> > >=20
+> > > It's not that simple. This would break the QXL with multiple monito=
+rs
+> > > per channel case.
+> >=20
+> > It is that simple.
+> >=20
+> > qxl doesn't use that code path and has its own version of the callbac=
+k
+> > (in qxl.c).  Fixing it there is a bit more tricky.
+>=20
+> Ok.. and what's actually the problem using qemu_console_get_head()? It
+> just doesn't feel right to me using channel_id as an index into this
+> array. It is not the right index strictly speaking.
 
-There are 3 virtqueues (ctrl, event and cmd) for virtio scsi device,
-but seabios will only set the physical address for the 3rd one (cmd).
-Then in vhost_virtqueue_start(), virtio_queue_get_desc_addr()
-will be 0 for ctrl and event vq.
+Assume you have one qxl and one virtio-gpu device (one head each), for
+example:
 
-In this case, ctrl and event vq are not initialized.
-vhost_verify_ring_mappings may use uninitialized vhost_virtqueue
-such that vhost_verify_ring_part_mapping returns ENOMEM.
+   00:02.0   qxl          channel 0
+   00:03.0   virtio-gpu   channel 1
 
-When encountered this problem, we got the following logs:
+So the client will assign display 0 to qxl and display 1 to virtio-gpu.
+In interface_client_monitors_config() we have to pick the correct array
+entry.
 
-    qemu-system-x86_64: Unable to map available ring for ring 0
-    qemu-system-x86_64: Verify ring failure on region 0
+When using the channel_id it works correctly.
 
-Signed-off-by: Forrest Liu <forrestl@synology.com>
-Signed-off-by: yuchenlin <yuchenlin@synology.com>
----
- hw/scsi/vhost-scsi.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+When using qemu_console_get_head() it doesn't work correctly, it would
+use the qxl card's data.  It would work if spice-server would filter the
+list to only include the entries for the given display channel before
+calling the ->client_monitors_config() callback.  But it doesn't, we get
+the complete set.
 
-diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
-index becf550085..7f21b4f9d6 100644
---- a/hw/scsi/vhost-scsi.c
-+++ b/hw/scsi/vhost-scsi.c
-@@ -183,7 +183,7 @@ static void vhost_scsi_realize(DeviceState *dev, Error **errp)
-     }
- 
-     vsc->dev.nvqs = VHOST_SCSI_VQ_NUM_FIXED + vs->conf.num_queues;
--    vsc->dev.vqs = g_new(struct vhost_virtqueue, vsc->dev.nvqs);
-+    vsc->dev.vqs = g_new0(struct vhost_virtqueue, vsc->dev.nvqs);
-     vsc->dev.vq_index = 0;
-     vsc->dev.backend_features = 0;
- 
--- 
-2.18.0
+> > > I think we should fix spice server to actually do the filtering and
+> > > only send monitors_config that belongs to the device to the QXL
+> > > interface. As Frediano mentioned, it looks more like a bug.
+> >=20
+> > Only problem is changing the callback semantics changes the library a=
+pi.
+> > We could add a second version of the callback which gets called with =
+a
+> > filtered list (if present).  Not sure this is worth the effort though=
+.
+>=20
+> That's right. But if we don't actually break any currently supported
+> use cases, it might be fine? The only thing we would be breaking is
+> the virtio-gpu, I think?  Is that already something we don't want to
+> break?
+
+It would break any multihead configuration which uses multiple display
+channels.  Yes, virtio-gpu is one case.  Breaking that would not be very
+nice, but maybe acceptable.  The other case is multiple qxl devices
+(i.e.  windows guest style multihead).  Breaking that is out of
+question.
+
+cheers,
+  Gerd
