@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56031)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gB0bB-0003wN-Ms
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 12:47:38 -0400
+	(envelope-from <crosa@redhat.com>) id 1gB0hO-0000hp-6R
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 12:54:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gB0bA-0000jN-Ko
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 12:47:37 -0400
-References: <20181012115532.12645-1-kwolf@redhat.com>
-	<20181012115532.12645-3-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <12e95cce-ab82-08e3-b0ae-2307fe94a392@redhat.com>
-Date: Fri, 12 Oct 2018 11:47:18 -0500
-MIME-Version: 1.0
-In-Reply-To: <20181012115532.12645-3-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/8] block: Add auto-read-only option
+	(envelope-from <crosa@redhat.com>) id 1gB0hK-0007uv-Ju
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 12:54:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57314)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gB0hK-0007tK-Bi
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 12:53:58 -0400
+From: Cleber Rosa <crosa@redhat.com>
+Date: Fri, 12 Oct 2018 12:53:45 -0400
+Message-Id: <20181012165347.2117-2-crosa@redhat.com>
+In-Reply-To: <20181012165347.2117-1-crosa@redhat.com>
+References: <20181012165347.2117-1-crosa@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 1/3] Bootstrap Python venv for tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,100 +23,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Laszlo Ersek <lersek@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Caio Carrara <ccarrara@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <pmathieu@redhat.com>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
-On 10/12/18 6:55 AM, Kevin Wolf wrote:
-> If a management application builds the block graph node by node, the
-> protocol layer doesn't inherit its read-only option from the format
-> layer any more, so it must be set explicitly.
-> 
+A number of QEMU tests are written in Python, and may benefit
+from an untainted Python venv.
 
-> The documentation for this option is consciously phrased in a way that
-> allows QEMU to switch to a better model eventually: Instead of trying
-> when the image is first opened, making the read-only flag dynamic and
-> changing it automatically whenever the first BLK_PERM_WRITE user is
-> attached or the last one is detached would be much more useful
-> behaviour.
-> 
-> Unfortunately, this more useful behaviour is also a lot harder to
-> implement, and libvirt needs a solution now before it can switch to
-> -blockdev, so let's start with this easier approach for now.
+By using make rules, tests that depend on specific Python libs
+can set that rule as a requirement, along with rules that require
+the presence or installation of specific libraries.
 
-I agree both with the approach of getting the simpler implementation in 
-now (always writable, even when we don't need to write) as well as 
-wording the documentation to permit a future stricter approach (only 
-writable at the points where we need to write).
+The tests/venv-requirements.txt is supposed to contain the
+Python requirements that should be added to the venv created
+by check-venv.
 
-> 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->   qapi/block-core.json  |  6 ++++++
->   include/block/block.h |  2 ++
->   block.c               | 21 ++++++++++++++++++++-
->   block/vvfat.c         |  1 +
->   4 files changed, 29 insertions(+), 1 deletion(-)
-> 
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index cfb37f8c1d..3a899298de 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -3651,6 +3651,11 @@
->   #                 either generally or in certain configurations. In this case,
->   #                 the default value does not work and the option must be
->   #                 specified explicitly.
-> +# @auto-read-only: if true, QEMU may ignore the @read-only option and
-> +#                  automatically decide whether to open the image read-only or
-> +#                  read-write (and switch between the modes later), e.g.
-> +#                  depending on whether the image file is writable or whether a
-> +#                  writing user is attached to the node (default: false).
+Signed-off-by: Cleber Rosa <crosa@redhat.com>
+---
+ tests/Makefile.include      | 20 ++++++++++++++++++++
+ tests/venv-requirements.txt |  3 +++
+ 2 files changed, 23 insertions(+)
+ create mode 100644 tests/venv-requirements.txt
 
-Bike-shedding: Do we really want to ignore @read-only? Here's the table 
-of 9 combinations ('t'rue, 'f'alse, 'o'mitted), with '*' on the rows 
-that must be preserved for back-compat:
-
-RO   Auto   effect
-o    o      *open for write, fail if not possible
-f    o      *open for write, fail if not possible
-t    o      *open for read, no conversion to write
-o    f      open for write, fail if not possible
-f    f      open for write, fail if not possible
-t    f      open for read, no conversion to write
-o    t      attempt write but graceful fall back to read
-f    t      attempt write but graceful fall back to read
-t    t      ignore RO flag, attempt write anyway
-
-That last row is weird, why not make it an explicit error instead of 
-ignoring the implied difference in semantics between the two?
-
-Or, another idea: is it worth trying to support a single tri-state 
-member (via an alternative between bool and enum, since the existing 
-code uses a JSON bool):
-
-"read-only": false (open for write, fail if not possible)
-"read-only": true (open read-only, no later switching)
-"read-only": "auto" (switch as needed; or for initial implementation 
-attempt for write with graceful fallback to read)
-omitting read-only: same as "read-only":false for back-compat
-
-
-> @@ -1328,6 +1338,11 @@ QemuOptsList bdrv_runtime_opts = {
->               .type = QEMU_OPT_BOOL,
->               .help = "Node is opened in read-only mode",
->           },
-> +        {
-> +            .name = BDRV_OPT_AUTO_READ_ONLY,
-> +            .type = QEMU_OPT_BOOL,
-> +            .help = "Node can become read-only if opening read-write fails",
-> +        },
-
-If we keep your current approach, is it worth mentioning that 
-auto-read-only true overrides read-only true?
-
-The code looks okay, but I'd like discussion on the bikeshed points 
-before giving R-b.
-
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 5eadfd52f9..b66180efa1 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -12,6 +12,7 @@ check-help:
+ 	@echo " $(MAKE) check-block          Run block tests"
+ 	@echo " $(MAKE) check-tcg            Run TCG tests"
+ 	@echo " $(MAKE) check-report.html    Generates an HTML test report"
++	@echo " $(MAKE) check-venv           Creates a Python venv for tests"
+ 	@echo " $(MAKE) check-clean          Clean the tests"
+ 	@echo
+ 	@echo "Please note that HTML reports do not regenerate if the unit tests"
+@@ -1017,6 +1018,24 @@ check-decodetree:
+           ./check.sh "$(PYTHON)" "$(SRC_PATH)/scripts/decodetree.py", \
+           TEST, decodetree.py)
+ 
++# Python venv for running tests
++
++.PHONY: check-venv
++
++TESTS_VENV_DIR=$(BUILD_DIR)/tests/venv
++TESTS_VENV_REQ=$(SRC_PATH)/tests/venv-requirements.txt
++
++$(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
++	$(call quiet-command, \
++            $(PYTHON) -m venv --system-site-packages $@, \
++            VENV, $@)
++	$(call quiet-command, \
++            $(TESTS_VENV_DIR)/bin/python -m pip -q install -r $(TESTS_VENV_REQ), \
++            PIP, $(TESTS_VENV_REQ))
++	$(call quiet-command, touch $@)
++
++check-venv: $(TESTS_VENV_DIR)
++
+ # Consolidated targets
+ 
+ .PHONY: check-qapi-schema check-qtest check-unit check check-clean
+@@ -1030,6 +1049,7 @@ check-clean:
+ 	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
+ 	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y)) $(check-qtest-generic-y))
+ 	rm -f tests/test-qapi-gen-timestamp
++	rm -rf $(TESTS_VENV_DIR)
+ 
+ clean: check-clean
+ 
+diff --git a/tests/venv-requirements.txt b/tests/venv-requirements.txt
+new file mode 100644
+index 0000000000..d39f9d1576
+--- /dev/null
++++ b/tests/venv-requirements.txt
+@@ -0,0 +1,3 @@
++# Add Python module requirements, one per line, to be installed
++# in the tests/venv Python virtual environment. For more info,
++# refer to: https://pip.pypa.io/en/stable/user_guide/#id1
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.17.1
