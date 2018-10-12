@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41228)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51657)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fli@suse.com>) id 1gAozz-0005O0-Vy
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 00:24:29 -0400
+	(envelope-from <fli@suse.com>) id 1gAqBL-0006A0-T2
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 01:40:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fli@suse.com>) id 1gAozw-0008CB-QG
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 00:24:27 -0400
-Received: from mx2.suse.de ([195.135.220.15]:59146 helo=mx1.suse.de)
+	(envelope-from <fli@suse.com>) id 1gAqBH-0001eK-01
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 01:40:15 -0400
+Received: from mx2.suse.de ([195.135.220.15]:39426 helo=mx1.suse.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <fli@suse.com>) id 1gAozw-0008A7-AZ
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 00:24:24 -0400
+	(Exim 4.71) (envelope-from <fli@suse.com>) id 1gAqBG-0001YN-Jw
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 01:40:10 -0400
 References: <20181010120841.13214-1-fli@suse.com>
-	<20181010120841.13214-2-fli@suse.com>
-	<87in286bst.fsf@dusky.pond.sub.org>
+	<20181010120841.13214-3-fli@suse.com>
+	<87h8hs4oe3.fsf@dusky.pond.sub.org>
 From: Fei Li <fli@suse.com>
-Message-ID: <3bef7443-9212-db30-a27f-4aa1bd70e65b@suse.com>
-Date: Fri, 12 Oct 2018 12:24:13 +0800
+Message-ID: <ccdf2dd1-412d-ee82-e77d-9eac6c7d86d9@suse.com>
+Date: Fri, 12 Oct 2018 13:40:01 +0800
 MIME-Version: 1.0
-In-Reply-To: <87in286bst.fsf@dusky.pond.sub.org>
+In-Reply-To: <87h8hs4oe3.fsf@dusky.pond.sub.org>
 Content-Language: en-US
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC v5 1/7] Fix segmentation fault when
- qemu_signal_init fails
+Subject: Re: [Qemu-devel] [PATCH RFC v5 2/7] ui/vnc.c: polish vnc_init_func
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,190 +34,226 @@ Cc: qemu-devel@nongnu.org, quintela@redhat.com, dgilbert@redhat.com, peterx@redh
 
 
 
-On 10/11/2018 06:02 PM, Markus Armbruster wrote:
+On 10/11/2018 09:13 PM, Markus Armbruster wrote:
 > Fei Li <fli@suse.com> writes:
 >
->> Currently, when qemu_signal_init() fails it only returns a non-zero
->> value but without propagating any Error. But its callers need a
->> non-null err when runs error_report_err(err), or else 0->msg occurs.
-> The bug is in qemu_init_main_loop():
->
->      ret =3D qemu_signal_init();
->      if (ret) {
->          return ret;
->      }
->
-> Fails without setting an error, unlike the other failures.  Its callers
-> crash then.
-Thanks!
->> To avoid such segmentation fault, add a new Error parameter to make
->> the call trace to propagate the err to the final caller.
+>> Add a new Error parameter for vnc_display_init() to handle errors
+>> in its caller: vnc_init_func(), just like vnc_display_open() does.
+>> And let the call trace propagate the Error.
+>>
+>> Besides, make vnc_start_worker_thread() return a bool to indicate
+>> whether it succeeds instead of returning nothing.
 >>
 >> Signed-off-by: Fei Li <fli@suse.com>
 >> Reviewed-by: Fam Zheng <famz@redhat.com>
 >> ---
->>   include/qemu/osdep.h | 2 +-
->>   util/compatfd.c      | 9 ++++++---
->>   util/main-loop.c     | 9 ++++-----
->>   3 files changed, 11 insertions(+), 9 deletions(-)
+>>   include/ui/console.h |  2 +-
+>>   ui/vnc-jobs.c        |  9 ++++++---
+>>   ui/vnc-jobs.h        |  2 +-
+>>   ui/vnc.c             | 12 +++++++++---
+>>   4 files changed, 17 insertions(+), 8 deletions(-)
 >>
->> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
->> index 4f8559e550..f1f56763a0 100644
->> --- a/include/qemu/osdep.h
->> +++ b/include/qemu/osdep.h
->> @@ -421,7 +421,7 @@ struct qemu_signalfd_siginfo {
->>                                additional fields in the future) */
+>> diff --git a/include/ui/console.h b/include/ui/console.h
+>> index fb969caf70..c17803c530 100644
+>> --- a/include/ui/console.h
+>> +++ b/include/ui/console.h
+>> @@ -453,7 +453,7 @@ void qemu_display_early_init(DisplayOptions *opts)=
+;
+>>   void qemu_display_init(DisplayState *ds, DisplayOptions *opts);
+>>  =20
+>>   /* vnc.c */
+>> -void vnc_display_init(const char *id);
+>> +void vnc_display_init(const char *id, Error **errp);
+>>   void vnc_display_open(const char *id, Error **errp);
+>>   void vnc_display_add_client(const char *id, int csock, bool skipauth=
+);
+>>   int vnc_display_password(const char *id, const char *password);
+>> diff --git a/ui/vnc-jobs.c b/ui/vnc-jobs.c
+>> index 929391f85d..8807d7217c 100644
+>> --- a/ui/vnc-jobs.c
+>> +++ b/ui/vnc-jobs.c
+>> @@ -331,15 +331,18 @@ static bool vnc_worker_thread_running(void)
+>>       return queue; /* Check global queue */
+>>   }
+>>  =20
+>> -void vnc_start_worker_thread(void)
+>> +bool vnc_start_worker_thread(Error **errp)
+>>   {
+>>       VncJobQueue *q;
+>>  =20
+>> -    if (vnc_worker_thread_running())
+>> -        return ;
+>> +    if (vnc_worker_thread_running()) {
+>> +        goto out;
+>> +    }
+>>  =20
+>>       q =3D vnc_queue_init();
+>>       qemu_thread_create(&q->thread, "vnc_worker", vnc_worker_thread, =
+q,
+>>                          QEMU_THREAD_DETACHED);
+>>       queue =3D q; /* Set global queue */
+>> +out:
+>> +    return true;
+>>   }
+> This function cannot fail.  Why convert it to Error, and complicate its
+> caller?
+[Issue1]
+Actually, this is to pave the way for patch 7/7, in case=20
+qemu_thread_create() fails.
+Patch 7/7 is long enough, thus I wrote the patch 1/2/3 separately to main=
+ly
+connects the broken errp for callers who initially have the errp.
+
+[I am back... If the other codes in this patches be squashed, maybe=20
+merge [Issue1]
+into patch 7/7 looks more intuitive.]
+>> diff --git a/ui/vnc-jobs.h b/ui/vnc-jobs.h
+>> index 59f66bcc35..14640593db 100644
+>> --- a/ui/vnc-jobs.h
+>> +++ b/ui/vnc-jobs.h
+>> @@ -37,7 +37,7 @@ void vnc_job_push(VncJob *job);
+>>   void vnc_jobs_join(VncState *vs);
+>>  =20
+>>   void vnc_jobs_consume_buffer(VncState *vs);
+>> -void vnc_start_worker_thread(void);
+>> +bool vnc_start_worker_thread(Error **errp);
+>>  =20
+>>   /* Locks */
+>>   static inline int vnc_trylock_display(VncDisplay *vd)
+>> diff --git a/ui/vnc.c b/ui/vnc.c
+>> index cf221c83cc..f3806e76db 100644
+>> --- a/ui/vnc.c
+>> +++ b/ui/vnc.c
+>> @@ -3205,7 +3205,7 @@ static const DisplayChangeListenerOps dcl_ops =3D=
+ {
+>>       .dpy_cursor_define    =3D vnc_dpy_cursor_define,
 >>   };
 >>  =20
->> -int qemu_signalfd(const sigset_t *mask);
->> +int qemu_signalfd(const sigset_t *mask, Error **errp);
->>   void sigaction_invoke(struct sigaction *action,
->>                         struct qemu_signalfd_siginfo *info);
->>   #endif
->> diff --git a/util/compatfd.c b/util/compatfd.c
->> index 980bd33e52..d3ed890405 100644
->> --- a/util/compatfd.c
->> +++ b/util/compatfd.c
->> @@ -16,6 +16,7 @@
->>   #include "qemu/osdep.h"
->>   #include "qemu-common.h"
->>   #include "qemu/thread.h"
->> +#include "qapi/error.h"
->>  =20
->>   #include <sys/syscall.h>
->>  =20
->> @@ -65,7 +66,7 @@ static void *sigwait_compat(void *opaque)
->>       }
->>   }
->>  =20
->> -static int qemu_signalfd_compat(const sigset_t *mask)
->> +static int qemu_signalfd_compat(const sigset_t *mask, Error **errp)
+>> -void vnc_display_init(const char *id)
+>> +void vnc_display_init(const char *id, Error **errp)
 >>   {
->>       struct sigfd_compat_info *info;
->>       QemuThread thread;
->> @@ -73,11 +74,13 @@ static int qemu_signalfd_compat(const sigset_t *ma=
-sk)
+>>       VncDisplay *vd;
 >>  =20
->>       info =3D malloc(sizeof(*info));
->>       if (info =3D=3D NULL) {
->> +        error_setg(errp, "Failed to allocate signalfd memory");
->>           errno =3D ENOMEM;
->>           return -1;
->>       }
->>  =20
->>       if (pipe(fds) =3D=3D -1) {
->> +        error_setg(errp, "Failed to create signalfd pipe");
->>           free(info);
->>           return -1;
->>       }
->> @@ -94,7 +97,7 @@ static int qemu_signalfd_compat(const sigset_t *mask=
-)
->>       return fds[0];
->>   }
->>  =20
->> -int qemu_signalfd(const sigset_t *mask)
->> +int qemu_signalfd(const sigset_t *mask, Error **errp)
->>   {
->>   #if defined(CONFIG_SIGNALFD)
->>       int ret;
->> @@ -106,5 +109,5 @@ int qemu_signalfd(const sigset_t *mask)
->>       }
->>   #endif
->>  =20
->> -    return qemu_signalfd_compat(mask);
->> +    return qemu_signalfd_compat(mask, errp);
->>   }
-> I think this takes the Error conversion too far.
+>         if (vnc_display_find(id) !=3D NULL) {
+>             return;
+>         }
+>         vd =3D g_malloc0(sizeof(*vd));
 >
-> qemu_signalfd() is like the signalfd() system call, only portable, and
-> setting FD_CLOEXEC.  In particular, it reports failure just like a
-> system call: it sets errno and returns -1.  I'd prefer to keep it that
-> way.  Instead...
+>         vd->id =3D strdup(id);
+>         QTAILQ_INSERT_TAIL(&vnc_displays, vd, next);
 >
->> diff --git a/util/main-loop.c b/util/main-loop.c
->> index affe0403c5..9671b6d226 100644
->> --- a/util/main-loop.c
->> +++ b/util/main-loop.c
->> @@ -71,7 +71,7 @@ static void sigfd_handler(void *opaque)
->>       }
->>   }
->>  =20
->> -static int qemu_signal_init(void)
->> +static int qemu_signal_init(Error **errp)
->>   {
->>       int sigfd;
->>       sigset_t set;
->> @@ -94,9 +94,8 @@ static int qemu_signal_init(void)
->>       pthread_sigmask(SIG_BLOCK, &set, NULL);
->>  =20
->>       sigdelset(&set, SIG_IPI);
->> -    sigfd =3D qemu_signalfd(&set);
->> +    sigfd =3D qemu_signalfd(&set, errp);
->>       if (sigfd =3D=3D -1) {
->> -        fprintf(stderr, "failed to create signalfd\n");
->>           return -errno;
->>       }
->>  =20
-> ... change this function so:
+>         QTAILQ_INIT(&vd->clients);
+>         vd->expires =3D TIME_MAX;
 >
->         pthread_sigmask(SIG_BLOCK, &set, NULL);
->    =20
->         sigdelset(&set, SIG_IPI);
->         sigfd =3D qemu_signalfd(&set);
->         if (sigfd =3D=3D -1) {
->    -        fprintf(stderr, "failed to create signalfd\n");
->    +        error_setg_errno(errp, errno, "failed to create signalfd");
->             return -errno;
+>         if (keyboard_layout) {
+>             trace_vnc_key_map_init(keyboard_layout);
+>             vd->kbd_layout =3D init_keyboard_layout(name2keysym, keyboa=
+rd_layout);
+>         } else {
+>             vd->kbd_layout =3D init_keyboard_layout(name2keysym, "en-us=
+");
 >         }
 >
-> Does this make sense?
-Yes, it looks more concise if we only have this patch, but triggers one=20
-errno-set
-issue after applying patch 7/7, which adds a Error **errp parameter for
-qemu_thread_create() to let its callers handle the error instead of=20
-exit() directly
-to add the robustness.
-
-For the patch series' current implementation, the=C2=A0 modified=20
-qemu_thread_create()
-in 7/7 patch returns a Boolean value to indicate whether it succeeds and=20
-set the
-error reason into the passed errp, and did not set the errno. Actually=20
-another
-similar errno-set issue has been talked in last patch. :)
-If we set the errno in future qemu_thread_create(), we need to=20
-distinguish the Linux
-and Windows implementation. For Linux, we can use error_setg_errno() to=20
-set errno.
-But for Windows, I am not sure if we can use
-
-"errno =3D GetLastError()"
-
-to set errno, as this seems a little weird. Do you have any idea about th=
-is?
-
-BTW, if we have a decent errno-set way for Windows, I will adopt your abo=
-ve
-proposal for this patch.
-
-Have a nice day, thanks for the review :)
-Fei
->> @@ -109,7 +108,7 @@ static int qemu_signal_init(void)
->>  =20
->>   #else /* _WIN32 */
->>  =20
->> -static int qemu_signal_init(void)
->> +static int qemu_signal_init(Error **errp)
->>   {
->>       return 0;
->>   }
->> @@ -148,7 +147,7 @@ int qemu_init_main_loop(Error **errp)
->>  =20
->>       init_clocks(qemu_timer_notify_cb);
->>  =20
->> -    ret =3D qemu_signal_init();
->> +    ret =3D qemu_signal_init(errp);
->>       if (ret) {
->>           return ret;
->>       }
+>         if (!vd->kbd_layout) {
+>             exit(1);
 >
+> Uh, init_keyboard_layout() reports errors to stderr, and the exit(1)
+> here makes them fatal.  Okay before this patch, but inappropriate
+> afterwards.  I'm afraid you have to convert init_keyboard_layout() to
+> Error first.
+[Issue2]
+Right. But I notice the returned kbd_layout_t *kbd_layout is a static=20
+value and also
+will be used by others, how about passing the errp parameter to=20
+init_keyboard_layout()
+as follows? And for its other callers, just pass NULL.
+
+@@ -3222,13 +3222,13 @@ void vnc_display_init(const char *id, Error **err=
+p)
+
+ =C2=A0=C2=A0=C2=A0=C2=A0 if (keyboard_layout) {
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 trace_vnc_key_map_init(=
+keyboard_layout);
+-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vd->kbd_layout =3D init_keybo=
+ard_layout(name2keysym,=20
+keyboard_layout);
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vd->kbd_layout =3D init_keybo=
+ard_layout(name2keysym,=20
+keyboard_layout, errp);
+ =C2=A0=C2=A0=C2=A0=C2=A0 } else {
+-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vd->kbd_layout =3D init_keybo=
+ard_layout(name2keysym, "en-us");
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vd->kbd_layout =3D init_keybo=
+ard_layout(name2keysym, "en-us", errp);
+ =C2=A0=C2=A0=C2=A0=C2=A0 }
+
+ =C2=A0=C2=A0=C2=A0=C2=A0 if (!vd->kbd_layout) {
+-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 exit(1);
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
+ =C2=A0=C2=A0=C2=A0=C2=A0 }
+
+>
+>         }
+>
+>         vd->share_policy =3D VNC_SHARE_POLICY_ALLOW_EXCLUSIVE;
+>> @@ -3235,7 +3235,9 @@ void vnc_display_init(const char *id)
+>>       vd->connections_limit =3D 32;
+>>  =20
+>>       qemu_mutex_init(&vd->mutex);
+>> -    vnc_start_worker_thread();
+>> +    if (!vnc_start_worker_thread(errp)) {
+>> +        return;
+>> +    }
+>>  =20
+>>       vd->dcl.ops =3D &dcl_ops;
+>>       register_displaychangelistener(&vd->dcl);
+>> @@ -4079,7 +4081,11 @@ int vnc_init_func(void *opaque, QemuOpts *opts,=
+ Error **errp)
+>>       char *id =3D (char *)qemu_opts_id(opts);
+>>  =20
+>>       assert(id);
+>> -    vnc_display_init(id);
+>> +    vnc_display_init(id, &local_err);
+>> +    if (local_err) {
+>> +        error_reportf_err(local_err, "Failed to init VNC server: ");
+>> +        exit(1);
+>> +    }
+>>       vnc_display_open(id, &local_err);
+>>       if (local_err !=3D NULL) {
+>>           error_reportf_err(local_err, "Failed to start VNC server: ")=
+;
+> Conflicts with my "[PATCH 24/31] vl: Clean up error reporting in
+> vnc_init_func()".  Your patch shows that mine is incomplete.
+>
+> Without my patch, there's no real reason for yours, however.  The two
+> should be squashed together.
+Ah, I noticed your patch 24/31. OK, let's squash.
+Should I write a new patch by
+- updating to error_propagate(...) if vnc_display_init() fails
+&&
+- modifying [Issue2] ?
+Or you do this in your original patch?
+
+BTW, for your patch 24/31, the updated passed errp for vnc_init_func is=20
+&error_fatal,
+then the system will exit(1) when running error_propagate(...) which call=
+s
+error_handle_fatal(...). This means the following two lines will not be=20
+touched.
+But if we want the following prepended error message, could we move it=20
+earlier than
+the error_propagare? I mean:
+
+ =C2=A0=C2=A0=C2=A0=C2=A0 if (local_err !=3D NULL) {
+-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_reportf_err(local_err, =
+"Failed to start VNC server: ");
+-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 exit(1);
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_prepend(&local_err, "Fa=
+iled to start VNC server: ");
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_propagate(errp, local_e=
+rr);
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -1;
+ =C2=A0=C2=A0=C2=A0=C2=A0 }
+
+Have a nice day
+Fei
