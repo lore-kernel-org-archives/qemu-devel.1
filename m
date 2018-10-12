@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54985)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54986)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gB0XZ-0001AT-Fd
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gB0XZ-0001AU-Fj
 	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 12:43:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gB0XV-00058f-AT
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gB0XW-00059x-2D
 	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 12:43:53 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:46830 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:46856 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gB0XV-00057N-2I
+	id 1gB0XV-00057w-Lm
 	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 12:43:49 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Fri, 12 Oct 2018 18:39:23 +0200
-Message-Id: <1539362376-12010-16-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Fri, 12 Oct 2018 18:39:26 +0200
+Message-Id: <1539362376-12010-19-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1539362376-12010-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1539362376-12010-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v5 15/28] target/mips: Add CPO MemoryMapID
- register
+Subject: [Qemu-devel] [PATCH v5 18/28] target/mips: Add availability control
+ for DSP R3 ASE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,78 +28,94 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, laurent@vivier.eu, riku.voipio@iki.fi
 
-From: Yongbok Kim <yongbok.kim@mips.com>
+From: Stefan Markovic <smarkovic@wavecomp.com>
 
-Add CPO MemoryMapID register. It is used by Global TLB Invalidate
-instruction (GINVT).
+Add infrastructure for availability control for DSP R3 ASE MIPS
+instructions. Only BPOSGE32C currently belongs to DSP R3 ASE, but
+this is likely to be changed in near future.
 
-Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/cpu.h      | 1 +
- target/mips/internal.h | 1 +
- target/mips/machine.c  | 4 ++++
- 3 files changed, 6 insertions(+)
+ target/mips/internal.h           | 11 ++++++++---
+ target/mips/translate.c          | 13 ++++++++++++-
+ target/mips/translate_init.inc.c |  3 ++-
+ 3 files changed, 22 insertions(+), 5 deletions(-)
 
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 10c3813..77c6355 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -252,6 +252,7 @@ struct CPUMIPSState {
- #define CP0GN_VPId 0
-     target_ulong CP0_Context;
-     target_ulong CP0_KScratch[MIPS_KSCRATCH_NUM];
-+    int32_t CP0_MemoryMapID;
-     int32_t CP0_PageMask;
-     int32_t CP0_PageGrain_rw_bitmask;
-     int32_t CP0_PageGrain;
 diff --git a/target/mips/internal.h b/target/mips/internal.h
-index 2898bfc..6888a06 100644
+index 54bf39f..e367d7e 100644
 --- a/target/mips/internal.h
 +++ b/target/mips/internal.h
-@@ -91,6 +91,7 @@ struct r4k_tlb_t {
-     target_ulong VPN;
-     uint32_t PageMask;
-     uint16_t ASID;
-+    uint32_t MMID;
-     unsigned int G:1;
-     unsigned int C0:3;
-     unsigned int C1:3;
-diff --git a/target/mips/machine.c b/target/mips/machine.c
-index 5d558c1..4c80724 100644
---- a/target/mips/machine.c
-+++ b/target/mips/machine.c
-@@ -136,6 +136,7 @@ static int get_tlb(QEMUFile *f, void *pv, size_t size, VMStateField *field)
-     qemu_get_betls(f, &v->VPN);
-     qemu_get_be32s(f, &v->PageMask);
-     qemu_get_be16s(f, &v->ASID);
-+    qemu_get_be32s(f, &v->MMID);
-     qemu_get_be16s(f, &flags);
-     v->G = (flags >> 10) & 1;
-     v->C0 = (flags >> 7) & 3;
-@@ -161,6 +162,7 @@ static int put_tlb(QEMUFile *f, void *pv, size_t size, VMStateField *field,
-     r4k_tlb_t *v = pv;
+@@ -310,8 +310,8 @@ static inline void compute_hflags(CPUMIPSState *env)
+     env->hflags &= ~(MIPS_HFLAG_COP1X | MIPS_HFLAG_64 | MIPS_HFLAG_CP0 |
+                      MIPS_HFLAG_F64 | MIPS_HFLAG_FPU | MIPS_HFLAG_KSU |
+                      MIPS_HFLAG_AWRAP | MIPS_HFLAG_DSP | MIPS_HFLAG_DSPR2 |
+-                     MIPS_HFLAG_SBRI | MIPS_HFLAG_MSA | MIPS_HFLAG_FRE |
+-                     MIPS_HFLAG_ELPA | MIPS_HFLAG_ERL);
++                     MIPS_HFLAG_DSPR3 | MIPS_HFLAG_SBRI | MIPS_HFLAG_MSA |
++                     MIPS_HFLAG_FRE | MIPS_HFLAG_ELPA | MIPS_HFLAG_ERL);
+     if (env->CP0_Status & (1 << CP0St_ERL)) {
+         env->hflags |= MIPS_HFLAG_ERL;
+     }
+@@ -358,7 +358,12 @@ static inline void compute_hflags(CPUMIPSState *env)
+         (env->CP0_Config5 & (1 << CP0C5_SBRI))) {
+         env->hflags |= MIPS_HFLAG_SBRI;
+     }
+-    if (env->insn_flags & ASE_DSPR2) {
++    if (env->insn_flags & ASE_DSPR3) {
++        if (env->CP0_Status & (1 << CP0St_MX)) {
++            env->hflags |= MIPS_HFLAG_DSP | MIPS_HFLAG_DSPR2 |
++                           MIPS_HFLAG_DSPR3;
++        }
++    } else if (env->insn_flags & ASE_DSPR2) {
+         /* Enables access MIPS DSP resources, now our cpu is DSP ASER2,
+            so enable to access DSPR2 resources. */
+         if (env->CP0_Status & (1 << CP0St_MX)) {
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index e9c3a14..c3ad65c 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -1869,6 +1869,17 @@ static inline void check_dspr2(DisasContext *ctx)
+     }
+ }
  
-     uint16_t asid = v->ASID;
-+    uint32_t mmid = v->MMID;
-     uint16_t flags = ((v->EHINV << 15) |
-                       (v->RI1 << 14) |
-                       (v->RI0 << 13) |
-@@ -177,6 +179,7 @@ static int put_tlb(QEMUFile *f, void *pv, size_t size, VMStateField *field,
-     qemu_put_betls(f, &v->VPN);
-     qemu_put_be32s(f, &v->PageMask);
-     qemu_put_be16s(f, &asid);
-+    qemu_put_be32s(f, &mmid);
-     qemu_put_be16s(f, &flags);
-     qemu_put_be64s(f, &v->PFN[0]);
-     qemu_put_be64s(f, &v->PFN[1]);
-@@ -251,6 +254,7 @@ const VMStateDescription vmstate_mips_cpu = {
-         VMSTATE_UINT64(env.CP0_EntryLo0, MIPSCPU),
-         VMSTATE_UINT64(env.CP0_EntryLo1, MIPSCPU),
-         VMSTATE_UINTTL(env.CP0_Context, MIPSCPU),
-+        VMSTATE_INT32(env.CP0_MemoryMapID, MIPSCPU),
-         VMSTATE_INT32(env.CP0_PageMask, MIPSCPU),
-         VMSTATE_INT32(env.CP0_PageGrain, MIPSCPU),
-         VMSTATE_UINTTL(env.CP0_SegCtl0, MIPSCPU),
++static inline void check_dspr3(DisasContext *ctx)
++{
++    if (unlikely(!(ctx->hflags & MIPS_HFLAG_DSPR3))) {
++        if (ctx->insn_flags & ASE_DSP) {
++            generate_exception_end(ctx, EXCP_DSPDIS);
++        } else {
++            generate_exception_end(ctx, EXCP_RI);
++        }
++    }
++}
++
+ /* This code generates a "reserved instruction" exception if the
+    CPU does not support the instruction set corresponding to flags. */
+ static inline void check_insn(DisasContext *ctx, int flags)
+@@ -20285,7 +20296,7 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
+                     gen_compute_branch_cp1_nm(ctx, OPC_BC1NEZ, rt, s);
+                     break;
+                 case NM_BPOSGE32C:
+-                    check_dspr2(ctx);
++                    check_dspr3(ctx);
+                     {
+                         int32_t imm = extract32(ctx->opcode, 1, 13) |
+                                       extract32(ctx->opcode, 0, 1) << 13;
+diff --git a/target/mips/translate_init.inc.c b/target/mips/translate_init.inc.c
+index b3320b9..d7cd4ee 100644
+--- a/target/mips/translate_init.inc.c
++++ b/target/mips/translate_init.inc.c
+@@ -485,7 +485,8 @@ const mips_def_t mips_defs[] =
+         .CP1_fcr31 = (1 << FCR31_ABS2008) | (1 << FCR31_NAN2008),
+         .SEGBITS = 32,
+         .PABITS = 32,
+-        .insn_flags = CPU_NANOMIPS32 | ASE_DSP | ASE_DSPR2 | ASE_MT,
++        .insn_flags = CPU_NANOMIPS32 | ASE_DSP | ASE_DSPR2 | ASE_DSPR3 |
++                      ASE_MT,
+         .mmu_type = MMU_TYPE_R4000,
+     },
+ #if defined(TARGET_MIPS64)
 -- 
 2.7.4
