@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40013)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gB1Ho-0001v7-UN
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 13:31:41 -0400
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gB1Hr-0001xr-9n
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 13:31:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gB1Hl-0000OR-O0
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 13:31:40 -0400
-References: <20181012115532.12645-1-kwolf@redhat.com>
-	<20181012115532.12645-8-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <0b377575-4838-c436-3867-a875bc8bab76@redhat.com>
-Date: Fri, 12 Oct 2018 12:31:21 -0500
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gB1Hp-0000Ro-Qo
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 13:31:43 -0400
+Received: from mail.uni-paderborn.de ([131.234.142.9]:55608)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
+	id 1gB1Hp-0000Fw-Iy
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 13:31:41 -0400
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Date: Fri, 12 Oct 2018 19:30:45 +0200
+Message-Id: <20181012173047.25420-27-kbastian@mail.uni-paderborn.de>
+In-Reply-To: <20181012173047.25420-1-kbastian@mail.uni-paderborn.de>
+References: <20181012173047.25420-1-kbastian@mail.uni-paderborn.de>
 MIME-Version: 1.0
-In-Reply-To: <20181012115532.12645-8-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 7/8] gluster: Support auto-read-only
- option
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 26/28] target/riscv: Remove gen_system()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,48 +26,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
+To: mjc@sifive.com, palmer@sifive.com, sagark@eecs.berkeley.edu, kbastian@mail.uni-paderborn.de
+Cc: qemu-devel@nongnu.org, peer.adelt@hni.uni-paderborn.de, Alistair.Francis@wdc.com
 
-On 10/12/18 6:55 AM, Kevin Wolf wrote:
-> If read-only=off, but auto-read-only=on is given, open the file
-> read-write if we have the permissions, but instead of erroring out for
-> read-only files, just degrade to read-only.
-> 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->   block/gluster.c | 9 +++++++++
->   1 file changed, 9 insertions(+)
-> 
-> diff --git a/block/gluster.c b/block/gluster.c
-> index 4fd55a9cc5..68d20c8830 100644
-> --- a/block/gluster.c
-> +++ b/block/gluster.c
-> @@ -849,6 +849,15 @@ static int qemu_gluster_open(BlockDriverState *bs,  QDict *options,
->       qemu_gluster_parse_flags(bdrv_flags, &open_flags);
->   
->       s->fd = glfs_open(s->glfs, gconf->path, open_flags);
-> +    if (!s->fd && errno == EACCES) {
+with all 16 bit insns moved to decodetree no path is falling back to
+gen_system(), so we can remove it.
 
-EROFS is not possible as it was for posix file?
+Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Signed-off-by: Peer Adelt <peer.adelt@hni.uni-paderborn.de>
+---
+ target/riscv/translate.c | 32 --------------------------------
+ 1 file changed, 32 deletions(-)
 
-> +        /* Try to degrade to read-only, but if it doesn't work, still use the
-> +         * normal error message. */
-> +        ret = bdrv_apply_auto_read_only(bs, NULL, NULL);
-
-No guarantees on what errno is on failure...
-
-> +        if (ret == 0) {
-> +            open_flags = (open_flags & ~O_RDWR) | O_RDONLY;
-> +            s->fd = glfs_open(s->glfs, gconf->path, open_flags);
-> +        }
-> +    }
->       if (!s->fd) {
->           ret = -errno;
-
-...but you are relying on it here.  (Same story as in the posix driver)
-
+diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+index 5e24ec49a0..86ca885c7e 100644
+--- a/target/riscv/translate.c
++++ b/target/riscv/translate.c
+@@ -305,34 +305,6 @@ static void gen_set_rm(DisasContext *ctx, int rm)
+     tcg_temp_free_i32(t0);
+ }
+ 
+-
+-static void gen_system(CPURISCVState *env, DisasContext *ctx, uint32_t opc,
+-                      int rd, int rs1, int csr)
+-{
+-    tcg_gen_movi_tl(cpu_pc, ctx->base.pc_next);
+-
+-    switch (opc) {
+-    case OPC_RISC_ECALL:
+-        switch (csr) {
+-        case 0x0: /* ECALL */
+-            /* always generates U-level ECALL, fixed in do_interrupt handler */
+-            generate_exception(ctx, RISCV_EXCP_U_ECALL);
+-            tcg_gen_exit_tb(NULL, 0); /* no chaining */
+-            ctx->base.is_jmp = DISAS_NORETURN;
+-            break;
+-        case 0x1: /* EBREAK */
+-            generate_exception(ctx, RISCV_EXCP_BREAKPOINT);
+-            tcg_gen_exit_tb(NULL, 0); /* no chaining */
+-            ctx->base.is_jmp = DISAS_NORETURN;
+-            break;
+-        default:
+-            gen_exception_illegal(ctx);
+-            break;
+-        }
+-        break;
+-    }
+-}
+-
+ #define EX_SH(amount) \
+     static int64_t ex_shift_##amount(int imm) \
+     {                                         \
+@@ -455,10 +427,6 @@ static void decode_RV32_64G(CPURISCVState *env, DisasContext *ctx)
+     rd = GET_RD(ctx->opcode);
+ 
+     switch (op) {
+-    case OPC_RISC_SYSTEM:
+-        gen_system(env, ctx, MASK_OP_SYSTEM(ctx->opcode), rd, rs1,
+-                   (ctx->opcode & 0xFFF00000) >> 20);
+-        break;
+     default:
+         gen_exception_illegal(ctx);
+         break;
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.19.1
