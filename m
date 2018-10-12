@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42468)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fli@suse.com>) id 1gAtxq-0001W9-Vj
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 05:42:36 -0400
+	(envelope-from <philmd@redhat.com>) id 1gAtyk-0001wt-Jz
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 05:43:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fli@suse.com>) id 1gAtxn-0003mU-Pl
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 05:42:34 -0400
-Received: from mx2.suse.de ([195.135.220.15]:48910 helo=mx1.suse.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <fli@suse.com>) id 1gAtxn-0003li-Fx
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 05:42:31 -0400
-References: <20181010120841.13214-1-fli@suse.com>
-	<20181010120841.13214-2-fli@suse.com>
-	<87in286bst.fsf@dusky.pond.sub.org>
-	<3bef7443-9212-db30-a27f-4aa1bd70e65b@suse.com>
-	<87zhvjsimc.fsf@dusky.pond.sub.org>
-From: Fei Li <fli@suse.com>
-Message-ID: <3906b0bf-a9ec-e4ac-8948-59419b126799@suse.com>
-Date: Fri, 12 Oct 2018 17:42:23 +0800
+	(envelope-from <philmd@redhat.com>) id 1gAtyd-0004Fi-3x
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 05:43:28 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:50477)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gAtyc-0004EP-Qh
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 05:43:23 -0400
+Received: by mail-wm1-f68.google.com with SMTP id i8-v6so11604271wmg.0
+	for <qemu-devel@nongnu.org>; Fri, 12 Oct 2018 02:43:20 -0700 (PDT)
+References: <153933509870.3834759.13291133122604475240.stgit@bahia.lan>
+	<153933510947.3834759.3504000962964977142.stgit@bahia.lan>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <7b426297-35ae-1df3-8d37-54d572671d13@redhat.com>
+Date: Fri, 12 Oct 2018 11:43:18 +0200
 MIME-Version: 1.0
-In-Reply-To: <87zhvjsimc.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <153933510947.3834759.3504000962964977142.stgit@bahia.lan>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC v5 1/7] Fix segmentation fault when
- qemu_signal_init fails
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] spapr_pci: convert g_malloc() to
+ g_new()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,250 +31,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: peterx@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, quintela@redhat.com
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, David Gibson <david@gibson.dropbear.id.au>
 
+On 12/10/2018 11:05, Greg Kurz wrote:
+> When allocating an array, it is a recommended coding practice to call
+> g_new(FooType, n) instead of g_malloc(n * sizeof(FooType)) because
+> it takes care to avoid overflow when calculating the size of the
+> allocated block and it returns FooType *, which allows the compiler
+> to perform type checking.
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-On 10/12/2018 03:56 PM, Markus Armbruster wrote:
-> Fei Li <fli@suse.com> writes:
->
->> On 10/11/2018 06:02 PM, Markus Armbruster wrote:
->>> Fei Li <fli@suse.com> writes:
->>>
->>>> Currently, when qemu_signal_init() fails it only returns a non-zero
->>>> value but without propagating any Error. But its callers need a
->>>> non-null err when runs error_report_err(err), or else 0->msg occurs.
->>> The bug is in qemu_init_main_loop():
->>>
->>>       ret =3D qemu_signal_init();
->>>       if (ret) {
->>>           return ret;
->>>       }
->>>
->>> Fails without setting an error, unlike the other failures.  Its calle=
-rs
->>> crash then.
->> Thanks!
-> Consider working that into your commit message.
-Ok. I'd like to reword as follows:
-Currently in qemu_init_main_loop(), qemu_signal_init() fails without=20
-setting an error
-like the other failures. Its callers crash then when runs=20
-error_report_err(err).
->
->>>> To avoid such segmentation fault, add a new Error parameter to make
->>>> the call trace to propagate the err to the final caller.
->>>>
->>>> Signed-off-by: Fei Li <fli@suse.com>
->>>> Reviewed-by: Fam Zheng <famz@redhat.com>
->>>> ---
->>>>    include/qemu/osdep.h | 2 +-
->>>>    util/compatfd.c      | 9 ++++++---
->>>>    util/main-loop.c     | 9 ++++-----
->>>>    3 files changed, 11 insertions(+), 9 deletions(-)
->>>>
->>>> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
->>>> index 4f8559e550..f1f56763a0 100644
->>>> --- a/include/qemu/osdep.h
->>>> +++ b/include/qemu/osdep.h
->>>> @@ -421,7 +421,7 @@ struct qemu_signalfd_siginfo {
->>>>                                 additional fields in the future) */
->>>>    };
->>>>    -int qemu_signalfd(const sigset_t *mask);
->>>> +int qemu_signalfd(const sigset_t *mask, Error **errp);
->>>>    void sigaction_invoke(struct sigaction *action,
->>>>                          struct qemu_signalfd_siginfo *info);
->>>>    #endif
->>>> diff --git a/util/compatfd.c b/util/compatfd.c
->>>> index 980bd33e52..d3ed890405 100644
->>>> --- a/util/compatfd.c
->>>> +++ b/util/compatfd.c
->>>> @@ -16,6 +16,7 @@
->>>>    #include "qemu/osdep.h"
->>>>    #include "qemu-common.h"
->>>>    #include "qemu/thread.h"
->>>> +#include "qapi/error.h"
->>>>      #include <sys/syscall.h>
->>>>    @@ -65,7 +66,7 @@ static void *sigwait_compat(void *opaque)
->>>>        }
->>>>    }
->>>>    -static int qemu_signalfd_compat(const sigset_t *mask)
->>>> +static int qemu_signalfd_compat(const sigset_t *mask, Error **errp)
->>>>    {
->>>>        struct sigfd_compat_info *info;
->>>>        QemuThread thread;
->>>> @@ -73,11 +74,13 @@ static int qemu_signalfd_compat(const sigset_t *=
-mask)
->>>>          info =3D malloc(sizeof(*info));
->>>>        if (info =3D=3D NULL) {
->>>> +        error_setg(errp, "Failed to allocate signalfd memory");
->>>>            errno =3D ENOMEM;
->>>>            return -1;
->>>>        }
->>>>          if (pipe(fds) =3D=3D -1) {
->>>> +        error_setg(errp, "Failed to create signalfd pipe");
->>>>            free(info);
->>>>            return -1;
->>>>        }
->>>> @@ -94,7 +97,7 @@ static int qemu_signalfd_compat(const sigset_t *ma=
-sk)
->>>>        return fds[0];
->>>>    }
->>>>    -int qemu_signalfd(const sigset_t *mask)
->>>> +int qemu_signalfd(const sigset_t *mask, Error **errp)
->>>>    {
->>>>    #if defined(CONFIG_SIGNALFD)
->>>>        int ret;
->>>> @@ -106,5 +109,5 @@ int qemu_signalfd(const sigset_t *mask)
->>>>        }
->>>>    #endif
->>>>    -    return qemu_signalfd_compat(mask);
->>>> +    return qemu_signalfd_compat(mask, errp);
->>>>    }
->>> I think this takes the Error conversion too far.
->>>
->>> qemu_signalfd() is like the signalfd() system call, only portable, an=
-d
->>> setting FD_CLOEXEC.  In particular, it reports failure just like a
->>> system call: it sets errno and returns -1.  I'd prefer to keep it tha=
-t
->>> way.  Instead...
->>>
->>>> diff --git a/util/main-loop.c b/util/main-loop.c
->>>> index affe0403c5..9671b6d226 100644
->>>> --- a/util/main-loop.c
->>>> +++ b/util/main-loop.c
->>>> @@ -71,7 +71,7 @@ static void sigfd_handler(void *opaque)
->>>>        }
->>>>    }
->>>>    -static int qemu_signal_init(void)
->>>> +static int qemu_signal_init(Error **errp)
->>>>    {
->>>>        int sigfd;
->>>>        sigset_t set;
->>>> @@ -94,9 +94,8 @@ static int qemu_signal_init(void)
->>>>        pthread_sigmask(SIG_BLOCK, &set, NULL);
->>>>          sigdelset(&set, SIG_IPI);
->>>> -    sigfd =3D qemu_signalfd(&set);
->>>> +    sigfd =3D qemu_signalfd(&set, errp);
->>>>        if (sigfd =3D=3D -1) {
->>>> -        fprintf(stderr, "failed to create signalfd\n");
->>>>            return -errno;
->>>>        }
->>>>   =20
->>> ... change this function so:
->>>
->>>          pthread_sigmask(SIG_BLOCK, &set, NULL);
->>>              sigdelset(&set, SIG_IPI);
->>>          sigfd =3D qemu_signalfd(&set);
->>>          if (sigfd =3D=3D -1) {
->>>     -        fprintf(stderr, "failed to create signalfd\n");
->>>     +        error_setg_errno(errp, errno, "failed to create signalfd=
-");
->>>              return -errno;
->>>          }
->>>
->>> Does this make sense?
->> Yes, it looks more concise if we only have this patch, but triggers
->> one errno-set
->> issue after applying patch 7/7, which adds a Error **errp parameter fo=
-r
->> qemu_thread_create() to let its callers handle the error instead of
->> exit() directly
->> to add the robustness.
-> I guess you're talking about the qemu_thread_create() in
-> qemu_signalfd_compat().  Correct?
-Yes.
->
->> For the patch series' current implementation, the=C2=A0 modified
->> qemu_thread_create()
->> in 7/7 patch returns a Boolean value to indicate whether it succeeds
->> and set the
->> error reason into the passed errp, and did not set the errno. Actually
->> another
->> similar errno-set issue has been talked in last patch. :)
->> If we set the errno in future qemu_thread_create(), we need to
->> distinguish the Linux
->> and Windows implementation. For Linux, we can use error_setg_errno()
->> to set errno.
->> But for Windows, I am not sure if we can use
->>
->> "errno =3D GetLastError()"
-> No, that won't work.
->
->> to set errno, as this seems a little weird. Do you have any idea about=
- this?
->>
->> BTW, if we have a decent errno-set way for Windows, I will adopt your =
-above
->> proposal for this patch.
-> According to MS docs, _beginthreadex() sets errno on failure:
->
->      If successful, each of these functions returns a handle to the new=
-ly
->      created thread; however, if the newly created thread exits too
->      quickly, _beginthread might not return a valid handle. (See the
->      discussion in the Remarks section.) On an error, _beginthread
->      returns -1L, and errno is set to EAGAIN if there are too many
->      threads, to EINVAL if the argument is invalid or the stack size is
->      incorrect, or to EACCES if there are insufficient resources (such =
-as
->      memory). On an error, _beginthreadex returns 0, and errno and
->      _doserrno are set.
->
-> https://docs.microsoft.com/cpp/c-runtime-library/reference/beginthread-=
-beginthreadex
->
-> Looks like the current code's use of GetLastError() after
-> _beginthreadex() failure is wrong.
->
-> Fix that, and both qemu_thread_create() implementations set errno on
-> failure, which in turn lets you make qemu_signalfd_compat() and thus
-> qemu_signalfd() behave sanely regardless of which qemu_thread_create()
-> implementation they use below the hood.
-Thanks for the detail explanation. :)
-To fix that, how about replacing the "GetLastError()" with the returned
-value "hThread" (actually returns 0)? I mean
- =C2=A0=C2=A0 ...
- =C2=A0=C2=A0=C2=A0 hThread =3D (HANDLE) _beginthreadex(NULL, 0, win32_st=
-art_routine,
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- data, 0, &thread->tid);
- =C2=A0=C2=A0=C2=A0 if (!hThread) {
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (data->mode !=3D QEMU_THRE=
-AD_DETACHED) {
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Delet=
-eCriticalSection(&data->cs);
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg_win32(errp, hThrea=
-d,
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-"failed to create win32_start_routine");
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 g_free(data);
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return false;
- =C2=A0=C2=A0=C2=A0 }
-
-Have a nice day, thanks
-Fei
->
->> Have a nice day, thanks for the review :)
->> Fei
->>>> @@ -109,7 +108,7 @@ static int qemu_signal_init(void)
->>>>      #else /* _WIN32 */
->>>>    -static int qemu_signal_init(void)
->>>> +static int qemu_signal_init(Error **errp)
->>>>    {
->>>>        return 0;
->>>>    }
->>>> @@ -148,7 +147,7 @@ int qemu_init_main_loop(Error **errp)
->>>>          init_clocks(qemu_timer_notify_cb);
->>>>    -    ret =3D qemu_signal_init();
->>>> +    ret =3D qemu_signal_init(errp);
->>>>        if (ret) {
->>>>            return ret;
->>>>        }
->
+> ---
+>  hw/ppc/spapr_pci.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> index c2271e6ed462..0537ce018f51 100644
+> --- a/hw/ppc/spapr_pci.c
+> +++ b/hw/ppc/spapr_pci.c
+> @@ -1883,7 +1883,7 @@ static int spapr_pci_pre_save(void *opaque)
+>      if (!sphb->msi_devs_num) {
+>          return 0;
+>      }
+> -    sphb->msi_devs = g_malloc(sphb->msi_devs_num * sizeof(spapr_pci_msi_mig));
+> +    sphb->msi_devs = g_new(spapr_pci_msi_mig, sphb->msi_devs_num);
+>  
+>      g_hash_table_iter_init(&iter, sphb->msi);
+>      for (i = 0; g_hash_table_iter_next(&iter, &key, &value); ++i) {
+> 
+> 
