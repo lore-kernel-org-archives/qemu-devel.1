@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49808)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gB0AE-0003AS-RR
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 12:19:47 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gB0Ec-0004GC-Da
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 12:24:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gB0AD-0005sP-Gz
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 12:19:46 -0400
-References: <20181012115532.12645-1-kwolf@redhat.com>
-	<20181012115532.12645-2-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b68bd971-8da0-fb03-2943-c8fa370ba240@redhat.com>
-Date: Fri, 12 Oct 2018 11:19:33 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gB0Eb-0006QQ-LN
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 12:24:18 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:32898)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gB0Ea-0006OQ-I2
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 12:24:17 -0400
+Received: by mail-oi1-x244.google.com with SMTP id a203-v6so10316362oib.0
+	for <qemu-devel@nongnu.org>; Fri, 12 Oct 2018 09:24:16 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20181012115532.12645-2-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/8] block: Update flags in
- bdrv_set_read_only()
+In-Reply-To: <20181012132135.12313-1-kraxel@redhat.com>
+References: <20181012132135.12313-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 12 Oct 2018 17:23:55 +0100
+Message-ID: <CAFEAcA8uyabYPENmK0AWKcwxr_B1mR9Uid26PkZDG3sFDUL+Ag@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/3] Ui 20181012 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,42 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 10/12/18 6:55 AM, Kevin Wolf wrote:
-> To fully change the read-only state of a node, we must not only change
-> bs->read_only, but also update bs->open_flags.
-> 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->   block.c | 7 +++++++
->   1 file changed, 7 insertions(+)
+On 12 October 2018 at 14:21, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> The following changes since commit 75e50c80e051423a6f55a34ee4a1eec842444a5b:
+>
+>   Merge remote-tracking branch 'remotes/armbru/tags/pull-misc-2018-10-10' into staging (2018-10-11 10:43:37 +0100)
+>
+> are available in the git repository at:
+>
+>   git://git.kraxel.org/qemu tags/ui-20181012-pull-request
+>
+> for you to fetch changes up to 1d454c3fee00d9d1e46e1ec6788d49da5a0bfdb0:
+>
+>   gtk: fix uninitialized variable (2018-10-12 14:49:03 +0200)
+>
+> ----------------------------------------------------------------
+> ui: gtk fixes, support more formats in sdl2.
+>
+> ----------------------------------------------------------------
+>
+> Kevin Wolf (1):
+>   gtk: Don't vte_terminal_set_encoding() on new VTE versions
+>
+> Max Reitz (1):
+>   sdl2: Support all virtio-gpu formats
+>
+> Paolo Bonzini (1):
+>   gtk: fix uninitialized variable
+>
+>  ui/gtk.c     |  8 +++++---
+>  ui/sdl2-2d.c | 15 +++++++++++++++
+>  2 files changed, 20 insertions(+), 3 deletions(-)
+>
+> --
+> 2.9.3
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Applied, thanks.
 
-> 
-> diff --git a/block.c b/block.c
-> index 0d6e5f1a76..d7bd6d29b4 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -281,6 +281,13 @@ int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **errp)
->       }
->   
->       bs->read_only = read_only;
-> +
-> +    if (read_only) {
-> +        bs->open_flags &= ~BDRV_O_RDWR;
-> +    } else {
-> +        bs->open_flags |= BDRV_O_RDWR;
-> +    }
-> +
->       return 0;
->   }
->   
-> 
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+-- PMM
