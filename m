@@ -1,39 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60827)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jag.raman@oracle.com>) id 1gB7Ax-0008C2-Os
+	(envelope-from <jag.raman@oracle.com>) id 1gB7Ax-0008C6-PJ
 	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 19:49:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jag.raman@oracle.com>) id 1gB7Aq-0006UY-6v
+	(envelope-from <jag.raman@oracle.com>) id 1gB7Aq-0006VR-Me
 	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 19:48:57 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:39820)
+Received: from userp2120.oracle.com ([156.151.31.85]:47410)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <jag.raman@oracle.com>)
-	id 1gB7Ao-0006RW-0L
+	id 1gB7Aq-0006T4-9v
 	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 19:48:52 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-	by userp2130.oracle.com (8.16.0.22/8.16.0.22) with SMTP id
-	w9CNibHT127381
-	for <qemu-devel@nongnu.org>; Fri, 12 Oct 2018 23:48:46 GMT
-Received: from userv0022.oracle.com (userv0022.oracle.com [156.151.31.74])
-	by userp2130.oracle.com with ESMTP id 2mxmfudn5p-1
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+	by userp2120.oracle.com (8.16.0.22/8.16.0.22) with SMTP id
+	w9CNiIP7088170
+	for <qemu-devel@nongnu.org>; Fri, 12 Oct 2018 23:48:49 GMT
+Received: from aserv0022.oracle.com (aserv0022.oracle.com [141.146.126.234])
+	by userp2120.oracle.com with ESMTP id 2mxnprndsw-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
-	for <qemu-devel@nongnu.org>; Fri, 12 Oct 2018 23:48:46 +0000
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-	by userv0022.oracle.com (8.14.4/8.14.4) with ESMTP id w9CNmj7k018509
+	for <qemu-devel@nongnu.org>; Fri, 12 Oct 2018 23:48:49 +0000
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+	by aserv0022.oracle.com (8.14.4/8.14.4) with ESMTP id w9CNmmhI009600
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=OK) for <qemu-devel@nongnu.org>; Fri, 12 Oct 2018 23:48:46 GMT
+	verify=OK) for <qemu-devel@nongnu.org>; Fri, 12 Oct 2018 23:48:48 GMT
 Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
-	by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id w9CNmjnF008250
-	for <qemu-devel@nongnu.org>; Fri, 12 Oct 2018 23:48:45 GMT
+	by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id w9CNmmXl012056
+	for <qemu-devel@nongnu.org>; Fri, 12 Oct 2018 23:48:48 GMT
 From: Jagannathan Raman <jag.raman@oracle.com>
-Date: Fri, 12 Oct 2018 19:48:30 -0400
-Message-Id: <003ec4dd9c1988941e03bef621fa9e730c73612f.1539387238.git.jag.raman@oracle.com>
+Date: Fri, 12 Oct 2018 19:48:35 -0400
+Message-Id: <c92b3730c01dc292c23fcc2fefe8fb8ed6194b78.1539387238.git.jag.raman@oracle.com>
 In-Reply-To: <cover.1539387238.git.jag.raman@oracle.com>
 References: <cover.1539387238.git.jag.raman@oracle.com>
 In-Reply-To: <cover.1539387238.git.jag.raman@oracle.com>
 References: <cover.1539387238.git.jag.raman@oracle.com>
-Subject: [Qemu-devel] [RFC PATCH v1 3/8] multi-process QEMU: setup PCI host
- bridge for remote device
+Subject: [Qemu-devel] [RFC PATCH v1 8/8] multi-process QEMU: synchronize RAM
+ between QEMU & remote device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,253 +45,229 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: john.g.johnson@oracle.com, Kanth.Ghatraju@oracle.com, elena.ufimtseva@oracle.com, jag.raman@oracle.com
 
-- PCI host bridge is setup for the remote device process. It is
-  implemented using remote-pcihost object. It is an extension of the PCI
-  host bridge setup by QEMU.
-- remote-pcihost configures a PCI bus which could be used by the remote
-  PCI device to latch on to.
+- Setup MemoryListener in QEMU to get all updates to sysmem, and
+  forward all RAM updates to remote device process
+- Remote device process updates its "system_memory" container using
+  shared file descriptors provided by SYNC_SYSMEM message
 
 Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 ---
- Makefile                 |  1 +
- Makefile.objs            |  4 +++
- Makefile.target          |  3 ++
- hw/pci/Makefile.objs     |  2 +-
- include/remote/pcihost.h | 58 +++++++++++++++++++++++++++++++++
- remote/Makefile.objs     |  1 +
- remote/pcihost.c         | 84 ++++++++++++++++++++++++++++++++++++++++++++++++
- 7 files changed, 152 insertions(+), 1 deletion(-)
- create mode 100644 include/remote/pcihost.h
- create mode 100644 remote/Makefile.objs
- create mode 100644 remote/pcihost.c
+ hw/qemu-proxy.c         | 156 ++++++++++++++++++++++++++++++++++++++++++++++++
+ hw/scsi/qemu-scsi-dev.c |  10 ++++
+ include/hw/qemu-proxy.h |   3 +
+ 3 files changed, 169 insertions(+)
 
-diff --git a/Makefile b/Makefile
-index b6cac08..fe4244a 100644
---- a/Makefile
-+++ b/Makefile
-@@ -429,6 +429,7 @@ dummy := $(call unnest-vars,, \
-                 qom-obj-y \
-                 io-obj-y \
-                 common-obj-y \
-+                remote-obj-y \
-                 scsi-dev-obj-y \
-                 common-obj-m \
-                 ui-obj-y \
-diff --git a/Makefile.objs b/Makefile.objs
-index 0a3799c..41a8c77 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -89,6 +89,10 @@ scsi-dev-obj-y += qdev-monitor.o
- scsi-dev-obj-y += bootdevice.o
- scsi-dev-obj-y += iothread.o
+diff --git a/hw/qemu-proxy.c b/hw/qemu-proxy.c
+index 1712b41..79cdd3f 100644
+--- a/hw/qemu-proxy.c
++++ b/hw/qemu-proxy.c
+@@ -159,6 +159,8 @@ static void pci_proxy_dev_realize(PCIDevice *device, Error **errp)
+         printf("Proxy link is not set\n");
+     }
  
-+#################################################
-+# remote-obj-y is code used by all remote devices
-+remote-obj-y += remote/
++    configure_memory_listener(dev);
 +
- #######################################################################
- # crypto-obj-y is code used by both qemu system emulation and qemu-img
+     pci_conf[PCI_LATENCY_TIMER] = 0xff;
  
-diff --git a/Makefile.target b/Makefile.target
-index c5feda2..74aab39 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -190,6 +190,7 @@ block-obj-y :=
- common-obj-y :=
- chardev-obj-y :=
- scsi-dev-obj-y :=
-+remote-obj-y :=
- include $(SRC_PATH)/Makefile.objs
- dummy := $(call unnest-vars,,target-obj-y)
- target-obj-y-save := $(target-obj-y)
-@@ -202,6 +203,7 @@ dummy := $(call unnest-vars,.., \
-                qom-obj-y \
-                io-obj-y \
-                common-obj-y \
-+               remote-obj-y \
-                scsi-dev-obj-y \
-                common-obj-m)
- target-obj-y := $(target-obj-y-save)
-@@ -217,6 +219,7 @@ all-scsi-dev-obj-y += $(block-obj-y)
- all-scsi-dev-obj-y += $(crypto-obj-y)
- all-scsi-dev-obj-y += $(io-obj-y)
- all-scsi-dev-obj-y += $(chardev-obj-y)
-+all-scsi-dev-obj-y += $(remote-obj-y)
- all-scsi-dev-obj-y += $(scsi-dev-obj-y)
+     memory_region_init_io(&dev->mmio_io, OBJECT(dev), &proxy_device_mmio_ops,
+@@ -213,3 +215,157 @@ void init_emulation_process(PCIProxyDev *pdev, char *command, Error **errp)
+ }
  
- $(QEMU_PROG_BUILD): config-devices.mak
-diff --git a/hw/pci/Makefile.objs b/hw/pci/Makefile.objs
-index 46af40a..f779285 100644
---- a/hw/pci/Makefile.objs
-+++ b/hw/pci/Makefile.objs
-@@ -8,6 +8,6 @@ common-obj-$(CONFIG_PCI) += pcie.o pcie_aer.o pcie_port.o
- common-obj-$(call lnot,$(CONFIG_PCI)) += pci-stub.o
- common-obj-$(CONFIG_ALL) += pci-stub.o
- 
--scsi-dev-obj-y += pci.o pci_bridge.o
-+scsi-dev-obj-y += pci.o pci_bridge.o pci_host.o pcie_host.o
- scsi-dev-obj-y += msi.o msix.o
- scsi-dev-obj-y += pcie.o
-diff --git a/include/remote/pcihost.h b/include/remote/pcihost.h
-new file mode 100644
-index 0000000..7357445
---- /dev/null
-+++ b/include/remote/pcihost.h
-@@ -0,0 +1,58 @@
-+/*
-+ * PCI Host for remote device
-+ *
-+ * Copyright 2018, Oracle and/or its affiliates. All rights reserved.
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
+ type_init(pci_proxy_dev_register_types)
 +
-+#ifndef REMOTE_PCIHOST_H
-+#define REMOTE_PCIHOST_H
-+
-+#include <stddef.h>
-+#include <stdint.h>
-+
-+#include "exec/memory.h"
-+#include "hw/pci/pcie_host.h"
-+
-+#define TYPE_REMOTE_HOST_DEVICE "remote-pcihost"
-+#define REMOTE_HOST_DEVICE(obj) \
-+    OBJECT_CHECK(RemPCIHost, (obj), TYPE_REMOTE_HOST_DEVICE)
-+
-+typedef struct RemPCIHost {
-+    /*< private >*/
-+    PCIExpressHost parent_obj;
-+    /*< public >*/
-+
-+    /* Memory Controller Hub (MCH) may not be necessary for the emulation
-+     * program. The two important reasons for implementing a PCI host in the
-+     * emulation program are:
-+     * - Provide a PCI bus for IO devices
-+     * - Enable translation of guest PA to the PCI bar regions
-+     *
-+     * For both the above mentioned purposes, it doesn't look like we would
-+     * need the MCH
-+     */
-+
-+    MemoryRegion *mr_pci_mem;
-+    MemoryRegion *mr_sys_mem;
-+    MemoryRegion *mr_sys_io;
-+} RemPCIHost;
-+
-+#endif
-diff --git a/remote/Makefile.objs b/remote/Makefile.objs
-new file mode 100644
-index 0000000..3072f95
---- /dev/null
-+++ b/remote/Makefile.objs
-@@ -0,0 +1 @@
-+remote-obj-y += pcihost.o
-diff --git a/remote/pcihost.c b/remote/pcihost.c
-new file mode 100644
-index 0000000..31cd7e8
---- /dev/null
-+++ b/remote/pcihost.c
-@@ -0,0 +1,84 @@
-+/*
-+ * Remote PCI host device
-+ *
-+ * Copyright 2018, Oracle and/or its affiliates. All rights reserved.
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#include <sys/types.h>
-+
-+#include "qemu/osdep.h"
-+#include "hw/pci/pci.h"
-+#include "hw/pci/pci_host.h"
-+#include "hw/pci/pcie_host.h"
-+#include "remote/pcihost.h"
-+#include "exec/memory.h"
-+
-+static const char *remote_host_root_bus_path(PCIHostState *host_bridge,
-+                                             PCIBus *rootbus)
++static void proxy_ml_begin(MemoryListener *listener)
 +{
-+    return "0000:00";
++    int mrs;
++    struct proxy_device *pdev = container_of(listener, struct proxy_device,
++                                             memory_listener);
++
++    for (mrs = 0; mrs < pdev->n_mr_sections; mrs++) {
++        memory_region_unref(pdev->mr_sections[mrs].mr);
++    }
++
++    g_free(pdev->mr_sections);
++    pdev->mr_sections = NULL;
++    pdev->n_mr_sections = 0;
 +}
 +
-+static void remote_host_realize(DeviceState *dev, Error **errp)
++static bool proxy_mrs_can_merge(uint64_t host, uint64_t prev_host, size_t size)
 +{
-+    PCIHostState *pci = PCI_HOST_BRIDGE(dev);
-+    RemPCIHost *s = REMOTE_HOST_DEVICE(dev);
++    bool merge;
++    ram_addr_t offset;
++    int fd1, fd2;
++    MemoryRegion *mr;
 +
-+    /*
-+     * TODO: the name of the bus would be provided by QEMU. Use
-+     * "pcie.0" for now.
-+     */
-+    pci->bus = pci_root_bus_new(DEVICE(s), "pcie.0",
-+                                s->mr_pci_mem, s->mr_sys_io,
-+                                0, TYPE_PCIE_BUS);
++    mr = memory_region_from_host((void *)(uintptr_t)host, &offset);
++    fd1 = memory_region_get_fd(mr);
++
++    mr = memory_region_from_host((void *)(uintptr_t)prev_host, &offset);
++    fd2 = memory_region_get_fd(mr);
++
++    merge = (fd1 == fd2);
++
++    merge &= ((prev_host + size) == host);
++
++    return merge;
 +}
 +
-+static Property remote_host_props[] = {
-+    DEFINE_PROP_END_OF_LIST(),
++static void proxy_ml_region_addnop(MemoryListener *listener,
++                                   MemoryRegionSection *section)
++{
++    bool need_add = true;
++    uint64_t mrs_size, mrs_gpa, mrs_page;
++    uintptr_t mrs_host;
++    RAMBlock *mrs_rb;
++    MemoryRegionSection *prev_sec;
++    struct proxy_device *pdev = container_of(listener, struct proxy_device,
++                                             memory_listener);
++
++    if (!(memory_region_is_ram(section->mr) &&
++          !memory_region_is_rom(section->mr))) {
++        return;
++    }
++
++    mrs_rb = section->mr->ram_block;
++    mrs_page = (uint64_t)qemu_ram_pagesize(mrs_rb);
++    mrs_size = int128_get64(section->size);
++    mrs_gpa = section->offset_within_address_space;
++    mrs_host = (uintptr_t)memory_region_get_ram_ptr(section->mr) +
++               section->offset_within_region;
++
++    mrs_host = mrs_host & ~(mrs_page - 1);
++    mrs_gpa = mrs_gpa & ~(mrs_page - 1);
++    mrs_size = ROUND_UP(mrs_size, mrs_page);
++
++    if (pdev->n_mr_sections) {
++        prev_sec = pdev->mr_sections + (pdev->n_mr_sections - 1);
++        uint64_t prev_gpa_start = prev_sec->offset_within_address_space;
++        uint64_t prev_size = int128_get64(prev_sec->size);
++        uint64_t prev_gpa_end   = range_get_last(prev_gpa_start, prev_size);
++        uint64_t prev_host_start =
++            (uintptr_t)memory_region_get_ram_ptr(prev_sec->mr) +
++            prev_sec->offset_within_region;
++        uint64_t prev_host_end = range_get_last(prev_host_start, prev_size);
++
++        if (mrs_gpa <= (prev_gpa_end + 1)) {
++            if (mrs_gpa < prev_gpa_start) {
++                assert(0);
++            }
++
++            if ((section->mr == prev_sec->mr) &&
++                proxy_mrs_can_merge(mrs_host, prev_host_start,
++                                    (mrs_gpa - prev_gpa_start))) {
++                uint64_t max_end = MAX(prev_host_end, mrs_host + mrs_size);
++               need_add = false;
++                prev_sec->offset_within_address_space =
++                    MIN(prev_gpa_start, mrs_gpa);
++                prev_sec->offset_within_region =
++                    MIN(prev_host_start, mrs_host) -
++                    (uintptr_t)memory_region_get_ram_ptr(prev_sec->mr);
++                prev_sec->size = int128_make64(max_end - MIN(prev_host_start,
++                                                             mrs_host));
++            }
++        }
++    }
++
++    if (need_add) {
++        ++pdev->n_mr_sections;
++        pdev->mr_sections = g_renew(MemoryRegionSection, pdev->mr_sections,
++                                    pdev->n_mr_sections);
++        pdev->mr_sections[pdev->n_mr_sections - 1] = *section;
++        pdev->mr_sections[pdev->n_mr_sections - 1].fv = NULL;
++        memory_region_ref(section->mr);
++    }
++}
++
++static void proxy_ml_commit(MemoryListener *listener)
++{
++    ProcMsg msg;
++    ram_addr_t offset;
++    MemoryRegion *mr;
++    MemoryRegionSection section;
++    uintptr_t host_addr;
++    int region;
++    struct proxy_device *pdev = container_of(listener, struct proxy_device,
++                                             memory_listener);
++
++    msg.cmd = SYNC_SYSMEM;
++    msg.bytestream = 0;
++    msg.num_fds = pdev->n_mr_sections;
++    assert(msg.num_fds <= MAX_FDS);
++
++    for (region = 0; region < pdev->n_mr_sections; region++) {
++        section = pdev->mr_sections[region];
++        msg.data1.sync_sysmem.gpas[region] =
++            section.offset_within_address_space;
++        msg.data1.sync_sysmem.sizes[region] = int128_get64(section.size);
++        host_addr = (uintptr_t)memory_region_get_ram_ptr(section.mr) +
++                    section.offset_within_region;
++        mr = memory_region_from_host((void *)host_addr, &offset);
++        msg.fds[region] = memory_region_get_fd(mr);
++    }
++    proxy_proc_send(pdev->proxy_link, &msg);
++}
++
++void deconfigure_memory_listener(PCIProxyDev *pdev)
++{
++    memory_listener_unregister(&pdev->proxy_dev.memory_listener);
++}
++
++static MemoryListener proxy_listener = {
++        .begin = proxy_ml_begin,
++        .commit = proxy_ml_commit,
++        .region_add = proxy_ml_region_addnop,
++        .region_nop = proxy_ml_region_addnop,
++        .priority = 10,
 +};
 +
-+static void remote_host_class_init(ObjectClass *klass, void *data)
++void configure_memory_listener(PCIProxyDev *dev)
 +{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    PCIHostBridgeClass *hc = PCI_HOST_BRIDGE_CLASS(klass);
-+
-+    hc->root_bus_path = remote_host_root_bus_path;
-+    dc->realize = remote_host_realize;
-+    dc->props = remote_host_props;
-+
-+    dc->user_creatable = false;
-+    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-+    dc->fw_name = "pci";
++    dev->proxy_dev.memory_listener = proxy_listener;
++    dev->proxy_dev.n_mr_sections = 0;
++    dev->proxy_dev.mr_sections = NULL;
++    memory_listener_register(&dev->proxy_dev.memory_listener,
++                             &address_space_memory);
 +}
-+
-+static const TypeInfo remote_host_info = {
-+    .name = TYPE_REMOTE_HOST_DEVICE,
-+    .parent = TYPE_PCIE_HOST_BRIDGE,
-+    .instance_size = sizeof(RemPCIHost),
-+    .class_init = remote_host_class_init,
-+};
-+
-+static void remote_machine_register(void)
-+{
-+    type_register_static(&remote_host_info);
-+}
-+
-+type_init(remote_machine_register)
+diff --git a/hw/scsi/qemu-scsi-dev.c b/hw/scsi/qemu-scsi-dev.c
+index ede0c4b..ff34cbc 100644
+--- a/hw/scsi/qemu-scsi-dev.c
++++ b/hw/scsi/qemu-scsi-dev.c
+@@ -65,6 +65,16 @@ static void process_msg(GIOCondition cond)
+         break;
+     case CONF_READ:
+         break;
++    case SYNC_SYSMEM:
++        /*
++         * TODO: ensure no active DMA is happening when
++         * sysmem is being updated
++         */
++        remote_sysmem_reconfig(msg, &err);
++        if (err) {
++            goto finalize_loop;
++        }
++        break;
+     default:
+         error_setg(&err, "Unknown command");
+         goto finalize_loop;
+diff --git a/include/hw/qemu-proxy.h b/include/hw/qemu-proxy.h
+index 0903626..867c3ce 100644
+--- a/include/hw/qemu-proxy.h
++++ b/include/hw/qemu-proxy.h
+@@ -33,6 +33,7 @@ typedef struct proxy_device {
+        int n_mr_sections;
+         MemoryRegionSection *mr_sections;
+         ProxyLinkState *proxy_link;
++        MemoryListener memory_listener;
+         int link_up;
+ } proxy_device;
+ 
+@@ -52,5 +53,7 @@ typedef struct PCIProxyDev {
+ void init_emulation_process(PCIProxyDev *pdev, char *command, Error **errp);
+ int config_op_send(PCIProxyDev *dev, uint32_t addr, uint32_t val, int l,
+                                                        unsigned int op);
++void deconfigure_memory_listener(PCIProxyDev *pdev);
++void configure_memory_listener(PCIProxyDev *pdev);
+ 
+ #endif
 -- 
 1.8.3.1
