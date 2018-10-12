@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58093)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gAx8a-0000j0-W7
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:05:54 -0400
+	(envelope-from <philmd@redhat.com>) id 1gAx9S-00017I-N3
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:06:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gAx8W-000162-JA
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:05:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59702)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1gAx8S-0000zA-SG
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:05:46 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E81D012F918
-	for <qemu-devel@nongnu.org>; Fri, 12 Oct 2018 13:05:41 +0000 (UTC)
-Date: Fri, 12 Oct 2018 07:05:38 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20181012070538.121f85a1@t450s.home>
-In-Reply-To: <20181012084302.so3aptiavcgvbbyh@sirius.home.kraxel.org>
-References: <20180917061729.22407-1-kraxel@redhat.com>
-	<20180917061729.22407-3-kraxel@redhat.com>
-	<20181011151941.77cd8516@w520.home>
-	<20181012084302.so3aptiavcgvbbyh@sirius.home.kraxel.org>
+	(envelope-from <philmd@redhat.com>) id 1gAx9P-0002Op-C7
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:06:46 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:39705)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gAx9P-0002Ni-2y
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:06:43 -0400
+Received: by mail-wm1-f68.google.com with SMTP id y144-v6so12805100wmd.4
+	for <qemu-devel@nongnu.org>; Fri, 12 Oct 2018 06:06:42 -0700 (PDT)
+References: <b41a233c-988c-19bb-0d4b-b17655912839@redhat.com>
+	<CAFEAcA-TeU8SRPrZU_6=97yyL8UkMO_61P8oK4Xz2q0DweeBQA@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <11e90911-c0f2-7710-2e7f-9dc856f9fe4b@redhat.com>
+Date: Fri, 12 Oct 2018 15:06:39 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/vfio/display: add ramfb support
+In-Reply-To: <CAFEAcA-TeU8SRPrZU_6=97yyL8UkMO_61P8oK4Xz2q0DweeBQA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] QOM: Can devices having link properties be
+ user-creatable?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,82 +31,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, Thomas Huth <thuth@redhat.com>, Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 
-On Fri, 12 Oct 2018 10:43:02 +0200
-Gerd Hoffmann <kraxel@redhat.com> wrote:
+On 12/10/2018 15:01, Peter Maydell wrote:
+> On 12 October 2018 at 13:47, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
+>> While looking at Mao's series
+>> (https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg02519.html) I
+>> wondered if devices having link properties can be user-creatable.
+>>
+>> Using the following patch (I don't think this is correct to put qdev
+>> code into qobject, but I used this as PoC):
+>>
+>> -- >8 --
+>> diff --git a/qom/object.c b/qom/object.c
+>> index 547dcf97c3..2dd3a25531 100644
+>> --- a/qom/object.c
+>> +++ b/qom/object.c
+>> @@ -16,4 +16,5 @@
+>>  #include "qom/object_interfaces.h"
+>>  #include "qemu/cutils.h"
+>> +#include "qemu/error-report.h"
+>>  #include "qapi/visitor.h"
+>>  #include "qapi/string-input-visitor.h"
+>> @@ -1662,4 +1663,11 @@ void object_property_add_link(Object *obj, const
+>> char *name,
+>>      gchar *full_type;
+>>      ObjectProperty *op;
+>> +    ObjectClass *klass = object_get_class(obj);
+>> +
+>> +    if (klass && object_dynamic_cast(obj, TYPE_DEVICE) &&
+>> +                 DEVICE_CLASS(klass)->user_creatable == false) {
+>> +        warn_report("Device type '%s' is user_creatable "
+>> +                    "(linked property: '%s')", type, name);
+>> +    }
+>>
+>>      prop->child = child;
+>> ---
+>>
+>> I get:
+>>
+>> $ aarch64-softmmu/qemu-system-aarch64 -M virt
+>> qemu-system-aarch64: warning: Device type 'bus' is user_creatable
+>> (linked property: 'parent_bus')
+>> qemu-system-aarch64: warning: Device type 'qemu:memory-region' is
+>> user_creatable (linked property: 'memory')
+> 
+> Is your warning printing the wrong thing? "bus", "irq",
+> etc don't seem like names of devices...
 
->   Hi,
-> 
-> > >      OnOffAuto display;
-> > > +    bool enable_ramfb;
-> > >      int32_t bootindex;
-> > >      uint32_t igd_gms;
-> > >      OffAutoPCIBAR msix_relo;  
-> > 
-> > Hi Gerd,
-> > 
-> > One tiny nit here, we can move this new bool down in the struct with
-> > the rest of the bools for better alignment.  I can change that on
-> > commit.  
-> 
-> I've grouped it with the display option because it is display related
-> too, but if you prefer to group the bools instead this is fine with me.
+Oh indeed I inverted (type, name) :)
 
-Not so much grouping the bools as simply making the struct a bit more
-space efficient by not adding obvious alignment holes.
+> I think whether a device with a link property is
+> user creatable might depend on what the property is
+> for and whether the device has a useful fallback for
+> "link not connected".
 
-> > However, I'm not having luck getting ramfb to work; the
-> > display is only getting initialized once the guest driver loads.  This
-> > is a 440FX/SeaBIOS VM, it looks like you've already updated bios.bin in
-> > qemu.git with ramfb support,  
-> 
-> Yes, seabios (and vgabios) bundled with 3.0 (and master branch) should work fine.
-> 
-> There is a standalone device you can use for testing (-vga none -device
-> ramfb), to see whenever the firmware side of things works correctly.
-> 
-> OVMF has ramfb support too btw (merged a few months back).
+OK it now makes sens, reading this example:
 
-Yes, I'm also trying with an OVMF build from your firmware repo.
+    static void bcm2836_realize(DeviceState *dev, Error **errp)
+    {
+        Object *obj;
+        Error *err = NULL;
 
-> > -device vfio-pci-nohotplug,id=hostdev0,sysfsdev=...,display=on,bus=pci.0,addr=0x9 \  
-> 
-> >     <hostdev mode='subsystem' type='mdev' managed='no' model='vfio-pci' display='on'>
-> >       <source>
-> >         <address uuid='cd4fa69f-c24c-476f-a61d-abca705e2a13'/>
-> >       </source>
-> >       <address type='pci' domain='0x0000' bus='0x00' slot='0x09' function='0x0'/>
-> >     </hostdev>  
-> 
-> Hmm, that actually uses vfio-pci-nohotplug?
-> But when ramfb=on doesn't throw an error, then yes, appearently.
+        obj = object_property_get_link(OBJECT(dev), "ram", &err);
+        if (obj == NULL) {
+            error_setg(errp, "%s: required ram link not found: %s",
+                       __func__, error_get_pretty(err));
+            return;
+        }
+        ...
 
-That's where my wrapper script was replacing
-s/vfio-pci/vfio-pci-nohotplug/, I didn't know about the driver override
-you list below, that's much cleaner.
- 
-> >   <qemu:commandline>
-> >     <qemu:arg value='-set'/>
-> >     <qemu:arg value='device.hostdev0.x-igd-opregion=on'/>
-> >     <qemu:arg value='-set'/>
-> >     <qemu:arg value='device.hostdev0.ramfb=on'/>
-> >   </qemu:commandline>  
-> 
-> I have this (additionally):
-> 
->     <qemu:arg value='-set'/>
->     <qemu:arg value='device.hostdev0.driver=vfio-pci-nohotplug'/>
-> 
-> > This is a Windows 10 VM, but as I understand this ramfb support, I
-> > think I'm still supposed to see SeaBIOS boot messages and perhaps even
-> > the Windows boot animation before the guest driver takes over, is that
-> > correct?  
-> 
-> Yes, you should see both.
+Thanks!
 
-Ok, I'll update my xml and also try the raw ramfb device and see if I
-can make it work.  Thanks,
-
-Alex
+Phil.
