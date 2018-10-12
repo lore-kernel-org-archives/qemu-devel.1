@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54255)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gB27A-0005kQ-4o
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 14:24:46 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1gB2EB-0007pM-43
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 14:31:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gB276-0006fe-Uh
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 14:24:44 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:40496)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gB276-0006f3-O6
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 14:24:40 -0400
-Received: by mail-wm1-f68.google.com with SMTP id z204-v6so13827624wmc.5
-	for <qemu-devel@nongnu.org>; Fri, 12 Oct 2018 11:24:39 -0700 (PDT)
-References: <153936155938.28040.11513367417790075721.stgit@gimli.home>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <d2698d9d-51e0-764d-a699-367e54508dd4@redhat.com>
-Date: Fri, 12 Oct 2018 20:24:37 +0200
-MIME-Version: 1.0
-In-Reply-To: <153936155938.28040.11513367417790075721.stgit@gimli.home>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <amarkovic@wavecomp.com>) id 1gB2E4-0002TT-QC
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 14:31:59 -0400
+Received: from mail-eopbgr690102.outbound.protection.outlook.com
+	([40.107.69.102]:46592
+	helo=NAM04-CO1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1gB2E4-0002TB-Gy
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 14:31:52 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Fri, 12 Oct 2018 18:31:45 +0000
+Message-ID: <BN6PR2201MB125161B53D73CCB70A0F200FC6E20@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <1539362376-12010-1-git-send-email-aleksandar.markovic@rt-rk.com>,
+	<1539362376-12010-6-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1539362376-12010-6-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] Makefile: Install new vgabios binaries
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v5 05/28] linux-user: Add infrastructure
+ for handling MIPS-specific prctl()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,33 +32,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org
-Cc: kraxel@redhat.com
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, "laurent@vivier.eu" <laurent@vivier.eu>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>
 
-On 12/10/2018 18:26, Alex Williamson wrote:
-> Difficult to make use of if not installed
-> 
-> Fixes: cd1bfd5ef336 ("seabios: update bios and vgabios binaries")
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
+> Subject: [PATCH v5 05/28] linux-user: Add infrastructure for handling MIP=
+S-specific prctl()
+>
+> From: Stefan Markovic <smarkovic@wavecomp.com>
+>
+>Add infrastructure for handling MIPS-specific prctl(). This is,
+for now, just an empty placeholder. The real handling will be
+implemented in subsequent patches.
+>
+> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 > ---
-> 
->  Makefile |    1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/Makefile b/Makefile
-> index 1144d6e3ba0e..f2947186a4c3 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -802,6 +802,7 @@ bepo    cz
->  ifdef INSTALL_BLOBS
->  BLOBS=bios.bin bios-256k.bin sgabios.bin vgabios.bin vgabios-cirrus.bin \
->  vgabios-stdvga.bin vgabios-vmware.bin vgabios-qxl.bin vgabios-virtio.bin \
-> +vgabios-ramfb.bin vgabios-bochs-display.bin \
->  ppc_rom.bin openbios-sparc32 openbios-sparc64 openbios-ppc QEMU,tcx.bin QEMU,cgthree.bin \
->  pxe-e1000.rom pxe-eepro100.rom pxe-ne2k_pci.rom \
->  pxe-pcnet.rom pxe-rtl8139.rom pxe-virtio.rom \
-> 
-> 
+> linux-user/syscall.c | 8 ++++++++
+> 1 file changed, 8 insertions(+)
+
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
