@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47611)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48568)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gAmUq-0006Kq-3d
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 21:44:08 -0400
+	(envelope-from <famz@redhat.com>) id 1gAmb8-00085e-G1
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 21:50:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gAmUp-0001l8-B7
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 21:44:08 -0400
-Date: Fri, 12 Oct 2018 12:14:59 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181012011458.GQ7004@umbus.fritz.box>
-References: <20181011234159.11496-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="J19t2I20ndwispKK"
-Content-Disposition: inline
-In-Reply-To: <20181011234159.11496-1-richard.henderson@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 0/7] target/ppc: Some cleanups to fp
- exceptions
+	(envelope-from <famz@redhat.com>) id 1gAmb5-0004cG-E9
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 21:50:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45838)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1gAmb5-0004bU-5x
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 21:50:35 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Fri, 12 Oct 2018 09:50:26 +0800
+Message-Id: <20181012015026.17441-3-famz@redhat.com>
+In-Reply-To: <20181012015026.17441-1-famz@redhat.com>
+References: <20181012015026.17441-1-famz@redhat.com>
+Subject: [Qemu-devel] [PULL 2/2] nvme: correct locking around completion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,67 +23,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
+From: Paolo Bonzini <pbonzini@redhat.com>
 
---J19t2I20ndwispKK
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+nvme_poll_queues is already protected by q->lock, and
+AIO callbacks are invoked outside the AioContext lock.
+So remove the acquire/release pair in nvme_handle_event.
 
-On Thu, Oct 11, 2018 at 04:41:52PM -0700, Richard Henderson wrote:
-1;5202;0c> There are a few bugs here, primarily wrt usage of GETPC().
-> But there is opportunity to share more code between paths
-> that operate on different floating point types.
->=20
-> This is not everything that could be done, but it's a good start.
-> Better for this not to hang out on a branch for another release.
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Message-Id: <20180814062739.19640-1-pbonzini@redhat.com>
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ block/nvme.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-Applied to ppc-for-3.1, thanks.
-
->=20
->=20
-> r~
->=20
->=20
-> Richard Henderson (7):
->   target/ppc: Split up float_invalid_op_excp
->   target/ppc: Remove float_check_status
->   target/ppc: Introduce fp number classification
->   target/ppc: Split out float_invalid_op_addsub
->   target/ppc: Split out float_invalid_op_mul
->   target/ppc: Split out float_invalid_op_div
->   target/ppc: Split out float_invalid_cvt
->=20
->  target/ppc/fpu_helper.c | 661 ++++++++++++++++++++--------------------
->  1 file changed, 327 insertions(+), 334 deletions(-)
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---J19t2I20ndwispKK
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlu/9Y8ACgkQbDjKyiDZ
-s5I1WxAAgAxh2O/VnTSEQn2rkTu8SE3+aM/PAcZcGY5/NvKGFbE8HReO0r+H9UCF
-83lrOcjMBvt72YRpfpjEtb/PQjlkguZgu5kmMDA8kcEDbQDaMkSeEbB3HqxMEWvB
-R9bb/F/WwaZtyvORWjMikK1Rl8/JhvKKf9nMV/qGfzOkK2bmztB6ZzYNNKJqP46L
-ts8J52T7mcR3nuHoFbqL6Sl1es9sKc0Y0PkrkQrUoQ0M2UG1qif1ML+CYasdAq5P
-4xli5kgs2gBLweDJfs9m50tRqd6+S3eKHMRo6vzbP34Q1Lch5JALKYHuCZ5VxBPO
-OnyCiwybbHHsIi9I/y68nR+fDOPkjPIVMThXL9ptjG8Uoq4vt8LRxULDXDZHMPrB
-UEp1irPXe6F3FXlh//KUS9HSsPiXVFm+AznofeiuMiOrBYjCgh+uG6ZRVYGHKVgm
-mBoCBFeDjNd9OlMrapzkFkjba52e16X9t/waisPUjXPYN+3NDgg0JC2fnUMko17N
-sumM0NrDfi00fE+tFUCe2JAvgCVtFjR7jIln9fH7zW6Q/2EKzpIjjdfyq/Ofj+wu
-2YkJpXpF5tlpFT0P7MOrpfV9Is61y6+XeAPYqJdKHO6MUItmnsuaKe52frBFu9BK
-c6d56CK9KD9ITQyhpS2DD6D09HDFUT4kmfaKFtux+nbEgXvdoUc=
-=HVCx
------END PGP SIGNATURE-----
-
---J19t2I20ndwispKK--
+diff --git a/block/nvme.c b/block/nvme.c
+index 781d77d6d2..29294038fc 100644
+--- a/block/nvme.c
++++ b/block/nvme.c
+@@ -489,10 +489,8 @@ static void nvme_handle_event(EventNotifier *n)
+     BDRVNVMeState *s = container_of(n, BDRVNVMeState, irq_notifier);
+ 
+     trace_nvme_handle_event(s);
+-    aio_context_acquire(s->aio_context);
+     event_notifier_test_and_clear(n);
+     nvme_poll_queues(s);
+-    aio_context_release(s->aio_context);
+ }
+ 
+ static bool nvme_add_io_queue(BlockDriverState *bs, Error **errp)
+-- 
+2.17.1
