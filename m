@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54386)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gAsoB-0002mu-W7
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 04:28:32 -0400
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gAsq9-00047y-2V
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 04:30:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gAsoB-0007DR-50
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 04:28:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39258)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gAsoA-0007D7-Vc
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 04:28:31 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1539329710-11600-1-git-send-email-namei.unix@gmail.com>
-Date: Fri, 12 Oct 2018 10:28:26 +0200
-In-Reply-To: <1539329710-11600-1-git-send-email-namei.unix@gmail.com> (Liu
-	Yuan's message of "Fri, 12 Oct 2018 15:35:10 +0800")
-Message-ID: <87efcvsh5h.fsf@dusky.pond.sub.org>
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gAsq5-0008KM-Lk
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 04:30:32 -0400
+Received: from cmccmta1.chinamobile.com ([221.176.66.79]:38193)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gAsq3-0008Fx-P7
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 04:30:28 -0400
+From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+Date: Fri, 12 Oct 2018 16:30:06 +0800
+Message-Id: <20181012083008.29027-2-maozhongyi@cmss.chinamobile.com>
+In-Reply-To: <20181012083008.29027-1-maozhongyi@cmss.chinamobile.com>
+References: <20181012083008.29027-1-maozhongyi@cmss.chinamobile.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: update block/sheepdog
- maintainers
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 1/3] audio: use TYPE_WM8750 instead of a
+ hardcoded string
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,37 +27,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Liu Yuan <namei.unix@gmail.com>
-Cc: qemu-devel@nongnu.org, Jeff Cody <jcody@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, Jan Kiszka <jan.kiszka@web.de>, Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>
 
-Liu Yuan <namei.unix@gmail.com> writes:
+Cc: Jan Kiszka <jan.kiszka@web.de>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-arm@nongnu.org
 
-> From: Liu Yuan <liuyuan1@cmiot.chinamobile.com>
->
-> E-mail to one of block/sheepdog maintainers Mitake Hitoshi bounces
->
-> <mitake.hitoshi@lab.ntt.co.jp>: unknown user: "mitake.hitoshi"
+Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ hw/arm/musicpal.c          | 2 +-
+ hw/audio/marvell_88w8618.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-Yup, got that, too.
-
-> and no current address is known. So just remove it.
->
-> Signed-off-by: Liu Yuan <liuyuan1@cmiot.chinamobile.com>
-> ---
->  MAINTAINERS | 1 -
->  1 file changed, 1 deletion(-)
->
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 3275cc6..6670c16 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -2007,7 +2007,6 @@ F: block/rbd.c
->  T: git git://github.com/codyprime/qemu-kvm-jtc.git block
->  
->  Sheepdog
-> -M: Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>
->  M: Liu Yuan <namei.unix@gmail.com>
->  M: Jeff Cody <jcody@redhat.com>
->  L: qemu-block@nongnu.org
-
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+diff --git a/hw/arm/musicpal.c b/hw/arm/musicpal.c
+index c807010e83..3dafb41b0b 100644
+--- a/hw/arm/musicpal.c
++++ b/hw/arm/musicpal.c
+@@ -1695,7 +1695,7 @@ static void musicpal_init(MachineState *machine)
+     wm8750_dev = i2c_create_slave(i2c, TYPE_WM8750, MP_WM_ADDR);
+     dev = qdev_create(NULL, "mv88w8618_audio");
+     s = SYS_BUS_DEVICE(dev);
+-    qdev_prop_set_ptr(dev, "wm8750", wm8750_dev);
++    qdev_prop_set_ptr(dev, TYPE_WM8750, wm8750_dev);
+     qdev_init_nofail(dev);
+     sysbus_mmio_map(s, 0, MP_AUDIO_BASE);
+     sysbus_connect_irq(s, 0, pic[MP_AUDIO_IRQ]);
+diff --git a/hw/audio/marvell_88w8618.c b/hw/audio/marvell_88w8618.c
+index e546892d3c..cf6ce6979b 100644
+--- a/hw/audio/marvell_88w8618.c
++++ b/hw/audio/marvell_88w8618.c
+@@ -280,7 +280,7 @@ static const VMStateDescription mv88w8618_audio_vmsd = {
+ };
+ 
+ static Property mv88w8618_audio_properties[] = {
+-    DEFINE_PROP_PTR("wm8750", mv88w8618_audio_state, wm),
++    DEFINE_PROP_PTR(TYPE_WM8750, mv88w8618_audio_state, wm),
+     {/* end of list */},
+ };
+ 
+-- 
+2.17.1
