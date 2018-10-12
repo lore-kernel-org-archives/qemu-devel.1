@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50704)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52755)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gAugx-0005GW-2m
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 06:29:11 -0400
+	(envelope-from <kraxel@redhat.com>) id 1gAutp-0007Oc-PB
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 06:42:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gAugs-0001vz-Um
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 06:29:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:30409)
+	(envelope-from <kraxel@redhat.com>) id 1gAutk-0001Vx-Mj
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 06:42:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44222)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gAugs-0001vJ-Hv
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 06:29:06 -0400
-Date: Fri, 12 Oct 2018 11:28:23 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181012102823.GW16720@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180914135230.15178-1-marcandre.lureau@redhat.com>
-	<20181011154834.GA10122@redhat.com>
-	<20181012093757.GT16720@redhat.com>
-	<20181012102311.uojhijhdrbaxrjw3@sirius.home.kraxel.org>
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gAutk-0001Vg-Gd
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 06:42:24 -0400
+Date: Fri, 12 Oct 2018 12:42:22 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20181012104222.vzwu73lanjbelnbl@sirius.home.kraxel.org>
+References: <20181009131052.18500-1-lhrazky@redhat.com>
+	<20181011122757.gsynkctea7reqnik@sirius.home.kraxel.org>
+	<1539263541.16655.110.camel@redhat.com>
+	<20181011134336.w55g5ts6kln6cgtt@sirius.home.kraxel.org>
+	<1539268208.16655.144.camel@redhat.com>
+	<20181011150944.5qfaflgkcekdlz3o@sirius.home.kraxel.org>
+	<1539272266.16655.154.camel@redhat.com>
+	<20181012092700.np256rvz6octswia@sirius.home.kraxel.org>
+	<2078529305.33241973.1539339318932.JavaMail.zimbra@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181012102311.uojhijhdrbaxrjw3@sirius.home.kraxel.org>
-Subject: Re: [Qemu-devel] [PATCH v2] vhost-user: define conventions for
- vhost-user backends
+In-Reply-To: <2078529305.33241973.1539339318932.JavaMail.zimbra@redhat.com>
+Subject: Re: [Qemu-devel] [Spice-devel] [RFC PATCH spice 1/2] QXL interface:
+ add functions to identify monitors in the guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,45 +35,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Victor Kaplansky <victork@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, libvir-list@redhat.com, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Felipe Franciosi <felipe@nutanix.com>, Changpeng Liu <changpeng.liu@intel.com>
+To: Frediano Ziglio <fziglio@redhat.com>
+Cc: =?utf-8?B?THVrw6HFoSBIcsOhemvDvQ==?= <lhrazky@redhat.com>, spice-devel@lists.freedesktop.org, qemu-devel@nongnu.org
 
-On Fri, Oct 12, 2018 at 12:23:11PM +0200, Gerd Hoffmann wrote:
->   Hi,
+  Hi,
+
+> > When using qemu_console_get_head() it doesn't work correctly, it would
+> > use the qxl card's data.  It would work if spice-server would filter the
+> > list to only include the entries for the given display channel before
+> > calling the ->client_monitors_config() callback.  But it doesn't, we get
+> > the complete set.
 > 
-> > Note, I can't remember what Markus had proposed for CLI arguments in
-> > QAPI, so I invented something arbitary but plausible.
-> 
-> Using qapi visitors to parse the command line.  Used by -blockdev and
-> -display (and maybe others meanwhile).  See parse_display_qapi().
-> 
-> I think Daniels suggestion was to do that in the backends ...
+> That's why I said is a bug, IMHO it should.
 
-More than just that - I was thinking of this series:
+Hmm, this should be easily detectable on qemu side I think.  If
+num_of_monitors (for a non-qxl card) is > 1, then we have an old,
+non-filtering spice-server.  If num_of_monitors == 1, then it is a new,
+filtering spice-server.  Or a single-head channel configuration, in
+which case it doesn't matter whenever it filters or not.
 
-   http://lists.gnu.org/archive/html/qemu-devel/2017-10/msg00209.html
+So this should be fixable without causing too much compatibility pain.
 
-In that there is no QemuOpts, or getopt(), etc. You end up using QAPI
-for the entire argv parsing procss:
-
-    QAPIOption *qopt;
-
-    qopt = qapi_options_parse(argc, argv);
-
-    for (i = 0; !qopt[i].cnt; i++) {
-       switch (qopt[i].type) {
-       case QAPI_OPTION_KIND_NODEFCONFIG:
-           defconfig = false;
-           break;
-       case QAPI_OPTION_KIND_NO_USER_CONFIG:
-           userconfig = false;
-           break;
-	   ...etc...
-    }
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+cheers,
+  Gerd
