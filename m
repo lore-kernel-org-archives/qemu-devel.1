@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39954)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gB1Hl-0001rT-5s
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 13:31:38 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gB1Hh-0000JG-T7
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gB1Hh-0001qq-PH
 	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 13:31:37 -0400
-Received: from mail.uni-paderborn.de ([131.234.142.9]:38644)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gB1Hd-0000FE-MK
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 13:31:33 -0400
+Received: from mail.uni-paderborn.de ([131.234.142.9]:37110)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
-	id 1gB1Hf-00005A-P1
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 13:31:33 -0400
+	id 1gB1Hb-0008S5-TI
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 13:31:28 -0400
 From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Date: Fri, 12 Oct 2018 19:30:36 +0200
-Message-Id: <20181012173047.25420-18-kbastian@mail.uni-paderborn.de>
+Date: Fri, 12 Oct 2018 19:30:28 +0200
+Message-Id: <20181012173047.25420-10-kbastian@mail.uni-paderborn.de>
 In-Reply-To: <20181012173047.25420-1-kbastian@mail.uni-paderborn.de>
 References: <20181012173047.25420-1-kbastian@mail.uni-paderborn.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 17/28] target/riscv: Convert quadrant 2 of RVXC
- insns to decodetree
+Subject: [Qemu-devel] [PATCH 09/28] target/riscv: Convert RV64A insns to
+ decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,387 +30,299 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: mjc@sifive.com, palmer@sifive.com, sagark@eecs.berkeley.edu, kbastian@mail.uni-paderborn.de
 Cc: qemu-devel@nongnu.org, peer.adelt@hni.uni-paderborn.de, Alistair.Francis@wdc.com
 
-This also removes all functions that now became obsolete.
-
 Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Signed-off-by: Peer Adelt <peer.adelt@hni.uni-paderborn.de>
 ---
- target/riscv/insn16.decode              |  34 +++++-
- target/riscv/insn_trans/trans_rvc.inc.c | 107 +++++++++++++++++
- target/riscv/translate.c                | 151 +-----------------------
- 3 files changed, 139 insertions(+), 153 deletions(-)
+ target/riscv/insn32.decode              |  13 +++
+ target/riscv/insn_trans/trans_rva.inc.c |  99 +++++++++++++++++
+ target/riscv/translate.c                | 140 ------------------------
+ 3 files changed, 112 insertions(+), 140 deletions(-)
 
-diff --git a/target/riscv/insn16.decode b/target/riscv/insn16.decode
-index 29dade0fa1..138290c450 100644
---- a/target/riscv/insn16.decode
-+++ b/target/riscv/insn16.decode
-@@ -20,6 +20,7 @@
- %rd        7:5
- %rs1_3     7:3                !function=ex_rvc_register
- %rs2_3     2:3                !function=ex_rvc_register
-+%rs2_5     2:5
- 
- # Immediates:
- %imm_ci        12:s1 2:5
-@@ -30,12 +31,14 @@
- %imm_cj        12:s1 8:1 9:2 6:1 7:1 2:1 11:1 3:3 !function=ex_shift_1
- 
- %nzuimm_6bit   12:1 2:5
-+%uimm_6bit_ld 2:3 12:1 5:2           !function=ex_shift_3
-+%uimm_6bit_lw 2:2 12:1 4:3           !function=ex_shift_2
-+%uimm_6bit_sd 7:3 10:3               !function=ex_shift_3
-+%uimm_6bit_sw 7:2 9:4                !function=ex_shift_2
- 
- %imm_addi16sp  12:s1 3:2 5:1 2:1 6:1 !function=ex_shift_4
- %imm_lui       12:s1 2:5             !function=ex_shift_12
- 
--
--
- # Argument sets:
- &cl               rs1 rd
- &cl_dw     uimm   rs1 rd
-@@ -47,11 +50,15 @@
- &cr               rd  rs2
- &c_j       imm
- &c_shift   shamt      rd
--
-+&c_ld      uimm  rd
-+&c_sd      uimm  rs2
- 
- &c_addi16sp_lui  imm_lui imm_addi16sp rd
-+&c_flwsp_ldsp    uimm_flwsp uimm_ldsp rd
-+&c_fswsp_sdsp    uimm_fswsp uimm_sdsp rs2
- 
- # Formats 16:
-+@cr        ....  ..... .....  .. &cr                      rs2=%rs2_5  %rd
- @ci        ... . ..... .....  .. &ci     imm=%imm_ci                  %rd
- @ciw       ...   ........ ... .. &ciw    nzuimm=%nzuimm_ciw           rd=%rs2_3
- @cl_d      ... ... ... .. ... .. &cl_dw  uimm=%uimm_cl_d  rs1=%rs1_3  rd=%rs2_3
-@@ -64,9 +71,19 @@
- @cb        ... ... ... .. ... .. &cb     imm=%imm_cb      rs1=%rs1_3
- @cj        ...    ........... .. &c_j    imm=%imm_cj
- 
-+@c_ld      ... . .....  ..... .. &c_ld     uimm=%uimm_6bit_ld  %rd
-+@c_lw      ... . .....  ..... .. &c_ld     uimm=%uimm_6bit_lw  %rd
-+@c_sd      ... . .....  ..... .. &c_sd     uimm=%uimm_6bit_sd  rs2=%rs2_5
-+@c_sw      ... . .....  ..... .. &c_sd     uimm=%uimm_6bit_sw  rs2=%rs2_5
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index 31fca2f184..b4a86f5402 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -148,3 +148,16 @@ amomin_w   10000 . . ..... ..... 010 ..... 0101111 @atom_st
+ amomax_w   10100 . . ..... ..... 010 ..... 0101111 @atom_st
+ amominu_w  11000 . . ..... ..... 010 ..... 0101111 @atom_st
+ amomaxu_w  11100 . . ..... ..... 010 ..... 0101111 @atom_st
 +
- @c_addi16sp_lui ... .  ..... ..... .. &c_addi16sp_lui %imm_lui %imm_addi16sp %rd
-+@c_flwsp_ldsp   ... .  ..... ..... .. &c_flwsp_ldsp uimm_flwsp=%uimm_6bit_lw \
-+    uimm_ldsp=%uimm_6bit_ld %rd
-+@c_fswsp_sdsp   ... .  ..... ..... .. &c_fswsp_sdsp uimm_fswsp=%uimm_6bit_sw \
-+    uimm_sdsp=%uimm_6bit_sd rs2=%rs2_5
- 
- @c_shift        ... . .. ... ..... .. &c_shift rd=%rs1_3 shamt=%nzuimm_6bit
-+@c_shift2       ... . .. ... ..... .. &c_shift rd=%rd    shamt=%nzuimm_6bit
- 
- @c_andi         ... . .. ... ..... .. &ci imm=%imm_ci rd=%rs1_3
- 
-@@ -96,3 +113,14 @@ c_addw            100 1 11 ... 01 ... 01 @cs_2
- c_j               101     ........... 01 @cj
- c_beqz            110  ... ...  ..... 01 @cb
- c_bnez            111  ... ...  ..... 01 @cb
-+
-+# *** RV64C Standard Extension (Quadrant 2) ***
-+c_slli            000 .  .....  ..... 10 @c_shift2
-+c_fldsp           001 .  .....  ..... 10 @c_ld
-+c_lwsp            010 .  .....  ..... 10 @c_lw
-+c_flwsp_ldsp      011 .  .....  ..... 10 @c_flwsp_ldsp #C.LDSP:RV64;C.FLWSP:RV32
-+c_jr_mv           100 0  .....  ..... 10 @cr
-+c_ebreak_jalr_add 100 1  .....  ..... 10 @cr
-+c_fsdsp           101   ......  ..... 10 @c_sd
-+c_swsp            110 .  .....  ..... 10 @c_sw
-+c_fswsp_sdsp      111 .  .....  ..... 10 @c_fswsp_sdsp #C.SDSP:RV64;C.FSWSP:RV32
-diff --git a/target/riscv/insn_trans/trans_rvc.inc.c b/target/riscv/insn_trans/trans_rvc.inc.c
-index 74cb4dad0a..b98c18d99e 100644
---- a/target/riscv/insn_trans/trans_rvc.inc.c
-+++ b/target/riscv/insn_trans/trans_rvc.inc.c
-@@ -237,3 +237,110 @@ static bool trans_c_bnez(DisasContext *ctx, arg_c_bnez *a, uint16_t insn)
-     arg_bne arg = { .rs1 = a->rs1, .rs2 = 0, .imm = a->imm };
-     return trans_bne(ctx, &arg, insn);
++# *** RV64A Standard Extension (in addition to RV32A) ***
++lr_d       00010 . . 00000 ..... 011 ..... 0101111 @atom_ld
++sc_d       00011 . . ..... ..... 011 ..... 0101111 @atom_st
++amoswap_d  00001 . . ..... ..... 011 ..... 0101111 @atom_st
++amoadd_d   00000 . . ..... ..... 011 ..... 0101111 @atom_st
++amoxor_d   00100 . . ..... ..... 011 ..... 0101111 @atom_st
++amoand_d   01100 . . ..... ..... 011 ..... 0101111 @atom_st
++amoor_d    01000 . . ..... ..... 011 ..... 0101111 @atom_st
++amomin_d   10000 . . ..... ..... 011 ..... 0101111 @atom_st
++amomax_d   10100 . . ..... ..... 011 ..... 0101111 @atom_st
++amominu_d  11000 . . ..... ..... 011 ..... 0101111 @atom_st
++amomaxu_d  11100 . . ..... ..... 011 ..... 0101111 @atom_st
+diff --git a/target/riscv/insn_trans/trans_rva.inc.c b/target/riscv/insn_trans/trans_rva.inc.c
+index 2cb2bfd9cc..06616982c6 100644
+--- a/target/riscv/insn_trans/trans_rva.inc.c
++++ b/target/riscv/insn_trans/trans_rva.inc.c
+@@ -173,3 +173,102 @@ static bool trans_amomaxu_w(DisasContext *ctx, arg_amomaxu_w *a, uint32_t insn)
+ {
+     return gen_amo(ctx, a, OPC_RISC_AMOMAXU, (MO_ALIGN | MO_TESL));
  }
 +
-+static bool trans_c_slli(DisasContext *ctx, arg_c_slli *a, uint16_t insn)
++static bool trans_lr_d(DisasContext *ctx, arg_lr_d *a, uint32_t insn)
 +{
-+    if (a->shamt == 0) {
-+        /* Reserved in ISA */
-+        gen_exception_illegal(ctx);
-+        return true;
-+    }
-+
-+#ifdef TARGET_RISCV32
-+    /* Ensure, that shamt[5] is zero for RV32 */
-+    if (a->shamt >= 32) {
-+        gen_exception_illegal(ctx);
-+        return true;
-+    }
-+#endif
-+
-+    arg_slli arg = { .rd = a->rd, .rs1 = a->rd, .shamt = a->shamt };
-+    return trans_slli(ctx, &arg, insn);
-+}
-+
-+static bool trans_c_fldsp(DisasContext *ctx, arg_c_fldsp *a, uint16_t insn)
-+{
-+    arg_fld arg = { .rd = a->rd, .rs1 = 2, .imm = a->uimm };
-+    return trans_fld(ctx, &arg, insn);
-+}
-+
-+static bool trans_c_lwsp(DisasContext *ctx, arg_c_lwsp *a, uint16_t insn)
-+{
-+    arg_lw arg = { .rd = a->rd, .rs1 = 2, .imm = a->uimm };
-+    return trans_lw(ctx, &arg, insn);
-+}
-+
-+static bool trans_c_flwsp_ldsp(DisasContext *ctx, arg_c_flwsp_ldsp *a,
-+        uint16_t insn)
-+{
-+#ifdef TARGET_RISCV32
-+    /* C.FLWSP */
-+    arg_flw arg_flw = { .rd = a->rd, .rs1 = 2, .imm = a->uimm_flwsp };
-+    return trans_flw(ctx, &arg_flw, insn);
++#ifdef TARGET_RISCV64
++    return gen_lr(ctx, a, MO_ALIGN | MO_TEQ);
 +#else
-+    /* C.LDSP */
-+    arg_ld arg_ld = { .rd = a->rd, .rs1 = 2, .imm = a->uimm_ldsp };
-+    return trans_ld(ctx, &arg_ld, insn);
++    return false;
 +#endif
++}
++
++static bool trans_sc_d(DisasContext *ctx, arg_sc_d *a, uint32_t insn)
++{
++#ifdef TARGET_RISCV64
++    return gen_sc(ctx, a, (MO_ALIGN | MO_TEQ));
++#else
 +    return false;
-+}
-+
-+static bool trans_c_jr_mv(DisasContext *ctx, arg_c_jr_mv *a, uint16_t insn)
-+{
-+    if (a->rd != 0 && a->rs2 == 0) {
-+        /* C.JR */
-+        arg_jalr arg = { .rd = 0, .rs1 = a->rd, .imm = 0 };
-+        return trans_jalr(ctx, &arg, insn);
-+    } else if (a->rd != 0 && a->rs2 != 0) {
-+        /* C.MV */
-+        arg_add arg = { .rd = a->rd, .rs1 = 0, .rs2 = a->rs2 };
-+        return trans_add(ctx, &arg, insn);
-+    }
-+    return false;
-+}
-+
-+static bool trans_c_ebreak_jalr_add(DisasContext *ctx, arg_c_ebreak_jalr_add *a,
-+        uint16_t insn)
-+{
-+    if (a->rd == 0 && a->rs2 == 0) {
-+        /* C.EBREAK */
-+        arg_ebreak arg = { };
-+        return trans_ebreak(ctx, &arg, insn);
-+    } else if (a->rd != 0) {
-+        if (a->rs2 == 0) {
-+            /* C.JALR */
-+            arg_jalr arg = { .rd = 1, .rs1 = a->rd, .imm = 0 };
-+            return trans_jalr(ctx, &arg, insn);
-+        } else {
-+            /* C.ADD */
-+            arg_add arg = { .rd = a->rd, .rs1 = a->rd, .rs2 = a->rs2 };
-+            return trans_add(ctx, &arg, insn);
-+        }
-+    }
-+    return false;
-+}
-+
-+static bool trans_c_fsdsp(DisasContext *ctx, arg_c_fsdsp *a, uint16_t insn)
-+{
-+    arg_fsd arg = { .rs1 = 2, .rs2 = a->rs2, .imm = a->uimm };
-+    return trans_fsd(ctx, &arg, insn);
-+}
-+
-+static bool trans_c_swsp(DisasContext *ctx, arg_c_swsp *a, uint16_t insn)
-+{
-+    arg_sw arg = { .rs1 = 2, .rs2 = a->rs2, .imm = a->uimm };
-+    return trans_sw(ctx, &arg, insn);
-+}
-+
-+static bool trans_c_fswsp_sdsp(DisasContext *ctx, arg_c_fswsp_sdsp *a,
-+        uint16_t insn)
-+{
-+#ifdef TARGET_RISCV32
-+    /* C.FSWSP */
-+    arg_fsw a_fsw = { .rs1 = a->rs2, .rs2 = 2, .imm = a->uimm_fswsp };
-+    return trans_fsw(ctx, &a_fsw, insn);
 +#endif
-+    /* C.SDSP */
-+    arg_sd a_sd = { .rs1 = 2, .rs2 = a->rs2, .imm = a->uimm_sdsp };
-+    return trans_sd(ctx, &a_sd, insn);
++}
++
++static bool trans_amoswap_d(DisasContext *ctx, arg_amoswap_d *a, uint32_t insn)
++{
++#ifdef TARGET_RISCV64
++    return gen_amo(ctx, a, OPC_RISC_AMOSWAP, (MO_ALIGN | MO_TEQ));
++#else
++    return false;
++#endif
++}
++
++static bool trans_amoadd_d(DisasContext *ctx, arg_amoadd_d *a, uint32_t insn)
++{
++#ifdef TARGET_RISCV64
++    return gen_amo(ctx, a, OPC_RISC_AMOADD, (MO_ALIGN | MO_TEQ));
++#else
++    return false;
++#endif
++}
++
++static bool trans_amoxor_d(DisasContext *ctx, arg_amoxor_d *a, uint32_t insn)
++{
++#ifdef TARGET_RISCV64
++    return gen_amo(ctx, a, OPC_RISC_AMOXOR, (MO_ALIGN | MO_TEQ));
++#else
++    return false;
++#endif
++}
++
++static bool trans_amoand_d(DisasContext *ctx, arg_amoand_d *a, uint32_t insn)
++{
++#ifdef TARGET_RISCV64
++    return gen_amo(ctx, a, OPC_RISC_AMOAND, (MO_ALIGN | MO_TEQ));
++#else
++    return false;
++#endif
++}
++
++static bool trans_amoor_d(DisasContext *ctx, arg_amoor_d *a, uint32_t insn)
++{
++#ifdef TARGET_RISCV64
++    return gen_amo(ctx, a, OPC_RISC_AMOOR, (MO_ALIGN | MO_TEQ));
++#else
++    return false;
++#endif
++}
++
++static bool trans_amomin_d(DisasContext *ctx, arg_amomin_d *a, uint32_t insn)
++{
++#ifdef TARGET_RISCV64
++    return gen_amo(ctx, a, OPC_RISC_AMOMIN, (MO_ALIGN | MO_TEQ));
++#else
++    return false;
++#endif
++}
++
++static bool trans_amomax_d(DisasContext *ctx, arg_amomax_d *a, uint32_t insn)
++{
++#ifdef TARGET_RISCV64
++    return gen_amo(ctx, a, OPC_RISC_AMOMAX, (MO_ALIGN | MO_TEQ));
++#else
++    return false;
++#endif
++}
++
++static bool trans_amominu_d(DisasContext *ctx, arg_amominu_d *a, uint32_t insn)
++{
++#ifdef TARGET_RISCV64
++    return gen_amo(ctx, a, OPC_RISC_AMOMINU, (MO_ALIGN | MO_TEQ));
++#else
++    return false;
++#endif
++}
++
++static bool trans_amomaxu_d(DisasContext *ctx, arg_amomaxu_d *a, uint32_t insn)
++{
++#ifdef TARGET_RISCV64
++    return gen_amo(ctx, a, OPC_RISC_AMOMAXU, (MO_ALIGN | MO_TEQ));
++#else
++    return false;
++#endif
 +}
 diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-index 3d2146c9b2..6b4a0430fd 100644
+index 760ed88162..1f6d58cb7e 100644
 --- a/target/riscv/translate.c
 +++ b/target/riscv/translate.c
-@@ -613,65 +613,6 @@ static void gen_store(DisasContext *ctx, uint32_t opc, int rs1, int rs2,
-     tcg_temp_free(dat);
+@@ -710,143 +710,6 @@ static void gen_fp_store(DisasContext *ctx, uint32_t opc, int rs1,
+     tcg_temp_free(t0);
  }
  
--static void gen_fp_load(DisasContext *ctx, uint32_t opc, int rd,
--        int rs1, target_long imm)
+-static void gen_atomic(DisasContext *ctx, uint32_t opc,
+-                      int rd, int rs1, int rs2)
 -{
--    TCGv t0;
+-    TCGv src1, src2, dat;
+-    TCGLabel *l1, *l2;
+-    TCGMemOp mop;
+-    bool aq, rl;
 -
--    if (!(ctx->flags & TB_FLAGS_FP_ENABLE)) {
+-    /* Extract the size of the atomic operation.  */
+-    switch (extract32(opc, 12, 3)) {
+-    case 2: /* 32-bit */
+-        mop = MO_ALIGN | MO_TESL;
+-        break;
+-#if defined(TARGET_RISCV64)
+-    case 3: /* 64-bit */
+-        mop = MO_ALIGN | MO_TEQ;
+-        break;
+-#endif
+-    default:
 -        gen_exception_illegal(ctx);
 -        return;
 -    }
+-    rl = extract32(opc, 25, 1);
+-    aq = extract32(opc, 26, 1);
 -
--    t0 = tcg_temp_new();
--    gen_get_gpr(t0, rs1);
--    tcg_gen_addi_tl(t0, t0, imm);
+-    src1 = tcg_temp_new();
+-    src2 = tcg_temp_new();
 -
--    switch (opc) {
--    case OPC_RISC_FLW:
--        tcg_gen_qemu_ld_i64(cpu_fpr[rd], t0, ctx->mem_idx, MO_TEUL);
--        /* RISC-V requires NaN-boxing of narrower width floating point values */
--        tcg_gen_ori_i64(cpu_fpr[rd], cpu_fpr[rd], 0xffffffff00000000ULL);
+-    switch (MASK_OP_ATOMIC_NO_AQ_RL_SZ(opc)) {
+-    case OPC_RISC_LR:
+-        /* Put addr in load_res, data in load_val.  */
+-        gen_get_gpr(src1, rs1);
+-        if (rl) {
+-            tcg_gen_mb(TCG_MO_ALL | TCG_BAR_STRL);
+-        }
+-        tcg_gen_qemu_ld_tl(load_val, src1, ctx->mem_idx, mop);
+-        if (aq) {
+-            tcg_gen_mb(TCG_MO_ALL | TCG_BAR_LDAQ);
+-        }
+-        tcg_gen_mov_tl(load_res, src1);
+-        gen_set_gpr(rd, load_val);
 -        break;
--    case OPC_RISC_FLD:
--        tcg_gen_qemu_ld_i64(cpu_fpr[rd], t0, ctx->mem_idx, MO_TEQ);
+-
+-    case OPC_RISC_SC:
+-        l1 = gen_new_label();
+-        l2 = gen_new_label();
+-        dat = tcg_temp_new();
+-
+-        gen_get_gpr(src1, rs1);
+-        tcg_gen_brcond_tl(TCG_COND_NE, load_res, src1, l1);
+-
+-        gen_get_gpr(src2, rs2);
+-        /* Note that the TCG atomic primitives are SC,
+-           so we can ignore AQ/RL along this path.  */
+-        tcg_gen_atomic_cmpxchg_tl(src1, load_res, load_val, src2,
+-                                  ctx->mem_idx, mop);
+-        tcg_gen_setcond_tl(TCG_COND_NE, dat, src1, load_val);
+-        gen_set_gpr(rd, dat);
+-        tcg_gen_br(l2);
+-
+-        gen_set_label(l1);
+-        /* Address comparion failure.  However, we still need to
+-           provide the memory barrier implied by AQ/RL.  */
+-        tcg_gen_mb(TCG_MO_ALL + aq * TCG_BAR_LDAQ + rl * TCG_BAR_STRL);
+-        tcg_gen_movi_tl(dat, 1);
+-        gen_set_gpr(rd, dat);
+-
+-        gen_set_label(l2);
+-        tcg_temp_free(dat);
 -        break;
+-
+-    case OPC_RISC_AMOSWAP:
+-        /* Note that the TCG atomic primitives are SC,
+-           so we can ignore AQ/RL along this path.  */
+-        gen_get_gpr(src1, rs1);
+-        gen_get_gpr(src2, rs2);
+-        tcg_gen_atomic_xchg_tl(src2, src1, src2, ctx->mem_idx, mop);
+-        gen_set_gpr(rd, src2);
+-        break;
+-    case OPC_RISC_AMOADD:
+-        gen_get_gpr(src1, rs1);
+-        gen_get_gpr(src2, rs2);
+-        tcg_gen_atomic_fetch_add_tl(src2, src1, src2, ctx->mem_idx, mop);
+-        gen_set_gpr(rd, src2);
+-        break;
+-    case OPC_RISC_AMOXOR:
+-        gen_get_gpr(src1, rs1);
+-        gen_get_gpr(src2, rs2);
+-        tcg_gen_atomic_fetch_xor_tl(src2, src1, src2, ctx->mem_idx, mop);
+-        gen_set_gpr(rd, src2);
+-        break;
+-    case OPC_RISC_AMOAND:
+-        gen_get_gpr(src1, rs1);
+-        gen_get_gpr(src2, rs2);
+-        tcg_gen_atomic_fetch_and_tl(src2, src1, src2, ctx->mem_idx, mop);
+-        gen_set_gpr(rd, src2);
+-        break;
+-    case OPC_RISC_AMOOR:
+-        gen_get_gpr(src1, rs1);
+-        gen_get_gpr(src2, rs2);
+-        tcg_gen_atomic_fetch_or_tl(src2, src1, src2, ctx->mem_idx, mop);
+-        gen_set_gpr(rd, src2);
+-        break;
+-    case OPC_RISC_AMOMIN:
+-        gen_get_gpr(src1, rs1);
+-        gen_get_gpr(src2, rs2);
+-        tcg_gen_atomic_fetch_smin_tl(src2, src1, src2, ctx->mem_idx, mop);
+-        gen_set_gpr(rd, src2);
+-        break;
+-    case OPC_RISC_AMOMAX:
+-        gen_get_gpr(src1, rs1);
+-        gen_get_gpr(src2, rs2);
+-        tcg_gen_atomic_fetch_smax_tl(src2, src1, src2, ctx->mem_idx, mop);
+-        gen_set_gpr(rd, src2);
+-        break;
+-    case OPC_RISC_AMOMINU:
+-        gen_get_gpr(src1, rs1);
+-        gen_get_gpr(src2, rs2);
+-        tcg_gen_atomic_fetch_umin_tl(src2, src1, src2, ctx->mem_idx, mop);
+-        gen_set_gpr(rd, src2);
+-        break;
+-    case OPC_RISC_AMOMAXU:
+-        gen_get_gpr(src1, rs1);
+-        gen_get_gpr(src2, rs2);
+-        tcg_gen_atomic_fetch_umax_tl(src2, src1, src2, ctx->mem_idx, mop);
+-        gen_set_gpr(rd, src2);
+-        break;
+-
 -    default:
 -        gen_exception_illegal(ctx);
 -        break;
 -    }
--    tcg_temp_free(t0);
--}
 -
--static void gen_fp_store(DisasContext *ctx, uint32_t opc, int rs1,
--        int rs2, target_long imm)
--{
--    TCGv t0;
--
--    if (!(ctx->flags & TB_FLAGS_FP_ENABLE)) {
--        gen_exception_illegal(ctx);
--        return;
--    }
--
--    t0 = tcg_temp_new();
--    gen_get_gpr(t0, rs1);
--    tcg_gen_addi_tl(t0, t0, imm);
--
--    switch (opc) {
--    case OPC_RISC_FSW:
--        tcg_gen_qemu_st_i64(cpu_fpr[rs2], t0, ctx->mem_idx, MO_TEUL);
--        break;
--    case OPC_RISC_FSD:
--        tcg_gen_qemu_st_i64(cpu_fpr[rs2], t0, ctx->mem_idx, MO_TEQ);
--        break;
--    default:
--        gen_exception_illegal(ctx);
--        break;
--    }
--
--    tcg_temp_free(t0);
+-    tcg_temp_free(src1);
+-    tcg_temp_free(src2);
 -}
 -
  static void gen_set_rm(DisasContext *ctx, int rm)
  {
      TCGv_i32 t0;
-@@ -713,95 +654,6 @@ static void gen_system(CPURISCVState *env, DisasContext *ctx, uint32_t opc,
-     }
- }
- 
--static void decode_RV32_64C2(CPURISCVState *env, DisasContext *ctx)
--{
--    uint8_t rd, rs2;
--    uint8_t funct3 = extract32(ctx->opcode, 13, 3);
--
--
--    rd = GET_RD(ctx->opcode);
--
--    switch (funct3) {
--    case 0: /* C.SLLI -> slli rd, rd, shamt[5:0]
--               C.SLLI64 -> */
--        gen_arith_imm(ctx, OPC_RISC_SLLI, rd, rd, GET_C_ZIMM(ctx->opcode));
+@@ -1668,9 +1531,6 @@ static void decode_RV32_64G(CPURISCVState *env, DisasContext *ctx)
+         gen_fp_store(ctx, MASK_OP_FP_STORE(ctx->opcode), rs1, rs2,
+                      GET_STORE_IMM(ctx->opcode));
+         break;
+-    case OPC_RISC_ATOMIC:
+-        gen_atomic(ctx, MASK_OP_ATOMIC(ctx->opcode), rd, rs1, rs2);
 -        break;
--    case 1: /* C.FLDSP(RV32/64DC) -> fld rd, offset[8:3](x2) */
--        gen_fp_load(ctx, OPC_RISC_FLD, rd, 2, GET_C_LDSP_IMM(ctx->opcode));
--        break;
--    case 2: /* C.LWSP -> lw rd, offset[7:2](x2) */
--        gen_load(ctx, OPC_RISC_LW, rd, 2, GET_C_LWSP_IMM(ctx->opcode));
--        break;
--    case 3:
--#if defined(TARGET_RISCV64)
--        /* C.LDSP(RVC64) -> ld rd, offset[8:3](x2) */
--        gen_load(ctx, OPC_RISC_LD, rd, 2, GET_C_LDSP_IMM(ctx->opcode));
--#else
--        /* C.FLWSP(RV32FC) -> flw rd, offset[7:2](x2) */
--        gen_fp_load(ctx, OPC_RISC_FLW, rd, 2, GET_C_LWSP_IMM(ctx->opcode));
--#endif
--        break;
--    case 4:
--        rs2 = GET_C_RS2(ctx->opcode);
--
--        if (extract32(ctx->opcode, 12, 1) == 0) {
--            if (rs2 == 0) {
--                /* C.JR -> jalr x0, rs1, 0*/
--                gen_jalr(env, ctx, OPC_RISC_JALR, 0, rd, 0);
--            } else {
--                /* C.MV -> add rd, x0, rs2 */
--                gen_arith(ctx, OPC_RISC_ADD, rd, 0, rs2);
--            }
--        } else {
--            if (rd == 0) {
--                /* C.EBREAK -> ebreak*/
--                gen_system(env, ctx, OPC_RISC_ECALL, 0, 0, 0x1);
--            } else {
--                if (rs2 == 0) {
--                    /* C.JALR -> jalr x1, rs1, 0*/
--                    gen_jalr(env, ctx, OPC_RISC_JALR, 1, rd, 0);
--                } else {
--                    /* C.ADD -> add rd, rd, rs2 */
--                    gen_arith(ctx, OPC_RISC_ADD, rd, rd, rs2);
--                }
--            }
--        }
--        break;
--    case 5:
--        /* C.FSDSP -> fsd rs2, offset[8:3](x2)*/
--        gen_fp_store(ctx, OPC_RISC_FSD, 2, GET_C_RS2(ctx->opcode),
--                     GET_C_SDSP_IMM(ctx->opcode));
--        /* C.SQSP */
--        break;
--    case 6: /* C.SWSP -> sw rs2, offset[7:2](x2)*/
--        gen_store(ctx, OPC_RISC_SW, 2, GET_C_RS2(ctx->opcode),
--                  GET_C_SWSP_IMM(ctx->opcode));
--        break;
--    case 7:
--#if defined(TARGET_RISCV64)
--        /* C.SDSP(Rv64/128) -> sd rs2, offset[8:3](x2)*/
--        gen_store(ctx, OPC_RISC_SD, 2, GET_C_RS2(ctx->opcode),
--                  GET_C_SDSP_IMM(ctx->opcode));
--#else
--        /* C.FSWSP(RV32) -> fsw rs2, offset[7:2](x2) */
--        gen_fp_store(ctx, OPC_RISC_FSW, 2, GET_C_RS2(ctx->opcode),
--                     GET_C_SWSP_IMM(ctx->opcode));
--#endif
--        break;
--    }
--}
--
--static void decode_RV32_64C(CPURISCVState *env, DisasContext *ctx)
--{
--    uint8_t op = extract32(ctx->opcode, 0, 2);
--
--    switch (op) {
--    case 2:
--        decode_RV32_64C2(env, ctx);
--        break;
--    }
--}
--
- #define EX_SH(amount) \
-     static int64_t ex_shift_##amount(int imm) \
-     {                                         \
-@@ -868,8 +720,7 @@ static void decode_opc(CPURISCVState *env, DisasContext *ctx)
-         } else {
-             ctx->pc_succ_insn = ctx->base.pc_next + 2;
-             if (!decode_insn16(ctx, ctx->opcode)) {
--                /* fall back to old decoder */
--                decode_RV32_64C(env, ctx);
-+                gen_exception_illegal(ctx);
-             }
-         }
-     } else {
+     case OPC_RISC_FMADD:
+         gen_fp_fmadd(ctx, MASK_OP_FP_FMADD(ctx->opcode), rd, rs1, rs2,
+                      GET_RS3(ctx->opcode), GET_RM(ctx->opcode));
 -- 
 2.19.1
