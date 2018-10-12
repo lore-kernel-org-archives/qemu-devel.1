@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39313)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40455)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <namei.unix@gmail.com>) id 1gAryq-0005Xn-7f
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 03:35:28 -0400
+	(envelope-from <david@redhat.com>) id 1gAs3p-0006vj-Re
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 03:40:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <namei.unix@gmail.com>) id 1gAryk-0002W3-LM
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 03:35:28 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:37776)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <namei.unix@gmail.com>)
-	id 1gAryj-0002Uo-F5
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 03:35:22 -0400
-Received: by mail-pf1-x441.google.com with SMTP id j23-v6so5747104pfi.4
-	for <qemu-devel@nongnu.org>; Fri, 12 Oct 2018 00:35:21 -0700 (PDT)
-From: Liu Yuan <namei.unix@gmail.com>
-Date: Fri, 12 Oct 2018 15:35:10 +0800
-Message-Id: <1539329710-11600-1-git-send-email-namei.unix@gmail.com>
-Subject: [Qemu-devel] [PATCH] MAINTAINERS: update block/sheepdog maintainers
+	(envelope-from <david@redhat.com>) id 1gAs3k-0006hc-0J
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 03:40:37 -0400
+References: <20181012032431.32693-1-david@gibson.dropbear.id.au>
+	<20181012032431.32693-2-david@gibson.dropbear.id.au>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <964b7f71-3fc9-83b4-3d5d-4cae592eef7d@redhat.com>
+Date: Fri, 12 Oct 2018 09:40:24 +0200
+MIME-Version: 1.0
+In-Reply-To: <20181012032431.32693-2-david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 1/5] virtio-balloon: Remove unnecessary
+ MADV_WILLNEED on deflate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,33 +25,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>, dhildenb@redhat.com, imammedo@redhat.com, ehabkost@redhat.com
+Cc: mst@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-From: Liu Yuan <liuyuan1@cmiot.chinamobile.com>
+On 12/10/2018 05:24, David Gibson wrote:
+> When the balloon is inflated, we discard memory place in it using madvise()
+> with MADV_DONTNEED.  And when we deflate it we use MADV_WILLNEED, which
+> sounds like it makes sense but is actually unnecessary.
+> 
+> The misleadingly named MADV_DONTNEED just discards the memory in question,
+> it doesn't set any persistent state on it in-kernel; all that's necessary
+> to bring the memory back is to touch it.  MADV_WILLNEED in contrast
+> specifically says that the memory will be used soon and faults it in.
+> 
+> Memory that's being given back to the guest by deflating the balloon
+> *might* be used soon, but it equally could just sit around in the guest's
+> pools until it actually needs it.  And, over the general timescale that
+> memory ballooning operates, it seems unlikely that one extra fault for the
+> guest will be a vast performance issue.
+> 
+> So, simplify the balloon's operation by dropping the madvise() on deflate.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  hw/virtio/virtio-balloon.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+> index 1728e4f83a..6ec4bcf4e1 100644
+> --- a/hw/virtio/virtio-balloon.c
+> +++ b/hw/virtio/virtio-balloon.c
+> @@ -35,9 +35,8 @@
+>  
+>  static void balloon_page(void *addr, int deflate)
+>  {
+> -    if (!qemu_balloon_is_inhibited()) {
+> -        qemu_madvise(addr, BALLOON_PAGE_SIZE,
+> -                deflate ? QEMU_MADV_WILLNEED : QEMU_MADV_DONTNEED);
+> +    if (!qemu_balloon_is_inhibited() && !deflate) {
+> +        qemu_madvise(addr, BALLOON_PAGE_SIZE, QEMU_MADV_DONTNEED);
+>      }
+>  }
+>  
+> 
 
-E-mail to one of block/sheepdog maintainers Mitake Hitoshi bounces
+Care to rename the function and drop the deflate parameter?
+(call it only when actually inflating)
 
-<mitake.hitoshi@lab.ntt.co.jp>: unknown user: "mitake.hitoshi"
+apart from that
 
-and no current address is known. So just remove it.
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-Signed-off-by: Liu Yuan <liuyuan1@cmiot.chinamobile.com>
----
- MAINTAINERS | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 3275cc6..6670c16 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2007,7 +2007,6 @@ F: block/rbd.c
- T: git git://github.com/codyprime/qemu-kvm-jtc.git block
- 
- Sheepdog
--M: Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>
- M: Liu Yuan <namei.unix@gmail.com>
- M: Jeff Cody <jcody@redhat.com>
- L: qemu-block@nongnu.org
 -- 
-2.7.4
+
+Thanks,
+
+David / dhildenb
