@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57844)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60231)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gB0hO-0000hr-7A
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 12:54:08 -0400
+	(envelope-from <eblake@redhat.com>) id 1gB0pI-0007Fd-9e
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 13:02:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gB0hL-0007w9-Vu
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 12:54:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56578)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gB0hL-0007vD-Np
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 12:53:59 -0400
-From: Cleber Rosa <crosa@redhat.com>
-Date: Fri, 12 Oct 2018 12:53:46 -0400
-Message-Id: <20181012165347.2117-3-crosa@redhat.com>
-In-Reply-To: <20181012165347.2117-1-crosa@redhat.com>
-References: <20181012165347.2117-1-crosa@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 2/3] Acceptance tests: add make rule for
- running them
+	(envelope-from <eblake@redhat.com>) id 1gB0pH-0007vs-9n
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 13:02:12 -0400
+References: <20181012115532.12645-1-kwolf@redhat.com>
+	<20181012115532.12645-4-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e61301c2-5865-fb02-c45b-56b4a3622dc3@redhat.com>
+Date: Fri, 12 Oct 2018 12:02:04 -0500
+MIME-Version: 1.0
+In-Reply-To: <20181012115532.12645-4-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/8] block: Require auto-read-only for
+ existing fallbacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,150 +25,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Laszlo Ersek <lersek@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Caio Carrara <ccarrara@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <pmathieu@redhat.com>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
 
-The acceptance (aka functional, aka Avocado-based) tests are
-Python files located in "tests/acceptance" that need to be run
-with the Avocado libs and test runner.
+On 10/12/18 6:55 AM, Kevin Wolf wrote:
+> Some block drivers have traditionally changed their node to read-only
+> mode without asking the user. This behaviour has been marked deprecated
+> since 2.11, expecting users to provide an explicit read-only=on option.
+> 
+> Now that we have auto-read-only=on, enable these drivers to make use of
+> the option.
+> 
+> This is the only use of bdrv_set_read_only(), so we can make it a bit
+> more specific and turn it into a bdrv_apply_auto_read_only() that is
+> more convenient for drivers to use.
+> 
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
 
-Let's provide a convenient way for QEMU developers to run them,
-by making use of the tests-venv with the required setup.
+> +++ b/block.c
+> @@ -266,27 +266,36 @@ int bdrv_can_set_read_only(BlockDriverState *bs, bool read_only,
+>       return 0;
+>   }
+>   
+> -/* TODO Remove (deprecated since 2.11)
+> - * Block drivers are not supposed to automatically change bs->read_only.
+> - * Instead, they should just check whether they can provide what the user
+> - * explicitly requested and error out if read-write is requested, but they can
+> - * only provide read-only access. */
+> -int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **errp)
+> +/*
+> + * Called by a driver that can only provide a read-only image.
+> + *
+> + * Returns 0 if the node is already read-only or it could switch the node to
+> + * read-only because BDRV_O_AUTO_RDONLY is set.
+> + *
+> + * Returns -EACCES if the node is read-write and BDRV_O_AUTO_RDONLY is not set.
+> + * If @errmsg is not NULL, it is used as the error message for the Error
+> + * object.
 
-Also, while the Avocado test runner will take care of creating a
-location to save test results to, it was understood that it's better
-if the results are kept within the build tree.
+I like it.
 
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
----
- docs/devel/testing.rst      | 35 ++++++++++++++++++++++++++++++-----
- tests/Makefile.include      | 21 +++++++++++++++++++--
- tests/venv-requirements.txt |  1 +
- 3 files changed, 50 insertions(+), 7 deletions(-)
+Worth documenting the -EINVAL (copy-on-read prevents setting read-only) 
+failure as well?  (The -EPERM failure of bdrv_can_set_read_only() is not 
+reachable, since this new function never clears readonly).
 
-diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
-index 727c4019b5..b992a2961d 100644
---- a/docs/devel/testing.rst
-+++ b/docs/devel/testing.rst
-@@ -545,10 +545,31 @@ Tests based on ``avocado_qemu.Test`` can easily:
-    - http://avocado-framework.readthedocs.io/en/latest/api/test/avocado.html#avocado.Test
-    - http://avocado-framework.readthedocs.io/en/latest/api/utils/avocado.utils.html
- 
--Installation
--------------
-+Running tests
-+-------------
- 
--To install Avocado and its dependencies, run:
-+You can run the acceptance tests simply by executing:
-+
-+.. code::
-+
-+  make check-acceptance
-+
-+This involves the automatic creation of Python virtual environment
-+within the build tree (at ``tests/venv``) which will have all the
-+right dependencies, and will save tests results also within the
-+build tree (at ``tests/results``).
-+
-+Note: the build environment must be using a Python 3 stack, and have
-+the ``venv`` and ``pip`` packages installed.  If necessary, make sure
-+``configure`` is called with ``--python=`` and that those modules are
-+available.  On Debian and Ubuntu based systems, depending on the
-+specific version, they may be on packages named ``python3-venv`` and
-+``python3-pip``.
-+
-+Manual Installation
-+-------------------
-+
-+To manually install Avocado and its dependencies, run:
- 
- .. code::
- 
-@@ -689,11 +710,15 @@ The exact QEMU binary to be used on QEMUMachine.
- Uninstalling Avocado
- --------------------
- 
--If you've followed the installation instructions above, you can easily
--uninstall Avocado.  Start by listing the packages you have installed::
-+If you've followed the manual installation instructions above, you can
-+easily uninstall Avocado.  Start by listing the packages you have
-+installed::
- 
-   pip list --user
- 
- And remove any package you want with::
- 
-   pip uninstall <package_name>
-+
-+If you've used ``make check-acceptance``, the Python virtual environment where
-+Avocado is installed will be cleaned up as part of ``make check-clean``.
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index b66180efa1..75547fc947 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -11,6 +11,7 @@ check-help:
- 	@echo " $(MAKE) check-qapi-schema    Run QAPI schema tests"
- 	@echo " $(MAKE) check-block          Run block tests"
- 	@echo " $(MAKE) check-tcg            Run TCG tests"
-+	@echo " $(MAKE) check-acceptance     Run all acceptance (functional) tests"
- 	@echo " $(MAKE) check-report.html    Generates an HTML test report"
- 	@echo " $(MAKE) check-venv           Creates a Python venv for tests"
- 	@echo " $(MAKE) check-clean          Clean the tests"
-@@ -1020,10 +1021,15 @@ check-decodetree:
- 
- # Python venv for running tests
- 
--.PHONY: check-venv
-+.PHONY: check-venv check-acceptance
- 
- TESTS_VENV_DIR=$(BUILD_DIR)/tests/venv
- TESTS_VENV_REQ=$(SRC_PATH)/tests/venv-requirements.txt
-+TESTS_RESULTS_DIR=$(BUILD_DIR)/tests/results
-+# Controls the output generated by Avocado when running tests.
-+# Any number of command separated loggers are accepted.  For more
-+# information please refer to "avocado --help".
-+AVOCADO_SHOW=none
- 
- $(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
- 	$(call quiet-command, \
-@@ -1034,8 +1040,19 @@ $(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
-             PIP, $(TESTS_VENV_REQ))
- 	$(call quiet-command, touch $@)
- 
-+$(TESTS_RESULTS_DIR):
-+	$(call quiet-command, mkdir -p $@, \
-+            MKDIR, $@)
-+
- check-venv: $(TESTS_VENV_DIR)
- 
-+check-acceptance: check-venv $(TESTS_RESULTS_DIR)
-+	$(call quiet-command, \
-+            $(TESTS_VENV_DIR)/bin/python -m avocado \
-+            --show=$(AVOCADO_SHOW) run --job-results-dir=$(TESTS_RESULTS_DIR) \
-+            --failfast=on $(SRC_PATH)/tests/acceptance, \
-+            "AVOCADO", "tests/acceptance")
-+
- # Consolidated targets
- 
- .PHONY: check-qapi-schema check-qtest check-unit check check-clean
-@@ -1049,7 +1066,7 @@ check-clean:
- 	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
- 	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y)) $(check-qtest-generic-y))
- 	rm -f tests/test-qapi-gen-timestamp
--	rm -rf $(TESTS_VENV_DIR)
-+	rm -rf $(TESTS_VENV_DIR) $(TESTS_RESULTS_DIR)
- 
- clean: check-clean
- 
-diff --git a/tests/venv-requirements.txt b/tests/venv-requirements.txt
-index d39f9d1576..64c6e27a94 100644
---- a/tests/venv-requirements.txt
-+++ b/tests/venv-requirements.txt
-@@ -1,3 +1,4 @@
- # Add Python module requirements, one per line, to be installed
- # in the tests/venv Python virtual environment. For more info,
- # refer to: https://pip.pypa.io/en/stable/user_guide/#id1
-+avocado-framework==65.0
+> + */
+> +int bdrv_apply_auto_read_only(BlockDriverState *bs, const char *errmsg,
+> +                              Error **errp)
+>   {
+>       int ret = 0;
+>   
+> -    ret = bdrv_can_set_read_only(bs, read_only, false, errp);
+> +    if (!(bs->open_flags & BDRV_O_RDWR)) {
+> +        return 0;
+> +    }
+> +    if (!(bs->open_flags & BDRV_O_AUTO_RDONLY)) {
+> +        error_setg(errp, "%s", errmsg ?: "Image is read-only");
+> +        return -EACCES;
+> +    }
+> +
+> +    ret = bdrv_can_set_read_only(bs, true, false, errp);
+>       if (ret < 0) {
+>           return ret;
+>       }
+
+Makes sense.
+
+> +++ b/block/vvfat.c
+> @@ -1262,16 +1262,10 @@ static int vvfat_open(BlockDriverState *bs, QDict *options, int flags,
+>                          "Unable to set VVFAT to 'rw' when drive is read-only");
+>               goto fail;
+>           }
+> -    } else  if (!bdrv_is_read_only(bs)) {
+> -        error_report("Opening non-rw vvfat images without an explicit "
+> -                     "read-only=on option is deprecated. Future versions "
+> -                     "will refuse to open the image instead of "
+> -                     "automatically marking the image read-only.");
+> -        /* read only is the default for safety */
+> -        ret = bdrv_set_read_only(bs, true, &local_err);
+> +    } else {
+> +        ret = bdrv_apply_auto_read_only(bs, NULL, errp);
+>           if (ret < 0) {
+> -            error_propagate(errp, local_err);
+> -            goto fail;
+> +            return ret;
+
+Don't you still need the goto fail, to avoid leaking opts?
+
 -- 
-2.17.1
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
