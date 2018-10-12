@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fziglio@redhat.com>) id 1gAuTc-0000nB-MT
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 06:15:25 -0400
+	(envelope-from <damien.hedde@greensocs.com>) id 1gAuYd-00029m-A8
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 06:20:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fziglio@redhat.com>) id 1gAuTZ-0000qA-Fq
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 06:15:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41776)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <fziglio@redhat.com>) id 1gAuTZ-0000oA-7t
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 06:15:21 -0400
-Date: Fri, 12 Oct 2018 06:15:18 -0400 (EDT)
-From: Frediano Ziglio <fziglio@redhat.com>
-Message-ID: <2078529305.33241973.1539339318932.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20181012092700.np256rvz6octswia@sirius.home.kraxel.org>
-References: <20181009131052.18500-1-lhrazky@redhat.com>
-	<20181011122757.gsynkctea7reqnik@sirius.home.kraxel.org>
-	<1539263541.16655.110.camel@redhat.com>
-	<20181011134336.w55g5ts6kln6cgtt@sirius.home.kraxel.org>
-	<1539268208.16655.144.camel@redhat.com>
-	<20181011150944.5qfaflgkcekdlz3o@sirius.home.kraxel.org>
-	<1539272266.16655.154.camel@redhat.com>
-	<20181012092700.np256rvz6octswia@sirius.home.kraxel.org>
+	(envelope-from <damien.hedde@greensocs.com>) id 1gAuYc-00044D-Cv
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 06:20:35 -0400
+References: <20181002142443.30976-1-damien.hedde@greensocs.com>
+	<20181002142443.30976-4-damien.hedde@greensocs.com>
+	<2478a2c0-7f5f-556c-09c3-1fa503984f38@redhat.com>
+From: Damien Hedde <damien.hedde@greensocs.com>
+Message-ID: <d8807487-72b9-e5c4-ba81-281218023dc6@greensocs.com>
+Date: Fri, 12 Oct 2018 12:20:17 +0200
 MIME-Version: 1.0
+In-Reply-To: <2478a2c0-7f5f-556c-09c3-1fa503984f38@redhat.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US-large
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Spice-devel] [RFC PATCH spice 1/2] QXL interface:
- add functions to identify monitors in the guest
+Subject: Re: [Qemu-devel] [PATCH v5 3/9] qdev-monitor: print the device's
+ clock with info qtree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,79 +26,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: =?utf-8?B?THVrw6HFoSBIcsOhemvDvQ==?= <lhrazky@redhat.com>, spice-devel@lists.freedesktop.org, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
+Cc: edgar.iglesias@xilinx.com, peter.maydell@linaro.org, alistair@alistair23.me, mark.burton@greensocs.com, saipava@xilinx.com, qemu-arm@nongnu.org, pbonzini@redhat.com, konrad@adacore.com, luc.michel@greensocs.com
 
-> On Thu, Oct 11, 2018 at 05:37:46PM +0200, Luk=C3=A1=C5=A1 Hr=C3=A1zk=C3=
-=BD wrote:
-> > On Thu, 2018-10-11 at 17:09 +0200, Gerd Hoffmann wrote:
-> > > > > Ok.  We probably should fix interface_client_monitors_config() to=
- use
-> > > > > the channel_id instead of qemu_console_get_head() then.
-> > > >=20
-> > > > It's not that simple. This would break the QXL with multiple monito=
-rs
-> > > > per channel case.
-> > >=20
-> > > It is that simple.
-> > >=20
-> > > qxl doesn't use that code path and has its own version of the callbac=
-k
-> > > (in qxl.c).  Fixing it there is a bit more tricky.
-> >=20
-> > Ok.. and what's actually the problem using qemu_console_get_head()? It
-> > just doesn't feel right to me using channel_id as an index into this
-> > array. It is not the right index strictly speaking.
->=20
-> Assume you have one qxl and one virtio-gpu device (one head each), for
-> example:
->=20
->    00:02.0   qxl          channel 0
->    00:03.0   virtio-gpu   channel 1
->=20
-> So the client will assign display 0 to qxl and display 1 to virtio-gpu.
-> In interface_client_monitors_config() we have to pick the correct array
-> entry.
->=20
-> When using the channel_id it works correctly.
->=20
-> When using qemu_console_get_head() it doesn't work correctly, it would
-> use the qxl card's data.  It would work if spice-server would filter the
-> list to only include the entries for the given display channel before
-> calling the ->client_monitors_config() callback.  But it doesn't, we get
-> the complete set.
->=20
+Hi Philippe,
 
-That's why I said is a bug, IMHO it should.
-
-> > > > I think we should fix spice server to actually do the filtering and
-> > > > only send monitors_config that belongs to the device to the QXL
-> > > > interface. As Frediano mentioned, it looks more like a bug.
-> > >=20
-> > > Only problem is changing the callback semantics changes the library a=
-pi.
-> > > We could add a second version of the callback which gets called with =
-a
-> > > filtered list (if present).  Not sure this is worth the effort though=
-.
-> >=20
-> > That's right. But if we don't actually break any currently supported
-> > use cases, it might be fine? The only thing we would be breaking is
-> > the virtio-gpu, I think?  Is that already something we don't want to
-> > break?
+On 10/3/18 12:42 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Damien,
 >=20
-> It would break any multihead configuration which uses multiple display
-> channels.  Yes, virtio-gpu is one case.  Breaking that would not be very
-> nice, but maybe acceptable.  The other case is multiple qxl devices
-> (i.e.  windows guest style multihead).  Breaking that is out of
-> question.
+> On 10/2/18 4:24 PM, Damien Hedde wrote:
+>> This prints the clocks attached to a DeviceState when using "info qtre=
+e" monitor
+>> command. For every clock, it displays the direction, the name and if t=
+he
+>> clock is forwarded. For input clock, it displays also the frequency.
 >=20
+> What would also be really useful (during development mostly)
+> is a "info clktree" monitor command.
 
-Windows is not a problem as it ignores the data passed to client_monitors_c=
-onfig.
+What would be the output ? A list of all clock related devices and their
+clocks ? Or something more like a clock tree starting from the source(s)
+clock up to the last ones ? (or the opposite starting from a
+clocked-device down to the sources)
 
-> cheers,
->   Gerd
+Concerning development, it might also be useful to have access to the
+frequency of a clock output. Maybe I should add the value in the object
+for that purpose ?
+
 >=20
+>>
+>> This is based on the original work of Frederic Konrad.
+>>
+>> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+>> ---
+>>  qdev-monitor.c | 12 ++++++++++++
+>>  1 file changed, 12 insertions(+)
+>>
+>> diff --git a/qdev-monitor.c b/qdev-monitor.c
+>> index 61e0300991..8c39a3a65b 100644
+>> --- a/qdev-monitor.c
+>> +++ b/qdev-monitor.c
+>> @@ -682,6 +682,7 @@ static void qdev_print(Monitor *mon, DeviceState *=
+dev, int indent)
+>>      ObjectClass *class;
+>>      BusState *child;
+>>      NamedGPIOList *ngl;
+>> +    NamedClockList *clk;
+>> =20
+>>      qdev_printf("dev: %s, id \"%s\"\n", object_get_typename(OBJECT(de=
+v)),
+>>                  dev->id ? dev->id : "");
+>> @@ -696,6 +697,17 @@ static void qdev_print(Monitor *mon, DeviceState =
+*dev, int indent)
+>>                          ngl->num_out);
+>>          }
+>>      }
+>> +    QLIST_FOREACH(clk, &dev->clocks, node) {
+>> +        if (clk->out) {
+>> +            qdev_printf("clock-out%s \"%s\"\n",
+>> +                        clk->forward ? " (fw)" : "",
+>> +                        clk->name);
+>> +        } else {
+>> +            qdev_printf("clock-in%s \"%s\" freq=3D%" PRIu64 "Hz\n",
+>=20
+> IMHO 'freq_hz=3D%" PRIu64 "\n"' is easier to read.
 
-Frediano
+The frequency value in hertz is not easy to read in general (eg:
+33333333Hz). Maybe we should print it with an apropriate unit (eg:
+33.333333MHz). We can also use the "'" printf flag for thousand
+separator but it's locale-dependent (and in my case it prints nothing).
+
+>=20
+> However if we plan to add/use a qemu_strtohz() similar to
+> qemu_strtosz_metric(), that would be fine.
+
+You mean for test purpose ?
+
+>=20
+>> +                        clk->forward ? " (fw)" : "",
+>> +                        clk->name, clock_get_frequency(clk->in));
+>> +        }
+>> +    }
+>>      class =3D object_get_class(OBJECT(dev));
+>>      do {
+>>          qdev_print_props(mon, dev, DEVICE_CLASS(class)->props, indent=
+);
+>>
+>=20
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>=20
