@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37181)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37605)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gAzJG-0006HG-9W
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 11:25:03 -0400
+	(envelope-from <damien.hedde@greensocs.com>) id 1gAzKq-0006yW-6M
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 11:26:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gAzJD-0001sF-L0
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 11:25:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56296)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1gAzJD-0001rP-Aw
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 11:24:59 -0400
-References: <1535739372-24454-1-git-send-email-Liam.Merwick@oracle.com>
-	<1535739372-24454-9-git-send-email-Liam.Merwick@oracle.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <bcb804f5-bf89-a8a8-216a-144e495aae38@redhat.com>
-Date: Fri, 12 Oct 2018 17:24:56 +0200
+	(envelope-from <damien.hedde@greensocs.com>) id 1gAzKp-0004Oz-7V
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 11:26:40 -0400
+References: <20181002142443.30976-1-damien.hedde@greensocs.com>
+From: Damien Hedde <damien.hedde@greensocs.com>
+Message-ID: <09e1483c-298e-d41a-f9c9-4f186f530dcb@greensocs.com>
+Date: Fri, 12 Oct 2018 17:26:18 +0200
 MIME-Version: 1.0
-In-Reply-To: <1535739372-24454-9-git-send-email-Liam.Merwick@oracle.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="u7hMdsu0IK5SSMD4nUgLGOYK6zuvI0FFy"
-Subject: Re: [Qemu-devel] [PATCH v3 8/8] qcow2: Read outside array bounds in
- qcow2_pre_write_overlap_check()
+In-Reply-To: <20181002142443.30976-1-damien.hedde@greensocs.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US-large
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 0/9] Clock framework API.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,91 +23,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Liam Merwick <Liam.Merwick@oracle.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: qemu-arm@nongnu.org, pbonzini@redhat.com, alistair@alistair23.me, saipava@xilinx.com, mark.burton@greensocs.com, luc.michel@greensocs.com, konrad@adacore.com, edgar.iglesias@xilinx.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---u7hMdsu0IK5SSMD4nUgLGOYK6zuvI0FFy
-From: Max Reitz <mreitz@redhat.com>
-To: Liam Merwick <Liam.Merwick@oracle.com>, qemu-devel@nongnu.org
-Message-ID: <bcb804f5-bf89-a8a8-216a-144e495aae38@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 8/8] qcow2: Read outside array bounds in
- qcow2_pre_write_overlap_check()
-References: <1535739372-24454-1-git-send-email-Liam.Merwick@oracle.com>
- <1535739372-24454-9-git-send-email-Liam.Merwick@oracle.com>
-In-Reply-To: <1535739372-24454-9-git-send-email-Liam.Merwick@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi Peter,
 
-On 31.08.18 20:16, Liam Merwick wrote:
-> The commit for 0e4e4318eaa5 increments QCOW2_OL_MAX_BITNR but does not
-> add an array entry for QCOW2_OL_BITMAP_DIRECTORY_BITNR to metadata_ol_n=
-ames[].
-> As a result, an array dereference of metadata_ol_names[8] in
-> qcow2_pre_write_overlap_check() could result in a read outside of the a=
-rray bounds.
->=20
-> Fixes: 0e4e4318eaa5 ('qcow2: add overlap check for bitmap directory')
->=20
-> Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> ---
->  block/qcow2-refcount.c | 18 ++++++++++--------
->  1 file changed, 10 insertions(+), 8 deletions(-)
+Sorry to bother you with this, but you said some time ago you would
+write something about reset.
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+On 10/2/18 4:24 PM, Damien Hedde wrote:
+> There is also the problem of initialization which is very much like the
+> migration. Currently, in the zynq example, clocks outputs are initialized in
+> the clock controller device_reset. According to Peter, outputs should not be
+> set in device_reset, so we need a better way.
 
-> diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-> index 3c539f02e5ec..46082aeac1d6 100644
-> --- a/block/qcow2-refcount.c
-> +++ b/block/qcow2-refcount.c
-> @@ -2719,15 +2719,17 @@ int qcow2_check_metadata_overlap(BlockDriverSta=
-te *bs, int ign, int64_t offset,
->  }
-> =20
->  static const char *metadata_ol_names[] =3D {
-> -    [QCOW2_OL_MAIN_HEADER_BITNR]    =3D "qcow2_header",
-> -    [QCOW2_OL_ACTIVE_L1_BITNR]      =3D "active L1 table",
-> -    [QCOW2_OL_ACTIVE_L2_BITNR]      =3D "active L2 table",
-> -    [QCOW2_OL_REFCOUNT_TABLE_BITNR] =3D "refcount table",
-> -    [QCOW2_OL_REFCOUNT_BLOCK_BITNR] =3D "refcount block",
-> -    [QCOW2_OL_SNAPSHOT_TABLE_BITNR] =3D "snapshot table",
-> -    [QCOW2_OL_INACTIVE_L1_BITNR]    =3D "inactive L1 table",
-> -    [QCOW2_OL_INACTIVE_L2_BITNR]    =3D "inactive L2 table",
-> +    [QCOW2_OL_MAIN_HEADER_BITNR]        =3D "qcow2_header",
-> +    [QCOW2_OL_ACTIVE_L1_BITNR]          =3D "active L1 table",
-> +    [QCOW2_OL_ACTIVE_L2_BITNR]          =3D "active L2 table",
-> +    [QCOW2_OL_REFCOUNT_TABLE_BITNR]     =3D "refcount table",
-> +    [QCOW2_OL_REFCOUNT_BLOCK_BITNR]     =3D "refcount block",
-> +    [QCOW2_OL_SNAPSHOT_TABLE_BITNR]     =3D "snapshot table",
-> +    [QCOW2_OL_INACTIVE_L1_BITNR]        =3D "inactive L1 table",
-> +    [QCOW2_OL_INACTIVE_L2_BITNR]        =3D "inactive L2 table",
-> +    [QCOW2_OL_BITMAP_DIRECTORY_BITNR]   =3D "bitmap directory",
->  };
-> +QEMU_BUILD_BUG_ON(QCOW2_OL_MAX_BITNR !=3D ARRAY_SIZE(metadata_ol_names=
-));
-> =20
->  /*
->   * First performs a check for metadata overlaps (through
->=20
+To illustrate the problem, lets take an example with the zynq case in
+the patchset. We have a 2-stage clock tree:
 
++--------+            +----------------+              +------+
+| Machine|>>base_clk>>|Clock controller|>>uart_clock>>| UART |
++--------+            +----------------+              +------+
 
+At the end of the tree, the uart uses the clock to setup the backend
+baudrate. The problem is that we need the whole clock path initialized
+before having the right final frequency.
 
---u7hMdsu0IK5SSMD4nUgLGOYK6zuvI0FFy
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+I've had some thought about it and I see several solutions
 
------BEGIN PGP SIGNATURE-----
+1. Set clock outputs in device_reset. But It can trigger side effects in
+yet-non-reseted devices.
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlvAvMgACgkQ9AfbAGHV
-z0Cg5Af+PiQJVnYiXvASrpbu1gmSiN/AJBsTdViizcZ8WAiIKEnxpUNRrtE+1Uaw
-lgfscTVRhUmrruQcTqUlbk23KRSxzo0/RnxpUQ35LZKRtPPaBBRdddQjE2f5zDwE
-tTH5XLJNB/uJEhjsr8az0J9fHaLqCPCCGBv+0WzxRdhSdd7SP3iJ1jL+j1lr2zxd
-KT3096rjEFfVESWPFXfKQF4A0CMqKUn5DrTPFzpTqKF6wuNgvjqXRMSko+6cn2V0
-24MxO/bHuXnAEwwOGJBrqlnaE8efUFF6yyPKRmmBKWdPAZUb2b22wv11/QAYTRdJ
-JlxSfowJIOq8OIR68AxLvRJaPDLPQg==
-=SVhR
------END PGP SIGNATURE-----
+2. Have some kind of global 2nd stage reset to do all the output
+propagation.
 
---u7hMdsu0IK5SSMD4nUgLGOYK6zuvI0FFy--
+3. Try to propagate init values at platform building when doing the
+clock connection.
+
+4. (1) and (2) mixed. Have a per device 2nd stage reset "clock_reset"
+(or any better name) method called when device_reset has been called and
+all clock inputs have been initialized (by other device "clock_reset").
+At the end of reset phase everything should have been propagated.
+
+(1) being not-an-option and also (2) I think.
+
+(3) seems complicated at best due to the unknown clock connection order.
+And I'm not sure clock connection is the right moment to do this. In the
+general case, a clock init value can depend on on some user-set/config
+properties which will be applied later on I suppose (But I don't have a
+clue at which point this operation -- the "realize" thing -- cab be done
+in the platform startup sequence)
+
+Do you think (4) is sensible ? It means any device requiring clock input
+value will need to implement this new method. Basically this
+"clock_reset" is just a part of the actual device_reset being delayed.
+Obviously if there is a clock loop, the method will never be called.
+
+--
+Damien
