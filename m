@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53565)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gAyKN-0003Vh-Dx
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 10:22:08 -0400
+	(envelope-from <imammedo@redhat.com>) id 1gAyXt-0006fU-3Q
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 10:36:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gAyKK-0002qs-6a
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 10:22:07 -0400
-Date: Fri, 12 Oct 2018 16:21:53 +0200
+	(envelope-from <imammedo@redhat.com>) id 1gAyXn-0001ek-Jr
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 10:36:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33243)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gAyXn-0001ak-An
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 10:35:59 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7C2FD3002094
+	for <qemu-devel@nongnu.org>; Fri, 12 Oct 2018 14:35:56 +0000 (UTC)
+Date: Fri, 12 Oct 2018 16:35:54 +0200
 From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181012162153.5d92ac45@redhat.com>
-In-Reply-To: <b1a1a9fe-9110-d050-008a-cec3251471ce@redhat.com>
-References: <20180926094219.20322-1-david@redhat.com>
-	<20180926094219.20322-19-david@redhat.com>
-	<20180927150141.60a6488a@redhat.com>
-	<dc5d7b2d-5b51-2c0b-aac7-ebf04a4e7859@redhat.com>
-	<20181001152443.2cca5c5e@redhat.com>
-	<85d59b49-25d7-6485-843c-838324cbc52e@redhat.com>
-	<20181008141904.17b601d3@redhat.com>
-	<aa176072-87b1-9e13-6770-97dfc354a1ed@redhat.com>
-	<20181008161229.5c6bce14@redhat.com>
-	<94df76ad-36f8-ccaf-a5e6-7e60d254e4d1@redhat.com>
-	<20181012102740.0f0d1e49@redhat.com>
-	<b1a1a9fe-9110-d050-008a-cec3251471ce@redhat.com>
+Message-ID: <20181012163554.6e54d717@redhat.com>
+In-Reply-To: <20181008173125.19678-15-armbru@redhat.com>
+References: <20181008173125.19678-1-armbru@redhat.com>
+	<20181008173125.19678-15-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 18/24] qdev: hotplug: provide do_unplug
- handler
+Subject: Re: [Qemu-devel] [PATCH 14/31] numa: Fix QMP command set-numa-node
+ error handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,116 +34,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Pankaj Gupta <pagupta@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, qemu-devel@nongnu.org, "Dr . David Alan
-	Gilbert" <dgilbert@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Luiz Capitulino <lcapitul@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Fri, 12 Oct 2018 10:45:41 +0200
-David Hildenbrand <david@redhat.com> wrote:
+On Mon,  8 Oct 2018 19:31:08 +0200
+Markus Armbruster <armbru@redhat.com> wrote:
 
-> > 
-> > The correct order should be opposite to one that created a devices,
-> > i.e. unplug -> unrealize -> delete.
-> > Doing unplug stuff after device was unrealized looks outright wrong
-> > (essentially device doesn't exists anymore except memory where it's
-> > been located).  
+> Calling error_report() in a function that takes an Error ** argument
+> is suspicious.  parse_numa_node() does that, and then exit()s.  It
+> also passes &error_fatal to machine_set_cpu_numa_node().  Both wrong.
+> Attempting to configure numa when the machine doesn't support it kills
+> the VM:
 > 
-> pre_plug -> realize -> plug
+>     $ qemu-system-x86_64 -nodefaults -S -display none -M none -preconfig -qmp stdio
+>     {"QMP": {"version": {"qemu": {"micro": 50, "minor": 0, "major": 3}, "package": "v3.0.0-837-gc5e4e49258"}, "capabilities": []}}
+>     {"execute": "qmp_capabilities"}
+>     {"return": {}}
+>     {"execute": "set-numa-node", "arguments": {"type": "node"}}
+>     NUMA is not supported by this machine-type
+>     $ echo $?
+>     1
 > 
-> unplug -> unrealize -> post_unplug
+> Messed up when commit 64c2a8f6d3f and 7c88e65d9e9 (v2.10.0) added
+> incorrect error handling right next to correct examples.  Latent bug
+> until commit f3be67812c2 (v3.0.0) made it accessible via QMP.  Fairly
+> harmless in practice, because it's limited to RUN_STATE_PRECONFIG.
+> The fix is obvious: replace error_report(); exit() by error_setg();
+> return.
 > 
-> doesn't look that wrong to me. But the problem seems to be that unplug
-> basically spans the whole unrealize phase (including the post_unplug
-> phase). So unplug should usually already contains the post_unplug part
-> as you noted below (when moving the object_unparent() part out).
-that just shortcut to move forward somewhere, personally I prefer having
-as less callbacks as possible, to me current unplug is pretty flexible
-we can do practically anything from it pre_unplug and post_unplug if
-necessary. Hence I don't see a reason for adding extra callbacks on top
-and for already mentioned reasons tight integration (hiding) of hotplug
-infrastructure within device_set_realized().
-
-  
-> >> As I already said that, the unplug/unplug_request handlers are very
-> >> different to the other handlers, as they actively delete(request to
-> >> delete) an object. In contrast to pre_plug/plug that don't create an
-> >> object but only wire it up while realizing the device.>
-> >>
-> >> That is the reason why we can't do stuff after calling the bus hotunplug
-> >> handler but only before it. We cannot really modify the calling order.  
-> > 
-> > There is nothing special in unplug handlers wrt plug ones, they all are
-> > external to the being created device. Theoretically we can move pre_plug
-> > /plug from device_set_realize() to outer caller qdev_device_add() and
-> > nothing would change.  
+> This affects parse_numa_node()'s other caller
+> numa_complete_configuration(): since it ignores errors, the "NUMA is
+> not supported by this machine-type" is now ignored, too.  But that
+> error is as unexpected there as any other.  Change it to abort on
+> error instead.
 > 
-> I guess at some point we should definitely move them out, this only
-> leads to confusion. (e.g. hotplug handlers getting called on device
-> within device hierarchies although we don't want this to be possible)
-For that to happen we probably would need to make qdev_device_add()
-provide a friendly C API for adding a device coming not from CLI
-with its options. Right now we would need to build QemuOpts
-before manually before creating device with qdev_device_add(),
-it might be fine but I haven't really looked into it.
-
-> > The problem here is the lack of unplug handler for pci device so
-> > unplugging boils down to object_unparent() which will unrealize
-> > device (and in process unplug it) and then delete it.
-> > What we really need is to factor out unplug code from pci device
-> > unrealizefn(). Then ideally unplug controller could look like:
-> >  static void pcie_unplug_device(PCIBus *bus, PCIDevice *dev, void *opaque)
-> >  {
-> > +    hotplug_ctrl = qdev_get_hotplug_handler(dev);
-> > +    ... do some port specific unplug ...
-> > +    hotplug_handler_do_unplug(hotplug_ctrl, dev); // default pci device unplug or pmem specific
-> >      object_unparent(OBJECT(dev));
-> >  }
-> > 
-> > where tear down and unrealize/delete parts are separated from each other.  
+> Fixes: f3be67812c226162f86ce92634bd913714445420
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > 
-> That makes sense, but we would then handle it for all PCI devices via
-> the hotplug chain I guess. (otherwise a object_unparent would be missing)
-I have an additional idea on top this, which will do a little more, see example:
-
- static void pcie_unplug_device(PCIBus *bus, PCIDevice *dev, void *opaque)
- {
-+    hotplug_ctrl = qdev_get_hotplug_handler(dev);
-+    ... do some port specific unplug ...
-+    hotplug_handler_do_unplug(hotplug_ctrl, dev); // default pci device unplug or pmem specific
-+        => pci_unplug_handler():
-+             object_property_set_bool(OBJECT(dev), FALSE, "realized", &err);
-     object_unparent(OBJECT(dev));
-}
-
-i.e. simulate tear down by doing explicit unrealize() from unplug handler
-but don't delete device from handler. Just leave deleting it to point of
-origin of unplug event. (concrete hw endpoints that trigger it)
-
-It's still not how it should be (unrealize and tear down are still done
-as a single step), but at least we isolate it from deleting part.
-If isolating pci.unrealize() won't be sufficient, we might try to factor out
-from there minimal parts that's necessary for composite virtio device to
-work.
-(I don't insist on complete PCI unplug refactoring, so it won't block
-this series).
-
-> [...]
-> >>
-> >> Do you have other ideas?  
-> > I'd proceed with suggestions made earlier [1][2] on this thread.
-> > That should solve the issue at hand with out factoring out PCI unplug
-> > from old pci::unrealize(). One would have to introduce shim unplug
-> > handlers for pci/bridge/pcie that would call object_unparent(), but
-> > that's the extent of another shallow PCI re-factoring.
-> > Of cause that's assuming that sequence
-> >  1.  memory_device_unplug()
-> >  2.  pci_unplug()
-> > is correct in virtio-pmem-pci case.  
+> fixup! numa: Fix QMP command set-numa-node error handling
+> ---
+>  numa.c | 13 +++++++++----
+>  1 file changed, 9 insertions(+), 4 deletions(-)
 > 
-> That is indeed possible as long as the memory device part has to come
-> first. I'll give it a try.
-> 
-> I already started prototyping and found some other PCI hotplug handler
-> issues I have to solve first ....
-I've been recently auditing plug/unplug parts across tree so if you have
-any question regarding it feel free to ping me.
+> diff --git a/numa.c b/numa.c
+> index 81542d4ebb..1d7c49ad43 100644
+> --- a/numa.c
+> +++ b/numa.c
+> @@ -60,6 +60,7 @@ NodeInfo numa_info[MAX_NODES];
+>  static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
+>                              Error **errp)
+>  {
+> +    Error *err = NULL;
+>      uint16_t nodenr;
+>      uint16List *cpus = NULL;
+>      MachineClass *mc = MACHINE_GET_CLASS(ms);
+> @@ -82,8 +83,8 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
+>      }
+>  
+>      if (!mc->cpu_index_to_instance_props || !mc->get_default_cpu_node_id) {
+> -        error_report("NUMA is not supported by this machine-type");
+> -        exit(1);
+> +        error_setg(errp, "NUMA is not supported by this machine-type");
+> +        return;
+>      }
+>      for (cpus = node->cpus; cpus; cpus = cpus->next) {
+>          CpuInstanceProperties props;
+> @@ -97,7 +98,11 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
+>          props = mc->cpu_index_to_instance_props(ms, cpus->value);
+>          props.node_id = nodenr;
+>          props.has_node_id = true;
+> -        machine_set_cpu_numa_node(ms, &props, &error_fatal);
+> +        machine_set_cpu_numa_node(ms, &props, &err);
+> +        if (err) {
+> +            error_propagate(errp, err);
+> +            return;
+> +        }
+>      }
+>  
+>      if (node->has_mem && node->has_memdev) {
+> @@ -367,7 +372,7 @@ void numa_complete_configuration(MachineState *ms)
+>      if (ms->ram_slots > 0 && nb_numa_nodes == 0 &&
+>          mc->auto_enable_numa_with_memhp) {
+>              NumaNodeOptions node = { };
+> -            parse_numa_node(ms, &node, NULL);
+> +            parse_numa_node(ms, &node, &error_abort);
+it won't affect machines with numa support /i.e. no change/,
+but if machine that doesn't support numa, gets here it fine for it to die.
+
+>      }
+>  
+>      assert(max_numa_nodeid <= MAX_NODES);
+
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
