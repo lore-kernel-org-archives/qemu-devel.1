@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36313)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gAvwi-0002ud-Ok
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 07:49:33 -0400
+	(envelope-from <david@redhat.com>) id 1gAvwp-0002xd-Ey
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 07:49:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gAvwh-0008Vf-Qc
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 07:49:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59660)
+	(envelope-from <david@redhat.com>) id 1gAvwl-0000Iz-Mp
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 07:49:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40590)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gAvwh-0008SX-BJ
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 07:49:31 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gAvwj-00009e-RS
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 07:49:34 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Fri, 12 Oct 2018 13:49:11 +0200
-Message-Id: <20181012114916.23532-3-david@redhat.com>
+Date: Fri, 12 Oct 2018 13:49:12 +0200
+Message-Id: <20181012114916.23532-4-david@redhat.com>
 In-Reply-To: <20181012114916.23532-1-david@redhat.com>
 References: <20181012114916.23532-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/7] qapi: use qemu_strtoi64() in
- parse_str_int64
+Subject: [Qemu-devel] [PATCH v2 3/7] range: pass const pointer where possible
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,55 +26,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, David Hildenbrand <david@redhat.com>
 
-The qemu api claims to be easier to use, and the resulting code
-shows that.
+If there are no changes, let's use a const pointer.
 
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- qapi/string-input-visitor.c | 16 +++++-----------
- 1 file changed, 5 insertions(+), 11 deletions(-)
+ include/qemu/range.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/qapi/string-input-visitor.c b/qapi/string-input-visitor.c
-index af0a841152..ee38ab1d10 100644
---- a/qapi/string-input-visitor.c
-+++ b/qapi/string-input-visitor.c
-@@ -48,10 +48,10 @@ static void free_range(void *range, void *dummy)
- static int parse_str_int64(StringInputVisitor *siv, const char *name,
-                            Error **errp)
+diff --git a/include/qemu/range.h b/include/qemu/range.h
+index f28f0c1825..7e75f4e655 100644
+--- a/include/qemu/range.h
++++ b/include/qemu/range.h
+@@ -39,7 +39,7 @@ struct Range {
+     uint64_t upb;        /* inclusive upper bound */
+ };
+ 
+-static inline void range_invariant(Range *range)
++static inline void range_invariant(const Range *range)
  {
--    char *str = (char *) siv->string;
--    long long start, end;
-+    const char *str = (char *) siv->string;
-+    const char *endptr;
-+    int64_t start, end;
-     Range *cur;
--    char *endptr;
+     assert(range->lob <= range->upb || range->lob == range->upb + 1);
+ }
+@@ -48,14 +48,14 @@ static inline void range_invariant(Range *range)
+ #define range_empty ((Range){ .lob = 1, .upb = 0 })
  
-     if (siv->ranges) {
-         return 0;
-@@ -62,9 +62,7 @@ static int parse_str_int64(StringInputVisitor *siv, const char *name,
-     }
+ /* Is @range empty? */
+-static inline bool range_is_empty(Range *range)
++static inline bool range_is_empty(const Range *range)
+ {
+     range_invariant(range);
+     return range->lob > range->upb;
+ }
  
-     do {
--        errno = 0;
--        start = strtoll(str, &endptr, 0);
--        if (errno == 0 && endptr > str) {
-+        if (!qemu_strtoi64(str, &endptr, 0, &start)) {
-             if (*endptr == '\0') {
-                 cur = g_malloc0(sizeof(*cur));
-                 range_set_bounds(cur, start, start);
-@@ -73,11 +71,7 @@ static int parse_str_int64(StringInputVisitor *siv, const char *name,
-                 str = NULL;
-             } else if (*endptr == '-') {
-                 str = endptr + 1;
--                errno = 0;
--                end = strtoll(str, &endptr, 0);
--                if (errno == 0 && endptr > str && start <= end &&
--                    (start > INT64_MAX - 65536 ||
--                     end < start + 65536)) {
-+                if (!qemu_strtoi64(str, &endptr, 0, &end) && start < end) {
-                     if (*endptr == '\0') {
-                         cur = g_malloc0(sizeof(*cur));
-                         range_set_bounds(cur, start, end);
+ /* Does @range contain @val? */
+-static inline bool range_contains(Range *range, uint64_t val)
++static inline bool range_contains(const Range *range, uint64_t val)
+ {
+     return val >= range->lob && val <= range->upb;
+ }
 -- 
 2.17.1
