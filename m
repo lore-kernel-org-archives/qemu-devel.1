@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53668)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gAskq-00019j-RE
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 04:25:05 -0400
+	(envelope-from <imammedo@redhat.com>) id 1gAsng-0002QK-Kl
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 04:28:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gAskl-0004IV-7c
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 04:25:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58372)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gAskk-0004Hs-RO
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 04:24:59 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181010120841.13214-1-fli@suse.com>
-	<20181010120841.13214-4-fli@suse.com>
-	<878t344o4l.fsf@dusky.pond.sub.org>
-	<dc2502f6-b288-05aa-dfed-7799a283616a@suse.com>
-Date: Fri, 12 Oct 2018 10:24:49 +0200
-In-Reply-To: <dc2502f6-b288-05aa-dfed-7799a283616a@suse.com> (Fei Li's message
-	of "Fri, 12 Oct 2018 13:55:08 +0800")
-Message-ID: <87r2gvshbi.fsf@dusky.pond.sub.org>
+	(envelope-from <imammedo@redhat.com>) id 1gAsnZ-0006qT-9n
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 04:28:00 -0400
+Date: Fri, 12 Oct 2018 10:27:40 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181012102740.0f0d1e49@redhat.com>
+In-Reply-To: <94df76ad-36f8-ccaf-a5e6-7e60d254e4d1@redhat.com>
+References: <20180926094219.20322-1-david@redhat.com>
+	<20180926094219.20322-19-david@redhat.com>
+	<20180927150141.60a6488a@redhat.com>
+	<dc5d7b2d-5b51-2c0b-aac7-ebf04a4e7859@redhat.com>
+	<20181001152443.2cca5c5e@redhat.com>
+	<85d59b49-25d7-6485-843c-838324cbc52e@redhat.com>
+	<20181008141904.17b601d3@redhat.com>
+	<aa176072-87b1-9e13-6770-97dfc354a1ed@redhat.com>
+	<20181008161229.5c6bce14@redhat.com>
+	<94df76ad-36f8-ccaf-a5e6-7e60d254e4d1@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH RFC v5 3/7] qemu_init_vcpu: add a new Error
- parameter to propagate
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 18/24] qdev: hotplug: provide do_unplug
+ handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,82 +32,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fei Li <fli@suse.com>
-Cc: peterx@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, quintela@redhat.com
+To: David Hildenbrand <david@redhat.com>
+Cc: Pankaj Gupta <pagupta@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, qemu-devel@nongnu.org, "Dr . David Alan
+	Gilbert" <dgilbert@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Luiz Capitulino <lcapitul@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-Fei Li <fli@suse.com> writes:
+On Thu, 11 Oct 2018 10:50:13 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-> On 10/11/2018 09:19 PM, Markus Armbruster wrote:
->> Fei Li <fli@suse.com> writes:
->>
->>> The caller of qemu_init_vcpu() already passed the **errp to handle
->> Which caller?  There are many.  Or do you mean "The callers"?
-> Oh, sorry, I mean "The callers" :)
->>
->>> errors. In view of this, add a new Error parameter to the following
->>> call trace to propagate the error and let the further caller check it.
->> Which "call trace"?
-> Actually, I want to say all functions called by qemu_init_vcpu()..
->>
->>> Besides, make qemu_init_vcpu() return a Boolean value to let its
->>> callers know whether it succeeds.
->>>
->>> Signed-off-by: Fei Li <fli@suse.com>
->>> Reviewed-by: Fam Zheng <famz@redhat.com>
->>> ---
->>>   accel/tcg/user-exec-stub.c      |  2 +-
->>>   cpus.c                          | 34 +++++++++++++++++++++-------------
->>>   include/qom/cpu.h               |  2 +-
->>>   target/alpha/cpu.c              |  4 +++-
->>>   target/arm/cpu.c                |  4 +++-
->>>   target/cris/cpu.c               |  4 +++-
->>>   target/hppa/cpu.c               |  4 +++-
->>>   target/i386/cpu.c               |  4 +++-
->>>   target/lm32/cpu.c               |  4 +++-
->>>   target/m68k/cpu.c               |  4 +++-
->>>   target/microblaze/cpu.c         |  4 +++-
->>>   target/mips/cpu.c               |  4 +++-
->>>   target/moxie/cpu.c              |  4 +++-
->>>   target/nios2/cpu.c              |  4 +++-
->>>   target/openrisc/cpu.c           |  4 +++-
->>>   target/ppc/translate_init.inc.c |  4 +++-
->>>   target/riscv/cpu.c              |  4 +++-
->>>   target/s390x/cpu.c              |  4 +++-
->>>   target/sh4/cpu.c                |  4 +++-
->>>   target/sparc/cpu.c              |  4 +++-
->>>   target/tilegx/cpu.c             |  4 +++-
->>>   target/tricore/cpu.c            |  4 +++-
->>>   target/unicore32/cpu.c          |  4 +++-
->>>   target/xtensa/cpu.c             |  4 +++-
->>>   24 files changed, 86 insertions(+), 36 deletions(-)
->>>
->>> diff --git a/accel/tcg/user-exec-stub.c b/accel/tcg/user-exec-stub.c
->>> index a32b4496af..38f6b928d4 100644
->>> --- a/accel/tcg/user-exec-stub.c
->>> +++ b/accel/tcg/user-exec-stub.c
->>> @@ -10,7 +10,7 @@ void cpu_resume(CPUState *cpu)
->>>   {
->>>   }
->>>   -void qemu_init_vcpu(CPUState *cpu)
->>> +bool qemu_init_vcpu(CPUState *cpu, Error **errp)
->>>   {
->> You need to return a value here.  Sure you compile-tested this?
-> Oops! I forget the TCG case.. The `return true` should be added.
-> Thanks for pointing this out!
+> On 08/10/2018 16:12, Igor Mammedov wrote:
+> > On Mon, 8 Oct 2018 14:41:50 +0200
+> > David Hildenbrand <david@redhat.com> wrote:
+> >   
+> >> On 08/10/2018 14:19, Igor Mammedov wrote:  
+> >>> On Mon, 8 Oct 2018 13:47:53 +0200
+> >>> David Hildenbrand <david@redhat.com> wrote:
+> >>>     
+> >>>>> That way using [2] and [1 - modulo it should match only concrete type]
+> >>>>> machine would be able to override hotplug handlers for TYPE_VIRTIO_PMEM_PCI
+> >>>>> and explicitly call machine + pci hotplug handlers in necessary order.
 
-You're welcome.
+*1
 
->>>   }
->>>   diff --git a/cpus.c b/cpus.c
-[...]
->> I see how you changed the code to pass an Error from the
->> qemu_FOO_start_vcpu() through qemu_init_vcpu() to its callers.  I can't
->> see how such errors can be created.  Without a way to create any, the
->> patch is pointless.  What am I missing?
-> This patch is also the pre-patch for the updated qemu_thread_create()
-> in patch 7/7
-> just as I explained in patch 2/7 [Issue1].
+> >>>>> flow would look like:
+> >>>>>   [acpi|shcp|native pci-e eject]->  
+> >>>>>        hotplug_ctrl = qdev_get_hotplug_handler(dev);
+> >>>>>        hotplug_handler_unplug(hotplug_ctrl, dev, &local_err); ->
+> >>>>>             machine_unplug()
+> >>>>>                machine_virtio_pci_pmem_cb(): 
+> >>>>>                   // we now that's device has 2 stage hotplug handlers,
+> >>>>>                   // so we can arrange hotplug sequence in necessary order
+> >>>>>                   hotplug_ctrl2 = qdev_get_bus_hotplug_handler(dev);
+> >>>>>
+> >>>>>                   //then do unplug in whatever order that's correct,
+> >>>>>                   // I'd assume tear down/stop PCI device first, flushing
+> >>>>>                   // command virtio command queues and that unplug memory itself.
+> >>>>>                   hotplug_handler_unplug(hotplug_ctrl2, dev, &local_err);
+> >>>>>                   memory_device_unplug()
+> >>>>>       
+> >>>>
+> >>>> Looking into the details, this order is not possible. The unplug will
+> >>>> essentially do a device_unparent() leading to the whole hierarchy
+> >>>> getting destroyed. The memory_device part always has to come first.    
+> >>>
 
-Patches that make little sense on their own, but pave the way for a
-later patch are okay.  But they should explain that purpose in their
-commit message.
+*2
+
+> >>> Question here is if there are anything that should be handled first on
+> >>> virtio level before memory_device/pmem part is called?
+> >>> If there isn't it might be fine to swap the order of unplug sequence.
+> >>>     
+> >>
+> >> Was asking myself the same thing, but as we are effectively holding the
+> >> iothread lock and the guest triggered the unplug, I guess it is fine to
+> >> unregister the memory region at this point.  
+> > It looks the same to me but I'm not familiar with virtio or PCI.
+> > I'd ask Michael if it's safe thing to do.  
+> 
+> It is certainly cleaner to do it after the device was unrealized.
+> 
+> The only way I see is to provide a post_unplug handler that will be run
+> after unrealize(false), but before deleting the object(s).
+
+The correct order should be opposite to one that created a devices,
+i.e. unplug -> unrealize -> delete.
+Doing unplug stuff after device was unrealized looks outright wrong
+(essentially device doesn't exists anymore except memory where it's
+been located).
+
+> As I already said that, the unplug/unplug_request handlers are very
+> different to the other handlers, as they actively delete(request to
+> delete) an object. In contrast to pre_plug/plug that don't create an
+> object but only wire it up while realizing the device.>
+> 
+> That is the reason why we can't do stuff after calling the bus hotunplug
+> handler but only before it. We cannot really modify the calling order.
+
+There is nothing special in unplug handlers wrt plug ones, they all are
+external to the being created device. Theoretically we can move pre_plug
+/plug from device_set_realize() to outer caller qdev_device_add() and
+nothing would change.
+
+The problem here is the lack of unplug handler for pci device so
+unplugging boils down to object_unparent() which will unrealize
+device (and in process unplug it) and then delete it.
+What we really need is to factor out unplug code from pci device
+unrealizefn(). Then ideally unplug controller could look like:
+ static void pcie_unplug_device(PCIBus *bus, PCIDevice *dev, void *opaque)
+ {
++    hotplug_ctrl = qdev_get_hotplug_handler(dev);
++    ... do some port specific unplug ...
++    hotplug_handler_do_unplug(hotplug_ctrl, dev); // default pci device unplug or pmem specific
+     object_unparent(OBJECT(dev));
+ }
+
+where tear down and unrealize/delete parts are separated from each other.
+
+> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> index 046d8f1f76..777a9486bf 100644
+> --- a/hw/core/qdev.c
+> +++ b/hw/core/qdev.c
+> @@ -885,6 +885,12 @@ static void device_set_realized(Object *obj, bool
+> value, Error **errp)
+>              local_errp = local_err ? NULL : &local_err;
+>              dc->unrealize(dev, local_errp);
+>          }
+> +
+> +        hotplug_ctrl = qdev_get_hotplug_handler(dev);
+> +        if (hotplug_ctrl) {
+> +            hotplug_handler_post_unplug(hotplug_ctrl, dev);
+> +        }
+> +
+>          dev->pending_deleted_event = true;
+>          DEVICE_LISTENER_CALL(unrealize, Reverse, dev);
+>      }
+> 
+> At that point all devices are unrealized but still alive.
+there is no device at this point, only memory where it's been located.
+
+> We can do what you imagined from there - make virtio-pmem-pci the memory
+> device and overwrite its hotplug handler. Call a handler chain (in case
+> we would have a pci post_unplug handler someday).
+making virtio-pmem-pci the memory device is orthogonal to the (un)plug
+topic.
+
+> If we want to do something before unplug, we can use the current unplug
+> handler (via hotplug handler chain).
+>
+> Do you have other ideas?
+I'd proceed with suggestions made earlier [1][2] on this thread.
+That should solve the issue at hand with out factoring out PCI unplug
+from old pci::unrealize(). One would have to introduce shim unplug
+handlers for pci/bridge/pcie that would call object_unparent(), but
+that's the extent of another shallow PCI re-factoring.
+Of cause that's assuming that sequence
+ 1.  memory_device_unplug()
+ 2.  pci_unplug()
+is correct in virtio-pmem-pci case.
