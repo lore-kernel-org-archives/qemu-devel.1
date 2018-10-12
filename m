@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49007)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gAsTL-0004tw-Lw
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 04:07:00 -0400
+	(envelope-from <armbru@redhat.com>) id 1gAseW-0007mJ-Eb
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 04:18:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gAsTJ-0002ll-BP
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 04:06:59 -0400
-References: <20181012032431.32693-1-david@gibson.dropbear.id.au>
-	<20181012032431.32693-6-david@gibson.dropbear.id.au>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <f21b8a98-3401-cf82-749d-2101fbe69a33@redhat.com>
-Date: Fri, 12 Oct 2018 10:06:50 +0200
+	(envelope-from <armbru@redhat.com>) id 1gAseS-0007tu-Dt
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 04:18:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33990)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gAseS-0007tK-61
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 04:18:28 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181010120841.13214-1-fli@suse.com>
+	<20181010120841.13214-3-fli@suse.com>
+	<87h8hs4oe3.fsf@dusky.pond.sub.org>
+	<ccdf2dd1-412d-ee82-e77d-9eac6c7d86d9@suse.com>
+Date: Fri, 12 Oct 2018 10:18:20 +0200
+In-Reply-To: <ccdf2dd1-412d-ee82-e77d-9eac6c7d86d9@suse.com> (Fei Li's message
+	of "Fri, 12 Oct 2018 13:40:01 +0800")
+Message-ID: <87sh1bshmb.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20181012032431.32693-6-david@gibson.dropbear.id.au>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC 5/5] virtio-balloon: Safely handle
- BALLOON_PAGE_SIZE < host page size
+Subject: Re: [Qemu-devel] [PATCH RFC v5 2/7] ui/vnc.c: polish vnc_init_func
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,194 +30,231 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, dhildenb@redhat.com, imammedo@redhat.com, ehabkost@redhat.com
-Cc: mst@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Fei Li <fli@suse.com>
+Cc: Markus Armbruster <armbru@redhat.com>, peterx@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, quintela@redhat.com
 
-On 12/10/2018 05:24, David Gibson wrote:
-> The virtio-balloon always works in units of 4kiB (BALLOON_PAGE_SIZE), b=
-ut
-> on the host side, we can only actually discard memory in units of the h=
-ost
-> page size.
->=20
-> At present we handle this very badly: we silently ignore balloon reques=
-ts
-> that aren't host page aligned, and for requests that are host page alig=
-ned
-> we discard the entire host page.  The latter potentially corrupts guest
-> memory if its page size is smaller than the host's.
->=20
-> We could just disable the balloon if the host page size is not 4kiB, bu=
-t
-> that would break a the special case where host and guest have the same =
-page
-> size, but that's larger than 4kiB.  Thius case currently works by accid=
-ent:
-> when the guest puts its page into the balloon, it will submit balloon
-> requests for each 4kiB subpage.  Most will be ignored, but the one whic=
-h
-> happens to be host page aligned will discard the whole lot.
+Fei Li <fli@suse.com> writes:
 
-Actually I would vote for disabling it if the host page size is not 4k.
-This is broken by design and should not be worked around.
+> On 10/11/2018 09:13 PM, Markus Armbruster wrote:
+>> Fei Li <fli@suse.com> writes:
+>>
+>>> Add a new Error parameter for vnc_display_init() to handle errors
+>>> in its caller: vnc_init_func(), just like vnc_display_open() does.
+>>> And let the call trace propagate the Error.
+>>>
+>>> Besides, make vnc_start_worker_thread() return a bool to indicate
+>>> whether it succeeds instead of returning nothing.
+>>>
+>>> Signed-off-by: Fei Li <fli@suse.com>
+>>> Reviewed-by: Fam Zheng <famz@redhat.com>
+>>> ---
+>>>   include/ui/console.h |  2 +-
+>>>   ui/vnc-jobs.c        |  9 ++++++---
+>>>   ui/vnc-jobs.h        |  2 +-
+>>>   ui/vnc.c             | 12 +++++++++---
+>>>   4 files changed, 17 insertions(+), 8 deletions(-)
+>>>
+>>> diff --git a/include/ui/console.h b/include/ui/console.h
+>>> index fb969caf70..c17803c530 100644
+>>> --- a/include/ui/console.h
+>>> +++ b/include/ui/console.h
+>>> @@ -453,7 +453,7 @@ void qemu_display_early_init(DisplayOptions *opts);
+>>>   void qemu_display_init(DisplayState *ds, DisplayOptions *opts);
+>>>     /* vnc.c */
+>>> -void vnc_display_init(const char *id);
+>>> +void vnc_display_init(const char *id, Error **errp);
+>>>   void vnc_display_open(const char *id, Error **errp);
+>>>   void vnc_display_add_client(const char *id, int csock, bool skipauth);
+>>>   int vnc_display_password(const char *id, const char *password);
+>>> diff --git a/ui/vnc-jobs.c b/ui/vnc-jobs.c
+>>> index 929391f85d..8807d7217c 100644
+>>> --- a/ui/vnc-jobs.c
+>>> +++ b/ui/vnc-jobs.c
+>>> @@ -331,15 +331,18 @@ static bool vnc_worker_thread_running(void)
+>>>       return queue; /* Check global queue */
+>>>   }
+>>>   -void vnc_start_worker_thread(void)
+>>> +bool vnc_start_worker_thread(Error **errp)
+>>>   {
+>>>       VncJobQueue *q;
+>>>   -    if (vnc_worker_thread_running())
+>>> -        return ;
+>>> +    if (vnc_worker_thread_running()) {
+>>> +        goto out;
+>>> +    }
+>>>         q =3D vnc_queue_init();
+>>>       qemu_thread_create(&q->thread, "vnc_worker", vnc_worker_thread, q,
+>>>                          QEMU_THREAD_DETACHED);
+>>>       queue =3D q; /* Set global queue */
+>>> +out:
+>>> +    return true;
+>>>   }
+>> This function cannot fail.  Why convert it to Error, and complicate its
+>> caller?
+> [Issue1]
+> Actually, this is to pave the way for patch 7/7, in case
+> qemu_thread_create() fails.
+> Patch 7/7 is long enough, thus I wrote the patch 1/2/3 separately to main=
+ly
+> connects the broken errp for callers who initially have the errp.
+>
+> [I am back... If the other codes in this patches be squashed, maybe
+> merge [Issue1]
+> into patch 7/7 looks more intuitive.]
+>>> diff --git a/ui/vnc-jobs.h b/ui/vnc-jobs.h
+>>> index 59f66bcc35..14640593db 100644
+>>> --- a/ui/vnc-jobs.h
+>>> +++ b/ui/vnc-jobs.h
+>>> @@ -37,7 +37,7 @@ void vnc_job_push(VncJob *job);
+>>>   void vnc_jobs_join(VncState *vs);
+>>>     void vnc_jobs_consume_buffer(VncState *vs);
+>>> -void vnc_start_worker_thread(void);
+>>> +bool vnc_start_worker_thread(Error **errp);
+>>>     /* Locks */
+>>>   static inline int vnc_trylock_display(VncDisplay *vd)
+>>> diff --git a/ui/vnc.c b/ui/vnc.c
+>>> index cf221c83cc..f3806e76db 100644
+>>> --- a/ui/vnc.c
+>>> +++ b/ui/vnc.c
+>>> @@ -3205,7 +3205,7 @@ static const DisplayChangeListenerOps dcl_ops =3D=
+ {
+>>>       .dpy_cursor_define    =3D vnc_dpy_cursor_define,
+>>>   };
+>>>   -void vnc_display_init(const char *id)
+>>> +void vnc_display_init(const char *id, Error **errp)
+>>>   {
+>>>       VncDisplay *vd;
+>>>=20=20=20
+>>         if (vnc_display_find(id) !=3D NULL) {
+>>             return;
+>>         }
+>>         vd =3D g_malloc0(sizeof(*vd));
+>>
+>>         vd->id =3D strdup(id);
+>>         QTAILQ_INSERT_TAIL(&vnc_displays, vd, next);
+>>
+>>         QTAILQ_INIT(&vd->clients);
+>>         vd->expires =3D TIME_MAX;
+>>
+>>         if (keyboard_layout) {
+>>             trace_vnc_key_map_init(keyboard_layout);
+>>             vd->kbd_layout =3D init_keyboard_layout(name2keysym, keyboar=
+d_layout);
+>>         } else {
+>>             vd->kbd_layout =3D init_keyboard_layout(name2keysym, "en-us"=
+);
+>>         }
+>>
+>>         if (!vd->kbd_layout) {
+>>             exit(1);
+>>
+>> Uh, init_keyboard_layout() reports errors to stderr, and the exit(1)
+>> here makes them fatal.  Okay before this patch, but inappropriate
+>> afterwards.  I'm afraid you have to convert init_keyboard_layout() to
+>> Error first.
+> [Issue2]
+> Right. But I notice the returned kbd_layout_t *kbd_layout is a static
+> value and also
+> will be used by others, how about passing the errp parameter to
+> init_keyboard_layout()
+> as follows? And for its other callers, just pass NULL.
+>
+> @@ -3222,13 +3222,13 @@ void vnc_display_init(const char *id, Error **err=
+p)
+>
+> =C2=A0=C2=A0=C2=A0=C2=A0 if (keyboard_layout) {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 trace_vnc_key_map_init(k=
+eyboard_layout);
+> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vd->kbd_layout =3D init_keybo=
+ard_layout(name2keysym, keyboard_layout);
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vd->kbd_layout =3D init_keybo=
+ard_layout(name2keysym, keyboard_layout, errp);
+> =C2=A0=C2=A0=C2=A0=C2=A0 } else {
+> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vd->kbd_layout =3D init_keybo=
+ard_layout(name2keysym, "en-us");
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vd->kbd_layout =3D init_keybo=
+ard_layout(name2keysym, "en-us", errp);
+> =C2=A0=C2=A0=C2=A0=C2=A0 }
+>
+> =C2=A0=C2=A0=C2=A0=C2=A0 if (!vd->kbd_layout) {
+> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 exit(1);
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
+> =C2=A0=C2=A0=C2=A0=C2=A0 }
 
-I consider 64k a similar case as huge pages in the hypervisor (from a
-virtio-balloon interface point of view - which is broken by design for
-these cases).
+Sounds good to me, except you should pass &error_fatal instead of NULL
+to preserve "report error and exit" semantics.
 
->=20
-> This occurs in practice routinely for POWER KVM systems, since both hos=
-t
-> and guest typically use 64kiB pages.
->=20
-> To make this safe, without breaking that useful case, we need to
-> accumulate 4kiB balloon requests until we have a whole contiguous host =
-page
-> at which point we can discard it.
+>>
+>>         }
+>>
+>>         vd->share_policy =3D VNC_SHARE_POLICY_ALLOW_EXCLUSIVE;
+>>> @@ -3235,7 +3235,9 @@ void vnc_display_init(const char *id)
+>>>       vd->connections_limit =3D 32;
+>>>         qemu_mutex_init(&vd->mutex);
+>>> -    vnc_start_worker_thread();
+>>> +    if (!vnc_start_worker_thread(errp)) {
+>>> +        return;
+>>> +    }
+>>>         vd->dcl.ops =3D &dcl_ops;
+>>>       register_displaychangelistener(&vd->dcl);
+>>> @@ -4079,7 +4081,11 @@ int vnc_init_func(void *opaque, QemuOpts *opts, =
+Error **errp)
+>>>       char *id =3D (char *)qemu_opts_id(opts);
+>>>         assert(id);
+>>> -    vnc_display_init(id);
+>>> +    vnc_display_init(id, &local_err);
+>>> +    if (local_err) {
+>>> +        error_reportf_err(local_err, "Failed to init VNC server: ");
+>>> +        exit(1);
+>>> +    }
+>>>       vnc_display_open(id, &local_err);
+>>>       if (local_err !=3D NULL) {
+>>>           error_reportf_err(local_err, "Failed to start VNC server: ");
+>> Conflicts with my "[PATCH 24/31] vl: Clean up error reporting in
+>> vnc_init_func()".  Your patch shows that mine is incomplete.
+>>
+>> Without my patch, there's no real reason for yours, however.  The two
+>> should be squashed together.
+> Ah, I noticed your patch 24/31. OK, let's squash.
+> Should I write a new patch by
+> - updating to error_propagate(...) if vnc_display_init() fails
+> &&
+> - modifying [Issue2] ?
+> Or you do this in your original patch?
 
-... and if you have a 4k guest it will just randomly report pages and
-your 67 LOC tweak is useless. And this can and will easily happen.
+If you send a v2 along that lines, I'll probably pick your patch into my
+series.  Should work even in case your series gets merged first.
 
->=20
-> We could in principle do that across all guest memory, but it would req=
-uire
-> a large bitmap to track.  This patch represents a compromise: instead w=
-e
+> BTW, for your patch 24/31, the updated passed errp for vnc_init_func
+> is &error_fatal,
+> then the system will exit(1) when running error_propagate(...) which calls
+> error_handle_fatal(...). This means the following two lines will not
+> be touched.
+> But if we want the following prepended error message, could we move it
+> earlier than
+> the error_propagare? I mean:
+>
+> =C2=A0=C2=A0=C2=A0=C2=A0 if (local_err !=3D NULL) {
+> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_reportf_err(local_err, =
+"Failed to start VNC server: ");
+> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 exit(1);
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_prepend(&local_err, "Fa=
+iled to start VNC server: ");
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_propagate(errp, local_e=
+rr);
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -1;
+> =C2=A0=C2=A0=C2=A0=C2=A0 }
 
-Oh god no, no tracking of all memory. (size of bitmap, memory hotplug,
-... migration?)
+Both
 
-> track ballooned subpages for a single contiguous host page at a time.  =
-This
-> means that if the guest discards all 4kiB chunks of a host page in
-> succession, we will discard it.  In particular that means the balloon w=
-ill
-> continue to work for the (host page size) =3D=3D (guest page size) > 4k=
-iB case.
->=20
-> If the guest scatters 4kiB requests across different host pages, we don=
-'t
-> discard anything, and issue a warning.  Not ideal, but at least we don'=
-t
-> corrupt guest memory as the previous version could.
+         error_propagate(errp, local_err);
+         error_prepend(errp, "Failed to start VNC server: ");
 
-My take would be to somehow disable the balloon on the hypervisor side
-in case the host page size is not 4k. Like not allowing to realize it.
-No corruptions, no warnings people will ignore.
+and
 
->=20
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  hw/virtio/virtio-balloon.c         | 67 +++++++++++++++++++++++++-----
->  include/hw/virtio/virtio-balloon.h |  3 ++
->  2 files changed, 60 insertions(+), 10 deletions(-)
->=20
-> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-> index 4435905c87..39573ef2e3 100644
-> --- a/hw/virtio/virtio-balloon.c
-> +++ b/hw/virtio/virtio-balloon.c
-> @@ -33,33 +33,80 @@
-> =20
->  #define BALLOON_PAGE_SIZE  (1 << VIRTIO_BALLOON_PFN_SHIFT)
-> =20
-> +typedef struct PartiallyBalloonedPage {
-> +    RAMBlock *rb;
-> +    ram_addr_t base;
-> +    unsigned long bitmap[];
-> +} PartiallyBalloonedPage;
-> +
->  static void balloon_inflate_page(VirtIOBalloon *balloon,
->                                   MemoryRegion *mr, hwaddr offset)
->  {
->      void *addr =3D memory_region_get_ram_ptr(mr) + offset;
->      RAMBlock *rb;
->      size_t rb_page_size;
-> -    ram_addr_t ram_offset;
-> +    int subpages;
-> +    ram_addr_t ram_offset, host_page_base;
-> =20
->      /* XXX is there a better way to get to the RAMBlock than via a
->       * host address? */
->      rb =3D qemu_ram_block_from_host(addr, false, &ram_offset);
->      rb_page_size =3D qemu_ram_pagesize(rb);
-> +    host_page_base =3D ram_offset & ~(rb_page_size - 1);
-> +
-> +    if (rb_page_size =3D=3D BALLOON_PAGE_SIZE) {
-> +        /* Easy case */
-> =20
-> -    /* Silently ignore hugepage RAM blocks */
-> -    if (rb_page_size !=3D getpagesize()) {
-> +        ram_block_discard_range(rb, ram_offset, rb_page_size);
-> +        /* We ignore errors from ram_block_discard_range(), because it
-> +         * has already reported them, and failing to discard a balloon
-> +         * page is not fatal */
->          return;
->      }
-> =20
-> -    /* Silently ignore unaligned requests */
-> -    if (ram_offset & (rb_page_size - 1)) {
-> -        return;
-> +    /* Hard case
-> +     *
-> +     * We've put a piece of a larger host page into the balloon - we
-> +     * need to keep track until we have a whole host page to
-> +     * discard
-> +     */
-> +    subpages =3D rb_page_size / BALLOON_PAGE_SIZE;
-> +
-> +    if (balloon->pbp
-> +        && (rb !=3D balloon->pbp->rb
-> +            || host_page_base !=3D balloon->pbp->base)) {
-> +        /* We've partially ballooned part of a host page, but now
-> +         * we're trying to balloon part of a different one.  Too hard,
-> +         * give up on the old partial page */
-> +        warn_report("Unable to insert a partial page into virtio-ballo=
-on");
+        error_prepend(&local_err, "Failed to start VNC server: ");
+        error_propagate(errp, local_err);
 
-I am pretty sure that you can create misleading warnings in case you
-migrate at the wrong time. (migrate while half the 64k page is inflated,
-on the new host the other part is inflated - a warning when switching to
-another 64k page).
-
-> +        free(balloon->pbp);
-> +        balloon->pbp =3D NULL;
->      }
-> =20
-> -    ram_block_discard_range(rb, ram_offset, rb_page_size);
-> -    /* We ignore errors from ram_block_discard_range(), because it has
-> -     * already reported them, and failing to discard a balloon page is
-> -     * not fatal */
-> +    if (!balloon->pbp) {
-> +        /* Starting on a new host page */
-> +        size_t bitlen =3D BITS_TO_LONGS(subpages) * sizeof(unsigned lo=
-ng);
-> +        balloon->pbp =3D g_malloc0(sizeof(PartiallyBalloonedPage) + bi=
-tlen);
-> +        balloon->pbp->rb =3D rb;
-> +        balloon->pbp->base =3D host_page_base;
-> +    }
-> +
-> +    bitmap_set(balloon->pbp->bitmap,
-> +               (ram_offset - balloon->pbp->base) / BALLOON_PAGE_SIZE,
-> +               subpages);
-> +
-> +    if (bitmap_full(balloon->pbp->bitmap, subpages)) {
-> +        /* We've accumulated a full host page, we can actually discard
-> +         * it now */
-> +
-> +        ram_block_discard_range(rb, balloon->pbp->base, rb_page_size);
-> +        /* We ignore errors from ram_block_discard_range(), because it
-> +         * has already reported them, and failing to discard a balloon
-> +         * page is not fatal */
-> +
-> +        free(balloon->pbp);
-> +        balloon->pbp =3D NULL;
-> +    }
->  }
-No, not a fan of this approach.
-
---=20
-
-Thanks,
-
-David / dhildenb
+work.  The former is slightly more efficient when errp is null.  But
+you're right, it fails to include the "Failed to start VNC server: "
+prefix with &error_fatal.  Thus, the latter is preferrable.
