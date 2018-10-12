@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60231)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38193)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gB0pI-0007Fd-9e
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 13:02:16 -0400
+	(envelope-from <eblake@redhat.com>) id 1gB1Ax-00079a-1t
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 13:24:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gB0pH-0007vs-9n
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 13:02:12 -0400
+	(envelope-from <eblake@redhat.com>) id 1gB1Aw-0005tT-Ak
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 13:24:35 -0400
 References: <20181012115532.12645-1-kwolf@redhat.com>
-	<20181012115532.12645-4-kwolf@redhat.com>
+	<20181012115532.12645-6-kwolf@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <e61301c2-5865-fb02-c45b-56b4a3622dc3@redhat.com>
-Date: Fri, 12 Oct 2018 12:02:04 -0500
+Message-ID: <697375fb-0ef4-0bee-73fe-ddbc6a015207@redhat.com>
+Date: Fri, 12 Oct 2018 12:24:27 -0500
 MIME-Version: 1.0
-In-Reply-To: <20181012115532.12645-4-kwolf@redhat.com>
+In-Reply-To: <20181012115532.12645-6-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/8] block: Require auto-read-only for
- existing fallbacks
+Subject: Re: [Qemu-devel] [PATCH v2 5/8] file-posix: Support auto-read-only
+ option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,89 +29,63 @@ To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Cc: mreitz@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
 
 On 10/12/18 6:55 AM, Kevin Wolf wrote:
-> Some block drivers have traditionally changed their node to read-only
-> mode without asking the user. This behaviour has been marked deprecated
-> since 2.11, expecting users to provide an explicit read-only=on option.
-> 
-> Now that we have auto-read-only=on, enable these drivers to make use of
-> the option.
-> 
-> This is the only use of bdrv_set_read_only(), so we can make it a bit
-> more specific and turn it into a bdrv_apply_auto_read_only() that is
-> more convenient for drivers to use.
+> If read-only=off, but auto-read-only=on is given, open the file
+> read-write if we have the permissions, but instead of erroring out for
+> read-only files, just degrade to read-only.
 > 
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
-
-> +++ b/block.c
-> @@ -266,27 +266,36 @@ int bdrv_can_set_read_only(BlockDriverState *bs, bool read_only,
->       return 0;
->   }
+>   block/file-posix.c | 13 +++++++++++++
+>   1 file changed, 13 insertions(+)
+> 
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index 2da3a76355..eead3f2df3 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -527,6 +527,19 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
 >   
-> -/* TODO Remove (deprecated since 2.11)
-> - * Block drivers are not supposed to automatically change bs->read_only.
-> - * Instead, they should just check whether they can provide what the user
-> - * explicitly requested and error out if read-write is requested, but they can
-> - * only provide read-only access. */
-> -int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **errp)
-> +/*
-> + * Called by a driver that can only provide a read-only image.
-> + *
-> + * Returns 0 if the node is already read-only or it could switch the node to
-> + * read-only because BDRV_O_AUTO_RDONLY is set.
-> + *
-> + * Returns -EACCES if the node is read-write and BDRV_O_AUTO_RDONLY is not set.
-> + * If @errmsg is not NULL, it is used as the error message for the Error
-> + * object.
+>       s->fd = -1;
+>       fd = qemu_open(filename, s->open_flags, 0644);
+> +
+> +    if (fd < 0 && (errno == EACCES || errno == EROFS)) {
+> +        /* Try to degrade to read-only, but if it doesn't work, still use the
+> +         * normal error message. */
+> +        ret = bdrv_apply_auto_read_only(bs, NULL, NULL);
 
-I like it.
+No guarantees what errno is after this call...
 
-Worth documenting the -EINVAL (copy-on-read prevents setting read-only) 
-failure as well?  (The -EPERM failure of bdrv_can_set_read_only() is not 
-reachable, since this new function never clears readonly).
-
-> + */
-> +int bdrv_apply_auto_read_only(BlockDriverState *bs, const char *errmsg,
-> +                              Error **errp)
->   {
->       int ret = 0;
->   
-> -    ret = bdrv_can_set_read_only(bs, read_only, false, errp);
-> +    if (!(bs->open_flags & BDRV_O_RDWR)) {
-> +        return 0;
-> +    }
-> +    if (!(bs->open_flags & BDRV_O_AUTO_RDONLY)) {
-> +        error_setg(errp, "%s", errmsg ?: "Image is read-only");
-> +        return -EACCES;
+> +        if (ret == 0) {
+> +            bdrv_flags &= ~BDRV_O_RDWR;
+> +            raw_parse_flags(bdrv_flags, &s->open_flags);
+> +            assert(!(s->open_flags & O_CREAT));
+> +            fd = qemu_open(filename, s->open_flags);
+> +        }
 > +    }
 > +
-> +    ret = bdrv_can_set_read_only(bs, true, false, errp);
->       if (ret < 0) {
->           return ret;
->       }
+>       if (fd < 0) {
+>           ret = -errno;
+>           error_setg_errno(errp, errno, "Could not open '%s'", filename);
 
-Makes sense.
+...even though you still rely on it here.
 
-> +++ b/block/vvfat.c
-> @@ -1262,16 +1262,10 @@ static int vvfat_open(BlockDriverState *bs, QDict *options, int flags,
->                          "Unable to set VVFAT to 'rw' when drive is read-only");
->               goto fail;
->           }
-> -    } else  if (!bdrv_is_read_only(bs)) {
-> -        error_report("Opening non-rw vvfat images without an explicit "
-> -                     "read-only=on option is deprecated. Future versions "
-> -                     "will refuse to open the image instead of "
-> -                     "automatically marking the image read-only.");
-> -        /* read only is the default for safety */
-> -        ret = bdrv_set_read_only(bs, true, &local_err);
-> +    } else {
-> +        ret = bdrv_apply_auto_read_only(bs, NULL, errp);
->           if (ret < 0) {
-> -            error_propagate(errp, local_err);
-> -            goto fail;
-> +            return ret;
+Possible solution:
 
-Don't you still need the goto fail, to avoid leaking opts?
+fd = qemu_open();
+if (fd < 0) {
+     ret = -errno;
+     if ((errno == EACCES || errno == EROFS) &&
+         !bdrv_apply_auto_read_only(bs, NULL, NULL)) {
+         bdrv_flags ...
+         fd = qemu_open();
+         ret = fd < 0 ? -errno : 0;
+     }
+}
+if (fd < 0) {
+     error_setg_errno(errp, -ret, "Could not open '%s'
+
+Another possible solution: change the contract of 
+bdrv_apply_auto_read_only() to leave errno unchanged (a bit odd, if the 
+return value is different than the incoming errno value).
 
 -- 
 Eric Blake, Principal Software Engineer
