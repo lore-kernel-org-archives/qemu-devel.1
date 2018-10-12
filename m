@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42575)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43552)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gAtzC-0002Dn-CP
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 05:43:59 -0400
+	(envelope-from <philmd@redhat.com>) id 1gAu5m-0004CW-Hu
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 05:50:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gAtz8-0004ki-0D
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 05:43:58 -0400
-Received: from mail-it1-f193.google.com ([209.85.166.193]:50768)
+	(envelope-from <philmd@redhat.com>) id 1gAu5h-00005u-JQ
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 05:50:46 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:42073)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gAtz6-0004iu-5A
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 05:43:52 -0400
-Received: by mail-it1-f193.google.com with SMTP id k206-v6so11734401ite.0
-	for <qemu-devel@nongnu.org>; Fri, 12 Oct 2018 02:43:52 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gAu5h-00005M-BP
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 05:50:41 -0400
+Received: by mail-wr1-f65.google.com with SMTP id g15-v6so12726957wru.9
+	for <qemu-devel@nongnu.org>; Fri, 12 Oct 2018 02:50:41 -0700 (PDT)
+References: <20181012083008.29027-1-maozhongyi@cmss.chinamobile.com>
+	<20181012083008.29027-2-maozhongyi@cmss.chinamobile.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <c2cbdec4-02db-a171-13c2-d8083a0ef355@redhat.com>
+Date: Fri, 12 Oct 2018 11:50:38 +0200
 MIME-Version: 1.0
-References: <20180914135230.15178-1-marcandre.lureau@redhat.com>
-	<20181011154834.GA10122@redhat.com>
-In-Reply-To: <20181011154834.GA10122@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Fri, 12 Oct 2018 13:43:39 +0400
-Message-ID: <CAMxuvawbr3i5d6dfaobcfOD3gvFNnR_vEzws6kmGUG+GBaJaOg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] vhost-user: define conventions for
- vhost-user backends
+In-Reply-To: <20181012083008.29027-2-maozhongyi@cmss.chinamobile.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] audio: use TYPE_WM8750 instead of a
+ hardcoded string
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,266 +31,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "P. Berrange, Daniel" <berrange@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, libvir-list <libvir-list@redhat.com>, "Hoffmann, Gerd" <kraxel@redhat.com>, "Liu,
-	Changpeng" <changpeng.liu@intel.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Felipe Franciosi <felipe@nutanix.com>, Gonglei <arei.gonglei@huawei.com>, "Coquelin,
-	Maxime" <maxime.coquelin@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, "Kaplansky,
-	Victor" <victork@redhat.com>, "Armbruster, Markus" <armbru@redhat.com>
+To: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jan Kiszka <jan.kiszka@web.de>, Gerd Hoffmann <kraxel@redhat.com>
 
-Hi
+On 12/10/2018 10:30, Mao Zhongyi wrote:
+> Cc: Jan Kiszka <jan.kiszka@web.de>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Gerd Hoffmann <kraxel@redhat.com>
+> To: qemu-arm@nongnu.org
 
-On Thu, Oct 11, 2018 at 7:49 PM Daniel P. Berrang=C3=A9 <berrange@redhat.co=
-m> wrote:
->
-> Adding Markus since we're talking about new CLI argument and capability
-> reporting standards.
->
-> On Fri, Sep 14, 2018 at 05:52:30PM +0400, Marc-Andr=C3=A9 Lureau wrote:
-> > As discussed during "[PATCH v4 00/29] vhost-user for input & GPU"
-> > review, let's define a common set of backend conventions to help with
-> > management layer implementation, and interoperability.
-> >
-> > v2:
-> >  - drop --pidfile
-> >  - add some notes about daemonizing & stdin/out/err
-> >
-> > Cc: libvir-list@redhat.com
-> > Cc: Gerd Hoffmann <kraxel@redhat.com>
-> > Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> > Cc: Changpeng Liu <changpeng.liu@intel.com>
-> > Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > Cc: Felipe Franciosi <felipe@nutanix.com>
-> > Cc: Gonglei <arei.gonglei@huawei.com>
-> > Cc: Maxime Coquelin <maxime.coquelin@redhat.com>
-> > Cc: Michael S. Tsirkin <mst@redhat.com>
-> > Cc: Victor Kaplansky <victork@redhat.com>
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > ---
-> >  docs/interop/vhost-user.txt | 109 +++++++++++++++++++++++++++++++++++-
-> >  1 file changed, 107 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
-> > index ba5e37d714..339b335e9c 100644
-> > --- a/docs/interop/vhost-user.txt
-> > +++ b/docs/interop/vhost-user.txt
-> > @@ -17,8 +17,13 @@ The protocol defines 2 sides of the communication, m=
-aster and slave. Master is
-> >  the application that shares its virtqueues, in our case QEMU. Slave is=
- the
-> >  consumer of the virtqueues.
-> >
-> > -In the current implementation QEMU is the Master, and the Slave is int=
-ended to
-> > -be a software Ethernet switch running in user space, such as Snabbswit=
-ch.
-> > +In the current implementation QEMU is the Master, and the Slave is the
-> > +external process consuming the virtio queues, for example a software
-> > +Ethernet switch running in user space, such as Snabbswitch, or a block
-> > +device backend processing read & write to a virtual disk. In order to
-> > +facilitate interoperability between various backend implementations,
-> > +it is recommended to follow the "Backend program conventions"
-> > +described in this document.
-> >
-> >  Master and slave can be either a client (i.e. connecting) or server (l=
-istening)
-> >  in the socket communication.
-> > @@ -859,3 +864,103 @@ resilient for selective requests.
-> >  For the message types that already solicit a reply from the client, th=
-e
-> >  presence of VHOST_USER_PROTOCOL_F_REPLY_ACK or need_reply bit being se=
-t brings
-> >  no behavioural change. (See the 'Communication' section for details.)
-> > +
-> > +Backend program conventions
-> > +---------------------------
-> > +
-> > +vhost-user backends provide various services and they may need to be
-> > +configured manually depending on the use case. However, it is a good
-> > +idea to follow the conventions listed here when possible. Users, QEMU
-> > +or libvirt, can then rely on some common behaviour to avoid
-> > +heterogenous configuration and management of the backend program and
-> > +facilitate interoperability.
-> > +
-> > +In order to be discoverable, default vhost-user backends should be
-> > +located under "/usr/libexec", and be named "vhost-user-$device" where
-> > +"$device" is the device name in lower-case following the name listed
-> > +in the Linux virtio_ids.h header (ex: the VIRTIO_ID_RPROC_SERIAL
-> > +backend would be named "vhost-user-rproc-serial").
-> > +
-> > +Mechanisms to list, and to select among alternatives implementations
-> > +or modify the default backend are not described at this point (a
-> > +distribution may use update-alternatives, for example, to list and to
-> > +pick a different default backend).
->
-> I don't think that update-alternatives is a good thing as it presumes
-> that each host only needs a single preferred impl at a time.
->
-> I think we need to be able to discover all impls for a given device
-> type.
+"To: qemu-arm@nongnu.org" is probably not relevant in the commit message.
 
-That was left for a future improvement. I don't think it's a good idea
-to tackle problems we don't have yet.
+The Linux kernel describes the 'Cc:' line in the "Submitting patches:
+the essential guide to getting your code into the kernel" document as:
 
->
-> This feels like the same problem we tackled recently with enumerating
-> and choosing between multiple firmware impls.
->
-> In $git/docs/interop/firmware.json we defined a way to drop config files
-> into a standard directory, providing info about the firmware in a well
-> defined QAPI based data format.
->
-> Rather than requiring a special file naming convention I think we just
-> need to register config files in a particular directory, letting the
-> mgmt app enumerate them.
->
-> eg
->
->   /etc/qemu/vhost-user/50-rproc-serial.json  (a default imp from QEMU)
->   /etc/qemu/vhost-user/10-my-rproc-serial.json (my replacenment impl)
->
-> a file could be something pretty simple like
->
->    {
->        "name": "my-rproc-serial",
->        "description": "My rproc serial impl doing foo, bar, wizz",
->        "device": "rproc-serial",
->        "binary": "/usr/libexec/my-awesome-rproc-serial",
->    }
->
-> Mgmt apps can simply load all files in that directory to learn about
-> the possible impls. The file load order gives a prioritization if
-> multiple matches exist, or a specific impl can be requested by
-> name "my-rproc-serial".
->
-> This shouldn't provide full capabilities reporting though, just
-> enough to identify viable binaries. Capabilities should still be
-> via the binary itself so it can be dynamically tailored based on
-> other environmental factors
->
-> > +
-> > +The backend program must not daemonize itself, but it may be
-> > +daemonized by the management layer. It may also have a restricted
-> > +access to the system.
-> > +
-> > +File descriptors 0, 1 and 2 will exist, and have regular
-> > +stdin/stdout/stderr usage (they may be redirected to /dev/null by the
-> > +management layer, or to a log handler).
-> > +
-> > +The backend program must end (as quickly and cleanly as possible) when
-> > +the SIGTERM signal is received. Eventually, it may be SIGKILL by the
-> > +management layer after a few seconds.
-> > +
-> > +The following command line options have an expected behaviour. They
-> > +are mandatory, unless explicitly said differently:
-> > +
-> > +* --socket-path=3DPATH
-> > +
-> > +This option specify the location of the vhost-user Unix domain socket.
-> > +It is incompatible with --fd.
-> > +
-> > +* --fd=3DFDNUM
-> > +
-> > +When this argument is given, the backend program is started with the
-> > +vhost-user socket as file descriptor FDNUM. It is incompatible with
-> > +--socket-path.
-> > +
-> > +* --print-capabilities
-> > +
-> > +Output to stdout a line-seperated list of backend capabilities, and
-> > +then exit successfully. Other options and arguments should be ignored,
-> > +and the backend program should not perform its normal function.
->
-> This is going to repeat the mistakes we've had with every other
-> binary in QEMU. A "simple" flag list or args sounds appealing,
-> but we've always been burnt by it in the medium-long term, which
-> is why we created QAPI.
+  If a person has had the opportunity to comment on a patch, but has not
+  provided such comments, you may optionally add a Cc: tag to the patch.
+  This is the only tag which might be added without an explicit action
+  by the person it names - but it should indicate that this person was
+  copied on the patch. This tag documents that potentially interested
+  parties have been included in the discussion.
 
-isn't libvirt using a list of strings/symbols as well for the
-capabilities? To me it sounds fairly easy to extend this way.
-
->
-> If we're doing to have any capabilities reporting, we should
-> model it in QAPI schema, so any '--print-capabilities' arg
-> should print a JSON doc following the documented schema.
-
-perhaps we could have --print-json-capabilities later, if needed.
-
->
-> While talking about QAPI, I think this is an opportunity to
-> also avoid the problems of CLI arg values becoming more
-> complex than just scalars. eg
->
->   --socket-path=3DPATH
->
-> may inevitably grow more options  - eg to perhaps say whether
-> to use it in listen or connect mode. Or to indicate a reconnect
-> timeout. etc
-
-Yes, that would be new capabilities symbols. That doesn't require json to m=
-e.
-
->
-> I know Markus wants to replace QemuOpts with something that
-> is again driven by QAPI, so that "-arg $VALUE" can handle
-> $VALUE being complex  non-scalar data following a QAPI
-> schema with well defined semantics for parsing. Since we
-> are defining a new standard, I think we should go todo
-> something better than scalar values right from the start.
->
-> > +
-> > +At the time of writing, there are no common capabilities. Some
-> > +device-specific capabilities are listed in the respective sections. By
-> > +convention, device-specific capabilities are prefixed by their device
-> > +name.
-> > +
-> > +vhost-user-input program conventions
-> > +------------------------------------
-> > +
-> > +Capabilities:
-> > +
-> > +input-evdev-path
-> > +
-> > +    The --evdev-path command line option is supported.
-> > +
-> > +input-no-grab
-> > +
-> > +    The --no-grab command line option is supported.
-> > +
-> > +* --evdev-path=3DPATH (optional)
-> > +
-> > +Specify the linux input device.
-> > +
-> > +* --no-grab (optional)
-> > +
-> > +Do no request exclusive access to the input device.
-> > +
-> > +vhost-user-gpu program conventions
-> > +----------------------------------
-> > +
-> > +Capabilities:
-> > +
-> > +gpu-render-node
-> > +
-> > +    The --render-node command line option is supported.
-> > +
-> > +gpu-virgl
-> > +
-> > +    The --virgl command line option is supported.
-> > +
-> > +* --render-node=3DPATH (optional)
-> > +
-> > +Specify the GPU DRM render node.
-> > +
-> > +* --virgl (optional)
-> > +
-> > +Enable virgl rendering support.
->
-> Regards,
-> Daniel
-> --
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+> 
+> Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+>  hw/arm/musicpal.c          | 2 +-
+>  hw/audio/marvell_88w8618.c | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/arm/musicpal.c b/hw/arm/musicpal.c
+> index c807010e83..3dafb41b0b 100644
+> --- a/hw/arm/musicpal.c
+> +++ b/hw/arm/musicpal.c
+> @@ -1695,7 +1695,7 @@ static void musicpal_init(MachineState *machine)
+>      wm8750_dev = i2c_create_slave(i2c, TYPE_WM8750, MP_WM_ADDR);
+>      dev = qdev_create(NULL, "mv88w8618_audio");
+>      s = SYS_BUS_DEVICE(dev);
+> -    qdev_prop_set_ptr(dev, "wm8750", wm8750_dev);
+> +    qdev_prop_set_ptr(dev, TYPE_WM8750, wm8750_dev);
+>      qdev_init_nofail(dev);
+>      sysbus_mmio_map(s, 0, MP_AUDIO_BASE);
+>      sysbus_connect_irq(s, 0, pic[MP_AUDIO_IRQ]);
+> diff --git a/hw/audio/marvell_88w8618.c b/hw/audio/marvell_88w8618.c
+> index e546892d3c..cf6ce6979b 100644
+> --- a/hw/audio/marvell_88w8618.c
+> +++ b/hw/audio/marvell_88w8618.c
+> @@ -280,7 +280,7 @@ static const VMStateDescription mv88w8618_audio_vmsd = {
+>  };
+>  
+>  static Property mv88w8618_audio_properties[] = {
+> -    DEFINE_PROP_PTR("wm8750", mv88w8618_audio_state, wm),
+> +    DEFINE_PROP_PTR(TYPE_WM8750, mv88w8618_audio_state, wm),
+>      {/* end of list */},
+>  };
+>  
+> 
