@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58039)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gAt2X-0002Dq-Br
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 04:43:24 -0400
+	(envelope-from <david@redhat.com>) id 1gAt4x-0003bI-8V
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 04:45:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gAt2O-0007N0-GM
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 04:43:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37872)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gAt2K-0006n7-In
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 04:43:11 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B933BC0293AD
-	for <qemu-devel@nongnu.org>; Fri, 12 Oct 2018 08:43:05 +0000 (UTC)
-Date: Fri, 12 Oct 2018 10:43:02 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20181012084302.so3aptiavcgvbbyh@sirius.home.kraxel.org>
-References: <20180917061729.22407-1-kraxel@redhat.com>
-	<20180917061729.22407-3-kraxel@redhat.com>
-	<20181011151941.77cd8516@w520.home>
+	(envelope-from <david@redhat.com>) id 1gAt4u-0001yO-2E
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 04:45:51 -0400
+References: <20180926094219.20322-1-david@redhat.com>
+	<20180926094219.20322-19-david@redhat.com>
+	<20180927150141.60a6488a@redhat.com>
+	<dc5d7b2d-5b51-2c0b-aac7-ebf04a4e7859@redhat.com>
+	<20181001152443.2cca5c5e@redhat.com>
+	<85d59b49-25d7-6485-843c-838324cbc52e@redhat.com>
+	<20181008141904.17b601d3@redhat.com>
+	<aa176072-87b1-9e13-6770-97dfc354a1ed@redhat.com>
+	<20181008161229.5c6bce14@redhat.com>
+	<94df76ad-36f8-ccaf-a5e6-7e60d254e4d1@redhat.com>
+	<20181012102740.0f0d1e49@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <b1a1a9fe-9110-d050-008a-cec3251471ce@redhat.com>
+Date: Fri, 12 Oct 2018 10:45:41 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181011151941.77cd8516@w520.home>
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/vfio/display: add ramfb support
+In-Reply-To: <20181012102740.0f0d1e49@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 18/24] qdev: hotplug: provide do_unplug
+ handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,68 +34,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Pankaj Gupta <pagupta@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Luiz Capitulino <lcapitul@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-  Hi,
+>=20
+> The correct order should be opposite to one that created a devices,
+> i.e. unplug -> unrealize -> delete.
+> Doing unplug stuff after device was unrealized looks outright wrong
+> (essentially device doesn't exists anymore except memory where it's
+> been located).
 
-> >      OnOffAuto display;
-> > +    bool enable_ramfb;
-> >      int32_t bootindex;
-> >      uint32_t igd_gms;
-> >      OffAutoPCIBAR msix_relo;
-> 
-> Hi Gerd,
-> 
-> One tiny nit here, we can move this new bool down in the struct with
-> the rest of the bools for better alignment.  I can change that on
-> commit.
+pre_plug -> realize -> plug
 
-I've grouped it with the display option because it is display related
-too, but if you prefer to group the bools instead this is fine with me.
+unplug -> unrealize -> post_unplug
 
-> However, I'm not having luck getting ramfb to work; the
-> display is only getting initialized once the guest driver loads.  This
-> is a 440FX/SeaBIOS VM, it looks like you've already updated bios.bin in
-> qemu.git with ramfb support,
+doesn't look that wrong to me. But the problem seems to be that unplug
+basically spans the whole unrealize phase (including the post_unplug
+phase). So unplug should usually already contains the post_unplug part
+as you noted below (when moving the object_unparent() part out).
 
-Yes, seabios (and vgabios) bundled with 3.0 (and master branch) should work fine.
+>=20
+>> As I already said that, the unplug/unplug_request handlers are very
+>> different to the other handlers, as they actively delete(request to
+>> delete) an object. In contrast to pre_plug/plug that don't create an
+>> object but only wire it up while realizing the device.>
+>>
+>> That is the reason why we can't do stuff after calling the bus hotunpl=
+ug
+>> handler but only before it. We cannot really modify the calling order.
+>=20
+> There is nothing special in unplug handlers wrt plug ones, they all are
+> external to the being created device. Theoretically we can move pre_plu=
+g
+> /plug from device_set_realize() to outer caller qdev_device_add() and
+> nothing would change.
 
-There is a standalone device you can use for testing (-vga none -device
-ramfb), to see whenever the firmware side of things works correctly.
+I guess at some point we should definitely move them out, this only
+leads to confusion. (e.g. hotplug handlers getting called on device
+within device hierarchies although we don't want this to be possible)
 
-OVMF has ramfb support too btw (merged a few months back).
+>=20
+> The problem here is the lack of unplug handler for pci device so
+> unplugging boils down to object_unparent() which will unrealize
+> device (and in process unplug it) and then delete it.
+> What we really need is to factor out unplug code from pci device
+> unrealizefn(). Then ideally unplug controller could look like:
+>  static void pcie_unplug_device(PCIBus *bus, PCIDevice *dev, void *opaq=
+ue)
+>  {
+> +    hotplug_ctrl =3D qdev_get_hotplug_handler(dev);
+> +    ... do some port specific unplug ...
+> +    hotplug_handler_do_unplug(hotplug_ctrl, dev); // default pci devic=
+e unplug or pmem specific
+>      object_unparent(OBJECT(dev));
+>  }
+>=20
+> where tear down and unrealize/delete parts are separated from each othe=
+r.
 
-> -device vfio-pci-nohotplug,id=hostdev0,sysfsdev=...,display=on,bus=pci.0,addr=0x9 \
+That makes sense, but we would then handle it for all PCI devices via
+the hotplug chain I guess. (otherwise a object_unparent would be missing)
 
->     <hostdev mode='subsystem' type='mdev' managed='no' model='vfio-pci' display='on'>
->       <source>
->         <address uuid='cd4fa69f-c24c-476f-a61d-abca705e2a13'/>
->       </source>
->       <address type='pci' domain='0x0000' bus='0x00' slot='0x09' function='0x0'/>
->     </hostdev>
+[...]
+>>
+>> Do you have other ideas?
+> I'd proceed with suggestions made earlier [1][2] on this thread.
+> That should solve the issue at hand with out factoring out PCI unplug
+> from old pci::unrealize(). One would have to introduce shim unplug
+> handlers for pci/bridge/pcie that would call object_unparent(), but
+> that's the extent of another shallow PCI re-factoring.
+> Of cause that's assuming that sequence
+>  1.  memory_device_unplug()
+>  2.  pci_unplug()
+> is correct in virtio-pmem-pci case.
 
-Hmm, that actually uses vfio-pci-nohotplug?
-But when ramfb=on doesn't throw an error, then yes, appearently.
+That is indeed possible as long as the memory device part has to come
+first. I'll give it a try.
 
->   <qemu:commandline>
->     <qemu:arg value='-set'/>
->     <qemu:arg value='device.hostdev0.x-igd-opregion=on'/>
->     <qemu:arg value='-set'/>
->     <qemu:arg value='device.hostdev0.ramfb=on'/>
->   </qemu:commandline>
+I already started prototyping and found some other PCI hotplug handler
+issues I have to solve first ....
 
-I have this (additionally):
+--=20
 
-    <qemu:arg value='-set'/>
-    <qemu:arg value='device.hostdev0.driver=vfio-pci-nohotplug'/>
+Thanks,
 
-> This is a Windows 10 VM, but as I understand this ramfb support, I
-> think I'm still supposed to see SeaBIOS boot messages and perhaps even
-> the Windows boot animation before the guest driver takes over, is that
-> correct?
-
-Yes, you should see both.
-
-cheers,
-  Gerd
+David / dhildenb
