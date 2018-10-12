@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38927)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48263)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fli@suse.com>) id 1gAw65-0001vV-4m
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 07:59:14 -0400
+	(envelope-from <wang.guangA@h3c.com>) id 1gAsSi-0004aC-Dw
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 04:06:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fli@suse.com>) id 1gAw5z-0007sr-Tf
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 07:59:12 -0400
-Received: from mx2.suse.de ([195.135.220.15]:44408 helo=mx1.suse.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <fli@suse.com>) id 1gAw5z-0007rQ-IW
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 07:59:07 -0400
-References: <20181012115013.29555-1-fli@suse.com>
-From: Fei Li <fli@suse.com>
-Message-ID: <3b1bf637-c3e7-0ba7-4868-c0b21414e980@suse.com>
-Date: Fri, 12 Oct 2018 19:59:00 +0800
+	(envelope-from <wang.guangA@h3c.com>) id 1gAsSZ-00027P-PX
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 04:06:18 -0400
+Received: from smtp.h3c.com ([60.191.123.56]:56861 helo=h3cmg01-ex.h3c.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <wang.guangA@h3c.com>) id 1gAsSZ-00024S-1w
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 04:06:11 -0400
+From: Wangguang <wang.guangA@h3c.com>
+Date: Fri, 12 Oct 2018 08:05:44 +0000
+Message-ID: <2B9C18D722D31E48A98313968F2F243C1209F2A8@H3CMLB14-EX.srv.huawei-3com.com>
+Content-Language: zh-CN
 MIME-Version: 1.0
-In-Reply-To: <20181012115013.29555-1-fli@suse.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2] ui/vnc.c: polish vnc_init_func
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
+Subject: [Qemu-devel] about qemu crash in scsi_handle_rw_error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,190 +25,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, armbru@redhat.com
+To: "'pbonzini@redhat.com'" <pbonzini@redhat.com>, "'famz@redhat.com'" <famz@redhat.com>
+Cc: "'qemu-devel@nongnu.org'" <qemu-devel@nongnu.org>
 
-
-
-On 10/12/2018 07:50 PM, Fei Li wrote:
-> Add a new Error parameter for vnc_display_init() to handle errors
-> in its caller: vnc_init_func(), just like vnc_display_open() does.
-> And let its callees propagate the Error, like init_keyboard_layout().
->
-> Signed-off-by: Fei Li <fli@suse.com>
-As this version do a big adjustment, remove the former Reviewed-By
-for the time being.
-> ---
->   include/ui/console.h |  2 +-
->   ui/curses.c          |  4 +++-
->   ui/keymaps.c         | 11 ++++++-----
->   ui/keymaps.h         |  2 +-
->   ui/sdl.c             |  4 +++-
->   ui/vnc.c             | 16 +++++++++++-----
->   6 files changed, 25 insertions(+), 14 deletions(-)
->
-> diff --git a/include/ui/console.h b/include/ui/console.h
-> index fb969caf70..c17803c530 100644
-> --- a/include/ui/console.h
-> +++ b/include/ui/console.h
-> @@ -453,7 +453,7 @@ void qemu_display_early_init(DisplayOptions *opts);
->   void qemu_display_init(DisplayState *ds, DisplayOptions *opts);
->   
->   /* vnc.c */
-> -void vnc_display_init(const char *id);
-> +void vnc_display_init(const char *id, Error **errp);
->   void vnc_display_open(const char *id, Error **errp);
->   void vnc_display_add_client(const char *id, int csock, bool skipauth);
->   int vnc_display_password(const char *id, const char *password);
-> diff --git a/ui/curses.c b/ui/curses.c
-> index 59d819fd4d..60c0962334 100644
-> --- a/ui/curses.c
-> +++ b/ui/curses.c
-> @@ -28,6 +28,7 @@
->   #include <termios.h>
->   #endif
->   
-> +#include "qapi/error.h"
->   #include "qemu-common.h"
->   #include "ui/console.h"
->   #include "ui/input.h"
-> @@ -421,7 +422,8 @@ static void curses_keyboard_setup(void)
->           keyboard_layout = "en-us";
->   #endif
->       if(keyboard_layout) {
-> -        kbd_layout = init_keyboard_layout(name2keysym, keyboard_layout);
-> +        kbd_layout = init_keyboard_layout(name2keysym, keyboard_layout,
-> +                                          &error_fatal);
->           if (!kbd_layout)
->               exit(1);
->       }
-> diff --git a/ui/keymaps.c b/ui/keymaps.c
-> index 43fe604724..52d432e856 100644
-> --- a/ui/keymaps.c
-> +++ b/ui/keymaps.c
-> @@ -27,6 +27,7 @@
->   #include "sysemu/sysemu.h"
->   #include "trace.h"
->   #include "qemu/error-report.h"
-> +#include "qapi/error.h"
->   
->   struct keysym2code {
->       uint32_t count;
-> @@ -81,7 +82,7 @@ static void add_keysym(char *line, int keysym, int keycode, kbd_layout_t *k)
->   
->   static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
->                                              const char *language,
-> -                                           kbd_layout_t *k)
-> +                                           kbd_layout_t *k, Error **errp)
->   {
->       FILE *f;
->       char * filename;
-> @@ -94,7 +95,7 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
->       f = filename ? fopen(filename, "r") : NULL;
->       g_free(filename);
->       if (!f) {
-> -        fprintf(stderr, "Could not read keymap file: '%s'\n", language);
-> +        error_setg(errp, "could not read keymap file: '%s'", language);
->           return NULL;
->       }
->   
-> @@ -118,7 +119,7 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
->               continue;
->           }
->           if (!strncmp(line, "include ", 8)) {
-> -            parse_keyboard_layout(table, line + 8, k);
-> +            parse_keyboard_layout(table, line + 8, k, errp);
->           } else {
->               int offset = 0;
->               while (line[offset] != 0 &&
-> @@ -170,9 +171,9 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
->   
->   
->   kbd_layout_t *init_keyboard_layout(const name2keysym_t *table,
-> -                                   const char *language)
-> +                                   const char *language, Error **errp)
->   {
-> -    return parse_keyboard_layout(table, language, NULL);
-> +    return parse_keyboard_layout(table, language, NULL, errp);
->   }
->   
->   
-> diff --git a/ui/keymaps.h b/ui/keymaps.h
-> index 0693588225..98213a4191 100644
-> --- a/ui/keymaps.h
-> +++ b/ui/keymaps.h
-> @@ -53,7 +53,7 @@ typedef struct {
->   typedef struct kbd_layout_t kbd_layout_t;
->   
->   kbd_layout_t *init_keyboard_layout(const name2keysym_t *table,
-> -                                   const char *language);
-> +                                   const char *language, Error **errp);
->   int keysym2scancode(kbd_layout_t *k, int keysym,
->                       bool shift, bool altgr, bool ctrl);
->   int keycode_is_keypad(kbd_layout_t *k, int keycode);
-> diff --git a/ui/sdl.c b/ui/sdl.c
-> index a5fd503c25..b33df70f4d 100644
-> --- a/ui/sdl.c
-> +++ b/ui/sdl.c
-> @@ -29,6 +29,7 @@
->   #include <SDL.h>
->   #include <SDL_syswm.h>
->   
-> +#include "qapi/error.h"
->   #include "qemu-common.h"
->   #include "qemu/cutils.h"
->   #include "ui/console.h"
-> @@ -917,7 +918,8 @@ static void sdl1_display_init(DisplayState *ds, DisplayOptions *o)
->           keyboard_layout = "en-us";
->   #endif
->       if(keyboard_layout) {
-> -        kbd_layout = init_keyboard_layout(name2keysym, keyboard_layout);
-> +        kbd_layout = init_keyboard_layout(name2keysym, keyboard_layout,
-> +                                          &error_fatal);
->           if (!kbd_layout)
->               exit(1);
->       }
-> diff --git a/ui/vnc.c b/ui/vnc.c
-> index cf221c83cc..03c70b16f6 100644
-> --- a/ui/vnc.c
-> +++ b/ui/vnc.c
-> @@ -3205,7 +3205,7 @@ static const DisplayChangeListenerOps dcl_ops = {
->       .dpy_cursor_define    = vnc_dpy_cursor_define,
->   };
->   
-> -void vnc_display_init(const char *id)
-> +void vnc_display_init(const char *id, Error **errp)
->   {
->       VncDisplay *vd;
->   
-> @@ -3222,13 +3222,14 @@ void vnc_display_init(const char *id)
->   
->       if (keyboard_layout) {
->           trace_vnc_key_map_init(keyboard_layout);
-> -        vd->kbd_layout = init_keyboard_layout(name2keysym, keyboard_layout);
-> +        vd->kbd_layout = init_keyboard_layout(name2keysym,
-> +                                              keyboard_layout, errp);
->       } else {
-> -        vd->kbd_layout = init_keyboard_layout(name2keysym, "en-us");
-> +        vd->kbd_layout = init_keyboard_layout(name2keysym, "en-us", errp);
->       }
->   
->       if (!vd->kbd_layout) {
-> -        exit(1);
-> +        return;
->       }
->   
->       vd->share_policy = VNC_SHARE_POLICY_ALLOW_EXCLUSIVE;
-> @@ -4079,7 +4080,12 @@ int vnc_init_func(void *opaque, QemuOpts *opts, Error **errp)
->       char *id = (char *)qemu_opts_id(opts);
->   
->       assert(id);
-> -    vnc_display_init(id);
-> +    vnc_display_init(id, &local_err);
-> +    if (local_err) {
-> +        error_prepend(&local_err, "Failed to init VNC server: ");
-> +        error_propagate(errp, local_err);
-> +        return -1;
-> +    }
->       vnc_display_open(id, &local_err);
->       if (local_err != NULL) {
->           error_reportf_err(local_err, "Failed to start VNC server: ");
+SGkNCnFlbXUgaGFkIGEgYXNzZXJ0IHdoZW4gd2UgdXNlIHNjc2ktMyByZXNlcnZhdGlvbqGjDQpU
+aGlzIGhhcHBlbiB3aGVuIHNjc2kgc2VuY2UgaXMgcmVjb3ZlcmQgZXJyb3Khow0KQW5kIHdoaWNo
+IGxlYWQgc2NzaV9yZXFfY29tcGxldGUgdHdpY2UuDQoNCg0Kc3RhdGljIGJvb2wgc2NzaV9oYW5k
+bGVfcndfZXJyb3IoU0NTSURpc2tSZXEgKnIsIGludCBlcnJvciwgYm9vbCBhY2N0X2ZhaWxlZCkN
+CnsNCiAgICBib29sIGlzX3JlYWQgPSAoci0+cmVxLmNtZC5tb2RlID09IFNDU0lfWEZFUl9GUk9N
+X0RFVik7DQogICAgU0NTSURpc2tTdGF0ZSAqcyA9IERPX1VQQ0FTVChTQ1NJRGlza1N0YXRlLCBx
+ZGV2LCByLT5yZXEuZGV2KTsNCiAgICBCbG9ja0Vycm9yQWN0aW9uIGFjdGlvbiA9IGJsa19nZXRf
+ZXJyb3JfYWN0aW9uKHMtPnFkZXYuY29uZi5ibGssDQogICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBpc19yZWFkLCBlcnJvcik7DQoNCiAgICBpZiAoYWN0
+aW9uID09IEJMT0NLX0VSUk9SX0FDVElPTl9SRVBPUlQpIHsNCiAgICAgICAgaWYgKGFjY3RfZmFp
+bGVkKSB7DQogICAgICAgICAgICBibG9ja19hY2N0X2ZhaWxlZChibGtfZ2V0X3N0YXRzKHMtPnFk
+ZXYuY29uZi5ibGspLCAmci0+YWNjdCk7DQogICAgICAgIH0NCiAgICAgICAgc3dpdGNoIChlcnJv
+cikgew0KICAgICAgICBjYXNlIDA6DQogICAgICAgICAgICAvKiBUaGUgY29tbWFuZCBoYXMgcnVu
+LCBubyBuZWVkIHRvIGZha2Ugc2Vuc2UuICAqLw0KICAgICAgICAgICAgYXNzZXJ0KHItPnN0YXR1
+cyAmJiAqci0+c3RhdHVzKTsNCiAgICAgICAgICAgIHNjc2lfcmVxX2NvbXBsZXRlKCZyLT5yZXEs
+ICpyLT5zdGF0dXMpOyAgICAgICAgICAgICAgICAgICAgICB0aGUgIGZpcnN0IGNvbXBsZXRlDQog
+ICAgICAgICAgICBicmVhazsNCiAgICAgICAgY2FzZSBFTk9NRURJVU06DQogICAgICAgICAgICBz
+Y3NpX2NoZWNrX2NvbmRpdGlvbihyLCBTRU5TRV9DT0RFKE5PX01FRElVTSkpOw0KICAgICAgICAg
+ICAgYnJlYWs7DQogICAgICAgIGNhc2UgRU5PTUVNOg0KICAgICAgICAgICAgc2NzaV9jaGVja19j
+b25kaXRpb24ociwgU0VOU0VfQ09ERShUQVJHRVRfRkFJTFVSRSkpOw0KICAgICAgICAgICAgYnJl
+YWs7DQogICAgICAgIGNhc2UgRUlOVkFMOg0KICAgICAgICAgICAgc2NzaV9jaGVja19jb25kaXRp
+b24ociwgU0VOU0VfQ09ERShJTlZBTElEX0ZJRUxEKSk7DQogICAgICAgICAgICBicmVhazsNCiAg
+ICAgICAgY2FzZSBFTk9TUEM6DQogICAgICAgICAgICBzY3NpX2NoZWNrX2NvbmRpdGlvbihyLCBT
+RU5TRV9DT0RFKFNQQUNFX0FMTE9DX0ZBSUxFRCkpOw0KICAgICAgICAgICAgYnJlYWs7DQogICAg
+ICAgIGRlZmF1bHQ6DQogICAgICAgICAgICBzY3NpX2NoZWNrX2NvbmRpdGlvbihyLCBTRU5TRV9D
+T0RFKElPX0VSUk9SKSk7DQogICAgICAgICAgICBicmVhazsNCiAgICAgICAgfQ0KICAgIH0NCiAg
+ICBpZiAoIWVycm9yKSB7DQogICAgICAgIGFzc2VydChyLT5zdGF0dXMgJiYgKnItPnN0YXR1cyk7
+DQogICAgICAgIGVycm9yID0gc2NzaV9zZW5zZV9idWZfdG9fZXJybm8oci0+cmVxLnNlbnNlLCBz
+aXplb2Yoci0+cmVxLnNlbnNlKSk7DQoNCiAgICAgICAgaWYgKGVycm9yID09IEVDQU5DRUxFRCB8
+fCBlcnJvciA9PSBFQUdBSU4gfHwgZXJyb3IgPT0gRU5PVENPTk4gfHwNCiAgICAgICAgICAgIGVy
+cm9yID09IDApICB7DQogICAgICAgICAgICAvKiBUaGVzZSBlcnJvcnMgYXJlIGhhbmRsZWQgYnkg
+Z3Vlc3QuICovDQogICAgICAgICAgIHNjc2lfcmVxX2NvbXBsZXRlKCZyLT5yZXEsICpyLT5zdGF0
+dXMpOyAgICAgICAgICAgICAgICAgICAgICBjb21wbGV0ZSBhZ2FpbiB3aGVuIGVycm9yPT0wOw0K
+ICAgICAgICAgICAgcmV0dXJuIHRydWU7DQogICAgICAgIH0NCiAgICB9DQoNCg0KDQoNClNoYWxs
+IHdlIGRlbGV0ZSBlcnJvcj09MCAgYXQgdGhlIHNlY29uZCBzY3NpX3JlcV9jb21wbGV0ZSCjv6O/
+DQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tDQqxvtPKvP68sMbkuL28/rqs09DQwruqyP28r83FtcSxo8Pc
+0MXPoqOsvfbP3tPat6LLzbj4yc/D5rXY1rfW0MHQs/YNCrXEuPbIy7vyyLrX6aGjvfvWucjOus7G
+5Mv7yMvS1MjOus7Qzsq9yrnTw6OosPzAqLWrsrvP3tPayKuyv7vysr+31rXY0LnCtqGiuLTWxqGi
+DQq78smit6KjqbG+08q8/tbQtcTQxc+ioaPI57n7xPq07crVwcuxvtPKvP6jrMfrxPrBory0tee7
+sLvy08q8/s2o1qq3orz+yMuyosm+s/2xvg0K08q8/qOhDQpUaGlzIGUtbWFpbCBhbmQgaXRzIGF0
+dGFjaG1lbnRzIGNvbnRhaW4gY29uZmlkZW50aWFsIGluZm9ybWF0aW9uIGZyb20gTmV3IEgzQywg
+d2hpY2ggaXMNCmludGVuZGVkIG9ubHkgZm9yIHRoZSBwZXJzb24gb3IgZW50aXR5IHdob3NlIGFk
+ZHJlc3MgaXMgbGlzdGVkIGFib3ZlLiBBbnkgdXNlIG9mIHRoZQ0KaW5mb3JtYXRpb24gY29udGFp
+bmVkIGhlcmVpbiBpbiBhbnkgd2F5IChpbmNsdWRpbmcsIGJ1dCBub3QgbGltaXRlZCB0bywgdG90
+YWwgb3IgcGFydGlhbA0KZGlzY2xvc3VyZSwgcmVwcm9kdWN0aW9uLCBvciBkaXNzZW1pbmF0aW9u
+KSBieSBwZXJzb25zIG90aGVyIHRoYW4gdGhlIGludGVuZGVkDQpyZWNpcGllbnQocykgaXMgcHJv
+aGliaXRlZC4gSWYgeW91IHJlY2VpdmUgdGhpcyBlLW1haWwgaW4gZXJyb3IsIHBsZWFzZSBub3Rp
+ZnkgdGhlIHNlbmRlcg0KYnkgcGhvbmUgb3IgZW1haWwgaW1tZWRpYXRlbHkgYW5kIGRlbGV0ZSBp
+dCENCg==
