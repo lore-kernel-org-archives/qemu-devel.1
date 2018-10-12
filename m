@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45394)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gAuFw-0000pP-2k
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 06:01:16 -0400
+	(envelope-from <cohuck@redhat.com>) id 1gAuGD-0000xV-2y
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 06:01:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gAuFt-0007RO-KX
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 06:01:15 -0400
+	(envelope-from <cohuck@redhat.com>) id 1gAuGB-0007er-Cn
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 06:01:32 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Fri, 12 Oct 2018 12:00:54 +0200
-Message-Id: <20181012100101.29058-2-cohuck@redhat.com>
+Date: Fri, 12 Oct 2018 12:00:57 +0200
+Message-Id: <20181012100101.29058-5-cohuck@redhat.com>
 In-Reply-To: <20181012100101.29058-1-cohuck@redhat.com>
 References: <20181012100101.29058-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 1/8] target/s390x/excp_helper: Remove DPRINTF()
- macro
+Subject: [Qemu-devel] [PULL 4/8] s390x/kvm: enable AP instruction
+ interpretation for guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,138 +21,77 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Tony Krowiak <akrowiak@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>
 
-From: Thomas Huth <thuth@redhat.com>
+From: Tony Krowiak <akrowiak@linux.ibm.com>
 
-Debug macros that are disabled by default should be avoided (since the
-code bit-rots quite easily). Thus turn these debug prints into proper
-qemu_log_mask(CPU_LOG_xxx, ...) statements instead. The DPRINTF statements
-in do_[ext|io|mchk]_interrupt can even be removed completely since we can
-log the information in a central place, s390_cpu_do_interrupt, instead.
+Let's use the KVM_SET_DEVICE_ATTR ioctl to enable hardware
+interpretation of AP instructions executed on the guest.
+If the S390_FEAT_AP feature is switched on for the guest,
+AP instructions must be interpreted by default; otherwise,
+they will be intercepted.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <1538751601-7433-1-git-send-email-thuth@redhat.com>
+This attribute setting may be overridden by a device. For example,
+a device may want to provide AP instructions to the guest (i.e.,
+S390_FEAT_AP turned on), but it may want to emulate them. In this
+case, the AP instructions executed on the guest must be
+intercepted; so when the device is realized, it must disable
+interpretation.
+
+Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+Tested-by: Pierre Morel <pmorel@linux.ibm.com>
 Reviewed-by: David Hildenbrand <david@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Acked-by: Halil Pasic <pasic@linux.ibm.com>
+Tested-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Message-Id: <20181010170309.12045-4-akrowiak@linux.ibm.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/excp_helper.c | 48 +++++++++++-----------------------------------
- 1 file changed, 11 insertions(+), 37 deletions(-)
+ target/s390x/kvm.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
-index cd76c3163a..2a33222f7e 100644
---- a/target/s390x/excp_helper.c
-+++ b/target/s390x/excp_helper.c
-@@ -33,23 +33,6 @@
- #include "hw/s390x/s390_flic.h"
- #endif
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 78d39b34d0..2ebf26adfe 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -2299,11 +2299,26 @@ void kvm_s390_get_host_cpu_model(S390CPUModel *model, Error **errp)
+         error_setg(errp, "KVM: host CPU model could not be identified");
+         return;
+     }
++    /* for now, we can only provide the AP feature with HW support */
++    if (kvm_vm_check_attr(kvm_state, KVM_S390_VM_CRYPTO,
++        KVM_S390_VM_CRYPTO_ENABLE_APIE)) {
++        set_bit(S390_FEAT_AP, model->features);
++    }
+     /* strip of features that are not part of the maximum model */
+     bitmap_and(model->features, model->features, model->def->full_feat,
+                S390_FEAT_MAX);
+ }
  
--/* #define DEBUG_S390 */
--/* #define DEBUG_S390_STDOUT */
--
--#ifdef DEBUG_S390
--#ifdef DEBUG_S390_STDOUT
--#define DPRINTF(fmt, ...) \
--    do { fprintf(stderr, fmt, ## __VA_ARGS__); \
--         if (qemu_log_separate()) { qemu_log(fmt, ##__VA_ARGS__); } } while (0)
--#else
--#define DPRINTF(fmt, ...) \
--    do { qemu_log(fmt, ## __VA_ARGS__); } while (0)
--#endif
--#else
--#define DPRINTF(fmt, ...) \
--    do { } while (0)
--#endif
--
- void QEMU_NORETURN tcg_s390_program_interrupt(CPUS390XState *env, uint32_t code,
-                                               int ilen, uintptr_t ra)
++static void kvm_s390_configure_apie(bool interpret)
++{
++    uint64_t attr = interpret ? KVM_S390_VM_CRYPTO_ENABLE_APIE :
++                                KVM_S390_VM_CRYPTO_DISABLE_APIE;
++
++    if (kvm_vm_check_attr(kvm_state, KVM_S390_VM_CRYPTO, attr)) {
++        kvm_s390_set_attr(attr);
++    }
++}
++
+ void kvm_s390_apply_cpu_model(const S390CPUModel *model, Error **errp)
  {
-@@ -128,8 +111,8 @@ int s390_cpu_handle_mmu_fault(CPUState *cs, vaddr orig_vaddr, int size,
-     uint64_t asc;
-     int prot;
- 
--    DPRINTF("%s: address 0x%" VADDR_PRIx " rw %d mmu_idx %d\n",
--            __func__, orig_vaddr, rw, mmu_idx);
-+    qemu_log_mask(CPU_LOG_MMU, "%s: addr 0x%" VADDR_PRIx " rw %d mmu_idx %d\n",
-+                  __func__, orig_vaddr, rw, mmu_idx);
- 
-     vaddr = orig_vaddr;
- 
-@@ -158,8 +141,9 @@ int s390_cpu_handle_mmu_fault(CPUState *cs, vaddr orig_vaddr, int size,
-     if (!address_space_access_valid(&address_space_memory, raddr,
-                                     TARGET_PAGE_SIZE, rw,
-                                     MEMTXATTRS_UNSPECIFIED)) {
--        DPRINTF("%s: raddr %" PRIx64 " > ram_size %" PRIx64 "\n", __func__,
--                (uint64_t)raddr, (uint64_t)ram_size);
-+        qemu_log_mask(CPU_LOG_MMU,
-+                      "%s: raddr %" PRIx64 " > ram_size %" PRIx64 "\n",
-+                      __func__, (uint64_t)raddr, (uint64_t)ram_size);
-         trigger_pgm_exception(env, PGM_ADDRESSING, ILEN_AUTO);
-         return 1;
+     struct kvm_s390_vm_cpu_processor prop  = {
+@@ -2353,6 +2368,10 @@ void kvm_s390_apply_cpu_model(const S390CPUModel *model, Error **errp)
+     if (test_bit(S390_FEAT_CMM, model->features)) {
+         kvm_s390_enable_cmma();
      }
-@@ -217,8 +201,10 @@ static void do_program_interrupt(CPUS390XState *env)
-         break;
-     }
- 
--    qemu_log_mask(CPU_LOG_INT, "%s: code=0x%x ilen=%d\n",
--                  __func__, env->int_pgm_code, ilen);
-+    qemu_log_mask(CPU_LOG_INT,
-+                  "%s: code=0x%x ilen=%d psw: %" PRIx64 " %" PRIx64 "\n",
-+                  __func__, env->int_pgm_code, ilen, env->psw.mask,
-+                  env->psw.addr);
- 
-     lowcore = cpu_map_lowcore(env);
- 
-@@ -240,10 +226,6 @@ static void do_program_interrupt(CPUS390XState *env)
- 
-     cpu_unmap_lowcore(lowcore);
- 
--    DPRINTF("%s: %x %x %" PRIx64 " %" PRIx64 "\n", __func__,
--            env->int_pgm_code, ilen, env->psw.mask,
--            env->psw.addr);
--
-     load_psw(env, mask, addr);
++
++    if (test_bit(S390_FEAT_AP, model->features)) {
++        kvm_s390_configure_apie(true);
++    }
  }
  
-@@ -334,9 +316,6 @@ static void do_ext_interrupt(CPUS390XState *env)
- 
-     cpu_unmap_lowcore(lowcore);
- 
--    DPRINTF("%s: %" PRIx64 " %" PRIx64 "\n", __func__,
--            env->psw.mask, env->psw.addr);
--
-     load_psw(env, mask, addr);
- }
- 
-@@ -365,8 +344,6 @@ static void do_io_interrupt(CPUS390XState *env)
-     cpu_unmap_lowcore(lowcore);
-     g_free(io);
- 
--    DPRINTF("%s: %" PRIx64 " %" PRIx64 "\n", __func__, env->psw.mask,
--            env->psw.addr);
-     load_psw(env, mask, addr);
- }
- 
-@@ -408,9 +385,6 @@ static void do_mchk_interrupt(CPUS390XState *env)
- 
-     cpu_unmap_lowcore(lowcore);
- 
--    DPRINTF("%s: %" PRIx64 " %" PRIx64 "\n", __func__,
--            env->psw.mask, env->psw.addr);
--
-     load_psw(env, mask, addr);
- }
- 
-@@ -421,8 +395,8 @@ void s390_cpu_do_interrupt(CPUState *cs)
-     CPUS390XState *env = &cpu->env;
-     bool stopped = false;
- 
--    qemu_log_mask(CPU_LOG_INT, "%s: %d at pc=%" PRIx64 "\n",
--                  __func__, cs->exception_index, env->psw.addr);
-+    qemu_log_mask(CPU_LOG_INT, "%s: %d at psw=%" PRIx64 ":%" PRIx64 "\n",
-+                  __func__, cs->exception_index, env->psw.mask, env->psw.addr);
- 
- try_deliver:
-     /* handle machine checks */
+ void kvm_s390_restart_interrupt(S390CPU *cpu)
 -- 
 2.14.4
