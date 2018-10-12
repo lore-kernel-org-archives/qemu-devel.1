@@ -1,35 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57530)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gAymE-000602-5X
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 10:50:54 -0400
+	(envelope-from <mreitz@redhat.com>) id 1gAynI-0006qS-Rr
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 10:52:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gAymA-00087t-2P
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 10:50:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43408)
+	(envelope-from <mreitz@redhat.com>) id 1gAynE-0001IZ-Nt
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 10:52:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50428)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1gAym9-00086T-Rd
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 10:50:49 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3A7F77D0E7
-	for <qemu-devel@nongnu.org>; Fri, 12 Oct 2018 14:50:49 +0000 (UTC)
-Date: Fri, 12 Oct 2018 16:50:44 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20181012145044.GB4585@dhcp-200-186.str.redhat.com>
-References: <20181008173125.19678-1-armbru@redhat.com>
-	<20181008173125.19678-31-armbru@redhat.com>
-	<a93edd67-8c1a-bb2d-7b52-db46b1e2abbd@redhat.com>
-	<87in27vhwc.fsf@dusky.pond.sub.org>
-	<5e5d426c-75f5-98ca-ddcf-729bc7656c99@redhat.com>
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1gAynE-0001Hz-F2
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 10:51:56 -0400
+References: <1535739372-24454-1-git-send-email-Liam.Merwick@oracle.com>
+	<1535739372-24454-5-git-send-email-Liam.Merwick@oracle.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <1d34f37c-94cb-61af-58a6-dae10ddc2ce5@redhat.com>
+Date: Fri, 12 Oct 2018 16:51:53 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="ReaqsoxgOBHFXBhH"
-Content-Disposition: inline
-In-Reply-To: <5e5d426c-75f5-98ca-ddcf-729bc7656c99@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 30/31] blockdev: Convert drive_new() to
- Error
+In-Reply-To: <1535739372-24454-5-git-send-email-Liam.Merwick@oracle.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="vR1nh9PV8HiiPr30uQ7uh7NyvKnQaKk9f"
+Subject: Re: [Qemu-devel] [PATCH v3 4/8] qemu-img: potential Null pointer
+ deref in img_commit()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,62 +29,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+To: Liam Merwick <Liam.Merwick@oracle.com>, qemu-devel@nongnu.org
 
-
---ReaqsoxgOBHFXBhH
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--vR1nh9PV8HiiPr30uQ7uh7NyvKnQaKk9f
+From: Max Reitz <mreitz@redhat.com>
+To: Liam Merwick <Liam.Merwick@oracle.com>, qemu-devel@nongnu.org
+Message-ID: <1d34f37c-94cb-61af-58a6-dae10ddc2ce5@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 4/8] qemu-img: potential Null pointer
+ deref in img_commit()
+References: <1535739372-24454-1-git-send-email-Liam.Merwick@oracle.com>
+ <1535739372-24454-5-git-send-email-Liam.Merwick@oracle.com>
+In-Reply-To: <1535739372-24454-5-git-send-email-Liam.Merwick@oracle.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-Am 12.10.2018 um 14:28 hat Max Reitz geschrieben:
-> >>> @@ -1155,8 +1155,7 @@ static void default_drive(int enable, int snaps=
-hot, BlockInterfaceType type,
-> >>>          drive_enable_snapshot(NULL, opts, NULL);
-> >>>      }
-> >>> =20
-> >>> -    dinfo =3D drive_new(opts, type);
-> >>> -    assert(dinfo);
-> >>> +    dinfo =3D drive_new(opts, type, &error_abort);
-> >>
-> >> Which means the assertion is still necessary here.
-> >=20
-> > I see very little value in assert(p) right before *p.  Matter of taste,
-> > I guess.  Do you want me to keep it?
+On 31.08.18 20:16, Liam Merwick wrote:
+> The function block_job_get() may return NULL so before dereferencing
+> the 'job' pointer in img_commit() it should be checked.
+
+It may not because the job yields before executing anything (if it
+started successfully; but otherwise, commit_active_start() would have
+returned an error).  Therefore, I think the better solution is to
+assert(job) here.
+
+(It would be a serious bug if block_job_get() returned NULL here, so
+it's definitely not something we can be quiet about.  But this patch
+makes it so the user doesn't even notice.)
+
+Max
+
+> Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
+> Reviewed-by: Darren Kenny <Darren.Kenny@oracle.com>
+> Reviewed-by: Mark Kanda <Mark.Kanda@oracle.com>
+> ---
+>  qemu-img.c | 3 +++
+>  1 file changed, 3 insertions(+)
 >=20
-> True.  "An assertion looks better to the user" isn't an argument,
-> considering the user shouldn't ever see assertions either.
+> diff --git a/qemu-img.c b/qemu-img.c
+> index b12f4cd19b0a..51fe09bd08ed 100644
+> --- a/qemu-img.c
+> +++ b/qemu-img.c
+> @@ -1029,6 +1029,9 @@ static int img_commit(int argc, char **argv)
+>      }
+> =20
+>      job =3D block_job_get("commit");
+> +    if (job =3D=3D NULL) {
+> +        goto unref_backing;
+> +    }
+>      run_block_job(job, &local_err);
+>      if (local_err) {
+>          goto unref_backing;
+>=20
 
-The point that could be made is that it documents that we're aware that
-drive_new() can return NULL generally, but we've made sure that with the
-specific options passed it doesn't happen here, so not having any error
-handling is not a bug, but intended.
 
-> So feel free to drop it indeed.
 
-I don't mind either way.
-
-Kevin
-
---ReaqsoxgOBHFXBhH
+--vR1nh9PV8HiiPr30uQ7uh7NyvKnQaKk9f
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIcBAEBAgAGBQJbwLTEAAoJEH8JsnLIjy/WDQ0P/A7ZZlphAQMsIZ2/LRzNvSpM
-gY/IKH7EKDA6jp8LA+JuZR/Jxb3qXFKrT/JR+TKj2EC+oYul9vCe4uuSdB+5kBDr
-6Z/qc5RbSl5jctcp10piqUSOJrDpk29pjH3iEyI9zETtv5lj4REZ3fp079SUUteA
-uhTIeKFVRHKGOpy13w6RMlRwT9Dohcchb3EzzFuKQd+laCb4FPVJ0pVS7jESUw+B
-zKRhAYeqgg1rD4B6UGs8XuK3rbasmt1bSvVFrELJAEJiR5957RnqrrJuEZ4+ceY6
-KeBUQpS350uVRm7vRBJwx1bIeik6KY6s9e4wF2j3kYvs/PYC+THKOM1PkeG+jKiz
-z+vo9Xp0CaLiHhKaQdeNTxYwPawMTO8QngJUCP5/fQLHd0ALpIrL5d2bmTodThvY
-sXrFNSmNYwsi23TPiUhPrP7PyhGYU0LNwjefsh26MSDb8DgVcvsFEy93qQ/MO73v
-reCxnf/8gAjw3kip7a+dFVC71WSipAScpBCZZAea6VGTxwzZKtLyGsh5ozeU/Bu1
-9T8pVSn825XdsALPZT+Zarmqg9ZW18Fc0dxu38A2EH/3+lxjlyzU9Qk8V3idCbhS
-/FiHBqXaiCECwaOp8r/3qMmRuM47lagOZIGrhrGrX+69CHfA7nmZgkMAeRYBjJrl
-dmDicO+RjKUTgMw1iH/W
-=xcw8
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlvAtQkACgkQ9AfbAGHV
+z0Dkggf8DxgnBNFUzjXv+Bb/K7YEJFsH7FyxToLpgtOdOxr9QbCl6EkYVg8uElXw
+fHTMPpdViJT8SpL5GAQI55sz6wnlI6E6NFLtzxE40aoPYtQ2sz1JbRo8IUutCJ2F
+5f1JvOxahuQ+uEthfGBsZIljF4nfSP79HuFPxT5/fLzT2oge+lFsd6kLVwh2qzep
++FW8BayPhb+uT5eNOPDc0CBQl+iZHs8jHkz0IENuqth8v2/8W/b8uJBoxsdq3wW4
+PlIDfjCgXNvk9Iv4noqj3/gNIXlHVF7B7URlM/RsrAUk5QyktUrutvWoc20ill30
+4qEuvbiQO3LGSpFAh1J8NxXkFyUTJg==
+=7s+f
 -----END PGP SIGNATURE-----
 
---ReaqsoxgOBHFXBhH--
+--vR1nh9PV8HiiPr30uQ7uh7NyvKnQaKk9f--
