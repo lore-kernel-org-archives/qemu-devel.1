@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54312)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54395)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gB0VM-0007h2-3F
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 12:41:36 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gB0Va-0007s5-Vl
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 12:41:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gB0VH-0002d1-4Y
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 12:41:36 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:46163 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gB0VV-0002ql-9o
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 12:41:50 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:45958 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gB0VG-0002bO-Su
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 12:41:31 -0400
+	id 1gB0VV-0001ne-1t
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 12:41:45 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Fri, 12 Oct 2018 18:39:12 +0200
-Message-Id: <1539362376-12010-5-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Fri, 12 Oct 2018 18:39:10 +0200
+Message-Id: <1539362376-12010-3-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1539362376-12010-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1539362376-12010-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v5 04/28] linux-user: Add MIPS-specific prctl()
- options
+Subject: [Qemu-devel] [PATCH v5 02/28] elf: Add MIPS_ABI_FP_XXX constants
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +29,34 @@ Cc: aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, 
 
 From: Stefan Markovic <smarkovic@wavecomp.com>
 
-Add MIPS-specific prctl() options TARGET_PR_SET_FP_MODE	and
-TARGET_PR_SET_FP_MODE. These values are essentially copied from
-linux kernel header include/uapi/linux/prctl.h.
+Add MIPS_ABI_FP_XXX constants to elf.h. The source of information
+is kernel header arch/mips/include/asm/elf.h.
 
-This is done in a way consistent with a similar case of
-aarch64-specific prctl() options TARGET_PR_SVE_SET_VL and
-TARGET_PR_SVE_GET_VL.
-
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- linux-user/mips/target_syscall.h | 4 ++++
- 1 file changed, 4 insertions(+)
+ include/elf.h | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/linux-user/mips/target_syscall.h b/linux-user/mips/target_syscall.h
-index 2fca1c6..718680d 100644
---- a/linux-user/mips/target_syscall.h
-+++ b/linux-user/mips/target_syscall.h
-@@ -239,6 +239,10 @@ struct target_pt_regs {
+diff --git a/include/elf.h b/include/elf.h
+index decf210..eb5958d 100644
+--- a/include/elf.h
++++ b/include/elf.h
+@@ -87,6 +87,14 @@ typedef int64_t  Elf64_Sxword;
+ #define EF_MIPS_MACH_LS3A     0x00a20000  /* ST Microelectronics Loongson 3A */
+ #define EF_MIPS_MACH          0x00ff0000  /* EF_MIPS_MACH_xxx selection mask */
  
- #define TARGET_FORCE_SHMLBA
++#define MIPS_ABI_FP_ANY       0x0         /* FP ABI doesn't matter           */
++#define MIPS_ABI_FP_DOUBLE    0x1         /* -mdouble-float                  */
++#define MIPS_ABI_FP_SINGLE    0x2         /* -msingle-float                  */
++#define MIPS_ABI_FP_SOFT      0x3         /* -msoft-float                    */
++#define MIPS_ABI_FP_OLD_64    0x4         /* -mips32r2 -mfp64                */
++#define MIPS_ABI_FP_XX        0x5         /* -mfpxx                          */
++#define MIPS_ABI_FP_64        0x6         /* -mips32r2 -mfp64                */
++#define MIPS_ABI_FP_64A       0x7         /* -mips32r2 -mfp64 -mno-odd-spreg */
  
-+/* MIPS-specific prctl() options */
-+#define TARGET_PR_SET_FP_MODE  45
-+#define TARGET_PR_GET_FP_MODE  46
-+
- static inline abi_ulong target_shmlba(CPUMIPSState *env)
- {
-     return 0x40000;
+ /* These constants define the different elf file types */
+ #define ET_NONE   0
 -- 
 2.7.4
