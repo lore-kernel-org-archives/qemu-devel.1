@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37853)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gBOUg-00041q-Kb
-	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 14:18:31 -0400
+	(envelope-from <mreitz@redhat.com>) id 1gBOWs-0004n3-Bn
+	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 14:20:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gBOUd-0008Ac-Gu
-	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 14:18:30 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:33085)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gBOUZ-000813-Qx
-	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 14:18:25 -0400
-Received: by mail-pl1-x644.google.com with SMTP id s4-v6so7404832plp.0
-	for <qemu-devel@nongnu.org>; Sat, 13 Oct 2018 11:18:22 -0700 (PDT)
-References: <20181012173047.25420-1-kbastian@mail.uni-paderborn.de>
-	<20181012173047.25420-16-kbastian@mail.uni-paderborn.de>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <2ef3b2f4-98da-a423-6e11-6dda5779031c@linaro.org>
-Date: Sat, 13 Oct 2018 11:18:18 -0700
+	(envelope-from <mreitz@redhat.com>) id 1gBOWr-0003Mu-Kc
+	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 14:20:46 -0400
+References: <20181013050227.17022-1-ehabkost@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <219bba9b-4102-f838-a46f-11b9704ca78f@redhat.com>
+Date: Sat, 13 Oct 2018 20:20:25 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181012173047.25420-16-kbastian@mail.uni-paderborn.de>
+In-Reply-To: <20181013050227.17022-1-ehabkost@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 15/28] target/riscv: Convert quadrant 0 of
- RVXC insns to decodetree
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC] Require Python 3 for building QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,69 +23,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, mjc@sifive.com, palmer@sifive.com, sagark@eecs.berkeley.edu
-Cc: peer.adelt@hni.uni-paderborn.de, Alistair.Francis@wdc.com, qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>
+Cc: qemu-block@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-On 10/12/18 10:30 AM, Bastian Koppelmann wrote:
-> +# Argument sets:
-> +&cl               rs1 rd
-> +&cl_dw     uimm   rs1 rd
-> +&ciw       nzuimm     rd
-> +&cs               rs1 rs2
-> +&cs_dw     uimm   rs1 rs2
+On 13.10.18 07:02, Eduardo Habkost wrote:
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+> I'd like to do this in QEMU 3.1.  I think it's time to drop
+> support for old systems that have only Python 2.
+>=20
+> We still have a few scripts that are not required for building
+> QEMU that still work only with Python 2 (iotests being the most
+> relevant set).  Requiring Python 3 for building QEMU won't
+> prevent people from using those scripts with Python 2 until they
+> are finally ported.
 
-I guess this is good enough for now.
-What I'd like to see is something like
+It very much does because the iotests specifically use the python path
+qemu was configured with.
 
-&i	imm rs1 rd	!extern
+To fix this, configure would need to write something else for into
+tests/qemu-iotests/common.env for $PYTHON.  But what?  I don't really
+want to introduce a new configure option for this.
 
-which tells decodetree that the arg_i structure has been declared elsewhere.
-Then you can write
+So the real fix is indeed to make the iotests work with Python 3, and I
+think that needs to be done before we can require Python 3.  Maybe it
+even needs to be done at the same time.
 
-> +@cl_w      ... ... ... .. ... .. &i  imm=%uimm_cl_w  rs1=%rs1_3  rd=%rs2_3
+Max
 
-lw	010 ... ... .. ... 00	@cl_w
-
-and then the same trans_lw can be used.
-
-> +c_flw_ld          011  --- ... -- ... 00 @cl    #Note: Must parse uimm manually
-
-Why?  It looks identical to @cl_w to me.
-
-> +static bool trans_c_addi4spn(DisasContext *ctx, arg_c_addi4spn *a,
-> +        uint16_t insn)
-> +{
-> +    if (a->nzuimm == 0) {
-> +        /* Reserved in ISA */
-> +        gen_exception_illegal(ctx);
-> +        return true;
-
-This should definitely be return false, as that kind of instruction overlap is
-exactly what the return value is for.  (There is no current support for
-overlapping insn patterns, but it is planned.)
-
-> +static bool trans_c_flw_ld(DisasContext *ctx, arg_c_flw_ld *a, uint16_t insn)
-> +{
-> +#ifdef TARGET_RISCV32
-> +    /* C.FLW ( RV32FC-only ) */
-> +    arg_c_lw *tmp = g_new0(arg_c_lw, 1);
-> +    extract_cl_w(tmp, insn);
-> +    arg_flw arg = { .rd = tmp->rd, .rs1 = tmp->rs1, .imm = tmp->uimm };
-> +    return trans_flw(ctx, &arg, insn);
-> +#else
-> +    /* C.LD ( RV64C/RV128C-only ) */
-> +    arg_c_fld *tmp = g_new0(arg_c_fld, 1);
-> +    extract_cl_d(tmp, insn);
-> +    arg_ld arg = { .rd = tmp->rd, .rs1 = tmp->rs1, .imm = tmp->uimm };
-> +    return trans_ld(ctx, &arg, insn);
-> +#endif
-
-Oh I see what you're after wrt manual parsing above.
-But why g_new0 and missing free.  Why not stack allocation?
-
-> +static int64_t ex_rvc_register(int reg)
-
-return type should be int.
-
-
-r~
+> ---
+>  configure   | 8 ++++----
+>  .travis.yml | 2 +-
+>  2 files changed, 5 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/configure b/configure
+> index f89d293585..43b45745dc 100755
+> --- a/configure
+> +++ b/configure
+> @@ -885,7 +885,7 @@ fi
+> =20
+>  : ${make=3D${MAKE-make}}
+>  : ${install=3D${INSTALL-install}}
+> -: ${python=3D${PYTHON-python}}
+> +: ${python=3D${PYTHON-python3}}
+>  : ${smbd=3D${SMBD-/usr/sbin/smbd}}
+> =20
+>  # Default objcc to clang if available, otherwise use CC
+> @@ -1730,13 +1730,13 @@ exit 0
+>  fi
+> =20
+>  if ! has $python; then
+> -  error_exit "Python not found. Use --python=3D/path/to/python"
+> +  error_exit "Python 3 not found. Use --python=3D/path/to/python"
+>  fi
+> =20
+>  # Note that if the Python conditional here evaluates True we will exit
+>  # with status 1 which is a shell 'false' value.
+> -if ! $python -c 'import sys; sys.exit(sys.version_info < (2,7))'; then
+> -  error_exit "Cannot use '$python', Python 2 >=3D 2.7 or Python 3 is r=
+equired." \
+> +if ! $python -c 'import sys; sys.exit(sys.version_info < (3,0))'; then
+> +  error_exit "Cannot use '$python', Python 3 is required." \
+>        "Use --python=3D/path/to/python to specify a supported Python."
+>  fi
+> =20
+> diff --git a/.travis.yml b/.travis.yml
+> index 95be6ec59f..caca9685fa 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -5,7 +5,7 @@ sudo: false
+>  dist: trusty
+>  language: c
+>  python:
+> -  - "2.6"
+> +  - "3.6"
+>  compiler:
+>    - gcc
+>  cache: ccache
+>=20
