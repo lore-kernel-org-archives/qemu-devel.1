@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58011)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58012)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gBTCz-0002nw-Sx
+	(envelope-from <cota@braap.org>) id 1gBTCz-0002nx-T0
 	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 19:20:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gBTCw-00088O-65
+	(envelope-from <cota@braap.org>) id 1gBTCx-00088t-8F
 	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 19:20:33 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:57117)
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:39355)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gBTCv-0007wt-UT
-	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 19:20:30 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gBTCw-0007wk-Bs
+	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 19:20:31 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Sat, 13 Oct 2018 19:19:33 -0400
-Message-Id: <20181013231933.28789-14-cota@braap.org>
+Date: Sat, 13 Oct 2018 19:19:31 -0400
+Message-Id: <20181013231933.28789-12-cota@braap.org>
 In-Reply-To: <20181013231933.28789-1-cota@braap.org>
 References: <20181013231933.28789-1-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v5 13/13] hardfloat: implement float32/64
- comparison
+Subject: [Qemu-devel] [PATCH v5 11/13] hardfloat: implement float32/64 fused
+ multiply-add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,179 +31,229 @@ Performance results for fp-bench:
 
 1. Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
 - before:
-cmp-single: 113.01 MFlops
-cmp-double: 115.54 MFlops
+fma-single: 74.73 MFlops
+fma-double: 74.54 MFlops
 - after:
-cmp-single: 527.83 MFlops
-cmp-double: 457.21 MFlops
+fma-single: 203.37 MFlops
+fma-double: 169.37 MFlops
 
 2. ARM Aarch64 A57 @ 2.4GHz
 - before:
-cmp-single: 39.32 MFlops
-cmp-double: 39.80 MFlops
+fma-single: 23.24 MFlops
+fma-double: 23.70 MFlops
 - after:
-cmp-single: 162.74 MFlops
-cmp-double: 167.08 MFlops
+fma-single: 66.14 MFlops
+fma-double: 63.10 MFlops
 
 3. IBM POWER8E @ 2.1 GHz
 - before:
-cmp-single: 60.81 MFlops
-cmp-double: 62.76 MFlops
+fma-single: 37.26 MFlops
+fma-double: 37.29 MFlops
 - after:
-cmp-single: 235.39 MFlops
-cmp-double: 283.44 MFlops
+fma-single: 48.90 MFlops
+fma-double: 59.51 MFlops
 
-Here using float{32,64}_is_any_nan is faster than using isnan
-for all machines. On x86_64 the perf difference is just a few
-percentage points, but on aarch64 we go from 117/119 to
-164/169 MFlops for single/double precision, respectively.
-
-Aggregate performance improvement for the last few patches:
-[ all charts in png: https://imgur.com/a/4yV8p ]
-
-1. Host: Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
-
-                   qemu-aarch64 NBench score; higher is better
-                 Host: Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
-
-  16 +-+-----------+-------------+----===-------+---===-------+-----------+-+
-  14 +-+..........................@@@&&.=.......@@@&&.=...................+-+
-  12 +-+..........................@.@.&.=.......@.@.&.=.....+befor===     +-+
-  10 +-+..........................@.@.&.=.......@.@.&.=.....+ad@@&& =     +-+
-   8 +-+.......................$$$%.@.&.=.......@.@.&.=.....+  @@u& =     +-+
-   6 +-+............@@@&&=+***##.$%.@.&.=***##$$%+@.&.=..###$$%%@i& =     +-+
-   4 +-+.......###$%%.@.&=.*.*.#.$%.@.&.=*.*.#.$%.@.&.=+**.#+$ +@m& =     +-+
-   2 +-+.....***.#$.%.@.&=.*.*.#.$%.@.&.=*.*.#.$%.@.&.=.**.#+$+sqr& =     +-+
-   0 +-+-----***##$%%@@&&=-***##$$%@@&&==***##$$%@@&&==-**##$$%+cmp==-----+-+
-            FOURIER    NEURAL NELU DECOMPOSITION         gmean
-
-                              qemu-aarch64 SPEC06fp (test set) speedup over QEMU 4c2c1015905
-                                      Host: Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
-                                            error bars: 95% confidence interval
-
-  4.5 +-+---+-----+----+-----+-----+-&---+-----+----+-----+-----+-----+----+-----+-----+-----+-----+----+-----+---+-+
-    4 +-+..........................+@@+...........................................................................+-+
-  3.5 +-+..............%%@&.........@@..............%%@&............................................+++dsub       +-+
-  2.5 +-+....&&+.......%%@&.......+%%@..+%%&+..@@&+.%%@&....................................+%%&+.+%@&++%%@&      +-+
-    2 +-+..+%%&..+%@&+.%%@&...+++..%%@...%%&.+$$@&..%%@&..%%@&.......+%%&+.%%@&+......+%%@&.+%%&++$$@&++d%@&  %%@&+-+
-  1.5 +-+**#$%&**#$@&**#%@&**$%@**#$%@**#$%&**#$@&**$%@&*#$%@**#$%@**#$%&**#%@&**$%@&*#$%@**#$%&**#$@&*+f%@&**$%@&+-+
-  0.5 +-+**#$%&**#$@&**#%@&**$%@**#$%@**#$%&**#$@&**$%@&*#$%@**#$%@**#$%&**#%@&**$%@&*#$%@**#$%&**#$@&+sqr@&**$%@&+-+
-    0 +-+**#$%&**#$@&**#%@&**$%@**#$%@**#$%&**#$@&**$%@&*#$%@**#$%@**#$%&**#%@&**$%@&*#$%@**#$%&**#$@&*+cmp&**$%@&+-+
-  410.bw416.gam433.434.z435.436.cac437.lesli444.447.de450.so453454.ca459.GemsF465.tont470.lb4482.sphinxgeomean
-
-2. Host: ARM Aarch64 A57 @ 2.4GHz
-
-                    qemu-aarch64 NBench score; higher is better
-                 Host: Applied Micro X-Gene, Aarch64 A57 @ 2.4 GHz
-
-    5 +-+-----------+-------------+-------------+-------------+-----------+-+
-  4.5 +-+........................................@@@&==...................+-+
-  3 4 +-+..........................@@@&==........@.@&.=.....+before       +-+
-    3 +-+..........................@.@&.=........@.@&.=.....+ad@@@&==     +-+
-  2.5 +-+.....................##$$%%.@&.=........@.@&.=.....+  @m@& =     +-+
-    2 +-+............@@@&==.***#.$.%.@&.=.***#$$%%.@&.=.***#$$%%d@& =     +-+
-  1.5 +-+.....***#$$%%.@&.=.*.*#.$.%.@&.=.*.*#.$.%.@&.=.*.*#+$ +f@& =     +-+
-  0.5 +-+.....*.*#.$.%.@&.=.*.*#.$.%.@&.=.*.*#.$.%.@&.=.*.*#+$+sqr& =     +-+
-    0 +-+-----***#$$%%@@&==-***#$$%%@@&==-***#$$%%@@&==-***#$$%+cmp==-----+-+
-             FOURIER    NEURAL NLU DECOMPOSITION         gmean
+Here having 3FP64 set to 1 pays off for x86_64:
+[1] 170.15 vs [0] 153.12 MFlops
 
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- fpu/softfloat.c | 74 +++++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 60 insertions(+), 14 deletions(-)
+ fpu/softfloat.c | 169 ++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 165 insertions(+), 4 deletions(-)
 
 diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index a738ca4a07..1758cc93e7 100644
+index 8ef0571c6e..1c1a42bf46 100644
 --- a/fpu/softfloat.c
 +++ b/fpu/softfloat.c
-@@ -3014,28 +3014,74 @@ static int compare_floats(FloatParts a, FloatParts b, bool is_quiet,
-     }
+@@ -1568,8 +1568,9 @@ float16 __attribute__((flatten)) float16_muladd(float16 a, float16 b, float16 c,
+     return float16_round_pack_canonical(pr, status);
  }
  
--#define COMPARE(sz)                                                     \
--int float ## sz ## _compare(float ## sz a, float ## sz b,               \
--                            float_status *s)                            \
-+#define COMPARE(name, attr, sz)                                         \
-+static int attr                                                         \
-+name(float ## sz a, float ## sz b, bool is_quiet, float_status *s)      \
- {                                                                       \
-     FloatParts pa = float ## sz ## _unpack_canonical(a, s);             \
-     FloatParts pb = float ## sz ## _unpack_canonical(b, s);             \
--    return compare_floats(pa, pb, false, s);                            \
--}                                                                       \
--int float ## sz ## _compare_quiet(float ## sz a, float ## sz b,         \
--                                  float_status *s)                      \
--{                                                                       \
--    FloatParts pa = float ## sz ## _unpack_canonical(a, s);             \
--    FloatParts pb = float ## sz ## _unpack_canonical(b, s);             \
--    return compare_floats(pa, pb, true, s);                             \
-+    return compare_floats(pa, pb, is_quiet, s);                         \
+-float32 __attribute__((flatten)) float32_muladd(float32 a, float32 b, float32 c,
+-                                                int flags, float_status *status)
++static float32 QEMU_SOFTFLOAT_ATTR
++soft_float32_muladd(float32 a, float32 b, float32 c, int flags,
++                    float_status *status)
+ {
+     FloatParts pa = float32_unpack_canonical(a, status);
+     FloatParts pb = float32_unpack_canonical(b, status);
+@@ -1579,8 +1580,9 @@ float32 __attribute__((flatten)) float32_muladd(float32 a, float32 b, float32 c,
+     return float32_round_pack_canonical(pr, status);
  }
  
--COMPARE(16)
--COMPARE(32)
--COMPARE(64)
-+COMPARE(soft_float16_compare, , 16)
-+COMPARE(soft_float32_compare, QEMU_SOFTFLOAT_ATTR, 32)
-+COMPARE(soft_float64_compare, QEMU_SOFTFLOAT_ATTR, 64)
+-float64 __attribute__((flatten)) float64_muladd(float64 a, float64 b, float64 c,
+-                                                int flags, float_status *status)
++static float64 QEMU_SOFTFLOAT_ATTR
++soft_float64_muladd(float64 a, float64 b, float64 c, int flags,
++                    float_status *status)
+ {
+     FloatParts pa = float64_unpack_canonical(a, status);
+     FloatParts pb = float64_unpack_canonical(b, status);
+@@ -1590,6 +1592,165 @@ float64 __attribute__((flatten)) float64_muladd(float64 a, float64 b, float64 c,
+     return float64_round_pack_canonical(pr, status);
+ }
  
- #undef COMPARE
- 
-+int __attribute__((flatten))
-+float16_compare(float16 a, float16 b, float_status *s)
-+{
-+    return soft_float16_compare(a, b, false, s);
-+}
-+
-+int __attribute__((flatten))
-+float16_compare_quiet(float16 a, float16 b, float_status *s)
-+{
-+    return soft_float16_compare(a, b, true, s);
-+}
-+
-+#define GEN_FPU_COMPARE(name, quiet_name, soft_t, host_t)               \
-+    static int                                                          \
-+    fpu_ ## name(soft_t a, soft_t b, bool is_quiet, float_status *s)    \
++/*
++ * FMA generator for softfloat-based condition checks.
++ *
++ * When (a || b) == 0, there's no need to check for under/over flow,
++ * since we know the addend is (normal || 0) and the product is 0.
++ */
++#define GEN_FMA_SF(name, soft_t, host_t, host_fma_f, host_abs_f, min_normal) \
++    static soft_t                                                       \
++    name(soft_t a, soft_t b, soft_t c, int flags, float_status *s)      \
 +    {                                                                   \
-+        host_t ha, hb;                                                  \
-+                                                                        \
 +        if (QEMU_NO_HARDFLOAT) {                                        \
-+            return soft_ ## name(a, b, is_quiet, s);                    \
++            goto soft;                                                  \
 +        }                                                               \
-+        soft_t ## _input_flush2(&a, &b, s);                             \
-+        ha = soft_t ## _to_ ## host_t(a);                               \
-+        hb = soft_t ## _to_ ## host_t(b);                               \
-+        if (unlikely(soft_t ## _is_any_nan(a) ||                        \
-+                     soft_t ## _is_any_nan(b))) {                       \
-+            return soft_ ## name(a, b, is_quiet, s);                    \
-+        }                                                               \
-+        if (isgreater(ha, hb)) {                                        \
-+            return float_relation_greater;                              \
-+        }                                                               \
-+        if (isless(ha, hb)) {                                           \
-+            return float_relation_less;                                 \
-+        }                                                               \
-+        return float_relation_equal;                                    \
-+    }                                                                   \
++        soft_t ## _input_flush3(&a, &b, &c, s);                         \
++        if (likely(soft_t ## _is_zero_or_normal(a) &&                   \
++                   soft_t ## _is_zero_or_normal(b) &&                   \
++                   soft_t ## _is_zero_or_normal(c) &&                   \
++                   !(flags & float_muladd_halve_result) &&              \
++                   can_use_fpu(s))) {                                   \
++            if (soft_t ## _is_zero(a) || soft_t ## _is_zero(b)) {       \
++                soft_t p, r;                                            \
++                host_t hp, hc, hr;                                      \
++                bool prod_sign;                                         \
 +                                                                        \
-+    int __attribute__((flatten))                                        \
-+    name(soft_t a, soft_t b, float_status *s)                           \
-+    {                                                                   \
-+        return fpu_ ## name(a, b, false, s);                            \
-+    }                                                                   \
++                prod_sign = soft_t ## _is_neg(a) ^ soft_t ## _is_neg(b); \
++                prod_sign ^= !!(flags & float_muladd_negate_product);   \
++                p = soft_t ## _set_sign(soft_t ## _zero, prod_sign);    \
 +                                                                        \
-+    int __attribute__((flatten))                                        \
-+    quiet_name(soft_t a, soft_t b, float_status *s)                     \
-+    {                                                                   \
-+        return fpu_ ## name(a, b, true, s);                             \
++                if (flags & float_muladd_negate_c) {                    \
++                    c = soft_t ## _chs(c);                              \
++                }                                                       \
++                                                                        \
++                hp = soft_t ## _to_ ## host_t(p);                       \
++                hc = soft_t ## _to_ ## host_t(c);                       \
++                hr = hp + hc;                                           \
++                r = host_t ## _to_ ## soft_t(hr);                       \
++                return flags & float_muladd_negate_result ?             \
++                    soft_t ## _chs(r) : r;                              \
++            } else {                                                    \
++                host_t ha, hb, hc, hr;                                  \
++                soft_t r;                                               \
++                soft_t sa = flags & float_muladd_negate_product ?       \
++                    soft_t ## _chs(a) : a;                              \
++                soft_t sc = flags & float_muladd_negate_c ?             \
++                    soft_t ## _chs(c) : c;                              \
++                                                                        \
++                ha = soft_t ## _to_ ## host_t(sa);                      \
++                hb = soft_t ## _to_ ## host_t(b);                       \
++                hc = soft_t ## _to_ ## host_t(sc);                      \
++                hr = host_fma_f(ha, hb, hc);                            \
++                r = host_t ## _to_ ## soft_t(hr);                       \
++                                                                        \
++                if (unlikely(isinf(hr))) {                              \
++                    s->float_exception_flags |= float_flag_overflow;    \
++                } else if (unlikely(host_abs_f(hr) <= min_normal)) {    \
++                    goto soft;                                          \
++                }                                                       \
++                return flags & float_muladd_negate_result ?             \
++                    soft_t ## _chs(r) : r;                              \
++            }                                                           \
++        }                                                               \
++    soft:                                                               \
++        return soft_ ## soft_t ## _muladd(a, b, c, flags, s);           \
 +    }
 +
-+GEN_FPU_COMPARE(float32_compare, float32_compare_quiet, float32, float)
-+GEN_FPU_COMPARE(float64_compare, float64_compare_quiet, float64, double)
-+#undef GEN_FPU_COMPARE
++/* FMA generator for native floating point condition checks */
++#define GEN_FMA_FP(name, soft_t, host_t, host_fma_f, host_abs_f, min_normal) \
++    static soft_t \
++    name(soft_t a, soft_t b, soft_t c, int flags, float_status *s)      \
++    {                                                                   \
++        host_t ha, hb, hc;                                              \
++                                                                        \
++        if (QEMU_NO_HARDFLOAT) {                                        \
++            goto soft;                                                  \
++        }                                                               \
++        soft_t ## _input_flush3(&a, &b, &c, s);                         \
++        ha = soft_t ## _to_ ## host_t(a);                               \
++        hb = soft_t ## _to_ ## host_t(b);                               \
++        hc = soft_t ## _to_ ## host_t(c);                               \
++        if (likely((fpclassify(ha) == FP_NORMAL ||                      \
++                    fpclassify(ha) == FP_ZERO) &&                       \
++                   (fpclassify(hb) == FP_NORMAL ||                      \
++                    fpclassify(hb) == FP_ZERO) &&                       \
++                   (fpclassify(hc) == FP_NORMAL ||                      \
++                    fpclassify(hc) == FP_ZERO) &&                       \
++                   !(flags & float_muladd_halve_result) &&              \
++                   can_use_fpu(s))) {                                   \
++            if (soft_t ## _is_zero(a) || soft_t ## _is_zero(b)) {       \
++                soft_t p, r;                                            \
++                host_t hp, hc, hr;                                      \
++                bool prod_sign;                                         \
++                                                                        \
++                prod_sign = soft_t ## _is_neg(a) ^ soft_t ## _is_neg(b); \
++                prod_sign ^= !!(flags & float_muladd_negate_product);   \
++                p = soft_t ## _set_sign(soft_t ## _zero, prod_sign);    \
++                                                                        \
++                if (flags & float_muladd_negate_c) {                    \
++                    c = soft_t ## _chs(c);                              \
++                }                                                       \
++                                                                        \
++                hp = soft_t ## _to_ ## host_t(p);                       \
++                hc = soft_t ## _to_ ## host_t(c);                       \
++                hr = hp + hc;                                           \
++                r = host_t ## _to_ ## soft_t(hr);                       \
++                return flags & float_muladd_negate_result ?             \
++                    soft_t ## _chs(r) : r;                              \
++            } else {                                                    \
++                host_t hr;                                              \
++                                                                        \
++                if (flags & float_muladd_negate_product) {              \
++                    ha = -ha;                                           \
++                }                                                       \
++                if (flags & float_muladd_negate_c) {                    \
++                    hc = -hc;                                           \
++                }                                                       \
++                hr = host_fma_f(ha, hb, hc);                            \
++                if (unlikely(isinf(hr))) {                              \
++                    s->float_exception_flags |= float_flag_overflow;    \
++                } else if (unlikely(host_abs_f(hr) <= min_normal)) {    \
++                    goto soft;                                          \
++                }                                                       \
++                if (flags & float_muladd_negate_result) {               \
++                    hr = -hr;                                           \
++                }                                                       \
++                return host_t ## _to_ ## soft_t(hr);                    \
++            }                                                           \
++        }                                                               \
++    soft:                                                               \
++        return soft_ ## soft_t ## _muladd(a, b, c, flags, s);           \
++    }
 +
- /* Multiply A by 2 raised to the power N.  */
- static FloatParts scalbn_decomposed(FloatParts a, int n, float_status *s)
- {
++GEN_FMA_SF(f32_muladd, float32, float, fmaf, fabsf, FLT_MIN)
++GEN_FMA_SF(f64_muladd, float64, double, fma, fabs, DBL_MIN)
++#undef GEN_FMA_SF
++
++GEN_FMA_FP(float_muladd, float32, float, fmaf, fabsf, FLT_MIN)
++GEN_FMA_FP(double_muladd, float64, double, fma, fabs, DBL_MIN)
++#undef GEN_FMA_FP
++
++float32 __attribute__((flatten))
++float32_muladd(float32 a, float32 b, float32 c, int flags, float_status *s)
++{
++    if (QEMU_HARDFLOAT_3F32_USE_FP) {
++        return float_muladd(a, b, c, flags, s);
++    } else {
++        return f32_muladd(a, b, c, flags, s);
++    }
++}
++
++float64 __attribute__((flatten))
++float64_muladd(float64 a, float64 b, float64 c, int flags, float_status *s)
++{
++    if (QEMU_HARDFLOAT_3F64_USE_FP) {
++        return double_muladd(a, b, c, flags, s);
++    } else {
++        return f64_muladd(a, b, c, flags, s);
++    }
++}
++
+ /*
+  * Returns the result of dividing the floating-point value `a' by the
+  * corresponding value `b'. The operation is performed according to
 -- 
 2.17.1
