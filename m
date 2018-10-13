@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50159)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50810)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gBPlf-00031F-A4
-	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 15:40:07 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1gBPpm-0004Do-0d
+	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 15:44:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gBPlb-00076P-Q2
-	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 15:40:07 -0400
-Received: from mail-pf1-x42b.google.com ([2607:f8b0:4864:20::42b]:33983)
+	(envelope-from <richard.henderson@linaro.org>) id 1gBPpi-00011T-EE
+	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 15:44:21 -0400
+Received: from mail-pf1-x431.google.com ([2607:f8b0:4864:20::431]:39221)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gBPlb-00075U-CK
-	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 15:40:03 -0400
-Received: by mail-pf1-x42b.google.com with SMTP id f78-v6so2011840pfe.1
-	for <qemu-devel@nongnu.org>; Sat, 13 Oct 2018 12:40:03 -0700 (PDT)
+	id 1gBPph-00010k-D5
+	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 15:44:18 -0400
+Received: by mail-pf1-x431.google.com with SMTP id c25-v6so7779015pfe.6
+	for <qemu-devel@nongnu.org>; Sat, 13 Oct 2018 12:44:17 -0700 (PDT)
 References: <20181012173047.25420-1-kbastian@mail.uni-paderborn.de>
-	<20181012173047.25420-20-kbastian@mail.uni-paderborn.de>
+	<20181012173047.25420-21-kbastian@mail.uni-paderborn.de>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <b3a18b03-7ff9-eb2c-a86a-d8c2b3d94a18@linaro.org>
-Date: Sat, 13 Oct 2018 12:39:58 -0700
+Message-ID: <79fbf03c-da2e-52f2-e653-15be519d1194@linaro.org>
+Date: Sat, 13 Oct 2018 12:44:13 -0700
 MIME-Version: 1.0
-In-Reply-To: <20181012173047.25420-20-kbastian@mail.uni-paderborn.de>
+In-Reply-To: <20181012173047.25420-21-kbastian@mail.uni-paderborn.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 19/28] target/riscv: Replace gen_branch()
- with trans_branch()
+Subject: Re: [Qemu-devel] [PATCH 20/28] target/riscv: Replace gen_load()
+ with trans_load()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,10 +36,22 @@ To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, mjc@sifive.com, palmer@
 Cc: peer.adelt@hni.uni-paderborn.de, Alistair.Francis@wdc.com, qemu-devel@nongnu.org
 
 On 10/12/18 10:30 AM, Bastian Koppelmann wrote:
-> +static bool trans_branch(DisasContext *ctx, arg_branch *a, TCGCond cond)
+> +static bool trans_load(DisasContext *ctx, arg_lb *a, int memop)
 
-I think you should still call it gen_branch.
-Reserve the trans_ prefix for things called from the decoder.
+Again, gen_load.
+
+>  {
+> -    gen_load(ctx, OPC_RISC_LB, a->rd, a->rs1, a->imm);
+> +    TCGv t0 = tcg_temp_new();
+> +    TCGv t1 = tcg_temp_new();
+> +    gen_get_gpr(t0, a->rs1);
+> +    tcg_gen_addi_tl(t0, t0, a->imm);
+> +
+> +    if (memop < 0) {
+> +        return false;
+> +    }
+
+This can't happen anymore.
 
 Otherwise,
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
