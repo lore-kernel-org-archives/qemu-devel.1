@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44850)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gBKuH-0007L6-Rq
-	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 10:28:42 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gBLe1-0006Rx-Dv
+	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 11:15:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gBKuH-00034E-4U
-	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 10:28:41 -0400
-References: <20181013050227.17022-1-ehabkost@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <30a1d2bf-011e-01b0-ccf1-a9f5bef6c5bd@redhat.com>
-Date: Sat, 13 Oct 2018 09:28:27 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gBLe0-0004PP-Ow
+	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 11:15:57 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:39405)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gBLe0-0004OW-IU
+	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 11:15:56 -0400
+Received: by mail-wr1-x444.google.com with SMTP id 61-v6so16444471wrb.6
+	for <qemu-devel@nongnu.org>; Sat, 13 Oct 2018 08:15:56 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Sat, 13 Oct 2018 17:15:41 +0200
+Message-Id: <20181013151545.3731-3-f4bug@amsat.org>
+In-Reply-To: <20181013151545.3731-1-f4bug@amsat.org>
+References: <20181013151545.3731-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20181013050227.17022-1-ehabkost@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC] Require Python 3 for building QEMU
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [RFC PATCH v3 2/6] tests/acceptance: Add a kludge to
+ not use the default console
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,29 +34,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, =?UTF-8?q?Luk=C3=A1=C5=A1=20Doktor?= <ldoktor@redhat.com>, Fam Zheng <famz@redhat.com>
 
-On 10/13/18 12:02 AM, Eduardo Habkost wrote:
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
+The board already instantiate the proper devices, we don't want to
+add extra devices but connect the chardev to one of the serial already
+available.
 
-Commit message is sparse; can you do something like commit e7b3af81 
-where you call out the availability of python 3 on all the platforms 
-that are currently supported per our platforms doc?
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ scripts/qemu.py | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-> I'd like to do this in QEMU 3.1.  I think it's time to drop
-> support for old systems that have only Python 2.
-> 
-> We still have a few scripts that are not required for building
-> QEMU that still work only with Python 2 (iotests being the most
-> relevant set).  Requiring Python 3 for building QEMU won't
-> prevent people from using those scripts with Python 2 until they
-> are finally ported.
-
-How much effort is it to complete the porting?
-
+diff --git a/scripts/qemu.py b/scripts/qemu.py
+index fca9b76990..7e779954e6 100644
+--- a/scripts/qemu.py
++++ b/scripts/qemu.py
+@@ -221,8 +221,10 @@ class QEMUMachine(object):
+                                                  self._name + "-console.sock")
+             chardev = ('socket,id=console,path=%s,server,nowait' %
+                        self._console_address)
+-            device = '%s,chardev=console' % self._console_device_type
+-            args.extend(['-chardev', chardev, '-device', device])
++            args.extend(['-chardev', chardev])
++            if len(self._console_device_type):
++                device = '%s,chardev=console' % self._console_device_type
++                args.extend(['-device', device])
+         return args
+ 
+     def _pre_launch(self):
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.19.1
