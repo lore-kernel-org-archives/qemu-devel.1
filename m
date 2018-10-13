@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57433)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42204)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gBGc0-0002hk-Pv
-	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 05:53:33 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gBHmu-0005Zr-Ol
+	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 07:08:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gBGbz-00015F-E5
-	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 05:53:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39246)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gBGby-00014n-Rw
-	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 05:53:30 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B726EBB0E
-	for <qemu-devel@nongnu.org>; Sat, 13 Oct 2018 09:53:29 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sat, 13 Oct 2018 11:53:22 +0200
-Message-Id: <1539424403-2884-2-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1539424403-2884-1-git-send-email-pbonzini@redhat.com>
-References: <1539424403-2884-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/2] scsi-disk: fix double completion of
- failing passthrough requests
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gBHmp-000619-R4
+	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 07:08:52 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:51931)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gBHmp-00060r-Jj
+	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 07:08:47 -0400
+Received: by mail-wm1-x344.google.com with SMTP id 143-v6so14438455wmf.1
+	for <qemu-devel@nongnu.org>; Sat, 13 Oct 2018 04:08:47 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20181009232607.15521-1-crosa@redhat.com>
+	<20181009232607.15521-8-crosa@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <f64fd819-8977-bcc0-97db-84ef4c83a046@amsat.org>
+Date: Sat, 13 Oct 2018 13:08:42 +0200
+MIME-Version: 1.0
+In-Reply-To: <20181009232607.15521-8-crosa@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 7/7] Acceptance Tests: change the
+ handling of tests for specific archs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,61 +36,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com
+To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
+Cc: Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laszlo Ersek <lersek@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <pmathieu@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Caio Carrara <ccarrara@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-If a command fails with a sense that scsi_sense_buf_to_errno converts to
-ECANCELED/EAGAIN/ENOTCONN or with a unit attention, scsi_req_complete is
-called twice.  This caused a crash.
+Hi Cleber,
 
-Reported-by: Wangguang <wang.guangA@h3c.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- hw/scsi/scsi-disk.c | 24 +++++++++++-------------
- 1 file changed, 11 insertions(+), 13 deletions(-)
+On 10/10/18 1:26 AM, Cleber Rosa wrote:
+> With the introduction of a variants file that can run the same
+> tests on various architectures, it makes sense to make most tests
+> to be reusable on those environments.  The exception should be
+> when a test is really testing a specific architecture feature.
+> 
+> With the change proposed here, on a command line such as:
+> 
+>   $ avocado run \
+>      --json-variants-load=tests/acceptance/variants/arch.json \
+>      -- tests/acceptance/
+> 
+> The boot_linux_console.py tests will appear as "CANCELED: Currently
+> specific to the x86_64 arch", which is as a good thing when compared
+> to being ignored by tags because:
+> 
+>  * The architecture specific parts can be addressed
+>  * It will be run on the matching architecture (as opposed to always
+>    being filtered out by the tags mechanism)
+>  * CANCELED tests do no influence negatively the overall job results,
+>    they're not considered an error or failure
+> 
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> ---
+>  tests/acceptance/boot_linux_console.py | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
+> index 58032f971c..ba3ac036da 100644
+> --- a/tests/acceptance/boot_linux_console.py
+> +++ b/tests/acceptance/boot_linux_console.py
+> @@ -19,12 +19,13 @@ class BootLinuxConsole(Test):
+>      and the kernel command line is properly passed from QEMU to the kernel
+>  
+>      :avocado: enable
+> -    :avocado: tags=x86_64
 
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index c43163c..4074d7c 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -441,9 +441,18 @@ static bool scsi_handle_rw_error(SCSIDiskReq *r, int error, bool acct_failed)
-         }
-         switch (error) {
-         case 0:
--            /* The command has run, no need to fake sense.  */
-+            /* A passthrough command has run and has produced sense data; check
-+             * whether the error has to be handled by the guest or should rather
-+             * pause the host.
-+             */
-             assert(r->status && *r->status);
--            scsi_req_complete(&r->req, *r->status);
-+            error = scsi_sense_buf_to_errno(r->req.sense, sizeof(r->req.sense));
-+            if (error == ECANCELED || error == EAGAIN || error == ENOTCONN ||
-+                error == 0)  {
-+                /* These errors are handled by guest. */
-+                scsi_req_complete(&r->req, *r->status);
-+                return true;
-+            }
-             break;
-         case ENOMEDIUM:
-             scsi_check_condition(r, SENSE_CODE(NO_MEDIUM));
-@@ -462,17 +471,6 @@ static bool scsi_handle_rw_error(SCSIDiskReq *r, int error, bool acct_failed)
-             break;
-         }
-     }
--    if (!error) {
--        assert(r->status && *r->status);
--        error = scsi_sense_buf_to_errno(r->req.sense, sizeof(r->req.sense));
--
--        if (error == ECANCELED || error == EAGAIN || error == ENOTCONN ||
--            error == 0)  {
--            /* These errors are handled by guest. */
--            scsi_req_complete(&r->req, *r->status);
--            return true;
--        }
--    }
- 
-     blk_error_action(s->qdev.conf.blk, action, is_read, error);
-     if (action == BLOCK_ERROR_ACTION_STOP) {
--- 
-1.8.3.1
+Can we keep a such tag (in format 'arch:x86_64') ...
+
+>      """
+>  
+>      timeout = 60
+>  
+>      def test(self):
+> +        if self.arch != 'x86_64':
+> +            self.cancel('Currently specific to the x86_64 target arch')
+
+... and have this check generic? (Eventually via a QemuTest(Test) parent
+class).
+
+>          kernel_url = ('https://mirrors.kernel.org/fedora/releases/28/'
+>                        'Everything/x86_64/os/images/pxeboot/vmlinuz')
+>          kernel_hash = '238e083e114c48200f80d889f7e32eeb2793e02a'
+> 
