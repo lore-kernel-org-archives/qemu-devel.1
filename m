@@ -1,31 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54104)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33967)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gBLe7-0006Uo-Cs
-	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 11:16:06 -0400
+	id 1gBMHU-0007U5-QR
+	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 11:56:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gBLe6-0004Um-6j
-	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 11:16:03 -0400
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:45980)
+	id 1gBMHR-0000ne-II
+	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 11:56:44 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:43581)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gBLe5-0004Tq-UU
-	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 11:16:02 -0400
-Received: by mail-wr1-x42e.google.com with SMTP id q5-v6so16446547wrw.12
-	for <qemu-devel@nongnu.org>; Sat, 13 Oct 2018 08:16:01 -0700 (PDT)
+	id 1gBMHR-0000nF-7j
+	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 11:56:41 -0400
+Received: by mail-wr1-x444.google.com with SMTP id n1-v6so16503860wrt.10
+	for <qemu-devel@nongnu.org>; Sat, 13 Oct 2018 08:56:41 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Sat, 13 Oct 2018 17:15:45 +0200
-Message-Id: <20181013151545.3731-7-f4bug@amsat.org>
-In-Reply-To: <20181013151545.3731-1-f4bug@amsat.org>
 References: <20181013151545.3731-1-f4bug@amsat.org>
+	<20181013151545.3731-6-f4bug@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <ad5c71eb-4860-003a-d23b-a30888525c0b@amsat.org>
+Date: Sat, 13 Oct 2018 17:56:37 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20181013151545.3731-6-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH v3 6/6] tests/acceptance: Add test_sh4_r2d
- in BootLinuxTracing
+Subject: Re: [Qemu-devel] [PATCH v3 5/6] tests/acceptance: Add test_sh4_r2d
+ in BootLinuxConsole
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,131 +36,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, BALATON Zoltan <balaton@eik.bme.hu>, Magnus Damm <magnus.damm@gmail.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, =?UTF-8?q?Luk=C3=A1=C5=A1=20Doktor?= <ldoktor@redhat.com>, Fam Zheng <famz@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, BALATON Zoltan <balaton@eik.bme.hu>, Magnus Damm <magnus.damm@gmail.com>
+Cc: qemu-devel@nongnu.org, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, Fam Zheng <famz@redhat.com>
 
-Similar to the test_x86_64_pc test, this boots a Linux kernel on a
-R2D board (SH4 little-endian) and verify the usb is working by looking
-at the usb trace events. Thus this test requires the QEMU binary to be
-compiled with:
+On 10/13/18 5:15 PM, Philippe Mathieu-Daudé wrote:
+> Similar to the test_x86_64_pc test, this boots a Linux kernel on a
+> R2D board (SH4 little-endian) and verify the serial is working.
+> 
+> This test requires the dpkg-deb tool (apt/dnf install dpkg) to
+> extract the kernel from the Debian package.
+> 
+> Note, due to a problem with the serial on this machine, this test
+> is currently disabled.
 
-  $ configure ... --enable-trace-backends=log
+Reading [1] "SH7751R has both SCI and SCIF ports. ttySC1 is the second
+(SCIF) port." and [2] I could figure the correct kernel arguments and
+the -serial argument out.
 
-This test also requires the dpkg-deb tool (apt/dnf install dpkg) to
-extract the kernel from the Debian package.
+[1] http://lists.busybox.net/pipermail/buildroot/2011-October/047070.html
+[2] http://lists.busybox.net/pipermail/buildroot/2011-October/047070.html
 
-  $ avocado --show=app,trace run -p arch=sh4 tests/acceptance/boot_linux_console.py
-  JOB ID     : dc45be27f5d1edb8289a1ede139e107bbc55b045
-  JOB LOG    : /home/phil/avocado/job-results/job-2018-10-13T14.46-dc45be2/job.log
-   (1/5) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_x86_64_pc: CANCEL: Currently specific to the x86_64 target arch (0.00 s)
-   (2/5) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_mips_4kc_malta: CANCEL: Currently specific to the sh4 target arch (0.00 s)
-   (3/5) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_mipsel_5kc_malta: CANCEL: Currently specific to the sh4 target arch (0.00 s)
-   (4/5) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_sh4_r2d: SKIP: console not working on r2d machine
-   (5/5) tests/acceptance/boot_linux_console.py:BootLinuxTracing.test_sh4_r2d:  /
-  trace: 22770@1539434809.450006:usb_ohci_init_time usb_bit_time=1000000 usb_frame_time=83
-  trace: 22770@1539434809.453017:usb_ohci_port_attach port #0
-  trace: 22770@1539434809.454827:usb_ohci_reset sysbus-ohci
-  trace: 22770@1539434809.454833:usb_ohci_stop sysbus-ohci: USB Suspended
-  trace: 22770@1539434809.454835:usb_ohci_stop sysbus-ohci: USB Suspended
-  trace: 22770@1539434809.454837:usb_ohci_port_detach port #0
-  trace: 22770@1539434809.454839:usb_ohci_port_attach port #0
-  trace: 22770@1539434811.588702:usb_ohci_reset sysbus-ohci
-  trace: 22770@1539434811.588711:usb_ohci_stop sysbus-ohci: USB Suspended
-  trace: 22770@1539434811.589062:usb_ohci_set_ctl sysbus-ohci: new state 0x80
-  trace: 22770@1539434811.589067:usb_ohci_start sysbus-ohci: USB Operational
-  trace: 22770@1539434811.589253:usb_ohci_hub_power_up powered up all ports
-  PASS (2.43 s)
-  RESULTS    : PASS 1 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | CANCEL 3
-  JOB TIME   : 2.67 s
+With the following patch:
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- tests/acceptance/boot_linux_console.py | 64 ++++++++++++++++++++++++++
- 1 file changed, 64 insertions(+)
-
-diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-index 8f99cc0d7c..e11993bf98 100644
---- a/tests/acceptance/boot_linux_console.py
-+++ b/tests/acceptance/boot_linux_console.py
-@@ -8,11 +8,22 @@
- # This work is licensed under the terms of the GNU GPL, version 2 or
- # later.  See the COPYING file in the top-level directory.
- 
-+import os
- import logging
+-- >8 --
+@@ -13,5 +13,4 @@ import logging
  import subprocess
- 
- from avocado import skip
+
+-from avocado import skip
  from avocado_qemu import Test
-+from avocado.utils.wait import wait_for
-+
-+
-+def read_stream_for_string(stream, expected_string, logger=None):
-+    msg = stream.readline()
-+    if len(msg) == 0:
-+        return False
-+    if logger:
-+        logger.debug(msg.strip())
-+    return expected_string in msg
- 
- 
- class BootLinuxConsole(Test):
-@@ -185,3 +196,56 @@ class BootLinuxConsole(Test):
-                 break
-             if 'Kernel panic - not syncing' in msg:
+ from avocado.utils.wait import wait_for
+@@ -151,5 +150,4 @@ class BootLinuxConsole(Test):
                  self.fail("Kernel panic reached")
-+
-+class BootLinuxTracing(Test):
-+    """
-+    Boots a Linux kernel and checks that via the Tracing framework that
-+    a specific trace events occured, demostrating the kernel is operational.
-+
-+    :avocado: enable
-+    """
-+
-+    timeout = 60
-+
-+    def test_sh4_r2d(self):
-+        """
-+        This test requires the dpkg-deb tool (apt/dnf install dpkg) to extract
-+        the kernel from the Debian package.
-+        This test also requires the QEMU binary to be compiled with:
-+
-+          $ configure ... --enable-trace-backends=log
-+
-+        The kernel can be rebuilt using this Debian kernel source [1] and
-+        following the instructions on [2].
-+
-+        [1] https://kernel-team.pages.debian.net/kernel-handbook/ch-common-tasks.html#s-common-official
-+        [2] http://snapshot.debian.org/package/linux-2.6/2.6.32-30/#linux-source-2.6.32_2.6.32-30
-+
-+        :avocado: tags=arch:sh4
-+        """
-+        if self.arch != 'sh4':
-+            self.cancel('Currently specific to the %s target arch' % self.arch)
-+
-+        deb_url = ('http://snapshot.debian.org/archive/'
-+                   'debian-ports/20110116T065852Z/pool-sh4/main/l/'
-+                   'linux-2.6/linux-image-2.6.32-5-sh7751r_2.6.32-30_sh4.deb')
-+        deb_hash = '8025e503319dc8ad786756e3afaa8eb868e9ef59'
-+        deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
-+        subprocess.check_call(['dpkg-deb', '--extract', deb_path, self.workdir])
-+        kernel_path = self.workdir + '/boot/vmlinuz-2.6.32-5-sh7751r'
-+        trace_path = os.path.join(self.workdir, 'trace.log')
-+        trace_logger = logging.getLogger('trace')
-+
-+        self.vm.set_arch(self.arch)
-+        self.vm.set_machine('r2d')
-+        kernel_command_line = 'noiotrap'
-+        self.vm.add_args('-trace', "enable=usb_ohci_*,file=" + trace_path,
-+                         '-kernel', kernel_path,
-+                         '-append', kernel_command_line)
-+
-+        self.vm.launch()
-+        if not wait_for(read_stream_for_string, timeout=15, step=0,
-+                        args=(open(trace_path),
-+                              'usb_ohci_hub_power_up powered up all ports',
-+                              trace_logger)):
-+            self.fail("Machine failed to boot")
--- 
-2.19.1
+
+-    @skip("console not working on r2d machine")
+     def test_sh4_r2d(self):
+         """
+@@ -182,6 +180,8 @@ class BootLinuxConsole(Test):
+         self.vm.set_machine('r2d')
+         self.vm.set_console("") # XXX
+-        kernel_command_line = 'console=ttyS0 printk.time=0 noiotrap'
+-        self.vm.add_args('-serial', "chardev:console",
++        kernel_command_line = 'console=ttySC0 printk.time=0 noiotrap'
++        self.vm.add_args('-serial', 'null',
++                         '-serial', "chardev:console",
++                         '-display', 'none',
+                          '-kernel', kernel_path,
+                          '-append', kernel_command_line)
+---
+
+I finally get:
+
+ (1/4)
+tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_x86_64_pc:
+CANCEL: Currently specific to the x86_64 target arch (0.00 s)
+ (2/4)
+tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_mips_4kc_malta:
+CANCEL: Currently specific to the sh4 target arch (0.00 s)
+ (3/4)
+tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_mipsel_5kc_malta:
+CANCEL: Currently specific to the sh4 target arch (0.00 s)
+ (4/4)
+tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_sh4_r2d: /
+console: [    0.000000] Initializing cgroup subsys cpuset
+console: [    0.000000] Initializing cgroup subsys cpu
+console: [    0.000000] Linux version 2.6.32-5-sh7751r (Debian
+2.6.32-30) (ben@decadent.org.uk) (gcc version 4.3.5 (Debian 4.3.5-4) )
+#1 Thu Jan 13 08:23:18 UTC 2011
+console: [    0.000000] Boot params:
+console: [    0.000000] ... MOUNT_ROOT_RDONLY - 00000000
+console: [    0.000000] ... RAMDISK_FLAGS     - 00000000
+console: [    0.000000] ... ORIG_ROOT_DEV     - 00000000
+console: [    0.000000] ... LOADER_TYPE       - 00000000
+console: [    0.000000] ... INITRD_START      - 00000000
+console: [    0.000000] ... INITRD_SIZE       - 00000000
+console: [    0.000000] Booting machvec: RTS7751R2D
+console: [    0.000000] Renesas Technology Sales RTS7751R2D support.
+console: [    0.000000] FPGA version:1 (revision:0)
+console: [    0.000000] Node 0: start_pfn = 0xc000, low = 0x10000
+console: [    0.000000] Zone PFN ranges:
+console: [    0.000000]   Normal   0x0000c000 -> 0x00010000
+console: [    0.000000] Movable zone start PFN for each node
+console: [    0.000000] early_node_map[1] active PFN ranges
+console: [    0.000000]     0: 0x0000c000 -> 0x00010000
+console: [    0.000000] Built 1 zonelists in Zone order, mobility
+grouping on.  Total pages: 16256
+console: [    0.000000] Kernel command line: console=ttySC0
+printk.time=0 noiotrap
+PASS (1.92 s)
+
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  tests/acceptance/boot_linux_console.py | 48 ++++++++++++++++++++++++++
+>  1 file changed, 48 insertions(+)
+> 
+> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
+> index e4a60297bf..8f99cc0d7c 100644
+> --- a/tests/acceptance/boot_linux_console.py
+> +++ b/tests/acceptance/boot_linux_console.py
+> @@ -11,6 +11,7 @@
+>  import logging
+>  import subprocess
+>  
+> +from avocado import skip
+>  from avocado_qemu import Test
+>  
+>  
+> @@ -137,3 +138,50 @@ class BootLinuxConsole(Test):
+>                  break
+>              if 'Kernel panic - not syncing' in msg:
+>                  self.fail("Kernel panic reached")
+> +
+> +    @skip("console not working on r2d machine")
+> +    def test_sh4_r2d(self):
+> +        """
+> +        This test requires the dpkg-deb tool (apt/dnf install dpkg) to extract
+> +        the kernel from the Debian package.
+> +        This test also requires the QEMU binary to be compiled with:
+> +
+> +          $ configure ... --enable-trace-backends=log
+> +
+> +        The kernel can be rebuilt using this Debian kernel source [1] and
+> +        following the instructions on [2].
+> +
+> +        [1] https://kernel-team.pages.debian.net/kernel-handbook/ch-common-tasks.html#s-common-official
+> +        [2] http://snapshot.debian.org/package/linux-2.6/2.6.32-30/#linux-source-2.6.32_2.6.32-30
+> +
+> +        :avocado: tags=arch:sh4
+> +        """
+> +        if self.arch != 'sh4':
+> +            self.cancel('Currently specific to the %s target arch' % self.arch)
+> +
+> +        deb_url = ('http://snapshot.debian.org/archive/'
+> +                   'debian-ports/20110116T065852Z/pool-sh4/main/l/'
+> +                   'linux-2.6/linux-image-2.6.32-5-sh7751r_2.6.32-30_sh4.deb')
+> +        deb_hash = '8025e503319dc8ad786756e3afaa8eb868e9ef59'
+> +        deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
+> +        subprocess.check_call(['dpkg-deb', '--extract', deb_path, self.workdir])
+> +        kernel_path = self.workdir + '/boot/vmlinuz-2.6.32-5-sh7751r'
+> +
+> +        self.vm.set_arch(self.arch)
+> +        self.vm.set_machine('r2d')
+> +        self.vm.set_console("") # XXX
+> +        kernel_command_line = 'console=ttyS0 printk.time=0 noiotrap'
+> +        self.vm.add_args('-serial', "chardev:console",
+> +                         '-kernel', kernel_path,
+> +                         '-append', kernel_command_line)
+> +
+> +        self.vm.launch()
+> +        console = self.vm.console_socket.makefile()
+> +        console_logger = logging.getLogger('console')
+> +        while True:
+> +            msg = console.readline()
+> +            console_logger.debug(msg.strip())
+> +            if 'Kernel command line: %s' % kernel_command_line in msg:
+> +                break
+> +            if 'Kernel panic - not syncing' in msg:
+> +                self.fail("Kernel panic reached")
+> 
