@@ -1,18 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47247)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1gBFSr-0000bb-Iy
-	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 04:40:02 -0400
+	(envelope-from <liq3ea@163.com>) id 1gBFfA-0002ph-9l
+	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 04:52:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1gBFSn-0002UA-3J
-	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 04:40:01 -0400
-Received: from m12-13.163.com ([220.181.12.13]:43155)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1gBFSm-0002TZ-6r
-	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 04:39:57 -0400
+	(envelope-from <liq3ea@163.com>) id 1gBFf9-0002PT-9D
+	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 04:52:44 -0400
 From: Li Qiang <liq3ea@163.com>
-Date: Sat, 13 Oct 2018 01:39:49 -0700
-Message-Id: <20181013083949.55346-1-liq3ea@163.com>
-Subject: [Qemu-devel] [PATCH] hw: scsi-disk: make it more QOMconventional
+Date: Sat, 13 Oct 2018 01:52:31 -0700
+Message-Id: <20181013085231.55608-1-liq3ea@163.com>
+Subject: [Qemu-devel] [PATCH] block: change some function return type to bool
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,136 +17,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, famz@redhat.com
-Cc: qemu-devel@nongnu.org, Li Qiang <liq3ea@163.com>
+To: kwolf@redhat.com, mreitz@redhat.com
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Li Qiang <liq3ea@163.com>
 
 Signed-off-by: Li Qiang <liq3ea@163.com>
 ---
- hw/scsi/scsi-disk.c | 28 ++++++++++++++++------------
- 1 file changed, 16 insertions(+), 12 deletions(-)
+ block/block-backend.c          | 8 ++++----
+ include/sysemu/block-backend.h | 6 +++---
+ 2 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index c43163cef4..15582fa0e2 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -55,6 +55,10 @@ do { printf("scsi-disk: " fmt , ## __VA_ARGS__); } while (0)
- #define DEFAULT_MAX_IO_SIZE         INT_MAX     /* 2 GB - 1 block */
- 
- #define TYPE_SCSI_DISK_BASE         "scsi-disk-base"
-+#define TYPE_SCSI_DISK              "scsi-disk"
-+#define TYPE_SCSI_HD                "scsi-hd"
-+#define TYPE_SCSI_BLOCK             "scsi-block"
-+#define TYPE_SCSI_CD                "scsi-cd"
- 
- #define SCSI_DISK_BASE(obj) \
-      OBJECT_CHECK(SCSIDiskState, (obj), TYPE_SCSI_DISK_BASE)
-@@ -2357,7 +2361,7 @@ static const BlockDevOps scsi_disk_block_ops = {
- 
- static void scsi_disk_unit_attention_reported(SCSIDevice *dev)
- {
--    SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, dev);
-+    SCSIDiskState *s = SCSI_DISK_BASE(dev);
-     if (s->media_changed) {
-         s->media_changed = false;
-         scsi_device_set_ua(&s->qdev, SENSE_CODE(MEDIUM_CHANGED));
-@@ -2366,7 +2370,7 @@ static void scsi_disk_unit_attention_reported(SCSIDevice *dev)
- 
- static void scsi_realize(SCSIDevice *dev, Error **errp)
- {
--    SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, dev);
-+    SCSIDiskState *s = SCSI_DISK_BASE(dev);
- 
-     if (!s->qdev.conf.blk) {
-         error_setg(errp, "drive property not set");
-@@ -2429,7 +2433,7 @@ static void scsi_realize(SCSIDevice *dev, Error **errp)
- 
- static void scsi_hd_realize(SCSIDevice *dev, Error **errp)
- {
--    SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, dev);
-+    SCSIDiskState *s = SCSI_DISK_BASE(dev);
-     /* can happen for devices without drive. The error message for missing
-      * backend will be issued in scsi_realize
-      */
-@@ -2446,7 +2450,7 @@ static void scsi_hd_realize(SCSIDevice *dev, Error **errp)
- 
- static void scsi_cd_realize(SCSIDevice *dev, Error **errp)
- {
--    SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, dev);
-+    SCSIDiskState *s = SCSI_DISK_BASE(dev);
-     int ret;
- 
-     if (!dev->conf.blk) {
-@@ -2549,7 +2553,7 @@ static const SCSIReqOps *const scsi_disk_reqops_dispatch[256] = {
- static SCSIRequest *scsi_new_request(SCSIDevice *d, uint32_t tag, uint32_t lun,
-                                      uint8_t *buf, void *hba_private)
- {
--    SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, d);
-+    SCSIDiskState *s = SCSI_DISK_BASE(d);
-     SCSIRequest *req;
-     const SCSIReqOps *ops;
-     uint8_t command;
-@@ -2601,7 +2605,7 @@ static int get_device_type(SCSIDiskState *s)
- 
- static void scsi_block_realize(SCSIDevice *dev, Error **errp)
- {
--    SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, dev);
-+    SCSIDiskState *s = SCSI_DISK_BASE(dev);
-     int sg_version;
-     int rc;
- 
-@@ -2879,7 +2883,7 @@ static SCSIRequest *scsi_block_new_request(SCSIDevice *d, uint32_t tag,
-                                            uint32_t lun, uint8_t *buf,
-                                            void *hba_private)
- {
--    SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, d);
-+    SCSIDiskState *s = SCSI_DISK_BASE(d);
- 
-     if (scsi_block_is_passthrough(s, buf)) {
-         return scsi_req_alloc(&scsi_generic_req_ops, &s->qdev, tag, lun,
-@@ -2893,7 +2897,7 @@ static SCSIRequest *scsi_block_new_request(SCSIDevice *d, uint32_t tag,
- static int scsi_block_parse_cdb(SCSIDevice *d, SCSICommand *cmd,
-                                   uint8_t *buf, void *hba_private)
- {
--    SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, d);
-+    SCSIDiskState *s = SCSI_DISK_BASE(d);
- 
-     if (scsi_block_is_passthrough(s, buf)) {
-         return scsi_bus_parse_cdb(&s->qdev, cmd, buf, hba_private);
-@@ -3002,7 +3006,7 @@ static void scsi_hd_class_initfn(ObjectClass *klass, void *data)
+diff --git a/block/block-backend.c b/block/block-backend.c
+index dc0cd57724..2a8f3b55f8 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -1708,7 +1708,7 @@ void blk_error_action(BlockBackend *blk, BlockErrorAction action,
+     }
  }
  
- static const TypeInfo scsi_hd_info = {
--    .name          = "scsi-hd",
-+    .name          = TYPE_SCSI_HD,
-     .parent        = TYPE_SCSI_DISK_BASE,
-     .class_init    = scsi_hd_class_initfn,
- };
-@@ -3033,7 +3037,7 @@ static void scsi_cd_class_initfn(ObjectClass *klass, void *data)
+-int blk_is_read_only(BlockBackend *blk)
++bool blk_is_read_only(BlockBackend *blk)
+ {
+     BlockDriverState *bs = blk_bs(blk);
+ 
+@@ -1719,18 +1719,18 @@ int blk_is_read_only(BlockBackend *blk)
+     }
  }
  
- static const TypeInfo scsi_cd_info = {
--    .name          = "scsi-cd",
-+    .name          = TYPE_SCSI_HD,
-     .parent        = TYPE_SCSI_DISK_BASE,
-     .class_init    = scsi_cd_class_initfn,
- };
-@@ -3071,7 +3075,7 @@ static void scsi_block_class_initfn(ObjectClass *klass, void *data)
+-int blk_is_sg(BlockBackend *blk)
++bool blk_is_sg(BlockBackend *blk)
+ {
+     BlockDriverState *bs = blk_bs(blk);
+ 
+     if (!bs) {
+-        return 0;
++        return false;
+     }
+ 
+     return bdrv_is_sg(bs);
  }
  
- static const TypeInfo scsi_block_info = {
--    .name          = "scsi-block",
-+    .name          = TYPE_SCSI_BLOCK,
-     .parent        = TYPE_SCSI_DISK_BASE,
-     .class_init    = scsi_block_class_initfn,
- };
-@@ -3111,7 +3115,7 @@ static void scsi_disk_class_initfn(ObjectClass *klass, void *data)
+-int blk_enable_write_cache(BlockBackend *blk)
++bool blk_enable_write_cache(BlockBackend *blk)
+ {
+     return blk->enable_write_cache;
  }
- 
- static const TypeInfo scsi_disk_info = {
--    .name          = "scsi-disk",
-+    .name          = TYPE_SCSI_DISK,
-     .parent        = TYPE_SCSI_DISK_BASE,
-     .class_init    = scsi_disk_class_initfn,
- };
+diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
+index 830d873f24..c96bcdee14 100644
+--- a/include/sysemu/block-backend.h
++++ b/include/sysemu/block-backend.h
+@@ -166,9 +166,9 @@ BlockErrorAction blk_get_error_action(BlockBackend *blk, bool is_read,
+                                       int error);
+ void blk_error_action(BlockBackend *blk, BlockErrorAction action,
+                       bool is_read, int error);
+-int blk_is_read_only(BlockBackend *blk);
+-int blk_is_sg(BlockBackend *blk);
+-int blk_enable_write_cache(BlockBackend *blk);
++bool blk_is_read_only(BlockBackend *blk);
++bool blk_is_sg(BlockBackend *blk);
++bool blk_enable_write_cache(BlockBackend *blk);
+ void blk_set_enable_write_cache(BlockBackend *blk, bool wce);
+ void blk_invalidate_cache(BlockBackend *blk, Error **errp);
+ bool blk_is_inserted(BlockBackend *blk);
 -- 
 2.17.1
