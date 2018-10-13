@@ -1,14 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45122)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gBC4e-0004Xb-LI
-	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 01:02:49 -0400
+	(envelope-from <liq3ea@163.com>) id 1gBCpZ-0003iD-Mr
+	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 01:51:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gBC4d-00015E-SB
-	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 01:02:48 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Sat, 13 Oct 2018 02:02:27 -0300
-Message-Id: <20181013050227.17022-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [RFC] Require Python 3 for building QEMU
+	(envelope-from <liq3ea@163.com>) id 1gBCpV-0005e5-JH
+	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 01:51:17 -0400
+Received: from m12-15.163.com ([220.181.12.15]:39934)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <liq3ea@163.com>) id 1gBCpU-0005Pi-N1
+	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 01:51:13 -0400
+From: Li Qiang <liq3ea@163.com>
+Date: Fri, 12 Oct 2018 22:51:03 -0700
+Message-Id: <20181013055103.51451-1-liq3ea@163.com>
+Subject: [Qemu-devel] [PATCH] hw: edu: drop DO_UPCAST
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,66 +21,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>
-Cc: qemu-block@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: pbonzini@redhat.com
+Cc: qemu-devel@nongnu.org, Li Qiang <liq3ea@163.com>
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Li Qiang <liq3ea@163.com>
 ---
-I'd like to do this in QEMU 3.1.  I think it's time to drop
-support for old systems that have only Python 2.
+ hw/misc/edu.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-We still have a few scripts that are not required for building
-QEMU that still work only with Python 2 (iotests being the most
-relevant set).  Requiring Python 3 for building QEMU won't
-prevent people from using those scripts with Python 2 until they
-are finally ported.
----
- configure   | 8 ++++----
- .travis.yml | 2 +-
- 2 files changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/configure b/configure
-index f89d293585..43b45745dc 100755
---- a/configure
-+++ b/configure
-@@ -885,7 +885,7 @@ fi
+diff --git a/hw/misc/edu.c b/hw/misc/edu.c
+index 0687ffd343..cdcf550dd7 100644
+--- a/hw/misc/edu.c
++++ b/hw/misc/edu.c
+@@ -342,7 +342,7 @@ static void *edu_fact_thread(void *opaque)
  
- : ${make=${MAKE-make}}
- : ${install=${INSTALL-install}}
--: ${python=${PYTHON-python}}
-+: ${python=${PYTHON-python3}}
- : ${smbd=${SMBD-/usr/sbin/smbd}}
+ static void pci_edu_realize(PCIDevice *pdev, Error **errp)
+ {
+-    EduState *edu = DO_UPCAST(EduState, pdev, pdev);
++    EduState *edu = EDU(pdev);
+     uint8_t *pci_conf = pdev->config;
  
- # Default objcc to clang if available, otherwise use CC
-@@ -1730,13 +1730,13 @@ exit 0
- fi
+     pci_config_set_interrupt_pin(pci_conf, 1);
+@@ -365,7 +365,7 @@ static void pci_edu_realize(PCIDevice *pdev, Error **errp)
  
- if ! has $python; then
--  error_exit "Python not found. Use --python=/path/to/python"
-+  error_exit "Python 3 not found. Use --python=/path/to/python"
- fi
+ static void pci_edu_uninit(PCIDevice *pdev)
+ {
+-    EduState *edu = DO_UPCAST(EduState, pdev, pdev);
++    EduState *edu = EDU(pdev);
  
- # Note that if the Python conditional here evaluates True we will exit
- # with status 1 which is a shell 'false' value.
--if ! $python -c 'import sys; sys.exit(sys.version_info < (2,7))'; then
--  error_exit "Cannot use '$python', Python 2 >= 2.7 or Python 3 is required." \
-+if ! $python -c 'import sys; sys.exit(sys.version_info < (3,0))'; then
-+  error_exit "Cannot use '$python', Python 3 is required." \
-       "Use --python=/path/to/python to specify a supported Python."
- fi
- 
-diff --git a/.travis.yml b/.travis.yml
-index 95be6ec59f..caca9685fa 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -5,7 +5,7 @@ sudo: false
- dist: trusty
- language: c
- python:
--  - "2.6"
-+  - "3.6"
- compiler:
-   - gcc
- cache: ccache
+     qemu_mutex_lock(&edu->thr_mutex);
+     edu->stopping = true;
 -- 
-2.18.0.rc1.1.g3f1ff2140
+2.17.1
