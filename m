@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57877)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gBTCf-0002TH-LL
+	(envelope-from <cota@braap.org>) id 1gBTCf-0002TG-LF
 	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 19:20:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gBTCd-0007xL-4a
+	(envelope-from <cota@braap.org>) id 1gBTCc-0007wu-PK
 	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 19:20:13 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:57231)
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:54739)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gBTCc-0007wT-Ta
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gBTCc-0007vg-HX
 	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 19:20:10 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Sat, 13 Oct 2018 19:19:30 -0400
-Message-Id: <20181013231933.28789-11-cota@braap.org>
-In-Reply-To: <20181013231933.28789-1-cota@braap.org>
-References: <20181013231933.28789-1-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v5 10/13] hardfloat: implement float32/64
- division
+Date: Sat, 13 Oct 2018 19:19:20 -0400
+Message-Id: <20181013231933.28789-1-cota@braap.org>
+Subject: [Qemu-devel] [PATCH v5 00/13] hardfloat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,152 +24,64 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Performance results for fp-bench:
+v4: https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg02960.html
 
-1. Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
-- before:
-div-single: 34.84 MFlops
-div-double: 34.04 MFlops
-- after:
-div-single: 275.23 MFlops
-div-double: 216.38 MFlops
+Changes since v4:
 
-2. ARM Aarch64 A57 @ 2.4GHz
-- before:
-div-single: 9.33 MFlops
-div-double: 9.30 MFlops
-- after:
-div-single: 51.55 MFlops
-div-double: 15.09 MFlops
+- Rebase on current master (a73549f99).
 
-3. IBM POWER8E @ 2.1 GHz
-- before:
-div-single: 25.65 MFlops
-div-double: 24.91 MFlops
-- after:
-div-single: 96.83 MFlops
-div-double: 31.01 MFlops
+- Add a patch for fp-test to pick a specialization; this gets rid of
+  the muladd errors, since our default "no specialization" does not
+  raise invalid when one of the muladd inputs is a nan.
 
-Here setting 2FP64_USE_FP to 1 pays off for x86_64:
-[1] 215.97 vs [0] 62.15 MFlops
+- fp-bench: add -r flag to set rounding mode. Do not support "odd"
+  as an option though, because few ops support it.
 
-Signed-off-by: Emilio G. Cota <cota@braap.org>
----
- fpu/softfloat.c | 88 +++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 86 insertions(+), 2 deletions(-)
+- fp-bench: use -o mulAdd instead of -o fma for muladd, to
+  be consistent with fp-test.
 
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 78837fa9d8..8ef0571c6e 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -1678,7 +1678,8 @@ float16 float16_div(float16 a, float16 b, float_status *status)
-     return float16_round_pack_canonical(pr, status);
- }
- 
--float32 float32_div(float32 a, float32 b, float_status *status)
-+static float32 QEMU_SOFTFLOAT_ATTR
-+soft_float32_div(float32 a, float32 b, float_status *status)
- {
-     FloatParts pa = float32_unpack_canonical(a, status);
-     FloatParts pb = float32_unpack_canonical(b, status);
-@@ -1687,7 +1688,8 @@ float32 float32_div(float32 a, float32 b, float_status *status)
-     return float32_round_pack_canonical(pr, status);
- }
- 
--float64 float64_div(float64 a, float64 b, float_status *status)
-+static float64 QEMU_SOFTFLOAT_ATTR
-+soft_float64_div(float64 a, float64 b, float_status *status)
- {
-     FloatParts pa = float64_unpack_canonical(a, status);
-     FloatParts pb = float64_unpack_canonical(b, status);
-@@ -1696,6 +1698,88 @@ float64 float64_div(float64 a, float64 b, float_status *status)
-     return float64_round_pack_canonical(pr, status);
- }
- 
-+static float float_div(float a, float b)
-+{
-+    return a / b;
-+}
-+
-+static double double_div(double a, double b)
-+{
-+    return a / b;
-+}
-+
-+static bool f32_div_pre(float32 a, float32 b, const struct float_status *s)
-+{
-+    return likely(float32_is_zero_or_normal(a) &&
-+                  float32_is_normal(b) &&
-+                  can_use_fpu(s));
-+}
-+
-+static bool f64_div_pre(float64 a, float64 b, const struct float_status *s)
-+{
-+    return likely(float64_is_zero_or_normal(a) &&
-+                  float64_is_normal(b) &&
-+                  can_use_fpu(s));
-+}
-+
-+static bool float_div_pre(float a, float b, const struct float_status *s)
-+{
-+    return likely((fpclassify(a) == FP_NORMAL || fpclassify(a) == FP_ZERO) &&
-+                  fpclassify(b) == FP_NORMAL &&
-+                  can_use_fpu(s));
-+}
-+
-+static bool double_div_pre(double a, double b, const struct float_status *s)
-+{
-+    return likely((fpclassify(a) == FP_NORMAL || fpclassify(a) == FP_ZERO) &&
-+                  fpclassify(b) == FP_NORMAL &&
-+                  can_use_fpu(s));
-+}
-+
-+static bool f32_div_post(float32 a, float32 b, const struct float_status *s)
-+{
-+    return !float32_is_zero(a);
-+}
-+
-+static bool f64_div_post(float64 a, float64 b, const struct float_status *s)
-+{
-+    return !float64_is_zero(a);
-+}
-+
-+static bool float_div_post(float a, float b, const struct float_status *s)
-+{
-+    return fpclassify(a) != FP_ZERO;
-+}
-+
-+static bool double_div_post(double a, double b, const struct float_status *s)
-+{
-+    return fpclassify(a) != FP_ZERO;
-+}
-+
-+float32 __attribute__((flatten))
-+float32_div(float32 a, float32 b, float_status *s)
-+{
-+    if (QEMU_HARDFLOAT_2F32_USE_FP) {
-+        return float_gen2(a, b, s, float_div, soft_float32_div, float_div_pre,
-+                          float_div_post, NULL, NULL);
-+    } else {
-+        return f32_gen2(a, b, s, float_div, soft_float32_div, f32_div_pre,
-+                        f32_div_post, NULL, NULL);
-+    }
-+}
-+
-+float64 __attribute__((flatten))
-+float64_div(float64 a, float64 b, float_status *s)
-+{
-+    if (QEMU_HARDFLOAT_2F64_USE_FP) {
-+        return double_gen2(a, b, s, double_div, soft_float64_div,
-+                           double_div_pre, double_div_post, NULL, NULL);
-+    } else {
-+        return f64_gen2(a, b, s, double_div, soft_float64_div, f64_div_pre,
-+                        f64_div_post, NULL, NULL);
-+    }
-+}
-+
- /*
-  * Float to Float conversions
-  *
--- 
-2.17.1
+- fp-bench: Use get_clock() instead of get_clock_realtime,
+  which on unix will use the monotonic clock, if available.
+  Thus, link fp-bench against libqemuutil (get_clock reads
+  the use_rt_clock variable, which is provided by
+  qemu-timer-common.o).
+
+- Do not remove the "flatten" attribute from the softfloat
+  primitives. Removing it reduces code size, but hurts execution time
+  (slowdown 2 to 3x) when the rounding mode != even.
+  Instead, keep the attribute so that !even ops run at a reasonable
+  speed.
+
+  Note that this speed is still a little slower (up to 12% slower
+  with fp-bench) than before hardfloat, due to the checks
+  at the beginning of hardfloat functions:
+    flush_to_zero_if_needed();
+    if (rounding != even) {
+        return softfloat();
+    }
+  but I suspect we can live with that.
+  If this were to be an issue in the future, we could use an "ops"
+  struct with function pointers to just call the right function
+  (in)directly. I am not doing that here because that would
+  require that all modifications of .float_rounding_mode go through
+  set_rounding_mode(), so that the function pointers can be updated.
+  Let me know if you feel strongly about this -- I did a quick
+  test with an ops struct for f32_add and it does indeed bringt
+  the slowdown for !even ops to 0%.
+
+This series introduces no regressions to fp-test. You can test
+hardfloat by passing "-f x" to fp-test (so that the inexact flag
+is set before each operation) and using even rounding (fp-test's
+default). Note that hardfloat does not affect any other rounding
+mode.
+
+Perf numbers for fp-bench running on several host machines are in
+each commit log; numbers for several benchmarks (NBench, SPEC06fp)
+are in the last patch's commit log.
+
+You can fetch this series from:
+  https://github.com/cota/qemu/tree/hardfloat-v5
+
+Thanks,
+
+		Emilio
