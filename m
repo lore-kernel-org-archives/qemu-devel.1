@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50941)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gBPqd-0004et-Nn
-	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 15:45:16 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1gBPzr-0006Pp-SE
+	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 15:54:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gBPqa-0001Sa-DO
-	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 15:45:15 -0400
-Received: from mail-pf1-x42a.google.com ([2607:f8b0:4864:20::42a]:39216)
+	(envelope-from <richard.henderson@linaro.org>) id 1gBPzp-0006pf-5q
+	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 15:54:47 -0400
+Received: from mail-pl1-x62b.google.com ([2607:f8b0:4864:20::62b]:39315)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gBPqa-0001S9-5l
-	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 15:45:12 -0400
-Received: by mail-pf1-x42a.google.com with SMTP id c25-v6so7779509pfe.6
-	for <qemu-devel@nongnu.org>; Sat, 13 Oct 2018 12:45:12 -0700 (PDT)
+	id 1gBPzo-0006pB-Oz
+	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 15:54:45 -0400
+Received: by mail-pl1-x62b.google.com with SMTP id w14-v6so7428756plp.6
+	for <qemu-devel@nongnu.org>; Sat, 13 Oct 2018 12:54:44 -0700 (PDT)
 References: <20181012173047.25420-1-kbastian@mail.uni-paderborn.de>
-	<20181012173047.25420-22-kbastian@mail.uni-paderborn.de>
+	<20181012173047.25420-23-kbastian@mail.uni-paderborn.de>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <af15eae9-c2a6-68dd-3570-0e41edd8bf1f@linaro.org>
-Date: Sat, 13 Oct 2018 12:45:08 -0700
+Message-ID: <ef00c2d5-04d3-d68f-8c36-52f48c0c10da@linaro.org>
+Date: Sat, 13 Oct 2018 12:54:40 -0700
 MIME-Version: 1.0
-In-Reply-To: <20181012173047.25420-22-kbastian@mail.uni-paderborn.de>
+In-Reply-To: <20181012173047.25420-23-kbastian@mail.uni-paderborn.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 21/28] target/riscv: Replace gen_store()
- with trans_store()
+Subject: Re: [Qemu-devel] [PATCH 22/28] target/riscv: Move gen_arith_imm()
+ decoding into trans_* functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,24 +36,27 @@ To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, mjc@sifive.com, palmer@
 Cc: peer.adelt@hni.uni-paderborn.de, Alistair.Francis@wdc.com, qemu-devel@nongnu.org
 
 On 10/12/18 10:30 AM, Bastian Koppelmann wrote:
-> +static bool trans_store(DisasContext *ctx, arg_sb *a, int memop)
-
-gen_store.
-
+>  static bool trans_slliw(DisasContext *ctx, arg_slliw *a, uint32_t insn)
 >  {
-> -    gen_store(ctx, OPC_RISC_SB, a->rs1, a->rs2, a->imm);
-> +    TCGv t0 = tcg_temp_new();
-> +    TCGv dat = tcg_temp_new();
-> +    gen_get_gpr(t0, a->rs1);
-> +    tcg_gen_addi_tl(t0, t0, a->imm);
-> +    gen_get_gpr(dat, a->rs2);
+> -    gen_arith_imm(ctx, OPC_RISC_SLLIW, a->rd, a->rs1, a->shamt);
+> +    TCGv source1;
+> +    source1 = tcg_temp_new();
+> +    gen_get_gpr(source1, a->rs1);
 > +
-> +    if (memop < 0) {
-> +        return false;
-> +    }
+> +    tcg_gen_shli_tl(source1, source1, a->shamt);
+> +    tcg_gen_ext32s_tl(source1, source1);
+> +    gen_set_gpr(a->rd, source1);
+> +
+> +    tcg_temp_free(source1);
+>      return true;
+>  }
 
-Can't happen.  Otherwise,
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Now missing the TARGET_RISCV64 check.
+
+> +static bool trans_arith_imm(DisasContext *ctx, arg_arith_imm *a,
+> +                            void(*func)(TCGv, TCGv, TCGv))
+
+gen_arith_imm.
 
 
 r~
