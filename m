@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54741)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57670)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1gBD6F-0006Ba-Fj
-	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 02:08:32 -0400
+	(envelope-from <liq3ea@163.com>) id 1gBDTB-0000dw-HG
+	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 02:32:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1gBD6A-0003MF-GH
-	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 02:08:31 -0400
-Received: from m12-18.163.com ([220.181.12.18]:34211)
+	(envelope-from <liq3ea@163.com>) id 1gBDT4-0002zs-2z
+	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 02:32:13 -0400
+Received: from m12-16.163.com ([220.181.12.16]:57228)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1gBD68-0003Gi-St
-	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 02:08:25 -0400
+	(envelope-from <liq3ea@163.com>) id 1gBDT2-0002xP-5v
+	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 02:32:05 -0400
 From: Li Qiang <liq3ea@163.com>
-Date: Fri, 12 Oct 2018 23:08:09 -0700
-Message-Id: <20181013060809.52496-1-liq3ea@163.com>
-Subject: [Qemu-devel] [PATCH] hw: AC97: make it more QOMconventional
+Date: Fri, 12 Oct 2018 23:31:53 -0700
+Message-Id: <20181013063153.54423-1-liq3ea@163.com>
+Subject: [Qemu-devel] [PATCH] hw: ne2000: make it more QOMconventional
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,64 +21,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kraxel@redhat.com
+To: jasowang@redhat.com
 Cc: qemu-devel@nongnu.org, Li Qiang <liq3ea@163.com>
 
 Signed-off-by: Li Qiang <liq3ea@163.com>
 ---
- hw/audio/ac97.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ hw/net/ne2000.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/hw/audio/ac97.c b/hw/audio/ac97.c
-index 337402e9c6..d799533aa9 100644
---- a/hw/audio/ac97.c
-+++ b/hw/audio/ac97.c
-@@ -123,6 +123,10 @@ enum {
+diff --git a/hw/net/ne2000.c b/hw/net/ne2000.c
+index 07d79e317f..ab71ad49cb 100644
+--- a/hw/net/ne2000.c
++++ b/hw/net/ne2000.c
+@@ -33,6 +33,10 @@
  
- #define MUTE_SHIFT 15
+ #define MAX_ETH_FRAME_SIZE 1514
  
-+#define TYPE_AC97 "AC97"
-+#define AC97(obj) \
-+    OBJECT_CHECK(AC97LinkState, (obj), TYPE_AC97)
++#define TYPE_NE2000 "ne2k_pci"
++#define NE2000(obj) \
++    OBJECT_CHECK(PCINE2000State, (obj), TYPE_NE2000)
 +
- #define REC_MASK 7
- enum {
-     REC_MIC = 0,
-@@ -1340,7 +1344,7 @@ static void ac97_on_reset (DeviceState *dev)
+ #define E8390_CMD	0x00  /* The command register (for all pages) */
+ /* Page 0 register offsets. */
+ #define EN0_CLDALO	0x01	/* Low byte of current local dma addr  RD */
+@@ -720,7 +724,7 @@ static NetClientInfo net_ne2000_info = {
  
- static void ac97_realize(PCIDevice *dev, Error **errp)
+ static void pci_ne2000_realize(PCIDevice *pci_dev, Error **errp)
  {
--    AC97LinkState *s = DO_UPCAST (AC97LinkState, dev, dev);
-+    AC97LinkState *s = AC97(dev);
-     uint8_t *c = s->dev.config;
+-    PCINE2000State *d = DO_UPCAST(PCINE2000State, dev, pci_dev);
++    PCINE2000State *d = NE2000(pci_dev);
+     NE2000State *s;
+     uint8_t *pci_conf;
  
-     /* TODO: no need to override */
-@@ -1389,7 +1393,7 @@ static void ac97_realize(PCIDevice *dev, Error **errp)
+@@ -742,7 +746,7 @@ static void pci_ne2000_realize(PCIDevice *pci_dev, Error **errp)
  
- static void ac97_exit(PCIDevice *dev)
+ static void pci_ne2000_exit(PCIDevice *pci_dev)
  {
--    AC97LinkState *s = DO_UPCAST(AC97LinkState, dev, dev);
-+    AC97LinkState *s = AC97(dev);
+-    PCINE2000State *d = DO_UPCAST(PCINE2000State, dev, pci_dev);
++    PCINE2000State *d = NE2000(pci_dev);
+     NE2000State *s = &d->ne2000;
  
-     AUD_close_in(&s->card, s->voice_pi);
-     AUD_close_out(&s->card, s->voice_po);
-@@ -1399,7 +1403,7 @@ static void ac97_exit(PCIDevice *dev)
+     qemu_del_nic(s->nic);
+@@ -751,13 +755,12 @@ static void pci_ne2000_exit(PCIDevice *pci_dev)
  
- static int ac97_init (PCIBus *bus)
+ static void ne2000_instance_init(Object *obj)
  {
--    pci_create_simple (bus, -1, "AC97");
-+    pci_create_simple(bus, -1, TYPE_AC97);
-     return 0;
+-    PCIDevice *pci_dev = PCI_DEVICE(obj);
+-    PCINE2000State *d = DO_UPCAST(PCINE2000State, dev, pci_dev);
++    PCINE2000State *d = NE2000(obj);
+     NE2000State *s = &d->ne2000;
+ 
+     device_add_bootindex_property(obj, &s->c.bootindex,
+                                   "bootindex", "/ethernet-phy@0",
+-                                  &pci_dev->qdev, NULL);
++                                  DEVICE(obj), NULL);
  }
  
-@@ -1427,7 +1431,7 @@ static void ac97_class_init (ObjectClass *klass, void *data)
+ static Property ne2000_properties[] = {
+@@ -782,7 +785,7 @@ static void ne2000_class_init(ObjectClass *klass, void *data)
  }
  
- static const TypeInfo ac97_info = {
--    .name          = "AC97",
-+    .name          = TYPE_AC97,
+ static const TypeInfo ne2000_info = {
+-    .name          = "ne2k_pci",
++    .name          = TYPE_NE2000,
      .parent        = TYPE_PCI_DEVICE,
-     .instance_size = sizeof (AC97LinkState),
-     .class_init    = ac97_class_init,
+     .instance_size = sizeof(PCINE2000State),
+     .class_init    = ne2000_class_init,
 -- 
 2.17.1
