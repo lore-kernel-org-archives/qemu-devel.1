@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57874)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57883)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gBTCf-0002TE-LE
+	(envelope-from <cota@braap.org>) id 1gBTCf-0002TL-Lh
 	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 19:20:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gBTCc-0007wP-D4
+	(envelope-from <cota@braap.org>) id 1gBTCc-0007wC-Bp
 	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 19:20:13 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:57713)
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:36351)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gBTCc-0007vd-1T
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gBTCc-0007vh-5H
 	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 19:20:10 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Sat, 13 Oct 2018 19:19:24 -0400
-Message-Id: <20181013231933.28789-5-cota@braap.org>
+Date: Sat, 13 Oct 2018 19:19:23 -0400
+Message-Id: <20181013231933.28789-4-cota@braap.org>
 In-Reply-To: <20181013231933.28789-1-cota@braap.org>
 References: <20181013231933.28789-1-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v5 04/13] softfloat: rename canonicalize to
- sf_canonicalize
+Subject: [Qemu-devel] [PATCH v5 03/13] target/tricore: use
+ float32_is_denormal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,61 +27,38 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-glibc >= 2.25 defines canonicalize in commit eaf5ad0
-(Add canonicalize, canonicalizef, canonicalizel., 2016-10-26).
-
-Given that we'll be including <math.h> soon, prepare
-for this by prefixing our canonicalize() with sf_ to avoid
-clashing with the libc's canonicalize().
-
-Reported-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Tested-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Reviewed-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- fpu/softfloat.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ target/tricore/fpu_helper.c | 9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
 
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 46ae206172..0cbb08be32 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -336,8 +336,8 @@ static inline float64 float64_pack_raw(FloatParts p)
- #include "softfloat-specialize.h"
- 
- /* Canonicalize EXP and FRAC, setting CLS.  */
--static FloatParts canonicalize(FloatParts part, const FloatFmt *parm,
--                               float_status *status)
-+static FloatParts sf_canonicalize(FloatParts part, const FloatFmt *parm,
-+                                  float_status *status)
- {
-     if (part.exp == parm->exp_max && !parm->arm_althp) {
-         if (part.frac == 0) {
-@@ -513,7 +513,7 @@ static FloatParts round_canonical(FloatParts p, float_status *s,
- static FloatParts float16a_unpack_canonical(float16 f, float_status *s,
-                                             const FloatFmt *params)
- {
--    return canonicalize(float16_unpack_raw(f), params, s);
-+    return sf_canonicalize(float16_unpack_raw(f), params, s);
+diff --git a/target/tricore/fpu_helper.c b/target/tricore/fpu_helper.c
+index df162902d6..31df462e4a 100644
+--- a/target/tricore/fpu_helper.c
++++ b/target/tricore/fpu_helper.c
+@@ -44,11 +44,6 @@ static inline uint8_t f_get_excp_flags(CPUTriCoreState *env)
+               | float_flag_inexact);
  }
  
- static FloatParts float16_unpack_canonical(float16 f, float_status *s)
-@@ -534,7 +534,7 @@ static float16 float16_round_pack_canonical(FloatParts p, float_status *s)
+-static inline bool f_is_denormal(float32 arg)
+-{
+-    return float32_is_zero_or_denormal(arg) && !float32_is_zero(arg);
+-}
+-
+ static inline float32 f_maddsub_nan_result(float32 arg1, float32 arg2,
+                                            float32 arg3, float32 result,
+                                            uint32_t muladd_negate_c)
+@@ -260,8 +255,8 @@ uint32_t helper_fcmp(CPUTriCoreState *env, uint32_t r1, uint32_t r2)
+     set_flush_inputs_to_zero(0, &env->fp_status);
  
- static FloatParts float32_unpack_canonical(float32 f, float_status *s)
- {
--    return canonicalize(float32_unpack_raw(f), &float32_params, s);
-+    return sf_canonicalize(float32_unpack_raw(f), &float32_params, s);
- }
+     result = 1 << (float32_compare_quiet(arg1, arg2, &env->fp_status) + 1);
+-    result |= f_is_denormal(arg1) << 4;
+-    result |= f_is_denormal(arg2) << 5;
++    result |= float32_is_denormal(arg1) << 4;
++    result |= float32_is_denormal(arg2) << 5;
  
- static float32 float32_round_pack_canonical(FloatParts p, float_status *s)
-@@ -544,7 +544,7 @@ static float32 float32_round_pack_canonical(FloatParts p, float_status *s)
- 
- static FloatParts float64_unpack_canonical(float64 f, float_status *s)
- {
--    return canonicalize(float64_unpack_raw(f), &float64_params, s);
-+    return sf_canonicalize(float64_unpack_raw(f), &float64_params, s);
- }
- 
- static float64 float64_round_pack_canonical(FloatParts p, float_status *s)
+     flags = f_get_excp_flags(env);
+     if (flags) {
 -- 
 2.17.1
