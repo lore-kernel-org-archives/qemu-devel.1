@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57941)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58011)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gBTCn-0002fO-Kt
-	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 19:20:24 -0400
+	(envelope-from <cota@braap.org>) id 1gBTCz-0002nw-Sx
+	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 19:20:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gBTCd-0007xa-81
-	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 19:20:16 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:41721)
+	(envelope-from <cota@braap.org>) id 1gBTCw-00088O-65
+	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 19:20:33 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:57117)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gBTCd-0007wO-0a
-	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 19:20:11 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gBTCv-0007wt-UT
+	for qemu-devel@nongnu.org; Sat, 13 Oct 2018 19:20:30 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Sat, 13 Oct 2018 19:19:28 -0400
-Message-Id: <20181013231933.28789-9-cota@braap.org>
+Date: Sat, 13 Oct 2018 19:19:33 -0400
+Message-Id: <20181013231933.28789-14-cota@braap.org>
 In-Reply-To: <20181013231933.28789-1-cota@braap.org>
 References: <20181013231933.28789-1-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v5 08/13] hardfloat: implement float32/64
- addition and subtraction
+Subject: [Qemu-devel] [PATCH v5 13/13] hardfloat: implement float32/64
+ comparison
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,209 +27,183 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Performance results (single and double precision) for fp-bench:
+Performance results for fp-bench:
 
 1. Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
 - before:
-add-single: 135.07 MFlops
-add-double: 131.60 MFlops
-sub-single: 130.04 MFlops
-sub-double: 133.01 MFlops
+cmp-single: 113.01 MFlops
+cmp-double: 115.54 MFlops
 - after:
-add-single: 443.04 MFlops
-add-double: 301.95 MFlops
-sub-single: 411.36 MFlops
-sub-double: 293.15 MFlops
+cmp-single: 527.83 MFlops
+cmp-double: 457.21 MFlops
 
 2. ARM Aarch64 A57 @ 2.4GHz
 - before:
-add-single: 44.79 MFlops
-add-double: 49.20 MFlops
-sub-single: 44.55 MFlops
-sub-double: 49.06 MFlops
+cmp-single: 39.32 MFlops
+cmp-double: 39.80 MFlops
 - after:
-add-single: 93.28 MFlops
-add-double: 88.27 MFlops
-sub-single: 91.47 MFlops
-sub-double: 88.27 MFlops
+cmp-single: 162.74 MFlops
+cmp-double: 167.08 MFlops
 
 3. IBM POWER8E @ 2.1 GHz
 - before:
-add-single: 72.59 MFlops
-add-double: 72.27 MFlops
-sub-single: 75.33 MFlops
-sub-double: 70.54 MFlops
+cmp-single: 60.81 MFlops
+cmp-double: 62.76 MFlops
 - after:
-add-single: 112.95 MFlops
-add-double: 201.11 MFlops
-sub-single: 116.80 MFlops
-sub-double: 188.72 MFlops
+cmp-single: 235.39 MFlops
+cmp-double: 283.44 MFlops
 
-Note that the IBM and ARM machines benefit from having
-HARDFLOAT_2F{32,64}_USE_FP set to 0. Otherwise their performance
-can suffer significantly:
-- IBM Power8:
-add-single: [1] 54.94 vs [0] 116.37 MFlops
-add-double: [1] 58.92 vs [0] 201.44 MFlops
-- Aarch64 A57:
-add-single: [1] 80.72 vs [0] 93.24 MFlops
-add-double: [1] 82.10 vs [0] 88.18 MFlops
+Here using float{32,64}_is_any_nan is faster than using isnan
+for all machines. On x86_64 the perf difference is just a few
+percentage points, but on aarch64 we go from 117/119 to
+164/169 MFlops for single/double precision, respectively.
 
-On the Intel machine, having 2F64 set to 1 pays off, but it
-doesn't for 2F32:
-- Intel i7-6700K:
-add-single: [1] 285.79 vs [0] 426.70 MFlops
-add-double: [1] 302.15 vs [0] 278.82 MFlops
+Aggregate performance improvement for the last few patches:
+[ all charts in png: https://imgur.com/a/4yV8p ]
+
+1. Host: Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
+
+                   qemu-aarch64 NBench score; higher is better
+                 Host: Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
+
+  16 +-+-----------+-------------+----===-------+---===-------+-----------+-+
+  14 +-+..........................@@@&&.=.......@@@&&.=...................+-+
+  12 +-+..........................@.@.&.=.......@.@.&.=.....+befor===     +-+
+  10 +-+..........................@.@.&.=.......@.@.&.=.....+ad@@&& =     +-+
+   8 +-+.......................$$$%.@.&.=.......@.@.&.=.....+  @@u& =     +-+
+   6 +-+............@@@&&=+***##.$%.@.&.=***##$$%+@.&.=..###$$%%@i& =     +-+
+   4 +-+.......###$%%.@.&=.*.*.#.$%.@.&.=*.*.#.$%.@.&.=+**.#+$ +@m& =     +-+
+   2 +-+.....***.#$.%.@.&=.*.*.#.$%.@.&.=*.*.#.$%.@.&.=.**.#+$+sqr& =     +-+
+   0 +-+-----***##$%%@@&&=-***##$$%@@&&==***##$$%@@&&==-**##$$%+cmp==-----+-+
+            FOURIER    NEURAL NELU DECOMPOSITION         gmean
+
+                              qemu-aarch64 SPEC06fp (test set) speedup over QEMU 4c2c1015905
+                                      Host: Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
+                                            error bars: 95% confidence interval
+
+  4.5 +-+---+-----+----+-----+-----+-&---+-----+----+-----+-----+-----+----+-----+-----+-----+-----+----+-----+---+-+
+    4 +-+..........................+@@+...........................................................................+-+
+  3.5 +-+..............%%@&.........@@..............%%@&............................................+++dsub       +-+
+  2.5 +-+....&&+.......%%@&.......+%%@..+%%&+..@@&+.%%@&....................................+%%&+.+%@&++%%@&      +-+
+    2 +-+..+%%&..+%@&+.%%@&...+++..%%@...%%&.+$$@&..%%@&..%%@&.......+%%&+.%%@&+......+%%@&.+%%&++$$@&++d%@&  %%@&+-+
+  1.5 +-+**#$%&**#$@&**#%@&**$%@**#$%@**#$%&**#$@&**$%@&*#$%@**#$%@**#$%&**#%@&**$%@&*#$%@**#$%&**#$@&*+f%@&**$%@&+-+
+  0.5 +-+**#$%&**#$@&**#%@&**$%@**#$%@**#$%&**#$@&**$%@&*#$%@**#$%@**#$%&**#%@&**$%@&*#$%@**#$%&**#$@&+sqr@&**$%@&+-+
+    0 +-+**#$%&**#$@&**#%@&**$%@**#$%@**#$%&**#$@&**$%@&*#$%@**#$%@**#$%&**#%@&**$%@&*#$%@**#$%&**#$@&*+cmp&**$%@&+-+
+  410.bw416.gam433.434.z435.436.cac437.lesli444.447.de450.so453454.ca459.GemsF465.tont470.lb4482.sphinxgeomean
+
+2. Host: ARM Aarch64 A57 @ 2.4GHz
+
+                    qemu-aarch64 NBench score; higher is better
+                 Host: Applied Micro X-Gene, Aarch64 A57 @ 2.4 GHz
+
+    5 +-+-----------+-------------+-------------+-------------+-----------+-+
+  4.5 +-+........................................@@@&==...................+-+
+  3 4 +-+..........................@@@&==........@.@&.=.....+before       +-+
+    3 +-+..........................@.@&.=........@.@&.=.....+ad@@@&==     +-+
+  2.5 +-+.....................##$$%%.@&.=........@.@&.=.....+  @m@& =     +-+
+    2 +-+............@@@&==.***#.$.%.@&.=.***#$$%%.@&.=.***#$$%%d@& =     +-+
+  1.5 +-+.....***#$$%%.@&.=.*.*#.$.%.@&.=.*.*#.$.%.@&.=.*.*#+$ +f@& =     +-+
+  0.5 +-+.....*.*#.$.%.@&.=.*.*#.$.%.@&.=.*.*#.$.%.@&.=.*.*#+$+sqr& =     +-+
+    0 +-+-----***#$$%%@@&==-***#$$%%@@&==-***#$$%%@@&==-***#$$%+cmp==-----+-+
+             FOURIER    NEURAL NLU DECOMPOSITION         gmean
 
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- fpu/softfloat.c | 106 ++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 98 insertions(+), 8 deletions(-)
+ fpu/softfloat.c | 74 +++++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 60 insertions(+), 14 deletions(-)
 
 diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 81d06548b5..d5d1c555dc 100644
+index a738ca4a07..1758cc93e7 100644
 --- a/fpu/softfloat.c
 +++ b/fpu/softfloat.c
-@@ -1077,8 +1077,8 @@ float16  __attribute__((flatten)) float16_add(float16 a, float16 b,
-     return float16_round_pack_canonical(pr, status);
+@@ -3014,28 +3014,74 @@ static int compare_floats(FloatParts a, FloatParts b, bool is_quiet,
+     }
  }
  
--float32 __attribute__((flatten)) float32_add(float32 a, float32 b,
--                                             float_status *status)
-+static float32 QEMU_SOFTFLOAT_ATTR
-+soft_float32_add(float32 a, float32 b, float_status *status)
- {
-     FloatParts pa = float32_unpack_canonical(a, status);
-     FloatParts pb = float32_unpack_canonical(b, status);
-@@ -1087,8 +1087,8 @@ float32 __attribute__((flatten)) float32_add(float32 a, float32 b,
-     return float32_round_pack_canonical(pr, status);
+-#define COMPARE(sz)                                                     \
+-int float ## sz ## _compare(float ## sz a, float ## sz b,               \
+-                            float_status *s)                            \
++#define COMPARE(name, attr, sz)                                         \
++static int attr                                                         \
++name(float ## sz a, float ## sz b, bool is_quiet, float_status *s)      \
+ {                                                                       \
+     FloatParts pa = float ## sz ## _unpack_canonical(a, s);             \
+     FloatParts pb = float ## sz ## _unpack_canonical(b, s);             \
+-    return compare_floats(pa, pb, false, s);                            \
+-}                                                                       \
+-int float ## sz ## _compare_quiet(float ## sz a, float ## sz b,         \
+-                                  float_status *s)                      \
+-{                                                                       \
+-    FloatParts pa = float ## sz ## _unpack_canonical(a, s);             \
+-    FloatParts pb = float ## sz ## _unpack_canonical(b, s);             \
+-    return compare_floats(pa, pb, true, s);                             \
++    return compare_floats(pa, pb, is_quiet, s);                         \
  }
  
--float64 __attribute__((flatten)) float64_add(float64 a, float64 b,
--                                             float_status *status)
-+static float64 QEMU_SOFTFLOAT_ATTR
-+soft_float64_add(float64 a, float64 b, float_status *status)
- {
-     FloatParts pa = float64_unpack_canonical(a, status);
-     FloatParts pb = float64_unpack_canonical(b, status);
-@@ -1107,8 +1107,8 @@ float16 __attribute__((flatten)) float16_sub(float16 a, float16 b,
-     return float16_round_pack_canonical(pr, status);
- }
+-COMPARE(16)
+-COMPARE(32)
+-COMPARE(64)
++COMPARE(soft_float16_compare, , 16)
++COMPARE(soft_float32_compare, QEMU_SOFTFLOAT_ATTR, 32)
++COMPARE(soft_float64_compare, QEMU_SOFTFLOAT_ATTR, 64)
  
--float32 __attribute__((flatten)) float32_sub(float32 a, float32 b,
--                                             float_status *status)
-+static float32 QEMU_SOFTFLOAT_ATTR
-+soft_float32_sub(float32 a, float32 b, float_status *status)
- {
-     FloatParts pa = float32_unpack_canonical(a, status);
-     FloatParts pb = float32_unpack_canonical(b, status);
-@@ -1117,8 +1117,8 @@ float32 __attribute__((flatten)) float32_sub(float32 a, float32 b,
-     return float32_round_pack_canonical(pr, status);
- }
+ #undef COMPARE
  
--float64 __attribute__((flatten)) float64_sub(float64 a, float64 b,
--                                             float_status *status)
-+static float64 QEMU_SOFTFLOAT_ATTR
-+soft_float64_sub(float64 a, float64 b, float_status *status)
- {
-     FloatParts pa = float64_unpack_canonical(a, status);
-     FloatParts pb = float64_unpack_canonical(b, status);
-@@ -1127,6 +1127,96 @@ float64 __attribute__((flatten)) float64_sub(float64 a, float64 b,
-     return float64_round_pack_canonical(pr, status);
- }
- 
-+static float float_add(float a, float b)
++int __attribute__((flatten))
++float16_compare(float16 a, float16 b, float_status *s)
 +{
-+    return a + b;
++    return soft_float16_compare(a, b, false, s);
 +}
 +
-+static float float_sub(float a, float b)
++int __attribute__((flatten))
++float16_compare_quiet(float16 a, float16 b, float_status *s)
 +{
-+    return a - b;
++    return soft_float16_compare(a, b, true, s);
 +}
 +
-+static double double_add(double a, double b)
-+{
-+    return a + b;
-+}
-+
-+static double double_sub(double a, double b)
-+{
-+    return a - b;
-+}
-+
-+static bool f32_addsub_post(float32 a, float32 b, const struct float_status *s)
-+{
-+    return !(float32_is_zero(a) && float32_is_zero(b));
-+}
-+
-+static bool
-+float_addsub_post(float a, float b, const struct float_status *s)
-+{
-+    return !(fpclassify(a) == FP_ZERO && fpclassify(b) == FP_ZERO);
-+}
-+
-+static bool f64_addsub_post(float64 a, float64 b, const struct float_status *s)
-+{
-+    return !(float64_is_zero(a) && float64_is_zero(b));
-+}
-+
-+static bool
-+double_addsub_post(double a, double b, const struct float_status *s)
-+{
-+    return !(fpclassify(a) == FP_ZERO && fpclassify(b) == FP_ZERO);
-+}
-+
-+static float32 float32_addsub(float32 a, float32 b, float_status *s,
-+                              float_op2_func_t hard, f32_op2_func_t soft)
-+{
-+    if (QEMU_HARDFLOAT_2F32_USE_FP) {
-+        return float_gen2(a, b, s, hard, soft, float_is_zon2, float_addsub_post,
-+                          NULL, NULL);
-+    } else {
-+        return f32_gen2(a, b, s, hard, soft, f32_is_zon2, f32_addsub_post,
-+                        NULL, NULL);
++#define GEN_FPU_COMPARE(name, quiet_name, soft_t, host_t)               \
++    static int                                                          \
++    fpu_ ## name(soft_t a, soft_t b, bool is_quiet, float_status *s)    \
++    {                                                                   \
++        host_t ha, hb;                                                  \
++                                                                        \
++        if (QEMU_NO_HARDFLOAT) {                                        \
++            return soft_ ## name(a, b, is_quiet, s);                    \
++        }                                                               \
++        soft_t ## _input_flush2(&a, &b, s);                             \
++        ha = soft_t ## _to_ ## host_t(a);                               \
++        hb = soft_t ## _to_ ## host_t(b);                               \
++        if (unlikely(soft_t ## _is_any_nan(a) ||                        \
++                     soft_t ## _is_any_nan(b))) {                       \
++            return soft_ ## name(a, b, is_quiet, s);                    \
++        }                                                               \
++        if (isgreater(ha, hb)) {                                        \
++            return float_relation_greater;                              \
++        }                                                               \
++        if (isless(ha, hb)) {                                           \
++            return float_relation_less;                                 \
++        }                                                               \
++        return float_relation_equal;                                    \
++    }                                                                   \
++                                                                        \
++    int __attribute__((flatten))                                        \
++    name(soft_t a, soft_t b, float_status *s)                           \
++    {                                                                   \
++        return fpu_ ## name(a, b, false, s);                            \
++    }                                                                   \
++                                                                        \
++    int __attribute__((flatten))                                        \
++    quiet_name(soft_t a, soft_t b, float_status *s)                     \
++    {                                                                   \
++        return fpu_ ## name(a, b, true, s);                             \
 +    }
-+}
 +
-+static float64 float64_addsub(float64 a, float64 b, float_status *s,
-+                              double_op2_func_t hard, f64_op2_func_t soft)
-+{
-+    if (QEMU_HARDFLOAT_2F64_USE_FP) {
-+        return double_gen2(a, b, s, hard, soft, double_is_zon2,
-+                           double_addsub_post, NULL, NULL);
-+    } else {
-+        return f64_gen2(a, b, s, hard, soft, f64_is_zon2, f64_addsub_post,
-+                        NULL, NULL);
-+    }
-+}
++GEN_FPU_COMPARE(float32_compare, float32_compare_quiet, float32, float)
++GEN_FPU_COMPARE(float64_compare, float64_compare_quiet, float64, double)
++#undef GEN_FPU_COMPARE
 +
-+float32 __attribute__((flatten))
-+float32_add(float32 a, float32 b, float_status *s)
-+{
-+    return float32_addsub(a, b, s, float_add, soft_float32_add);
-+}
-+
-+float32 __attribute__((flatten))
-+float32_sub(float32 a, float32 b, float_status *s)
-+{
-+    return float32_addsub(a, b, s, float_sub, soft_float32_sub);
-+}
-+
-+float64 __attribute__((flatten))
-+float64_add(float64 a, float64 b, float_status *s)
-+{
-+    return float64_addsub(a, b, s, double_add, soft_float64_add);
-+}
-+
-+float64 __attribute__((flatten))
-+float64_sub(float64 a, float64 b, float_status *s)
-+{
-+    return float64_addsub(a, b, s, double_sub, soft_float64_sub);
-+}
-+
- /*
-  * Returns the result of multiplying the floating-point values `a' and
-  * `b'. The operation is performed according to the IEC/IEEE Standard
+ /* Multiply A by 2 raised to the power N.  */
+ static FloatParts scalbn_decomposed(FloatParts a, int n, float_status *s)
+ {
 -- 
 2.17.1
