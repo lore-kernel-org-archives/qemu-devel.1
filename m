@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51228)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gBoxu-0001ub-2v
-	for qemu-devel@nongnu.org; Sun, 14 Oct 2018 18:34:27 -0400
+	(envelope-from <macro@linux-mips.org>) id 1gBpPt-0005TQ-IT
+	for qemu-devel@nongnu.org; Sun, 14 Oct 2018 19:03:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gBoxp-0008Ex-Nk
-	for qemu-devel@nongnu.org; Sun, 14 Oct 2018 18:34:25 -0400
-Received: from mail-yb1-f193.google.com ([209.85.219.193]:35630)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gBoxn-00089T-O1
-	for qemu-devel@nongnu.org; Sun, 14 Oct 2018 18:34:21 -0400
-Received: by mail-yb1-f193.google.com with SMTP id o63-v6so6828517yba.2
-	for <qemu-devel@nongnu.org>; Sun, 14 Oct 2018 15:34:16 -0700 (PDT)
+	(envelope-from <macro@linux-mips.org>) id 1gBpPp-00037E-PS
+	for qemu-devel@nongnu.org; Sun, 14 Oct 2018 19:03:21 -0400
+Received: from eddie.linux-mips.org ([148.251.95.138]:57062
+	helo=cvs.linux-mips.org) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <macro@linux-mips.org>) id 1gBpPj-00032o-W2
+	for qemu-devel@nongnu.org; Sun, 14 Oct 2018 19:03:14 -0400
+Received: (from localhost user: 'macro', uid#1010) by eddie.linux-mips.org
+	with ESMTP id S23990757AbeJNXDCHHV0v convert rfc822-to-quoted-printable
+	(ORCPT <rfc822;qemu-devel@nongnu.org>);
+	Mon, 15 Oct 2018 01:03:02 +0200
+Date: Mon, 15 Oct 2018 00:03:00 +0100 (BST)
+Sender: "Maciej W. Rozycki" <macro@linux-mips.org>
+From: "Maciej W. Rozycki" <macro@linux-mips.org>
+In-Reply-To: <CAAdtpL5xQYwyR0VxqAhA3dW9ec2KW07n-GKrMCt=UjQqwsuYHQ@mail.gmail.com>
+Message-ID: <alpine.LFD.2.21.1810142320320.16498@eddie.linux-mips.org>
+References: <20181014142928.2784-1-f4bug@amsat.org> <20181014164140.GB2319@sx9>
+	<CAAdtpL5xQYwyR0VxqAhA3dW9ec2KW07n-GKrMCt=UjQqwsuYHQ@mail.gmail.com>
 MIME-Version: 1.0
-References: <1539362376-12010-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1539362376-12010-11-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1539362376-12010-11-git-send-email-aleksandar.markovic@rt-rk.com>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philippe@mathieu-daude.net>
-Date: Mon, 15 Oct 2018 00:34:04 +0200
-Message-ID: <CAAdtpL42G+pHzzhmBqPL6wi2kbTmvwq2r3uFTUWV7N7+fydYiw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 10/28] target/mips: Add CPO PWSize
- register
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Subject: Re: [Qemu-devel] [PATCH] target/mips: Support Toshiba specific
+ three-operand MADD and MADDU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,169 +33,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Stefan Markovic <smarkovic@wavecomp.com>, Riku Voipio <riku.voipio@iki.fi>, Richard Henderson <richard.henderson@linaro.org>, Laurent Vivier <laurent@vivier.eu>, Aleksandar Markovic <amarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Fredrik Noring <noring@nocrew.org>, Richard Henderson <richard.henderson@linaro.org>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, =?UTF-8?Q?J=C3=BCrgen_Urban?= <JuergenUrban@gmx.de>
 
-On Fri, Oct 12, 2018 at 6:49 PM Aleksandar Markovic
-<aleksandar.markovic@rt-rk.com> wrote:
->
-> From: Yongbok Kim <yongbok.kim@mips.com>
->
-> Add PWSize register (CP0 Register 5, Select 7).
->
-> The PWSize register configures hardware page table walking for TLB
-> refills.
->
-> This register is required for the hardware page walker feature. It
-> exists only if Config3 PW bit is set to 1. It contains following
-> fields:
->
-> GDW  (29..24) Global Directory index width
-> UDW  (23..18) Upper Directory index width
-> MDW  (17..12) Middle Directory index width
-> PTW  (11..6 ) Page Table index width
-> PTEW ( 5..0 ) Left shift applied to the Page Table index
->
-> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
-> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> ---
->  target/mips/cpu.h       |  7 +++++++
->  target/mips/helper.h    |  1 +
->  target/mips/machine.c   |  5 +++--
->  target/mips/op_helper.c |  9 +++++++++
->  target/mips/translate.c | 20 ++++++++++++++++++++
->  5 files changed, 40 insertions(+), 2 deletions(-)
->
-> diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-> index 01cd65c..a6abd1f 100644
-> --- a/target/mips/cpu.h
-> +++ b/target/mips/cpu.h
-> @@ -296,6 +296,13 @@ struct CPUMIPSState {
->  #define CP0PF_MDI  12    /* 17..12 */
->  #define CP0PF_PTI  6     /* 11..6  */
->  #define CP0PF_PTEI 0     /*  5..0  */
-> +    target_ulong CP0_PWSize;
-> +#define CP0PS_PS   30
-> +#define CP0PS_GDW  24    /* 29..24 */
-> +#define CP0PS_UDW  18    /* 23..18 */
-> +#define CP0PS_MDW  12    /* 17..12 */
-> +#define CP0PS_PTW  6     /* 11..6  */
-> +#define CP0PS_PTEW 0     /*  5..0  */
->      int32_t CP0_Wired;
->      int32_t CP0_SRSConf0_rw_bitmask;
->      int32_t CP0_SRSConf0;
-> diff --git a/target/mips/helper.h b/target/mips/helper.h
-> index 6366f9b..169890a 100644
-> --- a/target/mips/helper.h
-> +++ b/target/mips/helper.h
-> @@ -121,6 +121,7 @@ DEF_HELPER_2(mtc0_segctl0, void, env, tl)
->  DEF_HELPER_2(mtc0_segctl1, void, env, tl)
->  DEF_HELPER_2(mtc0_segctl2, void, env, tl)
->  DEF_HELPER_2(mtc0_pwfield, void, env, tl)
-> +DEF_HELPER_2(mtc0_pwsize, void, env, tl)
->  DEF_HELPER_2(mtc0_wired, void, env, tl)
->  DEF_HELPER_2(mtc0_srsconf0, void, env, tl)
->  DEF_HELPER_2(mtc0_srsconf1, void, env, tl)
-> diff --git a/target/mips/machine.c b/target/mips/machine.c
-> index 7aa496c..3da891f 100644
-> --- a/target/mips/machine.c
-> +++ b/target/mips/machine.c
-> @@ -212,8 +212,8 @@ const VMStateDescription vmstate_tlb = {
->
->  const VMStateDescription vmstate_mips_cpu = {
->      .name = "cpu",
-> -    .version_id = 13,
-> -    .minimum_version_id = 13,
-> +    .version_id = 14,
-> +    .minimum_version_id = 14,
->      .post_load = cpu_post_load,
->      .fields = (VMStateField[]) {
->          /* Active TC */
-> @@ -258,6 +258,7 @@ const VMStateDescription vmstate_mips_cpu = {
->          VMSTATE_UINTTL(env.CP0_SegCtl2, MIPSCPU),
->          VMSTATE_UINTTL(env.CP0_PWBase, MIPSCPU),
->          VMSTATE_UINTTL(env.CP0_PWField, MIPSCPU),
-> +        VMSTATE_UINTTL(env.CP0_PWSize, MIPSCPU),
->          VMSTATE_INT32(env.CP0_Wired, MIPSCPU),
->          VMSTATE_INT32(env.CP0_SRSConf0, MIPSCPU),
->          VMSTATE_INT32(env.CP0_SRSConf1, MIPSCPU),
-> diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-> index bc506de..0986baf 100644
-> --- a/target/mips/op_helper.c
-> +++ b/target/mips/op_helper.c
-> @@ -1479,6 +1479,15 @@ void helper_mtc0_pwfield(CPUMIPSState *env, target_ulong arg1)
->  #endif
->  }
->
-> +void helper_mtc0_pwsize(CPUMIPSState *env, target_ulong arg1)
-> +{
-> +#ifdef TARGET_MIPS64
-> +    env->CP0_PWSize = arg1 & 0x3F7FFFFFFFULL;
-> +#else
-> +    env->CP0_PWSize = arg1 & 0x3FFFFFFF;
-> +#endif
-> +}
-> +
->  void helper_mtc0_wired(CPUMIPSState *env, target_ulong arg1)
->  {
->      if (env->insn_flags & ISA_MIPS32R6) {
-> diff --git a/target/mips/translate.c b/target/mips/translate.c
-> index 882a765..ef38be9 100644
-> --- a/target/mips/translate.c
-> +++ b/target/mips/translate.c
-> @@ -5558,6 +5558,11 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
->              gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_PWField));
->              rn = "PWField";
->              break;
-> +        case 7:
-> +            check_pw(ctx);
-> +            gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_PWSize));
-> +            rn = "PWSize";
-> +            break;
->          default:
->              goto cp0_unimplemented;
->          }
-> @@ -6269,6 +6274,11 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
->              gen_helper_mtc0_pwfield(cpu_env, arg);
->              rn = "PWField";
->              break;
-> +        case 7:
-> +            check_pw(ctx);
-> +            gen_helper_mtc0_pwsize(cpu_env, arg);
-> +            rn = "PWSize";
-> +            break;
->          default:
->              goto cp0_unimplemented;
->          }
-> @@ -6989,6 +6999,11 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
->              tcg_gen_ld_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_PWField));
->              rn = "PWField";
->              break;
-> +        case 7:
-> +            check_pw(ctx);
-> +            tcg_gen_ld_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_PWSize));
+On Sun, 14 Oct 2018, Philippe Mathieu-Daud=C3=A9 wrote:
 
-gen_mfc0_load64()?
+> > > +            gen_move_low32(cpu_LO[acc], t2);
+> > > +            gen_move_high32(cpu_HI[acc], t2);
+> > > +            if (rd) {
+> > > +                gen_move_low32(cpu_gpr[rd], t2);
+> >
+> > As above, are LO, HI and GPR[rd] sign-extended to 64 bits when requ=
+ired?
+>=20
+>   MADDU rd, rs, rt
+>   MADDU rs, rt
+>   Multiply the contents of registers rs and rt as unsigned integers,
+> and add the doubleword (64-bit)
+>   result to multiply/divide registers HI and LO. Also, store the lowe=
+r
+> 32 bits of the add result in register
+>   rd. In the MADDU rs, rt format, the store operation to a general
+> register is omitted.
+>=20
+> This one looks correct.
 
-> +            rn = "PWSize";
-> +            break;
->          default:
->              goto cp0_unimplemented;
->          }
-> @@ -7682,6 +7697,11 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
->              gen_helper_mtc0_pwfield(cpu_env, arg);
->              rn = "PWField";
->              break;
-> +        case 7:
-> +            check_pw(ctx);
-> +            gen_helper_mtc0_pwsize(cpu_env, arg);
-> +            rn = "PWSize";
-> +            break;
->          default:
->              goto cp0_unimplemented;
->          }
-> --
-> 2.7.4
->
->
+ Obviously with processors such as the TX49 or the TX79 where GPRs are=20
+64-bit for the purpose of integer arithmetic (i.e. any multimedia=20
+extension aside) any 32-bit results written to an integer register are=20
+implicitly sign-extended to the full 64-bit width of the destination=20
+register, as per the requirements of the MIPS architecture.  Otherwise=20
+operation of any subsequent 32-bit instruction (other than SLL or SLLV)=
+=20
+using that that result as an input operand would be unpredictable.  You=
+=20
+need to respect that in QEMU too.
+
+ So results of individual operations are as in the comments with this=20
+code:
+
+	mthi	$0		# HI <- 0
+	mtlo	$0		# LO <- 0
+	addiu	$2, $0, 1	# $2 <- 1
+	lui	$3, 0x4000	# $3 <- 0x40000000
+	maddu	$4, $3, $2	# HI <- 0
+				# LO <- 0x40000000
+				# $4 <- 0x40000000
+	maddu	$5, $4, $2	# HI <- 0
+				# LO <- 0xffffffff80000000
+				# $5 <- 0xffffffff80000000
+	maddu	$6, $4, $2	# HI <- 1
+				# LO <- 0
+				# $6 <- 0
+
+Similarly:
+
+	addiu	$2, $0, 1	# $2 <- 1
+	sll	$3, $2, 31	# $3 <- 0xffffffff80000000
+	dsll	$4, $2, 31	# $4 <- 0x80000000
+	dsll	$5, $3, 0	# $5 <- 0xffffffff80000000
+	sll	$6, $3, 0	# $6 <- 0xffffffff80000000
+	dsll	$7, $4, 0	# $7 <- 0x80000000
+	sll	$8, $4, 0	# $8 <- 0xffffffff80000000
+	daddu	$9, $3, $3	# $9 <- 0xffffffff00000000
+	addu	$10, $3, $3	# $10 <- 0
+	daddu	$11, $4, $4	# $11 <- 0x100000000=20
+	addu	$12, $4, $4	# unpredictable!
+
+ HTH,
+
+  Maciej
