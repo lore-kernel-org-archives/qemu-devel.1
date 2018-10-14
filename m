@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53507)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40643)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gBeki-0002Gr-19
-	for qemu-devel@nongnu.org; Sun, 14 Oct 2018 07:40:08 -0400
+	(envelope-from <laurent@vivier.eu>) id 1gBgJk-0000lU-Cr
+	for qemu-devel@nongnu.org; Sun, 14 Oct 2018 09:20:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gBekh-0000QD-4O
-	for qemu-devel@nongnu.org; Sun, 14 Oct 2018 07:40:07 -0400
-References: <20181013050227.17022-1-ehabkost@redhat.com>
-	<219bba9b-4102-f838-a46f-11b9704ca78f@redhat.com>
-	<20181013203607.GL31060@habkost.net>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <0547ccec-6b85-a03f-88e3-74baa5ab4273@redhat.com>
-Date: Sun, 14 Oct 2018 13:39:44 +0200
+	(envelope-from <laurent@vivier.eu>) id 1gBgJg-0002kV-U4
+	for qemu-devel@nongnu.org; Sun, 14 Oct 2018 09:20:24 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:43999)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1gBgJg-0002iG-6B
+	for qemu-devel@nongnu.org; Sun, 14 Oct 2018 09:20:20 -0400
+From: Laurent Vivier <laurent@vivier.eu>
+References: <20181010223656.31632-1-f4bug@amsat.org>
+	<20181010223656.31632-2-f4bug@amsat.org>
+Message-ID: <7922a298-276e-c1bf-a651-b61cb64c4f44@vivier.eu>
+Date: Sun, 14 Oct 2018 15:19:31 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181013203607.GL31060@habkost.net>
+In-Reply-To: <20181010223656.31632-2-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC] Require Python 3 for building QEMU
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v5 01/10] linux-user/syscall: Verify
+ recvfrom(addr) is user-writable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,45 +29,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>, qemu-block@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, =?UTF-8?Q?Guido_G=c3=bcnther?= <agx@sigxcpu.org>
 
-On 13.10.18 22:36, Eduardo Habkost wrote:
-> On Sat, Oct 13, 2018 at 08:20:25PM +0200, Max Reitz wrote:
->> On 13.10.18 07:02, Eduardo Habkost wrote:
->>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
->>> ---
->>> I'd like to do this in QEMU 3.1.  I think it's time to drop
->>> support for old systems that have only Python 2.
->>>
->>> We still have a few scripts that are not required for building
->>> QEMU that still work only with Python 2 (iotests being the most
->>> relevant set).  Requiring Python 3 for building QEMU won't
->>> prevent people from using those scripts with Python 2 until they
->>> are finally ported.
->>
->> It very much does because the iotests specifically use the python path
->> qemu was configured with.
->>
->> To fix this, configure would need to write something else for into
->> tests/qemu-iotests/common.env for $PYTHON.  But what?  I don't really
->> want to introduce a new configure option for this.
+On 11/10/2018 00:36, Philippe Mathieu-Daudé wrote:
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Tested-By: Guido Günther <agx@sigxcpu.org>
+> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+>  linux-user/syscall.c | 5 +++++
+>  1 file changed, 5 insertions(+)
 > 
-> What's wrong with '/usr/bin/env python2' and just using the
-> python2 binary from $PATH?  Why do we need to make the Python
-> interpreter path for iotests configurable?
-
-Nothing, sounds good.  No idea why I discarded that idea.
-
->> So the real fix is indeed to make the iotests work with Python 3, and I
->> think that needs to be done before we can require Python 3.  Maybe it
->> even needs to be done at the same time.
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index ae3c0dfef7..ea503381aa 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -2968,6 +2968,11 @@ static abi_long do_recvfrom(int fd, abi_ulong msg, size_t len, int flags,
+>              ret = -TARGET_EINVAL;
+>              goto fail;
+>          }
+> +        if (!access_ok(VERIFY_WRITE, target_addr, addrlen)) {
+> +            ret = -TARGET_EFAULT;
+> +            goto fail;
+> +        }
+> +
+>          addr = alloca(addrlen);
+>          ret = get_errno(safe_recvfrom(fd, host_msg, len, flags,
+>                                        addr, &addrlen));
 > 
-> I agree that this would be even better.  I just don't think the
-> pending iotest porting should force all the rest of the build
-> scripts to be compatible with Python 2.
 
-True.  It just means that we have to do something about the iotests
-before this patch can be merged.
+This one breaks the test recvfrom01 from the LTP testsuite
+ltp-full-20180515 archive.
 
-Max
+recvfrom01    3  TFAIL  :  recvfrom01.c:170: invalid socket buffer ;
+returned -1 (expected 0), errno 14 (expected 88)
+
+The testcase is with an invalid socket number (-1) and an invalid
+addrlen pointer.
+
+Thanks,
+Laurent
