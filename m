@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48612)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48983)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gBogh-0005xK-MS
-	for qemu-devel@nongnu.org; Sun, 14 Oct 2018 18:16:40 -0400
+	id 1gBojJ-0006q5-FF
+	for qemu-devel@nongnu.org; Sun, 14 Oct 2018 18:19:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gBogd-0005Bv-Iz
-	for qemu-devel@nongnu.org; Sun, 14 Oct 2018 18:16:39 -0400
-Received: from mail-yb1-f195.google.com ([209.85.219.195]:42967)
+	id 1gBoj9-0007ch-6K
+	for qemu-devel@nongnu.org; Sun, 14 Oct 2018 18:19:17 -0400
+Received: from mail-yw1-f66.google.com ([209.85.161.66]:37366)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gBogd-0005BZ-DT
-	for qemu-devel@nongnu.org; Sun, 14 Oct 2018 18:16:35 -0400
-Received: by mail-yb1-f195.google.com with SMTP id p74-v6so6803589ybc.9
-	for <qemu-devel@nongnu.org>; Sun, 14 Oct 2018 15:16:35 -0700 (PDT)
+	id 1gBoj5-0007YL-BX
+	for qemu-devel@nongnu.org; Sun, 14 Oct 2018 18:19:08 -0400
+Received: by mail-yw1-f66.google.com with SMTP id y14-v6so6874060ywa.4
+	for <qemu-devel@nongnu.org>; Sun, 14 Oct 2018 15:19:05 -0700 (PDT)
 MIME-Version: 1.0
 References: <1539362376-12010-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1539362376-12010-15-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1539362376-12010-15-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1539362376-12010-19-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1539362376-12010-19-git-send-email-aleksandar.markovic@rt-rk.com>
 From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philippe@mathieu-daude.net>
-Date: Mon, 15 Oct 2018 00:16:22 +0200
-Message-ID: <CAAdtpL5kx-0+tVfvOSLjnnVtSi9bUox6Ccy2VqGBKxkVgz5L9A@mail.gmail.com>
+Date: Mon, 15 Oct 2018 00:18:53 +0200
+Message-ID: <CAAdtpL7MbqK9FvMSfw9FYpAkGXQDGrV08B1LBu45rDEATm3XQQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 14/28] target/mips: Extend WatchHi
- registers
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 18/28] target/mips: Add availability
+ control for DSP R3 ASE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,207 +36,108 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Stefan Markovic <smarkovic@wavecomp.com>, Riku Voipio <riku.voipio@iki.fi>, Richard Henderson <richard.henderson@linaro.org>, Laurent Vivier <laurent@vivier.eu>, Aleksandar Markovic <amarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-On Fri, Oct 12, 2018 at 6:58 PM Aleksandar Markovic
+On Fri, Oct 12, 2018 at 6:52 PM Aleksandar Markovic
 <aleksandar.markovic@rt-rk.com> wrote:
 >
-> From: Yongbok Kim <yongbok.kim@mips.com>
+> From: Stefan Markovic <smarkovic@wavecomp.com>
 >
-> WatchHi is extended by the field MemoryMapID with the GINVT
-> instruction. The field is accessible by MTHC0/MFHC0 in 32-bit
-> architectures and DMTC0/DMFC0 in 64-bit architectures.
+> Add infrastructure for availability control for DSP R3 ASE MIPS
+> instructions. Only BPOSGE32C currently belongs to DSP R3 ASE, but
+> this is likely to be changed in near future.
 >
-> Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
+> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+
 > ---
->  target/mips/cpu.h       |  2 +-
->  target/mips/helper.h    |  3 +++
->  target/mips/machine.c   |  2 +-
->  target/mips/op_helper.c | 23 +++++++++++++++++++++--
->  target/mips/translate.c | 40 +++++++++++++++++++++++++++++++++++++++-
->  5 files changed, 65 insertions(+), 5 deletions(-)
+>  target/mips/internal.h           | 11 ++++++++---
+>  target/mips/translate.c          | 13 ++++++++++++-
+>  target/mips/translate_init.inc.c |  3 ++-
+>  3 files changed, 22 insertions(+), 5 deletions(-)
 >
-> diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-> index 5e45e97..10c3813 100644
-> --- a/target/mips/cpu.h
-> +++ b/target/mips/cpu.h
-> @@ -531,7 +531,7 @@ struct CPUMIPSState {
->      uint64_t CP0_LLAddr_rw_bitmask;
->      int CP0_LLAddr_shift;
->      target_ulong CP0_WatchLo[8];
-> -    int32_t CP0_WatchHi[8];
-> +    uint64_t CP0_WatchHi[8];
->  #define CP0WH_ASID 16
->      target_ulong CP0_XContext;
->      int32_t CP0_Framemask;
-> diff --git a/target/mips/helper.h b/target/mips/helper.h
-> index c23e4e5..0ec500a 100644
-> --- a/target/mips/helper.h
-> +++ b/target/mips/helper.h
-> @@ -76,6 +76,7 @@ DEF_HELPER_1(mfc0_maar, tl, env)
->  DEF_HELPER_1(mfhc0_maar, tl, env)
->  DEF_HELPER_2(mfc0_watchlo, tl, env, i32)
->  DEF_HELPER_2(mfc0_watchhi, tl, env, i32)
-> +DEF_HELPER_2(mfhc0_watchhi, tl, env, i32)
->  DEF_HELPER_1(mfc0_debug, tl, env)
->  DEF_HELPER_1(mftc0_debug, tl, env)
->  #ifdef TARGET_MIPS64
-> @@ -87,6 +88,7 @@ DEF_HELPER_1(dmfc0_tcschefback, tl, env)
->  DEF_HELPER_1(dmfc0_lladdr, tl, env)
->  DEF_HELPER_1(dmfc0_maar, tl, env)
->  DEF_HELPER_2(dmfc0_watchlo, tl, env, i32)
-> +DEF_HELPER_2(dmfc0_watchhi, tl, env, i32)
->  #endif /* TARGET_MIPS64 */
->
->  DEF_HELPER_2(mtc0_index, void, env, tl)
-> @@ -153,6 +155,7 @@ DEF_HELPER_2(mthc0_maar, void, env, tl)
->  DEF_HELPER_2(mtc0_maari, void, env, tl)
->  DEF_HELPER_3(mtc0_watchlo, void, env, tl, i32)
->  DEF_HELPER_3(mtc0_watchhi, void, env, tl, i32)
-> +DEF_HELPER_3(mthc0_watchhi, void, env, tl, i32)
->  DEF_HELPER_2(mtc0_xcontext, void, env, tl)
->  DEF_HELPER_2(mtc0_framemask, void, env, tl)
->  DEF_HELPER_2(mtc0_debug, void, env, tl)
-> diff --git a/target/mips/machine.c b/target/mips/machine.c
-> index 70a8909..5d558c1 100644
-> --- a/target/mips/machine.c
-> +++ b/target/mips/machine.c
-> @@ -292,7 +292,7 @@ const VMStateDescription vmstate_mips_cpu = {
->          VMSTATE_INT32(env.CP0_MAARI, MIPSCPU),
->          VMSTATE_UINT64(env.lladdr, MIPSCPU),
->          VMSTATE_UINTTL_ARRAY(env.CP0_WatchLo, MIPSCPU, 8),
-> -        VMSTATE_INT32_ARRAY(env.CP0_WatchHi, MIPSCPU, 8),
-> +        VMSTATE_UINT64_ARRAY(env.CP0_WatchHi, MIPSCPU, 8),
-
-Don't this break migration?
-
->          VMSTATE_UINTTL(env.CP0_XContext, MIPSCPU),
->          VMSTATE_INT32(env.CP0_Framemask, MIPSCPU),
->          VMSTATE_INT32(env.CP0_Debug, MIPSCPU),
-> diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-> index af130f6..3d86c60 100644
-> --- a/target/mips/op_helper.c
-> +++ b/target/mips/op_helper.c
-> @@ -991,7 +991,12 @@ target_ulong helper_mfc0_watchlo(CPUMIPSState *env, uint32_t sel)
->
->  target_ulong helper_mfc0_watchhi(CPUMIPSState *env, uint32_t sel)
->  {
-> -    return env->CP0_WatchHi[sel];
-> +    return (int32_t) env->CP0_WatchHi[sel];
-> +}
-> +
-> +target_ulong helper_mfhc0_watchhi(CPUMIPSState *env, uint32_t sel)
-> +{
-> +    return env->CP0_WatchHi[sel] >> 32;
->  }
->
->  target_ulong helper_mfc0_debug(CPUMIPSState *env)
-> @@ -1059,6 +1064,11 @@ target_ulong helper_dmfc0_watchlo(CPUMIPSState *env, uint32_t sel)
->  {
->      return env->CP0_WatchLo[sel];
->  }
-> +
-> +target_ulong helper_dmfc0_watchhi(CPUMIPSState *env, uint32_t sel)
-> +{
-> +    return env->CP0_WatchHi[sel];
-> +}
->  #endif /* TARGET_MIPS64 */
->
->  void helper_mtc0_index(CPUMIPSState *env, target_ulong arg1)
-> @@ -1818,11 +1828,20 @@ void helper_mtc0_watchlo(CPUMIPSState *env, target_ulong arg1, uint32_t sel)
->
->  void helper_mtc0_watchhi(CPUMIPSState *env, target_ulong arg1, uint32_t sel)
->  {
-> -    int mask = 0x40000FF8 | (env->CP0_EntryHi_ASID_mask << CP0WH_ASID);
-> +    uint64_t mask = 0x40000FF8 | (env->CP0_EntryHi_ASID_mask << CP0WH_ASID);
-> +    if ((env->CP0_Config5 >> CP0C5_MI) & 1) {
-> +        mask |= 0xFFFFFFFF00000000ULL; /* MMID */
-> +    }
->      env->CP0_WatchHi[sel] = arg1 & mask;
->      env->CP0_WatchHi[sel] &= ~(env->CP0_WatchHi[sel] & arg1 & 0x7);
->  }
->
-> +void helper_mthc0_watchhi(CPUMIPSState *env, target_ulong arg1, uint32_t sel)
-> +{
-> +    env->CP0_WatchHi[sel] = ((uint64_t) (arg1) << 32) |
-> +                            (env->CP0_WatchHi[sel] & 0x00000000ffffffffULL);
-
-Or:
-
-env->CP0_WatchHi[sel] = deposit64(env->CP0_WatchHi[sel], 32, 32, arg1);
-
-> +}
-> +
->  void helper_mtc0_xcontext(CPUMIPSState *env, target_ulong arg1)
->  {
->      target_ulong mask = (1ULL << (env->SEGBITS - 7)) - 1;
+> diff --git a/target/mips/internal.h b/target/mips/internal.h
+> index 54bf39f..e367d7e 100644
+> --- a/target/mips/internal.h
+> +++ b/target/mips/internal.h
+> @@ -310,8 +310,8 @@ static inline void compute_hflags(CPUMIPSState *env)
+>      env->hflags &=3D ~(MIPS_HFLAG_COP1X | MIPS_HFLAG_64 | MIPS_HFLAG_CP0=
+ |
+>                       MIPS_HFLAG_F64 | MIPS_HFLAG_FPU | MIPS_HFLAG_KSU |
+>                       MIPS_HFLAG_AWRAP | MIPS_HFLAG_DSP | MIPS_HFLAG_DSPR=
+2 |
+> -                     MIPS_HFLAG_SBRI | MIPS_HFLAG_MSA | MIPS_HFLAG_FRE |
+> -                     MIPS_HFLAG_ELPA | MIPS_HFLAG_ERL);
+> +                     MIPS_HFLAG_DSPR3 | MIPS_HFLAG_SBRI | MIPS_HFLAG_MSA=
+ |
+> +                     MIPS_HFLAG_FRE | MIPS_HFLAG_ELPA | MIPS_HFLAG_ERL);
+>      if (env->CP0_Status & (1 << CP0St_ERL)) {
+>          env->hflags |=3D MIPS_HFLAG_ERL;
+>      }
+> @@ -358,7 +358,12 @@ static inline void compute_hflags(CPUMIPSState *env)
+>          (env->CP0_Config5 & (1 << CP0C5_SBRI))) {
+>          env->hflags |=3D MIPS_HFLAG_SBRI;
+>      }
+> -    if (env->insn_flags & ASE_DSPR2) {
+> +    if (env->insn_flags & ASE_DSPR3) {
+> +        if (env->CP0_Status & (1 << CP0St_MX)) {
+> +            env->hflags |=3D MIPS_HFLAG_DSP | MIPS_HFLAG_DSPR2 |
+> +                           MIPS_HFLAG_DSPR3;
+> +        }
+> +    } else if (env->insn_flags & ASE_DSPR2) {
+>          /* Enables access MIPS DSP resources, now our cpu is DSP ASER2,
+>             so enable to access DSPR2 resources. */
+>          if (env->CP0_Status & (1 << CP0St_MX)) {
 > diff --git a/target/mips/translate.c b/target/mips/translate.c
-> index 5e508d5..c7eaee7 100644
+> index e9c3a14..c3ad65c 100644
 > --- a/target/mips/translate.c
 > +++ b/target/mips/translate.c
-> @@ -5223,6 +5223,25 @@ static void gen_mfhc0(DisasContext *ctx, TCGv arg, int reg, int sel)
->              goto cp0_unimplemented;
->          }
->          break;
-> +    case 19:
-> +        switch (sel) {
-> +        case 0:
-> +        case 1:
-> +        case 2:
-> +        case 3:
-> +        case 4:
-> +        case 5:
-> +        case 6:
-> +        case 7:
-> +            /* upper 32 bits are only available when Config5MI != 0 */
-> +            /* CP0_CHECK(ctx->mi); */
-
-What about this check?
-
-> +            gen_mfhc0_load64(arg, offsetof(CPUMIPSState, CP0_WatchHi[sel]), 0);
-> +            rn = "WatchHi";
-> +            break;
-> +        default:
-> +            goto cp0_unimplemented;
+> @@ -1869,6 +1869,17 @@ static inline void check_dspr2(DisasContext *ctx)
+>      }
+>  }
+>
+> +static inline void check_dspr3(DisasContext *ctx)
+> +{
+> +    if (unlikely(!(ctx->hflags & MIPS_HFLAG_DSPR3))) {
+> +        if (ctx->insn_flags & ASE_DSP) {
+> +            generate_exception_end(ctx, EXCP_DSPDIS);
+> +        } else {
+> +            generate_exception_end(ctx, EXCP_RI);
 > +        }
-> +        break;
->      case 28:
->          switch (sel) {
->          case 0:
-> @@ -5295,6 +5314,25 @@ static void gen_mthc0(DisasContext *ctx, TCGv arg, int reg, int sel)
->              goto cp0_unimplemented;
->          }
->          break;
-> +    case 19:
-> +        switch (sel) {
-> +        case 0:
-> +        case 1:
-> +        case 2:
-> +        case 3:
-> +        case 4:
-> +        case 5:
-> +        case 6:
-> +        case 7:
-> +            /* upper 32 bits are only available when Config5MI != 0 */
-> +            /* CP0_CHECK(ctx->mi); */
-> +            gen_helper_0e1i(mthc0_watchhi, arg, sel);
-> +            rn = "WatchHi";
-> +            break;
-> +        default:
-> +            goto cp0_unimplemented;
-> +        }
-> +        break;
->      case 28:
->          switch (sel) {
->          case 0:
-> @@ -7293,7 +7331,7 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
->          case 6:
->          case 7:
->              CP0_CHECK(ctx->CP0_Config1 & (1 << CP0C1_WR));
-> -            gen_helper_1e0i(mfc0_watchhi, arg, sel);
-> +            gen_helper_1e0i(dmfc0_watchhi, arg, sel);
->              rn = "WatchHi";
->              break;
->          default:
+> +    }
+> +}
+> +
+>  /* This code generates a "reserved instruction" exception if the
+>     CPU does not support the instruction set corresponding to flags. */
+>  static inline void check_insn(DisasContext *ctx, int flags)
+> @@ -20285,7 +20296,7 @@ static int decode_nanomips_32_48_opc(CPUMIPSState=
+ *env, DisasContext *ctx)
+>                      gen_compute_branch_cp1_nm(ctx, OPC_BC1NEZ, rt, s);
+>                      break;
+>                  case NM_BPOSGE32C:
+> -                    check_dspr2(ctx);
+> +                    check_dspr3(ctx);
+>                      {
+>                          int32_t imm =3D extract32(ctx->opcode, 1, 13) |
+>                                        extract32(ctx->opcode, 0, 1) << 13=
+;
+> diff --git a/target/mips/translate_init.inc.c b/target/mips/translate_ini=
+t.inc.c
+> index b3320b9..d7cd4ee 100644
+> --- a/target/mips/translate_init.inc.c
+> +++ b/target/mips/translate_init.inc.c
+> @@ -485,7 +485,8 @@ const mips_def_t mips_defs[] =3D
+>          .CP1_fcr31 =3D (1 << FCR31_ABS2008) | (1 << FCR31_NAN2008),
+>          .SEGBITS =3D 32,
+>          .PABITS =3D 32,
+> -        .insn_flags =3D CPU_NANOMIPS32 | ASE_DSP | ASE_DSPR2 | ASE_MT,
+> +        .insn_flags =3D CPU_NANOMIPS32 | ASE_DSP | ASE_DSPR2 | ASE_DSPR3=
+ |
+> +                      ASE_MT,
+>          .mmu_type =3D MMU_TYPE_R4000,
+>      },
+>  #if defined(TARGET_MIPS64)
 > --
 > 2.7.4
 >
