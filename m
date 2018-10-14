@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ndevos@redhat.com>) id 1gBeBy-0006H2-Af
-	for qemu-devel@nongnu.org; Sun, 14 Oct 2018 07:04:14 -0400
+	(envelope-from <mreitz@redhat.com>) id 1gBeki-0002Gr-19
+	for qemu-devel@nongnu.org; Sun, 14 Oct 2018 07:40:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ndevos@redhat.com>) id 1gBeBx-0004aF-GR
-	for qemu-devel@nongnu.org; Sun, 14 Oct 2018 07:04:14 -0400
-Date: Sun, 14 Oct 2018 13:04:03 +0200
-From: Niels de Vos <ndevos@redhat.com>
-Message-ID: <20181014110403.GD22957@ndevos-x270>
-References: <20181012115532.12645-1-kwolf@redhat.com>
-	<20181012115532.12645-8-kwolf@redhat.com>
-	<0b377575-4838-c436-3867-a875bc8bab76@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1gBekh-0000QD-4O
+	for qemu-devel@nongnu.org; Sun, 14 Oct 2018 07:40:07 -0400
+References: <20181013050227.17022-1-ehabkost@redhat.com>
+	<219bba9b-4102-f838-a46f-11b9704ca78f@redhat.com>
+	<20181013203607.GL31060@habkost.net>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <0547ccec-6b85-a03f-88e3-74baa5ab4273@redhat.com>
+Date: Sun, 14 Oct 2018 13:39:44 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0b377575-4838-c436-3867-a875bc8bab76@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 7/8] gluster: Support
- auto-read-only option
+In-Reply-To: <20181013203607.GL31060@habkost.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC] Require Python 3 for building QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,32 +25,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>, qemu-block@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-On Fri, Oct 12, 2018 at 12:31:21PM -0500, Eric Blake wrote:
-> On 10/12/18 6:55 AM, Kevin Wolf wrote:
-> > If read-only=off, but auto-read-only=on is given, open the file
-> > read-write if we have the permissions, but instead of erroring out for
-> > read-only files, just degrade to read-only.
-> > 
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >   block/gluster.c | 9 +++++++++
-> >   1 file changed, 9 insertions(+)
-> > 
-> > diff --git a/block/gluster.c b/block/gluster.c
-> > index 4fd55a9cc5..68d20c8830 100644
-> > --- a/block/gluster.c
-> > +++ b/block/gluster.c
-> > @@ -849,6 +849,15 @@ static int qemu_gluster_open(BlockDriverState *bs,  QDict *options,
-> >       qemu_gluster_parse_flags(bdrv_flags, &open_flags);
-> >       s->fd = glfs_open(s->glfs, gconf->path, open_flags);
-> > +    if (!s->fd && errno == EACCES) {
+On 13.10.18 22:36, Eduardo Habkost wrote:
+> On Sat, Oct 13, 2018 at 08:20:25PM +0200, Max Reitz wrote:
+>> On 13.10.18 07:02, Eduardo Habkost wrote:
+>>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+>>> ---
+>>> I'd like to do this in QEMU 3.1.  I think it's time to drop
+>>> support for old systems that have only Python 2.
+>>>
+>>> We still have a few scripts that are not required for building
+>>> QEMU that still work only with Python 2 (iotests being the most
+>>> relevant set).  Requiring Python 3 for building QEMU won't
+>>> prevent people from using those scripts with Python 2 until they
+>>> are finally ported.
+>>
+>> It very much does because the iotests specifically use the python path
+>> qemu was configured with.
+>>
+>> To fix this, configure would need to write something else for into
+>> tests/qemu-iotests/common.env for $PYTHON.  But what?  I don't really
+>> want to introduce a new configure option for this.
 > 
-> EROFS is not possible as it was for posix file?
+> What's wrong with '/usr/bin/env python2' and just using the
+> python2 binary from $PATH?  Why do we need to make the Python
+> interpreter path for iotests configurable?
 
-EROFS can happen, depending on the configuration of the Gluster volume.
-In that case, opening read-only should work fine.
+Nothing, sounds good.  No idea why I discarded that idea.
 
-Niels
+>> So the real fix is indeed to make the iotests work with Python 3, and I
+>> think that needs to be done before we can require Python 3.  Maybe it
+>> even needs to be done at the same time.
+> 
+> I agree that this would be even better.  I just don't think the
+> pending iotest porting should force all the rest of the build
+> scripts to be compatible with Python 2.
+
+True.  It just means that we have to do something about the iotests
+before this patch can be merged.
+
+Max
