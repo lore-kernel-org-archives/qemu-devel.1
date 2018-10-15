@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50963)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gByon-00021e-7n
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 05:05:44 -0400
+	(envelope-from <jerome.forissier@linaro.org>) id 1gByrk-0004Q2-In
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 05:08:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gByog-0008TP-Vw
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 05:05:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37086)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gByog-0008KR-Ip
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 05:05:34 -0400
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 15 Oct 2018 11:05:10 +0200
-Message-Id: <20181015090517.26884-1-kraxel@redhat.com>
+	(envelope-from <jerome.forissier@linaro.org>) id 1gByrf-0002E2-Ko
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 05:08:42 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36955)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jerome.forissier@linaro.org>)
+	id 1gByrZ-000294-5j
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 05:08:33 -0400
+Received: by mail-wr1-x442.google.com with SMTP id y11-v6so20338517wrd.4
+	for <qemu-devel@nongnu.org>; Mon, 15 Oct 2018 02:08:32 -0700 (PDT)
+From: Jerome Forissier <jerome.forissier@linaro.org>
+References: <20181005080729.6480-1-jerome.forissier@linaro.org>
+	<CAFEAcA9h7_vaKk7GuGVWv2_hFeR=xC4ZgJzLuD+iSqCdwa1PSw@mail.gmail.com>
+	<d52c8388-5482-633b-bd9d-5eaf0eeb3eec@linaro.org>
+Message-ID: <70f911cb-7d49-e8cb-e3cd-081033e010c2@linaro.org>
+Date: Mon, 15 Oct 2018 11:08:28 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/7] Vga 20181015 patches
+In-Reply-To: <d52c8388-5482-633b-bd9d-5eaf0eeb3eec@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/virt: add DT property
+ /secure-chosen/sdtout-path being secure UART
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,57 +33,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Etienne Carriere <etienne.carriere@linaro.org>, tee-dev@lists.linaro.org, Rob Herring <robh+dt@kernel.org>
 
-The following changes since commit a73549f99612f758dec0fdea6ae1c30b6c709a=
-0b:
+Hi Peter,
 
-  Merge remote-tracking branch 'remotes/kraxel/tags/ui-20181012-pull-requ=
-est' into staging (2018-10-12 16:45:51 +0100)
+On 10/05/2018 11:26 AM, Jerome Forissier wrote:
+> +CC: Rob Herring
+> 
+> On 10/05/2018 11:16 AM, Peter Maydell wrote:
+>> On 5 October 2018 at 09:07, Jerome Forissier
+>> <jerome.forissier@linaro.org> wrote:
+>>> Bindings for /secure-chosen and /secure-chosen/stdout-path have been
+>>> proposed 1.5 years ago [1] and implemented in OP-TEE at the same time [2].
+>>>
+>>> This patch creates the property when the machine is secure.
+>>>
+>>> [1] https://patchwork.kernel.org/patch/9602401/
+>>> [2] https://github.com/OP-TEE/optee_os/commit/4dc31c52544a
+>>>
+>>> Signed-off-by: Jerome Forissier <jerome.forissier@linaro.org>
+>>
+>> The patch seems OK, but it looks like the DT bindings are
+>> not upstream yet? [*]
+> 
+> No, they're not.
 
-are available in the git repository at:
+Update: Rob has now accepted the bindings [3] (thanks!).
 
-  git://git.kraxel.org/qemu tags/vga-20181015-pull-request
+[3] http://patchwork.ozlabs.org/patch/980467/#2009642
 
-for you to fetch changes up to 9f42e0b3c2355c4a2475124c3fc40421a88de813:
+-- 
+Jerome
 
-  Makefile: Install new vgabios binaries (2018-10-15 09:57:33 +0200)
-
-----------------------------------------------------------------
-vga: config tweaks, edid updates, qxl bugfix, install new vgabios blobs.
-
-----------------------------------------------------------------
-
-Alex Williamson (1):
-  Makefile: Install new vgabios binaries
-
-Gerd Hoffmann (5):
-  edid: fix alignment issues
-  display: add separate config option for bochs-display
-  bochs-display: wire up edid support
-  qxl: check qxl_phys2virt return value
-  i2c: switch ddc to use the new edid generator
-
-Thomas Huth (1):
-  hw/display/cirrus_vga: Move "isa-cirrus-vga" device into a separate
-    file
-
- Makefile                         |   1 +
- hw/display/cirrus_vga_internal.h | 103 ++++++++++++++++++++
- include/hw/i2c/i2c-ddc.h         |   4 +-
- hw/display/bochs-display.c       |  13 +++
- hw/display/cirrus_vga.c          | 143 +---------------------------
- hw/display/cirrus_vga_isa.c      |  98 +++++++++++++++++++
- hw/display/edid-generate.c       |   8 +-
- hw/display/qxl.c                 |   2 +-
- hw/i2c/i2c-ddc.c                 | 200 ++-------------------------------=
-------
- default-configs/pci.mak          |   1 +
- hw/display/Makefile.objs         |   4 +-
- 11 files changed, 240 insertions(+), 337 deletions(-)
- create mode 100644 hw/display/cirrus_vga_internal.h
- create mode 100644 hw/display/cirrus_vga_isa.c
-
---=20
-2.9.3
+> 
+>  I wouldn't want QEMU to start creating
+>> bindings until the spec is definitely final.
+> 
+> I understand, but I think we may have a chicken-and-egg problem, because
+> Rob said he'd like to see more usage of DT in secure world before
+> merging the bindings ;-)
+> 
+> That being said, I can certainly re-submit the binding to the LKML. Rob,
+> what do you say?
+> 
+>>
+>> [*] they're not in
+>> https://www.kernel.org/doc/Documentation/devicetree/bindings/arm/secure.txt
+>> anyway; is that the wrong place to look?
+>>
+>> thanks
+>> -- PMM
+>>
+> 
+> Thanks,
+> 
