@@ -1,26 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33591)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gBzMv-0006lU-2U
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 05:40:57 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gBzOs-0007nY-V3
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 05:42:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gBzMu-0005LY-BG
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 05:40:56 -0400
-Received: from mail-oi1-x229.google.com ([2607:f8b0:4864:20::229]:35981)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gBzMt-0005L3-Vb
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 05:40:56 -0400
-Received: by mail-oi1-x229.google.com with SMTP id p125-v6so14550024oic.3
-	for <qemu-devel@nongnu.org>; Mon, 15 Oct 2018 02:40:55 -0700 (PDT)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gBzOm-0007yc-2P
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 05:42:56 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 15 Oct 2018 09:42:46 +0000
+Message-ID: <cfe31ab4-92e7-41e1-24f3-2a09663021d7@virtuozzo.com>
+References: <20180626135035.133432-5-vsementsov@virtuozzo.com>
+	<700dffe4-f3a8-8f70-052c-9f6f8ffbe3d3@redhat.com>
+	<20180801102031.GC2691@work-vm>
+	<64aad02b-3d5c-70d6-0f5a-93dd5b88e4bc@redhat.com>
+	<20180801174005.GD2691@work-vm>
+	<cbdecba1-925c-5f6e-bf3c-a27cc4d944da@openvz.org>
+	<20180801185515.GE2691@work-vm>
+	<6bfdc952-fb17-feae-f367-be710853d829@openvz.org>
+	<20180802092907.GA2523@work-vm>
+	<202065a2-f9d1-ce31-b12b-437d57095ac1@openvz.org>
+	<20180802095056.GB2523@work-vm>
+	<86304a35-efd8-a605-f684-2bd3fb3b9815@openvz.org>
+	<1e41d103-6d56-71e8-ef60-fc4c9343a06e@redhat.com>
+	<6d8ed319-9b63-5a7b-fcfe-20cd37cf8c7c@virtuozzo.com>
+	<d2538432-be74-99bc-72d1-94f8abaa2f9b@redhat.com>
+	<26c0e008-898d-924a-214e-68ab9fedf1ea@virtuozzo.com>
+In-Reply-To: <26c0e008-898d-924a-214e-68ab9fedf1ea@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <AC6505B232276940BFD62EC74818AD40@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <39e2ed06-0e66-8030-fa4f-91b4c505da09@gmail.com>
-References: <39e2ed06-0e66-8030-fa4f-91b4c505da09@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 15 Oct 2018 10:40:34 +0100
-Message-ID: <CAFEAcA-E3jWDeBk_TRGkkHen5HUD9wfmK6hjxQGdbrc6HsWRRg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Assertion error when installing OpenBSD 6.3 in
- Linux 4.8.12
+Subject: [Qemu-devel] ping Re: [PATCH 4/6] dirty-bitmaps: clean-up bitmaps
+ loading and migration logic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,27 +40,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Hristo Mihaylov <za.hristomihaylov@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: John Snow <jsnow@redhat.com>, Denis Lunev <den@virtuozzo.com>, "Dr. David
+	Alan Gilbert" <dgilbert@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "quintela@redhat.com" <quintela@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "famz@redhat.com" <famz@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On 13 October 2018 at 17:50, Hristo Mihaylov
-<za.hristomihaylov@gmail.com> wrote:
-> Hello,
-> I'm trying to install OpenBSD 6.3 on Arch Linux.
-
-> This is the crash output:
->
-> qemu-system-x86_64:
-> /build/qemu/src/qemu-3.0.0/include/exec/memory_ldst_cached.inc.h:85:
-> address_space_stw_le_cached: Assertion `addr < cache->len && 2 <=
-> cache->len - addr' failed.
-
-> Am I doing something wrong or is this a bug?
-
-Hi; yes, this is a known bug (that affects OpenBSD guests
-using virtio networking). It's fixed in QEMU git master
-in commit db812c4073c77, and will be in the next (3.1)
-release as well as the next 3.0.x release.
-
-thanks
--- PMM
+cGluZw0KDQoxOC4wOS4yMDE4IDEzOjM3LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdy
+b3RlOg0KPiAxNy4wOS4yMDE4IDIxOjMzLCBKb2huIFNub3cgd3JvdGU6DQo+Pg0KPj4gT24gMDkv
+MTcvMjAxOCAxMTo1MSBBTSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+
+PiBIbW0sIHBpbmcsIGFueWJvZHkgaGVyZSA/KQ0KPj4+DQo+PiBXYXMgcHJlcGFyaW5nIHRvIHN0
+YWdlIG9uIEZyaWRheSwgd29ya2luZyBvbiBpdCBub3cuDQo+Pg0KPj4gSSBuZXZlciB1bmRlcnN0
+b29kIHdoeSB5b3UgZm9yYmlkIHRoZSB0cmFuc2ZlciBvZiByZWFkIG9ubHkgYml0bWFwcw0KPj4g
+dGhvdWdoLCBjYW4geW91IHBvaW50IHRoYXQgb3V0IGZvciBtZT8NCj4+DQo+PiAtLWpzDQo+DQo+
+IHJlYWRvbmx5IGJpdG1hcCAtIG1lYW5zIGl0IGlzIG5vdCBtYXJrZWQgaW5fdXNlIGluIHFjb3cy
+IGZpbGUuDQo+DQo+IEhtLCBJIGRvbid0IHJlbWVtYmVyIGV4YWN0IHJlYXNvbiwgYnV0IGF0IGxl
+YXN0IGZvciBzaGFyZWQgbWlncmF0aW9uIA0KPiBpdCBpcyB1bnNhZmUgdG8gbWlncmF0ZSByZWFk
+b25seSBiaXRtYXAgd2l0aG91dCBzcGVjaWFsIGhhbmRsaW5nOiB3ZSANCj4gbWlncmF0ZSBpdCwg
+aXQgYmVjb21lcyBub3QtcmVhZG9ubHksIGl0IGNoYW5nZXMgaW4gUkFNLCB0aGVuIChhc3N1bWUp
+IA0KPiBzdG9yaW5nIGZhaWxlZCBhbmQgd2UgaGF2ZSBvbGQgdmVyc2lvbiBvZnRoZSBiaXRtYXAg
+aW4gcWNvdzIsIHdoaWNoIGlzIA0KPiBub3QgbWFya2VkIGluX3VzZS4uIFNvIGl0IHNob3VsZCBi
+ZSBzb21laG93IGNhcmVmdWxseSBoYW5kbGVkLCB0aGUgDQo+IHNpbXBsZXN0IG9wdGlvbiBpcyBq
+dXN0IHRvIGZvcmJpZCBpdC4NCj4NCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQoN
+Cg==
