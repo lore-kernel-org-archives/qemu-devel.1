@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39393)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gC1R0-00045j-Fg
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:19 -0400
+	(envelope-from <armbru@redhat.com>) id 1gC1R3-00046x-7f
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gC1Qw-0001wv-Tz
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37928)
+	(envelope-from <armbru@redhat.com>) id 1gC1R1-00022X-3l
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59126)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gC1Qw-0001w1-Lw
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:14 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gC1R0-0001z0-R2
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:18 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id F19154E91A
+	for <qemu-devel@nongnu.org>; Mon, 15 Oct 2018 11:53:16 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-50.ams2.redhat.com
+	[10.36.116.50])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id BA3407C5A4
+	for <qemu-devel@nongnu.org>; Mon, 15 Oct 2018 11:53:16 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 15 Oct 2018 13:52:36 +0200
-Message-Id: <20181015115309.17089-3-armbru@redhat.com>
+Date: Mon, 15 Oct 2018 13:52:56 +0200
+Message-Id: <20181015115309.17089-23-armbru@redhat.com>
 In-Reply-To: <20181015115309.17089-1-armbru@redhat.com>
 References: <20181015115309.17089-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 02/35] Use error_fatal to simplify obvious
- fatal errors (again)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 22/35] vl: Clean up error reporting in
+ mon_init_func()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,113 +38,59 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Add a slight improvement of the Coccinelle semantic patch from commit
-007b06578ab, and use it to clean up.  It leaves dead Error * variables
-behind, cleaned up manually.
+Calling error_report() in a function that takes an Error ** argument
+is suspicious.  mon_init_func() does that, and then fails without
+setting an error.  Its caller main(), via qemu_opts_foreach(), is fine
+with it, but clean it up anyway.
 
-Cc: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexander Graf <agraf@suse.de>
-Cc: Eric Blake <eblake@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- hw/intc/xics_kvm.c                       |  7 +------
- qemu-nbd.c                               |  6 +-----
- scripts/coccinelle/use-error_fatal.cocci | 20 ++++++++++++++++++++
- vl.c                                     |  7 +------
- 4 files changed, 23 insertions(+), 17 deletions(-)
- create mode 100644 scripts/coccinelle/use-error_fatal.cocci
+ vl.c | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
 
-diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-index 30c3769a20..e8fa9a53ae 100644
---- a/hw/intc/xics_kvm.c
-+++ b/hw/intc/xics_kvm.c
-@@ -198,17 +198,12 @@ static void ics_get_kvm_state(ICSState *ics)
- {
-     uint64_t state;
-     int i;
--    Error *local_err = NULL;
- 
-     for (i = 0; i < ics->nr_irqs; i++) {
-         ICSIRQState *irq = &ics->irqs[i];
- 
-         kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURCES,
--                          i + ics->offset, &state, false, &local_err);
--        if (local_err) {
--            error_report_err(local_err);
--            exit(1);
--        }
-+                          i + ics->offset, &state, false, &error_fatal);
- 
-         irq->server = state & KVM_XICS_DESTINATION_MASK;
-         irq->saved_priority = (state >> KVM_XICS_PRIORITY_SHIFT)
-diff --git a/qemu-nbd.c b/qemu-nbd.c
-index e76fe3082a..7874bc973c 100644
---- a/qemu-nbd.c
-+++ b/qemu-nbd.c
-@@ -1002,11 +1002,7 @@ int main(int argc, char **argv)
-     }
- 
-     exp = nbd_export_new(bs, dev_offset, fd_size, nbdflags, nbd_export_closed,
--                         writethrough, NULL, &local_err);
--    if (!exp) {
--        error_report_err(local_err);
--        exit(EXIT_FAILURE);
--    }
-+                         writethrough, NULL, &error_fatal);
-     nbd_export_set_name(exp, export_name);
-     nbd_export_set_description(exp, export_description);
- 
-diff --git a/scripts/coccinelle/use-error_fatal.cocci b/scripts/coccinelle/use-error_fatal.cocci
-new file mode 100644
-index 0000000000..10fff0aec4
---- /dev/null
-+++ b/scripts/coccinelle/use-error_fatal.cocci
-@@ -0,0 +1,20 @@
-+@@
-+type T;
-+identifier FUN, RET;
-+expression list ARGS;
-+expression ERR, EC, FAIL;
-+@@
-+(
-+-    T RET = FUN(ARGS, &ERR);
-++    T RET = FUN(ARGS, &error_fatal);
-+|
-+-    RET = FUN(ARGS, &ERR);
-++    RET = FUN(ARGS, &error_fatal);
-+|
-+-    FUN(ARGS, &ERR);
-++    FUN(ARGS, &error_fatal);
-+)
-+-    if (FAIL) {
-+-        error_report_err(ERR);
-+-        exit(EC);
-+-    }
 diff --git a/vl.c b/vl.c
-index 4e25c78bff..ff50199e64 100644
+index c3c17106bf..cd8e8a6586 100644
 --- a/vl.c
 +++ b/vl.c
-@@ -2002,15 +2002,10 @@ static void select_vgahw(const char *p)
- 
- static void parse_display_qapi(const char *optarg)
- {
--    Error *err = NULL;
-     DisplayOptions *opts;
-     Visitor *v;
- 
--    v = qobject_input_visitor_new_str(optarg, "type", &err);
--    if (!v) {
--        error_report_err(err);
+@@ -2270,8 +2270,8 @@ static int mon_init_func(void *opaque, QemuOpts *op=
+ts, Error **errp)
+     } else if (strcmp(mode, "control") =3D=3D 0) {
+         flags =3D MONITOR_USE_CONTROL;
+     } else {
+-        error_report("unknown monitor mode \"%s\"", mode);
+-        exit(1);
++        error_setg(errp, "unknown monitor mode \"%s\"", mode);
++        return -1;
+     }
+=20
+     if (qemu_opt_get_bool(opts, "pretty", 0))
+@@ -2285,8 +2285,8 @@ static int mon_init_func(void *opaque, QemuOpts *op=
+ts, Error **errp)
+     chardev =3D qemu_opt_get(opts, "chardev");
+     chr =3D qemu_chr_find(chardev);
+     if (chr =3D=3D NULL) {
+-        error_report("chardev \"%s\" not found", chardev);
+-        exit(1);
++        error_setg(errp, "chardev \"%s\" not found", chardev);
++        return -1;
+     }
+=20
+     monitor_init(chr, flags);
+@@ -4412,10 +4412,8 @@ int main(int argc, char **argv, char **envp)
+     default_drive(default_floppy, snapshot, IF_FLOPPY, 0, FD_OPTS);
+     default_drive(default_sdcard, snapshot, IF_SD, 0, SD_OPTS);
+=20
+-    if (qemu_opts_foreach(qemu_find_opts("mon"),
+-                          mon_init_func, NULL, NULL)) {
 -        exit(1);
 -    }
-+    v = qobject_input_visitor_new_str(optarg, "type", &error_fatal);
- 
-     visit_type_DisplayOptions(v, NULL, &opts, &error_fatal);
-     QAPI_CLONE_MEMBERS(DisplayOptions, &dpy, opts);
--- 
++    qemu_opts_foreach(qemu_find_opts("mon"),
++                      mon_init_func, NULL, &error_fatal);
+=20
+     if (foreach_device_config(DEV_SERIAL, serial_parse) < 0)
+         exit(1);
+--=20
 2.17.1
