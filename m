@@ -1,21 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39286)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gC8wj-0002D1-GL
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 15:54:38 -0400
+	(envelope-from <crosa@redhat.com>) id 1gC95R-0004ui-SK
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 16:03:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gC8wf-0006BL-KV
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 15:54:31 -0400
-Date: Mon, 15 Oct 2018 16:54:17 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181015195417.GB31060@habkost.net>
-References: <20181015141453.32632-1-mreitz@redhat.com>
-	<20181015141453.32632-5-mreitz@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181015141453.32632-5-mreitz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 4/9] iotests: Use // for Python integer
- division
+	(envelope-from <crosa@redhat.com>) id 1gC95R-0001xf-1U
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 16:03:33 -0400
+From: Cleber Rosa <crosa@redhat.com>
+Date: Mon, 15 Oct 2018 16:03:19 -0400
+Message-Id: <20181015200319.23076-1-crosa@redhat.com>
+Subject: [Qemu-devel] [RFC PATCH] iotests: make 083 specific to raw
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,17 +17,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Max Reitz <mreitz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
-On Mon, Oct 15, 2018 at 04:14:48PM +0200, Max Reitz wrote:
-> In Python 3, / is always a floating-point division.  We usually do not
-> want this, and as Python 2.7 understands // as well, change all integer
-> divisions to use that.
-> 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+While testing the Python 3 changes which touch the 083 test, I noticed
+that it would fail with qcow2.  Expanding the testing, I noticed it
+had nothing to do with the Python 3 changes, and in fact, it would not
+pass on anything but raw:
 
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+ raw: pass
+ bochs: not generic
+ cloop: not generic
+ parallels: fail
+ qcow: fail
+ qcow2: fail
+ qed: fail
+ vdi: fail
+ vhdx: fail
+ vmdk: fail
+ vpc: fail
+ luks: fail
 
+The errors are a mixture I/O and "image not in xxx format", such as:
+
+  === Check disconnect before data ===
+
+  Unexpected end-of-file before all bytes were read
+ -read failed: Input/output error
+ +can't open device nbd+tcp://127.0.0.1:PORT/foo: Could not open 'nbd://127.0.0.1:PORT/foo': Input/output error
+
+  === Check disconnect after data ===
+
+ -read 512/512 bytes at offset 0
+ -512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ +can't open device nbd+tcp://127.0.0.1:PORT/foo: Image not in qcow format
+
+I'm not aware if there's a quick fix, so, for the time being, it looks
+like the honest approach is to make the test known to work on raw
+only.
+
+Signed-off-by: Cleber Rosa <crosa@redhat.com>
+---
+ tests/qemu-iotests/083 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/qemu-iotests/083 b/tests/qemu-iotests/083
+index 3c1adbf0fb..9f92317b0a 100755
+--- a/tests/qemu-iotests/083
++++ b/tests/qemu-iotests/083
+@@ -39,7 +39,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ . ./common.rc
+ . ./common.filter
+ 
+-_supported_fmt generic
++_supported_fmt raw
+ _supported_proto nbd
+ _supported_os Linux
+ 
 -- 
-Eduardo
+2.17.1
