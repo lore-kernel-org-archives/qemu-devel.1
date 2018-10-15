@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40795)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gCBs4-0001ts-Sr
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 19:02:02 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gCBuF-00038w-8u
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 19:04:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gCBrs-0000sB-QY
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 19:01:53 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:39347)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gCBrs-0000nw-GM
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 19:01:44 -0400
-Received: by mail-wr1-f68.google.com with SMTP id 61-v6so23192122wrb.6
-	for <qemu-devel@nongnu.org>; Mon, 15 Oct 2018 16:01:42 -0700 (PDT)
-References: <1539600633-17726-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1539600633-17726-2-git-send-email-aleksandar.markovic@rt-rk.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <fb72d6e5-a04b-f3b5-a29c-2e7e112e2ef2@redhat.com>
-Date: Tue, 16 Oct 2018 01:01:39 +0200
+	(envelope-from <ehabkost@redhat.com>) id 1gCBu9-0002gr-U6
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 19:04:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50316)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gCBu6-0002eG-2V
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 19:04:04 -0400
+Date: Mon, 15 Oct 2018 20:03:42 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181015230342.GJ31060@habkost.net>
+References: <20181013025435.25785-1-ehabkost@redhat.com>
+	<20181015081641.q6r5wnhm7rq5tgfh@sirius.home.kraxel.org>
+	<20181015062543-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1539600633-17726-2-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/3] target/mips: Add a comment with an
- overview of CP0 registers
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181015062543-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH] virtio: Provide version-specific variants
+ of virtio PCI devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,143 +29,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
-Cc: smarkovic@wavecomp.com, pjovanovic@wavecomp.com, amarkovic@wavecomp.com, aurelien@aurel32.net
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Cleber Rosa <crosa@redhat.com>, Markus Armbruster <armbru@redhat.com>, Laine Stump <laine@redhat.com>, Caio Carrara <ccarrara@redhat.com>
 
-Hi Aleksandar,
+On Mon, Oct 15, 2018 at 06:27:21AM -0400, Michael S. Tsirkin wrote:
+> On Mon, Oct 15, 2018 at 10:16:41AM +0200, Gerd Hoffmann wrote:
+> > On Fri, Oct 12, 2018 at 11:54:35PM -0300, Eduardo Habkost wrote:
+> > > The current virtio-*-pci device types actually represent 3
+> > > different types of devices:
+> > > * virtio 1.0 non-transitional devices
+> > > * virtio 1.0 transitional devices
+> > 
+> > Ok.
+> > 
+> > > * virtio 0.9 ("legacy device" in virtio 1.0 terminology)
+> > 
+> > Why?  Is there any reason to prefer 0.9 over transitional?
 
-On 15/10/2018 12:50, Aleksandar Markovic wrote:
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
-> 
-> Add a comment with an overview of CP0 registers close to the
-> definition of their corresponding fields in CPUMIPSState.
-> 
-> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> ---
->  target/mips/cpu.h | 109 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 109 insertions(+)
-> 
-> diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-> index 28af4d1..cd54073 100644
-> --- a/target/mips/cpu.h
-> +++ b/target/mips/cpu.h
-> @@ -195,6 +195,115 @@ struct CPUMIPSState {
->  #define MSAIR_ProcID    8
->  #define MSAIR_Rev       0
->  
-> +/*
-> + *     Summary of CP0 registers
+I don't know.  The `disable-modern` option already exists but I
+don't know who would want to use it.  I'm just adding a way to
+represent that existing feature without having another set of
+device types with multiple-personality disorder.
 
-"since MIPS32/MIPS64 release 1"? Previous have different registers.
-
-> + *     ========================
-> + *
-> + *
-> + *     Register 0        Register 1        Register 2        Register 3
-> + *     ----------        ----------        ----------        ----------
-> + *
-> + * 0   Index             Random            EntryLo0          EntryLo1
-> + * 1   MVPControl        VPEControl        TCStatus          GlobalNumber
-> + * 2   MVPConf0          VPEConf0          TCBind
-> + * 3   MVPConf1          VPEConf1          TCRestart
-> + * 4   VPControl         YQMask            TCHalt
-> + * 5                     VPESchedule       TCContext
-> + * 6                     VPEScheFBack      TCSchedule
-> + * 7                     VPEOpt            TCScheFBack       TCOpt
-> + *
-> + *
-> + *     Register 4        Register 5        Register 6        Register 7
-> + *     ----------        ----------        ----------        ----------
-> + *
-> + * 0   Context           PageMask          Wired             HWREna
-> + * 1   ContextConfig     PageGrain         SRSConf0
-> + * 2   UserLocal         SegCtl0           SRSConf1
-> + * 3   XContextConfig    SegCtl1           SRSConf2
-> + * 4   DebugContextID    SegCtl2           SRSConf3
-> + * 5   MemoryMapID       PWBase            SRSConf4
-> + * 6                     PWField           PWCtl
-> + * 7                     PWSize
-> + *
-> + *
-> + *     Register 8        Register 9        Register 10       Register 11
-> + *     ----------        ----------        -----------       -----------
-> + *
-> + * 0   BadVAddr          Count             EntryHi           Compare
-> + * 1   BadInstr
-> + * 2   BadInstrP
-> + * 3   BadInstrX
-> + * 4                                       GuestCtl1         GuestCtl0Ext
-> + * 5                                       GuestCtl2
-> + * 6                                       GuestCtl3
-> + * 7
-> + *
-> + *
-> + *     Register 12       Register 13       Register 14       Register 15
-> + *     -----------       -----------       -----------       -----------
-> + *
-> + * 0   Status            Cause             EPC               PRId
-> + * 1   IntCtl                                                EBase
-> + * 2   SRSCtl                              NestedEPC         CDMMBase
-> + * 3   SRSMap                                                CMGCRBase
-> + * 4   View_IPL          View_RIPL                           BEVVA
-> + * 5   SRSMap2           NestedExc
-> + * 6   GuestCtl0
-> + * 7   GTOffset
-> + *
-> + *
-> + *     Register 16       Register 17       Register 18       Register 19
-> + *     -----------       -----------       -----------       -----------
-> + *
-> + * 0   Config            LLAddr            WatchLo           WatchHi
-> + * 1   Config1           MAAR              WatchLo           WatchHi
-> + * 2   Config2           MAARI             WatchLo           WatchHi
-> + * 3   Config3                             WatchLo           WatchHi
-> + * 4   Config4                             WatchLo           WatchHi
-> + * 5   Config5                             WatchLo           WatchHi
-> + * 6                                       WatchLo           WatchHi
-> + * 7                                       WatchLo           WatchHi
-> + *
-> + *
-> + *     Register 20       Register 21       Register 22       Register 23
-> + *     -----------       -----------       -----------       -----------
-> + *
-> + * 0   XContext                                              Debug
-> + * 1                                                         TraceControl
-> + * 2                                                         TraceControl2
-> + * 3                                                         UserTraceData1
-> + * 4                                                         TraceIBPC
-> + * 5                                                         TraceDBPC
-> + * 6                                                         Debug2
-> + * 7
-> + *
-> + *
-> + *     Register 24       Register 25       Register 26       Register 27
-> + *     -----------       -----------       -----------       -----------
-> + *
-> + * 0   DEPC              PerfCnt            ErrCtl          CacheErr
-> + * 1                     PerfCnt
-> + * 2   TraceControl3     PerfCnt
-> + * 3   UserTraceData2    PerfCnt
-> + * 4                     PerfCnt
-> + * 5                     PerfCnt
-> + * 6                     PerfCnt
-> + * 7                     PerfCnt
-> + *
-> + *
-> + *     Register 28       Register 29       Register 30       Register 31
-> + *     -----------       -----------       -----------       -----------
-> + *
-> + * 0   DataLo            DataHi            ErrorEPC          DESAVE
-> + * 1   TagLo             TagHi
-> + * 2   DataLo            DataHi                              KScratch<n>
-> + * 3   TagLo             TagHi                               KScratch<n>
-> + * 4   DataLo            DataHi                              KScratch<n>
-> + * 5   TagLo             TagHi                               KScratch<n>
-> + * 6   DataLo            DataHi                              KScratch<n>
-> + * 7   TagLo             TagHi                               KScratch<n>
-> + *
-> + */
->      int32_t CP0_Index;
->      /* CP0_MVP* are per MVP registers. */
->      int32_t CP0_VPControl;
+> > 
+> > cheers,
+> >   Gerd
 > 
+> Right - maybe a flag to disable modern interface is enough.
+> We thus get two types:
+> - transitional (legacy)
+> - non-transitional (modern)
+> which matches spec nicely.
+
+I would agree with the removal of virtio-*-0.9 only if we decide
+to drop support for disable-modern=true.  If we still want to
+provide a legacy-only virtio device, it should be a separate
+device type.
+
+Without separate device types, it becomes impossible to provide
+meaningful device type information to management software,
+including but not limited to:
+
+* removal/deprecation of device types (especially important if we
+  plan to remove virtio 0.9 support from QEMU one day)
+* PCI IDs
+* Bus compatibility information
+* Schema/introspection for 0.9-only or 1.0-only device options
+
+-- 
+Eduardo
