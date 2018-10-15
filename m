@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55663)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gBz0z-0003QC-8N
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 05:18:19 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gBz0s-00008F-Is
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gBz0w-0003O3-Jk
 	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 05:18:16 -0400
-Received: from cmccmta3.chinamobile.com ([221.176.66.81]:47482)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gBz0t-00008r-Qy
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 05:18:14 -0400
+Received: from cmccmta2.chinamobile.com ([221.176.66.80]:20665)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gBz0q-0008R6-Dw
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 05:18:09 -0400
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gBz0t-0008R9-6d
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 05:18:11 -0400
 From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-Date: Mon, 15 Oct 2018 17:17:34 +0800
-Message-Id: <20181015091736.14997-1-maozhongyi@cmss.chinamobile.com>
-Subject: [Qemu-devel] [PATCH v2 1/3] archive-source.sh: Modern shell
+Date: Mon, 15 Oct 2018 17:17:35 +0800
+Message-Id: <20181015091736.14997-2-maozhongyi@cmss.chinamobile.com>
+In-Reply-To: <20181015091736.14997-1-maozhongyi@cmss.chinamobile.com>
+References: <20181015091736.14997-1-maozhongyi@cmss.chinamobile.com>
+Subject: [Qemu-devel] [PATCH v2 2/3] git-submodule.sh: Modern shell
  scripting (use $() instead of ``)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -32,30 +34,23 @@ everywhere.
 Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- scripts/archive-source.sh | 4 ++--
+ scripts/git-submodule.sh | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/archive-source.sh b/scripts/archive-source.sh
-index 4e63774f9a..62bd22578b 100755
---- a/scripts/archive-source.sh
-+++ b/scripts/archive-source.sh
-@@ -18,7 +18,7 @@ if test $# -lt 1; then
-     error "Usage: $0 <output tarball>"
- fi
+diff --git a/scripts/git-submodule.sh b/scripts/git-submodule.sh
+index 807ca0b4f8..98ca0f2737 100755
+--- a/scripts/git-submodule.sh
++++ b/scripts/git-submodule.sh
+@@ -59,8 +59,8 @@ status)
+     fi
  
--tar_file=`realpath "$1"`
-+tar_file=$(realpath "$1")
- list_file="${tar_file}.list"
- vroot_dir="${tar_file}.vroot"
- 
-@@ -34,7 +34,7 @@ if git diff-index --quiet HEAD -- &>/dev/null
- then
-     HEAD=HEAD
- else
--    HEAD=`git stash create`
-+    HEAD=$(git stash create)
- fi
- git clone --shared . "$vroot_dir"
- test $? -ne 0 && error "failed to clone into '$vroot_dir'"
+     test -f "$substat" || exit 1
+-    CURSTATUS=`$GIT submodule status $modules`
+-    OLDSTATUS=`cat $substat`
++    CURSTATUS=$($GIT submodule status $modules)
++    OLDSTATUS=$(cat $substat)
+     test "$CURSTATUS" = "$OLDSTATUS"
+     exit $?
+     ;;
 -- 
 2.17.1
