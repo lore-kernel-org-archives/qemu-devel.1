@@ -1,14 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38132)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38450)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gC65m-0000g7-91
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 12:51:43 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1gC66j-0001Sc-Dk
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 12:52:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gC65i-0006rx-UC
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 12:51:42 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 15 Oct 2018 19:51:30 +0300
-Message-Id: <20181015165133.80278-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v5 0/3] block nodes graph visualization
+	(envelope-from <richard.henderson@linaro.org>) id 1gC66g-0007dz-2a
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 12:52:41 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:38998)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gC66f-0007dF-R0
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 12:52:38 -0400
+Received: by mail-pg1-x544.google.com with SMTP id r9-v6so9444278pgv.6
+	for <qemu-devel@nongnu.org>; Mon, 15 Oct 2018 09:52:37 -0700 (PDT)
+References: <20181005154910.3099-1-alex.bennee@linaro.org>
+	<20181005154910.3099-12-alex.bennee@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <bb01827c-c6ab-d792-56f2-3beb2a2b618f@linaro.org>
+Date: Mon, 15 Oct 2018 09:52:33 -0700
+MIME-Version: 1.0
+In-Reply-To: <20181005154910.3099-12-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH 11/21] trace: expose a plugin fn
+ pointer in TraceEvent
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,64 +32,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: crosa@redhat.com, ehabkost@redhat.com, eblake@redhat.com, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, cota@braap.org, vilanova@ac.upc.edu, Pavel.Dovgaluk@ispras.ru
 
-Hi all!
+On 10/5/18 8:49 AM, Alex Bennée wrote:
+> We'll need somewhere to stash this later. It's up to the generated
+> code to do the funky casting to what it really is.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  trace/control-internal.h | 6 ++++++
+>  trace/event-internal.h   | 3 +++
+>  2 files changed, 9 insertions(+)
 
-On the way of backup schemes development (and in general any complicated
-developments in Qemu block layer) it would be good to have an ability to print
-out graph of block nodes with their permissions.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-v4:
-01: fix !name -> !*name for checking the result of blk_name
-    rename BlockGraph -> XDbgBlockGraph, to not occupy such a
-    generic name for x-debug command, correspondingly switch
-    dbg_ prefix for functions to xdbg_, add xdbg_ into
-    bdrv_get_{xdbg_}block_graph too.
-
-v4:
-01: - improve documentation and graph node type names
-    - parentheses in macro
-    - s/hash/graph_nodes
-    - add dbg_ prefix to graph functions
-    - free leaked gr in dbg_graph_finalize()
-    - use uintptr_t and "!= 0" for hash keys, add comment
-      about reserved 0 key
-    - add const specifier for permissions array and iterator,
-      add static on permissions array size
-    - fall back to blk_get_attached_dev_id() for block-backend
-      nodes if blk_name() returns NULL 
-02: - add a-b by Eduardo and r-b by Max
-    - change graph node type names (rebase on 01 change)
-
-v3: again, major rework, after long discussion with Max:
-   - start creating graph looping through blk's and block jobs, don't use opaque
-   - don't export pointers, generate ids instead
-   (graphical representation didn't significantly changed, you can look at the
-    picture, attached to v2 cover-letter)
-
-v2: major rework: Identifying non-bds nodes by their description was a bad idea,
-descriptions are not guaranteed to be different for different nodes. So, the only
-way is use pointer to identify them. And to be unique, let's use pointers to
-identify all the nodes in the graph. As additional benefit, we have pointers for
-each node, which is good for debugging (imagine a gdb session).
-
-Vladimir Sementsov-Ogievskiy (3):
-  qapi: add x-debug-query-block-graph
-  scripts: add render_block_graph function for QEMUMachine
-  not-for-commit: example of new command usage for debugging
-
- qapi/block-core.json           | 108 ++++++++++++++++++++++++
- include/block/block.h          |   1 +
- include/sysemu/block-backend.h |   2 +
- block.c                        | 147 +++++++++++++++++++++++++++++++++
- block/block-backend.c          |   5 ++
- blockdev.c                     |   5 ++
- scripts/render_block_graph.py  | 120 +++++++++++++++++++++++++++
- tests/qemu-iotests/222         |   2 +
- 8 files changed, 390 insertions(+)
- create mode 100755 scripts/render_block_graph.py
-
--- 
-2.18.0
+r~
