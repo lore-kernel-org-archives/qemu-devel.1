@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36484)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gBxtM-00028u-CF
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 04:06:21 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gBxtK-0005Oo-5Y
+	(envelope-from <armbru@redhat.com>) id 1gBxtE-00023B-61
 	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 04:06:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36566)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <armbru@redhat.com>) id 1gBxtC-0005IS-9a
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 04:06:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48442)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gBxtJ-0005Ls-1s
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 04:06:18 -0400
-References: <1539266915-15216-1-git-send-email-wexu@redhat.com>
-	<1539266915-15216-10-git-send-email-wexu@redhat.com>
-	<fb04c68b-024b-5be8-00ea-e558f9ae0d12@redhat.com>
-	<20181015080343.GE27871@wei-ubt>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <e6c8b457-210f-bf90-8345-5473f537305e@redhat.com>
-Date: Mon, 15 Oct 2018 16:05:58 +0800
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gBxtC-0005DW-2I
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 04:06:10 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181015065157.3634-1-maozhongyi@cmss.chinamobile.com>
+	<1e02eee6-de17-6da9-f7bb-4e12fc0b5cc6@redhat.com>
+Date: Mon, 15 Oct 2018 10:05:54 +0200
+In-Reply-To: <1e02eee6-de17-6da9-f7bb-4e12fc0b5cc6@redhat.com> (Thomas Huth's
+	message of "Mon, 15 Oct 2018 09:07:06 +0200")
+Message-ID: <87o9bv3a8t.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20181015080343.GE27871@wei-ubt>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [[RFC v3 09/12] virtio-net: fill head desc after
- done all in a chain
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 1/3] archive-source.sh: Modern shell
+ scripting (use $() instead of ``)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,79 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Xu <wexu@redhat.com>
-Cc: maxime.coquelin@redhat.com, jfreimann@redhat.com, qemu-devel@nongnu.org, tiwei.bie@intel.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, kraxel@redhat.com, Michael Roth <mdroth@linux.vnet.ibm.com>
 
+Thomas Huth <thuth@redhat.com> writes:
 
-
-On 2018=E5=B9=B410=E6=9C=8815=E6=97=A5 16:03, Wei Xu wrote:
-> On Mon, Oct 15, 2018 at 03:45:46PM +0800, Jason Wang wrote:
->>
->> On 2018=E5=B9=B410=E6=9C=8811=E6=97=A5 22:08, wexu@redhat.com wrote:
->>> From: Wei Xu <wexu@redhat.com>
->>>
->>> With the support of marking a descriptor used/unused in 'flags'
->>> field for 1.1, the current way of filling a chained descriptors
->>> does not work since driver side may get the wrong 'num_buffer'
->>> information in case of the head descriptor has been filled in
->>> while the subsequent ones are still in processing in device side.
->>>
->>> This patch fills the head one after done all the others one.
->>>
->>> Signed-off-by: Wei Xu <wexu@redhat.com>
->>> ---
->>>   hw/net/virtio-net.c | 11 ++++++++++-
->>>   1 file changed, 10 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
->>> index 4bdd5b8..186c86cd2 100644
->>> --- a/hw/net/virtio-net.c
->>> +++ b/hw/net/virtio-net.c
->>> @@ -1198,6 +1198,8 @@ static ssize_t virtio_net_receive_rcu(NetClient=
-State *nc, const uint8_t *buf,
->>>       struct virtio_net_hdr_mrg_rxbuf mhdr;
->>>       unsigned mhdr_cnt =3D 0;
->>>       size_t offset, i, guest_offset;
->>> +    VirtQueueElement head;
->>> +    int head_len =3D 0;
->>>       if (!virtio_net_can_receive(nc)) {
->>>           return -1;
->>> @@ -1275,7 +1277,13 @@ static ssize_t virtio_net_receive_rcu(NetClien=
-tState *nc, const uint8_t *buf,
->>>           }
->>>           /* signal other side */
->>> -        virtqueue_fill(q->rx_vq, elem, total, i++);
->>> +        if (i =3D=3D 0) {
->>> +            head_len =3D total;
->>> +            head =3D *elem;
->>> +        } else {
->>> +            virtqueue_fill(q->rx_vq, elem, len, i);
->>> +        }
->>> +        i++;
->>>           g_free(elem);
->>>       }
->>> @@ -1286,6 +1294,7 @@ static ssize_t virtio_net_receive_rcu(NetClient=
-State *nc, const uint8_t *buf,
->>>                        &mhdr.num_buffers, sizeof mhdr.num_buffers);
->>>       }
->>> +    virtqueue_fill(q->rx_vq, &head, head_len, 0);
->> It's not a good idea to fix API in device implementation. Let's introd=
-uce
->> new API and fix it there.
->>
->> E.g virtqueue_fill_n() and update the flag of first elem at the last s=
-tep.
-> OK, I haven't considered about the other devices so far.
-
-It will be an issue if they use virtqueue_fill() directly.
-
-Thanks
-
+> On 2018-10-15 08:51, Mao Zhongyi wrote:
+>> Various shell files contain a mix between obsolete `` and
+>> modern $(); use of `` is only required when using /bin/sh
+>> on Solaris. It would be nice to convert to using $()
+>> everywhere, or at least in all bash scripts, as well as in
+>> all scripts that are known to not be run on Solaris.
 >
-> Wei
->
->> Thanks
->>
->>>       virtqueue_flush(q->rx_vq, i);
->>>       virtio_notify(vdev, q->rx_vq);
->>
+> FWIW, I think we do not have to worry about Solaris' /bin/sh here
+> anymore. Somebody tried to compile on Solaris a couple of weeks ago, and
+> found out that you need a proper POSIX-compliant shell for compiling
+> QEMU, so /bin/sh can not be used here anymore anyway.
+
+Try
+
+    SHELL=/usr/xpg4/bin/sh PATH=/usr/xpg6/bin:/usr/xpg4/bin:$PATH
+
+to make Solaris behave.  See also
+Message-ID: <878t58s2kb.fsf@dusky.pond.sub.org>
+https://lists.nongnu.org/archive/html/qemu-devel/2018-08/msg02641.html
