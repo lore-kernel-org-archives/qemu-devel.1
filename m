@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38590)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gBtHC-0002Xb-Hv
-	for qemu-devel@nongnu.org; Sun, 14 Oct 2018 23:10:39 -0400
+	(envelope-from <jasowang@redhat.com>) id 1gBtOe-0003vm-P7
+	for qemu-devel@nongnu.org; Sun, 14 Oct 2018 23:18:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gBtH7-00046y-K3
-	for qemu-devel@nongnu.org; Sun, 14 Oct 2018 23:10:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52696)
+	(envelope-from <jasowang@redhat.com>) id 1gBtOb-0001AF-2E
+	for qemu-devel@nongnu.org; Sun, 14 Oct 2018 23:18:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43346)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gBtH7-00046a-Bu
-	for qemu-devel@nongnu.org; Sun, 14 Oct 2018 23:10:33 -0400
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gBtOa-00019I-4V
+	for qemu-devel@nongnu.org; Sun, 14 Oct 2018 23:18:16 -0400
 References: <1539266915-15216-1-git-send-email-wexu@redhat.com>
-	<1539266915-15216-4-git-send-email-wexu@redhat.com>
+	<1539266915-15216-6-git-send-email-wexu@redhat.com>
 From: Jason Wang <jasowang@redhat.com>
-Message-ID: <fef2ece0-03ca-3eef-3c21-31ee0a6440b7@redhat.com>
-Date: Mon, 15 Oct 2018 11:10:12 +0800
+Message-ID: <a9e70b0b-1955-6c8f-4c61-9c6dabef8353@redhat.com>
+Date: Mon, 15 Oct 2018 11:18:05 +0800
 MIME-Version: 1.0
-In-Reply-To: <1539266915-15216-4-git-send-email-wexu@redhat.com>
+In-Reply-To: <1539266915-15216-6-git-send-email-wexu@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [[RFC v3 03/12] virtio: init memory cache for
- packed ring
+Subject: Re: [Qemu-devel] [[RFC v3 05/12] virtio: init and desc empty check
+ for packed ring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,198 +37,111 @@ Cc: tiwei.bie@intel.com, jfreimann@redhat.com, maxime.coquelin@redhat.com
 On 2018=E5=B9=B410=E6=9C=8811=E6=97=A5 22:08, wexu@redhat.com wrote:
 > From: Wei Xu <wexu@redhat.com>
 >
-> Expand 1.0 by adding offset calculation accordingly.
-
-This is only part of what this patch did and I suggest to another patch=20
-to do this.
-
+> Basic initialization and helpers for packed ring.
 >
 > Signed-off-by: Wei Xu <wexu@redhat.com>
 > ---
->   hw/virtio/vhost.c          | 16 ++++++++--------
->   hw/virtio/virtio.c         | 35 +++++++++++++++++++++++------------
->   include/hw/virtio/virtio.h |  4 ++--
->   3 files changed, 33 insertions(+), 22 deletions(-)
+>   hw/virtio/virtio.c | 57 +++++++++++++++++++++++++++++++++++++++++++++=
+++++++++-
+>   1 file changed, 56 insertions(+), 1 deletion(-)
 >
-> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> index 569c405..9df2da3 100644
-> --- a/hw/virtio/vhost.c
-> +++ b/hw/virtio/vhost.c
-> @@ -996,14 +996,14 @@ static int vhost_virtqueue_start(struct vhost_dev=
- *dev,
->           r =3D -ENOMEM;
->           goto fail_alloc_desc;
->       }
-> -    vq->avail_size =3D s =3D l =3D virtio_queue_get_avail_size(vdev, i=
-dx);
-> +    vq->avail_size =3D s =3D l =3D virtio_queue_get_driver_size(vdev, =
-idx);
-
-Let's try to use a more consistent name. E.g either use avail/used or=20
-driver/device.
-
-I prefer to use avail/used, it can save lots of unnecessary changes.
-
->       vq->avail_phys =3D a =3D virtio_queue_get_avail_addr(vdev, idx);
->       vq->avail =3D vhost_memory_map(dev, a, &l, 0);
->       if (!vq->avail || l !=3D s) {
->           r =3D -ENOMEM;
->           goto fail_alloc_avail;
->       }
-> -    vq->used_size =3D s =3D l =3D virtio_queue_get_used_size(vdev, idx=
-);
-> +    vq->used_size =3D s =3D l =3D virtio_queue_get_device_size(vdev, i=
-dx);
->       vq->used_phys =3D a =3D virtio_queue_get_used_addr(vdev, idx);
->       vq->used =3D vhost_memory_map(dev, a, &l, 1);
->       if (!vq->used || l !=3D s) {
-> @@ -1051,10 +1051,10 @@ static int vhost_virtqueue_start(struct vhost_d=
-ev *dev,
->   fail_vector:
->   fail_kick:
->   fail_alloc:
-> -    vhost_memory_unmap(dev, vq->used, virtio_queue_get_used_size(vdev,=
- idx),
-> +    vhost_memory_unmap(dev, vq->used, virtio_queue_get_device_size(vde=
-v, idx),
->                          0, 0);
->   fail_alloc_used:
-> -    vhost_memory_unmap(dev, vq->avail, virtio_queue_get_avail_size(vde=
-v, idx),
-> +    vhost_memory_unmap(dev, vq->avail, virtio_queue_get_driver_size(vd=
-ev, idx),
->                          0, 0);
->   fail_alloc_avail:
->       vhost_memory_unmap(dev, vq->desc, virtio_queue_get_desc_size(vdev=
-, idx),
-> @@ -1101,10 +1101,10 @@ static void vhost_virtqueue_stop(struct vhost_d=
-ev *dev,
->                                                   vhost_vq_index);
->       }
->  =20
-> -    vhost_memory_unmap(dev, vq->used, virtio_queue_get_used_size(vdev,=
- idx),
-> -                       1, virtio_queue_get_used_size(vdev, idx));
-> -    vhost_memory_unmap(dev, vq->avail, virtio_queue_get_avail_size(vde=
-v, idx),
-> -                       0, virtio_queue_get_avail_size(vdev, idx));
-> +    vhost_memory_unmap(dev, vq->used, virtio_queue_get_device_size(vde=
-v, idx),
-> +                       1, virtio_queue_get_device_size(vdev, idx));
-> +    vhost_memory_unmap(dev, vq->avail, virtio_queue_get_driver_size(vd=
-ev, idx),
-> +                       0, virtio_queue_get_driver_size(vdev, idx));
->       vhost_memory_unmap(dev, vq->desc, virtio_queue_get_desc_size(vdev=
-, idx),
->                          0, virtio_queue_get_desc_size(vdev, idx));
->   }
 > diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> index 500eecf..bfb3364 100644
+> index 9185efb..86f88da 100644
 > --- a/hw/virtio/virtio.c
 > +++ b/hw/virtio/virtio.c
-> @@ -162,11 +162,8 @@ static void virtio_init_region_cache(VirtIODevice =
-*vdev, int n)
->       VRingMemoryRegionCaches *old =3D vq->vring.caches;
->       VRingMemoryRegionCaches *new =3D NULL;
->       hwaddr addr, size;
-> -    int event_size;
->       int64_t len;
+> @@ -24,6 +24,9 @@
+>   #include "hw/virtio/virtio-access.h"
+>   #include "sysemu/dma.h"
 >  =20
-> -    event_size =3D virtio_vdev_has_feature(vq->vdev, VIRTIO_RING_F_EVE=
-NT_IDX) ? 2 : 0;
-> -
->       addr =3D vq->vring.desc;
->       if (!addr) {
->           goto out_no_cache;
-> @@ -174,13 +171,13 @@ static void virtio_init_region_cache(VirtIODevice=
- *vdev, int n)
->       new =3D g_new0(VRingMemoryRegionCaches, 1);
->       size =3D virtio_queue_get_desc_size(vdev, n);
->       len =3D address_space_cache_init(&new->desc, vdev->dma_as,
-> -                                   addr, size, false);
-> +                                   addr, size, true);
-
-This looks wrong, for split virtqueue, descriptor ring is read only.
-
->       if (len < size) {
->           virtio_error(vdev, "Cannot map desc");
->           goto err_desc;
->       }
->  =20
-> -    size =3D virtio_queue_get_used_size(vdev, n) + event_size;
-> +    size =3D virtio_queue_get_device_size(vdev, n);
->       len =3D address_space_cache_init(&new->used, vdev->dma_as,
->                                      vq->vring.used, size, true);
->       if (len < size) {
-> @@ -188,7 +185,7 @@ static void virtio_init_region_cache(VirtIODevice *=
-vdev, int n)
->           goto err_used;
->       }
->  =20
-> -    size =3D virtio_queue_get_avail_size(vdev, n) + event_size;
-> +    size =3D virtio_queue_get_driver_size(vdev, n);
->       len =3D address_space_cache_init(&new->avail, vdev->dma_as,
->                                      vq->vring.avail, size, false);
->       if (len < size) {
-> @@ -2339,16 +2336,30 @@ hwaddr virtio_queue_get_desc_size(VirtIODevice =
-*vdev, int n)
->       return sizeof(VRingDesc) * vdev->vq[n].vring.num;
+> +#define AVAIL_DESC_PACKED(b) ((b) << 7)
+> +#define USED_DESC_PACKED(b)  ((b) << 15)
+> +
+>   /*
+>    * The alignment to use between consumer and producer parts of vring.
+>    * x86 pagesize again. This is the default, used by transports like P=
+CI
+> @@ -372,6 +375,23 @@ int virtio_queue_ready(VirtQueue *vq)
+>       return vq->vring.avail !=3D 0;
 >   }
 >  =20
-> -hwaddr virtio_queue_get_avail_size(VirtIODevice *vdev, int n)
-> +hwaddr virtio_queue_get_driver_size(VirtIODevice *vdev, int n)
->   {
-> -    return offsetof(VRingAvail, ring) +
-> -        sizeof(uint16_t) * vdev->vq[n].vring.num;
-> +    int s;
+> +static void vring_packed_desc_read_flags(VirtIODevice *vdev,
+> +                    VRingPackedDesc *desc, MemoryRegionCache *cache, i=
+nt i)
+> +{
+> +    address_space_read_cached(cache,
+> +              i * sizeof(VRingPackedDesc) + offsetof(VRingPackedDesc, =
+flags),
+> +              &desc->flags, sizeof(desc->flags));
+> +}
 > +
-> +    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
-> +        return sizeof(struct VRingPackedDescEvent);
-> +    } else {
-> +        s =3D virtio_vdev_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX) ?=
- 2 : 0;
-> +        return offsetof(VRingAvail, ring) +
-> +            sizeof(uint16_t) * vdev->vq[n].vring.num + s;
+> +static inline bool is_desc_avail(struct VRingPackedDesc *desc, bool wc=
+)
+> +{
 
-I tend to move this to an independent patch.
+I think it's better use wrap_counter instead of wc here (unless you want=20
+to use wc everywhere which is a even worse idea).
 
 Thanks
 
-> +    }
->   }
->  =20
-> -hwaddr virtio_queue_get_used_size(VirtIODevice *vdev, int n)
-> +hwaddr virtio_queue_get_device_size(VirtIODevice *vdev, int n)
->   {
-> -    return offsetof(VRingUsed, ring) +
-> -        sizeof(VRingUsedElem) * vdev->vq[n].vring.num;
-> +    int s;
+> +    bool avail, used;
 > +
-> +    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
-> +        return sizeof(struct VRingPackedDescEvent);
-> +    } else {
-> +        s =3D virtio_vdev_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX) ?=
- 2 : 0;
-> +        return offsetof(VRingUsed, ring) +
-> +            sizeof(VRingUsedElem) * vdev->vq[n].vring.num + s;
-> +    }
+> +    avail =3D !!(desc->flags & AVAIL_DESC_PACKED(1));
+> +    used =3D !!(desc->flags & USED_DESC_PACKED(1));
+> +    return (avail !=3D used) && (avail =3D=3D wc);
+> +}
+> +
+>   /* Fetch avail_idx from VQ memory only when we really need to know if
+>    * guest has added some buffers.
+>    * Called within rcu_read_lock().  */
+> @@ -392,7 +412,7 @@ static int virtio_queue_empty_rcu(VirtQueue *vq)
+>       return vring_avail_idx(vq) =3D=3D vq->last_avail_idx;
 >   }
 >  =20
->   uint16_t virtio_queue_get_last_avail_idx(VirtIODevice *vdev, int n)
-> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-> index 9c1fa07..e323e76 100644
-> --- a/include/hw/virtio/virtio.h
-> +++ b/include/hw/virtio/virtio.h
-> @@ -270,8 +270,8 @@ hwaddr virtio_queue_get_desc_addr(VirtIODevice *vde=
-v, int n);
->   hwaddr virtio_queue_get_avail_addr(VirtIODevice *vdev, int n);
->   hwaddr virtio_queue_get_used_addr(VirtIODevice *vdev, int n);
->   hwaddr virtio_queue_get_desc_size(VirtIODevice *vdev, int n);
-> -hwaddr virtio_queue_get_avail_size(VirtIODevice *vdev, int n);
-> -hwaddr virtio_queue_get_used_size(VirtIODevice *vdev, int n);
-> +hwaddr virtio_queue_get_driver_size(VirtIODevice *vdev, int n);
-> +hwaddr virtio_queue_get_device_size(VirtIODevice *vdev, int n);
->   uint16_t virtio_queue_get_last_avail_idx(VirtIODevice *vdev, int n);
->   void virtio_queue_set_last_avail_idx(VirtIODevice *vdev, int n, uint1=
-6_t idx);
->   void virtio_queue_restore_last_avail_idx(VirtIODevice *vdev, int n);
+> -int virtio_queue_empty(VirtQueue *vq)
+> +static int virtio_queue_split_empty(VirtQueue *vq)
+>   {
+>       bool empty;
+>  =20
+> @@ -414,6 +434,41 @@ int virtio_queue_empty(VirtQueue *vq)
+>       return empty;
+>   }
+>  =20
+> +static int virtio_queue_packed_empty_rcu(VirtQueue *vq)
+> +{
+> +    struct VRingPackedDesc desc;
+> +    VRingMemoryRegionCaches *cache;
+> +
+> +    if (unlikely(!vq->vring.desc)) {
+> +        return 1;
+> +    }
+> +
+> +    cache =3D vring_get_region_caches(vq);
+> +    vring_packed_desc_read_flags(vq->vdev, &desc, &cache->desc,
+> +                                vq->last_avail_idx);
+> +
+> +    return !is_desc_avail(&desc, vq->avail_wrap_counter);
+> +}
+> +
+> +static int virtio_queue_packed_empty(VirtQueue *vq)
+> +{
+> +    bool empty;
+> +
+> +    rcu_read_lock();
+> +    empty =3D virtio_queue_packed_empty_rcu(vq);
+> +    rcu_read_unlock();
+> +    return empty;
+> +}
+> +
+> +int virtio_queue_empty(VirtQueue *vq)
+> +{
+> +    if (virtio_vdev_has_feature(vq->vdev, VIRTIO_F_RING_PACKED)) {
+> +        return virtio_queue_packed_empty(vq);
+> +    } else {
+> +        return virtio_queue_split_empty(vq);
+> +    }
+> +}
+> +
+>   static void virtqueue_unmap_sg(VirtQueue *vq, const VirtQueueElement =
+*elem,
+>                                  unsigned int len)
+>   {
