@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39591)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gC1RB-0004GE-6C
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:31 -0400
+	(envelope-from <armbru@redhat.com>) id 1gC1RD-0004GV-53
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gC1R7-00028C-6H
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59136)
+	(envelope-from <armbru@redhat.com>) id 1gC1RA-0002Az-Vx
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34586)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gC1R5-00021E-33
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:23 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gC1R9-00024f-0i
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:27 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F1EB42DF94
-	for <qemu-devel@nongnu.org>; Mon, 15 Oct 2018 11:53:17 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 052BF550CC
+	for <qemu-devel@nongnu.org>; Mon, 15 Oct 2018 11:53:21 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 15 Oct 2018 13:53:06 +0200
-Message-Id: <20181015115309.17089-33-armbru@redhat.com>
+Date: Mon, 15 Oct 2018 13:52:59 +0200
+Message-Id: <20181015115309.17089-26-armbru@redhat.com>
 In-Reply-To: <20181015115309.17089-1-armbru@redhat.com>
 References: <20181015115309.17089-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 32/35] vl: Assert drive_new() does not fail
- in default_drive()
+Subject: [Qemu-devel] [PATCH v2 25/35] ui/keymaps: Fix handling of erroneous
+ include files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,34 +31,111 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-If creating (empty) default drives fails, it's a bug.  Therefore,
-assert() is more appropriate than exit(1).
+While errors in the keyboard layout named with -k are fatal, errors in
+included files are reported, but otherwise ignored:
 
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>
+    $ cat worst
+    include bad
+    include worse
+    $ ls -l bad worse
+    ls: cannot access 'bad': No such file or directory
+    ls: cannot access 'worse': No such file or directory
+    $ qemu-system-x86_64 -nodefaults -S -monitor stdio -display vnc=:0 -k bad
+    QEMU 3.0.50 monitor - type 'help' for more information
+    (qemu) Could not read keymap file: 'bad'
+    $ qemu-system-x86_64 -nodefaults -S -monitor stdio -display vnc=:0 -k worst
+    QEMU 3.0.50 monitor - type 'help' for more information
+    (qemu) Could not read keymap file: 'bad'
+    Could not read keymap file: 'worse'
+
+Fix that.
+
+Note that parse_keyboard_layout() allocates the keymap, except when
+it's parsing an include file.  To keep error handling simple, move the
+memory management to its caller init_keyboard_layout().
+
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- vl.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ ui/keymaps.c | 35 +++++++++++++++++++++++------------
+ 1 file changed, 23 insertions(+), 12 deletions(-)
 
-diff --git a/vl.c b/vl.c
-index 2a8ef05aef..65366b961e 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1156,9 +1156,7 @@ static void default_drive(int enable, int snapshot, BlockInterfaceType type,
+diff --git a/ui/keymaps.c b/ui/keymaps.c
+index 43fe604724..b05fb028dc 100644
+--- a/ui/keymaps.c
++++ b/ui/keymaps.c
+@@ -79,10 +79,11 @@ static void add_keysym(char *line, int keysym, int keycode, kbd_layout_t *k)
+     trace_keymap_add(keysym, keycode, line);
+ }
+ 
+-static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
+-                                           const char *language,
+-                                           kbd_layout_t *k)
++static int parse_keyboard_layout(kbd_layout_t *k,
++                                 const name2keysym_t *table,
++                                 const char *language)
+ {
++    int ret;
+     FILE *f;
+     char * filename;
+     char line[1024];
+@@ -95,12 +96,7 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
+     g_free(filename);
+     if (!f) {
+         fprintf(stderr, "Could not read keymap file: '%s'\n", language);
+-        return NULL;
+-    }
+-
+-    if (!k) {
+-        k = g_new0(kbd_layout_t, 1);
+-        k->hash = g_hash_table_new(NULL, NULL);
++        return -1;
      }
  
-     dinfo = drive_new(opts, type);
--    if (!dinfo) {
--        exit(1);
--    }
-+    assert(dinfo);
-     dinfo->is_default = true;
- 
+     for(;;) {
+@@ -118,7 +114,10 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
+             continue;
+         }
+         if (!strncmp(line, "include ", 8)) {
+-            parse_keyboard_layout(table, line + 8, k);
++            if (parse_keyboard_layout(k, table, line + 8) < 0) {
++                ret = -1;
++                goto out;
++            }
+         } else {
+             int offset = 0;
+             while (line[offset] != 0 &&
+@@ -164,15 +163,27 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
+             }
+         }
+     }
++
++    ret = 0;
++out:
+     fclose(f);
+-    return k;
++    return ret;
  }
+ 
+ 
+ kbd_layout_t *init_keyboard_layout(const name2keysym_t *table,
+                                    const char *language)
+ {
+-    return parse_keyboard_layout(table, language, NULL);
++    kbd_layout_t *k;
++
++    k = g_new0(kbd_layout_t, 1);
++    k->hash = g_hash_table_new(NULL, NULL);
++    if (parse_keyboard_layout(k, table, language) < 0) {
++        g_hash_table_unref(k->hash);
++        g_free(k);
++        return NULL;
++    }
++    return k;
+ }
+ 
+ 
 -- 
 2.17.1
