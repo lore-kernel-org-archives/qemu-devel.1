@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54463)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54459)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gC0cw-0002xa-13
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:01:35 -0400
+	(envelope-from <mreitz@redhat.com>) id 1gC0cw-0002xY-12
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:01:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gC0co-0007Qq-Kt
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:01:33 -0400
-Received: from mail-cys01nam02on0112.outbound.protection.outlook.com
-	([104.47.37.112]:21328
-	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1gC0ci-0007Jz-Kq
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:01:24 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Mon, 15 Oct 2018 11:01:05 +0000
-Message-ID: <BN6PR2201MB1251DDA3C4C4AC5A65D7331CC6FD0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <cover.1539428198.git.noring@nocrew.org>,
-	<540683755a2357b670b107a29658531466be18f4.1539428198.git.noring@nocrew.org>
-In-Reply-To: <540683755a2357b670b107a29658531466be18f4.1539428198.git.noring@nocrew.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <mreitz@redhat.com>) id 1gC0cs-0007TK-4i
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:01:31 -0400
+References: <20181013050227.17022-1-ehabkost@redhat.com>
+	<219bba9b-4102-f838-a46f-11b9704ca78f@redhat.com>
+	<20181013203607.GL31060@habkost.net>
+	<0547ccec-6b85-a03f-88e3-74baa5ab4273@redhat.com>
+	<87bm7v69f5.fsf@dusky.pond.sub.org>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <64176aa6-ed03-46f1-3be1-a4ea2f962e35@redhat.com>
+Date: Mon, 15 Oct 2018 13:01:00 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v7 7/7] elf: Toshiba/Sony rather than MIPS
- are the implementors of the R5900
+In-Reply-To: <87bm7v69f5.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC] Require Python 3 for building QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,64 +27,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fredrik Noring <noring@nocrew.org>, "Maciej W. Rozycki" <macro@linux-mips.org>, =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Petar Jovanovic <pjovanovic@wavecomp.com>, Peter Maydell <peter.maydell@linaro.org>, =?iso-8859-1?Q?J=FCrgen_Urban?= <JuergenUrban@gmx.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-> From: Fredrik Noring <noring@nocrew.org>
-> Sent: Saturday, October 13, 2018 1:11 PM
-> To: Aleksandar Markovic; Maciej W. Rozycki; Philippe Mathieu-Daud=E9
-> Cc: Richard Henderson; Aurelien Jarno; Petar Jovanovic; Peter Maydell; J=
-=FCrgen Urban; > qemu-devel@nongnu.org
-> Subject: [PATCH v7 7/7] elf: Toshiba/Sony rather than MIPS are the implem=
-entors of the > R5900
->=20
+On 15.10.18 07:55, Markus Armbruster wrote:
+> Max Reitz <mreitz@redhat.com> writes:
+> 
+>> On 13.10.18 22:36, Eduardo Habkost wrote:
+>>> On Sat, Oct 13, 2018 at 08:20:25PM +0200, Max Reitz wrote:
+>>>> On 13.10.18 07:02, Eduardo Habkost wrote:
+>>>>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+>>>>> ---
+>>>>> I'd like to do this in QEMU 3.1.  I think it's time to drop
+>>>>> support for old systems that have only Python 2.
+>>>>>
+>>>>> We still have a few scripts that are not required for building
+>>>>> QEMU that still work only with Python 2 (iotests being the most
+>>>>> relevant set).  Requiring Python 3 for building QEMU won't
+>>>>> prevent people from using those scripts with Python 2 until they
+>>>>> are finally ported.
+>>>>
+>>>> It very much does because the iotests specifically use the python path
+>>>> qemu was configured with.
+>>>>
+>>>> To fix this, configure would need to write something else for into
+>>>> tests/qemu-iotests/common.env for $PYTHON.  But what?  I don't really
+>>>> want to introduce a new configure option for this.
+>>>
+>>> What's wrong with '/usr/bin/env python2' and just using the
+>>> python2 binary from $PATH?  Why do we need to make the Python
+>>> interpreter path for iotests configurable?
+>>
+>> Nothing, sounds good.  No idea why I discarded that idea.
+>>
+>>>> So the real fix is indeed to make the iotests work with Python 3, and I
+>>>> think that needs to be done before we can require Python 3.  Maybe it
+>>>> even needs to be done at the same time.
+>>>
+>>> I agree that this would be even better.  I just don't think the
+>>> pending iotest porting should force all the rest of the build
+>>> scripts to be compatible with Python 2.
+>>
+>> True.  It just means that we have to do something about the iotests
+>> before this patch can be merged.
+> 
+> I keep hearing about that "we" guy, and all the stuff he has to do, but
+> I've never seen him deliver anything.
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+I've actually been working on it since yesterday.
 
-This patch will be applied to the next MIPS queue, perhaps in a slightly
-modified form. The queue is planned to be created very soon.
-
-> Sources [1][2] indicate that the Emotion Engine was designed by Toshiba
-> and licensed to Sony. Others [3][4][5] claim it was a joint effort. It
-> therefore makes sense to refer to the CPU as "Toshiba/Sony R5900".
->=20
-> [1] http://cs.nyu.edu/courses/spring02/V22.0480-002/projects/aldrich/emot=
-ionengine.ppt
-> [2] http://archive.arstechnica.com/reviews/1q00/playstation2/m-ee-3.html
-> [3] http://docencia.ac.upc.edu/ETSETB/SEGPAR/microprocessors/emotionengin=
-e%20(mpr).pdf
-> [4] http://www.eetimes.com/document.asp?doc_id=3D1144055
-> [5] https://www.toshiba.co.jp/about/press/2001_09/pr2701.htm
->=20
-> Reported-by: Maciej W. Rozycki <macro@linux-mips.org>
-> Signed-off-by: Fredrik Noring <noring@nocrew.org>
-> Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> ---
->  include/elf.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/include/elf.h b/include/elf.h
-> index 312f68af81..2510fc7be4 100644
-> --- a/include/elf.h
-> +++ b/include/elf.h
-> @@ -76,7 +76,7 @@ typedef int64_t  Elf64_Sxword;
->  #define EF_MIPS_MACH_OCTEON2  0x008d0000  /* Cavium Networks Octeon2    =
-     */
->  #define EF_MIPS_MACH_OCTEON3  0x008e0000  /* Cavium Networks Octeon3    =
-     */
->  #define EF_MIPS_MACH_5400     0x00910000  /* NEC VR5400                 =
-     */
-> -#define EF_MIPS_MACH_5900     0x00920000  /* MIPS R5900                 =
-     */
-> +#define EF_MIPS_MACH_5900     0x00920000  /* Toshiba/Sony R5900         =
-     */
->  #define EF_MIPS_MACH_5500     0x00980000  /* NEC VR5500                 =
-     */
->  #define EF_MIPS_MACH_9000     0x00990000  /* PMC-Sierra's RM9000        =
-     */
->  #define EF_MIPS_MACH_LS2E     0x00a00000  /* ST Microelectronics Loongso=
-n 2E */
-> --
-> 2.16.4
->=20
-> =
+Max
