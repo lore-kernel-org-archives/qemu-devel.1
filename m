@@ -1,16 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48666)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gC3eH-0008Js-T6
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 10:15:15 -0400
+	(envelope-from <mreitz@redhat.com>) id 1gC3eK-0008M4-Hj
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 10:15:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gC3eF-0007ND-V4
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 10:15:09 -0400
+	(envelope-from <mreitz@redhat.com>) id 1gC3eF-0007Mx-Nz
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 10:15:12 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon, 15 Oct 2018 16:14:45 +0200
-Message-Id: <20181015141453.32632-2-mreitz@redhat.com>
-In-Reply-To: <20181015141453.32632-1-mreitz@redhat.com>
-References: <20181015141453.32632-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/9] iotests: Make nbd-fault-injector flush
+Date: Mon, 15 Oct 2018 16:14:44 +0200
+Message-Id: <20181015141453.32632-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/9] iotests: Make them work for both Python 2
+ and 3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,81 +21,62 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
-When closing a connection, make the nbd-fault-injector flush the socket.
-Without this, the output is a bit unreliable with Python 3.
+This series prepares the iotests to work with both Python 2 and 3.  In
+some places, it adds version-specific code and decides what to do based
+on the version (for instance, whether to import the StringIO class from
+the 'io' or the 'StringIO' module), but most of the time, it just makes
+code work for both versions in general.
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/083.out               | 9 +++++++++
- tests/qemu-iotests/nbd-fault-injector.py | 1 +
- 2 files changed, 10 insertions(+)
+And when we make the switch to make Python 3 mandatory, we can simply
+drop the Python 2 branches.
 
-diff --git a/tests/qemu-iotests/083.out b/tests/qemu-iotests/083.out
-index be6079d27e..f9af8bb691 100644
---- a/tests/qemu-iotests/083.out
-+++ b/tests/qemu-iotests/083.out
-@@ -41,6 +41,7 @@ can't open device nbd+tcp://127.0.0.1:PORT/foo
- 
- === Check disconnect after neg2 ===
- 
-+Unable to read from socket: Connection reset by peer
- Connection closed
- read failed: Input/output error
- 
-@@ -54,6 +55,7 @@ can't open device nbd+tcp://127.0.0.1:PORT/foo
- 
- === Check disconnect before request ===
- 
-+Unable to read from socket: Connection reset by peer
- Connection closed
- read failed: Input/output error
- 
-@@ -116,6 +118,7 @@ can't open device nbd+tcp://127.0.0.1:PORT/
- 
- === Check disconnect after neg-classic ===
- 
-+Unable to read from socket: Connection reset by peer
- Connection closed
- read failed: Input/output error
- 
-@@ -161,6 +164,8 @@ can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
- 
- === Check disconnect after neg2 ===
- 
-+Unable to read from socket: Connection reset by peer
-+Connection closed
- read failed: Input/output error
- 
- === Check disconnect 8 neg2 ===
-@@ -173,6 +178,8 @@ can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
- 
- === Check disconnect before request ===
- 
-+Unable to read from socket: Connection reset by peer
-+Connection closed
- read failed: Input/output error
- 
- === Check disconnect after request ===
-@@ -234,6 +241,8 @@ can't open device nbd+unix:///?socket=TEST_DIR/nbd.sock
- 
- === Check disconnect after neg-classic ===
- 
-+Unable to read from socket: Connection reset by peer
-+Connection closed
- read failed: Input/output error
- 
- *** done
-diff --git a/tests/qemu-iotests/nbd-fault-injector.py b/tests/qemu-iotests/nbd-fault-injector.py
-index f9193c0fae..439a090eb6 100755
---- a/tests/qemu-iotests/nbd-fault-injector.py
-+++ b/tests/qemu-iotests/nbd-fault-injector.py
-@@ -112,6 +112,7 @@ class FaultInjectionSocket(object):
-             if rule.match(event, io):
-                 if rule.when == 0 or bufsize is None:
-                     print('Closing connection on rule match %s' % rule.name)
-+                    self.sock.flush()
-                     sys.exit(0)
-                 if rule.when != -1:
-                     return rule.when
+
+Max Reitz (9):
+  iotests: Make nbd-fault-injector flush
+  iotests: Flush in iotests.py's QemuIoInteractive
+  iotests: Use Python byte strings where appropriate
+  iotests: Use // for Python integer division
+  iotests: Different iterator behavior in Python 3
+  iotests: Explicitly inherit FDs in Python
+  iotests: 'new' module replacement in 169
+  iotests: Modify imports for Python 3
+  iotests: Unify log outputs between Python 2 and 3
+
+ scripts/qemu.py                          |  13 +-
+ scripts/qmp/qmp.py                       |   7 +
+ scripts/qtest.py                         |   2 +-
+ tests/qemu-iotests/040                   |   4 +-
+ tests/qemu-iotests/044                   |  20 +-
+ tests/qemu-iotests/056                   |   2 +-
+ tests/qemu-iotests/065                   |   4 +-
+ tests/qemu-iotests/083.out               |   9 +
+ tests/qemu-iotests/093                   |  18 +-
+ tests/qemu-iotests/124                   |   4 +-
+ tests/qemu-iotests/139                   |   2 +-
+ tests/qemu-iotests/147                   |   7 +
+ tests/qemu-iotests/149                   |  14 +-
+ tests/qemu-iotests/151                   |  12 +-
+ tests/qemu-iotests/163                   |   8 +-
+ tests/qemu-iotests/169                   |   3 +-
+ tests/qemu-iotests/194.out               |  22 +-
+ tests/qemu-iotests/202.out               |  12 +-
+ tests/qemu-iotests/203.out               |  14 +-
+ tests/qemu-iotests/206.out               | 144 +++----
+ tests/qemu-iotests/207                   |   4 +-
+ tests/qemu-iotests/207.out               |  52 +--
+ tests/qemu-iotests/208.out               |   8 +-
+ tests/qemu-iotests/210.out               |  72 ++--
+ tests/qemu-iotests/211.out               |  66 +--
+ tests/qemu-iotests/212.out               | 102 ++---
+ tests/qemu-iotests/213.out               | 124 +++---
+ tests/qemu-iotests/216.out               |   4 +-
+ tests/qemu-iotests/218.out               |  20 +-
+ tests/qemu-iotests/219.out               | 526 +++++++++++------------
+ tests/qemu-iotests/222.out               |  24 +-
+ tests/qemu-iotests/iotests.py            |  64 ++-
+ tests/qemu-iotests/nbd-fault-injector.py |  12 +-
+ tests/qemu-iotests/qcow2.py              |  10 +-
+ 34 files changed, 745 insertions(+), 664 deletions(-)
+
 -- 
 2.17.1
