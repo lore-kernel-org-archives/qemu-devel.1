@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56844)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gBxLS-0001mp-KW
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 03:31:19 -0400
+	(envelope-from <jasowang@redhat.com>) id 1gBxZj-000494-CB
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 03:46:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gBxLL-0000NR-0u
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 03:31:16 -0400
-Received: from cmccmta3.chinamobile.com ([221.176.66.81]:28592)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gBxLK-0000MV-CV
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 03:31:10 -0400
-References: <20181015065157.3634-1-maozhongyi@cmss.chinamobile.com>
-	<1e02eee6-de17-6da9-f7bb-4e12fc0b5cc6@redhat.com>
-From: maozy <maozhongyi@cmss.chinamobile.com>
-Message-ID: <0efa8745-b7bf-4459-98b3-99b7b2795d30@cmss.chinamobile.com>
-Date: Mon, 15 Oct 2018 15:31:06 +0800
+	(envelope-from <jasowang@redhat.com>) id 1gBxZg-0008CQ-4b
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 03:46:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42526)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gBxZf-0008BS-Rt
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 03:46:00 -0400
+References: <1539266915-15216-1-git-send-email-wexu@redhat.com>
+	<1539266915-15216-10-git-send-email-wexu@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <fb04c68b-024b-5be8-00ea-e558f9ae0d12@redhat.com>
+Date: Mon, 15 Oct 2018 15:45:46 +0800
 MIME-Version: 1.0
-In-Reply-To: <1e02eee6-de17-6da9-f7bb-4e12fc0b5cc6@redhat.com>
+In-Reply-To: <1539266915-15216-10-git-send-email-wexu@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/3] archive-source.sh: Modern
- shellscripting (use $() instead of ``)
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [[RFC v3 09/12] virtio-net: fill head desc after
+ done all in a chain
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,60 +29,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: kraxel@redhat.com, Eric Blake <eblake@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Fam Zheng <famz@redhat.com>
+To: wexu@redhat.com, qemu-devel@nongnu.org
+Cc: tiwei.bie@intel.com, jfreimann@redhat.com, maxime.coquelin@redhat.com
 
 
 
-On 10/15/18 3:07 PM, Thomas Huth wrote:
-> On 2018-10-15 08:51, Mao Zhongyi wrote:
->> Various shell files contain a mix between obsolete `` and
->> modern $(); use of `` is only required when using /bin/sh
->> on Solaris. It would be nice to convert to using $()
->> everywhere, or at least in all bash scripts, as well as in
->> all scripts that are known to not be run on Solaris.
-> 
-> FWIW, I think we do not have to worry about Solaris' /bin/sh here
-> anymore. Somebody tried to compile on Solaris a couple of weeks ago, and
-> found out that you need a proper POSIX-compliant shell for compiling
-> QEMU, so /bin/sh can not be used here anymore anyway.
+On 2018=E5=B9=B410=E6=9C=8811=E6=97=A5 22:08, wexu@redhat.com wrote:
+> From: Wei Xu <wexu@redhat.com>
+>
+> With the support of marking a descriptor used/unused in 'flags'
+> field for 1.1, the current way of filling a chained descriptors
+> does not work since driver side may get the wrong 'num_buffer'
+> information in case of the head descriptor has been filled in
+> while the subsequent ones are still in processing in device side.
+>
+> This patch fills the head one after done all the others one.
+>
+> Signed-off-by: Wei Xu <wexu@redhat.com>
+> ---
+>   hw/net/virtio-net.c | 11 ++++++++++-
+>   1 file changed, 10 insertions(+), 1 deletion(-)
+>
+> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+> index 4bdd5b8..186c86cd2 100644
+> --- a/hw/net/virtio-net.c
+> +++ b/hw/net/virtio-net.c
+> @@ -1198,6 +1198,8 @@ static ssize_t virtio_net_receive_rcu(NetClientSt=
+ate *nc, const uint8_t *buf,
+>       struct virtio_net_hdr_mrg_rxbuf mhdr;
+>       unsigned mhdr_cnt =3D 0;
+>       size_t offset, i, guest_offset;
+> +    VirtQueueElement head;
+> +    int head_len =3D 0;
+>  =20
+>       if (!virtio_net_can_receive(nc)) {
+>           return -1;
+> @@ -1275,7 +1277,13 @@ static ssize_t virtio_net_receive_rcu(NetClientS=
+tate *nc, const uint8_t *buf,
+>           }
+>  =20
+>           /* signal other side */
+> -        virtqueue_fill(q->rx_vq, elem, total, i++);
+> +        if (i =3D=3D 0) {
+> +            head_len =3D total;
+> +            head =3D *elem;
+> +        } else {
+> +            virtqueue_fill(q->rx_vq, elem, len, i);
+> +        }
+> +        i++;
+>           g_free(elem);
+>       }
+>  =20
+> @@ -1286,6 +1294,7 @@ static ssize_t virtio_net_receive_rcu(NetClientSt=
+ate *nc, const uint8_t *buf,
+>                        &mhdr.num_buffers, sizeof mhdr.num_buffers);
+>       }
+>  =20
+> +    virtqueue_fill(q->rx_vq, &head, head_len, 0);
 
-Thanks for your quick review and clarification. I got it.
-In addition, I fount that I didn't  completely replace `` in
-git-submodule.sh, so I plan to resend it later.
+It's not a good idea to fix API in device implementation. Let's=20
+introduce new API and fix it there.
 
-Thanks,
-Mao
+E.g virtqueue_fill_n() and update the flag of first elem at the last step=
+.
 
-> 
->> Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
->> ---
->>   scripts/archive-source.sh | 4 ++--
->>   1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/scripts/archive-source.sh b/scripts/archive-source.sh
->> index 4e63774f9a..62bd22578b 100755
->> --- a/scripts/archive-source.sh
->> +++ b/scripts/archive-source.sh
->> @@ -18,7 +18,7 @@ if test $# -lt 1; then
->>       error "Usage: $0 <output tarball>"
->>   fi
->>   
->> -tar_file=`realpath "$1"`
->> +tar_file=$(realpath "$1")
->>   list_file="${tar_file}.list"
->>   vroot_dir="${tar_file}.vroot"
->>   
->> @@ -34,7 +34,7 @@ if git diff-index --quiet HEAD -- &>/dev/null
->>   then
->>       HEAD=HEAD
->>   else
->> -    HEAD=`git stash create`
->> +    HEAD=$(git stash create)
->>   fi
->>   git clone --shared . "$vroot_dir"
->>   test $? -ne 0 && error "failed to clone into '$vroot_dir'"
->>
-> 
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> 
+Thanks
+
+>       virtqueue_flush(q->rx_vq, i);
+>       virtio_notify(vdev, q->rx_vq);
+>  =20
