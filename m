@@ -1,14 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53221)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gC5OD-0008J8-UT
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gC5OD-0008JD-WA
 	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 12:06:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gC5OA-00053a-NZ
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gC5OA-00053J-Ld
 	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 12:06:41 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 15 Oct 2018 19:06:22 +0300
-Message-Id: <20181015160633.63130-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v4 00/11] backup-top filter driver for backup
+Date: Mon, 15 Oct 2018 19:06:31 +0300
+Message-Id: <20181015160633.63130-10-vsementsov@virtuozzo.com>
+In-Reply-To: <20181015160633.63130-1-vsementsov@virtuozzo.com>
+References: <20181015160633.63130-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v4 09/11] block: add lock/unlock range functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,55 +22,74 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: famz@redhat.com, stefanha@redhat.com, jcody@redhat.com, mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com, den@openvz.org, eblake@redhat.com
 
-Hi all!
+From: Vladimir Sementsov-Ogievskiy <etendren@gmail.com>
 
-These series introduce backup-top driver. It's a filter-node, which
-do copy-before-write operation. Mirror uses filter-node for handling
-guest writes, let's move to filter-node (from write-notifiers) for
-backup too (patch 16)
+Introduce lock/unlock range functionality, based on serialized
+requests. This is needed to refactor backup, dropping local
+tracked-request-like synchronization.
 
-v4:
-fixes, rewrite driver to be implicit, drop new interfaces and
-don't move to BdrvDirtyBitmap for now, as it's not obvious will
-it be really needed and don't relate to these series more.
+Signed-off-by: Vladimir Sementsov-Ogievskiy <etendren@gmail.com>
+---
+ include/block/block_int.h |  3 +++
+ block/io.c                | 35 +++++++++++++++++++++++++++++++++++
+ 2 files changed, 38 insertions(+)
 
-v3 was "[PATCH v3 00/18] fleecing-hook driver for backup"
-
-v2 was "[RFC v2] new, node-graph-based fleecing and backup"
-
-These series are based on
- [PATCH v4 0/8] dirty-bitmap: rewrite bdrv_dirty_iter_next_area
-and
- [PATCH 0/2] replication: drop extra sync
-
-Based-on: <20180919124343.28206-1-vsementsov@virtuozzo.com>
-Based-on: <20180917145732.48590-1-vsementsov@virtuozzo.com>
-
-Vladimir Sementsov-Ogievskiy (11):
-  block/backup: simplify backup_incremental_init_copy_bitmap
-  block/backup: move to copy_bitmap with granularity
-  block: allow serialized reads to intersect
-  block: improve should_update_child
-  iotests: handle -f argument correctly for qemu_io_silent
-  iotests: allow resume_drive by node name
-  iotests: prepare 055 to graph changes during backup job
-  block: introduce backup-top filter driver
-  block: add lock/unlock range functions
-  block/backup: tiny refactor backup_job_create
-  block/backup: use backup-top instead of write notifiers
-
- block/backup-top.h            |  44 ++++
- include/block/block_int.h     |   3 +
- block.c                       |  32 ++-
- block/backup-top.c            | 298 ++++++++++++++++++++++++
- block/backup.c                | 415 +++++++++++++++++-----------------
- block/io.c                    |  38 +++-
- block/Makefile.objs           |   2 +
- tests/qemu-iotests/055        |  23 +-
- tests/qemu-iotests/iotests.py |  16 +-
- 9 files changed, 641 insertions(+), 230 deletions(-)
- create mode 100644 block/backup-top.h
- create mode 100644 block/backup-top.c
-
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 92ecbd866e..20617e5853 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -856,6 +856,9 @@ int coroutine_fn bdrv_co_preadv(BdrvChild *child,
+ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
+     int64_t offset, unsigned int bytes, QEMUIOVector *qiov,
+     BdrvRequestFlags flags);
++void *coroutine_fn bdrv_co_try_lock(BdrvChild *child,
++                                    int64_t offset, unsigned int bytes);
++void coroutine_fn bdrv_co_unlock(void *opaque);
+ 
+ extern unsigned int bdrv_drain_all_count;
+ void bdrv_apply_subtree_drain(BdrvChild *child, BlockDriverState *new_parent);
+diff --git a/block/io.c b/block/io.c
+index d4e46cb3dc..fd4ec53167 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -3243,3 +3243,38 @@ int bdrv_truncate(BdrvChild *child, int64_t offset, PreallocMode prealloc,
+ 
+     return tco.ret;
+ }
++
++void *coroutine_fn bdrv_co_try_lock(BdrvChild *child,
++                                    int64_t offset, unsigned int bytes)
++{
++    BlockDriverState *bs = child->bs;
++    BdrvTrackedRequest *req;
++
++    qemu_co_mutex_lock(&bs->reqs_lock);
++
++    QLIST_FOREACH(req, &bs->tracked_requests, list) {
++        if (req->type == BDRV_TRACKED_READ) {
++            continue;
++        }
++        if (tracked_request_overlaps(req, offset, bytes)) {
++            qemu_co_mutex_unlock(&bs->reqs_lock);
++            return NULL;
++        }
++    }
++
++    qemu_co_mutex_unlock(&bs->reqs_lock);
++
++    req = g_new(BdrvTrackedRequest, 1);
++    tracked_request_begin(req, bs, offset, bytes, BDRV_TRACKED_READ);
++    mark_request_serialising(req, bdrv_get_cluster_size(bs));
++
++    return req;
++}
++
++void coroutine_fn bdrv_co_unlock(void *opaque)
++{
++    BdrvTrackedRequest *req = opaque;
++
++    tracked_request_end(req);
++    g_free(req);
++}
 -- 
 2.18.0
