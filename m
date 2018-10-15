@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41529)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gBzsc-0000Hc-Fc
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 06:13:43 -0400
+	(envelope-from <mst@redhat.com>) id 1gC067-000328-8H
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 06:27:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gBzsb-00065X-LW
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 06:13:42 -0400
-Date: Mon, 15 Oct 2018 12:13:09 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20181015101309.GD10459@localhost.localdomain>
-References: <20181013050227.17022-1-ehabkost@redhat.com>
-	<20181015093243.GE6785@redhat.com>
-	<CAFEAcA8MQ37JVCCPGyQa20n6AuU8Sv_pC9DoDoCKdQhqekpGnQ@mail.gmail.com>
+	(envelope-from <mst@redhat.com>) id 1gC062-0003t2-C1
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 06:27:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44022)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gC062-0003rV-5G
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 06:27:34 -0400
+Date: Mon, 15 Oct 2018 06:27:21 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181015062543-mutt-send-email-mst@kernel.org>
+References: <20181013025435.25785-1-ehabkost@redhat.com>
+	<20181015081641.q6r5wnhm7rq5tgfh@sirius.home.kraxel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA8MQ37JVCCPGyQa20n6AuU8Sv_pC9DoDoCKdQhqekpGnQ@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC] Require Python 3 for building QEMU
+In-Reply-To: <20181015081641.q6r5wnhm7rq5tgfh@sirius.home.kraxel.org>
+Subject: Re: [Qemu-devel] [PATCH] virtio: Provide version-specific variants
+ of virtio PCI devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,57 +28,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Cleber Rosa <crosa@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Cleber Rosa <crosa@redhat.com>, Markus Armbruster <armbru@redhat.com>, Laine Stump <laine@redhat.com>, Caio Carrara <ccarrara@redhat.com>
 
-Am 15.10.2018 um 12:02 hat Peter Maydell geschrieben:
-> On 15 October 2018 at 10:32, Daniel P. Berrang=E9 <berrange@redhat.com>=
- wrote:
-> > On Sat, Oct 13, 2018 at 02:02:27AM -0300, Eduardo Habkost wrote:
-> >> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> >> ---
-> >> I'd like to do this in QEMU 3.1.  I think it's time to drop
-> >> support for old systems that have only Python 2.
-> >>
-> >> We still have a few scripts that are not required for building
-> >> QEMU that still work only with Python 2 (iotests being the most
-> >> relevant set).  Requiring Python 3 for building QEMU won't
-> >> prevent people from using those scripts with Python 2 until they
-> >> are finally ported.
-> >
-> > I think it is premature & unecessary to do this. We just got QEMU bui=
-lding
-> > with dual Python2/3 in 3.0 to give people leeway in the migration pat=
-h to
-> > a fully v3 future. The code to support building 2/3 in parallel is no=
-t
-> > imposing a unreasonable maint burden. Dropping py2 suport would have
-> > negligible impact on the code, as there's no v3-only features we have
-> > used. IOW, I don't think there's a compelling reason to rush into for=
-cing
-> > users onto v3.
-> >
-> > If we want to drop py2, we should give people a warning of such a pla=
-nned
-> > change, especially since some of our targetted host OS[1] don't even
-> > include a py3 as standard without acquiring extra add-on repos. Devs =
-in
-> > a typical corporate env will not have the freedom to install such ext=
-ra
-> > repos on their machines.
->=20
-> I agree. I also think that dropping python 2 support before we've
-> even converted all our python scripts to handle python 3 is the
-> wrong order to do things. People interested in moving forward with
-> the transition to python-3-only should start by making sure everything
-> we have works with python 3...
+On Mon, Oct 15, 2018 at 10:16:41AM +0200, Gerd Hoffmann wrote:
+> On Fri, Oct 12, 2018 at 11:54:35PM -0300, Eduardo Habkost wrote:
+> > The current virtio-*-pci device types actually represent 3
+> > different types of devices:
+> > * virtio 1.0 non-transitional devices
+> > * virtio 1.0 transitional devices
+> 
+> Ok.
+> 
+> > * virtio 0.9 ("legacy device" in virtio 1.0 terminology)
+> 
+> Why?  Is there any reason to prefer 0.9 over transitional?
+> 
+> cheers,
+>   Gerd
 
-It's easier to port stuff to Python 3 though than making them work with
-both. I think Eduardo's RFC is in part motivated by a patch from
-Philippe that converted something in iotests to work with Python 3,
-passed review and then turned out to break Python 2.
+Right - maybe a flag to disable modern interface is enough.
+We thus get two types:
+- transitional (legacy)
+- non-transitional (modern)
+which matches spec nicely.
 
-Having to test every iotests patch twice with different Python versions
-isn't something I would like to do for extended periods of time.
-
-Kevin
+-- 
+MST
