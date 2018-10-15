@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45855)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gCAF9-0000iG-Ag
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 17:17:40 -0400
+	(envelope-from <Stewart.Hildebrand@dornerworks.com>)
+	id 1gCAO0-0002WD-SS
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 17:26:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gCAF8-0001ez-Ep
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 17:17:39 -0400
-Date: Mon, 15 Oct 2018 18:17:22 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181015211722.GG31060@habkost.net>
-References: <20181015141453.32632-1-mreitz@redhat.com>
-	<20181015141453.32632-9-mreitz@redhat.com>
+	(envelope-from <Stewart.Hildebrand@dornerworks.com>)
+	id 1gCAO0-0001Ct-07
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 17:26:48 -0400
+From: Stewart Hildebrand <Stewart.Hildebrand@dornerworks.com>
+Date: Mon, 15 Oct 2018 21:26:39 +0000
+Message-ID: <40eb19fb56b24e10a5eaa99ccb78aff6@dornerworks.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181015141453.32632-9-mreitz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 8/9] iotests: Modify imports for Python 3
+Subject: [Qemu-devel] [PATCH] hw/arm/boot: Increase compliance with kernel
+ arm64 boot protocol.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,82 +24,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Andre Przywara <andre.przywara@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Julien Grall <julien.grall@arm.com>
 
-On Mon, Oct 15, 2018 at 04:14:52PM +0200, Max Reitz wrote:
-> There are two imports that need to be modified when running the iotests
-> under Python 3: One is StringIO, which no longer exists; instead, the
-> StringIO class comes from the io module, so import it from there.  The
-> other is the ConfigParser, which has just been renamed to configparser.
-> 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  tests/qemu-iotests/iotests.py            | 8 ++++++--
->  tests/qemu-iotests/nbd-fault-injector.py | 7 +++++--
->  2 files changed, 11 insertions(+), 4 deletions(-)
-> 
-> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-> index 7ca94e9278..a64ea90fb4 100644
-> --- a/tests/qemu-iotests/iotests.py
-> +++ b/tests/qemu-iotests/iotests.py
-> @@ -683,13 +683,17 @@ def main(supported_fmts=[], supported_oses=['linux'], supported_cache_modes=[],
->  
->      # We need to filter out the time taken from the output so that qemu-iotest
->      # can reliably diff the results against master output.
-> -    import StringIO
-> +    if sys.version_info.major >= 3:
-> +        from io import StringIO
-> +    else:
-> +        from StringIO import StringIO
-
-Considering that io.StringIO exists on Python 2.7, a comment
-explaining why exactly it doesn't work would be nice.
-
-But this shouldn't block this workaround, so:
-
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-
-
-> +
->      if debug:
->          output = sys.stdout
->          verbosity = 2
->          sys.argv.remove('-d')
->      else:
-> -        output = StringIO.StringIO()
-> +        output = StringIO()
->  
->      logging.basicConfig(level=(logging.DEBUG if debug else logging.WARN))
->  
-> diff --git a/tests/qemu-iotests/nbd-fault-injector.py b/tests/qemu-iotests/nbd-fault-injector.py
-> index d45e2e0a6a..6b2d659dee 100755
-> --- a/tests/qemu-iotests/nbd-fault-injector.py
-> +++ b/tests/qemu-iotests/nbd-fault-injector.py
-> @@ -48,7 +48,10 @@ import sys
->  import socket
->  import struct
->  import collections
-> -import ConfigParser
-> +if sys.version_info.major >= 3:
-> +    import configparser
-> +else:
-> +    import ConfigParser as configparser
->  
->  FAKE_DISK_SIZE = 8 * 1024 * 1024 * 1024 # 8 GB
->  
-> @@ -225,7 +228,7 @@ def parse_config(config):
->      return rules
->  
->  def load_rules(filename):
-> -    config = ConfigParser.RawConfigParser()
-> +    config = configparser.RawConfigParser()
->      with open(filename, 'rt') as f:
->          config.readfp(f, filename)
->      return parse_config(config)
-> -- 
-> 2.17.1
-> 
-
--- 
-Eduardo
+IlRoZSBJbWFnZSBtdXN0IGJlIHBsYWNlZCB0ZXh0X29mZnNldCBieXRlcyBmcm9tIGEgMk1CIGFs
+aWduZWQgYmFzZQ0KYWRkcmVzcyBhbnl3aGVyZSBpbiB1c2FibGUgc3lzdGVtIFJBTSBhbmQgY2Fs
+bGVkIHRoZXJlLiINCg0KRm9yIHRoZSB2aXJ0IGJvYXJkLCB3ZSB3cml0ZSBvdXIgc3RhcnR1cCBi
+b290bG9hZGVyIGF0IHRoZSB2ZXJ5DQpib3R0b20gb2YgUkFNLCBzbyB0aGF0IGJpdCBjYW4ndCBi
+ZSB1c2VkIGZvciB0aGUgaW1hZ2UuIFRvIGF2b2lkDQpvdmVybGFwIGluIGNhc2UgdGhlIGltYWdl
+IHJlcXVlc3RzIHRvIGJlIGxvYWRlZCBhdCBhbiBvZmZzZXQNCnNtYWxsZXIgdGhhbiBvdXIgYm9v
+dGxvYWRlciwgd2UgaW5jcmVtZW50IHRoZSBsb2FkIG9mZnNldCB0byB0aGUNCm5leHQgMk1CLg0K
+DQpUaGlzIGZpeGVzIGEgYm9vdCBmYWlsdXJlIGZvciBYZW4gQUFyY2g2NC4NCg0KU2lnbmVkLW9m
+Zi1ieTogU3Rld2FydCBIaWxkZWJyYW5kIDxzdGV3YXJ0LmhpbGRlYnJhbmRAZG9ybmVyd29ya3Mu
+Y29tPg0KLS0tDQogaHcvYXJtL2Jvb3QuYyB8IDEwICsrKysrKysrKysNCiAxIGZpbGUgY2hhbmdl
+ZCwgMTAgaW5zZXJ0aW9ucygrKQ0KDQpkaWZmIC0tZ2l0IGEvaHcvYXJtL2Jvb3QuYyBiL2h3L2Fy
+bS9ib290LmMNCmluZGV4IDIwYzcxZDdkOTYuLjU1OWRkYmNkNTMgMTAwNjQ0DQotLS0gYS9ody9h
+cm0vYm9vdC5jDQorKysgYi9ody9hcm0vYm9vdC5jDQpAQCAtOTE5LDYgKzkxOSwxNiBAQCBzdGF0
+aWMgdWludDY0X3QgbG9hZF9hYXJjaDY0X2ltYWdlKGNvbnN0IGNoYXIgKmZpbGVuYW1lLCBod2Fk
+ZHIgbWVtX2Jhc2UsDQogICAgICAgICBtZW1jcHkoJmhkcnZhbHMsIGJ1ZmZlciArIEFSTTY0X1RF
+WFRfT0ZGU0VUX09GRlNFVCwgc2l6ZW9mKGhkcnZhbHMpKTsNCiAgICAgICAgIGlmIChoZHJ2YWxz
+WzFdICE9IDApIHsNCiAgICAgICAgICAgICBrZXJuZWxfbG9hZF9vZmZzZXQgPSBsZTY0X3RvX2Nw
+dShoZHJ2YWxzWzBdKTsNCisNCisgICAgICAgICAgICAvKiBGb3IgdGhlIHZpcnQgYm9hcmQsIHdl
+IHdyaXRlIG91ciBzdGFydHVwICJib290bG9hZGVyIiBhdCB0aGUgdmVyeQ0KKyAgICAgICAgICAg
+ICAqIGJvdHRvbSBvZiBSQU0sIHNvIHRoYXQgYml0IGNhbid0IGJlIHVzZWQgZm9yIHRoZSBpbWFn
+ZS4gVG8gYXZvaWQNCisgICAgICAgICAgICAgKiBvdmVybGFwIGluIGNhc2UgdGhlIGltYWdlIHJl
+cXVlc3RzIHRvIGJlIGxvYWRlZCBhdCBhbiBvZmZzZXQNCisgICAgICAgICAgICAgKiBzbWFsbGVy
+IHRoYW4gb3VyIGJvb3Rsb2FkZXIsIHdlIGluY3JlbWVudCB0aGUgbG9hZCBvZmZzZXQgdG8gdGhl
+DQorICAgICAgICAgICAgICogbmV4dCAyTUIuDQorICAgICAgICAgICAgICovDQorICAgICAgICAg
+ICAgaWYgKGtlcm5lbF9sb2FkX29mZnNldCA8IEZJWFVQX01BWCkgew0KKyAgICAgICAgICAgICAg
+ICBrZXJuZWxfbG9hZF9vZmZzZXQgKz0gMiA8PCAyMDsNCisgICAgICAgICAgICB9DQogICAgICAg
+ICB9DQogICAgIH0NCiANCi0tIA0KMi4xNy4xDQo=
