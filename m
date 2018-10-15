@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44802)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gCC0V-0004Op-1A
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 19:10:39 -0400
+	(envelope-from <crosa@redhat.com>) id 1gCC8R-0006G9-G5
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 19:18:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gCC0Q-0007mv-Hp
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 19:10:38 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:32877)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gCC0O-0007aJ-Gr
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 19:10:34 -0400
-Received: by mail-pf1-x442.google.com with SMTP id 78-v6so8047711pfq.0
-	for <qemu-devel@nongnu.org>; Mon, 15 Oct 2018 16:10:20 -0700 (PDT)
-References: <20181013004034.6968-1-f4bug@amsat.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <e9c32ea9-c689-a790-fe73-9bd8c06aa872@linaro.org>
-Date: Mon, 15 Oct 2018 16:10:16 -0700
+	(envelope-from <crosa@redhat.com>) id 1gCC8Q-0005uF-64
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 19:18:51 -0400
+References: <20181015141453.32632-1-mreitz@redhat.com>
+	<20181015141453.32632-7-mreitz@redhat.com>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <4c35f899-8586-4b57-7c9d-699aac223752@redhat.com>
+Date: Mon, 15 Oct 2018 19:18:41 -0400
 MIME-Version: 1.0
-In-Reply-To: <20181013004034.6968-1-f4bug@amsat.org>
+In-Reply-To: <20181015141453.32632-7-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 0/8] tests/vm: Improvements when KVM is
- not available
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 6/9] iotests: Explicitly inherit FDs in
+ Python
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,30 +25,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
-Cc: Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-
-On 10/12/18 5:40 PM, Philippe Mathieu-Daudé wrote:
-> Hi Fam,
-> 
-> Few patches I added while testing the VM tests without KVM access.
-> I doubt many people want to suffer using TCG for VM testing, but
-> it was handy to debug/support aarch64 VM tests.
-> 
-> Also this could be a useful TCG stress test...?
-> 
-> Since v2: https://lists.gnu.org/archive/html/qemu-devel/2018-09/msg04084.html
-> - use default args.jobs (Fam)
-> - move kvm_available() to scripts/QEMU so it can be used by Avocado
-> - do not use -smp 1
-> - add a BaseVM::arch property to help cross vm testing
-> 
-> Since v1: http://lists.nongnu.org/archive/html/qemu-devel/2018-07/msg03411.html
-> - rebased on master
-> - added get_default_jobs (Fam)
-> - dropped 'When using TCG, wait longer for a VM to start'
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
 
 
-r~
+
+On 10/15/18 10:14 AM, Max Reitz wrote:
+> Python 3.2 introduced the inheritable attribute for FDs.  At the same
+> time, it changed the default so that all FDs are not inheritable by
+> default, that only inheritable FDs are inherited to subprocesses, and
+> only if close_fds is explicitly set to False.
+> 
+
+It's actually a change that was introduced in 3.4:
+
+https://docs.python.org/3/library/os.html#inheritance-of-file-descriptors
+
+> Adhere to this by setting close_fds to False when working with
+> subprocesses that may want to inherit FDs, and by trying to
+> set_inheritable() on FDs that we do want to bequeath to them.
+> 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  scripts/qemu.py        | 13 +++++++++++--
+>  scripts/qmp/qmp.py     |  7 +++++++
+>  tests/qemu-iotests/147 |  7 +++++++
+>  3 files changed, 25 insertions(+), 2 deletions(-)
+> 
+> diff --git a/scripts/qemu.py b/scripts/qemu.py
+> index f099ce7278..28366c4a67 100644
+> --- a/scripts/qemu.py
+> +++ b/scripts/qemu.py
+> @@ -142,10 +142,18 @@ class QEMUMachine(object):
+>          if opts:
+>              options.append(opts)
+>  
+> +        # This did not exist before 3.2, but since then it is
+> +        # mandatory for our purpose
+> +        try:
+
+Version should be 3.4 here as well.
+
+> +            os.set_inheritable(fd, True)
+> +        except AttributeError:
+> +            pass
+> +
+
+Doing hasattr(os, "set_inheritable") is cheaper.
+
+- Cleber.
+
+>          self._args.append('-add-fd')
+>          self._args.append(','.join(options))
+>          return self
+>  
+> +    # The caller needs to make sure the FD is inheritable
+>      def send_fd_scm(self, fd_file_path):
+>          # In iotest.py, the qmp should always use unix socket.
+>          assert self._qmp.is_scm_available()
+> @@ -159,7 +167,7 @@ class QEMUMachine(object):
+>                      "%s" % fd_file_path]
+>          devnull = open(os.path.devnull, 'rb')
+>          proc = subprocess.Popen(fd_param, stdin=devnull, stdout=subprocess.PIPE,
+> -                                stderr=subprocess.STDOUT)
+> +                                stderr=subprocess.STDOUT, close_fds=False)
+>          output = proc.communicate()[0]
+>          if output:
+>              LOG.debug(output)
+> @@ -280,7 +288,8 @@ class QEMUMachine(object):
+>                                         stdin=devnull,
+>                                         stdout=self._qemu_log_file,
+>                                         stderr=subprocess.STDOUT,
+> -                                       shell=False)
+> +                                       shell=False,
+> +                                       close_fds=False)
+>          self._post_launch()
+>  
+>      def wait(self):
+> diff --git a/scripts/qmp/qmp.py b/scripts/qmp/qmp.py
+> index 5c8cf6a056..009be8345b 100644
+> --- a/scripts/qmp/qmp.py
+> +++ b/scripts/qmp/qmp.py
+> @@ -10,6 +10,7 @@
+>  
+>  import json
+>  import errno
+> +import os
+>  import socket
+>  import logging
+>  
+> @@ -253,4 +254,10 @@ class QEMUMonitorProtocol(object):
+>          return self.__sock.fileno()
+>  
+>      def is_scm_available(self):
+> +        # This did not exist before 3.2, but since then it is
+> +        # mandatory for our purpose
+> +        try:
+> +            os.set_inheritable(self.get_sock_fd(), True)
+> +        except AttributeError:
+> +            pass
+>          return self.__sock.family == socket.AF_UNIX
+> diff --git a/tests/qemu-iotests/147 b/tests/qemu-iotests/147
+> index d2081df84b..b58455645b 100755
+> --- a/tests/qemu-iotests/147
+> +++ b/tests/qemu-iotests/147
+> @@ -229,6 +229,13 @@ class BuiltinNBD(NBDBlockdevAddBase):
+>          sockfd = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+>          sockfd.connect(unix_socket)
+>  
+> +        # This did not exist before 3.2, but since then it is
+> +        # mandatory for our purpose
+> +        try:
+> +            os.set_inheritable(sockfd.fileno(), True)
+> +        except AttributeError:
+> +            pass
+> +
+>          result = self.vm.send_fd_scm(str(sockfd.fileno()))
+>          self.assertEqual(result, 0, 'Failed to send socket FD')
+>  
+> 
