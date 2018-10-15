@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50785)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50789)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gByoh-0001wF-Dj
+	(envelope-from <kraxel@redhat.com>) id 1gByoh-0001wJ-G3
 	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 05:05:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gByog-0008Ry-9K
+	(envelope-from <kraxel@redhat.com>) id 1gByod-0008QH-Vi
 	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 05:05:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55794)
+Received: from mx1.redhat.com ([209.132.183.28]:38102)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gByof-0008LV-Sg
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 05:05:34 -0400
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gByoa-0008KU-TF
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 05:05:30 -0400
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 15 Oct 2018 11:05:11 +0200
-Message-Id: <20181015090517.26884-2-kraxel@redhat.com>
+Date: Mon, 15 Oct 2018 11:05:13 +0200
+Message-Id: <20181015090517.26884-4-kraxel@redhat.com>
 In-Reply-To: <20181015090517.26884-1-kraxel@redhat.com>
 References: <20181015090517.26884-1-kraxel@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/7] edid: fix alignment issues
+Subject: [Qemu-devel] [PULL 3/7] bochs-display: wire up edid support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +26,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-Use stl_le_p() & friends instead of casts.
-
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-id: 20181015055333.32030-1-kraxel@redhat.com
+Message-id: 20181005160147.892-3-kraxel@redhat.com
 ---
- hw/display/edid-generate.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ hw/display/bochs-display.c | 13 +++++++++++++
+ hw/display/Makefile.objs   |  1 +
+ 2 files changed, 14 insertions(+)
 
-diff --git a/hw/display/edid-generate.c b/hw/display/edid-generate.c
-index 37e60fe42a..bdf5e1d4d4 100644
---- a/hw/display/edid-generate.c
-+++ b/hw/display/edid-generate.c
-@@ -223,7 +223,7 @@ static void edid_desc_timing(uint8_t *desc,
-=20
-     uint32_t clock  =3D 75 * (xres + xblank) * (yres + yblank);
-=20
--    *(uint32_t *)(desc) =3D cpu_to_le32(clock / 10000);
-+    stl_le_p(desc, clock / 10000);
-=20
-     desc[2] =3D xres   & 0xff;
-     desc[3] =3D xblank & 0xff;
-@@ -342,9 +342,9 @@ void qemu_edid_generate(uint8_t *edid, size_t size,
-                           (((info->vendor[2] - '@') & 0x1f) <<  0));
-     uint16_t model_nr =3D 0x1234;
-     uint32_t serial_nr =3D info->serial ? atoi(info->serial) : 0;
--    *(uint16_t *)(edid +  8) =3D cpu_to_be16(vendor_id);
--    *(uint16_t *)(edid + 10) =3D cpu_to_le16(model_nr);
--    *(uint32_t *)(edid + 12) =3D cpu_to_le32(serial_nr);
-+    stw_be_p(edid +  8, vendor_id);
-+    stw_le_p(edid + 10, model_nr);
-+    stl_le_p(edid + 12, serial_nr);
-=20
-     /* manufacture week and year */
-     edid[16] =3D 42;
---=20
+diff --git a/hw/display/bochs-display.c b/hw/display/bochs-display.c
+index 09d8944a1b..3d439eb240 100644
+--- a/hw/display/bochs-display.c
++++ b/hw/display/bochs-display.c
+@@ -9,6 +9,7 @@
+ #include "hw/hw.h"
+ #include "hw/pci/pci.h"
+ #include "hw/display/bochs-vbe.h"
++#include "hw/display/edid.h"
+ 
+ #include "qapi/error.h"
+ 
+@@ -35,9 +36,13 @@ typedef struct BochsDisplayState {
+     MemoryRegion     mmio;
+     MemoryRegion     vbe;
+     MemoryRegion     qext;
++    MemoryRegion     edid;
+ 
+     /* device config */
+     uint64_t         vgamem;
++    bool             enable_edid;
++    qemu_edid_info   edid_info;
++    uint8_t          edid_blob[256];
+ 
+     /* device registers */
+     uint16_t         vbe_regs[VBE_DISPI_INDEX_NB];
+@@ -283,6 +288,12 @@ static void bochs_display_realize(PCIDevice *dev, Error **errp)
+     pci_register_bar(&s->pci, 0, PCI_BASE_ADDRESS_MEM_PREFETCH, &s->vram);
+     pci_register_bar(&s->pci, 2, PCI_BASE_ADDRESS_SPACE_MEMORY, &s->mmio);
+ 
++    if (s->enable_edid) {
++        qemu_edid_generate(s->edid_blob, sizeof(s->edid_blob), &s->edid_info);
++        qemu_edid_region_io(&s->edid, obj, s->edid_blob, sizeof(s->edid_blob));
++        memory_region_add_subregion(&s->mmio, 0, &s->edid);
++    }
++
+     if (pci_bus_is_express(pci_get_bus(dev))) {
+         dev->cap_present |= QEMU_PCI_CAP_EXPRESS;
+         ret = pcie_endpoint_cap_init(dev, 0x80);
+@@ -325,6 +336,8 @@ static void bochs_display_exit(PCIDevice *dev)
+ 
+ static Property bochs_display_properties[] = {
+     DEFINE_PROP_SIZE("vgamem", BochsDisplayState, vgamem, 16 * MiB),
++    DEFINE_PROP_BOOL("edid", BochsDisplayState, enable_edid, false),
++    DEFINE_EDID_PROPERTIES(BochsDisplayState, edid_info),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
+index 2a0de16a55..2e1b1bcd22 100644
+--- a/hw/display/Makefile.objs
++++ b/hw/display/Makefile.objs
+@@ -19,6 +19,7 @@ common-obj-$(CONFIG_VGA_ISA) += vga-isa.o
+ common-obj-$(CONFIG_VGA_ISA_MM) += vga-isa-mm.o
+ common-obj-$(CONFIG_VMWARE_VGA) += vmware_vga.o
+ common-obj-$(CONFIG_BOCHS_DISPLAY) += bochs-display.o
++common-obj-$(CONFIG_BOCHS_DISPLAY) += edid-region.o
+ 
+ common-obj-$(CONFIG_BLIZZARD) += blizzard.o
+ common-obj-$(CONFIG_EXYNOS4) += exynos4210_fimd.o
+-- 
 2.9.3
