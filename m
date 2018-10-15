@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40736)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41194)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gC6EI-00060N-55
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 13:00:31 -0400
+	(envelope-from <noring@nocrew.org>) id 1gC6Fs-0006dd-Pb
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 13:02:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gC6E9-0003PP-Mq
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 13:00:24 -0400
-Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:41652)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1gC6E9-0003Mw-6G
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 13:00:21 -0400
-Received: by mail-lf1-x141.google.com with SMTP id q39-v6so14616633lfi.8
-	for <qemu-devel@nongnu.org>; Mon, 15 Oct 2018 10:00:18 -0700 (PDT)
+	(envelope-from <noring@nocrew.org>) id 1gC6Fq-0004Ec-2B
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 13:02:08 -0400
+Received: from ste-pvt-msa2.bahnhof.se ([213.80.101.71]:34923)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gC6Fp-0004Dg-Qb
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 13:02:05 -0400
+Date: Mon, 15 Oct 2018 19:02:02 +0200
+From: Fredrik Noring <noring@nocrew.org>
+Message-ID: <20181015170202.GB2364@sx9>
+References: <20181014142928.2784-1-f4bug@amsat.org> <20181014164140.GB2319@sx9>
+	<CAAdtpL5xQYwyR0VxqAhA3dW9ec2KW07n-GKrMCt=UjQqwsuYHQ@mail.gmail.com>
+	<alpine.LFD.2.21.1810142320320.16498@eddie.linux-mips.org>
 MIME-Version: 1.0
-References: <cover.1538683492.git.alistair.francis@wdc.com>
-	<5dd21056229d12a1af8d65e9208f4de43ba4a2ae.camel@redhat.com>
-	<892d54c5-2851-74ec-bdf2-286c1665c44f@gmail.com>
-	<7d54ec114745b00b82601875416ccfe6a5f9fe6f.camel@redhat.com>
-	<CAKmqyKNTTu+5KyTMBHw5-+UMa7qnm9EaowxHj8NLxED98m1MKw@mail.gmail.com>
-	<d9e6d7979143130092b5b96602885c1acaca9b52.camel@redhat.com>
-	<CAKmqyKMTzYswJ74WEOQAQrisCdMDQ9Nf6NMEdUKLcUMCN7XLgg@mail.gmail.com>
-	<23d9891ec01bec45b16f89ba1412238be39addf9.camel@redhat.com>
-In-Reply-To: <23d9891ec01bec45b16f89ba1412238be39addf9.camel@redhat.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 15 Oct 2018 09:59:49 -0700
-Message-ID: <CAKmqyKMBxY6j3SwvyYsMVCCeAwKinuVE4+2kbAp6YapBWdKZig@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 0/5] Connect a PCIe host and graphics
- support to RISC-V
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <alpine.LFD.2.21.1810142320320.16498@eddie.linux-mips.org>
+Subject: Re: [Qemu-devel] [PATCH] target/mips: Support Toshiba specific
+ three-operand MADD and MADDU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,31 +29,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrea Bolognani <abologna@redhat.com>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, stephen@eideticom.com, "Richard W.M. Jones" <rjones@redhat.com>
+To: "Maciej W. Rozycki" <macro@linux-mips.org>
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, =?utf-8?Q?J=C3=BCrgen?= Urban <JuergenUrban@gmx.de>
 
-On Mon, Oct 15, 2018 at 7:39 AM Andrea Bolognani <abologna@redhat.com> wrote:
->
-> On Fri, 2018-10-12 at 09:12 -0700, Alistair Francis wrote:
-> > On Fri, Oct 12, 2018 at 6:46 AM Andrea Bolognani <abologna@redhat.com> wrote:
-> > > Problem solved then :)
-> >
-> > Does that mean you have it working?
->
-> Yeah, it was trivial once I knew what to look for ;)
->
->
-> One more thing that I forgot to bring up earlier: at the same time
-> as PCIe support is added, we should also make sure that the
-> pcie-root-port device is built into the qemu-system-riscv* binaries
-> by default, as that device being missing will cause PCI-enabled
-> libvirt guests to fail to start.
+Hi Maciej, Philippe,
 
-We are dong that aren't we?
+>  So results of individual operations are as in the comments with this 
+> code:
+> 
+> 	mthi	$0		# HI <- 0
+> 	mtlo	$0		# LO <- 0
+> 	addiu	$2, $0, 1	# $2 <- 1
+> 	lui	$3, 0x4000	# $3 <- 0x40000000
+> 	maddu	$4, $3, $2	# HI <- 0
+> 				# LO <- 0x40000000
+> 				# $4 <- 0x40000000
+> 	maddu	$5, $4, $2	# HI <- 0
+> 				# LO <- 0xffffffff80000000
+> 				# $5 <- 0xffffffff80000000
+> 	maddu	$6, $4, $2	# HI <- 1
+> 				# LO <- 0
+> 				# $6 <- 0
 
-Alistair
+Adding tests such as the one above to for example tests/tcg/mips/txx9/
+would be useful, I think. As previously noted, GCC can produce 32-bit
+R5900 programs but 64-bit compilations fail, so full test coverage may
+not be easily obtainable at the moment.
 
->
-> --
-> Andrea Bolognani / Red Hat / Virtualization
->
+Fredrik
