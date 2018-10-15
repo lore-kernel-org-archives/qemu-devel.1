@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39844)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gBzoN-0006FW-74
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 06:09:22 -0400
+	(envelope-from <kwolf@redhat.com>) id 1gBzsc-0000Hc-Fc
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 06:13:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gBzoL-0002Lf-SS
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 06:09:19 -0400
-Date: Mon, 15 Oct 2018 11:08:58 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181015100858.GF6785@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1gBzsb-00065X-LW
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 06:13:42 -0400
+Date: Mon, 15 Oct 2018 12:13:09 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20181015101309.GD10459@localhost.localdomain>
 References: <20181013050227.17022-1-ehabkost@redhat.com>
 	<20181015093243.GE6785@redhat.com>
 	<CAFEAcA8MQ37JVCCPGyQa20n6AuU8Sv_pC9DoDoCKdQhqekpGnQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 In-Reply-To: <CAFEAcA8MQ37JVCCPGyQa20n6AuU8Sv_pC9DoDoCKdQhqekpGnQ@mail.gmail.com>
 Content-Transfer-Encoding: quoted-printable
@@ -27,11 +26,11 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Cleber Rosa <crosa@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Cleber Rosa <crosa@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 
-On Mon, Oct 15, 2018 at 11:02:03AM +0100, Peter Maydell wrote:
-> On 15 October 2018 at 10:32, Daniel P. Berrang=C3=A9 <berrange@redhat.c=
-om> wrote:
+Am 15.10.2018 um 12:02 hat Peter Maydell geschrieben:
+> On 15 October 2018 at 10:32, Daniel P. Berrang=E9 <berrange@redhat.com>=
+ wrote:
 > > On Sat, Oct 13, 2018 at 02:02:27AM -0300, Eduardo Habkost wrote:
 > >> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 > >> ---
@@ -71,16 +70,12 @@ ra
 > the transition to python-3-only should start by making sure everything
 > we have works with python 3...
 
-FWIW,  I would /not/ object to the iotests directory being converted to
-pure py3 only, skipping 2/3 compat, if that made it easier, since it is
-not a commonly used thing by most people building QEMU.
+It's easier to port stuff to Python 3 though than making them work with
+both. I think Eduardo's RFC is in part motivated by a patch from
+Philippe that converted something in iotests to work with Python 3,
+passed review and then turned out to break Python 2.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Having to test every iotests patch twice with different Python versions
+isn't something I would like to do for extended periods of time.
+
+Kevin
