@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45432)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45463)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gByX3-0004Ei-Ht
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 04:47:22 -0400
+	(envelope-from <jasowang@redhat.com>) id 1gByX7-0004I1-5m
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 04:47:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gByWz-00047j-SO
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 04:47:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50464)
+	(envelope-from <jasowang@redhat.com>) id 1gByX3-0004Bo-Ic
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 04:47:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44574)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gByWt-0003ui-JU
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 04:47:12 -0400
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gByX1-0003dc-Mw
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 04:47:20 -0400
 From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 15 Oct 2018 16:46:11 +0800
-Message-Id: <1539593186-32183-12-git-send-email-jasowang@redhat.com>
+Date: Mon, 15 Oct 2018 16:46:04 +0800
+Message-Id: <1539593186-32183-5-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1539593186-32183-1-git-send-email-jasowang@redhat.com>
 References: <1539593186-32183-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL 11/26] qapi/migration.json: Rename COLO unknown
- mode to none mode.
+Subject: [Qemu-devel] [PULL 04/26] COLO: integrate colo compare with colo
+ frame
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,76 +25,152 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, qemu-devel@nongnu.org
-Cc: Zhang Chen <chen.zhang@intel.com>, Zhang Chen <zhangckid@gmail.com>, Jason Wang <jasowang@redhat.com>
+Cc: Zhang Chen <zhangckid@gmail.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Zhang Chen <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>
 
-From: Zhang Chen <chen.zhang@intel.com>
+From: Zhang Chen <zhangckid@gmail.com>
 
-Suggested by Markus Armbruster rename COLO unknown mode to none mode.
+For COLO FT, both the PVM and SVM run at the same time,
+only sync the state while it needs.
 
+So here, let SVM runs while not doing checkpoint, change
+DEFAULT_MIGRATE_X_CHECKPOINT_DELAY to 200*100.
+
+Besides, we forgot to release colo_checkpoint_semd and
+colo_delay_timer, fix them here.
+
+Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 Signed-off-by: Zhang Chen <zhangckid@gmail.com>
 Signed-off-by: Zhang Chen <chen.zhang@intel.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- migration/colo-failover.c |  2 +-
- migration/colo.c          |  2 +-
- qapi/migration.json       | 10 +++++-----
- 3 files changed, 7 insertions(+), 7 deletions(-)
+ migration/colo.c      | 42 ++++++++++++++++++++++++++++++++++++++++--
+ migration/migration.c |  6 ++----
+ 2 files changed, 42 insertions(+), 6 deletions(-)
 
-diff --git a/migration/colo-failover.c b/migration/colo-failover.c
-index 0ae0c41..4854a96 100644
---- a/migration/colo-failover.c
-+++ b/migration/colo-failover.c
-@@ -77,7 +77,7 @@ FailoverStatus failover_get_state(void)
- 
- void qmp_x_colo_lost_heartbeat(Error **errp)
- {
--    if (get_colo_mode() == COLO_MODE_UNKNOWN) {
-+    if (get_colo_mode() == COLO_MODE_NONE) {
-         error_setg(errp, QERR_FEATURE_DISABLED, "colo");
-         return;
-     }
 diff --git a/migration/colo.c b/migration/colo.c
-index bd7390d..2cdd366 100644
+index 88936f5..f4bdfde 100644
 --- a/migration/colo.c
 +++ b/migration/colo.c
-@@ -160,7 +160,7 @@ COLOMode get_colo_mode(void)
-     } else if (migration_incoming_in_colo_state()) {
-         return COLO_MODE_SECONDARY;
-     } else {
--        return COLO_MODE_UNKNOWN;
-+        return COLO_MODE_NONE;
+@@ -25,8 +25,11 @@
+ #include "qemu/error-report.h"
+ #include "migration/failover.h"
+ #include "replication.h"
++#include "net/colo-compare.h"
++#include "net/colo.h"
+ 
+ static bool vmstate_loading;
++static Notifier packets_compare_notifier;
+ 
+ #define COLO_BUFFER_BASE_SIZE (4 * 1024 * 1024)
+ 
+@@ -343,6 +346,11 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
+         goto out;
      }
+ 
++    colo_notify_compares_event(NULL, COLO_EVENT_CHECKPOINT, &local_err);
++    if (local_err) {
++        goto out;
++    }
++
+     /* Disable block migration */
+     migrate_set_block_enabled(false, &local_err);
+     qemu_savevm_state_header(fb);
+@@ -400,6 +408,11 @@ out:
+     return ret;
  }
  
-diff --git a/qapi/migration.json b/qapi/migration.json
-index 4a18209..0776e0f 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -923,18 +923,18 @@
- ##
- # @COLOMode:
- #
--# The colo mode
-+# The COLO current mode.
- #
--# @unknown: unknown mode
-+# @none: COLO is disabled.
- #
--# @primary: master side
-+# @primary: COLO node in primary side.
- #
--# @secondary: slave side
-+# @secondary: COLO node in slave side.
- #
- # Since: 2.8
- ##
- { 'enum': 'COLOMode',
--  'data': [ 'unknown', 'primary', 'secondary'] }
-+  'data': [ 'none', 'primary', 'secondary'] }
++static void colo_compare_notify_checkpoint(Notifier *notifier, void *data)
++{
++    colo_checkpoint_notify(data);
++}
++
+ static void colo_process_checkpoint(MigrationState *s)
+ {
+     QIOChannelBuffer *bioc;
+@@ -416,6 +429,9 @@ static void colo_process_checkpoint(MigrationState *s)
+         goto out;
+     }
  
- ##
- # @FailoverStatus:
++    packets_compare_notifier.notify = colo_compare_notify_checkpoint;
++    colo_compare_register_notifier(&packets_compare_notifier);
++
+     /*
+      * Wait for Secondary finish loading VM states and enter COLO
+      * restore.
+@@ -461,11 +477,21 @@ out:
+         qemu_fclose(fb);
+     }
+ 
+-    timer_del(s->colo_delay_timer);
+-
+     /* Hope this not to be too long to wait here */
+     qemu_sem_wait(&s->colo_exit_sem);
+     qemu_sem_destroy(&s->colo_exit_sem);
++
++    /*
++     * It is safe to unregister notifier after failover finished.
++     * Besides, colo_delay_timer and colo_checkpoint_sem can't be
++     * released befor unregister notifier, or there will be use-after-free
++     * error.
++     */
++    colo_compare_unregister_notifier(&packets_compare_notifier);
++    timer_del(s->colo_delay_timer);
++    timer_free(s->colo_delay_timer);
++    qemu_sem_destroy(&s->colo_checkpoint_sem);
++
+     /*
+      * Must be called after failover BH is completed,
+      * Or the failover BH may shutdown the wrong fd that
+@@ -559,6 +585,11 @@ void *colo_process_incoming_thread(void *opaque)
+     fb = qemu_fopen_channel_input(QIO_CHANNEL(bioc));
+     object_unref(OBJECT(bioc));
+ 
++    qemu_mutex_lock_iothread();
++    vm_start();
++    trace_colo_vm_state_change("stop", "run");
++    qemu_mutex_unlock_iothread();
++
+     colo_send_message(mis->to_src_file, COLO_MESSAGE_CHECKPOINT_READY,
+                       &local_err);
+     if (local_err) {
+@@ -578,6 +609,11 @@ void *colo_process_incoming_thread(void *opaque)
+             goto out;
+         }
+ 
++        qemu_mutex_lock_iothread();
++        vm_stop_force_state(RUN_STATE_COLO);
++        trace_colo_vm_state_change("run", "stop");
++        qemu_mutex_unlock_iothread();
++
+         /* FIXME: This is unnecessary for periodic checkpoint mode */
+         colo_send_message(mis->to_src_file, COLO_MESSAGE_CHECKPOINT_REPLY,
+                      &local_err);
+@@ -631,6 +667,8 @@ void *colo_process_incoming_thread(void *opaque)
+         }
+ 
+         vmstate_loading = false;
++        vm_start();
++        trace_colo_vm_state_change("stop", "run");
+         qemu_mutex_unlock_iothread();
+ 
+         if (failover_get_state() == FAILOVER_STATUS_RELAUNCH) {
+diff --git a/migration/migration.c b/migration/migration.c
+index d6ae879..32ce058 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -76,10 +76,8 @@
+ /* Migration XBZRLE default cache size */
+ #define DEFAULT_MIGRATE_XBZRLE_CACHE_SIZE (64 * 1024 * 1024)
+ 
+-/* The delay time (in ms) between two COLO checkpoints
+- * Note: Please change this default value to 10000 when we support hybrid mode.
+- */
+-#define DEFAULT_MIGRATE_X_CHECKPOINT_DELAY 200
++/* The delay time (in ms) between two COLO checkpoints */
++#define DEFAULT_MIGRATE_X_CHECKPOINT_DELAY (200 * 100)
+ #define DEFAULT_MIGRATE_MULTIFD_CHANNELS 2
+ #define DEFAULT_MIGRATE_MULTIFD_PAGE_COUNT 16
+ 
 -- 
 2.5.0
