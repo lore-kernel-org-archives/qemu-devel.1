@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43861)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45310)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gByPc-00029y-7q
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 04:39:41 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1gByWO-0003qz-2U
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 04:46:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gByPb-0005cx-Cd
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 04:39:40 -0400
-References: <cover.1539528213.git.artem.k.pisarenko@gmail.com>
-	<442bb618199daa309d3191a5ee848e659a46c0ce.1539528213.git.artem.k.pisarenko@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5016919e-897c-1b64-ad9a-4721b5692455@redhat.com>
-Date: Mon, 15 Oct 2018 10:39:12 +0200
+	(envelope-from <dovgaluk@ispras.ru>) id 1gByWG-0003WH-RT
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 04:46:36 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:51082)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1gByWC-0003Ok-Ov
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 04:46:29 -0400
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20181010133333.24538.53169.stgit@pasha-VirtualBox>
+In-Reply-To: <20181010133333.24538.53169.stgit@pasha-VirtualBox>
+Date: Mon, 15 Oct 2018 11:46:24 +0300
+Message-ID: <001701d46463$8dff3680$a9fda380$@ru>
 MIME-Version: 1.0
-In-Reply-To: <442bb618199daa309d3191a5ee848e659a46c0ce.1539528213.git.artem.k.pisarenko@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/3] Introduce attributes to qemu timer
- subsystem
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PATCH v7 00/19] Fixing record/replay and adding
+ reverse debugging
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,107 +29,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Artem Pisarenko <artem.k.pisarenko@gmail.com>, qemu-devel@nongnu.org
-Cc: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block I/O path" <qemu-block@nongnu.org>
+To: pbonzini@redhat.com, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, war2jordan@live.com, mst@redhat.com, jasowang@redhat.com, kraxel@redhat.com, thomas.dullien@googlemail.com, artem.k.pisarenko@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, armbru@redhat.com, dgilbert@redhat.com, boost.lists@gmail.com, alex.bennee@linaro.org, rth@twiddle.net, kwolf@redhat.com, crosthwaite.peter@gmail.com, mreitz@redhat.com, maria.klimushenkova@ispras.ru
 
-On 14/10/2018 16:55, Artem Pisarenko wrote:
-> Attributes are simple flags, associated with individual timers for thei=
-r whole lifetime.
-> They intended to be used to mark individual timers for special handling=
- by various qemu features operating at qemu core level.
-> Existing timer, aio and coroutine interface extended with attribute-ena=
-bled variants of functions, which create/initialize timers.
->=20
-> Signed-off-by: Artem Pisarenko <artem.k.pisarenko@gmail.com>
+Ping?
+
+Paolo, what do you think about upstreaming this before soft freeze?
+
+Pavel Dovgalyuk
+
+
+> -----Original Message-----
+> From: Pavel Dovgalyuk [mailto:Pavel.Dovgaluk@ispras.ru]
+> Sent: Wednesday, October 10, 2018 4:34 PM
+> To: qemu-devel@nongnu.org
+> Cc: peter.maydell@linaro.org; war2jordan@live.com; pavel.dovgaluk@ispras.ru; mst@redhat.com;
+> jasowang@redhat.com; zuban32s@gmail.com; kraxel@redhat.com; thomas.dullien@googlemail.com;
+> artem.k.pisarenko@gmail.com; quintela@redhat.com; ciro.santilli@gmail.com; armbru@redhat.com;
+> dovgaluk@ispras.ru; dgilbert@redhat.com; boost.lists@gmail.com; alex.bennee@linaro.org;
+> rth@twiddle.net; kwolf@redhat.com; crosthwaite.peter@gmail.com; mreitz@redhat.com;
+> maria.klimushenkova@ispras.ru; pbonzini@redhat.com
+> Subject: [PATCH v7 00/19] Fixing record/replay and adding reverse debugging
+> 
+> GDB remote protocol supports reverse debugging of the targets.
+> It includes 'reverse step' and 'reverse continue' operations.
+> The first one finds the previous step of the execution,
+> and the second one is intended to stop at the last breakpoint that
+> would happen when the program is executed normally.
+> 
+> Reverse debugging is possible in the replay mode, when at least
+> one snapshot was created at the record or replay phase.
+> QEMU can use these snapshots for travelling back in time with GDB.
+> 
+> Running the execution in replay mode allows using GDB reverse debugging
+> commands:
+>  - reverse-stepi (or rsi): Steps one instruction to the past.
+>    QEMU loads on of the prior snapshots and proceeds to the desired
+>    instruction forward. When that step is reaches, execution stops.
+>  - reverse-continue (or rc): Runs execution "backwards".
+>    QEMU tries to find breakpoint or watchpoint by loaded prior snapshot
+>    and replaying the execution. Then QEMU loads snapshots again and
+>    replays to the latest breakpoint. When there are no breakpoints in
+>    the examined section of the execution, QEMU finds one more snapshot
+>    and tries again. After the first snapshot is processed, execution
+>    stops at this snapshot.
+> 
+> The set of patches include the following modifications:
+>  - gdbstub update for reverse debugging support
+>  - functions that automatically perform reverse step and reverse
+>    continue operations
+>  - hmp/qmp commands for manipulating the replay process
+>  - improvement of the snapshotting for saving the execution step
+>    in the snapshot parameters
+>  - other record/replay fixes
+> 
+> The patches are available in the repository:
+> https://github.com/ispras/qemu/tree/rr-181010
+> 
+> v7 changes:
+>  - rebased to the new master with upstreamed patches from the series
+>  - several improvements in hmp/qmp commands handling (suggested by Markus Armbruster)
+>  - fixed record/replay with '-rtc base' option enabled
+>  - added document with virtual hardware requirements
+> 
+> v6 changes:
+>  - rebased to the new version of master
+>  - fixed build of linux-user configurations
+>  - added new clock for slirp and vnc timers
+> 
+> v5 changes:
+>  - multiple fixes of record/replay bugs appeared after QEMU core update
+>  - changed reverse debugging to 'since 3.1'
+> 
+> v4 changes:
+>  - changed 'since 2.13' to 'since 3.0' in json (as suggested by Eric Blake)
+> 
+> v3 changes:
+>  - Fixed PS/2 bug with save/load vm, which caused failures of the replay.
+>  - Rebased to the new code base.
+>  - Minor fixes.
+> 
+> v2 changes:
+>  - documented reverse debugging
+>  - fixed start vmstate loading in record mode
+>  - documented qcow2 changes (as suggested by Eric Blake)
+>  - made icount SnapshotInfo field optional (as suggested by Eric Blake)
+>  - renamed qmp commands (as suggested by Eric Blake)
+>  - minor changes
+> 
 > ---
->=20
-> Notes:
->     Conversion and association between QEMUTimerAttrBit and accessor ma=
-cro are dumb.
->     Maybe better alternatives exist (like QFlags in Qt framework) or ex=
-isting qemu code may be reused, if any.
->     Attributes also may be better named as flags, but they looks like s=
-omething volatile, whereas 'attribute' expresses constant nature better.
->=20
->  include/block/aio.h         |  50 +++++++++++++++++++-
->  include/qemu/coroutine.h    |   5 +-
->  include/qemu/timer.h        | 110 ++++++++++++++++++++++++++++++++++++=
-++------
->  tests/ptimer-test-stubs.c   |   7 +--
->  util/qemu-coroutine-sleep.c |   6 ++-
->  util/qemu-timer.c           |  12 +++--
->  6 files changed, 165 insertions(+), 25 deletions(-)
->=20
-> diff --git a/include/block/aio.h b/include/block/aio.h
-> index f08630c..a6be3fb 100644
-> --- a/include/block/aio.h
-> +++ b/include/block/aio.h
-> @@ -407,10 +407,35 @@ static inline QEMUTimer *aio_timer_new(AioContext=
- *ctx, QEMUClockType type,
->                                         int scale,
->                                         QEMUTimerCB *cb, void *opaque)
->  {
-> -    return timer_new_tl(ctx->tlg.tl[type], scale, cb, opaque);
-> +    return timer_new_a_tl(ctx->tlg.tl[type], scale, 0, cb, opaque);
->  }
-
-The new function _a_tl is a bit ugly.
-
-I would prefer to:
-
-- only have a new timer_new_full that takes all of scale, attribute and
-timerlist
-
-- accept a NULL timerlist and default to main_loop_tlg.tl[type]
-
-- add aio_timer_{new,init}_with_attrs
-
-> diff --git a/include/qemu/coroutine.h b/include/qemu/coroutine.h
-> index 9801e7f..cffc2b2 100644
-> --- a/include/qemu/coroutine.h
-> +++ b/include/qemu/coroutine.h
-> @@ -276,7 +276,10 @@ void qemu_co_rwlock_unlock(CoRwlock *lock);
->  /**
->   * Yield the coroutine for a given duration
->   */
-> -void coroutine_fn qemu_co_sleep_ns(QEMUClockType type, int64_t ns);
-> +#define qemu_co_sleep_ns(type, ns) \
-> +    qemu_co_sleep_a_ns(type, 0, ns)
-> +void coroutine_fn qemu_co_sleep_a_ns(QEMUClockType type, int attribute=
-s,
-> +                                     int64_t ns);
-
-I wouldn't bother adding co_sleep_a_ns unless it's needed.
-
->  /**
->   * Yield until a file descriptor becomes readable
-> diff --git a/include/qemu/timer.h b/include/qemu/timer.h
-> index 39ea907..031e3a1 100644
-> --- a/include/qemu/timer.h
-> +++ b/include/qemu/timer.h
-> @@ -52,6 +52,28 @@ typedef enum {
->      QEMU_CLOCK_MAX
->  } QEMUClockType;
-> =20
-> +/**
-> + * QEMU Timer attributes:
-> + *
-> + * An individual timer may be assigned with one or multiple attributes=
- when
-> + * initialized.
-> + * Attribute is a static flag, meaning that timer has corresponding pr=
-operty.
-> + * Attributes are defined in QEMUTimerAttrBit enum and encoded to bit =
-set,
-> + * which used to initialize timer, stored to 'attributes' member and c=
-an be
-> + * retrieved externally with timer_get_attributes() call.
-> + * Values of QEMUTimerAttrBit aren't used directly,
-> + * instead each attribute in bit set accessed with QEMU_TIMER_ATTR(id)=
- macro,
-> + * where 'id' is a unique part of attribute identifier.
-
-I think QEMU_TIMER_ATTR is an unnecessary complication.  I would just
-add a TIMER_ATTR_EXTERNAL constant.
-
-Paolo
+> 
+> Pavel Dovgalyuk (19):
+>       block: implement bdrv_snapshot_goto for blkreplay
+>       replay: disable default snapshot for record/replay
+>       replay: update docs for record/replay with block devices
+>       replay: don't drain/flush bdrv queue while RR is working
+>       replay: finish record/replay before closing the disks
+>       qcow2: introduce icount field for snapshots
+>       migration: introduce icount field for snapshots
+>       replay: provide and accessor for rr filename
+>       replay: introduce info hmp/qmp command
+>       replay: introduce breakpoint at the specified step
+>       replay: implement replay-seek command to proceed to the desired step
+>       replay: refine replay-time module
+>       replay: flush rr queue before loading the vmstate
+>       gdbstub: add reverse step support in replay mode
+>       gdbstub: add reverse continue support in replay mode
+>       replay: describe reverse debugging in docs/replay.txt
+>       replay: add BH oneshot event for block layer
+>       replay: init rtc after enabling the replay
+>       replay: document development rules
+> 
+> 
+>  accel/tcg/translator.c    |    1
+>  block/blkreplay.c         |    8 +
+>  block/block-backend.c     |    3
+>  block/io.c                |   22 +++
+>  block/qapi.c              |   17 ++
+>  block/qcow2-snapshot.c    |    9 +
+>  block/qcow2.h             |    2
+>  blockdev.c                |   10 +
+>  cpus.c                    |   19 ++-
+>  docs/devel/replay.txt     |   45 ++++++
+>  docs/interop/qcow2.txt    |    4 +
+>  docs/replay.txt           |   45 ++++++
+>  exec.c                    |    6 +
+>  gdbstub.c                 |   50 +++++++
+>  hmp-commands-info.hx      |   14 ++
+>  hmp-commands.hx           |   44 ++++++
+>  hmp.h                     |    4 +
+>  include/block/snapshot.h  |    1
+>  include/sysemu/replay.h   |   20 +++
+>  migration/savevm.c        |   15 +-
+>  qapi/block-core.json      |    7 +
+>  qapi/block.json           |    3
+>  qapi/misc.json            |   77 +++++++++++
+>  replay/Makefile.objs      |    3
+>  replay/replay-debugging.c |  319 +++++++++++++++++++++++++++++++++++++++++++++
+>  replay/replay-events.c    |   16 ++
+>  replay/replay-internal.h  |    7 +
+>  replay/replay-time.c      |   32 ++---
+>  replay/replay.c           |   26 ++++
+>  stubs/Makefile.objs       |    1
+>  stubs/replay-user.c       |    9 +
+>  stubs/replay.c            |   10 +
+>  vl.c                      |   22 ++-
+>  33 files changed, 818 insertions(+), 53 deletions(-)
+>  create mode 100644 docs/devel/replay.txt
+>  create mode 100644 replay/replay-debugging.c
+>  create mode 100644 stubs/replay-user.c
+> 
+> --
+> Pavel Dovgalyuk
