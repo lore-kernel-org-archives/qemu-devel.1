@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49232)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gBwnr-00080H-Fs
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 02:56:38 -0400
+	(envelope-from <jasowang@redhat.com>) id 1gBwrD-0000Xr-NY
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 03:00:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gBwnb-00042F-Nf
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 02:56:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47130)
+	(envelope-from <jasowang@redhat.com>) id 1gBwrA-0005Gf-HX
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 03:00:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51854)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gBwnQ-0003wa-6g
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 02:56:10 -0400
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gBwrA-0005Fq-4i
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 03:00:00 -0400
 References: <1539266915-15216-1-git-send-email-wexu@redhat.com>
 	<1539266915-15216-9-git-send-email-wexu@redhat.com>
 From: Jason Wang <jasowang@redhat.com>
-Message-ID: <4547298e-c84d-c244-3f38-a74bf01dd85d@redhat.com>
-Date: Mon, 15 Oct 2018 14:55:49 +0800
+Message-ID: <f9b19079-65fa-4d21-63ba-00f79095bc4f@redhat.com>
+Date: Mon, 15 Oct 2018 14:59:48 +0800
 MIME-Version: 1.0
 In-Reply-To: <1539266915-15216-9-git-send-email-wexu@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
@@ -120,6 +120,11 @@ able)
 > +    if (virtio_vdev_has_feature(vq->vdev, VIRTIO_RING_F_EVENT_IDX)) {
 > +        uint16_t off_wrap =3D vq->event_idx | vq->event_wrap_counter <=
 < 15;
+
+Btw, why not just use shadow_avail_idx here?
+
+Thanks
+
 > +
 > +        vring_packed_off_wrap_write(vq->vdev, &caches->device, off_wra=
 p);
@@ -184,25 +189,6 @@ dev, VirtQueue *vq)
 > +    if (wrap !=3D off_wrap >> 15) {
 > +        off +=3D vq->vring.num;
 > +    }
-
-Let's use a more compact and verified version from dpdk:
-
-static bool vhost_vring_packed_need_event(struct vhost_virtqueue *vq,
- =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=
-=A0 =C2=A0=C2=A0=C2=A0 =C2=A0 bool wrap, __u16 off_wrap, __u16 new,
- =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=
-=A0 =C2=A0=C2=A0=C2=A0 =C2=A0 __u16 old)
-{
- =C2=A0=C2=A0=C2=A0 int off =3D off_wrap & ~(1 << 15);
-
- =C2=A0=C2=A0=C2=A0 if (wrap !=3D off_wrap >> 15)
- =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 off -=3D vq->num;
-
- =C2=A0=C2=A0=C2=A0 return vring_need_event(off, new, old);
-}
-
-Thanks
-
 > +
 > +    return vring_need_event(off, new, old);
 > +}
