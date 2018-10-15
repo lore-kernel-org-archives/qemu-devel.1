@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48057)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49189)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gCBDT-0006Jz-CJ
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 18:20:00 -0400
+	(envelope-from <philmd@redhat.com>) id 1gCBG1-0007Hy-L3
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 18:22:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gCBDO-0004Fk-Bi
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 18:19:59 -0400
-Received: from mail-wm1-f41.google.com ([209.85.128.41]:39406)
+	(envelope-from <philmd@redhat.com>) id 1gCBFw-0006PC-Lx
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 18:22:37 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:37122)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gCBDO-0004EI-09
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 18:19:54 -0400
-Received: by mail-wm1-f41.google.com with SMTP id y144-v6so21107425wmd.4
-	for <qemu-devel@nongnu.org>; Mon, 15 Oct 2018 15:19:52 -0700 (PDT)
-References: <20181015141453.32632-1-mreitz@redhat.com>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gCBFt-00069z-8L
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 18:22:30 -0400
+Received: by mail-wr1-f67.google.com with SMTP id y11-v6so23100146wrd.4
+	for <qemu-devel@nongnu.org>; Mon, 15 Oct 2018 15:22:18 -0700 (PDT)
+References: <20181012165347.2117-1-crosa@redhat.com>
+	<20181012165347.2117-2-crosa@redhat.com>
+	<15152430-8023-2fac-2bbe-0876ac632e9d@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <6be3d69f-1bb4-04c2-c1af-9afb8122753d@redhat.com>
-Date: Tue, 16 Oct 2018 00:19:50 +0200
+Message-ID: <6d2a1a03-4362-cfbd-3670-cb67d4277ee8@redhat.com>
+Date: Tue, 16 Oct 2018 00:22:15 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181015141453.32632-1-mreitz@redhat.com>
+In-Reply-To: <15152430-8023-2fac-2bbe-0876ac632e9d@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/9] iotests: Make them work for both
- Python 2 and 3
+Subject: Re: [Qemu-devel] [PATCH v4 1/3] Bootstrap Python venv for tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,73 +31,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+To: ccarrara@redhat.com, Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
+Cc: Laszlo Ersek <lersek@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <pmathieu@redhat.com>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-Hi Max,
-
-On 15/10/2018 16:14, Max Reitz wrote:
-> This series prepares the iotests to work with both Python 2 and 3.  In
-> some places, it adds version-specific code and decides what to do based
-> on the version (for instance, whether to import the StringIO class from
-> the 'io' or the 'StringIO' module), but most of the time, it just makes
-> code work for both versions in general.
+On 15/10/2018 21:04, Caio Carrara wrote:
+> On 12-10-2018 13:53, Cleber Rosa wrote:
+>> A number of QEMU tests are written in Python, and may benefit
+>> from an untainted Python venv.
+>>
+>> By using make rules, tests that depend on specific Python libs
+>> can set that rule as a requirement, along with rules that require
+>> the presence or installation of specific libraries.
+>>
+>> The tests/venv-requirements.txt is supposed to contain the
+>> Python requirements that should be added to the venv created
+>> by check-venv.
+>>
+>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+>> ---
+>>  tests/Makefile.include      | 20 ++++++++++++++++++++
+>>  tests/venv-requirements.txt |  3 +++
 > 
-> And when we make the switch to make Python 3 mandatory, we can simply
-> drop the Python 2 branches.
-> 
-> 
-> Max Reitz (9):
->   iotests: Make nbd-fault-injector flush
->   iotests: Flush in iotests.py's QemuIoInteractive
->   iotests: Use Python byte strings where appropriate
->   iotests: Use // for Python integer division
->   iotests: Different iterator behavior in Python 3
->   iotests: Explicitly inherit FDs in Python
->   iotests: 'new' module replacement in 169
->   iotests: Modify imports for Python 3
->   iotests: Unify log outputs between Python 2 and 3
+> Any special reason to name `venv-requirements.txt` instead of only
+> `requirements.txt`? I think the second way is better (if there's no
+> cons) since it's the default from most of Python projects. Besides that
+> seems more semantic to have a `tests/requirements.txt` file that
+> registers the requirements for tests.
 
-You forgot:
-
-    MAINTAINERS: Add myself in the Python scripts section
-
-;)
+Agreed.
 
 > 
->  scripts/qemu.py                          |  13 +-
->  scripts/qmp/qmp.py                       |   7 +
->  scripts/qtest.py                         |   2 +-
->  tests/qemu-iotests/040                   |   4 +-
->  tests/qemu-iotests/044                   |  20 +-
->  tests/qemu-iotests/056                   |   2 +-
->  tests/qemu-iotests/065                   |   4 +-
->  tests/qemu-iotests/083.out               |   9 +
->  tests/qemu-iotests/093                   |  18 +-
->  tests/qemu-iotests/124                   |   4 +-
->  tests/qemu-iotests/139                   |   2 +-
->  tests/qemu-iotests/147                   |   7 +
->  tests/qemu-iotests/149                   |  14 +-
->  tests/qemu-iotests/151                   |  12 +-
->  tests/qemu-iotests/163                   |   8 +-
->  tests/qemu-iotests/169                   |   3 +-
->  tests/qemu-iotests/194.out               |  22 +-
->  tests/qemu-iotests/202.out               |  12 +-
->  tests/qemu-iotests/203.out               |  14 +-
->  tests/qemu-iotests/206.out               | 144 +++----
->  tests/qemu-iotests/207                   |   4 +-
->  tests/qemu-iotests/207.out               |  52 +--
->  tests/qemu-iotests/208.out               |   8 +-
->  tests/qemu-iotests/210.out               |  72 ++--
->  tests/qemu-iotests/211.out               |  66 +--
->  tests/qemu-iotests/212.out               | 102 ++---
->  tests/qemu-iotests/213.out               | 124 +++---
->  tests/qemu-iotests/216.out               |   4 +-
->  tests/qemu-iotests/218.out               |  20 +-
->  tests/qemu-iotests/219.out               | 526 +++++++++++------------
->  tests/qemu-iotests/222.out               |  24 +-
->  tests/qemu-iotests/iotests.py            |  64 ++-
->  tests/qemu-iotests/nbd-fault-injector.py |  12 +-
->  tests/qemu-iotests/qcow2.py              |  10 +-
->  34 files changed, 745 insertions(+), 664 deletions(-)
+> Still in this topic. As far as I could see, the files in `tests/`
+> directory are almost all C source code. The right place for the Python
+> requirements seems the `tests/acceptance/` directory specially because
+> the subject of all this patches. Keeping only one requirements file for
+> all kinds of tests (that uses Python) can be problematic in my opinion.
+> If it makes any sense, probably is also a good idea rename the target
+> from `check-venv` to something like `check-acceptance-venv`.
+
+Yes.
+
+> 
+>>  2 files changed, 23 insertions(+)
+>>  create mode 100644 tests/venv-requirements.txt
+>>
+>> diff --git a/tests/Makefile.include b/tests/Makefile.include
+>> index 5eadfd52f9..b66180efa1 100644
+>> --- a/tests/Makefile.include
+>> +++ b/tests/Makefile.include
+>> @@ -12,6 +12,7 @@ check-help:
+>>  	@echo " $(MAKE) check-block          Run block tests"
+>>  	@echo " $(MAKE) check-tcg            Run TCG tests"
+>>  	@echo " $(MAKE) check-report.html    Generates an HTML test report"
+>> +	@echo " $(MAKE) check-venv           Creates a Python venv for tests"
+>>  	@echo " $(MAKE) check-clean          Clean the tests"
+>>  	@echo
+>>  	@echo "Please note that HTML reports do not regenerate if the unit tests"
+>> @@ -1017,6 +1018,24 @@ check-decodetree:
+>>            ./check.sh "$(PYTHON)" "$(SRC_PATH)/scripts/decodetree.py", \
+>>            TEST, decodetree.py)
+>>  
+>> +# Python venv for running tests
+>> +
+>> +.PHONY: check-venv
+>> +
+>> +TESTS_VENV_DIR=$(BUILD_DIR)/tests/venv
+>> +TESTS_VENV_REQ=$(SRC_PATH)/tests/venv-requirements.txt
+>> +
+>> +$(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
+>> +	$(call quiet-command, \
+>> +            $(PYTHON) -m venv --system-site-packages $@, \
+>> +            VENV, $@)
+>> +	$(call quiet-command, \
+>> +            $(TESTS_VENV_DIR)/bin/python -m pip -q install -r $(TESTS_VENV_REQ), \
+>> +            PIP, $(TESTS_VENV_REQ))
+>> +	$(call quiet-command, touch $@)
+>> +
+>> +check-venv: $(TESTS_VENV_DIR)
+>> +
+>>  # Consolidated targets
+>>  
+>>  .PHONY: check-qapi-schema check-qtest check-unit check check-clean
+>> @@ -1030,6 +1049,7 @@ check-clean:
+>>  	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
+>>  	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y)) $(check-qtest-generic-y))
+>>  	rm -f tests/test-qapi-gen-timestamp
+>> +	rm -rf $(TESTS_VENV_DIR)
+>>  
+>>  clean: check-clean
+>>  
+>> diff --git a/tests/venv-requirements.txt b/tests/venv-requirements.txt
+>> new file mode 100644
+>> index 0000000000..d39f9d1576
+>> --- /dev/null
+>> +++ b/tests/venv-requirements.txt
+>> @@ -0,0 +1,3 @@
+>> +# Add Python module requirements, one per line, to be installed
+>> +# in the tests/venv Python virtual environment. For more info,
+>> +# refer to: https://pip.pypa.io/en/stable/user_guide/#id1
+>>
+> 
 > 
