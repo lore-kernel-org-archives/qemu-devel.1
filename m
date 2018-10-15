@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36263)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37580)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gC8li-0006Xi-DL
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 15:43:10 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1gC8oS-00080E-Qs
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 15:46:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gC8lh-0005fF-R6
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 15:43:10 -0400
-Date: Mon, 15 Oct 2018 16:43:00 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181015194300.GZ31060@habkost.net>
-References: <20181015141453.32632-1-mreitz@redhat.com>
-	<20181015141453.32632-3-mreitz@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1gC8oN-0000AT-TC
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 15:46:00 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:44926)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gC8oN-0008UZ-A6
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 15:45:55 -0400
+Received: by mail-pf1-x441.google.com with SMTP id r9-v6so10192417pff.11
+	for <qemu-devel@nongnu.org>; Mon, 15 Oct 2018 12:45:55 -0700 (PDT)
+References: <20181010203735.27918-1-aclindsa@gmail.com>
+	<20181010203735.27918-5-aclindsa@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <0e30ca6d-57f1-e67a-b9c3-dc5e4b703260@linaro.org>
+Date: Mon, 15 Oct 2018 12:45:51 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181015141453.32632-3-mreitz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/9] iotests: Flush in iotests.py's
- QemuIoInteractive
+In-Reply-To: <20181010203735.27918-5-aclindsa@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 04/14] target/arm: Swap PMU values
+ before/after migrations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,16 +32,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: Aaron Lindsay <aclindsa@gmail.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+Cc: Michael Spradling <mspradli@codeaurora.org>, qemu-devel@nongnu.org, Digant Desai <digantd@codeaurora.org>
 
-On Mon, Oct 15, 2018 at 04:14:46PM +0200, Max Reitz wrote:
-> After issuing a command, flush the pipe.  This does not change anything
-> in Python 2, but it makes a difference in Python 3.
-> 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+On 10/10/18 1:37 PM, Aaron Lindsay wrote:
+> +static void cpu_post_save(void *opaque)
+> +{
+> +    ARMCPU *cpu = opaque;
+> +    pmccntr_sync(&cpu->env);
+> +}
 
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+I'm confused about the need for this.
+Can you explain the sequence of events that requires it?
 
--- 
-Eduardo
+
+r~
