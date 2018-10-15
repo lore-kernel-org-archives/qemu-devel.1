@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35922)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40795)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gCBis-0008QQ-CU
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 18:52:29 -0400
+	(envelope-from <philmd@redhat.com>) id 1gCBs4-0001ts-Sr
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 19:02:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gCBih-0000WU-MZ
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 18:52:21 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:34741)
+	(envelope-from <philmd@redhat.com>) id 1gCBrs-0000sB-QY
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 19:01:53 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:39347)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gCBia-0000Pu-5G
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 18:52:10 -0400
-Received: by mail-wm1-f66.google.com with SMTP id z25-v6so24017322wmf.1
-	for <qemu-devel@nongnu.org>; Mon, 15 Oct 2018 15:52:07 -0700 (PDT)
-References: <20181015115309.17089-1-armbru@redhat.com>
-	<20181015115309.17089-2-armbru@redhat.com>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gCBrs-0000nw-GM
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 19:01:44 -0400
+Received: by mail-wr1-f68.google.com with SMTP id 61-v6so23192122wrb.6
+	for <qemu-devel@nongnu.org>; Mon, 15 Oct 2018 16:01:42 -0700 (PDT)
+References: <1539600633-17726-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1539600633-17726-2-git-send-email-aleksandar.markovic@rt-rk.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <144f1c58-7744-6107-b416-05e6286e559d@redhat.com>
-Date: Tue, 16 Oct 2018 00:52:04 +0200
+Message-ID: <fb72d6e5-a04b-f3b5-a29c-2e7e112e2ef2@redhat.com>
+Date: Tue, 16 Oct 2018 01:01:39 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181015115309.17089-2-armbru@redhat.com>
+In-Reply-To: <1539600633-17726-2-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 01/35] error: Fix use of error_prepend()
- with &error_fatal, &error_abort
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/3] target/mips: Add a comment with an
+ overview of CP0 registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,318 +31,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: Fei Li <fli@suse.com>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+Cc: smarkovic@wavecomp.com, pjovanovic@wavecomp.com, amarkovic@wavecomp.com, aurelien@aurel32.net
 
-On 15/10/2018 13:52, Markus Armbruster wrote:
-> From include/qapi/error.h:
+Hi Aleksandar,
+
+On 15/10/2018 12:50, Aleksandar Markovic wrote:
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
 > 
->   * Pass an existing error to the caller with the message modified:
->   *     error_propagate(errp, err);
->   *     error_prepend(errp, "Could not frobnicate '%s': ", name);
+> Add a comment with an overview of CP0 registers close to the
+> definition of their corresponding fields in CPUMIPSState.
 > 
-> Fei Li pointed out that doing error_propagate() first doesn't work
-> well when @errp is &error_fatal or &error_abort: the error_prepend()
-> is never reached.
-> 
-> Since I doubt fixing the documentation will stop people from getting
-> it wrong, introduce error_propagate_prepend(), in the hope that it
-> lures people away from using its constituents in the wrong order.
-> Update the instructions in error.h accordingly.
-> 
-> Convert existing error_prepend() next to error_propagate to
-> error_propagate_prepend().  If any of these get reached with
-> &error_fatal or &error_abort, the error messages improve.  I didn't
-> check whether that's the case anywhere.
-> 
-> Cc: Fei Li <fli@suse.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 > ---
->  block.c                 |  6 +++---
->  block/qcow2.c           |  4 ++--
->  block/qed.c             |  4 ++--
->  hw/9pfs/9p-local.c      |  4 ++--
->  hw/intc/xics.c          | 15 +++++++++------
->  hw/ppc/pnv_core.c       |  4 ++--
->  hw/ppc/spapr_pci.c      |  7 +++----
->  hw/timer/aspeed_timer.c |  3 +--
->  hw/usb/bus.c            |  5 +++--
->  hw/vfio/pci.c           |  3 +--
->  include/qapi/error.h    | 14 ++++++++++++++
->  migration/migration.c   | 12 ++++++------
->  util/error.c            | 13 +++++++++++++
->  13 files changed, 61 insertions(+), 33 deletions(-)
+>  target/mips/cpu.h | 109 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 109 insertions(+)
 > 
-> diff --git a/block.c b/block.c
-> index 7710b399a3..5d51419d21 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -4697,9 +4697,9 @@ bool bdrv_op_is_blocked(BlockDriverState *bs, BlockOpType op, Error **errp)
->      assert((int) op >= 0 && op < BLOCK_OP_TYPE_MAX);
->      if (!QLIST_EMPTY(&bs->op_blockers[op])) {
->          blocker = QLIST_FIRST(&bs->op_blockers[op]);
-> -        error_propagate(errp, error_copy(blocker->reason));
-> -        error_prepend(errp, "Node '%s' is busy: ",
-> -                      bdrv_get_device_or_node_name(bs));
-> +        error_propagate_prepend(errp, error_copy(blocker->reason),
-> +                                "Node '%s' is busy: ",
-> +                                bdrv_get_device_or_node_name(bs));
->          return true;
->      }
->      return false;
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 7277feda13..4f8d2fa7bd 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -2208,8 +2208,8 @@ static void coroutine_fn qcow2_co_invalidate_cache(BlockDriverState *bs,
->      qemu_co_mutex_unlock(&s->lock);
->      qobject_unref(options);
->      if (local_err) {
-> -        error_propagate(errp, local_err);
-> -        error_prepend(errp, "Could not reopen qcow2 layer: ");
-> +        error_propagate_prepend(errp, local_err,
-> +                                "Could not reopen qcow2 layer: ");
->          bs->drv = NULL;
->          return;
->      } else if (ret < 0) {
-> diff --git a/block/qed.c b/block/qed.c
-> index 689ea9d4d5..9377c0b7ad 100644
-> --- a/block/qed.c
-> +++ b/block/qed.c
-> @@ -1606,8 +1606,8 @@ static void coroutine_fn bdrv_qed_co_invalidate_cache(BlockDriverState *bs,
->      ret = bdrv_qed_do_open(bs, NULL, bs->open_flags, &local_err);
->      qemu_co_mutex_unlock(&s->table_lock);
->      if (local_err) {
-> -        error_propagate(errp, local_err);
-> -        error_prepend(errp, "Could not reopen qed layer: ");
-> +        error_propagate_prepend(errp, local_err,
-> +                                "Could not reopen qed layer: ");
->          return;
->      } else if (ret < 0) {
->          error_setg_errno(errp, -ret, "Could not reopen qed layer");
-> diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-> index c30f4f26bd..08e673a79c 100644
-> --- a/hw/9pfs/9p-local.c
-> +++ b/hw/9pfs/9p-local.c
-> @@ -1509,8 +1509,8 @@ static int local_parse_opts(QemuOpts *opts, FsDriverEntry *fse, Error **errp)
+> diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+> index 28af4d1..cd54073 100644
+> --- a/target/mips/cpu.h
+> +++ b/target/mips/cpu.h
+> @@ -195,6 +195,115 @@ struct CPUMIPSState {
+>  #define MSAIR_ProcID    8
+>  #define MSAIR_Rev       0
 >  
->      fsdev_throttle_parse_opts(opts, &fse->fst, &local_err);
->      if (local_err) {
-> -        error_propagate(errp, local_err);
-> -        error_prepend(errp, "invalid throttle configuration: ");
-> +        error_propagate_prepend(errp, local_err,
-> +                                "invalid throttle configuration: ");
->          return -1;
->      }
->  
-> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-> index c90c893228..406efee064 100644
-> --- a/hw/intc/xics.c
-> +++ b/hw/intc/xics.c
-> @@ -320,8 +320,9 @@ static void icp_realize(DeviceState *dev, Error **errp)
->  
->      obj = object_property_get_link(OBJECT(dev), ICP_PROP_XICS, &err);
->      if (!obj) {
-> -        error_propagate(errp, err);
-> -        error_prepend(errp, "required link '" ICP_PROP_XICS "' not found: ");
-> +        error_propagate_prepend(errp, err,
-> +                                "required link '" ICP_PROP_XICS
-> +                                "' not found: ");
->          return;
->      }
->  
-> @@ -329,8 +330,9 @@ static void icp_realize(DeviceState *dev, Error **errp)
->  
->      obj = object_property_get_link(OBJECT(dev), ICP_PROP_CPU, &err);
->      if (!obj) {
-> -        error_propagate(errp, err);
-> -        error_prepend(errp, "required link '" ICP_PROP_CPU "' not found: ");
-> +        error_propagate_prepend(errp, err,
-> +                                "required link '" ICP_PROP_CPU
-> +                                "' not found: ");
->          return;
->      }
->  
-> @@ -624,8 +626,9 @@ static void ics_base_realize(DeviceState *dev, Error **errp)
->  
->      obj = object_property_get_link(OBJECT(dev), ICS_PROP_XICS, &err);
->      if (!obj) {
-> -        error_propagate(errp, err);
-> -        error_prepend(errp, "required link '" ICS_PROP_XICS "' not found: ");
-> +        error_propagate_prepend(errp, err,
-> +                                "required link '" ICS_PROP_XICS
-> +                                "' not found: ");
->          return;
->      }
->      ics->xics = XICS_FABRIC(obj);
-> diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-> index 9750464bf4..ad1bcc7990 100644
-> --- a/hw/ppc/pnv_core.c
-> +++ b/hw/ppc/pnv_core.c
-> @@ -148,8 +148,8 @@ static void pnv_core_realize(DeviceState *dev, Error **errp)
->  
->      chip = object_property_get_link(OBJECT(dev), "chip", &local_err);
->      if (!chip) {
-> -        error_propagate(errp, local_err);
-> -        error_prepend(errp, "required link 'chip' not found: ");
-> +        error_propagate_prepend(errp, local_err,
-> +                                "required link 'chip' not found: ");
->          return;
->      }
->  
-> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> index c2271e6ed4..58afa46204 100644
-> --- a/hw/ppc/spapr_pci.c
-> +++ b/hw/ppc/spapr_pci.c
-> @@ -1724,16 +1724,15 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
->          if (smc->legacy_irq_allocation) {
->              irq = spapr_irq_findone(spapr, &local_err);
->              if (local_err) {
-> -                error_propagate(errp, local_err);
-> -                error_prepend(errp, "can't allocate LSIs: ");
-> +                error_propagate_prepend(errp, local_err,
-> +                                        "can't allocate LSIs: ");
->                  return;
->              }
->          }
->  
->          spapr_irq_claim(spapr, irq, true, &local_err);
->          if (local_err) {
-> -            error_propagate(errp, local_err);
-> -            error_prepend(errp, "can't allocate LSIs: ");
-> +            error_propagate_prepend(errp, local_err, "can't allocate LSIs: ");
->              return;
->          }
->  
-> diff --git a/hw/timer/aspeed_timer.c b/hw/timer/aspeed_timer.c
-> index 54b400b94a..5c786e5128 100644
-> --- a/hw/timer/aspeed_timer.c
-> +++ b/hw/timer/aspeed_timer.c
-> @@ -454,8 +454,7 @@ static void aspeed_timer_realize(DeviceState *dev, Error **errp)
->  
->      obj = object_property_get_link(OBJECT(dev), "scu", &err);
->      if (!obj) {
-> -        error_propagate(errp, err);
-> -        error_prepend(errp, "required link 'scu' not found: ");
-> +        error_propagate_prepend(errp, err, "required link 'scu' not found: ");
->          return;
->      }
->      s->scu = ASPEED_SCU(obj);
-> diff --git a/hw/usb/bus.c b/hw/usb/bus.c
-> index 11f7720d71..bf796d67e6 100644
-> --- a/hw/usb/bus.c
-> +++ b/hw/usb/bus.c
-> @@ -340,8 +340,9 @@ static USBDevice *usb_try_create_simple(USBBus *bus, const char *name,
->      }
->      object_property_set_bool(OBJECT(dev), true, "realized", &err);
->      if (err) {
-> -        error_propagate(errp, err);
-> -        error_prepend(errp, "Failed to initialize USB device '%s': ", name);
-> +        error_propagate_prepend(errp, err,
-> +                                "Failed to initialize USB device '%s': ",
-> +                                name);
->          return NULL;
->      }
->      return dev;
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index 866f0deeb7..8c95fc648a 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -1280,8 +1280,7 @@ static int vfio_msi_setup(VFIOPCIDevice *vdev, int pos, Error **errp)
->          if (ret == -ENOTSUP) {
->              return 0;
->          }
-> -        error_prepend(&err, "msi_init failed: ");
-> -        error_propagate(errp, err);
-> +        error_propagate_prepend(errp, err, "msi_init failed: ");
->          return ret;
->      }
->      vdev->msi_cap_size = 0xa + (msi_maskbit ? 0xa : 0) + (msi_64bit ? 0x4 : 0);
-> diff --git a/include/qapi/error.h b/include/qapi/error.h
-> index bcb86a79f5..51b63dd4b5 100644
-> --- a/include/qapi/error.h
-> +++ b/include/qapi/error.h
-> @@ -52,8 +52,12 @@
->   * where Error **errp is a parameter, by convention the last one.
->   *
->   * Pass an existing error to the caller with the message modified:
-> + *     error_propagate_prepend(errp, err);
-> + *
-> + * Avoid
->   *     error_propagate(errp, err);
->   *     error_prepend(errp, "Could not frobnicate '%s': ", name);
-> + * because this fails to prepend when @errp is &error_fatal.
->   *
->   * Create a new error and pass it to the caller:
->   *     error_setg(errp, "situation normal, all fouled up");
-> @@ -215,6 +219,16 @@ void error_setg_win32_internal(Error **errp,
->   */
->  void error_propagate(Error **dst_errp, Error *local_err);
->  
-> +
 > +/*
-> + * Propagate error object (if any) with some text prepended.
-> + * Behaves like
-> + *     error_prepend(&local_err, fmt, ...);
-> + *     error_propagate(dst_errp, local_err);
-> + */
-> +void error_propagate_prepend(Error **dst_errp, Error *local_err,
-> +                             const char *fmt, ...);
-> +
->  /*
->   * Prepend some text to @errp's human-readable error message.
->   * The text is made by formatting @fmt, @ap like vprintf().
-> diff --git a/migration/migration.c b/migration/migration.c
-> index d6ae879dc8..f0f299a773 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1546,9 +1546,9 @@ static GSList *migration_blockers;
->  int migrate_add_blocker(Error *reason, Error **errp)
->  {
->      if (migrate_get_current()->only_migratable) {
-> -        error_propagate(errp, error_copy(reason));
-> -        error_prepend(errp, "disallowing migration blocker "
-> -                          "(--only_migratable) for: ");
-> +        error_propagate_prepend(errp, error_copy(reason),
-> +                                "disallowing migration blocker "
-> +                                "(--only_migratable) for: ");
->          return -EACCES;
->      }
->  
-> @@ -1557,9 +1557,9 @@ int migrate_add_blocker(Error *reason, Error **errp)
->          return 0;
->      }
->  
-> -    error_propagate(errp, error_copy(reason));
-> -    error_prepend(errp, "disallowing migration blocker (migration in "
-> -                      "progress) for: ");
-> +    error_propagate_prepend(errp, error_copy(reason),
-> +                            "disallowing migration blocker "
-> +                            "(migration in progress) for: ");
->      return -EBUSY;
->  }
->  
-> diff --git a/util/error.c b/util/error.c
-> index 3efdd69162..b5ccbd8eac 100644
-> --- a/util/error.c
-> +++ b/util/error.c
-> @@ -292,3 +292,16 @@ void error_propagate(Error **dst_errp, Error *local_err)
->          error_free(local_err);
->      }
->  }
-> +
-> +void error_propagate_prepend(Error **dst_errp, Error *err,
-> +                             const char *fmt, ...)
-> +{
-> +    va_list ap;
-> +
-> +    if (dst_errp && !*dst_errp) {
-> +        va_start(ap, fmt);
-> +        error_vprepend(&err, fmt, ap);
-> +        va_end(ap);
-> +    } /* else error is being ignored, don't bother with prepending */
-> +    error_propagate(dst_errp, err);
-> +}
-> 
+> + *     Summary of CP0 registers
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+"since MIPS32/MIPS64 release 1"? Previous have different registers.
+
+> + *     ========================
+> + *
+> + *
+> + *     Register 0        Register 1        Register 2        Register 3
+> + *     ----------        ----------        ----------        ----------
+> + *
+> + * 0   Index             Random            EntryLo0          EntryLo1
+> + * 1   MVPControl        VPEControl        TCStatus          GlobalNumber
+> + * 2   MVPConf0          VPEConf0          TCBind
+> + * 3   MVPConf1          VPEConf1          TCRestart
+> + * 4   VPControl         YQMask            TCHalt
+> + * 5                     VPESchedule       TCContext
+> + * 6                     VPEScheFBack      TCSchedule
+> + * 7                     VPEOpt            TCScheFBack       TCOpt
+> + *
+> + *
+> + *     Register 4        Register 5        Register 6        Register 7
+> + *     ----------        ----------        ----------        ----------
+> + *
+> + * 0   Context           PageMask          Wired             HWREna
+> + * 1   ContextConfig     PageGrain         SRSConf0
+> + * 2   UserLocal         SegCtl0           SRSConf1
+> + * 3   XContextConfig    SegCtl1           SRSConf2
+> + * 4   DebugContextID    SegCtl2           SRSConf3
+> + * 5   MemoryMapID       PWBase            SRSConf4
+> + * 6                     PWField           PWCtl
+> + * 7                     PWSize
+> + *
+> + *
+> + *     Register 8        Register 9        Register 10       Register 11
+> + *     ----------        ----------        -----------       -----------
+> + *
+> + * 0   BadVAddr          Count             EntryHi           Compare
+> + * 1   BadInstr
+> + * 2   BadInstrP
+> + * 3   BadInstrX
+> + * 4                                       GuestCtl1         GuestCtl0Ext
+> + * 5                                       GuestCtl2
+> + * 6                                       GuestCtl3
+> + * 7
+> + *
+> + *
+> + *     Register 12       Register 13       Register 14       Register 15
+> + *     -----------       -----------       -----------       -----------
+> + *
+> + * 0   Status            Cause             EPC               PRId
+> + * 1   IntCtl                                                EBase
+> + * 2   SRSCtl                              NestedEPC         CDMMBase
+> + * 3   SRSMap                                                CMGCRBase
+> + * 4   View_IPL          View_RIPL                           BEVVA
+> + * 5   SRSMap2           NestedExc
+> + * 6   GuestCtl0
+> + * 7   GTOffset
+> + *
+> + *
+> + *     Register 16       Register 17       Register 18       Register 19
+> + *     -----------       -----------       -----------       -----------
+> + *
+> + * 0   Config            LLAddr            WatchLo           WatchHi
+> + * 1   Config1           MAAR              WatchLo           WatchHi
+> + * 2   Config2           MAARI             WatchLo           WatchHi
+> + * 3   Config3                             WatchLo           WatchHi
+> + * 4   Config4                             WatchLo           WatchHi
+> + * 5   Config5                             WatchLo           WatchHi
+> + * 6                                       WatchLo           WatchHi
+> + * 7                                       WatchLo           WatchHi
+> + *
+> + *
+> + *     Register 20       Register 21       Register 22       Register 23
+> + *     -----------       -----------       -----------       -----------
+> + *
+> + * 0   XContext                                              Debug
+> + * 1                                                         TraceControl
+> + * 2                                                         TraceControl2
+> + * 3                                                         UserTraceData1
+> + * 4                                                         TraceIBPC
+> + * 5                                                         TraceDBPC
+> + * 6                                                         Debug2
+> + * 7
+> + *
+> + *
+> + *     Register 24       Register 25       Register 26       Register 27
+> + *     -----------       -----------       -----------       -----------
+> + *
+> + * 0   DEPC              PerfCnt            ErrCtl          CacheErr
+> + * 1                     PerfCnt
+> + * 2   TraceControl3     PerfCnt
+> + * 3   UserTraceData2    PerfCnt
+> + * 4                     PerfCnt
+> + * 5                     PerfCnt
+> + * 6                     PerfCnt
+> + * 7                     PerfCnt
+> + *
+> + *
+> + *     Register 28       Register 29       Register 30       Register 31
+> + *     -----------       -----------       -----------       -----------
+> + *
+> + * 0   DataLo            DataHi            ErrorEPC          DESAVE
+> + * 1   TagLo             TagHi
+> + * 2   DataLo            DataHi                              KScratch<n>
+> + * 3   TagLo             TagHi                               KScratch<n>
+> + * 4   DataLo            DataHi                              KScratch<n>
+> + * 5   TagLo             TagHi                               KScratch<n>
+> + * 6   DataLo            DataHi                              KScratch<n>
+> + * 7   TagLo             TagHi                               KScratch<n>
+> + *
+> + */
+>      int32_t CP0_Index;
+>      /* CP0_MVP* are per MVP registers. */
+>      int32_t CP0_VPControl;
+> 
