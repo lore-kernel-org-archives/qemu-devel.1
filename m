@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34939)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gC2nh-0005cc-3b
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 09:20:49 -0400
+	(envelope-from <crosa@redhat.com>) id 1gC3IR-0003AH-1a
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 09:52:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gC2ng-0004Zx-BW
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 09:20:49 -0400
-Received: from mail-oi1-x232.google.com ([2607:f8b0:4864:20::232]:37392)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gC2ng-0004Ze-0B
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 09:20:48 -0400
-Received: by mail-oi1-x232.google.com with SMTP id e17-v6so15021570oib.4
-	for <qemu-devel@nongnu.org>; Mon, 15 Oct 2018 06:20:47 -0700 (PDT)
+	(envelope-from <crosa@redhat.com>) id 1gC3IM-00015j-Gg
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 09:52:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38900)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gC3IB-0000yR-TZ
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 09:52:22 -0400
+References: <20181009232607.15521-1-crosa@redhat.com>
+	<20181009232607.15521-8-crosa@redhat.com>
+	<f64fd819-8977-bcc0-97db-84ef4c83a046@amsat.org>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <affc1f0d-9ae9-193d-002b-773024561734@redhat.com>
+Date: Mon, 15 Oct 2018 09:52:03 -0400
 MIME-Version: 1.0
-In-Reply-To: <1539593186-32183-1-git-send-email-jasowang@redhat.com>
-References: <1539593186-32183-1-git-send-email-jasowang@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 15 Oct 2018 14:20:25 +0100
-Message-ID: <CAFEAcA_meKcp2pALQEKegYZOi-XVndRAd8+P7mOSNJFhm+-=RA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/26] Net patches
+In-Reply-To: <f64fd819-8977-bcc0-97db-84ef4c83a046@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 7/7] Acceptance Tests: change the
+ handling of tests for specific archs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +30,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+Cc: Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laszlo Ersek <lersek@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <pmathieu@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Caio Carrara <ccarrara@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-On 15 October 2018 at 09:46, Jason Wang <jasowang@redhat.com> wrote:
-> The following changes since commit a73549f99612f758dec0fdea6ae1c30b6c709a0b:
->
->   Merge remote-tracking branch 'remotes/kraxel/tags/ui-20181012-pull-request' into staging (2018-10-12 16:45:51 +0100)
->
-> are available in the git repository at:
->
->   https://github.com/jasowang/qemu.git tags/net-pull-request
->
-> for you to fetch changes up to a7ec0077c2db445d6bae421963188367d2695bd6:
->
->   qemu-options: Fix bad "macaddr" property in the documentation (2018-10-15 16:14:15 +0800)
->
-> ----------------------------------------------------------------
->
-> ----------------------------------------------------------------
 
-Hi; there seems to be a format string issue in this pullreq:
 
-In file included from hw/net/trace.c:4:0:
-hw/net/trace.h: In function '_nocheck__trace_e1000_receiver_overrun':
-hw/net/trace.h:2696:18: error: format '%lu' expects argument of type
-'long unsigned int', but argument 5 has type 'size_t {aka long long
-unsigned int}' [-Werror=format=]
-         qemu_log("%d@%zu.%06zu:e1000_receiver_overrun " "Receiver
-overrun: dropped packet of %lu bytes, RDH=%u, RDT=%u" "\n",
-                  ^
+On 10/13/18 7:08 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Cleber,
+>=20
+> On 10/10/18 1:26 AM, Cleber Rosa wrote:
+>> With the introduction of a variants file that can run the same
+>> tests on various architectures, it makes sense to make most tests
+>> to be reusable on those environments.  The exception should be
+>> when a test is really testing a specific architecture feature.
+>>
+>> With the change proposed here, on a command line such as:
+>>
+>>   $ avocado run \
+>>      --json-variants-load=3Dtests/acceptance/variants/arch.json \
+>>      -- tests/acceptance/
+>>
+>> The boot_linux_console.py tests will appear as "CANCELED: Currently
+>> specific to the x86_64 arch", which is as a good thing when compared
+>> to being ignored by tags because:
+>>
+>>  * The architecture specific parts can be addressed
+>>  * It will be run on the matching architecture (as opposed to always
+>>    being filtered out by the tags mechanism)
+>>  * CANCELED tests do no influence negatively the overall job results,
+>>    they're not considered an error or failure
+>>
+>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+>> ---
+>>  tests/acceptance/boot_linux_console.py | 3 ++-
+>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance=
+/boot_linux_console.py
+>> index 58032f971c..ba3ac036da 100644
+>> --- a/tests/acceptance/boot_linux_console.py
+>> +++ b/tests/acceptance/boot_linux_console.py
+>> @@ -19,12 +19,13 @@ class BootLinuxConsole(Test):
+>>      and the kernel command line is properly passed from QEMU to the k=
+ernel
+>> =20
+>>      :avocado: enable
+>> -    :avocado: tags=3Dx86_64
+>=20
+> Can we keep a such tag (in format 'arch:x86_64') ...
+>=20
 
-which means it won't compile on 32-bit hosts.
+Yes, sure.  That's how the best "standards" are born ;)
 
-thanks
--- PMM
+>>      """
+>> =20
+>>      timeout =3D 60
+>> =20
+>>      def test(self):
+>> +        if self.arch !=3D 'x86_64':
+>> +            self.cancel('Currently specific to the x86_64 target arch=
+')
+>=20
+> ... and have this check generic? (Eventually via a QemuTest(Test) paren=
+t
+> class).
+>=20
+
+Yes, there's a lot of upcoming setup that can be made generic to the
+base class.  Some of that is coming soon.
+
+Thanks!
+- Cleber.
+
+>>          kernel_url =3D ('https://mirrors.kernel.org/fedora/releases/2=
+8/'
+>>                        'Everything/x86_64/os/images/pxeboot/vmlinuz')
+>>          kernel_hash =3D '238e083e114c48200f80d889f7e32eeb2793e02a'
+>>
