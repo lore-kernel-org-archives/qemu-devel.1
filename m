@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39607)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gC1RB-0004GP-HP
+	(envelope-from <armbru@redhat.com>) id 1gC1RB-0004GE-6C
 	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gC1R7-00028R-9h
+	(envelope-from <armbru@redhat.com>) id 1gC1R7-00028C-6H
 	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59146)
+Received: from mx1.redhat.com ([209.132.183.28]:59136)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gC1R6-00021Y-IX
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:25 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gC1R5-00021E-33
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:23 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3005E67EC2
-	for <qemu-devel@nongnu.org>; Mon, 15 Oct 2018 11:53:18 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-50.ams2.redhat.com
-	[10.36.116.50])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id EB6EB5D788
+	by mx1.redhat.com (Postfix) with ESMTPS id F1EB42DF94
 	for <qemu-devel@nongnu.org>; Mon, 15 Oct 2018 11:53:17 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 15 Oct 2018 13:53:09 +0200
-Message-Id: <20181015115309.17089-36-armbru@redhat.com>
+Date: Mon, 15 Oct 2018 13:53:06 +0200
+Message-Id: <20181015115309.17089-33-armbru@redhat.com>
 In-Reply-To: <20181015115309.17089-1-armbru@redhat.com>
 References: <20181015115309.17089-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 35/35] vl: Simplify call of parse_name()
+Subject: [Qemu-devel] [PATCH v2 32/35] vl: Assert drive_new() does not fail
+ in default_drive()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,33 +31,34 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-main() checks for parse_name() failure even though it can't actually
-fail.  That's okay.  Simplify it to check by passing &error_fatal,
-like the other users of qemu_opts_foreach().
+If creating (empty) default drives fails, it's a bug.  Therefore,
+assert() is more appropriate than exit(1).
 
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- vl.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ vl.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
 diff --git a/vl.c b/vl.c
-index 89520d8007..01d71371c2 100644
+index 2a8ef05aef..65366b961e 100644
 --- a/vl.c
 +++ b/vl.c
-@@ -3973,10 +3973,8 @@ int main(int argc, char **argv, char **envp)
+@@ -1156,9 +1156,7 @@ static void default_drive(int enable, int snapshot, BlockInterfaceType type,
      }
- #endif
-=20
--    if (qemu_opts_foreach(qemu_find_opts("name"),
--                          parse_name, NULL, NULL)) {
+ 
+     dinfo = drive_new(opts, type);
+-    if (!dinfo) {
 -        exit(1);
 -    }
-+    qemu_opts_foreach(qemu_find_opts("name"),
-+                      parse_name, NULL, &error_fatal);
-=20
- #ifndef _WIN32
-     qemu_opts_foreach(qemu_find_opts("add-fd"),
---=20
++    assert(dinfo);
+     dinfo->is_default = true;
+ 
+ }
+-- 
 2.17.1
