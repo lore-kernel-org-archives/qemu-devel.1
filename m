@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37312)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chaiwen@baidu.com>) id 1gBt8i-00013c-0x
-	for qemu-devel@nongnu.org; Sun, 14 Oct 2018 23:01:52 -0400
+	(envelope-from <kraxel@redhat.com>) id 1gBvp1-0003Wb-A2
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 01:53:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chaiwen@baidu.com>) id 1gBt8c-0006je-QO
-	for qemu-devel@nongnu.org; Sun, 14 Oct 2018 23:01:51 -0400
-Received: from mx20.baidu.com ([111.202.115.85]:57742 helo=baidu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chaiwen@baidu.com>) id 1gBt8Y-0006c4-QX
-	for qemu-devel@nongnu.org; Sun, 14 Oct 2018 23:01:45 -0400
-From: "Chai,Wen" <chaiwen@baidu.com>
-Date: Mon, 15 Oct 2018 03:01:27 +0000
-Message-ID: <D7EA208E.32986%chaiwen@baidu.com>
-References: <20181012025623.38792-1-jialina01@baidu.com>
-	<20181012090131.GB2555@work-vm>
-In-Reply-To: <20181012090131.GB2555@work-vm>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="gb2312"
-Content-ID: <FA6AEE4D9F8F364E932A3342EC154CA6@internal.baidu.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] migration: avoid segmentfault when take a
- snapshot of a VM which being migrated
+	(envelope-from <kraxel@redhat.com>) id 1gBvox-00037w-5D
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 01:53:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59114)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gBvow-00037J-VR
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 01:53:39 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8C743308FBAE
+	for <qemu-devel@nongnu.org>; Mon, 15 Oct 2018 05:53:37 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 15 Oct 2018 07:53:33 +0200
+Message-Id: <20181015055333.32030-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH] edid: fix alignment issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,54 +27,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Jia,Lina(ACU-T1)" <jialina01@baidu.com>
-Cc: "quintela@redhat.com" <quintela@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Zhang,Yu(ACU-T1)" <zhangyu31@baidu.com>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-DQoNCtTaIDIwMTgvMTAvMTIgz8LO5zU6MDGjrCAiRHIuIERhdmlkIEFsYW4gR2lsYmVydCIgPGRn
-aWxiZXJ0QHJlZGhhdC5jb20+INC0yOs6DQoNCj4qIGppYWxpbmEwMSAoamlhbGluYTAxQGJhaWR1
-LmNvbSkgd3JvdGU6DQo+PiBEdXJpbmcgYW4gYWN0aXZlIGJhY2tncm91bmQgbWlncmFpb24sIHNu
-YXBzaG90IHdpbGwgdHJpZ2dlciBhDQo+PiBzZWdtZW50ZmF1bHQuIEFzIHNuYXBzaG90IGNsZWFy
-cyB0aGUgImN1cnJlbnRfbWlncmF0aW9uIiBzdHJ1Y3QNCj4+IGFuZCB1cGRhdGVzICJ0b19kc3Rf
-ZmlsZSIgYmVmb3JlIGl0IGZpbmRzIG91dCB0aGF0IHRoZXJlIGlzIGENCj4+IG1pZ3JhdGlvbiB0
-YXNrLCBNaWdyYXRpb24gYWNjZXNzZXMgdGhlIG51bGwgcG9pbnRlciBpbg0KPj4gImN1cnJlbnRf
-bWlncmF0aW9uIiBzdHJ1Y3QgYW5kIHFlbXUgY3Jhc2hlcyBldmVudHVhbGx5Lg0KPj4gDQo+PiBT
-aWduZWQtb2ZmLWJ5OiBqaWFsaW5hMDEgPGppYWxpbmEwMUBiYWlkdS5jb20+DQo+PiBTaWduZWQt
-b2ZmLWJ5OiBjaGFpd2VuIDxjaGFpd2VuQGJhaWR1LmNvbT4NCj4+IFNpZ25lZC1vZmYtYnk6IHpo
-YW5neXUgPHpoYW5neXUzMUBiYWlkdS5jb20+DQo+DQo+WWVzLCB0aGF0IGxvb2tzIGxpa2UgYW4g
-aW1wcm92ZW1lbnQsIGJ1dCBpcyBpdCBlbm91Z2g/DQoNCkluZGVlZCBpdKGvcyBub3QgZW5vdWdo
-o6wgdGhpcyBwYXRjaCBmYWlscyB0byBoYW5kbGUgdGhlIGNhc2UgdGhhdCBkb2luZw0KYSBzbmFw
-c2hvdCB1bmRlciBhbiBhY3RpdmUgbm9uLWJsb2NrIG1pZ3JhdGlvbi4NCg0KPldpdGggdGhhdCBj
-aGFuZ2UgZG9lcyBxZW11X3NhdmV2bV9zdGF0ZSBmYWlsIGNsZWFubHkgaWYgYXR0ZW1wdGVkDQo+
-ZHVyaW5nIGEgbWlncmF0aW9uPyAgIEkgc3VzcGVjdCBpdCB3aWxsIHN0aWxsIHRyeSBhbmQgZG8g
-YSBzbmFwc2hvdCwNCj5iZWNhdXNlIEkgZG9uJ3Qgc2VlIHdoZXJlIGl0J3MgY2hlY2tpbmcgdGhl
-IGN1cnJlbnQgc3RhdGUNCj4obGlrZSB0aGUgY2hlY2sgaW4gbWlncmF0ZV9wcmVwYXJlIHRoYXQg
-ZG9lcyBhIFFFUlJfTUlHUkFUSUlPTl9BQ1RJVkUpLg0KDQpZZXOjrCBtaWdyYXRpb25faXNfc2V0
-dXBfb3JfYWN0aXZlIGxvb2tzIGxpa2UgYSBtb3JlIHNlbnNpYmxlIGRldGVjdGlvbiBmb3INCnRo
-aXMgY2FzZSwNCmFuZCBhIHByb3BlciBlcnJvciBtZXNzYWdlIGl0IGJldHRlciB0byBiZSBzZXQu
-DQpUaGFua3MgZm9yIHlvdXIgY29tbWVudCwgd2Ugd2lsbCBzZW5kIGEgdjIgcGF0Y2ggbGF0ZXIu
-DQoNClRoYW5rcw0KQ2hhaSBXZW4NCg0KPg0KPkRhdmUNCj4NCj4NCj4+IC0tLQ0KPj4gIG1pZ3Jh
-dGlvbi9zYXZldm0uYyB8IDE0ICsrKysrLS0tLS0tLS0tDQo+PiAgMSBmaWxlIGNoYW5nZWQsIDUg
-aW5zZXJ0aW9ucygrKSwgOSBkZWxldGlvbnMoLSkNCj4+IA0KPj4gZGlmZiAtLWdpdCBhL21pZ3Jh
-dGlvbi9zYXZldm0uYyBiL21pZ3JhdGlvbi9zYXZldm0uYw0KPj4gaW5kZXggMmQxMGU0NTU4Mi4u
-OWNiOTdjYTM0MyAxMDA2NDQNCj4+IC0tLSBhL21pZ3JhdGlvbi9zYXZldm0uYw0KPj4gKysrIGIv
-bWlncmF0aW9uL3NhdmV2bS5jDQo+PiBAQCAtMTMxOSwyMSArMTMxOSwxOCBAQCBzdGF0aWMgaW50
-IHFlbXVfc2F2ZXZtX3N0YXRlKFFFTVVGaWxlICpmLCBFcnJvcg0KPj4qKmVycnApDQo+PiAgICAg
-IE1pZ3JhdGlvblN0YXRlICptcyA9IG1pZ3JhdGVfZ2V0X2N1cnJlbnQoKTsNCj4+ICAgICAgTWln
-cmF0aW9uU3RhdHVzIHN0YXR1czsNCj4+ICANCj4+IC0gICAgbWlncmF0ZV9pbml0KG1zKTsNCj4+
-IC0NCj4+IC0gICAgbXMtPnRvX2RzdF9maWxlID0gZjsNCj4+IC0NCj4+ICAgICAgaWYgKG1pZ3Jh
-dGlvbl9pc19ibG9ja2VkKGVycnApKSB7DQo+PiAtICAgICAgICByZXQgPSAtRUlOVkFMOw0KPj4g
-LSAgICAgICAgZ290byBkb25lOw0KPj4gKyAgICAgICAgcmV0dXJuIC1FSU5WQUw7DQo+PiAgICAg
-IH0NCj4+ICANCj4+ICAgICAgaWYgKG1pZ3JhdGVfdXNlX2Jsb2NrKCkpIHsNCj4+ICAgICAgICAg
-IGVycm9yX3NldGcoZXJycCwgIkJsb2NrIG1pZ3JhdGlvbiBhbmQgc25hcHNob3RzIGFyZQ0KPj5p
-bmNvbXBhdGlibGUiKTsNCj4+IC0gICAgICAgIHJldCA9IC1FSU5WQUw7DQo+PiAtICAgICAgICBn
-b3RvIGRvbmU7DQo+PiArICAgICAgICByZXR1cm4gLUVJTlZBTDsNCj4+ICAgICAgfQ0KPj4gIA0K
-Pj4gKyAgICBtaWdyYXRlX2luaXQobXMpOw0KPj4gKyAgICBtcy0+dG9fZHN0X2ZpbGUgPSBmOw0K
-Pj4gKw0KPj4gICAgICBxZW11X211dGV4X3VubG9ja19pb3RocmVhZCgpOw0KPj4gICAgICBxZW11
-X3NhdmV2bV9zdGF0ZV9oZWFkZXIoZik7DQo+PiAgICAgIHFlbXVfc2F2ZXZtX3N0YXRlX3NldHVw
-KGYpOw0KPj4gQEAgLTEzNTUsNyArMTM1Miw2IEBAIHN0YXRpYyBpbnQgcWVtdV9zYXZldm1fc3Rh
-dGUoUUVNVUZpbGUgKmYsIEVycm9yDQo+PioqZXJycCkNCj4+ICAgICAgICAgIGVycm9yX3NldGdf
-ZXJybm8oZXJycCwgLXJldCwgIkVycm9yIHdoaWxlIHdyaXRpbmcgVk0gc3RhdGUiKTsNCj4+ICAg
-ICAgfQ0KPj4gIA0KPj4gLWRvbmU6DQo+PiAgICAgIGlmIChyZXQgIT0gMCkgew0KPj4gICAgICAg
-ICAgc3RhdHVzID0gTUlHUkFUSU9OX1NUQVRVU19GQUlMRUQ7DQo+PiAgICAgIH0gZWxzZSB7DQo+
-PiAtLSANCj4+IDIuMTMuMi53aW5kb3dzLjENCj4+IA0KPi0tDQo+RHIuIERhdmlkIEFsYW4gR2ls
-YmVydCAvIGRnaWxiZXJ0QHJlZGhhdC5jb20gLyBNYW5jaGVzdGVyLCBVSw0KDQo=
+Use stl_le_p() & friends instead of casts.
+
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/display/edid-generate.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/hw/display/edid-generate.c b/hw/display/edid-generate.c
+index 37e60fe42a..bdf5e1d4d4 100644
+--- a/hw/display/edid-generate.c
++++ b/hw/display/edid-generate.c
+@@ -223,7 +223,7 @@ static void edid_desc_timing(uint8_t *desc,
+ 
+     uint32_t clock  = 75 * (xres + xblank) * (yres + yblank);
+ 
+-    *(uint32_t *)(desc) = cpu_to_le32(clock / 10000);
++    stl_le_p(desc, clock / 10000);
+ 
+     desc[2] = xres   & 0xff;
+     desc[3] = xblank & 0xff;
+@@ -342,9 +342,9 @@ void qemu_edid_generate(uint8_t *edid, size_t size,
+                           (((info->vendor[2] - '@') & 0x1f) <<  0));
+     uint16_t model_nr = 0x1234;
+     uint32_t serial_nr = info->serial ? atoi(info->serial) : 0;
+-    *(uint16_t *)(edid +  8) = cpu_to_be16(vendor_id);
+-    *(uint16_t *)(edid + 10) = cpu_to_le16(model_nr);
+-    *(uint32_t *)(edid + 12) = cpu_to_le32(serial_nr);
++    stw_be_p(edid +  8, vendor_id);
++    stw_le_p(edid + 10, model_nr);
++    stl_le_p(edid + 12, serial_nr);
+ 
+     /* manufacture week and year */
+     edid[16] = 42;
+-- 
+2.9.3
