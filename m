@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gC1RD-0004GU-4x
+	(envelope-from <armbru@redhat.com>) id 1gC1RD-0004GX-5z
 	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gC1RB-0002BD-2a
+	(envelope-from <armbru@redhat.com>) id 1gC1RB-0002B8-2O
 	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58940)
+Received: from mx1.redhat.com ([209.132.183.28]:57268)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gC1R9-00020w-47
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gC1R9-00020Z-4x
 	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:27 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C21C37F6CB
+	by mx1.redhat.com (Postfix) with ESMTPS id B0A8F8553D
+	for <qemu-devel@nongnu.org>; Mon, 15 Oct 2018 11:53:17 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-50.ams2.redhat.com
+	[10.36.116.50])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 7ADCC2B4AE
 	for <qemu-devel@nongnu.org>; Mon, 15 Oct 2018 11:53:17 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 15 Oct 2018 13:53:02 +0200
-Message-Id: <20181015115309.17089-29-armbru@redhat.com>
+Date: Mon, 15 Oct 2018 13:52:57 +0200
+Message-Id: <20181015115309.17089-24-armbru@redhat.com>
 In-Reply-To: <20181015115309.17089-1-armbru@redhat.com>
 References: <20181015115309.17089-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 28/35] numa: Clean up error reporting in
- parse_numa()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 23/35] vl: Clean up error reporting in
+ parse_fw_cfg()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,67 +38,77 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>
 
 Calling error_report() in a function that takes an Error ** argument
-is suspicious.  parse_numa() does that, and then fails without setting
-an error.  Its caller main(), via qemu_opts_foreach(), is fine with
-it, but clean it up anyway.
+is suspicious.  parse_fw_cfg() does that, and then fails without
+setting an error.  Its caller main(), via qemu_opts_foreach(), is fine
+with it, but clean it up anyway.
 
-While there, give parse_numa() internal linkage.
-
-Cc: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- include/sysemu/numa.h | 1 -
- numa.c                | 8 +++-----
- 2 files changed, 3 insertions(+), 6 deletions(-)
+ vl.c | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
 
-diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-index 7a0ae751aa..21713b7e2f 100644
---- a/include/sysemu/numa.h
-+++ b/include/sysemu/numa.h
-@@ -22,7 +22,6 @@ struct NumaNodeMem {
- };
- 
- extern NodeInfo numa_info[MAX_NODES];
--int parse_numa(void *opaque, QemuOpts *opts, Error **errp);
- void parse_numa_opts(MachineState *ms);
- void numa_complete_configuration(MachineState *ms);
- void query_numa_node_mem(NumaNodeMem node_mem[]);
-diff --git a/numa.c b/numa.c
-index 1d7c49ad43..50ec016013 100644
---- a/numa.c
-+++ b/numa.c
-@@ -215,7 +215,7 @@ end:
-     error_propagate(errp, err);
- }
- 
--int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
-+static int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
- {
-     NumaOptions *object = NULL;
-     MachineState *ms = MACHINE(opaque);
-@@ -239,7 +239,7 @@ int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
- end:
-     qapi_free_NumaOptions(object);
-     if (err) {
--        error_report_err(err);
-+        error_propagate(errp, err);
+diff --git a/vl.c b/vl.c
+index cd8e8a6586..c5bc54f72b 100644
+--- a/vl.c
++++ b/vl.c
+@@ -2174,7 +2174,7 @@ static int parse_fw_cfg(void *opaque, QemuOpts *opt=
+s, Error **errp)
+     FWCfgState *fw_cfg =3D (FWCfgState *) opaque;
+=20
+     if (fw_cfg =3D=3D NULL) {
+-        error_report("fw_cfg device not available");
++        error_setg(errp, "fw_cfg device not available");
          return -1;
      }
- 
-@@ -444,9 +444,7 @@ void numa_complete_configuration(MachineState *ms)
- 
- void parse_numa_opts(MachineState *ms)
- {
--    if (qemu_opts_foreach(qemu_find_opts("numa"), parse_numa, ms, NULL)) {
+     name =3D qemu_opt_get(opts, "name");
+@@ -2183,15 +2183,16 @@ static int parse_fw_cfg(void *opaque, QemuOpts *o=
+pts, Error **errp)
+=20
+     /* we need name and either a file or the content string */
+     if (!(nonempty_str(name) && (nonempty_str(file) || nonempty_str(str)=
+))) {
+-        error_report("invalid argument(s)");
++        error_setg(errp, "invalid argument(s)");
+         return -1;
+     }
+     if (nonempty_str(file) && nonempty_str(str)) {
+-        error_report("file and string are mutually exclusive");
++        error_setg(errp, "file and string are mutually exclusive");
+         return -1;
+     }
+     if (strlen(name) > FW_CFG_MAX_FILE_PATH - 1) {
+-        error_report("name too long (max. %d char)", FW_CFG_MAX_FILE_PAT=
+H - 1);
++        error_setg(errp, "name too long (max. %d char)",
++                   FW_CFG_MAX_FILE_PATH - 1);
+         return -1;
+     }
+     if (strncmp(name, "opt/", 4) !=3D 0) {
+@@ -2203,7 +2204,7 @@ static int parse_fw_cfg(void *opaque, QemuOpts *opt=
+s, Error **errp)
+         buf =3D g_memdup(str, size);
+     } else {
+         if (!g_file_get_contents(file, &buf, &size, NULL)) {
+-            error_report("can't load %s", file);
++            error_setg(errp, "can't load %s", file);
+             return -1;
+         }
+     }
+@@ -4476,10 +4477,8 @@ int main(int argc, char **argv, char **envp)
+         hax_sync_vcpus();
+     }
+=20
+-    if (qemu_opts_foreach(qemu_find_opts("fw_cfg"),
+-                          parse_fw_cfg, fw_cfg_find(), NULL) !=3D 0) {
 -        exit(1);
 -    }
-+    qemu_opts_foreach(qemu_find_opts("numa"), parse_numa, ms, &error_fatal);
- }
- 
- void qmp_set_numa_node(NumaOptions *cmd, Error **errp)
--- 
++    qemu_opts_foreach(qemu_find_opts("fw_cfg"),
++                      parse_fw_cfg, fw_cfg_find(), &error_fatal);
+=20
+     /* init USB devices */
+     if (machine_usb(current_machine)) {
+--=20
 2.17.1
