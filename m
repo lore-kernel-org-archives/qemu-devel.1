@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gC0pb-0006MY-Mv
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:14:40 -0400
+	(envelope-from <armbru@redhat.com>) id 1gC1R0-00045e-Eq
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gC0pY-0000nN-Eg
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:14:39 -0400
-References: <20181012032431.32693-1-david@gibson.dropbear.id.au>
-	<20181012032431.32693-2-david@gibson.dropbear.id.au>
-	<20181012140306-mutt-send-email-mst@kernel.org>
-	<996ed901-14b6-7461-a094-771a715cd6b2@redhat.com>
-	<20181015063430-mutt-send-email-mst@kernel.org>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <899a7b64-93d0-5636-d15b-c71a250b8a9e@redhat.com>
-Date: Mon, 15 Oct 2018 13:14:25 +0200
-MIME-Version: 1.0
-In-Reply-To: <20181015063430-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 1/5] virtio-balloon: Remove unnecessary
- MADV_WILLNEED on deflate
+	(envelope-from <armbru@redhat.com>) id 1gC1Qw-0001vv-5O
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36346)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gC1Qv-0001ut-UC
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:14 -0400
+From: Markus Armbruster <armbru@redhat.com>
+Date: Mon, 15 Oct 2018 13:52:42 +0200
+Message-Id: <20181015115309.17089-9-armbru@redhat.com>
+In-Reply-To: <20181015115309.17089-1-armbru@redhat.com>
+References: <20181015115309.17089-1-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 08/35] 9pfs: Fix CLI parsing crash on error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +23,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, dhildenb@redhat.com, imammedo@redhat.com, ehabkost@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Greg Kurz <groug@kaod.org>
 
+Calling error_report() in a function that takes an Error ** argument
+is suspicious.  9p-handle.c's handle_parse_opts() does that, and then
+fails without setting an error.  Wrong.  Its caller crashes when it
+tries to report the error:
 
->> (And "Expect access in the near future." does not sound like guarantees
->> to me either way)
-> 
-> Should we be concerned about impact on performance though?
+    $ qemu-system-x86_64 -nodefaults -fsdev id=foo,fsdriver=handle
+    qemu-system-x86_64: -fsdev id=foo,fsdriver=handle: warning: handle backend is deprecated
+    qemu-system-x86_64: -fsdev id=foo,fsdriver=handle: fsdev: No path specified
+    Segmentation fault (core dumped)
 
-Yes, it really depends on the use case (and most of the time, the memory
-won't be directly reused). Let's document it in the commit log just as
-you suggest.
+Screwed up when commit 91cda4e8f37 (v2.12.0) converted the function to
+Error.  Fix by calling error_setg() instead of error_report().
 
-> 
-> Thinking aloud it might have an impact.  But there is also a benefit.
-> Let's document known effects so people know what to look for
-> if they see issues?
-> 
-> 	WILLNEED aggressively faults all memory in, removing it
-> 	will cause just as much memory as needed to be allocated on access,
-> 	slowing down the CPU at that point but conserving host memory.
-> 
-> 	With this patch device assignment (e.g. with VFIO) hotplug will take longer
-> 	as it needs to allocate all this memory on hotplug.
-> 	While this happens all VM is paused right now.
+Fixes: 91cda4e8f372602795e3a2f4bd2e3adaf9f82255
+Cc: Greg Kurz <groug@kaod.org>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Acked-by: Greg Kurz <groug@kaod.org>
+---
+ hw/9pfs/9p-handle.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-
+diff --git a/hw/9pfs/9p-handle.c b/hw/9pfs/9p-handle.c
+index f3641dbe4a..3465b1ef30 100644
+--- a/hw/9pfs/9p-handle.c
++++ b/hw/9pfs/9p-handle.c
+@@ -19,6 +19,7 @@
+ #include <grp.h>
+ #include <sys/socket.h>
+ #include <sys/un.h>
++#include "qapi/error.h"
+ #include "qemu/xattr.h"
+ #include "qemu/cutils.h"
+ #include "qemu/error-report.h"
+@@ -655,12 +656,13 @@ static int handle_parse_opts(QemuOpts *opts, FsDriverEntry *fse, Error **errp)
+     warn_report("handle backend is deprecated");
+ 
+     if (sec_model) {
+-        error_report("Invalid argument security_model specified with handle fsdriver");
++        error_setg(errp,
++                   "Invalid argument security_model specified with handle fsdriver");
+         return -1;
+     }
+ 
+     if (!path) {
+-        error_report("fsdev: No path specified");
++        error_setg(errp, "fsdev: No path specified");
+         return -1;
+     }
+     fse->path = g_strdup(path);
 -- 
-
-Thanks,
-
-David / dhildenb
+2.17.1
