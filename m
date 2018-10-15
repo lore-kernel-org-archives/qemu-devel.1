@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gC5OD-0008JA-Vb
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gC5OD-0008J9-UW
 	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 12:06:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gC5OA-00053P-LY
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gC5OA-00053V-NR
 	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 12:06:41 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 15 Oct 2018 19:06:32 +0300
-Message-Id: <20181015160633.63130-11-vsementsov@virtuozzo.com>
+Date: Mon, 15 Oct 2018 19:06:26 +0300
+Message-Id: <20181015160633.63130-5-vsementsov@virtuozzo.com>
 In-Reply-To: <20181015160633.63130-1-vsementsov@virtuozzo.com>
 References: <20181015160633.63130-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v4 10/11] block/backup: tiny refactor
- backup_job_create
+Subject: [Qemu-devel] [PATCH v4 04/11] block: improve should_update_child
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,120 +22,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: famz@redhat.com, stefanha@redhat.com, jcody@redhat.com, mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com, den@openvz.org, eblake@redhat.com
 
-Move copy-bitmap find/create code. It's needed for the following
-commit, as we'll need copy_bitmap before actual block job creation. Do
-it in a separate commit to simplify review.
+As it already said in the comment, we don't want to create loops in
+parent->child relations. So, when we try to append @to to @c, we should
+check that @c is not in @to children subtree, and we should check it
+recursively, not only the first level. The patch provides BFS-based
+search, to check the relations.
+
+This is needed for further fleecing-hook filter usage: we need to
+append it to source, when the hook is already a parent of target, and
+source may be in a backing chain of target (fleecing-scheme). So, on
+appending, the hook should not became a child (direct or through
+children subtree) of the target.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/backup.c | 67 ++++++++++++++++++++++++++++----------------------
- 1 file changed, 38 insertions(+), 29 deletions(-)
+ block.c | 32 +++++++++++++++++++++++++++-----
+ 1 file changed, 27 insertions(+), 5 deletions(-)
 
-diff --git a/block/backup.c b/block/backup.c
-index 0b3fddeb6c..eda6f22318 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -561,6 +561,8 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-     BlockDriverInfo bdi;
-     BackupBlockJob *job = NULL;
-     int ret;
-+    int64_t cluster_size;
-+    HBitmap *copy_bitmap = NULL;
+diff --git a/block.c b/block.c
+index c298ca6a19..7f605b0bf0 100644
+--- a/block.c
++++ b/block.c
+@@ -3432,7 +3432,7 @@ void bdrv_close_all(void)
  
-     assert(bs);
-     assert(target);
-@@ -615,6 +617,33 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-         return NULL;
-     }
+ static bool should_update_child(BdrvChild *c, BlockDriverState *to)
+ {
+-    BdrvChild *to_c;
++    GList *queue = NULL, *pos;
  
-+    /* If there is no backing file on the target, we cannot rely on COW if our
-+     * backup cluster size is smaller than the target cluster size. Even for
-+     * targets with a backing file, try to avoid COW if possible. */
-+    ret = bdrv_get_info(target, &bdi);
-+    if (ret == -ENOTSUP && !target->backing) {
-+        /* Cluster size is not defined */
-+        warn_report("The target block device doesn't provide "
-+                    "information about the block size and it doesn't have a "
-+                    "backing file. The default block size of %u bytes is "
-+                    "used. If the actual block size of the target exceeds "
-+                    "this default, the backup may be unusable",
-+                    BACKUP_CLUSTER_SIZE_DEFAULT);
-+        cluster_size = BACKUP_CLUSTER_SIZE_DEFAULT;
-+    } else if (ret < 0 && !target->backing) {
-+        error_setg_errno(errp, -ret,
-+            "Couldn't determine the cluster size of the target image, "
-+            "which has no backing file");
-+        error_append_hint(errp,
-+            "Aborting, since this may create an unusable destination image\n");
-+        return NULL;
-+    } else if (ret < 0 && target->backing) {
-+        /* Not fatal; just trudge on ahead. */
-+        cluster_size = BACKUP_CLUSTER_SIZE_DEFAULT;
-+    } else {
-+        cluster_size = MAX(BACKUP_CLUSTER_SIZE_DEFAULT, bdi.cluster_size);
-+    }
+     if (c->role->stay_at_node) {
+         return false;
+@@ -3468,13 +3468,35 @@ static bool should_update_child(BdrvChild *c, BlockDriverState *to)
+      * if A is a child of B, that means we cannot replace A by B there
+      * because that would create a loop.  Silently detaching A from B
+      * is also not really an option.  So overall just leaving A in
+-     * place there is the most sensible choice. */
+-    QLIST_FOREACH(to_c, &to->children, next) {
+-        if (to_c == c) {
+-            return false;
++     * place there is the most sensible choice.
++     *
++     * upd: If the child @c belongs to the @to's children, or children of it's
++     * children and so on - this would create a loop to. To prevent it let's do
++     * a BFS search on @to children subtree.
++     */
 +
-     len = bdrv_getlength(bs);
-     if (len < 0) {
-         error_setg_errno(errp, -len, "unable to get length for '%s'",
-@@ -622,6 +651,8 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-         goto error;
-     }
- 
-+    copy_bitmap = hbitmap_alloc(len, ctz32(cluster_size));
++    pos = queue = g_list_append(queue, to);
++    while (pos) {
++        BlockDriverState *v = pos->data;
++        BdrvChild *c2;
 +
-     /* job->len is fixed, so we can't allow resize */
-     job = block_job_create(job_id, &backup_job_driver, txn, bs,
-                            BLK_PERM_CONSISTENT_READ,
-@@ -650,35 +681,9 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
- 
-     /* Detect image-fleecing (and similar) schemes */
-     job->serialize_target_writes = bdrv_chain_contains(target, bs);
--
--    /* If there is no backing file on the target, we cannot rely on COW if our
--     * backup cluster size is smaller than the target cluster size. Even for
--     * targets with a backing file, try to avoid COW if possible. */
--    ret = bdrv_get_info(target, &bdi);
--    if (ret == -ENOTSUP && !target->backing) {
--        /* Cluster size is not defined */
--        warn_report("The target block device doesn't provide "
--                    "information about the block size and it doesn't have a "
--                    "backing file. The default block size of %u bytes is "
--                    "used. If the actual block size of the target exceeds "
--                    "this default, the backup may be unusable",
--                    BACKUP_CLUSTER_SIZE_DEFAULT);
--        job->cluster_size = BACKUP_CLUSTER_SIZE_DEFAULT;
--    } else if (ret < 0 && !target->backing) {
--        error_setg_errno(errp, -ret,
--            "Couldn't determine the cluster size of the target image, "
--            "which has no backing file");
--        error_append_hint(errp,
--            "Aborting, since this may create an unusable destination image\n");
--        goto error;
--    } else if (ret < 0 && target->backing) {
--        /* Not fatal; just trudge on ahead. */
--        job->cluster_size = BACKUP_CLUSTER_SIZE_DEFAULT;
--    } else {
--        job->cluster_size = MAX(BACKUP_CLUSTER_SIZE_DEFAULT, bdi.cluster_size);
--    }
--
--    job->copy_bitmap = hbitmap_alloc(len, ctz32(job->cluster_size));
-+    job->cluster_size = cluster_size;
-+    job->copy_bitmap = copy_bitmap;
-+    copy_bitmap = NULL;
-     job->use_copy_range = true;
-     job->copy_range_size = MIN_NON_ZERO(blk_get_max_transfer(job->common.blk),
-                                         blk_get_max_transfer(job->target));
-@@ -694,6 +699,10 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-     return &job->common;
- 
-  error:
-+    if (copy_bitmap) {
-+        assert(!job || !job->copy_bitmap);
-+        hbitmap_free(copy_bitmap);
-+    }
-     if (sync_bitmap) {
-         bdrv_reclaim_dirty_bitmap(bs, sync_bitmap, NULL);
++        QLIST_FOREACH(c2, &v->children, next) {
++            if (c2 == c) {
++                g_list_free(queue);
++                return false;
++            }
++
++            if (g_list_find(queue, c2->bs)) {
++                continue;
++            }
++
++            queue = g_list_append(queue, c2->bs);
+         }
++
++        pos = pos->next;
      }
+ 
++    g_list_free(queue);
+     return true;
+ }
+ 
 -- 
 2.18.0
