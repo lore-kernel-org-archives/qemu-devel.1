@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gC5oS-0003g0-CH
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 12:33:49 -0400
+	(envelope-from <mreitz@redhat.com>) id 1gC5t7-0005Sy-61
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 12:38:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gC5oR-0002Xn-9Y
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 12:33:48 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181013050227.17022-1-ehabkost@redhat.com>
-	<20181015093243.GE6785@redhat.com>
-	<CAFEAcA8MQ37JVCCPGyQa20n6AuU8Sv_pC9DoDoCKdQhqekpGnQ@mail.gmail.com>
-	<20181015101309.GD10459@localhost.localdomain>
-Date: Mon, 15 Oct 2018 18:33:32 +0200
-In-Reply-To: <20181015101309.GD10459@localhost.localdomain> (Kevin Wolf's
-	message of "Mon, 15 Oct 2018 12:13:09 +0200")
-Message-ID: <87woqjw4o3.fsf@dusky.pond.sub.org>
+	(envelope-from <mreitz@redhat.com>) id 1gC5t6-0004KR-HF
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 12:38:37 -0400
+References: <20181011105802.22665-1-berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <cfedbf5d-1399-6d21-b686-1dedfaf5f7d9@redhat.com>
+Date: Mon, 15 Oct 2018 18:38:14 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC] Require Python 3 for building QEMU
+In-Reply-To: <20181011105802.22665-1-berto@igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="q8Trdq5OnG84U0OruZfmOarqdVigr7tig"
+Subject: Re: [Qemu-devel] [PATCH] qcow2: Get the request alignment for
+ encrypted images from QCryptoBlock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,64 +24,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, Alex =?utf-8?Q?Benn?= =?utf-8?Q?=C3=A9e?= <alex.bennee@linaro.org>, Philippe =?utf-8?Q?Mathieu?= =?utf-8?Q?-Daud=C3=A9?= <f4bug@amsat.org>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>
 
-Kevin Wolf <kwolf@redhat.com> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--q8Trdq5OnG84U0OruZfmOarqdVigr7tig
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>
+Message-ID: <cfedbf5d-1399-6d21-b686-1dedfaf5f7d9@redhat.com>
+Subject: Re: [PATCH] qcow2: Get the request alignment for encrypted images
+ from QCryptoBlock
+References: <20181011105802.22665-1-berto@igalia.com>
+In-Reply-To: <20181011105802.22665-1-berto@igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> Am 15.10.2018 um 12:02 hat Peter Maydell geschrieben:
->> On 15 October 2018 at 10:32, Daniel P. Berrang=C3=A9 <berrange@redhat.co=
-m> wrote:
->> > On Sat, Oct 13, 2018 at 02:02:27AM -0300, Eduardo Habkost wrote:
->> >> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
->> >> ---
->> >> I'd like to do this in QEMU 3.1.  I think it's time to drop
->> >> support for old systems that have only Python 2.
->> >>
->> >> We still have a few scripts that are not required for building
->> >> QEMU that still work only with Python 2 (iotests being the most
->> >> relevant set).  Requiring Python 3 for building QEMU won't
->> >> prevent people from using those scripts with Python 2 until they
->> >> are finally ported.
->> >
->> > I think it is premature & unecessary to do this. We just got QEMU buil=
-ding
->> > with dual Python2/3 in 3.0 to give people leeway in the migration path=
- to
->> > a fully v3 future. The code to support building 2/3 in parallel is not
->> > imposing a unreasonable maint burden. Dropping py2 suport would have
->> > negligible impact on the code, as there's no v3-only features we have
->> > used. IOW, I don't think there's a compelling reason to rush into forc=
-ing
->> > users onto v3.
->> >
->> > If we want to drop py2, we should give people a warning of such a plan=
-ned
->> > change, especially since some of our targetted host OS[1] don't even
->> > include a py3 as standard without acquiring extra add-on repos. Devs in
->> > a typical corporate env will not have the freedom to install such extra
->> > repos on their machines.
->>=20
->> I agree. I also think that dropping python 2 support before we've
->> even converted all our python scripts to handle python 3 is the
->> wrong order to do things. People interested in moving forward with
->> the transition to python-3-only should start by making sure everything
->> we have works with python 3...
->
-> It's easier to port stuff to Python 3 though than making them work with
-> both. I think Eduardo's RFC is in part motivated by a patch from
-> Philippe that converted something in iotests to work with Python 3,
-> passed review and then turned out to break Python 2.
+On 11.10.18 12:58, Alberto Garcia wrote:
+> This doesn't have any practical effect at the moment because the
+> values of BDRV_SECTOR_SIZE, QCRYPTO_BLOCK_LUKS_SECTOR_SIZE and
+> QCRYPTO_BLOCK_QCOW_SECTOR_SIZE are all the same (512 bytes), but
+> future encryption methods could have different requirements.
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  block/qcow2.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Seconded.  This is not about the cost of maintaining existing
-compatibility gunk, it's about the extra effort to first get the
-remainder to work with 2 and 3, only to throw away 2 a few months later.
+This breaks non-LUKS encryption:
 
-I propose we permit ourselves to port stuff that isn't essential to
-building QEMU straight to 3 instead.  This includes iotests.
+$ ./qemu-img create -f qcow2 -o encryption=3Don,encrypt.key-secret=3Dsecr=
+et
+--object secret,id=3Dsecret,data=3Dfoo foo.qcow2 64M
+Formatting 'foo.qcow2', fmt=3Dqcow2 size=3D67108864 encryption=3Don
+encrypt.key-secret=3Dsecret cluster_size=3D65536 lazy_refcounts=3Doff
+refcount_bits=3D16
+qemu-img: block.c:1248: bdrv_open_driver: Assertion
+`is_power_of_2(bs->bl.request_alignment)' failed.
+[1]    13589 abort (core dumped)  ./qemu-img create -f qcow2 -o
+encryption=3Don,encrypt.key-secret=3Dsecret --objec
 
-> Having to test every iotests patch twice with different Python versions
-> isn't something I would like to do for extended periods of time.
+(As seen in iotests 049, 087, 134, and 158.)
 
-It's worth doing only if the benefits of doing it outweigh the costs.  I
-don't think they do.
+Max
+
+
+--q8Trdq5OnG84U0OruZfmOarqdVigr7tig
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlvEwnYACgkQ9AfbAGHV
+z0AVYwgAupwa687g4VA1bKdNS4k7a+LlW+W+X/KReEgcXb6jmlq5xE2XGg5d71tp
+FYx7RoISqbd/p8gk2wTBTQsfjUeeGw/VXy4f3mZ0pEkdc95w/PdTQmzu8DwdZX+/
+8IIRTIwnJ8AyfGLtGobirnauR29DmARwWvsz8jqZskNFlo1nKXyLcQSana37aXEi
+aIZV5f00+MrBw07t07/tZ+k/Qkg49/dFP0bGw2kR1MUxfJTVV5711456lqylgiG7
+oWMnKTE7PNVTU6wdD03BkXTFfkCGSYBKWTLViqVshh5TRaExMUJS4/XqQoMGEZsp
+Mf0f+MI7GDjr/72WzM/7xf1EfGQTIA==
+=iFNr
+-----END PGP SIGNATURE-----
+
+--q8Trdq5OnG84U0OruZfmOarqdVigr7tig--
