@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44844)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44884)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gCRGB-0004ZA-PL
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:27:52 -0400
+	(envelope-from <eblake@redhat.com>) id 1gCRGH-0004fd-PM
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:28:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gCRG9-0006QK-H8
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:27:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:31741)
+	(envelope-from <eblake@redhat.com>) id 1gCRGG-0006eS-UU
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:27:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:62795)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gCRG9-0006PX-9C
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:27:49 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gCRGG-0006dz-Np
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:27:56 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 04074C045770
+	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 15:27:56 +0000 (UTC)
 References: <20181015115309.17089-1-armbru@redhat.com>
-	<20181015115309.17089-2-armbru@redhat.com>
+	<20181015115309.17089-6-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <66bcdf04-74e6-34c5-b34c-6fc06a5c6a7d@redhat.com>
-Date: Mon, 15 Oct 2018 13:49:33 -0500
+Message-ID: <10ce81ed-62b5-09a9-7d2a-2389fe1ee043@redhat.com>
+Date: Mon, 15 Oct 2018 13:53:30 -0500
 MIME-Version: 1.0
-In-Reply-To: <20181015115309.17089-2-armbru@redhat.com>
+In-Reply-To: <20181015115309.17089-6-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 01/35] error: Fix use of error_prepend()
- with &error_fatal, &error_abort
+Subject: Re: [Qemu-devel] [PATCH v2 05/35] vfio: Use warn_report() & friends
+ to report warnings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,32 +36,35 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: Fei Li <fli@suse.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>
 
 On 10/15/18 6:52 AM, Markus Armbruster wrote:
->>From include/qapi/error.h:
+> The vfio code reports warnings like
 > 
->    * Pass an existing error to the caller with the message modified:
->    *     error_propagate(errp, err);
->    *     error_prepend(errp, "Could not frobnicate '%s': ", name);
+>      error_report(WARN_PREFIX "Could not frobnicate", DEV-NAME);
 > 
-> Fei Li pointed out that doing error_propagate() first doesn't work
-> well when @errp is &error_fatal or &error_abort: the error_prepend()
-> is never reached.
+> where WARN_PREFIX is defined so the message comes out as
 > 
-> Since I doubt fixing the documentation will stop people from getting
-> it wrong, introduce error_propagate_prepend(), in the hope that it
-> lures people away from using its constituents in the wrong order.
-> Update the instructions in error.h accordingly.
+>      vfio warning: DEV-NAME: Could not frobnicate
 > 
-> Convert existing error_prepend() next to error_propagate to
-> error_propagate_prepend().  If any of these get reached with
-> &error_fatal or &error_abort, the error messages improve.  I didn't
-> check whether that's the case anywhere.
+> This usage predates the introduction of warn_report() & friends in
+> commit 97f40301f1d.  It's time to convert to that interface.  Since
+> these functions already prefix the message with "warning: ", replace
+> WARN_PREFIX by VFIO_MSG_PREFIX, so the messages come out like
 > 
-> Cc: Fei Li <fli@suse.com>
+>      warning: vfio DEV-NAME: Could not frobnicate
+> 
+> The next commit will replace ERR_PREFIX.
+> 
+> Cc: Alex Williamson <alex.williamson@redhat.com>
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Acked-by: Alex Williamson <alex.williamson@redhat.com>
 > ---
+>   hw/vfio/pci.c                 | 14 +++++++-------
+>   hw/vfio/platform.c            |  4 ++--
+>   include/hw/vfio/vfio-common.h |  2 +-
+>   3 files changed, 10 insertions(+), 10 deletions(-)
+> 
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
