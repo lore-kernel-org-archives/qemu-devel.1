@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57935)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58634)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gBsLR-0002mp-C3
-	for qemu-devel@nongnu.org; Sun, 14 Oct 2018 22:10:58 -0400
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gBsPP-0003mY-He
+	for qemu-devel@nongnu.org; Sun, 14 Oct 2018 22:15:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gBsLN-0002Gi-Go
-	for qemu-devel@nongnu.org; Sun, 14 Oct 2018 22:10:57 -0400
-Date: Mon, 15 Oct 2018 12:04:38 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181015010438.GI16167@umbus.fritz.box>
-References: <153933509870.3834759.13291133122604475240.stgit@bahia.lan>
-	<153933510947.3834759.3504000962964977142.stgit@bahia.lan>
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gBsPL-0003vr-0U
+	for qemu-devel@nongnu.org; Sun, 14 Oct 2018 22:15:03 -0400
+Received: from cmccmta1.chinamobile.com ([221.176.66.79]:15732)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gBsPK-0003sk-CD
+	for qemu-devel@nongnu.org; Sun, 14 Oct 2018 22:14:58 -0400
+References: <20181012083008.29027-1-maozhongyi@cmss.chinamobile.com>
+	<20181012083008.29027-3-maozhongyi@cmss.chinamobile.com>
+	<cfadc8a6-ae1c-367a-a6f1-6e711a6e79f4@redhat.com>
+	<f55ae5b1-2dbf-8c6e-c787-0f088fa491a9@cmss.chinamobile.com>
+	<2eecebee-de1f-5985-9420-4adcd1767c29@redhat.com>
+	<61bb828a-dc72-5bb2-44b0-2dc9bd737fc4@redhat.com>
+From: maozy <maozhongyi@cmss.chinamobile.com>
+Message-ID: <fda09bf4-f04e-e85a-74ce-6f5bc1821309@cmss.chinamobile.com>
+Date: Mon, 15 Oct 2018 10:14:39 +0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="3U8TY7m7wOx7RL1F"
-Content-Disposition: inline
-In-Reply-To: <153933510947.3834759.3504000962964977142.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] spapr_pci: convert g_malloc() to
- g_new()
+In-Reply-To: <61bb828a-dc72-5bb2-44b0-2dc9bd737fc4@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] audio: use object link instead
+ ofqdevproperty to pass wm8750 reference
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,70 +33,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Thomas Huth <thuth@redhat.com>
+Cc: Jan Kiszka <jan.kiszka@web.de>, Gerd Hoffmann <kraxel@redhat.com>
 
+Hi, Philippe
 
---3U8TY7m7wOx7RL1F
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Oct 12, 2018 at 11:05:09AM +0200, Greg Kurz wrote:
-> When allocating an array, it is a recommended coding practice to call
-> g_new(FooType, n) instead of g_malloc(n * sizeof(FooType)) because
-> it takes care to avoid overflow when calculating the size of the
-> allocated block and it returns FooType *, which allows the compiler
-> to perform type checking.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-
-Applied to ppc-for-3.1, thanks.
-
-> ---
->  hw/ppc/spapr_pci.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> index c2271e6ed462..0537ce018f51 100644
-> --- a/hw/ppc/spapr_pci.c
-> +++ b/hw/ppc/spapr_pci.c
-> @@ -1883,7 +1883,7 @@ static int spapr_pci_pre_save(void *opaque)
->      if (!sphb->msi_devs_num) {
->          return 0;
+On 10/13/18 2:40 AM, Philippe Mathieu-Daudé wrote:
+> Hi Mao,
+> 
+> On 12/10/2018 14:30, Philippe Mathieu-Daudé wrote:
+>> Cc'ing Eduardo and Thomas.
+>>
+>> On 12/10/2018 13:51, maozy wrote:
+>>> Hi, Philippe
+>>>
+>>> On 10/12/18 5:53 PM, Philippe Mathieu-Daudé wrote:
+>>>> Hi Mao,
+>>>>
+>>>> On 12/10/2018 10:30, Mao Zhongyi wrote:
+>>>>> According to qdev-properties.h, properties of pointer type should
+>>>>> be avoided, it seems a link type property is a good substitution.
+>>>>>
+>>>>> Cc: Jan Kiszka <jan.kiszka@web.de>
+>>>>> Cc: Peter Maydell <peter.maydell@linaro.org>
+>>>>> Cc: Gerd Hoffmann <kraxel@redhat.com>
+>>>>> To: qemu-arm@nongnu.org
+>>>>>
+>>>>> Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+>>>>> ---
+>>>>>    hw/arm/musicpal.c          |  3 ++-
+>>>>>    hw/audio/marvell_88w8618.c | 14 ++++++--------
+>>>>>    2 files changed, 8 insertions(+), 9 deletions(-)
+>>>>>
+>>>>> diff --git a/hw/arm/musicpal.c b/hw/arm/musicpal.c
+>>>>> index 3dafb41b0b..ac266f9253 100644
+>>>>> --- a/hw/arm/musicpal.c
+>>>>> +++ b/hw/arm/musicpal.c
+>>>>> @@ -1695,7 +1695,8 @@ static void musicpal_init(MachineState *machine)
+>>>>>        wm8750_dev = i2c_create_slave(i2c, TYPE_WM8750, MP_WM_ADDR);
+>>>>>        dev = qdev_create(NULL, "mv88w8618_audio");
+>>>>>        s = SYS_BUS_DEVICE(dev);
+>>>>> -    qdev_prop_set_ptr(dev, TYPE_WM8750, wm8750_dev);
+>>>>> +    object_property_set_link(OBJECT(dev), OBJECT(wm8750_dev),
+>>>>> +                             TYPE_WM8750, NULL);
+>>>>>        qdev_init_nofail(dev);
+>>>>>        sysbus_mmio_map(s, 0, MP_AUDIO_BASE);
+>>>>>        sysbus_connect_irq(s, 0, pic[MP_AUDIO_IRQ]);
+>>>>> diff --git a/hw/audio/marvell_88w8618.c b/hw/audio/marvell_88w8618.c
+>>>>> index cf6ce6979b..baab4a3d53 100644
+>>>>> --- a/hw/audio/marvell_88w8618.c
+>>>>> +++ b/hw/audio/marvell_88w8618.c
+>>>>> @@ -15,6 +15,7 @@
+>>>>>    #include "hw/i2c/i2c.h"
+>>>>>    #include "hw/audio/wm8750.h"
+>>>>>    #include "audio/audio.h"
+>>>>> +#include "qapi/error.h"
+>>>>>      #define MP_AUDIO_SIZE           0x00001000
+>>>>>    @@ -252,6 +253,11 @@ static void mv88w8618_audio_init(Object *obj)
+>>>>>        memory_region_init_io(&s->iomem, obj, &mv88w8618_audio_ops, s,
+>>>>>                              "audio", MP_AUDIO_SIZE);
+>>>>>        sysbus_init_mmio(dev, &s->iomem);
+>>>>> +
+>>>>> +    object_property_add_link(OBJECT(dev), "mv88w8618", TYPE_WM8750,
+>>>>> +                             (Object **) &s->wm,
+>>>>> +                             qdev_prop_allow_set_link_before_realize,
+>>>>> +                             0, &error_abort);
+>>>>>    }
+>>>>>      static void mv88w8618_audio_realize(DeviceState *dev, Error **errp)
+>>>>> @@ -279,11 +285,6 @@ static const VMStateDescription
+>>>>> mv88w8618_audio_vmsd = {
+>>>>>        }
+>>>>>    };
+>>>>>    -static Property mv88w8618_audio_properties[] = {
+>>>>> -    DEFINE_PROP_PTR(TYPE_WM8750, mv88w8618_audio_state, wm),
+>>>>> -    {/* end of list */},
+>>>>> -};
+>>>>> -
+>>>>>    static void mv88w8618_audio_class_init(ObjectClass *klass, void *data)
+>>>>>    {
+>>>>>        DeviceClass *dc = DEVICE_CLASS(klass);
+>>>>> @@ -291,9 +292,6 @@ static void
+>>>>> mv88w8618_audio_class_init(ObjectClass *klass, void *data)
+>>>>>        dc->realize = mv88w8618_audio_realize;
+>>>>>        dc->reset = mv88w8618_audio_reset;
+>>>>>        dc->vmsd = &mv88w8618_audio_vmsd;
+>>>>> -    dc->props = mv88w8618_audio_properties;
+>>>>> -    /* Reason: pointer property "wm8750" */
+>>>>> -    dc->user_creatable = false;
+>>>>
+>>>> Having a link property isn't it the same restriction?
+>>>
+>>> This task can found in
+>>> https://wiki.qemu.org/Contribute/BiteSizedTasks#Device_models
+>>>
+>>> Convert qdev pointer properties (defined with DEFINE_PROP_PTR) to QOM
+>>> links. Example: commit 873b4d3.
+>>
+>> I agree with the QOM conversion (the rest of this patch), what I'm
+>> wondering is if declaring this device now user_creatable is correct. I
+>> don't think we can set link property from command line, but maybe I'm
+>> wrong because I never investigate/tried to do it.
+>>
+>> Maybe devices having link property are automatically marked as
+>> user_creatable = false, then your change would be correct (except you
+>> should explicit that in the commit message).
+>>
+>> I'll post another mail on the list to ask about that.
+> 
+> On https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg02531.html
+> 
+> Peter answered:
+> 
+>    I think whether a device with a link property is
+>    user creatable might depend on what the property is
+>    for and whether the device has a useful fallback for
+>    "link not connected".
+> 
+> So if you look the realize function, there is no check on the linked object:
+> 
+>      static void mv88w8618_audio_realize(DeviceState *dev, Error **errp)
+>      {
+>          mv88w8618_audio_state *s = MV88W8618_AUDIO(dev);
+> 
+>          wm8750_data_req_set(s->wm, mv88w8618_audio_callback, s);
 >      }
-> -    sphb->msi_devs =3D g_malloc(sphb->msi_devs_num * sizeof(spapr_pci_ms=
-i_mig));
-> +    sphb->msi_devs =3D g_new(spapr_pci_msi_mig, sphb->msi_devs_num);
-> =20
->      g_hash_table_iter_init(&iter, sphb->msi);
->      for (i =3D 0; g_hash_table_iter_next(&iter, &key, &value); ++i) {
->=20
+> 
+> Then the called function dereference the WM8750State:
+> 
+>      void wm8750_data_req_set(DeviceState *dev, data_req_cb *data_req,
+>                               void *opaque)
+>      {
+>          WM8750State *s = WM8750(dev);
+> 
+>          s->data_req = data_req;
+>          s->opaque = opaque;
+>      }
+> 
+> So this patch is incorrect. You should either keep the
+> 'dc->user_creatable = false' line, or add a check in the realize()
+> function, as here:
+> 
+>      static void bcm2836_realize(DeviceState *dev, Error **errp)
+>      {
+>          Object *obj;
+>          Error *err = NULL;
+> 
+>          obj = object_property_get_link(OBJECT(dev), "ram", &err);
+>          if (obj == NULL) {
+>              error_setg(errp, "%s: required ram link not found: %s",
+>                         __func__, error_get_pretty(err));
+>              return;
+>          }
+>          ...
+> 
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Sorry for the delay in response, I was away for the holiday weekend.
+I saw the mail you discussed and reviewed the code, I will fix it in
+the next version. Thank you! I really appreciate it.
 
---3U8TY7m7wOx7RL1F
-Content-Type: application/pgp-signature; name="signature.asc"
+Thanks,
+Mao
 
------BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlvD56MACgkQbDjKyiDZ
-s5LUaxAAp8Hqlr2oSBY2DG9Pk+ldGHzSxRFR0h7oLUuVVnAAdVoWkncbWut4VjXU
-CDYfcw4XwcTjE0NI4ME5SkPYMiMTFzup1uq2UlmP3YU6WLqixA1CK7xVEEPM9c9A
-7n5vaDBSwLk+QjTCJssT9F958IwmZfmDR48f0KKkfXpWm9RcwlWQ6WNsw6uHH4oF
-nEXiYMOEXtw/Oeh7NAhdSfxM5vuycTZNuAps/xkJIbkRtzAACoFsSlMrekXrjcXd
-BGFf6og5AkSrG9KFC+GpYhJAriy/I1Ec3ti+1oCE4GwVtn7329S9cb7YXjsZ11hl
-Du2U3kAo4k7VvrkLSfzex3lqAOjs75Iwffs2KPjGEt59OUjIEgg72q/j30Eoh+s2
-KaMO//IYCLalzqSjYprNzB1OXFihRTeHf53DPj8ungqxXco4Ad2E52MuBn83jvt1
-jm5dgsI87twmHtavgA2bcO4APMH3TlfiYfZYYenZSsUY3ouq+HN7YJGUPihdjCvY
-5S3kedLOSgwCSM+GDY4+IZWM96bHrDj4ei3GoE39B++2jYXn+YKl9ROmjqwauKwk
-vPnYa1Z6mBlPkU1PZ5X0uJIdkFNp92Skj0uV3pFKWMKh1vm1wrhffakgow+JHTWg
-HiXIi+cScA6M4UjRIy1dmdtxdZ8sR+3DzEelKrWlctgo3b521Ew=
-=8Tvp
------END PGP SIGNATURE-----
-
---3U8TY7m7wOx7RL1F--
+> Regards,
+> 
+> Phil.
+> 
+>>
+>> Regards,
+>>
+>> Phil.
+>>
+>>>
+>>> Thanks,
+>>> Mao
+>>>
+>>>>
+>>>>>    }
+>>>>>      static const TypeInfo mv88w8618_audio_info = {
+>>>>>
+>>>>
+>>>
+>>>
+> 
