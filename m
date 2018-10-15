@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60088)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gBzFH-00040w-FN
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 05:33:04 -0400
+	(envelope-from <kwolf@redhat.com>) id 1gBzK9-0005iM-Q4
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 05:38:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gBzFG-0000Nn-ER
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 05:33:03 -0400
-Date: Mon, 15 Oct 2018 10:32:43 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181015093243.GE6785@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181013050227.17022-1-ehabkost@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1gBzK8-0003Wv-Fz
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 05:38:05 -0400
+Date: Mon, 15 Oct 2018 11:37:53 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20181015093753.GB10459@localhost.localdomain>
+References: <20181012115532.12645-1-kwolf@redhat.com>
+	<20181012115532.12645-3-kwolf@redhat.com>
+	<12e95cce-ab82-08e3-b0ae-2307fe94a392@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181013050227.17022-1-ehabkost@redhat.com>
-Subject: Re: [Qemu-devel] [RFC] Require Python 3 for building QEMU
+In-Reply-To: <12e95cce-ab82-08e3-b0ae-2307fe94a392@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/8] block: Add auto-read-only option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,40 +24,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>, qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
 
-On Sat, Oct 13, 2018 at 02:02:27AM -0300, Eduardo Habkost wrote:
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
-> I'd like to do this in QEMU 3.1.  I think it's time to drop
-> support for old systems that have only Python 2.
->
-> We still have a few scripts that are not required for building
-> QEMU that still work only with Python 2 (iotests being the most
-> relevant set).  Requiring Python 3 for building QEMU won't
-> prevent people from using those scripts with Python 2 until they
-> are finally ported.
+Am 12.10.2018 um 18:47 hat Eric Blake geschrieben:
+> On 10/12/18 6:55 AM, Kevin Wolf wrote:
+> > If a management application builds the block graph node by node, the
+> > protocol layer doesn't inherit its read-only option from the format
+> > layer any more, so it must be set explicitly.
+> > 
+> 
+> > The documentation for this option is consciously phrased in a way that
+> > allows QEMU to switch to a better model eventually: Instead of trying
+> > when the image is first opened, making the read-only flag dynamic and
+> > changing it automatically whenever the first BLK_PERM_WRITE user is
+> > attached or the last one is detached would be much more useful
+> > behaviour.
+> > 
+> > Unfortunately, this more useful behaviour is also a lot harder to
+> > implement, and libvirt needs a solution now before it can switch to
+> > -blockdev, so let's start with this easier approach for now.
+> 
+> I agree both with the approach of getting the simpler implementation in now
+> (always writable, even when we don't need to write) as well as wording the
+> documentation to permit a future stricter approach (only writable at the
+> points where we need to write).
+> 
+> > 
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > ---
+> >   qapi/block-core.json  |  6 ++++++
+> >   include/block/block.h |  2 ++
+> >   block.c               | 21 ++++++++++++++++++++-
+> >   block/vvfat.c         |  1 +
+> >   4 files changed, 29 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/qapi/block-core.json b/qapi/block-core.json
+> > index cfb37f8c1d..3a899298de 100644
+> > --- a/qapi/block-core.json
+> > +++ b/qapi/block-core.json
+> > @@ -3651,6 +3651,11 @@
+> >   #                 either generally or in certain configurations. In this case,
+> >   #                 the default value does not work and the option must be
+> >   #                 specified explicitly.
+> > +# @auto-read-only: if true, QEMU may ignore the @read-only option and
+> > +#                  automatically decide whether to open the image read-only or
+> > +#                  read-write (and switch between the modes later), e.g.
+> > +#                  depending on whether the image file is writable or whether a
+> > +#                  writing user is attached to the node (default: false).
+> 
+> Bike-shedding: Do we really want to ignore @read-only? Here's the table of 9
+> combinations ('t'rue, 'f'alse, 'o'mitted), with '*' on the rows that must be
+> preserved for back-compat:
+> 
+> RO   Auto   effect
+> o    o      *open for write, fail if not possible
+> f    o      *open for write, fail if not possible
+> t    o      *open for read, no conversion to write
+> o    f      open for write, fail if not possible
+> f    f      open for write, fail if not possible
+> t    f      open for read, no conversion to write
+> o    t      attempt write but graceful fall back to read
+> f    t      attempt write but graceful fall back to read
+> t    t      ignore RO flag, attempt write anyway
+> 
+> That last row is weird, why not make it an explicit error instead of
+> ignoring the implied difference in semantics between the two?
 
-I think it is premature & unecessary to do this. We just got QEMU building
-with dual Python2/3 in 3.0 to give people leeway in the migration path to
-a fully v3 future. The code to support building 2/3 in parallel is not
-imposing a unreasonable maint burden. Dropping py2 suport would have
-negligible impact on the code, as there's no v3-only features we have
-used. IOW, I don't think there's a compelling reason to rush into forcing
-users onto v3.
+You're right that the description allows this. In practice,
+auto-read-only can only make a node go from rw to ro, not the other way
+round.
 
-If we want to drop py2, we should give people a warning of such a planned
-change, especially since some of our targetted host OS[1] don't even
-include a py3 as standard without acquiring extra add-on repos. Devs in
-a typical corporate env will not have the freedom to install such extra
-repos on their machines.
+So our options are to document the current behaviour (auto-read-only has
+no effect when the image is already read-only) or to make it an error.
 
-Regards,
-Daniel
+One thought I had is that for convenience options like -hda (or in fact
+-drive), auto-read-only=on could be the default, and only -blockdev and
+blockdev-add would disable it by default. That would suggest that we
+don't want to make it an error.
 
-[1] https://qemu.weilnetz.de/doc/qemu-doc.html#Supported-build-platforms
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> Or, another idea: is it worth trying to support a single tri-state member
+> (via an alternative between bool and enum, since the existing code uses a
+> JSON bool):
+> 
+> "read-only": false (open for write, fail if not possible)
+> "read-only": true (open read-only, no later switching)
+> "read-only": "auto" (switch as needed; or for initial implementation attempt
+> for write with graceful fallback to read)
+> omitting read-only: same as "read-only":false for back-compat
+
+If read-only were new, I would probably make it an enum, but adding it
+now isn't very practical. I did actually start with an alternate and it
+just wasn't very nice. One thing I remember is places that directly
+accessed the options QDict, for which you could now have either a bool, a
+string, an int or not present. It becomes a bit too much.
+
+As read-only is optional, we could make it true/false/absent without
+introducing an alternate and the additional int/string options, but I
+don't like that very much either.
+
+
+While we're talking about the schema, another thing I considered was
+making auto-read-only an option only for the specific drivers that
+support it so introspection could tell the management tool whether the
+functionality is available. However, if we do this, we can't parse it in
+block.c code and use a flag any more, but need to parse it in each
+driver individually. Maybe it would be a better design anyway?
+
+> > @@ -1328,6 +1338,11 @@ QemuOptsList bdrv_runtime_opts = {
+> >               .type = QEMU_OPT_BOOL,
+> >               .help = "Node is opened in read-only mode",
+> >           },
+> > +        {
+> > +            .name = BDRV_OPT_AUTO_READ_ONLY,
+> > +            .type = QEMU_OPT_BOOL,
+> > +            .help = "Node can become read-only if opening read-write fails",
+> > +        },
+> 
+> If we keep your current approach, is it worth mentioning that
+> auto-read-only true overrides read-only true?
+
+This help text is never printed anywhere anyway... Maybe we should just
+delete it. What we refer to is the QAPI documentation anyway.
+
+Kevin
