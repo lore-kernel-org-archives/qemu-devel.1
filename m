@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39587)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gC1R5-0004A3-Rv
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:28 -0400
+	(envelope-from <armbru@redhat.com>) id 1gC1RB-0004GA-5l
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gC1R3-00024V-4A
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:14654)
+	(envelope-from <armbru@redhat.com>) id 1gC1R9-00029n-2b
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43824)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gC1R1-0001xI-EA
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:19 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gC1R7-0001yt-6i
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:25 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EA76C2DA988
-	for <qemu-devel@nongnu.org>; Mon, 15 Oct 2018 11:53:14 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id EE70364100
+	for <qemu-devel@nongnu.org>; Mon, 15 Oct 2018 11:53:16 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-50.ams2.redhat.com
+	[10.36.116.50])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id B84552B59A
+	for <qemu-devel@nongnu.org>; Mon, 15 Oct 2018 11:53:16 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 15 Oct 2018 13:52:45 +0200
-Message-Id: <20181015115309.17089-12-armbru@redhat.com>
+Date: Mon, 15 Oct 2018 13:52:55 +0200
+Message-Id: <20181015115309.17089-22-armbru@redhat.com>
 In-Reply-To: <20181015115309.17089-1-armbru@redhat.com>
 References: <20181015115309.17089-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 11/35] smbios: Clean up error handling in
- smbios_add()
+Subject: [Qemu-devel] [PATCH v2 21/35] vl: Clean up error reporting in
+ machine_set_property()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,237 +38,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>
 
 Calling error_report() in a function that takes an Error ** argument
-is suspicious.  smbios_entry_add() does that, and then exit()s.  It
-also passes &error_fatal to qemu_opts_validate().  Both wrong, but
-currently harmless, as its only caller passes &error_fatal.  Messed up
-in commit 1007a37e208.  Clean it up.
+is suspicious.  machine_set_property() does that, and then fails without
+setting an error.  Its caller main(), via qemu_opts_foreach(), is fine
+with it, but clean it up anyway.
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/smbios/smbios.c | 90 +++++++++++++++++++++++++++++++---------------
- 1 file changed, 62 insertions(+), 28 deletions(-)
+ vl.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
-diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
-index a27e54b2fa..920939454e 100644
---- a/hw/smbios/smbios.c
-+++ b/hw/smbios/smbios.c
-@@ -950,6 +950,7 @@ static void save_opt_list(size_t *ndest, const char *=
-**dest,
+diff --git a/vl.c b/vl.c
+index aa03192019..c3c17106bf 100644
+--- a/vl.c
++++ b/vl.c
+@@ -2676,7 +2676,7 @@ static int machine_set_property(void *opaque,
+     g_free(qom_name);
 =20
- void smbios_entry_add(QemuOpts *opts, Error **errp)
- {
-+    Error *err =3D NULL;
-     const char *val;
-=20
-     assert(!smbios_immutable);
-@@ -960,12 +961,16 @@ void smbios_entry_add(QemuOpts *opts, Error **errp)
-         int size;
-         struct smbios_table *table; /* legacy mode only */
-=20
--        qemu_opts_validate(opts, qemu_smbios_file_opts, &error_fatal);
-+        qemu_opts_validate(opts, qemu_smbios_file_opts, &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-=20
-         size =3D get_image_size(val);
-         if (size =3D=3D -1 || size < sizeof(struct smbios_structure_head=
-er)) {
--            error_report("Cannot read SMBIOS file %s", val);
--            exit(1);
-+            error_setg(errp, "Cannot read SMBIOS file %s", val);
-+            return;
-         }
-=20
-         /*
-@@ -978,14 +983,15 @@ void smbios_entry_add(QemuOpts *opts, Error **errp)
-                                                     smbios_tables_len);
-=20
-         if (load_image(val, (uint8_t *)header) !=3D size) {
--            error_report("Failed to load SMBIOS file %s", val);
--            exit(1);
-+            error_setg(errp, "Failed to load SMBIOS file %s", val);
-+            return;
-         }
-=20
-         if (test_bit(header->type, have_fields_bitmap)) {
--            error_report("can't load type %d struct, fields already spec=
-ified!",
--                         header->type);
--            exit(1);
-+            error_setg(errp,
-+                       "can't load type %d struct, fields already specif=
-ied!",
-+                       header->type);
-+            return;
-         }
-         set_bit(header->type, have_binfile_bitmap);
-=20
-@@ -1030,19 +1036,23 @@ void smbios_entry_add(QemuOpts *opts, Error **err=
-p)
-         unsigned long type =3D strtoul(val, NULL, 0);
-=20
-         if (type > SMBIOS_MAX_TYPE) {
--            error_report("out of range!");
--            exit(1);
-+            error_setg(errp, "out of range!");
-+            return;
-         }
-=20
-         if (test_bit(type, have_binfile_bitmap)) {
--            error_report("can't add fields, binary file already loaded!"=
-);
--            exit(1);
-+            error_setg(errp, "can't add fields, binary file already load=
-ed!");
-+            return;
-         }
-         set_bit(type, have_fields_bitmap);
-=20
-         switch (type) {
-         case 0:
--            qemu_opts_validate(opts, qemu_smbios_type0_opts, &error_fata=
-l);
-+            qemu_opts_validate(opts, qemu_smbios_type0_opts, &err);
-+            if (err) {
-+                error_propagate(errp, err);
-+                return;
-+            }
-             save_opt(&type0.vendor, opts, "vendor");
-             save_opt(&type0.version, opts, "version");
-             save_opt(&type0.date, opts, "date");
-@@ -1051,14 +1061,18 @@ void smbios_entry_add(QemuOpts *opts, Error **err=
-p)
-             val =3D qemu_opt_get(opts, "release");
-             if (val) {
-                 if (sscanf(val, "%hhu.%hhu", &type0.major, &type0.minor)=
- !=3D 2) {
--                    error_report("Invalid release");
--                    exit(1);
-+                    error_setg(errp, "Invalid release");
-+                    return;
-                 }
-                 type0.have_major_minor =3D true;
-             }
-             return;
-         case 1:
--            qemu_opts_validate(opts, qemu_smbios_type1_opts, &error_fata=
-l);
-+            qemu_opts_validate(opts, qemu_smbios_type1_opts, &err);
-+            if (err) {
-+                error_propagate(errp, err);
-+                return;
-+            }
-             save_opt(&type1.manufacturer, opts, "manufacturer");
-             save_opt(&type1.product, opts, "product");
-             save_opt(&type1.version, opts, "version");
-@@ -1069,14 +1083,18 @@ void smbios_entry_add(QemuOpts *opts, Error **err=
-p)
-             val =3D qemu_opt_get(opts, "uuid");
-             if (val) {
-                 if (qemu_uuid_parse(val, &qemu_uuid) !=3D 0) {
--                    error_report("Invalid UUID");
--                    exit(1);
-+                    error_setg(errp, "Invalid UUID");
-+                    return;
-                 }
-                 qemu_uuid_set =3D true;
-             }
-             return;
-         case 2:
--            qemu_opts_validate(opts, qemu_smbios_type2_opts, &error_fata=
-l);
-+            qemu_opts_validate(opts, qemu_smbios_type2_opts, &err);
-+            if (err) {
-+                error_propagate(errp, err);
-+                return;
-+            }
-             save_opt(&type2.manufacturer, opts, "manufacturer");
-             save_opt(&type2.product, opts, "product");
-             save_opt(&type2.version, opts, "version");
-@@ -1085,7 +1103,11 @@ void smbios_entry_add(QemuOpts *opts, Error **errp=
-)
-             save_opt(&type2.location, opts, "location");
-             return;
-         case 3:
--            qemu_opts_validate(opts, qemu_smbios_type3_opts, &error_fata=
-l);
-+            qemu_opts_validate(opts, qemu_smbios_type3_opts, &err);
-+            if (err) {
-+                error_propagate(errp, err);
-+                return;
-+            }
-             save_opt(&type3.manufacturer, opts, "manufacturer");
-             save_opt(&type3.version, opts, "version");
-             save_opt(&type3.serial, opts, "serial");
-@@ -1093,7 +1115,11 @@ void smbios_entry_add(QemuOpts *opts, Error **errp=
-)
-             save_opt(&type3.sku, opts, "sku");
-             return;
-         case 4:
--            qemu_opts_validate(opts, qemu_smbios_type4_opts, &error_fata=
-l);
-+            qemu_opts_validate(opts, qemu_smbios_type4_opts, &err);
-+            if (err) {
-+                error_propagate(errp, err);
-+                return;
-+            }
-             save_opt(&type4.sock_pfx, opts, "sock_pfx");
-             save_opt(&type4.manufacturer, opts, "manufacturer");
-             save_opt(&type4.version, opts, "version");
-@@ -1102,11 +1128,19 @@ void smbios_entry_add(QemuOpts *opts, Error **err=
-p)
-             save_opt(&type4.part, opts, "part");
-             return;
-         case 11:
--            qemu_opts_validate(opts, qemu_smbios_type11_opts, &error_fat=
-al);
-+            qemu_opts_validate(opts, qemu_smbios_type11_opts, &err);
-+            if (err) {
-+                error_propagate(errp, err);
-+                return;
-+            }
-             save_opt_list(&type11.nvalues, &type11.values, opts, "value"=
-);
-             return;
-         case 17:
--            qemu_opts_validate(opts, qemu_smbios_type17_opts, &error_fat=
-al);
-+            qemu_opts_validate(opts, qemu_smbios_type17_opts, &err);
-+            if (err) {
-+                error_propagate(errp, err);
-+                return;
-+            }
-             save_opt(&type17.loc_pfx, opts, "loc_pfx");
-             save_opt(&type17.bank, opts, "bank");
-             save_opt(&type17.manufacturer, opts, "manufacturer");
-@@ -1116,12 +1150,12 @@ void smbios_entry_add(QemuOpts *opts, Error **err=
-p)
-             type17.speed =3D qemu_opt_get_number(opts, "speed", 0);
-             return;
-         default:
--            error_report("Don't know how to build fields for SMBIOS type=
- %ld",
--                         type);
--            exit(1);
-+            error_setg(errp,
-+                       "Don't know how to build fields for SMBIOS type %=
-ld",
-+                       type);
-+            return;
-         }
+     if (local_err) {
+-        error_report_err(local_err);
++        error_propagate(errp, local_err);
+         return -1;
      }
 =20
--    error_report("Must specify type=3D or file=3D");
--    exit(1);
-+    error_setg(errp, "Must specify type=3D or file=3D");
- }
+@@ -4248,11 +4248,8 @@ int main(int argc, char **argv, char **envp)
+     }
+=20
+     machine_opts =3D qemu_get_machine_opts();
+-    if (qemu_opt_foreach(machine_opts, machine_set_property, current_mac=
+hine,
+-                         NULL)) {
+-        object_unref(OBJECT(current_machine));
+-        exit(1);
+-    }
++    qemu_opt_foreach(machine_opts, machine_set_property, current_machine=
+,
++                     &error_fatal);
+=20
+     configure_accelerator(current_machine);
+=20
 --=20
 2.17.1
