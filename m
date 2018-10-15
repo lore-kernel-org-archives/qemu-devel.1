@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39590)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39774)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gC1RB-0004GC-63
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:31 -0400
+	(envelope-from <armbru@redhat.com>) id 1gC1RF-0004JY-Vy
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gC1R9-00029f-1g
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59158)
+	(envelope-from <armbru@redhat.com>) id 1gC1RD-0002Eq-Op
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43734)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gC1R7-0001xe-2R
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:25 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gC1RD-00020f-DL
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:31 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 77E74308FBAE
-	for <qemu-devel@nongnu.org>; Mon, 15 Oct 2018 11:53:15 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B4CAB31500AE
+	for <qemu-devel@nongnu.org>; Mon, 15 Oct 2018 11:53:17 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-50.ams2.redhat.com
+	[10.36.116.50])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 7FE4C2B584
+	for <qemu-devel@nongnu.org>; Mon, 15 Oct 2018 11:53:17 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 15 Oct 2018 13:52:47 +0200
-Message-Id: <20181015115309.17089-14-armbru@redhat.com>
+Date: Mon, 15 Oct 2018 13:52:58 +0200
+Message-Id: <20181015115309.17089-25-armbru@redhat.com>
 In-Reply-To: <20181015115309.17089-1-armbru@redhat.com>
 References: <20181015115309.17089-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 13/35] l2tpv3: Improve
- -netdev/netdev_add/-net/... error reporting
+Subject: [Qemu-devel] [PATCH v2 24/35] vl: Clean up error reporting in
+ device_init_func()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,124 +38,49 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Jason Wang <jasowang@redhat.com>
 
-When -netdev l2tpv3 fails, it first reports a specific error, then a
-generic one, like this:
+Calling error_report() in a function that takes an Error ** argument
+is suspicious.  device_init_func() does that, and then fails without
+setting an error.  Its caller main(), via qemu_opts_foreach(), is fine
+with it, but clean it up anyway.
 
-    $ qemu-system-x86_64 -netdev l2tpv3,id=3Dfoo,src=3D,dst=3D,txsession=3D=
-1
-    qemu-system-x86_64: -netdev l2tpv3,id=3Dfoo,src=3D,dst=3D,txsession=3D=
-1: l2tpv3_open : could not resolve src, errno =3D Name or service not kno=
-wn
-    qemu-system-x86_64: Device 'l2tpv3' could not be initialized
-
-With the command line, the messages go to stderr.  In HMP, they go to
-the monitor.  In QMP, the second one becomes the error reply, and the
-first one goes to stderr.
-
-Convert net_init_tap() to Error.  This suppresses the unwanted second
-message, and makes the specific error the QMP error reply.
-
-Cc: Jason Wang <jasowang@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- net/l2tpv3.c | 25 ++++++++++++-------------
- 1 file changed, 12 insertions(+), 13 deletions(-)
+ vl.c | 10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
 
-diff --git a/net/l2tpv3.c b/net/l2tpv3.c
-index 6745b78990..81db24dc8c 100644
---- a/net/l2tpv3.c
-+++ b/net/l2tpv3.c
-@@ -28,6 +28,7 @@
- #include <netdb.h>
- #include "net/net.h"
- #include "clients.h"
-+#include "qapi/error.h"
- #include "qemu-common.h"
- #include "qemu/error-report.h"
- #include "qemu/option.h"
-@@ -528,7 +529,6 @@ int net_init_l2tpv3(const Netdev *netdev,
-                     const char *name,
-                     NetClientState *peer, Error **errp)
+diff --git a/vl.c b/vl.c
+index c5bc54f72b..c053117028 100644
+--- a/vl.c
++++ b/vl.c
+@@ -2222,12 +2222,10 @@ static int device_help_func(void *opaque, QemuOpt=
+s *opts, Error **errp)
+=20
+ static int device_init_func(void *opaque, QemuOpts *opts, Error **errp)
  {
--    /* FIXME error_setg(errp, ...) on failure */
-     const NetdevL2TPv3Options *l2tpv3;
-     NetL2TPV3State *s;
-     NetClientState *nc;
-@@ -555,7 +555,7 @@ int net_init_l2tpv3(const Netdev *netdev,
-     }
+-    Error *err =3D NULL;
+     DeviceState *dev;
 =20
-     if ((l2tpv3->has_offset) && (l2tpv3->offset > 256)) {
--        error_report("l2tpv3_open : offset must be less than 256 bytes")=
-;
-+        error_setg(errp, "offset must be less than 256 bytes");
-         goto outerr;
+-    dev =3D qdev_device_add(opts, &err);
++    dev =3D qdev_device_add(opts, errp);
+     if (!dev) {
+-        error_report_err(err);
+         return -1;
      }
+     object_unref(OBJECT(dev));
+@@ -4491,10 +4489,8 @@ int main(int argc, char **argv, char **envp)
 =20
-@@ -563,6 +563,8 @@ int net_init_l2tpv3(const Netdev *netdev,
-         if (l2tpv3->has_rxcookie && l2tpv3->has_txcookie) {
-             s->cookie =3D true;
-         } else {
-+            error_setg(errp,
-+                       "require both 'rxcookie' and 'txcookie' or neithe=
-r");
-             goto outerr;
-         }
-     } else {
-@@ -578,7 +580,7 @@ int net_init_l2tpv3(const Netdev *netdev,
-     if (l2tpv3->has_udp && l2tpv3->udp) {
-         s->udp =3D true;
-         if (!(l2tpv3->has_srcport && l2tpv3->has_dstport)) {
--            error_report("l2tpv3_open : need both src and dst port for u=
-dp");
-+            error_setg(errp, "need both src and dst port for udp");
-             goto outerr;
-         } else {
-             srcport =3D l2tpv3->srcport;
-@@ -639,20 +641,19 @@ int net_init_l2tpv3(const Netdev *netdev,
-     gairet =3D getaddrinfo(l2tpv3->src, srcport, &hints, &result);
+     /* init generic devices */
+     rom_set_order_override(FW_CFG_ORDER_OVERRIDE_DEVICE);
+-    if (qemu_opts_foreach(qemu_find_opts("device"),
+-                          device_init_func, NULL, NULL)) {
+-        exit(1);
+-    }
++    qemu_opts_foreach(qemu_find_opts("device"),
++                      device_init_func, NULL, &error_fatal);
 =20
-     if ((gairet !=3D 0) || (result =3D=3D NULL)) {
--        error_report(
--            "l2tpv3_open : could not resolve src, errno =3D %s",
--            gai_strerror(gairet)
--        );
-+        error_setg(errp, "could not resolve src, errno =3D %s",
-+                   gai_strerror(gairet));
-         goto outerr;
-     }
-     fd =3D socket(result->ai_family, result->ai_socktype, result->ai_pro=
-tocol);
-     if (fd =3D=3D -1) {
-         fd =3D -errno;
--        error_report("l2tpv3_open : socket creation failed, errno =3D %d=
-", -fd);
-+        error_setg(errp, "socket creation failed, errno =3D %d",
-+                   -fd);
-         goto outerr;
-     }
-     if (bind(fd, (struct sockaddr *) result->ai_addr, result->ai_addrlen=
-)) {
--        error_report("l2tpv3_open :  could not bind socket err=3D%i", er=
-rno);
-+        error_setg(errp, "could not bind socket err=3D%i", errno);
-         goto outerr;
-     }
-     if (result) {
-@@ -677,10 +678,8 @@ int net_init_l2tpv3(const Netdev *netdev,
-     result =3D NULL;
-     gairet =3D getaddrinfo(l2tpv3->dst, dstport, &hints, &result);
-     if ((gairet !=3D 0) || (result =3D=3D NULL)) {
--        error_report(
--            "l2tpv3_open : could not resolve dst, error =3D %s",
--            gai_strerror(gairet)
--        );
-+        error_setg(errp, "could not resolve dst, error =3D %s",
-+                   gai_strerror(gairet));
-         goto outerr;
-     }
+     cpu_synchronize_all_post_init();
 =20
 --=20
 2.17.1
