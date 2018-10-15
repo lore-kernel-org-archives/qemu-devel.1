@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49961)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52285)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amit@kernel.org>) id 1gC7xk-0002Co-8M
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 14:51:33 -0400
+	(envelope-from <crosa@redhat.com>) id 1gC85e-0003xC-1Y
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 14:59:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amit@kernel.org>) id 1gC7xe-0006Qn-Ai
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 14:51:32 -0400
-Date: Mon, 15 Oct 2018 20:51:15 +0200
-From: Amit Shah <amit@kernel.org>
-Message-ID: <20181015185115.GA3247@grmbl.mre>
-References: <CAEK8JBDPNqTap-LnoBxUZh4Bj9b+VgrsPm53QAivfOsLG7wuGw@mail.gmail.com>
-	<20181001114146.GA2508@work-vm>
-	<CAEK8JBBDPxTe0k8Nf=7PQ6gjYv4xyqQu=bef5VXmgaLVGw3JUg@mail.gmail.com>
-	<CAEK8JBC-HKGb43UynWx69Lj-y48Em038eNMpOb7G72XfLF_mDg@mail.gmail.com>
+	(envelope-from <crosa@redhat.com>) id 1gC85d-0002MK-7M
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 14:59:41 -0400
+References: <20181015141453.32632-1-mreitz@redhat.com>
+	<20181015141453.32632-9-mreitz@redhat.com>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <a797c85a-97c8-37c8-2a39-7ce33478a425@redhat.com>
+Date: Mon, 15 Oct 2018 14:59:28 -0400
 MIME-Version: 1.0
+In-Reply-To: <20181015141453.32632-9-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAEK8JBC-HKGb43UynWx69Lj-y48Em038eNMpOb7G72XfLF_mDg@mail.gmail.com>
-Subject: Re: [Qemu-devel] virtio-console downgrade the virtio-pci-blk
- performance
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 8/9] iotests: Modify imports for Python 3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,121 +24,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Feng Li <lifeng1519@gmail.com>
-Cc: dgilbert@redhat.com, amit@kernel.org, virtualization@lists.linux-foundation.org, linux-kernel <linux-kernel@vger.kernel.org>, qemu-discuss@nongnu.org, qemu-devel@nongnu.org, "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-On (Thu) 11 Oct 2018 [18:15:41], Feng Li wrote:
-> Add Amit Shah.
-> 
-> After some tests, we found:
-> - the virtio serial port number is inversely proportional to the iSCSI
-> virtio-blk-pci performance.
-> If we set the virio-serial ports to 2("<controller
-> type='virtio-serial' index='0' ports='2'/>), the performance downgrade
-> is minimal.
 
-If you use multiple virtio-net (or blk) devices -- just register, not
-necessarily use -- does that also bring the performance down?  I
-suspect it's the number of interrupts that get allocated for the
-ports.  Also, could you check if MSI is enabled?  Can you try with and
-without?  Can you also reproduce if you have multiple virtio-serial
-controllers with 2 ports each (totalling up to whatever number that
-reproduces the issue).
 
-		Amit
+On 10/15/18 10:14 AM, Max Reitz wrote:
+> There are two imports that need to be modified when running the iotests
+> under Python 3: One is StringIO, which no longer exists; instead, the
+> StringIO class comes from the io module, so import it from there.  The
+> other is the ConfigParser, which has just been renamed to configparser.
+> 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  tests/qemu-iotests/iotests.py            | 8 ++++++--
+>  tests/qemu-iotests/nbd-fault-injector.py | 7 +++++--
+>  2 files changed, 11 insertions(+), 4 deletions(-)
+> 
+> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+> index 7ca94e9278..a64ea90fb4 100644
+> --- a/tests/qemu-iotests/iotests.py
+> +++ b/tests/qemu-iotests/iotests.py
+> @@ -683,13 +683,17 @@ def main(supported_fmts=[], supported_oses=['linux'], supported_cache_modes=[],
+>  
+>      # We need to filter out the time taken from the output so that qemu-iotest
+>      # can reliably diff the results against master output.
+> -    import StringIO
+> +    if sys.version_info.major >= 3:
+> +        from io import StringIO
+> +    else:
+> +        from StringIO import StringIO
+> +
+>      if debug:
+>          output = sys.stdout
+>          verbosity = 2
+>          sys.argv.remove('-d')
+>      else:
+> -        output = StringIO.StringIO()
+> +        output = StringIO()
+>  
+>      logging.basicConfig(level=(logging.DEBUG if debug else logging.WARN))
+>  
+> diff --git a/tests/qemu-iotests/nbd-fault-injector.py b/tests/qemu-iotests/nbd-fault-injector.py
+> index d45e2e0a6a..6b2d659dee 100755
+> --- a/tests/qemu-iotests/nbd-fault-injector.py
+> +++ b/tests/qemu-iotests/nbd-fault-injector.py
+> @@ -48,7 +48,10 @@ import sys
+>  import socket
+>  import struct
+>  import collections
+> -import ConfigParser
+> +if sys.version_info.major >= 3:
+> +    import configparser
+> +else:
+> +    import ConfigParser as configparser
+>  
+>  FAKE_DISK_SIZE = 8 * 1024 * 1024 * 1024 # 8 GB
+>  
+> @@ -225,7 +228,7 @@ def parse_config(config):
+>      return rules
+>  
+>  def load_rules(filename):
+> -    config = ConfigParser.RawConfigParser()
+> +    config = configparser.RawConfigParser()
+>      with open(filename, 'rt') as f:
+>          config.readfp(f, filename)
+>      return parse_config(config)
+> 
 
-> 
-> - use local disk/ram disk as virtio-blk-pci disk, the performance
-> downgrade is still obvious.
-> 
-> 
-> Could anyone give some help about this issue?
-> 
-> Feng Li <lifeng1519@gmail.com> 于2018年10月1日周一 下午10:58写道：
-> >
-> > Hi Dave,
-> > My comments are in-line.
-> >
-> > Dr. David Alan Gilbert <dgilbert@redhat.com> 于2018年10月1日周一 下午7:41写道：
-> > >
-> > > * Feng Li (lifeng1519@gmail.com) wrote:
-> > > > Hi,
-> > > > I found an obvious performance downgrade when virtio-console combined
-> > > > with virtio-pci-blk.
-> > > >
-> > > > This phenomenon exists in nearly all Qemu versions and all Linux
-> > > > (CentOS7, Fedora 28, Ubuntu 18.04) distros.
-> > > >
-> > > > This is a disk cmd:
-> > > > -drive file=iscsi://127.0.0.1:3260/iqn.2016-02.com.test:system:fl-iscsi/1,format=raw,if=none,id=drive-virtio-disk0,cache=none,aio=native
-> > > > -device virtio-blk-pci,scsi=off,bus=pci.0,addr=0x6,drive=drive-virtio-disk0,id=virtio-disk0,bootindex=1,write-cache=on
-> > > >
-> > > > If I add "-device
-> > > > virtio-serial-pci,id=virtio-serial0,bus=pci.0,addr=0x5  ", the virtio
-> > > > disk 4k iops (randread/randwrite) would downgrade from 60k to 40k.
-> > > >
-> > > > In VM, if I rmmod virtio-console, the performance will back to normal.
-> > > >
-> > > > Any idea about this issue?
-> > > >
-> > > > I don't know this is a qemu issue or kernel issue.
-> > >
-> > > It sounds odd;  can you provide more details on:
-> > >   a) The benchmark you're using.
-> > I'm using fio, the config is:
-> > [global]
-> > ioengine=libaio
-> > iodepth=128
-> > runtime=120
-> > time_based
-> > direct=1
-> >
-> > [randread]
-> > stonewall
-> > bs=4k
-> > filename=/dev/vdb
-> > rw=randread
-> >
-> > >   b) the host and the guest config (number of cpus etc)
-> > The qemu cmd is : /usr/libexec/qemu-kvm --device virtio-balloon -m 16G
-> > --enable-kvm -cpu host -smp 8
-> > or qemu-system-x86_64 --device virtio-balloon -m 16G --enable-kvm -cpu
-> > host -smp 8
-> >
-> > The result is the same.
-> >
-> > >   c) Why are you running it with iscsi back to the same host - why not
-> > >      just simplify the test back to a simple file?
-> > >
-> >
-> > Because my ISCSI target could supply a high IOPS performance.
-> > If using a slow disk, the performance downgrade would be not so obvious.
-> > It's easy to be seen, you could try it.
-> >
-> >
-> > > Dave
-> > >
-> > > >
-> > > > Thanks in advance.
-> > > > --
-> > > > Thanks and Best Regards,
-> > > > Alex
-> > > >
-> > > --
-> > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> >
-> >
-> >
-> > --
-> > Thanks and Best Regards,
-> > Feng Li(Alex)
-> 
-> 
-> 
-> --
-> Thanks and Best Regards,
-> Feng Li(Alex)
+This may be a type of culture clash (on my side, due to not enough QEMU
+culture), but shouldn't this be applied before anything else on this series?
 
-		Amit
--- 
-http://amitshah.net/
+I mean, PATCH 1/9 is supposed to fix the reliability aspects of
+nbd-fault-injector under Python 3, but without this patch, it won't
+actually run on Python 3.
+
+Regards,
+- Cleber.
