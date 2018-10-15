@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gByWt-000476-Kf
+	(envelope-from <jasowang@redhat.com>) id 1gByWt-000477-Kj
 	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 04:47:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gByWr-000403-Qt
+	(envelope-from <jasowang@redhat.com>) id 1gByWq-0003yc-0I
 	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 04:47:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44664)
+Received: from mx1.redhat.com ([209.132.183.28]:53084)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gByWq-0003pi-KA
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 04:47:09 -0400
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gByWn-0003Yw-PP
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 04:47:07 -0400
 From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 15 Oct 2018 16:46:09 +0800
-Message-Id: <1539593186-32183-10-git-send-email-jasowang@redhat.com>
+Date: Mon, 15 Oct 2018 16:46:02 +0800
+Message-Id: <1539593186-32183-3-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1539593186-32183-1-git-send-email-jasowang@redhat.com>
 References: <1539593186-32183-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL 09/26] COLO: Flush memory data from ram cache
+Subject: [Qemu-devel] [PULL 02/26] colo-compare: implement the process of
+ checkpoint
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,98 +25,229 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, qemu-devel@nongnu.org
-Cc: Zhang Chen <zhangckid@gmail.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Jason Wang <jasowang@redhat.com>
+Cc: Zhang Chen <zhangckid@gmail.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Zhang Chen <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>
 
 From: Zhang Chen <zhangckid@gmail.com>
 
-During the time of VM's running, PVM may dirty some pages, we will transfer
-PVM's dirty pages to SVM and store them into SVM's RAM cache at next checkpoint
-time. So, the content of SVM's RAM cache will always be same with PVM's memory
-after checkpoint.
-
-Instead of flushing all content of PVM's RAM cache into SVM's MEMORY,
-we do this in a more efficient way:
-Only flush any page that dirtied by PVM since last checkpoint.
-In this way, we can ensure SVM's memory same with PVM's.
-
-Besides, we must ensure flush RAM cache before load device state.
+While do checkpoint, we need to flush all the unhandled packets,
+By using the filter notifier mechanism, we can easily to notify
+every compare object to do this process, which runs inside
+of compare threads as a coroutine.
 
 Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Zhang Chen <zhangckid@gmail.com>
+Signed-off-by: Zhang Chen <chen.zhang@intel.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- migration/ram.c        | 37 +++++++++++++++++++++++++++++++++++++
- migration/trace-events |  2 ++
- 2 files changed, 39 insertions(+)
+ include/migration/colo.h |  6 ++++
+ net/colo-compare.c       | 78 ++++++++++++++++++++++++++++++++++++++++++++++++
+ net/colo-compare.h       | 22 ++++++++++++++
+ 3 files changed, 106 insertions(+)
+ create mode 100644 net/colo-compare.h
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 404c8f0..477853d 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -3974,6 +3974,39 @@ static bool postcopy_is_running(void)
-     return ps >= POSTCOPY_INCOMING_LISTENING && ps < POSTCOPY_INCOMING_END;
+diff --git a/include/migration/colo.h b/include/migration/colo.h
+index 2fe48ad..fefb2fc 100644
+--- a/include/migration/colo.h
++++ b/include/migration/colo.h
+@@ -16,6 +16,12 @@
+ #include "qemu-common.h"
+ #include "qapi/qapi-types-migration.h"
+ 
++enum colo_event {
++    COLO_EVENT_NONE,
++    COLO_EVENT_CHECKPOINT,
++    COLO_EVENT_FAILOVER,
++};
++
+ void colo_info_init(void);
+ 
+ void migrate_start_colo_process(MigrationState *s);
+diff --git a/net/colo-compare.c b/net/colo-compare.c
+index dd745a4..80e6532 100644
+--- a/net/colo-compare.c
++++ b/net/colo-compare.c
+@@ -27,11 +27,16 @@
+ #include "qemu/sockets.h"
+ #include "colo.h"
+ #include "sysemu/iothread.h"
++#include "net/colo-compare.h"
++#include "migration/colo.h"
+ 
+ #define TYPE_COLO_COMPARE "colo-compare"
+ #define COLO_COMPARE(obj) \
+     OBJECT_CHECK(CompareState, (obj), TYPE_COLO_COMPARE)
+ 
++static QTAILQ_HEAD(, CompareState) net_compares =
++       QTAILQ_HEAD_INITIALIZER(net_compares);
++
+ #define COMPARE_READ_LEN_MAX NET_BUFSIZE
+ #define MAX_QUEUE_SIZE 1024
+ 
+@@ -41,6 +46,10 @@
+ /* TODO: Should be configurable */
+ #define REGULAR_PACKET_CHECK_MS 3000
+ 
++static QemuMutex event_mtx;
++static QemuCond event_complete_cond;
++static int event_unhandled_count;
++
+ /*
+  *  + CompareState ++
+  *  |               |
+@@ -87,6 +96,11 @@ typedef struct CompareState {
+     IOThread *iothread;
+     GMainContext *worker_context;
+     QEMUTimer *packet_check_timer;
++
++    QEMUBH *event_bh;
++    enum colo_event event;
++
++    QTAILQ_ENTRY(CompareState) next;
+ } CompareState;
+ 
+ typedef struct CompareClass {
+@@ -736,6 +750,25 @@ static void check_old_packet_regular(void *opaque)
+                 REGULAR_PACKET_CHECK_MS);
  }
  
-+/*
-+ * Flush content of RAM cache into SVM's memory.
-+ * Only flush the pages that be dirtied by PVM or SVM or both.
-+ */
-+static void colo_flush_ram_cache(void)
++/* Public API, Used for COLO frame to notify compare event */
++void colo_notify_compares_event(void *opaque, int event, Error **errp)
 +{
-+    RAMBlock *block = NULL;
-+    void *dst_host;
-+    void *src_host;
-+    unsigned long offset = 0;
++    CompareState *s;
 +
-+    trace_colo_flush_ram_cache_begin(ram_state->migration_dirty_pages);
-+    rcu_read_lock();
-+    block = QLIST_FIRST_RCU(&ram_list.blocks);
++    qemu_mutex_lock(&event_mtx);
++    QTAILQ_FOREACH(s, &net_compares, next) {
++        s->event = event;
++        qemu_bh_schedule(s->event_bh);
++        event_unhandled_count++;
++    }
++    /* Wait all compare threads to finish handling this event */
++    while (event_unhandled_count > 0) {
++        qemu_cond_wait(&event_complete_cond, &event_mtx);
++    }
 +
-+    while (block) {
-+        offset = migration_bitmap_find_dirty(ram_state, block, offset);
++    qemu_mutex_unlock(&event_mtx);
++}
 +
-+        if (offset << TARGET_PAGE_BITS >= block->used_length) {
-+            offset = 0;
-+            block = QLIST_NEXT_RCU(block, next);
-+        } else {
-+            migration_bitmap_clear_dirty(ram_state, block, offset);
-+            dst_host = block->host + (offset << TARGET_PAGE_BITS);
-+            src_host = block->colo_cache + (offset << TARGET_PAGE_BITS);
-+            memcpy(dst_host, src_host, TARGET_PAGE_SIZE);
+ static void colo_compare_timer_init(CompareState *s)
+ {
+     AioContext *ctx = iothread_get_aio_context(s->iothread);
+@@ -756,6 +789,30 @@ static void colo_compare_timer_del(CompareState *s)
+     }
+  }
+ 
++static void colo_flush_packets(void *opaque, void *user_data);
++
++static void colo_compare_handle_event(void *opaque)
++{
++    CompareState *s = opaque;
++
++    switch (s->event) {
++    case COLO_EVENT_CHECKPOINT:
++        g_queue_foreach(&s->conn_list, colo_flush_packets, s);
++        break;
++    case COLO_EVENT_FAILOVER:
++        break;
++    default:
++        break;
++    }
++
++    assert(event_unhandled_count > 0);
++
++    qemu_mutex_lock(&event_mtx);
++    event_unhandled_count--;
++    qemu_cond_broadcast(&event_complete_cond);
++    qemu_mutex_unlock(&event_mtx);
++}
++
+ static void colo_compare_iothread(CompareState *s)
+ {
+     object_ref(OBJECT(s->iothread));
+@@ -769,6 +826,7 @@ static void colo_compare_iothread(CompareState *s)
+                              s, s->worker_context, true);
+ 
+     colo_compare_timer_init(s);
++    s->event_bh = qemu_bh_new(colo_compare_handle_event, s);
+ }
+ 
+ static char *compare_get_pri_indev(Object *obj, Error **errp)
+@@ -926,8 +984,13 @@ static void colo_compare_complete(UserCreatable *uc, Error **errp)
+     net_socket_rs_init(&s->pri_rs, compare_pri_rs_finalize, s->vnet_hdr);
+     net_socket_rs_init(&s->sec_rs, compare_sec_rs_finalize, s->vnet_hdr);
+ 
++    QTAILQ_INSERT_TAIL(&net_compares, s, next);
++
+     g_queue_init(&s->conn_list);
+ 
++    qemu_mutex_init(&event_mtx);
++    qemu_cond_init(&event_complete_cond);
++
+     s->connection_track_table = g_hash_table_new_full(connection_key_hash,
+                                                       connection_key_equal,
+                                                       g_free,
+@@ -990,6 +1053,7 @@ static void colo_compare_init(Object *obj)
+ static void colo_compare_finalize(Object *obj)
+ {
+     CompareState *s = COLO_COMPARE(obj);
++    CompareState *tmp = NULL;
+ 
+     qemu_chr_fe_deinit(&s->chr_pri_in, false);
+     qemu_chr_fe_deinit(&s->chr_sec_in, false);
+@@ -997,6 +1061,16 @@ static void colo_compare_finalize(Object *obj)
+     if (s->iothread) {
+         colo_compare_timer_del(s);
+     }
++
++    qemu_bh_delete(s->event_bh);
++
++    QTAILQ_FOREACH(tmp, &net_compares, next) {
++        if (tmp == s) {
++            QTAILQ_REMOVE(&net_compares, s, next);
++            break;
 +        }
 +    }
 +
-+    rcu_read_unlock();
-+    trace_colo_flush_ram_cache_end();
-+}
-+
- static int ram_load(QEMUFile *f, void *opaque, int version_id)
- {
-     int flags = 0, ret = 0, invalid_flags = 0;
-@@ -4150,6 +4183,10 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-     ret |= wait_for_decompress_done();
-     rcu_read_unlock();
-     trace_ram_load_complete(ret, seq_iter);
-+
-+    if (!ret  && migration_incoming_in_colo_state()) {
-+        colo_flush_ram_cache();
-+    }
-     return ret;
- }
+     /* Release all unhandled packets after compare thead exited */
+     g_queue_foreach(&s->conn_list, colo_flush_packets, s);
  
-diff --git a/migration/trace-events b/migration/trace-events
-index fa0ff3f..bd2d0cd 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -102,6 +102,8 @@ ram_dirty_bitmap_sync_start(void) ""
- ram_dirty_bitmap_sync_wait(void) ""
- ram_dirty_bitmap_sync_complete(void) ""
- ram_state_resume_prepare(uint64_t v) "%" PRId64
-+colo_flush_ram_cache_begin(uint64_t dirty_pages) "dirty_pages %" PRIu64
-+colo_flush_ram_cache_end(void) ""
- 
- # migration/migration.c
- await_return_path_close_on_source_close(void) ""
+@@ -1009,6 +1083,10 @@ static void colo_compare_finalize(Object *obj)
+     if (s->iothread) {
+         object_unref(OBJECT(s->iothread));
+     }
++
++    qemu_mutex_destroy(&event_mtx);
++    qemu_cond_destroy(&event_complete_cond);
++
+     g_free(s->pri_indev);
+     g_free(s->sec_indev);
+     g_free(s->outdev);
+diff --git a/net/colo-compare.h b/net/colo-compare.h
+new file mode 100644
+index 0000000..1b1ce76
+--- /dev/null
++++ b/net/colo-compare.h
+@@ -0,0 +1,22 @@
++/*
++ * COarse-grain LOck-stepping Virtual Machines for Non-stop Service (COLO)
++ * (a.k.a. Fault Tolerance or Continuous Replication)
++ *
++ * Copyright (c) 2017 HUAWEI TECHNOLOGIES CO., LTD.
++ * Copyright (c) 2017 FUJITSU LIMITED
++ * Copyright (c) 2017 Intel Corporation
++ *
++ * Authors:
++ *    zhanghailiang <zhang.zhanghailiang@huawei.com>
++ *    Zhang Chen <zhangckid@gmail.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or
++ * later.  See the COPYING file in the top-level directory.
++ */
++
++#ifndef QEMU_COLO_COMPARE_H
++#define QEMU_COLO_COMPARE_H
++
++void colo_notify_compares_event(void *opaque, int event, Error **errp);
++
++#endif /* QEMU_COLO_COMPARE_H */
 -- 
 2.5.0
