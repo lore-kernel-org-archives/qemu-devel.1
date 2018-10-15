@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52017)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <robert.hu@linux.intel.com>) id 1gBun5-0008Uq-S8
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 00:47:41 -0400
+	(envelope-from <tao3.xu@intel.com>) id 1gBvXe-00080H-OX
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 01:35:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <robert.hu@linux.intel.com>) id 1gBun0-000187-Qm
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 00:47:39 -0400
-Received: from mga14.intel.com ([192.55.52.115]:20054)
+	(envelope-from <tao3.xu@intel.com>) id 1gBvXc-0006tx-1a
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 01:35:46 -0400
+Received: from mga12.intel.com ([192.55.52.136]:7065)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <robert.hu@linux.intel.com>)
-	id 1gBumy-00015b-Sa
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 00:47:33 -0400
-From: Robert Hoo <robert.hu@linux.intel.com>
-Date: Mon, 15 Oct 2018 12:47:23 +0800
-Message-Id: <1539578845-37944-2-git-send-email-robert.hu@linux.intel.com>
-In-Reply-To: <1539578845-37944-1-git-send-email-robert.hu@linux.intel.com>
-References: <1539578845-37944-1-git-send-email-robert.hu@linux.intel.com>
-Subject: [Qemu-devel] [PATCH v5 1/3] kvm: Add support to
- KVM_GET_MSR_FEATURE_INDEX_LIST and KVM_GET_MSRS system ioctl
+	(Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1gBvXb-0006rJ-M4
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 01:35:43 -0400
+References: <20180919031122.28487-1-tao3.xu@intel.com>
+	<20180919031122.28487-2-tao3.xu@intel.com>
+	<20181013043835.GG31060@habkost.net>
+From: Tao Xu <tao3.xu@intel.com>
+Message-ID: <a7571e89-e177-b971-b91c-fb0461a2c086@intel.com>
+Date: Mon, 15 Oct 2018 13:34:39 +0800
+MIME-Version: 1.0
+In-Reply-To: <20181013043835.GG31060@habkost.net>
+Content-Language: en-US
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/1] i386: Add new model of
+ Cascadelake-Server
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,142 +30,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, thomas.lendacky@amd.com
-Cc: qemu-devel@nongnu.org, robert.hu@intel.com, Robert Hoo <robert.hu@linux.intel.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: pbonzini@redhat.com, rth@twiddle.net, jingqi.liu@intel.com, qemu-devel@nongnu.org
 
-Add kvm_get_supported_feature_msrs() to get supported MSR feature index list.
-Add kvm_arch_get_supported_msr_feature() to get each MSR features value.
+Hi Eduardo,
 
-Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
----
- include/sysemu/kvm.h |  2 ++
- target/i386/kvm.c    | 80 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 82 insertions(+)
+Thank you for your comment.
 
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index 0b64b8e..97d8d9d 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -463,6 +463,8 @@ int kvm_vm_check_extension(KVMState *s, unsigned int extension);
- 
- uint32_t kvm_arch_get_supported_cpuid(KVMState *env, uint32_t function,
-                                       uint32_t index, int reg);
-+uint32_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index);
-+
- 
- void kvm_set_sigmask_len(KVMState *s, unsigned int sigmask_len);
- 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index dc4047b..db79dad 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -107,6 +107,7 @@ static int has_pit_state2;
- static bool has_msr_mcg_ext_ctl;
- 
- static struct kvm_cpuid2 *cpuid_cache;
-+static struct kvm_msr_list *kvm_feature_msrs;
- 
- int kvm_has_pit_state2(void)
- {
-@@ -420,6 +421,42 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
-     return ret;
- }
- 
-+uint32_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index)
-+{
-+    struct {
-+        struct kvm_msrs info;
-+        struct kvm_msr_entry entries[1];
-+    } msr_data;
-+    uint32_t ret;
-+
-+    if (kvm_feature_msrs == NULL) { /* Host doesn't support feature MSRs */
-+        return 0;
-+    }
-+
-+    /* Check if requested MSR is supported feature MSR */
-+    int i;
-+    for (i = 0; i < kvm_feature_msrs->nmsrs; i++)
-+        if (kvm_feature_msrs->indices[i] == index) {
-+            break;
-+        }
-+    if (i == kvm_feature_msrs->nmsrs) {
-+        return 0; /* if the feature MSR is not supported, simply return 0 */
-+    }
-+
-+    msr_data.info.nmsrs = 1;
-+    msr_data.entries[0].index = index;
-+
-+    ret = kvm_ioctl(s, KVM_GET_MSRS, &msr_data);
-+    if (ret != 1) {
-+        error_report("KVM get MSR (index=0x%x) feature failed, %s",
-+            index, strerror(-ret));
-+        exit(1);
-+    }
-+
-+    return msr_data.entries[0].data;
-+}
-+
-+
- typedef struct HWPoisonPage {
-     ram_addr_t ram_addr;
-     QLIST_ENTRY(HWPoisonPage) list;
-@@ -1239,6 +1276,47 @@ void kvm_arch_do_init_vcpu(X86CPU *cpu)
-     }
- }
- 
-+static int kvm_get_supported_feature_msrs(KVMState *s)
-+{
-+    int ret = 0;
-+
-+    if (kvm_feature_msrs != NULL) {
-+        return 0;
-+    }
-+
-+    if (!kvm_check_extension(s, KVM_CAP_GET_MSR_FEATURES)) {
-+        return 0;
-+    }
-+
-+    struct kvm_msr_list msr_list;
-+
-+    msr_list.nmsrs = 0;
-+    ret = kvm_ioctl(s, KVM_GET_MSR_FEATURE_INDEX_LIST, &msr_list);
-+    if (ret < 0 && ret != -E2BIG) {
-+        error_report("Fetch KVM feature MSR list failed: %s",
-+            strerror(-ret));
-+        return ret;
-+    }
-+
-+    assert(msr_list.nmsrs > 0);
-+    kvm_feature_msrs = (struct kvm_msr_list *) \
-+        g_malloc0(sizeof(msr_list) +
-+                 msr_list.nmsrs * sizeof(msr_list.indices[0]));
-+
-+    kvm_feature_msrs->nmsrs = msr_list.nmsrs;
-+    ret = kvm_ioctl(s, KVM_GET_MSR_FEATURE_INDEX_LIST, kvm_feature_msrs);
-+
-+    if (ret < 0) {
-+        error_report("Fetch KVM feature MSR list failed: %s",
-+            strerror(-ret));
-+        g_free(kvm_feature_msrs);
-+        kvm_feature_msrs = NULL;
-+        return ret;
-+    }
-+
-+    return 0;
-+}
-+
- static int kvm_get_supported_msrs(KVMState *s)
- {
-     static int kvm_supported_msrs;
-@@ -1392,6 +1470,8 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-         return ret;
-     }
- 
-+    kvm_get_supported_feature_msrs(s);
-+
-     uname(&utsname);
-     lm_capable_kernel = strcmp(utsname.machine, "x86_64") == 0;
- 
--- 
-1.8.3.1
+On the release document ref below link (page 13):
+https://software.intel.com/sites/default/files/managed/c5/15/\ 
+<https://software.intel.com/sites/default/files/managed/c5/15//>
+architecture-instruction-set-extensions-programming-reference.pdf
+
+PKU is supported in Skylake Server (Only Server) and later, and
+on Intel(R) Xeon(R) Processor Scalable Family. So it is supposed
+to be in Skylake-Server CPU model. And PKU/OSPKE 's CPUID has been
+exposed to QEMU. But in Skylake-Server CPU model I can't find
+PKU/OSPKE in the code. So we will submit another patch for
+Skylake-Server CPU model after we test it. OSPKE is to reads
+the value of PKRU (Instruction of PKU) into EAX and clears EDX.
+
+Cascadelake-Server is the later Server CPU on the same CPU family,
+so it inherit features from ancestor Skylake-Server and add new
+features.
+
+
+On 10/13/2018 12:38 PM, Eduardo Habkost wrote:
+> On Wed, Sep 19, 2018 at 11:11:22AM +0800, Tao Xu wrote:
+>> New CPU models mostly inherit features from ancestor Skylake-Server,
+>> while addin new features: AVX512_VNNI, Intel PT.
+>> SSBD support for speculative execution
+>> side channel mitigations.
+> Comparing to Skylake-Server, the following features are being
+> added:
+>
+> CPUID_7_0_EBX_INTEL_PT, CPUID_7_0_ECX_PKU, CPUID_7_0_ECX_OSPKE,
+> CPUID_7_0_ECX_AVX512VNNI, CPUID_7_0_EDX_SPEC_CTRL,
+> CPUID_7_0_EDX_SPEC_CTRL_SSBD.
+>
+>  From that list, only PKU/OSPKE is not mentioned in the commit
+> message.  Is this intentional?
+>
+> Is family/model really supposed to be the same as the one on
+> Skylake-Server?
+>
+>> Note:
+>>
+>> On Cascadelake, some capabilities (RDCL_NO, IBRS_ALL, RSBA,
+>> SKIP_L1DFL_VMENTRY and SSB_NO) are enumerated by MSR.
+>> These features rely on MSR based feature support patch.
+>> Will be added later after that patch's in.
+>> http://lists.nongnu.org/archive/html/qemu-devel/2018-09/msg00074.html
+>>
+>> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+>> ---
+>>   target/i386/cpu.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++
+>>   1 file changed, 54 insertions(+)
+>>
+>> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+>> index f24295e6e4..670898f32d 100644
+>> --- a/target/i386/cpu.c
+>> +++ b/target/i386/cpu.c
+>> @@ -2386,6 +2386,60 @@ static X86CPUDefinition builtin_x86_defs[] = {
+>>           .xlevel = 0x80000008,
+>>           .model_id = "Intel Xeon Processor (Skylake, IBRS)",
+>>       },
+>> +    {
+>> +        .name = "Cascadelake-Server",
+>> +        .level = 0xd,
+>> +        .vendor = CPUID_VENDOR_INTEL,
+>> +        .family = 6,
+>> +        .model = 85,
+>> +        .stepping = 5,
+>> +        .features[FEAT_1_EDX] =
+>> +            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX |
+>> +            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA |
+>> +            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
+>> +            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
+>> +            CPUID_DE | CPUID_FP87,
+>> +        .features[FEAT_1_ECX] =
+>> +            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
+>> +            CPUID_EXT_POPCNT | CPUID_EXT_X2APIC | CPUID_EXT_SSE42 |
+>> +            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
+>> +            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
+>> +            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA | CPUID_EXT_MOVBE |
+>> +            CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
+>> +        .features[FEAT_8000_0001_EDX] =
+>> +            CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
+>> +            CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
+>> +        .features[FEAT_8000_0001_ECX] =
+>> +            CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFETCH,
+>> +        .features[FEAT_7_0_EBX] =
+>> +            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
+>> +            CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP |
+>> +            CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID |
+>> +            CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
+>> +            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_MPX | CPUID_7_0_EBX_CLWB |
+>> +            CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
+>> +            CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
+>> +            CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT |
+>> +            CPUID_7_0_EBX_INTEL_PT,
+>> +        .features[FEAT_7_0_ECX] =
+>> +            CPUID_7_0_ECX_PKU | CPUID_7_0_ECX_OSPKE |
+>> +            CPUID_7_0_ECX_AVX512VNNI,
+>> +        .features[FEAT_7_0_EDX] =
+>> +            CPUID_7_0_EDX_SPEC_CTRL | CPUID_7_0_EDX_SPEC_CTRL_SSBD,
+>> +        /* Missing: XSAVES (not supported by some Linux versions,
+>> +                * including v4.1 to v4.12).
+>> +                * KVM doesn't yet expose any XSAVES state save component,
+>> +                * and the only one defined in Skylake (processor tracing)
+>> +                * probably will block migration anyway.
+>> +                */
+>> +        .features[FEAT_XSAVE] =
+>> +            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
+>> +            CPUID_XSAVE_XGETBV1,
+>> +        .features[FEAT_6_EAX] =
+>> +            CPUID_6_EAX_ARAT,
+>> +        .xlevel = 0x80000008,
+>> +        .model_id = "Intel Xeon Processor (Cascadelake)",
+>> +    },
+>>       {
+>>           .name = "Icelake-Client",
+>>           .level = 0xd,
+>> -- 
+>> 2.17.1
+>>
+>>
