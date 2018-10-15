@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58598)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gCCMI-00006a-1i
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 19:33:11 -0400
+	(envelope-from <crosa@redhat.com>) id 1gCCSa-0001kW-Vi
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 19:39:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gCCMC-0002Gj-3E
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 19:33:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47140)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gCCM8-0002Am-AN
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 19:33:02 -0400
-Date: Mon, 15 Oct 2018 20:32:42 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181015233242.GB18270@habkost.net>
-References: <20181013025435.25785-1-ehabkost@redhat.com>
-	<20181015114556.152d89cd.cohuck@redhat.com>
+	(envelope-from <crosa@redhat.com>) id 1gCCSY-0007l7-JH
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 19:39:40 -0400
+References: <20181015141453.32632-1-mreitz@redhat.com>
+	<20181015141453.32632-8-mreitz@redhat.com>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <14120cdc-1517-f9af-9f35-3c78b4f634a9@redhat.com>
+Date: Mon, 15 Oct 2018 19:38:45 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181015114556.152d89cd.cohuck@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] virtio: Provide version-specific variants
- of virtio PCI devices
+In-Reply-To: <20181015141453.32632-8-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 7/9] iotests: 'new' module replacement in
+ 169
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,109 +25,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Caio Carrara <ccarrara@redhat.com>, Markus Armbruster <armbru@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Gerd Hoffmann <kraxel@redhat.com>, Laine Stump <laine@redhat.com>, Cleber Rosa <crosa@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-On Mon, Oct 15, 2018 at 11:45:56AM +0200, Cornelia Huck wrote:
-> On Fri, 12 Oct 2018 23:54:35 -0300
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
+
+
+On 10/15/18 10:14 AM, Max Reitz wrote:
+> iotest 169 uses the 'new' module to add methods to a class.  This module
+> no longer exists in Python 3.  Instead, we can use a lambda.  Best of
+> all, this works in 2.7 just as well.
 > 
-> > The current virtio-*-pci device types actually represent 3
-> > different types of devices:
-> > * virtio 1.0 non-transitional devices
-> > * virtio 1.0 transitional devices
-> > * virtio 0.9 ("legacy device" in virtio 1.0 terminology)
-> > 
-> > That would be just an annoyance if it didn't break our device/bus
-> > compatibility QMP interfaces.  With this multi-purpose device
-> > type, there's no way to tell management software that
-> > transitional devices and legacy devices require a Conventional
-> > PCI bus.
-> > 
-> > The multi-purpose device types would also prevent us from telling
-> > management software what's the PCI vendor/device ID for them,
-> > because their PCI IDs change at runtime depending on the bus
-> > where they were is plugged.
-> > 
-> > This patch adds separate device types for each of those virtio
-> > device flavors:
-> > 
-> > - virtio-*-pci: the existing multi-purpose device types
-> >   - Configurable using `disable-legacy` and `disable-modern`
-> >     properties
-> >   - Legacy driver support is automatically enabled/disabled
-> >     depending on the bus where it is plugged
-> >   - Supports Conventional PCI and PCI Express buses
-> >     (but Conventional PCI is incompatible with
-> >     disable-legacy=off)
-> >   - Changes PCI vendor/device IDs at runtime
-> > - virtio-*-pci-0.9: legacy virtio device
-> >   - Supports Conventional PCI buses only, because
-> >     it has a PIO BAR
-> > - virtio-*-pci-1.0-transitional: virtio-1.0 device supporting legacy drivers
-> >   - Supports Conventional PCI buses only, because
-> >     it has a PIO BAR
-> > - virtio-*-pci-1.0: modern-only
-> >   - Supports both Conventional PCI and PCI Express buses
-> > 
-> > All the types above will inherit from an abstract
-> > "virtio-*-pci-base" type, so existing code that doesn't care
-> > about the virtio version can use "virtio-*-pci-base" on type
-> > casts.
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  tests/qemu-iotests/169 | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 > 
-> I get a crash when running 'make check'; might be missing a change to
-> virtio-input-host?
+> diff --git a/tests/qemu-iotests/169 b/tests/qemu-iotests/169
+> index f243db9955..e5614b159d 100755
+> --- a/tests/qemu-iotests/169
+> +++ b/tests/qemu-iotests/169
+> @@ -23,7 +23,6 @@ import iotests
+>  import time
+>  import itertools
+>  import operator
+> -import new
+>  from iotests import qemu_img
+>  
+>  
+> @@ -144,7 +143,7 @@ class TestDirtyBitmapMigration(iotests.QMPTestCase):
+>  
+>  def inject_test_case(klass, name, method, *args, **kwargs):
+>      mc = operator.methodcaller(method, *args, **kwargs)
+> -    setattr(klass, 'test_' + name, new.instancemethod(mc, None, klass))
+> +    setattr(klass, 'test_' + name, lambda self: mc(self))
+>  
+>  for cmb in list(itertools.product((True, False), repeat=4)):
+>      name = ('_' if cmb[0] else '_not_') + 'persistent_'
 > 
-> TEST: tests/device-introspect-test... (pid=28626)
->   /s390x/device/introspect/list:                                       OK
->   /s390x/device/introspect/list-fields:                                OK
->   /s390x/device/introspect/none:                                       OK
->   /s390x/device/introspect/abstract:                                   OK
->   /s390x/device/introspect/abstract-interfaces:                        OK
->   /s390x/device/introspect/concrete/defaults/none:                     /home/cohuck/git/qemu/hw/virtio/virtio-pci.c:2730:virtio_host_initfn: Object 0x5633a43a1480 is not an instance of type virtio-input-host-device-base
-> Broken pipe
-> /home/cohuck/git/qemu/tests/libqtest.c:125: kill_qemu() detected QEMU death from signal 6 (Aborted) (core dumped)
 
-Oops.  I will fix it in v2, thanks.
+This can be simplified with:
 
-> 
-[...]
-> > 
-> > A simple test script (tests/acceptance/virtio_version.py) is
-> > included, to check if the new device types are equivalent to
-> > using the `disable-legacy` and `disable-modern` options.
-> > 
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > ---
-> > Reference to previous discussion that originated this idea:
-> >   https://www.mail-archive.com/qemu-devel@nongnu.org/msg558389.html
-> > ---
-> >  hw/virtio/virtio-pci.h             |  93 +++++++++---
-> >  hw/display/virtio-gpu-pci.c        |   8 +-
-> >  hw/display/virtio-vga.c            |  11 +-
-> >  hw/virtio/virtio-crypto-pci.c      |   8 +-
-> >  hw/virtio/virtio-pci.c             | 225 +++++++++++++++++++++--------
-> >  tests/acceptance/virtio_version.py | 138 ++++++++++++++++++
-> >  6 files changed, 390 insertions(+), 93 deletions(-)
-> >  create mode 100644 tests/acceptance/virtio_version.py
-> 
-> The approach makes sense to me, but I second the suggestion to use
-> something like 'modern' (or 'standard'?) instead of '1.0'.
-
-As noted on the reply I sent to Michael: the whole point of this
-patch is to provide unambiguous device type names.  What would be
-the advantage of having another ambiguous device type named
-"virtio-*-modern"?
+diff --git a/tests/qemu-iotests/169 b/tests/qemu-iotests/169
+index e5614b159d..2199f14ae7 100755
+--- a/tests/qemu-iotests/169
++++ b/tests/qemu-iotests/169
+@@ -22,7 +22,6 @@ import os
+ import iotests
+ import time
+ import itertools
+-import operator
+ from iotests import qemu_img
 
 
-> 
-> Also, before someone asks: I don't think we need something like that
-> for virtio-ccw, as we (a) only support fencing newer revisions, not
-> older ones, and (b) the implications of using different virtio
-> revisions are localized to virtio-ccw only and do not have further
-> implications as for virtio-pci.
+@@ -141,18 +140,15 @@ class TestDirtyBitmapMigration(iotests.QMPTestCase):
+             self.check_bitmap(self.vm_b, sha256 if persistent else False)
 
-Thanks!  I was planning to ask about it later.  :)
 
--- 
-Eduardo
+-def inject_test_case(klass, name, method, *args, **kwargs):
+-    mc = operator.methodcaller(method, *args, **kwargs)
+-    setattr(klass, 'test_' + name, lambda self: mc(self))
+-
+ for cmb in list(itertools.product((True, False), repeat=4)):
+     name = ('_' if cmb[0] else '_not_') + 'persistent_'
+     name += ('_' if cmb[1] else '_not_') + 'migbitmap_'
+     name += '_online' if cmb[2] else '_offline'
+     name += '_shared' if cmb[3] else '_nonshared'
+
+-    inject_test_case(TestDirtyBitmapMigration, name, 'do_test_migration',
+-                     *list(cmb))
++    setattr(TestDirtyBitmapMigration, 'test_' + name,
++            lambda self: TestDirtyBitmapMigration.do_test_migration(
++                self, *list(cmb)))
+
+
+ if __name__ == '__main__':
