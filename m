@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39718)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gC1RE-0004IM-QN
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:34 -0400
+	(envelope-from <armbru@redhat.com>) id 1gC1RF-0004JV-VH
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gC1RD-0002Df-2f
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59202)
+	(envelope-from <armbru@redhat.com>) id 1gC1RD-0002Ev-Ps
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36498)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gC1RB-000274-4f
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:30 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gC1RD-00026i-BV
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:31 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 17716300441C
+	for <qemu-devel@nongnu.org>; Mon, 15 Oct 2018 11:53:23 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 15 Oct 2018 13:53:00 +0200
-Message-Id: <20181015115309.17089-27-armbru@redhat.com>
+Date: Mon, 15 Oct 2018 13:52:51 +0200
+Message-Id: <20181015115309.17089-18-armbru@redhat.com>
 In-Reply-To: <20181015115309.17089-1-armbru@redhat.com>
 References: <20181015115309.17089-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 26/35] ui: Convert vnc_display_init(),
- init_keyboard_layout() to Error
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 17/35] seccomp: Clean up error reporting in
+ parse_sandbox()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,194 +34,114 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Fei Li <fli@suse.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Eduardo Otubo <otubo@redhat.com>
 
-From: Fei Li <fli@suse.com>
+Calling error_report() in a function that takes an Error ** argument
+is suspicious.  parse_sandbox() does that, and then fails without
+setting an error.  Its caller main(), via qemu_opts_foreach(), is fine
+with it, but clean it up anyway.
 
-Signed-off-by: Fei Li <fli@suse.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Eduardo Otubo <otubo@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Acked-by: Eduardo Otubo <otubo@redhat.com>
 ---
- include/ui/console.h |  2 +-
- ui/curses.c          |  6 +++---
- ui/keymaps.c         | 11 ++++++-----
- ui/keymaps.h         |  2 +-
- ui/sdl.c             |  6 +++---
- ui/vnc.c             | 15 ++++++++++-----
- 6 files changed, 24 insertions(+), 18 deletions(-)
+ qemu-seccomp.c | 18 +++++++++---------
+ vl.c           |  4 ++--
+ 2 files changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/include/ui/console.h b/include/ui/console.h
-index fb969caf70..c17803c530 100644
---- a/include/ui/console.h
-+++ b/include/ui/console.h
-@@ -453,7 +453,7 @@ void qemu_display_early_init(DisplayOptions *opts);
- void qemu_display_init(DisplayState *ds, DisplayOptions *opts);
- 
- /* vnc.c */
--void vnc_display_init(const char *id);
-+void vnc_display_init(const char *id, Error **errp);
- void vnc_display_open(const char *id, Error **errp);
- void vnc_display_add_client(const char *id, int csock, bool skipauth);
- int vnc_display_password(const char *id, const char *password);
-diff --git a/ui/curses.c b/ui/curses.c
-index 59d819fd4d..f4e7a12f74 100644
---- a/ui/curses.c
-+++ b/ui/curses.c
-@@ -28,6 +28,7 @@
- #include <termios.h>
- #endif
- 
+diff --git a/qemu-seccomp.c b/qemu-seccomp.c
+index 1baa5c69ed..5c73e6ad05 100644
+--- a/qemu-seccomp.c
++++ b/qemu-seccomp.c
+@@ -12,11 +12,12 @@
+  * Contributions after 2012-01-13 are licensed under the terms of the
+  * GNU GPL, version 2 or (at your option) any later version.
+  */
++
+ #include "qemu/osdep.h"
 +#include "qapi/error.h"
- #include "qemu-common.h"
- #include "ui/console.h"
- #include "ui/input.h"
-@@ -421,9 +422,8 @@ static void curses_keyboard_setup(void)
-         keyboard_layout = "en-us";
- #endif
-     if(keyboard_layout) {
--        kbd_layout = init_keyboard_layout(name2keysym, keyboard_layout);
--        if (!kbd_layout)
--            exit(1);
-+        kbd_layout = init_keyboard_layout(name2keysym, keyboard_layout,
-+                                          &error_fatal);
-     }
- }
- 
-diff --git a/ui/keymaps.c b/ui/keymaps.c
-index b05fb028dc..085889b555 100644
---- a/ui/keymaps.c
-+++ b/ui/keymaps.c
-@@ -27,6 +27,7 @@
- #include "sysemu/sysemu.h"
- #include "trace.h"
- #include "qemu/error-report.h"
-+#include "qapi/error.h"
- 
- struct keysym2code {
-     uint32_t count;
-@@ -81,7 +82,7 @@ static void add_keysym(char *line, int keysym, int keycode, kbd_layout_t *k)
- 
- static int parse_keyboard_layout(kbd_layout_t *k,
-                                  const name2keysym_t *table,
--                                 const char *language)
-+                                 const char *language, Error **errp)
- {
-     int ret;
-     FILE *f;
-@@ -95,7 +96,7 @@ static int parse_keyboard_layout(kbd_layout_t *k,
-     f = filename ? fopen(filename, "r") : NULL;
-     g_free(filename);
-     if (!f) {
--        fprintf(stderr, "Could not read keymap file: '%s'\n", language);
-+        error_setg(errp, "could not read keymap file: '%s'", language);
-         return -1;
-     }
- 
-@@ -114,7 +115,7 @@ static int parse_keyboard_layout(kbd_layout_t *k,
-             continue;
-         }
-         if (!strncmp(line, "include ", 8)) {
--            if (parse_keyboard_layout(k, table, line + 8) < 0) {
-+            if (parse_keyboard_layout(k, table, line + 8, errp) < 0) {
-                 ret = -1;
-                 goto out;
+ #include "qemu/config-file.h"
+ #include "qemu/option.h"
+ #include "qemu/module.h"
+-#include "qemu/error-report.h"
+ #include <sys/prctl.h>
+ #include <seccomp.h>
+ #include "sysemu/seccomp.h"
+@@ -190,7 +191,7 @@ int parse_sandbox(void *opaque, QemuOpts *opts, Error=
+ **errp)
+                  * to provide a little bit of consistency for
+                  * the command line */
+             } else {
+-                error_report("invalid argument for obsolete");
++                error_setg(errp, "invalid argument for obsolete");
+                 return -1;
              }
-@@ -172,13 +173,13 @@ out:
- 
- 
- kbd_layout_t *init_keyboard_layout(const name2keysym_t *table,
--                                   const char *language)
-+                                   const char *language, Error **errp)
- {
-     kbd_layout_t *k;
- 
-     k = g_new0(kbd_layout_t, 1);
-     k->hash = g_hash_table_new(NULL, NULL);
--    if (parse_keyboard_layout(k, table, language) < 0) {
-+    if (parse_keyboard_layout(k, table, language, errp) < 0) {
-         g_hash_table_unref(k->hash);
-         g_free(k);
-         return NULL;
-diff --git a/ui/keymaps.h b/ui/keymaps.h
-index 0693588225..98213a4191 100644
---- a/ui/keymaps.h
-+++ b/ui/keymaps.h
-@@ -53,7 +53,7 @@ typedef struct {
- typedef struct kbd_layout_t kbd_layout_t;
- 
- kbd_layout_t *init_keyboard_layout(const name2keysym_t *table,
--                                   const char *language);
-+                                   const char *language, Error **errp);
- int keysym2scancode(kbd_layout_t *k, int keysym,
-                     bool shift, bool altgr, bool ctrl);
- int keycode_is_keypad(kbd_layout_t *k, int keycode);
-diff --git a/ui/sdl.c b/ui/sdl.c
-index a5fd503c25..190b16f575 100644
---- a/ui/sdl.c
-+++ b/ui/sdl.c
-@@ -29,6 +29,7 @@
- #include <SDL.h>
- #include <SDL_syswm.h>
- 
-+#include "qapi/error.h"
- #include "qemu-common.h"
- #include "qemu/cutils.h"
- #include "ui/console.h"
-@@ -917,9 +918,8 @@ static void sdl1_display_init(DisplayState *ds, DisplayOptions *o)
-         keyboard_layout = "en-us";
- #endif
-     if(keyboard_layout) {
--        kbd_layout = init_keyboard_layout(name2keysym, keyboard_layout);
--        if (!kbd_layout)
--            exit(1);
-+        kbd_layout = init_keyboard_layout(name2keysym, keyboard_layout,
-+                                          &error_fatal);
+         }
+@@ -205,14 +206,13 @@ int parse_sandbox(void *opaque, QemuOpts *opts, Err=
+or **errp)
+                 /* calling prctl directly because we're
+                  * not sure if host has CAP_SYS_ADMIN set*/
+                 if (prctl(PR_SET_NO_NEW_PRIVS, 1)) {
+-                    error_report("failed to set no_new_privs "
+-                                 "aborting");
++                    error_setg(errp, "failed to set no_new_privs abortin=
+g");
+                     return -1;
+                 }
+             } else if (g_str_equal(value, "allow")) {
+                 /* default value */
+             } else {
+-                error_report("invalid argument for elevateprivileges");
++                error_setg(errp, "invalid argument for elevateprivileges=
+");
+                 return -1;
+             }
+         }
+@@ -224,7 +224,7 @@ int parse_sandbox(void *opaque, QemuOpts *opts, Error=
+ **errp)
+             } else if (g_str_equal(value, "allow")) {
+                 /* default value */
+             } else {
+-                error_report("invalid argument for spawn");
++                error_setg(errp, "invalid argument for spawn");
+                 return -1;
+             }
+         }
+@@ -236,14 +236,14 @@ int parse_sandbox(void *opaque, QemuOpts *opts, Err=
+or **errp)
+             } else if (g_str_equal(value, "allow")) {
+                 /* default value */
+             } else {
+-                error_report("invalid argument for resourcecontrol");
++                error_setg(errp, "invalid argument for resourcecontrol")=
+;
+                 return -1;
+             }
+         }
+=20
+         if (seccomp_start(seccomp_opts) < 0) {
+-            error_report("failed to install seccomp syscall filter "
+-                         "in the kernel");
++            error_setg(errp, "failed to install seccomp syscall filter "
++                       "in the kernel");
+             return -1;
+         }
      }
- 
-     g_printerr("Running QEMU with SDL 1.2 is deprecated, and will be removed\n"
-diff --git a/ui/vnc.c b/ui/vnc.c
-index cf221c83cc..98e3d3b1d8 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -3205,7 +3205,7 @@ static const DisplayChangeListenerOps dcl_ops = {
-     .dpy_cursor_define    = vnc_dpy_cursor_define,
- };
- 
--void vnc_display_init(const char *id)
-+void vnc_display_init(const char *id, Error **errp)
- {
-     VncDisplay *vd;
- 
-@@ -3222,13 +3222,14 @@ void vnc_display_init(const char *id)
- 
-     if (keyboard_layout) {
-         trace_vnc_key_map_init(keyboard_layout);
--        vd->kbd_layout = init_keyboard_layout(name2keysym, keyboard_layout);
-+        vd->kbd_layout = init_keyboard_layout(name2keysym,
-+                                              keyboard_layout, errp);
-     } else {
--        vd->kbd_layout = init_keyboard_layout(name2keysym, "en-us");
-+        vd->kbd_layout = init_keyboard_layout(name2keysym, "en-us", errp);
-     }
- 
-     if (!vd->kbd_layout) {
+diff --git a/vl.c b/vl.c
+index ff50199e64..643121e5d4 100644
+--- a/vl.c
++++ b/vl.c
+@@ -3972,8 +3972,8 @@ int main(int argc, char **argv, char **envp)
+=20
+ #ifdef CONFIG_SECCOMP
+     olist =3D qemu_find_opts_err("sandbox", NULL);
+-    if (olist && qemu_opts_foreach(olist, parse_sandbox, NULL, NULL)) {
 -        exit(1);
-+        return;
++    if (olist) {
++        qemu_opts_foreach(olist, parse_sandbox, NULL, &error_fatal);
      }
- 
-     vd->share_policy = VNC_SHARE_POLICY_ALLOW_EXCLUSIVE;
-@@ -4079,7 +4080,11 @@ int vnc_init_func(void *opaque, QemuOpts *opts, Error **errp)
-     char *id = (char *)qemu_opts_id(opts);
- 
-     assert(id);
--    vnc_display_init(id);
-+    vnc_display_init(id, &local_err);
-+    if (local_err) {
-+        error_report_err(local_err);
-+        exit(1);
-+    }
-     vnc_display_open(id, &local_err);
-     if (local_err != NULL) {
-         error_reportf_err(local_err, "Failed to start VNC server: ");
--- 
+ #endif
+=20
+--=20
 2.17.1
