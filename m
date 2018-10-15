@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51399)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54463)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gC0Ti-0007Mq-Nr
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 06:52:03 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1gC0cw-0002xa-13
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:01:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gC0Tc-000177-KY
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 06:52:00 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:35386 helo=mail.rt-rk.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gC0Ta-0000Th-DP
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 06:51:56 -0400
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 15 Oct 2018 12:50:32 +0200
-Message-Id: <1539600633-17726-3-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1539600633-17726-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1539600633-17726-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH 2/3] target/mips: Add a comment before each CP0
- register section in cpu.h
+	(envelope-from <amarkovic@wavecomp.com>) id 1gC0co-0007Qq-Kt
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:01:33 -0400
+Received: from mail-cys01nam02on0112.outbound.protection.outlook.com
+	([104.47.37.112]:21328
+	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1gC0ci-0007Jz-Kq
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:01:24 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Mon, 15 Oct 2018 11:01:05 +0000
+Message-ID: <BN6PR2201MB1251DDA3C4C4AC5A65D7331CC6FD0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <cover.1539428198.git.noring@nocrew.org>,
+	<540683755a2357b670b107a29658531466be18f4.1539428198.git.noring@nocrew.org>
+In-Reply-To: <540683755a2357b670b107a29658531466be18f4.1539428198.git.noring@nocrew.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v7 7/7] elf: Toshiba/Sony rather than MIPS
+ are the implementors of the R5900
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,220 +32,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com
+To: Fredrik Noring <noring@nocrew.org>, "Maciej W. Rozycki" <macro@linux-mips.org>, =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Petar Jovanovic <pjovanovic@wavecomp.com>, Peter Maydell <peter.maydell@linaro.org>, =?iso-8859-1?Q?J=FCrgen_Urban?= <JuergenUrban@gmx.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+> From: Fredrik Noring <noring@nocrew.org>
+> Sent: Saturday, October 13, 2018 1:11 PM
+> To: Aleksandar Markovic; Maciej W. Rozycki; Philippe Mathieu-Daud=E9
+> Cc: Richard Henderson; Aurelien Jarno; Petar Jovanovic; Peter Maydell; J=
+=FCrgen Urban; > qemu-devel@nongnu.org
+> Subject: [PATCH v7 7/7] elf: Toshiba/Sony rather than MIPS are the implem=
+entors of the > R5900
+>=20
 
-Add a comment before each CP0 register section in CPUMIPSState
-definition, thus visually separating these sections.
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
----
- target/mips/cpu.h | 88 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 88 insertions(+)
+This patch will be applied to the next MIPS queue, perhaps in a slightly
+modified form. The queue is planned to be created very soon.
 
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index cd54073..37703ea 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -304,10 +304,16 @@ struct CPUMIPSState {
-  * 7   TagLo             TagHi                               KScratch<n>
-  *
-  */
-+/*
-+ * CP0 Register 0
-+ */
-     int32_t CP0_Index;
-     /* CP0_MVP* are per MVP registers. */
-     int32_t CP0_VPControl;
- #define CP0VPCtl_DIS    0
-+/*
-+ * CP0 Register 1
-+ */
-     int32_t CP0_Random;
-     int32_t CP0_VPEControl;
- #define CP0VPECo_YSI	21
-@@ -348,7 +354,13 @@ struct CPUMIPSState {
- #define CP0VPEOpt_DWX2	2
- #define CP0VPEOpt_DWX1	1
- #define CP0VPEOpt_DWX0	0
-+/*
-+ * CP0 Register 2
-+ */
-     uint64_t CP0_EntryLo0;
-+/*
-+ * CP0 Register 3
-+ */
-     uint64_t CP0_EntryLo1;
- #if defined(TARGET_MIPS64)
- # define CP0EnLo_RI 63
-@@ -359,8 +371,14 @@ struct CPUMIPSState {
- #endif
-     int32_t CP0_GlobalNumber;
- #define CP0GN_VPId 0
-+/*
-+ * CP0 Register 4
-+ */
-     target_ulong CP0_Context;
-     target_ulong CP0_KScratch[MIPS_KSCRATCH_NUM];
-+/*
-+ * CP0 Register 5
-+ */
-     int32_t CP0_PageMask;
-     int32_t CP0_PageGrain_rw_bitmask;
-     int32_t CP0_PageGrain;
-@@ -398,6 +416,9 @@ struct CPUMIPSState {
- #define CP0SC2_XR       56
- #define CP0SC2_XR_MASK  (0xFFULL << CP0SC2_XR)
- #define CP0SC2_MASK     (CP0SC_1GMASK | (CP0SC_1GMASK << 16) | CP0SC2_XR_MASK)
-+/*
-+ * CP0 Register 6
-+ */
-     int32_t CP0_Wired;
-     int32_t CP0_SRSConf0_rw_bitmask;
-     int32_t CP0_SRSConf0;
-@@ -428,16 +449,34 @@ struct CPUMIPSState {
- #define CP0SRSC4_SRS15	20
- #define CP0SRSC4_SRS14	10
- #define CP0SRSC4_SRS13	0
-+/*
-+ * CP0 Register 7
-+ */
-     int32_t CP0_HWREna;
-+/*
-+ * CP0 Register 8
-+ */
-     target_ulong CP0_BadVAddr;
-     uint32_t CP0_BadInstr;
-     uint32_t CP0_BadInstrP;
-     uint32_t CP0_BadInstrX;
-+/*
-+ * CP0 Register 9
-+ */
-     int32_t CP0_Count;
-+/*
-+ * CP0 Register 10
-+ */
-     target_ulong CP0_EntryHi;
- #define CP0EnHi_EHINV 10
-     target_ulong CP0_EntryHi_ASID_mask;
-+/*
-+ * CP0 Register 11
-+ */
-     int32_t CP0_Compare;
-+/*
-+ * CP0 Register 12
-+ */
-     int32_t CP0_Status;
- #define CP0St_CU3   31
- #define CP0St_CU2   30
-@@ -479,6 +518,9 @@ struct CPUMIPSState {
- #define CP0SRSMap_SSV2 8
- #define CP0SRSMap_SSV1 4
- #define CP0SRSMap_SSV0 0
-+/*
-+ * CP0 Register 13
-+ */
-     int32_t CP0_Cause;
- #define CP0Ca_BD   31
- #define CP0Ca_TI   30
-@@ -490,12 +532,21 @@ struct CPUMIPSState {
- #define CP0Ca_IP    8
- #define CP0Ca_IP_mask 0x0000FF00
- #define CP0Ca_EC    2
-+/*
-+ * CP0 Register 14
-+ */
-     target_ulong CP0_EPC;
-+/*
-+ * CP0 Register 15
-+ */
-     int32_t CP0_PRid;
-     target_ulong CP0_EBase;
-     target_ulong CP0_EBaseWG_rw_bitmask;
- #define CP0EBase_WG 11
-     target_ulong CP0_CMGCRBase;
-+/*
-+ * CP0 Register 16
-+ */
-     int32_t CP0_Config0;
- #define CP0C0_M    31
- #define CP0C0_K23  28    /* 30..28 */
-@@ -612,6 +663,9 @@ struct CPUMIPSState {
-     uint64_t CP0_MAAR[MIPS_MAAR_MAX];
-     int32_t CP0_MAARI;
-     /* XXX: Maybe make LLAddr per-TC? */
-+/*
-+ * CP0 Register 17
-+ */
-     uint64_t lladdr;
-     target_ulong llval;
-     target_ulong llnewval;
-@@ -620,11 +674,23 @@ struct CPUMIPSState {
-     target_ulong llreg;
-     uint64_t CP0_LLAddr_rw_bitmask;
-     int CP0_LLAddr_shift;
-+/*
-+ * CP0 Register 18
-+ */
-     target_ulong CP0_WatchLo[8];
-+/*
-+ * CP0 Register 19
-+ */
-     int32_t CP0_WatchHi[8];
- #define CP0WH_ASID 16
-+/*
-+ * CP0 Register 20
-+ */
-     target_ulong CP0_XContext;
-     int32_t CP0_Framemask;
-+/*
-+ * CP0 Register 23
-+ */
-     int32_t CP0_Debug;
- #define CP0DB_DBD  31
- #define CP0DB_DM   30
-@@ -644,18 +710,40 @@ struct CPUMIPSState {
- #define CP0DB_DDBL 2
- #define CP0DB_DBp  1
- #define CP0DB_DSS  0
-+/*
-+ * CP0 Register 24
-+ */
-     target_ulong CP0_DEPC;
-+/*
-+ * CP0 Register 25
-+ */
-     int32_t CP0_Performance0;
-+/*
-+ * CP0 Register 26
-+ */
-     int32_t CP0_ErrCtl;
- #define CP0EC_WST 29
- #define CP0EC_SPR 28
- #define CP0EC_ITC 26
-+/*
-+ * CP0 Register 28
-+ */
-     uint64_t CP0_TagLo;
-     int32_t CP0_DataLo;
-+/*
-+ * CP0 Register 29
-+ */
-     int32_t CP0_TagHi;
-     int32_t CP0_DataHi;
-+/*
-+ * CP0 Register 30
-+ */
-     target_ulong CP0_ErrorEPC;
-+/*
-+ * CP0 Register 31
-+ */
-     int32_t CP0_DESAVE;
-+
-     /* We waste some space so we can handle shadow registers like TCs. */
-     TCState tcs[MIPS_SHADOW_SET_MAX];
-     CPUMIPSFPUContext fpus[MIPS_FPU_MAX];
--- 
-2.7.4
+> Sources [1][2] indicate that the Emotion Engine was designed by Toshiba
+> and licensed to Sony. Others [3][4][5] claim it was a joint effort. It
+> therefore makes sense to refer to the CPU as "Toshiba/Sony R5900".
+>=20
+> [1] http://cs.nyu.edu/courses/spring02/V22.0480-002/projects/aldrich/emot=
+ionengine.ppt
+> [2] http://archive.arstechnica.com/reviews/1q00/playstation2/m-ee-3.html
+> [3] http://docencia.ac.upc.edu/ETSETB/SEGPAR/microprocessors/emotionengin=
+e%20(mpr).pdf
+> [4] http://www.eetimes.com/document.asp?doc_id=3D1144055
+> [5] https://www.toshiba.co.jp/about/press/2001_09/pr2701.htm
+>=20
+> Reported-by: Maciej W. Rozycki <macro@linux-mips.org>
+> Signed-off-by: Fredrik Noring <noring@nocrew.org>
+> Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> ---
+>  include/elf.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/include/elf.h b/include/elf.h
+> index 312f68af81..2510fc7be4 100644
+> --- a/include/elf.h
+> +++ b/include/elf.h
+> @@ -76,7 +76,7 @@ typedef int64_t  Elf64_Sxword;
+>  #define EF_MIPS_MACH_OCTEON2  0x008d0000  /* Cavium Networks Octeon2    =
+     */
+>  #define EF_MIPS_MACH_OCTEON3  0x008e0000  /* Cavium Networks Octeon3    =
+     */
+>  #define EF_MIPS_MACH_5400     0x00910000  /* NEC VR5400                 =
+     */
+> -#define EF_MIPS_MACH_5900     0x00920000  /* MIPS R5900                 =
+     */
+> +#define EF_MIPS_MACH_5900     0x00920000  /* Toshiba/Sony R5900         =
+     */
+>  #define EF_MIPS_MACH_5500     0x00980000  /* NEC VR5500                 =
+     */
+>  #define EF_MIPS_MACH_9000     0x00990000  /* PMC-Sierra's RM9000        =
+     */
+>  #define EF_MIPS_MACH_LS2E     0x00a00000  /* ST Microelectronics Loongso=
+n 2E */
+> --
+> 2.16.4
+>=20
+> =
