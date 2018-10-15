@@ -1,44 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49534)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1gC7wI-0001U3-8t
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 14:50:03 -0400
+	(envelope-from <amit@kernel.org>) id 1gC7xk-0002Co-8M
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 14:51:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1gC7wD-0005ls-T9
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 14:50:02 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39420)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1gC7wD-0005lK-HS
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 14:49:57 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w9FIdJIM041052
-	for <qemu-devel@nongnu.org>; Mon, 15 Oct 2018 14:49:56 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2n4w9j0dmn-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 15 Oct 2018 14:49:55 -0400
-Received: from localhost
-	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Mon, 15 Oct 2018 19:49:53 +0100
-References: <20181013050227.17022-1-ehabkost@redhat.com>
-	<20181015093243.GE6785@redhat.com>
-	<CAFEAcA8MQ37JVCCPGyQa20n6AuU8Sv_pC9DoDoCKdQhqekpGnQ@mail.gmail.com>
-	<20181015101309.GD10459@localhost.localdomain>
-	<87woqjw4o3.fsf@dusky.pond.sub.org>
-	<d1335244-1aaa-a6e6-e27f-a4de6a38a785@de.ibm.com>
-	<20181015183348.GS31060@habkost.net>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Mon, 15 Oct 2018 20:49:46 +0200
+	(envelope-from <amit@kernel.org>) id 1gC7xe-0006Qn-Ai
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 14:51:32 -0400
+Date: Mon, 15 Oct 2018 20:51:15 +0200
+From: Amit Shah <amit@kernel.org>
+Message-ID: <20181015185115.GA3247@grmbl.mre>
+References: <CAEK8JBDPNqTap-LnoBxUZh4Bj9b+VgrsPm53QAivfOsLG7wuGw@mail.gmail.com>
+	<20181001114146.GA2508@work-vm>
+	<CAEK8JBBDPxTe0k8Nf=7PQ6gjYv4xyqQu=bef5VXmgaLVGw3JUg@mail.gmail.com>
+	<CAEK8JBC-HKGb43UynWx69Lj-y48Em038eNMpOb7G72XfLF_mDg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20181015183348.GS31060@habkost.net>
-Content-Language: en-US
-Message-Id: <8b45171f-3686-cda6-8e04-de6d46af355d@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC] Require Python 3 for building QEMU
+In-Reply-To: <CAEK8JBC-HKGb43UynWx69Lj-y48Em038eNMpOb7G72XfLF_mDg@mail.gmail.com>
+Subject: Re: [Qemu-devel] virtio-console downgrade the virtio-pci-blk
+ performance
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,50 +27,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Feng Li <lifeng1519@gmail.com>
+Cc: dgilbert@redhat.com, amit@kernel.org, virtualization@lists.linux-foundation.org, linux-kernel <linux-kernel@vger.kernel.org>, qemu-discuss@nongnu.org, qemu-devel@nongnu.org, "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
 
-
-
-On 10/15/2018 08:33 PM, Eduardo Habkost wrote:
-> On Mon, Oct 15, 2018 at 08:19:18PM +0200, Christian Borntraeger wrote:
-[...]
-
->>>>
->>>> It's easier to port stuff to Python 3 though than making them work with
->>>> both. I think Eduardo's RFC is in part motivated by a patch from
->>>> Philippe that converted something in iotests to work with Python 3,
->>>> passed review and then turned out to break Python 2.
->>>
->>> Seconded.  This is not about the cost of maintaining existing
->>> compatibility gunk, it's about the extra effort to first get the
->>> remainder to work with 2 and 3, only to throw away 2 a few months later.
->>>
->>> I propose we permit ourselves to port stuff that isn't essential to
->>> building QEMU straight to 3 instead.  This includes iotests.
->>>
->>>> Having to test every iotests patch twice with different Python versions
->>>> isn't something I would like to do for extended periods of time.
->>>
->>> It's worth doing only if the benefits of doing it outweigh the costs.  I
->>> don't think they do.
->>
->> FWIW, I do not care about python 2 vs 3. I just want to emphasize that I 
->> consider the qemu iotest a very valuable part of the qemu test suite as it
->> has detected a lot of regressions over the past years. So as long as we keep
->> that running I am fine.
+On (Thu) 11 Oct 2018 [18:15:41], Feng Li wrote:
+> Add Amit Shah.
 > 
-> It depends where exactly one needs to keep them running.  Does
-> anybody need to run iotests for QEMU 3.0+ builds in systems where
-> it's impossible to install Python 3?
+> After some tests, we found:
+> - the virtio serial port number is inversely proportional to the iSCSI
+> virtio-blk-pci performance.
+> If we set the virio-serial ports to 2("<controller
+> type='virtio-serial' index='0' ports='2'/>), the performance downgrade
+> is minimal.
 
-I run that as a regression package. Most distros seems to be fine,
-with RHEL7 being the problematic case. But for upstream testing on a redhat
-like distro fedora is good enough. 
+If you use multiple virtio-net (or blk) devices -- just register, not
+necessarily use -- does that also bring the performance down?  I
+suspect it's the number of interrupts that get allocated for the
+ports.  Also, could you check if MSI is enabled?  Can you try with and
+without?  Can you also reproduce if you have multiple virtio-serial
+controllers with 2 ports each (totalling up to whatever number that
+reproduces the issue).
+
+		Amit
+
 > 
-> If somebody really needs that, then I'd kindly ask them to
-> volunteer to do the extra work to make iotests compatible with
-> both Python 2 and 3.
+> - use local disk/ram disk as virtio-blk-pci disk, the performance
+> downgrade is still obvious.
+> 
+> 
+> Could anyone give some help about this issue?
+> 
+> Feng Li <lifeng1519@gmail.com> 于2018年10月1日周一 下午10:58写道：
+> >
+> > Hi Dave,
+> > My comments are in-line.
+> >
+> > Dr. David Alan Gilbert <dgilbert@redhat.com> 于2018年10月1日周一 下午7:41写道：
+> > >
+> > > * Feng Li (lifeng1519@gmail.com) wrote:
+> > > > Hi,
+> > > > I found an obvious performance downgrade when virtio-console combined
+> > > > with virtio-pci-blk.
+> > > >
+> > > > This phenomenon exists in nearly all Qemu versions and all Linux
+> > > > (CentOS7, Fedora 28, Ubuntu 18.04) distros.
+> > > >
+> > > > This is a disk cmd:
+> > > > -drive file=iscsi://127.0.0.1:3260/iqn.2016-02.com.test:system:fl-iscsi/1,format=raw,if=none,id=drive-virtio-disk0,cache=none,aio=native
+> > > > -device virtio-blk-pci,scsi=off,bus=pci.0,addr=0x6,drive=drive-virtio-disk0,id=virtio-disk0,bootindex=1,write-cache=on
+> > > >
+> > > > If I add "-device
+> > > > virtio-serial-pci,id=virtio-serial0,bus=pci.0,addr=0x5  ", the virtio
+> > > > disk 4k iops (randread/randwrite) would downgrade from 60k to 40k.
+> > > >
+> > > > In VM, if I rmmod virtio-console, the performance will back to normal.
+> > > >
+> > > > Any idea about this issue?
+> > > >
+> > > > I don't know this is a qemu issue or kernel issue.
+> > >
+> > > It sounds odd;  can you provide more details on:
+> > >   a) The benchmark you're using.
+> > I'm using fio, the config is:
+> > [global]
+> > ioengine=libaio
+> > iodepth=128
+> > runtime=120
+> > time_based
+> > direct=1
+> >
+> > [randread]
+> > stonewall
+> > bs=4k
+> > filename=/dev/vdb
+> > rw=randread
+> >
+> > >   b) the host and the guest config (number of cpus etc)
+> > The qemu cmd is : /usr/libexec/qemu-kvm --device virtio-balloon -m 16G
+> > --enable-kvm -cpu host -smp 8
+> > or qemu-system-x86_64 --device virtio-balloon -m 16G --enable-kvm -cpu
+> > host -smp 8
+> >
+> > The result is the same.
+> >
+> > >   c) Why are you running it with iscsi back to the same host - why not
+> > >      just simplify the test back to a simple file?
+> > >
+> >
+> > Because my ISCSI target could supply a high IOPS performance.
+> > If using a slow disk, the performance downgrade would be not so obvious.
+> > It's easy to be seen, you could try it.
+> >
+> >
+> > > Dave
+> > >
+> > > >
+> > > > Thanks in advance.
+> > > > --
+> > > > Thanks and Best Regards,
+> > > > Alex
+> > > >
+> > > --
+> > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> >
+> >
+> >
+> > --
+> > Thanks and Best Regards,
+> > Feng Li(Alex)
+> 
+> 
+> 
+> --
+> Thanks and Best Regards,
+> Feng Li(Alex)
 
-As I said. As long as things continue to work on a resonably new distro
-things are ok.
+		Amit
+-- 
+http://amitshah.net/
