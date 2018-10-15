@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39791)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gC1RG-0004K3-Cb
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:39 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gC1RD-0002EZ-Ix
-	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36418)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gC1RD-00028u-84
+	(envelope-from <armbru@redhat.com>) id 1gC1RB-0004GO-HT
 	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:31 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <armbru@redhat.com>) id 1gC1R5-00026W-6i
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60380)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gC1R3-000240-9a
+	for qemu-devel@nongnu.org; Mon, 15 Oct 2018 07:53:21 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BE9EF3078ADD
-	for <qemu-devel@nongnu.org>; Mon, 15 Oct 2018 11:53:25 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6DD0A308FF30
+	for <qemu-devel@nongnu.org>; Mon, 15 Oct 2018 11:53:20 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 15 Oct 2018 13:53:01 +0200
-Message-Id: <20181015115309.17089-28-armbru@redhat.com>
+Date: Mon, 15 Oct 2018 13:53:04 +0200
+Message-Id: <20181015115309.17089-31-armbru@redhat.com>
 In-Reply-To: <20181015115309.17089-1-armbru@redhat.com>
 References: <20181015115309.17089-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 27/35] vnc: Clean up error reporting in
- vnc_init_func()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 30/35] spice: Clean up error reporting in
+ add_channel()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,52 +37,59 @@ To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 
 Calling error_report() in a function that takes an Error ** argument
-is suspicious.  vnc_init_func() does that, and then fails without
-setting an error.  Its caller main(), via qemu_opts_foreach(), is fine
-with it, but clean it up anyway.
+is suspicious.  add_channel() does that, and then exit()s.  Its caller
+main(), via qemu_opts_foreach(), is fine with it, but clean it up
+anyway.
 
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- ui/vnc.c | 9 +++++----
- vl.c     | 2 +-
- 2 files changed, 6 insertions(+), 5 deletions(-)
+ ui/spice-core.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/ui/vnc.c b/ui/vnc.c
-index 98e3d3b1d8..fcd2744d52 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -4082,13 +4082,14 @@ int vnc_init_func(void *opaque, QemuOpts *opts, Error **errp)
-     assert(id);
-     vnc_display_init(id, &local_err);
-     if (local_err) {
--        error_report_err(local_err);
--        exit(1);
-+        error_propagate(errp, local_err);
-+        return -1;
+diff --git a/ui/spice-core.c b/ui/spice-core.c
+index a4fbbc3898..ebaae24643 100644
+--- a/ui/spice-core.c
++++ b/ui/spice-core.c
+@@ -597,9 +597,9 @@ static int add_channel(void *opaque, const char *name=
+, const char *value,
+     if (strcmp(name, "tls-channel") =3D=3D 0) {
+         int *tls_port =3D opaque;
+         if (!*tls_port) {
+-            error_report("spice: tried to setup tls-channel"
+-                         " without specifying a TLS port");
+-            exit(1);
++            error_setg(errp, "spice: tried to setup tls-channel"
++                       " without specifying a TLS port");
++            return -1;
+         }
+         security =3D SPICE_CHANNEL_SECURITY_SSL;
      }
-     vnc_display_open(id, &local_err);
-     if (local_err != NULL) {
--        error_reportf_err(local_err, "Failed to start VNC server: ");
+@@ -615,8 +615,9 @@ static int add_channel(void *opaque, const char *name=
+, const char *value,
+         rc =3D spice_server_set_channel_security(spice_server, value, se=
+curity);
+     }
+     if (rc !=3D 0) {
+-        error_report("spice: failed to set channel security for %s", val=
+ue);
 -        exit(1);
-+        error_propagate_prepend(errp, local_err,
-+                                "Failed to start VNC server: ");
++        error_setg(errp, "spice: failed to set channel security for %s",
++                   value);
 +        return -1;
      }
      return 0;
  }
-diff --git a/vl.c b/vl.c
-index c053117028..8e0006d49c 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4526,7 +4526,7 @@ int main(int argc, char **argv, char **envp)
-     /* init remote displays */
- #ifdef CONFIG_VNC
-     qemu_opts_foreach(qemu_find_opts("vnc"),
--                      vnc_init_func, NULL, NULL);
-+                      vnc_init_func, NULL, &error_fatal);
- #endif
- 
-     if (using_spice) {
--- 
+@@ -787,7 +788,7 @@ void qemu_spice_init(void)
+     spice_server_set_playback_compression
+         (spice_server, qemu_opt_get_bool(opts, "playback-compression", 1=
+));
+=20
+-    qemu_opt_foreach(opts, add_channel, &tls_port, NULL);
++    qemu_opt_foreach(opts, add_channel, &tls_port, &error_fatal);
+=20
+     spice_server_set_name(spice_server, qemu_name);
+     spice_server_set_uuid(spice_server, (unsigned char *)&qemu_uuid);
+--=20
 2.17.1
