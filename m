@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36777)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1gCNFJ-0000Y2-T9
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 07:10:43 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1gCNFI-0000X0-1R
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 07:10:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1gCNFE-00032a-Df
+	(envelope-from <guangrong.xiao@gmail.com>) id 1gCNFD-000314-Uf
 	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 07:10:38 -0400
-Received: from mail-pf1-x42c.google.com ([2607:f8b0:4864:20::42c]:39709)
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:44471)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1gCNFE-0002Yn-29
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 07:10:36 -0400
-Received: by mail-pf1-x42c.google.com with SMTP id c25-v6so11291524pfe.6
-	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 04:10:20 -0700 (PDT)
+	id 1gCNFD-0002ln-En
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 07:10:35 -0400
+Received: by mail-pg1-x541.google.com with SMTP id g2-v6so10685614pgu.11
+	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 04:10:28 -0700 (PDT)
 From: guangrong.xiao@gmail.com
-Date: Tue, 16 Oct 2018 19:10:03 +0800
-Message-Id: <20181016111006.629-2-xiaoguangrong@tencent.com>
+Date: Tue, 16 Oct 2018 19:10:05 +0800
+Message-Id: <20181016111006.629-4-xiaoguangrong@tencent.com>
 In-Reply-To: <20181016111006.629-1-xiaoguangrong@tencent.com>
 References: <20181016111006.629-1-xiaoguangrong@tencent.com>
-Subject: [Qemu-devel] [PATCH 1/4] ptr_ring: port ptr_ring from linux kernel
- to QEMU
+Subject: [Qemu-devel] [PATCH 3/4] migration: use lockless Multithread model
+ for compression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,263 +32,398 @@ Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redh
 
 From: Xiao Guangrong <xiaoguangrong@tencent.com>
 
-ptr_ring is good to minimize cache-contention and has the simple model
-of memory barrier which will be used by lockless threads model to pass
-requests between main migration thread and compression threads
-
-Some changes are made:
-1) drop unnecessary APIs, e.g, for _irq, _bh APIs
-2) the resize APIs has not been ported
-3) drop the locks
-4) adjust some comments
-5) new API, ptr_ring_disable_batch, has been introduced
+Adapt the compression code to the lockless multithread model
 
 Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
 ---
- include/qemu/ptr_ring.h | 235 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 235 insertions(+)
- create mode 100644 include/qemu/ptr_ring.h
+ migration/ram.c | 312 +++++++++++++++++++++-----------------------------------
+ 1 file changed, 115 insertions(+), 197 deletions(-)
 
-diff --git a/include/qemu/ptr_ring.h b/include/qemu/ptr_ring.h
-new file mode 100644
-index 0000000000..d8266d45f6
---- /dev/null
-+++ b/include/qemu/ptr_ring.h
-@@ -0,0 +1,235 @@
-+/*
-+ *    Definitions for the 'struct ptr_ring' datastructure.
-+ *
-+ *    Author:
-+ *        Michael S. Tsirkin <mst@redhat.com>
-+ *        Xiao Guangrong <xiaoguangrong@tencent.com>
-+ *
-+ *    Copyright (C) 2018 Red Hat, Inc.
-+ *    Copyright (C) 2018 Tencent, Inc.
-+ *
-+ *    This program is free software; you can redistribute it and/or modify it
-+ *    under the terms of the GNU General Public License as published by the
-+ *    Free Software Foundation; either version 2 of the License, or (at your
-+ *    option) any later version.
-+ *
-+ *    This is a limited-size FIFO maintaining pointers in FIFO order, with
-+ *    one CPU producing entries and another consuming entries from a FIFO.
-+ *
-+ *    This implementation tries to minimize cache-contention when there is a
-+ *    single producer and a single consumer CPU.
-+ */
+diff --git a/migration/ram.c b/migration/ram.c
+index bc38d98cc3..2356bc255c 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -57,6 +57,7 @@
+ #include "qemu/uuid.h"
+ #include "savevm.h"
+ #include "qemu/iov.h"
++#include "qemu/lockless-threads.h"
+ 
+ /***********************************************************/
+ /* ram save/restore */
+@@ -349,22 +350,6 @@ typedef struct PageSearchStatus PageSearchStatus;
+ 
+ CompressionStats compression_counters;
+ 
+-struct CompressParam {
+-    bool done;
+-    bool quit;
+-    bool zero_page;
+-    QEMUFile *file;
+-    QemuMutex mutex;
+-    QemuCond cond;
+-    RAMBlock *block;
+-    ram_addr_t offset;
+-
+-    /* internally used fields */
+-    z_stream stream;
+-    uint8_t *originbuf;
+-};
+-typedef struct CompressParam CompressParam;
+-
+ struct DecompressParam {
+     bool done;
+     bool quit;
+@@ -377,15 +362,6 @@ struct DecompressParam {
+ };
+ typedef struct DecompressParam DecompressParam;
+ 
+-static CompressParam *comp_param;
+-static QemuThread *compress_threads;
+-/* comp_done_cond is used to wake up the migration thread when
+- * one of the compression threads has finished the compression.
+- * comp_done_lock is used to co-work with comp_done_cond.
+- */
+-static QemuMutex comp_done_lock;
+-static QemuCond comp_done_cond;
+-/* The empty QEMUFileOps will be used by file in CompressParam */
+ static const QEMUFileOps empty_ops = { };
+ 
+ static QEMUFile *decomp_file;
+@@ -394,125 +370,6 @@ static QemuThread *decompress_threads;
+ static QemuMutex decomp_done_lock;
+ static QemuCond decomp_done_cond;
+ 
+-static bool do_compress_ram_page(QEMUFile *f, z_stream *stream, RAMBlock *block,
+-                                 ram_addr_t offset, uint8_t *source_buf);
+-
+-static void *do_data_compress(void *opaque)
+-{
+-    CompressParam *param = opaque;
+-    RAMBlock *block;
+-    ram_addr_t offset;
+-    bool zero_page;
+-
+-    qemu_mutex_lock(&param->mutex);
+-    while (!param->quit) {
+-        if (param->block) {
+-            block = param->block;
+-            offset = param->offset;
+-            param->block = NULL;
+-            qemu_mutex_unlock(&param->mutex);
+-
+-            zero_page = do_compress_ram_page(param->file, &param->stream,
+-                                             block, offset, param->originbuf);
+-
+-            qemu_mutex_lock(&comp_done_lock);
+-            param->done = true;
+-            param->zero_page = zero_page;
+-            qemu_cond_signal(&comp_done_cond);
+-            qemu_mutex_unlock(&comp_done_lock);
+-
+-            qemu_mutex_lock(&param->mutex);
+-        } else {
+-            qemu_cond_wait(&param->cond, &param->mutex);
+-        }
+-    }
+-    qemu_mutex_unlock(&param->mutex);
+-
+-    return NULL;
+-}
+-
+-static void compress_threads_save_cleanup(void)
+-{
+-    int i, thread_count;
+-
+-    if (!migrate_use_compression() || !comp_param) {
+-        return;
+-    }
+-
+-    thread_count = migrate_compress_threads();
+-    for (i = 0; i < thread_count; i++) {
+-        /*
+-         * we use it as a indicator which shows if the thread is
+-         * properly init'd or not
+-         */
+-        if (!comp_param[i].file) {
+-            break;
+-        }
+-
+-        qemu_mutex_lock(&comp_param[i].mutex);
+-        comp_param[i].quit = true;
+-        qemu_cond_signal(&comp_param[i].cond);
+-        qemu_mutex_unlock(&comp_param[i].mutex);
+-
+-        qemu_thread_join(compress_threads + i);
+-        qemu_mutex_destroy(&comp_param[i].mutex);
+-        qemu_cond_destroy(&comp_param[i].cond);
+-        deflateEnd(&comp_param[i].stream);
+-        g_free(comp_param[i].originbuf);
+-        qemu_fclose(comp_param[i].file);
+-        comp_param[i].file = NULL;
+-    }
+-    qemu_mutex_destroy(&comp_done_lock);
+-    qemu_cond_destroy(&comp_done_cond);
+-    g_free(compress_threads);
+-    g_free(comp_param);
+-    compress_threads = NULL;
+-    comp_param = NULL;
+-}
+-
+-static int compress_threads_save_setup(void)
+-{
+-    int i, thread_count;
+-
+-    if (!migrate_use_compression()) {
+-        return 0;
+-    }
+-    thread_count = migrate_compress_threads();
+-    compress_threads = g_new0(QemuThread, thread_count);
+-    comp_param = g_new0(CompressParam, thread_count);
+-    qemu_cond_init(&comp_done_cond);
+-    qemu_mutex_init(&comp_done_lock);
+-    for (i = 0; i < thread_count; i++) {
+-        comp_param[i].originbuf = g_try_malloc(TARGET_PAGE_SIZE);
+-        if (!comp_param[i].originbuf) {
+-            goto exit;
+-        }
+-
+-        if (deflateInit(&comp_param[i].stream,
+-                        migrate_compress_level()) != Z_OK) {
+-            g_free(comp_param[i].originbuf);
+-            goto exit;
+-        }
+-
+-        /* comp_param[i].file is just used as a dummy buffer to save data,
+-         * set its ops to empty.
+-         */
+-        comp_param[i].file = qemu_fopen_ops(NULL, &empty_ops);
+-        comp_param[i].done = true;
+-        comp_param[i].quit = false;
+-        qemu_mutex_init(&comp_param[i].mutex);
+-        qemu_cond_init(&comp_param[i].cond);
+-        qemu_thread_create(compress_threads + i, "compress",
+-                           do_data_compress, comp_param + i,
+-                           QEMU_THREAD_JOINABLE);
+-    }
+-    return 0;
+-
+-exit:
+-    compress_threads_save_cleanup();
+-    return -1;
+-}
+-
+ /* Multiple fd's */
+ 
+ #define MULTIFD_MAGIC 0x11223344U
+@@ -1909,12 +1766,27 @@ exit:
+     return zero_page;
+ }
+ 
++struct CompressData {
++    /* filled by migration thread.*/
++    RAMBlock *block;
++    ram_addr_t offset;
 +
-+#ifndef _QEMU_PTR_RING_H
-+#define _QEMU_PTR_RING_H 1
++    /* filled by compress thread. */
++    QEMUFile *file;
++    z_stream stream;
++    uint8_t *originbuf;
++    bool zero_page;
 +
-+#include "qemu/compiler.h"
-+#include "qemu/atomic.h"
-+
-+#define SMP_CACHE_BYTES      64
-+#define ____cacheline_aligned_in_smp \
-+        __attribute__((__aligned__(SMP_CACHE_BYTES)))
-+
-+#define WRITE_ONCE(ptr, val) \
-+    (*((volatile typeof(ptr) *)(&(ptr))) = (val))
-+#define READ_ONCE(ptr) (*((volatile typeof(ptr) *)(&(ptr))))
-+
-+struct ptr_ring {
-+    int producer ____cacheline_aligned_in_smp;
-+    int consumer_head ____cacheline_aligned_in_smp; /* next valid entry */
-+    int consumer_tail; /* next entry to invalidate */
-+    /* Shared consumer/producer data */
-+    /* Read-only by both the producer and the consumer */
-+    int size ____cacheline_aligned_in_smp; /* max entries in queue */
-+    int batch; /* number of entries to consume in a batch */
-+    void **queue;
++    ThreadRequest request;
 +};
-+typedef struct ptr_ring Ptr_Ring;
++typedef struct CompressData CompressData;
 +
-+/*
-+ * Note: callers invoking this in a loop must use a compiler barrier,
-+ * for example cpu_relax().
-+ */
-+static inline bool ptr_ring_full(struct ptr_ring *r)
+ static void
+-update_compress_thread_counts(const CompressParam *param, int bytes_xmit)
++update_compress_thread_counts(CompressData *cd, int bytes_xmit)
+ {
+     ram_counters.transferred += bytes_xmit;
+ 
+-    if (param->zero_page) {
++    if (cd->zero_page) {
+         ram_counters.duplicate++;
+         return;
+     }
+@@ -1924,81 +1796,127 @@ update_compress_thread_counts(const CompressParam *param, int bytes_xmit)
+     compression_counters.pages++;
+ }
+ 
++static ThreadRequest *compress_thread_data_init(void)
 +{
-+    return r->queue[r->producer];
-+}
++    CompressData *cd = g_new0(CompressData, 1);
 +
-+/*
-+ * Note: callers invoking this in a loop must use a compiler barrier,
-+ * for example cpu_relax().
-+ *
-+ * Callers are responsible for making sure pointer that is being queued
-+ * points to a valid data.
-+ */
-+static inline int ptr_ring_produce(struct ptr_ring *r, void *ptr)
-+{
-+    if (unlikely(!r->size) || r->queue[r->producer])
-+        return -ENOSPC;
++    cd->originbuf = g_try_malloc(TARGET_PAGE_SIZE);
++    if (!cd->originbuf) {
++        goto exit;
++    }
 +
-+    /* Make sure the pointer we are storing points to a valid data. */
-+    /* Pairs with READ_ONCE in ptr_ring_consume. */
-+    smp_wmb();
++    if (deflateInit(&cd->stream, migrate_compress_level()) != Z_OK) {
++        g_free(cd->originbuf);
++        goto exit;
++    }
 +
-+    WRITE_ONCE(r->queue[r->producer++], ptr);
-+    if (unlikely(r->producer >= r->size))
-+        r->producer = 0;
-+    return 0;
-+}
++    cd->file = qemu_fopen_ops(NULL, &empty_ops);
++    return &cd->request;
 +
-+static inline void *__ptr_ring_peek(struct ptr_ring *r)
-+{
-+    if (likely(r->size))
-+        return READ_ONCE(r->queue[r->consumer_head]);
++exit:
++    g_free(cd);
 +    return NULL;
 +}
 +
-+/*
-+ * Test ring empty status.
-+ *
-+ * However, if some other CPU consumes ring entries at the same time,
-+ * the value returned is not guaranteed to be correct.
-+ *
-+ * In this case - to avoid incorrectly detecting the ring
-+ * as empty - the CPU consuming the ring entries is responsible
-+ * for either consuming all ring entries until the ring is empty,
-+ * or synchronizing with some other CPU and causing it to
-+ * re-test ptr_ring_empty and/or consume the ring enteries
-+ * after the synchronization point.
-+ *
-+ * Note: callers invoking this in a loop must use a compiler barrier,
-+ * for example cpu_relax().
-+ */
-+static inline bool ptr_ring_empty(struct ptr_ring *r)
++static void compress_thread_data_fini(ThreadRequest *request)
 +{
-+    if (likely(r->size))
-+        return !r->queue[READ_ONCE(r->consumer_head)];
-+    return true;
++    CompressData *cd = container_of(request, CompressData, request);
++
++    qemu_fclose(cd->file);
++    deflateEnd(&cd->stream);
++    g_free(cd->originbuf);
++    g_free(cd);
 +}
 +
-+/* Must only be called after __ptr_ring_peek returned !NULL */
-+static inline void __ptr_ring_discard_one(struct ptr_ring *r)
++static void compress_thread_data_handler(ThreadRequest *request)
 +{
-+    /* Fundamentally, what we want to do is update consumer
-+     * index and zero out the entry so producer can reuse it.
-+     * Doing it naively at each consume would be as simple as:
-+     *       consumer = r->consumer;
-+     *       r->queue[consumer++] = NULL;
-+     *       if (unlikely(consumer >= r->size))
-+     *               consumer = 0;
-+     *       r->consumer = consumer;
-+     * but that is suboptimal when the ring is full as producer is writing
-+     * out new entries in the same cache line.  Defer these updates until a
-+     * batch of entries has been consumed.
-+     */
-+    /* Note: we must keep consumer_head valid at all times for ptr_ring_empty
-+     * to work correctly.
-+     */
-+    int consumer_head = r->consumer_head;
-+    int head = consumer_head++;
++    CompressData *cd = container_of(request, CompressData, request);
 +
-+    /* Once we have processed enough entries invalidate them in
-+     * the ring all at once so producer can reuse their space in the ring.
-+     * We also do this when we reach end of the ring - not mandatory
-+     * but helps keep the implementation simple.
++    /*
++     * if compression fails, it will be indicated by
++     * migrate_get_current()->to_dst_file.
 +     */
-+    if (unlikely(consumer_head - r->consumer_tail >= r->batch ||
-+             consumer_head >= r->size)) {
-+        /* Zero out entries in the reverse order: this way we touch the
-+         * cache line that producer might currently be reading the last;
-+         * producer won't make progress and touch other cache lines
-+         * besides the first one until we write out all entries.
++    cd->zero_page = do_compress_ram_page(cd->file, &cd->stream, cd->block,
++                                         cd->offset, cd->originbuf);
++}
++
++static void compress_thread_data_done(ThreadRequest *request)
++{
++    CompressData *cd = container_of(request, CompressData, request);
++    RAMState *rs = ram_state;
++    int bytes_xmit;
++
++    bytes_xmit = qemu_put_qemu_file(rs->f, cd->file);
++    update_compress_thread_counts(cd, bytes_xmit);
++}
++
++static Threads *compress_threads;
++
+ static bool save_page_use_compression(RAMState *rs);
+ 
+ static void flush_compressed_data(RAMState *rs)
+ {
+-    int idx, len, thread_count;
+-
+     if (!save_page_use_compression(rs)) {
+         return;
+     }
+-    thread_count = migrate_compress_threads();
+ 
+-    qemu_mutex_lock(&comp_done_lock);
+-    for (idx = 0; idx < thread_count; idx++) {
+-        while (!comp_param[idx].done) {
+-            qemu_cond_wait(&comp_done_cond, &comp_done_lock);
+-        }
+-    }
+-    qemu_mutex_unlock(&comp_done_lock);
++    threads_wait_done(compress_threads);
++}
+ 
+-    for (idx = 0; idx < thread_count; idx++) {
+-        qemu_mutex_lock(&comp_param[idx].mutex);
+-        if (!comp_param[idx].quit) {
+-            len = qemu_put_qemu_file(rs->f, comp_param[idx].file);
+-            /*
+-             * it's safe to fetch zero_page without holding comp_done_lock
+-             * as there is no further request submitted to the thread,
+-             * i.e, the thread should be waiting for a request at this point.
+-             */
+-            update_compress_thread_counts(&comp_param[idx], len);
+-        }
+-        qemu_mutex_unlock(&comp_param[idx].mutex);
++static void compress_threads_save_cleanup(void)
++{
++    if (!compress_threads) {
++        return;
+     }
++
++    threads_destroy(compress_threads);
++    compress_threads = NULL;
+ }
+ 
+-static inline void set_compress_params(CompressParam *param, RAMBlock *block,
+-                                       ram_addr_t offset)
++static int compress_threads_save_setup(void)
+ {
+-    param->block = block;
+-    param->offset = offset;
++    if (!migrate_use_compression()) {
++        return 0;
++    }
++
++    compress_threads = threads_create(migrate_compress_threads(),
++                                      "compress",
++                                      DEFAULT_THREAD_RING_SIZE,
++                                      compress_thread_data_init,
++                                      compress_thread_data_fini,
++                                      compress_thread_data_handler,
++                                      compress_thread_data_done);
++    return compress_threads ? 0 : -1;
+ }
+ 
+ static int compress_page_with_multi_thread(RAMState *rs, RAMBlock *block,
+                                            ram_addr_t offset)
+ {
+-    int idx, thread_count, bytes_xmit = -1, pages = -1;
++    CompressData *cd;
++    ThreadRequest *request;
+     bool wait = migrate_compress_wait_thread();
+ 
+-    thread_count = migrate_compress_threads();
+-    qemu_mutex_lock(&comp_done_lock);
+ retry:
+-    for (idx = 0; idx < thread_count; idx++) {
+-        if (comp_param[idx].done) {
+-            comp_param[idx].done = false;
+-            bytes_xmit = qemu_put_qemu_file(rs->f, comp_param[idx].file);
+-            qemu_mutex_lock(&comp_param[idx].mutex);
+-            set_compress_params(&comp_param[idx], block, offset);
+-            qemu_cond_signal(&comp_param[idx].cond);
+-            qemu_mutex_unlock(&comp_param[idx].mutex);
+-            pages = 1;
+-            update_compress_thread_counts(&comp_param[idx], bytes_xmit);
+-            break;
++    request = threads_submit_request_prepare(compress_threads);
++    if (!request) {
++        /*
++         * wait for the free thread if the user specifies
++         * 'compress-wait-thread', otherwise we will post
++         *  the page out in the main thread as normal page.
 +         */
-+        while (likely(head >= r->consumer_tail))
-+            r->queue[head--] = NULL;
-+        r->consumer_tail = consumer_head;
-+    }
-+    if (unlikely(consumer_head >= r->size)) {
-+        consumer_head = 0;
-+        r->consumer_tail = 0;
-+    }
-+    /* matching READ_ONCE in ptr_ring_empty for lockless tests */
-+    WRITE_ONCE(r->consumer_head, consumer_head);
-+}
-+
-+static inline void *ptr_ring_consume(struct ptr_ring *r)
-+{
-+    void *ptr;
-+
-+    /* The READ_ONCE in __ptr_ring_peek guarantees that anyone
-+     * accessing data through the pointer is up to date. Pairs
-+     * with smp_wmb in ptr_ring_produce.
-+     */
-+    ptr = __ptr_ring_peek(r);
-+    if (ptr)
-+        __ptr_ring_discard_one(r);
-+
-+    return ptr;
-+}
-+
-+static inline int ptr_ring_consume_batched(struct ptr_ring *r,
-+                         void **array, int n)
-+{
-+    void *ptr;
-+    int i;
-+
-+    for (i = 0; i < n; i++) {
-+        ptr = ptr_ring_consume(r);
-+        if (!ptr)
-+            break;
-+        array[i] = ptr;
-+    }
-+
-+    return i;
-+}
-+
-+static inline void **__ptr_ring_init_queue_alloc(unsigned int size)
-+{
-+    return g_try_malloc0_n(size, sizeof(void *));
-+}
-+
-+static inline void __ptr_ring_set_size(struct ptr_ring *r, int size)
-+{
-+    r->size = size;
-+    r->batch = SMP_CACHE_BYTES * 2 / sizeof(*(r->queue));
-+    /* We need to set batch at least to 1 to make logic
-+     * in __ptr_ring_discard_one work correctly.
-+     * Batching too much (because ring is small) would cause a lot of
-+     * burstiness. Needs tuning, for now disable batching.
-+     */
-+    if (r->batch > r->size / 2 || !r->batch)
-+        r->batch = 1;
-+}
-+
-+/*
-+ * Disable batching so that there is no consumered entry in the ring.
-+ *
-+ * It is convenient if it makes sure that the ring is large enough to
-+ * contain all requests, i.e, ptr_ring_produce can not fail.
-+ */
-+static inline void ptr_ring_disable_batch(struct ptr_ring *r)
-+{
-+    r->batch = 1;
-+}
-+
-+static inline int ptr_ring_init(struct ptr_ring *r, int size)
-+{
-+    r->queue = __ptr_ring_init_queue_alloc(size);
-+    if (!r->queue)
-+        return -ENOMEM;
-+
-+    __ptr_ring_set_size(r, size);
-+    r->producer = r->consumer_head = r->consumer_tail = 0;
-+    return 0;
-+}
-+
-+static inline void ptr_ring_cleanup(struct ptr_ring *r, void (*destroy)(void *))
-+{
-+    void *ptr;
-+
-+    if (destroy)
-+        while ((ptr = ptr_ring_consume(r)))
-+            destroy(ptr);
-+    g_free(r->queue);
-+}
-+#endif
++        if (wait) {
++            cpu_relax();
++            goto retry;
+         }
+-    }
+ 
+-    /*
+-     * wait for the free thread if the user specifies 'compress-wait-thread',
+-     * otherwise we will post the page out in the main thread as normal page.
+-     */
+-    if (pages < 0 && wait) {
+-        qemu_cond_wait(&comp_done_cond, &comp_done_lock);
+-        goto retry;
+-    }
+-    qemu_mutex_unlock(&comp_done_lock);
++        return -1;
++     }
+ 
+-    return pages;
++    cd = container_of(request, CompressData, request);
++    cd->block = block;
++    cd->offset = offset;
++    threads_submit_request_commit(compress_threads, request);
++    return 1;
+ }
+ 
+ /**
 -- 
 2.14.4
