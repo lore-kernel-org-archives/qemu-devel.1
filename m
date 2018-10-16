@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45224)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47634)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aclindsa@gmail.com>) id 1gCOkV-0007kE-Oj
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 08:47:00 -0400
+	(envelope-from <kwolf@redhat.com>) id 1gCOot-00017U-17
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 08:51:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aclindsa@gmail.com>) id 1gCOkP-0001qB-AO
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 08:46:59 -0400
-Date: Tue, 16 Oct 2018 08:46:49 -0400
-From: Aaron Lindsay <aclindsa@gmail.com>
-Message-ID: <20181016124648.GN3671@okra.localdomain>
-References: <20181010203735.27918-1-aclindsa@gmail.com>
-	<CAFEAcA9cACQa7A8VUdfuSk-FcmFeHu+4x5m7HDE1A-+LYcwvXA@mail.gmail.com>
+	(envelope-from <kwolf@redhat.com>) id 1gCOor-0003H9-TJ
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 08:51:30 -0400
+Date: Tue, 16 Oct 2018 14:51:10 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20181016125110.GG5620@dhcp-200-186.str.redhat.com>
+References: <20181015200319.23076-1-crosa@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA9cACQa7A8VUdfuSk-FcmFeHu+4x5m7HDE1A-+LYcwvXA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v6 00/14] More fully implement ARM PMUv3
+In-Reply-To: <20181015200319.23076-1-crosa@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH] iotests: make 083 specific to raw
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,45 +22,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
+To: Cleber Rosa <crosa@redhat.com>
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org
 
-On Oct 16 13:01, Peter Maydell wrote:
-> On 10 October 2018 at 21:37, Aaron Lindsay <aclindsa@gmail.com> wrote:
-> > The ARM PMU implementation currently contains a basic cycle counter, but
-> > it is often useful to gather counts of other events, filter them based
-> > on execution mode, and/or be notified on counter overflow. These patches
-> > flesh out the implementations of various PMU registers including
-> > PM[X]EVCNTR and PM[X]EVTYPER, add a struct definition to represent
-> > arbitrary counter types, implement mode filtering, send interrupts on
-> > counter overflow, and add instruction, cycle, and software increment
-> > events.
-> >
-> > Since v5 [1] I have:
-> > * Taken a first pass at addressing migration
-> > * Restructured the list of supported events, and ensured they're all
-> >   initialized
-> > * Fixed aliasing for PMOVSSET
-> > * Added ARM_CP_IO for PMINTENCLR and PMINTENCLR_EL1
-> > * Addressed a few non-code issues (comment style, patch staging,
-> >   spelling, etc.)
-> >
-> > [1] - https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg06830.html
-> >
-> > Aaron Lindsay (14):
-> >   target/arm: Mark PMINTENCLR and PMINTENCLR_EL1 accesses as possibly
-> >     doing IO
-> >   target/arm: Mask PMOVSR writes based on supported counters
+Am 15.10.2018 um 22:03 hat Cleber Rosa geschrieben:
+> While testing the Python 3 changes which touch the 083 test, I noticed
+> that it would fail with qcow2.  Expanding the testing, I noticed it
+> had nothing to do with the Python 3 changes, and in fact, it would not
+> pass on anything but raw:
 > 
-> Hi; Richard has reviewed most of this series and suggested some
-> changes (thanks!); I'll just take these first two patches into
-> target-arm.next, since they're simple fixes that have been reviewed.
+>  raw: pass
+>  bochs: not generic
+>  cloop: not generic
+>  parallels: fail
+>  qcow: fail
+>  qcow2: fail
+>  qed: fail
+>  vdi: fail
+>  vhdx: fail
+>  vmdk: fail
+>  vpc: fail
+>  luks: fail
+> 
+> The errors are a mixture I/O and "image not in xxx format", such as:
+> 
+>   === Check disconnect before data ===
+> 
+>   Unexpected end-of-file before all bytes were read
+>  -read failed: Input/output error
+>  +can't open device nbd+tcp://127.0.0.1:PORT/foo: Could not open 'nbd://127.0.0.1:PORT/foo': Input/output error
+> 
+>   === Check disconnect after data ===
+> 
+>  -read 512/512 bytes at offset 0
+>  -512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+>  +can't open device nbd+tcp://127.0.0.1:PORT/foo: Image not in qcow format
+> 
+> I'm not aware if there's a quick fix, so, for the time being, it looks
+> like the honest approach is to make the test known to work on raw
+> only.
+> 
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
 
-Thanks, Peter and Richard!
+Yes, that makes sense to me.
 
-Is anyone willing to take a glance at the final patch in this series,
-"target/arm: Send interrupts on PMU counter overflow", before my next
-iteration? I'm particularly interested in a review of the approach I
-took for detecting overflow.
+Thanks, applied to the block branch.
 
--Aaron
+Kevin
