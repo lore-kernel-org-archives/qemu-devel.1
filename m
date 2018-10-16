@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60643)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32868)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gCTVM-0005kY-JK
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:51:41 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1gCTWV-0006pY-FP
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:52:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gCTVH-0004Ie-FU
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:51:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39298)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gCTVF-00046X-Gt
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:51:33 -0400
-From: Cleber Rosa <crosa@redhat.com>
-Date: Tue, 16 Oct 2018 13:50:42 -0400
-Message-Id: <20181016175042.578-4-crosa@redhat.com>
-In-Reply-To: <20181016175042.578-1-crosa@redhat.com>
-References: <20181016175042.578-1-crosa@redhat.com>
+	(envelope-from <pm215@archaic.org.uk>) id 1gCTWR-0006ck-H3
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:52:49 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:51928)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1gCTWM-0006OW-Q4
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:52:43 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 16 Oct 2018 18:52:36 +0100
+Message-Id: <20181016175236.5840-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 3/3] Travis support for the acceptance tests
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] hw/acpi/nvdimm: Don't take address of fields
+ in packed structs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,42 +26,70 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Laszlo Ersek <lersek@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Caio Carrara <ccarrara@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Cleber Rosa <crosa@redhat.com>
+Cc: patches@linaro.org, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>
 
-This enables the execution of the acceptance tests on Travis.
+Taking the address of a field in a packed struct is a bad idea, because
+it might not be actually aligned enough for that pointer type (and
+thus cause a crash on dereference on some host architectures). Newer
+versions of clang warn about this. Avoid the bug by not using the
+"modify in place" byte swapping functions.
 
-Because the Travis environment is based on Ubuntu Trusty, it requires
-the python3-pip and python3.4-venv packages.
+Patch produced with scripts/coccinelle/inplace-byteswaps.cocci.
 
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- .travis.yml | 5 +++++
- 1 file changed, 5 insertions(+)
+Automatically generated patch, tested with "make check" only.
 
-diff --git a/.travis.yml b/.travis.yml
-index 95be6ec59f..f55f799c52 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -36,6 +36,8 @@ addons:
-       - liburcu-dev
-       - libusb-1.0-0-dev
-       - libvte-2.90-dev
-+      - python3-pip
-+      - python3.4-venv
-       - sparse
-       - uuid-dev
-       - gcovr
-@@ -117,6 +119,9 @@ matrix:
-     - env: CONFIG=3D"--target-list=3Dx86_64-softmmu"
-       python:
-         - "3.6"
-+    # Acceptance (Functional) tests
-+    - env: CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86_64-=
-softmmu"
-+           TEST_CMD=3D"make AVOCADO_SHOW=3Dapp check-acceptance"
-     # Using newer GCC with sanitizers
-     - addons:
-         apt:
---=20
-2.17.1
+ hw/acpi/nvdimm.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
+index 27eeb6609f5..e53b2cb6819 100644
+--- a/hw/acpi/nvdimm.c
++++ b/hw/acpi/nvdimm.c
+@@ -581,7 +581,7 @@ static void nvdimm_dsm_func_read_fit(AcpiNVDIMMState *state, NvdimmDsmIn *in,
+     int size;
+ 
+     read_fit = (NvdimmFuncReadFITIn *)in->arg3;
+-    le32_to_cpus(&read_fit->offset);
++    read_fit->offset = le32_to_cpu(read_fit->offset);
+ 
+     fit = fit_buf->fit;
+ 
+@@ -742,8 +742,8 @@ static void nvdimm_dsm_get_label_data(NVDIMMDevice *nvdimm, NvdimmDsmIn *in,
+     int size;
+ 
+     get_label_data = (NvdimmFuncGetLabelDataIn *)in->arg3;
+-    le32_to_cpus(&get_label_data->offset);
+-    le32_to_cpus(&get_label_data->length);
++    get_label_data->offset = le32_to_cpu(get_label_data->offset);
++    get_label_data->length = le32_to_cpu(get_label_data->length);
+ 
+     nvdimm_debug("Read Label Data: offset %#x length %#x.\n",
+                  get_label_data->offset, get_label_data->length);
+@@ -781,8 +781,8 @@ static void nvdimm_dsm_set_label_data(NVDIMMDevice *nvdimm, NvdimmDsmIn *in,
+ 
+     set_label_data = (NvdimmFuncSetLabelDataIn *)in->arg3;
+ 
+-    le32_to_cpus(&set_label_data->offset);
+-    le32_to_cpus(&set_label_data->length);
++    set_label_data->offset = le32_to_cpu(set_label_data->offset);
++    set_label_data->length = le32_to_cpu(set_label_data->length);
+ 
+     nvdimm_debug("Write Label Data: offset %#x length %#x.\n",
+                  set_label_data->offset, set_label_data->length);
+@@ -877,9 +877,9 @@ nvdimm_dsm_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
+     in = g_new(NvdimmDsmIn, 1);
+     cpu_physical_memory_read(dsm_mem_addr, in, sizeof(*in));
+ 
+-    le32_to_cpus(&in->revision);
+-    le32_to_cpus(&in->function);
+-    le32_to_cpus(&in->handle);
++    in->revision = le32_to_cpu(in->revision);
++    in->function = le32_to_cpu(in->function);
++    in->handle = le32_to_cpu(in->handle);
+ 
+     nvdimm_debug("Revision %#x Handler %#x Function %#x.\n", in->revision,
+                  in->handle, in->function);
+-- 
+2.19.0
