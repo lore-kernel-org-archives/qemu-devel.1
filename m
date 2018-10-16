@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42135)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gCVLD-0000ii-Vu
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 15:49:20 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1gCXs8-0001Td-Gb
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 18:31:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gCVL4-0004LN-80
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 15:49:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48132)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gCVL2-0004Ii-8J
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 15:49:09 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4832C30DF710
-	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 19:49:07 +0000 (UTC)
-References: <20181016174158.15229-1-armbru@redhat.com>
-	<20181016174158.15229-38-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e9ba67f8-d209-5cfa-5241-4603419704ee@redhat.com>
-Date: Tue, 16 Oct 2018 14:49:04 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gCXs4-0005CS-U7
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 18:31:28 -0400
+Received: from mail-pf1-x42c.google.com ([2607:f8b0:4864:20::42c]:44716)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gCXs1-0004zh-D9
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 18:31:23 -0400
+Received: by mail-pf1-x42c.google.com with SMTP id r9-v6so12138807pff.11
+	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 15:31:20 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Tue, 16 Oct 2018 15:31:07 -0700
+Message-Id: <20181016223115.24100-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20181016174158.15229-38-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 37/38] raw: Convert a warning to
- warn_report()
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v4 0/8] target/arm: Rely on id regs instead of
+ features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,33 +28,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-On 10/16/18 12:41 PM, Markus Armbruster wrote:
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->   block/raw-format.c | 17 +++++++++--------
->   1 file changed, 9 insertions(+), 8 deletions(-)
+This edition moves some of the system registers into a substructure,
+which is then shared with "normal" runtime and the translators.
+This is seen as a better solution than letting the entire translator
+have access to the main ARMCPU structure.
 
-Incomplete. tests/qemu-iotests/109.out needs updating:
+Also after rebasing on mainline, there was a new cortex-m33 failure
+caused by v8m implying v7ve implying arm_div.
 
-> @@ -436,14 +437,14 @@ static int raw_open(BlockDriverState *bs, QDict *options, int flags,
->               bs->file->bs->supported_zero_flags);
->   
->       if (bs->probed && !bdrv_is_read_only(bs)) {
-> -        fprintf(stderr,
-> -                "WARNING: Image format was not specified for '%s' and probing "
-> -                "guessed raw.\n"
-> -                "         Automatically detecting the format is dangerous for "
-> -                "raw images, write operations on block 0 will be restricted.\n"
-> -                "         Specify the 'raw' format explicitly to remove the "
-> -                "restrictions.\n",
-> -                bs->file->bs->filename);
-> +        warn_report("Image format was not specified for '%s' and probing "
 
-as this changes s/WARNING/warning/
+r~
+
+
+Richard Henderson (8):
+  target/arm: Move some system registers into a substructure
+  target/arm: V8M should not imply V7VE
+  target/arm: Convert v8 extensions from feature bits to isar tests
+  target/arm: Convert division from feature bits to isar0 tests
+  target/arm: Convert jazelle from feature bit to isar1 test
+  target/arm: Convert t32ee from feature bit to isar3 test
+  target/arm: Convert sve from feature bit to aa64pfr0 test
+  target/arm: Convert v8.2-fp16 from feature bit to aa64pfr0 test
+
+ target/arm/cpu.h            | 220 +++++++++++++++++++++++++++-----
+ target/arm/translate.h      |   7 ++
+ hw/intc/armv7m_nvic.c       |  12 +-
+ linux-user/aarch64/signal.c |   4 +-
+ linux-user/elfload.c        |  60 +++++----
+ linux-user/syscall.c        |  10 +-
+ target/arm/cpu.c            | 242 +++++++++++++++++++-----------------
+ target/arm/cpu64.c          | 148 ++++++++++++----------
+ target/arm/helper.c         |  41 +++---
+ target/arm/machine.c        |   6 +-
+ target/arm/translate-a64.c  | 145 +++++++++++----------
+ target/arm/translate.c      |  48 ++++---
+ 12 files changed, 570 insertions(+), 373 deletions(-)
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.17.2
