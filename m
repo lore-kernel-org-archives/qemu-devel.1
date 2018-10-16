@@ -1,27 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54047)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45960)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gCIS8-0003Ys-IH
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 02:03:37 -0400
+	(envelope-from <armbru@redhat.com>) id 1gCJ3I-0001eq-Me
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 02:42:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gCIS0-00033C-9p
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 02:03:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40418)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gCIRq-0002tH-1H
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 02:03:18 -0400
-References: <20181005211450.847-1-cota@braap.org>
-	<20181005211450.847-5-cota@braap.org>
-	<4f8df676-f854-e7fe-afed-51099a8abffe@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6ae5b4c7-3300-2059-b648-855d7ea00488@redhat.com>
-Date: Tue, 16 Oct 2018 08:03:03 +0200
-MIME-Version: 1.0
-In-Reply-To: <4f8df676-f854-e7fe-afed-51099a8abffe@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 4/4] cputlb: read CPUTLBEntry.addr_write
- atomically
+	(envelope-from <armbru@redhat.com>) id 1gCJ3H-00088W-AY
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 02:42:00 -0400
+From: Markus Armbruster <armbru@redhat.com>
+Date: Tue, 16 Oct 2018 08:41:41 +0200
+Message-Id: <20181016064141.32167-1-armbru@redhat.com>
+Subject: [Qemu-devel] [RFC PATCH] block: Clean up bdrv_img_create()'s error
+ reporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,35 +18,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
 
-On 16/10/2018 04:52, Richard Henderson wrote:
-> On 10/5/18 2:14 PM, Emilio G. Cota wrote:
->> -    target_ulong tlb_addr = env->tlb_table[mmu_idx][index].addr_write;
->> +    target_ulong tlb_addr =
->> +        atomic_read(&env->tlb_table[mmu_idx][index].addr_write);
-> 
-> This fails for 32-bit hosts emulating 64-bit hosts.
-> I think you need a separate helper function.  Perhaps
-> 
-> static inline target_ulong tlb_addr_write(CPUTLBEntry *ent)
-> {
-> #if TCG_OVERSIZED_GUEST
->     return ent->addr_write;
-> #else
->     return atomic_read(&ent->addr_write);
-> #endif
-> }
-> 
+bdrv_img_create() takes an Error ** argument and used it in the
+conventional way, except for one place: when qemu_opts_do_parse()
+fails, it first reports its error to stderr or the HMP monitor with
+error_report_err(), then error_setg()'s a generic error.  When the
+caller reports that second error similarly, this produces two
+consecutive error messages on stderr or the HMP monitor.  When the
+caller does something else with it, such as send it via QMP, the first
+error still goes to stderr or the HMP monitor.  Not good.
 
-Or just atomic_read__nocheck.
+Turn the first message into a prefix for the second.
 
-Paolo
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
 
-> I'm going to drop this patch from my queue for now.
-> We can fix it up this week some time.
-> 
-> 
-> r~
-> 
+This is RFC because I didn't check whether "caller does something else
+with it" can actually happen with current code, and I'm not sure the
+prefix is wanted.  I hope we'll answer both questions during review.
+
+ block.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/block.c b/block.c
+index 5d51419d21..08aafc20a2 100644
+--- a/block.c
++++ b/block.c
+@@ -4803,9 +4803,9 @@ void bdrv_img_create(const char *filename, const char *fmt,
+     if (options) {
+         qemu_opts_do_parse(opts, options, NULL, &local_err);
+         if (local_err) {
+-            error_report_err(local_err);
+-            local_err = NULL;
+-            error_setg(errp, "Invalid options for file format '%s'", fmt);
++            error_propagate_prepend(errp, local_err,
++                                    "Invalid options for file format '%s'",
++                                    fmt);
+             goto out;
+         }
+     }
+-- 
+2.17.1
