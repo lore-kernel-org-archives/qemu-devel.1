@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41007)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41676)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gCSOV-0005zJ-5B
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 12:40:31 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1gCSQi-0007Cq-Oo
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 12:42:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gCSOS-0003L1-03
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 12:40:31 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:34139)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gCSOP-0003Gk-BO
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 12:40:26 -0400
-Date: Tue, 16 Oct 2018 12:40:19 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20181016164019.GA5666@flamenco>
-References: <20181016111006.629-1-xiaoguangrong@tencent.com>
-	<20181016111006.629-2-xiaoguangrong@tencent.com>
+	(envelope-from <pm215@archaic.org.uk>) id 1gCSQh-0005mz-QA
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 12:42:48 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:51908)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1gCSQh-0005mO-G8
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 12:42:47 -0400
+Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
+	(envelope-from <pm215@archaic.org.uk>) id 1gCSQf-0003uT-JP
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 17:42:45 +0100
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 16 Oct 2018 17:42:43 +0100
+Message-Id: <20181016164243.13855-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181016111006.629-2-xiaoguangrong@tencent.com>
-Subject: Re: [Qemu-devel] [PATCH 1/4] ptr_ring: port ptr_ring from linux
- kernel to QEMU
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 00/17] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +28,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: guangrong.xiao@gmail.com
-Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, kvm@vger.kernel.org, quintela@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>, qemu-devel@nongnu.org, peterx@redhat.com, dgilbert@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn
+To: qemu-devel@nongnu.org
 
-On Tue, Oct 16, 2018 at 19:10:03 +0800, guangrong.xiao@gmail.com wrote:
-(snip)
-> diff --git a/include/qemu/ptr_ring.h b/include/qemu/ptr_ring.h
-> new file mode 100644
-> index 0000000000..d8266d45f6
-> --- /dev/null
-> +++ b/include/qemu/ptr_ring.h
-> @@ -0,0 +1,235 @@
-(snip)
-> +#define SMP_CACHE_BYTES      64
-> +#define ____cacheline_aligned_in_smp \
-> +        __attribute__((__aligned__(SMP_CACHE_BYTES)))
+v2: dropped a couple of cadence_gem changes to ID regs that
+caused new clang sanitizer warnings.
 
-You could use QEMU_ALIGNED() here.
+-- PMM
 
-> +
-> +#define WRITE_ONCE(ptr, val) \
-> +    (*((volatile typeof(ptr) *)(&(ptr))) = (val))
-> +#define READ_ONCE(ptr) (*((volatile typeof(ptr) *)(&(ptr))))
+The following changes since commit dddb37495b844270088e68e3bf30b764d48d863f:
 
-Why not atomic_read/set, like in the rest of the QEMU code base?
+  Merge remote-tracking branch 'remotes/awilliam/tags/vfio-updates-20181015.0' into staging (2018-10-15 18:44:04 +0100)
 
-Furthermore, READ_ONCE in the kernel implies smp_read_barrier_depends,
-whereas here you're not bringing that in. That means that your
-barrier pairing, e.g.
+are available in the Git repository at:
 
-> +    /* Pairs with READ_ONCE in ptr_ring_consume. */
-> +    smp_wmb();
+  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20181016-1
 
-is incorrect for Alpha.
+for you to fetch changes up to 2ef297af07196c29446556537861f8e7dfeeae7b:
 
-Thanks,
+  coccinelle: new inplace-byteswaps.cocci to remove inplace-byteswapping calls (2018-10-16 17:14:55 +0100)
 
-		E.
+----------------------------------------------------------------
+target-arm queue:
+ * hw/arm/virt: add DT property /secure-chosen/stdout-path indicating secure UART
+ * target/arm: Fix aarch64_sve_change_el wrt EL0
+ * target/arm: Define fields of ISAR registers
+ * target/arm: Align cortex-r5 id_isar0
+ * target/arm: Fix cortex-a7 id_isar0
+ * net/cadence_gem: Fix various bugs, add support for new
+   features that will be used by the Xilinx Versal board
+ * target-arm: powerctl: Enable HVC when starting CPUs to EL2
+ * target/arm: Add the Cortex-A72
+ * target/arm: Mark PMINTENCLR and PMINTENCLR_EL1 accesses as possibly doing IO
+ * target/arm: Mask PMOVSR writes based on supported counters
+ * target/arm: Initialize ARMMMUFaultInfo in v7m_stack_read/write
+ * coccinelle: new inplace-byteswaps.cocci to remove inplace-byteswapping calls
+
+----------------------------------------------------------------
+Aaron Lindsay (2):
+      target/arm: Mark PMINTENCLR and PMINTENCLR_EL1 accesses as possibly doing IO
+      target/arm: Mask PMOVSR writes based on supported counters
+
+Edgar E. Iglesias (8):
+      net: cadence_gem: Disable TSU feature bit
+      net: cadence_gem: Use uint32_t for 32bit descriptor words
+      net: cadence_gem: Add macro with max number of descriptor words
+      net: cadence_gem: Add support for extended descriptors
+      net: cadence_gem: Add support for selecting the DMA MemoryRegion
+      net: cadence_gem: Implement support for 64bit descriptor addresses
+      target-arm: powerctl: Enable HVC when starting CPUs to EL2
+      target/arm: Add the Cortex-A72
+
+Jerome Forissier (1):
+      hw/arm/virt: add DT property /secure-chosen/stdout-path indicating secure UART
+
+Peter Maydell (2):
+      target/arm: Initialize ARMMMUFaultInfo in v7m_stack_read/write
+      coccinelle: new inplace-byteswaps.cocci to remove inplace-byteswapping calls
+
+Richard Henderson (4):
+      target/arm: Fix aarch64_sve_change_el wrt EL0
+      target/arm: Define fields of ISAR registers
+      target/arm: Align cortex-r5 id_isar0
+      target/arm: Fix cortex-a7 id_isar0
+
+ include/hw/net/cadence_gem.h               |   7 +-
+ target/arm/cpu.h                           |  95 ++++++++++++++-
+ hw/arm/virt.c                              |   4 +
+ hw/net/cadence_gem.c                       | 185 ++++++++++++++++++++---------
+ target/arm/arm-powerctl.c                  |  10 ++
+ target/arm/cpu.c                           |   7 +-
+ target/arm/cpu64.c                         |  66 +++++++++-
+ target/arm/helper.c                        |  27 +++--
+ target/arm/op_helper.c                     |   6 +-
+ scripts/coccinelle/inplace-byteswaps.cocci |  65 ++++++++++
+ 10 files changed, 402 insertions(+), 70 deletions(-)
+ create mode 100644 scripts/coccinelle/inplace-byteswaps.cocci
