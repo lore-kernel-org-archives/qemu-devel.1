@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37495)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37895)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Stewart.Hildebrand@dornerworks.com>)
-	id 1gCQvj-0003My-8f
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:06:48 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1gCQxc-0004PK-J7
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:08:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Stewart.Hildebrand@dornerworks.com>)
-	id 1gCQve-0002cF-IX
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:06:43 -0400
-From: Stewart Hildebrand <Stewart.Hildebrand@dornerworks.com>
-Date: Tue, 16 Oct 2018 15:06:29 +0000
-Message-ID: <b8a89518794b4436af0c151ed10de4fa@dornerworks.com>
+	(envelope-from <amarkovic@wavecomp.com>) id 1gCQxX-0005j6-Mx
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:08:40 -0400
+Received: from mail-co1nam03on071a.outbound.protection.outlook.com
+	([2a01:111:f400:fe48::71a]:24668
+	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1gCQxW-0005Yk-FZ
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:08:35 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Tue, 16 Oct 2018 15:08:25 +0000
+Message-ID: <BN6PR2201MB1251D7F521F61B0598E0D2F1C6FE0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <1539362376-12010-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1539362376-12010-9-git-send-email-aleksandar.markovic@rt-rk.com>,
+	<CAAdtpL44km+bdSVfx=M-eMaXSrAKvChbAvED--9-nQxv=5-Esg@mail.gmail.com>
+In-Reply-To: <CAAdtpL44km+bdSVfx=M-eMaXSrAKvChbAvED--9-nQxv=5-Esg@mail.gmail.com>
 Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v2] hw/arm/boot: Increase compliance with
- kernel arm64 boot protocol
+Subject: Re: [Qemu-devel] [PATCH v5 08/28] target/mips: Add CPO PWBase
+ register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,54 +33,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andre Przywara <andre.przywara@arm.com>, =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, Julien Grall <julien.grall@arm.com>
+To: =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philippe@mathieu-daude.net>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Stefan Markovic <smarkovic@wavecomp.com>, Riku Voipio <riku.voipio@iki.fi>, Richard Henderson <richard.henderson@linaro.org>, Laurent Vivier <laurent@vivier.eu>, Petar Jovanovic <pjovanovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-IlRoZSBJbWFnZSBtdXN0IGJlIHBsYWNlZCB0ZXh0X29mZnNldCBieXRlcyBmcm9tIGEgMk1CIGFs
-aWduZWQgYmFzZQ0KYWRkcmVzcyBhbnl3aGVyZSBpbiB1c2FibGUgc3lzdGVtIFJBTSBhbmQgY2Fs
-bGVkIHRoZXJlLiINCg0KRm9yIHRoZSB2aXJ0IGJvYXJkLCB3ZSB3cml0ZSBvdXIgc3RhcnR1cCBi
-b290bG9hZGVyIGF0IHRoZSB2ZXJ5DQpib3R0b20gb2YgUkFNLCBzbyB0aGF0IGJpdCBjYW4ndCBi
-ZSB1c2VkIGZvciB0aGUgaW1hZ2UuIFRvIGF2b2lkDQpvdmVybGFwIGluIGNhc2UgdGhlIGltYWdl
-IHJlcXVlc3RzIHRvIGJlIGxvYWRlZCBhdCBhbiBvZmZzZXQNCnNtYWxsZXIgdGhhbiBvdXIgYm9v
-dGxvYWRlciwgd2UgaW5jcmVtZW50IHRoZSBsb2FkIG9mZnNldCB0byB0aGUNCm5leHQgMk1CLg0K
-DQpUaGlzIGZpeGVzIGEgYm9vdCBmYWlsdXJlIGZvciBYZW4gQUFyY2g2NC4NCg0KU2lnbmVkLW9m
-Zi1ieTogU3Rld2FydCBIaWxkZWJyYW5kIDxzdGV3YXJ0LmhpbGRlYnJhbmRAZG9ybmVyd29ya3Mu
-Y29tPg0KLS0tDQpDaGFuZ2VzIHYxIC0+IHYyOg0KLSB1c2UgS2lCL01pQiBtYWNyb3MgZm9yIHJl
-YWRhYmlsaXR5IChzdWdnZXN0ZWQgYnkgUGhpbGlwcGUgTWF0aGlldS1EYXVkw6kpLCBoZW5jZSB0
-aGUgYWRkaXRpb25hbCAjaW5jbHVkZQ0KLSBkZWZpbmUgYW4gdXBwZXIgYm91bmQgZm9yIHRoZSBi
-b290bG9hZGVyIHNpemUgc2luY2UgVEVYVF9PRkZTRVQgaGFzIHRvIGJlIHBhZ2UgYWxpZ25lZCBh
-bnl3YXkgKHN1Z2dlc3RlZCBieSBBbmRyZSBQcnp5d2FyYSkNCi0gYWRkIGFzc2VydCgpIGluIHdy
-aXRlX2Jvb3Rsb2FkZXIoKSB0byBtYWtlIHN1cmUgd2Ugc3RheSBiZWxvdyB0aGUgNEsgbWF4IChz
-dWdnZXN0ZWQgYnkgUGV0ZXIgTWF5ZGVsbCkNCi0tLQ0KIGh3L2FybS9ib290LmMgfCAxNSArKysr
-KysrKysrKysrKysNCiAxIGZpbGUgY2hhbmdlZCwgMTUgaW5zZXJ0aW9ucygrKQ0KDQpkaWZmIC0t
-Z2l0IGEvaHcvYXJtL2Jvb3QuYyBiL2h3L2FybS9ib290LmMNCmluZGV4IDIwYzcxZDdkOTYuLmE2
-NzVhNjAyYmMgMTAwNjQ0DQotLS0gYS9ody9hcm0vYm9vdC5jDQorKysgYi9ody9hcm0vYm9vdC5j
-DQpAQCAtMjQsNiArMjQsNyBAQA0KICNpbmNsdWRlICJxZW11L2NvbmZpZy1maWxlLmgiDQogI2lu
-Y2x1ZGUgInFlbXUvb3B0aW9uLmgiDQogI2luY2x1ZGUgImV4ZWMvYWRkcmVzcy1zcGFjZXMuaCIN
-CisjaW5jbHVkZSAicWVtdS91bml0cy5oIg0KIA0KIC8qIEtlcm5lbCBib290IHByb3RvY29sIGlz
-IHNwZWNpZmllZCBpbiB0aGUga2VybmVsIGRvY3MNCiAgKiBEb2N1bWVudGF0aW9uL2FybS9Cb290
-aW5nIGFuZCBEb2N1bWVudGF0aW9uL2FybTY0L2Jvb3RpbmcudHh0DQpAQCAtMzYsNiArMzcsOCBA
-QA0KICNkZWZpbmUgQVJNNjRfVEVYVF9PRkZTRVRfT0ZGU0VUICAgIDgNCiAjZGVmaW5lIEFSTTY0
-X01BR0lDX09GRlNFVCAgICAgICAgICA1Ng0KIA0KKyNkZWZpbmUgQk9PVExPQURFUl9NQVhfU0la
-RSAgICAgICAgICg0ICogS2lCKQ0KKw0KIEFkZHJlc3NTcGFjZSAqYXJtX2Jvb3RfYWRkcmVzc19z
-cGFjZShBUk1DUFUgKmNwdSwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-Y29uc3Qgc3RydWN0IGFybV9ib290X2luZm8gKmluZm8pDQogew0KQEAgLTE4NCw2ICsxODcsOCBA
-QCBzdGF0aWMgdm9pZCB3cml0ZV9ib290bG9hZGVyKGNvbnN0IGNoYXIgKm5hbWUsIGh3YWRkciBh
-ZGRyLA0KICAgICAgICAgY29kZVtpXSA9IHRzd2FwMzIoaW5zbik7DQogICAgIH0NCiANCisgICAg
-YXNzZXJ0KChsZW4gKiBzaXplb2YodWludDMyX3QpKSA8IEJPT1RMT0FERVJfTUFYX1NJWkUpOw0K
-Kw0KICAgICByb21fYWRkX2Jsb2JfZml4ZWRfYXMobmFtZSwgY29kZSwgbGVuICogc2l6ZW9mKHVp
-bnQzMl90KSwgYWRkciwgYXMpOw0KIA0KICAgICBnX2ZyZWUoY29kZSk7DQpAQCAtOTE5LDYgKzky
-NCwxNiBAQCBzdGF0aWMgdWludDY0X3QgbG9hZF9hYXJjaDY0X2ltYWdlKGNvbnN0IGNoYXIgKmZp
-bGVuYW1lLCBod2FkZHIgbWVtX2Jhc2UsDQogICAgICAgICBtZW1jcHkoJmhkcnZhbHMsIGJ1ZmZl
-ciArIEFSTTY0X1RFWFRfT0ZGU0VUX09GRlNFVCwgc2l6ZW9mKGhkcnZhbHMpKTsNCiAgICAgICAg
-IGlmIChoZHJ2YWxzWzFdICE9IDApIHsNCiAgICAgICAgICAgICBrZXJuZWxfbG9hZF9vZmZzZXQg
-PSBsZTY0X3RvX2NwdShoZHJ2YWxzWzBdKTsNCisNCisgICAgICAgICAgICAvKiBGb3IgdGhlIHZp
-cnQgYm9hcmQsIHdlIHdyaXRlIG91ciBzdGFydHVwICJib290bG9hZGVyIiBhdCB0aGUgdmVyeQ0K
-KyAgICAgICAgICAgICAqIGJvdHRvbSBvZiBSQU0sIHNvIHRoYXQgYml0IGNhbid0IGJlIHVzZWQg
-Zm9yIHRoZSBpbWFnZS4gVG8gYXZvaWQNCisgICAgICAgICAgICAgKiBvdmVybGFwIGluIGNhc2Ug
-dGhlIGltYWdlIHJlcXVlc3RzIHRvIGJlIGxvYWRlZCBhdCBhbiBvZmZzZXQNCisgICAgICAgICAg
-ICAgKiBzbWFsbGVyIHRoYW4gb3VyIGJvb3Rsb2FkZXIsIHdlIGluY3JlbWVudCB0aGUgbG9hZCBv
-ZmZzZXQgdG8gdGhlDQorICAgICAgICAgICAgICogbmV4dCAyTUIuDQorICAgICAgICAgICAgICov
-DQorICAgICAgICAgICAgaWYgKGtlcm5lbF9sb2FkX29mZnNldCA8IEJPT1RMT0FERVJfTUFYX1NJ
-WkUpIHsNCisgICAgICAgICAgICAgICAga2VybmVsX2xvYWRfb2Zmc2V0ICs9IDIgKiBNaUI7DQor
-ICAgICAgICAgICAgfQ0KICAgICAgICAgfQ0KICAgICB9DQogDQotLSANCjIuMTcuMQ0K
+> From: Philippe Mathieu-Daud=E9 <philippe@mathieu-daude.net>
+
+> > @@ -6948,6 +6969,11 @@ static void gen_dmfc0(DisasContext *ctx, TCGv ar=
+g, int reg, int sel)
+> >              tcg_gen_ld_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_Seg=
+Ctl2));
+> >              rn =3D "SegCtl2";
+> >              break;
+> > +        case 5:
+> > +            check_pw(ctx);
+> > +            tcg_gen_ld_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_PWB=
+ase));
+
+> Shouldn't you use gen_mfc0_load64()?
+
+It looks to me that  tcg_gen_ld_tl() is appropriate here. It will properly =
+handle endianess. There is no need for sign-extension here.
+
+There are other 64-bit related issues wrt PWxxx registers in this patch, bu=
+t this particular line looks OK to me.
+
+Thanks,
+Aleksandar
