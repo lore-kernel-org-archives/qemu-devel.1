@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42414)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43910)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gCPtr-00053N-8X
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 10:00:44 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gCPz6-0006P8-82
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 10:06:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gCPtl-0005oR-DT
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 10:00:42 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:44327)
+	(envelope-from <peter.maydell@linaro.org>) id 1gCPz5-0003sa-5s
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 10:06:08 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:36116)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gCPtj-0005XN-9r
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 10:00:37 -0400
-Received: by mail-oi1-x243.google.com with SMTP id u74-v6so18099154oia.11
-	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 07:00:26 -0700 (PDT)
+	id 1gCPz4-0003qd-UE
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 10:06:07 -0400
+Received: by mail-ot1-x343.google.com with SMTP id x4so21224304otg.3
+	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 07:06:06 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1535031276-22911-30-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1535031276-22911-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1535031276-22911-30-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1538067351-23931-3-git-send-email-gengdongjiu@huawei.com>
+References: <1538067351-23931-1-git-send-email-gengdongjiu@huawei.com>
+	<1538067351-23931-3-git-send-email-gengdongjiu@huawei.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 16 Oct 2018 15:00:05 +0100
-Message-ID: <CAFEAcA_aMAn5fND1U32q4u8Lf7P6OOVHG0EKUHeLsH7MmsTxkw@mail.gmail.com>
+Date: Tue, 16 Oct 2018 15:05:45 +0100
+Message-ID: <CAFEAcA83hcHqsZRzn8+PiVCTyQT=H_uXubxZPU=0H+tycoia-g@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v4 29/46] target/mips: Add emulation of DSP
- ASE for nanoMIPS - part 1
+Subject: Re: [Qemu-devel] [PATCH RFC v11 2/2] target/arm: Add support for
+ VCPU event states
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,60 +30,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Markovic <smarkovic@wavecomp.com>
+To: Dongjiu Geng <gengdongjiu@huawei.com>
+Cc: Andrew Jones <drjones@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Zheng Xiang <zhengxiang9@huawei.com>
 
-On 23 August 2018 at 14:34, Aleksandar Markovic
-<aleksandar.markovic@rt-rk.com> wrote:
-> From: Stefan Markovic <smarkovic@wavecomp.com>
+On 27 September 2018 at 17:55, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+> This patch extends the qemu-kvm state sync logic with support for
+> KVM_GET/SET_VCPU_EVENTS, giving access to yet missing SError exception.
+> And also it can support the exception state migration.
 >
-> Add emulation of DSP ASE instructions for nanoMIPS - part 1.
+> The SError exception states include SError pending state and ESR value,
+> the kvm_put/get_vcpu_events() will be called when set or get system
+> registers. When do migration, if source machine has SError pending,
+> QEMU will do this migration regardless whether the target machine supports
+> to specify guest ESR value, because if target machine does not support that,
+> it can also inject the SError with zero ESR value.
 >
-> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 
-Hi. Coverity points out a bug in this patch (CID 1395627):
-
-> ---
->  target/mips/translate.c | 554 ++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 554 insertions(+)
->
-> diff --git a/target/mips/translate.c b/target/mips/translate.c
-> index 95632dd..d3635e7 100644
-> --- a/target/mips/translate.c
-> +++ b/target/mips/translate.c
-> @@ -18061,6 +18061,554 @@ static void gen_pool32f_nanomips_insn(DisasContext *ctx)
->      }
->  }
->
-> +static void gen_pool32a5_nanomips_insn(DisasContext *ctx, int opc,
-> +                                       int rd, int rs, int rt)
-> +{
-
-[...]
-
-> +    case NM_SHRA_R_PH:
-> +        check_dsp(ctx);
-> +        tcg_gen_movi_tl(t0, rd >> 1);
-> +        switch (extract32(ctx->opcode, 10, 1)) {
-> +        case 0:
-> +            /* SHRA_PH */
-> +            gen_helper_shra_ph(v1_t, t0, v1_t);
-> +            break;
-> +            gen_store_gpr(v1_t, rt);
-
-This gen_store_gpr() call is unreachable because it
-is after the 'break'. Should the two lines be in the
-other order?
-
-> +        case 1:
-> +            /* SHRA_R_PH */
-> +            gen_helper_shra_r_ph(v1_t, t0, v1_t);
-> +            gen_store_gpr(v1_t, rt);
-> +            break;
-> +        }
-> +        break;
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
 thanks
 -- PMM
