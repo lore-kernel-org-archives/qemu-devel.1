@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42952)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42929)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gCRC8-0000fK-N3
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:23:41 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gCRC7-0007un-NF
+	(envelope-from <pm215@archaic.org.uk>) id 1gCRC8-0000ec-41
 	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:23:40 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:51900)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <pm215@archaic.org.uk>) id 1gCRC7-0007uB-8b
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:23:40 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:51902)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1gCRC7-0007ll-EH
+	id 1gCRC7-0007sS-0x
 	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:23:39 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1gCRC0-0003mi-9E
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 16:23:32 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1gCRC6-0003oD-2T
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 16:23:38 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 16 Oct 2018 16:23:09 +0100
-Message-Id: <20181016152325.31367-4-peter.maydell@linaro.org>
+Date: Tue, 16 Oct 2018 16:23:15 +0100
+Message-Id: <20181016152325.31367-10-peter.maydell@linaro.org>
 In-Reply-To: <20181016152325.31367-1-peter.maydell@linaro.org>
 References: <20181016152325.31367-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 03/19] target/arm: Define fields of ISAR
- registers
+Subject: [Qemu-devel] [PULL 09/19] net: cadence_gem: Add macro with max
+ number of descriptor words
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,115 +33,65 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
+Add macro with max number of DMA descriptor words.
+No functional change.
+
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20181008212205.17752-3-richard.henderson@linaro.org
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Message-id: 20181011021931.4249-5-edgar.iglesias@gmail.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/cpu.h | 88 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 88 insertions(+)
+ include/hw/net/cadence_gem.h | 5 ++++-
+ hw/net/cadence_gem.c         | 4 ++--
+ 2 files changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 54362ddce81..f00c0444c48 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -1443,6 +1443,94 @@ FIELD(V7M_CSSELR, LEVEL, 1, 3)
+diff --git a/include/hw/net/cadence_gem.h b/include/hw/net/cadence_gem.h
+index 633d564dc3b..b33ef6513b9 100644
+--- a/include/hw/net/cadence_gem.h
++++ b/include/hw/net/cadence_gem.h
+@@ -32,6 +32,9 @@
+ 
+ #define CADENCE_GEM_MAXREG        (0x00000800 / 4) /* Last valid GEM address */
+ 
++/* Max number of words in a DMA descriptor.  */
++#define DESC_MAX_NUM_WORDS              2
++
+ #define MAX_PRIORITY_QUEUES             8
+ #define MAX_TYPE1_SCREENERS             16
+ #define MAX_TYPE2_SCREENERS             16
+@@ -74,7 +77,7 @@ typedef struct CadenceGEMState {
+ 
+     uint8_t can_rx_state; /* Debug only */
+ 
+-    uint32_t rx_desc[MAX_PRIORITY_QUEUES][2];
++    uint32_t rx_desc[MAX_PRIORITY_QUEUES][DESC_MAX_NUM_WORDS];
+ 
+     bool sar_active[4];
+ } CadenceGEMState;
+diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
+index 31f3fe0e816..4d769b02440 100644
+--- a/hw/net/cadence_gem.c
++++ b/hw/net/cadence_gem.c
+@@ -1042,7 +1042,7 @@ static void gem_transmit_updatestats(CadenceGEMState *s, const uint8_t *packet,
   */
- FIELD(V7M_CSSELR, INDEX, 0, 4)
+ static void gem_transmit(CadenceGEMState *s)
+ {
+-    uint32_t desc[2];
++    uint32_t desc[DESC_MAX_NUM_WORDS];
+     hwaddr packet_desc_addr;
+     uint8_t     tx_packet[2048];
+     uint8_t     *p;
+@@ -1108,7 +1108,7 @@ static void gem_transmit(CadenceGEMState *s)
  
-+/*
-+ * System register ID fields.
-+ */
-+FIELD(ID_ISAR0, SWAP, 0, 4)
-+FIELD(ID_ISAR0, BITCOUNT, 4, 4)
-+FIELD(ID_ISAR0, BITFIELD, 8, 4)
-+FIELD(ID_ISAR0, CMPBRANCH, 12, 4)
-+FIELD(ID_ISAR0, COPROC, 16, 4)
-+FIELD(ID_ISAR0, DEBUG, 20, 4)
-+FIELD(ID_ISAR0, DIVIDE, 24, 4)
-+
-+FIELD(ID_ISAR1, ENDIAN, 0, 4)
-+FIELD(ID_ISAR1, EXCEPT, 4, 4)
-+FIELD(ID_ISAR1, EXCEPT_AR, 8, 4)
-+FIELD(ID_ISAR1, EXTEND, 12, 4)
-+FIELD(ID_ISAR1, IFTHEN, 16, 4)
-+FIELD(ID_ISAR1, IMMEDIATE, 20, 4)
-+FIELD(ID_ISAR1, INTERWORK, 24, 4)
-+FIELD(ID_ISAR1, JAZELLE, 28, 4)
-+
-+FIELD(ID_ISAR2, LOADSTORE, 0, 4)
-+FIELD(ID_ISAR2, MEMHINT, 4, 4)
-+FIELD(ID_ISAR2, MULTIACCESSINT, 8, 4)
-+FIELD(ID_ISAR2, MULT, 12, 4)
-+FIELD(ID_ISAR2, MULTS, 16, 4)
-+FIELD(ID_ISAR2, MULTU, 20, 4)
-+FIELD(ID_ISAR2, PSR_AR, 24, 4)
-+FIELD(ID_ISAR2, REVERSAL, 28, 4)
-+
-+FIELD(ID_ISAR3, SATURATE, 0, 4)
-+FIELD(ID_ISAR3, SIMD, 4, 4)
-+FIELD(ID_ISAR3, SVC, 8, 4)
-+FIELD(ID_ISAR3, SYNCHPRIM, 12, 4)
-+FIELD(ID_ISAR3, TABBRANCH, 16, 4)
-+FIELD(ID_ISAR3, T32COPY, 20, 4)
-+FIELD(ID_ISAR3, TRUENOP, 24, 4)
-+FIELD(ID_ISAR3, T32EE, 28, 4)
-+
-+FIELD(ID_ISAR4, UNPRIV, 0, 4)
-+FIELD(ID_ISAR4, WITHSHIFTS, 4, 4)
-+FIELD(ID_ISAR4, WRITEBACK, 8, 4)
-+FIELD(ID_ISAR4, SMC, 12, 4)
-+FIELD(ID_ISAR4, BARRIER, 16, 4)
-+FIELD(ID_ISAR4, SYNCHPRIM_FRAC, 20, 4)
-+FIELD(ID_ISAR4, PSR_M, 24, 4)
-+FIELD(ID_ISAR4, SWP_FRAC, 28, 4)
-+
-+FIELD(ID_ISAR5, SEVL, 0, 4)
-+FIELD(ID_ISAR5, AES, 4, 4)
-+FIELD(ID_ISAR5, SHA1, 8, 4)
-+FIELD(ID_ISAR5, SHA2, 12, 4)
-+FIELD(ID_ISAR5, CRC32, 16, 4)
-+FIELD(ID_ISAR5, RDM, 24, 4)
-+FIELD(ID_ISAR5, VCMA, 28, 4)
-+
-+FIELD(ID_ISAR6, JSCVT, 0, 4)
-+FIELD(ID_ISAR6, DP, 4, 4)
-+FIELD(ID_ISAR6, FHM, 8, 4)
-+FIELD(ID_ISAR6, SB, 12, 4)
-+FIELD(ID_ISAR6, SPECRES, 16, 4)
-+
-+FIELD(ID_AA64ISAR0, AES, 4, 4)
-+FIELD(ID_AA64ISAR0, SHA1, 8, 4)
-+FIELD(ID_AA64ISAR0, SHA2, 12, 4)
-+FIELD(ID_AA64ISAR0, CRC32, 16, 4)
-+FIELD(ID_AA64ISAR0, ATOMIC, 20, 4)
-+FIELD(ID_AA64ISAR0, RDM, 28, 4)
-+FIELD(ID_AA64ISAR0, SHA3, 32, 4)
-+FIELD(ID_AA64ISAR0, SM3, 36, 4)
-+FIELD(ID_AA64ISAR0, SM4, 40, 4)
-+FIELD(ID_AA64ISAR0, DP, 44, 4)
-+FIELD(ID_AA64ISAR0, FHM, 48, 4)
-+FIELD(ID_AA64ISAR0, TS, 52, 4)
-+FIELD(ID_AA64ISAR0, TLB, 56, 4)
-+FIELD(ID_AA64ISAR0, RNDR, 60, 4)
-+
-+FIELD(ID_AA64ISAR1, DPB, 0, 4)
-+FIELD(ID_AA64ISAR1, APA, 4, 4)
-+FIELD(ID_AA64ISAR1, API, 8, 4)
-+FIELD(ID_AA64ISAR1, JSCVT, 12, 4)
-+FIELD(ID_AA64ISAR1, FCMA, 16, 4)
-+FIELD(ID_AA64ISAR1, LRCPC, 20, 4)
-+FIELD(ID_AA64ISAR1, GPA, 24, 4)
-+FIELD(ID_AA64ISAR1, GPI, 28, 4)
-+FIELD(ID_AA64ISAR1, FRINTTS, 32, 4)
-+FIELD(ID_AA64ISAR1, SB, 36, 4)
-+FIELD(ID_AA64ISAR1, SPECRES, 40, 4)
-+
- QEMU_BUILD_BUG_ON(ARRAY_SIZE(((ARMCPU *)0)->ccsidr) <= R_V7M_CSSELR_INDEX_MASK);
+             /* Last descriptor for this packet; hand the whole thing off */
+             if (tx_desc_get_last(desc)) {
+-                uint32_t desc_first[2];
++                uint32_t desc_first[DESC_MAX_NUM_WORDS];
  
- /* If adding a feature bit which corresponds to a Linux ELF
+                 /* Modify the 1st descriptor of this packet to be owned by
+                  * the processor.
 -- 
 2.19.0
