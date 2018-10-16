@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34814)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gCQor-0006RW-1h
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 10:59:38 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gCQrN-0000lN-Bx
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:02:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gCQon-0003zN-Oq
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 10:59:36 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:52501)
+	(envelope-from <peter.maydell@linaro.org>) id 1gCQrE-0001fE-UW
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:02:10 -0400
+Received: from mail-oi1-x236.google.com ([2607:f8b0:4864:20::236]:38910)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gCQon-0003n7-Ew
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 10:59:33 -0400
-Received: by mail-wm1-f68.google.com with SMTP id 189-v6so22790330wmw.2
-	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 07:59:31 -0700 (PDT)
-References: <20181012165347.2117-1-crosa@redhat.com>
-	<20181012165347.2117-2-crosa@redhat.com>
-	<94f7da55-eaa1-6e63-333c-894831b9d66e@redhat.com>
-	<20181013033747.GC31060@habkost.net>
-	<e5e90d50-4ff7-f8f1-db78-c65f46b8d928@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <08f053d3-9537-f5d7-ab48-a813a71a4cf1@redhat.com>
-Date: Tue, 16 Oct 2018 16:58:19 +0200
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gCQrA-0001Tw-Sq
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:02:02 -0400
+Received: by mail-oi1-x236.google.com with SMTP id u197-v6so18303667oif.5
+	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 08:01:59 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <e5e90d50-4ff7-f8f1-db78-c65f46b8d928@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 1/3] Bootstrap Python venv for tests
+In-Reply-To: <CAFEAcA_ibkOPd0b2LrfrvmqpQfeWh_9vs+mwsJdumPo+SUhGJQ@mail.gmail.com>
+References: <CAFEAcA_ibkOPd0b2LrfrvmqpQfeWh_9vs+mwsJdumPo+SUhGJQ@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 16 Oct 2018 16:01:37 +0100
+Message-ID: <CAFEAcA9ETs3BkkFynYmO+WFrkemQeyiBx8yU+bnKK6snOiQejA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] proposed schedule, QEMU 3.1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,133 +28,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Caio Carrara <ccarrara@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <pmathieu@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: QEMU Developers <qemu-devel@nongnu.org>
 
-On 16/10/2018 15:50, Cleber Rosa wrote:
+On 1 October 2018 at 09:41, Peter Maydell <peter.maydell@linaro.org> wrote:
+> Here's a draft release schedule for 3.1, created by
+> taking our usual setup and arranging it to be definitely
+> done before Christmas.
+>
+> 2018-10-30 Soft feature freeze.
+> 2018-11-06 Hard feature freeze. Tag rc0
+> 2018-11-13 Tag rc1 2018-11-20 Tag rc2
+> 2018-11-27 Tag rc3 2018-12-04
+> Release; or tag rc4 if needed
+> 2018-12-11 Release, if we needed an rc4
+>
+> NB: KVM Forum is 24-26 Oct, so just before
+> softfreeze.
+>
+> We could maybe move it a week back, but that would
+> mean probably releasing on the 18th. I haven't yet
+> figured out my Christmas holiday plans but I suspect
+> that would fall within them...
 
-> On 10/12/18 11:37 PM, Eduardo Habkost wrote:
->> On Fri, Oct 12, 2018 at 11:30:39PM +0200, Philippe Mathieu-Daudé wrote:
->>> Hi Cleber,
->>>
->>> On 12/10/2018 18:53, Cleber Rosa wrote:
->>>> A number of QEMU tests are written in Python, and may benefit
->>>> from an untainted Python venv.
->>>>
->>>> By using make rules, tests that depend on specific Python libs
->>>> can set that rule as a requirement, along with rules that require
->>>> the presence or installation of specific libraries.
->>>>
->>>> The tests/venv-requirements.txt is supposed to contain the
->>>> Python requirements that should be added to the venv created
->>>> by check-venv.
->>>
->>> Maybe you (or Eduardo...) what you wrote in the cover:
->>>
->>>  There's one current caveat: it requires Python 3, as it's based on the
->>>  venv module.
->>>
->>> To explain:
->>>
->>> $ make check-acceptance
->>> /usr/bin/python2: No module named venv
->>> make: *** [/home/phil/source/qemu/tests/Makefile.include:1033:] Error 1
->>
->> Oops, this doesn't look very friendly.
->>
->> But note that this would become a non-issue if we start requiring
->> Python 3 for building QEMU.
->>
->>
-> 
-> IIUC, printing a "Can't create tests venv on Python 2", and aborting,
-> would be enough, right?
+No comments at all, so let's go with the draft...
 
-Certainly.
-
-> 
-> - Cleber.
-> 
->>>
->>>>
->>>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
->>>> ---
->>>>  tests/Makefile.include      | 20 ++++++++++++++++++++
->>>>  tests/venv-requirements.txt |  3 +++
->>>>  2 files changed, 23 insertions(+)
->>>>  create mode 100644 tests/venv-requirements.txt
->>>>
->>>> diff --git a/tests/Makefile.include b/tests/Makefile.include
->>>> index 5eadfd52f9..b66180efa1 100644
->>>> --- a/tests/Makefile.include
->>>> +++ b/tests/Makefile.include
->>>> @@ -12,6 +12,7 @@ check-help:
->>>>  	@echo " $(MAKE) check-block          Run block tests"
->>>>  	@echo " $(MAKE) check-tcg            Run TCG tests"
->>>>  	@echo " $(MAKE) check-report.html    Generates an HTML test report"
->>>> +	@echo " $(MAKE) check-venv           Creates a Python venv for tests"
->>>>  	@echo " $(MAKE) check-clean          Clean the tests"
->>>>  	@echo
->>>>  	@echo "Please note that HTML reports do not regenerate if the unit tests"
->>>> @@ -1017,6 +1018,24 @@ check-decodetree:
->>>>            ./check.sh "$(PYTHON)" "$(SRC_PATH)/scripts/decodetree.py", \
->>>>            TEST, decodetree.py)
->>>>  
->>>> +# Python venv for running tests
->>>> +
->>>> +.PHONY: check-venv
->>>> +
->>>> +TESTS_VENV_DIR=$(BUILD_DIR)/tests/venv
->>>> +TESTS_VENV_REQ=$(SRC_PATH)/tests/venv-requirements.txt
->>>> +
->>>> +$(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
->>>> +	$(call quiet-command, \
->>>> +            $(PYTHON) -m venv --system-site-packages $@, \
->>>> +            VENV, $@)
->>>> +	$(call quiet-command, \
->>>> +            $(TESTS_VENV_DIR)/bin/python -m pip -q install -r $(TESTS_VENV_REQ), \
->>>> +            PIP, $(TESTS_VENV_REQ))
->>>> +	$(call quiet-command, touch $@)
->>>
->>> Hmm maybe we should print something like:
->>>
->>>   "You can now activate this virtual environment using:
->>>     source $(TESTS_VENV_DIR)/tests/venv/bin/activate"
->>
->> I'm not sure this would be necessary: I expect usage of the venv
->> to be completely transparent.
->>
->> If we require people to learn what venv is and manually activate
->> it, I'd say we have failed to provide usable tools for running
->> the tests.
->>
->>
->>>
->>>> +
->>>> +check-venv: $(TESTS_VENV_DIR)
->>>> +
->>>>  # Consolidated targets
->>>>  
->>>>  .PHONY: check-qapi-schema check-qtest check-unit check check-clean
->>>> @@ -1030,6 +1049,7 @@ check-clean:
->>>>  	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
->>>>  	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y)) $(check-qtest-generic-y))
->>>>  	rm -f tests/test-qapi-gen-timestamp
->>>> +	rm -rf $(TESTS_VENV_DIR)
->>>>  
->>>>  clean: check-clean
->>>>  
->>>> diff --git a/tests/venv-requirements.txt b/tests/venv-requirements.txt
->>>> new file mode 100644
->>>> index 0000000000..d39f9d1576
->>>> --- /dev/null
->>>> +++ b/tests/venv-requirements.txt
->>>> @@ -0,0 +1,3 @@
->>>> +# Add Python module requirements, one per line, to be installed
->>>> +# in the tests/venv Python virtual environment. For more info,
->>>> +# refer to: https://pip.pypa.io/en/stable/user_guide/#id1
->>>>
->>>
->>> Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->>
-> 
+thanks
+-- PMM
