@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60489)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gCTUw-0005Q5-NO
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:51:15 -0400
+	(envelope-from <crosa@redhat.com>) id 1gCTV6-0005Vr-3P
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:51:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gCTUs-0003xX-2n
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:51:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36042)
+	(envelope-from <crosa@redhat.com>) id 1gCTUx-00043S-Vq
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:51:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45340)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gCTUr-0003vr-M2
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:51:10 -0400
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gCTUx-00042I-7F
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:51:15 -0400
 From: Cleber Rosa <crosa@redhat.com>
-Date: Tue, 16 Oct 2018 13:50:39 -0400
-Message-Id: <20181016175042.578-1-crosa@redhat.com>
+Date: Tue, 16 Oct 2018 13:50:40 -0400
+Message-Id: <20181016175042.578-2-crosa@redhat.com>
+In-Reply-To: <20181016175042.578-1-crosa@redhat.com>
+References: <20181016175042.578-1-crosa@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 0/3] Bootstrap Python venv and
- acceptance/functional tests
+Subject: [Qemu-devel] [PATCH v5 1/3] Bootstrap Python venv for tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,155 +29,88 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Laszlo Ersek <lersek@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Caio Carrara <ccarrara@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
-TL;DR
-=3D=3D=3D=3D=3D
+A number of QEMU tests are written in Python, and may benefit
+from an untainted Python venv.
 
-Allow acceptance tests to be run with `make check-acceptance`.
+By using make rules, tests that depend on specific Python libs
+can set that rule as a requirement, along with rules that require
+the presence or installation of specific libraries.
 
-Details
-=3D=3D=3D=3D=3D=3D=3D
+The tests/venv-requirements.txt is supposed to contain the
+Python requirements that should be added to the venv created
+by check-venv.
 
-This introduces a Python virtual environment that will be setup within
-the QEMU build directory, that will contain the exact environment that
-tests may require.
-
-There's one current caveat: it requires Python 3, as it's based on the
-venv module.  This was based on some discussions and perception about
-standardizing on Python 3, but can easily be made to accommodate Python
-2 as well.
-
-Example of bootstrap and test execution on Travis-CI:
-
-https://travis-ci.org/qemu/qemu/jobs/439331028#L2508
-
-   ...
-      VENV    /home/travis/build/qemu/qemu/tests/venv
-      MKDIR   /home/travis/build/qemu/qemu/tests/results
-      PIP     /home/travis/build/qemu/qemu/tests/venv-requirements.txt
-      AVOCADO tests/acceptance
-    JOB ID     : 920e4fcf55a1782f1ae77bee64b20ccdc2e1111d
-    JOB LOG    : /home/travis/build/qemu/qemu/tests/results/job-2018-10-0=
-9T21.42-920e4fc/job.log
-     (1/6) /home/travis/build/qemu/qemu/tests/acceptance/boot_linux_conso=
-le.py:BootLinuxConsole.test:  PASS (3.57 s)
-     (2/6) /home/travis/build/qemu/qemu/tests/acceptance/version.py:Versi=
-on.test_qmp_human_info_version:  PASS (0.04 s)
-     (3/6) /home/travis/build/qemu/qemu/tests/acceptance/vnc.py:Vnc.test_=
-no_vnc:  PASS (0.04 s)
-     (4/6) /home/travis/build/qemu/qemu/tests/acceptance/vnc.py:Vnc.test_=
-no_vnc_change_password:  PASS (0.04 s)
-     (5/6) /home/travis/build/qemu/qemu/tests/acceptance/vnc.py:Vnc.test_=
-vnc_change_password_requires_a_password:  PASS (0.04 s)
-     (6/6) /home/travis/build/qemu/qemu/tests/acceptance/vnc.py:Vnc.test_=
-vnc_change_password:  PASS (0.04 s)
-    RESULTS    : PASS 6 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT =
-0 | CANCEL 0
-    JOB TIME   : 3.90 s
-   ...
-
-Changes from v4:
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
- * Added Python 3 version check and error message when running under
-   Python 2.  (Philippe)
-
- * Added notes about using Avocado from the virtual environment
-   without previous activation.  (Phillipe)
-
-Ideas discussed, but not implemented:
-
- * Instructions to activate/deactivate the venv: the idea is to be
-   use the venv as transparently as possible.
-
- * Move/rename tests/venv-requirements: the ideal, as per the first
-   commit is to provide one venv for all Python based tests to run.
-
- * Changed the Travis package requirements (python3-pip,
-   python3.4-venv) from the global setting to the job specific one:
-   waiting on further feedback from'Alex Benn=C3=A9e.
-
-Changes from v3:
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
- * Fixed typo in commit message (s/requiment/requirement/).  (Eric)
-
-Changes from v2:
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
- * Make the $(TESTS_VENV_DIR) target depend on the
-   venv-requirements.txt file, and touch $(TESTS_VENV_DIR) after venv
-   runs.  With this, updates on the file are reflected on the
-   venv. (Philippe)
-
- * Run pip with "python -m pip".  It may have been installed reusing
-   the system wide packages, and then the script may not be available
-   on the venv. (Philippe)
-
- * Dropped Python version on Travis, and using the version supplied
-   by the distro (3.4). (Philippe)
-
- * Added "python3.4-venv" package requirement on Travis. (Philippe)
-
- * Added variable (AVOCADO_SHOW) with logging streams to be shown
-   while running the acceptance tests.  By default it's set to none,
-   the equivalent of the quiet mode used on previous versions.
-   (Philippe)
-
- * On Travis, set the AVOCADO_SHOW variable to "app", so that the
-   individual test results can be easily seen.  (Philippe)
-
-Ideas discussed, but not implemented:
-
-  * Run pip with "$(PYTHON) -m pip -q install ..." because it points
-    to the system wide Python installation. (Philippe)
-
-  * Drop the "--system-site-packages" flag.  Waiting on another round
-    of tests to determine if they are really the cause of some package
-    installation problems.
-
-Changes from v1:
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
- * TESTS_VENV_REQ (the path of "venv-requirements.txt") now points to
-   the source path ($SRC_PATH instead of $BUILD_DIR)
-
- * Create the venv with "--system-site-packages", which allows the
-   reuse of packages (and no additional downloads) in case there's a
-   package installed system wide providing the same package and
-   version.
-
- * Run Avocado with "python -m avocado".  It may have been installed
-   reusing the system wide packages, and then the script may not
-   be available on the venv.
-
- * Improved documentation describing the Python 3, venv and pip
-   requirements.
-
- * Updated avocado-framework requirement to latest released version
-   (65.0)
-
- * (New commit) Added support for running the acceptance tests on
-   Travis.
-
-Ideas discussed, but not implemented:
-
- * Install external packages such as python3-pip on Debian based
-   systems, deemed too invasive on developer's systems.
-
- * Allow the use of Python 2, and consequently the "virtualenv"
-   module.
-
-Cleber Rosa (3):
-  Bootstrap Python venv for tests
-  Acceptance tests: add make rule for running them
-  Travis support for the acceptance tests
-
- .travis.yml                 |  5 +++++
- docs/devel/testing.rst      | 43 ++++++++++++++++++++++++++++++++-----
- tests/Makefile.include      | 43 +++++++++++++++++++++++++++++++++++++
- tests/venv-requirements.txt |  4 ++++
- 4 files changed, 90 insertions(+), 5 deletions(-)
+Signed-off-by: Cleber Rosa <crosa@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Cleber Rosa <crosa@redhat.com>
+---
+ tests/Makefile.include      | 26 ++++++++++++++++++++++++++
+ tests/venv-requirements.txt |  3 +++
+ 2 files changed, 29 insertions(+)
  create mode 100644 tests/venv-requirements.txt
 
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 5eadfd52f9..49deb9b3a1 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -12,6 +12,7 @@ check-help:
+ 	@echo " $(MAKE) check-block          Run block tests"
+ 	@echo " $(MAKE) check-tcg            Run TCG tests"
+ 	@echo " $(MAKE) check-report.html    Generates an HTML test report"
++	@echo " $(MAKE) check-venv           Creates a Python venv for tests"
+ 	@echo " $(MAKE) check-clean          Clean the tests"
+ 	@echo
+ 	@echo "Please note that HTML reports do not regenerate if the unit test=
+s"
+@@ -1017,6 +1018,30 @@ check-decodetree:
+           ./check.sh "$(PYTHON)" "$(SRC_PATH)/scripts/decodetree.py", \
+           TEST, decodetree.py)
+=20
++# Python venv for running tests
++
++.PHONY: check-venv
++
++TESTS_VENV_DIR=3D$(BUILD_DIR)/tests/venv
++TESTS_VENV_REQ=3D$(SRC_PATH)/tests/venv-requirements.txt
++
++PYTHON_VER :=3D $(findstring Python 3,$(shell $(PYTHON) -V))
++ifeq ($(PYTHON_VER),Python 3)
++$(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
++	$(call quiet-command, \
++            $(PYTHON) -m venv --system-site-packages $@, \
++            VENV, $@)
++	$(call quiet-command, \
++            $(TESTS_VENV_DIR)/bin/python -m pip -q install -r $(TESTS_VE=
+NV_REQ), \
++            PIP, $(TESTS_VENV_REQ))
++	$(call quiet-command, touch $@)
++else
++$(TESTS_VENV_DIR):
++       $(error "venv directory for tests requires Python 3")
++endif
++
++check-venv: $(TESTS_VENV_DIR)
++
+ # Consolidated targets
+=20
+ .PHONY: check-qapi-schema check-qtest check-unit check check-clean
+@@ -1030,6 +1055,7 @@ check-clean:
+ 	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
+ 	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(t=
+arget)-y)) $(check-qtest-generic-y))
+ 	rm -f tests/test-qapi-gen-timestamp
++	rm -rf $(TESTS_VENV_DIR)
+=20
+ clean: check-clean
+=20
+diff --git a/tests/venv-requirements.txt b/tests/venv-requirements.txt
+new file mode 100644
+index 0000000000..d39f9d1576
+--- /dev/null
++++ b/tests/venv-requirements.txt
+@@ -0,0 +1,3 @@
++# Add Python module requirements, one per line, to be installed
++# in the tests/venv Python virtual environment. For more info,
++# refer to: https://pip.pypa.io/en/stable/user_guide/#id1
 --=20
 2.17.1
