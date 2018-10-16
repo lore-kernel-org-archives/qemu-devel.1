@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56703)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gCTM9-00064U-0s
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:42:11 -0400
+	(envelope-from <armbru@redhat.com>) id 1gCTM5-00063G-GJ
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:42:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gCTM6-00007H-5l
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:42:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53678)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gCTM5-00005q-Ns
+	(envelope-from <armbru@redhat.com>) id 1gCTM2-0008Ux-46
 	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:42:05 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 01E7E80F88
-	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 17:42:05 +0000 (UTC)
+Received: from mx1.redhat.com ([209.132.183.28]:45606)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gCTM1-0008TI-Oe
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:42:01 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 16 Oct 2018 19:41:33 +0200
-Message-Id: <20181016174158.15229-14-armbru@redhat.com>
+Date: Tue, 16 Oct 2018 19:41:22 +0200
+Message-Id: <20181016174158.15229-3-armbru@redhat.com>
 In-Reply-To: <20181016174158.15229-1-armbru@redhat.com>
 References: <20181016174158.15229-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 13/38] l2tpv3: Improve
- -netdev/netdev_add/-net/... error reporting
+Subject: [Qemu-devel] [PATCH v3 02/38] Use error_fatal to simplify obvious
+ fatal errors (again)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,124 +25,113 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Jason Wang <jasowang@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-When -netdev l2tpv3 fails, it first reports a specific error, then a
-generic one, like this:
+Add a slight improvement of the Coccinelle semantic patch from commit
+007b06578ab, and use it to clean up.  It leaves dead Error * variables
+behind, cleaned up manually.
 
-    $ qemu-system-x86_64 -netdev l2tpv3,id=3Dfoo,src=3D,dst=3D,txsession=3D=
-1
-    qemu-system-x86_64: -netdev l2tpv3,id=3Dfoo,src=3D,dst=3D,txsession=3D=
-1: l2tpv3_open : could not resolve src, errno =3D Name or service not kno=
-wn
-    qemu-system-x86_64: Device 'l2tpv3' could not be initialized
-
-With the command line, the messages go to stderr.  In HMP, they go to
-the monitor.  In QMP, the second one becomes the error reply, and the
-first one goes to stderr.
-
-Convert net_init_tap() to Error.  This suppresses the unwanted second
-message, and makes the specific error the QMP error reply.
-
-Cc: Jason Wang <jasowang@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexander Graf <agraf@suse.de>
+Cc: Eric Blake <eblake@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- net/l2tpv3.c | 25 ++++++++++++-------------
- 1 file changed, 12 insertions(+), 13 deletions(-)
+ hw/intc/xics_kvm.c                       |  7 +------
+ qemu-nbd.c                               |  6 +-----
+ scripts/coccinelle/use-error_fatal.cocci | 20 ++++++++++++++++++++
+ vl.c                                     |  7 +------
+ 4 files changed, 23 insertions(+), 17 deletions(-)
+ create mode 100644 scripts/coccinelle/use-error_fatal.cocci
 
-diff --git a/net/l2tpv3.c b/net/l2tpv3.c
-index 6745b78990..81db24dc8c 100644
---- a/net/l2tpv3.c
-+++ b/net/l2tpv3.c
-@@ -28,6 +28,7 @@
- #include <netdb.h>
- #include "net/net.h"
- #include "clients.h"
-+#include "qapi/error.h"
- #include "qemu-common.h"
- #include "qemu/error-report.h"
- #include "qemu/option.h"
-@@ -528,7 +529,6 @@ int net_init_l2tpv3(const Netdev *netdev,
-                     const char *name,
-                     NetClientState *peer, Error **errp)
+diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+index 30c3769a20..e8fa9a53ae 100644
+--- a/hw/intc/xics_kvm.c
++++ b/hw/intc/xics_kvm.c
+@@ -198,17 +198,12 @@ static void ics_get_kvm_state(ICSState *ics)
  {
--    /* FIXME error_setg(errp, ...) on failure */
-     const NetdevL2TPv3Options *l2tpv3;
-     NetL2TPV3State *s;
-     NetClientState *nc;
-@@ -555,7 +555,7 @@ int net_init_l2tpv3(const Netdev *netdev,
+     uint64_t state;
+     int i;
+-    Error *local_err = NULL;
+ 
+     for (i = 0; i < ics->nr_irqs; i++) {
+         ICSIRQState *irq = &ics->irqs[i];
+ 
+         kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURCES,
+-                          i + ics->offset, &state, false, &local_err);
+-        if (local_err) {
+-            error_report_err(local_err);
+-            exit(1);
+-        }
++                          i + ics->offset, &state, false, &error_fatal);
+ 
+         irq->server = state & KVM_XICS_DESTINATION_MASK;
+         irq->saved_priority = (state >> KVM_XICS_PRIORITY_SHIFT)
+diff --git a/qemu-nbd.c b/qemu-nbd.c
+index e76fe3082a..7874bc973c 100644
+--- a/qemu-nbd.c
++++ b/qemu-nbd.c
+@@ -1002,11 +1002,7 @@ int main(int argc, char **argv)
      }
-=20
-     if ((l2tpv3->has_offset) && (l2tpv3->offset > 256)) {
--        error_report("l2tpv3_open : offset must be less than 256 bytes")=
-;
-+        error_setg(errp, "offset must be less than 256 bytes");
-         goto outerr;
-     }
-=20
-@@ -563,6 +563,8 @@ int net_init_l2tpv3(const Netdev *netdev,
-         if (l2tpv3->has_rxcookie && l2tpv3->has_txcookie) {
-             s->cookie =3D true;
-         } else {
-+            error_setg(errp,
-+                       "require both 'rxcookie' and 'txcookie' or neithe=
-r");
-             goto outerr;
-         }
-     } else {
-@@ -578,7 +580,7 @@ int net_init_l2tpv3(const Netdev *netdev,
-     if (l2tpv3->has_udp && l2tpv3->udp) {
-         s->udp =3D true;
-         if (!(l2tpv3->has_srcport && l2tpv3->has_dstport)) {
--            error_report("l2tpv3_open : need both src and dst port for u=
-dp");
-+            error_setg(errp, "need both src and dst port for udp");
-             goto outerr;
-         } else {
-             srcport =3D l2tpv3->srcport;
-@@ -639,20 +641,19 @@ int net_init_l2tpv3(const Netdev *netdev,
-     gairet =3D getaddrinfo(l2tpv3->src, srcport, &hints, &result);
-=20
-     if ((gairet !=3D 0) || (result =3D=3D NULL)) {
--        error_report(
--            "l2tpv3_open : could not resolve src, errno =3D %s",
--            gai_strerror(gairet)
--        );
-+        error_setg(errp, "could not resolve src, errno =3D %s",
-+                   gai_strerror(gairet));
-         goto outerr;
-     }
-     fd =3D socket(result->ai_family, result->ai_socktype, result->ai_pro=
-tocol);
-     if (fd =3D=3D -1) {
-         fd =3D -errno;
--        error_report("l2tpv3_open : socket creation failed, errno =3D %d=
-", -fd);
-+        error_setg(errp, "socket creation failed, errno =3D %d",
-+                   -fd);
-         goto outerr;
-     }
-     if (bind(fd, (struct sockaddr *) result->ai_addr, result->ai_addrlen=
-)) {
--        error_report("l2tpv3_open :  could not bind socket err=3D%i", er=
-rno);
-+        error_setg(errp, "could not bind socket err=3D%i", errno);
-         goto outerr;
-     }
-     if (result) {
-@@ -677,10 +678,8 @@ int net_init_l2tpv3(const Netdev *netdev,
-     result =3D NULL;
-     gairet =3D getaddrinfo(l2tpv3->dst, dstport, &hints, &result);
-     if ((gairet !=3D 0) || (result =3D=3D NULL)) {
--        error_report(
--            "l2tpv3_open : could not resolve dst, error =3D %s",
--            gai_strerror(gairet)
--        );
-+        error_setg(errp, "could not resolve dst, error =3D %s",
-+                   gai_strerror(gairet));
-         goto outerr;
-     }
-=20
---=20
+ 
+     exp = nbd_export_new(bs, dev_offset, fd_size, nbdflags, nbd_export_closed,
+-                         writethrough, NULL, &local_err);
+-    if (!exp) {
+-        error_report_err(local_err);
+-        exit(EXIT_FAILURE);
+-    }
++                         writethrough, NULL, &error_fatal);
+     nbd_export_set_name(exp, export_name);
+     nbd_export_set_description(exp, export_description);
+ 
+diff --git a/scripts/coccinelle/use-error_fatal.cocci b/scripts/coccinelle/use-error_fatal.cocci
+new file mode 100644
+index 0000000000..10fff0aec4
+--- /dev/null
++++ b/scripts/coccinelle/use-error_fatal.cocci
+@@ -0,0 +1,20 @@
++@@
++type T;
++identifier FUN, RET;
++expression list ARGS;
++expression ERR, EC, FAIL;
++@@
++(
++-    T RET = FUN(ARGS, &ERR);
+++    T RET = FUN(ARGS, &error_fatal);
++|
++-    RET = FUN(ARGS, &ERR);
+++    RET = FUN(ARGS, &error_fatal);
++|
++-    FUN(ARGS, &ERR);
+++    FUN(ARGS, &error_fatal);
++)
++-    if (FAIL) {
++-        error_report_err(ERR);
++-        exit(EC);
++-    }
+diff --git a/vl.c b/vl.c
+index 4e25c78bff..ff50199e64 100644
+--- a/vl.c
++++ b/vl.c
+@@ -2002,15 +2002,10 @@ static void select_vgahw(const char *p)
+ 
+ static void parse_display_qapi(const char *optarg)
+ {
+-    Error *err = NULL;
+     DisplayOptions *opts;
+     Visitor *v;
+ 
+-    v = qobject_input_visitor_new_str(optarg, "type", &err);
+-    if (!v) {
+-        error_report_err(err);
+-        exit(1);
+-    }
++    v = qobject_input_visitor_new_str(optarg, "type", &error_fatal);
+ 
+     visit_type_DisplayOptions(v, NULL, &opts, &error_fatal);
+     QAPI_CLONE_MEMBERS(DisplayOptions, &dpy, opts);
+-- 
 2.17.1
