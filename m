@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34666)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <smarkovic@wavecomp.com>) id 1gCPV3-0000Bz-3z
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 09:35:06 -0400
+	(envelope-from <berto@igalia.com>) id 1gCPV5-0000DD-6b
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 09:35:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <smarkovic@wavecomp.com>) id 1gCPUy-0003Rj-1N
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 09:35:05 -0400
-Received: from mail-sn1nam01on0095.outbound.protection.outlook.com
-	([104.47.32.95]:61481
-	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <smarkovic@wavecomp.com>)
-	id 1gCPUx-0003Qp-Oc
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 09:34:59 -0400
-References: <1539692044-15732-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1539692044-15732-4-git-send-email-aleksandar.markovic@rt-rk.com>
-From: Stefan Markovic <smarkovic@wavecomp.com>
-Message-ID: <742ae6ab-7fd8-e832-a6e9-dc44d813468a@wavecomp.com>
-Date: Tue, 16 Oct 2018 15:34:47 +0200
+	(envelope-from <berto@igalia.com>) id 1gCPV2-0003XV-0U
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 09:35:07 -0400
+Received: from fanzine.igalia.com ([91.117.99.155]:44381)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <berto@igalia.com>) id 1gCPV1-0003Sc-JM
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 09:35:03 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20181016100918.21030-6-berrange@redhat.com>
+References: <20181016100918.21030-1-berrange@redhat.com>
+	<20181016100918.21030-6-berrange@redhat.com>
+Date: Tue, 16 Oct 2018 15:35:01 +0200
+Message-ID: <w51bm7uypyy.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <1539692044-15732-4-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 3/4] target/mips: Add organizational chart
- of MXU ASE
+Subject: Re: [Qemu-devel] [PATCH v2 5/8] crypto: convert xts_mult_x to use
+ xts_uint128 type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,272 +28,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net, jancraig@amazon.com, amarkovic@wavecomp.com, pjovanovic@wavecomp.com
+To: =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, qemu-devel@nongnu.org
 
-
-On 16.10.18. 14:14, Aleksandar Markovic wrote:
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+On Tue 16 Oct 2018 12:09:15 PM CEST, Daniel P. Berrang=C3=A9 wrote:
+> Using 64-bit arithmetic increases the performance for xts-aes-128
+> when built with gcrypt:
 >
-> Add a comment that contains an organizational chart of MXU ASE
-> instructions.
+>   Encrypt: 355 MB/s -> 545 MB/s
+>   Decrypt: 362 MB/s -> 568 MB/s
 >
-> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> ---
->   target/mips/translate.c | 156 +++++++++++++++++++++++++++++++++++++++++=
-+++++++
->   1 file changed, 156 insertions(+)
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
+This patch is also fine, but I have a couple of minor comments:
 
-Reviewed-by: Stefan Markovic <smarkovic@wavecomp.com>
+> +static void xts_mult_x(xts_uint128 *I)
+> +{
+> +    uint64_t tt;
+> +
+> +    xts_uint128_cpu_to_les(I);
+> +
+> +    tt =3D I->u[0] >> 63;
+> +    I->u[0] =3D I->u[0] << 1;
 
+Perhaps I->u[0] <<=3D 1 , for clarity and consistency with the following
+line (I->u[0] ^=3D 0x87) ? But I don't mind if you prefer to keep it as is
+now.
 
->
-> diff --git a/target/mips/translate.c b/target/mips/translate.c
-> index 73d971e..4dfc360 100644
-> --- a/target/mips/translate.c
-> +++ b/target/mips/translate.c
-> @@ -1490,6 +1490,162 @@ enum {
->    *  Q16SCOP XRa, XRb, XRc, XRd        S32M2I XRa, Rb
->    *  Q16SAT XRa, XRb, XRc              S32I2M XRa, Rb
->    *
-> + *
-> + *              bits
-> + *             05..00
-> + *
-> + *          =E2=94=8C=E2=94=80 000000 =E2=94=80 OPC_MXU_S32MADD
-> + *          =E2=94=9C=E2=94=80 000001 =E2=94=80 OPC_MXU_S32MADDU
-> + *          =E2=94=9C=E2=94=80 000010 =E2=94=80 <not assigned>
-> + *          =E2=94=82                               20..18  (25..21 must=
- be 0)
-> + *          =E2=94=9C=E2=94=80 000011 =E2=94=80 OPC_MXU__POOL00 =E2=94=
-=80=E2=94=AC=E2=94=80 000 =E2=94=80 OPC_MXU_S32MAX
-> + *          =E2=94=82                            =E2=94=9C=E2=94=80 001 =
-=E2=94=80 OPC_MXU_S32MIN
-> + *          =E2=94=82                            =E2=94=9C=E2=94=80 010 =
-=E2=94=80 OPC_MXU_D16MAX
-> + *          =E2=94=82                            =E2=94=9C=E2=94=80 011 =
-=E2=94=80 OPC_MXU_D16MIN
-> + *          =E2=94=82                            =E2=94=9C=E2=94=80 100 =
-=E2=94=80 OPC_MXU_Q8MAX
-> + *          =E2=94=82                            =E2=94=9C=E2=94=80 101 =
-=E2=94=80 OPC_MXU_Q8MIN
-> + *          =E2=94=82                            =E2=94=9C=E2=94=80 110 =
-=E2=94=80 OPC_MXU_Q8SLT
-> + *          =E2=94=82                            =E2=94=94=E2=94=80 111 =
-=E2=94=80 OPC_MXU_Q8SLTU
-> + *          =E2=94=9C=E2=94=80 000100 =E2=94=80 OPC_MXU_S32MSUB
-> + *          =E2=94=9C=E2=94=80 000101 =E2=94=80 OPC_MXU_S32MSUBU    20..=
-18  (25..21 must be 0,
-> + *          =E2=94=82                                         except for=
- Q8ADD)
-> + *          =E2=94=9C=E2=94=80 000110 =E2=94=80 OPC_MXU__POOL01 =E2=94=
-=80=E2=94=AC=E2=94=80 000 =E2=94=80 OPC_MXU_S32SLT
-> + *          =E2=94=82                            =E2=94=9C=E2=94=80 001 =
-=E2=94=80 OPC_MXU_D16SLT
-> + *          =E2=94=82                            =E2=94=9C=E2=94=80 010 =
-=E2=94=80 OPC_MXU_D16AVG
-> + *          =E2=94=82                            =E2=94=9C=E2=94=80 011 =
-=E2=94=80 OPC_MXU_D16AVGR
-> + *          =E2=94=82                            =E2=94=9C=E2=94=80 100 =
-=E2=94=80 OPC_MXU_Q8AVG
-> + *          =E2=94=82                            =E2=94=9C=E2=94=80 101 =
-=E2=94=80 OPC_MXU_Q8AVGR
-> + *          =E2=94=82                            =E2=94=94=E2=94=80 111 =
-=E2=94=80 OPC_MXU_Q8ADD
-> + *          =E2=94=82
-> + *          =E2=94=82                               20..18  (25..21 must=
- be 0)
-> + *          =E2=94=9C=E2=94=80 000111 =E2=94=80 OPC_MXU__POOL02 =E2=94=
-=80=E2=94=AC=E2=94=80 000 =E2=94=80 OPC_MXU_S32CPS
-> + *          =E2=94=82                            =E2=94=9C=E2=94=80 010 =
-=E2=94=80 OPC_MXU_D16CPS
-> + *          =E2=94=82                            =E2=94=9C=E2=94=80 100 =
-=E2=94=80 OPC_MXU_Q8ABD
-> + *          =E2=94=82                            =E2=94=94=E2=94=80 110 =
-=E2=94=80 OPC_MXU_Q16SAT
-> + *          =E2=94=9C=E2=94=80 001000 =E2=94=80 OPC_MXU_D16MUL
-> + *          =E2=94=82                               25..24
-> + *          =E2=94=9C=E2=94=80 001001 =E2=94=80 OPC_MXU__POOL03 =E2=94=
-=80=E2=94=AC=E2=94=80 00 =E2=94=80 OPC_MXU_D16MULF
-> + *          =E2=94=82                            =E2=94=94=E2=94=80 01 =
-=E2=94=80 OPC_MXU_D16MULE
-> + *          =E2=94=9C=E2=94=80 001010 =E2=94=80 OPC_MXU_D16MAC
-> + *          =E2=94=9C=E2=94=80 001011 =E2=94=80 OPC_MXU_D16MACF
-> + *          =E2=94=9C=E2=94=80 001100 =E2=94=80 OPC_MXU_D16MADL
-> + *          =E2=94=82                               25..24
-> + *          =E2=94=9C=E2=94=80 001101 =E2=94=80 OPC_MXU__POOL04 =E2=94=
-=80=E2=94=AC=E2=94=80 00 =E2=94=80 OPC_MXU_S16MAD
-> + *          =E2=94=82                            =E2=94=94=E2=94=80 01 =
-=E2=94=80 OPC_MXU_S16MAD_1
-> + *          =E2=94=9C=E2=94=80 001110 =E2=94=80 OPC_MXU_Q16ADD
-> + *          =E2=94=9C=E2=94=80 001111 =E2=94=80 OPC_MXU_D16MACE
-> + *          =E2=94=82                               23
-> + *          =E2=94=9C=E2=94=80 010000 =E2=94=80 OPC_MXU__POOL05 =E2=94=
-=80=E2=94=AC=E2=94=80 0 =E2=94=80 OPC_MXU_S32LDD
-> + *          =E2=94=82                            =E2=94=94=E2=94=80 1 =
-=E2=94=80 OPC_MXU_S32LDDR
-> + *          =E2=94=82
-> + *          =E2=94=82                               23
-> + *          =E2=94=9C=E2=94=80 010001 =E2=94=80 OPC_MXU__POOL06 =E2=94=
-=80=E2=94=AC=E2=94=80 0 =E2=94=80 OPC_MXU_S32STD
-> + *          =E2=94=82                            =E2=94=94=E2=94=80 1 =
-=E2=94=80 OPC_MXU_S32STDR
-> + *          =E2=94=82
-> + *          =E2=94=82                               13..10
-> + *          =E2=94=9C=E2=94=80 010010 =E2=94=80 OPC_MXU__POOL07 =E2=94=
-=80=E2=94=AC=E2=94=80 0000 =E2=94=80 OPC_MXU_S32LDDV
-> + *          =E2=94=82                            =E2=94=94=E2=94=80 0001=
- =E2=94=80 OPC_MXU_S32LDDVR
-> + *          =E2=94=82
-> + *          =E2=94=82                               13..10
-> + *          =E2=94=9C=E2=94=80 010011 =E2=94=80 OPC_MXU__POOL08 =E2=94=
-=80=E2=94=AC=E2=94=80 0000 =E2=94=80 OPC_MXU_S32TDV
-> + *          =E2=94=82                            =E2=94=94=E2=94=80 0001=
- =E2=94=80 OPC_MXU_S32TDVR
-> + *          =E2=94=82
-> + *          =E2=94=82                               23
-> + *          =E2=94=9C=E2=94=80 010100 =E2=94=80 OPC_MXU__POOL09 =E2=94=
-=80=E2=94=AC=E2=94=80 0 =E2=94=80 OPC_MXU_S32LDI
-> + *          =E2=94=82                            =E2=94=94=E2=94=80 1 =
-=E2=94=80 OPC_MXU_S32LDIR
-> + *          =E2=94=82
-> + *          =E2=94=82                               23
-> + *          =E2=94=9C=E2=94=80 010101 =E2=94=80 OPC_MXU__POOL10 =E2=94=
-=80=E2=94=AC=E2=94=80 0 =E2=94=80 OPC_MXU_S32SDI
-> + *          =E2=94=82                            =E2=94=94=E2=94=80 1 =
-=E2=94=80 OPC_MXU_S32SDIR
-> + *          =E2=94=82
-> + *          =E2=94=82                               13..10
-> + *          =E2=94=9C=E2=94=80 010110 =E2=94=80 OPC_MXU__POOL11 =E2=94=
-=80=E2=94=AC=E2=94=80 0000 =E2=94=80 OPC_MXU_S32LDIV
-> + *          =E2=94=82                            =E2=94=94=E2=94=80 0001=
- =E2=94=80 OPC_MXU_S32LDIVR
-> + *          =E2=94=82
-> + *          =E2=94=82                               13..10
-> + *          =E2=94=9C=E2=94=80 010111 =E2=94=80 OPC_MXU__POOL12 =E2=94=
-=80=E2=94=AC=E2=94=80 0000 =E2=94=80 OPC_MXU_S32SDIV
-> + *          =E2=94=82                            =E2=94=94=E2=94=80 0001=
- =E2=94=80 OPC_MXU_S32SDIVR
-> + *          =E2=94=9C=E2=94=80 011000 =E2=94=80 OPC_MXU_D32ADD
-> + *          =E2=94=82
-> + *   MXU    =E2=94=9C=E2=94=80 011001 =E2=94=80 OPC_MXU__POOL13 =E2=94=
-=80=E2=94=AC=E2=94=80 00 =E2=94=80 OPC_MXU_D32ACC
-> + * opcodes =E2=94=80=E2=94=A4                            =E2=94=9C=E2=94=
-=80 01 =E2=94=80 OPC_MXU_D32ACCM
-> + *          =E2=94=82                            =E2=94=94=E2=94=80 10 =
-=E2=94=80 OPC_MXU_D32ASUM
-> + *          =E2=94=9C=E2=94=80 011010 =E2=94=80 <not assigned>
-> + *          =E2=94=82
-> + *          =E2=94=9C=E2=94=80 011011 =E2=94=80 OPC_MXU__POOL14 =E2=94=
-=80=E2=94=AC=E2=94=80 00 =E2=94=80 OPC_MXU_Q16ACC
-> + *          =E2=94=82                            =E2=94=9C=E2=94=80 01 =
-=E2=94=80 OPC_MXU_Q16ACCM
-> + *          =E2=94=82                            =E2=94=94=E2=94=80 10 =
-=E2=94=80 OPC_MXU_Q16ASUM
-> + *          =E2=94=82
-> + *          =E2=94=82
-> + *          =E2=94=9C=E2=94=80 011100 =E2=94=80 OPC_MXU__POOL15 =E2=94=
-=80=E2=94=AC=E2=94=80 00 =E2=94=80 OPC_MXU_Q8ADDE
-> + *          =E2=94=82                            =E2=94=9C=E2=94=80 01 =
-=E2=94=80 OPC_MXU_D8SUM
-> + *          =E2=94=9C=E2=94=80 011101 =E2=94=80 OPC_MXU_Q8ACCE   =E2=94=
-=94=E2=94=80 10 =E2=94=80 OPC_MXU_D8SUMC
-> + *          =E2=94=9C=E2=94=80 011110 =E2=94=80 <not assigned>
-> + *          =E2=94=9C=E2=94=80 011111 =E2=94=80 <not assigned>
-> + *          =E2=94=9C=E2=94=80 100000 =E2=94=80 <not assigned>
-> + *          =E2=94=9C=E2=94=80 100001 =E2=94=80 <not assigned>
-> + *          =E2=94=9C=E2=94=80 100010 =E2=94=80 OPC_MXU_S8LDD
-> + *          =E2=94=9C=E2=94=80 100011 =E2=94=80 OPC_MXU_S8STD
-> + *          =E2=94=9C=E2=94=80 100100 =E2=94=80 OPC_MXU_S8LDI
-> + *          =E2=94=9C=E2=94=80 100101 =E2=94=80 OPC_MXU_S8SDI
-> + *          =E2=94=82
-> + *          =E2=94=9C=E2=94=80 100110 =E2=94=80 OPC_MXU__POOL16 =E2=94=
-=80=E2=94=AC=E2=94=80 00 =E2=94=80 OPC_MXU_S32MUL
-> + *          =E2=94=82                            =E2=94=9C=E2=94=80 00 =
-=E2=94=80 OPC_MXU_S32MULU
-> + *          =E2=94=82                            =E2=94=9C=E2=94=80 00 =
-=E2=94=80 OPC_MXU_S32EXTR
-> + *          =E2=94=82                            =E2=94=94=E2=94=80 00 =
-=E2=94=80 OPC_MXU_S32EXTRV
-> + *          =E2=94=82
-> + *          =E2=94=82
-> + *          =E2=94=9C=E2=94=80 100111 =E2=94=80 OPC_MXU__POOL17 =E2=94=
-=80=E2=94=AC=E2=94=80 000 =E2=94=80 OPC_MXU_D32SARW
-> + *          =E2=94=82                            =E2=94=9C=E2=94=80 001 =
-=E2=94=80 OPC_MXU_S32ALN
-> + *          =E2=94=9C=E2=94=80 101000 =E2=94=80 OPC_MXU_LXB      =E2=94=
-=9C=E2=94=80 010 =E2=94=80 OPC_MXU_S32ALNI
-> + *          =E2=94=9C=E2=94=80 101001 =E2=94=80 <not assigned>   =E2=94=
-=9C=E2=94=80 011 =E2=94=80 OPC_MXU_S32NOR
-> + *          =E2=94=9C=E2=94=80 101010 =E2=94=80 OPC_MXU_S16LDD   =E2=94=
-=9C=E2=94=80 100 =E2=94=80 OPC_MXU_S32AND
-> + *          =E2=94=9C=E2=94=80 101011 =E2=94=80 OPC_MXU_S16STD   =E2=94=
-=9C=E2=94=80 101 =E2=94=80 OPC_MXU_S32OR
-> + *          =E2=94=9C=E2=94=80 101100 =E2=94=80 OPC_MXU_S16LDI   =E2=94=
-=9C=E2=94=80 110 =E2=94=80 OPC_MXU_S32XOR
-> + *          =E2=94=9C=E2=94=80 101101 =E2=94=80 OPC_MXU_S16SDI   =E2=94=
-=94=E2=94=80 111 =E2=94=80 OPC_MXU_S32LUI
-> + *          =E2=94=9C=E2=94=80 101000 =E2=94=80 <not assigned>
-> + *          =E2=94=9C=E2=94=80 101001 =E2=94=80 <not assigned>
-> + *          =E2=94=9C=E2=94=80 101010 =E2=94=80 <not assigned>
-> + *          =E2=94=9C=E2=94=80 101011 =E2=94=80 <not assigned>
-> + *          =E2=94=9C=E2=94=80 101100 =E2=94=80 <not assigned>
-> + *          =E2=94=9C=E2=94=80 101101 =E2=94=80 <not assigned>
-> + *          =E2=94=9C=E2=94=80 101110 =E2=94=80 OPC_MXU_S32M2I
-> + *          =E2=94=9C=E2=94=80 101111 =E2=94=80 OPC_MXU_S32I2M
-> + *          =E2=94=9C=E2=94=80 110000 =E2=94=80 OPC_MXU_D32SLL
-> + *          =E2=94=9C=E2=94=80 110001 =E2=94=80 OPC_MXU_D32SLR
-> + *          =E2=94=9C=E2=94=80 110010 =E2=94=80 OPC_MXU_D32SARL
-> + *          =E2=94=9C=E2=94=80 110011 =E2=94=80 OPC_MXU_D32SAR
-> + *          =E2=94=9C=E2=94=80 110100 =E2=94=80 OPC_MXU_Q16SLL
-> + *          =E2=94=9C=E2=94=80 110101 =E2=94=80 OPC_MXU_Q16SLR
-> + *          =E2=94=9C=E2=94=80 110110 =E2=94=80 OPC_MXU__POOL18 =E2=94=
-=80=E2=94=AC=E2=94=80 000 =E2=94=80 OPC_MXU_D32SLLV
-> + *          =E2=94=82                            =E2=94=9C=E2=94=80 001 =
-=E2=94=80 OPC_MXU_D32SLRV
-> + *          =E2=94=82                            =E2=94=9C=E2=94=80 010 =
-=E2=94=80 OPC_MXU_D32SARV
-> + *          =E2=94=82                            =E2=94=9C=E2=94=80 011 =
-=E2=94=80 OPC_MXU_Q16SLLV
-> + *          =E2=94=82                            =E2=94=9C=E2=94=80 100 =
-=E2=94=80 OPC_MXU_Q16SLRV
-> + *          =E2=94=82                            =E2=94=94=E2=94=80 101 =
-=E2=94=80 OPC_MXU_Q16SARV
-> + *          =E2=94=9C=E2=94=80 110111 =E2=94=80 OPC_MXU_Q16SAR
-> + *          =E2=94=82
-> + *          =E2=94=9C=E2=94=80 111000 =E2=94=80 OPC_MXU__POOL19 =E2=94=
-=80=E2=94=AC=E2=94=80 00 =E2=94=80 OPC_MXU_Q8MUL
-> + *          =E2=94=82                            =E2=94=94=E2=94=80 01 =
-=E2=94=80 OPC_MXU_Q8MULSU
-> + *          =E2=94=82
-> + *          =E2=94=82
-> + *          =E2=94=9C=E2=94=80 111001 =E2=94=80 OPC_MXU__POOL20 =E2=94=
-=80=E2=94=AC=E2=94=80 000 =E2=94=80 OPC_MXU_Q8MOVZ
-> + *          =E2=94=82                            =E2=94=9C=E2=94=80 001 =
-=E2=94=80 OPC_MXU_Q8MOVN
-> + *          =E2=94=82                            =E2=94=9C=E2=94=80 010 =
-=E2=94=80 OPC_MXU_D16MOVZ
-> + *          =E2=94=82                            =E2=94=9C=E2=94=80 011 =
-=E2=94=80 OPC_MXU_D16MOVN
-> + *          =E2=94=82                            =E2=94=9C=E2=94=80 100 =
-=E2=94=80 OPC_MXU_S32MOVZ
-> + *          =E2=94=82                            =E2=94=94=E2=94=80 101 =
-=E2=94=80 OPC_MXU_S32MOV
-> + *          =E2=94=82
-> + *          =E2=94=82
-> + *          =E2=94=9C=E2=94=80 111010 =E2=94=80 OPC_MXU__POOL21 =E2=94=
-=80=E2=94=AC=E2=94=80 00 =E2=94=80 OPC_MXU_Q8MAC
-> + *          =E2=94=82                            =E2=94=94=E2=94=80 10 =
-=E2=94=80 OPC_MXU_Q8MACSU
-> + *          =E2=94=9C=E2=94=80 111011 =E2=94=80 OPC_MXU_Q16SCOP
-> + *          =E2=94=9C=E2=94=80 111100 =E2=94=80 OPC_MXU_Q8MADL
-> + *          =E2=94=9C=E2=94=80 111101 =E2=94=80 OPC_MXU_S32SFL
-> + *          =E2=94=9C=E2=94=80 111110 =E2=94=80 OPC_MXU_Q8SAD
-> + *          =E2=94=94=E2=94=80 111111 =E2=94=80 <not assigned>
-> + *
-> + *
->    *   Compiled after:
->    *
->    *   "XBurst=C2=AE Instruction Set Architecture MIPS eXtension/enhanced=
- Unit
+> +    if (I->u[1] >> 63) {
+> +        I->u[0] ^=3D 0x87;
+>      }
+> +    I->u[1] =3D (I->u[1] << 1) | tt;
+> +
+> +    xts_uint128_le_to_cpus(I);
+
+I think both endianness conversion calls should be flipped. First you
+convert from the buffer byte order (LE) to the CPU byte order so you can
+do the bit shifts, then back to the original byte order (LE).
+
+Changing this doesn't have any practical effect because both calls
+perform the exact same operation, but it documents better what's going
+on.
+
+With this changed,
+
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+
+Berto
