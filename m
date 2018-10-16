@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57002)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56789)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gCTMQ-0006MP-U9
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:42:28 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gCTME-0000NM-PN
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:42:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57256)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gCTME-0000MA-Cq
+	(envelope-from <armbru@redhat.com>) id 1gCTMA-00066C-GJ
 	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:42:14 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <armbru@redhat.com>) id 1gCTM8-0000Cf-Ku
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:42:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34906)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gCTM8-0000A8-9J
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:42:08 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5791D368E7
+	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 17:42:07 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-50.ams2.redhat.com
+	[10.36.116.50])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 277401001F41
+	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 17:42:07 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 16 Oct 2018 19:41:24 +0200
-Message-Id: <20181016174158.15229-5-armbru@redhat.com>
+Date: Tue, 16 Oct 2018 19:41:54 +0200
+Message-Id: <20181016174158.15229-35-armbru@redhat.com>
 In-Reply-To: <20181016174158.15229-1-armbru@redhat.com>
 References: <20181016174158.15229-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 04/38] cpus hw target: Use warn_report() &
- friends to report warnings
+Subject: [Qemu-devel] [PATCH v3 34/38] vl: Fix exit status for -drive
+ format=help
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,194 +35,24 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Alex Williamson <alex.williamson@redhat.com>, Fam Zheng <famz@redhat.com>, Wei Huang <wei@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-Calling error_report() in a function that takes an Error ** argument
-is suspicious.  Convert a few that are actually warnings to
-warn_report().
-
-While there, split a warning consisting of multiple sentences to
-conform to conventions spelled out in warn_report()'s contract.
-
-Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: Alex Williamson <alex.williamson@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>
-Cc: Wei Huang <wei@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 ---
- cpus.c                          |  8 ++++----
- hw/display/cg3.c                |  2 +-
- hw/display/tcx.c                |  2 +-
- hw/misc/ivshmem.c               |  4 ++--
- hw/net/virtio-net.c             |  8 ++++----
- hw/virtio/virtio-pci.c          |  4 ++--
- target/i386/cpu.c               | 17 +++++++++--------
- target/ppc/translate_init.inc.c |  4 ++--
- 8 files changed, 25 insertions(+), 24 deletions(-)
+ vl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/cpus.c b/cpus.c
-index 361678e459..7804071872 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -211,12 +211,12 @@ void qemu_tcg_configure(QemuOpts *opts, Error **err=
-p)
-                 error_setg(errp, "No MTTCG when icount is enabled");
-             } else {
- #ifndef TARGET_SUPPORTS_MTTCG
--                error_report("Guest not yet converted to MTTCG - "
--                             "you may get unexpected results");
-+                warn_report("Guest not yet converted to MTTCG - "
-+                            "you may get unexpected results");
- #endif
-                 if (!check_tcg_memory_orders_compatible()) {
--                    error_report("Guest expects a stronger memory orderi=
-ng "
--                                 "than the host provides");
-+                    warn_report("Guest expects a stronger memory orderin=
-g "
-+                                "than the host provides");
-                     error_printf("This may cause strange/hard to debug e=
-rrors\n");
-                 }
-                 mttcg_enabled =3D true;
-diff --git a/hw/display/cg3.c b/hw/display/cg3.c
-index 1c199ab369..e50d97e48c 100644
---- a/hw/display/cg3.c
-+++ b/hw/display/cg3.c
-@@ -307,7 +307,7 @@ static void cg3_realizefn(DeviceState *dev, Error **e=
-rrp)
-         ret =3D load_image_mr(fcode_filename, &s->rom);
-         g_free(fcode_filename);
-         if (ret < 0 || ret > FCODE_MAX_ROM_SIZE) {
--            error_report("cg3: could not load prom '%s'", CG3_ROM_FILE);
-+            warn_report("cg3: could not load prom '%s'", CG3_ROM_FILE);
-         }
+diff --git a/vl.c b/vl.c
+index 22beca29d1..89520d8007 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4397,7 +4397,7 @@ int main(int argc, char **argv, char **envp)
+     if (qemu_opts_foreach(qemu_find_opts("drive"), drive_init_func,
+                           &machine_class->block_default_type, &error_fatal)) {
+         /* We printed help */
+-        exit(1);
++        exit(0);
      }
-=20
-diff --git a/hw/display/tcx.c b/hw/display/tcx.c
-index b2786ee8d0..66f2459226 100644
---- a/hw/display/tcx.c
-+++ b/hw/display/tcx.c
-@@ -823,7 +823,7 @@ static void tcx_realizefn(DeviceState *dev, Error **e=
-rrp)
-         ret =3D load_image_mr(fcode_filename, &s->rom);
-         g_free(fcode_filename);
-         if (ret < 0 || ret > FCODE_MAX_ROM_SIZE) {
--            error_report("tcx: could not load prom '%s'", TCX_ROM_FILE);
-+            warn_report("tcx: could not load prom '%s'", TCX_ROM_FILE);
-         }
-     }
-=20
-diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
-index 8cb17b9dd4..f88910e55c 100644
---- a/hw/misc/ivshmem.c
-+++ b/hw/misc/ivshmem.c
-@@ -1288,8 +1288,8 @@ static void ivshmem_realize(PCIDevice *dev, Error *=
-*errp)
-     IVShmemState *s =3D IVSHMEM_COMMON(dev);
-=20
-     if (!qtest_enabled()) {
--        error_report("ivshmem is deprecated, please use ivshmem-plain"
--                     " or ivshmem-doorbell instead");
-+        warn_report("ivshmem is deprecated, please use ivshmem-plain"
-+                    " or ivshmem-doorbell instead");
-     }
-=20
-     if (qemu_chr_fe_backend_connected(&s->server_chr) + !!s->shmobj !=3D=
- 1) {
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index 4bdd5b8532..385b1a03e9 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -2020,10 +2020,10 @@ static void virtio_net_device_realize(DeviceState=
- *dev, Error **errp)
-=20
-     if (n->net_conf.tx && strcmp(n->net_conf.tx, "timer")
-                        && strcmp(n->net_conf.tx, "bh")) {
--        error_report("virtio-net: "
--                     "Unknown option tx=3D%s, valid options: \"timer\" \=
-"bh\"",
--                     n->net_conf.tx);
--        error_report("Defaulting to \"bh\"");
-+        warn_report("virtio-net: "
-+                    "Unknown option tx=3D%s, valid options: \"timer\" \"=
-bh\"",
-+                    n->net_conf.tx);
-+        error_printf("Defaulting to \"bh\"");
-     }
-=20
-     n->net_conf.tx_queue_size =3D MIN(virtio_net_max_tx_queue_size(n),
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index 3a01fe90f0..a954799267 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -1683,8 +1683,8 @@ static void virtio_pci_device_plugged(DeviceState *=
-d, Error **errp)
-         if (err) {
-             /* Notice when a system that supports MSIx can't initialize =
-it */
-             if (err !=3D -ENOTSUP) {
--                error_report("unable to init msix vectors to %" PRIu32,
--                             proxy->nvectors);
-+                warn_report("unable to init msix vectors to %" PRIu32,
-+                            proxy->nvectors);
-             }
-             proxy->nvectors =3D 0;
-         }
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index c88876dfe3..9d4217afba 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -5123,14 +5123,15 @@ static void x86_cpu_realizefn(DeviceState *dev, E=
-rror **errp)
-      * NOTE: the following code has to follow qemu_init_vcpu(). Otherwis=
-e
-      * cs->nr_threads hasn't be populated yet and the checking is incorr=
-ect.
-      */
--     if (IS_AMD_CPU(env) &&
--         !(env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_TOPOEXT) &&
--         cs->nr_threads > 1 && !ht_warned) {
--            error_report("This family of AMD CPU doesn't support "
--                         "hyperthreading(%d). Please configure -smp "
--                         "options properly or try enabling topoext featu=
-re.",
--                         cs->nr_threads);
--        ht_warned =3D true;
-+    if (IS_AMD_CPU(env) &&
-+        !(env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_TOPOEXT) &&
-+        cs->nr_threads > 1 && !ht_warned) {
-+            warn_report("This family of AMD CPU doesn't support "
-+                        "hyperthreading(%d)",
-+                        cs->nr_threads);
-+            error_printf("Please configure -smp options properly"
-+                         " or try enabling topoext feature.\n");
-+            ht_warned =3D true;
-     }
-=20
-     x86_cpu_apic_realize(cpu, &local_err);
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
-inc.c
-index 263e63cb03..ee9432eb15 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -8381,8 +8381,8 @@ static void getset_compat_deprecated(Object *obj, V=
-isitor *v, const char *name,
-     QNull *null =3D NULL;
-=20
-     if (!qtest_enabled()) {
--        error_report("CPU 'compat' property is deprecated and has no eff=
-ect; "
--                     "use max-cpu-compat machine property instead");
-+        warn_report("CPU 'compat' property is deprecated and has no effe=
-ct; "
-+                    "use max-cpu-compat machine property instead");
-     }
-     visit_type_null(v, name, &null, NULL);
-     qobject_unref(null);
---=20
+ 
+     default_drive(default_cdrom, snapshot, machine_class->block_default_type, 2,
+-- 
 2.17.1
