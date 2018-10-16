@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59137)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gCOG9-0004M5-6n
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gCOG8-0004Lo-ST
 	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 08:15:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gCOG7-00086K-ST
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 08:15:37 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:39344 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gCOG7-00085n-F2
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 08:15:36 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:39287 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gCOG7-0007L4-AL
+	id 1gCOG6-0007JO-9j
 	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 08:15:35 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue, 16 Oct 2018 14:14:04 +0200
-Message-Id: <1539692044-15732-5-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Tue, 16 Oct 2018 14:14:03 +0200
+Message-Id: <1539692044-15732-4-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1539692044-15732-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1539692044-15732-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH 4/4] target/mips: Add opcode values of MXU ASE
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 3/4] target/mips: Add organizational chart of
+ MXU ASE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,299 +33,262 @@ Cc: aurelien@aurel32.net, jancraig@amazon.com, amarkovic@wavecomp.com, smarkovic
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add opcode values for all instructions in MXU ASE.
+Add a comment that contains an organizational chart of MXU ASE
+instructions.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 276 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 276 insertions(+)
+ target/mips/translate.c | 156 ++++++++++++++++++++++++++++++++++++++++++=
+++++++
+ 1 file changed, 156 insertions(+)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 4dfc360..941b546 100644
+index 73d971e..4dfc360 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -1652,6 +1652,282 @@ enum {
-  *   Programming Manual", Ingenic Semiconductor Co, Ltd., 2017
-  */
- 
-+enum {
-+    OPC_MXU_S32MADD  = 0x00,
-+    OPC_MXU_S32MADDU = 0x01,
-+    /* not assigned 0x02 */
-+    OPC_MXU__POOL00  = 0x03,
-+    OPC_MXU_S32MSUB  = 0x04,
-+    OPC_MXU_S32MSUBU = 0x05,
-+    OPC_MXU__POOL01  = 0x06,
-+    OPC_MXU__POOL02  = 0x07,
-+    OPC_MXU_D16MUL   = 0x08,
-+    OPC_MXU__POOL03  = 0x09,
-+    OPC_MXU_D16MAC   = 0x0A,
-+    OPC_MXU_D16MACF  = 0x0B,
-+    OPC_MXU_D16MADL  = 0x0C,
-+    OPC_MXU__POOL04  = 0x0D,
-+    OPC_MXU_Q16ADD   = 0x0E,
-+    OPC_MXU_D16MACE  = 0x0F,
-+    OPC_MXU__POOL05  = 0x10,
-+    OPC_MXU__POOL06  = 0x11,
-+    OPC_MXU__POOL07  = 0x12,
-+    OPC_MXU__POOL08  = 0x13,
-+    OPC_MXU__POOL09  = 0x14,
-+    OPC_MXU__POOL10  = 0x15,
-+    OPC_MXU__POOL11  = 0x16,
-+    OPC_MXU__POOL12  = 0x17,
-+    OPC_MXU_D32ADD   = 0x18,
-+    OPC_MXU__POOL13  = 0x19,
-+    /* not assigned 0x1A */
-+    OPC_MXU__POOL14  = 0x1B,
-+    OPC_MXU__POOL15  = 0x1C,
-+    OPC_MXU_Q8ACCE   = 0x1D,
-+    /* not assigned 0x1E */
-+    /* not assigned 0x1F */
-+    /* not assigned 0x20 */
-+    /* not assigned 0x21 */
-+    OPC_MXU_S8LDD    = 0x22,
-+    OPC_MXU_S8STD    = 0x23,
-+    OPC_MXU_S8LDI    = 0x24,
-+    OPC_MXU_S8SDI    = 0x25,
-+    OPC_MXU__POOL16  = 0x26,
-+    OPC_MXU__POOL17  = 0x27,
-+    OPC_MXU_LXB      = 0x28,
-+    /* not assigned 0x29 */
-+    OPC_MXU_S16LDD   = 0x2A,
-+    OPC_MXU_S16STD   = 0x2B,
-+    OPC_MXU_S16LDI   = 0x2C,
-+    OPC_MXU_S16SDI   = 0x2D,
-+    OPC_MXU_S32M2I   = 0x2E,
-+    OPC_MXU_S32I2M   = 0x2F,
-+    OPC_MXU_D32SLL   = 0x30,
-+    OPC_MXU_D32SLR   = 0x31,
-+    OPC_MXU_D32SARL  = 0x32,
-+    OPC_MXU_D32SAR   = 0x33,
-+    OPC_MXU_Q16SLL   = 0x34,
-+    OPC_MXU_Q16SLR   = 0x35,
-+    OPC_MXU__POOL18  = 0x36,
-+    OPC_MXU_Q16SAR   = 0x37,
-+    OPC_MXU__POOL19  = 0x38,
-+    OPC_MXU__POOL20  = 0x39,
-+    OPC_MXU__POOL21  = 0x3A,
-+    OPC_MXU_Q16SCOP  = 0x3B,
-+    OPC_MXU_Q8MADL   = 0x3C,
-+    OPC_MXU_S32SFL   = 0x3D,
-+    OPC_MXU_Q8SAD    = 0x3E,
-+    /* not assigned 0x3F */
-+};
-+
-+
-+/*
-+ * MXU pool 00
-+ */
-+enum {
-+    OPC_MXU_S32MAX   = 0x00,
-+    OPC_MXU_S32MIN   = 0x01,
-+    OPC_MXU_D16MAX   = 0x02,
-+    OPC_MXU_D16MIN   = 0x03,
-+    OPC_MXU_Q8MAX    = 0x04,
-+    OPC_MXU_Q8MIN    = 0x05,
-+    OPC_MXU_Q8SLT    = 0x06,
-+    OPC_MXU_Q8SLTU   = 0x07,
-+};
-+
-+/*
-+ * MXU pool 01
-+ */
-+enum {
-+    OPC_MXU_S32SLT   = 0x00,
-+    OPC_MXU_D16SLT   = 0x01,
-+    OPC_MXU_D16AVG   = 0x02,
-+    OPC_MXU_D16AVGR  = 0x03,
-+    OPC_MXU_Q8AVG    = 0x04,
-+    OPC_MXU_Q8AVGR   = 0x05,
-+    OPC_MXU_Q8ADD    = 0x07,
-+};
-+
-+/*
-+ * MXU pool 02
-+ */
-+enum {
-+    OPC_MXU_S32CPS   = 0x00,
-+    OPC_MXU_D16CPS   = 0x02,
-+    OPC_MXU_Q8ABD    = 0x04,
-+    OPC_MXU_Q16SAT   = 0x06,
-+};
-+
-+/*
-+ * MXU pool 03
-+ */
-+enum {
-+    OPC_MXU_D16MULF  = 0x00,
-+    OPC_MXU_D16MULE  = 0x01,
-+};
-+
-+/*
-+ * MXU pool 04
-+ */
-+enum {
-+    OPC_MXU_S16MAD   = 0x00,
-+    OPC_MXU_S16MAD_1 = 0x01,
-+};
-+
-+/*
-+ * MXU pool 05
-+ */
-+enum {
-+    OPC_MXU_S32LDD   = 0x00,
-+    OPC_MXU_S32LDDR  = 0x01,
-+};
-+
-+/*
-+ * MXU pool 06
-+ */
-+enum {
-+    OPC_MXU_S32STD   = 0x00,
-+    OPC_MXU_S32STDR  = 0x01,
-+};
-+
-+/*
-+ * MXU pool 07
-+ */
-+enum {
-+    OPC_MXU_S32LDDV  = 0x00,
-+    OPC_MXU_S32LDDVR = 0x01,
-+};
-+
-+/*
-+ * MXU pool 08
-+ */
-+enum {
-+    OPC_MXU_S32TDV   = 0x00,
-+    OPC_MXU_S32TDVR  = 0x01,
-+};
-+
-+/*
-+ * MXU pool 09
-+ */
-+enum {
-+    OPC_MXU_S32LDI   = 0x00,
-+    OPC_MXU_S32LDIR  = 0x01,
-+};
-+
-+/*
-+ * MXU pool 10
-+ */
-+enum {
-+    OPC_MXU_S32SDI   = 0x00,
-+    OPC_MXU_S32SDIR  = 0x01,
-+};
-+
-+/*
-+ * MXU pool 11
-+ */
-+enum {
-+    OPC_MXU_S32LDIV  = 0x00,
-+    OPC_MXU_S32LDIVR = 0x01,
-+};
-+
-+/*
-+ * MXU pool 12
-+ */
-+enum {
-+    OPC_MXU_S32SDIV  = 0x00,
-+    OPC_MXU_S32SDIVR = 0x01,
-+};
-+
-+/*
-+ * MXU pool 13
-+ */
-+enum {
-+    OPC_MXU_D32ACC   = 0x00,
-+    OPC_MXU_D32ACCM  = 0x01,
-+    OPC_MXU_D32ASUM  = 0x02,
-+};
-+
-+/*
-+ * MXU pool 14
-+ */
-+enum {
-+    OPC_MXU_Q16ACC   = 0x00,
-+    OPC_MXU_Q16ACCM  = 0x01,
-+    OPC_MXU_Q16ASUM  = 0x02,
-+};
-+
-+/*
-+ * MXU pool 15
-+ */
-+enum {
-+    OPC_MXU_Q8ADDE   = 0x00,
-+    OPC_MXU_D8SUM    = 0x01,
-+    OPC_MXU_D8SUMC   = 0x02,
-+};
-+
-+/*
-+ * MXU pool 16
-+ */
-+enum {
-+    OPC_MXU_S32MUL   = 0x00,
-+    OPC_MXU_S32MULU  = 0x01,
-+    OPC_MXU_S32EXTR  = 0x02,
-+    OPC_MXU_S32EXTRV = 0x03,
-+};
-+
-+/*
-+ * MXU pool 17
-+ */
-+enum {
-+    OPC_MXU_D32SARW  = 0x00,
-+    OPC_MXU_S32ALN   = 0x01,
-+    OPC_MXU_S32ALNI  = 0x02,
-+    OPC_MXU_S32NOR   = 0x03,
-+    OPC_MXU_S32AND   = 0x04,
-+    OPC_MXU_S32OR    = 0x05,
-+    OPC_MXU_S32XOR   = 0x06,
-+    OPC_MXU_S32LUI   = 0x07,
-+};
-+
-+/*
-+ * MXU pool 18
-+ */
-+enum {
-+    OPC_MXU_D32SLLV  = 0x00,
-+    OPC_MXU_D32SLRV  = 0x01,
-+    OPC_MXU_D32SARV  = 0x03,
-+    OPC_MXU_Q16SLLV  = 0x04,
-+    OPC_MXU_Q16SLRV  = 0x05,
-+    OPC_MXU_Q16SARV  = 0x07,
-+};
-+
-+/*
-+ * MXU pool 19
-+ */
-+enum {
-+    OPC_MXU_Q8MUL    = 0x00,
-+    OPC_MXU_Q8MULSU  = 0x01,
-+};
-+
-+/*
-+ * MXU pool 20
-+ */
-+enum {
-+    OPC_MXU_Q8MOVZ   = 0x00,
-+    OPC_MXU_Q8MOVN   = 0x01,
-+    OPC_MXU_D16MOVZ  = 0x02,
-+    OPC_MXU_D16MOVN  = 0x03,
-+    OPC_MXU_S32MOVZ  = 0x04,
-+    OPC_MXU_S32MOVN  = 0x05,
-+};
-+
-+/*
-+ * MXU pool 21
-+ */
-+enum {
-+    OPC_MXU_Q8MAC    = 0x00,
-+    OPC_MXU_Q8MACSU  = 0x01,
-+};
-+
- 
- /* global register indices */
- static TCGv cpu_gpr[32], cpu_PC;
--- 
+@@ -1490,6 +1490,162 @@ enum {
+  *  Q16SCOP XRa, XRb, XRc, XRd        S32M2I XRa, Rb
+  *  Q16SAT XRa, XRb, XRc              S32I2M XRa, Rb
+  *
++ *
++ *              bits
++ *             05..00
++ *
++ *          =E2=94=8C=E2=94=80 000000 =E2=94=80 OPC_MXU_S32MADD
++ *          =E2=94=9C=E2=94=80 000001 =E2=94=80 OPC_MXU_S32MADDU
++ *          =E2=94=9C=E2=94=80 000010 =E2=94=80 <not assigned>
++ *          =E2=94=82                               20..18  (25..21 must=
+ be 0)
++ *          =E2=94=9C=E2=94=80 000011 =E2=94=80 OPC_MXU__POOL00 =E2=94=80=
+=E2=94=AC=E2=94=80 000 =E2=94=80 OPC_MXU_S32MAX
++ *          =E2=94=82                            =E2=94=9C=E2=94=80 001 =
+=E2=94=80 OPC_MXU_S32MIN
++ *          =E2=94=82                            =E2=94=9C=E2=94=80 010 =
+=E2=94=80 OPC_MXU_D16MAX
++ *          =E2=94=82                            =E2=94=9C=E2=94=80 011 =
+=E2=94=80 OPC_MXU_D16MIN
++ *          =E2=94=82                            =E2=94=9C=E2=94=80 100 =
+=E2=94=80 OPC_MXU_Q8MAX
++ *          =E2=94=82                            =E2=94=9C=E2=94=80 101 =
+=E2=94=80 OPC_MXU_Q8MIN
++ *          =E2=94=82                            =E2=94=9C=E2=94=80 110 =
+=E2=94=80 OPC_MXU_Q8SLT
++ *          =E2=94=82                            =E2=94=94=E2=94=80 111 =
+=E2=94=80 OPC_MXU_Q8SLTU
++ *          =E2=94=9C=E2=94=80 000100 =E2=94=80 OPC_MXU_S32MSUB
++ *          =E2=94=9C=E2=94=80 000101 =E2=94=80 OPC_MXU_S32MSUBU    20..=
+18  (25..21 must be 0,
++ *          =E2=94=82                                         except for=
+ Q8ADD)
++ *          =E2=94=9C=E2=94=80 000110 =E2=94=80 OPC_MXU__POOL01 =E2=94=80=
+=E2=94=AC=E2=94=80 000 =E2=94=80 OPC_MXU_S32SLT
++ *          =E2=94=82                            =E2=94=9C=E2=94=80 001 =
+=E2=94=80 OPC_MXU_D16SLT
++ *          =E2=94=82                            =E2=94=9C=E2=94=80 010 =
+=E2=94=80 OPC_MXU_D16AVG
++ *          =E2=94=82                            =E2=94=9C=E2=94=80 011 =
+=E2=94=80 OPC_MXU_D16AVGR
++ *          =E2=94=82                            =E2=94=9C=E2=94=80 100 =
+=E2=94=80 OPC_MXU_Q8AVG
++ *          =E2=94=82                            =E2=94=9C=E2=94=80 101 =
+=E2=94=80 OPC_MXU_Q8AVGR
++ *          =E2=94=82                            =E2=94=94=E2=94=80 111 =
+=E2=94=80 OPC_MXU_Q8ADD
++ *          =E2=94=82
++ *          =E2=94=82                               20..18  (25..21 must=
+ be 0)
++ *          =E2=94=9C=E2=94=80 000111 =E2=94=80 OPC_MXU__POOL02 =E2=94=80=
+=E2=94=AC=E2=94=80 000 =E2=94=80 OPC_MXU_S32CPS
++ *          =E2=94=82                            =E2=94=9C=E2=94=80 010 =
+=E2=94=80 OPC_MXU_D16CPS
++ *          =E2=94=82                            =E2=94=9C=E2=94=80 100 =
+=E2=94=80 OPC_MXU_Q8ABD
++ *          =E2=94=82                            =E2=94=94=E2=94=80 110 =
+=E2=94=80 OPC_MXU_Q16SAT
++ *          =E2=94=9C=E2=94=80 001000 =E2=94=80 OPC_MXU_D16MUL
++ *          =E2=94=82                               25..24
++ *          =E2=94=9C=E2=94=80 001001 =E2=94=80 OPC_MXU__POOL03 =E2=94=80=
+=E2=94=AC=E2=94=80 00 =E2=94=80 OPC_MXU_D16MULF
++ *          =E2=94=82                            =E2=94=94=E2=94=80 01 =E2=
+=94=80 OPC_MXU_D16MULE
++ *          =E2=94=9C=E2=94=80 001010 =E2=94=80 OPC_MXU_D16MAC
++ *          =E2=94=9C=E2=94=80 001011 =E2=94=80 OPC_MXU_D16MACF
++ *          =E2=94=9C=E2=94=80 001100 =E2=94=80 OPC_MXU_D16MADL
++ *          =E2=94=82                               25..24
++ *          =E2=94=9C=E2=94=80 001101 =E2=94=80 OPC_MXU__POOL04 =E2=94=80=
+=E2=94=AC=E2=94=80 00 =E2=94=80 OPC_MXU_S16MAD
++ *          =E2=94=82                            =E2=94=94=E2=94=80 01 =E2=
+=94=80 OPC_MXU_S16MAD_1
++ *          =E2=94=9C=E2=94=80 001110 =E2=94=80 OPC_MXU_Q16ADD
++ *          =E2=94=9C=E2=94=80 001111 =E2=94=80 OPC_MXU_D16MACE
++ *          =E2=94=82                               23
++ *          =E2=94=9C=E2=94=80 010000 =E2=94=80 OPC_MXU__POOL05 =E2=94=80=
+=E2=94=AC=E2=94=80 0 =E2=94=80 OPC_MXU_S32LDD
++ *          =E2=94=82                            =E2=94=94=E2=94=80 1 =E2=
+=94=80 OPC_MXU_S32LDDR
++ *          =E2=94=82
++ *          =E2=94=82                               23
++ *          =E2=94=9C=E2=94=80 010001 =E2=94=80 OPC_MXU__POOL06 =E2=94=80=
+=E2=94=AC=E2=94=80 0 =E2=94=80 OPC_MXU_S32STD
++ *          =E2=94=82                            =E2=94=94=E2=94=80 1 =E2=
+=94=80 OPC_MXU_S32STDR
++ *          =E2=94=82
++ *          =E2=94=82                               13..10
++ *          =E2=94=9C=E2=94=80 010010 =E2=94=80 OPC_MXU__POOL07 =E2=94=80=
+=E2=94=AC=E2=94=80 0000 =E2=94=80 OPC_MXU_S32LDDV
++ *          =E2=94=82                            =E2=94=94=E2=94=80 0001=
+ =E2=94=80 OPC_MXU_S32LDDVR
++ *          =E2=94=82
++ *          =E2=94=82                               13..10
++ *          =E2=94=9C=E2=94=80 010011 =E2=94=80 OPC_MXU__POOL08 =E2=94=80=
+=E2=94=AC=E2=94=80 0000 =E2=94=80 OPC_MXU_S32TDV
++ *          =E2=94=82                            =E2=94=94=E2=94=80 0001=
+ =E2=94=80 OPC_MXU_S32TDVR
++ *          =E2=94=82
++ *          =E2=94=82                               23
++ *          =E2=94=9C=E2=94=80 010100 =E2=94=80 OPC_MXU__POOL09 =E2=94=80=
+=E2=94=AC=E2=94=80 0 =E2=94=80 OPC_MXU_S32LDI
++ *          =E2=94=82                            =E2=94=94=E2=94=80 1 =E2=
+=94=80 OPC_MXU_S32LDIR
++ *          =E2=94=82
++ *          =E2=94=82                               23
++ *          =E2=94=9C=E2=94=80 010101 =E2=94=80 OPC_MXU__POOL10 =E2=94=80=
+=E2=94=AC=E2=94=80 0 =E2=94=80 OPC_MXU_S32SDI
++ *          =E2=94=82                            =E2=94=94=E2=94=80 1 =E2=
+=94=80 OPC_MXU_S32SDIR
++ *          =E2=94=82
++ *          =E2=94=82                               13..10
++ *          =E2=94=9C=E2=94=80 010110 =E2=94=80 OPC_MXU__POOL11 =E2=94=80=
+=E2=94=AC=E2=94=80 0000 =E2=94=80 OPC_MXU_S32LDIV
++ *          =E2=94=82                            =E2=94=94=E2=94=80 0001=
+ =E2=94=80 OPC_MXU_S32LDIVR
++ *          =E2=94=82
++ *          =E2=94=82                               13..10
++ *          =E2=94=9C=E2=94=80 010111 =E2=94=80 OPC_MXU__POOL12 =E2=94=80=
+=E2=94=AC=E2=94=80 0000 =E2=94=80 OPC_MXU_S32SDIV
++ *          =E2=94=82                            =E2=94=94=E2=94=80 0001=
+ =E2=94=80 OPC_MXU_S32SDIVR
++ *          =E2=94=9C=E2=94=80 011000 =E2=94=80 OPC_MXU_D32ADD
++ *          =E2=94=82
++ *   MXU    =E2=94=9C=E2=94=80 011001 =E2=94=80 OPC_MXU__POOL13 =E2=94=80=
+=E2=94=AC=E2=94=80 00 =E2=94=80 OPC_MXU_D32ACC
++ * opcodes =E2=94=80=E2=94=A4                            =E2=94=9C=E2=94=
+=80 01 =E2=94=80 OPC_MXU_D32ACCM
++ *          =E2=94=82                            =E2=94=94=E2=94=80 10 =E2=
+=94=80 OPC_MXU_D32ASUM
++ *          =E2=94=9C=E2=94=80 011010 =E2=94=80 <not assigned>
++ *          =E2=94=82
++ *          =E2=94=9C=E2=94=80 011011 =E2=94=80 OPC_MXU__POOL14 =E2=94=80=
+=E2=94=AC=E2=94=80 00 =E2=94=80 OPC_MXU_Q16ACC
++ *          =E2=94=82                            =E2=94=9C=E2=94=80 01 =E2=
+=94=80 OPC_MXU_Q16ACCM
++ *          =E2=94=82                            =E2=94=94=E2=94=80 10 =E2=
+=94=80 OPC_MXU_Q16ASUM
++ *          =E2=94=82
++ *          =E2=94=82
++ *          =E2=94=9C=E2=94=80 011100 =E2=94=80 OPC_MXU__POOL15 =E2=94=80=
+=E2=94=AC=E2=94=80 00 =E2=94=80 OPC_MXU_Q8ADDE
++ *          =E2=94=82                            =E2=94=9C=E2=94=80 01 =E2=
+=94=80 OPC_MXU_D8SUM
++ *          =E2=94=9C=E2=94=80 011101 =E2=94=80 OPC_MXU_Q8ACCE   =E2=94=94=
+=E2=94=80 10 =E2=94=80 OPC_MXU_D8SUMC
++ *          =E2=94=9C=E2=94=80 011110 =E2=94=80 <not assigned>
++ *          =E2=94=9C=E2=94=80 011111 =E2=94=80 <not assigned>
++ *          =E2=94=9C=E2=94=80 100000 =E2=94=80 <not assigned>
++ *          =E2=94=9C=E2=94=80 100001 =E2=94=80 <not assigned>
++ *          =E2=94=9C=E2=94=80 100010 =E2=94=80 OPC_MXU_S8LDD
++ *          =E2=94=9C=E2=94=80 100011 =E2=94=80 OPC_MXU_S8STD
++ *          =E2=94=9C=E2=94=80 100100 =E2=94=80 OPC_MXU_S8LDI
++ *          =E2=94=9C=E2=94=80 100101 =E2=94=80 OPC_MXU_S8SDI
++ *          =E2=94=82
++ *          =E2=94=9C=E2=94=80 100110 =E2=94=80 OPC_MXU__POOL16 =E2=94=80=
+=E2=94=AC=E2=94=80 00 =E2=94=80 OPC_MXU_S32MUL
++ *          =E2=94=82                            =E2=94=9C=E2=94=80 00 =E2=
+=94=80 OPC_MXU_S32MULU
++ *          =E2=94=82                            =E2=94=9C=E2=94=80 00 =E2=
+=94=80 OPC_MXU_S32EXTR
++ *          =E2=94=82                            =E2=94=94=E2=94=80 00 =E2=
+=94=80 OPC_MXU_S32EXTRV
++ *          =E2=94=82
++ *          =E2=94=82
++ *          =E2=94=9C=E2=94=80 100111 =E2=94=80 OPC_MXU__POOL17 =E2=94=80=
+=E2=94=AC=E2=94=80 000 =E2=94=80 OPC_MXU_D32SARW
++ *          =E2=94=82                            =E2=94=9C=E2=94=80 001 =
+=E2=94=80 OPC_MXU_S32ALN
++ *          =E2=94=9C=E2=94=80 101000 =E2=94=80 OPC_MXU_LXB      =E2=94=9C=
+=E2=94=80 010 =E2=94=80 OPC_MXU_S32ALNI
++ *          =E2=94=9C=E2=94=80 101001 =E2=94=80 <not assigned>   =E2=94=9C=
+=E2=94=80 011 =E2=94=80 OPC_MXU_S32NOR
++ *          =E2=94=9C=E2=94=80 101010 =E2=94=80 OPC_MXU_S16LDD   =E2=94=9C=
+=E2=94=80 100 =E2=94=80 OPC_MXU_S32AND
++ *          =E2=94=9C=E2=94=80 101011 =E2=94=80 OPC_MXU_S16STD   =E2=94=9C=
+=E2=94=80 101 =E2=94=80 OPC_MXU_S32OR
++ *          =E2=94=9C=E2=94=80 101100 =E2=94=80 OPC_MXU_S16LDI   =E2=94=9C=
+=E2=94=80 110 =E2=94=80 OPC_MXU_S32XOR
++ *          =E2=94=9C=E2=94=80 101101 =E2=94=80 OPC_MXU_S16SDI   =E2=94=94=
+=E2=94=80 111 =E2=94=80 OPC_MXU_S32LUI
++ *          =E2=94=9C=E2=94=80 101000 =E2=94=80 <not assigned>
++ *          =E2=94=9C=E2=94=80 101001 =E2=94=80 <not assigned>
++ *          =E2=94=9C=E2=94=80 101010 =E2=94=80 <not assigned>
++ *          =E2=94=9C=E2=94=80 101011 =E2=94=80 <not assigned>
++ *          =E2=94=9C=E2=94=80 101100 =E2=94=80 <not assigned>
++ *          =E2=94=9C=E2=94=80 101101 =E2=94=80 <not assigned>
++ *          =E2=94=9C=E2=94=80 101110 =E2=94=80 OPC_MXU_S32M2I
++ *          =E2=94=9C=E2=94=80 101111 =E2=94=80 OPC_MXU_S32I2M
++ *          =E2=94=9C=E2=94=80 110000 =E2=94=80 OPC_MXU_D32SLL
++ *          =E2=94=9C=E2=94=80 110001 =E2=94=80 OPC_MXU_D32SLR
++ *          =E2=94=9C=E2=94=80 110010 =E2=94=80 OPC_MXU_D32SARL
++ *          =E2=94=9C=E2=94=80 110011 =E2=94=80 OPC_MXU_D32SAR
++ *          =E2=94=9C=E2=94=80 110100 =E2=94=80 OPC_MXU_Q16SLL
++ *          =E2=94=9C=E2=94=80 110101 =E2=94=80 OPC_MXU_Q16SLR
++ *          =E2=94=9C=E2=94=80 110110 =E2=94=80 OPC_MXU__POOL18 =E2=94=80=
+=E2=94=AC=E2=94=80 000 =E2=94=80 OPC_MXU_D32SLLV
++ *          =E2=94=82                            =E2=94=9C=E2=94=80 001 =
+=E2=94=80 OPC_MXU_D32SLRV
++ *          =E2=94=82                            =E2=94=9C=E2=94=80 010 =
+=E2=94=80 OPC_MXU_D32SARV
++ *          =E2=94=82                            =E2=94=9C=E2=94=80 011 =
+=E2=94=80 OPC_MXU_Q16SLLV
++ *          =E2=94=82                            =E2=94=9C=E2=94=80 100 =
+=E2=94=80 OPC_MXU_Q16SLRV
++ *          =E2=94=82                            =E2=94=94=E2=94=80 101 =
+=E2=94=80 OPC_MXU_Q16SARV
++ *          =E2=94=9C=E2=94=80 110111 =E2=94=80 OPC_MXU_Q16SAR
++ *          =E2=94=82
++ *          =E2=94=9C=E2=94=80 111000 =E2=94=80 OPC_MXU__POOL19 =E2=94=80=
+=E2=94=AC=E2=94=80 00 =E2=94=80 OPC_MXU_Q8MUL
++ *          =E2=94=82                            =E2=94=94=E2=94=80 01 =E2=
+=94=80 OPC_MXU_Q8MULSU
++ *          =E2=94=82
++ *          =E2=94=82
++ *          =E2=94=9C=E2=94=80 111001 =E2=94=80 OPC_MXU__POOL20 =E2=94=80=
+=E2=94=AC=E2=94=80 000 =E2=94=80 OPC_MXU_Q8MOVZ
++ *          =E2=94=82                            =E2=94=9C=E2=94=80 001 =
+=E2=94=80 OPC_MXU_Q8MOVN
++ *          =E2=94=82                            =E2=94=9C=E2=94=80 010 =
+=E2=94=80 OPC_MXU_D16MOVZ
++ *          =E2=94=82                            =E2=94=9C=E2=94=80 011 =
+=E2=94=80 OPC_MXU_D16MOVN
++ *          =E2=94=82                            =E2=94=9C=E2=94=80 100 =
+=E2=94=80 OPC_MXU_S32MOVZ
++ *          =E2=94=82                            =E2=94=94=E2=94=80 101 =
+=E2=94=80 OPC_MXU_S32MOV
++ *          =E2=94=82
++ *          =E2=94=82
++ *          =E2=94=9C=E2=94=80 111010 =E2=94=80 OPC_MXU__POOL21 =E2=94=80=
+=E2=94=AC=E2=94=80 00 =E2=94=80 OPC_MXU_Q8MAC
++ *          =E2=94=82                            =E2=94=94=E2=94=80 10 =E2=
+=94=80 OPC_MXU_Q8MACSU
++ *          =E2=94=9C=E2=94=80 111011 =E2=94=80 OPC_MXU_Q16SCOP
++ *          =E2=94=9C=E2=94=80 111100 =E2=94=80 OPC_MXU_Q8MADL
++ *          =E2=94=9C=E2=94=80 111101 =E2=94=80 OPC_MXU_S32SFL
++ *          =E2=94=9C=E2=94=80 111110 =E2=94=80 OPC_MXU_Q8SAD
++ *          =E2=94=94=E2=94=80 111111 =E2=94=80 <not assigned>
++ *
++ *
+  *   Compiled after:
+  *
+  *   "XBurst=C2=AE Instruction Set Architecture MIPS eXtension/enhanced =
+Unit
+--=20
 2.7.4
