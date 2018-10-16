@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56569)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56589)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gCTM5-00063F-EH
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:42:07 -0400
+	(envelope-from <armbru@redhat.com>) id 1gCTM6-00063M-8q
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:42:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gCTM4-0008WN-7t
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:42:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45636)
+	(envelope-from <armbru@redhat.com>) id 1gCTM2-0008Vg-TF
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:42:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32938)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gCTM4-0008W5-1d
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:42:04 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6AC0630833A4
-	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 17:42:03 +0000 (UTC)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gCTM2-0008V9-NI
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:42:02 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 16 Oct 2018 19:41:32 +0200
-Message-Id: <20181016174158.15229-13-armbru@redhat.com>
+Date: Tue, 16 Oct 2018 19:41:28 +0200
+Message-Id: <20181016174158.15229-9-armbru@redhat.com>
 In-Reply-To: <20181016174158.15229-1-armbru@redhat.com>
 References: <20181016174158.15229-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 12/38] migration: Fix !replay_can_snapshot()
- error handling
+Subject: [Qemu-devel] [PATCH v3 08/38] 9pfs: Fix CLI parsing crash on error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,54 +24,56 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Greg Kurz <groug@kaod.org>
 
 Calling error_report() in a function that takes an Error ** argument
-is suspicious.  save_snapshot() and load_snapshot() do that, and then
-fail without setting an error.  Wrong.  The HMP commands survive this
-unscathed, since hmp_handle_error() does nothing when no error has
-been set.  Callers main() (on behalf of -loadvm) and
-replay_vmstate_init() crash, but I'm not sure the error is possible
-there.
+is suspicious.  9p-handle.c's handle_parse_opts() does that, and then
+fails without setting an error.  Wrong.  Its caller crashes when it
+tries to report the error:
 
-Screwed up when commit 377b21ccea1 (v2.12.0) added incorrect error
-handling right next to correct examples.  Fix by calling error_setg()
-instead of error_report().
+    $ qemu-system-x86_64 -nodefaults -fsdev id=foo,fsdriver=handle
+    qemu-system-x86_64: -fsdev id=foo,fsdriver=handle: warning: handle backend is deprecated
+    qemu-system-x86_64: -fsdev id=foo,fsdriver=handle: fsdev: No path specified
+    Segmentation fault (core dumped)
 
-Fixes: 377b21ccea1755a8b0dae822c29567c58dda6939
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Screwed up when commit 91cda4e8f37 (v2.12.0) converted the function to
+Error.  Fix by calling error_setg() instead of error_report().
+
+Fixes: 91cda4e8f372602795e3a2f4bd2e3adaf9f82255
+Cc: Greg Kurz <groug@kaod.org>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Acked-by: Greg Kurz <groug@kaod.org>
 ---
- migration/savevm.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ hw/9pfs/9p-handle.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 2d10e45582..5f8eb38676 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -2414,8 +2414,8 @@ int save_snapshot(const char *name, Error **errp)
-     AioContext *aio_context;
-=20
-     if (!replay_can_snapshot()) {
--        error_report("Record/replay does not allow making snapshot "
--                     "right now. Try once more later.");
-+        error_setg(errp, "Record/replay does not allow making snapshot "
-+                   "right now. Try once more later.");
-         return ret;
+diff --git a/hw/9pfs/9p-handle.c b/hw/9pfs/9p-handle.c
+index f3641dbe4a..3465b1ef30 100644
+--- a/hw/9pfs/9p-handle.c
++++ b/hw/9pfs/9p-handle.c
+@@ -19,6 +19,7 @@
+ #include <grp.h>
+ #include <sys/socket.h>
+ #include <sys/un.h>
++#include "qapi/error.h"
+ #include "qemu/xattr.h"
+ #include "qemu/cutils.h"
+ #include "qemu/error-report.h"
+@@ -655,12 +656,13 @@ static int handle_parse_opts(QemuOpts *opts, FsDriverEntry *fse, Error **errp)
+     warn_report("handle backend is deprecated");
+ 
+     if (sec_model) {
+-        error_report("Invalid argument security_model specified with handle fsdriver");
++        error_setg(errp,
++                   "Invalid argument security_model specified with handle fsdriver");
+         return -1;
      }
-=20
-@@ -2611,8 +2611,8 @@ int load_snapshot(const char *name, Error **errp)
-     MigrationIncomingState *mis =3D migration_incoming_get_current();
-=20
-     if (!replay_can_snapshot()) {
--        error_report("Record/replay does not allow loading snapshot "
--                     "right now. Try once more later.");
-+        error_setg(errp, "Record/replay does not allow loading snapshot =
-"
-+                   "right now. Try once more later.");
-         return -EINVAL;
+ 
+     if (!path) {
+-        error_report("fsdev: No path specified");
++        error_setg(errp, "fsdev: No path specified");
+         return -1;
      }
-=20
---=20
+     fse->path = g_strdup(path);
+-- 
 2.17.1
