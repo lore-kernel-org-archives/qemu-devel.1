@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36763)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1gCNFI-0000X0-1R
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 07:10:45 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1gCNFL-0000ZF-Fz
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 07:10:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1gCNFD-000314-Uf
+	(envelope-from <guangrong.xiao@gmail.com>) id 1gCNFE-00031R-4K
 	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 07:10:38 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:44471)
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:35212)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1gCNFD-0002ln-En
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 07:10:35 -0400
-Received: by mail-pg1-x541.google.com with SMTP id g2-v6so10685614pgu.11
-	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 04:10:28 -0700 (PDT)
+	id 1gCNFD-0002fn-Nq
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 07:10:36 -0400
+Received: by mail-pg1-x541.google.com with SMTP id v133-v6so10701471pgb.2
+	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 04:10:24 -0700 (PDT)
 From: guangrong.xiao@gmail.com
-Date: Tue, 16 Oct 2018 19:10:05 +0800
-Message-Id: <20181016111006.629-4-xiaoguangrong@tencent.com>
+Date: Tue, 16 Oct 2018 19:10:04 +0800
+Message-Id: <20181016111006.629-3-xiaoguangrong@tencent.com>
 In-Reply-To: <20181016111006.629-1-xiaoguangrong@tencent.com>
 References: <20181016111006.629-1-xiaoguangrong@tencent.com>
-Subject: [Qemu-devel] [PATCH 3/4] migration: use lockless Multithread model
- for compression
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 2/4] migration: introduce lockless multithreads
+ model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,398 +35,495 @@ Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redh
 
 From: Xiao Guangrong <xiaoguangrong@tencent.com>
 
-Adapt the compression code to the lockless multithread model
+Current implementation of compression and decompression are very
+hard to be enabled on productions. We noticed that too many wait-wakes
+go to kernel space and CPU usages are very low even if the system
+is really free
+
+The reasons are:
+1) there are two many locks used to do synchronous，there
+　　is a global lock and each single thread has its own lock,
+　　migration thread and work threads need to go to sleep if
+　　these locks are busy
+
+2) migration thread separately submits request to the thread
+   however, only one request can be pended, that means, the
+   thread has to go to sleep after finishing the request
+
+To make it work better, we introduce a lockless multithread model,
+the user, currently it is the migration thread, submits request
+to each thread which has its own ring whose capacity is 4 and
+puts the result to a global ring where the user fetches result
+out and do remaining operations for the request, e.g, posting the
+compressed data out for migration on the source QEMU
 
 Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
 ---
- migration/ram.c | 312 +++++++++++++++++++++-----------------------------------
- 1 file changed, 115 insertions(+), 197 deletions(-)
+ include/qemu/lockless-threads.h |  63 +++++++
+ util/Makefile.objs              |   1 +
+ util/lockless-threads.c         | 373 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 437 insertions(+)
+ create mode 100644 include/qemu/lockless-threads.h
+ create mode 100644 util/lockless-threads.c
 
-diff --git a/migration/ram.c b/migration/ram.c
-index bc38d98cc3..2356bc255c 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -57,6 +57,7 @@
- #include "qemu/uuid.h"
- #include "savevm.h"
- #include "qemu/iov.h"
-+#include "qemu/lockless-threads.h"
- 
- /***********************************************************/
- /* ram save/restore */
-@@ -349,22 +350,6 @@ typedef struct PageSearchStatus PageSearchStatus;
- 
- CompressionStats compression_counters;
- 
--struct CompressParam {
--    bool done;
--    bool quit;
--    bool zero_page;
--    QEMUFile *file;
--    QemuMutex mutex;
--    QemuCond cond;
--    RAMBlock *block;
--    ram_addr_t offset;
--
--    /* internally used fields */
--    z_stream stream;
--    uint8_t *originbuf;
--};
--typedef struct CompressParam CompressParam;
--
- struct DecompressParam {
-     bool done;
-     bool quit;
-@@ -377,15 +362,6 @@ struct DecompressParam {
- };
- typedef struct DecompressParam DecompressParam;
- 
--static CompressParam *comp_param;
--static QemuThread *compress_threads;
--/* comp_done_cond is used to wake up the migration thread when
-- * one of the compression threads has finished the compression.
-- * comp_done_lock is used to co-work with comp_done_cond.
-- */
--static QemuMutex comp_done_lock;
--static QemuCond comp_done_cond;
--/* The empty QEMUFileOps will be used by file in CompressParam */
- static const QEMUFileOps empty_ops = { };
- 
- static QEMUFile *decomp_file;
-@@ -394,125 +370,6 @@ static QemuThread *decompress_threads;
- static QemuMutex decomp_done_lock;
- static QemuCond decomp_done_cond;
- 
--static bool do_compress_ram_page(QEMUFile *f, z_stream *stream, RAMBlock *block,
--                                 ram_addr_t offset, uint8_t *source_buf);
--
--static void *do_data_compress(void *opaque)
--{
--    CompressParam *param = opaque;
--    RAMBlock *block;
--    ram_addr_t offset;
--    bool zero_page;
--
--    qemu_mutex_lock(&param->mutex);
--    while (!param->quit) {
--        if (param->block) {
--            block = param->block;
--            offset = param->offset;
--            param->block = NULL;
--            qemu_mutex_unlock(&param->mutex);
--
--            zero_page = do_compress_ram_page(param->file, &param->stream,
--                                             block, offset, param->originbuf);
--
--            qemu_mutex_lock(&comp_done_lock);
--            param->done = true;
--            param->zero_page = zero_page;
--            qemu_cond_signal(&comp_done_cond);
--            qemu_mutex_unlock(&comp_done_lock);
--
--            qemu_mutex_lock(&param->mutex);
--        } else {
--            qemu_cond_wait(&param->cond, &param->mutex);
--        }
--    }
--    qemu_mutex_unlock(&param->mutex);
--
--    return NULL;
--}
--
--static void compress_threads_save_cleanup(void)
--{
--    int i, thread_count;
--
--    if (!migrate_use_compression() || !comp_param) {
--        return;
--    }
--
--    thread_count = migrate_compress_threads();
--    for (i = 0; i < thread_count; i++) {
--        /*
--         * we use it as a indicator which shows if the thread is
--         * properly init'd or not
--         */
--        if (!comp_param[i].file) {
--            break;
--        }
--
--        qemu_mutex_lock(&comp_param[i].mutex);
--        comp_param[i].quit = true;
--        qemu_cond_signal(&comp_param[i].cond);
--        qemu_mutex_unlock(&comp_param[i].mutex);
--
--        qemu_thread_join(compress_threads + i);
--        qemu_mutex_destroy(&comp_param[i].mutex);
--        qemu_cond_destroy(&comp_param[i].cond);
--        deflateEnd(&comp_param[i].stream);
--        g_free(comp_param[i].originbuf);
--        qemu_fclose(comp_param[i].file);
--        comp_param[i].file = NULL;
--    }
--    qemu_mutex_destroy(&comp_done_lock);
--    qemu_cond_destroy(&comp_done_cond);
--    g_free(compress_threads);
--    g_free(comp_param);
--    compress_threads = NULL;
--    comp_param = NULL;
--}
--
--static int compress_threads_save_setup(void)
--{
--    int i, thread_count;
--
--    if (!migrate_use_compression()) {
--        return 0;
--    }
--    thread_count = migrate_compress_threads();
--    compress_threads = g_new0(QemuThread, thread_count);
--    comp_param = g_new0(CompressParam, thread_count);
--    qemu_cond_init(&comp_done_cond);
--    qemu_mutex_init(&comp_done_lock);
--    for (i = 0; i < thread_count; i++) {
--        comp_param[i].originbuf = g_try_malloc(TARGET_PAGE_SIZE);
--        if (!comp_param[i].originbuf) {
--            goto exit;
--        }
--
--        if (deflateInit(&comp_param[i].stream,
--                        migrate_compress_level()) != Z_OK) {
--            g_free(comp_param[i].originbuf);
--            goto exit;
--        }
--
--        /* comp_param[i].file is just used as a dummy buffer to save data,
--         * set its ops to empty.
--         */
--        comp_param[i].file = qemu_fopen_ops(NULL, &empty_ops);
--        comp_param[i].done = true;
--        comp_param[i].quit = false;
--        qemu_mutex_init(&comp_param[i].mutex);
--        qemu_cond_init(&comp_param[i].cond);
--        qemu_thread_create(compress_threads + i, "compress",
--                           do_data_compress, comp_param + i,
--                           QEMU_THREAD_JOINABLE);
--    }
--    return 0;
--
--exit:
--    compress_threads_save_cleanup();
--    return -1;
--}
--
- /* Multiple fd's */
- 
- #define MULTIFD_MAGIC 0x11223344U
-@@ -1909,12 +1766,27 @@ exit:
-     return zero_page;
- }
- 
-+struct CompressData {
-+    /* filled by migration thread.*/
-+    RAMBlock *block;
-+    ram_addr_t offset;
+diff --git a/include/qemu/lockless-threads.h b/include/qemu/lockless-threads.h
+new file mode 100644
+index 0000000000..9340d3a748
+--- /dev/null
++++ b/include/qemu/lockless-threads.h
+@@ -0,0 +1,63 @@
++/*
++ * Lockless Multithreads Abstraction
++ *
++ * This is the abstraction layer for lockless multithreads management.
++ *
++ * Note: currently only one producer is allowed.
++ *
++ * Copyright(C) 2018 Tencent Corporation.
++ *
++ * Author:
++ *   Xiao Guangrong <xiaoguangrong@tencent.com>
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
++ * See the COPYING.LIB file in the top-level directory.
++ */
 +
-+    /* filled by compress thread. */
-+    QEMUFile *file;
-+    z_stream stream;
-+    uint8_t *originbuf;
-+    bool zero_page;
++#ifndef QEMU_LOCKLESS_THREAD_H
++#define QEMU_LOCKLESS_THREAD_H
 +
-+    ThreadRequest request;
++#include "qemu/queue.h"
++#include "qemu/thread.h"
++#include "qemu/ptr_ring.h"
++
++/*
++ * the request representation which contains the internally used mete data,
++ * it can be embedded to user's self-defined data struct and the user can
++ * use container_of() to get the self-defined data
++ */
++struct ThreadRequest {
++    QSLIST_ENTRY(ThreadRequest) node;
++    unsigned int thread_index;
 +};
-+typedef struct CompressData CompressData;
++typedef struct ThreadRequest ThreadRequest;
 +
- static void
--update_compress_thread_counts(const CompressParam *param, int bytes_xmit)
-+update_compress_thread_counts(CompressData *cd, int bytes_xmit)
- {
-     ram_counters.transferred += bytes_xmit;
- 
--    if (param->zero_page) {
-+    if (cd->zero_page) {
-         ram_counters.duplicate++;
-         return;
-     }
-@@ -1924,81 +1796,127 @@ update_compress_thread_counts(const CompressParam *param, int bytes_xmit)
-     compression_counters.pages++;
- }
- 
-+static ThreadRequest *compress_thread_data_init(void)
++typedef struct Threads Threads;
++
++/* the size of thread local request ring on default */
++#define DEFAULT_THREAD_RING_SIZE 4
++
++Threads *threads_create(unsigned int threads_nr, const char *name,
++                        int thread_ring_size,
++                        ThreadRequest *(*thread_request_init)(void),
++                        void (*thread_request_uninit)(ThreadRequest *request),
++                        void (*thread_request_handler)(ThreadRequest *request),
++                        void (*thread_request_done)(ThreadRequest *request));
++void threads_destroy(Threads *threads);
++
++/*
++ * find a free request and associate it with a free thread.
++ * If no request or no thread is free, return NULL
++ */
++ThreadRequest *threads_submit_request_prepare(Threads *threads);
++/*
++ * push the request to its thread's local ring and notify the thread
++ */
++void threads_submit_request_commit(Threads *threads, ThreadRequest *request);
++
++/*
++ * wait all threads to complete the request filled in their local rings
++ * to make sure there is no previous request exists.
++ */
++void threads_wait_done(Threads *threads);
++#endif
+diff --git a/util/Makefile.objs b/util/Makefile.objs
+index 0820923c18..deb5c972d5 100644
+--- a/util/Makefile.objs
++++ b/util/Makefile.objs
+@@ -50,5 +50,6 @@ util-obj-y += range.o
+ util-obj-y += stats64.o
+ util-obj-y += systemd.o
+ util-obj-y += iova-tree.o
++util-obj-y += lockless-threads.o
+ util-obj-$(CONFIG_LINUX) += vfio-helpers.o
+ util-obj-$(CONFIG_OPENGL) += drm.o
+diff --git a/util/lockless-threads.c b/util/lockless-threads.c
+new file mode 100644
+index 0000000000..50cf143c03
+--- /dev/null
++++ b/util/lockless-threads.c
+@@ -0,0 +1,373 @@
++/*
++ * Lockless Multithreads Implementation
++ *
++ * Implement lockless multithreads management.
++ *
++ * Note: currently only one producer is allowed.
++ *
++ * Copyright(C) 2018 Tencent Corporation.
++ *
++ * Author:
++ *   Xiao Guangrong <xiaoguangrong@tencent.com>
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
++ * See the COPYING.LIB file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/host-utils.h"
++#include "qemu/lockless-threads.h"
++
++struct ThreadLocal {
++    QemuThread thread;
++
++    /* the event used to wake up the thread */
++    QemuEvent ev;
++
++    struct Threads *threads;
++
++    /* local request ring which is filled by the user */
++    Ptr_Ring request_ring;
++
++    /* the index of the thread */
++    int self;
++
++    /* thread is useless and needs to exit */
++    bool quit;
++};
++typedef struct ThreadLocal ThreadLocal;
++
++/*
++ * the main data struct represents multithreads which is shared by
++ * all threads
++ */
++struct Threads {
++    const char *name;
++    unsigned int threads_nr;
++    /* the request is pushed to the thread with round-robin manner */
++    unsigned int current_thread_index;
++
++    int thread_ring_size;
++    int total_requests;
++
++    /* the request is pre-allocated and linked in the list */
++    int free_requests_nr;
++    QSLIST_HEAD(, ThreadRequest) free_requests;
++
++    /* the constructor of request */
++    ThreadRequest *(*thread_request_init)(void);
++    /* the destructor of request */
++    void (*thread_request_uninit)(ThreadRequest *request);
++    /* the handler of the request which is called in the thread */
++    void (*thread_request_handler)(ThreadRequest *request);
++    /*
++     * the handler to process the result which is called in the
++     * user's context
++     */
++    void (*thread_request_done)(ThreadRequest *request);
++
++    /* the thread push the result to this ring so it has multiple producers */
++    QemuSpin done_ring_lock;
++    Ptr_Ring request_done_ring;
++
++    ThreadLocal per_thread_data[0];
++};
++typedef struct Threads Threads;
++
++static void put_done_request(Threads *threads, ThreadRequest *request)
 +{
-+    CompressData *cd = g_new0(CompressData, 1);
++    int ret;
 +
-+    cd->originbuf = g_try_malloc(TARGET_PAGE_SIZE);
-+    if (!cd->originbuf) {
-+        goto exit;
++    qemu_spin_lock(&threads->done_ring_lock);
++    ret = ptr_ring_produce(&threads->request_done_ring, request);
++    /* there should be enough room to save all request. */
++    assert(!ret);
++    qemu_spin_unlock(&threads->done_ring_lock);
++}
++
++/* retry to see if there is avilable request before actually go to wait. */
++#define BUSY_WAIT_COUNT 1000
++
++static ThreadRequest *thread_busy_wait_for_request(ThreadLocal *thread)
++{
++    ThreadRequest *request;
++    int count = 0;
++
++    for (count = 0; count < BUSY_WAIT_COUNT; count++) {
++        request = ptr_ring_consume(&thread->request_ring);
++        if (request) {
++            return request;
++        }
++
++        cpu_relax();
 +    }
 +
-+    if (deflateInit(&cd->stream, migrate_compress_level()) != Z_OK) {
-+        g_free(cd->originbuf);
-+        goto exit;
-+    }
-+
-+    cd->file = qemu_fopen_ops(NULL, &empty_ops);
-+    return &cd->request;
-+
-+exit:
-+    g_free(cd);
 +    return NULL;
 +}
 +
-+static void compress_thread_data_fini(ThreadRequest *request)
++static void *thread_run(void *opaque)
 +{
-+    CompressData *cd = container_of(request, CompressData, request);
++    ThreadLocal *self_data = (ThreadLocal *)opaque;
++    Threads *threads = self_data->threads;
++    void (*handler)(ThreadRequest *data) = threads->thread_request_handler;
++    ThreadRequest *request;
 +
-+    qemu_fclose(cd->file);
-+    deflateEnd(&cd->stream);
-+    g_free(cd->originbuf);
-+    g_free(cd);
-+}
++    for ( ; !atomic_read(&self_data->quit); ) {
++        qemu_event_reset(&self_data->ev);
 +
-+static void compress_thread_data_handler(ThreadRequest *request)
-+{
-+    CompressData *cd = container_of(request, CompressData, request);
-+
-+    /*
-+     * if compression fails, it will be indicated by
-+     * migrate_get_current()->to_dst_file.
-+     */
-+    cd->zero_page = do_compress_ram_page(cd->file, &cd->stream, cd->block,
-+                                         cd->offset, cd->originbuf);
-+}
-+
-+static void compress_thread_data_done(ThreadRequest *request)
-+{
-+    CompressData *cd = container_of(request, CompressData, request);
-+    RAMState *rs = ram_state;
-+    int bytes_xmit;
-+
-+    bytes_xmit = qemu_put_qemu_file(rs->f, cd->file);
-+    update_compress_thread_counts(cd, bytes_xmit);
-+}
-+
-+static Threads *compress_threads;
-+
- static bool save_page_use_compression(RAMState *rs);
- 
- static void flush_compressed_data(RAMState *rs)
- {
--    int idx, len, thread_count;
--
-     if (!save_page_use_compression(rs)) {
-         return;
-     }
--    thread_count = migrate_compress_threads();
- 
--    qemu_mutex_lock(&comp_done_lock);
--    for (idx = 0; idx < thread_count; idx++) {
--        while (!comp_param[idx].done) {
--            qemu_cond_wait(&comp_done_cond, &comp_done_lock);
--        }
--    }
--    qemu_mutex_unlock(&comp_done_lock);
-+    threads_wait_done(compress_threads);
-+}
- 
--    for (idx = 0; idx < thread_count; idx++) {
--        qemu_mutex_lock(&comp_param[idx].mutex);
--        if (!comp_param[idx].quit) {
--            len = qemu_put_qemu_file(rs->f, comp_param[idx].file);
--            /*
--             * it's safe to fetch zero_page without holding comp_done_lock
--             * as there is no further request submitted to the thread,
--             * i.e, the thread should be waiting for a request at this point.
--             */
--            update_compress_thread_counts(&comp_param[idx], len);
--        }
--        qemu_mutex_unlock(&comp_param[idx].mutex);
-+static void compress_threads_save_cleanup(void)
-+{
-+    if (!compress_threads) {
-+        return;
-     }
-+
-+    threads_destroy(compress_threads);
-+    compress_threads = NULL;
- }
- 
--static inline void set_compress_params(CompressParam *param, RAMBlock *block,
--                                       ram_addr_t offset)
-+static int compress_threads_save_setup(void)
- {
--    param->block = block;
--    param->offset = offset;
-+    if (!migrate_use_compression()) {
-+        return 0;
++        request = thread_busy_wait_for_request(self_data);
++        if (!request) {
++            qemu_event_wait(&self_data->ev);
++            continue;
++        }
++        handler(request);
++        put_done_request(threads, request);
 +    }
 +
-+    compress_threads = threads_create(migrate_compress_threads(),
-+                                      "compress",
-+                                      DEFAULT_THREAD_RING_SIZE,
-+                                      compress_thread_data_init,
-+                                      compress_thread_data_fini,
-+                                      compress_thread_data_handler,
-+                                      compress_thread_data_done);
-+    return compress_threads ? 0 : -1;
- }
- 
- static int compress_page_with_multi_thread(RAMState *rs, RAMBlock *block,
-                                            ram_addr_t offset)
- {
--    int idx, thread_count, bytes_xmit = -1, pages = -1;
-+    CompressData *cd;
++    return NULL;
++}
++
++static void add_free_request(Threads *threads, ThreadRequest *request)
++{
++    QSLIST_INSERT_HEAD(&threads->free_requests, request, node);
++    threads->free_requests_nr++;
++}
++
++static ThreadRequest *get_and_remove_first_free_request(Threads *threads)
++{
 +    ThreadRequest *request;
-     bool wait = migrate_compress_wait_thread();
- 
--    thread_count = migrate_compress_threads();
--    qemu_mutex_lock(&comp_done_lock);
- retry:
--    for (idx = 0; idx < thread_count; idx++) {
--        if (comp_param[idx].done) {
--            comp_param[idx].done = false;
--            bytes_xmit = qemu_put_qemu_file(rs->f, comp_param[idx].file);
--            qemu_mutex_lock(&comp_param[idx].mutex);
--            set_compress_params(&comp_param[idx], block, offset);
--            qemu_cond_signal(&comp_param[idx].cond);
--            qemu_mutex_unlock(&comp_param[idx].mutex);
--            pages = 1;
--            update_compress_thread_counts(&comp_param[idx], bytes_xmit);
--            break;
-+    request = threads_submit_request_prepare(compress_threads);
-+    if (!request) {
-+        /*
-+         * wait for the free thread if the user specifies
-+         * 'compress-wait-thread', otherwise we will post
-+         *  the page out in the main thread as normal page.
-+         */
-+        if (wait) {
-+            cpu_relax();
-+            goto retry;
-         }
--    }
- 
--    /*
--     * wait for the free thread if the user specifies 'compress-wait-thread',
--     * otherwise we will post the page out in the main thread as normal page.
--     */
--    if (pages < 0 && wait) {
--        qemu_cond_wait(&comp_done_cond, &comp_done_lock);
--        goto retry;
--    }
--    qemu_mutex_unlock(&comp_done_lock);
++
++    if (QSLIST_EMPTY(&threads->free_requests)) {
++        return NULL;
++    }
++
++    request = QSLIST_FIRST(&threads->free_requests);
++    QSLIST_REMOVE_HEAD(&threads->free_requests, node);
++    threads->free_requests_nr--;
++    return request;
++}
++
++static void uninit_requests(Threads *threads, int free_nr)
++{
++    ThreadRequest *request;
++
++    /*
++     * all requests should be released to the list if threads are being
++     * destroyed, i,e. should call threads_wait_done() first.
++     */
++    assert(threads->free_requests_nr == free_nr);
++
++    while ((request = get_and_remove_first_free_request(threads))) {
++        threads->thread_request_uninit(request);
++    }
++
++    assert(ptr_ring_empty(&threads->request_done_ring));
++     ptr_ring_cleanup(&threads->request_done_ring, NULL);
++}
++
++static int init_requests(Threads *threads, int total_requests)
++{
++    ThreadRequest *request;
++    int i, free_nr = 0;
++
++    if (ptr_ring_init(&threads->request_done_ring, total_requests) < 0) {
 +        return -1;
-+     }
- 
--    return pages;
-+    cd = container_of(request, CompressData, request);
-+    cd->block = block;
-+    cd->offset = offset;
-+    threads_submit_request_commit(compress_threads, request);
-+    return 1;
- }
- 
- /**
++    }
++    ptr_ring_disable_batch(&threads->request_done_ring);
++
++    QSLIST_INIT(&threads->free_requests);
++    for (i = 0; i < total_requests; i++) {
++        request = threads->thread_request_init();
++        if (!request) {
++            goto cleanup;
++        }
++
++        free_nr++;
++        add_free_request(threads, request);
++    }
++    return 0;
++
++cleanup:
++    uninit_requests(threads, free_nr);
++    return -1;
++}
++
++static void uninit_thread_data(Threads *threads, int num)
++{
++    ThreadLocal *thread_local = threads->per_thread_data;
++    int i;
++
++    for (i = 0; i < num; i++) {
++        thread_local[i].quit = true;
++        qemu_event_set(&thread_local[i].ev);
++        qemu_thread_join(&thread_local[i].thread);
++        qemu_event_destroy(&thread_local[i].ev);
++        assert(ptr_ring_empty(&thread_local[i].request_ring));
++
++        /* nothing is left in the ring. */
++        ptr_ring_cleanup(&thread_local[i].request_ring, NULL);
++    }
++}
++
++static int init_thread_data(Threads *threads, int threads_nr)
++{
++    ThreadLocal *thread_local = threads->per_thread_data;
++    char *name;
++    int i;
++
++    for (i = 0; i < threads_nr; i++) {
++        if (ptr_ring_init(&thread_local[i].request_ring,
++                          threads->thread_ring_size) < 0) {
++            goto exit;
++        }
++        ptr_ring_disable_batch(&thread_local[i].request_ring);
++
++        qemu_event_init(&thread_local[i].ev, false);
++        thread_local[i].threads = threads;
++        thread_local[i].self = i;
++        name = g_strdup_printf("%s/%d", threads->name, thread_local[i].self);
++        qemu_thread_create(&thread_local[i].thread, name,
++                           thread_run, &thread_local[i], QEMU_THREAD_JOINABLE);
++        g_free(name);
++    }
++    return 0;
++
++ exit:
++    uninit_thread_data(threads, i);
++    return -1;
++}
++
++Threads *threads_create(unsigned int threads_nr, const char *name,
++                        int thread_ring_size,
++                        ThreadRequest *(*thread_request_init)(void),
++                        void (*thread_request_uninit)(ThreadRequest *request),
++                        void (*thread_request_handler)(ThreadRequest *request),
++                        void (*thread_request_done)(ThreadRequest *request))
++{
++    Threads *threads;
++    int total_requests;
++
++    threads = g_malloc0(sizeof(*threads) + threads_nr * sizeof(ThreadLocal));
++    threads->name = name;
++    threads->thread_request_init = thread_request_init;
++    threads->thread_request_uninit = thread_request_uninit;
++    threads->thread_request_handler = thread_request_handler;
++    threads->thread_request_done = thread_request_done;
++    qemu_spin_init(&threads->done_ring_lock);
++
++    threads->thread_ring_size = thread_ring_size;
++    total_requests = threads->thread_ring_size * threads_nr;
++    if (init_requests(threads, total_requests) < 0) {
++        goto exit;
++    }
++    threads->total_requests = total_requests;
++
++    if (init_thread_data(threads, threads_nr) < 0) {
++        goto exit;
++    }
++    threads->threads_nr = threads_nr;
++    return threads;
++
++exit:
++    threads_destroy(threads);
++    return NULL;
++}
++
++void threads_destroy(Threads *threads)
++{
++    uninit_thread_data(threads, threads->threads_nr);
++    uninit_requests(threads, threads->total_requests);
++    g_free(threads);
++}
++
++static int find_free_thread(Threads *threads, int range)
++{
++    int current_index, index, try = 0;
++
++    current_index = threads->current_thread_index % threads->threads_nr;
++    index = current_index;
++
++    do {
++        index = index % threads->threads_nr;
++        if (!ptr_ring_full(&threads->per_thread_data[index].request_ring)) {
++            threads->current_thread_index = index;
++            return index;
++        }
++
++        if (++try > range) {
++            return -1;
++        }
++    } while (++index != current_index);
++
++    return -1;
++}
++
++ThreadRequest *threads_submit_request_prepare(Threads *threads)
++{
++    ThreadRequest *request;
++    int index;
++
++    /* seek a free one in all threads. */
++    index = find_free_thread(threads, threads->threads_nr);
++    if (index < 0) {
++        return NULL;
++    }
++
++    /* try to get the request from the list */
++    request = get_and_remove_first_free_request(threads);
++    if (request) {
++        goto got_request;
++    }
++
++    /* get the request already been handled by the threads */
++    request = ptr_ring_consume(&threads->request_done_ring);
++    if (request) {
++        threads->thread_request_done(request);
++        goto got_request;
++    }
++
++    return NULL;
++
++got_request:
++    request->thread_index = index;
++    return request;
++}
++
++void threads_submit_request_commit(Threads *threads, ThreadRequest *request)
++{
++    int ret, index = request->thread_index;
++    ThreadLocal *thread_local = &threads->per_thread_data[index];
++
++    ret = ptr_ring_produce(&thread_local->request_ring, request);
++
++    /*
++     * we have detected that the thread's ring is not full in
++     * threads_submit_request_prepare(), there should be free
++     * room in the ring
++     */
++    assert(!ret);
++    /* new request arrived, notify the thread */
++    qemu_event_set(&thread_local->ev);
++
++    /* we have used this entry, search from the next one. */
++    threads->current_thread_index = ++index;
++}
++
++void threads_wait_done(Threads *threads)
++{
++    ThreadRequest *requests[DEFAULT_THREAD_RING_SIZE * 2];
++    int nr;
++
++retry:
++    nr = ptr_ring_consume_batched(&threads->request_done_ring,
++                                  (void **)requests, ARRAY_SIZE(requests));
++    while (nr--) {
++        threads->thread_request_done(requests[nr]);
++       add_free_request(threads, requests[nr]);
++    }
++
++    if (threads->free_requests_nr != threads->total_requests) {
++        cpu_relax();
++        goto retry;
++    }
++}
 -- 
 2.14.4
