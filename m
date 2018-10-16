@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42015)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gCRAF-0008J9-GJ
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:21:49 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1gCRC4-0000dO-Qv
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:23:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gCRA7-0002um-Q9
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:21:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:19846)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gCRA5-0002gJ-LS
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:21:33 -0400
-Date: Tue, 16 Oct 2018 11:21:28 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181016110735-mutt-send-email-mst@kernel.org>
-References: <20181015141841.09b945e5@w520.home>
+	(envelope-from <pm215@archaic.org.uk>) id 1gCRC3-0007ia-RB
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:23:36 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:51898)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1gCRC2-0007PR-KK
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:23:35 -0400
+Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
+	(envelope-from <pm215@archaic.org.uk>) id 1gCRBx-0003m2-F6
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 16:23:29 +0100
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 16 Oct 2018 16:23:06 +0100
+Message-Id: <20181016152325.31367-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181015141841.09b945e5@w520.home>
-Subject: Re: [Qemu-devel] QEMU PCIe link "negotiation"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 00/19] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,97 +28,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: qemu-devel@nongnu.org
 
-On Mon, Oct 15, 2018 at 02:18:41PM -0600, Alex Williamson wrote:
-> Hi,
-> 
-> I'd like to start a discussion about virtual PCIe link width and speeds
-> in QEMU to figure out how we progress past the 2.5GT/s, x1 width links
-> we advertise today.  This matters for assigned devices as the endpoint
-> driver may not enable full physical link utilization if the upstream
-> port only advertises minimal capabilities.  One GPU assignment users
-> has measured that they only see an average transfer rate of 3.2GB/s
-> with current code, but hacking the downstream port to advertise an
-> 8GT/s, x16 width link allows them to get 12GB/s.  Obviously not all
-> devices and drivers will have this dependency and see these kinds of
-> improvements, or perhaps any improvement at all.
-> 
-> The first problem seems to be how we expose these link parameters in a
-> way that makes sense and supports backwards compatibility and
-> migration.
+Latest set of arm patches. I may end up doing another pullreq at the
+end of the week, but this is big enough to send out, plus it has
+several instances of "let me take the first N patches in your series"
+in it, so getting those into master makes patch respins for those
+submitters easier.
 
-Isn't this just for vfio though? So why worry about migration?
+thanks
+-- PMM
 
->  I think we want the flexibility to allow the user to
-> specify per PCIe device the link width and at least the maximum link
-> speed, if not the actual discrete link speeds supported.  However,
-> while I want to provide this flexibility, I don't necessarily think it
-> makes sense to burden the user to always specify these to get
-> reasonable defaults.  So I would propose that we a) add link parameters
-> to the base PCIe device class and b) set defaults based on the machine
-> type.  Additionally these machine type defaults would only apply to
-> generic PCIe root ports and switch ports, anything based on real
-> hardware would be fixed, ex. ioh3420 would stay at 2.5GT/s, x1 unless
-> overridden by the user.  Existing machine types would also stay at this
-> "legacy" rate, while pc-q35-3.2 might bring all generic devices up to
-> PCIe 4.0 specs, x32 width and 16GT/s, where the per-endpoint
-> negotiation would bring us back to negotiated widths and speeds
-> matching the endpoint.  Reasonable?
+The following changes since commit dddb37495b844270088e68e3bf30b764d48d863f:
 
-Generally yes.  Last time I looked, there's a bunch of stuff the spec
-says we need to do for the negotiation. E.g. guest can at any time
-request width re-negotiation. Maybe most guests don't do it but it's
-still in the spec and we never know whether anyone will do it in the
-future.
+  Merge remote-tracking branch 'remotes/awilliam/tags/vfio-updates-20181015.0' into staging (2018-10-15 18:44:04 +0100)
 
-VFIO is often a compromise but for virtual devices
-I'd prefer we are stictly compliant if possible.
+are available in the Git repository at:
 
-> Next I think we need to look at how and when we do virtual link
-> negotiation.  We're mostly discussing a virtual link, so I think
-> negotiation is simply filling in the negotiated link and width with the
-> highest common factor between endpoint and upstream port.  For assigned
-> devices, this should match the endpoint's existing negotiated link
-> parameters, however, devices can dynamically change their link speed
-> (perhaps also width?), so I believe a current link seed of 2.5GT/s
-> could upshift to 8GT/s without any sort of visible renegotiation.  Does
-> this mean that we should have link parameter callbacks from downstream
-> port to endpoint?  Or maybe the downstream port link status register
-> should effectively be an alias for LNKSTA of devfn 00.0 of the
-> downstream device when it exists.  We only need to report a consistent
-> link status value when someone looks at it, so reading directly from
-> the endpoint probably makes more sense than any sort of interface to
-> keep the value current.
+  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20181016
 
-Don't we need to reflect the physical downstream link speed
-somehow though?
+for you to fetch changes up to bdaffef4bb0729a74c7a325dba5c61d8cd8f464f:
 
+  coccinelle: new inplace-byteswaps.cocci to remove inplace-byteswapping calls (2018-10-16 16:16:42 +0100)
 
-> If we take the above approach with LNKSTA (probably also LNKSTA2), is
-> any sort of "negotiation" required?  We're automatically negotiated if
-> the capabilities of the upstream port are a superset of the endpoint's
-> capabilities.  What do we do and what do we care about when the
-> upstream port is a subset of the endpoint though?  For example, an
-> 8GT/s, x16 endpoint is installed into a 2.5GT/s, x1 downstream port.
-> On real hardware we obviously negotiate the endpoint down to the
-> downstream port parameters.  We could do that with an emulated device,
-> but this is the scenario we have today with assigned devices and we
-> simply leave the inconsistency.  I don't think we actually want to
-> (and there would be lots of complications to) force the physical device
-> to negotiate down to match a virtual downstream port.  Do we simply
-> trigger a warning that this may result in non-optimal performance and
-> leave the inconsistency?
+----------------------------------------------------------------
+target-arm queue:
+ * hw/arm/virt: add DT property /secure-chosen/stdout-path indicating secure UART
+ * target/arm: Fix aarch64_sve_change_el wrt EL0
+ * target/arm: Define fields of ISAR registers
+ * target/arm: Align cortex-r5 id_isar0
+ * target/arm: Fix cortex-a7 id_isar0
+ * net/cadence_gem: Fix various bugs, add support for new
+   features that will be used by the Xilinx Versal board
+ * target-arm: powerctl: Enable HVC when starting CPUs to EL2
+ * target/arm: Add the Cortex-A72
+ * target/arm: Mark PMINTENCLR and PMINTENCLR_EL1 accesses as possibly doing IO
+ * target/arm: Mask PMOVSR writes based on supported counters
+ * target/arm: Initialize ARMMMUFaultInfo in v7m_stack_read/write
+ * coccinelle: new inplace-byteswaps.cocci to remove inplace-byteswapping calls
 
-Also when guest pokes at the width do we need to tweak the
-physical device/downstream port?
+----------------------------------------------------------------
+Aaron Lindsay (2):
+      target/arm: Mark PMINTENCLR and PMINTENCLR_EL1 accesses as possibly doing IO
+      target/arm: Mask PMOVSR writes based on supported counters
 
-> This email is already too long, but I also wonder whether we should
-> consider additional vfio-pci interfaces to trigger a link retraining or
-> allow virtualized access to the physical upstream port config space.
-> Clearly we need to consider multi-function devices and whether there
-> are useful configurations that could benefit from such access.  Thanks
-> for reading, please discuss,
-> 
-> Alex
+Edgar E. Iglesias (10):
+      net: cadence_gem: Disable TSU feature bit
+      net: cadence_gem: Announce availability of priority queues
+      net: cadence_gem: Use uint32_t for 32bit descriptor words
+      net: cadence_gem: Add macro with max number of descriptor words
+      net: cadence_gem: Add support for extended descriptors
+      net: cadence_gem: Add support for selecting the DMA MemoryRegion
+      net: cadence_gem: Implement support for 64bit descriptor addresses
+      net: cadence_gem: Announce 64bit addressing support
+      target-arm: powerctl: Enable HVC when starting CPUs to EL2
+      target/arm: Add the Cortex-A72
+
+Jerome Forissier (1):
+      hw/arm/virt: add DT property /secure-chosen/stdout-path indicating secure UART
+
+Peter Maydell (2):
+      target/arm: Initialize ARMMMUFaultInfo in v7m_stack_read/write
+      coccinelle: new inplace-byteswaps.cocci to remove inplace-byteswapping calls
+
+Richard Henderson (4):
+      target/arm: Fix aarch64_sve_change_el wrt EL0
+      target/arm: Define fields of ISAR registers
+      target/arm: Align cortex-r5 id_isar0
+      target/arm: Fix cortex-a7 id_isar0
+
+ include/hw/net/cadence_gem.h               |   7 +-
+ target/arm/cpu.h                           |  95 +++++++++++++-
+ hw/arm/virt.c                              |   4 +
+ hw/net/cadence_gem.c                       | 192 +++++++++++++++++++++--------
+ target/arm/arm-powerctl.c                  |  10 ++
+ target/arm/cpu.c                           |   7 +-
+ target/arm/cpu64.c                         |  66 +++++++++-
+ target/arm/helper.c                        |  27 ++--
+ target/arm/op_helper.c                     |   6 +-
+ scripts/coccinelle/inplace-byteswaps.cocci |  65 ++++++++++
+ 10 files changed, 408 insertions(+), 71 deletions(-)
+ create mode 100644 scripts/coccinelle/inplace-byteswaps.cocci
