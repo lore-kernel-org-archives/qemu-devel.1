@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <xiao.w.wang@intel.com>) id 1gCPSA-0006TZ-Fa
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 09:32:09 -0400
+	(envelope-from <xiao.w.wang@intel.com>) id 1gCPSH-0006XA-EA
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 09:32:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <xiao.w.wang@intel.com>) id 1gCPS6-0008Uy-PA
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 09:32:06 -0400
-Received: from mga01.intel.com ([192.55.52.88]:20618)
+	(envelope-from <xiao.w.wang@intel.com>) id 1gCPS9-00006h-LR
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 09:32:13 -0400
+Received: from mga01.intel.com ([192.55.52.88]:20623)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <xiao.w.wang@intel.com>)
-	id 1gCPS5-0008RS-2d
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 09:32:01 -0400
+	id 1gCPS9-0008Ug-83
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 09:32:05 -0400
 From: Xiao Wang <xiao.w.wang@intel.com>
-Date: Tue, 16 Oct 2018 21:23:26 +0800
-Message-Id: <20181016132327.121839-2-xiao.w.wang@intel.com>
+Date: Tue, 16 Oct 2018 21:23:27 +0800
+Message-Id: <20181016132327.121839-3-xiao.w.wang@intel.com>
 In-Reply-To: <20181016132327.121839-1-xiao.w.wang@intel.com>
 References: <20181016132327.121839-1-xiao.w.wang@intel.com>
-Subject: [Qemu-devel] [RFC 1/2] vhost-vfio: introduce vhost-vfio net client
+Subject: [Qemu-devel] [RFC 2/2] vhost-vfio: implement vhost-vfio backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,239 +27,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: jasowang@redhat.com, mst@redhat.com, alex.williamson@redhat.com
 Cc: qemu-devel@nongnu.org, tiwei.bie@intel.com, cunming.liang@intel.com, xiaolong.ye@intel.com, zhihong.wang@intel.com, dan.daly@intel.com, Xiao Wang <xiao.w.wang@intel.com>
 
-Following the patch (vhost: introduce mdev based hardware vhost backend)
-https://lwn.net/Articles/750770/, which defines a generic mdev device for
-vDPA (vhost data path acceleration), this patch set introduces a new net
-client type: vhost-vfio.
+This patch implements vhost ops of vhost-vfio backend.
 
-Currently we have 2 types of vhost backends in QEMU: vhost kernel and
-vhost-user. To implement a kernel space HW vhost, the above patch provides
-a generic mdev device for vDPA purpose, this vDPA mdev device exposes to
-user space a non-vendor-specific configuration interface for setting up
-a vhost HW accelerator, this patch set introduces a third vhost backend
-called vhost-vfio based on the vDPA mdev interface.
+All the regular vhost messages including vring addr, negotiated features,
+etc., are written to vDPA mdev device directly.
 
-vhost-vfio net client will set up a vDPA mdev device which is specified
-by a "sysfsdev" parameter, during the net client init, the device will be
-opened and parsed using VFIO API, the VFIO device fd and device BAR region
-pointers for BAR0 and BAR1 will be kept in a VhostVFIO structure.
+For device DMA mapping, QEMU passes memory region info to mdev device
+and let kernel parent device driver to program IOMMU. This is a
+temporary implementation, for future when IOMMU supports mdev bus, we
+can use VFIO API to program IOMMU directly for parent device.
 
-This device initialization will provide a channel for the next patch to
-pass vhost messages to vDPA kernel driver.
+For SET_VRING_KICK, vhost-vfio trys to leverage EPT to let guest virtio
+driver kick vDPA device doorbell directly. For virtio 0.95 case in which
+we cannot set host notifier memory region, QEMU will help to relay the
+notify to vDPA device.
 
-Vhost-vfio usage:
-
-    qemu-system-x86_64 -cpu host -enable-kvm \
-    <snip>
-    -mem-prealloc \
-    -netdev type=vhost-vfio,sysfsdev=/sys/bus/mdev/devices/$UUID,id=mynet\
-    -device virtio-net-pci,netdv=mynet,page-per-vq=on \
+For SET_VRING_CALL, vhost-vfio uses VFIO API to pass the irqfd to kernel.
 
 Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
 Signed-off-by: Xiao Wang <xiao.w.wang@intel.com>
 ---
- hw/net/vhost_net.c                |  56 ++++++-
- hw/virtio/vhost.c                 |  15 ++
- include/hw/virtio/vhost-backend.h |   6 +-
- include/hw/virtio/vhost-vfio.h    |  35 ++++
- include/hw/virtio/vhost.h         |   2 +
- include/net/vhost-vfio.h          |  17 ++
- linux-headers/linux/vhost.h       |   9 ++
- net/Makefile.objs                 |   1 +
- net/clients.h                     |   3 +
- net/net.c                         |   1 +
- net/vhost-vfio.c                  | 327 ++++++++++++++++++++++++++++++++++++++
- qapi/net.json                     |  22 ++-
- 12 files changed, 488 insertions(+), 6 deletions(-)
- create mode 100644 include/hw/virtio/vhost-vfio.h
- create mode 100644 include/net/vhost-vfio.h
- create mode 100644 net/vhost-vfio.c
+ hw/vfio/common.c                  |   3 +-
+ hw/virtio/Makefile.objs           |   2 +-
+ hw/virtio/vhost-backend.c         |   3 +
+ hw/virtio/vhost-vfio.c            | 501 ++++++++++++++++++++++++++++++++++++++
+ include/hw/virtio/vhost-backend.h |   1 +
+ 5 files changed, 508 insertions(+), 2 deletions(-)
+ create mode 100644 hw/virtio/vhost-vfio.c
 
-diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
-index e037db63..76ba8a32 100644
---- a/hw/net/vhost_net.c
-+++ b/hw/net/vhost_net.c
-@@ -17,6 +17,7 @@
- #include "net/net.h"
- #include "net/tap.h"
- #include "net/vhost-user.h"
-+#include "net/vhost-vfio.h"
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index fb396cf0..a3b1cf86 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -49,7 +49,8 @@ struct vfio_as_head vfio_address_spaces =
+  * initialized, this file descriptor is only released on QEMU exit and
+  * we'll re-use it should another vfio device be attached before then.
+  */
+-static int vfio_kvm_device_fd = -1;
++// XXX: Add vfio API for vDPA use case
++int vfio_kvm_device_fd = -1;
+ #endif
  
- #include "hw/virtio/virtio-net.h"
- #include "net/vhost_net.h"
-@@ -87,6 +88,37 @@ static const int user_feature_bits[] = {
-     VHOST_INVALID_FEATURE_BIT
- };
+ /*
+diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
+index 1b2799cf..c5aa6675 100644
+--- a/hw/virtio/Makefile.objs
++++ b/hw/virtio/Makefile.objs
+@@ -9,7 +9,7 @@ obj-$(CONFIG_VIRTIO_BALLOON) += virtio-balloon.o
+ obj-$(CONFIG_VIRTIO_CRYPTO) += virtio-crypto.o
+ obj-$(call land,$(CONFIG_VIRTIO_CRYPTO),$(CONFIG_VIRTIO_PCI)) += virtio-crypto-pci.o
  
-+/* Features supported by vhost vfio. */
-+static const int vfio_feature_bits[] = {
-+    VIRTIO_F_NOTIFY_ON_EMPTY,
-+    VIRTIO_RING_F_INDIRECT_DESC,
-+    VIRTIO_RING_F_EVENT_IDX,
-+
-+    VIRTIO_F_ANY_LAYOUT,
-+    VIRTIO_F_VERSION_1,
-+    VIRTIO_NET_F_CSUM,
-+    VIRTIO_NET_F_GUEST_CSUM,
-+    VIRTIO_NET_F_GSO,
-+    VIRTIO_NET_F_GUEST_TSO4,
-+    VIRTIO_NET_F_GUEST_TSO6,
-+    VIRTIO_NET_F_GUEST_ECN,
-+    VIRTIO_NET_F_GUEST_UFO,
-+    VIRTIO_NET_F_HOST_TSO4,
-+    VIRTIO_NET_F_HOST_TSO6,
-+    VIRTIO_NET_F_HOST_ECN,
-+    VIRTIO_NET_F_HOST_UFO,
-+    VIRTIO_NET_F_MRG_RXBUF,
-+    VIRTIO_NET_F_MTU,
-+    VIRTIO_F_IOMMU_PLATFORM,
-+
-+    /* This bit implies RARP isn't sent by QEMU out of band */
-+    VIRTIO_NET_F_GUEST_ANNOUNCE,
-+
-+    VIRTIO_NET_F_MQ,
-+
-+    VHOST_INVALID_FEATURE_BIT
-+};
-+
- static const int *vhost_net_get_feature_bits(struct vhost_net *net)
- {
-     const int *feature_bits = 0;
-@@ -98,6 +130,9 @@ static const int *vhost_net_get_feature_bits(struct vhost_net *net)
-     case NET_CLIENT_DRIVER_VHOST_USER:
-         feature_bits = user_feature_bits;
+-obj-$(CONFIG_LINUX) += vhost.o vhost-backend.o vhost-user.o
++obj-$(CONFIG_LINUX) += vhost.o vhost-backend.o vhost-user.o vhost-vfio.o
+ obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock.o
+ endif
+ 
+diff --git a/hw/virtio/vhost-backend.c b/hw/virtio/vhost-backend.c
+index 7f09efab..bfe0646d 100644
+--- a/hw/virtio/vhost-backend.c
++++ b/hw/virtio/vhost-backend.c
+@@ -277,6 +277,9 @@ int vhost_set_backend_type(struct vhost_dev *dev, VhostBackendType backend_type)
+     case VHOST_BACKEND_TYPE_USER:
+         dev->vhost_ops = &user_ops;
          break;
-+    case NET_CLIENT_DRIVER_VHOST_VFIO:
-+        feature_bits = vfio_feature_bits;
++    case VHOST_BACKEND_TYPE_VFIO:
++        dev->vhost_ops = &vfio_ops;
 +        break;
      default:
-         error_report("Feature bits not defined for this type: %d",
-                 net->nc->info->type);
-@@ -296,6 +331,7 @@ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs,
-     BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(dev)));
-     VirtioBusState *vbus = VIRTIO_BUS(qbus);
-     VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(vbus);
-+    struct vhost_net *net;
-     int r, e, i;
- 
-     if (!k->set_guest_notifiers) {
-@@ -304,8 +340,6 @@ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs,
-     }
- 
-     for (i = 0; i < total_queues; i++) {
--        struct vhost_net *net;
--
-         net = get_vhost_net(ncs[i].peer);
-         vhost_net_set_vq_index(net, i * 2);
- 
-@@ -341,6 +375,11 @@ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs,
-         }
-     }
- 
-+    net = get_vhost_net(ncs[0].peer);
-+    if (net->nc->info->type == NET_CLIENT_DRIVER_VHOST_VFIO) {
-+        r = vhost_set_state(&net->dev, VHOST_DEVICE_S_RUNNING);
-+    }         // FIXME: support other device type too
-+
-     return 0;
- 
- err_start:
-@@ -362,8 +401,14 @@ void vhost_net_stop(VirtIODevice *dev, NetClientState *ncs,
-     BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(dev)));
-     VirtioBusState *vbus = VIRTIO_BUS(qbus);
-     VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(vbus);
-+    struct vhost_net *net;
-     int i, r;
- 
-+    net = get_vhost_net(ncs[0].peer);
-+    if (net->nc->info->type == NET_CLIENT_DRIVER_VHOST_VFIO) {
-+        r = vhost_set_state(&net->dev, VHOST_DEVICE_S_STOPPED);
-+    }
-+
-     for (i = 0; i < total_queues; i++) {
-         vhost_net_stop_one(get_vhost_net(ncs[i].peer), dev);
-     }
-@@ -385,7 +430,8 @@ int vhost_net_notify_migration_done(struct vhost_net *net, char* mac_addr)
- {
-     const VhostOps *vhost_ops = net->dev.vhost_ops;
- 
--    assert(vhost_ops->backend_type == VHOST_BACKEND_TYPE_USER);
-+    assert(vhost_ops->backend_type == VHOST_BACKEND_TYPE_USER ||
-+		    vhost_ops->backend_type == VHOST_BACKEND_TYPE_VFIO);
-     assert(vhost_ops->vhost_migration_done);
- 
-     return vhost_ops->vhost_migration_done(&net->dev, mac_addr);
-@@ -418,6 +464,10 @@ VHostNetState *get_vhost_net(NetClientState *nc)
-         vhost_net = vhost_user_get_vhost_net(nc);
-         assert(vhost_net);
-         break;
-+    case NET_CLIENT_DRIVER_VHOST_VFIO:
-+        vhost_net = vhost_vfio_get_vhost_net(nc);
-+        assert(vhost_net);
-+        break;
-     default:
-         break;
-     }
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index d4cb5894..269cd498 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -1598,3 +1598,18 @@ int vhost_net_set_backend(struct vhost_dev *hdev,
- 
-     return -1;
- }
-+
-+/*
-+ * XXX:
-+ * state:
-+ * 0 - stop
-+ * 1 - start
-+ */
-+int vhost_set_state(struct vhost_dev *hdev, int state)
-+{
-+    if (hdev->vhost_ops->vhost_set_state) {
-+        return hdev->vhost_ops->vhost_set_state(hdev, state);
-+    }
-+
-+    return -1;
-+}
-diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-backend.h
-index 81283ec5..89590ae6 100644
---- a/include/hw/virtio/vhost-backend.h
-+++ b/include/hw/virtio/vhost-backend.h
-@@ -17,7 +17,8 @@ typedef enum VhostBackendType {
-     VHOST_BACKEND_TYPE_NONE = 0,
-     VHOST_BACKEND_TYPE_KERNEL = 1,
-     VHOST_BACKEND_TYPE_USER = 2,
--    VHOST_BACKEND_TYPE_MAX = 3,
-+    VHOST_BACKEND_TYPE_VFIO = 3,
-+    VHOST_BACKEND_TYPE_MAX = 4,
- } VhostBackendType;
- 
- typedef enum VhostSetConfigType {
-@@ -104,6 +105,8 @@ typedef int (*vhost_crypto_close_session_op)(struct vhost_dev *dev,
- typedef bool (*vhost_backend_mem_section_filter_op)(struct vhost_dev *dev,
-                                                 MemoryRegionSection *section);
- 
-+typedef int (*vhost_set_state_op)(struct vhost_dev *dev, int state);
-+
- typedef struct VhostOps {
-     VhostBackendType backend_type;
-     vhost_backend_init vhost_backend_init;
-@@ -142,6 +145,7 @@ typedef struct VhostOps {
-     vhost_crypto_create_session_op vhost_crypto_create_session;
-     vhost_crypto_close_session_op vhost_crypto_close_session;
-     vhost_backend_mem_section_filter_op vhost_backend_mem_section_filter;
-+    vhost_set_state_op vhost_set_state;
- } VhostOps;
- 
- extern const VhostOps user_ops;
-diff --git a/include/hw/virtio/vhost-vfio.h b/include/hw/virtio/vhost-vfio.h
+         error_report("Unknown vhost backend type");
+         r = -1;
+diff --git a/hw/virtio/vhost-vfio.c b/hw/virtio/vhost-vfio.c
 new file mode 100644
-index 00000000..3ec0dfe2
+index 00000000..253030a8
 --- /dev/null
-+++ b/include/hw/virtio/vhost-vfio.h
-@@ -0,0 +1,35 @@
++++ b/hw/virtio/vhost-vfio.c
+@@ -0,0 +1,501 @@
 +/*
 + * vhost-vfio
 + *
@@ -270,500 +112,508 @@ index 00000000..3ec0dfe2
 + *
 + */
 +
-+#ifndef HW_VIRTIO_VHOST_VFIO_H
-+#define HW_VIRTIO_VHOST_VFIO_H
-+
-+#include "hw/virtio/virtio.h"
-+
-+typedef struct VhostVFIONotifyCtx {
-+    int qid;
-+    int kick_fd;
-+    void *addr;
-+    MemoryRegion mr;
-+} VhostVFIONotifyCtx;
-+
-+typedef struct VhostVFIO {
-+    uint64_t bar0_offset;
-+    uint64_t bar0_size;
-+    uint64_t bar1_offset;
-+    uint64_t bar1_size;
-+    int device_fd;
-+    int group_fd;
-+    int container_fd;
-+
-+    VhostVFIONotifyCtx notify[VIRTIO_QUEUE_MAX];
-+} VhostVFIO;
-+
-+#endif
-diff --git a/include/hw/virtio/vhost.h b/include/hw/virtio/vhost.h
-index a7f449fa..db202d1d 100644
---- a/include/hw/virtio/vhost.h
-+++ b/include/hw/virtio/vhost.h
-@@ -111,6 +111,8 @@ bool vhost_has_free_slot(void);
- int vhost_net_set_backend(struct vhost_dev *hdev,
-                           struct vhost_vring_file *file);
- 
-+int vhost_set_state(struct vhost_dev *hdev, int state);
-+
- int vhost_device_iotlb_miss(struct vhost_dev *dev, uint64_t iova, int write);
- int vhost_dev_get_config(struct vhost_dev *dev, uint8_t *config,
-                          uint32_t config_len);
-diff --git a/include/net/vhost-vfio.h b/include/net/vhost-vfio.h
-new file mode 100644
-index 00000000..6d757284
---- /dev/null
-+++ b/include/net/vhost-vfio.h
-@@ -0,0 +1,17 @@
-+/*
-+ * vhost-vfio.h
-+ *
-+ * Copyright(c) 2017-2018 Intel Corporation. All rights reserved.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef VHOST_VFIO_H
-+#define VHOST_VFIO_H
-+
-+struct vhost_net;
-+struct vhost_net *vhost_vfio_get_vhost_net(NetClientState *nc);
-+
-+#endif /* VHOST_VFIO_H */
-diff --git a/linux-headers/linux/vhost.h b/linux-headers/linux/vhost.h
-index e336395d..289f46a4 100644
---- a/linux-headers/linux/vhost.h
-+++ b/linux-headers/linux/vhost.h
-@@ -207,4 +207,13 @@ struct vhost_scsi_target {
- #define VHOST_VSOCK_SET_GUEST_CID	_IOW(VHOST_VIRTIO, 0x60, __u64)
- #define VHOST_VSOCK_SET_RUNNING		_IOW(VHOST_VIRTIO, 0x61, int)
- 
-+
-+/* VHOST_DEVICE specific defines */
-+
-+#define VHOST_DEVICE_SET_STATE _IOW(VHOST_VIRTIO, 0x70, __u64)
-+
-+#define VHOST_DEVICE_S_STOPPED 0
-+#define VHOST_DEVICE_S_RUNNING 1
-+#define VHOST_DEVICE_S_MAX     2
-+
- #endif
-diff --git a/net/Makefile.objs b/net/Makefile.objs
-index b2bf88a0..94f1e9dd 100644
---- a/net/Makefile.objs
-+++ b/net/Makefile.objs
-@@ -4,6 +4,7 @@ common-obj-y += dump.o
- common-obj-y += eth.o
- common-obj-$(CONFIG_L2TPV3) += l2tpv3.o
- common-obj-$(CONFIG_POSIX) += vhost-user.o
-+common-obj-$(CONFIG_LINUX) += vhost-vfio.o
- common-obj-$(CONFIG_SLIRP) += slirp.o
- common-obj-$(CONFIG_VDE) += vde.o
- common-obj-$(CONFIG_NETMAP) += netmap.o
-diff --git a/net/clients.h b/net/clients.h
-index a6ef267e..7b3cbb4e 100644
---- a/net/clients.h
-+++ b/net/clients.h
-@@ -61,4 +61,7 @@ int net_init_netmap(const Netdev *netdev, const char *name,
- int net_init_vhost_user(const Netdev *netdev, const char *name,
-                         NetClientState *peer, Error **errp);
- 
-+int net_init_vhost_vfio(const Netdev *netdev, const char *name,
-+                        NetClientState *peer, Error **errp);
-+
- #endif /* QEMU_NET_CLIENTS_H */
-diff --git a/net/net.c b/net/net.c
-index 2a313399..5430ab38 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -952,6 +952,7 @@ static int (* const net_client_init_fun[NET_CLIENT_DRIVER__MAX])(
-         [NET_CLIENT_DRIVER_HUBPORT]   = net_init_hubport,
- #ifdef CONFIG_VHOST_NET_USED
-         [NET_CLIENT_DRIVER_VHOST_USER] = net_init_vhost_user,
-+        [NET_CLIENT_DRIVER_VHOST_VFIO] = net_init_vhost_vfio,
- #endif
- #ifdef CONFIG_L2TPV3
-         [NET_CLIENT_DRIVER_L2TPV3]    = net_init_l2tpv3,
-diff --git a/net/vhost-vfio.c b/net/vhost-vfio.c
-new file mode 100644
-index 00000000..2814e53b
---- /dev/null
-+++ b/net/vhost-vfio.c
-@@ -0,0 +1,327 @@
-+/*
-+ * vhost-vfio.c
-+ *
-+ * Copyright(c) 2017-2018 Intel Corporation. All rights reserved.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
 +#include "qemu/osdep.h"
-+#include "clients.h"
-+#include "net/vhost_net.h"
-+#include "net/vhost-vfio.h"
++#include <linux/vhost.h>
++#include <linux/vfio.h>
++#include <sys/eventfd.h>
++#include <sys/ioctl.h>
++#include "hw/virtio/vhost.h"
++#include "hw/virtio/vhost-backend.h"
++#include "hw/virtio/virtio-net.h"
 +#include "hw/virtio/vhost-vfio.h"
-+#include "qapi/error.h"
-+#include "qapi/qapi-commands-net.h"
-+#include "qemu/config-file.h"
-+#include "qemu/error-report.h"
-+#include "qemu/option.h"
-+#include "trace.h"
 +
-+typedef struct VhostVFIOState {
-+    NetClientState nc;
-+    VhostVFIO vhost_vfio;
-+    VHostNetState *vhost_net;
-+} VhostVFIOState;
++// XXX: move to linux/vhost.h
++struct vhost_vfio_op {
++    __u64 request;
++#define VHOST_VFIO_NEED_REPLY 0x1 /* Whether need reply */
++    __u32 flags;
++    __u32 size;
++    union {
++        __u64 u64;
++        struct vhost_vring_state state;
++        struct vhost_vring_addr addr;
++        struct vhost_memory memory;
++    } payload;
++};
++#define VHOST_VFIO_OP_HDR_SIZE (offsetof(struct vhost_vfio_op, payload))
++// -- end here
 +
-+VHostNetState *vhost_vfio_get_vhost_net(NetClientState *nc)
++// XXX: to be removed
++#include <linux/kvm.h>
++#include "sysemu/kvm.h"
++extern int vfio_kvm_device_fd;
++
++static int vhost_vfio_kvm_add_vfio_group(VhostVFIO *v)
 +{
-+    VhostVFIOState *s = DO_UPCAST(VhostVFIOState, nc, nc);
-+    assert(nc->info->type == NET_CLIENT_DRIVER_VHOST_VFIO);
-+    return s->vhost_net;
++    struct kvm_device_attr attr = {
++        .group = KVM_DEV_VFIO_GROUP,
++        .attr = KVM_DEV_VFIO_GROUP_ADD,
++        .addr = (uint64_t)(uintptr_t)&v->group_fd,
++    };
++    int ret;
++
++again:
++    if (vfio_kvm_device_fd < 0) {
++        struct kvm_create_device cd = {
++            .type = KVM_DEV_TYPE_VFIO,
++        };
++
++        ret = kvm_vm_ioctl(kvm_state, KVM_CREATE_DEVICE, &cd);
++        if (ret < 0) {
++            if (errno == EBUSY) {
++                goto again;
++            }
++            return -1;
++        }
++
++        vfio_kvm_device_fd = cd.fd;
++    }
++
++    ret = ioctl(vfio_kvm_device_fd, KVM_SET_DEVICE_ATTR, &attr);
++    if (ret < 0) {
++        return -1;
++    }
++
++    kvm_irqchip_commit_routes(kvm_state);
++
++    return 0;
 +}
 +
-+static int vhost_vfio_start(int queues, NetClientState *ncs[], void *be)
++static int vhost_vfio_kvm_del_vfio_group(VhostVFIO *v)
 +{
-+    VhostNetOptions options;
-+    struct vhost_net *net = NULL;
-+    VhostVFIOState *s;
-+    int max_queues;
-+    int i;
++    struct kvm_device_attr attr = {
++        .group = KVM_DEV_VFIO_GROUP,
++        .attr = KVM_DEV_VFIO_GROUP_DEL,
++        .addr = (uint64_t)(uintptr_t)&v->group_fd,
++    };
++    int ret;
 +
-+    options.backend_type = VHOST_BACKEND_TYPE_VFIO;
++    ret = ioctl(vfio_kvm_device_fd, KVM_SET_DEVICE_ATTR, &attr);
++    if (ret < 0)
++        return -1;
 +
-+    for (i = 0; i < queues; i++) {
-+        assert(ncs[i]->info->type == NET_CLIENT_DRIVER_VHOST_VFIO);
++    return 0;
++}
++// -- end here
 +
-+        s = DO_UPCAST(VhostVFIOState, nc, ncs[i]);
++static int vhost_vfio_write(struct vhost_dev *dev, struct vhost_vfio_op *op)
++{
++    VhostVFIO *vfio = dev->opaque;
++    int count = VHOST_VFIO_OP_HDR_SIZE + op->size;
++    int ret;
 +
-+        options.net_backend = ncs[i];
-+        options.opaque      = be;
-+        options.busyloop_timeout = 0;
-+        net = vhost_net_init(&options);
-+        if (!net) {
-+            error_report("failed to init vhost_net for queue %d", i);
-+            goto err;
-+        }
++    assert(dev->vhost_ops->backend_type == VHOST_BACKEND_TYPE_VFIO);
 +
-+        if (i == 0) {
-+            max_queues = vhost_net_get_max_queues(net);
-+            if (queues > max_queues) {
-+                error_report("you are asking more queues than supported: %d",
-+                             max_queues);
-+                goto err;
-+            }
-+        }
-+
-+        if (s->vhost_net) {
-+            vhost_net_cleanup(s->vhost_net);
-+            g_free(s->vhost_net);
-+        }
-+        s->vhost_net = net;
++    ret = pwrite64(vfio->device_fd, op, count, vfio->bar0_offset);
++    if (ret != count) {
++        return -1;
 +    }
 +
 +    return 0;
++}
 +
-+err:
-+    if (net)
-+        vhost_net_cleanup(net);
++static int vhost_vfio_read(struct vhost_dev *dev, struct vhost_vfio_op *op)
++{
++    VhostVFIO *vfio = dev->opaque;
++    int count = VHOST_VFIO_OP_HDR_SIZE + op->size;
++    uint64_t request = op->request;
++    int ret;
 +
-+    for (i = 0; i < queues; i++) {
-+        s = DO_UPCAST(VhostVFIOState, nc, ncs[i]);
-+        if (s->vhost_net)
-+            vhost_net_cleanup(s->vhost_net);
++    assert(dev->vhost_ops->backend_type == VHOST_BACKEND_TYPE_VFIO);
++
++    ret = pread64(vfio->device_fd, op, count, vfio->bar0_offset);
++    if (ret < 0 || request != op->request || ret != count) {
++        return -1;
++    }
++
++    return 0;
++}
++
++static int vhost_vfio_init(struct vhost_dev *dev, void *opaque)
++{
++    assert(dev->vhost_ops->backend_type == VHOST_BACKEND_TYPE_VFIO);
++
++    dev->opaque = opaque;
++    vhost_vfio_kvm_add_vfio_group(opaque);
++
++    return 0;
++}
++
++static int vhost_vfio_cleanup(struct vhost_dev *dev)
++{
++    assert(dev->vhost_ops->backend_type == VHOST_BACKEND_TYPE_VFIO);
++
++    vhost_vfio_kvm_del_vfio_group(dev->opaque);
++    dev->opaque = NULL;
++
++    return 0;
++}
++
++static int vhost_vfio_memslots_limit(struct vhost_dev *dev)
++{
++    int limit = 64; // XXX hardcoded for now
++
++    return limit;
++}
++
++static int vhost_vfio_set_log_base(struct vhost_dev *dev, uint64_t base,
++                                   struct vhost_log *log)
++{
++    struct vhost_vfio_op op;
++
++    op.request = VHOST_SET_LOG_BASE;
++    op.flags = 0;
++    op.size = sizeof(base);
++    op.payload.u64 = base;
++
++    return vhost_vfio_write(dev, &op);
++}
++
++// XXX: When IOMMU support mdev bus, we can use VFIO API to set up DMA mapping.
++static int vhost_vfio_set_mem_table(struct vhost_dev *dev,
++                                    struct vhost_memory *mem)
++{
++    struct vhost_vfio_op *op;
++    uint32_t size = sizeof(*mem) + mem->nregions * sizeof(*mem->regions);
++    int ret;
++
++    if (mem->padding)
++        return -1;
++
++    op = g_malloc0(VHOST_VFIO_OP_HDR_SIZE + size);
++
++    op->request = VHOST_SET_MEM_TABLE;
++    op->flags = 0;
++    op->size = size;
++    memcpy(&op->payload.memory, mem, size);
++
++    ret = vhost_vfio_write(dev, op);
++
++    free(op);
++
++    return ret;
++}
++
++// XXX: Pass IOVA addr directly when DMA mapping programmed by QEMU.
++static int vhost_vfio_set_vring_addr(struct vhost_dev *dev,
++                                     struct vhost_vring_addr *addr)
++{
++    struct vhost_vfio_op op;
++
++    op.request = VHOST_SET_VRING_ADDR;
++    op.flags = 0;
++    op.size = sizeof(*addr);
++    op.payload.addr = *addr;
++
++    return vhost_vfio_write(dev, &op);
++}
++
++static int vhost_vfio_set_vring_num(struct vhost_dev *dev,
++                                    struct vhost_vring_state *ring)
++{
++    struct vhost_vfio_op op;
++
++    op.request = VHOST_SET_VRING_NUM;
++    op.flags = 0;
++    op.size = sizeof(*ring);
++    op.payload.state = *ring;
++
++    return vhost_vfio_write(dev, &op);
++}
++
++static int vhost_vfio_set_vring_base(struct vhost_dev *dev,
++                                     struct vhost_vring_state *ring)
++{
++    struct vhost_vfio_op op;
++
++    op.request = VHOST_SET_VRING_BASE;
++    op.flags = 0;
++    op.size = sizeof(*ring);
++    op.payload.state = *ring;
++
++    return vhost_vfio_write(dev, &op);
++}
++
++static int vhost_vfio_get_vring_base(struct vhost_dev *dev,
++                                     struct vhost_vring_state *ring)
++{
++    struct vhost_vfio_op op;
++    int ret;
++
++    op.request = VHOST_GET_VRING_BASE;
++    op.flags = VHOST_VFIO_NEED_REPLY;
++    op.payload.state = *ring;
++    op.size = sizeof(op.payload.state);
++
++    ret = vhost_vfio_write(dev, &op);
++    if (ret != 0)
++        goto out;
++
++    op.request = VHOST_GET_VRING_BASE;
++    op.flags = 0;
++    op.size = sizeof(*ring);
++
++    ret = vhost_vfio_read(dev, &op);
++    if (ret != 0)
++        goto out;
++
++    *ring = op.payload.state;
++
++out:
++    return ret;
++}
++
++static void notify_relay(void *opaque)
++{
++    size_t page_size = qemu_real_host_page_size;
++    struct VhostVFIONotifyCtx *ctx = opaque;
++    VhostVFIO *vfio = container_of(ctx, VhostVFIO, notify[ctx->qid]);
++    int offset = page_size * ctx->qid;
++    eventfd_t value;
++    int ret;
++
++    eventfd_read(ctx->kick_fd, &value);
++
++    /* For virtio 0.95 case, no EPT mapping, QEMU MMIO write to help the notify relay */
++    if (ctx->addr) {
++        *((uint16_t *)ctx->addr) = ctx->qid;
++        return;
++    }
++
++    /* If the device BAR is not mmap-able, write device fd for notify */
++    ret = pwrite64(vfio->device_fd, &ctx->qid, sizeof(ctx->qid),
++             vfio->bar1_offset + offset);
++    if (ret < 0) {
++        // XXX: error handling (e.g. unset the handler, report error, etc.)
++    }
++}
++
++static int vhost_vfio_set_vring_kick(struct vhost_dev *dev,
++                                     struct vhost_vring_file *file)
++{
++    size_t page_size = qemu_real_host_page_size;
++    VirtIODevice *vdev = dev->vdev;
++    VhostVFIO *vfio = dev->opaque;
++    VhostVFIONotifyCtx *ctx;
++    int queue_idx;
++    char *name;
++    void *addr;
++
++    queue_idx = file->index + dev->vq_index;
++    ctx = &vfio->notify[queue_idx];
++    ctx->qid = queue_idx;
++
++    if (ctx->kick_fd > 0) {
++        qemu_set_fd_handler(ctx->kick_fd, NULL, NULL, NULL);
++        ctx->kick_fd = -1;
++
++        if (ctx->addr) {
++            virtio_queue_set_host_notifier_mr(vdev, queue_idx, &ctx->mr, false);
++            object_unparent(OBJECT(&ctx->mr));
++            munmap(ctx->addr, page_size);
++            ctx->addr = NULL;
++        }
++    }
++
++    if (file->fd <= 0)
++        return 0;
++
++    ctx->kick_fd = file->fd;
++
++    qemu_set_fd_handler(file->fd, notify_relay, NULL, ctx);
++
++    addr = mmap(NULL, page_size, PROT_READ | PROT_WRITE, MAP_SHARED,
++                vfio->device_fd, vfio->bar1_offset + page_size * queue_idx);
++    /* It's okay to mmap fail, but would expect lower performance */
++    if (addr == MAP_FAILED)
++        return 0;
++
++    name = g_strdup_printf("vhost-vfio/notifier@%p[%d]", vfio, queue_idx);
++    memory_region_init_ram_device_ptr(&ctx->mr, OBJECT(vdev), name, page_size, addr);
++    g_free(name);
++    ctx->addr = addr;
++
++    virtio_queue_set_host_notifier_mr(vdev, queue_idx, &ctx->mr, true);
++    return 0;
++}
++
++#define IRQ_SET_BUF_LEN (sizeof(struct vfio_irq_set) + sizeof(int) * 1)
++
++static int vhost_vfio_set_vring_call(struct vhost_dev *dev,
++                                     struct vhost_vring_file *file)
++{
++    VhostVFIO *vfio = dev->opaque;
++    struct vfio_irq_set *irq_set;
++    char irq_set_buf[IRQ_SET_BUF_LEN];
++    int *fd_ptr;
++    int ret;
++
++    irq_set = (struct vfio_irq_set *)irq_set_buf;
++    irq_set->flags = VFIO_IRQ_SET_ACTION_TRIGGER;
++    irq_set->index = VFIO_PCI_MSIX_IRQ_INDEX;
++    irq_set->start = file->index;
++
++    if (file->fd == -1) {
++        irq_set->argsz = sizeof(struct vfio_irq_set);
++        irq_set->count = 0;
++        irq_set->flags |= VFIO_IRQ_SET_DATA_NONE;
++    } else {
++        irq_set->argsz = sizeof(irq_set_buf);
++        irq_set->count = 1;
++        irq_set->flags |= VFIO_IRQ_SET_DATA_EVENTFD;
++        fd_ptr = (int *)&irq_set->data;
++        fd_ptr[0] = file->fd;
++    }
++
++    ret = ioctl(vfio->device_fd, VFIO_DEVICE_SET_IRQS, irq_set);
++
++    return ret;
++}
++
++static int vhost_vfio_set_features(struct vhost_dev *dev,
++                                   uint64_t features)
++{
++    struct vhost_vfio_op op;
++
++    op.request = VHOST_SET_FEATURES;
++    op.flags = 0;
++    op.size = sizeof(features);
++    op.payload.u64 = features;
++
++    return vhost_vfio_write(dev, &op);
++}
++
++static int vhost_vfio_get_features(struct vhost_dev *dev,
++                                   uint64_t *features)
++{
++    struct vhost_vfio_op op;
++    int ret;
++
++    op.request = VHOST_GET_FEATURES;
++    op.flags = VHOST_VFIO_NEED_REPLY;
++    op.size = 0;
++
++    ret = vhost_vfio_write(dev, &op);
++    if (ret != 0)
++        goto out;
++
++    op.request = VHOST_GET_FEATURES;
++    op.flags = 0;
++    op.size = sizeof(*features);
++
++    ret = vhost_vfio_read(dev, &op);
++    if (ret != 0)
++        goto out;
++
++    *features = op.payload.u64;
++out:
++    return ret;
++}
++
++static int vhost_vfio_set_owner(struct vhost_dev *dev)
++{
++    struct vhost_vfio_op op;
++
++    op.request = VHOST_SET_OWNER;
++    op.flags = 0;
++    op.size = 0;
++
++    return vhost_vfio_write(dev, &op);
++}
++
++static int vhost_vfio_reset_device(struct vhost_dev *dev)
++{
++    struct vhost_vfio_op op;
++
++    op.request = VHOST_RESET_OWNER;
++    op.flags = 0;
++    op.size = 0;
++
++    return vhost_vfio_write(dev, &op);
++}
++
++static int vhost_vfio_get_vq_index(struct vhost_dev *dev, int idx)
++{
++    assert(idx >= dev->vq_index && idx < dev->vq_index + dev->nvqs);
++
++    return idx - dev->vq_index;
++}
++
++static int vhost_vfio_set_state(struct vhost_dev *dev, int state)
++{
++    struct vhost_vfio_op op;
++
++    op.request = VHOST_DEVICE_SET_STATE;
++    op.flags = 0;
++    op.size = sizeof(state);
++    op.payload.u64 = state;
++
++    return vhost_vfio_write(dev, &op);
++}
++
++static int vhost_vfio_migration_done(struct vhost_dev *dev, char* mac_addr)
++{
++    assert(dev->vhost_ops->backend_type == VHOST_BACKEND_TYPE_VFIO);
++
++    /* If guest supports GUEST_ANNOUNCE, do nothing */
++    if (virtio_has_feature(dev->acked_features, VIRTIO_NET_F_GUEST_ANNOUNCE)) {
++        return 0;
 +    }
 +
 +    return -1;
 +}
 +
-+static ssize_t vhost_vfio_receive(NetClientState *nc, const uint8_t *buf,
-+                                  size_t size)
++static bool vhost_vfio_mem_section_filter(struct vhost_dev *dev,
++                                          MemoryRegionSection *section)
 +{
-+    /* In case of RARP (message size is 60) notify backup to send a fake RARP.
-+       This fake RARP will be sent by backend only for guest
-+       without GUEST_ANNOUNCE capability.
-+     */
-+    if (size == 60) {
-+        VhostVFIOState *s = DO_UPCAST(VhostVFIOState, nc, nc);
-+        int r;
-+        static int display_rarp_failure = 1;
-+        char mac_addr[6];
++    bool result;
 +
-+        /* extract guest mac address from the RARP message */
-+        memcpy(mac_addr, &buf[6], 6);
++    result = memory_region_get_fd(section->mr) >= 0;
 +
-+        r = vhost_net_notify_migration_done(s->vhost_net, mac_addr);
-+
-+        if ((r != 0) && (display_rarp_failure)) {
-+            fprintf(stderr,
-+                    "Vhost vfio backend fails to broadcast fake RARP\n");
-+            fflush(stderr);
-+            display_rarp_failure = 0;
-+        }
-+    }
-+
-+    return size;
++    return result;
 +}
 +
-+static void vhost_vfio_cleanup(NetClientState *nc)
-+{
-+    VhostVFIOState *s = DO_UPCAST(VhostVFIOState, nc, nc);
-+
-+    if (s->vhost_net) {
-+        vhost_net_cleanup(s->vhost_net);
-+        g_free(s->vhost_net);
-+        s->vhost_net = NULL;
-+    }
-+    if (nc->queue_index == 0) {
-+	    if (s->vhost_vfio.device_fd != -1) {
-+		    close(s->vhost_vfio.device_fd);
-+		    s->vhost_vfio.device_fd = -1;
-+	    }
-+	    if (s->vhost_vfio.group_fd != -1) {
-+		    close(s->vhost_vfio.group_fd);
-+		    s->vhost_vfio.group_fd = -1;
-+	    }
-+	    if (s->vhost_vfio.container_fd != -1) {
-+		    close(s->vhost_vfio.container_fd);
-+		    s->vhost_vfio.container_fd = -1;
-+	    }
-+    }
-+
-+    qemu_purge_queued_packets(nc);
-+}
-+
-+static NetClientInfo net_vhost_vfio_info = {
-+        .type = NET_CLIENT_DRIVER_VHOST_VFIO,
-+        .size = sizeof(VhostVFIOState),
-+        .receive = vhost_vfio_receive,
-+        .cleanup = vhost_vfio_cleanup,
++const VhostOps vfio_ops = {
++        .backend_type = VHOST_BACKEND_TYPE_VFIO,
++        .vhost_backend_init = vhost_vfio_init,
++        .vhost_backend_cleanup = vhost_vfio_cleanup,
++        .vhost_backend_memslots_limit = vhost_vfio_memslots_limit,
++        .vhost_set_log_base = vhost_vfio_set_log_base,
++        .vhost_set_mem_table = vhost_vfio_set_mem_table,
++        .vhost_set_vring_addr = vhost_vfio_set_vring_addr,
++        .vhost_set_vring_endian = NULL,
++        .vhost_set_vring_num = vhost_vfio_set_vring_num,
++        .vhost_set_vring_base = vhost_vfio_set_vring_base,
++        .vhost_get_vring_base = vhost_vfio_get_vring_base,
++        .vhost_set_vring_kick = vhost_vfio_set_vring_kick,
++        .vhost_set_vring_call = vhost_vfio_set_vring_call,
++        .vhost_set_features = vhost_vfio_set_features,
++        .vhost_get_features = vhost_vfio_get_features,
++        .vhost_set_owner = vhost_vfio_set_owner,
++        .vhost_reset_device = vhost_vfio_reset_device,
++        .vhost_get_vq_index = vhost_vfio_get_vq_index,
++        // XXX: implement this to support MQ
++        .vhost_set_vring_enable = NULL,
++        .vhost_requires_shm_log = NULL,
++        .vhost_migration_done = vhost_vfio_migration_done,
++        .vhost_backend_can_merge = NULL,
++        .vhost_net_set_mtu = NULL,
++        .vhost_set_iotlb_callback = NULL,
++        .vhost_send_device_iotlb_msg = NULL,
++        .vhost_backend_mem_section_filter = vhost_vfio_mem_section_filter,
++        .vhost_set_state = vhost_vfio_set_state,
 +};
-+
-+// XXX: to be cleaned up, rely on QEMU vfio API in future
-+#include <linux/vfio.h>
-+#include <sys/ioctl.h>
-+#include <err.h>
-+
-+static int net_vhost_vfio_init(NetClientState *peer, const char *device,
-+                               const char *name, const char *sysfsdev,
-+                               int queues)
-+{
-+    NetClientState *nc, *nc0 = NULL;
-+    NetClientState *ncs[MAX_QUEUE_NUM];
-+    VhostVFIOState *s;
-+    int i;
-+
-+    assert(name);
-+    assert(queues > 0);
-+
-+    for (i = 0; i < queues; i++) {
-+        nc = qemu_new_net_client(&net_vhost_vfio_info, peer, device, name);
-+        snprintf(nc->info_str, sizeof(nc->info_str), "vhost-vfio%d to %s", i, name);
-+        nc->queue_index = i;
-+        if (!nc0) {
-+            nc0 = nc;
-+            s = DO_UPCAST(VhostVFIOState, nc, nc);
-+        }
-+
-+        ncs[i]= nc;
-+    }
-+
-+    int vfio_container_fd = -1;
-+    int vfio_group_fd = -1;
-+    int vfio_device_fd = -1;
-+    int ret;
-+
-+    char linkname[PATH_MAX];
-+    char pathname[PATH_MAX];
-+    char *filename;
-+    int group_no;
-+
-+    vfio_container_fd = open("/dev/vfio/vfio", O_RDWR);
-+    if (vfio_container_fd == -1)
-+        err(EXIT_FAILURE, "open(/dev/vfio/vfio)");
-+
-+    ret = ioctl(vfio_container_fd, VFIO_GET_API_VERSION);
-+    if (ret < 0)
-+        err(EXIT_FAILURE, "vfio get API version for container");
-+
-+    snprintf(linkname, sizeof(linkname), "%s/iommu_group", sysfsdev);
-+    ret = readlink(linkname, pathname, sizeof(pathname));
-+    if (ret < 0)
-+        err(EXIT_FAILURE, "readlink(%s)", linkname);
-+
-+    filename = g_path_get_basename(pathname);
-+    group_no = atoi(filename);
-+    g_free(filename);
-+    snprintf(pathname, sizeof(pathname), "/dev/vfio/%d", group_no);
-+
-+    vfio_group_fd = open(pathname, O_RDWR);
-+    if (vfio_group_fd == -1)
-+        err(EXIT_FAILURE, "open(%s)", pathname);
-+
-+    if (vfio_group_fd == 0)
-+        err(EXIT_FAILURE, "%s not managed by VFIO driver", sysfsdev);
-+
-+    ret = ioctl(vfio_group_fd, VFIO_GROUP_SET_CONTAINER, &vfio_container_fd);
-+    if (ret)
-+        err(EXIT_FAILURE, "failed set container");
-+
-+    ret = ioctl(vfio_container_fd, VFIO_SET_IOMMU, VFIO_TYPE1_IOMMU);
-+    if (ret)
-+        err(EXIT_FAILURE, "failed set IOMMU");
-+
-+    filename = g_path_get_basename(sysfsdev);
-+
-+    vfio_device_fd = ioctl(vfio_group_fd, VFIO_GROUP_GET_DEVICE_FD, filename);
-+    if (vfio_device_fd < 0)
-+        err(EXIT_FAILURE, "failed to get device fd");
-+
-+    g_free(filename);
-+
-+    struct vfio_device_info device_info = {
-+        .argsz = sizeof(device_info),
-+    };
-+
-+    ret = ioctl(vfio_device_fd, VFIO_DEVICE_GET_INFO, &device_info);
-+    if (ret)
-+        err(EXIT_FAILURE, "failed to get device info");
-+
-+    for (i = 0; i < device_info.num_regions; i++) {
-+        struct vfio_region_info region_info = {
-+            .argsz = sizeof(region_info),
-+        };
-+
-+        region_info.index = i;
-+
-+        ret = ioctl(vfio_device_fd, VFIO_DEVICE_GET_REGION_INFO, &region_info);
-+        if (ret)
-+            err(EXIT_FAILURE, "failed to get region info for region %d", i);
-+
-+        if (region_info.size == 0)
-+            continue;
-+
-+        if (i == VFIO_PCI_BAR0_REGION_INDEX) {
-+            s->vhost_vfio.bar0_offset = region_info.offset;
-+            s->vhost_vfio.bar0_size   = region_info.size;
-+        } else if (i == VFIO_PCI_BAR1_REGION_INDEX) {
-+            s->vhost_vfio.bar1_offset = region_info.offset;
-+            s->vhost_vfio.bar1_size   = region_info.size;
-+        }
-+    }
-+
-+    if (s->vhost_vfio.bar0_size == 0 || s->vhost_vfio.bar1_size == 0)
-+            err(EXIT_FAILURE, "failed to get valid vdpa device");
-+
-+    s->vhost_vfio.device_fd = vfio_device_fd;
-+    s->vhost_vfio.group_fd  = vfio_group_fd;
-+    s->vhost_vfio.container_fd  = vfio_container_fd;
-+
-+    vhost_vfio_start(queues, ncs, (void *)&s->vhost_vfio);
-+
-+    assert(s->vhost_net);
-+
-+    return 0;
-+}
-+
-+static int net_vhost_check_net(void *opaque, QemuOpts *opts, Error **errp)
-+{
-+    const char *name = opaque;
-+    const char *driver, *netdev;
-+
-+    driver = qemu_opt_get(opts, "driver");
-+    netdev = qemu_opt_get(opts, "netdev");
-+
-+    if (!driver || !netdev) {
-+        return 0;
-+    }
-+
-+    if (strcmp(netdev, name) == 0 &&
-+        !g_str_has_prefix(driver, "virtio-net-")) {
-+        error_setg(errp, "vhost-vfio requires frontend driver virtio-net-*");
-+        return -1;
-+    }
-+
-+    return 0;
-+}
-+
-+int net_init_vhost_vfio(const Netdev *netdev, const char *name,
-+                        NetClientState *peer, Error **errp)
-+{
-+    int queues;
-+    const NetdevVhostVFIOOptions *vhost_vfio_opts;
-+
-+    assert(netdev->type == NET_CLIENT_DRIVER_VHOST_VFIO);
-+    vhost_vfio_opts = &netdev->u.vhost_vfio;
-+
-+    /* verify net frontend */
-+    if (qemu_opts_foreach(qemu_find_opts("device"), net_vhost_check_net,
-+                          (char *)name, errp)) {
-+        return -1;
-+    }
-+
-+    queues = vhost_vfio_opts->has_queues ? vhost_vfio_opts->queues : 1;
-+    if (queues < 1 || queues > MAX_QUEUE_NUM) {
-+        error_setg(errp,
-+                   "vhost-vfio number of queues must be in range [1, %d]",
-+                   MAX_QUEUE_NUM);
-+        return -1;
-+    }
-+
-+    return net_vhost_vfio_init(peer, "vhost_vfio", name,
-+                               vhost_vfio_opts->sysfsdev, queues);
-+
-+    return 0;
-+}
-diff --git a/qapi/net.json b/qapi/net.json
-index c86f3511..65c77c45 100644
---- a/qapi/net.json
-+++ b/qapi/net.json
-@@ -437,6 +437,23 @@
-     '*vhostforce':    'bool',
-     '*queues':        'int' } }
+diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-backend.h
+index 89590ae6..19e3acad 100644
+--- a/include/hw/virtio/vhost-backend.h
++++ b/include/hw/virtio/vhost-backend.h
+@@ -149,6 +149,7 @@ typedef struct VhostOps {
+ } VhostOps;
  
-+##
-+# @NetdevVhostVFIOOptions:
-+#
-+# Vhost-vfio network backend
-+#
-+# @sysfsdev: name of a mdev dev path in sysfs
-+#
-+# @queues: number of queues to be created for multiqueue vhost-vfio
-+#          (default: 1) (Since 2.11)
-+#
-+# Since: 2.11
-+##
-+{ 'struct': 'NetdevVhostVFIOOptions',
-+  'data': {
-+    '*sysfsdev':     'str',
-+    '*queues':       'int' } }
-+
- ##
- # @NetClientDriver:
- #
-@@ -448,7 +465,7 @@
- ##
- { 'enum': 'NetClientDriver',
-   'data': [ 'none', 'nic', 'user', 'tap', 'l2tpv3', 'socket', 'vde',
--            'bridge', 'hubport', 'netmap', 'vhost-user' ] }
-+            'bridge', 'hubport', 'netmap', 'vhost-user', 'vhost-vfio' ] }
+ extern const VhostOps user_ops;
++extern const VhostOps vfio_ops;
  
- ##
- # @Netdev:
-@@ -476,7 +493,8 @@
-     'bridge':   'NetdevBridgeOptions',
-     'hubport':  'NetdevHubPortOptions',
-     'netmap':   'NetdevNetmapOptions',
--    'vhost-user': 'NetdevVhostUserOptions' } }
-+    'vhost-user': 'NetdevVhostUserOptions',
-+    'vhost-vfio': 'NetdevVhostVFIOOptions' } }
- 
- ##
- # @NetLegacy:
+ int vhost_set_backend_type(struct vhost_dev *dev,
+                            VhostBackendType backend_type);
 -- 
 2.15.1
