@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59958)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60489)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gCTTZ-0004EV-4T
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:49:50 -0400
+	(envelope-from <crosa@redhat.com>) id 1gCTUw-0005Q5-NO
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:51:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gCTTX-0001Ip-Ak
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:49:49 -0400
-Received: from mail-pl1-x631.google.com ([2607:f8b0:4864:20::631]:39644)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gCTTW-0001Hf-Vg
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:49:47 -0400
-Received: by mail-pl1-x631.google.com with SMTP id e67-v6so2385881plb.6
-	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 10:49:46 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 16 Oct 2018 10:49:11 -0700
-Message-Id: <20181016174911.9052-22-richard.henderson@linaro.org>
-In-Reply-To: <20181016174911.9052-1-richard.henderson@linaro.org>
-References: <20181016174911.9052-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 21/21] cputlb: read CPUTLBEntry.addr_write
- atomically
+	(envelope-from <crosa@redhat.com>) id 1gCTUs-0003xX-2n
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:51:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36042)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gCTUr-0003vr-M2
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:51:10 -0400
+From: Cleber Rosa <crosa@redhat.com>
+Date: Tue, 16 Oct 2018 13:50:39 -0400
+Message-Id: <20181016175042.578-1-crosa@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v5 0/3] Bootstrap Python venv and
+ acceptance/functional tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,248 +26,157 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, "Emilio G. Cota" <cota@braap.org>
+Cc: Laszlo Ersek <lersek@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Caio Carrara <ccarrara@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
-From: "Emilio G. Cota" <cota@braap.org>
+TL;DR
+=3D=3D=3D=3D=3D
 
-Updates can come from other threads, so readers that do not
-take tlb_lock must use atomic_read to avoid undefined
-behaviour (UB).
+Allow acceptance tests to be run with `make check-acceptance`.
 
-This completes the conversion to tlb_lock. This conversion results
-on average in no performance loss, as the following experiments
-(run on an Intel i7-6700K CPU @ 4.00GHz) show.
+Details
+=3D=3D=3D=3D=3D=3D=3D
 
-1. aarch64 bootup+shutdown test:
+This introduces a Python virtual environment that will be setup within
+the QEMU build directory, that will contain the exact environment that
+tests may require.
 
-- Before:
- Performance counter stats for 'taskset -c 0 ../img/aarch64/die.sh' (10 runs):
+There's one current caveat: it requires Python 3, as it's based on the
+venv module.  This was based on some discussions and perception about
+standardizing on Python 3, but can easily be made to accommodate Python
+2 as well.
 
-       7487.087786      task-clock (msec)         #    0.998 CPUs utilized            ( +-  0.12% )
-    31,574,905,303      cycles                    #    4.217 GHz                      ( +-  0.12% )
-    57,097,908,812      instructions              #    1.81  insns per cycle          ( +-  0.08% )
-    10,255,415,367      branches                  # 1369.747 M/sec                    ( +-  0.08% )
-       173,278,962      branch-misses             #    1.69% of all branches          ( +-  0.18% )
+Example of bootstrap and test execution on Travis-CI:
 
-       7.504481349 seconds time elapsed                                          ( +-  0.14% )
+https://travis-ci.org/qemu/qemu/jobs/439331028#L2508
 
-- After:
- Performance counter stats for 'taskset -c 0 ../img/aarch64/die.sh' (10 runs):
+   ...
+      VENV    /home/travis/build/qemu/qemu/tests/venv
+      MKDIR   /home/travis/build/qemu/qemu/tests/results
+      PIP     /home/travis/build/qemu/qemu/tests/venv-requirements.txt
+      AVOCADO tests/acceptance
+    JOB ID     : 920e4fcf55a1782f1ae77bee64b20ccdc2e1111d
+    JOB LOG    : /home/travis/build/qemu/qemu/tests/results/job-2018-10-0=
+9T21.42-920e4fc/job.log
+     (1/6) /home/travis/build/qemu/qemu/tests/acceptance/boot_linux_conso=
+le.py:BootLinuxConsole.test:  PASS (3.57 s)
+     (2/6) /home/travis/build/qemu/qemu/tests/acceptance/version.py:Versi=
+on.test_qmp_human_info_version:  PASS (0.04 s)
+     (3/6) /home/travis/build/qemu/qemu/tests/acceptance/vnc.py:Vnc.test_=
+no_vnc:  PASS (0.04 s)
+     (4/6) /home/travis/build/qemu/qemu/tests/acceptance/vnc.py:Vnc.test_=
+no_vnc_change_password:  PASS (0.04 s)
+     (5/6) /home/travis/build/qemu/qemu/tests/acceptance/vnc.py:Vnc.test_=
+vnc_change_password_requires_a_password:  PASS (0.04 s)
+     (6/6) /home/travis/build/qemu/qemu/tests/acceptance/vnc.py:Vnc.test_=
+vnc_change_password:  PASS (0.04 s)
+    RESULTS    : PASS 6 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT =
+0 | CANCEL 0
+    JOB TIME   : 3.90 s
+   ...
 
-       7462.441328      task-clock (msec)         #    0.998 CPUs utilized            ( +-  0.07% )
-    31,478,476,520      cycles                    #    4.218 GHz                      ( +-  0.07% )
-    57,017,330,084      instructions              #    1.81  insns per cycle          ( +-  0.05% )
-    10,251,929,667      branches                  # 1373.804 M/sec                    ( +-  0.05% )
-       173,023,787      branch-misses             #    1.69% of all branches          ( +-  0.11% )
+Changes from v4:
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
-       7.474970463 seconds time elapsed                                          ( +-  0.07% )
+ * Added Python 3 version check and error message when running under
+   Python 2.  (Philippe)
 
-2. SPEC06int:
-                                              SPEC06int (test set)
-                                           [Y axis: Speedup over master]
-  1.15 +-+----+------+------+------+------+------+-------+------+------+------+------+------+------+----+-+
-       |                                                                                                  |
-   1.1 +-+.................................+++.............................+  tlb-lock-v2 (m+++x)       +-+
-       |                                +++ |                   +++        tlb-lock-v3 (spinl|ck)         |
-       |                    +++          |  |     +++    +++     |                           |            |
-  1.05 +-+....+++...........####.........|####.+++.|......|.....###....+++...........+++....###.........+-+
-       |      ###         ++#| #         |# |# ***### +++### +++#+#     |     +++     |     #|#    ###    |
-     1 +-+++***+#++++####+++#++#++++++++++#++#+*+*++#++++#+#+****+#++++###++++###++++###++++#+#++++#+#+++-+
-       |    *+* #    #++# ***  #   #### ***  # * *++# ****+# *| * # ****|#   |# #    #|#    #+#    # #    |
-  0.95 +-+..*.*.#....#..#.*|*..#...#..#.*|*..#.*.*..#.*|.*.#.*++*.#.*++*+#.****.#....#+#....#.#..++#.#..+-+
-       |    * * #    #  # *|*  #   #  # *|*  # * *  # *++* # *  * # *  * # * |* #  ++# #    # #  *** #    |
-       |    * * #  ++#  # *+*  #   #  # *|*  # * *  # *  * # *  * # *  * # *++* # **** #  ++# #  * * #    |
-   0.9 +-+..*.*.#...|#..#.*.*..#.++#..#.*|*..#.*.*..#.*..*.#.*..*.#.*..*.#.*..*.#.*.|*.#...|#.#..*.*.#..+-+
-       |    * * #  ***  # * *  #  |#  # *+*  # * *  # *  * # *  * # *  * # *  * # *++* #   |# #  * * #    |
-  0.85 +-+..*.*.#..*|*..#.*.*..#.***..#.*.*..#.*.*..#.*..*.#.*..*.#.*..*.#.*..*.#.*..*.#.****.#..*.*.#..+-+
-       |    * * #  *+*  # * *  # *|*  # * *  # * *  # *  * # *  * # *  * # *  * # *  * # * |* #  * * #    |
-       |    * * #  * *  # * *  # *+*  # * *  # * *  # *  * # *  * # *  * # *  * # *  * # * |* #  * * #    |
-   0.8 +-+..*.*.#..*.*..#.*.*..#.*.*..#.*.*..#.*.*..#.*..*.#.*..*.#.*..*.#.*..*.#.*..*.#.*++*.#..*.*.#..+-+
-       |    * * #  * *  # * *  # * *  # * *  # * *  # *  * # *  * # *  * # *  * # *  * # *  * #  * * #    |
-  0.75 +-+--***##--***###-***###-***###-***###-***###-****##-****##-****##-****##-****##-****##--***##--+-+
- 400.perlben401.bzip2403.gcc429.m445.gob456.hmme45462.libqua464.h26471.omnet473483.xalancbmkgeomean
+ * Added notes about using Avocado from the virtual environment
+   without previous activation.  (Phillipe)
 
-  png: https://imgur.com/a/BHzpPTW
+Ideas discussed, but not implemented:
 
-Notes:
-- tlb-lock-v2 corresponds to an implementation with a mutex.
-- tlb-lock-v3 corresponds to the current implementation, i.e.
-  a spinlock and a single lock acquisition in tlb_set_page_with_attrs.
+ * Instructions to activate/deactivate the venv: the idea is to be
+   use the venv as transparently as possible.
 
-Signed-off-by: Emilio G. Cota <cota@braap.org>
-Message-Id: <20181016153840.25877-1-cota@braap.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- accel/tcg/softmmu_template.h     | 12 ++++++------
- include/exec/cpu_ldst.h          | 11 ++++++++++-
- include/exec/cpu_ldst_template.h |  2 +-
- accel/tcg/cputlb.c               | 19 +++++++++++++------
- 4 files changed, 30 insertions(+), 14 deletions(-)
+ * Move/rename tests/venv-requirements: the ideal, as per the first
+   commit is to provide one venv for all Python based tests to run.
 
-diff --git a/accel/tcg/softmmu_template.h b/accel/tcg/softmmu_template.h
-index 09538b5349..b0adea045e 100644
---- a/accel/tcg/softmmu_template.h
-+++ b/accel/tcg/softmmu_template.h
-@@ -280,7 +280,7 @@ void helper_le_st_name(CPUArchState *env, target_ulong addr, DATA_TYPE val,
-     uintptr_t mmu_idx = get_mmuidx(oi);
-     uintptr_t index = tlb_index(env, mmu_idx, addr);
-     CPUTLBEntry *entry = tlb_entry(env, mmu_idx, addr);
--    target_ulong tlb_addr = entry->addr_write;
-+    target_ulong tlb_addr = tlb_addr_write(entry);
-     unsigned a_bits = get_alignment_bits(get_memop(oi));
-     uintptr_t haddr;
- 
-@@ -295,7 +295,7 @@ void helper_le_st_name(CPUArchState *env, target_ulong addr, DATA_TYPE val,
-             tlb_fill(ENV_GET_CPU(env), addr, DATA_SIZE, MMU_DATA_STORE,
-                      mmu_idx, retaddr);
-         }
--        tlb_addr = entry->addr_write & ~TLB_INVALID_MASK;
-+        tlb_addr = tlb_addr_write(entry) & ~TLB_INVALID_MASK;
-     }
- 
-     /* Handle an IO access.  */
-@@ -325,7 +325,7 @@ void helper_le_st_name(CPUArchState *env, target_ulong addr, DATA_TYPE val,
-            cannot evict the first.  */
-         page2 = (addr + DATA_SIZE) & TARGET_PAGE_MASK;
-         entry2 = tlb_entry(env, mmu_idx, page2);
--        if (!tlb_hit_page(entry2->addr_write, page2)
-+        if (!tlb_hit_page(tlb_addr_write(entry2), page2)
-             && !VICTIM_TLB_HIT(addr_write, page2)) {
-             tlb_fill(ENV_GET_CPU(env), page2, DATA_SIZE, MMU_DATA_STORE,
-                      mmu_idx, retaddr);
-@@ -358,7 +358,7 @@ void helper_be_st_name(CPUArchState *env, target_ulong addr, DATA_TYPE val,
-     uintptr_t mmu_idx = get_mmuidx(oi);
-     uintptr_t index = tlb_index(env, mmu_idx, addr);
-     CPUTLBEntry *entry = tlb_entry(env, mmu_idx, addr);
--    target_ulong tlb_addr = entry->addr_write;
-+    target_ulong tlb_addr = tlb_addr_write(entry);
-     unsigned a_bits = get_alignment_bits(get_memop(oi));
-     uintptr_t haddr;
- 
-@@ -373,7 +373,7 @@ void helper_be_st_name(CPUArchState *env, target_ulong addr, DATA_TYPE val,
-             tlb_fill(ENV_GET_CPU(env), addr, DATA_SIZE, MMU_DATA_STORE,
-                      mmu_idx, retaddr);
-         }
--        tlb_addr = entry->addr_write & ~TLB_INVALID_MASK;
-+        tlb_addr = tlb_addr_write(entry) & ~TLB_INVALID_MASK;
-     }
- 
-     /* Handle an IO access.  */
-@@ -403,7 +403,7 @@ void helper_be_st_name(CPUArchState *env, target_ulong addr, DATA_TYPE val,
-            cannot evict the first.  */
-         page2 = (addr + DATA_SIZE) & TARGET_PAGE_MASK;
-         entry2 = tlb_entry(env, mmu_idx, page2);
--        if (!tlb_hit_page(entry2->addr_write, page2)
-+        if (!tlb_hit_page(tlb_addr_write(entry2), page2)
-             && !VICTIM_TLB_HIT(addr_write, page2)) {
-             tlb_fill(ENV_GET_CPU(env), page2, DATA_SIZE, MMU_DATA_STORE,
-                      mmu_idx, retaddr);
-diff --git a/include/exec/cpu_ldst.h b/include/exec/cpu_ldst.h
-index f54d91ff68..959068495a 100644
---- a/include/exec/cpu_ldst.h
-+++ b/include/exec/cpu_ldst.h
-@@ -126,6 +126,15 @@ extern __thread uintptr_t helper_retaddr;
- /* The memory helpers for tcg-generated code need tcg_target_long etc.  */
- #include "tcg.h"
- 
-+static inline target_ulong tlb_addr_write(const CPUTLBEntry *entry)
-+{
-+#if TCG_OVERSIZED_GUEST
-+    return entry->addr_write;
-+#else
-+    return atomic_read(&entry->addr_write);
-+#endif
-+}
-+
- /* Find the TLB index corresponding to the mmu_idx + address pair.  */
- static inline uintptr_t tlb_index(CPUArchState *env, uintptr_t mmu_idx,
-                                   target_ulong addr)
-@@ -439,7 +448,7 @@ static inline void *tlb_vaddr_to_host(CPUArchState *env, abi_ptr addr,
-         tlb_addr = tlbentry->addr_read;
-         break;
-     case 1:
--        tlb_addr = tlbentry->addr_write;
-+        tlb_addr = tlb_addr_write(tlbentry);
-         break;
-     case 2:
-         tlb_addr = tlbentry->addr_code;
-diff --git a/include/exec/cpu_ldst_template.h b/include/exec/cpu_ldst_template.h
-index d21a0b59bf..0f061d47ef 100644
---- a/include/exec/cpu_ldst_template.h
-+++ b/include/exec/cpu_ldst_template.h
-@@ -177,7 +177,7 @@ glue(glue(glue(cpu_st, SUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
-     addr = ptr;
-     mmu_idx = CPU_MMU_INDEX;
-     entry = tlb_entry(env, mmu_idx, addr);
--    if (unlikely(entry->addr_write !=
-+    if (unlikely(tlb_addr_write(entry) !=
-                  (addr & (TARGET_PAGE_MASK | (DATA_SIZE - 1))))) {
-         oi = make_memop_idx(SHIFT, mmu_idx);
-         glue(glue(helper_ret_st, SUFFIX), MMUSUFFIX)(env, addr, v, oi,
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index 28b770a404..af57aca5e4 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -258,7 +258,7 @@ static inline bool tlb_hit_page_anyprot(CPUTLBEntry *tlb_entry,
-                                         target_ulong page)
- {
-     return tlb_hit_page(tlb_entry->addr_read, page) ||
--           tlb_hit_page(tlb_entry->addr_write, page) ||
-+           tlb_hit_page(tlb_addr_write(tlb_entry), page) ||
-            tlb_hit_page(tlb_entry->addr_code, page);
- }
- 
-@@ -855,7 +855,7 @@ static void io_writex(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
-         tlb_fill(cpu, addr, size, MMU_DATA_STORE, mmu_idx, retaddr);
- 
-         entry = tlb_entry(env, mmu_idx, addr);
--        tlb_addr = entry->addr_write;
-+        tlb_addr = tlb_addr_write(entry);
-         if (!(tlb_addr & ~(TARGET_PAGE_MASK | TLB_RECHECK))) {
-             /* RAM access */
-             uintptr_t haddr = addr + entry->addend;
-@@ -904,7 +904,14 @@ static bool victim_tlb_hit(CPUArchState *env, size_t mmu_idx, size_t index,
-     assert_cpu_is_self(ENV_GET_CPU(env));
-     for (vidx = 0; vidx < CPU_VTLB_SIZE; ++vidx) {
-         CPUTLBEntry *vtlb = &env->tlb_v_table[mmu_idx][vidx];
--        target_ulong cmp = *(target_ulong *)((uintptr_t)vtlb + elt_ofs);
-+        target_ulong cmp;
-+
-+        /* elt_ofs might correspond to .addr_write, so use atomic_read */
-+#if TCG_OVERSIZED_GUEST
-+        cmp = *(target_ulong *)((uintptr_t)vtlb + elt_ofs);
-+#else
-+        cmp = atomic_read((target_ulong *)((uintptr_t)vtlb + elt_ofs));
-+#endif
- 
-         if (cmp == page) {
-             /* Found entry in victim tlb, swap tlb and iotlb.  */
-@@ -977,7 +984,7 @@ void probe_write(CPUArchState *env, target_ulong addr, int size, int mmu_idx,
-     uintptr_t index = tlb_index(env, mmu_idx, addr);
-     CPUTLBEntry *entry = tlb_entry(env, mmu_idx, addr);
- 
--    if (!tlb_hit(entry->addr_write, addr)) {
-+    if (!tlb_hit(tlb_addr_write(entry), addr)) {
-         /* TLB entry is for a different page */
-         if (!VICTIM_TLB_HIT(addr_write, addr)) {
-             tlb_fill(ENV_GET_CPU(env), addr, size, MMU_DATA_STORE,
-@@ -995,7 +1002,7 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
-     size_t mmu_idx = get_mmuidx(oi);
-     uintptr_t index = tlb_index(env, mmu_idx, addr);
-     CPUTLBEntry *tlbe = tlb_entry(env, mmu_idx, addr);
--    target_ulong tlb_addr = tlbe->addr_write;
-+    target_ulong tlb_addr = tlb_addr_write(tlbe);
-     TCGMemOp mop = get_memop(oi);
-     int a_bits = get_alignment_bits(mop);
-     int s_bits = mop & MO_SIZE;
-@@ -1026,7 +1033,7 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
-             tlb_fill(ENV_GET_CPU(env), addr, 1 << s_bits, MMU_DATA_STORE,
-                      mmu_idx, retaddr);
-         }
--        tlb_addr = tlbe->addr_write & ~TLB_INVALID_MASK;
-+        tlb_addr = tlb_addr_write(tlbe) & ~TLB_INVALID_MASK;
-     }
- 
-     /* Notice an IO access or a needs-MMU-lookup access */
--- 
-2.17.2
+ * Changed the Travis package requirements (python3-pip,
+   python3.4-venv) from the global setting to the job specific one:
+   waiting on further feedback from'Alex Benn=C3=A9e.
+
+Changes from v3:
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+ * Fixed typo in commit message (s/requiment/requirement/).  (Eric)
+
+Changes from v2:
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+ * Make the $(TESTS_VENV_DIR) target depend on the
+   venv-requirements.txt file, and touch $(TESTS_VENV_DIR) after venv
+   runs.  With this, updates on the file are reflected on the
+   venv. (Philippe)
+
+ * Run pip with "python -m pip".  It may have been installed reusing
+   the system wide packages, and then the script may not be available
+   on the venv. (Philippe)
+
+ * Dropped Python version on Travis, and using the version supplied
+   by the distro (3.4). (Philippe)
+
+ * Added "python3.4-venv" package requirement on Travis. (Philippe)
+
+ * Added variable (AVOCADO_SHOW) with logging streams to be shown
+   while running the acceptance tests.  By default it's set to none,
+   the equivalent of the quiet mode used on previous versions.
+   (Philippe)
+
+ * On Travis, set the AVOCADO_SHOW variable to "app", so that the
+   individual test results can be easily seen.  (Philippe)
+
+Ideas discussed, but not implemented:
+
+  * Run pip with "$(PYTHON) -m pip -q install ..." because it points
+    to the system wide Python installation. (Philippe)
+
+  * Drop the "--system-site-packages" flag.  Waiting on another round
+    of tests to determine if they are really the cause of some package
+    installation problems.
+
+Changes from v1:
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+ * TESTS_VENV_REQ (the path of "venv-requirements.txt") now points to
+   the source path ($SRC_PATH instead of $BUILD_DIR)
+
+ * Create the venv with "--system-site-packages", which allows the
+   reuse of packages (and no additional downloads) in case there's a
+   package installed system wide providing the same package and
+   version.
+
+ * Run Avocado with "python -m avocado".  It may have been installed
+   reusing the system wide packages, and then the script may not
+   be available on the venv.
+
+ * Improved documentation describing the Python 3, venv and pip
+   requirements.
+
+ * Updated avocado-framework requirement to latest released version
+   (65.0)
+
+ * (New commit) Added support for running the acceptance tests on
+   Travis.
+
+Ideas discussed, but not implemented:
+
+ * Install external packages such as python3-pip on Debian based
+   systems, deemed too invasive on developer's systems.
+
+ * Allow the use of Python 2, and consequently the "virtualenv"
+   module.
+
+Cleber Rosa (3):
+  Bootstrap Python venv for tests
+  Acceptance tests: add make rule for running them
+  Travis support for the acceptance tests
+
+ .travis.yml                 |  5 +++++
+ docs/devel/testing.rst      | 43 ++++++++++++++++++++++++++++++++-----
+ tests/Makefile.include      | 43 +++++++++++++++++++++++++++++++++++++
+ tests/venv-requirements.txt |  4 ++++
+ 4 files changed, 90 insertions(+), 5 deletions(-)
+ create mode 100644 tests/venv-requirements.txt
+
+--=20
+2.17.1
