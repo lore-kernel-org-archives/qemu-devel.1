@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59696)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gCTTP-00046U-5w
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:49:40 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1gCTTP-00046X-6p
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:49:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gCTTK-0000zh-Qr
+	(envelope-from <richard.henderson@linaro.org>) id 1gCTTK-0000zU-L1
 	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:49:38 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:34983)
+Received: from mail-pf1-x429.google.com ([2607:f8b0:4864:20::429]:44118)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gCTTK-0000lq-Hr
+	id 1gCTTK-0000iN-9K
 	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:49:34 -0400
-Received: by mail-pg1-x544.google.com with SMTP id 32-v6so20135pgu.2
-	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 10:49:27 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id r9-v6so11810587pff.11
+	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 10:49:22 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 16 Oct 2018 10:48:58 -0700
-Message-Id: <20181016174911.9052-9-richard.henderson@linaro.org>
+Date: Tue, 16 Oct 2018 10:48:55 -0700
+Message-Id: <20181016174911.9052-6-richard.henderson@linaro.org>
 In-Reply-To: <20181016174911.9052-1-richard.henderson@linaro.org>
 References: <20181016174911.9052-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 08/21] exec: introduce tlb_init
+Subject: [Qemu-devel] [PULL 05/21] tcg: distribute tcg_time into TCG contexts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,71 +31,164 @@ Cc: peter.maydell@linaro.org, "Emilio G. Cota" <cota@braap.org>
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-Paves the way for the addition of a per-TLB lock.
+When we implemented per-vCPU TCG contexts, we forgot to also
+distribute the tcg_time counter, which has remained as a global
+accessed without any serialization, leading to potentially missed
+counts.
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Fix it by distributing the field over the TCG contexts, embedding
+it into TCGProfile with a field called "cpu_exec_time", which is more
+descriptive than "tcg_time". Add a function to query this value
+directly, and for completeness, fill in the field in
+tcg_profile_snapshot, even though its callers do not use it.
+
 Signed-off-by: Emilio G. Cota <cota@braap.org>
-Message-Id: <20181009174557.16125-4-cota@braap.org>
+Message-Id: <20181010144853.13005-5-cota@braap.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/exec/exec-all.h | 8 ++++++++
- accel/tcg/cputlb.c      | 4 ++++
- exec.c                  | 1 +
- 3 files changed, 13 insertions(+)
+ include/qemu/timer.h |  1 -
+ tcg/tcg.h            |  2 ++
+ cpus.c               |  3 ++-
+ monitor.c            | 13 ++++++++++---
+ tcg/tcg.c            | 23 +++++++++++++++++++++++
+ 5 files changed, 37 insertions(+), 5 deletions(-)
 
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index 5f78125582..815e5b1e83 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -99,6 +99,11 @@ void cpu_address_space_init(CPUState *cpu, int asidx,
- 
- #if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
- /* cputlb.c */
-+/**
-+ * tlb_init - initialize a CPU's TLB
-+ * @cpu: CPU whose TLB should be initialized
-+ */
-+void tlb_init(CPUState *cpu);
- /**
-  * tlb_flush_page:
-  * @cpu: CPU whose TLB should be flushed
-@@ -258,6 +263,9 @@ void tlb_set_page(CPUState *cpu, target_ulong vaddr,
- void probe_write(CPUArchState *env, target_ulong addr, int size, int mmu_idx,
-                  uintptr_t retaddr);
- #else
-+static inline void tlb_init(CPUState *cpu)
-+{
-+}
- static inline void tlb_flush_page(CPUState *cpu, target_ulong addr)
- {
+diff --git a/include/qemu/timer.h b/include/qemu/timer.h
+index a005ed2692..dfecd03e28 100644
+--- a/include/qemu/timer.h
++++ b/include/qemu/timer.h
+@@ -1046,7 +1046,6 @@ static inline int64_t profile_getclock(void)
+     return get_clock();
  }
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index f4702ce91f..502eea2850 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -73,6 +73,10 @@ QEMU_BUILD_BUG_ON(sizeof(target_ulong) > sizeof(run_on_cpu_data));
- QEMU_BUILD_BUG_ON(NB_MMU_MODES > 16);
- #define ALL_MMUIDX_BITS ((1 << NB_MMU_MODES) - 1)
  
-+void tlb_init(CPUState *cpu)
-+{
-+}
+-extern int64_t tcg_time;
+ extern int64_t dev_time;
+ #endif
+ 
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index d80ef2a883..c59f254e27 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -629,6 +629,7 @@ typedef struct TCGOp {
+ QEMU_BUILD_BUG_ON(NB_OPS > (1 << 8));
+ 
+ typedef struct TCGProfile {
++    int64_t cpu_exec_time;
+     int64_t tb_count1;
+     int64_t tb_count;
+     int64_t op_count; /* total insn count */
+@@ -1002,6 +1003,7 @@ int tcg_check_temp_count(void);
+ #define tcg_check_temp_count() 0
+ #endif
+ 
++int64_t tcg_cpu_exec_time(void);
+ void tcg_dump_info(FILE *f, fprintf_function cpu_fprintf);
+ void tcg_dump_op_count(FILE *f, fprintf_function cpu_fprintf);
+ 
+diff --git a/cpus.c b/cpus.c
+index 361678e459..cce64874e6 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1425,7 +1425,8 @@ static int tcg_cpu_exec(CPUState *cpu)
+     ret = cpu_exec(cpu);
+     cpu_exec_end(cpu);
+ #ifdef CONFIG_PROFILER
+-    tcg_time += profile_getclock() - ti;
++    atomic_set(&tcg_ctx->prof.cpu_exec_time,
++               tcg_ctx->prof.cpu_exec_time + profile_getclock() - ti);
+ #endif
+     return ret;
+ }
+diff --git a/monitor.c b/monitor.c
+index b9258a7438..823b5a1099 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -83,6 +83,7 @@
+ #include "sysemu/cpus.h"
+ #include "sysemu/iothread.h"
+ #include "qemu/cutils.h"
++#include "tcg/tcg.h"
+ 
+ #if defined(TARGET_S390X)
+ #include "hw/s390x/storage-keys.h"
+@@ -1966,16 +1967,22 @@ static void hmp_info_numa(Monitor *mon, const QDict *qdict)
+ 
+ #ifdef CONFIG_PROFILER
+ 
+-int64_t tcg_time;
+ int64_t dev_time;
+ 
+ static void hmp_info_profile(Monitor *mon, const QDict *qdict)
+ {
++    static int64_t last_cpu_exec_time;
++    int64_t cpu_exec_time;
++    int64_t delta;
 +
- /* flush_all_helper: run fn across all cpus
-  *
-  * If the wait flag is set then the src cpu's helper will be queued as
-diff --git a/exec.c b/exec.c
-index d0821e69aa..4fd831ef06 100644
---- a/exec.c
-+++ b/exec.c
-@@ -965,6 +965,7 @@ void cpu_exec_realizefn(CPUState *cpu, Error **errp)
-         tcg_target_initialized = true;
-         cc->tcg_initialize();
-     }
-+    tlb_init(cpu);
++    cpu_exec_time = tcg_cpu_exec_time();
++    delta = cpu_exec_time - last_cpu_exec_time;
++
+     monitor_printf(mon, "async time  %" PRId64 " (%0.3f)\n",
+                    dev_time, dev_time / (double)NANOSECONDS_PER_SECOND);
+     monitor_printf(mon, "qemu time   %" PRId64 " (%0.3f)\n",
+-                   tcg_time, tcg_time / (double)NANOSECONDS_PER_SECOND);
+-    tcg_time = 0;
++                   delta, delta / (double)NANOSECONDS_PER_SECOND);
++    last_cpu_exec_time = cpu_exec_time;
+     dev_time = 0;
+ }
+ #else
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index 8f26916b99..e85133ef05 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -30,6 +30,7 @@
+ /* Define to jump the ELF file used to communicate with GDB.  */
+ #undef DEBUG_JIT
  
- #ifndef CONFIG_USER_ONLY
-     if (qdev_get_vmsd(DEVICE(cpu)) == NULL) {
++#include "qemu/error-report.h"
+ #include "qemu/cutils.h"
+ #include "qemu/host-utils.h"
+ #include "qemu/timer.h"
+@@ -3361,6 +3362,7 @@ void tcg_profile_snapshot(TCGProfile *prof, bool counters, bool table)
+         const TCGProfile *orig = &s->prof;
+ 
+         if (counters) {
++            PROF_ADD(prof, orig, cpu_exec_time);
+             PROF_ADD(prof, orig, tb_count1);
+             PROF_ADD(prof, orig, tb_count);
+             PROF_ADD(prof, orig, op_count);
+@@ -3412,11 +3414,32 @@ void tcg_dump_op_count(FILE *f, fprintf_function cpu_fprintf)
+                     prof.table_op_count[i]);
+     }
+ }
++
++int64_t tcg_cpu_exec_time(void)
++{
++    unsigned int n_ctxs = atomic_read(&n_tcg_ctxs);
++    unsigned int i;
++    int64_t ret = 0;
++
++    for (i = 0; i < n_ctxs; i++) {
++        const TCGContext *s = atomic_read(&tcg_ctxs[i]);
++        const TCGProfile *prof = &s->prof;
++
++        ret += atomic_read(&prof->cpu_exec_time);
++    }
++    return ret;
++}
+ #else
+ void tcg_dump_op_count(FILE *f, fprintf_function cpu_fprintf)
+ {
+     cpu_fprintf(f, "[TCG profiler not compiled]\n");
+ }
++
++int64_t tcg_cpu_exec_time(void)
++{
++    error_report("%s: TCG profiler not compiled", __func__);
++    exit(EXIT_FAILURE);
++}
+ #endif
+ 
+ 
 -- 
 2.17.2
