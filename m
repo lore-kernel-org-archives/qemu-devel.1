@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45686)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46200)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1gCQ4g-0001Ra-Tf
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 10:11:56 -0400
+	(envelope-from <kwolf@redhat.com>) id 1gCQ6F-0002ZW-GB
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 10:13:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1gCQ4f-0001gu-Nh
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 10:11:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:25742)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <abologna@redhat.com>) id 1gCQ4f-0001f3-DL
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 10:11:53 -0400
-Message-ID: <4089265c6ef44f79f0dd67d203f69e5bde9b8d85.camel@redhat.com>
-From: Andrea Bolognani <abologna@redhat.com>
-Date: Tue, 16 Oct 2018 16:11:48 +0200
-In-Reply-To: <967af677f4d0b60bfb201f639ade0b0712e09fc8.camel@redhat.com>
-References: <cover.1538683492.git.alistair.francis@wdc.com>
-	<5dd21056229d12a1af8d65e9208f4de43ba4a2ae.camel@redhat.com>
-	<892d54c5-2851-74ec-bdf2-286c1665c44f@gmail.com>
-	<7d54ec114745b00b82601875416ccfe6a5f9fe6f.camel@redhat.com>
-	<CAKmqyKNTTu+5KyTMBHw5-+UMa7qnm9EaowxHj8NLxED98m1MKw@mail.gmail.com>
-	<d9e6d7979143130092b5b96602885c1acaca9b52.camel@redhat.com>
-	<CAKmqyKMTzYswJ74WEOQAQrisCdMDQ9Nf6NMEdUKLcUMCN7XLgg@mail.gmail.com>
-	<23d9891ec01bec45b16f89ba1412238be39addf9.camel@redhat.com>
-	<CAKmqyKMBxY6j3SwvyYsMVCCeAwKinuVE4+2kbAp6YapBWdKZig@mail.gmail.com>
-	<967af677f4d0b60bfb201f639ade0b0712e09fc8.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 0/5] Connect a PCIe host and graphics
- support to RISC-V
+	(envelope-from <kwolf@redhat.com>) id 1gCQ6C-0003G8-Lp
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 10:13:29 -0400
+Date: Tue, 16 Oct 2018 16:12:43 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20181016141243.GH5620@dhcp-200-186.str.redhat.com>
+References: <20181012115532.12645-1-kwolf@redhat.com>
+	<20181012115532.12645-4-kwolf@redhat.com>
+	<e61301c2-5865-fb02-c45b-56b4a3622dc3@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e61301c2-5865-fb02-c45b-56b4a3622dc3@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 3/8] block: Require auto-read-only for
+ existing fallbacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,108 +25,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair23@gmail.com>
-Cc: Palmer Dabbelt <palmer@sifive.com>, "Richard W.M. Jones" <rjones@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Michael Clark <mjc@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, stephen@eideticom.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
 
-On Tue, 2018-10-16 at 09:38 +0200, Andrea Bolognani wrote:
-> On Mon, 2018-10-15 at 09:59 -0700, Alistair Francis wrote:
-> > On Mon, Oct 15, 2018 at 7:39 AM Andrea Bolognani <abologna@redhat.com> wrote:
-> > > One more thing that I forgot to bring up earlier: at the same time
-> > > as PCIe support is added, we should also make sure that the
-> > > pcie-root-port device is built into the qemu-system-riscv* binaries
-> > > by default, as that device being missing will cause PCI-enabled
-> > > libvirt guests to fail to start.
+Am 12.10.2018 um 19:02 hat Eric Blake geschrieben:
+> On 10/12/18 6:55 AM, Kevin Wolf wrote:
+> > Some block drivers have traditionally changed their node to read-only
+> > mode without asking the user. This behaviour has been marked deprecated
+> > since 2.11, expecting users to provide an explicit read-only=on option.
 > > 
-> > We are dong that aren't we?
+> > Now that we have auto-read-only=on, enable these drivers to make use of
+> > the option.
+> > 
+> > This is the only use of bdrv_set_read_only(), so we can make it a bit
+> > more specific and turn it into a bdrv_apply_auto_read_only() that is
+> > more convenient for drivers to use.
+> > 
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > ---
 > 
-> Doesn't look that way:
+> > +++ b/block.c
+> > @@ -266,27 +266,36 @@ int bdrv_can_set_read_only(BlockDriverState *bs, bool read_only,
+> >       return 0;
+> >   }
+> > -/* TODO Remove (deprecated since 2.11)
+> > - * Block drivers are not supposed to automatically change bs->read_only.
+> > - * Instead, they should just check whether they can provide what the user
+> > - * explicitly requested and error out if read-write is requested, but they can
+> > - * only provide read-only access. */
+> > -int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **errp)
+> > +/*
+> > + * Called by a driver that can only provide a read-only image.
+> > + *
+> > + * Returns 0 if the node is already read-only or it could switch the node to
+> > + * read-only because BDRV_O_AUTO_RDONLY is set.
+> > + *
+> > + * Returns -EACCES if the node is read-write and BDRV_O_AUTO_RDONLY is not set.
+> > + * If @errmsg is not NULL, it is used as the error message for the Error
+> > + * object.
 > 
->   $ riscv64-softmmu/qemu-system-riscv64 -device help 2>&1 | head -5
->   Controller/Bridge/Hub devices:
->   name "pci-bridge", bus PCI, desc "Standard PCI Bridge"
->   name "pci-bridge-seat", bus PCI, desc "Standard PCI Bridge (multiseat)"
->   name "vfio-pci-igd-lpc-bridge", bus PCI, desc "VFIO dummy ISA/LPC bridge for IGD assignment"
+> I like it.
 > 
->   $
+> Worth documenting the -EINVAL (copy-on-read prevents setting read-only)
+> failure as well?  (The -EPERM failure of bdrv_can_set_read_only() is not
+> reachable, since this new function never clears readonly).
 
-Okay, I've (slow) cooked myself a BBL with CONFIG_PCI_HOST_GENERIC=y,
-a QEMU with CONFIG_PCIE_PORT=y and a libvirt with RISC-V PCI support.
+In fact, -EINVAL and the error string from bdrv_can_set_read_only() may
+be confusing because the user didn't explicitly request a read-only
+image. Maybe it would be better to just turn this case into -EACCES with
+the same error message.
 
-With all of the above in place, I could finally define a mmio-less
-guest which... Failed to boot pretty much right away:
+What do you think?
 
-  error: Failed to start domain riscv
-  error: internal error: process exited while connecting to monitor:
-  2018-10-16T13:32:20.713064Z qemu-system-riscv64: -device
-  pcie-root-port,port=0x8,chassis=1,id=pci.1,bus=pcie.0,multifunction=on,addr=0x1:
-  MSI-X is not supported by interrupt controller
+> > + */
+> > +int bdrv_apply_auto_read_only(BlockDriverState *bs, const char *errmsg,
+> > +                              Error **errp)
+> >   {
+> >       int ret = 0;
+> > -    ret = bdrv_can_set_read_only(bs, read_only, false, errp);
+> > +    if (!(bs->open_flags & BDRV_O_RDWR)) {
+> > +        return 0;
+> > +    }
+> > +    if (!(bs->open_flags & BDRV_O_AUTO_RDONLY)) {
+> > +        error_setg(errp, "%s", errmsg ?: "Image is read-only");
+> > +        return -EACCES;
+> > +    }
+> > +
+> > +    ret = bdrv_can_set_read_only(bs, true, false, errp);
+> >       if (ret < 0) {
+> >           return ret;
+> >       }
+> 
+> Makes sense.
+> 
+> > +++ b/block/vvfat.c
+> > @@ -1262,16 +1262,10 @@ static int vvfat_open(BlockDriverState *bs, QDict *options, int flags,
+> >                          "Unable to set VVFAT to 'rw' when drive is read-only");
+> >               goto fail;
+> >           }
+> > -    } else  if (!bdrv_is_read_only(bs)) {
+> > -        error_report("Opening non-rw vvfat images without an explicit "
+> > -                     "read-only=on option is deprecated. Future versions "
+> > -                     "will refuse to open the image instead of "
+> > -                     "automatically marking the image read-only.");
+> > -        /* read only is the default for safety */
+> > -        ret = bdrv_set_read_only(bs, true, &local_err);
+> > +    } else {
+> > +        ret = bdrv_apply_auto_read_only(bs, NULL, errp);
+> >           if (ret < 0) {
+> > -            error_propagate(errp, local_err);
+> > -            goto fail;
+> > +            return ret;
+> 
+> Don't you still need the goto fail, to avoid leaking opts?
 
-Well, okay then. As a second attempt, I manually placed all virtio
-devices on pcie.0, overriding libvirt's own address assignment
-algorithm and getting rid of pcie-root-ports at the same time. Now
-the guest will actually start, but soon enough
+Yes, I do. Thanks.
 
-  OF: PCI: host bridge /pci@2000000000 ranges:
-  OF: PCI:   No bus range found for /pci@2000000000, using [bus 00-ff]
-  OF: PCI:   MEM 0x40000000..0x5fffffff -> 0x40000000
-  pci-host-generic 2000000000.pci: ECAM area [mem 0x2000000000-0x2003ffffff] can only accommodate [bus 00-3f] (reduced from [bus 00-ff] desired)
-  pci-host-generic 2000000000.pci: ECAM at [mem 0x2000000000-0x2003ffffff] for [bus 00-3f]
-  pci-host-generic 2000000000.pci: PCI host bridge to bus 0000:00
-  pci_bus 0000:00: root bus resource [bus 00-ff]
-  pci_bus 0000:00: root bus resource [mem 0x40000000-0x5fffffff]
-  pci 0000:00:02.0: BAR 6: assigned [mem 0x40000000-0x4003ffff pref]
-  pci 0000:00:01.0: BAR 4: assigned [mem 0x40040000-0x40043fff 64bit pref]
-  pci 0000:00:02.0: BAR 4: assigned [mem 0x40044000-0x40047fff 64bit pref]
-  pci 0000:00:03.0: BAR 4: assigned [mem 0x40048000-0x4004bfff 64bit pref]
-  pci 0000:00:04.0: BAR 4: assigned [mem 0x4004c000-0x4004ffff 64bit pref]
-  pci 0000:00:01.0: BAR 0: no space for [io  size 0x0040]
-  pci 0000:00:01.0: BAR 0: failed to assign [io  size 0x0040]
-  pci 0000:00:02.0: BAR 0: no space for [io  size 0x0020]
-  pci 0000:00:02.0: BAR 0: failed to assign [io  size 0x0020]
-  pci 0000:00:03.0: BAR 0: no space for [io  size 0x0020]
-  pci 0000:00:03.0: BAR 0: failed to assign [io  size 0x0020]
-  pci 0000:00:04.0: BAR 0: no space for [io  size 0x0020]
-  pci 0000:00:04.0: BAR 0: failed to assign [io  size 0x0020]
-  virtio-pci 0000:00:01.0: enabling device (0000 -> 0002)
-  virtio-pci 0000:00:02.0: enabling device (0000 -> 0002)
-  virtio-pci 0000:00:03.0: enabling device (0000 -> 0002)
-  virtio-pci 0000:00:04.0: enabling device (0000 -> 0002)
-
-will show up on the console and boot will not progress any further.
-
-I tried making only the disk virtio-pci, leaving all other devices
-as virtio-mmio, but that too failed to boot with a similar message
-about IO space exaustion. If the network device is the only one
-using virtio-pci, though, despite still getting
-
-  pci 0000:00:01.0: BAR 0: no space for [io  size 0x0020]
-  pci 0000:00:01.0: BAR 0: failed to assign [io  size 0x0020]
-
-I can get all the way to a prompt, and the device will show up in
-the output of lspci:
-
-  00:00.0 Host bridge: Red Hat, Inc. QEMU PCIe Host bridge
-	Subsystem: Red Hat, Inc. Device 1100
-	Flags: fast devsel
-  lspci: Unable to load libkmod resources: error -12
-
-  00:01.0 Ethernet controller: Red Hat, Inc. Virtio network device
-	Subsystem: Red Hat, Inc. Device 0001
-	Flags: bus master, fast devsel, latency 0, IRQ 1
-	I/O ports at <unassigned> [disabled]
-	Memory at 40040000 (64-bit, prefetchable) [size=16K]
-	[virtual] Expansion ROM at 40000000 [disabled] [size=256K]
-	Capabilities: [84] Vendor Specific Information: VirtIO: <unknown>
-	Capabilities: [70] Vendor Specific Information: VirtIO: Notify
-	Capabilities: [60] Vendor Specific Information: VirtIO: DeviceCfg
-	Capabilities: [50] Vendor Specific Information: VirtIO: ISR
-	Capabilities: [40] Vendor Specific Information: VirtIO: CommonCfg
-	Kernel driver in use: virtio-pci
-
-So it looks like virtio-pci is not quite usable yet; still, this is
-definitely some progress over the status quo! Anyone has any ideas on
-how to bridge the gap separating us from a pure virtio-pci RISC-V
-guest?
-
--- 
-Andrea Bolognani / Red Hat / Virtualization
+Kevin
