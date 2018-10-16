@@ -1,39 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54081)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sbates@raithlin.com>) id 1gCTCP-0003uM-2q
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:32:05 -0400
+	(envelope-from <armbru@redhat.com>) id 1gCTM5-00063F-EH
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:42:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sbates@raithlin.com>) id 1gCTCL-00041u-0p
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:32:04 -0400
-Received: from mail-eopbgr660134.outbound.protection.outlook.com
-	([40.107.66.134]:8935
-	helo=CAN01-QB1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sbates@raithlin.com>) id 1gCTCK-00040n-P7
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:32:00 -0400
-From: "Stephen  Bates" <sbates@raithlin.com>
-Date: Tue, 16 Oct 2018 17:31:58 +0000
-Message-ID: <2C5AFCF5-9F41-4F8F-A058-67743C5403F5@eideticom.com>
-References: <cover.1538683492.git.alistair.francis@wdc.com>
-	<5dd21056229d12a1af8d65e9208f4de43ba4a2ae.camel@redhat.com>
-	<892d54c5-2851-74ec-bdf2-286c1665c44f@gmail.com>
-	<7d54ec114745b00b82601875416ccfe6a5f9fe6f.camel@redhat.com>
-	<CAKmqyKNTTu+5KyTMBHw5-+UMa7qnm9EaowxHj8NLxED98m1MKw@mail.gmail.com>
-	<d9e6d7979143130092b5b96602885c1acaca9b52.camel@redhat.com>
-	<CAKmqyKMTzYswJ74WEOQAQrisCdMDQ9Nf6NMEdUKLcUMCN7XLgg@mail.gmail.com>
-	<23d9891ec01bec45b16f89ba1412238be39addf9.camel@redhat.com>
-	<CAKmqyKMBxY6j3SwvyYsMVCCeAwKinuVE4+2kbAp6YapBWdKZig@mail.gmail.com>
-	<967af677f4d0b60bfb201f639ade0b0712e09fc8.camel@redhat.com>
-	<4089265c6ef44f79f0dd67d203f69e5bde9b8d85.camel@redhat.com>
-	<138e8c0bd96f9fa58c1b79e89615ba9a6f4318fd.camel@redhat.com>
-In-Reply-To: <138e8c0bd96f9fa58c1b79e89615ba9a6f4318fd.camel@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E50546B486ADF340B45D6442F4C70D7C@CANPRD01.PROD.OUTLOOK.COM>
-Content-Transfer-Encoding: base64
+	(envelope-from <armbru@redhat.com>) id 1gCTM4-0008WN-7t
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:42:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45636)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gCTM4-0008W5-1d
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:42:04 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6AC0630833A4
+	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 17:42:03 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+Date: Tue, 16 Oct 2018 19:41:32 +0200
+Message-Id: <20181016174158.15229-13-armbru@redhat.com>
+In-Reply-To: <20181016174158.15229-1-armbru@redhat.com>
+References: <20181016174158.15229-1-armbru@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v5 0/5] Connect a PCIe host and graphics
- support to RISC-V
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 12/38] migration: Fix !replay_can_snapshot()
+ error handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,20 +33,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrea Bolognani <abologna@redhat.com>, Alistair Francis <alistair23@gmail.com>
-Cc: Palmer Dabbelt <palmer@sifive.com>, "Richard W.M. Jones" <rjones@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Michael Clark <mjc@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 
-PiAgICBGb3Jnb3QgdG8gbWVudGlvbiB0aGF0LCBkZXNwaXRlIHNob3dpbmcgdXAsIHRoZSBkZXZp
-Y2UgZG9lc24ndCBxdWl0ZQ0KPiAgICB3b3JrOiBmb3IgZXhhbXBsZSwgaXQgY2FuJ3Qgc2VlbSB0
-byBiZSBhYmxlIHRvIGFjcXVpcmUgYW4gSVAgYWRkcmVzcy4NCiAgICANCkFuZHJlYSBhbmQgQWxp
-c3RhaXINCg0KQSBsb3Qgb2YgeW91ciBpc3N1ZXMgbG9vayB2ZXJ5IHNpbWlsYXIgdG8gd2hhdCBJ
-IHNhdy4gVGhlIFBDSWUgZGV2aWNlIGNhbiBiZSBhY2Nlc3NlZCB2aWEgTU1JTyBidXQgaW50ZXJy
-dXB0cyBhcmUgYnJva2VuIHdoaWNoIGNhdXNlcyBpc3N1ZXMgd2l0aCB0aGUgZGV2aWNlcyAoZS5n
-LiBOVk1lIG9yIDEwMDBlKS4gSSB0aGluayB3ZSBuZWVkIHRvIHJvb3QgY2F1c2UgYW5kIHJlc29s
-dmUgdGhpcyBpc3N1ZSBiZWZvcmUgd2UgY2FuIG1lcmdlIHRoZSBzZXJpZXMuDQoNCkFsaXN0YWly
-IEkgdGhpbmsgeW91IG5lZWQgdG8gcmV2aWV3IGhvdyBpbnRlcnJ1cHRzIGFyZSB3aXJlZCB1cCBp
-biB0aGUgUENJZSByb290IGRldmljZS4gTWF5YmUgY29tcGFyZSB0byBob3cgaXQgd2FzIGRvbmUg
-aW4gYXJtIGFzIGl0IGxvb2tzIGRpZmZlcmVudC4NCg0KRm9yIG5vdyBJIHdvdWxkIGNvbmNlbnRy
-YXRlIG9uIHRoZSB2aXJ0IG1hY2hpbmUgKHNpbmNlIGl0IGhhcyBhIHdvcmtpbmcgZXF1aXZhbGVu
-dCBpbiB0aGUgYXJtIHRyZWUpLiBXZSBjYW4gdGhlbiBsb29rIGF0IHRoZSBzaWZpdmVfdSBtYWNo
-aW5lIGFmdGVyLg0KDQpDaGVlcnMNCg0KU3RlcGhlbg0KICAgIA0KICAgIA0KDQo=
+Calling error_report() in a function that takes an Error ** argument
+is suspicious.  save_snapshot() and load_snapshot() do that, and then
+fail without setting an error.  Wrong.  The HMP commands survive this
+unscathed, since hmp_handle_error() does nothing when no error has
+been set.  Callers main() (on behalf of -loadvm) and
+replay_vmstate_init() crash, but I'm not sure the error is possible
+there.
+
+Screwed up when commit 377b21ccea1 (v2.12.0) added incorrect error
+handling right next to correct examples.  Fix by calling error_setg()
+instead of error_report().
+
+Fixes: 377b21ccea1755a8b0dae822c29567c58dda6939
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ migration/savevm.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 2d10e45582..5f8eb38676 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2414,8 +2414,8 @@ int save_snapshot(const char *name, Error **errp)
+     AioContext *aio_context;
+=20
+     if (!replay_can_snapshot()) {
+-        error_report("Record/replay does not allow making snapshot "
+-                     "right now. Try once more later.");
++        error_setg(errp, "Record/replay does not allow making snapshot "
++                   "right now. Try once more later.");
+         return ret;
+     }
+=20
+@@ -2611,8 +2611,8 @@ int load_snapshot(const char *name, Error **errp)
+     MigrationIncomingState *mis =3D migration_incoming_get_current();
+=20
+     if (!replay_can_snapshot()) {
+-        error_report("Record/replay does not allow loading snapshot "
+-                     "right now. Try once more later.");
++        error_setg(errp, "Record/replay does not allow loading snapshot =
+"
++                   "right now. Try once more later.");
+         return -EINVAL;
+     }
+=20
+--=20
+2.17.1
