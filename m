@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56827)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56774)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gCTMB-00066x-2O
+	(envelope-from <armbru@redhat.com>) id 1gCTMA-00065o-8A
 	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:42:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gCTM8-0000C7-5t
+	(envelope-from <armbru@redhat.com>) id 1gCTM8-0000Bo-2N
 	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:42:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34900)
+Received: from mx1.redhat.com ([209.132.183.28]:59560)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gCTM7-00008b-OJ
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gCTM7-00008U-L2
 	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:42:07 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A732B3082DCF
+	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 17:42:06 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 16 Oct 2018 19:41:49 +0200
-Message-Id: <20181016174158.15229-30-armbru@redhat.com>
+Date: Tue, 16 Oct 2018 19:41:52 +0200
+Message-Id: <20181016174158.15229-33-armbru@redhat.com>
 In-Reply-To: <20181016174158.15229-1-armbru@redhat.com>
 References: <20181016174158.15229-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 29/38] tpm: Clean up error reporting in
- tpm_init_tpmdev()
+Subject: [Qemu-devel] [PATCH v3 32/38] vl: Assert drive_new() does not fail
+ in default_drive()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,136 +31,34 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Calling error_report() in a function that takes an Error ** argument
-is suspicious.  tpm_init_tpmdev() does that, and then fails without
-setting an error.  Its caller main(), via tpm_init() and
-qemu_opts_foreach(), is fine with it, but clean it up anyway.
+If creating (empty) default drives fails, it's a bug.  Therefore,
+assert() is more appropriate than exit(1).
 
-Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- include/sysemu/tpm.h |  2 +-
- stubs/tpm.c          |  3 +--
- tpm.c                | 22 +++++++++-------------
- vl.c                 |  4 +---
- 4 files changed, 12 insertions(+), 19 deletions(-)
+ vl.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/include/sysemu/tpm.h b/include/sysemu/tpm.h
-index 9ae1ab6da3..17a97ed77a 100644
---- a/include/sysemu/tpm.h
-+++ b/include/sysemu/tpm.h
-@@ -16,7 +16,7 @@
- #include "qom/object.h"
-=20
- int tpm_config_parse(QemuOptsList *opts_list, const char *optarg);
--int tpm_init(void);
-+void tpm_init(void);
- void tpm_cleanup(void);
-=20
- typedef enum TPMVersion {
-diff --git a/stubs/tpm.c b/stubs/tpm.c
-index 6729bc8517..80939cd3db 100644
---- a/stubs/tpm.c
-+++ b/stubs/tpm.c
-@@ -9,9 +9,8 @@
- #include "qapi/qapi-commands-tpm.h"
- #include "sysemu/tpm.h"
-=20
--int tpm_init(void)
-+void tpm_init(void)
- {
--    return 0;
- }
-=20
- void tpm_cleanup(void)
-diff --git a/tpm.c b/tpm.c
-index 93031723ad..9c9e20bbb7 100644
---- a/tpm.c
-+++ b/tpm.c
-@@ -89,19 +89,19 @@ static int tpm_init_tpmdev(void *dummy, QemuOpts *opt=
-s, Error **errp)
-     int i;
-=20
-     if (!QLIST_EMPTY(&tpm_backends)) {
--        error_report("Only one TPM is allowed.");
-+        error_setg(errp, "Only one TPM is allowed.");
-         return 1;
-     }
-=20
-     id =3D qemu_opts_id(opts);
-     if (id =3D=3D NULL) {
--        error_report(QERR_MISSING_PARAMETER, "id");
-+        error_setg(errp, QERR_MISSING_PARAMETER, "id");
-         return 1;
-     }
-=20
-     value =3D qemu_opt_get(opts, "type");
-     if (!value) {
--        error_report(QERR_MISSING_PARAMETER, "type");
-+        error_setg(errp, QERR_MISSING_PARAMETER, "type");
-         tpm_display_backend_drivers();
-         return 1;
-     }
-@@ -109,8 +109,8 @@ static int tpm_init_tpmdev(void *dummy, QemuOpts *opt=
-s, Error **errp)
-     i =3D qapi_enum_parse(&TpmType_lookup, value, -1, NULL);
-     be =3D i >=3D 0 ? tpm_be_find_by_type(i) : NULL;
-     if (be =3D=3D NULL) {
--        error_report(QERR_INVALID_PARAMETER_VALUE,
--                     "type", "a TPM backend type");
-+        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "type",
-+                   "a TPM backend type");
-         tpm_display_backend_drivers();
-         return 1;
-     }
-@@ -118,7 +118,7 @@ static int tpm_init_tpmdev(void *dummy, QemuOpts *opt=
-s, Error **errp)
-     /* validate backend specific opts */
-     qemu_opts_validate(opts, be->opts, &local_err);
-     if (local_err) {
--        error_report_err(local_err);
-+        error_propagate(errp, local_err);
-         return 1;
-     }
-=20
-@@ -151,14 +151,10 @@ void tpm_cleanup(void)
-  * Initialize the TPM. Process the tpmdev command line options describin=
-g the
-  * TPM backend.
-  */
--int tpm_init(void)
-+void tpm_init(void)
- {
--    if (qemu_opts_foreach(qemu_find_opts("tpmdev"),
--                          tpm_init_tpmdev, NULL, NULL)) {
--        return -1;
--    }
--
--    return 0;
-+    qemu_opts_foreach(qemu_find_opts("tpmdev"),
-+                      tpm_init_tpmdev, NULL, &error_fatal);
- }
-=20
- /*
 diff --git a/vl.c b/vl.c
-index 8e0006d49c..abfe991ed6 100644
+index 2a8ef05aef..65366b961e 100644
 --- a/vl.c
 +++ b/vl.c
-@@ -4359,9 +4359,7 @@ int main(int argc, char **argv, char **envp)
-                       user_creatable_add_opts_foreach,
-                       object_create_delayed, &error_fatal);
-=20
--    if (tpm_init() < 0) {
+@@ -1156,9 +1156,7 @@ static void default_drive(int enable, int snapshot, BlockInterfaceType type,
+     }
+ 
+     dinfo = drive_new(opts, type);
+-    if (!dinfo) {
 -        exit(1);
 -    }
-+    tpm_init();
-=20
-     /* init the bluetooth world */
-     if (foreach_device_config(DEV_BT, bt_parse))
---=20
++    assert(dinfo);
+     dinfo->is_default = true;
+ 
+ }
+-- 
 2.17.1
