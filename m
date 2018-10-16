@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53821)
+Received: from eggs.gnu.org ([208.118.235.92]:42297)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gCKdU-0007Ff-NY
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 04:24:24 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gCKrM-0000qQ-A8
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 04:38:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gCKcg-0001ab-RJ
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 04:23:24 -0400
-Date: Tue, 16 Oct 2018 09:21:18 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20181016082117.GB2426@work-vm>
-References: <20181010203735.27918-1-aclindsa@gmail.com>
-	<20181010203735.27918-4-aclindsa@gmail.com>
-	<3a964ae2-a5d0-5960-9e15-7ede929a8294@linaro.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1gCKZ5-0004sN-Px
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 04:19:45 -0400
+Received: from mail-ot1-x331.google.com ([2607:f8b0:4864:20::331]:45028)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gCKZ4-0004ly-GV
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 04:18:55 -0400
+Received: by mail-ot1-x331.google.com with SMTP id p23so21626431otf.11
+	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 01:18:51 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3a964ae2-a5d0-5960-9e15-7ede929a8294@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH v6 03/14] migration: Add post_save function
- to VMStateDescription
+In-Reply-To: <153962488126.21502.17134983449941187881.stgit@gimli.home>
+References: <153962488126.21502.17134983449941187881.stgit@gimli.home>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 16 Oct 2018 09:18:30 +0100
+Message-ID: <CAFEAcA_sH5OC45GftQqRGoyzDuVQZ7z-kVvviui9usyMqBXbww@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/6] vfio updates 2018-10-15
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,103 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: Aaron Lindsay <aclindsa@gmail.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Michael Spradling <mspradli@codeaurora.org>, qemu-devel@nongnu.org, Digant Desai <digantd@codeaurora.org>, Juan Quintela <quintela@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Eric Auger <eric.auger@redhat.com>, Li Qiang <liq3ea@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Geert Uytterhoeven <geert+renesas@glider.be>
 
-* Richard Henderson (richard.henderson@linaro.org) wrote:
-> On 10/10/18 1:37 PM, Aaron Lindsay wrote:
-> > In some cases it may be helpful to modify state before saving it for
-> > migration, and then modify the state back after it has been saved. The
-> > existing pre_save function provides half of this functionality. This
-> > patch adds a post_save function to provide the second half.
-> > 
-> > Signed-off-by: Aaron Lindsay <aclindsa@gmail.com>
-> > ---
-> >  docs/devel/migration.rst    |  9 +++++++--
-> >  include/migration/vmstate.h |  1 +
-> >  migration/vmstate.c         | 10 +++++++++-
-> >  3 files changed, 17 insertions(+), 3 deletions(-)
-> 
-> Hmm, maybe.  I believe the common practice is for pre_save to copy state into a
-> separate member on the side, so that conversion back isn't necessary.
-> 
-> Ccing in the migration maintainers for a second opinion.
+On 15 October 2018 at 18:36, Alex Williamson <alex.williamson@redhat.com> wrote:
+> The following changes since commit ff56877e911782dedc9a424233fd3f62369c258c:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/vga-20181015-pull-request' into staging (2018-10-15 15:03:45 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/awilliam/qemu-vfio.git tags/vfio-updates-20181015.0
+>
+> for you to fetch changes up to 2683ccd5be8f4bad197aa95bf29154640519f4c2:
+>
+>   vfio-pci: make vfio-pci device more QOM conventional (2018-10-15 11:22:29 -0600)
+>
+> ----------------------------------------------------------------
+> VFIO updates 2018-10-15
+>
+>  - ramfb support for vfio-pci via new -nohotplug device variant
+>    (Gerd Hoffmann)
+>
+>  - Preparation for generic DT pass-through in vfio-platform
+>    (Geert Uytterhoeven & Eric Auger)
+>
+>  - vfio-pci QOM fixups (Li Qiang)
+>
+> ----------------------------------------------------------------
 
-It is common to copy stuff into a separate member; however we do
-occasionally think that post_save would be a useful addition; so I think
-we should take it (if nothing else it actually makes stuff symmetric!).
+Applied, thanks.
 
-Please make it return 'int' in the same way that pre_save/pre_load
-does, so that it can fail and stop the migration.
-
-Dave
-
-> 
-> 
-> r~
-> 
-> > 
-> > diff --git a/docs/devel/migration.rst b/docs/devel/migration.rst
-> > index 687570754d..2a2533c9b3 100644
-> > --- a/docs/devel/migration.rst
-> > +++ b/docs/devel/migration.rst
-> > @@ -419,8 +419,13 @@ The functions to do that are inside a vmstate definition, and are called:
-> >  
-> >    This function is called before we save the state of one device.
-> >  
-> > -Example: You can look at hpet.c, that uses the three function to
-> > -massage the state that is transferred.
-> > +- ``void (*post_save)(void *opaque);``
-> > +
-> > +  This function is called after we save the state of one device
-> > +  (even upon failure, unless the call to pre_save returned and error).
-> > +
-> > +Example: You can look at hpet.c, that uses the first three functions
-> > +to massage the state that is transferred.
-> >  
-> >  The ``VMSTATE_WITH_TMP`` macro may be useful when the migration
-> >  data doesn't match the stored device data well; it allows an
-> > diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-> > index 2b501d0466..f6053b94e4 100644
-> > --- a/include/migration/vmstate.h
-> > +++ b/include/migration/vmstate.h
-> > @@ -185,6 +185,7 @@ struct VMStateDescription {
-> >      int (*pre_load)(void *opaque);
-> >      int (*post_load)(void *opaque, int version_id);
-> >      int (*pre_save)(void *opaque);
-> > +    void (*post_save)(void *opaque);
-> >      bool (*needed)(void *opaque);
-> >      VMStateField *fields;
-> >      const VMStateDescription **subsections;
-> > diff --git a/migration/vmstate.c b/migration/vmstate.c
-> > index 0bc240a317..9afc9298f3 100644
-> > --- a/migration/vmstate.c
-> > +++ b/migration/vmstate.c
-> > @@ -387,6 +387,9 @@ int vmstate_save_state_v(QEMUFile *f, const VMStateDescription *vmsd,
-> >                  if (ret) {
-> >                      error_report("Save of field %s/%s failed",
-> >                                   vmsd->name, field->name);
-> > +                    if (vmsd->post_save) {
-> > +                        vmsd->post_save(opaque);
-> > +                    }
-> >                      return ret;
-> >                  }
-> >  
-> > @@ -412,7 +415,12 @@ int vmstate_save_state_v(QEMUFile *f, const VMStateDescription *vmsd,
-> >          json_end_array(vmdesc);
-> >      }
-> >  
-> > -    return vmstate_subsection_save(f, vmsd, opaque, vmdesc);
-> > +    ret = vmstate_subsection_save(f, vmsd, opaque, vmdesc);
-> > +
-> > +    if (vmsd->post_save) {
-> > +        vmsd->post_save(opaque);
-> > +    }
-> > +    return ret;
-> >  }
-> >  
-> >  static const VMStateDescription *
-> > 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-- PMM
