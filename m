@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56943)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56916)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gCTME-0006Ay-IO
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:42:15 -0400
+	(envelope-from <armbru@redhat.com>) id 1gCTMC-00068v-Ky
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:42:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gCTMA-0000Fi-IG
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:42:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36378)
+	(envelope-from <armbru@redhat.com>) id 1gCTM9-0000ER-Hn
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:42:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36364)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gCTMA-0000EP-6E
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:42:10 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gCTM9-0000CD-0T
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:42:09 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 16 Oct 2018 19:41:46 +0200
-Message-Id: <20181016174158.15229-27-armbru@redhat.com>
+Date: Tue, 16 Oct 2018 19:41:51 +0200
+Message-Id: <20181016174158.15229-32-armbru@redhat.com>
 In-Reply-To: <20181016174158.15229-1-armbru@redhat.com>
 References: <20181016174158.15229-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 26/38] ui: Convert vnc_display_init(),
- init_keyboard_layout() to Error
+Subject: [Qemu-devel] [PATCH v3 31/38] fsdev: Clean up error reporting in
+ qemu_fsdev_add()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,205 +25,157 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Fei Li <fli@suse.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Greg Kurz <groug@kaod.org>
 
-From: Fei Li <fli@suse.com>
+Calling error_report() from within a function that takes an Error **
+argument is suspicious.  qemu_fsdev_add() does that, and its caller
+fsdev_init_func() then fails without setting an error.  Its caller
+main(), via qemu_opts_foreach(), is fine with it, but clean it up
+anyway.
 
-Signed-off-by: Fei Li <fli@suse.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Greg Kurz <groug@kaod.org>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Acked-by: Greg Kurz <groug@kaod.org>
 ---
- include/ui/console.h |  2 +-
- ui/curses.c          |  6 +++---
- ui/keymaps.c         | 11 ++++++-----
- ui/keymaps.h         |  2 +-
- ui/sdl.c             |  6 +++---
- ui/vnc.c             | 15 ++++++++++-----
- 6 files changed, 24 insertions(+), 18 deletions(-)
+ fsdev/qemu-fsdev-dummy.c |  2 +-
+ fsdev/qemu-fsdev.c       | 12 +++++-------
+ fsdev/qemu-fsdev.h       |  2 +-
+ hw/9pfs/xen-9p-backend.c |  7 ++++++-
+ vl.c                     |  8 +++-----
+ 5 files changed, 16 insertions(+), 15 deletions(-)
 
-diff --git a/include/ui/console.h b/include/ui/console.h
-index fb969caf70..c17803c530 100644
---- a/include/ui/console.h
-+++ b/include/ui/console.h
-@@ -453,7 +453,7 @@ void qemu_display_early_init(DisplayOptions *opts);
- void qemu_display_init(DisplayState *ds, DisplayOptions *opts);
-=20
- /* vnc.c */
--void vnc_display_init(const char *id);
-+void vnc_display_init(const char *id, Error **errp);
- void vnc_display_open(const char *id, Error **errp);
- void vnc_display_add_client(const char *id, int csock, bool skipauth);
- int vnc_display_password(const char *id, const char *password);
-diff --git a/ui/curses.c b/ui/curses.c
-index 59d819fd4d..f4e7a12f74 100644
---- a/ui/curses.c
-+++ b/ui/curses.c
-@@ -28,6 +28,7 @@
- #include <termios.h>
- #endif
-=20
-+#include "qapi/error.h"
- #include "qemu-common.h"
- #include "ui/console.h"
- #include "ui/input.h"
-@@ -421,9 +422,8 @@ static void curses_keyboard_setup(void)
-         keyboard_layout =3D "en-us";
- #endif
-     if(keyboard_layout) {
--        kbd_layout =3D init_keyboard_layout(name2keysym, keyboard_layout=
-);
--        if (!kbd_layout)
--            exit(1);
-+        kbd_layout =3D init_keyboard_layout(name2keysym, keyboard_layout=
-,
-+                                          &error_fatal);
-     }
- }
-=20
-diff --git a/ui/keymaps.c b/ui/keymaps.c
-index b05fb028dc..085889b555 100644
---- a/ui/keymaps.c
-+++ b/ui/keymaps.c
-@@ -27,6 +27,7 @@
- #include "sysemu/sysemu.h"
- #include "trace.h"
- #include "qemu/error-report.h"
-+#include "qapi/error.h"
-=20
- struct keysym2code {
-     uint32_t count;
-@@ -81,7 +82,7 @@ static void add_keysym(char *line, int keysym, int keyc=
-ode, kbd_layout_t *k)
-=20
- static int parse_keyboard_layout(kbd_layout_t *k,
-                                  const name2keysym_t *table,
--                                 const char *language)
-+                                 const char *language, Error **errp)
+diff --git a/fsdev/qemu-fsdev-dummy.c b/fsdev/qemu-fsdev-dummy.c
+index 6dc0fbc4c4..489cd29081 100644
+--- a/fsdev/qemu-fsdev-dummy.c
++++ b/fsdev/qemu-fsdev-dummy.c
+@@ -15,7 +15,7 @@
+ #include "qemu/config-file.h"
+ #include "qemu/module.h"
+ 
+-int qemu_fsdev_add(QemuOpts *opts)
++int qemu_fsdev_add(QemuOpts *opts, Error **errp)
  {
-     int ret;
-     FILE *f;
-@@ -95,7 +96,7 @@ static int parse_keyboard_layout(kbd_layout_t *k,
-     f =3D filename ? fopen(filename, "r") : NULL;
-     g_free(filename);
-     if (!f) {
--        fprintf(stderr, "Could not read keymap file: '%s'\n", language);
-+        error_setg(errp, "could not read keymap file: '%s'", language);
+     return 0;
+ }
+diff --git a/fsdev/qemu-fsdev.c b/fsdev/qemu-fsdev.c
+index 8a4afbffbd..7a3b87cc9e 100644
+--- a/fsdev/qemu-fsdev.c
++++ b/fsdev/qemu-fsdev.c
+@@ -30,7 +30,7 @@ static FsDriverTable FsDrivers[] = {
+     { .name = "proxy", .ops = &proxy_ops},
+ };
+ 
+-int qemu_fsdev_add(QemuOpts *opts)
++int qemu_fsdev_add(QemuOpts *opts, Error **errp)
+ {
+     int i;
+     struct FsDriverListEntry *fsle;
+@@ -38,10 +38,9 @@ int qemu_fsdev_add(QemuOpts *opts)
+     const char *fsdriver = qemu_opt_get(opts, "fsdriver");
+     const char *writeout = qemu_opt_get(opts, "writeout");
+     bool ro = qemu_opt_get_bool(opts, "readonly", 0);
+-    Error *local_err = NULL;
+ 
+     if (!fsdev_id) {
+-        error_report("fsdev: No id specified");
++        error_setg(errp, "fsdev: No id specified");
          return -1;
      }
-=20
-@@ -114,7 +115,7 @@ static int parse_keyboard_layout(kbd_layout_t *k,
-             continue;
+ 
+@@ -53,11 +52,11 @@ int qemu_fsdev_add(QemuOpts *opts)
          }
-         if (!strncmp(line, "include ", 8)) {
--            if (parse_keyboard_layout(k, table, line + 8) < 0) {
-+            if (parse_keyboard_layout(k, table, line + 8, errp) < 0) {
-                 ret =3D -1;
-                 goto out;
-             }
-@@ -172,13 +173,13 @@ out:
-=20
-=20
- kbd_layout_t *init_keyboard_layout(const name2keysym_t *table,
--                                   const char *language)
-+                                   const char *language, Error **errp)
- {
-     kbd_layout_t *k;
-=20
-     k =3D g_new0(kbd_layout_t, 1);
-     k->hash =3D g_hash_table_new(NULL, NULL);
--    if (parse_keyboard_layout(k, table, language) < 0) {
-+    if (parse_keyboard_layout(k, table, language, errp) < 0) {
-         g_hash_table_unref(k->hash);
-         g_free(k);
-         return NULL;
-diff --git a/ui/keymaps.h b/ui/keymaps.h
-index 0693588225..98213a4191 100644
---- a/ui/keymaps.h
-+++ b/ui/keymaps.h
-@@ -53,7 +53,7 @@ typedef struct {
- typedef struct kbd_layout_t kbd_layout_t;
-=20
- kbd_layout_t *init_keyboard_layout(const name2keysym_t *table,
--                                   const char *language);
-+                                   const char *language, Error **errp);
- int keysym2scancode(kbd_layout_t *k, int keysym,
-                     bool shift, bool altgr, bool ctrl);
- int keycode_is_keypad(kbd_layout_t *k, int keycode);
-diff --git a/ui/sdl.c b/ui/sdl.c
-index a5fd503c25..190b16f575 100644
---- a/ui/sdl.c
-+++ b/ui/sdl.c
-@@ -29,6 +29,7 @@
- #include <SDL.h>
- #include <SDL_syswm.h>
-=20
-+#include "qapi/error.h"
- #include "qemu-common.h"
- #include "qemu/cutils.h"
- #include "ui/console.h"
-@@ -917,9 +918,8 @@ static void sdl1_display_init(DisplayState *ds, Displ=
-ayOptions *o)
-         keyboard_layout =3D "en-us";
- #endif
-     if(keyboard_layout) {
--        kbd_layout =3D init_keyboard_layout(name2keysym, keyboard_layout=
-);
--        if (!kbd_layout)
--            exit(1);
-+        kbd_layout =3D init_keyboard_layout(name2keysym, keyboard_layout=
-,
-+                                          &error_fatal);
-     }
-=20
-     g_printerr("Running QEMU with SDL 1.2 is deprecated, and will be rem=
-oved\n"
-diff --git a/ui/vnc.c b/ui/vnc.c
-index cf221c83cc..98e3d3b1d8 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -3205,7 +3205,7 @@ static const DisplayChangeListenerOps dcl_ops =3D {
-     .dpy_cursor_define    =3D vnc_dpy_cursor_define,
- };
-=20
--void vnc_display_init(const char *id)
-+void vnc_display_init(const char *id, Error **errp)
- {
-     VncDisplay *vd;
-=20
-@@ -3222,13 +3222,14 @@ void vnc_display_init(const char *id)
-=20
-     if (keyboard_layout) {
-         trace_vnc_key_map_init(keyboard_layout);
--        vd->kbd_layout =3D init_keyboard_layout(name2keysym, keyboard_la=
-yout);
-+        vd->kbd_layout =3D init_keyboard_layout(name2keysym,
-+                                              keyboard_layout, errp);
+ 
+         if (i == ARRAY_SIZE(FsDrivers)) {
+-            error_report("fsdev: fsdriver %s not found", fsdriver);
++            error_setg(errp, "fsdev: fsdriver %s not found", fsdriver);
+             return -1;
+         }
      } else {
--        vd->kbd_layout =3D init_keyboard_layout(name2keysym, "en-us");
-+        vd->kbd_layout =3D init_keyboard_layout(name2keysym, "en-us", er=
-rp);
+-        error_report("fsdev: No fsdriver specified");
++        error_setg(errp, "fsdev: No fsdriver specified");
+         return -1;
      }
-=20
-     if (!vd->kbd_layout) {
--        exit(1);
-+        return;
+ 
+@@ -76,8 +75,7 @@ int qemu_fsdev_add(QemuOpts *opts)
      }
-=20
-     vd->share_policy =3D VNC_SHARE_POLICY_ALLOW_EXCLUSIVE;
-@@ -4079,7 +4080,11 @@ int vnc_init_func(void *opaque, QemuOpts *opts, Er=
-ror **errp)
-     char *id =3D (char *)qemu_opts_id(opts);
-=20
-     assert(id);
--    vnc_display_init(id);
-+    vnc_display_init(id, &local_err);
-+    if (local_err) {
-+        error_report_err(local_err);
-+        exit(1);
+ 
+     if (fsle->fse.ops->parse_opts) {
+-        if (fsle->fse.ops->parse_opts(opts, &fsle->fse, &local_err)) {
+-            error_report_err(local_err);
++        if (fsle->fse.ops->parse_opts(opts, &fsle->fse, errp)) {
+             g_free(fsle->fse.fsdev_id);
+             g_free(fsle);
+             return -1;
+diff --git a/fsdev/qemu-fsdev.h b/fsdev/qemu-fsdev.h
+index 65e4b1cfab..d9716b4144 100644
+--- a/fsdev/qemu-fsdev.h
++++ b/fsdev/qemu-fsdev.h
+@@ -38,7 +38,7 @@ typedef struct FsDriverListEntry {
+     QTAILQ_ENTRY(FsDriverListEntry) next;
+ } FsDriverListEntry;
+ 
+-int qemu_fsdev_add(QemuOpts *opts);
++int qemu_fsdev_add(QemuOpts *opts, Error **errp);
+ FsDriverEntry *get_fsdev_fsentry(char *id);
+ extern FileOperations local_ops;
+ extern FileOperations handle_ops;
+diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
+index 6026780f95..3f54a21c76 100644
+--- a/hw/9pfs/xen-9p-backend.c
++++ b/hw/9pfs/xen-9p-backend.c
+@@ -14,6 +14,7 @@
+ #include "hw/9pfs/9p.h"
+ #include "hw/xen/xen_backend.h"
+ #include "hw/9pfs/xen-9pfs.h"
++#include "qapi/error.h"
+ #include "qemu/config-file.h"
+ #include "qemu/option.h"
+ #include "fsdev/qemu-fsdev.h"
+@@ -355,6 +356,7 @@ static int xen_9pfs_free(struct XenDevice *xendev)
+ 
+ static int xen_9pfs_connect(struct XenDevice *xendev)
+ {
++    Error *err = NULL;
+     int i;
+     Xen9pfsDev *xen_9pdev = container_of(xendev, Xen9pfsDev, xendev);
+     V9fsState *s = &xen_9pdev->state;
+@@ -452,7 +454,10 @@ static int xen_9pfs_connect(struct XenDevice *xendev)
+     qemu_opt_set(fsdev, "path", xen_9pdev->path, NULL);
+     qemu_opt_set(fsdev, "security_model", xen_9pdev->security_model, NULL);
+     qemu_opts_set_id(fsdev, s->fsconf.fsdev_id);
+-    qemu_fsdev_add(fsdev);
++    qemu_fsdev_add(fsdev, &err);
++    if (err) {
++        error_report_err(err);
 +    }
-     vnc_display_open(id, &local_err);
-     if (local_err !=3D NULL) {
-         error_reportf_err(local_err, "Failed to start VNC server: ");
---=20
+     v9fs_device_realize_common(s, &xen_9p_transport, NULL);
+ 
+     return 0;
+diff --git a/vl.c b/vl.c
+index abfe991ed6..2a8ef05aef 100644
+--- a/vl.c
++++ b/vl.c
+@@ -2249,7 +2249,7 @@ static int chardev_init_func(void *opaque, QemuOpts *opts, Error **errp)
+ #ifdef CONFIG_VIRTFS
+ static int fsdev_init_func(void *opaque, QemuOpts *opts, Error **errp)
+ {
+-    return qemu_fsdev_add(opts);
++    return qemu_fsdev_add(opts, errp);
+ }
+ #endif
+ 
+@@ -4235,10 +4235,8 @@ int main(int argc, char **argv, char **envp)
+                       chardev_init_func, NULL, &error_fatal);
+ 
+ #ifdef CONFIG_VIRTFS
+-    if (qemu_opts_foreach(qemu_find_opts("fsdev"),
+-                          fsdev_init_func, NULL, NULL)) {
+-        exit(1);
+-    }
++    qemu_opts_foreach(qemu_find_opts("fsdev"),
++                      fsdev_init_func, NULL, &error_fatal);
+ #endif
+ 
+     if (qemu_opts_foreach(qemu_find_opts("device"),
+-- 
 2.17.1
