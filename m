@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53663)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55438)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gCRdf-00078J-NR
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:52:08 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1gCRiJ-0001Aw-8E
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:56:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gCRde-0003L7-Tk
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:52:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56826)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1gCRde-0003Kj-Mg
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:52:06 -0400
-Date: Tue, 16 Oct 2018 17:51:49 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20181016175149.69f608b8.cohuck@redhat.com>
-In-Reply-To: <20181016133220.GP31060@habkost.net>
-References: <20181013025435.25785-1-ehabkost@redhat.com>
-	<20181014173258-mutt-send-email-mst@kernel.org>
-	<20181015181404.GQ31060@habkost.net>
-	<20181016103930.287d0c2a.cohuck@redhat.com>
-	<20181016133220.GP31060@habkost.net>
+	(envelope-from <richard.henderson@linaro.org>) id 1gCRiF-0002kW-TC
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:56:55 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:37347)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gCRiF-0002e1-Dn
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:56:51 -0400
+Received: by mail-pl1-x642.google.com with SMTP id u6-v6so8494444plz.4
+	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 08:56:49 -0700 (PDT)
+References: <20181005211450.847-1-cota@braap.org>
+	<20181005211450.847-5-cota@braap.org>
+	<4f8df676-f854-e7fe-afed-51099a8abffe@linaro.org>
+	<6ae5b4c7-3300-2059-b648-855d7ea00488@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <4e8d6cb0-2fb0-df55-afed-d71c76b1e526@linaro.org>
+Date: Tue, 16 Oct 2018 08:56:45 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <6ae5b4c7-3300-2059-b648-855d7ea00488@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] virtio: Provide version-specific variants
- of virtio PCI devices
+Subject: Re: [Qemu-devel] [PATCH v3 4/4] cputlb: read CPUTLBEntry.addr_write
+ atomically
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,38 +34,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Fabian Deutsch <fdeutsch@redhat.com>, Markus Armbruster <armbru@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, Gerd Hoffmann <kraxel@redhat.com>, Laine Stump <laine@redhat.com>, Cleber Rosa <crosa@redhat.com>, Andrea Bolognani <abologna@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-On Tue, 16 Oct 2018 10:32:20 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
-
-> On Tue, Oct 16, 2018 at 10:39:30AM +0200, Cornelia Huck wrote:
-> > So, what I'd propose is:
-> > - virtio-*-pci-standard: compliant with the virtio standard 1.0 or
-> >   later; no legacy fallback
-> > - virtio-*-pci-transitional: compliant with the virtio standard 1.0 or
-> >   later; fallback to legacy included, as specified by the standard
-> > (- virtio-*-pci-legacy: legacy devices, should we need that for compat
-> > reasons)
-> > 
-> > We could also use '-virtio-1' instead of '-standard', if we do a major
-> > break with a 2.x standard (I don't see it yet). But having a new type
-> > for 1.1 sounds wrong.  
+On 10/15/18 11:03 PM, Paolo Bonzini wrote:
+> On 16/10/2018 04:52, Richard Henderson wrote:
+>> On 10/5/18 2:14 PM, Emilio G. Cota wrote:
+>>> -    target_ulong tlb_addr = env->tlb_table[mmu_idx][index].addr_write;
+>>> +    target_ulong tlb_addr =
+>>> +        atomic_read(&env->tlb_table[mmu_idx][index].addr_write);
+>>
+>> This fails for 32-bit hosts emulating 64-bit hosts.
+>> I think you need a separate helper function.  Perhaps
+>>
+>> static inline target_ulong tlb_addr_write(CPUTLBEntry *ent)
+>> {
+>> #if TCG_OVERSIZED_GUEST
+>>     return ent->addr_write;
+>> #else
+>>     return atomic_read(&ent->addr_write);
+>> #endif
+>> }
+>>
 > 
-> That's true: adding a new type for 1.1 is probably going to be
-> wrong.
-> 
-> But how can I make any promises about the existing device type
-> being compatible with 1.1 (or 1.2, 1.3...), if the 1.1 (or 1.2,
-> 1.3...) specification wasn't released yet?
+> Or just atomic_read__nocheck.
 
-I think the *goal* is to keep them compatible. We'll probably want to
-switch to virtio-2 should we want to do an explicit break in the future.
+No, it won't be present, necessarily.
 
-> 
-> Maybe using "-virtio-1" would be a good way to be clear we're
-> talking about virtio-1.x without making any promises about 1.1,
-> 1.2, 1.3, etc.
 
-It would fit the way this is supposed to work, yes.
+r~
