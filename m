@@ -1,25 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50866)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gCSyC-0007vc-FO
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:17:25 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1gCT5i-0001fb-IH
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:25:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gCSyA-0003PF-Gs
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:17:24 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:45349)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gCSy9-0003Ih-Dz
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:17:22 -0400
-Received: by mail-oi1-x242.google.com with SMTP id e17-v6so18704026oig.12
-	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 10:17:15 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20181016164243.13855-1-peter.maydell@linaro.org>
-References: <20181016164243.13855-1-peter.maydell@linaro.org>
+	(envelope-from <pm215@archaic.org.uk>) id 1gCT5h-0002hj-HT
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:25:10 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 16 Oct 2018 18:16:54 +0100
-Message-ID: <CAFEAcA9vpWQ5T7=JyUFMZhf6D5TW6Bq6-RAuOQtaoa2haLw1aA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/17] target-arm queue
+Date: Tue, 16 Oct 2018 18:25:03 +0100
+Message-Id: <20181016172503.27814-1-peter.maydell@linaro.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] block/vdi: Don't take address of fields in
+ packed structs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +20,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Stefan Weil <sw@weilnetz.de>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-On 16 October 2018 at 17:42, Peter Maydell <peter.maydell@linaro.org> wrote:
-> v2: dropped a couple of cadence_gem changes to ID regs that
-> caused new clang sanitizer warnings.
->
-> -- PMM
->
-> The following changes since commit dddb37495b844270088e68e3bf30b764d48d863f:
->
->   Merge remote-tracking branch 'remotes/awilliam/tags/vfio-updates-20181015.0' into staging (2018-10-15 18:44:04 +0100)
->
-> are available in the Git repository at:
->
->   https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20181016-1
->
-> for you to fetch changes up to 2ef297af07196c29446556537861f8e7dfeeae7b:
->
->   coccinelle: new inplace-byteswaps.cocci to remove inplace-byteswapping calls (2018-10-16 17:14:55 +0100)
->
-> ----------------------------------------------------------------
-> target-arm queue:
->  * hw/arm/virt: add DT property /secure-chosen/stdout-path indicating secure UART
->  * target/arm: Fix aarch64_sve_change_el wrt EL0
->  * target/arm: Define fields of ISAR registers
->  * target/arm: Align cortex-r5 id_isar0
->  * target/arm: Fix cortex-a7 id_isar0
->  * net/cadence_gem: Fix various bugs, add support for new
->    features that will be used by the Xilinx Versal board
->  * target-arm: powerctl: Enable HVC when starting CPUs to EL2
->  * target/arm: Add the Cortex-A72
->  * target/arm: Mark PMINTENCLR and PMINTENCLR_EL1 accesses as possibly doing IO
->  * target/arm: Mask PMOVSR writes based on supported counters
->  * target/arm: Initialize ARMMMUFaultInfo in v7m_stack_read/write
->  * coccinelle: new inplace-byteswaps.cocci to remove inplace-byteswapping calls
->
+Taking the address of a field in a packed struct is a bad idea, because
+it might not be actually aligned enough for that pointer type (and
+thus cause a crash on dereference on some host architectures). Newer
+versions of clang warn about this. Avoid the bug by not using the
+"modify in place" byte swapping functions.
 
-Applied, thanks.
+There are a few places where the in-place swap function is
+used on something other than a packed struct field; we convert
+those anyway, for consistency.
 
--- PMM
+Patch produced with scripts/coccinelle/inplace-byteswaps.cocci.
+
+There are other places where we take the address of a packed member
+in this file for other purposes than passing it to a byteswap
+function (all the calls to qemu_uuid_*()); we leave those for now.
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+Another "tested with make check" auto-conversion patch. In this
+case, as noted above, it doesn't fix all the warnings for the file,
+but we might as well put the easy part of the fix in. I'm not sure
+what to do with the qemu_uuid_*() calls. Something like
+     QemuUUID uuid_link = header->uuid_link;
+and then using "qemu_uuid_is_null(uuid_link)" rather than
+"qemu_uuid_is_null(&header.uuid_link)" ?
+Or we could macroise the relevant qemu_uuid functions (notably
+qemu_uuid_bswap()) or turn them into functions taking a QemuUUID
+rather than a QemuUUID*. Suggestions ?
+
+ block/vdi.c | 64 ++++++++++++++++++++++++++---------------------------
+ 1 file changed, 32 insertions(+), 32 deletions(-)
+
+diff --git a/block/vdi.c b/block/vdi.c
+index 6555cffb886..0ff1ead736c 100644
+--- a/block/vdi.c
++++ b/block/vdi.c
+@@ -187,22 +187,22 @@ typedef struct {
+ 
+ static void vdi_header_to_cpu(VdiHeader *header)
+ {
+-    le32_to_cpus(&header->signature);
+-    le32_to_cpus(&header->version);
+-    le32_to_cpus(&header->header_size);
+-    le32_to_cpus(&header->image_type);
+-    le32_to_cpus(&header->image_flags);
+-    le32_to_cpus(&header->offset_bmap);
+-    le32_to_cpus(&header->offset_data);
+-    le32_to_cpus(&header->cylinders);
+-    le32_to_cpus(&header->heads);
+-    le32_to_cpus(&header->sectors);
+-    le32_to_cpus(&header->sector_size);
+-    le64_to_cpus(&header->disk_size);
+-    le32_to_cpus(&header->block_size);
+-    le32_to_cpus(&header->block_extra);
+-    le32_to_cpus(&header->blocks_in_image);
+-    le32_to_cpus(&header->blocks_allocated);
++    header->signature = le32_to_cpu(header->signature);
++    header->version = le32_to_cpu(header->version);
++    header->header_size = le32_to_cpu(header->header_size);
++    header->image_type = le32_to_cpu(header->image_type);
++    header->image_flags = le32_to_cpu(header->image_flags);
++    header->offset_bmap = le32_to_cpu(header->offset_bmap);
++    header->offset_data = le32_to_cpu(header->offset_data);
++    header->cylinders = le32_to_cpu(header->cylinders);
++    header->heads = le32_to_cpu(header->heads);
++    header->sectors = le32_to_cpu(header->sectors);
++    header->sector_size = le32_to_cpu(header->sector_size);
++    header->disk_size = le64_to_cpu(header->disk_size);
++    header->block_size = le32_to_cpu(header->block_size);
++    header->block_extra = le32_to_cpu(header->block_extra);
++    header->blocks_in_image = le32_to_cpu(header->blocks_in_image);
++    header->blocks_allocated = le32_to_cpu(header->blocks_allocated);
+     qemu_uuid_bswap(&header->uuid_image);
+     qemu_uuid_bswap(&header->uuid_last_snap);
+     qemu_uuid_bswap(&header->uuid_link);
+@@ -211,22 +211,22 @@ static void vdi_header_to_cpu(VdiHeader *header)
+ 
+ static void vdi_header_to_le(VdiHeader *header)
+ {
+-    cpu_to_le32s(&header->signature);
+-    cpu_to_le32s(&header->version);
+-    cpu_to_le32s(&header->header_size);
+-    cpu_to_le32s(&header->image_type);
+-    cpu_to_le32s(&header->image_flags);
+-    cpu_to_le32s(&header->offset_bmap);
+-    cpu_to_le32s(&header->offset_data);
+-    cpu_to_le32s(&header->cylinders);
+-    cpu_to_le32s(&header->heads);
+-    cpu_to_le32s(&header->sectors);
+-    cpu_to_le32s(&header->sector_size);
+-    cpu_to_le64s(&header->disk_size);
+-    cpu_to_le32s(&header->block_size);
+-    cpu_to_le32s(&header->block_extra);
+-    cpu_to_le32s(&header->blocks_in_image);
+-    cpu_to_le32s(&header->blocks_allocated);
++    header->signature = cpu_to_le32(header->signature);
++    header->version = cpu_to_le32(header->version);
++    header->header_size = cpu_to_le32(header->header_size);
++    header->image_type = cpu_to_le32(header->image_type);
++    header->image_flags = cpu_to_le32(header->image_flags);
++    header->offset_bmap = cpu_to_le32(header->offset_bmap);
++    header->offset_data = cpu_to_le32(header->offset_data);
++    header->cylinders = cpu_to_le32(header->cylinders);
++    header->heads = cpu_to_le32(header->heads);
++    header->sectors = cpu_to_le32(header->sectors);
++    header->sector_size = cpu_to_le32(header->sector_size);
++    header->disk_size = cpu_to_le64(header->disk_size);
++    header->block_size = cpu_to_le32(header->block_size);
++    header->block_extra = cpu_to_le32(header->block_extra);
++    header->blocks_in_image = cpu_to_le32(header->blocks_in_image);
++    header->blocks_allocated = cpu_to_le32(header->blocks_allocated);
+     qemu_uuid_bswap(&header->uuid_image);
+     qemu_uuid_bswap(&header->uuid_last_snap);
+     qemu_uuid_bswap(&header->uuid_link);
+-- 
+2.19.0
