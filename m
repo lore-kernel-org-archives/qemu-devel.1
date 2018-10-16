@@ -1,38 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33972)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <akrowiak@linux.ibm.com>) id 1gCQmM-0005De-VF
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 10:57:03 -0400
+	(envelope-from <philmd@redhat.com>) id 1gCQor-0006RW-1h
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 10:59:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <akrowiak@linux.ibm.com>) id 1gCQmJ-0005tZ-N4
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 10:57:02 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33952)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <akrowiak@linux.ibm.com>)
-	id 1gCQmI-0005o6-QW
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 10:56:59 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w9GEpoGc004402
-	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 10:56:56 -0400
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2n5h5yug6r-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 10:56:55 -0400
-Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <akrowiak@linux.ibm.com>;
-	Tue, 16 Oct 2018 08:56:54 -0600
-References: <20181016115817.14605-1-cohuck@redhat.com>
-From: Tony Krowiak <akrowiak@linux.ibm.com>
-Date: Tue, 16 Oct 2018 10:56:50 -0400
+	(envelope-from <philmd@redhat.com>) id 1gCQon-0003zN-Oq
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 10:59:36 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:52501)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gCQon-0003n7-Ew
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 10:59:33 -0400
+Received: by mail-wm1-f68.google.com with SMTP id 189-v6so22790330wmw.2
+	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 07:59:31 -0700 (PDT)
+References: <20181012165347.2117-1-crosa@redhat.com>
+	<20181012165347.2117-2-crosa@redhat.com>
+	<94f7da55-eaa1-6e63-333c-894831b9d66e@redhat.com>
+	<20181013033747.GC31060@habkost.net>
+	<e5e90d50-4ff7-f8f1-db78-c65f46b8d928@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <08f053d3-9537-f5d7-ab48-a813a71a4cf1@redhat.com>
+Date: Tue, 16 Oct 2018 16:58:19 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181016115817.14605-1-cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <e5e90d50-4ff7-f8f1-db78-c65f46b8d928@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <b61ffb66-027e-ee78-6b89-f7bc7c7da7b9@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] s390x/vfio-ap: report correct error
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4 1/3] Bootstrap Python venv for tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,35 +33,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Caio Carrara <ccarrara@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <pmathieu@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-On 10/16/2018 07:58 AM, Cornelia Huck wrote:
-> If ioctl(..., VFIO_DEVICE_RESET) fails, we want to report errno
-> instead of ret (which is always -1 on error).
-> 
-> Fixes Coverity issue CID 1396176.
-> 
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
->   hw/vfio/ap.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
-> index 3962bb74e5..65de952f44 100644
-> --- a/hw/vfio/ap.c
-> +++ b/hw/vfio/ap.c
-> @@ -142,7 +142,7 @@ static void vfio_ap_reset(DeviceState *dev)
->       ret = ioctl(vapdev->vdev.fd, VFIO_DEVICE_RESET);
->       if (ret) {
->           error_report("%s: failed to reset %s device: %s", __func__,
-> -                     vapdev->vdev.name, strerror(ret));
-> +                     vapdev->vdev.name, strerror(errno));
->       }
->   }
+On 16/10/2018 15:50, Cleber Rosa wrote:
 
-Reviewed-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> On 10/12/18 11:37 PM, Eduardo Habkost wrote:
+>> On Fri, Oct 12, 2018 at 11:30:39PM +0200, Philippe Mathieu-Daudé wrote:
+>>> Hi Cleber,
+>>>
+>>> On 12/10/2018 18:53, Cleber Rosa wrote:
+>>>> A number of QEMU tests are written in Python, and may benefit
+>>>> from an untainted Python venv.
+>>>>
+>>>> By using make rules, tests that depend on specific Python libs
+>>>> can set that rule as a requirement, along with rules that require
+>>>> the presence or installation of specific libraries.
+>>>>
+>>>> The tests/venv-requirements.txt is supposed to contain the
+>>>> Python requirements that should be added to the venv created
+>>>> by check-venv.
+>>>
+>>> Maybe you (or Eduardo...) what you wrote in the cover:
+>>>
+>>>  There's one current caveat: it requires Python 3, as it's based on the
+>>>  venv module.
+>>>
+>>> To explain:
+>>>
+>>> $ make check-acceptance
+>>> /usr/bin/python2: No module named venv
+>>> make: *** [/home/phil/source/qemu/tests/Makefile.include:1033:] Error 1
+>>
+>> Oops, this doesn't look very friendly.
+>>
+>> But note that this would become a non-issue if we start requiring
+>> Python 3 for building QEMU.
+>>
+>>
+> 
+> IIUC, printing a "Can't create tests venv on Python 2", and aborting,
+> would be enough, right?
 
->   
+Certainly.
+
+> 
+> - Cleber.
+> 
+>>>
+>>>>
+>>>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+>>>> ---
+>>>>  tests/Makefile.include      | 20 ++++++++++++++++++++
+>>>>  tests/venv-requirements.txt |  3 +++
+>>>>  2 files changed, 23 insertions(+)
+>>>>  create mode 100644 tests/venv-requirements.txt
+>>>>
+>>>> diff --git a/tests/Makefile.include b/tests/Makefile.include
+>>>> index 5eadfd52f9..b66180efa1 100644
+>>>> --- a/tests/Makefile.include
+>>>> +++ b/tests/Makefile.include
+>>>> @@ -12,6 +12,7 @@ check-help:
+>>>>  	@echo " $(MAKE) check-block          Run block tests"
+>>>>  	@echo " $(MAKE) check-tcg            Run TCG tests"
+>>>>  	@echo " $(MAKE) check-report.html    Generates an HTML test report"
+>>>> +	@echo " $(MAKE) check-venv           Creates a Python venv for tests"
+>>>>  	@echo " $(MAKE) check-clean          Clean the tests"
+>>>>  	@echo
+>>>>  	@echo "Please note that HTML reports do not regenerate if the unit tests"
+>>>> @@ -1017,6 +1018,24 @@ check-decodetree:
+>>>>            ./check.sh "$(PYTHON)" "$(SRC_PATH)/scripts/decodetree.py", \
+>>>>            TEST, decodetree.py)
+>>>>  
+>>>> +# Python venv for running tests
+>>>> +
+>>>> +.PHONY: check-venv
+>>>> +
+>>>> +TESTS_VENV_DIR=$(BUILD_DIR)/tests/venv
+>>>> +TESTS_VENV_REQ=$(SRC_PATH)/tests/venv-requirements.txt
+>>>> +
+>>>> +$(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
+>>>> +	$(call quiet-command, \
+>>>> +            $(PYTHON) -m venv --system-site-packages $@, \
+>>>> +            VENV, $@)
+>>>> +	$(call quiet-command, \
+>>>> +            $(TESTS_VENV_DIR)/bin/python -m pip -q install -r $(TESTS_VENV_REQ), \
+>>>> +            PIP, $(TESTS_VENV_REQ))
+>>>> +	$(call quiet-command, touch $@)
+>>>
+>>> Hmm maybe we should print something like:
+>>>
+>>>   "You can now activate this virtual environment using:
+>>>     source $(TESTS_VENV_DIR)/tests/venv/bin/activate"
+>>
+>> I'm not sure this would be necessary: I expect usage of the venv
+>> to be completely transparent.
+>>
+>> If we require people to learn what venv is and manually activate
+>> it, I'd say we have failed to provide usable tools for running
+>> the tests.
+>>
+>>
+>>>
+>>>> +
+>>>> +check-venv: $(TESTS_VENV_DIR)
+>>>> +
+>>>>  # Consolidated targets
+>>>>  
+>>>>  .PHONY: check-qapi-schema check-qtest check-unit check check-clean
+>>>> @@ -1030,6 +1049,7 @@ check-clean:
+>>>>  	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
+>>>>  	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y)) $(check-qtest-generic-y))
+>>>>  	rm -f tests/test-qapi-gen-timestamp
+>>>> +	rm -rf $(TESTS_VENV_DIR)
+>>>>  
+>>>>  clean: check-clean
+>>>>  
+>>>> diff --git a/tests/venv-requirements.txt b/tests/venv-requirements.txt
+>>>> new file mode 100644
+>>>> index 0000000000..d39f9d1576
+>>>> --- /dev/null
+>>>> +++ b/tests/venv-requirements.txt
+>>>> @@ -0,0 +1,3 @@
+>>>> +# Add Python module requirements, one per line, to be installed
+>>>> +# in the tests/venv Python virtual environment. For more info,
+>>>> +# refer to: https://pip.pypa.io/en/stable/user_guide/#id1
+>>>>
+>>>
+>>> Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>>
 > 
