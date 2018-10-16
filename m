@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60897)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <smarkovic@wavecomp.com>) id 1gCPNw-0004WU-R0
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 09:27:45 -0400
+	(envelope-from <thuth@redhat.com>) id 1gCPPY-0005aM-5m
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 09:29:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <smarkovic@wavecomp.com>) id 1gCPNt-0003iU-Jy
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 09:27:44 -0400
-Received: from mail-eopbgr710122.outbound.protection.outlook.com
-	([40.107.71.122]:8853
-	helo=NAM05-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <smarkovic@wavecomp.com>)
-	id 1gCPNt-0003fM-B1
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 09:27:41 -0400
-References: <1539692044-15732-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1539692044-15732-2-git-send-email-aleksandar.markovic@rt-rk.com>
-From: Stefan Markovic <smarkovic@wavecomp.com>
-Message-ID: <637e0ef6-9e4a-5633-e082-38952c2bd8aa@wavecomp.com>
-Date: Tue, 16 Oct 2018 15:27:28 +0200
+	(envelope-from <thuth@redhat.com>) id 1gCPPO-0005DA-DP
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 09:29:18 -0400
+References: <20181016115817.14605-1-cohuck@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <390decd2-bcaa-15fd-7600-f7621622247f@redhat.com>
+Date: Tue, 16 Oct 2018 15:29:07 +0200
 MIME-Version: 1.0
-In-Reply-To: <1539692044-15732-2-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20181016115817.14605-1-cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 1/4] target/mips: Add basic description of
- MXU ASE
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH] s390x/vfio-ap: report correct
+ error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,60 +24,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net, jancraig@amazon.com, amarkovic@wavecomp.com, pjovanovic@wavecomp.com
+To: Cornelia Huck <cohuck@redhat.com>, Tony Krowiak <akrowiak@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Alex Williamson <alex.williamson@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-
-On 16.10.18. 14:14, Aleksandar Markovic wrote:
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
->
-> Add a comment that contains a basic description of MXU ASE.
->
-> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+On 2018-10-16 13:58, Cornelia Huck wrote:
+> If ioctl(..., VFIO_DEVICE_RESET) fails, we want to report errno
+> instead of ret (which is always -1 on error).
+> 
+> Fixes Coverity issue CID 1396176.
+> 
+> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 > ---
->   target/mips/translate.c | 20 ++++++++++++++++++++
->   1 file changed, 20 insertions(+)
->
-> diff --git a/target/mips/translate.c b/target/mips/translate.c
-> index ab16cdb..23e21c5 100644
-> --- a/target/mips/translate.c
-> +++ b/target/mips/translate.c
-> @@ -1389,6 +1389,26 @@ enum {
->       OPC_BINSRI_df   =3D (0x7 << 23) | OPC_MSA_BIT_09,
->   };
->  =20
-> +
-> +/*
-> + *    AN OVERVIEW OF MXU EXTENSTION INSTRUCTION SET
-> + *    =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>  hw/vfio/ap.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
+> index 3962bb74e5..65de952f44 100644
+> --- a/hw/vfio/ap.c
+> +++ b/hw/vfio/ap.c
+> @@ -142,7 +142,7 @@ static void vfio_ap_reset(DeviceState *dev)
+>      ret = ioctl(vapdev->vdev.fd, VFIO_DEVICE_RESET);
+>      if (ret) {
+>          error_report("%s: failed to reset %s device: %s", __func__,
+> -                     vapdev->vdev.name, strerror(ret));
+> +                     vapdev->vdev.name, strerror(errno));
+>      }
+>  }
+>  
+> 
 
-Misspelled EXTENSION. Otherwise:
-
-Reviewed-by: Stefan Markovic <smarkovic@wavecomp.com>
-
-
-> + *
-> + * MXU (full name: MIPS eXtension/enhanced Unit) is an SIMD extension of=
- MIPS32
-> + * instructions set. It is designed to fit the needs of signal, graphica=
-l and
-> + * video processing applications. MXU instruction set is used in Xburst =
-family
-> + * of microprocessors by Ingenic.
-> + *
-> + * MXU unit contains 17 registers called X0-X16. X0 is always zero, and =
-X16 is
-> + * the control register.
-> + *
-> + *   Compiled after:
-> + *
-> + *   "XBurst=C2=AE Instruction Set Architecture MIPS eXtension/enhanced =
-Unit
-> + *   Programming Manual", Ingenic Semiconductor Co, Ltd., 2017
-> + */
-> +
-> +
->   /* global register indices */
->   static TCGv cpu_gpr[32], cpu_PC;
->   static TCGv cpu_HI[MIPS_DSP_ACC], cpu_LO[MIPS_DSP_ACC];
+Reviewed-by: Thomas Huth <thuth@redhat.com>
