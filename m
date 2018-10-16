@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56698)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gCTM8-00064Q-U7
+	(envelope-from <armbru@redhat.com>) id 1gCTM9-00064g-9z
 	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:42:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gCTM6-00007m-At
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:42:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33590)
+	(envelope-from <armbru@redhat.com>) id 1gCTM7-00008o-4B
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:42:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56434)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gCTM6-00005w-0i
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gCTM6-000078-Oi
 	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:42:06 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 343C7BCD4A
-	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 17:42:05 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-50.ams2.redhat.com
-	[10.36.116.50])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 00F8961B7C
+	by mx1.redhat.com (Postfix) with ESMTPS id C96C43091751
 	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 17:42:05 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 16 Oct 2018 19:41:38 +0200
-Message-Id: <20181016174158.15229-19-armbru@redhat.com>
+Date: Tue, 16 Oct 2018 19:41:27 +0200
+Message-Id: <20181016174158.15229-8-armbru@redhat.com>
 In-Reply-To: <20181016174158.15229-1-armbru@redhat.com>
 References: <20181016174158.15229-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 18/38] vl: Clean up error reporting in
- parse_add_fd()
+Subject: [Qemu-devel] [PATCH v3 07/38] char: Use error_printf() to print
+ help and such
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,87 +34,59 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
 Calling error_report() in a function that takes an Error ** argument
-is suspicious.  parse_add_fd() does that, and then fails without
-setting an error.  Its caller main(), via qemu_opts_foreach(), is fine
-with it, but clean it up anyway.
+is suspicious.  Convert a few that are actually help and such to
+error_printf().
 
-Also change call of cleanup_add_fd(), which can't fail, for symmetry.
+Improves output of -chardev help from
 
+    qemu-system-x86_64: -chardev help: Available chardev backend types:
+    serial
+    ...
+
+to
+
+    Available chardev backend types:
+    serial
+    ...
+
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- vl.c | 22 +++++++++-------------
- 1 file changed, 9 insertions(+), 13 deletions(-)
+ chardev/char-pty.c | 2 +-
+ chardev/char.c     | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/vl.c b/vl.c
-index 643121e5d4..2ef066ad61 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1059,12 +1059,12 @@ static int parse_add_fd(void *opaque, QemuOpts *o=
-pts, Error **errp)
-     fd_opaque =3D qemu_opt_get(opts, "opaque");
+diff --git a/chardev/char-pty.c b/chardev/char-pty.c
+index e8d9a53476..f681d637c1 100644
+--- a/chardev/char-pty.c
++++ b/chardev/char-pty.c
+@@ -259,7 +259,7 @@ static void char_pty_open(Chardev *chr,
+     qemu_set_nonblock(master_fd);
 =20
-     if (fd < 0) {
--        error_report("fd option is required and must be non-negative");
-+        error_setg(errp, "fd option is required and must be non-negative=
-");
-         return -1;
+     chr->filename =3D g_strdup_printf("pty:%s", pty_name);
+-    error_report("char device redirected to %s (label %s)",
++    error_printf("char device redirected to %s (label %s)\n",
+                  pty_name, chr->label);
+=20
+     s =3D PTY_CHARDEV(chr);
+diff --git a/chardev/char.c b/chardev/char.c
+index e115166995..7f07a1bfbd 100644
+--- a/chardev/char.c
++++ b/chardev/char.c
+@@ -634,7 +634,7 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts, Error=
+ **errp)
+=20
+         chardev_name_foreach(help_string_append, str);
+=20
+-        error_report("Available chardev backend types: %s", str->str);
++        error_printf("Available chardev backend types: %s\n", str->str);
+         g_string_free(str, true);
+         return NULL;
      }
-=20
-     if (fd <=3D STDERR_FILENO) {
--        error_report("fd cannot be a standard I/O stream");
-+        error_setg(errp, "fd cannot be a standard I/O stream");
-         return -1;
-     }
-=20
-@@ -1074,12 +1074,12 @@ static int parse_add_fd(void *opaque, QemuOpts *o=
-pts, Error **errp)
-      */
-     flags =3D fcntl(fd, F_GETFD);
-     if (flags =3D=3D -1 || (flags & FD_CLOEXEC)) {
--        error_report("fd is not valid or already in use");
-+        error_setg(errp, "fd is not valid or already in use");
-         return -1;
-     }
-=20
-     if (fdset_id < 0) {
--        error_report("set option is required and must be non-negative");
-+        error_setg(errp, "set option is required and must be non-negativ=
-e");
-         return -1;
-     }
-=20
-@@ -1092,7 +1092,7 @@ static int parse_add_fd(void *opaque, QemuOpts *opt=
-s, Error **errp)
-     }
- #endif
-     if (dupfd =3D=3D -1) {
--        error_report("error duplicating fd: %s", strerror(errno));
-+        error_setg(errp, "error duplicating fd: %s", strerror(errno));
-         return -1;
-     }
-=20
-@@ -3983,15 +3983,11 @@ int main(int argc, char **argv, char **envp)
-     }
-=20
- #ifndef _WIN32
--    if (qemu_opts_foreach(qemu_find_opts("add-fd"),
--                          parse_add_fd, NULL, NULL)) {
--        exit(1);
--    }
-+    qemu_opts_foreach(qemu_find_opts("add-fd"),
-+                      parse_add_fd, NULL, &error_fatal);
-=20
--    if (qemu_opts_foreach(qemu_find_opts("add-fd"),
--                          cleanup_add_fd, NULL, NULL)) {
--        exit(1);
--    }
-+    qemu_opts_foreach(qemu_find_opts("add-fd"),
-+                      cleanup_add_fd, NULL, &error_fatal);
- #endif
-=20
-     current_machine =3D MACHINE(object_new(object_class_get_name(
 --=20
 2.17.1
