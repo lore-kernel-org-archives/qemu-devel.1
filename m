@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42070)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gCTwN-0006kT-Mo
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 14:19:36 -0400
+	(envelope-from <kwankhede@nvidia.com>) id 1gCTwT-0006nl-Bi
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 14:19:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gCTwH-0003hG-Q0
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 14:19:33 -0400
-Received: from pio-pvt-msa2.bahnhof.se ([79.136.2.41]:49895)
+	(envelope-from <kwankhede@nvidia.com>) id 1gCTwP-0003rX-PK
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 14:19:41 -0400
+Received: from hqemgate14.nvidia.com ([216.228.121.143]:6155)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gCTw9-0003bs-VC
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 14:19:24 -0400
-Date: Tue, 16 Oct 2018 20:19:16 +0200
-From: Fredrik Noring <noring@nocrew.org>
-Message-ID: <20181016181916.GB2323@sx9>
-References: <20181014142928.2784-1-f4bug@amsat.org> <20181014164140.GB2319@sx9>
-	<CAAdtpL5xQYwyR0VxqAhA3dW9ec2KW07n-GKrMCt=UjQqwsuYHQ@mail.gmail.com>
-	<alpine.LFD.2.21.1810142320320.16498@eddie.linux-mips.org>
-	<20181015170202.GB2364@sx9>
-	<BN6PR2201MB125130DFBDFBBE67B4CD57A9C6FE0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	(Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
+	id 1gCTwN-0003iS-Pn
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 14:19:37 -0400
+From: Kirti Wankhede <kwankhede@nvidia.com>
+Date: Tue, 16 Oct 2018 23:42:37 +0530
+Message-ID: <1539713558-2453-4-git-send-email-kwankhede@nvidia.com>
+In-Reply-To: <1539713558-2453-1-git-send-email-kwankhede@nvidia.com>
+References: <1539713558-2453-1-git-send-email-kwankhede@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <BN6PR2201MB125130DFBDFBBE67B4CD57A9C6FE0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-Subject: Re: [Qemu-devel] [PATCH] target/mips: Support Toshiba specific
- three-operand MADD and MADDU
+Content-Type: text/plain
+Subject: [Qemu-devel] [RFC PATCH v1 3/4] Add vfio_listerner_log_sync to mark
+ dirty pages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,42 +27,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <amarkovic@wavecomp.com>
-Cc: "Maciej W. Rozycki" <macro@linux-mips.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, =?utf-8?Q?J=C3=BCrgen?= Urban <JuergenUrban@gmx.de>
+To: alex.williamson@redhat.com, cjia@nvidia.com
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>
 
-Hi Aleksandar,
+vfio_listerner_log_sync gets list of dirty pages from vendor driver and mark
+those pages dirty.
 
-> A peculiar case of DMULTU would be interesting.
+Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+Reviewed-by: Neo Jia <cjia@nvidia.com>
+---
+ hw/vfio/common.c | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
-Agreed, DMULTU would be good to test as well. (DMULTU isn't part of the
-R5900 ISA, though.)
-
-> It would be nice to implement just a single instruction from MMI, let's
-> say PAND, and have a test for it.
-
-Most if not all multimedia instructions operate on 128-bit GPRs, which
-means all GPRs need to be extended. I suppose there are several ways to
-implement this. The definitions in target/mips/translate.c are:
-
-/* global register indices */
-static TCGv cpu_gpr[32], cpu_PC;
-static TCGv cpu_HI[MIPS_DSP_ACC], cpu_LO[MIPS_DSP_ACC];
-
-One option is to create a new array such as
-
-static TCGv_i64 mmi_gpr[32];
-
-that represents the upper 64 bits of each GPR. Then cpu_gpr must be of
-a 64-bit type too, even when QEMU runs in 32-bit user mode. The R5900
-does not implement CP0.Status.UX in hardware, though, so system mode is
-64 bits, regardless.
-
-Interestingly, LO and HI are also extended to 128 bits, where the upper
-64 bits are used for the I1 pipeline instructions MULT1, etc.
-
-Additionally, a special SA register contains the shift amount used by
-the 256-bit funnel shift multimedia instruction QFSRV.
-
-What are your thoughts on making these register extensions in QEMU?
-
-Fredrik
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index fb396cf00ac4..817d93750337 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -697,9 +697,41 @@ static void vfio_listener_region_del(MemoryListener *listener,
+     }
+ }
+ 
++static void vfio_listerner_log_sync(MemoryListener *listener,
++                                    MemoryRegionSection *section)
++{
++    uint64_t start_addr, size, pfn_count;
++    VFIOGroup *group;
++    VFIODevice *vbasedev;
++
++    QLIST_FOREACH(group, &vfio_group_list, next) {
++        QLIST_FOREACH(vbasedev, &group->device_list, next) {
++            switch (vbasedev->device_state) {
++            case VFIO_DEVICE_STATE_MIGRATION_PRECOPY_ACTIVE:
++            case VFIO_DEVICE_STATE_MIGRATION_STOPNCOPY_ACTIVE:
++                    continue;
++
++            default:
++                    return;
++            }
++        }
++    }
++
++    start_addr = TARGET_PAGE_ALIGN(section->offset_within_address_space);
++    size = int128_get64(section->size);
++    pfn_count = size >> TARGET_PAGE_BITS;
++
++    QLIST_FOREACH(group, &vfio_group_list, next) {
++        QLIST_FOREACH(vbasedev, &group->device_list, next) {
++            vfio_get_dirty_page_list(vbasedev, start_addr, pfn_count);
++        }
++    }
++}
++
+ static const MemoryListener vfio_memory_listener = {
+     .region_add = vfio_listener_region_add,
+     .region_del = vfio_listener_region_del,
++    .log_sync = vfio_listerner_log_sync,
+ };
+ 
+ static void vfio_listener_release(VFIOContainer *container)
+-- 
+2.7.0
