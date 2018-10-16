@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46200)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48304)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gCQ6F-0002ZW-GB
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 10:13:34 -0400
+	(envelope-from <crosa@redhat.com>) id 1gCQAm-0004FP-Nq
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 10:18:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gCQ6C-0003G8-Lp
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 10:13:29 -0400
-Date: Tue, 16 Oct 2018 16:12:43 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20181016141243.GH5620@dhcp-200-186.str.redhat.com>
-References: <20181012115532.12645-1-kwolf@redhat.com>
-	<20181012115532.12645-4-kwolf@redhat.com>
-	<e61301c2-5865-fb02-c45b-56b4a3622dc3@redhat.com>
+	(envelope-from <crosa@redhat.com>) id 1gCQAg-0001Yf-Gt
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 10:18:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59204)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gCQAg-0001Xm-7v
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 10:18:06 -0400
+References: <20181012165347.2117-1-crosa@redhat.com>
+	<20181012165347.2117-2-crosa@redhat.com>
+	<15152430-8023-2fac-2bbe-0876ac632e9d@redhat.com>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <43405fa7-d7b6-6549-c82d-ffc5c534d3f6@redhat.com>
+Date: Tue, 16 Oct 2018 10:17:59 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e61301c2-5865-fb02-c45b-56b4a3622dc3@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/8] block: Require auto-read-only for
- existing fallbacks
+In-Reply-To: <15152430-8023-2fac-2bbe-0876ac632e9d@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 1/3] Bootstrap Python venv for tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,100 +29,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
+To: ccarrara@redhat.com, qemu-devel@nongnu.org
+Cc: Laszlo Ersek <lersek@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <pmathieu@redhat.com>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-Am 12.10.2018 um 19:02 hat Eric Blake geschrieben:
-> On 10/12/18 6:55 AM, Kevin Wolf wrote:
-> > Some block drivers have traditionally changed their node to read-only
-> > mode without asking the user. This behaviour has been marked deprecated
-> > since 2.11, expecting users to provide an explicit read-only=on option.
-> > 
-> > Now that we have auto-read-only=on, enable these drivers to make use of
-> > the option.
-> > 
-> > This is the only use of bdrv_set_read_only(), so we can make it a bit
-> > more specific and turn it into a bdrv_apply_auto_read_only() that is
-> > more convenient for drivers to use.
-> > 
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> 
-> > +++ b/block.c
-> > @@ -266,27 +266,36 @@ int bdrv_can_set_read_only(BlockDriverState *bs, bool read_only,
-> >       return 0;
-> >   }
-> > -/* TODO Remove (deprecated since 2.11)
-> > - * Block drivers are not supposed to automatically change bs->read_only.
-> > - * Instead, they should just check whether they can provide what the user
-> > - * explicitly requested and error out if read-write is requested, but they can
-> > - * only provide read-only access. */
-> > -int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **errp)
-> > +/*
-> > + * Called by a driver that can only provide a read-only image.
-> > + *
-> > + * Returns 0 if the node is already read-only or it could switch the node to
-> > + * read-only because BDRV_O_AUTO_RDONLY is set.
-> > + *
-> > + * Returns -EACCES if the node is read-write and BDRV_O_AUTO_RDONLY is not set.
-> > + * If @errmsg is not NULL, it is used as the error message for the Error
-> > + * object.
-> 
-> I like it.
-> 
-> Worth documenting the -EINVAL (copy-on-read prevents setting read-only)
-> failure as well?  (The -EPERM failure of bdrv_can_set_read_only() is not
-> reachable, since this new function never clears readonly).
 
-In fact, -EINVAL and the error string from bdrv_can_set_read_only() may
-be confusing because the user didn't explicitly request a read-only
-image. Maybe it would be better to just turn this case into -EACCES with
-the same error message.
 
-What do you think?
-
-> > + */
-> > +int bdrv_apply_auto_read_only(BlockDriverState *bs, const char *errmsg,
-> > +                              Error **errp)
-> >   {
-> >       int ret = 0;
-> > -    ret = bdrv_can_set_read_only(bs, read_only, false, errp);
-> > +    if (!(bs->open_flags & BDRV_O_RDWR)) {
-> > +        return 0;
-> > +    }
-> > +    if (!(bs->open_flags & BDRV_O_AUTO_RDONLY)) {
-> > +        error_setg(errp, "%s", errmsg ?: "Image is read-only");
-> > +        return -EACCES;
-> > +    }
-> > +
-> > +    ret = bdrv_can_set_read_only(bs, true, false, errp);
-> >       if (ret < 0) {
-> >           return ret;
-> >       }
+On 10/15/18 3:04 PM, Caio Carrara wrote:
+> On 12-10-2018 13:53, Cleber Rosa wrote:
+>> A number of QEMU tests are written in Python, and may benefit
+>> from an untainted Python venv.
+>>
+>> By using make rules, tests that depend on specific Python libs
+>> can set that rule as a requirement, along with rules that require
+>> the presence or installation of specific libraries.
+>>
+>> The tests/venv-requirements.txt is supposed to contain the
+>> Python requirements that should be added to the venv created
+>> by check-venv.
+>>
+>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+>> ---
+>>  tests/Makefile.include      | 20 ++++++++++++++++++++
+>>  tests/venv-requirements.txt |  3 +++
 > 
-> Makes sense.
+> Any special reason to name `venv-requirements.txt` instead of only
+> `requirements.txt`? I think the second way is better (if there's no
+> cons) since it's the default from most of Python projects. Besides that
+> seems more semantic to have a `tests/requirements.txt` file that
+> registers the requirements for tests.
 > 
-> > +++ b/block/vvfat.c
-> > @@ -1262,16 +1262,10 @@ static int vvfat_open(BlockDriverState *bs, QDict *options, int flags,
-> >                          "Unable to set VVFAT to 'rw' when drive is read-only");
-> >               goto fail;
-> >           }
-> > -    } else  if (!bdrv_is_read_only(bs)) {
-> > -        error_report("Opening non-rw vvfat images without an explicit "
-> > -                     "read-only=on option is deprecated. Future versions "
-> > -                     "will refuse to open the image instead of "
-> > -                     "automatically marking the image read-only.");
-> > -        /* read only is the default for safety */
-> > -        ret = bdrv_set_read_only(bs, true, &local_err);
-> > +    } else {
-> > +        ret = bdrv_apply_auto_read_only(bs, NULL, errp);
-> >           if (ret < 0) {
-> > -            error_propagate(errp, local_err);
-> > -            goto fail;
-> > +            return ret;
+
+It was a decision based on the fact that other components may have other
+requirements, basically a namespace thing and a "explicit is better than
+implicit" thing.
+
+The env-requirements.txt file is not for "tests" in general, but for the
+tests that we want to be run out of the venv.  This can quickly become a
+different thing (look at the tests/docker, tests/vm, tests/migration, etc).
+
+> Still in this topic. As far as I could see, the files in `tests/`
+> directory are almost all C source code. The right place for the Python
+> requirements seems the `tests/acceptance/` directory specially because
+> the subject of all this patches. Keeping only one requirements file for
+> all kinds of tests (that uses Python) can be problematic in my opinion.
+> If it makes any sense, probably is also a good idea rename the target
+> from `check-venv` to something like `check-acceptance-venv`.
 > 
-> Don't you still need the goto fail, to avoid leaking opts?
 
-Yes, I do. Thanks.
+I agree with some of your points here.  The way I see this working is
+either:
 
-Kevin
+1) Have a single venv created for running Python based tests, and have
+its requirements listed in tests/venv-requirements.txt
+
+2) Have one venv created for every type of Python based tests, and have
+requirements.txt in the specific directories (such as
+tests/acceptance/requirements.txt, tests/vm/requirements.txt), and
+multiple `check-[type]-venv` targets.
+
+I obviously chose 1, simply because I find it overkill to have different
+venvs at this point.  I don't see the additional value option #2 would
+have at this point.
+
+- Cleber.
+
+>>  2 files changed, 23 insertions(+)
+>>  create mode 100644 tests/venv-requirements.txt
+>>
+>> diff --git a/tests/Makefile.include b/tests/Makefile.include
+>> index 5eadfd52f9..b66180efa1 100644
+>> --- a/tests/Makefile.include
+>> +++ b/tests/Makefile.include
+>> @@ -12,6 +12,7 @@ check-help:
+>>  	@echo " $(MAKE) check-block          Run block tests"
+>>  	@echo " $(MAKE) check-tcg            Run TCG tests"
+>>  	@echo " $(MAKE) check-report.html    Generates an HTML test report"
+>> +	@echo " $(MAKE) check-venv           Creates a Python venv for tests"
+>>  	@echo " $(MAKE) check-clean          Clean the tests"
+>>  	@echo
+>>  	@echo "Please note that HTML reports do not regenerate if the unit tests"
+>> @@ -1017,6 +1018,24 @@ check-decodetree:
+>>            ./check.sh "$(PYTHON)" "$(SRC_PATH)/scripts/decodetree.py", \
+>>            TEST, decodetree.py)
+>>  
+>> +# Python venv for running tests
+>> +
+>> +.PHONY: check-venv
+>> +
+>> +TESTS_VENV_DIR=$(BUILD_DIR)/tests/venv
+>> +TESTS_VENV_REQ=$(SRC_PATH)/tests/venv-requirements.txt
+>> +
+>> +$(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
+>> +	$(call quiet-command, \
+>> +            $(PYTHON) -m venv --system-site-packages $@, \
+>> +            VENV, $@)
+>> +	$(call quiet-command, \
+>> +            $(TESTS_VENV_DIR)/bin/python -m pip -q install -r $(TESTS_VENV_REQ), \
+>> +            PIP, $(TESTS_VENV_REQ))
+>> +	$(call quiet-command, touch $@)
+>> +
+>> +check-venv: $(TESTS_VENV_DIR)
+>> +
+>>  # Consolidated targets
+>>  
+>>  .PHONY: check-qapi-schema check-qtest check-unit check check-clean
+>> @@ -1030,6 +1049,7 @@ check-clean:
+>>  	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
+>>  	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y)) $(check-qtest-generic-y))
+>>  	rm -f tests/test-qapi-gen-timestamp
+>> +	rm -rf $(TESTS_VENV_DIR)
+>>  
+>>  clean: check-clean
+>>  
+>> diff --git a/tests/venv-requirements.txt b/tests/venv-requirements.txt
+>> new file mode 100644
+>> index 0000000000..d39f9d1576
+>> --- /dev/null
+>> +++ b/tests/venv-requirements.txt
+>> @@ -0,0 +1,3 @@
+>> +# Add Python module requirements, one per line, to be installed
+>> +# in the tests/venv Python virtual environment. For more info,
+>> +# refer to: https://pip.pypa.io/en/stable/user_guide/#id1
+>>
+> 
+> 
+
+-- 
+Cleber Rosa
+[ Sr Software Engineer - Virtualization Team - Red Hat ]
+[ Avocado Test Framework - avocado-framework.github.io ]
+[  7ABB 96EB 8B46 B94D 5E0F  E9BB 657E 8D33 A5F2 09F3  ]
