@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gCRce-0006b0-Iy
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:51:05 -0400
+	(envelope-from <cohuck@redhat.com>) id 1gCRdf-00078J-NR
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:52:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gCRcb-0001tf-E4
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:51:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50702)
+	(envelope-from <cohuck@redhat.com>) id 1gCRde-0003L7-Tk
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:52:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56826)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1gCRcb-0001rg-6Y
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:51:01 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 395585F72C
-	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 15:51:00 +0000 (UTC)
-Date: Tue, 16 Oct 2018 09:50:53 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20181016095053.1ee0727a@w520.home>
-In-Reply-To: <20181016094924.GA2427@work-vm>
-References: <20181015141841.09b945e5@w520.home> <20181016094924.GA2427@work-vm>
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1gCRde-0003Kj-Mg
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:52:06 -0400
+Date: Tue, 16 Oct 2018 17:51:49 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181016175149.69f608b8.cohuck@redhat.com>
+In-Reply-To: <20181016133220.GP31060@habkost.net>
+References: <20181013025435.25785-1-ehabkost@redhat.com>
+	<20181014173258-mutt-send-email-mst@kernel.org>
+	<20181015181404.GQ31060@habkost.net>
+	<20181016103930.287d0c2a.cohuck@redhat.com>
+	<20181016133220.GP31060@habkost.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] QEMU PCIe link "negotiation"
+Subject: Re: [Qemu-devel] [PATCH] virtio: Provide version-specific variants
+ of virtio PCI devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,42 +31,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Fabian Deutsch <fdeutsch@redhat.com>, Markus Armbruster <armbru@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, Gerd Hoffmann <kraxel@redhat.com>, Laine Stump <laine@redhat.com>, Cleber Rosa <crosa@redhat.com>, Andrea Bolognani <abologna@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
 
-On Tue, 16 Oct 2018 10:49:25 +0100
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+On Tue, 16 Oct 2018 10:32:20 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-> * Alex Williamson (alex.williamson@redhat.com) wrote:
-> > This email is already too long, but I also wonder whether we should
-> > consider additional vfio-pci interfaces to trigger a link retraining or
-> > allow virtualized access to the physical upstream port config space.
-> > Clearly we need to consider multi-function devices and whether there
-> > are useful configurations that could benefit from such access.  Thanks
-> > for reading, please discuss,  
+> On Tue, Oct 16, 2018 at 10:39:30AM +0200, Cornelia Huck wrote:
+> > So, what I'd propose is:
+> > - virtio-*-pci-standard: compliant with the virtio standard 1.0 or
+> >   later; no legacy fallback
+> > - virtio-*-pci-transitional: compliant with the virtio standard 1.0 or
+> >   later; fallback to legacy included, as specified by the standard
+> > (- virtio-*-pci-legacy: legacy devices, should we need that for compat
+> > reasons)
+> > 
+> > We could also use '-virtio-1' instead of '-standard', if we do a major
+> > break with a 2.x standard (I don't see it yet). But having a new type
+> > for 1.1 sounds wrong.  
 > 
-> I'm not sure about the consequences of the actual link speeds, but I
-> worry we'll hit things looking for PCIe v3 features; in particular
-> AMD's ROCm code needs PCIe atomics:
+> That's true: adding a new type for 1.1 is probably going to be
+> wrong.
 > 
-> https://github.com/RadeonOpenCompute/ROCm_Documentation/blob/master/Installation_Guide/More-about-how-ROCm-uses-PCIe-Atomics.rst
+> But how can I make any promises about the existing device type
+> being compatible with 1.1 (or 1.2, 1.3...), if the 1.1 (or 1.2,
+> 1.3...) specification wasn't released yet?
+
+I think the *goal* is to keep them compatible. We'll probably want to
+switch to virtio-2 should we want to do an explicit break in the future.
+
 > 
-> so it feels like getting that to work with passthrough would
-> need some negotiation of features.
+> Maybe using "-virtio-1" would be a good way to be clear we're
+> talking about virtio-1.x without making any promises about 1.1,
+> 1.2, 1.3, etc.
 
-Taking a quick read through the AtomicOps ECN, I think this is
-somewhat orthogonal to the link speeds and widths.  Support for acting
-as a completer or router of atomic ops is indicated through the DEVCAP2
-register in the PCIe capability, it's optional and should not be
-assumed by other newer PCIe features.  So I think we can tackle it
-separately, but indeed it does appear to be a difficult feature to
-implement correctly for a VM, at least if we attempt to do it
-automatically.  We might need to burden the user with this sort of
-configuration unless AtomicOps support is so ubiquitous that we can
-correctly assume that it's available between arbitrary endpoints which
-might be assigned to the same VM.  Probably a device option on the
-pcie-root-port device to expose atomic op support is possible in the
-short term, though more thorough reading of the spec is required.
-Thanks,
-
-Alex
+It would fit the way this is supposed to work, yes.
