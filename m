@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([208.118.235.92]:55621)
+Received: from eggs.gnu.org ([208.118.235.92]:57219)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gCKTu-0004nj-0e
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 04:13:35 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gCKWF-0005ZC-SA
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 04:16:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gCKTo-0006DK-ML
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 04:13:32 -0400
-References: <20181003193931.18096-1-richard.henderson@linaro.org>
-	<20181003193931.18096-9-richard.henderson@linaro.org>
-	<12df0e47-0105-a200-5ed8-0b0311d1b09f@redhat.com>
-	<bbee3d45-5cf0-dab7-c2be-b104762e8dc5@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <05ed2143-b852-cb56-02d6-510ec85414a8@redhat.com>
-Date: Tue, 16 Oct 2018 10:13:08 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1gCKVP-0008S3-0r
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 04:15:59 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:42646)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gCKVL-0008Jh-66
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 04:15:04 -0400
+Received: by mail-oi1-x241.google.com with SMTP id w81-v6so17309305oiw.9
+	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 01:14:58 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <bbee3d45-5cf0-dab7-c2be-b104762e8dc5@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 8/9] target/s390x: Skip
- wout, cout helpers if op helper does not return
+In-Reply-To: <20181015180130.GO31060@habkost.net>
+References: <20181013050227.17022-1-ehabkost@redhat.com>
+	<20181015093243.GE6785@redhat.com>
+	<CAFEAcA8MQ37JVCCPGyQa20n6AuU8Sv_pC9DoDoCKdQhqekpGnQ@mail.gmail.com>
+	<20181015101309.GD10459@localhost.localdomain>
+	<87woqjw4o3.fsf@dusky.pond.sub.org>
+	<CAFEAcA_H78rpT-9-M-NhTNXtMy8dpmC8_Yvb_4MyJ+GD8ZEptg@mail.gmail.com>
+	<20181015180130.GO31060@habkost.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 16 Oct 2018 09:14:37 +0100
+Message-ID: <CAFEAcA_8AbfCJRO+1TvmDmOMMw_1LSKsLAT9+1pY9Nhy_Si74Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC] Require Python 3 for building QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,69 +34,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
-On 11/10/2018 18:47, Richard Henderson wrote:
-> On 10/11/18 1:06 AM, David Hildenbrand wrote:
->> On 03/10/2018 21:39, Richard Henderson wrote:
->>> When op raises an exception, it may not have initialized the output
->>> temps that would be written back by wout or cout.
->>>
->>> Cc: qemu-s390x@nongnu.org
->>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->>> ---
->>>  target/s390x/translate.c | 12 +++++++-----
->>>  1 file changed, 7 insertions(+), 5 deletions(-)
->>>
->>> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
->>> index 7363aabf3a..7fad3ad8e9 100644
->>> --- a/target/s390x/translate.c
->>> +++ b/target/s390x/translate.c
->>> @@ -6164,11 +6164,13 @@ static DisasJumpType translate_one(CPUS390XState *env, DisasContext *s)
->>>      if (insn->help_op) {
->>>          ret = insn->help_op(s, &o);
->>>      }
->>> -    if (insn->help_wout) {
->>> -        insn->help_wout(s, &f, &o);
->>> -    }
->>> -    if (insn->help_cout) {
->>> -        insn->help_cout(s, &o);
->>> +    if (ret != DISAS_NORETURN) {
->>> +        if (insn->help_wout) {
->>> +            insn->help_wout(s, &f, &o);
->>> +        }
->>> +        if (insn->help_cout) {
->>> +            insn->help_cout(s, &o);
->>> +        }
->>>      }
->>>  
->>>      /* Free any temporaries created by the helpers.  */
->>>
->>
->> What about things like LPSW/LPWSE ? They certainly don't imply that we
->> had an exception.
-> 
-> Exception in the tcg sense, not the guest architectural sense, in that we call
-> cpu_loop_exit from the helper, which performs a longjmp.  (Incidentally,
-> there's no reason to do that for load_psw -- we could just exit the tb normally.)
-> 
->> (these two don't use wout/cout, so it is still fine, but I would prefer
->> a comment somewhere because otherwise it is really easy to miss that
->> DISAS_NORETURN makes us skip these handlers)
-> 
-> Where would you like me to place that comment?  In the DisasInsn definition?
+On 15 October 2018 at 19:01, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> On Mon, Oct 15, 2018 at 05:55:27PM +0100, Peter Maydell wrote:
+>> I also suspect "a few months" is an underestimate. My guess
+>> would be we're going to want to keep Python 2 support for
+>> at least the next year, maybe two.
+>
+> Python 2.7 will die in less than 15 months[1].  I really want us
+> to stop reviewing and maintaining Python 2 code in QEMU in less
+> than 1 year.  Preferably in less than 6 months.
 
-That probably makes sense!
+Well, as with all our dependencies it depends on what the
+default python is in the various LTS distro versions we
+support. Once the last LTS distro with python 2 falls off
+our this-is-what-we-support list we can drop 2 support,
+possibly with a deprecate-and-warn-then-drop cycle.
 
-> 
-> 
-> r~
-> 
-
-
--- 
-
-Thanks,
-
-David / dhildenb
+thanks
+-- PMM
