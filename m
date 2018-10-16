@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1gCNFI-0000X1-1X
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 07:10:41 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1gCNFJ-0000Y2-T9
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 07:10:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1gCNFE-00031L-2R
+	(envelope-from <guangrong.xiao@gmail.com>) id 1gCNFE-00032a-Df
 	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 07:10:38 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:43669)
+Received: from mail-pf1-x42c.google.com ([2607:f8b0:4864:20::42c]:39709)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1gCNFD-0002t2-Jc
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 07:10:35 -0400
-Received: by mail-pl1-x643.google.com with SMTP id 30-v6so10844975plb.10
-	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 04:10:32 -0700 (PDT)
+	id 1gCNFE-0002Yn-29
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 07:10:36 -0400
+Received: by mail-pf1-x42c.google.com with SMTP id c25-v6so11291524pfe.6
+	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 04:10:20 -0700 (PDT)
 From: guangrong.xiao@gmail.com
-Date: Tue, 16 Oct 2018 19:10:06 +0800
-Message-Id: <20181016111006.629-5-xiaoguangrong@tencent.com>
+Date: Tue, 16 Oct 2018 19:10:03 +0800
+Message-Id: <20181016111006.629-2-xiaoguangrong@tencent.com>
 In-Reply-To: <20181016111006.629-1-xiaoguangrong@tencent.com>
 References: <20181016111006.629-1-xiaoguangrong@tencent.com>
-Subject: [Qemu-devel] [PATCH 4/4] migration: use lockless Multithread model
- for decompression
+Subject: [Qemu-devel] [PATCH 1/4] ptr_ring: port ptr_ring from linux kernel
+ to QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,318 +32,263 @@ Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redh
 
 From: Xiao Guangrong <xiaoguangrong@tencent.com>
 
-Adapt the compression code to the lockless multithread model
+ptr_ring is good to minimize cache-contention and has the simple model
+of memory barrier which will be used by lockless threads model to pass
+requests between main migration thread and compression threads
+
+Some changes are made:
+1) drop unnecessary APIs, e.g, for _irq, _bh APIs
+2) the resize APIs has not been ported
+3) drop the locks
+4) adjust some comments
+5) new API, ptr_ring_disable_batch, has been introduced
 
 Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
 ---
- migration/ram.c | 223 ++++++++++++++++++++------------------------------------
- 1 file changed, 78 insertions(+), 145 deletions(-)
+ include/qemu/ptr_ring.h | 235 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 235 insertions(+)
+ create mode 100644 include/qemu/ptr_ring.h
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 2356bc255c..99dc9d1911 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -350,25 +350,9 @@ typedef struct PageSearchStatus PageSearchStatus;
- 
- CompressionStats compression_counters;
- 
--struct DecompressParam {
--    bool done;
--    bool quit;
--    QemuMutex mutex;
--    QemuCond cond;
--    void *des;
--    uint8_t *compbuf;
--    int len;
--    z_stream stream;
--};
--typedef struct DecompressParam DecompressParam;
--
- static const QEMUFileOps empty_ops = { };
- 
- static QEMUFile *decomp_file;
--static DecompressParam *decomp_param;
--static QemuThread *decompress_threads;
--static QemuMutex decomp_done_lock;
--static QemuCond decomp_done_cond;
- 
- /* Multiple fd's */
- 
-@@ -3382,6 +3366,7 @@ void ram_handle_compressed(void *host, uint8_t ch, uint64_t size)
-     }
- }
- 
+diff --git a/include/qemu/ptr_ring.h b/include/qemu/ptr_ring.h
+new file mode 100644
+index 0000000000..d8266d45f6
+--- /dev/null
++++ b/include/qemu/ptr_ring.h
+@@ -0,0 +1,235 @@
++/*
++ *    Definitions for the 'struct ptr_ring' datastructure.
++ *
++ *    Author:
++ *        Michael S. Tsirkin <mst@redhat.com>
++ *        Xiao Guangrong <xiaoguangrong@tencent.com>
++ *
++ *    Copyright (C) 2018 Red Hat, Inc.
++ *    Copyright (C) 2018 Tencent, Inc.
++ *
++ *    This program is free software; you can redistribute it and/or modify it
++ *    under the terms of the GNU General Public License as published by the
++ *    Free Software Foundation; either version 2 of the License, or (at your
++ *    option) any later version.
++ *
++ *    This is a limited-size FIFO maintaining pointers in FIFO order, with
++ *    one CPU producing entries and another consuming entries from a FIFO.
++ *
++ *    This implementation tries to minimize cache-contention when there is a
++ *    single producer and a single consumer CPU.
++ */
 +
- /* return the size after decompression, or negative value on error */
- static int
- qemu_uncompress_data(z_stream *stream, uint8_t *dest, size_t dest_len,
-@@ -3407,166 +3392,114 @@ qemu_uncompress_data(z_stream *stream, uint8_t *dest, size_t dest_len,
-     return stream->total_out;
- }
- 
--static void *do_data_decompress(void *opaque)
--{
--    DecompressParam *param = opaque;
--    unsigned long pagesize;
--    uint8_t *des;
--    int len, ret;
--
--    qemu_mutex_lock(&param->mutex);
--    while (!param->quit) {
--        if (param->des) {
--            des = param->des;
--            len = param->len;
--            param->des = 0;
--            qemu_mutex_unlock(&param->mutex);
--
--            pagesize = TARGET_PAGE_SIZE;
--
--            ret = qemu_uncompress_data(&param->stream, des, pagesize,
--                                       param->compbuf, len);
--            if (ret < 0 && migrate_get_current()->decompress_error_check) {
--                error_report("decompress data failed");
--                qemu_file_set_error(decomp_file, ret);
--            }
-+struct DecompressData {
-+    /* filled by migration thread.*/
-+    void *des;
-+    uint8_t *compbuf;
-+    size_t len;
- 
--            qemu_mutex_lock(&decomp_done_lock);
--            param->done = true;
--            qemu_cond_signal(&decomp_done_cond);
--            qemu_mutex_unlock(&decomp_done_lock);
-+    z_stream stream;
-+    ThreadRequest request;
++#ifndef _QEMU_PTR_RING_H
++#define _QEMU_PTR_RING_H 1
++
++#include "qemu/compiler.h"
++#include "qemu/atomic.h"
++
++#define SMP_CACHE_BYTES      64
++#define ____cacheline_aligned_in_smp \
++        __attribute__((__aligned__(SMP_CACHE_BYTES)))
++
++#define WRITE_ONCE(ptr, val) \
++    (*((volatile typeof(ptr) *)(&(ptr))) = (val))
++#define READ_ONCE(ptr) (*((volatile typeof(ptr) *)(&(ptr))))
++
++struct ptr_ring {
++    int producer ____cacheline_aligned_in_smp;
++    int consumer_head ____cacheline_aligned_in_smp; /* next valid entry */
++    int consumer_tail; /* next entry to invalidate */
++    /* Shared consumer/producer data */
++    /* Read-only by both the producer and the consumer */
++    int size ____cacheline_aligned_in_smp; /* max entries in queue */
++    int batch; /* number of entries to consume in a batch */
++    void **queue;
 +};
-+typedef struct DecompressData DecompressData;
- 
--            qemu_mutex_lock(&param->mutex);
--        } else {
--            qemu_cond_wait(&param->cond, &param->mutex);
--        }
-+static Threads *decompress_threads;
++typedef struct ptr_ring Ptr_Ring;
 +
-+static ThreadRequest *decompress_thread_data_init(void)
++/*
++ * Note: callers invoking this in a loop must use a compiler barrier,
++ * for example cpu_relax().
++ */
++static inline bool ptr_ring_full(struct ptr_ring *r)
 +{
-+    DecompressData *dd = g_new0(DecompressData, 1);
-+
-+    if (inflateInit(&dd->stream) != Z_OK) {
-+        g_free(dd);
-+        return NULL;
-     }
--    qemu_mutex_unlock(&param->mutex);
- 
--    return NULL;
-+    dd->compbuf = g_malloc0(compressBound(TARGET_PAGE_SIZE));
-+    return &dd->request;
- }
- 
--static int wait_for_decompress_done(void)
-+static void decompress_thread_data_fini(ThreadRequest *request)
- {
--    int idx, thread_count;
-+    DecompressData *dd = container_of(request, DecompressData, request);
- 
--    if (!migrate_use_compression()) {
--        return 0;
--    }
-+    inflateEnd(&dd->stream);
-+    g_free(dd->compbuf);
-+    g_free(dd);
++    return r->queue[r->producer];
 +}
- 
--    thread_count = migrate_decompress_threads();
--    qemu_mutex_lock(&decomp_done_lock);
--    for (idx = 0; idx < thread_count; idx++) {
--        while (!decomp_param[idx].done) {
--            qemu_cond_wait(&decomp_done_cond, &decomp_done_lock);
--        }
-+static void decompress_thread_data_handler(ThreadRequest *request)
-+{
-+    DecompressData *dd = container_of(request, DecompressData, request);
-+    unsigned long pagesize = TARGET_PAGE_SIZE;
-+    int ret;
 +
-+    ret = qemu_uncompress_data(&dd->stream, dd->des, pagesize,
-+                               dd->compbuf, dd->len);
-+    if (ret < 0 && migrate_get_current()->decompress_error_check) {
-+        error_report("decompress data failed");
-+        qemu_file_set_error(decomp_file, ret);
-     }
--    qemu_mutex_unlock(&decomp_done_lock);
--    return qemu_file_get_error(decomp_file);
- }
- 
--static void compress_threads_load_cleanup(void)
-+static void decompress_thread_data_done(ThreadRequest *data)
- {
--    int i, thread_count;
++/*
++ * Note: callers invoking this in a loop must use a compiler barrier,
++ * for example cpu_relax().
++ *
++ * Callers are responsible for making sure pointer that is being queued
++ * points to a valid data.
++ */
++static inline int ptr_ring_produce(struct ptr_ring *r, void *ptr)
++{
++    if (unlikely(!r->size) || r->queue[r->producer])
++        return -ENOSPC;
++
++    /* Make sure the pointer we are storing points to a valid data. */
++    /* Pairs with READ_ONCE in ptr_ring_consume. */
++    smp_wmb();
++
++    WRITE_ONCE(r->queue[r->producer++], ptr);
++    if (unlikely(r->producer >= r->size))
++        r->producer = 0;
++    return 0;
 +}
- 
-+static int decompress_init(QEMUFile *f)
++
++static inline void *__ptr_ring_peek(struct ptr_ring *r)
 +{
-     if (!migrate_use_compression()) {
--        return;
-+        return 0;
-     }
--    thread_count = migrate_decompress_threads();
--    for (i = 0; i < thread_count; i++) {
--        /*
--         * we use it as a indicator which shows if the thread is
--         * properly init'd or not
--         */
--        if (!decomp_param[i].compbuf) {
--            break;
--        }
- 
--        qemu_mutex_lock(&decomp_param[i].mutex);
--        decomp_param[i].quit = true;
--        qemu_cond_signal(&decomp_param[i].cond);
--        qemu_mutex_unlock(&decomp_param[i].mutex);
--    }
--    for (i = 0; i < thread_count; i++) {
--        if (!decomp_param[i].compbuf) {
--            break;
--        }
-+    decomp_file = f;
-+    decompress_threads = threads_create(migrate_decompress_threads(),
-+                             "decompress",
-+                             DEFAULT_THREAD_RING_SIZE,
-+                             decompress_thread_data_init,
-+                             decompress_thread_data_fini,
-+                             decompress_thread_data_handler,
-+                             decompress_thread_data_done);
-+    return decompress_threads ? 0 : -1;
++    if (likely(r->size))
++        return READ_ONCE(r->queue[r->consumer_head]);
++    return NULL;
 +}
- 
--        qemu_thread_join(decompress_threads + i);
--        qemu_mutex_destroy(&decomp_param[i].mutex);
--        qemu_cond_destroy(&decomp_param[i].cond);
--        inflateEnd(&decomp_param[i].stream);
--        g_free(decomp_param[i].compbuf);
--        decomp_param[i].compbuf = NULL;
-+static void decompress_fini(void)
++
++/*
++ * Test ring empty status.
++ *
++ * However, if some other CPU consumes ring entries at the same time,
++ * the value returned is not guaranteed to be correct.
++ *
++ * In this case - to avoid incorrectly detecting the ring
++ * as empty - the CPU consuming the ring entries is responsible
++ * for either consuming all ring entries until the ring is empty,
++ * or synchronizing with some other CPU and causing it to
++ * re-test ptr_ring_empty and/or consume the ring enteries
++ * after the synchronization point.
++ *
++ * Note: callers invoking this in a loop must use a compiler barrier,
++ * for example cpu_relax().
++ */
++static inline bool ptr_ring_empty(struct ptr_ring *r)
 +{
-+    if (!decompress_threads) {
-+        return;
-     }
--    g_free(decompress_threads);
--    g_free(decomp_param);
++    if (likely(r->size))
++        return !r->queue[READ_ONCE(r->consumer_head)];
++    return true;
++}
 +
-+    threads_destroy(decompress_threads);
-     decompress_threads = NULL;
--    decomp_param = NULL;
-     decomp_file = NULL;
- }
- 
--static int compress_threads_load_setup(QEMUFile *f)
-+static int flush_decompressed_data(void)
- {
--    int i, thread_count;
--
-     if (!migrate_use_compression()) {
-         return 0;
-     }
- 
--    thread_count = migrate_decompress_threads();
--    decompress_threads = g_new0(QemuThread, thread_count);
--    decomp_param = g_new0(DecompressParam, thread_count);
--    qemu_mutex_init(&decomp_done_lock);
--    qemu_cond_init(&decomp_done_cond);
--    decomp_file = f;
--    for (i = 0; i < thread_count; i++) {
--        if (inflateInit(&decomp_param[i].stream) != Z_OK) {
--            goto exit;
--        }
--
--        decomp_param[i].compbuf = g_malloc0(compressBound(TARGET_PAGE_SIZE));
--        qemu_mutex_init(&decomp_param[i].mutex);
--        qemu_cond_init(&decomp_param[i].cond);
--        decomp_param[i].done = true;
--        decomp_param[i].quit = false;
--        qemu_thread_create(decompress_threads + i, "decompress",
--                           do_data_decompress, decomp_param + i,
--                           QEMU_THREAD_JOINABLE);
--    }
--    return 0;
--exit:
--    compress_threads_load_cleanup();
--    return -1;
-+    threads_wait_done(decompress_threads);
-+    return qemu_file_get_error(decomp_file);
- }
- 
- static void decompress_data_with_multi_threads(QEMUFile *f,
--                                               void *host, int len)
-+                                               void *host, size_t len)
- {
--    int idx, thread_count;
-+    ThreadRequest *request;
-+    DecompressData *dd;
- 
--    thread_count = migrate_decompress_threads();
--    qemu_mutex_lock(&decomp_done_lock);
--    while (true) {
--        for (idx = 0; idx < thread_count; idx++) {
--            if (decomp_param[idx].done) {
--                decomp_param[idx].done = false;
--                qemu_mutex_lock(&decomp_param[idx].mutex);
--                qemu_get_buffer(f, decomp_param[idx].compbuf, len);
--                decomp_param[idx].des = host;
--                decomp_param[idx].len = len;
--                qemu_cond_signal(&decomp_param[idx].cond);
--                qemu_mutex_unlock(&decomp_param[idx].mutex);
--                break;
--            }
--        }
--        if (idx < thread_count) {
--            break;
--        } else {
--            qemu_cond_wait(&decomp_done_cond, &decomp_done_lock);
--        }
-+retry:
-+    request = threads_submit_request_prepare(decompress_threads);
-+    if (!request) {
-+        goto retry;
-     }
--    qemu_mutex_unlock(&decomp_done_lock);
++/* Must only be called after __ptr_ring_peek returned !NULL */
++static inline void __ptr_ring_discard_one(struct ptr_ring *r)
++{
++    /* Fundamentally, what we want to do is update consumer
++     * index and zero out the entry so producer can reuse it.
++     * Doing it naively at each consume would be as simple as:
++     *       consumer = r->consumer;
++     *       r->queue[consumer++] = NULL;
++     *       if (unlikely(consumer >= r->size))
++     *               consumer = 0;
++     *       r->consumer = consumer;
++     * but that is suboptimal when the ring is full as producer is writing
++     * out new entries in the same cache line.  Defer these updates until a
++     * batch of entries has been consumed.
++     */
++    /* Note: we must keep consumer_head valid at all times for ptr_ring_empty
++     * to work correctly.
++     */
++    int consumer_head = r->consumer_head;
++    int head = consumer_head++;
 +
-+    dd = container_of(request, DecompressData, request);
-+    dd->des = host;
-+    dd->len = len;
-+    qemu_get_buffer(f, dd->compbuf, len);
-+    threads_submit_request_commit(decompress_threads, request);
- }
- 
- /**
-@@ -3579,7 +3512,7 @@ static void decompress_data_with_multi_threads(QEMUFile *f,
-  */
- static int ram_load_setup(QEMUFile *f, void *opaque)
- {
--    if (compress_threads_load_setup(f)) {
-+    if (decompress_init(f)) {
-         return -1;
-     }
- 
-@@ -3599,7 +3532,7 @@ static int ram_load_cleanup(void *opaque)
-     }
- 
-     xbzrle_load_cleanup();
--    compress_threads_load_cleanup();
-+    decompress_fini();
- 
-     RAMBLOCK_FOREACH_MIGRATABLE(rb) {
-         g_free(rb->receivedmap);
-@@ -3949,7 +3882,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-         }
-     }
- 
--    ret |= wait_for_decompress_done();
-+    ret |= flush_decompressed_data();
-     rcu_read_unlock();
-     trace_ram_load_complete(ret, seq_iter);
-     return ret;
++    /* Once we have processed enough entries invalidate them in
++     * the ring all at once so producer can reuse their space in the ring.
++     * We also do this when we reach end of the ring - not mandatory
++     * but helps keep the implementation simple.
++     */
++    if (unlikely(consumer_head - r->consumer_tail >= r->batch ||
++             consumer_head >= r->size)) {
++        /* Zero out entries in the reverse order: this way we touch the
++         * cache line that producer might currently be reading the last;
++         * producer won't make progress and touch other cache lines
++         * besides the first one until we write out all entries.
++         */
++        while (likely(head >= r->consumer_tail))
++            r->queue[head--] = NULL;
++        r->consumer_tail = consumer_head;
++    }
++    if (unlikely(consumer_head >= r->size)) {
++        consumer_head = 0;
++        r->consumer_tail = 0;
++    }
++    /* matching READ_ONCE in ptr_ring_empty for lockless tests */
++    WRITE_ONCE(r->consumer_head, consumer_head);
++}
++
++static inline void *ptr_ring_consume(struct ptr_ring *r)
++{
++    void *ptr;
++
++    /* The READ_ONCE in __ptr_ring_peek guarantees that anyone
++     * accessing data through the pointer is up to date. Pairs
++     * with smp_wmb in ptr_ring_produce.
++     */
++    ptr = __ptr_ring_peek(r);
++    if (ptr)
++        __ptr_ring_discard_one(r);
++
++    return ptr;
++}
++
++static inline int ptr_ring_consume_batched(struct ptr_ring *r,
++                         void **array, int n)
++{
++    void *ptr;
++    int i;
++
++    for (i = 0; i < n; i++) {
++        ptr = ptr_ring_consume(r);
++        if (!ptr)
++            break;
++        array[i] = ptr;
++    }
++
++    return i;
++}
++
++static inline void **__ptr_ring_init_queue_alloc(unsigned int size)
++{
++    return g_try_malloc0_n(size, sizeof(void *));
++}
++
++static inline void __ptr_ring_set_size(struct ptr_ring *r, int size)
++{
++    r->size = size;
++    r->batch = SMP_CACHE_BYTES * 2 / sizeof(*(r->queue));
++    /* We need to set batch at least to 1 to make logic
++     * in __ptr_ring_discard_one work correctly.
++     * Batching too much (because ring is small) would cause a lot of
++     * burstiness. Needs tuning, for now disable batching.
++     */
++    if (r->batch > r->size / 2 || !r->batch)
++        r->batch = 1;
++}
++
++/*
++ * Disable batching so that there is no consumered entry in the ring.
++ *
++ * It is convenient if it makes sure that the ring is large enough to
++ * contain all requests, i.e, ptr_ring_produce can not fail.
++ */
++static inline void ptr_ring_disable_batch(struct ptr_ring *r)
++{
++    r->batch = 1;
++}
++
++static inline int ptr_ring_init(struct ptr_ring *r, int size)
++{
++    r->queue = __ptr_ring_init_queue_alloc(size);
++    if (!r->queue)
++        return -ENOMEM;
++
++    __ptr_ring_set_size(r, size);
++    r->producer = r->consumer_head = r->consumer_tail = 0;
++    return 0;
++}
++
++static inline void ptr_ring_cleanup(struct ptr_ring *r, void (*destroy)(void *))
++{
++    void *ptr;
++
++    if (destroy)
++        while ((ptr = ptr_ring_consume(r)))
++            destroy(ptr);
++    g_free(r->queue);
++}
++#endif
 -- 
 2.14.4
