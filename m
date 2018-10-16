@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44867)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45111)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gCMIC-0002xl-7P
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 06:09:37 -0400
+	(envelope-from <jasowang@redhat.com>) id 1gCMJB-0003ti-U9
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 06:10:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gCMIA-0006Pj-W7
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 06:09:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44032)
+	(envelope-from <jasowang@redhat.com>) id 1gCMJ9-0008Cg-GG
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 06:10:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49394)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gCMIA-0006O5-Ic
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 06:09:34 -0400
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Tue, 16 Oct 2018 11:09:18 +0100
-Message-Id: <20181016100918.21030-9-berrange@redhat.com>
-In-Reply-To: <20181016100918.21030-1-berrange@redhat.com>
-References: <20181016100918.21030-1-berrange@redhat.com>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gCMJ9-0007VT-7s
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 06:10:35 -0400
+References: <1539593186-32183-1-git-send-email-jasowang@redhat.com>
+	<CAFEAcA_meKcp2pALQEKegYZOi-XVndRAd8+P7mOSNJFhm+-=RA@mail.gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <066a1675-8030-9e59-7a2c-7cfeca6f5f28@redhat.com>
+Date: Tue, 16 Oct 2018 18:10:09 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <CAFEAcA_meKcp2pALQEKegYZOi-XVndRAd8+P7mOSNJFhm+-=RA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 8/8] crypto: add testing for unaligned
- buffers with XTS cipher mode
+Subject: Re: [Qemu-devel] [PULL 00/26] Net patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,122 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Alberto Garcia <berto@igalia.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Validate that the XTS cipher mode will correctly operate with plain
-text, cipher text and IV buffers that are not 64-bit aligned.
 
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- tests/test-crypto-xts.c | 86 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 86 insertions(+)
+On 2018/10/15 =E4=B8=8B=E5=8D=889:20, Peter Maydell wrote:
+> On 15 October 2018 at 09:46, Jason Wang <jasowang@redhat.com> wrote:
+>> The following changes since commit a73549f99612f758dec0fdea6ae1c30b6c7=
+09a0b:
+>>
+>>    Merge remote-tracking branch 'remotes/kraxel/tags/ui-20181012-pull-=
+request' into staging (2018-10-12 16:45:51 +0100)
+>>
+>> are available in the git repository at:
+>>
+>>    https://github.com/jasowang/qemu.git tags/net-pull-request
+>>
+>> for you to fetch changes up to a7ec0077c2db445d6bae421963188367d2695bd=
+6:
+>>
+>>    qemu-options: Fix bad "macaddr" property in the documentation (2018=
+-10-15 16:14:15 +0800)
+>>
+>> ----------------------------------------------------------------
+>>
+>> ----------------------------------------------------------------
+> Hi; there seems to be a format string issue in this pullreq:
+>
+> In file included from hw/net/trace.c:4:0:
+> hw/net/trace.h: In function '_nocheck__trace_e1000_receiver_overrun':
+> hw/net/trace.h:2696:18: error: format '%lu' expects argument of type
+> 'long unsigned int', but argument 5 has type 'size_t {aka long long
+> unsigned int}' [-Werror=3Dformat=3D]
+>           qemu_log("%d@%zu.%06zu:e1000_receiver_overrun " "Receiver
+> overrun: dropped packet of %lu bytes, RDH=3D%u, RDT=3D%u" "\n",
+>                    ^
+>
+> which means it won't compile on 32-bit hosts.
+>
+> thanks
+> -- PMM
 
-diff --git a/tests/test-crypto-xts.c b/tests/test-crypto-xts.c
-index 81606d90ad..6fb61cf635 100644
---- a/tests/test-crypto-xts.c
-+++ b/tests/test-crypto-xts.c
-@@ -416,6 +416,88 @@ static void test_xts_split(const void *opaque)
- }
-=20
-=20
-+static void test_xts_unaligned(const void *opaque)
-+{
-+#define BAD_ALIGN 3
-+    const QCryptoXTSTestData *data =3D opaque;
-+    uint8_t in[512 + BAD_ALIGN], out[512 + BAD_ALIGN];
-+    uint8_t Torg[16], T[16 + BAD_ALIGN];
-+    uint64_t seq;
-+    struct TestAES aesdata;
-+    struct TestAES aestweak;
-+
-+    AES_set_encrypt_key(data->key1, data->keylen / 2 * 8, &aesdata.enc);
-+    AES_set_decrypt_key(data->key1, data->keylen / 2 * 8, &aesdata.dec);
-+    AES_set_encrypt_key(data->key2, data->keylen / 2 * 8, &aestweak.enc)=
-;
-+    AES_set_decrypt_key(data->key2, data->keylen / 2 * 8, &aestweak.dec)=
-;
-+
-+    seq =3D data->seqnum;
-+    STORE64L(seq, Torg);
-+    memset(Torg + 8, 0, 8);
-+
-+    /* IV not aligned */
-+    memcpy(T + BAD_ALIGN, Torg, 16);
-+    memcpy(in, data->PTX, data->PTLEN);
-+    xts_encrypt(&aesdata, &aestweak,
-+                test_xts_aes_encrypt,
-+                test_xts_aes_decrypt,
-+                T + BAD_ALIGN, data->PTLEN, out, in);
-+
-+    g_assert(memcmp(out, data->CTX, data->PTLEN) =3D=3D 0);
-+
-+    /* plain text not aligned */
-+    memcpy(T, Torg, 16);
-+    memcpy(in + BAD_ALIGN, data->PTX, data->PTLEN);
-+    xts_encrypt(&aesdata, &aestweak,
-+                test_xts_aes_encrypt,
-+                test_xts_aes_decrypt,
-+                T, data->PTLEN, out, in + BAD_ALIGN);
-+
-+    g_assert(memcmp(out, data->CTX, data->PTLEN) =3D=3D 0);
-+
-+    /* cipher text not aligned */
-+    memcpy(T, Torg, 16);
-+    memcpy(in, data->PTX, data->PTLEN);
-+    xts_encrypt(&aesdata, &aestweak,
-+                test_xts_aes_encrypt,
-+                test_xts_aes_decrypt,
-+                T, data->PTLEN, out + BAD_ALIGN, in);
-+
-+    g_assert(memcmp(out + BAD_ALIGN, data->CTX, data->PTLEN) =3D=3D 0);
-+
-+
-+    /* IV not aligned */
-+    memcpy(T + BAD_ALIGN, Torg, 16);
-+    memcpy(in, data->CTX, data->PTLEN);
-+    xts_decrypt(&aesdata, &aestweak,
-+                test_xts_aes_encrypt,
-+                test_xts_aes_decrypt,
-+                T + BAD_ALIGN, data->PTLEN, out, in);
-+
-+    g_assert(memcmp(out, data->PTX, data->PTLEN) =3D=3D 0);
-+
-+    /* cipher text not aligned */
-+    memcpy(T, Torg, 16);
-+    memcpy(in + BAD_ALIGN, data->CTX, data->PTLEN);
-+    xts_decrypt(&aesdata, &aestweak,
-+                test_xts_aes_encrypt,
-+                test_xts_aes_decrypt,
-+                T, data->PTLEN, out, in + BAD_ALIGN);
-+
-+    g_assert(memcmp(out, data->PTX, data->PTLEN) =3D=3D 0);
-+
-+    /* plain text not aligned */
-+    memcpy(T, Torg, 16);
-+    memcpy(in, data->CTX, data->PTLEN);
-+    xts_decrypt(&aesdata, &aestweak,
-+                test_xts_aes_encrypt,
-+                test_xts_aes_decrypt,
-+                T, data->PTLEN, out + BAD_ALIGN, in);
-+
-+    g_assert(memcmp(out + BAD_ALIGN, data->PTX, data->PTLEN) =3D=3D 0);
-+}
-+
-+
- int main(int argc, char **argv)
- {
-     size_t i;
-@@ -437,6 +519,10 @@ int main(int argc, char **argv)
-             g_test_add_data_func(path, &test_data[i], test_xts_split);
-             g_free(path);
-         }
-+
-+        path =3D g_strdup_printf("%s/unaligned", test_data[i].path);
-+        g_test_add_data_func(path, &test_data[i], test_xts_unaligned);
-+        g_free(path);
-     }
-=20
-     return g_test_run();
---=20
-2.17.2
+
+Sorry, will post V2.
+
+Thanks
