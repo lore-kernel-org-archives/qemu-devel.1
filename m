@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43445)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43657)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gCMEE-000157-7T
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 06:05:31 -0400
+	(envelope-from <bounces@canonical.com>) id 1gCMEj-0001M9-GC
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 06:06:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gCMDy-0003zn-Sb
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 06:05:22 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:42690)
+	(envelope-from <bounces@canonical.com>) id 1gCMEa-00061s-Ah
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 06:05:58 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51968)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gCMDt-0003WL-GN
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 06:05:10 -0400
-Received: by mail-ot1-x342.google.com with SMTP id c23so20137312otl.9
-	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 03:05:04 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gCMEV-0005fD-SV
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 06:05:48 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gCMEP-000326-N5
+	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 10:05:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 92B962E80D7
+	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 10:05:41 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20181016110200.0b20a7f3@donnerap.cambridge.arm.com>
-References: <40eb19fb56b24e10a5eaa99ccb78aff6@dornerworks.com>
-	<73dcea68-2342-63b7-9691-a151f00a42e8@redhat.com>
-	<65e2edeee9d94a288938da9cec4b16bb@dornerworks.com>
-	<20181016110200.0b20a7f3@donnerap.cambridge.arm.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 16 Oct 2018 11:04:43 +0100
-Message-ID: <CAFEAcA-5Q+L65b25i-qwyy-5fCQEzfaUB+N2D+pts8zVtyi2Cg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/boot: Increase compliance with
- kernel arm64 boot protocol.
+Date: Tue, 16 Oct 2018 09:55:50 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: Bug 1798057 <1798057@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153968292598.9512.8127269016874180318.malonedeb@chaenomeles.canonical.com>
+Message-Id: <153968375162.9421.2598722097561234261.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1798057] Re: Not able to start instances larger
+ than 1 TB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,56 +37,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Stewart Hildebrand <Stewart.Hildebrand@dornerworks.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Julien Grall <julien.grall@arm.com>
+To: qemu-devel@nongnu.org
 
-On 16 October 2018 at 11:02, Andre Przywara <andre.przywara@arm.com> wrote:
-> On Tue, 16 Oct 2018 01:19:35 +0000
-> Stewart Hildebrand <Stewart.Hildebrand@dornerworks.com> wrote:
->
-> Hi,
->
-> Stewart, thanks a lot for picking this up!
->
->> On Monday, October 15, 2018 6:05 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->> > Hi Stewart,
->> >
->> > On 15/10/2018 23:26, Stewart Hildebrand wrote:
->> > > +            /* For the virt board, we write our startup
->> > > "bootloader" at the very
->> > > +             * bottom of RAM, so that bit can't be used for the
->> > > image. To avoid
->> > > +             * overlap in case the image requests to be loaded
->> > > at an offset
->> > > +             * smaller than our bootloader, we increment the
->> > > load offset to the
->> > > +             * next 2MB.
->> > > +             */
->> > > +            if (kernel_load_offset < FIXUP_MAX) {
->> >
->> > I don't understand how this is related to FIXUP_MAX...
->>
->> You're right, my apologies, it's not directly related.
->> write_bootloader() calculates the size of the bootloader like so:
->>     len =3D 0;
->>     while (insns[len].fixup !=3D FIXUP_TERMINATOR) {
->>         len++;
->>     }
->>
->> The size of the bootloader then would be len * sizeof(uint32_t)
->>
->> It would be nice not to have to repeat that logic in
->> load_aarch64_image(). I'll send out a v2 after I take some time to
->> wrap my head around it...
->
-> I wonder if this could be done much easier, since TEXT_OFFSET must
-> actually be page aligned. So all we would need is an *upper bound* for
-> the bootloader size, as long as that is below 4K we wouldn't even loose
-> anything.
+Hi Alex,
+  You should be able to fix this by passing the right cpu flags, e.g.:
 
-Yes, I think it would be fine to just set a max bootloader size of
-4K and check against that. (If so, assert() in write_bootloader
-that we did stay below the max.)
+-cpu IvyBridge,host-phys-bits=3Dyes
 
-thanks
--- PMM
+or
+
+-cpu IvyBridge,physbits=3D46
+
+Dave
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1798057
+
+Title:
+  Not able to start instances larger than 1 TB
+
+Status in QEMU:
+  New
+
+Bug description:
+  Specs:
+
+  CPU: Intel(R) Xeon(R) Gold 6132 CPU @ 2.60GHz
+  OS: Ubuntu 18.04 AMD64
+  QEMU: 1:2.11+dfsg-1ubuntu7.6 (Ubuntu Bionic Package)
+  Openstack: Openstack Queens (Ubuntu Bionic Package)
+  Libvirt-daemon: 4.0.0-1ubuntu8.5
+  Seabios: 1.10.2-1ubuntu1
+
+  =
+
+  The Problem:
+  We are not able to start instances, which have a memory size over 1 TB.
+  After starting the instance, they shortly lock up. Starting guests with a=
+ lower amount of RAM works
+  perfectly. We dealt with the same problem in the past with an older Qemu =
+Version (2.5) by patching some source files according to this patch:
+
+  https://git.centos.org/blob/rpms!!qemu-
+  kvm.git/34b32196890e2c41b0aee042e600ba422f29db17/SOURCES!kvm-fix-
+  guest-physical-bits-to-match-host-to-go-beyond-1.patch
+
+  =
+
+  I think we now have somewhat the same problem here, however the source ba=
+se changed and I'am not able to find the corresponding snippet to patch thi=
+s.
+
+  Also, guests show a wrong physical address size which is probably the cau=
+se of the lock ups on high memory guests:
+  root@debug:~# grep physical /proc/cpuinfo =
+
+  physical id	: 0
+  address sizes	: 40 bits physical, 48 bits virtual =
+
+
+  Any way to fix this?
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1798057/+subscriptions
