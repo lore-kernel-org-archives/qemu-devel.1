@@ -1,34 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33521)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1gCQlD-0004Zd-12
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 10:55:51 -0400
+	(envelope-from <akrowiak@linux.ibm.com>) id 1gCQmM-0005De-VF
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 10:57:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1gCQl9-0003VW-Og
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 10:55:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50972)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <abologna@redhat.com>) id 1gCQl9-0003Rw-Ff
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 10:55:47 -0400
-Message-ID: <138e8c0bd96f9fa58c1b79e89615ba9a6f4318fd.camel@redhat.com>
-From: Andrea Bolognani <abologna@redhat.com>
-Date: Tue, 16 Oct 2018 16:55:41 +0200
-In-Reply-To: <4089265c6ef44f79f0dd67d203f69e5bde9b8d85.camel@redhat.com>
-References: <cover.1538683492.git.alistair.francis@wdc.com>
-	<5dd21056229d12a1af8d65e9208f4de43ba4a2ae.camel@redhat.com>
-	<892d54c5-2851-74ec-bdf2-286c1665c44f@gmail.com>
-	<7d54ec114745b00b82601875416ccfe6a5f9fe6f.camel@redhat.com>
-	<CAKmqyKNTTu+5KyTMBHw5-+UMa7qnm9EaowxHj8NLxED98m1MKw@mail.gmail.com>
-	<d9e6d7979143130092b5b96602885c1acaca9b52.camel@redhat.com>
-	<CAKmqyKMTzYswJ74WEOQAQrisCdMDQ9Nf6NMEdUKLcUMCN7XLgg@mail.gmail.com>
-	<23d9891ec01bec45b16f89ba1412238be39addf9.camel@redhat.com>
-	<CAKmqyKMBxY6j3SwvyYsMVCCeAwKinuVE4+2kbAp6YapBWdKZig@mail.gmail.com>
-	<967af677f4d0b60bfb201f639ade0b0712e09fc8.camel@redhat.com>
-	<4089265c6ef44f79f0dd67d203f69e5bde9b8d85.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+	(envelope-from <akrowiak@linux.ibm.com>) id 1gCQmJ-0005tZ-N4
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 10:57:02 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33952)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <akrowiak@linux.ibm.com>)
+	id 1gCQmI-0005o6-QW
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 10:56:59 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w9GEpoGc004402
+	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 10:56:56 -0400
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2n5h5yug6r-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 10:56:55 -0400
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <akrowiak@linux.ibm.com>;
+	Tue, 16 Oct 2018 08:56:54 -0600
+References: <20181016115817.14605-1-cohuck@redhat.com>
+From: Tony Krowiak <akrowiak@linux.ibm.com>
+Date: Tue, 16 Oct 2018 10:56:50 -0400
+MIME-Version: 1.0
+In-Reply-To: <20181016115817.14605-1-cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 0/5] Connect a PCIe host and graphics
- support to RISC-V
+Message-Id: <b61ffb66-027e-ee78-6b89-f7bc7c7da7b9@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] s390x/vfio-ap: report correct error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,36 +41,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair23@gmail.com>
-Cc: Palmer Dabbelt <palmer@sifive.com>, "Richard W.M. Jones" <rjones@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Michael Clark <mjc@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, stephen@eideticom.com
+To: Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-On Tue, 2018-10-16 at 16:11 +0200, Andrea Bolognani wrote:
-[...]
-> If the network device is the only one
-> using virtio-pci, though, despite still getting
+On 10/16/2018 07:58 AM, Cornelia Huck wrote:
+> If ioctl(..., VFIO_DEVICE_RESET) fails, we want to report errno
+> instead of ret (which is always -1 on error).
 > 
->   pci 0000:00:01.0: BAR 0: no space for [io  size 0x0020]
->   pci 0000:00:01.0: BAR 0: failed to assign [io  size 0x0020]
+> Fixes Coverity issue CID 1396176.
 > 
-> I can get all the way to a prompt, and the device will show up in
-> the output of lspci:
+> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>   hw/vfio/ap.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-[...]
->   00:01.0 Ethernet controller: Red Hat, Inc. Virtio network device
-> 	Subsystem: Red Hat, Inc. Device 0001
-> 	Flags: bus master, fast devsel, latency 0, IRQ 1
-> 	I/O ports at <unassigned> [disabled]
-> 	Memory at 40040000 (64-bit, prefetchable) [size=16K]
-> 	[virtual] Expansion ROM at 40000000 [disabled] [size=256K]
-> 	Capabilities: [84] Vendor Specific Information: VirtIO: <unknown>
-> 	Capabilities: [70] Vendor Specific Information: VirtIO: Notify
-> 	Capabilities: [60] Vendor Specific Information: VirtIO: DeviceCfg
-> 	Capabilities: [50] Vendor Specific Information: VirtIO: ISR
-> 	Capabilities: [40] Vendor Specific Information: VirtIO: CommonCfg
-> 	Kernel driver in use: virtio-pci
+> diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
+> index 3962bb74e5..65de952f44 100644
+> --- a/hw/vfio/ap.c
+> +++ b/hw/vfio/ap.c
+> @@ -142,7 +142,7 @@ static void vfio_ap_reset(DeviceState *dev)
+>       ret = ioctl(vapdev->vdev.fd, VFIO_DEVICE_RESET);
+>       if (ret) {
+>           error_report("%s: failed to reset %s device: %s", __func__,
+> -                     vapdev->vdev.name, strerror(ret));
+> +                     vapdev->vdev.name, strerror(errno));
+>       }
+>   }
 
-Forgot to mention that, despite showing up, the device doesn't quite
-work: for example, it can't seem to be able to acquire an IP address.
+Reviewed-by: Tony Krowiak <akrowiak@linux.ibm.com>
 
--- 
-Andrea Bolognani / Red Hat / Virtualization
+>   
+> 
