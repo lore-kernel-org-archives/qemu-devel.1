@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57872)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gCOD0-0002Gb-PI
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 08:12:27 -0400
+	(envelope-from <liq3ea@gmail.com>) id 1gCOD6-0002Kc-G3
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 08:12:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gCOCy-0005YM-E9
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 08:12:22 -0400
-Date: Tue, 16 Oct 2018 14:12:04 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20181016121204.GE5620@dhcp-200-186.str.redhat.com>
-References: <20181015172817.19796-1-mreitz@redhat.com>
-	<20181015172817.19796-2-mreitz@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181015172817.19796-2-mreitz@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 1/5] option: Make option help
- nicer to read
+	(envelope-from <liq3ea@gmail.com>) id 1gCOCy-0005Yp-RV
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 08:12:26 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:33969)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1gCOCy-0005XD-9l
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 08:12:20 -0400
+Received: by mail-pl1-x644.google.com with SMTP id f18-v6so10942261plr.1
+	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 05:12:19 -0700 (PDT)
+From: Li Qiang <liq3ea@gmail.com>
+Date: Tue, 16 Oct 2018 05:12:13 -0700
+Message-Id: <1539691933-4211-1-git-send-email-liq3ea@gmail.com>
+Subject: [Qemu-devel] [PATCH] kvm: move vcpu mmap size to KVMState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,68 +23,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: pbonzini@redhat.com
+Cc: qemu-devel@nongnu.org, liq3ea@163.com, Li Qiang <liq3ea@gmail.com>
 
-Am 15.10.2018 um 19:28 hat Max Reitz geschrieben:
-> This adds some whitespace into the option help (including indentation)
-> and replaces '=' by ': ' (not least because '=' should be used for
-> values, not types).  Furthermore, the list name is no longer printed as
-> part of every line, but only once in advance, and only if the caller did
-> not print a caption already.
-> 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+First the mmap size is a kvm ioctl, so it can go kvm initialization.
+Second this can avoid triggering KVM_GET_VCPU_MMAP_SIZE while
+initializing and destroying every VCPU.
 
-If this isn't a bike shedding series, then what is? So...
+Signed-off-by: Li Qiang <liq3ea@gmail.com>
+---
+ accel/kvm/kvm-all.c | 28 ++++++++++------------------
+ 1 file changed, 10 insertions(+), 18 deletions(-)
 
-> --- a/tests/qemu-iotests/082.out
-> +++ b/tests/qemu-iotests/082.out
-> @@ -44,171 +44,171 @@ cluster_size: 8192
->  
->  Testing: create -f qcow2 -o help TEST_DIR/t.qcow2 128M
->  Supported options:
-> -size             Virtual disk size
-> -compat           Compatibility level (0.10 or 1.1)
-> -backing_file     File name of a base image
-> -backing_fmt      Image format of the base image
-> -encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
-> -encrypt.format   Encrypt the image, format choices: 'aes', 'luks'
-> -encrypt.key-secret ID of secret providing qcow AES key or LUKS passphrase
-> -encrypt.cipher-alg Name of encryption cipher algorithm
-> -encrypt.cipher-mode Name of encryption cipher mode
-> -encrypt.ivgen-alg Name of IV generator algorithm
-> -encrypt.ivgen-hash-alg Name of IV generator hash algorithm
-> -encrypt.hash-alg Name of encryption hash algorithm
-> -encrypt.iter-time Time to spend in PBKDF in milliseconds
-> -cluster_size     qcow2 cluster size
-> -preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
-> -lazy_refcounts   Postpone refcount updates
-> -refcount_bits    Width of a reference count entry in bits
-> -nocow            Turn off copy-on-write (valid only on btrfs)
-> +  backing_file: str - File name of a base image
-> +  backing_fmt: str - Image format of the base image
-> +  cluster_size: size - qcow2 cluster size
-> +  compat: str - Compatibility level (0.10 or 1.1)
-> +  encrypt.cipher-alg: str - Name of encryption cipher algorithm
-> +  encrypt.cipher-mode: str - Name of encryption cipher mode
-> +  encrypt.format: str - Encrypt the image, format choices: 'aes', 'luks'
-> +  encrypt.hash-alg: str - Name of encryption hash algorithm
-> +  encrypt.iter-time: num - Time to spend in PBKDF in milliseconds
-> +  encrypt.ivgen-alg: str - Name of IV generator algorithm
-> +  encrypt.ivgen-hash-alg: str - Name of IV generator hash algorithm
-> +  encrypt.key-secret: str - ID of secret providing qcow AES key or LUKS passphrase
-> +  encryption: bool (on/off) - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
-> +  lazy_refcounts: bool (on/off) - Postpone refcount updates
-> +  nocow: bool (on/off) - Turn off copy-on-write (valid only on btrfs)
-> +  preallocation: str - Preallocation mode (allowed values: off, metadata, falloc, full)
-> +  refcount_bits: num - Width of a reference count entry in bits
-> +  size: size - Virtual disk size
-
-I like the result of this series better than what we have in current
-master. Looking at this patch, however, I must also say that I like the
-original state better than both.
-
-How about aligning the description to the same column again to combine
-the best of both worlds?
-
-Kevin
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index de12f78eb8..f5cc47ec9f 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -101,6 +101,7 @@ struct KVMState
+     int nr_allocated_irq_routes;
+     unsigned long *used_gsi_bitmap;
+     unsigned int gsi_count;
++    long mmap_size;
+     QTAILQ_HEAD(msi_hashtab, KVMMSIRoute) msi_hashtab[KVM_MSI_HASHTAB_SIZE];
+ #endif
+     KVMMemoryListener memory_listener;
+@@ -285,20 +286,12 @@ static int kvm_set_user_memory_region(KVMMemoryListener *kml, KVMSlot *slot, boo
+ int kvm_destroy_vcpu(CPUState *cpu)
+ {
+     KVMState *s = kvm_state;
+-    long mmap_size;
+     struct KVMParkedVcpu *vcpu = NULL;
+     int ret = 0;
+ 
+     DPRINTF("kvm_destroy_vcpu\n");
+ 
+-    mmap_size = kvm_ioctl(s, KVM_GET_VCPU_MMAP_SIZE, 0);
+-    if (mmap_size < 0) {
+-        ret = mmap_size;
+-        DPRINTF("KVM_GET_VCPU_MMAP_SIZE failed\n");
+-        goto err;
+-    }
+-
+-    ret = munmap(cpu->kvm_run, mmap_size);
++    ret = munmap(cpu->kvm_run, s->mmap_size);
+     if (ret < 0) {
+         goto err;
+     }
+@@ -332,7 +325,6 @@ static int kvm_get_vcpu(KVMState *s, unsigned long vcpu_id)
+ int kvm_init_vcpu(CPUState *cpu)
+ {
+     KVMState *s = kvm_state;
+-    long mmap_size;
+     int ret;
+ 
+     DPRINTF("kvm_init_vcpu\n");
+@@ -347,14 +339,7 @@ int kvm_init_vcpu(CPUState *cpu)
+     cpu->kvm_state = s;
+     cpu->vcpu_dirty = true;
+ 
+-    mmap_size = kvm_ioctl(s, KVM_GET_VCPU_MMAP_SIZE, 0);
+-    if (mmap_size < 0) {
+-        ret = mmap_size;
+-        DPRINTF("KVM_GET_VCPU_MMAP_SIZE failed\n");
+-        goto err;
+-    }
+-
+-    cpu->kvm_run = mmap(NULL, mmap_size, PROT_READ | PROT_WRITE, MAP_SHARED,
++    cpu->kvm_run = mmap(NULL, s->mmap_size, PROT_READ | PROT_WRITE, MAP_SHARED,
+                         cpu->kvm_fd, 0);
+     if (cpu->kvm_run == MAP_FAILED) {
+         ret = -errno;
+@@ -1583,6 +1568,13 @@ static int kvm_init(MachineState *ms)
+ 
+     s->vmfd = ret;
+ 
++    s->mmap_size = kvm_ioctl(s, KVM_GET_VCPU_MMAP_SIZE, 0);
++    if (s->mmap_size < 0) {
++        ret = s->mmap_size;
++        fprintf(stderr, "KVM_GET_VCPU_MMAP_SIZE failed\n");
++        goto err;
++    }
++
+     /* check the vcpu limits */
+     soft_vcpus_limit = kvm_recommended_vcpus(s);
+     hard_vcpus_limit = kvm_max_vcpus(s);
+-- 
+2.11.0
