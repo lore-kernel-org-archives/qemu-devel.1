@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40702)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40963)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aclindsa@gmail.com>) id 1gCPp0-0001pA-F9
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 09:55:43 -0400
+	(envelope-from <imammedo@redhat.com>) id 1gCPpU-00023M-3X
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 09:56:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aclindsa@gmail.com>) id 1gCPou-0000CV-M0
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 09:55:38 -0400
-Date: Tue, 16 Oct 2018 09:55:17 -0400
-From: Aaron Lindsay <aclindsa@gmail.com>
-Message-ID: <20181016135517.GO3671@okra.localdomain>
-References: <20181010203735.27918-1-aclindsa@gmail.com>
-	<20181010203735.27918-4-aclindsa@gmail.com>
-	<3a964ae2-a5d0-5960-9e15-7ede929a8294@linaro.org>
-	<20181016082117.GB2426@work-vm>
+	(envelope-from <imammedo@redhat.com>) id 1gCPpO-0000du-TN
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 09:56:11 -0400
+Date: Tue, 16 Oct 2018 15:56:00 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181016155600.31de8883@redhat.com>
+In-Reply-To: <1539696820-273275-1-git-send-email-imammedo@redhat.com>
+References: <1539696820-273275-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181016082117.GB2426@work-vm>
-Subject: Re: [Qemu-devel] [PATCH v6 03/14] migration: Add post_save function
- to VMStateDescription
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] call HotplugHandler->plug() as the last
+ step in device realization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,43 +23,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>, Wei Huang <wei@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>, qemu-arm@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, stefanha@redhat.com, cohuck@redhat.com, qemu-s390x@nongnu.org, david@gibson.dropbear.id.au, qemu-ppc@nongnu.org
 
-On Oct 16 09:21, Dr. David Alan Gilbert wrote:
-> * Richard Henderson (richard.henderson@linaro.org) wrote:
-> > On 10/10/18 1:37 PM, Aaron Lindsay wrote:
-> > > In some cases it may be helpful to modify state before saving it for
-> > > migration, and then modify the state back after it has been saved. The
-> > > existing pre_save function provides half of this functionality. This
-> > > patch adds a post_save function to provide the second half.
-> > > 
-> > > Signed-off-by: Aaron Lindsay <aclindsa@gmail.com>
-> > > ---
-> > >  docs/devel/migration.rst    |  9 +++++++--
-> > >  include/migration/vmstate.h |  1 +
-> > >  migration/vmstate.c         | 10 +++++++++-
-> > >  3 files changed, 17 insertions(+), 3 deletions(-)
-> > 
-> > Hmm, maybe.  I believe the common practice is for pre_save to copy state into a
-> > separate member on the side, so that conversion back isn't necessary.
-> > 
-> > Ccing in the migration maintainers for a second opinion.
+On Tue, 16 Oct 2018 15:33:40 +0200
+Igor Mammedov <imammedo@redhat.com> wrote:
+
+> When [2] was fixed it was agreed that adding and calling post_plug()
+> callback after device_reset() was low risk approach to hotfix issue
+> right before release. So it was merged instead of moving already
+> existing plug() callback after device_reset() is called which would
+> be more risky and require all plug() callbacks audit.
 > 
-> It is common to copy stuff into a separate member; however we do
-> occasionally think that post_save would be a useful addition; so I think
-> we should take it (if nothing else it actually makes stuff symmetric!).
+> Looking at the current plug() callbacks, it doesn't seem that moving
+> plug() callback after device_reset() is breaking anything, so here
+> goes agreed upon [3] proper fix which essentially reverts [1][2]
+> and moves plug() callback after device_reset().
+> This way devices always comes to plug() stage, after it's been fully
+> initialized (including being reset), which fixes race condition [2]
+> without need for an extra post_plug() callback.
 > 
-> Please make it return 'int' in the same way that pre_save/pre_load
-> does, so that it can fail and stop the migration.
+>  1. (25e897881 "qdev: add HotplugHandler->post_plug() callback")
+>  2. (8449bcf94 "virtio-scsi: fix hotplug ->reset() vs event race")
+>  3. https://www.mail-archive.com/qemu-devel@nongnu.org/msg549915.html
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+> TODO:
+>  remove usage of Error** from plug() callback, we need to factor out
+>  pre_plug part from plug() callbacks, before proceeding with it.
+>  DavidH has recently finished it for pc-dimm/memory_devices, cpus
+>  mostly have pre_plug parts factored out, but there still are parts
+>  that could fail so it needs some more work to eliminate failure points
+>  from plug() callbacks. Meanwhile, I'll plan to treat other misc
+>  handlers (pci[e]/acpi/usb/...) and introduce pre_plug() where
+>  necessary.
 
-This patch calls post_save *even if the save operation fails*. My
-reasoning was that I didn't want a failed migration to leave a
-still-running original QEMU instance in an invalid state. Was this
-misguided?
-
-If it was not, which error do you prefer to be returned from
-vmstate_save_state_v() in the case that both the save operation itself
-and the post_save call returned errors?
-
--Aaron
+Forgot to CC spapr/s390 folks to give it an extra scrutiny.
