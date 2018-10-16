@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32868)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gCTWV-0006pY-FP
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:52:52 -0400
+	(envelope-from <eblake@redhat.com>) id 1gCTl3-00033O-Hu
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 14:07:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gCTWR-0006ck-H3
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:52:49 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:51928)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1gCTWM-0006OW-Q4
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:52:43 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 16 Oct 2018 18:52:36 +0100
-Message-Id: <20181016175236.5840-1-peter.maydell@linaro.org>
+	(envelope-from <eblake@redhat.com>) id 1gCTkw-0007z9-24
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 14:07:48 -0400
+References: <20181015141453.32632-1-mreitz@redhat.com>
+	<20181015141453.32632-2-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b208ed10-5763-23a1-c576-23aaa4fa22b2@redhat.com>
+Date: Tue, 16 Oct 2018 13:07:20 -0500
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] hw/acpi/nvdimm: Don't take address of fields
- in packed structs
+In-Reply-To: <20181015141453.32632-2-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/9] iotests: Make nbd-fault-injector flush
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,71 +24,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Taking the address of a field in a packed struct is a bad idea, because
-it might not be actually aligned enough for that pointer type (and
-thus cause a crash on dereference on some host architectures). Newer
-versions of clang warn about this. Avoid the bug by not using the
-"modify in place" byte swapping functions.
+On 10/15/18 9:14 AM, Max Reitz wrote:
+> When closing a connection, make the nbd-fault-injector flush the socket.
+> Without this, the output is a bit unreliable with Python 3.
+> 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>   tests/qemu-iotests/083.out               | 9 +++++++++
+>   tests/qemu-iotests/nbd-fault-injector.py | 1 +
+>   2 files changed, 10 insertions(+)
 
-Patch produced with scripts/coccinelle/inplace-byteswaps.cocci.
+I already had a complaint that the error message in 083.out should NOT 
+be printing a message (whether the server is python 2 and auto-flushes, 
+or python 3 and needs an explicit flush, the message itself is 
+pointless, and the test is racy as a result).  We may need to revisit 
+this patch when that thread is resolved.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-Automatically generated patch, tested with "make check" only.
+https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg01041.html
 
- hw/acpi/nvdimm.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+That said, I'm not opposed to this patch, if it gets iotests to be more 
+useful in the meantime.
 
-diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
-index 27eeb6609f5..e53b2cb6819 100644
---- a/hw/acpi/nvdimm.c
-+++ b/hw/acpi/nvdimm.c
-@@ -581,7 +581,7 @@ static void nvdimm_dsm_func_read_fit(AcpiNVDIMMState *state, NvdimmDsmIn *in,
-     int size;
- 
-     read_fit = (NvdimmFuncReadFITIn *)in->arg3;
--    le32_to_cpus(&read_fit->offset);
-+    read_fit->offset = le32_to_cpu(read_fit->offset);
- 
-     fit = fit_buf->fit;
- 
-@@ -742,8 +742,8 @@ static void nvdimm_dsm_get_label_data(NVDIMMDevice *nvdimm, NvdimmDsmIn *in,
-     int size;
- 
-     get_label_data = (NvdimmFuncGetLabelDataIn *)in->arg3;
--    le32_to_cpus(&get_label_data->offset);
--    le32_to_cpus(&get_label_data->length);
-+    get_label_data->offset = le32_to_cpu(get_label_data->offset);
-+    get_label_data->length = le32_to_cpu(get_label_data->length);
- 
-     nvdimm_debug("Read Label Data: offset %#x length %#x.\n",
-                  get_label_data->offset, get_label_data->length);
-@@ -781,8 +781,8 @@ static void nvdimm_dsm_set_label_data(NVDIMMDevice *nvdimm, NvdimmDsmIn *in,
- 
-     set_label_data = (NvdimmFuncSetLabelDataIn *)in->arg3;
- 
--    le32_to_cpus(&set_label_data->offset);
--    le32_to_cpus(&set_label_data->length);
-+    set_label_data->offset = le32_to_cpu(set_label_data->offset);
-+    set_label_data->length = le32_to_cpu(set_label_data->length);
- 
-     nvdimm_debug("Write Label Data: offset %#x length %#x.\n",
-                  set_label_data->offset, set_label_data->length);
-@@ -877,9 +877,9 @@ nvdimm_dsm_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
-     in = g_new(NvdimmDsmIn, 1);
-     cpu_physical_memory_read(dsm_mem_addr, in, sizeof(*in));
- 
--    le32_to_cpus(&in->revision);
--    le32_to_cpus(&in->function);
--    le32_to_cpus(&in->handle);
-+    in->revision = le32_to_cpu(in->revision);
-+    in->function = le32_to_cpu(in->function);
-+    in->handle = le32_to_cpu(in->handle);
- 
-     nvdimm_debug("Revision %#x Handler %#x Function %#x.\n", in->revision,
-                  in->handle, in->function);
+> 
+> diff --git a/tests/qemu-iotests/083.out b/tests/qemu-iotests/083.out
+> index be6079d27e..f9af8bb691 100644
+> --- a/tests/qemu-iotests/083.out
+> +++ b/tests/qemu-iotests/083.out
+> @@ -41,6 +41,7 @@ can't open device nbd+tcp://127.0.0.1:PORT/foo
+>   
+>   === Check disconnect after neg2 ===
+>   
+> +Unable to read from socket: Connection reset by peer
+>   Connection closed
+>   read failed: Input/output error
+>   
+> @@ -54,6 +55,7 @@ can't open device nbd+tcp://127.0.0.1:PORT/foo
+>   
+>   === Check disconnect before request ===
+>   
+> +Unable to read from socket: Connection reset by peer
+>   Connection closed
+>   read failed: Input/output error
+>   
+> @@ -116,6 +118,7 @@ can't open device nbd+tcp://127.0.0.1:PORT/
+>   
+>   === Check disconnect after neg-classic ===
+>   
+> +Unable to read from socket: Connection reset by peer
+>   Connection closed
+>   read failed: Input/output error
+>   
+> @@ -161,6 +164,8 @@ can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
+>   
+>   === Check disconnect after neg2 ===
+>   
+> +Unable to read from socket: Connection reset by peer
+> +Connection closed
+>   read failed: Input/output error
+>   
+>   === Check disconnect 8 neg2 ===
+> @@ -173,6 +178,8 @@ can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
+>   
+>   === Check disconnect before request ===
+>   
+> +Unable to read from socket: Connection reset by peer
+> +Connection closed
+>   read failed: Input/output error
+>   
+>   === Check disconnect after request ===
+> @@ -234,6 +241,8 @@ can't open device nbd+unix:///?socket=TEST_DIR/nbd.sock
+>   
+>   === Check disconnect after neg-classic ===
+>   
+> +Unable to read from socket: Connection reset by peer
+> +Connection closed
+>   read failed: Input/output error
+>   
+>   *** done
+> diff --git a/tests/qemu-iotests/nbd-fault-injector.py b/tests/qemu-iotests/nbd-fault-injector.py
+> index f9193c0fae..439a090eb6 100755
+> --- a/tests/qemu-iotests/nbd-fault-injector.py
+> +++ b/tests/qemu-iotests/nbd-fault-injector.py
+> @@ -112,6 +112,7 @@ class FaultInjectionSocket(object):
+>               if rule.match(event, io):
+>                   if rule.when == 0 or bufsize is None:
+>                       print('Closing connection on rule match %s' % rule.name)
+> +                    self.sock.flush()
+>                       sys.exit(0)
+>                   if rule.when != -1:
+>                       return rule.when
+> 
+
 -- 
-2.19.0
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
