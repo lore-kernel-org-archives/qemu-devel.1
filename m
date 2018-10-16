@@ -1,31 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55438)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57357)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gCRiJ-0001Aw-8E
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:56:55 -0400
+	(envelope-from <andre.przywara@arm.com>) id 1gCRo5-0004Sb-8e
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 12:03:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gCRiF-0002kW-TC
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:56:55 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:37347)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gCRiF-0002e1-Dn
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:56:51 -0400
-Received: by mail-pl1-x642.google.com with SMTP id u6-v6so8494444plz.4
-	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 08:56:49 -0700 (PDT)
-References: <20181005211450.847-1-cota@braap.org>
-	<20181005211450.847-5-cota@braap.org>
-	<4f8df676-f854-e7fe-afed-51099a8abffe@linaro.org>
-	<6ae5b4c7-3300-2059-b648-855d7ea00488@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <4e8d6cb0-2fb0-df55-afed-d71c76b1e526@linaro.org>
-Date: Tue, 16 Oct 2018 08:56:45 -0700
+	(envelope-from <andre.przywara@arm.com>) id 1gCRny-0000s5-33
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 12:02:53 -0400
+Date: Tue, 16 Oct 2018 17:02:06 +0100
+From: Andre Przywara <andre.przywara@arm.com>
+Message-ID: <20181016170206.500a12de@donnerap.cambridge.arm.com>
+In-Reply-To: <b8a89518794b4436af0c151ed10de4fa@dornerworks.com>
+References: <b8a89518794b4436af0c151ed10de4fa@dornerworks.com>
 MIME-Version: 1.0
-In-Reply-To: <6ae5b4c7-3300-2059-b648-855d7ea00488@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 4/4] cputlb: read CPUTLBEntry.addr_write
- atomically
+Subject: Re: [Qemu-devel] [PATCH v2] hw/arm/boot: Increase compliance with
+ kernel arm64 boot protocol
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,32 +23,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: Stewart Hildebrand <Stewart.Hildebrand@dornerworks.com>
+Cc: "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, Julien Grall <julien.grall@arm.com>
 
-On 10/15/18 11:03 PM, Paolo Bonzini wrote:
-> On 16/10/2018 04:52, Richard Henderson wrote:
->> On 10/5/18 2:14 PM, Emilio G. Cota wrote:
->>> -    target_ulong tlb_addr = env->tlb_table[mmu_idx][index].addr_write;
->>> +    target_ulong tlb_addr =
->>> +        atomic_read(&env->tlb_table[mmu_idx][index].addr_write);
->>
->> This fails for 32-bit hosts emulating 64-bit hosts.
->> I think you need a separate helper function.  Perhaps
->>
->> static inline target_ulong tlb_addr_write(CPUTLBEntry *ent)
->> {
->> #if TCG_OVERSIZED_GUEST
->>     return ent->addr_write;
->> #else
->>     return atomic_read(&ent->addr_write);
->> #endif
->> }
->>
+On Tue, 16 Oct 2018 15:06:29 +0000
+Stewart Hildebrand <Stewart.Hildebrand@dornerworks.com> wrote:
+
+Hi, 
+
+> "The Image must be placed text_offset bytes from a 2MB aligned base
+> address anywhere in usable system RAM and called there."
 > 
-> Or just atomic_read__nocheck.
+> For the virt board, we write our startup bootloader at the very
+> bottom of RAM, so that bit can't be used for the image. To avoid
+> overlap in case the image requests to be loaded at an offset
+> smaller than our bootloader, we increment the load offset to the
+> next 2MB.
+> 
+> This fixes a boot failure for Xen AArch64.
 
-No, it won't be present, necessarily.
+Thanks for that, works for me.
 
+> Signed-off-by: Stewart Hildebrand <stewart.hildebrand@dornerworks.com>
 
-r~
+Tested-by: Andre Przywara <andre.przywara@arm.com>
+
+Cheers,
+Andre.
