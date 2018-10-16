@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42966)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gCRC9-0000fp-69
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:23:42 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1gCRCB-0000ht-1I
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:23:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gCRC8-0007w3-34
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:23:41 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:51898)
+	(envelope-from <pm215@archaic.org.uk>) id 1gCRC9-0007yr-Rx
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:23:42 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:51904)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1gCRC7-0007PR-OJ
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:23:39 -0400
+	id 1gCRC9-0007xg-HF
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 11:23:41 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1gCRBz-0003mU-Bf
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 16:23:31 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1gCRC8-0003od-IH
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 16:23:40 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 16 Oct 2018 16:23:08 +0100
-Message-Id: <20181016152325.31367-3-peter.maydell@linaro.org>
+Date: Tue, 16 Oct 2018 16:23:16 +0100
+Message-Id: <20181016152325.31367-11-peter.maydell@linaro.org>
 In-Reply-To: <20181016152325.31367-1-peter.maydell@linaro.org>
 References: <20181016152325.31367-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 02/19] target/arm: Fix aarch64_sve_change_el wrt
- EL0
+Subject: [Qemu-devel] [PULL 10/19] net: cadence_gem: Add support for
+ extended descriptors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,107 +32,201 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-At present we assert:
+Add support for extended descriptors with optional 64bit
+addressing and timestamping. QEMU will not yet provide
+timestamps (always leaving the valid timestamp bit as zero).
 
-  arm_el_is_aa64: Assertion `el >= 1 && el <= 3' failed.
-
-The comment in arm_el_is_aa64 explains why asking about EL0 without
-extra information is impossible.  Add an extra argument to provide
-it from the surrounding context.
-
-Fixes: 0ab5953b00b3
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20181008212205.17752-2-richard.henderson@linaro.org
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Message-id: 20181011021931.4249-6-edgar.iglesias@gmail.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/cpu.h       |  7 +++++--
- target/arm/helper.c    | 16 ++++++++++++----
- target/arm/op_helper.c |  6 +++++-
- 3 files changed, 22 insertions(+), 7 deletions(-)
+ include/hw/net/cadence_gem.h |  2 +-
+ hw/net/cadence_gem.c         | 69 ++++++++++++++++++++++++++----------
+ 2 files changed, 52 insertions(+), 19 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 3a2aff11928..54362ddce81 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -911,10 +911,13 @@ int arm_cpu_write_elf32_note(WriteCoreDumpFunction f, CPUState *cs,
- int aarch64_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
- int aarch64_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
- void aarch64_sve_narrow_vq(CPUARMState *env, unsigned vq);
--void aarch64_sve_change_el(CPUARMState *env, int old_el, int new_el);
-+void aarch64_sve_change_el(CPUARMState *env, int old_el,
-+                           int new_el, bool el0_a64);
- #else
- static inline void aarch64_sve_narrow_vq(CPUARMState *env, unsigned vq) { }
--static inline void aarch64_sve_change_el(CPUARMState *env, int o, int n) { }
-+static inline void aarch64_sve_change_el(CPUARMState *env, int o,
-+                                         int n, bool a)
-+{ }
- #endif
+diff --git a/include/hw/net/cadence_gem.h b/include/hw/net/cadence_gem.h
+index b33ef6513b9..00dbf4f72e3 100644
+--- a/include/hw/net/cadence_gem.h
++++ b/include/hw/net/cadence_gem.h
+@@ -33,7 +33,7 @@
+ #define CADENCE_GEM_MAXREG        (0x00000800 / 4) /* Last valid GEM address */
  
- target_ulong do_arm_semihosting(CPUARMState *env);
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index c83f7c1109c..0efbb5c76ce 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -8374,7 +8374,11 @@ static void arm_cpu_do_interrupt_aarch64(CPUState *cs)
-     unsigned int new_mode = aarch64_pstate_mode(new_el, true);
-     unsigned int cur_el = arm_current_el(env);
+ /* Max number of words in a DMA descriptor.  */
+-#define DESC_MAX_NUM_WORDS              2
++#define DESC_MAX_NUM_WORDS              6
  
--    aarch64_sve_change_el(env, cur_el, new_el);
-+    /*
-+     * Note that new_el can never be 0.  If cur_el is 0, then
-+     * el0_a64 is is_a64(), else el0_a64 is ignored.
-+     */
-+    aarch64_sve_change_el(env, cur_el, new_el, is_a64(env));
+ #define MAX_PRIORITY_QUEUES             8
+ #define MAX_TYPE1_SCREENERS             16
+diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
+index 4d769b02440..759c1d71e02 100644
+--- a/hw/net/cadence_gem.c
++++ b/hw/net/cadence_gem.c
+@@ -207,6 +207,9 @@
+ #define GEM_NWCFG_BCAST_REJ    0x00000020 /* Reject broadcast packets */
+ #define GEM_NWCFG_PROMISC      0x00000010 /* Accept all packets */
  
-     if (cur_el < new_el) {
-         /* Entry vector offset depends on whether the implemented EL
-@@ -12791,9 +12795,11 @@ void aarch64_sve_narrow_vq(CPUARMState *env, unsigned vq)
- /*
-  * Notice a change in SVE vector size when changing EL.
-  */
--void aarch64_sve_change_el(CPUARMState *env, int old_el, int new_el)
-+void aarch64_sve_change_el(CPUARMState *env, int old_el,
-+                           int new_el, bool el0_a64)
++#define GEM_DMACFG_ADDR_64B    (1U << 30)
++#define GEM_DMACFG_TX_BD_EXT   (1U << 29)
++#define GEM_DMACFG_RX_BD_EXT   (1U << 28)
+ #define GEM_DMACFG_RBUFSZ_M    0x00FF0000 /* DMA RX Buffer Size mask */
+ #define GEM_DMACFG_RBUFSZ_S    16         /* DMA RX Buffer Size shift */
+ #define GEM_DMACFG_RBUFSZ_MUL  64         /* DMA RX Buffer Size multiplier */
+@@ -302,9 +305,14 @@
+ 
+ #define GEM_MODID_VALUE 0x00020118
+ 
+-static inline unsigned tx_desc_get_buffer(uint32_t *desc)
++static inline uint64_t tx_desc_get_buffer(CadenceGEMState *s, uint32_t *desc)
  {
-     int old_len, new_len;
-+    bool old_a64, new_a64;
+-    return desc[0];
++    uint64_t ret = desc[0];
++
++    if (s->regs[GEM_DMACFG] & GEM_DMACFG_ADDR_64B) {
++        ret |= (uint64_t)desc[2] << 32;
++    }
++    return ret;
+ }
  
-     /* Nothing to do if no SVE.  */
-     if (!arm_feature(env, ARM_FEATURE_SVE)) {
-@@ -12817,9 +12823,11 @@ void aarch64_sve_change_el(CPUARMState *env, int old_el, int new_el)
-      * we already have the correct register contents when encountering the
-      * vq0->vq0 transition between EL0->EL1.
-      */
--    old_len = (arm_el_is_aa64(env, old_el) && !sve_exception_el(env, old_el)
-+    old_a64 = old_el ? arm_el_is_aa64(env, old_el) : el0_a64;
-+    old_len = (old_a64 && !sve_exception_el(env, old_el)
-                ? sve_zcr_len_for_el(env, old_el) : 0);
--    new_len = (arm_el_is_aa64(env, new_el) && !sve_exception_el(env, new_el)
-+    new_a64 = new_el ? arm_el_is_aa64(env, new_el) : el0_a64;
-+    new_len = (new_a64 && !sve_exception_el(env, new_el)
-                ? sve_zcr_len_for_el(env, new_el) : 0);
+ static inline unsigned tx_desc_get_used(uint32_t *desc)
+@@ -347,9 +355,30 @@ static inline void print_gem_tx_desc(uint32_t *desc, uint8_t queue)
+     DB_PRINT("length:  %d\n", tx_desc_get_length(desc));
+ }
  
-     /* When changing vector length, clear inaccessible state.  */
-diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-index fb15a13e6c9..d9155797126 100644
---- a/target/arm/op_helper.c
-+++ b/target/arm/op_helper.c
-@@ -1101,7 +1101,11 @@ void HELPER(exception_return)(CPUARMState *env)
-                       "AArch64 EL%d PC 0x%" PRIx64 "\n",
-                       cur_el, new_el, env->pc);
-     }
--    aarch64_sve_change_el(env, cur_el, new_el);
-+    /*
-+     * Note that cur_el can never be 0.  If new_el is 0, then
-+     * el0_a64 is return_to_aa64, else el0_a64 is ignored.
-+     */
-+    aarch64_sve_change_el(env, cur_el, new_el, return_to_aa64);
+-static inline unsigned rx_desc_get_buffer(uint32_t *desc)
++static inline uint64_t rx_desc_get_buffer(CadenceGEMState *s, uint32_t *desc)
+ {
+-    return desc[0] & ~0x3UL;
++    uint64_t ret = desc[0] & ~0x3UL;
++
++    if (s->regs[GEM_DMACFG] & GEM_DMACFG_ADDR_64B) {
++        ret |= (uint64_t)desc[2] << 32;
++    }
++    return ret;
++}
++
++static inline int gem_get_desc_len(CadenceGEMState *s, bool rx_n_tx)
++{
++    int ret = 2;
++
++    if (s->regs[GEM_DMACFG] & GEM_DMACFG_ADDR_64B) {
++        ret += 2;
++    }
++    if (s->regs[GEM_DMACFG] & (rx_n_tx ? GEM_DMACFG_RX_BD_EXT
++                                       : GEM_DMACFG_TX_BD_EXT)) {
++        ret += 2;
++    }
++
++    assert(ret <= DESC_MAX_NUM_WORDS);
++    return ret;
+ }
  
-     qemu_mutex_lock_iothread();
-     arm_call_el_change_hook(arm_env_get_cpu(env));
+ static inline unsigned rx_desc_get_wrap(uint32_t *desc)
+@@ -419,7 +448,7 @@ static void gem_init_register_masks(CadenceGEMState *s)
+     memset(&s->regs_ro[0], 0, sizeof(s->regs_ro));
+     s->regs_ro[GEM_NWCTRL]   = 0xFFF80000;
+     s->regs_ro[GEM_NWSTATUS] = 0xFFFFFFFF;
+-    s->regs_ro[GEM_DMACFG]   = 0xFE00F000;
++    s->regs_ro[GEM_DMACFG]   = 0x8E00F000;
+     s->regs_ro[GEM_TXSTATUS] = 0xFFFFFE08;
+     s->regs_ro[GEM_RXQBASE]  = 0x00000003;
+     s->regs_ro[GEM_TXQBASE]  = 0x00000003;
+@@ -807,7 +836,8 @@ static void gem_get_rx_desc(CadenceGEMState *s, int q)
+     DB_PRINT("read descriptor 0x%x\n", (unsigned)s->rx_desc_addr[q]);
+     /* read current descriptor */
+     cpu_physical_memory_read(s->rx_desc_addr[q],
+-                             (uint8_t *)s->rx_desc[q], sizeof(s->rx_desc[q]));
++                             (uint8_t *)s->rx_desc[q],
++                             sizeof(uint32_t) * gem_get_desc_len(s, true));
+ 
+     /* Descriptor owned by software ? */
+     if (rx_desc_get_ownership(s->rx_desc[q]) == 1) {
+@@ -926,9 +956,10 @@ static ssize_t gem_receive(NetClientState *nc, const uint8_t *buf, size_t size)
+                 rx_desc_get_buffer(s->rx_desc[q]));
+ 
+         /* Copy packet data to emulated DMA buffer */
+-        cpu_physical_memory_write(rx_desc_get_buffer(s->rx_desc[q]) +
+-                                                                 rxbuf_offset,
+-                                  rxbuf_ptr, MIN(bytes_to_copy, rxbufsize));
++        cpu_physical_memory_write(rx_desc_get_buffer(s, s->rx_desc[q]) +
++                                                                  rxbuf_offset,
++                                  rxbuf_ptr,
++                                  MIN(bytes_to_copy, rxbufsize));
+         rxbuf_ptr += MIN(bytes_to_copy, rxbufsize);
+         bytes_to_copy -= MIN(bytes_to_copy, rxbufsize);
+ 
+@@ -964,7 +995,7 @@ static ssize_t gem_receive(NetClientState *nc, const uint8_t *buf, size_t size)
+         /* Descriptor write-back.  */
+         cpu_physical_memory_write(s->rx_desc_addr[q],
+                                   (uint8_t *)s->rx_desc[q],
+-                                  sizeof(s->rx_desc[q]));
++                                  sizeof(uint32_t) * gem_get_desc_len(s, true));
+ 
+         /* Next descriptor */
+         if (rx_desc_get_wrap(s->rx_desc[q])) {
+@@ -972,7 +1003,7 @@ static ssize_t gem_receive(NetClientState *nc, const uint8_t *buf, size_t size)
+             s->rx_desc_addr[q] = s->regs[GEM_RXQBASE];
+         } else {
+             DB_PRINT("incrementing RX descriptor list\n");
+-            s->rx_desc_addr[q] += 8;
++            s->rx_desc_addr[q] += 4 * gem_get_desc_len(s, true);
+         }
+ 
+         gem_get_rx_desc(s, q);
+@@ -1069,7 +1100,8 @@ static void gem_transmit(CadenceGEMState *s)
+ 
+         DB_PRINT("read descriptor 0x%" HWADDR_PRIx "\n", packet_desc_addr);
+         cpu_physical_memory_read(packet_desc_addr,
+-                                 (uint8_t *)desc, sizeof(desc));
++                                 (uint8_t *)desc,
++                                 sizeof(uint32_t) * gem_get_desc_len(s, false));
+         /* Handle all descriptors owned by hardware */
+         while (tx_desc_get_used(desc) == 0) {
+ 
+@@ -1082,7 +1114,7 @@ static void gem_transmit(CadenceGEMState *s)
+             /* The real hardware would eat this (and possibly crash).
+              * For QEMU let's lend a helping hand.
+              */
+-            if ((tx_desc_get_buffer(desc) == 0) ||
++            if ((tx_desc_get_buffer(s, desc) == 0) ||
+                 (tx_desc_get_length(desc) == 0)) {
+                 DB_PRINT("Invalid TX descriptor @ 0x%x\n",
+                          (unsigned)packet_desc_addr);
+@@ -1101,7 +1133,7 @@ static void gem_transmit(CadenceGEMState *s)
+             /* Gather this fragment of the packet from "dma memory" to our
+              * contig buffer.
+              */
+-            cpu_physical_memory_read(tx_desc_get_buffer(desc), p,
++            cpu_physical_memory_read(tx_desc_get_buffer(s, desc), p,
+                                      tx_desc_get_length(desc));
+             p += tx_desc_get_length(desc);
+             total_bytes += tx_desc_get_length(desc);
+@@ -1124,7 +1156,8 @@ static void gem_transmit(CadenceGEMState *s)
+                 if (tx_desc_get_wrap(desc)) {
+                     s->tx_desc_addr[q] = s->regs[GEM_TXQBASE];
+                 } else {
+-                    s->tx_desc_addr[q] = packet_desc_addr + 8;
++                    s->tx_desc_addr[q] = packet_desc_addr +
++                                         4 * gem_get_desc_len(s, false);
+                 }
+                 DB_PRINT("TX descriptor next: 0x%08x\n", s->tx_desc_addr[q]);
+ 
+@@ -1168,11 +1201,11 @@ static void gem_transmit(CadenceGEMState *s)
+                 tx_desc_set_last(desc);
+                 packet_desc_addr = s->regs[GEM_TXQBASE];
+             } else {
+-                packet_desc_addr += 8;
++                packet_desc_addr += 4 * gem_get_desc_len(s, false);
+             }
+             DB_PRINT("read descriptor 0x%" HWADDR_PRIx "\n", packet_desc_addr);
+-            cpu_physical_memory_read(packet_desc_addr,
+-                                     (uint8_t *)desc, sizeof(desc));
++            cpu_physical_memory_read(packet_desc_addr, (uint8_t *)desc,
++                                sizeof(uint32_t) * gem_get_desc_len(s, false));
+         }
+ 
+         if (tx_desc_get_used(desc)) {
 -- 
 2.19.0
