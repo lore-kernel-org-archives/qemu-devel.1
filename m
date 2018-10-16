@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59668)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59750)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gCTTO-00045V-6u
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:49:39 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1gCTTQ-00047O-4W
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:49:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gCTTJ-0000y7-Rr
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:49:37 -0400
-Received: from mail-pg1-x52d.google.com ([2607:f8b0:4864:20::52d]:38062)
+	(envelope-from <richard.henderson@linaro.org>) id 1gCTTM-000146-RC
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:49:39 -0400
+Received: from mail-pg1-x534.google.com ([2607:f8b0:4864:20::534]:38069)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gCTTI-0000lD-HZ
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:49:33 -0400
-Received: by mail-pg1-x52d.google.com with SMTP id f8-v6so11197723pgq.5
-	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 10:49:25 -0700 (PDT)
+	id 1gCTTM-00011w-HI
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 13:49:36 -0400
+Received: by mail-pg1-x534.google.com with SMTP id f8-v6so11197932pgq.5
+	for <qemu-devel@nongnu.org>; Tue, 16 Oct 2018 10:49:36 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 16 Oct 2018 10:48:57 -0700
-Message-Id: <20181016174911.9052-8-richard.henderson@linaro.org>
+Date: Tue, 16 Oct 2018 10:49:04 -0700
+Message-Id: <20181016174911.9052-15-richard.henderson@linaro.org>
 In-Reply-To: <20181016174911.9052-1-richard.henderson@linaro.org>
 References: <20181016174911.9052-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 07/21] target/unicore32: remove tlb_flush from
- uc32_init_fn
+Subject: [Qemu-devel] [PULL 14/21] target/arm: Convert to HAVE_CMPXCHG128
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,39 +27,347 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, "Emilio G. Cota" <cota@braap.org>, Guan Xuetao <gxt@mprc.pku.edu.cn>
+Cc: peter.maydell@linaro.org
 
-From: "Emilio G. Cota" <cota@braap.org>
-
-As far as I can tell tlb_flush does not need to be called
-this early. tlb_flush is eventually called after the CPU
-has been realized.
-
-This change paves the way to the introduction of tlb_init,
-which will be called from cpu_exec_realizefn.
-
-Cc: Guan Xuetao <gxt@mprc.pku.edu.cn>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Emilio G. Cota <cota@braap.org>
-Message-Id: <20181009174557.16125-3-cota@braap.org>
+Reviewed-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/unicore32/cpu.c | 2 --
- 1 file changed, 2 deletions(-)
+ target/arm/helper-a64.c | 259 +++++++++++++++++++++-------------------
+ 1 file changed, 133 insertions(+), 126 deletions(-)
 
-diff --git a/target/unicore32/cpu.c b/target/unicore32/cpu.c
-index 68f978d80b..2b49d1ca40 100644
---- a/target/unicore32/cpu.c
-+++ b/target/unicore32/cpu.c
-@@ -116,8 +116,6 @@ static void uc32_cpu_initfn(Object *obj)
-     env->uncached_asr = ASR_MODE_PRIV;
-     env->regs[31] = 0x03000000;
- #endif
--
--    tlb_flush(cs);
+diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
+index 7f6ad3000b..6e4e1b8a19 100644
+--- a/target/arm/helper-a64.c
++++ b/target/arm/helper-a64.c
+@@ -30,6 +30,7 @@
+ #include "exec/exec-all.h"
+ #include "exec/cpu_ldst.h"
+ #include "qemu/int128.h"
++#include "qemu/atomic128.h"
+ #include "tcg.h"
+ #include "fpu/softfloat.h"
+ #include <zlib.h> /* For crc32 */
+@@ -509,189 +510,195 @@ uint64_t HELPER(crc32c_64)(uint64_t acc, uint64_t val, uint32_t bytes)
+     return crc32c(acc, buf, bytes) ^ 0xffffffff;
  }
  
- static const VMStateDescription vmstate_uc32_cpu = {
+-/* Returns 0 on success; 1 otherwise.  */
+-static uint64_t do_paired_cmpxchg64_le(CPUARMState *env, uint64_t addr,
+-                                       uint64_t new_lo, uint64_t new_hi,
+-                                       bool parallel, uintptr_t ra)
++uint64_t HELPER(paired_cmpxchg64_le)(CPUARMState *env, uint64_t addr,
++                                     uint64_t new_lo, uint64_t new_hi)
+ {
+-    Int128 oldv, cmpv, newv;
++    Int128 cmpv = int128_make128(env->exclusive_val, env->exclusive_high);
++    Int128 newv = int128_make128(new_lo, new_hi);
++    Int128 oldv;
++    uintptr_t ra = GETPC();
++    uint64_t o0, o1;
+     bool success;
+ 
+-    cmpv = int128_make128(env->exclusive_val, env->exclusive_high);
+-    newv = int128_make128(new_lo, new_hi);
+-
+-    if (parallel) {
+-#ifndef CONFIG_ATOMIC128
+-        cpu_loop_exit_atomic(ENV_GET_CPU(env), ra);
+-#else
+-        int mem_idx = cpu_mmu_index(env, false);
+-        TCGMemOpIdx oi = make_memop_idx(MO_LEQ | MO_ALIGN_16, mem_idx);
+-        oldv = helper_atomic_cmpxchgo_le_mmu(env, addr, cmpv, newv, oi, ra);
+-        success = int128_eq(oldv, cmpv);
+-#endif
+-    } else {
+-        uint64_t o0, o1;
+-
+ #ifdef CONFIG_USER_ONLY
+-        /* ??? Enforce alignment.  */
+-        uint64_t *haddr = g2h(addr);
++    /* ??? Enforce alignment.  */
++    uint64_t *haddr = g2h(addr);
+ 
+-        helper_retaddr = ra;
+-        o0 = ldq_le_p(haddr + 0);
+-        o1 = ldq_le_p(haddr + 1);
+-        oldv = int128_make128(o0, o1);
++    helper_retaddr = ra;
++    o0 = ldq_le_p(haddr + 0);
++    o1 = ldq_le_p(haddr + 1);
++    oldv = int128_make128(o0, o1);
+ 
+-        success = int128_eq(oldv, cmpv);
+-        if (success) {
+-            stq_le_p(haddr + 0, int128_getlo(newv));
+-            stq_le_p(haddr + 1, int128_gethi(newv));
+-        }
+-        helper_retaddr = 0;
+-#else
+-        int mem_idx = cpu_mmu_index(env, false);
+-        TCGMemOpIdx oi0 = make_memop_idx(MO_LEQ | MO_ALIGN_16, mem_idx);
+-        TCGMemOpIdx oi1 = make_memop_idx(MO_LEQ, mem_idx);
+-
+-        o0 = helper_le_ldq_mmu(env, addr + 0, oi0, ra);
+-        o1 = helper_le_ldq_mmu(env, addr + 8, oi1, ra);
+-        oldv = int128_make128(o0, o1);
+-
+-        success = int128_eq(oldv, cmpv);
+-        if (success) {
+-            helper_le_stq_mmu(env, addr + 0, int128_getlo(newv), oi1, ra);
+-            helper_le_stq_mmu(env, addr + 8, int128_gethi(newv), oi1, ra);
+-        }
+-#endif
++    success = int128_eq(oldv, cmpv);
++    if (success) {
++        stq_le_p(haddr + 0, int128_getlo(newv));
++        stq_le_p(haddr + 1, int128_gethi(newv));
+     }
++    helper_retaddr = 0;
++#else
++    int mem_idx = cpu_mmu_index(env, false);
++    TCGMemOpIdx oi0 = make_memop_idx(MO_LEQ | MO_ALIGN_16, mem_idx);
++    TCGMemOpIdx oi1 = make_memop_idx(MO_LEQ, mem_idx);
++
++    o0 = helper_le_ldq_mmu(env, addr + 0, oi0, ra);
++    o1 = helper_le_ldq_mmu(env, addr + 8, oi1, ra);
++    oldv = int128_make128(o0, o1);
++
++    success = int128_eq(oldv, cmpv);
++    if (success) {
++        helper_le_stq_mmu(env, addr + 0, int128_getlo(newv), oi1, ra);
++        helper_le_stq_mmu(env, addr + 8, int128_gethi(newv), oi1, ra);
++    }
++#endif
+ 
+     return !success;
+ }
+ 
+-uint64_t HELPER(paired_cmpxchg64_le)(CPUARMState *env, uint64_t addr,
+-                                              uint64_t new_lo, uint64_t new_hi)
+-{
+-    return do_paired_cmpxchg64_le(env, addr, new_lo, new_hi, false, GETPC());
+-}
+-
+ uint64_t HELPER(paired_cmpxchg64_le_parallel)(CPUARMState *env, uint64_t addr,
+                                               uint64_t new_lo, uint64_t new_hi)
+-{
+-    return do_paired_cmpxchg64_le(env, addr, new_lo, new_hi, true, GETPC());
+-}
+-
+-static uint64_t do_paired_cmpxchg64_be(CPUARMState *env, uint64_t addr,
+-                                       uint64_t new_lo, uint64_t new_hi,
+-                                       bool parallel, uintptr_t ra)
+ {
+     Int128 oldv, cmpv, newv;
++    uintptr_t ra = GETPC();
+     bool success;
++    int mem_idx;
++    TCGMemOpIdx oi;
+ 
+-    /* high and low need to be switched here because this is not actually a
+-     * 128bit store but two doublewords stored consecutively
+-     */
+-    cmpv = int128_make128(env->exclusive_high, env->exclusive_val);
+-    newv = int128_make128(new_hi, new_lo);
+-
+-    if (parallel) {
+-#ifndef CONFIG_ATOMIC128
++    if (!HAVE_CMPXCHG128) {
+         cpu_loop_exit_atomic(ENV_GET_CPU(env), ra);
+-#else
+-        int mem_idx = cpu_mmu_index(env, false);
+-        TCGMemOpIdx oi = make_memop_idx(MO_BEQ | MO_ALIGN_16, mem_idx);
+-        oldv = helper_atomic_cmpxchgo_be_mmu(env, addr, cmpv, newv, oi, ra);
+-        success = int128_eq(oldv, cmpv);
+-#endif
+-    } else {
+-        uint64_t o0, o1;
+-
+-#ifdef CONFIG_USER_ONLY
+-        /* ??? Enforce alignment.  */
+-        uint64_t *haddr = g2h(addr);
+-
+-        helper_retaddr = ra;
+-        o1 = ldq_be_p(haddr + 0);
+-        o0 = ldq_be_p(haddr + 1);
+-        oldv = int128_make128(o0, o1);
+-
+-        success = int128_eq(oldv, cmpv);
+-        if (success) {
+-            stq_be_p(haddr + 0, int128_gethi(newv));
+-            stq_be_p(haddr + 1, int128_getlo(newv));
+-        }
+-        helper_retaddr = 0;
+-#else
+-        int mem_idx = cpu_mmu_index(env, false);
+-        TCGMemOpIdx oi0 = make_memop_idx(MO_BEQ | MO_ALIGN_16, mem_idx);
+-        TCGMemOpIdx oi1 = make_memop_idx(MO_BEQ, mem_idx);
+-
+-        o1 = helper_be_ldq_mmu(env, addr + 0, oi0, ra);
+-        o0 = helper_be_ldq_mmu(env, addr + 8, oi1, ra);
+-        oldv = int128_make128(o0, o1);
+-
+-        success = int128_eq(oldv, cmpv);
+-        if (success) {
+-            helper_be_stq_mmu(env, addr + 0, int128_gethi(newv), oi1, ra);
+-            helper_be_stq_mmu(env, addr + 8, int128_getlo(newv), oi1, ra);
+-        }
+-#endif
+     }
+ 
++    mem_idx = cpu_mmu_index(env, false);
++    oi = make_memop_idx(MO_LEQ | MO_ALIGN_16, mem_idx);
++
++    cmpv = int128_make128(env->exclusive_val, env->exclusive_high);
++    newv = int128_make128(new_lo, new_hi);
++    oldv = helper_atomic_cmpxchgo_le_mmu(env, addr, cmpv, newv, oi, ra);
++
++    success = int128_eq(oldv, cmpv);
+     return !success;
+ }
+ 
+ uint64_t HELPER(paired_cmpxchg64_be)(CPUARMState *env, uint64_t addr,
+                                      uint64_t new_lo, uint64_t new_hi)
+ {
+-    return do_paired_cmpxchg64_be(env, addr, new_lo, new_hi, false, GETPC());
++    /*
++     * High and low need to be switched here because this is not actually a
++     * 128bit store but two doublewords stored consecutively
++     */
++    Int128 cmpv = int128_make128(env->exclusive_val, env->exclusive_high);
++    Int128 newv = int128_make128(new_lo, new_hi);
++    Int128 oldv;
++    uintptr_t ra = GETPC();
++    uint64_t o0, o1;
++    bool success;
++
++#ifdef CONFIG_USER_ONLY
++    /* ??? Enforce alignment.  */
++    uint64_t *haddr = g2h(addr);
++
++    helper_retaddr = ra;
++    o1 = ldq_be_p(haddr + 0);
++    o0 = ldq_be_p(haddr + 1);
++    oldv = int128_make128(o0, o1);
++
++    success = int128_eq(oldv, cmpv);
++    if (success) {
++        stq_be_p(haddr + 0, int128_gethi(newv));
++        stq_be_p(haddr + 1, int128_getlo(newv));
++    }
++    helper_retaddr = 0;
++#else
++    int mem_idx = cpu_mmu_index(env, false);
++    TCGMemOpIdx oi0 = make_memop_idx(MO_BEQ | MO_ALIGN_16, mem_idx);
++    TCGMemOpIdx oi1 = make_memop_idx(MO_BEQ, mem_idx);
++
++    o1 = helper_be_ldq_mmu(env, addr + 0, oi0, ra);
++    o0 = helper_be_ldq_mmu(env, addr + 8, oi1, ra);
++    oldv = int128_make128(o0, o1);
++
++    success = int128_eq(oldv, cmpv);
++    if (success) {
++        helper_be_stq_mmu(env, addr + 0, int128_gethi(newv), oi1, ra);
++        helper_be_stq_mmu(env, addr + 8, int128_getlo(newv), oi1, ra);
++    }
++#endif
++
++    return !success;
+ }
+ 
+ uint64_t HELPER(paired_cmpxchg64_be_parallel)(CPUARMState *env, uint64_t addr,
+-                                     uint64_t new_lo, uint64_t new_hi)
++                                              uint64_t new_lo, uint64_t new_hi)
+ {
+-    return do_paired_cmpxchg64_be(env, addr, new_lo, new_hi, true, GETPC());
++    Int128 oldv, cmpv, newv;
++    uintptr_t ra = GETPC();
++    bool success;
++    int mem_idx;
++    TCGMemOpIdx oi;
++
++    if (!HAVE_CMPXCHG128) {
++        cpu_loop_exit_atomic(ENV_GET_CPU(env), ra);
++    }
++
++    mem_idx = cpu_mmu_index(env, false);
++    oi = make_memop_idx(MO_BEQ | MO_ALIGN_16, mem_idx);
++
++    /*
++     * High and low need to be switched here because this is not actually a
++     * 128bit store but two doublewords stored consecutively
++     */
++    cmpv = int128_make128(env->exclusive_high, env->exclusive_val);
++    newv = int128_make128(new_hi, new_lo);
++    oldv = helper_atomic_cmpxchgo_be_mmu(env, addr, cmpv, newv, oi, ra);
++
++    success = int128_eq(oldv, cmpv);
++    return !success;
+ }
+ 
+ /* Writes back the old data into Rs.  */
+ void HELPER(casp_le_parallel)(CPUARMState *env, uint32_t rs, uint64_t addr,
+                               uint64_t new_lo, uint64_t new_hi)
+ {
+-    uintptr_t ra = GETPC();
+-#ifndef CONFIG_ATOMIC128
+-    cpu_loop_exit_atomic(ENV_GET_CPU(env), ra);
+-#else
+     Int128 oldv, cmpv, newv;
++    uintptr_t ra = GETPC();
++    int mem_idx;
++    TCGMemOpIdx oi;
++
++    if (!HAVE_CMPXCHG128) {
++        cpu_loop_exit_atomic(ENV_GET_CPU(env), ra);
++    }
++
++    mem_idx = cpu_mmu_index(env, false);
++    oi = make_memop_idx(MO_LEQ | MO_ALIGN_16, mem_idx);
+ 
+     cmpv = int128_make128(env->xregs[rs], env->xregs[rs + 1]);
+     newv = int128_make128(new_lo, new_hi);
+-
+-    int mem_idx = cpu_mmu_index(env, false);
+-    TCGMemOpIdx oi = make_memop_idx(MO_LEQ | MO_ALIGN_16, mem_idx);
+     oldv = helper_atomic_cmpxchgo_le_mmu(env, addr, cmpv, newv, oi, ra);
+ 
+     env->xregs[rs] = int128_getlo(oldv);
+     env->xregs[rs + 1] = int128_gethi(oldv);
+-#endif
+ }
+ 
+ void HELPER(casp_be_parallel)(CPUARMState *env, uint32_t rs, uint64_t addr,
+                               uint64_t new_hi, uint64_t new_lo)
+ {
+-    uintptr_t ra = GETPC();
+-#ifndef CONFIG_ATOMIC128
+-    cpu_loop_exit_atomic(ENV_GET_CPU(env), ra);
+-#else
+     Int128 oldv, cmpv, newv;
++    uintptr_t ra = GETPC();
++    int mem_idx;
++    TCGMemOpIdx oi;
++
++    if (!HAVE_CMPXCHG128) {
++        cpu_loop_exit_atomic(ENV_GET_CPU(env), ra);
++    }
++
++    mem_idx = cpu_mmu_index(env, false);
++    oi = make_memop_idx(MO_LEQ | MO_ALIGN_16, mem_idx);
+ 
+     cmpv = int128_make128(env->xregs[rs + 1], env->xregs[rs]);
+     newv = int128_make128(new_lo, new_hi);
+-
+-    int mem_idx = cpu_mmu_index(env, false);
+-    TCGMemOpIdx oi = make_memop_idx(MO_LEQ | MO_ALIGN_16, mem_idx);
+     oldv = helper_atomic_cmpxchgo_be_mmu(env, addr, cmpv, newv, oi, ra);
+ 
+     env->xregs[rs + 1] = int128_getlo(oldv);
+     env->xregs[rs] = int128_gethi(oldv);
+-#endif
+ }
+ 
+ /*
 -- 
 2.17.2
