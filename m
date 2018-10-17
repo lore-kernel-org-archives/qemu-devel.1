@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gChB4-0000Kw-Uw
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 04:27:39 -0400
+	(envelope-from <armbru@redhat.com>) id 1gChB4-0000Ks-TC
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 04:27:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gChB2-0001y9-16
+	(envelope-from <armbru@redhat.com>) id 1gChB2-0001zB-Eb
 	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 04:27:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44226)
+Received: from mx1.redhat.com ([209.132.183.28]:58452)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gChB1-0001Oq-Np
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 04:27:35 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gChB2-0001Vx-0F
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 04:27:36 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BB21680E7B
-	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 08:27:18 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id D359D307D858
+	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 08:27:21 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 17 Oct 2018 10:26:34 +0200
-Message-Id: <20181017082702.5581-11-armbru@redhat.com>
+Date: Wed, 17 Oct 2018 10:26:41 +0200
+Message-Id: <20181017082702.5581-18-armbru@redhat.com>
 In-Reply-To: <20181017082702.5581-1-armbru@redhat.com>
 References: <20181017082702.5581-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 10/38] ioapic: Fix error handling in
- realize()
+Subject: [Qemu-devel] [PATCH v4 17/38] seccomp: Clean up error reporting in
+ parse_sandbox()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,47 +34,114 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Xu <peterx@redhat.com>
+Cc: Eduardo Otubo <otubo@redhat.com>
 
 Calling error_report() in a function that takes an Error ** argument
-is suspicious.  ioapic_realize() does that, and then exit()s.
-Currently mostly harmless, as the device cannot be hot-plugged.
+is suspicious.  parse_sandbox() does that, and then fails without
+setting an error.  Its caller main(), via qemu_opts_foreach(), is fine
+with it, but clean it up anyway.
 
-Fixes: 20fd4b7b6d9282fe0cb83601f1821f31bd257458
-Cc: Peter Xu <peterx@redhat.com>
+Cc: Eduardo Otubo <otubo@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Acked-by: Eduardo Otubo <otubo@redhat.com>
 ---
- hw/intc/ioapic.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ qemu-seccomp.c | 18 +++++++++---------
+ vl.c           |  4 ++--
+ 2 files changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/hw/intc/ioapic.c b/hw/intc/ioapic.c
-index b6896ac4ce..4e529729b4 100644
---- a/hw/intc/ioapic.c
-+++ b/hw/intc/ioapic.c
-@@ -21,7 +21,7 @@
+diff --git a/qemu-seccomp.c b/qemu-seccomp.c
+index 1baa5c69ed..5c73e6ad05 100644
+--- a/qemu-seccomp.c
++++ b/qemu-seccomp.c
+@@ -12,11 +12,12 @@
+  * Contributions after 2012-01-13 are licensed under the terms of the
+  * GNU GPL, version 2 or (at your option) any later version.
   */
-=20
++
  #include "qemu/osdep.h"
--#include "qemu/error-report.h"
 +#include "qapi/error.h"
- #include "monitor/monitor.h"
- #include "hw/hw.h"
- #include "hw/i386/pc.h"
-@@ -393,9 +393,9 @@ static void ioapic_realize(DeviceState *dev, Error **=
-errp)
-     IOAPICCommonState *s =3D IOAPIC_COMMON(dev);
+ #include "qemu/config-file.h"
+ #include "qemu/option.h"
+ #include "qemu/module.h"
+-#include "qemu/error-report.h"
+ #include <sys/prctl.h>
+ #include <seccomp.h>
+ #include "sysemu/seccomp.h"
+@@ -190,7 +191,7 @@ int parse_sandbox(void *opaque, QemuOpts *opts, Error=
+ **errp)
+                  * to provide a little bit of consistency for
+                  * the command line */
+             } else {
+-                error_report("invalid argument for obsolete");
++                error_setg(errp, "invalid argument for obsolete");
+                 return -1;
+             }
+         }
+@@ -205,14 +206,13 @@ int parse_sandbox(void *opaque, QemuOpts *opts, Err=
+or **errp)
+                 /* calling prctl directly because we're
+                  * not sure if host has CAP_SYS_ADMIN set*/
+                 if (prctl(PR_SET_NO_NEW_PRIVS, 1)) {
+-                    error_report("failed to set no_new_privs "
+-                                 "aborting");
++                    error_setg(errp, "failed to set no_new_privs abortin=
+g");
+                     return -1;
+                 }
+             } else if (g_str_equal(value, "allow")) {
+                 /* default value */
+             } else {
+-                error_report("invalid argument for elevateprivileges");
++                error_setg(errp, "invalid argument for elevateprivileges=
+");
+                 return -1;
+             }
+         }
+@@ -224,7 +224,7 @@ int parse_sandbox(void *opaque, QemuOpts *opts, Error=
+ **errp)
+             } else if (g_str_equal(value, "allow")) {
+                 /* default value */
+             } else {
+-                error_report("invalid argument for spawn");
++                error_setg(errp, "invalid argument for spawn");
+                 return -1;
+             }
+         }
+@@ -236,14 +236,14 @@ int parse_sandbox(void *opaque, QemuOpts *opts, Err=
+or **errp)
+             } else if (g_str_equal(value, "allow")) {
+                 /* default value */
+             } else {
+-                error_report("invalid argument for resourcecontrol");
++                error_setg(errp, "invalid argument for resourcecontrol")=
+;
+                 return -1;
+             }
+         }
 =20
-     if (s->version !=3D 0x11 && s->version !=3D 0x20) {
--        error_report("IOAPIC only supports version 0x11 or 0x20 "
--                     "(default: 0x%x).", IOAPIC_VER_DEF);
--        exit(1);
-+        error_setg(errp, "IOAPIC only supports version 0x11 or 0x20 "
-+                   "(default: 0x%x).", IOAPIC_VER_DEF);
-+        return;
+         if (seccomp_start(seccomp_opts) < 0) {
+-            error_report("failed to install seccomp syscall filter "
+-                         "in the kernel");
++            error_setg(errp, "failed to install seccomp syscall filter "
++                       "in the kernel");
+             return -1;
+         }
      }
+diff --git a/vl.c b/vl.c
+index ff50199e64..643121e5d4 100644
+--- a/vl.c
++++ b/vl.c
+@@ -3972,8 +3972,8 @@ int main(int argc, char **argv, char **envp)
 =20
-     memory_region_init_io(&s->io_memory, OBJECT(s), &ioapic_io_ops, s,
+ #ifdef CONFIG_SECCOMP
+     olist =3D qemu_find_opts_err("sandbox", NULL);
+-    if (olist && qemu_opts_foreach(olist, parse_sandbox, NULL, NULL)) {
+-        exit(1);
++    if (olist) {
++        qemu_opts_foreach(olist, parse_sandbox, NULL, &error_fatal);
+     }
+ #endif
+=20
 --=20
 2.17.1
