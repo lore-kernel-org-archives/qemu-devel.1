@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50878)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gCjwc-0005nV-DI
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 07:24:58 -0400
+	(envelope-from <d.csapak@proxmox.com>) id 1gCk5d-00086y-Ha
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 07:34:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gCjwY-00085U-Qp
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 07:24:52 -0400
-References: <cover.1539764043.git.artem.k.pisarenko@gmail.com>
-	<f47b81dbce734e9806f9516eba8ca588e6321c2f.1539764043.git.artem.k.pisarenko@gmail.com>
-	<20181017091204.GC22755@stefanha-x1.localdomain>
-	<5a83aab6-1277-cc0e-7913-964a8fea5265@redhat.com>
-	<CANzW0mvPxvDsCURzXjOdjR-8uLjXpyAouH80ik6asb0awwX+VA@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c9cfbdff-f713-b49d-4ac8-33ed79b08502@redhat.com>
-Date: Wed, 17 Oct 2018 13:24:28 +0200
+	(envelope-from <d.csapak@proxmox.com>) id 1gCk5Z-00047d-JA
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 07:34:13 -0400
+Received: from proxmox-new.maurer-it.com ([212.186.127.180]:29544)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <d.csapak@proxmox.com>)
+	id 1gCk5X-0003z3-3h
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 07:34:07 -0400
+References: <20181008131924.7377-1-d.csapak@proxmox.com>
+	<1f00827b-4c94-e10c-ab57-4ceb5223bee9@proxmox.com>
+	<d2f89cb6-0ea5-75bc-1bb1-3f0ce6509ec4@redhat.com>
+From: Dominik Csapak <d.csapak@proxmox.com>
+Message-ID: <d5d914fc-daa1-4164-44ba-a02365a44ddb@proxmox.com>
+Date: Wed, 17 Oct 2018 13:34:01 +0200
 MIME-Version: 1.0
-In-Reply-To: <CANzW0mvPxvDsCURzXjOdjR-8uLjXpyAouH80ik6asb0awwX+VA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <d2f89cb6-0ea5-75bc-1bb1-3f0ce6509ec4@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 2/4] Introduce attributes
- to qemu timer subsystem
+Subject: Re: [Qemu-devel] [PATCH] qapi: add info about reset to SHUTDOWN
+ event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,111 +31,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Artem Pisarenko <artem.k.pisarenko@gmail.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, "open list:Block I/O path" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: armbru@redhat.com, eblake@redhat.com
 
-On 17/10/2018 12:57, Artem Pisarenko wrote:
->> Further down in this patch the notation is QEMU_TIMER_ATTR_<id>, which=
- I
->> think is clearer because QEMU_TIMER_ATTR(id) looks like a (non-existen=
-t)
->> macro.=C2=A0 Please use the QEMU_TIMER_ATTR_<id> notation consistently=
-.
+On 10/17/18 12:58 PM, Paolo Bonzini wrote:
+> On 17/10/2018 09:17, Dominik Csapak wrote:
+>> On 10/8/18 3:19 PM, Dominik Csapak wrote:
+>>> when '-no-reboot' is set, it is interesting if the guest was original=
+ly
+>>> shutdown or reset, so save and return that info
+>>
+>>
+>>  =C2=A0 {
+>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (no_reboot && reason !=3D SHUTDOWN_=
+CAUSE_SUBSYSTEM_RESET) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 shutdown_was_reset =3D tru=
+e;
+>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 shutdown_reque=
+sted =3D reason;
+>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {
+>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 reset_requeste=
+d =3D reason;
+>> @@ -1807,7 +1809,8 @@ static bool main_loop_should_exit(void)
+>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 request =3D qemu_shutdown_requested();
+>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (request) {
+>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_kill_repo=
+rt();
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qapi_event_send_shutdown(s=
+hutdown_caused_by_guest(request));
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qapi_event_send_shutdown(s=
+hutdown_caused_by_guest(request),
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 shutdown_was_reset);
 >=20
-> Yes, I've just forgot to update comments after previous patch version,
-> where it actually was macro.
+> So the problem with shutdown_caused_by_guest is that you get the same
+> value for both guest reset and guest shutdown.  Could we instead just
+> pass the ShutdownCause in the event (similar to what was proposed even
+> when discussing commit 08fba7ac9b618516a5f1d096f78a7e2837fe0594)?
 >=20
->> What is the purpose of this bit?=C2=A0 I guess it's just here as a
->> placeholder because no real bits have been defined yet.=C2=A0 Hopefull=
-y the
->> next patch removes it (/* This placeholder is removed in the next patc=
-h
->> */ would be a nice way to document this for reviewers).
->=20
-> It's just to prevent compilation errors, as required by
-> https://wiki.qemu.org/Contribute/SubmitAPatch#Split_up_long_patches
->=20
->> The enum isn't needed and makes debugging harder since the bit number =
-is
->> implicit in the enum ordering.=C2=A0 This alternative is clearer and m=
-ore
->> concise:
->>=C2=A0
->>=C2=A0 =C2=A0#define QEMU_TIMER_ATTR_foo BIT(n)
->=20
-> Agree.
+> You would get either guest-reset or host-qmp if it's a reset; the same
+> host-qmp reason could account for both "quit" and "system_reset", but i=
+n
+> practice the caller will know if it has asked for a hard shutdown or a
+> reset.
 
-Like this?
+i would find it nicer to always be able to distinguish between
+a reset and a normal exit, since it would be less work on the
+management side (i.e. we would have to handle the qmp reset elsewhere
+instead of in the same process that monitors the events)
 
-diff --git a/include/qemu/timer.h b/include/qemu/timer.h
-index 86ce70f20e..ef7526e389 100644
---- a/include/qemu/timer.h
-+++ b/include/qemu/timer.h
-@@ -55,25 +55,13 @@ typedef enum {
- /**
-  * QEMU Timer attributes:
-  *
-- * An individual timer may be assigned with one or multiple attributes w=
-hen
-- * initialized.
-- * Attribute is a static flag, meaning that timer has corresponding
-property.
-- * Attributes are defined in QEMUTimerAttrBit enum and encoded to bit se=
-t,
-- * which used to initialize timer, stored to 'attributes' member and can=
- be
-- * retrieved externally with timer_get_attributes() call.
-- * Values of QEMUTimerAttrBit aren't used directly,
-- * instead each attribute in bit set accessed with QEMU_TIMER_ATTR_<id>
-macro,
-- * where <id> is a unique part of attribute identifier.
-+ * An individual timer may be given one or multiple attributes when
-initialized.
-+ * Each attribute corresponds to one bit.  Attributes modify the process=
-ing
-+ * of timers when they fire.
-  *
-  * No attributes defined currently.
-  */
-
--typedef enum {
--    QEMU_TIMER_ATTRBIT__NONE
--} QEMUTimerAttrBit;
--
--#define QEMU_TIMER_ATTR__NONE (1 << QEMU_TIMER_ATTRBIT__NONE)
--
- typedef struct QEMUTimerList QEMUTimerList;
-
- struct QEMUTimerListGroup {
-@@ -640,14 +628,6 @@ static inline QEMUTimer *timer_new_ms(QEMUClockType
-type, QEMUTimerCB *cb,
-     return timer_new(type, SCALE_MS, cb, opaque);
- }
-
--/**
-- * timer_get_attributes:
-- * @ts: the timer
-- *
-- * Return 0, or one to multiple OR'ed QEMU_TIMER_ATTR(id) values
-- */
--int timer_get_attributes(QEMUTimer *ts);
--
- /**
-  * timer_deinit:
-  * @ts: the timer to be de-initialised
-diff --git a/util/qemu-timer.c b/util/qemu-timer.c
-index 2046b68c15..04527a343f 100644
---- a/util/qemu-timer.c
-+++ b/util/qemu-timer.c
-@@ -355,11 +355,6 @@ void timer_init_full(QEMUTimer *ts,
-     ts->expire_time =3D -1;
- }
-
--int timer_get_attributes(QEMUTimer *ts)
--{
--    return ts->attributes;
--}
--
- void timer_deinit(QEMUTimer *ts)
- {
-     assert(ts->expire_time =3D=3D -1);
+also it would make the 'guest' parameter redundant or change the api and=20
+i am not sure about how stable it has to be?
