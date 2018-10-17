@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40551)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gCmEp-0001dU-3g
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 09:51:51 -0400
+	(envelope-from <eblake@redhat.com>) id 1gCmHS-0003ZR-GC
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 09:54:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gCmEl-0008BK-G9
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 09:51:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37568)
+	(envelope-from <eblake@redhat.com>) id 1gCmHP-0004Zp-AG
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 09:54:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51682)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gCmEl-00085f-8I
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 09:51:47 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gCmHP-0004Xt-1a
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 09:54:31 -0400
 References: <20181008131924.7377-1-d.csapak@proxmox.com>
 	<1f00827b-4c94-e10c-ab57-4ceb5223bee9@proxmox.com>
+	<d2f89cb6-0ea5-75bc-1bb1-3f0ce6509ec4@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <98a20e5d-0a11-2d4f-2de9-d50ca4dff941@redhat.com>
-Date: Wed, 17 Oct 2018 08:51:35 -0500
+Message-ID: <a8739a07-0675-5e16-b357-6bb2179aed11@redhat.com>
+Date: Wed, 17 Oct 2018 08:54:23 -0500
 MIME-Version: 1.0
-In-Reply-To: <1f00827b-4c94-e10c-ab57-4ceb5223bee9@proxmox.com>
+In-Reply-To: <d2f89cb6-0ea5-75bc-1bb1-3f0ce6509ec4@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
@@ -29,42 +30,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dominik Csapak <d.csapak@proxmox.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, armbru@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, Dominik Csapak <d.csapak@proxmox.com>, qemu-devel@nongnu.org
+Cc: armbru@redhat.com
 
-On 10/17/18 2:17 AM, Dominik Csapak wrote:
-> On 10/8/18 3:19 PM, Dominik Csapak wrote:
->> when '-no-reboot' is set, it is interesting if the guest was originall=
-y
->> shutdown or reset, so save and return that info
->>
->> Signed-off-by: Dominik Csapak <d.csapak@proxmox.com>
->> ---
->> =C2=A0 qapi/run-state.json | 5 ++++-
->> =C2=A0 vl.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 5 ++++-
->> =C2=A0 2 files changed, 8 insertions(+), 2 deletions(-)
->>
->> diff --git a/qapi/run-state.json b/qapi/run-state.json
->> index 332e44897b..ec1769777d 100644
->> --- a/qapi/run-state.json
->> +++ b/qapi/run-state.json
->> @@ -107,6 +107,9 @@
->> =C2=A0 # a guest-initiated ACPI shutdown request or other hardware-spe=
-cific=20
->> action)
->> =C2=A0 # rather than a host request (such as sending qemu a SIGINT). (=
-since=20
->> 2.10)
->> =C2=A0 #
->> +# @was_reset: If true, the shutdown was actually a reset, but no-rebo=
-ot
->> +# was set, so it got converted to a shutdown
+On 10/17/18 5:58 AM, Paolo Bonzini wrote:
 
-New additions should prefer naming like 'was-reset' rather than=20
-'was_reset', if we still think this particular name is appropriate.  My=20
-personal take: what does the 'was' add, which would prevent us from just=20
-using the name 'reset' and avoiding the separator spelling issue?
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qapi_event_send_shutdown(s=
+hutdown_caused_by_guest(request));
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qapi_event_send_shutdown(s=
+hutdown_caused_by_guest(request),
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 shutdown_was_reset);
+>=20
+> So the problem with shutdown_caused_by_guest is that you get the same
+> value for both guest reset and guest shutdown.  Could we instead just
+> pass the ShutdownCause in the event (similar to what was proposed even
+> when discussing commit 08fba7ac9b618516a5f1d096f78a7e2837fe0594)?
+
+Indeed, it sounds like we are now at the point where we want to do=20
+precisely that - expose more fine-grained details by adding=20
+ShutdownCause as a QAPI enum, rather than just adding another bool per=20
+reason.
 
 --=20
 Eric Blake, Principal Software Engineer
