@@ -1,14 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51086)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gCbNV-0000FG-BF
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 22:16:06 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1gCbW4-0002Fi-N0
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 22:24:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gCbNT-00068I-W0
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 22:16:05 -0400
-From: Peng Hao <peng.hao2@zte.com.cn>
-Date: Wed, 17 Oct 2018 18:26:57 +0800
-Message-Id: <1539772017-18735-1-git-send-email-peng.hao2@zte.com.cn>
-Subject: [Qemu-devel] [PATCH v2]  target/arm : add pvpanic mmio device
+	(envelope-from <dgibson@ozlabs.org>) id 1gCbW3-0002Nr-O8
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 22:24:56 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:50987)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1gCbW2-0002GC-D1
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 22:24:55 -0400
+Date: Wed, 17 Oct 2018 11:34:15 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20181017003415.GK16167@umbus.fritz.box>
+References: <20180727123112.13707-1-dgilbert@redhat.com>
+	<d09b7607-a23b-7c05-9faf-7ec0000684af@ilande.co.uk>
+	<20180727134453.GB2498@work-vm>
+	<c8608e2e-35da-d095-193a-626d0d47c036@ilande.co.uk>
+	<20180727151412.GC2498@work-vm> <20181016113044.GE2426@work-vm>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="BFVE2HhgxTpCzM8t"
+Content-Disposition: inline
+In-Reply-To: <20181016113044.GE2426@work-vm>
+Subject: Re: [Qemu-devel] [PATCH] macio/pmu: Fix missing vmsd terminator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,249 +31,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Peng Hao <peng.hao2@zte.com.cn>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, lvivier@redhat.com, qemu-devel@nongnu.org, agraf@suse.de
 
-Add pvpanic mmio device that is similar to x86's pvpanic device.
 
-v1 ---> v2 add copyright and license for new files.
+--BFVE2HhgxTpCzM8t
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
----
- default-configs/arm-softmmu.mak |  2 +-
- hw/arm/virt.c                   | 21 +++++++++
- hw/misc/Makefile.objs           |  1 +
- hw/misc/pvpanic-mmio.c          | 97 +++++++++++++++++++++++++++++++++++++++++
- include/hw/arm/virt.h           |  1 +
- include/hw/misc/pvpanic-mmio.h  | 33 ++++++++++++++
- 6 files changed, 154 insertions(+), 1 deletion(-)
- create mode 100644 hw/misc/pvpanic-mmio.c
- create mode 100644 include/hw/misc/pvpanic-mmio.h
+On Tue, Oct 16, 2018 at 12:30:45PM +0100, Dr. David Alan Gilbert wrote:
+>=20
+> I noticed this hadn't got merged - who wants it?
 
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index 2420491..4713c92 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -43,7 +43,7 @@ CONFIG_USB_MUSB=y
- CONFIG_USB_EHCI_SYSBUS=y
- CONFIG_PLATFORM_BUS=y
- CONFIG_VIRTIO_MMIO=y
--
-+CONFIG_PVPANIC_MMIO=y
- CONFIG_ARM11MPCORE=y
- CONFIG_A9MPCORE=y
- CONFIG_A15MPCORE=y
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index a472566..ab41128 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -140,6 +140,7 @@ static const MemMapEntry a15memmap[] = {
-     [VIRT_UART] =               { 0x09000000, 0x00001000 },
-     [VIRT_RTC] =                { 0x09010000, 0x00001000 },
-     [VIRT_FW_CFG] =             { 0x09020000, 0x00000018 },
-+    [VIRT_PVPANIC_MMIO] =       { 0x09020018, 0x00000002 },
-     [VIRT_GPIO] =               { 0x09030000, 0x00001000 },
-     [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
-     [VIRT_SMMU] =               { 0x09050000, 0x00020000 },
-@@ -798,6 +799,24 @@ static void create_gpio(const VirtMachineState *vms, qemu_irq *pic)
-     g_free(nodename);
- }
- 
-+static void create_pvpanic_device(const VirtMachineState *vms)
-+{
-+    char *nodename;
-+    hwaddr base = vms->memmap[VIRT_PVPANIC_MMIO].base;
-+    hwaddr size = vms->memmap[VIRT_PVPANIC_MMIO].size;
-+
-+    sysbus_create_simple("pvpanic-mmio", base, NULL);
-+
-+    nodename = g_strdup_printf("/pvpanic-mmio@%" PRIx64, base);
-+    qemu_fdt_add_subnode(vms->fdt, nodename);
-+    qemu_fdt_setprop_string(vms->fdt, nodename,
-+                            "compatible", "pvpanic,mmio");
-+    qemu_fdt_setprop_sized_cells(vms->fdt, nodename, "reg",
-+                                 2, base, 2, size);
-+    g_free(nodename);
-+
-+}
-+
- static void create_virtio_devices(const VirtMachineState *vms, qemu_irq *pic)
- {
-     int i;
-@@ -1544,6 +1563,8 @@ static void machvirt_init(MachineState *machine)
- 
-     create_pcie(vms, pic);
- 
-+    create_pvpanic_device(vms);
-+
-     create_gpio(vms, pic);
- 
-     /* Create mmio transports, so the user can create virtio backends
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index 6d50b03..6326260 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -71,6 +71,7 @@ obj-$(CONFIG_IOTKIT_SYSCTL) += iotkit-sysctl.o
- obj-$(CONFIG_IOTKIT_SYSINFO) += iotkit-sysinfo.o
- 
- obj-$(CONFIG_PVPANIC) += pvpanic.o
-+obj-$(CONFIG_PVPANIC_MMIO) += pvpanic-mmio.o
- obj-$(CONFIG_HYPERV_TESTDEV) += hyperv_testdev.o
- obj-$(CONFIG_AUX) += auxbus.o
- obj-$(CONFIG_ASPEED_SOC) += aspeed_scu.o aspeed_sdmc.o
-diff --git a/hw/misc/pvpanic-mmio.c b/hw/misc/pvpanic-mmio.c
-new file mode 100644
-index 0000000..bcb9791
---- /dev/null
-+++ b/hw/misc/pvpanic-mmio.c
-@@ -0,0 +1,97 @@
-+/*
-+ * pvpanic mmio device emulation
-+ *
-+ * Copyright (c) 2018 ZTE Ltd.
-+ *
-+ * Author:
-+ *  Peng Hao <peng.hao2@zte.com.cn>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License; either version 2
-+ * of the License, or (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "sysemu/sysemu.h"
-+#include "qemu/log.h"
-+#include "hw/misc/pvpanic-mmio.h"
-+
-+#define PVPANIC_MMIO_FEAT_CRASHED      0
-+
-+#define PVPANIC_MMIO_CRASHED        (1 << PVPANIC_MMIO_FEAT_CRASHED)
-+
-+static void handle_mmio_event(int event)
-+{
-+    static bool logged;
-+
-+    if (event & ~PVPANIC_MMIO_CRASHED && !logged) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "pvpanic-mmio: unknown event %#x.\n", event);
-+        logged = true;
-+    }
-+
-+    if (event & PVPANIC_MMIO_CRASHED) {
-+        qemu_system_guest_panicked(NULL);
-+        return;
-+    }
-+}
-+
-+static uint64_t pvpanic_mmio_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    return -1;
-+}
-+
-+static void pvpanic_mmio_write(void *opaque, hwaddr addr, uint64_t value,
-+                                 unsigned size)
-+{
-+   handle_mmio_event(value);
-+}
-+
-+static const MemoryRegionOps pvpanic_mmio_ops = {
-+    .read = pvpanic_mmio_read,
-+    .write = pvpanic_mmio_write,
-+    .impl = {
-+        .min_access_size = 1,
-+        .max_access_size = 2,
-+    },
-+};
-+
-+
-+static void pvpanic_mmio_initfn(Object *obj)
-+{
-+    PVPanicState *s = PVPANIC_MMIO_DEVICE(obj);
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+
-+    memory_region_init_io(&s->mmio, OBJECT(s), &pvpanic_mmio_ops, s,
-+                          "pvpanic-mmio", 2);
-+    sysbus_init_mmio(sbd, &s->mmio);
-+}
-+
-+static void pvpanic_mmio_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-+}
-+
-+static TypeInfo pvpanic_mmio_info = {
-+    .name          = TYPE_PVPANIC_MMIO,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(PVPanicState),
-+    .instance_init = pvpanic_mmio_initfn,
-+    .class_init    = pvpanic_mmio_class_init,
-+};
-+
-+static void pvpanic_mmio_register_types(void)
-+{
-+    type_register_static(&pvpanic_mmio_info);
-+}
-+
-+type_init(pvpanic_mmio_register_types)
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 4cc57a7..61cc310 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -70,6 +70,7 @@ enum {
-     VIRT_MMIO,
-     VIRT_RTC,
-     VIRT_FW_CFG,
-+    VIRT_PVPANIC_MMIO,
-     VIRT_PCIE,
-     VIRT_PCIE_MMIO,
-     VIRT_PCIE_PIO,
-diff --git a/include/hw/misc/pvpanic-mmio.h b/include/hw/misc/pvpanic-mmio.h
-new file mode 100644
-index 0000000..0c4f728
---- /dev/null
-+++ b/include/hw/misc/pvpanic-mmio.h
-@@ -0,0 +1,33 @@
-+/*
-+ * pvpanic mmio device emulation
-+ *
-+ * Copyright (c) 2018 ZTE Ltd.
-+ *
-+ * Author:
-+ *  Peng Hao <peng.hao2@zte.com.cn>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License; either version 2
-+ * of the License, or (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef HW_MISC_PVPANIC_H
-+#define HW_MISC_PVPANIC_H
-+#include "hw/sysbus.h"
-+#define TYPE_PVPANIC_MMIO "pvpanic-mmio"
-+#define PVPANIC_MMIO_DEVICE(obj)    \
-+    OBJECT_CHECK(PVPanicState, (obj), TYPE_PVPANIC_MMIO)
-+#endif
-+
-+typedef struct PVPanicState {
-+    SysBusDevice parent_obj;
-+    MemoryRegion mmio;
-+} PVPanicState;
--- 
-1.8.3.1
+I think that's one for my tree, but I'm afraid I completely missed it
+before.  It's generally best to CC me on ppc related patches,
+otherwise I'm likely to lose them in the flood of qemu-devel.
+
+Anyway, I dug it out of my archives and applied.
+
+>=20
+> Dave
+>=20
+> * Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
+> > * Mark Cave-Ayland (mark.cave-ayland@ilande.co.uk) wrote:
+> > > On 27/07/18 14:44, Dr. David Alan Gilbert wrote:
+> > >=20
+> > > > * Mark Cave-Ayland (mark.cave-ayland@ilande.co.uk) wrote:
+> > > > > On 27/07/18 13:31, Dr. David Alan Gilbert (git) wrote:
+> > > > >=20
+> > > > > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > > > > >=20
+> > > > > > Fix missing terminator in VMStateDescription
+> > > > > >=20
+> > > > > > Fixes: d811d61fbc6ca5f2be2185fd7cfa916e7ba613ce
+> > > > > > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > > > > > ---
+> > > > > >    hw/misc/macio/pmu.c | 1 +
+> > > > > >    1 file changed, 1 insertion(+)
+> > > > > >=20
+> > > > > > diff --git a/hw/misc/macio/pmu.c b/hw/misc/macio/pmu.c
+> > > > > > index e246b0fd41..27dfaf8a74 100644
+> > > > > > --- a/hw/misc/macio/pmu.c
+> > > > > > +++ b/hw/misc/macio/pmu.c
+> > > > > > @@ -686,6 +686,7 @@ static const VMStateDescription vmstate_pmu=
+_adb =3D {
+> > > > > >            VMSTATE_TIMER_PTR(adb_poll_timer, PMUState),
+> > > > > >            VMSTATE_UINT8(adb_reply_size, PMUState),
+> > > > > >            VMSTATE_BUFFER(adb_reply, PMUState),
+> > > > > > +        VMSTATE_END_OF_LIST()
+> > > > > >        }
+> > > > > >    };
+> > > > >=20
+> > > > > Gah, yes indeed it certainly looks like I missed this whilst work=
+ing on the
+> > > > > PMU code :(
+> > > > >=20
+> > > > > Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> > > > >=20
+> > > > > Just out of interest does a savevm/loadvm migration still succeed=
+ once this
+> > > > > has been added?
+> > > >=20
+> > > > Have you got a suggested command line to test it with?
+> > >=20
+> > > I'm effectively AFK until tomorrow now, but just quickly:
+> > >=20
+> > > $ ./qemu-system-ppc -M mac99,via=3Dpmu
+> > >=20
+> > > Note that PMU support is new for 3.0 so there shouldn't be any backwa=
+rd
+> > > compatibility issue here.
+> >=20
+> > [root@virtlab414 try-64]# ./ppc-softmmu/qemu-system-ppc -M mac99,via=3D=
+pmu -nographic /home/vms/dummy1.qcow2=20
+> > QEMU 2.12.50 monitor - type 'help' for more information
+> > (qemu) ss>> et_property: NULL phandle
+> >=20
+> > >> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > >> OpenBIOS 1.1 [Jun 18 2018 18:20]
+> > >> Configuration device id QEMU version 1 machine id 1
+> > >> CPUs: 1
+> > >> Memory: 128M
+> > >> UUID: 00000000-0000-0000-0000-000000000000
+> > >> CPU type PowerPC,G4
+> > milliseconds isn't unique.
+> > saWelcome to OpenBIOS v1.1 built on Jun 18 2018 18:20
+> > Trying hd:,\\:tbxi...
+> > savTrying hd:,\ppc\bootinfo.txt...
+> > Trying hd:,%BOOT...
+> > saveNo valid state has been set by load or init-program
+> >=20
+> >=20
+> > (qemu)=20
+> >   ok
+> > 0 >   ok
+> > 0 > (qemu)=20
+> > (qemu) savevm "frob"
+> > (qemu) loadvm "frob"
+> > (qemu)=20
+> >   ok
+> > 0 > 2 2 + . 4  ok
+> >=20
+> > Looks OK to me.
+> >=20
+> > Dave
+> >=20
+> > >=20
+> > > ATB,
+> > >=20
+> > > Mark.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--BFVE2HhgxTpCzM8t
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlvGg4QACgkQbDjKyiDZ
+s5JamRAA4yd5OBWx8QXoq5hJFu+IfZ+N7s/1PP+ydCFVOr741RITRukTICm0ld27
+A8YEEWoWcSP8PslMdQyIzIlC+ih2OosgwqGWqBrsF4laqTzMlN2TKzO4tVuCC632
+Hk45wGlPV+2lLgzVD2mSTuepHv06ZDeZfkK4WIAXQF/yrVD+NAZ3nnpmlcKjgW2G
+1RILqLTojR4SEV9omNsnsNrT49pA5dyrncNU4WnKQQlDCRvna9Cd956lPHwxXJN0
+OzicnvufOpwpq9x5drNh92SpsVaRE11PWGV7tjHW3IGtAFjb9iLkxtqzA8+3dKXF
+3fcQ++z6cspeJnstSMi2kdvtH3PsjGHLRi209KSD91M5VgScjc1lxOzHjKeL3xjV
+HvY9K5k+ssN1UDw17GWeaHPf/QVV55N+dTNdjU8fcrtn3RhLvlk4Mi3sFA2qI2vy
+44h5oGvGkeKeykh3I+QzIjKjy9q5rVoFxmkKto8KBXqeLJHaYfxhlroL5Kk/xSlk
+9qRcxBbXJAHTLFwD4W5rJEcBVA9OdDTnRkC4MccWC84S380/Fs2ijFY0csu2nLl2
+kBuWbJsDoZR/cq5N80MH+qbWUtD51s9p9Xvpu/yMliaQeJdfvxW4wUHtGtppLqDd
+l95t9rY7TMcB6zWknn/IlslQyGvA1MFf+/Xi7yfal/PjNz+wzvM=
+=XUf3
+-----END PGP SIGNATURE-----
+
+--BFVE2HhgxTpCzM8t--
