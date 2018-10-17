@@ -1,43 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45222)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <muriloo@linux.ibm.com>) id 1gCrjI-0000J0-K1
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:43:41 -0400
+	(envelope-from <Aaron@os.amperecomputing.com>) id 1gCrna-0001m8-Pc
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:48:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <muriloo@linux.ibm.com>) id 1gCrjE-0002yd-ND
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:43:40 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48918
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <muriloo@linux.ibm.com>)
-	id 1gCrjB-0002oC-R0
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:43:34 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w9HJYB3m026504
-	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 15:43:23 -0400
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2n69adnn7y-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 15:43:23 -0400
-Received: from localhost
-	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <muriloo@linux.ibm.com>;
-	Wed, 17 Oct 2018 15:43:22 -0400
-Date: Wed, 17 Oct 2018 16:43:15 -0300
-From: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
-References: <20181016232201.16829-1-crosa@redhat.com>
-	<CAFEAcA_KFOay7zBoYMSqqEYd0ZhTcW5wp3bs28cr=oK4W4FL3A@mail.gmail.com>
-	<20181017162944.GF31060@habkost.net>
-	<d5f32475-df5b-0c5c-591f-5fae8e641c11@redhat.com>
-	<CAFEAcA_gyQvmq48QquNiFhGef-FWPeDKRUSk3wf7hS=_=xm_XQ@mail.gmail.com>
+	(envelope-from <Aaron@os.amperecomputing.com>) id 1gCrnZ-00074L-V7
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:48:06 -0400
+From: Aaron Lindsay <Aaron@os.amperecomputing.com>
+Date: Wed, 17 Oct 2018 19:47:56 +0000
+Message-ID: <20181017194748.GB25905@quinoa.localdomain>
+References: <20181010203735.27918-1-aclindsa@gmail.com>
+	<20181010203735.27918-12-aclindsa@gmail.com>
+	<be878ed3-509f-8ed8-8c28-71e3d0214837@linaro.org>
+In-Reply-To: <be878ed3-509f-8ed8-8c28-71e3d0214837@linaro.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <A24947424E333C4CB64BD13C977E49A7@prod.exchangelabs.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_gyQvmq48QquNiFhGef-FWPeDKRUSk3wf7hS=_=xm_XQ@mail.gmail.com>
-Message-Id: <20181017194315.GA18379@kermit-br-ibm-com>
-Subject: Re: [Qemu-devel] [PATCH] Acceptance tests: host arch to target arch
- name mapping
+Subject: Re: [Qemu-devel] [PATCH v6 11/14] target/arm: PMU: Add instruction
+ and cycle events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,53 +27,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Cleber Rosa <crosa@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: Aaron Lindsay <aclindsa@gmail.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Michael Spradling <mspradli@codeaurora.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Digant Desai <digantd@codeaurora.org>
 
-On Wed, Oct 17, 2018 at 07:40:51PM +0100, Peter Maydell wrote:
-> On 17 October 2018 at 18:38, Cleber Rosa <crosa@redhat.com> wrote:
-> >
-> >
-> > On 10/17/18 12:29 PM, Eduardo Habkost wrote:
-> >> On Wed, Oct 17, 2018 at 01:34:41PM +0100, Peter Maydell wrote:
-> >>> So, why does the test code need to care? It's not clear
-> >>> from the patch... My expectation would be that you'd
-> >>> just test all the testable target architectures,
-> >>> regardless of what the host architecture is.
-> >>
-> >> I tend to agree.  Maybe the right solution is to get rid of the
-> >> os.uname().  I think the default should be testing all QEMU
-> >> binaries that were built, and the host architecture shouldn't
-> >> matter.
->
-> Yes, looking at os.uname() also seems like an odd thing
-> for the tests to be doing here. The test framework
-> should be as far as possible host-architecture agnostic.
-> (For some of the KVM cases there probably is a need to
-> care, but those are exceptions, not the rule.)
->
-> > I'm in favor of exercising all built targets, but that seems to me to be
-> > on another layer, above the test themselves. This change is about the
-> > behavior of a test when not told about the target arch (and thus binary)
-> > it should use.
->
-> At that level, I think the right answer is "tell the user
-> they need to specify the qemu executable they are trying to test".
-> In particular, there is no guarantee that the user has actually
-> built the executable for the target that corresponds to the
-> host, so it doesn't work to try to default to that anyway.
->
-> thanks
-> -- PMM
->
+On Oct 16 17:04, Richard Henderson wrote:
+> On 10/10/18 1:37 PM, Aaron Lindsay wrote:
+> > + * Return the underlying cycle count for the PMU cycle counters. If we=
+'re in
+> > + * usermode, simply return 0.
+> > + */
+> > +static uint64_t cycles_get_count(CPUARMState *env)
+> > +{
+> > +#ifndef CONFIG_USER_ONLY
+> > +    return muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
+> > +                   ARM_CPU_FREQ, NANOSECONDS_PER_SECOND);
+> > +#else
+> > +    return 0;
+> > +#endif
+> > +}
+>=20
+> Usually we pass through the host cycle counter.
+> See cpu_get_host_ticks().
 
-I agree with Peter.  We can make qemu_bin parameter mandatory.  If it is not
-given, error out.  Trying to guess it based on host architecture turns out to be
-troublesome.
+Why do you prefer cpu_get_host_ticks()? And are you suggesting this for
+just user-mode, or both system and user?
 
-If we decide to follow this approach of not guessing QEMU binary, we should
-update docs/devel/testing.rst to make it crystal clear qemu_bin parameter is
-mandatory.
+PMCCNTR used this same qemu_clock_get_ns() call previous to my patch
+(see where this patch replaces that call with one to cycles_get_count()
+in pmccntr_op_start()). Of course, we could keep the preexisting PMCCNTR
+behavior while making the new cycle counter use cpu_get_host_ticks(),
+but having two ways through the same interface which count cycles
+differently feels wrong.
 
---
-Murilo
+-Aaron
