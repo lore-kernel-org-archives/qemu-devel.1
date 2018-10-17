@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49541)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gCiQu-0004oI-K1
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 05:48:05 -0400
+	(envelope-from <stefanha@gmail.com>) id 1gCiUL-000707-Aa
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 05:51:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gCiQp-0002FG-KN
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 05:48:04 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:36861)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gCiQp-0002D2-Cd
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 05:47:59 -0400
-Received: by mail-wm1-f65.google.com with SMTP id a8-v6so1444855wmf.1
-	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 02:47:58 -0700 (PDT)
-References: <20181016175236.5840-1-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <2fea129c-46d1-d299-0d3e-c1480ac6890d@redhat.com>
-Date: Wed, 17 Oct 2018 11:47:55 +0200
+	(envelope-from <stefanha@gmail.com>) id 1gCiUG-0006Qb-EZ
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 05:51:37 -0400
+Date: Wed, 17 Oct 2018 10:51:28 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20181017095128.GK22755@stefanha-x1.localdomain>
+References: <20181016132018.5054-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20181016175236.5840-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] hw/acpi/nvdimm: Don't take address of
- fields in packed structs
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="kswDJesP0akhmDn8"
+Content-Disposition: inline
+In-Reply-To: <20181016132018.5054-1-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] migration/block-dirty-bitmap:
+ fix Coverity CID1390625
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,74 +24,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, patches@linaro.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, peter.maydell@linaro.org, famz@redhat.com, quintela@redhat.com, dgilbert@redhat.com, stefanha@redhat.com, den@openvz.org, John Snow <jsnow@redhat.com>
 
-On 16/10/2018 19:52, Peter Maydell wrote:
-> Taking the address of a field in a packed struct is a bad idea, because
-> it might not be actually aligned enough for that pointer type (and
-> thus cause a crash on dereference on some host architectures). Newer
-> versions of clang warn about this. Avoid the bug by not using the
-> "modify in place" byte swapping functions.
-> 
-> Patch produced with scripts/coccinelle/inplace-byteswaps.cocci.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+--kswDJesP0akhmDn8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Oct 16, 2018 at 04:20:18PM +0300, Vladimir Sementsov-Ogievskiy wrot=
+e:
+> Theoretically possible that we finish the skipping loop with bs =3D NULL
+> and the following code will crash trying to dereference it. Fix that.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
-> Automatically generated patch, tested with "make check" only.
-> 
->  hw/acpi/nvdimm.c | 16 ++++++++--------
->  1 file changed, 8 insertions(+), 8 deletions(-)
-> 
-> diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
-> index 27eeb6609f5..e53b2cb6819 100644
-> --- a/hw/acpi/nvdimm.c
-> +++ b/hw/acpi/nvdimm.c
-> @@ -581,7 +581,7 @@ static void nvdimm_dsm_func_read_fit(AcpiNVDIMMState *state, NvdimmDsmIn *in,
->      int size;
->  
->      read_fit = (NvdimmFuncReadFITIn *)in->arg3;
-> -    le32_to_cpus(&read_fit->offset);
-> +    read_fit->offset = le32_to_cpu(read_fit->offset);
->  
->      fit = fit_buf->fit;
->  
-> @@ -742,8 +742,8 @@ static void nvdimm_dsm_get_label_data(NVDIMMDevice *nvdimm, NvdimmDsmIn *in,
->      int size;
->  
->      get_label_data = (NvdimmFuncGetLabelDataIn *)in->arg3;
-> -    le32_to_cpus(&get_label_data->offset);
-> -    le32_to_cpus(&get_label_data->length);
-> +    get_label_data->offset = le32_to_cpu(get_label_data->offset);
-> +    get_label_data->length = le32_to_cpu(get_label_data->length);
->  
->      nvdimm_debug("Read Label Data: offset %#x length %#x.\n",
->                   get_label_data->offset, get_label_data->length);
-> @@ -781,8 +781,8 @@ static void nvdimm_dsm_set_label_data(NVDIMMDevice *nvdimm, NvdimmDsmIn *in,
->  
->      set_label_data = (NvdimmFuncSetLabelDataIn *)in->arg3;
->  
-> -    le32_to_cpus(&set_label_data->offset);
-> -    le32_to_cpus(&set_label_data->length);
-> +    set_label_data->offset = le32_to_cpu(set_label_data->offset);
-> +    set_label_data->length = le32_to_cpu(set_label_data->length);
->  
->      nvdimm_debug("Write Label Data: offset %#x length %#x.\n",
->                   set_label_data->offset, set_label_data->length);
-> @@ -877,9 +877,9 @@ nvdimm_dsm_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
->      in = g_new(NvdimmDsmIn, 1);
->      cpu_physical_memory_read(dsm_mem_addr, in, sizeof(*in));
->  
-> -    le32_to_cpus(&in->revision);
-> -    le32_to_cpus(&in->function);
-> -    le32_to_cpus(&in->handle);
-> +    in->revision = le32_to_cpu(in->revision);
-> +    in->function = le32_to_cpu(in->function);
-> +    in->handle = le32_to_cpu(in->handle);
->  
->      nvdimm_debug("Revision %#x Handler %#x Function %#x.\n", in->revision,
->                   in->handle, in->function);
-> 
+>  migration/block-dirty-bitmap.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>=20
+> diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitma=
+p.c
+> index 477826330c..6de808f95f 100644
+> --- a/migration/block-dirty-bitmap.c
+> +++ b/migration/block-dirty-bitmap.c
+> @@ -288,6 +288,10 @@ static int init_dirty_bitmap_migration(void)
+>              bs =3D backing_bs(bs);
+>          }
+> =20
+> +        if (!bs || bs->implicit) {
+> +            continue;
+> +        }
+> +
+>          for (bitmap =3D bdrv_dirty_bitmap_next(bs, NULL); bitmap;
+>               bitmap =3D bdrv_dirty_bitmap_next(bs, bitmap))
+>          {
+
+Previous discussion:
+http://qemu.11.n7.nabble.com/PATCH-migration-Appease-coverity-skip-empty-bl=
+ock-trees-td582504.html
+
+I've CCed John so he can take a look.
+
+--kswDJesP0akhmDn8
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbxwYgAAoJEJykq7OBq3PIq+0IAKi2oSNnfSzcF2vR4kvhkS1n
+mYLhNgamTcnzElrt80Laq4jpj9U5+/+gfp0Dy1JriPkoEMGT6RsifAojb3g4il+H
+kOWyoJrDFRorFQlnYjkecMxu1qe0um+XWBQ8F+X4Q5AYqJyUuQ+Tz6nwzFE0D5my
+z5ZU+SEQHDBL5M6HDb6H77OYHmjV1F/tnWxWRHvD3TjvoYw2VTZDtZAtxUfjkblh
+4tpqPqVPJ45pr0WKjrGxC7X06u7k7+v6jZvbHN9la5OvGKSo5mwHGNmRA3okuKmr
+7XvNdTqacaFQ1iBr/o8CUuyp/wuoin6vfLB7E4teoc/jklQtsc3d34+dysiUXFM=
+=9RX1
+-----END PGP SIGNATURE-----
+
+--kswDJesP0akhmDn8--
