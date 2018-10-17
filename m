@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60503)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60582)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gCkQi-0007V7-9M
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 07:56:01 -0400
+	(envelope-from <armbru@redhat.com>) id 1gCkRJ-0007p5-SA
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 07:56:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gCkQe-0001S6-7Q
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 07:56:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47378)
+	(envelope-from <armbru@redhat.com>) id 1gCkRH-0002Wg-72
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 07:56:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56260)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1gCkQd-0001Q7-W9
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 07:55:56 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <CAFEAcA9+zzccFDQpGYTp8iwBR8u5wMuh8_R_d2m6BZXui2wOKQ@mail.gmail.com>
-	(Peter Maydell's message of "Thu, 11 Oct 2018 12:05:41 +0100")
-References: <20181011090007.1103-1-maozhongyi@cmss.chinamobile.com>
-	<20181011090007.1103-5-maozhongyi@cmss.chinamobile.com>
-	<997db16e-3da8-b66a-b29b-517674ae860f@redhat.com>
-	<CAFEAcA9+zzccFDQpGYTp8iwBR8u5wMuh8_R_d2m6BZXui2wOKQ@mail.gmail.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 17 Oct 2018 13:55:40 +0200
-Message-ID: <877eigaitf.fsf@trasno.org>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gCkRE-0002KF-Te
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 07:56:34 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181013025435.25785-1-ehabkost@redhat.com>
+	<20181014173258-mutt-send-email-mst@kernel.org>
+	<20181015181404.GQ31060@habkost.net>
+	<20181016170236.GJ7995@redhat.com>
+	<d8b9a6e6-c137-a553-8fe7-939edd2031b3@redhat.com>
+	<87murdf73g.fsf_-_@dusky.pond.sub.org>
+	<20181017063443.bfjm5yh47cx3vva3@sirius.home.kraxel.org>
+Date: Wed, 17 Oct 2018 13:56:05 +0200
+In-Reply-To: <20181017063443.bfjm5yh47cx3vva3@sirius.home.kraxel.org> (Gerd
+	Hoffmann's message of "Wed, 17 Oct 2018 08:34:43 +0200")
+Message-ID: <878t2wiy7e.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/4] audio: use existing macros istead of
- hardcoded strings
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] No more chameleon devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,47 +32,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, QEMU Developers <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Jan Kiszka <jan.kiszka@web.de>, Gerd Hoffmann <kraxel@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Cleber Rosa <crosa@redhat.com>, Fabian Deutsch <fdeutsch@redhat.com>, qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>, Andrea Bolognani <abologna@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Laine Stump <laine@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 11 October 2018 at 11:45, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
-om> wrote:
->> On 11/10/2018 11:00, Mao Zhongyi wrote:
->>> Cc: Jan Kiszka <jan.kiszka@web.de>
->>> Cc: Peter Maydell <peter.maydell@linaro.org>
->>> Cc: Gerd Hoffmann <kraxel@redhat.com>
->>> To: qemu-arm@nongnu.org
->>>
->>> Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
->>> ---
->>>  hw/arm/musicpal.c          | 16 ++++++++--------
->>>  hw/audio/marvell_88w8618.c |  3 +--
->>>  include/hw/audio/wm8750.h  |  1 +
->>>  3 files changed, 10 insertions(+), 10 deletions(-)
->>>
->>> diff --git a/hw/arm/musicpal.c b/hw/arm/musicpal.c
->>> index ac266f9253..6425f1d50f 100644
->>> --- a/hw/arm/musicpal.c
->>> +++ b/hw/arm/musicpal.c
->>> @@ -406,7 +406,7 @@ static void mv88w8618_eth_realize(DeviceState
->>> *dev, Error **errp)
->>>  }
->>>
->>>  static const VMStateDescription mv88w8618_eth_vmsd =3D {
->>> -    .name =3D "mv88w8618_eth",
->>> +    .name =3D TYPE_MV88W8618_ETH,
->>
->> I understand TYPE_device name might changed, but once used,
->> VMStateDescription shouldn't, else this would break migration.
->> Thus I wouldn't recommend using TYPE_name in VMStateDescription.name.
->>
->> Since I'm not sure I cc'ed the migration maintainers.
+Gerd Hoffmann <kraxel@redhat.com> writes:
+
+> On Wed, Oct 17, 2018 at 07:57:39AM +0200, Markus Armbruster wrote:
+>> Laine Stump <laine@redhat.com> writes:
+>> 
+>> [...]
+>> > In the end, having a device that changed PCI ID depending on what kind
+>> > of slot it was plugged into was an idea "too clever for its own good",
+>> > should be avoided when new devices are added in the future, and we
+>> > should at least provide an alternative that doesn't do that for existing
+>> > devices.
+>> 
+>> That means for each chameleon PCI/PCIe device:
+>> 
+>> * create a pair of devices that can only go into one kind of slot
+>> * deprecate the chameleon
 >
-> Yes, that's the usual approach -- the vmstate struct names
-> aren't inherently the same as the QOM type names, and so
-> we keep them decoupled to avoid accidentally breaking migration.
+> I think virtio devices are the only ones which actually change the pci
+> id and have non-trivial differences.
+>
+> qemu-xhci can likewise be plugged into both pci and pcie slots.  When
+> plugged into a pcie slot it'll have pcie endpoint capability.  That is
+> the only difference though.  Do you consider that a chameleon device?
 
-Yeap, I agree.
+Since the enticing simplicity of letting PCI device models go into PCIe
+slots as well is exactly what lured us into this mess, I do.
 
-Later, Juan.
+I believe all we actually saved by creating chameleons was a bunch of
+QOM types.  New, non-chameleon PCIe devices would have shared the actual
+device model code with the existing, non-chameleon PCI devices.
+
+Correcting the design mistake now involves yet another set of QOM types,
+for backward compatibility.
+
+A loss of simplicity we failed to consider properly back then was at the
+external interface.  Traditionally, a qdev has a bus type (printed by
+-device help), and it can go into a slot provided by such a bus.  But
+chameleon PCI qdevs can also go into a slot provided by a PCIe bus.  The
+interface is now less regular, for no convincing reason.
