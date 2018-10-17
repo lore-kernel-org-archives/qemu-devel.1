@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51045)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51034)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gChAb-00085M-Qc
+	(envelope-from <armbru@redhat.com>) id 1gChAb-000859-KO
 	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 04:27:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gChAY-0000zl-8S
+	(envelope-from <armbru@redhat.com>) id 1gChAY-000102-Eu
 	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 04:27:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52510)
+Received: from mx1.redhat.com ([209.132.183.28]:35520)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gChAX-0000xW-TA
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gChAY-0000y4-6J
 	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 04:27:06 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 17 Oct 2018 10:26:26 +0200
-Message-Id: <20181017082702.5581-3-armbru@redhat.com>
+Date: Wed, 17 Oct 2018 10:26:32 +0200
+Message-Id: <20181017082702.5581-9-armbru@redhat.com>
 In-Reply-To: <20181017082702.5581-1-armbru@redhat.com>
 References: <20181017082702.5581-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 02/38] Use error_fatal to simplify obvious
- fatal errors (again)
+Subject: [Qemu-devel] [PATCH v4 08/38] 9pfs: Fix CLI parsing crash on error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,113 +24,57 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Greg Kurz <groug@kaod.org>
 
-Add a slight improvement of the Coccinelle semantic patch from commit
-007b06578ab, and use it to clean up.  It leaves dead Error * variables
-behind, cleaned up manually.
+Calling error_report() in a function that takes an Error ** argument
+is suspicious.  9p-handle.c's handle_parse_opts() does that, and then
+fails without setting an error.  Wrong.  Its caller crashes when it
+tries to report the error:
 
-Cc: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexander Graf <agraf@suse.de>
-Cc: Eric Blake <eblake@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+    $ qemu-system-x86_64 -nodefaults -fsdev id=foo,fsdriver=handle
+    qemu-system-x86_64: -fsdev id=foo,fsdriver=handle: warning: handle backend is deprecated
+    qemu-system-x86_64: -fsdev id=foo,fsdriver=handle: fsdev: No path specified
+    Segmentation fault (core dumped)
+
+Screwed up when commit 91cda4e8f37 (v2.12.0) converted the function to
+Error.  Fix by calling error_setg() instead of error_report().
+
+Fixes: 91cda4e8f372602795e3a2f4bd2e3adaf9f82255
+Cc: Greg Kurz <groug@kaod.org>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Acked-by: Greg Kurz <groug@kaod.org>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/xics_kvm.c                       |  7 +------
- qemu-nbd.c                               |  6 +-----
- scripts/coccinelle/use-error_fatal.cocci | 20 ++++++++++++++++++++
- vl.c                                     |  7 +------
- 4 files changed, 23 insertions(+), 17 deletions(-)
- create mode 100644 scripts/coccinelle/use-error_fatal.cocci
+ hw/9pfs/9p-handle.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-index 30c3769a20..e8fa9a53ae 100644
---- a/hw/intc/xics_kvm.c
-+++ b/hw/intc/xics_kvm.c
-@@ -198,17 +198,12 @@ static void ics_get_kvm_state(ICSState *ics)
- {
-     uint64_t state;
-     int i;
--    Error *local_err = NULL;
+diff --git a/hw/9pfs/9p-handle.c b/hw/9pfs/9p-handle.c
+index f3641dbe4a..3465b1ef30 100644
+--- a/hw/9pfs/9p-handle.c
++++ b/hw/9pfs/9p-handle.c
+@@ -19,6 +19,7 @@
+ #include <grp.h>
+ #include <sys/socket.h>
+ #include <sys/un.h>
++#include "qapi/error.h"
+ #include "qemu/xattr.h"
+ #include "qemu/cutils.h"
+ #include "qemu/error-report.h"
+@@ -655,12 +656,13 @@ static int handle_parse_opts(QemuOpts *opts, FsDriverEntry *fse, Error **errp)
+     warn_report("handle backend is deprecated");
  
-     for (i = 0; i < ics->nr_irqs; i++) {
-         ICSIRQState *irq = &ics->irqs[i];
- 
-         kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURCES,
--                          i + ics->offset, &state, false, &local_err);
--        if (local_err) {
--            error_report_err(local_err);
--            exit(1);
--        }
-+                          i + ics->offset, &state, false, &error_fatal);
- 
-         irq->server = state & KVM_XICS_DESTINATION_MASK;
-         irq->saved_priority = (state >> KVM_XICS_PRIORITY_SHIFT)
-diff --git a/qemu-nbd.c b/qemu-nbd.c
-index e76fe3082a..7874bc973c 100644
---- a/qemu-nbd.c
-+++ b/qemu-nbd.c
-@@ -1002,11 +1002,7 @@ int main(int argc, char **argv)
+     if (sec_model) {
+-        error_report("Invalid argument security_model specified with handle fsdriver");
++        error_setg(errp,
++                   "Invalid argument security_model specified with handle fsdriver");
+         return -1;
      }
  
-     exp = nbd_export_new(bs, dev_offset, fd_size, nbdflags, nbd_export_closed,
--                         writethrough, NULL, &local_err);
--    if (!exp) {
--        error_report_err(local_err);
--        exit(EXIT_FAILURE);
--    }
-+                         writethrough, NULL, &error_fatal);
-     nbd_export_set_name(exp, export_name);
-     nbd_export_set_description(exp, export_description);
- 
-diff --git a/scripts/coccinelle/use-error_fatal.cocci b/scripts/coccinelle/use-error_fatal.cocci
-new file mode 100644
-index 0000000000..10fff0aec4
---- /dev/null
-+++ b/scripts/coccinelle/use-error_fatal.cocci
-@@ -0,0 +1,20 @@
-+@@
-+type T;
-+identifier FUN, RET;
-+expression list ARGS;
-+expression ERR, EC, FAIL;
-+@@
-+(
-+-    T RET = FUN(ARGS, &ERR);
-++    T RET = FUN(ARGS, &error_fatal);
-+|
-+-    RET = FUN(ARGS, &ERR);
-++    RET = FUN(ARGS, &error_fatal);
-+|
-+-    FUN(ARGS, &ERR);
-++    FUN(ARGS, &error_fatal);
-+)
-+-    if (FAIL) {
-+-        error_report_err(ERR);
-+-        exit(EC);
-+-    }
-diff --git a/vl.c b/vl.c
-index 4e25c78bff..ff50199e64 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2002,15 +2002,10 @@ static void select_vgahw(const char *p)
- 
- static void parse_display_qapi(const char *optarg)
- {
--    Error *err = NULL;
-     DisplayOptions *opts;
-     Visitor *v;
- 
--    v = qobject_input_visitor_new_str(optarg, "type", &err);
--    if (!v) {
--        error_report_err(err);
--        exit(1);
--    }
-+    v = qobject_input_visitor_new_str(optarg, "type", &error_fatal);
- 
-     visit_type_DisplayOptions(v, NULL, &opts, &error_fatal);
-     QAPI_CLONE_MEMBERS(DisplayOptions, &dpy, opts);
+     if (!path) {
+-        error_report("fsdev: No path specified");
++        error_setg(errp, "fsdev: No path specified");
+         return -1;
+     }
+     fse->path = g_strdup(path);
 -- 
 2.17.1
