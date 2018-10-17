@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40267)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gCrRw-0001Jy-Qz
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:25:45 -0400
+	(envelope-from <crosa@redhat.com>) id 1gCrS5-0001NT-Bj
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:25:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gCrRs-0001PV-Nr
+	(envelope-from <crosa@redhat.com>) id 1gCrRw-0001YH-P8
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:25:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46392)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gCrRu-0001R9-Nb
 	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:25:44 -0400
-Received: from indium.canonical.com ([91.189.90.7]:32868)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gCrRs-0001MD-4t
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:25:40 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gCrRp-0006A4-Fw
-	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 19:25:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 724372E80CB
-	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 19:25:37 +0000 (UTC)
+References: <20181016232201.16829-1-crosa@redhat.com>
+	<CAFEAcA_KFOay7zBoYMSqqEYd0ZhTcW5wp3bs28cr=oK4W4FL3A@mail.gmail.com>
+	<20181017162944.GF31060@habkost.net>
+	<d5f32475-df5b-0c5c-591f-5fae8e641c11@redhat.com>
+	<CAFEAcA_gyQvmq48QquNiFhGef-FWPeDKRUSk3wf7hS=_=xm_XQ@mail.gmail.com>
+	<20181017190951.GG31060@habkost.net>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <b6cff33b-79af-f7b2-2a08-a098135304e0@redhat.com>
+Date: Wed, 17 Oct 2018 15:25:34 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 17 Oct 2018 19:17:57 -0000
-From: Rob Maskell <1798451@bugs.launchpad.net>
-Reply-To: Bug 1798451 <1798451@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <153980387714.3465.12419240219281347614.malonedeb@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1798451] [NEW] HVF linux on OSX hangs 2nd time
- started after adding socket
+In-Reply-To: <20181017190951.GG31060@habkost.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] Acceptance tests: host arch to target arch
+ name mapping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,98 +33,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Caio Carrara <ccarrara@redhat.com>
 
-Public bug reported:
 
 
-Robs-MacBook-Pro-2:~ robmaskell$ qemu-system-x86_64 --version
-QEMU emulator version 3.0.0
+On 10/17/18 3:09 PM, Eduardo Habkost wrote:
+> On Wed, Oct 17, 2018 at 07:40:51PM +0100, Peter Maydell wrote:
+>> On 17 October 2018 at 18:38, Cleber Rosa <crosa@redhat.com> wrote:
+>>>
+>>>
+>>> On 10/17/18 12:29 PM, Eduardo Habkost wrote:
+>>>> On Wed, Oct 17, 2018 at 01:34:41PM +0100, Peter Maydell wrote:
+>>>>> So, why does the test code need to care? It's not clear
+>>>>> from the patch... My expectation would be that you'd
+>>>>> just test all the testable target architectures,
+>>>>> regardless of what the host architecture is.
+>>>>
+>>>> I tend to agree.  Maybe the right solution is to get rid of the
+>>>> os.uname().  I think the default should be testing all QEMU
+>>>> binaries that were built, and the host architecture shouldn't
+>>>> matter.
+>>
+>> Yes, looking at os.uname() also seems like an odd thing
+>> for the tests to be doing here. The test framework
+>> should be as far as possible host-architecture agnostic.
+>> (For some of the KVM cases there probably is a need to
+>> care, but those are exceptions, not the rule.)
+>>
+>>> I'm in favor of exercising all built targets, but that seems to me to be
+>>> on another layer, above the test themselves. This change is about the
+>>> behavior of a test when not told about the target arch (and thus binary)
+>>> it should use.
+>>
+>> At that level, I think the right answer is "tell the user
+>> they need to specify the qemu executable they are trying to test".
+>> In particular, there is no guarantee that the user has actually
+>> built the executable for the target that corresponds to the
+>> host, so it doesn't work to try to default to that anyway.
+> 
+> Agreed.  However, I don't see when exactly this message would be
+> triggered.  Cleber, on which use cases do you expect
+> pick_default_qemu_bin() to be called?
+> 
 
-Host: MacOS - 10.13.6
-  Model Name:	MacBook Pro
-  Model Identifier:	MacBookPro14,3
-  Processor Name:	Intel Core i7
-  Processor Speed:	2.8 GHz
-  Number of Processors:	1
-  Total Number of Cores:	4
-  L2 Cache (per Core):	256 KB
-  L3 Cache:	6 MB
-  Memory:	16 GB
+When a test is run ad-hoc.  You even suggested that tests could/should
+be executable.
 
-Guest OS: Elementary Linux Loki 0.4.1, patched up to date
+> In an ideal world, any testing runner/tool should be able to
+> automatically test all binaries by default.  Can Avocado help us
+> do that?  (If not, we could just do it inside a
+> ./tests/acceptance/run script).
+> 
 
-Command used to start QEMU:
+Avocado can do that indeed.  But I'm afraid that's not the main issue.
+Think of the qemu-iotests: do we want a "check" command to run  all
+tests with all binaries?
 
-qemu-system-x86_64 \
-  -name ElementaryLokiDev \
-  -machine pc,accel=3Dhvf \
-  -cpu max \
-  -smp cpus=3D2,sockets=3D2,cores=3D1,threads=3D1,maxcpus=3D2 \
-  -numa node,nodeid=3D0 \
-  -numa cpu,node-id=3D0,socket-id=3D0 -numa cpu,node-id=3D0,socket-id=3D1 \
-  -m 8G \
-  -vga vmware \
-  -hda e4.qcow2
-
-Symptoms: Started without the -smp / -numa commands to install the OS,
-then added -smp / -numa and the machine boots and lscpu reports extra
-cpu as expected. Restart VM and it hangs on startup. Remove -smp / -numa
-and machine starts again.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1798451
-
-Title:
-  HVF linux on OSX hangs 2nd time started after adding socket
-
-Status in QEMU:
-  New
-
-Bug description:
-  =
-
-  Robs-MacBook-Pro-2:~ robmaskell$ qemu-system-x86_64 --version
-  QEMU emulator version 3.0.0
-
-  Host: MacOS - 10.13.6
-    Model Name:	MacBook Pro
-    Model Identifier:	MacBookPro14,3
-    Processor Name:	Intel Core i7
-    Processor Speed:	2.8 GHz
-    Number of Processors:	1
-    Total Number of Cores:	4
-    L2 Cache (per Core):	256 KB
-    L3 Cache:	6 MB
-    Memory:	16 GB
-
-  Guest OS: Elementary Linux Loki 0.4.1, patched up to date
-
-  Command used to start QEMU:
-
-  qemu-system-x86_64 \
-    -name ElementaryLokiDev \
-    -machine pc,accel=3Dhvf \
-    -cpu max \
-    -smp cpus=3D2,sockets=3D2,cores=3D1,threads=3D1,maxcpus=3D2 \
-    -numa node,nodeid=3D0 \
-    -numa cpu,node-id=3D0,socket-id=3D0 -numa cpu,node-id=3D0,socket-id=3D1=
- \
-    -m 8G \
-    -vga vmware \
-    -hda e4.qcow2
-
-  Symptoms: Started without the -smp / -numa commands to install the OS,
-  then added -smp / -numa and the machine boots and lscpu reports extra
-  cpu as expected. Restart VM and it hangs on startup. Remove -smp /
-  -numa and machine starts again.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1798451/+subscriptions
+- Cleber.
