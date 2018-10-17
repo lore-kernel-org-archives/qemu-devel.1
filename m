@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43138)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gCrag-0004Mr-Up
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:34:47 -0400
+	(envelope-from <dan.j.williams@intel.com>) id 1gCrcu-0005RT-VE
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:37:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gCrac-0002CB-S0
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:34:46 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:41328)
+	(envelope-from <dan.j.williams@intel.com>) id 1gCrcu-0003y7-2K
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:37:04 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:39448)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gCrac-0002Bh-Cn
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:34:42 -0400
-Received: by mail-pg1-x543.google.com with SMTP id 23-v6so12997161pgc.8
-	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 12:34:42 -0700 (PDT)
-References: <20181010203735.27918-1-aclindsa@gmail.com>
-	<20181010203735.27918-13-aclindsa@gmail.com>
-	<0fdcad4a-c8b5-3309-d2ce-f9be901ec52a@linaro.org>
-	<20181017192013.GA25905@quinoa.localdomain>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <31f327f4-42ee-55fc-596d-97d935803867@linaro.org>
-Date: Wed, 17 Oct 2018 12:34:37 -0700
+	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
+	id 1gCrct-0003vy-Se
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:37:03 -0400
+Received: by mail-ot1-x343.google.com with SMTP id l58so27410652otd.6
+	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 12:37:02 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20181017192013.GA25905@quinoa.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 12/14] target/arm: PMU: Set PMCR.N to 4
+References: <20181013050021.11962-1-pagupta@redhat.com>
+	<20181013050021.11962-3-pagupta@redhat.com>
+	<CAPcyv4hroaVWA-HgjWCnr7QTd_y7U8sCvS+Up733ttnD6_cKzQ@mail.gmail.com>
+	<431127218.21694133.1539803509205.JavaMail.zimbra@redhat.com>
+In-Reply-To: <431127218.21694133.1539803509205.JavaMail.zimbra@redhat.com>
+From: Dan Williams <dan.j.williams@intel.com>
+Date: Wed, 17 Oct 2018 12:36:51 -0700
+Message-ID: <CAPcyv4joz_dPruJY4CYAxXSuMTD-NUoqm6kvGFrF19jt5dN=rg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] virtio-pmem: Add virtio pmem driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,71 +31,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aaron Lindsay <Aaron@os.amperecomputing.com>
-Cc: Aaron Lindsay <aclindsa@gmail.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Michael Spradling <mspradli@codeaurora.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Digant Desai <digantd@codeaurora.org>
+To: Pankaj Gupta <pagupta@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Jan Kara <jack@suse.cz>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, KVM list <kvm@vger.kernel.org>, Rik van Riel <riel@surriel.com>, linux-nvdimm <linux-nvdimm@ml01.01.org>, David Hildenbrand <david@redhat.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Dave Jiang <dave.jiang@intel.com>, Qemu Developers <qemu-devel@nongnu.org>, Christoph Hellwig <hch@infradead.org>, Vishal L Verma <vishal.l.verma@intel.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, zwisler@kernel.org, lcapitulino@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>
 
-On 10/17/18 12:20 PM, Aaron Lindsay wrote:
-> On Oct 16 17:09, Richard Henderson wrote:
->> On 10/10/18 1:37 PM, Aaron Lindsay wrote:
->>> This both advertises that we support four counters and enables them
->>> because the pmu_num_counters() reads this value from PMCR.
->>>
->>> Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
->>> ---
->>>  target/arm/helper.c | 8 ++++----
->>>  1 file changed, 4 insertions(+), 4 deletions(-)
->>
->> It looks like this should have been folded into patch 10,
->> or patch 10 split to include the code changes that go with
->> these comment changes.
-> 
-> By setting PMCR.N to 4, this commit is what causes all the previous
-> implementation of non-PMCCNTR counters to become usable by the guest -
-> both because the OS can now detect their presence in PMCR, and because
-> the system registers used to setup/access the counters are gated on
-> pmu_num_counters(), which uses PMCR.N to determine if a counter is
-> implemented.
+On Wed, Oct 17, 2018 at 12:11 PM Pankaj Gupta <pagupta@redhat.com> wrote:
+>
+>
+>
+> > On Fri, Oct 12, 2018 at 10:01 PM Pankaj Gupta <pagupta@redhat.com> wrote:
+> > >
+> > > This patch adds virtio-pmem driver for KVM guest.
+> > >
+> > > Guest reads the persistent memory range information from
+> > > Qemu over VIRTIO and registers it on nvdimm_bus. It also
+> > > creates a nd_region object with the persistent memory
+> > > range information so that existing 'nvdimm/pmem' driver
+> > > can reserve this into system memory map. This way
+> > > 'virtio-pmem' driver uses existing functionality of pmem
+> > > driver to register persistent memory compatible for DAX
+> > > capable filesystems.
+> > >
+> > > This also provides function to perform guest flush over
+> > > VIRTIO from 'pmem' driver when userspace performs flush
+> > > on DAX memory range.
+> >
+> > Before we can move forward with this driver we need additional
+> > filesystem enabling to detect when the backing device is fronting DAX
+> > pmem or a paravirtualized page cache through virtio-pmem. Any
+> > interface that requires fsync() and a round trip to the hypervisor to
+> > flush host page cache is not DAX.
+>
+> I saw your proposal[1] for new mmap flag MAP_DIRECT. IIUIC mapping should fail for
+> MAP_DIRECT if it requires explicit flush or buffer indirection. So, if we disable
+> MAP_SYNC flag for virtio-pmem this should fail MAP_DIRECT as well? Otherwise
+> without MAP_DIRECT, virtio-pmem should be defaulted to VIRTIO flush mechanism.
 
-But e.g.
+Right, although I wouldn't worry about MAP_DIRECT in the short term
+since we're still discussing what the upstream interface. Regardless
+of whether MAP_DIRECT is specified or not the virtio-flush mechanism
+would always be used for virtio-pmem. I.e. there is no possibility to
+get full DAX operation with virtio-pmem, only the page-cache bypass
+sub-set.
 
-> @@ -5412,8 +5412,8 @@ void register_cp_regs_for_features(ARMCPU *cpu)
->      }
->      if (arm_feature(env, ARM_FEATURE_V7)) {
->          /* v7 performance monitor control register: same implementor
-> -         * field as main ID register, and we implement only the cycle
-> -         * count register.
-> +         * field as main ID register, and we implement four counters in
-> +         * addition to the cycle count register.
->           */
->          unsigned int i, pmcrn = 4;
->          ARMCPRegInfo pmcr = {
-
-clearly belongs with the previous patch, since pmcrn is already 4.
-
-> @@ -1706,7 +1706,7 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
->        .access = PL1_W, .type = ARM_CP_NOP },
->      /* Performance monitors are implementation defined in v7,
->       * but with an ARM recommended set of registers, which we
-> -     * follow (although we don't actually implement any counters)
-> +     * follow.
->       *
->       * Performance registers fall into three categories:
->       *  (a) always UNDEF in PL0, RW in PL1 (PMINTENSET, PMINTENCLR)
-
-And this is out of date as well, and probably belonged elsewhere.
-Which leaves only
-
-> @@ -5430,7 +5430,7 @@ void register_cp_regs_for_features(ARMCPU *cpu)
->              .access = PL0_RW, .accessfn = pmreg_access,
->              .type = ARM_CP_IO,
->              .fieldoffset = offsetof(CPUARMState, cp15.c9_pmcr),
-> -            .resetvalue = cpu->midr & 0xff000000,
-> +            .resetvalue = (cpu->midr & 0xff000000) | (pmcrn << PMCRN_SHIFT),
->              .writefn = pmcr_write, .raw_writefn = raw_write,
->          };
-
-which suggests that this one line belonged to the patch that set pmcrn in the
-first place.
-
-
-r~
+Taking a look at where we could inject this check for filesystems it's
+a bit awkward to do it in xfs_file_mmap() for example because we do
+not have the backing device for the extents of the inode. So at a
+minimum you would need to investigate calling xfs_inode_supports_dax()
+from that path and teaching it about a new dax_device flag. I'm
+thinking the dax_device flag should be called DAXDEV_BUFFERED to
+indicate the presence of software buffering on a device that otherwise
+supports bypassing the local page cache.
