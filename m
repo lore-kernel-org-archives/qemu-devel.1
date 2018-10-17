@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51091)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ccarrara@redhat.com>) id 1gCpFn-0002GW-ID
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 13:05:07 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1gCpGa-00036P-CN
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 13:05:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ccarrara@redhat.com>) id 1gCpFd-00070A-RN
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 13:04:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59748)
+	(envelope-from <pbonzini@redhat.com>) id 1gCpGL-0007zX-5C
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 13:05:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42084)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ccarrara@redhat.com>) id 1gCpFb-0006w6-TB
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 13:04:52 -0400
-Reply-To: ccarrara@redhat.com
-References: <20181017160539.12316-1-crosa@redhat.com>
-From: Caio Carrara <ccarrara@redhat.com>
-Message-ID: <1c3df15f-c3d5-d638-cd33-fa05bfbbd516@redhat.com>
-Date: Wed, 17 Oct 2018 14:04:35 -0300
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gCpGK-0007fF-No
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 13:05:36 -0400
+References: <1539795177-21038-1-git-send-email-peng.hao2@zte.com.cn>
+	<1539795177-21038-2-git-send-email-peng.hao2@zte.com.cn>
+	<87woqgr4wp.fsf@vitty.brq.redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0ced3ef9-f58e-18dd-0959-c69b96d27c4a@redhat.com>
+Date: Wed, 17 Oct 2018 19:05:12 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181017160539.12316-1-crosa@redhat.com>
+In-Reply-To: <87woqgr4wp.fsf@vitty.brq.redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 0/3] Bootstrap Python venv and
- acceptance/functional tests
+Subject: Re: [Qemu-devel] [PATCH V6 1/5] target/i386 : add coalesced pio
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,32 +30,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Laszlo Ersek <lersek@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Wainer dos Santos Moschetta <wainersm@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Vitaly Kuznetsov <vkuznets@redhat.com>, Peng Hao <peng.hao2@zte.com.cn>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, rkrcmar@redhat.com, mst@redhat.com, ehabkost@redhat.com
 
-On 17-10-2018 13:05, Cleber Rosa wrote:
-> TL;DR
-> =====
+On 17/10/2018 17:04, Vitaly Kuznetsov wrote:
+>> +	union {
+>> +		__u32 pad;
+>> +		__u32 pio;
+>> +	};
+>>  };
+> I was just passing by, but what's the point in keeping 'pad'?
 > 
-> Allow acceptance tests to be run with `make check-acceptance`.
-> 
-> Details
-> =======
-> 
-> This introduces a Python virtual environment that will be setup within
-> the QEMU build directory, that will contain the exact environment that
-> tests may require.
-> 
-> There's one current caveat: it requires Python 3, as it's based on the
-> venv module.  This was based on some discussions and perception about
-> standardizing on Python 3, but can easily be made to accommodate Python
-> 2 as well.
-> (...)
 
-Reviewed-by: Caio Carrara <ccarrara@redhat.com>
+Backwards compatibility.  QEMU does have a couple instances of "x.pad =
+0", so...
 
--- 
-Caio Carrara
-Software Engineer, Virt Team
-Red Hat
-ccarrara@redhat.com
+Paolo
