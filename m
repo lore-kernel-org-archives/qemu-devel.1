@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37063)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gCkdK-00050q-Hy
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:09:03 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1gCkfu-0006EA-Eb
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:11:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gCkdE-0008Mn-PK
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:09:02 -0400
-Received: from mail-sn1nam02on0119.outbound.protection.outlook.com
-	([104.47.36.119]:61520
-	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1gCkdE-0008Kx-IY
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:08:56 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Wed, 17 Oct 2018 12:08:53 +0000
-Message-ID: <BN6PR2201MB1251FC9D28455D8F6EB5E721C6FF0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <20180930214744.27580-1-f4bug@amsat.org>,
-	<20180930214744.27580-3-f4bug@amsat.org>
-In-Reply-To: <20180930214744.27580-3-f4bug@amsat.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <dovgaluk@ispras.ru>) id 1gCkfq-0004hp-B5
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:11:42 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:34056)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1gCkfq-0004fU-13
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:11:38 -0400
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20181017090750.4378-1-pbonzini@redhat.com>
+	<001f01d465fd$01af8b80$050ea280$@ru>
+	<CANzW0ms5DMhjYqBUS3EHfhVRp9Li+Dk=WH9RRpO=jbfOgctkCg@mail.gmail.com>
+	<0817e2fe-5a97-a4ed-9ae2-2e8dee6c9a43@redhat.com>
+	<004201d4660d$e86ef1e0$b94cd5a0$@ru>
+	<a29da0a1-85d7-c57c-5c42-27594a7849ac@redhat.com>
+In-Reply-To: <a29da0a1-85d7-c57c-5c42-27594a7849ac@redhat.com>
+Date: Wed, 17 Oct 2018 15:11:39 +0300
+Message-ID: <004701d46612$8ef4f650$acdee2f0$@ru>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 2/4] target/mips: Remove definitions
- that are only used once
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PATCH] Revert "icount: remove obsolete warp call"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,23 +33,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>, Aurelien Jarno <aurelien@aurel32.net>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: 'Paolo Bonzini' <pbonzini@redhat.com>, 'Artem Pisarenko' <artem.k.pisarenko@gmail.com>, 'Clement Deschamps' <clement.deschamps@greensocs.com>
+Cc: qemu-devel@nongnu.org, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>
 
-> From: Philippe Mathieu-Daud=E9 <philippe.mathieu.daude@gmail.com> on beha=
-lf of Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> Subject: [PATCH v3 2/4] target/mips: Remove definitions that are only use=
-d once
->
-> There is no gain in adding cpu definition which is used only once.
-> Use the chip specific flags directly in place.
-> This also clears the 'MIPS CPU defines' namespace.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> ---
+> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+> On 17/10/2018 13:38, Pavel Dovgalyuk wrote:
+> >> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+> >> On 17/10/2018 11:53, Artem Pisarenko wrote:
+> >>> See my last comment in bug report. This kind of modification, even
+> >>> adapted to changed function name, doesn't solve issue.
+> >>> I thought long time that it does, but once I catched qemu with a hang.
+> >>> And of course, I wasn't able to reproduce it. So it just better hides issue.
+> >>> Take a look at alternative solution from
+> >>> QBox: https://git.greensocs.com/qemu/qbox/commit/a8ed106032e375e715a531d6e93e4d9ec295dbdb
+> >>> I didn't catched fail with it (yet).
+> >
+> > Tried to test it, but rr seems to be broken again.
+> > I'll try to bisect now.
+> 
+> Can we add a test that runs with "make check" and covers the basics of
+> record/replay's cpus.c bits?
+> 
+> rr is very cool, and we fixed/understood a lot of stuff when getting it
+> ready for inclusion.  But now it's constantly broken and every time we
+> change rr we also risk breaking icount.
 
-Being used only once is not a sufficient reason for deleting a preprocessor=
- constant. The constants in this case are just fine as they are.
+In addition to some rr bug I encountered the following (non-stable)
+error message:
 
-Thanks,
-Aleksandar=
+ERROR:/qemu/work/qemu/accel/tcg/translate-all.c:1346:tb_page_remove: code should not be reached
+
+Pavel Dovgalyuk
