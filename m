@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55350)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55446)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gCn2k-00072M-Ts
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 10:43:27 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1gCn2y-0007DV-HM
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 10:43:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gCn2f-0005Ct-26
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 10:43:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41242)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gCn2d-00059p-29
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 10:43:19 -0400
-References: <20181008131924.7377-1-d.csapak@proxmox.com>
-	<1f00827b-4c94-e10c-ab57-4ceb5223bee9@proxmox.com>
-	<d2f89cb6-0ea5-75bc-1bb1-3f0ce6509ec4@redhat.com>
-	<a8739a07-0675-5e16-b357-6bb2179aed11@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1gCn2x-0005VC-UQ
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 10:43:40 -0400
+References: <cover.1539764043.git.artem.k.pisarenko@gmail.com>
+	<f47b81dbce734e9806f9516eba8ca588e6321c2f.1539764043.git.artem.k.pisarenko@gmail.com>
+	<20181017091204.GC22755@stefanha-x1.localdomain>
+	<5a83aab6-1277-cc0e-7913-964a8fea5265@redhat.com>
+	<CANzW0mvPxvDsCURzXjOdjR-8uLjXpyAouH80ik6asb0awwX+VA@mail.gmail.com>
+	<c9cfbdff-f713-b49d-4ac8-33ed79b08502@redhat.com>
+	<CANzW0msXvjLESn2o559dOybWZvkRpFDuihSMGu6eZDBFOt_bFg@mail.gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9659efd3-3f39-c880-745e-8561e1989f82@redhat.com>
-Date: Wed, 17 Oct 2018 16:43:06 +0200
+Message-ID: <c51b114a-7064-acac-0fe9-34fc1187d15c@redhat.com>
+Date: Wed, 17 Oct 2018 16:43:18 +0200
 MIME-Version: 1.0
-In-Reply-To: <a8739a07-0675-5e16-b357-6bb2179aed11@redhat.com>
+In-Reply-To: <CANzW0msXvjLESn2o559dOybWZvkRpFDuihSMGu6eZDBFOt_bFg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] qapi: add info about reset to SHUTDOWN
- event
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 2/4] Introduce attributes
+ to qemu timer subsystem
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,23 +30,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Dominik Csapak <d.csapak@proxmox.com>, qemu-devel@nongnu.org
-Cc: armbru@redhat.com
+To: Artem Pisarenko <artem.k.pisarenko@gmail.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, "open list:Block I/O path" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 17/10/2018 15:54, Eric Blake wrote:
->>
->> So the problem with shutdown_caused_by_guest is that you get the same
->> value for both guest reset and guest shutdown.=C2=A0 Could we instead =
-just
->> pass the ShutdownCause in the event (similar to what was proposed even
->> when discussing commit 08fba7ac9b618516a5f1d096f78a7e2837fe0594)?
->=20
-> Indeed, it sounds like we are now at the point where we want to do
-> precisely that - expose more fine-grained details by adding
-> ShutdownCause as a QAPI enum, rather than just adding another bool per
-> reason.
+On 17/10/2018 15:07, Artem Pisarenko wrote:
+> Yes, but without words ..."when they fire" in attributes comments.
 
-So should we split HOST_QMP into HOST_QMP_{SYSTEM_RESET,QUIT} and add
-the ShutdownCause instead of was-reset?
+For now the only attribute applies when timers fire; that sentence was a
+way to clarify the intended scope and address Stefan's comment.  I can
+remove it too, but I'd like to understand if you have other ideas for
+attributes.
 
 Paolo
