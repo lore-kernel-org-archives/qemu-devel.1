@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56971)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57856)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gCpZj-0000ql-PO
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 13:25:40 -0400
+	(envelope-from <armbru@redhat.com>) id 1gCpe1-0002cg-Bf
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 13:30:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gCpZg-0006p5-8A
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 13:25:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34604)
+	(envelope-from <armbru@redhat.com>) id 1gCpdx-0002GA-Gg
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 13:30:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57166)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gCpZf-0006mo-W4
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 13:25:36 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gCpdv-0001o0-SX
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 13:30:00 -0400
 From: Markus Armbruster <armbru@redhat.com>
-References: <20181017151738.20299-1-berto@igalia.com>
-Date: Wed, 17 Oct 2018 19:25:32 +0200
-In-Reply-To: <20181017151738.20299-1-berto@igalia.com> (Alberto Garcia's
-	message of "Wed, 17 Oct 2018 18:17:38 +0300")
-Message-ID: <87d0s8o583.fsf@dusky.pond.sub.org>
+References: <20181017082702.5581-1-armbru@redhat.com>
+	<20181017082702.5581-4-armbru@redhat.com>
+	<20181017135043.GE31479@localhost.localdomain>
+Date: Wed, 17 Oct 2018 19:29:39 +0200
+In-Reply-To: <20181017135043.GE31479@localhost.localdomain> (Kevin Wolf's
+	message of "Wed, 17 Oct 2018 15:50:43 +0200")
+Message-ID: <878t2wo518.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] scripts: Remove check-qerror.sh
+Subject: Re: [Qemu-devel] [PATCH v4 03/38] block: Use warn_report() &
+ friends to report warnings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,26 +29,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Liu Yuan <namei.unix@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Alberto Garcia <berto@igalia.com> writes:
+Kevin Wolf <kwolf@redhat.com> writes:
 
-> qerror.h contains leftovers from the now-defunct QError API.
+> Am 17.10.2018 um 10:26 hat Markus Armbruster geschrieben:
+>> Calling error_report() in a function that takes an Error ** argument
+>> is suspicious.  Convert a few that are actually warnings to
+>> warn_report().
+>> 
+>> While there, split warnings consisting of multiple sentences to
+>> conform to conventions spelled out in warn_report()'s contract, and
+>> improve a rather useless warning in sheepdog.c.
+>> 
+>> Cc: Kevin Wolf <kwolf@redhat.com>
+>> Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Cc: Peter Lieven <pl@kamp.de>
+>> Cc: Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>
+>> Cc: Liu Yuan <namei.unix@gmail.com>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>> ---
+>>  block/bochs.c    |  8 ++++----
+>>  block/cloop.c    |  8 ++++----
+>>  block/dmg.c      |  8 ++++----
+>>  block/iscsi.c    |  2 +-
+>>  block/rbd.c      | 12 ++++++------
+>>  block/sheepdog.c |  2 +-
+>>  block/vvfat.c    |  8 ++++----
+>>  7 files changed, 24 insertions(+), 24 deletions(-)
+>> 
+>> diff --git a/block/bochs.c b/block/bochs.c
+>> index 50c630047b..36c1b45bd2 100644
+>> --- a/block/bochs.c
+>> +++ b/block/bochs.c
+>> @@ -112,10 +112,10 @@ static int bochs_open(BlockDriverState *bs, QDict *options, int flags,
+>>      }
+>>  
+>>      if (!bdrv_is_read_only(bs)) {
+>> -        error_report("Opening bochs images without an explicit read-only=on "
+>> -                     "option is deprecated. Future versions will refuse to "
+>> -                     "open the image instead of automatically marking the "
+>> -                     "image read-only.");
+>> +        warn_report("Opening bochs images without an explicit read-only=on "
+>> +                    "option is deprecated");
+>> +        error_printf("Future versions may refuse to open the image "
+>> +                     "instead of automatically marking it read-only.\n");
+>>          ret = bdrv_set_read_only(bs, true, errp); /* no write support yet */
+>>          if (ret < 0) {
+>>              return ret;
 >
-> There's only a handful of string macros left, and no one is supposed
-> to add anything else. The check-qerror.sh script was used to make sure
-> that all definitions on the qerror.c and qerror.h files were sorted
-> alphabetically. The former was removed three years ago, and the latter
-> is now in a different location, so the script doesn't even work (as
-> a matter of fact the alphabetical order was broken last time someone
-> added a macro -also in 2015- and no one seemed to notice).
->
-> There's no point in fixing this script so let's just remove it.
-> The rogue macro is also moved to its correct location.
->
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> While I agree with your intention, it would be best to leave all of the
+> !bdrv_is_read_only() warnings alone. My series "[PATCH v2 0/8] block:
+> Add auto-read-only option" gets rid of the message entirely, so this
+> would only add a merge conflict.
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+I wasn't are of that series.  I'm going to drop these hunks.  Left:
 
-Queued, thanks!
+diff --git a/block/iscsi.c b/block/iscsi.c
+index bb69faf34a..73998c2860 100644
+--- a/block/iscsi.c
++++ b/block/iscsi.c
+@@ -1844,7 +1844,7 @@ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
+     iscsi_set_timeout(iscsi, timeout);
+ #else
+     if (timeout) {
+-        error_report("iSCSI: ignoring timeout value for libiscsi <1.15.0");
++        warn_report("iSCSI: ignoring timeout value for libiscsi <1.15.0");
+     }
+ #endif
+ 
+diff --git a/block/rbd.c b/block/rbd.c
+index 014c68d629..6e26bac170 100644
+--- a/block/rbd.c
++++ b/block/rbd.c
+@@ -750,8 +750,8 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+         /* Take care whenever deciding to actually deprecate; once this ability
+          * is removed, we will not be able to open any images with legacy-styled
+          * backing image strings. */
+-        error_report("RBD options encoded in the filename as keyvalue pairs "
+-                     "is deprecated");
++        warn_report("RBD options encoded in the filename as keyvalue pairs "
++                    "is deprecated");
+     }
+ 
+     /* Remove the processed options from the QDict (the visitor processes
+diff --git a/block/sheepdog.c b/block/sheepdog.c
+index b229a664d9..0125df9d49 100644
+--- a/block/sheepdog.c
++++ b/block/sheepdog.c
+@@ -572,7 +572,7 @@ static int connect_to_sdog(BDRVSheepdogState *s, Error **errp)
+     if (s->addr->type == SOCKET_ADDRESS_TYPE_INET && fd >= 0) {
+         int ret = socket_set_nodelay(fd);
+         if (ret < 0) {
+-            error_report("%s", strerror(errno));
++            warn_report("can't set TCP_NODELAY: %s", strerror(errno));
+         }
+     }
+ 
