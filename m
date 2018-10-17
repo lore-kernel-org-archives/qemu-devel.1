@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59695)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59995)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gCkNQ-000696-Qq
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 07:52:37 -0400
+	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gCkOb-0006gH-Do
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 07:53:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gCkNK-00043b-D3
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 07:52:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38598)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gCkNG-0003lT-KP
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 07:52:28 -0400
-Date: Wed, 17 Oct 2018 12:52:11 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20181017115211.GE2530@work-vm>
-References: <20181005154910.3099-1-alex.bennee@linaro.org>
-	<20181005154910.3099-7-alex.bennee@linaro.org>
+	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gCkOa-0006BX-Jd
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 07:53:49 -0400
+Received: from mail-ot1-x32f.google.com ([2607:f8b0:4864:20::32f]:42184)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <artem.k.pisarenko@gmail.com>)
+	id 1gCkOa-0006Aa-CD
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 07:53:48 -0400
+Received: by mail-ot1-x32f.google.com with SMTP id c23so24062601otl.9
+	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 04:53:48 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20181005154910.3099-7-alex.bennee@linaro.org>
+References: <cover.1539259394.git.artem.k.pisarenko@gmail.com>
+In-Reply-To: <cover.1539259394.git.artem.k.pisarenko@gmail.com>
+From: Artem Pisarenko <artem.k.pisarenko@gmail.com>
+Date: Wed, 17 Oct 2018 17:53:35 +0600
+Message-ID: <CANzW0msA_rZrqucrgMxTFtwiZgJA_+w0O4zA2P64_L_XKs96hQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 06/21] trace: show trace point counts
- in the monitor
+Subject: Re: [Qemu-devel] [PATCH 0/4] Fix and improve core RTC function and
+ documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,82 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, Pavel.Dovgaluk@ispras.ru, vilanova@ac.upc.edu, cota@braap.org, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
 
-* Alex Benn=E9e (alex.bennee@linaro.org) wrote:
-> Now we have counts for each trace point we can expose them in the
-> monitor when the user queries what trace points are available.
->=20
-> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
+I checked it with ./configure --enable-debug and didn't imagined that in
+non-debug build (with -O2) compiler will complain:
+   "vl.c:847:12: error: =E2=80=98seconds=E2=80=99 may be used uninitialized=
+ in this
+function [-Werror=3Dmaybe-uninitialized]"
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+    int qemu_timedate_diff(struct tm *tm)
+    {
+        time_t seconds;
+        switch (rtc_base_type) {
+        case RTC_BASE_DATETIME:
+        case RTC_BASE_UTC:
+            seconds =3D mktimegm(tm);
+            break;
+        case RTC_BASE_LOCALTIME:
+        {
+            struct tm tmp =3D *tm;
+            tmp.tm_isdst =3D -1; /* use timezone to figure it out */
+            seconds =3D mktime(&tmp);
+            break;
+        }
+        }
+>>>  return seconds - qemu_ref_timedate(QEMU_CLOCK_HOST);
+    }
 
-> ---
->  monitor.c       | 5 +++--
->  qapi/trace.json | 3 ++-
->  trace/qmp.c     | 1 +
->  3 files changed, 6 insertions(+), 3 deletions(-)
->=20
-> diff --git a/monitor.c b/monitor.c
-> index c4677b502b..d8229cd2b0 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -1421,9 +1421,10 @@ static void hmp_info_trace_events(Monitor *mon, =
-const QDict *qdict)
->      }
-> =20
->      for (elem =3D events; elem !=3D NULL; elem =3D elem->next) {
-> -        monitor_printf(mon, "%s : state %u\n",
-> +        monitor_printf(mon, "%s : state %u count %" PRIu64 "\n",
->                         elem->value->name,
-> -                       elem->value->state =3D=3D TRACE_EVENT_STATE_ENA=
-BLED ? 1 : 0);
-> +                       elem->value->state =3D=3D TRACE_EVENT_STATE_ENA=
-BLED ? 1 : 0,
-> +                       elem->value->count);
->      }
->      qapi_free_TraceEventInfoList(events);
->  }
-> diff --git a/qapi/trace.json b/qapi/trace.json
-> index 799b254a18..b9184b0d18 100644
-> --- a/qapi/trace.json
-> +++ b/qapi/trace.json
-> @@ -33,6 +33,7 @@
->  # @name: Event name.
->  # @state: Tracing state.
->  # @vcpu: Whether this is a per-vCPU event (since 2.7).
-> +# @count: Current hits on trace-point (since 3.1).
->  #
->  # An event is per-vCPU if it has the "vcpu" property in the "trace-eve=
-nts"
->  # files.
-> @@ -40,7 +41,7 @@
->  # Since: 2.2
->  ##
->  { 'struct': 'TraceEventInfo',
-> -  'data': {'name': 'str', 'state': 'TraceEventState', 'vcpu': 'bool'} =
-}
-> +  'data': {'name': 'str', 'state': 'TraceEventState', 'vcpu': 'bool', =
-'count': 'int' } }
-> =20
->  ##
->  # @trace-event-get-state:
-> diff --git a/trace/qmp.c b/trace/qmp.c
-> index ea99b00956..cce8198091 100644
-> --- a/trace/qmp.c
-> +++ b/trace/qmp.c
-> @@ -102,6 +102,7 @@ TraceEventInfoList *qmp_trace_event_get_state(const=
- char *name,
->          elem->value =3D g_new(TraceEventInfo, 1);
->          elem->value->vcpu =3D is_vcpu;
->          elem->value->name =3D g_strdup(trace_event_get_name(ev));
-> +        elem->value->count =3D ev->count;
-> =20
->          if (!trace_event_get_state_static(ev)) {
->              elem->value->state =3D TRACE_EVENT_STATE_UNAVAILABLE;
-> --=20
-> 2.17.1
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Switch covers all defined enum values, so 'second' cannot be left
+uninitialized. One way it could be is if someone assigns integer value to
+'rtc_base_type' variable explicitly. Ok, let's look at it. This variable
+initialized with valid value at definition and elsewhere in code it's being
+assigned only valid enum values. Maybe it could be changed outside of
+compile unit ? No, it's defined as static. Maybe GCC isn't just smart
+enough to check it in whole compile unit scope context ? From my expirience
+I've seen that it's able to make even more complex assumptions and smart
+decisions. And with higher optimization levels GCC becomes just smarter.
+But this time GCC behavior differs...
+--=20
+
+=D0=A1 =D1=83=D0=B2=D0=B0=D0=B6=D0=B5=D0=BD=D0=B8=D0=B5=D0=BC,
+  =D0=90=D1=80=D1=82=D0=B5=D0=BC =D0=9F=D0=B8=D1=81=D0=B0=D1=80=D0=B5=D0=BD=
+=D0=BA=D0=BE
