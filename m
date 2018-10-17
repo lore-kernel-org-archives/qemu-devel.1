@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40551)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gCmDr-00017h-Fn
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 09:50:52 -0400
+	(envelope-from <eblake@redhat.com>) id 1gCmEp-0001dU-3g
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 09:51:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gCmDo-0006dY-8R
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 09:50:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47342)
+	(envelope-from <eblake@redhat.com>) id 1gCmEl-0008BK-G9
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 09:51:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37568)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1gCmDo-0006bT-26
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 09:50:48 -0400
-Date: Wed, 17 Oct 2018 15:50:43 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20181017135043.GE31479@localhost.localdomain>
-References: <20181017082702.5581-1-armbru@redhat.com>
-	<20181017082702.5581-4-armbru@redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gCmEl-00085f-8I
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 09:51:47 -0400
+References: <20181008131924.7377-1-d.csapak@proxmox.com>
+	<1f00827b-4c94-e10c-ab57-4ceb5223bee9@proxmox.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <98a20e5d-0a11-2d4f-2de9-d50ca4dff941@redhat.com>
+Date: Wed, 17 Oct 2018 08:51:35 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181017082702.5581-4-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 03/38] block: Use warn_report() &
- friends to report warnings
+In-Reply-To: <1f00827b-4c94-e10c-ab57-4ceb5223bee9@proxmox.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] qapi: add info about reset to SHUTDOWN
+ event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,59 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Lieven <pl@kamp.de>, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Liu Yuan <namei.unix@gmail.com>
+To: Dominik Csapak <d.csapak@proxmox.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, armbru@redhat.com
 
-Am 17.10.2018 um 10:26 hat Markus Armbruster geschrieben:
-> Calling error_report() in a function that takes an Error ** argument
-> is suspicious.  Convert a few that are actually warnings to
-> warn_report().
-> 
-> While there, split warnings consisting of multiple sentences to
-> conform to conventions spelled out in warn_report()'s contract, and
-> improve a rather useless warning in sheepdog.c.
-> 
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Peter Lieven <pl@kamp.de>
-> Cc: Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>
-> Cc: Liu Yuan <namei.unix@gmail.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> ---
->  block/bochs.c    |  8 ++++----
->  block/cloop.c    |  8 ++++----
->  block/dmg.c      |  8 ++++----
->  block/iscsi.c    |  2 +-
->  block/rbd.c      | 12 ++++++------
->  block/sheepdog.c |  2 +-
->  block/vvfat.c    |  8 ++++----
->  7 files changed, 24 insertions(+), 24 deletions(-)
-> 
-> diff --git a/block/bochs.c b/block/bochs.c
-> index 50c630047b..36c1b45bd2 100644
-> --- a/block/bochs.c
-> +++ b/block/bochs.c
-> @@ -112,10 +112,10 @@ static int bochs_open(BlockDriverState *bs, QDict *options, int flags,
->      }
->  
->      if (!bdrv_is_read_only(bs)) {
-> -        error_report("Opening bochs images without an explicit read-only=on "
-> -                     "option is deprecated. Future versions will refuse to "
-> -                     "open the image instead of automatically marking the "
-> -                     "image read-only.");
-> +        warn_report("Opening bochs images without an explicit read-only=on "
-> +                    "option is deprecated");
-> +        error_printf("Future versions may refuse to open the image "
-> +                     "instead of automatically marking it read-only.\n");
->          ret = bdrv_set_read_only(bs, true, errp); /* no write support yet */
->          if (ret < 0) {
->              return ret;
+On 10/17/18 2:17 AM, Dominik Csapak wrote:
+> On 10/8/18 3:19 PM, Dominik Csapak wrote:
+>> when '-no-reboot' is set, it is interesting if the guest was originall=
+y
+>> shutdown or reset, so save and return that info
+>>
+>> Signed-off-by: Dominik Csapak <d.csapak@proxmox.com>
+>> ---
+>> =C2=A0 qapi/run-state.json | 5 ++++-
+>> =C2=A0 vl.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 5 ++++-
+>> =C2=A0 2 files changed, 8 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/qapi/run-state.json b/qapi/run-state.json
+>> index 332e44897b..ec1769777d 100644
+>> --- a/qapi/run-state.json
+>> +++ b/qapi/run-state.json
+>> @@ -107,6 +107,9 @@
+>> =C2=A0 # a guest-initiated ACPI shutdown request or other hardware-spe=
+cific=20
+>> action)
+>> =C2=A0 # rather than a host request (such as sending qemu a SIGINT). (=
+since=20
+>> 2.10)
+>> =C2=A0 #
+>> +# @was_reset: If true, the shutdown was actually a reset, but no-rebo=
+ot
+>> +# was set, so it got converted to a shutdown
 
-While I agree with your intention, it would be best to leave all of the
-!bdrv_is_read_only() warnings alone. My series "[PATCH v2 0/8] block:
-Add auto-read-only option" gets rid of the message entirely, so this
-would only add a merge conflict.
+New additions should prefer naming like 'was-reset' rather than=20
+'was_reset', if we still think this particular name is appropriate.  My=20
+personal take: what does the 'was' add, which would prevent us from just=20
+using the name 'reset' and avoiding the separator spelling issue?
 
-Kevin
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
