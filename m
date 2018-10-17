@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43157)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43259)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gCkyK-00072O-4L
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:30:45 -0400
+	(envelope-from <quintela@redhat.com>) id 1gCkyj-0007JF-Ny
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:31:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gCkyG-0007EE-Nu
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:30:43 -0400
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:41361)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gCkyG-0007BP-AL
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:30:40 -0400
-Received: by mail-wr1-x434.google.com with SMTP id q7-v6so1627933wrr.8
-	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 05:30:38 -0700 (PDT)
-References: <20181017090750.4378-1-pbonzini@redhat.com>
-	<001f01d465fd$01af8b80$050ea280$@ru>
-	<CANzW0ms5DMhjYqBUS3EHfhVRp9Li+Dk=WH9RRpO=jbfOgctkCg@mail.gmail.com>
-	<0817e2fe-5a97-a4ed-9ae2-2e8dee6c9a43@redhat.com>
-	<004201d4660d$e86ef1e0$b94cd5a0$@ru>
-	<a29da0a1-85d7-c57c-5c42-27594a7849ac@redhat.com>
-	<004601d4660e$a54a6b00$efdf4100$@ru>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <004601d4660e$a54a6b00$efdf4100$@ru>
-Date: Wed, 17 Oct 2018 13:30:35 +0100
-Message-ID: <87efcooivo.fsf@linaro.org>
+	(envelope-from <quintela@redhat.com>) id 1gCkyg-0007qp-BT
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:31:09 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20181009132330.7549-4-berrange@redhat.com> ("Daniel
+	P. =?utf-8?Q?Berrang=C3=A9=22's?= message of "Tue, 9 Oct 2018 14:23:27
+	+0100")
+References: <20181009132330.7549-1-berrange@redhat.com>
+	<20181009132330.7549-4-berrange@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 17 Oct 2018 14:30:24 +0200
+Message-ID: <87in2092n3.fsf@trasno.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] Revert "icount: remove obsolete warp call"
+Subject: Re: [Qemu-devel] [PATCH v3 3/6] migration: add support for a
+ "tls-authz" migration parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,46 +27,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Cc: 'Paolo Bonzini' <pbonzini@redhat.com>, 'Artem Pisarenko' <artem.k.pisarenko@gmail.com>, 'Clement Deschamps' <clement.deschamps@greensocs.com>, qemu-devel@nongnu.org
+To: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, libvir-list@redhat.com, Kevin Wolf <kwolf@redhat.com>, =?utf-8?Q?Marc-?= =?utf-8?Q?Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David
+	Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-
-Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
-
->> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
->> On 17/10/2018 13:38, Pavel Dovgalyuk wrote:
->> >> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
->> >> On 17/10/2018 11:53, Artem Pisarenko wrote:
->> >>> See my last comment in bug report. This kind of modification, even
->> >>> adapted to changed function name, doesn't solve issue.
->> >>> I thought long time that it does, but once I catched qemu with a han=
-g.
->> >>> And of course, I wasn't able to reproduce it. So it just better hide=
-s issue.
->> >>> Take a look at alternative solution from
->> >>> QBox: https://git.greensocs.com/qemu/qbox/commit/a8ed106032e375e715a=
-531d6e93e4d9ec295dbdb
->> >>> I didn't catched fail with it (yet).
->> >
->> > Tried to test it, but rr seems to be broken again.
->> > I'll try to bisect now.
->>
->> Can we add a test that runs with "make check" and covers the basics of
->> record/replay's cpus.c bits?
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+> From: "Daniel P. Berrange" <berrange@redhat.com>
 >
-> I thought Alex is trying to create some tests.
-> Alex, am I right?
+> The QEMU instance that runs as the server for the migration data
+> transport (ie the target QEMU) needs to be able to configure access
+> control so it can prevent unauthorized clients initiating an incoming
+> migration. This adds a new 'tls-authz' migration parameter that is used
+> to provide the QOM ID of a QAuthZ subclass instance that provides the
+> access control check. This is checked against the x509 certificate
+> obtained during the TLS handshake.
+>
+> For example, when starting a QEMU for incoming migration, it is
+> possible to give an example identity of the source QEMU that is
+> intended to be connecting later:
+>
+>   $QEMU \
+>      -monitor stdio \
+>      -incoming defer \
+>      ...other args...
+>
+>   (qemu) object_add tls-creds-x509,id=3Dtls0,dir=3D/home/berrange/qemutls=
+,\
+>              endpoint=3Dserver,verify-peer=3Dyes \
+>   (qemu) object_add authz-simple,id=3Dauth0,identity=3DCN=3Dlaptop.exampl=
+e.com,,\
+>              O=3DExample Org,,L=3DLondon,,ST=3DLondon,,C=3DGB \
+>   (qemu) migrate_incoming tcp:localhost:9000
+>
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 
-Not actively at the moment but we need to get there. As rr only works
-with system emulation we need to update the check-tcg machinery to be
-able to build some system binaries. A number of the tests/tcg targets
-already have some system binaries waiting to be ported to the new make
-system.
-
-The next question is what we need to exercise rr? The migration tests
-have added some very simple ping-pong type "boot sectors" so perhaps
-putting the source for those into check-tcg we can build them and use it
-for rr testing?
-
---
-Alex Benn=C3=A9e
+Reviewed-by: Juan Quintela <quintela@redhat.com>
