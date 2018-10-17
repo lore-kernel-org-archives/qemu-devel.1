@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44758)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44929)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gCl2w-0001z5-1i
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:35:31 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gCl3A-0002Bp-AJ
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:35:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gCl2u-0006wF-2Y
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:35:29 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:39638 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gCl37-0007AA-Jh
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:35:44 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:36532 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gCl2t-0006gX-NF
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:35:27 -0400
+	id 1gCl37-00050W-Ai
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:35:41 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Wed, 17 Oct 2018 14:33:51 +0200
-Message-Id: <1539779635-15445-24-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Wed, 17 Oct 2018 14:33:30 +0200
+Message-Id: <1539779635-15445-3-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1539779635-15445-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1539779635-15445-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL 23/27] target/mips: Add reset state for PWSize
- and PWField registers
+Subject: [Qemu-devel] [PULL 02/27] elf: Fix PT_MIPS_XXX constants
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +27,35 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-From: Yongbok Kim <yongbok.kim@mips.com>
+From: Stefan Markovic <smarkovic@wavecomp.com>
 
-Add reset state for PWSize and PWField registers. The reset state
-is different for pre-R6 and R6 (and post-R6) ISAa.
+Fix existing and add missing PT_MIPS_XXX constants in elf.h.
+This is copied from kernel header arch/mips/include/asm/elf.h.
 
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
+Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ include/elf.h | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index d4d3369..aceda11 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -26443,6 +26443,24 @@ void cpu_state_reset(CPUMIPSState *env)
-         env->CP0_Status |= (1 << CP0St_FR);
-     }
- 
-+    if (env->insn_flags & ISA_MIPS32R6) {
-+        /* PTW  =  1 */
-+        env->CP0_PWSize = 0x40;
-+        /* GDI  = 12 */
-+        /* UDI  = 12 */
-+        /* MDI  = 12 */
-+        /* PRI  = 12 */
-+        /* PTEI =  2 */
-+        env->CP0_PWField = 0x0C30C302;
-+    } else {
-+        /* GDI  =  0 */
-+        /* UDI  =  0 */
-+        /* MDI  =  0 */
-+        /* PRI  =  0 */
-+        /* PTEI =  2 */
-+        env->CP0_PWField = 0x02;
-+    }
+diff --git a/include/elf.h b/include/elf.h
+index 312f68a..decf210 100644
+--- a/include/elf.h
++++ b/include/elf.h
+@@ -28,8 +28,11 @@ typedef int64_t  Elf64_Sxword;
+ #define PT_PHDR    6
+ #define PT_LOPROC  0x70000000
+ #define PT_HIPROC  0x7fffffff
+-#define PT_MIPS_REGINFO		0x70000000
+-#define PT_MIPS_OPTIONS		0x70000001
 +
-     if (env->CP0_Config3 & (1 << CP0C3_ISA) & (1 << (CP0C3_ISA + 1))) {
-         /*  microMIPS on reset when Config3.ISA is 3 */
-         env->hflags |= MIPS_HFLAG_M16;
++#define PT_MIPS_REGINFO   0x70000000
++#define PT_MIPS_RTPROC    0x70000001
++#define PT_MIPS_OPTIONS   0x70000002
++#define PT_MIPS_ABIFLAGS  0x70000003
+ 
+ /* Flags in the e_flags field of the header */
+ /* MIPS architecture level. */
 -- 
 2.7.4
