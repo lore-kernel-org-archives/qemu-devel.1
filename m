@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51034)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51038)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gChAb-000859-KO
+	(envelope-from <armbru@redhat.com>) id 1gChAb-00085D-L6
 	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 04:27:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gChAY-000102-Eu
+	(envelope-from <armbru@redhat.com>) id 1gChAY-0000zr-94
 	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 04:27:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35520)
+Received: from mx1.redhat.com ([209.132.183.28]:60806)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gChAY-0000y4-6J
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gChAX-0000xY-Te
 	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 04:27:06 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 17 Oct 2018 10:26:32 +0200
-Message-Id: <20181017082702.5581-9-armbru@redhat.com>
+Date: Wed, 17 Oct 2018 10:26:27 +0200
+Message-Id: <20181017082702.5581-4-armbru@redhat.com>
 In-Reply-To: <20181017082702.5581-1-armbru@redhat.com>
 References: <20181017082702.5581-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 08/38] 9pfs: Fix CLI parsing crash on error
+Subject: [Qemu-devel] [PATCH v4 03/38] block: Use warn_report() & friends to
+ report warnings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,57 +25,165 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Greg Kurz <groug@kaod.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Lieven <pl@kamp.de>, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Liu Yuan <namei.unix@gmail.com>
 
 Calling error_report() in a function that takes an Error ** argument
-is suspicious.  9p-handle.c's handle_parse_opts() does that, and then
-fails without setting an error.  Wrong.  Its caller crashes when it
-tries to report the error:
+is suspicious.  Convert a few that are actually warnings to
+warn_report().
 
-    $ qemu-system-x86_64 -nodefaults -fsdev id=foo,fsdriver=handle
-    qemu-system-x86_64: -fsdev id=foo,fsdriver=handle: warning: handle backend is deprecated
-    qemu-system-x86_64: -fsdev id=foo,fsdriver=handle: fsdev: No path specified
-    Segmentation fault (core dumped)
+While there, split warnings consisting of multiple sentences to
+conform to conventions spelled out in warn_report()'s contract, and
+improve a rather useless warning in sheepdog.c.
 
-Screwed up when commit 91cda4e8f37 (v2.12.0) converted the function to
-Error.  Fix by calling error_setg() instead of error_report().
-
-Fixes: 91cda4e8f372602795e3a2f4bd2e3adaf9f82255
-Cc: Greg Kurz <groug@kaod.org>
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Lieven <pl@kamp.de>
+Cc: Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>
+Cc: Liu Yuan <namei.unix@gmail.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Acked-by: Greg Kurz <groug@kaod.org>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- hw/9pfs/9p-handle.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ block/bochs.c    |  8 ++++----
+ block/cloop.c    |  8 ++++----
+ block/dmg.c      |  8 ++++----
+ block/iscsi.c    |  2 +-
+ block/rbd.c      | 12 ++++++------
+ block/sheepdog.c |  2 +-
+ block/vvfat.c    |  8 ++++----
+ 7 files changed, 24 insertions(+), 24 deletions(-)
 
-diff --git a/hw/9pfs/9p-handle.c b/hw/9pfs/9p-handle.c
-index f3641dbe4a..3465b1ef30 100644
---- a/hw/9pfs/9p-handle.c
-+++ b/hw/9pfs/9p-handle.c
-@@ -19,6 +19,7 @@
- #include <grp.h>
- #include <sys/socket.h>
- #include <sys/un.h>
-+#include "qapi/error.h"
- #include "qemu/xattr.h"
- #include "qemu/cutils.h"
- #include "qemu/error-report.h"
-@@ -655,12 +656,13 @@ static int handle_parse_opts(QemuOpts *opts, FsDriverEntry *fse, Error **errp)
-     warn_report("handle backend is deprecated");
- 
-     if (sec_model) {
--        error_report("Invalid argument security_model specified with handle fsdriver");
-+        error_setg(errp,
-+                   "Invalid argument security_model specified with handle fsdriver");
-         return -1;
+diff --git a/block/bochs.c b/block/bochs.c
+index 50c630047b..36c1b45bd2 100644
+--- a/block/bochs.c
++++ b/block/bochs.c
+@@ -112,10 +112,10 @@ static int bochs_open(BlockDriverState *bs, QDict *options, int flags,
      }
  
-     if (!path) {
--        error_report("fsdev: No path specified");
-+        error_setg(errp, "fsdev: No path specified");
-         return -1;
+     if (!bdrv_is_read_only(bs)) {
+-        error_report("Opening bochs images without an explicit read-only=on "
+-                     "option is deprecated. Future versions will refuse to "
+-                     "open the image instead of automatically marking the "
+-                     "image read-only.");
++        warn_report("Opening bochs images without an explicit read-only=on "
++                    "option is deprecated");
++        error_printf("Future versions may refuse to open the image "
++                     "instead of automatically marking it read-only.\n");
+         ret = bdrv_set_read_only(bs, true, errp); /* no write support yet */
+         if (ret < 0) {
+             return ret;
+diff --git a/block/cloop.c b/block/cloop.c
+index 2be68987bd..a558e67cb0 100644
+--- a/block/cloop.c
++++ b/block/cloop.c
+@@ -74,10 +74,10 @@ static int cloop_open(BlockDriverState *bs, QDict *options, int flags,
      }
-     fse->path = g_strdup(path);
+ 
+     if (!bdrv_is_read_only(bs)) {
+-        error_report("Opening cloop images without an explicit read-only=on "
+-                     "option is deprecated. Future versions will refuse to "
+-                     "open the image instead of automatically marking the "
+-                     "image read-only.");
++        warn_report("Opening cloop images without an explicit read-only=on "
++                    "option is deprecated");
++        error_printf("Future versions may refuse to open the image "
++                     "instead of automatically marking it read-only.\n");
+         ret = bdrv_set_read_only(bs, true, errp);
+         if (ret < 0) {
+             return ret;
+diff --git a/block/dmg.c b/block/dmg.c
+index c9b3c519c4..9fb814460d 100644
+--- a/block/dmg.c
++++ b/block/dmg.c
+@@ -420,10 +420,10 @@ static int dmg_open(BlockDriverState *bs, QDict *options, int flags,
+     }
+ 
+     if (!bdrv_is_read_only(bs)) {
+-        error_report("Opening dmg images without an explicit read-only=on "
+-                     "option is deprecated. Future versions will refuse to "
+-                     "open the image instead of automatically marking the "
+-                     "image read-only.");
++        warn_report("Opening dmg images without an explicit read-only=on "
++                    "option is deprecated");
++        error_printf("Future versions may refuse to open the image "
++                     "instead of automatically marking it read-only.\n");
+         ret = bdrv_set_read_only(bs, true, errp);
+         if (ret < 0) {
+             return ret;
+diff --git a/block/iscsi.c b/block/iscsi.c
+index bb69faf34a..73998c2860 100644
+--- a/block/iscsi.c
++++ b/block/iscsi.c
+@@ -1844,7 +1844,7 @@ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
+     iscsi_set_timeout(iscsi, timeout);
+ #else
+     if (timeout) {
+-        error_report("iSCSI: ignoring timeout value for libiscsi <1.15.0");
++        warn_report("iSCSI: ignoring timeout value for libiscsi <1.15.0");
+     }
+ #endif
+ 
+diff --git a/block/rbd.c b/block/rbd.c
+index 014c68d629..6e26bac170 100644
+--- a/block/rbd.c
++++ b/block/rbd.c
+@@ -750,8 +750,8 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+         /* Take care whenever deciding to actually deprecate; once this ability
+          * is removed, we will not be able to open any images with legacy-styled
+          * backing image strings. */
+-        error_report("RBD options encoded in the filename as keyvalue pairs "
+-                     "is deprecated");
++        warn_report("RBD options encoded in the filename as keyvalue pairs "
++                    "is deprecated");
+     }
+ 
+     /* Remove the processed options from the QDict (the visitor processes
+@@ -781,10 +781,10 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+      * leave as-is */
+     if (s->snap != NULL) {
+         if (!bdrv_is_read_only(bs)) {
+-            error_report("Opening rbd snapshots without an explicit "
+-                         "read-only=on option is deprecated. Future versions "
+-                         "will refuse to open the image instead of "
+-                         "automatically marking the image read-only.");
++            warn_report("Opening rbd snapshots without an explicit "
++                        "read-only=on option is deprecated");
++            error_printf("Future versions may refuse to open the image "
++                         "instead of automatically marking it read-only.\n");
+             r = bdrv_set_read_only(bs, true, &local_err);
+             if (r < 0) {
+                 error_propagate(errp, local_err);
+diff --git a/block/sheepdog.c b/block/sheepdog.c
+index b229a664d9..0125df9d49 100644
+--- a/block/sheepdog.c
++++ b/block/sheepdog.c
+@@ -572,7 +572,7 @@ static int connect_to_sdog(BDRVSheepdogState *s, Error **errp)
+     if (s->addr->type == SOCKET_ADDRESS_TYPE_INET && fd >= 0) {
+         int ret = socket_set_nodelay(fd);
+         if (ret < 0) {
+-            error_report("%s", strerror(errno));
++            warn_report("can't set TCP_NODELAY: %s", strerror(errno));
+         }
+     }
+ 
+diff --git a/block/vvfat.c b/block/vvfat.c
+index fc41841a5c..8f3f9e9a93 100644
+--- a/block/vvfat.c
++++ b/block/vvfat.c
+@@ -1263,10 +1263,10 @@ static int vvfat_open(BlockDriverState *bs, QDict *options, int flags,
+             goto fail;
+         }
+     } else  if (!bdrv_is_read_only(bs)) {
+-        error_report("Opening non-rw vvfat images without an explicit "
+-                     "read-only=on option is deprecated. Future versions "
+-                     "will refuse to open the image instead of "
+-                     "automatically marking the image read-only.");
++        warn_report("Opening non-rw vvfat images without an explicit "
++                    "read-only=on option is deprecated");
++        error_printf("Future versions may refuse to open the image "
++                     "instead of automatically marking it read-only.\n");
+         /* read only is the default for safety */
+         ret = bdrv_set_read_only(bs, true, &local_err);
+         if (ret < 0) {
 -- 
 2.17.1
