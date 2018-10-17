@@ -1,28 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43596)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1gCrcu-0005RT-VE
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:37:05 -0400
+	(envelope-from <muriloo@linux.ibm.com>) id 1gCrjI-0000J0-K1
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:43:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1gCrcu-0003y7-2K
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:37:04 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:39448)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
-	id 1gCrct-0003vy-Se
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:37:03 -0400
-Received: by mail-ot1-x343.google.com with SMTP id l58so27410652otd.6
-	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 12:37:02 -0700 (PDT)
+	(envelope-from <muriloo@linux.ibm.com>) id 1gCrjE-0002yd-ND
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:43:40 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48918
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <muriloo@linux.ibm.com>)
+	id 1gCrjB-0002oC-R0
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:43:34 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w9HJYB3m026504
+	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 15:43:23 -0400
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2n69adnn7y-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 15:43:23 -0400
+Received: from localhost
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <muriloo@linux.ibm.com>;
+	Wed, 17 Oct 2018 15:43:22 -0400
+Date: Wed, 17 Oct 2018 16:43:15 -0300
+From: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+References: <20181016232201.16829-1-crosa@redhat.com>
+	<CAFEAcA_KFOay7zBoYMSqqEYd0ZhTcW5wp3bs28cr=oK4W4FL3A@mail.gmail.com>
+	<20181017162944.GF31060@habkost.net>
+	<d5f32475-df5b-0c5c-591f-5fae8e641c11@redhat.com>
+	<CAFEAcA_gyQvmq48QquNiFhGef-FWPeDKRUSk3wf7hS=_=xm_XQ@mail.gmail.com>
 MIME-Version: 1.0
-References: <20181013050021.11962-1-pagupta@redhat.com>
-	<20181013050021.11962-3-pagupta@redhat.com>
-	<CAPcyv4hroaVWA-HgjWCnr7QTd_y7U8sCvS+Up733ttnD6_cKzQ@mail.gmail.com>
-	<431127218.21694133.1539803509205.JavaMail.zimbra@redhat.com>
-In-Reply-To: <431127218.21694133.1539803509205.JavaMail.zimbra@redhat.com>
-From: Dan Williams <dan.j.williams@intel.com>
-Date: Wed, 17 Oct 2018 12:36:51 -0700
-Message-ID: <CAPcyv4joz_dPruJY4CYAxXSuMTD-NUoqm6kvGFrF19jt5dN=rg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] virtio-pmem: Add virtio pmem driver
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_gyQvmq48QquNiFhGef-FWPeDKRUSk3wf7hS=_=xm_XQ@mail.gmail.com>
+Message-Id: <20181017194315.GA18379@kermit-br-ibm-com>
+Subject: Re: [Qemu-devel] [PATCH] Acceptance tests: host arch to target arch
+ name mapping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,53 +46,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pankaj Gupta <pagupta@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Jan Kara <jack@suse.cz>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, KVM list <kvm@vger.kernel.org>, Rik van Riel <riel@surriel.com>, linux-nvdimm <linux-nvdimm@ml01.01.org>, David Hildenbrand <david@redhat.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Dave Jiang <dave.jiang@intel.com>, Qemu Developers <qemu-devel@nongnu.org>, Christoph Hellwig <hch@infradead.org>, Vishal L Verma <vishal.l.verma@intel.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, zwisler@kernel.org, lcapitulino@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Cleber Rosa <crosa@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Wed, Oct 17, 2018 at 12:11 PM Pankaj Gupta <pagupta@redhat.com> wrote:
->
->
->
-> > On Fri, Oct 12, 2018 at 10:01 PM Pankaj Gupta <pagupta@redhat.com> wrote:
-> > >
-> > > This patch adds virtio-pmem driver for KVM guest.
-> > >
-> > > Guest reads the persistent memory range information from
-> > > Qemu over VIRTIO and registers it on nvdimm_bus. It also
-> > > creates a nd_region object with the persistent memory
-> > > range information so that existing 'nvdimm/pmem' driver
-> > > can reserve this into system memory map. This way
-> > > 'virtio-pmem' driver uses existing functionality of pmem
-> > > driver to register persistent memory compatible for DAX
-> > > capable filesystems.
-> > >
-> > > This also provides function to perform guest flush over
-> > > VIRTIO from 'pmem' driver when userspace performs flush
-> > > on DAX memory range.
+On Wed, Oct 17, 2018 at 07:40:51PM +0100, Peter Maydell wrote:
+> On 17 October 2018 at 18:38, Cleber Rosa <crosa@redhat.com> wrote:
 > >
-> > Before we can move forward with this driver we need additional
-> > filesystem enabling to detect when the backing device is fronting DAX
-> > pmem or a paravirtualized page cache through virtio-pmem. Any
-> > interface that requires fsync() and a round trip to the hypervisor to
-> > flush host page cache is not DAX.
+> >
+> > On 10/17/18 12:29 PM, Eduardo Habkost wrote:
+> >> On Wed, Oct 17, 2018 at 01:34:41PM +0100, Peter Maydell wrote:
+> >>> So, why does the test code need to care? It's not clear
+> >>> from the patch... My expectation would be that you'd
+> >>> just test all the testable target architectures,
+> >>> regardless of what the host architecture is.
+> >>
+> >> I tend to agree.  Maybe the right solution is to get rid of the
+> >> os.uname().  I think the default should be testing all QEMU
+> >> binaries that were built, and the host architecture shouldn't
+> >> matter.
 >
-> I saw your proposal[1] for new mmap flag MAP_DIRECT. IIUIC mapping should fail for
-> MAP_DIRECT if it requires explicit flush or buffer indirection. So, if we disable
-> MAP_SYNC flag for virtio-pmem this should fail MAP_DIRECT as well? Otherwise
-> without MAP_DIRECT, virtio-pmem should be defaulted to VIRTIO flush mechanism.
+> Yes, looking at os.uname() also seems like an odd thing
+> for the tests to be doing here. The test framework
+> should be as far as possible host-architecture agnostic.
+> (For some of the KVM cases there probably is a need to
+> care, but those are exceptions, not the rule.)
+>
+> > I'm in favor of exercising all built targets, but that seems to me to be
+> > on another layer, above the test themselves. This change is about the
+> > behavior of a test when not told about the target arch (and thus binary)
+> > it should use.
+>
+> At that level, I think the right answer is "tell the user
+> they need to specify the qemu executable they are trying to test".
+> In particular, there is no guarantee that the user has actually
+> built the executable for the target that corresponds to the
+> host, so it doesn't work to try to default to that anyway.
+>
+> thanks
+> -- PMM
+>
 
-Right, although I wouldn't worry about MAP_DIRECT in the short term
-since we're still discussing what the upstream interface. Regardless
-of whether MAP_DIRECT is specified or not the virtio-flush mechanism
-would always be used for virtio-pmem. I.e. there is no possibility to
-get full DAX operation with virtio-pmem, only the page-cache bypass
-sub-set.
+I agree with Peter.  We can make qemu_bin parameter mandatory.  If it is not
+given, error out.  Trying to guess it based on host architecture turns out to be
+troublesome.
 
-Taking a look at where we could inject this check for filesystems it's
-a bit awkward to do it in xfs_file_mmap() for example because we do
-not have the backing device for the extents of the inode. So at a
-minimum you would need to investigate calling xfs_inode_supports_dax()
-from that path and teaching it about a new dax_device flag. I'm
-thinking the dax_device flag should be called DAXDEV_BUFFERED to
-indicate the presence of software buffering on a device that otherwise
-supports bypassing the local page cache.
+If we decide to follow this approach of not guessing QEMU binary, we should
+update docs/devel/testing.rst to make it crystal clear qemu_bin parameter is
+mandatory.
+
+--
+Murilo
