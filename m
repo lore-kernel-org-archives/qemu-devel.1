@@ -1,19 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52599)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gClPe-0005cb-GJ
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:58:59 -0400
+	(envelope-from <pmorel@linux.ibm.com>) id 1gClWH-0002Vj-V0
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 09:05:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gClPd-0007pW-1e
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:58:58 -0400
-From: Alberto Garcia <berto@igalia.com>
-Date: Wed, 17 Oct 2018 15:57:30 +0300
-Message-Id: <8bbea9f80f6bc15005f18a4065e86eda1b17dd5d.1539780785.git.berto@igalia.com>
-In-Reply-To: <cover.1539780785.git.berto@igalia.com>
-References: <cover.1539780785.git.berto@igalia.com>
-In-Reply-To: <cover.1539780785.git.berto@igalia.com>
-References: <cover.1539780785.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v2 14/14] block: Stop passing flags to
- bdrv_reopen_queue_child()
+	(envelope-from <pmorel@linux.ibm.com>) id 1gClWD-0006gb-Kh
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 09:05:49 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:1735
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
+	id 1gClWD-0006Yz-Bm
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 09:05:45 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w9HD4hNR078321
+	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 09:05:42 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2n641kve9w-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 09:05:41 -0400
+Received: from localhost
+	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
+	Wed, 17 Oct 2018 14:05:39 +0100
+Reply-To: pmorel@linux.ibm.com
+References: <1539696820-273275-1-git-send-email-imammedo@redhat.com>
+	<20181017125638.7ab687c6.cohuck@redhat.com>
+From: Pierre Morel <pmorel@linux.ibm.com>
+Date: Wed, 17 Oct 2018 15:05:34 +0200
+MIME-Version: 1.0
+In-Reply-To: <20181017125638.7ab687c6.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Message-Id: <4330c759-4db2-ce41-58c2-76d19c63e4a3@linux.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] call HotplugHandler->plug() as the last
+ step in device realization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,150 +45,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, stefanha@redhat.com
 
-Now that all callers are passing the new options using the QDict we no
-longer need the 'flags' parameter.
+On 17/10/2018 12:56, Cornelia Huck wrote:
+> On Tue, 16 Oct 2018 15:33:40 +0200
+> Igor Mammedov <imammedo@redhat.com> wrote:
+>=20
+>> When [2] was fixed it was agreed that adding and calling post_plug()
+>> callback after device_reset() was low risk approach to hotfix issue
+>> right before release. So it was merged instead of moving already
+>> existing plug() callback after device_reset() is called which would
+>> be more risky and require all plug() callbacks audit.
+>>
+>> Looking at the current plug() callbacks, it doesn't seem that moving
+>> plug() callback after device_reset() is breaking anything, so here
+>> goes agreed upon [3] proper fix which essentially reverts [1][2]
+>> and moves plug() callback after device_reset().
+>> This way devices always comes to plug() stage, after it's been fully
+>> initialized (including being reset), which fixes race condition [2]
+>> without need for an extra post_plug() callback.
+>>
+>>   1. (25e897881 "qdev: add HotplugHandler->post_plug() callback")
+>>   2. (8449bcf94 "virtio-scsi: fix hotplug ->reset() vs event race")
+>>   3. https://www.mail-archive.com/qemu-devel@nongnu.org/msg549915.html
+>>
+>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+>> ---
+>> TODO:
+>>   remove usage of Error** from plug() callback, we need to factor out
+>>   pre_plug part from plug() callbacks, before proceeding with it.
+>>   DavidH has recently finished it for pc-dimm/memory_devices, cpus
+>>   mostly have pre_plug parts factored out, but there still are parts
+>>   that could fail so it needs some more work to eliminate failure poin=
+ts
+>>   from plug() callbacks. Meanwhile, I'll plan to treat other misc
+>>   handlers (pci[e]/acpi/usb/...) and introduce pre_plug() where
+>>   necessary.
+>> ---
+>>   include/hw/hotplug.h  | 11 -----------
+>>   hw/core/hotplug.c     | 10 ----------
+>>   hw/core/qdev.c        | 16 ++++++----------
+>>   hw/scsi/virtio-scsi.c | 11 +----------
+>>   4 files changed, 7 insertions(+), 41 deletions(-)
+>=20
+> I've looked at the s390x users of this interface, and it seems to be
+> sane. The one I'm a bit unsure about is zPCI with its bridge
+> enumeration code as introduced in d2f07120a35a ("s390x/pci: handle
+> PCIBridge bus number"). I *think* that one is fine as well. Pierre, can
+> you confirm?
 
-This patch makes the following changes:
+Yes, I can confirm.
+We have no problem with this patch in VFIO_PCI nor in VIRTIO_PCI with=20
+zPCI emulation, for devices bridge or bus.
 
-   1) The update_options_from_flags() call is no longer necessary
-      so it can be removed.
+I played the patch and tested locally. all fine.
 
-   2) The update_flags_from_options() call is now used in all cases,
-      and is moved down a few lines so it happens after the options
-      QDict contains the final set of values.
+For the S390:
+Tested-by: Pierre Morel<pmorel@linux.ibm.com>
 
-   3) The flags parameter is removed. Now the flags are initialized
-      using the current value (for the top-level node) or the parent
-      flags (after inherit_options()). In both cases the initial
-      values are updated to reflect the new options in the QDict. This
-      happens in bdrv_reopen_queue_child() (as explained above) and in
-      bdrv_reopen_prepare().
+also
+Acked-by: Pierre Morel<pmorel@linux.ibm.com>
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
----
- block.c | 62 ++++++++++++++++++++++++++------------------------------------
- 1 file changed, 26 insertions(+), 36 deletions(-)
+Regards,
+Pierre
 
-diff --git a/block.c b/block.c
-index 194200908d..810b4083fe 100644
---- a/block.c
-+++ b/block.c
-@@ -2876,7 +2876,6 @@ BlockDriverState *bdrv_open(const char *filename, const char *reference,
- static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
-                                                  BlockDriverState *bs,
-                                                  QDict *options,
--                                                 int flags,
-                                                  const BdrvChildRole *role,
-                                                  QDict *parent_options,
-                                                  int parent_flags)
-@@ -2885,7 +2884,10 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
- 
-     BlockReopenQueueEntry *bs_entry;
-     BdrvChild *child;
--    QDict *old_options, *explicit_options;
-+    QDict *old_options, *explicit_options, *options_copy;
-+    int flags;
-+    QemuOpts *opts;
-+    Error *local_err = NULL;
- 
-     /* Make sure that the caller remembered to use a drained section. This is
-      * important to avoid graph changes between the recursive queuing here and
-@@ -2911,22 +2913,11 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
-     /*
-      * Precedence of options:
-      * 1. Explicitly passed in options (highest)
--     * 2. Set in flags (only for top level)
--     * 3. Retained from explicitly set options of bs
--     * 4. Inherited from parent node
--     * 5. Retained from effective options of bs
-+     * 2. Retained from explicitly set options of bs
-+     * 3. Inherited from parent node
-+     * 4. Retained from effective options of bs
-      */
- 
--    if (!parent_options) {
--        /*
--         * Any setting represented by flags is always updated. If the
--         * corresponding QDict option is set, it takes precedence. Otherwise
--         * the flag is translated into a QDict option. The old setting of bs is
--         * not considered.
--         */
--        update_options_from_flags(options, flags);
--    }
--
-     /* Old explicitly set values (don't overwrite by inherited value) */
-     if (bs_entry) {
-         old_options = qdict_clone_shallow(bs_entry->state.explicit_options);
-@@ -2940,23 +2931,10 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
- 
-     /* Inherit from parent node */
-     if (parent_options) {
--        QemuOpts *opts;
--        QDict *options_copy;
--        Error *local_err = NULL;
--        assert(!flags);
-+        flags = 0;
-         role->inherit_options(&flags, options, parent_flags, parent_options);
--        options_copy = qdict_clone_shallow(options);
--        opts = qemu_opts_create(&bdrv_runtime_opts, NULL, 0, &error_abort);
--        qemu_opts_absorb_qdict(opts, options_copy, &local_err);
--        /* Don't call update_flags_from_options() if the options are wrong.
--         * bdrv_reopen_prepare() will later return an error. */
--        if (!local_err) {
--            update_flags_from_options(&flags, opts);
--        } else {
--            error_free(local_err);
--        }
--        qemu_opts_del(opts);
--        qobject_unref(options_copy);
-+    } else {
-+        flags = bdrv_get_flags(bs);
-     }
- 
-     /* Old values are used for options that aren't set yet */
-@@ -2964,6 +2942,20 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
-     bdrv_join_options(bs, options, old_options);
-     qobject_unref(old_options);
- 
-+    /* We have the final set of options so let's update the flags */
-+    options_copy = qdict_clone_shallow(options);
-+    opts = qemu_opts_create(&bdrv_runtime_opts, NULL, 0, &error_abort);
-+    qemu_opts_absorb_qdict(opts, options_copy, &local_err);
-+    /* Don't call update_flags_from_options() if the options are wrong.
-+     * bdrv_reopen_prepare() will later return an error. */
-+    if (!local_err) {
-+        update_flags_from_options(&flags, opts);
-+    } else {
-+        error_free(local_err);
-+    }
-+    qemu_opts_del(opts);
-+    qobject_unref(options_copy);
-+
-     /* bdrv_open_inherit() sets and clears some additional flags internally */
-     flags &= ~BDRV_O_PROTOCOL;
-     if (flags & BDRV_O_RDWR) {
-@@ -3003,7 +2995,7 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
-         qdict_extract_subqdict(options, &new_child_options, child_key_dot);
-         g_free(child_key_dot);
- 
--        bdrv_reopen_queue_child(bs_queue, child->bs, new_child_options, 0,
-+        bdrv_reopen_queue_child(bs_queue, child->bs, new_child_options,
-                                 child->role, options, flags);
-     }
- 
-@@ -3014,9 +3006,7 @@ BlockReopenQueue *bdrv_reopen_queue(BlockReopenQueue *bs_queue,
-                                     BlockDriverState *bs,
-                                     QDict *options)
- {
--    int flags = bdrv_get_flags(bs);
--    return bdrv_reopen_queue_child(bs_queue, bs, options, flags,
--                                   NULL, NULL, 0);
-+    return bdrv_reopen_queue_child(bs_queue, bs, options, NULL, NULL, 0);
- }
- 
- /*
--- 
-2.11.0
+
+--=20
+Pierre Morel
+Linux/KVM/QEMU in B=C3=B6blingen - Germany
