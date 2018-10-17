@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51529)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56971)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gCpGa-00036P-CN
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 13:05:55 -0400
+	(envelope-from <armbru@redhat.com>) id 1gCpZj-0000ql-PO
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 13:25:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gCpGL-0007zX-5C
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 13:05:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42084)
+	(envelope-from <armbru@redhat.com>) id 1gCpZg-0006p5-8A
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 13:25:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34604)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gCpGK-0007fF-No
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 13:05:36 -0400
-References: <1539795177-21038-1-git-send-email-peng.hao2@zte.com.cn>
-	<1539795177-21038-2-git-send-email-peng.hao2@zte.com.cn>
-	<87woqgr4wp.fsf@vitty.brq.redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0ced3ef9-f58e-18dd-0959-c69b96d27c4a@redhat.com>
-Date: Wed, 17 Oct 2018 19:05:12 +0200
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gCpZf-0006mo-W4
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 13:25:36 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181017151738.20299-1-berto@igalia.com>
+Date: Wed, 17 Oct 2018 19:25:32 +0200
+In-Reply-To: <20181017151738.20299-1-berto@igalia.com> (Alberto Garcia's
+	message of "Wed, 17 Oct 2018 18:17:38 +0300")
+Message-ID: <87d0s8o583.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <87woqgr4wp.fsf@vitty.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V6 1/5] target/i386 : add coalesced pio
- support
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] scripts: Remove check-qerror.sh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,19 +26,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>, Peng Hao <peng.hao2@zte.com.cn>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, rkrcmar@redhat.com, mst@redhat.com, ehabkost@redhat.com
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel@nongnu.org
 
-On 17/10/2018 17:04, Vitaly Kuznetsov wrote:
->> +	union {
->> +		__u32 pad;
->> +		__u32 pio;
->> +	};
->>  };
-> I was just passing by, but what's the point in keeping 'pad'?
-> 
+Alberto Garcia <berto@igalia.com> writes:
 
-Backwards compatibility.  QEMU does have a couple instances of "x.pad =
-0", so...
+> qerror.h contains leftovers from the now-defunct QError API.
+>
+> There's only a handful of string macros left, and no one is supposed
+> to add anything else. The check-qerror.sh script was used to make sure
+> that all definitions on the qerror.c and qerror.h files were sorted
+> alphabetically. The former was removed three years ago, and the latter
+> is now in a different location, so the script doesn't even work (as
+> a matter of fact the alphabetical order was broken last time someone
+> added a macro -also in 2015- and no one seemed to notice).
+>
+> There's no point in fixing this script so let's just remove it.
+> The rogue macro is also moved to its correct location.
+>
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
 
-Paolo
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+
+Queued, thanks!
