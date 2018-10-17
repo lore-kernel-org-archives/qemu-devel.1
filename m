@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1gCtXc-0007E4-7g
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 17:39:45 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1gCtXg-0007FQ-6p
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 17:39:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1gCtXW-0007tK-OC
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 17:39:42 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1gCtXc-0007vm-3a
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 17:39:46 -0400
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Wed, 17 Oct 2018 23:39:28 +0200
-Message-Id: <20181017213932.19973-1-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v3 0/4] arm: Add first models of Xilinx Versal
- SoC
+Date: Wed, 17 Oct 2018 23:39:29 +0200
+Message-Id: <20181017213932.19973-2-edgar.iglesias@gmail.com>
+In-Reply-To: <20181017213932.19973-1-edgar.iglesias@gmail.com>
+References: <20181017213932.19973-1-edgar.iglesias@gmail.com>
+Subject: [Qemu-devel] [PATCH v3 1/4] net: cadence_gem: Announce availability
+ of priority queues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,71 +25,40 @@ Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, frederic.konrad@adac
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-This patch series adds initial support for Xilinx's Versal SoC.
-Xilinx is introducing Versal, an adaptive compute acceleration platform
-(ACAP), built on 7nm FinFET process technology. Versal ACAPs combine Scalar
-Processing Engines, Adaptable Hardware Engines, and Intelligent Engines with
-leading-edge memory and interfacing technologies to deliver powerful
-heterogeneous acceleration for any application. The Versal AI Core series has
-five devices, offering 128 to 400 AI Engines. The series includes dual-core Arm
-Cortex-A72 application processors, dual-core Arm Cortex-R5 real-time
-processors, 256KB of on-chip memory with ECC, more than 1,900 DSP engines
-optimized for high-precision floating point with low latency.
+Announce the availability of the various priority queues.
+This fixes an issue where guest kernels would miss to
+configure secondary queues due to inproper feature bits.
 
-More info can be found here:
-https://www.xilinx.com/news/press/2018/xilinx-unveils-versal-the-first-in-a-new-category-of-platforms-delivering-rapid-innovation-with-software-programmability-and-scalable-ai-inference.html
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+---
+ hw/net/cadence_gem.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-
-In QEMU we'd like to have a virtual developer board with the Versal SoC
-and a selected set of peripherals under the control of QEMU.
-We'd like to gradually extend this board as QEMU gains more support
-for Versal hardware components. QEMU will generate a device-tree
-describing only the components it supports and includes in the virtual
-dev board.
-
-Before adding Versal support, this series starts with a few fixes to the
-GEM that I ran into when running recent kernels on the Versal and ZynqMP
-models.
-
-I also noticed a problem with HVC insns not being enabled when using
-QEMU's PSCI implementation on CPU's with EL2 and EL3 enabled. This causes
-problems for Linux/KVM guests, also fixed in this series.
-
-Best regards,
-Edgar
-
-ChangeLog:
-
-v2 -> v3:
-* Fix DESCONF6 queue mask generation for GEMs with only one queue.
-
-v1 -> v2:
-* Spell out OCM as On Chip Memory
-* apperture -> aperture
-* Remove copy+pasted virt board comment
-* Remove VMSD for Versal SoC (with a comment on why it's not needed)
-* Embedd AddressSpace dma object in GEM
-* Remove debug left-overs in arm-powerctl
-* Enable PMU in Cortex-A72
-* Rename cortex_a57_a53_cp_reginfo -> cortex_a72_a57_a53_cp_reginfo
-
-
-Edgar E. Iglesias (4):
-  net: cadence_gem: Announce availability of priority queues
-  net: cadence_gem: Announce 64bit addressing support
-  hw/arm: versal: Add a model of Xilinx Versal SoC
-  hw/arm: versal: Add a virtual Xilinx Versal board
-
- default-configs/aarch64-softmmu.mak |   1 +
- hw/arm/Makefile.objs                |   1 +
- hw/arm/xlnx-versal-virt.c           | 494 ++++++++++++++++++++++++++++
- hw/arm/xlnx-versal.c                | 324 ++++++++++++++++++
- hw/net/cadence_gem.c                |   9 +-
- include/hw/arm/xlnx-versal.h        | 122 +++++++
- 6 files changed, 950 insertions(+), 1 deletion(-)
- create mode 100644 hw/arm/xlnx-versal-virt.c
- create mode 100644 hw/arm/xlnx-versal.c
- create mode 100644 include/hw/arm/xlnx-versal.h
-
+diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
+index 1795998928..16a8455128 100644
+--- a/hw/net/cadence_gem.c
++++ b/hw/net/cadence_gem.c
+@@ -1283,6 +1283,7 @@ static void gem_reset(DeviceState *d)
+     int i;
+     CadenceGEMState *s = CADENCE_GEM(d);
+     const uint8_t *a;
++    uint32_t queues_mask = 0;
+ 
+     DB_PRINT("\n");
+ 
+@@ -1299,7 +1300,12 @@ static void gem_reset(DeviceState *d)
+     s->regs[GEM_DESCONF] = 0x02500111;
+     s->regs[GEM_DESCONF2] = 0x2ab13fff;
+     s->regs[GEM_DESCONF5] = 0x002f2045;
+-    s->regs[GEM_DESCONF6] = 0x00000200;
++    s->regs[GEM_DESCONF6] = 0x0;
++
++    if (s->num_priority_queues > 1) {
++        queues_mask = MAKE_64BIT_MASK(1, s->num_priority_queues - 1);
++        s->regs[GEM_DESCONF6] |= queues_mask;
++    }
+ 
+     /* Set MAC address */
+     a = &s->conf.macaddr.a[0];
 -- 
 2.17.1
