@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56637)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gCoCr-0002LF-OM
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 11:58:02 -0400
+	(envelope-from <r.bolshakov@yadro.com>) id 1gCoKP-00086d-VT
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 12:05:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gCoCn-0002rO-Rm
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 11:57:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44688)
+	(envelope-from <r.bolshakov@yadro.com>) id 1gCoKG-0002n4-AF
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 12:05:42 -0400
+Received: from mta-01.yadro.com ([89.207.88.251]:34120)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gCoCj-0002i5-LO
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 11:57:51 -0400
-Date: Wed, 17 Oct 2018 12:57:25 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181017155725.GD31060@habkost.net>
-References: <20181013025435.25785-1-ehabkost@redhat.com>
-	<20181014173258-mutt-send-email-mst@kernel.org>
-	<20181015181404.GQ31060@habkost.net>
-	<20181016170236.GJ7995@redhat.com>
-	<d8b9a6e6-c137-a553-8fe7-939edd2031b3@redhat.com>
-	<048ea4797a31e3a584c36453e6cad10403462e55.camel@redhat.com>
-	<20181017150137.GX31060@habkost.net>
-	<20181017110249-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <r.bolshakov@yadro.com>)
+	id 1gCoK9-0002S3-UA
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 12:05:32 -0400
+Date: Wed, 17 Oct 2018 19:05:21 +0300
+From: Roman Bolshakov <r.bolshakov@yadro.com>
+Message-ID: <20181017160521.76yozcu7pka5fqqg@SPB-NB-133.local>
+References: <20181016152712.qpvjter6w47azcri@SPB-NB-133.local>
+	<20181017094740.GJ22755@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20181017110249-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH] virtio: Provide version-specific variants
- of virtio PCI devices
+In-Reply-To: <20181017094740.GJ22755@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] modern virtio on HVF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,31 +28,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Andrea Bolognani <abologna@redhat.com>, Laine Stump <laine@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Cleber Rosa <crosa@redhat.com>, Markus Armbruster <armbru@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Fabian Deutsch <fdeutsch@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-On Wed, Oct 17, 2018 at 11:06:31AM -0400, Michael S. Tsirkin wrote:
-> On Wed, Oct 17, 2018 at 12:01:37PM -0300, Eduardo Habkost wrote:
-[...]
-> > I'm considering doing this in v2:
+On Wed, Oct 17, 2018 at 10:47:40AM +0100, Stefan Hajnoczi wrote:
+> On Tue, Oct 16, 2018 at 06:27:12PM +0300, Roman Bolshakov wrote:
 > > 
-> > * Remove the -0.9 device type, because nobody seems to need it
-> > * Add two device types:
-> >   * virtio-1-blk-pci-non-transitional
-> >   * virtio-1-blk-pci-transitional
+> > It looks like virtio backend doesn't return 0 device status after
+> > vp_iowrite8 and vp_reset blocks udev:
+> >         while (vp_ioread8(&vp_dev->common->device_status))
+> >                         msleep(1)
 > > 
-> > This way, we:
-> > * Include only the major version of the spec (so
-> >   we don't require new device types for virtio 1.1, 1.2, etc),
-> > * Use terms that come from the Virtio spec itself, to avoid
-> >   ambiguity.
+> > What could be the cause of the issue?
+> > Any advices how to triage it are appreciated.
 > 
-> I'd say just drop "1" completely then.  E.g. transitional and legacy
-> have same ID's, differences are internal and not interesting to users.
-> If spec comes up with a new type of device it will come up with a new
-> term for it, I am sure.
+> I wonder what happened in virtio_pci_probe() ->
+> virtio_pci_modern_probe().  For example, were the BARs properly set up?
+> 
+> For starters you can debug the QEMU process to check if
+> virtio_pci_common_read/write() get called for this device (disable all
+> other virtio devices to make life easy).  If these functions aren't
+> being called then the guest either got the address wrong or dispatch
+> isn't working for some other reason (hvf?).
+> 
 
-Sounds good to me.  I'll do that in v2.
+Thank you Stefan. That explains why it doesn't quit:
 
--- 
-Eduardo
+virtio_pci_common_write: hwaddr 0x14 val 0x8 size 0x1
+38552@1539791595.072718:virtio_set_status vdev 0x7f92d5ef4170 val 8
+virtio_pci_common_read: hwaddr 0x14 val 0x8 size 0x1
+virtio_pci_common_read: hwaddr 0x14 val 0x8 size 0x1
+virtio_pci_common_read: hwaddr 0x14 val 0x8 size 0x1
+virtio_pci_common_read: hwaddr 0x14 val 0x8 size 0x1
+virtio_pci_common_read: hwaddr 0x14 val 0x8 size 0x1
+virtio_pci_common_read: hwaddr 0x14 val 0x8 size 0x1
+
+
+I executed QEMU a number of times, each time vpirtio_pci_common_write
+writes different value but virtio_pci code clearly writes 0:
+    /* 0 status means a reset. */
+    vp_iowrite8(0, &vp_dev->common->device_status);
+
+Maybe the value somehow got corrupted or it was taken from wrong location.
+
+-Roman
