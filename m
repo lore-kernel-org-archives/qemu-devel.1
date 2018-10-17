@@ -1,44 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34258)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <muriloo@linux.ibm.com>) id 1gCsiG-0002NQ-MY
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 16:46:41 -0400
+	(envelope-from <kwankhede@nvidia.com>) id 1gCsjK-0003UK-G3
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 16:47:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <muriloo@linux.ibm.com>) id 1gCsiB-0002yy-N7
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 16:46:40 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46618
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <muriloo@linux.ibm.com>)
-	id 1gCsiB-0002wH-GO
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 16:46:35 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w9HKhwM8008095
-	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 16:46:26 -0400
-Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2n6bvjh8tx-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 16:46:26 -0400
-Received: from localhost
-	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <muriloo@linux.ibm.com>;
-	Wed, 17 Oct 2018 16:46:26 -0400
-Date: Wed, 17 Oct 2018 17:46:18 -0300
-From: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
-References: <20181016232201.16829-1-crosa@redhat.com>
-	<CAFEAcA_KFOay7zBoYMSqqEYd0ZhTcW5wp3bs28cr=oK4W4FL3A@mail.gmail.com>
-	<20181017162944.GF31060@habkost.net>
-	<d5f32475-df5b-0c5c-591f-5fae8e641c11@redhat.com>
-	<CAFEAcA_gyQvmq48QquNiFhGef-FWPeDKRUSk3wf7hS=_=xm_XQ@mail.gmail.com>
-	<20181017190951.GG31060@habkost.net>
+	(envelope-from <kwankhede@nvidia.com>) id 1gCsjE-0003TU-CK
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 16:47:45 -0400
+Received: from hqemgate15.nvidia.com ([216.228.121.64]:2389)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
+	id 1gCsjD-0003OU-UD
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 16:47:40 -0400
+References: <1539713558-2453-1-git-send-email-kwankhede@nvidia.com>
+	<1539713558-2453-2-git-send-email-kwankhede@nvidia.com>
+	<20181016163433.40003f66@w520.home>
+From: Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <d5bab37a-ffde-7efc-eb22-70179de906d7@nvidia.com>
+Date: Thu, 18 Oct 2018 02:17:19 +0530
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181017190951.GG31060@habkost.net>
-Message-Id: <20181017204618.GB18379@kermit-br-ibm-com>
-Subject: Re: [Qemu-devel] [PATCH] Acceptance tests: host arch to target arch
- name mapping
+In-Reply-To: <20181016163433.40003f66@w520.home>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH v1 1/4] VFIO KABI for migration
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,75 +31,319 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Caio Carrara <ccarrara@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: cjia@nvidia.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, Yulei Zhang <yulei.zhang@intel.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>
 
-On Wed, Oct 17, 2018 at 04:09:51PM -0300, Eduardo Habkost wrote:
-> On Wed, Oct 17, 2018 at 07:40:51PM +0100, Peter Maydell wrote:
-> > On 17 October 2018 at 18:38, Cleber Rosa <crosa@redhat.com> wrote:
-> > >
-> > >
-> > > On 10/17/18 12:29 PM, Eduardo Habkost wrote:
-> > >> On Wed, Oct 17, 2018 at 01:34:41PM +0100, Peter Maydell wrote:
-> > >>> So, why does the test code need to care? It's not clear
-> > >>> from the patch... My expectation would be that you'd
-> > >>> just test all the testable target architectures,
-> > >>> regardless of what the host architecture is.
-> > >>
-> > >> I tend to agree.  Maybe the right solution is to get rid of the
-> > >> os.uname().  I think the default should be testing all QEMU
-> > >> binaries that were built, and the host architecture shouldn't
-> > >> matter.
-> >
-> > Yes, looking at os.uname() also seems like an odd thing
-> > for the tests to be doing here. The test framework
-> > should be as far as possible host-architecture agnostic.
-> > (For some of the KVM cases there probably is a need to
-> > care, but those are exceptions, not the rule.)
-> >
-> > > I'm in favor of exercising all built targets, but that seems to me to be
-> > > on another layer, above the test themselves. This change is about the
-> > > behavior of a test when not told about the target arch (and thus binary)
-> > > it should use.
-> >
-> > At that level, I think the right answer is "tell the user
-> > they need to specify the qemu executable they are trying to test".
-> > In particular, there is no guarantee that the user has actually
-> > built the executable for the target that corresponds to the
-> > host, so it doesn't work to try to default to that anyway.
->
-> Agreed.  However, I don't see when exactly this message would be
-> triggered.  Cleber, on which use cases do you expect
-> pick_default_qemu_bin() to be called?
->
-> In an ideal world, any testing runner/tool should be able to
-> automatically test all binaries by default.  Can Avocado help us
-> do that?  (If not, we could just do it inside a
-> ./tests/acceptance/run script).
->
-> --
-> Eduardo
->
 
-Why don't we add a variants file to QEMU's tree listing all known possible paths
-for QEMU binary that can result from a build?  For example:
 
-    $ cat tests/acceptance/variants
-    qemu_bin:
-        - ppc-softmmu/qemu-system-ppc
-        - ppc64-softmmu/qemu-system-ppc64
-        - x86_64-softmmu/qemu-system-x86_64
+On 10/17/2018 4:04 AM, Alex Williamson wrote:
+> On Tue, 16 Oct 2018 23:42:35 +0530
+> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> 
+>> - Added vfio_device_migration_info structure to use interact with vendor
+>>   driver.
+>> - Different flags are used to get or set migration related information
+>>   from/to vendor driver.
+>> Flag VFIO_MIGRATION_PROBE: To query if feature is supported
+>> Flag VFIO_MIGRATION_GET_REGION: To get migration region info
+>> Flag VFIO_MIGRATION_SET_STATE: To convey device state in vendor driver
+>> Flag VFIO_MIGRATION_GET_PENDING: To get pending bytes yet to be migrated
+>>   from vendor driver
+>> Flag VFIO_MIGRATION_GET_BUFFER: On this flag, vendor driver should write
+>>   data to migration region and return number of bytes written in the region
+>> Flag VFIO_MIGRATION_SET_BUFFER: In migration resume path, user space app
+>>   writes to migration region and communicates it to vendor driver with
+>>   this ioctl with this flag.
+>> Flag VFIO_MIGRATION_GET_DIRTY_PFNS: Get bitmap of dirty pages from vendor
+>>   driver from given start address
+>>
+>> - Added enum for possible device states.
+>>
+>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+>> Reviewed-by: Neo Jia <cjia@nvidia.com>
+>> ---
+>>  linux-headers/linux/vfio.h | 91 ++++++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 91 insertions(+)
+>>
+>> diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+>> index 3615a269d378..8e9045ed9aa8 100644
+>> --- a/linux-headers/linux/vfio.h
+>> +++ b/linux-headers/linux/vfio.h
+>> @@ -602,6 +602,97 @@ struct vfio_device_ioeventfd {
+>>  
+>>  #define VFIO_DEVICE_IOEVENTFD		_IO(VFIO_TYPE, VFIO_BASE + 16)
+>>  
+>> +/**
+>> + * VFIO_DEVICE_MIGRATION_INFO - _IOW(VFIO_TYPE, VFIO_BASE + 17,
+>> + *                              struct vfio_device_migration_info)
+> 
+> This is quite a bit more than an "INFO" ioctl.
+> 
+>> + * Flag VFIO_MIGRATION_PROBE:
+>> + *      To query if feature is supported
+>> + *
+>> + * Flag VFIO_MIGRATION_GET_REGION:
+>> + *      To get migration region info
+>> + *      region_index [output] : region index to be used for migration region
+>> + *      size [output]: size of migration region
+> 
+> Of course the region migration region can describe itself as being used
+> for migration, so this is unnecessary.  The presence of that region
+> could also negate the need for a probe.
+> 
 
-Then avocado could multiplex these variants file and call ./tests/acceptance/run
-for each value of qemu_bin.  `run` script could skip and return if $qemu_bin
-doesn't exist.  This approach also allows user forcing a value of qemu_bin when
-calling `run` manually, for example:
+Yes, that can be done.
 
-    ./tests/acceptance/run --qemu_bin=/path/to/your/qemu-system-blah ...
 
-This ./tests/acceptance/run can serve as an entry point to run all the tests.
-If more parameters are considered mandatory in the future, the logic can be
-placed there.
+>> + *
+>> + * Flag VFIO_MIGRATION_SET_STATE:
+>> + *      To set device state in vendor driver
+>> + *      device_state [input] : User space app sends device state to vendor
+>> + *           driver on state change
+> 
+> Valid states are the enum defined below, correct?
+> 
 
---
-Murilo
+Yes, that's correct.
+
+> Does setting STOPNCOPY_ACTIVE stop any state change of the device or is
+> that expected to happen through other means?
+> 
+
+_PRECOPY_ACTIVE means vCPUs are still running, so VFIO device should
+still remain active.
+_STOPNCOPY_ACTIVE means vCPUs are not running and device should also be
+stopped and copy device's state.
+
+> What are the allowable state transitions?
+> 
+
+Normal VM running case:
+_NONE -> _RUNNING
+
+In case of live migration, at source:
+_RUNNING -> _SETUP -> _PRECOPY_ACTIVE -> _STOPNCOPY_ACTIVE ->
+_SAVE_COMPLETED
+
+at destination:
+_NONE -> _SETUP -> _RESUME -> _RESUME_COMPLETE -> _RUNNING
+
+In save VM case:
+_RUNNING -> _SETUP -> _STOPNCOPY_ACTIVE -> _SAVE_COMPLETED
+
+In case of resuming VM from saved state:
+_NONE -> _SETUP -> _RESUME -> _RESUME_COMPLETE -> _RUNNING
+
+_FAILED or _CANCELLED can happen in any state.
+
+> How many bits in flags is a user allowed to set at once?
+> 
+
+One bit at a time. Probably, I should use enum for flags rather than bits.
+
+>> + * Flag VFIO_MIGRATION_GET_PENDING:
+>> + *      To get pending bytes yet to be migrated from vendor driver
+>> + *      threshold_size [Input] : threshold of buffer in User space app.
+>> + *      pending_precopy_only [output] : pending data which must be migrated in
+>> + *          precopy phase or in stopped state, in other words - before target
+>> + *          vm start
+>> + *      pending_compatible [output] : pending data which may be migrated in any
+>> + *           phase
+>> + *      pending_postcopy_only [output] : pending data which must be migrated in
+>> + *           postcopy phase or in stopped state, in other words - after source
+>> + *           vm stop
+>> + *      Sum of pending_precopy_only, pending_compatible and
+>> + *      pending_postcopy_only is the whole amount of pending data.
+> 
+> What's the significance of the provided threshold, are the pending
+> bytes limited to threshold size?  It makes me nervous to define a
+> kernel API in terms of the internal API of a userspace program that can
+> change.  I wonder if it makes sense to define these in terms of the
+> state of the devices, pending initial data, runtime data, post-offline
+> data.
+> 
+
+Threshold is required, because that will tell size in bytes that user
+space application buffer can accommodate. Driver can copy data less than
+threshold, but copying data more than threshold doesn't make sense
+because user space application won't be able to copy that extra data and
+that data might get overwritten or lost.
+
+
+>> + *
+>> + * Flag VFIO_MIGRATION_GET_BUFFER:
+>> + *      On this flag, vendor driver should write data to migration
+>> region and
+>> + *      return number of bytes written in the region.
+>> + *      bytes_written [output] : number of bytes written in
+>> migration buffer by
+>> + *          vendor driver
+> 
+> Does the data the user gets here depend on the device state set
+> earlier?  For example the user gets pending_precopy_only data while
+> PRECOPY_ACTIVE is the device state and pending_postcopy_only data
+> in STOPNCOPY_ACTIVE?  The user should continue to call GET_BUFFER
+> in a given state until the associated pending field reaches zero?
+> Jumping between the region and ioctl is rather awkward.
+> 
+
+User gets pending_precopy_only data when device is in PRECOPY_ACTIVE
+state, but each time when user calls GET_BUFFER, pending bytes might
+change.
+VFIO device's driver is producer of data and user/QEMU is consumer of
+data. In pre-copy phase, when vCPUs are still running, driver will try
+to accumulate as much data as possible in this phase, but vCPUs are
+running and user of that device/application in guest is actively using
+that device, then there are chances that during next iteration of
+GET_BUFFER, driver might have more data.
+Even in case of STOPNCOPY_ACTIVE state of device, driver can start
+sending data in parts while a thread in vendor driver can still generate
+data after device has halted, producer and consumer can run in parallel.
+So User has to call GET_BUFFER until pending bytes are returned 0.
+
+>> + *
+>> + * Flag VFIO_MIGRATION_SET_BUFFER
+>> + *      In migration resume path, user space app writes to migration
+>> region and
+>> + *      communicates it to vendor driver with this ioctl with this
+>> flag.
+>> + *      bytes_written [Input] : number of bytes written in migration
+>> buffer by
+>> + *          user space app.
+>> + *
+>> + * Flag VFIO_MIGRATION_GET_DIRTY_PFNS
+>> + *      Get bitmap of dirty pages from vendor driver from given
+>> start address.
+>> + *      start_addr [Input] : start address
+>> + *      pfn_count [Input] : Total pfn count from start_addr for
+>> which dirty
+>> + *          bitmap is requested
+>> + *      dirty_bitmap [Output] : bitmap memory allocated by user space
+>> + *           application, vendor driver should return the bitmap
+>> with bits set
+>> + *           only for pages to be marked dirty.
+>> + * Return: 0 on success, -errno on failure.
+>> + */
+>> +
+>> +struct vfio_device_migration_info {
+>> +	__u32 argsz;
+>> +	__u32 flags;
+>> +#define VFIO_MIGRATION_PROBE            (1 << 0)
+>> +#define VFIO_MIGRATION_GET_REGION       (1 << 1)
+>> +#define VFIO_MIGRATION_SET_STATE        (1 << 2)
+>> +#define VFIO_MIGRATION_GET_PENDING      (1 << 3)
+>> +#define VFIO_MIGRATION_GET_BUFFER       (1 << 4)
+>> +#define VFIO_MIGRATION_SET_BUFFER       (1 << 5)
+>> +#define VFIO_MIGRATION_GET_DIRTY_PFNS   (1 << 6)
+>> +        __u32 region_index;	            /* region index */
+>> +        __u64 size;	                    /* size */
+>> +        __u32 device_state;                 /* VFIO device state */
+> 
+> We'd need to swap device_state and size for alignment or else this
+> struct could vary by compiler.
+> 
+
+Ok. Thanks for pointing that out. I'll change that.
+
+>> +        __u64 pending_precopy_only;
+>> +        __u64 pending_compatible;
+>> +        __u64 pending_postcopy_only;
+>> +        __u64 threshold_size;
+>> +        __u64 bytes_written;
+>> +        __u64 start_addr;
+>> +        __u64 pfn_count;
+>> +	__u8  dirty_bitmap[];
+>> +};
+>> +
+>> +enum {
+>> +    VFIO_DEVICE_STATE_NONE,
+>> +    VFIO_DEVICE_STATE_RUNNING,
+>> +    VFIO_DEVICE_STATE_MIGRATION_SETUP,
+>> +    VFIO_DEVICE_STATE_MIGRATION_PRECOPY_ACTIVE,
+>> +    VFIO_DEVICE_STATE_MIGRATION_STOPNCOPY_ACTIVE,
+>> +    VFIO_DEVICE_STATE_MIGRATION_SAVE_COMPLETED,
+>> +    VFIO_DEVICE_STATE_MIGRATION_RESUME,
+>> +    VFIO_DEVICE_STATE_MIGRATION_RESUME_COMPLETED,
+>> +    VFIO_DEVICE_STATE_MIGRATION_FAILED,
+>> +    VFIO_DEVICE_STATE_MIGRATION_CANCELLED,
+>> +};
+>> +
+>> +#define VFIO_DEVICE_MIGRATION_INFO _IO(VFIO_TYPE, VFIO_BASE + 17)
+>> +
+> 
+> I'm not entirely sure what this ioctl buys us that we can't do with a
+> region alone.  For example we could define a migration region as:
+> 
+> struct vfio_region_migration {
+> 	__u32 device_state;
+> 	__u32 data_offset;
+> 	__u64 data_size;
+> 	__u64 pending_pre;
+> 	__u64 pending_runtime;
+> 	__u64 pending_post;
+> 	__u64 bytes_available;
+> 	__u64 bytes_written;
+> };
+> 
+> A sparse mmap capability in the region could define whether the data
+> area supports mmap, the above defined registers would only have
+> read/write access.  The user can write device_state the same as the
+> ioctl would set it.  The data_offset and size describe the offset in
+> the region where migration data is relayed and the size of that area.
+> Pending fields are as you have above, though I've omitted the threshold
+> because I don't understand it.  The user reading bytes_available is the
+> same as calling GET_BUFFER, bytes_written the same as SET_BUFFER.  
+
+Yes, this could be done. Read/write on structure will be same as ioctl,
+i.e. block till expected operation is done.
+
+> I've
+> left out the dirty bitmap here, as it's a little less obvious to me how
+> it would work.  It could be a stand-alone ioctl, it could be
+> implemented as another region, or it could simply be a different offset
+> within this region.  The dirty bitmap start address could simply be
+> calculated as the offset into that region where a pread begins and the
+> extent is the size of that pread.  With a bit per page, we're only
+> looking at a 32MB region per 1TB of guest physical address space, so it
+> doesn't seem too terrible even if guest memory is sparse.  Maybe the
+> extremes are still problematic though, but if it were part of the same
+> region above we could solve that with another register written by the
+> user to indicate the base offset of the dirty bitmap window. 
+
+Generally guest memory is sparse and log_sync is called for each
+MemoryRegionSection. Same region can be used to get dirty page bitmap if
+we are going to move to using sparse region.
+I think here you are thinking of worst case where a VM with 1TB of
+memory have one MemoryRegionSection of 1TB.
+
+> For
+> example if the window is 32MB and page size 4k then it can index 1TB
+> and the user would write 0 (default) to the register for pfns from
+> 0 to (1TB - 1), 1 for pfns from 1TB to (2TB - 1), etc.
+> 
+
+Sorry I didn't get this example. By window here, do you meant sparse
+region size?
+
+
+> I don't see that this interface does anything to address the
+> compatibility concerns that were discussed in the previous iterations
+> from Intel though, nor is it documented exactly where and how a vendor
+> driver would indicate a migration failure if it had its own internal
+> consistency or compatibility checks fail.  Thanks,
+> 
+
+If vendor driver finds any inconsistency in data or if any operation is
+causing failure, vendor driver should return error to the corresponding
+ioctl. ioctl failure is treated as failure of the particular device. If
+one device returns failure during migration process, migration is
+terminated and VM at source resumes.
+
+This RFC is mainly focused on core logic of live migration which include
+pre-copy, stop-n-copy and resume phases. We can still continue
+discussion on compatibility concerns, that could be either separate
+change or can be merged in core logic. But I would also like to get some
+focus on core logic as well.
+
+Thanks,
+Kirti
