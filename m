@@ -1,34 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36997)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gCsnC-0004yi-Ix
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 16:51:49 -0400
+	(envelope-from <crosa@redhat.com>) id 1gCsqQ-0007c1-2K
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 16:55:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gCsnB-0006al-Lx
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 16:51:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46192)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gCsnB-0006aM-Fs
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 16:51:45 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gCsn8-0000Wn-57
-	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 20:51:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 578442E81C4
-	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 20:51:37 +0000 (UTC)
+	(envelope-from <crosa@redhat.com>) id 1gCsqM-0000cV-1f
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 16:55:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34746)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gCsqL-0000cN-PD
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 16:55:01 -0400
+References: <20181016232201.16829-1-crosa@redhat.com>
+	<CAFEAcA_KFOay7zBoYMSqqEYd0ZhTcW5wp3bs28cr=oK4W4FL3A@mail.gmail.com>
+	<20181017162944.GF31060@habkost.net>
+	<d5f32475-df5b-0c5c-591f-5fae8e641c11@redhat.com>
+	<CAFEAcA_gyQvmq48QquNiFhGef-FWPeDKRUSk3wf7hS=_=xm_XQ@mail.gmail.com>
+	<20181017190951.GG31060@habkost.net>
+	<b6cff33b-79af-f7b2-2a08-a098135304e0@redhat.com>
+	<20181017194833.GI31060@habkost.net>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <ba4cef67-a2c3-bd7c-7f4a-e96b12d016fe@redhat.com>
+Date: Wed, 17 Oct 2018 16:54:52 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 17 Oct 2018 20:41:36 -0000
-From: Neil Darlow <1793275@bugs.launchpad.net>
-Reply-To: Bug 1793275 <1793275@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153734706849.11874.4653304097344263662.malonedeb@gac.canonical.com>
-Message-Id: <153980889657.12923.10284731608576928727.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1793275] Re: Hosts fail to start after update to
- QEMU 3.0
+In-Reply-To: <20181017194833.GI31060@habkost.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] Acceptance tests: host arch to target arch
+ name mapping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,72 +35,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Caio Carrara <ccarrara@redhat.com>
 
-Archlinux have released qemu-headless-3.0.0-3 which includes a
-backported patch for virtio. I have tested this version and the problem
-still persists.
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1793275
+On 10/17/18 3:48 PM, Eduardo Habkost wrote:
+> On Wed, Oct 17, 2018 at 03:25:34PM -0400, Cleber Rosa wrote:
+>>
+>>
+>> On 10/17/18 3:09 PM, Eduardo Habkost wrote:
+>>> On Wed, Oct 17, 2018 at 07:40:51PM +0100, Peter Maydell wrote:
+>>>> On 17 October 2018 at 18:38, Cleber Rosa <crosa@redhat.com> wrote:
+>>>>>
+>>>>>
+>>>>> On 10/17/18 12:29 PM, Eduardo Habkost wrote:
+>>>>>> On Wed, Oct 17, 2018 at 01:34:41PM +0100, Peter Maydell wrote:
+>>>>>>> So, why does the test code need to care? It's not clear
+>>>>>>> from the patch... My expectation would be that you'd
+>>>>>>> just test all the testable target architectures,
+>>>>>>> regardless of what the host architecture is.
+>>>>>>
+>>>>>> I tend to agree.  Maybe the right solution is to get rid of the
+>>>>>> os.uname().  I think the default should be testing all QEMU
+>>>>>> binaries that were built, and the host architecture shouldn't
+>>>>>> matter.
+>>>>
+>>>> Yes, looking at os.uname() also seems like an odd thing
+>>>> for the tests to be doing here. The test framework
+>>>> should be as far as possible host-architecture agnostic.
+>>>> (For some of the KVM cases there probably is a need to
+>>>> care, but those are exceptions, not the rule.)
+>>>>
+>>>>> I'm in favor of exercising all built targets, but that seems to me to be
+>>>>> on another layer, above the test themselves. This change is about the
+>>>>> behavior of a test when not told about the target arch (and thus binary)
+>>>>> it should use.
+>>>>
+>>>> At that level, I think the right answer is "tell the user
+>>>> they need to specify the qemu executable they are trying to test".
+>>>> In particular, there is no guarantee that the user has actually
+>>>> built the executable for the target that corresponds to the
+>>>> host, so it doesn't work to try to default to that anyway.
+>>>
+>>> Agreed.  However, I don't see when exactly this message would be
+>>> triggered.  Cleber, on which use cases do you expect
+>>> pick_default_qemu_bin() to be called?
+>>>
+>>
+>> When a test is run ad-hoc.  You even suggested that tests could/should
+>> be executable.
+>>
+>>> In an ideal world, any testing runner/tool should be able to
+>>> automatically test all binaries by default.  Can Avocado help us
+>>> do that?  (If not, we could just do it inside a
+>>> ./tests/acceptance/run script).
+>>>
+>>
+>> Avocado can do that indeed.  But I'm afraid that's not the main issue.
+>> Think of the qemu-iotests: do we want a "check" command to run  all
+>> tests with all binaries?
+> 
+> Good question.  That would be my first expectation, but I'm not
+> sure.
+> 
 
-Title:
-  Hosts fail to start after update to QEMU 3.0
+If it wasn't clear, I'm trying to define the basic behavior of *one
+test*.  I'm aware of a few different behaviors across tests in QEMU:
 
-Status in QEMU:
-  New
+ 1) qemu-iotests: require "check" to run, will attempt to find/run with
+a "suitable" QEMU binary.
 
-Bug description:
-  Host OS: Archlinux
-  Host Architecture: AMD64
-  Guest OS: FreeBSD-11.2 (x2) and Archlinux (x1)
-  Guest Architecture: AMD64
+ 2) libqtest based: executables, in theory runnable by themselves, and
+will not attempt to find/run a "suitable" QEMU binary.  Those will
+print: "Environment variable QTEST_QEMU_BINARY required".
 
-  I have been using QEMU 2.x without issue for a number of years but
-  since updating to QEMU 3.0 my guests do not complete startup.
+ 3) acceptance tests: require the Avocado test runner, will attempt to
+find/run with a "suitable" QEMU binary.
 
-  FreeBSD 11.2 guest failure symptom:
-  The two FreeBSD-11.2 guests output repeated messages of "unexpected cache=
- type 4". This appears to be an internal error message and I've not found a=
-ny instances of it through Google search.
+So, I'm personally not aware of any test in QEMU which *by themselves*
+defaults to running on all (relevant) built targets (machine types?
+device types?).  Test selection (defining a test suite) and setting
+parameters is always done elsewhere (Makefile, check-block.sh,
+qemu-iotests-quick.sh, etc).
 
-  Archlinux guest failure symptom:
-  The single Archlinux guest gets no further than the message "uncompressin=
-g initial ramdisk".
+> Pro: testing all binaries by default would cause less confusion
+> than picking a random QEMU binary.
+> 
 
-  The guests are started by a qemu-kvm invokation. No virtual machine
-  managers are used. The command lines used (from ps awx) to launch the
-  VMs are:
+IMO we have to differentiate between *in test* QEMU binary selection
+(some? none?) and other layers (Makefiles, scripts, etc).
 
-  [neil@optimus ~]$ ps awx |grep qemu
-   1492 ?        Sl     3:19 /usr/bin/qemu-system-x86_64 -daemonize -pidfil=
-e /run/qemu_vps1.pid -enable-kvm -cpu host -smp 2 -k en-gb -boot order=3Dc =
--drive file=3D/dev/system/vps1,cache=3Dnone,format=3Draw,if=3Dvirtio,index=
-=3D0,media=3Ddisk -m 1024 -name FreeBSD_1 -net nic,macaddr=3D52:54:AD:86:64=
-:00,model=3Dvirtio -net vde,sock=3D/run/vde_switch-tap0.sock -monitor telne=
-t:127.0.0.2:23,server,nowait -vnc 192.168.0.1:0
-   1510 ?        Sl     0:54 /usr/bin/qemu-system-x86_64 -daemonize -pidfil=
-e /run/qemu_vps2.pid -enable-kvm -cpu host -smp 2 -k en-gb -boot order=3Dc =
--drive file=3D/dev/system/vps2,cache=3Dnone,format=3Draw,if=3Dvirtio,index=
-=3D0,media=3Ddisk -m 1024 -name Archlinux -net nic,macaddr=3D52:54:AD:86:64=
-:01,model=3Dvirtio -net vde,sock=3D/run/vde_switch-tap0.sock -monitor telne=
-t:127.0.0.3:23,server,nowait -vnc 192.168.0.1:1
-   1529 ?        Sl     3:07 /usr/bin/qemu-system-x86_64 -daemonize -pidfil=
-e /run/qemu_vps3.pid -enable-kvm -cpu host -smp 2 -k en-gb -boot order=3Dc =
--drive file=3D/dev/system/vps3,cache=3Dnone,format=3Draw,if=3Dvirtio,index=
-=3D0,media=3Ddisk -m 1024 -name FreeBSD_2 -net nic,macaddr=3D52:54:AD:86:64=
-:02,model=3Dvirtio -net vde,sock=3D/run/vde_switch-tap0.sock -monitor telne=
-t:127.0.0.4:23,server,nowait -vnc 192.168.0.1:2
+> Con: testing all binaries may be inconvenient for quickly
+> checking if a test case works.  (I'm not convinced this is a
+> problem.  If you don't want to test everything, you probably
+> already have a short target list in your ./configure line?)
+> 
 
-  The VMs were installed to LVM volumes on the host machine (hence the
-  /dev/system/vpsN device names). Networking is over a Linux tap
-  interface connected to a VDE2 virtual network switch.
+Convenience is important, but I'm convinced this is a software layering
+problem.  I have the feeling we're trying to impose higher level
+(environment/build/check) definitions to the lower level (test) entities.
 
-  Currently working version of QEMU: qemu-headless 2.12.1-1
-  Failing version of QEMU: qemu-headless-3.0.0-1
+> Pro: testing a single binary using uname() is already
+> implemented.
+> 
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1793275/+subscriptions
+Right.  I'm not unfavorable to changing that behavior, and ERRORing
+tests when a binary is not given (similar to libqtest) is a simple
+change if we're to do it.  But I do find that usability drops considerably.
+
+And finally I don't think the "if a qemu binary is not explicitly given,
+let's try the matching host architecture" is confusing or hard to
+follow.  And, it's pretty well documented if you ask me:
+
+---
+QEMU binary selection
+~~~~~~~~~~~~~~~~~~~~~
+
+The QEMU binary used for the ``self.vm`` QEMUMachine instance will
+primarily depend on the value of the ``qemu_bin`` parameter.  If it's
+not explicitly set, its default value will be the result of a dynamic
+probe in the same source tree.  A suitable binary will be one that
+targets the architecture matching (the) host machine.
+
+Based on this description, test writers will usually rely on one of
+the following approaches:
+
+1) Set ``qemu_bin``, and use the given binary
+
+2) Do not set ``qemu_bin``, and use a QEMU binary named like
+   "${arch}-softmmu/qemu-system-${arch}", either in the current
+   working directory, or in the current source tree.
+
+The resulting ``qemu_bin`` value will be preserved in the
+``avocado_qemu.Test`` as an attribute with the same name.
+---
+
+> Con: making `avocado run` automatically generate variants of a
+> test case may take some effort?
+> 
+
+Well, it will take some effort, sure.  But my point do we want to
+*enforce* that?  I think that should be left to a "run" script or make
+rule like you suggested.  IMO, `avocado run a_single_test.py` shouldn't
+do more than just that.
+
+Regards,
+- Cleber.
