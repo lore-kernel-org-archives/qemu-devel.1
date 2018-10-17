@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59492)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gCoKr-0008FR-Ql
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 12:06:15 -0400
+	(envelope-from <crosa@redhat.com>) id 1gCoKq-0008Ek-LE
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 12:06:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gCoKq-0003nw-J4
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 12:06:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49216)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gCoKm-0003Ri-NU
+	(envelope-from <crosa@redhat.com>) id 1gCoKk-0003cs-OK
 	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 12:06:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52964)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gCoKh-0003P8-Gq
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 12:06:05 -0400
 From: Cleber Rosa <crosa@redhat.com>
-Date: Wed, 17 Oct 2018 12:05:38 -0400
-Message-Id: <20181017160539.12316-3-crosa@redhat.com>
+Date: Wed, 17 Oct 2018 12:05:37 -0400
+Message-Id: <20181017160539.12316-2-crosa@redhat.com>
 In-Reply-To: <20181017160539.12316-1-crosa@redhat.com>
 References: <20181017160539.12316-1-crosa@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 2/3] Acceptance tests: add make rule for
- running them
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v6 1/3] Bootstrap Python venv for tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,156 +29,88 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Laszlo Ersek <lersek@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Caio Carrara <ccarrara@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
-The acceptance (aka functional, aka Avocado-based) tests are
-Python files located in "tests/acceptance" that need to be run
-with the Avocado libs and test runner.
+A number of QEMU tests are written in Python, and may benefit
+from an untainted Python venv.
 
-Let's provide a convenient way for QEMU developers to run them,
-by making use of the tests-venv with the required setup.
+By using make rules, tests that depend on specific Python libs
+can set that rule as a requirement, along with rules that require
+the presence or installation of specific libraries.
 
-Also, while the Avocado test runner will take care of creating a
-location to save test results to, it was understood that it's better
-if the results are kept within the build tree.
+The tests/venv-requirements.txt is supposed to contain the
+Python requirements that should be added to the venv created
+by check-venv.
 
 Signed-off-by: Cleber Rosa <crosa@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- docs/devel/testing.rst | 43 +++++++++++++++++++++++++++++++++++++-----
- tests/Makefile.include | 21 +++++++++++++++++++--
- tests/requirements.txt |  1 +
- 3 files changed, 58 insertions(+), 7 deletions(-)
+ tests/Makefile.include | 26 ++++++++++++++++++++++++++
+ tests/requirements.txt |  3 +++
+ 2 files changed, 29 insertions(+)
+ create mode 100644 tests/requirements.txt
 
-diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
-index 727c4019b5..e04feaccb5 100644
---- a/docs/devel/testing.rst
-+++ b/docs/devel/testing.rst
-@@ -545,10 +545,39 @@ Tests based on ``avocado_qemu.Test`` can easily:
-    - http://avocado-framework.readthedocs.io/en/latest/api/test/avocado.html#avocado.Test
-    - http://avocado-framework.readthedocs.io/en/latest/api/utils/avocado.utils.html
- 
--Installation
--------------
-+Running tests
-+-------------
- 
--To install Avocado and its dependencies, run:
-+You can run the acceptance tests simply by executing:
-+
-+.. code::
-+
-+  make check-acceptance
-+
-+This involves the automatic creation of Python virtual environment
-+within the build tree (at ``tests/venv``) which will have all the
-+right dependencies, and will save tests results also within the
-+build tree (at ``tests/results``).
-+
-+Note: the build environment must be using a Python 3 stack, and have
-+the ``venv`` and ``pip`` packages installed.  If necessary, make sure
-+``configure`` is called with ``--python=`` and that those modules are
-+available.  On Debian and Ubuntu based systems, depending on the
-+specific version, they may be on packages named ``python3-venv`` and
-+``python3-pip``.
-+
-+The scripts installed inside the virtual environment may be used
-+without an "activation".  For instance, the Avocado test runner
-+may be invoked by running:
-+
-+ .. code::
-+
-+  tests/venv/bin/avocado run $OPTION1 $OPTION2 tests/acceptance/
-+
-+Manual Installation
-+-------------------
-+
-+To manually install Avocado and its dependencies, run:
- 
- .. code::
- 
-@@ -689,11 +718,15 @@ The exact QEMU binary to be used on QEMUMachine.
- Uninstalling Avocado
- --------------------
- 
--If you've followed the installation instructions above, you can easily
--uninstall Avocado.  Start by listing the packages you have installed::
-+If you've followed the manual installation instructions above, you can
-+easily uninstall Avocado.  Start by listing the packages you have
-+installed::
- 
-   pip list --user
- 
- And remove any package you want with::
- 
-   pip uninstall <package_name>
-+
-+If you've used ``make check-acceptance``, the Python virtual environment where
-+Avocado is installed will be cleaned up as part of ``make check-clean``.
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 4b88a119e0..406a9bdaf8 100644
+index 5eadfd52f9..4b88a119e0 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -11,6 +11,7 @@ check-help:
- 	@echo " $(MAKE) check-qapi-schema    Run QAPI schema tests"
+@@ -12,6 +12,7 @@ check-help:
  	@echo " $(MAKE) check-block          Run block tests"
  	@echo " $(MAKE) check-tcg            Run TCG tests"
-+	@echo " $(MAKE) check-acceptance     Run all acceptance (functional) tests"
  	@echo " $(MAKE) check-report.html    Generates an HTML test report"
- 	@echo " $(MAKE) check-venv           Creates a Python venv for tests"
++	@echo " $(MAKE) check-venv           Creates a Python venv for tests"
  	@echo " $(MAKE) check-clean          Clean the tests"
-@@ -1020,10 +1021,15 @@ check-decodetree:
- 
- # Python venv for running tests
- 
--.PHONY: check-venv
-+.PHONY: check-venv check-acceptance
- 
- TESTS_VENV_DIR=$(BUILD_DIR)/tests/venv
- TESTS_VENV_REQ=$(SRC_PATH)/tests/requirements.txt
-+TESTS_RESULTS_DIR=$(BUILD_DIR)/tests/results
-+# Controls the output generated by Avocado when running tests.
-+# Any number of command separated loggers are accepted.  For more
-+# information please refer to "avocado --help".
-+AVOCADO_SHOW=none
- 
- PYTHON_VER := $(findstring Python 3,$(shell $(PYTHON) -V))
- ifeq ($(PYTHON_VER),Python 3)
-@@ -1040,8 +1046,19 @@ $(TESTS_VENV_DIR):
-        $(error "venv directory for tests requires Python 3")
- endif
- 
-+$(TESTS_RESULTS_DIR):
-+	$(call quiet-command, mkdir -p $@, \
-+            MKDIR, $@)
+ 	@echo
+ 	@echo "Please note that HTML reports do not regenerate if the unit test=
+s"
+@@ -1017,6 +1018,30 @@ check-decodetree:
+           ./check.sh "$(PYTHON)" "$(SRC_PATH)/scripts/decodetree.py", \
+           TEST, decodetree.py)
+=20
++# Python venv for running tests
 +
- check-venv: $(TESTS_VENV_DIR)
- 
-+check-acceptance: check-venv $(TESTS_RESULTS_DIR)
++.PHONY: check-venv
++
++TESTS_VENV_DIR=3D$(BUILD_DIR)/tests/venv
++TESTS_VENV_REQ=3D$(SRC_PATH)/tests/requirements.txt
++
++PYTHON_VER :=3D $(findstring Python 3,$(shell $(PYTHON) -V))
++ifeq ($(PYTHON_VER),Python 3)
++$(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
 +	$(call quiet-command, \
-+            $(TESTS_VENV_DIR)/bin/python -m avocado \
-+            --show=$(AVOCADO_SHOW) run --job-results-dir=$(TESTS_RESULTS_DIR) \
-+            --failfast=on $(SRC_PATH)/tests/acceptance, \
-+            "AVOCADO", "tests/acceptance")
++            $(PYTHON) -m venv --system-site-packages $@, \
++            VENV, $@)
++	$(call quiet-command, \
++            $(TESTS_VENV_DIR)/bin/python -m pip -q install -r $(TESTS_VE=
+NV_REQ), \
++            PIP, $(TESTS_VENV_REQ))
++	$(call quiet-command, touch $@)
++else
++$(TESTS_VENV_DIR):
++       $(error "venv directory for tests requires Python 3")
++endif
++
++check-venv: $(TESTS_VENV_DIR)
 +
  # Consolidated targets
- 
+=20
  .PHONY: check-qapi-schema check-qtest check-unit check check-clean
-@@ -1055,7 +1072,7 @@ check-clean:
+@@ -1030,6 +1055,7 @@ check-clean:
  	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
- 	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y)) $(check-qtest-generic-y))
+ 	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(t=
+arget)-y)) $(check-qtest-generic-y))
  	rm -f tests/test-qapi-gen-timestamp
--	rm -rf $(TESTS_VENV_DIR)
-+	rm -rf $(TESTS_VENV_DIR) $(TESTS_RESULTS_DIR)
- 
++	rm -rf $(TESTS_VENV_DIR)
+=20
  clean: check-clean
- 
+=20
 diff --git a/tests/requirements.txt b/tests/requirements.txt
-index d39f9d1576..64c6e27a94 100644
---- a/tests/requirements.txt
+new file mode 100644
+index 0000000000..d39f9d1576
+--- /dev/null
 +++ b/tests/requirements.txt
-@@ -1,3 +1,4 @@
- # Add Python module requirements, one per line, to be installed
- # in the tests/venv Python virtual environment. For more info,
- # refer to: https://pip.pypa.io/en/stable/user_guide/#id1
-+avocado-framework==65.0
--- 
+@@ -0,0 +1,3 @@
++# Add Python module requirements, one per line, to be installed
++# in the tests/venv Python virtual environment. For more info,
++# refer to: https://pip.pypa.io/en/stable/user_guide/#id1
+--=20
 2.17.1
