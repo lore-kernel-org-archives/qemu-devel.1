@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51467)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51468)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gChB4-0000Ks-TC
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 04:27:40 -0400
+	(envelope-from <armbru@redhat.com>) id 1gChB4-0000Kt-TB
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 04:27:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gChB2-0001zB-Eb
+	(envelope-from <armbru@redhat.com>) id 1gChB2-0001zI-MY
 	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 04:27:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58452)
+Received: from mx1.redhat.com ([209.132.183.28]:41770)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gChB2-0001Vx-0F
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gChB2-00018G-6u
 	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 04:27:36 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D359D307D858
-	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 08:27:21 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1194C120EE
+	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 08:27:11 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 17 Oct 2018 10:26:41 +0200
-Message-Id: <20181017082702.5581-18-armbru@redhat.com>
+Date: Wed, 17 Oct 2018 10:26:29 +0200
+Message-Id: <20181017082702.5581-6-armbru@redhat.com>
 In-Reply-To: <20181017082702.5581-1-armbru@redhat.com>
 References: <20181017082702.5581-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 17/38] seccomp: Clean up error reporting in
- parse_sandbox()
+Subject: [Qemu-devel] [PATCH v4 05/38] vfio: Use warn_report() & friends to
+ report warnings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,114 +31,115 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eduardo Otubo <otubo@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>
 
-Calling error_report() in a function that takes an Error ** argument
-is suspicious.  parse_sandbox() does that, and then fails without
-setting an error.  Its caller main(), via qemu_opts_foreach(), is fine
-with it, but clean it up anyway.
+The vfio code reports warnings like
 
-Cc: Eduardo Otubo <otubo@redhat.com>
+    error_report(WARN_PREFIX "Could not frobnicate", DEV-NAME);
+
+where WARN_PREFIX is defined so the message comes out as
+
+    vfio warning: DEV-NAME: Could not frobnicate
+
+This usage predates the introduction of warn_report() & friends in
+commit 97f40301f1d.  It's time to convert to that interface.  Since
+these functions already prefix the message with "warning: ", replace
+WARN_PREFIX by VFIO_MSG_PREFIX, so the messages come out like
+
+    warning: vfio DEV-NAME: Could not frobnicate
+
+The next commit will replace ERR_PREFIX.
+
+Cc: Alex Williamson <alex.williamson@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Acked-by: Eduardo Otubo <otubo@redhat.com>
+Acked-by: Alex Williamson <alex.williamson@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- qemu-seccomp.c | 18 +++++++++---------
- vl.c           |  4 ++--
- 2 files changed, 11 insertions(+), 11 deletions(-)
+ hw/vfio/pci.c                 | 14 +++++++-------
+ hw/vfio/platform.c            |  4 ++--
+ include/hw/vfio/vfio-common.h |  2 +-
+ 3 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/qemu-seccomp.c b/qemu-seccomp.c
-index 1baa5c69ed..5c73e6ad05 100644
---- a/qemu-seccomp.c
-+++ b/qemu-seccomp.c
-@@ -12,11 +12,12 @@
-  * Contributions after 2012-01-13 are licensed under the terms of the
-  * GNU GPL, version 2 or (at your option) any later version.
-  */
-+
- #include "qemu/osdep.h"
-+#include "qapi/error.h"
- #include "qemu/config-file.h"
- #include "qemu/option.h"
- #include "qemu/module.h"
--#include "qemu/error-report.h"
- #include <sys/prctl.h>
- #include <seccomp.h>
- #include "sysemu/seccomp.h"
-@@ -190,7 +191,7 @@ int parse_sandbox(void *opaque, QemuOpts *opts, Error=
- **errp)
-                  * to provide a little bit of consistency for
-                  * the command line */
-             } else {
--                error_report("invalid argument for obsolete");
-+                error_setg(errp, "invalid argument for obsolete");
-                 return -1;
-             }
-         }
-@@ -205,14 +206,13 @@ int parse_sandbox(void *opaque, QemuOpts *opts, Err=
-or **errp)
-                 /* calling prctl directly because we're
-                  * not sure if host has CAP_SYS_ADMIN set*/
-                 if (prctl(PR_SET_NO_NEW_PRIVS, 1)) {
--                    error_report("failed to set no_new_privs "
--                                 "aborting");
-+                    error_setg(errp, "failed to set no_new_privs abortin=
-g");
-                     return -1;
-                 }
-             } else if (g_str_equal(value, "allow")) {
-                 /* default value */
-             } else {
--                error_report("invalid argument for elevateprivileges");
-+                error_setg(errp, "invalid argument for elevateprivileges=
-");
-                 return -1;
-             }
-         }
-@@ -224,7 +224,7 @@ int parse_sandbox(void *opaque, QemuOpts *opts, Error=
- **errp)
-             } else if (g_str_equal(value, "allow")) {
-                 /* default value */
-             } else {
--                error_report("invalid argument for spawn");
-+                error_setg(errp, "invalid argument for spawn");
-                 return -1;
-             }
-         }
-@@ -236,14 +236,14 @@ int parse_sandbox(void *opaque, QemuOpts *opts, Err=
-or **errp)
-             } else if (g_str_equal(value, "allow")) {
-                 /* default value */
-             } else {
--                error_report("invalid argument for resourcecontrol");
-+                error_setg(errp, "invalid argument for resourcecontrol")=
-;
-                 return -1;
-             }
-         }
-=20
-         if (seccomp_start(seccomp_opts) < 0) {
--            error_report("failed to install seccomp syscall filter "
--                         "in the kernel");
-+            error_setg(errp, "failed to install seccomp syscall filter "
-+                       "in the kernel");
-             return -1;
-         }
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 4404c28360..0c3d245932 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -252,7 +252,7 @@ static void vfio_intx_update(PCIDevice *pdev)
+ 
+     vfio_intx_enable_kvm(vdev, &err);
+     if (err) {
+-        error_reportf_err(err, WARN_PREFIX, vdev->vbasedev.name);
++        warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
      }
-diff --git a/vl.c b/vl.c
-index ff50199e64..643121e5d4 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3972,8 +3972,8 @@ int main(int argc, char **argv, char **envp)
-=20
- #ifdef CONFIG_SECCOMP
-     olist =3D qemu_find_opts_err("sandbox", NULL);
--    if (olist && qemu_opts_foreach(olist, parse_sandbox, NULL, NULL)) {
--        exit(1);
-+    if (olist) {
-+        qemu_opts_foreach(olist, parse_sandbox, NULL, &error_fatal);
+ 
+     /* Re-enable the interrupt in cased we missed an EOI */
+@@ -317,7 +317,7 @@ static int vfio_intx_enable(VFIOPCIDevice *vdev, Error **errp)
+ 
+     vfio_intx_enable_kvm(vdev, &err);
+     if (err) {
+-        error_reportf_err(err, WARN_PREFIX, vdev->vbasedev.name);
++        warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
      }
+ 
+     vdev->interrupt = VFIO_INT_INTx;
+@@ -1557,7 +1557,7 @@ static int vfio_msix_setup(VFIOPCIDevice *vdev, int pos, Error **errp)
+                     &err);
+     if (ret < 0) {
+         if (ret == -ENOTSUP) {
+-            error_report_err(err);
++            warn_report_err(err);
+             return 0;
+         }
+ 
+@@ -2590,9 +2590,9 @@ static void vfio_populate_device(VFIOPCIDevice *vdev, Error **errp)
+     } else if (irq_info.count == 1) {
+         vdev->pci_aer = true;
+     } else {
+-        error_report(WARN_PREFIX
+-                     "Could not enable error recovery for the device",
+-                     vbasedev->name);
++        warn_report(VFIO_MSG_PREFIX
++                    "Could not enable error recovery for the device",
++                    vbasedev->name);
+     }
+ }
+ 
+@@ -2717,7 +2717,7 @@ static void vfio_req_notifier_handler(void *opaque)
+ 
+     qdev_unplug(&vdev->pdev.qdev, &err);
+     if (err) {
+-        error_reportf_err(err, WARN_PREFIX, vdev->vbasedev.name);
++        warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
+     }
+ }
+ 
+diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
+index 64c1af653d..baf236ae79 100644
+--- a/hw/vfio/platform.c
++++ b/hw/vfio/platform.c
+@@ -679,8 +679,8 @@ static void vfio_platform_realize(DeviceState *dev, Error **errp)
+ 
+     for (i = 0; i < vbasedev->num_regions; i++) {
+         if (vfio_region_mmap(vdev->regions[i])) {
+-            error_report("%s mmap unsupported. Performance may be slow",
+-                         memory_region_name(vdev->regions[i]->mem));
++            warn_report("%s mmap unsupported, performance may be slow",
++                        memory_region_name(vdev->regions[i]->mem));
+         }
+         sysbus_init_mmio(sbdev, vdev->regions[i]->mem);
+     }
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index e46a28910a..1d7630345b 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -32,7 +32,7 @@
  #endif
-=20
---=20
+ 
+ #define ERR_PREFIX "vfio error: %s: "
+-#define WARN_PREFIX "vfio warning: %s: "
++#define VFIO_MSG_PREFIX "vfio %s: "
+ 
+ enum {
+     VFIO_DEVICE_TYPE_PCI = 0,
+-- 
 2.17.1
