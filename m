@@ -1,18 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45007)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gCouT-0007YU-3J
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 12:43:07 -0400
+	(envelope-from <berrange@redhat.com>) id 1gCp37-0006YI-Ar
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 12:51:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gCouK-0004Eb-34
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 12:42:56 -0400
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 17 Oct 2018 18:41:59 +0200
-Message-Id: <20181017164200.22344-9-kwolf@redhat.com>
-In-Reply-To: <20181017164200.22344-1-kwolf@redhat.com>
-References: <20181017164200.22344-1-kwolf@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1gCp32-0005Cq-Oq
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 12:51:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47914)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gCp31-00050F-7M
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 12:51:51 -0400
+Date: Wed, 17 Oct 2018 17:51:39 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181017165139.GK15162@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20181016232201.16829-1-crosa@redhat.com>
+	<CAFEAcA_KFOay7zBoYMSqqEYd0ZhTcW5wp3bs28cr=oK4W4FL3A@mail.gmail.com>
+	<4e595639-5920-255e-04de-067280ceb477@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 8/9] iscsi: Support auto-read-only option
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <4e595639-5920-255e-04de-067280ceb477@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] Acceptance tests: host arch to target arch
+ name mapping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,40 +30,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
+To: Cleber Rosa <crosa@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Caio Carrara <ccarrara@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-If read-only=3Doff, but auto-read-only=3Don is given, open the volume
-read-write if we have the permissions, but instead of erroring out for
-read-only volumes, just degrade to read-only.
+On Wed, Oct 17, 2018 at 12:31:56PM -0400, Cleber Rosa wrote:
+> 
+> 
+> On 10/17/18 8:34 AM, Peter Maydell wrote:
+> > On 17 October 2018 at 00:22, Cleber Rosa <crosa@redhat.com> wrote:
+> >> The host arch name is not always the target arch name, so it's
+> >> necessary to have a mapping.
+> >>
+> >> The configure scripts contains what is the authoritative and failproof
+> >> mapping, but, reusing it is not straightforward, so it's replicated in
+> >> the acceptance tests supporting code.
+> > 
+> > So, why does the test code need to care? It's not clear
+> > from the patch... My expectation would be that you'd
+> > just test all the testable target architectures,
+> > regardless of what the host architecture is.
+> > 
+> 
+> That's a good question, and now I realize that I could have given more
+> information on the commit message (fixing it).
+> 
+> The core issue is that when running tests and a QEMU binary is not
+> explicitly chosen, we pick one first from the build tree (then from
+> system) that matches the host architecture.
+> 
+> Without such a mapping, when running tests say on a host arch ppc64le, a
+> QEMU binary will not be found.  This was first mentioned here:
+> 
+> https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg00865.html
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- block/iscsi.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+The configure script knows what the matching target for this host
+arch is. Can you just make it set a makefile variable you can then
+pick up ?
 
-diff --git a/block/iscsi.c b/block/iscsi.c
-index bb69faf34a..130ae26f5f 100644
---- a/block/iscsi.c
-+++ b/block/iscsi.c
-@@ -1878,9 +1878,11 @@ static int iscsi_open(BlockDriverState *bs, QDict =
-*options, int flags,
-     /* Check the write protect flag of the LUN if we want to write */
-     if (iscsilun->type =3D=3D TYPE_DISK && (flags & BDRV_O_RDWR) &&
-         iscsilun->write_protected) {
--        error_setg(errp, "Cannot open a write protected LUN as read-writ=
-e");
--        ret =3D -EACCES;
--        goto out;
-+        ret =3D bdrv_apply_auto_read_only(bs, "LUN is write protected", =
-errp);
-+        if (ret < 0) {
-+            goto out;
-+        }
-+        flags &=3D ~BDRV_O_RDWR;
-     }
-=20
-     iscsi_readcapacity_sync(iscsilun, &local_err);
---=20
-2.19.1
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
