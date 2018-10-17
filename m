@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36175)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39100)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gCnSy-00027k-F3
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 11:10:33 -0400
+	(envelope-from <berto@igalia.com>) id 1gCnaH-0003vg-5B
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 11:18:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gCnSt-00005O-Bm
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 11:10:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34142)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gCnSt-0008VA-2x
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 11:10:27 -0400
-Date: Wed, 17 Oct 2018 12:10:04 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181017151004.GY31060@habkost.net>
-References: <20181013025435.25785-1-ehabkost@redhat.com>
-	<20181017092237.GD22755@stefanha-x1.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181017092237.GD22755@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [PATCH] virtio: Provide version-specific variants
- of virtio PCI devices
+	(envelope-from <berto@igalia.com>) id 1gCnaC-0007CN-7Y
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 11:18:05 -0400
+Received: from fanzine.igalia.com ([91.117.99.155]:54125)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <berto@igalia.com>) id 1gCnaB-00078t-OI
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 11:18:00 -0400
+From: Alberto Garcia <berto@igalia.com>
+Date: Wed, 17 Oct 2018 18:17:38 +0300
+Message-Id: <20181017151738.20299-1-berto@igalia.com>
+Subject: [Qemu-devel] [PATCH] scripts: Remove check-qerror.sh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +21,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Caio Carrara <ccarrara@redhat.com>, Markus Armbruster <armbru@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Gerd Hoffmann <kraxel@redhat.com>, Laine Stump <laine@redhat.com>, Cleber Rosa <crosa@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, Markus Armbruster <armbru@redhat.com>
 
-On Wed, Oct 17, 2018 at 10:22:37AM +0100, Stefan Hajnoczi wrote:
-> On Fri, Oct 12, 2018 at 11:54:35PM -0300, Eduardo Habkost wrote:
-> > This patch adds separate device types for each of those virtio
-> > device flavors:
-> > 
-> > - virtio-*-pci: the existing multi-purpose device types
-> >   - Configurable using `disable-legacy` and `disable-modern`
-> >     properties
-> >   - Legacy driver support is automatically enabled/disabled
-> >     depending on the bus where it is plugged
-> >   - Supports Conventional PCI and PCI Express buses
-> >     (but Conventional PCI is incompatible with
-> >     disable-legacy=off)
-> >   - Changes PCI vendor/device IDs at runtime
-> > - virtio-*-pci-0.9: legacy virtio device
-> >   - Supports Conventional PCI buses only, because
-> >     it has a PIO BAR
-> > - virtio-*-pci-1.0-transitional: virtio-1.0 device supporting legacy drivers
-> >   - Supports Conventional PCI buses only, because
-> >     it has a PIO BAR
-> > - virtio-*-pci-1.0: modern-only
-> >   - Supports both Conventional PCI and PCI Express buses
-> 
-> If new device types are being created, is it time to decouple the VIRTIO
-> PCI transport from the actual VIRTIO device (blk, net, scsi) like we
-> already have with virtio-mmio?
-> 
->   -device virtio-pci-1.0,id=virtio-pci-0
->   -device virtio-blk,bus=virtio-pci-0,drive=drive0,serial=mydisk
-> 
-> That way we avoid lots of boilerplate code and an explosion of new
-> device types.
+qerror.h contains leftovers from the now-defunct QError API.
 
-I don't think that would work.  This would in turn make
-virtio-pci-1.0 a chameleon device that changes PCI ID depending
-on the backend device plugged to it.
+There's only a handful of string macros left, and no one is supposed
+to add anything else. The check-qerror.sh script was used to make sure
+that all definitions on the qerror.c and qerror.h files were sorted
+alphabetically. The former was removed three years ago, and the latter
+is now in a different location, so the script doesn't even work (as
+a matter of fact the alphabetical order was broken last time someone
+added a macro -also in 2015- and no one seemed to notice).
 
-Also, PCI IDs are not the only information contained inside the
-virtio-pci subclasses.  See all the PCI-specific +
-device-type-specific knowledge encoded inside the class_init and
-instance_init functions of each virtio-pci subclass.
+There's no point in fixing this script so let's just remove it.
+The rogue macro is also moved to its correct location.
 
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+ include/qapi/qmp/qerror.h |  6 +++---
+ scripts/check-qerror.sh   | 22 ----------------------
+ 2 files changed, 3 insertions(+), 25 deletions(-)
+ delete mode 100755 scripts/check-qerror.sh
+
+diff --git a/include/qapi/qmp/qerror.h b/include/qapi/qmp/qerror.h
+index 145571f618..7c76e24aa7 100644
+--- a/include/qapi/qmp/qerror.h
++++ b/include/qapi/qmp/qerror.h
+@@ -79,6 +79,9 @@
+ #define QERR_QGA_COMMAND_FAILED \
+     "Guest agent command failed, error was '%s'"
+ 
++#define QERR_REPLAY_NOT_SUPPORTED \
++    "Record/replay feature is not supported for '%s'"
++
+ #define QERR_SET_PASSWD_FAILED \
+     "Could not set password"
+ 
+@@ -88,7 +91,4 @@
+ #define QERR_UNSUPPORTED \
+     "this feature or command is not currently supported"
+ 
+-#define QERR_REPLAY_NOT_SUPPORTED \
+-    "Record/replay feature is not supported for '%s'"
+-
+ #endif /* QERROR_H */
+diff --git a/scripts/check-qerror.sh b/scripts/check-qerror.sh
+deleted file mode 100755
+index af7fbd5249..0000000000
+--- a/scripts/check-qerror.sh
++++ /dev/null
+@@ -1,22 +0,0 @@
+-#!/bin/sh
+-# This script verifies that qerror definitions and table entries are
+-# alphabetically ordered.
+-
+-check_order() {
+-  errmsg=$1
+-  shift
+-
+-  # sort -C verifies order but does not print a message.  sort -c does print a
+-  # message.  These options are both in POSIX.
+-  if ! "$@" | sort -C; then
+-    echo "$errmsg"
+-    "$@" | sort -c
+-    exit 1
+-  fi
+-  return 0
+-}
+-
+-check_order 'Definitions in qerror.h must be in alphabetical order:' \
+-            grep '^#define QERR_' qerror.h
+-check_order 'Entries in qerror.c:qerror_table must be in alphabetical order:' \
+-            sed -n '/^static.*qerror_table\[\]/,/^};/s/QERR_/&/gp' qerror.c
 -- 
-Eduardo
+2.11.0
