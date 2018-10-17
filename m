@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gCrCu-0002da-4X
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:10:12 -0400
+	(envelope-from <eblake@redhat.com>) id 1gCrDJ-0002vl-DU
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:10:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gCrCm-0001mh-Mi
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:10:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51662)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gCrCk-0001Zq-OZ
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:10:04 -0400
-Date: Wed, 17 Oct 2018 16:09:51 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181017190951.GG31060@habkost.net>
-References: <20181016232201.16829-1-crosa@redhat.com>
-	<CAFEAcA_KFOay7zBoYMSqqEYd0ZhTcW5wp3bs28cr=oK4W4FL3A@mail.gmail.com>
-	<20181017162944.GF31060@habkost.net>
-	<d5f32475-df5b-0c5c-591f-5fae8e641c11@redhat.com>
-	<CAFEAcA_gyQvmq48QquNiFhGef-FWPeDKRUSk3wf7hS=_=xm_XQ@mail.gmail.com>
+	(envelope-from <eblake@redhat.com>) id 1gCrDI-0002G1-IT
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:10:37 -0400
+References: <20181017164200.22344-1-kwolf@redhat.com>
+	<20181017164200.22344-10-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <98977898-2cec-725b-8aa0-80c25e6583ce@redhat.com>
+Date: Wed, 17 Oct 2018 14:10:22 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_gyQvmq48QquNiFhGef-FWPeDKRUSk3wf7hS=_=xm_XQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] Acceptance tests: host arch to target arch
- name mapping
+In-Reply-To: <20181017164200.22344-10-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 9/9] block: Make auto-read-only=on
+ default for -drive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,50 +25,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Cleber Rosa <crosa@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Caio Carrara <ccarrara@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
 
-On Wed, Oct 17, 2018 at 07:40:51PM +0100, Peter Maydell wrote:
-> On 17 October 2018 at 18:38, Cleber Rosa <crosa@redhat.com> wrote:
-> >
-> >
-> > On 10/17/18 12:29 PM, Eduardo Habkost wrote:
-> >> On Wed, Oct 17, 2018 at 01:34:41PM +0100, Peter Maydell wrote:
-> >>> So, why does the test code need to care? It's not clear
-> >>> from the patch... My expectation would be that you'd
-> >>> just test all the testable target architectures,
-> >>> regardless of what the host architecture is.
-> >>
-> >> I tend to agree.  Maybe the right solution is to get rid of the
-> >> os.uname().  I think the default should be testing all QEMU
-> >> binaries that were built, and the host architecture shouldn't
-> >> matter.
+On 10/17/18 11:42 AM, Kevin Wolf wrote:
+> While we want machine interfaces like -blockdev and QMP blockdev-add to
+> add as little auto-detection as possible so that management tools are
+> explicit about their needs, -drive is a convenience option for human
+> users. Enabling auto-read-only=on by default there enables users to use
+> read-only images for read-only guest devices without having to specify
+> read-only=on explicitly. If they try to attach the image to a read-write
+> device, they will still get an error message.
 > 
-> Yes, looking at os.uname() also seems like an odd thing
-> for the tests to be doing here. The test framework
-> should be as far as possible host-architecture agnostic.
-> (For some of the KVM cases there probably is a need to
-> care, but those are exceptions, not the rule.)
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>   blockdev.c | 1 +
+>   1 file changed, 1 insertion(+)
 > 
-> > I'm in favor of exercising all built targets, but that seems to me to be
-> > on another layer, above the test themselves. This change is about the
-> > behavior of a test when not told about the target arch (and thus binary)
-> > it should use.
-> 
-> At that level, I think the right answer is "tell the user
-> they need to specify the qemu executable they are trying to test".
-> In particular, there is no guarantee that the user has actually
-> built the executable for the target that corresponds to the
-> host, so it doesn't work to try to default to that anyway.
 
-Agreed.  However, I don't see when exactly this message would be
-triggered.  Cleber, on which use cases do you expect
-pick_default_qemu_bin() to be called?
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-In an ideal world, any testing runner/tool should be able to
-automatically test all binaries by default.  Can Avocado help us
-do that?  (If not, we could just do it inside a
-./tests/acceptance/run script).
+However, the obligatory: "iotests coverage?"
 
 -- 
-Eduardo
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
