@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gChB5-0000L6-2K
+	(envelope-from <armbru@redhat.com>) id 1gChB4-0000Kx-Ux
 	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 04:27:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gChB3-000218-64
+	(envelope-from <armbru@redhat.com>) id 1gChB2-0001yf-5u
 	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 04:27:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52726)
+Received: from mx1.redhat.com ([209.132.183.28]:41244)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gChB2-0001hi-Ll
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 04:27:36 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gChB1-00018X-N4
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 04:27:35 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 24001D3C14
+	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 08:27:11 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 17 Oct 2018 10:26:28 +0200
-Message-Id: <20181017082702.5581-5-armbru@redhat.com>
+Date: Wed, 17 Oct 2018 10:27:01 +0200
+Message-Id: <20181017082702.5581-38-armbru@redhat.com>
 In-Reply-To: <20181017082702.5581-1-armbru@redhat.com>
 References: <20181017082702.5581-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 04/38] cpus hw target: Use warn_report() &
- friends to report warnings
+Subject: [Qemu-devel] [PATCH v4 37/38] raw: Convert a warning to
+ warn_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,194 +31,208 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Alex Williamson <alex.williamson@redhat.com>, Fam Zheng <famz@redhat.com>, Wei Huang <wei@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Calling error_report() in a function that takes an Error ** argument
-is suspicious.  Convert a few that are actually warnings to
-warn_report().
+Convert the warning about dangerous automatic probing of raw images to
+warn_report().  Split its text to conform to conventions spelled out
+in warn_report()'s contract.
 
-While there, split a warning consisting of multiple sentences to
-conform to conventions spelled out in warn_report()'s contract.
+Update expected output of qemu-iotest 109 accordingly.  Update
+qemu-iotest 099's output filtering to keep filtering out the warning.
 
-Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: Alex Williamson <alex.williamson@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>
-Cc: Wei Huang <wei@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 ---
- cpus.c                          |  8 ++++----
- hw/display/cg3.c                |  2 +-
- hw/display/tcx.c                |  2 +-
- hw/misc/ivshmem.c               |  4 ++--
- hw/net/virtio-net.c             |  8 ++++----
- hw/virtio/virtio-pci.c          |  4 ++--
- target/i386/cpu.c               | 17 +++++++++--------
- target/ppc/translate_init.inc.c |  4 ++--
- 8 files changed, 25 insertions(+), 24 deletions(-)
+ block/raw-format.c         | 17 ++++++------
+ tests/qemu-iotests/099     |  3 ++-
+ tests/qemu-iotests/109.out | 55 +++++++++++++++++++++++---------------
+ 3 files changed, 44 insertions(+), 31 deletions(-)
 
-diff --git a/cpus.c b/cpus.c
-index 361678e459..7804071872 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -211,12 +211,12 @@ void qemu_tcg_configure(QemuOpts *opts, Error **err=
-p)
-                 error_setg(errp, "No MTTCG when icount is enabled");
-             } else {
- #ifndef TARGET_SUPPORTS_MTTCG
--                error_report("Guest not yet converted to MTTCG - "
--                             "you may get unexpected results");
-+                warn_report("Guest not yet converted to MTTCG - "
-+                            "you may get unexpected results");
- #endif
-                 if (!check_tcg_memory_orders_compatible()) {
--                    error_report("Guest expects a stronger memory orderi=
-ng "
--                                 "than the host provides");
-+                    warn_report("Guest expects a stronger memory orderin=
-g "
-+                                "than the host provides");
-                     error_printf("This may cause strange/hard to debug e=
-rrors\n");
-                 }
-                 mttcg_enabled =3D true;
-diff --git a/hw/display/cg3.c b/hw/display/cg3.c
-index 1c199ab369..e50d97e48c 100644
---- a/hw/display/cg3.c
-+++ b/hw/display/cg3.c
-@@ -307,7 +307,7 @@ static void cg3_realizefn(DeviceState *dev, Error **e=
-rrp)
-         ret =3D load_image_mr(fcode_filename, &s->rom);
-         g_free(fcode_filename);
-         if (ret < 0 || ret > FCODE_MAX_ROM_SIZE) {
--            error_report("cg3: could not load prom '%s'", CG3_ROM_FILE);
-+            warn_report("cg3: could not load prom '%s'", CG3_ROM_FILE);
-         }
+diff --git a/block/raw-format.c b/block/raw-format.c
+index 6f6dc99b2c..d65fd0ffce 100644
+--- a/block/raw-format.c
++++ b/block/raw-format.c
+@@ -29,6 +29,7 @@
+ #include "qemu/osdep.h"
+ #include "block/block_int.h"
+ #include "qapi/error.h"
++#include "qemu/error-report.h"
+ #include "qemu/option.h"
+ 
+ typedef struct BDRVRawState {
+@@ -436,14 +437,14 @@ static int raw_open(BlockDriverState *bs, QDict *options, int flags,
+             bs->file->bs->supported_zero_flags);
+ 
+     if (bs->probed && !bdrv_is_read_only(bs)) {
+-        fprintf(stderr,
+-                "WARNING: Image format was not specified for '%s' and probing "
+-                "guessed raw.\n"
+-                "         Automatically detecting the format is dangerous for "
+-                "raw images, write operations on block 0 will be restricted.\n"
+-                "         Specify the 'raw' format explicitly to remove the "
+-                "restrictions.\n",
+-                bs->file->bs->filename);
++        warn_report("Image format was not specified for '%s' and probing "
++                    "guessed raw",
++                    bs->file->bs->filename);
++        error_printf("Automatically detecting the format is dangerous for "
++                     "raw images, write\n"
++                     "operations on block 0 will be restricted.\n"
++                     "Specify the 'raw' format explicitly to remove the "
++                     "restrictions.\n");
      }
-=20
-diff --git a/hw/display/tcx.c b/hw/display/tcx.c
-index b2786ee8d0..66f2459226 100644
---- a/hw/display/tcx.c
-+++ b/hw/display/tcx.c
-@@ -823,7 +823,7 @@ static void tcx_realizefn(DeviceState *dev, Error **e=
-rrp)
-         ret =3D load_image_mr(fcode_filename, &s->rom);
-         g_free(fcode_filename);
-         if (ret < 0 || ret > FCODE_MAX_ROM_SIZE) {
--            error_report("tcx: could not load prom '%s'", TCX_ROM_FILE);
-+            warn_report("tcx: could not load prom '%s'", TCX_ROM_FILE);
-         }
-     }
-=20
-diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
-index 8cb17b9dd4..f88910e55c 100644
---- a/hw/misc/ivshmem.c
-+++ b/hw/misc/ivshmem.c
-@@ -1288,8 +1288,8 @@ static void ivshmem_realize(PCIDevice *dev, Error *=
-*errp)
-     IVShmemState *s =3D IVSHMEM_COMMON(dev);
-=20
-     if (!qtest_enabled()) {
--        error_report("ivshmem is deprecated, please use ivshmem-plain"
--                     " or ivshmem-doorbell instead");
-+        warn_report("ivshmem is deprecated, please use ivshmem-plain"
-+                    " or ivshmem-doorbell instead");
-     }
-=20
-     if (qemu_chr_fe_backend_connected(&s->server_chr) + !!s->shmobj !=3D=
- 1) {
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index 4bdd5b8532..385b1a03e9 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -2020,10 +2020,10 @@ static void virtio_net_device_realize(DeviceState=
- *dev, Error **errp)
-=20
-     if (n->net_conf.tx && strcmp(n->net_conf.tx, "timer")
-                        && strcmp(n->net_conf.tx, "bh")) {
--        error_report("virtio-net: "
--                     "Unknown option tx=3D%s, valid options: \"timer\" \=
-"bh\"",
--                     n->net_conf.tx);
--        error_report("Defaulting to \"bh\"");
-+        warn_report("virtio-net: "
-+                    "Unknown option tx=3D%s, valid options: \"timer\" \"=
-bh\"",
-+                    n->net_conf.tx);
-+        error_printf("Defaulting to \"bh\"");
-     }
-=20
-     n->net_conf.tx_queue_size =3D MIN(virtio_net_max_tx_queue_size(n),
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index 3a01fe90f0..a954799267 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -1683,8 +1683,8 @@ static void virtio_pci_device_plugged(DeviceState *=
-d, Error **errp)
-         if (err) {
-             /* Notice when a system that supports MSIx can't initialize =
-it */
-             if (err !=3D -ENOTSUP) {
--                error_report("unable to init msix vectors to %" PRIu32,
--                             proxy->nvectors);
-+                warn_report("unable to init msix vectors to %" PRIu32,
-+                            proxy->nvectors);
-             }
-             proxy->nvectors =3D 0;
-         }
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index c88876dfe3..9d4217afba 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -5123,14 +5123,15 @@ static void x86_cpu_realizefn(DeviceState *dev, E=
-rror **errp)
-      * NOTE: the following code has to follow qemu_init_vcpu(). Otherwis=
-e
-      * cs->nr_threads hasn't be populated yet and the checking is incorr=
-ect.
-      */
--     if (IS_AMD_CPU(env) &&
--         !(env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_TOPOEXT) &&
--         cs->nr_threads > 1 && !ht_warned) {
--            error_report("This family of AMD CPU doesn't support "
--                         "hyperthreading(%d). Please configure -smp "
--                         "options properly or try enabling topoext featu=
-re.",
--                         cs->nr_threads);
--        ht_warned =3D true;
-+    if (IS_AMD_CPU(env) &&
-+        !(env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_TOPOEXT) &&
-+        cs->nr_threads > 1 && !ht_warned) {
-+            warn_report("This family of AMD CPU doesn't support "
-+                        "hyperthreading(%d)",
-+                        cs->nr_threads);
-+            error_printf("Please configure -smp options properly"
-+                         " or try enabling topoext feature.\n");
-+            ht_warned =3D true;
-     }
-=20
-     x86_cpu_apic_realize(cpu, &local_err);
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
-inc.c
-index 263e63cb03..ee9432eb15 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -8381,8 +8381,8 @@ static void getset_compat_deprecated(Object *obj, V=
-isitor *v, const char *name,
-     QNull *null =3D NULL;
-=20
-     if (!qtest_enabled()) {
--        error_report("CPU 'compat' property is deprecated and has no eff=
-ect; "
--                     "use max-cpu-compat machine property instead");
-+        warn_report("CPU 'compat' property is deprecated and has no effe=
-ct; "
-+                    "use max-cpu-compat machine property instead");
-     }
-     visit_type_null(v, name, &null, NULL);
-     qobject_unref(null);
---=20
+ 
+     ret = raw_read_options(options, bs, s, errp);
+diff --git a/tests/qemu-iotests/099 b/tests/qemu-iotests/099
+index caaf58eee5..f2a62448d8 100755
+--- a/tests/qemu-iotests/099
++++ b/tests/qemu-iotests/099
+@@ -57,7 +57,8 @@ function run_qemu()
+     # which is how we can extract it)
+     do_run_qemu "$@" 2>&1 | _filter_testdir | _filter_imgfmt | _filter_qmp \
+         | _filter_qemu | grep "drv0" \
+-        | sed -e 's/^.*"file": "\(\(\\"\|[^"]\)*\)".*$/\1/' -e 's/\\"/"/g'
++        | sed -e 's/^.*"file": "\(\(\\"\|[^"]\)*\)".*$/\1/' -e 's/\\"/"/g' \
++	      -e '/probing guessed raw/d'
+ }
+ 
+ function test_qemu()
+diff --git a/tests/qemu-iotests/109.out b/tests/qemu-iotests/109.out
+index ad0ee6fb48..99add53271 100644
+--- a/tests/qemu-iotests/109.out
++++ b/tests/qemu-iotests/109.out
+@@ -5,8 +5,9 @@ QA output created by 109
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+ Formatting 'TEST_DIR/t.raw.src', fmt=IMGFMT size=67108864
+ {"return": {}}
+-WARNING: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw.
+-         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
++warning: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw
++Automatically detecting the format is dangerous for raw images, write
++operations on block 0 will be restricted.
+          Specify the 'raw' format explicitly to remove the restrictions.
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "src"}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "src"}}
+@@ -43,8 +44,9 @@ Images are identical.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+ Formatting 'TEST_DIR/t.raw.src', fmt=IMGFMT size=67108864
+ {"return": {}}
+-WARNING: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw.
+-         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
++warning: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw
++Automatically detecting the format is dangerous for raw images, write
++operations on block 0 will be restricted.
+          Specify the 'raw' format explicitly to remove the restrictions.
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "src"}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "src"}}
+@@ -81,8 +83,9 @@ Images are identical.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+ Formatting 'TEST_DIR/t.raw.src', fmt=IMGFMT size=67108864
+ {"return": {}}
+-WARNING: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw.
+-         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
++warning: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw
++Automatically detecting the format is dangerous for raw images, write
++operations on block 0 will be restricted.
+          Specify the 'raw' format explicitly to remove the restrictions.
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "src"}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "src"}}
+@@ -119,8 +122,9 @@ Images are identical.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+ Formatting 'TEST_DIR/t.raw.src', fmt=IMGFMT size=67108864
+ {"return": {}}
+-WARNING: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw.
+-         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
++warning: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw
++Automatically detecting the format is dangerous for raw images, write
++operations on block 0 will be restricted.
+          Specify the 'raw' format explicitly to remove the restrictions.
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "src"}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "src"}}
+@@ -157,8 +161,9 @@ Images are identical.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+ Formatting 'TEST_DIR/t.raw.src', fmt=IMGFMT size=67108864
+ {"return": {}}
+-WARNING: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw.
+-         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
++warning: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw
++Automatically detecting the format is dangerous for raw images, write
++operations on block 0 will be restricted.
+          Specify the 'raw' format explicitly to remove the restrictions.
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "src"}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "src"}}
+@@ -195,8 +200,9 @@ Images are identical.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+ Formatting 'TEST_DIR/t.raw.src', fmt=IMGFMT size=67108864
+ {"return": {}}
+-WARNING: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw.
+-         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
++warning: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw
++Automatically detecting the format is dangerous for raw images, write
++operations on block 0 will be restricted.
+          Specify the 'raw' format explicitly to remove the restrictions.
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "src"}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "src"}}
+@@ -232,8 +238,9 @@ Images are identical.
+ 
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+ {"return": {}}
+-WARNING: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw.
+-         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
++warning: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw
++Automatically detecting the format is dangerous for raw images, write
++operations on block 0 will be restricted.
+          Specify the 'raw' format explicitly to remove the restrictions.
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "src"}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "src"}}
+@@ -269,8 +276,9 @@ Images are identical.
+ 
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+ {"return": {}}
+-WARNING: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw.
+-         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
++warning: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw
++Automatically detecting the format is dangerous for raw images, write
++operations on block 0 will be restricted.
+          Specify the 'raw' format explicitly to remove the restrictions.
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "src"}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "src"}}
+@@ -306,8 +314,9 @@ Images are identical.
+ 
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+ {"return": {}}
+-WARNING: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw.
+-         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
++warning: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw
++Automatically detecting the format is dangerous for raw images, write
++operations on block 0 will be restricted.
+          Specify the 'raw' format explicitly to remove the restrictions.
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "src"}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "src"}}
+@@ -343,8 +352,9 @@ Images are identical.
+ 
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+ {"return": {}}
+-WARNING: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw.
+-         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
++warning: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw
++Automatically detecting the format is dangerous for raw images, write
++operations on block 0 will be restricted.
+          Specify the 'raw' format explicitly to remove the restrictions.
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "src"}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "src"}}
+@@ -380,8 +390,9 @@ Images are identical.
+ 
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+ {"return": {}}
+-WARNING: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw.
+-         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
++warning: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw
++Automatically detecting the format is dangerous for raw images, write
++operations on block 0 will be restricted.
+          Specify the 'raw' format explicitly to remove the restrictions.
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "src"}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "src"}}
+-- 
 2.17.1
