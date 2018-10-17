@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41398)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42666)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gCksm-0002fk-6d
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:25:00 -0400
+	(envelope-from <quintela@redhat.com>) id 1gCkwt-0005kK-Ke
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:29:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gCksl-0007PL-Eg
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:25:00 -0400
+	(envelope-from <quintela@redhat.com>) id 1gCkwr-0004oR-MI
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:29:14 -0400
 From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20181009132330.7549-2-berrange@redhat.com> ("Daniel
-	P. =?utf-8?Q?Berrang=C3=A9=22's?= message of "Tue, 9 Oct 2018 14:23:25
+In-Reply-To: <20181009132330.7549-3-berrange@redhat.com> ("Daniel
+	P. =?utf-8?Q?Berrang=C3=A9=22's?= message of "Tue, 9 Oct 2018 14:23:26
 	+0100")
 References: <20181009132330.7549-1-berrange@redhat.com>
-	<20181009132330.7549-2-berrange@redhat.com>
+	<20181009132330.7549-3-berrange@redhat.com>
 Reply-To: quintela@redhat.com
-Date: Wed, 17 Oct 2018 14:24:42 +0200
-Message-ID: <87tvlk92wl.fsf@trasno.org>
+Date: Wed, 17 Oct 2018 14:28:53 +0200
+Message-ID: <87murc92pm.fsf@trasno.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 1/6] qemu-nbd: add support for
- authorization of TLS clients
+Subject: Re: [Qemu-devel] [PATCH v3 2/6] nbd: allow authorization with
+ nbd-server-start QMP command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,37 +34,48 @@ Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongn
 Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
 > From: "Daniel P. Berrange" <berrange@redhat.com>
 >
-> Currently any client which can complete the TLS handshake is able to use
-> the NBD server. The server admin can turn on the 'verify-peer' option
-> for the x509 creds to require the client to provide a x509 certificate.
-> This means the client will have to acquire a certificate from the CA
-> before they are permitted to use the NBD server. This is still a fairly
-> low bar to cross.
+> As with the previous patch to qemu-nbd, the nbd-server-start QMP command
+> also needs to be able to specify authorization when enabling TLS encrypti=
+on.
 >
-> This adds a '--tls-authz OBJECT-ID' option to the qemu-nbd command which
-> takes the ID of a previously added 'QAuthZ' object instance. This will
-> be used to validate the client's x509 distinguished name. Clients
-> failing the authorization check will not be permitted to use the NBD
-> server.
+> First the client must create a QAuthZ object instance using the
+> 'object-add' command:
 >
-> For example to setup authorization that only allows connection from a cli=
-ent
-> whose x509 certificate distinguished name is
+>    {
+>      'execute': 'object-add',
+>      'arguments': {
+>        'qom-type': 'authz-list',
+>        'id': 'authz0',
+>        'parameters': {
+>          'policy': 'deny',
+>          'rules': [
+>            {
+>              'match': '*CN=3Dfred',
+>              'policy': 'allow'
+>            }
+>          ]
+>        }
+>      }
+>    }
 >
->    CN=3Dlaptop.example.com,O=3DExample Org,L=3DLondon,ST=3DLondon,C=3DGB
+> They can then reference this in the new 'tls-authz' parameter when
+> executing the 'nbd-server-start' command:
 >
-> use:
->
->   qemu-nbd --object tls-creds-x509,id=3Dtls0,dir=3D/home/berrange/qemutls=
-,\
->                     endpoint=3Dserver,verify-peer=3Dyes \
->            --object authz-simple,id=3Dauth0,identity=3DCN=3Dlaptop.exampl=
-e.com,,\
->                     O=3DExample Org,,L=3DLondon,,ST=3DLondon,,C=3DGB \
->            --tls-creds tls0 \
->            --tls-authz authz0
-> 	   ....other qemu-nbd args...
+>    {
+>      'execute': 'nbd-server-start',
+>      'arguments': {
+>        'addr': {
+>            'type': 'inet',
+>            'host': '127.0.0.1',
+>            'port': '9000'
+>        },
+>        'tls-creds': 'tls0',
+>        'tls-authz': 'authz0'
+>      }
+>    }
 >
 > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 
 Reviewed-by: Juan Quintela <quintela@redhat.com>
+
+similar to previous patch in series.
