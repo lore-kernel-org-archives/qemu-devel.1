@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52213)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gCo0S-0005qi-Q2
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 11:45:09 -0400
+	(envelope-from <lfy@google.com>) id 1gCo0e-00062H-Q1
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 11:45:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gCo0S-0000dS-0h
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 11:45:08 -0400
-Date: Wed, 17 Oct 2018 17:44:58 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20181017154458.GK31479@localhost.localdomain>
-References: <cover.1539786605.git.berto@igalia.com>
-	<e0ba08677155b2cf3820b580fb5057458ed017d0.1539786605.git.berto@igalia.com>
-	<20181017153132.GI31479@localhost.localdomain>
-	<w518t2woadq.fsf@maestria.local.igalia.com>
+	(envelope-from <lfy@google.com>) id 1gCo0W-0000vM-2S
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 11:45:18 -0400
+Received: from mail-qt1-x82f.google.com ([2607:f8b0:4864:20::82f]:43073)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lfy@google.com>) id 1gCo0V-0000rs-RV
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 11:45:11 -0400
+Received: by mail-qt1-x82f.google.com with SMTP id q41-v6so30532069qtq.10
+	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 08:45:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <w518t2woadq.fsf@maestria.local.igalia.com>
-Subject: Re: [Qemu-devel] [PATCH 2/3] quorum: Return an error if the
- blkverify mode has invalid settings
+From: Frank Yang <lfy@google.com>
+Date: Wed, 17 Oct 2018 08:44:59 -0700
+Message-ID: <CAEkmjvWv=CCf-Y4kDqG=Z-Fb2jPBUBVzHzy69rTxDinPZQ72YQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] QEMU hangs in main_loop_wait
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,32 +25,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
-Am 17.10.2018 um 17:34 hat Alberto Garcia geschrieben:
-> On Wed 17 Oct 2018 05:31:32 PM CEST, Kevin Wolf wrote:
-> > Am 17.10.2018 um 16:33 hat Alberto Garcia geschrieben:
-> >> The blkverify mode of Quorum can only be enabled if the number of
-> >> children is exactly two and the value of vote-threshold is also two.
-> >> 
-> >> If the user tries to enable it but the other settings are incorrect
-> >> then QEMU simply prints an error message to stderr and carries on
-> >> disabling the blkverify setting.
-> >> 
-> >> This patch makes quorum_open() fail and return an error in this case.
-> >> 
-> >> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> >> Reported-by: Markus Armbruster <armbru@redhat.com>
-> >
-> > While reviewing this, I think I found another problem: Shouldn't
-> > .bdrv_add_child refuse to add a child if s->is_blkverify == true? (And
-> > probably assert in .bdrv_del_child that s->is_blkverify == false after
-> > checking s->num_children <= s->threshold)
-> 
-> I think you're right. Do you want me to send this in a later patch or do
-> you prefer that I make it part of this series?
+Hi all,
 
-This series looked good, so no need to respin. A separate patch is fine.
+After quite some backports, such as
 
-Kevin
+https://android.googlesource.com/platform/external/qemu/+/a8da859b1b011e509056f03cbcb73df27afe4337
+
+we are not seeing hangs in flatview_do_translate, but are still getting
+hangs in main-loop:
+
+    qemu_mutex_unlock_iothread();
+    replay_mutex_unlock();
+
+    ret = qemu_poll_ns((GPollFD *)gpollfds->data, gpollfds->len, timeout);
+<-------------this seems to be the hanging part
+
+    replay_mutex_lock();
+    qemu_mutex_lock_iothread();
+
+Any idea how to diagnose the cause of taking too much time in g_poll in
+qemu_poll_ns?
+
+Frank
