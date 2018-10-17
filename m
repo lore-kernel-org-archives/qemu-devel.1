@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45872)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gCiGn-0008M5-4a
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 05:37:41 -0400
+	(envelope-from <stefanha@gmail.com>) id 1gCiHD-0000Df-Ms
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 05:38:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gCiGf-0002Ni-MX
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 05:37:37 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:47648)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gCiGf-00024K-AR
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 05:37:29 -0400
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20181017090750.4378-1-pbonzini@redhat.com>
-In-Reply-To: <20181017090750.4378-1-pbonzini@redhat.com>
-Date: Wed, 17 Oct 2018 12:37:22 +0300
-Message-ID: <001f01d465fd$01af8b80$050ea280$@ru>
+	(envelope-from <stefanha@gmail.com>) id 1gCiH7-0003EK-Mz
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 05:38:02 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33395)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gCiH7-0003Cc-F1
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 05:37:57 -0400
+Received: by mail-wr1-x444.google.com with SMTP id e4-v6so28863669wrs.0
+	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 02:37:57 -0700 (PDT)
+Date: Wed, 17 Oct 2018 10:37:54 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20181017093754.GI22755@stefanha-x1.localdomain>
+References: <20181016112232.23241-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [PATCH] Revert "icount: remove obsolete warp call"
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="a7XSrSxqzVsaECgU"
+Content-Disposition: inline
+In-Reply-To: <20181016112232.23241-1-dgilbert@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] pckbd: Convert DPRINTF->trace
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +29,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Paolo Bonzini' <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, 'Artem Pisarenko' <artem.k.pisarenko@gmail.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
-> QEMU running with options "-icount,sleep=off -rtc clock=vm" doesn't
-> execute emulation at maximum possible speed.
-> Target virtual clock may run faster or slower than realtime clock by N
-> times, where N value depends on various unrelated conditions (i.e. random
-> from the user point of view), or possibly the target hangs completely.
-> Bisection shows commit 281b2201e4 ("icount: remove obsolete warp call",
-> 2016-03-15) to be the culprit, revert it.
-> 
-> Suggested-by: Artem Pisarenko <artem.k.pisarenko@gmail.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+--a7XSrSxqzVsaECgU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Oct 16, 2018 at 12:22:32PM +0100, Dr. David Alan Gilbert (git) wrot=
+e:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>=20
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 > ---
->  cpus.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/cpus.c b/cpus.c
-> index 361678e459..2872e7e37c 100644
-> --- a/cpus.c
-> +++ b/cpus.c
-> @@ -1224,6 +1224,10 @@ static void qemu_tcg_rr_wait_io_event(CPUState *cpu)
->  {
->      while (all_cpu_threads_idle()) {
->          stop_tcg_kick_timer();
-> +
-> +        /* Start accounting real time to the virtual clock if the CPUs
-> +           are idle.  */
-> +        qemu_clock_warp(QEMU_CLOCK_VIRTUAL);
+>  hw/input/pckbd.c      | 19 ++++++-------------
+>  hw/input/trace-events |  7 +++++++
+>  2 files changed, 13 insertions(+), 13 deletions(-)
 
-Can't apply, because this function does not exist anymore.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
->          qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
->      }
-> 
-> --
-> 2.17.1
+--a7XSrSxqzVsaECgU
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
+iQEcBAEBAgAGBQJbxwLyAAoJEJykq7OBq3PIK2sH/j/pBEeiVgvwcsk1KUmIdD//
+Lpe7bdXhEWnMpIwOTnWLEWoEPUkzxaJlW/HuHCMuJj58KqmctCmVrHl8njVXOG/v
+T+v65k9gPpxQs/ZDWLD6b1IXRsvGMiKwC4+ys35/OozCipHQohTnEXRNcWO0iZ8h
+GWAgDl3TgKueeykBsbbsRoOdTPnZrhCm1BwJUp8pSvi7mbABm2bnnPDz6SiywNz7
+qU+Jk9twYNb3vI0A+OFSKro2P9UbjJoTqq20Y8WN46SloDNFYG/r0v5hXfpdpYGa
+LxINBtHFKL658qzF53Rd//s5FDz7VGle6SX0cj4gRCGfeYm16nq00dVFLCCLNd8=
+=+Q9Y
+-----END PGP SIGNATURE-----
 
-Pavel Dovgalyuk
+--a7XSrSxqzVsaECgU--
