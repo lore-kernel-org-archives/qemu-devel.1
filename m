@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43633)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gCl0F-0008O2-PJ
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:32:47 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gCl2W-0001cK-T7
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:35:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gCl0E-0002N5-LZ
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:32:43 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20181009132330.7549-5-berrange@redhat.com> ("Daniel
-	P. =?utf-8?Q?Berrang=C3=A9=22's?= message of "Tue, 9 Oct 2018 14:23:28
-	+0100")
-References: <20181009132330.7549-1-berrange@redhat.com>
-	<20181009132330.7549-5-berrange@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 17 Oct 2018 14:32:17 +0200
-Message-ID: <87efco92jy.fsf@trasno.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1gCl2V-0006Pa-1H
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:35:04 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:46114)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gCl2U-0006Nf-Qx
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:35:02 -0400
+Received: by mail-ot1-x343.google.com with SMTP id o21so25941772otb.13
+	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 05:35:02 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 4/6] chardev: add support for
- authorization for TLS clients
+In-Reply-To: <20181016232201.16829-1-crosa@redhat.com>
+References: <20181016232201.16829-1-crosa@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 17 Oct 2018 13:34:41 +0100
+Message-ID: <CAFEAcA_KFOay7zBoYMSqqEYd0ZhTcW5wp3bs28cr=oK4W4FL3A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] Acceptance tests: host arch to target arch
+ name mapping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,38 +29,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, libvir-list@redhat.com, Kevin Wolf <kwolf@redhat.com>, =?utf-8?Q?Marc-?= =?utf-8?Q?Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David
-	Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Cleber Rosa <crosa@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Caio Carrara <ccarrara@redhat.com>
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
-> From: "Daniel P. Berrange" <berrange@redhat.com>
+On 17 October 2018 at 00:22, Cleber Rosa <crosa@redhat.com> wrote:
+> The host arch name is not always the target arch name, so it's
+> necessary to have a mapping.
 >
-> Currently any client which can complete the TLS handshake is able to use
-> a chardev server. The server admin can turn on the 'verify-peer' option
-> for the x509 creds to require the client to provide a x509
-> certificate. This means the client will have to acquire a certificate
-> from the CA before they are permitted to use the chardev server. This is
-> still a fairly low bar.
->
-> This adds a 'tls-authz=3DOBJECT-ID' option to the socket chardev backend
-> which takes the ID of a previously added 'QAuthZ' object instance. This
-> will be used to validate the client's x509 distinguished name. Clients
-> failing the check will not be permitted to use the chardev server.
->
-> For example to setup authorization that only allows connection from a
-> client whose x509 certificate distinguished name contains 'CN=3Dfred', you
-> would use:
->
->   $QEMU -object tls-creds-x509,id=3Dtls0,dir=3D/home/berrange/qemutls,\
->                 endpoint=3Dserver,verify-peer=3Dyes \
->         -object authz-simple,id=3Dauthz0,identity=3DCN=3Dlaptop.example.c=
-om,,\
->                 O=3DExample Org,,L=3DLondon,,ST=3DLondon,,C=3DGB \
->         -chardev socket,host=3D127.0.0.1,port=3D9000,server,\
-> 	         tls-creds=3Dtls0,tls-authz=3Dauthz0 \
->         ...other qemu args...
->
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> The configure scripts contains what is the authoritative and failproof
+> mapping, but, reusing it is not straightforward, so it's replicated in
+> the acceptance tests supporting code.
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+So, why does the test code need to care? It's not clear
+from the patch... My expectation would be that you'd
+just test all the testable target architectures,
+regardless of what the host architecture is.
+
+thanks
+-- PMM
