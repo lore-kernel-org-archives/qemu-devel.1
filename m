@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gCrMR-0006c6-P6
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:20:04 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gCrMv-0006tt-Nz
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:20:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gCrMM-0005Rc-Ix
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:20:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51126)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gCrMM-0005RI-7h
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:19:58 -0400
-Date: Wed, 17 Oct 2018 16:19:42 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181017191942.GH31060@habkost.net>
-References: <20181013025435.25785-1-ehabkost@redhat.com>
-	<20181014173258-mutt-send-email-mst@kernel.org>
-	<20181015181404.GQ31060@habkost.net>
-	<20181016170236.GJ7995@redhat.com>
-	<d8b9a6e6-c137-a553-8fe7-939edd2031b3@redhat.com>
-	<87murdf73g.fsf_-_@dusky.pond.sub.org>
-	<20181017155637.GC31060@habkost.net>
-	<20181017122840-mutt-send-email-mst@kernel.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1gCrMv-0005uB-3D
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:20:33 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:36510)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gCrMu-0005t3-La
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:20:33 -0400
+Received: by mail-ot1-x341.google.com with SMTP id x4so25947683otg.3
+	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 12:20:32 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181017122840-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] No more chameleon devices (was: [PATCH] virtio:
- Provide version-specific variants of virtio PCI devices)
+In-Reply-To: <a53d1784-f947-501b-5589-07b611800959@redhat.com>
+References: <20181016232201.16829-1-crosa@redhat.com>
+	<CAFEAcA_KFOay7zBoYMSqqEYd0ZhTcW5wp3bs28cr=oK4W4FL3A@mail.gmail.com>
+	<20181017162944.GF31060@habkost.net>
+	<d5f32475-df5b-0c5c-591f-5fae8e641c11@redhat.com>
+	<CAFEAcA_gyQvmq48QquNiFhGef-FWPeDKRUSk3wf7hS=_=xm_XQ@mail.gmail.com>
+	<a53d1784-f947-501b-5589-07b611800959@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 17 Oct 2018 20:20:11 +0100
+Message-ID: <CAFEAcA9Ck+aUMTXY_rDLkim+wtMNObq1A=uEa+UzuHN8E_BccQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] Acceptance tests: host arch to target arch
+ name mapping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,90 +34,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Laine Stump <laine@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Fabian Deutsch <fdeutsch@redhat.com>, qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Gerd Hoffmann <kraxel@redhat.com>, Andrea Bolognani <abologna@redhat.com>, Cleber Rosa <crosa@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: Cleber Rosa <crosa@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Caio Carrara <ccarrara@redhat.com>
 
-On Wed, Oct 17, 2018 at 12:38:29PM -0400, Michael S. Tsirkin wrote:
-> On Wed, Oct 17, 2018 at 12:56:37PM -0300, Eduardo Habkost wrote:
-> > (CCing Marcel, in case he has extra details on the complex
-> > Conventional/Express bus/device plugging rules)
-> > 
-> > On Wed, Oct 17, 2018 at 07:57:39AM +0200, Markus Armbruster wrote:
-> > > Laine Stump <laine@redhat.com> writes:
-> > > 
-> > > [...]
-> > > > In the end, having a device that changed PCI ID depending on what kind
-> > > > of slot it was plugged into was an idea "too clever for its own good",
-> > > > should be avoided when new devices are added in the future, and we
-> > > > should at least provide an alternative that doesn't do that for existing
-> > > > devices.
-> > > 
-> > > That means for each chameleon PCI/PCIe device:
-> > > 
-> > > * create a pair of devices that can only go into one kind of slot
-> > > 
-> > > * deprecate the chameleon
-> > > 
-> > > Yes, please!  Volunteers?
-> > > 
-> > > Do we have similar chameleons outside PCI?
-> > 
-> > I'm worried that we could be trying to address multiple issues at
-> > the same time, and I'm not sure yet if we should address all of
-> > them in one take.
-> > 
-> > Right now we need to differentiate non-transitional and
-> > transitional virtio devices, for a few reasons:
-> > * They have different PCI IDs;
-> > * Legacy drivers don't work with non-transitional devices;
-> > * Transitional virtio devices can be plugged to Conventional PCI
-> >   buses; non-transitional ones can't.
-> 
-> No that last point isn't true at all.
+On 17 October 2018 at 20:05, Cleber Rosa <crosa@redhat.com> wrote:
+>
+>
+> On 10/17/18 2:40 PM, Peter Maydell wrote:
+>> At that level, I think the right answer is "tell the user
+>> they need to specify the qemu executable they are trying to test".
+>> In particular, there is no guarantee that the user has actually
+>> built the executable for the target that corresponds to the
+>> host, so it doesn't work to try to default to that anyway.
+>>
+>
+> I think your "right answer" is the ideal, but I'm afraid it's not
+> practical.  For instance, look at how a qemu-iotest is run:
+>
+> $ ./check 001
+> QEMU          --
+> "/tmp/qemu-build/tests/qemu-iotests/../../ppc64-softmmu/qemu-system-ppc64"
+> -nodefaults -machine accel=qtest
+> ...
 
-Sorry, I got it reversed:
+I don't know how the iotests stuff works (they're odd
+and not part of the stock "make check"), but the main
+tests/Makefile.include handles tests which run for any
+QEMU binary, tests which run only on certain target
+architectures, and tests which don't use a QEMU binary
+and just run once.
 
-* Non-transitional virtio devices can be plugged to PCI Express
-  buses; transitional ones can't[1].
+> The rules that "check" uses for finding a "default" QEMU binary are a
+> lot harder to describe (are "smarter") than the ones we currently have
+> on the acceptance tests.  IMO some compromises like these are necessary,
+> or else, tests may be run much much less than they could and should.
 
-[1] Well, theoretically, under a few circumstances they could.
-    We could extend the QMP interfaces in the future to cover
-    that use case, but I don't think it's worth the effort.
+I'm not sure what that check script is trying to do,
+but my first impression is that it's probably not a
+good model to follow.
 
-> 
-> > This patch addresses that problem.
-> >
-> > You seem to be talking about a different issue:
-> > * Some devices (including transitional virtio) can be plugged on
-> >   both Conventional PCI and PCI Express buses (I will call those
-> >   devices "hybrid PCI devices").
-> > 
-> > The former is a practical problem: management software needs to
-> > be able to ask for a transitional virtio device, depending o the
-> > guest OS being run.
-> > 
-> > Addressing the latter seems more complex (it would affect other
-> > devices, not just virtio), and I don't see which practical
-> > problems it would solve.
-> > 
-> > I see some problems it wouldn't solve, though: the system
-> > wouldn't be able to represent the fact that transitional virtio
-> > devices can still work on PCI Express buses, as long as they
-> > support PIO bars; or that Conventional PCI devices can be plugged
-> > to PCI Express root buses.
-> > 
-> > I don't see problems caused by hybrid conventional/express PCI
-> > devices.  The original problem with virtio devices was just not
-> > being hybrid, it was lying about being hybrid: non-transitional
-> > virtio devices are hybrid, but transitional virtio devices
-> > aren't.
-> > 
-> > I wouldn't be against abolishing hybrid PCI devices completely if
-> > somebody volunteers to do the work.  I just don't see which
-> > problems this would solve.
-> > 
-> > -- 
-> > Eduardo
-
--- 
-Eduardo
+thanks
+-- PMM
