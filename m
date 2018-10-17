@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54838)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54862)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gCim3-0001Cu-RA
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 06:09:56 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1gCimD-0001KP-Fs
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 06:10:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gCily-00023x-Sx
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 06:09:55 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:35829)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gCily-00023b-M1
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 06:09:50 -0400
-Received: by mail-wm1-f68.google.com with SMTP id e187-v6so1538464wmf.0
-	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 03:09:50 -0700 (PDT)
-References: <20181016232201.16829-1-crosa@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <f436196c-392e-1fd8-c176-54fe514bd07e@redhat.com>
-Date: Wed, 17 Oct 2018 12:09:48 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1gCimC-0002AM-7g
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 06:10:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43380)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gCimB-00029A-Qp
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 06:10:04 -0400
+Date: Wed, 17 Oct 2018 11:09:55 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20181017100952.GA2531@work-vm>
+References: <1539713558-2453-1-git-send-email-kwankhede@nvidia.com>
+	<1539713558-2453-2-git-send-email-kwankhede@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <20181016232201.16829-1-crosa@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] Acceptance tests: host arch to target arch
- name mapping
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <1539713558-2453-2-git-send-email-kwankhede@nvidia.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v1 1/4] VFIO KABI for migration
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,101 +29,192 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
-Cc: Caio Carrara <ccarrara@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Cc: alex.williamson@redhat.com, cjia@nvidia.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, quintela@redhat.com
 
-Hi Cleber,
-
-On 17/10/2018 01:22, Cleber Rosa wrote:
-> The host arch name is not always the target arch name, so it's
-> necessary to have a mapping.
-> 
-> The configure scripts contains what is the authoritative and failproof
-> mapping, but, reusing it is not straightforward, so it's replicated in
-> the acceptance tests supporting code.
-> 
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+* Kirti Wankhede (kwankhede@nvidia.com) wrote:
+> - Added vfio_device_migration_info structure to use interact with vendor
+>   driver.
+> - Different flags are used to get or set migration related information
+>   from/to vendor driver.
+> Flag VFIO_MIGRATION_PROBE: To query if feature is supported
+> Flag VFIO_MIGRATION_GET_REGION: To get migration region info
+> Flag VFIO_MIGRATION_SET_STATE: To convey device state in vendor driver
+> Flag VFIO_MIGRATION_GET_PENDING: To get pending bytes yet to be migrated
+>   from vendor driver
+> Flag VFIO_MIGRATION_GET_BUFFER: On this flag, vendor driver should write
+>   data to migration region and return number of bytes written in the regi=
+on
+> Flag VFIO_MIGRATION_SET_BUFFER: In migration resume path, user space app
+>   writes to migration region and communicates it to vendor driver with
+>   this ioctl with this flag.
+> Flag VFIO_MIGRATION_GET_DIRTY_PFNS: Get bitmap of dirty pages from vendor
+>   driver from given start address
+>=20
+> - Added enum for possible device states.
+>=20
+> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> Reviewed-by: Neo Jia <cjia@nvidia.com>
 > ---
->  configure                                 |  2 ++
->  tests/acceptance/avocado_qemu/__init__.py | 23 +++++++++++++++++++++++
->  2 files changed, 25 insertions(+)
-> 
-> diff --git a/configure b/configure
-> index 8af2be959f..e029b756d4 100755
-> --- a/configure
-> +++ b/configure
-> @@ -6992,6 +6992,8 @@ TARGET_ARCH="$target_name"
->  TARGET_BASE_ARCH=""
->  TARGET_ABI_DIR=""
->  
-> +# When updating target_name => TARGET_ARCH, please also update the
-> +# HOST_TARGET_ARCH mapping in tests/acceptance/avocado_qemu/__init__.py
->  case "$target_name" in
->    i386)
->      mttcg="yes"
-> diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance/avocado_qemu/__init__.py
-> index 1e54fd5932..d9bc4736ec 100644
-> --- a/tests/acceptance/avocado_qemu/__init__.py
-> +++ b/tests/acceptance/avocado_qemu/__init__.py
+>  linux-headers/linux/vfio.h | 91 ++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  1 file changed, 91 insertions(+)
+>=20
+> diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+> index 3615a269d378..8e9045ed9aa8 100644
+> --- a/linux-headers/linux/vfio.h
+> +++ b/linux-headers/linux/vfio.h
+> @@ -602,6 +602,97 @@ struct vfio_device_ioeventfd {
+> =20
+>  #define VFIO_DEVICE_IOEVENTFD		_IO(VFIO_TYPE, VFIO_BASE + 16)
+> =20
+> +/**
+> + * VFIO_DEVICE_MIGRATION_INFO - _IOW(VFIO_TYPE, VFIO_BASE + 17,
+> + *                              struct vfio_device_migration_info)
 
-I'd put this in scripts/qemu.py
+This is a little odd; what you really have here is 7 different
+operations that can be performed; they're independent operations all
+relating to part of migration; so instead of a 'flag' it's more of an
+operation type, and there's no reason to make them individual bit flags
+- for edxample there's no reason you'd want to OR together
+MIGRATION_GET_REGION and MIGRATION_GET_PENDING - they're just
+independent.
+(Similarly you could just make them 7 ioctls)
 
-> @@ -19,6 +19,28 @@ sys.path.append(os.path.join(SRC_ROOT_DIR, 'scripts'))
->  
->  from qemu import QEMUMachine
->  
+I guess what you're trying to do here is a direct 1-1 mapping of qemu's
+struct SaveVMHandlers interface to devices.
+That's not necessarily a bad idea, but remember it's not a stable
+interface, so QEMU will change it over time and you'll have to then
+figure out how to shim these interfaces to it, so it's worth keeping
+that in mind, just in case you can make these interfaces more general.
+
+> + * Flag VFIO_MIGRATION_PROBE:
+> + *      To query if feature is supported
+> + *
+> + * Flag VFIO_MIGRATION_GET_REGION:
+> + *      To get migration region info
+> + *      region_index [output] : region index to be used for migration re=
+gion
+> + *      size [output]: size of migration region
+> + *
+> + * Flag VFIO_MIGRATION_SET_STATE:
+> + *      To set device state in vendor driver
+> + *      device_state [input] : User space app sends device state to vend=
+or
+> + *           driver on state change
+> + *
+> + * Flag VFIO_MIGRATION_GET_PENDING:
+> + *      To get pending bytes yet to be migrated from vendor driver
+> + *      threshold_size [Input] : threshold of buffer in User space app.
+> + *      pending_precopy_only [output] : pending data which must be migra=
+ted in
+> + *          precopy phase or in stopped state, in other words - before t=
+arget
+> + *          vm start
+> + *      pending_compatible [output] : pending data which may be migrated=
+ in any
+> + *           phase
+> + *      pending_postcopy_only [output] : pending data which must be migr=
+ated in
+> + *           postcopy phase or in stopped state, in other words - after =
+source
+> + *           vm stop
+> + *      Sum of pending_precopy_only, pending_compatible and
+> + *      pending_postcopy_only is the whole amount of pending data.
+> + *
+> + * Flag VFIO_MIGRATION_GET_BUFFER:
+> + *      On this flag, vendor driver should write data to migration regio=
+n and
+> + *      return number of bytes written in the region.
+> + *      bytes_written [output] : number of bytes written in migration bu=
+ffer by
+> + *          vendor driver
+> + *
+> + * Flag VFIO_MIGRATION_SET_BUFFER
+> + *      In migration resume path, user space app writes to migration reg=
+ion and
+> + *      communicates it to vendor driver with this ioctl with this flag.
+> + *      bytes_written [Input] : number of bytes written in migration buf=
+fer by
+> + *          user space app.
+
+I guess we call getbuffer/setbuffer multiple times.  Is there anything
+that needs to be passed to get the data to line up (e.g. offset into the
+data)
+
+> + * Flag VFIO_MIGRATION_GET_DIRTY_PFNS
+> + *      Get bitmap of dirty pages from vendor driver from given start ad=
+dress.
+> + *      start_addr [Input] : start address
+> + *      pfn_count [Input] : Total pfn count from start_addr for which di=
+rty
+> + *          bitmap is requested
+> + *      dirty_bitmap [Output] : bitmap memory allocated by user space
+> + *           application, vendor driver should return the bitmap with bi=
+ts set
+> + *           only for pages to be marked dirty.
+> + * Return: 0 on success, -errno on failure.
+> + */
 > +
-> +#: Mapping of host arch names to target arch names.  It's expected that the
-> +#: arch identification on the host, using os.uname()[4], would return the
-> +#: key (LHS).  The QEMU target name, and consequently the target binary, would
-> +#: be based on the name on the value (RHS).
-> +HOST_TARGET_ARCH = {
-> +    'armeb': 'arm',
-> +    'aarch64_be': 'aarch64',
+> +struct vfio_device_migration_info {
+> +	__u32 argsz;
+> +	__u32 flags;
+> +#define VFIO_MIGRATION_PROBE            (1 << 0)
+> +#define VFIO_MIGRATION_GET_REGION       (1 << 1)
+> +#define VFIO_MIGRATION_SET_STATE        (1 << 2)
+> +#define VFIO_MIGRATION_GET_PENDING      (1 << 3)
+> +#define VFIO_MIGRATION_GET_BUFFER       (1 << 4)
+> +#define VFIO_MIGRATION_SET_BUFFER       (1 << 5)
+> +#define VFIO_MIGRATION_GET_DIRTY_PFNS   (1 << 6)
+> +        __u32 region_index;	            /* region index */
+> +        __u64 size;	                    /* size */
+> +        __u32 device_state;                 /* VFIO device state */
+> +        __u64 pending_precopy_only;
+> +        __u64 pending_compatible;
+> +        __u64 pending_postcopy_only;
+> +        __u64 threshold_size;
+> +        __u64 bytes_written;
+> +        __u64 start_addr;
+> +        __u64 pfn_count;
+> +	__u8  dirty_bitmap[];
+> +};
 
-Since you add this, I'd start directly with an exhaustive list:
+This feels like it should be separate types for the different calls.
 
-       'aarch64_be': {'arch': 'aarch64', 'endian': 'big', 'wordsize':
-64, 'abi' = 'arm'},
+Also, is there no state to tell the userspace what version of migration
+data we have?  What happens if I try and load a migration state
+=66rom an older driver into a newer one, or the other way around,
+or into a destination card that's not the same as the source.
 
-> +    'microblazeel': 'microblaze',
-> +    'mipsel': 'mips',
-> +    'mipsn32el' : 'mips64',
-> +    'mips64el': 'mips64',
-> +    'or1k': 'openrisc',
-> +    'ppc64le': 'ppc64',
-> +    'ppc64abi32': 'ppc64',
-> +    'riscv64': 'riscv',
-> +    'sh4eb': 'sh4',
-> +    'sparc32plus': 'sparc64',
-> +    'xtensaeb': 'xtensa'
-> +    }
+> +enum {
+> +    VFIO_DEVICE_STATE_NONE,
+> +    VFIO_DEVICE_STATE_RUNNING,
+> +    VFIO_DEVICE_STATE_MIGRATION_SETUP,
+> +    VFIO_DEVICE_STATE_MIGRATION_PRECOPY_ACTIVE,
+> +    VFIO_DEVICE_STATE_MIGRATION_STOPNCOPY_ACTIVE,
+> +    VFIO_DEVICE_STATE_MIGRATION_SAVE_COMPLETED,
+> +    VFIO_DEVICE_STATE_MIGRATION_RESUME,
+> +    VFIO_DEVICE_STATE_MIGRATION_RESUME_COMPLETED,
+> +    VFIO_DEVICE_STATE_MIGRATION_FAILED,
+> +    VFIO_DEVICE_STATE_MIGRATION_CANCELLED,
+> +};
 
-Then a function such:
+That's an interesting merge of QEMU's run-state and it's migration
+state.
 
-def target_normalize(key, arch):
-    return table[arch][key]
+You probably need to define which transitions you take as legal.
+
+Dave
 
 > +
+> +#define VFIO_DEVICE_MIGRATION_INFO _IO(VFIO_TYPE, VFIO_BASE + 17)
 > +
->  def is_readable_executable_file(path):
->      return os.path.isfile(path) and os.access(path, os.R_OK | os.X_OK)
->  
-> @@ -29,6 +51,7 @@ def pick_default_qemu_bin():
->      directory or in the source tree root directory.
->      """
->      arch = os.uname()[4]
-> +    arch = HOST_TARGET_ARCH.get(arch, arch)
-
-       arch = target_normalize('arch', os.uname()[4])
-
->      qemu_bin_relative_path = os.path.join("%s-softmmu" % arch,
->                                            "qemu-system-%s" % arch)
->      if is_readable_executable_file(qemu_bin_relative_path):
-> 
-
-What do you think?
-
-Thanks,
-
-Phil.
+>  /* -------- API for Type1 VFIO IOMMU -------- */
+> =20
+>  /**
+> --=20
+> 2.7.0
+>=20
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
