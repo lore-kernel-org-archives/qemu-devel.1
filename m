@@ -1,13 +1,13 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38021)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38842)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gCaLF-0007If-2w
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 21:09:42 -0400
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gCaNj-00083z-Du
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 21:12:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gCaLD-000849-V2
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 21:09:41 -0400
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gCaNf-0001s3-Lw
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 21:12:14 -0400
 From: Peng Hao <peng.hao2@zte.com.cn>
-Date: Wed, 17 Oct 2018 17:20:49 +0800
-Message-Id: <1539768049-18154-1-git-send-email-peng.hao2@zte.com.cn>
+Date: Wed, 17 Oct 2018 17:23:27 +0800
+Message-Id: <1539768207-18209-1-git-send-email-peng.hao2@zte.com.cn>
 Subject: [Qemu-devel] [PATCH]  target/arm : add pvpanic mmio device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -18,9 +18,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, root <root@host121.localdomain>, Peng Hao <peng.hao2@zte.com.cn>
-
-From: root <root@host121.localdomain>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Peng Hao <peng.hao2@zte.com.cn>
 
 Add pvpanic mmio device that is similar to x86's pvpanic device.
 
