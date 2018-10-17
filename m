@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41344)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41398)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gCksf-0002bI-NF
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:24:58 -0400
+	(envelope-from <quintela@redhat.com>) id 1gCksm-0002fk-6d
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:25:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gCkse-00078Y-O9
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:24:53 -0400
-Received: from mail-lj1-x236.google.com ([2a00:1450:4864:20::236]:42577)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <artem.k.pisarenko@gmail.com>)
-	id 1gCkse-00077Y-GO
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:24:52 -0400
-Received: by mail-lj1-x236.google.com with SMTP id y71-v6so24116357lje.9
-	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 05:24:52 -0700 (PDT)
-From: Artem Pisarenko <artem.k.pisarenko@gmail.com>
-Date: Wed, 17 Oct 2018 18:23:02 +0600
-Message-Id: <4632b5a4c97dcf4ccdb11ec0c4fe3a26e792ffa6.1539778764.git.artem.k.pisarenko@gmail.com>
-In-Reply-To: <cover.1539778764.git.artem.k.pisarenko@gmail.com>
-References: <cover.1539778764.git.artem.k.pisarenko@gmail.com>
+	(envelope-from <quintela@redhat.com>) id 1gCksl-0007PL-Eg
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:25:00 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20181009132330.7549-2-berrange@redhat.com> ("Daniel
+	P. =?utf-8?Q?Berrang=C3=A9=22's?= message of "Tue, 9 Oct 2018 14:23:25
+	+0100")
+References: <20181009132330.7549-1-berrange@redhat.com>
+	<20181009132330.7549-2-berrange@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 17 Oct 2018 14:24:42 +0200
+Message-ID: <87tvlk92wl.fsf@trasno.org>
 MIME-Version: 1.0
-In-Reply-To: <cover.1539778764.git.artem.k.pisarenko@gmail.com>
-References: <cover.1539778764.git.artem.k.pisarenko@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 3/4] Fixes RTC bug with base datetime shifts
- in clock=vm
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 1/6] qemu-nbd: add support for
+ authorization of TLS clients
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,150 +27,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Artem Pisarenko <artem.k.pisarenko@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, libvir-list@redhat.com, Kevin Wolf <kwolf@redhat.com>, =?utf-8?Q?Marc-?= =?utf-8?Q?Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David
+	Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-This makes all current "-rtc" option parameters combinations produce fixed/unambiguous RTC timedate reference for hardware emulation frontends.
-It restores determinism of guest execution when used with clock=vm and specified base <datetime> value.
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+> From: "Daniel P. Berrange" <berrange@redhat.com>
+>
+> Currently any client which can complete the TLS handshake is able to use
+> the NBD server. The server admin can turn on the 'verify-peer' option
+> for the x509 creds to require the client to provide a x509 certificate.
+> This means the client will have to acquire a certificate from the CA
+> before they are permitted to use the NBD server. This is still a fairly
+> low bar to cross.
+>
+> This adds a '--tls-authz OBJECT-ID' option to the qemu-nbd command which
+> takes the ID of a previously added 'QAuthZ' object instance. This will
+> be used to validate the client's x509 distinguished name. Clients
+> failing the authorization check will not be permitted to use the NBD
+> server.
+>
+> For example to setup authorization that only allows connection from a cli=
+ent
+> whose x509 certificate distinguished name is
+>
+>    CN=3Dlaptop.example.com,O=3DExample Org,L=3DLondon,ST=3DLondon,C=3DGB
+>
+> use:
+>
+>   qemu-nbd --object tls-creds-x509,id=3Dtls0,dir=3D/home/berrange/qemutls=
+,\
+>                     endpoint=3Dserver,verify-peer=3Dyes \
+>            --object authz-simple,id=3Dauth0,identity=3DCN=3Dlaptop.exampl=
+e.com,,\
+>                     O=3DExample Org,,L=3DLondon,,ST=3DLondon,,C=3DGB \
+>            --tls-creds tls0 \
+>            --tls-authz authz0
+> 	   ....other qemu-nbd args...
+>
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 
-Buglink: https://bugs.launchpad.net/qemu/+bug/1797033
-Signed-off-by: Artem Pisarenko <artem.k.pisarenko@gmail.com>
----
- vl.c | 58 +++++++++++++++++++++++++++++++++++-----------------------
- 1 file changed, 35 insertions(+), 23 deletions(-)
-
-diff --git a/vl.c b/vl.c
-index 10c4275..78a8a68 100644
---- a/vl.c
-+++ b/vl.c
-@@ -152,8 +152,10 @@ static enum {
-     RTC_BASE_LOCALTIME,
-     RTC_BASE_DATETIME,
- } rtc_base_type = RTC_BASE_UTC;
--static int rtc_host_datetime_offset = -1; /* valid only for host rtc_clock and
--                                             rtc_base_type=RTC_BASE_DATETIME */
-+static time_t rtc_ref_start_datetime;
-+static int rtc_realtime_clock_offset; /* used only with QEMU_CLOCK_REALTIME */
-+static int rtc_host_datetime_offset = -1; /* valid & used only with
-+                                             RTC_BASE_DATETIME */
- QEMUClockType rtc_clock;
- int vga_interface_type = VGA_NONE;
- static DisplayOptions dpy;
-@@ -785,32 +787,42 @@ void qemu_system_vmstop_request(RunState state)
- }
- 
- /***********************************************************/
--/* real time host monotonic timer */
--
--static time_t qemu_timedate(void)
--{
--    return qemu_clock_get_ms(QEMU_CLOCK_HOST) / 1000;
--}
--
--/***********************************************************/
- /* RTC reference time/date access */
-+static time_t qemu_ref_timedate(void)
-+{
-+    time_t value = qemu_clock_get_ms(rtc_clock) / 1000;
-+    switch (rtc_clock) {
-+    case QEMU_CLOCK_REALTIME:
-+        value -= rtc_realtime_clock_offset;
-+        /* no break */
-+    case QEMU_CLOCK_VIRTUAL:
-+        value += rtc_ref_start_datetime;
-+        break;
-+    case QEMU_CLOCK_HOST:
-+        if (rtc_base_type == RTC_BASE_DATETIME) {
-+            value -= rtc_host_datetime_offset;
-+        }
-+        break;
-+    default:
-+        assert(0);
-+    }
-+    return value;
-+}
-+
- void qemu_get_timedate(struct tm *tm, int offset)
- {
--    time_t ti = qemu_timedate();
-+    time_t ti = qemu_ref_timedate();
- 
-     ti += offset;
- 
-     switch (rtc_base_type) {
-+    case RTC_BASE_DATETIME:
-     case RTC_BASE_UTC:
-         gmtime_r(&ti, tm);
-         break;
-     case RTC_BASE_LOCALTIME:
-         localtime_r(&ti, tm);
-         break;
--    case RTC_BASE_DATETIME:
--        ti -= rtc_host_datetime_offset;
--        gmtime_r(&ti, tm);
--        break;
-     }
- }
- 
-@@ -819,6 +831,7 @@ int qemu_timedate_diff(struct tm *tm)
-     time_t seconds;
- 
-     switch (rtc_base_type) {
-+    case RTC_BASE_DATETIME:
-     case RTC_BASE_UTC:
-         seconds = mktimegm(tm);
-         break;
-@@ -829,9 +842,6 @@ int qemu_timedate_diff(struct tm *tm)
-         seconds = mktime(&tmp);
-         break;
-     }
--    case RTC_BASE_DATETIME:
--        seconds = mktimegm(tm) + rtc_host_datetime_offset;
--        break;
-     default:
-         /* gcc complains: ‘seconds’ may be used uninitialized */
-         g_assert_not_reached();
-@@ -839,10 +849,10 @@ int qemu_timedate_diff(struct tm *tm)
-         break;
-     }
- 
--    return seconds - qemu_timedate();
-+    return seconds - qemu_ref_timedate();
- }
- 
--static void configure_rtc_host_datetime_offset(const char *startdate)
-+static void configure_rtc_base_datetime(const char *startdate)
- {
-     time_t rtc_start_datetime;
-     struct tm tm;
-@@ -868,8 +878,8 @@ static void configure_rtc_host_datetime_offset(const char *startdate)
-                      "'2006-06-17T16:01:21' or '2006-06-17'\n");
-         exit(1);
-     }
--    rtc_host_datetime_offset = (qemu_clock_get_ms(QEMU_CLOCK_HOST) / 1000)
--                               - rtc_start_datetime;
-+    rtc_host_datetime_offset = rtc_ref_start_datetime - rtc_start_datetime;
-+    rtc_ref_start_datetime = rtc_start_datetime;
- }
- 
- static void configure_rtc(QemuOpts *opts)
-@@ -888,7 +898,7 @@ static void configure_rtc(QemuOpts *opts)
-             replay_add_blocker(blocker);
-         } else {
-             rtc_base_type = RTC_BASE_DATETIME;
--            configure_rtc_host_datetime_offset(value);
-+            configure_rtc_base_datetime(value);
-         }
-     }
-     value = qemu_opt_get(opts, "clock");
-@@ -3039,6 +3049,8 @@ int main(int argc, char **argv, char **envp)
-         exit(1);
-     }
-     rtc_clock = QEMU_CLOCK_HOST;
-+    rtc_ref_start_datetime = qemu_clock_get_ms(QEMU_CLOCK_HOST) / 1000;
-+    rtc_realtime_clock_offset = qemu_clock_get_ms(QEMU_CLOCK_REALTIME) / 1000;
- 
-     QLIST_INIT (&vm_change_state_head);
-     os_setup_early_signal_handling();
--- 
-2.7.4
+Reviewed-by: Juan Quintela <quintela@redhat.com>
