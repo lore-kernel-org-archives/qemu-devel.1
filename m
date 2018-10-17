@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59667)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gCqwg-0006FE-IR
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 14:53:29 -0400
+	(envelope-from <crosa@redhat.com>) id 1gCr8i-0000Jz-Ho
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:05:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gCqwf-00040C-I1
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 14:53:26 -0400
-References: <20181017164200.22344-1-kwolf@redhat.com>
-	<20181017164200.22344-4-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d7cef744-9dee-1445-b219-b01404051543@redhat.com>
-Date: Wed, 17 Oct 2018 13:53:13 -0500
+	(envelope-from <crosa@redhat.com>) id 1gCr8c-000176-59
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:05:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51806)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gCr8b-00016o-SC
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:05:46 -0400
+References: <20181016232201.16829-1-crosa@redhat.com>
+	<CAFEAcA_KFOay7zBoYMSqqEYd0ZhTcW5wp3bs28cr=oK4W4FL3A@mail.gmail.com>
+	<20181017162944.GF31060@habkost.net>
+	<d5f32475-df5b-0c5c-591f-5fae8e641c11@redhat.com>
+	<CAFEAcA_gyQvmq48QquNiFhGef-FWPeDKRUSk3wf7hS=_=xm_XQ@mail.gmail.com>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <a53d1784-f947-501b-5589-07b611800959@redhat.com>
+Date: Wed, 17 Oct 2018 15:05:38 -0400
 MIME-Version: 1.0
-In-Reply-To: <20181017164200.22344-4-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <CAFEAcA_gyQvmq48QquNiFhGef-FWPeDKRUSk3wf7hS=_=xm_XQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 3/9] block: Require auto-read-only for
- existing fallbacks
+Subject: Re: [Qemu-devel] [PATCH] Acceptance tests: host arch to target arch
+ name mapping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,68 +32,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Caio Carrara <ccarrara@redhat.com>
 
-On 10/17/18 11:41 AM, Kevin Wolf wrote:
-> Some block drivers have traditionally changed their node to read-only
-> mode without asking the user. This behaviour has been marked deprecated
-> since 2.11, expecting users to provide an explicit read-only=on option.
+
+
+On 10/17/18 2:40 PM, Peter Maydell wrote:
+> On 17 October 2018 at 18:38, Cleber Rosa <crosa@redhat.com> wrote:
+>>
+>>
+>> On 10/17/18 12:29 PM, Eduardo Habkost wrote:
+>>> On Wed, Oct 17, 2018 at 01:34:41PM +0100, Peter Maydell wrote:
+>>>> So, why does the test code need to care? It's not clear
+>>>> from the patch... My expectation would be that you'd
+>>>> just test all the testable target architectures,
+>>>> regardless of what the host architecture is.
+>>>
+>>> I tend to agree.  Maybe the right solution is to get rid of the
+>>> os.uname().  I think the default should be testing all QEMU
+>>> binaries that were built, and the host architecture shouldn't
+>>> matter.
 > 
-> Now that we have auto-read-only=on, enable these drivers to make use of
-> the option.
+> Yes, looking at os.uname() also seems like an odd thing
+> for the tests to be doing here. The test framework
+> should be as far as possible host-architecture agnostic.
+> (For some of the KVM cases there probably is a need to
+> care, but those are exceptions, not the rule.)
 > 
-> This is the only use of bdrv_set_read_only(), so we can make it a bit
-> more specific and turn it into a bdrv_apply_auto_read_only() that is
-> more convenient for drivers to use.
+>> I'm in favor of exercising all built targets, but that seems to me to be
+>> on another layer, above the test themselves. This change is about the
+>> behavior of a test when not told about the target arch (and thus binary)
+>> it should use.
 > 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
+> At that level, I think the right answer is "tell the user
+> they need to specify the qemu executable they are trying to test".
+> In particular, there is no guarantee that the user has actually
+> built the executable for the target that corresponds to the
+> host, so it doesn't work to try to default to that anyway.
+> 
 
-> +/*
-> + * Called by a driver that can only provide a read-only image.
-> + *
-> + * Returns 0 if the node is already read-only or it could switch the node to
-> + * read-only because BDRV_O_AUTO_RDONLY is set.
-> + *
-> + * Returns -EACCES if the node is read-write and BDRV_O_AUTO_RDONLY is not set
-> + * or bdrv_can_set_read_only() forbids making the node read-only. If @errmsg
-> + * is not NULL, it is used as the error message for the Error object.
+I think your "right answer" is the ideal, but I'm afraid it's not
+practical.  For instance, look at how a qemu-iotest is run:
 
-Works for me.
+$ ./check 001
+QEMU          --
+"/tmp/qemu-build/tests/qemu-iotests/../../ppc64-softmmu/qemu-system-ppc64"
+-nodefaults -machine accel=qtest
+...
 
-> +++ b/block/rbd.c
-> @@ -780,16 +780,10 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
->       /* If we are using an rbd snapshot, we must be r/o, otherwise
->        * leave as-is */
->       if (s->snap != NULL) {
-> -        if (!bdrv_is_read_only(bs)) {
-> -            error_report("Opening rbd snapshots without an explicit "
-> -                         "read-only=on option is deprecated. Future versions "
-> -                         "will refuse to open the image instead of "
-> -                         "automatically marking the image read-only.");
-> -            r = bdrv_set_read_only(bs, true, &local_err);
-> -            if (r < 0) {
-> -                error_propagate(errp, local_err);
-> -                goto failed_open;
-> -            }
-> +        r = bdrv_apply_auto_read_only(bs, "rbd snapshots are read-only", errp);
-> +        if (r < 0) {
-> +            rbd_close(s->image);
-> +            goto failed_open;
+IIRC, you're suggesting that check SHOULD abort and require a QEMU
+binary.  The command line would then become something like:
 
-That rbd_close() is an independent bugfix.  Should probably be split to 
-a separate commit, or at a minimum called out in the commit message as 
-intentional.
+$ ./check --qemu-bin=../../ppc64-softmmut/qemu-system-ppc64 001
 
-Actually, is it really needed to prevent a leak, or does the existing 
-rados_shutdown() in failed_open already implicitly cover the actions of 
-rbd_close()?
+The rules that "check" uses for finding a "default" QEMU binary are a
+lot harder to describe (are "smarter") than the ones we currently have
+on the acceptance tests.  IMO some compromises like these are necessary,
+or else, tests may be run much much less than they could and should.
 
-With the RBD issue touched up,
-Reviewed-by: Eric Blake <eblake@redhat.com>
+When it comes to trying to run the acceptance tests without an existing
+QEMU binary built, the current behavior is to CANCEL the tests.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Regards,
+- Cleber.
+
+> thanks
+> -- PMM
+> 
