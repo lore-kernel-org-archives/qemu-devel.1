@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37809)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gCsuq-0000iO-9H
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 16:59:41 -0400
+	(envelope-from <kwankhede@nvidia.com>) id 1gCsvH-00015l-2Z
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 17:00:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gCsum-00035h-30
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 16:59:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46108)
+	(envelope-from <kwankhede@nvidia.com>) id 1gCsvD-0003PR-0p
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 17:00:07 -0400
+Received: from hqemgate14.nvidia.com ([216.228.121.143]:2749)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gCsul-000336-OP
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 16:59:35 -0400
-References: <20181016232201.16829-1-crosa@redhat.com>
-	<CAFEAcA_KFOay7zBoYMSqqEYd0ZhTcW5wp3bs28cr=oK4W4FL3A@mail.gmail.com>
-	<20181017162944.GF31060@habkost.net>
-	<d5f32475-df5b-0c5c-591f-5fae8e641c11@redhat.com>
-	<CAFEAcA_gyQvmq48QquNiFhGef-FWPeDKRUSk3wf7hS=_=xm_XQ@mail.gmail.com>
-	<20181017190951.GG31060@habkost.net>
-	<20181017204618.GB18379@kermit-br-ibm-com>
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <46beb9dd-d3b7-de7a-313c-523ce036949e@redhat.com>
-Date: Wed, 17 Oct 2018 16:59:25 -0400
+	(Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
+	id 1gCsvC-0003No-MY
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 17:00:02 -0400
+References: <1539713558-2453-1-git-send-email-kwankhede@nvidia.com>
+	<20181017104909.15ba95ff.cohuck@redhat.com>
+From: Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <437bc057-03e6-a74d-8281-697247ea1667@nvidia.com>
+Date: Thu, 18 Oct 2018 02:29:52 +0530
 MIME-Version: 1.0
-In-Reply-To: <20181017204618.GB18379@kermit-br-ibm-com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20181017104909.15ba95ff.cohuck@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] Acceptance tests: host arch to target arch
- name mapping
+Subject: Re: [Qemu-devel] [RFC PATCH v1 0/4] Add migration support for VFIO
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,94 +30,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Caio Carrara <ccarrara@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Wainer dos Santos Moschetta <wainersm@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: alex.williamson@redhat.com, cjia@nvidia.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, Halil Pasic <pasic@linux.ibm.com>, Tony Krowiak <akrowiak@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org
 
 
 
-On 10/17/18 4:46 PM, Murilo Opsfelder Araujo wrote:
-> On Wed, Oct 17, 2018 at 04:09:51PM -0300, Eduardo Habkost wrote:
->> On Wed, Oct 17, 2018 at 07:40:51PM +0100, Peter Maydell wrote:
->>> On 17 October 2018 at 18:38, Cleber Rosa <crosa@redhat.com> wrote:
->>>>
->>>>
->>>> On 10/17/18 12:29 PM, Eduardo Habkost wrote:
->>>>> On Wed, Oct 17, 2018 at 01:34:41PM +0100, Peter Maydell wrote:
->>>>>> So, why does the test code need to care? It's not clear
->>>>>> from the patch... My expectation would be that you'd
->>>>>> just test all the testable target architectures,
->>>>>> regardless of what the host architecture is.
->>>>>
->>>>> I tend to agree.  Maybe the right solution is to get rid of the
->>>>> os.uname().  I think the default should be testing all QEMU
->>>>> binaries that were built, and the host architecture shouldn't
->>>>> matter.
->>>
->>> Yes, looking at os.uname() also seems like an odd thing
->>> for the tests to be doing here. The test framework
->>> should be as far as possible host-architecture agnostic.
->>> (For some of the KVM cases there probably is a need to
->>> care, but those are exceptions, not the rule.)
->>>
->>>> I'm in favor of exercising all built targets, but that seems to me to be
->>>> on another layer, above the test themselves. This change is about the
->>>> behavior of a test when not told about the target arch (and thus binary)
->>>> it should use.
->>>
->>> At that level, I think the right answer is "tell the user
->>> they need to specify the qemu executable they are trying to test".
->>> In particular, there is no guarantee that the user has actually
->>> built the executable for the target that corresponds to the
->>> host, so it doesn't work to try to default to that anyway.
+On 10/17/2018 2:19 PM, Cornelia Huck wrote:
+> On Tue, 16 Oct 2018 23:42:34 +0530
+> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> 
+>> Add migration support for VFIO device
+> 
+> I'd love to take a deeper look at this; but sadly, I'm currently low on
+> spare time, and therefore will only add some general remarks.
+> 
+
+Thanks. Those would be really helpful to have common infrastructure that
+can be used across different types of vfio devices.
+
 >>
->> Agreed.  However, I don't see when exactly this message would be
->> triggered.  Cleber, on which use cases do you expect
->> pick_default_qemu_bin() to be called?
+>> This Patch set include patches as below:
+>> - Define KABI for VFIO device for migration support.
+>> - Generic migration functionality for VFIO device.
+>>   * This patch set adds functionality only for PCI devices, but can be
+>>     extended to other VFIO devices.
+> 
+> I've been thinking about how best to add migration to vfio-ccw; it
+> might be quite different from what we do for vfio-pci, but I hope that
+> we can still use some common infrastructure.
+> 
+> Basically, we probably need something like the following:
+> 
+> - Wait until outstanding channel programs are finished, and don't allow
+>   new ones. Don't report back to userspace (or maybe do; we just don't
+>   want to fence of too many new requests.)
+> - Collect subchannel and related state, copy it over. That probably
+>   fits in with the interface you're proposing.
+> - Re-setup on the other side and get going again. The problem here
+>   might be state that the vfio-ccw driver can't be aware of (like
+>   replaying storage server configurations). Maybe we can send CRWs
+>   (notifications) to the guest and leverage the existing suspend/resume
+>   driver code for channel devices.
+> 
+> For vfio-ap, I frankly have no idea how migration will work, given the
+> setup with the matrix device and the interesting information in the SIE
+> control blocks (but maybe it just can replay from the info in the
+> matrix device?) Keys etc. are likely to be the bigger problem here.
+> 
+> Cc:ing some s390 folks for awareness.
+> 
+>>   * Added all the basic functions required for pre-copy, stop-and-copy and
+>>     resume phases of migration.
+>>   * Added state change notifier and from that notifier function, VFIO
+>>     device's state changed is conveyed to VFIO vendor driver.
+> 
+> I assume that this will, in general, be transparent for the guest; but
+> maybe there'll be need for some interaction for special cases?
+
+Ideally, this should be transparent for the guest for live migration.
+Guest shouldn't see any functional change during live migration.
+
+Thanks,
+Kirti
+
+> 
+>>   * During save setup phase and resume/load setup phase, migration region
+>>     is queried from vendor driver and is mmaped by QEMU. This region is
+>>     used to read/write data from and to vendor driver.
+>>   * .save_live_pending, .save_live_iterate and .is_active_iterate are
+>>     implemented to use QEMU's functionality of iteration during pre-copy
+>>     phase.
+>>   * In .save_live_complete_precopy, that is in stop-and-copy phase,
+>>     iteration to read data from vendor driver is implemented till pending
+>>     bytes returned by vendor driver are not zero.
+>>   * .save_cleanup and .load_cleanup are implemented to unmap migration
+>>     region that was setup duing setup phase.
+>>   * Added function to get dirty pages bitmap from vendor driver.
+>> - Add vfio_listerner_log_sync to mark dirty pages.
+>> - Make VFIO PCI device migration capable.
 >>
->> In an ideal world, any testing runner/tool should be able to
->> automatically test all binaries by default.  Can Avocado help us
->> do that?  (If not, we could just do it inside a
->> ./tests/acceptance/run script).
+>> Thanks,
+>> Kirti
 >>
->> --
->> Eduardo
+>> Kirti Wankhede (4):
+>>   VFIO KABI for migration interface
+>>   Add migration functions for VFIO devices
+>>   Add vfio_listerner_log_sync to mark dirty pages
+>>   Make vfio-pci device migration capable.
 >>
-> 
-> Why don't we add a variants file to QEMU's tree listing all known possible paths
-> for QEMU binary that can result from a build?  For example:
-> 
->     $ cat tests/acceptance/variants
->     qemu_bin:
->         - ppc-softmmu/qemu-system-ppc
->         - ppc64-softmmu/qemu-system-ppc64
->         - x86_64-softmmu/qemu-system-x86_64
-> 
-
-That's possible, and even proposed on the "basic arch support" series.
-But this is a higher level question IMO (it exceeds the test boundaries).
-
-> Then avocado could multiplex these variants file and call ./tests/acceptance/run
-> for each value of qemu_bin.  `run` script could skip and return if $qemu_bin
-> doesn't exist.  This approach also allows user forcing a value of qemu_bin when
-> calling `run` manually, for example:
-> 
->     ./tests/acceptance/run --qemu_bin=/path/to/your/qemu-system-blah ...
-> 
-> This ./tests/acceptance/run can serve as an entry point to run all the tests.
-> If more parameters are considered mandatory in the future, the logic can be
-> placed there.
-> 
-
-I'm completely favorable to having extra scripts or make rules that
-define a standard "job" behavior.  In fact, I think we'll end up having
-many of those.  "make check-acceptance" is just the first one.
-
-But being able to running individual tests should still be possible, and
-easy IMO.
-
-Regards,
-- Cleber.
-
-> --
-> Murilo
+>>  hw/vfio/Makefile.objs         |   2 +-
+>>  hw/vfio/common.c              |  32 ++
+>>  hw/vfio/migration.c           | 716 ++++++++++++++++++++++++++++++++++++++++++
+>>  hw/vfio/pci.c                 |  13 +-
+>>  include/hw/vfio/vfio-common.h |  23 ++
+>>  linux-headers/linux/vfio.h    |  91 ++++++
+>>  6 files changed, 869 insertions(+), 8 deletions(-)
+>>  create mode 100644 hw/vfio/migration.c
+>>
 > 
