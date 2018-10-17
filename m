@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53423)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53476)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lhrazky@redhat.com>) id 1gCmvy-0001XL-Cj
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 10:36:29 -0400
+	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gCmw8-0001gV-Kj
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 10:36:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lhrazky@redhat.com>) id 1gCmvn-0007vk-DN
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 10:36:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45334)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lhrazky@redhat.com>) id 1gCmvm-0007uu-Vo
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 10:36:15 -0400
-From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Hr=C3=A1zk=C3=BD?= <lhrazky@redhat.com>
-Date: Wed, 17 Oct 2018 16:36:04 +0200
-Message-Id: <20181017143604.5194-3-lhrazky@redhat.com>
-In-Reply-To: <20181017143604.5194-1-lhrazky@redhat.com>
-References: <20181017143604.5194-1-lhrazky@redhat.com>
+	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gCmw2-00083I-9p
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 10:36:36 -0400
+Received: from mail-ot1-x329.google.com ([2607:f8b0:4864:20::329]:46658)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <artem.k.pisarenko@gmail.com>)
+	id 1gCmvy-00080b-Ep
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 10:36:28 -0400
+Received: by mail-ot1-x329.google.com with SMTP id o21so26360455otb.13
+	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 07:36:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <cover.1539778764.git.artem.k.pisarenko@gmail.com>
+	<cf52eb15927d5517f9d525f6541b366a5b898af3.1539778764.git.artem.k.pisarenko@gmail.com>
+	<d7c6680b-558b-a2a7-fff1-d0bef7338cb3@redhat.com>
+In-Reply-To: <d7c6680b-558b-a2a7-fff1-d0bef7338cb3@redhat.com>
+From: Artem Pisarenko <artem.k.pisarenko@gmail.com>
+Date: Wed, 17 Oct 2018 20:36:12 +0600
+Message-ID: <CANzW0mug0bWY_f3iwmtvrgr-5cFCBbyO4Qr3+GRZn31QM21ezg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC PATCH qemu v2 2/2] spice: set device address and
- device display ID in QXL interface
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] vl,
+ qapi: offset value calculation in RTC_CHANGE event reverted to
+ match behavior before #1797033 bugfix and documented
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,144 +33,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: spice-devel@lists.freedesktop.org, qemu-devel@nongnu.org
-Cc: kraxel@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Calls new SPICE QXL interface functions to set:
+I fixed them and ready to submit v3.
+Anything else ?
 
-* The hardware address of the graphics device represented by the QXL
-  interface (e.g. a PCI path):
-  spice_qxl_set_device_address(...)
+=D1=81=D1=80, 17 =D0=BE=D0=BA=D1=82. 2018 =D0=B3. =D0=B2 20:01, Eric Blake =
+<eblake@redhat.com>:
 
-* The device display IDs (the IDs of the device's monitors that belong
-  to this QXL interface):
-  spice_qxl_monitor_set_device_display_id(...)
-
-Signed-off-by: Luk=C3=A1=C5=A1 Hr=C3=A1zk=C3=BD <lhrazky@redhat.com>
----
- hw/display/qxl.c   |  8 ++++++++
- ui/spice-core.c    | 45 ++++++++++++++++++++++++++++++++++++++++++++-
- ui/spice-display.c |  5 +++++
- 3 files changed, 57 insertions(+), 1 deletion(-)
-
-diff --git a/hw/display/qxl.c b/hw/display/qxl.c
-index f608abc769..63144f42b4 100644
---- a/hw/display/qxl.c
-+++ b/hw/display/qxl.c
-@@ -2184,6 +2184,14 @@ static void qxl_realize_common(PCIQXLDevice *qxl, =
-Error **errp)
-                    SPICE_INTERFACE_QXL_MAJOR, SPICE_INTERFACE_QXL_MINOR)=
-;
-         return;
-     }
-+
-+#if SPICE_SERVER_VERSION >=3D 0x000e02 /* release 0.14.2 */
-+    // register all possible device display IDs to SPICE server
-+    for (int i =3D 0; i < qxl->max_outputs; ++i) {
-+        spice_qxl_monitor_set_device_display_id(&qxl->ssd.qxl, i, i);
-+    }
-+#endif
-+
-     qemu_add_vm_change_state_handler(qxl_vm_change_state_handler, qxl);
-=20
-     qxl->update_irq =3D qemu_bh_new(qxl_update_irq_bh, qxl);
-diff --git a/ui/spice-core.c b/ui/spice-core.c
-index a4fbbc3898..2e01beea03 100644
---- a/ui/spice-core.c
-+++ b/ui/spice-core.c
-@@ -35,6 +35,8 @@
- #include "qemu/option.h"
- #include "migration/misc.h"
- #include "hw/hw.h"
-+#include "hw/pci/pci.h"
-+#include "hw/pci/pci_bus.h"
- #include "ui/spice-display.h"
-=20
- /* core bits */
-@@ -871,6 +873,26 @@ bool qemu_spice_have_display_interface(QemuConsole *=
-con)
-     return false;
- }
-=20
-+/*
-+ * Recursively (in reverse order) appends addresses of PCI devices as it=
- moves
-+ * up in the PCI hierarchy.
-+ *
-+ * @returns true on success, false when the buffer wasn't large enough
-+ */
-+static bool append_pci_address_recursive(char *buf, size_t buf_size, con=
-st PCIDevice *pci)
-+{
-+    PCIBus *bus =3D pci_get_bus(pci);
-+    if (!pci_bus_is_root(bus)) {
-+        append_pci_address_recursive(buf, buf_size, bus->parent_dev);
-+    }
-+
-+    size_t len =3D strlen(buf);
-+    size_t written =3D snprintf(buf + len, buf_size - len, "/%02x.%x",
-+        PCI_SLOT(pci->devfn), PCI_FUNC(pci->devfn));
-+
-+    return written > 0 && written < buf_size - len;
-+}
-+
- int qemu_spice_add_display_interface(QXLInstance *qxlin, QemuConsole *co=
-n)
- {
-     if (g_slist_find(spice_consoles, con)) {
-@@ -878,7 +900,28 @@ int qemu_spice_add_display_interface(QXLInstance *qx=
-lin, QemuConsole *con)
-     }
-     qxlin->id =3D qemu_console_get_index(con);
-     spice_consoles =3D g_slist_append(spice_consoles, con);
--    return qemu_spice_add_interface(&qxlin->base);
-+    int res =3D qemu_spice_add_interface(&qxlin->base);
-+
-+#if SPICE_SERVER_VERSION >=3D 0x000e02 /* release 0.14.2 */
-+    DeviceState *dev =3D DEVICE(object_property_get_link(OBJECT(con), "d=
-evice", &error_abort));
-+    PCIDevice *pci =3D (PCIDevice *) object_dynamic_cast(OBJECT(dev), TY=
-PE_PCI_DEVICE);
-+
-+    if (pci =3D=3D NULL) {
-+        warn_report("Setting PCI path of a display device to SPICE: Not =
-a PCI device.");
-+        return res;
-+    }
-+
-+    char device_path[128] =3D "pci/0000";  // hardcoded PCI domain 0000
-+    if (!append_pci_address_recursive(device_path, sizeof(device_path), =
-pci)) {
-+        warn_report("Setting PCI path of a display device to SPICE: "
-+            "Too many PCI devices in the chain.");
-+        return res;
-+    }
-+
-+    spice_qxl_set_device_address(qxlin, device_path);
-+#endif
-+
-+    return res;
- }
-=20
- static int qemu_spice_set_ticket(bool fail_if_conn, bool disconnect_if_c=
-onn)
-diff --git a/ui/spice-display.c b/ui/spice-display.c
-index 2f8adb6b9f..f620750803 100644
---- a/ui/spice-display.c
-+++ b/ui/spice-display.c
-@@ -1129,6 +1129,11 @@ static void qemu_spice_display_init_one(QemuConsol=
-e *con)
-=20
-     ssd->qxl.base.sif =3D &dpy_interface.base;
-     qemu_spice_add_display_interface(&ssd->qxl, con);
-+
-+#if SPICE_SERVER_VERSION >=3D 0x000e02 /* release 0.14.2 */
-+    spice_qxl_monitor_set_device_display_id(&ssd->qxl, 0, qemu_console_g=
-et_head(con));
-+#endif
-+
-     qemu_spice_create_host_memslot(ssd);
-=20
-     register_displaychangelistener(&ssd->dcl);
+> On 10/17/18 7:23 AM, Artem Pisarenko wrote:
+> > Return value of qemu_timedate_diff(), used for calculation offset in
+> QAPI 'RTC_CHANGE' event restored to keep compatibility, although it isn't
+> documented that difference is relative to host clock advancement.
+> > Added important note to 'RTC_CHANGE' event description to highlight
+> established implementation specifics.
+> >
+>
+> Hmm, I just replied to v1 before seeing that you sent v2; my comments
+> about long lines and a typo still apply.
+>
+> > Signed-off-by: Artem Pisarenko <artem.k.pisarenko@gmail.com>
+> > ---
+> >   qapi/misc.json |  3 ++-
+> >   vl.c           | 10 +++++-----
+> >   2 files changed, 7 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/qapi/misc.json b/qapi/misc.json
+> > index ada9af5..ed866f2 100644
+> > --- a/qapi/misc.json
+> > +++ b/qapi/misc.json
+> > @@ -3070,7 +3070,8 @@
+> >   # Emitted when the guest changes the RTC time.
+> >   #
+> >   # @offset: offset between base RTC clock (as specified by -rtc base),
+> and
+> > -#          new RTC clock value
+> > +#          new RTC clock value. Note that value will be different
+> depending
+> > +#          on clock choosen to drive RTC (specified by -rtc clock).
+> --
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266 <(919)%20301-3266>
+> Virtualization:  qemu.org | libvirt.org
+>
 --=20
-2.19.1
+
+=D0=A1 =D1=83=D0=B2=D0=B0=D0=B6=D0=B5=D0=BD=D0=B8=D0=B5=D0=BC,
+  =D0=90=D1=80=D1=82=D0=B5=D0=BC =D0=9F=D0=B8=D1=81=D0=B0=D1=80=D0=B5=D0=BD=
+=D0=BA=D0=BE
