@@ -1,27 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37934)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwankhede@nvidia.com>) id 1gCsvH-00015l-2Z
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 17:00:12 -0400
+	(envelope-from <ppandit@redhat.com>) id 1gCswE-0001tl-47
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 17:01:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwankhede@nvidia.com>) id 1gCsvD-0003PR-0p
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 17:00:07 -0400
-Received: from hqemgate14.nvidia.com ([216.228.121.143]:2749)
+	(envelope-from <ppandit@redhat.com>) id 1gCsw7-00046Y-3Y
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 17:01:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41346)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
-	id 1gCsvC-0003No-MY
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 17:00:02 -0400
-References: <1539713558-2453-1-git-send-email-kwankhede@nvidia.com>
-	<20181017104909.15ba95ff.cohuck@redhat.com>
-From: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <437bc057-03e6-a74d-8281-697247ea1667@nvidia.com>
-Date: Thu, 18 Oct 2018 02:29:52 +0530
-MIME-Version: 1.0
-In-Reply-To: <20181017104909.15ba95ff.cohuck@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH v1 0/4] Add migration support for VFIO
- device
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gCsw6-00043C-Jm
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 17:00:58 -0400
+From: P J P <ppandit@redhat.com>
+Date: Thu, 18 Oct 2018 02:28:48 +0530
+Message-Id: <20181017205848.2525-1-ppandit@redhat.com>
+Subject: [Qemu-devel] [PATCH] bt: use size_t type for length parameters
+ instead of signed int
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,101 +22,722 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: alex.williamson@redhat.com, cjia@nvidia.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, Halil Pasic <pasic@linux.ibm.com>, Tony Krowiak <akrowiak@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Arash TC <tohidi.arash@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Philippe Mathieu Daude <pmathieu@redhat.com>, Prasad J Pandit <pjp@fedoraproject.org>
 
+From: Prasad J Pandit <pjp@fedoraproject.org>
 
+The length parameter values are not negative, thus use an unsigned
+type 'size_t' for them. Many routines pass 'len' values to memcpy(3)
+calls. If it was negative, it could lead to memory corruption issues.
 
-On 10/17/2018 2:19 PM, Cornelia Huck wrote:
-> On Tue, 16 Oct 2018 23:42:34 +0530
-> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> 
->> Add migration support for VFIO device
-> 
-> I'd love to take a deeper look at this; but sadly, I'm currently low on
-> spare time, and therefore will only add some general remarks.
-> 
+Reported-by: Arash TC <tohidi.arash@gmail.com>
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+---
+ bt-host.c              |  6 ++---
+ bt-vhci.c              |  4 +--
+ hw/bt/core.c           |  2 +-
+ hw/bt/hci-csr.c        | 16 ++++++------
+ hw/bt/hci.c            | 38 ++++++++++++++--------------
+ hw/bt/hid.c            |  8 +++---
+ hw/bt/l2cap.c          | 56 ++++++++++++++++++++++--------------------
+ hw/bt/sdp.c            |  6 ++---
+ hw/usb/dev-bluetooth.c |  6 ++---
+ include/hw/bt.h        |  8 +++---
+ include/sysemu/bt.h    | 10 ++++----
+ 11 files changed, 81 insertions(+), 79 deletions(-)
 
-Thanks. Those would be really helpful to have common infrastructure that
-can be used across different types of vfio devices.
+This change is similar to
+  -> https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg02402.html
 
->>
->> This Patch set include patches as below:
->> - Define KABI for VFIO device for migration support.
->> - Generic migration functionality for VFIO device.
->>   * This patch set adds functionality only for PCI devices, but can be
->>     extended to other VFIO devices.
-> 
-> I've been thinking about how best to add migration to vfio-ccw; it
-> might be quite different from what we do for vfio-pci, but I hope that
-> we can still use some common infrastructure.
-> 
-> Basically, we probably need something like the following:
-> 
-> - Wait until outstanding channel programs are finished, and don't allow
->   new ones. Don't report back to userspace (or maybe do; we just don't
->   want to fence of too many new requests.)
-> - Collect subchannel and related state, copy it over. That probably
->   fits in with the interface you're proposing.
-> - Re-setup on the other side and get going again. The problem here
->   might be state that the vfio-ccw driver can't be aware of (like
->   replaying storage server configurations). Maybe we can send CRWs
->   (notifications) to the guest and leverage the existing suspend/resume
->   driver code for channel devices.
-> 
-> For vfio-ap, I frankly have no idea how migration will work, given the
-> setup with the matrix device and the interesting information in the SIE
-> control blocks (but maybe it just can replay from the info in the
-> matrix device?) Keys etc. are likely to be the bigger problem here.
-> 
-> Cc:ing some s390 folks for awareness.
-> 
->>   * Added all the basic functions required for pre-copy, stop-and-copy and
->>     resume phases of migration.
->>   * Added state change notifier and from that notifier function, VFIO
->>     device's state changed is conveyed to VFIO vendor driver.
-> 
-> I assume that this will, in general, be transparent for the guest; but
-> maybe there'll be need for some interaction for special cases?
-
-Ideally, this should be transparent for the guest for live migration.
-Guest shouldn't see any functional change during live migration.
-
-Thanks,
-Kirti
-
-> 
->>   * During save setup phase and resume/load setup phase, migration region
->>     is queried from vendor driver and is mmaped by QEMU. This region is
->>     used to read/write data from and to vendor driver.
->>   * .save_live_pending, .save_live_iterate and .is_active_iterate are
->>     implemented to use QEMU's functionality of iteration during pre-copy
->>     phase.
->>   * In .save_live_complete_precopy, that is in stop-and-copy phase,
->>     iteration to read data from vendor driver is implemented till pending
->>     bytes returned by vendor driver are not zero.
->>   * .save_cleanup and .load_cleanup are implemented to unmap migration
->>     region that was setup duing setup phase.
->>   * Added function to get dirty pages bitmap from vendor driver.
->> - Add vfio_listerner_log_sync to mark dirty pages.
->> - Make VFIO PCI device migration capable.
->>
->> Thanks,
->> Kirti
->>
->> Kirti Wankhede (4):
->>   VFIO KABI for migration interface
->>   Add migration functions for VFIO devices
->>   Add vfio_listerner_log_sync to mark dirty pages
->>   Make vfio-pci device migration capable.
->>
->>  hw/vfio/Makefile.objs         |   2 +-
->>  hw/vfio/common.c              |  32 ++
->>  hw/vfio/migration.c           | 716 ++++++++++++++++++++++++++++++++++++++++++
->>  hw/vfio/pci.c                 |  13 +-
->>  include/hw/vfio/vfio-common.h |  23 ++
->>  linux-headers/linux/vfio.h    |  91 ++++++
->>  6 files changed, 869 insertions(+), 8 deletions(-)
->>  create mode 100644 hw/vfio/migration.c
->>
-> 
+diff --git a/bt-host.c b/bt-host.c
+index 2f8f631c25..9a3e3e4d2a 100644
+--- a/bt-host.c
++++ b/bt-host.c
+@@ -63,17 +63,17 @@ static void bt_host_send(struct HCIInfo *hci,
+     }
+ }
+ 
+-static void bt_host_cmd(struct HCIInfo *hci, const uint8_t *data, int len)
++static void bt_host_cmd(struct HCIInfo *hci, const uint8_t *data, size_t len)
+ {
+     bt_host_send(hci, HCI_COMMAND_PKT, data, len);
+ }
+ 
+-static void bt_host_acl(struct HCIInfo *hci, const uint8_t *data, int len)
++static void bt_host_acl(struct HCIInfo *hci, const uint8_t *data, size_t len)
+ {
+     bt_host_send(hci, HCI_ACLDATA_PKT, data, len);
+ }
+ 
+-static void bt_host_sco(struct HCIInfo *hci, const uint8_t *data, int len)
++static void bt_host_sco(struct HCIInfo *hci, const uint8_t *data, size_t len)
+ {
+     bt_host_send(hci, HCI_SCODATA_PKT, data, len);
+ }
+diff --git a/bt-vhci.c b/bt-vhci.c
+index 9d277c32bf..534c4ed209 100644
+--- a/bt-vhci.c
++++ b/bt-vhci.c
+@@ -125,13 +125,13 @@ static void vhci_host_send(void *opaque,
+ }
+ 
+ static void vhci_out_hci_packet_event(void *opaque,
+-                const uint8_t *data, int len)
++                const uint8_t *data, size_t len)
+ {
+     vhci_host_send(opaque, HCI_EVENT_PKT, data, len);
+ }
+ 
+ static void vhci_out_hci_packet_acl(void *opaque,
+-                const uint8_t *data, int len)
++                const uint8_t *data, size_t len)
+ {
+     vhci_host_send(opaque, HCI_ACLDATA_PKT, data, len);
+ }
+diff --git a/hw/bt/core.c b/hw/bt/core.c
+index 78370e64f5..62720d1663 100644
+--- a/hw/bt/core.c
++++ b/hw/bt/core.c
+@@ -45,7 +45,7 @@ static void bt_dummy_lmp_disconnect_master(struct bt_link_s *link)
+ }
+ 
+ static void bt_dummy_lmp_acl_resp(struct bt_link_s *link,
+-                const uint8_t *data, int start, int len)
++                const uint8_t *data, int start, size_t len)
+ {
+     error_report("%s: stray ACL response PDU, fixme", __func__);
+     exit(-1);
+diff --git a/hw/bt/hci-csr.c b/hw/bt/hci-csr.c
+index 0341ded50c..c90e5d3dc4 100644
+--- a/hw/bt/hci-csr.c
++++ b/hw/bt/hci-csr.c
+@@ -103,7 +103,7 @@ static inline void csrhci_fifo_wake(struct csrhci_s *s)
+ }
+ 
+ #define csrhci_out_packetz(s, len) memset(csrhci_out_packet(s, len), 0, len)
+-static uint8_t *csrhci_out_packet(struct csrhci_s *s, int len)
++static uint8_t *csrhci_out_packet(struct csrhci_s *s, size_t len)
+ {
+     int off = s->out_start + s->out_len;
+ 
+@@ -112,14 +112,14 @@ static uint8_t *csrhci_out_packet(struct csrhci_s *s, int len)
+ 
+     if (off < FIFO_LEN) {
+         if (off + len > FIFO_LEN && (s->out_size = off + len) > FIFO_LEN * 2) {
+-            error_report("%s: can't alloc %i bytes", __func__, len);
++            error_report("%s: can't alloc %zu bytes", __func__, len);
+             exit(-1);
+         }
+         return s->outfifo + off;
+     }
+ 
+     if (s->out_len > s->out_size) {
+-        error_report("%s: can't alloc %i bytes", __func__, len);
++        error_report("%s: can't alloc %zu bytes", __func__, len);
+         exit(-1);
+     }
+ 
+@@ -127,7 +127,7 @@ static uint8_t *csrhci_out_packet(struct csrhci_s *s, int len)
+ }
+ 
+ static inline uint8_t *csrhci_out_packet_csr(struct csrhci_s *s,
+-                int type, int len)
++                int type, size_t len)
+ {
+     uint8_t *ret = csrhci_out_packetz(s, len + 2);
+ 
+@@ -138,7 +138,7 @@ static inline uint8_t *csrhci_out_packet_csr(struct csrhci_s *s,
+ }
+ 
+ static inline uint8_t *csrhci_out_packet_event(struct csrhci_s *s,
+-                int evt, int len)
++                int evt, size_t len)
+ {
+     uint8_t *ret = csrhci_out_packetz(s,
+                     len + 1 + sizeof(struct hci_event_hdr));
+@@ -151,7 +151,7 @@ static inline uint8_t *csrhci_out_packet_event(struct csrhci_s *s,
+ }
+ 
+ static void csrhci_in_packet_vendor(struct csrhci_s *s, int ocf,
+-                uint8_t *data, int len)
++                uint8_t *data, size_t len)
+ {
+     int offset;
+     uint8_t *rpkt;
+@@ -363,7 +363,7 @@ static int csrhci_write(struct Chardev *chr,
+ }
+ 
+ static void csrhci_out_hci_packet_event(void *opaque,
+-                const uint8_t *data, int len)
++                const uint8_t *data, size_t len)
+ {
+     struct csrhci_s *s = (struct csrhci_s *) opaque;
+     uint8_t *pkt = csrhci_out_packet(s, (len + 2) & ~1);	/* Align */
+@@ -375,7 +375,7 @@ static void csrhci_out_hci_packet_event(void *opaque,
+ }
+ 
+ static void csrhci_out_hci_packet_acl(void *opaque,
+-                const uint8_t *data, int len)
++                const uint8_t *data, size_t len)
+ {
+     struct csrhci_s *s = (struct csrhci_s *) opaque;
+     uint8_t *pkt = csrhci_out_packet(s, (len + 2) & ~1);	/* Align */
+diff --git a/hw/bt/hci.c b/hw/bt/hci.c
+index c6b2cc1d48..c59ccc55b9 100644
+--- a/hw/bt/hci.c
++++ b/hw/bt/hci.c
+@@ -32,7 +32,7 @@
+ 
+ struct bt_hci_s {
+     uint8_t *(*evt_packet)(void *opaque);
+-    void (*evt_submit)(void *opaque, int len);
++    void (*evt_submit)(void *opaque, size_t len);
+     void *opaque;
+     uint8_t evt_buf[256];
+ 
+@@ -62,7 +62,7 @@ struct bt_hci_s {
+         struct bt_hci_master_link_s {
+             struct bt_link_s *link;
+             void (*lmp_acl_data)(struct bt_link_s *link,
+-                            const uint8_t *data, int start, int len);
++                            const uint8_t *data, int start, size_t len);
+             QEMUTimer *acl_mode_timer;
+         } handle[HCI_HANDLES_MAX];
+         uint32_t role_bmp;
+@@ -434,7 +434,7 @@ static const uint8_t bt_event_reserved_mask[8] = {
+ };
+ 
+ 
+-static void null_hci_send(struct HCIInfo *hci, const uint8_t *data, int len)
++static void null_hci_send(struct HCIInfo *hci, const uint8_t *data, size_t len)
+ {
+ }
+ 
+@@ -452,13 +452,13 @@ struct HCIInfo null_hci = {
+ 
+ 
+ static inline uint8_t *bt_hci_event_start(struct bt_hci_s *hci,
+-                int evt, int len)
++                int evt, size_t len)
+ {
+     uint8_t *packet, mask;
+     int mask_byte;
+ 
+     if (len > 255) {
+-        error_report("%s: HCI event params too long (%ib)", __func__, len);
++        error_report("%s: HCI event params too long (%zub)", __func__, len);
+         exit(-1);
+     }
+ 
+@@ -475,7 +475,7 @@ static inline uint8_t *bt_hci_event_start(struct bt_hci_s *hci,
+ }
+ 
+ static inline void bt_hci_event(struct bt_hci_s *hci, int evt,
+-                void *params, int len)
++                void *params, size_t len)
+ {
+     uint8_t *packet = bt_hci_event_start(hci, evt, len);
+ 
+@@ -500,7 +500,7 @@ static inline void bt_hci_event_status(struct bt_hci_s *hci, int status)
+ }
+ 
+ static inline void bt_hci_event_complete(struct bt_hci_s *hci,
+-                void *ret, int len)
++                void *ret, size_t len)
+ {
+     uint8_t *packet = bt_hci_event_start(hci, EVT_CMD_COMPLETE,
+                     len + EVT_CMD_COMPLETE_SIZE);
+@@ -1477,7 +1477,7 @@ static inline void bt_hci_event_num_comp_pkts(struct bt_hci_s *hci,
+ }
+ 
+ static void bt_submit_hci(struct HCIInfo *info,
+-                const uint8_t *data, int length)
++                const uint8_t *data, size_t length)
+ {
+     struct bt_hci_s *hci = hci_from_info(info);
+     uint16_t cmd;
+@@ -1971,7 +1971,7 @@ static void bt_submit_hci(struct HCIInfo *info,
+         break;
+ 
+     short_hci:
+-        error_report("%s: HCI packet too short (%iB)", __func__, length);
++        error_report("%s: HCI packet too short (%zuB)", __func__, length);
+         bt_hci_event_status(hci, HCI_INVALID_PARAMETERS);
+         break;
+     }
+@@ -1982,7 +1982,7 @@ static void bt_submit_hci(struct HCIInfo *info,
+  * know that a packet contained the last fragment of the SDU when the next
+  * SDU starts.  */
+ static inline void bt_hci_lmp_acl_data(struct bt_hci_s *hci, uint16_t handle,
+-                const uint8_t *data, int start, int len)
++                const uint8_t *data, int start, size_t len)
+ {
+     struct hci_acl_hdr *pkt = (void *) hci->acl_buf;
+ 
+@@ -1990,7 +1990,7 @@ static inline void bt_hci_lmp_acl_data(struct bt_hci_s *hci, uint16_t handle,
+     /* TODO: avoid memcpy'ing */
+ 
+     if (len + HCI_ACL_HDR_SIZE > sizeof(hci->acl_buf)) {
+-        error_report("%s: can't take ACL packets %i bytes long",
++        error_report("%s: can't take ACL packets %zu bytes long",
+                      __func__, len);
+         return;
+     }
+@@ -2004,7 +2004,7 @@ static inline void bt_hci_lmp_acl_data(struct bt_hci_s *hci, uint16_t handle,
+ }
+ 
+ static void bt_hci_lmp_acl_data_slave(struct bt_link_s *btlink,
+-                const uint8_t *data, int start, int len)
++                const uint8_t *data, int start, size_t len)
+ {
+     struct bt_hci_link_s *link = (struct bt_hci_link_s *) btlink;
+ 
+@@ -2013,14 +2013,14 @@ static void bt_hci_lmp_acl_data_slave(struct bt_link_s *btlink,
+ }
+ 
+ static void bt_hci_lmp_acl_data_host(struct bt_link_s *link,
+-                const uint8_t *data, int start, int len)
++                const uint8_t *data, int start, size_t len)
+ {
+     bt_hci_lmp_acl_data(hci_from_device(link->host),
+                     link->handle, data, start, len);
+ }
+ 
+ static void bt_submit_acl(struct HCIInfo *info,
+-                const uint8_t *data, int length)
++                const uint8_t *data, size_t length)
+ {
+     struct bt_hci_s *hci = hci_from_info(info);
+     uint16_t handle;
+@@ -2028,7 +2028,7 @@ static void bt_submit_acl(struct HCIInfo *info,
+     struct bt_link_s *link;
+ 
+     if (length < HCI_ACL_HDR_SIZE) {
+-        error_report("%s: ACL packet too short (%iB)", __func__, length);
++        error_report("%s: ACL packet too short (%zuB)", __func__, length);
+         return;
+     }
+ 
+@@ -2046,7 +2046,7 @@ static void bt_submit_acl(struct HCIInfo *info,
+     handle &= ~HCI_HANDLE_OFFSET;
+ 
+     if (datalen > length) {
+-        error_report("%s: ACL packet too short (%iB < %iB)",
++        error_report("%s: ACL packet too short (%zuB < %iB)",
+                      __func__, length, datalen);
+         return;
+     }
+@@ -2088,7 +2088,7 @@ static void bt_submit_acl(struct HCIInfo *info,
+ }
+ 
+ static void bt_submit_sco(struct HCIInfo *info,
+-                const uint8_t *data, int length)
++                const uint8_t *data, size_t length)
+ {
+     struct bt_hci_s *hci = hci_from_info(info);
+     uint16_t handle;
+@@ -2107,7 +2107,7 @@ static void bt_submit_sco(struct HCIInfo *info,
+     }
+ 
+     if (datalen > length) {
+-        error_report("%s: SCO packet too short (%iB < %iB)",
++        error_report("%s: SCO packet too short (%zuB < %iB)",
+                      __func__, length, datalen);
+         return;
+     }
+@@ -2128,7 +2128,7 @@ static uint8_t *bt_hci_evt_packet(void *opaque)
+     return s->evt_buf;
+ }
+ 
+-static void bt_hci_evt_submit(void *opaque, int len)
++static void bt_hci_evt_submit(void *opaque, size_t len)
+ {
+     /* TODO: notify upper layer */
+     struct bt_hci_s *s = opaque;
+diff --git a/hw/bt/hid.c b/hw/bt/hid.c
+index 056291f9b5..e19f13c456 100644
+--- a/hw/bt/hid.c
++++ b/hw/bt/hid.c
+@@ -169,7 +169,7 @@ static void bt_hid_disconnect(struct bt_hid_device_s *s)
+ }
+ 
+ static void bt_hid_send_data(struct bt_l2cap_conn_params_s *ch, int type,
+-                const uint8_t *data, int len)
++                const uint8_t *data, size_t len)
+ {
+     uint8_t *pkt, hdr = (BT_DATA << 4) | type;
+     int plen;
+@@ -190,7 +190,7 @@ static void bt_hid_send_data(struct bt_l2cap_conn_params_s *ch, int type,
+ }
+ 
+ static void bt_hid_control_transaction(struct bt_hid_device_s *s,
+-                const uint8_t *data, int len)
++                const uint8_t *data, size_t len)
+ {
+     uint8_t type, parameter;
+     int rlen, ret = -1;
+@@ -362,7 +362,7 @@ static void bt_hid_control_transaction(struct bt_hid_device_s *s,
+         bt_hid_send_handshake(s, ret);
+ }
+ 
+-static void bt_hid_control_sdu(void *opaque, const uint8_t *data, int len)
++static void bt_hid_control_sdu(void *opaque, const uint8_t *data, size_t len)
+ {
+     struct bt_hid_device_s *hid = opaque;
+ 
+@@ -388,7 +388,7 @@ static void bt_hid_datain(HIDState *hs)
+                         hid->datain.buffer, hid->datain.len);
+ }
+ 
+-static void bt_hid_interrupt_sdu(void *opaque, const uint8_t *data, int len)
++static void bt_hid_interrupt_sdu(void *opaque, const uint8_t *data, size_t len)
+ {
+     struct bt_hid_device_s *hid = opaque;
+ 
+diff --git a/hw/bt/l2cap.c b/hw/bt/l2cap.c
+index 9cf27f0df6..efd9a4b66a 100644
+--- a/hw/bt/l2cap.c
++++ b/hw/bt/l2cap.c
+@@ -32,10 +32,10 @@ struct l2cap_instance_s {
+     int role;
+ 
+     uint8_t frame_in[65535 + L2CAP_HDR_SIZE] __attribute__ ((aligned (4)));
+-    int frame_in_len;
++    uint32_t frame_in_len;
+ 
+     uint8_t frame_out[65535 + L2CAP_HDR_SIZE] __attribute__ ((aligned (4)));
+-    int frame_out_len;
++    uint32_t frame_out_len;
+ 
+     /* Signalling channel timers.  They exist per-request but we can make
+      * sure we have no more than one outstanding request at any time.  */
+@@ -49,7 +49,7 @@ struct l2cap_instance_s {
+         struct bt_l2cap_conn_params_s params;
+ 
+         void (*frame_in)(struct l2cap_chan_s *chan, uint16_t cid,
+-                        const l2cap_hdr *hdr, int len);
++                        const l2cap_hdr *hdr, size_t len);
+         int mps;
+         int min_mtu;
+ 
+@@ -68,7 +68,7 @@ struct l2cap_instance_s {
+ 
+         /* Only flow-controlled, connection-oriented channels */
+         uint8_t sdu[65536]; /* TODO: dynamically allocate */
+-        int len_cur, len_total;
++        uint32_t len_cur, len_total;
+         int rexmit;
+         int monitor_timeout;
+         QEMUTimer *monitor_timer;
+@@ -140,7 +140,7 @@ static const uint16_t l2cap_fcs16_table[256] = {
+     0x8201, 0x42c0, 0x4380, 0x8341, 0x4100, 0x81c1, 0x8081, 0x4040,
+ };
+ 
+-static uint16_t l2cap_fcs16(const uint8_t *message, int len)
++static uint16_t l2cap_fcs16(const uint8_t *message, size_t len)
+ {
+     uint16_t fcs = 0x0000;
+ 
+@@ -186,7 +186,7 @@ static void l2cap_monitor_timer_update(struct l2cap_chan_s *ch)
+ }
+ 
+ static void l2cap_command_reject(struct l2cap_instance_s *l2cap, int id,
+-                uint16_t reason, const void *data, int plen)
++                uint16_t reason, const void *data, size_t plen)
+ {
+     uint8_t *pkt;
+     l2cap_cmd_hdr *hdr;
+@@ -247,7 +247,7 @@ static void l2cap_connection_response(struct l2cap_instance_s *l2cap,
+ }
+ 
+ static void l2cap_configuration_request(struct l2cap_instance_s *l2cap,
+-                int dcid, int flag, const uint8_t *data, int len)
++                int dcid, int flag, const uint8_t *data, size_t len)
+ {
+     uint8_t *pkt;
+     l2cap_cmd_hdr *hdr;
+@@ -275,7 +275,7 @@ static void l2cap_configuration_request(struct l2cap_instance_s *l2cap,
+ }
+ 
+ static void l2cap_configuration_response(struct l2cap_instance_s *l2cap,
+-                int scid, int flag, int result, const uint8_t *data, int len)
++                int scid, int flag, int result, const uint8_t *data, size_t len)
+ {
+     uint8_t *pkt;
+     l2cap_cmd_hdr *hdr;
+@@ -322,7 +322,7 @@ static void l2cap_disconnection_response(struct l2cap_instance_s *l2cap,
+ }
+ 
+ static void l2cap_echo_response(struct l2cap_instance_s *l2cap,
+-                const uint8_t *data, int len)
++                const uint8_t *data, size_t len)
+ {
+     uint8_t *pkt;
+     l2cap_cmd_hdr *hdr;
+@@ -343,7 +343,7 @@ static void l2cap_echo_response(struct l2cap_instance_s *l2cap,
+ }
+ 
+ static void l2cap_info_response(struct l2cap_instance_s *l2cap, int type,
+-                int result, const uint8_t *data, int len)
++                int result, const uint8_t *data, size_t len)
+ {
+     uint8_t *pkt;
+     l2cap_cmd_hdr *hdr;
+@@ -366,16 +366,18 @@ static void l2cap_info_response(struct l2cap_instance_s *l2cap, int type,
+     l2cap->signalling_ch.params.sdu_submit(&l2cap->signalling_ch.params);
+ }
+ 
+-static uint8_t *l2cap_bframe_out(struct bt_l2cap_conn_params_s *parm, int len);
++static uint8_t *l2cap_bframe_out(struct bt_l2cap_conn_params_s *parm,
++                size_t len);
+ static void l2cap_bframe_submit(struct bt_l2cap_conn_params_s *parms);
+ #if 0
+-static uint8_t *l2cap_iframe_out(struct bt_l2cap_conn_params_s *parm, int len);
++static uint8_t *l2cap_iframe_out(struct bt_l2cap_conn_params_s *parm,
++                size_t len);
+ static void l2cap_iframe_submit(struct bt_l2cap_conn_params_s *parm);
+ #endif
+ static void l2cap_bframe_in(struct l2cap_chan_s *ch, uint16_t cid,
+-                const l2cap_hdr *hdr, int len);
++                const l2cap_hdr *hdr, size_t len);
+ static void l2cap_iframe_in(struct l2cap_chan_s *ch, uint16_t cid,
+-                const l2cap_hdr *hdr, int len);
++                const l2cap_hdr *hdr, size_t len);
+ 
+ static int l2cap_cid_new(struct l2cap_instance_s *l2cap)
+ {
+@@ -499,7 +501,7 @@ static void l2cap_channel_config_req_event(struct l2cap_instance_s *l2cap,
+ 
+ static int l2cap_channel_config(struct l2cap_instance_s *l2cap,
+                 struct l2cap_chan_s *ch, int flag,
+-                const uint8_t *data, int len)
++                const uint8_t *data, size_t len)
+ {
+     l2cap_conf_opt *opt;
+     l2cap_conf_opt_qos *qos;
+@@ -684,7 +686,7 @@ static int l2cap_channel_config(struct l2cap_instance_s *l2cap,
+ }
+ 
+ static void l2cap_channel_config_req_msg(struct l2cap_instance_s *l2cap,
+-                int flag, int cid, const uint8_t *data, int len)
++                int flag, int cid, const uint8_t *data, size_t len)
+ {
+     struct l2cap_chan_s *ch;
+ 
+@@ -716,7 +718,7 @@ static void l2cap_channel_config_req_msg(struct l2cap_instance_s *l2cap,
+ }
+ 
+ static int l2cap_channel_config_rsp_msg(struct l2cap_instance_s *l2cap,
+-                int result, int flag, int cid, const uint8_t *data, int len)
++                int result, int flag, int cid, const uint8_t *data, size_t len)
+ {
+     struct l2cap_chan_s *ch;
+ 
+@@ -784,7 +786,7 @@ static void l2cap_info(struct l2cap_instance_s *l2cap, int type)
+ }
+ 
+ static void l2cap_command(struct l2cap_instance_s *l2cap, int code, int id,
+-                const uint8_t *params, int len)
++                const uint8_t *params, size_t len)
+ {
+     int err;
+ 
+@@ -939,7 +941,7 @@ static void l2cap_rexmit_enable(struct l2cap_chan_s *ch, int enable)
+ }
+ 
+ /* Command frame SDU */
+-static void l2cap_cframe_in(void *opaque, const uint8_t *data, int len)
++static void l2cap_cframe_in(void *opaque, const uint8_t *data, size_t len)
+ {
+     struct l2cap_instance_s *l2cap = opaque;
+     const l2cap_cmd_hdr *hdr;
+@@ -967,7 +969,7 @@ static void l2cap_cframe_in(void *opaque, const uint8_t *data, int len)
+ }
+ 
+ /* Group frame SDU */
+-static void l2cap_gframe_in(void *opaque, const uint8_t *data, int len)
++static void l2cap_gframe_in(void *opaque, const uint8_t *data, size_t len)
+ {
+ }
+ 
+@@ -978,7 +980,7 @@ static void l2cap_sframe_in(struct l2cap_chan_s *ch, uint16_t ctrl)
+ 
+ /* Basic L2CAP mode Information frame */
+ static void l2cap_bframe_in(struct l2cap_chan_s *ch, uint16_t cid,
+-                const l2cap_hdr *hdr, int len)
++                const l2cap_hdr *hdr, size_t len)
+ {
+     /* We have a full SDU, no further processing */
+     ch->params.sdu_in(ch->params.opaque, hdr->data, len);
+@@ -986,7 +988,7 @@ static void l2cap_bframe_in(struct l2cap_chan_s *ch, uint16_t cid,
+ 
+ /* Flow Control and Retransmission mode frame */
+ static void l2cap_iframe_in(struct l2cap_chan_s *ch, uint16_t cid,
+-                const l2cap_hdr *hdr, int len)
++                const l2cap_hdr *hdr, size_t len)
+ {
+     uint16_t fcs = lduw_le_p(hdr->data + len - 2);
+ 
+@@ -1077,7 +1079,7 @@ static void l2cap_frame_in(struct l2cap_instance_s *l2cap,
+ 
+ /* "Recombination" */
+ static void l2cap_pdu_in(struct l2cap_instance_s *l2cap,
+-                const uint8_t *data, int len)
++                const uint8_t *data, size_t len)
+ {
+     const l2cap_hdr *hdr = (void *) l2cap->frame_in;
+ 
+@@ -1124,7 +1126,7 @@ static inline void l2cap_pdu_submit(struct l2cap_instance_s *l2cap)
+             (l2cap->link, l2cap->frame_out, 1, l2cap->frame_out_len);
+ }
+ 
+-static uint8_t *l2cap_bframe_out(struct bt_l2cap_conn_params_s *parm, int len)
++static uint8_t *l2cap_bframe_out(struct bt_l2cap_conn_params_s *parm, size_t len)
+ {
+     struct l2cap_chan_s *chan = (struct l2cap_chan_s *) parm;
+ 
+@@ -1147,7 +1149,7 @@ static void l2cap_bframe_submit(struct bt_l2cap_conn_params_s *parms)
+ 
+ #if 0
+ /* Stub: Only used if an emulated device requests outgoing flow control */
+-static uint8_t *l2cap_iframe_out(struct bt_l2cap_conn_params_s *parm, int len)
++static uint8_t *l2cap_iframe_out(struct bt_l2cap_conn_params_s *parm, size_t len)
+ {
+     struct l2cap_chan_s *chan = (struct l2cap_chan_s *) parm;
+ 
+@@ -1292,7 +1294,7 @@ static void l2cap_lmp_disconnect_slave(struct bt_link_s *link)
+ }
+ 
+ static void l2cap_lmp_acl_data_slave(struct bt_link_s *link,
+-                const uint8_t *data, int start, int len)
++                const uint8_t *data, int start, size_t len)
+ {
+     struct slave_l2cap_instance_s *l2cap =
+             (struct slave_l2cap_instance_s *) link;
+@@ -1305,7 +1307,7 @@ static void l2cap_lmp_acl_data_slave(struct bt_link_s *link,
+ 
+ /* Stub */
+ static void l2cap_lmp_acl_data_host(struct bt_link_s *link,
+-                const uint8_t *data, int start, int len)
++                const uint8_t *data, int start, size_t len)
+ {
+     struct bt_l2cap_device_s *dev = (struct bt_l2cap_device_s *) link->host;
+     struct l2cap_instance_s *l2cap =
+diff --git a/hw/bt/sdp.c b/hw/bt/sdp.c
+index f4aba9d74f..163d315874 100644
+--- a/hw/bt/sdp.c
++++ b/hw/bt/sdp.c
+@@ -497,7 +497,7 @@ static ssize_t sdp_svc_search_attr_get(struct bt_l2cap_sdp_state_s *sdp,
+     return end + 2;
+ }
+ 
+-static void bt_l2cap_sdp_sdu_in(void *opaque, const uint8_t *data, int len)
++static void bt_l2cap_sdp_sdu_in(void *opaque, const uint8_t *data, size_t len)
+ {
+     struct bt_l2cap_sdp_state_s *sdp = opaque;
+     enum bt_sdp_cmd pdu_id;
+@@ -507,7 +507,7 @@ static void bt_l2cap_sdp_sdu_in(void *opaque, const uint8_t *data, int len)
+     int rsp_len = 0;
+ 
+     if (len < 5) {
+-        error_report("%s: short SDP PDU (%iB).", __func__, len);
++        error_report("%s: short SDP PDU (%zuB).", __func__, len);
+         return;
+     }
+ 
+@@ -518,7 +518,7 @@ static void bt_l2cap_sdp_sdu_in(void *opaque, const uint8_t *data, int len)
+     len -= 5;
+ 
+     if (len != plen) {
+-        error_report("%s: wrong SDP PDU length (%iB != %iB).",
++        error_report("%s: wrong SDP PDU length (%iB != %zuB).",
+                         __func__, plen, len);
+         err = SDP_INVALID_PDU_SIZE;
+         goto respond;
+diff --git a/hw/usb/dev-bluetooth.c b/hw/usb/dev-bluetooth.c
+index eac7365b0a..40729210d2 100644
+--- a/hw/usb/dev-bluetooth.c
++++ b/hw/usb/dev-bluetooth.c
+@@ -319,7 +319,7 @@ static inline void usb_bt_fifo_dequeue(struct usb_hci_in_fifo_s *fifo,
+ 
+ static inline void usb_bt_fifo_out_enqueue(struct USBBtState *s,
+                 struct usb_hci_out_fifo_s *fifo,
+-                void (*send)(struct HCIInfo *, const uint8_t *, int),
++                void (*send)(struct HCIInfo *, const uint8_t *, size_t),
+                 int (*complete)(const uint8_t *, int),
+                 USBPacket *p)
+ {
+@@ -478,7 +478,7 @@ static void usb_bt_handle_data(USBDevice *dev, USBPacket *p)
+ }
+ 
+ static void usb_bt_out_hci_packet_event(void *opaque,
+-                const uint8_t *data, int len)
++                const uint8_t *data, size_t len)
+ {
+     struct USBBtState *s = (struct USBBtState *) opaque;
+ 
+@@ -489,7 +489,7 @@ static void usb_bt_out_hci_packet_event(void *opaque,
+ }
+ 
+ static void usb_bt_out_hci_packet_acl(void *opaque,
+-                const uint8_t *data, int len)
++                const uint8_t *data, size_t len)
+ {
+     struct USBBtState *s = (struct USBBtState *) opaque;
+ 
+diff --git a/include/hw/bt.h b/include/hw/bt.h
+index b5e11d4d43..bc362aa662 100644
+--- a/include/hw/bt.h
++++ b/include/hw/bt.h
+@@ -94,9 +94,9 @@ struct bt_device_s {
+     void (*lmp_disconnect_master)(struct bt_link_s *link);
+     void (*lmp_disconnect_slave)(struct bt_link_s *link);
+     void (*lmp_acl_data)(struct bt_link_s *link, const uint8_t *data,
+-                    int start, int len);
++                    int start, size_t len);
+     void (*lmp_acl_resp)(struct bt_link_s *link, const uint8_t *data,
+-                    int start, int len);
++                    int start, size_t len);
+     void (*lmp_mode_change)(struct bt_link_s *link);
+ 
+     void (*handle_destroy)(struct bt_device_s *device);
+@@ -148,12 +148,12 @@ struct bt_l2cap_device_s {
+ 
+ struct bt_l2cap_conn_params_s {
+     /* Input */
+-    uint8_t *(*sdu_out)(struct bt_l2cap_conn_params_s *chan, int len);
++    uint8_t *(*sdu_out)(struct bt_l2cap_conn_params_s *chan, size_t len);
+     void (*sdu_submit)(struct bt_l2cap_conn_params_s *chan);
+     int remote_mtu;
+     /* Output */
+     void *opaque;
+-    void (*sdu_in)(void *opaque, const uint8_t *data, int len);
++    void (*sdu_in)(void *opaque, const uint8_t *data, size_t len);
+     void (*close)(void *opaque);
+ };
+ 
+diff --git a/include/sysemu/bt.h b/include/sysemu/bt.h
+index ddb05cd109..db935c695d 100644
+--- a/include/sysemu/bt.h
++++ b/include/sysemu/bt.h
+@@ -5,12 +5,12 @@
+ 
+ struct HCIInfo {
+     int (*bdaddr_set)(struct HCIInfo *hci, const uint8_t *bd_addr);
+-    void (*cmd_send)(struct HCIInfo *hci, const uint8_t *data, int len);
+-    void (*sco_send)(struct HCIInfo *hci, const uint8_t *data, int len);
+-    void (*acl_send)(struct HCIInfo *hci, const uint8_t *data, int len);
++    void (*cmd_send)(struct HCIInfo *hci, const uint8_t *data, size_t len);
++    void (*sco_send)(struct HCIInfo *hci, const uint8_t *data, size_t len);
++    void (*acl_send)(struct HCIInfo *hci, const uint8_t *data, size_t len);
+     void *opaque;
+-    void (*evt_recv)(void *opaque, const uint8_t *data, int len);
+-    void (*acl_recv)(void *opaque, const uint8_t *data, int len);
++    void (*evt_recv)(void *opaque, const uint8_t *data, size_t len);
++    void (*acl_recv)(void *opaque, const uint8_t *data, size_t len);
+ };
+ 
+ /* bt-host.c */
+-- 
+2.17.2
