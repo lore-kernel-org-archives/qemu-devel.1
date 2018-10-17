@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41322)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41372)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gCkse-0002aC-8e
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:24:53 -0400
+	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gCksj-0002dY-2x
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:24:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gCksd-00077A-8m
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:24:52 -0400
-Received: from mail-lj1-x235.google.com ([2a00:1450:4864:20::235]:42576)
+	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gCksg-0007C1-6k
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:24:56 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:44703)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <artem.k.pisarenko@gmail.com>)
-	id 1gCksd-00076I-11
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:24:51 -0400
-Received: by mail-lj1-x235.google.com with SMTP id y71-v6so24116293lje.9
-	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 05:24:50 -0700 (PDT)
+	id 1gCksf-00079h-VF
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:24:54 -0400
+Received: by mail-lj1-x242.google.com with SMTP id v6-v6so24105813ljc.11
+	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 05:24:53 -0700 (PDT)
 From: Artem Pisarenko <artem.k.pisarenko@gmail.com>
-Date: Wed, 17 Oct 2018 18:23:01 +0600
-Message-Id: <670f9397a16efca2646f571e811d44c0cfc5599d.1539778764.git.artem.k.pisarenko@gmail.com>
+Date: Wed, 17 Oct 2018 18:23:03 +0600
+Message-Id: <cf52eb15927d5517f9d525f6541b366a5b898af3.1539778764.git.artem.k.pisarenko@gmail.com>
 In-Reply-To: <cover.1539778764.git.artem.k.pisarenko@gmail.com>
 References: <cover.1539778764.git.artem.k.pisarenko@gmail.com>
-MIME-Version: 1.0
 In-Reply-To: <cover.1539778764.git.artem.k.pisarenko@gmail.com>
 References: <cover.1539778764.git.artem.k.pisarenko@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 2/4] vl: refactor -rtc option references
+Subject: [Qemu-devel] [PATCH v2 4/4] vl,
+ qapi: offset value calculation in RTC_CHANGE event reverted to
+ match behavior before #1797033 bugfix and documented
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,167 +31,66 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Artem Pisarenko <artem.k.pisarenko@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Artem Pisarenko <artem.k.pisarenko@gmail.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Improve code readability and prepare for fixing bug #1797033
+Return value of qemu_timedate_diff(), used for calculation offset in QAPI 'RTC_CHANGE' event restored to keep compatibility, although it isn't documented that difference is relative to host clock advancement.
+Added important note to 'RTC_CHANGE' event description to highlight established implementation specifics.
 
 Signed-off-by: Artem Pisarenko <artem.k.pisarenko@gmail.com>
 ---
+ qapi/misc.json |  3 ++-
+ vl.c           | 10 +++++-----
+ 2 files changed, 7 insertions(+), 6 deletions(-)
 
-Notes:
-    v2: fixed compiler warning
-
- vl.c | 85 ++++++++++++++++++++++++++++++++++++++++++--------------------------
- 1 file changed, 53 insertions(+), 32 deletions(-)
-
+diff --git a/qapi/misc.json b/qapi/misc.json
+index ada9af5..ed866f2 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -3070,7 +3070,8 @@
+ # Emitted when the guest changes the RTC time.
+ #
+ # @offset: offset between base RTC clock (as specified by -rtc base), and
+-#          new RTC clock value
++#          new RTC clock value. Note that value will be different depending
++#          on clock choosen to drive RTC (specified by -rtc clock).
+ #
+ # Note: This event is rate-limited.
+ #
 diff --git a/vl.c b/vl.c
-index 4e25c78..10c4275 100644
+index 78a8a68..c350aba 100644
 --- a/vl.c
 +++ b/vl.c
-@@ -147,8 +147,13 @@ bool enable_cpu_pm = false;
- int nb_nics;
- NICInfo nd_table[MAX_NICS];
- int autostart;
--static int rtc_utc = 1;
--static int rtc_date_offset = -1; /* -1 means no change */
-+static enum {
-+    RTC_BASE_UTC,
-+    RTC_BASE_LOCALTIME,
-+    RTC_BASE_DATETIME,
-+} rtc_base_type = RTC_BASE_UTC;
-+static int rtc_host_datetime_offset = -1; /* valid only for host rtc_clock and
-+                                             rtc_base_type=RTC_BASE_DATETIME */
- QEMUClockType rtc_clock;
- int vga_interface_type = VGA_NONE;
- static DisplayOptions dpy;
-@@ -782,26 +787,30 @@ void qemu_system_vmstop_request(RunState state)
- /***********************************************************/
- /* real time host monotonic timer */
+@@ -788,10 +788,10 @@ void qemu_system_vmstop_request(RunState state)
  
--static time_t qemu_time(void)
-+static time_t qemu_timedate(void)
+ /***********************************************************/
+ /* RTC reference time/date access */
+-static time_t qemu_ref_timedate(void)
++static time_t qemu_ref_timedate(QEMUClockType clock)
  {
-     return qemu_clock_get_ms(QEMU_CLOCK_HOST) / 1000;
- }
+-    time_t value = qemu_clock_get_ms(rtc_clock) / 1000;
+-    switch (rtc_clock) {
++    time_t value = qemu_clock_get_ms(clock) / 1000;
++    switch (clock) {
+     case QEMU_CLOCK_REALTIME:
+         value -= rtc_realtime_clock_offset;
+         /* no break */
+@@ -811,7 +811,7 @@ static time_t qemu_ref_timedate(void)
  
- /***********************************************************/
--/* host time/date access */
-+/* RTC reference time/date access */
  void qemu_get_timedate(struct tm *tm, int offset)
  {
--    time_t ti = qemu_time();
-+    time_t ti = qemu_timedate();
+-    time_t ti = qemu_ref_timedate();
++    time_t ti = qemu_ref_timedate(rtc_clock);
  
      ti += offset;
--    if (rtc_date_offset == -1) {
--        if (rtc_utc)
--            gmtime_r(&ti, tm);
--        else
--            localtime_r(&ti, tm);
--    } else {
--        ti -= rtc_date_offset;
-+
-+    switch (rtc_base_type) {
-+    case RTC_BASE_UTC:
-         gmtime_r(&ti, tm);
-+        break;
-+    case RTC_BASE_LOCALTIME:
-+        localtime_r(&ti, tm);
-+        break;
-+    case RTC_BASE_DATETIME:
-+        ti -= rtc_host_datetime_offset;
-+        gmtime_r(&ti, tm);
-+        break;
+ 
+@@ -849,7 +849,7 @@ int qemu_timedate_diff(struct tm *tm)
+         break;
      }
+ 
+-    return seconds - qemu_ref_timedate();
++    return seconds - qemu_ref_timedate(QEMU_CLOCK_HOST);
  }
  
-@@ -809,23 +818,33 @@ int qemu_timedate_diff(struct tm *tm)
- {
-     time_t seconds;
- 
--    if (rtc_date_offset == -1)
--        if (rtc_utc)
--            seconds = mktimegm(tm);
--        else {
--            struct tm tmp = *tm;
--            tmp.tm_isdst = -1; /* use timezone to figure it out */
--            seconds = mktime(&tmp);
--	}
--    else
--        seconds = mktimegm(tm) + rtc_date_offset;
-+    switch (rtc_base_type) {
-+    case RTC_BASE_UTC:
-+        seconds = mktimegm(tm);
-+        break;
-+    case RTC_BASE_LOCALTIME:
-+    {
-+        struct tm tmp = *tm;
-+        tmp.tm_isdst = -1; /* use timezone to figure it out */
-+        seconds = mktime(&tmp);
-+        break;
-+    }
-+    case RTC_BASE_DATETIME:
-+        seconds = mktimegm(tm) + rtc_host_datetime_offset;
-+        break;
-+    default:
-+        /* gcc complains: ‘seconds’ may be used uninitialized */
-+        g_assert_not_reached();
-+        seconds = -1;
-+        break;
-+    }
- 
--    return seconds - qemu_time();
-+    return seconds - qemu_timedate();
- }
- 
--static void configure_rtc_date_offset(const char *startdate)
-+static void configure_rtc_host_datetime_offset(const char *startdate)
- {
--    time_t rtc_start_date;
-+    time_t rtc_start_datetime;
-     struct tm tm;
- 
-     if (sscanf(startdate, "%d-%d-%dT%d:%d:%d", &tm.tm_year, &tm.tm_mon,
-@@ -841,15 +860,16 @@ static void configure_rtc_date_offset(const char *startdate)
-     }
-     tm.tm_year -= 1900;
-     tm.tm_mon--;
--    rtc_start_date = mktimegm(&tm);
--    if (rtc_start_date == -1) {
-+    rtc_start_datetime = mktimegm(&tm);
-+    if (rtc_start_datetime == -1) {
-     date_fail:
--        error_report("invalid date format");
-+        error_report("invalid datetime format");
-         error_printf("valid formats: "
-                      "'2006-06-17T16:01:21' or '2006-06-17'\n");
-         exit(1);
-     }
--    rtc_date_offset = qemu_time() - rtc_start_date;
-+    rtc_host_datetime_offset = (qemu_clock_get_ms(QEMU_CLOCK_HOST) / 1000)
-+                               - rtc_start_datetime;
- }
- 
- static void configure_rtc(QemuOpts *opts)
-@@ -859,15 +879,16 @@ static void configure_rtc(QemuOpts *opts)
-     value = qemu_opt_get(opts, "base");
-     if (value) {
-         if (!strcmp(value, "utc")) {
--            rtc_utc = 1;
-+            rtc_base_type = RTC_BASE_UTC;
-         } else if (!strcmp(value, "localtime")) {
-             Error *blocker = NULL;
--            rtc_utc = 0;
-+            rtc_base_type = RTC_BASE_LOCALTIME;
-             error_setg(&blocker, QERR_REPLAY_NOT_SUPPORTED,
-                       "-rtc base=localtime");
-             replay_add_blocker(blocker);
-         } else {
--            configure_rtc_date_offset(value);
-+            rtc_base_type = RTC_BASE_DATETIME;
-+            configure_rtc_host_datetime_offset(value);
-         }
-     }
-     value = qemu_opt_get(opts, "clock");
+ static void configure_rtc_base_datetime(const char *startdate)
 -- 
 2.7.4
