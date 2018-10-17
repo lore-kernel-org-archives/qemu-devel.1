@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53448)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53452)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gCiiA-0005yK-Bs
+	(envelope-from <thuth@redhat.com>) id 1gCiiA-0005yO-DG
 	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 06:05:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gCii7-0002Ey-8w
+	(envelope-from <thuth@redhat.com>) id 1gCii6-0002DT-VX
 	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 06:05:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:29346)
+Received: from mx1.redhat.com ([209.132.183.28]:50946)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gCii6-0001Hr-Sm
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 06:05:51 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gCii6-0001B4-Jx
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 06:05:50 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 17 Oct 2018 12:05:07 +0200
-Message-Id: <1539770707-7289-16-git-send-email-thuth@redhat.com>
+Date: Wed, 17 Oct 2018 12:05:01 +0200
+Message-Id: <1539770707-7289-10-git-send-email-thuth@redhat.com>
 In-Reply-To: <1539770707-7289-1-git-send-email-thuth@redhat.com>
 References: <1539770707-7289-1-git-send-email-thuth@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 15/15] configure: remove glib_subprocess check
+Subject: [Qemu-devel] [PULL 09/15] show-fixed-bugs.sh: Modern shell
+ scripting (use $() instead of ``)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +27,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: qemu-devel@nongnu.org
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 
-This should have been removed as part of commit
-692fbdf9f4c6f6bafd0b3a4d4f94973effd3bbae.
+Various shell files contain a mix between obsolete ``
+and modern $(); It would be nice to convert to using $()
+everywhere.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- configure | 6 ------
- 1 file changed, 6 deletions(-)
+ scripts/show-fixed-bugs.sh | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/configure b/configure
-index 8af2be9..9138af3 100755
---- a/configure
-+++ b/configure
-@@ -3531,12 +3531,6 @@ if ! compile_prog "$CFLAGS" "$LIBS" ; then
- 	       "build target"
+diff --git a/scripts/show-fixed-bugs.sh b/scripts/show-fixed-bugs.sh
+index 36f3068..a095a4d 100755
+--- a/scripts/show-fixed-bugs.sh
++++ b/scripts/show-fixed-bugs.sh
+@@ -23,10 +23,10 @@ while getopts "s:e:cbh" opt; do
+ done
+ 
+ if [ "x$start" = "x" ]; then
+-    start=`git tag -l 'v[0-9]*\.[0-9]*\.0' | tail -n 2 | head -n 1`
++    start=$(git tag -l 'v[0-9]*\.[0-9]*\.0' | tail -n 2 | head -n 1)
  fi
-=20
--# g_test_trap_subprocess added in 2.38. Used by some tests.
--glib_subprocess=3Dyes
--if ! $pkg_config --atleast-version=3D2.38 glib-2.0; then
--    glib_subprocess=3Dno
--fi
--
- # Silence clang 3.5.0 warnings about glib attribute __alloc_size__ usage
- cat > $TMPC << EOF
- #include <glib.h>
---=20
+ if [ "x$end" = "x" ]; then
+-    end=`git tag -l  'v[0-9]*\.[0-9]*\.0' | tail -n 1`
++    end=$(git tag -l  'v[0-9]*\.[0-9]*\.0' | tail -n 1)
+ fi
+ 
+ if [ "x$start" = "x" ] || [ "x$end" = "x" ]; then
+@@ -38,9 +38,9 @@ fi
+ echo "Searching git log for bugs in the range $start..$end"
+ 
+ urlstr='https://bugs.launchpad.net/\(bugs\|qemu/+bug\)/'
+-bug_urls=`git log $start..$end \
++bug_urls=$(git log $start..$end \
+   | sed -n '\,'"$urlstr"', s,\(.*\)\('"$urlstr"'\)\([0-9]*\).*,\2\4,p' \
+-  | sort -u`
++  | sort -u)
+ 
+ echo Found bug URLs:
+ for i in $bug_urls ; do echo " $i" ; done
+@@ -68,7 +68,7 @@ elif [ "x$show_in_browser" = "x1" ]; then
+         bugbrowser=xdg-open
+     elif command -v gnome-open >/dev/null 2>&1; then
+         bugbrowser=gnome-open
+-    elif [ "`uname`" = "Darwin" ]; then
++    elif [ "$(uname)" = "Darwin" ]; then
+         bugbrowser=open
+     elif command -v sensible-browser >/dev/null 2>&1; then
+         bugbrowser=sensible-browser
+-- 
 1.8.3.1
