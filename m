@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gCr8i-0000Jz-Ho
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:05:55 -0400
+	(envelope-from <eblake@redhat.com>) id 1gCrAG-000175-18
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:07:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gCr8c-000176-59
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:05:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51806)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gCr8b-00016o-SC
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:05:46 -0400
-References: <20181016232201.16829-1-crosa@redhat.com>
-	<CAFEAcA_KFOay7zBoYMSqqEYd0ZhTcW5wp3bs28cr=oK4W4FL3A@mail.gmail.com>
-	<20181017162944.GF31060@habkost.net>
-	<d5f32475-df5b-0c5c-591f-5fae8e641c11@redhat.com>
-	<CAFEAcA_gyQvmq48QquNiFhGef-FWPeDKRUSk3wf7hS=_=xm_XQ@mail.gmail.com>
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <a53d1784-f947-501b-5589-07b611800959@redhat.com>
-Date: Wed, 17 Oct 2018 15:05:38 -0400
+	(envelope-from <eblake@redhat.com>) id 1gCrAF-0005G8-FO
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 15:07:28 -0400
+References: <20181017164200.22344-1-kwolf@redhat.com>
+	<20181017164200.22344-6-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <81ffbfc4-f1f0-3d8c-350e-bb27c121bff7@redhat.com>
+Date: Wed, 17 Oct 2018 14:07:04 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_gyQvmq48QquNiFhGef-FWPeDKRUSk3wf7hS=_=xm_XQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20181017164200.22344-6-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] Acceptance tests: host arch to target arch
- name mapping
+Subject: Re: [Qemu-devel] [PATCH v3 5/9] file-posix: Support auto-read-only
+ option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,70 +25,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Caio Carrara <ccarrara@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
 
-
-
-On 10/17/18 2:40 PM, Peter Maydell wrote:
-> On 17 October 2018 at 18:38, Cleber Rosa <crosa@redhat.com> wrote:
->>
->>
->> On 10/17/18 12:29 PM, Eduardo Habkost wrote:
->>> On Wed, Oct 17, 2018 at 01:34:41PM +0100, Peter Maydell wrote:
->>>> So, why does the test code need to care? It's not clear
->>>> from the patch... My expectation would be that you'd
->>>> just test all the testable target architectures,
->>>> regardless of what the host architecture is.
->>>
->>> I tend to agree.  Maybe the right solution is to get rid of the
->>> os.uname().  I think the default should be testing all QEMU
->>> binaries that were built, and the host architecture shouldn't
->>> matter.
+On 10/17/18 11:41 AM, Kevin Wolf wrote:
+> If read-only=off, but auto-read-only=on is given, open the file
+> read-write if we have the permissions, but instead of erroring out for
+> read-only files, just degrade to read-only.
 > 
-> Yes, looking at os.uname() also seems like an odd thing
-> for the tests to be doing here. The test framework
-> should be as far as possible host-architecture agnostic.
-> (For some of the KVM cases there probably is a need to
-> care, but those are exceptions, not the rule.)
-> 
->> I'm in favor of exercising all built targets, but that seems to me to be
->> on another layer, above the test themselves. This change is about the
->> behavior of a test when not told about the target arch (and thus binary)
->> it should use.
-> 
-> At that level, I think the right answer is "tell the user
-> they need to specify the qemu executable they are trying to test".
-> In particular, there is no guarantee that the user has actually
-> built the executable for the target that corresponds to the
-> host, so it doesn't work to try to default to that anyway.
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>   block/file-posix.c | 19 ++++++++++++++++---
+>   1 file changed, 16 insertions(+), 3 deletions(-)
 > 
 
-I think your "right answer" is the ideal, but I'm afraid it's not
-practical.  For instance, look at how a qemu-iotest is run:
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-$ ./check 001
-QEMU          --
-"/tmp/qemu-build/tests/qemu-iotests/../../ppc64-softmmu/qemu-system-ppc64"
--nodefaults -machine accel=qtest
-...
-
-IIRC, you're suggesting that check SHOULD abort and require a QEMU
-binary.  The command line would then become something like:
-
-$ ./check --qemu-bin=../../ppc64-softmmut/qemu-system-ppc64 001
-
-The rules that "check" uses for finding a "default" QEMU binary are a
-lot harder to describe (are "smarter") than the ones we currently have
-on the acceptance tests.  IMO some compromises like these are necessary,
-or else, tests may be run much much less than they could and should.
-
-When it comes to trying to run the acceptance tests without an existing
-QEMU binary built, the current behavior is to CANCEL the tests.
-
-Regards,
-- Cleber.
-
-> thanks
-> -- PMM
-> 
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
