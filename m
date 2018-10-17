@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52342)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gClPL-0005IH-82
+	(envelope-from <berto@igalia.com>) id 1gClPL-0005I8-6o
 	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:58:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gClPH-0006Y5-3N
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:58:39 -0400
+	(envelope-from <berto@igalia.com>) id 1gClPH-0006YC-3m
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:58:38 -0400
 From: Alberto Garcia <berto@igalia.com>
-Date: Wed, 17 Oct 2018 15:57:18 +0300
-Message-Id: <38f4b775e2acf6e97b152fceed6993756c7c94a9.1539780785.git.berto@igalia.com>
+Date: Wed, 17 Oct 2018 15:57:17 +0300
+Message-Id: <5b203ceb35b456503115cb2a4ab2941b2fdc2a6a.1539780785.git.berto@igalia.com>
 In-Reply-To: <cover.1539780785.git.berto@igalia.com>
 References: <cover.1539780785.git.berto@igalia.com>
 In-Reply-To: <cover.1539780785.git.berto@igalia.com>
 References: <cover.1539780785.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v2 02/14] block: Add bdrv_reopen_set_read_only()
+Subject: [Qemu-devel] [PATCH v2 01/14] block: Don't call
+ update_flags_from_options() if the options are wrong
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,61 +25,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Most callers of bdrv_reopen() only use it to switch a BlockDriverState
-between read-only and read-write, so this patch adds a new function
-that does just that.
+If qemu_opts_absorb_qdict() fails and we carry on and call
+update_flags_from_options() then that can result on a failed
+assertion:
 
-We also want to get rid of the flags parameter in the bdrv_reopen()
-API, so this function sets the "read-only" option and passes the
-original flags (which will then be updated in bdrv_reopen_prepare()).
+   $ qemu-io -c 'reopen -o read-only=foo' hd.qcow2
+   block.c:1101: update_flags_from_options: Assertion `qemu_opt_find(opts, BDRV_OPT_CACHE_DIRECT)' failed.
+   Aborted
+
+This only happens in bdrv_reopen_queue_child(). Although this function
+doesn't return errors, we can simply keep the wrong options in the
+reopen queue and later bdrv_reopen_prepare() will fail.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block.c               | 17 +++++++++++++++++
- include/block/block.h |  2 ++
- 2 files changed, 19 insertions(+)
+ block.c                    | 11 +++++++++--
+ tests/qemu-iotests/133     |  6 ++++++
+ tests/qemu-iotests/133.out |  4 ++++
+ 3 files changed, 19 insertions(+), 2 deletions(-)
 
 diff --git a/block.c b/block.c
-index 47d5fe2f91..40c3a3d30b 100644
+index 7710b399a3..47d5fe2f91 100644
 --- a/block.c
 +++ b/block.c
-@@ -3098,6 +3098,23 @@ int bdrv_reopen(BlockDriverState *bs, int bdrv_flags, Error **errp)
-     return ret;
- }
+@@ -2942,12 +2942,19 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
+     if (parent_options) {
+         QemuOpts *opts;
+         QDict *options_copy;
++        Error *local_err = NULL;
+         assert(!flags);
+         role->inherit_options(&flags, options, parent_flags, parent_options);
+         options_copy = qdict_clone_shallow(options);
+         opts = qemu_opts_create(&bdrv_runtime_opts, NULL, 0, &error_abort);
+-        qemu_opts_absorb_qdict(opts, options_copy, NULL);
+-        update_flags_from_options(&flags, opts);
++        qemu_opts_absorb_qdict(opts, options_copy, &local_err);
++        /* Don't call update_flags_from_options() if the options are wrong.
++         * bdrv_reopen_prepare() will later return an error. */
++        if (!local_err) {
++            update_flags_from_options(&flags, opts);
++        } else {
++            error_free(local_err);
++        }
+         qemu_opts_del(opts);
+         qobject_unref(options_copy);
+     }
+diff --git a/tests/qemu-iotests/133 b/tests/qemu-iotests/133
+index af6b3e1dd4..b9f17c996f 100755
+--- a/tests/qemu-iotests/133
++++ b/tests/qemu-iotests/133
+@@ -92,6 +92,12 @@ echo
+ IMGOPTSSYNTAX=false $QEMU_IO -f null-co -c 'reopen' -c 'info' \
+     "json:{'driver': 'null-co', 'size': 65536}"
  
-+int bdrv_reopen_set_read_only(BlockDriverState *bs, bool read_only,
-+                              Error **errp)
-+{
-+    int ret;
-+    BlockReopenQueue *queue;
-+    QDict *opts = qdict_new();
++echo
++echo "=== Check that invalid options are handled correctly ==="
++echo
 +
-+    qdict_put_bool(opts, BDRV_OPT_READ_ONLY, read_only);
++$QEMU_IO -c 'reopen -o read-only=foo' $TEST_IMG
 +
-+    bdrv_subtree_drained_begin(bs);
-+    queue = bdrv_reopen_queue(NULL, bs, opts, bdrv_get_flags(bs));
-+    ret = bdrv_reopen_multiple(bdrv_get_aio_context(bs), queue, errp);
-+    bdrv_subtree_drained_end(bs);
+ # success, all done
+ echo "*** done"
+ rm -f $seq.full
+diff --git a/tests/qemu-iotests/133.out b/tests/qemu-iotests/133.out
+index f4a85aeb63..570f623b6b 100644
+--- a/tests/qemu-iotests/133.out
++++ b/tests/qemu-iotests/133.out
+@@ -24,4 +24,8 @@ Cannot change the option 'driver'
+ 
+ format name: null-co
+ format name: null-co
 +
-+    return ret;
-+}
++=== Check that invalid options are handled correctly ===
 +
- static BlockReopenQueueEntry *find_parent_in_reopen_queue(BlockReopenQueue *q,
-                                                           BdrvChild *c)
- {
-diff --git a/include/block/block.h b/include/block/block.h
-index b189cf422e..97317fdfb6 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -301,6 +301,8 @@ BlockReopenQueue *bdrv_reopen_queue(BlockReopenQueue *bs_queue,
-                                     QDict *options, int flags);
- int bdrv_reopen_multiple(AioContext *ctx, BlockReopenQueue *bs_queue, Error **errp);
- int bdrv_reopen(BlockDriverState *bs, int bdrv_flags, Error **errp);
-+int bdrv_reopen_set_read_only(BlockDriverState *bs, bool read_only,
-+                              Error **errp);
- int bdrv_reopen_prepare(BDRVReopenState *reopen_state,
-                         BlockReopenQueue *queue, Error **errp);
- void bdrv_reopen_commit(BDRVReopenState *reopen_state);
++Parameter 'read-only' expects 'on' or 'off'
+ *** done
 -- 
 2.11.0
