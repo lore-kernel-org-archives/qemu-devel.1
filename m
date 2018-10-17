@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40996)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gCjWG-0007Ko-Fu
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 06:57:42 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1gCjX7-0007qn-7k
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 06:58:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gCjWE-0002wx-ID
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 06:57:40 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1gCjX4-0004M0-1M
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 06:58:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36594)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gCjX3-0004Kf-LE
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 06:58:29 -0400
+References: <20181008131924.7377-1-d.csapak@proxmox.com>
+	<1f00827b-4c94-e10c-ab57-4ceb5223bee9@proxmox.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d2f89cb6-0ea5-75bc-1bb1-3f0ce6509ec4@redhat.com>
+Date: Wed, 17 Oct 2018 12:58:20 +0200
 MIME-Version: 1.0
-References: <cover.1539764043.git.artem.k.pisarenko@gmail.com>
-	<f47b81dbce734e9806f9516eba8ca588e6321c2f.1539764043.git.artem.k.pisarenko@gmail.com>
-	<20181017091204.GC22755@stefanha-x1.localdomain>
-	<5a83aab6-1277-cc0e-7913-964a8fea5265@redhat.com>
-In-Reply-To: <5a83aab6-1277-cc0e-7913-964a8fea5265@redhat.com>
-From: Artem Pisarenko <artem.k.pisarenko@gmail.com>
-Date: Wed, 17 Oct 2018 16:57:25 +0600
-Message-ID: <CANzW0mvPxvDsCURzXjOdjR-8uLjXpyAouH80ik6asb0awwX+VA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <1f00827b-4c94-e10c-ab57-4ceb5223bee9@proxmox.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 2/4] Introduce attributes
- to qemu timer subsystem
+Subject: Re: [Qemu-devel] [PATCH] qapi: add info about reset to SHUTDOWN
+ event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,58 +29,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, "open list:Block I/O path" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Dominik Csapak <d.csapak@proxmox.com>, qemu-devel@nongnu.org
+Cc: armbru@redhat.com, eblake@redhat.com
 
-> Further down in this patch the notation is QEMU_TIMER_ATTR_<id>, which I
-> think is clearer because QEMU_TIMER_ATTR(id) looks like a (non-existent)
-> macro.  Please use the QEMU_TIMER_ATTR_<id> notation consistently.
-
-Yes, I've just forgot to update comments after previous patch version,
-where it actually was macro.
-
-> What is the purpose of this bit?  I guess it's just here as a
-> placeholder because no real bits have been defined yet.  Hopefully the
-> next patch removes it (/* This placeholder is removed in the next patch
-> */ would be a nice way to document this for reviewers).
-
-It's just to prevent compilation errors, as required by
-https://wiki.qemu.org/Contribute/SubmitAPatch#Split_up_long_patches
-
-> The enum isn't needed and makes debugging harder since the bit number is
-> implicit in the enum ordering.  This alternative is clearer and more
-> concise:
+On 17/10/2018 09:17, Dominik Csapak wrote:
+> On 10/8/18 3:19 PM, Dominik Csapak wrote:
+>> when '-no-reboot' is set, it is interesting if the guest was originall=
+y
+>> shutdown or reset, so save and return that info=20
 >
->   #define QEMU_TIMER_ATTR_foo BIT(n)
+>=20
+> =C2=A0 {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (no_reboot && reason !=3D SHUTDOWN_CA=
+USE_SUBSYSTEM_RESET) {
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 shutdown_was_reset =3D true=
+;
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 shutdown_request=
+ed =3D reason;
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 reset_requested =
+=3D reason;
+> @@ -1807,7 +1809,8 @@ static bool main_loop_should_exit(void)
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 request =3D qemu_shutdown_requested();
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (request) {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_kill_report=
+();
+> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qapi_event_send_shutdown(sh=
+utdown_caused_by_guest(request));
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qapi_event_send_shutdown(sh=
+utdown_caused_by_guest(request),
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 shutdown_was_reset);
 
-Agree.
+So the problem with shutdown_caused_by_guest is that you get the same
+value for both guest reset and guest shutdown.  Could we instead just
+pass the ShutdownCause in the event (similar to what was proposed even
+when discussing commit 08fba7ac9b618516a5f1d096f78a7e2837fe0594)?
 
->=D1=81=D1=80, 17 =D0=BE=D0=BA=D1=82. 2018 =D0=B3. =D0=B2 15:15, Paolo Bonz=
-ini <pbonzini@redhat.com>:
->On 17/10/2018 11:12, Stefan Hajnoczi wrote:
->>> Attributes are simple flags, associated with individual timers for
-their whole lifetime.
->>> They intended to be used to mark individual timers for special handling
-by various qemu features operating at qemu core level.
->> I'm worried that this sentence suggests various parts of QEMU will stash
->> state in ts->attributes.  That's messy and they shouldn't do this.  Make
->> the field private to qemu-timer.c.
->
-> Yes, the contents of the fields are private.  Are you suggesting a
-> different wording for the commit message or the "QEMU Timer attributes"
-> doc comment, or something more than that?  Possibly removing
-> timer_get_attributes altogether?
+You would get either guest-reset or host-qmp if it's a reset; the same
+host-qmp reason could account for both "quit" and "system_reset", but in
+practice the caller will know if it has asked for a hard shutdown or a
+reset.
 
-Actually, attributes aren't intended to be changed externally of timers
-code.
-The purpose of timer_get_attributes() is just informational, same like if
-timer_get_clock(), timer_get_scale(), etc. would exist. But since none of
-such accessors exists, adding just one for 'attributes' looks exceptional.
-And it isn't being used even after whole patch series applied. As such, it
-could be just removed.
-Any suggestons to improve commit message and/or comments, if any ?
---=20
-
-=D0=A1 =D1=83=D0=B2=D0=B0=D0=B6=D0=B5=D0=BD=D0=B8=D0=B5=D0=BC,
-  =D0=90=D1=80=D1=82=D0=B5=D0=BC =D0=9F=D0=B8=D1=81=D0=B0=D1=80=D0=B5=D0=BD=
-=D0=BA=D0=BE
+Paolo
