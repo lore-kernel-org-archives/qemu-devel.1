@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43259)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gCkyj-0007JF-Ny
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:31:15 -0400
+	(envelope-from <quintela@redhat.com>) id 1gCl0F-0008O2-PJ
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:32:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gCkyg-0007qp-BT
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:31:09 -0400
+	(envelope-from <quintela@redhat.com>) id 1gCl0E-0002N5-LZ
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:32:43 -0400
 From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20181009132330.7549-4-berrange@redhat.com> ("Daniel
-	P. =?utf-8?Q?Berrang=C3=A9=22's?= message of "Tue, 9 Oct 2018 14:23:27
+In-Reply-To: <20181009132330.7549-5-berrange@redhat.com> ("Daniel
+	P. =?utf-8?Q?Berrang=C3=A9=22's?= message of "Tue, 9 Oct 2018 14:23:28
 	+0100")
 References: <20181009132330.7549-1-berrange@redhat.com>
-	<20181009132330.7549-4-berrange@redhat.com>
+	<20181009132330.7549-5-berrange@redhat.com>
 Reply-To: quintela@redhat.com
-Date: Wed, 17 Oct 2018 14:30:24 +0200
-Message-ID: <87in2092n3.fsf@trasno.org>
+Date: Wed, 17 Oct 2018 14:32:17 +0200
+Message-ID: <87efco92jy.fsf@trasno.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 3/6] migration: add support for a
- "tls-authz" migration parameter
+Subject: Re: [Qemu-devel] [PATCH v3 4/6] chardev: add support for
+ authorization for TLS clients
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,30 +34,30 @@ Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongn
 Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
 > From: "Daniel P. Berrange" <berrange@redhat.com>
 >
-> The QEMU instance that runs as the server for the migration data
-> transport (ie the target QEMU) needs to be able to configure access
-> control so it can prevent unauthorized clients initiating an incoming
-> migration. This adds a new 'tls-authz' migration parameter that is used
-> to provide the QOM ID of a QAuthZ subclass instance that provides the
-> access control check. This is checked against the x509 certificate
-> obtained during the TLS handshake.
+> Currently any client which can complete the TLS handshake is able to use
+> a chardev server. The server admin can turn on the 'verify-peer' option
+> for the x509 creds to require the client to provide a x509
+> certificate. This means the client will have to acquire a certificate
+> from the CA before they are permitted to use the chardev server. This is
+> still a fairly low bar.
 >
-> For example, when starting a QEMU for incoming migration, it is
-> possible to give an example identity of the source QEMU that is
-> intended to be connecting later:
+> This adds a 'tls-authz=3DOBJECT-ID' option to the socket chardev backend
+> which takes the ID of a previously added 'QAuthZ' object instance. This
+> will be used to validate the client's x509 distinguished name. Clients
+> failing the check will not be permitted to use the chardev server.
 >
->   $QEMU \
->      -monitor stdio \
->      -incoming defer \
->      ...other args...
+> For example to setup authorization that only allows connection from a
+> client whose x509 certificate distinguished name contains 'CN=3Dfred', you
+> would use:
 >
->   (qemu) object_add tls-creds-x509,id=3Dtls0,dir=3D/home/berrange/qemutls=
-,\
->              endpoint=3Dserver,verify-peer=3Dyes \
->   (qemu) object_add authz-simple,id=3Dauth0,identity=3DCN=3Dlaptop.exampl=
-e.com,,\
->              O=3DExample Org,,L=3DLondon,,ST=3DLondon,,C=3DGB \
->   (qemu) migrate_incoming tcp:localhost:9000
+>   $QEMU -object tls-creds-x509,id=3Dtls0,dir=3D/home/berrange/qemutls,\
+>                 endpoint=3Dserver,verify-peer=3Dyes \
+>         -object authz-simple,id=3Dauthz0,identity=3DCN=3Dlaptop.example.c=
+om,,\
+>                 O=3DExample Org,,L=3DLondon,,ST=3DLondon,,C=3DGB \
+>         -chardev socket,host=3D127.0.0.1,port=3D9000,server,\
+> 	         tls-creds=3Dtls0,tls-authz=3Dauthz0 \
+>         ...other qemu args...
 >
 > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 
