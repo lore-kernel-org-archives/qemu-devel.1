@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36997)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37666)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gCsqQ-0007c1-2K
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 16:55:07 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gCsu8-0000LT-Ez
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 16:58:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gCsqM-0000cV-1f
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 16:55:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34746)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gCsqL-0000cN-PD
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 16:55:01 -0400
-References: <20181016232201.16829-1-crosa@redhat.com>
-	<CAFEAcA_KFOay7zBoYMSqqEYd0ZhTcW5wp3bs28cr=oK4W4FL3A@mail.gmail.com>
-	<20181017162944.GF31060@habkost.net>
-	<d5f32475-df5b-0c5c-591f-5fae8e641c11@redhat.com>
-	<CAFEAcA_gyQvmq48QquNiFhGef-FWPeDKRUSk3wf7hS=_=xm_XQ@mail.gmail.com>
-	<20181017190951.GG31060@habkost.net>
-	<b6cff33b-79af-f7b2-2a08-a098135304e0@redhat.com>
-	<20181017194833.GI31060@habkost.net>
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <ba4cef67-a2c3-bd7c-7f4a-e96b12d016fe@redhat.com>
-Date: Wed, 17 Oct 2018 16:54:52 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gCsu4-0002fc-F9
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 16:58:56 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:57165
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1gCsu2-0002cw-NS
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 16:58:50 -0400
+References: <20180727123112.13707-1-dgilbert@redhat.com>
+	<d09b7607-a23b-7c05-9faf-7ec0000684af@ilande.co.uk>
+	<20180727134453.GB2498@work-vm>
+	<c8608e2e-35da-d095-193a-626d0d47c036@ilande.co.uk>
+	<20180727151412.GC2498@work-vm> <20181016113044.GE2426@work-vm>
+	<20181017003415.GK16167@umbus.fritz.box>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <3bc604c6-7d8c-9c0e-6471-e9ca1fa13334@ilande.co.uk>
+Date: Wed, 17 Oct 2018 21:58:32 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181017194833.GI31060@habkost.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20181017003415.GK16167@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] Acceptance tests: host arch to target arch
- name mapping
+Subject: Re: [Qemu-devel] [PATCH] macio/pmu: Fix missing vmsd terminator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,150 +34,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Caio Carrara <ccarrara@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: lvivier@redhat.com, qemu-devel@nongnu.org, agraf@suse.de
 
+On 17/10/2018 01:34, David Gibson wrote:
 
-
-On 10/17/18 3:48 PM, Eduardo Habkost wrote:
-> On Wed, Oct 17, 2018 at 03:25:34PM -0400, Cleber Rosa wrote:
+> On Tue, Oct 16, 2018 at 12:30:45PM +0100, Dr. David Alan Gilbert wrote:
 >>
->>
->> On 10/17/18 3:09 PM, Eduardo Habkost wrote:
->>> On Wed, Oct 17, 2018 at 07:40:51PM +0100, Peter Maydell wrote:
->>>> On 17 October 2018 at 18:38, Cleber Rosa <crosa@redhat.com> wrote:
->>>>>
->>>>>
->>>>> On 10/17/18 12:29 PM, Eduardo Habkost wrote:
->>>>>> On Wed, Oct 17, 2018 at 01:34:41PM +0100, Peter Maydell wrote:
->>>>>>> So, why does the test code need to care? It's not clear
->>>>>>> from the patch... My expectation would be that you'd
->>>>>>> just test all the testable target architectures,
->>>>>>> regardless of what the host architecture is.
->>>>>>
->>>>>> I tend to agree.  Maybe the right solution is to get rid of the
->>>>>> os.uname().  I think the default should be testing all QEMU
->>>>>> binaries that were built, and the host architecture shouldn't
->>>>>> matter.
->>>>
->>>> Yes, looking at os.uname() also seems like an odd thing
->>>> for the tests to be doing here. The test framework
->>>> should be as far as possible host-architecture agnostic.
->>>> (For some of the KVM cases there probably is a need to
->>>> care, but those are exceptions, not the rule.)
->>>>
->>>>> I'm in favor of exercising all built targets, but that seems to me to be
->>>>> on another layer, above the test themselves. This change is about the
->>>>> behavior of a test when not told about the target arch (and thus binary)
->>>>> it should use.
->>>>
->>>> At that level, I think the right answer is "tell the user
->>>> they need to specify the qemu executable they are trying to test".
->>>> In particular, there is no guarantee that the user has actually
->>>> built the executable for the target that corresponds to the
->>>> host, so it doesn't work to try to default to that anyway.
->>>
->>> Agreed.  However, I don't see when exactly this message would be
->>> triggered.  Cleber, on which use cases do you expect
->>> pick_default_qemu_bin() to be called?
->>>
->>
->> When a test is run ad-hoc.  You even suggested that tests could/should
->> be executable.
->>
->>> In an ideal world, any testing runner/tool should be able to
->>> automatically test all binaries by default.  Can Avocado help us
->>> do that?  (If not, we could just do it inside a
->>> ./tests/acceptance/run script).
->>>
->>
->> Avocado can do that indeed.  But I'm afraid that's not the main issue.
->> Think of the qemu-iotests: do we want a "check" command to run  all
->> tests with all binaries?
+>> I noticed this hadn't got merged - who wants it?
 > 
-> Good question.  That would be my first expectation, but I'm not
-> sure.
+> I think that's one for my tree, but I'm afraid I completely missed it
+> before.  It's generally best to CC me on ppc related patches,
+> otherwise I'm likely to lose them in the flood of qemu-devel.
 > 
+> Anyway, I dug it out of my archives and applied.
 
-If it wasn't clear, I'm trying to define the basic behavior of *one
-test*.  I'm aware of a few different behaviors across tests in QEMU:
+Great - thanks David. Apologies for the delay in my response, I've been fairly flat
+out recently so not much time for QEMU hacking.
 
- 1) qemu-iotests: require "check" to run, will attempt to find/run with
-a "suitable" QEMU binary.
 
- 2) libqtest based: executables, in theory runnable by themselves, and
-will not attempt to find/run a "suitable" QEMU binary.  Those will
-print: "Environment variable QTEST_QEMU_BINARY required".
+ATB,
 
- 3) acceptance tests: require the Avocado test runner, will attempt to
-find/run with a "suitable" QEMU binary.
-
-So, I'm personally not aware of any test in QEMU which *by themselves*
-defaults to running on all (relevant) built targets (machine types?
-device types?).  Test selection (defining a test suite) and setting
-parameters is always done elsewhere (Makefile, check-block.sh,
-qemu-iotests-quick.sh, etc).
-
-> Pro: testing all binaries by default would cause less confusion
-> than picking a random QEMU binary.
-> 
-
-IMO we have to differentiate between *in test* QEMU binary selection
-(some? none?) and other layers (Makefiles, scripts, etc).
-
-> Con: testing all binaries may be inconvenient for quickly
-> checking if a test case works.  (I'm not convinced this is a
-> problem.  If you don't want to test everything, you probably
-> already have a short target list in your ./configure line?)
-> 
-
-Convenience is important, but I'm convinced this is a software layering
-problem.  I have the feeling we're trying to impose higher level
-(environment/build/check) definitions to the lower level (test) entities.
-
-> Pro: testing a single binary using uname() is already
-> implemented.
-> 
-
-Right.  I'm not unfavorable to changing that behavior, and ERRORing
-tests when a binary is not given (similar to libqtest) is a simple
-change if we're to do it.  But I do find that usability drops considerably.
-
-And finally I don't think the "if a qemu binary is not explicitly given,
-let's try the matching host architecture" is confusing or hard to
-follow.  And, it's pretty well documented if you ask me:
-
----
-QEMU binary selection
-~~~~~~~~~~~~~~~~~~~~~
-
-The QEMU binary used for the ``self.vm`` QEMUMachine instance will
-primarily depend on the value of the ``qemu_bin`` parameter.  If it's
-not explicitly set, its default value will be the result of a dynamic
-probe in the same source tree.  A suitable binary will be one that
-targets the architecture matching (the) host machine.
-
-Based on this description, test writers will usually rely on one of
-the following approaches:
-
-1) Set ``qemu_bin``, and use the given binary
-
-2) Do not set ``qemu_bin``, and use a QEMU binary named like
-   "${arch}-softmmu/qemu-system-${arch}", either in the current
-   working directory, or in the current source tree.
-
-The resulting ``qemu_bin`` value will be preserved in the
-``avocado_qemu.Test`` as an attribute with the same name.
----
-
-> Con: making `avocado run` automatically generate variants of a
-> test case may take some effort?
-> 
-
-Well, it will take some effort, sure.  But my point do we want to
-*enforce* that?  I think that should be left to a "run" script or make
-rule like you suggested.  IMO, `avocado run a_single_test.py` shouldn't
-do more than just that.
-
-Regards,
-- Cleber.
+Mark.
