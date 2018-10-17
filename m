@@ -1,28 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43972)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52845)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <d.csapak@proxmox.com>) id 1gCmP7-0006S6-WF
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 10:02:30 -0400
+	(envelope-from <berto@igalia.com>) id 1gCmuJ-0000DB-6F
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 10:34:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <d.csapak@proxmox.com>) id 1gCmP4-0005Ya-P5
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 10:02:29 -0400
-Received: from proxmox-new.maurer-it.com ([212.186.127.180]:5818)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <d.csapak@proxmox.com>)
-	id 1gCmP4-0005Sg-Fr
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 10:02:26 -0400
-References: <20181008131924.7377-1-d.csapak@proxmox.com>
-	<1f00827b-4c94-e10c-ab57-4ceb5223bee9@proxmox.com>
-	<98a20e5d-0a11-2d4f-2de9-d50ca4dff941@redhat.com>
-From: Dominik Csapak <d.csapak@proxmox.com>
-Message-ID: <ac93c582-0726-043e-0f63-4339911d08c2@proxmox.com>
-Date: Wed, 17 Oct 2018 16:02:23 +0200
-MIME-Version: 1.0
-In-Reply-To: <98a20e5d-0a11-2d4f-2de9-d50ca4dff941@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] qapi: add info about reset to SHUTDOWN
- event
+	(envelope-from <berto@igalia.com>) id 1gCmuF-0006FJ-3R
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 10:34:43 -0400
+From: Alberto Garcia <berto@igalia.com>
+Date: Wed, 17 Oct 2018 17:33:49 +0300
+Message-Id: <efa8a2cd5ef6414103f05307b167a70e34405c13.1539786605.git.berto@igalia.com>
+In-Reply-To: <cover.1539786605.git.berto@igalia.com>
+References: <cover.1539786605.git.berto@igalia.com>
+In-Reply-To: <cover.1539786605.git.berto@igalia.com>
+References: <cover.1539786605.git.berto@igalia.com>
+Subject: [Qemu-devel] [PATCH 1/3] quorum: Remove quorum_err()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,46 +21,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, armbru@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 10/17/18 3:51 PM, Eric Blake wrote:
-> On 10/17/18 2:17 AM, Dominik Csapak wrote:
->> On 10/8/18 3:19 PM, Dominik Csapak wrote:
->>> when '-no-reboot' is set, it is interesting if the guest was original=
-ly
->>> shutdown or reset, so save and return that info
->>>
->>> Signed-off-by: Dominik Csapak <d.csapak@proxmox.com>
->>> ---
->>> =C2=A0 qapi/run-state.json | 5 ++++-
->>> =C2=A0 vl.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 5 ++++-
->>> =C2=A0 2 files changed, 8 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/qapi/run-state.json b/qapi/run-state.json
->>> index 332e44897b..ec1769777d 100644
->>> --- a/qapi/run-state.json
->>> +++ b/qapi/run-state.json
->>> @@ -107,6 +107,9 @@
->>> =C2=A0 # a guest-initiated ACPI shutdown request or other=20
->>> hardware-specific action)
->>> =C2=A0 # rather than a host request (such as sending qemu a SIGINT).=20
->>> (since 2.10)
->>> =C2=A0 #
->>> +# @was_reset: If true, the shutdown was actually a reset, but no-reb=
-oot
->>> +# was set, so it got converted to a shutdown
->=20
-> New additions should prefer naming like 'was-reset' rather than=20
-> 'was_reset', if we still think this particular name is appropriate.=C2=A0=
- My=20
-> personal take: what does the 'was' add, which would prevent us from jus=
-t=20
-> using the name 'reset' and avoiding the separator spelling issue?
->=20
+This is a static function with only one caller, so there's no need to
+keep it. Inlining the code in quorum_compare() makes it much simpler.
 
-yes of course 'reset' is fine, i just thought it might be confusing
-having a RESET event and a SHUTDOWN event with a 'reset' flag, but
-i guess if one tries to monitor them they would read the
-api documentation anyway
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+Reported-by: Markus Armbruster <armbru@redhat.com>
+---
+ block/quorum.c | 24 +++++-------------------
+ 1 file changed, 5 insertions(+), 19 deletions(-)
+
+diff --git a/block/quorum.c b/block/quorum.c
+index eb526cc0f1..b1b777baef 100644
+--- a/block/quorum.c
++++ b/block/quorum.c
+@@ -437,23 +437,7 @@ static bool quorum_iovec_compare(QEMUIOVector *a, QEMUIOVector *b)
+     return true;
+ }
+ 
+-static void GCC_FMT_ATTR(2, 3) quorum_err(QuorumAIOCB *acb,
+-                                          const char *fmt, ...)
+-{
+-    va_list ap;
+-
+-    va_start(ap, fmt);
+-    fprintf(stderr, "quorum: offset=%" PRIu64 " bytes=%" PRIu64 " ",
+-            acb->offset, acb->bytes);
+-    vfprintf(stderr, fmt, ap);
+-    fprintf(stderr, "\n");
+-    va_end(ap);
+-    exit(1);
+-}
+-
+-static bool quorum_compare(QuorumAIOCB *acb,
+-                           QEMUIOVector *a,
+-                           QEMUIOVector *b)
++static bool quorum_compare(QuorumAIOCB *acb, QEMUIOVector *a, QEMUIOVector *b)
+ {
+     BDRVQuorumState *s = acb->bs->opaque;
+     ssize_t offset;
+@@ -462,8 +446,10 @@ static bool quorum_compare(QuorumAIOCB *acb,
+     if (s->is_blkverify) {
+         offset = qemu_iovec_compare(a, b);
+         if (offset != -1) {
+-            quorum_err(acb, "contents mismatch at offset %" PRIu64,
+-                       acb->offset + offset);
++            fprintf(stderr, "quorum: offset=%" PRIu64 " bytes=%" PRIu64
++                    " contents mismatch at offset %" PRIu64 "\n",
++                    acb->offset, acb->bytes, acb->offset + offset);
++            exit(1);
+         }
+         return true;
+     }
+-- 
+2.11.0
