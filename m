@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35017)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gCkRJ-0007p5-SA
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 07:56:39 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1gCkZs-0002Mh-Vc
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:05:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gCkRH-0002Wg-72
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 07:56:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56260)
+	(envelope-from <dgilbert@redhat.com>) id 1gCkZZ-0002K8-WA
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:05:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53352)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gCkRE-0002KF-Te
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 07:56:34 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181013025435.25785-1-ehabkost@redhat.com>
-	<20181014173258-mutt-send-email-mst@kernel.org>
-	<20181015181404.GQ31060@habkost.net>
-	<20181016170236.GJ7995@redhat.com>
-	<d8b9a6e6-c137-a553-8fe7-939edd2031b3@redhat.com>
-	<87murdf73g.fsf_-_@dusky.pond.sub.org>
-	<20181017063443.bfjm5yh47cx3vva3@sirius.home.kraxel.org>
-Date: Wed, 17 Oct 2018 13:56:05 +0200
-In-Reply-To: <20181017063443.bfjm5yh47cx3vva3@sirius.home.kraxel.org> (Gerd
-	Hoffmann's message of "Wed, 17 Oct 2018 08:34:43 +0200")
-Message-ID: <878t2wiy7e.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gCkZY-0001ru-EN
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:05:08 -0400
+Date: Wed, 17 Oct 2018 13:04:47 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20181017120446.GF2530@work-vm>
+References: <20181005154910.3099-1-alex.bennee@linaro.org>
+	<20181005154910.3099-18-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] No more chameleon devices
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20181005154910.3099-18-alex.bennee@linaro.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 17/21] hmp: expose status of plugins to
+ the monitor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,45 +29,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Cleber Rosa <crosa@redhat.com>, Fabian Deutsch <fdeutsch@redhat.com>, qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>, Andrea Bolognani <abologna@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Laine Stump <laine@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, Pavel.Dovgaluk@ispras.ru, vilanova@ac.upc.edu, cota@braap.org, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Gerd Hoffmann <kraxel@redhat.com> writes:
+* Alex Benn=E9e (alex.bennee@linaro.org) wrote:
+> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
+> ---
+>  hmp-commands-info.hx   | 17 +++++++++++++++++
+>  include/qemu/plugins.h |  1 +
+>  monitor.c              | 14 ++++++++++++++
+>  trace/plugins.c        | 15 +++++++++++++++
+>  4 files changed, 47 insertions(+)
 
-> On Wed, Oct 17, 2018 at 07:57:39AM +0200, Markus Armbruster wrote:
->> Laine Stump <laine@redhat.com> writes:
->> 
->> [...]
->> > In the end, having a device that changed PCI ID depending on what kind
->> > of slot it was plugged into was an idea "too clever for its own good",
->> > should be avoided when new devices are added in the future, and we
->> > should at least provide an alternative that doesn't do that for existing
->> > devices.
->> 
->> That means for each chameleon PCI/PCIe device:
->> 
->> * create a pair of devices that can only go into one kind of slot
->> * deprecate the chameleon
->
-> I think virtio devices are the only ones which actually change the pci
-> id and have non-trivial differences.
->
-> qemu-xhci can likewise be plugged into both pci and pcie slots.  When
-> plugged into a pcie slot it'll have pcie endpoint capability.  That is
-> the only difference though.  Do you consider that a chameleon device?
+I'm OK with this; although it's worth thinking about whether this should
+be available via qmp, but it is just for debug/tracing.
 
-Since the enticing simplicity of letting PCI device models go into PCIe
-slots as well is exactly what lured us into this mess, I do.
 
-I believe all we actually saved by creating chameleons was a bunch of
-QOM types.  New, non-chameleon PCIe devices would have shared the actual
-device model code with the existing, non-chameleon PCI devices.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Correcting the design mistake now involves yet another set of QOM types,
-for backward compatibility.
 
-A loss of simplicity we failed to consider properly back then was at the
-external interface.  Traditionally, a qdev has a bus type (printed by
--device help), and it can go into a slot provided by such a bus.  But
-chameleon PCI qdevs can also go into a slot provided by a PCIe bus.  The
-interface is now less regular, for no convincing reason.
+> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+> index cbee8b944d..e245a852ae 100644
+> --- a/hmp-commands-info.hx
+> +++ b/hmp-commands-info.hx
+> @@ -683,6 +683,23 @@ STEXI
+>  Show available trace-events & their state.
+>  ETEXI
+
+> +#if defined(CONFIG_TRACE_PLUGIN)
+> +    {
+> +        .name       =3D "trace-plugins",
+> +        .args_type  =3D "name:s?",
+> +        .params     =3D "[name]",
+> +        .help       =3D "show available plugins and any extra info "
+> +                      "(name: plugin name pattern)",
+> +        .cmd =3D hmp_info_trace_plugins,
+> +    },
+> +
+> +STEXI
+> +@item info trace-plugins
+> +@findex info trace-plugins
+> +Show available trace-plugins & their state.
+> +ETEXI
+> +#endif
+> +
+>      {
+>          .name       =3D "tpm",
+>          .args_type  =3D "",
+> diff --git a/include/qemu/plugins.h b/include/qemu/plugins.h
+> index c86bb7ae67..44f2ec8c98 100644
+> --- a/include/qemu/plugins.h
+> +++ b/include/qemu/plugins.h
+> @@ -6,6 +6,7 @@
+>  void qemu_plugin_parse_cmd_args(const char *optarg);
+>  void qemu_plugin_load(const char *filename, const char *args);
+>  void qemu_plugins_init(void);
+> +GString *qemu_plugin_status(const char *name);
+> =20
+>  #else
+> =20
+> diff --git a/monitor.c b/monitor.c
+> index d8229cd2b0..0d0de9ece7 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -67,6 +67,9 @@
+>  #ifdef CONFIG_TRACE_SIMPLE
+>  #include "trace/simple.h"
+>  #endif
+> +#ifdef CONFIG_TRACE_PLUGIN
+> +#include "qemu/plugins.h"
+> +#endif
+>  #include "exec/memory.h"
+>  #include "exec/exec-all.h"
+>  #include "qemu/log.h"
+> @@ -1429,6 +1432,17 @@ static void hmp_info_trace_events(Monitor *mon, =
+const QDict *qdict)
+>      qapi_free_TraceEventInfoList(events);
+>  }
+> =20
+> +#ifdef CONFIG_TRACE_PLUGIN
+> +static void hmp_info_trace_plugins(Monitor *mon, const QDict *qdict)
+> +{
+> +    const char *name =3D qdict_get_try_str(qdict, "name");
+> +    GString *status =3D qemu_plugin_status(name);
+> +
+> +    monitor_printf(mon, "%s", status->str);
+> +    g_string_free(status, true);
+> +}
+> +#endif
+> +
+>  void qmp_client_migrate_info(const char *protocol, const char *hostnam=
+e,
+>                               bool has_port, int64_t port,
+>                               bool has_tls_port, int64_t tls_port,
+> diff --git a/trace/plugins.c b/trace/plugins.c
+> index 25aec2ff70..05630b02e6 100644
+> --- a/trace/plugins.c
+> +++ b/trace/plugins.c
+> @@ -58,6 +58,21 @@ void qemu_plugin_parse_cmd_args(const char *optarg)
+>                       qemu_opt_get(opts, "args"));
+>  }
+> =20
+> +GString *qemu_plugin_status(const char *name)
+> +{
+> +    QemuPluginInfo *info;
+> +    GString *status =3D g_string_new("");
+> +
+> +    QLIST_FOREACH(info, &qemu_plugins, next) {
+> +        if (info->status) {
+> +            char *pstatus =3D info->status();
+> +            g_string_append_printf(status, "%s: %s\n", info->filename,=
+ pstatus);
+> +            g_free(pstatus);
+> +        }
+> +    }
+> +    return status;
+> +}
+> +
+>  static int bind_to_tracepoints(GModule *g_module, GPtrArray *events)
+>  {
+>      int count =3D 0;
+> --=20
+> 2.17.1
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
