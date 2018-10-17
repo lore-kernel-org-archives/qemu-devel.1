@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44558)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gCl2k-0001iZ-9F
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:35:20 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gCl2j-0001i0-D5
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:35:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gCl2h-0006eF-3s
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:35:18 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:39280 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gCl2f-0006bm-EC
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:35:17 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:36530 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gCl2g-0006cT-MB
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:35:14 -0400
+	id 1gCl2f-00050O-3Z
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:35:13 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Wed, 17 Oct 2018 14:33:38 +0200
-Message-Id: <1539779635-15445-11-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Wed, 17 Oct 2018 14:33:29 +0200
+Message-Id: <1539779635-15445-2-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1539779635-15445-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1539779635-15445-1-git-send-email-aleksandar.markovic@rt-rk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 10/27] target/mips: Add assembler mnemonics list
- for MXU ASE
+Subject: [Qemu-devel] [PULL 01/27] mailmap: Add an item for Yongbok Kim
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,124 +29,26 @@ Cc: peter.maydell@linaro.org
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add a comment that contains a list all MXU instructions,
-expressed in assembler mnemonics.
+Yongbok Kim used two email adresses for QEMU contributions -
+his company changed its ownership/name.
 
 Reviewed-by: Stefan Markovic <smarkovic@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 88 +++++++++++++++++++++++++++++++++++++++++++=
-++++++
- 1 file changed, 88 insertions(+)
+ .mailmap | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 46655bb..91f63f2 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -1402,6 +1402,94 @@ enum {
-  * MXU unit contains 17 registers called X0-X16. X0 is always zero, and =
-X16 is
-  * the control register.
-  *
-+ * The notation used in MXU assembler mnemonics:
-+ *
-+ *   XRa, XRb, XRc, XRd - MXU registers
-+ *   Rb, Rc, Rd, Rs, Rt - general purpose MIPS registers
-+ *   s12                - a subfield of an instruction code
-+ *   strd2              - a subfield of an instruction code
-+ *   eptn2              - a subfield of an instruction code
-+ *   eptn3              - a subfield of an instruction code
-+ *   optn2              - a subfield of an instruction code
-+ *   optn3              - a subfield of an instruction code
-+ *   sft4               - a subfield of an instruction code
-+ *
-+ * Load/Store instructions           Multiplication instructions
-+ * -----------------------           ---------------------------
-+ *
-+ *  S32LDD XRa, Rb, s12               S32MADD XRa, XRd, Rs, Rt
-+ *  S32STD XRa, Rb, s12               S32MADDU XRa, XRd, Rs, Rt
-+ *  S32LDDV XRa, Rb, rc, strd2        S32SUB XRa, XRd, Rs, Rt
-+ *  S32STDV XRa, Rb, rc, strd2        S32SUBU XRa, XRd, Rs, Rt
-+ *  S32LDI XRa, Rb, s12               S32MUL XRa, XRd, Rs, Rt
-+ *  S32SDI XRa, Rb, s12               S32MULU XRa, XRd, Rs, Rt
-+ *  S32LDIV XRa, Rb, rc, strd2        D16MUL XRa, XRb, XRc, XRd, optn2
-+ *  S32SDIV XRa, Rb, rc, strd2        D16MULE XRa, XRb, XRc, optn2
-+ *  S32LDDR XRa, Rb, s12              D16MULF XRa, XRb, XRc, optn2
-+ *  S32STDR XRa, Rb, s12              D16MAC XRa, XRb, XRc, XRd, aptn2, =
-optn2
-+ *  S32LDDVR XRa, Rb, rc, strd2       D16MACE XRa, XRb, XRc, XRd, aptn2,=
- optn2
-+ *  S32STDVR XRa, Rb, rc, strd2       D16MACF XRa, XRb, XRc, XRd, aptn2,=
- optn2
-+ *  S32LDIR XRa, Rb, s12              D16MADL XRa, XRb, XRc, XRd, aptn2,=
- optn2
-+ *  S32SDIR XRa, Rb, s12              S16MAD XRa, XRb, XRc, XRd, aptn1, =
-optn2
-+ *  S32LDIVR XRa, Rb, rc, strd2       Q8MUL XRa, XRb, XRc, XRd
-+ *  S32SDIVR XRa, Rb, rc, strd2       Q8MULSU XRa, XRb, XRc, XRd
-+ *  S16LDD XRa, Rb, s10, eptn2        Q8MAC XRa, XRb, XRc, XRd, aptn2
-+ *  S16STD XRa, Rb, s10, eptn2        Q8MACSU XRa, XRb, XRc, XRd, aptn2
-+ *  S16LDI XRa, Rb, s10, eptn2        Q8MADL XRa, XRb, XRc, XRd, aptn2
-+ *  S16SDI XRa, Rb, s10, eptn2
-+ *  S8LDD XRa, Rb, s8, eptn3
-+ *  S8STD XRa, Rb, s8, eptn3         Addition and subtraction instructio=
-ns
-+ *  S8LDI XRa, Rb, s8, eptn3         -----------------------------------=
---
-+ *  S8SDI XRa, Rb, s8, eptn3
-+ *  LXW Rd, Rs, Rt, strd2             D32ADD XRa, XRb, XRc, XRd, eptn2
-+ *  LXH Rd, Rs, Rt, strd2             D32ADDC XRa, XRb, XRc, XRd
-+ *  LXHU Rd, Rs, Rt, strd2            D32ACC XRa, XRb, XRc, XRd, eptn2
-+ *  LXB Rd, Rs, Rt, strd2             D32ACCM XRa, XRb, XRc, XRd, eptn2
-+ *  LXBU Rd, Rs, Rt, strd2            D32ASUM XRa, XRb, XRc, XRd, eptn2
-+ *                                    S32CPS XRa, XRb, XRc
-+ *                                    Q16ADD XRa, XRb, XRc, XRd, eptn2, =
-optn2
-+ * Comparison instructions            Q16ACC XRa, XRb, XRc, XRd, eptn2
-+ * -----------------------            Q16ACCM XRa, XRb, XRc, XRd, eptn2
-+ *                                    D16ASUM XRa, XRb, XRc, XRd, eptn2
-+ *  S32MAX XRa, XRb, XRc              D16CPS XRa, XRb,
-+ *  S32MIN XRa, XRb, XRc              D16AVG XRa, XRb, XRc
-+ *  S32SLT XRa, XRb, XRc              D16AVGR XRa, XRb, XRc
-+ *  S32MOVZ XRa, XRb, XRc             Q8ADD XRa, XRb, XRc, eptn2
-+ *  S32MOVN XRa, XRb, XRc             Q8ADDE XRa, XRb, XRc, XRd, eptn2
-+ *  D16MAX XRa, XRb, XRc              Q8ACCE XRa, XRb, XRc, XRd, eptn2
-+ *  D16MIN XRa, XRb, XRc              Q8ABD XRa, XRb, XRc
-+ *  D16SLT XRa, XRb, XRc              Q8SAD XRa, XRb, XRc, XRd
-+ *  D16MOVZ XRa, XRb, XRc             Q8AVG XRa, XRb, XRc
-+ *  D16MOVN XRa, XRb, XRc             Q8AVGR XRa, XRb, XRc
-+ *  Q8MAX XRa, XRb, XRc               D8SUM XRa, XRb, XRc, XRd
-+ *  Q8MIN XRa, XRb, XRc               D8SUMC XRa, XRb, XRc, XRd
-+ *  Q8SLT XRa, XRb, XRc
-+ *  Q8SLTU XRa, XRb, XRc
-+ *  Q8MOVZ XRa, XRb, XRc             Shift instructions
-+ *  Q8MOVN XRa, XRb, XRc             ------------------
-+ *
-+ *                                    D32SLL XRa, XRb, XRc, XRd, sft4
-+ * Bitwise instructions               D32SLR XRa, XRb, XRc, XRd, sft4
-+ * --------------------               D32SAR XRa, XRb, XRc, XRd, sft4
-+ *                                    D32SARL XRa, XRb, XRc, sft4
-+ *  S32NOR XRa, XRb, XRc              D32SLLV XRa, XRb, Rb
-+ *  S32AND XRa, XRb, XRc              D32SLRV XRa, XRb, Rb
-+ *  S32XOR XRa, XRb, XRc              D32SARV XRa, XRb, Rb
-+ *  S32OR XRa, XRb, XRc               D32SARW XRa, XRb, XRc, Rb
-+ *                                    Q16SLL XRa, XRb, XRc, XRd, sft4
-+ *                                    Q16SLR XRa, XRb, XRc, XRd, sft4
-+ * Miscelaneous instructions          Q16SAR XRa, XRb, XRc, XRd, sft4
-+ * -------------------------          Q16SLLV XRa, XRb, Rb
-+ *                                    Q16SLRV XRa, XRb, Rb
-+ *  S32SFL XRa, XRb, XRc, XRd, optn2  Q16SARV XRa, XRb, Rb
-+ *  S32ALN XRa, XRb, XRc, Rb
-+ *  S32ALNI XRa, XRb, XRc, s3
-+ *  S32LUI XRa, s8, optn3            Move instructions
-+ *  S32EXTR XRa, XRb, Rb, bits5      -----------------
-+ *  S32EXTRV XRa, XRb, Rs, Rt
-+ *  Q16SCOP XRa, XRb, XRc, XRd        S32M2I XRa, Rb
-+ *  Q16SAT XRa, XRb, XRc              S32I2M XRa, Rb
-+ *
-  *   Compiled after:
-  *
-  *   "XBurst=C2=AE Instruction Set Architecture MIPS eXtension/enhanced =
-Unit
---=20
+diff --git a/.mailmap b/.mailmap
+index 2c2b9b1..0d886a1 100644
+--- a/.mailmap
++++ b/.mailmap
+@@ -12,6 +12,7 @@ Fabrice Bellard <fabrice@bellard.org> bellard <bellard@c046a42c-6fe2-441c-8c8c-7
+ James Hogan <jhogan@kernel.org> <james.hogan@imgtec.com>
+ Jocelyn Mayer <l_indien@magic.fr> j_mayer <j_mayer@c046a42c-6fe2-441c-8c8c-71466251a162>
+ Paul Brook <paul@codesourcery.com> pbrook <pbrook@c046a42c-6fe2-441c-8c8c-71466251a162>
++Yongbok Kim <yongbok.kim@mips.com> <yongbok.kim@imgtec.com>
+ Aleksandar Markovic <amarkovic@wavecomp.com> <aleksandar.markovic@mips.com>
+ Aleksandar Markovic <amarkovic@wavecomp.com> <aleksandar.markovic@imgtec.com>
+ Paul Burton <pburton@wavecomp.com> <paul.burton@mips.com>
+-- 
 2.7.4
