@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37666)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gCsu8-0000LT-Ez
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 16:58:57 -0400
+	(envelope-from <crosa@redhat.com>) id 1gCsuq-0000iO-9H
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 16:59:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gCsu4-0002fc-F9
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 16:58:56 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:57165
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1gCsu2-0002cw-NS
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 16:58:50 -0400
-References: <20180727123112.13707-1-dgilbert@redhat.com>
-	<d09b7607-a23b-7c05-9faf-7ec0000684af@ilande.co.uk>
-	<20180727134453.GB2498@work-vm>
-	<c8608e2e-35da-d095-193a-626d0d47c036@ilande.co.uk>
-	<20180727151412.GC2498@work-vm> <20181016113044.GE2426@work-vm>
-	<20181017003415.GK16167@umbus.fritz.box>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <3bc604c6-7d8c-9c0e-6471-e9ca1fa13334@ilande.co.uk>
-Date: Wed, 17 Oct 2018 21:58:32 +0100
+	(envelope-from <crosa@redhat.com>) id 1gCsum-00035h-30
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 16:59:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46108)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gCsul-000336-OP
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 16:59:35 -0400
+References: <20181016232201.16829-1-crosa@redhat.com>
+	<CAFEAcA_KFOay7zBoYMSqqEYd0ZhTcW5wp3bs28cr=oK4W4FL3A@mail.gmail.com>
+	<20181017162944.GF31060@habkost.net>
+	<d5f32475-df5b-0c5c-591f-5fae8e641c11@redhat.com>
+	<CAFEAcA_gyQvmq48QquNiFhGef-FWPeDKRUSk3wf7hS=_=xm_XQ@mail.gmail.com>
+	<20181017190951.GG31060@habkost.net>
+	<20181017204618.GB18379@kermit-br-ibm-com>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <46beb9dd-d3b7-de7a-313c-523ce036949e@redhat.com>
+Date: Wed, 17 Oct 2018 16:59:25 -0400
 MIME-Version: 1.0
-In-Reply-To: <20181017003415.GK16167@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-GB
+In-Reply-To: <20181017204618.GB18379@kermit-br-ibm-com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] macio/pmu: Fix missing vmsd terminator
+Subject: Re: [Qemu-devel] [PATCH] Acceptance tests: host arch to target arch
+ name mapping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,25 +34,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: lvivier@redhat.com, qemu-devel@nongnu.org, agraf@suse.de
+To: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Caio Carrara <ccarrara@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Wainer dos Santos Moschetta <wainersm@redhat.com>
 
-On 17/10/2018 01:34, David Gibson wrote:
 
-> On Tue, Oct 16, 2018 at 12:30:45PM +0100, Dr. David Alan Gilbert wrote:
+
+On 10/17/18 4:46 PM, Murilo Opsfelder Araujo wrote:
+> On Wed, Oct 17, 2018 at 04:09:51PM -0300, Eduardo Habkost wrote:
+>> On Wed, Oct 17, 2018 at 07:40:51PM +0100, Peter Maydell wrote:
+>>> On 17 October 2018 at 18:38, Cleber Rosa <crosa@redhat.com> wrote:
+>>>>
+>>>>
+>>>> On 10/17/18 12:29 PM, Eduardo Habkost wrote:
+>>>>> On Wed, Oct 17, 2018 at 01:34:41PM +0100, Peter Maydell wrote:
+>>>>>> So, why does the test code need to care? It's not clear
+>>>>>> from the patch... My expectation would be that you'd
+>>>>>> just test all the testable target architectures,
+>>>>>> regardless of what the host architecture is.
+>>>>>
+>>>>> I tend to agree.  Maybe the right solution is to get rid of the
+>>>>> os.uname().  I think the default should be testing all QEMU
+>>>>> binaries that were built, and the host architecture shouldn't
+>>>>> matter.
+>>>
+>>> Yes, looking at os.uname() also seems like an odd thing
+>>> for the tests to be doing here. The test framework
+>>> should be as far as possible host-architecture agnostic.
+>>> (For some of the KVM cases there probably is a need to
+>>> care, but those are exceptions, not the rule.)
+>>>
+>>>> I'm in favor of exercising all built targets, but that seems to me to be
+>>>> on another layer, above the test themselves. This change is about the
+>>>> behavior of a test when not told about the target arch (and thus binary)
+>>>> it should use.
+>>>
+>>> At that level, I think the right answer is "tell the user
+>>> they need to specify the qemu executable they are trying to test".
+>>> In particular, there is no guarantee that the user has actually
+>>> built the executable for the target that corresponds to the
+>>> host, so it doesn't work to try to default to that anyway.
 >>
->> I noticed this hadn't got merged - who wants it?
+>> Agreed.  However, I don't see when exactly this message would be
+>> triggered.  Cleber, on which use cases do you expect
+>> pick_default_qemu_bin() to be called?
+>>
+>> In an ideal world, any testing runner/tool should be able to
+>> automatically test all binaries by default.  Can Avocado help us
+>> do that?  (If not, we could just do it inside a
+>> ./tests/acceptance/run script).
+>>
+>> --
+>> Eduardo
+>>
 > 
-> I think that's one for my tree, but I'm afraid I completely missed it
-> before.  It's generally best to CC me on ppc related patches,
-> otherwise I'm likely to lose them in the flood of qemu-devel.
+> Why don't we add a variants file to QEMU's tree listing all known possible paths
+> for QEMU binary that can result from a build?  For example:
 > 
-> Anyway, I dug it out of my archives and applied.
+>     $ cat tests/acceptance/variants
+>     qemu_bin:
+>         - ppc-softmmu/qemu-system-ppc
+>         - ppc64-softmmu/qemu-system-ppc64
+>         - x86_64-softmmu/qemu-system-x86_64
+> 
 
-Great - thanks David. Apologies for the delay in my response, I've been fairly flat
-out recently so not much time for QEMU hacking.
+That's possible, and even proposed on the "basic arch support" series.
+But this is a higher level question IMO (it exceeds the test boundaries).
 
+> Then avocado could multiplex these variants file and call ./tests/acceptance/run
+> for each value of qemu_bin.  `run` script could skip and return if $qemu_bin
+> doesn't exist.  This approach also allows user forcing a value of qemu_bin when
+> calling `run` manually, for example:
+> 
+>     ./tests/acceptance/run --qemu_bin=/path/to/your/qemu-system-blah ...
+> 
+> This ./tests/acceptance/run can serve as an entry point to run all the tests.
+> If more parameters are considered mandatory in the future, the logic can be
+> placed there.
+> 
 
-ATB,
+I'm completely favorable to having extra scripts or make rules that
+define a standard "job" behavior.  In fact, I think we'll end up having
+many of those.  "make check-acceptance" is just the first one.
 
-Mark.
+But being able to running individual tests should still be possible, and
+easy IMO.
+
+Regards,
+- Cleber.
+
+> --
+> Murilo
+> 
