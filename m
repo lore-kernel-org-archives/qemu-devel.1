@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44532)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gCnoG-0007sP-KS
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 11:32:33 -0400
+	(envelope-from <mst@redhat.com>) id 1gCnoS-00084Z-Qt
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 11:32:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gCno9-0002Ez-1U
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 11:32:30 -0400
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Wed, 17 Oct 2018 15:32:14 +0000
-Message-ID: <cf068708-3d3d-66a6-7ff6-32e6624c52d5@virtuozzo.com>
-References: <1534844779-118784-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1534844779-118784-4-git-send-email-anton.nefedov@virtuozzo.com>
-	<20181004153359.GH6009@localhost.localdomain>
-	<956674d6-0cb9-f68c-15e2-89d39cfac049@virtuozzo.com>
-	<20181008150316.GB4604@localhost.localdomain>
-	<15568cd5-fa4e-8271-fcfb-b70b738a48e8@virtuozzo.com>
-	<20181008154617.GC4604@localhost.localdomain>
-	<cfa81c77-e2c3-816b-f3cd-2556ee54f5cc@virtuozzo.com>
-	<20181008164328.GA27808@localhost.localdomain>
-In-Reply-To: <20181008164328.GA27808@localhost.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <FCDB4F0516A55A4783D5E76DB6409C9A@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <mst@redhat.com>) id 1gCnoO-00036T-CQ
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 11:32:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49486)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gCnoO-00031w-3d
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 11:32:40 -0400
+Date: Wed, 17 Oct 2018 11:32:28 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181017112522-mutt-send-email-mst@kernel.org>
+References: <20181013025435.25785-1-ehabkost@redhat.com>
+	<20181017092237.GD22755@stefanha-x1.localdomain>
+	<20181017151004.GY31060@habkost.net>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4 3/8] ide: account UNMAP (TRIM) operations
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181017151004.GY31060@habkost.net>
+Subject: Re: [Qemu-devel] [PATCH] virtio: Provide version-specific variants
+ of virtio PCI devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,123 +29,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "famz@redhat.com" <famz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, Caio Carrara <ccarrara@redhat.com>, Markus Armbruster <armbru@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Gerd Hoffmann <kraxel@redhat.com>, Laine Stump <laine@redhat.com>, Cleber Rosa <crosa@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
 
-DQoNCk9uIDgvMTAvMjAxOCA3OjQzIFBNLCBLZXZpbiBXb2xmIHdyb3RlOg0KPiBBbSAwOC4xMC4y
-MDE4IHVtIDE4OjA0IGhhdCBBbnRvbiBOZWZlZG92IGdlc2NocmllYmVuOg0KPj4NCj4+DQo+PiBP
-biA4LzEwLzIwMTggNjo0NiBQTSwgS2V2aW4gV29sZiB3cm90ZToNCj4+PiBBbSAwOC4xMC4yMDE4
-IHVtIDE3OjI1IGhhdCBBbnRvbiBOZWZlZG92IGdlc2NocmllYmVuOg0KPj4+Pg0KPj4+Pg0KPj4+
-PiBPbiA4LzEwLzIwMTggNjowMyBQTSwgS2V2aW4gV29sZiB3cm90ZToNCj4+Pj4+IEFtIDA4LjEw
-LjIwMTggdW0gMTY6MzggaGF0IEFudG9uIE5lZmVkb3YgZ2VzY2hyaWViZW46DQo+Pj4+Pj4gT24g
-NC8xMC8yMDE4IDY6MzMgUE0sIEtldmluIFdvbGYgd3JvdGU6DQo+Pj4+Pj4+IEFtIDIxLjA4LjIw
-MTggdW0gMTE6NDYgaGF0IEFudG9uIE5lZmVkb3YgZ2VzY2hyaWViZW46DQo+Pj4+Pj4+PiBTaWdu
-ZWQtb2ZmLWJ5OiBBbnRvbiBOZWZlZG92IDxhbnRvbi5uZWZlZG92QHZpcnR1b3p6by5jb20+DQo+
-Pj4+Pj4+PiBSZXZpZXdlZC1ieTogQWxiZXJ0byBHYXJjaWEgPGJlcnRvQGlnYWxpYS5jb20+DQo+
-Pj4+Pj4+PiAtLS0NCj4+Pj4+Pj4+ICAgICAgaHcvaWRlL2NvcmUuYyB8IDEyICsrKysrKysrKysr
-Kw0KPj4+Pj4+Pj4gICAgICAxIGZpbGUgY2hhbmdlZCwgMTIgaW5zZXJ0aW9ucygrKQ0KPj4+Pj4+
-Pj4NCj4+Pj4+Pj4+IGRpZmYgLS1naXQgYS9ody9pZGUvY29yZS5jIGIvaHcvaWRlL2NvcmUuYw0K
-Pj4+Pj4+Pj4gaW5kZXggMmM2MmVmYy4uMzUyNDI5YiAxMDA2NDQNCj4+Pj4+Pj4+IC0tLSBhL2h3
-L2lkZS9jb3JlLmMNCj4+Pj4+Pj4+ICsrKyBiL2h3L2lkZS9jb3JlLmMNCj4+Pj4+Pj4+IEBAIC00
-NDAsNiArNDQwLDE0IEBAIHN0YXRpYyB2b2lkIGlkZV9pc3N1ZV90cmltX2NiKHZvaWQgKm9wYXF1
-ZSwgaW50IHJldCkNCj4+Pj4+Pj4+ICAgICAgICAgIFRyaW1BSU9DQiAqaW9jYiA9IG9wYXF1ZTsN
-Cj4+Pj4+Pj4+ICAgICAgICAgIElERVN0YXRlICpzID0gaW9jYi0+czsNCj4+Pj4+Pj4+ICAgICAg
-DQo+Pj4+Pj4+PiArICAgIGlmIChpb2NiLT5pID49IDApIHsNCj4+Pj4+Pj4+ICsgICAgICAgIGlm
-IChyZXQgPj0gMCkgew0KPj4+Pj4+Pj4gKyAgICAgICAgICAgIGJsb2NrX2FjY3RfZG9uZShibGtf
-Z2V0X3N0YXRzKHMtPmJsayksICZzLT5hY2N0KTsNCj4+Pj4+Pj4+ICsgICAgICAgIH0gZWxzZSB7
-DQo+Pj4+Pj4+PiArICAgICAgICAgICAgYmxvY2tfYWNjdF9mYWlsZWQoYmxrX2dldF9zdGF0cyhz
-LT5ibGspLCAmcy0+YWNjdCk7DQo+Pj4+Pj4+PiArICAgICAgICB9DQo+Pj4+Pj4+PiArICAgIH0N
-Cj4+Pj4+Pj4+ICsNCj4+Pj4+Pj4+ICAgICAgICAgIGlmIChyZXQgPj0gMCkgew0KPj4+Pj4+Pj4g
-ICAgICAgICAgICAgIHdoaWxlIChpb2NiLT5qIDwgaW9jYi0+cWlvdi0+bmlvdikgew0KPj4+Pj4+
-Pj4gICAgICAgICAgICAgICAgICBpbnQgaiA9IGlvY2ItPmo7DQo+Pj4+Pj4+PiBAQCAtNDYxLDYg
-KzQ2OSw5IEBAIHN0YXRpYyB2b2lkIGlkZV9pc3N1ZV90cmltX2NiKHZvaWQgKm9wYXF1ZSwgaW50
-IHJldCkNCj4+Pj4+Pj4+ICAgICAgICAgICAgICAgICAgICAgICAgICBnb3RvIGRvbmU7DQo+Pj4+
-Pj4+PiAgICAgICAgICAgICAgICAgICAgICB9DQo+Pj4+Pj4+PiAgICAgIA0KPj4+Pj4+Pj4gKyAg
-ICAgICAgICAgICAgICBibG9ja19hY2N0X3N0YXJ0KGJsa19nZXRfc3RhdHMocy0+YmxrKSwgJnMt
-PmFjY3QsDQo+Pj4+Pj4+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY291bnQg
-PDwgQkRSVl9TRUNUT1JfQklUUywgQkxPQ0tfQUNDVF9VTk1BUCk7DQo+Pj4+Pj4+PiArDQo+Pj4+
-Pj4+PiAgICAgICAgICAgICAgICAgICAgICAvKiBHb3QgYW4gZW50cnkhIFN1Ym1pdCBhbmQgZXhp
-dC4gICovDQo+Pj4+Pj4+PiAgICAgICAgICAgICAgICAgICAgICBpb2NiLT5haW9jYiA9IGJsa19h
-aW9fcGRpc2NhcmQocy0+YmxrLA0KPj4+Pj4+Pj4gICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIHNlY3RvciA8PCBCRFJWX1NFQ1RPUl9CSVRTLA0KPj4+
-Pj4+Pj4gQEAgLTg0NSw2ICs4NTYsNyBAQCBzdGF0aWMgdm9pZCBpZGVfZG1hX2NiKHZvaWQgKm9w
-YXF1ZSwgaW50IHJldCkNCj4+Pj4+Pj4+ICAgICAgICAgIH0NCj4+Pj4+Pj4+ICAgICAgDQo+Pj4+
-Pj4+PiAgICAgICAgICBpZiAocmV0ID09IC1FSU5WQUwpIHsNCj4+Pj4+Pj4+ICsgICAgICAgIGJs
-b2NrX2FjY3RfaW52YWxpZChibGtfZ2V0X3N0YXRzKHMtPmJsayksIEJMT0NLX0FDQ1RfVU5NQVAp
-Ow0KPj4+Pj4+Pg0KPj4+Pj4+PiBUaGlzIGxvb2tzIHdyb25nIHRvIG1lLCBpZGVfZG1hX2NiKCkg
-aXMgbm90IG9ubHkgY2FsbGVkIGZvciB1bm1hcCwgYnV0DQo+Pj4+Pj4+IGFsc28gZm9yIHJlYWRz
-IGFuZCB3cml0ZXMsIGFuZCBlYWNoIG9mIHRoZW0gY291bGQgcmV0dXJuIC1FSU5WQUwuDQo+Pj4+
-Pj4+DQo+Pj4+Pj4NCj4+Pj4+PiBTdGF0aW5nIGhlcmUgQkxPQ0tfQUNDVF9VTk1BUCBpcyBkZWZp
-bml0ZWx5IGEgYmx1bmRlciA6KA0KPj4+Pj4+DQo+Pj4+Pj4+IEFsc28sIC1FSU5WQUwgZG9lc24n
-dCBuZWNlc3NhcmlseSBtZWFuIHRoYXQgdGhlIGd1ZXN0IGRyaXZlciBkaWQNCj4+Pj4+Pj4gc29t
-ZXRoaW5nIHdyb25nLCBpdCBjb3VsZCBhbHNvIGJlIHRoZSByZXN1bHQgb2YgYSBob3N0IHByb2Js
-ZW0uDQo+Pj4+Pj4+IFRoZXJlZm9yZSwgaXQgaXNuJ3QgcmlnaHQgdG8gY2FsbCBibG9ja19hY2N0
-X2ludmFsaWQoKSBoZXJlIC0gZXNwZWNpYWxseQ0KPj4+Pj4+PiBzaW5jZSB0aGUgcmVxdWVzdCBt
-YXkgYWxyZWFkeSBoYXZlIGJlZW4gYWNjb3VudGVkIGZvciBhcyBlaXRoZXIgZG9uZSBvcg0KPj4+
-Pj4+PiBmYWlsZWQgaW4gaWRlX2lzc3VlX3RyaW1fY2IoKS4NCj4+Pj4+Pj4NCj4+Pj4+Pg0KPj4+
-Pj4+IENvdWxkbid0IGJlIGFjY291bnRlZCBkb25lIHdpdGggc3VjaCByZXRjb2RlOw0KPj4+Pj4+
-IGFuZCBpdCBzZWVtcyBJIHNob3VsZG50IGRvIGJsb2NrX2FjY3RfZmFpbGVkKCkgdGhlcmUgYW55
-d2F5IC0gb3IgaXQncw0KPj4+Pj4+IGFjY291bnRlZCB0d2ljZTogdGhlcmUgYW5kIGluIGlkZV9k
-bWFfY2IoKS0+aWRlX2hhbmRsZV9yd19lcnJvcigpDQo+Pj4+Pj4NCj4+Pj4+PiBCdXQgaWYgRUlO
-VkFMIChmcm9tIGZ1cnRoZXIgbGF5ZXJzKSBzaG91bGQgbm90IGJlIGFjY291bnRlZCBhcyBhbg0K
-Pj4+Pj4+IGludmFsaWQgb3AsIHRoZW4gaXQgc2hvdWxkIGJlIGFjY291bnRlZCBmYWlsZWQgaW5z
-dGVhZCwgdGhlIHRoaW5nIHRoYXQNCj4+Pj4+PiBjdXJyZW50IGNvZGUgZG9lcyBub3QgZG8uDQo+
-Pj4+Pj4gKGFuZCB3aGljaCBicmluZ3MgdXMgYmFjayB0byBwb3NzaWJsZSBkb3VibGUtYWNjb3Vu
-dGluZyBpZiB3ZSBhY2NvdW50DQo+Pj4+Pj4gaW52YWxpZCBpbiBpZGVfaXNzdWVfdHJpbV9jYigp
-ICkNCj4+Pj4+DQo+Pj4+PiBZZXMsIGNvbW1pdCBjYWVhZGJjOGJhNCB3YXMgYWxyZWFkeSB3cm9u
-ZyBpbiBhc3N1bWluZyB0aGF0IHRoZXJlIGlzDQo+Pj4+PiBvbmx5IG9uZSBwb3NzaWJsZSBzb3Vy
-Y2UgZm9yIC1FSU5WQUwuDQo+Pj4+Pg0KPj4+Pj4+PiBJbnN0ZWFkLCBJIHRoaW5rIGl0IHdvdWxk
-IGJlIGJldHRlciB0byBpbW1lZGlhdGVseSBhY2NvdW50IGZvciBpbnZhbGlkDQo+Pj4+Pj4+IHJl
-cXVlc3RzIGluIGlkZV9pc3N1ZV90cmltX2NiKCkgd2hlcmUgaW9jYi0+cmV0ID0gLUVJTlZBTCBp
-cyBzZXQgYW5kIHdlDQo+Pj4+Pj4+IGtub3cgZm9yIHN1cmUgdGhhdCBpbmRlZWQgIWlkZV9zZWN0
-X3JhbmdlX29rKCkgaXMgdGhlIGNhdXNlIGZvciB0aGUNCj4+Pj4+Pj4gLUVJTlZBTCByZXR1cm4g
-Y29kZS4NCj4+Pj4+Pj4NCj4+Pj4+PiBTbyBJIGd1ZXNzIHllcywgbW92ZSBhY2N0X2ludmFsaWQg
-aW4gaWRlX2lzc3VlX3RyaW1fY2IoKSBhbmQgbGVhdmUNCj4+Pj4+PiBhY2N0X2ZhaWxlZCB0aGVy
-ZSwgYW5kIGZpbHRlciBvZmYgVFJJTSBjb21tYW5kcyBpbiB0aGUgY29tbW9uDQo+Pj4+Pj4gYWNj
-b3VudGluZy4NCj4+Pj4+DQo+Pj4+PiBibGtfYWlvX2Rpc2NhcmQoKSBjYW4gZmFpbCB3aXRoIC1F
-SU5WQUwsIHRvbywgc28gZ2V0dGluZyB0aGlzIGVycm9yIGNvZGUNCj4+Pj4+IGZyb20gYSBUUklN
-IGNvbW1hbmQgZG9lc24ndCBtZWFuIGFueXRoaW5nLiBJdCBjYW4gc3RpbGwgaGF2ZSBtdWx0aXBs
-ZQ0KPj4+Pj4gcG9zc2libGUgc291cmNlcy4NCj4+Pj4+DQo+Pj4+DQo+Pj4+IEkgbWVhbnQgdGhh
-dCBjb21tb24gaWRlX2RtYV9jYigpIHNob3VsZCBhY2NvdW50IEVJTlZBTCAoYWxvbmcgd2l0aCBv
-dGhlcg0KPj4+PiBlcnJvcnMpIGFzIGZhaWxlZCwgdW5sZXNzIGl0J3MgVFJJTSwgd2hpY2ggbWVh
-bnMgaXQncyBhbHJlYWR5DQo+Pj4+IGFjY291bnRlZCAoZWl0aGVyIGludmFsaWQgb3IgZmFpbGVk
-KQ0KPj4+DQo+Pj4gT2gsIHlvdSB3b3VsZCBhbHJlYWR5IGFjY291bnQgZm9yIGZhaWx1cmUgaW4g
-aWRlX2lzc3VlX3RyaW1fY2IoKSwgdG9vLA0KPj4+IGJ1dCBvbmx5IGlmIGl0J3MgRUlOVkFMPyBU
-aGF0IGZlZWxzIGxpa2UgaXQgd291bGQgY29tcGxpY2F0ZSB0aGUgY29kZQ0KPj4+IHF1aXRlIGEg
-Yml0Lg0KPj4+DQo+Pg0KPj4gTm8sIG5vIDopIGlkZV9pc3N1ZV90cmltX2NiIGRvZXMgdGhlIHBy
-b3BlciBhY2NvdW50aW5nIChmYWlsZWQvaW52YWxpZCkNCj4+IGZvciBUUklNLg0KPj4gVGhlbiBj
-b21tb24gcGF0aCAoaWRlX2RtYV9jYigpKSBkb2VzIG5vdCBhY2NvdW50IFRSSU0gb3BlcmF0aW9u
-cyBhdCBhbGwNCj4+IHJlZ2FyZGxlc3Mgb2YgdGhlIGVycm9yIGNvZGUuIE5vIG5lZWQgdG8gY2hl
-Y2sgZm9yIFRSSU0gc3BlY2lmaWNhbGx5IGlmDQo+PiB3ZSBoYXZlIEJMT0NLX0FDQ1RfTk9ORS4N
-Cj4+DQo+Pj4gQW5kIGFjdHVhbGx5LCBkaWRuJ3QgY29tbWl0IGNhZWFkYmM4YmE0IGJyZWFrIHdl
-cnJvcj1zdG9wIGZvciByZXF1ZXN0cw0KPj4+IHJldHVybmluZyAtRUlOVkFMIGJlY2F1c2Ugd2Ug
-ZG9uJ3QgY2FsbCBpZGVfaGFuZGxlX3J3X2Vycm9yKCkgYW55IG1vcmU/DQo+Pj4NCj4+DQo+PiBZ
-ZXMuDQo+Pg0KPj4gUmVhZC93cml0ZSBpZ25vcmUgd2Vycm9yPXN0b3AgZm9yIGludmFsaWQgcmFu
-Z2UgY2FzZSAobm90IGZvciBFSU5WQUwpLg0KPj4gSSB3b25kZXIgaWYgaXQncyBjcnVjaWFsIHRv
-IGlnbm9yZSBpdCBmb3IgVFJJTSB0b28sIG90aGVyd2lzZSB3ZSBjb3VsZA0KPj4ganVzdCByZW1v
-dmUgdGhpcyBjaHVuaw0KPj4NCj4+ICAgICAgICBpZiAocmV0ID09IC1FSU5WQUwpIHsNCj4+ICAg
-ICAgICAgICAgaWRlX2RtYV9lcnJvcihzKTsNCj4+ICAgICAgICAgICAgcmV0dXJuOw0KPj4gICAg
-ICAgIH0NCj4gDQo+IEFoLCByaWdodCwgSSBmb3Jnb3QgYWJvdXQgdGhpcy4NCj4gDQo+IEl0IGlz
-IGFjdHVhbGx5IGRlc2lyYWJsZSB0byBhdm9pZCBzdG9wcGluZyBmb3IgaW52YWxpZCByZXF1ZXN0
-cyBiZWNhdXNlDQo+IHdlIHNob3VsZCBvbmx5IHN0b3AgZm9yIGhvc3QgZXJyb3JzLiBBbiBpbnZh
-bGlkIHJlcXVlc3QgaXMgYSBndWVzdCBlcnJvcg0KPiBhbmQgc3RvcHBpbmcgdGhlIFZNIHdpbGwg
-ZG8gbm90aGluZyB0byBmaXggaXQuIChSZXN1bWluZyB0aGUgVk0gd291bGQNCj4gaW1tZWRpYXRl
-bHkgZmFpbCBhZ2Fpbiwgc28gdGhlIFZNIHdvdWxkIGJlIGxvY2tlZCBpbiBwYXVzZWQgc3RhdGUu
-KQ0KPiANCj4gS2V2aW4NCj4gDQoNCkkgY2FuJ3QgY29tZSB1cCB3aXRoIGEgcGVyZmVjdCBzb2x1
-dGlvbiBvZiB0aGlzLg0KDQpJdCdzIGhhcmQgdG8gcmVhY2ggVFJJTSBzZWN0b3ItcmFuZ2VzIGZy
-b20gY29tbW9uIGlkZV9kbWFfY2IoKSAod2hpY2gNCm9ubHkgaGFzIFFFTVVTR0xpc3QpIGFuZCBp
-dCdzIGhhcmQgdG8gYWNjdXJhdGVseSByZXBvcnQgcmFuZ2UgaW52YWxpZGl0eQ0KdG8gaWRlX2Rt
-YV9jYigpIHdpdGggYSBzaW5nbGUgcmV0dmFsLg0KDQpJIHNlZSB0aGUgZm9sbG93aW5nIG9wdGlv
-bnMgZm9yIGludmFsaWQgcmFuZ2UgdHJpbToNCg0KICAgMS4gZGlzdGluZ3Vpc2ggcmFuZ2UgaW52
-YWxpZGl0eSBpbiBpZGVfZG1hX2NiKCkgd2l0aCBzb21lIHVudXNlZA0KICAgICAgZXJyY29kZSBp
-bnN0ZWFkIG9mIC1FSU5WQUwNCiAgICAgIC0gZG9lcyBvbmUgZXhpc3Q/DQogICAyLiB1c2Ugc29t
-ZSBuZXcgZ2xvYmFsIGZsYWcgb24gSURFU3RhdGUNCiAgICAgIC0gZXZlcnkgY2FsbGJhY2sgKGlk
-ZV9kbWFfY2IsIHBtYWNfaWRlX3RyYW5zZmVyX2NiKSBtdXN0IGNoZWNrDQogICAgICAgIGFuZCBj
-bGVhciB0aGF0DQogICAzLiBwYXJzZSBTR0xpc3QgYW5kIGNoZWNrIHJhbmdlIGludmFsaWRpdHkg
-c2VwYXJhdGVseSBpbiBpZGVfZG1hX2NiKCkNCiAgICAgIC0gc29tZXdoYXQgdG9vIGludHJ1c2l2
-ZSBjaGFuZ2UNCg0Kb3IgcHV0IHVwIHdpdGggaXQ6DQogICA0LiBpZ25vcmUgKGFjY291bnQgYXMg
-aW52YWxpZCBidXQgZG8gbm90IGFib3J0KQ0KICAgNS4gdHJlYXQgYXMgYSBob3N0IGVycm9yIGku
-ZS4gY2FsbCBpZGVfaGFuZGxlX3J3X2Vycm9yKCkgYW5kIHN0b3AgVk0NCiAgICAgIGlmIHdlcnJv
-cj1zdG9wDQogICA2LiBrZWVwIC1FSU5WQUwgKGFzIGRvbmUgbm93KSBhbmQgcG90ZW50aWFsbHkg
-aWdub3JlIGNvbmZpZ3VyZWQgZXJyb3INCiAgICAgIGFjdGlvbiBmb3IgdGhlIGhvc3QgcmV0dXJu
-ZWQgLUVJTlZBTA0KDQpXaGF0IGRvIHlvdSB0aGluaz8NCg0KL0FudG9uDQo=
+On Wed, Oct 17, 2018 at 12:10:04PM -0300, Eduardo Habkost wrote:
+> On Wed, Oct 17, 2018 at 10:22:37AM +0100, Stefan Hajnoczi wrote:
+> > On Fri, Oct 12, 2018 at 11:54:35PM -0300, Eduardo Habkost wrote:
+> > > This patch adds separate device types for each of those virtio
+> > > device flavors:
+> > > 
+> > > - virtio-*-pci: the existing multi-purpose device types
+> > >   - Configurable using `disable-legacy` and `disable-modern`
+> > >     properties
+> > >   - Legacy driver support is automatically enabled/disabled
+> > >     depending on the bus where it is plugged
+> > >   - Supports Conventional PCI and PCI Express buses
+> > >     (but Conventional PCI is incompatible with
+> > >     disable-legacy=off)
+> > >   - Changes PCI vendor/device IDs at runtime
+> > > - virtio-*-pci-0.9: legacy virtio device
+> > >   - Supports Conventional PCI buses only, because
+> > >     it has a PIO BAR
+> > > - virtio-*-pci-1.0-transitional: virtio-1.0 device supporting legacy drivers
+> > >   - Supports Conventional PCI buses only, because
+> > >     it has a PIO BAR
+> > > - virtio-*-pci-1.0: modern-only
+> > >   - Supports both Conventional PCI and PCI Express buses
+> > 
+> > If new device types are being created, is it time to decouple the VIRTIO
+> > PCI transport from the actual VIRTIO device (blk, net, scsi) like we
+> > already have with virtio-mmio?
+> > 
+> >   -device virtio-pci-1.0,id=virtio-pci-0
+> >   -device virtio-blk,bus=virtio-pci-0,drive=drive0,serial=mydisk
+> > 
+> > That way we avoid lots of boilerplate code and an explosion of new
+> > device types.
+> 
+> I don't think that would work.  This would in turn make
+> virtio-pci-1.0 a chameleon device that changes PCI ID depending
+> on the backend device plugged to it.
+> 
+> Also, PCI IDs are not the only information contained inside the
+> virtio-pci subclasses.  See all the PCI-specific +
+> device-type-specific knowledge encoded inside the class_init and
+> instance_init functions of each virtio-pci subclass.
+
+I think we need to draw the line somewhere. We can't make new
+classes and bother users each time there is a behaviour
+change in the device.
+
+But I also think the transport/device split it also an internal virtio
+thing, no one who has not read the spec cares about it.
+
+> -- 
+> Eduardo
