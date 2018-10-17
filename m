@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53193)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53265)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gCihR-0005UQ-IS
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 06:05:10 -0400
+	(envelope-from <thuth@redhat.com>) id 1gCihi-0005eZ-Jd
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 06:05:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gCihM-0008GB-HH
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 06:05:09 -0400
-Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:39778)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gCihM-000878-4a
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 06:05:04 -0400
-Received: by mail-wm1-x32b.google.com with SMTP id y144-v6so1492398wmd.4
-	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 03:05:04 -0700 (PDT)
-Date: Wed, 17 Oct 2018 11:05:01 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20181017100501.GM22755@stefanha-x1.localdomain>
-References: <87efcqniza.fsf@dusky.pond.sub.org>
+	(envelope-from <thuth@redhat.com>) id 1gCihW-0000pr-2x
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 06:05:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59294)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gCihV-0000jE-PK
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 06:05:13 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Wed, 17 Oct 2018 12:04:52 +0200
+Message-Id: <1539770707-7289-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Aaj1jBvBEV7KRjLi"
-Content-Disposition: inline
-In-Reply-To: <87efcqniza.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] When it's okay to treat OOM as fatal?
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 00/15] qtest and misc patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,52 +24,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
 Cc: qemu-devel@nongnu.org
 
+ Hi Peter,
 
---Aaj1jBvBEV7KRjLi
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+the following changes since commit dddb37495b844270088e68e3bf30b764d48d86=
+3f:
 
-On Tue, Oct 16, 2018 at 03:01:29PM +0200, Markus Armbruster wrote:
-> Anything that pages commonly becomes unusable long before
-> allocations fail.  Anything that overcommits will send you a (commonly
-> lethal) signal instead.  Anything that tries handling OOM gracefully,
-> and manages to dodge both these bullets somehow, will commonly get it
-> wrong and crash.
+  Merge remote-tracking branch 'remotes/awilliam/tags/vfio-updates-201810=
+15.0' into staging (2018-10-15 18:44:04 +0100)
 
-In the block layer blk_try_blockalign() (previously
-qemu_try_blockalign()) is used because significant amounts of memory can
-be allocated by the untrusted guest or untrusted disk image files.  I
-think the error handling is reasonable in those cases:
-1. QEMU startup or disk hotplug fail with a nice error message
-OR
-2. An I/O request is failed (ultimately just EIO error reporting but
-   it's better than killing the QEMU process!)
+are available in the git repository at:
 
-I'm pretty sure ENOMEM errors are possible even when memory overcommit
-is enabled.
+  https://gitlab.com/huth/qemu.git tags/pull-request-2018-10-17
 
-My thinking has been to use g_new() for small QEMU-internal structures
-and g_try_new() for large amounts of memory allocated in response to
-untrusted inputs.  (Untrusted inputs must never be used for unbounded
-allocation sizes but those bounded sizes can still be large.)
+for you to fetch changes up to 7fc527cdc9cfd139dee1d90e3220a884229a7698:
 
-Stefan
+  configure: remove glib_subprocess check (2018-10-17 09:01:41 +0200)
 
---Aaj1jBvBEV7KRjLi
-Content-Type: application/pgp-signature; name="signature.asc"
+----------------------------------------------------------------
+- Updates for qtest entries in test/Makefile.include
+- Simple updates for some shell scripts
+- Misc simple patches for files without regular subsystem pull requests
+----------------------------------------------------------------
 
------BEGIN PGP SIGNATURE-----
+Eric Blake (1):
+      tests: Prevent more accidental test disabling
 
-iQEcBAEBAgAGBQJbxwlNAAoJEJykq7OBq3PIpBEIAMpZ6wA3hpet4BzUkMCF1+Yg
-kZoXLyAO6lpETHuU4+VQb/Vf3qrTB1/GAWUrB8P/HPryFZAZdabClmMjDx3Srt0l
-vVvfxODW3Fw9/dzojxtovNADoxiOJi3z4dZziRhvY9BWTsvXO7fIMeJCWlCJkOrt
-Q9E05JkHLkzcBxIqGoGnaXuLpl3vvqUTKdAJv6nCRef7QjytIc75ItFotA524u0/
-SZEtO5lWu2wj53hzbjxDyoYttKY+GrureaeGNkNvO3gGlYAN+TQLZ6OJbq/2xP0j
-UzuX5i9pQliC7G4u4T0myUCM0L3bz2jcQCcioTHONdGVrhX0IUxT8neQ2607P5s=
-=Ci0g
------END PGP SIGNATURE-----
+John Arbuckle (1):
+      qemu-common.h: update copyright date to 2018
 
---Aaj1jBvBEV7KRjLi--
+Liu Yuan (1):
+      MAINTAINERS: update block/sheepdog maintainers
+
+Mao Zhongyi (3):
+      archive-source.sh: Modern shell scripting (use $() instead of ``)
+      git-submodule.sh: Modern shell scripting (use $() instead of ``)
+      show-fixed-bugs.sh: Modern shell scripting (use $() instead of ``)
+
+Marc-Andr=C3=A9 Lureau (1):
+      configure: remove glib_subprocess check
+
+Paolo Bonzini (1):
+      tests: remove gcov-files- variables
+
+Philippe Mathieu-Daud=C3=A9 (2):
+      gdbstub: Remove unused include
+      mailmap: Fix Reimar D=C3=B6ffinger name
+
+Thomas Huth (5):
+      target/cris/translate: Get rid of qemu_log_separate()
+      qemu/compiler: Wrap __attribute__((flatten)) in a macro
+      hw/core/generic-loader: Set a category for the generic-loader devic=
+e
+      cpu: Provide a proper prototype for target_words_bigendian() in a h=
+eader
+      hw/core/generic-loader: Compile only once, not for each target
+
+ .mailmap                   |   3 +-
+ MAINTAINERS                |   1 -
+ configure                  |   6 --
+ docs/devel/testing.rst     |   4 +-
+ exec.c                     |   5 --
+ fpu/softfloat.c            |  39 +++++--------
+ gdbstub.c                  |   1 -
+ hw/core/Makefile.objs      |   2 +-
+ hw/core/generic-loader.c   |   7 +--
+ hw/virtio/virtio.c         |   1 -
+ include/qemu-common.h      |   2 +-
+ include/qemu/compiler.h    |  15 +++++
+ include/qom/cpu.h          |  11 ++++
+ qom/cpu.c                  |   1 -
+ scripts/archive-source.sh  |   4 +-
+ scripts/git-submodule.sh   |   4 +-
+ scripts/show-fixed-bugs.sh |  10 ++--
+ target/cris/translate.c    |   6 +-
+ tests/Makefile.include     | 140 ++++-----------------------------------=
+------
+ 19 files changed, 69 insertions(+), 193 deletions(-)
