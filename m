@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52599)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38075)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gCbW4-0002Fi-N0
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 22:24:57 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1gCcpV-0006dT-3S
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 23:49:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gCbW3-0002Nr-O8
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 22:24:56 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:50987)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1gCbW2-0002GC-D1
-	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 22:24:55 -0400
-Date: Wed, 17 Oct 2018 11:34:15 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gCcpT-00079q-La
+	for qemu-devel@nongnu.org; Tue, 16 Oct 2018 23:49:05 -0400
+Date: Wed, 17 Oct 2018 14:28:59 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181017003415.GK16167@umbus.fritz.box>
-References: <20180727123112.13707-1-dgilbert@redhat.com>
-	<d09b7607-a23b-7c05-9faf-7ec0000684af@ilande.co.uk>
-	<20180727134453.GB2498@work-vm>
-	<c8608e2e-35da-d095-193a-626d0d47c036@ilande.co.uk>
-	<20180727151412.GC2498@work-vm> <20181016113044.GE2426@work-vm>
+Message-ID: <20181017032859.GB30180@umbus.fritz.box>
+References: <20181012032431.32693-1-david@gibson.dropbear.id.au>
+	<20181012032431.32693-6-david@gibson.dropbear.id.au>
+	<f21b8a98-3401-cf82-749d-2101fbe69a33@redhat.com>
+	<20181013064009.GG16167@umbus.fritz.box>
+	<d26f9429-1da8-20d2-e43b-bee1141fb62f@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="BFVE2HhgxTpCzM8t"
+	protocol="application/pgp-signature"; boundary="9zSXsLTf0vkW971A"
 Content-Disposition: inline
-In-Reply-To: <20181016113044.GE2426@work-vm>
-Subject: Re: [Qemu-devel] [PATCH] macio/pmu: Fix missing vmsd terminator
+In-Reply-To: <d26f9429-1da8-20d2-e43b-bee1141fb62f@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 5/5] virtio-balloon: Safely handle
+ BALLOON_PAGE_SIZE < host page size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,118 +28,290 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, lvivier@redhat.com, qemu-devel@nongnu.org, agraf@suse.de
+To: David Hildenbrand <david@redhat.com>
+Cc: dhildenb@redhat.com, imammedo@redhat.com, ehabkost@redhat.com, mst@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
---BFVE2HhgxTpCzM8t
+--9zSXsLTf0vkW971A
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 16, 2018 at 12:30:45PM +0100, Dr. David Alan Gilbert wrote:
+On Mon, Oct 15, 2018 at 09:08:45AM +0200, David Hildenbrand wrote:
+> >>> This occurs in practice routinely for POWER KVM systems, since both h=
+ost
+> >>> and guest typically use 64kiB pages.
+> >>>
+> >>> To make this safe, without breaking that useful case, we need to
+> >>> accumulate 4kiB balloon requests until we have a whole contiguous hos=
+t page
+> >>> at which point we can discard it.
+> >>
+> >> ... and if you have a 4k guest it will just randomly report pages and
+> >> your 67 LOC tweak is useless.
+> >=20
+> > Yes.
+> >=20
+> >> And this can and will easily happen.
+> >=20
+> > What cases are you thinking of?  For POWER at least, 4k on 64k will be
+> > vastly less common than 64k on 64k.
 >=20
-> I noticed this hadn't got merged - who wants it?
+> Okay, I was wondering why we don't get tons of bug reports for 4k on
+> 64k.
 
-I think that's one for my tree, but I'm afraid I completely missed it
-before.  It's generally best to CC me on ppc related patches,
-otherwise I'm likely to lose them in the flood of qemu-devel.
+Right, and the answer is because 64k has been the normal configuration
+on every major ppc64 distro for years (for both host and guest).
 
-Anyway, I dug it out of my archives and applied.
+> So 64k on 64k while using ballooning is supported and heavily used
+> then I guess? Because as you said, 4k on 64k triggers memory corruptions.
+
+Right.
+
+> >>> We could in principle do that across all guest memory, but it would r=
+equire
+> >>> a large bitmap to track.  This patch represents a compromise: instead=
+ we
+> >>
+> >> Oh god no, no tracking of all memory. (size of bitmap, memory hotplug,
+> >> ... migration?)
+> >=20
+> > Quite, that's why I didn't do it.  Although, I don't actually think
+> > migration is such an issue: we *already* essentially lose track of
+> > which pages are inside the balloon across migration.
+>=20
+> Well, we migrate zero pages that get replaces by zero pages on the
+> target. So at least KSM could recover them.
+
+Right, but there's no explicit state being transferred.  In a sense,
+KSM and zero page handling across migration resets the balloon to a
+state optimized for the current memory state of the guest.
+
+> >>> track ballooned subpages for a single contiguous host page at a time.=
+  This
+> >>> means that if the guest discards all 4kiB chunks of a host page in
+> >>> succession, we will discard it.  In particular that means the balloon=
+ will
+> >>> continue to work for the (host page size) =3D=3D (guest page size) > =
+4kiB case.
+> >>>
+> >>> If the guest scatters 4kiB requests across different host pages, we d=
+on't
+> >>> discard anything, and issue a warning.  Not ideal, but at least we do=
+n't
+> >>> corrupt guest memory as the previous version could.
+> >>
+> >> My take would be to somehow disable the balloon on the hypervisor side
+> >> in case the host page size is not 4k. Like not allowing to realize it.
+> >> No corruptions, no warnings people will ignore.
+> >=20
+> > No, that's even worse than just having it silently do nothing on
+> > non-4k setups.  Silently being useless we might get away with, we'll
+> > just waste memory, but failing the device load will absolutely break
+> > existing setups.
+>=20
+> Silently consume more memory is very very evil. Think about
+> auto-ballooning setups
+> https://www.ovirt.org/documentation/how-to/autoballooning/
+
+Well, sure, I don't think this is a good idea.
+
+> But on the other hand, this has been broken forever for huge pages
+> without printing warnings. Oh man, virtio-balloon ...
+>=20
+> Disallowing to realize will only break migration from an old host to a
+> new host. But migration will bail out right away.
+
+The issue isn't really migration here.  If we prevent the balloon
+device from realizing, guests which already had it configured simply
+won't be able to start after qemu is updated.
+
+> We could of course
+> glue this to a compat machine,
+
+We could, but what would it accomplish?  We'd still have to do
+something for the old machine versions - so we're back at either
+allowing memory corruption like we do right now, or batch gathering as
+my patch proposes.
+
+> but I guess the point you have is that
+> customer want to continue using this "works by accident without memory
+> corruptions" virtio-balloon implementation.
+
+Right.  That's why I really think we need this batch-gathering
+approach, ugly and irritating though it is.
 
 >=20
-> Dave
+> >=20
+> >>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> >>> ---
+> >>>  hw/virtio/virtio-balloon.c         | 67 +++++++++++++++++++++++++---=
+--
+> >>>  include/hw/virtio/virtio-balloon.h |  3 ++
+> >>>  2 files changed, 60 insertions(+), 10 deletions(-)
+> >>>
+> >>> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+> >>> index 4435905c87..39573ef2e3 100644
+> >>> --- a/hw/virtio/virtio-balloon.c
+> >>> +++ b/hw/virtio/virtio-balloon.c
+> >>> @@ -33,33 +33,80 @@
+> >>> =20
+> >>>  #define BALLOON_PAGE_SIZE  (1 << VIRTIO_BALLOON_PFN_SHIFT)
+> >>> =20
+> >>> +typedef struct PartiallyBalloonedPage {
+> >>> +    RAMBlock *rb;
+> >>> +    ram_addr_t base;
+> >>> +    unsigned long bitmap[];
+> >>> +} PartiallyBalloonedPage;
+> >>> +
+> >>>  static void balloon_inflate_page(VirtIOBalloon *balloon,
+> >>>                                   MemoryRegion *mr, hwaddr offset)
+> >>>  {
+> >>>      void *addr =3D memory_region_get_ram_ptr(mr) + offset;
+> >>>      RAMBlock *rb;
+> >>>      size_t rb_page_size;
+> >>> -    ram_addr_t ram_offset;
+> >>> +    int subpages;
+> >>> +    ram_addr_t ram_offset, host_page_base;
+> >>> =20
+> >>>      /* XXX is there a better way to get to the RAMBlock than via a
+> >>>       * host address? */
+> >>>      rb =3D qemu_ram_block_from_host(addr, false, &ram_offset);
+> >>>      rb_page_size =3D qemu_ram_pagesize(rb);
+> >>> +    host_page_base =3D ram_offset & ~(rb_page_size - 1);
+> >>> +
+> >>> +    if (rb_page_size =3D=3D BALLOON_PAGE_SIZE) {
+> >>> +        /* Easy case */
+> >>> =20
+> >>> -    /* Silently ignore hugepage RAM blocks */
+> >>> -    if (rb_page_size !=3D getpagesize()) {
+> >>> +        ram_block_discard_range(rb, ram_offset, rb_page_size);
+> >>> +        /* We ignore errors from ram_block_discard_range(), because =
+it
+> >>> +         * has already reported them, and failing to discard a ballo=
+on
+> >>> +         * page is not fatal */
+> >>>          return;
+> >>>      }
+> >>> =20
+> >>> -    /* Silently ignore unaligned requests */
+> >>> -    if (ram_offset & (rb_page_size - 1)) {
+> >>> -        return;
+> >>> +    /* Hard case
+> >>> +     *
+> >>> +     * We've put a piece of a larger host page into the balloon - we
+> >>> +     * need to keep track until we have a whole host page to
+> >>> +     * discard
+> >>> +     */
+> >>> +    subpages =3D rb_page_size / BALLOON_PAGE_SIZE;
+> >>> +
+> >>> +    if (balloon->pbp
+> >>> +        && (rb !=3D balloon->pbp->rb
+> >>> +            || host_page_base !=3D balloon->pbp->base)) {
+> >>> +        /* We've partially ballooned part of a host page, but now
+> >>> +         * we're trying to balloon part of a different one.  Too har=
+d,
+> >>> +         * give up on the old partial page */
+> >>> +        warn_report("Unable to insert a partial page into virtio-bal=
+loon");
+> >>
+> >> I am pretty sure that you can create misleading warnings in case you
+> >> migrate at the wrong time. (migrate while half the 64k page is inflate=
+d,
+> >> on the new host the other part is inflated - a warning when switching =
+to
+> >> another 64k page).
+> >=20
+> > Yes we can get bogus warnings across migration with this.  I was
+> > considering that an acceptable price, but I'm open to better
+> > alternatives.
 >=20
-> * Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
-> > * Mark Cave-Ayland (mark.cave-ayland@ilande.co.uk) wrote:
-> > > On 27/07/18 14:44, Dr. David Alan Gilbert wrote:
-> > >=20
-> > > > * Mark Cave-Ayland (mark.cave-ayland@ilande.co.uk) wrote:
-> > > > > On 27/07/18 13:31, Dr. David Alan Gilbert (git) wrote:
-> > > > >=20
-> > > > > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > > > > >=20
-> > > > > > Fix missing terminator in VMStateDescription
-> > > > > >=20
-> > > > > > Fixes: d811d61fbc6ca5f2be2185fd7cfa916e7ba613ce
-> > > > > > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > > > > > ---
-> > > > > >    hw/misc/macio/pmu.c | 1 +
-> > > > > >    1 file changed, 1 insertion(+)
-> > > > > >=20
-> > > > > > diff --git a/hw/misc/macio/pmu.c b/hw/misc/macio/pmu.c
-> > > > > > index e246b0fd41..27dfaf8a74 100644
-> > > > > > --- a/hw/misc/macio/pmu.c
-> > > > > > +++ b/hw/misc/macio/pmu.c
-> > > > > > @@ -686,6 +686,7 @@ static const VMStateDescription vmstate_pmu=
-_adb =3D {
-> > > > > >            VMSTATE_TIMER_PTR(adb_poll_timer, PMUState),
-> > > > > >            VMSTATE_UINT8(adb_reply_size, PMUState),
-> > > > > >            VMSTATE_BUFFER(adb_reply, PMUState),
-> > > > > > +        VMSTATE_END_OF_LIST()
-> > > > > >        }
-> > > > > >    };
-> > > > >=20
-> > > > > Gah, yes indeed it certainly looks like I missed this whilst work=
-ing on the
-> > > > > PMU code :(
-> > > > >=20
-> > > > > Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> > > > >=20
-> > > > > Just out of interest does a savevm/loadvm migration still succeed=
- once this
-> > > > > has been added?
-> > > >=20
-> > > > Have you got a suggested command line to test it with?
-> > >=20
-> > > I'm effectively AFK until tomorrow now, but just quickly:
-> > >=20
-> > > $ ./qemu-system-ppc -M mac99,via=3Dpmu
-> > >=20
-> > > Note that PMU support is new for 3.0 so there shouldn't be any backwa=
+> Is maybe reporting a warning on a 64k host when realizing the better
+> approach than on every inflation?
+>=20
+> "host page size does not match virtio-balloon page size. If the guest
+> has a different page size than the host, inflating the balloon might not
+> effectively free up memory."
+
+That might work - I'll see what I can come up with.  One complication
+is that theoretically at least, you can have multiple host page sizes
+(main memory in normal pages, a DIMM in hugepages).  That makes the
+condition on which the warning should be issued a bit fiddly to work
+out.
+
+> Or reporting a warning whenever changing the balloon target size.
+
+I'm not sure what you mean by this.
+
+>=20
+> >=20
+> >>> +        free(balloon->pbp);
+> >>> +        balloon->pbp =3D NULL;
+> >>>      }
+> >>> =20
+> >>> -    ram_block_discard_range(rb, ram_offset, rb_page_size);
+> >>> -    /* We ignore errors from ram_block_discard_range(), because it h=
+as
+> >>> -     * already reported them, and failing to discard a balloon page =
+is
+> >>> -     * not fatal */
+> >>> +    if (!balloon->pbp) {
+> >>> +        /* Starting on a new host page */
+> >>> +        size_t bitlen =3D BITS_TO_LONGS(subpages) * sizeof(unsigned =
+long);
+> >>> +        balloon->pbp =3D g_malloc0(sizeof(PartiallyBalloonedPage) + =
+bitlen);
+> >>> +        balloon->pbp->rb =3D rb;
+> >>> +        balloon->pbp->base =3D host_page_base;
+> >>> +    }
+> >>> +
+> >>> +    bitmap_set(balloon->pbp->bitmap,
+> >>> +               (ram_offset - balloon->pbp->base) / BALLOON_PAGE_SIZE,
+> >>> +               subpages);
+> >>> +
+> >>> +    if (bitmap_full(balloon->pbp->bitmap, subpages)) {
+> >>> +        /* We've accumulated a full host page, we can actually disca=
 rd
-> > > compatibility issue here.
+> >>> +         * it now */
+> >>> +
+> >>> +        ram_block_discard_range(rb, balloon->pbp->base, rb_page_size=
+);
+> >>> +        /* We ignore errors from ram_block_discard_range(), because =
+it
+> >>> +         * has already reported them, and failing to discard a ballo=
+on
+> >>> +         * page is not fatal */
+> >>> +
+> >>> +        free(balloon->pbp);
+> >>> +        balloon->pbp =3D NULL;
+> >>> +    }
+> >>>  }
+> >> No, not a fan of this approach.
 > >=20
-> > [root@virtlab414 try-64]# ./ppc-softmmu/qemu-system-ppc -M mac99,via=3D=
-pmu -nographic /home/vms/dummy1.qcow2=20
-> > QEMU 2.12.50 monitor - type 'help' for more information
-> > (qemu) ss>> et_property: NULL phandle
-> >=20
-> > >> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > >> OpenBIOS 1.1 [Jun 18 2018 18:20]
-> > >> Configuration device id QEMU version 1 machine id 1
-> > >> CPUs: 1
-> > >> Memory: 128M
-> > >> UUID: 00000000-0000-0000-0000-000000000000
-> > >> CPU type PowerPC,G4
-> > milliseconds isn't unique.
-> > saWelcome to OpenBIOS v1.1 built on Jun 18 2018 18:20
-> > Trying hd:,\\:tbxi...
-> > savTrying hd:,\ppc\bootinfo.txt...
-> > Trying hd:,%BOOT...
-> > saveNo valid state has been set by load or init-program
-> >=20
-> >=20
-> > (qemu)=20
-> >   ok
-> > 0 >   ok
-> > 0 > (qemu)=20
-> > (qemu) savevm "frob"
-> > (qemu) loadvm "frob"
-> > (qemu)=20
-> >   ok
-> > 0 > 2 2 + . 4  ok
-> >=20
-> > Looks OK to me.
-> >=20
-> > Dave
-> >=20
-> > >=20
-> > > ATB,
-> > >=20
-> > > Mark.
+> > I can see why, but I really can't see what else to do without breaking
+> > existing, supported, working (albeit by accident) setups.
+>=20
+> Is there any reason to use this more complicated "allow random freeing"
+> approach over a simplistic sequential freeing I propose? Then we can
+> simply migrate the last freed page and should be fine.
+
+Well.. your approach is probably simpler in terms of the calculations
+that need to be done, though only very slightly.  I think my approach
+is conceptually clearer though, since we're explicitly checking for
+exactly the condition we need, rather than something we thing should
+match up with that condition.
+
+Even if the extra robustness is strictly theoretical, I prefer the
+idea of more robust but slightly longer code versus less robust and
+slightly shorter code - at least when the latter will want a long
+detailed comment explaining why it's correct.
+
+> As far as I know Linux guests have been freeing and reporting these
+> pages sequentially, or is that not true? Are you aware of other
+> implementations that we might miss?
+
+No, I'm not aware of any other implementations we're likely to care
+about.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -150,24 +319,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---BFVE2HhgxTpCzM8t
+--9zSXsLTf0vkW971A
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlvGg4QACgkQbDjKyiDZ
-s5JamRAA4yd5OBWx8QXoq5hJFu+IfZ+N7s/1PP+ydCFVOr741RITRukTICm0ld27
-A8YEEWoWcSP8PslMdQyIzIlC+ih2OosgwqGWqBrsF4laqTzMlN2TKzO4tVuCC632
-Hk45wGlPV+2lLgzVD2mSTuepHv06ZDeZfkK4WIAXQF/yrVD+NAZ3nnpmlcKjgW2G
-1RILqLTojR4SEV9omNsnsNrT49pA5dyrncNU4WnKQQlDCRvna9Cd956lPHwxXJN0
-OzicnvufOpwpq9x5drNh92SpsVaRE11PWGV7tjHW3IGtAFjb9iLkxtqzA8+3dKXF
-3fcQ++z6cspeJnstSMi2kdvtH3PsjGHLRi209KSD91M5VgScjc1lxOzHjKeL3xjV
-HvY9K5k+ssN1UDw17GWeaHPf/QVV55N+dTNdjU8fcrtn3RhLvlk4Mi3sFA2qI2vy
-44h5oGvGkeKeykh3I+QzIjKjy9q5rVoFxmkKto8KBXqeLJHaYfxhlroL5Kk/xSlk
-9qRcxBbXJAHTLFwD4W5rJEcBVA9OdDTnRkC4MccWC84S380/Fs2ijFY0csu2nLl2
-kBuWbJsDoZR/cq5N80MH+qbWUtD51s9p9Xvpu/yMliaQeJdfvxW4wUHtGtppLqDd
-l95t9rY7TMcB6zWknn/IlslQyGvA1MFf+/Xi7yfal/PjNz+wzvM=
-=XUf3
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlvGrHUACgkQbDjKyiDZ
+s5KUFA/7BS/fhc//ALaRahsu+OY6VLck0xf8pE+v653p5FrvyOrvJrF9lN5vfM+D
+7eMjs+llRf6ldtgo26PpaIrLCuW8VV4JaGE4p8NjO4HYvjbmjWtipsHwO2EOxWor
+2wSIdVXq6I+L01v2T0OB1AP4uoFDYX//ozueRkdLONQ3RH36/KWY1XqHbFCoAcG7
+pFPQ6TtZtljgxxO4YnDan+e34uAymjKH2rcSN8fAwkB0dvzgG2dSwFhHBmvK67Rc
+yvsn5X2oL9MCDAMEwyT6JzEEwEFPo0Wp8LaUzHhYNZVXcwFEyMWz0eU4ElciHEEf
+mxPy2yUM5CuuR0LKb92SBB04MpEvj7I42qAH9HjOEcVNqpmaRideHw9Hf7dFSl2X
+UqcowieWY9kH2jmUFtphg2lhgodEiIBXdBe0gRMLRDj2L5gEcc7WjfsN6WLzUUM9
+z0dy8tIQOyidzg9/M/zUmxDA5CK3Ykd4TLsgplGG7S12rWBChWBYEpCs5VzOnXwM
+lN9GY5iz1KfmaFjnqtd01WPfDe1wHHtcvxGjcTh/0p+c3xRhqWM8Tg5ewzr/Bzfv
+Qzyyf+edyHOwCPyzjuAoBYqi5mktro0G0QLZMef2uP5HmnKM7vFLj+4JRVdBjuJX
+YsViHWmX4IvqS3G4MPU4xDgh3DKNECwQBYGGMlTLPfICbzxGQsI=
+=2ETJ
 -----END PGP SIGNATURE-----
 
---BFVE2HhgxTpCzM8t--
+--9zSXsLTf0vkW971A--
