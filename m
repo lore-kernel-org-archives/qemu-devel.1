@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44745)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44751)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gCl2v-0001yu-VI
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:35:31 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gCl2w-0001z1-1E
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:35:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gCl2t-0006uT-1K
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gCl2t-0006us-3r
 	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:35:29 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:39448 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:39502 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gCl2s-0006es-Ar
+	id 1gCl2s-0006fL-Ie
 	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 08:35:26 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Wed, 17 Oct 2018 14:33:44 +0200
-Message-Id: <1539779635-15445-17-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Wed, 17 Oct 2018 14:33:50 +0200
+Message-Id: <1539779635-15445-23-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1539779635-15445-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1539779635-15445-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL 16/27] target/mips: Add availability control for
- DSP R3 ASE
+Subject: [Qemu-devel] [PULL 22/27] target/mips: Add CP0 PWCtl register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,94 +27,166 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-From: Stefan Markovic <smarkovic@wavecomp.com>
+From: Yongbok Kim <yongbok.kim@mips.com>
 
-Add infrastructure for availability control for DSP R3 ASE MIPS
-instructions. Only BPOSGE32C currently belongs to DSP R3 ASE, but
-this is likely to be changed in near future.
+Add PWCtl register (CP0 Register 5, Select 6).
+
+The PWCtl register configures hardware page table walking for TLB
+refills.
+
+This register is required for the hardware page walker feature. It
+exists only if Config3 PW bit is set to 1. It contains following
+fields:
+
+PWEn     (31)   - Hardware Page Table walker enable
+PWDirExt (30)   - If 1, 4-th level implemented (MIPS64 only)
+XK       (28)   - If 1, walker handles xkseg (MIPS64 only)
+XS       (27)   - If 1, walker handles xsseg (MIPS64 only)
+XU       (26)   - If 1, walker handles xuseg (MIPS64 only)
+DPH      (7)    - Dual Page format of Huge Page support
+HugePg   (6)    - Huge Page PTE supported in Directory levels
+PSn      (5..0) - Bit position of PTEvld in Huge Page PTE
 
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/internal.h           | 11 ++++++++---
- target/mips/translate.c          | 13 ++++++++++++-
- target/mips/translate_init.inc.c |  3 ++-
- 3 files changed, 22 insertions(+), 5 deletions(-)
+ target/mips/cpu.h       | 11 +++++++++++
+ target/mips/helper.h    |  1 +
+ target/mips/machine.c   |  5 +++--
+ target/mips/op_helper.c | 10 ++++++++++
+ target/mips/translate.c | 20 ++++++++++++++++++++
+ 5 files changed, 45 insertions(+), 2 deletions(-)
 
-diff --git a/target/mips/internal.h b/target/mips/internal.h
-index bfe83ee..4490bd1 100644
---- a/target/mips/internal.h
-+++ b/target/mips/internal.h
-@@ -307,8 +307,8 @@ static inline void compute_hflags(CPUMIPSState *env)
-     env->hflags &= ~(MIPS_HFLAG_COP1X | MIPS_HFLAG_64 | MIPS_HFLAG_CP0 |
-                      MIPS_HFLAG_F64 | MIPS_HFLAG_FPU | MIPS_HFLAG_KSU |
-                      MIPS_HFLAG_AWRAP | MIPS_HFLAG_DSP | MIPS_HFLAG_DSPR2 |
--                     MIPS_HFLAG_SBRI | MIPS_HFLAG_MSA | MIPS_HFLAG_FRE |
--                     MIPS_HFLAG_ELPA | MIPS_HFLAG_ERL);
-+                     MIPS_HFLAG_DSPR3 | MIPS_HFLAG_SBRI | MIPS_HFLAG_MSA |
-+                     MIPS_HFLAG_FRE | MIPS_HFLAG_ELPA | MIPS_HFLAG_ERL);
-     if (env->CP0_Status & (1 << CP0St_ERL)) {
-         env->hflags |= MIPS_HFLAG_ERL;
-     }
-@@ -355,7 +355,12 @@ static inline void compute_hflags(CPUMIPSState *env)
-         (env->CP0_Config5 & (1 << CP0C5_SBRI))) {
-         env->hflags |= MIPS_HFLAG_SBRI;
-     }
--    if (env->insn_flags & ASE_DSPR2) {
-+    if (env->insn_flags & ASE_DSPR3) {
-+        if (env->CP0_Status & (1 << CP0St_MX)) {
-+            env->hflags |= MIPS_HFLAG_DSP | MIPS_HFLAG_DSPR2 |
-+                           MIPS_HFLAG_DSPR3;
-+        }
-+    } else if (env->insn_flags & ASE_DSPR2) {
-         /* Enables access MIPS DSP resources, now our cpu is DSP ASER2,
-            so enable to access DSPR2 resources. */
-         if (env->CP0_Status & (1 << CP0St_MX)) {
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index ce4a1bd..f7e861b 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -2408,6 +2408,17 @@ static inline void check_dspr2(DisasContext *ctx)
+diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+index 3475b2f..e48be4b 100644
+--- a/target/mips/cpu.h
++++ b/target/mips/cpu.h
+@@ -446,6 +446,17 @@ struct CPUMIPSState {
+  * CP0 Register 6
+  */
+     int32_t CP0_Wired;
++    int32_t CP0_PWCtl;
++#define CP0PC_PWEN      31
++#if defined(TARGET_MIPS64)
++#define CP0PC_PWDIREXT  30
++#define CP0PC_XK        28
++#define CP0PC_XS        27
++#define CP0PC_XU        26
++#endif
++#define CP0PC_DPH       7
++#define CP0PC_HUGEPG    6
++#define CP0PC_PSN       0     /*  5..0  */
+     int32_t CP0_SRSConf0_rw_bitmask;
+     int32_t CP0_SRSConf0;
+ #define CP0SRSC0_M	31
+diff --git a/target/mips/helper.h b/target/mips/helper.h
+index 169890a..c23e4e5 100644
+--- a/target/mips/helper.h
++++ b/target/mips/helper.h
+@@ -129,6 +129,7 @@ DEF_HELPER_2(mtc0_srsconf2, void, env, tl)
+ DEF_HELPER_2(mtc0_srsconf3, void, env, tl)
+ DEF_HELPER_2(mtc0_srsconf4, void, env, tl)
+ DEF_HELPER_2(mtc0_hwrena, void, env, tl)
++DEF_HELPER_2(mtc0_pwctl, void, env, tl)
+ DEF_HELPER_2(mtc0_count, void, env, tl)
+ DEF_HELPER_2(mtc0_entryhi, void, env, tl)
+ DEF_HELPER_2(mttc0_entryhi, void, env, tl)
+diff --git a/target/mips/machine.c b/target/mips/machine.c
+index 3da891f..70a8909 100644
+--- a/target/mips/machine.c
++++ b/target/mips/machine.c
+@@ -212,8 +212,8 @@ const VMStateDescription vmstate_tlb = {
+ 
+ const VMStateDescription vmstate_mips_cpu = {
+     .name = "cpu",
+-    .version_id = 14,
+-    .minimum_version_id = 14,
++    .version_id = 15,
++    .minimum_version_id = 15,
+     .post_load = cpu_post_load,
+     .fields = (VMStateField[]) {
+         /* Active TC */
+@@ -260,6 +260,7 @@ const VMStateDescription vmstate_mips_cpu = {
+         VMSTATE_UINTTL(env.CP0_PWField, MIPSCPU),
+         VMSTATE_UINTTL(env.CP0_PWSize, MIPSCPU),
+         VMSTATE_INT32(env.CP0_Wired, MIPSCPU),
++        VMSTATE_INT32(env.CP0_PWCtl, MIPSCPU),
+         VMSTATE_INT32(env.CP0_SRSConf0, MIPSCPU),
+         VMSTATE_INT32(env.CP0_SRSConf1, MIPSCPU),
+         VMSTATE_INT32(env.CP0_SRSConf2, MIPSCPU),
+diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
+index 66881a2..ada22e6 100644
+--- a/target/mips/op_helper.c
++++ b/target/mips/op_helper.c
+@@ -1527,6 +1527,16 @@ void helper_mtc0_wired(CPUMIPSState *env, target_ulong arg1)
      }
  }
  
-+static inline void check_dspr3(DisasContext *ctx)
++void helper_mtc0_pwctl(CPUMIPSState *env, target_ulong arg1)
 +{
-+    if (unlikely(!(ctx->hflags & MIPS_HFLAG_DSPR3))) {
-+        if (ctx->insn_flags & ASE_DSP) {
-+            generate_exception_end(ctx, EXCP_DSPDIS);
-+        } else {
-+            generate_exception_end(ctx, EXCP_RI);
-+        }
-+    }
++#if defined(TARGET_MIPS64)
++    /* PWEn = 0. Hardware page table walking is not implemented. */
++    env->CP0_PWCtl = (env->CP0_PWCtl & 0x000000C0) | (arg1 & 0x5C00003F);
++#else
++    env->CP0_PWCtl = (arg1 & 0x800000FF);
++#endif
 +}
 +
- /* This code generates a "reserved instruction" exception if the
-    CPU does not support the instruction set corresponding to flags. */
- static inline void check_insn(DisasContext *ctx, uint64_t flags)
-@@ -20638,7 +20649,7 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
-                     gen_compute_branch_cp1_nm(ctx, OPC_BC1NEZ, rt, s);
-                     break;
-                 case NM_BPOSGE32C:
--                    check_dspr2(ctx);
-+                    check_dspr3(ctx);
-                     {
-                         int32_t imm = extract32(ctx->opcode, 1, 13) |
-                                       extract32(ctx->opcode, 0, 1) << 13;
-diff --git a/target/mips/translate_init.inc.c b/target/mips/translate_init.inc.c
-index b3320b9..d7cd4ee 100644
---- a/target/mips/translate_init.inc.c
-+++ b/target/mips/translate_init.inc.c
-@@ -485,7 +485,8 @@ const mips_def_t mips_defs[] =
-         .CP1_fcr31 = (1 << FCR31_ABS2008) | (1 << FCR31_NAN2008),
-         .SEGBITS = 32,
-         .PABITS = 32,
--        .insn_flags = CPU_NANOMIPS32 | ASE_DSP | ASE_DSPR2 | ASE_MT,
-+        .insn_flags = CPU_NANOMIPS32 | ASE_DSP | ASE_DSPR2 | ASE_DSPR3 |
-+                      ASE_MT,
-         .mmu_type = MMU_TYPE_R4000,
-     },
- #if defined(TARGET_MIPS64)
+ void helper_mtc0_srsconf0(CPUMIPSState *env, target_ulong arg1)
+ {
+     env->CP0_SRSConf0 |= arg1 & env->CP0_SRSConf0_rw_bitmask;
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 9e05c92..d4d3369 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -6150,6 +6150,11 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_SRSConf4));
+             rn = "SRSConf4";
+             break;
++        case 6:
++            check_pw(ctx);
++            gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_PWCtl));
++            rn = "PWCtl";
++            break;
+         default:
+             goto cp0_unimplemented;
+         }
+@@ -6866,6 +6871,11 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+             gen_helper_mtc0_srsconf4(cpu_env, arg);
+             rn = "SRSConf4";
+             break;
++        case 6:
++            check_pw(ctx);
++            gen_helper_mtc0_pwctl(cpu_env, arg);
++            rn = "PWCtl";
++            break;
+         default:
+             goto cp0_unimplemented;
+         }
+@@ -7591,6 +7601,11 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_SRSConf4));
+             rn = "SRSConf4";
+             break;
++        case 6:
++            check_pw(ctx);
++            gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_PWCtl));
++            rn = "PWCtl";
++            break;
+         default:
+             goto cp0_unimplemented;
+         }
+@@ -8289,6 +8304,11 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+             gen_helper_mtc0_srsconf4(cpu_env, arg);
+             rn = "SRSConf4";
+             break;
++        case 6:
++            check_pw(ctx);
++            gen_helper_mtc0_pwctl(cpu_env, arg);
++            rn = "PWCtl";
++            break;
+         default:
+             goto cp0_unimplemented;
+         }
 -- 
 2.7.4
