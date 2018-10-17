@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53441)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53461)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gCii9-0005xq-NW
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 06:05:54 -0400
+	(envelope-from <thuth@redhat.com>) id 1gCiiA-0005yT-Eg
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 06:05:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gCii4-00026k-UP
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 06:05:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:64245)
+	(envelope-from <thuth@redhat.com>) id 1gCii7-0002Ea-7k
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 06:05:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59912)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gCihw-0001BO-N0
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 06:05:44 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gCii6-000174-MC
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 06:05:51 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 17 Oct 2018 12:05:02 +0200
-Message-Id: <1539770707-7289-11-git-send-email-thuth@redhat.com>
+Date: Wed, 17 Oct 2018 12:05:00 +0200
+Message-Id: <1539770707-7289-9-git-send-email-thuth@redhat.com>
 In-Reply-To: <1539770707-7289-1-git-send-email-thuth@redhat.com>
 References: <1539770707-7289-1-git-send-email-thuth@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] =?utf-8?q?=5BPULL_10/15=5D_mailmap=3A_Fix_Reimar_D?=
- =?utf-8?q?=C3=B6ffinger_name?=
+Subject: [Qemu-devel] [PULL 08/15] git-submodule.sh: Modern shell scripting
+ (use $() instead of ``)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,30 +27,33 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: qemu-devel@nongnu.org
 
-From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 
-This probably happened when interpreting the utf8 name as latin1.
+Various shell files contain a mix between obsolete ``
+and modern $(); It would be nice to convert to using $()
+everywhere.
 
-Fixes dbbaaff6867 and f4e94dfefb6.
-
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- .mailmap | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ scripts/git-submodule.sh | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/.mailmap b/.mailmap
-index 2c2b9b1..6f2ff22 100644
---- a/.mailmap
-+++ b/.mailmap
-@@ -33,5 +33,6 @@ Justin Terry (VM) <juterry@microsoft.com> Justin Terry =
-(VM) via Qemu-devel <qemu
-=20
-=20
- # Also list preferred name forms where people have changed their
--# git author config
-+# git author config, or having utf8/latin1 encoding issues.
- Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-+Reimar D=C3=B6ffinger <Reimar.Doeffinger@gmx.de>
---=20
+diff --git a/scripts/git-submodule.sh b/scripts/git-submodule.sh
+index 807ca0b..98ca0f2 100755
+--- a/scripts/git-submodule.sh
++++ b/scripts/git-submodule.sh
+@@ -59,8 +59,8 @@ status)
+     fi
+ 
+     test -f "$substat" || exit 1
+-    CURSTATUS=`$GIT submodule status $modules`
+-    OLDSTATUS=`cat $substat`
++    CURSTATUS=$($GIT submodule status $modules)
++    OLDSTATUS=$(cat $substat)
+     test "$CURSTATUS" = "$OLDSTATUS"
+     exit $?
+     ;;
+-- 
 1.8.3.1
