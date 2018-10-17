@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59993)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gClks-0006uZ-JB
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 09:20:55 -0400
+	(envelope-from <edgari@xilinx.com>) id 1gCluW-0001QM-M2
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 09:30:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gClkp-00083r-TJ
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 09:20:54 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:40552)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gClkp-00082g-Fm
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 09:20:51 -0400
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20181017090750.4378-1-pbonzini@redhat.com>
-	<001f01d465fd$01af8b80$050ea280$@ru>
-	<CANzW0ms5DMhjYqBUS3EHfhVRp9Li+Dk=WH9RRpO=jbfOgctkCg@mail.gmail.com>
-	<0817e2fe-5a97-a4ed-9ae2-2e8dee6c9a43@redhat.com>
-	<004201d4660d$e86ef1e0$b94cd5a0$@ru>
-	<a29da0a1-85d7-c57c-5c42-27594a7849ac@redhat.com>
-In-Reply-To: <a29da0a1-85d7-c57c-5c42-27594a7849ac@redhat.com>
-Date: Wed, 17 Oct 2018 16:20:52 +0300
-Message-ID: <005c01d4661c$3a9cd0a0$afd671e0$@ru>
+	(envelope-from <edgari@xilinx.com>) id 1gCluV-0004Za-Qo
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 09:30:52 -0400
+Date: Wed, 17 Oct 2018 15:30:25 +0200
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Message-ID: <20181017133025.GC4229@toto>
+References: <20181011021931.4249-1-edgar.iglesias@gmail.com>
+	<20181011021931.4249-3-edgar.iglesias@gmail.com>
+	<CAFEAcA_c8YiyTtb1pE_ToSF_r6DGjCbjbDHF+6OQeCccbwpc=A@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Content-Language: ru
-Subject: Re: [Qemu-devel] [PATCH] Revert "icount: remove obsolete warp call"
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_c8YiyTtb1pE_ToSF_r6DGjCbjbDHF+6OQeCccbwpc=A@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2 02/12] net: cadence_gem: Announce
+ availability of priority queues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,80 +25,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Paolo Bonzini' <pbonzini@redhat.com>, 'Artem Pisarenko' <artem.k.pisarenko@gmail.com>, 'Clement Deschamps' <clement.deschamps@greensocs.com>
-Cc: qemu-devel@nongnu.org, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, KONRAD Frederic <frederic.konrad@adacore.com>, Alistair Francis <alistair@alistair23.me>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Francisco Iglesias <frasse.iglesias@gmail.com>, figlesia@xilinx.com, Stefano Stabellini <sstabellini@kernel.org>, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
 
-> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
-> On 17/10/2018 13:38, Pavel Dovgalyuk wrote:
-> >> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
-> >> On 17/10/2018 11:53, Artem Pisarenko wrote:
-> >>> See my last comment in bug report. This kind of modification, even
-> >>> adapted to changed function name, doesn't solve issue.
-> >>> I thought long time that it does, but once I catched qemu with a =
-hang.
-> >>> And of course, I wasn't able to reproduce it. So it just better =
-hides issue.
-> >>> Take a look at alternative solution from
-> >>> QBox: =
-https://git.greensocs.com/qemu/qbox/commit/a8ed106032e375e715a531d6e93e4d=
-9ec295dbdb
-> >>> I didn't catched fail with it (yet).
+On Tue, Oct 16, 2018 at 05:15:36PM +0100, Peter Maydell wrote:
+> On 11 October 2018 at 03:19, Edgar E. Iglesias <edgar.iglesias@gmail.com> wrote:
+> > From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 > >
-> > Tried to test it, but rr seems to be broken again.
-> > I'll try to bisect now.
->=20
-> Can we add a test that runs with "make check" and covers the basics of
-> record/replay's cpus.c bits?
->=20
-> rr is very cool, and we fixed/understood a lot of stuff when getting =
-it
-> ready for inclusion.  But now it's constantly broken and every time we
-> change rr we also risk breaking icount.
+> > Announce the availability of the various priority queues.
+> > This fixes an issue where guest kernels would miss to
+> > configure secondary queues due to inproper feature bits.
+> >
+> > Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+> > Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> > ---
+> >  hw/net/cadence_gem.c | 6 +++++-
+> >  1 file changed, 5 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
+> > index e560b7a142..901c173970 100644
+> > --- a/hw/net/cadence_gem.c
+> > +++ b/hw/net/cadence_gem.c
+> > @@ -1213,6 +1213,7 @@ static void gem_reset(DeviceState *d)
+> >      int i;
+> >      CadenceGEMState *s = CADENCE_GEM(d);
+> >      const uint8_t *a;
+> > +    uint32_t queues_mask;
+> >
+> >      DB_PRINT("\n");
+> >
+> > @@ -1229,7 +1230,10 @@ static void gem_reset(DeviceState *d)
+> >      s->regs[GEM_DESCONF] = 0x02500111;
+> >      s->regs[GEM_DESCONF2] = 0x2ab13fff;
+> >      s->regs[GEM_DESCONF5] = 0x002f2045;
+> > -    s->regs[GEM_DESCONF6] = 0x00000200;
+> > +    s->regs[GEM_DESCONF6] = 0x0;
+> > +
+> > +    queues_mask = MAKE_64BIT_MASK(1, s->num_priority_queues - 1);
+> > +    s->regs[GEM_DESCONF6] |= queues_mask;
+> 
+> This causes the clang runtime sanitizer to complain:
+>   /aarch64/qom/xilinx-zynq-a9:
+> /home/petmay01/linaro/qemu-for-merges/hw/net/cadence_gem.c:1306:19:
+> runtime error: shift exponent 64 is too large for 64-bit type
+> 'unsigned long long'
 
-I found the source of the bug. As QEMU becomes more multi-threaded and =
-non-synchronized,
-checkpoints move from thread to thread.
-And the event queue that processed at checkpoints should belong to the =
-same thread
-in both record and replay executions.
-
-Current problem was with the checkpoint for virtual timers. They are =
-processed from different threads:
-from vCPU and from aio_dispatch function.
-
-Therefore the following patch fixes the problem, but I think that this =
-part has to be refactored.
-There should be nailed-to-thread events that process the event queue. =
-Then checkpoints can become
-just synchronization events and therefore omitted for empty timer lists, =
-for example.
+Argh, my bad.
 
 
-diff --git a/replay/replay-events.c b/replay/replay-events.c
-index 83a7d81..60e8c21 100644
---- a/replay/replay-events.c
-+++ b/replay/replay-events.c
-@@ -205,6 +205,7 @@ void replay_save_events(int checkpoint)
- {
-     g_assert(replay_mutex_locked());
-     g_assert(checkpoint !=3D CHECKPOINT_CLOCK_WARP_START);
-+    g_assert(checkpoint !=3D CHECKPOINT_CLOCK_VIRTUAL);
-     while (!QTAILQ_EMPTY(&events_list)) {
-         Event *event =3D QTAILQ_FIRST(&events_list);
-         replay_save_event(event, checkpoint);
-diff --git a/replay/replay.c b/replay/replay.c
-index 93d2573..79b8485 100644
---- a/replay/replay.c
-+++ b/replay/replay.c
-@@ -231,7 +231,8 @@ bool replay_checkpoint(ReplayCheckpoint checkpoint)
-         /* This checkpoint belongs to several threads.
-            Processing events from different threads is
-            non-deterministic */
--        if (checkpoint !=3D CHECKPOINT_CLOCK_WARP_START) {
-+        if (checkpoint !=3D CHECKPOINT_CLOCK_WARP_START
-+            && checkpoint !=3D CHECKPOINT_CLOCK_VIRTUAL) {
-             replay_save_events(checkpoint);
-         }
-         res =3D true;
+> 
+> because s->num_priority_queues is 1, and so you've
+> asked for a zero-width mask, which MAKE_64BIT_MASK
+> doesn't permit. What was the intention of the code here?
 
-Pavel Dovgalyuk
+
+The intention was a mask with zero bits set when only 1 queue is available.
+
+DESCONF6 has a bit set per queue that is available,
+except for queue 0, for which bit 0 is always 0.
+
+For example configuration with 1 queue:
+..000000
+
+2 queues:
+..000010
+
+3 queues:
+..000110
+
+4 queues:
+..001110
+
+etc.
+
+I'll post a v3 with this fixed.
+
+
+> I don't think any value of num_priority_queues can
+> produce the old 0x200 value for this ID register.
+
+Right, the 0x200 value was bogus.
+
+> 
+> I'm going to drop this patch and "net: cadence_gem:
+> Announce 64bit addressing support" (which depends
+> on this one) from my pullreq.
+
+
+Best regards,
+Edgar
