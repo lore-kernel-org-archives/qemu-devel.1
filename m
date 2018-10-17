@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51354)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gChB1-0000Gb-Fd
+	(envelope-from <armbru@redhat.com>) id 1gChB1-0000GY-FR
 	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 04:27:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gChAx-0001qc-Q8
+	(envelope-from <armbru@redhat.com>) id 1gChAx-0001qB-Mw
 	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 04:27:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:30559)
+Received: from mx1.redhat.com ([209.132.183.28]:35670)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gChAx-0001Fi-CD
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gChAx-0001Oo-AV
 	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 04:27:31 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 25A7467EC2
-	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 08:27:14 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B97E93082E60
+	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 08:27:18 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 17 Oct 2018 10:27:00 +0200
-Message-Id: <20181017082702.5581-37-armbru@redhat.com>
+Date: Wed, 17 Oct 2018 10:26:33 +0200
+Message-Id: <20181017082702.5581-10-armbru@redhat.com>
 In-Reply-To: <20181017082702.5581-1-armbru@redhat.com>
 References: <20181017082702.5581-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 36/38] block: Clean up bdrv_img_create()'s
- error reporting
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v4 09/38] pc: Fix machine property
+ nvdimm-persistence error handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,89 +34,54 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
 
-bdrv_img_create() takes an Error ** argument and uses it in the
-conventional way, except for one place: when qemu_opts_do_parse()
-fails, it first reports its error to stderr or the HMP monitor with
-error_report_err(), then error_setg()'s a generic error.
+Calling error_report() in a function that takes an Error ** argument
+is suspicious.  pc.c's pc_machine_set_nvdimm_persistence() does that,
+and then exit()s.  Wrong.  Attempting to set machine property
+nvdimm-persistence to a bad value instantly kills the VM:
 
-When the caller reports that second error similarly, this produces two
-consecutive error messages on stderr or the HMP monitor.
+    $ qemu-system-x86_64 -nodefaults -S -display none -qmp stdio
+    {"QMP": {"version": {"qemu": {"micro": 50, "minor": 0, "major": 3}, "=
+package": "v3.0.0-837-gc5e4e49258"}, "capabilities": []}}
+    {"execute": "qmp_capabilities"}
+    {"return": {}}
+    {"execute": "qom-set", "arguments": {"path": "/machine", "property": =
+"nvdimm-persistence", "value": "instadeath"}}
+    -machine nvdimm-persistence=3Dinstadeath: unsupported option
+    $ echo $?
+    1
 
-When the caller does something else with it, such as send it via QMP,
-the first error still goes to stderr or the HMP monitor.  Fortunately,
-no such caller exists.
+Broken when commit 11c39b5cd96 (v3.0.0) replaced error_propagate();
+return by error_report(); exit() instead of error_setg(); return.  Fix
+that.
 
-Simply use the first error as is.  Update expected output of
-qemu-iotest 049 accordingly.
-
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>
+Fixes: 11c39b5cd966ddc067a1ca0c5392ec9b666c45b7
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- block.c                    |  3 ---
- tests/qemu-iotests/049.out | 12 ++++--------
- 2 files changed, 4 insertions(+), 11 deletions(-)
+ hw/i386/pc.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/block.c b/block.c
-index 5d51419d21..08d64cdc61 100644
---- a/block.c
-+++ b/block.c
-@@ -4803,9 +4803,6 @@ void bdrv_img_create(const char *filename, const char *fmt,
-     if (options) {
-         qemu_opts_do_parse(opts, options, NULL, &local_err);
-         if (local_err) {
--            error_report_err(local_err);
--            local_err = NULL;
--            error_setg(errp, "Invalid options for file format '%s'", fmt);
-             goto out;
-         }
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index cd5029c149..eab8572f2a 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -2209,8 +2209,9 @@ static void pc_machine_set_nvdimm_persistence(Objec=
+t *obj, const char *value,
+     else if (strcmp(value, "mem-ctrl") =3D=3D 0)
+         nvdimm_state->persistence =3D 2;
+     else {
+-        error_report("-machine nvdimm-persistence=3D%s: unsupported opti=
+on", value);
+-        exit(EXIT_FAILURE);
++        error_setg(errp, "-machine nvdimm-persistence=3D%s: unsupported =
+option",
++                   value);
++        return;
      }
-diff --git a/tests/qemu-iotests/049.out b/tests/qemu-iotests/049.out
-index 0871bff564..6b505408dd 100644
---- a/tests/qemu-iotests/049.out
-+++ b/tests/qemu-iotests/049.out
-@@ -95,35 +95,31 @@ qemu-img create -f qcow2 TEST_DIR/t.qcow2 -- -1024
- qemu-img: Image size must be less than 8 EiB!
- 
- qemu-img create -f qcow2 -o size=-1024 TEST_DIR/t.qcow2
--qemu-img: Value '-1024' is out of range for parameter 'size'
--qemu-img: TEST_DIR/t.qcow2: Invalid options for file format 'qcow2'
-+qemu-img: TEST_DIR/t.qcow2: Value '-1024' is out of range for parameter 'size'
- 
- qemu-img create -f qcow2 TEST_DIR/t.qcow2 -- -1k
- qemu-img: Image size must be less than 8 EiB!
- 
- qemu-img create -f qcow2 -o size=-1k TEST_DIR/t.qcow2
--qemu-img: Value '-1k' is out of range for parameter 'size'
--qemu-img: TEST_DIR/t.qcow2: Invalid options for file format 'qcow2'
-+qemu-img: TEST_DIR/t.qcow2: Value '-1k' is out of range for parameter 'size'
- 
- qemu-img create -f qcow2 TEST_DIR/t.qcow2 -- 1kilobyte
- qemu-img: Invalid image size specified! You may use k, M, G, T, P or E suffixes for
- qemu-img: kilobytes, megabytes, gigabytes, terabytes, petabytes and exabytes.
- 
- qemu-img create -f qcow2 -o size=1kilobyte TEST_DIR/t.qcow2
--qemu-img: Parameter 'size' expects a non-negative number below 2^64
-+qemu-img: TEST_DIR/t.qcow2: Parameter 'size' expects a non-negative number below 2^64
- Optional suffix k, M, G, T, P or E means kilo-, mega-, giga-, tera-, peta-
- and exabytes, respectively.
--qemu-img: TEST_DIR/t.qcow2: Invalid options for file format 'qcow2'
- 
- qemu-img create -f qcow2 TEST_DIR/t.qcow2 -- foobar
- qemu-img: Invalid image size specified! You may use k, M, G, T, P or E suffixes for
- qemu-img: kilobytes, megabytes, gigabytes, terabytes, petabytes and exabytes.
- 
- qemu-img create -f qcow2 -o size=foobar TEST_DIR/t.qcow2
--qemu-img: Parameter 'size' expects a non-negative number below 2^64
-+qemu-img: TEST_DIR/t.qcow2: Parameter 'size' expects a non-negative number below 2^64
- Optional suffix k, M, G, T, P or E means kilo-, mega-, giga-, tera-, peta-
- and exabytes, respectively.
--qemu-img: TEST_DIR/t.qcow2: Invalid options for file format 'qcow2'
- 
- == Check correct interpretation of suffixes for cluster size ==
- 
--- 
+=20
+     g_free(nvdimm_state->persistence_string);
+--=20
 2.17.1
