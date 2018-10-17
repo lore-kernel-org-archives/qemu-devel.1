@@ -1,30 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43201)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gCoqN-0005M9-0V
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 12:38:47 -0400
+	(envelope-from <kwolf@redhat.com>) id 1gCouJ-00070U-07
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 12:42:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gCoqH-0003xq-NV
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 12:38:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35706)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gCoqH-0003we-D4
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 12:38:41 -0400
-Date: Wed, 17 Oct 2018 12:38:29 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181017122840-mutt-send-email-mst@kernel.org>
-References: <20181013025435.25785-1-ehabkost@redhat.com>
-	<20181014173258-mutt-send-email-mst@kernel.org>
-	<20181015181404.GQ31060@habkost.net>
-	<20181016170236.GJ7995@redhat.com>
-	<d8b9a6e6-c137-a553-8fe7-939edd2031b3@redhat.com>
-	<87murdf73g.fsf_-_@dusky.pond.sub.org>
-	<20181017155637.GC31060@habkost.net>
+	(envelope-from <kwolf@redhat.com>) id 1gCouG-000406-4f
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 12:42:50 -0400
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Wed, 17 Oct 2018 18:41:55 +0200
+Message-Id: <20181017164200.22344-5-kwolf@redhat.com>
+In-Reply-To: <20181017164200.22344-1-kwolf@redhat.com>
+References: <20181017164200.22344-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181017155637.GC31060@habkost.net>
-Subject: Re: [Qemu-devel] No more chameleon devices (was: [PATCH] virtio:
- Provide version-specific variants of virtio PCI devices)
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 4/9] nbd: Support auto-read-only option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,76 +21,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Laine Stump <laine@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Fabian Deutsch <fdeutsch@redhat.com>, qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Gerd Hoffmann <kraxel@redhat.com>, Andrea Bolognani <abologna@redhat.com>, Cleber Rosa <crosa@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
 
-On Wed, Oct 17, 2018 at 12:56:37PM -0300, Eduardo Habkost wrote:
-> (CCing Marcel, in case he has extra details on the complex
-> Conventional/Express bus/device plugging rules)
-> 
-> On Wed, Oct 17, 2018 at 07:57:39AM +0200, Markus Armbruster wrote:
-> > Laine Stump <laine@redhat.com> writes:
-> > 
-> > [...]
-> > > In the end, having a device that changed PCI ID depending on what kind
-> > > of slot it was plugged into was an idea "too clever for its own good",
-> > > should be avoided when new devices are added in the future, and we
-> > > should at least provide an alternative that doesn't do that for existing
-> > > devices.
-> > 
-> > That means for each chameleon PCI/PCIe device:
-> > 
-> > * create a pair of devices that can only go into one kind of slot
-> > 
-> > * deprecate the chameleon
-> > 
-> > Yes, please!  Volunteers?
-> > 
-> > Do we have similar chameleons outside PCI?
-> 
-> I'm worried that we could be trying to address multiple issues at
-> the same time, and I'm not sure yet if we should address all of
-> them in one take.
-> 
-> Right now we need to differentiate non-transitional and
-> transitional virtio devices, for a few reasons:
-> * They have different PCI IDs;
-> * Legacy drivers don't work with non-transitional devices;
-> * Transitional virtio devices can be plugged to Conventional PCI
->   buses; non-transitional ones can't.
+If read-only=3Doff, but auto-read-only=3Don is given, open a read-write N=
+BD
+connection if the server provides a read-write export, but instead of
+erroring out for read-only exports, just degrade to read-only.
 
-No that last point isn't true at all.
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ block/nbd-client.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-> This patch addresses that problem.
->
-> You seem to be talking about a different issue:
-> * Some devices (including transitional virtio) can be plugged on
->   both Conventional PCI and PCI Express buses (I will call those
->   devices "hybrid PCI devices").
-> 
-> The former is a practical problem: management software needs to
-> be able to ask for a transitional virtio device, depending o the
-> guest OS being run.
-> 
-> Addressing the latter seems more complex (it would affect other
-> devices, not just virtio), and I don't see which practical
-> problems it would solve.
-> 
-> I see some problems it wouldn't solve, though: the system
-> wouldn't be able to represent the fact that transitional virtio
-> devices can still work on PCI Express buses, as long as they
-> support PIO bars; or that Conventional PCI devices can be plugged
-> to PCI Express root buses.
-> 
-> I don't see problems caused by hybrid conventional/express PCI
-> devices.  The original problem with virtio devices was just not
-> being hybrid, it was lying about being hybrid: non-transitional
-> virtio devices are hybrid, but transitional virtio devices
-> aren't.
-> 
-> I wouldn't be against abolishing hybrid PCI devices completely if
-> somebody volunteers to do the work.  I just don't see which
-> problems this would solve.
-> 
-> -- 
-> Eduardo
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index 9686ecbd5e..76e9ca3abe 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -992,11 +992,11 @@ int nbd_client_init(BlockDriverState *bs,
+         logout("Failed to negotiate with the NBD server\n");
+         return ret;
+     }
+-    if (client->info.flags & NBD_FLAG_READ_ONLY &&
+-        !bdrv_is_read_only(bs)) {
+-        error_setg(errp,
+-                   "request for write access conflicts with read-only ex=
+port");
+-        return -EACCES;
++    if (client->info.flags & NBD_FLAG_READ_ONLY) {
++        ret =3D bdrv_apply_auto_read_only(bs, "NBD export is read-only",=
+ errp);
++        if (ret < 0) {
++            return ret;
++        }
+     }
+     if (client->info.flags & NBD_FLAG_SEND_FUA) {
+         bs->supported_write_flags =3D BDRV_REQ_FUA;
+--=20
+2.19.1
