@@ -1,34 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51192)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gChAl-0008Er-Dk
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 04:27:20 -0400
+	(envelope-from <armbru@redhat.com>) id 1gChAb-00085C-Kb
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 04:27:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gChAc-00016N-Aw
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 04:27:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48034)
+	(envelope-from <armbru@redhat.com>) id 1gChAY-0000zb-6M
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 04:27:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52500)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gChAb-00013X-Vs
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 04:27:10 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gChAX-0000wM-Q9
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 04:27:06 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 984D380F8F
-	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 08:27:08 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id E224E3081D9B
+	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 08:27:03 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-50.ams2.redhat.com
 	[10.36.116.50])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 5E8195DD79
-	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 08:27:08 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 83C781057057
+	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 08:27:03 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 17 Oct 2018 10:26:44 +0200
-Message-Id: <20181017082702.5581-21-armbru@redhat.com>
-In-Reply-To: <20181017082702.5581-1-armbru@redhat.com>
-References: <20181017082702.5581-1-armbru@redhat.com>
+Date: Wed, 17 Oct 2018 10:26:24 +0200
+Message-Id: <20181017082702.5581-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 20/38] vl: Clean up error reporting in
- chardev_init_func()
+Subject: [Qemu-devel] [PATCH v4 00/38] Replace some unwise uses of
+ error_report() & friends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,44 +37,146 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Calling error_report() in a function that takes an Error ** argument
-is suspicious.  chardev_init_func() does that, and then fails without
-setting an error.  Its caller main(), via qemu_opts_foreach(), is fine
-with it, but clean it up anyway.
+Calling error_report() or similar in a function that takes an Error **
+argument is suspicious.  Fix a number of instances that are actually
+wrong.  Clean up a few more that are merely fragile / bad examples.
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- vl.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+v4:
+* PATCH 36-37: Unbreak qemu-iotests [Eric]
 
-diff --git a/vl.c b/vl.c
-index bb18f2d995..aa03192019 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2239,7 +2239,7 @@ static int chardev_init_func(void *opaque, QemuOpts=
- *opts, Error **errp)
-=20
-     if (!qemu_chr_new_from_opts(opts, &local_err)) {
-         if (local_err) {
--            error_report_err(local_err);
-+            error_propagate(errp, local_err);
-             return -1;
-         }
-         exit(0);
-@@ -4232,10 +4232,8 @@ int main(int argc, char **argv, char **envp)
-                       user_creatable_add_opts_foreach,
-                       object_create_initial, &error_fatal);
-=20
--    if (qemu_opts_foreach(qemu_find_opts("chardev"),
--                          chardev_init_func, NULL, NULL)) {
--        exit(1);
--    }
-+    qemu_opts_foreach(qemu_find_opts("chardev"),
-+                      chardev_init_func, NULL, &error_fatal);
-=20
- #ifdef CONFIG_VIRTFS
-     if (qemu_opts_foreach(qemu_find_opts("fsdev"),
+v3:
+* PATCH 27: Drop useless error message prefix [Gerd]
+* PATCH 36-38: New
+
+v2:
+* PATCH 01: New
+* PATCH 02: Commit hash corrected in commit message [Eric]
+* PATCH 13: Error messages tidied up [Marc-Andr=C3=A9]
+* PATCH 15: Commit message tidied up [Eduardo H.]
+* PATCH 16: Unwanted string split fixed [Marc-Andr=C3=A9, Eduardo O.]
+* PATCH 20: Commit message corrected [Marc-Andr=C3=A9]
+* PATCH 25-26: New
+* PATCH 27: Rebased, commit message corrected
+* PATCH 30: Commit message tidied up [Eric]
+* PATCH 32: Less confusing commit message, help fixed [Max]
+* PATCH 34: New
+
+Fei Li (1):
+  ui: Convert vnc_display_init(), init_keyboard_layout() to Error
+
+Markus Armbruster (37):
+  error: Fix use of error_prepend() with &error_fatal, &error_abort
+  Use error_fatal to simplify obvious fatal errors (again)
+  block: Use warn_report() & friends to report warnings
+  cpus hw target: Use warn_report() & friends to report warnings
+  vfio: Use warn_report() & friends to report warnings
+  vfio: Clean up error reporting after previous commit
+  char: Use error_printf() to print help and such
+  9pfs: Fix CLI parsing crash on error
+  pc: Fix machine property nvdimm-persistence error handling
+  ioapic: Fix error handling in realize()
+  smbios: Clean up error handling in smbios_add()
+  migration: Fix !replay_can_snapshot() error handling
+  l2tpv3: Improve -netdev/netdev_add/-net/... error reporting
+  net/socket: Fix invalid socket type error handling
+  numa: Fix QMP command set-numa-node error handling
+  xen/pt: Fix incomplete conversion to realize()
+  seccomp: Clean up error reporting in parse_sandbox()
+  vl: Clean up error reporting in parse_add_fd()
+  qom: Clean up error reporting in user_creatable_add_opts_foreach()
+  vl: Clean up error reporting in chardev_init_func()
+  vl: Clean up error reporting in machine_set_property()
+  vl: Clean up error reporting in mon_init_func()
+  vl: Clean up error reporting in parse_fw_cfg()
+  vl: Clean up error reporting in device_init_func()
+  ui/keymaps: Fix handling of erroneous include files
+  vnc: Clean up error reporting in vnc_init_func()
+  numa: Clean up error reporting in parse_numa()
+  tpm: Clean up error reporting in tpm_init_tpmdev()
+  spice: Clean up error reporting in add_channel()
+  fsdev: Clean up error reporting in qemu_fsdev_add()
+  vl: Assert drive_new() does not fail in default_drive()
+  blockdev: Convert drive_new() to Error
+  vl: Fix exit status for -drive format=3Dhelp
+  vl: Simplify call of parse_name()
+  block: Clean up bdrv_img_create()'s error reporting
+  raw: Convert a warning to warn_report()
+  vpc: Fail open on bad header checksum
+
+ block.c                                  |   9 +-
+ block/bochs.c                            |   8 +-
+ block/cloop.c                            |   8 +-
+ block/dmg.c                              |   8 +-
+ block/iscsi.c                            |   2 +-
+ block/qcow2.c                            |   4 +-
+ block/qed.c                              |   4 +-
+ block/raw-format.c                       |  17 +--
+ block/rbd.c                              |  12 +-
+ block/sheepdog.c                         |   2 +-
+ block/vpc.c                              |   8 +-
+ block/vvfat.c                            |   8 +-
+ blockdev.c                               |  27 ++---
+ chardev/char-pty.c                       |   2 +-
+ chardev/char.c                           |   2 +-
+ cpus.c                                   |   8 +-
+ device-hotplug.c                         |   5 +-
+ fsdev/qemu-fsdev-dummy.c                 |   2 +-
+ fsdev/qemu-fsdev.c                       |  12 +-
+ fsdev/qemu-fsdev.h                       |   2 +-
+ hw/9pfs/9p-handle.c                      |   6 +-
+ hw/9pfs/9p-local.c                       |   4 +-
+ hw/9pfs/xen-9p-backend.c                 |   7 +-
+ hw/display/cg3.c                         |   2 +-
+ hw/display/tcx.c                         |   2 +-
+ hw/i386/pc.c                             |   5 +-
+ hw/intc/ioapic.c                         |   8 +-
+ hw/intc/xics.c                           |  15 ++-
+ hw/intc/xics_kvm.c                       |   7 +-
+ hw/misc/ivshmem.c                        |   4 +-
+ hw/net/virtio-net.c                      |   8 +-
+ hw/ppc/pnv_core.c                        |   4 +-
+ hw/ppc/spapr_pci.c                       |   7 +-
+ hw/smbios/smbios.c                       |  90 ++++++++++-----
+ hw/timer/aspeed_timer.c                  |   3 +-
+ hw/usb/bus.c                             |   5 +-
+ hw/vfio/pci-quirks.c                     |   4 +-
+ hw/vfio/pci.c                            |  25 ++--
+ hw/vfio/platform.c                       |   6 +-
+ hw/virtio/virtio-pci.c                   |   4 +-
+ hw/xen/xen_pt.c                          |   2 +-
+ include/hw/vfio/vfio-common.h            |   3 +-
+ include/qapi/error.h                     |  14 +++
+ include/sysemu/blockdev.h                |   3 +-
+ include/sysemu/numa.h                    |   1 -
+ include/sysemu/tpm.h                     |   2 +-
+ include/ui/console.h                     |   2 +-
+ migration/migration.c                    |  12 +-
+ migration/savevm.c                       |   8 +-
+ net/l2tpv3.c                             |  25 ++--
+ net/socket.c                             |   4 +-
+ numa.c                                   |  21 ++--
+ qemu-io.c                                |   8 +-
+ qemu-nbd.c                               |  14 +--
+ qemu-seccomp.c                           |  18 +--
+ qom/object_interfaces.c                  |   4 +-
+ scripts/coccinelle/use-error_fatal.cocci |  20 ++++
+ stubs/tpm.c                              |   3 +-
+ target/i386/cpu.c                        |  17 +--
+ target/ppc/translate_init.inc.c          |   4 +-
+ tests/qemu-iotests/049.out               |  12 +-
+ tests/qemu-iotests/099                   |   3 +-
+ tests/qemu-iotests/109.out               |  55 +++++----
+ tpm.c                                    |  22 ++--
+ ui/curses.c                              |   6 +-
+ ui/keymaps.c                             |  40 ++++---
+ ui/keymaps.h                             |   2 +-
+ ui/sdl.c                                 |   6 +-
+ ui/spice-core.c                          |  13 ++-
+ ui/vnc.c                                 |  19 ++--
+ util/error.c                             |  13 +++
+ vl.c                                     | 139 +++++++++--------------
+ 72 files changed, 474 insertions(+), 407 deletions(-)
+ create mode 100644 scripts/coccinelle/use-error_fatal.cocci
+
 --=20
 2.17.1
