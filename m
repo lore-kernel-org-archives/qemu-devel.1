@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34906)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gD9I3-0003oY-2S
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:28:43 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gD9J9-0004Zx-ED
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:29:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gD9Hz-0003Rt-OX
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:28:42 -0400
-Received: from mail-wr1-f54.google.com ([209.85.221.54]:33479)
+	(envelope-from <peter.maydell@linaro.org>) id 1gD9J8-0005Gv-KS
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:29:51 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:43387)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gD9Hz-0003J9-D1
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:28:39 -0400
-Received: by mail-wr1-f54.google.com with SMTP id e4-v6so33941761wrs.0
-	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 07:28:30 -0700 (PDT)
-References: <87efcqniza.fsf@dusky.pond.sub.org>
-	<20181016132035.GF7995@redhat.com> <87o9brl7zc.fsf@dusky.pond.sub.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d8974e95-f3f3-f07e-78dd-11e8765854c2@redhat.com>
-Date: Thu, 18 Oct 2018 16:28:27 +0200
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gD9J8-0005Dr-5C
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:29:50 -0400
+Received: by mail-oi1-x241.google.com with SMTP id s69-v6so24130356oie.10
+	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 07:29:50 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87o9brl7zc.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] When it's okay to treat OOM as fatal?
+In-Reply-To: <20181018142743.29489-1-eric.auger@redhat.com>
+References: <20181018142743.29489-1-eric.auger@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 18 Oct 2018 15:29:28 +0100
+Message-ID: <CAFEAcA-dy=OdwwzjHcLjSACaZnPb=PzTK-fUvzL5R=iMxMhqjA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/boot: introduce fdt_add_memory_node
+ helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,16 +29,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Eric Auger <eric.auger@redhat.com>
+Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Igor Mammedov <imammedo@redhat.com>, Andrew Jones <drjones@redhat.com>
 
-On 18/10/2018 15:06, Markus Armbruster wrote:
-> Device "qxl" creates a memory region "qxl.vgavram" with a size taken
-> from uint32_t property "ram_size", silently rounded up to the next power
-> of two.  It uses &error_fatal for error handling.
+On 18 October 2018 at 15:27, Eric Auger <eric.auger@redhat.com> wrote:
+> From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+>
+> We introduce an helper to create a memory node.
 
-That's good to some extent---it means that the core code _is_ ready for
-handling ENOMEM in this part of QEMU, it's just the device that doesn't
-use it.
+Hi; this seems to be missing the rationale for doing this ?
 
-Paolo
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+
+thanks
+-- PMM
