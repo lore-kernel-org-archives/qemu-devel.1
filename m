@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gDCcC-00078g-Ue
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:01:46 -0400
+	(envelope-from <philmd@redhat.com>) id 1gDCe6-0000LI-Pt
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:03:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gDCc6-0002Ud-N4
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:01:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46710)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gDCc6-0001nJ-5c
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:01:38 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3CD59227D5
-	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 18:01:21 +0000 (UTC)
-Date: Thu, 18 Oct 2018 19:01:17 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20181018180117.GF2632@work-vm>
-References: <87efcqniza.fsf@dusky.pond.sub.org> <20181016133340.GB2427@work-vm>
-	<87va5zjort.fsf@dusky.pond.sub.org> <20181018145406.GE2632@work-vm>
-	<87zhvbi2sy.fsf@dusky.pond.sub.org>
+	(envelope-from <philmd@redhat.com>) id 1gDCe2-0007GS-Ig
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:03:42 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:35220)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gDCe2-0006tI-87
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:03:38 -0400
+Received: by mail-wm1-f68.google.com with SMTP id o17-v6so506312wmh.0
+	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 11:03:25 -0700 (PDT)
+References: <20181009130442.26296-1-berrange@redhat.com>
+	<20181009130442.26296-7-berrange@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <c71325cd-3a30-096a-9ac8-e060f7f8915d@redhat.com>
+Date: Thu, 18 Oct 2018 20:03:23 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87zhvbi2sy.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] When it's okay to treat OOM as fatal?
+In-Reply-To: <20181009130442.26296-7-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 06/11] authz: add QAuthZ object as an
+ authorization base class
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,153 +31,397 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
-> 
-> > * Markus Armbruster (armbru@redhat.com) wrote:
-> >> "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
-> >> 
-> >> > * Markus Armbruster (armbru@redhat.com) wrote:
-> >> >> We sometimes use g_new() & friends, which abort() on OOM, and sometimes
-> >> >> g_try_new() & friends, which can fail, and therefore require error
-> >> >> handling.
-> >> >> 
-> >> >> HACKING points out the difference, but is mum on when to use what:
-> >> >> 
-> >> >>     3. Low level memory management
-> >> >> 
-> >> >>     Use of the malloc/free/realloc/calloc/valloc/memalign/posix_memalign
-> >> >>     APIs is not allowed in the QEMU codebase. Instead of these routines,
-> >> >>     use the GLib memory allocation routines g_malloc/g_malloc0/g_new/
-> >> >>     g_new0/g_realloc/g_free or QEMU's qemu_memalign/qemu_blockalign/qemu_vfree
-> >> >>     APIs.
-> >> >> 
-> >> >>     Please note that g_malloc will exit on allocation failure, so there
-> >> >>     is no need to test for failure (as you would have to with malloc).
-> >> >>     Calling g_malloc with a zero size is valid and will return NULL.
-> >> >> 
-> >> >>     Prefer g_new(T, n) instead of g_malloc(sizeof(T) * n) for the following
-> >> >>     reasons:
-> >> >> 
-> >> >>       a. It catches multiplication overflowing size_t;
-> >> >>       b. It returns T * instead of void *, letting compiler catch more type
-> >> >>          errors.
-> >> >> 
-> >> >>     Declarations like T *v = g_malloc(sizeof(*v)) are acceptable, though.
-> >> >> 
-> >> >>     Memory allocated by qemu_memalign or qemu_blockalign must be freed with
-> >> >>     qemu_vfree, since breaking this will cause problems on Win32.
-> >> >> 
-> >> >> Now, in my personal opinion, handling OOM gracefully is worth the
-> >> >> (commonly considerable) trouble when you're coding for an Apple II or
-> >> >> similar.  Anything that pages commonly becomes unusable long before
-> >> >> allocations fail.
-> >> >
-> >> > That's not always my experience; I've seen cases where you suddenly
-> >> > allocate a load more memory and hit OOM fairly quickly on that hot
-> >> > process.  Most of the time on the desktop you're right.
-> >> >
-> >> >> Anything that overcommits will send you a (commonly
-> >> >> lethal) signal instead.  Anything that tries handling OOM gracefully,
-> >> >> and manages to dodge both these bullets somehow, will commonly get it
-> >> >> wrong and crash.
-> >> >
-> >> > If your qemu has maped it's main memory from hugetlbfs or similar pools
-> >> > then we're looking at the other memory allocations; and that's a bit of
-> >> > an interesting difference where those other allocations should be a lot
-> >> > smaller.
-> >> >
-> >> >> But others are entitled to their opinions as much as I am.  I just want
-> >> >> to know what our rules are, preferably in the form of a patch to
-> >> >> HACKING.
-> >> >
-> >> > My rule is to try not to break a happily running VM by some new
-> >> > activity; I don't worry about it during startup.
-> >> >
-> >> > So for example, I don't like it when starting a migration, allocates
-> >> > some more memory and kills the VM - the user had a happy stable VM
-> >> > upto that point.  Migration gets the blame at this point.
-> >> 
-> >> I don't doubt reliable OOM handling would be nice.  I do doubt it's
-> >> practical for an application like QEMU.
-> >
-> > Well, our use of glib certainly makes it much much harder.
-> > I just try and make sure anywhere that I'm allocating a non-trivial
-> > amount of memory (especially anything guest or user controlled) uses
-> > the _try_ variants.  That should keep a lot of the larger allocations.
-> 
-> Matters only when your g_try_new()s actually fail (which they won't, at
-> least not reliably), and your error paths actually work (which they
-> won't unless you test them, no offense).
-> 
-> > However, it scares me that we've got things that can return big chunks
-> > of JSON for example, and I don't think they're being careful about it.
-> 
-> We got countless allocations small and large (large as in Gigabytes)
-> that kill QEMU on OOM.  Some of the small allocations add up to
-> Megabytes (QObjects for JSON work, for example).
-> 
-> Yet the *practical* problem isn't lack of graceful handling when these
-> allocations fail.  Because they pretty much don't.
-> 
-> The practical problem I see is general confusion on what to do about
-> OOM.  There's no written guidance.  Vague rules of thumb on when to
-> handle OOM are floating around.  Code gets copied.  Unsurprisingly, OOM
-> handling is a haphazard affair.
+On 09/10/2018 15:04, Daniel P. Berrangé wrote:> From: "Daniel P.
+Berrange" <berrange@redhat.com>
+>
+> The current qemu_acl module provides a simple access control list
+> facility inside QEMU, which is used via a set of monitor commands
+> acl_show, acl_policy, acl_add, acl_remove & acl_reset.
+>
+> Note there is no ability to create ACLs - the network services (eg VNC
+> server) were expected to create ACLs that they want to check.
+>
+> There is also no way to define ACLs on the command line, nor potentially
+> integrate with external authorization systems like polkit, pam, ldap
+> lookup, etc.
+>
+> The QAuthZ object defines a minimal abstract QOM class that can be
+> subclassed for creating different authorization providers.
+>
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  MAINTAINERS          |   7 +++
+>  Makefile             |  10 ++--
+>  Makefile.objs        |   6 +++
+>  Makefile.target      |   2 +
+>  authz/Makefile.objs  |   1 +
+>  authz/base.c         |  82 +++++++++++++++++++++++++++++++
+>  authz/trace-events   |   4 ++
+>  include/authz/base.h | 112 +++++++++++++++++++++++++++++++++++++++++++
 
-> In this state, whatever OOM handling we have is too unreliable to be
-> worth much, since it can only help when (1) allocations actually fail
-> (they generally don't), and (2) the allocation that fails is actually
-> handled (they generally aren't), and (3) the handling actually works (we
-> don't test OOM, so it generally doesn't).
-> 
-> For the sake of the argument, let's assume there's a practical way to
-> run QEMU so that memory allocations actually fail.  We then still need
-> to find a way to increase the probability for failed allocations to be
-> actually handled, and the probability for the error handling to actually
-> work, both to a useful level.  This will require rules on OOM handling,
-> a strategy to make them stick, a strategy to test OOM, and resources to
-> implement all that.
+You should use scripts/git.orderfile.
 
-There's probably no way to guarantee we've got all paths, however we
-can test in restricted memory environments.
-For example we could set up a test environment that runs a series of
-hotplug or migration tests (say avocado or something) in cgroups
-or nested VMs with random reduced amounts of RAM.  These will blow up
-spectacularly and we can slowly attack some of the more common paths.
+>  8 files changed, 220 insertions(+), 4 deletions(-)
+>  create mode 100644 authz/Makefile.objs
+>  create mode 100644 authz/base.c
+>  create mode 100644 authz/trace-events
+>  create mode 100644 include/authz/base.h
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index fecaf79c6b..3eb5bff7a0 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1841,6 +1841,13 @@ F: io/
+>  F: include/io/
+>  F: tests/test-io-*
+>
+> +User authorization
+> +M: Daniel P. Berrange <berrange@redhat.com>
+> +S: Maintained
+> +F: authz/
+> +F: include/authz/
+> +F: tests/test-authz-*
+> +
+>  Sockets
+>  M: Daniel P. Berrange <berrange@redhat.com>
+>  M: Gerd Hoffmann <kraxel@redhat.com>
+> diff --git a/Makefile b/Makefile
+> index 1144d6e3ba..35e5bd6a03 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -412,6 +412,7 @@ endif
+>
+>  dummy := $(call unnest-vars,, \
+>                  stub-obj-y \
+> +                authz-obj-y \
+>                  chardev-obj-y \
+>                  util-obj-y \
+>                  qga-obj-y \
+> @@ -474,6 +475,7 @@ qemu-options.def: $(SRC_PATH)/qemu-options.hx
+$(SRC_PATH)/scripts/hxtool
+>  SUBDIR_RULES=$(patsubst %,subdir-%, $(TARGET_DIRS))
+>  SOFTMMU_SUBDIR_RULES=$(filter %-softmmu,$(SUBDIR_RULES))
+>
+> +$(SOFTMMU_SUBDIR_RULES): $(authz-obj-y)
+>  $(SOFTMMU_SUBDIR_RULES): $(block-obj-y)
+>  $(SOFTMMU_SUBDIR_RULES): $(crypto-obj-y)
+>  $(SOFTMMU_SUBDIR_RULES): $(io-obj-y)
+> @@ -536,9 +538,9 @@ COMMON_LDADDS = libqemuutil.a
+>
+>  qemu-img.o: qemu-img-cmds.h
+>
+> -qemu-img$(EXESUF): qemu-img.o $(block-obj-y) $(crypto-obj-y)
+$(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+> -qemu-nbd$(EXESUF): qemu-nbd.o $(block-obj-y) $(crypto-obj-y)
+$(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+> -qemu-io$(EXESUF): qemu-io.o $(block-obj-y) $(crypto-obj-y)
+$(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+> +qemu-img$(EXESUF): qemu-img.o $(authz-obj-y) $(block-obj-y)
+$(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+> +qemu-nbd$(EXESUF): qemu-nbd.o $(authz-obj-y) $(block-obj-y)
+$(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+> +qemu-io$(EXESUF): qemu-io.o $(authz-obj-y) $(block-obj-y)
+$(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+>
+>  qemu-bridge-helper$(EXESUF): qemu-bridge-helper.o $(COMMON_LDADDS)
+>
+> @@ -549,7 +551,7 @@ qemu-edid$(EXESUF): qemu-edid.o
+hw/display/edid-generate.o $(COMMON_LDADDS)
+>  fsdev/virtfs-proxy-helper$(EXESUF): fsdev/virtfs-proxy-helper.o
+fsdev/9p-marshal.o fsdev/9p-iov-marshal.o $(COMMON_LDADDS)
+>  fsdev/virtfs-proxy-helper$(EXESUF): LIBS += -lcap
+>
+> -scsi/qemu-pr-helper$(EXESUF): scsi/qemu-pr-helper.o scsi/utils.o
+$(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+> +scsi/qemu-pr-helper$(EXESUF): scsi/qemu-pr-helper.o scsi/utils.o
+$(authz-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+>  ifdef CONFIG_MPATH
+>  scsi/qemu-pr-helper$(EXESUF): LIBS += -ludev -lmultipath -lmpathpersist
+>  endif
+> diff --git a/Makefile.objs b/Makefile.objs
+> index 1e1ff387d7..ecb1071c4f 100644
+> --- a/Makefile.objs
+> +++ b/Makefile.objs
+> @@ -62,6 +62,11 @@ util-obj-y += qapi/qapi-introspect.o
+>
+>  chardev-obj-y = chardev/
+>
+> +#######################################################################
+> +# authz-obj-y is code used by both qemu system emulation and qemu-img
+> +
+> +authz-obj-y = authz/
+> +
+>  #######################################################################
+>  # block-obj-y is code used by both qemu system emulation and qemu-img
+>
+> @@ -200,6 +205,7 @@ trace-events-subdirs =
+>  trace-events-subdirs += accel/kvm
+>  trace-events-subdirs += accel/tcg
+>  trace-events-subdirs += audio
+> +trace-events-subdirs += authz
+>  trace-events-subdirs += block
+>  trace-events-subdirs += chardev
+>  trace-events-subdirs += crypto
+> diff --git a/Makefile.target b/Makefile.target
+> index 4d56298bbf..c08461726d 100644
+> --- a/Makefile.target
+> +++ b/Makefile.target
+> @@ -172,6 +172,7 @@ include $(SRC_PATH)/Makefile.objs
+>  dummy := $(call unnest-vars,,target-obj-y)
+>  target-obj-y-save := $(target-obj-y)
+>  dummy := $(call unnest-vars,.., \
+> +               authz-obj-y \
+>                 block-obj-y \
+>                 block-obj-m \
+>                 chardev-obj-y \
+> @@ -185,6 +186,7 @@ target-obj-y := $(target-obj-y-save)
+>  all-obj-y += $(common-obj-y)
+>  all-obj-y += $(target-obj-y)
+>  all-obj-y += $(qom-obj-y)
+> +all-obj-$(CONFIG_SOFTMMU) += $(authz-obj-y)
+>  all-obj-$(CONFIG_SOFTMMU) += $(block-obj-y) $(chardev-obj-y)
+>  all-obj-$(CONFIG_USER_ONLY) += $(crypto-aes-obj-y)
+>  all-obj-$(CONFIG_SOFTMMU) += $(crypto-obj-y)
+> diff --git a/authz/Makefile.objs b/authz/Makefile.objs
+> new file mode 100644
+> index 0000000000..12597c9528
+> --- /dev/null
+> +++ b/authz/Makefile.objs
+> @@ -0,0 +1 @@
+> +authz-obj-y += base.o
+> diff --git a/authz/base.c b/authz/base.c
+> new file mode 100644
+> index 0000000000..5b15811384
+> --- /dev/null
+> +++ b/authz/base.c
+> @@ -0,0 +1,82 @@
+> +/*
+> + * QEMU authorization framework base class
+> + *
+> + * Copyright (c) 2018 Red Hat, Inc.
+> + *
+> + * This library is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU Lesser General Public
+> + * License as published by the Free Software Foundation; either
+> + * version 2 of the License, or (at your option) any later version.
+> + *
+> + * This library is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + * Lesser General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU Lesser General Public
+> + * License along with this library; if not, see
+<http://www.gnu.org/licenses/>.
+> + *
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "authz/base.h"
+> +#include "authz/trace.h"
+> +
+> +bool qauthz_is_allowed(QAuthZ *authz,
+> +                       const char *identity,
+> +                       Error **errp)
+> +{
+> +    QAuthZClass *cls = QAUTHZ_GET_CLASS(authz);
+> +    bool allowed;
+> +
+> +    allowed = cls->is_allowed(authz, identity, errp);
+> +    trace_qauthz_is_allowed(authz, identity, allowed);
+> +
+> +    return allowed;
+> +}
+> +
+> +
+> +bool qauthz_is_allowed_by_id(const char *authzid,
+> +                             const char *identity,
+> +                             Error **errp)
+> +{
+> +    QAuthZ *authz;
+> +    Object *obj;
+> +    Object *container;
+> +
+> +    container = object_get_objects_root();
+> +    obj = object_resolve_path_component(container,
+> +                                        authzid);
+> +    if (!obj) {
+> +        error_setg(errp, "Cannot find QAuthZ object ID %s",
 
-If we can find common cases then perhaps we can identify things to use
-static checkers for.
+Here we aren't sure this is a QAuthZ yet. But use this error message
+makes sens.
 
-We can also try setting up tests in environments closer to the way
-OpenStack and oVirt configure they're hosts;  they seem to jump through
-hoops to get a feeling of how much spare memory to allocate, but of
-course since we don't define how much we use they can't really do that.
+> +                   authzid);
+> +        return 0;
 
-Using  mlock would probably make the allocations more likely to
-fail rather than fault later?
+           return false;
 
-> Will the benefits be worth the effort?  Arguing about that in the
-> near-total vacuum we have now is unlikely to be productive.  To ground
-> the debate at least somewhat, I'd like those of us in favour of OOM
-> handling to propose a first draft of OOM handling rules.
+> +    }
+> +
+> +    if (!object_dynamic_cast(obj, TYPE_QAUTHZ)) {
+> +        error_setg(errp, "Object '%s' is not a QAuthZ subclass",
+> +                   authzid);
 
-Well, I'm up to give it a go; but before I do, can you define a bit more
-what you want. Firstly what do you define as 'OOM handling' and secondly
-what type of level of rules do you want.
+           return false;
 
-> If we can't do even that, I'll be tempted to shoot down OOM handling in
-> patches to code I maintain.
+> +        return 0;
+> +    }
+> +
+> +    authz = QAUTHZ(obj);
+> +
+> +    return qauthz_is_allowed(authz, identity, errp);
+> +}
+> +
+> +
+> +static const TypeInfo authz_info = {
+> +    .parent = TYPE_OBJECT,
+> +    .name = TYPE_QAUTHZ,
+> +    .instance_size = sizeof(QAuthZ),
+> +    .class_size = sizeof(QAuthZClass),
+> +    .abstract = true,
+> +};
+> +
+> +static void qauthz_register_types(void)
+> +{
+> +    type_register_static(&authz_info);
+> +}
+> +
+> +type_init(qauthz_register_types)
+> +
+> diff --git a/authz/trace-events b/authz/trace-events
+> new file mode 100644
+> index 0000000000..481c90f511
+> --- /dev/null
+> +++ b/authz/trace-events
+> @@ -0,0 +1,4 @@
+> +# See docs/devel/tracing.txt for syntax documentation.
+> +
+> +# authz/base.c
+> +qauthz_is_allowed(void *authz, const char *identity, bool allowed)
+"AuthZ %p check identity=%s allowed=%d"
+> diff --git a/include/authz/base.h b/include/authz/base.h
+> new file mode 100644
+> index 0000000000..77dcd54c4c
+> --- /dev/null
+> +++ b/include/authz/base.h
+> @@ -0,0 +1,112 @@
+> +/*
+> + * QEMU authorization framework base class
+> + *
+> + * Copyright (c) 2018 Red Hat, Inc.
+> + *
+> + * This library is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU Lesser General Public
+> + * License as published by the Free Software Foundation; either
+> + * version 2 of the License, or (at your option) any later version.
+> + *
+> + * This library is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + * Lesser General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU Lesser General Public
+> + * License along with this library; if not, see
+<http://www.gnu.org/licenses/>.
+> + *
+> + */
+> +
+> +#ifndef QAUTHZ_BASE_H__
+> +#define QAUTHZ_BASE_H__
+> +
+> +#include "qemu-common.h"
+> +#include "qapi/error.h"
+> +#include "qom/object.h"
+> +
+> +
+> +#define TYPE_QAUTHZ "authz"
+> +
+> +#define QAUTHZ_CLASS(klass) \
+> +     OBJECT_CLASS_CHECK(QAuthZClass, (klass), \
+> +                        TYPE_QAUTHZ)
+> +#define QAUTHZ_GET_CLASS(obj) \
+> +     OBJECT_GET_CLASS(QAuthZClass, (obj), \
+> +                      TYPE_QAUTHZ)
+> +#define QAUTHZ(obj) \
+> +     INTERFACE_CHECK(QAuthZ, (obj), \
+> +                     TYPE_QAUTHZ)
+> +
+> +typedef struct QAuthZ QAuthZ;
+> +typedef struct QAuthZClass QAuthZClass;
+> +
+> +/**
+> + * QAuthZ:
+> + *
+> + * The QAuthZ class defines an API contract to be used
+> + * for providing an authorization driver for services
+> + * with user identities.
+> + */
+> +
+> +struct QAuthZ {
+> +    Object parent_obj;
+> +};
+> +
+> +
+> +struct QAuthZClass {
+> +    ObjectClass parent_class;
+> +
+> +    bool (*is_allowed)(QAuthZ *authz,
+> +                       const char *identity,
+> +                       Error **errp);
+> +};
+> +
+> +
+> +/**
+> + * qauthz_is_allowed:
+> + * @authz: the authorization object
+> + * @identity: the user identity to authorize
+> + * @errp: pointer to a NULL initialized error object
+> + *
+> + * Check if a user @identity is authorized. If an error
+> + * occurs this method will return false to indicate
+> + * denial, as well as setting @errp to contain the details.
+> + * Callers are recommended to treat the denial and error
+> + * scenarios identically. Specifically the error info in
+> + * @errp should never be fed back to the user being
+> + * authorized, it is merely for benefit of administrator
+> + * debugging.
+> + *
+> + * Returns: true if @identity is authorized, false if denied or if
+> + * an error occurred.
+> + */
+> +bool qauthz_is_allowed(QAuthZ *authz,
+> +                       const char *identity,
+> +                       Error **errp);
+> +
+> +
+> +/**
+> + * qauthz_is_allowed_by_id:
+> + * @authzid: ID of the authorization object
+> + * @identity: the user identity to authorize
+> + * @errp: pointer to a NULL initialized error object
+> + *
+> + * Check if a user @identity is authorized. If an error
+> + * occurs this method will return false to indicate
+> + * denial, as well as setting @errp to contain the details.
+> + * Callers are recommended to treat the denial and error
+> + * scenarios identically. Specifically the error info in
+> + * @errp should never be fed back to the user being
+> + * authorized, it is merely for benefit of administrator
+> + * debugging.
+> + *
+> + * Returns: true if @identity is authorized, false if denied or if
+> + * an error occurred.
+> + */
+> +bool qauthz_is_allowed_by_id(const char *authzid,
+> +                             const char *identity,
+> +                             Error **errp);
+> +
+> +#endif /* QAUTHZ_BASE_H__ */
+> +
+>
 
-Please please don't do that;  getting it right in the monitor path and
-QMP is import for those cases where we generate big chunks of JSON
-(it would be better if we didn't generate big chunks of JSON, but that's
-a partially separate problem).
-
-Dave
-
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
