@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43061)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gD9er-0006O2-Fq
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:52:21 -0400
+	(envelope-from <berrange@redhat.com>) id 1gD9f8-0006a8-5F
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:52:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gD9em-0000K9-QK
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:52:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36106)
+	(envelope-from <berrange@redhat.com>) id 1gD9eq-0000NI-Ga
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:52:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40930)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gD9em-0000JW-E4
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:52:12 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gD9ep-0000MG-Ov
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:52:16 -0400
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Thu, 18 Oct 2018 15:52:01 +0100
-Message-Id: <20181018145203.11336-3-berrange@redhat.com>
+Date: Thu, 18 Oct 2018 15:52:02 +0100
+Message-Id: <20181018145203.11336-4-berrange@redhat.com>
 In-Reply-To: <20181018145203.11336-1-berrange@redhat.com>
 References: <20181018145203.11336-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [web PATCH 2/4] Introduce content and tools for
- managing security notices
+Subject: [Qemu-devel] [web PATCH 3/4] Add vulnerability reports for 2018
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,1232 +31,639 @@ Cc: Prasad J Pandit <pjp@fedoraproject.org>, Paolo Bonzini <pbonzini@redhat.com>
 
 Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- _config.yml                                  |   4 +
- _includes/nav.html                           |   3 +-
- _layouts/secnotice.html                      |  22 ++
- assets/css/style.css                         |  47 +++
- secnotice/Makefile                           |  40 +++
- secnotice/README-template.md                 |  78 +++++
- secnotice/README.md                          |  20 ++
- secnotice/_scripts/index-html.xsl            |  72 +++++
- secnotice/_scripts/index-xml                 |  28 ++
- secnotice/_scripts/notice-html.xsl           | 286 +++++++++++++++++++
- secnotice/_scripts/notice-txt.xsl            | 277 ++++++++++++++++++
- secnotice/_scripts/report-vulnerable-tags.pl | 135 +++++++++
- secnotice/template.xml                       |  50 ++++
- 13 files changed, 1061 insertions(+), 1 deletion(-)
- create mode 100644 _layouts/secnotice.html
- create mode 100644 secnotice/Makefile
- create mode 100644 secnotice/README-template.md
- create mode 100644 secnotice/README.md
- create mode 100644 secnotice/_scripts/index-html.xsl
- create mode 100755 secnotice/_scripts/index-xml
- create mode 100644 secnotice/_scripts/notice-html.xsl
- create mode 100644 secnotice/_scripts/notice-txt.xsl
- create mode 100644 secnotice/_scripts/report-vulnerable-tags.pl
- create mode 100644 secnotice/template.xml
+ secnotice/2018/001.xml | 248 +++++++++++++++++++++++++++++++++++++++++
+ secnotice/2018/002.xml | 242 ++++++++++++++++++++++++++++++++++++++++
+ secnotice/2018/003.xml | 191 +++++++++++++++++++++++++++++++
+ secnotice/2018/004.xml | 243 ++++++++++++++++++++++++++++++++++++++++
+ secnotice/2018/005.xml | 225 +++++++++++++++++++++++++++++++++++++
+ secnotice/2018/006.xml | 247 ++++++++++++++++++++++++++++++++++++++++
+ secnotice/2018/007.xml | 201 +++++++++++++++++++++++++++++++++
+ secnotice/2018/008.xml | 225 +++++++++++++++++++++++++++++++++++++
+ secnotice/2018/009.xml | 225 +++++++++++++++++++++++++++++++++++++
+ secnotice/2018/010.xml | 223 ++++++++++++++++++++++++++++++++++++
+ secnotice/2018/011.xml | 199 +++++++++++++++++++++++++++++++++
+ 11 files changed, 2469 insertions(+)
+ create mode 100644 secnotice/2018/001.xml
+ create mode 100644 secnotice/2018/002.xml
+ create mode 100644 secnotice/2018/003.xml
+ create mode 100644 secnotice/2018/004.xml
+ create mode 100644 secnotice/2018/005.xml
+ create mode 100644 secnotice/2018/006.xml
+ create mode 100644 secnotice/2018/007.xml
+ create mode 100644 secnotice/2018/008.xml
+ create mode 100644 secnotice/2018/009.xml
+ create mode 100644 secnotice/2018/010.xml
+ create mode 100644 secnotice/2018/011.xml
 
-diff --git a/_config.yml b/_config.yml
-index 0a0201c..6fddace 100644
---- a/_config.yml
-+++ b/_config.yml
-@@ -37,3 +37,7 @@ gems:
- exclude:
-   - Gemfile
-   - Gemfile.lock
-+  - Makefile
-+  - secalert/README.md
-+  - secalert/README-template.md
-+  - secalert/template.xml
-diff --git a/_includes/nav.html b/_includes/nav.html
-index 241d83e..350de6d 100644
---- a/_includes/nav.html
-+++ b/_includes/nav.html
-@@ -6,7 +6,8 @@
- 			</li><li {% if current[1] =3D=3D 'download' %}class=3D'current'{% end=
-if %}><a href=3D"/download">Download</a>
- 			</li><li {% if current[1] =3D=3D 'contribute' %}class=3D'current'{% e=
-ndif %}><a href=3D"/contribute">Contribute</a>
- 			</li><li {% if current[1] =3D=3D 'documentation' %}class=3D'current'{=
-% endif %}><a href=3D"/documentation">Documentation</a>
--			</li><li {% if current[1] =3D=3D 'blog' %}class=3D'current'{% endif %=
-}><a href=3D"/blog">Blog</a></li>
-+			</li><li {% if current[1] =3D=3D 'blog' %}class=3D'current'{% endif %=
-}><a href=3D"/blog">Blog</a>
-+			</li><li {% if current[1] =3D=3D 'secnotice' %}class=3D'current'{% en=
-dif %}><a href=3D"/secnotice">Security Notices</a></li>
- 		</ul>
- 	</nav>
-=20
-diff --git a/_layouts/secnotice.html b/_layouts/secnotice.html
+diff --git a/secnotice/2018/001.xml b/secnotice/2018/001.xml
 new file mode 100644
-index 0000000..b30c036
+index 0000000..3636545
 --- /dev/null
-+++ b/_layouts/secnotice.html
-@@ -0,0 +1,22 @@
-+<!DOCTYPE HTML>
-+<!--
-+Linear by TEMPLATED
-+templated.co @templatedco
-+Released for free under the Creative Commons Attribution 3.0 license (te=
-mplated.co/license)
-+-->
-+<html>
-+<head>
-+	<title>{{ page.title }} - {{ site.title }}</title>
-+	{% include assets.html %}
-+</head>
-+<body class=3D"secnotice">
-+
-+	{% include nav.html %}
-+
-+	{{ content }}
-+
-+	{% include footer.html %}
-+	{% include copyright.html %}
-+
-+</body>
-+</html>
-diff --git a/assets/css/style.css b/assets/css/style.css
-index b828887..dccffb0 100644
---- a/assets/css/style.css
-+++ b/assets/css/style.css
-@@ -590,3 +590,50 @@
- 	{
- 		margin-top: 1.5em;
- 	}
-+
-+/***********************************************************************=
-**********/
-+/* Security notices                                                     =
-         */
-+/***********************************************************************=
-**********/
-+
-+	body.secnotice #main
-+	{
-+		width: 50%;
-+	}
-+
-+	body.secnotice #sidebar
-+	{
-+		margin-top: 10em;
-+		width: 30%;
-+	}
-+
-+	body.secnotice p.altformat
-+	{
-+		font-size: smaller;
-+		color: inherit;
-+		text-align: right;
-+	}
-+
-+	body.secnotice table.repository {
-+	    border-spacing: 0px;
-+	}
-+
-+	body.secnotice table.repository tbody th {
-+	    text-align: right;
-+	}
-+
-+	body.secnotice table.repository tbody th,
-+	body.secnotice table.repository tbody td {
-+	    padding: 2px;
-+	}=09
-+
-+	body.secnotice table.repository tbody td.fixedtag,
-+	body.secnotice table.repository tbody td.mergedcommit {
-+	    background: rgb(240,255,240);
-+	}
-+	body.secnotice table.repository tbody td.fixedcommit {
-+	    background: rgb(240,240,255);
-+	}
-+
-+	body.secnotice table.repository thead {
-+	    background: rgb(240,240,240);
-+	}
-diff --git a/secnotice/Makefile b/secnotice/Makefile
-new file mode 100644
-index 0000000..fef2e8c
---- /dev/null
-+++ b/secnotice/Makefile
-@@ -0,0 +1,40 @@
-+
-+YEARS =3D $(wildcard 2???)
-+
-+INDEX_XML =3D index.xml $(YEARS:%=3D%/index.xml)
-+INDEX_HTML =3D $(INDEX_XML:%.xml=3D%.html)
-+
-+NOTICE_XML =3D $(wildcard */???.xml)
-+NOTICE_TXT =3D $(NOTICE_XML:%.xml=3D%.txt)
-+NOTICE_HTML =3D $(NOTICE_XML:%.xml=3D%.html)
-+
-+all: $(INDEX_XML) $(INDEX_HTML) $(NOTICE_TXT) $(NOTICE_HTML)
-+
-+index.xml: $(NOTICE_XML) _scripts/index-xml Makefile
-+	mkdir -p `dirname $@`
-+	_scripts/index-xml $(sort $(NOTICE_XML)) > $@
-+
-+index.html: index.xml _scripts/index-html.xsl Makefile
-+	xsltproc _scripts/index-html.xsl $< > $@
-+
-+%/index.xml: $(NOTICE_XML) _scripts/index-xml Makefile
-+	mkdir -p `dirname $@`
-+	DIR=3D`echo $@ | sed -e 's,/index.xml,,'`
-+	rm -f $@
-+	_scripts/index-xml $(sort $(wildcard $(@:%/index.xml=3D%/)???.xml)) > $=
-@
-+
-+%/index.html: %/index.xml _scripts/index-html.xsl Makefile
-+	xsltproc --stringparam permalink $(@:%/index.html=3D/secnotice/%/) _scr=
-ipts/index-html.xsl $< > $@
-+
-+%.txt: %.xml _scripts/notice-txt.xsl Makefile
-+	mkdir -p `dirname $@`
-+	xsltproc _scripts/notice-txt.xsl $< > $@
-+
-+%.html: %.xml _scripts/notice-html.xsl Makefile
-+	mkdir -p `dirname $@`
-+	xsltproc _scripts/notice-html.xsl $< > $@
-+
-+clean:
-+	rm -rf index.{xml,html}
-+	rm -rf */index.{xml,html}
-+	rm -rf */*.{txt,html}
-diff --git a/secnotice/README-template.md b/secnotice/README-template.md
-new file mode 100644
-index 0000000..2b80dca
---- /dev/null
-+++ b/secnotice/README-template.md
-@@ -0,0 +1,78 @@
-+QEMU Security Notice Schema
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
-+
-+The top level element of a QEMU security notice has a name of
-+``security-notice`` and is in an XML namespace of
-+``http://qemu.org/xmlns/security-notice/1.0``
-+
-+Basic metadata
-+--------------
-+
-+The ``id`` element content is a pair of 4 digit numbers uniquely identif=
-ying
-+the security issue. By convention the first 4 digit number is the year i=
-n which
-+it was reported and the second number is an integer value that is unique=
- within
-+the year, monotonically incrementing from 1. eg the 137th issue reported=
- in
-+2013 would have an id of ``2013-0137``
-+
-+The ``summary`` element is a short, single line description of the flaw,
-+ideally 80 characters or less to make it suitable for use in email subje=
-ct
-+lines or git commit messages.
-+
-+The ``credits`` element provides information on persons involved with th=
-e flaw.
-+It permits the child elements ``reporter`` or ``patcher`` each of which =
-can be
-+repeated zero or more times. Both elements contain two further child ele=
-ments
-+``email`` and ``name`` with the former providing the email address and t=
-he
-+latter providing the full name. At least one of ``email`` and ``name`` m=
-ust
-+be provided.
-+
-+The ``lifecycle`` element provides date on key milestones in handling of=
- the
-+issue. It contains between one and three child elements, ``reported``,
-+``published`` and ``fixed``. The ``reported`` element says the date on w=
-hich
-+the QEMU security received notification of the issue. The ``published`` =
-element
-+says the date on which the issue was revealed to the public. The ``fixed=
-``
-+element says the date on which the issue was patched in the primary code=
- branch
-+(typically GIT master).
-+
-+The ``reference`` element provides details of related resources. It will=
- have
-+one or more child elements which can be either ``advisory`` or ``bug``. =
-An
-+``advisory`` element includes a ``type`` and ``id`` attribute where ``ty=
-pe`` is
-+currently allowed to be ``CVE`` and ``id`` is the identifier of the repo=
-rt. A
-+``bug`` element includes ``tracker`` and ``id`` attributes where ``track=
-er`` is
-+allowed to be ``redhat``, ``debian`` or a short name for another vendors=
-' bug
-+tracker.
-+
-+Descriptive data
-+----------------
-+
-+There are three free form text elements providing descriptive data about=
- the
-+issue. The data will usually be inside a CDATA block.
-+
-+The ``description`` element content is an expanded version of the ``summ=
-ary``
-+element content, describing what the flaw is.
-+
-+The ``impact`` element content describes the implications of the securit=
-y
-+issue. ie what can a malicious user do with the flaw.
-+
-+The ``workaround`` element content describes any steps that an administr=
-ator
-+can take to eliminate or at least mitigate the impact of the flaw.
-+
-+
-+Product data
-+------------
-+
-+The ``product`` element provides information about the codebase of the a=
-ffected
-+products. The ``name`` attribute is the name of a QEMU product, typicall=
-y based
-+on the tar.gz archive name with the suffix stripped. This contains a chi=
-ld
-+``repository`` element which is a URL to the master GIT repository. Ther=
-e is
-+then one or more ``branch`` elements which details the state of affected
-+branches.
-+
-+The first child of the ``branch`` element is a ``name`` giving the branc=
-h name,
-+eg ``master``, ``v1.0.1-maint``, etc. There are then zero or more ``tag`=
-` or
-+``change`` child elements with a ``state`` attribute of ``vulnerable`` o=
-r
-+``fixed``. The ``tag`` element content details the name of the GIT tag(s=
-) on
-+that branch are vulnerable and which tags are fixed. The ``change`` elem=
-ent
-+content details the GIT hash of the change(s) which both introduce and f=
-ix the
-+flaw. The same vulnerable change hash may appear under multiple ``branch=
-``
-+elements since branches will share large portions of their history. The =
-fix
-+hash will however usually be different.
-diff --git a/secnotice/README.md b/secnotice/README.md
-new file mode 100644
-index 0000000..643076d
---- /dev/null
-+++ b/secnotice/README.md
-@@ -0,0 +1,20 @@
-+QEMU Security Notices
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+This directory records all QEMU Security Notices that are issued.
-+
-+Notices must only added to this directory once any embargo is lifted, si=
-nce the
-+GIT repository is fully public.
-+
-+Notices are written in XML in a file ``$YEAR/$NUM.xml`` eg ``2014/0001.x=
-ml``.
-+Assign numbers incrementally as new issues are reported.  More details o=
-n the
-+XML format can be found in `README-schema.rst``.
-+
-+When a new notice is published for the first time, send the text renderi=
-ng of
-+the notice to the ``qemu-devel@nongnu.org``
-+
-+When backporting security fixes to ``stable-X.Y`` branches, update the n=
-otice
-+with details of the backported changeset hash.
-+
-+When doing a formal stable release, update the notices included with the=
- release
-+tag name.
-diff --git a/secnotice/_scripts/index-html.xsl b/secnotice/_scripts/index=
--html.xsl
-new file mode 100644
-index 0000000..71ae716
---- /dev/null
-+++ b/secnotice/_scripts/index-html.xsl
-@@ -0,0 +1,72 @@
-+<!--
-+  - This program is free software; you can redistribute it and/or modify
-+  - it under the terms of the GNU General Public License as published by
-+  - the Free Software Foundation; either version 2 of the License, or
-+  - (at your option) any later version.
-+  -
-+  - This program is distributed in the hope that it will be useful,
-+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
-+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+  - GNU General Public License for more details.
-+  -
-+  - You should have received a copy of the GNU General Public License
-+  - along with this program.  If not, see
-+  - <http://www.gnu.org/licenses/>.
-+  -->
-+<xsl:stylesheet
-+  xmlns=3D"http://www.w3.org/1999/xhtml"
-+  xmlns:xsl=3D"http://www.w3.org/1999/XSL/Transform"
-+  xmlns:qsn=3D"http://qemu.org/xmlns/security-notice/1.0"
-+  xmlns:qsnl=3D"http://qemu.org/xmlns/security-notice-list/1.0"
-+  exclude-result-prefixes=3D"xsl qsn qsnl"
-+  version=3D"1.0">
-+
-+  <xsl:output omit-xml-declaration=3D"yes" method=3D"xml" indent=3D"yes"=
- />
-+
-+  <xsl:param name=3D"permalink" select=3D"'/secnotice/'"/>
-+
-+  <xsl:template match=3D"/qsnl:security-notice-list">---
-+title: QEMU Security Notices
-+permalink: <xsl:value-of select=3D"$permalink"/>
-+---
-+
-+   <p>
-+     If you believe you have identified a new security issue in QEMU, pl=
-ease
-+     follow the <a href=3D"https://wiki.qemu.org/SecurityProcess">securi=
-ty process</a>
-+     to report it in a non-public way. Do <strong>NOT</strong> use the b=
-ug tracker,
-+     mailing lists, or IRC to report non-public security issues.
-+   </p>
-+
-+    <ul>
-+      <xsl:apply-templates select=3D"qsnl:security-notice">
-+	<xsl:sort select=3D"@name" order=3D"descending" />
-+      </xsl:apply-templates>
-+    </ul>
-+
-+    <p class=3D"alt">
-+      Alternative formats: <a href=3D"index.xml">[xml]</a>
-+    </p>
-+  </xsl:template>
-+
-+  <xsl:template name=3D"qsnhref">
-+    <xsl:param name=3D"id"/>
-+
-+    <xsl:variable name=3D"dir" select=3D"substring-before($id, '-')"/>
-+    <xsl:variable name=3D"file" select=3D"substring-after($id, '-')"/>
-+
-+    <xsl:value-of select=3D"concat($dir, '/', $file)"/>
-+  </xsl:template>
-+
-+  <xsl:template match=3D"qsnl:security-notice">
-+    <xsl:variable name=3D"notice" select=3D"document(concat('../../', @n=
-ame))"/>
-+    <xsl:variable name=3D"id" select=3D"$notice/qsn:security-notice/qsn:=
-id"/>
-+    <xsl:variable name=3D"summary" select=3D"$notice/qsn:security-notice=
-/qsn:summary"/>
-+    <xsl:variable name=3D"href">
-+      <xsl:call-template name=3D"qsnhref">
-+	<xsl:with-param name=3D"id" select=3D"$id"/>
-+      </xsl:call-template>
-+    </xsl:variable>
-+
-+    <li><a href=3D"{$href}">QSN-<xsl:value-of select=3D"$id"/>: <xsl:val=
-ue-of select=3D"$summary"/></a></li>
-+  </xsl:template>
-+</xsl:stylesheet>
-diff --git a/secnotice/_scripts/index-xml b/secnotice/_scripts/index-xml
-new file mode 100755
-index 0000000..67de29f
---- /dev/null
-+++ b/secnotice/_scripts/index-xml
-@@ -0,0 +1,28 @@
-+#!/bin/bash
-+#
-+# Copyright (C) 2013-2014 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see
-+# <http://www.gnu.org/licenses/>.
-+
-+set -e
-+
-+DIR=3D"$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-+
-+echo '<security-notice-list xmlns=3D"http://qemu.org/xmlns/security-noti=
-ce-list/1.0">'
-+for n in $@
-+do
-+  echo "  <security-notice name=3D'/secnotice/$n'/>"
-+done
-+echo '</security-notice-list>'
-diff --git a/secnotice/_scripts/notice-html.xsl b/secnotice/_scripts/noti=
-ce-html.xsl
-new file mode 100644
-index 0000000..50ba802
---- /dev/null
-+++ b/secnotice/_scripts/notice-html.xsl
-@@ -0,0 +1,286 @@
-+<!--
-+  - This program is free software; you can redistribute it and/or modify
-+  - it under the terms of the GNU General Public License as published by
-+  - the Free Software Foundation; either version 2 of the License, or
-+  - (at your option) any later version.
-+  -
-+  - This program is distributed in the hope that it will be useful,
-+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
-+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+  - GNU General Public License for more details.
-+  -
-+  - You should have received a copy of the GNU General Public License
-+  - along with this program.  If not, see
-+  - <http://www.gnu.org/licenses/>.
-+  -->
-+<xsl:stylesheet
-+  xmlns=3D"http://www.w3.org/1999/xhtml"
-+  xmlns:xsl=3D"http://www.w3.org/1999/XSL/Transform"
-+  xmlns:qsn=3D"http://qemu.org/xmlns/security-notice/1.0"
-+  exclude-result-prefixes=3D"xsl qsn"
-+  version=3D"1.0">
-+
-+  <xsl:output omit-xml-declaration=3D"yes" method=3D"xml" indent=3D"yes"=
- />
-+
-+  <xsl:template name=3D"selfhref">
-+    <xsl:param name=3D"id"/>
-+    <xsl:param name=3D"ext"/>
-+
-+    <xsl:variable name=3D"dir" select=3D"substring-before($id, '-')"/>
-+    <xsl:variable name=3D"file" select=3D"substring-after($id, '-')"/>
-+
-+    <xsl:value-of select=3D"concat('/secnotice/', $dir, '/', $file, $ext=
-)"/>
-+  </xsl:template>
-+
-+  <xsl:template match=3D"/qsn:security-notice">---
-+title: 'QSN-<xsl:value-of select=3D"qsn:id"/>: <xsl:value-of select=3D"q=
-sn:summary"/>'
-+layout: secnotice
-+permalink: <xsl:call-template name=3D"selfhref">
-+  <xsl:with-param name=3D"id" select=3D"qsn:id"/>
-+</xsl:call-template>
-+---
-+
-+    <div id=3D"main">
-+      <div class=3D"container">
-+
-+	<h2>
-+	  <xsl:value-of select=3D"qsn:summary"/>
-+	</h2>
-+
-+	<xsl:apply-templates select=3D"qsn:lifecycle"/>
-+	<xsl:apply-templates select=3D"qsn:credits"/>
-+
-+	<xsl:apply-templates select=3D"qsn:reference"/>
-+	<xsl:apply-templates select=3D"qsn:description"/>
-+	<xsl:apply-templates select=3D"qsn:impact"/>
-+	<xsl:apply-templates select=3D"qsn:mitigation"/>
-+
-+	<xsl:call-template name=3D"selflink"/>
-+      </div>
-+    </div>
-+
-+    <div id=3D"sidebar">
-+      <div class=3D"container">
-+	<section>
-+	  <header>
-+	    <h2>Related commits</h2>
-+	  </header>
-+	  <xsl:apply-templates select=3D"qsn:repository"/>
-+	</section>
-+      </div>
-+    </div>
-+  </xsl:template>
-+
-+  <xsl:template name=3D"selflink">
-+    <p class=3D"altformat">
-+      Alternative formats:
-+      <a>
-+	<xsl:attribute name=3D"href">
-+	  <xsl:call-template name=3D"selfhref">
-+	    <xsl:with-param name=3D"id" select=3D"qsn:id"/>
-+	    <xsl:with-param name=3D"ext" select=3D"'.xml'"/>
-+	  </xsl:call-template>
-+	</xsl:attribute>
-+	<xsl:text>[xml]</xsl:text>
-+      </a>
-+      <xsl:text> </xsl:text>
-+      <a>
-+	<xsl:attribute name=3D"href">
-+	  <xsl:call-template name=3D"selfhref">
-+	    <xsl:with-param name=3D"id" select=3D"qsn:id"/>
-+	    <xsl:with-param name=3D"ext" select=3D"'.txt'"/>
-+	  </xsl:call-template>
-+	</xsl:attribute>
-+	<xsl:text>[text]</xsl:text>
-+      </a>
-+    </p>
-+  </xsl:template>
-+
-+  <xsl:template match=3D"qsn:lifecycle">
-+    <h3>Lifecycle</h3>
-+    <table>
-+      <tr>
-+	<th>Reported on:</th>
-+	<td><xsl:value-of select=3D"qsn:reported"/></td>
-+      </tr>
-+      <tr>
-+	<th>Published on:</th>
-+	<td><xsl:value-of select=3D"qsn:published"/></td>
-+      </tr>
-+      <tr>
-+	<th>Fixed on:</th>
-+	<td><xsl:value-of select=3D"qsn:fixed"/></td>
-+      </tr>
-+    </table>
-+  </xsl:template>
-+
-+  <xsl:template match=3D"qsn:credits">
-+    <h3>Credits</h3>
-+    <table>
-+      <xsl:for-each select=3D"qsn:reporter">
-+	<tr>
-+	  <xsl:if test=3D"position() =3D 1">
-+	    <th>Reported by:</th>
-+	  </xsl:if>
-+	  <xsl:if test=3D"position() > 1">
-+	    <th></th>
-+	  </xsl:if>
-+	  <td>
-+	    <a href=3D"mailto:{qsn:email}"><xsl:value-of select=3D"qsn:name"/><=
-/a>
-+	  </td>
-+	</tr>
-+      </xsl:for-each>
-+      <xsl:for-each select=3D"qsn:patcher">
-+	<tr>
-+	  <xsl:if test=3D"position() =3D 1">
-+	    <th>Patched by:</th>
-+	  </xsl:if>
-+	  <xsl:if test=3D"position() > 1">
-+	    <th></th>
-+	  </xsl:if>
-+	  <td>
-+	    <a href=3D"mailto:{qsn:email}"><xsl:value-of select=3D"qsn:name"/><=
-/a>
-+	  </td>
-+	</tr>
-+      </xsl:for-each>
-+    </table>
-+  </xsl:template>
-+
-+  <xsl:template match=3D"qsn:advisory">
-+    <xsl:choose>
-+      <xsl:when test=3D"@type=3D'CVE'">
-+	<a href=3D"https://nvd.nist.gov/vuln/detail/CVE-{@id}">
-+	  <xsl:text>CVE-</xsl:text>
-+	  <xsl:value-of select=3D"@id"/>
-+	</a>
-+      </xsl:when>
-+      <xsl:otherwise>
-+	<xsl:value-of select=3D"@type"/>
-+	<xsl:text>-</xsl:text>
-+	<xsl:value-of select=3D"@id"/>
-+      </xsl:otherwise>
-+    </xsl:choose>
-+  </xsl:template>
-+
-+  <xsl:template match=3D"qsn:bug">
-+    <xsl:value-of select=3D"@tracker"/>
-+    <xsl:text> bug #</xsl:text>
-+    <xsl:value-of select=3D"@id"/>
-+  </xsl:template>
-+
-+  <xsl:template match=3D"qsn:reference">
-+    <h3>See also</h3>
-+    <ul>
-+    <xsl:for-each select=3D"qsn:advisory|qsn:bug">
-+      <li><xsl:apply-templates select=3D"."/></li>
-+    </xsl:for-each>
-+    </ul>
-+  </xsl:template>
-+
-+  <xsl:template match=3D"qsn:description">
-+    <h3>Description</h3>
-+    <p>
-+      <xsl:value-of select=3D"."/>
-+    </p>
-+  </xsl:template>
-+
-+  <xsl:template match=3D"qsn:impact">
-+    <h3>Impact</h3>
-+    <p>
-+      <xsl:value-of select=3D"."/>
-+    </p>
-+  </xsl:template>
-+
-+  <xsl:template match=3D"qsn:mitigation">
-+    <h3>Mitigation</h3>
-+    <p>
-+      <xsl:value-of select=3D"."/>
-+    </p>
-+  </xsl:template>
-+
-+  <xsl:template name=3D"gitbranch">
-+    <xsl:param name=3D"branch"/>
-+
-+    <a href=3D"http://git.qemu.org/?p=3Dqemu.git;a=3Dshortlog;h=3Drefs/h=
-eads/{$branch}"><xsl:value-of select=3D"$branch"/></a>
-+  </xsl:template>
-+
-+  <xsl:template name=3D"gittag">
-+    <xsl:param name=3D"tag"/>
-+
-+    <a href=3D"http://git.qemu.org/?p=3Dqemu.git;a=3Dtag;h=3D{$tag}"><xs=
-l:value-of select=3D"$tag"/></a>
-+  </xsl:template>
-+
-+  <xsl:template name=3D"gitchange">
-+    <xsl:param name=3D"change"/>
-+
-+    <a href=3D"http://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3D{$change=
-}"><xsl:value-of select=3D"$change"/></a>
-+  </xsl:template>
-+
-+  <xsl:template match=3D"qsn:repository">
-+    <xsl:for-each select=3D"qsn:branch">
-+      <table class=3D"repository">
-+	<thead>
-+	  <tr>
-+	    <th colspan=3D"2">Branch:
-+	      <xsl:call-template name=3D"gitbranch">
-+		<xsl:with-param name=3D"branch" select=3D"qsn:name"/>
-+	      </xsl:call-template>
-+	    </th>
-+	  </tr>
-+	</thead>
-+	<tbody>
-+	  <xsl:for-each select=3D"qsn:tag[@state=3D'fixed']">
-+	    <tr>
-+	      <th>Fixed in:</th>
-+	      <td class=3D"fixedtag">
-+		<xsl:call-template name=3D"gittag">
-+		  <xsl:with-param name=3D"tag" select=3D"."/>
-+		</xsl:call-template>
-+	      </td>
-+	    </tr>
-+	  </xsl:for-each>
-+	  <xsl:for-each select=3D"qsn:change[@state=3D'fixed']">
-+	    <tr>
-+	      <th>Fixed by:</th>
-+	      <td class=3D"fixedcommit">
-+		<xsl:call-template name=3D"gitchange">
-+		  <xsl:with-param name=3D"change" select=3D"."/>
-+		</xsl:call-template>
-+	      </td>
-+	    </tr>
-+	  </xsl:for-each>
-+	  <xsl:for-each select=3D"qsn:change[@state=3D'merged']">
-+	    <tr>
-+	      <th>Merged by:</th>
-+	      <td class=3D"mergedcommit">
-+		<xsl:call-template name=3D"gitchange">
-+		  <xsl:with-param name=3D"change" select=3D"."/>
-+		</xsl:call-template>
-+	      </td>
-+	    </tr>
-+	  </xsl:for-each>
-+	  <xsl:for-each select=3D"qsn:tag[@state=3D'vulnerable']">
-+	    <tr>
-+	      <th>Broken in:</th>
-+	      <td class=3D"brokentag">
-+		<xsl:call-template name=3D"gittag">
-+		  <xsl:with-param name=3D"tag" select=3D"."/>
-+		</xsl:call-template>
-+	      </td>
-+	  </tr>
-+	  </xsl:for-each>
-+	  <xsl:for-each select=3D"qsn:change[@state=3D'vulnerable']">
-+	    <tr>
-+	      <th>Broken by:</th>
-+	      <td class=3D"brokencommit">
-+		<xsl:call-template name=3D"gitchange">
-+		  <xsl:with-param name=3D"change" select=3D"."/>
-+		</xsl:call-template>
-+	      </td>
-+	    </tr>
-+	  </xsl:for-each>
-+	</tbody>
-+      </table>
-+    </xsl:for-each>
-+  </xsl:template>
-+</xsl:stylesheet>
-diff --git a/secnotice/_scripts/notice-txt.xsl b/secnotice/_scripts/notic=
-e-txt.xsl
-new file mode 100644
-index 0000000..dc4c125
---- /dev/null
-+++ b/secnotice/_scripts/notice-txt.xsl
-@@ -0,0 +1,277 @@
-+<!--
-+  - This program is free software; you can redistribute it and/or modify
-+  - it under the terms of the GNU General Public License as published by
-+  - the Free Software Foundation; either version 2 of the License, or
-+  - (at your option) any later version.
-+  -
-+  - This program is distributed in the hope that it will be useful,
-+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
-+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+  - GNU General Public License for more details.
-+  -
-+  - You should have received a copy of the GNU General Public License
-+  - along with this program.  If not, see
-+  - <http://www.gnu.org/licenses/>.
-+  -->
-+<xsl:stylesheet
-+  xmlns=3D"http://www.w3.org/1999/xhtml"
-+  xmlns:xsl=3D"http://www.w3.org/1999/XSL/Transform"
-+  xmlns:qsn=3D"http://qemu.org/xmlns/security-notice/1.0"
-+  exclude-result-prefixes=3D"xsl qsn"
-+  version=3D"1.0">
-+
-+  <xsl:output method=3D"text"/>
-+
-+  <xsl:variable name=3D"nl">
-+    <xsl:text>
-+</xsl:text>
-+  </xsl:variable>
-+
-+  <!-- based on http://plasmasturm.org/log/xslwordwrap/ -->
-+  <!-- Copyright 2010 Aristotle Pagaltzis; under the MIT licence -->
-+  <!-- http://www.opensource.org/licenses/mit-license.php -->
-+  <xsl:template name=3D"wrap-string">
-+    <xsl:param name=3D"str" />
-+    <xsl:param name=3D"wrap-col" />
-+    <xsl:param name=3D"break-mark" />
-+    <xsl:param name=3D"pos" select=3D"0" />
-+    <xsl:choose>
-+      <xsl:when test=3D"contains( $str, ' ' )">
-+	<xsl:variable name=3D"first-word" select=3D"substring-before( $str, ' '=
- )" />
-+	<xsl:variable name=3D"pos-now" select=3D"$pos + 1 + string-length( $fir=
-st-word )" />
-+	<xsl:choose>
-+          <xsl:when test=3D"$pos > 0 and $pos-now >=3D $wrap-col">
-+            <xsl:copy-of select=3D"$break-mark" />
-+            <xsl:call-template name=3D"wrap-string">
-+              <xsl:with-param name=3D"str" select=3D"$str" />
-+              <xsl:with-param name=3D"wrap-col" select=3D"$wrap-col" />
-+              <xsl:with-param name=3D"break-mark" select=3D"$break-mark"=
- />
-+              <xsl:with-param name=3D"pos" select=3D"0" />
-+            </xsl:call-template>
-+          </xsl:when>
-+          <xsl:otherwise>
-+            <xsl:if test=3D"$pos > 0">
-+              <xsl:text> </xsl:text>
-+            </xsl:if>
-+            <xsl:value-of select=3D"$first-word" />
-+            <xsl:call-template name=3D"wrap-string">
-+              <xsl:with-param name=3D"str" select=3D"substring-after( $s=
-tr, ' ' )" />
-+              <xsl:with-param name=3D"wrap-col" select=3D"$wrap-col" />
-+              <xsl:with-param name=3D"break-mark" select=3D"$break-mark"=
- />
-+              <xsl:with-param name=3D"pos" select=3D"$pos-now" />
-+            </xsl:call-template>
-+          </xsl:otherwise>
-+	</xsl:choose>
-+      </xsl:when>
-+      <xsl:otherwise>
-+	<xsl:choose>
-+          <xsl:when test=3D"$pos + string-length( $str ) >=3D $wrap-col"=
->
-+            <xsl:copy-of select=3D"$break-mark" />
-+          </xsl:when>
-+          <xsl:otherwise>
-+            <xsl:if test=3D"$pos > 0">
-+              <xsl:text> </xsl:text>
-+            </xsl:if>
-+          </xsl:otherwise>
-+	</xsl:choose>
-+	<xsl:value-of select=3D"$str" />
-+      </xsl:otherwise>
-+    </xsl:choose>
-+  </xsl:template>
-+
-+  <xsl:template match=3D"/qsn:security-notice">
-+    <xsl:text>        QEMU Security Notice: QSN-</xsl:text>
-+    <xsl:value-of select=3D"qsn:id"/>
-+    <xsl:value-of select=3D"$nl"/>
-+    <xsl:text>        =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D</xsl:text>
-+    <xsl:value-of select=3D"$nl"/>
-+
-+    <xsl:value-of select=3D"$nl"/>
-+
-+
-+    <xsl:apply-templates select=3D"qsn:summary"/>
-+    <xsl:apply-templates select=3D"qsn:lifecycle"/>
-+    <xsl:apply-templates select=3D"qsn:credits"/>
-+    <xsl:apply-templates select=3D"qsn:reference"/>
-+    <xsl:apply-templates select=3D"qsn:description"/>
-+    <xsl:apply-templates select=3D"qsn:impact"/>
-+    <xsl:apply-templates select=3D"qsn:mitigation"/>
-+    <xsl:apply-templates select=3D"qsn:repository"/>
-+  </xsl:template>
-+
-+  <xsl:template match=3D"qsn:summary">
-+    <xsl:text>       Summary: </xsl:text>
-+    <xsl:call-template name=3D"wrap-string">
-+      <xsl:with-param name=3D"str" select=3D"normalize-space(.)"/>
-+      <xsl:with-param name=3D"wrap-col" select=3D"52"/>
-+      <xsl:with-param name=3D"break-mark" select=3D"concat($nl, '       =
-         ')"/>
-+    </xsl:call-template>
-+    <xsl:value-of select=3D"$nl"/>
-+  </xsl:template>
-+
-+  <xsl:template match=3D"qsn:lifecycle">
-+    <xsl:text>   Reported on: </xsl:text>
-+    <xsl:value-of select=3D"qsn:reported"/>
-+    <xsl:value-of select=3D"$nl"/>
-+
-+    <xsl:text>  Published on: </xsl:text>
-+    <xsl:value-of select=3D"qsn:published"/>
-+    <xsl:value-of select=3D"$nl"/>
-+
-+    <xsl:text>      Fixed on: </xsl:text>
-+    <xsl:value-of select=3D"qsn:fixed"/>
-+    <xsl:value-of select=3D"$nl"/>
-+  </xsl:template>
-+
-+  <xsl:template match=3D"qsn:credits">
-+    <xsl:text>   Reported by: </xsl:text>
-+    <xsl:for-each select=3D"qsn:reporter">
-+      <xsl:if test=3D"position() > 1">
-+	<xsl:text>                </xsl:text>
-+      </xsl:if>
-+      <xsl:value-of select=3D"qsn:name"/>
-+      <xsl:text> &lt;</xsl:text>
-+      <xsl:value-of select=3D"qsn:email"/>
-+      <xsl:text>&gt;</xsl:text>
-+      <xsl:if test=3D"position() !=3D last()">
-+	<xsl:value-of select=3D"$nl"/>
-+      </xsl:if>
-+    </xsl:for-each>
-+    <xsl:value-of select=3D"$nl"/>
-+    <xsl:text>    Patched by: </xsl:text>
-+    <xsl:for-each select=3D"qsn:patcher">
-+      <xsl:if test=3D"position() > 1">
-+	<xsl:text>                </xsl:text>
-+      </xsl:if>
-+      <xsl:value-of select=3D"qsn:name"/>
-+      <xsl:text> &lt;</xsl:text>
-+      <xsl:value-of select=3D"qsn:email"/>
-+      <xsl:text>&gt;</xsl:text>
-+      <xsl:if test=3D"position() !=3D last()">
-+	<xsl:value-of select=3D"concat(',',$nl)"/>
-+      </xsl:if>
-+    </xsl:for-each>
-+    <xsl:value-of select=3D"$nl"/>
-+  </xsl:template>
-+
-+  <xsl:template match=3D"qsn:advisory">
-+    <xsl:value-of select=3D"@type"/>
-+    <xsl:text>-</xsl:text>
-+    <xsl:value-of select=3D"@id"/>
-+  </xsl:template>
-+
-+  <xsl:template match=3D"qsn:bug">
-+    <xsl:value-of select=3D"@tracker"/>
-+    <xsl:text> bug #</xsl:text>
-+    <xsl:value-of select=3D"@id"/>
-+  </xsl:template>
-+
-+  <xsl:template match=3D"qsn:reference">
-+    <xsl:text>      See also: </xsl:text>
-+    <xsl:variable name=3D"refs">
-+      <xsl:for-each select=3D"qsn:advisory|qsn:bug">
-+	<xsl:apply-templates select=3D"."/>
-+	<xsl:if test=3D"position() !=3D last()">
-+	  <xsl:text>, </xsl:text>
-+	</xsl:if>
-+      </xsl:for-each>
-+    </xsl:variable>
-+    <xsl:call-template name=3D"wrap-string">
-+      <xsl:with-param name=3D"str" select=3D"$refs"/>
-+      <xsl:with-param name=3D"wrap-col" select=3D"52"/>
-+      <xsl:with-param name=3D"break-mark" select=3D"concat($nl, '       =
-         ')"/>
-+    </xsl:call-template>
-+    <xsl:value-of select=3D"$nl"/>
-+    <xsl:value-of select=3D"$nl"/>
-+  </xsl:template>
-+
-+  <xsl:template match=3D"qsn:description">
-+    <xsl:text>Description</xsl:text>
-+    <xsl:value-of select=3D"$nl"/>
-+    <xsl:text>-----------</xsl:text>
-+    <xsl:value-of select=3D"$nl"/>
-+    <xsl:value-of select=3D"$nl"/>
-+    <xsl:call-template name=3D"wrap-string">
-+      <xsl:with-param name=3D"str" select=3D"normalize-space(.)"/>
-+      <xsl:with-param name=3D"wrap-col" select=3D"70"/>
-+      <xsl:with-param name=3D"break-mark" select=3D"$nl"/>
-+    </xsl:call-template>
-+    <xsl:value-of select=3D"$nl"/>
-+    <xsl:value-of select=3D"$nl"/>
-+  </xsl:template>
-+
-+  <xsl:template match=3D"qsn:impact">
-+    <xsl:text>Impact</xsl:text>
-+    <xsl:value-of select=3D"$nl"/>
-+    <xsl:text>------</xsl:text>
-+    <xsl:value-of select=3D"$nl"/>
-+    <xsl:value-of select=3D"$nl"/>
-+    <xsl:call-template name=3D"wrap-string">
-+      <xsl:with-param name=3D"str" select=3D"normalize-space(.)"/>
-+      <xsl:with-param name=3D"wrap-col" select=3D"70"/>
-+      <xsl:with-param name=3D"break-mark" select=3D"$nl"/>
-+    </xsl:call-template>
-+    <xsl:value-of select=3D"$nl"/>
-+    <xsl:value-of select=3D"$nl"/>
-+  </xsl:template>
-+
-+  <xsl:template match=3D"qsn:mitigation">
-+    <xsl:text>Mitigation</xsl:text>
-+    <xsl:value-of select=3D"$nl"/>
-+    <xsl:text>----------</xsl:text>
-+    <xsl:value-of select=3D"$nl"/>
-+    <xsl:value-of select=3D"$nl"/>
-+    <xsl:call-template name=3D"wrap-string">
-+      <xsl:with-param name=3D"str" select=3D"normalize-space(.)"/>
-+      <xsl:with-param name=3D"wrap-col" select=3D"70"/>
-+      <xsl:with-param name=3D"break-mark" select=3D"$nl"/>
-+    </xsl:call-template>
-+    <xsl:value-of select=3D"$nl"/>
-+    <xsl:value-of select=3D"$nl"/>
-+  </xsl:template>
-+
-+
-+  <xsl:template match=3D"qsn:repository">
-+    <xsl:text>Related commits</xsl:text>
-+    <xsl:value-of select=3D"$nl"/>
-+    <xsl:text>----------------</xsl:text>
-+    <xsl:value-of select=3D"$nl"/>
-+    <xsl:value-of select=3D"$nl"/>
-+    <xsl:text>  git://git.qemu.org/qemu.git</xsl:text>
-+    <xsl:value-of select=3D"$nl"/>
-+    <xsl:text>  https://git.qemu.org/?p=3Dqemu.git</xsl:text>
-+    <xsl:value-of select=3D"$nl"/>
-+    <xsl:value-of select=3D"$nl"/>
-+
-+    <xsl:for-each    select=3D"qsn:branch">
-+      <xsl:text>      Branch: </xsl:text>
-+      <xsl:value-of select=3D"qsn:name"/>
-+      <xsl:value-of select=3D"$nl"/>
-+      <xsl:if test=3D"count(qsn:tag)">
-+	<xsl:for-each select=3D"qsn:tag[@state=3D'vulnerable']">
-+	  <xsl:text>   Broken in: </xsl:text>
-+	  <xsl:value-of select=3D"."/>
-+	  <xsl:value-of select=3D"$nl"/>
-+	</xsl:for-each>
-+	<xsl:for-each select=3D"qsn:tag[@state=3D'fixed']">
-+	  <xsl:text>    Fixed in: </xsl:text>
-+	  <xsl:value-of select=3D"."/>
-+	  <xsl:value-of select=3D"$nl"/>
-+	</xsl:for-each>
-+      </xsl:if>
-+      <xsl:if test=3D"count(qsn:change)">
-+	<xsl:for-each select=3D"qsn:change[@state=3D'vulnerable']">
-+	  <xsl:text>   Broken by: </xsl:text>
-+	  <xsl:value-of select=3D"."/>
-+	  <xsl:value-of select=3D"$nl"/>
-+	</xsl:for-each>
-+	<xsl:for-each select=3D"qsn:change[@state=3D'fixed']">
-+	  <xsl:text>    Fixed by: </xsl:text>
-+	  <xsl:value-of select=3D"."/>
-+	  <xsl:value-of select=3D"$nl"/>
-+	</xsl:for-each>
-+      </xsl:if>
-+      <xsl:value-of select=3D"$nl"/>
-+    </xsl:for-each>
-+  </xsl:template>
-+</xsl:stylesheet>
-diff --git a/secnotice/_scripts/report-vulnerable-tags.pl b/secnotice/_sc=
-ripts/report-vulnerable-tags.pl
-new file mode 100644
-index 0000000..3b89efd
---- /dev/null
-+++ b/secnotice/_scripts/report-vulnerable-tags.pl
-@@ -0,0 +1,135 @@
-+#!/usr/bin/perl
-+
-+use strict;
-+use warnings;
-+
-+use Sort::Versions;
-+
-+if (int(@ARGV) !=3D 1 && int (@ARGV) !=3D 2) {
-+    die "syntax: $0 BROKEN-COMMIT [MERGED-COMMIT]\n";
-+}
-+
-+my $broken =3D shift @ARGV;
-+my $merged =3D shift @ARGV;
-+
-+sub get_tags {
-+    my @args =3D @_;
-+
-+    my @tags;
-+    open GIT, "-|", "git", "tag", @args or
-+    die "cannot query 'git tags @args': $!\n";
-+
-+    while (<GIT>) {
-+        chomp;
-+
-+        # Drop anything except  vN.N.N style tags
-+        # where 'N' is only digits.
-+        if (/^v(\d+)(\.\d+)+$/) {
-+            push @tags, $_;
-+        }
-+    }
-+
-+    close GIT;
-+
-+    return @tags;
-+}
-+
-+sub get_branch {
-+    my $tag =3D shift;
-+
-+    my @branches;
-+    open GIT, "-|", "git", "branch", "--all", "--contains", $tag or
-+    die "cannot query 'git branch --all --contains $tag': $!\n";
-+
-+    while (<GIT>) {
-+        chomp;
-+
-+        if (m,^\s*remotes/origin/(stable-.*)$,) {
-+            push @branches, $1;
-+        }
-+    }
-+
-+    close GIT;
-+
-+    return @branches;
-+}
-+
-+my @branches;
-+my %tags;
-+my %branches;
-+
-+my %merged;
-+my $mergedtag;
-+
-+if (defined $merged) {
-+    for my $tag (get_tags("--contains", $merged)) {
-+	$merged{$tag} =3D 1;
-+	$mergedtag =3D $tag unless defined $mergedtag;
-+    }
-+}
-+
-+$branches{"master"} =3D [];
-+# Most tags live on master so lets get them first
-+for my $tag (get_tags("--contains", $broken, "--merged", "master")) {
-+    next if exists $merged{$tag};
-+    push @{$branches{"master"}}, $tag;
-+    $tags{$tag} =3D 1;
-+}
-+push @branches, "master";
-+
-+# Now we need slower work to find branches for
-+# few remaining tags
-+for my $tag (get_tags("--contains", $broken)) {
-+
-+    next if exists $tags{$tag};
-+    next if exists $merged{$tag};
-+    next if $tag =3D~ /v\d+\.\d+\.9\d/;
-+
-+    my @tagbranches =3D get_branch($tag);
-+    if (int(@tagbranches) =3D=3D 0) {
-+	if ($tag =3D~ "^v0.10") {
-+	    @tagbranches =3D ("stable-0.10")
-+	} elsif ($tag =3D~ "^v0") {
-+	    @tagbranches =3D ("master")
-+	} else {
-+	    print "Tag $tag doesn't appear in any branch\n";
-+	    next;
-+	}
-+    }
-+
-+    if (int(@tagbranches) > 1) {
-+        print "Tag $tag appears in multiple branches\n";
-+    }
-+
-+    unless (exists($branches{$tagbranches[0]})) {
-+        $branches{$tagbranches[0]} =3D [];
-+        push @branches, $tagbranches[0];
-+    }
-+    push @{$branches{$tagbranches[0]}}, $tag;
-+}
-+
-+
-+foreach my $branch (sort versioncmp @branches) {
-+    print "    <branch>\n";
-+    print "      <name>$branch</name>\n";
-+    if ($branch eq "master") {
-+	print "      <change state=3D\"fixed\"></change>\n";
-+	if (defined $merged) {
-+	    print "      <change state=3D\"merged\">$merged</change>\n";
-+	} else {
-+	    print "      <change state=3D\"merged\"></change>\n";
-+	}
-+	if (defined $mergedtag) {
-+	    print "      <tag state=3D\"fixed\">$mergedtag</tag>\n";
-+	} else {
-+	    print "      <tag state=3D\"fixed\"></tag>\n";
-+	}
-+    }
-+
-+    foreach my $tag (sort versioncmp @{$branches{$branch}}) {
-+        print "      <tag state=3D\"vulnerable\">$tag</tag>\n";
-+    }
-+    print "      <change state=3D\"vulnerable\">$broken</change>\n";
-+
-+    print "    </branch>\n";
-+}
-diff --git a/secnotice/template.xml b/secnotice/template.xml
-new file mode 100644
-index 0000000..8f8a0d4
---- /dev/null
-+++ b/secnotice/template.xml
-@@ -0,0 +1,50 @@
++++ b/secnotice/2018/001.xml
+@@ -0,0 +1,248 @@
 +<security-notice xmlns=3D"http://qemu.org/xmlns/security-notice/1.0">
-+  <id>XXXX-XXX</id>
++  <id>2018-001</id>
 +
-+  <summary></summary>
++  <summary>Speculative store bypass</summary>
 +
 +  <description>
-+<![CDATA[]]>
++<![CDATA[An industry-wide issue was found in the way many modern micropr=
+ocessor designs have implemented speculative execution of Load & Store in=
+structions (a commonly used performance optimization).
++
++It relies on the presence of a precisely-defined instruction sequence in=
+ the privileged code as well as the fact that memory read from address to=
+ which a recent memory write has occurred may see an older value and subs=
+equently cause an update into the microprocessor's data cache even for sp=
+eculatively executed instructions that never actually commit (retire).
++]]>
 +  </description>
 +
 +  <impact>
-+<![CDATA[]]>
++<![CDATA[As a result, an unprivileged attacker could use this flaw to re=
+ad privileged memory by conducting targeted cache side-channel attacks.]]=
+>
 +  </impact>
 +
-+  <workaround>
-+<![CDATA[]]>
-+  </workaround>
++  <mitigation>
++<![CDATA[None]]>
++  </mitigation>
++
++  <credits>
++    <reporter>
++      <name>Ken Johnson (Microsoft Security Response Center)</name>
++    </reporter>
++    <reporter>
++      <name>Jann Horn (Google Project Zero)</name>
++    </reporter>
++    <patcher>
++      <name>Daniel P. Berrang=C3=A9</name>
++      <email>berrange@redhat.com</email>
++    </patcher>
++    <patcher>
++      <name>Konrad Rzeszutek Wilk</name>
++      <email>konrad.wilk@oracle.com</email>
++    </patcher>
++  </credits>
++
++  <lifecycle>
++    <reported>20180312</reported>
++    <published>20180521</published>
++    <fixed>20180626</fixed>
++  </lifecycle>
++
++  <reference>
++    <advisory type=3D"CVE" id=3D"2018-3639"/>
++  </reference>
++
++  <repository>
++    <branch>
++      <name>master</name>
++      <change state=3D"fixed">d19d1f965904a533998739698020ff4ee8a103da</=
+change>
++      <change state=3D"fixed">403503b162ffc33fb64cfefdf7b880acf41772cd</=
+change>
++      <change state=3D"merged">4f50c1673a89b07f376ce5c42d22d79a79cd466d<=
+/change>
++      <change state=3D"fixed">a764f3f7197f4d7ad8fe8424269933de912224cb</=
+change>
++      <change state=3D"merged">e409d9a158c77c650651e8118f6c86c8dc76eba6<=
+/change>
++      <tag state=3D"fixed"></tag>
++      <tag state=3D"vulnerable">v0.10.1</tag>
++      <tag state=3D"vulnerable">v0.10.2</tag>
++      <tag state=3D"vulnerable">v1.0</tag>
++      <tag state=3D"vulnerable">v1.1.0</tag>
++      <tag state=3D"vulnerable">v1.2.0</tag>
++      <tag state=3D"vulnerable">v1.3.0</tag>
++      <tag state=3D"vulnerable">v1.4.0</tag>
++      <tag state=3D"vulnerable">v1.5.0</tag>
++      <tag state=3D"vulnerable">v1.6.0</tag>
++      <tag state=3D"vulnerable">v1.7.0</tag>
++      <tag state=3D"vulnerable">v2.0.0</tag>
++      <tag state=3D"vulnerable">v2.1.0</tag>
++      <tag state=3D"vulnerable">v2.2.0</tag>
++      <tag state=3D"vulnerable">v2.3.0</tag>
++      <tag state=3D"vulnerable">v2.4.0</tag>
++      <tag state=3D"vulnerable">v2.5.0</tag>
++      <tag state=3D"vulnerable">v2.6.0</tag>
++      <tag state=3D"vulnerable">v2.7.0</tag>
++      <tag state=3D"vulnerable">v2.8.0</tag>
++      <tag state=3D"vulnerable">v2.9.0</tag>
++      <tag state=3D"vulnerable">v2.10.0</tag>
++      <tag state=3D"vulnerable">v2.11.0</tag>
++      <tag state=3D"vulnerable">v2.12.0</tag>
++      <tag state=3D"vulnerable">v3.0.0</tag>
++      <change state=3D"vulnerable">7ba1e61953f4592606e60b2e7507ff6a6faf8=
+61a</change>
++    </branch>
++    <branch>
++      <name>stable-0.10</name>
++      <tag state=3D"vulnerable">v0.10.0</tag>
++      <tag state=3D"vulnerable">v0.10.3</tag>
++      <tag state=3D"vulnerable">v0.10.4</tag>
++      <tag state=3D"vulnerable">v0.10.5</tag>
++      <tag state=3D"vulnerable">v0.10.6</tag>
++      <change state=3D"vulnerable">7ba1e61953f4592606e60b2e7507ff6a6faf8=
+61a</change>
++    </branch>
++    <branch>
++      <name>stable-0.11</name>
++      <tag state=3D"vulnerable">v0.11.0</tag>
++      <tag state=3D"vulnerable">v0.11.1</tag>
++      <change state=3D"vulnerable">7ba1e61953f4592606e60b2e7507ff6a6faf8=
+61a</change>
++    </branch>
++    <branch>
++      <name>stable-0.12</name>
++      <tag state=3D"vulnerable">v0.12.0</tag>
++      <tag state=3D"vulnerable">v0.12.1</tag>
++      <tag state=3D"vulnerable">v0.12.2</tag>
++      <tag state=3D"vulnerable">v0.12.3</tag>
++      <tag state=3D"vulnerable">v0.12.4</tag>
++      <tag state=3D"vulnerable">v0.12.5</tag>
++      <change state=3D"vulnerable">7ba1e61953f4592606e60b2e7507ff6a6faf8=
+61a</change>
++    </branch>
++    <branch>
++      <name>stable-0.13</name>
++      <tag state=3D"vulnerable">v0.13.0</tag>
++      <change state=3D"vulnerable">7ba1e61953f4592606e60b2e7507ff6a6faf8=
+61a</change>
++    </branch>
++    <branch>
++      <name>stable-0.14</name>
++      <tag state=3D"vulnerable">v0.14.0</tag>
++      <tag state=3D"vulnerable">v0.14.1</tag>
++      <change state=3D"vulnerable">7ba1e61953f4592606e60b2e7507ff6a6faf8=
+61a</change>
++    </branch>
++    <branch>
++      <name>stable-0.15</name>
++      <tag state=3D"vulnerable">v0.15.0</tag>
++      <tag state=3D"vulnerable">v0.15.1</tag>
++      <change state=3D"vulnerable">7ba1e61953f4592606e60b2e7507ff6a6faf8=
+61a</change>
++    </branch>
++    <branch>
++      <name>stable-1.0</name>
++      <tag state=3D"vulnerable">v1.0.1</tag>
++      <change state=3D"vulnerable">7ba1e61953f4592606e60b2e7507ff6a6faf8=
+61a</change>
++    </branch>
++    <branch>
++      <name>stable-1.1</name>
++      <tag state=3D"vulnerable">v1.1.1</tag>
++      <tag state=3D"vulnerable">v1.1.2</tag>
++      <change state=3D"vulnerable">7ba1e61953f4592606e60b2e7507ff6a6faf8=
+61a</change>
++    </branch>
++    <branch>
++      <name>stable-1.2</name>
++      <tag state=3D"vulnerable">v1.2.1</tag>
++      <tag state=3D"vulnerable">v1.2.2</tag>
++      <change state=3D"vulnerable">7ba1e61953f4592606e60b2e7507ff6a6faf8=
+61a</change>
++    </branch>
++    <branch>
++      <name>stable-1.3</name>
++      <tag state=3D"vulnerable">v1.3.1</tag>
++      <change state=3D"vulnerable">7ba1e61953f4592606e60b2e7507ff6a6faf8=
+61a</change>
++    </branch>
++    <branch>
++      <name>stable-1.4</name>
++      <tag state=3D"vulnerable">v1.4.1</tag>
++      <tag state=3D"vulnerable">v1.4.2</tag>
++      <change state=3D"vulnerable">7ba1e61953f4592606e60b2e7507ff6a6faf8=
+61a</change>
++    </branch>
++    <branch>
++      <name>stable-1.5</name>
++      <tag state=3D"vulnerable">v1.5.1</tag>
++      <tag state=3D"vulnerable">v1.5.2</tag>
++      <tag state=3D"vulnerable">v1.5.3</tag>
++      <change state=3D"vulnerable">7ba1e61953f4592606e60b2e7507ff6a6faf8=
+61a</change>
++    </branch>
++    <branch>
++      <name>stable-1.6</name>
++      <tag state=3D"vulnerable">v1.6.1</tag>
++      <tag state=3D"vulnerable">v1.6.2</tag>
++      <change state=3D"vulnerable">7ba1e61953f4592606e60b2e7507ff6a6faf8=
+61a</change>
++    </branch>
++    <branch>
++      <name>stable-1.7</name>
++      <tag state=3D"vulnerable">v1.7.1</tag>
++      <tag state=3D"vulnerable">v1.7.2</tag>
++      <change state=3D"vulnerable">7ba1e61953f4592606e60b2e7507ff6a6faf8=
+61a</change>
++    </branch>
++    <branch>
++      <name>stable-2.0</name>
++      <tag state=3D"vulnerable">v2.0.1</tag>
++      <tag state=3D"vulnerable">v2.0.2</tag>
++      <change state=3D"vulnerable">7ba1e61953f4592606e60b2e7507ff6a6faf8=
+61a</change>
++    </branch>
++    <branch>
++      <name>stable-2.1</name>
++      <tag state=3D"vulnerable">v2.1.1</tag>
++      <tag state=3D"vulnerable">v2.1.2</tag>
++      <tag state=3D"vulnerable">v2.1.3</tag>
++      <change state=3D"vulnerable">7ba1e61953f4592606e60b2e7507ff6a6faf8=
+61a</change>
++    </branch>
++    <branch>
++      <name>stable-2.2</name>
++      <tag state=3D"vulnerable">v2.2.1</tag>
++      <change state=3D"vulnerable">7ba1e61953f4592606e60b2e7507ff6a6faf8=
+61a</change>
++    </branch>
++    <branch>
++      <name>stable-2.3</name>
++      <tag state=3D"vulnerable">v2.3.1</tag>
++      <change state=3D"vulnerable">7ba1e61953f4592606e60b2e7507ff6a6faf8=
+61a</change>
++    </branch>
++    <branch>
++      <name>stable-2.4</name>
++      <tag state=3D"vulnerable">v2.4.0.1</tag>
++      <tag state=3D"vulnerable">v2.4.1</tag>
++      <change state=3D"vulnerable">7ba1e61953f4592606e60b2e7507ff6a6faf8=
+61a</change>
++    </branch>
++    <branch>
++      <name>stable-2.5</name>
++      <tag state=3D"vulnerable">v2.5.1</tag>
++      <tag state=3D"vulnerable">v2.5.1.1</tag>
++      <change state=3D"vulnerable">7ba1e61953f4592606e60b2e7507ff6a6faf8=
+61a</change>
++    </branch>
++    <branch>
++      <name>stable-2.6</name>
++      <tag state=3D"vulnerable">v2.6.1</tag>
++      <tag state=3D"vulnerable">v2.6.2</tag>
++      <change state=3D"vulnerable">7ba1e61953f4592606e60b2e7507ff6a6faf8=
+61a</change>
++    </branch>
++    <branch>
++      <name>stable-2.7</name>
++      <tag state=3D"vulnerable">v2.7.1</tag>
++      <change state=3D"vulnerable">7ba1e61953f4592606e60b2e7507ff6a6faf8=
+61a</change>
++    </branch>
++    <branch>
++      <name>stable-2.8</name>
++      <tag state=3D"vulnerable">v2.8.1</tag>
++      <tag state=3D"vulnerable">v2.8.1.1</tag>
++      <change state=3D"vulnerable">7ba1e61953f4592606e60b2e7507ff6a6faf8=
+61a</change>
++    </branch>
++    <branch>
++      <name>stable-2.9</name>
++      <tag state=3D"vulnerable">v2.9.1</tag>
++      <change state=3D"vulnerable">7ba1e61953f4592606e60b2e7507ff6a6faf8=
+61a</change>
++    </branch>
++    <branch>
++      <name>stable-2.10</name>
++      <tag state=3D"vulnerable">v2.10.1</tag>
++      <tag state=3D"vulnerable">v2.10.2</tag>
++      <change state=3D"vulnerable">7ba1e61953f4592606e60b2e7507ff6a6faf8=
+61a</change>
++    </branch>
++    <branch>
++      <name>stable-2.11</name>
++      <tag state=3D"vulnerable">v2.11.1</tag>
++      <tag state=3D"vulnerable">v2.11.2</tag>
++      <change state=3D"vulnerable">7ba1e61953f4592606e60b2e7507ff6a6faf8=
+61a</change>
++    </branch>
++    <branch>
++      <name>stable-2.12</name>
++      <tag state=3D"vulnerable">v2.12.1</tag>
++      <change state=3D"vulnerable">7ba1e61953f4592606e60b2e7507ff6a6faf8=
+61a</change>
++    </branch>
++  </repository>
++
++</security-notice>
+diff --git a/secnotice/2018/002.xml b/secnotice/2018/002.xml
+new file mode 100644
+index 0000000..6422715
+--- /dev/null
++++ b/secnotice/2018/002.xml
+@@ -0,0 +1,242 @@
++<security-notice xmlns=3D"http://qemu.org/xmlns/security-notice/1.0">
++  <id>2018-002</id>
++
++  <summary>VGA out of bounds in vga_draw_text</summary>
++
++  <description>
++<![CDATA[Quick Emulator(QEMU) built with the VGA emulator support is vul=
+nerable to an out-of-bounds access issue in vga_draw_text. It could occur=
+ while updating vga display area.]]>
++  </description>
++
++  <impact>
++<![CDATA[A privileged user inside guest could use this flaw to crash the=
+ Qemu process
++resulting in DoS.]]>
++  </impact>
++
++  <mitigation>
++<![CDATA[Disable graphics adapters if the virtual machines can be operat=
+ed
++via the serial console]]>
++  </mitigation>
++
++  <credits>
++    <reporter>
++      <name>Jiang Xin</name>
++      <email>jiangxin1@huawei.com</email>
++    </reporter>
++    <patcher>
++      <name>Lin ZheCheng</name>
++      <email>linzhecheng@huawei.com</email>
++    </patcher>
++  </credits>
++
++  <lifecycle>
++    <reported>20171228</reported>
++    <published>20171225</published>
++    <fixed>20180125</fixed>
++  </lifecycle>
++
++  <reference>
++    <advisory type=3D"CVE" id=3D"2018-5683"/>
++  </reference>
++
++  <repository>
++    <branch>
++      <name>master</name>
++      <tag state=3D"fixed">v2.12.0</tag>
++      <change state=3D"fixed">191f59dc17396bb5a8da50f8c59b6e0a430711a4</=
+change>
++      <change state=3D"merged">b3bbe959b5dc3bf07041946455cc8e8d562bfd1f<=
+/change>
++      <tag state=3D"vulnerable">v0.4.4</tag>
++      <tag state=3D"vulnerable">v0.5.0</tag>
++      <tag state=3D"vulnerable">v0.5.1</tag>
++      <tag state=3D"vulnerable">v0.6.0</tag>
++      <tag state=3D"vulnerable">v0.6.1</tag>
++      <tag state=3D"vulnerable">v0.7.0</tag>
++      <tag state=3D"vulnerable">v0.7.1</tag>
++      <tag state=3D"vulnerable">v0.8.1</tag>
++      <tag state=3D"vulnerable">v0.8.2</tag>
++      <tag state=3D"vulnerable">v0.9.0</tag>
++      <tag state=3D"vulnerable">v0.9.1</tag>
++      <tag state=3D"vulnerable">v1.0</tag>
++      <tag state=3D"vulnerable">v1.1.0</tag>
++      <tag state=3D"vulnerable">v1.2.0</tag>
++      <tag state=3D"vulnerable">v1.3.0</tag>
++      <tag state=3D"vulnerable">v1.4.0</tag>
++      <tag state=3D"vulnerable">v1.5.0</tag>
++      <tag state=3D"vulnerable">v1.6.0</tag>
++      <tag state=3D"vulnerable">v1.7.0</tag>
++      <tag state=3D"vulnerable">v2.0.0</tag>
++      <tag state=3D"vulnerable">v2.1.0</tag>
++      <tag state=3D"vulnerable">v2.2.0</tag>
++      <tag state=3D"vulnerable">v2.3.0</tag>
++      <tag state=3D"vulnerable">v2.4.0</tag>
++      <tag state=3D"vulnerable">v2.5.0</tag>
++      <tag state=3D"vulnerable">v2.6.0</tag>
++      <tag state=3D"vulnerable">v2.7.0</tag>
++      <tag state=3D"vulnerable">v2.8.0</tag>
++      <tag state=3D"vulnerable">v2.9.0</tag>
++      <tag state=3D"vulnerable">v2.10.0</tag>
++      <tag state=3D"vulnerable">v2.11.0</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-0.10</name>
++      <tag state=3D"vulnerable">v0.10.0</tag>
++      <tag state=3D"vulnerable">v0.10.1</tag>
++      <tag state=3D"vulnerable">v0.10.2</tag>
++      <tag state=3D"vulnerable">v0.10.3</tag>
++      <tag state=3D"vulnerable">v0.10.4</tag>
++      <tag state=3D"vulnerable">v0.10.5</tag>
++      <tag state=3D"vulnerable">v0.10.6</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-0.11</name>
++      <tag state=3D"vulnerable">v0.11.0</tag>
++      <tag state=3D"vulnerable">v0.11.1</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-0.12</name>
++      <tag state=3D"vulnerable">v0.12.0</tag>
++      <tag state=3D"vulnerable">v0.12.1</tag>
++      <tag state=3D"vulnerable">v0.12.2</tag>
++      <tag state=3D"vulnerable">v0.12.3</tag>
++      <tag state=3D"vulnerable">v0.12.4</tag>
++      <tag state=3D"vulnerable">v0.12.5</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-0.13</name>
++      <tag state=3D"vulnerable">v0.13.0</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-0.14</name>
++      <tag state=3D"vulnerable">v0.14.0</tag>
++      <tag state=3D"vulnerable">v0.14.1</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-0.15</name>
++      <tag state=3D"vulnerable">v0.15.0</tag>
++      <tag state=3D"vulnerable">v0.15.1</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-1.0</name>
++      <tag state=3D"vulnerable">v1.0.1</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-1.1</name>
++      <tag state=3D"vulnerable">v1.1.1</tag>
++      <tag state=3D"vulnerable">v1.1.2</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-1.2</name>
++      <tag state=3D"vulnerable">v1.2.1</tag>
++      <tag state=3D"vulnerable">v1.2.2</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-1.3</name>
++      <tag state=3D"vulnerable">v1.3.1</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-1.4</name>
++      <tag state=3D"vulnerable">v1.4.1</tag>
++      <tag state=3D"vulnerable">v1.4.2</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-1.5</name>
++      <tag state=3D"vulnerable">v1.5.1</tag>
++      <tag state=3D"vulnerable">v1.5.2</tag>
++      <tag state=3D"vulnerable">v1.5.3</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-1.6</name>
++      <tag state=3D"vulnerable">v1.6.1</tag>
++      <tag state=3D"vulnerable">v1.6.2</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-1.7</name>
++      <tag state=3D"vulnerable">v1.7.1</tag>
++      <tag state=3D"vulnerable">v1.7.2</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-2.0</name>
++      <tag state=3D"vulnerable">v2.0.1</tag>
++      <tag state=3D"vulnerable">v2.0.2</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-2.1</name>
++      <tag state=3D"vulnerable">v2.1.1</tag>
++      <tag state=3D"vulnerable">v2.1.2</tag>
++      <tag state=3D"vulnerable">v2.1.3</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-2.2</name>
++      <tag state=3D"vulnerable">v2.2.1</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-2.3</name>
++      <tag state=3D"vulnerable">v2.3.1</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-2.4</name>
++      <tag state=3D"vulnerable">v2.4.0.1</tag>
++      <tag state=3D"vulnerable">v2.4.1</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-2.5</name>
++      <tag state=3D"vulnerable">v2.5.1</tag>
++      <tag state=3D"vulnerable">v2.5.1.1</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-2.6</name>
++      <tag state=3D"vulnerable">v2.6.1</tag>
++      <tag state=3D"vulnerable">v2.6.2</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-2.7</name>
++      <tag state=3D"vulnerable">v2.7.1</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-2.8</name>
++      <tag state=3D"vulnerable">v2.8.1</tag>
++      <tag state=3D"vulnerable">v2.8.1.1</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-2.9</name>
++      <tag state=3D"vulnerable">v2.9.1</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-2.10</name>
++      <tag state=3D"vulnerable">v2.10.1</tag>
++      <tag state=3D"vulnerable">v2.10.2</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-2.11</name>
++      <tag state=3D"vulnerable">v2.11.1</tag>
++      <tag state=3D"vulnerable">v2.11.2</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++  </repository>
++
++</security-notice>
+diff --git a/secnotice/2018/003.xml b/secnotice/2018/003.xml
+new file mode 100644
+index 0000000..9691805
+--- /dev/null
++++ b/secnotice/2018/003.xml
+@@ -0,0 +1,191 @@
++<security-notice xmlns=3D"http://qemu.org/xmlns/security-notice/1.0">
++  <id>2018-003</id>
++
++  <summary>Multiboot out of bounds loading kernel</summary>
++
++  <description>
++<![CDATA[Quick Emulator(QEMU) built with the PC System Emulator with mul=
+tiboot feature
++support is vulnerable to an OOB memory access issue. It could occur whil=
+e
++loading a kernel image during a guest boot if multiboot head addresses
++mh_load_end_addr was greater than mh_bss_end_addr.]]>
++  </description>
++
++  <impact>
++<![CDATA[A user/process could use this flaw to potentially achieve arbit=
+rary code
++execution on a host.]]>
++  </impact>
++
++  <mitigation>
++<![CDATA[Do not use the -kernel argument to QEMU for providing the boot =
+kernel.
++Allow the guest firmware and bootloader (eg grub) to load the boot kerne=
+l from
++inside the confined guest execution environment]]>
++  </mitigation>
 +
 +  <credits>
 +    <reporter>
@@ -1271,23 +677,2274 @@ index 0000000..8f8a0d4
 +  </credits>
 +
 +  <lifecycle>
-+    <reported></reported>
-+    <published></published>
++    <reported>20180221</reported>
++    <published>20180227</published>
++    <fixed>20180328</fixed>
++  </lifecycle>
++
++  <reference>
++    <advisory type=3D"CVE" id=3D"2018-7550"/>
++  </reference>
++
++  <repository>
++    <branch>
++      <name>master</name>
++      <tag state=3D"fixed">v2.12.0</tag>
++      <change state=3D"fixed">2a8fcd119eb7c6bb3837fc3669eb1b2dfb31daf8</=
+change>
++      <change state=3D"merged">854a4436dd313eaeb51c275d00526d60437915d2<=
+/change>
++      <tag state=3D"vulnerable">v1.0</tag>
++      <tag state=3D"vulnerable">v1.1.0</tag>
++      <tag state=3D"vulnerable">v1.2.0</tag>
++      <tag state=3D"vulnerable">v1.3.0</tag>
++      <tag state=3D"vulnerable">v1.4.0</tag>
++      <tag state=3D"vulnerable">v1.5.0</tag>
++      <tag state=3D"vulnerable">v1.6.0</tag>
++      <tag state=3D"vulnerable">v1.7.0</tag>
++      <tag state=3D"vulnerable">v2.0.0</tag>
++      <tag state=3D"vulnerable">v2.1.0</tag>
++      <tag state=3D"vulnerable">v2.2.0</tag>
++      <tag state=3D"vulnerable">v2.3.0</tag>
++      <tag state=3D"vulnerable">v2.4.0</tag>
++      <tag state=3D"vulnerable">v2.5.0</tag>
++      <tag state=3D"vulnerable">v2.6.0</tag>
++      <tag state=3D"vulnerable">v2.7.0</tag>
++      <tag state=3D"vulnerable">v2.8.0</tag>
++      <tag state=3D"vulnerable">v2.9.0</tag>
++      <tag state=3D"vulnerable">v2.10.0</tag>
++      <tag state=3D"vulnerable">v2.11.0</tag>
++      <change state=3D"vulnerable">6b8273a1b97876950d91c228a420a851e10e1=
+2bb</change>
++    </branch>
++    <branch>
++      <name>stable-1.0</name>
++      <tag state=3D"vulnerable">v1.0.1</tag>
++      <change state=3D"vulnerable">6b8273a1b97876950d91c228a420a851e10e1=
+2bb</change>
++    </branch>
++    <branch>
++      <name>stable-1.1</name>
++      <tag state=3D"vulnerable">v1.1.1</tag>
++      <tag state=3D"vulnerable">v1.1.2</tag>
++      <change state=3D"vulnerable">6b8273a1b97876950d91c228a420a851e10e1=
+2bb</change>
++    </branch>
++    <branch>
++      <name>stable-1.2</name>
++      <tag state=3D"vulnerable">v1.2.1</tag>
++      <tag state=3D"vulnerable">v1.2.2</tag>
++      <change state=3D"vulnerable">6b8273a1b97876950d91c228a420a851e10e1=
+2bb</change>
++    </branch>
++    <branch>
++      <name>stable-1.3</name>
++      <tag state=3D"vulnerable">v1.3.1</tag>
++      <change state=3D"vulnerable">6b8273a1b97876950d91c228a420a851e10e1=
+2bb</change>
++    </branch>
++    <branch>
++      <name>stable-1.4</name>
++      <tag state=3D"vulnerable">v1.4.1</tag>
++      <tag state=3D"vulnerable">v1.4.2</tag>
++      <change state=3D"vulnerable">6b8273a1b97876950d91c228a420a851e10e1=
+2bb</change>
++    </branch>
++    <branch>
++      <name>stable-1.5</name>
++      <tag state=3D"vulnerable">v1.5.1</tag>
++      <tag state=3D"vulnerable">v1.5.2</tag>
++      <tag state=3D"vulnerable">v1.5.3</tag>
++      <change state=3D"vulnerable">6b8273a1b97876950d91c228a420a851e10e1=
+2bb</change>
++    </branch>
++    <branch>
++      <name>stable-1.6</name>
++      <tag state=3D"vulnerable">v1.6.1</tag>
++      <tag state=3D"vulnerable">v1.6.2</tag>
++      <change state=3D"vulnerable">6b8273a1b97876950d91c228a420a851e10e1=
+2bb</change>
++    </branch>
++    <branch>
++      <name>stable-1.7</name>
++      <tag state=3D"vulnerable">v1.7.1</tag>
++      <tag state=3D"vulnerable">v1.7.2</tag>
++      <change state=3D"vulnerable">6b8273a1b97876950d91c228a420a851e10e1=
+2bb</change>
++    </branch>
++    <branch>
++      <name>stable-2.0</name>
++      <tag state=3D"vulnerable">v2.0.1</tag>
++      <tag state=3D"vulnerable">v2.0.2</tag>
++      <change state=3D"vulnerable">6b8273a1b97876950d91c228a420a851e10e1=
+2bb</change>
++    </branch>
++    <branch>
++      <name>stable-2.1</name>
++      <tag state=3D"vulnerable">v2.1.1</tag>
++      <tag state=3D"vulnerable">v2.1.2</tag>
++      <tag state=3D"vulnerable">v2.1.3</tag>
++      <change state=3D"vulnerable">6b8273a1b97876950d91c228a420a851e10e1=
+2bb</change>
++    </branch>
++    <branch>
++      <name>stable-2.2</name>
++      <tag state=3D"vulnerable">v2.2.1</tag>
++      <change state=3D"vulnerable">6b8273a1b97876950d91c228a420a851e10e1=
+2bb</change>
++    </branch>
++    <branch>
++      <name>stable-2.3</name>
++      <tag state=3D"vulnerable">v2.3.1</tag>
++      <change state=3D"vulnerable">6b8273a1b97876950d91c228a420a851e10e1=
+2bb</change>
++    </branch>
++    <branch>
++      <name>stable-2.4</name>
++      <tag state=3D"vulnerable">v2.4.0.1</tag>
++      <tag state=3D"vulnerable">v2.4.1</tag>
++      <change state=3D"vulnerable">6b8273a1b97876950d91c228a420a851e10e1=
+2bb</change>
++    </branch>
++    <branch>
++      <name>stable-2.5</name>
++      <tag state=3D"vulnerable">v2.5.1</tag>
++      <tag state=3D"vulnerable">v2.5.1.1</tag>
++      <change state=3D"vulnerable">6b8273a1b97876950d91c228a420a851e10e1=
+2bb</change>
++    </branch>
++    <branch>
++      <name>stable-2.6</name>
++      <tag state=3D"vulnerable">v2.6.1</tag>
++      <tag state=3D"vulnerable">v2.6.2</tag>
++      <change state=3D"vulnerable">6b8273a1b97876950d91c228a420a851e10e1=
+2bb</change>
++    </branch>
++    <branch>
++      <name>stable-2.7</name>
++      <tag state=3D"vulnerable">v2.7.1</tag>
++      <change state=3D"vulnerable">6b8273a1b97876950d91c228a420a851e10e1=
+2bb</change>
++    </branch>
++    <branch>
++      <name>stable-2.8</name>
++      <tag state=3D"vulnerable">v2.8.1</tag>
++      <tag state=3D"vulnerable">v2.8.1.1</tag>
++      <change state=3D"vulnerable">6b8273a1b97876950d91c228a420a851e10e1=
+2bb</change>
++    </branch>
++    <branch>
++      <name>stable-2.9</name>
++      <tag state=3D"vulnerable">v2.9.1</tag>
++      <change state=3D"vulnerable">6b8273a1b97876950d91c228a420a851e10e1=
+2bb</change>
++    </branch>
++    <branch>
++      <name>stable-2.10</name>
++      <tag state=3D"vulnerable">v2.10.1</tag>
++      <tag state=3D"vulnerable">v2.10.2</tag>
++      <change state=3D"vulnerable">6b8273a1b97876950d91c228a420a851e10e1=
+2bb</change>
++    </branch>
++    <branch>
++      <name>stable-2.11</name>
++      <tag state=3D"vulnerable">v2.11.1</tag>
++      <tag state=3D"vulnerable">v2.11.2</tag>
++      <change state=3D"vulnerable">6b8273a1b97876950d91c228a420a851e10e1=
+2bb</change>
++    </branch>
++  </repository>
++
++</security-notice>
+diff --git a/secnotice/2018/004.xml b/secnotice/2018/004.xml
+new file mode 100644
+index 0000000..83a43dc
+--- /dev/null
++++ b/secnotice/2018/004.xml
+@@ -0,0 +1,243 @@
++<security-notice xmlns=3D"http://qemu.org/xmlns/security-notice/1.0">
++  <id>2018-004</id>
++
++  <summary>Cirrus out of bounds access updating VGA display</summary>
++
++  <description>
++<![CDATA[Quick emulator(QEMU) built with the Cirrus CLGD 54xx VGA Emulat=
+or support is
++vulnerable to an out-of-bounds access issue. It could occur while updati=
+ng
++VGA display, after guest has adjusted the display dimensions.]]>
++  </description>
++
++  <impact>
++<![CDATA[A privileged user inside guest could use this flaw to crash the=
+ Qemu process
++resulting in DoS.]]>
++  </impact>
++
++  <mitigation>
++<![CDATA[Replace use of the cirrus video adapter with an alternative mod=
+el]]>
++  </mitigation>
++
++  <credits>
++    <reporter>
++      <name>Ross Lagerwall</name>
++      <email>ross.lagerwall@citrix.com</email>
++    </reporter>
++    <patcher>
++      <name>Gerd Hoffmann</name>
++      <email>kraxel@redhat.com</email>
++    </patcher>
++  </credits>
++
++  <lifecycle>
++    <reported>20180228</reported>
++    <published>20180308</published>
++    <fixed>20180312</fixed>
++  </lifecycle>
++
++  <reference>
++    <advisory type=3D"CVE" id=3D"2018-7858"/>
++  </reference>
++
++  <repository>
++    <branch>
++      <name>master</name>
++      <tag state=3D"fixed">v2.12.0</tag>
++      <change state=3D"fixed">7cdc61becd095b64a786b2625f321624e7111f3d</=
+change>
++      <change state=3D"merged">fb5fff15881ba7a002924b967eb211c002897983<=
+/change>
++      <tag state=3D"vulnerable">v0.4.4</tag>
++      <tag state=3D"vulnerable">v0.5.0</tag>
++      <tag state=3D"vulnerable">v0.5.1</tag>
++      <tag state=3D"vulnerable">v0.6.0</tag>
++      <tag state=3D"vulnerable">v0.6.1</tag>
++      <tag state=3D"vulnerable">v0.7.0</tag>
++      <tag state=3D"vulnerable">v0.7.1</tag>
++      <tag state=3D"vulnerable">v0.8.1</tag>
++      <tag state=3D"vulnerable">v0.8.2</tag>
++      <tag state=3D"vulnerable">v0.9.0</tag>
++      <tag state=3D"vulnerable">v0.9.1</tag>
++      <tag state=3D"vulnerable">v1.0</tag>
++      <tag state=3D"vulnerable">v1.1.0</tag>
++      <tag state=3D"vulnerable">v1.2.0</tag>
++      <tag state=3D"vulnerable">v1.3.0</tag>
++      <tag state=3D"vulnerable">v1.4.0</tag>
++      <tag state=3D"vulnerable">v1.5.0</tag>
++      <tag state=3D"vulnerable">v1.6.0</tag>
++      <tag state=3D"vulnerable">v1.7.0</tag>
++      <tag state=3D"vulnerable">v2.0.0</tag>
++      <tag state=3D"vulnerable">v2.1.0</tag>
++      <tag state=3D"vulnerable">v2.2.0</tag>
++      <tag state=3D"vulnerable">v2.3.0</tag>
++      <tag state=3D"vulnerable">v2.4.0</tag>
++      <tag state=3D"vulnerable">v2.5.0</tag>
++      <tag state=3D"vulnerable">v2.6.0</tag>
++      <tag state=3D"vulnerable">v2.7.0</tag>
++      <tag state=3D"vulnerable">v2.8.0</tag>
++      <tag state=3D"vulnerable">v2.9.0</tag>
++      <tag state=3D"vulnerable">v2.10.0</tag>
++      <tag state=3D"vulnerable">v2.11.0</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-0.10</name>
++      <tag state=3D"vulnerable">v0.10.0</tag>
++      <tag state=3D"vulnerable">v0.10.1</tag>
++      <tag state=3D"vulnerable">v0.10.2</tag>
++      <tag state=3D"vulnerable">v0.10.3</tag>
++      <tag state=3D"vulnerable">v0.10.4</tag>
++      <tag state=3D"vulnerable">v0.10.5</tag>
++      <tag state=3D"vulnerable">v0.10.6</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-0.11</name>
++      <tag state=3D"vulnerable">v0.11.0</tag>
++      <tag state=3D"vulnerable">v0.11.1</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-0.12</name>
++      <tag state=3D"vulnerable">v0.12.0</tag>
++      <tag state=3D"vulnerable">v0.12.1</tag>
++      <tag state=3D"vulnerable">v0.12.2</tag>
++      <tag state=3D"vulnerable">v0.12.3</tag>
++      <tag state=3D"vulnerable">v0.12.4</tag>
++      <tag state=3D"vulnerable">v0.12.5</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-0.13</name>
++      <tag state=3D"vulnerable">v0.13.0</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-0.14</name>
++      <tag state=3D"vulnerable">v0.14.0</tag>
++      <tag state=3D"vulnerable">v0.14.1</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-0.15</name>
++      <tag state=3D"vulnerable">v0.15.0</tag>
++      <tag state=3D"vulnerable">v0.15.1</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-1.0</name>
++      <tag state=3D"vulnerable">v1.0.1</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-1.1</name>
++      <tag state=3D"vulnerable">v1.1.1</tag>
++      <tag state=3D"vulnerable">v1.1.2</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-1.2</name>
++      <tag state=3D"vulnerable">v1.2.1</tag>
++      <tag state=3D"vulnerable">v1.2.2</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-1.3</name>
++      <tag state=3D"vulnerable">v1.3.1</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-1.4</name>
++      <tag state=3D"vulnerable">v1.4.1</tag>
++      <tag state=3D"vulnerable">v1.4.2</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-1.5</name>
++      <tag state=3D"vulnerable">v1.5.1</tag>
++      <tag state=3D"vulnerable">v1.5.2</tag>
++      <tag state=3D"vulnerable">v1.5.3</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-1.6</name>
++      <tag state=3D"vulnerable">v1.6.1</tag>
++      <tag state=3D"vulnerable">v1.6.2</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-1.7</name>
++      <tag state=3D"vulnerable">v1.7.1</tag>
++      <tag state=3D"vulnerable">v1.7.2</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-2.0</name>
++      <tag state=3D"vulnerable">v2.0.1</tag>
++      <tag state=3D"vulnerable">v2.0.2</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-2.1</name>
++      <tag state=3D"vulnerable">v2.1.1</tag>
++      <tag state=3D"vulnerable">v2.1.2</tag>
++      <tag state=3D"vulnerable">v2.1.3</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-2.2</name>
++      <tag state=3D"vulnerable">v2.2.1</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-2.3</name>
++      <tag state=3D"vulnerable">v2.3.1</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-2.4</name>
++      <tag state=3D"vulnerable">v2.4.0.1</tag>
++      <tag state=3D"vulnerable">v2.4.1</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-2.5</name>
++      <tag state=3D"vulnerable">v2.5.1</tag>
++      <tag state=3D"vulnerable">v2.5.1.1</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-2.6</name>
++      <tag state=3D"vulnerable">v2.6.1</tag>
++      <tag state=3D"vulnerable">v2.6.2</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-2.7</name>
++      <tag state=3D"vulnerable">v2.7.1</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-2.8</name>
++      <tag state=3D"vulnerable">v2.8.1</tag>
++      <tag state=3D"vulnerable">v2.8.1.1</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-2.9</name>
++      <tag state=3D"vulnerable">v2.9.1</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-2.10</name>
++      <tag state=3D"vulnerable">v2.10.1</tag>
++      <tag state=3D"vulnerable">v2.10.2</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++    <branch>
++      <name>stable-2.11</name>
++      <tag state=3D"vulnerable">v2.11.1</tag>
++      <tag state=3D"vulnerable">v2.11.2</tag>
++      <change state=3D"vulnerable">e89f66eca974d2a9d5d89271c6041daefdab2=
+105</change>
++    </branch>
++  </repository>
++
++</security-notice>
+diff --git a/secnotice/2018/005.xml b/secnotice/2018/005.xml
+new file mode 100644
+index 0000000..55a2374
+--- /dev/null
++++ b/secnotice/2018/005.xml
+@@ -0,0 +1,225 @@
++<security-notice xmlns=3D"http://qemu.org/xmlns/security-notice/1.0">
++  <id>2018-005</id>
++
++  <summary>ne2000 integer overflow in buffer access</summary>
++
++  <description>
++<![CDATA[Qemu emulator built with the NE2000 NIC emulation support is vu=
+lnerable to an integer overflow, which could lead to buffer overflow issu=
+e. It could occur when receiving packets over the network.]]>
++  </description>
++
++  <impact>
++<![CDATA[A user inside guest could use this flaw to crash the Qemu proce=
+ss resulting in DoS.]]>
++  </impact>
++
++  <mitigation>
++<![CDATA[Replace use of the NE2000 network adapter with an alternative m=
+odel]]>
++  </mitigation>
++
++  <credits>
++    <reporter>
++      <name>Daniel Shapira</name>
++      <email>daniel@twistlock.com</email>
++    </reporter>
++    <patcher>
++      <name>Jason Wang</name>
++      <email>jasonwang@redhat.com</email>
++    </patcher>
++  </credits>
++
++  <lifecycle>
++    <reported>20180522</reported>
++    <published>20180926</published>
 +    <fixed></fixed>
 +  </lifecycle>
 +
 +  <reference>
-+    <advisory type=3D"CVE" id=3D"XXXX-XXXX"/>
++    <advisory type=3D"CVE" id=3D"2018-10839"/>
 +  </reference>
 +
 +  <repository>
 +    <branch>
 +      <name>master</name>
 +      <tag state=3D"fixed"></tag>
++      <change state=3D"fixed">0caf499e2f26ae305a16ae2c4e7a2f295ddf64d1</=
+change>
++      <change state=3D"merged"></change>
++      <tag state=3D"vulnerable">v1.0</tag>
++      <tag state=3D"vulnerable">v1.1.0</tag>
++      <tag state=3D"vulnerable">v1.2.0</tag>
++      <tag state=3D"vulnerable">v1.3.0</tag>
++      <tag state=3D"vulnerable">v1.4.0</tag>
++      <tag state=3D"vulnerable">v1.5.0</tag>
++      <tag state=3D"vulnerable">v1.6.0</tag>
++      <tag state=3D"vulnerable">v1.7.0</tag>
++      <tag state=3D"vulnerable">v2.0.0</tag>
++      <tag state=3D"vulnerable">v2.1.0</tag>
++      <tag state=3D"vulnerable">v2.2.0</tag>
++      <tag state=3D"vulnerable">v2.3.0</tag>
++      <tag state=3D"vulnerable">v2.4.0</tag>
++      <tag state=3D"vulnerable">v2.5.0</tag>
++      <tag state=3D"vulnerable">v2.6.0</tag>
++      <tag state=3D"vulnerable">v2.7.0</tag>
++      <tag state=3D"vulnerable">v2.8.0</tag>
++      <tag state=3D"vulnerable">v2.9.0</tag>
++      <tag state=3D"vulnerable">v2.10.0</tag>
++      <tag state=3D"vulnerable">v2.11.0</tag>
++      <tag state=3D"vulnerable">v2.12.0</tag>
++      <tag state=3D"vulnerable">v3.0.0</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-0.11</name>
++      <tag state=3D"vulnerable">v0.11.0</tag>
++      <tag state=3D"vulnerable">v0.11.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-0.12</name>
++      <tag state=3D"vulnerable">v0.12.0</tag>
++      <tag state=3D"vulnerable">v0.12.1</tag>
++      <tag state=3D"vulnerable">v0.12.2</tag>
++      <tag state=3D"vulnerable">v0.12.3</tag>
++      <tag state=3D"vulnerable">v0.12.4</tag>
++      <tag state=3D"vulnerable">v0.12.5</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-0.13</name>
++      <tag state=3D"vulnerable">v0.13.0</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-0.14</name>
++      <tag state=3D"vulnerable">v0.14.0</tag>
++      <tag state=3D"vulnerable">v0.14.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-0.15</name>
++      <tag state=3D"vulnerable">v0.15.0</tag>
++      <tag state=3D"vulnerable">v0.15.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-1.0</name>
++      <tag state=3D"vulnerable">v1.0.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-1.1</name>
++      <tag state=3D"vulnerable">v1.1.1</tag>
++      <tag state=3D"vulnerable">v1.1.2</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-1.2</name>
++      <tag state=3D"vulnerable">v1.2.1</tag>
++      <tag state=3D"vulnerable">v1.2.2</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-1.3</name>
++      <tag state=3D"vulnerable">v1.3.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-1.4</name>
++      <tag state=3D"vulnerable">v1.4.1</tag>
++      <tag state=3D"vulnerable">v1.4.2</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-1.5</name>
++      <tag state=3D"vulnerable">v1.5.1</tag>
++      <tag state=3D"vulnerable">v1.5.2</tag>
++      <tag state=3D"vulnerable">v1.5.3</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-1.6</name>
++      <tag state=3D"vulnerable">v1.6.1</tag>
++      <tag state=3D"vulnerable">v1.6.2</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-1.7</name>
++      <tag state=3D"vulnerable">v1.7.1</tag>
++      <tag state=3D"vulnerable">v1.7.2</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.0</name>
++      <tag state=3D"vulnerable">v2.0.1</tag>
++      <tag state=3D"vulnerable">v2.0.2</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.1</name>
++      <tag state=3D"vulnerable">v2.1.1</tag>
++      <tag state=3D"vulnerable">v2.1.2</tag>
++      <tag state=3D"vulnerable">v2.1.3</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.2</name>
++      <tag state=3D"vulnerable">v2.2.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.3</name>
++      <tag state=3D"vulnerable">v2.3.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.4</name>
++      <tag state=3D"vulnerable">v2.4.0.1</tag>
++      <tag state=3D"vulnerable">v2.4.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.5</name>
++      <tag state=3D"vulnerable">v2.5.1</tag>
++      <tag state=3D"vulnerable">v2.5.1.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.6</name>
++      <tag state=3D"vulnerable">v2.6.1</tag>
++      <tag state=3D"vulnerable">v2.6.2</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.7</name>
++      <tag state=3D"vulnerable">v2.7.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.8</name>
++      <tag state=3D"vulnerable">v2.8.1</tag>
++      <tag state=3D"vulnerable">v2.8.1.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.9</name>
++      <tag state=3D"vulnerable">v2.9.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.10</name>
++      <tag state=3D"vulnerable">v2.10.1</tag>
++      <tag state=3D"vulnerable">v2.10.2</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.11</name>
++      <tag state=3D"vulnerable">v2.11.1</tag>
++      <tag state=3D"vulnerable">v2.11.2</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.12</name>
++      <tag state=3D"vulnerable">v2.12.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++  </repository>
++
++</security-notice>
+diff --git a/secnotice/2018/006.xml b/secnotice/2018/006.xml
+new file mode 100644
+index 0000000..7a7908c
+--- /dev/null
++++ b/secnotice/2018/006.xml
+@@ -0,0 +1,247 @@
++<security-notice xmlns=3D"http://qemu.org/xmlns/security-notice/1.0">
++  <id>2018-006</id>
++
++  <summary>slirp buffer overflow assembling fragmented datastream</summa=
+ry>
++
++  <description>
++<![CDATA[A heap buffer overflow issue was found in the way Slirp network=
+ing back-end
++in QEMU processes fragmented packets. It could occur while reassembling =
+the
++fragmented datagrams of an incoming packet.]]>
++  </description>
++
++  <impact>
++<![CDATA[A privileged user/process inside guest could use this flaw to c=
+rash the QEMU
++process resulting in DoS OR potentially leverage it to execute arbitrary=
+ code
++on the host with privileges of the QEMU process.]]>
++  </impact>
++
++  <mitigation>
++<![CDATA[Replace use of the "user" network backend with an alternative c=
+hoice]]>
++  </mitigation>
++
++  <credits>
++    <reporter>
++      <name>ZDI Disclosures</name>
++      <email>zdi-disclosures@trendmicro.com</email>
++    </reporter>
++    <patcher>
++      <name>Prasad J Pandit</name>
++      <email>pjp@fedoraproject.org</email>
++    </patcher>
++  </credits>
++
++  <lifecycle>
++    <reported>20180427</reported>
++    <published>20180605</published>
++    <fixed>20180608</fixed>
++  </lifecycle>
++
++  <reference>
++    <advisory type=3D"CVE" id=3D"2018-11806"/>
++  </reference>
++
++  <repository>
++    <branch>
++      <name>master</name>
++      <tag state=3D"fixed">v3.0.0</tag>
++      <change state=3D"fixed">864036e251f54c99d31df124aad7f34f01f5344c</=
+change>
++      <change state=3D"merged">bac5ba3dc5da706f52c149fa6c0bd1dc96899bec<=
+/change>
++      <tag state=3D"vulnerable">v0.6.0</tag>
++      <tag state=3D"vulnerable">v0.6.1</tag>
++      <tag state=3D"vulnerable">v0.7.0</tag>
++      <tag state=3D"vulnerable">v0.7.1</tag>
++      <tag state=3D"vulnerable">v0.8.1</tag>
++      <tag state=3D"vulnerable">v0.8.2</tag>
++      <tag state=3D"vulnerable">v0.9.0</tag>
++      <tag state=3D"vulnerable">v0.9.1</tag>
++      <tag state=3D"vulnerable">v1.0</tag>
++      <tag state=3D"vulnerable">v1.1.0</tag>
++      <tag state=3D"vulnerable">v1.2.0</tag>
++      <tag state=3D"vulnerable">v1.3.0</tag>
++      <tag state=3D"vulnerable">v1.4.0</tag>
++      <tag state=3D"vulnerable">v1.5.0</tag>
++      <tag state=3D"vulnerable">v1.6.0</tag>
++      <tag state=3D"vulnerable">v1.7.0</tag>
++      <tag state=3D"vulnerable">v2.0.0</tag>
++      <tag state=3D"vulnerable">v2.1.0</tag>
++      <tag state=3D"vulnerable">v2.2.0</tag>
++      <tag state=3D"vulnerable">v2.3.0</tag>
++      <tag state=3D"vulnerable">v2.4.0</tag>
++      <tag state=3D"vulnerable">v2.5.0</tag>
++      <tag state=3D"vulnerable">v2.6.0</tag>
++      <tag state=3D"vulnerable">v2.7.0</tag>
++      <tag state=3D"vulnerable">v2.8.0</tag>
++      <tag state=3D"vulnerable">v2.9.0</tag>
++      <tag state=3D"vulnerable">v2.10.0</tag>
++      <tag state=3D"vulnerable">v2.11.0</tag>
++      <tag state=3D"vulnerable">v2.12.0</tag>
++      <change state=3D"vulnerable">f0cbd3ec9f4a3de1a9ef94deda09704543889=
+f44</change>
++    </branch>
++    <branch>
++      <name>stable-0.10</name>
++      <tag state=3D"vulnerable">v0.10.0</tag>
++      <tag state=3D"vulnerable">v0.10.1</tag>
++      <tag state=3D"vulnerable">v0.10.2</tag>
++      <tag state=3D"vulnerable">v0.10.3</tag>
++      <tag state=3D"vulnerable">v0.10.4</tag>
++      <tag state=3D"vulnerable">v0.10.5</tag>
++      <tag state=3D"vulnerable">v0.10.6</tag>
++      <change state=3D"vulnerable">f0cbd3ec9f4a3de1a9ef94deda09704543889=
+f44</change>
++    </branch>
++    <branch>
++      <name>stable-0.11</name>
++      <tag state=3D"vulnerable">v0.11.0</tag>
++      <tag state=3D"vulnerable">v0.11.1</tag>
++      <change state=3D"vulnerable">f0cbd3ec9f4a3de1a9ef94deda09704543889=
+f44</change>
++    </branch>
++    <branch>
++      <name>stable-0.12</name>
++      <tag state=3D"vulnerable">v0.12.0</tag>
++      <tag state=3D"vulnerable">v0.12.1</tag>
++      <tag state=3D"vulnerable">v0.12.2</tag>
++      <tag state=3D"vulnerable">v0.12.3</tag>
++      <tag state=3D"vulnerable">v0.12.4</tag>
++      <tag state=3D"vulnerable">v0.12.5</tag>
++      <change state=3D"vulnerable">f0cbd3ec9f4a3de1a9ef94deda09704543889=
+f44</change>
++    </branch>
++    <branch>
++      <name>stable-0.13</name>
++      <tag state=3D"vulnerable">v0.13.0</tag>
++      <change state=3D"vulnerable">f0cbd3ec9f4a3de1a9ef94deda09704543889=
+f44</change>
++    </branch>
++    <branch>
++      <name>stable-0.14</name>
++      <tag state=3D"vulnerable">v0.14.0</tag>
++      <tag state=3D"vulnerable">v0.14.1</tag>
++      <change state=3D"vulnerable">f0cbd3ec9f4a3de1a9ef94deda09704543889=
+f44</change>
++    </branch>
++    <branch>
++      <name>stable-0.15</name>
++      <tag state=3D"vulnerable">v0.15.0</tag>
++      <tag state=3D"vulnerable">v0.15.1</tag>
++      <change state=3D"vulnerable">f0cbd3ec9f4a3de1a9ef94deda09704543889=
+f44</change>
++    </branch>
++    <branch>
++      <name>stable-1.0</name>
++      <tag state=3D"vulnerable">v1.0.1</tag>
++      <change state=3D"vulnerable">f0cbd3ec9f4a3de1a9ef94deda09704543889=
+f44</change>
++    </branch>
++    <branch>
++      <name>stable-1.1</name>
++      <tag state=3D"vulnerable">v1.1.1</tag>
++      <tag state=3D"vulnerable">v1.1.2</tag>
++      <change state=3D"vulnerable">f0cbd3ec9f4a3de1a9ef94deda09704543889=
+f44</change>
++    </branch>
++    <branch>
++      <name>stable-1.2</name>
++      <tag state=3D"vulnerable">v1.2.1</tag>
++      <tag state=3D"vulnerable">v1.2.2</tag>
++      <change state=3D"vulnerable">f0cbd3ec9f4a3de1a9ef94deda09704543889=
+f44</change>
++    </branch>
++    <branch>
++      <name>stable-1.3</name>
++      <tag state=3D"vulnerable">v1.3.1</tag>
++      <change state=3D"vulnerable">f0cbd3ec9f4a3de1a9ef94deda09704543889=
+f44</change>
++    </branch>
++    <branch>
++      <name>stable-1.4</name>
++      <tag state=3D"vulnerable">v1.4.1</tag>
++      <tag state=3D"vulnerable">v1.4.2</tag>
++      <change state=3D"vulnerable">f0cbd3ec9f4a3de1a9ef94deda09704543889=
+f44</change>
++    </branch>
++    <branch>
++      <name>stable-1.5</name>
++      <tag state=3D"vulnerable">v1.5.1</tag>
++      <tag state=3D"vulnerable">v1.5.2</tag>
++      <tag state=3D"vulnerable">v1.5.3</tag>
++      <change state=3D"vulnerable">f0cbd3ec9f4a3de1a9ef94deda09704543889=
+f44</change>
++    </branch>
++    <branch>
++      <name>stable-1.6</name>
++      <tag state=3D"vulnerable">v1.6.1</tag>
++      <tag state=3D"vulnerable">v1.6.2</tag>
++      <change state=3D"vulnerable">f0cbd3ec9f4a3de1a9ef94deda09704543889=
+f44</change>
++    </branch>
++    <branch>
++      <name>stable-1.7</name>
++      <tag state=3D"vulnerable">v1.7.1</tag>
++      <tag state=3D"vulnerable">v1.7.2</tag>
++      <change state=3D"vulnerable">f0cbd3ec9f4a3de1a9ef94deda09704543889=
+f44</change>
++    </branch>
++    <branch>
++      <name>stable-2.0</name>
++      <tag state=3D"vulnerable">v2.0.1</tag>
++      <tag state=3D"vulnerable">v2.0.2</tag>
++      <change state=3D"vulnerable">f0cbd3ec9f4a3de1a9ef94deda09704543889=
+f44</change>
++    </branch>
++    <branch>
++      <name>stable-2.1</name>
++      <tag state=3D"vulnerable">v2.1.1</tag>
++      <tag state=3D"vulnerable">v2.1.2</tag>
++      <tag state=3D"vulnerable">v2.1.3</tag>
++      <change state=3D"vulnerable">f0cbd3ec9f4a3de1a9ef94deda09704543889=
+f44</change>
++    </branch>
++    <branch>
++      <name>stable-2.2</name>
++      <tag state=3D"vulnerable">v2.2.1</tag>
++      <change state=3D"vulnerable">f0cbd3ec9f4a3de1a9ef94deda09704543889=
+f44</change>
++    </branch>
++    <branch>
++      <name>stable-2.3</name>
++      <tag state=3D"vulnerable">v2.3.1</tag>
++      <change state=3D"vulnerable">f0cbd3ec9f4a3de1a9ef94deda09704543889=
+f44</change>
++    </branch>
++    <branch>
++      <name>stable-2.4</name>
++      <tag state=3D"vulnerable">v2.4.0.1</tag>
++      <tag state=3D"vulnerable">v2.4.1</tag>
++      <change state=3D"vulnerable">f0cbd3ec9f4a3de1a9ef94deda09704543889=
+f44</change>
++    </branch>
++    <branch>
++      <name>stable-2.5</name>
++      <tag state=3D"vulnerable">v2.5.1</tag>
++      <tag state=3D"vulnerable">v2.5.1.1</tag>
++      <change state=3D"vulnerable">f0cbd3ec9f4a3de1a9ef94deda09704543889=
+f44</change>
++    </branch>
++    <branch>
++      <name>stable-2.6</name>
++      <tag state=3D"vulnerable">v2.6.1</tag>
++      <tag state=3D"vulnerable">v2.6.2</tag>
++      <change state=3D"vulnerable">f0cbd3ec9f4a3de1a9ef94deda09704543889=
+f44</change>
++    </branch>
++    <branch>
++      <name>stable-2.7</name>
++      <tag state=3D"vulnerable">v2.7.1</tag>
++      <change state=3D"vulnerable">f0cbd3ec9f4a3de1a9ef94deda09704543889=
+f44</change>
++    </branch>
++    <branch>
++      <name>stable-2.8</name>
++      <tag state=3D"vulnerable">v2.8.1</tag>
++      <tag state=3D"vulnerable">v2.8.1.1</tag>
++      <change state=3D"vulnerable">f0cbd3ec9f4a3de1a9ef94deda09704543889=
+f44</change>
++    </branch>
++    <branch>
++      <name>stable-2.9</name>
++      <tag state=3D"vulnerable">v2.9.1</tag>
++      <change state=3D"vulnerable">f0cbd3ec9f4a3de1a9ef94deda09704543889=
+f44</change>
++    </branch>
++    <branch>
++      <name>stable-2.10</name>
++      <tag state=3D"vulnerable">v2.10.1</tag>
++      <tag state=3D"vulnerable">v2.10.2</tag>
++      <change state=3D"vulnerable">f0cbd3ec9f4a3de1a9ef94deda09704543889=
+f44</change>
++    </branch>
++    <branch>
++      <name>stable-2.11</name>
++      <tag state=3D"vulnerable">v2.11.1</tag>
++      <tag state=3D"vulnerable">v2.11.2</tag>
++      <change state=3D"vulnerable">f0cbd3ec9f4a3de1a9ef94deda09704543889=
+f44</change>
++    </branch>
++    <branch>
++      <name>stable-2.12</name>
++      <tag state=3D"vulnerable">v2.12.1</tag>
++      <change state=3D"vulnerable">f0cbd3ec9f4a3de1a9ef94deda09704543889=
+f44</change>
++    </branch>
++  </repository>
++
++</security-notice>
+diff --git a/secnotice/2018/007.xml b/secnotice/2018/007.xml
+new file mode 100644
+index 0000000..4de353b
+--- /dev/null
++++ b/secnotice/2018/007.xml
+@@ -0,0 +1,201 @@
++<security-notice xmlns=3D"http://qemu.org/xmlns/security-notice/1.0">
++  <id>2018-007</id>
++
++  <summary>qemu-guest-agent integer overflow reading guest file</summary=
+>
++
++  <description>
++<![CDATA[The QEMU Guest Agent in QEMU is vulnerable to an integer overfl=
+ow in the=20
++qmp_guest_file_read(). An attacker could exploit this by sending a craft=
+ed QMP=20
++command (including guest-file-read with a large count value) to the agen=
+t via=20
++the listening socket to trigger a g_malloc() call with a large memory ch=
+unk=20
++resulting in a segmentation fault.]]>
++  </description>
++
++  <impact>
++<![CDATA[A user could use this flaw to crash the QEMU guest agent proces=
+s resulting in DoS.]]>
++  </impact>
++
++  <mitigation>
++<![CDATA[Disable the QEMU guest agent or blacklist the guest-file-read c=
+ommand]]>
++  </mitigation>
++
++  <credits>
++    <reporter>
++      <name>Fakhri Zulkifli</name>
++      <email>mohdfakhrizulkifli@gmail.com</email>
++    </reporter>
++    <patcher>
++      <name>Prasad J Pandit</name>
++      <email>pjp@fedoraproject.org</email>
++    </patcher>
++  </credits>
++
++  <lifecycle>
++    <reported>20180622</reported>
++    <published>20180622</published>
++    <fixed>20180705</fixed>
++  </lifecycle>
++
++  <reference>
++    <advisory type=3D"CVE" id=3D"2018-12617"/>
++  </reference>
++
++  <repository>
++    <branch>
++      <name>master</name>
++      <tag state=3D"fixed">v3.0.0</tag>
++      <change state=3D"fixed">141b197408ab398c4f474ac1a728ab316e921f2b</=
+change>
++      <change state=3D"merged">8beb8cc64da2868acec270e4becb9fea8f9093dc<=
+/change>
++      <tag state=3D"vulnerable">v1.0</tag>
++      <tag state=3D"vulnerable">v1.1.0</tag>
++      <tag state=3D"vulnerable">v1.2.0</tag>
++      <tag state=3D"vulnerable">v1.3.0</tag>
++      <tag state=3D"vulnerable">v1.4.0</tag>
++      <tag state=3D"vulnerable">v1.5.0</tag>
++      <tag state=3D"vulnerable">v1.6.0</tag>
++      <tag state=3D"vulnerable">v1.7.0</tag>
++      <tag state=3D"vulnerable">v2.0.0</tag>
++      <tag state=3D"vulnerable">v2.1.0</tag>
++      <tag state=3D"vulnerable">v2.2.0</tag>
++      <tag state=3D"vulnerable">v2.3.0</tag>
++      <tag state=3D"vulnerable">v2.4.0</tag>
++      <tag state=3D"vulnerable">v2.5.0</tag>
++      <tag state=3D"vulnerable">v2.6.0</tag>
++      <tag state=3D"vulnerable">v2.7.0</tag>
++      <tag state=3D"vulnerable">v2.8.0</tag>
++      <tag state=3D"vulnerable">v2.9.0</tag>
++      <tag state=3D"vulnerable">v2.10.0</tag>
++      <tag state=3D"vulnerable">v2.11.0</tag>
++      <tag state=3D"vulnerable">v2.12.0</tag>
++      <change state=3D"vulnerable">e3d4d25206a13ca48936e4357a53591997ce6=
+d57</change>
++    </branch>
++    <branch>
++      <name>stable-0.15</name>
++      <tag state=3D"vulnerable">v0.15.0</tag>
++      <tag state=3D"vulnerable">v0.15.1</tag>
++      <change state=3D"vulnerable">e3d4d25206a13ca48936e4357a53591997ce6=
+d57</change>
++    </branch>
++    <branch>
++      <name>stable-1.0</name>
++      <tag state=3D"vulnerable">v1.0.1</tag>
++      <change state=3D"vulnerable">e3d4d25206a13ca48936e4357a53591997ce6=
+d57</change>
++    </branch>
++    <branch>
++      <name>stable-1.1</name>
++      <tag state=3D"vulnerable">v1.1.1</tag>
++      <tag state=3D"vulnerable">v1.1.2</tag>
++      <change state=3D"vulnerable">e3d4d25206a13ca48936e4357a53591997ce6=
+d57</change>
++    </branch>
++    <branch>
++      <name>stable-1.2</name>
++      <tag state=3D"vulnerable">v1.2.1</tag>
++      <tag state=3D"vulnerable">v1.2.2</tag>
++      <change state=3D"vulnerable">e3d4d25206a13ca48936e4357a53591997ce6=
+d57</change>
++    </branch>
++    <branch>
++      <name>stable-1.3</name>
++      <tag state=3D"vulnerable">v1.3.1</tag>
++      <change state=3D"vulnerable">e3d4d25206a13ca48936e4357a53591997ce6=
+d57</change>
++    </branch>
++    <branch>
++      <name>stable-1.4</name>
++      <tag state=3D"vulnerable">v1.4.1</tag>
++      <tag state=3D"vulnerable">v1.4.2</tag>
++      <change state=3D"vulnerable">e3d4d25206a13ca48936e4357a53591997ce6=
+d57</change>
++    </branch>
++    <branch>
++      <name>stable-1.5</name>
++      <tag state=3D"vulnerable">v1.5.1</tag>
++      <tag state=3D"vulnerable">v1.5.2</tag>
++      <tag state=3D"vulnerable">v1.5.3</tag>
++      <change state=3D"vulnerable">e3d4d25206a13ca48936e4357a53591997ce6=
+d57</change>
++    </branch>
++    <branch>
++      <name>stable-1.6</name>
++      <tag state=3D"vulnerable">v1.6.1</tag>
++      <tag state=3D"vulnerable">v1.6.2</tag>
++      <change state=3D"vulnerable">e3d4d25206a13ca48936e4357a53591997ce6=
+d57</change>
++    </branch>
++    <branch>
++      <name>stable-1.7</name>
++      <tag state=3D"vulnerable">v1.7.1</tag>
++      <tag state=3D"vulnerable">v1.7.2</tag>
++      <change state=3D"vulnerable">e3d4d25206a13ca48936e4357a53591997ce6=
+d57</change>
++    </branch>
++    <branch>
++      <name>stable-2.0</name>
++      <tag state=3D"vulnerable">v2.0.1</tag>
++      <tag state=3D"vulnerable">v2.0.2</tag>
++      <change state=3D"vulnerable">e3d4d25206a13ca48936e4357a53591997ce6=
+d57</change>
++    </branch>
++    <branch>
++      <name>stable-2.1</name>
++      <tag state=3D"vulnerable">v2.1.1</tag>
++      <tag state=3D"vulnerable">v2.1.2</tag>
++      <tag state=3D"vulnerable">v2.1.3</tag>
++      <change state=3D"vulnerable">e3d4d25206a13ca48936e4357a53591997ce6=
+d57</change>
++    </branch>
++    <branch>
++      <name>stable-2.2</name>
++      <tag state=3D"vulnerable">v2.2.1</tag>
++      <change state=3D"vulnerable">e3d4d25206a13ca48936e4357a53591997ce6=
+d57</change>
++    </branch>
++    <branch>
++      <name>stable-2.3</name>
++      <tag state=3D"vulnerable">v2.3.1</tag>
++      <change state=3D"vulnerable">e3d4d25206a13ca48936e4357a53591997ce6=
+d57</change>
++    </branch>
++    <branch>
++      <name>stable-2.4</name>
++      <tag state=3D"vulnerable">v2.4.0.1</tag>
++      <tag state=3D"vulnerable">v2.4.1</tag>
++      <change state=3D"vulnerable">e3d4d25206a13ca48936e4357a53591997ce6=
+d57</change>
++    </branch>
++    <branch>
++      <name>stable-2.5</name>
++      <tag state=3D"vulnerable">v2.5.1</tag>
++      <tag state=3D"vulnerable">v2.5.1.1</tag>
++      <change state=3D"vulnerable">e3d4d25206a13ca48936e4357a53591997ce6=
+d57</change>
++    </branch>
++    <branch>
++      <name>stable-2.6</name>
++      <tag state=3D"vulnerable">v2.6.1</tag>
++      <tag state=3D"vulnerable">v2.6.2</tag>
++      <change state=3D"vulnerable">e3d4d25206a13ca48936e4357a53591997ce6=
+d57</change>
++    </branch>
++    <branch>
++      <name>stable-2.7</name>
++      <tag state=3D"vulnerable">v2.7.1</tag>
++      <change state=3D"vulnerable">e3d4d25206a13ca48936e4357a53591997ce6=
+d57</change>
++    </branch>
++    <branch>
++      <name>stable-2.8</name>
++      <tag state=3D"vulnerable">v2.8.1</tag>
++      <tag state=3D"vulnerable">v2.8.1.1</tag>
++      <change state=3D"vulnerable">e3d4d25206a13ca48936e4357a53591997ce6=
+d57</change>
++    </branch>
++    <branch>
++      <name>stable-2.9</name>
++      <tag state=3D"vulnerable">v2.9.1</tag>
++      <change state=3D"vulnerable">e3d4d25206a13ca48936e4357a53591997ce6=
+d57</change>
++    </branch>
++    <branch>
++      <name>stable-2.10</name>
++      <tag state=3D"vulnerable">v2.10.1</tag>
++      <tag state=3D"vulnerable">v2.10.2</tag>
++      <change state=3D"vulnerable">e3d4d25206a13ca48936e4357a53591997ce6=
+d57</change>
++    </branch>
++    <branch>
++      <name>stable-2.11</name>
++      <tag state=3D"vulnerable">v2.11.1</tag>
++      <tag state=3D"vulnerable">v2.11.2</tag>
++      <change state=3D"vulnerable">e3d4d25206a13ca48936e4357a53591997ce6=
+d57</change>
++    </branch>
++    <branch>
++      <name>stable-2.12</name>
++      <tag state=3D"vulnerable">v2.12.1</tag>
++      <change state=3D"vulnerable">e3d4d25206a13ca48936e4357a53591997ce6=
+d57</change>
++    </branch>
++  </repository>
++
++</security-notice>
+diff --git a/secnotice/2018/008.xml b/secnotice/2018/008.xml
+new file mode 100644
+index 0000000..5cf8d5a
+--- /dev/null
++++ b/secnotice/2018/008.xml
+@@ -0,0 +1,225 @@
++<security-notice xmlns=3D"http://qemu.org/xmlns/security-notice/1.0">
++  <id>2018-008</id>
++
++  <summary>rtl8139 integer overflow accessing buffer</summary>
++
++  <description>
++<![CDATA[Qemu emulator built with the RTL8139 NIC emulation support is v=
+ulnerable to an integer overflow, which could lead to buffer overflow iss=
+ue. It could occur when receiving packets over the network.]]>
++  </description>
++
++  <impact>
++<![CDATA[A user inside guest could use this flaw to crash the Qemu proce=
+ss resulting in DoS.]]>
++  </impact>
++
++  <mitigation>
++<![CDATA[Replace use of the RTL8139 network adapter with an alternative =
+model]]>
++  </mitigation>
++
++  <credits>
++    <reporter>
++      <name>Daniel Shapira</name>
++      <email>daniel@twistlock.com</email>
++    </reporter>
++    <patcher>
++      <name>Jason Wang</name>
++      <email>jasonwang@redhat.com</email>
++    </patcher>
++  </credits>
++
++  <lifecycle>
++    <reported>20180521</reported>
++    <published>20180926</published>
++    <fixed></fixed>
++  </lifecycle>
++
++  <reference>
++    <advisory type=3D"CVE" id=3D"2018-17958"/>
++  </reference>
++
++  <repository>
++    <branch>
++      <name>master</name>
++      <tag state=3D"fixed"></tag>
++      <change state=3D"fixed">784b912f722bc86126b290c00de72c1bc8d34950</=
+change>
++      <change state=3D"merged"></change>
++      <tag state=3D"vulnerable">v1.0</tag>
++      <tag state=3D"vulnerable">v1.1.0</tag>
++      <tag state=3D"vulnerable">v1.2.0</tag>
++      <tag state=3D"vulnerable">v1.3.0</tag>
++      <tag state=3D"vulnerable">v1.4.0</tag>
++      <tag state=3D"vulnerable">v1.5.0</tag>
++      <tag state=3D"vulnerable">v1.6.0</tag>
++      <tag state=3D"vulnerable">v1.7.0</tag>
++      <tag state=3D"vulnerable">v2.0.0</tag>
++      <tag state=3D"vulnerable">v2.1.0</tag>
++      <tag state=3D"vulnerable">v2.2.0</tag>
++      <tag state=3D"vulnerable">v2.3.0</tag>
++      <tag state=3D"vulnerable">v2.4.0</tag>
++      <tag state=3D"vulnerable">v2.5.0</tag>
++      <tag state=3D"vulnerable">v2.6.0</tag>
++      <tag state=3D"vulnerable">v2.7.0</tag>
++      <tag state=3D"vulnerable">v2.8.0</tag>
++      <tag state=3D"vulnerable">v2.9.0</tag>
++      <tag state=3D"vulnerable">v2.10.0</tag>
++      <tag state=3D"vulnerable">v2.11.0</tag>
++      <tag state=3D"vulnerable">v2.12.0</tag>
++      <tag state=3D"vulnerable">v3.0.0</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-0.11</name>
++      <tag state=3D"vulnerable">v0.11.0</tag>
++      <tag state=3D"vulnerable">v0.11.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-0.12</name>
++      <tag state=3D"vulnerable">v0.12.0</tag>
++      <tag state=3D"vulnerable">v0.12.1</tag>
++      <tag state=3D"vulnerable">v0.12.2</tag>
++      <tag state=3D"vulnerable">v0.12.3</tag>
++      <tag state=3D"vulnerable">v0.12.4</tag>
++      <tag state=3D"vulnerable">v0.12.5</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-0.13</name>
++      <tag state=3D"vulnerable">v0.13.0</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-0.14</name>
++      <tag state=3D"vulnerable">v0.14.0</tag>
++      <tag state=3D"vulnerable">v0.14.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-0.15</name>
++      <tag state=3D"vulnerable">v0.15.0</tag>
++      <tag state=3D"vulnerable">v0.15.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-1.0</name>
++      <tag state=3D"vulnerable">v1.0.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-1.1</name>
++      <tag state=3D"vulnerable">v1.1.1</tag>
++      <tag state=3D"vulnerable">v1.1.2</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-1.2</name>
++      <tag state=3D"vulnerable">v1.2.1</tag>
++      <tag state=3D"vulnerable">v1.2.2</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-1.3</name>
++      <tag state=3D"vulnerable">v1.3.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-1.4</name>
++      <tag state=3D"vulnerable">v1.4.1</tag>
++      <tag state=3D"vulnerable">v1.4.2</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-1.5</name>
++      <tag state=3D"vulnerable">v1.5.1</tag>
++      <tag state=3D"vulnerable">v1.5.2</tag>
++      <tag state=3D"vulnerable">v1.5.3</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-1.6</name>
++      <tag state=3D"vulnerable">v1.6.1</tag>
++      <tag state=3D"vulnerable">v1.6.2</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-1.7</name>
++      <tag state=3D"vulnerable">v1.7.1</tag>
++      <tag state=3D"vulnerable">v1.7.2</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.0</name>
++      <tag state=3D"vulnerable">v2.0.1</tag>
++      <tag state=3D"vulnerable">v2.0.2</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.1</name>
++      <tag state=3D"vulnerable">v2.1.1</tag>
++      <tag state=3D"vulnerable">v2.1.2</tag>
++      <tag state=3D"vulnerable">v2.1.3</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.2</name>
++      <tag state=3D"vulnerable">v2.2.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.3</name>
++      <tag state=3D"vulnerable">v2.3.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.4</name>
++      <tag state=3D"vulnerable">v2.4.0.1</tag>
++      <tag state=3D"vulnerable">v2.4.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.5</name>
++      <tag state=3D"vulnerable">v2.5.1</tag>
++      <tag state=3D"vulnerable">v2.5.1.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.6</name>
++      <tag state=3D"vulnerable">v2.6.1</tag>
++      <tag state=3D"vulnerable">v2.6.2</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.7</name>
++      <tag state=3D"vulnerable">v2.7.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.8</name>
++      <tag state=3D"vulnerable">v2.8.1</tag>
++      <tag state=3D"vulnerable">v2.8.1.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.9</name>
++      <tag state=3D"vulnerable">v2.9.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.10</name>
++      <tag state=3D"vulnerable">v2.10.1</tag>
++      <tag state=3D"vulnerable">v2.10.2</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.11</name>
++      <tag state=3D"vulnerable">v2.11.1</tag>
++      <tag state=3D"vulnerable">v2.11.2</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.12</name>
++      <tag state=3D"vulnerable">v2.12.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++  </repository>
++
++</security-notice>
+diff --git a/secnotice/2018/009.xml b/secnotice/2018/009.xml
+new file mode 100644
+index 0000000..6ad782f
+--- /dev/null
++++ b/secnotice/2018/009.xml
+@@ -0,0 +1,225 @@
++<security-notice xmlns=3D"http://qemu.org/xmlns/security-notice/1.0">
++  <id>2018-009</id>
++
++  <summary>pcnet integer overflow accessing buffer</summary>
++
++  <description>
++<![CDATA[Qemu emulator built with the AMD PC-Net II (Am79C970A) emulatio=
+n support is vulnerable to an integer overflow, which could lead to buffe=
+r overflow issue. It could occur when receiving packets over the network.=
+]]>
++  </description>
++
++  <impact>
++<![CDATA[A user inside guest could use this flaw to crash the Qemu proce=
+ss resulting in DoS.]]>
++  </impact>
++
++  <mitigation>
++<![CDATA[Replace use of the AMD PC-Net II network adapter with an altern=
+ative model]]>
++  </mitigation>
++
++  <credits>
++    <reporter>
++      <name>Daniel Shapira</name>
++      <email>daniel@twistlock.com</email>
++    </reporter>
++    <patcher>
++      <name>Jason Wang</name>
++      <email>jasonwang@redhat.com</email>
++    </patcher>
++  </credits>
++
++  <lifecycle>
++    <reported>20180521</reported>
++    <published>20180926</published>
++    <fixed></fixed>
++  </lifecycle>
++
++  <reference>
++    <advisory type=3D"CVE" id=3D"2018-17962"/>
++  </reference>
++
++  <repository>
++    <branch>
++      <name>master</name>
++      <tag state=3D"fixed"></tag>
++      <change state=3D"fixed">2fc84f6b39577ccd6fd57bdd270902f5098c3a88</=
+change>
++      <change state=3D"merged"></change>
++      <tag state=3D"vulnerable">v1.0</tag>
++      <tag state=3D"vulnerable">v1.1.0</tag>
++      <tag state=3D"vulnerable">v1.2.0</tag>
++      <tag state=3D"vulnerable">v1.3.0</tag>
++      <tag state=3D"vulnerable">v1.4.0</tag>
++      <tag state=3D"vulnerable">v1.5.0</tag>
++      <tag state=3D"vulnerable">v1.6.0</tag>
++      <tag state=3D"vulnerable">v1.7.0</tag>
++      <tag state=3D"vulnerable">v2.0.0</tag>
++      <tag state=3D"vulnerable">v2.1.0</tag>
++      <tag state=3D"vulnerable">v2.2.0</tag>
++      <tag state=3D"vulnerable">v2.3.0</tag>
++      <tag state=3D"vulnerable">v2.4.0</tag>
++      <tag state=3D"vulnerable">v2.5.0</tag>
++      <tag state=3D"vulnerable">v2.6.0</tag>
++      <tag state=3D"vulnerable">v2.7.0</tag>
++      <tag state=3D"vulnerable">v2.8.0</tag>
++      <tag state=3D"vulnerable">v2.9.0</tag>
++      <tag state=3D"vulnerable">v2.10.0</tag>
++      <tag state=3D"vulnerable">v2.11.0</tag>
++      <tag state=3D"vulnerable">v2.12.0</tag>
++      <tag state=3D"vulnerable">v3.0.0</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-0.11</name>
++      <tag state=3D"vulnerable">v0.11.0</tag>
++      <tag state=3D"vulnerable">v0.11.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-0.12</name>
++      <tag state=3D"vulnerable">v0.12.0</tag>
++      <tag state=3D"vulnerable">v0.12.1</tag>
++      <tag state=3D"vulnerable">v0.12.2</tag>
++      <tag state=3D"vulnerable">v0.12.3</tag>
++      <tag state=3D"vulnerable">v0.12.4</tag>
++      <tag state=3D"vulnerable">v0.12.5</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-0.13</name>
++      <tag state=3D"vulnerable">v0.13.0</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-0.14</name>
++      <tag state=3D"vulnerable">v0.14.0</tag>
++      <tag state=3D"vulnerable">v0.14.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-0.15</name>
++      <tag state=3D"vulnerable">v0.15.0</tag>
++      <tag state=3D"vulnerable">v0.15.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-1.0</name>
++      <tag state=3D"vulnerable">v1.0.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-1.1</name>
++      <tag state=3D"vulnerable">v1.1.1</tag>
++      <tag state=3D"vulnerable">v1.1.2</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-1.2</name>
++      <tag state=3D"vulnerable">v1.2.1</tag>
++      <tag state=3D"vulnerable">v1.2.2</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-1.3</name>
++      <tag state=3D"vulnerable">v1.3.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-1.4</name>
++      <tag state=3D"vulnerable">v1.4.1</tag>
++      <tag state=3D"vulnerable">v1.4.2</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-1.5</name>
++      <tag state=3D"vulnerable">v1.5.1</tag>
++      <tag state=3D"vulnerable">v1.5.2</tag>
++      <tag state=3D"vulnerable">v1.5.3</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-1.6</name>
++      <tag state=3D"vulnerable">v1.6.1</tag>
++      <tag state=3D"vulnerable">v1.6.2</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-1.7</name>
++      <tag state=3D"vulnerable">v1.7.1</tag>
++      <tag state=3D"vulnerable">v1.7.2</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.0</name>
++      <tag state=3D"vulnerable">v2.0.1</tag>
++      <tag state=3D"vulnerable">v2.0.2</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.1</name>
++      <tag state=3D"vulnerable">v2.1.1</tag>
++      <tag state=3D"vulnerable">v2.1.2</tag>
++      <tag state=3D"vulnerable">v2.1.3</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.2</name>
++      <tag state=3D"vulnerable">v2.2.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.3</name>
++      <tag state=3D"vulnerable">v2.3.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.4</name>
++      <tag state=3D"vulnerable">v2.4.0.1</tag>
++      <tag state=3D"vulnerable">v2.4.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.5</name>
++      <tag state=3D"vulnerable">v2.5.1</tag>
++      <tag state=3D"vulnerable">v2.5.1.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.6</name>
++      <tag state=3D"vulnerable">v2.6.1</tag>
++      <tag state=3D"vulnerable">v2.6.2</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.7</name>
++      <tag state=3D"vulnerable">v2.7.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.8</name>
++      <tag state=3D"vulnerable">v2.8.1</tag>
++      <tag state=3D"vulnerable">v2.8.1.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.9</name>
++      <tag state=3D"vulnerable">v2.9.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.10</name>
++      <tag state=3D"vulnerable">v2.10.1</tag>
++      <tag state=3D"vulnerable">v2.10.2</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.11</name>
++      <tag state=3D"vulnerable">v2.11.1</tag>
++      <tag state=3D"vulnerable">v2.11.2</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++    <branch>
++      <name>stable-2.12</name>
++      <tag state=3D"vulnerable">v2.12.1</tag>
++      <change state=3D"vulnerable">4f1c942b7fb29864ad86cb3af9076da38f38f=
+74e</change>
++    </branch>
++  </repository>
++
++</security-notice>
+diff --git a/secnotice/2018/010.xml b/secnotice/2018/010.xml
+new file mode 100644
+index 0000000..23719d4
+--- /dev/null
++++ b/secnotice/2018/010.xml
+@@ -0,0 +1,223 @@
++<security-notice xmlns=3D"http://qemu.org/xmlns/security-notice/1.0">
++  <id>2018-010</id>
++
++  <summary>Ignore network packet sizes larger than INT_MAX</summary>
++
++  <description>
++<![CDATA[A potential integer overflow issue was found in the QEMU emulat=
+or. It could occur when a packet with large packet size is accepted and p=
+rocessed.]]>
++  </description>
++
++  <impact>
++<![CDATA[A user inside guest could use this flaw to crash the Qemu proce=
+ss resulting in DoS.]]>
++  </impact>
++
++  <mitigation>
++<![CDATA[None]]>
++  </mitigation>
++
++  <credits>
++    <reporter>
++      <name>Daniel Shapira</name>
++      <email>daniel@twistlock.com</email>
++    </reporter>
++    <patcher>
++      <name>Jason Wang</name>
++      <email>jasonwang@redhat.com</email>
++    </patcher>
++  </credits>
++
++  <lifecycle>
++    <reported>20180521</reported>
++    <published>20180926</published>
++    <fixed></fixed>
++  </lifecycle>
++
++  <reference>
++    <advisory type=3D"CVE" id=3D"2018-17963"/>
++  </reference>
++
++  <repository>
++    <branch>
++      <name>master</name>
++      <change state=3D"vulnerable">9a6ecb308b1c668fff84d56a356dbd595c51d=
+556</change>
++    </branch>
++    <branch>
++      <name>master</name>
++      <tag state=3D"fixed"></tag>
++      <change state=3D"fixed">36772a6341af7c0f100b8e55a1e779db5fe818da</=
+change>
++      <change state=3D"merged"></change>
++      <tag state=3D"vulnerable">v1.0</tag>
++      <tag state=3D"vulnerable">v1.1.0</tag>
++      <tag state=3D"vulnerable">v1.2.0</tag>
++      <tag state=3D"vulnerable">v1.3.0</tag>
++      <tag state=3D"vulnerable">v1.4.0</tag>
++      <tag state=3D"vulnerable">v1.5.0</tag>
++      <tag state=3D"vulnerable">v1.6.0</tag>
++      <tag state=3D"vulnerable">v1.7.0</tag>
++      <tag state=3D"vulnerable">v2.0.0</tag>
++      <tag state=3D"vulnerable">v2.1.0</tag>
++      <tag state=3D"vulnerable">v2.2.0</tag>
++      <tag state=3D"vulnerable">v2.3.0</tag>
++      <tag state=3D"vulnerable">v2.4.0</tag>
++      <tag state=3D"vulnerable">v2.5.0</tag>
++      <tag state=3D"vulnerable">v2.6.0</tag>
++      <tag state=3D"vulnerable">v2.7.0</tag>
++      <tag state=3D"vulnerable">v2.8.0</tag>
++      <tag state=3D"vulnerable">v2.9.0</tag>
++      <tag state=3D"vulnerable">v2.10.0</tag>
++      <tag state=3D"vulnerable">v2.11.0</tag>
++      <tag state=3D"vulnerable">v2.12.0</tag>
++      <tag state=3D"vulnerable">v3.0.0</tag>
++      <change state=3D"vulnerable">9a6ecb308b1c668fff84d56a356dbd595c51d=
+556</change>
++    </branch>
++    <branch>
++      <name>stable-0.12</name>
++      <tag state=3D"vulnerable">v0.12.0</tag>
++      <tag state=3D"vulnerable">v0.12.1</tag>
++      <tag state=3D"vulnerable">v0.12.2</tag>
++      <tag state=3D"vulnerable">v0.12.3</tag>
++      <tag state=3D"vulnerable">v0.12.4</tag>
++      <tag state=3D"vulnerable">v0.12.5</tag>
++      <change state=3D"vulnerable">9a6ecb308b1c668fff84d56a356dbd595c51d=
+556</change>
++    </branch>
++    <branch>
++      <name>stable-0.13</name>
++      <tag state=3D"vulnerable">v0.13.0</tag>
++      <change state=3D"vulnerable">9a6ecb308b1c668fff84d56a356dbd595c51d=
+556</change>
++    </branch>
++    <branch>
++      <name>stable-0.14</name>
++      <tag state=3D"vulnerable">v0.14.0</tag>
++      <tag state=3D"vulnerable">v0.14.1</tag>
++      <change state=3D"vulnerable">9a6ecb308b1c668fff84d56a356dbd595c51d=
+556</change>
++    </branch>
++    <branch>
++      <name>stable-0.15</name>
++      <tag state=3D"vulnerable">v0.15.0</tag>
++      <tag state=3D"vulnerable">v0.15.1</tag>
++      <change state=3D"vulnerable">9a6ecb308b1c668fff84d56a356dbd595c51d=
+556</change>
++    </branch>
++    <branch>
++      <name>stable-1.0</name>
++      <tag state=3D"vulnerable">v1.0.1</tag>
++      <change state=3D"vulnerable">9a6ecb308b1c668fff84d56a356dbd595c51d=
+556</change>
++    </branch>
++    <branch>
++      <name>stable-1.1</name>
++      <tag state=3D"vulnerable">v1.1.1</tag>
++      <tag state=3D"vulnerable">v1.1.2</tag>
++      <change state=3D"vulnerable">9a6ecb308b1c668fff84d56a356dbd595c51d=
+556</change>
++    </branch>
++    <branch>
++      <name>stable-1.2</name>
++      <tag state=3D"vulnerable">v1.2.1</tag>
++      <tag state=3D"vulnerable">v1.2.2</tag>
++      <change state=3D"vulnerable">9a6ecb308b1c668fff84d56a356dbd595c51d=
+556</change>
++    </branch>
++    <branch>
++      <name>stable-1.3</name>
++      <tag state=3D"vulnerable">v1.3.1</tag>
++      <change state=3D"vulnerable">9a6ecb308b1c668fff84d56a356dbd595c51d=
+556</change>
++    </branch>
++    <branch>
++      <name>stable-1.4</name>
++      <tag state=3D"vulnerable">v1.4.1</tag>
++      <tag state=3D"vulnerable">v1.4.2</tag>
++      <change state=3D"vulnerable">9a6ecb308b1c668fff84d56a356dbd595c51d=
+556</change>
++    </branch>
++    <branch>
++      <name>stable-1.5</name>
++      <tag state=3D"vulnerable">v1.5.1</tag>
++      <tag state=3D"vulnerable">v1.5.2</tag>
++      <tag state=3D"vulnerable">v1.5.3</tag>
++      <change state=3D"vulnerable">9a6ecb308b1c668fff84d56a356dbd595c51d=
+556</change>
++    </branch>
++    <branch>
++      <name>stable-1.6</name>
++      <tag state=3D"vulnerable">v1.6.1</tag>
++      <tag state=3D"vulnerable">v1.6.2</tag>
++      <change state=3D"vulnerable">9a6ecb308b1c668fff84d56a356dbd595c51d=
+556</change>
++    </branch>
++    <branch>
++      <name>stable-1.7</name>
++      <tag state=3D"vulnerable">v1.7.1</tag>
++      <tag state=3D"vulnerable">v1.7.2</tag>
++      <change state=3D"vulnerable">9a6ecb308b1c668fff84d56a356dbd595c51d=
+556</change>
++    </branch>
++    <branch>
++      <name>stable-2.0</name>
++      <tag state=3D"vulnerable">v2.0.1</tag>
++      <tag state=3D"vulnerable">v2.0.2</tag>
++      <change state=3D"vulnerable">9a6ecb308b1c668fff84d56a356dbd595c51d=
+556</change>
++    </branch>
++    <branch>
++      <name>stable-2.1</name>
++      <tag state=3D"vulnerable">v2.1.1</tag>
++      <tag state=3D"vulnerable">v2.1.2</tag>
++      <tag state=3D"vulnerable">v2.1.3</tag>
++      <change state=3D"vulnerable">9a6ecb308b1c668fff84d56a356dbd595c51d=
+556</change>
++    </branch>
++    <branch>
++      <name>stable-2.2</name>
++      <tag state=3D"vulnerable">v2.2.1</tag>
++      <change state=3D"vulnerable">9a6ecb308b1c668fff84d56a356dbd595c51d=
+556</change>
++    </branch>
++    <branch>
++      <name>stable-2.3</name>
++      <tag state=3D"vulnerable">v2.3.1</tag>
++      <change state=3D"vulnerable">9a6ecb308b1c668fff84d56a356dbd595c51d=
+556</change>
++    </branch>
++    <branch>
++      <name>stable-2.4</name>
++      <tag state=3D"vulnerable">v2.4.0.1</tag>
++      <tag state=3D"vulnerable">v2.4.1</tag>
++      <change state=3D"vulnerable">9a6ecb308b1c668fff84d56a356dbd595c51d=
+556</change>
++    </branch>
++    <branch>
++      <name>stable-2.5</name>
++      <tag state=3D"vulnerable">v2.5.1</tag>
++      <tag state=3D"vulnerable">v2.5.1.1</tag>
++      <change state=3D"vulnerable">9a6ecb308b1c668fff84d56a356dbd595c51d=
+556</change>
++    </branch>
++    <branch>
++      <name>stable-2.6</name>
++      <tag state=3D"vulnerable">v2.6.1</tag>
++      <tag state=3D"vulnerable">v2.6.2</tag>
++      <change state=3D"vulnerable">9a6ecb308b1c668fff84d56a356dbd595c51d=
+556</change>
++    </branch>
++    <branch>
++      <name>stable-2.7</name>
++      <tag state=3D"vulnerable">v2.7.1</tag>
++      <change state=3D"vulnerable">9a6ecb308b1c668fff84d56a356dbd595c51d=
+556</change>
++    </branch>
++    <branch>
++      <name>stable-2.8</name>
++      <tag state=3D"vulnerable">v2.8.1</tag>
++      <tag state=3D"vulnerable">v2.8.1.1</tag>
++      <change state=3D"vulnerable">9a6ecb308b1c668fff84d56a356dbd595c51d=
+556</change>
++    </branch>
++    <branch>
++      <name>stable-2.9</name>
++      <tag state=3D"vulnerable">v2.9.1</tag>
++      <change state=3D"vulnerable">9a6ecb308b1c668fff84d56a356dbd595c51d=
+556</change>
++    </branch>
++    <branch>
++      <name>stable-2.10</name>
++      <tag state=3D"vulnerable">v2.10.1</tag>
++      <tag state=3D"vulnerable">v2.10.2</tag>
++      <change state=3D"vulnerable">9a6ecb308b1c668fff84d56a356dbd595c51d=
+556</change>
++    </branch>
++    <branch>
++      <name>stable-2.11</name>
++      <tag state=3D"vulnerable">v2.11.1</tag>
++      <tag state=3D"vulnerable">v2.11.2</tag>
++      <change state=3D"vulnerable">9a6ecb308b1c668fff84d56a356dbd595c51d=
+556</change>
++    </branch>
++    <branch>
++      <name>stable-2.12</name>
++      <tag state=3D"vulnerable">v2.12.1</tag>
++      <change state=3D"vulnerable">9a6ecb308b1c668fff84d56a356dbd595c51d=
+556</change>
++    </branch>
++  </repository>
++
++</security-notice>
+diff --git a/secnotice/2018/011.xml b/secnotice/2018/011.xml
+new file mode 100644
+index 0000000..811df0d
+--- /dev/null
++++ b/secnotice/2018/011.xml
+@@ -0,0 +1,199 @@
++<security-notice xmlns=3D"http://qemu.org/xmlns/security-notice/1.0">
++  <id>2018-011</id>
++
++  <summary>CCID integer overflow reading data</summary>
++
++  <description>
++<![CDATA[An integer overflow issue was found in the CCID Passthru card d=
+evice emulation, while reading card data in ccid_card_vscard_read() funct=
+ion. The ccid_card_vscard_read() function accepts a signed integer 'size'=
+ argument, which is subsequently used as unsigned size_t value in memcpy(=
+), copying large amounts of memory.
++]]>
++  </description>
++
++  <impact>
++<![CDATA[A user inside guest could use this flaw to crash the Qemu proce=
+ss resulting in DoS.]]>
++  </impact>
++
++  <mitigation>
++<![CDATA[Remove the CCID device emulation from virtual machines]]>
++  </mitigation>
++
++  <credits>
++    <reporter>
++      <name>Arash Tohidi</name>
++      <email>tohidi.arash@gmail.com</email>
++    </reporter>
++    <patcher>
++      <name>Philippe Mathieu-Daud=C3=A9</name>
++      <email>philmd@redhat.com</email>
++    </patcher>
++  </credits>
++
++  <lifecycle>
++    <reported>20180726</reported>
++    <published>20181011</published>
++    <fixed></fixed>
++  </lifecycle>
++
++  <reference>
++    <advisory type=3D"CVE" id=3D"2018-18438"/>
++  </reference>
++
++  <repository>
++    <branch>
++      <name>master</name>
 +      <change state=3D"fixed"></change>
 +      <change state=3D"merged"></change>
-+      <change state=3D"vulnerable"></change>
-+      <tag state=3D"vulnerable"></tag>
++      <tag state=3D"fixed"></tag>
++      <tag state=3D"vulnerable">v1.0</tag>
++      <tag state=3D"vulnerable">v1.1.0</tag>
++      <tag state=3D"vulnerable">v1.2.0</tag>
++      <tag state=3D"vulnerable">v1.3.0</tag>
++      <tag state=3D"vulnerable">v1.4.0</tag>
++      <tag state=3D"vulnerable">v1.5.0</tag>
++      <tag state=3D"vulnerable">v1.6.0</tag>
++      <tag state=3D"vulnerable">v1.7.0</tag>
++      <tag state=3D"vulnerable">v2.0.0</tag>
++      <tag state=3D"vulnerable">v2.1.0</tag>
++      <tag state=3D"vulnerable">v2.2.0</tag>
++      <tag state=3D"vulnerable">v2.3.0</tag>
++      <tag state=3D"vulnerable">v2.4.0</tag>
++      <tag state=3D"vulnerable">v2.5.0</tag>
++      <tag state=3D"vulnerable">v2.6.0</tag>
++      <tag state=3D"vulnerable">v2.7.0</tag>
++      <tag state=3D"vulnerable">v2.8.0</tag>
++      <tag state=3D"vulnerable">v2.9.0</tag>
++      <tag state=3D"vulnerable">v2.10.0</tag>
++      <tag state=3D"vulnerable">v2.11.0</tag>
++      <tag state=3D"vulnerable">v2.12.0</tag>
++      <tag state=3D"vulnerable">v3.0.0</tag>
++      <change state=3D"vulnerable">edbb21363fbfe40e050f583df921484cbc31c=
+79d</change>
++    </branch>
++    <branch>
++      <name>stable-0.15</name>
++      <tag state=3D"vulnerable">v0.15.0</tag>
++      <tag state=3D"vulnerable">v0.15.1</tag>
++      <change state=3D"vulnerable">edbb21363fbfe40e050f583df921484cbc31c=
+79d</change>
++    </branch>
++    <branch>
++      <name>stable-1.0</name>
++      <tag state=3D"vulnerable">v1.0.1</tag>
++      <change state=3D"vulnerable">edbb21363fbfe40e050f583df921484cbc31c=
+79d</change>
++    </branch>
++    <branch>
++      <name>stable-1.1</name>
++      <tag state=3D"vulnerable">v1.1.1</tag>
++      <tag state=3D"vulnerable">v1.1.2</tag>
++      <change state=3D"vulnerable">edbb21363fbfe40e050f583df921484cbc31c=
+79d</change>
++    </branch>
++    <branch>
++      <name>stable-1.2</name>
++      <tag state=3D"vulnerable">v1.2.1</tag>
++      <tag state=3D"vulnerable">v1.2.2</tag>
++      <change state=3D"vulnerable">edbb21363fbfe40e050f583df921484cbc31c=
+79d</change>
++    </branch>
++    <branch>
++      <name>stable-1.3</name>
++      <tag state=3D"vulnerable">v1.3.1</tag>
++      <change state=3D"vulnerable">edbb21363fbfe40e050f583df921484cbc31c=
+79d</change>
++    </branch>
++    <branch>
++      <name>stable-1.4</name>
++      <tag state=3D"vulnerable">v1.4.1</tag>
++      <tag state=3D"vulnerable">v1.4.2</tag>
++      <change state=3D"vulnerable">edbb21363fbfe40e050f583df921484cbc31c=
+79d</change>
++    </branch>
++    <branch>
++      <name>stable-1.5</name>
++      <tag state=3D"vulnerable">v1.5.1</tag>
++      <tag state=3D"vulnerable">v1.5.2</tag>
++      <tag state=3D"vulnerable">v1.5.3</tag>
++      <change state=3D"vulnerable">edbb21363fbfe40e050f583df921484cbc31c=
+79d</change>
++    </branch>
++    <branch>
++      <name>stable-1.6</name>
++      <tag state=3D"vulnerable">v1.6.1</tag>
++      <tag state=3D"vulnerable">v1.6.2</tag>
++      <change state=3D"vulnerable">edbb21363fbfe40e050f583df921484cbc31c=
+79d</change>
++    </branch>
++    <branch>
++      <name>stable-1.7</name>
++      <tag state=3D"vulnerable">v1.7.1</tag>
++      <tag state=3D"vulnerable">v1.7.2</tag>
++      <change state=3D"vulnerable">edbb21363fbfe40e050f583df921484cbc31c=
+79d</change>
++    </branch>
++    <branch>
++      <name>stable-2.0</name>
++      <tag state=3D"vulnerable">v2.0.1</tag>
++      <tag state=3D"vulnerable">v2.0.2</tag>
++      <change state=3D"vulnerable">edbb21363fbfe40e050f583df921484cbc31c=
+79d</change>
++    </branch>
++    <branch>
++      <name>stable-2.1</name>
++      <tag state=3D"vulnerable">v2.1.1</tag>
++      <tag state=3D"vulnerable">v2.1.2</tag>
++      <tag state=3D"vulnerable">v2.1.3</tag>
++      <change state=3D"vulnerable">edbb21363fbfe40e050f583df921484cbc31c=
+79d</change>
++    </branch>
++    <branch>
++      <name>stable-2.2</name>
++      <tag state=3D"vulnerable">v2.2.1</tag>
++      <change state=3D"vulnerable">edbb21363fbfe40e050f583df921484cbc31c=
+79d</change>
++    </branch>
++    <branch>
++      <name>stable-2.3</name>
++      <tag state=3D"vulnerable">v2.3.1</tag>
++      <change state=3D"vulnerable">edbb21363fbfe40e050f583df921484cbc31c=
+79d</change>
++    </branch>
++    <branch>
++      <name>stable-2.4</name>
++      <tag state=3D"vulnerable">v2.4.0.1</tag>
++      <tag state=3D"vulnerable">v2.4.1</tag>
++      <change state=3D"vulnerable">edbb21363fbfe40e050f583df921484cbc31c=
+79d</change>
++    </branch>
++    <branch>
++      <name>stable-2.5</name>
++      <tag state=3D"vulnerable">v2.5.1</tag>
++      <tag state=3D"vulnerable">v2.5.1.1</tag>
++      <change state=3D"vulnerable">edbb21363fbfe40e050f583df921484cbc31c=
+79d</change>
++    </branch>
++    <branch>
++      <name>stable-2.6</name>
++      <tag state=3D"vulnerable">v2.6.1</tag>
++      <tag state=3D"vulnerable">v2.6.2</tag>
++      <change state=3D"vulnerable">edbb21363fbfe40e050f583df921484cbc31c=
+79d</change>
++    </branch>
++    <branch>
++      <name>stable-2.7</name>
++      <tag state=3D"vulnerable">v2.7.1</tag>
++      <change state=3D"vulnerable">edbb21363fbfe40e050f583df921484cbc31c=
+79d</change>
++    </branch>
++    <branch>
++      <name>stable-2.8</name>
++      <tag state=3D"vulnerable">v2.8.1</tag>
++      <tag state=3D"vulnerable">v2.8.1.1</tag>
++      <change state=3D"vulnerable">edbb21363fbfe40e050f583df921484cbc31c=
+79d</change>
++    </branch>
++    <branch>
++      <name>stable-2.9</name>
++      <tag state=3D"vulnerable">v2.9.1</tag>
++      <change state=3D"vulnerable">edbb21363fbfe40e050f583df921484cbc31c=
+79d</change>
++    </branch>
++    <branch>
++      <name>stable-2.10</name>
++      <tag state=3D"vulnerable">v2.10.1</tag>
++      <tag state=3D"vulnerable">v2.10.2</tag>
++      <change state=3D"vulnerable">edbb21363fbfe40e050f583df921484cbc31c=
+79d</change>
++    </branch>
++    <branch>
++      <name>stable-2.11</name>
++      <tag state=3D"vulnerable">v2.11.1</tag>
++      <tag state=3D"vulnerable">v2.11.2</tag>
++      <change state=3D"vulnerable">edbb21363fbfe40e050f583df921484cbc31c=
+79d</change>
++    </branch>
++    <branch>
++      <name>stable-2.12</name>
++      <tag state=3D"vulnerable">v2.12.1</tag>
++      <change state=3D"vulnerable">edbb21363fbfe40e050f583df921484cbc31c=
+79d</change>
 +    </branch>
 +  </repository>
 +
