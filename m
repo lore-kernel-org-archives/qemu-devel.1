@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40863)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gDEc0-0003hm-1u
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:09:41 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gDEc6-0003oJ-Gs
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:09:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gDEbv-0004FY-Up
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:09:39 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gDEc2-0004P7-68
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:09:46 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 18 Oct 2018 17:04:15 -0300
-Message-Id: <20181018200422.4358-39-ehabkost@redhat.com>
+Date: Thu, 18 Oct 2018 17:04:16 -0300
+Message-Id: <20181018200422.4358-40-ehabkost@redhat.com>
 In-Reply-To: <20181018200422.4358-1-ehabkost@redhat.com>
 References: <20181018200422.4358-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 38/45] net: milkymist_minimac2: convert SysBus
- init method to a realize method
+Subject: [Qemu-devel] [PULL 39/45] net: mipsnet: convert SysBus init method
+ to a realize method
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,54 +28,51 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Rob Her
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-Cc: Michael Walle <michael@walle.cc>
+Cc: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20181001063803.22330-6-clg@kaod.org>
-Acked-by: Michael Walle <michael@walle.cc>
+Message-Id: <20181001063803.22330-7-clg@kaod.org>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/net/milkymist-minimac2.c | 9 +++------
+ hw/net/mipsnet.c | 9 +++------
  1 file changed, 3 insertions(+), 6 deletions(-)
 
-diff --git a/hw/net/milkymist-minimac2.c b/hw/net/milkymist-minimac2.c
-index 3eaa19dfde..7ef1daee41 100644
---- a/hw/net/milkymist-minimac2.c
-+++ b/hw/net/milkymist-minimac2.c
-@@ -452,9 +452,9 @@ static NetClientInfo net_milkymist_minimac2_info =3D =
-{
-     .receive =3D minimac2_rx,
+diff --git a/hw/net/mipsnet.c b/hw/net/mipsnet.c
+index 5a63df7ccb..03b3104278 100644
+--- a/hw/net/mipsnet.c
++++ b/hw/net/mipsnet.c
+@@ -236,9 +236,9 @@ static const MemoryRegionOps mipsnet_ioport_ops =3D {
+     .impl.max_access_size =3D 4,
  };
 =20
--static int milkymist_minimac2_init(SysBusDevice *sbd)
-+static void milkymist_minimac2_realize(DeviceState *dev, Error **errp)
+-static int mipsnet_sysbus_init(SysBusDevice *sbd)
++static void mipsnet_realize(DeviceState *dev, Error **errp)
  {
 -    DeviceState *dev =3D DEVICE(sbd);
 +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
-     MilkymistMinimac2State *s =3D MILKYMIST_MINIMAC2(dev);
-     size_t buffers_size =3D TARGET_PAGE_ALIGN(3 * MINIMAC2_BUFFER_SIZE);
+     MIPSnetState *s =3D MIPS_NET(dev);
 =20
-@@ -479,8 +479,6 @@ static int milkymist_minimac2_init(SysBusDevice *sbd)
-     s->nic =3D qemu_new_nic(&net_milkymist_minimac2_info, &s->conf,
+     memory_region_init_io(&s->io, OBJECT(dev), &mipsnet_ioport_ops, s,
+@@ -249,8 +249,6 @@ static int mipsnet_sysbus_init(SysBusDevice *sbd)
+     s->nic =3D qemu_new_nic(&net_mipsnet_info, &s->conf,
                            object_get_typename(OBJECT(dev)), dev->id, s);
      qemu_format_nic_info_str(qemu_get_queue(s->nic), s->conf.macaddr.a);
 -
 -    return 0;
  }
 =20
- static const VMStateDescription vmstate_milkymist_minimac2_mdio =3D {
-@@ -521,9 +519,8 @@ static Property milkymist_minimac2_properties[] =3D {
- static void milkymist_minimac2_class_init(ObjectClass *klass, void *data=
-)
+ static void mipsnet_sysbus_reset(DeviceState *dev)
+@@ -267,9 +265,8 @@ static Property mipsnet_properties[] =3D {
+ static void mipsnet_class_init(ObjectClass *klass, void *data)
  {
      DeviceClass *dc =3D DEVICE_CLASS(klass);
 -    SysBusDeviceClass *k =3D SYS_BUS_DEVICE_CLASS(klass);
 =20
--    k->init =3D milkymist_minimac2_init;
-+    dc->realize =3D milkymist_minimac2_realize;
-     dc->reset =3D milkymist_minimac2_reset;
-     dc->vmsd =3D &vmstate_milkymist_minimac2;
-     dc->props =3D milkymist_minimac2_properties;
+-    k->init =3D mipsnet_sysbus_init;
++    dc->realize =3D mipsnet_realize;
+     set_bit(DEVICE_CATEGORY_NETWORK, dc->categories);
+     dc->desc =3D "MIPS Simulator network device";
+     dc->reset =3D mipsnet_sysbus_reset;
 --=20
 2.18.0.rc1.1.g3f1ff2140
