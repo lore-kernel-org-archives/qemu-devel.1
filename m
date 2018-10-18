@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48169)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48244)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gDEyL-0007Lg-9J
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:32:46 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gDEyO-0007QR-S0
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:32:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gDEyH-0006LS-Dt
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:32:45 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36776)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gDEyN-0006QF-0p
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:32:48 -0400
+Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:40851)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gDEyG-0006EJ-Cp
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:32:40 -0400
-Received: by mail-wr1-x444.google.com with SMTP id y16so35119845wrw.3
-	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 13:32:34 -0700 (PDT)
+	id 1gDEyL-0006OC-HT
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:32:45 -0400
+Received: by mail-wm1-x332.google.com with SMTP id z204-v6so1611202wmc.5
+	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 13:32:45 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 18 Oct 2018 22:31:41 +0200
-Message-Id: <1539894735-14232-15-git-send-email-pbonzini@redhat.com>
+Date: Thu, 18 Oct 2018 22:31:51 +0200
+Message-Id: <1539894735-14232-25-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1539894735-14232-1-git-send-email-pbonzini@redhat.com>
 References: <1539894735-14232-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 14/48] i386: hvf: Fix register refs if REX is
- present
+Subject: [Qemu-devel] [PULL 24/48] hyperv_testdev: refactor for better
+ maintainability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,255 +29,199 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Roman Bolshakov <r.bolshakov@yadro.com>
+Cc: Roman Kagan <rkagan@virtuozzo.com>
 
-From: Roman Bolshakov <r.bolshakov@yadro.com>
+From: Roman Kagan <rkagan@virtuozzo.com>
 
-According to Intel(R)64 and IA-32 Architectures Software Developer's
-Manual, the following one-byte registers should be fetched when REX
-prefix is present (sorted by reg encoding index):
-AL, CL, DL, BL, SPL, BPL, SIL, DIL, R8L - R15L
+Make hyperv_testdev slightly easier to follow and enhance in future.
+For that, put the hyperv sint routes (wrapped in a helper structure) on
+a linked list rather than a fixed-size array.  Besides, this way
+HvSintRoute can be treated as an opaque structure, allowing for easier
+refactoring of the core Hyper-V SynIC code in followup pathches.
 
-The first 8 are fetched if REX.R is zero, the last 8 if non-zero.
-
-The following registers should be fetched for instructions without REX
-prefix (also sorted by reg encoding index):
-AL, CL, DL, BL, AH, CH, DH, BH
-
-Current emulation code doesn't handle accesses to SPL, BPL, SIL, DIL
-when REX is present, thefore an instruction 40883e "mov %dil,(%rsi)" is
-decoded as "mov %bh,(%rsi)".
-
-That caused an infinite loop in vp_reset:
-https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg03293.html
-
-Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
-Message-Id: <20181018134401.44471-1-r.bolshakov@yadro.com>
+Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
+Message-Id: <20180921081836.29230-2-rkagan@virtuozzo.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/hvf/x86_decode.c | 67 +++++++++++++++++++++++++-------------------
- target/i386/hvf/x86_decode.h |  6 ++--
- 2 files changed, 42 insertions(+), 31 deletions(-)
+ hw/misc/hyperv_testdev.c | 116 ++++++++++++++++++++++-------------------------
+ 1 file changed, 55 insertions(+), 61 deletions(-)
 
-diff --git a/target/i386/hvf/x86_decode.c b/target/i386/hvf/x86_decode.c
-index 2d7540f..2e33b69 100644
---- a/target/i386/hvf/x86_decode.c
-+++ b/target/i386/hvf/x86_decode.c
-@@ -113,7 +113,8 @@ static void decode_modrm_reg(CPUX86State *env, struct x86_decode *decode,
+diff --git a/hw/misc/hyperv_testdev.c b/hw/misc/hyperv_testdev.c
+index 7549f47..915d74e 100644
+--- a/hw/misc/hyperv_testdev.c
++++ b/hw/misc/hyperv_testdev.c
+@@ -12,6 +12,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/queue.h"
+ #include <linux/kvm.h>
+ #include "hw/hw.h"
+ #include "hw/qdev.h"
+@@ -20,12 +21,17 @@
+ #include "target/i386/hyperv.h"
+ #include "kvm_i386.h"
+ 
+-#define HV_TEST_DEV_MAX_SINT_ROUTES 64
++typedef struct TestSintRoute {
++    QLIST_ENTRY(TestSintRoute) le;
++    uint8_t vp_index;
++    uint8_t sint;
++    HvSintRoute *sint_route;
++} TestSintRoute;
+ 
+ struct HypervTestDev {
+     ISADevice parent_obj;
+     MemoryRegion sint_control;
+-    HvSintRoute *sint_route[HV_TEST_DEV_MAX_SINT_ROUTES];
++    QLIST_HEAD(, TestSintRoute) sint_routes;
+ };
+ typedef struct HypervTestDev HypervTestDev;
+ 
+@@ -39,70 +45,56 @@ enum {
+     HV_TEST_DEV_SINT_ROUTE_SET_SINT
+ };
+ 
+-static int alloc_sint_route_index(HypervTestDev *dev)
++static void sint_route_create(HypervTestDev *dev,
++                              uint8_t vp_index, uint8_t sint)
  {
-     op->type = X86_VAR_REG;
-     op->reg = decode->modrm.reg;
--    op->ptr = get_reg_ref(env, op->reg, decode->rex.r, decode->operand_size);
-+    op->ptr = get_reg_ref(env, op->reg, decode->rex.rex, decode->rex.r,
-+                          decode->operand_size);
+-    int i;
++    TestSintRoute *sint_route;
+ 
+-    for (i = 0; i < ARRAY_SIZE(dev->sint_route); i++) {
+-        if (dev->sint_route[i] == NULL) {
+-            return i;
+-        }
+-    }
+-    return -1;
+-}
++    sint_route = g_new0(TestSintRoute, 1);
++    assert(sint_route);
+ 
+-static void free_sint_route_index(HypervTestDev *dev, int i)
+-{
+-    assert(i >= 0 && i < ARRAY_SIZE(dev->sint_route));
+-    dev->sint_route[i] = NULL;
++    sint_route->vp_index = vp_index;
++    sint_route->sint = sint;
++
++    sint_route->sint_route = kvm_hv_sint_route_create(vp_index, sint, NULL);
++    assert(sint_route->sint_route);
++
++    QLIST_INSERT_HEAD(&dev->sint_routes, sint_route, le);
  }
  
- static void decode_rax(CPUX86State *env, struct x86_decode *decode,
-@@ -121,7 +122,8 @@ static void decode_rax(CPUX86State *env, struct x86_decode *decode,
+-static int find_sint_route_index(HypervTestDev *dev, uint32_t vp_index,
+-                                 uint32_t sint)
++static TestSintRoute *sint_route_find(HypervTestDev *dev,
++                                      uint8_t vp_index, uint8_t sint)
  {
-     op->type = X86_VAR_REG;
-     op->reg = R_EAX;
--    op->ptr = get_reg_ref(env, op->reg, 0, decode->operand_size);
-+    op->ptr = get_reg_ref(env, op->reg, decode->rex.rex, 0,
-+                          decode->operand_size);
- }
+-    HvSintRoute *sint_route;
+-    int i;
++    TestSintRoute *sint_route;
  
- static inline void decode_immediate(CPUX86State *env, struct x86_decode *decode,
-@@ -263,16 +265,16 @@ static void decode_incgroup(CPUX86State *env, struct x86_decode *decode)
- {
-     decode->op[0].type = X86_VAR_REG;
-     decode->op[0].reg = decode->opcode[0] - 0x40;
--    decode->op[0].ptr = get_reg_ref(env, decode->op[0].reg, decode->rex.b,
--                                    decode->operand_size);
-+    decode->op[0].ptr = get_reg_ref(env, decode->op[0].reg, decode->rex.rex,
-+                                    decode->rex.b, decode->operand_size);
- }
- 
- static void decode_decgroup(CPUX86State *env, struct x86_decode *decode)
- {
-     decode->op[0].type = X86_VAR_REG;
-     decode->op[0].reg = decode->opcode[0] - 0x48;
--    decode->op[0].ptr = get_reg_ref(env, decode->op[0].reg, decode->rex.b,
--                                    decode->operand_size);
-+    decode->op[0].ptr = get_reg_ref(env, decode->op[0].reg, decode->rex.rex,
-+                                    decode->rex.b, decode->operand_size);
- }
- 
- static void decode_incgroup2(CPUX86State *env, struct x86_decode *decode)
-@@ -288,16 +290,16 @@ static void decode_pushgroup(CPUX86State *env, struct x86_decode *decode)
- {
-     decode->op[0].type = X86_VAR_REG;
-     decode->op[0].reg = decode->opcode[0] - 0x50;
--    decode->op[0].ptr = get_reg_ref(env, decode->op[0].reg, decode->rex.b,
--                                    decode->operand_size);
-+    decode->op[0].ptr = get_reg_ref(env, decode->op[0].reg, decode->rex.rex,
-+                                    decode->rex.b, decode->operand_size);
- }
- 
- static void decode_popgroup(CPUX86State *env, struct x86_decode *decode)
- {
-     decode->op[0].type = X86_VAR_REG;
-     decode->op[0].reg = decode->opcode[0] - 0x58;
--    decode->op[0].ptr = get_reg_ref(env, decode->op[0].reg, decode->rex.b,
--                                    decode->operand_size);
-+    decode->op[0].ptr = get_reg_ref(env, decode->op[0].reg, decode->rex.rex,
-+                                    decode->rex.b, decode->operand_size);
- }
- 
- static void decode_jxx(CPUX86State *env, struct x86_decode *decode)
-@@ -378,16 +380,16 @@ static void decode_xchgroup(CPUX86State *env, struct x86_decode *decode)
- {
-     decode->op[0].type = X86_VAR_REG;
-     decode->op[0].reg = decode->opcode[0] - 0x90;
--    decode->op[0].ptr = get_reg_ref(env, decode->op[0].reg, decode->rex.b,
--                                    decode->operand_size);
-+    decode->op[0].ptr = get_reg_ref(env, decode->op[0].reg, decode->rex.rex,
-+                                    decode->rex.b, decode->operand_size);
- }
- 
- static void decode_movgroup(CPUX86State *env, struct x86_decode *decode)
- {
-     decode->op[0].type = X86_VAR_REG;
-     decode->op[0].reg = decode->opcode[0] - 0xb8;
--    decode->op[0].ptr = get_reg_ref(env, decode->op[0].reg, decode->rex.b,
--                                    decode->operand_size);
-+    decode->op[0].ptr = get_reg_ref(env, decode->op[0].reg, decode->rex.rex,
-+                                    decode->rex.b, decode->operand_size);
-     decode_immediate(env, decode, &decode->op[1], decode->operand_size);
- }
- 
-@@ -402,8 +404,8 @@ static void decode_movgroup8(CPUX86State *env, struct x86_decode *decode)
- {
-     decode->op[0].type = X86_VAR_REG;
-     decode->op[0].reg = decode->opcode[0] - 0xb0;
--    decode->op[0].ptr = get_reg_ref(env, decode->op[0].reg, decode->rex.b,
--                                    decode->operand_size);
-+    decode->op[0].ptr = get_reg_ref(env, decode->op[0].reg, decode->rex.rex,
-+                                    decode->rex.b, decode->operand_size);
-     decode_immediate(env, decode, &decode->op[1], decode->operand_size);
- }
- 
-@@ -412,7 +414,8 @@ static void decode_rcx(CPUX86State *env, struct x86_decode *decode,
- {
-     op->type = X86_VAR_REG;
-     op->reg = R_ECX;
--    op->ptr = get_reg_ref(env, op->reg, decode->rex.b, decode->operand_size);
-+    op->ptr = get_reg_ref(env, op->reg, decode->rex.rex, decode->rex.b,
-+                          decode->operand_size);
- }
- 
- struct decode_tbl {
-@@ -639,8 +642,8 @@ static void decode_bswap(CPUX86State *env, struct x86_decode *decode)
- {
-     decode->op[0].type = X86_VAR_REG;
-     decode->op[0].reg = decode->opcode[1] - 0xc8;
--    decode->op[0].ptr = get_reg_ref(env, decode->op[0].reg, decode->rex.b,
--                                    decode->operand_size);
-+    decode->op[0].ptr = get_reg_ref(env, decode->op[0].reg, decode->rex.rex,
-+                                    decode->rex.b, decode->operand_size);
- }
- 
- static void decode_d9_4(CPUX86State *env, struct x86_decode *decode)
-@@ -1686,7 +1689,8 @@ calc_addr:
-     }
- }
- 
--target_ulong get_reg_ref(CPUX86State *env, int reg, int is_extended, int size)
-+target_ulong get_reg_ref(CPUX86State *env, int reg, int rex, int is_extended,
-+                         int size)
- {
-     target_ulong ptr = 0;
-     int which = 0;
-@@ -1698,7 +1702,7 @@ target_ulong get_reg_ref(CPUX86State *env, int reg, int is_extended, int size)
- 
-     switch (size) {
-     case 1:
--        if (is_extended || reg < 4) {
-+        if (is_extended || reg < 4 || rex) {
-             which = 1;
-             ptr = (target_ulong)&RL(env, reg);
-         } else {
-@@ -1714,10 +1718,11 @@ target_ulong get_reg_ref(CPUX86State *env, int reg, int is_extended, int size)
-     return ptr;
- }
- 
--target_ulong get_reg_val(CPUX86State *env, int reg, int is_extended, int size)
-+target_ulong get_reg_val(CPUX86State *env, int reg, int rex, int is_extended,
-+                         int size)
- {
-     target_ulong val = 0;
--    memcpy(&val, (void *)get_reg_ref(env, reg, is_extended, size), size);
-+    memcpy(&val, (void *)get_reg_ref(env, reg, rex, is_extended, size), size);
-     return val;
- }
- 
-@@ -1739,7 +1744,8 @@ static target_ulong get_sib_val(CPUX86State *env, struct x86_decode *decode,
-         if (base_reg == R_ESP || base_reg == R_EBP) {
-             *sel = R_SS;
+-    for (i = 0; i < ARRAY_SIZE(dev->sint_route); i++) {
+-        sint_route = dev->sint_route[i];
+-        if (sint_route && sint_route->vp_index == vp_index &&
+-            sint_route->sint == sint) {
+-            return i;
++    QLIST_FOREACH(sint_route, &dev->sint_routes, le) {
++        if (sint_route->vp_index == vp_index && sint_route->sint == sint) {
++            return sint_route;
          }
--        base = get_reg_val(env, decode->sib.base, decode->rex.b, addr_size);
-+        base = get_reg_val(env, decode->sib.base, decode->rex.rex,
-+                           decode->rex.b, addr_size);
      }
+-    return -1;
++    assert(false);
++    return NULL;
+ }
  
-     if (decode->rex.x) {
-@@ -1747,7 +1753,8 @@ static target_ulong get_sib_val(CPUX86State *env, struct x86_decode *decode,
+-static void hv_synic_test_dev_control(HypervTestDev *dev, uint32_t ctl,
+-                                      uint32_t vp_index, uint32_t sint)
++static void sint_route_destroy(HypervTestDev *dev,
++                               uint8_t vp_index, uint8_t sint)
+ {
+-    int i;
+-    HvSintRoute *sint_route;
++    TestSintRoute *sint_route;
+ 
+-    switch (ctl) {
+-    case HV_TEST_DEV_SINT_ROUTE_CREATE:
+-        i = alloc_sint_route_index(dev);
+-        assert(i >= 0);
+-        sint_route = kvm_hv_sint_route_create(vp_index, sint, NULL);
+-        assert(sint_route);
+-        dev->sint_route[i] = sint_route;
+-        break;
+-    case HV_TEST_DEV_SINT_ROUTE_DESTROY:
+-        i = find_sint_route_index(dev, vp_index, sint);
+-        assert(i >= 0);
+-        sint_route = dev->sint_route[i];
+-        kvm_hv_sint_route_destroy(sint_route);
+-        free_sint_route_index(dev, i);
+-        break;
+-    case HV_TEST_DEV_SINT_ROUTE_SET_SINT:
+-        i = find_sint_route_index(dev, vp_index, sint);
+-        assert(i >= 0);
+-        sint_route = dev->sint_route[i];
+-        kvm_hv_sint_route_set_sint(sint_route);
+-        break;
+-    default:
+-        break;
+-    }
++    sint_route = sint_route_find(dev, vp_index, sint);
++    QLIST_REMOVE(sint_route, le);
++    kvm_hv_sint_route_destroy(sint_route->sint_route);
++    g_free(sint_route);
++}
++
++static void sint_route_set_sint(HypervTestDev *dev,
++                                uint8_t vp_index, uint8_t sint)
++{
++    TestSintRoute *sint_route;
++
++    sint_route = sint_route_find(dev, vp_index, sint);
++
++    kvm_hv_sint_route_set_sint(sint_route->sint_route);
+ }
+ 
+ static uint64_t hv_test_dev_read(void *opaque, hwaddr addr, unsigned size)
+@@ -114,18 +106,20 @@ static void hv_test_dev_write(void *opaque, hwaddr addr, uint64_t data,
+                                 uint32_t len)
+ {
+     HypervTestDev *dev = HYPERV_TEST_DEV(opaque);
+-    uint8_t ctl;
++    uint8_t sint = data & 0xFF;
++    uint8_t vp_index = (data >> 8ULL) & 0xFF;
++    uint8_t ctl = (data >> 16ULL) & 0xFF;
+ 
+-    ctl = (data >> 16ULL) & 0xFF;
+     switch (ctl) {
+     case HV_TEST_DEV_SINT_ROUTE_CREATE:
++        sint_route_create(dev, vp_index, sint);
++        break;
+     case HV_TEST_DEV_SINT_ROUTE_DESTROY:
+-    case HV_TEST_DEV_SINT_ROUTE_SET_SINT: {
+-        uint8_t sint = data & 0xFF;
+-        uint8_t vp_index = (data >> 8ULL) & 0xFF;
+-        hv_synic_test_dev_control(dev, ctl, vp_index, sint);
++        sint_route_destroy(dev, vp_index, sint);
++        break;
++    case HV_TEST_DEV_SINT_ROUTE_SET_SINT:
++        sint_route_set_sint(dev, vp_index, sint);
+         break;
+-    }
+     default:
+         break;
      }
+@@ -145,7 +139,7 @@ static void hv_test_dev_realizefn(DeviceState *d, Error **errp)
+     HypervTestDev *dev = HYPERV_TEST_DEV(d);
+     MemoryRegion *io = isa_address_space_io(isa);
  
-     if (index_reg != R_ESP) {
--        scaled_index = get_reg_val(env, index_reg, decode->rex.x, addr_size) <<
-+        scaled_index = get_reg_val(env, index_reg, decode->rex.rex,
-+                                   decode->rex.x, addr_size) <<
-                                    decode->sib.scale;
-     }
-     return base + scaled_index;
-@@ -1776,7 +1783,8 @@ void calc_modrm_operand32(CPUX86State *env, struct x86_decode *decode,
-         if (decode->modrm.rm == R_EBP || decode->modrm.rm == R_ESP) {
-             seg = R_SS;
-         }
--        ptr += get_reg_val(env, decode->modrm.rm, decode->rex.b, addr_size);
-+        ptr += get_reg_val(env, decode->modrm.rm, decode->rex.rex,
-+                           decode->rex.b, addr_size);
-     }
- 
-     if (X86_DECODE_CMD_LEA == decode->cmd) {
-@@ -1805,7 +1813,8 @@ void calc_modrm_operand64(CPUX86State *env, struct x86_decode *decode,
-     } else if (0 == mod && 5 == rm) {
-         ptr = RIP(env) + decode->len + (int32_t) offset;
-     } else {
--        ptr = get_reg_val(env, src, decode->rex.b, 8) + (int64_t) offset;
-+        ptr = get_reg_val(env, src, decode->rex.rex, decode->rex.b, 8) +
-+              (int64_t) offset;
-     }
- 
-     if (X86_DECODE_CMD_LEA == decode->cmd) {
-@@ -1822,8 +1831,8 @@ void calc_modrm_operand(CPUX86State *env, struct x86_decode *decode,
-     if (3 == decode->modrm.mod) {
-         op->reg = decode->modrm.reg;
-         op->type = X86_VAR_REG;
--        op->ptr = get_reg_ref(env, decode->modrm.rm, decode->rex.b,
--                              decode->operand_size);
-+        op->ptr = get_reg_ref(env, decode->modrm.rm, decode->rex.rex,
-+                              decode->rex.b, decode->operand_size);
-         return;
-     }
- 
-diff --git a/target/i386/hvf/x86_decode.h b/target/i386/hvf/x86_decode.h
-index 5ab6f31..ef4bcab 100644
---- a/target/i386/hvf/x86_decode.h
-+++ b/target/i386/hvf/x86_decode.h
-@@ -303,8 +303,10 @@ uint64_t sign(uint64_t val, int size);
- 
- uint32_t decode_instruction(CPUX86State *env, struct x86_decode *decode);
- 
--target_ulong get_reg_ref(CPUX86State *env, int reg, int is_extended, int size);
--target_ulong get_reg_val(CPUX86State *env, int reg, int is_extended, int size);
-+target_ulong get_reg_ref(CPUX86State *env, int reg, int rex, int is_extended,
-+                         int size);
-+target_ulong get_reg_val(CPUX86State *env, int reg, int rex, int is_extended,
-+                         int size);
- void calc_modrm_operand(CPUX86State *env, struct x86_decode *decode,
-                         struct x86_decode_op *op);
- target_ulong decode_linear_addr(CPUX86State *env, struct x86_decode *decode,
+-    memset(dev->sint_route, 0, sizeof(dev->sint_route));
++    QLIST_INIT(&dev->sint_routes);
+     memory_region_init_io(&dev->sint_control, OBJECT(dev),
+                           &synic_test_sint_ops, dev,
+                           "hyperv-testdev-ctl", 4);
 -- 
 1.8.3.1
