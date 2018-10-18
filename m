@@ -1,36 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35077)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36795)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1gDCvZ-0006ga-Gs
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:21:46 -0400
+	(envelope-from <palmer@sifive.com>) id 1gDD0A-0000pE-SZ
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:26:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1gDCvW-00061j-7W
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:21:45 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39022
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1gDCvW-0005zB-1M
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:21:42 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w9IIFGKA086427
-	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 14:21:41 -0400
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2n6wrjcjjv-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 14:21:41 -0400
-Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Thu, 18 Oct 2018 12:21:40 -0600
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Thu, 18 Oct 2018 14:21:30 -0400
-In-Reply-To: <20181018182130.799406-1-stefanb@linux.vnet.ibm.com>
-References: <20181018182130.799406-1-stefanb@linux.vnet.ibm.com>
-Message-Id: <20181018182130.799406-2-stefanb@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 2/2] MAINTAINERS: Change my email address to
- the new domain
+	(envelope-from <palmer@sifive.com>) id 1gDD07-00061b-NI
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:26:30 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:35470)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gDD07-00060e-AB
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:26:27 -0400
+Received: by mail-pg1-x541.google.com with SMTP id 32-v6so3393294pgu.2
+	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 11:26:27 -0700 (PDT)
+Date: Thu, 18 Oct 2018 11:26:25 -0700 (PDT)
+In-Reply-To: <CAHNT7Nux+jD0o8QPuk971tHO=+pCSk0e9e5Bxu_093XGeO2aJQ@mail.gmail.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+Message-ID: <mhng-1fd66b85-ffc2-4e63-940d-ec539ce35390@palmer-si-x1c4>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULL] First RISC-V Patch Set for the 3.1 Soft
+ Freeze
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,29 +28,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, marcandre.lureau@gmail.com
-Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>, Stefan Berger <stefanb@linux.ibm.com>
+To: Michael Clark <mjc@sifive.com>
+Cc: eblake@redhat.com, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <Alistair.Francis@wdc.com>, qemu-devel@nongnu.org
 
-My old email address will soon not work anymore, so change it to the
-new domain.
+On Thu, 18 Oct 2018 05:54:01 PDT (-0700), Michael Clark wrote:
+> Any patches intended for the RISC-V port should go through the maintainer
+> tree. I have been pretty clear that I would like to run regression tests. I
+> do not wish to pull surprises in via master. I also do not agree with this
+> random patch approach. It's all well and good for inactive maintainers to
+> pop up now, but we were not getting our patches reviewed. The riscv-qemu
+> tree is actively managed and we rebase and test at release time. I don't
+> like the idea of busted stuff getting into the tree with patch churn
+> correcting it. In any case we disagree regards process. Please don't break
+> any of the branches in the riscv-qemu repository. I have scripts to tag our
+> stable branches there (we got positive feedback from Karsten on the
+> "series"). You are adding risk to the process. Fine. You are in charge.
+> Don't break stuff.
 
-Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
----
- MAINTAINERS | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Sorry Michael, I thought we talked about this last week in on the call and 
+decided that you were happy to let someone else take over the process of 
+getting the current RISC-V patch queue upstream.  While I agree there's a risk 
+to submitting patches, right now we're in the position where there are known 
+bugs in the upstream QEMU port.  
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 3275cc6bbe..b7b0be640c 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1778,7 +1778,7 @@ F: docs/devel/tracing.txt
- T: git git://github.com/stefanha/qemu.git tracing
- 
- TPM
--M: Stefan Berger <stefanb@linux.vnet.ibm.com>
-+M: Stefan Berger <stefanb@linux.ibm.com>
- S: Maintained
- F: tpm.c
- F: stubs/tpm.c
--- 
-2.17.1
+The real intent here is to provide a process by which we can get the RISC-V 
+QEMU port flowing smoothly.  You haven't submitted a PR since May, and as a 
+result it's very hard for a community to develop around the RISC-V port -- 
+distros have to go track down out-of-tree patches, releases have known bugs, 
+developers don't know where to start, etc.  I know it's easy to get overwhelmed 
+(that happened to me with both binutils and Linux), and I thought we agreed 
+that you'd be happy to have someone else help out with shepherding patches from 
+the RISC-V patch queue into master.  I know it's hard to get the ball rolling, 
+but the longer we wait the harder it'll be.
+
+I purposefully created a new "for-master" branch on the RISC-V QEMU github repo 
+to avoid touching any of the branches you've been maintaining, and my intent 
+was for all these patches to have come off of "for-upstream" (which IIUC is the 
+RISC-V patch queue).  If I screwed anything up then let me know.
+
+Maybe we can talk about what we're going to do here this afternoon?  I 
+certainly don't want to step on your toes here, but I really would like to get 
+patches to start flowing upstream.
+
+Sorry for the confusion, everyone!
+
+> On Thu, Oct 18, 2018 at 1:01 PM Palmer Dabbelt <palmer@sifive.com> wrote:
+>
+>> On Wed, 17 Oct 2018 16:32:10 PDT (-0700), eblake@redhat.com wrote:
+>> > On 10/17/18 4:54 PM, Palmer Dabbelt wrote:
+>> >> The following changes since commit
+>> 09558375a634e17cea6cfbfec883ac2376d2dc7f:
+>> >>
+>> >>    Merge remote-tracking branch
+>> 'remotes/pmaydell/tags/pull-target-arm-20181016-1' into staging (2018-10-16
+>> 17:42:56 +0100)
+>> >>
+>> >> are available in the Git repository at:
+>> >>
+>> >>    git://github.com/riscv/riscv-qemu.git tags/riscv-for-master-3.1-sf0
+>> >>
+>> >> for you to fetch changes up to 7c28f4da20e5585dce7d575691dac5392b7c6f78:
+>> >>
+>> >>    RISC-V: Don't add NULL bootargs to device-tree (2018-10-17 13:02:30
+>> -0700)
+>> >>
+>> >> ----------------------------------------------------------------
+>> >> First RISC-V Patch Set for the 3.1 Soft Freeze
+>> >>
+>> >
+>> >> ----------------------------------------------------------------
+>> >> Michael Clark (5):
+>> >>        RISC-V: Allow setting and clearing multiple irqs
+>> >>        RISC-V: Move non-ops from op_helper to cpu_helper
+>> >>        RISC-V: Update CSR and interrupt definitions
+>> >>        RISC-V: Add missing free for plic_hart_config
+>> >>        RISC-V: Don't add NULL bootargs to device-tree
+>> >>
+>> >
+>> > Isn't this just a subset of Alistair's pull request?
+>> > https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg02342.html
+>>
+>> Yes, but there's still on-going discussion about the PCIe patches so
+>> they're
+>> not really fully reviewed.  I think part of the trouble here is that there
+>> wasn't someone submitting regular QEMU pull requests so there was always a
+>> rush
+>> to get things in.  I've volunteered to wrangle the branches and submit
+>> weekly
+>> pull requests (just like I do for Linux), so now there won't be any more
+>> big
+>> cliffs.
+>>
+>> We've got a lot of patches to filter through because things have been
+>> backed up
+>> for a bit, so I thought it'd be best to just go with something simple for
+>> this
+>> first week.  Assuming everything gets sorted out for the PCIe patches
+>> they'll
+>> just go up next week -- I'm super excited for them as well :)
+>>
+>> > which included:
+>> >> ----------------------------------------------------------------
+>> >> Alistair Francis (5):
+>> >>       hw/riscv/virt: Increase the number of interrupts
+>> >>       hw/riscv/virt: Connect the gpex PCIe
+>> >>       riscv: Enable VGA and PCIE_VGA
+>> >>       hw/riscv/sifive_u: Connect the Xilinx PCIe
+>> >>       hw/riscv/virt: Connect a VirtIO net PCIe device
+>> >>
+>> >> Michael Clark (5):
+>> >>       RISC-V: Allow setting and clearing multiple irqs
+>> >>       RISC-V: Move non-ops from op_helper to cpu_helper
+>> >>       RISC-V: Update CSR and interrupt definitions
+>> >>       RISC-V: Add missing free for plic_hart_config
+>> >>       RISC-V: Don't add NULL bootargs to device-tree
+>>
