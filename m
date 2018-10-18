@@ -1,27 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41219)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41586)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gD9aS-0002rR-MB
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:47:48 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gD9bg-0003lS-FQ
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:49:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gD9aP-000087-9T
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:47:44 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:46744)
+	(envelope-from <peter.maydell@linaro.org>) id 1gD9bf-0002K5-ND
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:49:00 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:36004)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gD9aP-000077-2S
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:47:41 -0400
-Received: by mail-wr1-f67.google.com with SMTP id n11-v6so33935842wru.13
-	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 07:47:40 -0700 (PDT)
-References: <cover.1539846575.git.artem.k.pisarenko@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b29d3807-6ae3-94c6-aab3-af872a075eb7@redhat.com>
-Date: Thu, 18 Oct 2018 16:47:38 +0200
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gD9bd-0002Ai-SM
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:48:59 -0400
+Received: by mail-ot1-x343.google.com with SMTP id x4so28602818otg.3
+	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 07:48:53 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <cover.1539846575.git.artem.k.pisarenko@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] Fix and improve core RTC function
- and documentation
+In-Reply-To: <6bdbd841-5922-c974-8232-4912a8fd9906@gmail.com>
+References: <20181013025435.25785-1-ehabkost@redhat.com>
+	<20181014173258-mutt-send-email-mst@kernel.org>
+	<20181015181404.GQ31060@habkost.net> <20181016170236.GJ7995@redhat.com>
+	<d8b9a6e6-c137-a553-8fe7-939edd2031b3@redhat.com>
+	<87murdf73g.fsf_-_@dusky.pond.sub.org>
+	<20181017155637.GC31060@habkost.net>
+	<29ed5e33-18d5-7c86-d946-02e96b9bff68@gmail.com>
+	<CAFEAcA_f1yAXLTgK6utBYG5H4woPw5UezgB8Co5aauNu2EA+wg@mail.gmail.com>
+	<20181018143858.GG20424@redhat.com>
+	<CAFEAcA-OyfXgU-NgcSXvUf_KEnAJQYDWAs9=FFLPt7son2W9Ag@mail.gmail.com>
+	<6bdbd841-5922-c974-8232-4912a8fd9906@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 18 Oct 2018 15:48:32 +0100
+Message-ID: <CAFEAcA-bVOJGSquDd_ikSUMs41xfJuHvc_Pp++08sUq5x8O+Gg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] No more chameleon devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,48 +38,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Artem Pisarenko <artem.k.pisarenko@gmail.com>, qemu-devel@nongnu.org
+To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Fabian Deutsch <fdeutsch@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Markus Armbruster <armbru@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Laine Stump <laine@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Andrea Bolognani <abologna@redhat.com>, Cleber Rosa <crosa@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 
-On 18/10/2018 09:12, Artem Pisarenko wrote:
-> Modifications are motivated by bug https://bugs.launchpad.net/qemu/+bug/1797033 I've encountered recently.
-> 
-> Trying to fix it and analyzing its effect on all use cases (not covered in bug report) revealed much deeper problems.
-> This is my first patch to QEMU and I'm not sure whether the way I addressed them is proper.
-> They definitely require either modifications to current implementation (breaking compability), or adding clarifications to user documentation. I've tried to find compromise.
-> Changes I propose are driven mostly by my interpretation of user documentation and comments in code, rather than by existing implementation.
-> 
-> I've splitted patches in a way that at least some of them may be accepted. Following subsets are make sense on their own:
-> - 1
-> - 1,2,3
-> 
-> I limited refactoring only to vl.c, although it leads to reworking of all hw/* rtc models which have unreasonable duplications of actions performed by vl.c.
-> I'm sure such kind of rework will reveal more hidden bugs/features, but so far I've had enough (it's a long story how muсh effort and pain cost me to find that tricky bug above).
-> I suppose just to draw attention of relevant hw/* maintainers.
+On 18 October 2018 at 15:45, Marcel Apfelbaum
+<marcel.apfelbaum@gmail.com> wrote:
+> PCIe machines support PCI devices while PCI machines do not support
+> PCIe devices.
+>
+> I think users of the PCI machines would benefit from having a clear list of
+> supported devices, rather than have to find out if their device
+>  1. Is a hybrid device - QEMU will 'make' it PCI/PCIe
+>  2. Is a PCIe device - would not work on a PCI machine
+>  3. Is a PCI device - all good
 
-Queued, thanks.
+Ah, I see. So, today, of all the devices labelled as "pci" which
+QEMU has, how many of them are in which of those categories?
+(I guess I'm mostly interested in whether what we have is
+mostly really-PCI devices with one or two PCIe devices, or
+if we're currently (mis-)modelling some PCIe devices as hybrid.)
 
-As a start of future refactoring, would you mind moving all this code to
-hw/timer/rtc.c or rtc.c?  It was somewaht generic before, but now it's
-very tied to -rtc.
-
-Paolo
-
-> 
-> v3 changes:
->  - commit messages rewritten/shortened/wrapped to match patch requirements
->  - fixed minor typo
-> v2 changes:
->  - fixed compiler warning caused non-debug build fail
-> 
-> 
-> Artem Pisarenko (4):
->   vl: improve/fix documentation related to RTC function
->   vl: refactor -rtc option references
->   Fixes RTC bug with base datetime shifts in clock=vm
->   vl,qapi: offset calculation in RTC_CHANGE event reverted
-> 
->  qapi/misc.json  |   3 +-
->  qemu-options.hx |  14 +++++---
->  vl.c            | 105 +++++++++++++++++++++++++++++++++++++-------------------
->  3 files changed, 80 insertions(+), 42 deletions(-)
-> 
+thanks
+-- PMM
