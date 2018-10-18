@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43290)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gCwbM-0004lC-Tu
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 20:55:49 -0400
+	(envelope-from <pagupta@redhat.com>) id 1gCxMz-0007bQ-L0
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 21:45:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gCwbL-00080w-Pd
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 20:55:48 -0400
-Date: Thu, 18 Oct 2018 08:55:16 +0800 (CST)
-Message-ID: <201810180855169525575@zte.com.cn>
-In-Reply-To: <61bc5059-e7b1-3371-66b3-5bc10d06935b@redhat.com>
-References: 1539768207-18209-1-git-send-email-peng.hao2@zte.com.cn,
-	61bc5059-e7b1-3371-66b3-5bc10d06935b@redhat.com
-Mime-Version: 1.0
-From: <peng.hao2@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel]
- =?utf-8?q?=5BPATCH=5D_target/arm_=3A_add_pvpanic_mm?=
- =?utf-8?q?io_device?=
+	(envelope-from <pagupta@redhat.com>) id 1gCxMs-0007kv-7t
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 21:44:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36042)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1gCxMq-0007fa-7r
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 21:44:53 -0400
+Date: Wed, 17 Oct 2018 21:44:49 -0400 (EDT)
+From: Pankaj Gupta <pagupta@redhat.com>
+Message-ID: <130749719.21742520.1539827089099.JavaMail.zimbra@redhat.com>
+In-Reply-To: <CAPcyv4joz_dPruJY4CYAxXSuMTD-NUoqm6kvGFrF19jt5dN=rg@mail.gmail.com>
+References: <20181013050021.11962-1-pagupta@redhat.com>
+	<20181013050021.11962-3-pagupta@redhat.com>
+	<CAPcyv4hroaVWA-HgjWCnr7QTd_y7U8sCvS+Up733ttnD6_cKzQ@mail.gmail.com>
+	<431127218.21694133.1539803509205.JavaMail.zimbra@redhat.com>
+	<CAPcyv4joz_dPruJY4CYAxXSuMTD-NUoqm6kvGFrF19jt5dN=rg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] virtio-pmem: Add virtio pmem driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,96 +30,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: philmd@redhat.com
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+To: Dan Williams <dan.j.williams@intel.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, Jan Kara <jack@suse.cz>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, KVM list <kvm@vger.kernel.org>, Rik van Riel <riel@surriel.com>, linux-nvdimm <linux-nvdimm@ml01.01.org>, David Hildenbrand <david@redhat.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, Christoph Hellwig <hch@infradead.org>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Vishal L Verma <vishal.l.verma@intel.com>, zwisler@kernel.org, Dave Jiang <dave.jiang@intel.com>, lcapitulino@redhat.com
 
-PkhpIFBlbmcsCj4KPk9uIDE3LzEwLzIwMTggMTE6MjMsIFBlbmcgSGFvIHdyb3RlOgo+PiBBZGQg
-cHZwYW5pYyBtbWlvIGRldmljZSB0aGF0IGlzIHNpbWlsYXIgdG8geDg2J3MgcHZwYW5pYyBkZXZp
-Y2UuCj4KPj4KPj4gU2lnbmVkLW9mZi1ieTogUGVuZyBIYW8gPHBlbmcuaGFvMkB6dGUuY29tLmNu
-Pgo+PiAtLS0KPj4gIGRlZmF1bHQtY29uZmlncy9hcm0tc29mdG1tdS5tYWsgfCAgMiArLQo+PiAg
-aHcvYXJtL3ZpcnQuYyAgICAgICAgICAgICAgICAgICB8IDIxICsrKysrKysrKysrKwo+PiAgaHcv
-bWlzYy9NYWtlZmlsZS5vYmpzICAgICAgICAgICB8ICAxICsKPj4gIGh3L21pc2MvcHZwYW5pYy1t
-bWlvLmMgICAgICAgICAgfCA3NiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKwo+PiAgaW5jbHVkZS9ody9hcm0vdmlydC5oICAgICAgICAgICB8ICAxICsKPj4gIGluY2x1
-ZGUvaHcvbWlzYy9wdnBhbmljLW1taW8uaCAgfCAxMiArKysrKysrCj4+ICA2IGZpbGVzIGNoYW5n
-ZWQsIDExMiBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pCj4+ICBjcmVhdGUgbW9kZSAxMDA2
-NDQgaHcvbWlzYy9wdnBhbmljLW1taW8uYwo+PiAgY3JlYXRlIG1vZGUgMTAwNjQ0IGluY2x1ZGUv
-aHcvbWlzYy9wdnBhbmljLW1taW8uaAo+Pgo+PiBkaWZmIC0tZ2l0IGEvZGVmYXVsdC1jb25maWdz
-L2FybS1zb2Z0bW11Lm1hayBiL2RlZmF1bHQtY29uZmlncy9hcm0tc29mdG1tdS5tYWsKPj4gaW5k
-ZXggMjQyMDQ5MS4uNDcxM2M5MiAxMDA2NDQKPj4gLS0tIGEvZGVmYXVsdC1jb25maWdzL2FybS1z
-b2Z0bW11Lm1hawo+PiArKysgYi9kZWZhdWx0LWNvbmZpZ3MvYXJtLXNvZnRtbXUubWFrCj4+IEBA
-IC00Myw3ICs0Myw3IEBAIENPTkZJR19VU0JfTVVTQj15Cj4+ICBDT05GSUdfVVNCX0VIQ0lfU1lT
-QlVTPXkKPj4gIENPTkZJR19QTEFURk9STV9CVVM9eQo+PiAgQ09ORklHX1ZJUlRJT19NTUlPPXkK
-Pj4gLQo+PiArQ09ORklHX1BWUEFOSUNfTU1JTz15Cj4+ICBDT05GSUdfQVJNMTFNUENPUkU9eQo+
-PiAgQ09ORklHX0E5TVBDT1JFPXkKPj4gIENPTkZJR19BMTVNUENPUkU9eQo+PiBkaWZmIC0tZ2l0
-IGEvaHcvYXJtL3ZpcnQuYyBiL2h3L2FybS92aXJ0LmMKPj4gaW5kZXggYTQ3MjU2Ni4uYWI0MTEy
-OCAxMDA2NDQKPj4gLS0tIGEvaHcvYXJtL3ZpcnQuYwo+PiArKysgYi9ody9hcm0vdmlydC5jCj4+
-IEBAIC0xNDAsNiArMTQwLDcgQEAgc3RhdGljIGNvbnN0IE1lbU1hcEVudHJ5IGExNW1lbW1hcFtd
-ID0gewo+PiAgICAgIFtWSVJUX1VBUlRdID0gICAgICAgICAgICAgICB7IDB4MDkwMDAwMDAsIDB4
-MDAwMDEwMDAgfSwKPj4gICAgICBbVklSVF9SVENdID0gICAgICAgICAgICAgICAgeyAweDA5MDEw
-MDAwLCAweDAwMDAxMDAwIH0sCj4+ICAgICAgW1ZJUlRfRldfQ0ZHXSA9ICAgICAgICAgICAgIHsg
-MHgwOTAyMDAwMCwgMHgwMDAwMDAxOCB9LAo+PiArICAgIFtWSVJUX1BWUEFOSUNfTU1JT10gPSAg
-ICAgICB7IDB4MDkwMjAwMTgsIDB4MDAwMDAwMDIgfSwKPj4gICAgICBbVklSVF9HUElPXSA9ICAg
-ICAgICAgICAgICAgeyAweDA5MDMwMDAwLCAweDAwMDAxMDAwIH0sCj4+ICAgICAgW1ZJUlRfU0VD
-VVJFX1VBUlRdID0gICAgICAgIHsgMHgwOTA0MDAwMCwgMHgwMDAwMTAwMCB9LAo+PiAgICAgIFtW
-SVJUX1NNTVVdID0gICAgICAgICAgICAgICB7IDB4MDkwNTAwMDAsIDB4MDAwMjAwMDAgfSwKPj4g
-QEAgLTc5OCw2ICs3OTksMjQgQEAgc3RhdGljIHZvaWQgY3JlYXRlX2dwaW8oY29uc3QgVmlydE1h
-Y2hpbmVTdGF0ZSAqdm1zLCBxZW11X2lycSAqcGljKQo+PiAgICAgIGdfZnJlZShub2RlbmFtZSk7
-Cj4+ICB9Cj4+Cj4+ICtzdGF0aWMgdm9pZCBjcmVhdGVfcHZwYW5pY19kZXZpY2UoY29uc3QgVmly
-dE1hY2hpbmVTdGF0ZSAqdm1zKQo+PiArewo+PiArICAgIGNoYXIgKm5vZGVuYW1lOwo+PiArICAg
-IGh3YWRkciBiYXNlID0gdm1zLT5tZW1tYXBbVklSVF9QVlBBTklDX01NSU9dLmJhc2U7Cj4+ICsg
-ICAgaHdhZGRyIHNpemUgPSB2bXMtPm1lbW1hcFtWSVJUX1BWUEFOSUNfTU1JT10uc2l6ZTsKPj4g
-Kwo+PiArICAgIHN5c2J1c19jcmVhdGVfc2ltcGxlKCJwdnBhbmljLW1taW8iLCBiYXNlLCBOVUxM
-KTsKPj4gKwo+PiArICAgIG5vZGVuYW1lID0gZ19zdHJkdXBfcHJpbnRmKCIvcHZwYW5pYy1tbWlv
-QCUiIFBSSXg2NCwgYmFzZSk7Cj4+ICsgICAgcWVtdV9mZHRfYWRkX3N1Ym5vZGUodm1zLT5mZHQs
-IG5vZGVuYW1lKTsKPj4gKyAgICBxZW11X2ZkdF9zZXRwcm9wX3N0cmluZyh2bXMtPmZkdCwgbm9k
-ZW5hbWUsCj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgImNvbXBhdGlibGUiLCAicHZw
-YW5pYyxtbWlvIik7Cj4+ICsgICAgcWVtdV9mZHRfc2V0cHJvcF9zaXplZF9jZWxscyh2bXMtPmZk
-dCwgbm9kZW5hbWUsICJyZWciLAo+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-MiwgYmFzZSwgMiwgc2l6ZSk7Cj4+ICsgICAgZ19mcmVlKG5vZGVuYW1lKTsKPj4gKwo+PiArfQo+
-PiArCj4+ICBzdGF0aWMgdm9pZCBjcmVhdGVfdmlydGlvX2RldmljZXMoY29uc3QgVmlydE1hY2hp
-bmVTdGF0ZSAqdm1zLCBxZW11X2lycSAqcGljKQo+PiAgewo+PiAgICAgIGludCBpOwo+PiBAQCAt
-MTU0NCw2ICsxNTYzLDggQEAgc3RhdGljIHZvaWQgbWFjaHZpcnRfaW5pdChNYWNoaW5lU3RhdGUg
-Km1hY2hpbmUpCj4+Cj4+ICAgICAgY3JlYXRlX3BjaWUodm1zLCBwaWMpOwo+Pgo+PiArICAgIGNy
-ZWF0ZV9wdnBhbmljX2RldmljZSh2bXMpOwo+PiArCj4+ICAgICAgY3JlYXRlX2dwaW8odm1zLCBw
-aWMpOwo+Pgo+PiAgICAgIC8qIENyZWF0ZSBtbWlvIHRyYW5zcG9ydHMsIHNvIHRoZSB1c2VyIGNh
-biBjcmVhdGUgdmlydGlvIGJhY2tlbmRzCj4+IGRpZmYgLS1naXQgYS9ody9taXNjL01ha2VmaWxl
-Lm9ianMgYi9ody9taXNjL01ha2VmaWxlLm9ianMKPj4gaW5kZXggNmQ1MGIwMy4uNjMyNjI2MCAx
-MDA2NDQKPj4gLS0tIGEvaHcvbWlzYy9NYWtlZmlsZS5vYmpzCj4+ICsrKyBiL2h3L21pc2MvTWFr
-ZWZpbGUub2Jqcwo+PiBAQCAtNzEsNiArNzEsNyBAQCBvYmotJChDT05GSUdfSU9US0lUX1NZU0NU
-TCkgKz0gaW90a2l0LXN5c2N0bC5vCj4+ICBvYmotJChDT05GSUdfSU9US0lUX1NZU0lORk8pICs9
-IGlvdGtpdC1zeXNpbmZvLm8KPj4KPj4gIG9iai0kKENPTkZJR19QVlBBTklDKSArPSBwdnBhbmlj
-Lm8KPj4gK29iai0kKENPTkZJR19QVlBBTklDX01NSU8pICs9IHB2cGFuaWMtbW1pby5vCj4+ICBv
-YmotJChDT05GSUdfSFlQRVJWX1RFU1RERVYpICs9IGh5cGVydl90ZXN0ZGV2Lm8KPj4gIG9iai0k
-KENPTkZJR19BVVgpICs9IGF1eGJ1cy5vCj4+ICBvYmotJChDT05GSUdfQVNQRUVEX1NPQykgKz0g
-YXNwZWVkX3NjdS5vIGFzcGVlZF9zZG1jLm8KPj4gZGlmZiAtLWdpdCBhL2h3L21pc2MvcHZwYW5p
-Yy1tbWlvLmMgYi9ody9taXNjL3B2cGFuaWMtbW1pby5jCj4+IG5ldyBmaWxlIG1vZGUgMTAwNjQ0
-Cj4+IGluZGV4IDAwMDAwMDAuLmM3ZjM3M2UKPj4gLS0tIC9kZXYvbnVsbAo+PiArKysgYi9ody9t
-aXNjL3B2cGFuaWMtbW1pby5jCj4+IEBAIC0wLDAgKzEsNzYgQEAKPj4gKyNpbmNsdWRlICJxZW11
-L29zZGVwLmgiCj4+ICsjaW5jbHVkZSAic3lzZW11L3N5c2VtdS5oIgo+PiArI2luY2x1ZGUgInFl
-bXUvbG9nLmgiCj4+ICsjaW5jbHVkZSAiaHcvbWlzYy9wdnBhbmljLW1taW8uaCIKPj4gKwo+PiAr
-I2RlZmluZSBQVlBBTklDX01NSU9fRkVBVF9DUkFTSEVEICAgICAgMAo+PiArCj4+ICsjZGVmaW5l
-IFBWUEFOSUNfTU1JT19DUkFTSEVEICAgICAgICAoMSA8PCBQVlBBTklDX01NSU9fRkVBVF9DUkFT
-SEVEKQo+PiArCj4+ICtzdGF0aWMgdm9pZCBoYW5kbGVfbW1pb19ldmVudChpbnQgZXZlbnQpCj4+
-ICt7Cj4+ICsgICAgc3RhdGljIGJvb2wgbG9nZ2VkOwo+PiArCj4+ICsgICAgaWYgKGV2ZW50ICYg
-flBWUEFOSUNfTU1JT19DUkFTSEVEICYmICFsb2dnZWQpIHsKPj4gKyAgICAgICAgcWVtdV9sb2df
-bWFzayhMT0dfR1VFU1RfRVJST1IsICJwdnBhbmljLW1taW86IHVua25vd24gZXZlbnQgJSN4Llxu
-IiwgZXZlbnQpOwo+PiArICAgICAgICBsb2dnZWQgPSB0cnVlOwo+PiArICAgIH0KPj4gKwo+PiAr
-ICAgIGlmIChldmVudCAmIFBWUEFOSUNfTU1JT19DUkFTSEVEKSB7Cj4+ICsgICAgICAgIHFlbXVf
-c3lzdGVtX2d1ZXN0X3Bhbmlja2VkKE5VTEwpOwo+PiArICAgICAgICByZXR1cm47Cj4+ICsgICAg
-fQo+Cj5JdCB3b3VsZCBiZSBlYXNpZXIgdG8gbWFpbnRhaW4gYSBzaW5nbGUgcHZwYW5pYyBkZXZp
-Y2UuIFRoZXJlIGlzIG5vCj5pbXByb3ZlbWVudCBoZXJlLCBpdCBpcyB0aGUgc2FtZSBoYW5kbGVy
-IHRoYW4gJ3B2cGFuaWMuYycuCj4KPlRoZSBjdXJyZW50IHB2cGFuaWMgZGV2aWNlIGlzIG5vdCB4
-ODYtb25seSwgaXQgb25seSBpbXBsZW1lbnRzIHRoZQo+aW9wb3J0IEFQSS4KQnV0IGluIGxpbnV4
-IGtlcm5lbCB0aGUgZHJpdmVyIG9mIHB2cGFuaWMgZGV2aWNlIGlzIHg4Ni1vbmx5LgoKPklmIHlv
-dSB3YW50IHRvIHVzZSB0aGUgbW1pbyBBUEksIHBsZWFzZSBhZGQgaXQgdGhlcmUuCj5CYXNpY2Fs
-bHkgeW91IGRvbid0IGhhdmUgdG8gd3JpdGUgYW55IG1vcmUgY29kZSB0aGF0IGluIHRoaXMgcGF0
-Y2gsIGJ1dAo+anVzdCBtb3ZlIGl0IGluIHRoZSBwdnBhbmljLmMgZmlsZS4KSSB3YW50IHRvIHVz
-ZSBwdnBhbmljIGRpcmVjdGx5IGluc3RlYWQgb2YgYWRkaW5nIGEgbmV3IGRldmljZSBlbXVsYXRp
-b24uCkJ1dCBJIGNhbid0IHVzZSBpdC4gRmlyc3RseSBwdnBhbmljIHVzZSBpb3BvcnQsIGJ1dCBh
-cm0gZG9uJ3Qgc3VwcG9ydCBpb3BvcnQuCnNlY29uZGx5IHB2cGFuaWMgZGV2aWNlIGlzIGVtdWxh
-dGVkIGFzIGEgaXNhIGJ1cyBkZXZpY2UsIGJ1dCBhcm0gZG9uJ3Qgc3VwcG9ydAppc2EgYnVzLgp0
-aGlyZGx5IHRoZSByZWFsaXphdGlvbiBvZiBwdnBhbmljIGRldmljZSBpcyBkZXBlbmRzIG9uIEFD
-UEkgaW4gbGludXgga2VybmVsIGRyaXZlciBhbmQgaW4gcWVtdQp0aGUgcG9ydCBpbmZvIGlzIHBh
-c3NlZCB0aHJvdWdoIEFDUEkgLCBidXQgSXQgaXMgbm90IG5lY2Vzc2FyeSB0byBjb25maWd1cmUg
-QUNQSSBmb3IgYXJtIGd1ZXN0LiAKClRoYW5rcy4KPgo+VGhhbmtzLAo+Cj5QaGlsLg==
+
+> >
+> >
+> > > On Fri, Oct 12, 2018 at 10:01 PM Pankaj Gupta <pagupta@redhat.com> wrote:
+> > > >
+> > > > This patch adds virtio-pmem driver for KVM guest.
+> > > >
+> > > > Guest reads the persistent memory range information from
+> > > > Qemu over VIRTIO and registers it on nvdimm_bus. It also
+> > > > creates a nd_region object with the persistent memory
+> > > > range information so that existing 'nvdimm/pmem' driver
+> > > > can reserve this into system memory map. This way
+> > > > 'virtio-pmem' driver uses existing functionality of pmem
+> > > > driver to register persistent memory compatible for DAX
+> > > > capable filesystems.
+> > > >
+> > > > This also provides function to perform guest flush over
+> > > > VIRTIO from 'pmem' driver when userspace performs flush
+> > > > on DAX memory range.
+> > >
+> > > Before we can move forward with this driver we need additional
+> > > filesystem enabling to detect when the backing device is fronting DAX
+> > > pmem or a paravirtualized page cache through virtio-pmem. Any
+> > > interface that requires fsync() and a round trip to the hypervisor to
+> > > flush host page cache is not DAX.
+> >
+> > I saw your proposal[1] for new mmap flag MAP_DIRECT. IIUIC mapping should
+> > fail for
+> > MAP_DIRECT if it requires explicit flush or buffer indirection. So, if we
+> > disable
+> > MAP_SYNC flag for virtio-pmem this should fail MAP_DIRECT as well?
+> > Otherwise
+> > without MAP_DIRECT, virtio-pmem should be defaulted to VIRTIO flush
+> > mechanism.
+> 
+> Right, although I wouldn't worry about MAP_DIRECT in the short term
+> since we're still discussing what the upstream interface. Regardless
+> of whether MAP_DIRECT is specified or not the virtio-flush mechanism
+> would always be used for virtio-pmem. I.e. there is no possibility to
+> get full DAX operation with virtio-pmem, only the page-cache bypass
+> sub-set.
+
+Agree. I will also follow the thread.
+
+> 
+> Taking a look at where we could inject this check for filesystems it's
+> a bit awkward to do it in xfs_file_mmap() for example because we do
+> not have the backing device for the extents of the inode. So at a
+> minimum you would need to investigate calling xfs_inode_supports_dax()
+> from that path and teaching it about a new dax_device flag. I'm
+> thinking the dax_device flag should be called DAXDEV_BUFFERED to
+> indicate the presence of software buffering on a device that otherwise
+> supports bypassing the local page cache.
+
+Sure. Will investigate XFS code as suggested. 
+Thanks for the detail directions towards the solution. Will try to come up 
+with a solution.
+
+Best regards,
+Pankaj
+  
