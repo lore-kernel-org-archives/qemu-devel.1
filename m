@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35596)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gD69I-0002dG-1T
+	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gD69H-0002d9-SQ
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 07:07:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gD69E-000052-S4
+	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gD69E-0008WJ-Hr
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 07:07:27 -0400
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:33806)
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:37623)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <artem.k.pisarenko@gmail.com>)
-	id 1gD69E-0008VY-IE
+	id 1gD69E-0008Sn-3q
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 07:07:24 -0400
-Received: by mail-lj1-x242.google.com with SMTP id j17-v6so27323468lja.1
-	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 04:07:24 -0700 (PDT)
+Received: by mail-lj1-x244.google.com with SMTP id 63-v6so27319721ljs.4
+	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 04:07:18 -0700 (PDT)
 From: Artem Pisarenko <artem.k.pisarenko@gmail.com>
-Date: Thu, 18 Oct 2018 17:04:30 +0600
-Message-Id: <f7e05cd91086858f52f1f8c03581d6f04f116bb9.1539860473.git.artem.k.pisarenko@gmail.com>
-In-Reply-To: <cover.1539860473.git.artem.k.pisarenko@gmail.com>
-References: <cover.1539860473.git.artem.k.pisarenko@gmail.com>
-In-Reply-To: <cover.1539860473.git.artem.k.pisarenko@gmail.com>
-References: <cover.1539860473.git.artem.k.pisarenko@gmail.com>
-Subject: [Qemu-devel] [PATCH v3 3/4] Restores record/replay behavior related
- to special virtual clock processing for timers used in external subsystems.
+Date: Thu, 18 Oct 2018 17:04:27 +0600
+Message-Id: <cover.1539860473.git.artem.k.pisarenko@gmail.com>
+Subject: [Qemu-devel] [PATCH v3 0/4] Introduce attributes for timers
+ subsystem and remove QEMU_CLOCK_VIRTUAL_EXT clock type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,173 +26,55 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Paolo Bonzini <pbonzini@redhat.com>, Artem Pisarenko <artem.k.pisarenko@gmail.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jan Kiszka <jan.kiszka@siemens.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Paolo Bonzini <pbonzini@redhat.com>, Artem Pisarenko <artem.k.pisarenko@gmail.com>
 
-Adds EXTERNAL attribute definition to qemu timers subsystem and assigns it to virtual clock timers, used in slirp (ICMP IPv6) and ui (key queue).
-Virtual clock processing in rr mode reimplemented using this attribute.
+Recent patches from series [PATCH v6] "Fixing record/replay and adding reverse debugging" introduced new clock type QEMU_CLOCK_VIRTUAL_EXT and replaced virtual timers in some external subsystems with it.
+This resulted in small change to existing behavior, which I consider to be unacceptable.
+Processing of virtual timers, belonging to new clock type, was kicked off to main loop, which made them asynchronous with vCPU thread and, in icount mode, with whole guest execution. This breaks expected determinism in non-record/replay icount mode of emulation where these "external subsystems" are isolated from host (i.e. they external only to guest core, not to emulation environment).
 
-Fixes: 87f4fe7653baf55b5c2f2753fe6003f473c07342
-Fixes: 775a412bf83f6bc0c5c02091ee06cf649b34c593
-Fixes: 9888091404a702d7ec79d51b088d994b9fc121bd
-Signed-off-by: Artem Pisarenko <artem.k.pisarenko@gmail.com>
----
- include/qemu/timer.h | 11 ++++++++++-
- slirp/ip6_icmp.c     |  4 +++-
- ui/input.c           |  5 +++--
- util/qemu-timer.c    | 50 +++++++++++++++++++++++++++++++++++++++++++-------
- 4 files changed, 59 insertions(+), 11 deletions(-)
+Example for slirp ("user" backend for network device):
+User runs qemu in icount mode with rtc clock=vm without any external communication interfaces but with "-netdev user,restrict=on". It expects deterministic execution, because network services are emulated inside qemu and isolated from host. There are no reasons to get reply from DHCP server with different delay or something like that.
 
-diff --git a/include/qemu/timer.h b/include/qemu/timer.h
-index d45aded..dc0fd14 100644
---- a/include/qemu/timer.h
-+++ b/include/qemu/timer.h
-@@ -2,6 +2,7 @@
- #define QEMU_TIMER_H
- 
- #include "qemu-common.h"
-+#include "qemu/bitops.h"
- #include "qemu/notify.h"
- #include "qemu/host-utils.h"
- 
-@@ -59,9 +60,17 @@ typedef enum {
-  * Each attribute corresponds to one bit. Attributes modify the processing
-  * of timers when they fire.
-  *
-- * No attributes defined currently.
-+ * The following attributes are available:
-+ *
-+ * QEMU_TIMER_ATTR_EXTERNAL: drives external subsystem
-+ *
-+ * Timers with this attribute do not recorded in rr mode, therefore it could be
-+ * used for the subsystems that operate outside the guest core. Applicable only
-+ * with virtual clock type.
-  */
- 
-+#define QEMU_TIMER_ATTR_EXTERNAL BIT(0)
-+
- typedef struct QEMUTimerList QEMUTimerList;
- 
- struct QEMUTimerListGroup {
-diff --git a/slirp/ip6_icmp.c b/slirp/ip6_icmp.c
-index ee333d0..cd1e0b9 100644
---- a/slirp/ip6_icmp.c
-+++ b/slirp/ip6_icmp.c
-@@ -27,7 +27,9 @@ void icmp6_init(Slirp *slirp)
-         return;
-     }
- 
--    slirp->ra_timer = timer_new_ms(QEMU_CLOCK_VIRTUAL, ra_timer_handler, slirp);
-+    slirp->ra_timer = timer_new_full(NULL, QEMU_CLOCK_VIRTUAL,
-+                                     SCALE_MS, QEMU_TIMER_ATTR_EXTERNAL,
-+                                     ra_timer_handler, slirp);
-     timer_mod(slirp->ra_timer,
-               qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + NDP_Interval);
- }
-diff --git a/ui/input.c b/ui/input.c
-index 51b1019..7c9a410 100644
---- a/ui/input.c
-+++ b/ui/input.c
-@@ -448,8 +448,9 @@ void qemu_input_event_send_key_delay(uint32_t delay_ms)
-     }
- 
-     if (!kbd_timer) {
--        kbd_timer = timer_new_ms(QEMU_CLOCK_VIRTUAL, qemu_input_queue_process,
--                                 &kbd_queue);
-+        kbd_timer = timer_new_full(NULL, QEMU_CLOCK_VIRTUAL,
-+                                   SCALE_MS, QEMU_TIMER_ATTR_EXTERNAL,
-+                                   qemu_input_queue_process, &kbd_queue);
-     }
-     if (queue_count < queue_limit) {
-         qemu_input_queue_delay(&kbd_queue, kbd_timer,
-diff --git a/util/qemu-timer.c b/util/qemu-timer.c
-index 04527a3..e2746cf 100644
---- a/util/qemu-timer.c
-+++ b/util/qemu-timer.c
-@@ -489,6 +489,7 @@ bool timerlist_run_timers(QEMUTimerList *timer_list)
-     bool progress = false;
-     QEMUTimerCB *cb;
-     void *opaque;
-+    bool need_replay_checkpoint = false;
- 
-     if (!atomic_read(&timer_list->active_timers)) {
-         return false;
-@@ -504,8 +505,15 @@ bool timerlist_run_timers(QEMUTimerList *timer_list)
-         break;
-     default:
-     case QEMU_CLOCK_VIRTUAL:
--        if (!replay_checkpoint(CHECKPOINT_CLOCK_VIRTUAL)) {
--            goto out;
-+        if (replay_mode != REPLAY_MODE_NONE) {
-+            /* Checkpoint for virtual clock is redundant in cases where
-+             * it's being triggered with only non-EXTERNAL timers, because
-+             * these timers don't change guest state directly.
-+             * Since it has conditional dependence on specific timers, it is
-+             * subject to race conditions and requires special handling.
-+             * See below.
-+             */
-+            need_replay_checkpoint = true;
-         }
-         break;
-     case QEMU_CLOCK_HOST:
-@@ -520,13 +528,38 @@ bool timerlist_run_timers(QEMUTimerList *timer_list)
-         break;
-     }
- 
-+    /*
-+     * Extract expired timers from active timers list and and process them.
-+     *
-+     * In rr mode we need "filtered" checkpointing for virtual clock.
-+     * Checkpoint must be replayed before any non-EXTERNAL timer has been
-+     * processed and only one time (virtual clock value stays same). But these
-+     * timers may appear in the timers list while it being processed, so this
-+     * must be checked until we finally decide that "no timers left - we are
-+     * done".
-+     */
-     current_time = qemu_clock_get_ns(timer_list->clock->type);
--    for(;;) {
--        qemu_mutex_lock(&timer_list->active_timers_lock);
--        ts = timer_list->active_timers;
-+    qemu_mutex_lock(&timer_list->active_timers_lock);
-+    while ((ts = timer_list->active_timers)) {
-         if (!timer_expired_ns(ts, current_time)) {
-+            /* No expired timers left.
-+             * (If rr checkpoint was needed, it either already handled,
-+             *  or may be skipped.) */
-+            break;
-+        }
-+        if (need_replay_checkpoint
-+                && !(ts->attributes & QEMU_TIMER_ATTR_EXTERNAL)) {
-+            /* once we got here, checkpoint clock only once */
-+            need_replay_checkpoint = false;
-             qemu_mutex_unlock(&timer_list->active_timers_lock);
--            break;
-+            if (!replay_checkpoint(CHECKPOINT_CLOCK_VIRTUAL)) {
-+                goto out;
-+            }
-+            qemu_mutex_lock(&timer_list->active_timers_lock);
-+            /* it's better to start over again,
-+             * just in case if timer list was modified
-+             */
-+            continue;
-         }
- 
-         /* remove timer from the list before calling the callback */
-@@ -535,12 +568,15 @@ bool timerlist_run_timers(QEMUTimerList *timer_list)
-         ts->expire_time = -1;
-         cb = ts->cb;
-         opaque = ts->opaque;
--        qemu_mutex_unlock(&timer_list->active_timers_lock);
- 
-         /* run the callback (the timer list can be modified) */
-+        qemu_mutex_unlock(&timer_list->active_timers_lock);
-         cb(opaque);
-+        qemu_mutex_lock(&timer_list->active_timers_lock);
-+
-         progress = true;
-     }
-+    qemu_mutex_unlock(&timer_list->active_timers_lock);
- 
- out:
-     qemu_event_set(&timer_list->timers_done_ev);
+These series of patches revert those commits and reimplement their modifications in a better way.
+
+Current implementation of timers/clock processing is confusing (at least for me) because of exceptions from design concept behind them, which already introduced by icount mode (which adds QEMU_CLOCK_VIRTUAL_RT). Adding QEMU_CLOCK_VIRTUAL_EXT just made things even more complicated. I consider these "alternative" virtual clocks to be some kind of hacks being convinient only to authors of relevant qemu features. Lets don't touch fundamental clock types and keep them orthogonal to special cases of timers handling.
+
+As far as I understand, original intention of author was just to make optimization in replay log by avoiding storing extra events which don't change guest state directly. Indeed, for example, ipv6 icmp timer in slirp does things which external to guest core and ends with sending network packet to guest, but record/replay will anyway catch event, corresponding to packet reception in guest network frontend, and store it to replay log, so there are no need in making checkpoint for corresponding clock when that timer fires.
+If so, then we just need to skip checkpoints for clock values, when only these specific timers are run. It is individual timers which are specific, not clock.
+Adding some kind of attribute/flag/property to individual timer allows any special qemu feature (such as record/replay) to inspect it and handle as needed. This design achieves less dependencies, more transparency and has more intuitive and clear sense. For record/replay feature it's achieved with 'EXTERNAL' attribute. The only drawback is that it required to add one extra mutex unlock/lock pair for virtual clock type in timerlist_run_timers() function (see patch 3), but it's being added only when qemu runs in record/replay mode.
+
+Finally, this patch series optimizes checkpointing for all other clocks it applies to.
+
+
+v3 changes:
+ - fixed failed build in last patch
+ - attributes has been refactored and restricted to be used only within qemu-timer (as suggested by Stefan Hajnoczi and Paolo Bonzini)
+
+v2 changes:
+ - timers/aio interface refactored and improved, addition to couroutines removed (as Paolo Bonzini suggested)
+ - fixed wrong reimplementation in qemu-timer.c caused race conditions
+ - added bonus patch which optimizes checkpointing for other clocks
+
+P.S. I've tried to test record/replay with slirp, but in replay mode qemu stucks at guest linux boot after "Configuring network interfaces..." message, where DHCP communication takes place. It's broken in a same way both in master and master with reverted commits being fixed.
+
+P.S.2. I wasn't able to test these patches on purely clean master branch because of bugs https://bugs.launchpad.net/qemu/+bug/1790460 and https://bugs.launchpad.net/qemu/+bug/1795369, which workarounded by several not-accepted (yet?) modifications.
+
+
+Artem Pisarenko (4):
+  Revert some patches from recent [PATCH v6] "Fixing record/replay and
+    adding reverse debugging"
+  Introduce attributes to qemu timer subsystem
+  Restores record/replay behavior related to special virtual clock
+    processing for timers used in external subsystems.
+  Optimize record/replay checkpointing for all clocks it applies to
+
+ include/block/aio.h       |  59 ++++++++++++++++++---
+ include/qemu/timer.h      | 128 +++++++++++++++++++++++-----------------------
+ slirp/ip6_icmp.c          |   9 ++--
+ tests/ptimer-test-stubs.c |  13 +++--
+ ui/input.c                |   9 ++--
+ util/qemu-timer.c         |  95 +++++++++++++++++++++++-----------
+ 6 files changed, 201 insertions(+), 112 deletions(-)
+
 -- 
 2.7.4
