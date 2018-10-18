@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48522)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gDEyg-0007qI-SF
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:33:07 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gDEyr-0008DL-R4
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:33:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gDEyf-0006fn-PJ
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:33:06 -0400
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:42135)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gDEyk-0006jH-Et
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:33:12 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43362)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gDEyf-0006f1-Fh
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:33:05 -0400
-Received: by mail-wr1-x429.google.com with SMTP id r17-v6so2746659wrt.9
-	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 13:33:05 -0700 (PDT)
+	id 1gDEyi-0006ha-Tj
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:33:10 -0400
+Received: by mail-wr1-x441.google.com with SMTP id n1-v6so35103031wrt.10
+	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 13:33:08 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 18 Oct 2018 22:32:10 +0200
-Message-Id: <1539894735-14232-44-git-send-email-pbonzini@redhat.com>
+Date: Thu, 18 Oct 2018 22:32:13 +0200
+Message-Id: <1539894735-14232-47-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1539894735-14232-1-git-send-email-pbonzini@redhat.com>
 References: <1539894735-14232-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 43/48] hyperv: process SIGNAL_EVENT hypercall
+Subject: [Qemu-devel] [PULL 46/48] hyperv_testdev: add SynIC message and
+ event testmodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,194 +33,239 @@ Cc: Roman Kagan <rkagan@virtuozzo.com>
 
 From: Roman Kagan <rkagan@virtuozzo.com>
 
-Add handling of SIGNAL_EVENT hypercall.  For that, provide an interface
-to associate an EventNotifier with an event connection number, so that
-it's signaled when the SIGNAL_EVENT hypercall with the matching
-connection ID is called by the guest.
-
-Support for using KVM functionality for this will be added in a followup
-patch.
+Add testmodes for SynIC messages and events.  The message or event
+connection setup / teardown is initiated by the guest via new control
+codes written to the test device port.  Then the test connections bounce
+the respective operations back to the guest, i.e. the incoming messages
+are posted or the incoming events are signaled on the configured vCPUs.
 
 Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
-Message-Id: <20180921082217.29481-8-rkagan@virtuozzo.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/hyperv/hyperv.c               | 93 ++++++++++++++++++++++++++++++++++++++++
- include/hw/hyperv/hyperv-proto.h |  1 +
- include/hw/hyperv/hyperv.h       | 13 ++++++
- target/i386/hyperv.c             | 10 +++--
- 4 files changed, 113 insertions(+), 4 deletions(-)
+ hw/hyperv/hyperv_testdev.c | 165 ++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 164 insertions(+), 1 deletion(-)
 
-diff --git a/hw/hyperv/hyperv.c b/hw/hyperv/hyperv.c
-index 2b0e593..d745016 100644
---- a/hw/hyperv/hyperv.c
-+++ b/hw/hyperv/hyperv.c
-@@ -13,6 +13,9 @@
- #include "exec/address-spaces.h"
- #include "sysemu/kvm.h"
- #include "qemu/bitops.h"
-+#include "qemu/queue.h"
-+#include "qemu/rcu.h"
-+#include "qemu/rcu_queue.h"
- #include "hw/hyperv/hyperv.h"
+diff --git a/hw/hyperv/hyperv_testdev.c b/hw/hyperv/hyperv_testdev.c
+index fc3f6c5..4880333 100644
+--- a/hw/hyperv/hyperv_testdev.c
++++ b/hw/hyperv/hyperv_testdev.c
+@@ -12,6 +12,7 @@
+  */
  
- typedef struct SynICState {
-@@ -450,3 +453,93 @@ int hyperv_sint_route_set_sint(HvSintRoute *sint_route)
- {
-     return event_notifier_set(&sint_route->sint_set_notifier);
+ #include "qemu/osdep.h"
++#include "qemu/main-loop.h"
+ #include "qemu/queue.h"
+ #include "hw/qdev.h"
+ #include "hw/isa/isa.h"
+@@ -24,10 +25,26 @@ typedef struct TestSintRoute {
+     HvSintRoute *sint_route;
+ } TestSintRoute;
+ 
++typedef struct TestMsgConn {
++    QLIST_ENTRY(TestMsgConn) le;
++    uint8_t conn_id;
++    HvSintRoute *sint_route;
++    struct hyperv_message msg;
++} TestMsgConn;
++
++typedef struct TestEvtConn {
++    QLIST_ENTRY(TestEvtConn) le;
++    uint8_t conn_id;
++    HvSintRoute *sint_route;
++    EventNotifier notifier;
++} TestEvtConn;
++
+ struct HypervTestDev {
+     ISADevice parent_obj;
+     MemoryRegion sint_control;
+     QLIST_HEAD(, TestSintRoute) sint_routes;
++    QLIST_HEAD(, TestMsgConn) msg_conns;
++    QLIST_HEAD(, TestEvtConn) evt_conns;
+ };
+ typedef struct HypervTestDev HypervTestDev;
+ 
+@@ -38,7 +55,11 @@ typedef struct HypervTestDev HypervTestDev;
+ enum {
+     HV_TEST_DEV_SINT_ROUTE_CREATE = 1,
+     HV_TEST_DEV_SINT_ROUTE_DESTROY,
+-    HV_TEST_DEV_SINT_ROUTE_SET_SINT
++    HV_TEST_DEV_SINT_ROUTE_SET_SINT,
++    HV_TEST_DEV_MSG_CONN_CREATE,
++    HV_TEST_DEV_MSG_CONN_DESTROY,
++    HV_TEST_DEV_EVT_CONN_CREATE,
++    HV_TEST_DEV_EVT_CONN_DESTROY,
+ };
+ 
+ static void sint_route_create(HypervTestDev *dev,
+@@ -93,6 +114,133 @@ static void sint_route_set_sint(HypervTestDev *dev,
+     hyperv_sint_route_set_sint(sint_route->sint_route);
  }
-+
-+typedef struct EventFlagHandler {
-+    struct rcu_head rcu;
-+    QLIST_ENTRY(EventFlagHandler) link;
-+    uint32_t conn_id;
-+    EventNotifier *notifier;
-+} EventFlagHandler;
-+
-+static QLIST_HEAD(, EventFlagHandler) event_flag_handlers;
-+static QemuMutex handlers_mutex;
-+
-+static void __attribute__((constructor)) hv_init(void)
+ 
++static void msg_retry(void *opaque)
 +{
-+    QLIST_INIT(&event_flag_handlers);
-+    qemu_mutex_init(&handlers_mutex);
++    TestMsgConn *conn = opaque;
++    assert(!hyperv_post_msg(conn->sint_route, &conn->msg));
 +}
 +
-+int hyperv_set_event_flag_handler(uint32_t conn_id, EventNotifier *notifier)
++static void msg_cb(void *data, int status)
++{
++    TestMsgConn *conn = data;
++
++    if (!status) {
++        return;
++    }
++
++    assert(status == -EAGAIN);
++
++    aio_bh_schedule_oneshot(qemu_get_aio_context(), msg_retry, conn);
++}
++
++static uint16_t msg_handler(const struct hyperv_post_message_input *msg,
++                            void *data)
 +{
 +    int ret;
-+    EventFlagHandler *handler;
++    TestMsgConn *conn = data;
 +
-+    qemu_mutex_lock(&handlers_mutex);
-+    QLIST_FOREACH(handler, &event_flag_handlers, link) {
-+        if (handler->conn_id == conn_id) {
-+            if (notifier) {
-+                ret = -EEXIST;
-+            } else {
-+                QLIST_REMOVE_RCU(handler, link);
-+                g_free_rcu(handler, rcu);
-+                ret = 0;
-+            }
-+            goto unlock;
-+        }
-+    }
++    /* post the same message we've got */
++    conn->msg.header.message_type = msg->message_type;
++    assert(msg->payload_size < sizeof(conn->msg.payload));
++    conn->msg.header.payload_size = msg->payload_size;
++    memcpy(&conn->msg.payload, msg->payload, msg->payload_size);
 +
-+    if (notifier) {
-+        handler = g_new(EventFlagHandler, 1);
-+        handler->conn_id = conn_id;
-+        handler->notifier = notifier;
-+        QLIST_INSERT_HEAD_RCU(&event_flag_handlers, handler, link);
-+        ret = 0;
-+    } else {
-+        ret = -ENOENT;
-+    }
-+unlock:
-+    qemu_mutex_unlock(&handlers_mutex);
-+    return ret;
-+}
++    ret = hyperv_post_msg(conn->sint_route, &conn->msg);
 +
-+uint16_t hyperv_hcall_signal_event(uint64_t param, bool fast)
-+{
-+    uint16_t ret;
-+    EventFlagHandler *handler;
-+
-+    if (unlikely(!fast)) {
-+        hwaddr addr = param;
-+
-+        if (addr & (__alignof__(addr) - 1)) {
-+            return HV_STATUS_INVALID_ALIGNMENT;
-+        }
-+
-+        param = ldq_phys(&address_space_memory, addr);
-+    }
-+
-+    /*
-+     * Per spec, bits 32-47 contain the extra "flag number".  However, we
-+     * have no use for it, and in all known usecases it is zero, so just
-+     * report lookup failure if it isn't.
-+     */
-+    if (param & 0xffff00000000ULL) {
-+        return HV_STATUS_INVALID_PORT_ID;
-+    }
-+    /* remaining bits are reserved-zero */
-+    if (param & ~HV_CONNECTION_ID_MASK) {
++    switch (ret) {
++    case 0:
++        return HV_STATUS_SUCCESS;
++    case -EAGAIN:
++        return HV_STATUS_INSUFFICIENT_BUFFERS;
++    default:
 +        return HV_STATUS_INVALID_HYPERCALL_INPUT;
 +    }
++}
 +
-+    ret = HV_STATUS_INVALID_CONNECTION_ID;
-+    rcu_read_lock();
-+    QLIST_FOREACH_RCU(handler, &event_flag_handlers, link) {
-+        if (handler->conn_id == param) {
-+            event_notifier_set(handler->notifier);
-+            ret = 0;
-+            break;
++static void msg_conn_create(HypervTestDev *dev, uint8_t vp_index,
++                            uint8_t sint, uint8_t conn_id)
++{
++    TestMsgConn *conn;
++
++    conn = g_new0(TestMsgConn, 1);
++    assert(conn);
++
++    conn->conn_id = conn_id;
++
++    conn->sint_route = hyperv_sint_route_new(vp_index, sint, msg_cb, conn);
++    assert(conn->sint_route);
++
++    assert(!hyperv_set_msg_handler(conn->conn_id, msg_handler, conn));
++
++    QLIST_INSERT_HEAD(&dev->msg_conns, conn, le);
++}
++
++static void msg_conn_destroy(HypervTestDev *dev, uint8_t conn_id)
++{
++    TestMsgConn *conn;
++
++    QLIST_FOREACH(conn, &dev->msg_conns, le) {
++        if (conn->conn_id == conn_id) {
++            QLIST_REMOVE(conn, le);
++            hyperv_set_msg_handler(conn->conn_id, NULL, NULL);
++            hyperv_sint_route_unref(conn->sint_route);
++            g_free(conn);
++            return;
 +        }
 +    }
-+    rcu_read_unlock();
-+    return ret;
++    assert(false);
 +}
-diff --git a/include/hw/hyperv/hyperv-proto.h b/include/hw/hyperv/hyperv-proto.h
-index 2dc78ee..21dc28a 100644
---- a/include/hw/hyperv/hyperv-proto.h
-+++ b/include/hw/hyperv/hyperv-proto.h
-@@ -21,6 +21,7 @@
- #define HV_STATUS_INVALID_ALIGNMENT           4
- #define HV_STATUS_INVALID_PARAMETER           5
- #define HV_STATUS_INSUFFICIENT_MEMORY         11
-+#define HV_STATUS_INVALID_PORT_ID             17
- #define HV_STATUS_INVALID_CONNECTION_ID       18
- #define HV_STATUS_INSUFFICIENT_BUFFERS        19
- 
-diff --git a/include/hw/hyperv/hyperv.h b/include/hw/hyperv/hyperv.h
-index 757c85e..df92ed7 100644
---- a/include/hw/hyperv/hyperv.h
-+++ b/include/hw/hyperv/hyperv.h
-@@ -39,6 +39,19 @@ int hyperv_post_msg(HvSintRoute *sint_route, struct hyperv_message *msg);
-  */
- int hyperv_set_event_flag(HvSintRoute *sint_route, unsigned eventno);
- 
-+/*
-+ * Associate @notifier with the event connection @conn_id, such that @notifier
-+ * is signaled when the guest executes HV_SIGNAL_EVENT hypercall on @conn_id.
-+ * If @notifier is NULL clear the association.
-+ */
-+int hyperv_set_event_flag_handler(uint32_t conn_id, EventNotifier *notifier);
 +
-+/*
-+ * Process HV_SIGNAL_EVENT hypercall: signal the EventNotifier associated with
-+ * the connection as specified in @param.
-+ */
-+uint16_t hyperv_hcall_signal_event(uint64_t param, bool fast);
++static void evt_conn_handler(EventNotifier *notifier)
++{
++    TestEvtConn *conn = container_of(notifier, TestEvtConn, notifier);
 +
- static inline uint32_t hyperv_vp_index(CPUState *cs)
++    event_notifier_test_and_clear(notifier);
++
++    /* signal the same event flag we've got */
++    assert(!hyperv_set_event_flag(conn->sint_route, conn->conn_id));
++}
++
++static void evt_conn_create(HypervTestDev *dev, uint8_t vp_index,
++                            uint8_t sint, uint8_t conn_id)
++{
++    TestEvtConn *conn;
++
++    conn = g_new0(TestEvtConn, 1);
++    assert(conn);
++
++    conn->conn_id = conn_id;
++
++    conn->sint_route = hyperv_sint_route_new(vp_index, sint, NULL, NULL);
++    assert(conn->sint_route);
++
++    assert(!event_notifier_init(&conn->notifier, false));
++
++    event_notifier_set_handler(&conn->notifier, evt_conn_handler);
++
++    assert(!hyperv_set_event_flag_handler(conn_id, &conn->notifier));
++
++    QLIST_INSERT_HEAD(&dev->evt_conns, conn, le);
++}
++
++static void evt_conn_destroy(HypervTestDev *dev, uint8_t conn_id)
++{
++    TestEvtConn *conn;
++
++    QLIST_FOREACH(conn, &dev->evt_conns, le) {
++        if (conn->conn_id == conn_id) {
++            QLIST_REMOVE(conn, le);
++            hyperv_set_event_flag_handler(conn->conn_id, NULL);
++            event_notifier_set_handler(&conn->notifier, NULL);
++            event_notifier_cleanup(&conn->notifier);
++            hyperv_sint_route_unref(conn->sint_route);
++            g_free(conn);
++            return;
++        }
++    }
++    assert(false);
++}
++
+ static uint64_t hv_test_dev_read(void *opaque, hwaddr addr, unsigned size)
  {
-     return cs->cpu_index;
-diff --git a/target/i386/hyperv.c b/target/i386/hyperv.c
-index 3f76c3e..96b3b5a 100644
---- a/target/i386/hyperv.c
-+++ b/target/i386/hyperv.c
-@@ -79,16 +79,18 @@ int kvm_hv_handle_exit(X86CPU *cpu, struct kvm_hyperv_exit *exit)
+     return 0;
+@@ -105,6 +253,7 @@ static void hv_test_dev_write(void *opaque, hwaddr addr, uint64_t data,
+     uint8_t sint = data & 0xFF;
+     uint8_t vp_index = (data >> 8ULL) & 0xFF;
+     uint8_t ctl = (data >> 16ULL) & 0xFF;
++    uint8_t conn_id = (data >> 24ULL) & 0xFF;
  
-         return 0;
-     case KVM_EXIT_HYPERV_HCALL: {
--        uint16_t code;
-+        uint16_t code = exit->u.hcall.input & 0xffff;
-+        bool fast = exit->u.hcall.input & HV_HYPERCALL_FAST;
-+        uint64_t param = exit->u.hcall.params[0];
- 
--        code  = exit->u.hcall.input & 0xffff;
-         switch (code) {
--        case HV_POST_MESSAGE:
-         case HV_SIGNAL_EVENT:
-+            exit->u.hcall.result = hyperv_hcall_signal_event(param, fast);
-+            break;
-         default:
-             exit->u.hcall.result = HV_STATUS_INVALID_HYPERCALL_CODE;
--            return 0;
-         }
-+        return 0;
-     }
+     switch (ctl) {
+     case HV_TEST_DEV_SINT_ROUTE_CREATE:
+@@ -116,6 +265,18 @@ static void hv_test_dev_write(void *opaque, hwaddr addr, uint64_t data,
+     case HV_TEST_DEV_SINT_ROUTE_SET_SINT:
+         sint_route_set_sint(dev, vp_index, sint);
+         break;
++    case HV_TEST_DEV_MSG_CONN_CREATE:
++        msg_conn_create(dev, vp_index, sint, conn_id);
++        break;
++    case HV_TEST_DEV_MSG_CONN_DESTROY:
++        msg_conn_destroy(dev, conn_id);
++        break;
++    case HV_TEST_DEV_EVT_CONN_CREATE:
++        evt_conn_create(dev, vp_index, sint, conn_id);
++        break;
++    case HV_TEST_DEV_EVT_CONN_DESTROY:
++        evt_conn_destroy(dev, conn_id);
++        break;
      default:
-         return -1;
+         break;
+     }
+@@ -136,6 +297,8 @@ static void hv_test_dev_realizefn(DeviceState *d, Error **errp)
+     MemoryRegion *io = isa_address_space_io(isa);
+ 
+     QLIST_INIT(&dev->sint_routes);
++    QLIST_INIT(&dev->msg_conns);
++    QLIST_INIT(&dev->evt_conns);
+     memory_region_init_io(&dev->sint_control, OBJECT(dev),
+                           &synic_test_sint_ops, dev,
+                           "hyperv-testdev-ctl", 4);
 -- 
 1.8.3.1
