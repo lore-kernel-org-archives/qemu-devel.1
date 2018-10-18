@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gDEXj-0007s4-Iy
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:05:17 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gDEYC-0008Ds-DP
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:05:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gDEXi-0007iU-Ok
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:05:15 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gDEYB-0008D6-H0
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:05:44 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 18 Oct 2018 17:03:43 -0300
-Message-Id: <20181018200422.4358-7-ehabkost@redhat.com>
+Date: Thu, 18 Oct 2018 17:03:48 -0300
+Message-Id: <20181018200422.4358-12-ehabkost@redhat.com>
 In-Reply-To: <20181018200422.4358-1-ehabkost@redhat.com>
 References: <20181018200422.4358-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 06/45] hw/timer/sun4v-rtc: Convert from
- DPRINTF() macro to trace events
+Subject: [Qemu-devel] [PULL 11/45] hw/mips/gt64xxx_pci: Convert
+ gt64120_reset() function into Device reset method
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,74 +28,61 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Rob Her
 
 From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
+Convert the gt64120_reset() function into a proper Device reset method.
+
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Artyom Tarasenko <atar4qemu@gmail.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Message-Id: <20181002212522.23303-3-f4bug@amsat.org>
+Message-Id: <20181002212522.23303-8-f4bug@amsat.org>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/timer/sun4v-rtc.c  | 13 +++----------
- hw/timer/trace-events |  4 ++++
- 2 files changed, 7 insertions(+), 10 deletions(-)
+ hw/mips/gt64xxx_pci.c | 17 +++--------------
+ 1 file changed, 3 insertions(+), 14 deletions(-)
 
-diff --git a/hw/timer/sun4v-rtc.c b/hw/timer/sun4v-rtc.c
-index 310523225f..13be94f8da 100644
---- a/hw/timer/sun4v-rtc.c
-+++ b/hw/timer/sun4v-rtc.c
-@@ -14,15 +14,8 @@
- #include "hw/sysbus.h"
- #include "qemu/timer.h"
- #include "hw/timer/sun4v-rtc.h"
-+#include "trace.h"
-=20
--//#define DEBUG_SUN4V_RTC
--
--#ifdef DEBUG_SUN4V_RTC
--#define DPRINTF(fmt, ...)                                       \
--    do { printf("sun4v_rtc: " fmt , ## __VA_ARGS__); } while (0)
--#else
--#define DPRINTF(fmt, ...) do {} while (0)
--#endif
-=20
- #define TYPE_SUN4V_RTC "sun4v_rtc"
- #define SUN4V_RTC(obj) OBJECT_CHECK(Sun4vRtc, (obj), TYPE_SUN4V_RTC)
-@@ -41,14 +34,14 @@ static uint64_t sun4v_rtc_read(void *opaque, hwaddr a=
-ddr,
-         /* accessing the high 32 bits */
-         val >>=3D 32;
-     }
--    DPRINTF("read from " TARGET_FMT_plx " val %lx\n", addr, val);
-+    trace_sun4v_rtc_read(addr, val);
-     return val;
+diff --git a/hw/mips/gt64xxx_pci.c b/hw/mips/gt64xxx_pci.c
+index 24ad0ad024..dcd1a66329 100644
+--- a/hw/mips/gt64xxx_pci.c
++++ b/hw/mips/gt64xxx_pci.c
+@@ -992,9 +992,9 @@ static void gt64120_pci_set_irq(void *opaque, int irq=
+_num, int level)
  }
 =20
- static void sun4v_rtc_write(void *opaque, hwaddr addr,
-                              uint64_t val, unsigned size)
+=20
+-static void gt64120_reset(void *opaque)
++static void gt64120_reset(DeviceState *dev)
  {
--    DPRINTF("write 0x%x to " TARGET_FMT_plx "\n", (unsigned)val, addr);
-+    trace_sun4v_rtc_read(addr, val);
+-    GT64120State *s =3D opaque;
++    GT64120State *s =3D GT64120_PCI_HOST_BRIDGE(dev);
+=20
+     /* FIXME: Malta specific hw assumptions ahead */
+=20
+@@ -1184,16 +1184,6 @@ PCIBus *gt64120_register(qemu_irq *pic)
+     return phb->bus;
  }
 =20
- static const MemoryRegionOps sun4v_rtc_ops =3D {
-diff --git a/hw/timer/trace-events b/hw/timer/trace-events
-index ca9ad6321a..75bd3b1042 100644
---- a/hw/timer/trace-events
-+++ b/hw/timer/trace-events
-@@ -66,5 +66,9 @@ cmsdk_apb_dualtimer_read(uint64_t offset, uint64_t data=
-, unsigned size) "CMSDK A
- cmsdk_apb_dualtimer_write(uint64_t offset, uint64_t data, unsigned size)=
- "CMSDK APB dualtimer write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size=
- %u"
- cmsdk_apb_dualtimer_reset(void) "CMSDK APB dualtimer: reset"
+-static int gt64120_init(SysBusDevice *dev)
+-{
+-    GT64120State *s;
+-
+-    s =3D GT64120_PCI_HOST_BRIDGE(dev);
+-
+-    qemu_register_reset(gt64120_reset, s);
+-    return 0;
+-}
+-
+ static void gt64120_pci_realize(PCIDevice *d, Error **errp)
+ {
+     /* FIXME: Malta specific hw assumptions ahead */
+@@ -1241,9 +1231,8 @@ static const TypeInfo gt64120_pci_info =3D {
+ static void gt64120_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+-    SysBusDeviceClass *sdc =3D SYS_BUS_DEVICE_CLASS(klass);
 =20
-+# hw/timer/sun4v-rtc.c
-+sun4v_rtc_read(uint64_t addr, uint64_t value) "read: addr 0x%" PRIx64 " =
-value 0x%" PRIx64
-+sun4v_rtc_write(uint64_t addr, uint64_t value) "write: addr 0x%" PRIx64 =
-" value 0x%" PRIx64
-+
- # hw/timer/xlnx-zynqmp-rtc.c
- xlnx_zynqmp_rtc_gettime(int year, int month, int day, int hour, int min,=
- int sec) "Get time from host: %d-%d-%d %2d:%02d:%02d"
+-    sdc->init =3D gt64120_init;
++    dc->reset =3D gt64120_reset;
+     dc->vmsd =3D &vmstate_gt64120;
+ }
+=20
 --=20
 2.18.0.rc1.1.g3f1ff2140
