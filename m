@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39310)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gDEZ4-0000Zd-EX
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:06:39 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gDEZI-0000kU-5s
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:06:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gDEZ3-0001MK-5o
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:06:38 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gDEZF-0001g1-07
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:06:52 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 18 Oct 2018 17:03:55 -0300
-Message-Id: <20181018200422.4358-19-ehabkost@redhat.com>
+Date: Thu, 18 Oct 2018 17:03:56 -0300
+Message-Id: <20181018200422.4358-20-ehabkost@redhat.com>
 In-Reply-To: <20181018200422.4358-1-ehabkost@redhat.com>
 References: <20181018200422.4358-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 18/45] memory-device: fix alignment error message
+Subject: [Qemu-devel] [PULL 19/45] memory-device: fix error message when
+ hinted address is too small
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,29 +25,37 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Rob Her
 
 From: David Hildenbrand <david@redhat.com>
 
-We're missing "x" after the leading 0.
+The "at" should actually be a "before".
+    if (new_addr < address_space_start)
+     -> "can't add memory ... before... $address_space_start"
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+So it looks similar to the other check
+    } else if ((new_addr + size) > address_space_end)
+     -> "can't add memory ... beyond..."
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20181005092024.14344-2-david@redhat.com>
+Message-Id: <20181005092024.14344-3-david@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/mem/memory-device.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/mem/memory-device.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
-index 6de4f70bb4..0b52fe2c5e 100644
+index 0b52fe2c5e..7c706fadfc 100644
 --- a/hw/mem/memory-device.c
 +++ b/hw/mem/memory-device.c
-@@ -120,7 +120,7 @@ uint64_t memory_device_get_free_addr(MachineState *ms, const uint64_t *hint,
- 
-     /* address_space_start indicates the maximum alignment we expect */
-     if (QEMU_ALIGN_UP(address_space_start, align) != address_space_start) {
--        error_setg(errp, "the alignment (0%" PRIx64 ") is not supported",
-+        error_setg(errp, "the alignment (0x%" PRIx64 ") is not supported",
-                    align);
-         return 0;
-     }
+@@ -146,7 +146,8 @@ uint64_t memory_device_get_free_addr(MachineState *ms, const uint64_t *hint,
+         new_addr = *hint;
+         if (new_addr < address_space_start) {
+             error_setg(errp, "can't add memory [0x%" PRIx64 ":0x%" PRIx64
+-                       "] at 0x%" PRIx64, new_addr, size, address_space_start);
++                       "] before 0x%" PRIx64, new_addr, size,
++                       address_space_start);
+             return 0;
+         } else if ((new_addr + size) > address_space_end) {
+             error_setg(errp, "can't add memory [0x%" PRIx64 ":0x%" PRIx64
 -- 
 2.18.0.rc1.1.g3f1ff2140
