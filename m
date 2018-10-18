@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45432)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gDAvs-0004EZ-PQ
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 12:13:57 -0400
+	(envelope-from <Aaron@os.amperecomputing.com>) id 1gDB2q-0006Vk-9p
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 12:21:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gDAvo-0004eJ-U6
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 12:13:56 -0400
-Received: from out1.zte.com.cn ([202.103.147.172]:60298 helo=mxct.zte.com.cn)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peng.hao2@zte.com.cn>)
-	id 1gDAvo-0004Zv-HB
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 12:13:52 -0400
-Date: Fri, 19 Oct 2018 00:13:40 +0800 (CST)
-Message-ID: <201810190013401340757@zte.com.cn>
-In-Reply-To: <20181018130434.23237-4-philmd@redhat.com>
-References: 20181018130434.23237-1-philmd@redhat.com,
-	20181018130434.23237-4-philmd@redhat.com
-Mime-Version: 1.0
-From: <peng.hao2@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel]
- =?utf-8?q?=5BPATCH_v3_3/4=5D_hw/misc/pvpanic=3A_Add?=
- =?utf-8?q?_the_MMIO_interface?=
+	(envelope-from <Aaron@os.amperecomputing.com>) id 1gDB2p-0002fz-Ge
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 12:21:08 -0400
+From: Aaron Lindsay <Aaron@os.amperecomputing.com>
+Date: Thu, 18 Oct 2018 16:20:58 +0000
+Message-ID: <20181018162048.GB12691@quinoa.localdomain>
+References: <20181010203735.27918-1-aclindsa@gmail.com>
+	<20181010203735.27918-12-aclindsa@gmail.com>
+	<be878ed3-509f-8ed8-8c28-71e3d0214837@linaro.org>
+	<20181017194748.GB25905@quinoa.localdomain>
+	<32172d01-329a-764e-449c-efb83e353353@linaro.org>
+In-Reply-To: <32172d01-329a-764e-449c-efb83e353353@linaro.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <9DAC7DC327D9204CA1FBEF57E22DC5F1@prod.exchangelabs.com>
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v6 11/14] target/arm: PMU: Add instruction
+ and cycle events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,14 +29,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: philmd@redhat.com
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, wency@cn.fujitsu.com, hutao@cn.fujitsu.com
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: Aaron Lindsay <aclindsa@gmail.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Michael Spradling <mspradli@codeaurora.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Digant Desai <digantd@codeaurora.org>
 
-Pgo+U2lnbmVkLW9mZi1ieTogUGVuZyBIYW8gPHBlbmcuaGFvMkB6dGUuY29tLmNuPgo+U2lnbmVk
-LW9mZi1ieTogUGhpbGlwcGUgTWF0aGlldS1EYXVkw6kgPHBoaWxtZEByZWRoYXQuY29tPgo+W1BN
-RDogVXNlIFRZUEVfUFZQQU5JQyBkZWZpbml0aW9uLCBzcGxpdCBpbiAyIHBhdGNoZXNdCj4tLS0K
-PlBlbmc6IEkgaG9wZSB0aGlzIGlzIG5vdyBtb3JlIG9idmlvdXMgaG93IHlvdSBjb3VsZCByZXVz
-ZSB0aGUgcHZwYW5pYyBkZXZpY2UuCj4KVGhhbmtzLiBJIHdpbGwgdGhpbmsgYWJvdXQgeW91ciBz
-dWdnZXN0aW9ucyBhbmQgcGF0Y2hlcy4KPmh3L21pc2MvcHZwYW5pYy5jIHwgNTIgKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0KPjEgZmlsZSBjaGFuZ2VkLCA1
-MSBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0p
+On Oct 17 14:12, Richard Henderson wrote:
+> On 10/17/18 12:47 PM, Aaron Lindsay wrote:
+> > On Oct 16 17:04, Richard Henderson wrote:
+> >> On 10/10/18 1:37 PM, Aaron Lindsay wrote:
+> >>> + * Return the underlying cycle count for the PMU cycle counters. If =
+we're in
+> >>> + * usermode, simply return 0.
+> >>> + */
+> >>> +static uint64_t cycles_get_count(CPUARMState *env)
+> >>> +{
+> >>> +#ifndef CONFIG_USER_ONLY
+> >>> +    return muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
+> >>> +                   ARM_CPU_FREQ, NANOSECONDS_PER_SECOND);
+> >>> +#else
+> >>> +    return 0;
+> >>> +#endif
+> >>> +}
+> >>
+> >> Usually we pass through the host cycle counter.
+> >> See cpu_get_host_ticks().
+> >=20
+> > Why do you prefer cpu_get_host_ticks()? And are you suggesting this for
+> > just user-mode, or both system and user?
+>=20
+> Just user-mode.  Providing a clock with unknown scaling is more useful th=
+an a
+> constant 0.
+
+Okay, that makes sense I think. I slightly dislike the fact that the
+behavior is silently different between user and system mode, but perhaps
+some documentation could alleviate my concern - is there an appropriate
+place to document this difference?
+
+It occurs to me that one argument for always returning 0 is that it's
+immediately obvious that the behavior is different from system mode,
+eliminating the possibility of a user assuming results from user and
+system mode are comparable.
+
+-Aaron
