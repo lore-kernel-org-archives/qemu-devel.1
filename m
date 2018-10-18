@@ -1,15 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34728)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gD9HQ-0003Kv-2H
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:28:04 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1gD9I3-0003oY-2S
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:28:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gD9HP-0002yu-4m
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:28:03 -0400
-From: Eric Auger <eric.auger@redhat.com>
-Date: Thu, 18 Oct 2018 16:27:43 +0200
-Message-Id: <20181018142743.29489-1-eric.auger@redhat.com>
-Subject: [Qemu-devel] [PATCH] hw/arm/boot: introduce fdt_add_memory_node
- helper
+	(envelope-from <pbonzini@redhat.com>) id 1gD9Hz-0003Rt-OX
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:28:42 -0400
+Received: from mail-wr1-f54.google.com ([209.85.221.54]:33479)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gD9Hz-0003J9-D1
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:28:39 -0400
+Received: by mail-wr1-f54.google.com with SMTP id e4-v6so33941761wrs.0
+	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 07:28:30 -0700 (PDT)
+References: <87efcqniza.fsf@dusky.pond.sub.org>
+	<20181016132035.GF7995@redhat.com> <87o9brl7zc.fsf@dusky.pond.sub.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d8974e95-f3f3-f07e-78dd-11e8765854c2@redhat.com>
+Date: Thu, 18 Oct 2018 16:28:27 +0200
+MIME-Version: 1.0
+In-Reply-To: <87o9brl7zc.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] When it's okay to treat OOM as fatal?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,107 +30,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com
-Cc: drjones@redhat.com
+To: Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+On 18/10/2018 15:06, Markus Armbruster wrote:
+> Device "qxl" creates a memory region "qxl.vgavram" with a size taken
+> from uint32_t property "ram_size", silently rounded up to the next power
+> of two.  It uses &error_fatal for error handling.
 
-We introduce an helper to create a memory node.
+That's good to some extent---it means that the core code _is_ ready for
+handling ENOMEM in this part of QEMU, it's just the device that doesn't
+use it.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
----
- hw/arm/boot.c | 54 ++++++++++++++++++++++++++++++++-------------------
- 1 file changed, 34 insertions(+), 20 deletions(-)
-
-diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-index 20c71d7d96..ba2004da5c 100644
---- a/hw/arm/boot.c
-+++ b/hw/arm/boot.c
-@@ -413,6 +413,36 @@ static void set_kernel_args_old(const struct arm_boot_info *info,
-     }
- }
- 
-+static int fdt_add_memory_node(void *fdt, uint32_t acells, hwaddr mem_base,
-+                               uint32_t scells, hwaddr mem_len,
-+                               int numa_node_id)
-+{
-+    char *nodename = NULL;
-+    int ret;
-+
-+    nodename = g_strdup_printf("/memory@%" PRIx64, mem_base);
-+    qemu_fdt_add_subnode(fdt, nodename);
-+    qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
-+    ret = qemu_fdt_setprop_sized_cells(fdt, nodename, "reg", acells, mem_base,
-+                                       scells, mem_len);
-+    if (ret < 0) {
-+        fprintf(stderr, "couldn't set %s/reg\n", nodename);
-+        goto out;
-+    }
-+    if (numa_node_id < 0) {
-+        goto out;
-+    }
-+
-+    ret = qemu_fdt_setprop_cell(fdt, nodename, "numa-node-id", numa_node_id);
-+    if (ret < 0) {
-+        fprintf(stderr, "couldn't set %s/numa-node-id\n", nodename);
-+    }
-+
-+out:
-+    g_free(nodename);
-+    return ret;
-+}
-+
- static void fdt_add_psci_node(void *fdt)
- {
-     uint32_t cpu_suspend_fn;
-@@ -492,7 +522,6 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
-     void *fdt = NULL;
-     int size, rc, n = 0;
-     uint32_t acells, scells;
--    char *nodename;
-     unsigned int i;
-     hwaddr mem_base, mem_len;
-     char **node_path;
-@@ -566,35 +595,20 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
-         mem_base = binfo->loader_start;
-         for (i = 0; i < nb_numa_nodes; i++) {
-             mem_len = numa_info[i].node_mem;
--            nodename = g_strdup_printf("/memory@%" PRIx64, mem_base);
--            qemu_fdt_add_subnode(fdt, nodename);
--            qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
--            rc = qemu_fdt_setprop_sized_cells(fdt, nodename, "reg",
--                                              acells, mem_base,
--                                              scells, mem_len);
-+            rc = fdt_add_memory_node(fdt, acells, mem_base,
-+                                     scells, mem_len, i);
-             if (rc < 0) {
--                fprintf(stderr, "couldn't set %s/reg for node %d\n", nodename,
--                        i);
-                 goto fail;
-             }
- 
--            qemu_fdt_setprop_cell(fdt, nodename, "numa-node-id", i);
-             mem_base += mem_len;
--            g_free(nodename);
-         }
-     } else {
--        nodename = g_strdup_printf("/memory@%" PRIx64, binfo->loader_start);
--        qemu_fdt_add_subnode(fdt, nodename);
--        qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
--
--        rc = qemu_fdt_setprop_sized_cells(fdt, nodename, "reg",
--                                          acells, binfo->loader_start,
--                                          scells, binfo->ram_size);
-+        rc = fdt_add_memory_node(fdt, acells, binfo->loader_start,
-+                                 scells, binfo->ram_size, -1);
-         if (rc < 0) {
--            fprintf(stderr, "couldn't set %s reg\n", nodename);
-             goto fail;
-         }
--        g_free(nodename);
-     }
- 
-     rc = fdt_path_offset(fdt, "/chosen");
--- 
-2.17.1
+Paolo
