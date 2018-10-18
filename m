@@ -1,30 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43918)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gD9gp-0007x0-81
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:54:21 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1gD9hH-0008Lk-4j
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:54:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gD9gj-00028F-8Y
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:54:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47188)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gD9gi-00027X-Vy
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:54:13 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D6BB33DBCD
-	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 14:54:11 +0000 (UTC)
-Date: Thu, 18 Oct 2018 15:54:06 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20181018145406.GE2632@work-vm>
-References: <87efcqniza.fsf@dusky.pond.sub.org> <20181016133340.GB2427@work-vm>
-	<87va5zjort.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87va5zjort.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] When it's okay to treat OOM as fatal?
+	(envelope-from <eric.auger@redhat.com>) id 1gD9hG-0002SP-AB
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:54:47 -0400
+From: Eric Auger <eric.auger@redhat.com>
+Date: Thu, 18 Oct 2018 16:54:28 +0200
+Message-Id: <20181018145428.31134-1-eric.auger@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] hw/arm/boot: introduce fdt_add_memory_node
+ helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,83 +18,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com
+Cc: drjones@redhat.com
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
-> 
-> > * Markus Armbruster (armbru@redhat.com) wrote:
-> >> We sometimes use g_new() & friends, which abort() on OOM, and sometimes
-> >> g_try_new() & friends, which can fail, and therefore require error
-> >> handling.
-> >> 
-> >> HACKING points out the difference, but is mum on when to use what:
-> >> 
-> >>     3. Low level memory management
-> >> 
-> >>     Use of the malloc/free/realloc/calloc/valloc/memalign/posix_memalign
-> >>     APIs is not allowed in the QEMU codebase. Instead of these routines,
-> >>     use the GLib memory allocation routines g_malloc/g_malloc0/g_new/
-> >>     g_new0/g_realloc/g_free or QEMU's qemu_memalign/qemu_blockalign/qemu_vfree
-> >>     APIs.
-> >> 
-> >>     Please note that g_malloc will exit on allocation failure, so there
-> >>     is no need to test for failure (as you would have to with malloc).
-> >>     Calling g_malloc with a zero size is valid and will return NULL.
-> >> 
-> >>     Prefer g_new(T, n) instead of g_malloc(sizeof(T) * n) for the following
-> >>     reasons:
-> >> 
-> >>       a. It catches multiplication overflowing size_t;
-> >>       b. It returns T * instead of void *, letting compiler catch more type
-> >>          errors.
-> >> 
-> >>     Declarations like T *v = g_malloc(sizeof(*v)) are acceptable, though.
-> >> 
-> >>     Memory allocated by qemu_memalign or qemu_blockalign must be freed with
-> >>     qemu_vfree, since breaking this will cause problems on Win32.
-> >> 
-> >> Now, in my personal opinion, handling OOM gracefully is worth the
-> >> (commonly considerable) trouble when you're coding for an Apple II or
-> >> similar.  Anything that pages commonly becomes unusable long before
-> >> allocations fail.
-> >
-> > That's not always my experience; I've seen cases where you suddenly
-> > allocate a load more memory and hit OOM fairly quickly on that hot
-> > process.  Most of the time on the desktop you're right.
-> >
-> >> Anything that overcommits will send you a (commonly
-> >> lethal) signal instead.  Anything that tries handling OOM gracefully,
-> >> and manages to dodge both these bullets somehow, will commonly get it
-> >> wrong and crash.
-> >
-> > If your qemu has maped it's main memory from hugetlbfs or similar pools
-> > then we're looking at the other memory allocations; and that's a bit of
-> > an interesting difference where those other allocations should be a lot
-> > smaller.
-> >
-> >> But others are entitled to their opinions as much as I am.  I just want
-> >> to know what our rules are, preferably in the form of a patch to
-> >> HACKING.
-> >
-> > My rule is to try not to break a happily running VM by some new
-> > activity; I don't worry about it during startup.
-> >
-> > So for example, I don't like it when starting a migration, allocates
-> > some more memory and kills the VM - the user had a happy stable VM
-> > upto that point.  Migration gets the blame at this point.
-> 
-> I don't doubt reliable OOM handling would be nice.  I do doubt it's
-> practical for an application like QEMU.
+From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 
-Well, our use of glib certainly makes it much much harder.
-I just try and make sure anywhere that I'm allocating a non-trivial
-amount of memory (especially anything guest or user controlled) uses
-the _try_ variants.  That should keep a lot of the larger allocations.
-However, it scares me that we've got things that can return big chunks
-of JSON for example, and I don't think they're being careful about it.
+We introduce an helper to create a memory node. This avoids some
+code duplication in arm_load_dtb(). Also in the future we will need
+to add some more memory nodes (for DIMMs) and this helper will be
+useful.
 
-Dave
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+
+---
+v1 -> v2:
+improve the commit message
+---
+ hw/arm/boot.c | 54 ++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 34 insertions(+), 20 deletions(-)
+
+diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+index 20c71d7d96..ba2004da5c 100644
+--- a/hw/arm/boot.c
++++ b/hw/arm/boot.c
+@@ -413,6 +413,36 @@ static void set_kernel_args_old(const struct arm_boot_info *info,
+     }
+ }
+ 
++static int fdt_add_memory_node(void *fdt, uint32_t acells, hwaddr mem_base,
++                               uint32_t scells, hwaddr mem_len,
++                               int numa_node_id)
++{
++    char *nodename = NULL;
++    int ret;
++
++    nodename = g_strdup_printf("/memory@%" PRIx64, mem_base);
++    qemu_fdt_add_subnode(fdt, nodename);
++    qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
++    ret = qemu_fdt_setprop_sized_cells(fdt, nodename, "reg", acells, mem_base,
++                                       scells, mem_len);
++    if (ret < 0) {
++        fprintf(stderr, "couldn't set %s/reg\n", nodename);
++        goto out;
++    }
++    if (numa_node_id < 0) {
++        goto out;
++    }
++
++    ret = qemu_fdt_setprop_cell(fdt, nodename, "numa-node-id", numa_node_id);
++    if (ret < 0) {
++        fprintf(stderr, "couldn't set %s/numa-node-id\n", nodename);
++    }
++
++out:
++    g_free(nodename);
++    return ret;
++}
++
+ static void fdt_add_psci_node(void *fdt)
+ {
+     uint32_t cpu_suspend_fn;
+@@ -492,7 +522,6 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+     void *fdt = NULL;
+     int size, rc, n = 0;
+     uint32_t acells, scells;
+-    char *nodename;
+     unsigned int i;
+     hwaddr mem_base, mem_len;
+     char **node_path;
+@@ -566,35 +595,20 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+         mem_base = binfo->loader_start;
+         for (i = 0; i < nb_numa_nodes; i++) {
+             mem_len = numa_info[i].node_mem;
+-            nodename = g_strdup_printf("/memory@%" PRIx64, mem_base);
+-            qemu_fdt_add_subnode(fdt, nodename);
+-            qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
+-            rc = qemu_fdt_setprop_sized_cells(fdt, nodename, "reg",
+-                                              acells, mem_base,
+-                                              scells, mem_len);
++            rc = fdt_add_memory_node(fdt, acells, mem_base,
++                                     scells, mem_len, i);
+             if (rc < 0) {
+-                fprintf(stderr, "couldn't set %s/reg for node %d\n", nodename,
+-                        i);
+                 goto fail;
+             }
+ 
+-            qemu_fdt_setprop_cell(fdt, nodename, "numa-node-id", i);
+             mem_base += mem_len;
+-            g_free(nodename);
+         }
+     } else {
+-        nodename = g_strdup_printf("/memory@%" PRIx64, binfo->loader_start);
+-        qemu_fdt_add_subnode(fdt, nodename);
+-        qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
+-
+-        rc = qemu_fdt_setprop_sized_cells(fdt, nodename, "reg",
+-                                          acells, binfo->loader_start,
+-                                          scells, binfo->ram_size);
++        rc = fdt_add_memory_node(fdt, acells, binfo->loader_start,
++                                 scells, binfo->ram_size, -1);
+         if (rc < 0) {
+-            fprintf(stderr, "couldn't set %s reg\n", nodename);
+             goto fail;
+         }
+-        g_free(nodename);
+     }
+ 
+     rc = fdt_path_offset(fdt, "/chosen");
+-- 
+2.17.1
