@@ -1,19 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35587)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gD69H-0002dB-SQ
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 07:07:32 -0400
+	(envelope-from <kwolf@redhat.com>) id 1gD6CW-00052h-O4
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 07:10:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gD69E-0008WQ-K9
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 07:07:27 -0400
-From: Artem Pisarenko <artem.k.pisarenko@gmail.com>
-Date: Thu, 18 Oct 2018 17:04:29 +0600
-Message-Id: <71d3b9366dc8e7f0dab1f290d5944cb84e3cc876.1539860473.git.artem.k.pisarenko@gmail.com>
-In-Reply-To: <cover.1539860473.git.artem.k.pisarenko@gmail.com>
-References: <cover.1539860473.git.artem.k.pisarenko@gmail.com>
-In-Reply-To: <cover.1539860473.git.artem.k.pisarenko@gmail.com>
-References: <cover.1539860473.git.artem.k.pisarenko@gmail.com>
-Subject: [Qemu-devel] [PATCH v3 2/4] Introduce attributes to qemu timer
- subsystem
+	(envelope-from <kwolf@redhat.com>) id 1gD6CT-0002yK-Kn
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 07:10:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39768)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1gD6CT-0002xM-9F
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 07:10:45 -0400
+Date: Thu, 18 Oct 2018 13:10:41 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20181018111041.GA4946@localhost.localdomain>
+References: <20181017082702.5581-1-armbru@redhat.com>
+	<20181017082702.5581-4-armbru@redhat.com>
+	<20181017135043.GE31479@localhost.localdomain>
+	<878t2wo518.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <878t2wo518.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v4 03/38] block: Use warn_report() &
+ friends to report warnings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,419 +30,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Paolo Bonzini <pbonzini@redhat.com>, Artem Pisarenko <artem.k.pisarenko@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block I/O path" <qemu-block@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Liu Yuan <namei.unix@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Attributes are simple flags, associated with individual timers for their whole lifetime.
-They intended to be used to mark individual timers for special handling by various qemu features which have integration into qemu-timer.
-New/init functions family in timer interface updated and refactored (new 'attribute' argument added, timer_list replaced with timer_list_group+type combinations, comments improved to avoid info duplication).
-Also existing aio interface extended with attribute-enabled variants of functions, which create/initialize timers.
+Am 17.10.2018 um 19:29 hat Markus Armbruster geschrieben:
+> Kevin Wolf <kwolf@redhat.com> writes:
+> 
+> > Am 17.10.2018 um 10:26 hat Markus Armbruster geschrieben:
+> >> Calling error_report() in a function that takes an Error ** argument
+> >> is suspicious.  Convert a few that are actually warnings to
+> >> warn_report().
+> >> 
+> >> While there, split warnings consisting of multiple sentences to
+> >> conform to conventions spelled out in warn_report()'s contract, and
+> >> improve a rather useless warning in sheepdog.c.
+> >> 
+> >> Cc: Kevin Wolf <kwolf@redhat.com>
+> >> Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+> >> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> >> Cc: Peter Lieven <pl@kamp.de>
+> >> Cc: Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>
+> >> Cc: Liu Yuan <namei.unix@gmail.com>
+> >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> >> Reviewed-by: Eric Blake <eblake@redhat.com>
+> >> ---
+> >>  block/bochs.c    |  8 ++++----
+> >>  block/cloop.c    |  8 ++++----
+> >>  block/dmg.c      |  8 ++++----
+> >>  block/iscsi.c    |  2 +-
+> >>  block/rbd.c      | 12 ++++++------
+> >>  block/sheepdog.c |  2 +-
+> >>  block/vvfat.c    |  8 ++++----
+> >>  7 files changed, 24 insertions(+), 24 deletions(-)
+> >> 
+> >> diff --git a/block/bochs.c b/block/bochs.c
+> >> index 50c630047b..36c1b45bd2 100644
+> >> --- a/block/bochs.c
+> >> +++ b/block/bochs.c
+> >> @@ -112,10 +112,10 @@ static int bochs_open(BlockDriverState *bs, QDict *options, int flags,
+> >>      }
+> >>  
+> >>      if (!bdrv_is_read_only(bs)) {
+> >> -        error_report("Opening bochs images without an explicit read-only=on "
+> >> -                     "option is deprecated. Future versions will refuse to "
+> >> -                     "open the image instead of automatically marking the "
+> >> -                     "image read-only.");
+> >> +        warn_report("Opening bochs images without an explicit read-only=on "
+> >> +                    "option is deprecated");
+> >> +        error_printf("Future versions may refuse to open the image "
+> >> +                     "instead of automatically marking it read-only.\n");
+> >>          ret = bdrv_set_read_only(bs, true, errp); /* no write support yet */
+> >>          if (ret < 0) {
+> >>              return ret;
+> >
+> > While I agree with your intention, it would be best to leave all of the
+> > !bdrv_is_read_only() warnings alone. My series "[PATCH v2 0/8] block:
+> > Add auto-read-only option" gets rid of the message entirely, so this
+> > would only add a merge conflict.
+> 
+> I wasn't are of that series.  I'm going to drop these hunks.  Left:
+> 
+> diff --git a/block/iscsi.c b/block/iscsi.c
+> index bb69faf34a..73998c2860 100644
+> --- a/block/iscsi.c
+> +++ b/block/iscsi.c
+> @@ -1844,7 +1844,7 @@ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
+>      iscsi_set_timeout(iscsi, timeout);
+>  #else
+>      if (timeout) {
+> -        error_report("iSCSI: ignoring timeout value for libiscsi <1.15.0");
+> +        warn_report("iSCSI: ignoring timeout value for libiscsi <1.15.0");
+>      }
+>  #endif
+>  
+> diff --git a/block/rbd.c b/block/rbd.c
+> index 014c68d629..6e26bac170 100644
+> --- a/block/rbd.c
+> +++ b/block/rbd.c
+> @@ -750,8 +750,8 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+>          /* Take care whenever deciding to actually deprecate; once this ability
+>           * is removed, we will not be able to open any images with legacy-styled
+>           * backing image strings. */
+> -        error_report("RBD options encoded in the filename as keyvalue pairs "
+> -                     "is deprecated");
+> +        warn_report("RBD options encoded in the filename as keyvalue pairs "
+> +                    "is deprecated");
+>      }
+>  
+>      /* Remove the processed options from the QDict (the visitor processes
+> diff --git a/block/sheepdog.c b/block/sheepdog.c
+> index b229a664d9..0125df9d49 100644
+> --- a/block/sheepdog.c
+> +++ b/block/sheepdog.c
+> @@ -572,7 +572,7 @@ static int connect_to_sdog(BDRVSheepdogState *s, Error **errp)
+>      if (s->addr->type == SOCKET_ADDRESS_TYPE_INET && fd >= 0) {
+>          int ret = socket_set_nodelay(fd);
+>          if (ret < 0) {
+> -            error_report("%s", strerror(errno));
+> +            warn_report("can't set TCP_NODELAY: %s", strerror(errno));
+>          }
+>      }
 
-Signed-off-by: Artem Pisarenko <artem.k.pisarenko@gmail.com>
----
+Looks good to me.
 
-Notes:
-    v3:
-    - attributes has been properly incapsulated to qemu-timer (as suggested by Stefan Hajnoczi)
-    - attributes definition and docs refactored to avoid extra enum and use simple macros with explicit bit positions (as suggested by Stefan Hajnoczi and Paolo Bonzini)
-    - fixed old "QEMU_TIMER_ATTR(id)" notation (in comments) left from initial patch version
-    
-    v2:
-    - timer creation/initialize functions reworked and and their unnecessary variants removed (as Paolo Bonzini suggested)
-    - also their comments improved to avoid info duplication
-
- include/block/aio.h       |  59 ++++++++++++++++++++++---
- include/qemu/timer.h      | 110 +++++++++++++++++++++++-----------------------
- tests/ptimer-test-stubs.c |  13 ++++--
- util/qemu-timer.c         |  13 ++++--
- 4 files changed, 125 insertions(+), 70 deletions(-)
-
-diff --git a/include/block/aio.h b/include/block/aio.h
-index f08630c..0ca25df 100644
---- a/include/block/aio.h
-+++ b/include/block/aio.h
-@@ -388,6 +388,32 @@ struct LinuxAioState *aio_setup_linux_aio(AioContext *ctx, Error **errp);
- struct LinuxAioState *aio_get_linux_aio(AioContext *ctx);
- 
- /**
-+ * aio_timer_new_with_attrs:
-+ * @ctx: the aio context
-+ * @type: the clock type
-+ * @scale: the scale
-+ * @attributes: 0, or one to multiple OR'ed QEMU_TIMER_ATTR_<id> values
-+ *              to assign
-+ * @cb: the callback to call on timer expiry
-+ * @opaque: the opaque pointer to pass to the callback
-+ *
-+ * Allocate a new timer (with attributes) attached to the context @ctx.
-+ * The function is responsible for memory allocation.
-+ *
-+ * The preferred interface is aio_timer_init or aio_timer_init_with_attrs.
-+ * Use that unless you really need dynamic memory allocation.
-+ *
-+ * Returns: a pointer to the new timer
-+ */
-+static inline QEMUTimer *aio_timer_new_with_attrs(AioContext *ctx,
-+                                                  QEMUClockType type,
-+                                                  int scale, int attributes,
-+                                                  QEMUTimerCB *cb, void *opaque)
-+{
-+    return timer_new_full(&ctx->tlg, type, scale, attributes, cb, opaque);
-+}
-+
-+/**
-  * aio_timer_new:
-  * @ctx: the aio context
-  * @type: the clock type
-@@ -396,10 +422,7 @@ struct LinuxAioState *aio_get_linux_aio(AioContext *ctx);
-  * @opaque: the opaque pointer to pass to the callback
-  *
-  * Allocate a new timer attached to the context @ctx.
-- * The function is responsible for memory allocation.
-- *
-- * The preferred interface is aio_timer_init. Use that
-- * unless you really need dynamic memory allocation.
-+ * See aio_timer_new_with_attrs for details.
-  *
-  * Returns: a pointer to the new timer
-  */
-@@ -407,7 +430,29 @@ static inline QEMUTimer *aio_timer_new(AioContext *ctx, QEMUClockType type,
-                                        int scale,
-                                        QEMUTimerCB *cb, void *opaque)
- {
--    return timer_new_tl(ctx->tlg.tl[type], scale, cb, opaque);
-+    return timer_new_full(&ctx->tlg, type, scale, 0, cb, opaque);
-+}
-+
-+/**
-+ * aio_timer_init_with_attrs:
-+ * @ctx: the aio context
-+ * @ts: the timer
-+ * @type: the clock type
-+ * @scale: the scale
-+ * @attributes: 0, or one to multiple OR'ed QEMU_TIMER_ATTR_<id> values
-+ *              to assign
-+ * @cb: the callback to call on timer expiry
-+ * @opaque: the opaque pointer to pass to the callback
-+ *
-+ * Initialise a new timer (with attributes) attached to the context @ctx.
-+ * The caller is responsible for memory allocation.
-+ */
-+static inline void aio_timer_init_with_attrs(AioContext *ctx,
-+                                             QEMUTimer *ts, QEMUClockType type,
-+                                             int scale, int attributes,
-+                                             QEMUTimerCB *cb, void *opaque)
-+{
-+    timer_init_full(ts, &ctx->tlg, type, scale, attributes, cb, opaque);
- }
- 
- /**
-@@ -420,14 +465,14 @@ static inline QEMUTimer *aio_timer_new(AioContext *ctx, QEMUClockType type,
-  * @opaque: the opaque pointer to pass to the callback
-  *
-  * Initialise a new timer attached to the context @ctx.
-- * The caller is responsible for memory allocation.
-+ * See aio_timer_init_with_attrs for details.
-  */
- static inline void aio_timer_init(AioContext *ctx,
-                                   QEMUTimer *ts, QEMUClockType type,
-                                   int scale,
-                                   QEMUTimerCB *cb, void *opaque)
- {
--    timer_init_tl(ts, ctx->tlg.tl[type], scale, cb, opaque);
-+    timer_init_full(ts, &ctx->tlg, type, scale, 0, cb, opaque);
- }
- 
- /**
-diff --git a/include/qemu/timer.h b/include/qemu/timer.h
-index 39ea907..d45aded 100644
---- a/include/qemu/timer.h
-+++ b/include/qemu/timer.h
-@@ -52,6 +52,16 @@ typedef enum {
-     QEMU_CLOCK_MAX
- } QEMUClockType;
- 
-+/**
-+ * QEMU Timer attributes:
-+ *
-+ * An individual timer may be given one or multiple attributes when initialized.
-+ * Each attribute corresponds to one bit. Attributes modify the processing
-+ * of timers when they fire.
-+ *
-+ * No attributes defined currently.
-+ */
-+
- typedef struct QEMUTimerList QEMUTimerList;
- 
- struct QEMUTimerListGroup {
-@@ -67,6 +77,7 @@ struct QEMUTimer {
-     QEMUTimerCB *cb;
-     void *opaque;
-     QEMUTimer *next;
-+    int attributes;
-     int scale;
- };
- 
-@@ -418,22 +429,28 @@ int64_t timerlistgroup_deadline_ns(QEMUTimerListGroup *tlg);
-  */
- 
- /**
-- * timer_init_tl:
-+ * timer_init_full:
-  * @ts: the timer to be initialised
-- * @timer_list: the timer list to attach the timer to
-+ * @timer_list_group: (optional) the timer list group to attach the timer to
-+ * @type: the clock type to use
-  * @scale: the scale value for the timer
-+ * @attributes: 0, or one to multiple OR'ed QEMU_TIMER_ATTR_<id> values
-+ *              to assign
-  * @cb: the callback to be called when the timer expires
-  * @opaque: the opaque pointer to be passed to the callback
-  *
-- * Initialise a new timer and associate it with @timer_list.
-+ * Initialise a timer with the given scale and attributes,
-+ * and associate it with timer list for given clock @type in @timer_list_group
-+ * (or default timer list group, if NULL).
-  * The caller is responsible for allocating the memory.
-  *
-  * You need not call an explicit deinit call. Simply make
-  * sure it is not on a list with timer_del.
-  */
--void timer_init_tl(QEMUTimer *ts,
--                   QEMUTimerList *timer_list, int scale,
--                   QEMUTimerCB *cb, void *opaque);
-+void timer_init_full(QEMUTimer *ts,
-+                     QEMUTimerListGroup *timer_list_group, QEMUClockType type,
-+                     int scale, int attributes,
-+                     QEMUTimerCB *cb, void *opaque);
- 
- /**
-  * timer_init:
-@@ -445,14 +462,12 @@ void timer_init_tl(QEMUTimer *ts,
-  *
-  * Initialize a timer with the given scale on the default timer list
-  * associated with the clock.
-- *
-- * You need not call an explicit deinit call. Simply make
-- * sure it is not on a list with timer_del.
-+ * See timer_init_full for details.
-  */
- static inline void timer_init(QEMUTimer *ts, QEMUClockType type, int scale,
-                               QEMUTimerCB *cb, void *opaque)
- {
--    timer_init_tl(ts, main_loop_tlg.tl[type], scale, cb, opaque);
-+    timer_init_full(ts, &main_loop_tlg, type, scale, 0, cb, opaque);
- }
- 
- /**
-@@ -464,9 +479,7 @@ static inline void timer_init(QEMUTimer *ts, QEMUClockType type, int scale,
-  *
-  * Initialize a timer with nanosecond scale on the default timer list
-  * associated with the clock.
-- *
-- * You need not call an explicit deinit call. Simply make
-- * sure it is not on a list with timer_del.
-+ * See timer_init_full for details.
-  */
- static inline void timer_init_ns(QEMUTimer *ts, QEMUClockType type,
-                                  QEMUTimerCB *cb, void *opaque)
-@@ -483,9 +496,7 @@ static inline void timer_init_ns(QEMUTimer *ts, QEMUClockType type,
-  *
-  * Initialize a timer with microsecond scale on the default timer list
-  * associated with the clock.
-- *
-- * You need not call an explicit deinit call. Simply make
-- * sure it is not on a list with timer_del.
-+ * See timer_init_full for details.
-  */
- static inline void timer_init_us(QEMUTimer *ts, QEMUClockType type,
-                                  QEMUTimerCB *cb, void *opaque)
-@@ -502,9 +513,7 @@ static inline void timer_init_us(QEMUTimer *ts, QEMUClockType type,
-  *
-  * Initialize a timer with millisecond scale on the default timer list
-  * associated with the clock.
-- *
-- * You need not call an explicit deinit call. Simply make
-- * sure it is not on a list with timer_del.
-+ * See timer_init_full for details.
-  */
- static inline void timer_init_ms(QEMUTimer *ts, QEMUClockType type,
-                                  QEMUTimerCB *cb, void *opaque)
-@@ -513,27 +522,38 @@ static inline void timer_init_ms(QEMUTimer *ts, QEMUClockType type,
- }
- 
- /**
-- * timer_new_tl:
-- * @timer_list: the timer list to attach the timer to
-+ * timer_new_full:
-+ * @timer_list_group: (optional) the timer list group to attach the timer to
-+ * @type: the clock type to use
-  * @scale: the scale value for the timer
-+ * @attributes: 0, or one to multiple OR'ed QEMU_TIMER_ATTR_<id> values
-+ *              to assign
-  * @cb: the callback to be called when the timer expires
-  * @opaque: the opaque pointer to be passed to the callback
-  *
-- * Create a new timer and associate it with @timer_list.
-+ * Create a new timer with the given scale and attributes,
-+ * and associate it with timer list for given clock @type in @timer_list_group
-+ * (or default timer list group, if NULL).
-  * The memory is allocated by the function.
-  *
-  * This is not the preferred interface unless you know you
-- * are going to call timer_free. Use timer_init instead.
-+ * are going to call timer_free. Use timer_init or timer_init_full instead.
-+ *
-+ * The default timer list has one special feature: in icount mode,
-+ * %QEMU_CLOCK_VIRTUAL timers are run in the vCPU thread.  This is
-+ * not true of other timer lists, which are typically associated
-+ * with an AioContext---each of them runs its timer callbacks in its own
-+ * AioContext thread.
-  *
-  * Returns: a pointer to the timer
-  */
--static inline QEMUTimer *timer_new_tl(QEMUTimerList *timer_list,
--                                      int scale,
--                                      QEMUTimerCB *cb,
--                                      void *opaque)
-+static inline QEMUTimer *timer_new_full(QEMUTimerListGroup *timer_list_group,
-+                                        QEMUClockType type,
-+                                        int scale, int attributes,
-+                                        QEMUTimerCB *cb, void *opaque)
- {
-     QEMUTimer *ts = g_malloc0(sizeof(QEMUTimer));
--    timer_init_tl(ts, timer_list, scale, cb, opaque);
-+    timer_init_full(ts, timer_list_group, type, scale, attributes, cb, opaque);
-     return ts;
- }
- 
-@@ -544,21 +564,16 @@ static inline QEMUTimer *timer_new_tl(QEMUTimerList *timer_list,
-  * @cb: the callback to be called when the timer expires
-  * @opaque: the opaque pointer to be passed to the callback
-  *
-- * Create a new timer and associate it with the default
-- * timer list for the clock type @type.
-- *
-- * The default timer list has one special feature: in icount mode,
-- * %QEMU_CLOCK_VIRTUAL timers are run in the vCPU thread.  This is
-- * not true of other timer lists, which are typically associated
-- * with an AioContext---each of them runs its timer callbacks in its own
-- * AioContext thread.
-+ * Create a new timer with the given scale,
-+ * and associate it with the default timer list for the clock type @type.
-+ * See timer_new_full for details.
-  *
-  * Returns: a pointer to the timer
-  */
- static inline QEMUTimer *timer_new(QEMUClockType type, int scale,
-                                    QEMUTimerCB *cb, void *opaque)
- {
--    return timer_new_tl(main_loop_tlg.tl[type], scale, cb, opaque);
-+    return timer_new_full(&main_loop_tlg, type, scale, 0, cb, opaque);
- }
- 
- /**
-@@ -569,12 +584,7 @@ static inline QEMUTimer *timer_new(QEMUClockType type, int scale,
-  *
-  * Create a new timer with nanosecond scale on the default timer list
-  * associated with the clock.
-- *
-- * The default timer list has one special feature: in icount mode,
-- * %QEMU_CLOCK_VIRTUAL timers are run in the vCPU thread.  This is
-- * not true of other timer lists, which are typically associated
-- * with an AioContext---each of them runs its timer callbacks in its own
-- * AioContext thread.
-+ * See timer_new_full for details.
-  *
-  * Returns: a pointer to the newly created timer
-  */
-@@ -590,14 +600,9 @@ static inline QEMUTimer *timer_new_ns(QEMUClockType type, QEMUTimerCB *cb,
-  * @cb: the callback to call when the timer expires
-  * @opaque: the opaque pointer to pass to the callback
-  *
-- * The default timer list has one special feature: in icount mode,
-- * %QEMU_CLOCK_VIRTUAL timers are run in the vCPU thread.  This is
-- * not true of other timer lists, which are typically associated
-- * with an AioContext---each of them runs its timer callbacks in its own
-- * AioContext thread.
-- *
-  * Create a new timer with microsecond scale on the default timer list
-  * associated with the clock.
-+ * See timer_new_full for details.
-  *
-  * Returns: a pointer to the newly created timer
-  */
-@@ -613,14 +618,9 @@ static inline QEMUTimer *timer_new_us(QEMUClockType type, QEMUTimerCB *cb,
-  * @cb: the callback to call when the timer expires
-  * @opaque: the opaque pointer to pass to the callback
-  *
-- * The default timer list has one special feature: in icount mode,
-- * %QEMU_CLOCK_VIRTUAL timers are run in the vCPU thread.  This is
-- * not true of other timer lists, which are typically associated
-- * with an AioContext---each of them runs its timer callbacks in its own
-- * AioContext thread.
-- *
-  * Create a new timer with millisecond scale on the default timer list
-  * associated with the clock.
-+ * See timer_new_full for details.
-  *
-  * Returns: a pointer to the newly created timer
-  */
-diff --git a/tests/ptimer-test-stubs.c b/tests/ptimer-test-stubs.c
-index ca5cc3b..54b3fd2 100644
---- a/tests/ptimer-test-stubs.c
-+++ b/tests/ptimer-test-stubs.c
-@@ -34,14 +34,19 @@ int64_t ptimer_test_time_ns;
- int use_icount = 1;
- bool qtest_allowed;
- 
--void timer_init_tl(QEMUTimer *ts,
--                   QEMUTimerList *timer_list, int scale,
--                   QEMUTimerCB *cb, void *opaque)
-+void timer_init_full(QEMUTimer *ts,
-+                     QEMUTimerListGroup *timer_list_group, QEMUClockType type,
-+                     int scale, int attributes,
-+                     QEMUTimerCB *cb, void *opaque)
- {
--    ts->timer_list = timer_list;
-+    if (!timer_list_group) {
-+        timer_list_group = &main_loop_tlg;
-+    }
-+    ts->timer_list = timer_list_group->tl[type];
-     ts->cb = cb;
-     ts->opaque = opaque;
-     ts->scale = scale;
-+    ts->attributes = attributes;
-     ts->expire_time = -1;
- }
- 
-diff --git a/util/qemu-timer.c b/util/qemu-timer.c
-index 86bfe84..04527a3 100644
---- a/util/qemu-timer.c
-+++ b/util/qemu-timer.c
-@@ -339,14 +339,19 @@ int qemu_poll_ns(GPollFD *fds, guint nfds, int64_t timeout)
- }
- 
- 
--void timer_init_tl(QEMUTimer *ts,
--                   QEMUTimerList *timer_list, int scale,
--                   QEMUTimerCB *cb, void *opaque)
-+void timer_init_full(QEMUTimer *ts,
-+                     QEMUTimerListGroup *timer_list_group, QEMUClockType type,
-+                     int scale, int attributes,
-+                     QEMUTimerCB *cb, void *opaque)
- {
--    ts->timer_list = timer_list;
-+    if (!timer_list_group) {
-+        timer_list_group = &main_loop_tlg;
-+    }
-+    ts->timer_list = timer_list_group->tl[type];
-     ts->cb = cb;
-     ts->opaque = opaque;
-     ts->scale = scale;
-+    ts->attributes = attributes;
-     ts->expire_time = -1;
- }
- 
--- 
-2.7.4
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
