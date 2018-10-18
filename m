@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44425)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDDMW-0000ms-67
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDDMW-0000my-6N
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:49:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDDMT-0005nX-SK
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDDMT-0005n3-R4
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:49:36 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:56927 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:56938 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gDDMQ-0005WV-Jn
+	id 1gDDMQ-0005cq-Ik
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:49:32 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 18 Oct 2018 20:47:34 +0200
-Message-Id: <1539888473-16340-10-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 18 Oct 2018 20:47:38 +0200
+Message-Id: <1539888473-16340-14-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1539888473-16340-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1539888473-16340-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v2 09/28] target/mips: Add a comment before each
- CP0 register section in cpu.h
+Subject: [Qemu-devel] [PULL v2 13/28] target/mips: Add opcode values of MXU
+ ASE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,216 +30,300 @@ Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add a comment before each CP0 register section in CPUMIPSState
-definition, thus visually separating these sections.
+Add opcode values for all instructions in MXU ASE.
 
 Reviewed-by: Stefan Markovic <smarkovic@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/cpu.h | 88 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 88 insertions(+)
+ target/mips/translate.c | 276 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 276 insertions(+)
 
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index cd54073..37703ea 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -304,10 +304,16 @@ struct CPUMIPSState {
-  * 7   TagLo             TagHi                               KScratch<n>
-  *
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 4ad3562..a309df7 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -1651,6 +1651,282 @@ enum {
+  *   Programming Manual", Ingenic Semiconductor Co, Ltd., 2017
   */
-+/*
-+ * CP0 Register 0
-+ */
-     int32_t CP0_Index;
-     /* CP0_MVP* are per MVP registers. */
-     int32_t CP0_VPControl;
- #define CP0VPCtl_DIS    0
-+/*
-+ * CP0 Register 1
-+ */
-     int32_t CP0_Random;
-     int32_t CP0_VPEControl;
- #define CP0VPECo_YSI	21
-@@ -348,7 +354,13 @@ struct CPUMIPSState {
- #define CP0VPEOpt_DWX2	2
- #define CP0VPEOpt_DWX1	1
- #define CP0VPEOpt_DWX0	0
-+/*
-+ * CP0 Register 2
-+ */
-     uint64_t CP0_EntryLo0;
-+/*
-+ * CP0 Register 3
-+ */
-     uint64_t CP0_EntryLo1;
- #if defined(TARGET_MIPS64)
- # define CP0EnLo_RI 63
-@@ -359,8 +371,14 @@ struct CPUMIPSState {
- #endif
-     int32_t CP0_GlobalNumber;
- #define CP0GN_VPId 0
-+/*
-+ * CP0 Register 4
-+ */
-     target_ulong CP0_Context;
-     target_ulong CP0_KScratch[MIPS_KSCRATCH_NUM];
-+/*
-+ * CP0 Register 5
-+ */
-     int32_t CP0_PageMask;
-     int32_t CP0_PageGrain_rw_bitmask;
-     int32_t CP0_PageGrain;
-@@ -398,6 +416,9 @@ struct CPUMIPSState {
- #define CP0SC2_XR       56
- #define CP0SC2_XR_MASK  (0xFFULL << CP0SC2_XR)
- #define CP0SC2_MASK     (CP0SC_1GMASK | (CP0SC_1GMASK << 16) | CP0SC2_XR_MASK)
-+/*
-+ * CP0 Register 6
-+ */
-     int32_t CP0_Wired;
-     int32_t CP0_SRSConf0_rw_bitmask;
-     int32_t CP0_SRSConf0;
-@@ -428,16 +449,34 @@ struct CPUMIPSState {
- #define CP0SRSC4_SRS15	20
- #define CP0SRSC4_SRS14	10
- #define CP0SRSC4_SRS13	0
-+/*
-+ * CP0 Register 7
-+ */
-     int32_t CP0_HWREna;
-+/*
-+ * CP0 Register 8
-+ */
-     target_ulong CP0_BadVAddr;
-     uint32_t CP0_BadInstr;
-     uint32_t CP0_BadInstrP;
-     uint32_t CP0_BadInstrX;
-+/*
-+ * CP0 Register 9
-+ */
-     int32_t CP0_Count;
-+/*
-+ * CP0 Register 10
-+ */
-     target_ulong CP0_EntryHi;
- #define CP0EnHi_EHINV 10
-     target_ulong CP0_EntryHi_ASID_mask;
-+/*
-+ * CP0 Register 11
-+ */
-     int32_t CP0_Compare;
-+/*
-+ * CP0 Register 12
-+ */
-     int32_t CP0_Status;
- #define CP0St_CU3   31
- #define CP0St_CU2   30
-@@ -479,6 +518,9 @@ struct CPUMIPSState {
- #define CP0SRSMap_SSV2 8
- #define CP0SRSMap_SSV1 4
- #define CP0SRSMap_SSV0 0
-+/*
-+ * CP0 Register 13
-+ */
-     int32_t CP0_Cause;
- #define CP0Ca_BD   31
- #define CP0Ca_TI   30
-@@ -490,12 +532,21 @@ struct CPUMIPSState {
- #define CP0Ca_IP    8
- #define CP0Ca_IP_mask 0x0000FF00
- #define CP0Ca_EC    2
-+/*
-+ * CP0 Register 14
-+ */
-     target_ulong CP0_EPC;
-+/*
-+ * CP0 Register 15
-+ */
-     int32_t CP0_PRid;
-     target_ulong CP0_EBase;
-     target_ulong CP0_EBaseWG_rw_bitmask;
- #define CP0EBase_WG 11
-     target_ulong CP0_CMGCRBase;
-+/*
-+ * CP0 Register 16
-+ */
-     int32_t CP0_Config0;
- #define CP0C0_M    31
- #define CP0C0_K23  28    /* 30..28 */
-@@ -612,6 +663,9 @@ struct CPUMIPSState {
-     uint64_t CP0_MAAR[MIPS_MAAR_MAX];
-     int32_t CP0_MAARI;
-     /* XXX: Maybe make LLAddr per-TC? */
-+/*
-+ * CP0 Register 17
-+ */
-     uint64_t lladdr;
-     target_ulong llval;
-     target_ulong llnewval;
-@@ -620,11 +674,23 @@ struct CPUMIPSState {
-     target_ulong llreg;
-     uint64_t CP0_LLAddr_rw_bitmask;
-     int CP0_LLAddr_shift;
-+/*
-+ * CP0 Register 18
-+ */
-     target_ulong CP0_WatchLo[8];
-+/*
-+ * CP0 Register 19
-+ */
-     int32_t CP0_WatchHi[8];
- #define CP0WH_ASID 16
-+/*
-+ * CP0 Register 20
-+ */
-     target_ulong CP0_XContext;
-     int32_t CP0_Framemask;
-+/*
-+ * CP0 Register 23
-+ */
-     int32_t CP0_Debug;
- #define CP0DB_DBD  31
- #define CP0DB_DM   30
-@@ -644,18 +710,40 @@ struct CPUMIPSState {
- #define CP0DB_DDBL 2
- #define CP0DB_DBp  1
- #define CP0DB_DSS  0
-+/*
-+ * CP0 Register 24
-+ */
-     target_ulong CP0_DEPC;
-+/*
-+ * CP0 Register 25
-+ */
-     int32_t CP0_Performance0;
-+/*
-+ * CP0 Register 26
-+ */
-     int32_t CP0_ErrCtl;
- #define CP0EC_WST 29
- #define CP0EC_SPR 28
- #define CP0EC_ITC 26
-+/*
-+ * CP0 Register 28
-+ */
-     uint64_t CP0_TagLo;
-     int32_t CP0_DataLo;
-+/*
-+ * CP0 Register 29
-+ */
-     int32_t CP0_TagHi;
-     int32_t CP0_DataHi;
-+/*
-+ * CP0 Register 30
-+ */
-     target_ulong CP0_ErrorEPC;
-+/*
-+ * CP0 Register 31
-+ */
-     int32_t CP0_DESAVE;
+ 
++enum {
++    OPC_MXU_S32MADD  = 0x00,
++    OPC_MXU_S32MADDU = 0x01,
++    /* not assigned 0x02 */
++    OPC_MXU__POOL00  = 0x03,
++    OPC_MXU_S32MSUB  = 0x04,
++    OPC_MXU_S32MSUBU = 0x05,
++    OPC_MXU__POOL01  = 0x06,
++    OPC_MXU__POOL02  = 0x07,
++    OPC_MXU_D16MUL   = 0x08,
++    OPC_MXU__POOL03  = 0x09,
++    OPC_MXU_D16MAC   = 0x0A,
++    OPC_MXU_D16MACF  = 0x0B,
++    OPC_MXU_D16MADL  = 0x0C,
++    OPC_MXU__POOL04  = 0x0D,
++    OPC_MXU_Q16ADD   = 0x0E,
++    OPC_MXU_D16MACE  = 0x0F,
++    OPC_MXU__POOL05  = 0x10,
++    OPC_MXU__POOL06  = 0x11,
++    OPC_MXU__POOL07  = 0x12,
++    OPC_MXU__POOL08  = 0x13,
++    OPC_MXU__POOL09  = 0x14,
++    OPC_MXU__POOL10  = 0x15,
++    OPC_MXU__POOL11  = 0x16,
++    OPC_MXU__POOL12  = 0x17,
++    OPC_MXU_D32ADD   = 0x18,
++    OPC_MXU__POOL13  = 0x19,
++    /* not assigned 0x1A */
++    OPC_MXU__POOL14  = 0x1B,
++    OPC_MXU__POOL15  = 0x1C,
++    OPC_MXU_Q8ACCE   = 0x1D,
++    /* not assigned 0x1E */
++    /* not assigned 0x1F */
++    /* not assigned 0x20 */
++    /* not assigned 0x21 */
++    OPC_MXU_S8LDD    = 0x22,
++    OPC_MXU_S8STD    = 0x23,
++    OPC_MXU_S8LDI    = 0x24,
++    OPC_MXU_S8SDI    = 0x25,
++    OPC_MXU__POOL16  = 0x26,
++    OPC_MXU__POOL17  = 0x27,
++    OPC_MXU_LXB      = 0x28,
++    /* not assigned 0x29 */
++    OPC_MXU_S16LDD   = 0x2A,
++    OPC_MXU_S16STD   = 0x2B,
++    OPC_MXU_S16LDI   = 0x2C,
++    OPC_MXU_S16SDI   = 0x2D,
++    OPC_MXU_S32M2I   = 0x2E,
++    OPC_MXU_S32I2M   = 0x2F,
++    OPC_MXU_D32SLL   = 0x30,
++    OPC_MXU_D32SLR   = 0x31,
++    OPC_MXU_D32SARL  = 0x32,
++    OPC_MXU_D32SAR   = 0x33,
++    OPC_MXU_Q16SLL   = 0x34,
++    OPC_MXU_Q16SLR   = 0x35,
++    OPC_MXU__POOL18  = 0x36,
++    OPC_MXU_Q16SAR   = 0x37,
++    OPC_MXU__POOL19  = 0x38,
++    OPC_MXU__POOL20  = 0x39,
++    OPC_MXU__POOL21  = 0x3A,
++    OPC_MXU_Q16SCOP  = 0x3B,
++    OPC_MXU_Q8MADL   = 0x3C,
++    OPC_MXU_S32SFL   = 0x3D,
++    OPC_MXU_Q8SAD    = 0x3E,
++    /* not assigned 0x3F */
++};
 +
-     /* We waste some space so we can handle shadow registers like TCs. */
-     TCState tcs[MIPS_SHADOW_SET_MAX];
-     CPUMIPSFPUContext fpus[MIPS_FPU_MAX];
++
++/*
++ * MXU pool 00
++ */
++enum {
++    OPC_MXU_S32MAX   = 0x00,
++    OPC_MXU_S32MIN   = 0x01,
++    OPC_MXU_D16MAX   = 0x02,
++    OPC_MXU_D16MIN   = 0x03,
++    OPC_MXU_Q8MAX    = 0x04,
++    OPC_MXU_Q8MIN    = 0x05,
++    OPC_MXU_Q8SLT    = 0x06,
++    OPC_MXU_Q8SLTU   = 0x07,
++};
++
++/*
++ * MXU pool 01
++ */
++enum {
++    OPC_MXU_S32SLT   = 0x00,
++    OPC_MXU_D16SLT   = 0x01,
++    OPC_MXU_D16AVG   = 0x02,
++    OPC_MXU_D16AVGR  = 0x03,
++    OPC_MXU_Q8AVG    = 0x04,
++    OPC_MXU_Q8AVGR   = 0x05,
++    OPC_MXU_Q8ADD    = 0x07,
++};
++
++/*
++ * MXU pool 02
++ */
++enum {
++    OPC_MXU_S32CPS   = 0x00,
++    OPC_MXU_D16CPS   = 0x02,
++    OPC_MXU_Q8ABD    = 0x04,
++    OPC_MXU_Q16SAT   = 0x06,
++};
++
++/*
++ * MXU pool 03
++ */
++enum {
++    OPC_MXU_D16MULF  = 0x00,
++    OPC_MXU_D16MULE  = 0x01,
++};
++
++/*
++ * MXU pool 04
++ */
++enum {
++    OPC_MXU_S16MAD   = 0x00,
++    OPC_MXU_S16MAD_1 = 0x01,
++};
++
++/*
++ * MXU pool 05
++ */
++enum {
++    OPC_MXU_S32LDD   = 0x00,
++    OPC_MXU_S32LDDR  = 0x01,
++};
++
++/*
++ * MXU pool 06
++ */
++enum {
++    OPC_MXU_S32STD   = 0x00,
++    OPC_MXU_S32STDR  = 0x01,
++};
++
++/*
++ * MXU pool 07
++ */
++enum {
++    OPC_MXU_S32LDDV  = 0x00,
++    OPC_MXU_S32LDDVR = 0x01,
++};
++
++/*
++ * MXU pool 08
++ */
++enum {
++    OPC_MXU_S32STDV  = 0x00,
++    OPC_MXU_S32STDVR = 0x01,
++};
++
++/*
++ * MXU pool 09
++ */
++enum {
++    OPC_MXU_S32LDI   = 0x00,
++    OPC_MXU_S32LDIR  = 0x01,
++};
++
++/*
++ * MXU pool 10
++ */
++enum {
++    OPC_MXU_S32SDI   = 0x00,
++    OPC_MXU_S32SDIR  = 0x01,
++};
++
++/*
++ * MXU pool 11
++ */
++enum {
++    OPC_MXU_S32LDIV  = 0x00,
++    OPC_MXU_S32LDIVR = 0x01,
++};
++
++/*
++ * MXU pool 12
++ */
++enum {
++    OPC_MXU_S32SDIV  = 0x00,
++    OPC_MXU_S32SDIVR = 0x01,
++};
++
++/*
++ * MXU pool 13
++ */
++enum {
++    OPC_MXU_D32ACC   = 0x00,
++    OPC_MXU_D32ACCM  = 0x01,
++    OPC_MXU_D32ASUM  = 0x02,
++};
++
++/*
++ * MXU pool 14
++ */
++enum {
++    OPC_MXU_Q16ACC   = 0x00,
++    OPC_MXU_Q16ACCM  = 0x01,
++    OPC_MXU_Q16ASUM  = 0x02,
++};
++
++/*
++ * MXU pool 15
++ */
++enum {
++    OPC_MXU_Q8ADDE   = 0x00,
++    OPC_MXU_D8SUM    = 0x01,
++    OPC_MXU_D8SUMC   = 0x02,
++};
++
++/*
++ * MXU pool 16
++ */
++enum {
++    OPC_MXU_S32MUL   = 0x00,
++    OPC_MXU_S32MULU  = 0x01,
++    OPC_MXU_S32EXTR  = 0x02,
++    OPC_MXU_S32EXTRV = 0x03,
++};
++
++/*
++ * MXU pool 17
++ */
++enum {
++    OPC_MXU_D32SARW  = 0x00,
++    OPC_MXU_S32ALN   = 0x01,
++    OPC_MXU_S32ALNI  = 0x02,
++    OPC_MXU_S32NOR   = 0x03,
++    OPC_MXU_S32AND   = 0x04,
++    OPC_MXU_S32OR    = 0x05,
++    OPC_MXU_S32XOR   = 0x06,
++    OPC_MXU_S32LUI   = 0x07,
++};
++
++/*
++ * MXU pool 18
++ */
++enum {
++    OPC_MXU_D32SLLV  = 0x00,
++    OPC_MXU_D32SLRV  = 0x01,
++    OPC_MXU_D32SARV  = 0x03,
++    OPC_MXU_Q16SLLV  = 0x04,
++    OPC_MXU_Q16SLRV  = 0x05,
++    OPC_MXU_Q16SARV  = 0x07,
++};
++
++/*
++ * MXU pool 19
++ */
++enum {
++    OPC_MXU_Q8MUL    = 0x00,
++    OPC_MXU_Q8MULSU  = 0x01,
++};
++
++/*
++ * MXU pool 20
++ */
++enum {
++    OPC_MXU_Q8MOVZ   = 0x00,
++    OPC_MXU_Q8MOVN   = 0x01,
++    OPC_MXU_D16MOVZ  = 0x02,
++    OPC_MXU_D16MOVN  = 0x03,
++    OPC_MXU_S32MOVZ  = 0x04,
++    OPC_MXU_S32MOVN  = 0x05,
++};
++
++/*
++ * MXU pool 21
++ */
++enum {
++    OPC_MXU_Q8MAC    = 0x00,
++    OPC_MXU_Q8MACSU  = 0x01,
++};
++
+ 
+ /* global register indices */
+ static TCGv cpu_gpr[32], cpu_PC;
 -- 
 2.7.4
