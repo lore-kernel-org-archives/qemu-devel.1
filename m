@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39060)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gDEYP-0008QP-1W
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:05:57 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gDEYW-00005M-Rx
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:06:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gDEYO-0000Yz-7D
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:05:56 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gDEYU-0000ra-F8
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:06:03 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 18 Oct 2018 17:03:51 -0300
-Message-Id: <20181018200422.4358-15-ehabkost@redhat.com>
+Date: Thu, 18 Oct 2018 17:03:52 -0300
+Message-Id: <20181018200422.4358-16-ehabkost@redhat.com>
 In-Reply-To: <20181018200422.4358-1-ehabkost@redhat.com>
 References: <20181018200422.4358-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 14/45] hw/alpha/typhoon: Remove unuseful code
+Subject: [Qemu-devel] [PULL 15/45] hw/hppa/dino: Remove unuseful code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +29,33 @@ From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20181002212522.23303-11-f4bug@amsat.org>
+Message-Id: <20181002212522.23303-12-f4bug@amsat.org>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/alpha/typhoon.c | 13 -------------
- 1 file changed, 13 deletions(-)
+ hw/hppa/dino.c | 7 -------
+ 1 file changed, 7 deletions(-)
 
-diff --git a/hw/alpha/typhoon.c b/hw/alpha/typhoon.c
-index d74b5b55e1..8004afe45b 100644
---- a/hw/alpha/typhoon.c
-+++ b/hw/alpha/typhoon.c
-@@ -932,23 +932,10 @@ PCIBus *typhoon_init(ram_addr_t ram_size, ISABus **=
-isa_bus,
+diff --git a/hw/hppa/dino.c b/hw/hppa/dino.c
+index 564b938e3a..31e09942b5 100644
+--- a/hw/hppa/dino.c
++++ b/hw/hppa/dino.c
+@@ -488,17 +488,10 @@ PCIBus *dino_init(MemoryRegion *addr_space,
      return b;
  }
 =20
--static int typhoon_pcihost_init(SysBusDevice *dev)
+-static int dino_pcihost_init(SysBusDevice *dev)
 -{
 -    return 0;
 -}
 -
--static void typhoon_pcihost_class_init(ObjectClass *klass, void *data)
--{
+ static void dino_pcihost_class_init(ObjectClass *klass, void *data)
+ {
 -    SysBusDeviceClass *k =3D SYS_BUS_DEVICE_CLASS(klass);
--
--    k->init =3D typhoon_pcihost_init;
--}
--
- static const TypeInfo typhoon_pcihost_info =3D {
-     .name          =3D TYPE_TYPHOON_PCI_HOST_BRIDGE,
-     .parent        =3D TYPE_PCI_HOST_BRIDGE,
-     .instance_size =3D sizeof(TyphoonState),
--    .class_init    =3D typhoon_pcihost_class_init,
- };
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
 =20
- static void typhoon_iommu_memory_region_class_init(ObjectClass *klass,
+-    k->init =3D dino_pcihost_init;
+     dc->vmsd =3D &vmstate_dino;
+ }
+=20
 --=20
 2.18.0.rc1.1.g3f1ff2140
