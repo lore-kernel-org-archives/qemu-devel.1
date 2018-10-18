@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39084)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gD7yt-0006lR-0N
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 09:04:51 -0400
+	(envelope-from <philmd@redhat.com>) id 1gD7yt-0006lm-En
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 09:04:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gD7ys-00032Y-9i
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 09:04:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58844)
+	(envelope-from <philmd@redhat.com>) id 1gD7yn-0002oC-TM
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 09:04:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47708)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gD7ys-0002yK-3J
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 09:04:50 -0400
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gD7yn-0002kf-MB
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 09:04:45 -0400
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Thu, 18 Oct 2018 15:04:31 +0200
-Message-Id: <20181018130434.23237-2-philmd@redhat.com>
-In-Reply-To: <20181018130434.23237-1-philmd@redhat.com>
-References: <20181018130434.23237-1-philmd@redhat.com>
+Date: Thu, 18 Oct 2018 15:04:30 +0200
+Message-Id: <20181018130434.23237-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 1/4] hw/misc/pvpanic: Build the pvpanic
- device in $(common-obj)
+Subject: [Qemu-devel] [PATCH v3 0/4] hw/misc: Add a MMIO interface to the
+ pvpanic device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,32 +28,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peng Hao <peng.hao2@zte.com.cn>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Wen Congyang <wency@cn.fujitsu.com>, Hu Tao <hutao@cn.fujitsu.com>
 
-The 'pvpanic' ISA device can be use by any machine with an ISA bus.
+Hi, this series takes Peng Hao's previous work but rather than adding yet
+another device, simply add the MMIO interface to the current device (whic=
+h
+only implements the I/O port access).=20
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- hw/misc/Makefile.objs | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The first patches are simple cleanups:
+- patch 1 move the pvpanic device with the 'ocmmon objects' so we compile
+  it once for the x86/arm/aarch64 archs,
+- patch 2 simply renames ISA fields/definitions to generic ones.
 
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index 6d50b03cfd..74e7300f30 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -11,6 +11,7 @@ common-obj-$(CONFIG_PCA9552) +=3D pca9552.o
-=20
- common-obj-y +=3D unimp.o
- common-obj-$(CONFIG_FW_CFG_DMA) +=3D vmcoreinfo.o
-+common-obj-$(CONFIG_PVPANIC) +=3D pvpanic.o
-=20
- # ARM devices
- common-obj-$(CONFIG_PL310) +=3D arm_l2x0.o
-@@ -70,7 +71,6 @@ obj-$(CONFIG_IOTKIT_SECCTL) +=3D iotkit-secctl.o
- obj-$(CONFIG_IOTKIT_SYSCTL) +=3D iotkit-sysctl.o
- obj-$(CONFIG_IOTKIT_SYSINFO) +=3D iotkit-sysinfo.o
-=20
--obj-$(CONFIG_PVPANIC) +=3D pvpanic.o
- obj-$(CONFIG_HYPERV_TESTDEV) +=3D hyperv_testdev.o
- obj-$(CONFIG_AUX) +=3D auxbus.o
- obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_scu.o aspeed_sdmc.o
+Then instead of add/use the MMIO pvpanic device in the virt machine in an
+unique patch, I split it in two distinct patches:
+- patch 3 uses Peng Hao's work, but add the MMIO interface to the existin=
+g
+  device (no logical change).
+- patch 4 is Peng Hao's work in the virt machine (no logical change).
+
+v2 from Peng Hao is:
+https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg03433.html
+
+Regards,
+
+Phil.
+
+Philippe Mathieu-Daud=C3=A9 (4):
+  hw/misc/pvpanic: Build the pvpanic device in $(common-obj)
+  hw/misc/pvpanic: Cosmetic renaming
+  hw/misc/pvpanic: Add the MMIO interface
+  hw/arm/virt: Use the pvpanic device
+
+ default-configs/arm-softmmu.mak |  2 +-
+ hw/arm/virt.c                   | 21 ++++++++++
+ hw/misc/Makefile.objs           |  2 +-
+ hw/misc/pvpanic.c               | 68 +++++++++++++++++++++++++++++----
+ include/hw/arm/virt.h           |  1 +
+ 5 files changed, 84 insertions(+), 10 deletions(-)
+
 --=20
 2.17.2
