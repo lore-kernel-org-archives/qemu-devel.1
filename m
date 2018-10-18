@@ -1,24 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37685)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gDD1k-00023p-9F
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:28:09 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gDD2u-0002vM-TZ
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:29:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gDD1i-0000EJ-WD
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:28:08 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:35743)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gDD1i-0000C5-LS
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:28:06 -0400
-Received: by mail-pl1-x642.google.com with SMTP id f8-v6so14709715plb.2
-	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 11:28:06 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 18 Oct 2018 11:27:58 -0700
-Message-Id: <20181018182758.18646-4-richard.henderson@linaro.org>
-In-Reply-To: <20181018182758.18646-1-richard.henderson@linaro.org>
-References: <20181018182758.18646-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 3/3] target/arm: Flush only the TLBs affected
- by TTBR*_EL1
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gDD2n-00025a-RI
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:29:19 -0400
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Thu, 18 Oct 2018 19:28:45 +0100
+Message-Id: <20181018182856.28001-1-mark.cave-ayland@ilande.co.uk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v4 00/11] hw/m68k: add Apple Machintosh Quadra
+ 800 machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,74 +21,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, jasowang@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, hpoussin@reactos.org, kraxel@redhat.com, pbonzini@redhat.com, yongbok.kim@mips.com, afaerber@suse.de, aurelien@aurel32.net, laurent@vivier.eu
 
-Only the EL0 and EL1 TLBs are affected by the EL1 register,
-so flush only 2 of the 8 TLBs.
+(MCA: I've reposting this on behalf of Laurent as I've been working on the
+feedback from v3 over the past months and therefore am better placed to
+update the changelog. If all goes well, it would be good to get this merged
+in time for 3.1 soft freeze)
 
-In testing a boot of the Ubuntu installer to the first menu, this
-accounts for nearly all of the full tlb flushes: all but 11k of
-the 1.2M instances without the patch.
+I'm rebasing some of these patches for seven years now,
+too many years...
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/helper.c | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+if you want to test the machine, I'm sorry, it doesn't boot
+a MacROM, but you can boot a linux kernel from the command line.
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index ed70ac645e..a943e91666 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -2706,14 +2706,16 @@ static void vmsa_tcr_el1_write(CPUARMState *env, const ARMCPRegInfo *ri,
-     tcr->raw_tcr = value;
- }
- 
--static void vmsa_ttbr_write(CPUARMState *env, const ARMCPRegInfo *ri,
--                            uint64_t value)
-+static void vmsa_ttbr1_write(CPUARMState *env, const ARMCPRegInfo *ri,
-+                             uint64_t value)
- {
-     /* If the ASID changes (with a 64-bit write), we must flush the TLB.  */
-     if (cpreg_field_is_64bit(ri) &&
-         extract64(raw_read(env, ri) ^ value, 48, 16) != 0) {
-         ARMCPU *cpu = arm_env_get_cpu(env);
--        tlb_flush(CPU(cpu));
-+        tlb_flush_by_mmuidx(CPU(cpu),
-+                            ARMMMUIdxBit_S12NSE1 |
-+                            ARMMMUIdxBit_S12NSE0);
-     }
-     raw_write(env, ri, value);
- }
-@@ -2761,12 +2763,12 @@ static const ARMCPRegInfo vmsa_cp_reginfo[] = {
-       .fieldoffset = offsetof(CPUARMState, cp15.esr_el[1]), .resetvalue = 0, },
-     { .name = "TTBR0_EL1", .state = ARM_CP_STATE_BOTH,
-       .opc0 = 3, .opc1 = 0, .crn = 2, .crm = 0, .opc2 = 0,
--      .access = PL1_RW, .writefn = vmsa_ttbr_write, .resetvalue = 0,
-+      .access = PL1_RW, .writefn = vmsa_ttbr1_write, .resetvalue = 0,
-       .bank_fieldoffsets = { offsetof(CPUARMState, cp15.ttbr0_s),
-                              offsetof(CPUARMState, cp15.ttbr0_ns) } },
-     { .name = "TTBR1_EL1", .state = ARM_CP_STATE_BOTH,
-       .opc0 = 3, .opc1 = 0, .crn = 2, .crm = 0, .opc2 = 1,
--      .access = PL1_RW, .writefn = vmsa_ttbr_write, .resetvalue = 0,
-+      .access = PL1_RW, .writefn = vmsa_ttbr1_write, .resetvalue = 0,
-       .bank_fieldoffsets = { offsetof(CPUARMState, cp15.ttbr1_s),
-                              offsetof(CPUARMState, cp15.ttbr1_ns) } },
-     { .name = "TCR_EL1", .state = ARM_CP_STATE_AA64,
-@@ -3018,12 +3020,12 @@ static const ARMCPRegInfo lpae_cp_reginfo[] = {
-       .access = PL1_RW, .type = ARM_CP_64BIT | ARM_CP_ALIAS,
-       .bank_fieldoffsets = { offsetof(CPUARMState, cp15.ttbr0_s),
-                              offsetof(CPUARMState, cp15.ttbr0_ns) },
--      .writefn = vmsa_ttbr_write, },
-+      .writefn = vmsa_ttbr1_write, },
-     { .name = "TTBR1", .cp = 15, .crm = 2, .opc1 = 1,
-       .access = PL1_RW, .type = ARM_CP_64BIT | ARM_CP_ALIAS,
-       .bank_fieldoffsets = { offsetof(CPUARMState, cp15.ttbr1_s),
-                              offsetof(CPUARMState, cp15.ttbr1_ns) },
--      .writefn = vmsa_ttbr_write, },
-+      .writefn = vmsa_ttbr1_write, },
-     REGINFO_SENTINEL
- };
- 
+You can install your own disk using debian-installer, with:
+
+    ...
+    -M q800 \
+    -serial none -serial mon:stdio \
+    -m 1000M -drive file=m68k.qcow2,format=qcow2 \
+    -net nic,model=dp83932,addr=09:00:07:12:34:57 \
+    -append "console=ttyS0 vga=off" \
+    -kernel vmlinux-4.15.0-2-m68k \
+    -initrd initrd.gz \
+    -drive file=debian-9.0-m68k-NETINST-1.iso \
+    -drive file=m68k.qcow2,format=qcow2 \
+    -nographic
+
+If you use a graphic adapter instead of "-nographic", you can use "-g" to set the
+size of the display (I use "-g 1600x800x24").
+
+You can get the ISO from:
+
+https://cdimage.debian.org/mirror/cdimage/ports/9.0/m68k/iso-cd/debian-9.0-m68k-NETINST-1.iso
+
+and extract the kernel and initrd.gz:
+
+guestfish --add debian-9.0-m68k-NETINST-1.iso --ro \
+          --mount /dev/sda:/ <<_EOF_
+copy-out /install/cdrom/initrd.gz .
+copy-out /install/kernels/vmlinux-4.15.0-2-m68k .
+_EOF_
+
+The mirror to use is: http://ftp.ports.debian.org/debian-ports/
+when it fails, continue without boot loader.
+
+In the same way, you can extract the kernel and the initramfs from the qcow2
+image to use it with "-kernel" and "-initrd":
+
+guestfish --add m68k.qcow2 --mount /dev/sda2:/ <<_EOF_
+copy-out /boot/vmlinux-4.15.0-2-m68k .
+copy-out /boot/initrd.img-4.15.0-2-m68k .
+_EOF_
+
+and boot with:
+
+   ...
+   -append "root=/dev/sda2 rw console=ttyS0 console=tty \
+   -kernel vmlinux-4.15.0-2-m68k \
+   -initrd initrd.img-4.15.0-2-m68k
+
+v4: Drop RFC from subject prefix as this is getting close to final
+    Rebased onto master (fixing ESP, rom_ptr() conflicts)
+    Reworked q800.c based upon Thomas' comments about cpu_init() and
+      qemu_check_nic_model()
+    Address Thomas' comments on using error_report() instead of hw_error()
+    Change the NuBus memory regions from DEVICE_NATIVE_ENDIAN to
+      DEVICE_BIG_ENDIAN
+    Split macfb Nubus support into separate commit
+    Change VMSTATE_BUFFER_UNSAFE() to VMSTATE_UINT8_ARRAY() in macfb.c as
+      suggested by David
+    Remove dummy Apple Sound Chip migration state as pointed out by David
+    Keep VIA ADB state and buffers in the mac_via device rather than adding
+      to existing ADBState (this matches the pattern used in the PPC CUDA/PMU
+      VIAs)
+    Remove blacklisting for q800 machine from "make check" as requested by
+      Thomas with the following fixes:
+        - Fix incorrect MemoryRegion owner in ASC device
+        - Add qtest_enabled() check in q800_init() to allow testing when no
+          kernel is specified
+        - Move some Mac VIA initialisation from init to realize
+    Remove legacy drive properties from SWIM floppy controller and instead
+      expose separate floppy bus and drive devices as requested by Kevin
+        
+v3: fix subject prefix "C" -> "RFC"
+
+v2: remove the dp8393x fixes, because one of the patch breaks something
+    Update "dp8393x: manage big endian bus" with idea from Thomas
+    Mark has reworked most of the patches:
+    - use mos6522
+    - some code move, renamings and cleanup
+
+Laurent Vivier (10):
+  hw/m68k: add via support
+  hw/m68k: implement ADB bus support for via
+  escc: introduce a selector for the register bit
+  hw/m68k: add macfb video card
+  hw/m68k: Apple Sound Chip (ASC) emulation
+  ESP: add pseudo-DMA as used by Macintosh
+  hw/m68k: add Nubus support
+  hw/m68k: add a dummy SWIM floppy controller
+  dp8393x: manage big endian bus
+  hw/m68k: define Macintosh Quadra 800
+
+Mark Cave-Ayland (1):
+  hw/m68k: add Nubus support for macfb video card
+
+ MAINTAINERS                         |  19 +
+ arch_init.c                         |   4 +
+ default-configs/m68k-softmmu.mak    |  14 +
+ hw/Makefile.objs                    |   1 +
+ hw/audio/Makefile.objs              |   1 +
+ hw/audio/asc.c                      | 446 +++++++++++++++++++
+ hw/block/Makefile.objs              |   1 +
+ hw/block/swim.c                     | 415 ++++++++++++++++++
+ hw/char/escc.c                      |  30 +-
+ hw/display/Makefile.objs            |   1 +
+ hw/display/macfb-template.h         | 158 +++++++
+ hw/display/macfb.c                  | 308 +++++++++++++
+ hw/input/adb.c                      |   2 +
+ hw/intc/Makefile.objs               |   1 +
+ hw/intc/q800_irq.c                  |  73 ++++
+ hw/m68k/Makefile.objs               |   6 +-
+ hw/m68k/bootinfo.h                  | 100 +++++
+ hw/m68k/q800.c                      | 367 ++++++++++++++++
+ hw/misc/Makefile.objs               |   1 +
+ hw/misc/mac_via.c                   | 834 ++++++++++++++++++++++++++++++++++++
+ hw/net/dp8393x.c                    |  88 ++--
+ hw/nubus/Makefile.objs              |   4 +
+ hw/nubus/mac-nubus-bridge.c         |  45 ++
+ hw/nubus/nubus-bridge.c             |  34 ++
+ hw/nubus/nubus-bus.c                | 111 +++++
+ hw/nubus/nubus-device.c             | 209 +++++++++
+ hw/scsi/esp.c                       | 292 +++++++++++--
+ include/hw/audio/asc.h              |  48 +++
+ include/hw/block/swim.h             |  76 ++++
+ include/hw/char/escc.h              |   1 +
+ include/hw/display/macfb.h          |  63 +++
+ include/hw/intc/q800_irq.h          |  39 ++
+ include/hw/misc/mac_via.h           | 113 +++++
+ include/hw/nubus/mac-nubus-bridge.h |  24 ++
+ include/hw/nubus/nubus.h            |  69 +++
+ include/hw/scsi/esp.h               |   7 +
+ qemu-options.hx                     |   2 +-
+ vl.c                                |   3 +-
+ 38 files changed, 3940 insertions(+), 70 deletions(-)
+ create mode 100644 hw/audio/asc.c
+ create mode 100644 hw/block/swim.c
+ create mode 100644 hw/display/macfb-template.h
+ create mode 100644 hw/display/macfb.c
+ create mode 100644 hw/intc/q800_irq.c
+ create mode 100644 hw/m68k/bootinfo.h
+ create mode 100644 hw/m68k/q800.c
+ create mode 100644 hw/misc/mac_via.c
+ create mode 100644 hw/nubus/Makefile.objs
+ create mode 100644 hw/nubus/mac-nubus-bridge.c
+ create mode 100644 hw/nubus/nubus-bridge.c
+ create mode 100644 hw/nubus/nubus-bus.c
+ create mode 100644 hw/nubus/nubus-device.c
+ create mode 100644 include/hw/audio/asc.h
+ create mode 100644 include/hw/block/swim.h
+ create mode 100644 include/hw/display/macfb.h
+ create mode 100644 include/hw/intc/q800_irq.h
+ create mode 100644 include/hw/misc/mac_via.h
+ create mode 100644 include/hw/nubus/mac-nubus-bridge.h
+ create mode 100644 include/hw/nubus/nubus.h
+
 -- 
-2.17.2
+2.11.0
