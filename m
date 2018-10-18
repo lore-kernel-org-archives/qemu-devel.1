@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33014)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gD2V4-0004XR-9f
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 03:13:43 -0400
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gD2WF-0005IJ-Gq
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 03:14:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gD2V2-0000AA-MG
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 03:13:42 -0400
-Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:38440)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <artem.k.pisarenko@gmail.com>)
-	id 1gD2V1-00005Z-6k
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 03:13:40 -0400
-Received: by mail-lf1-x141.google.com with SMTP id x24-v6so6009464lfe.5
-	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 00:13:39 -0700 (PDT)
-From: Artem Pisarenko <artem.k.pisarenko@gmail.com>
-Date: Thu, 18 Oct 2018 13:12:55 +0600
-Message-Id: <1fc12c77e8b7115d3842919a8b586d9cbe4efca6.1539846575.git.artem.k.pisarenko@gmail.com>
-In-Reply-To: <cover.1539846575.git.artem.k.pisarenko@gmail.com>
-References: <cover.1539846575.git.artem.k.pisarenko@gmail.com>
-In-Reply-To: <cover.1539846575.git.artem.k.pisarenko@gmail.com>
-References: <cover.1539846575.git.artem.k.pisarenko@gmail.com>
-Subject: [Qemu-devel] [PATCH v3 4/4] vl,
- qapi: offset calculation in RTC_CHANGE event reverted
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gD2WE-0002TV-Ju
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 03:14:55 -0400
+References: <20181018031723.23459-1-maozhongyi@cmss.chinamobile.com>
+	<20181018031723.23459-2-maozhongyi@cmss.chinamobile.com>
+	<c46fe8e5-e31d-478b-d2fa-e51740f1aa32@redhat.com>
+From: maozy <maozhongyi@cmss.chinamobile.com>
+Message-ID: <37ec6ad2-1392-7970-f9a5-c95b633585c7@cmss.chinamobile.com>
+Date: Thu, 18 Oct 2018 15:14:44 +0800
+MIME-Version: 1.0
+In-Reply-To: <c46fe8e5-e31d-478b-d2fa-e51740f1aa32@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] qemu-iotests: Modern
+ shellscripting(use $() instead of ``)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,70 +26,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Artem Pisarenko <artem.k.pisarenko@gmail.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
-Return value of qemu_timedate_diff(), used for calculation offset in
-QAPI 'RTC_CHANGE' event, restored to keep compatibility. Since it
-wasn't documented that difference is relative to host clock
-advancement, this change also adds important note to 'RTC_CHANGE'
-event description to highlight established implementation specifics.
+Hi, Eric
 
-Signed-off-by: Artem Pisarenko <artem.k.pisarenko@gmail.com>
----
- qapi/misc.json |  3 ++-
- vl.c           | 10 +++++-----
- 2 files changed, 7 insertions(+), 6 deletions(-)
+On 10/18/18 11:28 AM, Eric Blake wrote:
+> On 10/17/18 10:17 PM, Mao Zhongyi wrote:
+>> Various shell files contain a mix between obsolete ``
+>> and modern $(); It would be nice to convert to using $()
+>> everywhere.
+>>
+>> `pwd` and `basename $0` are in 231 files under directory
+>> tests/qemu-iotests, so replaced it with the following:
+>>
+>> sed -i 's/`pwd`/$(pwd)/g' $(git grep -l "\`pwd\`")
+> 
+> No. Instead, I'd rather a separate patch that does:
+> 
+> s/`pwd`/$PWD/
+> s/\$(pwd)/$PWD/
+> 
+> since POSIX requires $PWD to be sane, and thus save us a wasted forked 
+> process.
 
-diff --git a/qapi/misc.json b/qapi/misc.json
-index ada9af5..d0f5381 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -3070,7 +3070,8 @@
- # Emitted when the guest changes the RTC time.
- #
- # @offset: offset between base RTC clock (as specified by -rtc base), and
--#          new RTC clock value
-+#          new RTC clock value. Note that value will be different depending
-+#          on clock chosen to drive RTC (specified by -rtc clock).
- #
- # Note: This event is rate-limited.
- #
-diff --git a/vl.c b/vl.c
-index 78a8a68..c350aba 100644
---- a/vl.c
-+++ b/vl.c
-@@ -788,10 +788,10 @@ void qemu_system_vmstop_request(RunState state)
- 
- /***********************************************************/
- /* RTC reference time/date access */
--static time_t qemu_ref_timedate(void)
-+static time_t qemu_ref_timedate(QEMUClockType clock)
- {
--    time_t value = qemu_clock_get_ms(rtc_clock) / 1000;
--    switch (rtc_clock) {
-+    time_t value = qemu_clock_get_ms(clock) / 1000;
-+    switch (clock) {
-     case QEMU_CLOCK_REALTIME:
-         value -= rtc_realtime_clock_offset;
-         /* no break */
-@@ -811,7 +811,7 @@ static time_t qemu_ref_timedate(void)
- 
- void qemu_get_timedate(struct tm *tm, int offset)
- {
--    time_t ti = qemu_ref_timedate();
-+    time_t ti = qemu_ref_timedate(rtc_clock);
- 
-     ti += offset;
- 
-@@ -849,7 +849,7 @@ int qemu_timedate_diff(struct tm *tm)
-         break;
-     }
- 
--    return seconds - qemu_ref_timedate();
-+    return seconds - qemu_ref_timedate(QEMU_CLOCK_HOST);
- }
- 
- static void configure_rtc_base_datetime(const char *startdate)
--- 
-2.7.4
+I got you, thank you very much.
+
+>> sed -i 's/`basename $0`/$(basename $0)/g' $(git grep -l "basename \$0")
+>>
+>> A small amount of the rest is manually modified.
+>>
+>> Cc: kwolf@redhat.com
+>> Cc: mreitz@redhat.com
+>> Cc: qemu-block@nongnu.org
+>>
+>> Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+>> ---
+> 
+>> +++ b/tests/qemu-iotests/001
+>> @@ -21,10 +21,10 @@
+>>   # creator
+>>   owner=hch@lst.de
+>> -seq=`basename $0`
+>> +seq=$(basename $0)
+>>   echo "QA output created by $seq"
+>> -here=`pwd`
+>> +here=$(pwd)
+>>   status=1    # failure is the default!
+> 
+> At one point, someone (Jeff?) proposed a cleanup patch that got rid of a 
+> lot of cruft in iotests, including the fact that scripts that don't use 
+> $seq don't need to assign seq=$(basename $0).  We should probably revive 
+> that rather than just making pointless churn on stuff that is garbage 
+> anyways.  But I don't have time to look up a URL to that older series at 
+> the moment.
+>
+
+
+I think I might have found this patchset, but it was a long time ago.
+
+https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg04056.html
+
+I will remove this patch from this series and resend a separate patch
+to replace `pwd` and "$(pwd)" with $PWD. Am I right?
+
+Thanks,
+Mao
