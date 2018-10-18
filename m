@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gDEYM-0008Oi-76
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:05:55 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gDEYO-0008Pi-Au
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:05:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gDEYL-0000Ia-Dx
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:05:54 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gDEYN-0000VI-EK
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:05:56 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 18 Oct 2018 17:03:49 -0300
-Message-Id: <20181018200422.4358-13-ehabkost@redhat.com>
+Date: Thu, 18 Oct 2018 17:03:50 -0300
+Message-Id: <20181018200422.4358-14-ehabkost@redhat.com>
 In-Reply-To: <20181018200422.4358-1-ehabkost@redhat.com>
 References: <20181018200422.4358-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 12/45] hw/mips/gt64xxx_pci: Mark as bridge device
+Subject: [Qemu-devel] [PULL 13/45] hw/sparc64/niagara: Model the I/O Bridge
+ with the 'unimplemented_device'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,30 +28,53 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Rob Her
 
 From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-The gt64120 is currently listed as uncategorized device.
-Mark it as bridge device.
+Since the I/O Bridge device is not implemented,  Use the
+TYPE_UNIMPLEMENTED_DEVICE which suits better: if the user
+asks for 'unimp' warnings via the -d option then all accesses
+will generate logging.
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Message-Id: <20181002212522.23303-9-f4bug@amsat.org>
+Reviewed-by: Artyom Tarasenko <atar4qemu@gmail.com>
+Message-Id: <20181002212522.23303-10-f4bug@amsat.org>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/mips/gt64xxx_pci.c | 1 +
- 1 file changed, 1 insertion(+)
+ default-configs/sparc64-softmmu.mak | 1 -
+ hw/sparc64/niagara.c                | 4 ++--
+ 2 files changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/hw/mips/gt64xxx_pci.c b/hw/mips/gt64xxx_pci.c
-index dcd1a66329..1cd8aac658 100644
---- a/hw/mips/gt64xxx_pci.c
-+++ b/hw/mips/gt64xxx_pci.c
-@@ -1232,6 +1232,7 @@ static void gt64120_class_init(ObjectClass *klass, =
-void *data)
- {
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-=20
-+    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-     dc->reset =3D gt64120_reset;
-     dc->vmsd =3D &vmstate_gt64120;
+diff --git a/default-configs/sparc64-softmmu.mak b/default-configs/sparc6=
+4-softmmu.mak
+index 52edafe547..ce63d47046 100644
+--- a/default-configs/sparc64-softmmu.mak
++++ b/default-configs/sparc64-softmmu.mak
+@@ -16,5 +16,4 @@ CONFIG_SIMBA=3Dy
+ CONFIG_SUNHME=3Dy
+ CONFIG_MC146818RTC=3Dy
+ CONFIG_ISA_TESTDEV=3Dy
+-CONFIG_EMPTY_SLOT=3Dy
+ CONFIG_SUN4V_RTC=3Dy
+diff --git a/hw/sparc64/niagara.c b/hw/sparc64/niagara.c
+index 4fa8cb2904..f8a856f611 100644
+--- a/hw/sparc64/niagara.c
++++ b/hw/sparc64/niagara.c
+@@ -29,7 +29,7 @@
+ #include "hw/hw.h"
+ #include "hw/boards.h"
+ #include "hw/char/serial.h"
+-#include "hw/empty_slot.h"
++#include "hw/misc/unimp.h"
+ #include "hw/loader.h"
+ #include "hw/sparc/sparc64.h"
+ #include "hw/timer/sun4v-rtc.h"
+@@ -161,7 +161,7 @@ static void niagara_init(MachineState *machine)
+         serial_mm_init(sysmem, NIAGARA_UART_BASE, 0, NULL, 115200,
+                        serial_hd(0), DEVICE_BIG_ENDIAN);
+     }
+-    empty_slot_init(NIAGARA_IOBBASE, NIAGARA_IOBSIZE);
++    create_unimplemented_device("sun4v-iob", NIAGARA_IOBBASE, NIAGARA_IO=
+BSIZE);
+     sun4v_rtc_init(NIAGARA_RTC_BASE);
  }
+=20
 --=20
 2.18.0.rc1.1.g3f1ff2140
