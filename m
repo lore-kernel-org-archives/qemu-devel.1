@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38882)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gDEYC-0008Do-BC
+	(envelope-from <ehabkost@redhat.com>) id 1gDEYC-0008E6-Jd
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:05:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gDEYB-0008Cx-EV
+	(envelope-from <ehabkost@redhat.com>) id 1gDEYB-0008Dd-Kn
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:05:44 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 18 Oct 2018 17:03:47 -0300
-Message-Id: <20181018200422.4358-11-ehabkost@redhat.com>
+Date: Thu, 18 Oct 2018 17:03:45 -0300
+Message-Id: <20181018200422.4358-9-ehabkost@redhat.com>
 In-Reply-To: <20181018200422.4358-1-ehabkost@redhat.com>
 References: <20181018200422.4358-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 10/45] hw/pci-host/bonito: Use
+Subject: [Qemu-devel] [PULL 08/45] hw/ssi/xilinx_spi: Use
  DeviceState::realize rather than SysBusDevice::init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -32,56 +32,49 @@ Move from the legacy SysBusDevice::init method to using DeviceState::real=
 ize.
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-Id: <20181002212522.23303-7-f4bug@amsat.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Message-Id: <20181002212522.23303-5-f4bug@amsat.org>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/pci-host/bonito.c | 9 +++------
+ hw/ssi/xilinx_spi.c | 9 +++------
  1 file changed, 3 insertions(+), 6 deletions(-)
 
-diff --git a/hw/pci-host/bonito.c b/hw/pci-host/bonito.c
-index 9868e2eccc..9f33582706 100644
---- a/hw/pci-host/bonito.c
-+++ b/hw/pci-host/bonito.c
-@@ -595,7 +595,7 @@ static const VMStateDescription vmstate_bonito =3D {
+diff --git a/hw/ssi/xilinx_spi.c b/hw/ssi/xilinx_spi.c
+index 83585bc8b2..3dae303d5b 100644
+--- a/hw/ssi/xilinx_spi.c
++++ b/hw/ssi/xilinx_spi.c
+@@ -319,9 +319,9 @@ static const MemoryRegionOps spi_ops =3D {
      }
  };
 =20
--static int bonito_pcihost_initfn(SysBusDevice *dev)
-+static void bonito_pcihost_realize(DeviceState *dev, Error **errp)
+-static int xilinx_spi_init(SysBusDevice *sbd)
++static void xilinx_spi_realize(DeviceState *dev, Error **errp)
  {
-     PCIHostState *phb =3D PCI_HOST_BRIDGE(dev);
+-    DeviceState *dev =3D DEVICE(sbd);
++    SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
+     XilinxSPI *s =3D XILINX_SPI(dev);
+     int i;
 =20
-@@ -603,8 +603,6 @@ static int bonito_pcihost_initfn(SysBusDevice *dev)
-                                      pci_bonito_set_irq, pci_bonito_map_=
-irq,
-                                      dev, get_system_memory(), get_syste=
-m_io(),
-                                      0x28, 32, TYPE_PCI_BUS);
+@@ -344,8 +344,6 @@ static int xilinx_spi_init(SysBusDevice *sbd)
+=20
+     fifo8_create(&s->tx_fifo, FIFO_CAPACITY);
+     fifo8_create(&s->rx_fifo, FIFO_CAPACITY);
 -
 -    return 0;
  }
 =20
- static void bonito_realize(PCIDevice *dev, Error **errp)
-@@ -684,7 +682,6 @@ PCIBus *bonito_init(qemu_irq *pic)
-     pcihost->pic =3D pic;
-     qdev_init_nofail(dev);
-=20
--    /* set the pcihost pointer before bonito_initfn is called */
-     d =3D pci_create(phb->bus, PCI_DEVFN(0, 0), TYPE_PCI_BONITO);
-     s =3D PCI_BONITO(d);
-     s->pcihost =3D pcihost;
-@@ -726,9 +723,9 @@ static const TypeInfo bonito_info =3D {
-=20
- static void bonito_pcihost_class_init(ObjectClass *klass, void *data)
+ static const VMStateDescription vmstate_xilinx_spi =3D {
+@@ -368,9 +366,8 @@ static Property xilinx_spi_properties[] =3D {
+ static void xilinx_spi_class_init(ObjectClass *klass, void *data)
  {
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
 -    SysBusDeviceClass *k =3D SYS_BUS_DEVICE_CLASS(klass);
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
 =20
--    k->init =3D bonito_pcihost_initfn;
-+    dc->realize =3D bonito_pcihost_realize;
- }
-=20
- static const TypeInfo bonito_pcihost_info =3D {
+-    k->init =3D xilinx_spi_init;
++    dc->realize =3D xilinx_spi_realize;
+     dc->reset =3D xlx_spi_reset;
+     dc->props =3D xilinx_spi_properties;
+     dc->vmsd =3D &vmstate_xilinx_spi;
 --=20
 2.18.0.rc1.1.g3f1ff2140
