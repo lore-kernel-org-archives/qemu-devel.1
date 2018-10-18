@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45925)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=822dd159c=roger.pau@citrix.com>)
-	id 1gD9kk-0004D3-1K
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:58:26 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1gDA2c-00037h-KK
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 11:16:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=822dd159c=roger.pau@citrix.com>)
-	id 1gD9kZ-0007ho-DE
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:58:18 -0400
-Received: from smtp.ctxuk.citrix.com ([185.25.65.24]:13020
-	helo=SMTP.EU.CITRIX.COM)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <prvs=822dd159c=roger.pau@citrix.com>)
-	id 1gD9kZ-0007cn-1S
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:58:11 -0400
-Date: Thu, 18 Oct 2018 15:56:36 +0100
-From: Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
-Message-ID: <20181018145636.k6ptvn4iszabjhxw@mac.bytemobile.com>
-References: <20181016021439.6212-1-yan.y.zhao@intel.com>
-	<F22B14EC3CFBB843AD3E03B6B78F2C6A4ACFD80C@SHSMSX104.ccr.corp.intel.com>
+	(envelope-from <eric.auger@redhat.com>) id 1gDA2a-0001v3-Fc
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 11:16:50 -0400
+References: <20180921081819.9203-1-eric.auger@redhat.com>
+	<A2975661238FB949B60364EF0F2C257439D32CBE@SHSMSX104.ccr.corp.intel.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <5624f123-27fd-8392-32cf-1792b52483b5@redhat.com>
+Date: Thu, 18 Oct 2018 17:16:25 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <F22B14EC3CFBB843AD3E03B6B78F2C6A4ACFD80C@SHSMSX104.ccr.corp.intel.com>
-Subject: Re: [Qemu-devel] [PATCH] Xen PCI passthrough: fix passthrough
- failure when irq map failure
+In-Reply-To: <A2975661238FB949B60364EF0F2C257439D32CBE@SHSMSX104.ccr.corp.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v2 00/28] vSMMUv3/pSMMUv3 2 stage VFIO
+ integration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,23 +25,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Zhao, Yan Y" <yan.y.zhao@intel.com>
-Cc: "sstabellini@kernel.org" <sstabellini@kernel.org>, "anthony.perard@citrix.com" <anthony.perard@citrix.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: "Liu, Yi L" <yi.l.liu@intel.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>
+Cc: "Tian, Kevin" <kevin.tian@intel.com>, "cdall@kernel.org" <cdall@kernel.org>, "mst@redhat.com" <mst@redhat.com>, "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>, "Sun, Yi Y" <yi.y.sun@intel.com>, "peterx@redhat.com" <peterx@redhat.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On Thu, Oct 18, 2018 at 08:22:41AM +0000, Zhao, Yan Y wrote:
-> Hi
-> The background for this patch is that: for some pci device, even it's PCI_INTERRUPT_PIN is not 0, it actually does not support INTx mode, so we should just report error, disable INTx mode and continue the passthrough.
-> However, the commit 5a11d0f7 regards this as error condition and let qemu quit passthrough, which is too rigorous.
+Hi Yi,
+
+On 10/18/18 12:30 PM, Liu, Yi L wrote:
+> Hi Eric,
 > 
-> Error message is below:
-> libxl: error: libxl_qmp.c:287:qmp_handle_error_response: Domain 2:received an error message from QMP server: Mapping machine irq 0 to pirq -1 failed: Operation not permitted
+>> From: Eric Auger [mailto:eric.auger@redhat.com]
+>> Sent: Friday, September 21, 2018 4:18 PM
+>> Subject: [RFC v2 00/28] vSMMUv3/pSMMUv3 2 stage VFIO integration
+>>
+>> Up to now vSMMUv3 has not been integrated with VFIO. VFIO
+>> integration requires to program the physical IOMMU consistently
+>> with the guest mappings. However, as opposed to VTD, SMMUv3 has
+>> no "Caching Mode" which allows easy trapping of guest mappings.
+>> This means the vSMMUV3 cannot use the same VFIO integration as VTD.
+>>
+>> However SMMUv3 has 2 translation stages. This was devised with
+>> virtualization use case in mind where stage 1 is "owned" by the
+>> guest whereas the host uses stage 2 for VM isolation.
+>>
+>> This series sets up this nested translation stage. It only works
+>> if there is one physical SMMUv3 used along with QEMU vSMMUv3 (in
+>> other words, it does not work if there is a physical SMMUv2).
+>>
+>> The series uses a new kernel user API [1], still under definition.
+>>
+>> - We force the host to use stage 2 instead of stage 1, when we
+>>   detect a vSMMUV3 is behind a VFIO device. For a VFIO device
+>>   without any virtual IOMMU, we still use stage 1 as many existing
+>>   SMMUs expect this behavior.
+>> - We introduce new IOTLB "config" notifiers, requested to notify
+>>   changes in the config of a given iommu memory region. So now
+>>   we have notifiers for IOTLB changes and config changes.
+>> - vSMMUv3 calls config notifiers when STE (Stream Table Entries)
+>>   are updated by the guest.
+>> - We implement a specific UNMAP notifier that conveys guest
+>>   IOTLB invalidations to the host
+>> - We implement a new MAP notifiers only used for MSI IOVAs so
+>>   that the host can build a nested stage translation for MSI IOVAs
+>> - As the legacy MAP notifier is not called anymore, we must make
+>>   sure stage 2 mappings are set. This is achieved through another
+>>   memory listener.
+>> - Physical SMMUs faults are reported to the guest via en eventfd
+>>   mechanism and reinjected into this latter.
+>>
+>> Note: some iommu memory notifier rework related patches are close
+>> to those previously published by Peter and Liu. I will be pleased to
+>> add their Signed-off-by if they agree/wish.
+> 
+> Yeah, feel free to add mine if it's originated from our previous work.
+OK
+> 
+> BTW. Curiously, are you planning to implement all vIOMMU related
+> operations through MemoryRegion notifiers? Honestly, I did it in such
+> way in early RFC for vSVA work. However, we encountered two issues
+> at that time. First, how to check whether the notifier should be registered.
+On my side I think I resolved this by querying the iommu mr about the
+new IOMMU_ATTR_VFIO_NESTED IOMMU attribute  in vfio_connect_container
 
-I'm having issues figuring out what's happening here.
-s->real_device.irq is 0, yet the PCI config space read of
-PCI_INTERRUPT_PIN returns something different than 0.
+See patches 5 and 6, 8
 
-AFAICT this is due to some kind of error in Linux, so that even when
-the device is supposed to have a valid IRQ the sysfs node it is set to
-0, do you know the actual underlying cause of this?
+This tells me whether the nested mode must be setup and choose the right
+container->iommu_type which is then used in vfio_listener_region_add()
+to decide whether the specific notifiers mustd to be registered.
 
-Thanks, Roger.
+
+> Second, there are cases in which the vfio_listener_region_add is not
+> triggered but vIOMMU exists. Details can be got by the link below:
+> (http://lists.gnu.org/archive/html/qemu-devel/2018-03/msg00078.html)
+
+Yes I remember this, due to the PT=1 case. On ARM we don't have this
+specificity hence this integration.
+> 
+> As thus, we had some discussions in community. Last time, PCIPASIDOps
+> was proposed. It is to add callbacks in PCIDevice. VFIO would register its
+> implementations in vfio_realize(). Supposedly, pasid_table_bind,
+> page_table_bind, sva_tlb_invalidation_passdown and other vIOMMU
+> related operations can be done in such way. The sample patch below
+> may show how it looks like. (the full patch is in my sandbox, planned to
+> send out with Scalable Mode emulation patch).
+
+To be honest, I lost track of the series and did not see this
+PCIPASIDOps proposal. I will study whether this can fit my needs.
+
+Thank you for the link!
+
+Best Regards
+
+Eric
+> 
+> Sample patch:
+> include/hw/pci/pci.h:
+>  +typedef struct PCIPASIDOps PCIPASIDOps;
+>  +struct PCIPASIDOps {
+>  +    void (*pasid_bind_table)(PCIBus *bus, int32_t devfn,
+>  +                            struct pasid_table_config *ptbl_cfg);
+>  +    void (*pasid_invalidate_extend_iotlb)(PCIBus *bus, int32_t devfn,
+>  +                            struct tlb_invalidate_info *inv_info);
+>  +};
+> 
+>  @@ -350,6 +359,7 @@ struct PCIDevice {
+>       MSIVectorUseNotifier msix_vector_use_notifier;
+>       MSIVectorReleaseNotifier msix_vector_release_notifier;
+>       MSIVectorPollNotifier msix_vector_poll_notifier;
+>  +    PCIPASIDOps *pasid_ops;
+>   };
+> 
+> hw/pci/pci.c:
+> +void pci_setup_pasid_ops(PCIDevice *dev, PCIPASIDOps *ops)
+>  +{
+>  +    assert(ops && !dev->pasid_ops);
+>  +    dev->pasid_ops = ops;
+>  +}
+>  +
+>  +void pci_device_pasid_bind_table(PCIBus *bus, int32_t devfn,
+>  +                                 struct pasid_table_config *ptbl_cfg)
+>  +{
+>  +    PCIDevice *dev;
+>  +
+>  +    if (!bus) {
+>  +        return;
+>  +    }
+>  +
+>  +    dev = bus->devices[devfn];
+>  +    if (dev && dev->pasid_ops) {
+>  +        dev->pasid_ops->pasid_bind_table(bus, devfn, ptbl_cfg);
+>  +    }
+>  +}
+> 
+> hw/vfio/pci.c:
+> +static PCIPASIDOps vfio_pci_pasid_ops = {
+>  +    .pasid_bind_table = vfio_pci_device_pasid_bind_table,
+>  +    .pasid_invalidate_extend_iotlb = vfio_pci_device_pasid_invalidate_eiotlb,
+>  +};
+>  +
+>   static void vfio_realize(PCIDevice *pdev, Error **errp)
+>   {
+>       VFIOPCIDevice *vdev = DO_UPCAST(VFIOPCIDevice, pdev, pdev);
+>  @@ -3048,6 +3068,8 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+>       vfio_register_req_notifier(vdev);
+>       vfio_setup_resetfn_quirk(vdev);
+> 
+>  +    pci_setup_pasid_ops(pdev, &vfio_pci_pasid_ops);
+>  +
+>       return;
+> 
+> Regards,
+> Yi Liu
+> 
+> 
