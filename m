@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39789)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gDEa2-0001Ni-Ff
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:07:41 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gDEaB-0001aZ-GH
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:07:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gDEa1-0002HD-Mp
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:07:38 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gDEaA-0002JP-LJ
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:07:47 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 18 Oct 2018 17:04:00 -0300
-Message-Id: <20181018200422.4358-24-ehabkost@redhat.com>
+Date: Thu, 18 Oct 2018 17:04:01 -0300
+Message-Id: <20181018200422.4358-25-ehabkost@redhat.com>
 In-Reply-To: <20181018200422.4358-1-ehabkost@redhat.com>
 References: <20181018200422.4358-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 23/45] memory-device: introduce separate config
- option
+Subject: [Qemu-devel] [PULL 24/45] memory-device: forward errors in
+ get_region_size()/get_plugged_size()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,87 +25,96 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Rob Her
 
 From: David Hildenbrand <david@redhat.com>
 
-Some architectures might support memory devices, while they don't
-support DIMM/NVDIMM. So let's
-- Rename CONFIG_MEM_HOTPLUG to CONFIG_MEM_DEVICE
-- Introduce CONFIG_DIMM and use it similarly to CONFIG NVDIMM
+Let's properly forward the errors, so errors from get_region_size() /
+get_plugged_size() can be handled.
 
-CONFIG_DIMM and CONFIG_NVDIMM require CONFIG_MEM_DEVICE.
+Users right now call both functions after the device has been realized,
+which is will never fail, so it is fine to continue using error_abort.
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+While at it, remove a leftover error check (suggested by Igor).
+
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20181005092024.14344-7-david@redhat.com>
+Message-Id: <20181005092024.14344-8-david@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- default-configs/i386-softmmu.mak  | 3 ++-
- default-configs/ppc64-softmmu.mak | 3 ++-
- qapi/misc.json                    | 2 +-
- hw/Makefile.objs                  | 2 +-
- hw/mem/Makefile.objs              | 4 ++--
- 5 files changed, 8 insertions(+), 6 deletions(-)
+ include/hw/mem/memory-device.h | 4 ++--
+ hw/mem/memory-device.c         | 9 +++------
+ hw/mem/pc-dimm.c               | 5 +++--
+ 3 files changed, 8 insertions(+), 10 deletions(-)
 
-diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-index 8c7d4a0fa0..4c1637338b 100644
---- a/default-configs/i386-softmmu.mak
-+++ b/default-configs/i386-softmmu.mak
-@@ -50,7 +50,8 @@ CONFIG_PCI_Q35=y
- CONFIG_APIC=y
- CONFIG_IOAPIC=y
- CONFIG_PVPANIC=y
--CONFIG_MEM_HOTPLUG=y
-+CONFIG_MEM_DEVICE=y
-+CONFIG_DIMM=y
- CONFIG_NVDIMM=y
- CONFIG_ACPI_NVDIMM=y
- CONFIG_PCIE_PORT=y
-diff --git a/default-configs/ppc64-softmmu.mak b/default-configs/ppc64-softmmu.mak
-index b94af6c7c6..f550573782 100644
---- a/default-configs/ppc64-softmmu.mak
-+++ b/default-configs/ppc64-softmmu.mak
-@@ -16,4 +16,5 @@ CONFIG_VIRTIO_VGA=y
- CONFIG_XICS=$(CONFIG_PSERIES)
- CONFIG_XICS_SPAPR=$(CONFIG_PSERIES)
- CONFIG_XICS_KVM=$(call land,$(CONFIG_PSERIES),$(CONFIG_KVM))
--CONFIG_MEM_HOTPLUG=y
-+CONFIG_MEM_DEVICE=y
-+CONFIG_DIMM=y
-diff --git a/qapi/misc.json b/qapi/misc.json
-index 3a68af9ca3..9b964644aa 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -2066,7 +2066,7 @@
- #
- # @plugged-memory: size of memory that can be hot-unplugged. This field
- #                  is omitted if target doesn't support memory hotplug
--#                  (i.e. CONFIG_MEM_HOTPLUG not defined on build time).
-+#                  (i.e. CONFIG_MEM_DEVICE not defined at build time).
- #
- # Since: 2.11.0
- ##
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index a19c1417ed..58872e27e0 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -33,7 +33,7 @@ devices-dirs-$(CONFIG_SOFTMMU) += vfio/
- devices-dirs-$(CONFIG_SOFTMMU) += virtio/
- devices-dirs-$(CONFIG_SOFTMMU) += watchdog/
- devices-dirs-$(CONFIG_SOFTMMU) += xen/
--devices-dirs-$(CONFIG_MEM_HOTPLUG) += mem/
-+devices-dirs-$(CONFIG_MEM_DEVICE) += mem/
- devices-dirs-$(CONFIG_SOFTMMU) += smbios/
- devices-dirs-y += core/
- common-obj-y += $(devices-dirs-y)
-diff --git a/hw/mem/Makefile.objs b/hw/mem/Makefile.objs
-index 10be4df2a2..3e2f7c5ca2 100644
---- a/hw/mem/Makefile.objs
-+++ b/hw/mem/Makefile.objs
-@@ -1,3 +1,3 @@
--common-obj-$(CONFIG_MEM_HOTPLUG) += pc-dimm.o
--common-obj-$(CONFIG_MEM_HOTPLUG) += memory-device.o
-+common-obj-$(CONFIG_DIMM) += pc-dimm.o
-+common-obj-$(CONFIG_MEM_DEVICE) += memory-device.o
- common-obj-$(CONFIG_NVDIMM) += nvdimm.o
+diff --git a/include/hw/mem/memory-device.h b/include/hw/mem/memory-device.h
+index 2853b084b5..f02b229837 100644
+--- a/include/hw/mem/memory-device.h
++++ b/include/hw/mem/memory-device.h
+@@ -33,8 +33,8 @@ typedef struct MemoryDeviceClass {
+     InterfaceClass parent_class;
+ 
+     uint64_t (*get_addr)(const MemoryDeviceState *md);
+-    uint64_t (*get_plugged_size)(const MemoryDeviceState *md);
+-    uint64_t (*get_region_size)(const MemoryDeviceState *md);
++    uint64_t (*get_plugged_size)(const MemoryDeviceState *md, Error **errp);
++    uint64_t (*get_region_size)(const MemoryDeviceState *md, Error **errp);
+     void (*fill_device_info)(const MemoryDeviceState *md,
+                              MemoryDeviceInfo *info);
+ } MemoryDeviceClass;
+diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
+index 87369ef2e1..c1e1b81cf2 100644
+--- a/hw/mem/memory-device.c
++++ b/hw/mem/memory-device.c
+@@ -60,7 +60,7 @@ static int memory_device_used_region_size(Object *obj, void *opaque)
+         const MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(obj);
+ 
+         if (dev->realized) {
+-            *size += mdc->get_region_size(md);
++            *size += mdc->get_region_size(md, &error_abort);
+         }
+     }
+ 
+@@ -167,10 +167,7 @@ uint64_t memory_device_get_free_addr(MachineState *ms, const uint64_t *hint,
+         uint64_t md_size, md_addr;
+ 
+         md_addr = mdc->get_addr(md);
+-        md_size = mdc->get_region_size(md);
+-        if (*errp) {
+-            goto out;
+-        }
++        md_size = mdc->get_region_size(md, &error_abort);
+ 
+         if (ranges_overlap(md_addr, md_size, new_addr, size)) {
+             if (hint) {
+@@ -234,7 +231,7 @@ static int memory_device_plugged_size(Object *obj, void *opaque)
+         const MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(obj);
+ 
+         if (dev->realized) {
+-            *size += mdc->get_plugged_size(md);
++            *size += mdc->get_plugged_size(md, &error_abort);
+         }
+     }
+ 
+diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+index f46fb7ada2..130f78d0de 100644
+--- a/hw/mem/pc-dimm.c
++++ b/hw/mem/pc-dimm.c
+@@ -234,14 +234,15 @@ static uint64_t pc_dimm_md_get_addr(const MemoryDeviceState *md)
+     return dimm->addr;
+ }
+ 
+-static uint64_t pc_dimm_md_get_region_size(const MemoryDeviceState *md)
++static uint64_t pc_dimm_md_get_region_size(const MemoryDeviceState *md,
++                                           Error **errp)
+ {
+     /* dropping const here is fine as we don't touch the memory region */
+     PCDIMMDevice *dimm = PC_DIMM(md);
+     const PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(md);
+     MemoryRegion *mr;
+ 
+-    mr = ddc->get_memory_region(dimm, &error_abort);
++    mr = ddc->get_memory_region(dimm, errp);
+     if (!mr) {
+         return 0;
+     }
 -- 
 2.18.0.rc1.1.g3f1ff2140
