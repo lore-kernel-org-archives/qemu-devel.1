@@ -1,38 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52378)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gDAOH-0004bh-5R
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 11:39:14 -0400
+	(envelope-from <elena.ufimtseva@oracle.com>) id 1gDA04-0001L6-CX
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 11:14:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gDAOB-00016X-Ai
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 11:39:13 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:52163)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1gDAO7-00014M-J8
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 11:39:05 -0400
-Received: by mail-wm1-x342.google.com with SMTP id 143-v6so743203wmf.1
-	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 08:39:02 -0700 (PDT)
-References: <20181013025435.25785-1-ehabkost@redhat.com>
-	<20181014173258-mutt-send-email-mst@kernel.org>
-	<20181015181404.GQ31060@habkost.net> <20181016170236.GJ7995@redhat.com>
-	<d8b9a6e6-c137-a553-8fe7-939edd2031b3@redhat.com>
-	<87murdf73g.fsf_-_@dusky.pond.sub.org>
-	<20181017155637.GC31060@habkost.net>
-	<29ed5e33-18d5-7c86-d946-02e96b9bff68@gmail.com>
-	<CAFEAcA_f1yAXLTgK6utBYG5H4woPw5UezgB8Co5aauNu2EA+wg@mail.gmail.com>
-	<20181018143858.GG20424@redhat.com>
-	<CAFEAcA-OyfXgU-NgcSXvUf_KEnAJQYDWAs9=FFLPt7son2W9Ag@mail.gmail.com>
-	<6bdbd841-5922-c974-8232-4912a8fd9906@gmail.com>
-	<CAFEAcA-bVOJGSquDd_ikSUMs41xfJuHvc_Pp++08sUq5x8O+Gg@mail.gmail.com>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <8568c109-1def-101b-2056-844c97105666@gmail.com>
-Date: Thu, 18 Oct 2018 18:39:54 +0300
+	(envelope-from <elena.ufimtseva@oracle.com>) id 1gDA00-0006rl-Ak
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 11:14:12 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:51260)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <elena.ufimtseva@oracle.com>)
+	id 1gD9zz-0006jr-P4
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 11:14:08 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+	by aserp2120.oracle.com (8.16.0.22/8.16.0.22) with SMTP id
+	w9IExc55143588
+	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 15:14:04 GMT
+Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
+	by aserp2120.oracle.com with ESMTP id 2n38nqf51f-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
+	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 15:14:04 +0000
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+	by userv0021.oracle.com (8.14.4/8.14.4) with ESMTP id w9IFE3nD028863
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK) for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 15:14:03 GMT
+Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
+	by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id w9IFE3v7004599
+	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 15:14:03 GMT
+Date: Thu, 18 Oct 2018 08:14:01 -0700
+From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+Message-ID: <20181018151401.GA1807@localhost.localdomain>
+References: <cover.1539387238.git.jag.raman@oracle.com>
+	<9b117184511df4ff6b0571a814387b8bd33646a1.1539387238.git.jag.raman@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-bVOJGSquDd_ikSUMs41xfJuHvc_Pp++08sUq5x8O+Gg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] No more chameleon devices
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9b117184511df4ff6b0571a814387b8bd33646a1.1539387238.git.jag.raman@oracle.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v1 7/8] multi-process QEMU: introduce
+ proxy object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,43 +44,329 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Fabian Deutsch <fdeutsch@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Markus Armbruster <armbru@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Laine Stump <laine@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Andrea Bolognani <abologna@redhat.com>, Cleber Rosa <crosa@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+To: Jagannathan Raman <jag.raman@oracle.com>
+Cc: qemu-devel@nongnu.org, john.g.johnson@oracle.com, Kanth.Ghatraju@oracle.com
 
+On Fri, Oct 12, 2018 at 07:48:34PM -0400, Jagannathan Raman wrote:
+> From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+> 
+> Define PCI Device proxy object as a parent of TYPE_PCI_DEVICE.
+> PCI Proxy Object will register PCI BARs, MemoryRegionOps to handle
+> access to the BARs and forward those to the remote device.
+> PCI Proxy object intercepts config space reads and writes. In case
+> of pci config write it forwards it to the remote device using
+> communication channel.
+> 
+> TODO:
+> - Handle interrupt messages from the emulation program and implement
+>   DMA operations.
+>
+And one more to add to TODO:
+  - dont use malloc/free.
 
-
-On 10/18/18 5:48 PM, Peter Maydell wrote:
-> On 18 October 2018 at 15:45, Marcel Apfelbaum
-> <marcel.apfelbaum@gmail.com> wrote:
->> PCIe machines support PCI devices while PCI machines do not support
->> PCIe devices.
->>
->> I think users of the PCI machines would benefit from having a clear list of
->> supported devices, rather than have to find out if their device
->>   1. Is a hybrid device - QEMU will 'make' it PCI/PCIe
->>   2. Is a PCIe device - would not work on a PCI machine
->>   3. Is a PCI device - all good
-> Ah, I see. So, today, of all the devices labelled as "pci" which
-> QEMU has, how many of them are in which of those categories?
-> (I guess I'm mostly interested in whether what we have is
-> mostly really-PCI devices with one or two PCIe devices, or
-> if we're currently (mis-)modelling some PCIe devices as hybrid.)
-
-Eduardo added 'marker' interfaces to all PCI/PCIe devices
-making it easier to answer the question.
-
-A 'hybrid' devices implements both:
-    * INTERFACE_CONVENTIONAL_PCI_DEVICE
-    * INTERFACE_PCIE_DEVICE
-interfaces, please see the complete list:
-     https://paste.fedoraproject.org/paste/vgOo7n7PKi3Wxij~5dZxQQ
-
-The list is not complete as we cannot see devices of derived classes,
-like virtio-*-pci, but is good enough.
-
-
-Thanks,
-Marcel
-
-> thanks
-> -- PMM
+Elena 
+> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+> ---
+>  hw/Makefile.objs        |   2 +
+>  hw/qemu-proxy.c         | 215 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  include/hw/qemu-proxy.h |  56 +++++++++++++
+>  3 files changed, 273 insertions(+)
+>  create mode 100644 hw/qemu-proxy.c
+>  create mode 100644 include/hw/qemu-proxy.h
+> 
+> diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+> index 9c99c29..6bb2eb0 100644
+> --- a/hw/Makefile.objs
+> +++ b/hw/Makefile.objs
+> @@ -44,3 +44,5 @@ scsi-dev-obj-y += scsi/
+>  scsi-dev-obj-y += block/
+>  scsi-dev-obj-y += pci/
+>  scsi-dev-obj-y += nvram/
+> +
+> +common-obj-y += qemu-proxy.o
+> diff --git a/hw/qemu-proxy.c b/hw/qemu-proxy.c
+> new file mode 100644
+> index 0000000..1712b41
+> --- /dev/null
+> +++ b/hw/qemu-proxy.c
+> @@ -0,0 +1,215 @@
+> +/*
+> + * Copyright 2018, Oracle and/or its affiliates. All rights reserved.
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#include <stdio.h>
+> +#include <stdlib.h>
+> +#include <sys/types.h>
+> +#include <sys/socket.h>
+> +#include <unistd.h>
+> +#include <assert.h>
+> +#include <string.h>
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "io/proxy-link.h"
+> +#include "exec/memory.h"
+> +#include "exec/cpu-common.h"
+> +#include "exec/address-spaces.h"
+> +#include "qemu/int128.h"
+> +#include "qemu/range.h"
+> +#include "hw/pci/pci.h"
+> +#include "qemu/option.h"
+> +#include "qemu/config-file.h"
+> +#include "qapi/qmp/qjson.h"
+> +#include "qapi/qmp/qstring.h"
+> +#include "sysemu/sysemu.h"
+> +#include "hw/qemu-proxy.h"
+> +
+> +char command[] = "qemu-scsi-dev";
+> +
+> +static void pci_proxy_dev_realize(PCIDevice *dev, Error **errp);
+> +
+> +int config_op_send(PCIProxyDev *dev, uint32_t addr, uint32_t val, int l,
+> +                                                        unsigned int op)
+> +{
+> +    ProcMsg msg;
+> +    struct conf_data_msg conf_data;
+> +
+> +    conf_data.addr = addr;
+> +    conf_data.val = val;
+> +    conf_data.l = l;
+> +
+> +
+> +    msg.data2 = (uint8_t *)malloc(sizeof(conf_data));
+> +    if (!msg.data2) {
+> +        printf("Failed to allocate memory for msg.data2\n");
+> +        return -ENOMEM;
+> +    }
+> +    memcpy(msg.data2, (const uint8_t *)&conf_data, sizeof(conf_data));
+> +    msg.size = sizeof(conf_data);
+> +    msg.num_fds = 0;
+> +    msg.cmd = op;
+> +    msg.bytestream = 1;
+> +
+> +    proxy_proc_send(dev->proxy_dev.proxy_link, &msg);
+> +    free(msg.data2);
+> +
+> +    return 0;
+> +}
+> +
+> +static uint32_t pci_proxy_read_config(PCIDevice *d,
+> +                                       uint32_t addr, int len)
+> +{
+> +    config_op_send(PCI_PROXY_DEV(d), addr, 0, 0, CONF_READ);
+> +    return pci_default_read_config(d, addr, len);
+> +}
+> +
+> +static void pci_proxy_write_config(PCIDevice *d, uint32_t addr, uint32_t val,
+> +                                    int l)
+> +{
+> +    pci_default_write_config(d, addr, val, l);
+> +    config_op_send(PCI_PROXY_DEV(d), addr, val, l, CONF_WRITE);
+> +}
+> +
+> +
+> +static void pci_proxy_dev_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+> +
+> +    k->realize = pci_proxy_dev_realize;
+> +    k->class_id = PCI_CLASS_SYSTEM_OTHER;
+> +    k->vendor_id = PCI_VENDOR_ID_REDHAT;
+> +    k->device_id = PCI_DEVICE_ID_REDHAT_TEST;
+> +    k->config_read = pci_proxy_read_config;
+> +    k->config_write = pci_proxy_write_config;
+> +
+> +    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+> +    dc->desc = "PCI Proxy Device";
+> +}
+> +
+> +static const TypeInfo pci_proxy_dev_type_info = {
+> +    .name          = TYPE_PCI_PROXY_DEV,
+> +    .parent        = TYPE_PCI_DEVICE,
+> +    .instance_size = sizeof(PCIProxyDev),
+> +    .class_init    = pci_proxy_dev_class_init,
+> +    .interfaces = (InterfaceInfo[]) {
+> +        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
+> +        { },
+> +    }
+> +};
+> +
+> +static void pci_proxy_mmio_write(void *opaque, hwaddr addr, uint64_t val,
+> +                                    unsigned size)
+> +{
+> +    return;
+> +}
+> +
+> +static uint64_t pci_proxy_mmio_read(void *opaque, hwaddr addr, unsigned size)
+> +{
+> +    return 0;
+> +}
+> +
+> +static const MemoryRegionOps proxy_device_mmio_ops = {
+> +    .read = pci_proxy_mmio_read,
+> +    .write = pci_proxy_mmio_write,
+> +    .endianness = DEVICE_NATIVE_ENDIAN,
+> +    .impl = {
+> +        .min_access_size = 1,
+> +    }
+> +};
+> +
+> +static void pci_proxy_dev_register_types(void)
+> +{
+> +    type_register_static(&pci_proxy_dev_type_info);
+> +}
+> +
+> +static void pci_proxy_dev_realize(PCIDevice *device, Error **errp)
+> +{
+> +    PCIProxyDev *dev = PCI_PROXY_DEV(device);
+> +    uint8_t *pci_conf;
+> +
+> +    pci_conf = device->config;
+> +
+> +    init_emulation_process(dev, command, errp);
+> +    if (*errp) {
+> +        printf("Process did not start\n");
+> +        error_report_err(*errp);
+> +    }
+> +
+> +    if (!dev->proxy_dev.proxy_link) {
+> +        printf("Proxy link is not set\n");
+> +    }
+> +
+> +    pci_conf[PCI_LATENCY_TIMER] = 0xff;
+> +
+> +    memory_region_init_io(&dev->mmio_io, OBJECT(dev), &proxy_device_mmio_ops,
+> +                          dev, "proxy-device-mmio", 0x400);
+> +
+> +    pci_register_bar(device, 0, PCI_BASE_ADDRESS_SPACE_MEMORY, &dev->mmio_io);
+> +
+> +}
+> +
+> +void init_emulation_process(PCIProxyDev *pdev, char *command, Error **errp)
+> +{
+> +    char *args[2];
+> +    pid_t rpid;
+> +    int fd[2];
+> +
+> +    if (socketpair(AF_UNIX, SOCK_STREAM, 0, fd)) {
+> +        error_setg(errp, "Unable to create unix socket.");
+> +        return;
+> +    }
+> +
+> +    rpid = qemu_fork(errp);
+> +
+> +    if (rpid == -1) {
+> +        error_setg(errp, "Unable to spawn emulation program.");
+> +        return;
+> +    }
+> +
+> +    if (rpid == 0) {
+> +        if (dup2(fd[1], STDIN_FILENO) != STDIN_FILENO) {
+> +            perror("Failed to acquire socket.");
+> +            exit(1);
+> +        }
+> +
+> +        close(fd[0]);
+> +        close(fd[1]);
+> +
+> +        args[0] = command;
+> +        args[1] = NULL;
+> +        execvp(args[0], (char *const *)args);
+> +        exit(1);
+> +    }
+> +
+> +    pdev->proxy_dev.proxy_link = proxy_link_create();
+> +
+> +    if (!pdev->proxy_dev.proxy_link) {
+> +        return;
+> +    }
+> +
+> +    proxy_link_set_sock(pdev->proxy_dev.proxy_link, fd[0]);
+> +    close(fd[1]);
+> +
+> +}
+> +
+> +type_init(pci_proxy_dev_register_types)
+> diff --git a/include/hw/qemu-proxy.h b/include/hw/qemu-proxy.h
+> new file mode 100644
+> index 0000000..0903626
+> --- /dev/null
+> +++ b/include/hw/qemu-proxy.h
+> @@ -0,0 +1,56 @@
+> +/*
+> + * Copyright 2018, Oracle and/or its affiliates. All rights reserved.
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#ifndef QEMU_PROXY_H
+> +#define QEMU_PROXY_H
+> +
+> +#include "io/proxy-link.h"
+> +
+> +#define TYPE_PCI_PROXY_DEV "pci-proxy-dev"
+> +#define PCI_PROXY_DEV(obj) \
+> +            OBJECT_CHECK(PCIProxyDev, (obj), TYPE_PCI_PROXY_DEV)
+> +
+> +typedef struct proxy_device {
+> +       int n_mr_sections;
+> +        MemoryRegionSection *mr_sections;
+> +        ProxyLinkState *proxy_link;
+> +        int link_up;
+> +} proxy_device;
+> +
+> +typedef struct PCIProxyDev {
+> +        PCIDevice parent_dev;
+> +        struct proxy_device proxy_dev;
+> +
+> +        MemoryRegion bar;
+> +        MemoryRegion mmio_io;
+> +        MemoryRegion ram_io;
+> +
+> +        void (*proxy_read_config)(void);
+> +        void (*proxy_write_config) (void);
+> +
+> +} PCIProxyDev;
+> +
+> +void init_emulation_process(PCIProxyDev *pdev, char *command, Error **errp);
+> +int config_op_send(PCIProxyDev *dev, uint32_t addr, uint32_t val, int l,
+> +                                                       unsigned int op);
+> +
+> +#endif
+> -- 
+> 1.8.3.1
+> 
