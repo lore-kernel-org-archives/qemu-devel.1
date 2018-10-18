@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47963)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gDEy8-000761-Om
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gDEy8-000765-P6
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:32:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gDEy3-000696-2W
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gDEy5-0006Ab-EF
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:32:31 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:37908)
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35971)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gDEy1-00062p-GP
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:32:25 -0400
-Received: by mail-wr1-x442.google.com with SMTP id a13-v6so35114507wrt.5
-	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 13:32:19 -0700 (PDT)
-Received: from 640k.lan (dynamic-adsl-78-12-231-174.clienti.tiscali.it.
-	[78.12.231.174]) by smtp.gmail.com with ESMTPSA id
-	a12-v6sm14270952wrr.71.2018.10.18.13.32.16
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 18 Oct 2018 13:32:16 -0700 (PDT)
+	id 1gDEy1-00066Y-Qs
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:32:27 -0400
+Received: by mail-wm1-x344.google.com with SMTP id a8-v6so1626269wmf.1
+	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 13:32:22 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 18 Oct 2018 22:31:27 +0200
-Message-Id: <1539894735-14232-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 00/48] Miscellaneous patches for 2018-10-18
+Date: Thu, 18 Oct 2018 22:31:31 +0200
+Message-Id: <1539894735-14232-5-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1539894735-14232-1-git-send-email-pbonzini@redhat.com>
+References: <1539894735-14232-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PULL 04/48] qemu-timer: avoid checkpoints for virtual
+ clock timers in external subsystems
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,165 +29,172 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Artem Pisarenko <artem.k.pisarenko@gmail.com>
 
-The following changes since commit 77f7c747193662edfadeeb3118d63eed0eac51a6:
+From: Artem Pisarenko <artem.k.pisarenko@gmail.com>
 
-  Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2018-10-17' into staging (2018-10-18 13:40:19 +0100)
+Adds EXTERNAL attribute definition to qemu timers subsystem and assigns
+it to virtual clock timers, used in slirp (ICMP IPv6) and ui (key queue).
+Virtual clock processing in rr mode can use this attribute instead of a
+separate clock type.
 
-are available in the git repository at:
+Fixes: 87f4fe7653baf55b5c2f2753fe6003f473c07342
+Fixes: 775a412bf83f6bc0c5c02091ee06cf649b34c593
+Fixes: 9888091404a702d7ec79d51b088d994b9fc121bd
+Signed-off-by: Artem Pisarenko <artem.k.pisarenko@gmail.com>
+Message-Id: <e771f96ab94e86b54b9a783c974f2af3009fe5d1.1539764043.git.artem.k.pisarenko@gmail.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ include/qemu/timer.h | 10 +++++++++-
+ slirp/ip6_icmp.c     |  4 +++-
+ ui/input.c           |  5 +++--
+ util/qemu-timer.c    | 50 +++++++++++++++++++++++++++++++++++++++++++-------
+ 4 files changed, 58 insertions(+), 11 deletions(-)
 
-
-  git://github.com/bonzini/qemu.git tags/for-upstream
-
-for you to fetch changes up to c30cee638bc1523548828129f61ceb1941e10894:
-
-  replay: pass raw icount value to replay_save_clock (2018-10-18 22:28:34 +0200)
-
-----------------------------------------------------------------
-* RTC fixes (Artem)
-* icount fixes (Artem)
-* rr fixes (Pavel, myself)
-* hotplug cleanup (Igor)
-* SCSI fixes (myself)
-* 4.20-rc1 KVM header update (myself)
-* coalesced PIO support (Peng Hao)
-* HVF fixes (Roman B.)
-* Hyper-V refactoring (Roman K.)
-* Support for Hyper-V IPI (Vitaly)
-
-----------------------------------------------------------------
-Artem Pisarenko (8):
-      Revert some patches from recent [PATCH v6] "Fixing record/replay and adding reverse debugging"
-      qemu-timer: introduce timer attributes
-      qemu-timer: avoid checkpoints for virtual clock timers in external subsystems
-      qemu-timer: optimize record/replay checkpointing for all clocks
-      vl: improve/fix documentation related to RTC function
-      vl: refactor -rtc option references
-      Fixes RTC bug with base datetime shifts in clock=vm
-      vl, qapi: offset calculation in RTC_CHANGE event reverted
-
-Igor Mammedov (1):
-      call HotplugHandler->plug() as the last step in device realization
-
-Li Qiang (2):
-      hw: edu: drop DO_UPCAST
-      target/i386: kvm: just return after migrate_add_blocker failed
-
-Paolo Bonzini (6):
-      es1370: more fixes for ADC_FRAMEADR and ADC_FRAMECNT
-      target-i386: kvm: do not initialize padding fields
-      linux-headers: update to 4.20-rc1
-      scsi-disk: fix double completion of failing passthrough requests
-      scsi-disk: fix rerror/werror=ignore
-      replay: pass raw icount value to replay_save_clock
-
-Pavel Dovgalyuk (1):
-      replay: don't process events at virtual clock checkpoint
-
-Peng Hao (4):
-      target-i386 : add coalesced_pio API
-      target-i386: add rtc 0x70 port as coalesced_pio
-      target-i386: add i440fx 0xcf8 port as coalesced_pio
-      target-i386: add q35 0xcf8 port as coalesced_pio
-
-Roman Bolshakov (2):
-      i386: hvf: Fix register refs if REX is present
-      i386: hvf: Remove hvf_disabled
-
-Roman Kagan (23):
-      hyperv_testdev: refactor for better maintainability
-      hyperv_testdev: drop unnecessary includes
-      hyperv: cosmetic: g_malloc -> g_new
-      hyperv: synic: only setup ack notifier if there's a callback
-      hyperv: allow passing arbitrary data to sint ack callback
-      hyperv: address HvSintRoute by X86CPU pointer
-      hyperv: make HvSintRoute reference-counted
-      hyperv: rename kvm_hv_sint_route_set_sint
-      hyperv: split hyperv-proto.h into x86 and arch-independent parts
-      hyperv: make hyperv_vp_index inline
-      hyperv: factor out arch-independent API into hw/hyperv
-      default-configs: collect CONFIG_HYPERV* in hyperv.mak
-      i386: add hyperv-stub for CONFIG_HYPERV=n
-      hyperv:synic: split capability testing and setting
-      hyperv: qom-ify SynIC
-      hyperv: only add SynIC in compatible configurations
-      hyperv: make overlay pages for SynIC
-      hyperv: add synic message delivery
-      hyperv: add synic event flag signaling
-      hyperv: process SIGNAL_EVENT hypercall
-      hyperv: add support for KVM_HYPERV_EVENTFD
-      hyperv: process POST_MESSAGE hypercall
-      hyperv_testdev: add SynIC message and event testmodes
-
-Vitaly Kuznetsov (1):
-      i386/kvm: add support for Hyper-V IPI send
-
- accel/kvm/kvm-all.c              |  56 +++-
- cpus.c                           |   4 +-
- default-configs/hyperv.mak       |   2 +
- default-configs/i386-softmmu.mak |   2 +-
- hw/Makefile.objs                 |   1 +
- hw/audio/es1370.c                |  10 +-
- hw/core/hotplug.c                |  10 -
- hw/core/qdev.c                   |  16 +-
- hw/hyperv/Makefile.objs          |   2 +
- hw/hyperv/hyperv.c               | 654 +++++++++++++++++++++++++++++++++++++++
- hw/hyperv/hyperv_testdev.c       | 327 ++++++++++++++++++++
- hw/misc/Makefile.objs            |   1 -
- hw/misc/edu.c                    |   4 +-
- hw/misc/hyperv_testdev.c         | 174 -----------
- hw/pci-host/piix.c               |   4 +
- hw/pci-host/q35.c                |   4 +
- hw/scsi/scsi-disk.c              |  29 +-
- hw/scsi/virtio-scsi.c            |  11 +-
- hw/timer/mc146818rtc.c           |   9 +
- include/block/aio.h              |  59 +++-
- include/exec/memory.h            |   4 +-
- include/hw/hotplug.h             |  11 -
- include/hw/hyperv/hyperv-proto.h | 130 ++++++++
- include/hw/hyperv/hyperv.h       |  83 +++++
- include/hw/i386/pc.h             |   8 +
- include/qemu/timer.h             | 126 ++++----
- include/sysemu/hvf.h             |   4 +-
- include/sysemu/replay.h          |  10 +-
- linux-headers/asm-powerpc/kvm.h  |   1 +
- linux-headers/asm-x86/kvm.h      |   8 +-
- linux-headers/linux/kvm.h        |  16 +-
- memory.c                         |   4 +-
- qapi/misc.json                   |   3 +-
- qemu-options.hx                  |  14 +-
- replay/replay-events.c           |   1 +
- replay/replay-internal.c         |  25 +-
- replay/replay-internal.h         |   2 +
- replay/replay-time.c             |   8 +-
- replay/replay.c                  |   9 +-
- slirp/ip6_icmp.c                 |   9 +-
- stubs/cpu-get-icount.c           |   5 +
- stubs/replay.c                   |   2 +-
- target/i386/Makefile.objs        |  17 +-
- target/i386/cpu.c                |   3 +
- target/i386/cpu.h                |   2 +
- target/i386/hvf/hvf.c            |   9 +-
- target/i386/hvf/x86_decode.c     |  67 ++--
- target/i386/hvf/x86_decode.h     |   6 +-
- target/i386/hyperv-proto.h       | 116 +------
- target/i386/hyperv-stub.c        |  48 +++
- target/i386/hyperv.c             | 130 +++-----
- target/i386/hyperv.h             |  28 +-
- target/i386/kvm.c                |  68 +++-
- target/i386/machine.c            |   9 +
- tests/ptimer-test-stubs.c        |  13 +-
- ui/input.c                       |   9 +-
- util/qemu-timer.c                |  96 ++++--
- vl.c                             | 112 ++++---
- 58 files changed, 1888 insertions(+), 707 deletions(-)
- create mode 100644 default-configs/hyperv.mak
- create mode 100644 hw/hyperv/Makefile.objs
- create mode 100644 hw/hyperv/hyperv.c
- create mode 100644 hw/hyperv/hyperv_testdev.c
- delete mode 100644 hw/misc/hyperv_testdev.c
- create mode 100644 include/hw/hyperv/hyperv-proto.h
- create mode 100644 include/hw/hyperv/hyperv.h
- create mode 100644 target/i386/hyperv-stub.c
+diff --git a/include/qemu/timer.h b/include/qemu/timer.h
+index 8ff1092..9f37c92 100644
+--- a/include/qemu/timer.h
++++ b/include/qemu/timer.h
+@@ -60,9 +60,17 @@ typedef enum {
+  * Each attribute corresponds to one bit. Attributes modify the processing
+  * of timers when they fire.
+  *
+- * No attributes defined currently.
++ * The following attributes are available:
++ *
++ * QEMU_TIMER_ATTR_EXTERNAL: drives external subsystem
++ *
++ * Timers with this attribute do not recorded in rr mode, therefore it could be
++ * used for the subsystems that operate outside the guest core. Applicable only
++ * with virtual clock type.
+  */
+ 
++#define QEMU_TIMER_ATTR_EXTERNAL BIT(0)
++
+ typedef struct QEMUTimerList QEMUTimerList;
+ 
+ struct QEMUTimerListGroup {
+diff --git a/slirp/ip6_icmp.c b/slirp/ip6_icmp.c
+index ee333d0..cd1e0b9 100644
+--- a/slirp/ip6_icmp.c
++++ b/slirp/ip6_icmp.c
+@@ -27,7 +27,9 @@ void icmp6_init(Slirp *slirp)
+         return;
+     }
+ 
+-    slirp->ra_timer = timer_new_ms(QEMU_CLOCK_VIRTUAL, ra_timer_handler, slirp);
++    slirp->ra_timer = timer_new_full(NULL, QEMU_CLOCK_VIRTUAL,
++                                     SCALE_MS, QEMU_TIMER_ATTR_EXTERNAL,
++                                     ra_timer_handler, slirp);
+     timer_mod(slirp->ra_timer,
+               qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + NDP_Interval);
+ }
+diff --git a/ui/input.c b/ui/input.c
+index 51b1019..7c9a410 100644
+--- a/ui/input.c
++++ b/ui/input.c
+@@ -448,8 +448,9 @@ void qemu_input_event_send_key_delay(uint32_t delay_ms)
+     }
+ 
+     if (!kbd_timer) {
+-        kbd_timer = timer_new_ms(QEMU_CLOCK_VIRTUAL, qemu_input_queue_process,
+-                                 &kbd_queue);
++        kbd_timer = timer_new_full(NULL, QEMU_CLOCK_VIRTUAL,
++                                   SCALE_MS, QEMU_TIMER_ATTR_EXTERNAL,
++                                   qemu_input_queue_process, &kbd_queue);
+     }
+     if (queue_count < queue_limit) {
+         qemu_input_queue_delay(&kbd_queue, kbd_timer,
+diff --git a/util/qemu-timer.c b/util/qemu-timer.c
+index 04527a3..1cc1b2f 100644
+--- a/util/qemu-timer.c
++++ b/util/qemu-timer.c
+@@ -489,6 +489,7 @@ bool timerlist_run_timers(QEMUTimerList *timer_list)
+     bool progress = false;
+     QEMUTimerCB *cb;
+     void *opaque;
++    bool need_replay_checkpoint = false;
+ 
+     if (!atomic_read(&timer_list->active_timers)) {
+         return false;
+@@ -504,8 +505,15 @@ bool timerlist_run_timers(QEMUTimerList *timer_list)
+         break;
+     default:
+     case QEMU_CLOCK_VIRTUAL:
+-        if (!replay_checkpoint(CHECKPOINT_CLOCK_VIRTUAL)) {
+-            goto out;
++        if (replay_mode != REPLAY_MODE_NONE) {
++            /* Checkpoint for virtual clock is redundant in cases where
++             * it's being triggered with only non-EXTERNAL timers, because
++             * these timers don't change guest state directly.
++             * Since it has conditional dependence on specific timers, it is
++             * subject to race conditions and requires special handling.
++             * See below.
++             */
++            need_replay_checkpoint = true;
+         }
+         break;
+     case QEMU_CLOCK_HOST:
+@@ -520,14 +528,39 @@ bool timerlist_run_timers(QEMUTimerList *timer_list)
+         break;
+     }
+ 
++    /*
++     * Extract expired timers from active timers list and and process them.
++     *
++     * In rr mode we need "filtered" checkpointing for virtual clock.  The
++     * checkpoint must be recorded/replayed before processing any non-EXTERNAL timer,
++     * and that must only be done once since the clock value stays the same. Because
++     * non-EXTERNAL timers may appear in the timers list while it being processed,
++     * the checkpoint can be issued at a time until no timers are left and we are
++     * done".
++     */
+     current_time = qemu_clock_get_ns(timer_list->clock->type);
+-    for(;;) {
+-        qemu_mutex_lock(&timer_list->active_timers_lock);
+-        ts = timer_list->active_timers;
++    qemu_mutex_lock(&timer_list->active_timers_lock);
++    while ((ts = timer_list->active_timers)) {
+         if (!timer_expired_ns(ts, current_time)) {
+-            qemu_mutex_unlock(&timer_list->active_timers_lock);
++            /* No expired timers left.  The checkpoint can be skipped
++             * if no timers fired or they were all external.
++             */
+             break;
+         }
++        if (need_replay_checkpoint
++                && !(ts->attributes & QEMU_TIMER_ATTR_EXTERNAL)) {
++            /* once we got here, checkpoint clock only once */
++            need_replay_checkpoint = false;
++            qemu_mutex_unlock(&timer_list->active_timers_lock);
++            if (!replay_checkpoint(CHECKPOINT_CLOCK_VIRTUAL)) {
++                goto out;
++            }
++            qemu_mutex_lock(&timer_list->active_timers_lock);
++            /* The lock was released; start over again in case the list was
++             * modified.
++             */
++            continue;
++        }
+ 
+         /* remove timer from the list before calling the callback */
+         timer_list->active_timers = ts->next;
+@@ -535,12 +568,15 @@ bool timerlist_run_timers(QEMUTimerList *timer_list)
+         ts->expire_time = -1;
+         cb = ts->cb;
+         opaque = ts->opaque;
+-        qemu_mutex_unlock(&timer_list->active_timers_lock);
+ 
+         /* run the callback (the timer list can be modified) */
++        qemu_mutex_unlock(&timer_list->active_timers_lock);
+         cb(opaque);
++        qemu_mutex_lock(&timer_list->active_timers_lock);
++
+         progress = true;
+     }
++    qemu_mutex_unlock(&timer_list->active_timers_lock);
+ 
+ out:
+     qemu_event_set(&timer_list->timers_done_ev);
 -- 
 1.8.3.1
