@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48110)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48114)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gDEyJ-0007JU-FT
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:32:44 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gDEyJ-0007JZ-Fy
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:32:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gDEyH-0006LL-BB
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gDEyG-0006Kc-GH
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:32:43 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:37267)
+Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:38557)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gDEyG-0006CF-9J
+	id 1gDEyG-0006G0-6f
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:32:40 -0400
-Received: by mail-wm1-x342.google.com with SMTP id 185-v6so1627868wmt.2
-	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 13:32:32 -0700 (PDT)
+Received: by mail-wm1-x32c.google.com with SMTP id 193-v6so1614390wme.3
+	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 13:32:36 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 18 Oct 2018 22:31:40 +0200
-Message-Id: <1539894735-14232-14-git-send-email-pbonzini@redhat.com>
+Date: Thu, 18 Oct 2018 22:31:43 +0200
+Message-Id: <1539894735-14232-17-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1539894735-14232-1-git-send-email-pbonzini@redhat.com>
 References: <1539894735-14232-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 13/48] i386/kvm: add support for Hyper-V IPI send
+Subject: [Qemu-devel] [PULL 16/48] vl: improve/fix documentation related to
+ RTC function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,92 +29,58 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Artem Pisarenko <artem.k.pisarenko@gmail.com>
 
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
+From: Artem Pisarenko <artem.k.pisarenko@gmail.com>
 
-Hyper-V PV IPI support is merged to KVM, enable the feature in Qemu. When
-enabled, this allows Windows guests to send IPIs to other vCPUs with a
-single hypercall even when there are >64 vCPUs in the request.
+Documentation describing -rtc option updated to better match current
+implementation and highlight some important specifics.
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Reviewed-by: Roman Kagan <rkagan@virtuozzo.com>
-Message-Id: <20181009130853.6412-3-vkuznets@redhat.com>
+Signed-off-by: Artem Pisarenko <artem.k.pisarenko@gmail.com>
+Message-Id: <1b245c6c0803d4bf11dcbf9eb32f34af8c2bd0b4.1539846575.git.artem.k.pisarenko@gmail.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/cpu.c          |  1 +
- target/i386/cpu.h          |  1 +
- target/i386/hyperv-proto.h |  1 +
- target/i386/kvm.c          | 14 +++++++++++++-
- 4 files changed, 16 insertions(+), 1 deletion(-)
+ qemu-options.hx | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index c88876d..32ea041 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -5564,6 +5564,7 @@ static Property x86_cpu_properties[] = {
-     DEFINE_PROP_BOOL("hv-frequencies", X86CPU, hyperv_frequencies, false),
-     DEFINE_PROP_BOOL("hv-reenlightenment", X86CPU, hyperv_reenlightenment, false),
-     DEFINE_PROP_BOOL("hv-tlbflush", X86CPU, hyperv_tlbflush, false),
-+    DEFINE_PROP_BOOL("hv-ipi", X86CPU, hyperv_ipi, false),
-     DEFINE_PROP_BOOL("check", X86CPU, check_cpuid, true),
-     DEFINE_PROP_BOOL("enforce", X86CPU, enforce_cpuid, false),
-     DEFINE_PROP_BOOL("kvm", X86CPU, expose_kvm, true),
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 730c06f..caa1544 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1382,6 +1382,7 @@ struct X86CPU {
-     bool hyperv_frequencies;
-     bool hyperv_reenlightenment;
-     bool hyperv_tlbflush;
-+    bool hyperv_ipi;
-     bool check_cpuid;
-     bool enforce_cpuid;
-     bool expose_kvm;
-diff --git a/target/i386/hyperv-proto.h b/target/i386/hyperv-proto.h
-index d6d5a79..87f36d1 100644
---- a/target/i386/hyperv-proto.h
-+++ b/target/i386/hyperv-proto.h
-@@ -58,6 +58,7 @@
- #define HV_APIC_ACCESS_RECOMMENDED          (1u << 3)
- #define HV_SYSTEM_RESET_RECOMMENDED         (1u << 4)
- #define HV_RELAXED_TIMING_RECOMMENDED       (1u << 5)
-+#define HV_CLUSTER_IPI_RECOMMENDED          (1u << 10)
- #define HV_EX_PROCESSOR_MASKS_RECOMMENDED   (1u << 11)
+diff --git a/qemu-options.hx b/qemu-options.hx
+index f139459..829ed81 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -3458,25 +3458,29 @@ HXCOMM Silently ignored for compatibility
+ DEF("clock", HAS_ARG, QEMU_OPTION_clock, "", QEMU_ARCH_ALL)
  
- /*
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 302f420..4e62b5c 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -608,7 +608,8 @@ static bool hyperv_enabled(X86CPU *cpu)
-             cpu->hyperv_synic ||
-             cpu->hyperv_stimer ||
-             cpu->hyperv_reenlightenment ||
--            cpu->hyperv_tlbflush);
-+            cpu->hyperv_tlbflush ||
-+            cpu->hyperv_ipi);
- }
+ DEF("rtc", HAS_ARG, QEMU_OPTION_rtc, \
+-    "-rtc [base=utc|localtime|date][,clock=host|rt|vm][,driftfix=none|slew]\n" \
++    "-rtc [base=utc|localtime|<datetime>][,clock=host|rt|vm][,driftfix=none|slew]\n" \
+     "                set the RTC base and clock, enable drift fix for clock ticks (x86 only)\n",
+     QEMU_ARCH_ALL)
  
- static int kvm_arch_set_tsc_khz(CPUState *cs)
-@@ -888,6 +889,17 @@ int kvm_arch_init_vcpu(CPUState *cs)
-             c->eax |= HV_REMOTE_TLB_FLUSH_RECOMMENDED;
-             c->eax |= HV_EX_PROCESSOR_MASKS_RECOMMENDED;
-         }
-+        if (cpu->hyperv_ipi) {
-+            if (kvm_check_extension(cs->kvm_state,
-+                                    KVM_CAP_HYPERV_SEND_IPI) <= 0) {
-+                fprintf(stderr, "Hyper-V IPI send support "
-+                        "(requested by 'hv-ipi' cpu flag) "
-+                        " is not supported by kernel\n");
-+                return -ENOSYS;
-+            }
-+            c->eax |= HV_CLUSTER_IPI_RECOMMENDED;
-+            c->eax |= HV_EX_PROCESSOR_MASKS_RECOMMENDED;
-+        }
+ STEXI
  
-         c->ebx = cpu->hyperv_spinlock_attempts;
+-@item -rtc [base=utc|localtime|@var{date}][,clock=host|vm][,driftfix=none|slew]
++@item -rtc [base=utc|localtime|@var{datetime}][,clock=host|rt|vm][,driftfix=none|slew]
+ @findex -rtc
+ Specify @option{base} as @code{utc} or @code{localtime} to let the RTC start at the current
+ UTC or local time, respectively. @code{localtime} is required for correct date in
+-MS-DOS or Windows. To start at a specific point in time, provide @var{date} in the
++MS-DOS or Windows. To start at a specific point in time, provide @var{datetime} in the
+ format @code{2006-06-17T16:01:21} or @code{2006-06-17}. The default base is UTC.
  
+ By default the RTC is driven by the host system time. This allows using of the
+ RTC as accurate reference clock inside the guest, specifically if the host
+ time is smoothly following an accurate external reference clock, e.g. via NTP.
+ If you want to isolate the guest time from the host, you can set @option{clock}
+-to @code{rt} instead.  To even prevent it from progressing during suspension,
+-you can set it to @code{vm}.
++to @code{rt} instead, which provides a host monotonic clock if host support it.
++To even prevent the RTC from progressing during suspension, you can set @option{clock}
++to @code{vm} (virtual clock). @samp{clock=vm} is recommended especially in
++icount mode in order to preserve determinism; however, note that in icount mode
++the speed of the virtual clock is variable and can in general differ from the
++host clock.
+ 
+ Enable @option{driftfix} (i386 targets only) if you experience time drift problems,
+ specifically with Windows' ACPI HAL. This option will try to figure out how
 -- 
 1.8.3.1
