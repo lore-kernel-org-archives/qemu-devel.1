@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40717)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40768)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gDEbn-0003Tf-AX
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:09:29 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gDEbr-0003Xm-9l
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:09:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gDEbh-0003qG-1K
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:09:27 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gDEbp-000456-9L
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:09:31 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 18 Oct 2018 17:04:12 -0300
-Message-Id: <20181018200422.4358-36-ehabkost@redhat.com>
+Date: Thu, 18 Oct 2018 17:04:14 -0300
+Message-Id: <20181018200422.4358-38-ehabkost@redhat.com>
 In-Reply-To: <20181018200422.4358-1-ehabkost@redhat.com>
 References: <20181018200422.4358-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 35/45] net: etraxfs_eth: add a reset method
+Subject: [Qemu-devel] [PULL 37/45] net: lance: convert SysBus init method to
+ a realize method
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,87 +28,49 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Rob Her
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-Cc: Edgar E. Iglesias <edgar.iglesias@gmail.com>
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Message-Id: <20181001063803.22330-3-clg@kaod.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-Id: <20181001063803.22330-5-clg@kaod.org>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/net/etraxfs_eth.c | 31 +++++++++++++++++++++++++------
- 1 file changed, 25 insertions(+), 6 deletions(-)
+ hw/net/lance.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/hw/net/etraxfs_eth.c b/hw/net/etraxfs_eth.c
-index 64ab3df1ae..36855804db 100644
---- a/hw/net/etraxfs_eth.c
-+++ b/hw/net/etraxfs_eth.c
-@@ -127,7 +127,7 @@ tdk_write(struct qemu_phy *phy, unsigned int req, uns=
-igned int data)
- }
-=20
- static void
--tdk_init(struct qemu_phy *phy)
-+tdk_reset(struct qemu_phy *phy)
- {
-     phy->regs[0] =3D 0x3100;
-     /* PHY Id.  */
-@@ -136,9 +136,6 @@ tdk_init(struct qemu_phy *phy)
-     /* Autonegotiation advertisement reg.  */
-     phy->regs[4] =3D 0x01E1;
-     phy->link =3D 1;
--
--    phy->read =3D tdk_read;
--    phy->write =3D tdk_write;
- }
-=20
- struct qemu_mdio
-@@ -585,6 +582,27 @@ static NetClientInfo net_etraxfs_info =3D {
-     .link_status_changed =3D eth_set_link,
+diff --git a/hw/net/lance.c b/hw/net/lance.c
+index a08d5ac6a8..f987b2fd18 100644
+--- a/hw/net/lance.c
++++ b/hw/net/lance.c
+@@ -97,9 +97,9 @@ static const VMStateDescription vmstate_lance =3D {
+     }
  };
 =20
-+static void etraxfs_eth_reset(DeviceState *dev)
-+{
-+    ETRAXFSEthState *s =3D ETRAX_FS_ETH(dev);
-+
-+    memset(s->regs, 0, sizeof(s->regs));
-+    memset(s->macaddr, 0, sizeof(s->macaddr));
-+    s->duplex_mismatch =3D 0;
-+
-+    s->mdio_bus.mdc =3D 0;
-+    s->mdio_bus.mdio =3D 0;
-+    s->mdio_bus.state =3D 0;
-+    s->mdio_bus.drive =3D 0;
-+    s->mdio_bus.cnt =3D 0;
-+    s->mdio_bus.addr =3D 0;
-+    s->mdio_bus.opc =3D 0;
-+    s->mdio_bus.req =3D 0;
-+    s->mdio_bus.data =3D 0;
-+
-+    tdk_reset(&s->phy);
-+}
-+
- static void etraxfs_eth_realize(DeviceState *dev, Error **errp)
+-static int lance_init(SysBusDevice *sbd)
++static void lance_realize(DeviceState *dev, Error **errp)
  {
-     SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
-@@ -609,8 +627,8 @@ static void etraxfs_eth_realize(DeviceState *dev, Err=
-or **errp)
-                           object_get_typename(OBJECT(s)), dev->id, s);
-     qemu_format_nic_info_str(qemu_get_queue(s->nic), s->conf.macaddr.a);
+-    DeviceState *dev =3D DEVICE(sbd);
++    SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
+     SysBusPCNetState *d =3D SYSBUS_PCNET(dev);
+     PCNetState *s =3D &d->state;
 =20
--
--    tdk_init(&s->phy);
-+    s->phy.read =3D tdk_read;
-+    s->phy.write =3D tdk_write;
-     mdio_attach(&s->mdio_bus, &s->phy, s->phyaddr);
+@@ -115,7 +115,6 @@ static int lance_init(SysBusDevice *sbd)
+     s->phys_mem_read =3D ledma_memory_read;
+     s->phys_mem_write =3D ledma_memory_write;
+     pcnet_common_init(dev, s, &net_lance_info);
+-    return 0;
  }
 =20
-@@ -627,6 +645,7 @@ static void etraxfs_eth_class_init(ObjectClass *klass=
-, void *data)
+ static void lance_reset(DeviceState *dev)
+@@ -144,9 +143,8 @@ static Property lance_properties[] =3D {
+ static void lance_class_init(ObjectClass *klass, void *data)
+ {
      DeviceClass *dc =3D DEVICE_CLASS(klass);
+-    SysBusDeviceClass *k =3D SYS_BUS_DEVICE_CLASS(klass);
 =20
-     dc->realize =3D etraxfs_eth_realize;
-+    dc->reset =3D etraxfs_eth_reset;
-     dc->props =3D etraxfs_eth_properties;
-     /* Reason: pointer properties "dma_out", "dma_in" */
-     dc->user_creatable =3D false;
+-    k->init =3D lance_init;
++    dc->realize =3D lance_realize;
+     set_bit(DEVICE_CATEGORY_NETWORK, dc->categories);
+     dc->fw_name =3D "ethernet";
+     dc->reset =3D lance_reset;
 --=20
 2.18.0.rc1.1.g3f1ff2140
