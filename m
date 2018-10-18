@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48495)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48306)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gDEyf-0007qF-6l
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:33:06 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gDEyU-0007Y3-Lx
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:32:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gDEye-0006el-Fz
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:33:05 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:40231)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gDEyP-0006TZ-KJ
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:32:54 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:39182)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gDEye-0006eD-9K
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:33:04 -0400
-Received: by mail-wm1-x342.google.com with SMTP id z204-v6so1612001wmc.5
-	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 13:33:04 -0700 (PDT)
+	id 1gDEyP-0006Sa-DN
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:32:49 -0400
+Received: by mail-wm1-x344.google.com with SMTP id y144-v6so1607814wmd.4
+	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 13:32:49 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 18 Oct 2018 22:32:09 +0200
-Message-Id: <1539894735-14232-43-git-send-email-pbonzini@redhat.com>
+Date: Thu, 18 Oct 2018 22:31:55 +0200
+Message-Id: <1539894735-14232-29-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1539894735-14232-1-git-send-email-pbonzini@redhat.com>
 References: <1539894735-14232-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 42/48] hyperv: add synic event flag signaling
+Subject: [Qemu-devel] [PULL 28/48] hyperv: allow passing arbitrary data to
+ sint ack callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,82 +33,112 @@ Cc: Roman Kagan <rkagan@virtuozzo.com>
 
 From: Roman Kagan <rkagan@virtuozzo.com>
 
-Add infrastructure to signal SynIC event flags by atomically setting the
-corresponding bit in the event flags page and firing a SINT if
-necessary.
+Make sint ack callback accept an opaque pointer, that is stored on
+sint_route at creation time.
+
+This allows for more convenient interaction with the callback.
+
+Besides, nothing outside hyperv.c should need to know the layout of
+HvSintRoute fields any more so its declaration can be removed from the
+header.
 
 Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
-Message-Id: <20180921082217.29481-7-rkagan@virtuozzo.com>
+Message-Id: <20180921081836.29230-6-rkagan@virtuozzo.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/hyperv/hyperv.c         | 32 ++++++++++++++++++++++++++++++++
- include/hw/hyperv/hyperv.h |  4 ++++
- 2 files changed, 36 insertions(+)
+ hw/misc/hyperv_testdev.c |  2 +-
+ target/i386/hyperv.c     | 16 ++++++++++++++--
+ target/i386/hyperv.h     | 15 +++------------
+ 3 files changed, 18 insertions(+), 15 deletions(-)
 
-diff --git a/hw/hyperv/hyperv.c b/hw/hyperv/hyperv.c
-index 654ca4f..2b0e593 100644
---- a/hw/hyperv/hyperv.c
-+++ b/hw/hyperv/hyperv.c
-@@ -12,6 +12,7 @@
- #include "qapi/error.h"
- #include "exec/address-spaces.h"
- #include "sysemu/kvm.h"
-+#include "qemu/bitops.h"
- #include "hw/hyperv/hyperv.h"
+diff --git a/hw/misc/hyperv_testdev.c b/hw/misc/hyperv_testdev.c
+index 7291fb1..1f32d3c 100644
+--- a/hw/misc/hyperv_testdev.c
++++ b/hw/misc/hyperv_testdev.c
+@@ -52,7 +52,7 @@ static void sint_route_create(HypervTestDev *dev,
+     sint_route->vp_index = vp_index;
+     sint_route->sint = sint;
  
- typedef struct SynICState {
-@@ -310,6 +311,37 @@ static void sint_ack_handler(EventNotifier *notifier)
-     aio_bh_schedule_oneshot(qemu_get_aio_context(), sint_msg_bh, sint_route);
+-    sint_route->sint_route = kvm_hv_sint_route_create(vp_index, sint, NULL);
++    sint_route->sint_route = kvm_hv_sint_route_create(vp_index, sint, NULL, NULL);
+     assert(sint_route->sint_route);
+ 
+     QLIST_INSERT_HEAD(&dev->sint_routes, sint_route, le);
+diff --git a/target/i386/hyperv.c b/target/i386/hyperv.c
+index acdb0ca..11fd1ad 100644
+--- a/target/i386/hyperv.c
++++ b/target/i386/hyperv.c
+@@ -16,6 +16,16 @@
+ #include "hyperv.h"
+ #include "hyperv-proto.h"
+ 
++struct HvSintRoute {
++    uint32_t sint;
++    uint32_t vp_index;
++    int gsi;
++    EventNotifier sint_set_notifier;
++    EventNotifier sint_ack_notifier;
++    HvSintAckClb sint_ack_clb;
++    void *sint_ack_clb_data;
++};
++
+ uint32_t hyperv_vp_index(X86CPU *cpu)
+ {
+     return CPU(cpu)->cpu_index;
+@@ -77,11 +87,12 @@ static void kvm_hv_sint_ack_handler(EventNotifier *notifier)
+     HvSintRoute *sint_route = container_of(notifier, HvSintRoute,
+                                            sint_ack_notifier);
+     event_notifier_test_and_clear(notifier);
+-    sint_route->sint_ack_clb(sint_route);
++    sint_route->sint_ack_clb(sint_route->sint_ack_clb_data);
  }
  
-+/*
-+ * Set given event flag for a given sint on a given vcpu, and signal the sint.
-+ */
-+int hyperv_set_event_flag(HvSintRoute *sint_route, unsigned eventno)
-+{
-+    int ret;
-+    SynICState *synic = sint_route->synic;
-+    unsigned long *flags, set_mask;
-+    unsigned set_idx;
-+
-+    if (eventno > HV_EVENT_FLAGS_COUNT) {
-+        return -EINVAL;
-+    }
-+    if (!synic->enabled || !synic->event_page_addr) {
-+        return -ENXIO;
-+    }
-+
-+    set_idx = BIT_WORD(eventno);
-+    set_mask = BIT_MASK(eventno);
-+    flags = synic->event_page->slot[sint_route->sint].flags;
-+
-+    if ((atomic_fetch_or(&flags[set_idx], set_mask) & set_mask) != set_mask) {
-+        memory_region_set_dirty(&synic->event_page_mr, 0,
-+                                sizeof(*synic->event_page));
-+        ret = hyperv_sint_route_set_sint(sint_route);
-+    } else {
-+        ret = 0;
-+    }
-+    return ret;
-+}
-+
- HvSintRoute *hyperv_sint_route_new(uint32_t vp_index, uint32_t sint,
-                                    HvSintMsgCb cb, void *cb_data)
+ HvSintRoute *kvm_hv_sint_route_create(uint32_t vp_index, uint32_t sint,
+-                                      HvSintAckClb sint_ack_clb)
++                                      HvSintAckClb sint_ack_clb,
++                                      void *sint_ack_clb_data)
  {
-diff --git a/include/hw/hyperv/hyperv.h b/include/hw/hyperv/hyperv.h
-index 82d561f..757c85e 100644
---- a/include/hw/hyperv/hyperv.h
-+++ b/include/hw/hyperv/hyperv.h
-@@ -34,6 +34,10 @@ int hyperv_sint_route_set_sint(HvSintRoute *sint_route);
-  * with the @sint_route; until then no more messages are accepted.
-  */
- int hyperv_post_msg(HvSintRoute *sint_route, struct hyperv_message *msg);
-+/*
-+ * Set event flag @eventno, and signal the SINT if the flag has changed.
-+ */
-+int hyperv_set_event_flag(HvSintRoute *sint_route, unsigned eventno);
+     HvSintRoute *sint_route;
+     EventNotifier *ack_notifier;
+@@ -116,6 +127,7 @@ HvSintRoute *kvm_hv_sint_route_create(uint32_t vp_index, uint32_t sint,
+     }
+     sint_route->gsi = gsi;
+     sint_route->sint_ack_clb = sint_ack_clb;
++    sint_route->sint_ack_clb_data = sint_ack_clb_data;
+     sint_route->vp_index = vp_index;
+     sint_route->sint = sint;
  
- static inline uint32_t hyperv_vp_index(CPUState *cs)
- {
+diff --git a/target/i386/hyperv.h b/target/i386/hyperv.h
+index 00c9b45..ab99047 100644
+--- a/target/i386/hyperv.h
++++ b/target/i386/hyperv.h
+@@ -16,24 +16,15 @@
+ 
+ #include "cpu.h"
+ #include "sysemu/kvm.h"
+-#include "qemu/event_notifier.h"
+ 
+ typedef struct HvSintRoute HvSintRoute;
+-typedef void (*HvSintAckClb)(HvSintRoute *sint_route);
+-
+-struct HvSintRoute {
+-    uint32_t sint;
+-    uint32_t vp_index;
+-    int gsi;
+-    EventNotifier sint_set_notifier;
+-    EventNotifier sint_ack_notifier;
+-    HvSintAckClb sint_ack_clb;
+-};
++typedef void (*HvSintAckClb)(void *data);
+ 
+ int kvm_hv_handle_exit(X86CPU *cpu, struct kvm_hyperv_exit *exit);
+ 
+ HvSintRoute *kvm_hv_sint_route_create(uint32_t vp_index, uint32_t sint,
+-                                      HvSintAckClb sint_ack_clb);
++                                      HvSintAckClb sint_ack_clb,
++                                      void *sint_ack_clb_data);
+ 
+ void kvm_hv_sint_route_destroy(HvSintRoute *sint_route);
+ 
 -- 
 1.8.3.1
