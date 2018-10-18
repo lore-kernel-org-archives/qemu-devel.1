@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48438)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gDEyc-0007i7-ES
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:33:03 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gDEyZ-0006ax-7R
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gDEyY-0007bl-9H
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:33:02 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:35669)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gDEyV-0006Xu-Cc
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:32:58 -0400
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:39911)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gDEyY-0006a4-VZ
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:32:59 -0400
-Received: by mail-wm1-x343.google.com with SMTP id o17-v6so901194wmh.0
-	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 13:32:58 -0700 (PDT)
+	id 1gDEyV-0006Wr-1r
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:32:55 -0400
+Received: by mail-wr1-x429.google.com with SMTP id 61-v6so35110496wrb.6
+	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 13:32:54 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 18 Oct 2018 22:32:04 +0200
-Message-Id: <1539894735-14232-38-git-send-email-pbonzini@redhat.com>
+Date: Thu, 18 Oct 2018 22:32:00 +0200
+Message-Id: <1539894735-14232-34-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1539894735-14232-1-git-send-email-pbonzini@redhat.com>
 References: <1539894735-14232-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 37/48] hyperv:synic: split capability testing
- and setting
+Subject: [Qemu-devel] [PULL 33/48] hyperv: make hyperv_vp_index inline
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,73 +32,57 @@ Cc: Roman Kagan <rkagan@virtuozzo.com>
 
 From: Roman Kagan <rkagan@virtuozzo.com>
 
-Put a bit more consistency into handling KVM_CAP_HYPERV_SYNIC capability,
-by checking its availability and determining the feasibility of hv-synic
-property first, and enabling it later.
+Also make the inverse function, hyperv_find_vcpu, static as it's not
+used outside hyperv.c
+
+This paves the way to making hyperv.c built optionally.
 
 Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
-Message-Id: <20180921082217.29481-2-rkagan@virtuozzo.com>
+Message-Id: <20180921082041.29380-3-rkagan@virtuozzo.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/kvm.c | 20 ++++++++++++++++----
- 1 file changed, 16 insertions(+), 4 deletions(-)
+ target/i386/hyperv.c | 11 ++++-------
+ target/i386/hyperv.h |  6 ++++--
+ 2 files changed, 8 insertions(+), 9 deletions(-)
 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index b0b42d2..2e5b9f6 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -735,8 +735,9 @@ static int hyperv_handle_properties(CPUState *cs)
-     }
-     if (cpu->hyperv_synic) {
-         if (!has_msr_hv_synic ||
--            kvm_vcpu_enable_cap(cs, KVM_CAP_HYPERV_SYNIC, 0)) {
--            fprintf(stderr, "Hyper-V SynIC is not supported by kernel\n");
-+            !kvm_check_extension(cs->kvm_state, KVM_CAP_HYPERV_SYNIC)) {
-+            fprintf(stderr, "Hyper-V SynIC (requested by 'hv-synic' cpu flag) "
-+                    "is not supported by kernel\n");
-             return -ENOSYS;
-         }
+diff --git a/target/i386/hyperv.c b/target/i386/hyperv.c
+index fc537e7..6881664 100644
+--- a/target/i386/hyperv.c
++++ b/target/i386/hyperv.c
+@@ -27,14 +27,11 @@ struct HvSintRoute {
+     unsigned refcount;
+ };
  
-@@ -754,12 +755,14 @@ static int hyperv_handle_properties(CPUState *cs)
- 
- static int hyperv_init_vcpu(X86CPU *cpu)
+-uint32_t hyperv_vp_index(X86CPU *cpu)
++static X86CPU *hyperv_find_vcpu(uint32_t vp_index)
  {
-+    CPUState *cs = CPU(cpu);
-+    int ret;
-+
-     if (cpu->hyperv_vpindex && !hv_vpindex_settable) {
-         /*
-          * the kernel doesn't support setting vp_index; assert that its value
-          * is in sync
-          */
--        int ret;
-         struct {
-             struct kvm_msrs info;
-             struct kvm_msr_entry entries[1];
-@@ -768,7 +771,7 @@ static int hyperv_init_vcpu(X86CPU *cpu)
-             .entries[0].index = HV_X64_MSR_VP_INDEX,
-         };
- 
--        ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_MSRS, &msr_data);
-+        ret = kvm_vcpu_ioctl(cs, KVM_GET_MSRS, &msr_data);
-         if (ret < 0) {
-             return ret;
-         }
-@@ -780,6 +783,15 @@ static int hyperv_init_vcpu(X86CPU *cpu)
-         }
-     }
- 
-+    if (cpu->hyperv_synic) {
-+        ret = kvm_vcpu_enable_cap(cs, KVM_CAP_HYPERV_SYNIC, 0);
-+        if (ret < 0) {
-+            error_report("failed to turn on HyperV SynIC in KVM: %s",
-+                         strerror(-ret));
-+            return ret;
-+        }
-+    }
-+
-     return 0;
+-    return CPU(cpu)->cpu_index;
+-}
+-
+-X86CPU *hyperv_find_vcpu(uint32_t vp_index)
+-{
+-    return X86_CPU(qemu_get_cpu(vp_index));
++    X86CPU *cpu = X86_CPU(qemu_get_cpu(vp_index));
++    assert(hyperv_vp_index(cpu) == vp_index);
++    return cpu;
  }
  
+ int kvm_hv_handle_exit(X86CPU *cpu, struct kvm_hyperv_exit *exit)
+diff --git a/target/i386/hyperv.h b/target/i386/hyperv.h
+index 59e9f9a..8d4619c 100644
+--- a/target/i386/hyperv.h
++++ b/target/i386/hyperv.h
+@@ -30,7 +30,9 @@ void hyperv_sint_route_unref(HvSintRoute *sint_route);
+ 
+ int hyperv_sint_route_set_sint(HvSintRoute *sint_route);
+ 
+-uint32_t hyperv_vp_index(X86CPU *cpu);
+-X86CPU *hyperv_find_vcpu(uint32_t vp_index);
++static inline uint32_t hyperv_vp_index(X86CPU *cpu)
++{
++    return CPU(cpu)->cpu_index;
++}
+ 
+ #endif
 -- 
 1.8.3.1
