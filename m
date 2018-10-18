@@ -1,27 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38341)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Aaron@os.amperecomputing.com>) id 1gDEOw-0004qb-FV
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 15:56:11 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gDEX9-0007PE-Se
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:04:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Aaron@os.amperecomputing.com>) id 1gDEOq-0008In-La
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 15:56:08 -0400
-From: Aaron Lindsay <Aaron@os.amperecomputing.com>
-Date: Thu, 18 Oct 2018 19:55:04 +0000
-Message-ID: <20181018195456.GF12691@quinoa.localdomain>
-References: <20181010203735.27918-1-aclindsa@gmail.com>
-	<20181010203735.27918-13-aclindsa@gmail.com>
-	<0fdcad4a-c8b5-3309-d2ce-f9be901ec52a@linaro.org>
-	<20181017192013.GA25905@quinoa.localdomain>
-	<31f327f4-42ee-55fc-596d-97d935803867@linaro.org>
-	<20181017202505.GC25905@quinoa.localdomain>
-	<ddceb720-97d2-22fa-e58a-7283fb416c29@linaro.org>
-In-Reply-To: <ddceb720-97d2-22fa-e58a-7283fb416c29@linaro.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <DCF50956F035B347998E5F63B6B81EB6@prod.exchangelabs.com>
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <ehabkost@redhat.com>) id 1gDEX8-0006mo-Lg
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:04:39 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Thu, 18 Oct 2018 17:03:37 -0300
+Message-Id: <20181018200422.4358-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v6 12/14] target/arm: PMU: Set PMCR.N to 4
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 00/45] Machine queue, 2018-10-18
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,27 +20,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: Aaron Lindsay <aclindsa@gmail.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Michael Spradling <mspradli@codeaurora.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Digant Desai <digantd@codeaurora.org>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Rob Herring <robh@kernel.org>, libvir-list@redhat.com, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-arm@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Markus Armbruster <armbru@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Eduardo Habkost <ehabkost@redhat.com>, Michael Walle <michael@walle.cc>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Alistair Francis <alistair@alistair23.me>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-ppc@nongnu.org, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Max Filippov <jcmvbkbc@gmail.com>
 
-On Oct 17 14:14, Richard Henderson wrote:
-> On 10/17/18 1:25 PM, Aaron Lindsay wrote:
-> > I suppose pmcrn (the local variable) should've been set to 0 before thi=
-s
-> > patch and updated here to be 4.
->=20
-> That's plausible.
->=20
-> > Anyway, by splitting these patches apart, my intention was to separate
-> > the plumbing work from turning on the water. If you believe it is bette=
-r
-> > to do both in the same patch, I'll make that change for v7.
->=20
-> Fair.  I'll let Peter weigh in for final decision.
+The following changes since commit 09558375a634e17cea6cfbfec883ac2376d2dc=
+7f:
 
-At a minimum, I've updated my local tree so that pmcrn is initially set
-to 0 in 'target/arm: Finish implementation of PM[X]EVCNTR and
-PM[X]EVTYPER' and updated to 4 in this patch. And I'll squash them
-instead if that ends up being the decision.=20
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-201=
+81016-1' into staging (2018-10-16 17:42:56 +0100)
 
--Aaron
+are available in the Git repository at:
+
+  git://github.com/ehabkost/qemu.git tags/machine-next-pull-request
+
+for you to fetch changes up to 6d8e1bcc7dd5e819ce81e6a87fffe23e39c700cc:
+
+  numa: Clean up error reporting in parse_numa() (2018-10-17 16:33:40 -03=
+00)
+
+----------------------------------------------------------------
+Machine queue, 2018-10-18
+
+* sysbus init/realize cleanups
+  (C=C3=A9dric Le Goater, Philippe Mathieu-Daud=C3=A9)
+* memory-device refactoring (David Hildenbrand)
+* -smp: deprecate incorrect CPUs topology (Igor Mammedov)
+* -numa parsing cleanups (Markus Armbruster)
+* Fix hostmem-file memory leak (Zhang Yi)
+* Typo fix (Li Qiang)
+
+----------------------------------------------------------------
+
+Queue for Machine Core patches
+
+
+C=C3=A9dric Le Goater (11):
+  net: etraxfs_eth: convert SysBus init method to a realize method
+  net: etraxfs_eth: add a reset method
+  net: lan9118: convert SysBus init method to a realize method
+  net: lance: convert SysBus init method to a realize method
+  net: milkymist_minimac2: convert SysBus init method to a realize
+    method
+  net: mipsnet: convert SysBus init method to a realize method
+  net: opencores_eth: convert SysBus init method to a realize method
+  net: smc91c111: convert SysBus init method to a realize method
+  net: stellaris_enet: convert SysBus init method to a realize method
+  net: stellaris_enet: add a reset method
+  net: xgmac: convert SysBus init method to a realize method
+
+David Hildenbrand (16):
+  memory-device: fix alignment error message
+  memory-device: fix error message when hinted address is too small
+  memory-device: improve "range conflicts" error message
+  pc-dimm: pass PCDIMMDevice to pc_dimm_.*plug
+  memory-device: use memory device terminology in error messages
+  memory-device: introduce separate config option
+  memory-device: forward errors in get_region_size()/get_plugged_size()
+  memory-device: document MemoryDeviceClass
+  memory-device: add and use memory_device_get_region_size()
+  memory-device: factor out get_memory_region() from pc-dimm
+  memory-device: drop get_region_size()
+  memory-device: add device class function set_addr()
+  memory-device: complete factoring out pre_plug handling
+  memory-device: complete factoring out plug handling
+  memory-device: complete factoring out unplug handling
+  memory-device: trace when pre_plugging/plugging/unplugging
+
+Igor Mammedov (2):
+  vl.c deprecate incorrect CPUs topology
+  vl:c: make sure that sockets are calculated correctly in '-smp X' case
+
+Li Qiang (1):
+  machine: fix a typo
+
+Markus Armbruster (2):
+  numa: Fix QMP command set-numa-node error handling
+  numa: Clean up error reporting in parse_numa()
+
+Philippe Mathieu-Daud=C3=A9 (12):
+  trace-events: Fix copy/paste typo
+  hw/timer/sun4v-rtc: Convert from DPRINTF() macro to trace events
+  hw/timer/sun4v-rtc: Use DeviceState::realize rather than
+    SysBusDevice::init
+  hw/ssi/xilinx_spi: Use DeviceState::realize rather than
+    SysBusDevice::init
+  hw/sh4/sh_pci: Use DeviceState::realize rather than SysBusDevice::init
+  hw/pci-host/bonito: Use DeviceState::realize rather than
+    SysBusDevice::init
+  hw/mips/gt64xxx_pci: Convert gt64120_reset() function into Device
+    reset method
+  hw/mips/gt64xxx_pci: Mark as bridge device
+  hw/sparc64/niagara: Model the I/O Bridge with the
+    'unimplemented_device'
+  hw/alpha/typhoon: Remove unuseful code
+  hw/hppa/dino: Remove unuseful code
+  hw/mips/malta: Remove unuseful code
+
+Zhang Yi (1):
+  hostmem-file: fixed the memory leak while get pmem path.
+
+ default-configs/i386-softmmu.mak    |   3 +-
+ default-configs/ppc64-softmmu.mak   |   3 +-
+ default-configs/sparc64-softmmu.mak |   1 -
+ qapi/misc.json                      |   2 +-
+ include/hw/mem/memory-device.h      |  74 +++++++++++++++++---
+ include/hw/mem/pc-dimm.h            |  10 +--
+ include/sysemu/numa.h               |   1 -
+ backends/hostmem-file.c             |  10 ++-
+ hw/alpha/typhoon.c                  |  13 ----
+ hw/core/machine.c                   |   2 +-
+ hw/hppa/dino.c                      |   7 --
+ hw/i386/pc.c                        |   6 +-
+ hw/mem/memory-device.c              | 103 ++++++++++++++++++++++------
+ hw/mem/nvdimm.c                     |   9 ++-
+ hw/mem/pc-dimm.c                    |  84 ++++++++---------------
+ hw/mips/gt64xxx_pci.c               |  18 ++---
+ hw/mips/mips_malta.c                |  13 ----
+ hw/net/etraxfs_eth.c                |  44 ++++++++----
+ hw/net/lan9118.c                    |   9 +--
+ hw/net/lance.c                      |   8 +--
+ hw/net/milkymist-minimac2.c         |   9 +--
+ hw/net/mipsnet.c                    |   9 +--
+ hw/net/opencores_eth.c              |   8 +--
+ hw/net/smc91c111.c                  |   8 +--
+ hw/net/stellaris_enet.c             |  15 ++--
+ hw/net/xgmac.c                      |   9 +--
+ hw/pci-host/bonito.c                |   9 +--
+ hw/ppc/spapr.c                      |  29 +++-----
+ hw/sh4/sh_pci.c                     |  20 +++---
+ hw/sparc64/niagara.c                |   4 +-
+ hw/ssi/xilinx_spi.c                 |   9 +--
+ hw/timer/sun4v-rtc.c                |  23 +++----
+ numa.c                              |  21 +++---
+ vl.c                                |  12 +++-
+ hw/Makefile.objs                    |   2 +-
+ hw/mem/Makefile.objs                |   4 +-
+ hw/mem/trace-events                 |   5 +-
+ hw/timer/trace-events               |   6 +-
+ qemu-deprecated.texi                |  12 ++++
+ 39 files changed, 347 insertions(+), 287 deletions(-)
+
+--=20
+2.18.0.rc1.1.g3f1ff2140
