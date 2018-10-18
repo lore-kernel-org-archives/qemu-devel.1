@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39045)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39060)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gDEYO-0008Pi-Au
+	(envelope-from <ehabkost@redhat.com>) id 1gDEYP-0008QP-1W
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:05:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gDEYN-0000VI-EK
+	(envelope-from <ehabkost@redhat.com>) id 1gDEYO-0000Yz-7D
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:05:56 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 18 Oct 2018 17:03:50 -0300
-Message-Id: <20181018200422.4358-14-ehabkost@redhat.com>
+Date: Thu, 18 Oct 2018 17:03:51 -0300
+Message-Id: <20181018200422.4358-15-ehabkost@redhat.com>
 In-Reply-To: <20181018200422.4358-1-ehabkost@redhat.com>
 References: <20181018200422.4358-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 13/45] hw/sparc64/niagara: Model the I/O Bridge
- with the 'unimplemented_device'
+Subject: [Qemu-devel] [PULL 14/45] hw/alpha/typhoon: Remove unuseful code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,53 +27,42 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Rob Her
 
 From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Since the I/O Bridge device is not implemented,  Use the
-TYPE_UNIMPLEMENTED_DEVICE which suits better: if the user
-asks for 'unimp' warnings via the -d option then all accesses
-will generate logging.
-
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Artyom Tarasenko <atar4qemu@gmail.com>
-Message-Id: <20181002212522.23303-10-f4bug@amsat.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20181002212522.23303-11-f4bug@amsat.org>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- default-configs/sparc64-softmmu.mak | 1 -
- hw/sparc64/niagara.c                | 4 ++--
- 2 files changed, 2 insertions(+), 3 deletions(-)
+ hw/alpha/typhoon.c | 13 -------------
+ 1 file changed, 13 deletions(-)
 
-diff --git a/default-configs/sparc64-softmmu.mak b/default-configs/sparc6=
-4-softmmu.mak
-index 52edafe547..ce63d47046 100644
---- a/default-configs/sparc64-softmmu.mak
-+++ b/default-configs/sparc64-softmmu.mak
-@@ -16,5 +16,4 @@ CONFIG_SIMBA=3Dy
- CONFIG_SUNHME=3Dy
- CONFIG_MC146818RTC=3Dy
- CONFIG_ISA_TESTDEV=3Dy
--CONFIG_EMPTY_SLOT=3Dy
- CONFIG_SUN4V_RTC=3Dy
-diff --git a/hw/sparc64/niagara.c b/hw/sparc64/niagara.c
-index 4fa8cb2904..f8a856f611 100644
---- a/hw/sparc64/niagara.c
-+++ b/hw/sparc64/niagara.c
-@@ -29,7 +29,7 @@
- #include "hw/hw.h"
- #include "hw/boards.h"
- #include "hw/char/serial.h"
--#include "hw/empty_slot.h"
-+#include "hw/misc/unimp.h"
- #include "hw/loader.h"
- #include "hw/sparc/sparc64.h"
- #include "hw/timer/sun4v-rtc.h"
-@@ -161,7 +161,7 @@ static void niagara_init(MachineState *machine)
-         serial_mm_init(sysmem, NIAGARA_UART_BASE, 0, NULL, 115200,
-                        serial_hd(0), DEVICE_BIG_ENDIAN);
-     }
--    empty_slot_init(NIAGARA_IOBBASE, NIAGARA_IOBSIZE);
-+    create_unimplemented_device("sun4v-iob", NIAGARA_IOBBASE, NIAGARA_IO=
-BSIZE);
-     sun4v_rtc_init(NIAGARA_RTC_BASE);
+diff --git a/hw/alpha/typhoon.c b/hw/alpha/typhoon.c
+index d74b5b55e1..8004afe45b 100644
+--- a/hw/alpha/typhoon.c
++++ b/hw/alpha/typhoon.c
+@@ -932,23 +932,10 @@ PCIBus *typhoon_init(ram_addr_t ram_size, ISABus **=
+isa_bus,
+     return b;
  }
 =20
+-static int typhoon_pcihost_init(SysBusDevice *dev)
+-{
+-    return 0;
+-}
+-
+-static void typhoon_pcihost_class_init(ObjectClass *klass, void *data)
+-{
+-    SysBusDeviceClass *k =3D SYS_BUS_DEVICE_CLASS(klass);
+-
+-    k->init =3D typhoon_pcihost_init;
+-}
+-
+ static const TypeInfo typhoon_pcihost_info =3D {
+     .name          =3D TYPE_TYPHOON_PCI_HOST_BRIDGE,
+     .parent        =3D TYPE_PCI_HOST_BRIDGE,
+     .instance_size =3D sizeof(TyphoonState),
+-    .class_init    =3D typhoon_pcihost_class_init,
+ };
+=20
+ static void typhoon_iommu_memory_region_class_init(ObjectClass *klass,
 --=20
 2.18.0.rc1.1.g3f1ff2140
