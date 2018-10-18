@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36238)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gD9L1-0005y9-Tc
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:31:48 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1gD9L0-0005wU-FD
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:31:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gD9L0-0007Oa-KT
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:31:47 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1gD9Kz-0007NL-Ai
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:31:46 -0400
 From: Eric Auger <eric.auger@redhat.com>
-Date: Thu, 18 Oct 2018 16:30:34 +0200
-Message-Id: <20181018143042.29588-9-eric.auger@redhat.com>
+Date: Thu, 18 Oct 2018 16:30:33 +0200
+Message-Id: <20181018143042.29588-8-eric.auger@redhat.com>
 In-Reply-To: <20181018143042.29588-1-eric.auger@redhat.com>
 References: <20181018143042.29588-1-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v4 08/16] hw/arm/virt: Allocate device_memory
+Subject: [Qemu-devel] [RFC v4 07/16] hw/arm/virt: Implement kvm_type
+ function for 3.2 machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,193 +23,125 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, kwangwoo.lee@sk.com, imammedo@redhat.com, david@redhat.com
 Cc: drjones@redhat.com, dgilbert@redhat.com, Suzuki.Poulose@arm.com
 
-We define a device memory region stating at 2TB and max 4TB.
-This requires support of more than 40b IPA on host (CPU,
-kernel config and FW). IPA needs are adjusted according to
-maxram_size - ram_size value.
+This patch computes the requested IPA bits according to
+the requested maxram value.
 
-This is largely inspired of device memory initialization in
-pc machine code.
+The machine class kvm_type() callback is implemented and
+fills the kvm_type[7-0] bits with the computed max IPA shift
+(0 default value corresponds to 40b IPA). The kvm_type is
+passed to the KVM_CREATE_VM ioctl.
+
+The max IPA address shift is computed assuming the top of the
+address space is occuped by device memory starting at 2TB and
+of size maxram_size - ramsize.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
 
 ---
 
-v3 -> v4:
-- remove bootinfo.device_memory_start/device_memory_size
-- rename VIRT_HOTPLUG_MEM into VIRT_DEVICE_MEM
+The approach to have an IPA range depending on the machine memory
+attributes is preferred here against having an IPA range based
+on the max capability of the host (which would be simpler). This
+latter would sometimes lead to having additional useless translation
+levels at stage2 as this may downgrade the guest performance.
 ---
- hw/arm/virt.c         | 98 ++++++++++++++++++++++++++++++-------------
+ hw/arm/virt.c         | 48 ++++++++++++++++++++++++++++++++++++++++++-
  include/hw/arm/virt.h |  1 +
- 2 files changed, 71 insertions(+), 28 deletions(-)
+ 2 files changed, 48 insertions(+), 1 deletion(-)
 
 diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 21718c250e..9b06797090 100644
+index f920ef247b..21718c250e 100644
 --- a/hw/arm/virt.c
 +++ b/hw/arm/virt.c
-@@ -59,6 +59,7 @@
- #include "qapi/visitor.h"
- #include "standard-headers/linux/input.h"
- #include "hw/arm/smmuv3.h"
-+#include "hw/acpi/acpi.h"
- 
- #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
-     static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
-@@ -94,38 +95,29 @@
- 
- #define PLATFORM_BUS_NUM_IRQS 64
- 
--/* RAM limit in GB. Since VIRT_MEM starts at the 1GB mark, this means
-- * RAM can go up to the 256GB mark, leaving 256GB of the physical
-- * address space unallocated and free for future use between 256G and 512G.
-- * If we need to provide more RAM to VMs in the future then we need to:
-- *  * allocate a second bank of RAM starting at 2TB and working up
-- *  * fix the DT and ACPI table generation code in QEMU to correctly
-- *    report two split lumps of RAM to the guest
-- *  * fix KVM in the host kernel to allow guests with >40 bit address spaces
-- * (We don't want to fill all the way up to 512GB with RAM because
-- * we might want it for non-RAM purposes later. Conversely it seems
-- * reasonable to assume that anybody configuring a VM with a quarter
-- * of a terabyte of RAM will be doing it on a host with more than a
-- * terabyte of physical address space.)
-- */
- #define SZ_1G (1024ULL * 1024 * 1024)
--#define RAMLIMIT_GB 255
--#define RAMLIMIT_BYTES (RAMLIMIT_GB * SZ_1G)
-+#define SZ_64K 0x10000
- 
- /* device memory starts at 2TB */
- #define DEVICE_MEM_BASE (2048 * SZ_1G)
-+#define DEVICE_MEM_SIZE (4096 * SZ_1G)
+@@ -108,8 +108,12 @@
+  * of a terabyte of RAM will be doing it on a host with more than a
+  * terabyte of physical address space.)
+  */
++#define SZ_1G (1024ULL * 1024 * 1024)
+ #define RAMLIMIT_GB 255
+-#define RAMLIMIT_BYTES (RAMLIMIT_GB * 1024ULL * 1024 * 1024)
++#define RAMLIMIT_BYTES (RAMLIMIT_GB * SZ_1G)
++
++/* device memory starts at 2TB */
++#define DEVICE_MEM_BASE (2048 * SZ_1G)
  
  /* Addresses and sizes of our components.
-- * 0..128MB is space for a flash device so we can run bootrom code such as UEFI.
-- * 128MB..256MB is used for miscellaneous device I/O.
-- * 256MB..1GB is reserved for possible future PCI support (ie where the
-- * PCI memory window will go if we add a PCI host controller).
-- * 1GB and up is RAM (which may happily spill over into the
-- * high memory region beyond 4GB).
-- * This represents a compromise between how much RAM can be given to
-- * a 32 bit VM and leaving space for expansion and in particular for PCI.
-- * Note that devices should generally be placed at multiples of 0x10000,
-+ * 0..128MB is space for a flash device so we can run bootrom code such as UEFI,
-+ * 128MB..256MB is used for miscellaneous device I/O,
-+ * 256MB..1GB is used for PCI host controller,
-+ * 1GB..256GB is RAM (not hotpluggable),
-+ * 256GB..512GB: is left for device I/O (non RAM purpose),
-+ * 512GB..1TB: high mem PCI MMIO region,
-+ * 2TB..6TB is used for device memory (assumes dynamic IPA setting on kernel).
-+ *
-+ * Note that IO devices should generally be placed at multiples of 0x10000,
-  * to accommodate guests using 64K pages.
-+ *
-+ * Conversely it seems reasonable to assume that anybody configuring a VM
-+ * with a quarter of a terabyte of RAM will be doing it on a host with more
-+ * than a terabyte of physical address space.)
-+ *
-  */
- static const MemMapEntry a15memmap[] = {
-     /* Space up to 0x8000000 is reserved for a boot ROM */
-@@ -154,12 +146,14 @@ static const MemMapEntry a15memmap[] = {
-     [VIRT_PCIE_MMIO] =          { 0x10000000, 0x2eff0000 },
-     [VIRT_PCIE_PIO] =           { 0x3eff0000, 0x00010000 },
-     [VIRT_PCIE_ECAM] =          { 0x3f000000, 0x01000000 },
--    [VIRT_MEM] =                { 0x40000000, RAMLIMIT_BYTES },
-+    [VIRT_MEM] =                { SZ_1G , 255 * SZ_1G },
-     /* Additional 64 MB redist region (can contain up to 512 redistributors) */
-     [VIRT_GIC_REDIST2] =        { 0x4000000000ULL, 0x4000000 },
-     [VIRT_PCIE_ECAM_HIGH] =     { 0x4010000000ULL, 0x10000000 },
-     /* Second PCIe window, 512GB wide at the 512GB boundary */
--    [VIRT_PCIE_MMIO_HIGH] =   { 0x8000000000ULL, 0x8000000000ULL },
-+    [VIRT_PCIE_MMIO_HIGH] =     { 512 * SZ_1G, 512 * SZ_1G },
-+    /* device memory beyond 2TB */
-+    [VIRT_DEVICE_MEM] =         { DEVICE_MEM_BASE, DEVICE_MEM_SIZE },
- };
- 
- static const int a15irqmap[] = {
-@@ -1265,6 +1259,51 @@ static void create_secure_ram(VirtMachineState *vms,
-     g_free(nodename);
+  * 0..128MB is space for a flash device so we can run bootrom code such as UEFI.
+@@ -1748,6 +1752,38 @@ static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
+     return NULL;
  }
  
-+static void create_device_memory(VirtMachineState *vms, MemoryRegion *sysmem)
++/*
++ * for arm64 kvm_type [7-0] encodes the IPA size shift
++ */
++static inline int virt_kvm_type(MachineState *ms, const char *type_str)
 +{
-+    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
-+    MachineClass *mc = MACHINE_GET_CLASS(vms);
-+    MachineState *ms = MACHINE(vms);
-+    uint64_t device_memory_size = ms->maxram_size - ms->ram_size;
-+    uint64_t align = SZ_64K;
++    int max_vm_phys_shift = kvm_arm_get_max_vm_phys_shift(ms);
++    ram_addr_t device_mem_size = ms->maxram_size - ms->ram_size;
++    uint8_t requested_vm_phys_shift;
 +
-+    if (!device_memory_size) {
-+        return;
++    if (!device_mem_size) {
++        return 0; /* default 40b IPA */
 +    }
 +
-+    if (vmc->no_device_memory) {
-+        error_report("Machine %s does not support device memory: "
-+                     "maxmem option not supported", mc->name);
-+        exit(EXIT_FAILURE);
++    /* we need at least 42b IPA to fit device memory at 2TB*/
++    if (max_vm_phys_shift < 42) {
++        error_report("This host does not support 42b IPA: "
++                     "maxram/slots options not usable");
++        exit(1);
 +    }
 +
-+    if (ms->ram_slots > ACPI_MAX_RAM_SLOTS) {
-+        error_report("unsupported number of memory slots: %"PRIu64,
-+                     ms->ram_slots);
-+        exit(EXIT_FAILURE);
++    requested_vm_phys_shift = 64 - clz64(DEVICE_MEM_BASE + device_mem_size);
++
++    if (requested_vm_phys_shift > max_vm_phys_shift) {
++        error_report("maxmem option value too large. Max supported value "
++                     "for this host is 0x%"PRIx64,
++                     (ram_addr_t)((1ULL << max_vm_phys_shift) - DEVICE_MEM_BASE));
++       exit(1);
 +    }
 +
-+    if (QEMU_ALIGN_UP(ms->maxram_size, align) != ms->maxram_size) {
-+        error_report("maximum memory size must be aligned to multiple of 0x%"
-+                     PRIx64, align);
-+        exit(EXIT_FAILURE);
-+    }
-+
-+    if (device_memory_size > vms->memmap[VIRT_DEVICE_MEM].size) {
-+        error_report("unsupported amount of maximum memory: " RAM_ADDR_FMT,
-+                         ms->maxram_size);
-+        exit(EXIT_FAILURE);
-+    }
-+
-+    ms->device_memory = g_malloc0(sizeof(*ms->device_memory));
-+    ms->device_memory->base = vms->memmap[VIRT_DEVICE_MEM].base;
-+
-+    memory_region_init(&ms->device_memory->mr, OBJECT(vms),
-+                       "device-memory", device_memory_size);
-+    memory_region_add_subregion(sysmem, ms->device_memory->base,
-+                                &ms->device_memory->mr);
++    return requested_vm_phys_shift;
 +}
 +
- static void *machvirt_dtb(const struct arm_boot_info *binfo, int *fdt_size)
+ static void virt_machine_class_init(ObjectClass *oc, void *data)
  {
-     const VirtMachineState *board = container_of(binfo, VirtMachineState,
-@@ -1438,7 +1477,8 @@ static void machvirt_init(MachineState *machine)
-     vms->smp_cpus = smp_cpus;
+     MachineClass *mc = MACHINE_CLASS(oc);
+@@ -1772,6 +1808,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
+     mc->cpu_index_to_instance_props = virt_cpu_index_to_props;
+     mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a15");
+     mc->get_default_cpu_node_id = virt_get_default_cpu_node_id;
++    mc->kvm_type = virt_kvm_type;
+     assert(!mc->get_hotplug_handler);
+     mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
+     hc->plug = virt_machine_device_plug_cb;
+@@ -1878,7 +1915,16 @@ static void virt_3_1_instance_init(Object *obj)
  
-     if (machine->ram_size > vms->memmap[VIRT_MEM].size) {
--        error_report("mach-virt: cannot model more than %dGB RAM", RAMLIMIT_GB);
-+        error_report("mach-virt: cannot model more than %dGB RAM",
-+                     (int)(vms->memmap[VIRT_MEM].size / SZ_1G));
-         exit(1);
-     }
- 
-@@ -1533,6 +1573,8 @@ static void machvirt_init(MachineState *machine)
-                                          machine->ram_size);
-     memory_region_add_subregion(sysmem, vms->memmap[VIRT_MEM].base, ram);
- 
-+    create_device_memory(vms, sysmem);
+ static void virt_machine_3_1_options(MachineClass *mc)
+ {
++    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
 +
-     create_flash(vms, sysmem, secure_sysmem ? secure_sysmem : sysmem);
+     virt_machine_3_2_options(mc);
++
++    /*
++     * Device memory and capability to set the max IPA address shift
++     * are enabled from 3.2 onwards
++     */
++    vmc->no_device_memory = true;
++    mc->kvm_type = NULL;
+ }
+ DEFINE_VIRT_MACHINE(3, 1)
  
-     create_gic(vms, pic);
 diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index f57e4c1890..032d88f4c4 100644
+index 4cc57a7ef6..f57e4c1890 100644
 --- a/include/hw/arm/virt.h
 +++ b/include/hw/arm/virt.h
-@@ -80,6 +80,7 @@ enum {
-     VIRT_GPIO,
-     VIRT_SECURE_UART,
-     VIRT_SECURE_MEM,
-+    VIRT_DEVICE_MEM,
- };
+@@ -101,6 +101,7 @@ typedef struct {
+     bool claim_edge_triggered_timers;
+     bool smbios_old_sys_ver;
+     bool no_highmem_ecam;
++    bool no_device_memory;
+ } VirtMachineClass;
  
- typedef enum VirtIOMMUType {
+ typedef struct {
 -- 
 2.17.1
