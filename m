@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46587)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gD53y-0007uA-NQ
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 05:57:58 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1gD5J8-0003zv-5A
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 06:13:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gD53v-0006VR-HK
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 05:57:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49370)
+	(envelope-from <pbonzini@redhat.com>) id 1gD5J4-0004TB-4d
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 06:13:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47474)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gD53v-0006TO-Au
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 05:57:51 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8E66281F01
-	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 09:57:48 +0000 (UTC)
-Date: Thu, 18 Oct 2018 11:57:42 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181018115742.7a5f840e@redhat.com>
-In-Reply-To: <2890bcd3-1ebf-7b56-f99a-cadf9f8be7d8@redhat.com>
-References: <1539696820-273275-1-git-send-email-imammedo@redhat.com>
-	<2890bcd3-1ebf-7b56-f99a-cadf9f8be7d8@redhat.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gD5J3-0004R8-SH
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 06:13:30 -0400
+References: <201810181603210927379@zte.com.cn>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <99cf25d1-3a3a-085e-8012-0a3fd8914779@redhat.com>
+Date: Thu, 18 Oct 2018 12:13:20 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <201810181603210927379@zte.com.cn>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] call HotplugHandler->plug() as the last
- step in device realization
+Subject: Re: [Qemu-devel] [PATCH V6 3/5] target-i386: add rtc 0x70 port as
+ coalesced_pio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,42 +28,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com
+To: peng.hao2@zte.com.cn
+Cc: rkrcmar@redhat.com, mst@redhat.com, ehabkost@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
 
-On Wed, 17 Oct 2018 13:40:00 +0200
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+On 18/10/2018 10:03, peng.hao2@zte.com.cn wrote:
+>>> +    /* register rtc 0x70 port as coalesced_pio */
+>>> +    memory_region_set_flush_coalesced(&s->io);
+>>> +    memory_region_init_io(&s->coalesced_io, OBJECT(s), &cmos_ops,
+>>> +                          s, "rtc1", 1);
+>>> +    isa_register_ioport(isadev, &s->coalesced_io, base);
+>> I think instead of isa_register_ioport you can use
+>> memory_region_add_subregion, so that s->coalesced_io is added below s->io?
+>>
+> isa_register_ioport also called memory_region_add_subregion.
+> modify code  like this:
+>   //isa_register_ioport(isadev, &s->coalesced_io, base);
+>     memory_region_add_subregion(get_system_io(),0x70,&s->coalesced_io);
+> The regional distribution before and after code modification is consistent.
 
-> On 16/10/2018 15:33, Igor Mammedov wrote:
-> > TODO:
-> >  remove usage of Error** from plug() callback, we need to factor out
-> >  pre_plug part from plug() callbacks, before proceeding with it.
-> >  DavidH has recently finished it for pc-dimm/memory_devices, cpus
-> >  mostly have pre_plug parts factored out, but there still are parts
-> >  that could fail so it needs some more work to eliminate failure points
-> >  from plug() callbacks. Meanwhile, I'll plan to treat other misc
-> >  handlers (pci[e]/acpi/usb/...) and introduce pre_plug() where
-> >  necessary.  
-> 
-> I am not sure it's a good idea to do this first, rather than last (so
-> that we risk introducing a ping-pong of bugs that appear now and are
-> fixed when the other changes are made), but if others disagree I am okay
-> with the patch.
-It will take a time to cleanup Error** handling, but it's not
-must have req for moving plug() handler to the right place,
-even if error gets triggered on this patch ever it cleanly fails
-device_realize().
+Right, but I'd rather add s->coalesced_io subregion as a subregion of
+s->io at offset 0.
 
-I'm posting this first, so post_plug() won't confuse people and
-won't introduce a new code that would depend on it or even worse
-some plug handler would depend on plug() happening before reset.
-This patch should prevent that from happening. (Error** concerns
-are secondary here and I'll deal with it later on, hopefully
-during 3.2 cycle)
+Paolo
 
-PS:
- post_plug() is recurring idea which indicates that current plug()
- is misplaced. (previous instance that's slipped in, was nvdimm's
- 75b0713e1 which was removed later on by c7f8d0f3a5).
-
-[...]
+>    0000000000000070-0000000000000070 (prio 0, i/o): rtc1
+>     0000000000000070-0000000000000071 (prio 0, i/o): rtc
