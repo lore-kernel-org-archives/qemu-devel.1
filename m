@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1gDGtG-0007Y1-HK
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 18:35:41 -0400
+	(envelope-from <crosa@redhat.com>) id 1gDI6X-0001m3-Fy
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 19:53:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1gDGtD-0003CP-D9
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 18:35:38 -0400
-Received: from smtp50.i.mail.ru ([94.100.177.110]:35804)
+	(envelope-from <crosa@redhat.com>) id 1gDI6G-0007zl-UT
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 19:53:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44360)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1gDGtC-000304-Nz
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 18:35:35 -0400
-From: Julia Suvorova <jusual@mail.ru>
-Date: Fri, 19 Oct 2018 01:35:00 +0300
-Message-Id: <20181018223501.21683-3-jusual@mail.ru>
-In-Reply-To: <20181018223501.21683-1-jusual@mail.ru>
-References: <20181018223501.21683-1-jusual@mail.ru>
-Subject: [Qemu-devel] [PATCH v3 2/3] chardev: Add websocket support
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gDI6D-0007sE-5O
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 19:53:08 -0400
+References: <20181018162057.19348-1-wainersm@redhat.com>
+	<f53ae31c-a0e6-9370-2b77-26d313380f3a@redhat.com>
+	<20181018220922.GA31060@habkost.net>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <59005eb9-98cd-a614-46fb-d6627056352a@redhat.com>
+Date: Thu, 18 Oct 2018 19:52:58 -0400
+MIME-Version: 1.0
+In-Reply-To: <20181018220922.GA31060@habkost.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] Acceptance tests: add Linux initrd
+ checking test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,260 +30,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, marcandre.lureau@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <mail@steffen-goertz.de>, Julia Suvorova <jusual@mail.ru>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org, lizhijian@cn.fujitsu.com, ccarrara@redhat.com, philmd@redhat.com
 
-New option "websocket" added to allow using WebSocket protocol for
-chardev socket backend.
-Example:
-    -chardev socket,websocket,server,id=...
 
-Signed-off-by: Julia Suvorova <jusual@mail.ru>
----
- chardev/char-socket.c | 64 ++++++++++++++++++++++++++++++++++++++-----
- chardev/char.c        |  8 +++++-
- qapi/char.json        |  3 ++
- qemu-options.hx       | 13 +++++++--
- 4 files changed, 77 insertions(+), 11 deletions(-)
 
-diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index effde65a89..ba4ae9dfb0 100644
---- a/chardev/char-socket.c
-+++ b/chardev/char-socket.c
-@@ -26,6 +26,7 @@
- #include "chardev/char.h"
- #include "io/channel-socket.h"
- #include "io/channel-tls.h"
-+#include "io/channel-websock.h"
- #include "io/net-listener.h"
- #include "qemu/error-report.h"
- #include "qemu/option.h"
-@@ -68,6 +69,8 @@ typedef struct {
-     GSource *telnet_source;
-     TCPChardevTelnetInit *telnet_init;
- 
-+    bool is_websock;
-+
-     GSource *reconnect_timer;
-     int64_t reconnect_time;
-     bool connect_err_reported;
-@@ -394,7 +397,7 @@ static const char *qemu_chr_socket_protocol(SocketChardev *s)
-     if (s->is_telnet) {
-         return "telnet";
-     }
--    return "tcp";
-+    return s->is_websock ? "websocket" : "tcp";
- }
- 
- static char *qemu_chr_socket_address(SocketChardev *s, const char *prefix)
-@@ -714,6 +717,41 @@ cont:
- }
- 
- 
-+static void tcp_chr_websock_handshake(QIOTask *task, gpointer user_data)
-+{
-+    Chardev *chr = user_data;
-+    SocketChardev *s = user_data;
-+
-+    if (qio_task_propagate_error(task, NULL)) {
-+        tcp_chr_disconnect(chr);
-+    } else {
-+        if (s->do_telnetopt) {
-+            tcp_chr_telnet_init(chr);
-+        } else {
-+            tcp_chr_connect(chr);
-+        }
-+    }
-+}
-+
-+
-+static void tcp_chr_websock_init(Chardev *chr)
-+{
-+    SocketChardev *s = SOCKET_CHARDEV(chr);
-+    QIOChannelWebsock *wioc = NULL;
-+    gchar *name;
-+
-+    wioc = qio_channel_websock_new_server(s->ioc);
-+
-+    name = g_strdup_printf("chardev-websocket-server-%s", chr->label);
-+    qio_channel_set_name(QIO_CHANNEL(wioc), name);
-+    g_free(name);
-+    object_unref(OBJECT(s->ioc));
-+    s->ioc = QIO_CHANNEL(wioc);
-+
-+    qio_channel_websock_handshake(wioc, tcp_chr_websock_handshake, chr, NULL);
-+}
-+
-+
- static void tcp_chr_tls_handshake(QIOTask *task,
-                                   gpointer user_data)
- {
-@@ -723,7 +761,9 @@ static void tcp_chr_tls_handshake(QIOTask *task,
-     if (qio_task_propagate_error(task, NULL)) {
-         tcp_chr_disconnect(chr);
-     } else {
--        if (s->do_telnetopt) {
-+        if (s->is_websock) {
-+            tcp_chr_websock_init(chr);
-+        } else if (s->do_telnetopt) {
-             tcp_chr_telnet_init(chr);
-         } else {
-             tcp_chr_connect(chr);
-@@ -809,12 +849,12 @@ static int tcp_chr_new_client(Chardev *chr, QIOChannelSocket *sioc)
- 
-     if (s->tls_creds) {
-         tcp_chr_tls_init(chr);
-+    } else if (s->is_websock) {
-+        tcp_chr_websock_init(chr);
-+    } else if (s->do_telnetopt) {
-+        tcp_chr_telnet_init(chr);
-     } else {
--        if (s->do_telnetopt) {
--            tcp_chr_telnet_init(chr);
--        } else {
--            tcp_chr_connect(chr);
--        }
-+        tcp_chr_connect(chr);
-     }
- 
-     return 0;
-@@ -959,13 +999,20 @@ static void qmp_chardev_open_socket(Chardev *chr,
-     bool is_telnet      = sock->has_telnet  ? sock->telnet  : false;
-     bool is_tn3270      = sock->has_tn3270  ? sock->tn3270  : false;
-     bool is_waitconnect = sock->has_wait    ? sock->wait    : false;
-+    bool is_websock     = sock->has_websocket ? sock->websocket : false;
-     int64_t reconnect   = sock->has_reconnect ? sock->reconnect : 0;
-     QIOChannelSocket *sioc = NULL;
-     SocketAddress *addr;
- 
-+    if (!is_listen && is_websock) {
-+        error_setg(errp, "%s", "Websocket client is not implemented");
-+        goto error;
-+    }
-+
-     s->is_listen = is_listen;
-     s->is_telnet = is_telnet;
-     s->is_tn3270 = is_tn3270;
-+    s->is_websock = is_websock;
-     s->do_nodelay = do_nodelay;
-     if (sock->tls_creds) {
-         Object *creds;
-@@ -1072,6 +1119,7 @@ static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backend,
-     bool is_waitconnect = is_listen && qemu_opt_get_bool(opts, "wait", true);
-     bool is_telnet      = qemu_opt_get_bool(opts, "telnet", false);
-     bool is_tn3270      = qemu_opt_get_bool(opts, "tn3270", false);
-+    bool is_websock     = qemu_opt_get_bool(opts, "websocket", false);
-     bool do_nodelay     = !qemu_opt_get_bool(opts, "delay", true);
-     int64_t reconnect   = qemu_opt_get_number(opts, "reconnect", 0);
-     const char *path = qemu_opt_get(opts, "path");
-@@ -1120,6 +1168,8 @@ static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backend,
-     sock->telnet = is_telnet;
-     sock->has_tn3270 = true;
-     sock->tn3270 = is_tn3270;
-+    sock->has_websocket = true;
-+    sock->websocket = is_websock;
-     sock->has_wait = true;
-     sock->wait = is_waitconnect;
-     sock->has_reconnect = true;
-diff --git a/chardev/char.c b/chardev/char.c
-index e115166995..a8790017e6 100644
---- a/chardev/char.c
-+++ b/chardev/char.c
-@@ -409,7 +409,8 @@ QemuOpts *qemu_chr_parse_compat(const char *label, const char *filename,
-     }
-     if (strstart(filename, "tcp:", &p) ||
-         strstart(filename, "telnet:", &p) ||
--        strstart(filename, "tn3270:", &p)) {
-+        strstart(filename, "tn3270:", &p) ||
-+        strstart(filename, "websocket:", &p)) {
-         if (sscanf(p, "%64[^:]:%32[^,]%n", host, port, &pos) < 2) {
-             host[0] = 0;
-             if (sscanf(p, ":%32[^,]%n", port, &pos) < 1)
-@@ -429,6 +430,8 @@ QemuOpts *qemu_chr_parse_compat(const char *label, const char *filename,
-             qemu_opt_set(opts, "telnet", "on", &error_abort);
-         } else if (strstart(filename, "tn3270:", &p)) {
-             qemu_opt_set(opts, "tn3270", "on", &error_abort);
-+        } else if (strstart(filename, "websocket:", &p)) {
-+            qemu_opt_set(opts, "websocket", "on", &error_abort);
-         }
-         return opts;
-     }
-@@ -860,6 +863,9 @@ QemuOptsList qemu_chardev_opts = {
-         },{
-             .name = "tls-creds",
-             .type = QEMU_OPT_STRING,
-+        },{
-+            .name = "websocket",
-+            .type = QEMU_OPT_BOOL,
-         },{
-             .name = "width",
-             .type = QEMU_OPT_NUMBER,
-diff --git a/qapi/char.json b/qapi/char.json
-index b7b2a05766..79bac598a0 100644
---- a/qapi/char.json
-+++ b/qapi/char.json
-@@ -251,6 +251,8 @@
- #          sockets (default: false)
- # @tn3270: enable tn3270 protocol on server
- #          sockets (default: false) (Since: 2.10)
-+# @websocket: enable websocket protocol on server
-+#           sockets (default: false) (Since: 3.1)
- # @reconnect: For a client socket, if a socket is disconnected,
- #          then attempt a reconnect after the given number of seconds.
- #          Setting this to zero disables this function. (default: 0)
-@@ -265,6 +267,7 @@
-                                      '*nodelay'   : 'bool',
-                                      '*telnet'    : 'bool',
-                                      '*tn3270'    : 'bool',
-+                                     '*websocket' : 'bool',
-                                      '*reconnect' : 'int' },
-   'base': 'ChardevCommon' }
- 
-diff --git a/qemu-options.hx b/qemu-options.hx
-index f139459e80..022c793162 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -2409,9 +2409,9 @@ DEF("chardev", HAS_ARG, QEMU_OPTION_chardev,
-     "-chardev help\n"
-     "-chardev null,id=id[,mux=on|off][,logfile=PATH][,logappend=on|off]\n"
-     "-chardev socket,id=id[,host=host],port=port[,to=to][,ipv4][,ipv6][,nodelay][,reconnect=seconds]\n"
--    "         [,server][,nowait][,telnet][,reconnect=seconds][,mux=on|off]\n"
-+    "         [,server][,nowait][,telnet][,websocket][,reconnect=seconds][,mux=on|off]\n"
-     "         [,logfile=PATH][,logappend=on|off][,tls-creds=ID] (tcp)\n"
--    "-chardev socket,id=id,path=path[,server][,nowait][,telnet][,reconnect=seconds]\n"
-+    "-chardev socket,id=id,path=path[,server][,nowait][,telnet][,websocket][,reconnect=seconds]\n"
-     "         [,mux=on|off][,logfile=PATH][,logappend=on|off] (unix)\n"
-     "-chardev udp,id=id[,host=host],port=port[,localaddr=localaddr]\n"
-     "         [,localport=localport][,ipv4][,ipv6][,mux=on|off]\n"
-@@ -2539,7 +2539,7 @@ The available backends are:
- A void device. This device will not emit any data, and will drop any data it
- receives. The null backend does not take any options.
- 
--@item -chardev socket,id=@var{id}[,@var{TCP options} or @var{unix options}][,server][,nowait][,telnet][,reconnect=@var{seconds}][,tls-creds=@var{id}]
-+@item -chardev socket,id=@var{id}[,@var{TCP options} or @var{unix options}][,server][,nowait][,telnet][,websocket][,reconnect=@var{seconds}][,tls-creds=@var{id}]
- 
- Create a two-way stream socket, which can be either a TCP or a unix socket. A
- unix socket will be created if @option{path} is specified. Behaviour is
-@@ -2553,6 +2553,9 @@ connect to a listening socket.
- @option{telnet} specifies that traffic on the socket should interpret telnet
- escape sequences.
- 
-+@option{websocket} specifies that the socket uses WebSocket protocol for
-+communication.
-+
- @option{reconnect} sets the timeout for reconnecting on non-server sockets when
- the remote end goes away.  qemu will delay this many seconds and then attempt
- to reconnect.  Zero disables reconnecting, and is the default.
-@@ -3101,6 +3104,10 @@ MAGIC_SYSRQ sequence if you use a telnet that supports sending the break
- sequence.  Typically in unix telnet you do it with Control-] and then
- type "send break" followed by pressing the enter key.
- 
-+@item websocket:@var{host}:@var{port},server[,nowait][,nodelay]
-+The WebSocket protocol is used instead of raw tcp socket. The port acts as
-+a WebSocket server. Client mode is not supported.
-+
- @item unix:@var{path}[,server][,nowait][,reconnect=@var{seconds}]
- A unix domain socket is used instead of a tcp socket.  The option works the
- same as if you had specified @code{-serial tcp} except the unix domain socket
--- 
-2.17.1
+On 10/18/18 6:09 PM, Eduardo Habkost wrote:
+> On Thu, Oct 18, 2018 at 05:45:56PM -0400, Cleber Rosa wrote:
+>>
+>>
+>> On 10/18/18 12:20 PM, Wainer dos Santos Moschetta wrote:
+>>> QEMU used to exits with a not accurate error message when
+>>> an initrd >= 2GB was passed. That was fixed on patch:
+>>>
+>>> 	commit f3839fda5771596152b75dd1e1a6d050e6e6e380
+>>> 	Author: Li Zhijian <lizhijian@cn.fujitsu.com>
+>>> 	Date:   Thu Sep 13 18:07:13 2018 +0800
+>>>
+>>>     	change get_image_size return type to int64_t
+>>>
+>>> This change adds a regression test for that fix. It starts
+>>> QEMU with a 2GB dummy initrd, and check it evaluates the file
+>>> size correctly and prints accurate message.
+>>>
+>>> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+>>> ---
+>>>  tests/acceptance/linux_initrd.py | 47 ++++++++++++++++++++++++++++++++
+>>>  1 file changed, 47 insertions(+)
+>>>  create mode 100644 tests/acceptance/linux_initrd.py
+>>>
+>>> diff --git a/tests/acceptance/linux_initrd.py b/tests/acceptance/linux_initrd.py
+>>> new file mode 100644
+>>> index 0000000000..7d9e5862cd
+>>> --- /dev/null
+>>> +++ b/tests/acceptance/linux_initrd.py
+>>> @@ -0,0 +1,47 @@
+>>> +# Linux initrd acceptance test.
+>>> +#
+>>> +# Copyright (c) 2018 Red Hat, Inc.
+>>> +#
+>>> +# Author:
+>>> +#  Wainer dos Santos Moschetta <wainersm@redhat.com>
+>>> +#
+>>> +# This work is licensed under the terms of the GNU GPL, version 2 or
+>>> +# later.  See the COPYING file in the top-level directory.
+>>> +
+>>> +import tempfile
+>>> +
+>>> +from avocado_qemu import Test
+>>> +from avocado.utils.process import run
+>>> +
+>>> +
+>>> +class LinuxInitrd(Test):
+>>> +    """
+>>> +    Checks QEMU evaluates correctly the initrd file passed as -initrd option.
+>>> +
+>>> +    :avocado: enable
+>>> +    :avocado: tags=x86_64
+>>> +    """
+>>> +
+>>> +    timeout = 60
+>>> +
+>>> +    def test_with_2GB_file_should_exit_error_msg(self):
+>>> +        """
+>>> +        Pretends to boot QEMU with an initrd file with size of 2GB
+>>> +        and expect it exits with error message.
+>>> +        Regression test for bug fixed on commit f3839fda5771596152.
+>>> +        """
+>>> +        kernel_url = ('https://mirrors.kernel.org/fedora/releases/28/'
+>>> +                      'Everything/x86_64/os/images/pxeboot/vmlinuz')
+>>> +        kernel_hash = '238e083e114c48200f80d889f7e32eeb2793e02a'
+>>> +        kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
+>>> +
+>>> +        with tempfile.NamedTemporaryFile() as initrd:
+>>> +            initrd.seek(2048*(1024**2) -1)
+>>
+>> It's a style issue, but I'd go with spaces between operators:
+>>
+>>         initrd.seek(2048 * (1024 ** 2) - 1)
+>>
+>> One other possibility that may improve code readability is:
+>>
+>>         from avocado.utils.data_structures import DataSize
+>>         initrd.seek(DataSize('2G').b - 1)
+>>
+> 
+> I'd agree if "2G" weren't ambiguous (I would expect it to mean
+> 2,000,000,000, not 1,073,741,824).
+> 
+> I can live with the ambiguity of 2GB in the commit message, class
+> name, and docstring.  But having to look for the
+> avocado.utils.data_structures.DataSize documentation to find out
+> what's the file size makes the code less readable to me.
+> 
+> 
+
+Fair enough.  The "G" here isn't clear about gibibyte/gigabyte.
+
+>> Or finally, just set a "max_size" variable to the 2GB literal value.
+>>
+>>> +            initrd.write(b'\0')
+>>> +            initrd.flush()
+>>> +            cmd = "%s -kernel %s -initrd %s" % (self.qemu_bin, kernel_path,
+>>> +                                                initrd.name)
+>>> +            res = run(cmd, ignore_status=True)
+>>> +            self.assertNotEqual(res.exit_status, 0)
+> 
+> I would prefer to ensure exit code is 1.  We don't want the test
+> to pass if QEMU crashed with a signal, for example.
+> 
+> 
+
+Agreed.
+
+>>> +            expected_msg = r'.*initrd is too large.*max: \d+, need \d+.*'
+>>
+>> I'd be a bit more assertive here and do something like:
+>>
+>>       expected_msg = r'.*initrd is too large.*max: \d+, need %d\)' %
+>> max_size
+>>
+>> And if "134053887" (which appears in "max"), is a QEMU constant, that
+>> can be added there as well.
+> 
+> I was going to suggest the opposite: just checking if the error
+> message contains "initrd is too large".  If we ensure the exit
+> status is 1, the exact format of the error message isn't very
+> important.
+> 
+
+It's certainly a matter of style here, and both are fine to me, but I'd
+rather have someone touching that part of the code to also have to touch
+the test if the message changes.
+
+Note that I can't predict if this will eventually catch a regression
+that the simpler message you suggest wouldn't, but, I, personally,
+prefer to be safe than sorry.
+
+- Cleber.
