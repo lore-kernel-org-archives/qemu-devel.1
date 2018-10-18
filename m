@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38844)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gDEYB-0008CE-6F
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:05:44 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gDEYC-0008E1-ID
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:05:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gDEYA-0008BQ-CF
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:05:43 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gDEYB-0008DN-J0
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:05:44 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 18 Oct 2018 17:03:44 -0300
-Message-Id: <20181018200422.4358-8-ehabkost@redhat.com>
+Date: Thu, 18 Oct 2018 17:03:46 -0300
+Message-Id: <20181018200422.4358-10-ehabkost@redhat.com>
 In-Reply-To: <20181018200422.4358-1-ehabkost@redhat.com>
 References: <20181018200422.4358-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 07/45] hw/timer/sun4v-rtc: Use
- DeviceState::realize rather than SysBusDevice::init
+Subject: [Qemu-devel] [PULL 09/45] hw/sh4/sh_pci: Use DeviceState::realize
+ rather than SysBusDevice::init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,44 +32,68 @@ Move from the legacy SysBusDevice::init method to using DeviceState::real=
 ize.
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Message-Id: <20181002212522.23303-4-f4bug@amsat.org>
+Message-Id: <20181002212522.23303-6-f4bug@amsat.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/timer/sun4v-rtc.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ hw/sh4/sh_pci.c | 20 +++++++++-----------
+ 1 file changed, 9 insertions(+), 11 deletions(-)
 
-diff --git a/hw/timer/sun4v-rtc.c b/hw/timer/sun4v-rtc.c
-index 13be94f8da..4e7f6a1eff 100644
---- a/hw/timer/sun4v-rtc.c
-+++ b/hw/timer/sun4v-rtc.c
-@@ -63,21 +63,21 @@ void sun4v_rtc_init(hwaddr addr)
-     sysbus_mmio_map(s, 0, addr);
+diff --git a/hw/sh4/sh_pci.c b/hw/sh4/sh_pci.c
+index 4ec2e35500..379d0685ed 100644
+--- a/hw/sh4/sh_pci.c
++++ b/hw/sh4/sh_pci.c
+@@ -120,16 +120,15 @@ static void sh_pci_set_irq(void *opaque, int irq_nu=
+m, int level)
+     qemu_set_irq(pic[irq_num], level);
  }
 =20
--static int sun4v_rtc_init1(SysBusDevice *dev)
-+static void sun4v_rtc_realize(DeviceState *dev, Error **errp)
+-static int sh_pci_device_init(SysBusDevice *dev)
++static void sh_pci_device_realize(DeviceState *dev, Error **errp)
  {
+-    PCIHostState *phb;
+-    SHPCIState *s;
 +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
-     Sun4vRtc *s =3D SUN4V_RTC(dev);
++    SHPCIState *s =3D SH_PCI_HOST_BRIDGE(dev);
++    PCIHostState *phb =3D PCI_HOST_BRIDGE(s);
+     int i;
 =20
-     memory_region_init_io(&s->iomem, OBJECT(s), &sun4v_rtc_ops, s,
-                           "sun4v-rtc", 0x08ULL);
--    sysbus_init_mmio(dev, &s->iomem);
+-    s =3D SH_PCI_HOST_BRIDGE(dev);
+-    phb =3D PCI_HOST_BRIDGE(s);
+     for (i =3D 0; i < 4; i++) {
+-        sysbus_init_irq(dev, &s->irq[i]);
++        sysbus_init_irq(sbd, &s->irq[i]);
+     }
+     phb->bus =3D pci_register_root_bus(DEVICE(dev), "pci",
+                                      sh_pci_set_irq, sh_pci_map_irq,
+@@ -143,13 +142,12 @@ static int sh_pci_device_init(SysBusDevice *dev)
+                              &s->memconfig_p4, 0, 0x224);
+     memory_region_init_alias(&s->isa, OBJECT(s), "sh_pci.isa",
+                              get_system_io(), 0, 0x40000);
+-    sysbus_init_mmio(dev, &s->memconfig_p4);
+-    sysbus_init_mmio(dev, &s->memconfig_a7);
++    sysbus_init_mmio(sbd, &s->memconfig_p4);
++    sysbus_init_mmio(sbd, &s->memconfig_a7);
+     s->iobr =3D 0xfe240000;
+     memory_region_add_subregion(get_system_memory(), s->iobr, &s->isa);
+=20
+     s->dev =3D pci_create_simple(phb->bus, PCI_DEVFN(0, 0), "sh_pci_host=
+");
 -    return 0;
-+    sysbus_init_mmio(sbd, &s->iomem);
  }
 =20
- static void sun4v_rtc_class_init(ObjectClass *klass, void *data)
+ static void sh_pci_host_realize(PCIDevice *d, Error **errp)
+@@ -187,9 +185,9 @@ static const TypeInfo sh_pci_host_info =3D {
+=20
+ static void sh_pci_device_class_init(ObjectClass *klass, void *data)
  {
--    SysBusDeviceClass *k =3D SYS_BUS_DEVICE_CLASS(klass);
+-    SysBusDeviceClass *sdc =3D SYS_BUS_DEVICE_CLASS(klass);
 +    DeviceClass *dc =3D DEVICE_CLASS(klass);
 =20
--    k->init =3D sun4v_rtc_init1;
-+    dc->realize =3D sun4v_rtc_realize;
+-    sdc->init =3D sh_pci_device_init;
++    dc->realize =3D sh_pci_device_realize;
  }
 =20
- static const TypeInfo sun4v_rtc_info =3D {
+ static const TypeInfo sh_pci_device_info =3D {
 --=20
 2.18.0.rc1.1.g3f1ff2140
