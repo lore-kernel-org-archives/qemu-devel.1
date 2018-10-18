@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44173)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44293)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gDDLe-0000Ja-2J
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:48:43 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDDMF-0000Yc-2f
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:49:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gDDLY-0004gD-Vh
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:48:41 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:55069)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1gDDLV-0004SP-8y
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:48:34 -0400
-References: <20181008163521.17341-1-cst@tolva.net>
-	<20181008163521.17341-4-cst@tolva.net>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <ab7987e7-0cf9-7bde-12d3-52dba3b16713@vivier.eu>
-Date: Thu, 18 Oct 2018 20:48:24 +0200
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDDM3-0005Ux-E6
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:49:13 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:56684 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1gDDM3-000443-4p
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:49:07 -0400
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Date: Thu, 18 Oct 2018 20:47:30 +0200
+Message-Id: <1539888473-16340-6-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1539888473-16340-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1539888473-16340-1-git-send-email-aleksandar.markovic@rt-rk.com>
 MIME-Version: 1.0
-In-Reply-To: <20181008163521.17341-4-cst@tolva.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] linux-user: Implement special usbfs
- ioctls.
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v2 05/28] elf: Fix comments to EF_MIPS_MACH_xxx
+ constants
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,109 +28,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Cortland_T=c3=b6lva?= <cst@tolva.net>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
-Le 08/10/2018 à 18:35, Cortland Tölva a écrit :
-> Userspace submits a USB Request Buffer to the kernel, optionally
-> discards it, and finally reaps the URB.  Thunk buffers from target
-> to host and back.
-> 
-> Tested by running an i386 scanner driver on ARMv7 and by running
-> the PowerPC lsusb utility on x86_64.  The discardurb ioctl is
-> not exercised in these tests.
-> 
-> Signed-off-by: Cortland Tölva <cst@tolva.net>
-> ---
-> There are two alternatives for the strategy of holding lock_user on
-> memory from submit until reap.  v3 of this series tries to determine
-> the access permissions for user memory from endpoint direction, but
-> the logic for this is complex.  The first alternative is to request
-> write access.  If that fails, request read access.  If that fails, try
-> to submit the ioctl with no buffer - perhaps the user code filled in
-> fields the kernel will ignore.  The second alternative is to read user
-> memory into an allocated buffer, pass it to the kernel, and write back
-> to target memory only if the kernel indicates that writes occurred.
-> 
-> Changes from v1:
->   improve pointer cast to int compatibility
->   remove unimplemented types for usb streams
->   struct definitions moved to this patch where possible
-> 
-> Changes from v2:
->  organize urb thunk metadata in a struct
->  hold lock_user from submit until discard
->  fixes for 64-bit hosts
-> 
->  linux-user/ioctls.h        |   8 ++
->  linux-user/syscall.c       | 177 +++++++++++++++++++++++++++++++++++++++++++++
->  linux-user/syscall_defs.h  |   4 +
->  linux-user/syscall_types.h |  20 +++++
->  4 files changed, 209 insertions(+)
-> 
-> diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-> index 92f6177f1d..ae8951625f 100644
-...
-> index 2641260186..9b7ea96cfb 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -96,6 +96,7 @@
->  #include <linux/fb.h>
->  #if defined(CONFIG_USBFS)
->  #include <linux/usbdevice_fs.h>
-> +#include <linux/usb/ch9.h>
->  #endif
->  #include <linux/vt.h>
->  #include <linux/dm-ioctl.h>
-> @@ -4199,6 +4200,182 @@ static abi_long do_ioctl_ifconf(const IOCTLEntry *ie, uint8_t *buf_temp,
->      return ret;
->  }
->  
-> +#if defined(CONFIG_USBFS)
-> +#if HOST_LONG_BITS > 64
-> +#error USBDEVFS thunks do not support >64 bit hosts yet.
-> +#endif
-> +struct live_urb {
-> +    uint64_t target_urb_adr;
-> +    uint64_t target_buf_adr;
-> +    char *target_buf_ptr;
-> +    struct usbdevfs_urb host_urb;
-> +};
-> +
-> +static GHashTable *usbdevfs_urb_hashtable(void)
-> +{
-> +    static GHashTable *urb_hashtable;
-> +
-> +    if (!urb_hashtable) {
-> +        urb_hashtable = g_hash_table_new(g_int64_hash, g_int64_equal);
-> +    }
-> +    return urb_hashtable;
-> +}
-> +
-> +static void urb_hashtable_insert(struct live_urb *urb)
-> +{
-> +    GHashTable *urb_hashtable = usbdevfs_urb_hashtable();
-> +    g_hash_table_insert(urb_hashtable, urb, urb);
+From: Fredrik Noring <noring@nocrew.org>
 
-Here the key of the hashtable seems to be the pointer to the host live_urb.
+Regarding R5900 CPU, some sources indicate that the Emotion Engine
+ISA/ASE was designed by Toshiba and licensed to Sony. Others sources
+claim it was a joint effort. It therefore makes sense to refer to
+the CPU as "Toshiba/Sony R5900".
 
-> +}
-> +
-> +static struct live_urb *urb_hashtable_lookup(uint64_t target_urb_adr)
-> +{
-> +    GHashTable *urb_hashtable = usbdevfs_urb_hashtable();
-> +    return g_hash_table_lookup(urb_hashtable, &target_urb_adr);
+Also, remove and "'s" in the line for some other CPU, for the sake
+of consistency.
 
-And here the key is the pointer to the target_urb_adr
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reported-by: Maciej W. Rozycki <macro@linux-mips.org>
+Signed-off-by: Fredrik Noring <noring@nocrew.org>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+---
+ include/elf.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-So I think urb_hashtable_insert()  should be:
-
-    g_hash_table_insert(urb_hashtable, urb->target_urb_adr, urb);
-
-and urb_hashtable_lookup() should be:
-
-    return g_hash_table_lookup(urb_hashtable, target_urb_adr);
-...
-Did I miss something?
-
-Thanks,
-Laurent
+diff --git a/include/elf.h b/include/elf.h
+index 911b95a..5f45f9b 100644
+--- a/include/elf.h
++++ b/include/elf.h
+@@ -79,9 +79,9 @@ typedef int64_t  Elf64_Sxword;
+ #define EF_MIPS_MACH_OCTEON2  0x008d0000  /* Cavium Networks Octeon2    =
+     */
+ #define EF_MIPS_MACH_OCTEON3  0x008e0000  /* Cavium Networks Octeon3    =
+     */
+ #define EF_MIPS_MACH_5400     0x00910000  /* NEC VR5400                 =
+     */
+-#define EF_MIPS_MACH_5900     0x00920000  /* MIPS R5900                 =
+     */
++#define EF_MIPS_MACH_5900     0x00920000  /* Toshiba/Sony R5900         =
+     */
+ #define EF_MIPS_MACH_5500     0x00980000  /* NEC VR5500                 =
+     */
+-#define EF_MIPS_MACH_9000     0x00990000  /* PMC-Sierra's RM9000        =
+     */
++#define EF_MIPS_MACH_9000     0x00990000  /* PMC-Sierra RM9000          =
+     */
+ #define EF_MIPS_MACH_LS2E     0x00a00000  /* ST Microelectronics Loongso=
+n 2E */
+ #define EF_MIPS_MACH_LS2F     0x00a10000  /* ST Microelectronics Loongso=
+n 2F */
+ #define EF_MIPS_MACH_LS3A     0x00a20000  /* ST Microelectronics Loongso=
+n 3A */
+--=20
+2.7.4
