@@ -1,32 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58545)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40283)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gDE0V-0007N0-Ig
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 15:30:56 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gDEb7-0002iW-Qa
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:08:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gDE0Q-0005a2-Fi
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 15:30:55 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51604)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gDE0M-0004ZE-K8
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 15:30:48 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gDE0J-0007Ra-62
-	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 19:30:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id DF92E2E80D2
-	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 19:30:42 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 18 Oct 2018 19:17:54 -0000
-From: Oren Milman <orenmn@gmail.com>
-Reply-To: Bug 1798659 <1798659@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <153989027444.15424.224613242357516969.malonedeb@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1798659] [NEW] A typo in trace/simple.c
+	(envelope-from <ehabkost@redhat.com>) id 1gDEb6-0002xm-UU
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:08:45 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Thu, 18 Oct 2018 17:04:06 -0300
+Message-Id: <20181018200422.4358-30-ehabkost@redhat.com>
+In-Reply-To: <20181018200422.4358-1-ehabkost@redhat.com>
+References: <20181018200422.4358-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PULL 29/45] memory-device: add device class function
+ set_addr()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,42 +20,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Rob Herring <robh@kernel.org>, libvir-list@redhat.com, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-arm@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Markus Armbruster <armbru@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Eduardo Habkost <ehabkost@redhat.com>, Michael Walle <michael@walle.cc>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Alistair Francis <alistair@alistair23.me>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-ppc@nongnu.org, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Max Filippov <jcmvbkbc@gmail.com>, David Hildenbrand <david@redhat.com>
 
-Public bug reported:
+From: David Hildenbrand <david@redhat.com>
 
-In the master branch in trace/simple.c in writeout_thread (https://github.c=
-om/qemu/qemu/blob/master/trace/simple.c#L174) we currently have:
-  dropped.rec.length =3D sizeof(TraceRecord) + sizeof(uint64_t),
-  dropped.rec.pid =3D trace_pid;
+To be able to factor out address assignment of memory devices, we will
+have to read (get_addr()) and write (set_addr()) the address.
 
-It seems to me like a typo that the first line ends with a comma.
-Currently this causes no harm, but I think this should be fixed.
+We can't use properties for this purpose, as properties are device
+specific. E.g. while the address property for a DIMM is called "addr", it
+might be called differently (e.g. "memaddr") for other devices.
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+Especially virtio based memory devices cannot use "addr" as that is already
+reserved and used for the address on the bus (for the proxy device).
 
--- =
+Also, it might be possible to have memory devices without address
+properties (e.g. internal DIMM-like thingies).
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1798659
+In contrast to get_addr(), we expect that set_addr() can fail.
 
-Title:
-  A typo in trace/simple.c
+Keep it simple for now for pc-dimm and simply set the static property, that
+will fail once realized.
 
-Status in QEMU:
-  New
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20181005092024.14344-13-david@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ include/hw/mem/memory-device.h | 8 ++++++++
+ hw/mem/pc-dimm.c               | 7 +++++++
+ 2 files changed, 15 insertions(+)
 
-Bug description:
-  In the master branch in trace/simple.c in writeout_thread (https://github=
-.com/qemu/qemu/blob/master/trace/simple.c#L174) we currently have:
-    dropped.rec.length =3D sizeof(TraceRecord) + sizeof(uint64_t),
-    dropped.rec.pid =3D trace_pid;
-
-  It seems to me like a typo that the first line ends with a comma.
-  Currently this causes no harm, but I think this should be fixed.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1798659/+subscriptions
+diff --git a/include/hw/mem/memory-device.h b/include/hw/mem/memory-device.h
+index 9c3398bc4a..ed7cf5bf4b 100644
+--- a/include/hw/mem/memory-device.h
++++ b/include/hw/mem/memory-device.h
+@@ -59,6 +59,14 @@ typedef struct MemoryDeviceClass {
+      */
+     uint64_t (*get_addr)(const MemoryDeviceState *md);
+ 
++    /*
++     * Set the address of the memory device in guest physical memory.
++     *
++     * Called when plugging the memory device to configure the determined
++     * address in guest physical memory.
++     */
++    void (*set_addr)(MemoryDeviceState *md, uint64_t addr, Error **errp);
++
+     /*
+      * Return the amount of memory provided by the memory device currently
+      * usable ("plugged") by the VM.
+diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+index 47b2e83389..4a15091734 100644
+--- a/hw/mem/pc-dimm.c
++++ b/hw/mem/pc-dimm.c
+@@ -236,6 +236,12 @@ static uint64_t pc_dimm_md_get_addr(const MemoryDeviceState *md)
+     return dimm->addr;
+ }
+ 
++static void pc_dimm_md_set_addr(MemoryDeviceState *md, uint64_t addr,
++                                Error **errp)
++{
++    object_property_set_uint(OBJECT(md), addr, PC_DIMM_ADDR_PROP, errp);
++}
++
+ static MemoryRegion *pc_dimm_md_get_memory_region(MemoryDeviceState *md,
+                                                   Error **errp)
+ {
+@@ -286,6 +292,7 @@ static void pc_dimm_class_init(ObjectClass *oc, void *data)
+     ddc->get_vmstate_memory_region = pc_dimm_get_memory_region;
+ 
+     mdc->get_addr = pc_dimm_md_get_addr;
++    mdc->set_addr = pc_dimm_md_set_addr;
+     /* for a dimm plugged_size == region_size */
+     mdc->get_plugged_size = memory_device_get_region_size;
+     mdc->get_memory_region = pc_dimm_md_get_memory_region;
+-- 
+2.18.0.rc1.1.g3f1ff2140
