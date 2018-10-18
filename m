@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50109)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gD6zS-0001xC-E2
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 08:01:27 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1gD74P-0003Rp-Lp
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 08:06:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gD6zM-0003Q7-RN
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 08:01:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52814)
+	(envelope-from <pbonzini@redhat.com>) id 1gD74M-0007tu-D1
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 08:06:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53130)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gD6zM-0003MV-K0
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 08:01:16 -0400
-Date: Thu, 18 Oct 2018 17:31:07 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-In-Reply-To: <e8f2f7c5-936f-9949-a6b3-55988482cab3@redhat.com>
-Message-ID: <nycvar.YSQ.7.76.1810181727570.18164@xnncv>
-References: <20181017205848.2525-1-ppandit@redhat.com>
-	<e8f2f7c5-936f-9949-a6b3-55988482cab3@redhat.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gD74M-0007tS-5A
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 08:06:26 -0400
+References: <cover.1539860473.git.artem.k.pisarenko@gmail.com>
+	<CANzW0mtYvBSOEmOdu4_c0TLuP5kb9T2AV-11mE2O0ZqCW0vx=Q@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6110f7a1-ae99-5eeb-ea2c-6482f8f46e17@redhat.com>
+Date: Thu, 18 Oct 2018 14:06:21 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH] bt: use size_t type for length parameters
- instead of signed int
+In-Reply-To: <CANzW0mtYvBSOEmOdu4_c0TLuP5kb9T2AV-11mE2O0ZqCW0vx=Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] Introduce attributes for timers
+ subsystem and remove QEMU_CLOCK_VIRTUAL_EXT clock type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,20 +29,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Arash TC <tohidi.arash@gmail.com>, Philippe Mathieu Daude <pmathieu@redhat.com>
+To: Artem Pisarenko <artem.k.pisarenko@gmail.com>, qemu-devel@nongnu.org
+Cc: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
-+-- On Thu, 18 Oct 2018, Paolo Bonzini wrote --+
-| So you have to first find out all places where something is subtracted
-| from the length, and ensure it's okay or add assertions.
-| 
-| Then you have to check a much more important issue: places that use a 
-| fixed-size buffer such as vhci_host_send should range check len first, again 
-| with an assertion if needed.
+On 18/10/2018 14:00, Artem Pisarenko wrote:
+> Sorry, I forgot to fix long lines in commit messages. Do I need to
+> submit v4 ?
+> 
 
-  Okay. There are routines which range check 'len', checking others.
+No need, don't worry.
 
-Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
+Paolo
