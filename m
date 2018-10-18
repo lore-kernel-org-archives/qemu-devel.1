@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49717)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <casasfernando@hotmail.com>) id 1gD8Xa-0005C5-61
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 09:40:43 -0400
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gD8Xk-0005IW-RP
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 09:40:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <casasfernando@hotmail.com>) id 1gD8XX-0007sN-0W
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 09:40:42 -0400
-From: =?iso-8859-1?Q?Fernando_Casas_Sch=F6ssow?= <casasfernando@hotmail.com>
-Date: Thu, 18 Oct 2018 13:40:36 +0000
-Message-ID: <AM6PR10MB2247D63F532AE33155BA57EFB7F80@AM6PR10MB2247.EURPRD10.PROD.OUTLOOK.COM>
-References: <VI1PR10MB0301515CFEEA940842FDF26FB7330@VI1PR10MB0301.EURPRD10.PROD.OUTLOOK.COM>
-	<20171211115634.GI13593@stefanha-x1.localdomain>
-	<VI1PR10MB030143CAC84D8E8AA783C0B0B7370@VI1PR10MB0301.EURPRD10.PROD.OUTLOOK.COM>
-	<20171213112345.GK16782@stefanha-x1.localdomain>
-	<VI1PR10MB0301BD1873225A06B658C988B7350@VI1PR10MB0301.EURPRD10.PROD.OUTLOOK.COM>
-	<20180129160104.GN20446@stefanha-x1.localdomain>
-	<AM6PR10MB2247BA55ABF2CC4F38B30339B7F80@AM6PR10MB2247.EURPRD10.PROD.OUTLOOK.COM>
-	<20181018123816.GB4946@localhost.localdomain>
-In-Reply-To: <20181018123816.GB4946@localhost.localdomain>
-Content-Language: en-US
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gD8Xh-00080G-Mm
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 09:40:52 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34315)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1gD8Xh-0007zU-DU
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 09:40:49 -0400
+Received: by mail-wr1-x444.google.com with SMTP id l6-v6so33345031wrt.1
+	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 06:40:49 -0700 (PDT)
+References: <20181011161820.38794-1-liq3ea@163.com>
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <9df25d36-4150-29d4-8d68-3da5dfb89468@gmail.com>
+Date: Thu, 18 Oct 2018 16:41:43 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-block] qemu process crash: Assertion failed:
- QLIST_EMPTY(&bs->tracked_requests)
+In-Reply-To: <20181011161820.38794-1-liq3ea@163.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v2] piix_pci: change the i440fx data sheet
+ link
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,28 +31,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Jeff Cody <jcody@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+To: Li Qiang <liq3ea@163.com>, mst@redhat.com
+Cc: qemu-devel@nongnu.org, philmd@redhat.com
 
-Hi Kevin,
 
-Not at the moment. This is a production system and pretty much up to date b=
-ut can't upgrade to 3.0 yet.
-If the dump can be of any use, I can upload it somewhere for analysis.
 
-BR,
+On 10/11/18 7:18 PM, Li Qiang wrote:
+> Seems the intel link is unavailable, change it to qemu site.
+>
+> Signed-off-by: Li Qiang <liq3ea@163.com>
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+>   hw/pci-host/piix.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
+> index 0e608347c1..56a42055f1 100644
+> --- a/hw/pci-host/piix.c
+> +++ b/hw/pci-host/piix.c
+> @@ -40,7 +40,7 @@
+>   
+>   /*
+>    * I440FX chipset data sheet.
+> - * http://download.intel.com/design/chipsets/datashts/29054901.pdf
+> + * https://wiki.qemu.org/File:29054901.pdf
+>    */
+>   
 
-Fernando
+Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
 
-On jue, oct 18, 2018 at 2:38 PM, Kevin Wolf <kwolf@redhat.com> wrote:
-Hi Fernando, Am 18.10.2018 um 14:25 hat Fernando Casas Sch=F6ssow geschrieb=
-en:
-I hope this email finds you well and I apologize in advance for resurrectin=
-g this thread. I'm currently running on qemu 2.12.1 and I'm still having th=
-is issue every few days but now I managed to get a core dump generated (wit=
-hout including the guest memory). Would you take a look at the dump? Please=
- let me know how do you prefer me to share it. The file is around 290MB as =
-is but I can try to compress it.
-would it be possible for you to test whether the bug still exists in QEMU 3=
-.0? There were a few fixes related to request draining in that release, so =
-maybe it's already solved now. Kevin
+Thanks,
+Marcel
+
+>   #define I440FX_PCI_HOST_BRIDGE(obj) \
