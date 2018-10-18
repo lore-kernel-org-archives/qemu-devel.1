@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32948)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43290)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gCvl0-0002xU-M3
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 20:01:43 -0400
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gCwbM-0004lC-Tu
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 20:55:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gCvkv-0007bw-S2
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 20:01:42 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:35825)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gCvkv-0007aW-Df
-	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 20:01:37 -0400
-Received: by mail-pl1-x642.google.com with SMTP id f8-v6so13461208plb.2
-	for <qemu-devel@nongnu.org>; Wed, 17 Oct 2018 17:01:37 -0700 (PDT)
-Date: Wed, 17 Oct 2018 17:01:35 -0700 (PDT)
-In-Reply-To: <fc39293f-9d79-a3d3-9e39-9e4680e6bbb4@redhat.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-6c4401ed-995c-48e1-a3ba-21692c2efcb1@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL] First RISC-V Patch Set for the 3.1 Soft
- Freeze
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gCwbL-00080w-Pd
+	for qemu-devel@nongnu.org; Wed, 17 Oct 2018 20:55:48 -0400
+Date: Thu, 18 Oct 2018 08:55:16 +0800 (CST)
+Message-ID: <201810180855169525575@zte.com.cn>
+In-Reply-To: <61bc5059-e7b1-3371-66b3-5bc10d06935b@redhat.com>
+References: 1539768207-18209-1-git-send-email-peng.hao2@zte.com.cn,
+	61bc5059-e7b1-3371-66b3-5bc10d06935b@redhat.com
+Mime-Version: 1.0
+From: <peng.hao2@zte.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel]
+ =?utf-8?q?=5BPATCH=5D_target/arm_=3A_add_pvpanic_mm?=
+ =?utf-8?q?io_device?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,63 +26,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eblake@redhat.com
-Cc: Peter Maydell <peter.maydell@linaro.org>, Michael Clark <mjc@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, qemu-devel@nongnu.org
+To: philmd@redhat.com
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
-On Wed, 17 Oct 2018 16:32:10 PDT (-0700), eblake@redhat.com wrote:
-> On 10/17/18 4:54 PM, Palmer Dabbelt wrote:
->> The following changes since commit 09558375a634e17cea6cfbfec883ac2376d2dc7f:
->>
->>    Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20181016-1' into staging (2018-10-16 17:42:56 +0100)
->>
->> are available in the Git repository at:
->>
->>    git://github.com/riscv/riscv-qemu.git tags/riscv-for-master-3.1-sf0
->>
->> for you to fetch changes up to 7c28f4da20e5585dce7d575691dac5392b7c6f78:
->>
->>    RISC-V: Don't add NULL bootargs to device-tree (2018-10-17 13:02:30 -0700)
->>
->> ----------------------------------------------------------------
->> First RISC-V Patch Set for the 3.1 Soft Freeze
->>
->
->> ----------------------------------------------------------------
->> Michael Clark (5):
->>        RISC-V: Allow setting and clearing multiple irqs
->>        RISC-V: Move non-ops from op_helper to cpu_helper
->>        RISC-V: Update CSR and interrupt definitions
->>        RISC-V: Add missing free for plic_hart_config
->>        RISC-V: Don't add NULL bootargs to device-tree
->>
->
-> Isn't this just a subset of Alistair's pull request?
-> https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg02342.html
-
-Yes, but there's still on-going discussion about the PCIe patches so they're 
-not really fully reviewed.  I think part of the trouble here is that there 
-wasn't someone submitting regular QEMU pull requests so there was always a rush 
-to get things in.  I've volunteered to wrangle the branches and submit weekly 
-pull requests (just like I do for Linux), so now there won't be any more big 
-cliffs.
-
-We've got a lot of patches to filter through because things have been backed up 
-for a bit, so I thought it'd be best to just go with something simple for this 
-first week.  Assuming everything gets sorted out for the PCIe patches they'll 
-just go up next week -- I'm super excited for them as well :)
-
-> which included:
->> ----------------------------------------------------------------
->> Alistair Francis (5):
->>       hw/riscv/virt: Increase the number of interrupts
->>       hw/riscv/virt: Connect the gpex PCIe
->>       riscv: Enable VGA and PCIE_VGA
->>       hw/riscv/sifive_u: Connect the Xilinx PCIe
->>       hw/riscv/virt: Connect a VirtIO net PCIe device
->>
->> Michael Clark (5):
->>       RISC-V: Allow setting and clearing multiple irqs
->>       RISC-V: Move non-ops from op_helper to cpu_helper
->>       RISC-V: Update CSR and interrupt definitions
->>       RISC-V: Add missing free for plic_hart_config
->>       RISC-V: Don't add NULL bootargs to device-tree
+PkhpIFBlbmcsCj4KPk9uIDE3LzEwLzIwMTggMTE6MjMsIFBlbmcgSGFvIHdyb3RlOgo+PiBBZGQg
+cHZwYW5pYyBtbWlvIGRldmljZSB0aGF0IGlzIHNpbWlsYXIgdG8geDg2J3MgcHZwYW5pYyBkZXZp
+Y2UuCj4KPj4KPj4gU2lnbmVkLW9mZi1ieTogUGVuZyBIYW8gPHBlbmcuaGFvMkB6dGUuY29tLmNu
+Pgo+PiAtLS0KPj4gIGRlZmF1bHQtY29uZmlncy9hcm0tc29mdG1tdS5tYWsgfCAgMiArLQo+PiAg
+aHcvYXJtL3ZpcnQuYyAgICAgICAgICAgICAgICAgICB8IDIxICsrKysrKysrKysrKwo+PiAgaHcv
+bWlzYy9NYWtlZmlsZS5vYmpzICAgICAgICAgICB8ICAxICsKPj4gIGh3L21pc2MvcHZwYW5pYy1t
+bWlvLmMgICAgICAgICAgfCA3NiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKwo+PiAgaW5jbHVkZS9ody9hcm0vdmlydC5oICAgICAgICAgICB8ICAxICsKPj4gIGluY2x1
+ZGUvaHcvbWlzYy9wdnBhbmljLW1taW8uaCAgfCAxMiArKysrKysrCj4+ICA2IGZpbGVzIGNoYW5n
+ZWQsIDExMiBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pCj4+ICBjcmVhdGUgbW9kZSAxMDA2
+NDQgaHcvbWlzYy9wdnBhbmljLW1taW8uYwo+PiAgY3JlYXRlIG1vZGUgMTAwNjQ0IGluY2x1ZGUv
+aHcvbWlzYy9wdnBhbmljLW1taW8uaAo+Pgo+PiBkaWZmIC0tZ2l0IGEvZGVmYXVsdC1jb25maWdz
+L2FybS1zb2Z0bW11Lm1hayBiL2RlZmF1bHQtY29uZmlncy9hcm0tc29mdG1tdS5tYWsKPj4gaW5k
+ZXggMjQyMDQ5MS4uNDcxM2M5MiAxMDA2NDQKPj4gLS0tIGEvZGVmYXVsdC1jb25maWdzL2FybS1z
+b2Z0bW11Lm1hawo+PiArKysgYi9kZWZhdWx0LWNvbmZpZ3MvYXJtLXNvZnRtbXUubWFrCj4+IEBA
+IC00Myw3ICs0Myw3IEBAIENPTkZJR19VU0JfTVVTQj15Cj4+ICBDT05GSUdfVVNCX0VIQ0lfU1lT
+QlVTPXkKPj4gIENPTkZJR19QTEFURk9STV9CVVM9eQo+PiAgQ09ORklHX1ZJUlRJT19NTUlPPXkK
+Pj4gLQo+PiArQ09ORklHX1BWUEFOSUNfTU1JTz15Cj4+ICBDT05GSUdfQVJNMTFNUENPUkU9eQo+
+PiAgQ09ORklHX0E5TVBDT1JFPXkKPj4gIENPTkZJR19BMTVNUENPUkU9eQo+PiBkaWZmIC0tZ2l0
+IGEvaHcvYXJtL3ZpcnQuYyBiL2h3L2FybS92aXJ0LmMKPj4gaW5kZXggYTQ3MjU2Ni4uYWI0MTEy
+OCAxMDA2NDQKPj4gLS0tIGEvaHcvYXJtL3ZpcnQuYwo+PiArKysgYi9ody9hcm0vdmlydC5jCj4+
+IEBAIC0xNDAsNiArMTQwLDcgQEAgc3RhdGljIGNvbnN0IE1lbU1hcEVudHJ5IGExNW1lbW1hcFtd
+ID0gewo+PiAgICAgIFtWSVJUX1VBUlRdID0gICAgICAgICAgICAgICB7IDB4MDkwMDAwMDAsIDB4
+MDAwMDEwMDAgfSwKPj4gICAgICBbVklSVF9SVENdID0gICAgICAgICAgICAgICAgeyAweDA5MDEw
+MDAwLCAweDAwMDAxMDAwIH0sCj4+ICAgICAgW1ZJUlRfRldfQ0ZHXSA9ICAgICAgICAgICAgIHsg
+MHgwOTAyMDAwMCwgMHgwMDAwMDAxOCB9LAo+PiArICAgIFtWSVJUX1BWUEFOSUNfTU1JT10gPSAg
+ICAgICB7IDB4MDkwMjAwMTgsIDB4MDAwMDAwMDIgfSwKPj4gICAgICBbVklSVF9HUElPXSA9ICAg
+ICAgICAgICAgICAgeyAweDA5MDMwMDAwLCAweDAwMDAxMDAwIH0sCj4+ICAgICAgW1ZJUlRfU0VD
+VVJFX1VBUlRdID0gICAgICAgIHsgMHgwOTA0MDAwMCwgMHgwMDAwMTAwMCB9LAo+PiAgICAgIFtW
+SVJUX1NNTVVdID0gICAgICAgICAgICAgICB7IDB4MDkwNTAwMDAsIDB4MDAwMjAwMDAgfSwKPj4g
+QEAgLTc5OCw2ICs3OTksMjQgQEAgc3RhdGljIHZvaWQgY3JlYXRlX2dwaW8oY29uc3QgVmlydE1h
+Y2hpbmVTdGF0ZSAqdm1zLCBxZW11X2lycSAqcGljKQo+PiAgICAgIGdfZnJlZShub2RlbmFtZSk7
+Cj4+ICB9Cj4+Cj4+ICtzdGF0aWMgdm9pZCBjcmVhdGVfcHZwYW5pY19kZXZpY2UoY29uc3QgVmly
+dE1hY2hpbmVTdGF0ZSAqdm1zKQo+PiArewo+PiArICAgIGNoYXIgKm5vZGVuYW1lOwo+PiArICAg
+IGh3YWRkciBiYXNlID0gdm1zLT5tZW1tYXBbVklSVF9QVlBBTklDX01NSU9dLmJhc2U7Cj4+ICsg
+ICAgaHdhZGRyIHNpemUgPSB2bXMtPm1lbW1hcFtWSVJUX1BWUEFOSUNfTU1JT10uc2l6ZTsKPj4g
+Kwo+PiArICAgIHN5c2J1c19jcmVhdGVfc2ltcGxlKCJwdnBhbmljLW1taW8iLCBiYXNlLCBOVUxM
+KTsKPj4gKwo+PiArICAgIG5vZGVuYW1lID0gZ19zdHJkdXBfcHJpbnRmKCIvcHZwYW5pYy1tbWlv
+QCUiIFBSSXg2NCwgYmFzZSk7Cj4+ICsgICAgcWVtdV9mZHRfYWRkX3N1Ym5vZGUodm1zLT5mZHQs
+IG5vZGVuYW1lKTsKPj4gKyAgICBxZW11X2ZkdF9zZXRwcm9wX3N0cmluZyh2bXMtPmZkdCwgbm9k
+ZW5hbWUsCj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgImNvbXBhdGlibGUiLCAicHZw
+YW5pYyxtbWlvIik7Cj4+ICsgICAgcWVtdV9mZHRfc2V0cHJvcF9zaXplZF9jZWxscyh2bXMtPmZk
+dCwgbm9kZW5hbWUsICJyZWciLAo+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+MiwgYmFzZSwgMiwgc2l6ZSk7Cj4+ICsgICAgZ19mcmVlKG5vZGVuYW1lKTsKPj4gKwo+PiArfQo+
+PiArCj4+ICBzdGF0aWMgdm9pZCBjcmVhdGVfdmlydGlvX2RldmljZXMoY29uc3QgVmlydE1hY2hp
+bmVTdGF0ZSAqdm1zLCBxZW11X2lycSAqcGljKQo+PiAgewo+PiAgICAgIGludCBpOwo+PiBAQCAt
+MTU0NCw2ICsxNTYzLDggQEAgc3RhdGljIHZvaWQgbWFjaHZpcnRfaW5pdChNYWNoaW5lU3RhdGUg
+Km1hY2hpbmUpCj4+Cj4+ICAgICAgY3JlYXRlX3BjaWUodm1zLCBwaWMpOwo+Pgo+PiArICAgIGNy
+ZWF0ZV9wdnBhbmljX2RldmljZSh2bXMpOwo+PiArCj4+ICAgICAgY3JlYXRlX2dwaW8odm1zLCBw
+aWMpOwo+Pgo+PiAgICAgIC8qIENyZWF0ZSBtbWlvIHRyYW5zcG9ydHMsIHNvIHRoZSB1c2VyIGNh
+biBjcmVhdGUgdmlydGlvIGJhY2tlbmRzCj4+IGRpZmYgLS1naXQgYS9ody9taXNjL01ha2VmaWxl
+Lm9ianMgYi9ody9taXNjL01ha2VmaWxlLm9ianMKPj4gaW5kZXggNmQ1MGIwMy4uNjMyNjI2MCAx
+MDA2NDQKPj4gLS0tIGEvaHcvbWlzYy9NYWtlZmlsZS5vYmpzCj4+ICsrKyBiL2h3L21pc2MvTWFr
+ZWZpbGUub2Jqcwo+PiBAQCAtNzEsNiArNzEsNyBAQCBvYmotJChDT05GSUdfSU9US0lUX1NZU0NU
+TCkgKz0gaW90a2l0LXN5c2N0bC5vCj4+ICBvYmotJChDT05GSUdfSU9US0lUX1NZU0lORk8pICs9
+IGlvdGtpdC1zeXNpbmZvLm8KPj4KPj4gIG9iai0kKENPTkZJR19QVlBBTklDKSArPSBwdnBhbmlj
+Lm8KPj4gK29iai0kKENPTkZJR19QVlBBTklDX01NSU8pICs9IHB2cGFuaWMtbW1pby5vCj4+ICBv
+YmotJChDT05GSUdfSFlQRVJWX1RFU1RERVYpICs9IGh5cGVydl90ZXN0ZGV2Lm8KPj4gIG9iai0k
+KENPTkZJR19BVVgpICs9IGF1eGJ1cy5vCj4+ICBvYmotJChDT05GSUdfQVNQRUVEX1NPQykgKz0g
+YXNwZWVkX3NjdS5vIGFzcGVlZF9zZG1jLm8KPj4gZGlmZiAtLWdpdCBhL2h3L21pc2MvcHZwYW5p
+Yy1tbWlvLmMgYi9ody9taXNjL3B2cGFuaWMtbW1pby5jCj4+IG5ldyBmaWxlIG1vZGUgMTAwNjQ0
+Cj4+IGluZGV4IDAwMDAwMDAuLmM3ZjM3M2UKPj4gLS0tIC9kZXYvbnVsbAo+PiArKysgYi9ody9t
+aXNjL3B2cGFuaWMtbW1pby5jCj4+IEBAIC0wLDAgKzEsNzYgQEAKPj4gKyNpbmNsdWRlICJxZW11
+L29zZGVwLmgiCj4+ICsjaW5jbHVkZSAic3lzZW11L3N5c2VtdS5oIgo+PiArI2luY2x1ZGUgInFl
+bXUvbG9nLmgiCj4+ICsjaW5jbHVkZSAiaHcvbWlzYy9wdnBhbmljLW1taW8uaCIKPj4gKwo+PiAr
+I2RlZmluZSBQVlBBTklDX01NSU9fRkVBVF9DUkFTSEVEICAgICAgMAo+PiArCj4+ICsjZGVmaW5l
+IFBWUEFOSUNfTU1JT19DUkFTSEVEICAgICAgICAoMSA8PCBQVlBBTklDX01NSU9fRkVBVF9DUkFT
+SEVEKQo+PiArCj4+ICtzdGF0aWMgdm9pZCBoYW5kbGVfbW1pb19ldmVudChpbnQgZXZlbnQpCj4+
+ICt7Cj4+ICsgICAgc3RhdGljIGJvb2wgbG9nZ2VkOwo+PiArCj4+ICsgICAgaWYgKGV2ZW50ICYg
+flBWUEFOSUNfTU1JT19DUkFTSEVEICYmICFsb2dnZWQpIHsKPj4gKyAgICAgICAgcWVtdV9sb2df
+bWFzayhMT0dfR1VFU1RfRVJST1IsICJwdnBhbmljLW1taW86IHVua25vd24gZXZlbnQgJSN4Llxu
+IiwgZXZlbnQpOwo+PiArICAgICAgICBsb2dnZWQgPSB0cnVlOwo+PiArICAgIH0KPj4gKwo+PiAr
+ICAgIGlmIChldmVudCAmIFBWUEFOSUNfTU1JT19DUkFTSEVEKSB7Cj4+ICsgICAgICAgIHFlbXVf
+c3lzdGVtX2d1ZXN0X3Bhbmlja2VkKE5VTEwpOwo+PiArICAgICAgICByZXR1cm47Cj4+ICsgICAg
+fQo+Cj5JdCB3b3VsZCBiZSBlYXNpZXIgdG8gbWFpbnRhaW4gYSBzaW5nbGUgcHZwYW5pYyBkZXZp
+Y2UuIFRoZXJlIGlzIG5vCj5pbXByb3ZlbWVudCBoZXJlLCBpdCBpcyB0aGUgc2FtZSBoYW5kbGVy
+IHRoYW4gJ3B2cGFuaWMuYycuCj4KPlRoZSBjdXJyZW50IHB2cGFuaWMgZGV2aWNlIGlzIG5vdCB4
+ODYtb25seSwgaXQgb25seSBpbXBsZW1lbnRzIHRoZQo+aW9wb3J0IEFQSS4KQnV0IGluIGxpbnV4
+IGtlcm5lbCB0aGUgZHJpdmVyIG9mIHB2cGFuaWMgZGV2aWNlIGlzIHg4Ni1vbmx5LgoKPklmIHlv
+dSB3YW50IHRvIHVzZSB0aGUgbW1pbyBBUEksIHBsZWFzZSBhZGQgaXQgdGhlcmUuCj5CYXNpY2Fs
+bHkgeW91IGRvbid0IGhhdmUgdG8gd3JpdGUgYW55IG1vcmUgY29kZSB0aGF0IGluIHRoaXMgcGF0
+Y2gsIGJ1dAo+anVzdCBtb3ZlIGl0IGluIHRoZSBwdnBhbmljLmMgZmlsZS4KSSB3YW50IHRvIHVz
+ZSBwdnBhbmljIGRpcmVjdGx5IGluc3RlYWQgb2YgYWRkaW5nIGEgbmV3IGRldmljZSBlbXVsYXRp
+b24uCkJ1dCBJIGNhbid0IHVzZSBpdC4gRmlyc3RseSBwdnBhbmljIHVzZSBpb3BvcnQsIGJ1dCBh
+cm0gZG9uJ3Qgc3VwcG9ydCBpb3BvcnQuCnNlY29uZGx5IHB2cGFuaWMgZGV2aWNlIGlzIGVtdWxh
+dGVkIGFzIGEgaXNhIGJ1cyBkZXZpY2UsIGJ1dCBhcm0gZG9uJ3Qgc3VwcG9ydAppc2EgYnVzLgp0
+aGlyZGx5IHRoZSByZWFsaXphdGlvbiBvZiBwdnBhbmljIGRldmljZSBpcyBkZXBlbmRzIG9uIEFD
+UEkgaW4gbGludXgga2VybmVsIGRyaXZlciBhbmQgaW4gcWVtdQp0aGUgcG9ydCBpbmZvIGlzIHBh
+c3NlZCB0aHJvdWdoIEFDUEkgLCBidXQgSXQgaXMgbm90IG5lY2Vzc2FyeSB0byBjb25maWd1cmUg
+QUNQSSBmb3IgYXJtIGd1ZXN0LiAKClRoYW5rcy4KPgo+VGhhbmtzLAo+Cj5QaGlsLg==
