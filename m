@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38889)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39012)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gDEYC-0008E1-ID
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:05:45 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gDEYM-0008Oi-76
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:05:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gDEYB-0008DN-J0
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:05:44 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gDEYL-0000Ia-Dx
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:05:54 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 18 Oct 2018 17:03:46 -0300
-Message-Id: <20181018200422.4358-10-ehabkost@redhat.com>
+Date: Thu, 18 Oct 2018 17:03:49 -0300
+Message-Id: <20181018200422.4358-13-ehabkost@redhat.com>
 In-Reply-To: <20181018200422.4358-1-ehabkost@redhat.com>
 References: <20181018200422.4358-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 09/45] hw/sh4/sh_pci: Use DeviceState::realize
- rather than SysBusDevice::init
+Subject: [Qemu-devel] [PULL 12/45] hw/mips/gt64xxx_pci: Mark as bridge device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,72 +27,30 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Rob Her
 
 From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Move from the legacy SysBusDevice::init method to using DeviceState::real=
-ize.
+The gt64120 is currently listed as uncategorized device.
+Mark it as bridge device.
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-Id: <20181002212522.23303-6-f4bug@amsat.org>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Message-Id: <20181002212522.23303-9-f4bug@amsat.org>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/sh4/sh_pci.c | 20 +++++++++-----------
- 1 file changed, 9 insertions(+), 11 deletions(-)
+ hw/mips/gt64xxx_pci.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/sh4/sh_pci.c b/hw/sh4/sh_pci.c
-index 4ec2e35500..379d0685ed 100644
---- a/hw/sh4/sh_pci.c
-+++ b/hw/sh4/sh_pci.c
-@@ -120,16 +120,15 @@ static void sh_pci_set_irq(void *opaque, int irq_nu=
-m, int level)
-     qemu_set_irq(pic[irq_num], level);
- }
-=20
--static int sh_pci_device_init(SysBusDevice *dev)
-+static void sh_pci_device_realize(DeviceState *dev, Error **errp)
+diff --git a/hw/mips/gt64xxx_pci.c b/hw/mips/gt64xxx_pci.c
+index dcd1a66329..1cd8aac658 100644
+--- a/hw/mips/gt64xxx_pci.c
++++ b/hw/mips/gt64xxx_pci.c
+@@ -1232,6 +1232,7 @@ static void gt64120_class_init(ObjectClass *klass, =
+void *data)
  {
--    PCIHostState *phb;
--    SHPCIState *s;
-+    SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
-+    SHPCIState *s =3D SH_PCI_HOST_BRIDGE(dev);
-+    PCIHostState *phb =3D PCI_HOST_BRIDGE(s);
-     int i;
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
 =20
--    s =3D SH_PCI_HOST_BRIDGE(dev);
--    phb =3D PCI_HOST_BRIDGE(s);
-     for (i =3D 0; i < 4; i++) {
--        sysbus_init_irq(dev, &s->irq[i]);
-+        sysbus_init_irq(sbd, &s->irq[i]);
-     }
-     phb->bus =3D pci_register_root_bus(DEVICE(dev), "pci",
-                                      sh_pci_set_irq, sh_pci_map_irq,
-@@ -143,13 +142,12 @@ static int sh_pci_device_init(SysBusDevice *dev)
-                              &s->memconfig_p4, 0, 0x224);
-     memory_region_init_alias(&s->isa, OBJECT(s), "sh_pci.isa",
-                              get_system_io(), 0, 0x40000);
--    sysbus_init_mmio(dev, &s->memconfig_p4);
--    sysbus_init_mmio(dev, &s->memconfig_a7);
-+    sysbus_init_mmio(sbd, &s->memconfig_p4);
-+    sysbus_init_mmio(sbd, &s->memconfig_a7);
-     s->iobr =3D 0xfe240000;
-     memory_region_add_subregion(get_system_memory(), s->iobr, &s->isa);
-=20
-     s->dev =3D pci_create_simple(phb->bus, PCI_DEVFN(0, 0), "sh_pci_host=
-");
--    return 0;
++    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+     dc->reset =3D gt64120_reset;
+     dc->vmsd =3D &vmstate_gt64120;
  }
-=20
- static void sh_pci_host_realize(PCIDevice *d, Error **errp)
-@@ -187,9 +185,9 @@ static const TypeInfo sh_pci_host_info =3D {
-=20
- static void sh_pci_device_class_init(ObjectClass *klass, void *data)
- {
--    SysBusDeviceClass *sdc =3D SYS_BUS_DEVICE_CLASS(klass);
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-=20
--    sdc->init =3D sh_pci_device_init;
-+    dc->realize =3D sh_pci_device_realize;
- }
-=20
- static const TypeInfo sh_pci_device_info =3D {
 --=20
 2.18.0.rc1.1.g3f1ff2140
