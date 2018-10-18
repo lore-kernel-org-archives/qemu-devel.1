@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44625)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDDMi-0000xx-Gi
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:49:49 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDDMg-0000uD-3g
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:49:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDDMg-00063Y-Pg
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:49:48 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:56937 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDDMb-0005rx-0y
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:49:45 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:56940 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gDDMg-0005cs-AO
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:49:46 -0400
+	id 1gDDMa-0005cy-Lb
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:49:40 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 18 Oct 2018 20:47:39 +0200
-Message-Id: <1539888473-16340-15-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 18 Oct 2018 20:47:35 +0200
+Message-Id: <1539888473-16340-11-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1539888473-16340-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1539888473-16340-1-git-send-email-aleksandar.markovic@rt-rk.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 14/28] target/mips: Increase 'supported
- ISAs/ASEs' flag holder size
+Subject: [Qemu-devel] [PULL v2 10/28] target/mips: Add basic description of
+ MXU ASE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,78 +31,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
-From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Increase the size of insn_flags holder size to 64 bits. This is
-needed for future extensions since existing bits are almost all used.
+Add a comment that contains a basic description of MXU ASE.
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Stefan Markovic <smarkovic@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/cpu.h       | 2 +-
- target/mips/internal.h  | 2 +-
- target/mips/translate.c | 6 +++---
- 3 files changed, 5 insertions(+), 5 deletions(-)
+ target/mips/translate.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 37703ea..3b3509c 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -811,7 +811,7 @@ struct CPUMIPSState {
-     int CCRes; /* Cycle count resolution/divisor */
-     uint32_t CP0_Status_rw_bitmask; /* Read/write bits in CP0_Status */
-     uint32_t CP0_TCStatus_rw_bitmask; /* Read/write bits in CP0_TCStatus=
- */
--    int insn_flags; /* Supported instruction set */
-+    uint64_t insn_flags; /* Supported instruction set */
-=20
-     /* Fields up to this point are cleared by a CPU reset */
-     struct {} end_reset_fields;
-diff --git a/target/mips/internal.h b/target/mips/internal.h
-index e41051f..bfe83ee 100644
---- a/target/mips/internal.h
-+++ b/target/mips/internal.h
-@@ -59,7 +59,7 @@ struct mips_def_t {
-     int32_t CP0_PageGrain_rw_bitmask;
-     int32_t CP0_PageGrain;
-     target_ulong CP0_EBaseWG_rw_bitmask;
--    int insn_flags;
-+    uint64_t insn_flags;
-     enum mips_mmu_types mmu_type;
- };
-=20
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index a309df7..c91c541 100644
+index ab16cdb..46655bb 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -1986,7 +1986,7 @@ typedef struct DisasContext {
-     target_ulong saved_pc;
-     target_ulong page_start;
-     uint32_t opcode;
--    int insn_flags;
-+    uint64_t insn_flags;
-     int32_t CP0_Config1;
-     int32_t CP0_Config3;
-     int32_t CP0_Config5;
-@@ -2409,7 +2409,7 @@ static inline void check_dspr2(DisasContext *ctx)
+@@ -1389,6 +1389,26 @@ enum {
+     OPC_BINSRI_df   =3D (0x7 << 23) | OPC_MSA_BIT_09,
+ };
 =20
- /* This code generates a "reserved instruction" exception if the
-    CPU does not support the instruction set corresponding to flags. */
--static inline void check_insn(DisasContext *ctx, int flags)
-+static inline void check_insn(DisasContext *ctx, uint64_t flags)
- {
-     if (unlikely(!(ctx->insn_flags & flags))) {
-         generate_exception_end(ctx, EXCP_RI);
-@@ -2419,7 +2419,7 @@ static inline void check_insn(DisasContext *ctx, in=
-t flags)
- /* This code generates a "reserved instruction" exception if the
-    CPU has corresponding flag set which indicates that the instruction
-    has been removed. */
--static inline void check_insn_opc_removed(DisasContext *ctx, int flags)
-+static inline void check_insn_opc_removed(DisasContext *ctx, uint64_t fl=
-ags)
- {
-     if (unlikely(ctx->insn_flags & flags)) {
-         generate_exception_end(ctx, EXCP_RI);
++
++/*
++ *    AN OVERVIEW OF MXU EXTENSION INSTRUCTION SET
++ *    =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++ *
++ * MXU (full name: MIPS eXtension/enhanced Unit) is an SIMD extension of=
+ MIPS32
++ * instructions set. It is designed to fit the needs of signal, graphica=
+l and
++ * video processing applications. MXU instruction set is used in Xburst =
+family
++ * of microprocessors by Ingenic.
++ *
++ * MXU unit contains 17 registers called X0-X16. X0 is always zero, and =
+X16 is
++ * the control register.
++ *
++ *   Compiled after:
++ *
++ *   "XBurst=C2=AE Instruction Set Architecture MIPS eXtension/enhanced =
+Unit
++ *   Programming Manual", Ingenic Semiconductor Co, Ltd., 2017
++ */
++
++
+ /* global register indices */
+ static TCGv cpu_gpr[32], cpu_PC;
+ static TCGv cpu_HI[MIPS_DSP_ACC], cpu_LO[MIPS_DSP_ACC];
 --=20
 2.7.4
