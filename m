@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53701)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gDA2c-00037h-KK
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 11:16:52 -0400
+	(envelope-from <berrange@redhat.com>) id 1gDA5L-0004OE-4v
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 11:19:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gDA2a-0001v3-Fc
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 11:16:50 -0400
-References: <20180921081819.9203-1-eric.auger@redhat.com>
-	<A2975661238FB949B60364EF0F2C257439D32CBE@SHSMSX104.ccr.corp.intel.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <5624f123-27fd-8392-32cf-1792b52483b5@redhat.com>
-Date: Thu, 18 Oct 2018 17:16:25 +0200
+	(envelope-from <berrange@redhat.com>) id 1gDA5H-0004M8-46
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 11:19:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33628)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gDA5G-0004LR-Qs
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 11:19:35 -0400
+Date: Thu, 18 Oct 2018 16:19:28 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181018151928.GH20424@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20181009130442.26296-1-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <A2975661238FB949B60364EF0F2C257439D32CBE@SHSMSX104.ccr.corp.intel.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v2 00/28] vSMMUv3/pSMMUv3 2 stage VFIO
- integration
+Content-Disposition: inline
+In-Reply-To: <20181009130442.26296-1-berrange@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 00/11] Add a standard authorization
+ framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,155 +29,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liu, Yi L" <yi.l.liu@intel.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>, "cdall@kernel.org" <cdall@kernel.org>, "mst@redhat.com" <mst@redhat.com>, "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>, "Sun, Yi Y" <yi.y.sun@intel.com>, "peterx@redhat.com" <peterx@redhat.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
+Cc: Andreas =?utf-8?Q?F=C3=A4rber?= <afaerber@suse.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Hi Yi,
+ping, is anyone able to review the patches in this series. We are
+awfully close to soft freeze and KVM forum...
 
-On 10/18/18 12:30 PM, Liu, Yi L wrote:
-> Hi Eric,
-> 
->> From: Eric Auger [mailto:eric.auger@redhat.com]
->> Sent: Friday, September 21, 2018 4:18 PM
->> Subject: [RFC v2 00/28] vSMMUv3/pSMMUv3 2 stage VFIO integration
->>
->> Up to now vSMMUv3 has not been integrated with VFIO. VFIO
->> integration requires to program the physical IOMMU consistently
->> with the guest mappings. However, as opposed to VTD, SMMUv3 has
->> no "Caching Mode" which allows easy trapping of guest mappings.
->> This means the vSMMUV3 cannot use the same VFIO integration as VTD.
->>
->> However SMMUv3 has 2 translation stages. This was devised with
->> virtualization use case in mind where stage 1 is "owned" by the
->> guest whereas the host uses stage 2 for VM isolation.
->>
->> This series sets up this nested translation stage. It only works
->> if there is one physical SMMUv3 used along with QEMU vSMMUv3 (in
->> other words, it does not work if there is a physical SMMUv2).
->>
->> The series uses a new kernel user API [1], still under definition.
->>
->> - We force the host to use stage 2 instead of stage 1, when we
->>   detect a vSMMUV3 is behind a VFIO device. For a VFIO device
->>   without any virtual IOMMU, we still use stage 1 as many existing
->>   SMMUs expect this behavior.
->> - We introduce new IOTLB "config" notifiers, requested to notify
->>   changes in the config of a given iommu memory region. So now
->>   we have notifiers for IOTLB changes and config changes.
->> - vSMMUv3 calls config notifiers when STE (Stream Table Entries)
->>   are updated by the guest.
->> - We implement a specific UNMAP notifier that conveys guest
->>   IOTLB invalidations to the host
->> - We implement a new MAP notifiers only used for MSI IOVAs so
->>   that the host can build a nested stage translation for MSI IOVAs
->> - As the legacy MAP notifier is not called anymore, we must make
->>   sure stage 2 mappings are set. This is achieved through another
->>   memory listener.
->> - Physical SMMUs faults are reported to the guest via en eventfd
->>   mechanism and reinjected into this latter.
->>
->> Note: some iommu memory notifier rework related patches are close
->> to those previously published by Peter and Liu. I will be pleased to
->> add their Signed-off-by if they agree/wish.
-> 
-> Yeah, feel free to add mine if it's originated from our previous work.
-OK
-> 
-> BTW. Curiously, are you planning to implement all vIOMMU related
-> operations through MemoryRegion notifiers? Honestly, I did it in such
-> way in early RFC for vSVA work. However, we encountered two issues
-> at that time. First, how to check whether the notifier should be registered.
-On my side I think I resolved this by querying the iommu mr about the
-new IOMMU_ATTR_VFIO_NESTED IOMMU attribute  in vfio_connect_container
+On Tue, Oct 09, 2018 at 02:04:31PM +0100, Daniel P. Berrang=C3=A9 wrote:
+> An update to
+>=20
+>  v2: https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg04469.htm=
+l
+>  v3: https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg05660.htm=
+l
+>  v4: https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg02961.htm=
+l
+>=20
+> The current network services now support encryption via TLS and in some
+> cases support authentication via SASL. In cases where SASL is not
+> available, x509 client certificates can be used as a crude authorizatio=
+n
+> scheme, but using a sub-CA and controlling who you give certs to. In
+> general this is not very flexible though, so this series introduces a
+> new standard authorization framework.
+>=20
+> It comes with four initial authorization mechanisms
+>=20
+>  - Simple - an exact username match. This is useful when there is
+>    exactly one user that is known to connect. For example when live
+>    migrating from one QEMU to another with TLS, libvirt would use
+>    the simple scheme to whitelist the TLS cert of the source QEMU.
+>=20
+>  - List - an full access control list, with optional regex matching.
+>    This is more flexible and is used to provide 100% backcompat with
+>    the existing HMP ACL commands. The caveat is that we can't create
+>    these via the CLI -object arg yet.
+>=20
+>  - ListFile - the same as List, but with the rules stored in JSON
+>    format in an external file. This avoids the -object limitation
+>    while also allowing the admin to change list entries on the file.
+>    QEMU uses inotify to notice these changes and auto-reload the
+>    file contents. This is likely a good default choice for most
+>    network services, if the "simple" mechanism isn't sufficient.
+>=20
+>  - PAM - delegate the username lookup to a PAM module, which opens
+>    the door to many options including things like SQL/LDAP lookups.
+>=20
+> A later series that follows will integrate this framework into the VNC,
+> NBD, migration, and character device servers.
+>=20
+> Changed in v5:
+>=20
+>  - Rebase to latest git master
+>=20
+> Changed in v4:
+>=20
+>  - Rebase to latest git master
+>=20
+> Changed in v3:
+>=20
+>  - Added docs for object types in qemu-options.hx
+>  - Added example CLI syntax in header files
+>  - Improved commit messages
+>=20
+> Changed in v2:
+>=20
+>  - Switch to a global shared instance of the file monitor so only
+>    a single inotify file descriptor is required
+>=20
+>  - Require all watches to be registered against directories. File
+>    watches are useless in Linux, since they are tied to inodes, and
+>    so stop working when editors save by doing a tmpfile + rename
+>    dance.
+>=20
+>  - Change auth list impl to use a directory based watch instead
+>    of filename
+>=20
+>  - Put MTP const-ness fixes in separate patch
+>=20
+>  - Split QOM change off into separate patch
+>=20
+>  - Fix conditionals on Win32 build
+>=20
+> Daniel P. Berrang=C3=A9 (11):
+>   util: add helper APIs for dealing with inotify in portable manner
+>   qom: don't require user creatable objects to be registered
+>   hw/usb: don't set IN_ISDIR for inotify watch in MTP driver
+>   hw/usb: fix const-ness for string params in MTP driver
+>   hw/usb: switch MTP to use new inotify APIs
+>   authz: add QAuthZ object as an authorization base class
+>   authz: add QAuthZSimple object type for easy whitelist auth checks
+>   authz: add QAuthZList object type for an access control list
+>   authz: add QAuthZListFile object type for a file access control list
+>   authz: add QAuthZPAM object type for authorizing using PAM
+>   authz: delete existing ACL implementation
+>=20
+>  .gitignore                     |   4 +
+>  MAINTAINERS                    |  14 ++
+>  Makefile                       |  17 +-
+>  Makefile.objs                  |  10 ++
+>  Makefile.target                |   2 +
+>  authz/Makefile.objs            |   7 +
+>  authz/base.c                   |  82 +++++++++
+>  authz/list.c                   | 315 +++++++++++++++++++++++++++++++++
+>  authz/listfile.c               | 284 +++++++++++++++++++++++++++++
+>  authz/pamacct.c                | 149 ++++++++++++++++
+>  authz/simple.c                 | 122 +++++++++++++
+>  authz/trace-events             |  18 ++
+>  configure                      |  37 ++++
+>  crypto/tlssession.c            |  35 ++--
+>  crypto/trace-events            |   2 +-
+>  hw/usb/dev-mtp.c               | 257 ++++++++++-----------------
+>  hw/usb/trace-events            |   2 +-
+>  include/authz/base.h           | 112 ++++++++++++
+>  include/authz/list.h           | 106 +++++++++++
+>  include/authz/listfile.h       | 110 ++++++++++++
+>  include/authz/pamacct.h        | 100 +++++++++++
+>  include/authz/simple.h         |  84 +++++++++
+>  include/qemu/acl.h             |  66 -------
+>  include/qemu/filemonitor.h     | 117 ++++++++++++
+>  monitor.c                      | 180 ++++++++++++-------
+>  qapi/authz.json                |  58 ++++++
+>  qapi/qapi-schema.json          |   1 +
+>  qemu-options.hx                | 103 +++++++++++
+>  qom/object.c                   |  12 +-
+>  qom/object_interfaces.c        |  16 +-
+>  tests/Makefile.include         |   8 +-
+>  tests/test-authz-list.c        | 171 ++++++++++++++++++
+>  tests/test-crypto-tlssession.c |  15 +-
+>  tests/test-io-channel-tls.c    |  16 +-
+>  ui/vnc-auth-sasl.c             |  23 ++-
+>  ui/vnc-auth-sasl.h             |   5 +-
+>  ui/vnc-auth-vencrypt.c         |   2 +-
+>  ui/vnc-ws.c                    |   2 +-
+>  ui/vnc.c                       |  37 ++--
+>  ui/vnc.h                       |   4 +-
+>  util/Makefile.objs             |   2 +-
+>  util/acl.c                     | 179 -------------------
+>  util/filemonitor.c             | 315 +++++++++++++++++++++++++++++++++
+>  util/trace-events              |   9 +
+>  44 files changed, 2671 insertions(+), 539 deletions(-)
+>  create mode 100644 authz/Makefile.objs
+>  create mode 100644 authz/base.c
+>  create mode 100644 authz/list.c
+>  create mode 100644 authz/listfile.c
+>  create mode 100644 authz/pamacct.c
+>  create mode 100644 authz/simple.c
+>  create mode 100644 authz/trace-events
+>  create mode 100644 include/authz/base.h
+>  create mode 100644 include/authz/list.h
+>  create mode 100644 include/authz/listfile.h
+>  create mode 100644 include/authz/pamacct.h
+>  create mode 100644 include/authz/simple.h
+>  delete mode 100644 include/qemu/acl.h
+>  create mode 100644 include/qemu/filemonitor.h
+>  create mode 100644 qapi/authz.json
+>  create mode 100644 tests/test-authz-list.c
+>  delete mode 100644 util/acl.c
+>  create mode 100644 util/filemonitor.c
+>=20
+> --=20
+> 2.17.1
+>=20
 
-See patches 5 and 6, 8
-
-This tells me whether the nested mode must be setup and choose the right
-container->iommu_type which is then used in vfio_listener_region_add()
-to decide whether the specific notifiers mustd to be registered.
-
-
-> Second, there are cases in which the vfio_listener_region_add is not
-> triggered but vIOMMU exists. Details can be got by the link below:
-> (http://lists.gnu.org/archive/html/qemu-devel/2018-03/msg00078.html)
-
-Yes I remember this, due to the PT=1 case. On ARM we don't have this
-specificity hence this integration.
-> 
-> As thus, we had some discussions in community. Last time, PCIPASIDOps
-> was proposed. It is to add callbacks in PCIDevice. VFIO would register its
-> implementations in vfio_realize(). Supposedly, pasid_table_bind,
-> page_table_bind, sva_tlb_invalidation_passdown and other vIOMMU
-> related operations can be done in such way. The sample patch below
-> may show how it looks like. (the full patch is in my sandbox, planned to
-> send out with Scalable Mode emulation patch).
-
-To be honest, I lost track of the series and did not see this
-PCIPASIDOps proposal. I will study whether this can fit my needs.
-
-Thank you for the link!
-
-Best Regards
-
-Eric
-> 
-> Sample patch:
-> include/hw/pci/pci.h:
->  +typedef struct PCIPASIDOps PCIPASIDOps;
->  +struct PCIPASIDOps {
->  +    void (*pasid_bind_table)(PCIBus *bus, int32_t devfn,
->  +                            struct pasid_table_config *ptbl_cfg);
->  +    void (*pasid_invalidate_extend_iotlb)(PCIBus *bus, int32_t devfn,
->  +                            struct tlb_invalidate_info *inv_info);
->  +};
-> 
->  @@ -350,6 +359,7 @@ struct PCIDevice {
->       MSIVectorUseNotifier msix_vector_use_notifier;
->       MSIVectorReleaseNotifier msix_vector_release_notifier;
->       MSIVectorPollNotifier msix_vector_poll_notifier;
->  +    PCIPASIDOps *pasid_ops;
->   };
-> 
-> hw/pci/pci.c:
-> +void pci_setup_pasid_ops(PCIDevice *dev, PCIPASIDOps *ops)
->  +{
->  +    assert(ops && !dev->pasid_ops);
->  +    dev->pasid_ops = ops;
->  +}
->  +
->  +void pci_device_pasid_bind_table(PCIBus *bus, int32_t devfn,
->  +                                 struct pasid_table_config *ptbl_cfg)
->  +{
->  +    PCIDevice *dev;
->  +
->  +    if (!bus) {
->  +        return;
->  +    }
->  +
->  +    dev = bus->devices[devfn];
->  +    if (dev && dev->pasid_ops) {
->  +        dev->pasid_ops->pasid_bind_table(bus, devfn, ptbl_cfg);
->  +    }
->  +}
-> 
-> hw/vfio/pci.c:
-> +static PCIPASIDOps vfio_pci_pasid_ops = {
->  +    .pasid_bind_table = vfio_pci_device_pasid_bind_table,
->  +    .pasid_invalidate_extend_iotlb = vfio_pci_device_pasid_invalidate_eiotlb,
->  +};
->  +
->   static void vfio_realize(PCIDevice *pdev, Error **errp)
->   {
->       VFIOPCIDevice *vdev = DO_UPCAST(VFIOPCIDevice, pdev, pdev);
->  @@ -3048,6 +3068,8 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
->       vfio_register_req_notifier(vdev);
->       vfio_setup_resetfn_quirk(vdev);
-> 
->  +    pci_setup_pasid_ops(pdev, &vfio_pci_pasid_ops);
->  +
->       return;
-> 
-> Regards,
-> Yi Liu
-> 
-> 
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
