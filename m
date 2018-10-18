@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gD7Uk-0002WP-Fe
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 08:33:43 -0400
+	(envelope-from <thuth@redhat.com>) id 1gD7Z7-0003xp-Ur
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 08:38:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gD7Uf-0005SC-Gj
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 08:33:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51294)
+	(envelope-from <thuth@redhat.com>) id 1gD7Z3-0001S0-UY
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 08:38:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44962)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gD7Ue-0005P8-JT
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 08:33:37 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 61E08653C7
-	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 12:33:34 +0000 (UTC)
-Received: from donizetti.redhat.com (unknown [10.36.112.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 9DD40537A7
-	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 12:33:33 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 18 Oct 2018 14:33:32 +0200
-Message-Id: <20181018123332.23518-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH] target-i386: kvm: do not initialize padding
- fields
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gD7Z3-0001RJ-1t
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 08:38:09 -0400
+References: <20181011192513.63634-1-dgilbert@redhat.com>
+	<20181011192513.63634-3-dgilbert@redhat.com>
+	<20181017192826.GA7385@flamenco>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <286c9ba0-05d9-02ec-7f59-34b34a66be2c@redhat.com>
+Date: Thu, 18 Oct 2018 14:38:01 +0200
+MIME-Version: 1.0
+In-Reply-To: <20181017192826.GA7385@flamenco>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 2/7] tests/migration: Enable the migration
+ test on s390x, too
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,52 +30,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Emilio G. Cota" <cota@braap.org>, "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, wei@redhat.com, i.maximets@samsung.com, den@openvz.org, Peter Maydell <peter.maydell@linaro.org>
 
-The exception.pad field is going to be renamed to pending in an upcoming header
-file update.  Remove the unnecessary initialization.
+On 2018-10-17 21:28, Emilio G. Cota wrote:
+> On Thu, Oct 11, 2018 at 20:25:08 +0100, Dr. David Alan Gilbert (git) wr=
+ote:
+>> From: Thomas Huth <thuth@redhat.com>
+>>
+>> We can re-use the s390-ccw bios code to implement a small firmware
+>> for a s390x guest which prints out the "A" and "B" characters and
+>> modifies the memory, as required for the migration test.
+>>
+>> [quintela: Converted the compile script to Makefile rules]
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> Message-Id: <1539078677-25396-1-git-send-email-thuth@redhat.com>
+>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>>   Fixed up Makefile since the aarch patch sneaked in first
+>=20
+> I suspect this test is giving me intermittent hangs. I've seen the hang=
+s
+> in different machines, but when they're lightly loaded the
+> hang happens more frequently.
+>=20
+> To reproduce:
+>=20
+> $ ./configure --target-list=3Ds390x-softmmu
+> $ make clean && make
+> $ for i in $(seq 0 150); do echo $i && make -j check-qtest || break; do=
+ne
+>=20
+> It usually ends up hanging before 50 runs. When the hang happens, I see
+> two qemu-system-s390x processes with:
+>=20
+> -serial file:/tmp/migration-test-0FZErQ/dest_serial
+>=20
+> as an argument, among others. That means the migration test is the
+> one hanging, correct?
+>=20
+> Attaching with gdb just shows the TCG thread waiting for work
+> in qemu_tcg_rr_wait_io_event.
+>=20
+> Can anyone reproduce this? Otherwise, let me know what other info
+> I could provide.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- linux-headers/asm-x86/kvm.h | 5 +----
- target/i386/kvm.c           | 2 --
- 2 files changed, 1 insertion(+), 6 deletions(-)
+I've finally been able to reproduce it - seems like it only happens here
+when the host is under heavy load.
 
-diff --git a/linux-headers/asm-x86/kvm.h b/linux-headers/asm-x86/kvm.h
-index 7a7acf9e47..dabfcf7c39 100644
---- a/linux-headers/asm-x86/kvm.h
-+++ b/linux-headers/asm-x86/kvm.h
-@@ -300,10 +300,7 @@ struct kvm_vcpu_events {
- 		__u8 injected;
- 		__u8 nr;
- 		__u8 has_error_code;
--               union {
--       		__u8 pad;
--       		__u8 pending;
--               }
-+		__u8 pending;
- 		__u32 error_code;
- 	} exception;
- 	struct {
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 6e5f951f4f..74193b1b9d 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -2696,7 +2696,6 @@ static int kvm_put_vcpu_events(X86CPU *cpu, int level)
-     events.exception.nr = env->exception_injected;
-     events.exception.has_error_code = env->has_error_code;
-     events.exception.error_code = env->error_code;
--    events.exception.pad = 0;
- 
-     events.interrupt.injected = (env->interrupt_injected >= 0);
-     events.interrupt.nr = env->interrupt_injected;
-@@ -2705,7 +2704,6 @@ static int kvm_put_vcpu_events(X86CPU *cpu, int level)
-     events.nmi.injected = env->nmi_injected;
-     events.nmi.pending = env->nmi_pending;
-     events.nmi.masked = !!(env->hflags2 & HF2_NMI_MASK);
--    events.nmi.pad = 0;
- 
-     events.sipi_vector = env->sipi_vector;
-     events.flags = 0;
--- 
-2.17.1
+... not sure whether I've got time to debug this before KVM forum, so if
+it bugs you, feel free to send a patch to disable the test in
+tests/Makefile.include for s390x again.
+
+ Thomas
