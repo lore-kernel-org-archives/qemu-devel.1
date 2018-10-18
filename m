@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44426)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDDMW-0000mt-6N
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDDMW-0000n2-Ry
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:49:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDDMQ-0005kB-Ca
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDDMT-0005nP-S3
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:49:36 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:56924 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:56958 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gDDMK-0005WF-W8
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:49:26 -0400
+	id 1gDDMQ-0005fM-KJ
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:49:32 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 18 Oct 2018 20:47:33 +0200
-Message-Id: <1539888473-16340-9-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 18 Oct 2018 20:47:45 +0200
+Message-Id: <1539888473-16340-21-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1539888473-16340-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1539888473-16340-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v2 08/28] target/mips: Add a comment with an
- overview of CP0 registers
+Subject: [Qemu-devel] [PULL v2 20/28] target/mips: Add CP0 PWBase register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,136 +27,130 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Yongbok Kim <yongbok.kim@mips.com>
 
-Add a comment with an overview of CP0 registers close to the
-definition of their corresponding fields in CPUMIPSState.
+Add PWBase register (CP0 Register 5, Select 5).
 
-Reviewed-by: Stefan Markovic <smarkovic@wavecomp.com>
+The PWBase register contains the Page Table Base virtual address.
+
+This register is required for the hardware page walker feature. It
+exists only if Config3 PW bit is set to 1.
+
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/cpu.h | 109 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 109 insertions(+)
+ target/mips/cpu.h       |  1 +
+ target/mips/machine.c   |  5 +++--
+ target/mips/translate.c | 33 +++++++++++++++++++++++++++++++++
+ 3 files changed, 37 insertions(+), 2 deletions(-)
 
 diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 28af4d1..cd54073 100644
+index 953643b..9cbde99 100644
 --- a/target/mips/cpu.h
 +++ b/target/mips/cpu.h
-@@ -195,6 +195,115 @@ struct CPUMIPSState {
- #define MSAIR_ProcID    8
- #define MSAIR_Rev       0
+@@ -416,6 +416,7 @@ struct CPUMIPSState {
+ #define CP0SC2_XR       56
+ #define CP0SC2_XR_MASK  (0xFFULL << CP0SC2_XR)
+ #define CP0SC2_MASK     (CP0SC_1GMASK | (CP0SC_1GMASK << 16) | CP0SC2_XR_MASK)
++    target_ulong CP0_PWBase;
+ /*
+  * CP0 Register 6
+  */
+diff --git a/target/mips/machine.c b/target/mips/machine.c
+index 5ba78ac..3592bb7 100644
+--- a/target/mips/machine.c
++++ b/target/mips/machine.c
+@@ -212,8 +212,8 @@ const VMStateDescription vmstate_tlb = {
  
+ const VMStateDescription vmstate_mips_cpu = {
+     .name = "cpu",
+-    .version_id = 11,
+-    .minimum_version_id = 11,
++    .version_id = 12,
++    .minimum_version_id = 12,
+     .post_load = cpu_post_load,
+     .fields = (VMStateField[]) {
+         /* Active TC */
+@@ -256,6 +256,7 @@ const VMStateDescription vmstate_mips_cpu = {
+         VMSTATE_UINTTL(env.CP0_SegCtl0, MIPSCPU),
+         VMSTATE_UINTTL(env.CP0_SegCtl1, MIPSCPU),
+         VMSTATE_UINTTL(env.CP0_SegCtl2, MIPSCPU),
++        VMSTATE_UINTTL(env.CP0_PWBase, MIPSCPU),
+         VMSTATE_INT32(env.CP0_Wired, MIPSCPU),
+         VMSTATE_INT32(env.CP0_SRSConf0, MIPSCPU),
+         VMSTATE_INT32(env.CP0_SRSConf1, MIPSCPU),
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index e26d54a..0896dcc 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -2478,6 +2478,19 @@ static inline void check_xnp(DisasContext *ctx)
+     }
+ }
+ 
++#ifndef CONFIG_USER_ONLY
 +/*
-+ *     Summary of CP0 registers
-+ *     ========================
-+ *
-+ *
-+ *     Register 0        Register 1        Register 2        Register 3
-+ *     ----------        ----------        ----------        ----------
-+ *
-+ * 0   Index             Random            EntryLo0          EntryLo1
-+ * 1   MVPControl        VPEControl        TCStatus          GlobalNumber
-+ * 2   MVPConf0          VPEConf0          TCBind
-+ * 3   MVPConf1          VPEConf1          TCRestart
-+ * 4   VPControl         YQMask            TCHalt
-+ * 5                     VPESchedule       TCContext
-+ * 6                     VPEScheFBack      TCSchedule
-+ * 7                     VPEOpt            TCScheFBack       TCOpt
-+ *
-+ *
-+ *     Register 4        Register 5        Register 6        Register 7
-+ *     ----------        ----------        ----------        ----------
-+ *
-+ * 0   Context           PageMask          Wired             HWREna
-+ * 1   ContextConfig     PageGrain         SRSConf0
-+ * 2   UserLocal         SegCtl0           SRSConf1
-+ * 3   XContextConfig    SegCtl1           SRSConf2
-+ * 4   DebugContextID    SegCtl2           SRSConf3
-+ * 5   MemoryMapID       PWBase            SRSConf4
-+ * 6                     PWField           PWCtl
-+ * 7                     PWSize
-+ *
-+ *
-+ *     Register 8        Register 9        Register 10       Register 11
-+ *     ----------        ----------        -----------       -----------
-+ *
-+ * 0   BadVAddr          Count             EntryHi           Compare
-+ * 1   BadInstr
-+ * 2   BadInstrP
-+ * 3   BadInstrX
-+ * 4                                       GuestCtl1         GuestCtl0Ext
-+ * 5                                       GuestCtl2
-+ * 6                                       GuestCtl3
-+ * 7
-+ *
-+ *
-+ *     Register 12       Register 13       Register 14       Register 15
-+ *     -----------       -----------       -----------       -----------
-+ *
-+ * 0   Status            Cause             EPC               PRId
-+ * 1   IntCtl                                                EBase
-+ * 2   SRSCtl                              NestedEPC         CDMMBase
-+ * 3   SRSMap                                                CMGCRBase
-+ * 4   View_IPL          View_RIPL                           BEVVA
-+ * 5   SRSMap2           NestedExc
-+ * 6   GuestCtl0
-+ * 7   GTOffset
-+ *
-+ *
-+ *     Register 16       Register 17       Register 18       Register 19
-+ *     -----------       -----------       -----------       -----------
-+ *
-+ * 0   Config            LLAddr            WatchLo           WatchHi
-+ * 1   Config1           MAAR              WatchLo           WatchHi
-+ * 2   Config2           MAARI             WatchLo           WatchHi
-+ * 3   Config3                             WatchLo           WatchHi
-+ * 4   Config4                             WatchLo           WatchHi
-+ * 5   Config5                             WatchLo           WatchHi
-+ * 6                                       WatchLo           WatchHi
-+ * 7                                       WatchLo           WatchHi
-+ *
-+ *
-+ *     Register 20       Register 21       Register 22       Register 23
-+ *     -----------       -----------       -----------       -----------
-+ *
-+ * 0   XContext                                              Debug
-+ * 1                                                         TraceControl
-+ * 2                                                         TraceControl2
-+ * 3                                                         UserTraceData1
-+ * 4                                                         TraceIBPC
-+ * 5                                                         TraceDBPC
-+ * 6                                                         Debug2
-+ * 7
-+ *
-+ *
-+ *     Register 24       Register 25       Register 26       Register 27
-+ *     -----------       -----------       -----------       -----------
-+ *
-+ * 0   DEPC              PerfCnt            ErrCtl          CacheErr
-+ * 1                     PerfCnt
-+ * 2   TraceControl3     PerfCnt
-+ * 3   UserTraceData2    PerfCnt
-+ * 4                     PerfCnt
-+ * 5                     PerfCnt
-+ * 6                     PerfCnt
-+ * 7                     PerfCnt
-+ *
-+ *
-+ *     Register 28       Register 29       Register 30       Register 31
-+ *     -----------       -----------       -----------       -----------
-+ *
-+ * 0   DataLo            DataHi            ErrorEPC          DESAVE
-+ * 1   TagLo             TagHi
-+ * 2   DataLo            DataHi                              KScratch<n>
-+ * 3   TagLo             TagHi                               KScratch<n>
-+ * 4   DataLo            DataHi                              KScratch<n>
-+ * 5   TagLo             TagHi                               KScratch<n>
-+ * 6   DataLo            DataHi                              KScratch<n>
-+ * 7   TagLo             TagHi                               KScratch<n>
-+ *
++ * This code generates a "reserved instruction" exception if the
++ * Config3 PW bit is NOT set.
 + */
-     int32_t CP0_Index;
-     /* CP0_MVP* are per MVP registers. */
-     int32_t CP0_VPControl;
++static inline void check_pw(DisasContext *ctx)
++{
++    if (unlikely(!(ctx->CP0_Config3 & (1 << CP0C3_PW)))) {
++        generate_exception_end(ctx, EXCP_RI);
++    }
++}
++#endif
++
+ /*
+  * This code generates a "reserved instruction" exception if the
+  * Config3 MT bit is NOT set.
+@@ -6088,6 +6101,11 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+             tcg_gen_ext32s_tl(arg, arg);
+             rn = "SegCtl2";
+             break;
++        case 5:
++            check_pw(ctx);
++            gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_PWBase));
++            rn = "PWBase";
++            break;
+         default:
+             goto cp0_unimplemented;
+         }
+@@ -6789,6 +6807,11 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+             gen_helper_mtc0_segctl2(cpu_env, arg);
+             rn = "SegCtl2";
+             break;
++        case 5:
++            check_pw(ctx);
++            gen_mtc0_store32(arg, offsetof(CPUMIPSState, CP0_PWBase));
++            rn = "PWBase";
++            break;
+         default:
+             goto cp0_unimplemented;
+         }
+@@ -7499,6 +7522,11 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+             tcg_gen_ld_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_SegCtl2));
+             rn = "SegCtl2";
+             break;
++        case 5:
++            check_pw(ctx);
++            tcg_gen_ld_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_PWBase));
++            rn = "PWBase";
++            break;
+         default:
+             goto cp0_unimplemented;
+         }
+@@ -8182,6 +8210,11 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+             gen_helper_mtc0_segctl2(cpu_env, arg);
+             rn = "SegCtl2";
+             break;
++        case 5:
++            check_pw(ctx);
++            tcg_gen_st_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_PWBase));
++            rn = "PWBase";
++            break;
+         default:
+             goto cp0_unimplemented;
+         }
 -- 
 2.7.4
