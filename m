@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38411)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1gDGtG-0007Y2-Ip
+	(envelope-from <jusual@mail.ru>) id 1gDGtG-0007Y1-HK
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 18:35:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1gDGtC-0003BH-Qk
+	(envelope-from <jusual@mail.ru>) id 1gDGtD-0003CP-D9
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 18:35:38 -0400
-Received: from smtp50.i.mail.ru ([94.100.177.110]:33096)
+Received: from smtp50.i.mail.ru ([94.100.177.110]:35804)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1gDGtA-0002uQ-JQ
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 18:35:34 -0400
+	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1gDGtC-000304-Nz
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 18:35:35 -0400
 From: Julia Suvorova <jusual@mail.ru>
-Date: Fri, 19 Oct 2018 01:34:59 +0300
-Message-Id: <20181018223501.21683-2-jusual@mail.ru>
+Date: Fri, 19 Oct 2018 01:35:00 +0300
+Message-Id: <20181018223501.21683-3-jusual@mail.ru>
 In-Reply-To: <20181018223501.21683-1-jusual@mail.ru>
 References: <20181018223501.21683-1-jusual@mail.ru>
-Subject: [Qemu-devel] [PATCH v3 1/3] chardev/char-socket: Function headers
- refactoring
+Subject: [Qemu-devel] [PATCH v3 2/3] chardev: Add websocket support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,128 +26,257 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, marcandre.lureau@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <mail@steffen-goertz.de>, Julia Suvorova <jusual@mail.ru>
 
-Upcoming websocket support requires additional parameters in function
-headers that are already overloaded. This patch replaces the bunch of
-parameters with a single structure pointer.
+New option "websocket" added to allow using WebSocket protocol for
+chardev socket backend.
+Example:
+    -chardev socket,websocket,server,id=...
 
 Signed-off-by: Julia Suvorova <jusual@mail.ru>
 ---
- chardev/char-socket.c | 55 +++++++++++++++++++++++--------------------
- 1 file changed, 30 insertions(+), 25 deletions(-)
+ chardev/char-socket.c | 64 ++++++++++++++++++++++++++++++++++++++-----
+ chardev/char.c        |  8 +++++-
+ qapi/char.json        |  3 ++
+ qemu-options.hx       | 13 +++++++--
+ 4 files changed, 77 insertions(+), 11 deletions(-)
 
 diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index a75b46d9fe..effde65a89 100644
+index effde65a89..ba4ae9dfb0 100644
 --- a/chardev/char-socket.c
 +++ b/chardev/char-socket.c
-@@ -389,30 +389,37 @@ static void tcp_chr_free_connection(Chardev *chr)
-     s->connected = 0;
+@@ -26,6 +26,7 @@
+ #include "chardev/char.h"
+ #include "io/channel-socket.h"
+ #include "io/channel-tls.h"
++#include "io/channel-websock.h"
+ #include "io/net-listener.h"
+ #include "qemu/error-report.h"
+ #include "qemu/option.h"
+@@ -68,6 +69,8 @@ typedef struct {
+     GSource *telnet_source;
+     TCPChardevTelnetInit *telnet_init;
+ 
++    bool is_websock;
++
+     GSource *reconnect_timer;
+     int64_t reconnect_time;
+     bool connect_err_reported;
+@@ -394,7 +397,7 @@ static const char *qemu_chr_socket_protocol(SocketChardev *s)
+     if (s->is_telnet) {
+         return "telnet";
+     }
+-    return "tcp";
++    return s->is_websock ? "websocket" : "tcp";
  }
  
--static char *SocketAddress_to_str(const char *prefix, SocketAddress *addr,
--                                  bool is_listen, bool is_telnet)
-+static const char *qemu_chr_socket_protocol(SocketChardev *s)
- {
--    switch (addr->type) {
-+    if (s->is_telnet) {
-+        return "telnet";
+ static char *qemu_chr_socket_address(SocketChardev *s, const char *prefix)
+@@ -714,6 +717,41 @@ cont:
+ }
+ 
+ 
++static void tcp_chr_websock_handshake(QIOTask *task, gpointer user_data)
++{
++    Chardev *chr = user_data;
++    SocketChardev *s = user_data;
++
++    if (qio_task_propagate_error(task, NULL)) {
++        tcp_chr_disconnect(chr);
++    } else {
++        if (s->do_telnetopt) {
++            tcp_chr_telnet_init(chr);
++        } else {
++            tcp_chr_connect(chr);
++        }
 +    }
-+    return "tcp";
 +}
 +
-+static char *qemu_chr_socket_address(SocketChardev *s, const char *prefix)
++
++static void tcp_chr_websock_init(Chardev *chr)
 +{
-+    switch (s->addr->type) {
-     case SOCKET_ADDRESS_TYPE_INET:
-         return g_strdup_printf("%s%s:%s:%s%s", prefix,
--                               is_telnet ? "telnet" : "tcp",
--                               addr->u.inet.host,
--                               addr->u.inet.port,
--                               is_listen ? ",server" : "");
-+                               qemu_chr_socket_protocol(s),
-+                               s->addr->u.inet.host,
-+                               s->addr->u.inet.port,
-+                               s->is_listen ? ",server" : "");
-         break;
-     case SOCKET_ADDRESS_TYPE_UNIX:
-         return g_strdup_printf("%sunix:%s%s", prefix,
--                               addr->u.q_unix.path,
--                               is_listen ? ",server" : "");
-+                               s->addr->u.q_unix.path,
-+                               s->is_listen ? ",server" : "");
-         break;
-     case SOCKET_ADDRESS_TYPE_FD:
--        return g_strdup_printf("%sfd:%s%s", prefix, addr->u.fd.str,
--                               is_listen ? ",server" : "");
-+        return g_strdup_printf("%sfd:%s%s", prefix, s->addr->u.fd.str,
-+                               s->is_listen ? ",server" : "");
-         break;
-     case SOCKET_ADDRESS_TYPE_VSOCK:
-         return g_strdup_printf("%svsock:%s:%s", prefix,
--                               addr->u.vsock.cid,
--                               addr->u.vsock.port);
-+                               s->addr->u.vsock.cid,
-+                               s->addr->u.vsock.port);
-     default:
-         abort();
-     }
-@@ -424,8 +431,7 @@ static void update_disconnected_filename(SocketChardev *s)
- 
-     g_free(chr->filename);
-     if (s->addr) {
--        chr->filename = SocketAddress_to_str("disconnected:", s->addr,
--                                             s->is_listen, s->is_telnet);
-+        chr->filename = qemu_chr_socket_address(s, "disconnected:");
-     } else {
-         chr->filename = g_strdup("disconnected:socket");
-     }
-@@ -514,10 +520,12 @@ static int tcp_chr_sync_read(Chardev *chr, const uint8_t *buf, int len)
-     return size;
- }
- 
--static char *sockaddr_to_str(struct sockaddr_storage *ss, socklen_t ss_len,
--                             struct sockaddr_storage *ps, socklen_t ps_len,
--                             bool is_listen, bool is_telnet)
-+static char *qemu_chr_compute_filename(SocketChardev *s)
++    SocketChardev *s = SOCKET_CHARDEV(chr);
++    QIOChannelWebsock *wioc = NULL;
++    gchar *name;
++
++    wioc = qio_channel_websock_new_server(s->ioc);
++
++    name = g_strdup_printf("chardev-websocket-server-%s", chr->label);
++    qio_channel_set_name(QIO_CHANNEL(wioc), name);
++    g_free(name);
++    object_unref(OBJECT(s->ioc));
++    s->ioc = QIO_CHANNEL(wioc);
++
++    qio_channel_websock_handshake(wioc, tcp_chr_websock_handshake, chr, NULL);
++}
++
++
+ static void tcp_chr_tls_handshake(QIOTask *task,
+                                   gpointer user_data)
  {
-+    struct sockaddr_storage *ss = &s->sioc->localAddr;
-+    struct sockaddr_storage *ps = &s->sioc->remoteAddr;
-+    socklen_t ss_len = s->sioc->localAddrLen;
-+    socklen_t ps_len = s->sioc->remoteAddrLen;
-     char shost[NI_MAXHOST], sserv[NI_MAXSERV];
-     char phost[NI_MAXHOST], pserv[NI_MAXSERV];
-     const char *left = "", *right = "";
-@@ -527,7 +535,7 @@ static char *sockaddr_to_str(struct sockaddr_storage *ss, socklen_t ss_len,
-     case AF_UNIX:
-         return g_strdup_printf("unix:%s%s",
-                                ((struct sockaddr_un *)(ss))->sun_path,
--                               is_listen ? ",server" : "");
-+                               s->is_listen ? ",server" : "");
- #endif
-     case AF_INET6:
-         left  = "[";
-@@ -539,9 +547,9 @@ static char *sockaddr_to_str(struct sockaddr_storage *ss, socklen_t ss_len,
-         getnameinfo((struct sockaddr *) ps, ps_len, phost, sizeof(phost),
-                     pserv, sizeof(pserv), NI_NUMERICHOST | NI_NUMERICSERV);
-         return g_strdup_printf("%s:%s%s%s:%s%s <-> %s%s%s:%s",
--                               is_telnet ? "telnet" : "tcp",
-+                               qemu_chr_socket_protocol(s),
-                                left, shost, right, sserv,
--                               is_listen ? ",server" : "",
-+                               s->is_listen ? ",server" : "",
-                                left, phost, right, pserv);
+@@ -723,7 +761,9 @@ static void tcp_chr_tls_handshake(QIOTask *task,
+     if (qio_task_propagate_error(task, NULL)) {
+         tcp_chr_disconnect(chr);
+     } else {
+-        if (s->do_telnetopt) {
++        if (s->is_websock) {
++            tcp_chr_websock_init(chr);
++        } else if (s->do_telnetopt) {
+             tcp_chr_telnet_init(chr);
+         } else {
+             tcp_chr_connect(chr);
+@@ -809,12 +849,12 @@ static int tcp_chr_new_client(Chardev *chr, QIOChannelSocket *sioc)
  
-     default:
-@@ -576,10 +584,7 @@ static void tcp_chr_connect(void *opaque)
-     SocketChardev *s = SOCKET_CHARDEV(opaque);
+     if (s->tls_creds) {
+         tcp_chr_tls_init(chr);
++    } else if (s->is_websock) {
++        tcp_chr_websock_init(chr);
++    } else if (s->do_telnetopt) {
++        tcp_chr_telnet_init(chr);
+     } else {
+-        if (s->do_telnetopt) {
+-            tcp_chr_telnet_init(chr);
+-        } else {
+-            tcp_chr_connect(chr);
+-        }
++        tcp_chr_connect(chr);
+     }
  
-     g_free(chr->filename);
--    chr->filename = sockaddr_to_str(
--        &s->sioc->localAddr, s->sioc->localAddrLen,
--        &s->sioc->remoteAddr, s->sioc->remoteAddrLen,
--        s->is_listen, s->is_telnet);
-+    chr->filename = qemu_chr_compute_filename(s);
+     return 0;
+@@ -959,13 +999,20 @@ static void qmp_chardev_open_socket(Chardev *chr,
+     bool is_telnet      = sock->has_telnet  ? sock->telnet  : false;
+     bool is_tn3270      = sock->has_tn3270  ? sock->tn3270  : false;
+     bool is_waitconnect = sock->has_wait    ? sock->wait    : false;
++    bool is_websock     = sock->has_websocket ? sock->websocket : false;
+     int64_t reconnect   = sock->has_reconnect ? sock->reconnect : 0;
+     QIOChannelSocket *sioc = NULL;
+     SocketAddress *addr;
  
-     s->connected = 1;
-     update_ioc_handlers(s);
++    if (!is_listen && is_websock) {
++        error_setg(errp, "%s", "Websocket client is not implemented");
++        goto error;
++    }
++
+     s->is_listen = is_listen;
+     s->is_telnet = is_telnet;
+     s->is_tn3270 = is_tn3270;
++    s->is_websock = is_websock;
+     s->do_nodelay = do_nodelay;
+     if (sock->tls_creds) {
+         Object *creds;
+@@ -1072,6 +1119,7 @@ static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backend,
+     bool is_waitconnect = is_listen && qemu_opt_get_bool(opts, "wait", true);
+     bool is_telnet      = qemu_opt_get_bool(opts, "telnet", false);
+     bool is_tn3270      = qemu_opt_get_bool(opts, "tn3270", false);
++    bool is_websock     = qemu_opt_get_bool(opts, "websocket", false);
+     bool do_nodelay     = !qemu_opt_get_bool(opts, "delay", true);
+     int64_t reconnect   = qemu_opt_get_number(opts, "reconnect", 0);
+     const char *path = qemu_opt_get(opts, "path");
+@@ -1120,6 +1168,8 @@ static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backend,
+     sock->telnet = is_telnet;
+     sock->has_tn3270 = true;
+     sock->tn3270 = is_tn3270;
++    sock->has_websocket = true;
++    sock->websocket = is_websock;
+     sock->has_wait = true;
+     sock->wait = is_waitconnect;
+     sock->has_reconnect = true;
+diff --git a/chardev/char.c b/chardev/char.c
+index e115166995..a8790017e6 100644
+--- a/chardev/char.c
++++ b/chardev/char.c
+@@ -409,7 +409,8 @@ QemuOpts *qemu_chr_parse_compat(const char *label, const char *filename,
+     }
+     if (strstart(filename, "tcp:", &p) ||
+         strstart(filename, "telnet:", &p) ||
+-        strstart(filename, "tn3270:", &p)) {
++        strstart(filename, "tn3270:", &p) ||
++        strstart(filename, "websocket:", &p)) {
+         if (sscanf(p, "%64[^:]:%32[^,]%n", host, port, &pos) < 2) {
+             host[0] = 0;
+             if (sscanf(p, ":%32[^,]%n", port, &pos) < 1)
+@@ -429,6 +430,8 @@ QemuOpts *qemu_chr_parse_compat(const char *label, const char *filename,
+             qemu_opt_set(opts, "telnet", "on", &error_abort);
+         } else if (strstart(filename, "tn3270:", &p)) {
+             qemu_opt_set(opts, "tn3270", "on", &error_abort);
++        } else if (strstart(filename, "websocket:", &p)) {
++            qemu_opt_set(opts, "websocket", "on", &error_abort);
+         }
+         return opts;
+     }
+@@ -860,6 +863,9 @@ QemuOptsList qemu_chardev_opts = {
+         },{
+             .name = "tls-creds",
+             .type = QEMU_OPT_STRING,
++        },{
++            .name = "websocket",
++            .type = QEMU_OPT_BOOL,
+         },{
+             .name = "width",
+             .type = QEMU_OPT_NUMBER,
+diff --git a/qapi/char.json b/qapi/char.json
+index b7b2a05766..79bac598a0 100644
+--- a/qapi/char.json
++++ b/qapi/char.json
+@@ -251,6 +251,8 @@
+ #          sockets (default: false)
+ # @tn3270: enable tn3270 protocol on server
+ #          sockets (default: false) (Since: 2.10)
++# @websocket: enable websocket protocol on server
++#           sockets (default: false) (Since: 3.1)
+ # @reconnect: For a client socket, if a socket is disconnected,
+ #          then attempt a reconnect after the given number of seconds.
+ #          Setting this to zero disables this function. (default: 0)
+@@ -265,6 +267,7 @@
+                                      '*nodelay'   : 'bool',
+                                      '*telnet'    : 'bool',
+                                      '*tn3270'    : 'bool',
++                                     '*websocket' : 'bool',
+                                      '*reconnect' : 'int' },
+   'base': 'ChardevCommon' }
+ 
+diff --git a/qemu-options.hx b/qemu-options.hx
+index f139459e80..022c793162 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -2409,9 +2409,9 @@ DEF("chardev", HAS_ARG, QEMU_OPTION_chardev,
+     "-chardev help\n"
+     "-chardev null,id=id[,mux=on|off][,logfile=PATH][,logappend=on|off]\n"
+     "-chardev socket,id=id[,host=host],port=port[,to=to][,ipv4][,ipv6][,nodelay][,reconnect=seconds]\n"
+-    "         [,server][,nowait][,telnet][,reconnect=seconds][,mux=on|off]\n"
++    "         [,server][,nowait][,telnet][,websocket][,reconnect=seconds][,mux=on|off]\n"
+     "         [,logfile=PATH][,logappend=on|off][,tls-creds=ID] (tcp)\n"
+-    "-chardev socket,id=id,path=path[,server][,nowait][,telnet][,reconnect=seconds]\n"
++    "-chardev socket,id=id,path=path[,server][,nowait][,telnet][,websocket][,reconnect=seconds]\n"
+     "         [,mux=on|off][,logfile=PATH][,logappend=on|off] (unix)\n"
+     "-chardev udp,id=id[,host=host],port=port[,localaddr=localaddr]\n"
+     "         [,localport=localport][,ipv4][,ipv6][,mux=on|off]\n"
+@@ -2539,7 +2539,7 @@ The available backends are:
+ A void device. This device will not emit any data, and will drop any data it
+ receives. The null backend does not take any options.
+ 
+-@item -chardev socket,id=@var{id}[,@var{TCP options} or @var{unix options}][,server][,nowait][,telnet][,reconnect=@var{seconds}][,tls-creds=@var{id}]
++@item -chardev socket,id=@var{id}[,@var{TCP options} or @var{unix options}][,server][,nowait][,telnet][,websocket][,reconnect=@var{seconds}][,tls-creds=@var{id}]
+ 
+ Create a two-way stream socket, which can be either a TCP or a unix socket. A
+ unix socket will be created if @option{path} is specified. Behaviour is
+@@ -2553,6 +2553,9 @@ connect to a listening socket.
+ @option{telnet} specifies that traffic on the socket should interpret telnet
+ escape sequences.
+ 
++@option{websocket} specifies that the socket uses WebSocket protocol for
++communication.
++
+ @option{reconnect} sets the timeout for reconnecting on non-server sockets when
+ the remote end goes away.  qemu will delay this many seconds and then attempt
+ to reconnect.  Zero disables reconnecting, and is the default.
+@@ -3101,6 +3104,10 @@ MAGIC_SYSRQ sequence if you use a telnet that supports sending the break
+ sequence.  Typically in unix telnet you do it with Control-] and then
+ type "send break" followed by pressing the enter key.
+ 
++@item websocket:@var{host}:@var{port},server[,nowait][,nodelay]
++The WebSocket protocol is used instead of raw tcp socket. The port acts as
++a WebSocket server. Client mode is not supported.
++
+ @item unix:@var{path}[,server][,nowait][,reconnect=@var{seconds}]
+ A unix domain socket is used instead of a tcp socket.  The option works the
+ same as if you had specified @code{-serial tcp} except the unix domain socket
 -- 
 2.17.1
