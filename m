@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36138)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gD7rG-00045l-JZ
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 08:56:59 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gD7xz-0006PT-G4
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 09:03:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gD7rE-0001oP-9D
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 08:56:57 -0400
-References: <1530602398-16127-1-git-send-email-eric.auger@redhat.com>
-	<20180718160832.0d754aa4@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <4bdd8486-f044-4a0c-8bcd-c6f357306781@redhat.com>
-Date: Thu, 18 Oct 2018 14:56:38 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1gD7xx-00015X-O3
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 09:03:55 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:38766)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gD7xw-000155-B1
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 09:03:53 -0400
+Received: by mail-oi1-x243.google.com with SMTP id u197-v6so23903920oif.5
+	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 06:03:51 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180718160832.0d754aa4@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v3 00/15] ARM virt: PCDIMM/NVDIMM at 2TB
+In-Reply-To: <20181018123332.23518-1-pbonzini@redhat.com>
+References: <20181018123332.23518-1-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 18 Oct 2018 14:03:30 +0100
+Message-ID: <CAFEAcA_6jGoD3-iTwc7=RUrYc1ac7jcjA8m26-JpRrcW+P-qRQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] target-i386: kvm: do not initialize
+ padding fields
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,182 +29,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, dgilbert@redhat.com, agraf@suse.de, david@gibson.dropbear.id.au, drjones@redhat.com, wei@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Hi Igor,
+On 18 October 2018 at 13:33, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> The exception.pad field is going to be renamed to pending in an upcoming header
+> file update.  Remove the unnecessary initialization.
+>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  linux-headers/asm-x86/kvm.h | 5 +----
+>  target/i386/kvm.c           | 2 --
+>  2 files changed, 1 insertion(+), 6 deletions(-)
+>
+> diff --git a/linux-headers/asm-x86/kvm.h b/linux-headers/asm-x86/kvm.h
+> index 7a7acf9e47..dabfcf7c39 100644
+> --- a/linux-headers/asm-x86/kvm.h
+> +++ b/linux-headers/asm-x86/kvm.h
+> @@ -300,10 +300,7 @@ struct kvm_vcpu_events {
+>                 __u8 injected;
+>                 __u8 nr;
+>                 __u8 has_error_code;
+> -               union {
+> -                       __u8 pad;
+> -                       __u8 pending;
+> -               }
+> +               __u8 pending;
+>                 __u32 error_code;
+>         } exception;
+>         struct {
 
-On 7/18/18 4:08 PM, Igor Mammedov wrote:
-> On Tue,  3 Jul 2018 09:19:43 +0200
-> Eric Auger <eric.auger@redhat.com> wrote:
-> 
->> This series aims at supporting PCDIMM/NVDIMM intantiation in
->> machvirt at 2TB guest physical address.
->>
->> This is achieved in 3 steps:
->> 1) support more than 40b IPA/GPA
-> will it work for TCG as well?
-> /important from make check pov and maybe in cases when there is no ARM system available to test/play with the feature/
-> 
+Do we need to include this hand-edited update to the linux-headers/
+in this patch, or could we just drop the initializations, and leave
+the header itself to be changed by some future update ?
 
-Sorry I missed this comment.
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index 6e5f951f4f..74193b1b9d 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -2696,7 +2696,6 @@ static int kvm_put_vcpu_events(X86CPU *cpu, int level)
+>      events.exception.nr = env->exception_injected;
+>      events.exception.has_error_code = env->has_error_code;
+>      events.exception.error_code = env->error_code;
+> -    events.exception.pad = 0;
+>
+>      events.interrupt.injected = (env->interrupt_injected >= 0);
+>      events.interrupt.nr = env->interrupt_injected;
+> @@ -2705,7 +2704,6 @@ static int kvm_put_vcpu_events(X86CPU *cpu, int level)
+>      events.nmi.injected = env->nmi_injected;
+>      events.nmi.pending = env->nmi_pending;
+>      events.nmi.masked = !!(env->hflags2 & HF2_NMI_MASK);
+> -    events.nmi.pad = 0;
+>
+>      events.sipi_vector = env->sipi_vector;
+>      events.flags = 0;
 
-On A TCG guest ID_AA64MMFR0_EL1.PARange ID register field is the machine
-limiting factor as it returns the supported physical address range
-(target/arm/cpu64.c):
+You could also mention in the commit message:
+ * these initializers were added by commit 7e680753cfa2
+   in order to suppress a valgrind warning
+ * they were rendered unnecessary by the later commit 076796f8fd27f4d,
+   which added the "= {}" initializer to the declaration of "events",
+   thus zero-initializing the whole struct (and so this patch does
+   not change behaviour at all)
 
-aarch64_a53_initfn hardcodes PA range to 40bits
-	cpu->id_aa64mmfr0 = 0x00001122
-aarch64_a57_initfn hardcodes PA Range to 44 bits
-    	cpu->id_aa64mmfr0 = 0x00001124
-
-for TCG guests we may add support for the phys-bits option which would
-allow to set the PARange instead of hardcoding it.
-
-Thanks
-
-Eric
-
-> 
-> 
->> 2) support PCDIMM instantiation
->> 3) support NVDIMM instantiation
->>
->> This series reuses/rebases patches initially submitted by Shameer in [1]
->> and Kwangwoo in [2].
->>
->> I put all parts all together for consistency and due to dependencies
->> however as soon as the kernel dependency is resolved we can consider
->> upstreaming them separately.
->>
->> Support more than 40b IPA/GPA [ patches 1 - 5 ]
->> -----------------------------------------------
->> was "[RFC 0/6] KVM/ARM: Dynamic and larger GPA size"
->>
->> At the moment the guest physical address space is limited to 40b
->> due to KVM limitations. [0] bumps this limitation and allows to
->> create a VM with up to 52b GPA address space.
->>
->> With this series, QEMU creates a virt VM with the max IPA range
->> reported by the host kernel or 40b by default.
->>
->> This choice can be overriden by using the -machine kvm-type=<bits>
->> option with bits within [40, 52]. If <bits> are not supported by
->> the host, the legacy 40b value is used.
->>
->> Currently the EDK2 FW also hardcodes the max number of GPA bits to
->> 40. This will need to be fixed.
->>
->> PCDIMM Support [ patches 6 - 11 ]
->> ---------------------------------
->> was "[RFC 0/5] ARM virt: Support PC-DIMM at 2TB"
->>
->> We instantiate the device_memory at 2TB. Using it obviously requires
->> at least 42b of IPA/GPA. While its max capacity is currently limited
->> to 2TB, the actual size depends on the initial guest RAM size and
->> maxmem parameter.
->>
->> Actual hot-plug and hot-unplug of PC-DIMM is not suported due to lack
->> of support of those features in baremetal.
->>
->> NVDIMM support [ patches 12 - 15 ]
->> ----------------------------------
->>
->> Once the memory hotplug framework is in place it is fairly
->> straightforward to add support for NVDIMM. the machine "nvdimm" option
->> turns the capability on.
->>
->> Best Regards
->>
->> Eric
->>
->> References:
->>
->> [0] [PATCH v3 00/20] arm64: Dynamic & 52bit IPA support
->> https://www.spinics.net/lists/kernel/msg2841735.html
->>
->> [1] [RFC v2 0/6] hw/arm: Add support for non-contiguous iova regions
->> http://patchwork.ozlabs.org/cover/914694/
->>
->> [2] [RFC PATCH 0/3] add nvdimm support on AArch64 virt platform
->> https://lists.gnu.org/archive/html/qemu-devel/2016-07/msg04599.html
->>
->> Tests:
->> - On Cavium Gigabyte, a 48b VM was created.
->> - Migration tests were performed between kernel supporting the
->>   feature and destination kernel not suporting it
->> - test with ACPI: to overcome the limitation of EDK2 FW, virt
->>   memory map was hacked to move the device memory below 1TB.
->>
->> This series can be found at:
->> https://github.com/eauger/qemu/tree/v2.12.0-dimm-2tb-v3
->>
->> History:
->>
->> v2 -> v3:
->> - fix pc_q35 and pc_piix compilation error
->> - kwangwoo's email being not valid anymore, remove his address
->>
->> v1 -> v2:
->> - kvm_get_max_vm_phys_shift moved in arch specific file
->> - addition of NVDIMM part
->> - single series
->> - rebase on David's refactoring
->>
->> v1:
->> - was "[RFC 0/6] KVM/ARM: Dynamic and larger GPA size"
->> - was "[RFC 0/5] ARM virt: Support PC-DIMM at 2TB"
->>
->> Best Regards
->>
->> Eric
->>
->>
->> Eric Auger (9):
->>   linux-headers: header update for KVM/ARM KVM_ARM_GET_MAX_VM_PHYS_SHIFT
->>   hw/boards: Add a MachineState parameter to kvm_type callback
->>   kvm: add kvm_arm_get_max_vm_phys_shift
->>   hw/arm/virt: support kvm_type property
->>   hw/arm/virt: handle max_vm_phys_shift conflicts on migration
->>   hw/arm/virt: Allocate device_memory
->>   acpi: move build_srat_hotpluggable_memory to generic ACPI source
->>   hw/arm/boot: Expose the pmem nodes in the DT
->>   hw/arm/virt: Add nvdimm and nvdimm-persistence options
->>
->> Kwangwoo Lee (2):
->>   nvdimm: use configurable ACPI IO base and size
->>   hw/arm/virt: Add nvdimm hot-plug infrastructure
->>
->> Shameer Kolothum (4):
->>   hw/arm/virt: Add memory hotplug framework
->>   hw/arm/boot: introduce fdt_add_memory_node helper
->>   hw/arm/boot: Expose the PC-DIMM nodes in the DT
->>   hw/arm/virt-acpi-build: Add PC-DIMM in SRAT
->>
->>  accel/kvm/kvm-all.c                            |   2 +-
->>  default-configs/arm-softmmu.mak                |   4 +
->>  hw/acpi/aml-build.c                            |  51 ++++
->>  hw/acpi/nvdimm.c                               |  28 ++-
->>  hw/arm/boot.c                                  | 123 +++++++--
->>  hw/arm/virt-acpi-build.c                       |  10 +
->>  hw/arm/virt.c                                  | 330 ++++++++++++++++++++++---
->>  hw/i386/acpi-build.c                           |  49 ----
->>  hw/i386/pc_piix.c                              |   8 +-
->>  hw/i386/pc_q35.c                               |   8 +-
->>  hw/ppc/mac_newworld.c                          |   2 +-
->>  hw/ppc/mac_oldworld.c                          |   2 +-
->>  hw/ppc/spapr.c                                 |   2 +-
->>  include/hw/acpi/aml-build.h                    |   3 +
->>  include/hw/arm/arm.h                           |   2 +
->>  include/hw/arm/virt.h                          |   7 +
->>  include/hw/boards.h                            |   2 +-
->>  include/hw/mem/nvdimm.h                        |  12 +
->>  include/standard-headers/linux/virtio_config.h |  16 +-
->>  linux-headers/asm-mips/unistd.h                |  18 +-
->>  linux-headers/asm-powerpc/kvm.h                |   1 +
->>  linux-headers/linux/kvm.h                      |  16 ++
->>  target/arm/kvm.c                               |   9 +
->>  target/arm/kvm_arm.h                           |  16 ++
->>  24 files changed, 597 insertions(+), 124 deletions(-)
->>
-> 
+thanks
+-- PMM
