@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41054)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41219)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gD9Zm-0002IO-Gt
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:47:03 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1gD9aS-0002rR-MB
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:47:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gD9Zj-0007u4-BF
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:47:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34482)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gD9Zg-0007j7-A3
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:46:58 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 751123001A52
-	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 14:46:48 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <87efcqniza.fsf@dusky.pond.sub.org> <20181016133340.GB2427@work-vm>
-Date: Thu, 18 Oct 2018 16:46:46 +0200
-In-Reply-To: <20181016133340.GB2427@work-vm> (David Alan Gilbert's message of
-	"Tue, 16 Oct 2018 14:33:41 +0100")
-Message-ID: <87va5zjort.fsf@dusky.pond.sub.org>
+	(envelope-from <pbonzini@redhat.com>) id 1gD9aP-000087-9T
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:47:44 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:46744)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gD9aP-000077-2S
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:47:41 -0400
+Received: by mail-wr1-f67.google.com with SMTP id n11-v6so33935842wru.13
+	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 07:47:40 -0700 (PDT)
+References: <cover.1539846575.git.artem.k.pisarenko@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b29d3807-6ae3-94c6-aab3-af872a075eb7@redhat.com>
+Date: Thu, 18 Oct 2018 16:47:38 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] When it's okay to treat OOM as fatal?
+In-Reply-To: <cover.1539846575.git.artem.k.pisarenko@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] Fix and improve core RTC function
+ and documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,71 +30,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Artem Pisarenko <artem.k.pisarenko@gmail.com>, qemu-devel@nongnu.org
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
+On 18/10/2018 09:12, Artem Pisarenko wrote:
+> Modifications are motivated by bug https://bugs.launchpad.net/qemu/+bug/1797033 I've encountered recently.
+> 
+> Trying to fix it and analyzing its effect on all use cases (not covered in bug report) revealed much deeper problems.
+> This is my first patch to QEMU and I'm not sure whether the way I addressed them is proper.
+> They definitely require either modifications to current implementation (breaking compability), or adding clarifications to user documentation. I've tried to find compromise.
+> Changes I propose are driven mostly by my interpretation of user documentation and comments in code, rather than by existing implementation.
+> 
+> I've splitted patches in a way that at least some of them may be accepted. Following subsets are make sense on their own:
+> - 1
+> - 1,2,3
+> 
+> I limited refactoring only to vl.c, although it leads to reworking of all hw/* rtc models which have unreasonable duplications of actions performed by vl.c.
+> I'm sure such kind of rework will reveal more hidden bugs/features, but so far I've had enough (it's a long story how muсh effort and pain cost me to find that tricky bug above).
+> I suppose just to draw attention of relevant hw/* maintainers.
 
-> * Markus Armbruster (armbru@redhat.com) wrote:
->> We sometimes use g_new() & friends, which abort() on OOM, and sometimes
->> g_try_new() & friends, which can fail, and therefore require error
->> handling.
->> 
->> HACKING points out the difference, but is mum on when to use what:
->> 
->>     3. Low level memory management
->> 
->>     Use of the malloc/free/realloc/calloc/valloc/memalign/posix_memalign
->>     APIs is not allowed in the QEMU codebase. Instead of these routines,
->>     use the GLib memory allocation routines g_malloc/g_malloc0/g_new/
->>     g_new0/g_realloc/g_free or QEMU's qemu_memalign/qemu_blockalign/qemu_vfree
->>     APIs.
->> 
->>     Please note that g_malloc will exit on allocation failure, so there
->>     is no need to test for failure (as you would have to with malloc).
->>     Calling g_malloc with a zero size is valid and will return NULL.
->> 
->>     Prefer g_new(T, n) instead of g_malloc(sizeof(T) * n) for the following
->>     reasons:
->> 
->>       a. It catches multiplication overflowing size_t;
->>       b. It returns T * instead of void *, letting compiler catch more type
->>          errors.
->> 
->>     Declarations like T *v = g_malloc(sizeof(*v)) are acceptable, though.
->> 
->>     Memory allocated by qemu_memalign or qemu_blockalign must be freed with
->>     qemu_vfree, since breaking this will cause problems on Win32.
->> 
->> Now, in my personal opinion, handling OOM gracefully is worth the
->> (commonly considerable) trouble when you're coding for an Apple II or
->> similar.  Anything that pages commonly becomes unusable long before
->> allocations fail.
->
-> That's not always my experience; I've seen cases where you suddenly
-> allocate a load more memory and hit OOM fairly quickly on that hot
-> process.  Most of the time on the desktop you're right.
->
->> Anything that overcommits will send you a (commonly
->> lethal) signal instead.  Anything that tries handling OOM gracefully,
->> and manages to dodge both these bullets somehow, will commonly get it
->> wrong and crash.
->
-> If your qemu has maped it's main memory from hugetlbfs or similar pools
-> then we're looking at the other memory allocations; and that's a bit of
-> an interesting difference where those other allocations should be a lot
-> smaller.
->
->> But others are entitled to their opinions as much as I am.  I just want
->> to know what our rules are, preferably in the form of a patch to
->> HACKING.
->
-> My rule is to try not to break a happily running VM by some new
-> activity; I don't worry about it during startup.
->
-> So for example, I don't like it when starting a migration, allocates
-> some more memory and kills the VM - the user had a happy stable VM
-> upto that point.  Migration gets the blame at this point.
+Queued, thanks.
 
-I don't doubt reliable OOM handling would be nice.  I do doubt it's
-practical for an application like QEMU.
+As a start of future refactoring, would you mind moving all this code to
+hw/timer/rtc.c or rtc.c?  It was somewaht generic before, but now it's
+very tied to -rtc.
+
+Paolo
+
+> 
+> v3 changes:
+>  - commit messages rewritten/shortened/wrapped to match patch requirements
+>  - fixed minor typo
+> v2 changes:
+>  - fixed compiler warning caused non-debug build fail
+> 
+> 
+> Artem Pisarenko (4):
+>   vl: improve/fix documentation related to RTC function
+>   vl: refactor -rtc option references
+>   Fixes RTC bug with base datetime shifts in clock=vm
+>   vl,qapi: offset calculation in RTC_CHANGE event reverted
+> 
+>  qapi/misc.json  |   3 +-
+>  qemu-options.hx |  14 +++++---
+>  vl.c            | 105 +++++++++++++++++++++++++++++++++++++-------------------
+>  3 files changed, 80 insertions(+), 42 deletions(-)
+> 
