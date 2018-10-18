@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39847)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39962)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gDEaB-0001aZ-GH
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:07:50 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gDEaU-0001u8-4w
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:08:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gDEaA-0002JP-LJ
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:07:47 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gDEaT-0002W3-AH
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:08:06 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 18 Oct 2018 17:04:01 -0300
-Message-Id: <20181018200422.4358-25-ehabkost@redhat.com>
+Date: Thu, 18 Oct 2018 17:04:02 -0300
+Message-Id: <20181018200422.4358-26-ehabkost@redhat.com>
 In-Reply-To: <20181018200422.4358-1-ehabkost@redhat.com>
 References: <20181018200422.4358-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 24/45] memory-device: forward errors in
- get_region_size()/get_plugged_size()
+Subject: [Qemu-devel] [PULL 25/45] memory-device: document MemoryDeviceClass
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,96 +24,73 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Rob Her
 
 From: David Hildenbrand <david@redhat.com>
 
-Let's properly forward the errors, so errors from get_region_size() /
-get_plugged_size() can be handled.
+Document the functions. Don't document get_region_size(), as we will be
+dropping/replacing that one soon.
 
-Users right now call both functions after the device has been realized,
-which is will never fail, so it is fine to continue using error_abort.
-
-While at it, remove a leftover error check (suggested by Igor).
+Use same documentation style as in include/exec/memory.h, but don't
+document the parameters, as they are self-explanatory.
 
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20181005092024.14344-8-david@redhat.com>
+Message-Id: <20181005092024.14344-9-david@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- include/hw/mem/memory-device.h | 4 ++--
- hw/mem/memory-device.c         | 9 +++------
- hw/mem/pc-dimm.c               | 5 +++--
- 3 files changed, 8 insertions(+), 10 deletions(-)
+ include/hw/mem/memory-device.h | 36 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
 diff --git a/include/hw/mem/memory-device.h b/include/hw/mem/memory-device.h
-index 2853b084b5..f02b229837 100644
+index f02b229837..0474a3dd11 100644
 --- a/include/hw/mem/memory-device.h
 +++ b/include/hw/mem/memory-device.h
-@@ -33,8 +33,8 @@ typedef struct MemoryDeviceClass {
+@@ -29,12 +29,48 @@ typedef struct MemoryDeviceState {
+     Object parent_obj;
+ } MemoryDeviceState;
+ 
++/**
++ * MemoryDeviceClass:
++ *
++ * All memory devices need to implement TYPE_MEMORY_DEVICE as an interface.
++ *
++ * A memory device is a device that owns a memory region which is
++ * mapped into guest physical address space at a certain address. The
++ * address in guest physical memory can either be specified explicitly
++ * or get assigned automatically.
++ */
+ typedef struct MemoryDeviceClass {
++    /* private */
      InterfaceClass parent_class;
  
++    /*
++     * Return the address of the memory device in guest physical memory.
++     *
++     * Called when (un)plugging a memory device or when iterating over
++     * all memory devices mapped into guest physical address space.
++     *
++     * If "0" is returned, no address has been specified by the user and
++     * no address has been assigned to this memory device yet.
++     */
      uint64_t (*get_addr)(const MemoryDeviceState *md);
--    uint64_t (*get_plugged_size)(const MemoryDeviceState *md);
--    uint64_t (*get_region_size)(const MemoryDeviceState *md);
-+    uint64_t (*get_plugged_size)(const MemoryDeviceState *md, Error **errp);
-+    uint64_t (*get_region_size)(const MemoryDeviceState *md, Error **errp);
++
++    /*
++     * Return the amount of memory provided by the memory device currently
++     * usable ("plugged") by the VM.
++     *
++     * Called when calculating the total amount of ram available to the
++     * VM (e.g. to report memory stats to the user).
++     *
++     * This is helpful for devices that dynamically manage the amount of
++     * memory accessible by the guest via the reserved memory region. For
++     * most devices, this corresponds to the size of the memory region.
++     */
+     uint64_t (*get_plugged_size)(const MemoryDeviceState *md, Error **errp);
+     uint64_t (*get_region_size)(const MemoryDeviceState *md, Error **errp);
++
++    /*
++     * Translate the memory device into #MemoryDeviceInfo.
++     */
      void (*fill_device_info)(const MemoryDeviceState *md,
                               MemoryDeviceInfo *info);
  } MemoryDeviceClass;
-diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
-index 87369ef2e1..c1e1b81cf2 100644
---- a/hw/mem/memory-device.c
-+++ b/hw/mem/memory-device.c
-@@ -60,7 +60,7 @@ static int memory_device_used_region_size(Object *obj, void *opaque)
-         const MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(obj);
- 
-         if (dev->realized) {
--            *size += mdc->get_region_size(md);
-+            *size += mdc->get_region_size(md, &error_abort);
-         }
-     }
- 
-@@ -167,10 +167,7 @@ uint64_t memory_device_get_free_addr(MachineState *ms, const uint64_t *hint,
-         uint64_t md_size, md_addr;
- 
-         md_addr = mdc->get_addr(md);
--        md_size = mdc->get_region_size(md);
--        if (*errp) {
--            goto out;
--        }
-+        md_size = mdc->get_region_size(md, &error_abort);
- 
-         if (ranges_overlap(md_addr, md_size, new_addr, size)) {
-             if (hint) {
-@@ -234,7 +231,7 @@ static int memory_device_plugged_size(Object *obj, void *opaque)
-         const MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(obj);
- 
-         if (dev->realized) {
--            *size += mdc->get_plugged_size(md);
-+            *size += mdc->get_plugged_size(md, &error_abort);
-         }
-     }
- 
-diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-index f46fb7ada2..130f78d0de 100644
---- a/hw/mem/pc-dimm.c
-+++ b/hw/mem/pc-dimm.c
-@@ -234,14 +234,15 @@ static uint64_t pc_dimm_md_get_addr(const MemoryDeviceState *md)
-     return dimm->addr;
- }
- 
--static uint64_t pc_dimm_md_get_region_size(const MemoryDeviceState *md)
-+static uint64_t pc_dimm_md_get_region_size(const MemoryDeviceState *md,
-+                                           Error **errp)
- {
-     /* dropping const here is fine as we don't touch the memory region */
-     PCDIMMDevice *dimm = PC_DIMM(md);
-     const PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(md);
-     MemoryRegion *mr;
- 
--    mr = ddc->get_memory_region(dimm, &error_abort);
-+    mr = ddc->get_memory_region(dimm, errp);
-     if (!mr) {
-         return 0;
-     }
 -- 
 2.18.0.rc1.1.g3f1ff2140
