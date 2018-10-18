@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44428)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDDMW-0000mx-6O
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDDMW-0000mq-4l
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:49:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDDMT-0005ne-SS
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:49:36 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:56954 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDDMQ-0005jz-B0
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:49:35 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:56953 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gDDMQ-0005di-JH
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:49:32 -0400
+	id 1gDDMK-0005dk-QO
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:49:26 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 18 Oct 2018 20:47:40 +0200
-Message-Id: <1539888473-16340-16-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 18 Oct 2018 20:47:42 +0200
+Message-Id: <1539888473-16340-18-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1539888473-16340-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1539888473-16340-1-git-send-email-aleksandar.markovic@rt-rk.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 15/28] target/mips: Reorganize bit
- definitions for insn_flags (ISAs/ASEs flags)
+Subject: [Qemu-devel] [PULL v2 17/28] target/mips: Add availability control
+ for DSP R3 ASE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,111 +31,102 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
-From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+From: Stefan Markovic <smarkovic@wavecomp.com>
 
-Distribute bits 56-63 vendor-specific ASEs as follows:
-
-  - bits 0-31 MIPS base instruction sets
-  - bits 32-47 MIPS ASEs
-  - bits 48-55 vendor-specific base instruction sets
-  - bits 56-63 vendor-specific ASEs
+Add infrastructure for availability control for DSP R3 ASE MIPS
+instructions. Only BPOSGE32C currently belongs to DSP R3 ASE, but
+this is likely to be changed in near future.
 
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/mips-defs.h | 78 ++++++++++++++++++++++++++++---------------=
-------
- 1 file changed, 44 insertions(+), 34 deletions(-)
+ target/mips/internal.h           | 11 ++++++++---
+ target/mips/translate.c          | 13 ++++++++++++-
+ target/mips/translate_init.inc.c |  3 ++-
+ 3 files changed, 22 insertions(+), 5 deletions(-)
 
-diff --git a/target/mips/mips-defs.h b/target/mips/mips-defs.h
-index c8e9979..66b7953 100644
---- a/target/mips/mips-defs.h
-+++ b/target/mips/mips-defs.h
-@@ -22,40 +22,50 @@
- #endif
- #endif
+diff --git a/target/mips/internal.h b/target/mips/internal.h
+index bfe83ee..4490bd1 100644
+--- a/target/mips/internal.h
++++ b/target/mips/internal.h
+@@ -307,8 +307,8 @@ static inline void compute_hflags(CPUMIPSState *env)
+     env->hflags &=3D ~(MIPS_HFLAG_COP1X | MIPS_HFLAG_64 | MIPS_HFLAG_CP0=
+ |
+                      MIPS_HFLAG_F64 | MIPS_HFLAG_FPU | MIPS_HFLAG_KSU |
+                      MIPS_HFLAG_AWRAP | MIPS_HFLAG_DSP | MIPS_HFLAG_DSPR=
+2 |
+-                     MIPS_HFLAG_SBRI | MIPS_HFLAG_MSA | MIPS_HFLAG_FRE |
+-                     MIPS_HFLAG_ELPA | MIPS_HFLAG_ERL);
++                     MIPS_HFLAG_DSPR3 | MIPS_HFLAG_SBRI | MIPS_HFLAG_MSA=
+ |
++                     MIPS_HFLAG_FRE | MIPS_HFLAG_ELPA | MIPS_HFLAG_ERL);
+     if (env->CP0_Status & (1 << CP0St_ERL)) {
+         env->hflags |=3D MIPS_HFLAG_ERL;
+     }
+@@ -355,7 +355,12 @@ static inline void compute_hflags(CPUMIPSState *env)
+         (env->CP0_Config5 & (1 << CP0C5_SBRI))) {
+         env->hflags |=3D MIPS_HFLAG_SBRI;
+     }
+-    if (env->insn_flags & ASE_DSPR2) {
++    if (env->insn_flags & ASE_DSPR3) {
++        if (env->CP0_Status & (1 << CP0St_MX)) {
++            env->hflags |=3D MIPS_HFLAG_DSP | MIPS_HFLAG_DSPR2 |
++                           MIPS_HFLAG_DSPR3;
++        }
++    } else if (env->insn_flags & ASE_DSPR2) {
+         /* Enables access MIPS DSP resources, now our cpu is DSP ASER2,
+            so enable to access DSPR2 resources. */
+         if (env->CP0_Status & (1 << CP0St_MX)) {
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index c91c541..50c6bb3 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -2407,6 +2407,17 @@ static inline void check_dspr2(DisasContext *ctx)
+     }
+ }
 =20
--/* Masks used to mark instructions to indicate which ISA level they
--   were introduced in. */
--#define		ISA_MIPS1	0x00000001
--#define		ISA_MIPS2	0x00000002
--#define		ISA_MIPS3	0x00000004
--#define		ISA_MIPS4	0x00000008
--#define		ISA_MIPS5	0x00000010
--#define		ISA_MIPS32	0x00000020
--#define		ISA_MIPS32R2	0x00000040
--#define		ISA_MIPS64	0x00000080
--#define		ISA_MIPS64R2	0x00000100
--#define   ISA_MIPS32R3  0x00000200
--#define   ISA_MIPS64R3  0x00000400
--#define   ISA_MIPS32R5  0x00000800
--#define   ISA_MIPS64R5  0x00001000
--#define   ISA_MIPS32R6  0x00002000
--#define   ISA_MIPS64R6  0x00004000
--#define   ISA_NANOMIPS32  0x00008000
--
--/* MIPS ASEs. */
--#define   ASE_MIPS16    0x00010000
--#define   ASE_MIPS3D    0x00020000
--#define   ASE_MDMX      0x00040000
--#define   ASE_DSP       0x00080000
--#define   ASE_DSPR2     0x00100000
--#define   ASE_MT        0x00200000
--#define   ASE_SMARTMIPS 0x00400000
--#define   ASE_MICROMIPS 0x00800000
--#define   ASE_MSA       0x01000000
--
--/* Chip specific instructions. */
--#define		INSN_LOONGSON2E  0x20000000
--#define		INSN_LOONGSON2F  0x40000000
--#define		INSN_VR54XX	0x80000000
-+/*
-+ * bit definitions for insn_flags (ISAs/ASEs flags)
-+ * ------------------------------------------------
-+ */
-+/*
-+ *   bits 0-31: MIPS base instruction sets
-+ */
-+#define ISA_MIPS1         0x0000000000000001ULL
-+#define ISA_MIPS2         0x0000000000000002ULL
-+#define ISA_MIPS3         0x0000000000000004ULL
-+#define ISA_MIPS4         0x0000000000000008ULL
-+#define ISA_MIPS5         0x0000000000000010ULL
-+#define ISA_MIPS32        0x0000000000000020ULL
-+#define ISA_MIPS32R2      0x0000000000000040ULL
-+#define ISA_MIPS64        0x0000000000000080ULL
-+#define ISA_MIPS64R2      0x0000000000000100ULL
-+#define ISA_MIPS32R3      0x0000000000000200ULL
-+#define ISA_MIPS64R3      0x0000000000000400ULL
-+#define ISA_MIPS32R5      0x0000000000000800ULL
-+#define ISA_MIPS64R5      0x0000000000001000ULL
-+#define ISA_MIPS32R6      0x0000000000002000ULL
-+#define ISA_MIPS64R6      0x0000000000004000ULL
-+#define ISA_NANOMIPS32    0x0000000000008000ULL
-+/*
-+ *   bits 32-47: MIPS ASEs
-+ */
-+#define ASE_MIPS16        0x0000000100000000ULL
-+#define ASE_MIPS3D        0x0000000200000000ULL
-+#define ASE_MDMX          0x0000000400000000ULL
-+#define ASE_DSP           0x0000000800000000ULL
-+#define ASE_DSPR2         0x0000001000000000ULL
-+#define ASE_MT            0x0000004000000000ULL
-+#define ASE_SMARTMIPS     0x0000008000000000ULL
-+#define ASE_MICROMIPS     0x0000010000000000ULL
-+#define ASE_MSA           0x0000020000000000ULL
-+/*
-+ *   bits 48-55: vendor-specific base instruction sets
-+ */
-+#define INSN_LOONGSON2E   0x0001000000000000ULL
-+#define INSN_LOONGSON2F   0x0002000000000000ULL
-+#define INSN_VR54XX       0x0004000000000000ULL
-+/*
-+ *   bits 56-63: vendor-specific ASEs
-+ */
-=20
- /* MIPS CPU defines. */
- #define		CPU_MIPS1	(ISA_MIPS1)
++static inline void check_dspr3(DisasContext *ctx)
++{
++    if (unlikely(!(ctx->hflags & MIPS_HFLAG_DSPR3))) {
++        if (ctx->insn_flags & ASE_DSP) {
++            generate_exception_end(ctx, EXCP_DSPDIS);
++        } else {
++            generate_exception_end(ctx, EXCP_RI);
++        }
++    }
++}
++
+ /* This code generates a "reserved instruction" exception if the
+    CPU does not support the instruction set corresponding to flags. */
+ static inline void check_insn(DisasContext *ctx, uint64_t flags)
+@@ -20637,7 +20648,7 @@ static int decode_nanomips_32_48_opc(CPUMIPSState=
+ *env, DisasContext *ctx)
+                     gen_compute_branch_cp1_nm(ctx, OPC_BC1NEZ, rt, s);
+                     break;
+                 case NM_BPOSGE32C:
+-                    check_dspr2(ctx);
++                    check_dspr3(ctx);
+                     {
+                         int32_t imm =3D extract32(ctx->opcode, 1, 13) |
+                                       extract32(ctx->opcode, 0, 1) << 13=
+;
+diff --git a/target/mips/translate_init.inc.c b/target/mips/translate_ini=
+t.inc.c
+index b3320b9..d7cd4ee 100644
+--- a/target/mips/translate_init.inc.c
++++ b/target/mips/translate_init.inc.c
+@@ -485,7 +485,8 @@ const mips_def_t mips_defs[] =3D
+         .CP1_fcr31 =3D (1 << FCR31_ABS2008) | (1 << FCR31_NAN2008),
+         .SEGBITS =3D 32,
+         .PABITS =3D 32,
+-        .insn_flags =3D CPU_NANOMIPS32 | ASE_DSP | ASE_DSPR2 | ASE_MT,
++        .insn_flags =3D CPU_NANOMIPS32 | ASE_DSP | ASE_DSPR2 | ASE_DSPR3=
+ |
++                      ASE_MT,
+         .mmu_type =3D MMU_TYPE_R4000,
+     },
+ #if defined(TARGET_MIPS64)
 --=20
 2.7.4
