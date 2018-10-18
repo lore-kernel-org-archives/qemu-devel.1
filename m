@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40285)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40347)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gDEb7-0002if-Ux
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:08:46 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gDEb9-0002jw-Te
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:08:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gDEb6-0002xr-UY
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:08:45 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gDEb8-0002zJ-TT
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:08:47 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 18 Oct 2018 17:04:05 -0300
-Message-Id: <20181018200422.4358-29-ehabkost@redhat.com>
+Date: Thu, 18 Oct 2018 17:04:08 -0300
+Message-Id: <20181018200422.4358-32-ehabkost@redhat.com>
 In-Reply-To: <20181018200422.4358-1-ehabkost@redhat.com>
 References: <20181018200422.4358-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 28/45] memory-device: drop get_region_size()
+Subject: [Qemu-devel] [PULL 31/45] memory-device: complete factoring out
+ plug handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,95 +25,82 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Rob Her
 
 From: David Hildenbrand <david@redhat.com>
 
-There are no remaining users of get_region_size() except
-memory_device_get_region_size() itself. We can make
-memory_device_get_region_size() work directly on get_memory_region()
-instead and drop get_region_size().
-
-In addition, we can now use memory_device_get_region_size() in pc-dimm
-code to implement get_plugged_size()"
+With the new memory device functions in place, we can factor out
+plugging of memory devices completely.
 
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20181005092024.14344-12-david@redhat.com>
+Message-Id: <20181005092024.14344-15-david@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- include/hw/mem/memory-device.h |  1 -
- hw/mem/memory-device.c         | 11 +++++++++--
- hw/mem/pc-dimm.c               | 18 +-----------------
- 3 files changed, 10 insertions(+), 20 deletions(-)
+ include/hw/mem/memory-device.h |  3 +--
+ hw/mem/memory-device.c         | 13 ++++++++++---
+ hw/mem/pc-dimm.c               |  9 +--------
+ 3 files changed, 12 insertions(+), 13 deletions(-)
 
 diff --git a/include/hw/mem/memory-device.h b/include/hw/mem/memory-device.h
-index 659f38385c..9c3398bc4a 100644
+index d92acd2425..53d89dac89 100644
 --- a/include/hw/mem/memory-device.h
 +++ b/include/hw/mem/memory-device.h
-@@ -71,7 +71,6 @@ typedef struct MemoryDeviceClass {
-      * most devices, this corresponds to the size of the memory region.
-      */
-     uint64_t (*get_plugged_size)(const MemoryDeviceState *md, Error **errp);
--    uint64_t (*get_region_size)(const MemoryDeviceState *md, Error **errp);
- 
-     /*
-      * Return the memory region of the memory device.
+@@ -101,8 +101,7 @@ MemoryDeviceInfoList *qmp_memory_device_list(void);
+ uint64_t get_plugged_memory_size(void);
+ void memory_device_pre_plug(MemoryDeviceState *md, MachineState *ms,
+                             const uint64_t *legacy_align, Error **errp);
+-void memory_device_plug_region(MachineState *ms, MemoryRegion *mr,
+-                               uint64_t addr);
++void memory_device_plug(MemoryDeviceState *md, MachineState *ms);
+ void memory_device_unplug_region(MachineState *ms, MemoryRegion *mr);
+ uint64_t memory_device_get_region_size(const MemoryDeviceState *md,
+                                        Error **errp);
 diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
-index 425830c65c..07749bab69 100644
+index aa4ddd5918..6569896b7e 100644
 --- a/hw/mem/memory-device.c
 +++ b/hw/mem/memory-device.c
-@@ -268,9 +268,16 @@ void memory_device_unplug_region(MachineState *ms, MemoryRegion *mr)
- uint64_t memory_device_get_region_size(const MemoryDeviceState *md,
-                                        Error **errp)
- {
--    MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(md);
-+    const MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(md);
-+    MemoryRegion *mr;
- 
--    return mdc->get_region_size(md, errp);
-+    /* dropping const here is fine as we don't touch the memory region */
-+    mr = mdc->get_memory_region((MemoryDeviceState *)md, errp);
-+    if (!mr) {
-+        return 0;
-+    }
-+
-+    return memory_region_size(mr);
+@@ -273,10 +273,17 @@ out:
+     error_propagate(errp, local_err);
  }
  
- static const TypeInfo memory_device_info = {
+-void memory_device_plug_region(MachineState *ms, MemoryRegion *mr,
+-                               uint64_t addr)
++void memory_device_plug(MemoryDeviceState *md, MachineState *ms)
+ {
+-    /* we expect a previous call to memory_device_get_free_addr() */
++    const MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(md);
++    const uint64_t addr = mdc->get_addr(md);
++    MemoryRegion *mr;
++
++    /*
++     * We expect that a previous call to memory_device_pre_plug() succeeded, so
++     * it can't fail at this point.
++     */
++    mr = mdc->get_memory_region(md, &error_abort);
+     g_assert(ms->device_memory);
+ 
+     memory_region_add_subregion(&ms->device_memory->mr,
 diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-index c9f6ad589e..47b2e83389 100644
+index b2959bcf0e..647841bcd4 100644
 --- a/hw/mem/pc-dimm.c
 +++ b/hw/mem/pc-dimm.c
-@@ -236,21 +236,6 @@ static uint64_t pc_dimm_md_get_addr(const MemoryDeviceState *md)
-     return dimm->addr;
- }
- 
--static uint64_t pc_dimm_md_get_region_size(const MemoryDeviceState *md,
--                                           Error **errp)
--{
--    MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(md);
--    MemoryRegion *mr;
--
--    /* dropping const here is fine as we don't touch the memory region */
--    mr = mdc->get_memory_region((MemoryDeviceState *)md, errp);
--    if (!mr) {
--        return 0;
--    }
--
--    return memory_region_size(mr);
--}
--
- static MemoryRegion *pc_dimm_md_get_memory_region(MemoryDeviceState *md,
-                                                   Error **errp)
+@@ -63,17 +63,10 @@ out:
+ void pc_dimm_plug(PCDIMMDevice *dimm, MachineState *machine, Error **errp)
  {
-@@ -302,8 +287,7 @@ static void pc_dimm_class_init(ObjectClass *oc, void *data)
+     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+-    MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(dimm);
+     MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm,
+                                                               &error_abort);
+-    MemoryRegion *mr = mdc->get_memory_region(MEMORY_DEVICE(dimm),
+-                                              &error_abort);
+-    uint64_t addr;
+-
+-    addr = object_property_get_uint(OBJECT(dimm), PC_DIMM_ADDR_PROP,
+-                                    &error_abort);
  
-     mdc->get_addr = pc_dimm_md_get_addr;
-     /* for a dimm plugged_size == region_size */
--    mdc->get_plugged_size = pc_dimm_md_get_region_size;
--    mdc->get_region_size = pc_dimm_md_get_region_size;
-+    mdc->get_plugged_size = memory_device_get_region_size;
-     mdc->get_memory_region = pc_dimm_md_get_memory_region;
-     mdc->fill_device_info = pc_dimm_md_fill_device_info;
+-    memory_device_plug_region(machine, mr, addr);
++    memory_device_plug(MEMORY_DEVICE(dimm), machine);
+     vmstate_register_ram(vmstate_mr, DEVICE(dimm));
  }
+ 
 -- 
 2.18.0.rc1.1.g3f1ff2140
