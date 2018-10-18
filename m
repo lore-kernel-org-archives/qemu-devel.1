@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44473)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44425)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDDMX-0000n3-Ea
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDDMW-0000ms-67
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:49:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDDMW-0005pO-JY
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:49:37 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:56956 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDDMT-0005nX-SK
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:49:36 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:56927 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gDDMW-0005em-BY
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:49:36 -0400
+	id 1gDDMQ-0005WV-Jn
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 14:49:32 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 18 Oct 2018 20:47:41 +0200
-Message-Id: <1539888473-16340-17-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 18 Oct 2018 20:47:34 +0200
+Message-Id: <1539888473-16340-10-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1539888473-16340-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1539888473-16340-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v2 16/28] target/mips: Add bit definitions for
- DSP R3 ASE
+Subject: [Qemu-devel] [PULL v2 09/28] target/mips: Add a comment before each
+ CP0 register section in cpu.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +28,218 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
-From: Stefan Markovic <smarkovic@wavecomp.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add DSP R3 ASE related bit definition for insn_flags and hflags.
+Add a comment before each CP0 register section in CPUMIPSState
+definition, thus visually separating these sections.
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+Reviewed-by: Stefan Markovic <smarkovic@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/cpu.h       | 1 +
- target/mips/mips-defs.h | 1 +
- 2 files changed, 2 insertions(+)
+ target/mips/cpu.h | 88 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 88 insertions(+)
 
 diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 3b3509c..7f4e6d0 100644
+index cd54073..37703ea 100644
 --- a/target/mips/cpu.h
 +++ b/target/mips/cpu.h
-@@ -795,6 +795,7 @@ struct CPUMIPSState {
-     /* MIPS DSP resources access. */
- #define MIPS_HFLAG_DSP   0x080000  /* Enable access to MIPS DSP resources. */
- #define MIPS_HFLAG_DSPR2 0x100000  /* Enable access to MIPS DSPR2 resources. */
-+#define MIPS_HFLAG_DSPR3 0x20000000 /* Enable access to MIPS DSPR3 resources.*/
-     /* Extra flag about HWREna register. */
- #define MIPS_HFLAG_HWRENA_ULR 0x200000 /* ULR bit from HWREna is set. */
- #define MIPS_HFLAG_SBRI  0x400000 /* R6 SDBBP causes RI excpt. in user mode */
-diff --git a/target/mips/mips-defs.h b/target/mips/mips-defs.h
-index 66b7953..a23c4ed 100644
---- a/target/mips/mips-defs.h
-+++ b/target/mips/mips-defs.h
-@@ -53,6 +53,7 @@
- #define ASE_MDMX          0x0000000400000000ULL
- #define ASE_DSP           0x0000000800000000ULL
- #define ASE_DSPR2         0x0000001000000000ULL
-+#define ASE_DSPR3         0x0000002000000000ULL
- #define ASE_MT            0x0000004000000000ULL
- #define ASE_SMARTMIPS     0x0000008000000000ULL
- #define ASE_MICROMIPS     0x0000010000000000ULL
+@@ -304,10 +304,16 @@ struct CPUMIPSState {
+  * 7   TagLo             TagHi                               KScratch<n>
+  *
+  */
++/*
++ * CP0 Register 0
++ */
+     int32_t CP0_Index;
+     /* CP0_MVP* are per MVP registers. */
+     int32_t CP0_VPControl;
+ #define CP0VPCtl_DIS    0
++/*
++ * CP0 Register 1
++ */
+     int32_t CP0_Random;
+     int32_t CP0_VPEControl;
+ #define CP0VPECo_YSI	21
+@@ -348,7 +354,13 @@ struct CPUMIPSState {
+ #define CP0VPEOpt_DWX2	2
+ #define CP0VPEOpt_DWX1	1
+ #define CP0VPEOpt_DWX0	0
++/*
++ * CP0 Register 2
++ */
+     uint64_t CP0_EntryLo0;
++/*
++ * CP0 Register 3
++ */
+     uint64_t CP0_EntryLo1;
+ #if defined(TARGET_MIPS64)
+ # define CP0EnLo_RI 63
+@@ -359,8 +371,14 @@ struct CPUMIPSState {
+ #endif
+     int32_t CP0_GlobalNumber;
+ #define CP0GN_VPId 0
++/*
++ * CP0 Register 4
++ */
+     target_ulong CP0_Context;
+     target_ulong CP0_KScratch[MIPS_KSCRATCH_NUM];
++/*
++ * CP0 Register 5
++ */
+     int32_t CP0_PageMask;
+     int32_t CP0_PageGrain_rw_bitmask;
+     int32_t CP0_PageGrain;
+@@ -398,6 +416,9 @@ struct CPUMIPSState {
+ #define CP0SC2_XR       56
+ #define CP0SC2_XR_MASK  (0xFFULL << CP0SC2_XR)
+ #define CP0SC2_MASK     (CP0SC_1GMASK | (CP0SC_1GMASK << 16) | CP0SC2_XR_MASK)
++/*
++ * CP0 Register 6
++ */
+     int32_t CP0_Wired;
+     int32_t CP0_SRSConf0_rw_bitmask;
+     int32_t CP0_SRSConf0;
+@@ -428,16 +449,34 @@ struct CPUMIPSState {
+ #define CP0SRSC4_SRS15	20
+ #define CP0SRSC4_SRS14	10
+ #define CP0SRSC4_SRS13	0
++/*
++ * CP0 Register 7
++ */
+     int32_t CP0_HWREna;
++/*
++ * CP0 Register 8
++ */
+     target_ulong CP0_BadVAddr;
+     uint32_t CP0_BadInstr;
+     uint32_t CP0_BadInstrP;
+     uint32_t CP0_BadInstrX;
++/*
++ * CP0 Register 9
++ */
+     int32_t CP0_Count;
++/*
++ * CP0 Register 10
++ */
+     target_ulong CP0_EntryHi;
+ #define CP0EnHi_EHINV 10
+     target_ulong CP0_EntryHi_ASID_mask;
++/*
++ * CP0 Register 11
++ */
+     int32_t CP0_Compare;
++/*
++ * CP0 Register 12
++ */
+     int32_t CP0_Status;
+ #define CP0St_CU3   31
+ #define CP0St_CU2   30
+@@ -479,6 +518,9 @@ struct CPUMIPSState {
+ #define CP0SRSMap_SSV2 8
+ #define CP0SRSMap_SSV1 4
+ #define CP0SRSMap_SSV0 0
++/*
++ * CP0 Register 13
++ */
+     int32_t CP0_Cause;
+ #define CP0Ca_BD   31
+ #define CP0Ca_TI   30
+@@ -490,12 +532,21 @@ struct CPUMIPSState {
+ #define CP0Ca_IP    8
+ #define CP0Ca_IP_mask 0x0000FF00
+ #define CP0Ca_EC    2
++/*
++ * CP0 Register 14
++ */
+     target_ulong CP0_EPC;
++/*
++ * CP0 Register 15
++ */
+     int32_t CP0_PRid;
+     target_ulong CP0_EBase;
+     target_ulong CP0_EBaseWG_rw_bitmask;
+ #define CP0EBase_WG 11
+     target_ulong CP0_CMGCRBase;
++/*
++ * CP0 Register 16
++ */
+     int32_t CP0_Config0;
+ #define CP0C0_M    31
+ #define CP0C0_K23  28    /* 30..28 */
+@@ -612,6 +663,9 @@ struct CPUMIPSState {
+     uint64_t CP0_MAAR[MIPS_MAAR_MAX];
+     int32_t CP0_MAARI;
+     /* XXX: Maybe make LLAddr per-TC? */
++/*
++ * CP0 Register 17
++ */
+     uint64_t lladdr;
+     target_ulong llval;
+     target_ulong llnewval;
+@@ -620,11 +674,23 @@ struct CPUMIPSState {
+     target_ulong llreg;
+     uint64_t CP0_LLAddr_rw_bitmask;
+     int CP0_LLAddr_shift;
++/*
++ * CP0 Register 18
++ */
+     target_ulong CP0_WatchLo[8];
++/*
++ * CP0 Register 19
++ */
+     int32_t CP0_WatchHi[8];
+ #define CP0WH_ASID 16
++/*
++ * CP0 Register 20
++ */
+     target_ulong CP0_XContext;
+     int32_t CP0_Framemask;
++/*
++ * CP0 Register 23
++ */
+     int32_t CP0_Debug;
+ #define CP0DB_DBD  31
+ #define CP0DB_DM   30
+@@ -644,18 +710,40 @@ struct CPUMIPSState {
+ #define CP0DB_DDBL 2
+ #define CP0DB_DBp  1
+ #define CP0DB_DSS  0
++/*
++ * CP0 Register 24
++ */
+     target_ulong CP0_DEPC;
++/*
++ * CP0 Register 25
++ */
+     int32_t CP0_Performance0;
++/*
++ * CP0 Register 26
++ */
+     int32_t CP0_ErrCtl;
+ #define CP0EC_WST 29
+ #define CP0EC_SPR 28
+ #define CP0EC_ITC 26
++/*
++ * CP0 Register 28
++ */
+     uint64_t CP0_TagLo;
+     int32_t CP0_DataLo;
++/*
++ * CP0 Register 29
++ */
+     int32_t CP0_TagHi;
+     int32_t CP0_DataHi;
++/*
++ * CP0 Register 30
++ */
+     target_ulong CP0_ErrorEPC;
++/*
++ * CP0 Register 31
++ */
+     int32_t CP0_DESAVE;
++
+     /* We waste some space so we can handle shadow registers like TCs. */
+     TCState tcs[MIPS_SHADOW_SET_MAX];
+     CPUMIPSFPUContext fpus[MIPS_FPU_MAX];
 -- 
 2.7.4
