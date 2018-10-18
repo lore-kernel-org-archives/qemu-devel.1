@@ -1,26 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58173)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34728)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pizhenwei@bytedance.com>) id 1gD5kv-0005I1-Sa
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 06:42:18 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1gD9HQ-0003Kv-2H
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:28:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pizhenwei@bytedance.com>) id 1gD5ks-0001wT-Iy
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 06:42:17 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:39513)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pizhenwei@bytedance.com>)
-	id 1gD5ks-0001ve-9C
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 06:42:14 -0400
-Received: by mail-pl1-x641.google.com with SMTP id e67-v6so5165865plb.6
-	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 03:42:13 -0700 (PDT)
-From: zhenwei pi <pizhenwei@bytedance.com>
-Message-ID: <a4205609-576c-49cd-1ef6-650491222ff0@bytedance.com>
-Date: Thu, 18 Oct 2018 18:42:09 +0800
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: [Qemu-devel] [PATCH] blockdev: report error on block latency
- histogram set error
+	(envelope-from <eric.auger@redhat.com>) id 1gD9HP-0002yu-4m
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 10:28:03 -0400
+From: Eric Auger <eric.auger@redhat.com>
+Date: Thu, 18 Oct 2018 16:27:43 +0200
+Message-Id: <20181018142743.29489-1-eric.auger@redhat.com>
+Subject: [Qemu-devel] [PATCH] hw/arm/boot: introduce fdt_add_memory_node
+ helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,70 +18,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kwolf@redhat.com, mreitz@redhat.com
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, vsementsov@virtuozzo.com
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com
+Cc: drjones@redhat.com
 
-Function block_latency_histogram_set may return error, but qapi ignore this.
-This can be reproduced easily by qmp command:
-virsh qemu-monitor-command INSTANCE '{"execute":"x-block-latency-histogram-set",
-"arguments":{"device":"drive-virtio-disk1","boundaries":[10,200,40]}}'
-In fact this command does not work, but we still get success result.
+From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 
-qmp_x_block_latency_histogram_set is a batch setting API, report error ASAP.
+We introduce an helper to create a memory node.
 
-Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 ---
-  blockdev.c | 19 ++++++++++++++++---
-  1 file changed, 16 insertions(+), 3 deletions(-)
+ hw/arm/boot.c | 54 ++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 34 insertions(+), 20 deletions(-)
 
-diff --git a/blockdev.c b/blockdev.c
-index a8755bd..03b1aa3 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -4377,6 +4377,7 @@ void qmp_x_block_latency_histogram_set(
-  {
-      BlockBackend *blk = blk_by_name(device);
-      BlockAcctStats *stats;
+diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+index 20c71d7d96..ba2004da5c 100644
+--- a/hw/arm/boot.c
++++ b/hw/arm/boot.c
+@@ -413,6 +413,36 @@ static void set_kernel_args_old(const struct arm_boot_info *info,
+     }
+ }
+ 
++static int fdt_add_memory_node(void *fdt, uint32_t acells, hwaddr mem_base,
++                               uint32_t scells, hwaddr mem_len,
++                               int numa_node_id)
++{
++    char *nodename = NULL;
 +    int ret;
-  
-      if (!blk) {
-          error_setg(errp, "Device '%s' not found", device);
-@@ -4392,21 +4393,33 @@ void qmp_x_block_latency_histogram_set(
-      }
-  
-      if (has_boundaries || has_boundaries_read) {
--        block_latency_histogram_set(
-+        ret = block_latency_histogram_set(
-              stats, BLOCK_ACCT_READ,
-              has_boundaries_read ? boundaries_read : boundaries);
-+        if (ret) {
-+            error_setg(errp, "Device '%s' set read boundaries fail", device);
-+            return;
-+        }
-      }
-  
-      if (has_boundaries || has_boundaries_write) {
--        block_latency_histogram_set(
-+        ret = block_latency_histogram_set(
-              stats, BLOCK_ACCT_WRITE,
-              has_boundaries_write ? boundaries_write : boundaries);
-+        if (ret) {
-+            error_setg(errp, "Device '%s' set write boundaries fail", device);
-+            return;
-+        }
-      }
-  
-      if (has_boundaries || has_boundaries_flush) {
--        block_latency_histogram_set(
-+        ret = block_latency_histogram_set(
-              stats, BLOCK_ACCT_FLUSH,
-              has_boundaries_flush ? boundaries_flush : boundaries);
-+        if (ret) {
-+            error_setg(errp, "Device '%s' set flush boundaries fail", device);
-+            return;
-+        }
-      }
-  }
-  
++
++    nodename = g_strdup_printf("/memory@%" PRIx64, mem_base);
++    qemu_fdt_add_subnode(fdt, nodename);
++    qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
++    ret = qemu_fdt_setprop_sized_cells(fdt, nodename, "reg", acells, mem_base,
++                                       scells, mem_len);
++    if (ret < 0) {
++        fprintf(stderr, "couldn't set %s/reg\n", nodename);
++        goto out;
++    }
++    if (numa_node_id < 0) {
++        goto out;
++    }
++
++    ret = qemu_fdt_setprop_cell(fdt, nodename, "numa-node-id", numa_node_id);
++    if (ret < 0) {
++        fprintf(stderr, "couldn't set %s/numa-node-id\n", nodename);
++    }
++
++out:
++    g_free(nodename);
++    return ret;
++}
++
+ static void fdt_add_psci_node(void *fdt)
+ {
+     uint32_t cpu_suspend_fn;
+@@ -492,7 +522,6 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+     void *fdt = NULL;
+     int size, rc, n = 0;
+     uint32_t acells, scells;
+-    char *nodename;
+     unsigned int i;
+     hwaddr mem_base, mem_len;
+     char **node_path;
+@@ -566,35 +595,20 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+         mem_base = binfo->loader_start;
+         for (i = 0; i < nb_numa_nodes; i++) {
+             mem_len = numa_info[i].node_mem;
+-            nodename = g_strdup_printf("/memory@%" PRIx64, mem_base);
+-            qemu_fdt_add_subnode(fdt, nodename);
+-            qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
+-            rc = qemu_fdt_setprop_sized_cells(fdt, nodename, "reg",
+-                                              acells, mem_base,
+-                                              scells, mem_len);
++            rc = fdt_add_memory_node(fdt, acells, mem_base,
++                                     scells, mem_len, i);
+             if (rc < 0) {
+-                fprintf(stderr, "couldn't set %s/reg for node %d\n", nodename,
+-                        i);
+                 goto fail;
+             }
+ 
+-            qemu_fdt_setprop_cell(fdt, nodename, "numa-node-id", i);
+             mem_base += mem_len;
+-            g_free(nodename);
+         }
+     } else {
+-        nodename = g_strdup_printf("/memory@%" PRIx64, binfo->loader_start);
+-        qemu_fdt_add_subnode(fdt, nodename);
+-        qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
+-
+-        rc = qemu_fdt_setprop_sized_cells(fdt, nodename, "reg",
+-                                          acells, binfo->loader_start,
+-                                          scells, binfo->ram_size);
++        rc = fdt_add_memory_node(fdt, acells, binfo->loader_start,
++                                 scells, binfo->ram_size, -1);
+         if (rc < 0) {
+-            fprintf(stderr, "couldn't set %s reg\n", nodename);
+             goto fail;
+         }
+-        g_free(nodename);
+     }
+ 
+     rc = fdt_path_offset(fdt, "/chosen");
 -- 
-2.7.4
+2.17.1
