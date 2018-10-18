@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57863)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60472)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gDACQ-00070l-0S
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 11:26:59 -0400
+	(envelope-from <crosa@redhat.com>) id 1gDAH2-0000zU-7N
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 11:31:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gDACO-00047U-QU
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 11:26:57 -0400
-Date: Thu, 18 Oct 2018 16:26:30 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20181018152630.GA3442@stefanha-x1.localdomain>
-References: <cover.1539860473.git.artem.k.pisarenko@gmail.com>
-	<71d3b9366dc8e7f0dab1f290d5944cb84e3cc876.1539860473.git.artem.k.pisarenko@gmail.com>
+	(envelope-from <crosa@redhat.com>) id 1gDAGz-0000WJ-8o
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 11:31:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35586)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gDAGy-0000RP-Pk
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 11:31:41 -0400
+From: Cleber Rosa <crosa@redhat.com>
+Date: Thu, 18 Oct 2018 11:31:32 -0400
+Message-Id: <20181018153134.8493-2-crosa@redhat.com>
+In-Reply-To: <20181018153134.8493-1-crosa@redhat.com>
+References: <20181018153134.8493-1-crosa@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="HcAYCG3uE/tztfnV"
-Content-Disposition: inline
-In-Reply-To: <71d3b9366dc8e7f0dab1f290d5944cb84e3cc876.1539860473.git.artem.k.pisarenko@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v3 2/4] Introduce attributes to qemu timer
- subsystem
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v7 1/3] Bootstrap Python venv for tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,65 +26,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Artem Pisarenko <artem.k.pisarenko@gmail.com>
-Cc: qemu-devel@nongnu.org, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block I/O path" <qemu-block@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Caio Carrara <ccarrara@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Cleber Rosa <crosa@redhat.com>
 
+A number of QEMU tests are written in Python, and may benefit
+from an untainted Python venv.
 
---HcAYCG3uE/tztfnV
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+By using make rules, tests that depend on specific Python libs
+can set that rule as a requirement, along with rules that require
+the presence or installation of specific libraries.
 
-On Thu, Oct 18, 2018 at 05:04:29PM +0600, Artem Pisarenko wrote:
-> Attributes are simple flags, associated with individual timers for their =
-whole lifetime.
-> They intended to be used to mark individual timers for special handling b=
-y various qemu features which have integration into qemu-timer.
-> New/init functions family in timer interface updated and refactored (new =
-'attribute' argument added, timer_list replaced with timer_list_group+type =
-combinations, comments improved to avoid info duplication).
-> Also existing aio interface extended with attribute-enabled variants of f=
-unctions, which create/initialize timers.
->=20
-> Signed-off-by: Artem Pisarenko <artem.k.pisarenko@gmail.com>
-> ---
->=20
-> Notes:
->     v3:
->     - attributes has been properly incapsulated to qemu-timer (as suggest=
-ed by Stefan Hajnoczi)
->     - attributes definition and docs refactored to avoid extra enum and u=
-se simple macros with explicit bit positions (as suggested by Stefan Hajnoc=
-zi and Paolo Bonzini)
->     - fixed old "QEMU_TIMER_ATTR(id)" notation (in comments) left from in=
-itial patch version
->    =20
->     v2:
->     - timer creation/initialize functions reworked and and their unnecess=
-ary variants removed (as Paolo Bonzini suggested)
->     - also their comments improved to avoid info duplication
->=20
->  include/block/aio.h       |  59 ++++++++++++++++++++++---
->  include/qemu/timer.h      | 110 +++++++++++++++++++++++-----------------=
-------
->  tests/ptimer-test-stubs.c |  13 ++++--
->  util/qemu-timer.c         |  13 ++++--
->  4 files changed, 125 insertions(+), 70 deletions(-)
+The tests/requirements.txt is supposed to contain the Python
+requirements that should be added to the venv created by check-venv.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Cleber Rosa <crosa@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+Acked-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Reviewed-by: Caio Carrara <ccarrara@redhat.com>
+---
+ tests/Makefile.include | 26 ++++++++++++++++++++++++++
+ tests/requirements.txt |  3 +++
+ 2 files changed, 29 insertions(+)
+ create mode 100644 tests/requirements.txt
 
---HcAYCG3uE/tztfnV
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJbyKYmAAoJEJykq7OBq3PILBkIALYxT8+9bw0r0f1scd9DITA0
-1Le/LX3TqrugD63SNigsu38nAiXfqkrWiXESt90xpP3X8B8NpXyEEK/rSZ6SCba3
-X7p9eighYnSeYLxui3PtmgInWMkU5JWmdrvi05X/c08crIkUx1iuNpfARohOXOAP
-dfp03kiXr5/FaQy3uC/nZxDIcdahHz0A3YpjSw0bJ+OJgMJdGuDLbTJ7tmVCqf0p
-3zp2n1/i7age8dsqf+FBe3BaDKB4V7bDoRoXIc1d5ots5MyLdnEOxbO/3eAX9eXh
-D7VPRKP36H5ixIpvZF7v9UBYvF4pHPV1iLo4sGvoT7PcEBrE4IT6xe7czSEqhS8=
-=9eca
------END PGP SIGNATURE-----
-
---HcAYCG3uE/tztfnV--
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 7fe8578972..004a86f274 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -12,6 +12,7 @@ check-help:
+ 	@echo " $(MAKE) check-block          Run block tests"
+ 	@echo " $(MAKE) check-tcg            Run TCG tests"
+ 	@echo " $(MAKE) check-report.html    Generates an HTML test report"
++	@echo " $(MAKE) check-venv           Creates a Python venv for tests"
+ 	@echo " $(MAKE) check-clean          Clean the tests"
+ 	@echo
+ 	@echo "Please note that HTML reports do not regenerate if the unit test=
+s"
+@@ -899,6 +900,30 @@ check-decodetree:
+           ./check.sh "$(PYTHON)" "$(SRC_PATH)/scripts/decodetree.py", \
+           TEST, decodetree.py)
+=20
++# Python venv for running tests
++
++.PHONY: check-venv
++
++TESTS_VENV_DIR=3D$(BUILD_DIR)/tests/venv
++TESTS_VENV_REQ=3D$(SRC_PATH)/tests/requirements.txt
++
++$(shell $(PYTHON) -c 'import sys; assert sys.version_info >=3D (3,0)' >/=
+dev/null 2>&1)
++ifeq ($(.SHELLSTATUS),0)
++$(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
++	$(call quiet-command, \
++            $(PYTHON) -m venv --system-site-packages $@, \
++            VENV, $@)
++	$(call quiet-command, \
++            $(TESTS_VENV_DIR)/bin/python -m pip -q install -r $(TESTS_VE=
+NV_REQ), \
++            PIP, $(TESTS_VENV_REQ))
++	$(call quiet-command, touch $@)
++else
++$(TESTS_VENV_DIR):
++	$(error "venv directory for tests requires Python 3")
++endif
++
++check-venv: $(TESTS_VENV_DIR)
++
+ # Consolidated targets
+=20
+ .PHONY: check-qapi-schema check-qtest check-unit check check-clean
+@@ -912,6 +937,7 @@ check-clean:
+ 	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
+ 	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(t=
+arget)-y)) $(check-qtest-generic-y))
+ 	rm -f tests/test-qapi-gen-timestamp
++	rm -rf $(TESTS_VENV_DIR)
+=20
+ clean: check-clean
+=20
+diff --git a/tests/requirements.txt b/tests/requirements.txt
+new file mode 100644
+index 0000000000..d39f9d1576
+--- /dev/null
++++ b/tests/requirements.txt
+@@ -0,0 +1,3 @@
++# Add Python module requirements, one per line, to be installed
++# in the tests/venv Python virtual environment. For more info,
++# refer to: https://pip.pypa.io/en/stable/user_guide/#id1
+--=20
+2.17.1
