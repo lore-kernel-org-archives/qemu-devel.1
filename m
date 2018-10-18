@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41025)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gDEc9-0003r7-8t
+	(envelope-from <ehabkost@redhat.com>) id 1gDEc9-0003rD-CT
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:09:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gDEc8-0004RL-E9
+	(envelope-from <ehabkost@redhat.com>) id 1gDEc8-0004RQ-IJ
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:09:49 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 18 Oct 2018 17:04:19 -0300
-Message-Id: <20181018200422.4358-43-ehabkost@redhat.com>
+Date: Thu, 18 Oct 2018 17:04:18 -0300
+Message-Id: <20181018200422.4358-42-ehabkost@redhat.com>
 In-Reply-To: <20181018200422.4358-1-ehabkost@redhat.com>
 References: <20181018200422.4358-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 42/45] net: stellaris_enet: convert SysBus init
+Subject: [Qemu-devel] [PULL 41/45] net: smc91c111: convert SysBus init
  method to a realize method
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,51 +28,48 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Rob Her
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Message-Id: <20181001063803.22330-9-clg@kaod.org>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20181001063803.22330-10-clg@kaod.org>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/net/stellaris_enet.c | 8 +++-----
+ hw/net/smc91c111.c | 8 +++-----
  1 file changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/hw/net/stellaris_enet.c b/hw/net/stellaris_enet.c
-index 165562d788..3ee1e0f8a4 100644
---- a/hw/net/stellaris_enet.c
-+++ b/hw/net/stellaris_enet.c
-@@ -473,9 +473,9 @@ static NetClientInfo net_stellaris_enet_info =3D {
-     .receive =3D stellaris_enet_receive,
+diff --git a/hw/net/smc91c111.c b/hw/net/smc91c111.c
+index d2fd2040e8..99da2d9297 100644
+--- a/hw/net/smc91c111.c
++++ b/hw/net/smc91c111.c
+@@ -766,9 +766,9 @@ static NetClientInfo net_smc91c111_info =3D {
+     .receive =3D smc91c111_receive,
  };
 =20
--static int stellaris_enet_init(SysBusDevice *sbd)
-+static void stellaris_enet_realize(DeviceState *dev, Error **errp)
+-static int smc91c111_init1(SysBusDevice *sbd)
++static void smc91c111_realize(DeviceState *dev, Error **errp)
  {
 -    DeviceState *dev =3D DEVICE(sbd);
 +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
-     stellaris_enet_state *s =3D STELLARIS_ENET(dev);
+     smc91c111_state *s =3D SMC91C111(dev);
 =20
-     memory_region_init_io(&s->mmio, OBJECT(s), &stellaris_enet_ops, s,
-@@ -489,7 +489,6 @@ static int stellaris_enet_init(SysBusDevice *sbd)
+     memory_region_init_io(&s->mmio, OBJECT(s), &smc91c111_mem_ops, s,
+@@ -780,7 +780,6 @@ static int smc91c111_init1(SysBusDevice *sbd)
+                           object_get_typename(OBJECT(dev)), dev->id, s);
      qemu_format_nic_info_str(qemu_get_queue(s->nic), s->conf.macaddr.a);
-=20
-     stellaris_enet_reset(s);
+     /* ??? Save/restore.  */
 -    return 0;
  }
 =20
- static Property stellaris_enet_properties[] =3D {
-@@ -500,9 +499,8 @@ static Property stellaris_enet_properties[] =3D {
- static void stellaris_enet_class_init(ObjectClass *klass, void *data)
+ static Property smc91c111_properties[] =3D {
+@@ -791,9 +790,8 @@ static Property smc91c111_properties[] =3D {
+ static void smc91c111_class_init(ObjectClass *klass, void *data)
  {
      DeviceClass *dc =3D DEVICE_CLASS(klass);
 -    SysBusDeviceClass *k =3D SYS_BUS_DEVICE_CLASS(klass);
 =20
--    k->init =3D stellaris_enet_init;
-+    dc->realize =3D stellaris_enet_realize;
-     dc->props =3D stellaris_enet_properties;
-     dc->vmsd =3D &vmstate_stellaris_enet;
- }
+-    k->init =3D smc91c111_init1;
++    dc->realize =3D smc91c111_realize;
+     dc->reset =3D smc91c111_reset;
+     dc->vmsd =3D &vmstate_smc91c111;
+     dc->props =3D smc91c111_properties;
 --=20
 2.18.0.rc1.1.g3f1ff2140
