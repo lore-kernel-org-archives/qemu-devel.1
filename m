@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52377)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36526)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ccarrara@redhat.com>) id 1gDDiE-0004DC-Ie
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 15:12:03 -0400
+	(envelope-from <Aaron@os.amperecomputing.com>) id 1gDEOw-0004qb-FV
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 15:56:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ccarrara@redhat.com>) id 1gDDiB-0003Oo-CM
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 15:12:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46656)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ccarrara@redhat.com>) id 1gDDiB-0003Mk-5W
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 15:11:59 -0400
-Reply-To: ccarrara@redhat.com
-References: <20181018162057.19348-1-wainersm@redhat.com>
-From: Caio Carrara <ccarrara@redhat.com>
-Message-ID: <1444866c-59e1-1ef9-b137-b0607f34d219@redhat.com>
-Date: Thu, 18 Oct 2018 16:11:47 -0300
-MIME-Version: 1.0
-In-Reply-To: <20181018162057.19348-1-wainersm@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <Aaron@os.amperecomputing.com>) id 1gDEOq-0008In-La
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 15:56:08 -0400
+From: Aaron Lindsay <Aaron@os.amperecomputing.com>
+Date: Thu, 18 Oct 2018 19:55:04 +0000
+Message-ID: <20181018195456.GF12691@quinoa.localdomain>
+References: <20181010203735.27918-1-aclindsa@gmail.com>
+	<20181010203735.27918-13-aclindsa@gmail.com>
+	<0fdcad4a-c8b5-3309-d2ce-f9be901ec52a@linaro.org>
+	<20181017192013.GA25905@quinoa.localdomain>
+	<31f327f4-42ee-55fc-596d-97d935803867@linaro.org>
+	<20181017202505.GC25905@quinoa.localdomain>
+	<ddceb720-97d2-22fa-e58a-7283fb416c29@linaro.org>
+In-Reply-To: <ddceb720-97d2-22fa-e58a-7283fb416c29@linaro.org>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] Acceptance tests: add Linux initrd
- checking test
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <DCF50956F035B347998E5F63B6B81EB6@prod.exchangelabs.com>
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v6 12/14] target/arm: PMU: Set PMCR.N to 4
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +30,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, crosa@redhat.com, philmd@redhat.com, lizhijian@cn.fujitsu.com
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: Aaron Lindsay <aclindsa@gmail.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Michael Spradling <mspradli@codeaurora.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Digant Desai <digantd@codeaurora.org>
 
-Hi Wainer,
+On Oct 17 14:14, Richard Henderson wrote:
+> On 10/17/18 1:25 PM, Aaron Lindsay wrote:
+> > I suppose pmcrn (the local variable) should've been set to 0 before thi=
+s
+> > patch and updated here to be 4.
+>=20
+> That's plausible.
+>=20
+> > Anyway, by splitting these patches apart, my intention was to separate
+> > the plumbing work from turning on the water. If you believe it is bette=
+r
+> > to do both in the same patch, I'll make that change for v7.
+>=20
+> Fair.  I'll let Peter weigh in for final decision.
 
-On 18-10-2018 13:20, Wainer dos Santos Moschetta wrote:
-> [...]
-> +    def test_with_2GB_file_should_exit_error_msg(self):
-> +        """
-> +        Pretends to boot QEMU with an initrd file with size of 2GB
-> +        and expect it exits with error message.
-> +        Regression test for bug fixed on commit f3839fda5771596152.
-> +        """
-> +        kernel_url = ('https://mirrors.kernel.org/fedora/releases/28/'
-> +                      'Everything/x86_64/os/images/pxeboot/vmlinuz')
-> +        kernel_hash = '238e083e114c48200f80d889f7e32eeb2793e02a'
-> +        kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
-> +
-> +        with tempfile.NamedTemporaryFile() as initrd:
-> +            initrd.seek(2048*(1024**2) -1)
-> +            initrd.write(b'\0')
-> +            initrd.flush()
-> +            cmd = "%s -kernel %s -initrd %s" % (self.qemu_bin, kernel_path,
-> +                                                initrd.name)
-> +            res = run(cmd, ignore_status=True)
-> +            self.assertNotEqual(res.exit_status, 0)
-> +            expected_msg = r'.*initrd is too large.*max: \d+, need \d+.*'
-> +            self.assertRegex(res.stderr_text, expected_msg)
-> 
+At a minimum, I've updated my local tree so that pmcrn is initially set
+to 0 in 'target/arm: Finish implementation of PM[X]EVCNTR and
+PM[X]EVTYPER' and updated to 4 in this patch. And I'll squash them
+instead if that ends up being the decision.=20
 
-At least on my run this test is the first one to fail (with error) due
-Python version (on Py2 there's no assertRegex method). AFIK we're moving
-towards only Py3 support on the acceptance tests, right? The current
-behavior (error) is the expected?
-
-Since the comment above is just for clarification and not a blocking issue:
-
-Reviewed-by: Caio Carrara <ccarrara@redhat.com>
-Tested-by: Caio Carrara <ccarrara@redhat.com>
-
--- 
-Caio Carrara
-Software Engineer, Virt Team
-Red Hat
-ccarrara@redhat.com
+-Aaron
