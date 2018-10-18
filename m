@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36705)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gD6CW-00052h-O4
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 07:10:49 -0400
+	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gD6If-0007yy-WA
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 07:17:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gD6CT-0002yK-Kn
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 07:10:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39768)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1gD6CT-0002xM-9F
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 07:10:45 -0400
-Date: Thu, 18 Oct 2018 13:10:41 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20181018111041.GA4946@localhost.localdomain>
-References: <20181017082702.5581-1-armbru@redhat.com>
-	<20181017082702.5581-4-armbru@redhat.com>
-	<20181017135043.GE31479@localhost.localdomain>
-	<878t2wo518.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <878t2wo518.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v4 03/38] block: Use warn_report() &
- friends to report warnings
+	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gD6Ia-0007r9-Jk
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 07:17:08 -0400
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:46133)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <artem.k.pisarenko@gmail.com>)
+	id 1gD6IY-0007oi-Cl
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 07:17:04 -0400
+Received: by mail-lj1-x241.google.com with SMTP id x3-v6so27315870lji.13
+	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 04:16:59 -0700 (PDT)
+From: Artem Pisarenko <artem.k.pisarenko@gmail.com>
+Date: Thu, 18 Oct 2018 17:16:11 +0600
+Message-Id: <ecc524bb47e169394f9bed88c979fdc8d990111a.1539861171.git.artem.k.pisarenko@gmail.com>
+In-Reply-To: <cover.1539860473.git.artem.k.pisarenko@gmail.com>
+References: <cover.1539860473.git.artem.k.pisarenko@gmail.com>
+Subject: [Qemu-devel] [PATCH v3] Optimize record/replay checkpointing for
+ all clocks it applies to
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,107 +27,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Liu Yuan <namei.unix@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Paolo Bonzini <pbonzini@redhat.com>, Artem Pisarenko <artem.k.pisarenko@gmail.com>
 
-Am 17.10.2018 um 19:29 hat Markus Armbruster geschrieben:
-> Kevin Wolf <kwolf@redhat.com> writes:
-> 
-> > Am 17.10.2018 um 10:26 hat Markus Armbruster geschrieben:
-> >> Calling error_report() in a function that takes an Error ** argument
-> >> is suspicious.  Convert a few that are actually warnings to
-> >> warn_report().
-> >> 
-> >> While there, split warnings consisting of multiple sentences to
-> >> conform to conventions spelled out in warn_report()'s contract, and
-> >> improve a rather useless warning in sheepdog.c.
-> >> 
-> >> Cc: Kevin Wolf <kwolf@redhat.com>
-> >> Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
-> >> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> >> Cc: Peter Lieven <pl@kamp.de>
-> >> Cc: Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>
-> >> Cc: Liu Yuan <namei.unix@gmail.com>
-> >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> >> Reviewed-by: Eric Blake <eblake@redhat.com>
-> >> ---
-> >>  block/bochs.c    |  8 ++++----
-> >>  block/cloop.c    |  8 ++++----
-> >>  block/dmg.c      |  8 ++++----
-> >>  block/iscsi.c    |  2 +-
-> >>  block/rbd.c      | 12 ++++++------
-> >>  block/sheepdog.c |  2 +-
-> >>  block/vvfat.c    |  8 ++++----
-> >>  7 files changed, 24 insertions(+), 24 deletions(-)
-> >> 
-> >> diff --git a/block/bochs.c b/block/bochs.c
-> >> index 50c630047b..36c1b45bd2 100644
-> >> --- a/block/bochs.c
-> >> +++ b/block/bochs.c
-> >> @@ -112,10 +112,10 @@ static int bochs_open(BlockDriverState *bs, QDict *options, int flags,
-> >>      }
-> >>  
-> >>      if (!bdrv_is_read_only(bs)) {
-> >> -        error_report("Opening bochs images without an explicit read-only=on "
-> >> -                     "option is deprecated. Future versions will refuse to "
-> >> -                     "open the image instead of automatically marking the "
-> >> -                     "image read-only.");
-> >> +        warn_report("Opening bochs images without an explicit read-only=on "
-> >> +                    "option is deprecated");
-> >> +        error_printf("Future versions may refuse to open the image "
-> >> +                     "instead of automatically marking it read-only.\n");
-> >>          ret = bdrv_set_read_only(bs, true, errp); /* no write support yet */
-> >>          if (ret < 0) {
-> >>              return ret;
-> >
-> > While I agree with your intention, it would be best to leave all of the
-> > !bdrv_is_read_only() warnings alone. My series "[PATCH v2 0/8] block:
-> > Add auto-read-only option" gets rid of the message entirely, so this
-> > would only add a merge conflict.
-> 
-> I wasn't are of that series.  I'm going to drop these hunks.  Left:
-> 
-> diff --git a/block/iscsi.c b/block/iscsi.c
-> index bb69faf34a..73998c2860 100644
-> --- a/block/iscsi.c
-> +++ b/block/iscsi.c
-> @@ -1844,7 +1844,7 @@ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
->      iscsi_set_timeout(iscsi, timeout);
->  #else
->      if (timeout) {
-> -        error_report("iSCSI: ignoring timeout value for libiscsi <1.15.0");
-> +        warn_report("iSCSI: ignoring timeout value for libiscsi <1.15.0");
->      }
->  #endif
->  
-> diff --git a/block/rbd.c b/block/rbd.c
-> index 014c68d629..6e26bac170 100644
-> --- a/block/rbd.c
-> +++ b/block/rbd.c
-> @@ -750,8 +750,8 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
->          /* Take care whenever deciding to actually deprecate; once this ability
->           * is removed, we will not be able to open any images with legacy-styled
->           * backing image strings. */
-> -        error_report("RBD options encoded in the filename as keyvalue pairs "
-> -                     "is deprecated");
-> +        warn_report("RBD options encoded in the filename as keyvalue pairs "
-> +                    "is deprecated");
->      }
->  
->      /* Remove the processed options from the QDict (the visitor processes
-> diff --git a/block/sheepdog.c b/block/sheepdog.c
-> index b229a664d9..0125df9d49 100644
-> --- a/block/sheepdog.c
-> +++ b/block/sheepdog.c
-> @@ -572,7 +572,7 @@ static int connect_to_sdog(BDRVSheepdogState *s, Error **errp)
->      if (s->addr->type == SOCKET_ADDRESS_TYPE_INET && fd >= 0) {
->          int ret = socket_set_nodelay(fd);
->          if (ret < 0) {
-> -            error_report("%s", strerror(errno));
-> +            warn_report("can't set TCP_NODELAY: %s", strerror(errno));
->          }
->      }
+Removes redundant checkpoints in replay log when there are no expired timers in timers list, associated with corresponding clock (i.e. no rr events associated with current clock value).
+This also improves performance in rr mode.
 
-Looks good to me.
+Signed-off-by: Artem Pisarenko <artem.k.pisarenko@gmail.com>
+---
 
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Oops, forgot to commit this fix
+
+    v3:
+    - fixed compiler warning caused non-debug build to fail
+
+ include/qemu/timer.h |  2 +-
+ util/qemu-timer.c    | 62 +++++++++++++++++++++++++---------------------------
+ 2 files changed, 31 insertions(+), 33 deletions(-)
+
+diff --git a/include/qemu/timer.h b/include/qemu/timer.h
+index dc0fd14..bff8dac 100644
+--- a/include/qemu/timer.h
++++ b/include/qemu/timer.h
+@@ -65,7 +65,7 @@ typedef enum {
+  * QEMU_TIMER_ATTR_EXTERNAL: drives external subsystem
+  *
+  * Timers with this attribute do not recorded in rr mode, therefore it could be
+- * used for the subsystems that operate outside the guest core. Applicable only
++ * used for the subsystems that operate outside the guest core. Relevant only
+  * with virtual clock type.
+  */
+ 
+diff --git a/util/qemu-timer.c b/util/qemu-timer.c
+index e2746cf..47205fe 100644
+--- a/util/qemu-timer.c
++++ b/util/qemu-timer.c
+@@ -490,6 +490,7 @@ bool timerlist_run_timers(QEMUTimerList *timer_list)
+     QEMUTimerCB *cb;
+     void *opaque;
+     bool need_replay_checkpoint = false;
++    ReplayCheckpoint replay_checkpoint_id = (ReplayCheckpoint)-1;
+ 
+     if (!atomic_read(&timer_list->active_timers)) {
+         return false;
+@@ -500,43 +501,40 @@ bool timerlist_run_timers(QEMUTimerList *timer_list)
+         goto out;
+     }
+ 
+-    switch (timer_list->clock->type) {
+-    case QEMU_CLOCK_REALTIME:
+-        break;
+-    default:
+-    case QEMU_CLOCK_VIRTUAL:
+-        if (replay_mode != REPLAY_MODE_NONE) {
+-            /* Checkpoint for virtual clock is redundant in cases where
+-             * it's being triggered with only non-EXTERNAL timers, because
+-             * these timers don't change guest state directly.
+-             * Since it has conditional dependence on specific timers, it is
+-             * subject to race conditions and requires special handling.
+-             * See below.
+-             */
++    if (replay_mode != REPLAY_MODE_NONE) {
++        /* Postpone actual checkpointing to timer list processing
++         * to properly check if we actually need it.
++         */
++        switch (timer_list->clock->type) {
++        case QEMU_CLOCK_VIRTUAL:
+             need_replay_checkpoint = true;
++            replay_checkpoint_id = CHECKPOINT_CLOCK_VIRTUAL;
++            break;
++        case QEMU_CLOCK_HOST:
++            need_replay_checkpoint = true;
++            replay_checkpoint_id = CHECKPOINT_CLOCK_HOST;
++            break;
++        case QEMU_CLOCK_VIRTUAL_RT:
++            need_replay_checkpoint = true;
++            replay_checkpoint_id = CHECKPOINT_CLOCK_VIRTUAL_RT;
++            break;
++        default:
++            break;
+         }
+-        break;
+-    case QEMU_CLOCK_HOST:
+-        if (!replay_checkpoint(CHECKPOINT_CLOCK_HOST)) {
+-            goto out;
+-        }
+-        break;
+-    case QEMU_CLOCK_VIRTUAL_RT:
+-        if (!replay_checkpoint(CHECKPOINT_CLOCK_VIRTUAL_RT)) {
+-            goto out;
+-        }
+-        break;
+     }
+ 
+     /*
+-     * Extract expired timers from active timers list and and process them.
++     * Extract expired timers from active timers list and and process them,
++     * taking into account checkpointing required in rr mode.
+      *
+-     * In rr mode we need "filtered" checkpointing for virtual clock.
+-     * Checkpoint must be replayed before any non-EXTERNAL timer has been
+-     * processed and only one time (virtual clock value stays same). But these
+-     * timers may appear in the timers list while it being processed, so this
+-     * must be checked until we finally decide that "no timers left - we are
+-     * done".
++     * Checkpoint must be replayed before any timer has been processed
++     * and only one time. But new timers may appear in the timers list while
++     * it's being processed, so this must be checked until we finally decide
++     * that "no timers left - we are done" (to avoid skipping checkpoint due to
++     * possible races).
++     * Also checkpoint for virtual clock is redundant in cases where it's being
++     * triggered with only non-EXTERNAL timers, because these timers don't
++     * change guest state directly.
+      */
+     current_time = qemu_clock_get_ns(timer_list->clock->type);
+     qemu_mutex_lock(&timer_list->active_timers_lock);
+@@ -552,7 +550,7 @@ bool timerlist_run_timers(QEMUTimerList *timer_list)
+             /* once we got here, checkpoint clock only once */
+             need_replay_checkpoint = false;
+             qemu_mutex_unlock(&timer_list->active_timers_lock);
+-            if (!replay_checkpoint(CHECKPOINT_CLOCK_VIRTUAL)) {
++            if (!replay_checkpoint(replay_checkpoint_id)) {
+                 goto out;
+             }
+             qemu_mutex_lock(&timer_list->active_timers_lock);
+-- 
+2.7.4
