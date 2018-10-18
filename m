@@ -1,17 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41277)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gDEcq-0004W7-QN
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:10:34 -0400
+	(envelope-from <keescook@chromium.org>) id 1gDEgD-0007xy-3p
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:14:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gDEcl-0004dU-0U
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:10:31 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 18 Oct 2018 17:04:22 -0300
-Message-Id: <20181018200422.4358-46-ehabkost@redhat.com>
-In-Reply-To: <20181018200422.4358-1-ehabkost@redhat.com>
-References: <20181018200422.4358-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 45/45] numa: Clean up error reporting in
- parse_numa()
+	(envelope-from <keescook@chromium.org>) id 1gDEg8-0006Oo-7X
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:14:01 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:37093)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <keescook@chromium.org>)
+	id 1gDEg7-0006NE-WB
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:13:56 -0400
+Received: by mail-pf1-x444.google.com with SMTP id j23-v6so15384422pfi.4
+	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 13:13:55 -0700 (PDT)
+Date: Thu, 18 Oct 2018 13:13:51 -0700
+From: Kees Cook <keescook@chromium.org>
+Message-ID: <20181018201351.GA25286@beast>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] [PATCH] nvdimm: Add docs hint for Linux driver name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,72 +27,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Rob Herring <robh@kernel.org>, libvir-list@redhat.com, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-arm@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Markus Armbruster <armbru@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Eduardo Habkost <ehabkost@redhat.com>, Michael Walle <michael@walle.cc>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Alistair Francis <alistair@alistair23.me>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-ppc@nongnu.org, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Max Filippov <jcmvbkbc@gmail.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Ross Zwisler <ross.zwisler@linux.intel.com>, qemu-devel@nongnu.org
 
-From: Markus Armbruster <armbru@redhat.com>
+I spent way too much time trying to figure out why the emulated NVDIMM
+was missing under Linux. In an effort to help others who might be looking
+for these kinds of things in the future, include a hint.
 
-Calling error_report() in a function that takes an Error ** argument
-is suspicious.  parse_numa() does that, and then fails without setting
-an error.  Its caller main(), via qemu_opts_foreach(), is fine with
-it, but clean it up anyway.
-
-While there, give parse_numa() internal linkage.
-
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20181008173125.19678-26-armbru@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- include/sysemu/numa.h | 1 -
- numa.c                | 8 +++-----
- 2 files changed, 3 insertions(+), 6 deletions(-)
+ docs/nvdimm.txt | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-index 7a0ae751aa..21713b7e2f 100644
---- a/include/sysemu/numa.h
-+++ b/include/sysemu/numa.h
-@@ -22,7 +22,6 @@ struct NumaNodeMem {
- };
+diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
+index 5f158a61708e..7231c2d78f65 100644
+--- a/docs/nvdimm.txt
++++ b/docs/nvdimm.txt
+@@ -49,8 +49,9 @@ Multiple vNVDIMM devices can be created if multiple pairs of "-object"
+ and "-device" are provided.
  
- extern NodeInfo numa_info[MAX_NODES];
--int parse_numa(void *opaque, QemuOpts *opts, Error **errp);
- void parse_numa_opts(MachineState *ms);
- void numa_complete_configuration(MachineState *ms);
- void query_numa_node_mem(NumaNodeMem node_mem[]);
-diff --git a/numa.c b/numa.c
-index 1d7c49ad43..50ec016013 100644
---- a/numa.c
-+++ b/numa.c
-@@ -215,7 +215,7 @@ end:
-     error_propagate(errp, err);
- }
+ For above command line options, if the guest OS has the proper NVDIMM
+-driver, it should be able to detect a NVDIMM device which is in the
+-persistent memory mode and whose size is $NVDIMM_SIZE.
++driver (e.g. "CONFIG_ACPI_NFIT=y" under Linux), it should be able to
++detect a NVDIMM device which is in the persistent memory mode and whose
++size is $NVDIMM_SIZE.
  
--int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
-+static int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
- {
-     NumaOptions *object = NULL;
-     MachineState *ms = MACHINE(opaque);
-@@ -239,7 +239,7 @@ int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
- end:
-     qapi_free_NumaOptions(object);
-     if (err) {
--        error_report_err(err);
-+        error_propagate(errp, err);
-         return -1;
-     }
+ Note:
  
-@@ -444,9 +444,7 @@ void numa_complete_configuration(MachineState *ms)
- 
- void parse_numa_opts(MachineState *ms)
- {
--    if (qemu_opts_foreach(qemu_find_opts("numa"), parse_numa, ms, NULL)) {
--        exit(1);
--    }
-+    qemu_opts_foreach(qemu_find_opts("numa"), parse_numa, ms, &error_fatal);
- }
- 
- void qmp_set_numa_node(NumaOptions *cmd, Error **errp)
 -- 
-2.18.0.rc1.1.g3f1ff2140
+2.17.1
+
+
+-- 
+Kees Cook
+Pixel Security
