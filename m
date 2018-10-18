@@ -1,34 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40170)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41248)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gD13G-00012M-Ac
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 01:40:55 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1gD1Bs-0003Ax-8Q
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 01:49:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gD13C-00021i-By
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 01:40:54 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40730)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gD13A-0001uL-Ik
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 01:40:50 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gD138-000151-AT
-	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 05:40:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4C95A2E80C7
-	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 05:40:46 +0000 (UTC)
+	(envelope-from <dovgaluk@ispras.ru>) id 1gD1Bo-0003Yz-EV
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 01:49:48 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:49944)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1gD1Bm-0003Qz-HE
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 01:49:43 -0400
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20181017090750.4378-1-pbonzini@redhat.com>
+	<001f01d465fd$01af8b80$050ea280$@ru>
+	<CANzW0ms5DMhjYqBUS3EHfhVRp9Li+Dk=WH9RRpO=jbfOgctkCg@mail.gmail.com>
+	<0817e2fe-5a97-a4ed-9ae2-2e8dee6c9a43@redhat.com>
+	<004201d4660d$e86ef1e0$b94cd5a0$@ru>
+	<a29da0a1-85d7-c57c-5c42-27594a7849ac@redhat.com>
+	<005c01d4661c$3a9cd0a0$afd671e0$@ru>
+	<CANzW0mtAh9vjWa-TAdB60b1kvyN_3O07kbyvFzYO_eL6sNjHQQ@mail.gmail.com>
+In-Reply-To: <CANzW0mtAh9vjWa-TAdB60b1kvyN_3O07kbyvFzYO_eL6sNjHQQ@mail.gmail.com>
+Date: Thu, 18 Oct 2018 08:49:43 +0300
+Message-ID: <000001d466a6$5e940430$1bbc0c90$@ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Language: ru
+Content-Type: text/plain;
+	charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 18 Oct 2018 05:31:14 -0000
-From: Thomas Huth <1798434@bugs.launchpad.net>
-Reply-To: Bug 1798434 <1798434@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153980046834.15506.5857548093711799323.malonedeb@gac.canonical.com>
-Message-Id: <153984067458.15792.17465627827895757998.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1798434] Re: [Feature Request] Automatic device
- configuration discovery
+Subject: Re: [Qemu-devel] [PATCH] Revert "icount: remove obsolete warp call"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,38 +35,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: 'Artem Pisarenko' <artem.k.pisarenko@gmail.com>
+Cc: 'Paolo Bonzini' <pbonzini@redhat.com>, 'Clement Deschamps' <clement.deschamps@greensocs.com>, qemu-devel@nongnu.org, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>
 
-Right, and since QEMU also only supports a limited set of devices, there
-is no chance that you can mirror an arbitrary host this way. But if you
-want to convert a host into a VM and do not care whether each and every
-detail can be mirrored, have a look at http://libguestfs.org/virt-
-p2v.1.html - that's likely the best solution so far.
+I made a fix to ensure that QBox patch doesn=E2=80=99t break the replay.
 
-** Changed in: qemu
-       Status: New =3D> Won't Fix
+Now I tried it on couple of tests and didn=E2=80=99t see any regression.
 
--- =
+=20
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1798434
+Pavel Dovgalyuk
 
-Title:
-  [Feature Request] Automatic device configuration discovery
+=20
 
-Status in QEMU:
-  Won't Fix
+From: Artem Pisarenko [mailto:artem.k.pisarenko@gmail.com]=20
+Sent: Wednesday, October 17, 2018 4:32 PM
+To: Pavel Dovgalyuk
+Cc: Paolo Bonzini; Clement Deschamps; qemu-devel@nongnu.org; Pavel =
+Dovgalyuk
+Subject: Re: [PATCH] Revert "icount: remove obsolete warp call"
 
-Bug description:
-  Would it be possible to have a script that enumerates the device tree
-  of a Linux host and generates a qemu command line that would recreate
-  it under emulation? The user would have to customize the arguments
-  (for instance to point to disk image files), but it would take a lot
-  of the guesswork out.
+=20
 
-  Similarly, there could be information that can be gleaned from the
-  kernel build config that would help with configuration.
+> I found the source of the bug. As QEMU becomes more multi-threaded and =
+non-> synchronized,
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1798434/+subscriptions
+> checkpoints move from thread to thread.
+> And the event queue that processed at checkpoints should belong to the =
+same thread
+> in both record and replay executions.
+>=20
+> Current problem was with the checkpoint for virtual timers. They are =
+processed from different threads:
+> from vCPU and from aio_dispatch function.
+
+=20
+
+What bug you're talking about ? This patch thread started with intention =
+to fix generic bug with icount, which is being encountered in non-rr =
+mode. As far as I understood your words (and patch content) it will not =
+fix that generic bug.
+
+Anyway, it's a good news!
+
+--=20
+
+=D0=A1 =D1=83=D0=B2=D0=B0=D0=B6=D0=B5=D0=BD=D0=B8=D0=B5=D0=BC,
+  =D0=90=D1=80=D1=82=D0=B5=D0=BC =
+=D0=9F=D0=B8=D1=81=D0=B0=D1=80=D0=B5=D0=BD=D0=BA=D0=BE
