@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46264)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gD34j-0001vh-PH
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 03:50:34 -0400
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gD3HT-0005Ij-6k
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 04:03:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gD34g-0004mY-EZ
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 03:50:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53504)
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gD3HP-0004bd-DL
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 04:03:42 -0400
+Received: from mxhk.zte.com.cn ([63.217.80.70]:22648)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gD34g-0004fl-5n
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 03:50:30 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181009060835.4608-1-armbru@redhat.com>
-Date: Thu, 18 Oct 2018 09:50:18 +0200
-In-Reply-To: <20181009060835.4608-1-armbru@redhat.com> (Markus Armbruster's
-	message of "Tue, 9 Oct 2018 08:08:35 +0200")
-Message-ID: <8736t3bsn9.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] ssi-sd: Make devices picking up
- backends unavailable with -device
+	(Exim 4.71) (envelope-from <peng.hao2@zte.com.cn>)
+	id 1gD3HP-0004B4-2B
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 04:03:39 -0400
+Date: Thu, 18 Oct 2018 16:03:21 +0800 (CST)
+Message-ID: <201810181603210927379@zte.com.cn>
+In-Reply-To: <32bbd4a7-94eb-1f0a-7f2f-d59d5e47dda6@redhat.com>
+References: 1539795177-21038-1-git-send-email-peng.hao2@zte.com.cn,
+	32bbd4a7-94eb-1f0a-7f2f-d59d5e47dda6@redhat.com
+Mime-Version: 1.0
+From: <peng.hao2@zte.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel]
+ =?utf-8?q?=5BPATCH_V6_3/5=5D_target-i386=3A_add_rtc?=
+ =?utf-8?q?_0x70_port_as_coalesced=5Fpio?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +31,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, thuth@redhat.com, philmd@redhat.com
+To: pbonzini@redhat.com
+Cc: rkrcmar@redhat.com, mst@redhat.com, ehabkost@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
 
-Peter, would you be willing to take this through your ARM tree?
-
-Markus Armbruster <armbru@redhat.com> writes:
-
-> Device models aren't supposed to go on fishing expeditions for
-> backends.  They should expose suitable properties for the user to set.
-> For onboard devices, board code sets them.
->
-> Device ssi-sd picks up its block backend in its init() method with
-> drive_get_next() instead.  This mistake is already marked FIXME since
-> commit af9e40a.
->
-> Unset user_creatable to remove the mistake from our external
-> interface.  Since the SSI bus doesn't support hotplug, only -device
-> can be affected.  Only certain ARM machines have ssi-sd and provide an
-> SSI bus for it; this patch breaks -device ssi-sd for these machines.
-> No actual use of -device ssi-sd is known.
->
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> Acked-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
-> v2:
-> * Rebase to master
-> * Improve commit message
->
->  hw/sd/ssi-sd.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/hw/sd/ssi-sd.c b/hw/sd/ssi-sd.c
-> index 95a143bfba..623d0333e8 100644
-> --- a/hw/sd/ssi-sd.c
-> +++ b/hw/sd/ssi-sd.c
-> @@ -284,6 +284,8 @@ static void ssi_sd_class_init(ObjectClass *klass, voi=
-d *data)
->      k->cs_polarity =3D SSI_CS_LOW;
->      dc->vmsd =3D &vmstate_ssi_sd;
->      dc->reset =3D ssi_sd_reset;
-> +    /* Reason: init() method uses drive_get_next() */
-> +    dc->user_creatable =3D false;
->  }
->=20=20
->  static const TypeInfo ssi_sd_info =3D {
+Pk9uIDE3LzEwLzIwMTggMTg6NTIsIFBlbmcgSGFvIHdyb3RlOgo+PiArICAgIC8qIHJlZ2lzdGVy
+IHJ0YyAweDcwIHBvcnQgYXMgY29hbGVzY2VkX3BpbyAqLwo+PiArICAgIG1lbW9yeV9yZWdpb25f
+c2V0X2ZsdXNoX2NvYWxlc2NlZCgmcy0+aW8pOwo+PiArICAgIG1lbW9yeV9yZWdpb25faW5pdF9p
+bygmcy0+Y29hbGVzY2VkX2lvLCBPQkpFQ1QocyksICZjbW9zX29wcywKPj4gKyAgICAgICAgICAg
+ICAgICAgICAgICAgICAgcywgInJ0YzEiLCAxKTsKPj4gKyAgICBpc2FfcmVnaXN0ZXJfaW9wb3J0
+KGlzYWRldiwgJnMtPmNvYWxlc2NlZF9pbywgYmFzZSk7Cj4KPkkgdGhpbmsgaW5zdGVhZCBvZiBp
+c2FfcmVnaXN0ZXJfaW9wb3J0IHlvdSBjYW4gdXNlCj5tZW1vcnlfcmVnaW9uX2FkZF9zdWJyZWdp
+b24sIHNvIHRoYXQgcy0+Y29hbGVzY2VkX2lvIGlzIGFkZGVkIGJlbG93IHMtPmlvPwo+CmlzYV9y
+ZWdpc3Rlcl9pb3BvcnQgYWxzbyBjYWxsZWQgbWVtb3J5X3JlZ2lvbl9hZGRfc3VicmVnaW9uLgpt
+b2RpZnkgY29kZSAgbGlrZSB0aGlzOgogIC8vaXNhX3JlZ2lzdGVyX2lvcG9ydChpc2FkZXYsICZz
+LT5jb2FsZXNjZWRfaW8sIGJhc2UpOwogICAgbWVtb3J5X3JlZ2lvbl9hZGRfc3VicmVnaW9uKGdl
+dF9zeXN0ZW1faW8oKSwweDcwLCZzLT5jb2FsZXNjZWRfaW8pOwpUaGUgcmVnaW9uYWwgZGlzdHJp
+YnV0aW9uIGJlZm9yZSBhbmQgYWZ0ZXIgY29kZSBtb2RpZmljYXRpb24gaXMgY29uc2lzdGVudC4K
+CiAgIDAwMDAwMDAwMDAwMDAwNzAtMDAwMDAwMDAwMDAwMDA3MCAocHJpbyAwLCBpL28pOiBydGMx
+CiAgICAwMDAwMDAwMDAwMDAwMDcwLTAwMDAwMDAwMDAwMDAwNzEgKHByaW8gMCwgaS9vKTogcnRj
+Cj5UaGlzIHdheSwgeW91IGRvbid0IHJlbHkgb24gdGhlIGJlaGF2aW9yIG9mIG92ZXJsYXBwaW5n
+IHJlZ2lvbnMuCj4KPlBhb2xvCj4KPj4gKyAgICBtZW1vcnlfcmVnaW9uX2FkZF9jb2FsZXNjaW5n
+KCZzLT5jb2FsZXNjZWRfaW8sIDAsIDEpOwo+PiAr
