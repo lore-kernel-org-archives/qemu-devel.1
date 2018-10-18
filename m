@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39138)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39248)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gDEYW-00005M-Rx
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:06:05 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gDEYt-0000OS-Di
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:06:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gDEYU-0000ra-F8
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:06:03 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gDEYl-0001DX-RB
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 16:06:24 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 18 Oct 2018 17:03:52 -0300
-Message-Id: <20181018200422.4358-16-ehabkost@redhat.com>
+Date: Thu, 18 Oct 2018 17:03:53 -0300
+Message-Id: <20181018200422.4358-17-ehabkost@redhat.com>
 In-Reply-To: <20181018200422.4358-1-ehabkost@redhat.com>
 References: <20181018200422.4358-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 15/45] hw/hppa/dino: Remove unuseful code
+Subject: [Qemu-devel] [PULL 16/45] hw/mips/malta: Remove unuseful code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,33 +29,39 @@ From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20181002212522.23303-12-f4bug@amsat.org>
+Message-Id: <20181002212522.23303-13-f4bug@amsat.org>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/hppa/dino.c | 7 -------
- 1 file changed, 7 deletions(-)
+ hw/mips/mips_malta.c | 13 -------------
+ 1 file changed, 13 deletions(-)
 
-diff --git a/hw/hppa/dino.c b/hw/hppa/dino.c
-index 564b938e3a..31e09942b5 100644
---- a/hw/hppa/dino.c
-+++ b/hw/hppa/dino.c
-@@ -488,17 +488,10 @@ PCIBus *dino_init(MemoryRegion *addr_space,
-     return b;
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index 29b90bacf3..c1cf0fe12e 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -1422,23 +1422,10 @@ void mips_malta_init(MachineState *machine)
+     pci_vga_init(pci_bus);
  }
 =20
--static int dino_pcihost_init(SysBusDevice *dev)
+-static int mips_malta_sysbus_device_init(SysBusDevice *sysbusdev)
 -{
 -    return 0;
 -}
 -
- static void dino_pcihost_class_init(ObjectClass *klass, void *data)
- {
+-static void mips_malta_class_init(ObjectClass *klass, void *data)
+-{
 -    SysBusDeviceClass *k =3D SYS_BUS_DEVICE_CLASS(klass);
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
+-
+-    k->init =3D mips_malta_sysbus_device_init;
+-}
+-
+ static const TypeInfo mips_malta_device =3D {
+     .name          =3D TYPE_MIPS_MALTA,
+     .parent        =3D TYPE_SYS_BUS_DEVICE,
+     .instance_size =3D sizeof(MaltaState),
+-    .class_init    =3D mips_malta_class_init,
+ };
 =20
--    k->init =3D dino_pcihost_init;
-     dc->vmsd =3D &vmstate_dino;
- }
-=20
+ static void mips_malta_machine_init(MachineClass *mc)
 --=20
 2.18.0.rc1.1.g3f1ff2140
