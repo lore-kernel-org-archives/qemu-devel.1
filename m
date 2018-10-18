@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35130)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1gD7ol-0003IX-SS
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 08:54:25 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1gD7rG-00045l-JZ
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 08:56:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1gD7of-0008F2-VZ
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 08:54:21 -0400
-Received: from mail-oi1-x22f.google.com ([2607:f8b0:4864:20::22f]:40921)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1gD7oc-00089d-P8
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 08:54:15 -0400
-Received: by mail-oi1-x22f.google.com with SMTP id j68-v6so23899612oib.7
-	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 05:54:14 -0700 (PDT)
+	(envelope-from <eric.auger@redhat.com>) id 1gD7rE-0001oP-9D
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 08:56:57 -0400
+References: <1530602398-16127-1-git-send-email-eric.auger@redhat.com>
+	<20180718160832.0d754aa4@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <4bdd8486-f044-4a0c-8bcd-c6f357306781@redhat.com>
+Date: Thu, 18 Oct 2018 14:56:38 +0200
 MIME-Version: 1.0
-References: <fc39293f-9d79-a3d3-9e39-9e4680e6bbb4@redhat.com>
-	<mhng-6c4401ed-995c-48e1-a3ba-21692c2efcb1@palmer-si-x1c4>
-In-Reply-To: <mhng-6c4401ed-995c-48e1-a3ba-21692c2efcb1@palmer-si-x1c4>
-From: Michael Clark <mjc@sifive.com>
-Date: Fri, 19 Oct 2018 01:54:01 +1300
-Message-ID: <CAHNT7Nux+jD0o8QPuk971tHO=+pCSk0e9e5Bxu_093XGeO2aJQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL] First RISC-V Patch Set for the 3.1 Soft
- Freeze
+In-Reply-To: <20180718160832.0d754aa4@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v3 00/15] ARM virt: PCDIMM/NVDIMM at 2TB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,90 +24,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Palmer Dabbelt <palmer@sifive.com>
-Cc: eblake@redhat.com, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <Alistair.Francis@wdc.com>, qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, dgilbert@redhat.com, agraf@suse.de, david@gibson.dropbear.id.au, drjones@redhat.com, wei@redhat.com
 
-Any patches intended for the RISC-V port should go through the maintainer
-tree. I have been pretty clear that I would like to run regression tests. I
-do not wish to pull surprises in via master. I also do not agree with this
-random patch approach. It's all well and good for inactive maintainers to
-pop up now, but we were not getting our patches reviewed. The riscv-qemu
-tree is actively managed and we rebase and test at release time. I don't
-like the idea of busted stuff getting into the tree with patch churn
-correcting it. In any case we disagree regards process. Please don't break
-any of the branches in the riscv-qemu repository. I have scripts to tag our
-stable branches there (we got positive feedback from Karsten on the
-"series"). You are adding risk to the process. Fine. You are in charge.
-Don't break stuff.
+Hi Igor,
 
-On Thu, Oct 18, 2018 at 1:01 PM Palmer Dabbelt <palmer@sifive.com> wrote:
+On 7/18/18 4:08 PM, Igor Mammedov wrote:
+> On Tue,  3 Jul 2018 09:19:43 +0200
+> Eric Auger <eric.auger@redhat.com> wrote:
+> 
+>> This series aims at supporting PCDIMM/NVDIMM intantiation in
+>> machvirt at 2TB guest physical address.
+>>
+>> This is achieved in 3 steps:
+>> 1) support more than 40b IPA/GPA
+> will it work for TCG as well?
+> /important from make check pov and maybe in cases when there is no ARM system available to test/play with the feature/
+> 
 
-> On Wed, 17 Oct 2018 16:32:10 PDT (-0700), eblake@redhat.com wrote:
-> > On 10/17/18 4:54 PM, Palmer Dabbelt wrote:
-> >> The following changes since commit
-> 09558375a634e17cea6cfbfec883ac2376d2dc7f:
-> >>
-> >>    Merge remote-tracking branch
-> 'remotes/pmaydell/tags/pull-target-arm-20181016-1' into staging (2018-10-16
-> 17:42:56 +0100)
-> >>
-> >> are available in the Git repository at:
-> >>
-> >>    git://github.com/riscv/riscv-qemu.git tags/riscv-for-master-3.1-sf0
-> >>
-> >> for you to fetch changes up to 7c28f4da20e5585dce7d575691dac5392b7c6f78:
-> >>
-> >>    RISC-V: Don't add NULL bootargs to device-tree (2018-10-17 13:02:30
-> -0700)
-> >>
-> >> ----------------------------------------------------------------
-> >> First RISC-V Patch Set for the 3.1 Soft Freeze
-> >>
-> >
-> >> ----------------------------------------------------------------
-> >> Michael Clark (5):
-> >>        RISC-V: Allow setting and clearing multiple irqs
-> >>        RISC-V: Move non-ops from op_helper to cpu_helper
-> >>        RISC-V: Update CSR and interrupt definitions
-> >>        RISC-V: Add missing free for plic_hart_config
-> >>        RISC-V: Don't add NULL bootargs to device-tree
-> >>
-> >
-> > Isn't this just a subset of Alistair's pull request?
-> > https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg02342.html
->
-> Yes, but there's still on-going discussion about the PCIe patches so
-> they're
-> not really fully reviewed.  I think part of the trouble here is that there
-> wasn't someone submitting regular QEMU pull requests so there was always a
-> rush
-> to get things in.  I've volunteered to wrangle the branches and submit
-> weekly
-> pull requests (just like I do for Linux), so now there won't be any more
-> big
-> cliffs.
->
-> We've got a lot of patches to filter through because things have been
-> backed up
-> for a bit, so I thought it'd be best to just go with something simple for
-> this
-> first week.  Assuming everything gets sorted out for the PCIe patches
-> they'll
-> just go up next week -- I'm super excited for them as well :)
->
-> > which included:
-> >> ----------------------------------------------------------------
-> >> Alistair Francis (5):
-> >>       hw/riscv/virt: Increase the number of interrupts
-> >>       hw/riscv/virt: Connect the gpex PCIe
-> >>       riscv: Enable VGA and PCIE_VGA
-> >>       hw/riscv/sifive_u: Connect the Xilinx PCIe
-> >>       hw/riscv/virt: Connect a VirtIO net PCIe device
-> >>
-> >> Michael Clark (5):
-> >>       RISC-V: Allow setting and clearing multiple irqs
-> >>       RISC-V: Move non-ops from op_helper to cpu_helper
-> >>       RISC-V: Update CSR and interrupt definitions
-> >>       RISC-V: Add missing free for plic_hart_config
-> >>       RISC-V: Don't add NULL bootargs to device-tree
->
+Sorry I missed this comment.
+
+On A TCG guest ID_AA64MMFR0_EL1.PARange ID register field is the machine
+limiting factor as it returns the supported physical address range
+(target/arm/cpu64.c):
+
+aarch64_a53_initfn hardcodes PA range to 40bits
+	cpu->id_aa64mmfr0 = 0x00001122
+aarch64_a57_initfn hardcodes PA Range to 44 bits
+    	cpu->id_aa64mmfr0 = 0x00001124
+
+for TCG guests we may add support for the phys-bits option which would
+allow to set the PARange instead of hardcoding it.
+
+Thanks
+
+Eric
+
+> 
+> 
+>> 2) support PCDIMM instantiation
+>> 3) support NVDIMM instantiation
+>>
+>> This series reuses/rebases patches initially submitted by Shameer in [1]
+>> and Kwangwoo in [2].
+>>
+>> I put all parts all together for consistency and due to dependencies
+>> however as soon as the kernel dependency is resolved we can consider
+>> upstreaming them separately.
+>>
+>> Support more than 40b IPA/GPA [ patches 1 - 5 ]
+>> -----------------------------------------------
+>> was "[RFC 0/6] KVM/ARM: Dynamic and larger GPA size"
+>>
+>> At the moment the guest physical address space is limited to 40b
+>> due to KVM limitations. [0] bumps this limitation and allows to
+>> create a VM with up to 52b GPA address space.
+>>
+>> With this series, QEMU creates a virt VM with the max IPA range
+>> reported by the host kernel or 40b by default.
+>>
+>> This choice can be overriden by using the -machine kvm-type=<bits>
+>> option with bits within [40, 52]. If <bits> are not supported by
+>> the host, the legacy 40b value is used.
+>>
+>> Currently the EDK2 FW also hardcodes the max number of GPA bits to
+>> 40. This will need to be fixed.
+>>
+>> PCDIMM Support [ patches 6 - 11 ]
+>> ---------------------------------
+>> was "[RFC 0/5] ARM virt: Support PC-DIMM at 2TB"
+>>
+>> We instantiate the device_memory at 2TB. Using it obviously requires
+>> at least 42b of IPA/GPA. While its max capacity is currently limited
+>> to 2TB, the actual size depends on the initial guest RAM size and
+>> maxmem parameter.
+>>
+>> Actual hot-plug and hot-unplug of PC-DIMM is not suported due to lack
+>> of support of those features in baremetal.
+>>
+>> NVDIMM support [ patches 12 - 15 ]
+>> ----------------------------------
+>>
+>> Once the memory hotplug framework is in place it is fairly
+>> straightforward to add support for NVDIMM. the machine "nvdimm" option
+>> turns the capability on.
+>>
+>> Best Regards
+>>
+>> Eric
+>>
+>> References:
+>>
+>> [0] [PATCH v3 00/20] arm64: Dynamic & 52bit IPA support
+>> https://www.spinics.net/lists/kernel/msg2841735.html
+>>
+>> [1] [RFC v2 0/6] hw/arm: Add support for non-contiguous iova regions
+>> http://patchwork.ozlabs.org/cover/914694/
+>>
+>> [2] [RFC PATCH 0/3] add nvdimm support on AArch64 virt platform
+>> https://lists.gnu.org/archive/html/qemu-devel/2016-07/msg04599.html
+>>
+>> Tests:
+>> - On Cavium Gigabyte, a 48b VM was created.
+>> - Migration tests were performed between kernel supporting the
+>>   feature and destination kernel not suporting it
+>> - test with ACPI: to overcome the limitation of EDK2 FW, virt
+>>   memory map was hacked to move the device memory below 1TB.
+>>
+>> This series can be found at:
+>> https://github.com/eauger/qemu/tree/v2.12.0-dimm-2tb-v3
+>>
+>> History:
+>>
+>> v2 -> v3:
+>> - fix pc_q35 and pc_piix compilation error
+>> - kwangwoo's email being not valid anymore, remove his address
+>>
+>> v1 -> v2:
+>> - kvm_get_max_vm_phys_shift moved in arch specific file
+>> - addition of NVDIMM part
+>> - single series
+>> - rebase on David's refactoring
+>>
+>> v1:
+>> - was "[RFC 0/6] KVM/ARM: Dynamic and larger GPA size"
+>> - was "[RFC 0/5] ARM virt: Support PC-DIMM at 2TB"
+>>
+>> Best Regards
+>>
+>> Eric
+>>
+>>
+>> Eric Auger (9):
+>>   linux-headers: header update for KVM/ARM KVM_ARM_GET_MAX_VM_PHYS_SHIFT
+>>   hw/boards: Add a MachineState parameter to kvm_type callback
+>>   kvm: add kvm_arm_get_max_vm_phys_shift
+>>   hw/arm/virt: support kvm_type property
+>>   hw/arm/virt: handle max_vm_phys_shift conflicts on migration
+>>   hw/arm/virt: Allocate device_memory
+>>   acpi: move build_srat_hotpluggable_memory to generic ACPI source
+>>   hw/arm/boot: Expose the pmem nodes in the DT
+>>   hw/arm/virt: Add nvdimm and nvdimm-persistence options
+>>
+>> Kwangwoo Lee (2):
+>>   nvdimm: use configurable ACPI IO base and size
+>>   hw/arm/virt: Add nvdimm hot-plug infrastructure
+>>
+>> Shameer Kolothum (4):
+>>   hw/arm/virt: Add memory hotplug framework
+>>   hw/arm/boot: introduce fdt_add_memory_node helper
+>>   hw/arm/boot: Expose the PC-DIMM nodes in the DT
+>>   hw/arm/virt-acpi-build: Add PC-DIMM in SRAT
+>>
+>>  accel/kvm/kvm-all.c                            |   2 +-
+>>  default-configs/arm-softmmu.mak                |   4 +
+>>  hw/acpi/aml-build.c                            |  51 ++++
+>>  hw/acpi/nvdimm.c                               |  28 ++-
+>>  hw/arm/boot.c                                  | 123 +++++++--
+>>  hw/arm/virt-acpi-build.c                       |  10 +
+>>  hw/arm/virt.c                                  | 330 ++++++++++++++++++++++---
+>>  hw/i386/acpi-build.c                           |  49 ----
+>>  hw/i386/pc_piix.c                              |   8 +-
+>>  hw/i386/pc_q35.c                               |   8 +-
+>>  hw/ppc/mac_newworld.c                          |   2 +-
+>>  hw/ppc/mac_oldworld.c                          |   2 +-
+>>  hw/ppc/spapr.c                                 |   2 +-
+>>  include/hw/acpi/aml-build.h                    |   3 +
+>>  include/hw/arm/arm.h                           |   2 +
+>>  include/hw/arm/virt.h                          |   7 +
+>>  include/hw/boards.h                            |   2 +-
+>>  include/hw/mem/nvdimm.h                        |  12 +
+>>  include/standard-headers/linux/virtio_config.h |  16 +-
+>>  linux-headers/asm-mips/unistd.h                |  18 +-
+>>  linux-headers/asm-powerpc/kvm.h                |   1 +
+>>  linux-headers/linux/kvm.h                      |  16 ++
+>>  target/arm/kvm.c                               |   9 +
+>>  target/arm/kvm_arm.h                           |  16 ++
+>>  24 files changed, 597 insertions(+), 124 deletions(-)
+>>
+> 
