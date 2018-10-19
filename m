@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48214)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hongbo.zhang@linaro.org>) id 1gDRs6-0002JZ-8Z
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 06:19:11 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gDRtQ-00035D-3o
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 06:20:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hongbo.zhang@linaro.org>) id 1gDRs2-0008L3-6p
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 06:19:10 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:41121)
+	(envelope-from <peter.maydell@linaro.org>) id 1gDRtP-00021T-7j
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 06:20:32 -0400
+Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:42157)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <hongbo.zhang@linaro.org>)
-	id 1gDRs1-0008Gu-8k
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 06:19:06 -0400
-Received: by mail-pl1-x642.google.com with SMTP id p5-v6so767866plq.8
-	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 03:19:05 -0700 (PDT)
-From: Hongbo Zhang <hongbo.zhang@linaro.org>
-Date: Fri, 19 Oct 2018 18:18:55 +0800
-Message-Id: <1539944335-19556-1-git-send-email-hongbo.zhang@linaro.org>
-Subject: [Qemu-devel] [PATCH] hw/arm/virt: remove unused header files
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gDRtN-0001mc-Be
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 06:20:31 -0400
+Received: by mail-ot1-x32b.google.com with SMTP id c23so30900498otl.9
+	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 03:20:11 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <1539888473-16340-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1539888473-16340-1-git-send-email-aleksandar.markovic@rt-rk.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 19 Oct 2018 11:19:50 +0100
+Message-ID: <CAFEAcA-Bve7UiXpLsqw7fwg5o7rUP_btyS+KVb_=7hfwQnLWfQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v2 00/28] MIPS queue October 2018, part 1, v2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,53 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org, alex.bennee@linaro.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc: Hongbo Zhang <hongbo.zhang@linaro.org>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Remove the unused herder files, 'virt' can be compiled and run without
-including them.
+On 18 October 2018 at 19:47, Aleksandar Markovic
+<aleksandar.markovic@rt-rk.com> wrote:
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+>
+> The following changes since commit 77f7c747193662edfadeeb3118d63eed0eac51a6:
+>
+>   Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2018-10-17' into staging (2018-10-18 13:40:19 +0100)
+>
+> are available in the git repository at:
+>
+>   https://github.com/AMarkovic/qemu tags/mips-queue-october-2018-part1-v2
+>
+> for you to fetch changes up to 0d30b3bbc5fed12da8f8d1bfd28f2803d65a4cb0:
+>
+>   target/mips: Add opcodes for nanoMIPS EVA instructions (2018-10-18 20:37:20 +0200)
+>
+> ----------------------------------------------------------------
+> MIPS queue October 2018, part1, v2
+>
+> v1->v2:
+> - fixed clang build error
+> - a small patch forgotten in v1 included now
+> - MXU patches slightly improved (fixed typos etc.)
+> ----------------------------------------------------------------
+>
 
-Signed-off-by: Hongbo Zhang <hongbo.zhang@linaro.org>
----
- hw/arm/virt.c | 8 --------
- 1 file changed, 8 deletions(-)
+Applied, thanks.
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 9f67782..f0066cb 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -30,9 +30,6 @@
- 
- #include "qemu/osdep.h"
- #include "qapi/error.h"
--#include "hw/sysbus.h"
--#include "hw/arm/arm.h"
--#include "hw/arm/primecell.h"
- #include "hw/arm/virt.h"
- #include "hw/vfio/vfio-calxeda-xgmac.h"
- #include "hw/vfio/vfio-amd-xgbe.h"
-@@ -41,12 +38,9 @@
- #include "net/net.h"
- #include "sysemu/device_tree.h"
- #include "sysemu/numa.h"
--#include "sysemu/sysemu.h"
- #include "sysemu/kvm.h"
- #include "hw/compat.h"
- #include "hw/loader.h"
--#include "exec/address-spaces.h"
--#include "qemu/bitops.h"
- #include "qemu/error-report.h"
- #include "hw/pci-host/gpex.h"
- #include "hw/arm/sysbus-fdt.h"
-@@ -56,9 +50,7 @@
- #include "hw/intc/arm_gicv3_common.h"
- #include "kvm_arm.h"
- #include "hw/smbios/smbios.h"
--#include "qapi/visitor.h"
- #include "standard-headers/linux/input.h"
--#include "hw/arm/smmuv3.h"
- 
- #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
-     static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
--- 
-2.7.4
+-- PMM
