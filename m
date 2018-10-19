@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52359)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55048)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gDULz-0007PG-Kj
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:58:12 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gDUTE-0005cd-Aq
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 09:05:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gDULw-0000Ux-5P
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:58:11 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:42127)
+	(envelope-from <peter.maydell@linaro.org>) id 1gDUT9-00040k-Bt
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 09:05:38 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:44284)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gDULv-0000SV-Ua
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:58:08 -0400
-Received: by mail-wr1-f67.google.com with SMTP id r17-v6so4972696wrt.9
-	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 05:58:07 -0700 (PDT)
-References: <20181009130442.26296-1-berrange@redhat.com>
-	<20181009130442.26296-11-berrange@redhat.com>
-	<d8312d1b-4c21-65f7-72eb-380a91f4459f@redhat.com>
-	<20181019125545.GT13722@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <fe8c05ab-dccf-19b2-43f3-73f5e8806fb3@redhat.com>
-Date: Fri, 19 Oct 2018 14:58:04 +0200
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gDUT2-0003hv-7L
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 09:05:29 -0400
+Received: by mail-oi1-x243.google.com with SMTP id u74-v6so26721117oia.11
+	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 06:05:23 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20181019125545.GT13722@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5 10/11] authz: add QAuthZPAM object type
- for authorizing using PAM
+In-Reply-To: <20181011205206.3552-18-richard.henderson@linaro.org>
+References: <20181011205206.3552-1-richard.henderson@linaro.org>
+	<20181011205206.3552-18-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 19 Oct 2018 14:05:01 +0100
+Message-ID: <CAFEAcA_oPQuQvnLFSGo_Q-7TBWJgqCBYt8mdbH8ZHc1RVcBzhA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 17/20] target/arm: Use gvec for NEON VLD
+ all lanes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,118 +30,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 19/10/2018 14:55, Daniel P. Berrangé wrote:
-> On Fri, Oct 19, 2018 at 12:02:57PM +0200, Philippe Mathieu-Daudé wrote:
->> On 09/10/2018 15:04, Daniel P. Berrangé wrote:
->>> From: "Daniel P. Berrange" <berrange@redhat.com>
->>>
->>> Add an authorization backend that talks to PAM to check whether the user
->>> identity is allowed. This only uses the PAM account validation facility,
->>> which is essentially just a check to see if the provided username is permitted
->>> access. It doesn't use the authentication or session parts of PAM, since
->>> that's dealt with by the relevant part of QEMU (eg VNC server).
->>>
->>> Consider starting QEMU with a VNC server and telling it to use TLS with
->>> x509 client certificates and configuring it to use an PAM to validate
->>> the x509 distinguished name. In this example we're telling it to use PAM
->>> for the QAuthZ impl with a service name of "qemu-vnc"
->>>
->>>  $ qemu-system-x86_64 \
->>>      -object tls-creds-x509,id=tls0,dir=/home/berrange/security/qemutls,\
->>>              endpoint=server,verify-peer=yes \
->>>      -object authz-pam,id=authz0,service=qemu-vnc \
->>>      -vnc :1,tls-creds=tls0,tls-authz=authz0
->>>
->>> This requires an /etc/pam/qemu-vnc file to be created with the auth
->>> rules. A very simple file based whitelist can be setup using
->>>
->>>   $ cat > /etc/pam/qemu-vnc <<EOF
->>>   account         requisite       pam_listfile.so item=user sense=allow file=/etc/qemu/vnc.allow
->>>   EOF
->>>
->>> The /etc/qemu/vnc.allow file simply contains one username per line. Any
->>> username not in the file is denied. The usernames in this example are
->>> the x509 distinguished name from the client's x509 cert.
->>>
->>>   $ cat > /etc/qemu/vnc.allow <<EOF
->>>   CN=laptop.berrange.com,O=Berrange Home,L=London,ST=London,C=GB
->>>   EOF
->>>
->>> More interesting would be to configure PAM to use an LDAP backend, so
->>> that the QEMU authorization check data can be centralized instead of
->>> requiring each compute host to have file maintained.
->>>
->>> The main limitation with this PAM module is that the rules apply to all
->>> QEMU instances on the host. Setting up different rules per VM, would
->>> require creating a separate PAM service name & config file for every
->>> guest. An alternative approach for the future might be to not pass in
->>> the plain username to PAM, but instead combine the VM name or UUID with
->>> the username. This requires further consideration though.
->>>
->>> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
->>> ---
->>>  authz/Makefile.objs     |   3 +
->>>  authz/pamacct.c         | 149 ++++++++++++++++++++++++++++++++++++++++
->>>  authz/trace-events      |   3 +
->>>  configure               |  37 ++++++++++
->>>  include/authz/pamacct.h | 100 +++++++++++++++++++++++++++
->>>  qemu-options.hx         |  35 ++++++++++
->>>  6 files changed, 327 insertions(+)
->>>  create mode 100644 authz/pamacct.c
->>>  create mode 100644 include/authz/pamacct.h
->>>
->>> diff --git a/configure b/configure
->>> index f89d293585..bca8fd1b49 100755
->>> --- a/configure
->>> +++ b/configure
->>> +##########################################
->>> +# PAM probe
->>> +
->>> +if test "x$auth_pam" != "no"; then
->>> +    cat > $TMPC <<EOF
->>> +#include <security/pam_appl.h>
->>> +#include <stdio.h>
->>> +int main(void) {
->>> +   const char *service_name = "qemu";
->>> +   const char *user = "frank";
->>> +   const struct pam_conv *pam_conv = NULL;
->>> +   pam_handle_t *pamh = NULL;
->>> +   pam_start(service_name, user, pam_conv, &pamh);
->>> +   return 0;
->>> +}
->>> +EOF
->>> +    if compile_prog "" "-lpam" ; then
->>> +	auth_pam=yes
->>> +    else
->>> +	if test "$auth_pam" = "yes"; then
->>> +	    feature_not_found "PAM" "Install pam-devel"
->>
->> Not all distributions name this package 'pam-devel', but I think we get
->> the message.
-> 
-> I'll squash in
-> 
-> diff --git a/configure b/configure
-> index 3ec5578c5a..db35d52e12 100755
-> --- a/configure
-> +++ b/configure
-> @@ -2902,7 +2902,7 @@ EOF
->         auth_pam=yes
->      else
->         if test "$auth_pam" = "yes"; then
-> -           feature_not_found "PAM" "Install pam-devel"
-> +           feature_not_found "PAM" "Install PAM development package"
+On 11 October 2018 at 21:52, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/translate.c | 81 ++++++++++++++----------------------------
+>  1 file changed, 26 insertions(+), 55 deletions(-)
 
-This seems better, thanks.
+> -                /* VLD2/3/4 to all lanes: bit 5 indicates register stride */
+> -                stride = (insn & (1 << 5)) ? 2 : 1;
 
->         else
->             auth_pam=no
->         fi
-> 
-> 
-> Regards,
-> Daniel
-> 
+
+> +            stride = insn & (1 << 5) ? 2 : 1;
+
+You dropped the clarifying parens in the ?: expression here; I've added
+them back...
+
+thanks
+-- PMM
