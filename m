@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gDJFO-0004U5-Sx
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:06:42 -0400
+	(envelope-from <cota@braap.org>) id 1gDJFR-0004UK-4z
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:06:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gDJFL-0002js-Bq
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:06:38 -0400
-Received: from out5-smtp.messagingengine.com ([66.111.4.29]:53827)
+	(envelope-from <cota@braap.org>) id 1gDJFN-0002my-1P
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:06:40 -0400
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:52709)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gDJFJ-0002aF-D4
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:06:35 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gDJFM-0002aO-6T
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:06:36 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 18 Oct 2018 21:05:32 -0400
-Message-Id: <20181019010625.25294-4-cota@braap.org>
+Date: Thu, 18 Oct 2018 21:05:33 -0400
+Message-Id: <20181019010625.25294-5-cota@braap.org>
 In-Reply-To: <20181019010625.25294-1-cota@braap.org>
 References: <20181019010625.25294-1-cota@braap.org>
-Subject: [Qemu-devel] [RFC v3 03/56] cpu: introduce cpu_mutex_lock/unlock
+Subject: [Qemu-devel] [RFC v3 04/56] cpu: make qemu_work_cond per-cpu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,162 +26,201 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-The few direct users of &cpu->lock will be converted soon.
+This eliminates the need to use the BQL to queue CPU work.
+
+While at it, give the per-cpu field a generic name ("cond") since
+it will soon be used for more than just queueing CPU work.
 
 Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>
 Cc: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- include/qom/cpu.h   | 26 ++++++++++++++++++++++++
- cpus.c              | 48 +++++++++++++++++++++++++++++++++++++++++++--
- stubs/cpu-lock.c    | 15 ++++++++++++++
- stubs/Makefile.objs |  1 +
- 4 files changed, 88 insertions(+), 2 deletions(-)
- create mode 100644 stubs/cpu-lock.c
+ include/qom/cpu.h |  6 +++---
+ cpus-common.c     | 48 ++++++++++++++++++++++++++++++++++-------------
+ cpus.c            |  2 +-
+ qom/cpu.c         |  1 +
+ 4 files changed, 40 insertions(+), 17 deletions(-)
 
 diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index b813ca28fa..1292e7aa33 100644
+index 1292e7aa33..82937881ef 100644
 --- a/include/qom/cpu.h
 +++ b/include/qom/cpu.h
-@@ -452,6 +452,32 @@ extern struct CPUTailQ cpus;
+@@ -316,6 +316,7 @@ struct qemu_work_item;
+  * @mem_io_vaddr: Target virtual address at which the memory was accessed.
+  * @kvm_fd: vCPU file descriptor for KVM.
+  * @lock: Lock to prevent multiple access to per-CPU fields.
++ * @cond: Condition variable for per-CPU events.
+  * @work_list: List of pending asynchronous work.
+  * @trace_dstate_delayed: Delayed changes to trace_dstate (includes all changes
+  *                        to @trace_dstate).
+@@ -358,6 +359,7 @@ struct CPUState {
  
- extern __thread CPUState *current_cpu;
+     QemuMutex lock;
+     /* fields below protected by @lock */
++    QemuCond cond;
+     QSIMPLEQ_HEAD(, qemu_work_item) work_list;
  
-+/**
-+ * cpu_mutex_lock - lock a CPU's mutex
-+ * @cpu: the CPU whose mutex is to be locked
-+ *
-+ * To avoid deadlock, a CPU's mutex must be acquired after the BQL.
-+ */
-+#define cpu_mutex_lock(cpu)                             \
-+    cpu_mutex_lock_impl(cpu, __FILE__, __LINE__)
-+void cpu_mutex_lock_impl(CPUState *cpu, const char *file, int line);
-+
-+/**
-+ * cpu_mutex_unlock - unlock a CPU's mutex
-+ * @cpu: the CPU whose mutex is to be unlocked
-+ */
-+#define cpu_mutex_unlock(cpu)                           \
-+    cpu_mutex_unlock_impl(cpu, __FILE__, __LINE__)
-+void cpu_mutex_unlock_impl(CPUState *cpu, const char *file, int line);
-+
-+/**
-+ * cpu_mutex_locked - check whether a CPU's mutex is locked
-+ * @cpu: the CPU of interest
-+ *
-+ * Returns true if the calling thread is currently holding the CPU's mutex.
-+ */
-+bool cpu_mutex_locked(const CPUState *cpu);
-+
- static inline void cpu_tb_jmp_cache_clear(CPUState *cpu)
- {
-     unsigned int i;
-diff --git a/cpus.c b/cpus.c
-index b2a9698dc0..a190651653 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -83,6 +83,47 @@ static unsigned int throttle_percentage;
- #define CPU_THROTTLE_PCT_MAX 99
- #define CPU_THROTTLE_TIMESLICE_NS 10000000
+     CPUAddressSpace *cpu_ases;
+@@ -762,12 +764,10 @@ bool cpu_is_stopped(CPUState *cpu);
+  * @cpu: The vCPU to run on.
+  * @func: The function to be executed.
+  * @data: Data to pass to the function.
+- * @mutex: Mutex to release while waiting for @func to run.
+  *
+  * Used internally in the implementation of run_on_cpu.
+  */
+-void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data,
+-                   QemuMutex *mutex);
++void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data);
  
-+/* XXX: is this really the max number of CPUs? */
-+#define CPU_LOCK_BITMAP_SIZE 2048
-+
-+/*
-+ * Note: we index the bitmap with cpu->cpu_index + 1 so that the logic
-+ * also works during early CPU initialization, when cpu->cpu_index is set to
-+ * UNASSIGNED_CPU_INDEX == -1.
-+ */
-+static __thread DECLARE_BITMAP(cpu_lock_bitmap, CPU_LOCK_BITMAP_SIZE);
-+
-+static bool no_cpu_mutex_locked(void)
-+{
-+    return bitmap_empty(cpu_lock_bitmap, CPU_LOCK_BITMAP_SIZE);
-+}
-+
-+void cpu_mutex_lock_impl(CPUState *cpu, const char *file, int line)
-+{
-+/* coverity gets confused by the indirect function call */
-+#ifdef __COVERITY__
-+    qemu_mutex_lock_impl(&cpu->lock, file, line);
-+#else
-+    QemuMutexLockFunc f = atomic_read(&qemu_mutex_lock_func);
-+
-+    g_assert(!cpu_mutex_locked(cpu));
-+    set_bit(cpu->cpu_index + 1, cpu_lock_bitmap);
-+    f(&cpu->lock, file, line);
-+#endif
-+}
-+
-+void cpu_mutex_unlock_impl(CPUState *cpu, const char *file, int line)
-+{
-+    g_assert(cpu_mutex_locked(cpu));
-+    qemu_mutex_unlock_impl(&cpu->lock, file, line);
-+    clear_bit(cpu->cpu_index + 1, cpu_lock_bitmap);
-+}
-+
-+bool cpu_mutex_locked(const CPUState *cpu)
-+{
-+    return test_bit(cpu->cpu_index + 1, cpu_lock_bitmap);
-+}
-+
- bool cpu_is_stopped(CPUState *cpu)
- {
-     return cpu->stopped || !runstate_is_running();
-@@ -92,9 +133,9 @@ static inline bool cpu_work_list_empty(CPUState *cpu)
- {
-     bool ret;
+ /**
+  * run_on_cpu:
+diff --git a/cpus-common.c b/cpus-common.c
+index 2913294cb7..2881707c35 100644
+--- a/cpus-common.c
++++ b/cpus-common.c
+@@ -26,7 +26,6 @@
+ static QemuMutex qemu_cpu_list_lock;
+ static QemuCond exclusive_cond;
+ static QemuCond exclusive_resume;
+-static QemuCond qemu_work_cond;
  
--    qemu_mutex_lock(&cpu->lock);
-+    cpu_mutex_lock(cpu);
-     ret = QSIMPLEQ_EMPTY(&cpu->work_list);
--    qemu_mutex_unlock(&cpu->lock);
-+    cpu_mutex_unlock(cpu);
-     return ret;
+ /* >= 1 if a thread is inside start_exclusive/end_exclusive.  Written
+  * under qemu_cpu_list_lock, read with atomic operations.
+@@ -42,7 +41,6 @@ void qemu_init_cpu_list(void)
+     qemu_mutex_init(&qemu_cpu_list_lock);
+     qemu_cond_init(&exclusive_cond);
+     qemu_cond_init(&exclusive_resume);
+-    qemu_cond_init(&qemu_work_cond);
  }
  
-@@ -1843,6 +1884,9 @@ void qemu_mutex_lock_iothread_impl(const char *file, int line)
- {
-     QemuMutexLockFunc bql_lock = atomic_read(&qemu_bql_mutex_lock_func);
+ void cpu_list_lock(void)
+@@ -113,39 +111,52 @@ struct qemu_work_item {
+     bool free, exclusive, done;
+ };
  
-+    /* prevent deadlock with CPU mutex */
-+    g_assert(no_cpu_mutex_locked());
-+
-     g_assert(!qemu_mutex_iothread_locked());
-     bql_lock(&qemu_global_mutex, file, line);
-     iothread_locked = true;
-diff --git a/stubs/cpu-lock.c b/stubs/cpu-lock.c
-new file mode 100644
-index 0000000000..bc54f00b78
---- /dev/null
-+++ b/stubs/cpu-lock.c
-@@ -0,0 +1,15 @@
-+#include "qemu/osdep.h"
-+#include "qom/cpu.h"
-+
-+void cpu_mutex_lock_impl(CPUState *cpu, const char *file, int line)
+-static void queue_work_on_cpu(CPUState *cpu, struct qemu_work_item *wi)
++/* Called with the CPU's lock held */
++static void queue_work_on_cpu_locked(CPUState *cpu, struct qemu_work_item *wi)
+ {
+-    qemu_mutex_lock(&cpu->lock);
+     QSIMPLEQ_INSERT_TAIL(&cpu->work_list, wi, node);
+     wi->done = false;
+-    qemu_mutex_unlock(&cpu->lock);
+ 
+     qemu_cpu_kick(cpu);
+ }
+ 
+-void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data,
+-                   QemuMutex *mutex)
++static void queue_work_on_cpu(CPUState *cpu, struct qemu_work_item *wi)
 +{
++    cpu_mutex_lock(cpu);
++    queue_work_on_cpu_locked(cpu, wi);
++    cpu_mutex_unlock(cpu);
 +}
 +
-+void cpu_mutex_unlock_impl(CPUState *cpu, const char *file, int line)
-+{
-+}
++void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
+ {
+     struct qemu_work_item wi;
+ 
++    g_assert(qemu_mutex_iothread_locked());
 +
-+bool cpu_mutex_locked(const CPUState *cpu)
-+{
-+    return true;
-+}
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index 53d3f32cb2..fbcdc0256d 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -8,6 +8,7 @@ stub-obj-y += blockdev-close-all-bdrv-states.o
- stub-obj-y += clock-warp.o
- stub-obj-y += cpu-get-clock.o
- stub-obj-y += cpu-get-icount.o
-+stub-obj-y += cpu-lock.o
- stub-obj-y += dump.o
- stub-obj-y += error-printf.o
- stub-obj-y += fdset.o
+     if (qemu_cpu_is_self(cpu)) {
+         func(cpu, data);
+         return;
+     }
+ 
++    qemu_mutex_unlock_iothread();
++
+     wi.func = func;
+     wi.data = data;
+     wi.done = false;
+     wi.free = false;
+     wi.exclusive = false;
+ 
+-    queue_work_on_cpu(cpu, &wi);
++    cpu_mutex_lock(cpu);
++    queue_work_on_cpu_locked(cpu, &wi);
+     while (!atomic_mb_read(&wi.done)) {
+         CPUState *self_cpu = current_cpu;
+ 
+-        qemu_cond_wait(&qemu_work_cond, mutex);
++        qemu_cond_wait(&cpu->cond, &cpu->lock);
+         current_cpu = self_cpu;
+     }
++    cpu_mutex_unlock(cpu);
++
++    qemu_mutex_lock_iothread();
+ }
+ 
+ void async_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
+@@ -307,6 +318,7 @@ void async_safe_run_on_cpu(CPUState *cpu, run_on_cpu_func func,
+ void process_queued_cpu_work(CPUState *cpu)
+ {
+     struct qemu_work_item *wi;
++    bool has_bql = qemu_mutex_iothread_locked();
+ 
+     qemu_mutex_lock(&cpu->lock);
+     if (QSIMPLEQ_EMPTY(&cpu->work_list)) {
+@@ -324,13 +336,23 @@ void process_queued_cpu_work(CPUState *cpu)
+              * BQL, so it goes to sleep; start_exclusive() is sleeping too, so
+              * neither CPU can proceed.
+              */
+-            qemu_mutex_unlock_iothread();
++            if (has_bql) {
++                qemu_mutex_unlock_iothread();
++            }
+             start_exclusive();
+             wi->func(cpu, wi->data);
+             end_exclusive();
+-            qemu_mutex_lock_iothread();
++            if (has_bql) {
++                qemu_mutex_lock_iothread();
++            }
+         } else {
+-            wi->func(cpu, wi->data);
++            if (has_bql) {
++                wi->func(cpu, wi->data);
++            } else {
++                qemu_mutex_lock_iothread();
++                wi->func(cpu, wi->data);
++                qemu_mutex_unlock_iothread();
++            }
+         }
+         qemu_mutex_lock(&cpu->lock);
+         if (wi->free) {
+@@ -340,5 +362,5 @@ void process_queued_cpu_work(CPUState *cpu)
+         }
+     }
+     qemu_mutex_unlock(&cpu->lock);
+-    qemu_cond_broadcast(&qemu_work_cond);
++    qemu_cond_broadcast(&cpu->cond);
+ }
+diff --git a/cpus.c b/cpus.c
+index a190651653..e844335386 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1236,7 +1236,7 @@ void qemu_init_cpu_loop(void)
+ 
+ void run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
+ {
+-    do_run_on_cpu(cpu, func, data, &qemu_global_mutex);
++    do_run_on_cpu(cpu, func, data);
+ }
+ 
+ static void qemu_kvm_destroy_vcpu(CPUState *cpu)
+diff --git a/qom/cpu.c b/qom/cpu.c
+index d0758c907d..bb031a3a6a 100644
+--- a/qom/cpu.c
++++ b/qom/cpu.c
+@@ -373,6 +373,7 @@ static void cpu_common_initfn(Object *obj)
+     cpu->nr_threads = 1;
+ 
+     qemu_mutex_init(&cpu->lock);
++    qemu_cond_init(&cpu->cond);
+     QSIMPLEQ_INIT(&cpu->work_list);
+     QTAILQ_INIT(&cpu->breakpoints);
+     QTAILQ_INIT(&cpu->watchpoints);
 -- 
 2.17.1
