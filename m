@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50098)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50413)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brad@comstyle.com>) id 1gDUGh-0002Zd-Bq
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:52:44 -0400
+	(envelope-from <thuth@redhat.com>) id 1gDUHe-0003KB-2O
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:53:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brad@comstyle.com>) id 1gDUGg-0004hA-Ie
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:52:43 -0400
-Received: from speedy.comstyle.com ([2001:470:1d:8c::2]:5825
-	helo=mail.comstyle.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <brad@comstyle.com>) id 1gDUGg-0004dp-7z
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:52:42 -0400
-Received: from mail.comstyle.com (localhost [127.0.0.1])
-	by mail.comstyle.com (Postfix) with ESMTP id 5E0B89843A
-	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 08:52:32 -0400 (EDT)
-Received: from humpty.home.comstyle.com (unknown
-	[IPv6:2001:470:c454:100:bae4:5a8f:59c0:49f6])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested) (Authenticated sender: brad)
-	by mail.comstyle.com (Postfix) with ESMTPSA id 36A1298439
-	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 08:52:32 -0400 (EDT)
-Date: Fri, 19 Oct 2018 08:52:39 -0400
-From: Brad Smith <brad@comstyle.com>
-Message-ID: <20181019125239.GA13884@humpty.home.comstyle.com>
+	(envelope-from <thuth@redhat.com>) id 1gDUHa-0006mg-Mx
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:53:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50736)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gDUHa-0006g6-Bo
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:53:38 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8AC55308FF21
+	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 12:53:35 +0000 (UTC)
+References: <20181019122613.28663-1-pbonzini@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <c74a4a2c-49e0-6d80-0a75-16f41316fa99@redhat.com>
+Date: Fri, 19 Oct 2018 14:53:30 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] [PATCH v3] oslib-posix: Use MAP_STACK in
- qemu_alloc_stack() on OpenBSD
+In-Reply-To: <20181019122613.28663-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: remove or downgrade myself to
+ reviewer from some subsystems
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,59 +34,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
-Use MAP_STACK in qemu_alloc_stack() on OpenBSD.
+On 2018-10-19 14:26, Paolo Bonzini wrote:
+> Other people are doing a much better work than myself at handling some
+> subsystems.  For those files it is better if I downgrade myself to
+> reviewer or recognize that I am not actually doing any work there.
+>=20
+> Cc: Daniel P. Berrange <berrange@redhat.com>
+> Cc: Gerd Hoffmann <kraxel@redhat.com>
+> Cc: Eric Blake <eblake@redhat.com>
+> Cc: Thomas Huth <thuth@redhat.com>
+> Cc: Laurent Vivier <lvivier@redhat.com>
+> Cc: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  MAINTAINERS | 13 ++++++-------
+>  1 file changed, 6 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index fb81b3a8eb..8c814b2e60 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -105,9 +105,9 @@ Guest CPU cores (TCG):
+>  ----------------------
+>  Overall
+>  L: qemu-devel@nongnu.org
+> -M: Paolo Bonzini <pbonzini@redhat.com>
+>  M: Peter Crosthwaite <crosthwaite.peter@gmail.com>
+>  M: Richard Henderson <rth@twiddle.net>
+> +R: Paolo Bonzini <pbonzini@redhat.com>
+>  S: Maintained
+>  F: cpus.c
+>  F: exec.c
+> @@ -1132,7 +1132,8 @@ F: hw/pci-host/ppce500.c
+>  F: hw/net/fsl_etsec/
+> =20
+>  Character devices
+> -M: Paolo Bonzini <pbonzini@redhat.com>
+> +M: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> +R: Paolo Bonzini <pbonzini@redhat.com>
+>  S: Odd Fixes
+>  F: hw/char/
+> =20
+> @@ -1517,8 +1518,8 @@ T: git git://github.com/famz/qemu.git bitmaps
+>  T: git git://github.com/jnsnow/qemu.git bitmaps
+> =20
+>  Character device backends
+> -M: Paolo Bonzini <pbonzini@redhat.com>
+>  M: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> +R: Paolo Bonzini <pbonzini@redhat.com>
+>  S: Maintained
+>  F: chardev/
+>  F: include/chardev/
+> @@ -1751,9 +1752,9 @@ F: tests/qmp-cmd-test.c
+>  T: git git://repo.or.cz/qemu/armbru.git qapi-next
+> =20
+>  qtest
+> -M: Paolo Bonzini <pbonzini@redhat.com>
+>  M: Thomas Huth <thuth@redhat.com>
+>  M: Laurent Vivier <lvivier@redhat.com>
+> +R: Paolo Bonzini <pbonzini@redhat.com>
+>  S: Maintained
+>  F: qtest.c
+>  F: tests/libqtest.*
+> @@ -1860,7 +1861,6 @@ F: tests/test-io-*
+>  Sockets
+>  M: Daniel P. Berrange <berrange@redhat.com>
+>  M: Gerd Hoffmann <kraxel@redhat.com>
+> -M: Paolo Bonzini <pbonzini@redhat.com>
+>  S: Maintained
+>  F: include/qemu/sockets.h
+>  F: util/qemu-sockets.c
+> @@ -2050,13 +2050,12 @@ M: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+>  M: Paolo Bonzini <pbonzini@redhat.com>
+>  M: Peter Lieven <pl@kamp.de>
+>  L: qemu-block@nongnu.org
+> -S: Supported
+> +S: Odd Fixes
+>  F: block/iscsi.c
+>  F: block/iscsi-opts.c
+> =20
+>  Network Block Device (NBD)
+>  M: Eric Blake <eblake@redhat.com>
+> -M: Paolo Bonzini <pbonzini@redhat.com>
+>  L: qemu-block@nongnu.org
+>  S: Maintained
+>  F: block/nbd*
+>=20
 
-Added to our 6.4 release.
+:-(
 
-MAP_STACK      Indicate that the mapping is used as a stack.  This
-               flag must be used in combination with MAP_ANON and
-               MAP_PRIVATE.
-
-Implement MAP_STACK option for mmap().  Synchronous faults (pagefault and
-syscall) confirm the stack register points at MAP_STACK memory, otherwise
-SIGSEGV is delivered. sigaltstack() and pthread_attr_setstack() are modified
-to create a MAP_STACK sub-region which satisfies alignment requirements.
-Observe that MAP_STACK can only be set/cleared by mmap(), which zeroes the
-contents of the region -- there is no mprotect() equivalent operation, so
-there is no MAP_STACK-adding gadget.
-
-
-Signed-off-by: Brad Smith <brad@comstyle.com>
-Reviewed-by: Kamil Rytarowski <n54@gmx.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index fbd0dc8c57..c1bee2a581 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -596,6 +596,7 @@ pid_t qemu_fork(Error **errp)
- void *qemu_alloc_stack(size_t *sz)
- {
-     void *ptr, *guardpage;
-+    int flags;
- #ifdef CONFIG_DEBUG_STACK_USAGE
-     void *ptr2;
- #endif
-@@ -610,8 +611,18 @@ void *qemu_alloc_stack(size_t *sz)
-     /* allocate one extra page for the guard page */
-     *sz += pagesz;
- 
--    ptr = mmap(NULL, *sz, PROT_READ | PROT_WRITE,
--               MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-+    flags = MAP_PRIVATE | MAP_ANONYMOUS;
-+#if defined(MAP_STACK) && defined(__OpenBSD__)
-+    /* Only enable MAP_STACK on OpenBSD. Other OS's such as
-+     * Linux/FreeBSD/NetBSD have a flag with the same name
-+     * but have differing functionality. OpenBSD will SEGV
-+     * if it spots execution with a stack pointer pointing
-+     * at memory that was not allocated with MAP_STACK.
-+     */
-+    flags |= MAP_STACK;
-+#endif
-+
-+    ptr = mmap(NULL, *sz, PROT_READ | PROT_WRITE, flags, -1, 0);
-     if (ptr == MAP_FAILED) {
-         perror("failed to allocate memory for stack");
-         abort();
+Acked-by: Thomas Huth <thuth@redhat.com>
