@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58842)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58938)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gDJFZ-0004cj-Qa
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:06:52 -0400
+	(envelope-from <cota@braap.org>) id 1gDJFc-0004eg-76
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:06:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gDJFX-00031X-Hs
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:06:49 -0400
-Received: from out5-smtp.messagingengine.com ([66.111.4.29]:53185)
+	(envelope-from <cota@braap.org>) id 1gDJFZ-000369-U0
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:06:51 -0400
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:50609)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gDJFW-0002lR-W5
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:06:47 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gDJFZ-0002nF-29
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:06:49 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 18 Oct 2018 21:05:49 -0400
-Message-Id: <20181019010625.25294-21-cota@braap.org>
+Date: Thu, 18 Oct 2018 21:05:52 -0400
+Message-Id: <20181019010625.25294-24-cota@braap.org>
 In-Reply-To: <20181019010625.25294-1-cota@braap.org>
 References: <20181019010625.25294-1-cota@braap.org>
-Subject: [Qemu-devel] [RFC v3 20/56] gdbstub: convert to cpu_halted
+Subject: [Qemu-devel] [RFC v3 23/56] cpu: define cpu_interrupt_request
+ helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,21 +29,54 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>
 
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- gdbstub.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/qom/cpu.h | 35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
 
-diff --git a/gdbstub.c b/gdbstub.c
-index c8478de8f5..a5ff50d9e7 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -1305,7 +1305,7 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-                 /* memtohex() doubles the required space */
-                 len = snprintf((char *)mem_buf, sizeof(buf) / 2,
-                                "CPU#%d [%s]", cpu->cpu_index,
--                               cpu->halted ? "halted " : "running");
-+                               cpu_halted(cpu) ? "halted " : "running");
-                 trace_gdbstub_op_extra_info((char *)mem_buf);
-                 memtohex(buf, mem_buf, len);
-                 put_packet(s, buf);
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index 3bf6767cb0..cd66b8828a 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -504,6 +504,41 @@ static inline void cpu_halted_set(CPUState *cpu, uint32_t val)
+     cpu_mutex_unlock(cpu);
+ }
+ 
++static inline uint32_t cpu_interrupt_request(CPUState *cpu)
++{
++    uint32_t ret;
++
++    if (cpu_mutex_locked(cpu)) {
++        return cpu->interrupt_request;
++    }
++    cpu_mutex_lock(cpu);
++    ret = cpu->interrupt_request;
++    cpu_mutex_unlock(cpu);
++    return ret;
++}
++
++static inline void cpu_interrupt_request_or(CPUState *cpu, uint32_t mask)
++{
++    if (cpu_mutex_locked(cpu)) {
++        cpu->interrupt_request |= mask;
++        return;
++    }
++    cpu_mutex_lock(cpu);
++    cpu->interrupt_request |= mask;
++    cpu_mutex_unlock(cpu);
++}
++
++static inline void cpu_interrupt_request_set(CPUState *cpu, uint32_t val)
++{
++    if (cpu_mutex_locked(cpu)) {
++        cpu->interrupt_request = val;
++        return;
++    }
++    cpu_mutex_lock(cpu);
++    cpu->interrupt_request = val;
++    cpu_mutex_unlock(cpu);
++}
++
+ static inline void cpu_tb_jmp_cache_clear(CPUState *cpu)
+ {
+     unsigned int i;
 -- 
 2.17.1
