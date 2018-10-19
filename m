@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39114)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39169)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gDXkT-00067v-IT
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:35:42 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDXkb-0006Dh-6v
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:35:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gDXkQ-0001D7-9A
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:35:41 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:43676)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gDXkP-00019I-SK
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:35:38 -0400
-Received: by mail-wr1-f66.google.com with SMTP id n1-v6so38073857wrt.10
-	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 09:35:37 -0700 (PDT)
-References: <1539954845-26716-1-git-send-email-thuth@redhat.com>
-	<1539954845-26716-6-git-send-email-thuth@redhat.com>
-	<CAFEAcA_NkdZtbM9n4633_hSr38eb9FJsi92=+Eeuky+U=eDtZA@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <6ea8c64f-272f-6645-8a2f-b94117a24027@redhat.com>
-Date: Fri, 19 Oct 2018 18:35:30 +0200
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_NkdZtbM9n4633_hSr38eb9FJsi92=+Eeuky+U=eDtZA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 5/5] configs: Add a CONFIG_SMC37C669 switch
- for the "smc37c669-superio" device
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDXkY-0001Pu-00
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:35:49 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:58349 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1gDXkX-00011P-Ja
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:35:45 -0400
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Date: Fri, 19 Oct 2018 18:33:47 +0200
+Message-Id: <1539966828-20947-14-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1539966828-20947-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1539966828-20947-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PATCH v5 13/14] target/mips: Add emulation of MXU
+ instructions Q8MUL and Q8MULSU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,63 +25,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Cc: aurelien@aurel32.net, richard.henderson@linaro.org, jancraig@amazon.com, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com
 
-On 19/10/2018 16:46, Peter Maydell wrote:
-> On 19 October 2018 at 14:14, Thomas Huth <thuth@redhat.com> wrote:
->> This device is not user-creatable and currently only used for the
->> "alpha" target. So if the user does not want to compile alpha-softmmu,
->> we should also not compile this device. Add a proper config switch to
->> be able to compile this more flexibly.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  default-configs/alpha-softmmu.mak | 1 +
->>  hw/isa/Makefile.objs              | 3 ++-
->>  2 files changed, 3 insertions(+), 1 deletion(-)
->>
->> diff --git a/default-configs/alpha-softmmu.mak b/default-configs/alpha-softmmu.mak
->> index bbe361f..eb58b40 100644
->> --- a/default-configs/alpha-softmmu.mak
->> +++ b/default-configs/alpha-softmmu.mak
->> @@ -19,3 +19,4 @@ CONFIG_IDE_CMD646=y
->>  CONFIG_I8259=y
->>  CONFIG_MC146818RTC=y
->>  CONFIG_ISA_TESTDEV=y
->> +CONFIG_SMC37C669=y
->> diff --git a/hw/isa/Makefile.objs b/hw/isa/Makefile.objs
->> index 83e06f6..9e106df 100644
->> --- a/hw/isa/Makefile.objs
->> +++ b/hw/isa/Makefile.objs
->> @@ -1,9 +1,10 @@
->>  common-obj-$(CONFIG_ISA_BUS) += isa-bus.o
->> -common-obj-$(CONFIG_ISA_BUS) += isa-superio.o smc37c669-superio.o
->> +common-obj-$(CONFIG_ISA_BUS) += isa-superio.o
->>  common-obj-$(CONFIG_APM) += apm.o
->>  common-obj-$(CONFIG_I82378) += i82378.o
->>  common-obj-$(CONFIG_PC87312) += pc87312.o
->>  common-obj-$(CONFIG_PIIX4) += piix4.o
->>  common-obj-$(CONFIG_VT82C686) += vt82c686.o
->> +common-obj-$(CONFIG_SMC37C669) += smc37c669-superio.o
-> 
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> 
-> Should isa-superio.o also go in its own config flag?
+From: Craig Janeczek <jancraig@amazon.com>
 
-It could be, but pc87312/smc37c669/vt82c686 inherit of TYPE_ISA_SUPERIO
-so would require something like:
+Adds support for emulating the Q8MUL and Q8MULSU MXU instructions.
 
-common-obj-$(call land,$(CONFIG_ISA_SUPERIO),$(CONFIG_PC87312)) \
-            += pc87312.o
-common-obj-$(call land,$(CONFIG_ISA_SUPERIO),$(CONFIG_VT82C686)) \
-            += vt82c686.o
-common-obj-$(call land,$(CONFIG_ISA_SUPERIO),$(CONFIG_SMC37C669)) \
-            += smc37c669-superio.o
+Signed-off-by: Craig Janeczek <jancraig@amazon.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+---
+ target/mips/translate.c | 101 ++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 94 insertions(+), 7 deletions(-)
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> 
-> thanks
-> -- PMM
-> 
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index d37539b..76859bf 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -23644,6 +23644,99 @@ static void gen_mxu_d16mac(DisasContext *ctx)
+     tcg_temp_free(t3);
+ }
+ 
++/*
++ * Q8MUL   XRa, XRb, XRc, XRd - Parallel unsigned 8 bit pattern multiply
++ * Q8MULSU XRa, XRb, XRc, XRd - Parallel signed 8 bit pattern multiply
++ */
++static void gen_mxu_q8mul_q8mulsu(DisasContext *ctx)
++{
++    TCGv t0, t1, t2, t3, t4, t5, t6, t7;
++    TCGLabel *l0;
++    uint32_t XRa, XRb, XRc, XRd, sel;
++
++    t0 = tcg_temp_new();
++    t1 = tcg_temp_new();
++    t2 = tcg_temp_new();
++    t3 = tcg_temp_new();
++    t4 = tcg_temp_new();
++    t5 = tcg_temp_new();
++    t6 = tcg_temp_new();
++    t7 = tcg_temp_new();
++
++    l0 = gen_new_label();
++
++    XRa = extract32(ctx->opcode, 6, 4);
++    XRb = extract32(ctx->opcode, 10, 4);
++    XRc = extract32(ctx->opcode, 14, 4);
++    XRd = extract32(ctx->opcode, 18, 4);
++    sel = extract32(ctx->opcode, 22, 2);
++
++    gen_load_mxu_cr(t0);
++    tcg_gen_andi_tl(t0, t0, MXU_CR_MXU_EN);
++    tcg_gen_brcondi_tl(TCG_COND_NE, t0, MXU_CR_MXU_EN, l0);
++
++    gen_load_mxu_gpr(t3, XRb);
++    gen_load_mxu_gpr(t7, XRc);
++
++    if (sel == 0x2) {
++        /* Q8MULSU */
++        tcg_gen_ext8s_tl(t0, t3);
++        tcg_gen_shri_tl(t3, t3, 8);
++        tcg_gen_ext8s_tl(t1, t3);
++        tcg_gen_shri_tl(t3, t3, 8);
++        tcg_gen_ext8s_tl(t2, t3);
++        tcg_gen_shri_tl(t3, t3, 8);
++        tcg_gen_ext8s_tl(t3, t3);
++    } else {
++        /* Q8MUL */
++        tcg_gen_ext8u_tl(t0, t3);
++        tcg_gen_shri_tl(t3, t3, 8);
++        tcg_gen_ext8u_tl(t1, t3);
++        tcg_gen_shri_tl(t3, t3, 8);
++        tcg_gen_ext8u_tl(t2, t3);
++        tcg_gen_shri_tl(t3, t3, 8);
++        tcg_gen_ext8u_tl(t3, t3);
++    }
++
++    tcg_gen_ext8u_tl(t4, t7);
++    tcg_gen_shri_tl(t7, t7, 8);
++    tcg_gen_ext8u_tl(t5, t7);
++    tcg_gen_shri_tl(t7, t7, 8);
++    tcg_gen_ext8u_tl(t6, t7);
++    tcg_gen_shri_tl(t7, t7, 8);
++    tcg_gen_ext8u_tl(t7, t7);
++
++    tcg_gen_mul_tl(t0, t0, t4);
++    tcg_gen_mul_tl(t1, t1, t5);
++    tcg_gen_mul_tl(t2, t2, t6);
++    tcg_gen_mul_tl(t3, t3, t7);
++
++    tcg_gen_andi_tl(t0, t0, 0xFFFF);
++    tcg_gen_andi_tl(t1, t1, 0xFFFF);
++    tcg_gen_andi_tl(t2, t2, 0xFFFF);
++    tcg_gen_andi_tl(t3, t3, 0xFFFF);
++
++    tcg_gen_shli_tl(t1, t1, 16);
++    tcg_gen_shli_tl(t3, t3, 16);
++
++    tcg_gen_or_tl(t0, t0, t1);
++    tcg_gen_or_tl(t1, t2, t3);
++
++    gen_store_mxu_gpr(t0, XRd);
++    gen_store_mxu_gpr(t1, XRa);
++
++    gen_set_label(l0);
++
++    tcg_temp_free(t0);
++    tcg_temp_free(t1);
++    tcg_temp_free(t2);
++    tcg_temp_free(t3);
++    tcg_temp_free(t4);
++    tcg_temp_free(t5);
++    tcg_temp_free(t6);
++    tcg_temp_free(t7);
++}
++
+ 
+ /*
+  * Decoding engine for MXU
+@@ -24467,14 +24560,8 @@ static void decode_opc_mxu__pool19(CPUMIPSState *env, DisasContext *ctx)
+ 
+     switch (opcode) {
+     case OPC_MXU_Q8MUL:
+-        /* TODO: Implement emulation of Q8MUL instruction. */
+-        MIPS_INVAL("OPC_MXU_Q8MUL");
+-        generate_exception_end(ctx, EXCP_RI);
+-        break;
+     case OPC_MXU_Q8MULSU:
+-        /* TODO: Implement emulation of Q8MULSU instruction. */
+-        MIPS_INVAL("OPC_MXU_Q8MULSU");
+-        generate_exception_end(ctx, EXCP_RI);
++        gen_mxu_q8mul_q8mulsu(ctx);
+         break;
+     default:
+         MIPS_INVAL("decode_opc_mxu");
+-- 
+2.7.4
