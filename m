@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39169)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDXkb-0006Dh-6v
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:35:50 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gDXmH-0007Ka-Ro
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:37:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDXkY-0001Pu-00
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:35:49 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:58349 helo=mail.rt-rk.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gDXkX-00011P-Ja
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:35:45 -0400
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Fri, 19 Oct 2018 18:33:47 +0200
-Message-Id: <1539966828-20947-14-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1539966828-20947-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1539966828-20947-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v5 13/14] target/mips: Add emulation of MXU
- instructions Q8MUL and Q8MULSU
+	(envelope-from <peter.maydell@linaro.org>) id 1gDXmG-0003GG-US
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:37:33 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:38861)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gDXmE-0003FH-Uq
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:37:31 -0400
+Received: by mail-ot1-x341.google.com with SMTP id l1so33774091otj.5
+	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 09:37:30 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <2c425566-53b5-e299-ccb1-09793ab673d5@linaro.org>
+References: <20181019015617.22583-1-richard.henderson@linaro.org>
+	<20181019015617.22583-4-richard.henderson@linaro.org>
+	<CAFEAcA81rDucGOEVYi1LCw=1eiHisuM8+yXGzaw2dMktdU99cw@mail.gmail.com>
+	<1dda484c-1fc8-f75e-3150-111b0c7d85f9@linaro.org>
+	<CAFEAcA8f2SvmsABANVrWLZo8NzeAirMOqsm7AnyPCVVKL_z0Sw@mail.gmail.com>
+	<2c425566-53b5-e299-ccb1-09793ab673d5@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 19 Oct 2018 17:37:09 +0100
+Message-ID: <CAFEAcA-NK7sMBBXg4e1c=B_BxypKWAiBnZu1p4gMohTqL=gT8g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] target/arm: Flush only the TLBs
+ affected by TTBR*_EL1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,138 +34,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net, richard.henderson@linaro.org, jancraig@amazon.com, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-From: Craig Janeczek <jancraig@amazon.com>
+On 19 October 2018 at 17:31, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> On 10/19/18 9:12 AM, Peter Maydell wrote:
+>> A conservative check is probably:
+>>   if arm_current_el() < 3
+>>      // TTBR definitely can only be affecting the EL0/1
+>>      // translation regime for the current security state
+>>      if arm_is_secure_below_el3()
+>>         if EL3 is AArch32
+>>             flush S1SE0, S1E3
+>>         else
+>>             flush S1SE0, S1SE1
+>>      else
+>>         flush S12NSE1, S12NSE0
+>>   else
+>>      // err on the side of flushing more than maybe we need to
+>>      flush S1SE0, S12NSE1, S12NSE0
+>>      if EL3 is AArch32
+>>           flush S1E3
+>>      else
+>>           flush S1SE1
+>>
+>> (but you should check my logic ;-))
+>
+> Riiight.
+>
+> Clearly it would be simpler and safer to track unused tlbs within cputlb.c.
 
-Adds support for emulating the Q8MUL and Q8MULSU MXU instructions.
+The advantage of the above logic is that it means that even
+when we do have trustzone and are using the secure TLBs,
+we only flush the side we need to, not the whole lot.
+(But yeah, it's a bit hairy.)
 
-Signed-off-by: Craig Janeczek <jancraig@amazon.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
----
- target/mips/translate.c | 101 ++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 94 insertions(+), 7 deletions(-)
+> So drop this patch for now and I'll get back to it.  The other two in this
+> series are at least incremental improvement in the meantime.
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index d37539b..76859bf 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -23644,6 +23644,99 @@ static void gen_mxu_d16mac(DisasContext *ctx)
-     tcg_temp_free(t3);
- }
- 
-+/*
-+ * Q8MUL   XRa, XRb, XRc, XRd - Parallel unsigned 8 bit pattern multiply
-+ * Q8MULSU XRa, XRb, XRc, XRd - Parallel signed 8 bit pattern multiply
-+ */
-+static void gen_mxu_q8mul_q8mulsu(DisasContext *ctx)
-+{
-+    TCGv t0, t1, t2, t3, t4, t5, t6, t7;
-+    TCGLabel *l0;
-+    uint32_t XRa, XRb, XRc, XRd, sel;
-+
-+    t0 = tcg_temp_new();
-+    t1 = tcg_temp_new();
-+    t2 = tcg_temp_new();
-+    t3 = tcg_temp_new();
-+    t4 = tcg_temp_new();
-+    t5 = tcg_temp_new();
-+    t6 = tcg_temp_new();
-+    t7 = tcg_temp_new();
-+
-+    l0 = gen_new_label();
-+
-+    XRa = extract32(ctx->opcode, 6, 4);
-+    XRb = extract32(ctx->opcode, 10, 4);
-+    XRc = extract32(ctx->opcode, 14, 4);
-+    XRd = extract32(ctx->opcode, 18, 4);
-+    sel = extract32(ctx->opcode, 22, 2);
-+
-+    gen_load_mxu_cr(t0);
-+    tcg_gen_andi_tl(t0, t0, MXU_CR_MXU_EN);
-+    tcg_gen_brcondi_tl(TCG_COND_NE, t0, MXU_CR_MXU_EN, l0);
-+
-+    gen_load_mxu_gpr(t3, XRb);
-+    gen_load_mxu_gpr(t7, XRc);
-+
-+    if (sel == 0x2) {
-+        /* Q8MULSU */
-+        tcg_gen_ext8s_tl(t0, t3);
-+        tcg_gen_shri_tl(t3, t3, 8);
-+        tcg_gen_ext8s_tl(t1, t3);
-+        tcg_gen_shri_tl(t3, t3, 8);
-+        tcg_gen_ext8s_tl(t2, t3);
-+        tcg_gen_shri_tl(t3, t3, 8);
-+        tcg_gen_ext8s_tl(t3, t3);
-+    } else {
-+        /* Q8MUL */
-+        tcg_gen_ext8u_tl(t0, t3);
-+        tcg_gen_shri_tl(t3, t3, 8);
-+        tcg_gen_ext8u_tl(t1, t3);
-+        tcg_gen_shri_tl(t3, t3, 8);
-+        tcg_gen_ext8u_tl(t2, t3);
-+        tcg_gen_shri_tl(t3, t3, 8);
-+        tcg_gen_ext8u_tl(t3, t3);
-+    }
-+
-+    tcg_gen_ext8u_tl(t4, t7);
-+    tcg_gen_shri_tl(t7, t7, 8);
-+    tcg_gen_ext8u_tl(t5, t7);
-+    tcg_gen_shri_tl(t7, t7, 8);
-+    tcg_gen_ext8u_tl(t6, t7);
-+    tcg_gen_shri_tl(t7, t7, 8);
-+    tcg_gen_ext8u_tl(t7, t7);
-+
-+    tcg_gen_mul_tl(t0, t0, t4);
-+    tcg_gen_mul_tl(t1, t1, t5);
-+    tcg_gen_mul_tl(t2, t2, t6);
-+    tcg_gen_mul_tl(t3, t3, t7);
-+
-+    tcg_gen_andi_tl(t0, t0, 0xFFFF);
-+    tcg_gen_andi_tl(t1, t1, 0xFFFF);
-+    tcg_gen_andi_tl(t2, t2, 0xFFFF);
-+    tcg_gen_andi_tl(t3, t3, 0xFFFF);
-+
-+    tcg_gen_shli_tl(t1, t1, 16);
-+    tcg_gen_shli_tl(t3, t3, 16);
-+
-+    tcg_gen_or_tl(t0, t0, t1);
-+    tcg_gen_or_tl(t1, t2, t3);
-+
-+    gen_store_mxu_gpr(t0, XRd);
-+    gen_store_mxu_gpr(t1, XRa);
-+
-+    gen_set_label(l0);
-+
-+    tcg_temp_free(t0);
-+    tcg_temp_free(t1);
-+    tcg_temp_free(t2);
-+    tcg_temp_free(t3);
-+    tcg_temp_free(t4);
-+    tcg_temp_free(t5);
-+    tcg_temp_free(t6);
-+    tcg_temp_free(t7);
-+}
-+
- 
- /*
-  * Decoding engine for MXU
-@@ -24467,14 +24560,8 @@ static void decode_opc_mxu__pool19(CPUMIPSState *env, DisasContext *ctx)
- 
-     switch (opcode) {
-     case OPC_MXU_Q8MUL:
--        /* TODO: Implement emulation of Q8MUL instruction. */
--        MIPS_INVAL("OPC_MXU_Q8MUL");
--        generate_exception_end(ctx, EXCP_RI);
--        break;
-     case OPC_MXU_Q8MULSU:
--        /* TODO: Implement emulation of Q8MULSU instruction. */
--        MIPS_INVAL("OPC_MXU_Q8MULSU");
--        generate_exception_end(ctx, EXCP_RI);
-+        gen_mxu_q8mul_q8mulsu(ctx);
-         break;
-     default:
-         MIPS_INVAL("decode_opc_mxu");
--- 
-2.7.4
+OK, I'll put those in target-arm.next.
+
+thanks
+-- PMM
