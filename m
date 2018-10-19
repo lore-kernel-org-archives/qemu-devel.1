@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDXiz-00051z-QV
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:34:10 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDXj4-00055c-N3
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:34:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDXiw-0006Xb-LO
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:34:09 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:54849 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDXj3-0006i8-Ov
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:34:14 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:54906 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gDXiw-0006TX-CY
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:34:06 -0400
+	id 1gDXj3-0006gE-Et
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:34:13 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Fri, 19 Oct 2018 18:33:34 +0200
-Message-Id: <1539966828-20947-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v5 00/14] Add limited MXU instruction support
+Date: Fri, 19 Oct 2018 18:33:35 +0200
+Message-Id: <1539966828-20947-2-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1539966828-20947-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1539966828-20947-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PATCH v5 01/14] target/mips: Introduce MXU registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,41 +27,85 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: aurelien@aurel32.net, richard.henderson@linaro.org, jancraig@amazon.com, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Craig Janeczek <jancraig@amazon.com>
 
-This patch set begins to add MXU instruction support for
-MIPS emulation.
+Define and initialize the 16 MXU registers - 15 general computational
+register, and 1 control register). There is also a zero register, but
+it does not have any corresponding variable.
 
-v4->v5:
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Craig Janeczek <jancraig@amazon.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+---
+ target/mips/cpu.h       | 10 ++++++++++
+ target/mips/translate.c | 20 ++++++++++++++++++++
+ 2 files changed, 30 insertions(+)
 
-  - added full decoding engine for MXU ASE
-  - changes on aptn2, optn2, optn3 are now stand-alone patches
-  - all patches on individual instructions are reworked to fit
-    new decoding engine, and also cosmetically improved
-  - rebased to the latest code
-
-Aleksandar Markovic (2):
-  target/mips: Add and integrate MXU decoding engine placeholder
-  target/mips: Add MXU decoding engine
-
-Craig Janeczek (12):
-  target/mips: Introduce MXU registers
-  target/mips: Define a bit for MXU in insn_flags
-  target/mips: Add bit encoding for MXU add/subtract patterns 'aptn2'
-  target/mips: Add bit encoding for MXU operand getting patterns 'optn2'
-  target/mips: Add bit encoding for MXU operand getting patterns 'optn3'
-  target/mips: Add emulation of non-MXU MULL within MXU decoding engine
-  target/mips: Add emulation of MXU instructions S32I2M and S32M2I
-  target/mips: Add emulation of MXU instruction S8LDD
-  target/mips: Add emulation of MXU instruction D16MUL
-  target/mips: Add emulation of MXU instruction D16MAC
-  target/mips: Add emulation of MXU instructions Q8MUL and Q8MULSU
-  target/mips: Add emulation of MXU instructions S32LDD and S32LDDR
-
- target/mips/cpu.h       |   10 +
- target/mips/mips-defs.h |    1 +
- target/mips/translate.c | 1979 +++++++++++++++++++++++++++++++++++++++++++----
- 3 files changed, 1834 insertions(+), 156 deletions(-)
-
+diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+index e48be4b..03c03fd 100644
+--- a/target/mips/cpu.h
++++ b/target/mips/cpu.h
+@@ -170,6 +170,16 @@ struct TCState {
+         MSACSR_FS_MASK)
+ 
+     float_status msa_fp_status;
++
++#define NUMBER_OF_MXU_REGISTERS 16
++    target_ulong mxu_gpr[NUMBER_OF_MXU_REGISTERS - 1];
++    target_ulong mxu_cr;
++#define MXU_CR_LC       31
++#define MXU_CR_RC       30
++#define MXU_CR_BIAS     2
++#define MXU_CR_RD_EN    1
++#define MXU_CR_MXU_EN   0
++
+ };
+ 
+ typedef struct CPUMIPSState CPUMIPSState;
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 3a0bdd5..ef7ad62 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -1937,6 +1937,10 @@ static TCGv_i32 fpu_fcr0, fpu_fcr31;
+ static TCGv_i64 fpu_f64[32];
+ static TCGv_i64 msa_wr_d[64];
+ 
++/* MXU registers */
++static TCGv mxu_gpr[NUMBER_OF_MXU_REGISTERS - 1];
++static TCGv mxu_CR;
++
+ #include "exec/gen-icount.h"
+ 
+ #define gen_helper_0e0i(name, arg) do {                           \
+@@ -2059,6 +2063,11 @@ static const char * const msaregnames[] = {
+     "w30.d0", "w30.d1", "w31.d0", "w31.d1",
+ };
+ 
++static const char * const mxuregnames[] = {
++    "XR1",  "XR2",  "XR3",  "XR4",  "XR5",  "XR6",  "XR7",  "XR8",
++    "XR9",  "XR10", "XR11", "XR12", "XR13", "XR14", "XR15", "MXU_CR",
++};
++
+ #define LOG_DISAS(...)                                                        \
+     do {                                                                      \
+         if (MIPS_DEBUG_DISAS) {                                               \
+@@ -26264,6 +26273,17 @@ void mips_tcg_init(void)
+     fpu_fcr31 = tcg_global_mem_new_i32(cpu_env,
+                                        offsetof(CPUMIPSState, active_fpu.fcr31),
+                                        "fcr31");
++
++    for (i = 0; i < NUMBER_OF_MXU_REGISTERS - 1; i++) {
++        mxu_gpr[i] = tcg_global_mem_new(cpu_env,
++                                        offsetof(CPUMIPSState,
++                                                 active_tc.mxu_gpr[i]),
++                                        mxuregnames[i]);
++    }
++
++    mxu_CR = tcg_global_mem_new(cpu_env,
++                                offsetof(CPUMIPSState, active_tc.mxu_cr),
++                                mxuregnames[NUMBER_OF_MXU_REGISTERS - 1]);
+ }
+ 
+ #include "translate_init.inc.c"
 -- 
 2.7.4
