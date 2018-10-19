@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46376)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gDRnh-0007Bs-VR
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 06:14:39 -0400
+	(envelope-from <mlureau@redhat.com>) id 1gDRoh-0007wf-5d
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 06:15:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gDRnd-0008Il-4D
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 06:14:37 -0400
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:36987)
+	(envelope-from <mlureau@redhat.com>) id 1gDRoa-0001j8-UZ
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 06:15:39 -0400
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:41824)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gDRna-0008DY-Ol
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 06:14:30 -0400
-Received: by mail-qt1-f195.google.com with SMTP id d14-v6so37629223qto.4
-	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 03:14:29 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gDRoT-0001UY-DF
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 06:15:30 -0400
+Received: by mail-qt1-f196.google.com with SMTP id l41-v6so37600191qtl.8
+	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 03:15:22 -0700 (PDT)
 MIME-Version: 1.0
 References: <20181018223501.21683-1-jusual@mail.ru>
-	<20181018223501.21683-4-jusual@mail.ru>
-In-Reply-To: <20181018223501.21683-4-jusual@mail.ru>
+	<20181018223501.21683-3-jusual@mail.ru>
+In-Reply-To: <20181018223501.21683-3-jusual@mail.ru>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Fri, 19 Oct 2018 14:14:17 +0400
-Message-ID: <CAMxuvawrC2xEHPJ=4y3+odxc4H4Ot1HufxKCBWU5qBX4VoaE4g@mail.gmail.com>
+Date: Fri, 19 Oct 2018 14:15:10 +0400
+Message-ID: <CAMxuvawyME-vDek6mcbfwLcCE1iE9AmqUgu1_r+Ka9ejZyGodQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] tests/test-char: Check websocket
- chardev functionality
+Subject: Re: [Qemu-devel] [PATCH v3 2/3] chardev: Add websocket support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,183 +36,261 @@ Hi
 
 On Fri, Oct 19, 2018 at 2:35 AM Julia Suvorova <jusual@mail.ru> wrote:
 >
-> Test order:
->     Creating server websocket chardev
->     Creating usual tcp chardev client
->     Sending handshake message from client
->     Receiving handshake reply
->     Sending ping frame with "hello" payload
->     Receiving pong reply
->     Sending binary data "world"
->     Checking the received data on server side
->     Checking of closing handshake
+> New option "websocket" added to allow using WebSocket protocol for
+> chardev socket backend.
+> Example:
+>     -chardev socket,websocket,server,id=...
 >
 > Signed-off-by: Julia Suvorova <jusual@mail.ru>
-
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
 > ---
->  tests/test-char.c | 125 ++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 125 insertions(+)
+>  chardev/char-socket.c | 64 ++++++++++++++++++++++++++++++++++++++-----
+>  chardev/char.c        |  8 +++++-
+>  qapi/char.json        |  3 ++
+>  qemu-options.hx       | 13 +++++++--
+>  4 files changed, 77 insertions(+), 11 deletions(-)
 >
-> diff --git a/tests/test-char.c b/tests/test-char.c
-> index 831e37fbf4..19c3efad72 100644
-> --- a/tests/test-char.c
-> +++ b/tests/test-char.c
-> @@ -420,6 +420,130 @@ static void char_socket_fdpass_test(void)
+> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+> index effde65a89..ba4ae9dfb0 100644
+> --- a/chardev/char-socket.c
+> +++ b/chardev/char-socket.c
+> @@ -26,6 +26,7 @@
+>  #include "chardev/char.h"
+>  #include "io/channel-socket.h"
+>  #include "io/channel-tls.h"
+> +#include "io/channel-websock.h"
+>  #include "io/net-listener.h"
+>  #include "qemu/error-report.h"
+>  #include "qemu/option.h"
+> @@ -68,6 +69,8 @@ typedef struct {
+>      GSource *telnet_source;
+>      TCPChardevTelnetInit *telnet_init;
+>
+> +    bool is_websock;
+> +
+>      GSource *reconnect_timer;
+>      int64_t reconnect_time;
+>      bool connect_err_reported;
+> @@ -394,7 +397,7 @@ static const char *qemu_chr_socket_protocol(SocketChardev *s)
+>      if (s->is_telnet) {
+>          return "telnet";
+>      }
+> -    return "tcp";
+> +    return s->is_websock ? "websocket" : "tcp";
+>  }
+>
+>  static char *qemu_chr_socket_address(SocketChardev *s, const char *prefix)
+> @@ -714,6 +717,41 @@ cont:
 >  }
 >
 >
-> +static void websock_server_read(void *opaque, const uint8_t *buf, int si=
-ze)
+> +static void tcp_chr_websock_handshake(QIOTask *task, gpointer user_data)
 > +{
-> +    g_assert_cmpint(size, =3D=3D, 5);
-> +    g_assert(memcmp(buf, "world", size) =3D=3D 0);
-> +    quit =3D true;
-> +}
+> +    Chardev *chr = user_data;
+> +    SocketChardev *s = user_data;
 > +
-> +
-> +static int websock_server_can_read(void *opaque)
-> +{
-> +    return 10;
-> +}
-> +
-> +
-> +static bool websock_check_http_headers(char *buf, int size)
-> +{
-> +    int i;
-> +    const char *ans[] =3D { "HTTP/1.1 101 Switching Protocols\r\n",
-> +                          "Server: QEMU VNC\r\n",
-> +                          "Upgrade: websocket\r\n",
-> +                          "Connection: Upgrade\r\n",
-> +                          "Sec-WebSocket-Accept:",
-> +                          "Sec-WebSocket-Protocol: binary\r\n" };
-> +
-> +    for (i =3D 0; i < 6; i++) {
-> +        if (g_strstr_len(buf, size, ans[i]) =3D=3D NULL) {
-> +            return false;
+> +    if (qio_task_propagate_error(task, NULL)) {
+> +        tcp_chr_disconnect(chr);
+
+What about error_report() the error?
+
+> +    } else {
+> +        if (s->do_telnetopt) {
+> +            tcp_chr_telnet_init(chr);
+> +        } else {
+> +            tcp_chr_connect(chr);
 > +        }
 > +    }
-> +
-> +    return true;
 > +}
 > +
 > +
-> +static void websock_client_read(void *opaque, const uint8_t *buf, int si=
-ze)
+> +static void tcp_chr_websock_init(Chardev *chr)
 > +{
-> +    const uint8_t ping[] =3D { 0x89, 0x85,                  /* Ping head=
-er */
-> +                             0x07, 0x77, 0x9e, 0xf9,      /* Masking key=
- */
-> +                             0x6f, 0x12, 0xf2, 0x95, 0x68 /* "hello" */ =
-};
+> +    SocketChardev *s = SOCKET_CHARDEV(chr);
+> +    QIOChannelWebsock *wioc = NULL;
+> +    gchar *name;
 > +
-> +    const uint8_t binary[] =3D { 0x82, 0x85,                  /* Binary =
-header */
-> +                               0x74, 0x90, 0xb9, 0xdf,      /* Masking k=
-ey */
-> +                               0x03, 0xff, 0xcb, 0xb3, 0x10 /* "world" *=
-/ };
-> +    Chardev *chr_client =3D opaque;
+> +    wioc = qio_channel_websock_new_server(s->ioc);
 > +
-> +    if (websock_check_http_headers((char *) buf, size)) {
-> +        qemu_chr_fe_write(chr_client->be, ping, sizeof(ping));
-> +    } else if (buf[0] =3D=3D 0x8a && buf[1] =3D=3D 0x05) {
-> +        g_assert(strncmp((char *) buf + 2, "hello", 5) =3D=3D 0);
-> +        qemu_chr_fe_write(chr_client->be, binary, sizeof(binary));
-> +    } else {
-> +        g_assert(buf[0] =3D=3D 0x88 && buf[1] =3D=3D 0x16);
-> +        g_assert(strncmp((char *) buf + 4, "peer requested close", 10) =
-=3D=3D 0);
-> +        quit =3D true;
-> +    }
+> +    name = g_strdup_printf("chardev-websocket-server-%s", chr->label);
+> +    qio_channel_set_name(QIO_CHANNEL(wioc), name);
+> +    g_free(name);
+> +    object_unref(OBJECT(s->ioc));
+> +    s->ioc = QIO_CHANNEL(wioc);
+> +
+> +    qio_channel_websock_handshake(wioc, tcp_chr_websock_handshake, chr, NULL);
 > +}
 > +
 > +
-> +static int websock_client_can_read(void *opaque)
-> +{
-> +    return 4096;
-> +}
-> +
-> +
-> +static void char_websock_test(void)
-> +{
-> +    QObject *addr;
-> +    QDict *qdict;
-> +    const char *port;
-> +    char *tmp;
-> +    char *handshake_port;
-> +    CharBackend be;
-> +    CharBackend client_be;
-> +    Chardev *chr_client;
-> +    Chardev *chr =3D qemu_chr_new("server",
-> +                                "websocket:127.0.0.1:0,server,nowait");
-> +    const char handshake[] =3D "GET / HTTP/1.1\r\n"
-> +                             "Upgrade: websocket\r\n"
-> +                             "Connection: Upgrade\r\n"
-> +                             "Host: localhost:%s\r\n"
-> +                             "Origin: http://localhost:%s\r\n"
-> +                             "Sec-WebSocket-Key: o9JHNiS3/0/0zYE1wa3yIw=
-=3D=3D\r\n"
-> +                             "Sec-WebSocket-Version: 13\r\n"
-> +                             "Sec-WebSocket-Protocol: binary\r\n\r\n";
-> +    const uint8_t close[] =3D { 0x88, 0x82,             /* Close header =
-*/
-> +                              0xef, 0xaa, 0xc5, 0x97, /* Masking key */
-> +                              0xec, 0x42              /* Status code */ =
-};
-> +
-> +    addr =3D object_property_get_qobject(OBJECT(chr), "addr", &error_abo=
-rt);
-> +    qdict =3D qobject_to(QDict, addr);
-> +    port =3D qdict_get_str(qdict, "port");
-> +    tmp =3D g_strdup_printf("tcp:127.0.0.1:%s", port);
-> +    handshake_port =3D g_strdup_printf(handshake, port, port);
-> +    qobject_unref(qdict);
-> +
-> +    qemu_chr_fe_init(&be, chr, &error_abort);
-> +    qemu_chr_fe_set_handlers(&be, websock_server_can_read, websock_serve=
-r_read,
-> +                             NULL, NULL, chr, NULL, true);
-> +
-> +    chr_client =3D qemu_chr_new("client", tmp);
-> +    qemu_chr_fe_init(&client_be, chr_client, &error_abort);
-> +    qemu_chr_fe_set_handlers(&client_be, websock_client_can_read,
-> +                             websock_client_read,
-> +                             NULL, NULL, chr_client, NULL, true);
-> +    g_free(tmp);
-> +
-> +    qemu_chr_write_all(chr_client,
-> +                       (uint8_t *) handshake_port,
-> +                       strlen(handshake_port));
-> +    g_free(handshake_port);
-> +    main_loop();
-> +
-> +    g_assert(object_property_get_bool(OBJECT(chr), "connected", &error_a=
-bort));
-> +    g_assert(object_property_get_bool(OBJECT(chr_client),
-> +                                      "connected", &error_abort));
-> +
-> +    qemu_chr_write_all(chr_client, close, sizeof(close));
-> +    main_loop();
-> +
-> +    object_unparent(OBJECT(chr_client));
-> +    object_unparent(OBJECT(chr));
-> +}
-> +
-> +
->  #ifndef _WIN32
->  static void char_pipe_test(void)
+>  static void tcp_chr_tls_handshake(QIOTask *task,
+>                                    gpointer user_data)
 >  {
-> @@ -842,6 +966,7 @@ int main(int argc, char **argv)
->      g_test_add_func("/char/serial", char_serial_test);
->  #endif
->      g_test_add_func("/char/hotswap", char_hotswap_test);
-> +    g_test_add_func("/char/websocket", char_websock_test);
+> @@ -723,7 +761,9 @@ static void tcp_chr_tls_handshake(QIOTask *task,
+>      if (qio_task_propagate_error(task, NULL)) {
+>          tcp_chr_disconnect(chr);
+>      } else {
+> -        if (s->do_telnetopt) {
+> +        if (s->is_websock) {
+> +            tcp_chr_websock_init(chr);
+> +        } else if (s->do_telnetopt) {
+>              tcp_chr_telnet_init(chr);
+>          } else {
+>              tcp_chr_connect(chr);
+> @@ -809,12 +849,12 @@ static int tcp_chr_new_client(Chardev *chr, QIOChannelSocket *sioc)
 >
->      return g_test_run();
->  }
+>      if (s->tls_creds) {
+>          tcp_chr_tls_init(chr);
+> +    } else if (s->is_websock) {
+> +        tcp_chr_websock_init(chr);
+> +    } else if (s->do_telnetopt) {
+> +        tcp_chr_telnet_init(chr);
+>      } else {
+> -        if (s->do_telnetopt) {
+> -            tcp_chr_telnet_init(chr);
+> -        } else {
+> -            tcp_chr_connect(chr);
+> -        }
+> +        tcp_chr_connect(chr);
+>      }
+>
+>      return 0;
+> @@ -959,13 +999,20 @@ static void qmp_chardev_open_socket(Chardev *chr,
+>      bool is_telnet      = sock->has_telnet  ? sock->telnet  : false;
+>      bool is_tn3270      = sock->has_tn3270  ? sock->tn3270  : false;
+>      bool is_waitconnect = sock->has_wait    ? sock->wait    : false;
+> +    bool is_websock     = sock->has_websocket ? sock->websocket : false;
+>      int64_t reconnect   = sock->has_reconnect ? sock->reconnect : 0;
+>      QIOChannelSocket *sioc = NULL;
+>      SocketAddress *addr;
+>
+> +    if (!is_listen && is_websock) {
+> +        error_setg(errp, "%s", "Websocket client is not implemented");
+> +        goto error;
+> +    }
+> +
+>      s->is_listen = is_listen;
+>      s->is_telnet = is_telnet;
+>      s->is_tn3270 = is_tn3270;
+> +    s->is_websock = is_websock;
+>      s->do_nodelay = do_nodelay;
+>      if (sock->tls_creds) {
+>          Object *creds;
+> @@ -1072,6 +1119,7 @@ static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backend,
+>      bool is_waitconnect = is_listen && qemu_opt_get_bool(opts, "wait", true);
+>      bool is_telnet      = qemu_opt_get_bool(opts, "telnet", false);
+>      bool is_tn3270      = qemu_opt_get_bool(opts, "tn3270", false);
+> +    bool is_websock     = qemu_opt_get_bool(opts, "websocket", false);
+>      bool do_nodelay     = !qemu_opt_get_bool(opts, "delay", true);
+>      int64_t reconnect   = qemu_opt_get_number(opts, "reconnect", 0);
+>      const char *path = qemu_opt_get(opts, "path");
+> @@ -1120,6 +1168,8 @@ static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backend,
+>      sock->telnet = is_telnet;
+>      sock->has_tn3270 = true;
+>      sock->tn3270 = is_tn3270;
+> +    sock->has_websocket = true;
+> +    sock->websocket = is_websock;
+>      sock->has_wait = true;
+>      sock->wait = is_waitconnect;
+>      sock->has_reconnect = true;
+> diff --git a/chardev/char.c b/chardev/char.c
+> index e115166995..a8790017e6 100644
+> --- a/chardev/char.c
+> +++ b/chardev/char.c
+> @@ -409,7 +409,8 @@ QemuOpts *qemu_chr_parse_compat(const char *label, const char *filename,
+>      }
+>      if (strstart(filename, "tcp:", &p) ||
+>          strstart(filename, "telnet:", &p) ||
+> -        strstart(filename, "tn3270:", &p)) {
+> +        strstart(filename, "tn3270:", &p) ||
+> +        strstart(filename, "websocket:", &p)) {
+>          if (sscanf(p, "%64[^:]:%32[^,]%n", host, port, &pos) < 2) {
+>              host[0] = 0;
+>              if (sscanf(p, ":%32[^,]%n", port, &pos) < 1)
+> @@ -429,6 +430,8 @@ QemuOpts *qemu_chr_parse_compat(const char *label, const char *filename,
+>              qemu_opt_set(opts, "telnet", "on", &error_abort);
+>          } else if (strstart(filename, "tn3270:", &p)) {
+>              qemu_opt_set(opts, "tn3270", "on", &error_abort);
+> +        } else if (strstart(filename, "websocket:", &p)) {
+> +            qemu_opt_set(opts, "websocket", "on", &error_abort);
+>          }
+>          return opts;
+>      }
+> @@ -860,6 +863,9 @@ QemuOptsList qemu_chardev_opts = {
+>          },{
+>              .name = "tls-creds",
+>              .type = QEMU_OPT_STRING,
+> +        },{
+> +            .name = "websocket",
+> +            .type = QEMU_OPT_BOOL,
+>          },{
+>              .name = "width",
+>              .type = QEMU_OPT_NUMBER,
+> diff --git a/qapi/char.json b/qapi/char.json
+> index b7b2a05766..79bac598a0 100644
+> --- a/qapi/char.json
+> +++ b/qapi/char.json
+> @@ -251,6 +251,8 @@
+>  #          sockets (default: false)
+>  # @tn3270: enable tn3270 protocol on server
+>  #          sockets (default: false) (Since: 2.10)
+> +# @websocket: enable websocket protocol on server
+> +#           sockets (default: false) (Since: 3.1)
+>  # @reconnect: For a client socket, if a socket is disconnected,
+>  #          then attempt a reconnect after the given number of seconds.
+>  #          Setting this to zero disables this function. (default: 0)
+> @@ -265,6 +267,7 @@
+>                                       '*nodelay'   : 'bool',
+>                                       '*telnet'    : 'bool',
+>                                       '*tn3270'    : 'bool',
+> +                                     '*websocket' : 'bool',
+>                                       '*reconnect' : 'int' },
+>    'base': 'ChardevCommon' }
+>
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index f139459e80..022c793162 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -2409,9 +2409,9 @@ DEF("chardev", HAS_ARG, QEMU_OPTION_chardev,
+>      "-chardev help\n"
+>      "-chardev null,id=id[,mux=on|off][,logfile=PATH][,logappend=on|off]\n"
+>      "-chardev socket,id=id[,host=host],port=port[,to=to][,ipv4][,ipv6][,nodelay][,reconnect=seconds]\n"
+> -    "         [,server][,nowait][,telnet][,reconnect=seconds][,mux=on|off]\n"
+> +    "         [,server][,nowait][,telnet][,websocket][,reconnect=seconds][,mux=on|off]\n"
+>      "         [,logfile=PATH][,logappend=on|off][,tls-creds=ID] (tcp)\n"
+> -    "-chardev socket,id=id,path=path[,server][,nowait][,telnet][,reconnect=seconds]\n"
+> +    "-chardev socket,id=id,path=path[,server][,nowait][,telnet][,websocket][,reconnect=seconds]\n"
+>      "         [,mux=on|off][,logfile=PATH][,logappend=on|off] (unix)\n"
+>      "-chardev udp,id=id[,host=host],port=port[,localaddr=localaddr]\n"
+>      "         [,localport=localport][,ipv4][,ipv6][,mux=on|off]\n"
+> @@ -2539,7 +2539,7 @@ The available backends are:
+>  A void device. This device will not emit any data, and will drop any data it
+>  receives. The null backend does not take any options.
+>
+> -@item -chardev socket,id=@var{id}[,@var{TCP options} or @var{unix options}][,server][,nowait][,telnet][,reconnect=@var{seconds}][,tls-creds=@var{id}]
+> +@item -chardev socket,id=@var{id}[,@var{TCP options} or @var{unix options}][,server][,nowait][,telnet][,websocket][,reconnect=@var{seconds}][,tls-creds=@var{id}]
+>
+>  Create a two-way stream socket, which can be either a TCP or a unix socket. A
+>  unix socket will be created if @option{path} is specified. Behaviour is
+> @@ -2553,6 +2553,9 @@ connect to a listening socket.
+>  @option{telnet} specifies that traffic on the socket should interpret telnet
+>  escape sequences.
+>
+> +@option{websocket} specifies that the socket uses WebSocket protocol for
+> +communication.
+> +
+>  @option{reconnect} sets the timeout for reconnecting on non-server sockets when
+>  the remote end goes away.  qemu will delay this many seconds and then attempt
+>  to reconnect.  Zero disables reconnecting, and is the default.
+> @@ -3101,6 +3104,10 @@ MAGIC_SYSRQ sequence if you use a telnet that supports sending the break
+>  sequence.  Typically in unix telnet you do it with Control-] and then
+>  type "send break" followed by pressing the enter key.
+>
+> +@item websocket:@var{host}:@var{port},server[,nowait][,nodelay]
+> +The WebSocket protocol is used instead of raw tcp socket. The port acts as
+> +a WebSocket server. Client mode is not supported.
+> +
+>  @item unix:@var{path}[,server][,nowait][,reconnect=@var{seconds}]
+>  A unix domain socket is used instead of a tcp socket.  The option works the
+>  same as if you had specified @code{-serial tcp} except the unix domain socket
 > --
 > 2.17.1
 >
