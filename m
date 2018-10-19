@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gDRNd-0001Om-U5
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 05:47:42 -0400
+	(envelope-from <thuth@redhat.com>) id 1gDROT-0001uR-JF
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 05:48:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gDRNa-000579-H7
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 05:47:41 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:37063)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gDRNa-00055x-Ao
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 05:47:38 -0400
-Received: by mail-wm1-f68.google.com with SMTP id 185-v6so3074828wmt.2
-	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 02:47:38 -0700 (PDT)
-References: <1539886203-33670-1-git-send-email-pbonzini@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <c85602f6-c794-d81b-98c7-a1db9618dbaf@redhat.com>
-Date: Fri, 19 Oct 2018 11:47:35 +0200
+	(envelope-from <thuth@redhat.com>) id 1gDROP-0006oz-Tm
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 05:48:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39456)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gDROK-0006eP-82
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 05:48:26 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 43A2388319
+	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 09:48:18 +0000 (UTC)
+References: <20180720214020.22897-1-bsd@redhat.com>
+	<20180720214020.22897-4-bsd@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <d05f2c28-c24b-f2ca-206a-2addfc913851@redhat.com>
+Date: Fri, 19 Oct 2018 11:48:10 +0200
 MIME-Version: 1.0
-In-Reply-To: <1539886203-33670-1-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <20180720214020.22897-4-bsd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] tests: docker: update test-mingw for GTK+
- 2.0 removal
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/5] dev-mtp: retry write for incomplete
+ transfers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,44 +35,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: famz@redhat.com
+To: Bandan Das <bsd@redhat.com>, qemu-devel@nongnu.org
+Cc: kraxel@redhat.com
 
-On 18/10/2018 20:10, Paolo Bonzini wrote:
-> --with-gtkabi does not exist anymore; remove it from the configure invocation.
+On 2018-07-20 23:40, Bandan Das wrote:
+> For large buffers, write may not copy the full buffer. For example,
+> on Linux, write imposes a limit of 0x7ffff000. Note that this does
+> not fix >4G transfers but ~>2G files will transfer successfully.
 > 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Bandan Das <bsd@redhat.com>
 > ---
->  tests/docker/test-mingw | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+>  hw/usb/dev-mtp.c | 22 ++++++++++++++++++++--
+>  1 file changed, 20 insertions(+), 2 deletions(-)
 > 
-> diff --git a/tests/docker/test-mingw b/tests/docker/test-mingw
-> index 7cca7e1..b078f22 100755
-> --- a/tests/docker/test-mingw
-> +++ b/tests/docker/test-mingw
-> @@ -28,8 +28,7 @@ for prefix in x86_64-w64-mingw32- i686-w64-mingw32-; do
->          --enable-vnc \
->          --enable-bzip2 \
->          --enable-guest-agent \
-> -        --with-sdlabi=2.0 \
-> -        --with-gtkabi=3.0
-> +        --with-sdlabi=2.0
->      install_qemu
->      make clean
+> diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
+> index 1b72603dc5..c8f6eb4e9e 100644
+> --- a/hw/usb/dev-mtp.c
+> +++ b/hw/usb/dev-mtp.c
+> @@ -1602,6 +1602,24 @@ static void utf16_to_str(uint8_t len, uint16_t *arr, char *name)
+>      g_free(wstr);
+>  }
 >  
-> 
+> +/* Wrapper around write, returns 0 on failure */
+> +static uint64_t write_retry(int fd, void *buf, uint64_t size)
+> +{
+> +        uint64_t bytes_left = size, ret;
+> +
+> +        while (bytes_left > 0) {
+> +                ret = write(fd, buf, bytes_left);
+> +                if ((ret == -1) && (errno != EINTR || errno != EAGAIN ||
+> +                                    errno != EWOULDBLOCK)) {
 
-$ ./configure ...
-C compiler        i686-w64-mingw32.shared-gcc
-SDL support       yes (2.0.5)
-GTK support       no
-GTK GL support    no
-mingw32 support   yes
+Someone opened a bug ticket about this here:
 
-$ make
-...
-  LINK    arm-softmmu/qemu-system-armw.exe
-  GEN     arm-softmmu/qemu-system-arm.exe
+ https://bugs.launchpad.net/qemu/+bug/1798780
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+The check looks wrong, indeed - either "!=" should be "==" or "||"
+should be "&&" here ?
+
+ Thomas
