@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37345)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gDXfb-0002ub-5W
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:30:40 -0400
+	(envelope-from <kwolf@redhat.com>) id 1gDXfe-0002zW-0x
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:30:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gDXfW-00020s-Jo
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:30:38 -0400
+	(envelope-from <kwolf@redhat.com>) id 1gDXfc-0002CN-SG
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:30:41 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 19 Oct 2018 18:30:05 +0200
-Message-Id: <20181019163013.11787-2-kwolf@redhat.com>
+Date: Fri, 19 Oct 2018 18:30:11 +0200
+Message-Id: <20181019163013.11787-8-kwolf@redhat.com>
 In-Reply-To: <20181019163013.11787-1-kwolf@redhat.com>
 References: <20181019163013.11787-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 01/11] block: Update flags in
- bdrv_set_read_only()
+Subject: [Qemu-devel] [PATCH v4 07/11] curl: Support auto-read-only option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,34 +24,35 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
 
-To fully change the read-only state of a node, we must not only change
-bs->read_only, but also update bs->open_flags.
+If read-only=3Doff, but auto-read-only=3Don is given, just degrade to
+read-only.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- block.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ block/curl.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/block.c b/block.c
-index 0d6e5f1a76..d7bd6d29b4 100644
---- a/block.c
-+++ b/block.c
-@@ -281,6 +281,13 @@ int bdrv_set_read_only(BlockDriverState *bs, bool re=
-ad_only, Error **errp)
+diff --git a/block/curl.c b/block/curl.c
+index fabb2b4da7..db5d2bd8ef 100644
+--- a/block/curl.c
++++ b/block/curl.c
+@@ -684,10 +684,10 @@ static int curl_open(BlockDriverState *bs, QDict *o=
+ptions, int flags,
+     const char *protocol_delimiter;
+     int ret;
+=20
+-
+-    if (flags & BDRV_O_RDWR) {
+-        error_setg(errp, "curl block device does not support writes");
+-        return -EROFS;
++    ret =3D bdrv_apply_auto_read_only(bs, "curl driver does not support =
+writes",
++                                    errp);
++    if (ret < 0) {
++        return ret;
      }
 =20
-     bs->read_only =3D read_only;
-+
-+    if (read_only) {
-+        bs->open_flags &=3D ~BDRV_O_RDWR;
-+    } else {
-+        bs->open_flags |=3D BDRV_O_RDWR;
-+    }
-+
-     return 0;
- }
-=20
+     if (!libcurl_initialized) {
 --=20
 2.19.1
