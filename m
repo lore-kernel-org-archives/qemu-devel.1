@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36250)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gDSeW-0000Ra-Ur
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 07:09:14 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gDSeV-0006P6-MZ
+	(envelope-from <berrange@redhat.com>) id 1gDSeV-0000RF-4p
 	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 07:09:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41520)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <berrange@redhat.com>) id 1gDSeR-0006Mj-EK
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 07:09:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33960)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gDSeV-0006NI-6M
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 07:09:11 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gDSeP-0006H8-DT
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 07:09:06 -0400
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Fri, 19 Oct 2018 12:08:55 +0100
-Message-Id: <20181019110856.18893-8-berrange@redhat.com>
+Date: Fri, 19 Oct 2018 12:08:50 +0100
+Message-Id: <20181019110856.18893-3-berrange@redhat.com>
 In-Reply-To: <20181019110856.18893-1-berrange@redhat.com>
 References: <20181019110856.18893-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 7/8] crypto: refactor XTS cipher mode test
- suite
+Subject: [Qemu-devel] [PATCH v3 2/8] crypto: remove code duplication in
+ tweak encrypt/decrypt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,197 +30,145 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-The current XTS test overloads two different tests in a single function
-making the code a little hard to follow. Split it into distinct test
-cases.
+The tweak encrypt/decrypt functions are identical except for the
+comments, so can be merged. Profiling data shows that the compiler is
+in fact already merging the two merges in the object files.
 
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- tests/test-crypto-xts.c | 140 +++++++++++++++++++++++-----------------
- 1 file changed, 80 insertions(+), 60 deletions(-)
+ crypto/xts.c | 64 ++++++++++++----------------------------------------
+ 1 file changed, 15 insertions(+), 49 deletions(-)
 
-diff --git a/tests/test-crypto-xts.c b/tests/test-crypto-xts.c
-index 1f1412c45a..81606d90ad 100644
---- a/tests/test-crypto-xts.c
-+++ b/tests/test-crypto-xts.c
-@@ -1,7 +1,7 @@
- /*
-  * QEMU Crypto XTS cipher mode
+diff --git a/crypto/xts.c b/crypto/xts.c
+index 95212341f6..3c1a92f01d 100644
+--- a/crypto/xts.c
++++ b/crypto/xts.c
+@@ -43,20 +43,20 @@ static void xts_mult_x(uint8_t *I)
+=20
+=20
+ /**
+- * xts_tweak_uncrypt:
++ * xts_tweak_encdec:
+  * @param ctxt: the cipher context
+  * @param func: the cipher function
+- * @src: buffer providing the cipher text of XTS_BLOCK_SIZE bytes
+- * @dst: buffer to output the plain text of XTS_BLOCK_SIZE bytes
++ * @src: buffer providing the input text of XTS_BLOCK_SIZE bytes
++ * @dst: buffer to output the output text of XTS_BLOCK_SIZE bytes
+  * @iv: the initialization vector tweak of XTS_BLOCK_SIZE bytes
   *
-- * Copyright (c) 2015-2016 Red Hat, Inc.
-+ * Copyright (c) 2015-2018 Red Hat, Inc.
-  *
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-@@ -340,70 +340,79 @@ static void test_xts_aes_decrypt(const void *ctx,
- static void test_xts(const void *opaque)
+- * Decrypt data with a tweak
++ * Encrypt/decrypt data with a tweak
+  */
+-static void xts_tweak_decrypt(const void *ctx,
+-                              xts_cipher_func *func,
+-                              const uint8_t *src,
+-                              uint8_t *dst,
+-                              uint8_t *iv)
++static void xts_tweak_encdec(const void *ctx,
++                             xts_cipher_func *func,
++                             const uint8_t *src,
++                             uint8_t *dst,
++                             uint8_t *iv)
  {
-     const QCryptoXTSTestData *data =3D opaque;
--    unsigned char out[512], Torg[16], T[16];
-+    uint8_t out[512], Torg[16], T[16];
-     uint64_t seq;
--    int j;
--    unsigned long len;
-     struct TestAES aesdata;
-     struct TestAES aestweak;
+     unsigned long x;
 =20
--    for (j =3D 0; j < 2; j++) {
--        /* skip the cases where
--         * the length is smaller than 2*blocklen
--         * or the length is not a multiple of 32
--         */
--        if ((j =3D=3D 1) && ((data->PTLEN < 32) || (data->PTLEN % 32))) =
-{
--            continue;
--        }
--        len =3D data->PTLEN / 2;
--
--        AES_set_encrypt_key(data->key1, data->keylen / 2 * 8, &aesdata.e=
-nc);
--        AES_set_decrypt_key(data->key1, data->keylen / 2 * 8, &aesdata.d=
-ec);
--        AES_set_encrypt_key(data->key2, data->keylen / 2 * 8, &aestweak.=
-enc);
--        AES_set_decrypt_key(data->key2, data->keylen / 2 * 8, &aestweak.=
-dec);
--
--        seq =3D data->seqnum;
--        STORE64L(seq, Torg);
--        memset(Torg + 8, 0, 8);
--
--        memcpy(T, Torg, sizeof(T));
--        if (j =3D=3D 0) {
--            xts_encrypt(&aesdata, &aestweak,
--                        test_xts_aes_encrypt,
--                        test_xts_aes_decrypt,
--                        T, data->PTLEN, out, data->PTX);
--        } else {
--            xts_encrypt(&aesdata, &aestweak,
--                        test_xts_aes_encrypt,
--                        test_xts_aes_decrypt,
--                        T, len, out, data->PTX);
--            xts_encrypt(&aesdata, &aestweak,
--                        test_xts_aes_encrypt,
--                        test_xts_aes_decrypt,
--                        T, len, &out[len], &data->PTX[len]);
--        }
-+    AES_set_encrypt_key(data->key1, data->keylen / 2 * 8, &aesdata.enc);
-+    AES_set_decrypt_key(data->key1, data->keylen / 2 * 8, &aesdata.dec);
-+    AES_set_encrypt_key(data->key2, data->keylen / 2 * 8, &aestweak.enc)=
-;
-+    AES_set_decrypt_key(data->key2, data->keylen / 2 * 8, &aestweak.dec)=
-;
+@@ -105,7 +105,7 @@ void xts_decrypt(const void *datactx,
+     encfunc(tweakctx, XTS_BLOCK_SIZE, T, iv);
 =20
--        g_assert(memcmp(out, data->CTX, data->PTLEN) =3D=3D 0);
--
--        memcpy(T, Torg, sizeof(T));
--        if (j =3D=3D 0) {
--            xts_decrypt(&aesdata, &aestweak,
--                        test_xts_aes_encrypt,
--                        test_xts_aes_decrypt,
--                        T, data->PTLEN, out, data->CTX);
--        } else {
--            xts_decrypt(&aesdata, &aestweak,
--                        test_xts_aes_encrypt,
--                        test_xts_aes_decrypt,
--                        T, len, out, data->CTX);
--            xts_decrypt(&aesdata, &aestweak,
--                        test_xts_aes_encrypt,
--                        test_xts_aes_decrypt,
--                        T, len, &out[len], &data->CTX[len]);
--        }
-+    seq =3D data->seqnum;
-+    STORE64L(seq, Torg);
-+    memset(Torg + 8, 0, 8);
+     for (i =3D 0; i < lim; i++) {
+-        xts_tweak_decrypt(datactx, decfunc, src, dst, T);
++        xts_tweak_encdec(datactx, decfunc, src, dst, T);
 =20
--        g_assert(memcmp(out, data->PTX, data->PTLEN) =3D=3D 0);
--    }
-+    memcpy(T, Torg, sizeof(T));
-+    xts_encrypt(&aesdata, &aestweak,
-+                test_xts_aes_encrypt,
-+                test_xts_aes_decrypt,
-+                T, data->PTLEN, out, data->PTX);
-+
-+    g_assert(memcmp(out, data->CTX, data->PTLEN) =3D=3D 0);
-+
-+    memcpy(T, Torg, sizeof(T));
-+    xts_decrypt(&aesdata, &aestweak,
-+                test_xts_aes_encrypt,
-+                test_xts_aes_decrypt,
-+                T, data->PTLEN, out, data->CTX);
-+
-+    g_assert(memcmp(out, data->PTX, data->PTLEN) =3D=3D 0);
-+}
-+
-+
-+static void test_xts_split(const void *opaque)
-+{
-+    const QCryptoXTSTestData *data =3D opaque;
-+    uint8_t out[512], Torg[16], T[16];
-+    uint64_t seq;
-+    unsigned long len =3D data->PTLEN / 2;
-+    struct TestAES aesdata;
-+    struct TestAES aestweak;
-+
-+    AES_set_encrypt_key(data->key1, data->keylen / 2 * 8, &aesdata.enc);
-+    AES_set_decrypt_key(data->key1, data->keylen / 2 * 8, &aesdata.dec);
-+    AES_set_encrypt_key(data->key2, data->keylen / 2 * 8, &aestweak.enc)=
-;
-+    AES_set_decrypt_key(data->key2, data->keylen / 2 * 8, &aestweak.dec)=
-;
-+
-+    seq =3D data->seqnum;
-+    STORE64L(seq, Torg);
-+    memset(Torg + 8, 0, 8);
-+
-+    memcpy(T, Torg, sizeof(T));
-+    xts_encrypt(&aesdata, &aestweak,
-+                test_xts_aes_encrypt,
-+                test_xts_aes_decrypt,
-+                T, len, out, data->PTX);
-+    xts_encrypt(&aesdata, &aestweak,
-+                test_xts_aes_encrypt,
-+                test_xts_aes_decrypt,
-+                T, len, &out[len], &data->PTX[len]);
-+
-+    g_assert(memcmp(out, data->CTX, data->PTLEN) =3D=3D 0);
-+
-+    memcpy(T, Torg, sizeof(T));
-+    xts_decrypt(&aesdata, &aestweak,
-+                test_xts_aes_encrypt,
-+                test_xts_aes_decrypt,
-+                T, len, out, data->CTX);
-+    xts_decrypt(&aesdata, &aestweak,
-+                test_xts_aes_encrypt,
-+                test_xts_aes_decrypt,
-+                T, len, &out[len], &data->CTX[len]);
-+
-+    g_assert(memcmp(out, data->PTX, data->PTLEN) =3D=3D 0);
+         src +=3D XTS_BLOCK_SIZE;
+         dst +=3D XTS_BLOCK_SIZE;
+@@ -117,7 +117,7 @@ void xts_decrypt(const void *datactx,
+         xts_mult_x(CC);
+=20
+         /* PP =3D tweak decrypt block m-1 */
+-        xts_tweak_decrypt(datactx, decfunc, src, PP, CC);
++        xts_tweak_encdec(datactx, decfunc, src, PP, CC);
+=20
+         /* Pm =3D first length % XTS_BLOCK_SIZE bytes of PP */
+         for (i =3D 0; i < mo; i++) {
+@@ -129,7 +129,7 @@ void xts_decrypt(const void *datactx,
+         }
+=20
+         /* Pm-1 =3D Tweak uncrypt CC */
+-        xts_tweak_decrypt(datactx, decfunc, CC, dst, T);
++        xts_tweak_encdec(datactx, decfunc, CC, dst, T);
+     }
+=20
+     /* Decrypt the iv back */
+@@ -137,40 +137,6 @@ void xts_decrypt(const void *datactx,
  }
 =20
 =20
-@@ -416,7 +425,18 @@ int main(int argc, char **argv)
-     g_assert(qcrypto_init(NULL) =3D=3D 0);
+-/**
+- * xts_tweak_crypt:
+- * @param ctxt: the cipher context
+- * @param func: the cipher function
+- * @src: buffer providing the plain text of XTS_BLOCK_SIZE bytes
+- * @dst: buffer to output the cipher text of XTS_BLOCK_SIZE bytes
+- * @iv: the initialization vector tweak of XTS_BLOCK_SIZE bytes
+- *
+- * Encrypt data with a tweak
+- */
+-static void xts_tweak_encrypt(const void *ctx,
+-                              xts_cipher_func *func,
+-                              const uint8_t *src,
+-                              uint8_t *dst,
+-                              uint8_t *iv)
+-{
+-    unsigned long x;
+-
+-    /* tweak encrypt block i */
+-    for (x =3D 0; x < XTS_BLOCK_SIZE; x++) {
+-        dst[x] =3D src[x] ^ iv[x];
+-    }
+-
+-    func(ctx, XTS_BLOCK_SIZE, dst, dst);
+-
+-    for (x =3D 0; x < XTS_BLOCK_SIZE; x++) {
+-        dst[x] =3D dst[x] ^ iv[x];
+-    }
+-
+-    /* LFSR the tweak */
+-    xts_mult_x(iv);
+-}
+-
+-
+ void xts_encrypt(const void *datactx,
+                  const void *tweakctx,
+                  xts_cipher_func *encfunc,
+@@ -200,7 +166,7 @@ void xts_encrypt(const void *datactx,
+     encfunc(tweakctx, XTS_BLOCK_SIZE, T, iv);
 =20
-     for (i =3D 0; i < G_N_ELEMENTS(test_data); i++) {
--        g_test_add_data_func(test_data[i].path, &test_data[i], test_xts)=
-;
-+        gchar *path =3D g_strdup_printf("%s/basic", test_data[i].path);
-+        g_test_add_data_func(path, &test_data[i], test_xts);
-+        g_free(path);
-+
-+        /* skip the cases where the length is smaller than 2*blocklen
-+         * or the length is not a multiple of 32
-+         */
-+        if ((test_data[i].PTLEN >=3D 32) && !(test_data[i].PTLEN % 32)) =
-{
-+            path =3D g_strdup_printf("%s/split", test_data[i].path);
-+            g_test_add_data_func(path, &test_data[i], test_xts_split);
-+            g_free(path);
-+        }
+     for (i =3D 0; i < lim; i++) {
+-        xts_tweak_encrypt(datactx, encfunc, src, dst, T);
++        xts_tweak_encdec(datactx, encfunc, src, dst, T);
+=20
+         dst +=3D XTS_BLOCK_SIZE;
+         src +=3D XTS_BLOCK_SIZE;
+@@ -209,7 +175,7 @@ void xts_encrypt(const void *datactx,
+     /* if length is not a multiple of XTS_BLOCK_SIZE then */
+     if (mo > 0) {
+         /* CC =3D tweak encrypt block m-1 */
+-        xts_tweak_encrypt(datactx, encfunc, src, CC, T);
++        xts_tweak_encdec(datactx, encfunc, src, CC, T);
+=20
+         /* Cm =3D first length % XTS_BLOCK_SIZE bytes of CC */
+         for (i =3D 0; i < mo; i++) {
+@@ -222,7 +188,7 @@ void xts_encrypt(const void *datactx,
+         }
+=20
+         /* Cm-1 =3D Tweak encrypt PP */
+-        xts_tweak_encrypt(datactx, encfunc, PP, dst, T);
++        xts_tweak_encdec(datactx, encfunc, PP, dst, T);
      }
 =20
-     return g_test_run();
+     /* Decrypt the iv back */
 --=20
 2.17.2
