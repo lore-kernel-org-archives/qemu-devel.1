@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54639)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55822)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gDXBy-0004wz-LB
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:00:07 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1gDXE1-0006fF-Ki
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:02:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gDXBs-00035r-25
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:00:02 -0400
-References: <1539954845-26716-1-git-send-email-thuth@redhat.com>
-	<1539954845-26716-5-git-send-email-thuth@redhat.com>
-	<CAFEAcA-ahq3Y4sgs=Vijq_fsDPgX4JuG0gGdMwE5oOLOrsvxjQ@mail.gmail.com>
-	<a6b421a6-439e-ac87-0f96-b28ca349bc70@redhat.com>
-	<CAFEAcA9Pb5Dw9zu5_esYwor+MEmUJ=f4ZZqifui9qyJdKWbTiQ@mail.gmail.com>
+	(envelope-from <pbonzini@redhat.com>) id 1gDXDv-0005zN-Tr
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:02:09 -0400
+References: <20181019010625.25294-1-cota@braap.org>
+	<f7067d72-3b2a-9e6e-4636-f18ac1cf5202@redhat.com>
+	<20181019145018.GB7279@flamenco>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <98df614b-e432-5a18-34f3-b2275ba9af93@redhat.com>
-Date: Fri, 19 Oct 2018 17:59:34 +0200
+Message-ID: <6190036c-cd1f-4549-9b7e-9e7913c972d4@redhat.com>
+Date: Fri, 19 Oct 2018 18:01:18 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9Pb5Dw9zu5_esYwor+MEmUJ=f4ZZqifui9qyJdKWbTiQ@mail.gmail.com>
+In-Reply-To: <20181019145018.GB7279@flamenco>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/5] configs: Add a CONFIG_UNIMP switch for
- the "unimplemented-device"
+Subject: Re: [Qemu-devel] [RFC v3 0/56] per-CPU locks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,26 +25,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Richard Henderson <richard.henderson@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, qemu-ppc <qemu-ppc@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>, Alexander Graf <agraf@suse.de>, Alistair Francis <alistair23@gmail.com>, Andrzej Zaborowski <balrogg@gmail.com>, Anthony Green <green@moxielogic.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Chris Wulff <crwulff@gmail.com>, Cornelia Huck <cohuck@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, David Hildenbrand <david@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Fabien Chouteau <chouteau@adacore.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, James Hogan <jhogan@kernel.org>, Laurent Vivier <laurent@vivier.eu>, Marek Vasut <marex@denx.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Max Filippov <jcmvbkbc@gmail.com>, Michael Clark <mjc@sifive.com>, Michael Walle <michael@walle.cc>, Palmer Dabbelt <palmer@sifive.com>, Pavel Dovgalyuk <dovgaluk@ispras.ru>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Stafford Horne <shorne@gmail.com>
 
-On 19/10/2018 16:43, Peter Maydell wrote:
-> I think if we want to support this for downstreams we need
-> to look at something better than the default-configs/
-> mechanism for it. (Perhaps the kconfig-alike Paolo mentioned
-> in a previous thread?)
+On 19/10/2018 16:50, Emilio G. Cota wrote:
+> On Fri, Oct 19, 2018 at 08:59:24 +0200, Paolo Bonzini wrote:
+>> On 19/10/2018 03:05, Emilio G. Cota wrote:
+>>> I'm calling this series a v3 because it supersedes the two series
+>>> I previously sent about using atomics for interrupt_request:
+>>>   https://lists.gnu.org/archive/html/qemu-devel/2018-09/msg02013.html
+>>> The approach in that series cannot work reliably; using (locked) atomics
+>>> to set interrupt_request but not using (locked) atomics to read it
+>>> can lead to missed updates.
+>>
+>> The idea here was that changes to protected fields are all followed by
+>> kick.  That may not have been the case, granted, but I wonder if the
+>> plan is unworkable.
+> 
+> I suspect that the cpu->interrupt_request+kick mechanism is not the issue,
+> otherwise master should not work--we do atomic_read(cpu->interrupt_request)
+> and only if that read != 0 we take the BQL.
+> 
+> My guess is that the problem is with other reads of cpu->interrupt_request,
+> e.g. those in cpu_has_work. Currently those reads happen with the
+> BQL held, and updates to cpu->interrupt_request take the BQL. If we drop
+> the BQL from the setters to instead use locked atomics (like in the
+> aforementioned series), those BQL-protected readers might miss updates.
 
-True, but having more CONFIG_* symbols does not complicate the switch to
-a system like that one.
+cpu_has_work is only needed to handle the processor's halted state (or
+is it?).  If it is, OR+kick should work.
 
-> My dividing line for "should something go in a specific
-> architecture's default-configs/ list" is "is this an SoC
-> or real piece of hardware that is naturally limited to
-> one or a few SoCs".
+> Given that we need a per-CPU lock anyway to remove the BQL from the
+> CPU loop, extending this lock to protect cpu->interrupt_request is
+> a simple solution that keeps the current logic and allows for
+> greater scalability.
 
-I tend to agree, but I'd rather have a separate CONFIG_* symbol as soon
-as two different *targets* (aka default-configs/*.mak files) use a
-device.  So the SPARC change that you mention would actually be a good
-reason to introduce CONFIG_UNIMP, for example.
+Sure, I was just curious what the problem was.  KVM uses OR+kick with no
+problems.
 
 Paolo
