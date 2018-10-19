@@ -1,32 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37750)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38600)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gDXge-0003iM-7c
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:31:44 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDXiz-00051z-QV
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:34:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gDXgb-00031Q-2l
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:31:44 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:40473)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gDXga-0002le-R0
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:31:40 -0400
-Received: by mail-pg1-x541.google.com with SMTP id o14-v6so268869pgv.7
-	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 09:31:15 -0700 (PDT)
-References: <20181019015617.22583-1-richard.henderson@linaro.org>
-	<20181019015617.22583-4-richard.henderson@linaro.org>
-	<CAFEAcA81rDucGOEVYi1LCw=1eiHisuM8+yXGzaw2dMktdU99cw@mail.gmail.com>
-	<1dda484c-1fc8-f75e-3150-111b0c7d85f9@linaro.org>
-	<CAFEAcA8f2SvmsABANVrWLZo8NzeAirMOqsm7AnyPCVVKL_z0Sw@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <2c425566-53b5-e299-ccb1-09793ab673d5@linaro.org>
-Date: Fri, 19 Oct 2018 09:31:10 -0700
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8f2SvmsABANVrWLZo8NzeAirMOqsm7AnyPCVVKL_z0Sw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] target/arm: Flush only the TLBs
- affected by TTBR*_EL1
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDXiw-0006Xb-LO
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:34:09 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:54849 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1gDXiw-0006TX-CY
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:34:06 -0400
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Date: Fri, 19 Oct 2018 18:33:34 +0200
+Message-Id: <1539966828-20947-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PATCH v5 00/14] Add limited MXU instruction support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,44 +22,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: aurelien@aurel32.net, richard.henderson@linaro.org, jancraig@amazon.com, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com
 
-On 10/19/18 9:12 AM, Peter Maydell wrote:
-> A conservative check is probably:
->   if arm_current_el() < 3
->      // TTBR definitely can only be affecting the EL0/1
->      // translation regime for the current security state
->      if arm_is_secure_below_el3()
->         if EL3 is AArch32
->             flush S1SE0, S1E3
->         else
->             flush S1SE0, S1SE1
->      else
->         flush S12NSE1, S12NSE0
->   else
->      // err on the side of flushing more than maybe we need to
->      flush S1SE0, S12NSE1, S12NSE0
->      if EL3 is AArch32
->           flush S1E3
->      else
->           flush S1SE1
-> 
-> (but you should check my logic ;-))
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Riiight.
+This patch set begins to add MXU instruction support for
+MIPS emulation.
 
-Clearly it would be simpler and safer to track unused tlbs within cputlb.c.
+v4->v5:
 
-> We do for AArch32 with TTBCR.EAE == 1 (ie LPAE, when you want to
-> use the 64-bit form of the register, accessed via MRRC/MCRR).
-> cpreg_field_is_64bit() is true for both "AArch64 sysreg" and
-> "AArch32 64-bit cp reg".
+  - added full decoding engine for MXU ASE
+  - changes on aptn2, optn2, optn3 are now stand-alone patches
+  - all patches on individual instructions are reworked to fit
+    new decoding engine, and also cosmetically improved
+  - rebased to the latest code
 
-Ok, thanks.
+Aleksandar Markovic (2):
+  target/mips: Add and integrate MXU decoding engine placeholder
+  target/mips: Add MXU decoding engine
 
-So drop this patch for now and I'll get back to it.  The other two in this
-series are at least incremental improvement in the meantime.
+Craig Janeczek (12):
+  target/mips: Introduce MXU registers
+  target/mips: Define a bit for MXU in insn_flags
+  target/mips: Add bit encoding for MXU add/subtract patterns 'aptn2'
+  target/mips: Add bit encoding for MXU operand getting patterns 'optn2'
+  target/mips: Add bit encoding for MXU operand getting patterns 'optn3'
+  target/mips: Add emulation of non-MXU MULL within MXU decoding engine
+  target/mips: Add emulation of MXU instructions S32I2M and S32M2I
+  target/mips: Add emulation of MXU instruction S8LDD
+  target/mips: Add emulation of MXU instruction D16MUL
+  target/mips: Add emulation of MXU instruction D16MAC
+  target/mips: Add emulation of MXU instructions Q8MUL and Q8MULSU
+  target/mips: Add emulation of MXU instructions S32LDD and S32LDDR
 
+ target/mips/cpu.h       |   10 +
+ target/mips/mips-defs.h |    1 +
+ target/mips/translate.c | 1979 +++++++++++++++++++++++++++++++++++++++++++----
+ 3 files changed, 1834 insertions(+), 156 deletions(-)
 
-r~
+-- 
+2.7.4
