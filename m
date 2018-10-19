@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39039)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39022)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDXkP-00061t-Ae
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:35:38 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDXkN-00015W-TM
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDXkO-00061M-QR
 	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:35:37 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:58350 helo=mail.rt-rk.com)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDXkM-00011G-OR
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:35:36 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:58301 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gDXkN-00011O-KG
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:35:35 -0400
+	id 1gDXkM-0000vV-AT
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:35:34 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Fri, 19 Oct 2018 18:33:48 +0200
-Message-Id: <1539966828-20947-15-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Fri, 19 Oct 2018 18:33:41 +0200
+Message-Id: <1539966828-20947-8-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1539966828-20947-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1539966828-20947-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v5 14/14] target/mips: Add emulation of MXU
- instructions S32LDD and S32LDDR
+Subject: [Qemu-devel] [PATCH v5 07/14] target/mips: Add bit encoding for MXU
+ operand getting patterns 'optn3'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,86 +30,34 @@ Cc: aurelien@aurel32.net, richard.henderson@linaro.org, jancraig@amazon.com, ama
 
 From: Craig Janeczek <jancraig@amazon.com>
 
-Add support for emulating the S32LDD and S32LDDR MXU instructions.
+Add bit encoding for MXU operand getting patterns 'optn3'.
 
 Signed-off-by: Craig Janeczek <jancraig@amazon.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 54 ++++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 47 insertions(+), 7 deletions(-)
+ target/mips/translate.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 76859bf..99184ab 100644
+index 60bba15..5b7e6f3 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -23737,6 +23737,52 @@ static void gen_mxu_q8mul_q8mulsu(DisasContext *ctx)
-     tcg_temp_free(t7);
- }
+@@ -23323,6 +23323,16 @@ static void decode_opc_special(CPUMIPSState *env, DisasContext *ctx)
+ #define MXU_OPTN2_HW    2
+ #define MXU_OPTN2_XW    3
  
-+/*
-+ * S32LDD  XRa, Rb, S12 - Load a word from memory to XRF
-+ * S32LDDR XRa, Rb, S12 - Load a word from memory to XRF, reversed byte seq.
-+ */
-+static void gen_mxu_s32ldd_s32lddr(DisasContext *ctx)
-+{
-+    TCGv t0, t1;
-+    TCGLabel *l0;
-+    uint32_t XRa, Rb, s12, sel;
-+
-+    t0 = tcg_temp_new();
-+    t1 = tcg_temp_new();
-+
-+    l0 = gen_new_label();
-+
-+    XRa = extract32(ctx->opcode, 6, 4);
-+    s12 = extract32(ctx->opcode, 10, 10);
-+    sel = extract32(ctx->opcode, 20, 1);
-+    Rb = extract32(ctx->opcode, 21, 5);
-+
-+    gen_load_mxu_cr(t0);
-+    tcg_gen_andi_tl(t0, t0, MXU_CR_MXU_EN);
-+    tcg_gen_brcondi_tl(TCG_COND_NE, t0, MXU_CR_MXU_EN, l0);
-+
-+    gen_load_gpr(t0, Rb);
-+
-+    tcg_gen_movi_tl(t1, s12);
-+    tcg_gen_shli_tl(t1, t1, 2);
-+    if (s12 & 0x200) {
-+        tcg_gen_ori_tl(t1, t1, 0xFFFFF000);
-+    }
-+    tcg_gen_add_tl(t1, t0, t1);
-+    tcg_gen_qemu_ld_tl(t1, t1, ctx->mem_idx, MO_SL);
-+
-+    if (sel == 1) {
-+        /* S32LDDR */
-+        tcg_gen_bswap32_tl(t1, t1);
-+    }
-+    gen_store_mxu_gpr(t1, XRa);
-+
-+    gen_set_label(l0);
-+
-+    tcg_temp_free(t0);
-+    tcg_temp_free(t1);
-+}
++/* MXU operand getting patterns 'optn3' */
++#define MXU_OPTN3_PTN0  0
++#define MXU_OPTN3_PTN1  1
++#define MXU_OPTN3_PTN2  2
++#define MXU_OPTN3_PTN3  3
++#define MXU_OPTN3_PTN4  4
++#define MXU_OPTN3_PTN5  5
++#define MXU_OPTN3_PTN6  6
++#define MXU_OPTN3_PTN7  7
 +
  
  /*
-  * Decoding engine for MXU
-@@ -23998,14 +24044,8 @@ static void decode_opc_mxu__pool05(CPUMIPSState *env, DisasContext *ctx)
- 
-     switch (opcode) {
-     case OPC_MXU_S32LDD:
--        /* TODO: Implement emulation of S32LDD instruction. */
--        MIPS_INVAL("OPC_MXU_S32LDD");
--        generate_exception_end(ctx, EXCP_RI);
--        break;
-     case OPC_MXU_S32LDDR:
--        /* TODO: Implement emulation of S32LDDR instruction. */
--        MIPS_INVAL("OPC_MXU_S32LDDR");
--        generate_exception_end(ctx, EXCP_RI);
-+        gen_mxu_s32ldd_s32lddr(ctx);
-         break;
-     default:
-         MIPS_INVAL("decode_opc_mxu");
+  *
 -- 
 2.7.4
