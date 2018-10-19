@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44757)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45659)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gDU46-00008C-H6
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:39:46 -0400
+	(envelope-from <berrange@redhat.com>) id 1gDU6B-0002AD-E7
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:41:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gDU42-0003nH-Ep
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:39:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33980)
+	(envelope-from <berrange@redhat.com>) id 1gDU68-00021I-5p
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:41:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41358)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gDU40-0003Fe-Dx
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:39:37 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6C86C356F3
-	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 12:39:25 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-34.ams2.redhat.com
-	[10.36.117.34])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3B25F600C0
-	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 12:39:25 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 19 Oct 2018 14:39:23 +0200
-Message-Id: <20181019123923.26649-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH] error: Drop bogus "use error_setg() instead"
- admonitions
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gDU67-00020g-Rx
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:41:48 -0400
+Date: Fri, 19 Oct 2018 13:41:39 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181019124139.GQ13722@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20181009130442.26296-1-berrange@redhat.com>
+	<20181009130442.26296-9-berrange@redhat.com>
+	<2bf95805-02c8-2e69-9d31-139f2d34ca3e@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <2bf95805-02c8-2e69-9d31-139f2d34ca3e@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 08/11] authz: add QAuthZList object type
+ for an access control list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,63 +31,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Andreas =?utf-8?Q?F=C3=A4rber?= <afaerber@suse.de>
 
-Commit 97f40301f1d "error: Functions to report warnings and
-informational messages" copied the "use error_setg() instead"
-admonition from the error reporting functions to new functions even
-though it doesn't actually apply there.  Drop it.  Also drop it from
-vreport(), where it doesn't apply anymore.
+On Fri, Oct 19, 2018 at 11:57:45AM +0200, Philippe Mathieu-Daud=C3=A9 wro=
+te:
+> On 09/10/2018 15:04, Daniel P. Berrang=C3=A9 wrote:
+> > From: "Daniel P. Berrange" <berrange@redhat.com>
+> >=20
+> > Add a QAuthZList object type that implements the QAuthZ interface. Th=
+is
+> > built-in implementation maintains a trivial access control list with =
+a
+> > sequence of match rules and a final default policy. This replicates t=
+he
+> > functionality currently provided by the qemu_acl module.
+> >=20
+> > To create an instance of this object via the QMP monitor, the syntax
+> > used would be:
+> >=20
+> >   {
+> >     "execute": "object-add",
+> >     "arguments": {
+> >       "qom-type": "authz-list",
+> >       "id": "authz0",
+> >       "parameters": {
+> >         "rules": [
+> >            { "match": "fred", "policy": "allow", "format": "exact" },
+> >            { "match": "bob", "policy": "allow", "format": "exact" },
+> >            { "match": "danb", "policy": "deny", "format": "glob" },
+> >            { "match": "dan*", "policy": "allow", "format": "exact" },
+> >         ],
+> >         "policy": "deny"
+> >       }
+> >     }
+> >   }
+> >=20
+> > This sets up an authorization rule that allows 'fred', 'bob' and anyo=
+ne
+> > whose name starts with 'dan', except for 'danb'. Everyone unmatched i=
+s
+> > denied.
+> >=20
+> > It is not currently possible to create this via -object, since there =
+is
+> > no syntax supported to specify non-scalar properties for objects. Thi=
+s
+> > is likely to be addressed by later support for using JSON with -objec=
+t,
+> > or an equivalent approach.
+> >=20
+> > In any case the future "authz-listfile" object can be used from the
+> > CLI and is likely a better choice, as it allows the ACL to be refresh=
+ed
+> > automatically on change.
+> > +static void
+> > +qauthz_list_prop_set_policy(Object *obj,
+> > +                            int value,
+> > +                            Error **errp G_GNUC_UNUSED)
+> > +{
+> > +    QAuthZList *bauthz =3D QAUTHZ_LIST(obj);
+> > +
+>=20
+> Here:
+>=20
+>        g_free(bauthz->policy);
 
-Reported-by: Kevin Wolf <kwolf@redhat.com>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- util/qemu-error.c | 5 -----
- 1 file changed, 5 deletions(-)
+'policy' is an integer, so I don't think we need g_free(0x1) :-)
 
-diff --git a/util/qemu-error.c b/util/qemu-error.c
-index 4ab428f7e4..fcbe8a1f74 100644
---- a/util/qemu-error.c
-+++ b/util/qemu-error.c
-@@ -194,7 +194,6 @@ bool enable_timestamp_msg;
-  * Format arguments like vsprintf().  The resulting message should be
-  * a single phrase, with no newline or trailing punctuation.
-  * Prepend the current location and append a newline.
-- * It's wrong to call this in a QMP monitor.  Use error_setg() there.
-  */
- static void vreport(report_type type, const char *fmt, va_list ap)
- {
-@@ -242,7 +241,6 @@ void error_vreport(const char *fmt, va_list ap)
-  * Format arguments like vsprintf().  The resulting message should be
-  * a single phrase, with no newline or trailing punctuation.
-  * Prepend the current location and append a newline.
-- * It's wrong to call this in a QMP monitor.  Use error_setg() there.
-  */
- void warn_vreport(const char *fmt, va_list ap)
- {
-@@ -255,7 +253,6 @@ void warn_vreport(const char *fmt, va_list ap)
-  * Format arguments like vsprintf().  The resulting message should be
-  * a single phrase, with no newline or trailing punctuation.
-  * Prepend the current location and append a newline.
-- * It's wrong to call this in a QMP monitor.  Use error_setg() there.
-  */
- void info_vreport(const char *fmt, va_list ap)
- {
-@@ -283,7 +280,6 @@ void error_report(const char *fmt, ...)
-  * Format arguments like sprintf(). The resulting message should be a
-  * single phrase, with no newline or trailing punctuation.
-  * Prepend the current location and append a newline.
-- * It's wrong to call this in a QMP monitor.  Use error_setg() there.
-  */
- void warn_report(const char *fmt, ...)
- {
-@@ -300,7 +296,6 @@ void warn_report(const char *fmt, ...)
-  * Format arguments like sprintf(). The resulting message should be a
-  * single phrase, with no newline or trailing punctuation.
-  * Prepend the current location and append a newline.
-- * It's wrong to call this in a QMP monitor.  Use error_setg() there.
-  */
- void info_report(const char *fmt, ...)
- {
--- 
-2.17.2
+>=20
+> > +    bauthz->policy =3D value;
+> > +}
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
