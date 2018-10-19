@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59495)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gDJG4-00058e-6i
+	(envelope-from <cota@braap.org>) id 1gDJG4-00058U-2V
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:07:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gDJFz-0003ae-1O
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:07:18 -0400
+	(envelope-from <cota@braap.org>) id 1gDJFx-0003ZL-32
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:07:17 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 18 Oct 2018 21:06:08 -0400
-Message-Id: <20181019010625.25294-40-cota@braap.org>
+Date: Thu, 18 Oct 2018 21:05:56 -0400
+Message-Id: <20181019010625.25294-28-cota@braap.org>
 In-Reply-To: <20181019010625.25294-1-cota@braap.org>
 References: <20181019010625.25294-1-cota@braap.org>
-Subject: [Qemu-devel] [RFC v3 39/56] s390x: convert to cpu_interrupt_request
+Subject: [Qemu-devel] [RFC v3 27/56] s390x: use cpu_reset_interrupt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,45 +20,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
+
+From: Paolo Bonzini <pbonzini@redhat.com>
 
 Cc: Cornelia Huck <cohuck@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Alexander Graf <agraf@suse.de>
 Cc: Richard Henderson <rth@twiddle.net>
+Cc: Alexander Graf <agraf@suse.de>
 Cc: David Hildenbrand <david@redhat.com>
 Cc: qemu-s390x@nongnu.org
+Reviewed-by: David Hildenbrand <david@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- hw/intc/s390_flic.c | 2 +-
- target/s390x/cpu.c  | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ target/s390x/excp_helper.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/intc/s390_flic.c b/hw/intc/s390_flic.c
-index bfb5cf1d07..d944824e67 100644
---- a/hw/intc/s390_flic.c
-+++ b/hw/intc/s390_flic.c
-@@ -189,7 +189,7 @@ static void qemu_s390_flic_notify(uint32_t type)
-     CPU_FOREACH(cs) {
-         S390CPU *cpu = S390_CPU(cs);
+diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
+index d22c5b3ce5..7ca50b3df6 100644
+--- a/target/s390x/excp_helper.c
++++ b/target/s390x/excp_helper.c
+@@ -454,7 +454,7 @@ try_deliver:
  
--        cs->interrupt_request |= CPU_INTERRUPT_HARD;
-+        cpu_interrupt_request_or(cs, CPU_INTERRUPT_HARD);
- 
-         /* ignore CPUs that are not sleeping */
-         if (s390_cpu_get_state(cpu) != S390_CPU_STATE_OPERATING &&
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index 956d4e1d18..1f91df57bc 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -65,7 +65,7 @@ static bool s390_cpu_has_work(CPUState *cs)
-         return false;
+     /* we might still have pending interrupts, but not deliverable */
+     if (!env->pending_int && !qemu_s390_flic_has_any(flic)) {
+-        cs->interrupt_request &= ~CPU_INTERRUPT_HARD;
++        cpu_reset_interrupt(cs, CPU_INTERRUPT_HARD);
      }
  
--    if (!(cs->interrupt_request & CPU_INTERRUPT_HARD)) {
-+    if (!(cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD)) {
-         return false;
-     }
- 
+     /* WAIT PSW during interrupt injection or STOP interrupt */
 -- 
 2.17.1
