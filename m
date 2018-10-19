@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56456)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gDTRY-0004zf-Gu
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 07:59:53 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1gDTSM-0005ao-Jm
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:00:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gDTRX-0004eD-Bf
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 07:59:52 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:35371)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gDTRX-0004dh-1c
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 07:59:51 -0400
-Received: by mail-oi1-x241.google.com with SMTP id 22-v6so26610553oiz.2
-	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 04:59:50 -0700 (PDT)
+	(envelope-from <pbonzini@redhat.com>) id 1gDTSF-0005rb-VQ
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:00:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56802)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gDTSF-0005nK-Kw
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:00:35 -0400
+References: <20180823102502.28122-1-berrange@redhat.com>
+	<20181019112250.GA19474@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a6c6768c-dbc1-e1be-fe94-3a354fa0cad0@redhat.com>
+Date: Fri, 19 Oct 2018 14:00:21 +0200
 MIME-Version: 1.0
-In-Reply-To: <1539944335-19556-1-git-send-email-hongbo.zhang@linaro.org>
-References: <1539944335-19556-1-git-send-email-hongbo.zhang@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 19 Oct 2018 12:59:29 +0100
-Message-ID: <CAFEAcA-MD7aE1phES3RPEH2mk5USfKv0j1tGtbrOnid3hLQmXw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/virt: remove unused header files
+In-Reply-To: <20181019112250.GA19474@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] scripts: report on author emails that are
+ mangled by the mailing list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +29,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Hongbo Zhang <hongbo.zhang@linaro.org>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-On 19 October 2018 at 11:18, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
-> Remove the unused herder files, 'virt' can be compiled and run without
-> including them.
->
-> Signed-off-by: Hongbo Zhang <hongbo.zhang@linaro.org>
-> ---
->  hw/arm/virt.c | 8 --------
->  1 file changed, 8 deletions(-)
->
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 9f67782..f0066cb 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -30,9 +30,6 @@
->
->  #include "qemu/osdep.h"
->  #include "qapi/error.h"
-> -#include "hw/sysbus.h"
-> -#include "hw/arm/arm.h"
-> -#include "hw/arm/primecell.h"
+On 19/10/2018 13:22, Daniel P. Berrang=C3=A9 wrote:
+> Copying Paolo, since this probably falls under the "misc patches"
+> maintainer bucket.
 
-Dropping primecell.h makes sense, we don't use what it provides.
-But I suspect the others are "unused" only because some other
-header we include drags them in implicitly. I think it's better
-to explicitly include what we need, in case that other header
-changes in future.
+I think we should define a "generic maintainer stuff" bucket where every
+maintainer is supposed to send patches with a Reviewed-by.  Maintainers
+are probably good enough at getting reviews by an appropriate person.
 
-How did you determine which #includes to drop here?
+(I am slowly trying to remove stuff from the misc bucket).
 
-thanks
--- PMM
+Paolo
+
+> On Thu, Aug 23, 2018 at 11:25:02AM +0100, Daniel P. Berrang=C3=A9 wrote=
+:
+>> In some cases the Author: email address in patches submitted to the
+>> list gets mangled such that it says
+>>
+>>     John Doe via Qemu-devel <qemu-devel@nongnu.org>
+>>
+>> This change is a result of workarounds for DMARC policies.
+>>
+>> Subsystem maintainers accepting patches need to catch these and fix
+>> them before sending pull requests, so a checkpatch.pl test is highly
+>> desirable.
+>>
+>> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+>> ---
+>>  scripts/checkpatch.pl | 4 ++++
+>>  1 file changed, 4 insertions(+)
+>>
+>> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+>> index 42e1c50dd8..be2114a179 100755
+>> --- a/scripts/checkpatch.pl
+>> +++ b/scripts/checkpatch.pl
+>> @@ -1402,6 +1402,10 @@ sub process {
+>>  			$is_patch =3D 1;
+>>  		}
+>> =20
+>> +		if ($line =3D~ /^Author: .*via Qemu-devel.*<qemu-devel\@nongnu.org>=
+/) {
+>> +		    ERROR("Author email address is mangled by the mailing list\n" .=
+ $herecurr);
+>> +		}
+>> +
+>>  #check the patch for a signoff:
+>>  		if ($line =3D~ /^\s*signed-off-by:/i) {
+>>  			# This is a signoff, if ugly, so do not double report.
+>> --=20
+>> 2.17.1
+>>
+>=20
+> Regards,
+> Daniel
+>=20
