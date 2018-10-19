@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48335)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gDUCR-0007zl-RM
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:48:21 -0400
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gDUE4-0000kf-08
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:50:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gDUCL-0007xt-Fu
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:48:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38966)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gDUCL-0007pW-5L
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:48:13 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C90C97F6BB
-	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 12:48:11 +0000 (UTC)
-Date: Fri, 19 Oct 2018 13:48:02 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181019124802.GR13722@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181019122613.28663-1-pbonzini@redhat.com>
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gDUDz-0004Ww-If
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:49:59 -0400
+Received: from mail.uni-paderborn.de ([131.234.142.9]:44394)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
+	id 1gDUDz-0004QY-8D
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:49:55 -0400
+References: <20181012173047.25420-1-kbastian@mail.uni-paderborn.de>
+	<20181012173047.25420-16-kbastian@mail.uni-paderborn.de>
+	<2ef3b2f4-98da-a423-6e11-6dda5779031c@linaro.org>
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Message-ID: <2619969c-866a-5d9a-ff19-800edd1815be@mail.uni-paderborn.de>
+Date: Fri, 19 Oct 2018 14:49:52 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20181019122613.28663-1-pbonzini@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: remove or downgrade myself to
- reviewer from some subsystems
+In-Reply-To: <2ef3b2f4-98da-a423-6e11-6dda5779031c@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US-large
+Subject: Re: [Qemu-devel] [PATCH 15/28] target/riscv: Convert quadrant 0 of
+ RVXC insns to decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,110 +31,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-
-On Fri, Oct 19, 2018 at 02:26:13PM +0200, Paolo Bonzini wrote:
-> Other people are doing a much better work than myself at handling some
-> subsystems.  For those files it is better if I downgrade myself to
-> reviewer or recognize that I am not actually doing any work there.
->=20
-> Cc: Daniel P. Berrange <berrange@redhat.com>
-> Cc: Gerd Hoffmann <kraxel@redhat.com>
-> Cc: Eric Blake <eblake@redhat.com>
-> Cc: Thomas Huth <thuth@redhat.com>
-> Cc: Laurent Vivier <lvivier@redhat.com>
-> Cc: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  MAINTAINERS | 13 ++++++-------
->  1 file changed, 6 insertions(+), 7 deletions(-)
-
-For sockets maintainer change
-
-Acked-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>, mjc@sifive.com, palmer@sifive.com, sagark@eecs.berkeley.edu
+Cc: peer.adelt@hni.uni-paderborn.de, Alistair.Francis@wdc.com, qemu-devel@nongnu.org
 
 
->=20
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index fb81b3a8eb..8c814b2e60 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -105,9 +105,9 @@ Guest CPU cores (TCG):
->  ----------------------
->  Overall
->  L: qemu-devel@nongnu.org
-> -M: Paolo Bonzini <pbonzini@redhat.com>
->  M: Peter Crosthwaite <crosthwaite.peter@gmail.com>
->  M: Richard Henderson <rth@twiddle.net>
-> +R: Paolo Bonzini <pbonzini@redhat.com>
->  S: Maintained
->  F: cpus.c
->  F: exec.c
-> @@ -1132,7 +1132,8 @@ F: hw/pci-host/ppce500.c
->  F: hw/net/fsl_etsec/
-> =20
->  Character devices
-> -M: Paolo Bonzini <pbonzini@redhat.com>
-> +M: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> +R: Paolo Bonzini <pbonzini@redhat.com>
->  S: Odd Fixes
->  F: hw/char/
-> =20
-> @@ -1517,8 +1518,8 @@ T: git git://github.com/famz/qemu.git bitmaps
->  T: git git://github.com/jnsnow/qemu.git bitmaps
-> =20
->  Character device backends
-> -M: Paolo Bonzini <pbonzini@redhat.com>
->  M: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> +R: Paolo Bonzini <pbonzini@redhat.com>
->  S: Maintained
->  F: chardev/
->  F: include/chardev/
-> @@ -1751,9 +1752,9 @@ F: tests/qmp-cmd-test.c
->  T: git git://repo.or.cz/qemu/armbru.git qapi-next
-> =20
->  qtest
-> -M: Paolo Bonzini <pbonzini@redhat.com>
->  M: Thomas Huth <thuth@redhat.com>
->  M: Laurent Vivier <lvivier@redhat.com>
-> +R: Paolo Bonzini <pbonzini@redhat.com>
->  S: Maintained
->  F: qtest.c
->  F: tests/libqtest.*
-> @@ -1860,7 +1861,6 @@ F: tests/test-io-*
->  Sockets
->  M: Daniel P. Berrange <berrange@redhat.com>
->  M: Gerd Hoffmann <kraxel@redhat.com>
-> -M: Paolo Bonzini <pbonzini@redhat.com>
->  S: Maintained
->  F: include/qemu/sockets.h
->  F: util/qemu-sockets.c
-> @@ -2050,13 +2050,12 @@ M: Ronnie Sahlberg <ronniesahlberg@gmail.com>
->  M: Paolo Bonzini <pbonzini@redhat.com>
->  M: Peter Lieven <pl@kamp.de>
->  L: qemu-block@nongnu.org
-> -S: Supported
-> +S: Odd Fixes
->  F: block/iscsi.c
->  F: block/iscsi-opts.c
-> =20
->  Network Block Device (NBD)
->  M: Eric Blake <eblake@redhat.com>
-> -M: Paolo Bonzini <pbonzini@redhat.com>
->  L: qemu-block@nongnu.org
->  S: Maintained
->  F: block/nbd*
-> --=20
-> 2.17.1
->=20
+On 10/13/18 8:18 PM, Richard Henderson wrote:
+> On 10/12/18 10:30 AM, Bastian Koppelmann wrote:
+>> +# Argument sets:
+>> +&cl               rs1 rd
+>> +&cl_dw     uimm   rs1 rd
+>> +&ciw       nzuimm     rd
+>> +&cs               rs1 rs2
+>> +&cs_dw     uimm   rs1 rs2
+> I guess this is good enough for now.
+> What I'd like to see is something like
+>
+> &i	imm rs1 rd	!extern
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+
+That looks so much better. Can you CC me when you send the patches for 
+the extern support, so I can implement this for RISC-V?
+
+
+Cheers,
+
+Bastian
