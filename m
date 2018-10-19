@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53154)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56091)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gDOFt-0004Sh-Sa
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 02:27:36 -0400
+	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gDOIp-0006uB-JX
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 02:30:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gDOFm-0004Z1-Tx
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 02:27:29 -0400
-Received: from mail-pg1-x532.google.com ([2607:f8b0:4864:20::532]:43711)
+	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gDOIo-0002YE-LO
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 02:30:31 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:44491)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gDOFl-0002vY-SU
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 02:27:22 -0400
-Received: by mail-pg1-x532.google.com with SMTP id d8-v6so4106484pgv.10
-	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 23:26:43 -0700 (PDT)
-References: <20181019010625.25294-1-cota@braap.org>
-	<20181019010625.25294-3-cota@braap.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <1b04b6e6-c5cf-128f-484c-d8f3e579b187@linaro.org>
-Date: Thu, 18 Oct 2018 23:26:39 -0700
+	(Exim 4.71) (envelope-from <artem.k.pisarenko@gmail.com>)
+	id 1gDOIo-0002Ue-Ce
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 02:30:30 -0400
+Received: by mail-ot1-x341.google.com with SMTP id p23so32162599otf.11
+	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 23:30:30 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20181019010625.25294-3-cota@braap.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v3 02/56] cpu: rename cpu->work_mutex to
- cpu->lock
+References: <cover.1539860473.git.artem.k.pisarenko@gmail.com>
+	<3a396555c19468ce89788cc6deabbfef4ab56035.1539860473.git.artem.k.pisarenko@gmail.com>
+	<002201d46770$4affc060$e0ff4120$@ru>
+In-Reply-To: <002201d46770$4affc060$e0ff4120$@ru>
+From: Artem Pisarenko <artem.k.pisarenko@gmail.com>
+Date: Fri, 19 Oct 2018 12:30:17 +0600
+Message-ID: <CANzW0mui0aaCWH0iQT+KxHygmE1TSh9Xko_Qyrwkg=6kUnM_Eg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 4/4] Optimize record/replay
+ checkpointing for all clocks it applies to
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,24 +32,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Cc: qemu-devel@nongnu.org, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 10/18/18 6:05 PM, Emilio G. Cota wrote:
-> This lock will soon protect more fields of the struct. Give
-> it a more appropriate name.
-> 
-> Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>
-> Cc: Richard Henderson <rth@twiddle.net>
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> ---
->  include/qom/cpu.h |  5 +++--
->  cpus-common.c     | 14 +++++++-------
->  cpus.c            |  4 ++--
->  qom/cpu.c         |  2 +-
->  4 files changed, 13 insertions(+), 12 deletions(-)
+> =E2=80=A6
+> This is wrong at least for QEMU_CLOCK_HOST.
+> =E2=80=A6
+> Reading the host clock here is not protected by the checkpoint.
+> Therefore it may incur the inconsistency when replaying the execution.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-
-r~
+That's why I didn't like idea of this patch and asked for any possible side
+effects beforehand. So, here is one.
+I have no idea how to fix it properly and would like to recall this
+particular patch from these series (remember, it doesn't match series
+goal). Lets leave this patch/issue for separate resolution, although I'm
+not very interested in it.
