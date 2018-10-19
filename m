@@ -1,19 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38941)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39902)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gDTrU-0004ul-2w
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:26:45 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1gDTsM-0005wV-Ik
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:27:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gDTrQ-0000Sd-0y
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:26:39 -0400
-From: Alberto Garcia <berto@igalia.com>
-Date: Fri, 19 Oct 2018 15:24:36 +0300
-Message-Id: <f37ebb48399542bf1ea62961e1ab1b3f9cbcffc4.1539950487.git.berto@igalia.com>
-In-Reply-To: <cover.1539950487.git.berto@igalia.com>
-References: <cover.1539950487.git.berto@igalia.com>
-In-Reply-To: <cover.1539950487.git.berto@igalia.com>
-References: <cover.1539950487.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v3 05/15] block: Use
- bdrv_reopen_set_read_only() in stream_start/complete()
+	(envelope-from <pbonzini@redhat.com>) id 1gDTsI-0004JV-BQ
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:27:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59302)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gDTsA-0003B2-Hd
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:27:26 -0400
+References: <20181019122449.26387-1-rka@sysgo.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e408c3b6-bba1-d121-a2b0-ab0507285091@redhat.com>
+Date: Fri, 19 Oct 2018 14:27:07 +0200
+MIME-Version: 1.0
+In-Reply-To: <20181019122449.26387-1-rka@sysgo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] Clear RF on SYSCALL instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,79 +27,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Roman Kapl <rka@sysgo.com>
+Cc: Rudolf Marek <rudolf.marek@sysgo.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
 
-This patch replaces the bdrv_reopen() calls that set and remove the
-BDRV_O_RDWR flag with the new bdrv_reopen_set_read_only() function.
+On 19/10/2018 14:24, Roman Kapl wrote:
+> From: Rudolf Marek <rudolf.marek@sysgo.com>
+> 
+> Fix the SYSCALL instruction in 64-bit (long mode). The RF flag
+> should be cleared in R11 as well as in the RFLAGS. Intel
+> and AMD CPUs behave same. AMD has this documented in the
+> APM vol 3.
+> 
+> Signed-off-by: Roman Kapl <rka@sysgo.com>
+> Signed-off-by: Rudolf Marek <rudolf.marek@sysgo.com>
+> ---
+>  target/i386/seg_helper.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/target/i386/seg_helper.c b/target/i386/seg_helper.c
+> index 33714bc6e1..63e265cb38 100644
+> --- a/target/i386/seg_helper.c
+> +++ b/target/i386/seg_helper.c
+> @@ -991,11 +991,11 @@ void helper_syscall(CPUX86State *env, int next_eip_addend)
+>          int code64;
+>  
+>          env->regs[R_ECX] = env->eip + next_eip_addend;
+> -        env->regs[11] = cpu_compute_eflags(env);
+> +        env->regs[11] = cpu_compute_eflags(env) & ~RF_MASK;
+>  
+>          code64 = env->hflags & HF_CS64_MASK;
+>  
+> -        env->eflags &= ~env->fmask;
+> +        env->eflags &= ~(env->fmask | RF_MASK);
+>          cpu_load_eflags(env, env->eflags, 0);
+>          cpu_x86_load_seg_cache(env, R_CS, selector & 0xfffc,
+>                             0, 0xffffffff,
+> 
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
----
- block/stream.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+Queued, thanks.
 
-diff --git a/block/stream.c b/block/stream.c
-index 81a7ec8ece..262d280ccd 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -34,7 +34,7 @@ typedef struct StreamBlockJob {
-     BlockDriverState *base;
-     BlockdevOnError on_error;
-     char *backing_file_str;
--    int bs_flags;
-+    bool bs_read_only;
- } StreamBlockJob;
- 
- static int coroutine_fn stream_populate(BlockBackend *blk,
-@@ -89,10 +89,10 @@ static void stream_clean(Job *job)
-     BlockDriverState *bs = blk_bs(bjob->blk);
- 
-     /* Reopen the image back in read-only mode if necessary */
--    if (s->bs_flags != bdrv_get_flags(bs)) {
-+    if (s->bs_read_only) {
-         /* Give up write permissions before making it read-only */
-         blk_set_perm(bjob->blk, 0, BLK_PERM_ALL, &error_abort);
--        bdrv_reopen(bs, s->bs_flags, NULL);
-+        bdrv_reopen_set_read_only(bs, true, NULL);
-     }
- 
-     g_free(s->backing_file_str);
-@@ -226,12 +226,12 @@ void stream_start(const char *job_id, BlockDriverState *bs,
- {
-     StreamBlockJob *s;
-     BlockDriverState *iter;
--    int orig_bs_flags;
-+    int bs_read_only;
- 
-     /* Make sure that the image is opened in read-write mode */
--    orig_bs_flags = bdrv_get_flags(bs);
--    if (!(orig_bs_flags & BDRV_O_RDWR)) {
--        if (bdrv_reopen(bs, orig_bs_flags | BDRV_O_RDWR, errp) != 0) {
-+    bs_read_only = bdrv_is_read_only(bs);
-+    if (bs_read_only) {
-+        if (bdrv_reopen_set_read_only(bs, false, errp) != 0) {
-             return;
-         }
-     }
-@@ -261,7 +261,7 @@ void stream_start(const char *job_id, BlockDriverState *bs,
- 
-     s->base = base;
-     s->backing_file_str = g_strdup(backing_file_str);
--    s->bs_flags = orig_bs_flags;
-+    s->bs_read_only = bs_read_only;
- 
-     s->on_error = on_error;
-     trace_stream_start(bs, base, s);
-@@ -269,7 +269,7 @@ void stream_start(const char *job_id, BlockDriverState *bs,
-     return;
- 
- fail:
--    if (orig_bs_flags != bdrv_get_flags(bs)) {
--        bdrv_reopen(bs, orig_bs_flags, NULL);
-+    if (bs_read_only) {
-+        bdrv_reopen_set_read_only(bs, true, NULL);
-     }
- }
--- 
-2.11.0
+Paolo
