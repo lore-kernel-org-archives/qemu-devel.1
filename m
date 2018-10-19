@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44874)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47248)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gDWjy-0001W3-TW
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 11:31:07 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1gDWrR-0003rs-Ne
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 11:38:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gDWju-00013h-Ui
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 11:31:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39850)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gDWju-00010T-Kt
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 11:31:02 -0400
-References: <1539919345-10703-1-git-send-email-jasowang@redhat.com>
-	<1539919345-10703-13-git-send-email-jasowang@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a42bdd2a-4163-e1f0-4e2e-d3be0c857732@redhat.com>
-Date: Fri, 19 Oct 2018 10:30:53 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gDWrM-00028w-Fv
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 11:38:49 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:41010)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gDWrM-0001oD-5q
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 11:38:44 -0400
+Received: by mail-pg1-x542.google.com with SMTP id 23-v6so15917773pgc.8
+	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 08:38:33 -0700 (PDT)
+References: <20181012173047.25420-1-kbastian@mail.uni-paderborn.de>
+	<20181012173047.25420-17-kbastian@mail.uni-paderborn.de>
+	<ed4c028f-12b8-d940-c4ce-49b59c36a06e@linaro.org>
+	<86d7b325-80e1-1783-fb9b-b2071f1795cc@mail.uni-paderborn.de>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <18e0d466-2f16-d85c-fa4a-50c85df1bddb@linaro.org>
+Date: Fri, 19 Oct 2018 08:38:29 -0700
 MIME-Version: 1.0
-In-Reply-To: <1539919345-10703-13-git-send-email-jasowang@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <86d7b325-80e1-1783-fb9b-b2071f1795cc@mail.uni-paderborn.de>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL V2 12/26] qapi: Add new command to query
- colo status
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 16/28] target/riscv: Convert quadrant 1 of
+ RVXC insns to decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,62 +34,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, peter.maydell@linaro.org, qemu-devel@nongnu.org
-Cc: Zhang Chen <chen.zhang@intel.com>, Zhang Chen <zhangckid@gmail.com>
+To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, mjc@sifive.com, palmer@sifive.com, sagark@eecs.berkeley.edu
+Cc: peer.adelt@hni.uni-paderborn.de, Alistair.Francis@wdc.com, qemu-devel@nongnu.org
 
-On 10/18/18 10:22 PM, Jason Wang wrote:
-> From: Zhang Chen <zhangckid@gmail.com>
+On 10/19/18 8:28 AM, Bastian Koppelmann wrote:
 > 
-> Libvirt or other high level software can use this command query colo status.
-> You can test this command like that:
-> {'execute':'query-colo-status'}
+> On 10/13/18 8:53 PM, Richard Henderson wrote:
+>> On 10/12/18 10:30 AM, Bastian Koppelmann wrote:
+>>> +static bool trans_c_addi(DisasContext *ctx, arg_c_addi *a, uint16_t insn)
+>>> +{
+>>> +    if (a->imm == 0) {
+>>> +        return true;
+>>> +    }
+>> return false, I think.
 > 
-> Signed-off-by: Zhang Chen <zhangckid@gmail.com>
-> Signed-off-by: Zhang Chen <chen.zhang@intel.com>
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> ---
+> 
+> Those are HINTS, which means the instruction in valid, but does not affect
+> state, so true is correct. If I do return false, then Linux does not boot
+> anymore :)
 
-> +++ b/qapi/migration.json
-> @@ -1308,6 +1308,38 @@
->   { 'command': 'xen-colo-do-checkpoint' }
->   
->   ##
-> +# @COLOStatus:
-> +#
-> +# The result format for 'query-colo-status'.
-> +#
-> +# @mode: COLO running mode. If COLO is running, this field will return
-> +#        'primary' or 'secondary'.
-> +#
-> +# @reason: describes the reason for the COLO exit.
-> +#
-> +# Since: 3.0
+Ah, this information is not present in the main body of the text, only in table
+12.5.  It might be good to add comments to the code here.
 
-Now that the pull request has landed, please submit a followup patch 
-that fixes s/3.0/3.1/
-
-> +##
-> +{ 'struct': 'COLOStatus',
-> +  'data': { 'mode': 'COLOMode', 'reason': 'COLOExitReason' } }
-> +
-> +##
-> +# @query-colo-status:
-> +#
-> +# Query COLO status while the vm is running.
-> +#
-> +# Returns: A @COLOStatus object showing the status.
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "query-colo-status" }
-> +# <- { "return": { "mode": "primary", "active": true, "reason": "request" } }
-> +#
-> +# Since: 3.0
-
-at both locations
+Thanks.
 
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+r~
