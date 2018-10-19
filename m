@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48495)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48613)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gDY7r-0003E3-AJ
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:59:52 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1gDY7z-0003Lk-93
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 13:00:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gDY7q-0004jr-Ew
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:59:51 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:51982)
+	(envelope-from <pm215@archaic.org.uk>) id 1gDY7y-0004sF-53
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:59:59 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:51980)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1gDY7q-0002Jh-4l
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:59:50 -0400
+	id 1gDY7x-00020Y-Pw
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:59:58 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1gDY67-0006lQ-N4
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 17:58:03 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1gDY66-0006lC-RK
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 17:58:02 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 19 Oct 2018 17:57:16 +0100
-Message-Id: <20181019165735.22511-27-peter.maydell@linaro.org>
+Date: Fri, 19 Oct 2018 17:57:15 +0100
+Message-Id: <20181019165735.22511-26-peter.maydell@linaro.org>
 In-Reply-To: <20181019165735.22511-1-peter.maydell@linaro.org>
 References: <20181019165735.22511-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 26/45] target/arm: Mark some arrays const
+Subject: [Qemu-devel] [PULL 25/45] target/arm: Promote consecutive memory
+ ops for aa64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,37 +34,147 @@ To: qemu-devel@nongnu.org
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
+For a sequence of loads or stores from a single register,
+little-endian operations can be promoted to an 8-byte op.
+This can reduce the number of operations by a factor of 8.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-id: 20181011205206.3552-6-richard.henderson@linaro.org
-[PMM: drop change to now-deleted cpu_mode_names array]
+Message-id: 20181011205206.3552-5-richard.henderson@linaro.org
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/translate.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ target/arm/translate-a64.c | 66 +++++++++++++++++++++++---------------
+ 1 file changed, 40 insertions(+), 26 deletions(-)
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 7d7a48e5b93..869dadbe8db 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -72,7 +72,7 @@ static TCGv_i64 cpu_F0d, cpu_F1d;
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 39ac45c0080..f1bd9d7633a 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -1200,25 +1200,23 @@ static void write_vec_element_i32(DisasContext *s, TCGv_i32 tcg_src,
  
- #include "exec/gen-icount.h"
+ /* Store from vector register to memory */
+ static void do_vec_st(DisasContext *s, int srcidx, int element,
+-                      TCGv_i64 tcg_addr, int size)
++                      TCGv_i64 tcg_addr, int size, TCGMemOp endian)
+ {
+-    TCGMemOp memop = s->be_data + size;
+     TCGv_i64 tcg_tmp = tcg_temp_new_i64();
  
--static const char *regnames[] =
-+static const char * const regnames[] =
-     { "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7",
-       "r8", "r9", "r10", "r11", "r12", "r13", "r14", "pc" };
+     read_vec_element(s, tcg_tmp, srcidx, element, size);
+-    tcg_gen_qemu_st_i64(tcg_tmp, tcg_addr, get_mem_index(s), memop);
++    tcg_gen_qemu_st_i64(tcg_tmp, tcg_addr, get_mem_index(s), endian | size);
  
-@@ -4907,7 +4907,7 @@ static struct {
-     int nregs;
-     int interleave;
-     int spacing;
--} neon_ls_element_type[11] = {
-+} const neon_ls_element_type[11] = {
-     {4, 4, 1},
-     {4, 4, 2},
-     {4, 1, 1},
+     tcg_temp_free_i64(tcg_tmp);
+ }
+ 
+ /* Load from memory to vector register */
+ static void do_vec_ld(DisasContext *s, int destidx, int element,
+-                      TCGv_i64 tcg_addr, int size)
++                      TCGv_i64 tcg_addr, int size, TCGMemOp endian)
+ {
+-    TCGMemOp memop = s->be_data + size;
+     TCGv_i64 tcg_tmp = tcg_temp_new_i64();
+ 
+-    tcg_gen_qemu_ld_i64(tcg_tmp, tcg_addr, get_mem_index(s), memop);
++    tcg_gen_qemu_ld_i64(tcg_tmp, tcg_addr, get_mem_index(s), endian | size);
+     write_vec_element(s, tcg_tmp, destidx, element, size);
+ 
+     tcg_temp_free_i64(tcg_tmp);
+@@ -3013,9 +3011,10 @@ static void disas_ldst_multiple_struct(DisasContext *s, uint32_t insn)
+     bool is_postidx = extract32(insn, 23, 1);
+     bool is_q = extract32(insn, 30, 1);
+     TCGv_i64 tcg_addr, tcg_rn, tcg_ebytes;
++    TCGMemOp endian = s->be_data;
+ 
+-    int ebytes = 1 << size;
+-    int elements = (is_q ? 128 : 64) / (8 << size);
++    int ebytes;   /* bytes per element */
++    int elements; /* elements per vector */
+     int rpt;    /* num iterations */
+     int selem;  /* structure elements */
+     int r;
+@@ -3074,6 +3073,20 @@ static void disas_ldst_multiple_struct(DisasContext *s, uint32_t insn)
+         gen_check_sp_alignment(s);
+     }
+ 
++    /* For our purposes, bytes are always little-endian.  */
++    if (size == 0) {
++        endian = MO_LE;
++    }
++
++    /* Consecutive little-endian elements from a single register
++     * can be promoted to a larger little-endian operation.
++     */
++    if (selem == 1 && endian == MO_LE) {
++        size = 3;
++    }
++    ebytes = 1 << size;
++    elements = (is_q ? 16 : 8) / ebytes;
++
+     tcg_rn = cpu_reg_sp(s, rn);
+     tcg_addr = tcg_temp_new_i64();
+     tcg_gen_mov_i64(tcg_addr, tcg_rn);
+@@ -3082,32 +3095,33 @@ static void disas_ldst_multiple_struct(DisasContext *s, uint32_t insn)
+     for (r = 0; r < rpt; r++) {
+         int e;
+         for (e = 0; e < elements; e++) {
+-            int tt = (rt + r) % 32;
+             int xs;
+             for (xs = 0; xs < selem; xs++) {
++                int tt = (rt + r + xs) % 32;
+                 if (is_store) {
+-                    do_vec_st(s, tt, e, tcg_addr, size);
++                    do_vec_st(s, tt, e, tcg_addr, size, endian);
+                 } else {
+-                    do_vec_ld(s, tt, e, tcg_addr, size);
+-
+-                    /* For non-quad operations, setting a slice of the low
+-                     * 64 bits of the register clears the high 64 bits (in
+-                     * the ARM ARM pseudocode this is implicit in the fact
+-                     * that 'rval' is a 64 bit wide variable).
+-                     * For quad operations, we might still need to zero the
+-                     * high bits of SVE.  We optimize by noticing that we only
+-                     * need to do this the first time we touch a register.
+-                     */
+-                    if (e == 0 && (r == 0 || xs == selem - 1)) {
+-                        clear_vec_high(s, is_q, tt);
+-                    }
++                    do_vec_ld(s, tt, e, tcg_addr, size, endian);
+                 }
+                 tcg_gen_add_i64(tcg_addr, tcg_addr, tcg_ebytes);
+-                tt = (tt + 1) % 32;
+             }
+         }
+     }
+ 
++    if (!is_store) {
++        /* For non-quad operations, setting a slice of the low
++         * 64 bits of the register clears the high 64 bits (in
++         * the ARM ARM pseudocode this is implicit in the fact
++         * that 'rval' is a 64 bit wide variable).
++         * For quad operations, we might still need to zero the
++         * high bits of SVE.
++         */
++        for (r = 0; r < rpt * selem; r++) {
++            int tt = (rt + r) % 32;
++            clear_vec_high(s, is_q, tt);
++        }
++    }
++
+     if (is_postidx) {
+         int rm = extract32(insn, 16, 5);
+         if (rm == 31) {
+@@ -3228,9 +3242,9 @@ static void disas_ldst_single_struct(DisasContext *s, uint32_t insn)
+         } else {
+             /* Load/store one element per register */
+             if (is_load) {
+-                do_vec_ld(s, rt, index, tcg_addr, scale);
++                do_vec_ld(s, rt, index, tcg_addr, scale, s->be_data);
+             } else {
+-                do_vec_st(s, rt, index, tcg_addr, scale);
++                do_vec_st(s, rt, index, tcg_addr, scale, s->be_data);
+             }
+         }
+         tcg_gen_add_i64(tcg_addr, tcg_addr, tcg_ebytes);
 -- 
 2.19.1
