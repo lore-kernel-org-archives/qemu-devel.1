@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51960)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60063)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gDOyv-0006ye-0O
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 03:14:02 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1gDPGs-0002j8-Qk
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 03:32:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gDOyr-0005K5-Lo
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 03:14:00 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:34461)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1gDOyl-0005CV-Sb
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 03:13:53 -0400
-References: <20181008163521.17341-1-cst@tolva.net>
-	<20181008163521.17341-4-cst@tolva.net>
-	<ab7987e7-0cf9-7bde-12d3-52dba3b16713@vivier.eu>
-	<CALQmfgOEAsowdHNAUVzfL_GosQbhPMwQk9zP+d0B8kAC_Ex4Rw@mail.gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <b13449fd-aaa8-28c5-3fca-0eb11beaf7c6@vivier.eu>
-Date: Fri, 19 Oct 2018 09:13:46 +0200
+	(envelope-from <pbonzini@redhat.com>) id 1gDPGp-0004nJ-2g
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 03:32:34 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:37755)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gDPGo-0004lw-7T
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 03:32:30 -0400
+Received: by mail-wr1-f67.google.com with SMTP id q1-v6so3392649wrs.4
+	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 00:32:30 -0700 (PDT)
+Received: from [192.168.10.150] (dynamic-adsl-78-12-231-174.clienti.tiscali.it.
+	[78.12.231.174]) by smtp.gmail.com with ESMTPSA id
+	x139-v6sm5770193wme.3.2018.10.19.00.32.27 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Fri, 19 Oct 2018 00:32:27 -0700 (PDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+References: <1539894735-14232-1-git-send-email-pbonzini@redhat.com>
+Message-ID: <95f719e1-c93c-ff60-3298-02153af7c8b1@redhat.com>
+Date: Fri, 19 Oct 2018 09:32:27 +0200
 MIME-Version: 1.0
-In-Reply-To: <CALQmfgOEAsowdHNAUVzfL_GosQbhPMwQk9zP+d0B8kAC_Ex4Rw@mail.gmail.com>
+In-Reply-To: <1539894735-14232-1-git-send-email-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] linux-user: Implement special usbfs
- ioctls.
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 00/48] Miscellaneous patches for 2018-10-18
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,137 +34,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Cortland_Setlow_T=c3=b6lva?= <cst@tolva.net>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-Le 19/10/2018 à 04:16, Cortland Setlow Tölva a écrit :
-> On Thu, Oct 18, 2018 at 11:48 AM Laurent Vivier <laurent@vivier.eu> wrote:
->>
->> Le 08/10/2018 à 18:35, Cortland Tölva a écrit :
->>> Userspace submits a USB Request Buffer to the kernel, optionally
->>> discards it, and finally reaps the URB.  Thunk buffers from target
->>> to host and back.
->>>
->>> Tested by running an i386 scanner driver on ARMv7 and by running
->>> the PowerPC lsusb utility on x86_64.  The discardurb ioctl is
->>> not exercised in these tests.
->>>
->>> Signed-off-by: Cortland Tölva <cst@tolva.net>
->>> ---
->>> There are two alternatives for the strategy of holding lock_user on
->>> memory from submit until reap.  v3 of this series tries to determine
->>> the access permissions for user memory from endpoint direction, but
->>> the logic for this is complex.  The first alternative is to request
->>> write access.  If that fails, request read access.  If that fails, try
->>> to submit the ioctl with no buffer - perhaps the user code filled in
->>> fields the kernel will ignore.  The second alternative is to read user
->>> memory into an allocated buffer, pass it to the kernel, and write back
->>> to target memory only if the kernel indicates that writes occurred.
->>>
->>> Changes from v1:
->>>   improve pointer cast to int compatibility
->>>   remove unimplemented types for usb streams
->>>   struct definitions moved to this patch where possible
->>>
->>> Changes from v2:
->>>  organize urb thunk metadata in a struct
->>>  hold lock_user from submit until discard
->>>  fixes for 64-bit hosts
->>>
->>>  linux-user/ioctls.h        |   8 ++
->>>  linux-user/syscall.c       | 177 +++++++++++++++++++++++++++++++++++++++++++++
->>>  linux-user/syscall_defs.h  |   4 +
->>>  linux-user/syscall_types.h |  20 +++++
->>>  4 files changed, 209 insertions(+)
->>>
->>> diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
->>> index 92f6177f1d..ae8951625f 100644
->> ...
->>> index 2641260186..9b7ea96cfb 100644
->>> --- a/linux-user/syscall.c
->>> +++ b/linux-user/syscall.c
->>> @@ -96,6 +96,7 @@
->>>  #include <linux/fb.h>
->>>  #if defined(CONFIG_USBFS)
->>>  #include <linux/usbdevice_fs.h>
->>> +#include <linux/usb/ch9.h>
->>>  #endif
->>>  #include <linux/vt.h>
->>>  #include <linux/dm-ioctl.h>
->>> @@ -4199,6 +4200,182 @@ static abi_long do_ioctl_ifconf(const IOCTLEntry *ie, uint8_t *buf_temp,
->>>      return ret;
->>>  }
->>>
->>> +#if defined(CONFIG_USBFS)
->>> +#if HOST_LONG_BITS > 64
->>> +#error USBDEVFS thunks do not support >64 bit hosts yet.
->>> +#endif
->>> +struct live_urb {
->>> +    uint64_t target_urb_adr;
->>> +    uint64_t target_buf_adr;
->>> +    char *target_buf_ptr;
->>> +    struct usbdevfs_urb host_urb;
->>> +};
->>> +
->>> +static GHashTable *usbdevfs_urb_hashtable(void)
->>> +{
->>> +    static GHashTable *urb_hashtable;
->>> +
->>> +    if (!urb_hashtable) {
->>> +        urb_hashtable = g_hash_table_new(g_int64_hash, g_int64_equal);
+On 18/10/2018 22:31, Paolo Bonzini wrote:
+> The following changes since commit 77f7c747193662edfadeeb3118d63eed0eac51a6:
 > 
-> g_int64_hash means this GHashTable expects to be given a pointer to an int64_t,
-> and the int64_t is used as the key.
+>   Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2018-10-17' into staging (2018-10-18 13:40:19 +0100)
 > 
->>> +    }
->>> +    return urb_hashtable;
->>> +}
->>> +
->>> +static void urb_hashtable_insert(struct live_urb *urb)
->>> +{
->>> +    GHashTable *urb_hashtable = usbdevfs_urb_hashtable();
->>> +    g_hash_table_insert(urb_hashtable, urb, urb);
->>
->> Here the key of the hashtable seems to be the pointer to the host live_urb.
->>
+> are available in the git repository at:
 > 
-> The key is pointed to by urb. It is the first member of the struct,
-> target_urb_adr.
 > 
->>> +}
->>> +
->>> +static struct live_urb *urb_hashtable_lookup(uint64_t target_urb_adr)
->>> +{
->>> +    GHashTable *urb_hashtable = usbdevfs_urb_hashtable();
->>> +    return g_hash_table_lookup(urb_hashtable, &target_urb_adr);
->>
->> And here the key is the pointer to the target_urb_adr
->>
+>   git://github.com/bonzini/qemu.git tags/for-upstream
 > 
-> target_urb_adr is on the stack here, and it contains the key.  Both
-> g_hash_table_lookup
-> and g_hash_table_insert take a pointer to the key, which is an int64_t
-> in this code.
+> for you to fetch changes up to c30cee638bc1523548828129f61ceb1941e10894:
 > 
->> So I think urb_hashtable_insert()  should be:
->>
->>     g_hash_table_insert(urb_hashtable, urb->target_urb_adr, urb);
->>
->> and urb_hashtable_lookup() should be:
->>
->>     return g_hash_table_lookup(urb_hashtable, target_urb_adr);
->> ...
->> Did I miss something?
+>   replay: pass raw icount value to replay_save_clock (2018-10-18 22:28:34 +0200)
 > 
-> My code might have been clearer if urb_hashtable_insert and
-> urb_hashtable_lookup had the same argument type.  However,
-> I did not want to treat target_urb_adr as the first element in a
-> struct live_urb until checking that it was tracked in the hashtable.
+> ----------------------------------------------------------------
+> * RTC fixes (Artem)
+> * icount fixes (Artem)
+> * rr fixes (Pavel, myself)
+> * hotplug cleanup (Igor)
+> * SCSI fixes (myself)
+> * 4.20-rc1 KVM header update (myself)
+> * coalesced PIO support (Peng Hao)
+> * HVF fixes (Roman B.)
+> * Hyper-V refactoring (Roman K.)
+> * Support for Hyper-V IPI (Vitaly)
 > 
-> The thing we are looking up has to be a target-sized pointer, so I
-> cannot use the g_direct_hash with host-sized pointers as keys.
-> The next best option was to use int64_t as the key.
+> ----------------------------------------------------------------
 
-OK, it's clearer now. Thank you for the explanation.
+One patch has to be dropped.  Sending v2.
 
-Laurent
+Paolo
+
+> Artem Pisarenko (8):
+>       Revert some patches from recent [PATCH v6] "Fixing record/replay and adding reverse debugging"
+>       qemu-timer: introduce timer attributes
+>       qemu-timer: avoid checkpoints for virtual clock timers in external subsystems
+>       qemu-timer: optimize record/replay checkpointing for all clocks
+>       vl: improve/fix documentation related to RTC function
+>       vl: refactor -rtc option references
+>       Fixes RTC bug with base datetime shifts in clock=vm
+>       vl, qapi: offset calculation in RTC_CHANGE event reverted
+> 
+> Igor Mammedov (1):
+>       call HotplugHandler->plug() as the last step in device realization
+> 
+> Li Qiang (2):
+>       hw: edu: drop DO_UPCAST
+>       target/i386: kvm: just return after migrate_add_blocker failed
+> 
+> Paolo Bonzini (6):
+>       es1370: more fixes for ADC_FRAMEADR and ADC_FRAMECNT
+>       target-i386: kvm: do not initialize padding fields
+>       linux-headers: update to 4.20-rc1
+>       scsi-disk: fix double completion of failing passthrough requests
+>       scsi-disk: fix rerror/werror=ignore
+>       replay: pass raw icount value to replay_save_clock
+> 
+> Pavel Dovgalyuk (1):
+>       replay: don't process events at virtual clock checkpoint
+> 
+> Peng Hao (4):
+>       target-i386 : add coalesced_pio API
+>       target-i386: add rtc 0x70 port as coalesced_pio
+>       target-i386: add i440fx 0xcf8 port as coalesced_pio
+>       target-i386: add q35 0xcf8 port as coalesced_pio
+> 
+> Roman Bolshakov (2):
+>       i386: hvf: Fix register refs if REX is present
+>       i386: hvf: Remove hvf_disabled
+> 
+> Roman Kagan (23):
+>       hyperv_testdev: refactor for better maintainability
+>       hyperv_testdev: drop unnecessary includes
+>       hyperv: cosmetic: g_malloc -> g_new
+>       hyperv: synic: only setup ack notifier if there's a callback
+>       hyperv: allow passing arbitrary data to sint ack callback
+>       hyperv: address HvSintRoute by X86CPU pointer
+>       hyperv: make HvSintRoute reference-counted
+>       hyperv: rename kvm_hv_sint_route_set_sint
+>       hyperv: split hyperv-proto.h into x86 and arch-independent parts
+>       hyperv: make hyperv_vp_index inline
+>       hyperv: factor out arch-independent API into hw/hyperv
+>       default-configs: collect CONFIG_HYPERV* in hyperv.mak
+>       i386: add hyperv-stub for CONFIG_HYPERV=n
+>       hyperv:synic: split capability testing and setting
+>       hyperv: qom-ify SynIC
+>       hyperv: only add SynIC in compatible configurations
+>       hyperv: make overlay pages for SynIC
+>       hyperv: add synic message delivery
+>       hyperv: add synic event flag signaling
+>       hyperv: process SIGNAL_EVENT hypercall
+>       hyperv: add support for KVM_HYPERV_EVENTFD
+>       hyperv: process POST_MESSAGE hypercall
+>       hyperv_testdev: add SynIC message and event testmodes
+> 
+> Vitaly Kuznetsov (1):
+>       i386/kvm: add support for Hyper-V IPI send
+> 
+>  accel/kvm/kvm-all.c              |  56 +++-
+>  cpus.c                           |   4 +-
+>  default-configs/hyperv.mak       |   2 +
+>  default-configs/i386-softmmu.mak |   2 +-
+>  hw/Makefile.objs                 |   1 +
+>  hw/audio/es1370.c                |  10 +-
+>  hw/core/hotplug.c                |  10 -
+>  hw/core/qdev.c                   |  16 +-
+>  hw/hyperv/Makefile.objs          |   2 +
+>  hw/hyperv/hyperv.c               | 654 +++++++++++++++++++++++++++++++++++++++
+>  hw/hyperv/hyperv_testdev.c       | 327 ++++++++++++++++++++
+>  hw/misc/Makefile.objs            |   1 -
+>  hw/misc/edu.c                    |   4 +-
+>  hw/misc/hyperv_testdev.c         | 174 -----------
+>  hw/pci-host/piix.c               |   4 +
+>  hw/pci-host/q35.c                |   4 +
+>  hw/scsi/scsi-disk.c              |  29 +-
+>  hw/scsi/virtio-scsi.c            |  11 +-
+>  hw/timer/mc146818rtc.c           |   9 +
+>  include/block/aio.h              |  59 +++-
+>  include/exec/memory.h            |   4 +-
+>  include/hw/hotplug.h             |  11 -
+>  include/hw/hyperv/hyperv-proto.h | 130 ++++++++
+>  include/hw/hyperv/hyperv.h       |  83 +++++
+>  include/hw/i386/pc.h             |   8 +
+>  include/qemu/timer.h             | 126 ++++----
+>  include/sysemu/hvf.h             |   4 +-
+>  include/sysemu/replay.h          |  10 +-
+>  linux-headers/asm-powerpc/kvm.h  |   1 +
+>  linux-headers/asm-x86/kvm.h      |   8 +-
+>  linux-headers/linux/kvm.h        |  16 +-
+>  memory.c                         |   4 +-
+>  qapi/misc.json                   |   3 +-
+>  qemu-options.hx                  |  14 +-
+>  replay/replay-events.c           |   1 +
+>  replay/replay-internal.c         |  25 +-
+>  replay/replay-internal.h         |   2 +
+>  replay/replay-time.c             |   8 +-
+>  replay/replay.c                  |   9 +-
+>  slirp/ip6_icmp.c                 |   9 +-
+>  stubs/cpu-get-icount.c           |   5 +
+>  stubs/replay.c                   |   2 +-
+>  target/i386/Makefile.objs        |  17 +-
+>  target/i386/cpu.c                |   3 +
+>  target/i386/cpu.h                |   2 +
+>  target/i386/hvf/hvf.c            |   9 +-
+>  target/i386/hvf/x86_decode.c     |  67 ++--
+>  target/i386/hvf/x86_decode.h     |   6 +-
+>  target/i386/hyperv-proto.h       | 116 +------
+>  target/i386/hyperv-stub.c        |  48 +++
+>  target/i386/hyperv.c             | 130 +++-----
+>  target/i386/hyperv.h             |  28 +-
+>  target/i386/kvm.c                |  68 +++-
+>  target/i386/machine.c            |   9 +
+>  tests/ptimer-test-stubs.c        |  13 +-
+>  ui/input.c                       |   9 +-
+>  util/qemu-timer.c                |  96 ++++--
+>  vl.c                             | 112 ++++---
+>  58 files changed, 1888 insertions(+), 707 deletions(-)
+>  create mode 100644 default-configs/hyperv.mak
+>  create mode 100644 hw/hyperv/Makefile.objs
+>  create mode 100644 hw/hyperv/hyperv.c
+>  create mode 100644 hw/hyperv/hyperv_testdev.c
+>  delete mode 100644 hw/misc/hyperv_testdev.c
+>  create mode 100644 include/hw/hyperv/hyperv-proto.h
+>  create mode 100644 include/hw/hyperv/hyperv.h
+>  create mode 100644 target/i386/hyperv-stub.c
+> 
