@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47766)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gDY6c-00024y-8v
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:58:35 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1gDY6d-000265-FF
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:58:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gDY6b-0002tX-8Q
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:58:34 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:51984)
+	(envelope-from <pm215@archaic.org.uk>) id 1gDY6c-0002w0-KO
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:58:35 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:51980)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1gDY6a-0002bn-TL
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:58:33 -0400
+	id 1gDY6c-00020Y-9m
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:58:34 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1gDY6J-0006oJ-0D
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 17:58:15 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1gDY6Q-0006pt-ON
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 17:58:22 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 19 Oct 2018 17:57:28 +0100
-Message-Id: <20181019165735.22511-39-peter.maydell@linaro.org>
+Date: Fri, 19 Oct 2018 17:57:35 +0100
+Message-Id: <20181019165735.22511-46-peter.maydell@linaro.org>
 In-Reply-To: <20181019165735.22511-1-peter.maydell@linaro.org>
 References: <20181019165735.22511-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 38/45] target/arm: Use gvec for NEON VLD all
- lanes
+Subject: [Qemu-devel] [PULL 45/45] target/arm: Only flush tlb if ASID changes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,129 +34,41 @@ To: qemu-devel@nongnu.org
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
+Since QEMU does not implement ASIDs, changes to the ASID must flush the
+tlb.  However, if the ASID does not change there is no reason to flush.
+
+In testing a boot of the Ubuntu installer to the first menu, this reduces
+the number of flushes by 30%, or nearly 600k instances.
+
+Reviewed-by: Aaron Lindsay <aaron@os.amperecomputing.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20181011205206.3552-18-richard.henderson@linaro.org
-[PMM: added parens in ?: expression]
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-id: 20181019015617.22583-3-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/translate.c | 81 ++++++++++++++----------------------------
- 1 file changed, 26 insertions(+), 55 deletions(-)
+ target/arm/helper.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index e6b06910369..e5d723d03b7 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -2993,19 +2993,6 @@ static void gen_vfp_msr(TCGv_i32 tmp)
-     tcg_temp_free_i32(tmp);
- }
- 
--static void gen_neon_dup_u8(TCGv_i32 var, int shift)
--{
--    TCGv_i32 tmp = tcg_temp_new_i32();
--    if (shift)
--        tcg_gen_shri_i32(var, var, shift);
--    tcg_gen_ext8u_i32(var, var);
--    tcg_gen_shli_i32(tmp, var, 8);
--    tcg_gen_or_i32(var, var, tmp);
--    tcg_gen_shli_i32(tmp, var, 16);
--    tcg_gen_or_i32(var, var, tmp);
--    tcg_temp_free_i32(tmp);
--}
--
- static void gen_neon_dup_low16(TCGv_i32 var)
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 20114bf574d..bea4d5350d1 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -2758,12 +2758,10 @@ static void vmsa_tcr_el1_write(CPUARMState *env, const ARMCPRegInfo *ri,
+ static void vmsa_ttbr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                             uint64_t value)
  {
-     TCGv_i32 tmp = tcg_temp_new_i32();
-@@ -3024,28 +3011,6 @@ static void gen_neon_dup_high16(TCGv_i32 var)
-     tcg_temp_free_i32(tmp);
- }
- 
--static TCGv_i32 gen_load_and_replicate(DisasContext *s, TCGv_i32 addr, int size)
--{
--    /* Load a single Neon element and replicate into a 32 bit TCG reg */
--    TCGv_i32 tmp = tcg_temp_new_i32();
--    switch (size) {
--    case 0:
--        gen_aa32_ld8u(s, tmp, addr, get_mem_index(s));
--        gen_neon_dup_u8(tmp, 0);
--        break;
--    case 1:
--        gen_aa32_ld16u(s, tmp, addr, get_mem_index(s));
--        gen_neon_dup_low16(tmp);
--        break;
--    case 2:
--        gen_aa32_ld32u(s, tmp, addr, get_mem_index(s));
--        break;
--    default: /* Avoid compiler warnings.  */
--        abort();
--    }
--    return tmp;
--}
+-    /* 64 bit accesses to the TTBRs can change the ASID and so we
+-     * must flush the TLB.
+-     */
+-    if (cpreg_field_is_64bit(ri)) {
++    /* If the ASID changes (with a 64-bit write), we must flush the TLB.  */
++    if (cpreg_field_is_64bit(ri) &&
++        extract64(raw_read(env, ri) ^ value, 48, 16) != 0) {
+         ARMCPU *cpu = arm_env_get_cpu(env);
 -
- static int handle_vsel(uint32_t insn, uint32_t rd, uint32_t rn, uint32_t rm,
-                        uint32_t dp)
- {
-@@ -4949,6 +4914,7 @@ static int disas_neon_ls_insn(DisasContext *s, uint32_t insn)
-     int load;
-     int shift;
-     int n;
-+    int vec_size;
-     TCGv_i32 addr;
-     TCGv_i32 tmp;
-     TCGv_i32 tmp2;
-@@ -5118,28 +5084,33 @@ static int disas_neon_ls_insn(DisasContext *s, uint32_t insn)
-             }
-             addr = tcg_temp_new_i32();
-             load_reg_var(s, addr, rn);
--            if (nregs == 1) {
--                /* VLD1 to all lanes: bit 5 indicates how many Dregs to write */
--                tmp = gen_load_and_replicate(s, addr, size);
--                tcg_gen_st_i32(tmp, cpu_env, neon_reg_offset(rd, 0));
--                tcg_gen_st_i32(tmp, cpu_env, neon_reg_offset(rd, 1));
--                if (insn & (1 << 5)) {
--                    tcg_gen_st_i32(tmp, cpu_env, neon_reg_offset(rd + 1, 0));
--                    tcg_gen_st_i32(tmp, cpu_env, neon_reg_offset(rd + 1, 1));
--                }
--                tcg_temp_free_i32(tmp);
--            } else {
--                /* VLD2/3/4 to all lanes: bit 5 indicates register stride */
--                stride = (insn & (1 << 5)) ? 2 : 1;
--                for (reg = 0; reg < nregs; reg++) {
--                    tmp = gen_load_and_replicate(s, addr, size);
--                    tcg_gen_st_i32(tmp, cpu_env, neon_reg_offset(rd, 0));
--                    tcg_gen_st_i32(tmp, cpu_env, neon_reg_offset(rd, 1));
--                    tcg_temp_free_i32(tmp);
--                    tcg_gen_addi_i32(addr, addr, 1 << size);
--                    rd += stride;
-+
-+            /* VLD1 to all lanes: bit 5 indicates how many Dregs to write.
-+             * VLD2/3/4 to all lanes: bit 5 indicates register stride.
-+             */
-+            stride = (insn & (1 << 5)) ? 2 : 1;
-+            vec_size = nregs == 1 ? stride * 8 : 8;
-+
-+            tmp = tcg_temp_new_i32();
-+            for (reg = 0; reg < nregs; reg++) {
-+                gen_aa32_ld_i32(s, tmp, addr, get_mem_index(s),
-+                                s->be_data | size);
-+                if ((rd & 1) && vec_size == 16) {
-+                    /* We cannot write 16 bytes at once because the
-+                     * destination is unaligned.
-+                     */
-+                    tcg_gen_gvec_dup_i32(size, neon_reg_offset(rd, 0),
-+                                         8, 8, tmp);
-+                    tcg_gen_gvec_mov(0, neon_reg_offset(rd + 1, 0),
-+                                     neon_reg_offset(rd, 0), 8, 8);
-+                } else {
-+                    tcg_gen_gvec_dup_i32(size, neon_reg_offset(rd, 0),
-+                                         vec_size, vec_size, tmp);
-                 }
-+                tcg_gen_addi_i32(addr, addr, 1 << size);
-+                rd += stride;
-             }
-+            tcg_temp_free_i32(tmp);
-             tcg_temp_free_i32(addr);
-             stride = (1 << size) * nregs;
-         } else {
+         tlb_flush(CPU(cpu));
+     }
+     raw_write(env, ri, value);
 -- 
 2.19.1
