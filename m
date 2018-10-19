@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42449)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46011)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gDVBm-0006Rt-RH
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 09:51:43 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gDVIb-0004PR-AC
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 09:58:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gDVBl-0005bJ-O2
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 09:51:42 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:45196)
+	(envelope-from <peter.maydell@linaro.org>) id 1gDVIa-0000oG-0S
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 09:58:45 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:35007)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gDVBl-0005QS-HH
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 09:51:41 -0400
-Received: by mail-ot1-x342.google.com with SMTP id u22so33205605ota.12
-	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 06:51:39 -0700 (PDT)
+	id 1gDVIZ-0008Ms-Mw
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 09:58:43 -0400
+Received: by mail-oi1-x244.google.com with SMTP id 22-v6so26893672oiz.2
+	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 06:58:16 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20181011205206.3552-1-richard.henderson@linaro.org>
-References: <20181011205206.3552-1-richard.henderson@linaro.org>
+In-Reply-To: <1539954845-26716-5-git-send-email-thuth@redhat.com>
+References: <1539954845-26716-1-git-send-email-thuth@redhat.com>
+	<1539954845-26716-5-git-send-email-thuth@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 19 Oct 2018 14:51:18 +0100
-Message-ID: <CAFEAcA-vbm=ZN+4dd=Js2s_4gKffs12XgWsO1F_9405v=xhf0w@mail.gmail.com>
+Date: Fri, 19 Oct 2018 14:57:55 +0100
+Message-ID: <CAFEAcA-ahq3Y4sgs=Vijq_fsDPgX4JuG0gGdMwE5oOLOrsvxjQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 00/20] target/arm: Convert some neon insns
- to gvec
+Subject: Re: [Qemu-devel] [PATCH 4/5] configs: Add a CONFIG_UNIMP switch for
+ the "unimplemented-device"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,24 +30,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Richard Henderson <richard.henderson@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, qemu-ppc <qemu-ppc@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
-On 11 October 2018 at 21:51, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> The conversion to gvec is by no means complete, but it brings aa32
-> to parity with the work already done for aa64.  Plus some misc changes,
-> at least one of which has been sitting on a branch for 2 years.  ;-P
+On 19 October 2018 at 14:14, Thomas Huth <thuth@redhat.com> wrote:
+> The "unimplemented-device" is currently only used for one arm board.
+
+? It's used in all the MPS boards, several of the imx SoCs,
+the nrf51 SoC used by the microbit, and by the stellaris boards.
+
+> Let's add a CONFIG switch to make sure that we only compile it when
+> it is really necessary.
 >
-> I've run the result through Alex's aarch32-all.tar.xz RISU tests.
-> There are no regressions, though there are pre-existing failures.
-> Our aa32 translator could use some additional work, no surprise.
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  default-configs/arm-softmmu.mak | 1 +
+>  hw/misc/Makefile.objs           | 2 +-
+>  2 files changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+> index 6f2ffc1..dc9730f 100644
+> --- a/default-configs/arm-softmmu.mak
+> +++ b/default-configs/arm-softmmu.mak
+> @@ -7,6 +7,7 @@ CONFIG_NAND=y
+>  CONFIG_OR_IRQ=y
+>  CONFIG_SPLIT_IRQ=y
+>  CONFIG_REGISTER=y
+> +CONFIG_UNIMP=y
+>  CONFIG_ECC=y
+>  CONFIG_SERIAL=y
+>  CONFIG_SERIAL_ISA=y
 
-Applied to target-arm.next, thanks. I made a couple of minor tweaks
-which I've noted in replies to the relevant patches.
+This seems awkward to me. The 'unimplemented' device is supposed
+to be an entirely generic thing usable in any board model.
+If we only turn it on in the arm-softmmu.mak then it means
+faffing around with the default-configs/ whenever it gets
+used in a different architecture.
 
-If you could clarify whether patch 18 is fixing a bug I can tweak
-the commit message on that one.
+In particular, there's a pull request on the list that uses
+it in a sparc board, so this patch will break compile on sparc
+once that pullreq lands.
 
 thanks
 -- PMM
