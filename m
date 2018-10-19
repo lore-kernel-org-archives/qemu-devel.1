@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40693)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42048)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gDZ2c-0008Sm-4V
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 13:58:30 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gDZ5m-00026p-Pg
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 14:01:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gDZ2b-0004QQ-8Y
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 13:58:30 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:52020)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1gDZ2b-0004K9-15
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 13:58:29 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 19 Oct 2018 18:49:58 +0100
-Message-Id: <20181019174958.26616-3-peter.maydell@linaro.org>
-In-Reply-To: <20181019174958.26616-1-peter.maydell@linaro.org>
-References: <20181019174958.26616-1-peter.maydell@linaro.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1gDZ5k-00062G-Kb
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 14:01:46 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:47093)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gDZ5k-0005Yh-5l
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 14:01:44 -0400
+Received: by mail-oi1-x242.google.com with SMTP id k64-v6so27468519oia.13
+	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 11:01:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 2/2] linux-user: Clean up nios2 main loop
- signal handling
+In-Reply-To: <20181019060656.7968-1-richard.henderson@linaro.org>
+References: <20181019060656.7968-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 19 Oct 2018 19:01:14 +0100
+Message-ID: <CAFEAcA_gpNi5oo-L5HurEm9z3fXq8H28c03Z2jTrgRsGBrG9+g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v2 00/21] tcg patch queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,61 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Chris Wulff <crwulff@gmail.com>, Marek Vasut <marex@denx.de>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-The nios2 main loop code's code does some odd
-things with gdb_handlesig() that no other target
-CPU does: it has some signals that are delivered
-to gdb and only to gdb. Stop doing this, and instead
-behave like all the other targets:
- * a trap instruction becomes a SIGTRAP
- * an unhandled exception type returned from cpu_exec()
-   causes us to abort(), not to try to hand gdb a SIGILL
+On 19 October 2018 at 07:06, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Changes since v1:
+>   * Added QEMU_ERROR to wrap __attribute__((error)) -- patch 12.
+>
+>
+> r~
+>
+>
+> The following changes since commit 77f7c747193662edfadeeb3118d63eed0eac51a6:
+>
+>   Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2018-10-17' into staging (2018-10-18 13:40:19 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/rth7680/qemu.git tags/pull-tcg-20181018
+>
+> for you to fetch changes up to 403f290c0603f35f2d09c982bf5549b6d0803ec1:
+>
+>   cputlb: read CPUTLBEntry.addr_write atomically (2018-10-18 19:46:53 -0700)
+>
+> ----------------------------------------------------------------
+> Queued tcg patches.
+>
 
-This fixes in passing Coverity issue CID 1390853,
-which was a complaint that the old code failed to
-check the return value from gdb_handlesig().
+Applied, thanks.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-Disclaimer: compile tested, and the change makes conceptual
-sense, but I have no nios2 test environment.
----
- linux-user/nios2/cpu_loop.c | 14 +++++---------
- 1 file changed, 5 insertions(+), 9 deletions(-)
-
-diff --git a/linux-user/nios2/cpu_loop.c b/linux-user/nios2/cpu_loop.c
-index dac7a061813..973dd54d791 100644
---- a/linux-user/nios2/cpu_loop.c
-+++ b/linux-user/nios2/cpu_loop.c
-@@ -68,7 +68,10 @@ void cpu_loop(CPUNios2State *env)
-                 env->regs[R_EA] = env->regs[R_PC] + 4;
-                 env->regs[R_PC] = cpu->exception_addr;
- 
--                gdbsig = TARGET_SIGTRAP;
-+                info.si_signo = TARGET_SIGTRAP;
-+                info.si_errno = 0;
-+                info.si_code = TARGET_TRAP_BRKPT;
-+                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-                 break;
-             }
-         case 0xaa:
-@@ -106,14 +109,7 @@ kuser_fail:
-         default:
-             EXCP_DUMP(env, "\nqemu: unhandled CPU exception %#x - aborting\n",
-                      trapnr);
--            gdbsig = TARGET_SIGILL;
--            break;
--        }
--        if (gdbsig) {
--            gdb_handlesig(cs, gdbsig);
--            if (gdbsig != TARGET_SIGTRAP) {
--                exit(EXIT_FAILURE);
--            }
-+            abort();
-         }
- 
-         process_pending_signals(env);
--- 
-2.19.1
+-- PMM
