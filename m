@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1gDSjs-0005Ph-9S
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 07:14:45 -0400
+	(envelope-from <berrange@redhat.com>) id 1gDSjy-0005Vu-Vd
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 07:14:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1gDSjo-0007jp-TP
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 07:14:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53888)
+	(envelope-from <berrange@redhat.com>) id 1gDSjx-000887-T5
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 07:14:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49484)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1gDSjo-0007it-KQ
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 07:14:40 -0400
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-Date: Fri, 19 Oct 2018 13:14:31 +0200
-Message-Id: <20181019111432.5040-2-vkuznets@redhat.com>
-In-Reply-To: <20181019111432.5040-1-vkuznets@redhat.com>
-References: <20181019111432.5040-1-vkuznets@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/2] linux-headers: update
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gDSjx-00086C-Jr
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 07:14:49 -0400
+Date: Fri, 19 Oct 2018 12:14:39 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181019111439.GA19260@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180830105757.10577-1-berrange@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180830105757.10577-1-berrange@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] i386: clarify that the Q35 machine type
+ implements a P35 chipset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,132 +30,101 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>
+Cc: Cole Robinson <crobinso@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Laine Stump <laine@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-Update to kvm/next commit 1e58e5e59148 ("KVM: VMX: enable nested
- virtualization by default").
+Ping - it has 2 reviews, but never made it into the i386 maintainers
+tree / pull request. Can someone queue this patch for merge.
 
-kvm_put_vcpu_events() needs to be fixed as 'pad' was renamed to
-'pending' in 'struct kvm_vcpu_events'
+On Thu, Aug 30, 2018 at 11:57:57AM +0100, Daniel P. Berrang=C3=A9 wrote:
+> The 'q35' machine type implements an Intel Series 3 chipset,
+> of which there are several variants:
+>=20
+>   https://www.intel.com/Assets/PDF/datasheet/316966.pdf
+>=20
+> The key difference between the 82P35 MCH ('p35', PCI device ID 0x29c0)
+> and 82Q35 GMCH ('q35', PCI device ID 0x29b0) variants is that the latte=
+r
+> has an integrated graphics adapter. QEMU does not implement integrated
+> graphics, so uses the PCI ID for the 82P35 chipset, despite calling the
+> machine type 'q35'. Thus we rename the PCI device ID constant to reflec=
+t
+> reality, to avoid confusing future developers. The new name more closel=
+y
+> matches what pci.ids reports it to be:
+>=20
+> $ grep  P35 /usr/share/hwdata/pci.ids  | grep 29
+> 	29c0  82G33/G31/P35/P31 Express DRAM Controller
+> 	29c1  82G33/G31/P35/P31 Express PCI Express Root Port
+> 	29c4  82G33/G31/P35/P31 Express MEI Controller
+> 	29c5  82G33/G31/P35/P31 Express MEI Controller
+> 	29c6  82G33/G31/P35/P31 Express PT IDER Controller
+> 	29c7  82G33/G31/P35/P31 Express Serial KT Controller
+>=20
+> $ grep  Q35 /usr/share/hwdata/pci.ids  | grep 29
+> 	29b0  82Q35 Express DRAM Controller
+> 	29b1  82Q35 Express PCI Express Root Port
+> 	29b2  82Q35 Express Integrated Graphics Controller
+> 	29b3  82Q35 Express Integrated Graphics Controller
+> 	29b4  82Q35 Express MEI Controller
+> 	29b5  82Q35 Express MEI Controller
+> 	29b6  82Q35 Express PT IDER Controller
+> 	29b7  82Q35 Express Serial KT Controller
+>=20
+> Arguably the QEMU machine type should be named 'p35'. At this point in
+> time, however, it is not worth the churn for management applications &
+> documentation to worry about renaming it.
+>=20
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> ---
+>  hw/pci-host/q35.c        | 10 +++++++++-
+>  include/hw/pci/pci_ids.h |  2 +-
+>  2 files changed, 10 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
+> index 02f9576588..0a056d6aea 100644
+> --- a/hw/pci-host/q35.c
+> +++ b/hw/pci-host/q35.c
+> @@ -618,7 +618,15 @@ static void mch_class_init(ObjectClass *klass, voi=
+d *data)
+>      dc->desc =3D "Host bridge";
+>      dc->vmsd =3D &vmstate_mch;
+>      k->vendor_id =3D PCI_VENDOR_ID_INTEL;
+> -    k->device_id =3D PCI_DEVICE_ID_INTEL_Q35_MCH;
+> +    /*
+> +     * The 'q35' machine type implements an Intel Series 3 chipset,
+> +     * of which there are several variants. The key difference between
+> +     * the 82P35 MCH ('p35') and 82Q35 GMCH ('q35') variants is that
+> +     * the latter has an integrated graphics adapter. QEMU does not
+> +     * implement integrated graphics, so uses the PCI ID for the 82P35
+> +     * chipset.
+> +     */
+> +    k->device_id =3D PCI_DEVICE_ID_INTEL_P35_MCH;
+>      k->revision =3D MCH_HOST_BRIDGE_REVISION_DEFAULT;
+>      k->class_id =3D PCI_CLASS_BRIDGE_HOST;
+>      /*
+> diff --git a/include/hw/pci/pci_ids.h b/include/hw/pci/pci_ids.h
+> index 63acc722a9..eeb33018ad 100644
+> --- a/include/hw/pci/pci_ids.h
+> +++ b/include/hw/pci/pci_ids.h
+> @@ -255,7 +255,7 @@
+>  #define PCI_DEVICE_ID_INTEL_82801I_EHCI2 0x293c
+>  #define PCI_DEVICE_ID_INTEL_82599_SFP_VF 0x10ed
+> =20
+> -#define PCI_DEVICE_ID_INTEL_Q35_MCH      0x29c0
+> +#define PCI_DEVICE_ID_INTEL_P35_MCH      0x29c0
+> =20
+>  #define PCI_VENDOR_ID_XEN                0x5853
+>  #define PCI_DEVICE_ID_XEN_PLATFORM       0x0001
+> --=20
+> 2.17.1
+>=20
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- linux-headers/asm-powerpc/kvm.h |  1 +
- linux-headers/asm-x86/kvm.h     |  8 ++++++--
- linux-headers/linux/kvm.h       | 16 ++++++++++++++--
- target/i386/kvm.c               |  2 +-
- 4 files changed, 22 insertions(+), 5 deletions(-)
-
-diff --git a/linux-headers/asm-powerpc/kvm.h b/linux-headers/asm-powerpc/kvm.h
-index 1b32b56a03..8c876c166e 100644
---- a/linux-headers/asm-powerpc/kvm.h
-+++ b/linux-headers/asm-powerpc/kvm.h
-@@ -634,6 +634,7 @@ struct kvm_ppc_cpu_char {
- 
- #define KVM_REG_PPC_DEC_EXPIRY	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xbe)
- #define KVM_REG_PPC_ONLINE	(KVM_REG_PPC | KVM_REG_SIZE_U32 | 0xbf)
-+#define KVM_REG_PPC_PTCR	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc0)
- 
- /* Transactional Memory checkpointed state:
-  * This is all GPRs, all VSX regs and a subset of SPRs
-diff --git a/linux-headers/asm-x86/kvm.h b/linux-headers/asm-x86/kvm.h
-index fd23d5778e..dabfcf7c39 100644
---- a/linux-headers/asm-x86/kvm.h
-+++ b/linux-headers/asm-x86/kvm.h
-@@ -288,6 +288,7 @@ struct kvm_reinject_control {
- #define KVM_VCPUEVENT_VALID_SIPI_VECTOR	0x00000002
- #define KVM_VCPUEVENT_VALID_SHADOW	0x00000004
- #define KVM_VCPUEVENT_VALID_SMM		0x00000008
-+#define KVM_VCPUEVENT_VALID_PAYLOAD	0x00000010
- 
- /* Interrupt shadow states */
- #define KVM_X86_SHADOW_INT_MOV_SS	0x01
-@@ -299,7 +300,7 @@ struct kvm_vcpu_events {
- 		__u8 injected;
- 		__u8 nr;
- 		__u8 has_error_code;
--		__u8 pad;
-+		__u8 pending;
- 		__u32 error_code;
- 	} exception;
- 	struct {
-@@ -322,7 +323,9 @@ struct kvm_vcpu_events {
- 		__u8 smm_inside_nmi;
- 		__u8 latched_init;
- 	} smi;
--	__u32 reserved[9];
-+	__u8 reserved[27];
-+	__u8 exception_has_payload;
-+	__u64 exception_payload;
- };
- 
- /* for KVM_GET/SET_DEBUGREGS */
-@@ -381,6 +384,7 @@ struct kvm_sync_regs {
- 
- #define KVM_STATE_NESTED_GUEST_MODE	0x00000001
- #define KVM_STATE_NESTED_RUN_PENDING	0x00000002
-+#define KVM_STATE_NESTED_EVMCS		0x00000004
- 
- #define KVM_STATE_NESTED_SMM_GUEST_MODE	0x00000001
- #define KVM_STATE_NESTED_SMM_VMXON	0x00000002
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index 83ba4eb571..f11a7eb49c 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -420,13 +420,19 @@ struct kvm_run {
- struct kvm_coalesced_mmio_zone {
- 	__u64 addr;
- 	__u32 size;
--	__u32 pad;
-+	union {
-+		__u32 pad;
-+		__u32 pio;
-+	};
- };
- 
- struct kvm_coalesced_mmio {
- 	__u64 phys_addr;
- 	__u32 len;
--	__u32 pad;
-+	union {
-+		__u32 pad;
-+		__u32 pio;
-+	};
- 	__u8  data[8];
- };
- 
-@@ -719,6 +725,7 @@ struct kvm_ppc_one_seg_page_size {
- 
- #define KVM_PPC_PAGE_SIZES_REAL		0x00000001
- #define KVM_PPC_1T_SEGMENTS		0x00000002
-+#define KVM_PPC_NO_HASH			0x00000004
- 
- struct kvm_ppc_smmu_info {
- 	__u64 flags;
-@@ -953,6 +960,11 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_NESTED_STATE 157
- #define KVM_CAP_ARM_INJECT_SERROR_ESR 158
- #define KVM_CAP_MSR_PLATFORM_INFO 159
-+#define KVM_CAP_PPC_NESTED_HV 160
-+#define KVM_CAP_HYPERV_SEND_IPI 161
-+#define KVM_CAP_COALESCED_PIO 162
-+#define KVM_CAP_HYPERV_ENLIGHTENED_VMCS 163
-+#define KVM_CAP_EXCEPTION_PAYLOAD 164
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index dc4047b02f..a46ad102d8 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -2686,7 +2686,7 @@ static int kvm_put_vcpu_events(X86CPU *cpu, int level)
-     events.exception.nr = env->exception_injected;
-     events.exception.has_error_code = env->has_error_code;
-     events.exception.error_code = env->error_code;
--    events.exception.pad = 0;
-+    events.exception.pending = 0;
- 
-     events.interrupt.injected = (env->interrupt_injected >= 0);
-     events.interrupt.nr = env->interrupt_injected;
--- 
-2.17.2
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
