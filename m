@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gDTxE-0002Go-Gk
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:32:38 -0400
+	(envelope-from <thuth@redhat.com>) id 1gDU1t-0006HI-BS
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:37:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gDTxA-0008RK-9U
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:32:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42104)
+	(envelope-from <thuth@redhat.com>) id 1gDU1j-0001vq-KV
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:37:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:63164)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gDTxA-0008OD-0I
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:32:32 -0400
-Date: Fri, 19 Oct 2018 13:32:23 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181019123223.GP13722@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181009130442.26296-1-berrange@redhat.com>
-	<20181009130442.26296-8-berrange@redhat.com>
-	<CAP+75-Wkd8m+s-C_eA2uGQLreVh9MXqfuOeK4f8q48DjbBg92g@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAP+75-Wkd8m+s-C_eA2uGQLreVh9MXqfuOeK4f8q48DjbBg92g@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 07/11] authz: add QAuthZSimple object
- type for easy whitelist auth checks
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gDU1j-0001qn-Co
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:37:15 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Fri, 19 Oct 2018 14:37:06 +0200
+Message-Id: <1539952626-1644-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] hw/core: Move null-machine into the common-obj
+ list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,74 +22,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Andreas =?utf-8?Q?F=C3=A4rber?= <afaerber@suse.de>
+To: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-On Fri, Oct 19, 2018 at 11:56:00AM +0200, Philippe Mathieu-Daud=C3=A9 wro=
-te:
-> On 09/10/2018 15:04, Daniel P. Berrang=C3=A9 wrote:
-> > In many cases a single VM will just need to whilelist a single identi=
-ty
-> > as the allowed user of network services. This is especially the case =
-for
-> > TLS live migration (optionally with NBD storage) where we just need t=
-o
-> > whitelist the x509 certificate distinguished name of the source QEMU
-> > host.
-> >
-> > Via QMP this can be configured with:
-> >
-> >   {
-> >     "execute": "object-add",
-> >     "arguments": {
-> >       "qom-type": "authz-simple",
-> >       "id": "authz0",
-> >       "parameters": {
-> >         "identity": "fred"
-> >       }
-> >     }
-> >   }
-> >
-> > Or via the command line
-> >
-> >   -object authz-simple,id=3Dauthz0,identity=3Dfred
-> >
-> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> > ---
-> >  authz/Makefile.objs    |   1 +
-> >  authz/simple.c         | 122 +++++++++++++++++++++++++++++++++++++++=
-++
-> >  authz/trace-events     |   3 +
-> >  include/authz/simple.h |  84 ++++++++++++++++++++++++++++
-> >  qemu-options.hx        |  21 +++++++
-> >  5 files changed, 231 insertions(+)
-> >  create mode 100644 authz/simple.c
-> >  create mode 100644 include/authz/simple.h
+The null-machine code used to be target specific since it used the
+target-specific cpu_init() function in the past. But in the recent
+commit 2278b93941d42c30e2950 ("Use cpu_create(type) instead of
+cpu_init(cpu_model)") this has been change, so that the code now
+uses the common cpu_create() function instead. Thus we can put
+the null-machine into the common-obj list so that it is compiled
+only once for all targets, to save some compilation time.
 
-> > +static void
-> > +qauthz_simple_prop_set_identity(Object *obj,
-> > +                                const char *value,
-> > +                                Error **errp G_GNUC_UNUSED)
-> > +{
-> > +    QAuthZSimple *authz =3D QAUTHZ_SIMPLE(obj);
-> > +
->=20
-> Hmm don't this miss:
->=20
->          g_free(authz->identity);
->=20
-> > +    authz->identity =3D g_strdup(value);
-> > +}
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/core/Makefile.objs  | 3 +--
+ hw/core/null-machine.c | 2 +-
+ 2 files changed, 2 insertions(+), 3 deletions(-)
 
-Yes, will squash that in
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
+index b736ce2..a799c83 100644
+--- a/hw/core/Makefile.objs
++++ b/hw/core/Makefile.objs
+@@ -21,5 +21,4 @@ common-obj-$(CONFIG_SOFTMMU) += or-irq.o
+ common-obj-$(CONFIG_SOFTMMU) += split-irq.o
+ common-obj-$(CONFIG_PLATFORM_BUS) += platform-bus.o
+ common-obj-$(CONFIG_SOFTMMU) += generic-loader.o
+-
+-obj-$(CONFIG_SOFTMMU) += null-machine.o
++common-obj-$(CONFIG_SOFTMMU) += null-machine.o
+diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
+index cde4d3e..76d3f8e 100644
+--- a/hw/core/null-machine.c
++++ b/hw/core/null-machine.c
+@@ -18,7 +18,7 @@
+ #include "hw/boards.h"
+ #include "sysemu/sysemu.h"
+ #include "exec/address-spaces.h"
+-#include "cpu.h"
++#include "qom/cpu.h"
+ 
+ static void machine_none_init(MachineState *mch)
+ {
+-- 
+1.8.3.1
