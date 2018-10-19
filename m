@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54848)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Liam.Merwick@oracle.com>) id 1gDbY4-0007zo-Mp
+	(envelope-from <Liam.Merwick@oracle.com>) id 1gDbY4-0007zJ-5q
 	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 16:39:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Liam.Merwick@oracle.com>) id 1gDbY3-0002im-Rj
+	(envelope-from <Liam.Merwick@oracle.com>) id 1gDbY1-0002db-15
 	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 16:39:08 -0400
 From: Liam Merwick <Liam.Merwick@oracle.com>
-Date: Fri, 19 Oct 2018 21:39:03 +0100
-Message-Id: <1539981546-10596-6-git-send-email-Liam.Merwick@oracle.com>
+Date: Fri, 19 Oct 2018 21:39:05 +0100
+Message-Id: <1539981546-10596-8-git-send-email-Liam.Merwick@oracle.com>
 In-Reply-To: <1539981546-10596-1-git-send-email-Liam.Merwick@oracle.com>
 References: <1539981546-10596-1-git-send-email-Liam.Merwick@oracle.com>
-Subject: [Qemu-devel] [PATCH v4 5/8] block: Fix potential Null pointer
- dereferences in vvfat.c
+Subject: [Qemu-devel] [PATCH v4 7/8] qcow2: Read outside array bounds in
+ qcow2_pre_write_overlap_check()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,118 +23,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, jsnow@redhat.com, berrange@redhat.com, mreitz@redhat.com
 
-The calls to find_mapping_for_cluster() may return NULL but it
-isn't always checked for before dereferencing the value returned.
-Additionally, add some asserts to cover cases where NULL can't
-be returned but which might not be obvious at first glance.
+The commit for 0e4e4318eaa5 increments QCOW2_OL_MAX_BITNR but does not
+add an array entry for QCOW2_OL_BITMAP_DIRECTORY_BITNR to metadata_ol_names[].
+As a result, an array dereference of metadata_ol_names[8] in
+qcow2_pre_write_overlap_check() could result in a read outside of the array bounds.
 
+Fixes: 0e4e4318eaa5 ('qcow2: add overlap check for bitmap directory')
+
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/vvfat.c | 33 ++++++++++++++++++++++++++++-----
- 1 file changed, 28 insertions(+), 5 deletions(-)
+ block/qcow2-refcount.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
-diff --git a/block/vvfat.c b/block/vvfat.c
-index fc41841a5c3c..19f6725054a0 100644
---- a/block/vvfat.c
-+++ b/block/vvfat.c
-@@ -100,6 +100,7 @@ static inline void array_free(array_t* array)
- /* does not automatically grow */
- static inline void* array_get(array_t* array,unsigned int index) {
-     assert(index < array->next);
-+    assert(array->pointer);
-     return array->pointer + index * array->item_size;
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index 3c539f02e5ec..46082aeac1d6 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -2719,15 +2719,17 @@ int qcow2_check_metadata_overlap(BlockDriverState *bs, int ign, int64_t offset,
  }
  
-@@ -108,8 +109,7 @@ static inline int array_ensure_allocated(array_t* array, int index)
-     if((index + 1) * array->item_size > array->size) {
-         int new_size = (index + 32) * array->item_size;
-         array->pointer = g_realloc(array->pointer, new_size);
--        if (!array->pointer)
--            return -1;
-+        assert(array->pointer);
-         memset(array->pointer + array->size, 0, new_size - array->size);
-         array->size = new_size;
-         array->next = index + 1;
-@@ -2261,6 +2261,9 @@ static mapping_t* insert_mapping(BDRVVVFATState* s,
-     }
-     if (index >= s->mapping.next || mapping->begin > begin) {
-         mapping = array_insert(&(s->mapping), index, 1);
-+        if (mapping == NULL) {
-+            return NULL;
-+        }
-         mapping->path = NULL;
-         adjust_mapping_indices(s, index, +1);
-     }
-@@ -2428,6 +2431,9 @@ static int commit_direntries(BDRVVVFATState* s,
-     direntry_t* direntry = array_get(&(s->directory), dir_index);
-     uint32_t first_cluster = dir_index == 0 ? 0 : begin_of_direntry(direntry);
-     mapping_t* mapping = find_mapping_for_cluster(s, first_cluster);
-+    if (mapping == NULL) {
-+        return -1;
-+    }
+ static const char *metadata_ol_names[] = {
+-    [QCOW2_OL_MAIN_HEADER_BITNR]    = "qcow2_header",
+-    [QCOW2_OL_ACTIVE_L1_BITNR]      = "active L1 table",
+-    [QCOW2_OL_ACTIVE_L2_BITNR]      = "active L2 table",
+-    [QCOW2_OL_REFCOUNT_TABLE_BITNR] = "refcount table",
+-    [QCOW2_OL_REFCOUNT_BLOCK_BITNR] = "refcount block",
+-    [QCOW2_OL_SNAPSHOT_TABLE_BITNR] = "snapshot table",
+-    [QCOW2_OL_INACTIVE_L1_BITNR]    = "inactive L1 table",
+-    [QCOW2_OL_INACTIVE_L2_BITNR]    = "inactive L2 table",
++    [QCOW2_OL_MAIN_HEADER_BITNR]        = "qcow2_header",
++    [QCOW2_OL_ACTIVE_L1_BITNR]          = "active L1 table",
++    [QCOW2_OL_ACTIVE_L2_BITNR]          = "active L2 table",
++    [QCOW2_OL_REFCOUNT_TABLE_BITNR]     = "refcount table",
++    [QCOW2_OL_REFCOUNT_BLOCK_BITNR]     = "refcount block",
++    [QCOW2_OL_SNAPSHOT_TABLE_BITNR]     = "snapshot table",
++    [QCOW2_OL_INACTIVE_L1_BITNR]        = "inactive L1 table",
++    [QCOW2_OL_INACTIVE_L2_BITNR]        = "inactive L2 table",
++    [QCOW2_OL_BITMAP_DIRECTORY_BITNR]   = "bitmap directory",
+ };
++QEMU_BUILD_BUG_ON(QCOW2_OL_MAX_BITNR != ARRAY_SIZE(metadata_ol_names));
  
-     int factor = 0x10 * s->sectors_per_cluster;
-     int old_cluster_count, new_cluster_count;
-@@ -2494,6 +2500,9 @@ DLOG(fprintf(stderr, "commit_direntries for %s, parent_mapping_index %d\n", mapp
-         direntry = array_get(&(s->directory), first_dir_index + i);
-         if (is_directory(direntry) && !is_dot(direntry)) {
-             mapping = find_mapping_for_cluster(s, first_cluster);
-+            if (mapping == NULL) {
-+                return -1;
-+            }
-             assert(mapping->mode & MODE_DIRECTORY);
-             ret = commit_direntries(s, first_dir_index + i,
-                 array_index(&(s->mapping), mapping));
-@@ -2522,6 +2531,10 @@ static int commit_one_file(BDRVVVFATState* s,
-     assert(offset < size);
-     assert((offset % s->cluster_size) == 0);
- 
-+    if (mapping == NULL) {
-+        return -1;
-+    }
-+
-     for (i = s->cluster_size; i < offset; i += s->cluster_size)
-         c = modified_fat_get(s, c);
- 
-@@ -2668,8 +2681,12 @@ static int handle_renames_and_mkdirs(BDRVVVFATState* s)
-         if (commit->action == ACTION_RENAME) {
-             mapping_t* mapping = find_mapping_for_cluster(s,
-                     commit->param.rename.cluster);
--            char* old_path = mapping->path;
-+            char *old_path;
- 
-+            if (mapping == NULL) {
-+                return -1;
-+            }
-+            old_path = mapping->path;
-             assert(commit->path);
-             mapping->path = commit->path;
-             if (rename(old_path, mapping->path))
-@@ -2690,10 +2707,15 @@ static int handle_renames_and_mkdirs(BDRVVVFATState* s)
-                         direntry_t* d = direntry + i;
- 
-                         if (is_file(d) || (is_directory(d) && !is_dot(d))) {
-+                            int l;
-+                            char *new_path;
-                             mapping_t* m = find_mapping_for_cluster(s,
-                                     begin_of_direntry(d));
--                            int l = strlen(m->path);
--                            char* new_path = g_malloc(l + diff + 1);
-+                            if (m == NULL) {
-+                                return -1;
-+                            }
-+                            l = strlen(m->path);
-+                            new_path = g_malloc(l + diff + 1);
- 
-                             assert(!strncmp(m->path, mapping->path, l2));
- 
-@@ -3193,6 +3215,7 @@ static int enable_write_target(BlockDriverState *bs, Error **errp)
- 
-     backing = bdrv_new_open_driver(&vvfat_write_target, NULL, BDRV_O_ALLOW_RDWR,
-                                    &error_abort);
-+    assert(backing);
-     *(void**) backing->opaque = s;
- 
-     bdrv_set_backing_hd(s->bs, backing, &error_abort);
+ /*
+  * First performs a check for metadata overlaps (through
 -- 
 1.8.3.1
