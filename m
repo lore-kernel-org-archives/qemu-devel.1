@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45641)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47262)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gDb3s-00032g-UP
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 16:07:57 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gDb7M-0004Uq-Cy
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 16:11:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gDb3s-0008Nq-21
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 16:07:56 -0400
-Date: Fri, 19 Oct 2018 17:07:46 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1gDb7L-0003h2-Hm
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 16:11:32 -0400
+Date: Fri, 19 Oct 2018 17:11:21 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181019200746.GK31060@habkost.net>
+Message-ID: <20181019201121.GL31060@habkost.net>
 References: <20181019191523.12157-1-mreitz@redhat.com>
-	<20181019191523.12157-7-mreitz@redhat.com>
+	<20181019191523.12157-9-mreitz@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181019191523.12157-7-mreitz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 6/9] iotests: Explicitly inherit FDs in
- Python
+In-Reply-To: <20181019191523.12157-9-mreitz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 8/9] iotests: Modify imports for Python 3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,125 +26,88 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Max Reitz <mreitz@redhat.com>
 Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
-On Fri, Oct 19, 2018 at 09:15:20PM +0200, Max Reitz wrote:
-> Python 3.4 introduced the inheritable attribute for FDs.  At the same
-> time, it changed the default so that all FDs are not inheritable by
-> default, that only inheritable FDs are inherited to subprocesses, and
-> only if close_fds is explicitly set to False.
-> 
-> Adhere to this by setting close_fds to False when working with
-> subprocesses that may want to inherit FDs, and by trying to
-> set_inheritable() on FDs that we do want to bequeath to them.
+On Fri, Oct 19, 2018 at 09:15:22PM +0200, Max Reitz wrote:
+> There are two imports that need to be modified when running the iotests
+> under Python 3: One is StringIO, which no longer exists; instead, the
+> StringIO class comes from the io module, so import it from there (and
+> use the BytesIO class for Python 2).  The other is the ConfigParser,
+> which has just been renamed to configparser.
 > 
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  scripts/qemu.py        | 34 +++++++++++++++++++++++++++++-----
->  tests/qemu-iotests/045 |  2 +-
->  tests/qemu-iotests/147 |  2 +-
->  3 files changed, 31 insertions(+), 7 deletions(-)
+>  tests/qemu-iotests/iotests.py            | 13 +++++++++----
+>  tests/qemu-iotests/nbd-fault-injector.py |  7 +++++--
+>  2 files changed, 14 insertions(+), 6 deletions(-)
 > 
-> diff --git a/scripts/qemu.py b/scripts/qemu.py
-> index f099ce7278..fb29b73c30 100644
-> --- a/scripts/qemu.py
-> +++ b/scripts/qemu.py
-> @@ -142,11 +142,19 @@ class QEMUMachine(object):
->          if opts:
->              options.append(opts)
+> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+> index 7ca94e9278..ed91095505 100644
+> --- a/tests/qemu-iotests/iotests.py
+> +++ b/tests/qemu-iotests/iotests.py
+> @@ -29,6 +29,7 @@ import json
+>  import signal
+>  import logging
+>  import atexit
+> +import io
 >  
-> +        # This did not exist before 3.4, but since then it is
-> +        # mandatory for our purpose
-> +        if hasattr(os, 'set_inheritable'):
-> +            os.set_inheritable(fd, True)
-> +
->          self._args.append('-add-fd')
->          self._args.append(','.join(options))
->          return self
+>  sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'scripts'))
+>  import qtest
+> @@ -681,15 +682,19 @@ def main(supported_fmts=[], supported_oses=['linux'], supported_cache_modes=[],
+>      verify_platform(supported_oses)
+>      verify_cache_mode(supported_cache_modes)
 >  
-> -    def send_fd_scm(self, fd_file_path):
-> +    # Exactly one of fd and file_path must be given.
-> +    # (If it is file_path, the helper will open that file and pass its
-> +    # own fd)
-> +    def send_fd_scm(self, fd=None, file_path=None):
->          # In iotest.py, the qmp should always use unix socket.
->          assert self._qmp.is_scm_available()
->          if self._socket_scm_helper is None:
-> @@ -154,12 +162,27 @@ class QEMUMachine(object):
->          if not os.path.exists(self._socket_scm_helper):
->              raise QEMUMachineError("%s does not exist" %
->                                     self._socket_scm_helper)
-> +
-> +        # This did not exist before 3.4, but since then it is
-> +        # mandatory for our purpose
-> +        if hasattr(os, 'set_inheritable'):
-> +            os.set_inheritable(self._qmp.get_sock_fd(), True)
-> +            if fd is not None:
+> -    # We need to filter out the time taken from the output so that qemu-iotest
+> -    # can reliably diff the results against master output.
+> -    import StringIO
+>      if debug:
+>          output = sys.stdout
+>          verbosity = 2
+>          sys.argv.remove('-d')
+>      else:
+> -        output = StringIO.StringIO()
+> +        # We need to filter out the time taken from the output so that
+> +        # qemu-iotest can reliably diff the results against master output.
+> +        if sys.version_info.major >= 3:
+> +            output = io.StringIO()
+> +        else:
+> +            # StringIO() is for unicode strings, which is not what
 
-I was going to suggest keeping the existing function parameter,
-and using:
-  isinstance(fd_file_path, int)
-But your solution makes callers more explicit.  This seems to be
-a good thing.
+Nit: I would change the comment to say "io.StringIO" instead of
+"StringIO", to avoid confusion with StringIO.StringIO.
+
+Not a big deal, so:
 
 Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 
-
-> +                os.set_inheritable(fd, True)
-> +
->          fd_param = ["%s" % self._socket_scm_helper,
-> -                    "%d" % self._qmp.get_sock_fd(),
-> -                    "%s" % fd_file_path]
-> +                    "%d" % self._qmp.get_sock_fd()]
-> +
-> +        if file_path is not None:
-> +            assert fd is None
-> +            fd_param.append(file_path)
-> +        else:
-> +            assert fd is not None
-> +            fd_param.append(str(fd))
-> +
->          devnull = open(os.path.devnull, 'rb')
->          proc = subprocess.Popen(fd_param, stdin=devnull, stdout=subprocess.PIPE,
-> -                                stderr=subprocess.STDOUT)
-> +                                stderr=subprocess.STDOUT, close_fds=False)
->          output = proc.communicate()[0]
->          if output:
->              LOG.debug(output)
-> @@ -280,7 +303,8 @@ class QEMUMachine(object):
->                                         stdin=devnull,
->                                         stdout=self._qemu_log_file,
->                                         stderr=subprocess.STDOUT,
-> -                                       shell=False)
-> +                                       shell=False,
-> +                                       close_fds=False)
->          self._post_launch()
+> +            # 2.x's test runner emits.
+> +            output = io.BytesIO()
 >  
->      def wait(self):
-> diff --git a/tests/qemu-iotests/045 b/tests/qemu-iotests/045
-> index 6be8fc4912..55a5d31ca8 100755
-> --- a/tests/qemu-iotests/045
-> +++ b/tests/qemu-iotests/045
-> @@ -140,7 +140,7 @@ class TestSCMFd(iotests.QMPTestCase):
->          os.remove(image0)
+>      logging.basicConfig(level=(logging.DEBUG if debug else logging.WARN))
 >  
->      def _send_fd_by_SCM(self):
-> -        ret = self.vm.send_fd_scm(image0)
-> +        ret = self.vm.send_fd_scm(file_path=image0)
->          self.assertEqual(ret, 0, 'Failed to send fd with UNIX SCM')
+> diff --git a/tests/qemu-iotests/nbd-fault-injector.py b/tests/qemu-iotests/nbd-fault-injector.py
+> index d45e2e0a6a..6b2d659dee 100755
+> --- a/tests/qemu-iotests/nbd-fault-injector.py
+> +++ b/tests/qemu-iotests/nbd-fault-injector.py
+> @@ -48,7 +48,10 @@ import sys
+>  import socket
+>  import struct
+>  import collections
+> -import ConfigParser
+> +if sys.version_info.major >= 3:
+> +    import configparser
+> +else:
+> +    import ConfigParser as configparser
 >  
->      def test_add_fd(self):
-> diff --git a/tests/qemu-iotests/147 b/tests/qemu-iotests/147
-> index d2081df84b..05b374b7d3 100755
-> --- a/tests/qemu-iotests/147
-> +++ b/tests/qemu-iotests/147
-> @@ -229,7 +229,7 @@ class BuiltinNBD(NBDBlockdevAddBase):
->          sockfd = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
->          sockfd.connect(unix_socket)
+>  FAKE_DISK_SIZE = 8 * 1024 * 1024 * 1024 # 8 GB
 >  
-> -        result = self.vm.send_fd_scm(str(sockfd.fileno()))
-> +        result = self.vm.send_fd_scm(fd=sockfd.fileno())
->          self.assertEqual(result, 0, 'Failed to send socket FD')
+> @@ -225,7 +228,7 @@ def parse_config(config):
+>      return rules
 >  
->          result = self.vm.qmp('getfd', fdname='nbd-fifo')
+>  def load_rules(filename):
+> -    config = ConfigParser.RawConfigParser()
+> +    config = configparser.RawConfigParser()
+>      with open(filename, 'rt') as f:
+>          config.readfp(f, filename)
+>      return parse_config(config)
 > -- 
 > 2.17.1
 > 
