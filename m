@@ -1,17 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57669)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gDUbf-00081i-KP
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 09:14:24 -0400
+	(envelope-from <eblake@redhat.com>) id 1gDUbo-0008AL-2M
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 09:14:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gDUbe-0005zn-VZ
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 09:14:23 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Fri, 19 Oct 2018 15:14:04 +0200
-Message-Id: <1539954845-26716-5-git-send-email-thuth@redhat.com>
-In-Reply-To: <1539954845-26716-1-git-send-email-thuth@redhat.com>
-References: <1539954845-26716-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH 4/5] configs: Add a CONFIG_UNIMP switch for the
- "unimplemented-device"
+	(envelope-from <eblake@redhat.com>) id 1gDUbl-00066r-GU
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 09:14:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55214)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gDUbl-00066I-Ag
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 09:14:29 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AEE0DC04AC54
+	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 13:14:28 +0000 (UTC)
+References: <20181019122613.28663-1-pbonzini@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c48219f3-4af6-22de-15b3-a1263aa46096@redhat.com>
+Date: Fri, 19 Oct 2018 08:14:18 -0500
+MIME-Version: 1.0
+In-Reply-To: <20181019122613.28663-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: remove or downgrade myself to
+ reviewer from some subsystems
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,43 +34,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Richard Henderson <richard.henderson@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, qemu-ppc@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: "Daniel P . Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
-The "unimplemented-device" is currently only used for one arm board.
-Let's add a CONFIG switch to make sure that we only compile it when
-it is really necessary.
+On 10/19/18 7:26 AM, Paolo Bonzini wrote:
+> Other people are doing a much better work than myself at handling some
+> subsystems.  For those files it is better if I downgrade myself to
+> reviewer or recognize that I am not actually doing any work there.
+>=20
+> Cc: Daniel P. Berrange <berrange@redhat.com>
+> Cc: Gerd Hoffmann <kraxel@redhat.com>
+> Cc: Eric Blake <eblake@redhat.com>
+> Cc: Thomas Huth <thuth@redhat.com>
+> Cc: Laurent Vivier <lvivier@redhat.com>
+> Cc: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>   MAINTAINERS | 13 ++++++-------
+>   1 file changed, 6 insertions(+), 7 deletions(-)
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- default-configs/arm-softmmu.mak | 1 +
- hw/misc/Makefile.objs           | 2 +-
- 2 files changed, 2 insertions(+), 1 deletion(-)
+NBD portion:
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index 6f2ffc1..dc9730f 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -7,6 +7,7 @@ CONFIG_NAND=y
- CONFIG_OR_IRQ=y
- CONFIG_SPLIT_IRQ=y
- CONFIG_REGISTER=y
-+CONFIG_UNIMP=y
- CONFIG_ECC=y
- CONFIG_SERIAL=y
- CONFIG_SERIAL_ISA=y
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index 6d50b03..c604859 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -9,7 +9,7 @@ common-obj-$(CONFIG_PCI_TESTDEV) += pci-testdev.o
- common-obj-$(CONFIG_EDU) += edu.o
- common-obj-$(CONFIG_PCA9552) += pca9552.o
- 
--common-obj-y += unimp.o
-+common-obj-$(CONFIG_UNIMP) += unimp.o
- common-obj-$(CONFIG_FW_CFG_DMA) += vmcoreinfo.o
- 
- # ARM devices
--- 
-1.8.3.1
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
