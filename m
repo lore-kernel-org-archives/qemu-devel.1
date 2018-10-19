@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59715)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gDaFb-0003uP-9K
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 15:16:02 -0400
+	(envelope-from <mreitz@redhat.com>) id 1gDaFb-0003uU-AR
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 15:16:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gDaFX-0005Hz-5e
+	(envelope-from <mreitz@redhat.com>) id 1gDaFX-0005Hn-3P
 	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 15:15:59 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Fri, 19 Oct 2018 21:15:21 +0200
-Message-Id: <20181019191523.12157-8-mreitz@redhat.com>
+Date: Fri, 19 Oct 2018 21:15:15 +0200
+Message-Id: <20181019191523.12157-2-mreitz@redhat.com>
 In-Reply-To: <20181019191523.12157-1-mreitz@redhat.com>
 References: <20181019191523.12157-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 7/9] iotests: 'new' module replacement in 169
+Subject: [Qemu-devel] [PATCH v2 1/9] iotests: Make nbd-fault-injector flush
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,36 +22,84 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
-iotest 169 uses the 'new' module to add methods to a class.  This module
-no longer exists in Python 3.  Instead, we can use a lambda.  Best of
-all, this works in 2.7 just as well.
+When closing a connection, make the nbd-fault-injector flush the socket.
+Without this, the output is a bit unreliable with Python 3.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Cleber Rosa <crosa@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- tests/qemu-iotests/169 | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ tests/qemu-iotests/083.out               | 9 +++++++++
+ tests/qemu-iotests/nbd-fault-injector.py | 1 +
+ 2 files changed, 10 insertions(+)
 
-diff --git a/tests/qemu-iotests/169 b/tests/qemu-iotests/169
-index f243db9955..e5614b159d 100755
---- a/tests/qemu-iotests/169
-+++ b/tests/qemu-iotests/169
-@@ -23,7 +23,6 @@ import iotests
- import time
- import itertools
- import operator
--import new
- from iotests import qemu_img
+diff --git a/tests/qemu-iotests/083.out b/tests/qemu-iotests/083.out
+index be6079d27e..f9af8bb691 100644
+--- a/tests/qemu-iotests/083.out
++++ b/tests/qemu-iotests/083.out
+@@ -41,6 +41,7 @@ can't open device nbd+tcp://127.0.0.1:PORT/foo
  
+ === Check disconnect after neg2 ===
  
-@@ -144,7 +143,7 @@ class TestDirtyBitmapMigration(iotests.QMPTestCase):
++Unable to read from socket: Connection reset by peer
+ Connection closed
+ read failed: Input/output error
  
- def inject_test_case(klass, name, method, *args, **kwargs):
-     mc = operator.methodcaller(method, *args, **kwargs)
--    setattr(klass, 'test_' + name, new.instancemethod(mc, None, klass))
-+    setattr(klass, 'test_' + name, lambda self: mc(self))
+@@ -54,6 +55,7 @@ can't open device nbd+tcp://127.0.0.1:PORT/foo
  
- for cmb in list(itertools.product((True, False), repeat=4)):
-     name = ('_' if cmb[0] else '_not_') + 'persistent_'
+ === Check disconnect before request ===
+ 
++Unable to read from socket: Connection reset by peer
+ Connection closed
+ read failed: Input/output error
+ 
+@@ -116,6 +118,7 @@ can't open device nbd+tcp://127.0.0.1:PORT/
+ 
+ === Check disconnect after neg-classic ===
+ 
++Unable to read from socket: Connection reset by peer
+ Connection closed
+ read failed: Input/output error
+ 
+@@ -161,6 +164,8 @@ can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
+ 
+ === Check disconnect after neg2 ===
+ 
++Unable to read from socket: Connection reset by peer
++Connection closed
+ read failed: Input/output error
+ 
+ === Check disconnect 8 neg2 ===
+@@ -173,6 +178,8 @@ can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
+ 
+ === Check disconnect before request ===
+ 
++Unable to read from socket: Connection reset by peer
++Connection closed
+ read failed: Input/output error
+ 
+ === Check disconnect after request ===
+@@ -234,6 +241,8 @@ can't open device nbd+unix:///?socket=TEST_DIR/nbd.sock
+ 
+ === Check disconnect after neg-classic ===
+ 
++Unable to read from socket: Connection reset by peer
++Connection closed
+ read failed: Input/output error
+ 
+ *** done
+diff --git a/tests/qemu-iotests/nbd-fault-injector.py b/tests/qemu-iotests/nbd-fault-injector.py
+index f9193c0fae..439a090eb6 100755
+--- a/tests/qemu-iotests/nbd-fault-injector.py
++++ b/tests/qemu-iotests/nbd-fault-injector.py
+@@ -112,6 +112,7 @@ class FaultInjectionSocket(object):
+             if rule.match(event, io):
+                 if rule.when == 0 or bufsize is None:
+                     print('Closing connection on rule match %s' % rule.name)
++                    self.sock.flush()
+                     sys.exit(0)
+                 if rule.when != -1:
+                     return rule.when
 -- 
 2.17.1
