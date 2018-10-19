@@ -1,16 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59153)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gDJFk-0004os-Kn
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:07:04 -0400
+	(envelope-from <cota@braap.org>) id 1gDJFn-0004sK-Fw
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:07:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gDJFi-0003IK-A1
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:07:00 -0400
+	(envelope-from <cota@braap.org>) id 1gDJFj-0003LO-Tb
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:07:03 -0400
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:35727)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gDJFj-00032Y-DV
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:06:59 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 18 Oct 2018 21:05:46 -0400
-Message-Id: <20181019010625.25294-18-cota@braap.org>
+Date: Thu, 18 Oct 2018 21:06:04 -0400
+Message-Id: <20181019010625.25294-36-cota@braap.org>
 In-Reply-To: <20181019010625.25294-1-cota@braap.org>
 References: <20181019010625.25294-1-cota@braap.org>
-Subject: [Qemu-devel] [RFC v3 17/56] s390x: convert to cpu_halted
+Subject: [Qemu-devel] [RFC v3 35/56] lm32: convert to cpu_interrupt_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,154 +24,26 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Michael Walle <michael@walle.cc>
 
-Cc: Cornelia Huck <cohuck@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Alexander Graf <agraf@suse.de>
-Cc: David Hildenbrand <david@redhat.com>
-Cc: qemu-s390x@nongnu.org
+Cc: Michael Walle <michael@walle.cc>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- hw/intc/s390_flic.c        |  2 +-
- target/s390x/cpu.c         | 18 +++++++++++-------
- target/s390x/excp_helper.c |  2 +-
- target/s390x/kvm.c         |  2 +-
- target/s390x/sigp.c        |  8 ++++----
- 5 files changed, 18 insertions(+), 14 deletions(-)
+ target/lm32/cpu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/intc/s390_flic.c b/hw/intc/s390_flic.c
-index 5f8168f0f0..bfb5cf1d07 100644
---- a/hw/intc/s390_flic.c
-+++ b/hw/intc/s390_flic.c
-@@ -198,7 +198,7 @@ static void qemu_s390_flic_notify(uint32_t type)
-         }
+diff --git a/target/lm32/cpu.c b/target/lm32/cpu.c
+index b7499cb627..1508bb6199 100644
+--- a/target/lm32/cpu.c
++++ b/target/lm32/cpu.c
+@@ -101,7 +101,7 @@ static void lm32_cpu_init_cfg_reg(LM32CPU *cpu)
  
-         /* we always kick running CPUs for now, this is tricky */
--        if (cs->halted) {
-+        if (cpu_halted(cs)) {
-             /* don't check for subclasses, CPUs double check when waking up */
-             if (type & FLIC_PENDING_SERVICE) {
-                 if (!(cpu->env.psw.mask & PSW_MASK_EXT)) {
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index 18ba7f85a5..956d4e1d18 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -288,7 +288,7 @@ static void s390_cpu_initfn(Object *obj)
-     CPUS390XState *env = &cpu->env;
- 
-     cs->env_ptr = env;
--    cs->halted = 1;
-+    cpu_halted_set(cs, 1);
-     cs->exception_index = EXCP_HLT;
-     object_property_add(obj, "crash-information", "GuestPanicInformation",
-                         s390_cpu_get_crash_info_qom, NULL, NULL, NULL, NULL);
-@@ -313,8 +313,8 @@ static void s390_cpu_finalize(Object *obj)
- #if !defined(CONFIG_USER_ONLY)
- static bool disabled_wait(CPUState *cpu)
+ static bool lm32_cpu_has_work(CPUState *cs)
  {
--    return cpu->halted && !(S390_CPU(cpu)->env.psw.mask &
--                            (PSW_MASK_IO | PSW_MASK_EXT | PSW_MASK_MCHECK));
-+    return cpu_halted(cpu) && !(S390_CPU(cpu)->env.psw.mask &
-+                                (PSW_MASK_IO | PSW_MASK_EXT | PSW_MASK_MCHECK));
+-    return cs->interrupt_request & CPU_INTERRUPT_HARD;
++    return cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD;
  }
  
- static unsigned s390_count_running_cpus(void)
-@@ -340,10 +340,12 @@ unsigned int s390_cpu_halt(S390CPU *cpu)
-     CPUState *cs = CPU(cpu);
-     trace_cpu_halt(cs->cpu_index);
- 
--    if (!cs->halted) {
--        cs->halted = 1;
-+    cpu_mutex_lock(cs);
-+    if (!cpu_halted(cs)) {
-+        cpu_halted_set(cs, 1);
-         cs->exception_index = EXCP_HLT;
-     }
-+    cpu_mutex_unlock(cs);
- 
-     return s390_count_running_cpus();
- }
-@@ -353,10 +355,12 @@ void s390_cpu_unhalt(S390CPU *cpu)
-     CPUState *cs = CPU(cpu);
-     trace_cpu_unhalt(cs->cpu_index);
- 
--    if (cs->halted) {
--        cs->halted = 0;
-+    cpu_mutex_lock(cs);
-+    if (cpu_halted(cs)) {
-+        cpu_halted_set(cs, 0);
-         cs->exception_index = -1;
-     }
-+    cpu_mutex_unlock(cs);
- }
- 
- unsigned int s390_cpu_set_state(uint8_t cpu_state, S390CPU *cpu)
-diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
-index 2a33222f7e..d22c5b3ce5 100644
---- a/target/s390x/excp_helper.c
-+++ b/target/s390x/excp_helper.c
-@@ -461,7 +461,7 @@ try_deliver:
-     if ((env->psw.mask & PSW_MASK_WAIT) || stopped) {
-         /* don't trigger a cpu_loop_exit(), use an interrupt instead */
-         cpu_interrupt(CPU(cpu), CPU_INTERRUPT_HALT);
--    } else if (cs->halted) {
-+    } else if (cpu_halted(cs)) {
-         /* unhalt if we had a WAIT PSW somehwere in our injection chain */
-         s390_cpu_unhalt(cpu);
-     }
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index 2ebf26adfe..ffb52888c0 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -1005,7 +1005,7 @@ MemTxAttrs kvm_arch_post_run(CPUState *cs, struct kvm_run *run)
- 
- int kvm_arch_process_async_events(CPUState *cs)
- {
--    return cs->halted;
-+    return cpu_halted(cs);
- }
- 
- static int s390_kvm_irq_to_interrupt(struct kvm_s390_irq *irq,
-diff --git a/target/s390x/sigp.c b/target/s390x/sigp.c
-index c1f9245797..d410da797a 100644
---- a/target/s390x/sigp.c
-+++ b/target/s390x/sigp.c
-@@ -115,7 +115,7 @@ static void sigp_stop(CPUState *cs, run_on_cpu_data arg)
-     }
- 
-     /* disabled wait - sleeping in user space */
--    if (cs->halted) {
-+    if (cpu_halted(cs)) {
-         s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu);
-     } else {
-         /* execute the stop function */
-@@ -131,7 +131,7 @@ static void sigp_stop_and_store_status(CPUState *cs, run_on_cpu_data arg)
-     SigpInfo *si = arg.host_ptr;
- 
-     /* disabled wait - sleeping in user space */
--    if (s390_cpu_get_state(cpu) == S390_CPU_STATE_OPERATING && cs->halted) {
-+    if (s390_cpu_get_state(cpu) == S390_CPU_STATE_OPERATING && cpu_halted(cs)) {
-         s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu);
-     }
- 
-@@ -313,7 +313,7 @@ static void sigp_cond_emergency(S390CPU *src_cpu, S390CPU *dst_cpu,
-     }
- 
-     /* this looks racy, but these values are only used when STOPPED */
--    idle = CPU(dst_cpu)->halted;
-+    idle = cpu_halted(CPU(dst_cpu));
-     psw_addr = dst_cpu->env.psw.addr;
-     psw_mask = dst_cpu->env.psw.mask;
-     asn = si->param;
-@@ -347,7 +347,7 @@ static void sigp_sense_running(S390CPU *dst_cpu, SigpInfo *si)
-     }
- 
-     /* If halted (which includes also STOPPED), it is not running */
--    if (CPU(dst_cpu)->halted) {
-+    if (cpu_halted(CPU(dst_cpu))) {
-         si->cc = SIGP_CC_ORDER_CODE_ACCEPTED;
-     } else {
-         set_sigp_status(si, SIGP_STAT_NOT_RUNNING);
+ /* CPUClass::reset() */
 -- 
 2.17.1
