@@ -1,28 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53119)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54622)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liam.merwick@oracle.com>) id 1gDbTo-0005be-4w
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 16:34:45 -0400
+	(envelope-from <Liam.Merwick@oracle.com>) id 1gDbXt-0007rs-0g
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 16:38:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liam.merwick@oracle.com>) id 1gDbTk-0001aW-TU
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 16:34:44 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:60296)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
-	id 1gDbTi-0001N1-Ov
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 16:34:38 -0400
-References: <1535739372-24454-1-git-send-email-Liam.Merwick@oracle.com>
-	<1535739372-24454-7-git-send-email-Liam.Merwick@oracle.com>
-	<a4732da2-c0d2-c6d9-fac4-1969758b1ff9@redhat.com>
-From: Liam Merwick <liam.merwick@oracle.com>
-Message-ID: <07eb9a63-0247-ba8d-6528-d7e15293b48e@oracle.com>
-Date: Fri, 19 Oct 2018 21:34:56 +0100
+	(envelope-from <Liam.Merwick@oracle.com>) id 1gDbXs-0002PA-4V
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 16:38:56 -0400
+From: Liam Merwick <Liam.Merwick@oracle.com>
+Date: Fri, 19 Oct 2018 21:38:58 +0100
+Message-Id: <1539981546-10596-1-git-send-email-Liam.Merwick@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <a4732da2-c0d2-c6d9-fac4-1969758b1ff9@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 6/8] block: dump_qlist() may dereference
- a Null pointer
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v4 0/8] off-by-one and NULL pointer accesses
+ detected by static analysis
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,65 +21,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, jsnow@redhat.com, berrange@redhat.com, mreitz@redhat.com
 
+Below are a number of fixes to some off-by-one, read outside array bounds=
+, and
+NULL pointer accesses detected by an internal Oracle static analysis tool=
+ (Parfait).
+https://labs.oracle.com/pls/apex/f?p=3Dlabs:49:::::P49_PROJECT_ID:13
 
+I have also included a patch to add a command-line option to configure to
+select if AVX2 is used or not (keeping the existing behaviour by default).
+My motivation was avoiding an issue with the static analysis tool but Net=
+Spectre
+was announced as I was working on this and I felt it may have more genera=
+l uses.
 
-On 12/10/18 16:22, Max Reitz wrote:
-> On 31.08.18 20:16, Liam Merwick wrote:
->> A NULL 'list' passed into function dump_qlist() isn't correctly
->> validated and can be passed to qlist_first() where it is dereferenced.
->>
->> Given that dump_qlist() is static, and callers already do the right
->> thing, just add an assert to catch future potential bugs.
->>
->> Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
->> Reviewed-by: Eric Blake <eblake@redhat.com>
->> ---
->>   block/qapi.c | 2 ++
->>   1 file changed, 2 insertions(+)
-> 
-> I don't disagree, but I don't see why the program just wouldn't crash if
-> someone passed a NULL pointer.  And I don't quite see why anyone would
-> pass a NULL pointer.
-> 
-> Of course it's reasonable to just add an assert() to reinforce the
-> contract; but we have so many functions that just take a pointer that
-> they assume to be non-NULL and then immediately dereference it.  Nearly
-> every blk_* function takes a BlockBackend that is always assumed to be
-> non-NULL, for instance, and I don't really want to put assert()s into
-> all of them.  Or another example: dump_qobject() and dump_qdict() do
-> exactly the same -- if we added an assertion in dump_qlist(), we would
-> actually have to add the very same assertions there, too.
-> 
-> So I don't really object this patch (because it's not wrong), but I
-> don't think it's very useful.
+v1 -> v2
+Based on feedback from Eric Blake:
+patch2: reworded commit message to clarify issue
+patch6: Reverted common qlist routines and added assert to qlist_dump ins=
+tead
+patch7: Fixed incorrect logic
+patch8: Added QEMU_BUILD_BUG_ON to catch future =D1=96nstance at compile-=
+time
 
+v2 -> v3
+Based on feedback from Eric Blake:
+patch6: removed double space from commit message
+patch8: removed unnecessary comment and updated QEMU_BUILD_BUG_ON to use =
+ARRAY_SIZE
+Added Eric's R-b to patches 6,7,8
 
-I agree with all the above - however I kept the patch in the series 
-given it was helping reduce the static analysis noise (hopefully making 
-it easier to spot real issues)
+v3 -> v4
+Based on feedback from Max Reitz:
+patch2: Added R-b from John Snow
+patch3: fixed blk_get_attached_dev_id() instead of checking return value
+patch4: switched to assert()
+patch5: numerous changes based on feedback from Max
+patch6: updated commit message
+patch7: (was patch8): Added Max's R-b
+patch8: (new): patch fixing NULL pointer dereference in kvm_arch_init_vcp=
+u()
 
-Regards,
-Liam
+I also dropped the 'io: potential unnecessary check in qio_channel_comman=
+d_new_spawn()'
+patch from v3 - it was correct but of no benefit to staic analysis checki=
+ng
 
+Liam Merwick (8):
+  configure: Provide option to explicitly disable AVX2
+  job: Fix off-by-one assert checks for JobSTT and JobVerbTable
+  block: Null pointer dereference in blk_root_get_parent_desc()
+  qemu-img: assert block_job_get() does not return NULL in img_commit()
+  block: Fix potential Null pointer dereferences in vvfat.c
+  block: dump_qlist() may dereference a Null pointer
+  qcow2: Read outside array bounds in qcow2_pre_write_overlap_check()
+  kvm: Potential NULL pointer dereference in kvm_arch_init_vcpu()
 
-> 
-> Max
-> 
->> diff --git a/block/qapi.c b/block/qapi.c
->> index c66f949db839..e81be604217c 100644
->> --- a/block/qapi.c
->> +++ b/block/qapi.c
->> @@ -740,6 +740,8 @@ static void dump_qlist(fprintf_function func_fprintf, void *f, int indentation,
->>       const QListEntry *entry;
->>       int i = 0;
->>   
->> +    assert(list);
->> +
->>       for (entry = qlist_first(list); entry; entry = qlist_next(entry), i++) {
->>           QType type = qobject_type(entry->value);
->>           bool composite = (type == QTYPE_QDICT || type == QTYPE_QLIST);
->>
-> 
-> 
+ block/block-backend.c  |  6 +++++-
+ block/qapi.c           |  2 ++
+ block/qcow2-refcount.c | 18 ++++++++++--------
+ block/vvfat.c          | 33 ++++++++++++++++++++++++++++-----
+ configure              | 11 +++++++++--
+ dtc                    |  2 +-
+ job.c                  |  4 ++--
+ qemu-img.c             |  1 +
+ target/i386/kvm.c      |  4 +++-
+ 9 files changed, 61 insertions(+), 20 deletions(-)
+
+--=20
+1.8.3.1
