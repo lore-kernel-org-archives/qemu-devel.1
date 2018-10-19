@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36680)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36720)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gDLNZ-0002jI-Nj
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:15 -0400
+	(envelope-from <jasowang@redhat.com>) id 1gDLNg-0002nh-E3
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gDLNW-0002vI-3F
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59026)
+	(envelope-from <jasowang@redhat.com>) id 1gDLNa-000314-Tg
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35412)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gDLNV-0002tQ-MM
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:09 -0400
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gDLNa-0002zh-A9
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:14 -0400
 From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 19 Oct 2018 11:22:12 +0800
-Message-Id: <1539919345-10703-14-git-send-email-jasowang@redhat.com>
+Date: Fri, 19 Oct 2018 11:22:14 +0800
+Message-Id: <1539919345-10703-16-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1539919345-10703-1-git-send-email-jasowang@redhat.com>
 References: <1539919345-10703-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL V2 13/26] savevm: split the process of different
- stages for loadvm/savevm
+Subject: [Qemu-devel] [PULL V2 15/26] filter: Add handle_event method for
+ NetFilterClass
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,216 +25,120 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, qemu-devel@nongnu.org
-Cc: Zhang Chen <zhangckid@gmail.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Zhang Chen <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>
+Cc: Zhang Chen <zhangckid@gmail.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Zhang Chen <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>
 
 From: Zhang Chen <zhangckid@gmail.com>
 
-There are several stages during loadvm/savevm process. In different stage,
-migration incoming processes different types of sections.
-We want to control these stages more accuracy, it will benefit COLO
-performance, we don't have to save type of QEMU_VM_SECTION_START
-sections everytime while do checkpoint, besides, we want to separate
-the process of saving/loading memory and devices state.
-
-So we add three new helper functions: qemu_load_device_state() and
-qemu_savevm_live_state() to achieve different process during migration.
-
-Besides, we make qemu_loadvm_state_main() and qemu_save_device_state()
-public, and simplify the codes of qemu_save_device_state() by calling the
-wrapper qemu_savevm_state_header().
+Filter needs to process the event of checkpoint/failover or
+other event passed by COLO frame.
 
 Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
 Signed-off-by: Zhang Chen <zhangckid@gmail.com>
 Signed-off-by: Zhang Chen <chen.zhang@intel.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- migration/colo.c   | 41 ++++++++++++++++++++++++++++++++---------
- migration/savevm.c | 36 +++++++++++++++++++++++++++++-------
- migration/savevm.h |  4 ++++
- 3 files changed, 65 insertions(+), 16 deletions(-)
+ include/net/filter.h |  5 +++++
+ net/filter.c         | 17 +++++++++++++++++
+ net/net.c            | 19 +++++++++++++++++++
+ 3 files changed, 41 insertions(+)
 
-diff --git a/migration/colo.c b/migration/colo.c
-index 94c4e09..59bb507 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -30,6 +30,7 @@
- #include "block/block.h"
- #include "qapi/qapi-events-migration.h"
- #include "qapi/qmp/qerror.h"
-+#include "sysemu/cpus.h"
+diff --git a/include/net/filter.h b/include/net/filter.h
+index 435acd6..49da666 100644
+--- a/include/net/filter.h
++++ b/include/net/filter.h
+@@ -38,6 +38,8 @@ typedef ssize_t (FilterReceiveIOV)(NetFilterState *nc,
  
- static bool vmstate_loading;
- static Notifier packets_compare_notifier;
-@@ -401,24 +402,35 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
+ typedef void (FilterStatusChanged) (NetFilterState *nf, Error **errp);
  
-     /* Disable block migration */
-     migrate_set_block_enabled(false, &local_err);
--    qemu_savevm_state_header(fb);
--    qemu_savevm_state_setup(fb);
-     qemu_mutex_lock_iothread();
-     replication_do_checkpoint_all(&local_err);
-     if (local_err) {
-         qemu_mutex_unlock_iothread();
-         goto out;
-     }
--    qemu_savevm_state_complete_precopy(fb, false, false);
--    qemu_mutex_unlock_iothread();
--
--    qemu_fflush(fb);
++typedef void (FilterHandleEvent) (NetFilterState *nf, int event, Error **errp);
++
+ typedef struct NetFilterClass {
+     ObjectClass parent_class;
  
-     colo_send_message(s->to_dst_file, COLO_MESSAGE_VMSTATE_SEND, &local_err);
-     if (local_err) {
-+        qemu_mutex_unlock_iothread();
-+        goto out;
+@@ -45,6 +47,7 @@ typedef struct NetFilterClass {
+     FilterSetup *setup;
+     FilterCleanup *cleanup;
+     FilterStatusChanged *status_changed;
++    FilterHandleEvent *handle_event;
+     /* mandatory */
+     FilterReceiveIOV *receive_iov;
+ } NetFilterClass;
+@@ -77,4 +80,6 @@ ssize_t qemu_netfilter_pass_to_next(NetClientState *sender,
+                                     int iovcnt,
+                                     void *opaque);
+ 
++void colo_notify_filters_event(int event, Error **errp);
++
+ #endif /* QEMU_NET_FILTER_H */
+diff --git a/net/filter.c b/net/filter.c
+index 2fd7d7d..c9f9e5f 100644
+--- a/net/filter.c
++++ b/net/filter.c
+@@ -17,6 +17,8 @@
+ #include "net/vhost_net.h"
+ #include "qom/object_interfaces.h"
+ #include "qemu/iov.h"
++#include "net/colo.h"
++#include "migration/colo.h"
+ 
+ static inline bool qemu_can_skip_netfilter(NetFilterState *nf)
+ {
+@@ -245,11 +247,26 @@ static void netfilter_finalize(Object *obj)
+     g_free(nf->netdev_id);
+ }
+ 
++static void default_handle_event(NetFilterState *nf, int event, Error **errp)
++{
++    switch (event) {
++    case COLO_EVENT_CHECKPOINT:
++        break;
++    case COLO_EVENT_FAILOVER:
++        object_property_set_str(OBJECT(nf), "off", "status", errp);
++        break;
++    default:
++        break;
 +    }
-+    /* Note: device state is saved into buffer */
-+    ret = qemu_save_device_state(fb);
++}
 +
-+    qemu_mutex_unlock_iothread();
-+    if (ret < 0) {
-         goto out;
+ static void netfilter_class_init(ObjectClass *oc, void *data)
+ {
+     UserCreatableClass *ucc = USER_CREATABLE_CLASS(oc);
++    NetFilterClass *nfc = NETFILTER_CLASS(oc);
+ 
+     ucc->complete = netfilter_complete;
++    nfc->handle_event = default_handle_event;
+ }
+ 
+ static const TypeInfo netfilter_info = {
+diff --git a/net/net.c b/net/net.c
+index cdcd5cf..c66847e 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -1335,6 +1335,25 @@ void hmp_info_network(Monitor *mon, const QDict *qdict)
      }
-     /*
-+     * Only save VM's live state, which not including device state.
-+     * TODO: We may need a timeout mechanism to prevent COLO process
-+     * to be blocked here.
-+     */
-+    qemu_savevm_live_state(s->to_dst_file);
-+
-+    qemu_fflush(fb);
-+
-+    /*
-      * We need the size of the VMstate data in Secondary side,
-      * With which we can decide how much data should be read.
-      */
-@@ -635,6 +647,7 @@ void *colo_process_incoming_thread(void *opaque)
-     uint64_t total_size;
-     uint64_t value;
-     Error *local_err = NULL;
-+    int ret;
+ }
  
-     rcu_register_thread();
-     qemu_sem_init(&mis->colo_incoming_sem, 0);
-@@ -708,6 +721,16 @@ void *colo_process_incoming_thread(void *opaque)
-             goto out;
-         }
- 
-+        qemu_mutex_lock_iothread();
-+        cpu_synchronize_all_pre_loadvm();
-+        ret = qemu_loadvm_state_main(mis->from_src_file, mis);
-+        qemu_mutex_unlock_iothread();
++void colo_notify_filters_event(int event, Error **errp)
++{
++    NetClientState *nc;
++    NetFilterState *nf;
++    NetFilterClass *nfc = NULL;
++    Error *local_err = NULL;
 +
-+        if (ret < 0) {
-+            error_report("Load VM's live state (ram) error");
-+            goto out;
++    QTAILQ_FOREACH(nc, &net_clients, next) {
++        QTAILQ_FOREACH(nf, &nc->filters, next) {
++            nfc = NETFILTER_GET_CLASS(OBJECT(nf));
++            nfc->handle_event(nf, event, &local_err);
++            if (local_err) {
++                error_propagate(errp, local_err);
++                return;
++            }
 +        }
-+
-         value = colo_receive_message_value(mis->from_src_file,
-                                  COLO_MESSAGE_VMSTATE_SIZE, &local_err);
-         if (local_err) {
-@@ -739,10 +762,10 @@ void *colo_process_incoming_thread(void *opaque)
-         }
- 
-         qemu_mutex_lock_iothread();
--        qemu_system_reset(SHUTDOWN_CAUSE_NONE);
-         vmstate_loading = true;
--        if (qemu_loadvm_state(fb) < 0) {
--            error_report("COLO: loadvm failed");
-+        ret = qemu_load_device_state(fb);
-+        if (ret < 0) {
-+            error_report("COLO: load device state failed");
-             qemu_mutex_unlock_iothread();
-             goto out;
-         }
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 288b807..e4caff9 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -1378,13 +1378,21 @@ done:
-     return ret;
- }
- 
--static int qemu_save_device_state(QEMUFile *f)
-+void qemu_savevm_live_state(QEMUFile *f)
- {
--    SaveStateEntry *se;
-+    /* save QEMU_VM_SECTION_END section */
-+    qemu_savevm_state_complete_precopy(f, true, false);
-+    qemu_put_byte(f, QEMU_VM_EOF);
-+}
- 
--    qemu_put_be32(f, QEMU_VM_FILE_MAGIC);
--    qemu_put_be32(f, QEMU_VM_FILE_VERSION);
-+int qemu_save_device_state(QEMUFile *f)
-+{
-+    SaveStateEntry *se;
- 
-+    if (!migration_in_colo_state()) {
-+        qemu_put_be32(f, QEMU_VM_FILE_MAGIC);
-+        qemu_put_be32(f, QEMU_VM_FILE_VERSION);
 +    }
-     cpu_synchronize_all_states();
- 
-     QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
-@@ -1440,8 +1448,6 @@ enum LoadVMExitCodes {
-     LOADVM_QUIT     =  1,
- };
- 
--static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis);
--
- /* ------ incoming postcopy messages ------ */
- /* 'advise' arrives before any transfers just to tell us that a postcopy
-  * *might* happen - it might be skipped if precopy transferred everything
-@@ -2247,7 +2253,7 @@ static bool postcopy_pause_incoming(MigrationIncomingState *mis)
-     return true;
- }
- 
--static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
-+int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
- {
-     uint8_t section_type;
-     int ret = 0;
-@@ -2418,6 +2424,22 @@ int qemu_loadvm_state(QEMUFile *f)
-     return ret;
- }
- 
-+int qemu_load_device_state(QEMUFile *f)
-+{
-+    MigrationIncomingState *mis = migration_incoming_get_current();
-+    int ret;
-+
-+    /* Load QEMU_VM_SECTION_FULL section */
-+    ret = qemu_loadvm_state_main(f, mis);
-+    if (ret < 0) {
-+        error_report("Failed to load device state: %d", ret);
-+        return ret;
-+    }
-+
-+    cpu_synchronize_all_post_init();
-+    return 0;
 +}
 +
- int save_snapshot(const char *name, Error **errp)
+ void qmp_set_link(const char *name, bool up, Error **errp)
  {
-     BlockDriverState *bs, *bs1;
-diff --git a/migration/savevm.h b/migration/savevm.h
-index 8373c2f..51a4b9c 100644
---- a/migration/savevm.h
-+++ b/migration/savevm.h
-@@ -56,8 +56,12 @@ void qemu_savevm_send_postcopy_ram_discard(QEMUFile *f, const char *name,
-                                            uint64_t *start_list,
-                                            uint64_t *length_list);
- void qemu_savevm_send_colo_enable(QEMUFile *f);
-+void qemu_savevm_live_state(QEMUFile *f);
-+int qemu_save_device_state(QEMUFile *f);
- 
- int qemu_loadvm_state(QEMUFile *f);
- void qemu_loadvm_state_cleanup(void);
-+int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis);
-+int qemu_load_device_state(QEMUFile *f);
- 
- #endif
+     NetClientState *ncs[MAX_QUEUE_NUM];
 -- 
 2.5.0
