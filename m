@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36817)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36902)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gDLNw-00031k-6w
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:37 -0400
+	(envelope-from <jasowang@redhat.com>) id 1gDLNy-00033P-0c
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gDLNs-00039s-51
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46616)
+	(envelope-from <jasowang@redhat.com>) id 1gDLNx-0003I4-18
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58188)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gDLNm-00032w-P5
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:28 -0400
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gDLNw-00035K-C6
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:36 -0400
 From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 19 Oct 2018 11:22:16 +0800
-Message-Id: <1539919345-10703-18-git-send-email-jasowang@redhat.com>
+Date: Fri, 19 Oct 2018 11:22:18 +0800
+Message-Id: <1539919345-10703-20-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1539919345-10703-1-git-send-email-jasowang@redhat.com>
 References: <1539919345-10703-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL V2 17/26] COLO: notify net filters about
- checkpoint/failover event
+Subject: [Qemu-devel] [PULL V2 19/26] docs: Add COLO status diagram to
+ COLO-FT.txt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,58 +25,64 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, qemu-devel@nongnu.org
-Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>, Jason Wang <jasowang@redhat.com>
+Cc: Zhang Chen <chen.zhang@intel.com>, Zhang Chen <zhangckid@gmail.com>, Jason Wang <jasowang@redhat.com>
 
-From: zhanghailiang <zhang.zhanghailiang@huawei.com>
+From: Zhang Chen <chen.zhang@intel.com>
 
-Notify all net filters about the checkpoint and failover event.
+This diagram make user better understand COLO.
+Suggested by Markus Armbruster.
 
-Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Zhang Chen <zhangckid@gmail.com>
+Signed-off-by: Zhang Chen <chen.zhang@intel.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- migration/colo.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ docs/COLO-FT.txt | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
-diff --git a/migration/colo.c b/migration/colo.c
-index 59bb507..57a8542 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -31,6 +31,7 @@
- #include "qapi/qapi-events-migration.h"
- #include "qapi/qmp/qerror.h"
- #include "sysemu/cpus.h"
-+#include "net/filter.h"
+diff --git a/docs/COLO-FT.txt b/docs/COLO-FT.txt
+index 70cfb9c..6302469 100644
+--- a/docs/COLO-FT.txt
++++ b/docs/COLO-FT.txt
+@@ -110,6 +110,40 @@ Note:
+ HeartBeat has not been implemented yet, so you need to trigger failover process
+ by using 'x-colo-lost-heartbeat' command.
  
- static bool vmstate_loading;
- static Notifier packets_compare_notifier;
-@@ -83,6 +84,12 @@ static void secondary_vm_do_failover(void)
-         error_report_err(local_err);
-     }
- 
-+    /* Notify all filters of all NIC to do checkpoint */
-+    colo_notify_filters_event(COLO_EVENT_FAILOVER, &local_err);
-+    if (local_err) {
-+        error_report_err(local_err);
-+    }
++== COLO operation status ==
 +
-     if (!autostart) {
-         error_report("\"-S\" qemu option will be ignored in secondary side");
-         /* recover runstate to normal migration finish state */
-@@ -782,6 +789,14 @@ void *colo_process_incoming_thread(void *opaque)
-             goto out;
-         }
- 
-+        /* Notify all filters of all NIC to do checkpoint */
-+        colo_notify_filters_event(COLO_EVENT_CHECKPOINT, &local_err);
+++-----------------+
++|                 |
++|    Start COLO   |
++|                 |
+++--------+--------+
++         |
++         |  Main qmp command:
++         |  migrate-set-capabilities with x-colo
++         |  migrate
++         |
++         v
+++--------+--------+
++|                 |
++|  COLO running   |
++|                 |
+++--------+--------+
++         |
++         |  Main qmp command:
++         |  x-colo-lost-heartbeat
++         |  or
++         |  some error happened
++         v
+++--------+--------+
++|                 |  send qmp event:
++|  COLO failover  |  COLO_EXIT
++|                 |
+++-----------------+
 +
-+        if (local_err) {
-+            qemu_mutex_unlock_iothread();
-+            goto out;
-+        }
++COLO use the qmp command to switch and report operation status.
++The diagram just shows the main qmp command, you can get the detail
++in test procedure.
 +
-         vmstate_loading = false;
-         vm_start();
-         trace_colo_vm_state_change("stop", "run");
+ == Test procedure ==
+ 1. Startup qemu
+ Primary:
 -- 
 2.5.0
