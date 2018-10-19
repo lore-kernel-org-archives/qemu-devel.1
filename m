@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60169)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gDUbo-0008AL-2M
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 09:14:32 -0400
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gDUhw-0004WI-FX
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 09:20:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gDUbl-00066r-GU
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 09:14:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55214)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gDUbl-00066I-Ag
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 09:14:29 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AEE0DC04AC54
-	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 13:14:28 +0000 (UTC)
-References: <20181019122613.28663-1-pbonzini@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c48219f3-4af6-22de-15b3-a1263aa46096@redhat.com>
-Date: Fri, 19 Oct 2018 08:14:18 -0500
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gDUhq-0004gx-PP
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 09:20:52 -0400
+Received: from mail.uni-paderborn.de ([131.234.142.9]:55666)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
+	id 1gDUho-0004fu-WC
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 09:20:46 -0400
+References: <20181012173047.25420-1-kbastian@mail.uni-paderborn.de>
+	<20181012173047.25420-17-kbastian@mail.uni-paderborn.de>
+	<ed4c028f-12b8-d940-c4ce-49b59c36a06e@linaro.org>
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Message-ID: <3644d9c1-cb6c-1f73-0988-2e00579c0354@mail.uni-paderborn.de>
+Date: Fri, 19 Oct 2018 15:20:42 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181019122613.28663-1-pbonzini@redhat.com>
+In-Reply-To: <ed4c028f-12b8-d940-c4ce-49b59c36a06e@linaro.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: remove or downgrade myself to
- reviewer from some subsystems
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US-large
+Subject: Re: [Qemu-devel] [PATCH 16/28] target/riscv: Convert quadrant 1 of
+ RVXC insns to decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,29 +31,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: "Daniel P . Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>, mjc@sifive.com, palmer@sifive.com, sagark@eecs.berkeley.edu
+Cc: peer.adelt@hni.uni-paderborn.de, Alistair.Francis@wdc.com, qemu-devel@nongnu.org
 
-On 10/19/18 7:26 AM, Paolo Bonzini wrote:
-> Other people are doing a much better work than myself at handling some
-> subsystems.  For those files it is better if I downgrade myself to
-> reviewer or recognize that I am not actually doing any work there.
->=20
-> Cc: Daniel P. Berrange <berrange@redhat.com>
-> Cc: Gerd Hoffmann <kraxel@redhat.com>
-> Cc: Eric Blake <eblake@redhat.com>
-> Cc: Thomas Huth <thuth@redhat.com>
-> Cc: Laurent Vivier <lvivier@redhat.com>
-> Cc: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->   MAINTAINERS | 13 ++++++-------
->   1 file changed, 6 insertions(+), 7 deletions(-)
 
-NBD portion:
-Reviewed-by: Eric Blake <eblake@redhat.com>
+On 10/13/18 8:53 PM, Richard Henderson wrote:
+> Choose return false or raise exception. Except...
+> I wonder if we might write this as
+>
+>      int shamt = a->shamt;
+>      if (shamt == 0) {
+>          shamt = 64;
+>      }
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+
+Good catch. I'll add a comment, that a shamt of 0 is intended for RV128.
+
+
+Cheers,
+
+Bastian
