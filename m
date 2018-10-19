@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59569)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33315)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gDXOW-0003Gz-IN
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:13:01 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1gDXSz-0004qo-46
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:17:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gDXOV-0007tS-FL
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:13:00 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:34757)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gDXOV-0007tE-1T
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:12:59 -0400
-Received: by mail-ot1-x342.google.com with SMTP id v2so26576069otk.1
-	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 09:12:58 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1dda484c-1fc8-f75e-3150-111b0c7d85f9@linaro.org>
-References: <20181019015617.22583-1-richard.henderson@linaro.org>
-	<20181019015617.22583-4-richard.henderson@linaro.org>
-	<CAFEAcA81rDucGOEVYi1LCw=1eiHisuM8+yXGzaw2dMktdU99cw@mail.gmail.com>
-	<1dda484c-1fc8-f75e-3150-111b0c7d85f9@linaro.org>
+	(envelope-from <pm215@archaic.org.uk>) id 1gDXSw-0004Qg-Nv
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:17:36 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:51962)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1gDXSs-00044B-U8
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:17:32 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 19 Oct 2018 17:12:37 +0100
-Message-ID: <CAFEAcA8f2SvmsABANVrWLZo8NzeAirMOqsm7AnyPCVVKL_z0Sw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] target/arm: Flush only the TLBs
- affected by TTBR*_EL1
+Date: Fri, 19 Oct 2018 17:17:15 +0100
+Message-Id: <20181019161715.12122-1-peter.maydell@linaro.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] linux-user: Remove dead error-checking code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,94 +24,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-On 19 October 2018 at 16:21, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> On 10/19/18 7:28 AM, Peter Maydell wrote:
->> On 19 October 2018 at 02:56, Richard Henderson
->> <richard.henderson@linaro.org> wrote:
->>> Only the EL0 and EL1 TLBs are affected by the EL1 register,
->>> so flush only 2 of the 8 TLBs.
->>>
->>> In testing a boot of the Ubuntu installer to the first menu, this
->>> accounts for nearly all of the full tlb flushes: all but 11k of
->>> the 1.2M instances without the patch.
->>>
->>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->>> ---
->>>  target/arm/helper.c | 16 +++++++++-------
->>>  1 file changed, 9 insertions(+), 7 deletions(-)
->>>
->>> diff --git a/target/arm/helper.c b/target/arm/helper.c
->>> index ed70ac645e..3ba8e66487 100644
->>> --- a/target/arm/helper.c
->>> +++ b/target/arm/helper.c
->>> @@ -2706,14 +2706,16 @@ static void vmsa_tcr_el1_write(CPUARMState *env, const ARMCPRegInfo *ri,
->>>      tcr->raw_tcr = value;
->>>  }
->>>
->>> -static void vmsa_ttbr_write(CPUARMState *env, const ARMCPRegInfo *ri,
->>> -                            uint64_t value)
->>> +static void vmsa_ttbr_el1_write(CPUARMState *env, const ARMCPRegInfo *ri,
->>> +                                uint64_t value)
->>>  {
->>>      /* If the ASID changes (with a 64-bit write), we must flush the TLB.  */
->>>      if (cpreg_field_is_64bit(ri) &&
->>>          extract64(raw_read(env, ri) ^ value, 48, 16) != 0) {
->>>          ARMCPU *cpu = arm_env_get_cpu(env);
->>> -        tlb_flush(CPU(cpu));
->>> +        tlb_flush_by_mmuidx(CPU(cpu),
->>> +                            ARMMMUIdxBit_S12NSE1 |
->>> +                            ARMMMUIdxBit_S12NSE0);
->>
->> This isn't taking account of the possibility of secure mode.
->> ARMMMUIdxBit_S1SE0 and ARMMMUIdxBit_S1SE1 might also be affected.
->
-> Ah.  Is there an easy way to tell if secure mode is present/enabled?  It'd be
-> nice to not flush tlbs that aren't in use...
+Remove some dead code spotted by Coverity (CID 1009855,
+1390854, 1390847). The underlying cause in all these cases
+is the same: QEMU's put_user operations can't result in
+errors, but the kernel's equivalent does. So when code
+was copied from the kernel signal-frame-setup/teardown
+code, checks on error flags that were needed in the kernel
+became dead code for us.
 
-If ARM_FEATURE_EL3 is set, we have an EL3. It is probably possible
-to look at the current state of the CPU and determine whether we
-need to flush the NS TLBs or the S TLBs, but I would need to
-think about that. For AArch32 there are banked registers here, so
-we could in theory distinguish writes to the S banked and NS banked
-regs. For AArch64 there's only one EL1 register, so we'd
-need to check the Arm ARM for how interleaved writes to the TTBR_EL1
-and flipping between S and NS work (and when the guest is supposed
-to do the TLB maintenance anyway).
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ linux-user/m68k/signal.c  | 3 ---
+ linux-user/sh4/signal.c   | 4 ----
+ linux-user/sparc/signal.c | 2 --
+ 3 files changed, 9 deletions(-)
 
-A conservative check is probably:
-  if arm_current_el() < 3
-     // TTBR definitely can only be affecting the EL0/1
-     // translation regime for the current security state
-     if arm_is_secure_below_el3()
-        if EL3 is AArch32
-            flush S1SE0, S1E3
-        else
-            flush S1SE0, S1SE1
-     else
-        flush S12NSE1, S12NSE0
-  else
-     // err on the side of flushing more than maybe we need to
-     flush S1SE0, S12NSE1, S12NSE0
-     if EL3 is AArch32
-          flush S1E3
-     else
-          flush S1SE1
-
-(but you should check my logic ;-))
-
->> And for AArch32, this writefn is used for the secure-banked versions
->> of TTBR0/TTBR1, which means ARMMMUIdxBit_S1E3 may also need flushing.
->
-> For aarch32, we don't have an asid, and so do not flush at all.
-
-We do for AArch32 with TTBCR.EAE == 1 (ie LPAE, when you want to
-use the 64-bit form of the register, accessed via MRRC/MCRR).
-cpreg_field_is_64bit() is true for both "AArch64 sysreg" and
-"AArch32 64-bit cp reg".
-
-thanks
--- PMM
+diff --git a/linux-user/m68k/signal.c b/linux-user/m68k/signal.c
+index 38bd77ec160..49ff87c77bc 100644
+--- a/linux-user/m68k/signal.c
++++ b/linux-user/m68k/signal.c
+@@ -334,9 +334,6 @@ void setup_rt_frame(int sig, struct target_sigaction *ka,
+                (uint32_t *)(frame->retcode + 0));
+     __put_user(0x4e40, (uint16_t *)(frame->retcode + 4));
+ 
+-    if (err)
+-        goto give_sigsegv;
+-
+     /* Set up to return from userspace */
+ 
+     env->aregs[7] = frame_addr;
+diff --git a/linux-user/sh4/signal.c b/linux-user/sh4/signal.c
+index c6752baa7ee..cc89a48ff8b 100644
+--- a/linux-user/sh4/signal.c
++++ b/linux-user/sh4/signal.c
+@@ -279,7 +279,6 @@ long do_sigreturn(CPUSH4State *regs)
+     sigset_t blocked;
+     target_sigset_t target_set;
+     int i;
+-    int err = 0;
+ 
+     frame_addr = regs->gregs[15];
+     trace_user_do_sigreturn(regs, frame_addr);
+@@ -292,9 +291,6 @@ long do_sigreturn(CPUSH4State *regs)
+         __get_user(target_set.sig[i], &frame->extramask[i - 1]);
+     }
+ 
+-    if (err)
+-        goto badframe;
+-
+     target_to_host_sigset_internal(&blocked, &target_set);
+     set_sigmask(&blocked);
+ 
+diff --git a/linux-user/sparc/signal.c b/linux-user/sparc/signal.c
+index e44e99993c6..295e415b1e6 100644
+--- a/linux-user/sparc/signal.c
++++ b/linux-user/sparc/signal.c
+@@ -256,8 +256,6 @@ void setup_frame(int sig, struct target_sigaction *ka,
+         /* t 0x10 */
+         val32 = 0x91d02010;
+         __put_user(val32, &sf->insns[1]);
+-        if (err)
+-            goto sigsegv;
+     }
+     unlock_user(sf, sf_addr, sizeof(struct target_signal_frame));
+     return;
+-- 
+2.19.1
