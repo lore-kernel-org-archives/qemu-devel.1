@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49650)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gDVUJ-0001HU-T4
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 10:10:52 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gDVWI-00026d-D0
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 10:12:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gDVUG-000316-MR
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 10:10:51 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:57551)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gDVUG-00030W-Bn
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 10:10:48 -0400
-Date: Fri, 19 Oct 2018 10:10:46 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20181019141046.GA7279@flamenco>
-References: <1539946806-695-1-git-send-email-thuth@redhat.com>
-	<4837dc8a-c4a7-9bd8-649a-3b35b0fe20fa@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gDVWH-0005Xq-2r
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 10:12:54 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:38207)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gDVWG-0005Wj-OA
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 10:12:52 -0400
+Received: by mail-oi1-x244.google.com with SMTP id u197-v6so26896418oif.5
+	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 07:12:52 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4837dc8a-c4a7-9bd8-649a-3b35b0fe20fa@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] tests/migration-test: Disable s390x test
- when running with TCG
+In-Reply-To: <20181018200422.4358-1-ehabkost@redhat.com>
+References: <20181018200422.4358-1-ehabkost@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 19 Oct 2018 15:12:31 +0100
+Message-ID: <CAFEAcA9p0dLoNQy7kBdcXMz0HiMGEZTBX67Lq2SizTY3kgeksw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 00/45] Machine queue, 2018-10-18
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,20 +29,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Wei Huang <wei@redhat.com>, david@redhat.com, Cornelia Huck <cohuck@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Rob Herring <robh@kernel.org>, Libvirt <libvir-list@redhat.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Markus Armbruster <armbru@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Michael Walle <michael@walle.cc>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Alistair Francis <alistair@alistair23.me>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-ppc <qemu-ppc@nongnu.org>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Max Filippov <jcmvbkbc@gmail.com>
 
-On Fri, Oct 19, 2018 at 13:14:57 +0200, Laurent Vivier wrote:
-> On 19/10/2018 13:00, Thomas Huth wrote:
-> > The migration test for s390x sometimes hangs when running with TCG,
-> > similar to the problems that we have already observed with TCG for
-> > the ppc64 guests. Thus disable the s390x test when we are not running
-> > with KVM for now until the problem with TCG has been resolved.
-> > 
-> > Signed-off-by: Thomas Huth <thuth@redhat.com>
+On 18 October 2018 at 21:03, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> The following changes since commit 09558375a634e17cea6cfbfec883ac2376d2dc=
+7f:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-201=
+81016-1' into staging (2018-10-16 17:42:56 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/ehabkost/qemu.git tags/machine-next-pull-request
+>
+> for you to fetch changes up to 6d8e1bcc7dd5e819ce81e6a87fffe23e39c700cc:
+>
+>   numa: Clean up error reporting in parse_numa() (2018-10-17 16:33:40 -03=
+00)
+>
+> ----------------------------------------------------------------
+> Machine queue, 2018-10-18
+>
+> * sysbus init/realize cleanups
+>   (C=C3=A9dric Le Goater, Philippe Mathieu-Daud=C3=A9)
+> * memory-device refactoring (David Hildenbrand)
+> * -smp: deprecate incorrect CPUs topology (Igor Mammedov)
+> * -numa parsing cleanups (Markus Armbruster)
+> * Fix hostmem-file memory leak (Zhang Yi)
+> * Typo fix (Li Qiang)
+>
+> ----------------------------------------------------------------
+>
 
-Reviewed-by: Emilio G. Cota <cota@braap.org>
+Hi. This had some problems in merge testing, I'm afraid:
 
-Thanks!
+On aarch64 host, warnings running tests/cpu-plug-test for i386 and s390 tar=
+gets:
 
-		E.
+TEST: tests/cpu-plug-test... (pid=3D12602)
+  /i386/cpu-plug/pc-i440fx-3.0/cpu-add/1x3x2&maxcpus=3D12:
+qemu-system-i386: warning: Invalid CPU topology deprecated: sockets
+(1) * cores (3) * threads (2) !=3D maxcpus (12)
+OK
+  /i386/cpu-plug/pc-i440fx-3.0/device-add/1x3x2&maxcpus=3D12:
+qemu-system-i386: warning: Invalid CPU topology deprecated: sockets
+(1) * cores (3) * threads (2) !=3D maxcpus (12)
+OK
+  /i386/cpu-plug/pc-q35-3.0/cpu-add/1x3x2&maxcpus=3D12:
+qemu-system-i386: warning: Invalid CPU topology deprecated: sockets
+(1) * cores (3) * threads (2) !=3D maxcpus (12)
+OK
+  /i386/cpu-plug/pc-q35-3.0/device-add/1x3x2&maxcpus=3D12:
+qemu-system-i386: warning: Invalid CPU topology deprecated: sockets
+(1) * cores (3) * threads (2) !=3D maxcpus (12)
+OK
+  /arm/qom/n800:                                                       OK
+PASS: tests/cpu-plug-test
+[...]
+TEST: tests/cpu-plug-test... (pid=3D15040)
+  /s390x/cpu-plug/s390-ccw-virtio-3.1/cpu-add/1x3x1&maxcpus=3D6:
+qemu-system-s390x: warning: Invalid CPU topology deprecated: sockets
+(1) * cores (3) * threads (1) !=3D maxcpus (6)
+OK
+  /s390x/cpu-plug/s390-ccw-virtio-3.1/device-add/1x3x1&maxcpus=3D6:
+qemu-system-s390x: warning: Invalid CPU topology deprecated: sockets
+(1) * cores (3) * threads (1) !=3D maxcpus (6)
+OK
+  /s390x/cpu-plug/s390-ccw-virtio-3.0/cpu-add/1x3x1&maxcpus=3D6:
+qemu-system-s390x: warning: Invalid CPU topology deprecated: sockets
+(1) * cores (3) * threads (1) !=3D maxcpus (6)
+OK
+  /s390x/cpu-plug/s390-ccw-virtio-3.0/device-add/1x3x1&maxcpus=3D6:
+qemu-system-s390x: warning: Invalid CPU topology deprecated: sockets
+(1) * cores (3) * threads (1) !=3D maxcpus (6)
+OK
+PASS: tests/cpu-plug-test
+
+(plus similar ppc64, x86_64 targets)
+
+I see similar warnings on hosts SPARC, PPC64BE, S390, 32-bit Arm
+and x86 FreeBSD.
+
+I also got a build failure on one of my configs, but I think that
+is caused by some latent bug in our makefiles where we don't
+correctly rebuild x86_64-softmmu/config-devices.mak when a
+change is made to default-configs/i386-softmmu.mak -- doing a
+hand rm of the config-devices.mak fixed it.
+
+
+thanks
+-- PMM
