@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59191)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59258)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gDJFl-0004qM-Sz
+	(envelope-from <cota@braap.org>) id 1gDJFn-0004rk-4C
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:07:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gDJFj-0003LA-Pm
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:07:01 -0400
-Received: from out5-smtp.messagingengine.com ([66.111.4.29]:45691)
+	(envelope-from <cota@braap.org>) id 1gDJFl-0003NX-0Q
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:07:02 -0400
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:33497)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gDJFj-00033x-7M
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:06:59 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gDJFk-00034x-1F
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:07:00 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 18 Oct 2018 21:06:10 -0400
-Message-Id: <20181019010625.25294-42-cota@braap.org>
+Date: Thu, 18 Oct 2018 21:06:15 -0400
+Message-Id: <20181019010625.25294-47-cota@braap.org>
 In-Reply-To: <20181019010625.25294-1-cota@braap.org>
 References: <20181019010625.25294-1-cota@braap.org>
-Subject: [Qemu-devel] [RFC v3 41/56] moxie: convert to cpu_interrupt_request
+Subject: [Qemu-devel] [RFC v3 46/56] accel/tcg: convert to
+ cpu_interrupt_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,26 +25,108 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Anthony Green <green@moxielogic.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-Cc: Anthony Green <green@moxielogic.com>
+Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>
+Cc: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/moxie/cpu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ accel/tcg/cpu-exec.c      | 14 +++++++-------
+ accel/tcg/tcg-all.c       | 12 +++++++++---
+ accel/tcg/translate-all.c |  2 +-
+ 3 files changed, 17 insertions(+), 11 deletions(-)
 
-diff --git a/target/moxie/cpu.c b/target/moxie/cpu.c
-index 8d67eb6727..bad92cfc61 100644
---- a/target/moxie/cpu.c
-+++ b/target/moxie/cpu.c
-@@ -33,7 +33,7 @@ static void moxie_cpu_set_pc(CPUState *cs, vaddr value)
+diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+index f37c9b1e94..25027a1fc6 100644
+--- a/accel/tcg/cpu-exec.c
++++ b/accel/tcg/cpu-exec.c
+@@ -428,7 +428,7 @@ static inline bool cpu_handle_halt_locked(CPUState *cpu)
  
- static bool moxie_cpu_has_work(CPUState *cs)
+     if (cpu_halted(cpu)) {
+ #if defined(TARGET_I386) && !defined(CONFIG_USER_ONLY)
+-        if ((cpu->interrupt_request & CPU_INTERRUPT_POLL)
++        if ((cpu_interrupt_request(cpu) & CPU_INTERRUPT_POLL)
+             && replay_interrupt()) {
+             X86CPU *x86_cpu = X86_CPU(cpu);
+ 
+@@ -540,16 +540,16 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
+      */
+     atomic_mb_set(&cpu->icount_decr.u16.high, 0);
+ 
+-    if (unlikely(atomic_read(&cpu->interrupt_request))) {
++    if (unlikely(cpu_interrupt_request(cpu))) {
+         int interrupt_request;
+         qemu_mutex_lock_iothread();
+-        interrupt_request = cpu->interrupt_request;
++        interrupt_request = cpu_interrupt_request(cpu);
+         if (unlikely(cpu->singlestep_enabled & SSTEP_NOIRQ)) {
+             /* Mask out external interrupts for this step. */
+             interrupt_request &= ~CPU_INTERRUPT_SSTEP_MASK;
+         }
+         if (interrupt_request & CPU_INTERRUPT_DEBUG) {
+-            cpu->interrupt_request &= ~CPU_INTERRUPT_DEBUG;
++            cpu_reset_interrupt(cpu, CPU_INTERRUPT_DEBUG);
+             cpu->exception_index = EXCP_DEBUG;
+             qemu_mutex_unlock_iothread();
+             return true;
+@@ -558,7 +558,7 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
+             /* Do nothing */
+         } else if (interrupt_request & CPU_INTERRUPT_HALT) {
+             replay_interrupt();
+-            cpu->interrupt_request &= ~CPU_INTERRUPT_HALT;
++            cpu_reset_interrupt(cpu, CPU_INTERRUPT_HALT);
+             cpu_halted_set(cpu, 1);
+             cpu->exception_index = EXCP_HLT;
+             qemu_mutex_unlock_iothread();
+@@ -595,10 +595,10 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
+             }
+             /* The target hook may have updated the 'cpu->interrupt_request';
+              * reload the 'interrupt_request' value */
+-            interrupt_request = cpu->interrupt_request;
++            interrupt_request = cpu_interrupt_request(cpu);
+         }
+         if (interrupt_request & CPU_INTERRUPT_EXITTB) {
+-            cpu->interrupt_request &= ~CPU_INTERRUPT_EXITTB;
++            cpu_reset_interrupt(cpu, CPU_INTERRUPT_EXITTB);
+             /* ensure that no TB jump will be modified as
+                the program flow was changed */
+             *last_tb = NULL;
+diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
+index 3d25bdcc17..4e2fe70350 100644
+--- a/accel/tcg/tcg-all.c
++++ b/accel/tcg/tcg-all.c
+@@ -39,10 +39,16 @@ unsigned long tcg_tb_size;
+ static void tcg_handle_interrupt(CPUState *cpu, int mask)
  {
--    return cs->interrupt_request & CPU_INTERRUPT_HARD;
-+    return cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD;
+     int old_mask;
+-    g_assert(qemu_mutex_iothread_locked());
+ 
+-    old_mask = cpu->interrupt_request;
+-    cpu->interrupt_request |= mask;
++    if (!cpu_mutex_locked(cpu)) {
++        cpu_mutex_lock(cpu);
++        old_mask = cpu_interrupt_request(cpu);
++        cpu_interrupt_request_or(cpu, mask);
++        cpu_mutex_unlock(cpu);
++    } else {
++        old_mask = cpu_interrupt_request(cpu);
++        cpu_interrupt_request_or(cpu, mask);
++    }
+ 
+     /*
+      * If called from iothread context, wake the target cpu in
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index 356dcd0948..038d82fdb5 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -2340,7 +2340,7 @@ void dump_opcount_info(FILE *f, fprintf_function cpu_fprintf)
+ void cpu_interrupt(CPUState *cpu, int mask)
+ {
+     g_assert(qemu_mutex_iothread_locked());
+-    cpu->interrupt_request |= mask;
++    cpu_interrupt_request_or(cpu, mask);
+     atomic_set(&cpu->icount_decr.u16.high, -1);
  }
  
- static void moxie_cpu_reset(CPUState *s)
 -- 
 2.17.1
