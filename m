@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60376)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60394)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gDSWB-0002mg-0G
+	(envelope-from <thuth@redhat.com>) id 1gDSWB-0002nL-RC
 	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 07:00:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gDSW5-00058a-72
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 07:00:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34282)
+	(envelope-from <thuth@redhat.com>) id 1gDSW5-00059O-MO
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 07:00:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33132)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gDSW4-0004of-RO
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gDSW5-0004xX-8J
 	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 07:00:29 -0400
-Date: Fri, 19 Oct 2018 11:59:58 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181019105958.GK13722@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181018223501.21683-1-jusual@mail.ru>
-	<20181018223501.21683-3-jusual@mail.ru>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20181018223501.21683-3-jusual@mail.ru>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 2/3] chardev: Add websocket support
+From: Thomas Huth <thuth@redhat.com>
+Date: Fri, 19 Oct 2018 13:00:06 +0200
+Message-Id: <1539946806-695-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] tests/migration-test: Disable s390x test when
+ running with TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,32 +22,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Julia Suvorova <jusual@mail.ru>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, marcandre.lureau@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Steffen =?utf-8?B?R8O2cnR6?= <mail@steffen-goertz.de>
+To: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Peter Maydell <peter.maydell@linaro.org>, Wei Huang <wei@redhat.com>, david@redhat.com, Cornelia Huck <cohuck@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-On Fri, Oct 19, 2018 at 01:35:00AM +0300, Julia Suvorova wrote:
-> New option "websocket" added to allow using WebSocket protocol for
-> chardev socket backend.
-> Example:
->     -chardev socket,websocket,server,id=3D...
->=20
-> Signed-off-by: Julia Suvorova <jusual@mail.ru>
-> ---
->  chardev/char-socket.c | 64 ++++++++++++++++++++++++++++++++++++++-----
->  chardev/char.c        |  8 +++++-
->  qapi/char.json        |  3 ++
->  qemu-options.hx       | 13 +++++++--
->  4 files changed, 77 insertions(+), 11 deletions(-)
+The migration test for s390x sometimes hangs when running with TCG,
+similar to the problems that we have already observed with TCG for
+the ppc64 guests. Thus disable the s390x test when we are not running
+with KVM for now until the problem with TCG has been resolved.
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ tests/migration-test.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index b792025..06ca506 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -803,6 +803,22 @@ int main(int argc, char **argv)
+         return 0;
+     }
+ 
++    /*
++     * Similar to ppc64, s390x seems to be touchy with TCG, so disable it
++     * there until the problems are resolved
++     */
++    if (g_str_equal(qtest_get_arch(), "s390x")) {
++#if defined(HOST_S390X)
++        if (access("/dev/kvm", R_OK | W_OK)) {
++            g_test_message("Skipping test: kvm not available");
++            return 0;
++        }
++#else
++        g_test_message("Skipping test: Need s390x host to work properly");
++        return 0;
++#endif
++    }
++
+     tmpfs = mkdtemp(template);
+     if (!tmpfs) {
+         g_test_message("mkdtemp on path (%s): %s\n", template, strerror(errno));
+-- 
+1.8.3.1
