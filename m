@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gDLN3-0002MG-SR
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:22:43 -0400
+	(envelope-from <jasowang@redhat.com>) id 1gDLNA-0002N2-7r
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:22:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gDLN2-0002ZU-BZ
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:22:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60130)
+	(envelope-from <jasowang@redhat.com>) id 1gDLN8-0002hb-Id
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:22:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55792)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gDLN1-0002Xy-QP
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:22:40 -0400
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gDLN7-0002g7-OC
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:22:46 -0400
 From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 19 Oct 2018 11:22:02 +0800
-Message-Id: <1539919345-10703-4-git-send-email-jasowang@redhat.com>
+Date: Fri, 19 Oct 2018 11:22:04 +0800
+Message-Id: <1539919345-10703-6-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1539919345-10703-1-git-send-email-jasowang@redhat.com>
 References: <1539919345-10703-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL V2 03/26] colo-compare: use notifier to notify
- packets comparing result
+Subject: [Qemu-devel] [PULL V2 05/26] COLO: Add block replication into colo
+ process
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,127 +25,163 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, qemu-devel@nongnu.org
-Cc: Zhang Chen <zhangckid@gmail.com>, Zhang Chen <chen.zhang@intel.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Jason Wang <jasowang@redhat.com>
+Cc: Zhang Chen <zhangckid@gmail.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Zhang Chen <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>
 
 From: Zhang Chen <zhangckid@gmail.com>
 
-It's a good idea to use notifier to notify COLO frame of
-inconsistent packets comparing.
+Make sure master start block replication after slave's block
+replication started.
 
+Besides, we need to activate VM's blocks before goes into
+COLO state.
+
+Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
 Signed-off-by: Zhang Chen <zhangckid@gmail.com>
 Signed-off-by: Zhang Chen <chen.zhang@intel.com>
-Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- net/colo-compare.c | 37 ++++++++++++++++++++++++++-----------
- net/colo-compare.h |  2 ++
- 2 files changed, 28 insertions(+), 11 deletions(-)
+ migration/colo.c      | 43 +++++++++++++++++++++++++++++++++++++++++++
+ migration/migration.c | 10 ++++++++++
+ 2 files changed, 53 insertions(+)
 
-diff --git a/net/colo-compare.c b/net/colo-compare.c
-index 80e6532..3f7e240 100644
---- a/net/colo-compare.c
-+++ b/net/colo-compare.c
-@@ -29,6 +29,7 @@
- #include "sysemu/iothread.h"
+diff --git a/migration/colo.c b/migration/colo.c
+index f4bdfde..af04010 100644
+--- a/migration/colo.c
++++ b/migration/colo.c
+@@ -27,6 +27,7 @@
+ #include "replication.h"
  #include "net/colo-compare.h"
- #include "migration/colo.h"
-+#include "migration/migration.h"
+ #include "net/colo.h"
++#include "block/block.h"
  
- #define TYPE_COLO_COMPARE "colo-compare"
- #define COLO_COMPARE(obj) \
-@@ -37,6 +38,9 @@
- static QTAILQ_HEAD(, CompareState) net_compares =
-        QTAILQ_HEAD_INITIALIZER(net_compares);
- 
-+static NotifierList colo_compare_notifiers =
-+    NOTIFIER_LIST_INITIALIZER(colo_compare_notifiers);
-+
- #define COMPARE_READ_LEN_MAX NET_BUFSIZE
- #define MAX_QUEUE_SIZE 1024
- 
-@@ -326,6 +330,12 @@ static bool colo_mark_tcp_pkt(Packet *ppkt, Packet *spkt,
-     return false;
- }
- 
-+static void colo_compare_inconsistency_notify(void)
-+{
-+    notifier_list_notify(&colo_compare_notifiers,
-+                migrate_get_current());
-+}
-+
- static void colo_compare_tcp(CompareState *s, Connection *conn)
+ static bool vmstate_loading;
+ static Notifier packets_compare_notifier;
+@@ -56,6 +57,7 @@ static void secondary_vm_do_failover(void)
  {
-     Packet *ppkt = NULL, *spkt = NULL;
-@@ -427,10 +437,7 @@ sec:
-         qemu_hexdump((char *)spkt->data, stderr,
-                      "colo-compare spkt", spkt->size);
+     int old_state;
+     MigrationIncomingState *mis = migration_incoming_get_current();
++    Error *local_err = NULL;
  
--        /*
--         * colo_compare_inconsistent_notify();
--         * TODO: notice to checkpoint();
--         */
-+        colo_compare_inconsistency_notify();
-     }
- }
+     /* Can not do failover during the process of VM's loading VMstate, Or
+      * it will break the secondary VM.
+@@ -73,6 +75,11 @@ static void secondary_vm_do_failover(void)
+     migrate_set_state(&mis->state, MIGRATION_STATUS_COLO,
+                       MIGRATION_STATUS_COMPLETED);
  
-@@ -561,8 +568,18 @@ static int colo_old_packet_check_one(Packet *pkt, int64_t *check_time)
-     }
- }
- 
-+void colo_compare_register_notifier(Notifier *notify)
-+{
-+    notifier_list_add(&colo_compare_notifiers, notify);
-+}
++    replication_stop_all(true, &local_err);
++    if (local_err) {
++        error_report_err(local_err);
++    }
 +
-+void colo_compare_unregister_notifier(Notifier *notify)
-+{
-+    notifier_remove(notify);
-+}
-+
- static int colo_old_packet_check_one_conn(Connection *conn,
--                                          void *user_data)
-+                                           void *user_data)
+     if (!autostart) {
+         error_report("\"-S\" qemu option will be ignored in secondary side");
+         /* recover runstate to normal migration finish state */
+@@ -110,6 +117,7 @@ static void primary_vm_do_failover(void)
  {
-     GList *result = NULL;
-     int64_t check_time = REGULAR_PACKET_CHECK_MS;
-@@ -573,10 +590,7 @@ static int colo_old_packet_check_one_conn(Connection *conn,
+     MigrationState *s = migrate_get_current();
+     int old_state;
++    Error *local_err = NULL;
  
-     if (result) {
-         /* Do checkpoint will flush old packet */
--        /*
--         * TODO: Notify colo frame to do checkpoint.
--         * colo_compare_inconsistent_notify();
--         */
-+        colo_compare_inconsistency_notify();
-         return 0;
+     migrate_set_state(&s->state, MIGRATION_STATUS_COLO,
+                       MIGRATION_STATUS_COMPLETED);
+@@ -133,6 +141,13 @@ static void primary_vm_do_failover(void)
+                      FailoverStatus_str(old_state));
+         return;
      }
++
++    replication_stop_all(true, &local_err);
++    if (local_err) {
++        error_report_err(local_err);
++        local_err = NULL;
++    }
++
+     /* Notify COLO thread that failover work is finished */
+     qemu_sem_post(&s->colo_exit_sem);
+ }
+@@ -356,6 +371,11 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
+     qemu_savevm_state_header(fb);
+     qemu_savevm_state_setup(fb);
+     qemu_mutex_lock_iothread();
++    replication_do_checkpoint_all(&local_err);
++    if (local_err) {
++        qemu_mutex_unlock_iothread();
++        goto out;
++    }
+     qemu_savevm_state_complete_precopy(fb, false, false);
+     qemu_mutex_unlock_iothread();
  
-@@ -620,11 +634,12 @@ static void colo_compare_packet(CompareState *s, Connection *conn,
-             /*
-              * If one packet arrive late, the secondary_list or
-              * primary_list will be empty, so we can't compare it
--             * until next comparison.
-+             * until next comparison. If the packets in the list are
-+             * timeout, it will trigger a checkpoint request.
-              */
-             trace_colo_compare_main("packet different");
-             g_queue_push_head(&conn->primary_list, pkt);
--            /* TODO: colo_notify_checkpoint();*/
-+            colo_compare_inconsistency_notify();
-             break;
+@@ -446,6 +466,12 @@ static void colo_process_checkpoint(MigrationState *s)
+     object_unref(OBJECT(bioc));
+ 
+     qemu_mutex_lock_iothread();
++    replication_start_all(REPLICATION_MODE_PRIMARY, &local_err);
++    if (local_err) {
++        qemu_mutex_unlock_iothread();
++        goto out;
++    }
++
+     vm_start();
+     qemu_mutex_unlock_iothread();
+     trace_colo_vm_state_change("stop", "run");
+@@ -586,6 +612,11 @@ void *colo_process_incoming_thread(void *opaque)
+     object_unref(OBJECT(bioc));
+ 
+     qemu_mutex_lock_iothread();
++    replication_start_all(REPLICATION_MODE_SECONDARY, &local_err);
++    if (local_err) {
++        qemu_mutex_unlock_iothread();
++        goto out;
++    }
+     vm_start();
+     trace_colo_vm_state_change("stop", "run");
+     qemu_mutex_unlock_iothread();
+@@ -666,6 +697,18 @@ void *colo_process_incoming_thread(void *opaque)
+             goto out;
          }
-     }
-diff --git a/net/colo-compare.h b/net/colo-compare.h
-index 1b1ce76..22ddd51 100644
---- a/net/colo-compare.h
-+++ b/net/colo-compare.h
-@@ -18,5 +18,7 @@
- #define QEMU_COLO_COMPARE_H
  
- void colo_notify_compares_event(void *opaque, int event, Error **errp);
-+void colo_compare_register_notifier(Notifier *notify);
-+void colo_compare_unregister_notifier(Notifier *notify);
++        replication_get_error_all(&local_err);
++        if (local_err) {
++            qemu_mutex_unlock_iothread();
++            goto out;
++        }
++        /* discard colo disk buffer */
++        replication_do_checkpoint_all(&local_err);
++        if (local_err) {
++            qemu_mutex_unlock_iothread();
++            goto out;
++        }
++
+         vmstate_loading = false;
+         vm_start();
+         trace_colo_vm_state_change("stop", "run");
+diff --git a/migration/migration.c b/migration/migration.c
+index 32ce058..bf5fcd1 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -386,6 +386,7 @@ static void process_incoming_migration_co(void *opaque)
+     MigrationIncomingState *mis = migration_incoming_get_current();
+     PostcopyState ps;
+     int ret;
++    Error *local_err = NULL;
  
- #endif /* QEMU_COLO_COMPARE_H */
+     assert(mis->from_src_file);
+     mis->migration_incoming_co = qemu_coroutine_self();
+@@ -418,6 +419,15 @@ static void process_incoming_migration_co(void *opaque)
+ 
+     /* we get COLO info, and know if we are in COLO mode */
+     if (!ret && migration_incoming_enable_colo()) {
++        /* Make sure all file formats flush their mutable metadata */
++        bdrv_invalidate_cache_all(&local_err);
++        if (local_err) {
++            migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
++                    MIGRATION_STATUS_FAILED);
++            error_report_err(local_err);
++            exit(EXIT_FAILURE);
++        }
++
+         qemu_thread_create(&mis->colo_incoming_thread, "COLO incoming",
+              colo_process_incoming_thread, mis, QEMU_THREAD_JOINABLE);
+         mis->have_colo_incoming_thread = true;
 -- 
 2.5.0
