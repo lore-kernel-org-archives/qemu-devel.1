@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33778)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38894)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gDW6n-00027S-Lp
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 10:50:38 -0400
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gDWQG-000110-BD
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 11:10:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gDW6m-0001Su-Ox
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 10:50:37 -0400
-Date: Fri, 19 Oct 2018 10:50:18 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20181019145018.GB7279@flamenco>
-References: <20181019010625.25294-1-cota@braap.org>
-	<f7067d72-3b2a-9e6e-4636-f18ac1cf5202@redhat.com>
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gDWQA-0006La-W9
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 11:10:44 -0400
+Received: from mail.uni-paderborn.de ([131.234.142.9]:45932)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
+	id 1gDWQA-0006JN-N5
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 11:10:38 -0400
+References: <20181012173047.25420-1-kbastian@mail.uni-paderborn.de>
+	<20181012173047.25420-18-kbastian@mail.uni-paderborn.de>
+	<2826c8b3-fcaf-d646-1153-801cc93eebc8@linaro.org>
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Message-ID: <5bae16da-c534-b812-5810-f4a475f9c86b@mail.uni-paderborn.de>
+Date: Fri, 19 Oct 2018 17:10:36 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f7067d72-3b2a-9e6e-4636-f18ac1cf5202@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v3 0/56] per-CPU locks
+In-Reply-To: <2826c8b3-fcaf-d646-1153-801cc93eebc8@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US-large
+Subject: Re: [Qemu-devel] [PATCH 17/28] target/riscv: Convert quadrant 2 of
+ RVXC insns to decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,37 +31,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>, Alexander Graf <agraf@suse.de>, Alistair Francis <alistair23@gmail.com>, Andrzej Zaborowski <balrogg@gmail.com>, Anthony Green <green@moxielogic.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Chris Wulff <crwulff@gmail.com>, Cornelia Huck <cohuck@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, David Hildenbrand <david@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Fabien Chouteau <chouteau@adacore.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, James Hogan <jhogan@kernel.org>, Laurent Vivier <laurent@vivier.eu>, Marek Vasut <marex@denx.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Max Filippov <jcmvbkbc@gmail.com>, Michael Clark <mjc@sifive.com>, Michael Walle <michael@walle.cc>, Palmer Dabbelt <palmer@sifive.com>, Pavel Dovgalyuk <dovgaluk@ispras.ru>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Stafford Horne <shorne@gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>, mjc@sifive.com, palmer@sifive.com, sagark@eecs.berkeley.edu
+Cc: peer.adelt@hni.uni-paderborn.de, Alistair.Francis@wdc.com, qemu-devel@nongnu.org
 
-On Fri, Oct 19, 2018 at 08:59:24 +0200, Paolo Bonzini wrote:
-> On 19/10/2018 03:05, Emilio G. Cota wrote:
-> > I'm calling this series a v3 because it supersedes the two series
-> > I previously sent about using atomics for interrupt_request:
-> >   https://lists.gnu.org/archive/html/qemu-devel/2018-09/msg02013.html
-> > The approach in that series cannot work reliably; using (locked) atomics
-> > to set interrupt_request but not using (locked) atomics to read it
-> > can lead to missed updates.
-> 
-> The idea here was that changes to protected fields are all followed by
-> kick.  That may not have been the case, granted, but I wonder if the
-> plan is unworkable.
 
-I suspect that the cpu->interrupt_request+kick mechanism is not the issue,
-otherwise master should not work--we do atomic_read(cpu->interrupt_request)
-and only if that read != 0 we take the BQL.
+On 10/13/18 9:34 PM, Richard Henderson wrote:
+> On 10/12/18 10:30 AM, Bastian Koppelmann wrote:
+>> +@c_flwsp_ldsp   ... .  ..... ..... .. &c_flwsp_ldsp uimm_flwsp=%uimm_6bit_lw \
+>> +    uimm_ldsp=%uimm_6bit_ld %rd
+>> +@c_fswsp_sdsp   ... .  ..... ..... .. &c_fswsp_sdsp uimm_fswsp=%uimm_6bit_sw \
+>> +    uimm_sdsp=%uimm_6bit_sd rs2=%rs2_5
+> I'm not especially keen about decoding the same bits twice.
+>
+> I wonder if it's better to call the proper extract_foo function
+> within the trans_ function like you do elsewhere.  Written as
+>
+> c_flwsp_ldsp	011 -  ----- ----- 10
 
-My guess is that the problem is with other reads of cpu->interrupt_request,
-e.g. those in cpu_has_work. Currently those reads happen with the
-BQL held, and updates to cpu->interrupt_request take the BQL. If we drop
-the BQL from the setters to instead use locked atomics (like in the
-aforementioned series), those BQL-protected readers might miss updates.
 
-Given that we need a per-CPU lock anyway to remove the BQL from the
-CPU loop, extending this lock to protect cpu->interrupt_request is
-a simple solution that keeps the current logic and allows for
-greater scalability.
+Hmm, Do you mean split the formats up into:
 
-Thanks,
+@c_fswsp ... . ..... ..... .. &fswsp_sdsp uimm=%uimm_6bit_sw
 
-		Emilio
+and
+
+@c_sdsp ... . ..... ..... .. &fswsp_sdsp uimm=%uimm_6bit_sd rs2=%rs2_5
+
+
+And then call extract_c_sdsp and extract_c_fswsp in each of the 
+TARGET_RVX cases. However then we end up with unused functions in either 
+TARGET_RV32 and TARGET_RV64.
+
+I don't think its worth it to go through all that trouble for a small 
+optimization.
+
+
+Cheers,
+
+Bastian
