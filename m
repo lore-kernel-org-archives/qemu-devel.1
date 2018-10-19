@@ -1,21 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36902)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36865)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gDLNy-00033P-0c
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:39 -0400
+	(envelope-from <jasowang@redhat.com>) id 1gDLNx-00032Z-59
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gDLNx-0003I4-18
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58188)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gDLNw-00035K-C6
+	(envelope-from <jasowang@redhat.com>) id 1gDLNw-0003F2-2t
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:36 -0400
 From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 19 Oct 2018 11:22:18 +0800
-Message-Id: <1539919345-10703-20-git-send-email-jasowang@redhat.com>
+Date: Fri, 19 Oct 2018 11:22:19 +0800
+Message-Id: <1539919345-10703-21-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1539919345-10703-1-git-send-email-jasowang@redhat.com>
 References: <1539919345-10703-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL V2 19/26] docs: Add COLO status diagram to
- COLO-FT.txt
+Subject: [Qemu-devel] [PULL V2 20/26] clean up callback when del virtqueue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,64 +20,43 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, qemu-devel@nongnu.org
-Cc: Zhang Chen <chen.zhang@intel.com>, Zhang Chen <zhangckid@gmail.com>, Jason Wang <jasowang@redhat.com>
+Cc: liujunjie <liujunjie23@huawei.com>, qemu-stable@nongnu.org, Jason Wang <jasowang@redhat.com>
 
-From: Zhang Chen <chen.zhang@intel.com>
+From: liujunjie <liujunjie23@huawei.com>
 
-This diagram make user better understand COLO.
-Suggested by Markus Armbruster.
+Before, we did not clear callback like handle_output when delete
+the virtqueue which may result be segmentfault.
+The scene is as follows:
+1. Start a vm with multiqueue vhost-net,
+2. then we write VIRTIO_PCI_GUEST_FEATURES in PCI configuration to
+triger multiqueue disable in this vm which will delete the virtqueue.
+In this step, the tx_bh is deleted but the callback virtio_net_handle_tx_bh
+still exist.
+3. Finally, we write VIRTIO_PCI_QUEUE_NOTIFY in PCI configuration to
+notify the deleted virtqueue. In this way, virtio_net_handle_tx_bh
+will be called and qemu will be crashed.
 
-Signed-off-by: Zhang Chen <zhangckid@gmail.com>
-Signed-off-by: Zhang Chen <chen.zhang@intel.com>
+Although the way described above is uncommon, we had better reinforce it.
+
+CC: qemu-stable@nongnu.org
+Signed-off-by: liujunjie <liujunjie23@huawei.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- docs/COLO-FT.txt | 34 ++++++++++++++++++++++++++++++++++
- 1 file changed, 34 insertions(+)
+ hw/virtio/virtio.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/docs/COLO-FT.txt b/docs/COLO-FT.txt
-index 70cfb9c..6302469 100644
---- a/docs/COLO-FT.txt
-+++ b/docs/COLO-FT.txt
-@@ -110,6 +110,40 @@ Note:
- HeartBeat has not been implemented yet, so you need to trigger failover process
- by using 'x-colo-lost-heartbeat' command.
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index 4e61944..4136d23 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -1611,6 +1611,8 @@ void virtio_del_queue(VirtIODevice *vdev, int n)
  
-+== COLO operation status ==
-+
-++-----------------+
-+|                 |
-+|    Start COLO   |
-+|                 |
-++--------+--------+
-+         |
-+         |  Main qmp command:
-+         |  migrate-set-capabilities with x-colo
-+         |  migrate
-+         |
-+         v
-++--------+--------+
-+|                 |
-+|  COLO running   |
-+|                 |
-++--------+--------+
-+         |
-+         |  Main qmp command:
-+         |  x-colo-lost-heartbeat
-+         |  or
-+         |  some error happened
-+         v
-++--------+--------+
-+|                 |  send qmp event:
-+|  COLO failover  |  COLO_EXIT
-+|                 |
-++-----------------+
-+
-+COLO use the qmp command to switch and report operation status.
-+The diagram just shows the main qmp command, you can get the detail
-+in test procedure.
-+
- == Test procedure ==
- 1. Startup qemu
- Primary:
+     vdev->vq[n].vring.num = 0;
+     vdev->vq[n].vring.num_default = 0;
++    vdev->vq[n].handle_output = NULL;
++    vdev->vq[n].handle_aio_output = NULL;
+ }
+ 
+ static void virtio_set_isr(VirtIODevice *vdev, int value)
 -- 
 2.5.0
