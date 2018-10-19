@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38416)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38846)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gDQQQ-00089b-Ea
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 04:46:31 -0400
+	(envelope-from <mreitz@redhat.com>) id 1gDQR3-0008RL-4P
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 04:47:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gDQQN-0001E0-3m
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 04:46:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50526)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gDQQM-0000xh-Nw
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 04:46:26 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8A2F330832D7
-	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 08:46:21 +0000 (UTC)
-References: <20181016135027.9856-1-pbonzini@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <2b1519d7-ef3b-fca6-398d-294bd63f2a54@redhat.com>
-Date: Fri, 19 Oct 2018 10:46:19 +0200
+	(envelope-from <mreitz@redhat.com>) id 1gDQR1-0002sD-UP
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 04:47:08 -0400
+References: <20181015141453.32632-1-mreitz@redhat.com>
+	<20181015141453.32632-4-mreitz@redhat.com>
+	<20181015195343.GA31060@habkost.net>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <9b998c3a-dce4-9ba1-35e7-90466605a4b9@redhat.com>
+Date: Fri, 19 Oct 2018 10:46:53 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181016135027.9856-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] es1370: more fixes for ADC_FRAMEADR and
- ADC_FRAMECNT
+In-Reply-To: <20181015195343.GA31060@habkost.net>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="jMlJQzfQYpeRZPC7WXQc8JAR7JXxh7j1s"
+Subject: Re: [Qemu-devel] [PATCH 3/9] iotests: Use Python byte strings where
+ appropriate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,55 +26,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
-On 2018-10-16 15:50, Paolo Bonzini wrote:
-> They are not consecutive with DAC1_FRAME* and DAC2_FRAME*; Coverity
-> still complains about es1370_read, while es1370_write was fixed in
-> commit cf9270e5220671f49cc238deaf6136669cc07ae1.
-> 
-> Fixes: 154c1d1f960c5147a3f8ef00907504112f271cd8
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  hw/audio/es1370.c | 10 ++++++++--
->  1 file changed, 8 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/audio/es1370.c b/hw/audio/es1370.c
-> index 4f980a598b..aa5a8d728c 100644
-> --- a/hw/audio/es1370.c
-> +++ b/hw/audio/es1370.c
-> @@ -585,9 +585,12 @@ static uint64_t es1370_read(void *opaque, hwaddr addr, unsigned size)
->  #endif
->          break;
->  
-> +    case ES1370_REG_ADC_FRAMECNT:
-> +        d += 2;
-> +        goto framecnt;
->      case ES1370_REG_DAC1_FRAMECNT:
->      case ES1370_REG_DAC2_FRAMECNT:
-> -    case ES1370_REG_ADC_FRAMECNT:
-> +    framecnt:
->          d += (addr - ES1370_REG_DAC1_FRAMECNT) >> 3;
->          val = d->frame_cnt;
->  #ifdef DEBUG_ES1370
-> @@ -602,9 +605,12 @@ static uint64_t es1370_read(void *opaque, hwaddr addr, unsigned size)
->  #endif
->          break;
->  
-> +    case ES1370_REG_ADC_FRAMEADR:
-> +        d += 2;
-> +        goto frameadr;
->      case ES1370_REG_DAC1_FRAMEADR:
->      case ES1370_REG_DAC2_FRAMEADR:
-> -    case ES1370_REG_ADC_FRAMEADR:
-> +    frameadr:
->          d += (addr - ES1370_REG_DAC1_FRAMEADR) >> 3;
->          val = d->frame_addr;
->          break;
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--jMlJQzfQYpeRZPC7WXQc8JAR7JXxh7j1s
+From: Max Reitz <mreitz@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Kevin Wolf <kwolf@redhat.com>, Cleber Rosa <crosa@redhat.com>
+Message-ID: <9b998c3a-dce4-9ba1-35e7-90466605a4b9@redhat.com>
+Subject: Re: [PATCH 3/9] iotests: Use Python byte strings where appropriate
+References: <20181015141453.32632-1-mreitz@redhat.com>
+ <20181015141453.32632-4-mreitz@redhat.com>
+ <20181015195343.GA31060@habkost.net>
+In-Reply-To: <20181015195343.GA31060@habkost.net>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-It's in a pull request already, so this is likely too late: But for the
-next time, could you maybe rather use a "/* fall through */" comment
-instead of a goto? That looks less ugly.
+On 15.10.18 21:53, Eduardo Habkost wrote:
+> On Mon, Oct 15, 2018 at 04:14:47PM +0200, Max Reitz wrote:
+>> Since byte strings are no longer the default in Python 3, we have to
+>> explicitly use them where we need to, which is mostly when working wit=
+h
+>> structures.  It also means that we need to open a file in binary mode
+>> when we want to use structures.
+>>
+>> On the other hand, we have to accomodate for the fact that some
+>> functions (still) work with byte strings but we want to use unicode
+>> strings (in Python 3 at least, and it does not matter in Python 2).
+>> This includes base64 encoding, but it is most notable when working wit=
+h
+>> the subprocess module: Either we set univeral_newlines to True so that=
 
- Thomas
+>> the default streams are opened in text mode (hence this parameter is
+>> aliased as "text" as of 3.7), or, if that is not possible, we have to
+>> decode the output to a normal string.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> [...]
+>> diff --git a/tests/qemu-iotests/149 b/tests/qemu-iotests/149
+>> index 9e0cad76f9..1225334cb8 100755
+>> --- a/tests/qemu-iotests/149
+>> +++ b/tests/qemu-iotests/149
+>> @@ -79,7 +79,7 @@ class LUKSConfig(object):
+>> =20
+>>      def first_password_base64(self):
+>>          (pw, slot) =3D self.first_password()
+>> -        return base64.b64encode(pw)
+>> +        return base64.b64encode(pw.encode('ascii')).decode('ascii')
+>=20
+> Would we want to have a test case for non-ascii passwords in the
+> future?  In that case you would probably need to make
+> self.passwords[] contain byte strings instead of text.
+
+I remember someone once providing a non-ASCII initial password to some
+system for me.  I remember the system was running Windows, and I was
+running Linux, so the system expected ISO-8859-1, while I was sending UTF=
+-8.
+
+The moral of the story is that you probably don't want non-ASCII
+passwords.  And if we do want to test them, well, we'll need to decide
+on an encoding then (or use byte strings, as you suggest).
+
+> In either case, using 'ascii' as the encoding everywhere will
+> ensure the code will not try to be too smart about string
+> encodings if that happens.  I like that.
+>=20
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+
+Thanks for reviewing!
+
+Max
+
+
+--jMlJQzfQYpeRZPC7WXQc8JAR7JXxh7j1s
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlvJmf0ACgkQ9AfbAGHV
+z0DJ+Qf8DSD6c+SZOnH7eDNa/UjBgLemkvU0OVlSsTsWC8WmggFb7/qfxqPDu8m8
+ruCxqZNjxPl6tHWtWVHqwFyUwQdNjscHe8mUmxba98yYDhUFC3bWWXOgJ/nc7X9R
+vDhz6x4Ft/U+tMAAzQVNxBHZ1G5Cw8OCNQAVtuwj3dxYO7ES0WPVCeDYzKmeb9sU
+mZtQjHKaysW7kBBDjLbrvCXf2qerGJRnTiPpOi/+rWVaRoZ1gQ4Uy4h45k6m7GQM
+Lhai8Icmk7aRj+tOVvi3Ppow3PiT2qqTJLGXhPw5b+G/wy50Est7i5jPM+8uif7i
+dtRe9w7/gfxnK2S1AOzJoojpJgRJ7A==
+=wcQX
+-----END PGP SIGNATURE-----
+
+--jMlJQzfQYpeRZPC7WXQc8JAR7JXxh7j1s--
