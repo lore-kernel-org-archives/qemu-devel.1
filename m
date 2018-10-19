@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38036)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38445)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gDObB-0005x8-PK
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 02:49:33 -0400
+	(envelope-from <kraxel@redhat.com>) id 1gDObY-00068d-1P
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 02:49:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gDOau-000828-QS
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 02:49:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42506)
+	(envelope-from <kraxel@redhat.com>) id 1gDObT-00007G-Ap
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 02:49:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52734)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gDOap-0007vT-Gy
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 02:49:10 -0400
-References: <cover.1539860473.git.artem.k.pisarenko@gmail.com>
-	<3a396555c19468ce89788cc6deabbfef4ab56035.1539860473.git.artem.k.pisarenko@gmail.com>
-	<002201d46770$4affc060$e0ff4120$@ru>
-	<CANzW0mui0aaCWH0iQT+KxHygmE1TSh9Xko_Qyrwkg=6kUnM_Eg@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <28e6277d-cf84-c4a4-8916-1c7168d64a8e@redhat.com>
-Date: Fri, 19 Oct 2018 08:48:58 +0200
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gDObS-000057-Mj
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 02:49:46 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B31C390C78
+	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 06:49:45 +0000 (UTC)
+Date: Fri, 19 Oct 2018 08:49:44 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20181019064944.wcann4ysqcg65z5t@sirius.home.kraxel.org>
+References: <20181017082702.5581-1-armbru@redhat.com>
+	<20181017082702.5581-26-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CANzW0mui0aaCWH0iQT+KxHygmE1TSh9Xko_Qyrwkg=6kUnM_Eg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 4/4] Optimize record/replay
- checkpointing for all clocks it applies to
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181017082702.5581-26-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 25/38] ui/keymaps: Fix handling of
+ erroneous include files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,23 +34,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Artem Pisarenko <artem.k.pisarenko@gmail.com>, Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Cc: qemu-devel@nongnu.org, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 19/10/2018 08:30, Artem Pisarenko wrote:
->> This is wrong at least for QEMU_CLOCK_HOST.
->> =E2=80=A6
->> Reading the host clock here is not protected by the checkpoint.
->> Therefore it may incur the inconsistency when replaying the execution.
->=20
-> That's why I didn't like idea of this patch and asked for any possible
-> side effects beforehand. So, here is one.
-> I have no idea how to fix it properly and would like to recall this
-> particular patch from these series (remember, it doesn't match series
-> goal). Lets leave this patch/issue for separate resolution, although I'=
-m
-> not very interested in it.
+On Wed, Oct 17, 2018 at 10:26:49AM +0200, Markus Armbruster wrote:
+> While errors in the keyboard layout named with -k are fatal, errors in
+> included files are reported, but otherwise ignored:
+> 
+>     $ cat worst
+>     include bad
+>     include worse
+>     $ ls -l bad worse
+>     ls: cannot access 'bad': No such file or directory
+>     ls: cannot access 'worse': No such file or directory
+>     $ qemu-system-x86_64 -nodefaults -S -monitor stdio -display vnc=:0 -k bad
+>     QEMU 3.0.50 monitor - type 'help' for more information
+>     (qemu) Could not read keymap file: 'bad'
+>     $ qemu-system-x86_64 -nodefaults -S -monitor stdio -display vnc=:0 -k worst
+>     QEMU 3.0.50 monitor - type 'help' for more information
+>     (qemu) Could not read keymap file: 'bad'
+>     Could not read keymap file: 'worse'
+> 
+> Fix that.
+> 
+> Note that parse_keyboard_layout() allocates the keymap, except when
+> it's parsing an include file.  To keep error handling simple, move the
+> memory management to its caller init_keyboard_layout().
+> 
+> Cc: Gerd Hoffmann <kraxel@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-Yup, I'll send v2 of the pull request with this patch removed.
-
-Paolo
+Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
