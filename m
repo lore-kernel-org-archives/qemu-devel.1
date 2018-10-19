@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52571)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gDVby-0005Fa-Sa
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 10:18:47 -0400
+	(envelope-from <eblake@redhat.com>) id 1gDVeM-0006Yi-6C
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 10:21:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gDVby-00010F-57
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 10:18:46 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:37703)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gDVbx-0000zM-M4
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 10:18:46 -0400
-Received: by mail-oi1-x244.google.com with SMTP id e17-v6so26917925oib.4
-	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 07:18:45 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1gDVeL-0006yg-6a
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 10:21:14 -0400
+References: <20181015141453.32632-1-mreitz@redhat.com>
+	<20181015141453.32632-2-mreitz@redhat.com>
+	<b208ed10-5763-23a1-c576-23aaa4fa22b2@redhat.com>
+	<ed466764-8fdf-0737-5b8d-a469ee04bb06@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <9a6fdd27-14dd-f26f-3137-8a741bd7cd16@redhat.com>
+Date: Fri, 19 Oct 2018 09:21:05 -0500
 MIME-Version: 1.0
-In-Reply-To: <20181017213932.19973-4-edgar.iglesias@gmail.com>
-References: <20181017213932.19973-1-edgar.iglesias@gmail.com>
-	<20181017213932.19973-4-edgar.iglesias@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 19 Oct 2018 15:18:24 +0100
-Message-ID: <CAFEAcA9Dd3=52zReFVMgitYFeQsRA=guYsVMxy=0zHsLJ_+z_g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 3/4] hw/arm: versal: Add a model of
- Xilinx Versal SoC
+In-Reply-To: <ed466764-8fdf-0737-5b8d-a469ee04bb06@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/9] iotests: Make nbd-fault-injector flush
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,29 +26,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, KONRAD Frederic <frederic.konrad@adacore.com>, Alistair Francis <alistair@alistair23.me>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Francisco Iglesias <frasse.iglesias@gmail.com>, figlesia@xilinx.com, Stefano Stabellini <sstabellini@kernel.org>, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>, Edgar Iglesias <edgar.iglesias@xilinx.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-On 17 October 2018 at 22:39, Edgar E. Iglesias <edgar.iglesias@gmail.com> wrote:
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
->
-> Add a model of Xilinx Versal SoC.
->
-> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-> ---
->  default-configs/aarch64-softmmu.mak |   1 +
->  hw/arm/Makefile.objs                |   1 +
->  hw/arm/xlnx-versal.c                | 324 ++++++++++++++++++++++++++++
->  include/hw/arm/xlnx-versal.h        | 122 +++++++++++
->  4 files changed, 448 insertions(+)
->  create mode 100644 hw/arm/xlnx-versal.c
->  create mode 100644 include/hw/arm/xlnx-versal.h
+On 10/19/18 4:48 AM, Max Reitz wrote:
+> On 16.10.18 20:07, Eric Blake wrote:
+>> On 10/15/18 9:14 AM, Max Reitz wrote:
+>>> When closing a connection, make the nbd-fault-injector flush the sock=
+et.
+>>> Without this, the output is a bit unreliable with Python 3.
+>>>
+>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>>> ---
+>>>  =C2=A0 tests/qemu-iotests/083.out=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 9 +++++++++
+>>>  =C2=A0 tests/qemu-iotests/nbd-fault-injector.py | 1 +
+>>>  =C2=A0 2 files changed, 10 insertions(+)
+>>
+>> I already had a complaint that the error message in 083.out should NOT
+>> be printing a message
+>=20
+> You mean the NBD server itself, right?
 
-> +    if (!kvm_irqchip_in_kernel()) {
-> +        qdev_prop_set_bit(gicdev, "has-security-extensions", true);
-> +    }
+Yes, the NBD server should not be printing the redundant error messages=20
+that 083.out exposes.
 
-Do you really support KVM for this board/SoC ?
+>=20
+>>                        (whether the server is python 2 and auto-flushe=
+s,
+>> or python 3 and needs an explicit flush, the message itself is
+>> pointless, and the test is racy as a result).=C2=A0 We may need to rev=
+isit
+>> this patch when that thread is resolved.
+>>
+>> https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg01041.html
+>=20
+> Well, it's not like the flush hurts either way. :-)
 
-thanks
--- PMM
+True. On that grounds:
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
