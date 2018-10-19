@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42989)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gDNDE-0003lZ-TK
+	(envelope-from <liq3ea@gmail.com>) id 1gDNDE-0003lQ-NL
 	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 01:20:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gDNDD-0000Fw-PE
+	(envelope-from <liq3ea@gmail.com>) id 1gDNDD-0000FT-GD
 	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 01:20:40 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:37032)
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:36527)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1gDNDD-0008WP-DD
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1gDNDD-0008Qq-4L
 	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 01:20:39 -0400
-Received: by mail-pl1-x643.google.com with SMTP id bh10-v6so1967509plb.4
-	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 22:20:33 -0700 (PDT)
+Received: by mail-pl1-x642.google.com with SMTP id y11-v6so15348814plt.3
+	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 22:20:27 -0700 (PDT)
 From: Li Qiang <liq3ea@gmail.com>
-Date: Thu, 18 Oct 2018 22:20:08 -0700
-Message-Id: <1539926412-21831-4-git-send-email-liq3ea@gmail.com>
+Date: Thu, 18 Oct 2018 22:20:06 -0700
+Message-Id: <1539926412-21831-2-git-send-email-liq3ea@gmail.com>
 In-Reply-To: <1539926412-21831-1-git-send-email-liq3ea@gmail.com>
 References: <1539926412-21831-1-git-send-email-liq3ea@gmail.com>
-Subject: [Qemu-devel] [PATCH 3/7] vfio: drop TYPE_FOO MACRO in
- VMStateDescription
+Subject: [Qemu-devel] [PATCH 1/7] vfio-pci: make "vfio-pci-nohotplug" as
+ MACRO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,84 +29,34 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: alex.williamson@redhat.com
 Cc: qemu-devel@nongnu.org, philmd@redhat.com, Li Qiang <liq3ea@gmail.com>
 
-As the vmstate structure names aren't related with
-the QOM type names.
-Per Peter's mail:
--->https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg02175.html
-
 Signed-off-by: Li Qiang <liq3ea@gmail.com>
 ---
- hw/vfio/amd-xgbe.c      | 2 +-
- hw/vfio/ap.c            | 2 +-
- hw/vfio/calxeda-xgmac.c | 2 +-
- hw/vfio/ccw.c           | 2 +-
- hw/vfio/platform.c      | 2 +-
- 5 files changed, 5 insertions(+), 5 deletions(-)
+ hw/vfio/pci.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/hw/vfio/amd-xgbe.c b/hw/vfio/amd-xgbe.c
-index ee64a3b..1b06c0f 100644
---- a/hw/vfio/amd-xgbe.c
-+++ b/hw/vfio/amd-xgbe.c
-@@ -26,7 +26,7 @@ static void amd_xgbe_realize(DeviceState *dev, Error **errp)
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 8b73582..1f05b57 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -40,6 +40,8 @@
+ #define TYPE_VFIO_PCI "vfio-pci"
+ #define PCI_VFIO(obj)    OBJECT_CHECK(VFIOPCIDevice, obj, TYPE_VFIO_PCI)
+ 
++#define TYPE_VFIO_PCI_NOHOTPLUG "vfio-pci-nohotplug"
++
+ static void vfio_disable_interrupts(VFIOPCIDevice *vdev);
+ static void vfio_mmap_set_enabled(VFIOPCIDevice *vdev, bool enabled);
+ 
+@@ -3277,8 +3279,8 @@ static void vfio_pci_nohotplug_dev_class_init(ObjectClass *klass, void *data)
  }
  
- static const VMStateDescription vfio_platform_amd_xgbe_vmstate = {
--    .name = TYPE_VFIO_AMD_XGBE,
-+    .name = "vfio-amd-xgbe",
-     .unmigratable = 1,
+ static const TypeInfo vfio_pci_nohotplug_dev_info = {
+-    .name = "vfio-pci-nohotplug",
+-    .parent = "vfio-pci",
++    .name = TYPE_VFIO_PCI_NOHOTPLUG,
++    .parent = TYPE_VFIO_PCI,
+     .instance_size = sizeof(VFIOPCIDevice),
+     .class_init = vfio_pci_nohotplug_dev_class_init,
  };
- 
-diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
-index b332395..35b01b3 100644
---- a/hw/vfio/ap.c
-+++ b/hw/vfio/ap.c
-@@ -147,7 +147,7 @@ static void vfio_ap_reset(DeviceState *dev)
- }
- 
- static const VMStateDescription vfio_ap_vmstate = {
--    .name = TYPE_VFIO_AP_DEVICE,
-+    .name = "vfio-ap",
-     .unmigratable = 1,
- };
- 
-diff --git a/hw/vfio/calxeda-xgmac.c b/hw/vfio/calxeda-xgmac.c
-index e7767c4..6cc608b 100644
---- a/hw/vfio/calxeda-xgmac.c
-+++ b/hw/vfio/calxeda-xgmac.c
-@@ -26,7 +26,7 @@ static void calxeda_xgmac_realize(DeviceState *dev, Error **errp)
- }
- 
- static const VMStateDescription vfio_platform_calxeda_xgmac_vmstate = {
--    .name = TYPE_VFIO_CALXEDA_XGMAC,
-+    .name = "vfio-calxeda-xgmac",
-     .unmigratable = 1,
- };
- 
-diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-index 9246729..4786d46 100644
---- a/hw/vfio/ccw.c
-+++ b/hw/vfio/ccw.c
-@@ -466,7 +466,7 @@ static Property vfio_ccw_properties[] = {
- };
- 
- static const VMStateDescription vfio_ccw_vmstate = {
--    .name = TYPE_VFIO_CCW,
-+    .name = "vfio-ccw",
-     .unmigratable = 1,
- };
- 
-diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
-index 64c1af6..ba03dcd 100644
---- a/hw/vfio/platform.c
-+++ b/hw/vfio/platform.c
-@@ -697,7 +697,7 @@ out:
- }
- 
- static const VMStateDescription vfio_platform_vmstate = {
--    .name = TYPE_VFIO_PLATFORM,
-+    .name = "vfio-platform",
-     .unmigratable = 1,
- };
- 
 -- 
 1.8.3.1
