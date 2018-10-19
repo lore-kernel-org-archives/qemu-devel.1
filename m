@@ -1,19 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37423)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37750)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gDXfd-0002yl-4D
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:30:43 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1gDXge-0003iM-7c
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:31:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gDXfb-00028n-2o
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:30:40 -0400
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 19 Oct 2018 18:30:08 +0200
-Message-Id: <20181019163013.11787-5-kwolf@redhat.com>
-In-Reply-To: <20181019163013.11787-1-kwolf@redhat.com>
-References: <20181019163013.11787-1-kwolf@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1gDXgb-00031Q-2l
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:31:44 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:40473)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gDXga-0002le-R0
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:31:40 -0400
+Received: by mail-pg1-x541.google.com with SMTP id o14-v6so268869pgv.7
+	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 09:31:15 -0700 (PDT)
+References: <20181019015617.22583-1-richard.henderson@linaro.org>
+	<20181019015617.22583-4-richard.henderson@linaro.org>
+	<CAFEAcA81rDucGOEVYi1LCw=1eiHisuM8+yXGzaw2dMktdU99cw@mail.gmail.com>
+	<1dda484c-1fc8-f75e-3150-111b0c7d85f9@linaro.org>
+	<CAFEAcA8f2SvmsABANVrWLZo8NzeAirMOqsm7AnyPCVVKL_z0Sw@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <2c425566-53b5-e299-ccb1-09793ab673d5@linaro.org>
+Date: Fri, 19 Oct 2018 09:31:10 -0700
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 04/11] block: Require auto-read-only for
- existing fallbacks
+In-Reply-To: <CAFEAcA8f2SvmsABANVrWLZo8NzeAirMOqsm7AnyPCVVKL_z0Sw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] target/arm: Flush only the TLBs
+ affected by TTBR*_EL1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,282 +35,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Some block drivers have traditionally changed their node to read-only
-mode without asking the user. This behaviour has been marked deprecated
-since 2.11, expecting users to provide an explicit read-only=3Don option.
+On 10/19/18 9:12 AM, Peter Maydell wrote:
+> A conservative check is probably:
+>   if arm_current_el() < 3
+>      // TTBR definitely can only be affecting the EL0/1
+>      // translation regime for the current security state
+>      if arm_is_secure_below_el3()
+>         if EL3 is AArch32
+>             flush S1SE0, S1E3
+>         else
+>             flush S1SE0, S1SE1
+>      else
+>         flush S12NSE1, S12NSE0
+>   else
+>      // err on the side of flushing more than maybe we need to
+>      flush S1SE0, S12NSE1, S12NSE0
+>      if EL3 is AArch32
+>           flush S1E3
+>      else
+>           flush S1SE1
+> 
+> (but you should check my logic ;-))
 
-Now that we have auto-read-only=3Don, enable these drivers to make use of
-the option.
+Riiight.
 
-This is the only use of bdrv_set_read_only(), so we can make it a bit
-more specific and turn it into a bdrv_apply_auto_read_only() that is
-more convenient for drivers to use.
+Clearly it would be simpler and safer to track unused tlbs within cputlb.c.
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- include/block/block.h |  3 ++-
- block.c               | 42 +++++++++++++++++++++++++++---------------
- block/bochs.c         | 17 ++++++-----------
- block/cloop.c         | 16 +++++-----------
- block/dmg.c           | 16 +++++-----------
- block/rbd.c           | 15 ++++-----------
- block/vvfat.c         | 10 ++--------
- 7 files changed, 51 insertions(+), 68 deletions(-)
+> We do for AArch32 with TTBCR.EAE == 1 (ie LPAE, when you want to
+> use the 64-bit form of the register, accessed via MRRC/MCRR).
+> cpreg_field_is_64bit() is true for both "AArch64 sysreg" and
+> "AArch32 64-bit cp reg".
 
-diff --git a/include/block/block.h b/include/block/block.h
-index 580b3716c3..7f5453b45b 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -438,7 +438,8 @@ int bdrv_is_allocated_above(BlockDriverState *top, Bl=
-ockDriverState *base,
- bool bdrv_is_read_only(BlockDriverState *bs);
- int bdrv_can_set_read_only(BlockDriverState *bs, bool read_only,
-                            bool ignore_allow_rdw, Error **errp);
--int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **err=
-p);
-+int bdrv_apply_auto_read_only(BlockDriverState *bs, const char *errmsg,
-+                              Error **errp);
- bool bdrv_is_writable(BlockDriverState *bs);
- bool bdrv_is_sg(BlockDriverState *bs);
- bool bdrv_is_inserted(BlockDriverState *bs);
-diff --git a/block.c b/block.c
-index ed73522cc6..a97e324f39 100644
---- a/block.c
-+++ b/block.c
-@@ -266,29 +266,41 @@ int bdrv_can_set_read_only(BlockDriverState *bs, bo=
-ol read_only,
-     return 0;
- }
-=20
--/* TODO Remove (deprecated since 2.11)
-- * Block drivers are not supposed to automatically change bs->read_only.
-- * Instead, they should just check whether they can provide what the use=
-r
-- * explicitly requested and error out if read-write is requested, but th=
-ey can
-- * only provide read-only access. */
--int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **err=
-p)
-+/*
-+ * Called by a driver that can only provide a read-only image.
-+ *
-+ * Returns 0 if the node is already read-only or it could switch the nod=
-e to
-+ * read-only because BDRV_O_AUTO_RDONLY is set.
-+ *
-+ * Returns -EACCES if the node is read-write and BDRV_O_AUTO_RDONLY is n=
-ot set
-+ * or bdrv_can_set_read_only() forbids making the node read-only. If @er=
-rmsg
-+ * is not NULL, it is used as the error message for the Error object.
-+ */
-+int bdrv_apply_auto_read_only(BlockDriverState *bs, const char *errmsg,
-+                              Error **errp)
- {
-     int ret =3D 0;
-=20
--    ret =3D bdrv_can_set_read_only(bs, read_only, false, errp);
--    if (ret < 0) {
--        return ret;
-+    if (!(bs->open_flags & BDRV_O_RDWR)) {
-+        return 0;
-+    }
-+    if (!(bs->open_flags & BDRV_O_AUTO_RDONLY)) {
-+        goto fail;
-     }
-=20
--    bs->read_only =3D read_only;
--
--    if (read_only) {
--        bs->open_flags &=3D ~BDRV_O_RDWR;
--    } else {
--        bs->open_flags |=3D BDRV_O_RDWR;
-+    ret =3D bdrv_can_set_read_only(bs, true, false, NULL);
-+    if (ret < 0) {
-+        goto fail;
-     }
-=20
-+    bs->read_only =3D true;
-+    bs->open_flags &=3D ~BDRV_O_RDWR;
-+
-     return 0;
-+
-+fail:
-+    error_setg(errp, "%s", errmsg ?: "Image is read-only");
-+    return -EACCES;
- }
-=20
- void bdrv_get_full_backing_filename_from_filename(const char *backed,
-diff --git a/block/bochs.c b/block/bochs.c
-index 50c630047b..22e7d44211 100644
---- a/block/bochs.c
-+++ b/block/bochs.c
-@@ -105,23 +105,18 @@ static int bochs_open(BlockDriverState *bs, QDict *=
-options, int flags,
-     struct bochs_header bochs;
-     int ret;
-=20
-+    /* No write support yet */
-+    ret =3D bdrv_apply_auto_read_only(bs, NULL, errp);
-+    if (ret < 0) {
-+        return ret;
-+    }
-+
-     bs->file =3D bdrv_open_child(NULL, options, "file", bs, &child_file,
-                                false, errp);
-     if (!bs->file) {
-         return -EINVAL;
-     }
-=20
--    if (!bdrv_is_read_only(bs)) {
--        error_report("Opening bochs images without an explicit read-only=
-=3Don "
--                     "option is deprecated. Future versions will refuse =
-to "
--                     "open the image instead of automatically marking th=
-e "
--                     "image read-only.");
--        ret =3D bdrv_set_read_only(bs, true, errp); /* no write support =
-yet */
--        if (ret < 0) {
--            return ret;
--        }
--    }
--
-     ret =3D bdrv_pread(bs->file, 0, &bochs, sizeof(bochs));
-     if (ret < 0) {
-         return ret;
-diff --git a/block/cloop.c b/block/cloop.c
-index 2be68987bd..df2b85f723 100644
---- a/block/cloop.c
-+++ b/block/cloop.c
-@@ -67,23 +67,17 @@ static int cloop_open(BlockDriverState *bs, QDict *op=
-tions, int flags,
-     uint32_t offsets_size, max_compressed_block_size =3D 1, i;
-     int ret;
-=20
-+    ret =3D bdrv_apply_auto_read_only(bs, NULL, errp);
-+    if (ret < 0) {
-+        return ret;
-+    }
-+
-     bs->file =3D bdrv_open_child(NULL, options, "file", bs, &child_file,
-                                false, errp);
-     if (!bs->file) {
-         return -EINVAL;
-     }
-=20
--    if (!bdrv_is_read_only(bs)) {
--        error_report("Opening cloop images without an explicit read-only=
-=3Don "
--                     "option is deprecated. Future versions will refuse =
-to "
--                     "open the image instead of automatically marking th=
-e "
--                     "image read-only.");
--        ret =3D bdrv_set_read_only(bs, true, errp);
--        if (ret < 0) {
--            return ret;
--        }
--    }
--
-     /* read header */
-     ret =3D bdrv_pread(bs->file, 128, &s->block_size, 4);
-     if (ret < 0) {
-diff --git a/block/dmg.c b/block/dmg.c
-index c9b3c519c4..1d9283ba2f 100644
---- a/block/dmg.c
-+++ b/block/dmg.c
-@@ -413,23 +413,17 @@ static int dmg_open(BlockDriverState *bs, QDict *op=
-tions, int flags,
-     int64_t offset;
-     int ret;
-=20
-+    ret =3D bdrv_apply_auto_read_only(bs, NULL, errp);
-+    if (ret < 0) {
-+        return ret;
-+    }
-+
-     bs->file =3D bdrv_open_child(NULL, options, "file", bs, &child_file,
-                                false, errp);
-     if (!bs->file) {
-         return -EINVAL;
-     }
-=20
--    if (!bdrv_is_read_only(bs)) {
--        error_report("Opening dmg images without an explicit read-only=3D=
-on "
--                     "option is deprecated. Future versions will refuse =
-to "
--                     "open the image instead of automatically marking th=
-e "
--                     "image read-only.");
--        ret =3D bdrv_set_read_only(bs, true, errp);
--        if (ret < 0) {
--            return ret;
--        }
--    }
--
-     block_module_load_one("dmg-bz2");
-=20
-     s->n_chunks =3D 0;
-diff --git a/block/rbd.c b/block/rbd.c
-index 27c9a1e81c..ee0b4a6941 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -780,17 +780,10 @@ static int qemu_rbd_open(BlockDriverState *bs, QDic=
-t *options, int flags,
-     /* If we are using an rbd snapshot, we must be r/o, otherwise
-      * leave as-is */
-     if (s->snap !=3D NULL) {
--        if (!bdrv_is_read_only(bs)) {
--            error_report("Opening rbd snapshots without an explicit "
--                         "read-only=3Don option is deprecated. Future ve=
-rsions "
--                         "will refuse to open the image instead of "
--                         "automatically marking the image read-only.");
--            r =3D bdrv_set_read_only(bs, true, &local_err);
--            if (r < 0) {
--                rbd_close(s->image);
--                error_propagate(errp, local_err);
--                goto failed_open;
--            }
-+        r =3D bdrv_apply_auto_read_only(bs, "rbd snapshots are read-only=
-", errp);
-+        if (r < 0) {
-+            rbd_close(s->image);
-+            goto failed_open;
-         }
-     }
-=20
-diff --git a/block/vvfat.c b/block/vvfat.c
-index 98ba5e2bac..e4df255d58 100644
---- a/block/vvfat.c
-+++ b/block/vvfat.c
-@@ -1262,15 +1262,9 @@ static int vvfat_open(BlockDriverState *bs, QDict =
-*options, int flags,
-                        "Unable to set VVFAT to 'rw' when drive is read-o=
-nly");
-             goto fail;
-         }
--    } else  if (!bdrv_is_read_only(bs)) {
--        error_report("Opening non-rw vvfat images without an explicit "
--                     "read-only=3Don option is deprecated. Future versio=
-ns "
--                     "will refuse to open the image instead of "
--                     "automatically marking the image read-only.");
--        /* read only is the default for safety */
--        ret =3D bdrv_set_read_only(bs, true, &local_err);
-+    } else {
-+        ret =3D bdrv_apply_auto_read_only(bs, NULL, errp);
-         if (ret < 0) {
--            error_propagate(errp, local_err);
-             goto fail;
-         }
-     }
---=20
-2.19.1
+Ok, thanks.
+
+So drop this patch for now and I'll get back to it.  The other two in this
+series are at least incremental improvement in the meantime.
+
+
+r~
