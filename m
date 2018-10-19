@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60319)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32768)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gDTa9-0001xR-Ls
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:08:47 -0400
+	(envelope-from <bounces@canonical.com>) id 1gDTcg-0002pr-Hc
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:11:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gDTa6-0002Bs-Hd
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:08:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:1615)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gDTa6-0002AE-8Q
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:08:42 -0400
-References: <20181018145203.11336-1-berrange@redhat.com>
-	<c11576e1-9644-66e7-7dc6-b9d0ee4b537f@redhat.com>
-	<20181019102528.GG13722@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a7cec56c-5871-8a98-42f9-506f9b215569@redhat.com>
-Date: Fri, 19 Oct 2018 14:08:37 +0200
+	(envelope-from <bounces@canonical.com>) id 1gDTcb-00004z-5R
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:11:22 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52178)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gDTca-0008Tz-Uu
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:11:17 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gDTcZ-00038F-9c
+	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 12:11:15 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 93D922E80D5
+	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 12:11:12 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20181019102528.GG13722@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [web PATCH 0/4] Add web section reporting
- information about CVEs in QEMU
+Date: Fri, 19 Oct 2018 11:59:26 -0000
+From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+Reply-To: Bug 1797262 <1797262@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153921596093.13046.16485884973780639345.malonedeb@wampee.canonical.com>
+Message-Id: <153995036671.15384.18371512606809407583.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1797262] Re: qemu arm no longer able to boot RPI
+ Kernels
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,26 +37,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Prasad J Pandit <pjp@fedoraproject.org>, Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 19/10/2018 12:25, Daniel P. Berrang=C3=A9 wrote:
-> I really don't want to use an application specific templating system.
-> While we're using Jekyll for the website today, I don't think it is
-> a good idea to assume that for the longer term.
->=20
-> Even today I can't actually run the jekyll website on my laptop because
-> the qemu-web content uses templating syntax from an older version of
-> Jekyll that has been deleted in the current Jekyll versions. So I have
-> to hack the code to remove pieces, in order to do testing.
+Isn't this likely due to the newer kernel accessing hardware we are not
+emulating properly?
 
-Note that you can use
+-- =
 
-   bundle install --path .gems
-   bundle exec jekyll serve
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1797262
 
-in order to use locally-downloaded gems.
+Title:
+  qemu arm no longer able to boot RPI Kernels
 
-That said, we should indeed update Jekyll to a more recent version.
+Status in QEMU:
+  New
 
-Paolo
+Bug description:
+  Since RPi Kernel 1.20170427, qemu is no longer able to emulate the
+  Rasberry Pi, as the linux kernel is complaining about timing issues.
+
+  Old kernel output - https://pastebin.com/wvkneNNF
+  New kernel output - https://pastebin.com/QTwgCkV2
+
+  Note that the actual error is caused by the kernel being unable to get
+  the timing source for the mmc (Line 160), which causes an unable-to-
+  mount-root panic.  There are other issues with the serial port
+  returning an invalid speed, which displays a divide-by-zero error,
+  which is PROBABLY a symptom of the same root cause.
+
+  This is simple to replicate - The last working kernel is available
+  here:
+
+  https://github.com/raspberrypi/firmware/tree/1.20170405/boot
+
+  Download kernel7 and the dtb, and try to boot with (for example)
+
+  qemu-system-aarch64 -M raspi2 -kernel kernel7.img -dtb
+  bcm2709-rpi-2-b.dtb -serial stdio -sd noobs.img -append
+  "root=3D/dev/mmcblk0p2 init=3D/bin/bash"
+
+  This works, and boots successfully.
+
+  However, if you replace the kernel7.img and dtb with ones taken from
+  https://github.com/raspberrypi/firmware/tree/1.20170427/boot it will
+  NOT boot because of various clock timing issues (as in the second
+  paste)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1797262/+subscriptions
