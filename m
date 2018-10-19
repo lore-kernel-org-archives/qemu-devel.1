@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36175)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36254)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gDSeV-0000RF-4p
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 07:09:12 -0400
+	(envelope-from <berrange@redhat.com>) id 1gDSeX-0000Rc-0y
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 07:09:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gDSeR-0006Mj-EK
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 07:09:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33960)
+	(envelope-from <berrange@redhat.com>) id 1gDSeV-0006Pa-RZ
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 07:09:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37366)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gDSeP-0006H8-DT
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 07:09:06 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gDSeV-0006O8-J3
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 07:09:11 -0400
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Fri, 19 Oct 2018 12:08:50 +0100
-Message-Id: <20181019110856.18893-3-berrange@redhat.com>
+Date: Fri, 19 Oct 2018 12:08:56 +0100
+Message-Id: <20181019110856.18893-9-berrange@redhat.com>
 In-Reply-To: <20181019110856.18893-1-berrange@redhat.com>
 References: <20181019110856.18893-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 2/8] crypto: remove code duplication in
- tweak encrypt/decrypt
+Subject: [Qemu-devel] [PATCH v3 8/8] crypto: add testing for unaligned
+ buffers with XTS cipher mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,145 +30,120 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-The tweak encrypt/decrypt functions are identical except for the
-comments, so can be merged. Profiling data shows that the compiler is
-in fact already merging the two merges in the object files.
+Validate that the XTS cipher mode will correctly operate with plain
+text, cipher text and IV buffers that are not 64-bit aligned.
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- crypto/xts.c | 64 ++++++++++++----------------------------------------
- 1 file changed, 15 insertions(+), 49 deletions(-)
+ tests/test-crypto-xts.c | 86 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 86 insertions(+)
 
-diff --git a/crypto/xts.c b/crypto/xts.c
-index 95212341f6..3c1a92f01d 100644
---- a/crypto/xts.c
-+++ b/crypto/xts.c
-@@ -43,20 +43,20 @@ static void xts_mult_x(uint8_t *I)
-=20
-=20
- /**
-- * xts_tweak_uncrypt:
-+ * xts_tweak_encdec:
-  * @param ctxt: the cipher context
-  * @param func: the cipher function
-- * @src: buffer providing the cipher text of XTS_BLOCK_SIZE bytes
-- * @dst: buffer to output the plain text of XTS_BLOCK_SIZE bytes
-+ * @src: buffer providing the input text of XTS_BLOCK_SIZE bytes
-+ * @dst: buffer to output the output text of XTS_BLOCK_SIZE bytes
-  * @iv: the initialization vector tweak of XTS_BLOCK_SIZE bytes
-  *
-- * Decrypt data with a tweak
-+ * Encrypt/decrypt data with a tweak
-  */
--static void xts_tweak_decrypt(const void *ctx,
--                              xts_cipher_func *func,
--                              const uint8_t *src,
--                              uint8_t *dst,
--                              uint8_t *iv)
-+static void xts_tweak_encdec(const void *ctx,
-+                             xts_cipher_func *func,
-+                             const uint8_t *src,
-+                             uint8_t *dst,
-+                             uint8_t *iv)
- {
-     unsigned long x;
-=20
-@@ -105,7 +105,7 @@ void xts_decrypt(const void *datactx,
-     encfunc(tweakctx, XTS_BLOCK_SIZE, T, iv);
-=20
-     for (i =3D 0; i < lim; i++) {
--        xts_tweak_decrypt(datactx, decfunc, src, dst, T);
-+        xts_tweak_encdec(datactx, decfunc, src, dst, T);
-=20
-         src +=3D XTS_BLOCK_SIZE;
-         dst +=3D XTS_BLOCK_SIZE;
-@@ -117,7 +117,7 @@ void xts_decrypt(const void *datactx,
-         xts_mult_x(CC);
-=20
-         /* PP =3D tweak decrypt block m-1 */
--        xts_tweak_decrypt(datactx, decfunc, src, PP, CC);
-+        xts_tweak_encdec(datactx, decfunc, src, PP, CC);
-=20
-         /* Pm =3D first length % XTS_BLOCK_SIZE bytes of PP */
-         for (i =3D 0; i < mo; i++) {
-@@ -129,7 +129,7 @@ void xts_decrypt(const void *datactx,
-         }
-=20
-         /* Pm-1 =3D Tweak uncrypt CC */
--        xts_tweak_decrypt(datactx, decfunc, CC, dst, T);
-+        xts_tweak_encdec(datactx, decfunc, CC, dst, T);
-     }
-=20
-     /* Decrypt the iv back */
-@@ -137,40 +137,6 @@ void xts_decrypt(const void *datactx,
+diff --git a/tests/test-crypto-xts.c b/tests/test-crypto-xts.c
+index 81606d90ad..6fb61cf635 100644
+--- a/tests/test-crypto-xts.c
++++ b/tests/test-crypto-xts.c
+@@ -416,6 +416,88 @@ static void test_xts_split(const void *opaque)
  }
 =20
 =20
--/**
-- * xts_tweak_crypt:
-- * @param ctxt: the cipher context
-- * @param func: the cipher function
-- * @src: buffer providing the plain text of XTS_BLOCK_SIZE bytes
-- * @dst: buffer to output the cipher text of XTS_BLOCK_SIZE bytes
-- * @iv: the initialization vector tweak of XTS_BLOCK_SIZE bytes
-- *
-- * Encrypt data with a tweak
-- */
--static void xts_tweak_encrypt(const void *ctx,
--                              xts_cipher_func *func,
--                              const uint8_t *src,
--                              uint8_t *dst,
--                              uint8_t *iv)
--{
--    unsigned long x;
--
--    /* tweak encrypt block i */
--    for (x =3D 0; x < XTS_BLOCK_SIZE; x++) {
--        dst[x] =3D src[x] ^ iv[x];
--    }
--
--    func(ctx, XTS_BLOCK_SIZE, dst, dst);
--
--    for (x =3D 0; x < XTS_BLOCK_SIZE; x++) {
--        dst[x] =3D dst[x] ^ iv[x];
--    }
--
--    /* LFSR the tweak */
--    xts_mult_x(iv);
--}
--
--
- void xts_encrypt(const void *datactx,
-                  const void *tweakctx,
-                  xts_cipher_func *encfunc,
-@@ -200,7 +166,7 @@ void xts_encrypt(const void *datactx,
-     encfunc(tweakctx, XTS_BLOCK_SIZE, T, iv);
-=20
-     for (i =3D 0; i < lim; i++) {
--        xts_tweak_encrypt(datactx, encfunc, src, dst, T);
-+        xts_tweak_encdec(datactx, encfunc, src, dst, T);
-=20
-         dst +=3D XTS_BLOCK_SIZE;
-         src +=3D XTS_BLOCK_SIZE;
-@@ -209,7 +175,7 @@ void xts_encrypt(const void *datactx,
-     /* if length is not a multiple of XTS_BLOCK_SIZE then */
-     if (mo > 0) {
-         /* CC =3D tweak encrypt block m-1 */
--        xts_tweak_encrypt(datactx, encfunc, src, CC, T);
-+        xts_tweak_encdec(datactx, encfunc, src, CC, T);
-=20
-         /* Cm =3D first length % XTS_BLOCK_SIZE bytes of CC */
-         for (i =3D 0; i < mo; i++) {
-@@ -222,7 +188,7 @@ void xts_encrypt(const void *datactx,
++static void test_xts_unaligned(const void *opaque)
++{
++#define BAD_ALIGN 3
++    const QCryptoXTSTestData *data =3D opaque;
++    uint8_t in[512 + BAD_ALIGN], out[512 + BAD_ALIGN];
++    uint8_t Torg[16], T[16 + BAD_ALIGN];
++    uint64_t seq;
++    struct TestAES aesdata;
++    struct TestAES aestweak;
++
++    AES_set_encrypt_key(data->key1, data->keylen / 2 * 8, &aesdata.enc);
++    AES_set_decrypt_key(data->key1, data->keylen / 2 * 8, &aesdata.dec);
++    AES_set_encrypt_key(data->key2, data->keylen / 2 * 8, &aestweak.enc)=
+;
++    AES_set_decrypt_key(data->key2, data->keylen / 2 * 8, &aestweak.dec)=
+;
++
++    seq =3D data->seqnum;
++    STORE64L(seq, Torg);
++    memset(Torg + 8, 0, 8);
++
++    /* IV not aligned */
++    memcpy(T + BAD_ALIGN, Torg, 16);
++    memcpy(in, data->PTX, data->PTLEN);
++    xts_encrypt(&aesdata, &aestweak,
++                test_xts_aes_encrypt,
++                test_xts_aes_decrypt,
++                T + BAD_ALIGN, data->PTLEN, out, in);
++
++    g_assert(memcmp(out, data->CTX, data->PTLEN) =3D=3D 0);
++
++    /* plain text not aligned */
++    memcpy(T, Torg, 16);
++    memcpy(in + BAD_ALIGN, data->PTX, data->PTLEN);
++    xts_encrypt(&aesdata, &aestweak,
++                test_xts_aes_encrypt,
++                test_xts_aes_decrypt,
++                T, data->PTLEN, out, in + BAD_ALIGN);
++
++    g_assert(memcmp(out, data->CTX, data->PTLEN) =3D=3D 0);
++
++    /* cipher text not aligned */
++    memcpy(T, Torg, 16);
++    memcpy(in, data->PTX, data->PTLEN);
++    xts_encrypt(&aesdata, &aestweak,
++                test_xts_aes_encrypt,
++                test_xts_aes_decrypt,
++                T, data->PTLEN, out + BAD_ALIGN, in);
++
++    g_assert(memcmp(out + BAD_ALIGN, data->CTX, data->PTLEN) =3D=3D 0);
++
++
++    /* IV not aligned */
++    memcpy(T + BAD_ALIGN, Torg, 16);
++    memcpy(in, data->CTX, data->PTLEN);
++    xts_decrypt(&aesdata, &aestweak,
++                test_xts_aes_encrypt,
++                test_xts_aes_decrypt,
++                T + BAD_ALIGN, data->PTLEN, out, in);
++
++    g_assert(memcmp(out, data->PTX, data->PTLEN) =3D=3D 0);
++
++    /* cipher text not aligned */
++    memcpy(T, Torg, 16);
++    memcpy(in + BAD_ALIGN, data->CTX, data->PTLEN);
++    xts_decrypt(&aesdata, &aestweak,
++                test_xts_aes_encrypt,
++                test_xts_aes_decrypt,
++                T, data->PTLEN, out, in + BAD_ALIGN);
++
++    g_assert(memcmp(out, data->PTX, data->PTLEN) =3D=3D 0);
++
++    /* plain text not aligned */
++    memcpy(T, Torg, 16);
++    memcpy(in, data->CTX, data->PTLEN);
++    xts_decrypt(&aesdata, &aestweak,
++                test_xts_aes_encrypt,
++                test_xts_aes_decrypt,
++                T, data->PTLEN, out + BAD_ALIGN, in);
++
++    g_assert(memcmp(out + BAD_ALIGN, data->PTX, data->PTLEN) =3D=3D 0);
++}
++
++
+ int main(int argc, char **argv)
+ {
+     size_t i;
+@@ -437,6 +519,10 @@ int main(int argc, char **argv)
+             g_test_add_data_func(path, &test_data[i], test_xts_split);
+             g_free(path);
          }
-=20
-         /* Cm-1 =3D Tweak encrypt PP */
--        xts_tweak_encrypt(datactx, encfunc, PP, dst, T);
-+        xts_tweak_encdec(datactx, encfunc, PP, dst, T);
++
++        path =3D g_strdup_printf("%s/unaligned", test_data[i].path);
++        g_test_add_data_func(path, &test_data[i], test_xts_unaligned);
++        g_free(path);
      }
 =20
-     /* Decrypt the iv back */
+     return g_test_run();
 --=20
 2.17.2
