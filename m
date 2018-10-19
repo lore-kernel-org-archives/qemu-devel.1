@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39349)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39355)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gDNwl-0004Uo-LI
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 02:07:45 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1gDNwl-0004Uz-PZ
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 02:07:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gDNwg-0002nF-3K
+	(envelope-from <richard.henderson@linaro.org>) id 1gDNwg-0002nY-73
 	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 02:07:43 -0400
-Received: from mail-pg1-x533.google.com ([2607:f8b0:4864:20::533]:40766)
+Received: from mail-pl1-x636.google.com ([2607:f8b0:4864:20::636]:41601)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gDNwf-0002O4-FE
+	id 1gDNwf-0002As-Hn
 	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 02:07:37 -0400
-Received: by mail-pg1-x533.google.com with SMTP id n31-v6so15308166pgm.7
-	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 23:07:29 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id p5-v6so484395plq.8
+	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 23:07:16 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 18 Oct 2018 23:06:56 -0700
-Message-Id: <20181019060656.7968-22-richard.henderson@linaro.org>
+Date: Thu, 18 Oct 2018 23:06:47 -0700
+Message-Id: <20181019060656.7968-13-richard.henderson@linaro.org>
 In-Reply-To: <20181019060656.7968-1-richard.henderson@linaro.org>
 References: <20181019060656.7968-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL v2 21/21] cputlb: read CPUTLBEntry.addr_write
- atomically
+Subject: [Qemu-devel] [PULL v2 12/21] tcg: Split CONFIG_ATOMIC128
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,248 +27,410 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, "Emilio G. Cota" <cota@braap.org>
+Cc: peter.maydell@linaro.org
 
-From: "Emilio G. Cota" <cota@braap.org>
+GCC7+ will no longer advertise support for 16-byte __atomic operations
+if only cmpxchg is supported, as for x86_64.  Fortunately, x86_64 still
+has support for __sync_compare_and_swap_16 and we can make use of that.
+AArch64 does not have, nor ever has had such support, so open-code it.
 
-Updates can come from other threads, so readers that do not
-take tlb_lock must use atomic_read to avoid undefined
-behaviour (UB).
-
-This completes the conversion to tlb_lock. This conversion results
-on average in no performance loss, as the following experiments
-(run on an Intel i7-6700K CPU @ 4.00GHz) show.
-
-1. aarch64 bootup+shutdown test:
-
-- Before:
- Performance counter stats for 'taskset -c 0 ../img/aarch64/die.sh' (10 runs):
-
-       7487.087786      task-clock (msec)         #    0.998 CPUs utilized            ( +-  0.12% )
-    31,574,905,303      cycles                    #    4.217 GHz                      ( +-  0.12% )
-    57,097,908,812      instructions              #    1.81  insns per cycle          ( +-  0.08% )
-    10,255,415,367      branches                  # 1369.747 M/sec                    ( +-  0.08% )
-       173,278,962      branch-misses             #    1.69% of all branches          ( +-  0.18% )
-
-       7.504481349 seconds time elapsed                                          ( +-  0.14% )
-
-- After:
- Performance counter stats for 'taskset -c 0 ../img/aarch64/die.sh' (10 runs):
-
-       7462.441328      task-clock (msec)         #    0.998 CPUs utilized            ( +-  0.07% )
-    31,478,476,520      cycles                    #    4.218 GHz                      ( +-  0.07% )
-    57,017,330,084      instructions              #    1.81  insns per cycle          ( +-  0.05% )
-    10,251,929,667      branches                  # 1373.804 M/sec                    ( +-  0.05% )
-       173,023,787      branch-misses             #    1.69% of all branches          ( +-  0.11% )
-
-       7.474970463 seconds time elapsed                                          ( +-  0.07% )
-
-2. SPEC06int:
-                                              SPEC06int (test set)
-                                           [Y axis: Speedup over master]
-  1.15 +-+----+------+------+------+------+------+-------+------+------+------+------+------+------+----+-+
-       |                                                                                                  |
-   1.1 +-+.................................+++.............................+  tlb-lock-v2 (m+++x)       +-+
-       |                                +++ |                   +++        tlb-lock-v3 (spinl|ck)         |
-       |                    +++          |  |     +++    +++     |                           |            |
-  1.05 +-+....+++...........####.........|####.+++.|......|.....###....+++...........+++....###.........+-+
-       |      ###         ++#| #         |# |# ***### +++### +++#+#     |     +++     |     #|#    ###    |
-     1 +-+++***+#++++####+++#++#++++++++++#++#+*+*++#++++#+#+****+#++++###++++###++++###++++#+#++++#+#+++-+
-       |    *+* #    #++# ***  #   #### ***  # * *++# ****+# *| * # ****|#   |# #    #|#    #+#    # #    |
-  0.95 +-+..*.*.#....#..#.*|*..#...#..#.*|*..#.*.*..#.*|.*.#.*++*.#.*++*+#.****.#....#+#....#.#..++#.#..+-+
-       |    * * #    #  # *|*  #   #  # *|*  # * *  # *++* # *  * # *  * # * |* #  ++# #    # #  *** #    |
-       |    * * #  ++#  # *+*  #   #  # *|*  # * *  # *  * # *  * # *  * # *++* # **** #  ++# #  * * #    |
-   0.9 +-+..*.*.#...|#..#.*.*..#.++#..#.*|*..#.*.*..#.*..*.#.*..*.#.*..*.#.*..*.#.*.|*.#...|#.#..*.*.#..+-+
-       |    * * #  ***  # * *  #  |#  # *+*  # * *  # *  * # *  * # *  * # *  * # *++* #   |# #  * * #    |
-  0.85 +-+..*.*.#..*|*..#.*.*..#.***..#.*.*..#.*.*..#.*..*.#.*..*.#.*..*.#.*..*.#.*..*.#.****.#..*.*.#..+-+
-       |    * * #  *+*  # * *  # *|*  # * *  # * *  # *  * # *  * # *  * # *  * # *  * # * |* #  * * #    |
-       |    * * #  * *  # * *  # *+*  # * *  # * *  # *  * # *  * # *  * # *  * # *  * # * |* #  * * #    |
-   0.8 +-+..*.*.#..*.*..#.*.*..#.*.*..#.*.*..#.*.*..#.*..*.#.*..*.#.*..*.#.*..*.#.*..*.#.*++*.#..*.*.#..+-+
-       |    * * #  * *  # * *  # * *  # * *  # * *  # *  * # *  * # *  * # *  * # *  * # *  * #  * * #    |
-  0.75 +-+--***##--***###-***###-***###-***###-***###-****##-****##-****##-****##-****##-****##--***##--+-+
- 400.perlben401.bzip2403.gcc429.m445.gob456.hmme45462.libqua464.h26471.omnet473483.xalancbmkgeomean
-
-  png: https://imgur.com/a/BHzpPTW
-
-Notes:
-- tlb-lock-v2 corresponds to an implementation with a mutex.
-- tlb-lock-v3 corresponds to the current implementation, i.e.
-  a spinlock and a single lock acquisition in tlb_set_page_with_attrs.
-
-Signed-off-by: Emilio G. Cota <cota@braap.org>
-Message-Id: <20181016153840.25877-1-cota@braap.org>
+Reviewed-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- accel/tcg/softmmu_template.h     | 12 ++++++------
- include/exec/cpu_ldst.h          | 11 ++++++++++-
- include/exec/cpu_ldst_template.h |  2 +-
- accel/tcg/cputlb.c               | 19 +++++++++++++------
- 4 files changed, 30 insertions(+), 14 deletions(-)
+ accel/tcg/atomic_template.h |  20 ++++-
+ include/qemu/atomic128.h    | 153 ++++++++++++++++++++++++++++++++++++
+ include/qemu/compiler.h     |  11 +++
+ tcg/tcg.h                   |  16 ++--
+ accel/tcg/cputlb.c          |   3 +-
+ accel/tcg/user-exec.c       |   5 +-
+ configure                   |  19 +++++
+ 7 files changed, 213 insertions(+), 14 deletions(-)
+ create mode 100644 include/qemu/atomic128.h
 
-diff --git a/accel/tcg/softmmu_template.h b/accel/tcg/softmmu_template.h
-index 09538b5349..b0adea045e 100644
---- a/accel/tcg/softmmu_template.h
-+++ b/accel/tcg/softmmu_template.h
-@@ -280,7 +280,7 @@ void helper_le_st_name(CPUArchState *env, target_ulong addr, DATA_TYPE val,
-     uintptr_t mmu_idx = get_mmuidx(oi);
-     uintptr_t index = tlb_index(env, mmu_idx, addr);
-     CPUTLBEntry *entry = tlb_entry(env, mmu_idx, addr);
--    target_ulong tlb_addr = entry->addr_write;
-+    target_ulong tlb_addr = tlb_addr_write(entry);
-     unsigned a_bits = get_alignment_bits(get_memop(oi));
-     uintptr_t haddr;
+diff --git a/accel/tcg/atomic_template.h b/accel/tcg/atomic_template.h
+index d751bcba48..efde12fdb2 100644
+--- a/accel/tcg/atomic_template.h
++++ b/accel/tcg/atomic_template.h
+@@ -100,19 +100,24 @@ ABI_TYPE ATOMIC_NAME(cmpxchg)(CPUArchState *env, target_ulong addr,
+     DATA_TYPE ret;
  
-@@ -295,7 +295,7 @@ void helper_le_st_name(CPUArchState *env, target_ulong addr, DATA_TYPE val,
-             tlb_fill(ENV_GET_CPU(env), addr, DATA_SIZE, MMU_DATA_STORE,
-                      mmu_idx, retaddr);
-         }
--        tlb_addr = entry->addr_write & ~TLB_INVALID_MASK;
-+        tlb_addr = tlb_addr_write(entry) & ~TLB_INVALID_MASK;
-     }
- 
-     /* Handle an IO access.  */
-@@ -325,7 +325,7 @@ void helper_le_st_name(CPUArchState *env, target_ulong addr, DATA_TYPE val,
-            cannot evict the first.  */
-         page2 = (addr + DATA_SIZE) & TARGET_PAGE_MASK;
-         entry2 = tlb_entry(env, mmu_idx, page2);
--        if (!tlb_hit_page(entry2->addr_write, page2)
-+        if (!tlb_hit_page(tlb_addr_write(entry2), page2)
-             && !VICTIM_TLB_HIT(addr_write, page2)) {
-             tlb_fill(ENV_GET_CPU(env), page2, DATA_SIZE, MMU_DATA_STORE,
-                      mmu_idx, retaddr);
-@@ -358,7 +358,7 @@ void helper_be_st_name(CPUArchState *env, target_ulong addr, DATA_TYPE val,
-     uintptr_t mmu_idx = get_mmuidx(oi);
-     uintptr_t index = tlb_index(env, mmu_idx, addr);
-     CPUTLBEntry *entry = tlb_entry(env, mmu_idx, addr);
--    target_ulong tlb_addr = entry->addr_write;
-+    target_ulong tlb_addr = tlb_addr_write(entry);
-     unsigned a_bits = get_alignment_bits(get_memop(oi));
-     uintptr_t haddr;
- 
-@@ -373,7 +373,7 @@ void helper_be_st_name(CPUArchState *env, target_ulong addr, DATA_TYPE val,
-             tlb_fill(ENV_GET_CPU(env), addr, DATA_SIZE, MMU_DATA_STORE,
-                      mmu_idx, retaddr);
-         }
--        tlb_addr = entry->addr_write & ~TLB_INVALID_MASK;
-+        tlb_addr = tlb_addr_write(entry) & ~TLB_INVALID_MASK;
-     }
- 
-     /* Handle an IO access.  */
-@@ -403,7 +403,7 @@ void helper_be_st_name(CPUArchState *env, target_ulong addr, DATA_TYPE val,
-            cannot evict the first.  */
-         page2 = (addr + DATA_SIZE) & TARGET_PAGE_MASK;
-         entry2 = tlb_entry(env, mmu_idx, page2);
--        if (!tlb_hit_page(entry2->addr_write, page2)
-+        if (!tlb_hit_page(tlb_addr_write(entry2), page2)
-             && !VICTIM_TLB_HIT(addr_write, page2)) {
-             tlb_fill(ENV_GET_CPU(env), page2, DATA_SIZE, MMU_DATA_STORE,
-                      mmu_idx, retaddr);
-diff --git a/include/exec/cpu_ldst.h b/include/exec/cpu_ldst.h
-index f54d91ff68..959068495a 100644
---- a/include/exec/cpu_ldst.h
-+++ b/include/exec/cpu_ldst.h
-@@ -126,6 +126,15 @@ extern __thread uintptr_t helper_retaddr;
- /* The memory helpers for tcg-generated code need tcg_target_long etc.  */
- #include "tcg.h"
- 
-+static inline target_ulong tlb_addr_write(const CPUTLBEntry *entry)
-+{
-+#if TCG_OVERSIZED_GUEST
-+    return entry->addr_write;
+     ATOMIC_TRACE_RMW;
++#if DATA_SIZE == 16
++    ret = atomic16_cmpxchg(haddr, cmpv, newv);
 +#else
-+    return atomic_read(&entry->addr_write);
+     ret = atomic_cmpxchg__nocheck(haddr, cmpv, newv);
 +#endif
-+}
-+
- /* Find the TLB index corresponding to the mmu_idx + address pair.  */
- static inline uintptr_t tlb_index(CPUArchState *env, uintptr_t mmu_idx,
-                                   target_ulong addr)
-@@ -439,7 +448,7 @@ static inline void *tlb_vaddr_to_host(CPUArchState *env, abi_ptr addr,
-         tlb_addr = tlbentry->addr_read;
-         break;
-     case 1:
--        tlb_addr = tlbentry->addr_write;
-+        tlb_addr = tlb_addr_write(tlbentry);
-         break;
-     case 2:
-         tlb_addr = tlbentry->addr_code;
-diff --git a/include/exec/cpu_ldst_template.h b/include/exec/cpu_ldst_template.h
-index d21a0b59bf..0f061d47ef 100644
---- a/include/exec/cpu_ldst_template.h
-+++ b/include/exec/cpu_ldst_template.h
-@@ -177,7 +177,7 @@ glue(glue(glue(cpu_st, SUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
-     addr = ptr;
-     mmu_idx = CPU_MMU_INDEX;
-     entry = tlb_entry(env, mmu_idx, addr);
--    if (unlikely(entry->addr_write !=
-+    if (unlikely(tlb_addr_write(entry) !=
-                  (addr & (TARGET_PAGE_MASK | (DATA_SIZE - 1))))) {
-         oi = make_memop_idx(SHIFT, mmu_idx);
-         glue(glue(helper_ret_st, SUFFIX), MMUSUFFIX)(env, addr, v, oi,
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index 28b770a404..af57aca5e4 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -258,7 +258,7 @@ static inline bool tlb_hit_page_anyprot(CPUTLBEntry *tlb_entry,
-                                         target_ulong page)
- {
-     return tlb_hit_page(tlb_entry->addr_read, page) ||
--           tlb_hit_page(tlb_entry->addr_write, page) ||
-+           tlb_hit_page(tlb_addr_write(tlb_entry), page) ||
-            tlb_hit_page(tlb_entry->addr_code, page);
+     ATOMIC_MMU_CLEANUP;
+     return ret;
  }
  
-@@ -855,7 +855,7 @@ static void io_writex(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
-         tlb_fill(cpu, addr, size, MMU_DATA_STORE, mmu_idx, retaddr);
+ #if DATA_SIZE >= 16
++#if HAVE_ATOMIC128
+ ABI_TYPE ATOMIC_NAME(ld)(CPUArchState *env, target_ulong addr EXTRA_ARGS)
+ {
+     ATOMIC_MMU_DECLS;
+     DATA_TYPE val, *haddr = ATOMIC_MMU_LOOKUP;
  
-         entry = tlb_entry(env, mmu_idx, addr);
--        tlb_addr = entry->addr_write;
-+        tlb_addr = tlb_addr_write(entry);
-         if (!(tlb_addr & ~(TARGET_PAGE_MASK | TLB_RECHECK))) {
-             /* RAM access */
-             uintptr_t haddr = addr + entry->addend;
-@@ -904,7 +904,14 @@ static bool victim_tlb_hit(CPUArchState *env, size_t mmu_idx, size_t index,
-     assert_cpu_is_self(ENV_GET_CPU(env));
-     for (vidx = 0; vidx < CPU_VTLB_SIZE; ++vidx) {
-         CPUTLBEntry *vtlb = &env->tlb_v_table[mmu_idx][vidx];
--        target_ulong cmp = *(target_ulong *)((uintptr_t)vtlb + elt_ofs);
-+        target_ulong cmp;
-+
-+        /* elt_ofs might correspond to .addr_write, so use atomic_read */
-+#if TCG_OVERSIZED_GUEST
-+        cmp = *(target_ulong *)((uintptr_t)vtlb + elt_ofs);
-+#else
-+        cmp = atomic_read((target_ulong *)((uintptr_t)vtlb + elt_ofs));
+     ATOMIC_TRACE_LD;
+-    __atomic_load(haddr, &val, __ATOMIC_RELAXED);
++    val = atomic16_read(haddr);
+     ATOMIC_MMU_CLEANUP;
+     return val;
+ }
+@@ -124,9 +129,10 @@ void ATOMIC_NAME(st)(CPUArchState *env, target_ulong addr,
+     DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;
+ 
+     ATOMIC_TRACE_ST;
+-    __atomic_store(haddr, &val, __ATOMIC_RELAXED);
++    atomic16_set(haddr, val);
+     ATOMIC_MMU_CLEANUP;
+ }
 +#endif
+ #else
+ ABI_TYPE ATOMIC_NAME(xchg)(CPUArchState *env, target_ulong addr,
+                            ABI_TYPE val EXTRA_ARGS)
+@@ -228,19 +234,24 @@ ABI_TYPE ATOMIC_NAME(cmpxchg)(CPUArchState *env, target_ulong addr,
+     DATA_TYPE ret;
  
-         if (cmp == page) {
-             /* Found entry in victim tlb, swap tlb and iotlb.  */
-@@ -977,7 +984,7 @@ void probe_write(CPUArchState *env, target_ulong addr, int size, int mmu_idx,
-     uintptr_t index = tlb_index(env, mmu_idx, addr);
-     CPUTLBEntry *entry = tlb_entry(env, mmu_idx, addr);
+     ATOMIC_TRACE_RMW;
++#if DATA_SIZE == 16
++    ret = atomic16_cmpxchg(haddr, BSWAP(cmpv), BSWAP(newv));
++#else
+     ret = atomic_cmpxchg__nocheck(haddr, BSWAP(cmpv), BSWAP(newv));
++#endif
+     ATOMIC_MMU_CLEANUP;
+     return BSWAP(ret);
+ }
  
--    if (!tlb_hit(entry->addr_write, addr)) {
-+    if (!tlb_hit(tlb_addr_write(entry), addr)) {
-         /* TLB entry is for a different page */
-         if (!VICTIM_TLB_HIT(addr_write, addr)) {
-             tlb_fill(ENV_GET_CPU(env), addr, size, MMU_DATA_STORE,
-@@ -995,7 +1002,7 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
-     size_t mmu_idx = get_mmuidx(oi);
-     uintptr_t index = tlb_index(env, mmu_idx, addr);
-     CPUTLBEntry *tlbe = tlb_entry(env, mmu_idx, addr);
--    target_ulong tlb_addr = tlbe->addr_write;
-+    target_ulong tlb_addr = tlb_addr_write(tlbe);
-     TCGMemOp mop = get_memop(oi);
-     int a_bits = get_alignment_bits(mop);
-     int s_bits = mop & MO_SIZE;
-@@ -1026,7 +1033,7 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
-             tlb_fill(ENV_GET_CPU(env), addr, 1 << s_bits, MMU_DATA_STORE,
-                      mmu_idx, retaddr);
-         }
--        tlb_addr = tlbe->addr_write & ~TLB_INVALID_MASK;
-+        tlb_addr = tlb_addr_write(tlbe) & ~TLB_INVALID_MASK;
-     }
+ #if DATA_SIZE >= 16
++#if HAVE_ATOMIC128
+ ABI_TYPE ATOMIC_NAME(ld)(CPUArchState *env, target_ulong addr EXTRA_ARGS)
+ {
+     ATOMIC_MMU_DECLS;
+     DATA_TYPE val, *haddr = ATOMIC_MMU_LOOKUP;
  
-     /* Notice an IO access or a needs-MMU-lookup access */
+     ATOMIC_TRACE_LD;
+-    __atomic_load(haddr, &val, __ATOMIC_RELAXED);
++    val = atomic16_read(haddr);
+     ATOMIC_MMU_CLEANUP;
+     return BSWAP(val);
+ }
+@@ -253,9 +264,10 @@ void ATOMIC_NAME(st)(CPUArchState *env, target_ulong addr,
+ 
+     ATOMIC_TRACE_ST;
+     val = BSWAP(val);
+-    __atomic_store(haddr, &val, __ATOMIC_RELAXED);
++    atomic16_set(haddr, val);
+     ATOMIC_MMU_CLEANUP;
+ }
++#endif
+ #else
+ ABI_TYPE ATOMIC_NAME(xchg)(CPUArchState *env, target_ulong addr,
+                            ABI_TYPE val EXTRA_ARGS)
+diff --git a/include/qemu/atomic128.h b/include/qemu/atomic128.h
+new file mode 100644
+index 0000000000..a6af22ff10
+--- /dev/null
++++ b/include/qemu/atomic128.h
+@@ -0,0 +1,153 @@
++/*
++ * Simple interface for 128-bit atomic operations.
++ *
++ * Copyright (C) 2018 Linaro, Ltd.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ * See docs/devel/atomics.txt for discussion about the guarantees each
++ * atomic primitive is meant to provide.
++ */
++
++#ifndef QEMU_ATOMIC128_H
++#define QEMU_ATOMIC128_H
++
++/*
++ * GCC is a house divided about supporting large atomic operations.
++ *
++ * For hosts that only have large compare-and-swap, a legalistic reading
++ * of the C++ standard means that one cannot implement __atomic_read on
++ * read-only memory, and thus all atomic operations must synchronize
++ * through libatomic.
++ *
++ * See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80878
++ *
++ * This interpretation is not especially helpful for QEMU.
++ * For softmmu, all RAM is always read/write from the hypervisor.
++ * For user-only, if the guest doesn't implement such an __atomic_read
++ * then the host need not worry about it either.
++ *
++ * Moreover, using libatomic is not an option, because its interface is
++ * built for std::atomic<T>, and requires that *all* accesses to such an
++ * object go through the library.  In our case we do not have an object
++ * in the C/C++ sense, but a view of memory as seen by the guest.
++ * The guest may issue a large atomic operation and then access those
++ * pieces using word-sized accesses.  From the hypervisor, we have no
++ * way to connect those two actions.
++ *
++ * Therefore, special case each platform.
++ */
++
++#if defined(CONFIG_ATOMIC128)
++static inline Int128 atomic16_cmpxchg(Int128 *ptr, Int128 cmp, Int128 new)
++{
++    return atomic_cmpxchg__nocheck(ptr, cmp, new);
++}
++# define HAVE_CMPXCHG128 1
++#elif defined(CONFIG_CMPXCHG128)
++static inline Int128 atomic16_cmpxchg(Int128 *ptr, Int128 cmp, Int128 new)
++{
++    return __sync_val_compare_and_swap_16(ptr, cmp, new);
++}
++# define HAVE_CMPXCHG128 1
++#elif defined(__aarch64__)
++/* Through gcc 8, aarch64 has no support for 128-bit at all.  */
++static inline Int128 atomic16_cmpxchg(Int128 *ptr, Int128 cmp, Int128 new)
++{
++    uint64_t cmpl = int128_getlo(cmp), cmph = int128_gethi(cmp);
++    uint64_t newl = int128_getlo(new), newh = int128_gethi(new);
++    uint64_t oldl, oldh;
++    uint32_t tmp;
++
++    asm("0: ldaxp %[oldl], %[oldh], %[mem]\n\t"
++        "cmp %[oldl], %[cmpl]\n\t"
++        "ccmp %[oldh], %[cmph], #0, eq\n\t"
++        "b.ne 1f\n\t"
++        "stlxp %w[tmp], %[newl], %[newh], %[mem]\n\t"
++        "cbnz %w[tmp], 0b\n"
++        "1:"
++        : [mem] "+m"(*ptr), [tmp] "=&r"(tmp),
++          [oldl] "=&r"(oldl), [oldh] "=r"(oldh)
++        : [cmpl] "r"(cmpl), [cmph] "r"(cmph),
++          [newl] "r"(newl), [newh] "r"(newh)
++        : "memory", "cc");
++
++    return int128_make128(oldl, oldh);
++}
++# define HAVE_CMPXCHG128 1
++#else
++/* Fallback definition that must be optimized away, or error.  */
++Int128 QEMU_ERROR("unsupported atomic")
++    atomic16_cmpxchg(Int128 *ptr, Int128 cmp, Int128 new);
++# define HAVE_CMPXCHG128 0
++#endif /* Some definition for HAVE_CMPXCHG128 */
++
++
++#if defined(CONFIG_ATOMIC128)
++static inline Int128 atomic16_read(Int128 *ptr)
++{
++    return atomic_read__nocheck(ptr);
++}
++
++static inline void atomic16_set(Int128 *ptr, Int128 val)
++{
++    atomic_set__nocheck(ptr, val);
++}
++
++# define HAVE_ATOMIC128 1
++#elif !defined(CONFIG_USER_ONLY) && defined(__aarch64__)
++/* We can do better than cmpxchg for AArch64.  */
++static inline Int128 atomic16_read(Int128 *ptr)
++{
++    uint64_t l, h;
++    uint32_t tmp;
++
++    /* The load must be paired with the store to guarantee not tearing.  */
++    asm("0: ldxp %[l], %[h], %[mem]\n\t"
++        "stxp %w[tmp], %[l], %[h], %[mem]\n\t"
++        "cbnz %w[tmp], 0b"
++        : [mem] "+m"(*ptr), [tmp] "=r"(tmp), [l] "=r"(l), [h] "=r"(h));
++
++    return int128_make128(l, h);
++}
++
++static inline void atomic16_set(Int128 *ptr, Int128 val)
++{
++    uint64_t l = int128_getlo(val), h = int128_gethi(val);
++    uint64_t t1, t2;
++
++    /* Load into temporaries to acquire the exclusive access lock.  */
++    asm("0: ldxp %[t1], %[t2], %[mem]\n\t"
++        "stxp %w[t1], %[l], %[h], %[mem]\n\t"
++        "cbnz %w[t1], 0b"
++        : [mem] "+m"(*ptr), [t1] "=&r"(t1), [t2] "=&r"(t2)
++        : [l] "r"(l), [h] "r"(h));
++}
++
++# define HAVE_ATOMIC128 1
++#elif !defined(CONFIG_USER_ONLY) && HAVE_CMPXCHG128
++static inline Int128 atomic16_read(Int128 *ptr)
++{
++    /* Maybe replace 0 with 0, returning the old value.  */
++    return atomic16_cmpxchg(ptr, 0, 0);
++}
++
++static inline void atomic16_set(Int128 *ptr, Int128 val)
++{
++    Int128 old = *ptr, cmp;
++    do {
++        cmp = old;
++        old = atomic16_cmpxchg(ptr, cmp, val);
++    } while (old != cmp);
++}
++
++# define HAVE_ATOMIC128 1
++#else
++/* Fallback definitions that must be optimized away, or error.  */
++Int128 QEMU_ERROR("unsupported atomic") atomic16_read(Int128 *ptr);
++void QEMU_ERROR("unsupported atomic") atomic16_set(Int128 *ptr, Int128 val);
++# define HAVE_ATOMIC128 0
++#endif /* Some definition for HAVE_ATOMIC128 */
++
++#endif /* QEMU_ATOMIC128_H */
+diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
+index 66f8c241dc..6b92710487 100644
+--- a/include/qemu/compiler.h
++++ b/include/qemu/compiler.h
+@@ -146,6 +146,17 @@
+ # define QEMU_FLATTEN
+ #endif
+ 
++/*
++ * If __attribute__((error)) is present, use it to produce an error at
++ * compile time.  Otherwise, one must wait for the linker to diagnose
++ * the missing symbol.
++ */
++#if __has_attribute(error)
++# define QEMU_ERROR(X) __attribute__((error(X)))
++#else
++# define QEMU_ERROR(X)
++#endif
++
+ /* Implement C11 _Generic via GCC builtins.  Example:
+  *
+  *    QEMU_GENERIC(x, (float, sinf), (long double, sinl), sin) (x)
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index c59f254e27..f4efbaa680 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -32,6 +32,7 @@
+ #include "qemu/queue.h"
+ #include "tcg-mo.h"
+ #include "tcg-target.h"
++#include "qemu/int128.h"
+ 
+ /* XXX: make safe guess about sizes */
+ #define MAX_OP_PER_INSTR 266
+@@ -1456,11 +1457,14 @@ GEN_ATOMIC_HELPER_ALL(xchg)
+ #undef GEN_ATOMIC_HELPER
+ #endif /* CONFIG_SOFTMMU */
+ 
+-#ifdef CONFIG_ATOMIC128
+-#include "qemu/int128.h"
+-
+-/* These aren't really a "proper" helpers because TCG cannot manage Int128.
+-   However, use the same format as the others, for use by the backends. */
++/*
++ * These aren't really a "proper" helpers because TCG cannot manage Int128.
++ * However, use the same format as the others, for use by the backends.
++ *
++ * The cmpxchg functions are only defined if HAVE_CMPXCHG128;
++ * the ld/st functions are only defined if HAVE_ATOMIC128,
++ * as defined by <qemu/atomic128.h>.
++ */
+ Int128 helper_atomic_cmpxchgo_le_mmu(CPUArchState *env, target_ulong addr,
+                                      Int128 cmpv, Int128 newv,
+                                      TCGMemOpIdx oi, uintptr_t retaddr);
+@@ -1477,6 +1481,4 @@ void helper_atomic_sto_le_mmu(CPUArchState *env, target_ulong addr, Int128 val,
+ void helper_atomic_sto_be_mmu(CPUArchState *env, target_ulong addr, Int128 val,
+                               TCGMemOpIdx oi, uintptr_t retaddr);
+ 
+-#endif /* CONFIG_ATOMIC128 */
+-
+ #endif /* TCG_H */
+diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+index e4993d72fb..28b770a404 100644
+--- a/accel/tcg/cputlb.c
++++ b/accel/tcg/cputlb.c
+@@ -32,6 +32,7 @@
+ #include "exec/log.h"
+ #include "exec/helper-proto.h"
+ #include "qemu/atomic.h"
++#include "qemu/atomic128.h"
+ 
+ /* DEBUG defines, enable DEBUG_TLB_LOG to log to the CPU_LOG_MMU target */
+ /* #define DEBUG_TLB */
+@@ -1112,7 +1113,7 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
+ #include "atomic_template.h"
+ #endif
+ 
+-#ifdef CONFIG_ATOMIC128
++#if HAVE_CMPXCHG128 || HAVE_ATOMIC128
+ #define DATA_SIZE 16
+ #include "atomic_template.h"
+ #endif
+diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
+index 26a3ffbba1..cd75829cf2 100644
+--- a/accel/tcg/user-exec.c
++++ b/accel/tcg/user-exec.c
+@@ -25,6 +25,7 @@
+ #include "exec/cpu_ldst.h"
+ #include "translate-all.h"
+ #include "exec/helper-proto.h"
++#include "qemu/atomic128.h"
+ 
+ #undef EAX
+ #undef ECX
+@@ -615,7 +616,7 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
+ /* The following is only callable from other helpers, and matches up
+    with the softmmu version.  */
+ 
+-#ifdef CONFIG_ATOMIC128
++#if HAVE_ATOMIC128 || HAVE_CMPXCHG128
+ 
+ #undef EXTRA_ARGS
+ #undef ATOMIC_NAME
+@@ -628,4 +629,4 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
+ 
+ #define DATA_SIZE 16
+ #include "atomic_template.h"
+-#endif /* CONFIG_ATOMIC128 */
++#endif
+diff --git a/configure b/configure
+index 9138af37f8..1d267b49cc 100755
+--- a/configure
++++ b/configure
+@@ -5154,6 +5154,21 @@ EOF
+   fi
+ fi
+ 
++cmpxchg128=no
++if test "$int128" = yes -a "$atomic128" = no; then
++  cat > $TMPC << EOF
++int main(void)
++{
++  unsigned __int128 x = 0, y = 0;
++  __sync_val_compare_and_swap_16(&x, y, x);
++  return 0;
++}
++EOF
++  if compile_prog "" "" ; then
++    cmpxchg128=yes
++  fi
++fi
++
+ #########################################
+ # See if 64-bit atomic operations are supported.
+ # Note that without __atomic builtins, we can only
+@@ -6663,6 +6678,10 @@ if test "$atomic128" = "yes" ; then
+   echo "CONFIG_ATOMIC128=y" >> $config_host_mak
+ fi
+ 
++if test "$cmpxchg128" = "yes" ; then
++  echo "CONFIG_CMPXCHG128=y" >> $config_host_mak
++fi
++
+ if test "$atomic64" = "yes" ; then
+   echo "CONFIG_ATOMIC64=y" >> $config_host_mak
+ fi
 -- 
 2.17.2
