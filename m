@@ -1,16 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36865)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36873)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gDLNx-00032Z-59
+	(envelope-from <jasowang@redhat.com>) id 1gDLNx-00032n-Ai
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gDLNw-0003F2-2t
+	(envelope-from <jasowang@redhat.com>) id 1gDLNw-0003Fz-C4
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37934)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gDLNu-00034X-9u
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:36 -0400
 From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 19 Oct 2018 11:22:19 +0800
-Message-Id: <1539919345-10703-21-git-send-email-jasowang@redhat.com>
+Date: Fri, 19 Oct 2018 11:22:17 +0800
+Message-Id: <1539919345-10703-19-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1539919345-10703-1-git-send-email-jasowang@redhat.com>
 References: <1539919345-10703-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL V2 20/26] clean up callback when del virtqueue
+Subject: [Qemu-devel] [PULL V2 18/26] COLO: quick failover process by kick
+ COLO thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,43 +25,46 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, qemu-devel@nongnu.org
-Cc: liujunjie <liujunjie23@huawei.com>, qemu-stable@nongnu.org, Jason Wang <jasowang@redhat.com>
+Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>, Jason Wang <jasowang@redhat.com>
 
-From: liujunjie <liujunjie23@huawei.com>
+From: zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-Before, we did not clear callback like handle_output when delete
-the virtqueue which may result be segmentfault.
-The scene is as follows:
-1. Start a vm with multiqueue vhost-net,
-2. then we write VIRTIO_PCI_GUEST_FEATURES in PCI configuration to
-triger multiqueue disable in this vm which will delete the virtqueue.
-In this step, the tx_bh is deleted but the callback virtio_net_handle_tx_bh
-still exist.
-3. Finally, we write VIRTIO_PCI_QUEUE_NOTIFY in PCI configuration to
-notify the deleted virtqueue. In this way, virtio_net_handle_tx_bh
-will be called and qemu will be crashed.
+COLO thread may sleep at qemu_sem_wait(&s->colo_checkpoint_sem),
+while failover works begin, It's better to wakeup it to quick
+the process.
 
-Although the way described above is uncommon, we had better reinforce it.
-
-CC: qemu-stable@nongnu.org
-Signed-off-by: liujunjie <liujunjie23@huawei.com>
+Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- hw/virtio/virtio.c | 2 ++
- 1 file changed, 2 insertions(+)
+ migration/colo.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 4e61944..4136d23 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -1611,6 +1611,8 @@ void virtio_del_queue(VirtIODevice *vdev, int n)
+diff --git a/migration/colo.c b/migration/colo.c
+index 57a8542..956ac23 100644
+--- a/migration/colo.c
++++ b/migration/colo.c
+@@ -131,6 +131,11 @@ static void primary_vm_do_failover(void)
  
-     vdev->vq[n].vring.num = 0;
-     vdev->vq[n].vring.num_default = 0;
-+    vdev->vq[n].handle_output = NULL;
-+    vdev->vq[n].handle_aio_output = NULL;
- }
+     migrate_set_state(&s->state, MIGRATION_STATUS_COLO,
+                       MIGRATION_STATUS_COMPLETED);
++    /*
++     * kick COLO thread which might wait at
++     * qemu_sem_wait(&s->colo_checkpoint_sem).
++     */
++    colo_checkpoint_notify(migrate_get_current());
  
- static void virtio_set_isr(VirtIODevice *vdev, int value)
+     /*
+      * Wake up COLO thread which may blocked in recv() or send(),
+@@ -539,6 +544,9 @@ static void colo_process_checkpoint(MigrationState *s)
+ 
+         qemu_sem_wait(&s->colo_checkpoint_sem);
+ 
++        if (s->state != MIGRATION_STATUS_COLO) {
++            goto out;
++        }
+         ret = colo_do_checkpoint_transaction(s, bioc, fb);
+         if (ret < 0) {
+             goto out;
 -- 
 2.5.0
