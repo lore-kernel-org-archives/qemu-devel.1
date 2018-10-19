@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48656)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gDY81-0003Nd-7n
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 13:00:01 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1gDY82-0003PH-De
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 13:00:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gDY80-0004vQ-Cr
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 13:00:01 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:51984)
+	(envelope-from <pm215@archaic.org.uk>) id 1gDY81-0004x2-FX
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 13:00:02 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:51982)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1gDY80-0002bn-1k
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 13:00:00 -0400
+	id 1gDY81-0002Jh-6X
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 13:00:01 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1gDY65-0006ky-Vq
+	(envelope-from <pm215@archaic.org.uk>) id 1gDY65-0006kk-1B
 	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 17:58:01 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 19 Oct 2018 17:57:14 +0100
-Message-Id: <20181019165735.22511-25-peter.maydell@linaro.org>
+Date: Fri, 19 Oct 2018 17:57:13 +0100
+Message-Id: <20181019165735.22511-24-peter.maydell@linaro.org>
 In-Reply-To: <20181019165735.22511-1-peter.maydell@linaro.org>
 References: <20181019165735.22511-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 24/45] target/arm: Use tcg_gen_gvec_dup_i64 for
- LD[1-4]R
+Subject: [Qemu-devel] [PULL 23/45] target/arm: Don't call
+ tcg_clear_temp_count
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,57 +35,42 @@ To: qemu-devel@nongnu.org
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
+This is done generically in translator_loop.
+
+Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20181011205206.3552-4-richard.henderson@linaro.org
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-id: 20181011205206.3552-3-richard.henderson@linaro.org
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/translate-a64.c | 28 +++-------------------------
- 1 file changed, 3 insertions(+), 25 deletions(-)
+ target/arm/translate-a64.c | 1 -
+ target/arm/translate.c     | 1 -
+ 2 files changed, 2 deletions(-)
 
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index c3a0e5accd8..39ac45c0080 100644
+index 371909620bb..c3a0e5accd8 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -3217,36 +3217,14 @@ static void disas_ldst_single_struct(DisasContext *s, uint32_t insn)
-     for (xs = 0; xs < selem; xs++) {
-         if (replicate) {
-             /* Load and replicate to all elements */
--            uint64_t mulconst;
-             TCGv_i64 tcg_tmp = tcg_temp_new_i64();
+@@ -13899,7 +13899,6 @@ static void aarch64_tr_init_disas_context(DisasContextBase *dcbase,
  
-             tcg_gen_qemu_ld_i64(tcg_tmp, tcg_addr,
-                                 get_mem_index(s), s->be_data + scale);
--            switch (scale) {
--            case 0:
--                mulconst = 0x0101010101010101ULL;
--                break;
--            case 1:
--                mulconst = 0x0001000100010001ULL;
--                break;
--            case 2:
--                mulconst = 0x0000000100000001ULL;
--                break;
--            case 3:
--                mulconst = 0;
--                break;
--            default:
--                g_assert_not_reached();
--            }
--            if (mulconst) {
--                tcg_gen_muli_i64(tcg_tmp, tcg_tmp, mulconst);
--            }
--            write_vec_element(s, tcg_tmp, rt, 0, MO_64);
--            if (is_q) {
--                write_vec_element(s, tcg_tmp, rt, 1, MO_64);
--            }
-+            tcg_gen_gvec_dup_i64(scale, vec_full_reg_offset(s, rt),
-+                                 (is_q + 1) * 8, vec_full_reg_size(s),
-+                                 tcg_tmp);
-             tcg_temp_free_i64(tcg_tmp);
--            clear_vec_high(s, is_q, rt);
-         } else {
-             /* Load/store one element per register */
-             if (is_load) {
+ static void aarch64_tr_tb_start(DisasContextBase *db, CPUState *cpu)
+ {
+-    tcg_clear_temp_count();
+ }
+ 
+ static void aarch64_tr_insn_start(DisasContextBase *dcbase, CPUState *cpu)
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 1bf339a98b6..7d7a48e5b93 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -12701,7 +12701,6 @@ static void arm_tr_tb_start(DisasContextBase *dcbase, CPUState *cpu)
+         tcg_gen_movi_i32(tmp, 0);
+         store_cpu_field(tmp, condexec_bits);
+     }
+-    tcg_clear_temp_count();
+ }
+ 
+ static void arm_tr_insn_start(DisasContextBase *dcbase, CPUState *cpu)
 -- 
 2.19.1
