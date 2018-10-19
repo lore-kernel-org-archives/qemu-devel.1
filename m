@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59487)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59495)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gDJG4-00058W-3V
+	(envelope-from <cota@braap.org>) id 1gDJG4-00058e-6i
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:07:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gDJFz-0003am-1g
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:07:17 -0400
+	(envelope-from <cota@braap.org>) id 1gDJFz-0003ae-1O
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:07:18 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 18 Oct 2018 21:06:19 -0400
-Message-Id: <20181019010625.25294-51-cota@braap.org>
+Date: Thu, 18 Oct 2018 21:06:08 -0400
+Message-Id: <20181019010625.25294-40-cota@braap.org>
 In-Reply-To: <20181019010625.25294-1-cota@braap.org>
 References: <20181019010625.25294-1-cota@braap.org>
-Subject: [Qemu-devel] [RFC v3 50/56] s390: acquire the BQL in cpu_has_work
+Subject: [Qemu-devel] [RFC v3 39/56] s390x: convert to cpu_interrupt_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,67 +20,45 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
-
-Soon we will call cpu_has_work without the BQL.
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
 
 Cc: Cornelia Huck <cohuck@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>
 Cc: Alexander Graf <agraf@suse.de>
+Cc: Richard Henderson <rth@twiddle.net>
 Cc: David Hildenbrand <david@redhat.com>
 Cc: qemu-s390x@nongnu.org
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/s390x/cpu.c | 20 +++++++++++++++++++-
- 1 file changed, 19 insertions(+), 1 deletion(-)
+ hw/intc/s390_flic.c | 2 +-
+ target/s390x/cpu.c  | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/hw/intc/s390_flic.c b/hw/intc/s390_flic.c
+index bfb5cf1d07..d944824e67 100644
+--- a/hw/intc/s390_flic.c
++++ b/hw/intc/s390_flic.c
+@@ -189,7 +189,7 @@ static void qemu_s390_flic_notify(uint32_t type)
+     CPU_FOREACH(cs) {
+         S390CPU *cpu = S390_CPU(cs);
+ 
+-        cs->interrupt_request |= CPU_INTERRUPT_HARD;
++        cpu_interrupt_request_or(cs, CPU_INTERRUPT_HARD);
+ 
+         /* ignore CPUs that are not sleeping */
+         if (s390_cpu_get_state(cpu) != S390_CPU_STATE_OPERATING &&
 diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index 1f91df57bc..64c10ad115 100644
+index 956d4e1d18..1f91df57bc 100644
 --- a/target/s390x/cpu.c
 +++ b/target/s390x/cpu.c
-@@ -24,6 +24,7 @@
-  */
+@@ -65,7 +65,7 @@ static bool s390_cpu_has_work(CPUState *cs)
+         return false;
+     }
  
- #include "qemu/osdep.h"
-+#include "qemu/main-loop.h"
- #include "qapi/error.h"
- #include "cpu.h"
- #include "internal.h"
-@@ -55,10 +56,12 @@ static void s390_cpu_set_pc(CPUState *cs, vaddr value)
-     cpu->env.psw.addr = value;
- }
+-    if (!(cs->interrupt_request & CPU_INTERRUPT_HARD)) {
++    if (!(cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD)) {
+         return false;
+     }
  
--static bool s390_cpu_has_work(CPUState *cs)
-+static bool s390_cpu_has_work_locked(CPUState *cs)
- {
-     S390CPU *cpu = S390_CPU(cs);
- 
-+    g_assert(qemu_mutex_iothread_locked());
-+
-     /* STOPPED cpus can never wake up */
-     if (s390_cpu_get_state(cpu) != S390_CPU_STATE_LOAD &&
-         s390_cpu_get_state(cpu) != S390_CPU_STATE_OPERATING) {
-@@ -72,6 +75,21 @@ static bool s390_cpu_has_work(CPUState *cs)
-     return s390_cpu_has_int(cpu);
- }
- 
-+static bool s390_cpu_has_work(CPUState *cs)
-+{
-+    if (!qemu_mutex_iothread_locked()) {
-+        bool ret;
-+
-+        cpu_mutex_unlock(cs);
-+        qemu_mutex_lock_iothread();
-+        cpu_mutex_lock(cs);
-+        ret = s390_cpu_has_work_locked(cs);
-+        qemu_mutex_unlock_iothread();
-+        return ret;
-+    }
-+    return s390_cpu_has_work_locked(cs);
-+}
-+
- #if !defined(CONFIG_USER_ONLY)
- /* S390CPUClass::load_normal() */
- static void s390_cpu_load_normal(CPUState *s)
 -- 
 2.17.1
