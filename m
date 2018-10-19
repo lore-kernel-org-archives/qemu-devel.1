@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39042)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39114)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDXkP-00061w-DS
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:35:38 -0400
+	(envelope-from <philmd@redhat.com>) id 1gDXkT-00067v-IT
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:35:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gDXkN-00014e-Ls
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:35:37 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:58348 helo=mail.rt-rk.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gDXkN-0000zu-4a
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:35:35 -0400
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Fri, 19 Oct 2018 18:33:46 +0200
-Message-Id: <1539966828-20947-13-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1539966828-20947-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1539966828-20947-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v5 12/14] target/mips: Add emulation of MXU
- instruction D16MAC
+	(envelope-from <philmd@redhat.com>) id 1gDXkQ-0001D7-9A
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:35:41 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:43676)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gDXkP-00019I-SK
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:35:38 -0400
+Received: by mail-wr1-f66.google.com with SMTP id n1-v6so38073857wrt.10
+	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 09:35:37 -0700 (PDT)
+References: <1539954845-26716-1-git-send-email-thuth@redhat.com>
+	<1539954845-26716-6-git-send-email-thuth@redhat.com>
+	<CAFEAcA_NkdZtbM9n4633_hSr38eb9FJsi92=+Eeuky+U=eDtZA@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <6ea8c64f-272f-6645-8a2f-b94117a24027@redhat.com>
+Date: Fri, 19 Oct 2018 18:35:30 +0200
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA_NkdZtbM9n4633_hSr38eb9FJsi92=+Eeuky+U=eDtZA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 5/5] configs: Add a CONFIG_SMC37C669 switch
+ for the "smc37c669-superio" device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,126 +32,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net, richard.henderson@linaro.org, jancraig@amazon.com, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com
+To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
+Cc: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-From: Craig Janeczek <jancraig@amazon.com>
+On 19/10/2018 16:46, Peter Maydell wrote:
+> On 19 October 2018 at 14:14, Thomas Huth <thuth@redhat.com> wrote:
+>> This device is not user-creatable and currently only used for the
+>> "alpha" target. So if the user does not want to compile alpha-softmmu,
+>> we should also not compile this device. Add a proper config switch to
+>> be able to compile this more flexibly.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  default-configs/alpha-softmmu.mak | 1 +
+>>  hw/isa/Makefile.objs              | 3 ++-
+>>  2 files changed, 3 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/default-configs/alpha-softmmu.mak b/default-configs/alpha-softmmu.mak
+>> index bbe361f..eb58b40 100644
+>> --- a/default-configs/alpha-softmmu.mak
+>> +++ b/default-configs/alpha-softmmu.mak
+>> @@ -19,3 +19,4 @@ CONFIG_IDE_CMD646=y
+>>  CONFIG_I8259=y
+>>  CONFIG_MC146818RTC=y
+>>  CONFIG_ISA_TESTDEV=y
+>> +CONFIG_SMC37C669=y
+>> diff --git a/hw/isa/Makefile.objs b/hw/isa/Makefile.objs
+>> index 83e06f6..9e106df 100644
+>> --- a/hw/isa/Makefile.objs
+>> +++ b/hw/isa/Makefile.objs
+>> @@ -1,9 +1,10 @@
+>>  common-obj-$(CONFIG_ISA_BUS) += isa-bus.o
+>> -common-obj-$(CONFIG_ISA_BUS) += isa-superio.o smc37c669-superio.o
+>> +common-obj-$(CONFIG_ISA_BUS) += isa-superio.o
+>>  common-obj-$(CONFIG_APM) += apm.o
+>>  common-obj-$(CONFIG_I82378) += i82378.o
+>>  common-obj-$(CONFIG_PC87312) += pc87312.o
+>>  common-obj-$(CONFIG_PIIX4) += piix4.o
+>>  common-obj-$(CONFIG_VT82C686) += vt82c686.o
+>> +common-obj-$(CONFIG_SMC37C669) += smc37c669-superio.o
+> 
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> 
+> Should isa-superio.o also go in its own config flag?
 
-Add support for emulating the D16MAC MXU instruction.
+It could be, but pc87312/smc37c669/vt82c686 inherit of TYPE_ISA_SUPERIO
+so would require something like:
 
-Signed-off-by: Craig Janeczek <jancraig@amazon.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
----
- target/mips/translate.c | 90 +++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 87 insertions(+), 3 deletions(-)
+common-obj-$(call land,$(CONFIG_ISA_SUPERIO),$(CONFIG_PC87312)) \
+            += pc87312.o
+common-obj-$(call land,$(CONFIG_ISA_SUPERIO),$(CONFIG_VT82C686)) \
+            += vt82c686.o
+common-obj-$(call land,$(CONFIG_ISA_SUPERIO),$(CONFIG_SMC37C669)) \
+            += smc37c669-superio.o
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index ea7fe0c..d37539b 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -23558,6 +23558,92 @@ static void gen_mxu_d16mul(DisasContext *ctx)
-     tcg_temp_free(t3);
- }
- 
-+/*
-+ * D16MAC XRa, XRb, XRc, XRd, aptn2, optn2 - Signed 16 bit pattern multiply
-+ *                                           and accumulate
-+ */
-+static void gen_mxu_d16mac(DisasContext *ctx)
-+{
-+    TCGv t0, t1, t2, t3;
-+    TCGLabel *l0;
-+    uint32_t XRa, XRb, XRc, XRd, optn2, aptn2;
-+
-+    t0 = tcg_temp_new();
-+    t1 = tcg_temp_new();
-+    t2 = tcg_temp_new();
-+    t3 = tcg_temp_new();
-+
-+    l0 = gen_new_label();
-+
-+    XRa = extract32(ctx->opcode, 6, 4);
-+    XRb = extract32(ctx->opcode, 10, 4);
-+    XRc = extract32(ctx->opcode, 14, 4);
-+    XRd = extract32(ctx->opcode, 18, 4);
-+    optn2 = extract32(ctx->opcode, 22, 2);
-+    aptn2 = extract32(ctx->opcode, 24, 2);
-+
-+    gen_load_mxu_cr(t0);
-+    tcg_gen_andi_tl(t0, t0, MXU_CR_MXU_EN);
-+    tcg_gen_brcondi_tl(TCG_COND_NE, t0, MXU_CR_MXU_EN, l0);
-+
-+    gen_load_mxu_gpr(t1, XRb);
-+    tcg_gen_sextract_tl(t0, t1, 0, 16);
-+    tcg_gen_sextract_tl(t1, t1, 16, 16);
-+
-+    gen_load_mxu_gpr(t3, XRc);
-+    tcg_gen_sextract_tl(t2, t3, 0, 16);
-+    tcg_gen_sextract_tl(t3, t3, 16, 16);
-+
-+    switch (optn2) {
-+    case MXU_OPTN2_WW: /* XRB.H*XRC.H == lop, XRB.L*XRC.L == rop */
-+        tcg_gen_mul_tl(t3, t1, t3);
-+        tcg_gen_mul_tl(t2, t0, t2);
-+        break;
-+    case MXU_OPTN2_LW: /* XRB.L*XRC.H == lop, XRB.L*XRC.L == rop */
-+        tcg_gen_mul_tl(t3, t0, t3);
-+        tcg_gen_mul_tl(t2, t0, t2);
-+        break;
-+    case MXU_OPTN2_HW: /* XRB.H*XRC.H == lop, XRB.H*XRC.L == rop */
-+        tcg_gen_mul_tl(t3, t1, t3);
-+        tcg_gen_mul_tl(t2, t1, t2);
-+        break;
-+    case MXU_OPTN2_XW: /* XRB.L*XRC.H == lop, XRB.H*XRC.L == rop */
-+        tcg_gen_mul_tl(t3, t0, t3);
-+        tcg_gen_mul_tl(t2, t1, t2);
-+        break;
-+    }
-+    gen_load_mxu_gpr(t0, XRa);
-+    gen_load_mxu_gpr(t1, XRd);
-+
-+    switch (aptn2) {
-+    case MXU_APTN2_AA:
-+        tcg_gen_add_tl(t3, t0, t3);
-+        tcg_gen_add_tl(t2, t1, t2);
-+        break;
-+    case MXU_APTN2_AS:
-+        tcg_gen_add_tl(t3, t0, t3);
-+        tcg_gen_sub_tl(t2, t1, t2);
-+        break;
-+    case MXU_APTN2_SA:
-+        tcg_gen_sub_tl(t3, t0, t3);
-+        tcg_gen_add_tl(t2, t1, t2);
-+        break;
-+    case MXU_APTN2_SS:
-+        tcg_gen_sub_tl(t3, t0, t3);
-+        tcg_gen_sub_tl(t2, t1, t2);
-+        break;
-+    }
-+    gen_store_mxu_gpr(t3, XRa);
-+    gen_store_mxu_gpr(t2, XRd);
-+
-+    gen_set_label(l0);
-+
-+    tcg_temp_free(t0);
-+    tcg_temp_free(t1);
-+    tcg_temp_free(t2);
-+    tcg_temp_free(t3);
-+}
-+
- 
- /*
-  * Decoding engine for MXU
-@@ -24544,9 +24630,7 @@ static void decode_opc_mxu(CPUMIPSState *env, DisasContext *ctx)
-         decode_opc_mxu__pool03(env, ctx);
-         break;
-     case OPC_MXU_D16MAC:
--        /* TODO: Implement emulation of D16MAC instruction. */
--        MIPS_INVAL("OPC_MXU_D16MAC");
--        generate_exception_end(ctx, EXCP_RI);
-+        gen_mxu_d16mac(ctx);
-         break;
-     case OPC_MXU_D16MACF:
-         /* TODO: Implement emulation of D16MACF instruction. */
--- 
-2.7.4
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+> 
+> thanks
+> -- PMM
+> 
