@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37274)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gDRIQ-0006qh-Kc
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 05:42:19 -0400
+	(envelope-from <mreitz@redhat.com>) id 1gDRJu-0008Vp-A4
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 05:43:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gDRIO-0005IQ-NM
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 05:42:17 -0400
+	(envelope-from <mreitz@redhat.com>) id 1gDRJr-00079m-40
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 05:43:50 -0400
 References: <20181015141453.32632-1-mreitz@redhat.com>
-	<20181015141453.32632-6-mreitz@redhat.com>
-	<84df80ea-f9c8-f953-9e4d-f4af8351edf2@redhat.com>
+	<20181015141453.32632-7-mreitz@redhat.com>
+	<4c35f899-8586-4b57-7c9d-699aac223752@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <0a3afbfc-ee1f-402a-1f92-2355482876cb@redhat.com>
-Date: Fri, 19 Oct 2018 11:42:07 +0200
+Message-ID: <cc57cd72-eafc-e6a9-207c-6ebb7eea5deb@redhat.com>
+Date: Fri, 19 Oct 2018 11:43:32 +0200
 MIME-Version: 1.0
-In-Reply-To: <84df80ea-f9c8-f953-9e4d-f4af8351edf2@redhat.com>
+In-Reply-To: <4c35f899-8586-4b57-7c9d-699aac223752@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="XMejFtkxTxcixeqXKttBWU3AOILsyY6z8"
-Subject: Re: [Qemu-devel] [PATCH 5/9] iotests: Different iterator behavior
- in Python 3
+	boundary="M8sKQjef8FCsbhKFEFPE4DKdqBAcqGWC2"
+Subject: Re: [Qemu-devel] [PATCH 6/9] iotests: Explicitly inherit FDs in
+ Python
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,102 +30,168 @@ To: Cleber Rosa <crosa@redhat.com>, qemu-block@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---XMejFtkxTxcixeqXKttBWU3AOILsyY6z8
+--M8sKQjef8FCsbhKFEFPE4DKdqBAcqGWC2
 From: Max Reitz <mreitz@redhat.com>
 To: Cleber Rosa <crosa@redhat.com>, qemu-block@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
  Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <0a3afbfc-ee1f-402a-1f92-2355482876cb@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 5/9] iotests: Different iterator behavior in
- Python 3
+Message-ID: <cc57cd72-eafc-e6a9-207c-6ebb7eea5deb@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 6/9] iotests: Explicitly inherit FDs in
+ Python
 References: <20181015141453.32632-1-mreitz@redhat.com>
- <20181015141453.32632-6-mreitz@redhat.com>
- <84df80ea-f9c8-f953-9e4d-f4af8351edf2@redhat.com>
-In-Reply-To: <84df80ea-f9c8-f953-9e4d-f4af8351edf2@redhat.com>
+ <20181015141453.32632-7-mreitz@redhat.com>
+ <4c35f899-8586-4b57-7c9d-699aac223752@redhat.com>
+In-Reply-To: <4c35f899-8586-4b57-7c9d-699aac223752@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 16.10.18 00:39, Cleber Rosa wrote:
+On 16.10.18 01:18, Cleber Rosa wrote:
 >=20
 >=20
 > On 10/15/18 10:14 AM, Max Reitz wrote:
->> In Python 3, several functions now return iterators instead of lists.
->> This includes range(), items(), map(), and filter().  This means that =
-if
->> we really want a list, we have to wrap those instances with list().  O=
-n
->> the other hand, sometimes we do just want an iterator, in which case w=
-e
->> have sometimes used xrange() and iteritems() which no longer exist in
->> Python 3.  Just change these calls to be range() and items(), which
->> costs a bit of performance in Python 2, but will do the right thing in=
-
->> Python 3 (which is what is important).
+>> Python 3.2 introduced the inheritable attribute for FDs.  At the same
+>> time, it changed the default so that all FDs are not inheritable by
+>> default, that only inheritable FDs are inherited to subprocesses, and
+>> only if close_fds is explicitly set to False.
 >>
->> In one instance, we only wanted the first instance of the result of a
->> filter() call.  Instead of using next(filter()) which would work only =
-in
->> Python 3, or list(filter())[0] which would work everywhere but is a bi=
-t
->> weird, this instance is changed to a single-line for with next() wrapp=
-ed
->> around, which works both in 2.7 and 3.
+>=20
+> It's actually a change that was introduced in 3.4:
+>=20
+> https://docs.python.org/3/library/os.html#inheritance-of-file-descripto=
+rs
+
+Oops, don't know how I got that wrong.
+
+>> Adhere to this by setting close_fds to False when working with
+>> subprocesses that may want to inherit FDs, and by trying to
+>> set_inheritable() on FDs that we do want to bequeath to them.
 >>
 >> Signed-off-by: Max Reitz <mreitz@redhat.com>
 >> ---
->>  tests/qemu-iotests/044 | 12 ++++++------
->>  tests/qemu-iotests/056 |  2 +-
->>  tests/qemu-iotests/065 |  4 ++--
->>  tests/qemu-iotests/124 |  4 ++--
->>  tests/qemu-iotests/139 |  2 +-
->>  tests/qemu-iotests/163 |  6 +++---
->>  6 files changed, 15 insertions(+), 15 deletions(-)
+>>  scripts/qemu.py        | 13 +++++++++++--
+>>  scripts/qmp/qmp.py     |  7 +++++++
+>>  tests/qemu-iotests/147 |  7 +++++++
+>>  3 files changed, 25 insertions(+), 2 deletions(-)
 >>
+>> diff --git a/scripts/qemu.py b/scripts/qemu.py
+>> index f099ce7278..28366c4a67 100644
+>> --- a/scripts/qemu.py
+>> +++ b/scripts/qemu.py
+>> @@ -142,10 +142,18 @@ class QEMUMachine(object):
+>>          if opts:
+>>              options.append(opts)
+>> =20
+>> +        # This did not exist before 3.2, but since then it is
+>> +        # mandatory for our purpose
+>> +        try:
 >=20
-> You have 2 files here which use xrange (which is a manageable size, and=
+> Version should be 3.4 here as well.
 
-> whose occurrences involve a moderate size of items) to also consider:
+Yes, will fix everywhere.
+
+>> +            os.set_inheritable(fd, True)
+>> +        except AttributeError:
+>> +            pass
+>> +
 >=20
-> if sys.version_info.major =3D=3D 2:
->    range =3D xrange
+> Doing hasattr(os, "set_inheritable") is cheaper.
+>=20
+> - Cleber.
 
-I don't think it's necessary, but it's so easy to grep for
-"sys.version_info" once we want to completely switch to Python 3 that I
-can't find good arguments against it. O:-)
+Nice, I'll use that then.
 
 Max
 
-> Defaulting to the Python 3 names, but behaving the same across Python 2=
-
-> and 3.
+>>          self._args.append('-add-fd')
+>>          self._args.append(','.join(options))
+>>          return self
+>> =20
+>> +    # The caller needs to make sure the FD is inheritable
+>>      def send_fd_scm(self, fd_file_path):
+>>          # In iotest.py, the qmp should always use unix socket.
+>>          assert self._qmp.is_scm_available()
+>> @@ -159,7 +167,7 @@ class QEMUMachine(object):
+>>                      "%s" % fd_file_path]
+>>          devnull =3D open(os.path.devnull, 'rb')
+>>          proc =3D subprocess.Popen(fd_param, stdin=3Ddevnull, stdout=3D=
+subprocess.PIPE,
+>> -                                stderr=3Dsubprocess.STDOUT)
+>> +                                stderr=3Dsubprocess.STDOUT, close_fds=
+=3DFalse)
+>>          output =3D proc.communicate()[0]
+>>          if output:
+>>              LOG.debug(output)
+>> @@ -280,7 +288,8 @@ class QEMUMachine(object):
+>>                                         stdin=3Ddevnull,
+>>                                         stdout=3Dself._qemu_log_file,
+>>                                         stderr=3Dsubprocess.STDOUT,
+>> -                                       shell=3DFalse)
+>> +                                       shell=3DFalse,
+>> +                                       close_fds=3DFalse)
+>>          self._post_launch()
+>> =20
+>>      def wait(self):
+>> diff --git a/scripts/qmp/qmp.py b/scripts/qmp/qmp.py
+>> index 5c8cf6a056..009be8345b 100644
+>> --- a/scripts/qmp/qmp.py
+>> +++ b/scripts/qmp/qmp.py
+>> @@ -10,6 +10,7 @@
+>> =20
+>>  import json
+>>  import errno
+>> +import os
+>>  import socket
+>>  import logging
+>> =20
+>> @@ -253,4 +254,10 @@ class QEMUMonitorProtocol(object):
+>>          return self.__sock.fileno()
+>> =20
+>>      def is_scm_available(self):
+>> +        # This did not exist before 3.2, but since then it is
+>> +        # mandatory for our purpose
+>> +        try:
+>> +            os.set_inheritable(self.get_sock_fd(), True)
+>> +        except AttributeError:
+>> +            pass
+>>          return self.__sock.family =3D=3D socket.AF_UNIX
+>> diff --git a/tests/qemu-iotests/147 b/tests/qemu-iotests/147
+>> index d2081df84b..b58455645b 100755
+>> --- a/tests/qemu-iotests/147
+>> +++ b/tests/qemu-iotests/147
+>> @@ -229,6 +229,13 @@ class BuiltinNBD(NBDBlockdevAddBase):
+>>          sockfd =3D socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+>>          sockfd.connect(unix_socket)
+>> =20
+>> +        # This did not exist before 3.2, but since then it is
+>> +        # mandatory for our purpose
+>> +        try:
+>> +            os.set_inheritable(sockfd.fileno(), True)
+>> +        except AttributeError:
+>> +            pass
+>> +
+>>          result =3D self.vm.send_fd_scm(str(sockfd.fileno()))
+>>          self.assertEqual(result, 0, 'Failed to send socket FD')
+>> =20
+>>
 >=20
-> To do the same for dict.iteritems() =3D> dict.items() requires a lot mo=
-re
-> code, so I'd stay away from it for now.  Also, it looks like most of
-> those dicts are small in size (**kwargs and the like).
->=20
-> Other than that suggestion,
->=20
-> Reviewed-by: Cleber Rosa <crosa@redhat.com>
->=20
 
 
 
---XMejFtkxTxcixeqXKttBWU3AOILsyY6z8
+--M8sKQjef8FCsbhKFEFPE4DKdqBAcqGWC2
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlvJpu8ACgkQ9AfbAGHV
-z0DSBgf/aulCJY8Nh2psHnFudYAuzxeuUR1ic0UTr0cGdh0IW1IaRAmx8W0gBvwj
-Zlf5oPUnCFksHOja4Cym0sV/2E+hAjs45BIjjB1mlvJIRP37xGzhjYEbYQTe8CVx
-tdzTuB9iktYI9Tg/hT/htiqdjtqoniz6PpCdxei9DGQP7cSpFgudhmuyF9W+6QVm
-tCSa8WbLlEMOgQ50DSEmrBfoz+6k7Dd6BXx8LBtxH3kPmnU5MfQzvrrj0lse49q2
-PDKoSqp5H7N95pPOyF7A3MH7TnROcWcBm+mJkHxDsitLDAOGkLiWwnEWyUJ33xYY
-NVgl1sUmaFyfv9jz9oHlOhP2+2izpw==
-=9phL
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlvJp0QACgkQ9AfbAGHV
+z0AwbAf/aqruepb1d1IDUjMKCTed5WL6kGrVvy8UljwlTWvyT+MTasRxV1u81hjC
+yIXa/j5A82uVtIKgKR5ef0LHoXvwuY7kaHt2ba++W0fc66apM8C7Y4dxZDC6ZhGv
+75Q39LgaKRXPmiamKV2ob6clO8RRIDpDD2HgjGyyScGC63T1RXoQf2DNys+2zZFs
+7WPYjIMuDF/oCceOAB37QKOIXUrQP09aGDz2TIupYv1XpNKG2LoPuK3O2RKpCXEq
+nH0jyEZaZi4BzSo5xGFgy3kxIURzmlJvDtVWu+Nmu+ztlg8PEpV/YW0h78WfitA7
+gTELbXWjKFHEekHd2OB2U9tO/QnjGA==
+=myLl
 -----END PGP SIGNATURE-----
 
---XMejFtkxTxcixeqXKttBWU3AOILsyY6z8--
+--M8sKQjef8FCsbhKFEFPE4DKdqBAcqGWC2--
