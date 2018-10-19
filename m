@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54607)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58070)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gDYMt-000362-3A
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 13:15:24 -0400
+	(envelope-from <palmer@sifive.com>) id 1gDYVt-00020K-FA
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 13:24:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gDYMl-0001m9-OH
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 13:15:21 -0400
-Received: from mail-co1nam03on0094.outbound.protection.outlook.com
-	([104.47.40.94]:32640
-	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1gDYMl-0001j8-AH
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 13:15:15 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Fri, 19 Oct 2018 17:15:10 +0000
-Message-ID: <BN6PR2201MB1251DFE0C7DA3AA4581A26E2C6F90@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <1539966828-20947-1-git-send-email-aleksandar.markovic@rt-rk.com>,
-	<1539966828-20947-11-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1539966828-20947-11-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v5 10/14] target/mips: Add emulation of MXU
- instruction S8LDD
+	(envelope-from <palmer@sifive.com>) id 1gDYVq-0005Ve-5a
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 13:24:41 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:37576)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gDYVp-0005Sv-RH
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 13:24:37 -0400
+Received: by mail-pg1-x542.google.com with SMTP id c10-v6so16046078pgq.4
+	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 10:24:37 -0700 (PDT)
+Date: Fri, 19 Oct 2018 10:24:34 -0700 (PDT)
+In-Reply-To: <20181019010625.25294-17-cota@braap.org>
+From: Palmer Dabbelt <palmer@sifive.com>
+Message-ID: <mhng-f66ea843-b706-430e-b102-59f3a9ac4636@palmer-si-x1c4>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC v3 16/56] riscv: convert to cpu_halted
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,145 +27,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>, "jancraig@amazon.com" <jancraig@amazon.com>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>
+To: cota@braap.org
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, Michael Clark <mjc@sifive.com>, sagark@eecs.berkeley.edu, kbastian@mail.uni-paderborn.de, alistair23@gmail.com
 
-
-> From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-> Sent: Friday, October 19, 2018 6:33 PM
-> Subject: [PATCH v5 10/14] target/mips: Add emulation of MXU instruction S=
-8LDD
->=20
-> From: Craig Janeczek <jancraig@amazon.com>
->=20
-> Add support for emulating the S8LDD MXU instruction.
->=20
-> Signed-off-by: Craig Janeczek <jancraig@amazon.com>
-> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+On Thu, 18 Oct 2018 18:05:45 PDT (-0700), cota@braap.org wrote:
+> Cc: Michael Clark <mjc@sifive.com>
+> Cc: Palmer Dabbelt <palmer@sifive.com>
+> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
+> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+> Cc: Alistair Francis <alistair23@gmail.com>
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
 > ---
->  target/mips/translate.c | 90 +++++++++++++++++++++++++++++++++++++++++++=
-++++--
->  1 file changed, 87 insertions(+), 3 deletions(-)
->=20
-> diff --git a/target/mips/translate.c b/target/mips/translate.c
-> index c2b3463..71a6533 100644
-> --- a/target/mips/translate.c
-> +++ b/target/mips/translate.c
-> @@ -23410,6 +23410,92 @@ static void gen_mxu_s32m2i(DisasContext *ctx)
->      tcg_temp_free(t0);
+>  target/riscv/op_helper.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
+> index aec7558e1b..b5c32241dd 100644
+> --- a/target/riscv/op_helper.c
+> +++ b/target/riscv/op_helper.c
+> @@ -736,7 +736,7 @@ void helper_wfi(CPURISCVState *env)
+>  {
+>      CPUState *cs = CPU(riscv_env_get_cpu(env));
+>
+> -    cs->halted = 1;
+> +    cpu_halted_set(cs, 1);
+>      cs->exception_index = EXCP_HLT;
+>      cpu_loop_exit(cs);
 >  }
->=20
-> +/*
-> + * S8LDD XRa, Rb, s8, optn3 - Load a byte from memory to XRF
-> + */
-> +static void gen_mxu_s8ldd(DisasContext *ctx)
-> +{
-> +    TCGv t0, t1;
-> +    TCGLabel *l0;
-> +    uint32_t XRa, Rb, s8, optn3;
-> +
-> +    t0 =3D tcg_temp_new();
-> +    t1 =3D tcg_temp_new();
-> +
-> +    l0 =3D gen_new_label();
-> +
-> +    XRa =3D extract32(ctx->opcode, 6, 4);
-> +    s8 =3D extract32(ctx->opcode, 10, 8);
-> +    optn3 =3D extract32(ctx->opcode, 18, 3);
-> +    Rb =3D extract32(ctx->opcode, 21, 5);
-> +
-> +    gen_load_mxu_cr(t0);
-> +    tcg_gen_andi_tl(t0, t0, MXU_CR_MXU_EN);
-> +    tcg_gen_brcondi_tl(TCG_COND_NE, t0, MXU_CR_MXU_EN, l0);
-> +
 
-Is there any way to move MXU_CR_MXU_EN check to the one level higher functi=
-on, to avoid repetition?
-
-I think all MXU instructions need this check, except S32I2M, S32M2I, and no=
-n-MXU MUL.
-
-Thanks,
-Aleksandar
-
-> +    gen_load_gpr(t0, Rb);
-> +    tcg_gen_addi_tl(t0, t0, (int8_t)s8);
-> +
-> +    switch (optn3) {
-> +    /* XRa[7:0] =3D tmp8 */
-> +    case MXU_OPTN3_PTN0:
-> +        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
-> +        gen_load_mxu_gpr(t0, XRa);
-> +        tcg_gen_deposit_tl(t0, t0, t1, 0, 8);
-> +        break;
-> +    /* XRa[15:8] =3D tmp8 */
-> +    case MXU_OPTN3_PTN1:
-> +        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
-> +        gen_load_mxu_gpr(t0, XRa);
-> +        tcg_gen_deposit_tl(t0, t0, t1, 8, 8);
-> +        break;
-> +    /* XRa[23:16] =3D tmp8 */
-> +    case MXU_OPTN3_PTN2:
-> +        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
-> +        gen_load_mxu_gpr(t0, XRa);
-> +        tcg_gen_deposit_tl(t0, t0, t1, 16, 8);
-> +        break;
-> +    /* XRa[31:24] =3D tmp8 */
-> +    case MXU_OPTN3_PTN3:
-> +        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
-> +        gen_load_mxu_gpr(t0, XRa);
-> +        tcg_gen_deposit_tl(t0, t0, t1, 24, 8);
-> +        break;
-> +    /* XRa =3D {8'b0, tmp8, 8'b0, tmp8} */
-> +    case MXU_OPTN3_PTN4:
-> +        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
-> +        tcg_gen_deposit_tl(t0, t1, t1, 16, 16);
-> +        break;
-> +    /* XRa =3D {tmp8, 8'b0, tmp8, 8'b0} */
-> +    case MXU_OPTN3_PTN5:
-> +        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
-> +        tcg_gen_shli_tl(t1, t1, 8);
-> +        tcg_gen_deposit_tl(t0, t1, t1, 16, 16);
-> +        break;
-> +    /* XRa =3D {{8{sign of tmp8}}, tmp8, {8{sign of tmp8}}, tmp8} */
-> +    case MXU_OPTN3_PTN6:
-> +        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_SB);
-> +        tcg_gen_mov_tl(t0, t1);
-> +        tcg_gen_andi_tl(t0, t0, 0xFF00FFFF);
-> +        tcg_gen_shli_tl(t1, t1, 16);
-> +        tcg_gen_or_tl(t0, t0, t1);
-> +        break;
-> +    /* XRa =3D {tmp8, tmp8, tmp8, tmp8} */
-> +    case MXU_OPTN3_PTN7:
-> +        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
-> +        tcg_gen_deposit_tl(t1, t1, t1, 8, 8);
-> +        tcg_gen_deposit_tl(t0, t1, t1, 16, 16);
-> +        break;
-> +    }
-> +
-> +    gen_store_mxu_gpr(t0, XRa);
-> +
-> +    gen_set_label(l0);
-> +
-> +    tcg_temp_free(t0);
-> +    tcg_temp_free(t1);
-> +}
-> +
->=20
->  /*
->   * Decoding engine for MXU
-> @@ -24469,9 +24555,7 @@ static void decode_opc_mxu(CPUMIPSState *env, Dis=
-asContext *ctx)
->          generate_exception_end(ctx, EXCP_RI);
->          break;
->      case OPC_MXU_S8LDD:
-> -        /* TODO: Implement emulation of S8LDD instruction. */
-> -        MIPS_INVAL("OPC_MXU_S8LDD");
-> -        generate_exception_end(ctx, EXCP_RI);
-> +        gen_mxu_s8ldd(ctx);
->          break;
->      case OPC_MXU_S8STD:
->          /* TODO: Implement emulation of S8STD instruction. */
-> --
-> 2.7.4
->=20
+Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
