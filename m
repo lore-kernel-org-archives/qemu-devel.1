@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51949)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liam.merwick@oracle.com>) id 1gDbQZ-0002jN-ME
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 16:31:24 -0400
+	(envelope-from <liam.merwick@oracle.com>) id 1gDbQv-0002vc-Ah
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 16:31:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liam.merwick@oracle.com>) id 1gDbQY-0004Fe-RF
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 16:31:23 -0400
+	(envelope-from <liam.merwick@oracle.com>) id 1gDbQs-00052X-6Q
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 16:31:45 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:58060)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
+	id 1gDbQr-00051Q-Tv
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 16:31:42 -0400
 From: Liam Merwick <liam.merwick@oracle.com>
 References: <1535739372-24454-1-git-send-email-Liam.Merwick@oracle.com>
-	<1535739372-24454-4-git-send-email-Liam.Merwick@oracle.com>
-	<ed7db5e9-142d-7ab9-0b3a-969490b0099a@redhat.com>
-Message-ID: <04cebbe1-e088-b90f-649c-0eb184a5b228@oracle.com>
-Date: Fri, 19 Oct 2018 21:31:33 +0100
+	<1535739372-24454-5-git-send-email-Liam.Merwick@oracle.com>
+	<1d34f37c-94cb-61af-58a6-dae10ddc2ce5@redhat.com>
+Message-ID: <27a60d5c-481a-c8c1-88e7-853ff441b144@oracle.com>
+Date: Fri, 19 Oct 2018 21:32:05 +0100
 MIME-Version: 1.0
-In-Reply-To: <ed7db5e9-142d-7ab9-0b3a-969490b0099a@redhat.com>
+In-Reply-To: <1d34f37c-94cb-61af-58a6-dae10ddc2ce5@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 3/8] block: Null pointer dereference in
- blk_root_get_parent_desc()
+Subject: Re: [Qemu-devel] [PATCH v3 4/8] qemu-img: potential Null pointer
+ deref in img_commit()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,67 +32,54 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org
 
 
 
-On 12/10/18 15:48, Max Reitz wrote:
-> Hi,
-> 
+On 12/10/18 15:51, Max Reitz wrote:
 > On 31.08.18 20:16, Liam Merwick wrote:
->> The dev_id returned by the call to blk_get_attached_dev_id() in
->> blk_root_get_parent_desc() can be NULL (an internal call to
->> object_get_canonical_path may have returned NULL) so it should
->> be checked before dereferencing.
->>
->> Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
->> Reviewed-by: Darren Kenny <Darren.Kenny@oracle.com>
->> Reviewed-by: Mark Kanda <Mark.Kanda@oracle.com>
->> ---
->>   block/block-backend.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/block/block-backend.c b/block/block-backend.c
->> index fa120630be83..210eee75006a 100644
->> --- a/block/block-backend.c
->> +++ b/block/block-backend.c
->> @@ -136,7 +136,7 @@ static char *blk_root_get_parent_desc(BdrvChild *child)
->>       }
->>   
->>       dev_id = blk_get_attached_dev_id(blk);
->> -    if (*dev_id) {
->> +    if (dev_id && *dev_id) {
->>           return dev_id;
+>> The function block_job_get() may return NULL so before dereferencing
+>> the 'job' pointer in img_commit() it should be checked.
 > 
-> I rather think that blk_get_attached_dev_id() needs attention first.  It
-> returns an explicitly empty string if blk->dev is NULL.  If NULL was a
-> valid return value, it should just return NULL there.
-> 
-> Besides this caller, there are two callers that pass the dev_id to
-> qapi_event_send_device_tray_moved().  Now in practice that allows the
-> string to be NULL, but there is a comment in visit_type_str() that says
-> one should not pass NULL.
-> 
-> So it's either changing blk_get_attached_dev_id() to return NULL when
-> there is no valid ID (instead of the empty string, and then we could
-> save ourselves the check "*dev_id" here and elsewhere), but then we have
-> to fix all callers.
-> 
-> Or we make it return an empty string if object_get_canonical_path()
-> returned NULL.
+> It may not because the job yields before executing anything (if it
+> started successfully; but otherwise, commit_active_start() would have
+> returned an error).  Therefore, I think the better solution is to
+> assert(job) here.
 > 
 
-I went with the latter and now (in upcoming v4) check the return value 
-from object_get_canonical_path() and return an empty string if it's NULL.
+
+Switched patch to use assert()
 
 Regards,
 Liam
 
 
+> (It would be a serious bug if block_job_get() returned NULL here, so
+> it's definitely not something we can be quiet about.  But this patch
+> makes it so the user doesn't even notice.)
+> 
 > Max
 > 
->>       } else {
->>           /* TODO Callback into the BB owner for something more detailed */
+>> Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
+>> Reviewed-by: Darren Kenny <Darren.Kenny@oracle.com>
+>> Reviewed-by: Mark Kanda <Mark.Kanda@oracle.com>
+>> ---
+>>   qemu-img.c | 3 +++
+>>   1 file changed, 3 insertions(+)
+>>
+>> diff --git a/qemu-img.c b/qemu-img.c
+>> index b12f4cd19b0a..51fe09bd08ed 100644
+>> --- a/qemu-img.c
+>> +++ b/qemu-img.c
+>> @@ -1029,6 +1029,9 @@ static int img_commit(int argc, char **argv)
+>>       }
+>>   
+>>       job = block_job_get("commit");
+>> +    if (job == NULL) {
+>> +        goto unref_backing;
+>> +    }
+>>       run_block_job(job, &local_err);
+>>       if (local_err) {
+>>           goto unref_backing;
 >>
 > 
 > 
