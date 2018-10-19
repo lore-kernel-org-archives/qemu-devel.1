@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49132)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gDUE4-0000kf-08
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:50:03 -0400
+	(envelope-from <brad@comstyle.com>) id 1gDUGh-0002Zd-Bq
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:52:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gDUDz-0004Ww-If
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:49:59 -0400
-Received: from mail.uni-paderborn.de ([131.234.142.9]:44394)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
-	id 1gDUDz-0004QY-8D
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:49:55 -0400
-References: <20181012173047.25420-1-kbastian@mail.uni-paderborn.de>
-	<20181012173047.25420-16-kbastian@mail.uni-paderborn.de>
-	<2ef3b2f4-98da-a423-6e11-6dda5779031c@linaro.org>
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Message-ID: <2619969c-866a-5d9a-ff19-800edd1815be@mail.uni-paderborn.de>
-Date: Fri, 19 Oct 2018 14:49:52 +0200
+	(envelope-from <brad@comstyle.com>) id 1gDUGg-0004hA-Ie
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:52:43 -0400
+Received: from speedy.comstyle.com ([2001:470:1d:8c::2]:5825
+	helo=mail.comstyle.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <brad@comstyle.com>) id 1gDUGg-0004dp-7z
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:52:42 -0400
+Received: from mail.comstyle.com (localhost [127.0.0.1])
+	by mail.comstyle.com (Postfix) with ESMTP id 5E0B89843A
+	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 08:52:32 -0400 (EDT)
+Received: from humpty.home.comstyle.com (unknown
+	[IPv6:2001:470:c454:100:bae4:5a8f:59c0:49f6])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested) (Authenticated sender: brad)
+	by mail.comstyle.com (Postfix) with ESMTPSA id 36A1298439
+	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 08:52:32 -0400 (EDT)
+Date: Fri, 19 Oct 2018 08:52:39 -0400
+From: Brad Smith <brad@comstyle.com>
+Message-ID: <20181019125239.GA13884@humpty.home.comstyle.com>
 MIME-Version: 1.0
-In-Reply-To: <2ef3b2f4-98da-a423-6e11-6dda5779031c@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US-large
-Subject: Re: [Qemu-devel] [PATCH 15/28] target/riscv: Convert quadrant 0 of
- RVXC insns to decodetree
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] [PATCH v3] oslib-posix: Use MAP_STACK in
+ qemu_alloc_stack() on OpenBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,28 +35,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, mjc@sifive.com, palmer@sifive.com, sagark@eecs.berkeley.edu
-Cc: peer.adelt@hni.uni-paderborn.de, Alistair.Francis@wdc.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+
+Use MAP_STACK in qemu_alloc_stack() on OpenBSD.
+
+Added to our 6.4 release.
+
+MAP_STACK      Indicate that the mapping is used as a stack.  This
+               flag must be used in combination with MAP_ANON and
+               MAP_PRIVATE.
+
+Implement MAP_STACK option for mmap().  Synchronous faults (pagefault and
+syscall) confirm the stack register points at MAP_STACK memory, otherwise
+SIGSEGV is delivered. sigaltstack() and pthread_attr_setstack() are modified
+to create a MAP_STACK sub-region which satisfies alignment requirements.
+Observe that MAP_STACK can only be set/cleared by mmap(), which zeroes the
+contents of the region -- there is no mprotect() equivalent operation, so
+there is no MAP_STACK-adding gadget.
 
 
-On 10/13/18 8:18 PM, Richard Henderson wrote:
-> On 10/12/18 10:30 AM, Bastian Koppelmann wrote:
->> +# Argument sets:
->> +&cl               rs1 rd
->> +&cl_dw     uimm   rs1 rd
->> +&ciw       nzuimm     rd
->> +&cs               rs1 rs2
->> +&cs_dw     uimm   rs1 rs2
-> I guess this is good enough for now.
-> What I'd like to see is something like
->
-> &i	imm rs1 rd	!extern
+Signed-off-by: Brad Smith <brad@comstyle.com>
+Reviewed-by: Kamil Rytarowski <n54@gmx.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-
-That looks so much better. Can you CC me when you send the patches for 
-the extern support, so I can implement this for RISC-V?
-
-
-Cheers,
-
-Bastian
+diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+index fbd0dc8c57..c1bee2a581 100644
+--- a/util/oslib-posix.c
++++ b/util/oslib-posix.c
+@@ -596,6 +596,7 @@ pid_t qemu_fork(Error **errp)
+ void *qemu_alloc_stack(size_t *sz)
+ {
+     void *ptr, *guardpage;
++    int flags;
+ #ifdef CONFIG_DEBUG_STACK_USAGE
+     void *ptr2;
+ #endif
+@@ -610,8 +611,18 @@ void *qemu_alloc_stack(size_t *sz)
+     /* allocate one extra page for the guard page */
+     *sz += pagesz;
+ 
+-    ptr = mmap(NULL, *sz, PROT_READ | PROT_WRITE,
+-               MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
++    flags = MAP_PRIVATE | MAP_ANONYMOUS;
++#if defined(MAP_STACK) && defined(__OpenBSD__)
++    /* Only enable MAP_STACK on OpenBSD. Other OS's such as
++     * Linux/FreeBSD/NetBSD have a flag with the same name
++     * but have differing functionality. OpenBSD will SEGV
++     * if it spots execution with a stack pointer pointing
++     * at memory that was not allocated with MAP_STACK.
++     */
++    flags |= MAP_STACK;
++#endif
++
++    ptr = mmap(NULL, *sz, PROT_READ | PROT_WRITE, flags, -1, 0);
+     if (ptr == MAP_FAILED) {
+         perror("failed to allocate memory for stack");
+         abort();
