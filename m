@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34654)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gDUpV-0001Zj-JY
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 09:28:42 -0400
+	(envelope-from <berrange@redhat.com>) id 1gDUzG-0004LF-Ju
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 09:38:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gDUpS-0005DT-DT
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 09:28:41 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:51855)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1gDUpS-000582-1w
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 09:28:38 -0400
-References: <cover.1539428198.git.noring@nocrew.org>
-	<BN6PR2201MB125158347C995B4CC764BCDBC6FD0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <40c175ec-9f64-0f05-f63d-b3d00d0705cc@vivier.eu>
-Date: Fri, 19 Oct 2018 15:28:15 +0200
+	(envelope-from <berrange@redhat.com>) id 1gDUzD-0008ON-Dv
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 09:38:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35628)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gDUzD-0008O6-5F
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 09:38:43 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7610630012C3
+	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 13:38:42 +0000 (UTC)
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Fri, 19 Oct 2018 14:38:24 +0100
+Message-Id: <20181019133835.16494-1-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <BN6PR2201MB125158347C995B4CC764BCDBC6FD0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v7 0/7] target/mips: Limited support for
- the R5900
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v6 00/11] Add a standard authorization framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +30,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <amarkovic@wavecomp.com>, Fredrik Noring <noring@nocrew.org>, "Maciej W. Rozycki" <macro@linux-mips.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, =?UTF-8?Q?J=c3=bcrgen_Urban?= <JuergenUrban@gmx.de>, Petar Jovanovic <pjovanovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Le 15/10/2018 à 14:16, Aleksandar Markovic a écrit :
->> From: Fredrik Noring <noring@nocrew.org>
->> Sent: Saturday, October 13, 2018 1:09 PM
->> To: Aleksandar Markovic; Maciej W. Rozycki; Philippe Mathieu-Daudé
->> Cc: Richard Henderson; Aurelien Jarno; Petar Jovanovic; Peter Maydell; Jürgen Urban; > qemu-devel@nongnu.org
->> Subject: [PATCH v7 0/7] target/mips: Limited support for the R5900
->>
->> The primary purpose of these changes is to support programs compiled
->> by GCC for the R5900 target and thereby run R5900 Linux distributions,
->> for example Gentoo.
->>
-> 
-> Hello, Fredrik.
-> 
-> Your series is getting better and better with each version, which is very good. For a change, I don't have any objection about the title. :) Patch 7 will be integrated shortly in the MIPS queue, you don't need to worry about it. With this series you are not only supporting your prime use case, but you are introducing a new instruction set to QEMU. Try to step back and get wider perspective. No matter how limited the support for the new ISA is, its introduction to QEMU must have following elements:
-> 
-> (1) Definition of basic preprocessor constants for the new ISA.
-> (2) All opcodes for the ISA.
-> (3) Basic decoding engine for new instructions.
-> 
-> Your patch 1 adresses 1). However, there are no patches for (2) and (3) in this series. Let me walk though the details on how to implement (2) and (3).
-> 
-> (2) All opcodes for the ISA.
+An update to
 
-As Fredrik only wants to use R5900 gentoo userland binaries using qemu
-linux-user mode, does he really need to implement all the opcodes of the
-ISA?
+ v2: https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg04469.html
+ v3: https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg05660.html
+ v4: https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg02961.html
+ v5: https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg01613.html
 
-Most of the architectures have started with only the userland
-instruction set, and the privileged instruction set was added once this
-part was validated (see the risu project
-https://wiki.linaro.org/PeterMaydell/Risu). It was really helpful for me
-to add the m680x0 processor emulation in QEMU by this way (I've added
-FPU and MMU later)
+The current network services now support encryption via TLS and in some
+cases support authentication via SASL. In cases where SASL is not
+available, x509 client certificates can be used as a crude authorization
+scheme, but using a sub-CA and controlling who you give certs to. In
+general this is not very flexible though, so this series introduces a
+new standard authorization framework.
 
-It can be a lot of work to add all the opcodes for the ISA, and be very
-time consuming, and Fredrik has only test case for the opcode he has
-implemented, the rest of the ISA will not be tested, or will need more
-work from him.
+It comes with four initial authorization mechanisms
 
-So perhaps a not fully implemented R5900 ISA (with big WARNINGs in the
-code, and perhaps assert()?) would be better than nothing at all?
+ - Simple - an exact username match. This is useful when there is
+   exactly one user that is known to connect. For example when live
+   migrating from one QEMU to another with TLS, libvirt would use
+   the simple scheme to whitelist the TLS cert of the source QEMU.
 
-Thanks,
-Laurent
+ - List - an full access control list, with optional regex matching.
+   This is more flexible and is used to provide 100% backcompat with
+   the existing HMP ACL commands. The caveat is that we can't create
+   these via the CLI -object arg yet.
+
+ - ListFile - the same as List, but with the rules stored in JSON
+   format in an external file. This avoids the -object limitation
+   while also allowing the admin to change list entries on the file.
+   QEMU uses inotify to notice these changes and auto-reload the
+   file contents. This is likely a good default choice for most
+   network services, if the "simple" mechanism isn't sufficient.
+
+ - PAM - delegate the username lookup to a PAM module, which opens
+   the door to many options including things like SQL/LDAP lookups.
+
+A later series that follows will integrate this framework into the VNC,
+NBD, migration, and character device servers.
+
+Changed in v6:
+
+ - Fix consistency of object variable names
+ - Fix command line example quoting
+ - Use 'false' not '0' for bool return values
+ - Remove empty 'complete' methods
+ - Fix leak of rules in finalizer
+ - Fix missing {} around conditional
+ - Refactor rule refresh to use goto & invert conditional
+
+Changed in v5:
+
+ - Rebase to latest git master
+
+Changed in v4:
+
+ - Rebase to latest git master
+
+Changed in v3:
+
+ - Added docs for object types in qemu-options.hx
+ - Added example CLI syntax in header files
+ - Improved commit messages
+
+Changed in v2:
+
+ - Switch to a global shared instance of the file monitor so only
+   a single inotify file descriptor is required
+
+ - Require all watches to be registered against directories. File
+   watches are useless in Linux, since they are tied to inodes, and
+   so stop working when editors save by doing a tmpfile + rename
+   dance.
+
+ - Change auth list impl to use a directory based watch instead
+   of filename
+
+ - Put MTP const-ness fixes in separate patch
+
+ - Split QOM change off into separate patch
+
+ - Fix conditionals on Win32 build
+
+Daniel P. Berrang=C3=A9 (11):
+  util: add helper APIs for dealing with inotify in portable manner
+  qom: don't require user creatable objects to be registered
+  hw/usb: don't set IN_ISDIR for inotify watch in MTP driver
+  hw/usb: fix const-ness for string params in MTP driver
+  hw/usb: switch MTP to use new inotify APIs
+  authz: add QAuthZ object as an authorization base class
+  authz: add QAuthZSimple object type for easy whitelist auth checks
+  authz: add QAuthZList object type for an access control list
+  authz: add QAuthZListFile object type for a file access control list
+  authz: add QAuthZPAM object type for authorizing using PAM
+  authz: delete existing ACL implementation
+
+ configure                      |  37 ++++
+ Makefile                       |  17 +-
+ Makefile.objs                  |  10 ++
+ Makefile.target                |   2 +
+ qapi/authz.json                |  58 ++++++
+ qapi/qapi-schema.json          |   1 +
+ include/authz/base.h           | 112 ++++++++++++
+ include/authz/list.h           | 106 +++++++++++
+ include/authz/listfile.h       | 110 ++++++++++++
+ include/authz/pamacct.h        | 100 +++++++++++
+ include/authz/simple.h         |  84 +++++++++
+ include/qemu/acl.h             |  66 -------
+ include/qemu/filemonitor.h     | 117 ++++++++++++
+ ui/vnc-auth-sasl.h             |   5 +-
+ ui/vnc.h                       |   4 +-
+ authz/base.c                   |  82 +++++++++
+ authz/list.c                   | 309 ++++++++++++++++++++++++++++++++
+ authz/listfile.c               | 286 ++++++++++++++++++++++++++++++
+ authz/pamacct.c                | 149 ++++++++++++++++
+ authz/simple.c                 | 115 ++++++++++++
+ crypto/tlssession.c            |  35 ++--
+ hw/usb/dev-mtp.c               | 257 ++++++++++-----------------
+ monitor.c                      | 185 ++++++++++++-------
+ qom/object.c                   |  12 +-
+ qom/object_interfaces.c        |  16 +-
+ tests/test-authz-list.c        | 171 ++++++++++++++++++
+ tests/test-crypto-tlssession.c |  15 +-
+ tests/test-io-channel-tls.c    |  16 +-
+ ui/vnc-auth-sasl.c             |  23 ++-
+ ui/vnc-auth-vencrypt.c         |   2 +-
+ ui/vnc-ws.c                    |   2 +-
+ ui/vnc.c                       |  37 ++--
+ util/acl.c                     | 179 -------------------
+ util/filemonitor.c             | 315 +++++++++++++++++++++++++++++++++
+ .gitignore                     |   4 +
+ MAINTAINERS                    |  14 ++
+ authz/Makefile.objs            |   7 +
+ authz/trace-events             |  18 ++
+ crypto/trace-events            |   2 +-
+ hw/usb/trace-events            |   2 +-
+ qemu-options.hx                | 105 +++++++++++
+ tests/Makefile.include         |   8 +-
+ util/Makefile.objs             |   2 +-
+ util/trace-events              |   9 +
+ 44 files changed, 2667 insertions(+), 539 deletions(-)
+ create mode 100644 qapi/authz.json
+ create mode 100644 include/authz/base.h
+ create mode 100644 include/authz/list.h
+ create mode 100644 include/authz/listfile.h
+ create mode 100644 include/authz/pamacct.h
+ create mode 100644 include/authz/simple.h
+ delete mode 100644 include/qemu/acl.h
+ create mode 100644 include/qemu/filemonitor.h
+ create mode 100644 authz/base.c
+ create mode 100644 authz/list.c
+ create mode 100644 authz/listfile.c
+ create mode 100644 authz/pamacct.c
+ create mode 100644 authz/simple.c
+ create mode 100644 tests/test-authz-list.c
+ delete mode 100644 util/acl.c
+ create mode 100644 util/filemonitor.c
+ create mode 100644 authz/Makefile.objs
+ create mode 100644 authz/trace-events
+
+--=20
+2.17.2
