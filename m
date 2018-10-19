@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38160)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38219)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gDUzf-0004my-Q7
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 09:39:15 -0400
+	(envelope-from <berrange@redhat.com>) id 1gDUzj-0004q4-3E
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 09:39:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gDUzb-0000VN-Hg
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 09:39:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38794)
+	(envelope-from <berrange@redhat.com>) id 1gDUzg-0000cd-89
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 09:39:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54216)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gDUza-0000SX-VW
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 09:39:07 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gDUzf-0000XY-SC
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 09:39:12 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E002030034A1
-	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 13:39:05 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 79C5C30F8C16
+	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 13:39:08 +0000 (UTC)
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Fri, 19 Oct 2018 14:38:34 +0100
-Message-Id: <20181019133835.16494-11-berrange@redhat.com>
+Date: Fri, 19 Oct 2018 14:38:35 +0100
+Message-Id: <20181019133835.16494-12-berrange@redhat.com>
 In-Reply-To: <20181019133835.16494-1-berrange@redhat.com>
 References: <20181019133835.16494-1-berrange@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 10/11] authz: add QAuthZPAM object type for
- authorizing using PAM
+Subject: [Qemu-devel] [PATCH v6 11/11] authz: delete existing ACL
+ implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,489 +35,980 @@ Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Gerd Hoffma
 
 From: "Daniel P. Berrange" <berrange@redhat.com>
 
-Add an authorization backend that talks to PAM to check whether the user
-identity is allowed. This only uses the PAM account validation facility,
-which is essentially just a check to see if the provided username is perm=
-itted
-access. It doesn't use the authentication or session parts of PAM, since
-that's dealt with by the relevant part of QEMU (eg VNC server).
+The 'qemu_acl' type was a previous non-QOM based attempt to provide an
+authorization facility in QEMU. Because it is non-QOM based it cannot be
+created via the command line and requires special monitor commands to
+manipulate it.
 
-Consider starting QEMU with a VNC server and telling it to use TLS with
-x509 client certificates and configuring it to use an PAM to validate
-the x509 distinguished name. In this example we're telling it to use PAM
-for the QAuthZ impl with a service name of "qemu-vnc"
+The new QAuthZ subclasses provide a superset of the functionality in
+qemu_acl, so the latter can now be deleted. The HMP 'acl_*' monitor
+commands are converted to use the new QAuthZSimple data type instead
+in order to provide temporary backwards compatibility.
 
- $ qemu-system-x86_64 \
-     -object tls-creds-x509,id=3Dtls0,dir=3D/home/berrange/security/qemut=
-ls,\
-             endpoint=3Dserver,verify-peer=3Dyes \
-     -object authz-pam,id=3Dauthz0,service=3Dqemu-vnc \
-     -vnc :1,tls-creds=3Dtls0,tls-authz=3Dauthz0
-
-This requires an /etc/pam/qemu-vnc file to be created with the auth
-rules. A very simple file based whitelist can be setup using
-
-  $ cat > /etc/pam/qemu-vnc <<EOF
-  account         requisite       pam_listfile.so item=3Duser sense=3Dall=
-ow file=3D/etc/qemu/vnc.allow
-  EOF
-
-The /etc/qemu/vnc.allow file simply contains one username per line. Any
-username not in the file is denied. The usernames in this example are
-the x509 distinguished name from the client's x509 cert.
-
-  $ cat > /etc/qemu/vnc.allow <<EOF
-  CN=3Dlaptop.berrange.com,O=3DBerrange Home,L=3DLondon,ST=3DLondon,C=3DG=
-B
-  EOF
-
-More interesting would be to configure PAM to use an LDAP backend, so
-that the QEMU authorization check data can be centralized instead of
-requiring each compute host to have file maintained.
-
-The main limitation with this PAM module is that the rules apply to all
-QEMU instances on the host. Setting up different rules per VM, would
-require creating a separate PAM service name & config file for every
-guest. An alternative approach for the future might be to not pass in
-the plain username to PAM, but instead combine the VM name or UUID with
-the username. This requires further consideration though.
-
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- configure               |  37 ++++++++++
- include/authz/pamacct.h | 100 +++++++++++++++++++++++++++
- authz/pamacct.c         | 149 ++++++++++++++++++++++++++++++++++++++++
- authz/Makefile.objs     |   3 +
- authz/trace-events      |   3 +
- qemu-options.hx         |  35 ++++++++++
- 6 files changed, 327 insertions(+)
- create mode 100644 include/authz/pamacct.h
- create mode 100644 authz/pamacct.c
+ include/qemu/acl.h             |  66 ------------
+ ui/vnc-auth-sasl.h             |   5 +-
+ ui/vnc.h                       |   4 +-
+ crypto/tlssession.c            |  35 +++----
+ monitor.c                      | 185 ++++++++++++++++++++++-----------
+ tests/test-crypto-tlssession.c |  15 ++-
+ tests/test-io-channel-tls.c    |  16 ++-
+ ui/vnc-auth-sasl.c             |  23 ++--
+ ui/vnc-auth-vencrypt.c         |   2 +-
+ ui/vnc-ws.c                    |   2 +-
+ ui/vnc.c                       |  37 ++++---
+ util/acl.c                     | 179 -------------------------------
+ crypto/trace-events            |   2 +-
+ tests/Makefile.include         |   4 +-
+ util/Makefile.objs             |   1 -
+ 15 files changed, 215 insertions(+), 361 deletions(-)
+ delete mode 100644 include/qemu/acl.h
+ delete mode 100644 util/acl.c
 
-diff --git a/configure b/configure
-index 9138af37f8..db35d52e12 100755
---- a/configure
-+++ b/configure
-@@ -463,6 +463,7 @@ nettle_kdf=3D"no"
- gcrypt=3D""
- gcrypt_hmac=3D"no"
- gcrypt_kdf=3D"no"
-+auth_pam=3D""
- vte=3D""
- virglrenderer=3D""
- tpm=3D"yes"
-@@ -1361,6 +1362,10 @@ for opt do
-   ;;
-   --enable-gcrypt) gcrypt=3D"yes"
-   ;;
-+  --disable-auth-pam) auth_pam=3D"no"
-+  ;;
-+  --enable-auth-pam) auth_pam=3D"yes"
-+  ;;
-   --enable-rdma) rdma=3D"yes"
-   ;;
-   --disable-rdma) rdma=3D"no"
-@@ -1653,6 +1658,7 @@ disabled with --disable-FEATURE, default is enabled=
- if available:
-   gnutls          GNUTLS cryptography support
-   nettle          nettle cryptography support
-   gcrypt          libgcrypt cryptography support
-+  auth-pam        PAM access control
-   sdl             SDL UI
-   --with-sdlabi     select preferred SDL ABI 1.2 or 2.0
-   gtk             gtk UI
-@@ -2876,6 +2882,33 @@ else
- fi
-=20
-=20
-+##########################################
-+# PAM probe
-+
-+if test "x$auth_pam" !=3D "no"; then
-+    cat > $TMPC <<EOF
-+#include <security/pam_appl.h>
-+#include <stdio.h>
-+int main(void) {
-+   const char *service_name =3D "qemu";
-+   const char *user =3D "frank";
-+   const struct pam_conv *pam_conv =3D NULL;
-+   pam_handle_t *pamh =3D NULL;
-+   pam_start(service_name, user, pam_conv, &pamh);
-+   return 0;
-+}
-+EOF
-+    if compile_prog "" "-lpam" ; then
-+	auth_pam=3Dyes
-+    else
-+	if test "$auth_pam" =3D "yes"; then
-+	    feature_not_found "PAM" "Install PAM development package"
-+	else
-+	    auth_pam=3Dno
-+	fi
-+    fi
-+fi
-+
- ##########################################
- # getifaddrs (for tests/test-io-channel-socket )
-=20
-@@ -5967,6 +6000,7 @@ echo "libgcrypt kdf     $gcrypt_kdf"
- echo "nettle            $nettle $(echo_version $nettle $nettle_version)"
- echo "nettle kdf        $nettle_kdf"
- echo "libtasn1          $tasn1"
-+echo "PAM               $auth_pam"
- echo "curses support    $curses"
- echo "virgl support     $virglrenderer $(echo_version $virglrenderer $vi=
-rgl_version)"
- echo "curl support      $curl"
-@@ -6423,6 +6457,9 @@ fi
- if test "$tasn1" =3D "yes" ; then
-   echo "CONFIG_TASN1=3Dy" >> $config_host_mak
- fi
-+if test "$auth_pam" =3D "yes" ; then
-+    echo "CONFIG_AUTH_PAM=3Dy" >> $config_host_mak
-+fi
- if test "$have_ifaddrs_h" =3D "yes" ; then
-     echo "HAVE_IFADDRS_H=3Dy" >> $config_host_mak
- fi
-diff --git a/include/authz/pamacct.h b/include/authz/pamacct.h
-new file mode 100644
-index 0000000000..d2c0149153
---- /dev/null
-+++ b/include/authz/pamacct.h
-@@ -0,0 +1,100 @@
-+/*
-+ * QEMU PAM authorization driver
-+ *
-+ * Copyright (c) 2018 Red Hat, Inc.
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/lice=
-nses/>.
-+ *
-+ */
-+
-+#ifndef QAUTHZ_PAM_H__
-+#define QAUTHZ_PAM_H__
-+
+diff --git a/include/qemu/acl.h b/include/qemu/acl.h
+deleted file mode 100644
+index 7c44119a47..0000000000
+--- a/include/qemu/acl.h
++++ /dev/null
+@@ -1,66 +0,0 @@
+-/*
+- * QEMU access control list management
+- *
+- * Copyright (C) 2009 Red Hat, Inc
+- *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to deal
+- * in the Software without restriction, including without limitation the rights
+- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+- * copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+- * THE SOFTWARE.
+- */
+-
+-#ifndef QEMU_ACL_H
+-#define QEMU_ACL_H
+-
+-#include "qemu/queue.h"
+-
+-typedef struct qemu_acl_entry qemu_acl_entry;
+-typedef struct qemu_acl qemu_acl;
+-
+-struct qemu_acl_entry {
+-    char *match;
+-    int deny;
+-
+-    QTAILQ_ENTRY(qemu_acl_entry) next;
+-};
+-
+-struct qemu_acl {
+-    char *aclname;
+-    unsigned int nentries;
+-    QTAILQ_HEAD(,qemu_acl_entry) entries;
+-    int defaultDeny;
+-};
+-
+-qemu_acl *qemu_acl_init(const char *aclname);
+-
+-qemu_acl *qemu_acl_find(const char *aclname);
+-
+-int qemu_acl_party_is_allowed(qemu_acl *acl,
+-			      const char *party);
+-
+-void qemu_acl_reset(qemu_acl *acl);
+-
+-int qemu_acl_append(qemu_acl *acl,
+-		    int deny,
+-		    const char *match);
+-int qemu_acl_insert(qemu_acl *acl,
+-		    int deny,
+-		    const char *match,
+-		    int index);
+-int qemu_acl_remove(qemu_acl *acl,
+-		    const char *match);
+-
+-#endif /* QEMU_ACL_H */
+diff --git a/ui/vnc-auth-sasl.h b/ui/vnc-auth-sasl.h
+index 2ae224ee3a..fb55fe04ca 100644
+--- a/ui/vnc-auth-sasl.h
++++ b/ui/vnc-auth-sasl.h
+@@ -30,8 +30,8 @@
+ typedef struct VncStateSASL VncStateSASL;
+ typedef struct VncDisplaySASL VncDisplaySASL;
+ 
+-#include "qemu/acl.h"
+ #include "qemu/main-loop.h"
 +#include "authz/base.h"
+ 
+ struct VncStateSASL {
+     sasl_conn_t *conn;
+@@ -60,7 +60,8 @@ struct VncStateSASL {
+ };
+ 
+ struct VncDisplaySASL {
+-    qemu_acl *acl;
++    QAuthZ *authz;
++    char *authzid;
+ };
+ 
+ void vnc_sasl_client_cleanup(VncState *vs);
+diff --git a/ui/vnc.h b/ui/vnc.h
+index a86e0610e8..29ee1738a5 100644
+--- a/ui/vnc.h
++++ b/ui/vnc.h
+@@ -39,6 +39,7 @@
+ #include "io/channel-socket.h"
+ #include "io/channel-tls.h"
+ #include "io/net-listener.h"
++#include "authz/base.h"
+ #include <zlib.h>
+ 
+ #include "keymaps.h"
+@@ -177,7 +178,8 @@ struct VncDisplay
+     bool lossy;
+     bool non_adaptive;
+     QCryptoTLSCreds *tlscreds;
+-    char *tlsaclname;
++    QAuthZ *tlsauthz;
++    char *tlsauthzid;
+ #ifdef CONFIG_VNC_SASL
+     VncDisplaySASL sasl;
+ #endif
+diff --git a/crypto/tlssession.c b/crypto/tlssession.c
+index 66a6fbe19c..23842aa95d 100644
+--- a/crypto/tlssession.c
++++ b/crypto/tlssession.c
+@@ -24,7 +24,7 @@
+ #include "crypto/tlscredspsk.h"
+ #include "crypto/tlscredsx509.h"
+ #include "qapi/error.h"
+-#include "qemu/acl.h"
++#include "authz/base.h"
+ #include "trace.h"
+ 
+ #ifdef CONFIG_GNUTLS
+@@ -37,7 +37,7 @@ struct QCryptoTLSSession {
+     QCryptoTLSCreds *creds;
+     gnutls_session_t handle;
+     char *hostname;
+-    char *aclname;
++    char *authzid;
+     bool handshakeComplete;
+     QCryptoTLSSessionWriteFunc writeFunc;
+     QCryptoTLSSessionReadFunc readFunc;
+@@ -56,7 +56,7 @@ qcrypto_tls_session_free(QCryptoTLSSession *session)
+     gnutls_deinit(session->handle);
+     g_free(session->hostname);
+     g_free(session->peername);
+-    g_free(session->aclname);
++    g_free(session->authzid);
+     object_unref(OBJECT(session->creds));
+     g_free(session);
+ }
+@@ -101,7 +101,7 @@ qcrypto_tls_session_pull(void *opaque, void *buf, size_t len)
+ QCryptoTLSSession *
+ qcrypto_tls_session_new(QCryptoTLSCreds *creds,
+                         const char *hostname,
+-                        const char *aclname,
++                        const char *authzid,
+                         QCryptoTLSCredsEndpoint endpoint,
+                         Error **errp)
+ {
+@@ -111,13 +111,13 @@ qcrypto_tls_session_new(QCryptoTLSCreds *creds,
+     session = g_new0(QCryptoTLSSession, 1);
+     trace_qcrypto_tls_session_new(
+         session, creds, hostname ? hostname : "<none>",
+-        aclname ? aclname : "<none>", endpoint);
++        authzid ? authzid : "<none>", endpoint);
+ 
+     if (hostname) {
+         session->hostname = g_strdup(hostname);
+     }
+-    if (aclname) {
+-        session->aclname = g_strdup(aclname);
++    if (authzid) {
++        session->authzid = g_strdup(authzid);
+     }
+     session->creds = creds;
+     object_ref(OBJECT(creds));
+@@ -268,6 +268,7 @@ qcrypto_tls_session_check_certificate(QCryptoTLSSession *session,
+     unsigned int nCerts, i;
+     time_t now;
+     gnutls_x509_crt_t cert = NULL;
++    Error *err = NULL;
+ 
+     now = time(NULL);
+     if (now == ((time_t)-1)) {
+@@ -355,19 +356,17 @@ qcrypto_tls_session_check_certificate(QCryptoTLSSession *session,
+                            gnutls_strerror(ret));
+                 goto error;
+             }
+-            if (session->aclname) {
+-                qemu_acl *acl = qemu_acl_find(session->aclname);
+-                int allow;
+-                if (!acl) {
+-                    error_setg(errp, "Cannot find ACL %s",
+-                               session->aclname);
++            if (session->authzid) {
++                bool allow;
 +
++                allow = qauthz_is_allowed_by_id(session->authzid,
++                                                session->peername, &err);
++                if (err) {
++                    error_propagate(errp, err);
+                     goto error;
+                 }
+-
+-                allow = qemu_acl_party_is_allowed(acl, session->peername);
+-
+                 if (!allow) {
+-                    error_setg(errp, "TLS x509 ACL check for %s is denied",
++                    error_setg(errp, "TLS x509 authz check for %s is denied",
+                                session->peername);
+                     goto error;
+                 }
+@@ -558,7 +557,7 @@ qcrypto_tls_session_get_peer_name(QCryptoTLSSession *session)
+ QCryptoTLSSession *
+ qcrypto_tls_session_new(QCryptoTLSCreds *creds G_GNUC_UNUSED,
+                         const char *hostname G_GNUC_UNUSED,
+-                        const char *aclname G_GNUC_UNUSED,
++                        const char *authzid G_GNUC_UNUSED,
+                         QCryptoTLSCredsEndpoint endpoint G_GNUC_UNUSED,
+                         Error **errp)
+ {
+diff --git a/monitor.c b/monitor.c
+index b9258a7438..2458322eb1 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -51,7 +51,8 @@
+ #include "sysemu/balloon.h"
+ #include "qemu/timer.h"
+ #include "sysemu/hw_accel.h"
+-#include "qemu/acl.h"
++#include "authz/list.h"
++#include "qapi/util.h"
+ #include "sysemu/tpm.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qerror.h"
+@@ -2040,93 +2041,154 @@ static void hmp_wavcapture(Monitor *mon, const QDict *qdict)
+     QLIST_INSERT_HEAD (&capture_head, s, entries);
+ }
+ 
+-static qemu_acl *find_acl(Monitor *mon, const char *name)
++static QAuthZList *find_auth(Monitor *mon, const char *name)
+ {
+-    qemu_acl *acl = qemu_acl_find(name);
++    Object *obj;
++    Object *container;
+ 
+-    if (!acl) {
++    container = object_get_objects_root();
++    obj = object_resolve_path_component(container, name);
++    if (!obj) {
+         monitor_printf(mon, "acl: unknown list '%s'\n", name);
++        return NULL;
+     }
+-    return acl;
 +
-+#define TYPE_QAUTHZ_PAM "authz-pam"
++    return QAUTHZ_LIST(obj);
+ }
+ 
+ static void hmp_acl_show(Monitor *mon, const QDict *qdict)
+ {
+     const char *aclname = qdict_get_str(qdict, "aclname");
+-    qemu_acl *acl = find_acl(mon, aclname);
+-    qemu_acl_entry *entry;
+-    int i = 0;
+-
+-    if (acl) {
+-        monitor_printf(mon, "policy: %s\n",
+-                       acl->defaultDeny ? "deny" : "allow");
+-        QTAILQ_FOREACH(entry, &acl->entries, next) {
+-            i++;
+-            monitor_printf(mon, "%d: %s %s\n", i,
+-                           entry->deny ? "deny" : "allow", entry->match);
+-        }
++    QAuthZList *auth = find_auth(mon, aclname);
++    QAuthZListRuleList *rules;
++    size_t i = 0;
 +
-+#define QAUTHZ_PAM_CLASS(klass) \
-+     OBJECT_CLASS_CHECK(QAuthZPamClass, (klass), \
-+                        TYPE_QAUTHZ_PAM)
-+#define QAUTHZ_PAM_GET_CLASS(obj) \
-+     OBJECT_GET_CLASS(QAuthZPamClass, (obj), \
-+                      TYPE_QAUTHZ_PAM)
-+#define QAUTHZ_PAM(obj) \
-+     INTERFACE_CHECK(QAuthZPam, (obj), \
-+                     TYPE_QAUTHZ_PAM)
-+
-+typedef struct QAuthZPam QAuthZPam;
-+typedef struct QAuthZPamClass QAuthZPamClass;
-+
-+
-+/**
-+ * QAuthZPam:
-+ *
-+ * This authorization driver provides a PAM mechanism
-+ * for granting access by matching user names against a
-+ * list of globs. Each match rule has an associated policy
-+ * and a catch all policy applies if no rule matches
-+ *
-+ * To create an instance of this class via QMP:
-+ *
-+ *  {
-+ *    "execute": "object-add",
-+ *    "arguments": {
-+ *      "qom-type": "authz-pam",
-+ *      "id": "authz0",
-+ *      "parameters": {
-+ *        "service": "qemu-vnc-tls"
-+ *      }
-+ *    }
-+ *  }
-+ *
-+ * The driver only uses the PAM "account" verification
-+ * subsystem. The above config would require a config
-+ * file /etc/pam.d/qemu-vnc-tls. For a simple file
-+ * lookup it would contain
-+ *
-+ *   account requisite  pam_listfile.so item=3Duser sense=3Dallow \
-+ *           file=3D/etc/qemu/vnc.allow
-+ *
-+ * The external file would then contain a list of usernames.
-+ * If x509 cert was being used as the username, a suitable
-+ * entry would match the distinguish name:
-+ *
-+ *  CN=3Dlaptop.berrange.com,O=3DBerrange Home,L=3DLondon,ST=3DLondon,C=3D=
-GB
-+ *
-+ * On the command line it can be created using
-+ *
-+ *   -object authz-pam,id=3Dauthz0,service=3Dqemu-vnc-tls
-+ *
-+ */
-+struct QAuthZPam {
-+    QAuthZ parent_obj;
-+
-+    char *service;
-+};
-+
-+
-+struct QAuthZPamClass {
-+    QAuthZClass parent_class;
-+};
-+
-+
-+QAuthZPam *qauthz_pam_new(const char *id,
-+                          const char *service,
-+                          Error **errp);
-+
-+
-+#endif /* QAUTHZ_PAM_H__ */
-diff --git a/authz/pamacct.c b/authz/pamacct.c
-new file mode 100644
-index 0000000000..a070dda217
---- /dev/null
-+++ b/authz/pamacct.c
-@@ -0,0 +1,149 @@
-+/*
-+ * QEMU PAM authorization driver
-+ *
-+ * Copyright (c) 2018 Red Hat, Inc.
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/lice=
-nses/>.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "authz/pamacct.h"
-+#include "authz/trace.h"
-+#include "qom/object_interfaces.h"
-+
-+#include <security/pam_appl.h>
-+
-+
-+static bool qauthz_pam_is_allowed(QAuthZ *authz,
-+                                  const char *identity,
-+                                  Error **errp)
-+{
-+    QAuthZPam *pauthz =3D QAUTHZ_PAM(authz);
-+    const struct pam_conv pam_conversation =3D { 0 };
-+    pam_handle_t *pamh =3D NULL;
-+    int ret;
-+
-+    trace_qauthz_pam_check(authz, identity, pauthz->service);
-+    ret =3D pam_start(pauthz->service,
-+                    identity,
-+                    &pam_conversation,
-+                    &pamh);
-+    if (ret !=3D PAM_SUCCESS) {
-+        error_setg(errp, "Unable to start PAM transaction: %s",
-+                   pam_strerror(NULL, ret));
-+        return false;
++    if (!auth) {
++        return;
 +    }
 +
-+    ret =3D pam_acct_mgmt(pamh, PAM_SILENT);
-+    if (ret !=3D PAM_SUCCESS) {
-+        error_setg(errp, "Unable to authorize user '%s': %s",
-+                   identity, pam_strerror(pamh, ret));
-+        goto cleanup;
++    monitor_printf(mon, "policy: %s\n",
++                   QAuthZListPolicy_lookup.array[auth->policy]);
++
++    rules = auth->rules;
++    while (rules) {
++        QAuthZListRule *rule = rules->value;
++        i++;
++        monitor_printf(mon, "%zu: %s %s\n", i,
++                       QAuthZListPolicy_lookup.array[rule->policy],
++                       rule->match);
++        rules = rules->next;
+     }
+ }
+ 
+ static void hmp_acl_reset(Monitor *mon, const QDict *qdict)
+ {
+     const char *aclname = qdict_get_str(qdict, "aclname");
+-    qemu_acl *acl = find_acl(mon, aclname);
++    QAuthZList *auth = find_auth(mon, aclname);
+ 
+-    if (acl) {
+-        qemu_acl_reset(acl);
+-        monitor_printf(mon, "acl: removed all rules\n");
++    if (!auth) {
++        return;
+     }
++
++    auth->policy = QAUTHZ_LIST_POLICY_DENY;
++    qapi_free_QAuthZListRuleList(auth->rules);
++    auth->rules = NULL;
++    monitor_printf(mon, "acl: removed all rules\n");
+ }
+ 
+ static void hmp_acl_policy(Monitor *mon, const QDict *qdict)
+ {
+     const char *aclname = qdict_get_str(qdict, "aclname");
+     const char *policy = qdict_get_str(qdict, "policy");
+-    qemu_acl *acl = find_acl(mon, aclname);
++    QAuthZList *auth = find_auth(mon, aclname);
++    int val;
++    Error *err = NULL;
++
++    if (!auth) {
++        return;
++    }
+ 
+-    if (acl) {
+-        if (strcmp(policy, "allow") == 0) {
+-            acl->defaultDeny = 0;
++    val = qapi_enum_parse(&QAuthZListPolicy_lookup,
++                          policy,
++                          QAUTHZ_LIST_POLICY_DENY,
++                          &err);
++    if (err) {
++        error_free(err);
++        monitor_printf(mon, "acl: unknown policy '%s', "
++                       "expected 'deny' or 'allow'\n", policy);
++    } else {
++        auth->policy = val;
++        if (auth->policy == QAUTHZ_LIST_POLICY_ALLOW) {
+             monitor_printf(mon, "acl: policy set to 'allow'\n");
+-        } else if (strcmp(policy, "deny") == 0) {
+-            acl->defaultDeny = 1;
+-            monitor_printf(mon, "acl: policy set to 'deny'\n");
+         } else {
+-            monitor_printf(mon, "acl: unknown policy '%s', "
+-                           "expected 'deny' or 'allow'\n", policy);
++            monitor_printf(mon, "acl: policy set to 'deny'\n");
+         }
+     }
+ }
+ 
++static QAuthZListFormat hmp_acl_get_format(const char *match)
++{
++#ifdef CONFIG_FNMATCH
++    if (strchr(match, '*')) {
++        return QAUTHZ_LIST_FORMAT_GLOB;
++    } else {
++        return QAUTHZ_LIST_FORMAT_EXACT;
++    }
++#else
++    /* Historically we silently degraded to plain strcmp
++     * when fnmatch() was missing */
++    return QAUTHZ_LIST_FORMAT_EXACT;
++#endif
++}
++
+ static void hmp_acl_add(Monitor *mon, const QDict *qdict)
+ {
+     const char *aclname = qdict_get_str(qdict, "aclname");
+     const char *match = qdict_get_str(qdict, "match");
+-    const char *policy = qdict_get_str(qdict, "policy");
++    const char *policystr = qdict_get_str(qdict, "policy");
+     int has_index = qdict_haskey(qdict, "index");
+     int index = qdict_get_try_int(qdict, "index", -1);
+-    qemu_acl *acl = find_acl(mon, aclname);
+-    int deny, ret;
+-
+-    if (acl) {
+-        if (strcmp(policy, "allow") == 0) {
+-            deny = 0;
+-        } else if (strcmp(policy, "deny") == 0) {
+-            deny = 1;
+-        } else {
+-            monitor_printf(mon, "acl: unknown policy '%s', "
+-                           "expected 'deny' or 'allow'\n", policy);
+-            return;
+-        }
+-        if (has_index)
+-            ret = qemu_acl_insert(acl, deny, match, index);
+-        else
+-            ret = qemu_acl_append(acl, deny, match);
+-        if (ret < 0)
+-            monitor_printf(mon, "acl: unable to add acl entry\n");
+-        else
+-            monitor_printf(mon, "acl: added rule at position %d\n", ret);
++    QAuthZList *auth = find_auth(mon, aclname);
++    Error *err = NULL;
++    QAuthZListPolicy policy;
++    QAuthZListFormat format;
++    size_t i = 0;
++
++    if (!auth) {
++        return;
 +    }
 +
-+ cleanup:
-+    pam_end(pamh, ret);
-+    return ret =3D=3D PAM_SUCCESS;
-+}
-+
-+
-+static void
-+qauthz_pam_prop_set_service(Object *obj,
-+                            const char *service,
-+                            Error **errp G_GNUC_UNUSED)
-+{
-+    QAuthZPam *pauthz =3D QAUTHZ_PAM(obj);
-+
-+    g_free(pauthz->service);
-+    pauthz->service =3D g_strdup(service);
-+}
-+
-+
-+static char *
-+qauthz_pam_prop_get_service(Object *obj,
-+                            Error **errp G_GNUC_UNUSED)
-+{
-+    QAuthZPam *pauthz =3D QAUTHZ_PAM(obj);
-+
-+    return g_strdup(pauthz->service);
-+}
-+
-+
-+static void
-+qauthz_pam_complete(UserCreatable *uc, Error **errp)
-+{
-+}
-+
-+
-+static void
-+qauthz_pam_finalize(Object *obj)
-+{
-+    QAuthZPam *pauthz =3D QAUTHZ_PAM(obj);
-+
-+    g_free(pauthz->service);
-+}
-+
-+
-+static void
-+qauthz_pam_class_init(ObjectClass *oc, void *data)
-+{
-+    UserCreatableClass *ucc =3D USER_CREATABLE_CLASS(oc);
-+    QAuthZClass *authz =3D QAUTHZ_CLASS(oc);
-+
-+    ucc->complete =3D qauthz_pam_complete;
-+    authz->is_allowed =3D qauthz_pam_is_allowed;
-+
-+    object_class_property_add_str(oc, "service",
-+                                  qauthz_pam_prop_get_service,
-+                                  qauthz_pam_prop_set_service,
-+                                  NULL);
-+}
-+
-+
-+QAuthZPam *qauthz_pam_new(const char *id,
-+                          const char *service,
-+                          Error **errp)
-+{
-+    return QAUTHZ_PAM(
-+        object_new_with_props(TYPE_QAUTHZ_PAM,
-+                              object_get_objects_root(),
-+                              id, errp,
-+                              "service", service,
-+                              NULL));
-+}
-+
-+
-+static const TypeInfo qauthz_pam_info =3D {
-+    .parent =3D TYPE_QAUTHZ,
-+    .name =3D TYPE_QAUTHZ_PAM,
-+    .instance_size =3D sizeof(QAuthZPam),
-+    .instance_finalize =3D qauthz_pam_finalize,
-+    .class_size =3D sizeof(QAuthZPamClass),
-+    .class_init =3D qauthz_pam_class_init,
-+    .interfaces =3D (InterfaceInfo[]) {
-+        { TYPE_USER_CREATABLE },
-+        { }
++    policy = qapi_enum_parse(&QAuthZListPolicy_lookup,
++                             policystr,
++                             QAUTHZ_LIST_POLICY_DENY,
++                             &err);
++    if (err) {
++        error_free(err);
++        monitor_printf(mon, "acl: unknown policy '%s', "
++                       "expected 'deny' or 'allow'\n", policystr);
++        return;
 +    }
-+};
 +
++    format = hmp_acl_get_format(match);
 +
-+static void
-+qauthz_pam_register_types(void)
-+{
-+    type_register_static(&qauthz_pam_info);
-+}
++    if (has_index && index == 0) {
++        monitor_printf(mon, "acl: unable to add acl entry\n");
++        return;
++    }
 +
++    if (has_index) {
++        i = qauthz_list_insert_rule(auth, match, policy,
++                                    format, index - 1, &err);
++    } else {
++        i = qauthz_list_append_rule(auth, match, policy,
++                                    format, &err);
++    }
++    if (err) {
++        monitor_printf(mon, "acl: unable to add rule: %s",
++                       error_get_pretty(err));
++        error_free(err);
++    } else {
++        monitor_printf(mon, "acl: added rule at position %zu\n", i + 1);
+     }
+ }
+ 
+@@ -2134,15 +2196,18 @@ static void hmp_acl_remove(Monitor *mon, const QDict *qdict)
+ {
+     const char *aclname = qdict_get_str(qdict, "aclname");
+     const char *match = qdict_get_str(qdict, "match");
+-    qemu_acl *acl = find_acl(mon, aclname);
+-    int ret;
++    QAuthZList *auth = find_auth(mon, aclname);
++    ssize_t i = 0;
+ 
+-    if (acl) {
+-        ret = qemu_acl_remove(acl, match);
+-        if (ret < 0)
+-            monitor_printf(mon, "acl: no matching acl entry\n");
+-        else
+-            monitor_printf(mon, "acl: removed rule at position %d\n", ret);
++    if (!auth) {
++        return;
++    }
 +
-+type_init(qauthz_pam_register_types);
-diff --git a/authz/Makefile.objs b/authz/Makefile.objs
-index 8351bf181d..ed7b273596 100644
---- a/authz/Makefile.objs
-+++ b/authz/Makefile.objs
-@@ -2,3 +2,6 @@ authz-obj-y +=3D base.o
- authz-obj-y +=3D simple.o
- authz-obj-y +=3D list.o
- authz-obj-y +=3D listfile.o
-+authz-obj-$(CONFIG_AUTH_PAM) +=3D pamacct.o
++    i = qauthz_list_delete_rule(auth, match);
++    if (i >= 0) {
++        monitor_printf(mon, "acl: removed rule at position %zu\n", i + 1);
++    } else {
++        monitor_printf(mon, "acl: no matching acl entry\n");
+     }
+ }
+ 
+diff --git a/tests/test-crypto-tlssession.c b/tests/test-crypto-tlssession.c
+index 6fa9950afb..15212ec276 100644
+--- a/tests/test-crypto-tlssession.c
++++ b/tests/test-crypto-tlssession.c
+@@ -28,7 +28,7 @@
+ #include "qom/object_interfaces.h"
+ #include "qapi/error.h"
+ #include "qemu/sockets.h"
+-#include "qemu/acl.h"
++#include "authz/list.h"
+ 
+ #ifdef QCRYPTO_HAVE_TLS_TEST_SUPPORT
+ 
+@@ -229,7 +229,7 @@ static void test_crypto_tls_session_x509(const void *opaque)
+     QCryptoTLSCreds *serverCreds;
+     QCryptoTLSSession *clientSess = NULL;
+     QCryptoTLSSession *serverSess = NULL;
+-    qemu_acl *acl;
++    QAuthZList *auth;
+     const char * const *wildcards;
+     int channel[2];
+     bool clientShake = false;
+@@ -285,11 +285,15 @@ static void test_crypto_tls_session_x509(const void *opaque)
+         SERVER_CERT_DIR);
+     g_assert(serverCreds != NULL);
+ 
+-    acl = qemu_acl_init("tlssessionacl");
+-    qemu_acl_reset(acl);
++    auth = qauthz_list_new("tlssessionacl",
++                           QAUTHZ_LIST_POLICY_DENY,
++                           &error_abort);
+     wildcards = data->wildcards;
+     while (wildcards && *wildcards) {
+-        qemu_acl_append(acl, 0, *wildcards);
++        qauthz_list_append_rule(auth, *wildcards,
++                                QAUTHZ_LIST_POLICY_ALLOW,
++                                QAUTHZ_LIST_FORMAT_GLOB,
++                                &error_abort);
+         wildcards++;
+     }
+ 
+@@ -377,6 +381,7 @@ static void test_crypto_tls_session_x509(const void *opaque)
+ 
+     object_unparent(OBJECT(serverCreds));
+     object_unparent(OBJECT(clientCreds));
++    object_unparent(OBJECT(auth));
+ 
+     qcrypto_tls_session_free(serverSess);
+     qcrypto_tls_session_free(clientSess);
+diff --git a/tests/test-io-channel-tls.c b/tests/test-io-channel-tls.c
+index 4900c6d433..43b707eba7 100644
+--- a/tests/test-io-channel-tls.c
++++ b/tests/test-io-channel-tls.c
+@@ -29,8 +29,8 @@
+ #include "io-channel-helpers.h"
+ #include "crypto/init.h"
+ #include "crypto/tlscredsx509.h"
+-#include "qemu/acl.h"
+ #include "qapi/error.h"
++#include "authz/list.h"
+ #include "qom/object_interfaces.h"
+ 
+ #ifdef QCRYPTO_HAVE_TLS_TEST_SUPPORT
+@@ -113,7 +113,7 @@ static void test_io_channel_tls(const void *opaque)
+     QIOChannelTLS *serverChanTLS;
+     QIOChannelSocket *clientChanSock;
+     QIOChannelSocket *serverChanSock;
+-    qemu_acl *acl;
++    QAuthZList *auth;
+     const char * const *wildcards;
+     int channel[2];
+     struct QIOChannelTLSHandshakeData clientHandshake = { false, false };
+@@ -161,11 +161,15 @@ static void test_io_channel_tls(const void *opaque)
+         SERVER_CERT_DIR);
+     g_assert(serverCreds != NULL);
+ 
+-    acl = qemu_acl_init("channeltlsacl");
+-    qemu_acl_reset(acl);
++    auth = qauthz_list_new("channeltlsacl",
++                           QAUTHZ_LIST_POLICY_DENY,
++                           &error_abort);
+     wildcards = data->wildcards;
+     while (wildcards && *wildcards) {
+-        qemu_acl_append(acl, 0, *wildcards);
++        qauthz_list_append_rule(auth, *wildcards,
++                                QAUTHZ_LIST_POLICY_ALLOW,
++                                QAUTHZ_LIST_FORMAT_GLOB,
++                                &error_abort);
+         wildcards++;
+     }
+ 
+@@ -253,6 +257,8 @@ static void test_io_channel_tls(const void *opaque)
+     object_unref(OBJECT(serverChanSock));
+     object_unref(OBJECT(clientChanSock));
+ 
++    object_unparent(OBJECT(auth));
 +
-+pamacct.o-libs =3D -lpam
-diff --git a/authz/trace-events b/authz/trace-events
-index fb65349a90..72c411927d 100644
---- a/authz/trace-events
-+++ b/authz/trace-events
-@@ -13,3 +13,6 @@ qauthz_list_default_policy(void *authz, const char *ide=
-ntity, int policy) "AuthZ
- # auth/listfile.c
- qauthz_list_file_load(void *authz, const char *filename) "AuthZ file %p =
-load filename=3D%s"
- qauthz_list_file_refresh(void *authz, const char *filename, int success)=
- "AuthZ file %p load filename=3D%s success=3D%d"
-+
-+# auth/pam.c
-+qauthz_pam_check(void *authz, const char *identity, const char *service)=
- "AuthZ PAM %p identity=3D%s service=3D%s"
-diff --git a/qemu-options.hx b/qemu-options.hx
-index a1c3e0e59c..a9654b8115 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4447,6 +4447,41 @@ would look like:
-      ...
- @end example
-=20
-+@item -object authz-pam,id=3D@var{id},service=3D@var{string}
-+
-+Create an authorization object that will control access to network servi=
-ces.
-+
-+The @option{service} parameter provides the name of a PAM service to use
-+for authorization. It requires that a file @code{/etc/pam.d/@var{service=
-}}
-+exist to provide the configuration for the @code{account} subsystem.
-+
-+An example authorization object to validate a TLS x509 distinguished
-+name would look like:
-+
-+@example
-+ # $QEMU \
-+     ...
-+     -object authz-simple,id=3Dauth0,service=3Dqemu-vnc
-+     ...
-+@end example
-+
-+There would then be a corresponding config file for PAM at
-+@code{/etc/pam.d/qemu-vnc} that contains:
-+
-+@example
-+account requisite  pam_listfile.so item=3Duser sense=3Dallow \
-+           file=3D/etc/qemu/vnc.allow
-+@end example
-+
-+Finally the @code{/etc/qemu/vnc.allow} file would contain
-+the list of x509 distingished names that are permitted
-+access
-+
-+@example
-+CN=3Dlaptop.example.com,O=3DExample Home,L=3DLondon,ST=3DLondon,C=3DGB
-+@end example
-+
-+
- @end table
-=20
- ETEXI
---=20
+     close(channel[0]);
+     close(channel[1]);
+ }
+diff --git a/ui/vnc-auth-sasl.c b/ui/vnc-auth-sasl.c
+index 3751a777a4..7b2b09f242 100644
+--- a/ui/vnc-auth-sasl.c
++++ b/ui/vnc-auth-sasl.c
+@@ -24,6 +24,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
++#include "authz/base.h"
+ #include "vnc.h"
+ #include "trace.h"
+ 
+@@ -146,13 +147,14 @@ size_t vnc_client_read_sasl(VncState *vs)
+ static int vnc_auth_sasl_check_access(VncState *vs)
+ {
+     const void *val;
+-    int err;
+-    int allow;
++    int rv;
++    Error *err = NULL;
++    bool allow;
+ 
+-    err = sasl_getprop(vs->sasl.conn, SASL_USERNAME, &val);
+-    if (err != SASL_OK) {
++    rv = sasl_getprop(vs->sasl.conn, SASL_USERNAME, &val);
++    if (rv != SASL_OK) {
+         trace_vnc_auth_fail(vs, vs->auth, "Cannot fetch SASL username",
+-                            sasl_errstring(err, NULL, NULL));
++                            sasl_errstring(rv, NULL, NULL));
+         return -1;
+     }
+     if (val == NULL) {
+@@ -163,12 +165,19 @@ static int vnc_auth_sasl_check_access(VncState *vs)
+     vs->sasl.username = g_strdup((const char*)val);
+     trace_vnc_auth_sasl_username(vs, vs->sasl.username);
+ 
+-    if (vs->vd->sasl.acl == NULL) {
++    if (vs->vd->sasl.authzid == NULL) {
+         trace_vnc_auth_sasl_acl(vs, 1);
+         return 0;
+     }
+ 
+-    allow = qemu_acl_party_is_allowed(vs->vd->sasl.acl, vs->sasl.username);
++    allow = qauthz_is_allowed_by_id(vs->vd->sasl.authzid,
++                                    vs->sasl.username, &err);
++    if (err) {
++        trace_vnc_auth_fail(vs, vs->auth, "Error from authz",
++                            error_get_pretty(err));
++        error_free(err);
++        return -1;
++    }
+ 
+     trace_vnc_auth_sasl_acl(vs, allow);
+     return allow ? 0 : -1;
+diff --git a/ui/vnc-auth-vencrypt.c b/ui/vnc-auth-vencrypt.c
+index d99ea362c1..f072e16ace 100644
+--- a/ui/vnc-auth-vencrypt.c
++++ b/ui/vnc-auth-vencrypt.c
+@@ -109,7 +109,7 @@ static int protocol_client_vencrypt_auth(VncState *vs, uint8_t *data, size_t len
+         tls = qio_channel_tls_new_server(
+             vs->ioc,
+             vs->vd->tlscreds,
+-            vs->vd->tlsaclname,
++            vs->vd->tlsauthzid,
+             &err);
+         if (!tls) {
+             trace_vnc_auth_fail(vs, vs->auth, "TLS setup failed",
+diff --git a/ui/vnc-ws.c b/ui/vnc-ws.c
+index 950f1cd2ac..95c9703c72 100644
+--- a/ui/vnc-ws.c
++++ b/ui/vnc-ws.c
+@@ -62,7 +62,7 @@ gboolean vncws_tls_handshake_io(QIOChannel *ioc G_GNUC_UNUSED,
+     tls = qio_channel_tls_new_server(
+         vs->ioc,
+         vs->vd->tlscreds,
+-        vs->vd->tlsaclname,
++        vs->vd->tlsauthzid,
+         &err);
+     if (!tls) {
+         VNC_DEBUG("Failed to setup TLS %s\n", error_get_pretty(err));
+diff --git a/ui/vnc.c b/ui/vnc.c
+index cf221c83cc..60cb7c2d3d 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -33,7 +33,7 @@
+ #include "qemu/option.h"
+ #include "qemu/sockets.h"
+ #include "qemu/timer.h"
+-#include "qemu/acl.h"
++#include "authz/list.h"
+ #include "qemu/config-file.h"
+ #include "qapi/qapi-events.h"
+ #include "qapi/error.h"
+@@ -3267,12 +3267,24 @@ static void vnc_display_close(VncDisplay *vd)
+         object_unparent(OBJECT(vd->tlscreds));
+         vd->tlscreds = NULL;
+     }
+-    g_free(vd->tlsaclname);
+-    vd->tlsaclname = NULL;
++    if (vd->tlsauthz) {
++        object_unparent(OBJECT(vd->tlsauthz));
++        vd->tlsauthz = NULL;
++    }
++    g_free(vd->tlsauthzid);
++    vd->tlsauthzid = NULL;
+     if (vd->lock_key_sync) {
+         qemu_remove_led_event_handler(vd->led);
+         vd->led = NULL;
+     }
++#ifdef CONFIG_VNC_SASL
++    if (vd->sasl.authz) {
++        object_unparent(OBJECT(vd->sasl.authz));
++        vd->sasl.authz = NULL;
++    }
++    g_free(vd->sasl.authzid);
++    vd->sasl.authzid = NULL;
++#endif
+ }
+ 
+ int vnc_display_password(const char *id, const char *password)
+@@ -3925,23 +3937,24 @@ void vnc_display_open(const char *id, Error **errp)
+ 
+     if (acl) {
+         if (strcmp(vd->id, "default") == 0) {
+-            vd->tlsaclname = g_strdup("vnc.x509dname");
++            vd->tlsauthzid = g_strdup("vnc.x509dname");
+         } else {
+-            vd->tlsaclname = g_strdup_printf("vnc.%s.x509dname", vd->id);
++            vd->tlsauthzid = g_strdup_printf("vnc.%s.x509dname", vd->id);
+         }
+-        qemu_acl_init(vd->tlsaclname);
++        vd->tlsauthz = QAUTHZ(qauthz_list_new(vd->tlsauthzid,
++                                              QAUTHZ_LIST_POLICY_DENY,
++                                              &error_abort));
+     }
+ #ifdef CONFIG_VNC_SASL
+     if (acl && sasl) {
+-        char *aclname;
+-
+         if (strcmp(vd->id, "default") == 0) {
+-            aclname = g_strdup("vnc.username");
++            vd->sasl.authzid = g_strdup("vnc.username");
+         } else {
+-            aclname = g_strdup_printf("vnc.%s.username", vd->id);
++            vd->sasl.authzid = g_strdup_printf("vnc.%s.username", vd->id);
+         }
+-        vd->sasl.acl = qemu_acl_init(aclname);
+-        g_free(aclname);
++        vd->sasl.authz = QAUTHZ(qauthz_list_new(vd->sasl.authzid,
++                                                QAUTHZ_LIST_POLICY_DENY,
++                                                &error_abort));
+     }
+ #endif
+ 
+diff --git a/util/acl.c b/util/acl.c
+deleted file mode 100644
+index c105addadc..0000000000
+--- a/util/acl.c
++++ /dev/null
+@@ -1,179 +0,0 @@
+-/*
+- * QEMU access control list management
+- *
+- * Copyright (C) 2009 Red Hat, Inc
+- *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to deal
+- * in the Software without restriction, including without limitation the rights
+- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+- * copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+- * THE SOFTWARE.
+- */
+-
+-
+-#include "qemu/osdep.h"
+-#include "qemu-common.h"
+-#include "qemu/acl.h"
+-
+-#ifdef CONFIG_FNMATCH
+-#include <fnmatch.h>
+-#endif
+-
+-
+-static unsigned int nacls = 0;
+-static qemu_acl **acls = NULL;
+-
+-
+-
+-qemu_acl *qemu_acl_find(const char *aclname)
+-{
+-    int i;
+-    for (i = 0 ; i < nacls ; i++) {
+-        if (strcmp(acls[i]->aclname, aclname) == 0)
+-            return acls[i];
+-    }
+-
+-    return NULL;
+-}
+-
+-qemu_acl *qemu_acl_init(const char *aclname)
+-{
+-    qemu_acl *acl;
+-
+-    acl = qemu_acl_find(aclname);
+-    if (acl)
+-        return acl;
+-
+-    acl = g_malloc(sizeof(*acl));
+-    acl->aclname = g_strdup(aclname);
+-    /* Deny by default, so there is no window of "open
+-     * access" between QEMU starting, and the user setting
+-     * up ACLs in the monitor */
+-    acl->defaultDeny = 1;
+-
+-    acl->nentries = 0;
+-    QTAILQ_INIT(&acl->entries);
+-
+-    acls = g_realloc(acls, sizeof(*acls) * (nacls +1));
+-    acls[nacls] = acl;
+-    nacls++;
+-
+-    return acl;
+-}
+-
+-int qemu_acl_party_is_allowed(qemu_acl *acl,
+-                              const char *party)
+-{
+-    qemu_acl_entry *entry;
+-
+-    QTAILQ_FOREACH(entry, &acl->entries, next) {
+-#ifdef CONFIG_FNMATCH
+-        if (fnmatch(entry->match, party, 0) == 0)
+-            return entry->deny ? 0 : 1;
+-#else
+-        /* No fnmatch, so fallback to exact string matching
+-         * instead of allowing wildcards */
+-        if (strcmp(entry->match, party) == 0)
+-            return entry->deny ? 0 : 1;
+-#endif
+-    }
+-
+-    return acl->defaultDeny ? 0 : 1;
+-}
+-
+-
+-void qemu_acl_reset(qemu_acl *acl)
+-{
+-    qemu_acl_entry *entry, *next_entry;
+-
+-    /* Put back to deny by default, so there is no window
+-     * of "open access" while the user re-initializes the
+-     * access control list */
+-    acl->defaultDeny = 1;
+-    QTAILQ_FOREACH_SAFE(entry, &acl->entries, next, next_entry) {
+-        QTAILQ_REMOVE(&acl->entries, entry, next);
+-        g_free(entry->match);
+-        g_free(entry);
+-    }
+-    acl->nentries = 0;
+-}
+-
+-
+-int qemu_acl_append(qemu_acl *acl,
+-                    int deny,
+-                    const char *match)
+-{
+-    qemu_acl_entry *entry;
+-
+-    entry = g_malloc(sizeof(*entry));
+-    entry->match = g_strdup(match);
+-    entry->deny = deny;
+-
+-    QTAILQ_INSERT_TAIL(&acl->entries, entry, next);
+-    acl->nentries++;
+-
+-    return acl->nentries;
+-}
+-
+-
+-int qemu_acl_insert(qemu_acl *acl,
+-                    int deny,
+-                    const char *match,
+-                    int index)
+-{
+-    qemu_acl_entry *tmp;
+-    int i = 0;
+-
+-    if (index <= 0)
+-        return -1;
+-    if (index > acl->nentries) {
+-        return qemu_acl_append(acl, deny, match);
+-    }
+-
+-    QTAILQ_FOREACH(tmp, &acl->entries, next) {
+-        i++;
+-        if (i == index) {
+-            qemu_acl_entry *entry;
+-            entry = g_malloc(sizeof(*entry));
+-            entry->match = g_strdup(match);
+-            entry->deny = deny;
+-
+-            QTAILQ_INSERT_BEFORE(tmp, entry, next);
+-            acl->nentries++;
+-            break;
+-        }
+-    }
+-
+-    return i;
+-}
+-
+-int qemu_acl_remove(qemu_acl *acl,
+-                    const char *match)
+-{
+-    qemu_acl_entry *entry;
+-    int i = 0;
+-
+-    QTAILQ_FOREACH(entry, &acl->entries, next) {
+-        i++;
+-        if (strcmp(entry->match, match) == 0) {
+-            QTAILQ_REMOVE(&acl->entries, entry, next);
+-            acl->nentries--;
+-            g_free(entry->match);
+-            g_free(entry);
+-            return i;
+-        }
+-    }
+-    return -1;
+-}
+diff --git a/crypto/trace-events b/crypto/trace-events
+index 597389b73c..a38ad7b787 100644
+--- a/crypto/trace-events
++++ b/crypto/trace-events
+@@ -19,5 +19,5 @@ qcrypto_tls_creds_x509_load_cert(void *creds, int isServer, const char *file) "T
+ qcrypto_tls_creds_x509_load_cert_list(void *creds, const char *file) "TLS creds x509 load cert list creds=%p file=%s"
+ 
+ # crypto/tlssession.c
+-qcrypto_tls_session_new(void *session, void *creds, const char *hostname, const char *aclname, int endpoint) "TLS session new session=%p creds=%p hostname=%s aclname=%s endpoint=%d"
++qcrypto_tls_session_new(void *session, void *creds, const char *hostname, const char *authzid, int endpoint) "TLS session new session=%p creds=%p hostname=%s authzid=%s endpoint=%d"
+ qcrypto_tls_session_check_creds(void *session, const char *status) "TLS session check creds session=%p status=%s"
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index b2369c14cb..e8ceb4e5f6 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -510,8 +510,8 @@ test-qom-obj-y = $(qom-obj-y) $(test-util-obj-y)
+ test-qapi-obj-y = tests/test-qapi-visit.o tests/test-qapi-types.o \
+ 	tests/test-qapi-events.o tests/test-qapi-introspect.o \
+ 	$(test-qom-obj-y)
+-benchmark-crypto-obj-y = $(crypto-obj-y) $(test-qom-obj-y)
+-test-crypto-obj-y = $(crypto-obj-y) $(test-qom-obj-y)
++benchmark-crypto-obj-y = $(authz-obj-y) $(crypto-obj-y) $(test-qom-obj-y)
++test-crypto-obj-y = $(authz-obj-y) $(crypto-obj-y) $(test-qom-obj-y)
+ test-io-obj-y = $(io-obj-y) $(test-crypto-obj-y)
+ test-block-obj-y = $(block-obj-y) $(test-io-obj-y) tests/iothread.o
+ 
+diff --git a/util/Makefile.objs b/util/Makefile.objs
+index 4d7675d6e7..ca99e7e90d 100644
+--- a/util/Makefile.objs
++++ b/util/Makefile.objs
+@@ -20,7 +20,6 @@ util-obj-y += envlist.o path.o module.o
+ util-obj-y += host-utils.o
+ util-obj-y += bitmap.o bitops.o hbitmap.o
+ util-obj-y += fifo8.o
+-util-obj-y += acl.o
+ util-obj-y += cacheinfo.o
+ util-obj-y += error.o qemu-error.o
+ util-obj-y += id.o
+-- 
 2.17.2
