@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1gDVPC-0008Kj-1q
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 10:05:37 -0400
+	(envelope-from <cota@braap.org>) id 1gDVUJ-0001HU-T4
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 10:10:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1gDVP5-0003EA-PI
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 10:05:32 -0400
-Received: from mail-eopbgr730085.outbound.protection.outlook.com
-	([40.107.73.85]:64506
-	helo=NAM05-DM3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1gDVP2-0002Za-IC
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 10:05:25 -0400
-From: "Singh, Brijesh" <brijesh.singh@amd.com>
-Date: Fri, 19 Oct 2018 14:05:06 +0000
-Message-ID: <849fed2b-3763-14c1-d3a7-cc9891aeaff5@amd.com>
-References: <1538423049-29524-1-git-send-email-brijesh.singh@amd.com>
-In-Reply-To: <1538423049-29524-1-git-send-email-brijesh.singh@amd.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <1ABFFAF95DA9C444BA7E2D7960D106A7@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <cota@braap.org>) id 1gDVUG-000316-MR
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 10:10:51 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:57551)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gDVUG-00030W-Bn
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 10:10:48 -0400
+Date: Fri, 19 Oct 2018 10:10:46 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20181019141046.GA7279@flamenco>
+References: <1539946806-695-1-git-send-email-thuth@redhat.com>
+	<4837dc8a-c4a7-9bd8-649a-3b35b0fe20fa@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v5 0/9] x86_iommu/amd: add interrupt remap
- support
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4837dc8a-c4a7-9bd8-649a-3b35b0fe20fa@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] tests/migration-test: Disable s390x test
+ when running with TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,84 +28,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "Singh, Brijesh" <brijesh.singh@amd.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Lendacky,
-	Thomas" <Thomas.Lendacky@amd.com>, "Suthikulpanit, Suravee" <Suravee.Suthikulpanit@amd.com>, Peter Xu <peterx@redhat.com>
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Wei Huang <wei@redhat.com>, david@redhat.com, Cornelia Huck <cohuck@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
 
-SGkgTWljaGFlbCwgUGFvbG8gYW5kIEVkdWFyZG8sDQoNCkFueSB0aG91Z2h0cyBvbiB0aGUgc2Vy
-aWVzID8NCg0KVGhhbmtzDQpCcmlqZXNoDQoNCk9uIDEwLzEvMTggMTI6NDQgUE0sIFNpbmdoLCBC
-cmlqZXNoIHdyb3RlOg0KPiBUaGlzIHNlcmllcyBhZGRzIHRoZSBpbnRlcnJ1cHQgcmVtYXBwaW5n
-IHN1cHBvcnQgZm9yIGFtZC1pb21tdSBkZXZpY2UuDQo+DQo+IElPTU1VIHNwZWMgaXMgYXZhaWxh
-YmxlIGF0OiBodHRwczovL3N1cHBvcnQuYW1kLmNvbS9UZWNoRG9jcy80ODg4Ml9JT01NVS5wZGYN
-Cj4NCj4gVG8gZW5hYmxlIHRoZSBpbnRlcnJ1cHQgcmVtYXAgdXNlIGJlbG93IHFlbXUgY2xpDQo+
-ICMgJFFFTVUgXA0KPiAgIC1kZXZpY2UgYW1kLWlvbW11LGludHJlbWFwPW9uDQo+DQo+IEkgaGF2
-ZSB0ZXN0ZWQgRkMtMjggYW5kIFVidW50dSAxOC4wNCBndWVzdC4gDQo+DQo+IExpbnV4IGd1ZXN0
-IGJvb3R1cCBsb2cgc2hvd3MgdGhlIGludGVycnVwdCByZW1hcCBzdXBwb3J0czoNCj4NCj4gW3Jv
-b3RAbG9jYWxob3N0IH5dIyBkbWVzZyB8IGdyZXAgLWkgQU1ELVZpDQo+IFsgICAgMC4wMDE3NjFd
-IEFNRC1WaTogVXNpbmcgSVZIRCB0eXBlIDB4MTANCj4gWyAgICAwLjAwMzA1MV0gQU1ELVZpOiBk
-ZXZpY2U6IDAwOjAzLjAgY2FwOiAwMDQwIHNlZzogMCBmbGFnczogZDEgaW5mbyAwMDAwDQo+IFsg
-ICAgMC4wMDQwMDddIEFNRC1WaTogICAgICAgIG1taW8tYWRkcjogMDAwMDAwMDBmZWQ4MDAwMA0K
-PiBbICAgIDAuMDA0ODc0XSBBTUQtVmk6ICAgREVWX0FMTCAgICAgICAgICAgICAgICAgICAgICAg
-IGZsYWdzOiAwMA0KPiBbICAgIDAuMDA2MjM2XSBBTUQtVmk6ICAgREVWX1NQRUNJQUwoSU9BUElD
-WzBdKSAgICAgICAgIGRldmlkOiAwMDoxNC4wDQo+IFsgICAgMC42Njc5NDNdIEFNRC1WaTogRm91
-bmQgSU9NTVUgYXQgMDAwMDowMDowMy4wIGNhcCAweDQwDQo+IFsgICAgMC42Njg3MjddIEFNRC1W
-aTogRXh0ZW5kZWQgZmVhdHVyZXMgKDB4MjlkMyk6DQo+IFsgICAgMC42Njk4NzRdIEFNRC1WaTog
-SW50ZXJydXB0IHJlbWFwcGluZyBlbmFibGVkDQo+IFsgICAgMC42NzEwNzRdIEFNRC1WaTogTGF6
-eSBJTy9UTEIgZmx1c2hpbmcgZW5hYmxlZA0KPg0KPiBjYXQgL3Byb2MvaW50ZXJydXB0cyBjb25m
-aXJtcyB0aGF0IGl0cyB1c2luZyBJUg0KPg0KPiBbcm9vdEBsb2NhbGhvc3Qgfl0jIGNhdCAvcHJv
-Yy9pbnRlcnJ1cHRzIA0KPiBDUFUwICAgICAgIA0KPiAgMDogICAgICAgICA0MCAgSVItSU8tQVBJ
-QyAgICAyLWVkZ2UgICAgICB0aW1lcg0KPiAgMTogICAgICAgICAgOSAgSVItSU8tQVBJQyAgICAx
-LWVkZ2UgICAgICBpODA0Mg0KPiAgNDogICAgICAgMTc3MCAgSVItSU8tQVBJQyAgICA0LWVkZ2Ug
-ICAgICB0dHlTMA0KPiAgNzogICAgICAgICAgMCAgSVItSU8tQVBJQyAgICA3LWVkZ2UgICAgICBw
-YXJwb3J0MA0KPiAgODogICAgICAgICAgMSAgSVItSU8tQVBJQyAgICA4LWVkZ2UgICAgICBydGMw
-DQo+ICA5OiAgICAgICAgICAwICBJUi1JTy1BUElDICAgIDktZmFzdGVvaSAgIGFjcGkNCj4gMTI6
-ICAgICAgICAgMTUgIElSLUlPLUFQSUMgICAxMi1lZGdlICAgICAgaTgwNDINCj4gMTY6ICAgICAg
-ICAgIDAgIElSLUlPLUFQSUMgICAxNi1mYXN0ZW9pICAgaTgwMV9zbWJ1cw0KPiAyNDogICAgICAg
-ICAgMCAgIFBDSS1NU0kgNDkxNTItZWRnZSAgICAgIEFNRC1WaQ0KPiAyNTogICAgICAxMzA3MCAg
-SVItUENJLU1TSSA1MTIwMDAtZWRnZSAgICAgIGFoY2lbMDAwMDowMDoxZi4yXQ0KPiAyNjogICAg
-ICAgICA4NiAgSVItUENJLU1TSSAzMjc2OC1lZGdlICAgICAgZW5wMHMyLXJ4LTANCj4gMjc6ICAg
-ICAgICAxMzkgIElSLVBDSS1NU0kgMzI3NjktZWRnZSAgICAgIGVucDBzMi10eC0wDQo+IDI4OiAg
-ICAgICAgICAxICBJUi1QQ0ktTVNJIDMyNzcwLWVkZ2UgICAgICBlbnAwczINCj4gTk1JOiAgICAg
-ICAgICAwICAgTm9uLW1hc2thYmxlIGludGVycnVwdHMNCj4gTE9DOiAgICAgIDI2Njg2ICAgTG9j
-YWwgdGltZXIgaW50ZXJydXB0cw0KPiBTUFU6ICAgICAgICAgIDAgICBTcHVyaW91cyBpbnRlcnJ1
-cHRzDQo+IC4uLg0KPiAuLi4NCj4NCj4gQ2M6ICJNaWNoYWVsIFMuIFRzaXJraW4iIDxtc3RAcmVk
-aGF0LmNvbT4NCj4gQ2M6IFBhb2xvIEJvbnppbmkgPHBib256aW5pQHJlZGhhdC5jb20+DQo+IENj
-OiBSaWNoYXJkIEhlbmRlcnNvbiA8cnRoQHR3aWRkbGUubmV0Pg0KPiBDYzogRWR1YXJkbyBIYWJr
-b3N0IDxlaGFia29zdEByZWRoYXQuY29tPg0KPiBDYzogTWFyY2VsIEFwZmVsYmF1bSA8bWFyY2Vs
-LmFwZmVsYmF1bUBnbWFpbC5jb20+DQo+IENjOiBUb20gTGVuZGFja3kgPFRob21hcy5MZW5kYWNr
-eUBhbWQuY29tPg0KPiBDYzogU3VyYXZlZSBTdXRoaWt1bHBhbml0IDxTdXJhdmVlLlN1dGhpa3Vs
-cGFuaXRAYW1kLmNvbT4NCj4gQ2M6IFBldGVyIFh1IDxwZXRlcnhAcmVkaGF0LmNvbT4NCj4NCj4g
-Q2hhbmdlcyBzaW5jZSB2NDoNCj4gLSBCYXNlZCBvbiBQZXRlcidzIGNvbW1lbnQgdXNlIGVycm9y
-X3JlcG9ydF9vbmNlIGluIHBhdGNoIDUgYW5kDQo+ICAgdHJhY2Vwb2ludCBpbiBQYXRjaCA2DQo+
-DQo+IENoYW5nZXMgc2luY2UgdjM6DQo+IC0gZG8gbm90IHRyZWF0IGVycm9ycyBhcyBhIHBhc3N0
-aHJvdWdoICh3aGVyZSBhcHBsaWNhYmxlKQ0KPiAtIHVzZSBlcnJvcl9yZXBvcnRfb25jZSB3aGVu
-IGFwcGxpY2FibGUNCj4NCj4gQ2hhbmdlcyBzaW5jZSB2MjoNCj4gLSBtYWtlIHRoZSBhZGRyZXNz
-IHNwYWNlIHJlbmFtZSBhIHNlcGFyYXRlIHBhdGNoDQo+IC0gZml4IHRoZSBWPTEgY2hlY2sgaW4g
-cGF0Y2ggMg0KPiAtIGFkZCBtb3JlIGNvbW1lbnRzIGluIHRoZSBwYXRjaGVzDQo+IC0gdXNlIGFt
-ZHZpX3RhcmdldF9hYm9ydCB0cmFjZSBwb2ludCB3aGVyZSBhcHBsaWNhYmxlDQo+IC0gdXNlIGVy
-cm9yX3JlcG9ydF9vbmNlIHdoZXJlIGFwcGxpY2FibGUNCj4gLSBkbyBub3QgY2F1c2UgZXhpdCgp
-IHdoZW4gY29uZmlndXJhdGlvbiBtaXNtYXRjaCBpcyBkZXRlY3RlZCwNCj4gICBidXQgbG9nIHRo
-ZSBlcnJvciBzbyB0aGF0IHVzZXIga25vd3MgYWJvdXQgaXQuDQo+DQo+IENoYW5nZXMgc2luY2Ug
-djE6DQo+IC0gbW92ZSB2dGRfZ2VuZXJhdGVfbXNpX21lc3NhZ2UgdG8gY29tbW9uIGNvZGUNCj4g
-LSBmaXggdGhlIGRlc3RfbW9kZSBiaXQgZXh0cmFjdGlvbg0KPiAtIGFkZCBtb3JlIGNvbW1lbnRz
-IGV4cGxhaW5pbmcgd2h5IHdlIGFkZCB0aGUgc3BlY2lhbCBkZXZpY2UNCj4gLSBzb21lIG1pbm9y
-IGNsZWFudXBzIGJhc2VkIG9uIFBldGVyJ3MgZmVlZGJhY2tzDQo+IEJyaWplc2ggU2luZ2ggKDkp
-Og0KPiAgIHg4Nl9pb21tdTogbW92ZSB0aGUga2VybmVsLWlycWNoaXAgY2hlY2sgaW4gY29tbW9u
-IGNvZGUNCj4gICB4ODZfaW9tbXU6IG1vdmUgdnRkX2dlbmVyYXRlX21zaV9tZXNzYWdlIGluIGNv
-bW1vbiBmaWxlDQo+ICAgeDg2X2lvbW11L2FtZDogcmVtb3ZlIFY9MSBjaGVjayBmcm9tIGFtZHZp
-X3ZhbGlkYXRlX2R0ZSgpDQo+ICAgeDg2X2lvbW11L2FtZDogbWFrZSB0aGUgYWRkcmVzcyBzcGFj
-ZSBuYW1pbmcgY29uc2lzdGVudCB3aXRoDQo+ICAgICBpbnRlbC1pb21tdQ0KPiAgIHg4Nl9pb21t
-dS9hbWQ6IFByZXBhcmUgZm9yIGludGVycnVwdCByZW1hcCBzdXBwb3J0DQo+ICAgeDg2X2lvbW11
-L2FtZDogQWRkIGludGVycnVwdCByZW1hcCBzdXBwb3J0IHdoZW4gVkFQSUMgaXMgbm90IGVuYWJs
-ZWQNCj4gICBpMzg2OiBhY3BpOiBhZGQgSVZIRCBkZXZpY2UgZW50cnkgZm9yIElPQVBJQw0KPiAg
-IHg4Nl9pb21tdS9hbWQ6IEFkZCBpbnRlcnJ1cHQgcmVtYXAgc3VwcG9ydCB3aGVuIFZBUElDIGlz
-IGVuYWJsZWQNCj4gICB4ODZfaW9tbXUvYW1kOiBFbmFibGUgR3Vlc3QgdmlydHVhbCBBUElDIHN1
-cHBvcnQNCj4NCj4gIGh3L2kzODYvYWNwaS1idWlsZC5jICAgICAgICAgIHwgIDMxICsrKy0NCj4g
-IGh3L2kzODYvYW1kX2lvbW11LmMgICAgICAgICAgIHwgNDE0ICsrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrLQ0KPiAgaHcvaTM4Ni9hbWRfaW9tbXUuaCAgICAgICAgICAg
-fCAgOTYgKysrKysrKysrLQ0KPiAgaHcvaTM4Ni9pbnRlbF9pb21tdS5jICAgICAgICAgfCAgMzkg
-Ky0tLQ0KPiAgaHcvaTM4Ni90cmFjZS1ldmVudHMgICAgICAgICAgfCAgMTQgKysNCj4gIGh3L2kz
-ODYveDg2LWlvbW11LmMgICAgICAgICAgIHwgIDMzICsrKysNCj4gIGluY2x1ZGUvaHcvaTM4Ni9p
-bnRlbF9pb21tdS5oIHwgIDU5IC0tLS0tLQ0KPiAgaW5jbHVkZS9ody9pMzg2L3g4Ni1pb21tdS5o
-ICAgfCAgNjYgKysrKysrKw0KPiAgOCBmaWxlcyBjaGFuZ2VkLCA2NDMgaW5zZXJ0aW9ucygrKSwg
-MTA5IGRlbGV0aW9ucygtKQ0KPg0KDQo=
+On Fri, Oct 19, 2018 at 13:14:57 +0200, Laurent Vivier wrote:
+> On 19/10/2018 13:00, Thomas Huth wrote:
+> > The migration test for s390x sometimes hangs when running with TCG,
+> > similar to the problems that we have already observed with TCG for
+> > the ppc64 guests. Thus disable the s390x test when we are not running
+> > with KVM for now until the problem with TCG has been resolved.
+> > 
+> > Signed-off-by: Thomas Huth <thuth@redhat.com>
+
+Reviewed-by: Emilio G. Cota <cota@braap.org>
+
+Thanks!
+
+		E.
