@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gDXfe-0002zu-6Q
+	(envelope-from <kwolf@redhat.com>) id 1gDXfe-00030Q-IS
 	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:30:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gDXfd-0002DN-4j
+	(envelope-from <kwolf@redhat.com>) id 1gDXfd-0002E2-FF
 	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:30:42 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 19 Oct 2018 18:30:07 +0200
-Message-Id: <20181019163013.11787-4-kwolf@redhat.com>
+Date: Fri, 19 Oct 2018 18:30:13 +0200
+Message-Id: <20181019163013.11787-10-kwolf@redhat.com>
 In-Reply-To: <20181019163013.11787-1-kwolf@redhat.com>
 References: <20181019163013.11787-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 03/11] rbd: Close image in qemu_rbd_open()
- error path
+Subject: [Qemu-devel] [PATCH v4 09/11] iscsi: Support auto-read-only option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,30 +24,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
 
-Commit e2b8247a322 introduced an error path in qemu_rbd_open() after
-calling rbd_open(), but neglected to close the image again in this error
-path. The error path should contain everything that the regular close
-function qemu_rbd_close() contains.
-
-This adds the missing rbd_close() call.
+If read-only=3Doff, but auto-read-only=3Don is given, open the volume
+read-write if we have the permissions, but instead of erroring out for
+read-only volumes, just degrade to read-only.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block/rbd.c | 1 +
- 1 file changed, 1 insertion(+)
+ block/iscsi.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/block/rbd.c b/block/rbd.c
-index 014c68d629..27c9a1e81c 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -787,6 +787,7 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict =
+diff --git a/block/iscsi.c b/block/iscsi.c
+index bb69faf34a..130ae26f5f 100644
+--- a/block/iscsi.c
++++ b/block/iscsi.c
+@@ -1878,9 +1878,11 @@ static int iscsi_open(BlockDriverState *bs, QDict =
 *options, int flags,
-                          "automatically marking the image read-only.");
-             r =3D bdrv_set_read_only(bs, true, &local_err);
-             if (r < 0) {
-+                rbd_close(s->image);
-                 error_propagate(errp, local_err);
-                 goto failed_open;
-             }
+     /* Check the write protect flag of the LUN if we want to write */
+     if (iscsilun->type =3D=3D TYPE_DISK && (flags & BDRV_O_RDWR) &&
+         iscsilun->write_protected) {
+-        error_setg(errp, "Cannot open a write protected LUN as read-writ=
+e");
+-        ret =3D -EACCES;
+-        goto out;
++        ret =3D bdrv_apply_auto_read_only(bs, "LUN is write protected", =
+errp);
++        if (ret < 0) {
++            goto out;
++        }
++        flags &=3D ~BDRV_O_RDWR;
+     }
+=20
+     iscsi_readcapacity_sync(iscsilun, &local_err);
 --=20
 2.19.1
