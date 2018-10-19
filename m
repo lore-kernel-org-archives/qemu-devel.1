@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45646)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gDZJF-0005Qe-FX
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 14:15:42 -0400
+	(envelope-from <palmer@sifive.com>) id 1gDZMC-0006Yu-1t
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 14:18:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gDZJE-0000a2-KE
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 14:15:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44248)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gDZJE-0000ZG-DD
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 14:15:40 -0400
-References: <20181013151545.3731-1-f4bug@amsat.org>
-	<20181013151545.3731-2-f4bug@amsat.org>
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <8328ffc9-a3a0-a66c-7dc7-d19a632d9b2c@redhat.com>
-Date: Fri, 19 Oct 2018 14:15:35 -0400
-MIME-Version: 1.0
-In-Reply-To: <20181013151545.3731-2-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 1/6] tests/acceptance: Rename the
- generic BootLinuxConsole test as test_x86_64_pc
+	(envelope-from <palmer@sifive.com>) id 1gDZM8-0006WP-Rw
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 14:18:43 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:36437)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gDZM5-00066I-En
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 14:18:39 -0400
+Received: by mail-pf1-x443.google.com with SMTP id l81-v6so16837099pfg.3
+	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 11:18:22 -0700 (PDT)
+Date: Fri, 19 Oct 2018 11:18:20 -0700 (PDT)
+In-Reply-To: <da430247-4273-6df4-3629-99140c0995bc@mail.uni-paderborn.de>
+From: Palmer Dabbelt <palmer@sifive.com>
+Message-ID: <mhng-48b7d6e5-1376-4ffc-8adc-81eddc8e6aa2@palmer-si-x1c4>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 04/28] target/riscv: Convert RVXI
+ arithmetic insns to decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,49 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, Fam Zheng <famz@redhat.com>
+To: kbastian@mail.uni-paderborn.de
+Cc: richard.henderson@linaro.org, Michael Clark <mjc@sifive.com>, sagark@eecs.berkeley.edu, peer.adelt@hni.uni-paderborn.de, Alistair Francis <Alistair.Francis@wdc.com>, qemu-devel@nongnu.org
 
+On Fri, 19 Oct 2018 04:00:33 PDT (-0700), kbastian@mail.uni-paderborn.de wrote:
+> Hi Richard,
+>
+> On 10/12/18 8:46 PM, Richard Henderson wrote:
+>> On 10/12/18 10:30 AM, Bastian Koppelmann wrote:
+>>> +static bool trans_andi(DisasContext *ctx, arg_andi *a, uint32_t insn)
+>>> +{
+>>> +    gen_arith_imm(ctx, OPC_RISC_ANDI, a->rd, a->rs1, a->imm);
+>>> +    return true;
+>>> +}
+>>> +static bool trans_slli(DisasContext *ctx, arg_slli *a, uint32_t insn)
+>>> +{
+>>> +    if (a->rd != 0) {
+>>> +        TCGv t = tcg_temp_new();
+>>> +        gen_get_gpr(t, a->rs1);
+>>> +
+>>> +        if (a->shamt >= TARGET_LONG_BITS) {
+>>> +            gen_exception_illegal(ctx);
+>>> +            return true;
+>>> +        }
+>>> +        tcg_gen_shli_tl(t, t, a->shamt);
+>>> +
+>>> +        gen_set_gpr(a->rd, t);
+>>> +        tcg_temp_free(t);
+>>> +    } /* NOP otherwise */
+>>> +    return true;
+>>> +}
+>> Spacing.  Any reason why trans_slli (and the other shifts) aren't using
+>> gen_arith_imm as well?
+>
+>
+> Their opcode is not uniquely defined in instmap.h, just a generic
+> OPC_RISC_SHIFT_RIGHT_IW. I guess I can give the opcode as a magic value
+> for now.
 
-
-On 10/13/18 11:15 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  tests/acceptance/boot_linux_console.py | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/=
-boot_linux_console.py
-> index ba3ac036da..3aa4dbe5f9 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -15,7 +15,7 @@ from avocado_qemu import Test
-> =20
->  class BootLinuxConsole(Test):
->      """
-> -    Boots a x86_64 Linux kernel and checks that the console is operati=
-onal
-> +    Boots a Linux kernel and checks that the console is operational
->      and the kernel command line is properly passed from QEMU to the ke=
-rnel
-> =20
->      :avocado: enable
-> @@ -23,7 +23,7 @@ class BootLinuxConsole(Test):
-> =20
->      timeout =3D 60
-> =20
-> -    def test(self):
-> +    def test_x86_64_pc(self):
->          if self.arch !=3D 'x86_64':
->              self.cancel('Currently specific to the x86_64 target arch'=
-)
->          kernel_url =3D ('https://mirrors.kernel.org/fedora/releases/28=
-/'
->=20
-
-
-This looks right, but given "self.arch" is still not on master, so I'm
-holding on to giving the reviewed-by/tested-by.
-
-Question: do you believe a maintainer and/or developer would want to
-test specific machine types?
+Shifts are the only arithmetic operations that aren't uniquely defined by func3 
+(the opcode), but instead have another bit packed in where the immediate 
+usually lives to differentiate between arithmetic and logical shifts.  This 
+pretty much always ends up as a bit of a special case in software decoders.
