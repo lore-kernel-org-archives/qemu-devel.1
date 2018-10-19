@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41490)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42541)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gDSs0-0002k2-4K
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 07:23:08 -0400
+	(envelope-from <berrange@redhat.com>) id 1gDSut-0004Zi-F1
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 07:26:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gDSrw-0003bX-5P
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 07:23:08 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:40628)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gDSrv-0003b1-Mw
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 07:23:04 -0400
-Received: by mail-wr1-x444.google.com with SMTP id d2-v6so37044813wro.7
-	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 04:23:03 -0700 (PDT)
-References: <20181017094406.4844-1-maozhongyi@cmss.chinamobile.com>
-	<20181017094406.4844-3-maozhongyi@cmss.chinamobile.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181017094406.4844-3-maozhongyi@cmss.chinamobile.com>
-Date: Fri, 19 Oct 2018 12:23:01 +0100
-Message-ID: <875zxynpt6.fsf@linaro.org>
+	(envelope-from <berrange@redhat.com>) id 1gDSus-00070u-By
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 07:26:07 -0400
+Date: Fri, 19 Oct 2018 12:25:54 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181019112554.GA19770@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180321153124.5357-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180321153124.5357-1-berrange@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/3] debian-bootstrap.pre: Modern shell
- scripting (use $() instead of ``)
+Subject: Re: [Qemu-devel] [PATCH] block: drop moderated sheepdog mailing
+ list from MAINTAINERS file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,54 +25,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, philmd@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Liu Yuan <namei.unix@gmail.com>, Jeff Cody <jcody@redhat.com>
 
+Paolo, I think this is a patch for your misc patches queue.
 
-Mao Zhongyi <maozhongyi@cmss.chinamobile.com> writes:
-
-> Various shell files contain a mix between obsolete ``
-> and modern $(); It would be nice to convert to using $()
-> everywhere.
->
-> Cc: alex.bennee@linaro.org
-> Cc: famz@redhat.com
-> Cc: philmd@redhat.com
->
-> Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-
+On Wed, Mar 21, 2018 at 03:31:24PM +0000, Daniel P. Berrang=C3=A9 wrote:
+> The sheepdog mailing list is setup to stop and queue messages from
+> non-subscribers, pending moderator approval. Unfortunately it seems
+> that the moderation queue is not actively dealt with. Even when message=
+s
+> are approved, the sender is never added to the whitelist, so every
+> future mail the same sender continues to get stopped for moderation.
+>=20
+> MAINTAINERS entries should be responsive and not uneccessarily block
+> mails from QEMU contributors, so drop the sheepdog mailing list.
+>=20
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 > ---
->  tests/docker/dockerfiles/debian-bootstrap.pre | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/tests/docker/dockerfiles/debian-bootstrap.pre b/tests/docker=
-/dockerfiles/debian-bootstrap.pre
-> index 3b0ef95374..c164778c30 100755
-> --- a/tests/docker/dockerfiles/debian-bootstrap.pre
-> +++ b/tests/docker/dockerfiles/debian-bootstrap.pre
-> @@ -2,7 +2,7 @@
->  #
->  # Simple wrapper for debootstrap, run in the docker build context
->  #
-> -FAKEROOT=3D`which fakeroot 2> /dev/null`
-> +FAKEROOT=3D$(which fakeroot 2> /dev/null)
->  # debootstrap < 1.0.67 generates empty sources.list, see Debian#732255
->  MIN_DEBOOTSTRAP_VERSION=3D1.0.67
->
-> @@ -52,7 +52,7 @@ fi
->
->  if [ -z $DEBOOTSTRAP_DIR ]; then
->      NEED_DEBOOTSTRAP=3Dfalse
-> -    DEBOOTSTRAP=3D`which debootstrap 2> /dev/null`
-> +    DEBOOTSTRAP=3D$(which debootstrap 2> /dev/null)
->      if [ -z $DEBOOTSTRAP ]; then
->          echo "No debootstrap installed, attempting to install from SCM"
->          NEED_DEBOOTSTRAP=3Dtrue
+>  MAINTAINERS | 1 -
+>  1 file changed, 1 deletion(-)
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 354a18ce49..7eea869dcd 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1871,7 +1871,6 @@ M: Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>
+>  M: Liu Yuan <namei.unix@gmail.com>
+>  M: Jeff Cody <jcody@redhat.com>
+>  L: qemu-block@nongnu.org
+> -L: sheepdog@lists.wpkg.org
+>  S: Supported
+>  F: block/sheepdog.c
+>  T: git git://github.com/codyprime/qemu-kvm-jtc.git block
+> --=20
+> 2.14.3
+>=20
 
-
---
-Alex Benn=C3=A9e
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
