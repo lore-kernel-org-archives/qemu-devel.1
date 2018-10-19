@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58068)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33243)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gDYVt-00020I-FB
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 13:24:42 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1gDYep-0002EJ-Kk
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 13:33:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gDYVr-0005Xg-Ix
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 13:24:41 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:44289)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gDYVr-0005WW-CO
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 13:24:39 -0400
-Received: by mail-pl1-x642.google.com with SMTP id d23-v6so2700890pls.11
-	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 10:24:39 -0700 (PDT)
-Date: Fri, 19 Oct 2018 10:24:37 -0700 (PDT)
-In-Reply-To: <20181019010625.25294-52-cota@braap.org>
-From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-06bdb774-88d4-4a05-9cc0-f120a26646cd@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC v3 51/56] riscv: acquire the BQL in
- cpu_has_work
+	(envelope-from <amarkovic@wavecomp.com>) id 1gDYek-0000sj-SA
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 13:33:55 -0400
+Received: from mail-sn1nam02on0117.outbound.protection.outlook.com
+	([104.47.36.117]:65264
+	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1gDYek-0000im-Do
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 13:33:50 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Fri, 19 Oct 2018 17:33:42 +0000
+Message-ID: <BN6PR2201MB1251A64564A3B7F337F94DA1C6F90@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <cover.1539428198.git.noring@nocrew.org>
+	<BN6PR2201MB125158347C995B4CC764BCDBC6FD0@BN6PR2201MB1251.namprd22.prod.outlook.com>,
+	<40c175ec-9f64-0f05-f63d-b3d00d0705cc@vivier.eu>
+In-Reply-To: <40c175ec-9f64-0f05-f63d-b3d00d0705cc@vivier.eu>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v7 0/7] target/mips: Limited support for
+ the R5900
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,75 +33,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: cota@braap.org
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, Michael Clark <mjc@sifive.com>, sagark@eecs.berkeley.edu, kbastian@mail.uni-paderborn.de
+To: Laurent Vivier <laurent@vivier.eu>, Fredrik Noring <noring@nocrew.org>, "Maciej W. Rozycki" <macro@linux-mips.org>, =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, =?iso-8859-1?Q?J=FCrgen_Urban?= <JuergenUrban@gmx.de>, Petar Jovanovic <pjovanovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-On Thu, 18 Oct 2018 18:06:20 PDT (-0700), cota@braap.org wrote:
-> Soon we will call cpu_has_work without the BQL.
+> From: Laurent Vivier <laurent@vivier.eu>
+> Sent: Friday, October 19, 2018 3:28 PM
+> Subject: Re: [Qemu-devel] [PATCH v7 0/7] target/mips: Limited support for=
+ the R5900
+>=20
+> Le 15/10/2018 =E0 14:16, Aleksandar Markovic a =E9crit :
+> >> From: Fredrik Noring <noring@nocrew.org>
+> >> Sent: Saturday, October 13, 2018 1:09 PM
+> >> To: Aleksandar Markovic; Maciej W. Rozycki; Philippe Mathieu-Daud=E9
+> >> Cc: Richard Henderson; Aurelien Jarno; Petar Jovanovic; Peter Maydell;=
+ J=FCrgen Urban; > > qemu-devel@nongnu.org
+> >> Subject: [PATCH v7 0/7] target/mips: Limited support for the R5900
+> >>
+> >> The primary purpose of these changes is to support programs compiled
+> >> by GCC for the R5900 target and thereby run R5900 Linux distributions,
+> >> for example Gentoo.
+> >>
+> >
+> > Hello, Fredrik.
+> >
+> > Your series is getting better and better with each version, which is ve=
+ry good. For a change,
+> > I don't have any objection about the title. :) Patch 7 will be integrat=
+ed shortly in the MIPS
+> > queue, you don't need to worry about it. With this series you are not o=
+nly supporting your=20
+> > prime use case, but you are introducing a new instruction set to QEMU. =
+Try to step back and get
+> > wider perspective. No matter how limited the support for the new ISA is=
+, its introduction to
+> > QEMU must have following elements:
+> >
+> > (1) Definition of basic preprocessor constants for the new ISA.
+> > (2) All opcodes for the ISA.
+> > (3) Basic decoding engine for new instructions.
+> >
+> > Your patch 1 adresses 1). However, there are no patches for (2) and (3)=
+ in this series. Let > me walk though the details on how to implement (2) a=
+nd (3).
+> >
+> > (2) All opcodes for the ISA.
+>=20
+> As Fredrik only wants to use R5900 gentoo userland binaries using qemu
+> linux-user mode, does he really need to implement all the opcodes of the
+> ISA?
 >
-> Cc: Michael Clark <mjc@sifive.com>
-> Cc: Palmer Dabbelt <palmer@sifive.com>
-> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> ---
->  target/riscv/cpu.c | 21 ++++++++++++++++++++-
->  1 file changed, 20 insertions(+), 1 deletion(-)
->
-> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-> index d630e8fd6c..b10995c807 100644
-> --- a/target/riscv/cpu.c
-> +++ b/target/riscv/cpu.c
-> @@ -18,6 +18,7 @@
->   */
->
->  #include "qemu/osdep.h"
-> +#include "qemu/main-loop.h"
->  #include "qemu/log.h"
->  #include "cpu.h"
->  #include "exec/exec-all.h"
-> @@ -244,11 +245,14 @@ static void riscv_cpu_synchronize_from_tb(CPUState *cs, TranslationBlock *tb)
->      env->pc = tb->pc;
->  }
->
-> -static bool riscv_cpu_has_work(CPUState *cs)
-> +static bool riscv_cpu_has_work_locked(CPUState *cs)
->  {
->  #ifndef CONFIG_USER_ONLY
->      RISCVCPU *cpu = RISCV_CPU(cs);
->      CPURISCVState *env = &cpu->env;
-> +
-> +    g_assert(qemu_mutex_iothread_locked());
-> +
->      /*
->       * Definition of the WFI instruction requires it to ignore the privilege
->       * mode and delegation registers, but respect individual enables
-> @@ -259,6 +263,21 @@ static bool riscv_cpu_has_work(CPUState *cs)
->  #endif
->  }
->
-> +static bool riscv_cpu_has_work(CPUState *cs)
-> +{
-> +    if (!qemu_mutex_iothread_locked()) {
-> +        bool ret;
-> +
-> +        cpu_mutex_unlock(cs);
-> +        qemu_mutex_lock_iothread();
-> +        cpu_mutex_lock(cs);
-> +        ret = riscv_cpu_has_work_locked(cs);
-> +        qemu_mutex_unlock_iothread();
-> +        return ret;
-> +    }
-> +    return riscv_cpu_has_work_locked(cs);
-> +}
-> +
->  void restore_state_to_opc(CPURISCVState *env, TranslationBlock *tb,
->                            target_ulong *data)
->  {
 
-I'm afraid I don't understand the locking scheme, but as far as the RISC-V 
-stuff goes this looks fine.
+It should be clear from my previous mail, but this is what I meant by (2) a=
+nd (3):
 
-Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
+(2) A list of all R5900 instructions not covered by MIPS III/IV, in the for=
+m of '#defines' or enum elements, logically clustered.
 
-Thanks!
+(3) A set of functions (in my estimation, around a dozen of them is needed)=
+, each containing a switch statement with cases for individual instructions=
+, each case containing only "TODO" comment and raising EXCP_RI. Of course, =
+all such function should be interconnected and integrated with the rest of =
+MIPS code according to the R5900 doc.
+
+In my view, it is really a stretch that this is 'very time consuming'. True=
+, it does require focus and meticulousness.
+
+My impression is that Fridrik understood my guidance correctly. Fridrik, pl=
+ease let me know if you need clarification of any kind.
+
+Sincerely,
+Aleksandar
+
+
+> Most of the architectures have started with only the userland
+> instruction set, and the privileged instruction set was added once this
+> part was validated (see the risu project
+> https://wiki.linaro.org/PeterMaydell/Risu). It was really helpful for me
+> to add the m680x0 processor emulation in QEMU by this way (I've added
+> FPU and MMU later)
+>=20
+> It can be a lot of work to add all the opcodes for the ISA, and be very
+> time consuming, and Fredrik has only test case for the opcode he has
+> implemented, the rest of the ISA will not be tested, or will need more
+> work from him.
+>=20
+> So perhaps a not fully implemented R5900 ISA (with big WARNINGs in the
+> code, and perhaps assert()?) would be better than nothing at all?
+>=20
+> Thanks,
+> Laurent
+>=20
+>=20
+>=20
