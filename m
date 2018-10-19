@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50558)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50755)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gDUHr-0003UD-I5
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:53:56 -0400
+	(envelope-from <brad@comstyle.com>) id 1gDUIM-0003ug-As
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:54:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gDUHo-0007LH-31
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:53:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44988)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gDUHn-0007Jt-ON
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:53:51 -0400
-Date: Fri, 19 Oct 2018 13:53:42 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181019125342.GS13722@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181009130442.26296-1-berrange@redhat.com>
-	<20181009130442.26296-10-berrange@redhat.com>
-	<b1d61bfd-cc34-2103-35a1-86bd828e7a93@redhat.com>
+	(envelope-from <brad@comstyle.com>) id 1gDUIE-0008VN-EP
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:54:21 -0400
+Received: from speedy.comstyle.com ([2001:470:1d:8c::2]:15976
+	helo=mail.comstyle.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <brad@comstyle.com>) id 1gDUID-0008Pa-Nu
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:54:18 -0400
+References: <20181018221028.GB85911@humpty.home.comstyle.com>
+	<CAFEAcA_MMUS=-Pf7+EcWnLFn=izyOYtuC7g5zGsjyDjvcw1+1g@mail.gmail.com>
+From: Brad Smith <brad@comstyle.com>
+Message-ID: <da1252fa-c8fe-bc88-6abc-bf43081a0d22@comstyle.com>
+Date: Fri, 19 Oct 2018 08:54:13 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <b1d61bfd-cc34-2103-35a1-86bd828e7a93@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 09/11] authz: add QAuthZListFile object
- type for a file access control list
+In-Reply-To: <CAFEAcA_MMUS=-Pf7+EcWnLFn=izyOYtuC7g5zGsjyDjvcw1+1g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v2] oslib-posix: Use MAP_STACK in
+ qemu_alloc_stack() on OpenBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,168 +30,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Andreas =?utf-8?Q?F=C3=A4rber?= <afaerber@suse.de>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Fri, Oct 19, 2018 at 11:41:45AM +0200, Philippe Mathieu-Daud=C3=A9 wro=
-te:
-> On 09/10/2018 15:04, Daniel P. Berrang=C3=A9 wrote:
-> > Add a QAuthZListFile object type that implements the QAuthZ interface=
-. This
-> > built-in implementation is a proxy around the QAtuhZList object type,
-> > initializing it from an external file, and optionally, automatically
-> > reloading it whenever it changes.
-> >=20
-> > To create an instance of this object via the QMP monitor, the syntax
-> > used would be:
-> >=20
-> >       {
-> >         "execute": "object-add",
-> >         "arguments": {
-> >           "qom-type": "authz-list-file",
-> >           "id": "authz0",
-> >           "parameters": {
-> >             "filename": "/etc/qemu/vnc.acl",
-> > 	    "refresh": "yes"
-> >           }
-> >         }
-> >       }
-> >=20
-> > If "refresh" is "yes", inotify is used to monitor the file,
-> > automatically reloading changes. If an error occurs during reloading,
-> > all authorizations will fail until the file is next successfully
-> > loaded.
-> >=20
-> > The /etc/qemu/vnc.acl file would contain a JSON representation of a
-> > QAuthZList object
-> >=20
-> >     {
-> >       "rules": [
-> >          { "match": "fred", "policy": "allow", "format": "exact" },
-> >          { "match": "bob", "policy": "allow", "format": "exact" },
-> >          { "match": "danb", "policy": "deny", "format": "glob" },
-> >          { "match": "dan*", "policy": "allow", "format": "exact" },
-> >       ],
-> >       "policy": "deny"
-> >     }
-> >=20
-> > This sets up an authorization rule that allows 'fred', 'bob' and anyo=
-ne
-> > whose name starts with 'dan', except for 'danb'. Everyone unmatched i=
-s
-> > denied.
-> >=20
-> > The object can be loaded on the comand line using
-> >=20
-> >    -object authz-list-file,id=3Dauthz0,filename=3D/etc/qemu/vnc.acl,r=
-efresh=3Dyes
-> >=20
-> > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> > ---
-> >  authz/Makefile.objs      |   1 +
-> >  authz/listfile.c         | 284 +++++++++++++++++++++++++++++++++++++=
-++
-> >  authz/trace-events       |   4 +
-> >  include/authz/listfile.h | 110 +++++++++++++++
-> >  qemu-options.hx          |  47 +++++++
-> >  5 files changed, 446 insertions(+)
-> >  create mode 100644 authz/listfile.c
-> >  create mode 100644 include/authz/listfile.h
-> >=20
+On 10/19/2018 7:55 AM, Peter Maydell wrote:
 
-> > +static void
-> > +qauthz_list_file_event(int wd G_GNUC_UNUSED,
-> > +                       QFileMonitorEvent ev G_GNUC_UNUSED,
-> > +                       const char *name G_GNUC_UNUSED,
-> > +                       void *opaque)
-> > +{
-> > +    QAuthZListFile *fauthz =3D opaque;
-> > +    Error *err =3D NULL;
-> > +
-> > +    if (ev !=3D QFILE_MONITOR_EVENT_MODIFIED &&
-> > +        ev !=3D QFILE_MONITOR_EVENT_CREATED)
->=20
-> You missed:
->=20
->                                               {
->=20
-> > +        return;
->=20
->        }
+> On 18 October 2018 at 23:10, Brad Smith <brad@comstyle.com> wrote:
+>> Use MAP_STACK in qemu_alloc_stack() on OpenBSD.
+>>
+>> Added to -current and will be in our soon to be 6.4 release.
+>>
+>> MAP_STACK      Indicate that the mapping is used as a stack.  This
+>>                 flag must be used in combination with MAP_ANON and
+>>                 MAP_PRIVATE.
+>>
+>> Implement MAP_STACK option for mmap().  Synchronous faults (pagefault and
+>> syscall) confirm the stack register points at MAP_STACK memory, otherwise
+>> SIGSEGV is delivered. sigaltstack() and pthread_attr_setstack() are modified
+>> to create a MAP_STACK sub-region which satisfies alignment requirements.
+>> Observe that MAP_STACK can only be set/cleared by mmap(), which zeroes the
+>> contents of the region -- there is no mprotect() equivalent operation, so
+>> there is no MAP_STACK-adding gadget.
+>>
+>>
+>> Signed-off-by: Brad Smith <brad@comstyle.com>
+>> Reviewed-by: Kamil Rytarowski <n54@gmx.com>
+>>
+>> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+>> index fbd0dc8c57..7814e61114 100644
+>> --- a/util/oslib-posix.c
+>> +++ b/util/oslib-posix.c
+>> @@ -596,6 +596,7 @@ pid_t qemu_fork(Error **errp)
+>>   void *qemu_alloc_stack(size_t *sz)
+>>   {
+>>       void *ptr, *guardpage;
+>> +    int flags;
+>>   #ifdef CONFIG_DEBUG_STACK_USAGE
+>>       void *ptr2;
+>>   #endif
+>> @@ -610,8 +611,15 @@ void *qemu_alloc_stack(size_t *sz)
+>>       /* allocate one extra page for the guard page */
+>>       *sz += pagesz;
+>>
+>> -    ptr = mmap(NULL, *sz, PROT_READ | PROT_WRITE,
+>> -               MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+>> +    flags = MAP_PRIVATE | MAP_ANONYMOUS;
+>> +#if defined(MAP_STACK) && defined(__OpenBSD__)
+>> +    /* Only enable MAP_STACK on OpenBSD. Other OS's such
+>> +       as Linux/FreeBSD/NetBSD have a flag with the same
+>> +       name but have differing functionality. */
+>> +    flags |= MAP_STACK;
+>> +#endif
+> I think it would be useful to also add "OpenBSD will SEGV
+> if it spots execution with a stack pointer pointing at
+> memory that was not allocated with MAP_STACK." (summarising
+> what the interesting bit of OpenBSD behaviour is here to save
+> having to go back and read the commit message in future).
+>
+> Also our multiline comment format is linux-kernel style
+>   /*
+>    * line 1
+>    * line 2
+>    */
+> (as noted in CODING_STYLE).
+>
+> Otherwise
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Added the comment and adjusted the comment format.
 
-Opps, yes.
-
-
-> > +static void
-> > +qauthz_list_file_complete(UserCreatable *uc, Error **errp)
-> > +{
-> > +    QAuthZListFile *fauthz =3D QAUTHZ_LIST_FILE(uc);
-> > +
-> > +    fauthz->list =3D qauthz_list_file_load(fauthz, errp);
-> > +
-> > +    if (fauthz->refresh) {
->=20
-> Can we invert this condition?
-
-Yes, will do
-
->=20
-> > +        gchar *dir, *file;
-> > +        fauthz->file_monitor =3D qemu_file_monitor_get_instance(errp=
-);
-> > +        if (!fauthz->file_monitor) {
-> > +            return;
-> > +        }
-> > +
-> > +        dir =3D g_path_get_dirname(fauthz->filename);
-> > +        if (g_str_equal(dir, ".")) {
-> > +            error_setg(errp, "Filename must be an absolute path");
->=20
-> What about:
->=20
->                goto cleanup;
-
-Yep.
-
->=20
-> > +            g_free(dir);
-> > +            return;
-> > +        }
-> > +        file =3D g_path_get_basename(fauthz->filename);
-> > +        if (g_str_equal(file, ".")) {
-> > +            error_setg(errp, "Path has no trailing filename componen=
-t");
->=20
->                goto cleanup;
->=20
-> > +            g_free(file);
-> > +            g_free(dir);
-> > +            return;
-> > +        }
-> > +
-> > +        fauthz->file_watch =3D qemu_file_monitor_add_watch(
-> > +            fauthz->file_monitor, dir, file,
-> > +            qauthz_list_file_event, fauthz, errp);
-> > +        g_free(file);
-> > +        g_free(dir);
-> > +        if (fauthz->file_watch < 0) {
->=20
-> Is this really useful? Do you plan to add more code here?
-
-I just want to make it clear to anyone who changes the code
-in future that there's an expected failure condition here.
-
-> > +            return;
-> > +        }
-> > +    }
-> > +}
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Thanks.
