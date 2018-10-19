@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gDLNT-0002dP-Hl
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:08 -0400
+	(envelope-from <jasowang@redhat.com>) id 1gDLNV-0002fZ-N1
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gDLNP-0002rm-Mv
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37870)
+	(envelope-from <jasowang@redhat.com>) id 1gDLNT-0002tI-KM
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58122)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gDLNN-0002pi-Fb
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:01 -0400
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gDLNQ-0002qx-VE
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:05 -0400
 From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 19 Oct 2018 11:22:09 +0800
-Message-Id: <1539919345-10703-11-git-send-email-jasowang@redhat.com>
+Date: Fri, 19 Oct 2018 11:22:10 +0800
+Message-Id: <1539919345-10703-12-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1539919345-10703-1-git-send-email-jasowang@redhat.com>
 References: <1539919345-10703-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL V2 10/26] qmp event: Add COLO_EXIT event to
- notify users while exited COLO
+Subject: [Qemu-devel] [PULL V2 11/26] qapi/migration.json: Rename COLO
+ unknown mode to none mode.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,130 +25,76 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, qemu-devel@nongnu.org
-Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Zhang Chen <zhangckid@gmail.com>, Zhang Chen <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>
+Cc: Zhang Chen <chen.zhang@intel.com>, Zhang Chen <zhangckid@gmail.com>, Jason Wang <jasowang@redhat.com>
 
-From: zhanghailiang <zhang.zhanghailiang@huawei.com>
+From: Zhang Chen <chen.zhang@intel.com>
 
-If some errors happen during VM's COLO FT stage, it's important to
-notify the users of this event. Together with 'x-colo-lost-heartbeat',
-Users can intervene in COLO's failover work immediately.
-If users don't want to get involved in COLO's failover verdict,
-it is still necessary to notify users that we exited COLO mode.
+Suggested by Markus Armbruster rename COLO unknown mode to none mode.
 
-Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
 Signed-off-by: Zhang Chen <zhangckid@gmail.com>
 Signed-off-by: Zhang Chen <chen.zhang@intel.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- migration/colo.c    | 31 +++++++++++++++++++++++++++++++
- qapi/migration.json | 38 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 69 insertions(+)
+ migration/colo-failover.c |  2 +-
+ migration/colo.c          |  2 +-
+ qapi/migration.json       | 10 +++++-----
+ 3 files changed, 7 insertions(+), 7 deletions(-)
 
+diff --git a/migration/colo-failover.c b/migration/colo-failover.c
+index 0ae0c41..4854a96 100644
+--- a/migration/colo-failover.c
++++ b/migration/colo-failover.c
+@@ -77,7 +77,7 @@ FailoverStatus failover_get_state(void)
+ 
+ void qmp_x_colo_lost_heartbeat(Error **errp)
+ {
+-    if (get_colo_mode() == COLO_MODE_UNKNOWN) {
++    if (get_colo_mode() == COLO_MODE_NONE) {
+         error_setg(errp, QERR_FEATURE_DISABLED, "colo");
+         return;
+     }
 diff --git a/migration/colo.c b/migration/colo.c
-index d3163b5..bd7390d 100644
+index bd7390d..2cdd366 100644
 --- a/migration/colo.c
 +++ b/migration/colo.c
-@@ -28,6 +28,7 @@
- #include "net/colo-compare.h"
- #include "net/colo.h"
- #include "block/block.h"
-+#include "qapi/qapi-events-migration.h"
- 
- static bool vmstate_loading;
- static Notifier packets_compare_notifier;
-@@ -514,6 +515,23 @@ out:
-         qemu_fclose(fb);
+@@ -160,7 +160,7 @@ COLOMode get_colo_mode(void)
+     } else if (migration_incoming_in_colo_state()) {
+         return COLO_MODE_SECONDARY;
+     } else {
+-        return COLO_MODE_UNKNOWN;
++        return COLO_MODE_NONE;
      }
+ }
  
-+    /*
-+     * There are only two reasons we can get here, some error happened
-+     * or the user triggered failover.
-+     */
-+    switch (failover_get_state()) {
-+    case FAILOVER_STATUS_NONE:
-+        qapi_event_send_colo_exit(COLO_MODE_PRIMARY,
-+                                  COLO_EXIT_REASON_ERROR);
-+        break;
-+    case FAILOVER_STATUS_REQUIRE:
-+        qapi_event_send_colo_exit(COLO_MODE_PRIMARY,
-+                                  COLO_EXIT_REASON_REQUEST);
-+        break;
-+    default:
-+        abort();
-+    }
-+
-     /* Hope this not to be too long to wait here */
-     qemu_sem_wait(&s->colo_exit_sem);
-     qemu_sem_destroy(&s->colo_exit_sem);
-@@ -746,6 +764,19 @@ out:
-         error_report_err(local_err);
-     }
- 
-+    switch (failover_get_state()) {
-+    case FAILOVER_STATUS_NONE:
-+        qapi_event_send_colo_exit(COLO_MODE_SECONDARY,
-+                                  COLO_EXIT_REASON_ERROR);
-+        break;
-+    case FAILOVER_STATUS_REQUIRE:
-+        qapi_event_send_colo_exit(COLO_MODE_SECONDARY,
-+                                  COLO_EXIT_REASON_REQUEST);
-+        break;
-+    default:
-+        abort();
-+    }
-+
-     if (fb) {
-         qemu_fclose(fb);
-     }
 diff --git a/qapi/migration.json b/qapi/migration.json
-index 6e8c212..4a18209 100644
+index 4a18209..0776e0f 100644
 --- a/qapi/migration.json
 +++ b/qapi/migration.json
-@@ -957,6 +957,44 @@
-   'data': [ 'none', 'require', 'active', 'completed', 'relaunch' ] }
+@@ -923,18 +923,18 @@
+ ##
+ # @COLOMode:
+ #
+-# The colo mode
++# The COLO current mode.
+ #
+-# @unknown: unknown mode
++# @none: COLO is disabled.
+ #
+-# @primary: master side
++# @primary: COLO node in primary side.
+ #
+-# @secondary: slave side
++# @secondary: COLO node in slave side.
+ #
+ # Since: 2.8
+ ##
+ { 'enum': 'COLOMode',
+-  'data': [ 'unknown', 'primary', 'secondary'] }
++  'data': [ 'none', 'primary', 'secondary'] }
  
  ##
-+# @COLO_EXIT:
-+#
-+# Emitted when VM finishes COLO mode due to some errors happening or
-+# at the request of users.
-+#
-+# @mode: report COLO mode when COLO exited.
-+#
-+# @reason: describes the reason for the COLO exit.
-+#
-+# Since: 3.1
-+#
-+# Example:
-+#
-+# <- { "timestamp": {"seconds": 2032141960, "microseconds": 417172},
-+#      "event": "COLO_EXIT", "data": {"mode": "primary", "reason": "request" } }
-+#
-+##
-+{ 'event': 'COLO_EXIT',
-+  'data': {'mode': 'COLOMode', 'reason': 'COLOExitReason' } }
-+
-+##
-+# @COLOExitReason:
-+#
-+# The reason for a COLO exit
-+#
-+# @none: no failover has ever happened. This can't occur in the
-+# COLO_EXIT event, only in the result of query-colo-status.
-+#
-+# @request: COLO exit is due to an external request
-+#
-+# @error: COLO exit is due to an internal error
-+#
-+# Since: 3.1
-+##
-+{ 'enum': 'COLOExitReason',
-+  'data': [ 'none', 'request', 'error' ] }
-+
-+##
- # @x-colo-lost-heartbeat:
- #
- # Tell qemu that heartbeat is lost, request it to do takeover procedures.
+ # @FailoverStatus:
 -- 
 2.5.0
