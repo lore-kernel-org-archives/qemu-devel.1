@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47490)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47508)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gDY5r-0001Pg-1b
+	(envelope-from <pm215@archaic.org.uk>) id 1gDY5r-0001Qg-Us
 	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:57:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gDY5p-0001vU-Pl
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:57:46 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1gDY5q-0001wa-RL
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:57:47 -0400
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:51976)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1gDY5p-0001uO-H1
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:57:45 -0400
+	id 1gDY5q-0001uO-He
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:57:46 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1gDY5o-0006gt-Ks
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 17:57:44 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1gDY5p-0006h7-GE
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 17:57:45 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 19 Oct 2018 17:56:57 +0100
-Message-Id: <20181019165735.22511-8-peter.maydell@linaro.org>
+Date: Fri, 19 Oct 2018 17:56:58 +0100
+Message-Id: <20181019165735.22511-9-peter.maydell@linaro.org>
 In-Reply-To: <20181019165735.22511-1-peter.maydell@linaro.org>
 References: <20181019165735.22511-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 07/45] target/arm: Convert jazelle from feature
- bit to isar1 test
+Subject: [Qemu-devel] [PULL 08/45] target/arm: Convert t32ee from feature
+ bit to isar3 test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,111 +35,119 @@ To: qemu-devel@nongnu.org
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-Having V6 alone imply jazelle was wrong for cortex-m0.
-Change to an assertion for V6 & !M.
-
-This was harmless, because the only place we tested ARM_FEATURE_JAZELLE
-was for 'bxj' in disas_arm(), which is unreachable for M-profile cores.
-
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20181016223115.24100-6-richard.henderson@linaro.org
+Message-id: 20181016223115.24100-7-richard.henderson@linaro.org
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/cpu.h       |  6 +++++-
- target/arm/cpu.c       | 17 ++++++++++++++---
- target/arm/translate.c |  2 +-
- 3 files changed, 20 insertions(+), 5 deletions(-)
+ target/arm/cpu.h     | 6 +++++-
+ linux-user/elfload.c | 2 +-
+ target/arm/cpu.c     | 4 ----
+ target/arm/helper.c  | 2 +-
+ target/arm/machine.c | 3 +--
+ 5 files changed, 8 insertions(+), 9 deletions(-)
 
 diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index f1c2ec64616..1683ee98d60 100644
+index 1683ee98d60..c2c78ecccbe 100644
 --- a/target/arm/cpu.h
 +++ b/target/arm/cpu.h
-@@ -1593,7 +1593,6 @@ enum arm_features {
-     ARM_FEATURE_PMU, /* has PMU support */
-     ARM_FEATURE_VBAR, /* has cp15 VBAR */
-     ARM_FEATURE_M_SECURITY, /* M profile Security Extension */
--    ARM_FEATURE_JAZELLE, /* has (trivial) Jazelle implementation */
-     ARM_FEATURE_SVE, /* has Scalable Vector Extension */
-     ARM_FEATURE_V8_FP16, /* implements v8.2 half-precision float */
-     ARM_FEATURE_M_MAIN, /* M profile Main Extension */
-@@ -3160,6 +3159,11 @@ static inline bool isar_feature_arm_div(const ARMISARegisters *id)
-     return FIELD_EX32(id->id_isar0, ID_ISAR0, DIVIDE) > 1;
+@@ -1565,7 +1565,6 @@ enum arm_features {
+     ARM_FEATURE_NEON,
+     ARM_FEATURE_M, /* Microcontroller profile.  */
+     ARM_FEATURE_OMAPCP, /* OMAP specific CP15 ops handling.  */
+-    ARM_FEATURE_THUMB2EE,
+     ARM_FEATURE_V7MP,    /* v7 Multiprocessing Extensions */
+     ARM_FEATURE_V7VE, /* v7 Virtualization Extensions (non-EL2 parts) */
+     ARM_FEATURE_V4T,
+@@ -3164,6 +3163,11 @@ static inline bool isar_feature_jazelle(const ARMISARegisters *id)
+     return FIELD_EX32(id->id_isar1, ID_ISAR1, JAZELLE) != 0;
  }
  
-+static inline bool isar_feature_jazelle(const ARMISARegisters *id)
++static inline bool isar_feature_t32ee(const ARMISARegisters *id)
 +{
-+    return FIELD_EX32(id->id_isar1, ID_ISAR1, JAZELLE) != 0;
++    return FIELD_EX32(id->id_isar3, ID_ISAR3, T32EE) != 0;
 +}
 +
  static inline bool isar_feature_aa32_aes(const ARMISARegisters *id)
  {
      return FIELD_EX32(id->id_isar5, ID_ISAR5, AES) != 0;
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index 1e0f22d812b..c6edc545ac9 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -466,7 +466,7 @@ static uint32_t get_elf_hwcap(void)
+     GET_FEATURE(ARM_FEATURE_V5, ARM_HWCAP_ARM_EDSP);
+     GET_FEATURE(ARM_FEATURE_VFP, ARM_HWCAP_ARM_VFP);
+     GET_FEATURE(ARM_FEATURE_IWMMXT, ARM_HWCAP_ARM_IWMMXT);
+-    GET_FEATURE(ARM_FEATURE_THUMB2EE, ARM_HWCAP_ARM_THUMBEE);
++    GET_FEATURE_ID(t32ee, ARM_HWCAP_ARM_THUMBEE);
+     GET_FEATURE(ARM_FEATURE_NEON, ARM_HWCAP_ARM_NEON);
+     GET_FEATURE(ARM_FEATURE_VFP3, ARM_HWCAP_ARM_VFPv3);
+     GET_FEATURE(ARM_FEATURE_V6K, ARM_HWCAP_ARM_TLS);
 diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 9319f92f1f3..8f16e96b6c8 100644
+index 8f16e96b6c8..e08a2d2d799 100644
 --- a/target/arm/cpu.c
 +++ b/target/arm/cpu.c
-@@ -854,8 +854,8 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
-     }
-     if (arm_feature(env, ARM_FEATURE_V6)) {
-         set_feature(env, ARM_FEATURE_V5);
--        set_feature(env, ARM_FEATURE_JAZELLE);
-         if (!arm_feature(env, ARM_FEATURE_M)) {
-+            assert(cpu_isar_feature(jazelle, cpu));
-             set_feature(env, ARM_FEATURE_AUXCR);
-         }
-     }
-@@ -1082,11 +1082,16 @@ static void arm926_initfn(Object *obj)
-     set_feature(&cpu->env, ARM_FEATURE_VFP);
+@@ -1440,7 +1440,6 @@ static void cortex_a8_initfn(Object *obj)
+     set_feature(&cpu->env, ARM_FEATURE_V7);
+     set_feature(&cpu->env, ARM_FEATURE_VFP3);
+     set_feature(&cpu->env, ARM_FEATURE_NEON);
+-    set_feature(&cpu->env, ARM_FEATURE_THUMB2EE);
      set_feature(&cpu->env, ARM_FEATURE_DUMMY_C15_REGS);
-     set_feature(&cpu->env, ARM_FEATURE_CACHE_TEST_CLEAN);
--    set_feature(&cpu->env, ARM_FEATURE_JAZELLE);
-     cpu->midr = 0x41069265;
-     cpu->reset_fpsid = 0x41011090;
-     cpu->ctr = 0x1dd20d2;
-     cpu->reset_sctlr = 0x00090078;
-+
-+    /*
-+     * ARMv5 does not have the ID_ISAR registers, but we can still
-+     * set the field to indicate Jazelle support within QEMU.
-+     */
-+    cpu->isar.id_isar1 = FIELD_DP32(cpu->isar.id_isar1, ID_ISAR1, JAZELLE, 1);
+     set_feature(&cpu->env, ARM_FEATURE_EL3);
+     cpu->midr = 0x410fc080;
+@@ -1509,7 +1508,6 @@ static void cortex_a9_initfn(Object *obj)
+     set_feature(&cpu->env, ARM_FEATURE_VFP3);
+     set_feature(&cpu->env, ARM_FEATURE_VFP_FP16);
+     set_feature(&cpu->env, ARM_FEATURE_NEON);
+-    set_feature(&cpu->env, ARM_FEATURE_THUMB2EE);
+     set_feature(&cpu->env, ARM_FEATURE_EL3);
+     /* Note that A9 supports the MP extensions even for
+      * A9UP and single-core A9MP (which are both different
+@@ -1572,7 +1570,6 @@ static void cortex_a7_initfn(Object *obj)
+     set_feature(&cpu->env, ARM_FEATURE_V7VE);
+     set_feature(&cpu->env, ARM_FEATURE_VFP4);
+     set_feature(&cpu->env, ARM_FEATURE_NEON);
+-    set_feature(&cpu->env, ARM_FEATURE_THUMB2EE);
+     set_feature(&cpu->env, ARM_FEATURE_GENERIC_TIMER);
+     set_feature(&cpu->env, ARM_FEATURE_DUMMY_C15_REGS);
+     set_feature(&cpu->env, ARM_FEATURE_CBAR_RO);
+@@ -1618,7 +1615,6 @@ static void cortex_a15_initfn(Object *obj)
+     set_feature(&cpu->env, ARM_FEATURE_V7VE);
+     set_feature(&cpu->env, ARM_FEATURE_VFP4);
+     set_feature(&cpu->env, ARM_FEATURE_NEON);
+-    set_feature(&cpu->env, ARM_FEATURE_THUMB2EE);
+     set_feature(&cpu->env, ARM_FEATURE_GENERIC_TIMER);
+     set_feature(&cpu->env, ARM_FEATURE_DUMMY_C15_REGS);
+     set_feature(&cpu->env, ARM_FEATURE_CBAR_RO);
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 342c802a952..b7d9a3392e3 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -5359,7 +5359,7 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+         define_arm_cp_regs(cpu, vmsa_pmsa_cp_reginfo);
+         define_arm_cp_regs(cpu, vmsa_cp_reginfo);
+     }
+-    if (arm_feature(env, ARM_FEATURE_THUMB2EE)) {
++    if (cpu_isar_feature(t32ee, cpu)) {
+         define_arm_cp_regs(cpu, t2ee_cp_reginfo);
+     }
+     if (arm_feature(env, ARM_FEATURE_GENERIC_TIMER)) {
+diff --git a/target/arm/machine.c b/target/arm/machine.c
+index 32bcde070a0..e3b1b1a02b6 100644
+--- a/target/arm/machine.c
++++ b/target/arm/machine.c
+@@ -322,9 +322,8 @@ static const VMStateDescription vmstate_m = {
+ static bool thumb2ee_needed(void *opaque)
+ {
+     ARMCPU *cpu = opaque;
+-    CPUARMState *env = &cpu->env;
+ 
+-    return arm_feature(env, ARM_FEATURE_THUMB2EE);
++    return cpu_isar_feature(t32ee, cpu);
  }
  
- static void arm946_initfn(Object *obj)
-@@ -1112,12 +1117,18 @@ static void arm1026_initfn(Object *obj)
-     set_feature(&cpu->env, ARM_FEATURE_AUXCR);
-     set_feature(&cpu->env, ARM_FEATURE_DUMMY_C15_REGS);
-     set_feature(&cpu->env, ARM_FEATURE_CACHE_TEST_CLEAN);
--    set_feature(&cpu->env, ARM_FEATURE_JAZELLE);
-     cpu->midr = 0x4106a262;
-     cpu->reset_fpsid = 0x410110a0;
-     cpu->ctr = 0x1dd20d2;
-     cpu->reset_sctlr = 0x00090078;
-     cpu->reset_auxcr = 1;
-+
-+    /*
-+     * ARMv5 does not have the ID_ISAR registers, but we can still
-+     * set the field to indicate Jazelle support within QEMU.
-+     */
-+    cpu->isar.id_isar1 = FIELD_DP32(cpu->isar.id_isar1, ID_ISAR1, JAZELLE, 1);
-+
-     {
-         /* The 1026 had an IFAR at c6,c0,0,1 rather than the ARMv6 c6,c0,0,2 */
-         ARMCPRegInfo ifar = {
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 8b2be714390..e56b5cdff77 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -42,7 +42,7 @@
- #define ENABLE_ARCH_5     arm_dc_feature(s, ARM_FEATURE_V5)
- /* currently all emulated v5 cores are also v5TE, so don't bother */
- #define ENABLE_ARCH_5TE   arm_dc_feature(s, ARM_FEATURE_V5)
--#define ENABLE_ARCH_5J    arm_dc_feature(s, ARM_FEATURE_JAZELLE)
-+#define ENABLE_ARCH_5J    dc_isar_feature(jazelle, s)
- #define ENABLE_ARCH_6     arm_dc_feature(s, ARM_FEATURE_V6)
- #define ENABLE_ARCH_6K    arm_dc_feature(s, ARM_FEATURE_V6K)
- #define ENABLE_ARCH_6T2   arm_dc_feature(s, ARM_FEATURE_THUMB2)
+ static const VMStateDescription vmstate_thumb2ee = {
 -- 
 2.19.1
