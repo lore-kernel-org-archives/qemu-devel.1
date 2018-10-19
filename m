@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39036)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gDTrX-0004uq-0H
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:26:45 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gDTrS-0000aw-Rq
+	(envelope-from <berto@igalia.com>) id 1gDTrP-0004rO-Tl
 	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:26:42 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:45744)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gDTrS-0000RN-Gp
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:26:38 -0400
-Received: by mail-oi1-x244.google.com with SMTP id e17-v6so26633908oig.12
-	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 05:26:36 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <153995036671.15384.18371512606809407583.malone@gac.canonical.com>
-References: <153921596093.13046.16485884973780639345.malonedeb@wampee.canonical.com>
-	<153995036671.15384.18371512606809407583.malone@gac.canonical.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 19 Oct 2018 13:26:14 +0100
-Message-ID: <CAFEAcA8g4zYbTLQ5e1evX6D8pq7eoW=tU7FK3_iZJVxvr3uOdw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Bug 1797262] Re: qemu arm no longer able to boot
- RPI Kernels
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <berto@igalia.com>) id 1gDTrB-00006u-4L
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:26:26 -0400
+From: Alberto Garcia <berto@igalia.com>
+Date: Fri, 19 Oct 2018 15:24:39 +0300
+Message-Id: <27cefc6ff02cde03d205f0e0c883be0dd184f1a1.1539950487.git.berto@igalia.com>
+In-Reply-To: <cover.1539950487.git.berto@igalia.com>
+References: <cover.1539950487.git.berto@igalia.com>
+In-Reply-To: <cover.1539950487.git.berto@igalia.com>
+References: <cover.1539950487.git.berto@igalia.com>
+Subject: [Qemu-devel] [PATCH v3 08/15] block: Use
+ bdrv_reopen_set_read_only() in the mirror driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,16 +22,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bug 1797262 <1797262@bugs.launchpad.net>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 19 October 2018 at 12:59, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
-e:
-> Isn't this likely due to the newer kernel accessing hardware we are not
-> emulating properly?
+The 'block-commit' QMP command is implemented internally using two
+different drivers. If the source image is the active layer then the
+mirror driver is used (commit_active_start()), otherwise the commit
+driver is used (commit_start()).
 
-Yes, it will be the missing cprman emulation. There was another
-bug/thread on this recently.
+In both cases the destination image must be put temporarily in
+read-write mode. This is done correctly in the latter case, but what
+commit_active_start() does is copy all flags instead.
 
-thanks
--- PMM
+This patch replaces the bdrv_reopen() calls in that function with
+bdrv_reopen_set_read_only() so that only the read-only status is
+changed.
+
+A similar change is made in mirror_exit(), which is also used by the
+'drive-mirror' and 'blockdev-mirror' commands.
+
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+---
+ block/mirror.c | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
+
+diff --git a/block/mirror.c b/block/mirror.c
+index 56d9ef7474..41b6cbaad6 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -672,9 +672,10 @@ static int mirror_exit_common(Job *job)
+ 
+     if (s->should_complete && !abort) {
+         BlockDriverState *to_replace = s->to_replace ?: src;
++        bool ro = bdrv_is_read_only(to_replace);
+ 
+-        if (bdrv_get_flags(target_bs) != bdrv_get_flags(to_replace)) {
+-            bdrv_reopen(target_bs, bdrv_get_flags(to_replace), NULL);
++        if (ro != bdrv_is_read_only(target_bs)) {
++            bdrv_reopen_set_read_only(target_bs, ro, NULL);
+         }
+ 
+         /* The mirror job has no requests in flight any more, but we need to
+@@ -1692,13 +1693,15 @@ void commit_active_start(const char *job_id, BlockDriverState *bs,
+                          BlockCompletionFunc *cb, void *opaque,
+                          bool auto_complete, Error **errp)
+ {
+-    int orig_base_flags;
++    bool base_read_only;
+     Error *local_err = NULL;
+ 
+-    orig_base_flags = bdrv_get_flags(base);
++    base_read_only = bdrv_is_read_only(base);
+ 
+-    if (bdrv_reopen(base, bs->open_flags, errp)) {
+-        return;
++    if (base_read_only) {
++        if (bdrv_reopen_set_read_only(base, false, errp) < 0) {
++            return;
++        }
+     }
+ 
+     mirror_start_job(job_id, bs, creation_flags, base, NULL, speed, 0, 0,
+@@ -1717,6 +1720,8 @@ void commit_active_start(const char *job_id, BlockDriverState *bs,
+ error_restore_flags:
+     /* ignore error and errp for bdrv_reopen, because we want to propagate
+      * the original error */
+-    bdrv_reopen(base, orig_base_flags, NULL);
++    if (base_read_only) {
++        bdrv_reopen_set_read_only(base, true, NULL);
++    }
+     return;
+ }
+-- 
+2.11.0
