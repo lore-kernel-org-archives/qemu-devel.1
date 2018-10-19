@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38873)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38880)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gDNw8-0003xR-BT
+	(envelope-from <richard.henderson@linaro.org>) id 1gDNw8-0003xT-KE
 	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 02:07:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gDNw5-0001ff-3K
+	(envelope-from <richard.henderson@linaro.org>) id 1gDNw7-0001n1-MT
 	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 02:07:04 -0400
-Received: from mail-pl1-x631.google.com ([2607:f8b0:4864:20::631]:36552)
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:40784)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gDNw4-0001a7-G4
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 02:07:00 -0400
-Received: by mail-pl1-x631.google.com with SMTP id y11-v6so15394149plt.3
-	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 23:07:00 -0700 (PDT)
+	id 1gDNw7-0001iG-2n
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 02:07:03 -0400
+Received: by mail-pg1-x543.google.com with SMTP id n31-v6so15307656pgm.7
+	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 23:07:02 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 18 Oct 2018 23:06:35 -0700
-Message-Id: <20181019060656.7968-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 00/21] tcg patch queue
+Date: Thu, 18 Oct 2018 23:06:37 -0700
+Message-Id: <20181019060656.7968-3-richard.henderson@linaro.org>
+In-Reply-To: <20181019060656.7968-1-richard.henderson@linaro.org>
+References: <20181019060656.7968-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PULL v2 02/21] tcg: access cpu->icount_decr.u16.high
+ with atomics
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,87 +28,64 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+Cc: peter.maydell@linaro.org, "Emilio G. Cota" <cota@braap.org>
 
-Changes since v1:
-  * Added QEMU_ERROR to wrap __attribute__((error)) -- patch 12.
+From: "Emilio G. Cota" <cota@braap.org>
 
+Consistently access u16.high with atomics to avoid
+undefined behaviour in MTTCG.
 
-r~
+Note that icount_decr.u16.low is only used in icount mode,
+so regular accesses to it are OK.
 
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+Message-Id: <20181010144853.13005-2-cota@braap.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ accel/tcg/tcg-all.c       | 2 +-
+ accel/tcg/translate-all.c | 2 +-
+ qom/cpu.c                 | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-The following changes since commit 77f7c747193662edfadeeb3118d63eed0eac51a6:
-
-  Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2018-10-17' into staging (2018-10-18 13:40:19 +0100)
-
-are available in the Git repository at:
-
-  https://github.com/rth7680/qemu.git tags/pull-tcg-20181018
-
-for you to fetch changes up to 403f290c0603f35f2d09c982bf5549b6d0803ec1:
-
-  cputlb: read CPUTLBEntry.addr_write atomically (2018-10-18 19:46:53 -0700)
-
-----------------------------------------------------------------
-Queued tcg patches.
-
-----------------------------------------------------------------
-Emilio G. Cota (10):
-      tcg: access cpu->icount_decr.u16.high with atomics
-      tcg: fix use of uninitialized variable under CONFIG_PROFILER
-      tcg: plug holes in struct TCGProfile
-      tcg: distribute tcg_time into TCG contexts
-      target/alpha: remove tlb_flush from alpha_cpu_initfn
-      target/unicore32: remove tlb_flush from uc32_init_fn
-      exec: introduce tlb_init
-      cputlb: fix assert_cpu_is_self macro
-      cputlb: serialize tlb updates with env->tlb_lock
-      cputlb: read CPUTLBEntry.addr_write atomically
-
-Richard Henderson (11):
-      tcg: Implement CPU_LOG_TB_NOCHAIN during expansion
-      tcg: Add tlb_index and tlb_entry helpers
-      tcg: Split CONFIG_ATOMIC128
-      target/i386: Convert to HAVE_CMPXCHG128
-      target/arm: Convert to HAVE_CMPXCHG128
-      target/arm: Check HAVE_CMPXCHG128 at translate time
-      target/ppc: Convert to HAVE_CMPXCHG128 and HAVE_ATOMIC128
-      target/s390x: Convert to HAVE_CMPXCHG128 and HAVE_ATOMIC128
-      target/s390x: Split do_cdsg, do_lpq, do_stpq
-      target/s390x: Skip wout, cout helpers if op helper does not return
-      target/s390x: Check HAVE_ATOMIC128 and HAVE_CMPXCHG128 at translate
-
- accel/tcg/atomic_template.h      |  20 +++-
- accel/tcg/softmmu_template.h     |  64 +++++-----
- include/exec/cpu-defs.h          |   3 +
- include/exec/cpu_ldst.h          |  30 ++++-
- include/exec/cpu_ldst_template.h |  25 ++--
- include/exec/exec-all.h          |   8 ++
- include/qemu/atomic128.h         | 153 ++++++++++++++++++++++++
- include/qemu/compiler.h          |  11 ++
- include/qemu/timer.h             |   1 -
- target/ppc/helper.h              |   2 +-
- tcg/tcg.h                        |  20 ++--
- accel/tcg/cpu-exec.c             |   2 +-
- accel/tcg/cputlb.c               | 235 +++++++++++++++++++-----------------
- accel/tcg/tcg-all.c              |   2 +-
- accel/tcg/translate-all.c        |   2 +-
- accel/tcg/user-exec.c            |   5 +-
- cpus.c                           |   3 +-
- exec.c                           |   1 +
- monitor.c                        |  13 +-
- qom/cpu.c                        |   2 +-
- target/alpha/cpu.c               |   1 -
- target/arm/helper-a64.c          | 251 +++++++++++++++++++--------------------
- target/arm/translate-a64.c       |  38 +++---
- target/i386/mem_helper.c         |   9 +-
- target/ppc/mem_helper.c          |  33 ++++-
- target/ppc/translate.c           | 115 +++++++++---------
- target/s390x/mem_helper.c        | 202 +++++++++++++++----------------
- target/s390x/translate.c         |  45 +++++--
- target/unicore32/cpu.c           |   2 -
- tcg/tcg-op.c                     |   9 +-
- tcg/tcg.c                        |  25 +++-
- configure                        |  19 +++
- 32 files changed, 839 insertions(+), 512 deletions(-)
- create mode 100644 include/qemu/atomic128.h
+diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
+index 56dbb56a16..3d25bdcc17 100644
+--- a/accel/tcg/tcg-all.c
++++ b/accel/tcg/tcg-all.c
+@@ -51,7 +51,7 @@ static void tcg_handle_interrupt(CPUState *cpu, int mask)
+     if (!qemu_cpu_is_self(cpu)) {
+         qemu_cpu_kick(cpu);
+     } else {
+-        cpu->icount_decr.u16.high = -1;
++        atomic_set(&cpu->icount_decr.u16.high, -1);
+         if (use_icount &&
+             !cpu->can_do_io
+             && (mask & ~old_mask) != 0) {
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index ad5c758246..356dcd0948 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -2341,7 +2341,7 @@ void cpu_interrupt(CPUState *cpu, int mask)
+ {
+     g_assert(qemu_mutex_iothread_locked());
+     cpu->interrupt_request |= mask;
+-    cpu->icount_decr.u16.high = -1;
++    atomic_set(&cpu->icount_decr.u16.high, -1);
+ }
+ 
+ /*
+diff --git a/qom/cpu.c b/qom/cpu.c
+index f7746546d0..9ad1372d57 100644
+--- a/qom/cpu.c
++++ b/qom/cpu.c
+@@ -265,7 +265,7 @@ static void cpu_common_reset(CPUState *cpu)
+     cpu->mem_io_pc = 0;
+     cpu->mem_io_vaddr = 0;
+     cpu->icount_extra = 0;
+-    cpu->icount_decr.u32 = 0;
++    atomic_set(&cpu->icount_decr.u32, 0);
+     cpu->can_do_io = 1;
+     cpu->exception_index = -1;
+     cpu->crash_occurred = false;
+-- 
+2.17.2
