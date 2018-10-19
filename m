@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43105)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gDNDI-0003p0-Qp
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 01:20:45 -0400
+	(envelope-from <liq3ea@gmail.com>) id 1gDNDJ-0003qF-SZ
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 01:20:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gDNDD-0000Do-1V
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 01:20:44 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:39798)
+	(envelope-from <liq3ea@gmail.com>) id 1gDNDH-0000QJ-O3
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 01:20:45 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:36527)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1gDNDC-00008u-Jo
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 01:20:38 -0400
-Received: by mail-pf1-x444.google.com with SMTP id c25-v6so15957053pfe.6
-	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 22:20:36 -0700 (PDT)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1gDNDH-0000NT-En
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 01:20:43 -0400
+Received: by mail-pl1-x641.google.com with SMTP id y11-v6so15349089plt.3
+	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 22:20:43 -0700 (PDT)
 From: Li Qiang <liq3ea@gmail.com>
-Date: Thu, 18 Oct 2018 22:20:09 -0700
-Message-Id: <1539926412-21831-5-git-send-email-liq3ea@gmail.com>
+Date: Thu, 18 Oct 2018 22:20:12 -0700
+Message-Id: <1539926412-21831-8-git-send-email-liq3ea@gmail.com>
 In-Reply-To: <1539926412-21831-1-git-send-email-liq3ea@gmail.com>
 References: <1539926412-21831-1-git-send-email-liq3ea@gmail.com>
-Subject: [Qemu-devel] [PATCH 4/7] vfio: paltform: fix a typo
+Subject: [Qemu-devel] [PATCH 7/7] vfio: platform: destory mutex in error path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,30 +30,30 @@ Cc: qemu-devel@nongnu.org, philmd@redhat.com, Li Qiang <liq3ea@gmail.com>
 
 Signed-off-by: Li Qiang <liq3ea@gmail.com>
 ---
- hw/vfio/platform.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/vfio/platform.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
-index ba03dcd..5992fe7 100644
+index ba19143..e9d9e80 100644
 --- a/hw/vfio/platform.c
 +++ b/hw/vfio/platform.c
-@@ -72,7 +72,7 @@ static VFIOINTp *vfio_init_intp(VFIODevice *vbasedev,
-         g_free(intp->interrupt);
-         g_free(intp);
-         error_setg_errno(errp, -ret,
--                         "failed to initialize trigger eventd notifier");
-+                         "failed to initialize trigger eventfd notifier");
-         return NULL;
-     }
-     if (vfio_irq_is_automasked(intp)) {
-@@ -84,7 +84,7 @@ static VFIOINTp *vfio_init_intp(VFIODevice *vbasedev,
-             g_free(intp->unmask);
-             g_free(intp);
-             error_setg_errno(errp, -ret,
--                             "failed to initialize resample eventd notifier");
-+                             "failed to initialize resample eventfd notifier");
-             return NULL;
+@@ -668,7 +668,7 @@ static void vfio_platform_realize(DeviceState *dev, Error **errp)
+             error_setg(errp, "%s", gerr->message);
+             g_error_free(gerr);
+             g_free(path);
+-            return;
++            goto out;
          }
+         g_free(path);
+         vdev->compat = contents;
+@@ -691,6 +691,8 @@ out:
+         return;
      }
+ 
++    qemu_mutex_destroy(&vdev->intp_mutex);
++
+     if (vdev->vbasedev.name) {
+         error_prepend(errp, ERR_PREFIX, vdev->vbasedev.name);
+     } else {
 -- 
 1.8.3.1
