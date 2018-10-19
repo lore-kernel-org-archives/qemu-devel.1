@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38804)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gDTrP-0004rN-Tg
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:26:42 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1gDTrP-0004rV-Un
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:26:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gDTrB-00006Z-8L
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:26:26 -0400
-From: Alberto Garcia <berto@igalia.com>
-Date: Fri, 19 Oct 2018 15:24:41 +0300
-Message-Id: <e2c4e93389cd9f48a76084a9f53d14e98b0f78d4.1539950487.git.berto@igalia.com>
-In-Reply-To: <cover.1539950487.git.berto@igalia.com>
-References: <cover.1539950487.git.berto@igalia.com>
-In-Reply-To: <cover.1539950487.git.berto@igalia.com>
-References: <cover.1539950487.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v3 10/15] qemu-io: Put flag changes in the
- options QDict in reopen_f()
+	(envelope-from <pbonzini@redhat.com>) id 1gDTrB-0000AD-PZ
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:26:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49094)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gDTrB-0008WK-9s
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:26:21 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CC99C307D868
+	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 12:26:19 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 19 Oct 2018 14:26:13 +0200
+Message-Id: <20181019122613.28663-1-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] MAINTAINERS: remove or downgrade myself to
+ reviewer from some subsystems
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,120 +32,91 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: "Daniel P . Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-When reopen_f() puts a block device in the reopen queue, some of the
-new options are passed using a QDict, but others ("read-only" and the
-cache options) are passed as flags.
+Other people are doing a much better work than myself at handling some
+subsystems.  For those files it is better if I downgrade myself to
+reviewer or recognize that I am not actually doing any work there.
 
-This patch puts those flags in the QDict. This way the flags parameter
-becomes redundant and we'll be able to get rid of it in a subsequent
-patch.
-
-Signed-off-by: Alberto Garcia <berto@igalia.com>
+Cc: Daniel P. Berrange <berrange@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>
+Cc: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- qemu-io-cmds.c             | 27 ++++++++++++++++++++++++++-
- tests/qemu-iotests/133     |  9 +++++++++
- tests/qemu-iotests/133.out |  8 ++++++++
- 3 files changed, 43 insertions(+), 1 deletion(-)
+ MAINTAINERS | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
-diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-index db0b3ee5ef..b49a816cc8 100644
---- a/qemu-io-cmds.c
-+++ b/qemu-io-cmds.c
-@@ -10,6 +10,7 @@
- 
- #include "qemu/osdep.h"
- #include "qapi/error.h"
-+#include "qapi/qmp/qdict.h"
- #include "qemu-io.h"
- #include "sysemu/block-backend.h"
- #include "block/block.h"
-@@ -1978,6 +1979,7 @@ static int reopen_f(BlockBackend *blk, int argc, char **argv)
-     int flags = bs->open_flags;
-     bool writethrough = !blk_enable_write_cache(blk);
-     bool has_rw_option = false;
-+    bool has_cache_option = false;
- 
-     BlockReopenQueue *brq;
-     Error *local_err = NULL;
-@@ -1989,6 +1991,7 @@ static int reopen_f(BlockBackend *blk, int argc, char **argv)
-                 error_report("Invalid cache option: %s", optarg);
-                 return -EINVAL;
-             }
-+            has_cache_option = true;
-             break;
-         case 'o':
-             if (!qemu_opts_parse_noisily(&reopen_opts, optarg, 0)) {
-@@ -2046,9 +2049,31 @@ static int reopen_f(BlockBackend *blk, int argc, char **argv)
-     }
- 
-     qopts = qemu_opts_find(&reopen_opts, NULL);
--    opts = qopts ? qemu_opts_to_qdict(qopts, NULL) : NULL;
-+    opts = qopts ? qemu_opts_to_qdict(qopts, NULL) : qdict_new();
-     qemu_opts_reset(&reopen_opts);
- 
-+    if (qdict_haskey(opts, BDRV_OPT_READ_ONLY)) {
-+        if (has_rw_option) {
-+            error_report("Cannot set both -r/-w and '" BDRV_OPT_READ_ONLY "'");
-+            qobject_unref(opts);
-+            return -EINVAL;
-+        }
-+    } else {
-+        qdict_put_bool(opts, BDRV_OPT_READ_ONLY, !(flags & BDRV_O_RDWR));
-+    }
-+
-+    if (qdict_haskey(opts, BDRV_OPT_CACHE_DIRECT) ||
-+        qdict_haskey(opts, BDRV_OPT_CACHE_NO_FLUSH)) {
-+        if (has_cache_option) {
-+            error_report("Cannot set both -c and the cache options");
-+            qobject_unref(opts);
-+            return -EINVAL;
-+        }
-+    } else {
-+        qdict_put_bool(opts, BDRV_OPT_CACHE_DIRECT, flags & BDRV_O_NOCACHE);
-+        qdict_put_bool(opts, BDRV_OPT_CACHE_NO_FLUSH, flags & BDRV_O_NO_FLUSH);
-+    }
-+
-     bdrv_subtree_drained_begin(bs);
-     brq = bdrv_reopen_queue(NULL, bs, opts, flags);
-     bdrv_reopen_multiple(bdrv_get_aio_context(bs), brq, &local_err);
-diff --git a/tests/qemu-iotests/133 b/tests/qemu-iotests/133
-index af6b3e1dd4..14e6b3b972 100755
---- a/tests/qemu-iotests/133
-+++ b/tests/qemu-iotests/133
-@@ -92,6 +92,15 @@ echo
- IMGOPTSSYNTAX=false $QEMU_IO -f null-co -c 'reopen' -c 'info' \
-     "json:{'driver': 'null-co', 'size': 65536}"
- 
-+echo
-+echo "=== Check that mixing -c/-r/-w and their corresponding options is forbidden ==="
-+echo
-+
-+$QEMU_IO -c 'reopen -r -o read-only=on' $TEST_IMG
-+$QEMU_IO -c 'reopen -w -o read-only=on' $TEST_IMG
-+$QEMU_IO -c 'reopen -c none -o cache.direct=on' $TEST_IMG
-+$QEMU_IO -c 'reopen -c writeback -o cache.direct=on' $TEST_IMG
-+$QEMU_IO -c 'reopen -c directsync -o cache.no-flush=on' $TEST_IMG
- # success, all done
- echo "*** done"
- rm -f $seq.full
-diff --git a/tests/qemu-iotests/133.out b/tests/qemu-iotests/133.out
-index f4a85aeb63..48a9d087f0 100644
---- a/tests/qemu-iotests/133.out
-+++ b/tests/qemu-iotests/133.out
-@@ -24,4 +24,12 @@ Cannot change the option 'driver'
- 
- format name: null-co
- format name: null-co
-+
-+=== Check that mixing -c/-r/-w and their corresponding options is forbidden ===
-+
-+Cannot set both -r/-w and 'read-only'
-+Cannot set both -r/-w and 'read-only'
-+Cannot set both -c and the cache options
-+Cannot set both -c and the cache options
-+Cannot set both -c and the cache options
- *** done
--- 
-2.11.0
+diff --git a/MAINTAINERS b/MAINTAINERS
+index fb81b3a8eb..8c814b2e60 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -105,9 +105,9 @@ Guest CPU cores (TCG):
+ ----------------------
+ Overall
+ L: qemu-devel@nongnu.org
+-M: Paolo Bonzini <pbonzini@redhat.com>
+ M: Peter Crosthwaite <crosthwaite.peter@gmail.com>
+ M: Richard Henderson <rth@twiddle.net>
++R: Paolo Bonzini <pbonzini@redhat.com>
+ S: Maintained
+ F: cpus.c
+ F: exec.c
+@@ -1132,7 +1132,8 @@ F: hw/pci-host/ppce500.c
+ F: hw/net/fsl_etsec/
+=20
+ Character devices
+-M: Paolo Bonzini <pbonzini@redhat.com>
++M: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
++R: Paolo Bonzini <pbonzini@redhat.com>
+ S: Odd Fixes
+ F: hw/char/
+=20
+@@ -1517,8 +1518,8 @@ T: git git://github.com/famz/qemu.git bitmaps
+ T: git git://github.com/jnsnow/qemu.git bitmaps
+=20
+ Character device backends
+-M: Paolo Bonzini <pbonzini@redhat.com>
+ M: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
++R: Paolo Bonzini <pbonzini@redhat.com>
+ S: Maintained
+ F: chardev/
+ F: include/chardev/
+@@ -1751,9 +1752,9 @@ F: tests/qmp-cmd-test.c
+ T: git git://repo.or.cz/qemu/armbru.git qapi-next
+=20
+ qtest
+-M: Paolo Bonzini <pbonzini@redhat.com>
+ M: Thomas Huth <thuth@redhat.com>
+ M: Laurent Vivier <lvivier@redhat.com>
++R: Paolo Bonzini <pbonzini@redhat.com>
+ S: Maintained
+ F: qtest.c
+ F: tests/libqtest.*
+@@ -1860,7 +1861,6 @@ F: tests/test-io-*
+ Sockets
+ M: Daniel P. Berrange <berrange@redhat.com>
+ M: Gerd Hoffmann <kraxel@redhat.com>
+-M: Paolo Bonzini <pbonzini@redhat.com>
+ S: Maintained
+ F: include/qemu/sockets.h
+ F: util/qemu-sockets.c
+@@ -2050,13 +2050,12 @@ M: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+ M: Paolo Bonzini <pbonzini@redhat.com>
+ M: Peter Lieven <pl@kamp.de>
+ L: qemu-block@nongnu.org
+-S: Supported
++S: Odd Fixes
+ F: block/iscsi.c
+ F: block/iscsi-opts.c
+=20
+ Network Block Device (NBD)
+ M: Eric Blake <eblake@redhat.com>
+-M: Paolo Bonzini <pbonzini@redhat.com>
+ L: qemu-block@nongnu.org
+ S: Maintained
+ F: block/nbd*
+--=20
+2.17.1
