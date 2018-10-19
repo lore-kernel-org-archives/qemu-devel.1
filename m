@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59413)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gDJFw-000508-VN
+	(envelope-from <cota@braap.org>) id 1gDJFw-000507-V6
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:07:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gDJFl-0003ON-Ap
+	(envelope-from <cota@braap.org>) id 1gDJFl-0003OT-DB
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:07:09 -0400
-Received: from out5-smtp.messagingengine.com ([66.111.4.29]:38915)
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:40869)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gDJFk-00035s-IE
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gDJFk-00036H-KJ
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:07:01 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 18 Oct 2018 21:06:18 -0400
-Message-Id: <20181019010625.25294-50-cota@braap.org>
+Date: Thu, 18 Oct 2018 21:06:20 -0400
+Message-Id: <20181019010625.25294-52-cota@braap.org>
 In-Reply-To: <20181019010625.25294-1-cota@braap.org>
 References: <20181019010625.25294-1-cota@braap.org>
-Subject: [Qemu-devel] [RFC v3 49/56] mips: acquire the BQL in cpu_has_work
+Subject: [Qemu-devel] [RFC v3 51/56] riscv: acquire the BQL in cpu_has_work
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,50 +24,52 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
 Soon we will call cpu_has_work without the BQL.
 
-Cc: Aurelien Jarno <aurelien@aurel32.net>
-Cc: Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: Michael Clark <mjc@sifive.com>
+Cc: Palmer Dabbelt <palmer@sifive.com>
+Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/mips/cpu.c | 20 +++++++++++++++++++-
- 1 file changed, 19 insertions(+), 1 deletion(-)
+ target/riscv/cpu.c | 21 ++++++++++++++++++++-
+ 1 file changed, 20 insertions(+), 1 deletion(-)
 
-diff --git a/target/mips/cpu.c b/target/mips/cpu.c
-index e30aec6851..ea30c3c474 100644
---- a/target/mips/cpu.c
-+++ b/target/mips/cpu.c
-@@ -19,6 +19,7 @@
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index d630e8fd6c..b10995c807 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -18,6 +18,7 @@
   */
  
  #include "qemu/osdep.h"
 +#include "qemu/main-loop.h"
- #include "qapi/error.h"
+ #include "qemu/log.h"
  #include "cpu.h"
- #include "internal.h"
-@@ -51,12 +52,14 @@ static void mips_cpu_synchronize_from_tb(CPUState *cs, TranslationBlock *tb)
-     env->hflags |= tb->flags & MIPS_HFLAG_BMASK;
+ #include "exec/exec-all.h"
+@@ -244,11 +245,14 @@ static void riscv_cpu_synchronize_from_tb(CPUState *cs, TranslationBlock *tb)
+     env->pc = tb->pc;
  }
  
--static bool mips_cpu_has_work(CPUState *cs)
-+static bool mips_cpu_has_work_locked(CPUState *cs)
+-static bool riscv_cpu_has_work(CPUState *cs)
++static bool riscv_cpu_has_work_locked(CPUState *cs)
  {
-     MIPSCPU *cpu = MIPS_CPU(cs);
-     CPUMIPSState *env = &cpu->env;
-     bool has_work = false;
- 
+ #ifndef CONFIG_USER_ONLY
+     RISCVCPU *cpu = RISCV_CPU(cs);
+     CPURISCVState *env = &cpu->env;
++
 +    g_assert(qemu_mutex_iothread_locked());
 +
-     /* Prior to MIPS Release 6 it is implementation dependent if non-enabled
-        interrupts wake-up the CPU, however most of the implementations only
-        check for interrupts that can be taken. */
-@@ -92,6 +95,21 @@ static bool mips_cpu_has_work(CPUState *cs)
-     return has_work;
+     /*
+      * Definition of the WFI instruction requires it to ignore the privilege
+      * mode and delegation registers, but respect individual enables
+@@ -259,6 +263,21 @@ static bool riscv_cpu_has_work(CPUState *cs)
+ #endif
  }
  
-+static bool mips_cpu_has_work(CPUState *cs)
++static bool riscv_cpu_has_work(CPUState *cs)
 +{
 +    if (!qemu_mutex_iothread_locked()) {
 +        bool ret;
@@ -75,15 +77,15 @@ index e30aec6851..ea30c3c474 100644
 +        cpu_mutex_unlock(cs);
 +        qemu_mutex_lock_iothread();
 +        cpu_mutex_lock(cs);
-+        ret = mips_cpu_has_work_locked(cs);
++        ret = riscv_cpu_has_work_locked(cs);
 +        qemu_mutex_unlock_iothread();
 +        return ret;
 +    }
-+    return mips_cpu_has_work_locked(cs);
++    return riscv_cpu_has_work_locked(cs);
 +}
 +
- /* CPUClass::reset() */
- static void mips_cpu_reset(CPUState *s)
+ void restore_state_to_opc(CPURISCVState *env, TranslationBlock *tb,
+                           target_ulong *data)
  {
 -- 
 2.17.1
