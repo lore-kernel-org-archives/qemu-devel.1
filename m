@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43594)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43794)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gDRft-0003Ek-PF
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 06:06:35 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1gDRgf-0003hw-GD
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 06:07:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gDRfo-0005kS-Po
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 06:06:33 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:52889)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gDRfn-0005k8-Sr
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 06:06:28 -0400
-Received: by mail-wm1-f66.google.com with SMTP id 189-v6so3050898wmw.2
-	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 03:06:27 -0700 (PDT)
-References: <20181009130442.26296-1-berrange@redhat.com>
-	<20181018151928.GH20424@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <7a8c6d0e-f1ae-33d6-9235-10af424515fa@redhat.com>
-Date: Fri, 19 Oct 2018 12:06:24 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1gDRgU-0006f3-Ve
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 06:07:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50866)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gDRgU-0006cY-Lk
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 06:07:10 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0E2094E8BC
+	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 10:07:10 +0000 (UTC)
+Date: Fri, 19 Oct 2018 11:07:06 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20181019100705.GA2323@work-vm>
+References: <87efcqniza.fsf@dusky.pond.sub.org> <20181016133340.GB2427@work-vm>
+	<87va5zjort.fsf@dusky.pond.sub.org> <20181018145406.GE2632@work-vm>
+	<87zhvbi2sy.fsf@dusky.pond.sub.org> <20181018180117.GF2632@work-vm>
+	<87a7napk36.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20181018151928.GH20424@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5 00/11] Add a standard authorization
- framework
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87a7napk36.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] When it's okay to treat OOM as fatal?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,176 +35,255 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
-Cc: =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Hi Daniel,
-
-On 18/10/2018 17:19, Daniel P. Berrangé wrote:
-> ping, is anyone able to review the patches in this series. We are
-> awfully close to soft freeze and KVM forum...
-
-I'll let the inotify patches to someone more familiar with it (patches
-#1 and #5). Patch #5 definitively requires Gerd's review.
-
-Regards,
-
-Phil.
-
+* Markus Armbruster (armbru@redhat.com) wrote:
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
 > 
-> On Tue, Oct 09, 2018 at 02:04:31PM +0100, Daniel P. Berrangé wrote:
->> An update to
->>
->>  v2: https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg04469.html
->>  v3: https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg05660.html
->>  v4: https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg02961.html
->>
->> The current network services now support encryption via TLS and in some
->> cases support authentication via SASL. In cases where SASL is not
->> available, x509 client certificates can be used as a crude authorization
->> scheme, but using a sub-CA and controlling who you give certs to. In
->> general this is not very flexible though, so this series introduces a
->> new standard authorization framework.
->>
->> It comes with four initial authorization mechanisms
->>
->>  - Simple - an exact username match. This is useful when there is
->>    exactly one user that is known to connect. For example when live
->>    migrating from one QEMU to another with TLS, libvirt would use
->>    the simple scheme to whitelist the TLS cert of the source QEMU.
->>
->>  - List - an full access control list, with optional regex matching.
->>    This is more flexible and is used to provide 100% backcompat with
->>    the existing HMP ACL commands. The caveat is that we can't create
->>    these via the CLI -object arg yet.
->>
->>  - ListFile - the same as List, but with the rules stored in JSON
->>    format in an external file. This avoids the -object limitation
->>    while also allowing the admin to change list entries on the file.
->>    QEMU uses inotify to notice these changes and auto-reload the
->>    file contents. This is likely a good default choice for most
->>    network services, if the "simple" mechanism isn't sufficient.
->>
->>  - PAM - delegate the username lookup to a PAM module, which opens
->>    the door to many options including things like SQL/LDAP lookups.
->>
->> A later series that follows will integrate this framework into the VNC,
->> NBD, migration, and character device servers.
->>
->> Changed in v5:
->>
->>  - Rebase to latest git master
->>
->> Changed in v4:
->>
->>  - Rebase to latest git master
->>
->> Changed in v3:
->>
->>  - Added docs for object types in qemu-options.hx
->>  - Added example CLI syntax in header files
->>  - Improved commit messages
->>
->> Changed in v2:
->>
->>  - Switch to a global shared instance of the file monitor so only
->>    a single inotify file descriptor is required
->>
->>  - Require all watches to be registered against directories. File
->>    watches are useless in Linux, since they are tied to inodes, and
->>    so stop working when editors save by doing a tmpfile + rename
->>    dance.
->>
->>  - Change auth list impl to use a directory based watch instead
->>    of filename
->>
->>  - Put MTP const-ness fixes in separate patch
->>
->>  - Split QOM change off into separate patch
->>
->>  - Fix conditionals on Win32 build
->>
->> Daniel P. Berrangé (11):
->>   util: add helper APIs for dealing with inotify in portable manner
->>   qom: don't require user creatable objects to be registered
->>   hw/usb: don't set IN_ISDIR for inotify watch in MTP driver
->>   hw/usb: fix const-ness for string params in MTP driver
->>   hw/usb: switch MTP to use new inotify APIs
->>   authz: add QAuthZ object as an authorization base class
->>   authz: add QAuthZSimple object type for easy whitelist auth checks
->>   authz: add QAuthZList object type for an access control list
->>   authz: add QAuthZListFile object type for a file access control list
->>   authz: add QAuthZPAM object type for authorizing using PAM
->>   authz: delete existing ACL implementation
->>
->>  .gitignore                     |   4 +
->>  MAINTAINERS                    |  14 ++
->>  Makefile                       |  17 +-
->>  Makefile.objs                  |  10 ++
->>  Makefile.target                |   2 +
->>  authz/Makefile.objs            |   7 +
->>  authz/base.c                   |  82 +++++++++
->>  authz/list.c                   | 315 +++++++++++++++++++++++++++++++++
->>  authz/listfile.c               | 284 +++++++++++++++++++++++++++++
->>  authz/pamacct.c                | 149 ++++++++++++++++
->>  authz/simple.c                 | 122 +++++++++++++
->>  authz/trace-events             |  18 ++
->>  configure                      |  37 ++++
->>  crypto/tlssession.c            |  35 ++--
->>  crypto/trace-events            |   2 +-
->>  hw/usb/dev-mtp.c               | 257 ++++++++++-----------------
->>  hw/usb/trace-events            |   2 +-
->>  include/authz/base.h           | 112 ++++++++++++
->>  include/authz/list.h           | 106 +++++++++++
->>  include/authz/listfile.h       | 110 ++++++++++++
->>  include/authz/pamacct.h        | 100 +++++++++++
->>  include/authz/simple.h         |  84 +++++++++
->>  include/qemu/acl.h             |  66 -------
->>  include/qemu/filemonitor.h     | 117 ++++++++++++
->>  monitor.c                      | 180 ++++++++++++-------
->>  qapi/authz.json                |  58 ++++++
->>  qapi/qapi-schema.json          |   1 +
->>  qemu-options.hx                | 103 +++++++++++
->>  qom/object.c                   |  12 +-
->>  qom/object_interfaces.c        |  16 +-
->>  tests/Makefile.include         |   8 +-
->>  tests/test-authz-list.c        | 171 ++++++++++++++++++
->>  tests/test-crypto-tlssession.c |  15 +-
->>  tests/test-io-channel-tls.c    |  16 +-
->>  ui/vnc-auth-sasl.c             |  23 ++-
->>  ui/vnc-auth-sasl.h             |   5 +-
->>  ui/vnc-auth-vencrypt.c         |   2 +-
->>  ui/vnc-ws.c                    |   2 +-
->>  ui/vnc.c                       |  37 ++--
->>  ui/vnc.h                       |   4 +-
->>  util/Makefile.objs             |   2 +-
->>  util/acl.c                     | 179 -------------------
->>  util/filemonitor.c             | 315 +++++++++++++++++++++++++++++++++
->>  util/trace-events              |   9 +
->>  44 files changed, 2671 insertions(+), 539 deletions(-)
->>  create mode 100644 authz/Makefile.objs
->>  create mode 100644 authz/base.c
->>  create mode 100644 authz/list.c
->>  create mode 100644 authz/listfile.c
->>  create mode 100644 authz/pamacct.c
->>  create mode 100644 authz/simple.c
->>  create mode 100644 authz/trace-events
->>  create mode 100644 include/authz/base.h
->>  create mode 100644 include/authz/list.h
->>  create mode 100644 include/authz/listfile.h
->>  create mode 100644 include/authz/pamacct.h
->>  create mode 100644 include/authz/simple.h
->>  delete mode 100644 include/qemu/acl.h
->>  create mode 100644 include/qemu/filemonitor.h
->>  create mode 100644 qapi/authz.json
->>  create mode 100644 tests/test-authz-list.c
->>  delete mode 100644 util/acl.c
->>  create mode 100644 util/filemonitor.c
->>
->> -- 
->> 2.17.1
->>
+> > * Markus Armbruster (armbru@redhat.com) wrote:
+> >> "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
+> >> 
+> >> > * Markus Armbruster (armbru@redhat.com) wrote:
+> >> >> "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
+> >> >> 
+> >> >> > * Markus Armbruster (armbru@redhat.com) wrote:
+> >> >> >> We sometimes use g_new() & friends, which abort() on OOM, and sometimes
+> >> >> >> g_try_new() & friends, which can fail, and therefore require error
+> >> >> >> handling.
+> >> >> >> 
+> >> >> >> HACKING points out the difference, but is mum on when to use what:
+> >> >> >> 
+> >> >> >>     3. Low level memory management
+> >> >> >> 
+> >> >> >>     Use of the malloc/free/realloc/calloc/valloc/memalign/posix_memalign
+> >> >> >>     APIs is not allowed in the QEMU codebase. Instead of these routines,
+> >> >> >>     use the GLib memory allocation routines g_malloc/g_malloc0/g_new/
+> >> >> >>     g_new0/g_realloc/g_free or QEMU's qemu_memalign/qemu_blockalign/qemu_vfree
+> >> >> >>     APIs.
+> >> >> >> 
+> >> >> >>     Please note that g_malloc will exit on allocation failure, so there
+> >> >> >>     is no need to test for failure (as you would have to with malloc).
+> >> >> >>     Calling g_malloc with a zero size is valid and will return NULL.
+> >> >> >> 
+> >> >> >>     Prefer g_new(T, n) instead of g_malloc(sizeof(T) * n) for the following
+> >> >> >>     reasons:
+> >> >> >> 
+> >> >> >>       a. It catches multiplication overflowing size_t;
+> >> >> >>       b. It returns T * instead of void *, letting compiler catch more type
+> >> >> >>          errors.
+> >> >> >> 
+> >> >> >>     Declarations like T *v = g_malloc(sizeof(*v)) are acceptable, though.
+> >> >> >> 
+> >> >> >>     Memory allocated by qemu_memalign or qemu_blockalign must be freed with
+> >> >> >>     qemu_vfree, since breaking this will cause problems on Win32.
+> >> >> >> 
+> >> >> >> Now, in my personal opinion, handling OOM gracefully is worth the
+> >> >> >> (commonly considerable) trouble when you're coding for an Apple II or
+> >> >> >> similar.  Anything that pages commonly becomes unusable long before
+> >> >> >> allocations fail.
+> >> >> >
+> >> >> > That's not always my experience; I've seen cases where you suddenly
+> >> >> > allocate a load more memory and hit OOM fairly quickly on that hot
+> >> >> > process.  Most of the time on the desktop you're right.
+> >> >> >
+> >> >> >> Anything that overcommits will send you a (commonly
+> >> >> >> lethal) signal instead.  Anything that tries handling OOM gracefully,
+> >> >> >> and manages to dodge both these bullets somehow, will commonly get it
+> >> >> >> wrong and crash.
+> >> >> >
+> >> >> > If your qemu has maped it's main memory from hugetlbfs or similar pools
+> >> >> > then we're looking at the other memory allocations; and that's a bit of
+> >> >> > an interesting difference where those other allocations should be a lot
+> >> >> > smaller.
+> >> >> >
+> >> >> >> But others are entitled to their opinions as much as I am.  I just want
+> >> >> >> to know what our rules are, preferably in the form of a patch to
+> >> >> >> HACKING.
+> >> >> >
+> >> >> > My rule is to try not to break a happily running VM by some new
+> >> >> > activity; I don't worry about it during startup.
+> >> >> >
+> >> >> > So for example, I don't like it when starting a migration, allocates
+> >> >> > some more memory and kills the VM - the user had a happy stable VM
+> >> >> > upto that point.  Migration gets the blame at this point.
+> >> >> 
+> >> >> I don't doubt reliable OOM handling would be nice.  I do doubt it's
+> >> >> practical for an application like QEMU.
+> >> >
+> >> > Well, our use of glib certainly makes it much much harder.
+> >> > I just try and make sure anywhere that I'm allocating a non-trivial
+> >> > amount of memory (especially anything guest or user controlled) uses
+> >> > the _try_ variants.  That should keep a lot of the larger allocations.
+> >> 
+> >> Matters only when your g_try_new()s actually fail (which they won't, at
+> >> least not reliably), and your error paths actually work (which they
+> >> won't unless you test them, no offense).
+> >> 
+> >> > However, it scares me that we've got things that can return big chunks
+> >> > of JSON for example, and I don't think they're being careful about it.
+> >> 
+> >> We got countless allocations small and large (large as in Gigabytes)
+> >> that kill QEMU on OOM.  Some of the small allocations add up to
+> >> Megabytes (QObjects for JSON work, for example).
+> >> 
+> >> Yet the *practical* problem isn't lack of graceful handling when these
+> >> allocations fail.  Because they pretty much don't.
+> >> 
+> >> The practical problem I see is general confusion on what to do about
+> >> OOM.  There's no written guidance.  Vague rules of thumb on when to
+> >> handle OOM are floating around.  Code gets copied.  Unsurprisingly, OOM
+> >> handling is a haphazard affair.
+> >
+> >> In this state, whatever OOM handling we have is too unreliable to be
+> >> worth much, since it can only help when (1) allocations actually fail
+> >> (they generally don't), and (2) the allocation that fails is actually
+> >> handled (they generally aren't), and (3) the handling actually works (we
+> >> don't test OOM, so it generally doesn't).
+> >> 
+> >> For the sake of the argument, let's assume there's a practical way to
+> >> run QEMU so that memory allocations actually fail.  We then still need
+> >> to find a way to increase the probability for failed allocations to be
+> >> actually handled, and the probability for the error handling to actually
+> >> work, both to a useful level.  This will require rules on OOM handling,
+> >> a strategy to make them stick, a strategy to test OOM, and resources to
+> >> implement all that.
+> >
+> > There's probably no way to guarantee we've got all paths, however we
+> > can test in restricted memory environments.
+> > For example we could set up a test environment that runs a series of
+> > hotplug or migration tests (say avocado or something) in cgroups
+> > or nested VMs with random reduced amounts of RAM.  These will blow up
+> > spectacularly and we can slowly attack some of the more common paths.
 > 
-> Regards,
-> Daniel
+> There's also fault injection.  It's more targeted.  Bonus: it lets you
+> make only the allocations fail you deem likely to fail, i.e. keep the
+> unchecked ones working ;-P
+
+Yes, although I'm worrying more about the paths we forgot about, so I
+like the idea of random testing to find those.
+
+> > If we can find common cases then perhaps we can identify things to use
+> > static checkers for.
+> >
+> > We can also try setting up tests in environments closer to the way
+> > OpenStack and oVirt configure they're hosts;  they seem to jump through
+> > hoops to get a feeling of how much spare memory to allocate, but of
+> > course since we don't define how much we use they can't really do that.
+> >
+> > Using  mlock would probably make the allocations more likely to
+> > fail rather than fault later?
 > 
+> "More likely" as in "at all likely".  Without a solution here, all the
+> other work is on unreachable code.  My box lets me allocate Gigabytes of
+> memory I don't have.  In case you find my example involving -device qxl
+> is too opaque, I append a test program.  It successfully allocates one
+> Terabyte in 1024 Gigabyte chunks for me.  It behaves exactly the same
+> with g_malloc() instead of malloc().
+
+Yes, it's tricky.
+The only way that I got to work was  ulimit -v 4000000   and then your
+test prints OOM and the qxl test prints:
+-device qxl,ram_size=2147483648: cannot set up guest memory 'qxl.vgavram': Cannot allocate memory
+
+> The "normal" way to disable memory overcommit is
+> /proc/sys/vm/overcommit_memory, but it's system-wide, and requires root.
+> That's a big hammer.  A more precise tool could be more useful.  To
+> actually matter, we need a tool that libvirt can apply to production
+> VMs.
+
+I had a play with some other things that I thought should work but
+couldn't persuade them to, and I worry why.
+I thought ulimit -l together with qemu with -realtime mlock=on  would
+work, but it didn't seem to - that one really worries me.
+
+I thought cgroup limits would work, but again they didn't seem to.
+libvirt can set up both ulimit mlock and some cgroup limits.
+
+While overcommit_memory is a big hammer, it's not necessarily a problem
+having a root-only hammer, because that still solves the problem for
+dedicated hypervisor machines that are common in both OpenStack and
+oVirt.
+
+I guess we should also take a step back and worry if this is a
+linux-ism.
+
+> >> Will the benefits be worth the effort?  Arguing about that in the
+> >> near-total vacuum we have now is unlikely to be productive.  To ground
+> >> the debate at least somewhat, I'd like those of us in favour of OOM
+> >> handling to propose a first draft of OOM handling rules.
+> >
+> > Well, I'm up to give it a go; but before I do, can you define a bit more
+> > what you want. Firstly what do you define as 'OOM handling' and secondly
+> > what type of level of rules do you want.
+> 
+> 0. OOM is failure to allocate a chunk of memory.
+> 
+> 1. When is it okay to terminate the process on OOM?
+> 
+>    Write down rules that let people decide whether a given allocation
+>    needs to be handled gracefully.
+> 
+>    If your rules involve small vs. large allocations, then make sure to
+>    define "small".
+> 
+>    If your rules involve "in response to untrusted input", spell that
+>    out.
+> 
+>    If your rules involve "in response to trusted input (think QMP)",
+>    spell that out.
+> 
+>    Also: exit() or abort()?  If I remember correctly, GLib aborts.
+> 
+> 2. How to handle OOM gracefully [skip for first draft]
+> 
+>    The usual: revert the functions side effects, return failure to
+>    caller, repeat for caller until reaching the caller that consumes the
+>    error.
+> 
+> 3. Coding conventions [definitely skip for first draft]
+> 
+>    This is part of the "strategy to make the rules stick".
+
+OK, that's reasonable (although I might try and avoid the use of OOM as
+a name because people think o the kernel OOM killer, and that confuses
+the thing we'd try and avoid).
+
+> >> If we can't do even that, I'll be tempted to shoot down OOM handling in
+> >> patches to code I maintain.
+> >
+> > Please please don't do that;  getting it right in the monitor path and
+> > QMP is import for those cases where we generate big chunks of JSON
+> > (it would be better if we didn't generate big chunks of JSON, but that's
+> > a partially separate problem).
+> 
+> As long as allocations don't fail, this is all mental masturbation
+> (pardon my french).
+
+No need to blame the French.
+
+Dave
+> 
+> 
+> #include <stdlib.h>
+> #include <stdio.h>
+> 
+> int
+> main(void)
+> {
+>     size_t GiB = 1024 * 1024 * 1024;
+>     int i;
+>     void *p;
+> 
+>     for (i = 0; i < 1024; i++) {
+> 	printf("%d\n", i);
+> 	p = malloc(GiB);
+> 	if (!p) {
+> 	    printf("OOM\n");
+> 	    break;
+> 	}
+>     }
+>     return 0;
+> }
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
