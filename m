@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gDLNV-0002fZ-N1
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:13 -0400
+	(envelope-from <jasowang@redhat.com>) id 1gDLNZ-0002jJ-Nj
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gDLNT-0002tI-KM
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58122)
+	(envelope-from <jasowang@redhat.com>) id 1gDLNV-0002u3-Gt
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60412)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gDLNQ-0002qx-VE
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:05 -0400
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gDLNS-0002sM-W7
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:07 -0400
 From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 19 Oct 2018 11:22:10 +0800
-Message-Id: <1539919345-10703-12-git-send-email-jasowang@redhat.com>
+Date: Fri, 19 Oct 2018 11:22:11 +0800
+Message-Id: <1539919345-10703-13-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1539919345-10703-1-git-send-email-jasowang@redhat.com>
 References: <1539919345-10703-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL V2 11/26] qapi/migration.json: Rename COLO
- unknown mode to none mode.
+Subject: [Qemu-devel] [PULL V2 12/26] qapi: Add new command to query colo
+ status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,76 +25,103 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, qemu-devel@nongnu.org
-Cc: Zhang Chen <chen.zhang@intel.com>, Zhang Chen <zhangckid@gmail.com>, Jason Wang <jasowang@redhat.com>
+Cc: Zhang Chen <zhangckid@gmail.com>, Zhang Chen <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>
 
-From: Zhang Chen <chen.zhang@intel.com>
+From: Zhang Chen <zhangckid@gmail.com>
 
-Suggested by Markus Armbruster rename COLO unknown mode to none mode.
+Libvirt or other high level software can use this command query colo status.
+You can test this command like that:
+{'execute':'query-colo-status'}
 
 Signed-off-by: Zhang Chen <zhangckid@gmail.com>
 Signed-off-by: Zhang Chen <chen.zhang@intel.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- migration/colo-failover.c |  2 +-
- migration/colo.c          |  2 +-
- qapi/migration.json       | 10 +++++-----
- 3 files changed, 7 insertions(+), 7 deletions(-)
+ migration/colo.c    | 21 +++++++++++++++++++++
+ qapi/migration.json | 32 ++++++++++++++++++++++++++++++++
+ 2 files changed, 53 insertions(+)
 
-diff --git a/migration/colo-failover.c b/migration/colo-failover.c
-index 0ae0c41..4854a96 100644
---- a/migration/colo-failover.c
-+++ b/migration/colo-failover.c
-@@ -77,7 +77,7 @@ FailoverStatus failover_get_state(void)
- 
- void qmp_x_colo_lost_heartbeat(Error **errp)
- {
--    if (get_colo_mode() == COLO_MODE_UNKNOWN) {
-+    if (get_colo_mode() == COLO_MODE_NONE) {
-         error_setg(errp, QERR_FEATURE_DISABLED, "colo");
-         return;
-     }
 diff --git a/migration/colo.c b/migration/colo.c
-index bd7390d..2cdd366 100644
+index 2cdd366..94c4e09 100644
 --- a/migration/colo.c
 +++ b/migration/colo.c
-@@ -160,7 +160,7 @@ COLOMode get_colo_mode(void)
-     } else if (migration_incoming_in_colo_state()) {
-         return COLO_MODE_SECONDARY;
-     } else {
--        return COLO_MODE_UNKNOWN;
-+        return COLO_MODE_NONE;
-     }
+@@ -29,6 +29,7 @@
+ #include "net/colo.h"
+ #include "block/block.h"
+ #include "qapi/qapi-events-migration.h"
++#include "qapi/qmp/qerror.h"
+ 
+ static bool vmstate_loading;
+ static Notifier packets_compare_notifier;
+@@ -237,6 +238,26 @@ void qmp_xen_colo_do_checkpoint(Error **errp)
+ #endif
  }
  
++COLOStatus *qmp_query_colo_status(Error **errp)
++{
++    COLOStatus *s = g_new0(COLOStatus, 1);
++
++    s->mode = get_colo_mode();
++
++    switch (failover_get_state()) {
++    case FAILOVER_STATUS_NONE:
++        s->reason = COLO_EXIT_REASON_NONE;
++        break;
++    case FAILOVER_STATUS_REQUIRE:
++        s->reason = COLO_EXIT_REASON_REQUEST;
++        break;
++    default:
++        s->reason = COLO_EXIT_REASON_ERROR;
++    }
++
++    return s;
++}
++
+ static void colo_send_message(QEMUFile *f, COLOMessage msg,
+                               Error **errp)
+ {
 diff --git a/qapi/migration.json b/qapi/migration.json
-index 4a18209..0776e0f 100644
+index 0776e0f..0928f4b 100644
 --- a/qapi/migration.json
 +++ b/qapi/migration.json
-@@ -923,18 +923,18 @@
- ##
- # @COLOMode:
- #
--# The colo mode
-+# The COLO current mode.
- #
--# @unknown: unknown mode
-+# @none: COLO is disabled.
- #
--# @primary: master side
-+# @primary: COLO node in primary side.
- #
--# @secondary: slave side
-+# @secondary: COLO node in slave side.
- #
- # Since: 2.8
- ##
- { 'enum': 'COLOMode',
--  'data': [ 'unknown', 'primary', 'secondary'] }
-+  'data': [ 'none', 'primary', 'secondary'] }
+@@ -1308,6 +1308,38 @@
+ { 'command': 'xen-colo-do-checkpoint' }
  
  ##
- # @FailoverStatus:
++# @COLOStatus:
++#
++# The result format for 'query-colo-status'.
++#
++# @mode: COLO running mode. If COLO is running, this field will return
++#        'primary' or 'secondary'.
++#
++# @reason: describes the reason for the COLO exit.
++#
++# Since: 3.0
++##
++{ 'struct': 'COLOStatus',
++  'data': { 'mode': 'COLOMode', 'reason': 'COLOExitReason' } }
++
++##
++# @query-colo-status:
++#
++# Query COLO status while the vm is running.
++#
++# Returns: A @COLOStatus object showing the status.
++#
++# Example:
++#
++# -> { "execute": "query-colo-status" }
++# <- { "return": { "mode": "primary", "active": true, "reason": "request" } }
++#
++# Since: 3.0
++##
++{ 'command': 'query-colo-status',
++  'returns': 'COLOStatus' }
++
++##
+ # @migrate-recover:
+ #
+ # Provide a recovery migration stream URI.
 -- 
 2.5.0
