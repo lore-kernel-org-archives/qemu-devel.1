@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36573)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gDLNN-0002XP-Eq
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:03 -0400
+	(envelope-from <jasowang@redhat.com>) id 1gDLNR-0002bI-Il
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gDLNJ-0002p0-Nu
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:22:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58986)
+	(envelope-from <jasowang@redhat.com>) id 1gDLNL-0002pm-KM
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37858)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gDLNH-0002n7-Mg
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gDLNJ-0002oO-L4
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:22:57 -0400
 From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 19 Oct 2018 11:22:07 +0800
-Message-Id: <1539919345-10703-9-git-send-email-jasowang@redhat.com>
+Date: Fri, 19 Oct 2018 11:22:08 +0800
+Message-Id: <1539919345-10703-10-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1539919345-10703-1-git-send-email-jasowang@redhat.com>
 References: <1539919345-10703-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL V2 08/26] ram/COLO: Record the dirty pages that
- SVM received
+Subject: [Qemu-devel] [PULL V2 09/26] COLO: Flush memory data from ram cache
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,112 +24,98 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, qemu-devel@nongnu.org
-Cc: Zhang Chen <zhangckid@gmail.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Zhang Chen <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>
+Cc: Zhang Chen <zhangckid@gmail.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Jason Wang <jasowang@redhat.com>
 
 From: Zhang Chen <zhangckid@gmail.com>
 
-We record the address of the dirty pages that received,
-it will help flushing pages that cached into SVM.
+During the time of VM's running, PVM may dirty some pages, we will transfer
+PVM's dirty pages to SVM and store them into SVM's RAM cache at next checkpoint
+time. So, the content of SVM's RAM cache will always be same with PVM's memory
+after checkpoint.
 
-Here, it is a trick, we record dirty pages by re-using migration
-dirty bitmap. In the later patch, we will start the dirty log
-for SVM, just like migration, in this way, we can record both
-the dirty pages caused by PVM and SVM, we only flush those dirty
-pages from RAM cache while do checkpoint.
+Instead of flushing all content of PVM's RAM cache into SVM's MEMORY,
+we do this in a more efficient way:
+Only flush any page that dirtied by PVM since last checkpoint.
+In this way, we can ensure SVM's memory same with PVM's.
+
+Besides, we must ensure flush RAM cache before load device state.
 
 Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Signed-off-by: Zhang Chen <zhangckid@gmail.com>
-Signed-off-by: Zhang Chen <chen.zhang@intel.com>
+Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- migration/ram.c | 43 ++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 40 insertions(+), 3 deletions(-)
+ migration/ram.c        | 37 +++++++++++++++++++++++++++++++++++++
+ migration/trace-events |  2 ++
+ 2 files changed, 39 insertions(+)
 
 diff --git a/migration/ram.c b/migration/ram.c
-index cd7a446..404c8f0 100644
+index 404c8f0..477853d 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -3458,6 +3458,15 @@ static inline void *colo_cache_from_block_offset(RAMBlock *block,
-                      __func__, block->idstr);
-         return NULL;
-     }
-+
-+    /*
-+    * During colo checkpoint, we need bitmap of these migrated pages.
-+    * It help us to decide which pages in ram cache should be flushed
-+    * into VM's RAM later.
-+    */
-+    if (!test_and_set_bit(offset >> TARGET_PAGE_BITS, block->bmap)) {
-+        ram_state->migration_dirty_pages++;
-+    }
-     return block->colo_cache + offset;
+@@ -3974,6 +3974,39 @@ static bool postcopy_is_running(void)
+     return ps >= POSTCOPY_INCOMING_LISTENING && ps < POSTCOPY_INCOMING_END;
  }
  
-@@ -3675,7 +3684,7 @@ int colo_init_ram_cache(void)
-     RAMBlock *block;
- 
-     rcu_read_lock();
--    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-+    RAMBLOCK_FOREACH_MIGRATABLE(block) {
-         block->colo_cache = qemu_anon_ram_alloc(block->used_length,
-                                                 NULL,
-                                                 false);
-@@ -3688,10 +3697,29 @@ int colo_init_ram_cache(void)
-         memcpy(block->colo_cache, block->host, block->used_length);
-     }
-     rcu_read_unlock();
-+    /*
-+    * Record the dirty pages that sent by PVM, we use this dirty bitmap together
-+    * with to decide which page in cache should be flushed into SVM's RAM. Here
-+    * we use the same name 'ram_bitmap' as for migration.
-+    */
-+    if (ram_bytes_total()) {
-+        RAMBlock *block;
++/*
++ * Flush content of RAM cache into SVM's memory.
++ * Only flush the pages that be dirtied by PVM or SVM or both.
++ */
++static void colo_flush_ram_cache(void)
++{
++    RAMBlock *block = NULL;
++    void *dst_host;
++    void *src_host;
++    unsigned long offset = 0;
 +
-+        RAMBLOCK_FOREACH_MIGRATABLE(block) {
-+            unsigned long pages = block->max_length >> TARGET_PAGE_BITS;
++    trace_colo_flush_ram_cache_begin(ram_state->migration_dirty_pages);
++    rcu_read_lock();
++    block = QLIST_FIRST_RCU(&ram_list.blocks);
 +
-+            block->bmap = bitmap_new(pages);
-+            bitmap_set(block->bmap, 0, pages);
++    while (block) {
++        offset = migration_bitmap_find_dirty(ram_state, block, offset);
++
++        if (offset << TARGET_PAGE_BITS >= block->used_length) {
++            offset = 0;
++            block = QLIST_NEXT_RCU(block, next);
++        } else {
++            migration_bitmap_clear_dirty(ram_state, block, offset);
++            dst_host = block->host + (offset << TARGET_PAGE_BITS);
++            src_host = block->colo_cache + (offset << TARGET_PAGE_BITS);
++            memcpy(dst_host, src_host, TARGET_PAGE_SIZE);
 +        }
 +    }
-+    ram_state = g_new0(RAMState, 1);
-+    ram_state->migration_dirty_pages = 0;
 +
-     return 0;
- 
- out_locked:
--    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
++    rcu_read_unlock();
++    trace_colo_flush_ram_cache_end();
++}
 +
-+    RAMBLOCK_FOREACH_MIGRATABLE(block) {
-         if (block->colo_cache) {
-             qemu_anon_ram_free(block->colo_cache, block->used_length);
-             block->colo_cache = NULL;
-@@ -3707,14 +3735,23 @@ void colo_release_ram_cache(void)
+ static int ram_load(QEMUFile *f, void *opaque, int version_id)
  {
-     RAMBlock *block;
- 
-+    RAMBLOCK_FOREACH_MIGRATABLE(block) {
-+        g_free(block->bmap);
-+        block->bmap = NULL;
-+    }
-+
-     rcu_read_lock();
--    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-+
-+    RAMBLOCK_FOREACH_MIGRATABLE(block) {
-         if (block->colo_cache) {
-             qemu_anon_ram_free(block->colo_cache, block->used_length);
-             block->colo_cache = NULL;
-         }
-     }
-+
+     int flags = 0, ret = 0, invalid_flags = 0;
+@@ -4150,6 +4183,10 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+     ret |= wait_for_decompress_done();
      rcu_read_unlock();
-+    g_free(ram_state);
-+    ram_state = NULL;
+     trace_ram_load_complete(ret, seq_iter);
++
++    if (!ret  && migration_incoming_in_colo_state()) {
++        colo_flush_ram_cache();
++    }
+     return ret;
  }
  
- /**
+diff --git a/migration/trace-events b/migration/trace-events
+index fa0ff3f..bd2d0cd 100644
+--- a/migration/trace-events
++++ b/migration/trace-events
+@@ -102,6 +102,8 @@ ram_dirty_bitmap_sync_start(void) ""
+ ram_dirty_bitmap_sync_wait(void) ""
+ ram_dirty_bitmap_sync_complete(void) ""
+ ram_state_resume_prepare(uint64_t v) "%" PRId64
++colo_flush_ram_cache_begin(uint64_t dirty_pages) "dirty_pages %" PRIu64
++colo_flush_ram_cache_end(void) ""
+ 
+ # migration/migration.c
+ await_return_path_close_on_source_close(void) ""
 -- 
 2.5.0
