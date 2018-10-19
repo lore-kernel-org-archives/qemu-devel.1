@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36681)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36679)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gDLNZ-0002jJ-Nj
+	(envelope-from <jasowang@redhat.com>) id 1gDLNZ-0002jH-Na
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gDLNV-0002u3-Gt
+	(envelope-from <jasowang@redhat.com>) id 1gDLNX-0002xF-Qs
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60412)
+Received: from mx1.redhat.com ([209.132.183.28]:35362)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gDLNS-0002sM-W7
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:07 -0400
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gDLNX-0002w3-HJ
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 23:23:11 -0400
 From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 19 Oct 2018 11:22:11 +0800
-Message-Id: <1539919345-10703-13-git-send-email-jasowang@redhat.com>
+Date: Fri, 19 Oct 2018 11:22:13 +0800
+Message-Id: <1539919345-10703-15-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1539919345-10703-1-git-send-email-jasowang@redhat.com>
 References: <1539919345-10703-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL V2 12/26] qapi: Add new command to query colo
- status
+Subject: [Qemu-devel] [PULL V2 14/26] COLO: flush host dirty ram from cache
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,103 +24,56 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, qemu-devel@nongnu.org
-Cc: Zhang Chen <zhangckid@gmail.com>, Zhang Chen <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>
+Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Zhang Chen <zhangckid@gmail.com>, Zhang Chen <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>
 
-From: Zhang Chen <zhangckid@gmail.com>
+From: zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-Libvirt or other high level software can use this command query colo status.
-You can test this command like that:
-{'execute':'query-colo-status'}
+Don't need to flush all VM's ram from cache, only
+flush the dirty pages since last checkpoint
 
+Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
 Signed-off-by: Zhang Chen <zhangckid@gmail.com>
 Signed-off-by: Zhang Chen <chen.zhang@intel.com>
+Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- migration/colo.c    | 21 +++++++++++++++++++++
- qapi/migration.json | 32 ++++++++++++++++++++++++++++++++
- 2 files changed, 53 insertions(+)
+ migration/ram.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/migration/colo.c b/migration/colo.c
-index 2cdd366..94c4e09 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -29,6 +29,7 @@
- #include "net/colo.h"
- #include "block/block.h"
- #include "qapi/qapi-events-migration.h"
-+#include "qapi/qmp/qerror.h"
+diff --git a/migration/ram.c b/migration/ram.c
+index 477853d..7e7deec 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -3714,6 +3714,7 @@ int colo_init_ram_cache(void)
+     }
+     ram_state = g_new0(RAMState, 1);
+     ram_state->migration_dirty_pages = 0;
++    memory_global_dirty_log_start();
  
- static bool vmstate_loading;
- static Notifier packets_compare_notifier;
-@@ -237,6 +238,26 @@ void qmp_xen_colo_do_checkpoint(Error **errp)
- #endif
- }
+     return 0;
  
-+COLOStatus *qmp_query_colo_status(Error **errp)
-+{
-+    COLOStatus *s = g_new0(COLOStatus, 1);
-+
-+    s->mode = get_colo_mode();
-+
-+    switch (failover_get_state()) {
-+    case FAILOVER_STATUS_NONE:
-+        s->reason = COLO_EXIT_REASON_NONE;
-+        break;
-+    case FAILOVER_STATUS_REQUIRE:
-+        s->reason = COLO_EXIT_REASON_REQUEST;
-+        break;
-+    default:
-+        s->reason = COLO_EXIT_REASON_ERROR;
-+    }
-+
-+    return s;
-+}
-+
- static void colo_send_message(QEMUFile *f, COLOMessage msg,
-                               Error **errp)
+@@ -3735,6 +3736,7 @@ void colo_release_ram_cache(void)
  {
-diff --git a/qapi/migration.json b/qapi/migration.json
-index 0776e0f..0928f4b 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -1308,6 +1308,38 @@
- { 'command': 'xen-colo-do-checkpoint' }
+     RAMBlock *block;
  
- ##
-+# @COLOStatus:
-+#
-+# The result format for 'query-colo-status'.
-+#
-+# @mode: COLO running mode. If COLO is running, this field will return
-+#        'primary' or 'secondary'.
-+#
-+# @reason: describes the reason for the COLO exit.
-+#
-+# Since: 3.0
-+##
-+{ 'struct': 'COLOStatus',
-+  'data': { 'mode': 'COLOMode', 'reason': 'COLOExitReason' } }
++    memory_global_dirty_log_stop();
+     RAMBLOCK_FOREACH_MIGRATABLE(block) {
+         g_free(block->bmap);
+         block->bmap = NULL;
+@@ -3985,6 +3987,13 @@ static void colo_flush_ram_cache(void)
+     void *src_host;
+     unsigned long offset = 0;
+ 
++    memory_global_dirty_log_sync();
++    rcu_read_lock();
++    RAMBLOCK_FOREACH_MIGRATABLE(block) {
++        migration_bitmap_sync_range(ram_state, block, 0, block->used_length);
++    }
++    rcu_read_unlock();
 +
-+##
-+# @query-colo-status:
-+#
-+# Query COLO status while the vm is running.
-+#
-+# Returns: A @COLOStatus object showing the status.
-+#
-+# Example:
-+#
-+# -> { "execute": "query-colo-status" }
-+# <- { "return": { "mode": "primary", "active": true, "reason": "request" } }
-+#
-+# Since: 3.0
-+##
-+{ 'command': 'query-colo-status',
-+  'returns': 'COLOStatus' }
-+
-+##
- # @migrate-recover:
- #
- # Provide a recovery migration stream URI.
+     trace_colo_flush_ram_cache_begin(ram_state->migration_dirty_pages);
+     rcu_read_lock();
+     block = QLIST_FIRST_RCU(&ram_list.blocks);
 -- 
 2.5.0
