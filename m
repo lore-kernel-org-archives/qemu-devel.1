@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34381)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gDR9j-0003hS-UQ
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 05:33:22 -0400
+	(envelope-from <mreitz@redhat.com>) id 1gDRAV-0003z3-M7
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 05:34:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gDR9e-00045o-HK
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 05:33:19 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:37697)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gDR9e-000447-5r
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 05:33:14 -0400
-Received: by mail-wm1-f65.google.com with SMTP id 185-v6so3032501wmt.2
-	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 02:33:13 -0700 (PDT)
-References: <20181009130442.26296-1-berrange@redhat.com>
-	<20181009130442.26296-9-berrange@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <7d4f2fcd-06c2-256b-1a0c-358365d90d41@redhat.com>
-Date: Fri, 19 Oct 2018 11:33:06 +0200
+	(envelope-from <mreitz@redhat.com>) id 1gDRAT-0005HC-V4
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 05:34:07 -0400
+References: <20181015141453.32632-1-mreitz@redhat.com>
+	<20181015141453.32632-10-mreitz@redhat.com>
+	<20181015222638.GH31060@habkost.net>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <5682ded4-8fd8-76c9-8e1c-0c797fb267ef@redhat.com>
+Date: Fri, 19 Oct 2018 11:33:54 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181009130442.26296-9-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5 08/11] authz: add QAuthZList object type
- for an access control list
+In-Reply-To: <20181015222638.GH31060@habkost.net>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="EX8eFGJrSEKJTkBLld754v2L58Wwy0Txz"
+Subject: Re: [Qemu-devel] [PATCH 9/9] iotests: Unify log outputs between
+ Python 2 and 3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,943 +26,266 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
 
-Hi Daniel,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--EX8eFGJrSEKJTkBLld754v2L58Wwy0Txz
+From: Max Reitz <mreitz@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <5682ded4-8fd8-76c9-8e1c-0c797fb267ef@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 9/9] iotests: Unify log outputs between
+ Python 2 and 3
+References: <20181015141453.32632-1-mreitz@redhat.com>
+ <20181015141453.32632-10-mreitz@redhat.com>
+ <20181015222638.GH31060@habkost.net>
+In-Reply-To: <20181015222638.GH31060@habkost.net>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 09/10/2018 15:04, Daniel P. Berrangé wrote:
-> From: "Daniel P. Berrange" <berrange@redhat.com>
-> 
-> Add a QAuthZList object type that implements the QAuthZ interface. This
-> built-in implementation maintains a trivial access control list with a
-> sequence of match rules and a final default policy. This replicates the
-> functionality currently provided by the qemu_acl module.
-> 
-> To create an instance of this object via the QMP monitor, the syntax
-> used would be:
-> 
->   {
->     "execute": "object-add",
->     "arguments": {
->       "qom-type": "authz-list",
->       "id": "authz0",
->       "parameters": {
->         "rules": [
->            { "match": "fred", "policy": "allow", "format": "exact" },
->            { "match": "bob", "policy": "allow", "format": "exact" },
->            { "match": "danb", "policy": "deny", "format": "glob" },
->            { "match": "dan*", "policy": "allow", "format": "exact" },
->         ],
->         "policy": "deny"
->       }
->     }
->   }
-> 
-> This sets up an authorization rule that allows 'fred', 'bob' and anyone
-> whose name starts with 'dan', except for 'danb'. Everyone unmatched is
-> denied.
-> 
-> It is not currently possible to create this via -object, since there is
-> no syntax supported to specify non-scalar properties for objects. This
-> is likely to be addressed by later support for using JSON with -object,
-> or an equivalent approach.
-> 
-> In any case the future "authz-listfile" object can be used from the
-> CLI and is likely a better choice, as it allows the ACL to be refreshed
-> automatically on change.
-> 
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  .gitignore              |   4 +
->  MAINTAINERS             |   1 +
->  Makefile                |   7 +-
->  Makefile.objs           |   4 +
->  authz/Makefile.objs     |   1 +
->  authz/list.c            | 315 ++++++++++++++++++++++++++++++++++++++++
->  authz/trace-events      |   4 +
->  include/authz/list.h    | 106 ++++++++++++++
+On 16.10.18 00:26, Eduardo Habkost wrote:
+> On Mon, Oct 15, 2018 at 04:14:53PM +0200, Max Reitz wrote:
+>> When dumping an object into the log, there are differences between
+>> Python 2 and 3.  First, unicode strings are prefixed by 'u' in Python =
+2
+>> (they are no longer in 3, because unicode strings are the default
+>> there).  [...]
+>=20
+> This could be addressed using JSON.  See below[1].
+>=20
+>> [...] Second, the order of keys in dicts may differ.  [...]
+>=20
+> Can be addressed using json.dumps(..., sort_keys=3DTrue).
 
-Please setup scripts/git.orderfile ;)
+Ah.  Nice. :-)
 
->  qapi/authz.json         |  58 ++++++++
->  qapi/qapi-schema.json   |   1 +
->  tests/Makefile.include  |   4 +
->  tests/test-authz-list.c | 171 ++++++++++++++++++++++
->  12 files changed, 675 insertions(+), 1 deletion(-)
->  create mode 100644 authz/list.c
->  create mode 100644 include/authz/list.h
->  create mode 100644 qapi/authz.json
->  create mode 100644 tests/test-authz-list.c
-> 
-> diff --git a/.gitignore b/.gitignore
-> index 64efdfd929..9b9fcad829 100644
-> --- a/.gitignore
-> +++ b/.gitignore
-> @@ -47,6 +47,7 @@
->  /qapi/qapi-commands-trace.[ch]
->  /qapi/qapi-commands-transaction.[ch]
->  /qapi/qapi-commands-ui.[ch]
-> +/qapi/qapi-commands-authz.[ch]
->  /qapi/qapi-commands.[ch]
->  /qapi/qapi-events-block-core.[ch]
->  /qapi/qapi-events-block.[ch]
-> @@ -65,6 +66,7 @@
->  /qapi/qapi-events-trace.[ch]
->  /qapi/qapi-events-transaction.[ch]
->  /qapi/qapi-events-ui.[ch]
-> +/qapi/qapi-events-authz.[ch]
->  /qapi/qapi-events.[ch]
->  /qapi/qapi-introspect.[ch]
->  /qapi/qapi-types-block-core.[ch]
-> @@ -84,6 +86,7 @@
->  /qapi/qapi-types-trace.[ch]
->  /qapi/qapi-types-transaction.[ch]
->  /qapi/qapi-types-ui.[ch]
-> +/qapi/qapi-types-authz.[ch]
->  /qapi/qapi-types.[ch]
->  /qapi/qapi-visit-block-core.[ch]
->  /qapi/qapi-visit-block.[ch]
-> @@ -102,6 +105,7 @@
->  /qapi/qapi-visit-trace.[ch]
->  /qapi/qapi-visit-transaction.[ch]
->  /qapi/qapi-visit-ui.[ch]
-> +/qapi/qapi-visit-authz.[ch]
->  /qapi/qapi-visit.[ch]
->  /qapi/qapi-doc.texi
->  /qemu-doc.html
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 3eb5bff7a0..e9d2994015 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1845,6 +1845,7 @@ User authorization
->  M: Daniel P. Berrange <berrange@redhat.com>
->  S: Maintained
->  F: authz/
-> +F: qapi/authz.json
->  F: include/authz/
->  F: tests/test-authz-*
->  
-> diff --git a/Makefile b/Makefile
-> index 35e5bd6a03..ee816c8a9e 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -600,7 +600,8 @@ qapi-modules = $(SRC_PATH)/qapi/qapi-schema.json $(SRC_PATH)/qapi/common.json \
->                 $(SRC_PATH)/qapi/tpm.json \
->                 $(SRC_PATH)/qapi/trace.json \
->                 $(SRC_PATH)/qapi/transaction.json \
-> -               $(SRC_PATH)/qapi/ui.json
-> +               $(SRC_PATH)/qapi/ui.json \
-> +               $(SRC_PATH)/qapi/authz.json
->  
->  qapi/qapi-builtin-types.c qapi/qapi-builtin-types.h \
->  qapi/qapi-types.c qapi/qapi-types.h \
-> @@ -621,6 +622,7 @@ qapi/qapi-types-tpm.c qapi/qapi-types-tpm.h \
->  qapi/qapi-types-trace.c qapi/qapi-types-trace.h \
->  qapi/qapi-types-transaction.c qapi/qapi-types-transaction.h \
->  qapi/qapi-types-ui.c qapi/qapi-types-ui.h \
-> +qapi/qapi-types-authz.c qapi/qapi-types-authz.h \
->  qapi/qapi-builtin-visit.c qapi/qapi-builtin-visit.h \
->  qapi/qapi-visit.c qapi/qapi-visit.h \
->  qapi/qapi-visit-block-core.c qapi/qapi-visit-block-core.h \
-> @@ -640,6 +642,7 @@ qapi/qapi-visit-tpm.c qapi/qapi-visit-tpm.h \
->  qapi/qapi-visit-trace.c qapi/qapi-visit-trace.h \
->  qapi/qapi-visit-transaction.c qapi/qapi-visit-transaction.h \
->  qapi/qapi-visit-ui.c qapi/qapi-visit-ui.h \
-> +qapi/qapi-visit-authz.c qapi/qapi-visit-authz.h \
->  qapi/qapi-commands.h qapi/qapi-commands.c \
->  qapi/qapi-commands-block-core.c qapi/qapi-commands-block-core.h \
->  qapi/qapi-commands-block.c qapi/qapi-commands-block.h \
-> @@ -658,6 +661,7 @@ qapi/qapi-commands-tpm.c qapi/qapi-commands-tpm.h \
->  qapi/qapi-commands-trace.c qapi/qapi-commands-trace.h \
->  qapi/qapi-commands-transaction.c qapi/qapi-commands-transaction.h \
->  qapi/qapi-commands-ui.c qapi/qapi-commands-ui.h \
-> +qapi/qapi-commands-authz.c qapi/qapi-commands-authz.h \
->  qapi/qapi-events.c qapi/qapi-events.h \
->  qapi/qapi-events-block-core.c qapi/qapi-events-block-core.h \
->  qapi/qapi-events-block.c qapi/qapi-events-block.h \
-> @@ -676,6 +680,7 @@ qapi/qapi-events-tpm.c qapi/qapi-events-tpm.h \
->  qapi/qapi-events-trace.c qapi/qapi-events-trace.h \
->  qapi/qapi-events-transaction.c qapi/qapi-events-transaction.h \
->  qapi/qapi-events-ui.c qapi/qapi-events-ui.h \
-> +qapi/qapi-events-authz.c qapi/qapi-events-authz.h \
->  qapi/qapi-introspect.h qapi/qapi-introspect.c \
->  qapi/qapi-doc.texi: \
->  qapi-gen-timestamp ;
-> diff --git a/Makefile.objs b/Makefile.objs
-> index ecb1071c4f..825c5863ac 100644
-> --- a/Makefile.objs
-> +++ b/Makefile.objs
-> @@ -21,6 +21,7 @@ util-obj-y += qapi/qapi-types-tpm.o
->  util-obj-y += qapi/qapi-types-trace.o
->  util-obj-y += qapi/qapi-types-transaction.o
->  util-obj-y += qapi/qapi-types-ui.o
-> +util-obj-y += qapi/qapi-types-authz.o
->  util-obj-y += qapi/qapi-builtin-visit.o
->  util-obj-y += qapi/qapi-visit.o
->  util-obj-y += qapi/qapi-visit-block-core.o
-> @@ -40,6 +41,7 @@ util-obj-y += qapi/qapi-visit-tpm.o
->  util-obj-y += qapi/qapi-visit-trace.o
->  util-obj-y += qapi/qapi-visit-transaction.o
->  util-obj-y += qapi/qapi-visit-ui.o
-> +util-obj-y += qapi/qapi-visit-authz.o
->  util-obj-y += qapi/qapi-events.o
->  util-obj-y += qapi/qapi-events-block-core.o
->  util-obj-y += qapi/qapi-events-block.o
-> @@ -58,6 +60,7 @@ util-obj-y += qapi/qapi-events-tpm.o
->  util-obj-y += qapi/qapi-events-trace.o
->  util-obj-y += qapi/qapi-events-transaction.o
->  util-obj-y += qapi/qapi-events-ui.o
-> +util-obj-y += qapi/qapi-events-authz.o
->  util-obj-y += qapi/qapi-introspect.o
->  
->  chardev-obj-y = chardev/
-> @@ -160,6 +163,7 @@ common-obj-y += qapi/qapi-commands-tpm.o
->  common-obj-y += qapi/qapi-commands-trace.o
->  common-obj-y += qapi/qapi-commands-transaction.o
->  common-obj-y += qapi/qapi-commands-ui.o
-> +common-obj-y += qapi/qapi-commands-authz.o
->  common-obj-y += qapi/qapi-introspect.o
->  common-obj-y += qmp.o hmp.o
->  endif
-> diff --git a/authz/Makefile.objs b/authz/Makefile.objs
-> index 2a75d53840..921fa624d7 100644
-> --- a/authz/Makefile.objs
-> +++ b/authz/Makefile.objs
-> @@ -1,2 +1,3 @@
->  authz-obj-y += base.o
->  authz-obj-y += simple.o
-> +authz-obj-y += list.o
-> diff --git a/authz/list.c b/authz/list.c
-> new file mode 100644
-> index 0000000000..1fc83290df
-> --- /dev/null
-> +++ b/authz/list.c
-> @@ -0,0 +1,315 @@
-> +/*
-> + * QEMU access control list authorization driver
-> + *
-> + * Copyright (c) 2018 Red Hat, Inc.
-> + *
-> + * This library is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU Lesser General Public
-> + * License as published by the Free Software Foundation; either
-> + * version 2 of the License, or (at your option) any later version.
-> + *
-> + * This library is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + * Lesser General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU Lesser General Public
-> + * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-> + *
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "authz/list.h"
-> +#include "authz/trace.h"
-> +#include "qom/object_interfaces.h"
-> +#include "qapi/qapi-visit-authz.h"
-> +
-> +#ifdef CONFIG_FNMATCH
-> +#include <fnmatch.h>
-> +#endif
-> +
-> +static bool qauthz_list_is_allowed(QAuthZ *authz,
-> +                                   const char *identity,
-> +                                   Error **errp)
-> +{
-> +    QAuthZList *sauthz = QAUTHZ_LIST(authz);
-> +    QAuthZListRuleList *rules = sauthz->rules;
-> +
-> +    while (rules) {
-> +        QAuthZListRule *rule = rules->value;
-> +        QAuthZListFormat format = rule->has_format ? rule->format :
-> +            QAUTHZ_LIST_FORMAT_EXACT;
-> +
-> +        trace_qauthz_list_check_rule(authz, rule->match, identity,
-> +                                     format, rule->policy);
-> +        switch (format) {
-> +        case QAUTHZ_LIST_FORMAT_EXACT:
-> +            if (strcmp(rule->match, identity) == 0) {
-> +                return rule->policy == QAUTHZ_LIST_POLICY_ALLOW;
-> +            }
-> +            break;
-> +#ifdef CONFIG_FNMATCH
-> +        case QAUTHZ_LIST_FORMAT_GLOB:
-> +            if (fnmatch(rule->match, identity, 0) == 0) {
-> +                return rule->policy == QAUTHZ_LIST_POLICY_ALLOW;
-> +            }
-> +            break;
-> +#else
-> +            return false;
-> +#endif
-> +        default:
-> +            return false;
-> +        }
-> +        rules = rules->next;
-> +    }
-> +
-> +    trace_qauthz_list_default_policy(authz, identity, sauthz->policy);
-> +    return sauthz->policy == QAUTHZ_LIST_POLICY_ALLOW;
-> +}
-> +
-> +
-> +static void
-> +qauthz_list_prop_set_policy(Object *obj,
-> +                            int value,
-> +                            Error **errp G_GNUC_UNUSED)
-> +{
-> +    QAuthZList *bauthz = QAUTHZ_LIST(obj);
-> +
-> +    bauthz->policy = value;
-> +}
-> +
-> +
-> +static int
-> +qauthz_list_prop_get_policy(Object *obj,
-> +                            Error **errp G_GNUC_UNUSED)
-> +{
-> +    QAuthZList *bauthz = QAUTHZ_LIST(obj);
-> +
-> +    return bauthz->policy;
-> +}
-> +
-> +
-> +static void
-> +qauthz_list_prop_get_rules(Object *obj, Visitor *v, const char *name,
-> +                           void *opaque, Error **errp)
-> +{
-> +    QAuthZList *bauthz = QAUTHZ_LIST(obj);
-> +
-> +    visit_type_QAuthZListRuleList(v, name, &bauthz->rules, errp);
-> +}
-> +
-> +static void
-> +qauthz_list_prop_set_rules(Object *obj, Visitor *v, const char *name,
-> +                           void *opaque, Error **errp)
-> +{
-> +    QAuthZList *bauthz = QAUTHZ_LIST(obj);
-> +    QAuthZListRuleList *oldrules;
-> +#ifndef CONFIG_FNMATCH
-> +    QAuthZListRuleList *rules;
-> +#endif
-> +
-> +    oldrules = bauthz->rules;
-> +    visit_type_QAuthZListRuleList(v, name, &bauthz->rules, errp);
-> +
-> +#ifndef CONFIG_FNMATCH
-> +    rules = bauthz->rules;
-> +    while (rules) {
-> +        QAuthZListRule *rule = rules->value;
-> +        if (rule->has_format &&
-> +            rule->format == QAUTHZ_LIST_FORMAT_GLOB) {
-> +            error_setg(errp, "Glob format not supported on this platform");
-> +            qapi_free_QAuthZListRuleList(bauthz->rules);
-> +            bauthz->rules = oldrules;
-> +            return;
-> +        }
-> +    }
-> +#endif
-> +
-> +    qapi_free_QAuthZListRuleList(oldrules);
-> +}
-> +
-> +
-> +static void
-> +qauthz_list_complete(UserCreatable *uc, Error **errp)
-> +{
+>> [...] Third,
+>> especially long numbers are longs in Python 2 and thus get an 'L'
+>> suffix, which does not happen in Python 3.
+>=20
+> print() doesn't add a L suffix on Python 2.7 on my system:
+>=20
+> Python 2.7.15 (default, May 15 2018, 15:37:31)
+> [GCC 7.3.1 20180303 (Red Hat 7.3.1-5)] on linux2
+> Type "help", "copyright", "credits" or "license" for more information.
+>>>> print(99999999999999999999999999999999999999999999999999999999999999=
+999999999999999999999L)
+> 99999999999999999999999999999999999999999999999999999999999999999999999=
+999999999999
+>=20
+> So I assume this happens only for QMP commands.
 
-Is this useful?
+It happens for dicts:
 
-> +}
-> +
-> +
-> +static void
-> +qauthz_list_finalize(Object *obj)
-> +{
+>>> print 99999999999999999999L
+99999999999999999999
+>>> print {'foo':99999999999999999999L}
+{'foo': 99999999999999999999L}
 
-Ditto.
+> It would be addressed if using JSON, too.
 
-> +}
-> +
-> +
-> +static void
-> +qauthz_list_class_init(ObjectClass *oc, void *data)
-> +{
-> +    UserCreatableClass *ucc = USER_CREATABLE_CLASS(oc);
-> +    QAuthZClass *authz = QAUTHZ_CLASS(oc);
-> +
-> +    ucc->complete = qauthz_list_complete;
-> +
-> +    object_class_property_add_enum(oc, "policy",
-> +                                   "QAuthZListPolicy",
-> +                                   &QAuthZListPolicy_lookup,
-> +                                   qauthz_list_prop_get_policy,
-> +                                   qauthz_list_prop_set_policy,
-> +                                   NULL);
-> +
-> +    object_class_property_add(oc, "rules", "QAuthZListRule",
-> +                              qauthz_list_prop_get_rules,
-> +                              qauthz_list_prop_set_rules,
-> +                              NULL, NULL, NULL);
-> +
-> +    authz->is_allowed = qauthz_list_is_allowed;
-> +}
-> +
-> +
-> +QAuthZList *qauthz_list_new(const char *id,
-> +                            QAuthZListPolicy policy,
-> +                            Error **errp)
-> +{
-> +    return QAUTHZ_LIST(
-> +        object_new_with_props(TYPE_QAUTHZ_LIST,
-> +                              object_get_objects_root(),
-> +                              id, errp,
-> +                              "policy", QAuthZListPolicy_lookup.array[policy],
-> +                              NULL));
-> +}
-> +
-> +ssize_t qauthz_list_append_rule(QAuthZList *auth,
-> +                                const char *match,
-> +                                QAuthZListPolicy policy,
-> +                                QAuthZListFormat format,
-> +                                Error **errp)
-> +{
-> +    QAuthZListRule *rule;
-> +    QAuthZListRuleList *rules, *tmp;
-> +    size_t i = 0;
-> +
-> +#ifndef CONFIG_FNMATCH
-> +    if (format == QAUTHZ_LIST_FORMAT_GLOB) {
-> +        error_setg(errp, "Glob format not supported on this platform");
-> +        return -1;
-> +    }
-> +#endif
-> +
-> +    rule = g_new0(QAuthZListRule, 1);
-> +    rule->policy = policy;
-> +    rule->match = g_strdup(match);
-> +    rule->format = format;
-> +    rule->has_format = true;
-> +
-> +    tmp = g_new0(QAuthZListRuleList, 1);
-> +    tmp->value = rule;
-> +
-> +    rules = auth->rules;
-> +    if (rules) {
-> +        while (rules->next) {
-> +            i++;
-> +            rules = rules->next;
-> +        }
-> +        rules->next = tmp;
-> +        return i + 1;
-> +    } else {
-> +        auth->rules = tmp;
-> +        return 0;
-> +    }
+OK.
 
-Can we manage the rules with the QSLIST macros?
+>> To get around these differences, this patch introduces functions to
+>> convert an object to a string that looks the same regardless of the
+>> Python version: In Python 2, they decode unicode strings to byte strin=
+gs
+>> (normal str); in Python 3, they encode byte strings to unicode strings=
 
-> +}
-> +
-> +
-> +ssize_t qauthz_list_insert_rule(QAuthZList *auth,
-> +                                const char *match,
-> +                                QAuthZListPolicy policy,
-> +                                QAuthZListFormat format,
-> +                                size_t index,
-> +                                Error **errp)
-> +{
-> +    QAuthZListRule *rule;
-> +    QAuthZListRuleList *rules, *tmp;
-> +    size_t i = 0;
-> +
-> +#ifndef CONFIG_FNMATCH
-> +    if (format == QAUTHZ_LIST_FORMAT_GLOB) {
-> +        error_setg(errp, "Glob format not supported on this platform");
-> +        return -1;
-> +    }
-> +#endif
-> +
-> +    rule = g_new0(QAuthZListRule, 1);
-> +    rule->policy = policy;
-> +    rule->match = g_strdup(match);
-> +    rule->format = format;
-> +    rule->has_format = true;
-> +
-> +    tmp = g_new0(QAuthZListRuleList, 1);
-> +    tmp->value = rule;
-> +
-> +    rules = auth->rules;
-> +    if (rules && index > 0) {
-> +        while (rules->next && i < (index - 1)) {
-> +            i++;
-> +            rules = rules->next;
-> +        }
-> +        tmp->next = rules->next;
-> +        rules->next = tmp;
-> +        return i + 1;
-> +    } else {
-> +        tmp->next = auth->rules;
-> +        auth->rules = tmp;
-> +        return 0;
-> +    }
-> +}
-> +
-> +
-> +ssize_t qauthz_list_delete_rule(QAuthZList *auth, const char *match)
-> +{
-> +    QAuthZListRule *rule;
-> +    QAuthZListRuleList *rules, *prev;
-> +    size_t i = 0;
-> +
-> +    prev = NULL;
-> +    rules = auth->rules;
-> +    while (rules) {
-> +        rule = rules->value;
-> +        if (g_str_equal(rule->match, match)) {
-> +            if (prev) {
-> +                prev->next = rules->next;
-> +            } else {
-> +                auth->rules = rules->next;
-> +            }
-> +            rules->next = NULL;
-> +            qapi_free_QAuthZListRuleList(rules);
-> +            return i;
-> +        }
-> +        prev = rules;
-> +        rules = rules->next;
-> +        i++;
-> +    }
-> +
-> +    return -1;
-> +}
-> +
-> +
-> +static const TypeInfo qauthz_list_info = {
-> +    .parent = TYPE_QAUTHZ,
-> +    .name = TYPE_QAUTHZ_LIST,
-> +    .instance_size = sizeof(QAuthZList),
-> +    .instance_finalize = qauthz_list_finalize,
-> +    .class_size = sizeof(QAuthZListClass),
-> +    .class_init = qauthz_list_class_init,
-> +    .interfaces = (InterfaceInfo[]) {
-> +        { TYPE_USER_CREATABLE },
-> +        { }
-> +    }
-> +};
-> +
-> +
-> +static void
-> +qauthz_list_register_types(void)
-> +{
-> +    type_register_static(&qauthz_list_info);
-> +}
-> +
-> +
-> +type_init(qauthz_list_register_types);
-> diff --git a/authz/trace-events b/authz/trace-events
-> index 1ef796c1e1..a896d876e8 100644
-> --- a/authz/trace-events
-> +++ b/authz/trace-events
-> @@ -5,3 +5,7 @@ qauthz_is_allowed(void *authz, const char *identity, bool allowed) "AuthZ %p che
->  
->  # auth/simple.c
->  qauthz_simple_is_allowed(void *authz, const char *wantidentity, const char *gotidentity) "AuthZ simple %p check want identity=%s got identity=%s"
-> +
-> +# auth/list.c
-> +qauthz_list_check_rule(void *authz, const char *identity, const char *rule, int format, int policy) "AuthZ list %p check rule=%s identity=%s format=%d policy=%d"
-> +qauthz_list_default_policy(void *authz, const char *identity, int policy) "AuthZ list %p default identity=%s policy=%d"
-> diff --git a/include/authz/list.h b/include/authz/list.h
-> new file mode 100644
-> index 0000000000..eb131ba0f0
-> --- /dev/null
-> +++ b/include/authz/list.h
-> @@ -0,0 +1,106 @@
-> +/*
-> + * QEMU list authorization driver
-> + *
-> + * Copyright (c) 2018 Red Hat, Inc.
-> + *
-> + * This library is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU Lesser General Public
-> + * License as published by the Free Software Foundation; either
-> + * version 2 of the License, or (at your option) any later version.
-> + *
-> + * This library is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + * Lesser General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU Lesser General Public
-> + * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-> + *
-> + */
-> +
-> +#ifndef QAUTHZ_LIST_H__
-> +#define QAUTHZ_LIST_H__
-> +
-> +#include "authz/base.h"
-> +#include "qapi/qapi-types-authz.h"
-> +
-> +#define TYPE_QAUTHZ_LIST "authz-list"
-> +
-> +#define QAUTHZ_LIST_CLASS(klass)                        \
-> +    OBJECT_CLASS_CHECK(QAuthZListClass, (klass),        \
-> +                       TYPE_QAUTHZ_LIST)
-> +#define QAUTHZ_LIST_GET_CLASS(obj)              \
-> +    OBJECT_GET_CLASS(QAuthZListClass, (obj),    \
-> +                      TYPE_QAUTHZ_LIST)
-> +#define QAUTHZ_LIST(obj) \
-> +    INTERFACE_CHECK(QAuthZList, (obj),          \
-> +                    TYPE_QAUTHZ_LIST)
-> +
-> +typedef struct QAuthZList QAuthZList;
-> +typedef struct QAuthZListClass QAuthZListClass;
-> +
-> +
-> +/**
-> + * QAuthZList:
-> + *
-> + * This authorization driver provides a list mechanism
-> + * for granting access by matching user names against a
-> + * list of globs. Each match rule has an associated policy
-> + * and a catch all policy applies if no rule matches
-> + *
-> + * To create an instance of this class via QMP:
-> + *
-> + *  {
-> + *    "execute": "object-add",
-> + *    "arguments": {
-> + *      "qom-type": "authz-list",
-> + *      "id": "authz0",
-> + *      "parameters": {
-> + *        "rules": [
-> + *           { "match": "fred", "policy": "allow", "format": "exact" },
-> + *           { "match": "bob", "policy": "allow", "format": "exact" },
-> + *           { "match": "danb", "policy": "deny", "format": "exact" },
-> + *           { "match": "dan*", "policy": "allow", "format": "glob" }
-> + *        ],
-> + *        "policy": "deny"
-> + *      }
-> + *    }
-> + *  }
-> + *
-> + */
-> +struct QAuthZList {
-> +    QAuthZ parent_obj;
-> +
-> +    QAuthZListPolicy policy;
-> +    QAuthZListRuleList *rules;
-> +};
-> +
-> +
-> +struct QAuthZListClass {
-> +    QAuthZClass parent_class;
-> +};
-> +
-> +
-> +QAuthZList *qauthz_list_new(const char *id,
-> +                            QAuthZListPolicy policy,
-> +                            Error **errp);
-> +
-> +ssize_t qauthz_list_append_rule(QAuthZList *auth,
-> +                                const char *match,
-> +                                QAuthZListPolicy policy,
-> +                                QAuthZListFormat format,
-> +                                Error **errp);
-> +
-> +ssize_t qauthz_list_insert_rule(QAuthZList *auth,
-> +                                const char *match,
-> +                                QAuthZListPolicy policy,
-> +                                QAuthZListFormat format,
-> +                                size_t index,
-> +                                Error **errp);
-> +
-> +ssize_t qauthz_list_delete_rule(QAuthZList *auth,
-> +                                const char *match);
-> +
-> +
-> +#endif /* QAUTHZ_LIST_H__ */
-> +
-> diff --git a/qapi/authz.json b/qapi/authz.json
-> new file mode 100644
-> index 0000000000..607839c627
-> --- /dev/null
-> +++ b/qapi/authz.json
-> @@ -0,0 +1,58 @@
-> +# -*- Mode: Python -*-
-> +#
-> +# QAPI authz definitions
-> +
-> +##
-> +# @QAuthZListPolicy:
-> +#
-> +# The authorization policy result
-> +#
-> +# @deny: deny access
-> +# @allow: allow access
-> +#
-> +# Since: 3.0
-> +##
-> +{ 'enum': 'QAuthZListPolicy',
-> +  'prefix': 'QAUTHZ_LIST_POLICY',
-> +  'data': ['deny', 'allow']}
-> +
-> +##
-> +# @QAuthZListFormat:
-> +#
-> +# The authorization policy result
-> +#
-> +# @exact: an exact string match
-> +# @glob: string with ? and * shell wildcard support
-> +#
-> +# Since: 3.0
-> +##
-> +{ 'enum': 'QAuthZListFormat',
-> +  'prefix': 'QAUTHZ_LIST_FORMAT',
-> +  'data': ['exact', 'glob']}
-> +
-> +##
-> +# @QAuthZListRule:
-> +#
-> +# A single authorization rule.
-> +#
-> +# @match: a glob to match against a user identity
-> +# @policy: the result to return if @match evaluates to true
-> +# @format: (optional) the format of the @match rule (default 'exact')
-> +#
-> +# Since: 3.0
-> +##
-> +{ 'struct': 'QAuthZListRule',
-> +  'data': {'match': 'str',
-> +           'policy': 'QAuthZListPolicy',
-> +           '*format': 'QAuthZListFormat'}}
-> +
-> +##
-> +# @QAuthZListRuleListHack:
-> +#
-> +# Not exposed via QMP; hack to generate QAuthZListRuleList
-> +# for use internally by the code.
-> +#
-> +# Since: 3.0
-> +##
-> +{ 'struct': 'QAuthZListRuleListHack',
-> +  'data': { 'unused': ['QAuthZListRule'] } }
-> diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
-> index 65b6dc2f6f..6a5a02a388 100644
-> --- a/qapi/qapi-schema.json
-> +++ b/qapi/qapi-schema.json
-> @@ -89,6 +89,7 @@
->  { 'include': 'rocker.json' }
->  { 'include': 'tpm.json' }
->  { 'include': 'ui.json' }
-> +{ 'include': 'authz.json' }
->  { 'include': 'migration.json' }
->  { 'include': 'transaction.json' }
->  { 'include': 'trace.json' }
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 7a3059bf6c..4bd67cd53f 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -175,6 +175,7 @@ check-unit-y += tests/ptimer-test$(EXESUF)
->  gcov-files-ptimer-test-y = hw/core/ptimer.c
->  check-unit-y += tests/test-qapi-util$(EXESUF)
->  gcov-files-test-qapi-util-y = qapi/qapi-util.c
-> +check-unit-y += tests/test-authz-list$(EXESUF)
->  
->  check-block-$(CONFIG_POSIX) += tests/qemu-iotests-quick.sh
->  
-> @@ -688,6 +689,9 @@ tests/test-timed-average$(EXESUF): tests/test-timed-average.o $(test-util-obj-y)
->  tests/test-base64$(EXESUF): tests/test-base64.o $(test-util-obj-y)
->  tests/ptimer-test$(EXESUF): tests/ptimer-test.o tests/ptimer-test-stubs.o hw/core/ptimer.o
->  
-> +tests/test-authz-list$(EXESUF): tests/test-authz-list.o \
-> +	$(test-util-obj-y) $(authz-obj-y) $(qom-obj-y)
-> +
->  tests/test-logging$(EXESUF): tests/test-logging.o $(test-util-obj-y)
->  
->  tests/test-replication$(EXESUF): tests/test-replication.o $(test-util-obj-y) \
-> diff --git a/tests/test-authz-list.c b/tests/test-authz-list.c
-> new file mode 100644
-> index 0000000000..02ce4c5763
-> --- /dev/null
-> +++ b/tests/test-authz-list.c
-> @@ -0,0 +1,171 @@
-> +/*
-> + * QEMU list authorization object
-> + *
-> + * Copyright (c) 2018 Red Hat, Inc.
-> + *
-> + * This library is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU Lesser General Public
-> + * License as published by the Free Software Foundation; either
-> + * version 2 of the License, or (at your option) any later version.
-> + *
-> + * This library is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + * Lesser General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU Lesser General Public
-> + * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-> + *
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +
-> +#include "authz/list.h"
-> +
-> +static void test_authz_default_deny(void)
-> +{
-> +    QAuthZList *auth = qauthz_list_new("auth0",
-> +                                       QAUTHZ_LIST_POLICY_DENY,
-> +                                       &error_abort);
-> +
-> +    g_assert(!qauthz_is_allowed(QAUTHZ(auth), "fred", &error_abort));
-> +
-> +    object_unparent(OBJECT(auth));
-> +}
-> +
-> +static void test_authz_default_allow(void)
-> +{
-> +    QAuthZList *auth = qauthz_list_new("auth0",
-> +                                       QAUTHZ_LIST_POLICY_ALLOW,
-> +                                       &error_abort);
-> +
-> +    g_assert(qauthz_is_allowed(QAUTHZ(auth), "fred", &error_abort));
-> +
-> +    object_unparent(OBJECT(auth));
-> +}
-> +
-> +static void test_authz_explicit_deny(void)
-> +{
-> +    QAuthZList *auth = qauthz_list_new("auth0",
-> +                                       QAUTHZ_LIST_POLICY_ALLOW,
-> +                                       &error_abort);
-> +
-> +    qauthz_list_append_rule(auth, "fred", QAUTHZ_LIST_POLICY_DENY,
-> +                            QAUTHZ_LIST_FORMAT_EXACT, &error_abort);
-> +
-> +    g_assert(!qauthz_is_allowed(QAUTHZ(auth), "fred", &error_abort));
-> +
-> +    object_unparent(OBJECT(auth));
-> +}
-> +
-> +static void test_authz_explicit_allow(void)
-> +{
-> +    QAuthZList *auth = qauthz_list_new("auth0",
-> +                                       QAUTHZ_LIST_POLICY_DENY,
-> +                                       &error_abort);
-> +
-> +    qauthz_list_append_rule(auth, "fred", QAUTHZ_LIST_POLICY_ALLOW,
-> +                            QAUTHZ_LIST_FORMAT_EXACT, &error_abort);
-> +
-> +    g_assert(qauthz_is_allowed(QAUTHZ(auth), "fred", &error_abort));
-> +
-> +    object_unparent(OBJECT(auth));
-> +}
-> +
-> +
-> +static void test_authz_complex(void)
-> +{
-> +#ifndef CONFIG_FNMATCH
-> +    Error *local_err = NULL;
-> +#endif
-> +    QAuthZList *auth = qauthz_list_new("auth0",
-> +                                       QAUTHZ_LIST_POLICY_DENY,
-> +                                       &error_abort);
-> +
-> +    qauthz_list_append_rule(auth, "fred", QAUTHZ_LIST_POLICY_ALLOW,
-> +                            QAUTHZ_LIST_FORMAT_EXACT, &error_abort);
-> +    qauthz_list_append_rule(auth, "bob", QAUTHZ_LIST_POLICY_ALLOW,
-> +                            QAUTHZ_LIST_FORMAT_EXACT, &error_abort);
-> +    qauthz_list_append_rule(auth, "dan", QAUTHZ_LIST_POLICY_DENY,
-> +                            QAUTHZ_LIST_FORMAT_EXACT, &error_abort);
-> +#ifdef CONFIG_FNMATCH
-> +    qauthz_list_append_rule(auth, "dan*", QAUTHZ_LIST_POLICY_ALLOW,
-> +                            QAUTHZ_LIST_FORMAT_GLOB, &error_abort);
-> +
-> +    g_assert(qauthz_is_allowed(QAUTHZ(auth), "fred", &error_abort));
-> +    g_assert(qauthz_is_allowed(QAUTHZ(auth), "bob", &error_abort));
-> +    g_assert(!qauthz_is_allowed(QAUTHZ(auth), "dan", &error_abort));
-> +    g_assert(qauthz_is_allowed(QAUTHZ(auth), "danb", &error_abort));
-> +#else
-> +    g_assert(qauthz_list_append_rule(auth, "dan*",
-> +                                     QAUTHZ_LIST_POLICY_ALLOW,
-> +                                     QAUTHZ_LIST_FORMAT_GLOB,
-> +                                     &local_err) < 0);
-> +    g_assert(local_err != NULL);
-> +    error_free(local_err);
-> +#endif
-> +
-> +    object_unparent(OBJECT(auth));
-> +}
-> +
-> +static void test_authz_add_remove(void)
-> +{
-> +    QAuthZList *auth = qauthz_list_new("auth0",
-> +                                       QAUTHZ_LIST_POLICY_ALLOW,
-> +                                       &error_abort);
-> +
-> +    g_assert_cmpint(qauthz_list_append_rule(auth, "fred",
-> +                                            QAUTHZ_LIST_POLICY_ALLOW,
-> +                                            QAUTHZ_LIST_FORMAT_EXACT,
-> +                                            &error_abort),
-> +                    ==, 0);
-> +    g_assert_cmpint(qauthz_list_append_rule(auth, "bob",
-> +                                            QAUTHZ_LIST_POLICY_ALLOW,
-> +                                            QAUTHZ_LIST_FORMAT_EXACT,
-> +                                            &error_abort),
-> +                    ==, 1);
-> +    g_assert_cmpint(qauthz_list_append_rule(auth, "dan",
-> +                                            QAUTHZ_LIST_POLICY_DENY,
-> +                                            QAUTHZ_LIST_FORMAT_EXACT,
-> +                                            &error_abort),
-> +                    ==, 2);
-> +    g_assert_cmpint(qauthz_list_append_rule(auth, "frank",
-> +                                            QAUTHZ_LIST_POLICY_DENY,
-> +                                            QAUTHZ_LIST_FORMAT_EXACT,
-> +                                            &error_abort),
-> +                    ==, 3);
-> +
-> +    g_assert(!qauthz_is_allowed(QAUTHZ(auth), "dan", &error_abort));
-> +
-> +    g_assert_cmpint(qauthz_list_delete_rule(auth, "dan"),
-> +                    ==, 2);
-> +
-> +    g_assert(qauthz_is_allowed(QAUTHZ(auth), "dan", &error_abort));
-> +
-> +    g_assert_cmpint(qauthz_list_insert_rule(auth, "dan",
-> +                                            QAUTHZ_LIST_POLICY_DENY,
-> +                                            QAUTHZ_LIST_FORMAT_EXACT,
-> +                                            2,
-> +                                            &error_abort),
-> +                    ==, 2);
-> +
-> +    g_assert(!qauthz_is_allowed(QAUTHZ(auth), "dan", &error_abort));
-> +
-> +    object_unparent(OBJECT(auth));
-> +}
-> +
-> +int main(int argc, char **argv)
-> +{
-> +    g_test_init(&argc, &argv, NULL);
-> +
-> +    module_call_init(MODULE_INIT_QOM);
-> +
-> +    g_test_add_func("/auth/list/default/deny", test_authz_default_deny);
-> +    g_test_add_func("/auth/list/default/allow", test_authz_default_allow);
-> +    g_test_add_func("/auth/list/explicit/deny", test_authz_explicit_deny);
-> +    g_test_add_func("/auth/list/explicit/allow", test_authz_explicit_allow);
-> +    g_test_add_func("/auth/list/complex", test_authz_complex);
-> +    g_test_add_func("/auth/list/add-remove", test_authz_add_remove);
-> +
-> +    return g_test_run();
-> +}
-> 
+>> (normal str).  They also manually convert lists and dicts to strings,
+>> which allows sorting the dicts by key, so we are no longer at the merc=
+y
+>> of the internal implementation when it comes to how the keys appear in=
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> the output.
+>>
+>> This changes the output of all tests that use these logging functions.=
+
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>>  tests/qemu-iotests/194.out    |  22 +-
+>>  tests/qemu-iotests/202.out    |  12 +-
+>>  tests/qemu-iotests/203.out    |  14 +-
+>>  tests/qemu-iotests/206.out    | 144 +++++-----
+>>  tests/qemu-iotests/207.out    |  52 ++--
+>>  tests/qemu-iotests/208.out    |   8 +-
+>>  tests/qemu-iotests/210.out    |  72 ++---
+>>  tests/qemu-iotests/211.out    |  66 ++---
+>>  tests/qemu-iotests/212.out    | 102 +++----
+>>  tests/qemu-iotests/213.out    | 124 ++++----
+>>  tests/qemu-iotests/216.out    |   4 +-
+>>  tests/qemu-iotests/218.out    |  20 +-
+>>  tests/qemu-iotests/219.out    | 526 +++++++++++++++++----------------=
+-
+>>  tests/qemu-iotests/222.out    |  24 +-
+>>  tests/qemu-iotests/iotests.py |  42 ++-
+>>  15 files changed, 634 insertions(+), 598 deletions(-)
+> [...]
+>> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotest=
+s.py
+>> index a64ea90fb4..f8dbc8cc71 100644
+>> --- a/tests/qemu-iotests/iotests.py
+>> +++ b/tests/qemu-iotests/iotests.py
+>> @@ -250,10 +250,45 @@ def filter_img_info(output, filename):
+>>          lines.append(line)
+>>      return '\n'.join(lines)
+>> =20
+>> +def log_to_string_repr(obj):
+>> +    # Normal Python 3 strings are the unicode strings from Python 2;
+>> +    # and normal Python 2 strings are byte strings in Python 3.  Thus=
+,
+>> +    # we convert bytes -> str in py3 and unicode -> str in py2.
+>> +    if sys.version_info.major >=3D 3:
+>> +        if type(obj) is bytes:
+>> +            return repr(obj.decode('utf-8'))
+>> +    else:
+>> +        if type(obj) is unicode:
+>> +            return repr(obj.encode('utf-8'))
+>> +        elif type(obj) is long:
+>> +            return str(obj) # repr() would include an 'L' suffix
+>> +
+>> +    if type(obj) is list:
+>> +        return '[' + ', '.join(map(log_to_string_repr, obj)) + ']'
+>> +    elif type(obj) is dict:
+>> +        return '{' + ', '.join(map(lambda k: log_to_string_repr(k) + =
+': ' +
+>> +                                             log_to_string_repr(obj[k=
+]),
+>> +                                   sorted(obj.keys()))) + '}'
+>> +    else:
+>> +        return repr(obj)
+>=20
+> I assume this function exists only because of QMP logging,
+> correct?
+
+In practice probably yes.
+
+> I would just use json.dumps() at qmp_log(), see below[1].
+
+However, there is not just qmp_log(), there are places that dump objects
+directly into log().
+
+>> +
+>> +def log_to_string(obj):
+>> +    if type(obj) is str:
+>> +        return obj
+>> +
+>> +    if sys.version_info.major >=3D 3:
+>> +        if type(obj) is bytes:
+>> +            return obj.decode('utf-8')
+>=20
+> Do you know how many of existing log() calls actually pass a byte
+> string as argument?
+
+Frankly I hope none.
+
+>> +    else:
+>> +        if type(obj) is unicode:
+>> +            return obj.encode('utf-8')
+>=20
+> Is this really necessary?  The existing code just calls
+> print(msg) and it works, doesn't it?
+
+True.  But the main issue is that we still need to return immediately
+for byte strings and Unicode strings, but the type "bytes" only exists
+in 3.x and "unicode" only exists in 2.x, i.e. "if type(obj) is unicode"
+throws an exception in 3.x.
+
+So I have to distinguish between 2.x and 3.x anyway, and I thought to
+myself that if I distinguished anyway, I might do the conversion to the
+native type at the same time.
+
+>> +
+>> +    return log_to_string_repr(obj)
+>> +
+>>  def log(msg, filters=3D[]):
+>>      for flt in filters:
+>>          msg =3D flt(msg)
+>> -    print(msg)
+>> +    print(log_to_string(msg))
+>> =20
+>>  class Timeout:
+>>      def __init__(self, seconds, errmsg =3D "Timeout"):
+>> @@ -441,10 +476,11 @@ class VM(qtest.QEMUQtestMachine):
+>>          return result
+>> =20
+>>      def qmp_log(self, cmd, filters=3D[filter_testfiles], **kwargs):
+>> -        logmsg =3D "{'execute': '%s', 'arguments': %s}" % (cmd, kwarg=
+s)
+>> +        logmsg =3D "{'execute': '%s', 'arguments': %s}" % \
+>> +            (cmd, log_to_string(kwargs))
+>>          log(logmsg, filters)
+>>          result =3D self.qmp(cmd, **kwargs)
+>> -        log(str(result), filters)
+>> +        log(log_to_string(result), filters)
+>=20
+> [1]
+>=20
+> If we're being forced to regenerate all the QMP output in the
+> .out files, what about always using JSON instead of the hack at
+> log_to_string_repr()?  i.e.:
+>=20
+> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests=
+=2Epy
+> index a64ea90fb4..0b28dc2a65 100644
+> --- a/tests/qemu-iotests/iotests.py
+> +++ b/tests/qemu-iotests/iotests.py
+> @@ -441,10 +441,12 @@ class VM(qtest.QEMUQtestMachine):
+>          return result
+> =20
+>      def qmp_log(self, cmd, filters=3D[filter_testfiles], **kwargs):
+> -        logmsg =3D "{'execute': '%s', 'arguments': %s}" % (cmd, kwargs=
+)
+> +        logmsg =3D '{"execute": %s, "arguments": %s}' % \
+> +                 (json.dumps(cmd, sort_keys=3DTrue),
+> +                  json.dumps(kwargs, sort_keys=3DTrue))
+>          log(logmsg, filters)
+>          result =3D self.qmp(cmd, **kwargs)
+> -        log(str(result), filters)
+> +        log(json.dumps(result, sort_keys=3DTrue), filters)
+>          return result
+
+Sure, sounds good, thanks. :-)
+
+The only thing is I would allow log() to still accept objects, it should
+do the conversion to JSON itself (if the object to be logged is a list
+or dict).
+
+Max
+
+>      def run_job(self, job, auto_finalize=3DTrue, auto_dismiss=3DFalse)=
+:
+>=20
+>>          return result
+>> =20
+>>      def run_job(self, job, auto_finalize=3DTrue, auto_dismiss=3DFalse=
+):
+>> --=20
+>> 2.17.1
+>>
+>>
+>=20
+
+
+
+--EX8eFGJrSEKJTkBLld754v2L58Wwy0Txz
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlvJpQIACgkQ9AfbAGHV
+z0D6BAf/V5bJi8ztEmD9GfsEztVO2y3shV/+ShYqvBmiASrVWv+jHP09HmZ8Lvkz
+xK2IoTbTcevjbPfLR/0pF7Ti2E/KW5CKOiDX3Yi0vQmBnmkyY1SIYn8lw34uVhTK
+P705Q+kDUYl/247SjIH4yfSmsHXQ+ggIGX51hAU2CIg8//nfy98nJ7GwDm/bEWuA
+gXRLLHPjPtJptIBHwnT5FgRBiQBHU0l7BMNQynJOF7ZxjiopWkzgzeR21fx3gXMP
+vdEWnF7axnX/J0wly0DiVtalC+aufFb5XJ15unfMlqOSOVm+CK3gpYW6ivfJ+/gp
+dX++eBUGPgbbe1RVvHX/qvcfBo16ow==
+=zNa7
+-----END PGP SIGNATURE-----
+
+--EX8eFGJrSEKJTkBLld754v2L58Wwy0Txz--
