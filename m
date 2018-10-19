@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38789)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39004)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gDTrP-0004rE-RE
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:26:42 -0400
+	(envelope-from <berto@igalia.com>) id 1gDTrW-0004uo-1F
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:26:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gDTrA-00004z-CG
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:26:26 -0400
+	(envelope-from <berto@igalia.com>) id 1gDTrQ-0000TG-2E
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:26:41 -0400
 From: Alberto Garcia <berto@igalia.com>
-Date: Fri, 19 Oct 2018 15:24:43 +0300
-Message-Id: <957510b568a46b46dba275643cda8321f6d6e8fe.1539950487.git.berto@igalia.com>
+Date: Fri, 19 Oct 2018 15:24:40 +0300
+Message-Id: <f515e64f26a28d23254d325f50c3ce61279abff1.1539950487.git.berto@igalia.com>
 In-Reply-To: <cover.1539950487.git.berto@igalia.com>
 References: <cover.1539950487.git.berto@igalia.com>
 In-Reply-To: <cover.1539950487.git.berto@igalia.com>
 References: <cover.1539950487.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v3 12/15] block: Remove flags parameter from
- bdrv_reopen_queue()
+Subject: [Qemu-devel] [PATCH v3 09/15] block: Drop bdrv_reopen()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,94 +24,58 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Now that all callers are passing all flag changes as QDict options,
-the flags parameter is no longer necessary, so we can get rid of it.
+No one is using this function anymore, so we can safely remove it.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block.c               | 5 +++--
- block/replication.c   | 6 ++----
- include/block/block.h | 3 +--
- qemu-io-cmds.c        | 2 +-
- 4 files changed, 7 insertions(+), 9 deletions(-)
+ block.c               | 21 ---------------------
+ include/block/block.h |  1 -
+ 2 files changed, 22 deletions(-)
 
 diff --git a/block.c b/block.c
-index edb880a66b..c142773358 100644
+index 744509f683..edb880a66b 100644
 --- a/block.c
 +++ b/block.c
-@@ -3005,8 +3005,9 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
- 
- BlockReopenQueue *bdrv_reopen_queue(BlockReopenQueue *bs_queue,
-                                     BlockDriverState *bs,
--                                    QDict *options, int flags)
-+                                    QDict *options)
- {
-+    int flags = bdrv_get_flags(bs);
-     return bdrv_reopen_queue_child(bs_queue, bs, options, flags,
-                                    NULL, NULL, 0);
+@@ -3070,27 +3070,6 @@ cleanup:
+     return ret;
  }
-@@ -3080,7 +3081,7 @@ int bdrv_reopen_set_read_only(BlockDriverState *bs, bool read_only,
-     qdict_put_bool(opts, BDRV_OPT_READ_ONLY, read_only);
  
-     bdrv_subtree_drained_begin(bs);
--    queue = bdrv_reopen_queue(NULL, bs, opts, bdrv_get_flags(bs));
-+    queue = bdrv_reopen_queue(NULL, bs, opts);
-     ret = bdrv_reopen_multiple(bdrv_get_aio_context(bs), queue, errp);
-     bdrv_subtree_drained_end(bs);
- 
-diff --git a/block/replication.c b/block/replication.c
-index 481a225924..fdbfe47fa4 100644
---- a/block/replication.c
-+++ b/block/replication.c
-@@ -393,19 +393,17 @@ static void reopen_backing_file(BlockDriverState *bs, bool writable,
-     bdrv_subtree_drained_begin(s->secondary_disk->bs);
- 
-     if (s->orig_hidden_read_only) {
--        int flags = bdrv_get_flags(s->hidden_disk->bs);
-         QDict *opts = qdict_new();
-         qdict_put_bool(opts, BDRV_OPT_READ_ONLY, !writable);
-         reopen_queue = bdrv_reopen_queue(reopen_queue, s->hidden_disk->bs,
--                                         opts, flags);
-+                                         opts);
-     }
- 
-     if (s->orig_secondary_read_only) {
--        int flags = bdrv_get_flags(s->secondary_disk->bs);
-         QDict *opts = qdict_new();
-         qdict_put_bool(opts, BDRV_OPT_READ_ONLY, !writable);
-         reopen_queue = bdrv_reopen_queue(reopen_queue, s->secondary_disk->bs,
--                                         opts, flags);
-+                                         opts);
-     }
- 
-     if (reopen_queue) {
+-
+-/* Reopen a single BlockDriverState with the specified flags. */
+-int bdrv_reopen(BlockDriverState *bs, int bdrv_flags, Error **errp)
+-{
+-    int ret = -1;
+-    Error *local_err = NULL;
+-    BlockReopenQueue *queue;
+-
+-    bdrv_subtree_drained_begin(bs);
+-
+-    queue = bdrv_reopen_queue(NULL, bs, NULL, bdrv_flags);
+-    ret = bdrv_reopen_multiple(bdrv_get_aio_context(bs), queue, &local_err);
+-    if (local_err != NULL) {
+-        error_propagate(errp, local_err);
+-    }
+-
+-    bdrv_subtree_drained_end(bs);
+-
+-    return ret;
+-}
+-
+ int bdrv_reopen_set_read_only(BlockDriverState *bs, bool read_only,
+                               Error **errp)
+ {
 diff --git a/include/block/block.h b/include/block/block.h
-index 3649136689..38d5c1adf4 100644
+index 97317fdfb6..3649136689 100644
 --- a/include/block/block.h
 +++ b/include/block/block.h
-@@ -297,8 +297,7 @@ BlockDriverState *bdrv_open(const char *filename, const char *reference,
- BlockDriverState *bdrv_new_open_driver(BlockDriver *drv, const char *node_name,
-                                        int flags, Error **errp);
- BlockReopenQueue *bdrv_reopen_queue(BlockReopenQueue *bs_queue,
--                                    BlockDriverState *bs,
--                                    QDict *options, int flags);
-+                                    BlockDriverState *bs, QDict *options);
+@@ -300,7 +300,6 @@ BlockReopenQueue *bdrv_reopen_queue(BlockReopenQueue *bs_queue,
+                                     BlockDriverState *bs,
+                                     QDict *options, int flags);
  int bdrv_reopen_multiple(AioContext *ctx, BlockReopenQueue *bs_queue, Error **errp);
+-int bdrv_reopen(BlockDriverState *bs, int bdrv_flags, Error **errp);
  int bdrv_reopen_set_read_only(BlockDriverState *bs, bool read_only,
                                Error **errp);
-diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-index b49a816cc8..e272e5c80b 100644
---- a/qemu-io-cmds.c
-+++ b/qemu-io-cmds.c
-@@ -2075,7 +2075,7 @@ static int reopen_f(BlockBackend *blk, int argc, char **argv)
-     }
- 
-     bdrv_subtree_drained_begin(bs);
--    brq = bdrv_reopen_queue(NULL, bs, opts, flags);
-+    brq = bdrv_reopen_queue(NULL, bs, opts);
-     bdrv_reopen_multiple(bdrv_get_aio_context(bs), brq, &local_err);
-     bdrv_subtree_drained_end(bs);
- 
+ int bdrv_reopen_prepare(BDRVReopenState *reopen_state,
 -- 
 2.11.0
