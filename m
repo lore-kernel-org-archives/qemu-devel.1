@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33369)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38872)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gDNke-0001TU-AM
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 01:55:13 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1gDNw8-0003xQ-BF
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 02:07:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gDNka-0008Jz-Rl
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 01:55:12 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:32904)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gDNka-0007ow-CC
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 01:55:08 -0400
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <cover.1539860473.git.artem.k.pisarenko@gmail.com>
-	<3a396555c19468ce89788cc6deabbfef4ab56035.1539860473.git.artem.k.pisarenko@gmail.com>
-In-Reply-To: <3a396555c19468ce89788cc6deabbfef4ab56035.1539860473.git.artem.k.pisarenko@gmail.com>
-Date: Fri, 19 Oct 2018 08:55:09 +0300
-Message-ID: <002201d46770$4affc060$e0ff4120$@ru>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [PATCH v3 4/4] Optimize record/replay
- checkpointing for all clocks it applies to
+	(envelope-from <richard.henderson@linaro.org>) id 1gDNw5-0001hP-MF
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 02:07:04 -0400
+Received: from mail-pl1-x62a.google.com ([2607:f8b0:4864:20::62a]:43018)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gDNw5-0001er-B8
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 02:07:01 -0400
+Received: by mail-pl1-x62a.google.com with SMTP id 30-v6so15380354plb.10
+	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 23:07:01 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Thu, 18 Oct 2018 23:06:36 -0700
+Message-Id: <20181019060656.7968-2-richard.henderson@linaro.org>
+In-Reply-To: <20181019060656.7968-1-richard.henderson@linaro.org>
+References: <20181019060656.7968-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PULL v2 01/21] tcg: Implement CPU_LOG_TB_NOCHAIN
+ during expansion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,140 +27,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Artem Pisarenko' <artem.k.pisarenko@gmail.com>, qemu-devel@nongnu.org
-Cc: 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, 'Paolo Bonzini' <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-> From: Artem Pisarenko [mailto:artem.k.pisarenko@gmail.com]
-> Removes redundant checkpoints in replay log when there are no expired timers in timers list,
-> associated with corresponding clock (i.e. no rr events associated with current clock value).
-> This also improves performance in rr mode.
-> 
-> Signed-off-by: Artem Pisarenko <artem.k.pisarenko@gmail.com>
-> ---
-> 
-> Notes:
->     v3:
->     - fixed compiler warning caused non-debug build to fail
-> 
->  include/qemu/timer.h |  2 +-
->  util/qemu-timer.c    | 62 +++++++++++++++++++++++++---------------------------
->  2 files changed, 31 insertions(+), 33 deletions(-)
-> 
-> diff --git a/include/qemu/timer.h b/include/qemu/timer.h
-> index dc0fd14..bff8dac 100644
-> --- a/include/qemu/timer.h
-> +++ b/include/qemu/timer.h
-> @@ -65,7 +65,7 @@ typedef enum {
->   * QEMU_TIMER_ATTR_EXTERNAL: drives external subsystem
->   *
->   * Timers with this attribute do not recorded in rr mode, therefore it could be
-> - * used for the subsystems that operate outside the guest core. Applicable only
-> + * used for the subsystems that operate outside the guest core. Relevant only
->   * with virtual clock type.
->   */
-> 
-> diff --git a/util/qemu-timer.c b/util/qemu-timer.c
-> index e2746cf..216d107 100644
-> --- a/util/qemu-timer.c
-> +++ b/util/qemu-timer.c
-> @@ -490,6 +490,7 @@ bool timerlist_run_timers(QEMUTimerList *timer_list)
->      QEMUTimerCB *cb;
->      void *opaque;
->      bool need_replay_checkpoint = false;
-> +    ReplayCheckpoint replay_checkpoint_id;
-> 
->      if (!atomic_read(&timer_list->active_timers)) {
->          return false;
-> @@ -500,43 +501,40 @@ bool timerlist_run_timers(QEMUTimerList *timer_list)
->          goto out;
->      }
-> 
-> -    switch (timer_list->clock->type) {
-> -    case QEMU_CLOCK_REALTIME:
-> -        break;
-> -    default:
-> -    case QEMU_CLOCK_VIRTUAL:
-> -        if (replay_mode != REPLAY_MODE_NONE) {
-> -            /* Checkpoint for virtual clock is redundant in cases where
-> -             * it's being triggered with only non-EXTERNAL timers, because
-> -             * these timers don't change guest state directly.
-> -             * Since it has conditional dependence on specific timers, it is
-> -             * subject to race conditions and requires special handling.
-> -             * See below.
-> -             */
-> +    if (replay_mode != REPLAY_MODE_NONE) {
-> +        /* Postpone actual checkpointing to timer list processing
-> +         * to properly check if we actually need it.
-> +         */
-> +        switch (timer_list->clock->type) {
-> +        case QEMU_CLOCK_VIRTUAL:
->              need_replay_checkpoint = true;
-> +            replay_checkpoint_id = CHECKPOINT_CLOCK_VIRTUAL;
-> +            break;
-> +        case QEMU_CLOCK_HOST:
-> +            need_replay_checkpoint = true;
-> +            replay_checkpoint_id = CHECKPOINT_CLOCK_HOST;
-> +            break;
+Rather than test NOCHAIN before linking, do not emit the
+goto_tb opcode at all.  We already do this for goto_ptr.
 
-This is wrong at least for QEMU_CLOCK_HOST.
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ accel/tcg/cpu-exec.c | 2 +-
+ tcg/tcg-op.c         | 9 ++++++++-
+ 2 files changed, 9 insertions(+), 2 deletions(-)
 
-> +        case QEMU_CLOCK_VIRTUAL_RT:
-> +            need_replay_checkpoint = true;
-> +            replay_checkpoint_id = CHECKPOINT_CLOCK_VIRTUAL_RT;
-> +            break;
-> +        default:
-> +            break;
->          }
-> -        break;
-> -    case QEMU_CLOCK_HOST:
-> -        if (!replay_checkpoint(CHECKPOINT_CLOCK_HOST)) {
-> -            goto out;
-> -        }
-> -        break;
-> -    case QEMU_CLOCK_VIRTUAL_RT:
-> -        if (!replay_checkpoint(CHECKPOINT_CLOCK_VIRTUAL_RT)) {
-> -            goto out;
-> -        }
-> -        break;
->      }
-> 
->      /*
-> -     * Extract expired timers from active timers list and and process them.
-> +     * Extract expired timers from active timers list and and process them,
-> +     * taking into account checkpointing required in rr mode.
->       *
-> -     * In rr mode we need "filtered" checkpointing for virtual clock.
-> -     * Checkpoint must be replayed before any non-EXTERNAL timer has been
-> -     * processed and only one time (virtual clock value stays same). But these
-> -     * timers may appear in the timers list while it being processed, so this
-> -     * must be checked until we finally decide that "no timers left - we are
-> -     * done".
-> +     * Checkpoint must be replayed before any timer has been processed
-> +     * and only one time. But new timers may appear in the timers list while
-> +     * it's being processed, so this must be checked until we finally decide
-> +     * that "no timers left - we are done" (to avoid skipping checkpoint due to
-> +     * possible races).
-> +     * Also checkpoint for virtual clock is redundant in cases where it's being
-> +     * triggered with only non-EXTERNAL timers, because these timers don't
-> +     * change guest state directly.
->       */
->      current_time = qemu_clock_get_ns(timer_list->clock->type);
-
-Reading the host clock here is not protected by the checkpoint.
-Therefore it may incur the inconsistency when replaying the execution.
-
->      qemu_mutex_lock(&timer_list->active_timers_lock);
-> @@ -552,7 +550,7 @@ bool timerlist_run_timers(QEMUTimerList *timer_list)
->              /* once we got here, checkpoint clock only once */
->              need_replay_checkpoint = false;
->              qemu_mutex_unlock(&timer_list->active_timers_lock);
-> -            if (!replay_checkpoint(CHECKPOINT_CLOCK_VIRTUAL)) {
-> +            if (!replay_checkpoint(replay_checkpoint_id)) {
->                  goto out;
->              }
->              qemu_mutex_lock(&timer_list->active_timers_lock);
-> --
-> 2.7.4
-
-
-Pavel Dovgalyuk
+diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+index 6bcb6d99bd..870027d435 100644
+--- a/accel/tcg/cpu-exec.c
++++ b/accel/tcg/cpu-exec.c
+@@ -416,7 +416,7 @@ static inline TranslationBlock *tb_find(CPUState *cpu,
+     }
+ #endif
+     /* See if we can patch the calling TB. */
+-    if (last_tb && !qemu_loglevel_mask(CPU_LOG_TB_NOCHAIN)) {
++    if (last_tb) {
+         tb_add_jump(last_tb, tb_exit, tb);
+     }
+     return tb;
+diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
+index daa416a143..7a8015c5a9 100644
+--- a/tcg/tcg-op.c
++++ b/tcg/tcg-op.c
+@@ -2586,6 +2586,10 @@ void tcg_gen_exit_tb(TranslationBlock *tb, unsigned idx)
+            seen this numbered exit before, via tcg_gen_goto_tb.  */
+         tcg_debug_assert(tcg_ctx->goto_tb_issue_mask & (1 << idx));
+ #endif
++        /* When not chaining, exit without indicating a link.  */
++        if (qemu_loglevel_mask(CPU_LOG_TB_NOCHAIN)) {
++            val = 0;
++        }
+     } else {
+         /* This is an exit via the exitreq label.  */
+         tcg_debug_assert(idx == TB_EXIT_REQUESTED);
+@@ -2603,7 +2607,10 @@ void tcg_gen_goto_tb(unsigned idx)
+     tcg_debug_assert((tcg_ctx->goto_tb_issue_mask & (1 << idx)) == 0);
+     tcg_ctx->goto_tb_issue_mask |= 1 << idx;
+ #endif
+-    tcg_gen_op1i(INDEX_op_goto_tb, idx);
++    /* When not chaining, we simply fall through to the "fallback" exit.  */
++    if (!qemu_loglevel_mask(CPU_LOG_TB_NOCHAIN)) {
++        tcg_gen_op1i(INDEX_op_goto_tb, idx);
++    }
+ }
+ 
+ void tcg_gen_lookup_and_goto_ptr(void)
+-- 
+2.17.2
