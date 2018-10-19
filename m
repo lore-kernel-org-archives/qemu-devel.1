@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47649)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gDY6J-0001oh-FJ
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:58:16 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1gDY6S-0001wg-Cg
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:58:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gDY6H-0002Yz-GY
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:58:15 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:51982)
+	(envelope-from <pm215@archaic.org.uk>) id 1gDY6Q-0002eV-TG
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:58:24 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:51980)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1gDY6F-0002Jh-Jg
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:58:13 -0400
+	id 1gDY6J-00020Y-Bh
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:58:17 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1gDY64-0006kT-4a
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 17:58:00 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1gDY6G-0006nl-F4
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 17:58:12 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 19 Oct 2018 17:57:12 +0100
-Message-Id: <20181019165735.22511-23-peter.maydell@linaro.org>
+Date: Fri, 19 Oct 2018 17:57:26 +0100
+Message-Id: <20181019165735.22511-37-peter.maydell@linaro.org>
 In-Reply-To: <20181019165735.22511-1-peter.maydell@linaro.org>
 References: <20181019165735.22511-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 22/45] target/arm: Hoist address increment for
- vector memory ops
+Subject: [Qemu-devel] [PULL 36/45] target/arm: Use gvec for NEON_3R_VML
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,90 +31,323 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Richard Henderson <rth@twiddle.net>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-This can reduce the number of opcodes required for certain
-complex forms of load-multiple (e.g. ld4.16b).
+Move mla_op and mls_op expanders from translate-a64.c.
 
-Signed-off-by: Richard Henderson <rth@twiddle.net>
-Message-id: 20181011205206.3552-2-richard.henderson@linaro.org
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20181011205206.3552-16-richard.henderson@linaro.org
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/translate-a64.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ target/arm/translate.h     |   2 +
+ target/arm/translate-a64.c | 106 -----------------------------
+ target/arm/translate.c     | 134 ++++++++++++++++++++++++++++++++-----
+ 3 files changed, 120 insertions(+), 122 deletions(-)
 
+diff --git a/target/arm/translate.h b/target/arm/translate.h
+index 7eb759d0414..1b4703dc6e7 100644
+--- a/target/arm/translate.h
++++ b/target/arm/translate.h
+@@ -196,6 +196,8 @@ static inline TCGv_i32 get_ahp_flag(void)
+ extern const GVecGen3 bsl_op;
+ extern const GVecGen3 bit_op;
+ extern const GVecGen3 bif_op;
++extern const GVecGen3 mla_op[4];
++extern const GVecGen3 mls_op[4];
+ extern const GVecGen2i ssra_op[4];
+ extern const GVecGen2i usra_op[4];
+ extern const GVecGen2i sri_op[4];
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 09c7c4af047..371909620bb 100644
+index c26168d72c8..fd4d8072da2 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -3012,7 +3012,7 @@ static void disas_ldst_multiple_struct(DisasContext *s, uint32_t insn)
-     bool is_store = !extract32(insn, 22, 1);
-     bool is_postidx = extract32(insn, 23, 1);
-     bool is_q = extract32(insn, 30, 1);
--    TCGv_i64 tcg_addr, tcg_rn;
-+    TCGv_i64 tcg_addr, tcg_rn, tcg_ebytes;
+@@ -10410,66 +10410,6 @@ static void disas_simd_3same_float(DisasContext *s, uint32_t insn)
+     }
+ }
  
-     int ebytes = 1 << size;
-     int elements = (is_q ? 128 : 64) / (8 << size);
-@@ -3077,6 +3077,7 @@ static void disas_ldst_multiple_struct(DisasContext *s, uint32_t insn)
-     tcg_rn = cpu_reg_sp(s, rn);
-     tcg_addr = tcg_temp_new_i64();
-     tcg_gen_mov_i64(tcg_addr, tcg_rn);
-+    tcg_ebytes = tcg_const_i64(ebytes);
+-static void gen_mla8_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
+-{
+-    gen_helper_neon_mul_u8(a, a, b);
+-    gen_helper_neon_add_u8(d, d, a);
+-}
+-
+-static void gen_mla16_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
+-{
+-    gen_helper_neon_mul_u16(a, a, b);
+-    gen_helper_neon_add_u16(d, d, a);
+-}
+-
+-static void gen_mla32_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
+-{
+-    tcg_gen_mul_i32(a, a, b);
+-    tcg_gen_add_i32(d, d, a);
+-}
+-
+-static void gen_mla64_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
+-{
+-    tcg_gen_mul_i64(a, a, b);
+-    tcg_gen_add_i64(d, d, a);
+-}
+-
+-static void gen_mla_vec(unsigned vece, TCGv_vec d, TCGv_vec a, TCGv_vec b)
+-{
+-    tcg_gen_mul_vec(vece, a, a, b);
+-    tcg_gen_add_vec(vece, d, d, a);
+-}
+-
+-static void gen_mls8_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
+-{
+-    gen_helper_neon_mul_u8(a, a, b);
+-    gen_helper_neon_sub_u8(d, d, a);
+-}
+-
+-static void gen_mls16_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
+-{
+-    gen_helper_neon_mul_u16(a, a, b);
+-    gen_helper_neon_sub_u16(d, d, a);
+-}
+-
+-static void gen_mls32_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
+-{
+-    tcg_gen_mul_i32(a, a, b);
+-    tcg_gen_sub_i32(d, d, a);
+-}
+-
+-static void gen_mls64_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
+-{
+-    tcg_gen_mul_i64(a, a, b);
+-    tcg_gen_sub_i64(d, d, a);
+-}
+-
+-static void gen_mls_vec(unsigned vece, TCGv_vec d, TCGv_vec a, TCGv_vec b)
+-{
+-    tcg_gen_mul_vec(vece, a, a, b);
+-    tcg_gen_sub_vec(vece, d, d, a);
+-}
+-
+ /* Integer op subgroup of C3.6.16. */
+ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
+ {
+@@ -10488,52 +10428,6 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
+           .prefer_i64 = TCG_TARGET_REG_BITS == 64,
+           .vece = MO_64 },
+     };
+-    static const GVecGen3 mla_op[4] = {
+-        { .fni4 = gen_mla8_i32,
+-          .fniv = gen_mla_vec,
+-          .opc = INDEX_op_mul_vec,
+-          .load_dest = true,
+-          .vece = MO_8 },
+-        { .fni4 = gen_mla16_i32,
+-          .fniv = gen_mla_vec,
+-          .opc = INDEX_op_mul_vec,
+-          .load_dest = true,
+-          .vece = MO_16 },
+-        { .fni4 = gen_mla32_i32,
+-          .fniv = gen_mla_vec,
+-          .opc = INDEX_op_mul_vec,
+-          .load_dest = true,
+-          .vece = MO_32 },
+-        { .fni8 = gen_mla64_i64,
+-          .fniv = gen_mla_vec,
+-          .opc = INDEX_op_mul_vec,
+-          .prefer_i64 = TCG_TARGET_REG_BITS == 64,
+-          .load_dest = true,
+-          .vece = MO_64 },
+-    };
+-    static const GVecGen3 mls_op[4] = {
+-        { .fni4 = gen_mls8_i32,
+-          .fniv = gen_mls_vec,
+-          .opc = INDEX_op_mul_vec,
+-          .load_dest = true,
+-          .vece = MO_8 },
+-        { .fni4 = gen_mls16_i32,
+-          .fniv = gen_mls_vec,
+-          .opc = INDEX_op_mul_vec,
+-          .load_dest = true,
+-          .vece = MO_16 },
+-        { .fni4 = gen_mls32_i32,
+-          .fniv = gen_mls_vec,
+-          .opc = INDEX_op_mul_vec,
+-          .load_dest = true,
+-          .vece = MO_32 },
+-        { .fni8 = gen_mls64_i64,
+-          .fniv = gen_mls_vec,
+-          .opc = INDEX_op_mul_vec,
+-          .prefer_i64 = TCG_TARGET_REG_BITS == 64,
+-          .load_dest = true,
+-          .vece = MO_64 },
+-    };
  
-     for (r = 0; r < rpt; r++) {
-         int e;
-@@ -3101,7 +3102,7 @@ static void disas_ldst_multiple_struct(DisasContext *s, uint32_t insn)
-                         clear_vec_high(s, is_q, tt);
-                     }
+     int is_q = extract32(insn, 30, 1);
+     int u = extract32(insn, 29, 1);
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index ee7294e54f0..d4eb66fadd6 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -5468,7 +5468,7 @@ static void gen_neon_narrow_op(int op, int u, int size,
+ #define NEON_3R_VABA 15
+ #define NEON_3R_VADD_VSUB 16
+ #define NEON_3R_VTST_VCEQ 17
+-#define NEON_3R_VML 18 /* VMLA, VMLAL, VMLS, VMLSL */
++#define NEON_3R_VML 18 /* VMLA, VMLS */
+ #define NEON_3R_VMUL 19
+ #define NEON_3R_VPMAX 20
+ #define NEON_3R_VPMIN 21
+@@ -6032,6 +6032,117 @@ const GVecGen2i sli_op[4] = {
+       .vece = MO_64 },
+ };
+ 
++static void gen_mla8_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
++{
++    gen_helper_neon_mul_u8(a, a, b);
++    gen_helper_neon_add_u8(d, d, a);
++}
++
++static void gen_mls8_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
++{
++    gen_helper_neon_mul_u8(a, a, b);
++    gen_helper_neon_sub_u8(d, d, a);
++}
++
++static void gen_mla16_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
++{
++    gen_helper_neon_mul_u16(a, a, b);
++    gen_helper_neon_add_u16(d, d, a);
++}
++
++static void gen_mls16_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
++{
++    gen_helper_neon_mul_u16(a, a, b);
++    gen_helper_neon_sub_u16(d, d, a);
++}
++
++static void gen_mla32_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
++{
++    tcg_gen_mul_i32(a, a, b);
++    tcg_gen_add_i32(d, d, a);
++}
++
++static void gen_mls32_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
++{
++    tcg_gen_mul_i32(a, a, b);
++    tcg_gen_sub_i32(d, d, a);
++}
++
++static void gen_mla64_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
++{
++    tcg_gen_mul_i64(a, a, b);
++    tcg_gen_add_i64(d, d, a);
++}
++
++static void gen_mls64_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
++{
++    tcg_gen_mul_i64(a, a, b);
++    tcg_gen_sub_i64(d, d, a);
++}
++
++static void gen_mla_vec(unsigned vece, TCGv_vec d, TCGv_vec a, TCGv_vec b)
++{
++    tcg_gen_mul_vec(vece, a, a, b);
++    tcg_gen_add_vec(vece, d, d, a);
++}
++
++static void gen_mls_vec(unsigned vece, TCGv_vec d, TCGv_vec a, TCGv_vec b)
++{
++    tcg_gen_mul_vec(vece, a, a, b);
++    tcg_gen_sub_vec(vece, d, d, a);
++}
++
++/* Note that while NEON does not support VMLA and VMLS as 64-bit ops,
++ * these tables are shared with AArch64 which does support them.
++ */
++const GVecGen3 mla_op[4] = {
++    { .fni4 = gen_mla8_i32,
++      .fniv = gen_mla_vec,
++      .opc = INDEX_op_mul_vec,
++      .load_dest = true,
++      .vece = MO_8 },
++    { .fni4 = gen_mla16_i32,
++      .fniv = gen_mla_vec,
++      .opc = INDEX_op_mul_vec,
++      .load_dest = true,
++      .vece = MO_16 },
++    { .fni4 = gen_mla32_i32,
++      .fniv = gen_mla_vec,
++      .opc = INDEX_op_mul_vec,
++      .load_dest = true,
++      .vece = MO_32 },
++    { .fni8 = gen_mla64_i64,
++      .fniv = gen_mla_vec,
++      .opc = INDEX_op_mul_vec,
++      .prefer_i64 = TCG_TARGET_REG_BITS == 64,
++      .load_dest = true,
++      .vece = MO_64 },
++};
++
++const GVecGen3 mls_op[4] = {
++    { .fni4 = gen_mls8_i32,
++      .fniv = gen_mls_vec,
++      .opc = INDEX_op_mul_vec,
++      .load_dest = true,
++      .vece = MO_8 },
++    { .fni4 = gen_mls16_i32,
++      .fniv = gen_mls_vec,
++      .opc = INDEX_op_mul_vec,
++      .load_dest = true,
++      .vece = MO_16 },
++    { .fni4 = gen_mls32_i32,
++      .fniv = gen_mls_vec,
++      .opc = INDEX_op_mul_vec,
++      .load_dest = true,
++      .vece = MO_32 },
++    { .fni8 = gen_mls64_i64,
++      .fniv = gen_mls_vec,
++      .opc = INDEX_op_mul_vec,
++      .prefer_i64 = TCG_TARGET_REG_BITS == 64,
++      .load_dest = true,
++      .vece = MO_64 },
++};
++
+ /* Translate a NEON data processing instruction.  Return nonzero if the
+    instruction is invalid.
+    We process data in a mixture of 32-bit and 64-bit chunks.
+@@ -6233,7 +6344,13 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+                 return 0;
+             }
+             break;
++
++        case NEON_3R_VML: /* VMLA, VMLS */
++            tcg_gen_gvec_3(rd_ofs, rn_ofs, rm_ofs, vec_size, vec_size,
++                           u ? &mls_op[size] : &mla_op[size]);
++            return 0;
+         }
++
+         if (size == 3) {
+             /* 64-bit element instructions. */
+             for (pass = 0; pass < (q ? 2 : 1); pass++) {
+@@ -6435,21 +6552,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
                  }
--                tcg_gen_addi_i64(tcg_addr, tcg_addr, ebytes);
-+                tcg_gen_add_i64(tcg_addr, tcg_addr, tcg_ebytes);
-                 tt = (tt + 1) % 32;
              }
-         }
-@@ -3115,6 +3116,7 @@ static void disas_ldst_multiple_struct(DisasContext *s, uint32_t insn)
-             tcg_gen_add_i64(tcg_rn, tcg_rn, cpu_reg(s, rm));
-         }
-     }
-+    tcg_temp_free_i64(tcg_ebytes);
-     tcg_temp_free_i64(tcg_addr);
- }
- 
-@@ -3157,7 +3159,7 @@ static void disas_ldst_single_struct(DisasContext *s, uint32_t insn)
-     bool replicate = false;
-     int index = is_q << 3 | S << 2 | size;
-     int ebytes, xs;
--    TCGv_i64 tcg_addr, tcg_rn;
-+    TCGv_i64 tcg_addr, tcg_rn, tcg_ebytes;
- 
-     switch (scale) {
-     case 3:
-@@ -3210,6 +3212,7 @@ static void disas_ldst_single_struct(DisasContext *s, uint32_t insn)
-     tcg_rn = cpu_reg_sp(s, rn);
-     tcg_addr = tcg_temp_new_i64();
-     tcg_gen_mov_i64(tcg_addr, tcg_rn);
-+    tcg_ebytes = tcg_const_i64(ebytes);
- 
-     for (xs = 0; xs < selem; xs++) {
-         if (replicate) {
-@@ -3252,7 +3255,7 @@ static void disas_ldst_single_struct(DisasContext *s, uint32_t insn)
-                 do_vec_st(s, rt, index, tcg_addr, scale);
-             }
-         }
--        tcg_gen_addi_i64(tcg_addr, tcg_addr, ebytes);
-+        tcg_gen_add_i64(tcg_addr, tcg_addr, tcg_ebytes);
-         rt = (rt + 1) % 32;
-     }
- 
-@@ -3264,6 +3267,7 @@ static void disas_ldst_single_struct(DisasContext *s, uint32_t insn)
-             tcg_gen_add_i64(tcg_rn, tcg_rn, cpu_reg(s, rm));
-         }
-     }
-+    tcg_temp_free_i64(tcg_ebytes);
-     tcg_temp_free_i64(tcg_addr);
- }
- 
+             break;
+-        case NEON_3R_VML: /* VMLA, VMLAL, VMLS,VMLSL */
+-            switch (size) {
+-            case 0: gen_helper_neon_mul_u8(tmp, tmp, tmp2); break;
+-            case 1: gen_helper_neon_mul_u16(tmp, tmp, tmp2); break;
+-            case 2: tcg_gen_mul_i32(tmp, tmp, tmp2); break;
+-            default: abort();
+-            }
+-            tcg_temp_free_i32(tmp2);
+-            tmp2 = neon_load_reg(rd, pass);
+-            if (u) { /* VMLS */
+-                gen_neon_rsb(size, tmp, tmp2);
+-            } else { /* VMLA */
+-                gen_neon_add(size, tmp, tmp2);
+-            }
+-            break;
+         case NEON_3R_VMUL:
+             /* VMUL.P8; other cases already eliminated.  */
+             gen_helper_neon_mul_p8(tmp, tmp, tmp2);
 -- 
 2.19.1
