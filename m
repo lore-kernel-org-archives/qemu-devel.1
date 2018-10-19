@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56091)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60690)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gDOIp-0006uB-JX
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 02:30:32 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1gDORf-0001Q4-1B
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 02:39:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gDOIo-0002YE-LO
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 02:30:31 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:44491)
+	(envelope-from <richard.henderson@linaro.org>) id 1gDORa-0000jD-TV
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 02:39:38 -0400
+Received: from mail-pl1-x636.google.com ([2607:f8b0:4864:20::636]:40302)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <artem.k.pisarenko@gmail.com>)
-	id 1gDOIo-0002Ue-Ce
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 02:30:30 -0400
-Received: by mail-ot1-x341.google.com with SMTP id p23so32162599otf.11
-	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 23:30:30 -0700 (PDT)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gDORa-0000dq-A7
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 02:39:34 -0400
+Received: by mail-pl1-x636.google.com with SMTP id 1-v6so15428307plv.7
+	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 23:39:33 -0700 (PDT)
+References: <20181019010625.25294-1-cota@braap.org>
+	<20181019010625.25294-6-cota@braap.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <1dfe58d4-7f71-2afa-e781-038847c3524f@linaro.org>
+Date: Thu, 18 Oct 2018 23:39:29 -0700
 MIME-Version: 1.0
-References: <cover.1539860473.git.artem.k.pisarenko@gmail.com>
-	<3a396555c19468ce89788cc6deabbfef4ab56035.1539860473.git.artem.k.pisarenko@gmail.com>
-	<002201d46770$4affc060$e0ff4120$@ru>
-In-Reply-To: <002201d46770$4affc060$e0ff4120$@ru>
-From: Artem Pisarenko <artem.k.pisarenko@gmail.com>
-Date: Fri, 19 Oct 2018 12:30:17 +0600
-Message-ID: <CANzW0mui0aaCWH0iQT+KxHygmE1TSh9Xko_Qyrwkg=6kUnM_Eg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 4/4] Optimize record/replay
- checkpointing for all clocks it applies to
+In-Reply-To: <20181019010625.25294-6-cota@braap.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v3 05/56] cpu: move run_on_cpu to cpus-common
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,18 +31,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Cc: qemu-devel@nongnu.org, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Paolo Bonzini <pbonzini@redhat.com>
+To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-> =E2=80=A6
-> This is wrong at least for QEMU_CLOCK_HOST.
-> =E2=80=A6
-> Reading the host clock here is not protected by the checkpoint.
-> Therefore it may incur the inconsistency when replaying the execution.
+On 10/18/18 6:05 PM, Emilio G. Cota wrote:
+> We don't pass a pointer to qemu_global_mutex anymore.
+> 
+> Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+> ---
+>  include/qom/cpu.h | 10 ----------
+>  cpus-common.c     |  2 +-
+>  cpus.c            |  5 -----
+>  3 files changed, 1 insertion(+), 16 deletions(-)
 
-That's why I didn't like idea of this patch and asked for any possible side
-effects beforehand. So, here is one.
-I have no idea how to fix it properly and would like to recall this
-particular patch from these series (remember, it doesn't match series
-goal). Lets leave this patch/issue for separate resolution, although I'm
-not very interested in it.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+r~
