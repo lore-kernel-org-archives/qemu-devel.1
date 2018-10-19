@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39004)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gDTrW-0004uo-1F
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:26:46 -0400
+	(envelope-from <berto@igalia.com>) id 1gDTrP-0004rA-Qh
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:26:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gDTrQ-0000TG-2E
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:26:41 -0400
+	(envelope-from <berto@igalia.com>) id 1gDTrB-00006U-Ah
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 08:26:26 -0400
 From: Alberto Garcia <berto@igalia.com>
-Date: Fri, 19 Oct 2018 15:24:40 +0300
-Message-Id: <f515e64f26a28d23254d325f50c3ce61279abff1.1539950487.git.berto@igalia.com>
+Date: Fri, 19 Oct 2018 15:24:34 +0300
+Message-Id: <7dacb1e9d0374de246dd4ae5c242c88c675cbb19.1539950487.git.berto@igalia.com>
 In-Reply-To: <cover.1539950487.git.berto@igalia.com>
 References: <cover.1539950487.git.berto@igalia.com>
 In-Reply-To: <cover.1539950487.git.berto@igalia.com>
 References: <cover.1539950487.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v3 09/15] block: Drop bdrv_reopen()
+Subject: [Qemu-devel] [PATCH v3 03/15] block: Use
+ bdrv_reopen_set_read_only() in commit_start/complete()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,58 +25,69 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-No one is using this function anymore, so we can safely remove it.
+This patch replaces the bdrv_reopen() calls that set and remove the
+BDRV_O_RDWR flag with the new bdrv_reopen_set_read_only() function.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block.c               | 21 ---------------------
- include/block/block.h |  1 -
- 2 files changed, 22 deletions(-)
+ block/commit.c | 16 ++++++----------
+ 1 file changed, 6 insertions(+), 10 deletions(-)
 
-diff --git a/block.c b/block.c
-index 744509f683..edb880a66b 100644
---- a/block.c
-+++ b/block.c
-@@ -3070,27 +3070,6 @@ cleanup:
-     return ret;
- }
+diff --git a/block/commit.c b/block/commit.c
+index a2da5740b0..a53c2d04b0 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -38,7 +38,7 @@ typedef struct CommitBlockJob {
+     BlockBackend *base;
+     BlockDriverState *base_bs;
+     BlockdevOnError on_error;
+-    int base_flags;
++    bool base_read_only;
+     char *backing_file_str;
+ } CommitBlockJob;
  
--
--/* Reopen a single BlockDriverState with the specified flags. */
--int bdrv_reopen(BlockDriverState *bs, int bdrv_flags, Error **errp)
--{
--    int ret = -1;
--    Error *local_err = NULL;
--    BlockReopenQueue *queue;
--
--    bdrv_subtree_drained_begin(bs);
--
--    queue = bdrv_reopen_queue(NULL, bs, NULL, bdrv_flags);
--    ret = bdrv_reopen_multiple(bdrv_get_aio_context(bs), queue, &local_err);
--    if (local_err != NULL) {
--        error_propagate(errp, local_err);
--    }
--
--    bdrv_subtree_drained_end(bs);
--
--    return ret;
--}
--
- int bdrv_reopen_set_read_only(BlockDriverState *bs, bool read_only,
-                               Error **errp)
+@@ -124,8 +124,8 @@ static void commit_clean(Job *job)
+     /* restore base open flags here if appropriate (e.g., change the base back
+      * to r/o). These reopens do not need to be atomic, since we won't abort
+      * even on failure here */
+-    if (s->base_flags != bdrv_get_flags(s->base_bs)) {
+-        bdrv_reopen(s->base_bs, s->base_flags, NULL);
++    if (s->base_read_only) {
++        bdrv_reopen_set_read_only(s->base_bs, true, NULL);
+     }
+ 
+     g_free(s->backing_file_str);
+@@ -264,7 +264,6 @@ void commit_start(const char *job_id, BlockDriverState *bs,
+                   const char *filter_node_name, Error **errp)
  {
-diff --git a/include/block/block.h b/include/block/block.h
-index 97317fdfb6..3649136689 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -300,7 +300,6 @@ BlockReopenQueue *bdrv_reopen_queue(BlockReopenQueue *bs_queue,
-                                     BlockDriverState *bs,
-                                     QDict *options, int flags);
- int bdrv_reopen_multiple(AioContext *ctx, BlockReopenQueue *bs_queue, Error **errp);
--int bdrv_reopen(BlockDriverState *bs, int bdrv_flags, Error **errp);
- int bdrv_reopen_set_read_only(BlockDriverState *bs, bool read_only,
-                               Error **errp);
- int bdrv_reopen_prepare(BDRVReopenState *reopen_state,
+     CommitBlockJob *s;
+-    int orig_base_flags;
+     BlockDriverState *iter;
+     BlockDriverState *commit_top_bs = NULL;
+     Error *local_err = NULL;
+@@ -283,11 +282,9 @@ void commit_start(const char *job_id, BlockDriverState *bs,
+     }
+ 
+     /* convert base to r/w, if necessary */
+-    orig_base_flags = bdrv_get_flags(base);
+-    if (!(orig_base_flags & BDRV_O_RDWR)) {
+-        bdrv_reopen(base, orig_base_flags | BDRV_O_RDWR, &local_err);
+-        if (local_err != NULL) {
+-            error_propagate(errp, local_err);
++    s->base_read_only = bdrv_is_read_only(base);
++    if (s->base_read_only) {
++        if (bdrv_reopen_set_read_only(base, false, errp) != 0) {
+             goto fail;
+         }
+     }
+@@ -363,7 +360,6 @@ void commit_start(const char *job_id, BlockDriverState *bs,
+         goto fail;
+     }
+ 
+-    s->base_flags = orig_base_flags;
+     s->backing_file_str = g_strdup(backing_file_str);
+     s->on_error = on_error;
+ 
 -- 
 2.11.0
