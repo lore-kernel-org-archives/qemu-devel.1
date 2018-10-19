@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gDNwi-0004Tp-PQ
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 02:07:44 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1gDNwl-0004Uo-LI
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 02:07:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gDNwf-0002lp-HK
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 02:07:40 -0400
-Received: from mail-pg1-x52f.google.com ([2607:f8b0:4864:20::52f]:40762)
+	(envelope-from <richard.henderson@linaro.org>) id 1gDNwg-0002nF-3K
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 02:07:43 -0400
+Received: from mail-pg1-x533.google.com ([2607:f8b0:4864:20::533]:40766)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gDNwe-0002FP-Rx
+	id 1gDNwf-0002O4-FE
 	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 02:07:37 -0400
-Received: by mail-pg1-x52f.google.com with SMTP id n31-v6so15308022pgm.7
-	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 23:07:21 -0700 (PDT)
+Received: by mail-pg1-x533.google.com with SMTP id n31-v6so15308166pgm.7
+	for <qemu-devel@nongnu.org>; Thu, 18 Oct 2018 23:07:29 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 18 Oct 2018 23:06:51 -0700
-Message-Id: <20181019060656.7968-17-richard.henderson@linaro.org>
+Date: Thu, 18 Oct 2018 23:06:56 -0700
+Message-Id: <20181019060656.7968-22-richard.henderson@linaro.org>
 In-Reply-To: <20181019060656.7968-1-richard.henderson@linaro.org>
 References: <20181019060656.7968-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL v2 16/21] target/ppc: Convert to HAVE_CMPXCHG128
- and HAVE_ATOMIC128
+Subject: [Qemu-devel] [PULL v2 21/21] cputlb: read CPUTLBEntry.addr_write
+ atomically
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,279 +28,248 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+Cc: peter.maydell@linaro.org, "Emilio G. Cota" <cota@braap.org>
 
-Reviewed-by: Emilio G. Cota <cota@braap.org>
+From: "Emilio G. Cota" <cota@braap.org>
+
+Updates can come from other threads, so readers that do not
+take tlb_lock must use atomic_read to avoid undefined
+behaviour (UB).
+
+This completes the conversion to tlb_lock. This conversion results
+on average in no performance loss, as the following experiments
+(run on an Intel i7-6700K CPU @ 4.00GHz) show.
+
+1. aarch64 bootup+shutdown test:
+
+- Before:
+ Performance counter stats for 'taskset -c 0 ../img/aarch64/die.sh' (10 runs):
+
+       7487.087786      task-clock (msec)         #    0.998 CPUs utilized            ( +-  0.12% )
+    31,574,905,303      cycles                    #    4.217 GHz                      ( +-  0.12% )
+    57,097,908,812      instructions              #    1.81  insns per cycle          ( +-  0.08% )
+    10,255,415,367      branches                  # 1369.747 M/sec                    ( +-  0.08% )
+       173,278,962      branch-misses             #    1.69% of all branches          ( +-  0.18% )
+
+       7.504481349 seconds time elapsed                                          ( +-  0.14% )
+
+- After:
+ Performance counter stats for 'taskset -c 0 ../img/aarch64/die.sh' (10 runs):
+
+       7462.441328      task-clock (msec)         #    0.998 CPUs utilized            ( +-  0.07% )
+    31,478,476,520      cycles                    #    4.218 GHz                      ( +-  0.07% )
+    57,017,330,084      instructions              #    1.81  insns per cycle          ( +-  0.05% )
+    10,251,929,667      branches                  # 1373.804 M/sec                    ( +-  0.05% )
+       173,023,787      branch-misses             #    1.69% of all branches          ( +-  0.11% )
+
+       7.474970463 seconds time elapsed                                          ( +-  0.07% )
+
+2. SPEC06int:
+                                              SPEC06int (test set)
+                                           [Y axis: Speedup over master]
+  1.15 +-+----+------+------+------+------+------+-------+------+------+------+------+------+------+----+-+
+       |                                                                                                  |
+   1.1 +-+.................................+++.............................+  tlb-lock-v2 (m+++x)       +-+
+       |                                +++ |                   +++        tlb-lock-v3 (spinl|ck)         |
+       |                    +++          |  |     +++    +++     |                           |            |
+  1.05 +-+....+++...........####.........|####.+++.|......|.....###....+++...........+++....###.........+-+
+       |      ###         ++#| #         |# |# ***### +++### +++#+#     |     +++     |     #|#    ###    |
+     1 +-+++***+#++++####+++#++#++++++++++#++#+*+*++#++++#+#+****+#++++###++++###++++###++++#+#++++#+#+++-+
+       |    *+* #    #++# ***  #   #### ***  # * *++# ****+# *| * # ****|#   |# #    #|#    #+#    # #    |
+  0.95 +-+..*.*.#....#..#.*|*..#...#..#.*|*..#.*.*..#.*|.*.#.*++*.#.*++*+#.****.#....#+#....#.#..++#.#..+-+
+       |    * * #    #  # *|*  #   #  # *|*  # * *  # *++* # *  * # *  * # * |* #  ++# #    # #  *** #    |
+       |    * * #  ++#  # *+*  #   #  # *|*  # * *  # *  * # *  * # *  * # *++* # **** #  ++# #  * * #    |
+   0.9 +-+..*.*.#...|#..#.*.*..#.++#..#.*|*..#.*.*..#.*..*.#.*..*.#.*..*.#.*..*.#.*.|*.#...|#.#..*.*.#..+-+
+       |    * * #  ***  # * *  #  |#  # *+*  # * *  # *  * # *  * # *  * # *  * # *++* #   |# #  * * #    |
+  0.85 +-+..*.*.#..*|*..#.*.*..#.***..#.*.*..#.*.*..#.*..*.#.*..*.#.*..*.#.*..*.#.*..*.#.****.#..*.*.#..+-+
+       |    * * #  *+*  # * *  # *|*  # * *  # * *  # *  * # *  * # *  * # *  * # *  * # * |* #  * * #    |
+       |    * * #  * *  # * *  # *+*  # * *  # * *  # *  * # *  * # *  * # *  * # *  * # * |* #  * * #    |
+   0.8 +-+..*.*.#..*.*..#.*.*..#.*.*..#.*.*..#.*.*..#.*..*.#.*..*.#.*..*.#.*..*.#.*..*.#.*++*.#..*.*.#..+-+
+       |    * * #  * *  # * *  # * *  # * *  # * *  # *  * # *  * # *  * # *  * # *  * # *  * #  * * #    |
+  0.75 +-+--***##--***###-***###-***###-***###-***###-****##-****##-****##-****##-****##-****##--***##--+-+
+ 400.perlben401.bzip2403.gcc429.m445.gob456.hmme45462.libqua464.h26471.omnet473483.xalancbmkgeomean
+
+  png: https://imgur.com/a/BHzpPTW
+
+Notes:
+- tlb-lock-v2 corresponds to an implementation with a mutex.
+- tlb-lock-v3 corresponds to the current implementation, i.e.
+  a spinlock and a single lock acquisition in tlb_set_page_with_attrs.
+
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+Message-Id: <20181016153840.25877-1-cota@braap.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/ppc/helper.h     |   2 +-
- target/ppc/mem_helper.c |  33 ++++++++++--
- target/ppc/translate.c  | 115 +++++++++++++++++++++-------------------
- 3 files changed, 88 insertions(+), 62 deletions(-)
+ accel/tcg/softmmu_template.h     | 12 ++++++------
+ include/exec/cpu_ldst.h          | 11 ++++++++++-
+ include/exec/cpu_ldst_template.h |  2 +-
+ accel/tcg/cputlb.c               | 19 +++++++++++++------
+ 4 files changed, 30 insertions(+), 14 deletions(-)
 
-diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index ef64248bc4..7a1481fd0b 100644
---- a/target/ppc/helper.h
-+++ b/target/ppc/helper.h
-@@ -800,7 +800,7 @@ DEF_HELPER_4(dscliq, void, env, fprp, fprp, i32)
- DEF_HELPER_1(tbegin, void, env)
- DEF_HELPER_FLAGS_1(fixup_thrm, TCG_CALL_NO_RWG, void, env)
+diff --git a/accel/tcg/softmmu_template.h b/accel/tcg/softmmu_template.h
+index 09538b5349..b0adea045e 100644
+--- a/accel/tcg/softmmu_template.h
++++ b/accel/tcg/softmmu_template.h
+@@ -280,7 +280,7 @@ void helper_le_st_name(CPUArchState *env, target_ulong addr, DATA_TYPE val,
+     uintptr_t mmu_idx = get_mmuidx(oi);
+     uintptr_t index = tlb_index(env, mmu_idx, addr);
+     CPUTLBEntry *entry = tlb_entry(env, mmu_idx, addr);
+-    target_ulong tlb_addr = entry->addr_write;
++    target_ulong tlb_addr = tlb_addr_write(entry);
+     unsigned a_bits = get_alignment_bits(get_memop(oi));
+     uintptr_t haddr;
  
--#if defined(TARGET_PPC64) && defined(CONFIG_ATOMIC128)
-+#ifdef TARGET_PPC64
- DEF_HELPER_FLAGS_3(lq_le_parallel, TCG_CALL_NO_WG, i64, env, tl, i32)
- DEF_HELPER_FLAGS_3(lq_be_parallel, TCG_CALL_NO_WG, i64, env, tl, i32)
- DEF_HELPER_FLAGS_5(stq_le_parallel, TCG_CALL_NO_WG,
-diff --git a/target/ppc/mem_helper.c b/target/ppc/mem_helper.c
-index 8f0d86d104..a1485fad9b 100644
---- a/target/ppc/mem_helper.c
-+++ b/target/ppc/mem_helper.c
-@@ -25,6 +25,7 @@
- #include "exec/cpu_ldst.h"
+@@ -295,7 +295,7 @@ void helper_le_st_name(CPUArchState *env, target_ulong addr, DATA_TYPE val,
+             tlb_fill(ENV_GET_CPU(env), addr, DATA_SIZE, MMU_DATA_STORE,
+                      mmu_idx, retaddr);
+         }
+-        tlb_addr = entry->addr_write & ~TLB_INVALID_MASK;
++        tlb_addr = tlb_addr_write(entry) & ~TLB_INVALID_MASK;
+     }
+ 
+     /* Handle an IO access.  */
+@@ -325,7 +325,7 @@ void helper_le_st_name(CPUArchState *env, target_ulong addr, DATA_TYPE val,
+            cannot evict the first.  */
+         page2 = (addr + DATA_SIZE) & TARGET_PAGE_MASK;
+         entry2 = tlb_entry(env, mmu_idx, page2);
+-        if (!tlb_hit_page(entry2->addr_write, page2)
++        if (!tlb_hit_page(tlb_addr_write(entry2), page2)
+             && !VICTIM_TLB_HIT(addr_write, page2)) {
+             tlb_fill(ENV_GET_CPU(env), page2, DATA_SIZE, MMU_DATA_STORE,
+                      mmu_idx, retaddr);
+@@ -358,7 +358,7 @@ void helper_be_st_name(CPUArchState *env, target_ulong addr, DATA_TYPE val,
+     uintptr_t mmu_idx = get_mmuidx(oi);
+     uintptr_t index = tlb_index(env, mmu_idx, addr);
+     CPUTLBEntry *entry = tlb_entry(env, mmu_idx, addr);
+-    target_ulong tlb_addr = entry->addr_write;
++    target_ulong tlb_addr = tlb_addr_write(entry);
+     unsigned a_bits = get_alignment_bits(get_memop(oi));
+     uintptr_t haddr;
+ 
+@@ -373,7 +373,7 @@ void helper_be_st_name(CPUArchState *env, target_ulong addr, DATA_TYPE val,
+             tlb_fill(ENV_GET_CPU(env), addr, DATA_SIZE, MMU_DATA_STORE,
+                      mmu_idx, retaddr);
+         }
+-        tlb_addr = entry->addr_write & ~TLB_INVALID_MASK;
++        tlb_addr = tlb_addr_write(entry) & ~TLB_INVALID_MASK;
+     }
+ 
+     /* Handle an IO access.  */
+@@ -403,7 +403,7 @@ void helper_be_st_name(CPUArchState *env, target_ulong addr, DATA_TYPE val,
+            cannot evict the first.  */
+         page2 = (addr + DATA_SIZE) & TARGET_PAGE_MASK;
+         entry2 = tlb_entry(env, mmu_idx, page2);
+-        if (!tlb_hit_page(entry2->addr_write, page2)
++        if (!tlb_hit_page(tlb_addr_write(entry2), page2)
+             && !VICTIM_TLB_HIT(addr_write, page2)) {
+             tlb_fill(ENV_GET_CPU(env), page2, DATA_SIZE, MMU_DATA_STORE,
+                      mmu_idx, retaddr);
+diff --git a/include/exec/cpu_ldst.h b/include/exec/cpu_ldst.h
+index f54d91ff68..959068495a 100644
+--- a/include/exec/cpu_ldst.h
++++ b/include/exec/cpu_ldst.h
+@@ -126,6 +126,15 @@ extern __thread uintptr_t helper_retaddr;
+ /* The memory helpers for tcg-generated code need tcg_target_long etc.  */
  #include "tcg.h"
- #include "internal.h"
-+#include "qemu/atomic128.h"
  
- //#define DEBUG_OP
- 
-@@ -215,11 +216,15 @@ target_ulong helper_lscbx(CPUPPCState *env, target_ulong addr, uint32_t reg,
-     return i;
++static inline target_ulong tlb_addr_write(const CPUTLBEntry *entry)
++{
++#if TCG_OVERSIZED_GUEST
++    return entry->addr_write;
++#else
++    return atomic_read(&entry->addr_write);
++#endif
++}
++
+ /* Find the TLB index corresponding to the mmu_idx + address pair.  */
+ static inline uintptr_t tlb_index(CPUArchState *env, uintptr_t mmu_idx,
+                                   target_ulong addr)
+@@ -439,7 +448,7 @@ static inline void *tlb_vaddr_to_host(CPUArchState *env, abi_ptr addr,
+         tlb_addr = tlbentry->addr_read;
+         break;
+     case 1:
+-        tlb_addr = tlbentry->addr_write;
++        tlb_addr = tlb_addr_write(tlbentry);
+         break;
+     case 2:
+         tlb_addr = tlbentry->addr_code;
+diff --git a/include/exec/cpu_ldst_template.h b/include/exec/cpu_ldst_template.h
+index d21a0b59bf..0f061d47ef 100644
+--- a/include/exec/cpu_ldst_template.h
++++ b/include/exec/cpu_ldst_template.h
+@@ -177,7 +177,7 @@ glue(glue(glue(cpu_st, SUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
+     addr = ptr;
+     mmu_idx = CPU_MMU_INDEX;
+     entry = tlb_entry(env, mmu_idx, addr);
+-    if (unlikely(entry->addr_write !=
++    if (unlikely(tlb_addr_write(entry) !=
+                  (addr & (TARGET_PAGE_MASK | (DATA_SIZE - 1))))) {
+         oi = make_memop_idx(SHIFT, mmu_idx);
+         glue(glue(helper_ret_st, SUFFIX), MMUSUFFIX)(env, addr, v, oi,
+diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+index 28b770a404..af57aca5e4 100644
+--- a/accel/tcg/cputlb.c
++++ b/accel/tcg/cputlb.c
+@@ -258,7 +258,7 @@ static inline bool tlb_hit_page_anyprot(CPUTLBEntry *tlb_entry,
+                                         target_ulong page)
+ {
+     return tlb_hit_page(tlb_entry->addr_read, page) ||
+-           tlb_hit_page(tlb_entry->addr_write, page) ||
++           tlb_hit_page(tlb_addr_write(tlb_entry), page) ||
+            tlb_hit_page(tlb_entry->addr_code, page);
  }
  
--#if defined(TARGET_PPC64) && defined(CONFIG_ATOMIC128)
-+#ifdef TARGET_PPC64
- uint64_t helper_lq_le_parallel(CPUPPCState *env, target_ulong addr,
-                                uint32_t opidx)
- {
--    Int128 ret = helper_atomic_ldo_le_mmu(env, addr, opidx, GETPC());
-+    Int128 ret;
+@@ -855,7 +855,7 @@ static void io_writex(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
+         tlb_fill(cpu, addr, size, MMU_DATA_STORE, mmu_idx, retaddr);
+ 
+         entry = tlb_entry(env, mmu_idx, addr);
+-        tlb_addr = entry->addr_write;
++        tlb_addr = tlb_addr_write(entry);
+         if (!(tlb_addr & ~(TARGET_PAGE_MASK | TLB_RECHECK))) {
+             /* RAM access */
+             uintptr_t haddr = addr + entry->addend;
+@@ -904,7 +904,14 @@ static bool victim_tlb_hit(CPUArchState *env, size_t mmu_idx, size_t index,
+     assert_cpu_is_self(ENV_GET_CPU(env));
+     for (vidx = 0; vidx < CPU_VTLB_SIZE; ++vidx) {
+         CPUTLBEntry *vtlb = &env->tlb_v_table[mmu_idx][vidx];
+-        target_ulong cmp = *(target_ulong *)((uintptr_t)vtlb + elt_ofs);
++        target_ulong cmp;
 +
-+    /* We will have raised EXCP_ATOMIC from the translator.  */
-+    assert(HAVE_ATOMIC128);
-+    ret = helper_atomic_ldo_le_mmu(env, addr, opidx, GETPC());
-     env->retxh = int128_gethi(ret);
-     return int128_getlo(ret);
- }
-@@ -227,7 +232,11 @@ uint64_t helper_lq_le_parallel(CPUPPCState *env, target_ulong addr,
- uint64_t helper_lq_be_parallel(CPUPPCState *env, target_ulong addr,
-                                uint32_t opidx)
- {
--    Int128 ret = helper_atomic_ldo_be_mmu(env, addr, opidx, GETPC());
-+    Int128 ret;
-+
-+    /* We will have raised EXCP_ATOMIC from the translator.  */
-+    assert(HAVE_ATOMIC128);
-+    ret = helper_atomic_ldo_be_mmu(env, addr, opidx, GETPC());
-     env->retxh = int128_gethi(ret);
-     return int128_getlo(ret);
- }
-@@ -235,14 +244,22 @@ uint64_t helper_lq_be_parallel(CPUPPCState *env, target_ulong addr,
- void helper_stq_le_parallel(CPUPPCState *env, target_ulong addr,
-                             uint64_t lo, uint64_t hi, uint32_t opidx)
- {
--    Int128 val = int128_make128(lo, hi);
-+    Int128 val;
-+
-+    /* We will have raised EXCP_ATOMIC from the translator.  */
-+    assert(HAVE_ATOMIC128);
-+    val = int128_make128(lo, hi);
-     helper_atomic_sto_le_mmu(env, addr, val, opidx, GETPC());
- }
++        /* elt_ofs might correspond to .addr_write, so use atomic_read */
++#if TCG_OVERSIZED_GUEST
++        cmp = *(target_ulong *)((uintptr_t)vtlb + elt_ofs);
++#else
++        cmp = atomic_read((target_ulong *)((uintptr_t)vtlb + elt_ofs));
++#endif
  
- void helper_stq_be_parallel(CPUPPCState *env, target_ulong addr,
-                             uint64_t lo, uint64_t hi, uint32_t opidx)
- {
--    Int128 val = int128_make128(lo, hi);
-+    Int128 val;
-+
-+    /* We will have raised EXCP_ATOMIC from the translator.  */
-+    assert(HAVE_ATOMIC128);
-+    val = int128_make128(lo, hi);
-     helper_atomic_sto_be_mmu(env, addr, val, opidx, GETPC());
- }
+         if (cmp == page) {
+             /* Found entry in victim tlb, swap tlb and iotlb.  */
+@@ -977,7 +984,7 @@ void probe_write(CPUArchState *env, target_ulong addr, int size, int mmu_idx,
+     uintptr_t index = tlb_index(env, mmu_idx, addr);
+     CPUTLBEntry *entry = tlb_entry(env, mmu_idx, addr);
  
-@@ -252,6 +269,9 @@ uint32_t helper_stqcx_le_parallel(CPUPPCState *env, target_ulong addr,
- {
-     bool success = false;
- 
-+    /* We will have raised EXCP_ATOMIC from the translator.  */
-+    assert(HAVE_CMPXCHG128);
-+
-     if (likely(addr == env->reserve_addr)) {
-         Int128 oldv, cmpv, newv;
- 
-@@ -271,6 +291,9 @@ uint32_t helper_stqcx_be_parallel(CPUPPCState *env, target_ulong addr,
- {
-     bool success = false;
- 
-+    /* We will have raised EXCP_ATOMIC from the translator.  */
-+    assert(HAVE_CMPXCHG128);
-+
-     if (likely(addr == env->reserve_addr)) {
-         Int128 oldv, cmpv, newv;
- 
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index 881743571b..4e59dd5f42 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -33,6 +33,7 @@
- #include "trace-tcg.h"
- #include "exec/translator.h"
- #include "exec/log.h"
-+#include "qemu/atomic128.h"
- 
- 
- #define CPU_SINGLE_STEP 0x1
-@@ -2654,22 +2655,22 @@ static void gen_lq(DisasContext *ctx)
-     hi = cpu_gpr[rd];
- 
-     if (tb_cflags(ctx->base.tb) & CF_PARALLEL) {
--#ifdef CONFIG_ATOMIC128
--        TCGv_i32 oi = tcg_temp_new_i32();
--        if (ctx->le_mode) {
--            tcg_gen_movi_i32(oi, make_memop_idx(MO_LEQ, ctx->mem_idx));
--            gen_helper_lq_le_parallel(lo, cpu_env, EA, oi);
-+        if (HAVE_ATOMIC128) {
-+            TCGv_i32 oi = tcg_temp_new_i32();
-+            if (ctx->le_mode) {
-+                tcg_gen_movi_i32(oi, make_memop_idx(MO_LEQ, ctx->mem_idx));
-+                gen_helper_lq_le_parallel(lo, cpu_env, EA, oi);
-+            } else {
-+                tcg_gen_movi_i32(oi, make_memop_idx(MO_BEQ, ctx->mem_idx));
-+                gen_helper_lq_be_parallel(lo, cpu_env, EA, oi);
-+            }
-+            tcg_temp_free_i32(oi);
-+            tcg_gen_ld_i64(hi, cpu_env, offsetof(CPUPPCState, retxh));
-         } else {
--            tcg_gen_movi_i32(oi, make_memop_idx(MO_BEQ, ctx->mem_idx));
--            gen_helper_lq_be_parallel(lo, cpu_env, EA, oi);
-+            /* Restart with exclusive lock.  */
-+            gen_helper_exit_atomic(cpu_env);
-+            ctx->base.is_jmp = DISAS_NORETURN;
+-    if (!tlb_hit(entry->addr_write, addr)) {
++    if (!tlb_hit(tlb_addr_write(entry), addr)) {
+         /* TLB entry is for a different page */
+         if (!VICTIM_TLB_HIT(addr_write, addr)) {
+             tlb_fill(ENV_GET_CPU(env), addr, size, MMU_DATA_STORE,
+@@ -995,7 +1002,7 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
+     size_t mmu_idx = get_mmuidx(oi);
+     uintptr_t index = tlb_index(env, mmu_idx, addr);
+     CPUTLBEntry *tlbe = tlb_entry(env, mmu_idx, addr);
+-    target_ulong tlb_addr = tlbe->addr_write;
++    target_ulong tlb_addr = tlb_addr_write(tlbe);
+     TCGMemOp mop = get_memop(oi);
+     int a_bits = get_alignment_bits(mop);
+     int s_bits = mop & MO_SIZE;
+@@ -1026,7 +1033,7 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
+             tlb_fill(ENV_GET_CPU(env), addr, 1 << s_bits, MMU_DATA_STORE,
+                      mmu_idx, retaddr);
          }
--        tcg_temp_free_i32(oi);
--        tcg_gen_ld_i64(hi, cpu_env, offsetof(CPUPPCState, retxh));
--#else
--        /* Restart with exclusive lock.  */
--        gen_helper_exit_atomic(cpu_env);
--        ctx->base.is_jmp = DISAS_NORETURN;
--#endif
-     } else if (ctx->le_mode) {
-         tcg_gen_qemu_ld_i64(lo, EA, ctx->mem_idx, MO_LEQ);
-         gen_addr_add(ctx, EA, EA, 8);
-@@ -2805,21 +2806,21 @@ static void gen_std(DisasContext *ctx)
-         hi = cpu_gpr[rs];
+-        tlb_addr = tlbe->addr_write & ~TLB_INVALID_MASK;
++        tlb_addr = tlb_addr_write(tlbe) & ~TLB_INVALID_MASK;
+     }
  
-         if (tb_cflags(ctx->base.tb) & CF_PARALLEL) {
--#ifdef CONFIG_ATOMIC128
--            TCGv_i32 oi = tcg_temp_new_i32();
--            if (ctx->le_mode) {
--                tcg_gen_movi_i32(oi, make_memop_idx(MO_LEQ, ctx->mem_idx));
--                gen_helper_stq_le_parallel(cpu_env, EA, lo, hi, oi);
-+            if (HAVE_ATOMIC128) {
-+                TCGv_i32 oi = tcg_temp_new_i32();
-+                if (ctx->le_mode) {
-+                    tcg_gen_movi_i32(oi, make_memop_idx(MO_LEQ, ctx->mem_idx));
-+                    gen_helper_stq_le_parallel(cpu_env, EA, lo, hi, oi);
-+                } else {
-+                    tcg_gen_movi_i32(oi, make_memop_idx(MO_BEQ, ctx->mem_idx));
-+                    gen_helper_stq_be_parallel(cpu_env, EA, lo, hi, oi);
-+                }
-+                tcg_temp_free_i32(oi);
-             } else {
--                tcg_gen_movi_i32(oi, make_memop_idx(MO_BEQ, ctx->mem_idx));
--                gen_helper_stq_be_parallel(cpu_env, EA, lo, hi, oi);
-+                /* Restart with exclusive lock.  */
-+                gen_helper_exit_atomic(cpu_env);
-+                ctx->base.is_jmp = DISAS_NORETURN;
-             }
--            tcg_temp_free_i32(oi);
--#else
--            /* Restart with exclusive lock.  */
--            gen_helper_exit_atomic(cpu_env);
--            ctx->base.is_jmp = DISAS_NORETURN;
--#endif
-         } else if (ctx->le_mode) {
-             tcg_gen_qemu_st_i64(lo, EA, ctx->mem_idx, MO_LEQ);
-             gen_addr_add(ctx, EA, EA, 8);
-@@ -3404,26 +3405,26 @@ static void gen_lqarx(DisasContext *ctx)
-     hi = cpu_gpr[rd];
- 
-     if (tb_cflags(ctx->base.tb) & CF_PARALLEL) {
--#ifdef CONFIG_ATOMIC128
--        TCGv_i32 oi = tcg_temp_new_i32();
--        if (ctx->le_mode) {
--            tcg_gen_movi_i32(oi, make_memop_idx(MO_LEQ | MO_ALIGN_16,
--                                                ctx->mem_idx));
--            gen_helper_lq_le_parallel(lo, cpu_env, EA, oi);
-+        if (HAVE_ATOMIC128) {
-+            TCGv_i32 oi = tcg_temp_new_i32();
-+            if (ctx->le_mode) {
-+                tcg_gen_movi_i32(oi, make_memop_idx(MO_LEQ | MO_ALIGN_16,
-+                                                    ctx->mem_idx));
-+                gen_helper_lq_le_parallel(lo, cpu_env, EA, oi);
-+            } else {
-+                tcg_gen_movi_i32(oi, make_memop_idx(MO_BEQ | MO_ALIGN_16,
-+                                                    ctx->mem_idx));
-+                gen_helper_lq_be_parallel(lo, cpu_env, EA, oi);
-+            }
-+            tcg_temp_free_i32(oi);
-+            tcg_gen_ld_i64(hi, cpu_env, offsetof(CPUPPCState, retxh));
-         } else {
--            tcg_gen_movi_i32(oi, make_memop_idx(MO_BEQ | MO_ALIGN_16,
--                                                ctx->mem_idx));
--            gen_helper_lq_be_parallel(lo, cpu_env, EA, oi);
-+            /* Restart with exclusive lock.  */
-+            gen_helper_exit_atomic(cpu_env);
-+            ctx->base.is_jmp = DISAS_NORETURN;
-+            tcg_temp_free(EA);
-+            return;
-         }
--        tcg_temp_free_i32(oi);
--        tcg_gen_ld_i64(hi, cpu_env, offsetof(CPUPPCState, retxh));
--#else
--        /* Restart with exclusive lock.  */
--        gen_helper_exit_atomic(cpu_env);
--        ctx->base.is_jmp = DISAS_NORETURN;
--        tcg_temp_free(EA);
--        return;
--#endif
-     } else if (ctx->le_mode) {
-         tcg_gen_qemu_ld_i64(lo, EA, ctx->mem_idx, MO_LEQ | MO_ALIGN_16);
-         tcg_gen_mov_tl(cpu_reserve, EA);
-@@ -3461,20 +3462,22 @@ static void gen_stqcx_(DisasContext *ctx)
-     hi = cpu_gpr[rs];
- 
-     if (tb_cflags(ctx->base.tb) & CF_PARALLEL) {
--        TCGv_i32 oi = tcg_const_i32(DEF_MEMOP(MO_Q) | MO_ALIGN_16);
--#ifdef CONFIG_ATOMIC128
--        if (ctx->le_mode) {
--            gen_helper_stqcx_le_parallel(cpu_crf[0], cpu_env, EA, lo, hi, oi);
-+        if (HAVE_CMPXCHG128) {
-+            TCGv_i32 oi = tcg_const_i32(DEF_MEMOP(MO_Q) | MO_ALIGN_16);
-+            if (ctx->le_mode) {
-+                gen_helper_stqcx_le_parallel(cpu_crf[0], cpu_env,
-+                                             EA, lo, hi, oi);
-+            } else {
-+                gen_helper_stqcx_be_parallel(cpu_crf[0], cpu_env,
-+                                             EA, lo, hi, oi);
-+            }
-+            tcg_temp_free_i32(oi);
-         } else {
--            gen_helper_stqcx_le_parallel(cpu_crf[0], cpu_env, EA, lo, hi, oi);
-+            /* Restart with exclusive lock.  */
-+            gen_helper_exit_atomic(cpu_env);
-+            ctx->base.is_jmp = DISAS_NORETURN;
-         }
--#else
--        /* Restart with exclusive lock.  */
--        gen_helper_exit_atomic(cpu_env);
--        ctx->base.is_jmp = DISAS_NORETURN;
--#endif
-         tcg_temp_free(EA);
--        tcg_temp_free_i32(oi);
-     } else {
-         TCGLabel *lab_fail = gen_new_label();
-         TCGLabel *lab_over = gen_new_label();
+     /* Notice an IO access or a needs-MMU-lookup access */
 -- 
 2.17.2
