@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41453)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42795)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gDXqD-0002Qv-V4
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:41:38 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1gDXtU-0007p3-0q
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:45:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gDXqD-0001ye-7W
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:41:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48526)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1gDXqB-0001qS-Qa
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:41:35 -0400
-References: <1539926412-21831-1-git-send-email-liq3ea@gmail.com>
-	<1539926412-21831-5-git-send-email-liq3ea@gmail.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <40678697-be58-af17-0a1f-5195ed108614@redhat.com>
-Date: Fri, 19 Oct 2018 18:41:23 +0200
+	(envelope-from <pbonzini@redhat.com>) id 1gDXtS-0007Og-QX
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:44:59 -0400
+References: <1539954845-26716-1-git-send-email-thuth@redhat.com>
+	<1539954845-26716-5-git-send-email-thuth@redhat.com>
+	<CAFEAcA-ahq3Y4sgs=Vijq_fsDPgX4JuG0gGdMwE5oOLOrsvxjQ@mail.gmail.com>
+	<a6b421a6-439e-ac87-0f96-b28ca349bc70@redhat.com>
+	<CAAdtpL4M9zD3LPOMgQNtN50pKzZAsoKn0c_uBe5vajPFwUMJvQ@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b43a36a4-bb35-77e4-42e3-d15aebd618f9@redhat.com>
+Date: Fri, 19 Oct 2018 18:44:50 +0200
 MIME-Version: 1.0
-In-Reply-To: <1539926412-21831-5-git-send-email-liq3ea@gmail.com>
+In-Reply-To: <CAAdtpL4M9zD3LPOMgQNtN50pKzZAsoKn0c_uBe5vajPFwUMJvQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/7] vfio: paltform: fix a typo
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 4/5] configs: Add a CONFIG_UNIMP switch for
+ the "unimplemented-device"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +28,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@gmail.com>, alex.williamson@redhat.com
-Cc: philmd@redhat.com, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Thomas Huth <thuth@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Richard Henderson <richard.henderson@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, "qemu-ppc@nongnu.org list:PowerPC" <qemu-ppc@nongnu.org>
 
-Hi,
+On 19/10/2018 18:25, Philippe Mathieu-Daud=C3=A9 wrote:
+>=20
+> First because I'm using it heavily on MIPS and PPC boards, when no
+> datashits are available.
+> I'll submit that during the next merge window, although the MIPS tree
+> seems now reluctant to that kind of hobbyist work.
+>=20
+> Second, because it is very clean when you implement a SoC to first
+> start with an empty UNIMP region and a cpu core,
+> then declare the mmio regions for each device (still UNIMP), then you
+> can slowly add devices one at a time.
+> This let you (me, so far) push at most a dozen of tiny patches in a
+> working series, instead of a small series of a dozen of huge patches,
+> or a series of 100 tiny patches.
 
-On 10/19/18 7:20 AM, Li Qiang wrote:
-> Signed-off-by: Li Qiang <liq3ea@gmail.com>
-> ---
->  hw/vfio/platform.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
-> index ba03dcd..5992fe7 100644
-> --- a/hw/vfio/platform.c
-> +++ b/hw/vfio/platform.c
-> @@ -72,7 +72,7 @@ static VFIOINTp *vfio_init_intp(VFIODevice *vbasedev,
->          g_free(intp->interrupt);
->          g_free(intp);
->          error_setg_errno(errp, -ret,
-> -                         "failed to initialize trigger eventd notifier");
-> +                         "failed to initialize trigger eventfd notifier");
->          return NULL;
->      }
->      if (vfio_irq_is_automasked(intp)) {
-> @@ -84,7 +84,7 @@ static VFIOINTp *vfio_init_intp(VFIODevice *vbasedev,
->              g_free(intp->unmask);
->              g_free(intp);
->              error_setg_errno(errp, -ret,
-> -                             "failed to initialize resample eventd notifier");
-> +                             "failed to initialize resample eventfd notifier");
->              return NULL;
->          }
->      }
-> 
-s/palform/platform in the commit message.
+I don't see however why it's a problem to add/remove CONFIG_UNIMP to
+default-configs though (in the Kconfig world the board would "select
+UNIMP").
 
-Besides
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Thanks
-
-Eric
+Paolo
