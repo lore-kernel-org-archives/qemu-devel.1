@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54218)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gDVgA-0007Vp-5f
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 10:23:06 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gDVmF-0001s5-6h
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 10:29:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gDVg9-0001Vt-F3
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 10:23:06 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:42793)
+	(envelope-from <peter.maydell@linaro.org>) id 1gDVmB-00058b-8O
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 10:29:23 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:44808)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gDVg9-0001UZ-9G
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 10:23:05 -0400
-Received: by mail-ot1-x342.google.com with SMTP id c23so31560119otl.9
-	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 07:23:05 -0700 (PDT)
+	id 1gDVm5-00055U-KY
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 10:29:15 -0400
+Received: by mail-oi1-x243.google.com with SMTP id u74-v6so26942073oia.11
+	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 07:29:13 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20181019015617.22583-3-richard.henderson@linaro.org>
+In-Reply-To: <20181019015617.22583-4-richard.henderson@linaro.org>
 References: <20181019015617.22583-1-richard.henderson@linaro.org>
-	<20181019015617.22583-3-richard.henderson@linaro.org>
+	<20181019015617.22583-4-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 19 Oct 2018 15:22:43 +0100
-Message-ID: <CAFEAcA_SsZE8y7UxGqemfshT6+UzGqLP6C-ZGWb_vvPDaR=Oqg@mail.gmail.com>
+Date: Fri, 19 Oct 2018 15:28:52 +0100
+Message-ID: <CAFEAcA81rDucGOEVYi1LCw=1eiHisuM8+yXGzaw2dMktdU99cw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] target/arm: Only flush tlb if ASID
- changes
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] target/arm: Flush only the TLBs
+ affected by TTBR*_EL1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,42 +35,45 @@ Cc: QEMU Developers <qemu-devel@nongnu.org>
 
 On 19 October 2018 at 02:56, Richard Henderson
 <richard.henderson@linaro.org> wrote:
-> Since QEMU does not implement ASIDs, changes to the ASID must flush the
-> tlb.  However, if the ASID does not change there is no reason to flush.
+> Only the EL0 and EL1 TLBs are affected by the EL1 register,
+> so flush only 2 of the 8 TLBs.
 >
-> In testing a boot of the Ubuntu installer to the first menu, this reduces
-> the number of flushes by 30%, or nearly 600k instances.
+> In testing a boot of the Ubuntu installer to the first menu, this
+> accounts for nearly all of the full tlb flushes: all but 11k of
+> the 1.2M instances without the patch.
 >
-> Reviewed-by: Aaron Lindsay <aaron@os.amperecomputing.com>
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  target/arm/helper.c | 8 +++-----
->  1 file changed, 3 insertions(+), 5 deletions(-)
+>  target/arm/helper.c | 16 +++++++++-------
+>  1 file changed, 9 insertions(+), 7 deletions(-)
 >
 > diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 24bbde4f76..ed70ac645e 100644
+> index ed70ac645e..3ba8e66487 100644
 > --- a/target/arm/helper.c
 > +++ b/target/arm/helper.c
-> @@ -2709,12 +2709,10 @@ static void vmsa_tcr_el1_write(CPUARMState *env, const ARMCPRegInfo *ri,
->  static void vmsa_ttbr_write(CPUARMState *env, const ARMCPRegInfo *ri,
->                              uint64_t value)
+> @@ -2706,14 +2706,16 @@ static void vmsa_tcr_el1_write(CPUARMState *env, const ARMCPRegInfo *ri,
+>      tcr->raw_tcr = value;
+>  }
+>
+> -static void vmsa_ttbr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+> -                            uint64_t value)
+> +static void vmsa_ttbr_el1_write(CPUARMState *env, const ARMCPRegInfo *ri,
+> +                                uint64_t value)
 >  {
-> -    /* 64 bit accesses to the TTBRs can change the ASID and so we
-> -     * must flush the TLB.
-> -     */
-> -    if (cpreg_field_is_64bit(ri)) {
-> +    /* If the ASID changes (with a 64-bit write), we must flush the TLB.  */
-> +    if (cpreg_field_is_64bit(ri) &&
-> +        extract64(raw_read(env, ri) ^ value, 48, 16) != 0) {
+>      /* If the ASID changes (with a 64-bit write), we must flush the TLB.  */
+>      if (cpreg_field_is_64bit(ri) &&
+>          extract64(raw_read(env, ri) ^ value, 48, 16) != 0) {
 >          ARMCPU *cpu = arm_env_get_cpu(env);
-> -
->          tlb_flush(CPU(cpu));
->      }
->      raw_write(env, ri, value);
-> --
-> 2.17.2
+> -        tlb_flush(CPU(cpu));
+> +        tlb_flush_by_mmuidx(CPU(cpu),
+> +                            ARMMMUIdxBit_S12NSE1 |
+> +                            ARMMMUIdxBit_S12NSE0);
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+This isn't taking account of the possibility of secure mode.
+ARMMMUIdxBit_S1SE0 and ARMMMUIdxBit_S1SE1 might also be affected.
+
+And for AArch32, this writefn is used for the secure-banked versions
+of TTBR0/TTBR1, which means ARMMMUIdxBit_S1E3 may also need flushing.
 
 thanks
 -- PMM
