@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52527)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54639)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gDX83-0003A1-Vd
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 11:56:00 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1gDXBy-0004wz-LB
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:00:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gDX7v-0005fL-5h
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 11:55:58 -0400
-Received: from mail-pf1-x42b.google.com ([2607:f8b0:4864:20::42b]:39660)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gDX7r-0005JU-1n
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 11:55:47 -0400
-Received: by mail-pf1-x42b.google.com with SMTP id c25-v6so16667481pfe.6
-	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 08:55:43 -0700 (PDT)
-References: <38a2dbae-42d8-ab2d-2e21-056794945677@linaro.org>
-	<877eiensh4.fsf@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <29f04688-085c-1703-1149-3598be36902d@linaro.org>
-Date: Fri, 19 Oct 2018 08:55:39 -0700
+	(envelope-from <pbonzini@redhat.com>) id 1gDXBs-00035r-25
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:00:02 -0400
+References: <1539954845-26716-1-git-send-email-thuth@redhat.com>
+	<1539954845-26716-5-git-send-email-thuth@redhat.com>
+	<CAFEAcA-ahq3Y4sgs=Vijq_fsDPgX4JuG0gGdMwE5oOLOrsvxjQ@mail.gmail.com>
+	<a6b421a6-439e-ac87-0f96-b28ca349bc70@redhat.com>
+	<CAFEAcA9Pb5Dw9zu5_esYwor+MEmUJ=f4ZZqifui9qyJdKWbTiQ@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <98df614b-e432-5a18-34f3-b2275ba9af93@redhat.com>
+Date: Fri, 19 Oct 2018 17:59:34 +0200
 MIME-Version: 1.0
-In-Reply-To: <877eiensh4.fsf@linaro.org>
+In-Reply-To: <CAFEAcA9Pb5Dw9zu5_esYwor+MEmUJ=f4ZZqifui9qyJdKWbTiQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] check-tcg failure
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 4/5] configs: Add a CONFIG_UNIMP switch for
+ the "unimplemented-device"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,32 +28,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Richard Henderson <richard.henderson@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, qemu-ppc <qemu-ppc@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-On 10/19/18 3:25 AM, Alex Bennée wrote:
-> 
-> Richard Henderson <richard.henderson@linaro.org> writes:
-> 
->> On aa64, "cross-compiling" to aa32, with
->>
->> CC=arm-linux-gnueabihf-gcc
-> 
-> So this is different from ./configure --cross-cc=arch-linux-gnueabihf-
+On 19/10/2018 16:43, Peter Maydell wrote:
+> I think if we want to support this for downstreams we need
+> to look at something better than the default-configs/
+> mechanism for it. (Perhaps the kconfig-alike Paolo mentioned
+> in a previous thread?)
 
-No, that's exactly how I configured.
+True, but having more CONFIG_* symbols does not complicate the switch to
+a system like that one.
 
-> In fact looking deeper I'm not sure what HOST_CC is meant to be used
-> for. We export it to make but the only place I can find it in the source
-> tree is:
-> 
-> $(feat-dst)gen-features: $(feat-src)gen-features.c
-> 	$(call quiet-command,$(HOST_CC) $(QEMU_INCLUDES) -o $@ $<,"CC","$(TARGET_DIR)gen-features")
-> 
-> As part of s390x - weird.
+> My dividing line for "should something go in a specific
+> architecture's default-configs/ list" is "is this an SoC
+> or real piece of hardware that is naturally limited to
+> one or a few SoCs".
 
-Because of course gen-features is run on the host to produce gen-features.h, as
-part of the build process.  Those are the two lines immediately above those.
+I tend to agree, but I'd rather have a separate CONFIG_* symbol as soon
+as two different *targets* (aka default-configs/*.mak files) use a
+device.  So the SPARC change that you mention would actually be a good
+reason to introduce CONFIG_UNIMP, for example.
 
-
-r~
+Paolo
