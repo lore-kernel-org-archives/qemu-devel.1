@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47445)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47472)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gDY5n-0001Lv-Rf
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:57:44 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1gDY5q-0001Or-B7
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:57:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gDY5m-0001qp-Sz
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:57:43 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:51972)
+	(envelope-from <pm215@archaic.org.uk>) id 1gDY5p-0001uv-1q
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:57:46 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:51974)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1gDY5m-0001mu-LY
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:57:42 -0400
+	id 1gDY5o-0001qj-Ow
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:57:44 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1gDY5l-0006g3-D1
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 17:57:41 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1gDY5n-0006gc-EU
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 17:57:43 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 19 Oct 2018 17:56:54 +0100
-Message-Id: <20181019165735.22511-5-peter.maydell@linaro.org>
+Date: Fri, 19 Oct 2018 17:56:56 +0100
+Message-Id: <20181019165735.22511-7-peter.maydell@linaro.org>
 In-Reply-To: <20181019165735.22511-1-peter.maydell@linaro.org>
 References: <20181019165735.22511-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 04/45] target/arm: V8M should not imply V7VE
+Subject: [Qemu-devel] [PULL 06/45] target/arm: Convert division from feature
+ bits to isar0 tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,34 +35,131 @@ To: qemu-devel@nongnu.org
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-Instantiating mps2-an505 (cortex-m33) will fail make check when
-V7VE asserts that ID_ISAR0.Divide includes ARM division.  It is
-also wrong to include ARM_FEATURE_LPAE.
+Both arm and thumb2 division are controlled by the same ISAR field,
+which takes care of the arm implies thumb case.  Having M imply
+thumb2 division was wrong for cortex-m0, which is v6m and does not
+have thumb2 at all, much less thumb2 division.
 
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20181016223115.24100-3-richard.henderson@linaro.org
+Message-id: 20181016223115.24100-5-richard.henderson@linaro.org
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/cpu.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ target/arm/cpu.h       | 12 ++++++++++--
+ linux-user/elfload.c   |  4 ++--
+ target/arm/cpu.c       | 10 +---------
+ target/arm/translate.c |  4 ++--
+ 4 files changed, 15 insertions(+), 15 deletions(-)
 
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 1c0712fe840..f1c2ec64616 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -1563,7 +1563,6 @@ enum arm_features {
+     ARM_FEATURE_VFP3,
+     ARM_FEATURE_VFP_FP16,
+     ARM_FEATURE_NEON,
+-    ARM_FEATURE_THUMB_DIV, /* divide supported in Thumb encoding */
+     ARM_FEATURE_M, /* Microcontroller profile.  */
+     ARM_FEATURE_OMAPCP, /* OMAP specific CP15 ops handling.  */
+     ARM_FEATURE_THUMB2EE,
+@@ -1573,7 +1572,6 @@ enum arm_features {
+     ARM_FEATURE_V5,
+     ARM_FEATURE_STRONGARM,
+     ARM_FEATURE_VAPA, /* cp15 VA to PA lookups */
+-    ARM_FEATURE_ARM_DIV, /* divide supported in ARM encoding */
+     ARM_FEATURE_VFP4, /* VFPv4 (implies that NEON is v2) */
+     ARM_FEATURE_GENERIC_TIMER,
+     ARM_FEATURE_MVFR, /* Media and VFP Feature Registers 0 and 1 */
+@@ -3152,6 +3150,16 @@ extern const uint64_t pred_esz_masks[4];
+ /*
+  * 32-bit feature tests via id registers.
+  */
++static inline bool isar_feature_thumb_div(const ARMISARegisters *id)
++{
++    return FIELD_EX32(id->id_isar0, ID_ISAR0, DIVIDE) != 0;
++}
++
++static inline bool isar_feature_arm_div(const ARMISARegisters *id)
++{
++    return FIELD_EX32(id->id_isar0, ID_ISAR0, DIVIDE) > 1;
++}
++
+ static inline bool isar_feature_aa32_aes(const ARMISARegisters *id)
+ {
+     return FIELD_EX32(id->id_isar5, ID_ISAR5, AES) != 0;
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index 97014959ff3..1e0f22d812b 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -471,8 +471,8 @@ static uint32_t get_elf_hwcap(void)
+     GET_FEATURE(ARM_FEATURE_VFP3, ARM_HWCAP_ARM_VFPv3);
+     GET_FEATURE(ARM_FEATURE_V6K, ARM_HWCAP_ARM_TLS);
+     GET_FEATURE(ARM_FEATURE_VFP4, ARM_HWCAP_ARM_VFPv4);
+-    GET_FEATURE(ARM_FEATURE_ARM_DIV, ARM_HWCAP_ARM_IDIVA);
+-    GET_FEATURE(ARM_FEATURE_THUMB_DIV, ARM_HWCAP_ARM_IDIVT);
++    GET_FEATURE_ID(arm_div, ARM_HWCAP_ARM_IDIVA);
++    GET_FEATURE_ID(thumb_div, ARM_HWCAP_ARM_IDIVT);
+     /* All QEMU's VFPv3 CPUs have 32 registers, see VFP_DREG in translate.c.
+      * Note that the ARM_HWCAP_ARM_VFPv3D16 bit is always the inverse of
+      * ARM_HWCAP_ARM_VFPD32 (and so always clear for QEMU); it is unrelated
 diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 4f6756a4e2e..12e6273d603 100644
+index 6f27c33b555..9319f92f1f3 100644
 --- a/target/arm/cpu.c
 +++ b/target/arm/cpu.c
-@@ -814,7 +814,11 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
- 
-     /* Some features automatically imply others: */
-     if (arm_feature(env, ARM_FEATURE_V8)) {
--        set_feature(env, ARM_FEATURE_V7VE);
-+        if (arm_feature(env, ARM_FEATURE_M)) {
-+            set_feature(env, ARM_FEATURE_V7);
-+        } else {
-+            set_feature(env, ARM_FEATURE_V7VE);
-+        }
+@@ -829,7 +829,7 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+          * Presence of EL2 itself is ARM_FEATURE_EL2, and of the
+          * Security Extensions is ARM_FEATURE_EL3.
+          */
+-        set_feature(env, ARM_FEATURE_ARM_DIV);
++        assert(cpu_isar_feature(arm_div, cpu));
+         set_feature(env, ARM_FEATURE_LPAE);
+         set_feature(env, ARM_FEATURE_V7);
      }
-     if (arm_feature(env, ARM_FEATURE_V7VE)) {
-         /* v7 Virtualization Extensions. In real hardware this implies
+@@ -862,12 +862,6 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+     if (arm_feature(env, ARM_FEATURE_V5)) {
+         set_feature(env, ARM_FEATURE_V4T);
+     }
+-    if (arm_feature(env, ARM_FEATURE_M)) {
+-        set_feature(env, ARM_FEATURE_THUMB_DIV);
+-    }
+-    if (arm_feature(env, ARM_FEATURE_ARM_DIV)) {
+-        set_feature(env, ARM_FEATURE_THUMB_DIV);
+-    }
+     if (arm_feature(env, ARM_FEATURE_VFP4)) {
+         set_feature(env, ARM_FEATURE_VFP3);
+         set_feature(env, ARM_FEATURE_VFP_FP16);
+@@ -1388,8 +1382,6 @@ static void cortex_r5_initfn(Object *obj)
+     ARMCPU *cpu = ARM_CPU(obj);
+ 
+     set_feature(&cpu->env, ARM_FEATURE_V7);
+-    set_feature(&cpu->env, ARM_FEATURE_THUMB_DIV);
+-    set_feature(&cpu->env, ARM_FEATURE_ARM_DIV);
+     set_feature(&cpu->env, ARM_FEATURE_V7MP);
+     set_feature(&cpu->env, ARM_FEATURE_PMSA);
+     cpu->midr = 0x411fc153; /* r1p3 */
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index f6215951970..8b2be714390 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -9755,7 +9755,7 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+                     case 1:
+                     case 3:
+                         /* SDIV, UDIV */
+-                        if (!arm_dc_feature(s, ARM_FEATURE_ARM_DIV)) {
++                        if (!dc_isar_feature(arm_div, s)) {
+                             goto illegal_op;
+                         }
+                         if (((insn >> 5) & 7) || (rd != 15)) {
+@@ -10963,7 +10963,7 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+             tmp2 = load_reg(s, rm);
+             if ((op & 0x50) == 0x10) {
+                 /* sdiv, udiv */
+-                if (!arm_dc_feature(s, ARM_FEATURE_THUMB_DIV)) {
++                if (!dc_isar_feature(thumb_div, s)) {
+                     goto illegal_op;
+                 }
+                 if (op & 0x20)
 -- 
 2.19.1
