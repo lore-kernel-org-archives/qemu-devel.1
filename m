@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59307)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gDJFo-0004t2-BY
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:07:06 -0400
+	(envelope-from <cota@braap.org>) id 1gDJFn-0004rl-5k
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:07:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gDJFl-0003Nr-4Q
-	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:07:03 -0400
-Received: from out5-smtp.messagingengine.com ([66.111.4.29]:35991)
+	(envelope-from <cota@braap.org>) id 1gDJFk-0003N3-NL
+	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:07:02 -0400
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:47341)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gDJFk-00035X-CS
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gDJFj-00034m-Va
 	for qemu-devel@nongnu.org; Thu, 18 Oct 2018 21:07:00 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 18 Oct 2018 21:06:16 -0400
-Message-Id: <20181019010625.25294-48-cota@braap.org>
+Date: Thu, 18 Oct 2018 21:06:12 -0400
+Message-Id: <20181019010625.25294-44-cota@braap.org>
 In-Reply-To: <20181019010625.25294-1-cota@braap.org>
 References: <20181019010625.25294-1-cota@braap.org>
-Subject: [Qemu-devel] [RFC v3 47/56] cpu: call .cpu_has_work with the CPU
- lock held
+Subject: [Qemu-devel] [RFC v3 43/56] openrisc: convert to
+ cpu_interrupt_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,34 +25,42 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Stafford Horne <shorne@gmail.com>
 
+Cc: Stafford Horne <shorne@gmail.com>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- include/qom/cpu.h | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ hw/openrisc/cputimer.c | 2 +-
+ target/openrisc/cpu.c  | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index cd66b8828a..ca7d92c360 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -784,9 +784,16 @@ const char *parse_cpu_model(const char *cpu_model);
- static inline bool cpu_has_work(CPUState *cpu)
- {
-     CPUClass *cc = CPU_GET_CLASS(cpu);
-+    bool ret;
+diff --git a/hw/openrisc/cputimer.c b/hw/openrisc/cputimer.c
+index 850f88761c..739404e4f5 100644
+--- a/hw/openrisc/cputimer.c
++++ b/hw/openrisc/cputimer.c
+@@ -102,7 +102,7 @@ static void openrisc_timer_cb(void *opaque)
+         CPUState *cs = CPU(cpu);
  
-     g_assert(cc->has_work);
--    return cc->has_work(cpu);
-+    if (cpu_mutex_locked(cpu)) {
-+        return cc->has_work(cpu);
-+    }
-+    cpu_mutex_lock(cpu);
-+    ret = cc->has_work(cpu);
-+    cpu_mutex_unlock(cpu);
-+    return ret;
+         cpu->env.ttmr |= TTMR_IP;
+-        cs->interrupt_request |= CPU_INTERRUPT_TIMER;
++        cpu_interrupt_request_or(cs, CPU_INTERRUPT_TIMER);
+     }
+ 
+     switch (cpu->env.ttmr & TTMR_M) {
+diff --git a/target/openrisc/cpu.c b/target/openrisc/cpu.c
+index fb7cb5c507..cdbc9353b7 100644
+--- a/target/openrisc/cpu.c
++++ b/target/openrisc/cpu.c
+@@ -32,8 +32,8 @@ static void openrisc_cpu_set_pc(CPUState *cs, vaddr value)
+ 
+ static bool openrisc_cpu_has_work(CPUState *cs)
+ {
+-    return cs->interrupt_request & (CPU_INTERRUPT_HARD |
+-                                    CPU_INTERRUPT_TIMER);
++    return cpu_interrupt_request(cs) & (CPU_INTERRUPT_HARD |
++                                        CPU_INTERRUPT_TIMER);
  }
  
- /**
+ static void openrisc_disas_set_info(CPUState *cpu, disassemble_info *info)
 -- 
 2.17.1
