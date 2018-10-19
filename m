@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37274)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38099)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gDRJu-0008Vp-A4
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 05:43:51 -0400
+	(envelope-from <mreitz@redhat.com>) id 1gDRNA-00012D-OX
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 05:47:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gDRJr-00079m-40
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 05:43:50 -0400
+	(envelope-from <mreitz@redhat.com>) id 1gDRN8-0004Ck-6h
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 05:47:11 -0400
 References: <20181015141453.32632-1-mreitz@redhat.com>
-	<20181015141453.32632-7-mreitz@redhat.com>
-	<4c35f899-8586-4b57-7c9d-699aac223752@redhat.com>
+	<20181015141453.32632-8-mreitz@redhat.com>
+	<14120cdc-1517-f9af-9f35-3c78b4f634a9@redhat.com>
+	<20181015235752.GK31060@habkost.net>
+	<0287ec2e-9ab7-2fd3-4abf-1c84a97f0e07@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <cc57cd72-eafc-e6a9-207c-6ebb7eea5deb@redhat.com>
-Date: Fri, 19 Oct 2018 11:43:32 +0200
+Message-ID: <454c0ced-e3d9-e447-9e2b-ef8badb808d1@redhat.com>
+Date: Fri, 19 Oct 2018 11:46:59 +0200
 MIME-Version: 1.0
-In-Reply-To: <4c35f899-8586-4b57-7c9d-699aac223752@redhat.com>
+In-Reply-To: <0287ec2e-9ab7-2fd3-4abf-1c84a97f0e07@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="M8sKQjef8FCsbhKFEFPE4DKdqBAcqGWC2"
-Subject: Re: [Qemu-devel] [PATCH 6/9] iotests: Explicitly inherit FDs in
- Python
+	boundary="0s4ROCvcsss7lZnCLTyxvJ48ehcnhsAAR"
+Subject: Re: [Qemu-devel] [PATCH 7/9] iotests: 'new' module replacement in
+ 169
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,172 +28,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+To: Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---M8sKQjef8FCsbhKFEFPE4DKdqBAcqGWC2
+--0s4ROCvcsss7lZnCLTyxvJ48ehcnhsAAR
 From: Max Reitz <mreitz@redhat.com>
-To: Cleber Rosa <crosa@redhat.com>, qemu-block@nongnu.org
+To: Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <cc57cd72-eafc-e6a9-207c-6ebb7eea5deb@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 6/9] iotests: Explicitly inherit FDs in
- Python
+ qemu-block@nongnu.org
+Message-ID: <454c0ced-e3d9-e447-9e2b-ef8badb808d1@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 7/9] iotests: 'new' module replacement in 169
 References: <20181015141453.32632-1-mreitz@redhat.com>
- <20181015141453.32632-7-mreitz@redhat.com>
- <4c35f899-8586-4b57-7c9d-699aac223752@redhat.com>
-In-Reply-To: <4c35f899-8586-4b57-7c9d-699aac223752@redhat.com>
+ <20181015141453.32632-8-mreitz@redhat.com>
+ <14120cdc-1517-f9af-9f35-3c78b4f634a9@redhat.com>
+ <20181015235752.GK31060@habkost.net>
+ <0287ec2e-9ab7-2fd3-4abf-1c84a97f0e07@redhat.com>
+In-Reply-To: <0287ec2e-9ab7-2fd3-4abf-1c84a97f0e07@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 16.10.18 01:18, Cleber Rosa wrote:
+On 16.10.18 03:01, Cleber Rosa wrote:
 >=20
 >=20
-> On 10/15/18 10:14 AM, Max Reitz wrote:
->> Python 3.2 introduced the inheritable attribute for FDs.  At the same
->> time, it changed the default so that all FDs are not inheritable by
->> default, that only inheritable FDs are inherited to subprocesses, and
->> only if close_fds is explicitly set to False.
+> On 10/15/18 7:57 PM, Eduardo Habkost wrote:
+>> On Mon, Oct 15, 2018 at 07:38:45PM -0400, Cleber Rosa wrote:
+>>>
+>>>
+>>> On 10/15/18 10:14 AM, Max Reitz wrote:
+>>>> iotest 169 uses the 'new' module to add methods to a class.  This mo=
+dule
+>>>> no longer exists in Python 3.  Instead, we can use a lambda.  Best o=
+f
+>>>> all, this works in 2.7 just as well.
+>>>>
+>>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>>>> ---
+>>>>  tests/qemu-iotests/169 | 3 +--
+>>>>  1 file changed, 1 insertion(+), 2 deletions(-)
+>>>>
+>>>> diff --git a/tests/qemu-iotests/169 b/tests/qemu-iotests/169
+>>>> index f243db9955..e5614b159d 100755
+>>>> --- a/tests/qemu-iotests/169
+>>>> +++ b/tests/qemu-iotests/169
+>>>> @@ -23,7 +23,6 @@ import iotests
+>>>>  import time
+>>>>  import itertools
+>>>>  import operator
+>>>> -import new
+>>>>  from iotests import qemu_img
+>>>> =20
+>>>> =20
+>>>> @@ -144,7 +143,7 @@ class TestDirtyBitmapMigration(iotests.QMPTestCa=
+se):
+>>>> =20
+>>>>  def inject_test_case(klass, name, method, *args, **kwargs):
+>>>>      mc =3D operator.methodcaller(method, *args, **kwargs)
+>>>> -    setattr(klass, 'test_' + name, new.instancemethod(mc, None, kla=
+ss))
+>>>> +    setattr(klass, 'test_' + name, lambda self: mc(self))
+>>>> =20
+>>>>  for cmb in list(itertools.product((True, False), repeat=3D4)):
+>>>>      name =3D ('_' if cmb[0] else '_not_') + 'persistent_'
+>>>>
+>>>
+>>> This can be simplified with:
+>>>
+>>> diff --git a/tests/qemu-iotests/169 b/tests/qemu-iotests/169
+>>> index e5614b159d..2199f14ae7 100755
+>>> --- a/tests/qemu-iotests/169
+>>> +++ b/tests/qemu-iotests/169
+>>> @@ -22,7 +22,6 @@ import os
+>>>  import iotests
+>>>  import time
+>>>  import itertools
+>>> -import operator
+>>>  from iotests import qemu_img
+>>>
+>>>
+>>> @@ -141,18 +140,15 @@ class TestDirtyBitmapMigration(iotests.QMPTestC=
+ase):
+>>>              self.check_bitmap(self.vm_b, sha256 if persistent else F=
+alse)
+>>>
+>>>
+>>> -def inject_test_case(klass, name, method, *args, **kwargs):
+>>> -    mc =3D operator.methodcaller(method, *args, **kwargs)
+>>> -    setattr(klass, 'test_' + name, lambda self: mc(self))
+>>> -
+>>>  for cmb in list(itertools.product((True, False), repeat=3D4)):
+>>>      name =3D ('_' if cmb[0] else '_not_') + 'persistent_'
+>>>      name +=3D ('_' if cmb[1] else '_not_') + 'migbitmap_'
+>>>      name +=3D '_online' if cmb[2] else '_offline'
+>>>      name +=3D '_shared' if cmb[3] else '_nonshared'
+>>>
+>>> -    inject_test_case(TestDirtyBitmapMigration, name, 'do_test_migrat=
+ion',
+>>> -                     *list(cmb))
+>>> +    setattr(TestDirtyBitmapMigration, 'test_' + name,
+>>> +            lambda self: TestDirtyBitmapMigration.do_test_migration(=
+
+>>> +                self, *list(cmb)))
+>>
+>> I'm not fond of the long multi-line lambda expression, but I love
+>> that you got rid of operator.methodcaller().  :)
+>>
+>> However, this doesn't seem to work: `*list(cmb)` will be
+>> evaluated only when the lambda is called, and `cmb` will be
+>> always `(False, False, False, False)`.
+>>
+>> I was going to suggest defining a nested function inside
+>> inject_test_case() to replace operator.methodcaller(), but then I
+>> thought it was not worth it.
 >>
 >=20
-> It's actually a change that was introduced in 3.4:
+> You're right! I missed that.  Anyway, another possibility:
 >=20
-> https://docs.python.org/3/library/os.html#inheritance-of-file-descripto=
-rs
-
-Oops, don't know how I got that wrong.
-
->> Adhere to this by setting close_fds to False when working with
->> subprocesses that may want to inherit FDs, and by trying to
->> set_inheritable() on FDs that we do want to bequeath to them.
->>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  scripts/qemu.py        | 13 +++++++++++--
->>  scripts/qmp/qmp.py     |  7 +++++++
->>  tests/qemu-iotests/147 |  7 +++++++
->>  3 files changed, 25 insertions(+), 2 deletions(-)
->>
->> diff --git a/scripts/qemu.py b/scripts/qemu.py
->> index f099ce7278..28366c4a67 100644
->> --- a/scripts/qemu.py
->> +++ b/scripts/qemu.py
->> @@ -142,10 +142,18 @@ class QEMUMachine(object):
->>          if opts:
->>              options.append(opts)
->> =20
->> +        # This did not exist before 3.2, but since then it is
->> +        # mandatory for our purpose
->> +        try:
+> diff --git a/tests/qemu-iotests/169 b/tests/qemu-iotests/169
+> index e5614b159d..cd0d9c289c 100755
+> --- a/tests/qemu-iotests/169
+> +++ b/tests/qemu-iotests/169
+> @@ -22,7 +22,7 @@ import os
+>  import iotests
+>  import time
+>  import itertools
+> -import operator
+> +import functools
+>  from iotests import qemu_img
 >=20
-> Version should be 3.4 here as well.
-
-Yes, will fix everywhere.
-
->> +            os.set_inheritable(fd, True)
->> +        except AttributeError:
->> +            pass
->> +
 >=20
-> Doing hasattr(os, "set_inheritable") is cheaper.
+> @@ -140,20 +140,15 @@ class TestDirtyBitmapMigration(iotests.QMPTestCas=
+e):
+>              self.vm_b.launch()
+>              self.check_bitmap(self.vm_b, sha256 if persistent else Fal=
+se)
 >=20
-> - Cleber.
+> -
+> -def inject_test_case(klass, name, method, *args, **kwargs):
+> -    mc =3D operator.methodcaller(method, *args, **kwargs)
+> -    setattr(klass, 'test_' + name, lambda self: mc(self))
+> -
+> -for cmb in list(itertools.product((True, False), repeat=3D4)):
+> +for cmb in itertools.product((True, False), repeat=3D4):
+>      name =3D ('_' if cmb[0] else '_not_') + 'persistent_'
+>      name +=3D ('_' if cmb[1] else '_not_') + 'migbitmap_'
+>      name +=3D '_online' if cmb[2] else '_offline'
+>      name +=3D '_shared' if cmb[3] else '_nonshared'
+>=20
+> -    inject_test_case(TestDirtyBitmapMigration, name, 'do_test_migratio=
+n',
+> -                     *list(cmb))
+> -
+> +    test =3D
+> functools.partialmethod(TestDirtyBitmapMigration.do_test_migration,
+> +                                   *cmb)
+> +    setattr(TestDirtyBitmapMigration, 'test_' + name, test)
 
-Nice, I'll use that then.
+I'm not sure how that is any simpler, though (apart from the inlining). :=
+-)
+
+I mean, my personal goal is not to touch this beyond what I need to
+because it's black magic to me anyway, so I'm happy with what works.
 
 Max
 
->>          self._args.append('-add-fd')
->>          self._args.append(','.join(options))
->>          return self
->> =20
->> +    # The caller needs to make sure the FD is inheritable
->>      def send_fd_scm(self, fd_file_path):
->>          # In iotest.py, the qmp should always use unix socket.
->>          assert self._qmp.is_scm_available()
->> @@ -159,7 +167,7 @@ class QEMUMachine(object):
->>                      "%s" % fd_file_path]
->>          devnull =3D open(os.path.devnull, 'rb')
->>          proc =3D subprocess.Popen(fd_param, stdin=3Ddevnull, stdout=3D=
-subprocess.PIPE,
->> -                                stderr=3Dsubprocess.STDOUT)
->> +                                stderr=3Dsubprocess.STDOUT, close_fds=
-=3DFalse)
->>          output =3D proc.communicate()[0]
->>          if output:
->>              LOG.debug(output)
->> @@ -280,7 +288,8 @@ class QEMUMachine(object):
->>                                         stdin=3Ddevnull,
->>                                         stdout=3Dself._qemu_log_file,
->>                                         stderr=3Dsubprocess.STDOUT,
->> -                                       shell=3DFalse)
->> +                                       shell=3DFalse,
->> +                                       close_fds=3DFalse)
->>          self._post_launch()
->> =20
->>      def wait(self):
->> diff --git a/scripts/qmp/qmp.py b/scripts/qmp/qmp.py
->> index 5c8cf6a056..009be8345b 100644
->> --- a/scripts/qmp/qmp.py
->> +++ b/scripts/qmp/qmp.py
->> @@ -10,6 +10,7 @@
->> =20
->>  import json
->>  import errno
->> +import os
->>  import socket
->>  import logging
->> =20
->> @@ -253,4 +254,10 @@ class QEMUMonitorProtocol(object):
->>          return self.__sock.fileno()
->> =20
->>      def is_scm_available(self):
->> +        # This did not exist before 3.2, but since then it is
->> +        # mandatory for our purpose
->> +        try:
->> +            os.set_inheritable(self.get_sock_fd(), True)
->> +        except AttributeError:
->> +            pass
->>          return self.__sock.family =3D=3D socket.AF_UNIX
->> diff --git a/tests/qemu-iotests/147 b/tests/qemu-iotests/147
->> index d2081df84b..b58455645b 100755
->> --- a/tests/qemu-iotests/147
->> +++ b/tests/qemu-iotests/147
->> @@ -229,6 +229,13 @@ class BuiltinNBD(NBDBlockdevAddBase):
->>          sockfd =3D socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
->>          sockfd.connect(unix_socket)
->> =20
->> +        # This did not exist before 3.2, but since then it is
->> +        # mandatory for our purpose
->> +        try:
->> +            os.set_inheritable(sockfd.fileno(), True)
->> +        except AttributeError:
->> +            pass
->> +
->>          result =3D self.vm.send_fd_scm(str(sockfd.fileno()))
->>          self.assertEqual(result, 0, 'Failed to send socket FD')
->> =20
->>
->=20
 
-
-
---M8sKQjef8FCsbhKFEFPE4DKdqBAcqGWC2
+--0s4ROCvcsss7lZnCLTyxvJ48ehcnhsAAR
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlvJp0QACgkQ9AfbAGHV
-z0AwbAf/aqruepb1d1IDUjMKCTed5WL6kGrVvy8UljwlTWvyT+MTasRxV1u81hjC
-yIXa/j5A82uVtIKgKR5ef0LHoXvwuY7kaHt2ba++W0fc66apM8C7Y4dxZDC6ZhGv
-75Q39LgaKRXPmiamKV2ob6clO8RRIDpDD2HgjGyyScGC63T1RXoQf2DNys+2zZFs
-7WPYjIMuDF/oCceOAB37QKOIXUrQP09aGDz2TIupYv1XpNKG2LoPuK3O2RKpCXEq
-nH0jyEZaZi4BzSo5xGFgy3kxIURzmlJvDtVWu+Nmu+ztlg8PEpV/YW0h78WfitA7
-gTELbXWjKFHEekHd2OB2U9tO/QnjGA==
-=myLl
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlvJqBMACgkQ9AfbAGHV
+z0C18Qf9F0eQjI9p+NtmZnMWzbWLR9kw8ZX01nQu8KHELIaEKfKPRoBxZI91RxgF
+mtqz17fnK3XULyZGAyfNxbAq5KF9gJqAu6FnMmY5/ihXY9M4iYlAwFTFugER2ENX
+dIHDTXOweRl4xpxWd1L6SKFMRibXIQ81YhA6zgZVCwfBEtUfnDGZo/RR6gtu+HOR
+k836iDNbU2DKGfdfQMof/End6PJJoo+ed7e9dxoYHiWdIX3FSzrQqs2BHNzidamQ
+dYxsIjaBSZvfamBFWo+51K0pPhXV22SjGiCfgs8ZmAkxTL4HS5sFzYeY4SS0MWNJ
+wjn11i6gNk+02DHSbJvP0AIMFoERtQ==
+=u+AU
 -----END PGP SIGNATURE-----
 
---M8sKQjef8FCsbhKFEFPE4DKdqBAcqGWC2--
+--0s4ROCvcsss7lZnCLTyxvJ48ehcnhsAAR--
