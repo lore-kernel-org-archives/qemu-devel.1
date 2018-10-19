@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60536)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gDSWR-00030r-RK
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 07:00:56 -0400
+	(envelope-from <berrange@redhat.com>) id 1gDSY6-0004LF-7U
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 07:02:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gDSWG-0005Qs-CK
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 07:00:46 -0400
-Received: from mail.uni-paderborn.de ([131.234.142.9]:54916)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
-	id 1gDSWD-0005LH-FX
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 07:00:39 -0400
-References: <20181012173047.25420-1-kbastian@mail.uni-paderborn.de>
-	<20181012173047.25420-5-kbastian@mail.uni-paderborn.de>
-	<7cd20102-7198-2755-3ef5-eca7716ac61e@linaro.org>
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Message-ID: <da430247-4273-6df4-3629-99140c0995bc@mail.uni-paderborn.de>
-Date: Fri, 19 Oct 2018 13:00:33 +0200
+	(envelope-from <berrange@redhat.com>) id 1gDSXu-0007yL-NS
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 07:02:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46760)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gDSXp-0007oi-1n
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 07:02:18 -0400
+Date: Fri, 19 Oct 2018 12:02:03 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181019110203.GL13722@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20181018223501.21683-1-jusual@mail.ru>
+	<20181018223501.21683-4-jusual@mail.ru>
 MIME-Version: 1.0
-In-Reply-To: <7cd20102-7198-2755-3ef5-eca7716ac61e@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US-large
-Subject: Re: [Qemu-devel] [PATCH 04/28] target/riscv: Convert RVXI
- arithmetic insns to decodetree
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20181018223501.21683-4-jusual@mail.ru>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 3/3] tests/test-char: Check websocket
+ chardev functionality
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,44 +30,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, mjc@sifive.com, palmer@sifive.com, sagark@eecs.berkeley.edu
-Cc: peer.adelt@hni.uni-paderborn.de, Alistair.Francis@wdc.com, qemu-devel@nongnu.org
+To: Julia Suvorova <jusual@mail.ru>
+Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, marcandre.lureau@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Steffen =?utf-8?B?R8O2cnR6?= <mail@steffen-goertz.de>
 
-Hi Richard,
+On Fri, Oct 19, 2018 at 01:35:01AM +0300, Julia Suvorova wrote:
+> Test order:
+>     Creating server websocket chardev
+>     Creating usual tcp chardev client
+>     Sending handshake message from client
+>     Receiving handshake reply
+>     Sending ping frame with "hello" payload
+>     Receiving pong reply
+>     Sending binary data "world"
+>     Checking the received data on server side
+>     Checking of closing handshake
+>=20
+> Signed-off-by: Julia Suvorova <jusual@mail.ru>
+> ---
+>  tests/test-char.c | 125 ++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 125 insertions(+)
 
-On 10/12/18 8:46 PM, Richard Henderson wrote:
-> On 10/12/18 10:30 AM, Bastian Koppelmann wrote:
->> +static bool trans_andi(DisasContext *ctx, arg_andi *a, uint32_t insn)
->> +{
->> +    gen_arith_imm(ctx, OPC_RISC_ANDI, a->rd, a->rs1, a->imm);
->> +    return true;
->> +}
->> +static bool trans_slli(DisasContext *ctx, arg_slli *a, uint32_t insn)
->> +{
->> +    if (a->rd != 0) {
->> +        TCGv t = tcg_temp_new();
->> +        gen_get_gpr(t, a->rs1);
->> +
->> +        if (a->shamt >= TARGET_LONG_BITS) {
->> +            gen_exception_illegal(ctx);
->> +            return true;
->> +        }
->> +        tcg_gen_shli_tl(t, t, a->shamt);
->> +
->> +        gen_set_gpr(a->rd, t);
->> +        tcg_temp_free(t);
->> +    } /* NOP otherwise */
->> +    return true;
->> +}
-> Spacing.  Any reason why trans_slli (and the other shifts) aren't using
-> gen_arith_imm as well?
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
 
-Their opcode is not uniquely defined in instmap.h, just a generic 
-OPC_RISC_SHIFT_RIGHT_IW. I guess I can give the opcode as a magic value 
-for now.
-
-
-Cheers,
-
-Bastian
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
