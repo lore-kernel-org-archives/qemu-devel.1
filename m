@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54657)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54659)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Liam.Merwick@oracle.com>) id 1gDbXv-0007sN-0v
+	(envelope-from <Liam.Merwick@oracle.com>) id 1gDbXv-0007sO-2I
 	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 16:38:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Liam.Merwick@oracle.com>) id 1gDbXu-0002SY-40
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 16:38:58 -0400
+	(envelope-from <Liam.Merwick@oracle.com>) id 1gDbXu-0002T0-8J
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 16:38:59 -0400
 From: Liam Merwick <Liam.Merwick@oracle.com>
-Date: Fri, 19 Oct 2018 21:39:00 +0100
-Message-Id: <1539981546-10596-3-git-send-email-Liam.Merwick@oracle.com>
+Date: Fri, 19 Oct 2018 21:39:01 +0100
+Message-Id: <1539981546-10596-4-git-send-email-Liam.Merwick@oracle.com>
 In-Reply-To: <1539981546-10596-1-git-send-email-Liam.Merwick@oracle.com>
 References: <1539981546-10596-1-git-send-email-Liam.Merwick@oracle.com>
-Subject: [Qemu-devel] [PATCH v4 2/8] job: Fix off-by-one assert checks for
- JobSTT and JobVerbTable
+Subject: [Qemu-devel] [PATCH v4 3/8] block: Null pointer dereference in
+ blk_root_get_parent_desc()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,47 +23,51 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, jsnow@redhat.com, berrange@redhat.com, mreitz@redhat.com
 
-In the assert checking the array dereference of JobVerbTable[verb]
-in job_apply_verb() the check of the index, verb, allows an overrun
-because an index equal to the array size is permitted.
+The dev_id returned by the call to blk_get_attached_dev_id() in
+blk_root_get_parent_desc() can be NULL (an internal call to
+object_get_canonical_path may have returned NULL).
 
-Similarly, in the assert check of JobSTT[s0][s1] with index s1
-in job_state_transition(), an off-by-one overrun is not flagged
-either.
-
-This is not a run-time issue as there are no callers actually
-passing in the max value.
+Instead of just checking this case before before dereferencing,
+adjust blk_get_attached_dev_id() to return the empty string if no
+object path can be found (similar to the case when blk->dev is NULL
+and an empty string is returned).
 
 Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
-Reviewed-by: Darren Kenny <Darren.Kenny@oracle.com>
-Reviewed-by: Mark Kanda <Mark.Kanda@oracle.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- job.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ block/block-backend.c | 6 +++++-
+ dtc                   | 2 +-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/job.c b/job.c
-index c65e01bbfa34..da8e4b7bf2f3 100644
---- a/job.c
-+++ b/job.c
-@@ -159,7 +159,7 @@ bool job_is_internal(Job *job)
- static void job_state_transition(Job *job, JobStatus s1)
+diff --git a/block/block-backend.c b/block/block-backend.c
+index dc0cd5772413..e628920f3cd8 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -909,6 +909,7 @@ void *blk_get_attached_dev(BlockBackend *blk)
+ char *blk_get_attached_dev_id(BlockBackend *blk)
  {
-     JobStatus s0 = job->status;
--    assert(s1 >= 0 && s1 <= JOB_STATUS__MAX);
-+    assert(s1 >= 0 && s1 < JOB_STATUS__MAX);
-     trace_job_state_transition(job, job->ret,
-                                JobSTT[s0][s1] ? "allowed" : "disallowed",
-                                JobStatus_str(s0), JobStatus_str(s1));
-@@ -174,7 +174,7 @@ static void job_state_transition(Job *job, JobStatus s1)
- int job_apply_verb(Job *job, JobVerb verb, Error **errp)
- {
-     JobStatus s0 = job->status;
--    assert(verb >= 0 && verb <= JOB_VERB__MAX);
-+    assert(verb >= 0 && verb < JOB_VERB__MAX);
-     trace_job_apply_verb(job, JobStatus_str(s0), JobVerb_str(verb),
-                          JobVerbTable[verb][s0] ? "allowed" : "prohibited");
-     if (JobVerbTable[verb][s0]) {
+     DeviceState *dev;
++    char *dev_id;
+ 
+     assert(!blk->legacy_dev);
+     dev = blk->dev;
+@@ -918,7 +919,10 @@ char *blk_get_attached_dev_id(BlockBackend *blk)
+     } else if (dev->id) {
+         return g_strdup(dev->id);
+     }
+-    return object_get_canonical_path(OBJECT(dev));
++
++    dev_id = object_get_canonical_path(OBJECT(dev));
++
++    return dev_id ? dev_id : g_strdup("");
+ }
+ 
+ /*
+diff --git a/dtc b/dtc
+index 88f18909db73..e54388015af1 160000
+--- a/dtc
++++ b/dtc
+@@ -1 +1 @@
+-Subproject commit 88f18909db731a627456f26d779445f84e449536
++Subproject commit e54388015af1fb4bf04d0bca99caba1074d9cc42
 -- 
 1.8.3.1
