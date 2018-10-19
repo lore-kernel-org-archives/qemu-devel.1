@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48999)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gDQhj-0000jH-KQ
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 05:04:24 -0400
+	(envelope-from <mreitz@redhat.com>) id 1gDQjV-0001o4-MJ
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 05:06:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gDQhh-0000k3-RW
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 05:04:23 -0400
+	(envelope-from <mreitz@redhat.com>) id 1gDQjU-0004aW-3n
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 05:06:13 -0400
 References: <20181015141453.32632-1-mreitz@redhat.com>
-	<20181015141453.32632-7-mreitz@redhat.com>
-	<20181015203036.GE31060@habkost.net>
+	<20181015141453.32632-5-mreitz@redhat.com>
+	<b5f45c50-eb78-837e-e1be-114fe758aae6@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <edce93ab-cdde-fc70-4592-3bede42301a2@redhat.com>
-Date: Fri, 19 Oct 2018 11:03:56 +0200
+Message-ID: <0b4c1473-93a6-9841-dd59-6c857b312613@redhat.com>
+Date: Fri, 19 Oct 2018 11:06:00 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181015203036.GE31060@habkost.net>
+In-Reply-To: <b5f45c50-eb78-837e-e1be-114fe758aae6@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="uXUcvOb7wCzcAj1IPeURHEwegcXDwAroM"
-Subject: Re: [Qemu-devel] [PATCH 6/9] iotests: Explicitly inherit FDs in
- Python
+	boundary="5m7bZlJOyAacNR8scQ1vr7SNnHtxftk9M"
+Subject: Re: [Qemu-devel] [PATCH 4/9] iotests: Use // for Python integer
+ division
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,209 +26,267 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: Cleber Rosa <crosa@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---uXUcvOb7wCzcAj1IPeURHEwegcXDwAroM
+--5m7bZlJOyAacNR8scQ1vr7SNnHtxftk9M
 From: Max Reitz <mreitz@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Kevin Wolf <kwolf@redhat.com>, Cleber Rosa <crosa@redhat.com>
-Message-ID: <edce93ab-cdde-fc70-4592-3bede42301a2@redhat.com>
-Subject: Re: [PATCH 6/9] iotests: Explicitly inherit FDs in Python
+To: Cleber Rosa <crosa@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <0b4c1473-93a6-9841-dd59-6c857b312613@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 4/9] iotests: Use // for Python integer
+ division
 References: <20181015141453.32632-1-mreitz@redhat.com>
- <20181015141453.32632-7-mreitz@redhat.com>
- <20181015203036.GE31060@habkost.net>
-In-Reply-To: <20181015203036.GE31060@habkost.net>
+ <20181015141453.32632-5-mreitz@redhat.com>
+ <b5f45c50-eb78-837e-e1be-114fe758aae6@redhat.com>
+In-Reply-To: <b5f45c50-eb78-837e-e1be-114fe758aae6@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 15.10.18 22:30, Eduardo Habkost wrote:
-> On Mon, Oct 15, 2018 at 04:14:50PM +0200, Max Reitz wrote:
->> Python 3.2 introduced the inheritable attribute for FDs.  At the same
->> time, it changed the default so that all FDs are not inheritable by
->> default, that only inheritable FDs are inherited to subprocesses, and
->> only if close_fds is explicitly set to False.
->>
->> Adhere to this by setting close_fds to False when working with
->> subprocesses that may want to inherit FDs, and by trying to
->> set_inheritable() on FDs that we do want to bequeath to them.
+On 15.10.18 23:13, Cleber Rosa wrote:
+>=20
+>=20
+> On 10/15/18 10:14 AM, Max Reitz wrote:
+>> In Python 3, / is always a floating-point division.  We usually do not=
+
+>> want this, and as Python 2.7 understands // as well, change all intege=
+r
+>> divisions to use that.
 >>
 >> Signed-off-by: Max Reitz <mreitz@redhat.com>
 >> ---
->>  scripts/qemu.py        | 13 +++++++++++--
->>  scripts/qmp/qmp.py     |  7 +++++++
->>  tests/qemu-iotests/147 |  7 +++++++
->>  3 files changed, 25 insertions(+), 2 deletions(-)
+>>  tests/qemu-iotests/040        |  4 ++--
+>>  tests/qemu-iotests/044        |  2 +-
+>>  tests/qemu-iotests/093        | 18 +++++++++---------
+>>  tests/qemu-iotests/149        |  6 +++---
+>>  tests/qemu-iotests/151        | 12 ++++++------
+>>  tests/qemu-iotests/163        |  2 +-
+>>  tests/qemu-iotests/iotests.py |  2 +-
+>>  7 files changed, 23 insertions(+), 23 deletions(-)
 >>
->> diff --git a/scripts/qemu.py b/scripts/qemu.py
->> index f099ce7278..28366c4a67 100644
->> --- a/scripts/qemu.py
->> +++ b/scripts/qemu.py
->> @@ -142,10 +142,18 @@ class QEMUMachine(object):
->>          if opts:
->>              options.append(opts)
+>> diff --git a/tests/qemu-iotests/040 b/tests/qemu-iotests/040
+>> index 1cb1ceeb33..b81133a474 100755
+>> --- a/tests/qemu-iotests/040
+>> +++ b/tests/qemu-iotests/040
+>> @@ -195,7 +195,7 @@ class TestSingleDrive(ImageCommitTestCase):
 >> =20
->> +        # This did not exist before 3.2, but since then it is
->> +        # mandatory for our purpose
->> +        try:
->> +            os.set_inheritable(fd, True)
->> +        except AttributeError:
->> +            pass
->> +
->=20
-> This is add_fd(), so calling set_inheritable() automatically here
-> makes sense.
->=20
->>          self._args.append('-add-fd')
->>          self._args.append(','.join(options))
->>          return self
+>>          self.assert_no_active_block_jobs()
+>>          result =3D self.vm.qmp('block-commit', device=3D'drive0', top=
+=3Dmid_img,
+>> -                             base=3Dbacking_img, speed=3D(self.image_=
+len / 4))
+>> +                             base=3Dbacking_img, speed=3D(self.image_=
+len // 4))
+>>          self.assert_qmp(result, 'return', {})
+>>          result =3D self.vm.qmp('device_del', id=3D'scsi0')
+>>          self.assert_qmp(result, 'return', {})
+>> @@ -225,7 +225,7 @@ class TestSingleDrive(ImageCommitTestCase):
 >> =20
->> +    # The caller needs to make sure the FD is inheritable
->>      def send_fd_scm(self, fd_file_path):
->>          # In iotest.py, the qmp should always use unix socket.
->>          assert self._qmp.is_scm_available()
->> @@ -159,7 +167,7 @@ class QEMUMachine(object):
->>                      "%s" % fd_file_path]
->>          devnull =3D open(os.path.devnull, 'rb')
->>          proc =3D subprocess.Popen(fd_param, stdin=3Ddevnull, stdout=3D=
-subprocess.PIPE,
->> -                                stderr=3Dsubprocess.STDOUT)
->> +                                stderr=3Dsubprocess.STDOUT, close_fds=
-=3DFalse)
->>          output =3D proc.communicate()[0]
->>          if output:
->>              LOG.debug(output)
->> @@ -280,7 +288,8 @@ class QEMUMachine(object):
->>                                         stdin=3Ddevnull,
->>                                         stdout=3Dself._qemu_log_file,
->>                                         stderr=3Dsubprocess.STDOUT,
->> -                                       shell=3DFalse)
->> +                                       shell=3DFalse,
->> +                                       close_fds=3DFalse)
->>          self._post_launch()
+>>          self.assert_no_active_block_jobs()
+>>          result =3D self.vm.qmp('block-commit', device=3D'drive0', top=
+=3Dmid_img,
+>> -                             base=3Dbacking_img, speed=3D(self.image_=
+len / 4))
+>> +                             base=3Dbacking_img, speed=3D(self.image_=
+len // 4))
+>>          self.assert_qmp(result, 'return', {})
 >> =20
->>      def wait(self):
->> diff --git a/scripts/qmp/qmp.py b/scripts/qmp/qmp.py
->> index 5c8cf6a056..009be8345b 100644
->> --- a/scripts/qmp/qmp.py
->> +++ b/scripts/qmp/qmp.py
->> @@ -10,6 +10,7 @@
+>>          result =3D self.vm.qmp('query-block')
+>> diff --git a/tests/qemu-iotests/044 b/tests/qemu-iotests/044
+>> index 69e736f687..7ef5e46fe9 100755
+>> --- a/tests/qemu-iotests/044
+>> +++ b/tests/qemu-iotests/044
+>> @@ -86,7 +86,7 @@ class TestRefcountTableGrowth(iotests.QMPTestCase):
+>>                  off =3D off + 1024 * 512
 >> =20
->>  import json
->>  import errno
->> +import os
->>  import socket
->>  import logging
+>>              table =3D b''.join(struct.pack('>Q', (1 << 63) | off + 51=
+2 * j)
+>> -                for j in xrange(0, remaining / 512))
+>> +                for j in xrange(0, remaining // 512))
+>>              fd.write(table)
 >> =20
->> @@ -253,4 +254,10 @@ class QEMUMonitorProtocol(object):
->>          return self.__sock.fileno()
 >> =20
->>      def is_scm_available(self):
->> +        # This did not exist before 3.2, but since then it is
->> +        # mandatory for our purpose
->> +        try:
->> +            os.set_inheritable(self.get_sock_fd(), True)
->> +        except AttributeError:
->> +            pass
->=20
-> Why did you decide to place this code inside is_scm_available()?
->=20
-> For reference, this is the only caller of is_scm_available():
->=20
->     def send_fd_scm(self, fd_file_path):
->         # In iotest.py, the qmp should always use unix socket.
->         assert self._qmp.is_scm_available()
->         ...
->=20
-> In addition to making a method called is_*() have an unexpected
-> side-effect,
-
-True.  My idea was that a function that asks for SCM to be available
-might as well make it available.
-
->              the method won't be called at all if running with
-> debugging disabled.
-
-Well, I sure hope we don't disable debugging in the iotests.  We use
-assert quite a number of times there.
-
-On the other hand, someone might want to use this outside of the iotests
-but I don't even know whether that works, considering the SCM helper
-program is part of the iotests.
-
-> I suggest simply placing the os.set_inheritable() call inside
-> send_fd_scm(), as close as possible to the subprocess.Popen()
-> call.
-
-Yes, I think you're right.  I didn't want to put it into send_fd_scm(),
-because that method is only there to send some FD over QMP/SCM; it isn't
-really supposed to send the QMP socket FD somewhere.  But sending
-something over QMP/SCM is different from bequeathing something to a
-child process (the socket_scm_helper).  And since send_fd_scm() needs to
-bequeath the QMP socket FD to that helper, it should be responsible for
-making it inheritable.
-
-And maybe even more importantly, whether the socket allows for SCM
-really has nothing to do with whether it's inheritable.  So it's
-actually just wrong to put it here.
-
->>          return self.__sock.family =3D=3D socket.AF_UNIX
->> diff --git a/tests/qemu-iotests/147 b/tests/qemu-iotests/147
->> index d2081df84b..b58455645b 100755
->> --- a/tests/qemu-iotests/147
->> +++ b/tests/qemu-iotests/147
->> @@ -229,6 +229,13 @@ class BuiltinNBD(NBDBlockdevAddBase):
->>          sockfd =3D socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
->>          sockfd.connect(unix_socket)
+>> diff --git a/tests/qemu-iotests/093 b/tests/qemu-iotests/093
+>> index 9d1971a56c..d88fbc182e 100755
+>> --- a/tests/qemu-iotests/093
+>> +++ b/tests/qemu-iotests/093
+>> @@ -69,18 +69,18 @@ class ThrottleTestCase(iotests.QMPTestCase):
+>>          # in. The throttled requests won't be executed until we
+>>          # advance the virtual clock.
+>>          rq_size =3D 512
+>> -        rd_nr =3D max(params['bps'] / rq_size / 2,
+>> -                    params['bps_rd'] / rq_size,
+>> -                    params['iops'] / 2,
+>> +        rd_nr =3D max(params['bps'] // rq_size // 2,
+>> +                    params['bps_rd'] // rq_size,
+>> +                    params['iops'] // 2,
+>>                      params['iops_rd'])
+>>          rd_nr *=3D seconds * 2
+>> -        rd_nr /=3D ndrives
+>> -        wr_nr =3D max(params['bps'] / rq_size / 2,
+>> -                    params['bps_wr'] / rq_size,
+>> -                    params['iops'] / 2,
+>> +        rd_nr //=3D ndrives
+>> +        wr_nr =3D max(params['bps'] // rq_size // 2,
+>> +                    params['bps_wr'] // rq_size,
+>> +                    params['iops'] // 2,
+>>                      params['iops_wr'])
+>>          wr_nr *=3D seconds * 2
+>> -        wr_nr /=3D ndrives
+>> +        wr_nr //=3D ndrives
 >> =20
->> +        # This did not exist before 3.2, but since then it is
->> +        # mandatory for our purpose
->> +        try:
->> +            os.set_inheritable(sockfd.fileno(), True)
->> +        except AttributeError:
->> +            pass
->> +
+>>          # Send I/O requests to all drives
+>>          for i in range(rd_nr):
+>> @@ -196,7 +196,7 @@ class ThrottleTestCase(iotests.QMPTestCase):
+>>              self.configure_throttle(ndrives, settings)
+>> =20
+>>              # Wait for the bucket to empty so we can do bursts
+>> -            wait_ns =3D nsec_per_sec * burst_length * burst_rate / ra=
+te
+>> +            wait_ns =3D nsec_per_sec * burst_length * burst_rate // r=
+ate
+>>              self.vm.qtest("clock_step %d" % wait_ns)
+>> =20
+>>              # Test I/O at the max burst rate
+>> diff --git a/tests/qemu-iotests/149 b/tests/qemu-iotests/149
+>> index 1225334cb8..4f363f295f 100755
+>> --- a/tests/qemu-iotests/149
+>> +++ b/tests/qemu-iotests/149
+>> @@ -314,13 +314,13 @@ def test_once(config, qemu_img=3DFalse):
+>>      image_size =3D 4 * oneTB
+>>      if qemu_img:
+>>          iotests.log("# Create image")
+>> -        qemu_img_create(config, image_size / oneMB)
+>> +        qemu_img_create(config, image_size // oneMB)
+>>      else:
+>>          iotests.log("# Create image")
+>> -        create_image(config, image_size / oneMB)
+>> +        create_image(config, image_size // oneMB)
+>> =20
+>>      lowOffsetMB =3D 100
+>> -    highOffsetMB =3D 3 * oneTB / oneMB
+>> +    highOffsetMB =3D 3 * oneTB // oneMB
+>> =20
+>>      try:
+>>          if not qemu_img:
+>> diff --git a/tests/qemu-iotests/151 b/tests/qemu-iotests/151
+>> index fe53b9f446..1bb74d67c4 100755
+>> --- a/tests/qemu-iotests/151
+>> +++ b/tests/qemu-iotests/151
+>> @@ -67,9 +67,9 @@ class TestActiveMirror(iotests.QMPTestCase):
+>>                              'write -P 1 0 %i' % self.image_len);
+>> =20
+>>          # Start some background requests
+>> -        for offset in range(1 * self.image_len / 8, 3 * self.image_le=
+n / 8, 1024 * 1024):
+>> +        for offset in range(1 * self.image_len // 8, 3 * self.image_l=
+en // 8, 1024 * 1024):
+>>              self.vm.hmp_qemu_io('source', 'aio_write -P 2 %i 1M' % of=
+fset)
+>> -        for offset in range(2 * self.image_len / 8, 3 * self.image_le=
+n / 8, 1024 * 1024):
+>> +        for offset in range(2 * self.image_len // 8, 3 * self.image_l=
+en // 8, 1024 * 1024):
+>>              self.vm.hmp_qemu_io('source', 'aio_write -z %i 1M' % offs=
+et)
+>> =20
+>>          # Start the block job
+>> @@ -83,9 +83,9 @@ class TestActiveMirror(iotests.QMPTestCase):
+>>          self.assert_qmp(result, 'return', {})
+>> =20
+>>          # Start some more requests
+>> -        for offset in range(3 * self.image_len / 8, 5 * self.image_le=
+n / 8, 1024 * 1024):
+>> +        for offset in range(3 * self.image_len // 8, 5 * self.image_l=
+en // 8, 1024 * 1024):
+>>              self.vm.hmp_qemu_io('source', 'aio_write -P 3 %i 1M' % of=
+fset)
+>> -        for offset in range(4 * self.image_len / 8, 5 * self.image_le=
+n / 8, 1024 * 1024):
+>> +        for offset in range(4 * self.image_len // 8, 5 * self.image_l=
+en // 8, 1024 * 1024):
+>>              self.vm.hmp_qemu_io('source', 'aio_write -z %i 1M' % offs=
+et)
+>> =20
+>>          # Wait for the READY event
+>> @@ -95,9 +95,9 @@ class TestActiveMirror(iotests.QMPTestCase):
+>>          # the source) should be settled using the active mechanism.
+>>          # The mirror code itself asserts that the source BDS's dirty
+>>          # bitmap will stay clean between READY and COMPLETED.
+>> -        for offset in range(5 * self.image_len / 8, 7 * self.image_le=
+n / 8, 1024 * 1024):
+>> +        for offset in range(5 * self.image_len // 8, 7 * self.image_l=
+en // 8, 1024 * 1024):
+>>              self.vm.hmp_qemu_io('source', 'aio_write -P 3 %i 1M' % of=
+fset)
+>> -        for offset in range(6 * self.image_len / 8, 7 * self.image_le=
+n / 8, 1024 * 1024):
+>> +        for offset in range(6 * self.image_len // 8, 7 * self.image_l=
+en // 8, 1024 * 1024):
+>>              self.vm.hmp_qemu_io('source', 'aio_write -z %i 1M' % offs=
+et)
+>> =20
+>>          if sync_source_and_target:
+>> diff --git a/tests/qemu-iotests/163 b/tests/qemu-iotests/163
+>> index 403842354e..5fd424761b 100755
+>> --- a/tests/qemu-iotests/163
+>> +++ b/tests/qemu-iotests/163
+>> @@ -38,7 +38,7 @@ class ShrinkBaseClass(iotests.QMPTestCase):
+>>          entry_bits =3D 3
+>>          entry_size =3D 1 << entry_bits
+>>          l1_mask =3D 0x00fffffffffffe00
+>> -        div_roundup =3D lambda n, d: (n + d - 1) / d
+>> +        div_roundup =3D lambda n, d: (n + d - 1) // d
+>> =20
+>>          def split_by_n(data, n):
+>>              for x in xrange(0, len(data), n):
+>> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotest=
+s.py
+>> index 7290c0b159..7ca94e9278 100644
+>> --- a/tests/qemu-iotests/iotests.py
+>> +++ b/tests/qemu-iotests/iotests.py
+>> @@ -199,7 +199,7 @@ def create_image(name, size):
+>>      file =3D open(name, 'wb')
+>>      i =3D 0
+>>      while i < size:
+>> -        sector =3D struct.pack('>l504xl', i / 512, i / 512)
+>> +        sector =3D struct.pack('>l504xl', i // 512, i // 512)
+>>          file.write(sector)
+>>          i =3D i + 512
+>>      file.close()
+>>
 >=20
-> Why not make send_fd_scm() responsible for calling
-> os.set_inheritable(), making this hunk unnecessary?
+> Found a few other occurrences:
+>=20
+> 030:''' % (event, errno, self.STREAM_BUFFER_SIZE / 512, event, event))
+> 041:''' % (event, errno, self.MIRROR_GRANULARITY / 512, event, event))
+> 041:''' % (event, errno, self.MIRROR_GRANULARITY / 512, event, event))
 
-My idea was: Because send_fd_scm() takes a string and not an integer.
-The socket_scm_helper takes either an FD or a path, so send_fd_scm()
-accepts either.
+Oh, thanks.  Right, those just worked because they were converted back
+to integers thanks to the %d in the format string.
 
-But now I realize that if we pass a path, we don't need to make the FD
-inheritable.  So send_fd_scm() can check whether it's supposed to pass
-an FD, and if so, make it inheritable, yes.
+Will fix.  Thanks for reviewing!
 
 Max
 
->>          result =3D self.vm.send_fd_scm(str(sockfd.fileno()))
->>          self.assertEqual(result, 0, 'Failed to send socket FD')
->> =20
->> --=20
->> 2.17.1
->>
->=20
 
-
-
---uXUcvOb7wCzcAj1IPeURHEwegcXDwAroM
+--5m7bZlJOyAacNR8scQ1vr7SNnHtxftk9M
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlvJnfwACgkQ9AfbAGHV
-z0ALXQgAlGa62Q75pxNUAPUIzoRhbHcBesnFdeWGPww65xMl/bHSwjEnuJlgvCpU
-X06Bqh0KKmo9nVvhSCzwN8p5qeHoLXxoC8PnkkNYkmcYIurSU1HFB1jrtJjiod6f
-GQU3JYBIqxSI7lfsZYQB6hgQwEebQ2Z16XfUr75vs04BlAjVl3JL3mtqnIt4kaNh
-AnyB8vvhAXWBAJ79pke9jUPD5RfV7+++zFVTDXtLgzspP2RsoQe0a4G1GhRzfZ/0
-J5CsFgDoKZwWH2vV6Sl228Yez7Izxlq0WillH3TRKbONtxryU5IYu+fMLGyOIBUX
-NU9cHWKNISz09YZ3l1QUeqH9LaGPpA==
-=wcId
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlvJnngACgkQ9AfbAGHV
+z0CvJQgAuLg5utXQxof1v+tVwlMcRi/UHSykRtCC9kwhB0ipBszh2PtbJgKJG6/z
+qdzOlsRzbAtFD97gVEB/w27yYph/QiA+oKY6VEjgfPYX35QThPublbwZTwUnuO78
+28zUP1lU0QWt4OKmE4dRHrnke2U6wTri510FXWPQXx/5MQHXMkWSKwq/XGr8g9q6
+8nkzoiQlGmOZOtwBVP6zPNLFX7rRFJpieT4gH52tsSUcejp97sgqf4O9wlIurW7C
+/tJb2FW4co490ky7Q+5J5yxwXEayrDDoEDAKEiMXfe5fpber0Q8ve3UJ1XkPzZQN
+cxxqWtCuFaQz5qNstSve+4k8H8DzcQ==
+=NG60
 -----END PGP SIGNATURE-----
 
---uXUcvOb7wCzcAj1IPeURHEwegcXDwAroM--
+--5m7bZlJOyAacNR8scQ1vr7SNnHtxftk9M--
