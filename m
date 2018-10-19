@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55143)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55293)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gDSF5-0003QN-SH
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 06:42:56 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1gDSFl-0003oF-LP
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 06:43:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gDSF2-0005AX-MR
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 06:42:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34826)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gDSF2-00057a-Dl
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 06:42:52 -0400
-References: <20181011192513.63634-1-dgilbert@redhat.com>
-	<20181011192513.63634-3-dgilbert@redhat.com>
-	<20181017192826.GA7385@flamenco>
-	<286c9ba0-05d9-02ec-7f59-34b34a66be2c@redhat.com>
-	<20181018124328.GA1040@flamenco>
-	<590abdea-cd12-651b-7130-86c1786da99a@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <9d6f3d79-fc23-4cdc-1a4c-7b3c4cf939f0@redhat.com>
-Date: Fri, 19 Oct 2018 12:42:45 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1gDSFi-0006KP-Fx
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 06:43:37 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35087)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gDSFh-0006Ij-Qs
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 06:43:34 -0400
+Received: by mail-wr1-x442.google.com with SMTP id w5-v6so36888524wrt.2
+	for <qemu-devel@nongnu.org>; Fri, 19 Oct 2018 03:43:33 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Fri, 19 Oct 2018 11:43:26 +0100
+Message-Id: <20181019104326.28052-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <590abdea-cd12-651b-7130-86c1786da99a@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 2/7] tests/migration: Enable the migration
- test on s390x, too
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] configure: set cross_cc_FOO from cc,
+ not host_cc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,33 +28,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Huang <wei@redhat.com>, "Emilio G. Cota" <cota@braap.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, quintela@redhat.com, "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, i.maximets@samsung.com, den@openvz.org
+To: qemu-devel@nongnu.org
+Cc: richard.henderson@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On 2018-10-18 16:53, Wei Huang wrote:
-> 
-> 
-> On 10/18/2018 07:43 AM, Emilio G. Cota wrote:
->> On Thu, Oct 18, 2018 at 14:38:01 +0200, Thomas Huth wrote:
->>> On 2018-10-17 21:28, Emilio G. Cota wrote:
->>>> Can anyone reproduce this? Otherwise, let me know what other info
->>>> I could provide.
->>>
->>> I've finally been able to reproduce it - seems like it only happens here
->>> when the host is under heavy load.
-> 
-> Given that it only happens under heavy load, could the failure be caused
-> by migration thresholds defined in migrate_postcopy_prepare()? You can
-> play with "max-bandwidth", "downtime-limit" and others to see if it helps.
+The purpose of the code is to use the designated compiler for building
+the targets test cases. This is not actually host_cc which will still
+be cc even when we are cross compiling. As the tests for $cpu all use
+$cc we should do the same.
 
-David suggested on IRC yesterday that this problem might be the same as
-with the ppc64 migration test: It does not work with TCG, only with KVM.
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reported-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ configure | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-I've now done some tests, and indeed, I can not reproduce the problem
-when running with KVM on a s390x host. But as soon as I disable the kvm
-kernel module and run the test with TCG there, the problem occurs again.
-
-So I think I'll send a patch to disable this test with TCG for now. Once
-the problem with TCG has been solved, we can enable it again.
-
- Thomas
+diff --git a/configure b/configure
+index 9138af37f8..d6605bd633 100755
+--- a/configure
++++ b/configure
+@@ -717,37 +717,37 @@ case "$cpu" in
+   ppc|ppc64|s390|s390x|sparc64|x32)
+     cpu="$cpu"
+     supported_cpu="yes"
+-    eval "cross_cc_${cpu}=\$host_cc"
++    eval "cross_cc_${cpu}=\$cc"
+   ;;
+   i386|i486|i586|i686|i86pc|BePC)
+     cpu="i386"
+     supported_cpu="yes"
+-    cross_cc_i386=$host_cc
++    cross_cc_i386=$cc
+   ;;
+   x86_64|amd64)
+     cpu="x86_64"
+     supported_cpu="yes"
+-    cross_cc_x86_64=$host_cc
++    cross_cc_x86_64=$cc
+   ;;
+   armv*b|armv*l|arm)
+     cpu="arm"
+     supported_cpu="yes"
+-    cross_cc_arm=$host_cc
++    cross_cc_arm=$cc
+   ;;
+   aarch64)
+     cpu="aarch64"
+     supported_cpu="yes"
+-    cross_cc_aarch64=$host_cc
++    cross_cc_aarch64=$cc
+   ;;
+   mips*)
+     cpu="mips"
+     supported_cpu="yes"
+-    cross_cc_mips=$host_cc
++    cross_cc_mips=$cc
+   ;;
+   sparc|sun4[cdmuv])
+     cpu="sparc"
+     supported_cpu="yes"
+-    cross_cc_sparc=$host_cc
++    cross_cc_sparc=$cc
+   ;;
+   *)
+     # This will result in either an error or falling back to TCI later
+-- 
+2.17.1
