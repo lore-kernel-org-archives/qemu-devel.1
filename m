@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33315)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35428)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gDXSz-0004qo-46
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:17:37 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gDXaT-0007vw-DF
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:25:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gDXSw-0004Qg-Nv
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:17:36 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:51962)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1gDXSs-00044B-U8
-	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:17:32 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 19 Oct 2018 17:17:15 +0100
-Message-Id: <20181019161715.12122-1-peter.maydell@linaro.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gDXaN-0003Ra-Ff
+	for qemu-devel@nongnu.org; Fri, 19 Oct 2018 12:25:21 -0400
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] linux-user: Remove dead error-checking code
+References: <1539954845-26716-1-git-send-email-thuth@redhat.com>
+	<1539954845-26716-5-git-send-email-thuth@redhat.com>
+	<CAFEAcA-ahq3Y4sgs=Vijq_fsDPgX4JuG0gGdMwE5oOLOrsvxjQ@mail.gmail.com>
+	<a6b421a6-439e-ac87-0f96-b28ca349bc70@redhat.com>
+In-Reply-To: <a6b421a6-439e-ac87-0f96-b28ca349bc70@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Fri, 19 Oct 2018 18:25:02 +0200
+Message-ID: <CAAdtpL4M9zD3LPOMgQNtN50pKzZAsoKn0c_uBe5vajPFwUMJvQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 4/5] configs: Add a CONFIG_UNIMP switch for
+ the "unimplemented-device"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,72 +27,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Richard Henderson <richard.henderson@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, "qemu-ppc@nongnu.org list:PowerPC" <qemu-ppc@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-Remove some dead code spotted by Coverity (CID 1009855,
-1390854, 1390847). The underlying cause in all these cases
-is the same: QEMU's put_user operations can't result in
-errors, but the kernel's equivalent does. So when code
-was copied from the kernel signal-frame-setup/teardown
-code, checks on error flags that were needed in the kernel
-became dead code for us.
+On Fri, Oct 19, 2018 at 4:40 PM Thomas Huth <thuth@redhat.com> wrote:
+>
+> On 2018-10-19 15:57, Peter Maydell wrote:
+> > On 19 October 2018 at 14:14, Thomas Huth <thuth@redhat.com> wrote:
+> >> The "unimplemented-device" is currently only used for one arm board.
+> >
+> > ? It's used in all the MPS boards, several of the imx SoCs,
+> > the nrf51 SoC used by the microbit, and by the stellaris boards.
+> >
+> >> Let's add a CONFIG switch to make sure that we only compile it when
+> >> it is really necessary.
+> >>
+> >> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> >> ---
+> >>  default-configs/arm-softmmu.mak | 1 +
+> >>  hw/misc/Makefile.objs           | 2 +-
+> >>  2 files changed, 2 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+> >> index 6f2ffc1..dc9730f 100644
+> >> --- a/default-configs/arm-softmmu.mak
+> >> +++ b/default-configs/arm-softmmu.mak
+> >> @@ -7,6 +7,7 @@ CONFIG_NAND=y
+> >>  CONFIG_OR_IRQ=y
+> >>  CONFIG_SPLIT_IRQ=y
+> >>  CONFIG_REGISTER=y
+> >> +CONFIG_UNIMP=y
+> >>  CONFIG_ECC=y
+> >>  CONFIG_SERIAL=y
+> >>  CONFIG_SERIAL_ISA=y
+> >
+> > This seems awkward to me. The 'unimplemented' device is supposed
+> > to be an entirely generic thing usable in any board model.
+> > If we only turn it on in the arm-softmmu.mak then it means
+> > faffing around with the default-configs/ whenever it gets
+> > used in a different architecture.
+>
+> The device has been added 1.5 years ago, and so far no other target is
+> using it yet. So it's very seldom that you've got to expect any changes,
+> I think.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- linux-user/m68k/signal.c  | 3 ---
- linux-user/sh4/signal.c   | 4 ----
- linux-user/sparc/signal.c | 2 --
- 3 files changed, 9 deletions(-)
+I disagree with this (and this patch).
 
-diff --git a/linux-user/m68k/signal.c b/linux-user/m68k/signal.c
-index 38bd77ec160..49ff87c77bc 100644
---- a/linux-user/m68k/signal.c
-+++ b/linux-user/m68k/signal.c
-@@ -334,9 +334,6 @@ void setup_rt_frame(int sig, struct target_sigaction *ka,
-                (uint32_t *)(frame->retcode + 0));
-     __put_user(0x4e40, (uint16_t *)(frame->retcode + 4));
- 
--    if (err)
--        goto give_sigsegv;
--
-     /* Set up to return from userspace */
- 
-     env->aregs[7] = frame_addr;
-diff --git a/linux-user/sh4/signal.c b/linux-user/sh4/signal.c
-index c6752baa7ee..cc89a48ff8b 100644
---- a/linux-user/sh4/signal.c
-+++ b/linux-user/sh4/signal.c
-@@ -279,7 +279,6 @@ long do_sigreturn(CPUSH4State *regs)
-     sigset_t blocked;
-     target_sigset_t target_set;
-     int i;
--    int err = 0;
- 
-     frame_addr = regs->gregs[15];
-     trace_user_do_sigreturn(regs, frame_addr);
-@@ -292,9 +291,6 @@ long do_sigreturn(CPUSH4State *regs)
-         __get_user(target_set.sig[i], &frame->extramask[i - 1]);
-     }
- 
--    if (err)
--        goto badframe;
--
-     target_to_host_sigset_internal(&blocked, &target_set);
-     set_sigmask(&blocked);
- 
-diff --git a/linux-user/sparc/signal.c b/linux-user/sparc/signal.c
-index e44e99993c6..295e415b1e6 100644
---- a/linux-user/sparc/signal.c
-+++ b/linux-user/sparc/signal.c
-@@ -256,8 +256,6 @@ void setup_frame(int sig, struct target_sigaction *ka,
-         /* t 0x10 */
-         val32 = 0x91d02010;
-         __put_user(val32, &sf->insns[1]);
--        if (err)
--            goto sigsegv;
-     }
-     unlock_user(sf, sf_addr, sizeof(struct target_signal_frame));
-     return;
--- 
-2.19.1
+First because I'm using it heavily on MIPS and PPC boards, when no
+datashits are available.
+I'll submit that during the next merge window, although the MIPS tree
+seems now reluctant to that kind of hobbyist work.
+
+Second, because it is very clean when you implement a SoC to first
+start with an empty UNIMP region and a cpu core,
+then declare the mmio regions for each device (still UNIMP), then you
+can slowly add devices one at a time.
+This let you (me, so far) push at most a dozen of tiny patches in a
+working series, instead of a small series of a dozen of huge patches,
+or a series of 100 tiny patches.
+
+See https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg06094.html
+about this approach.
+
+Regards,
+
+Phil.
+
+> Anyway, it's also not only about speeding up the compilation process for
+> people who don't want to use the corresponding targets, this is also
+> very useful for downstream distributions of QEMU who want to make sure
+> to not compile-in more devices than urgently needed. For example we
+> disable this device here and the others in downstream RHEL version of
+> QEMU, and I guess it might be interesting for nemu, too. So having more
+> flexibility here in the Makefiles would be really great to decrease the
+> burden with downstream-specific patches...
+>
+> > In particular, there's a pull request on the list that uses
+> > it in a sparc board, so this patch will break compile on sparc
+> > once that pullreq lands.
+>
+> Ok, then please disregard this patch here, but it would be great if you
+> could still consider the other patches of this series.
+>
+>  Thomas
