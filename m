@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53090)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gDxNl-0003JO-8Q
-	for qemu-devel@nongnu.org; Sat, 20 Oct 2018 15:57:58 -0400
+	(envelope-from <bounces@canonical.com>) id 1gDxez-0000M1-Gh
+	for qemu-devel@nongnu.org; Sat, 20 Oct 2018 16:15:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gDxNh-0002ld-Vu
-	for qemu-devel@nongnu.org; Sat, 20 Oct 2018 15:57:57 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:38735)
+	(envelope-from <bounces@canonical.com>) id 1gDxeu-00013L-Hg
+	for qemu-devel@nongnu.org; Sat, 20 Oct 2018 16:15:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49782)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gDxNh-0002l8-Or
-	for qemu-devel@nongnu.org; Sat, 20 Oct 2018 15:57:53 -0400
-Received: by mail-wr1-f65.google.com with SMTP id d10-v6so1188585wrs.5
-	for <qemu-devel@nongnu.org>; Sat, 20 Oct 2018 12:57:52 -0700 (PDT)
-References: <1539954845-26716-1-git-send-email-thuth@redhat.com>
-	<1539954845-26716-5-git-send-email-thuth@redhat.com>
-	<CAFEAcA-ahq3Y4sgs=Vijq_fsDPgX4JuG0gGdMwE5oOLOrsvxjQ@mail.gmail.com>
-	<a6b421a6-439e-ac87-0f96-b28ca349bc70@redhat.com>
-	<CAAdtpL4M9zD3LPOMgQNtN50pKzZAsoKn0c_uBe5vajPFwUMJvQ@mail.gmail.com>
-	<b43a36a4-bb35-77e4-42e3-d15aebd618f9@redhat.com>
-	<CAFEAcA9QtLnFhPfgRgeduB+avJcC9X8Tea1Hi-2q3p9GtU_j8g@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <004ec9ef-8568-c645-627d-f7cc2b4df3f6@redhat.com>
-Date: Sat, 20 Oct 2018 21:57:48 +0200
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gDxeu-00012S-BY
+	for qemu-devel@nongnu.org; Sat, 20 Oct 2018 16:15:40 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gDxer-0000WI-9E
+	for <qemu-devel@nongnu.org>; Sat, 20 Oct 2018 20:15:37 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 39CD62E8030
+	for <qemu-devel@nongnu.org>; Sat, 20 Oct 2018 20:15:37 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9QtLnFhPfgRgeduB+avJcC9X8Tea1Hi-2q3p9GtU_j8g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 4/5] configs: Add a CONFIG_UNIMP switch for
- the "unimplemented-device"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 20 Oct 2018 20:09:04 -0000
+From: Rob Maskell <1798451@bugs.launchpad.net>
+Reply-To: Bug 1798451 <1798451@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153980387714.3465.12419240219281347614.malonedeb@soybean.canonical.com>
+Message-Id: <154006614420.16581.15059778077256480858.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1798451] Re: HVF linux on OSX hangs 2nd time
+ started after adding socket
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,43 +37,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, "qemu-ppc@nongnu.org list:PowerPC" <qemu-ppc@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>
+To: qemu-devel@nongnu.org
 
-On 19/10/2018 18:54, Peter Maydell wrote:
-> On 19 October 2018 at 17:44, Paolo Bonzini <pbonzini@redhat.com> wrote:
->> On 19/10/2018 18:25, Philippe Mathieu-Daudé wrote:
->>>
->>> First because I'm using it heavily on MIPS and PPC boards, when no
->>> datashits are available.
->>> I'll submit that during the next merge window, although the MIPS tree
->>> seems now reluctant to that kind of hobbyist work.
->>>
->>> Second, because it is very clean when you implement a SoC to first
->>> start with an empty UNIMP region and a cpu core,
->>> then declare the mmio regions for each device (still UNIMP), then you
->>> can slowly add devices one at a time.
->>> This let you (me, so far) push at most a dozen of tiny patches in a
->>> working series, instead of a small series of a dozen of huge patches,
->>> or a series of 100 tiny patches.
->>
->> I don't see however why it's a problem to add/remove CONFIG_UNIMP to
->> default-configs though (in the Kconfig world the board would "select
->> UNIMP").
-> 
-> Well, it's extra friction for people writing new board models,
-> and the benefit of having CONFIG_UNIMP is all to downstream
-> redistributors, not to upstream...
-> 
-> I'm not vetoing this patchset, but I do think that if RedHat
-> wants to distribute significantly-cut-down binaries then
-> it would be worth working on a mechanism for making that
-> more conveniently doable, rather than just hacking up
-> the very creaky default-configs/ stuff.
+Also seeing quite a few of these errors
 
-Yes, we are going to meet the NEMU guys at KVM Forum and talk about the
-"mini-Kconfig" stuff; in the meanwhile, default-configs/ is what we
-have, it was enough while we were caring basically only about x86 and
-thus we only needed to disable PCI devices, but now it's showing its age.
+Unimplemented handler (7f7a56978294) for 0 (f 7f) =
 
-Paolo
+Unimplemented handler (7f2eaa6c8849) for 0 (f 7f) =
+
+Unimplemented handler (7f82f92a9294) for 0 (f 7f) =
+
+Unimplemented handler (7f04702f2294) for 0 (f 7f)
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1798451
+
+Title:
+  HVF linux on OSX hangs 2nd time started after adding socket
+
+Status in QEMU:
+  New
+
+Bug description:
+  =
+
+  Robs-MacBook-Pro-2:~ robmaskell$ qemu-system-x86_64 --version
+  QEMU emulator version 3.0.0
+
+  Host: MacOS - 10.13.6
+    Model Name:	MacBook Pro
+    Model Identifier:	MacBookPro14,3
+    Processor Name:	Intel Core i7
+    Processor Speed:	2.8 GHz
+    Number of Processors:	1
+    Total Number of Cores:	4
+    L2 Cache (per Core):	256 KB
+    L3 Cache:	6 MB
+    Memory:	16 GB
+
+  Guest OS: Elementary Linux Loki 0.4.1, patched up to date
+
+  Command used to start QEMU:
+
+  qemu-system-x86_64 \
+    -name ElementaryLokiDev \
+    -machine pc,accel=3Dhvf \
+    -cpu max \
+    -smp cpus=3D2,sockets=3D2,cores=3D1,threads=3D1,maxcpus=3D2 \
+    -numa node,nodeid=3D0 \
+    -numa cpu,node-id=3D0,socket-id=3D0 -numa cpu,node-id=3D0,socket-id=3D1=
+ \
+    -m 8G \
+    -vga vmware \
+    -hda e4.qcow2
+
+  Symptoms: Started without the -smp / -numa commands to install the OS,
+  then added -smp / -numa and the machine boots and lscpu reports extra
+  cpu as expected. Restart VM and it hangs on startup. Remove -smp /
+  -numa and machine starts again.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1798451/+subscriptions
