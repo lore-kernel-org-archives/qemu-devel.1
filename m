@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46128)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46164)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gE5Nt-0003xf-M1
-	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 00:30:40 -0400
+	(envelope-from <bounces@canonical.com>) id 1gE5Nx-0003zZ-02
+	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 00:30:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gE5Np-000592-Pd
-	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 00:30:35 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41732)
+	(envelope-from <bounces@canonical.com>) id 1gE5Nu-0005Aw-0h
+	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 00:30:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42052)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gE5Np-0004zx-Em
-	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 00:30:33 -0400
+	id 1gE5Nt-00055i-Ok
+	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 00:30:37 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gE5NZ-0006JL-72
-	for <qemu-devel@nongnu.org>; Sun, 21 Oct 2018 04:30:17 +0000
+	id 1gE5Nf-0006Q5-Qb
+	for <qemu-devel@nongnu.org>; Sun, 21 Oct 2018 04:30:23 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2F2732E805B
-	for <qemu-devel@nongnu.org>; Sun, 21 Oct 2018 04:30:17 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id C81502E806B
+	for <qemu-devel@nongnu.org>; Sun, 21 Oct 2018 04:30:23 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 21 Oct 2018 04:17:29 -0000
-From: Launchpad Bug Tracker <1180777@bugs.launchpad.net>
-Reply-To: Bug 1180777 <1180777@bugs.launchpad.net>
+Date: Sun, 21 Oct 2018 04:17:23 -0000
+From: Launchpad Bug Tracker <965867@bugs.launchpad.net>
+Reply-To: Bug 965867 <965867@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20130516122510.15619.26740.malonedeb@chaenomeles.canonical.com>
-Message-Id: <154009544934.6632.10513725331473142824.malone@loganberry.canonical.com>
+References: <20120327015624.22022.30085.malonedeb@soybean.canonical.com>
+Message-Id: <154009544325.6632.14278551257679429247.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1180777] Re: RDP traffic freeze on quiet network
+Subject: [Qemu-devel] [Bug 965867] Re: 9p virtual file system on qemu slow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,93 +38,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-[Expired for qemu-kvm (Ubuntu) because there has been no activity for 60
-days.]
+[Expired for QEMU because there has been no activity for 60 days.]
 
-** Changed in: qemu-kvm (Ubuntu)
+** Changed in: qemu
        Status: Incomplete =3D> Expired
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1180777
+https://bugs.launchpad.net/bugs/965867
 
 Title:
-  RDP traffic freeze on quiet network
+  9p virtual file system on qemu slow
 
 Status in QEMU:
   Expired
 Status in qemu-kvm package in Ubuntu:
   Expired
-Status in Debian:
-  Incomplete
 
 Bug description:
-  To summarize what I think has been found so far,
+  Hi, =
 
-    1. The main symptom is that RDP connections hang after some time
-    2. This bug affects qemu 1.0 .. 1.6.5
-    3. This bug affects at least windows xp and windows 7 guests
-    4. Keeping another network connection open, such as vnc, prevents the R=
-DP connection from hanging.
+  The 9p virtual file system is slow. Several examples below: =
 
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  Hi,
+  ---------------------------------------------------------
+  Host for the first time: =
 
-  I have recently setup a Windows 7 VM on KVM and started using it
-  through remote desktop.
+  $ time ls bam.unsorted/
+  ...........................
+  real    0m0.084s
+  user    0m0.000s
+  sys     0m0.028s
+  --------------------------------------------------
+  Host second and following: =
 
-  What happens is that, after some hours of usage, the remote desktop
-  connection freezes. I thought it was a remmina bug, as the it was
-  enough to kill and restart it to successfully connect again to the VM.
 
-  However, today I've switched to a different RDP client (2X Client
-  chromium app) and the freeze just happened again!
+  real    0m0.009s
+  user    0m0.000s
+  sys     0m0.008s
+  ------------------------------------------------------
+  VM for the first time: =
 
-  Some information:
-  - the host and the VM are completely idle when the freeze occurs
-  - I've tried sniffing the network packets toward the RDP port during the =
-freeze and found that the client is sending packets but no packet is sent b=
-ack
+  $ time ls bam.unsorted/
+  ................................
+  real    0m23.141s
+  user    0m0.064s
+  sys     0m2.156s
+  ------------------------------------------------------
+  VM for the second time
+  real    0m3.643s
+  user    0m0.024s
+  sys     0m0.424s
+  ----------------------------------------------------
 
-  Could this be a KVM issue? How can I further debug this one (I expect
-  the freeze to happen again...)?
+  Copy on host: =
 
-  ProblemType: Bug
-  DistroRelease: Ubuntu 12.04
-  Package: kvm 1:84+dfsg-0ubuntu16+1.0+noroms+0ubuntu14.8
-  ProcVersionSignature: Ubuntu 3.2.0-41.66-generic 3.2.42
-  Uname: Linux 3.2.0-41-generic x86_64
-  ApportVersion: 2.0.1-0ubuntu17.2
-  Architecture: amd64
-  Date: Thu May 16 14:12:40 2013
-  MachineType: Hewlett-Packard HP ProBook 4520s
-  MarkForUpload: True
-  ProcEnviron:
-  =C2=A0TERM=3Dxterm
-  =C2=A0PATH=3D(custom, no user)
-  =C2=A0LANG=3Den_US.UTF-8
-  =C2=A0SHELL=3D/bin/bash
-  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-3.2.0-41-generic root=3DUUI=
-D=3DD2E20BC3E20BAAB5 loop=3D/hostname/disks/root.disk ro quiet splash vt.ha=
-ndoff=3D7
-  SourcePackage: qemu-kvm
-  UpgradeStatus: No upgrade log present (probably fresh install)
-  dmi.bios.date: 08/26/2010
-  dmi.bios.vendor: Hewlett-Packard
-  dmi.bios.version: 68AZZ Ver. F.0A
-  dmi.board.name: 1411
-  dmi.board.vendor: Hewlett-Packard
-  dmi.board.version: KBC Version 57.30
-  dmi.chassis.type: 10
-  dmi.chassis.vendor: Hewlett-Packard
-  dmi.modalias: dmi:bvnHewlett-Packard:bvr68AZZVer.F.0A:bd08/26/2010:svnHew=
-lett-Packard:pnHPProBook4520s:pvr:rvnHewlett-Packard:rn1411:rvrKBCVersion57=
-.30:cvnHewlett-Packard:ct10:cvr:
-  dmi.product.name: HP ProBook 4520s
-  dmi.sys.vendor: Hewlett-Packard
+  $ time cp 5173T.root.bak test.tmp
+  real    0m30.346s
+  user    0m0.004s
+  sys     0m5.324s
+
+  $ ls -lahs test.tmp
+  2.7G -rw------- 1 oneadmin cloud 2.7G Mar 26 21:47 test.tmp
+
+  ---------------------------------------------------
+  $ copy on VM for the same file
+
+  time cp 5173T.root.bak test.tmp
+
+  real    5m46.978s
+  user    0m0.352s
+  sys     1m38.962s
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1180777/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/965867/+subscriptions
