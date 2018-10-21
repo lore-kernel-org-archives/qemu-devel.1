@@ -1,28 +1,26 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:39452)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gEDPw-0004B7-M2
-	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 09:05:17 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gEDQF-0004B7-6u
+	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 09:05:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gEDLZ-0004qo-AF
-	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 09:00:48 -0400
-Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:37925)
+	(envelope-from <peter.maydell@linaro.org>) id 1gEDLP-0004kc-72
+	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 09:00:35 -0400
+Received: from mail-oi1-x22b.google.com ([2607:f8b0:4864:20::22b]:35013)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gEDLZ-0004qF-3Q
-	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 09:00:45 -0400
-Received: by mail-wm1-x335.google.com with SMTP id 193-v6so7642876wme.3
-	for <qemu-devel@nongnu.org>; Sun, 21 Oct 2018 06:00:44 -0700 (PDT)
-References: <20181019010625.25294-1-cota@braap.org>
-	<20181019010625.25294-14-cota@braap.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <cf3e7f4a-e976-4529-2abd-4ff1ec209f21@linaro.org>
-Date: Sun, 21 Oct 2018 14:00:41 +0100
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gEDLP-0004h2-19
+	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 09:00:35 -0400
+Received: by mail-oi1-x22b.google.com with SMTP id 22-v6so30154747oiz.2
+	for <qemu-devel@nongnu.org>; Sun, 21 Oct 2018 06:00:27 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20181019010625.25294-14-cota@braap.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v3 13/56] lm32: convert to cpu_halted
+In-Reply-To: <1539949778-13129-1-git-send-email-pbonzini@redhat.com>
+References: <1539949778-13129-1-git-send-email-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sun, 21 Oct 2018 14:00:04 +0100
+Message-ID: <CAFEAcA8cqwd4zc4Wyw0PDkXgP4HA+roiPXadDrksg8VQEY9AuQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v3 00/47] Miscellaneous patches for
+ 2018-10-18
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,29 +29,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Michael Walle <michael@walle.cc>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 10/19/18 2:05 AM, Emilio G. Cota wrote:
-> Cc: Michael Walle <michael@walle.cc>
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> ---
->  target/lm32/op_helper.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+On 19 October 2018 at 12:49, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> The following changes since commit 77f7c747193662edfadeeb3118d63eed0eac51a6:
+>
+>   Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2018-10-17' into staging (2018-10-18 13:40:19 +0100)
+>
+> are available in the git repository at:
+>
+>
+>   git://github.com/bonzini/qemu.git tags/for-upstream
+>
+> for you to fetch changes up to 74c0b816adfc6aa1b01b4426fdf385e32e35cbac:
+>
+>   replay: pass raw icount value to replay_save_clock (2018-10-19 13:44:15 +0200)
+>
+> ----------------------------------------------------------------
+> * RTC fixes (Artem)
+> * icount fixes (Artem)
+> * rr fixes (Pavel, myself)
+> * hotplug cleanup (Igor)
+> * SCSI fixes (myself)
+> * 4.20-rc1 KVM header update (myself)
+> * coalesced PIO support (Peng Hao)
+> * HVF fixes (Roman B.)
+> * Hyper-V refactoring (Roman K.)
+> * Support for Hyper-V IPI (Vitaly)
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Applied, thanks.
 
-+++ b/target/lm32/op_helper.c
-> @@ -31,7 +31,7 @@ void HELPER(hlt)(CPULM32State *env)
->  {
->      CPUState *cs = CPU(lm32_env_get_cpu(env));
->  
-> -    cs->halted = 1;
-> +    cpu_halted_set(cs, 1);
->      cs->exception_index = EXCP_HLT;
->      cpu_loop_exit(cs);
-
-I am beginning to think this sequence of three should be its own helper...
-
-
-r~
+-- PMM
