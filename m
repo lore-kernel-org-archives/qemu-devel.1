@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45020)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gEFjX-0007wL-Ls
-	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 11:33:40 -0400
+	(envelope-from <noring@nocrew.org>) id 1gEFk6-0008J0-10
+	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 11:34:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gEFjU-0001St-Hr
-	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 11:33:39 -0400
-Received: from pio-pvt-msa1.bahnhof.se ([79.136.2.40]:34903)
+	(envelope-from <noring@nocrew.org>) id 1gEFk2-0001ft-JJ
+	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 11:34:13 -0400
+Received: from pio-pvt-msa2.bahnhof.se ([79.136.2.41]:47032)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gEFjU-0001Pf-4v
-	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 11:33:36 -0400
-Date: Sun, 21 Oct 2018 17:33:32 +0200
+	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gEFk2-0001fX-8S
+	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 11:34:10 -0400
+Date: Sun, 21 Oct 2018 17:34:04 +0200
 From: Fredrik Noring <noring@nocrew.org>
-Message-ID: <a4f155ec3e9e08f850410b0020d8ee40d0ef12ef.1540134918.git.noring@nocrew.org>
+Message-ID: <d63d5b7d59d73f2f197e64d2a0f96da263eff609.1540134918.git.noring@nocrew.org>
 References: <cover.1540134918.git.noring@nocrew.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <cover.1540134918.git.noring@nocrew.org>
-Subject: [Qemu-devel] [PATCH v8 05/38] target/mips: Define R5900 MMI{0, 1, 2,
- 3} subclasses and MMI opcode constants
+Subject: [Qemu-devel] [PATCH v8 06/38] target/mips: Define R5900 MMI0 opcode
+ constants
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,62 +36,62 @@ Signed-off-by: Fredrik Noring <noring@nocrew.org>
  1 file changed, 51 insertions(+)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index e205c3eaef..ae988177a1 100644
+index ae988177a1..242f2df2e2 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -2129,6 +2129,57 @@ enum {
-     TX79_SQ        = 0x1F << 26,    /* Same as OPC_SPECIAL3 */
+@@ -2180,6 +2180,57 @@ enum {
+     TX79_MMI_PSRAW      = 0x3F | TX79_CLASS_MMI,
  };
  
 +/*
-+ * TX79 Multimedia Instructions with opcode field = MMI:
++ * TX79 Multimedia Instructions with opcode field = MMI and bits 5..0 = MMI0:
 + *
-+ *  31    26                                 5      0
-+ * +--------+-------------------------------+--------+
-+ * |   MMI  |                               |function|
-+ * +--------+-------------------------------+--------+
++ *  31    26                        10     6 5      0
++ * +--------+----------------------+--------+--------+
++ * |   MMI  |                      |function|  MMI0  |
++ * +--------+----------------------+--------+--------+
 + *
-+ * function  bits 2..0
-+ *     bits |   0   |   1   |   2   |   3   |   4   |   5   |   6   |   7
-+ *     5..3 |  000  |  001  |  010  |  011  |  100  |  101  |  110  |  111
-+ *   -------+-------+-------+-------+-------+-------+-------+-------+-------
-+ *    0 000 |  MADD | MADDU |   *   |   *   | PLZCW |   *   |   *   |   *
-+ *    1 001 | MMI0% | MMI2% |   *   |   *   |   *   |   *   |   *   |   *
-+ *    2 010 | MFHI1 | MTHI1 | MFLO1 | MTLO1 |   *   |   *   |   *   |   *
-+ *    3 011 | MULT1 | MULTU1|  DIV1 | DIVU1 |   *   |   *   |   *   |   *
-+ *    4 100 | MADD1 | MADDU1|   *   |   *   |   *   |   *   |   *   |   *
-+ *    5 101 | MMI1% | MMI3% |   *   |   *   |   *   |   *   |   *   |   *
-+ *    6 110 | PMFHL | PMTHL |   *   |   *   | PSLLH |   *   | PSRLH | PSRAH
-+ *    7 111 |   *   |   *   |   *   |   *   | PSLLW |   *   | PSRLW | PSRAW
++ * function  bits 7..6
++ *     bits |   0   |   1   |   2   |   3
++ *    10..8 |   00  |   01  |   10  |   11
++ *   -------+-------+-------+-------+-------
++ *    0 000 | PADDW | PSUBW | PCGTW | PMAXW
++ *    1 001 | PADDH | PSUBH | PCGTH | PMAXH
++ *    2 010 | PADDB | PSUBB | PCGTB |   *
++ *    3 011 |   *   |   *   |   *   |   *
++ *    4 100 | PADDSW| PSUBSW| PEXTLW| PPACW
++ *    5 101 | PADDSH| PSUBSH| PEXTLH| PPACH
++ *    6 110 | PADDSB| PSUBSB| PEXTLB| PPACB
++ *    7 111 |   *   |   *   | PEXT5 | PPAC5
 + */
 +
-+#define MASK_TX79_MMI(op) (MASK_OP_MAJOR(op) | ((op) & 0x3F))
++#define MASK_TX79_MMI0(op) (MASK_OP_MAJOR(op) | ((op) & 0x7FF))
 +enum {
-+    TX79_MMI_MADD       = 0x00 | TX79_CLASS_MMI, /* Same as OPC_MADD */
-+    TX79_MMI_MADDU      = 0x01 | TX79_CLASS_MMI, /* Same as OPC_MADDU */
-+    TX79_MMI_PLZCW      = 0x04 | TX79_CLASS_MMI,
-+    TX79_MMI_CLASS_MMI0 = 0x08 | TX79_CLASS_MMI,
-+    TX79_MMI_CLASS_MMI2 = 0x09 | TX79_CLASS_MMI,
-+    TX79_MMI_MFHI1      = 0x10 | TX79_CLASS_MMI, /* Same minor as OPC_MFHI */
-+    TX79_MMI_MTHI1      = 0x11 | TX79_CLASS_MMI, /* Same minor as OPC_MTHI */
-+    TX79_MMI_MFLO1      = 0x12 | TX79_CLASS_MMI, /* Same minor as OPC_MFLO */
-+    TX79_MMI_MTLO1      = 0x13 | TX79_CLASS_MMI, /* Same minor as OPC_MTLO */
-+    TX79_MMI_MULT1      = 0x18 | TX79_CLASS_MMI, /* Same minor as OPC_MULT */
-+    TX79_MMI_MULTU1     = 0x19 | TX79_CLASS_MMI, /* Same minor as OPC_MULTU */
-+    TX79_MMI_DIV1       = 0x1A | TX79_CLASS_MMI, /* Same minor as OPC_DIV */
-+    TX79_MMI_DIVU1      = 0x1B | TX79_CLASS_MMI, /* Same minor as OPC_DIVU */
-+    TX79_MMI_MADD1      = 0x20 | TX79_CLASS_MMI,
-+    TX79_MMI_MADDU1     = 0x21 | TX79_CLASS_MMI,
-+    TX79_MMI_CLASS_MMI1 = 0x28 | TX79_CLASS_MMI,
-+    TX79_MMI_CLASS_MMI3 = 0x29 | TX79_CLASS_MMI,
-+    TX79_MMI_PMFHL      = 0x30 | TX79_CLASS_MMI,
-+    TX79_MMI_PMTHL      = 0x31 | TX79_CLASS_MMI,
-+    TX79_MMI_PSLLH      = 0x34 | TX79_CLASS_MMI,
-+    TX79_MMI_PSRLH      = 0x36 | TX79_CLASS_MMI,
-+    TX79_MMI_PSRAH      = 0x37 | TX79_CLASS_MMI,
-+    TX79_MMI_PSLLW      = 0x3C | TX79_CLASS_MMI,
-+    TX79_MMI_PSRLW      = 0x3E | TX79_CLASS_MMI,
-+    TX79_MMI_PSRAW      = 0x3F | TX79_CLASS_MMI,
++    TX79_MMI0_PADDW  = (0x00 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PSUBW  = (0x01 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PCGTW  = (0x02 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PMAXW  = (0x03 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PADDH  = (0x04 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PSUBH  = (0x05 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PCGTH  = (0x06 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PMAXH  = (0x07 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PADDB  = (0x08 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PSUBB  = (0x09 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PCGTB  = (0x0A << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PADDSW = (0x10 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PSUBSW = (0x11 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PEXTLW = (0x12 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PPACW  = (0x13 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PADDSH = (0x14 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PSUBSH = (0x15 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PEXTLH = (0x16 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PPACH  = (0x17 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PADDSB = (0x18 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PSUBSB = (0x19 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PEXTLB = (0x1A << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PPACB  = (0x1B << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PEXT5  = (0x1E << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PPAC5  = (0x1F << 6) | TX79_MMI_CLASS_MMI0,
 +};
 +
  /* global register indices */
