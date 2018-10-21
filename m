@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gEDsJ-0003KC-SU
-	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 09:34:36 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1gEDwO-0006hL-8m
+	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 09:38:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gEDsF-0001fF-WE
-	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 09:34:33 -0400
-Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:42712)
+	(envelope-from <richard.henderson@linaro.org>) id 1gEDwJ-0003Dc-Ut
+	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 09:38:47 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38808)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gEDsD-0001ah-8v
-	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 09:34:31 -0400
-Received: by mail-wr1-x432.google.com with SMTP id f8-v6so2527459wro.9
-	for <qemu-devel@nongnu.org>; Sun, 21 Oct 2018 06:34:28 -0700 (PDT)
-References: <20181019010625.25294-1-cota@braap.org>
-	<20181019010625.25294-47-cota@braap.org>
+	id 1gEDwJ-0003Ca-MC
+	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 09:38:43 -0400
+Received: by mail-wr1-x442.google.com with SMTP id d10-v6so2443314wrs.5
+	for <qemu-devel@nongnu.org>; Sun, 21 Oct 2018 06:38:43 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <8af6bae7-ac35-f419-0a83-8a54cfb5eb0d@linaro.org>
-Date: Sun, 21 Oct 2018 14:34:25 +0100
+References: <20181019010625.25294-1-cota@braap.org>
+	<20181019010625.25294-8-cota@braap.org>
+	<38c8c109-c231-696e-2fb8-4fae6f3fb641@linaro.org>
+Message-ID: <fde51a9d-331b-1456-d93a-cd015e8caba9@linaro.org>
+Date: Sun, 21 Oct 2018 14:38:38 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181019010625.25294-47-cota@braap.org>
+In-Reply-To: <38c8c109-c231-696e-2fb8-4fae6f3fb641@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v3 46/56] accel/tcg: convert to
- cpu_interrupt_request
+Subject: Re: [Qemu-devel] [RFC v3 07/56] target/m68k: rename cpu_halted to
+ cpu_halt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,31 +34,28 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <laurent@vivier.eu>
 
-On 10/19/18 2:06 AM, Emilio G. Cota wrote:
-> @@ -540,16 +540,16 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
->       */
->      atomic_mb_set(&cpu->icount_decr.u16.high, 0);
->  
-> -    if (unlikely(atomic_read(&cpu->interrupt_request))) {
-> +    if (unlikely(cpu_interrupt_request(cpu))) {
->          int interrupt_request;
->          qemu_mutex_lock_iothread();
-> -        interrupt_request = cpu->interrupt_request;
-> +        interrupt_request = cpu_interrupt_request(cpu);
->          if (unlikely(cpu->singlestep_enabled & SSTEP_NOIRQ)) {
->              /* Mask out external interrupts for this step. */
->              interrupt_request &= ~CPU_INTERRUPT_SSTEP_MASK;
->          }
->          if (interrupt_request & CPU_INTERRUPT_DEBUG) {
-> -            cpu->interrupt_request &= ~CPU_INTERRUPT_DEBUG;
-> +            cpu_reset_interrupt(cpu, CPU_INTERRUPT_DEBUG);
->              cpu->exception_index = EXCP_DEBUG;
->              qemu_mutex_unlock_iothread();
->              return true;
+On 10/21/18 1:53 PM, Richard Henderson wrote:
+> On 10/19/18 2:05 AM, Emilio G. Cota wrote:
+>> To avoid a name clash with the soon-to-be-defined cpu_halted() helper.
+>>
+>> Cc: Laurent Vivier <laurent@vivier.eu>
+>> Signed-off-by: Emilio G. Cota <cota@braap.org>
+>> ---
+>>  target/m68k/translate.c | 6 +++---
+>>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> Although for this usage it's probably better to avoid the
+> tcg_global_mem_new_i32 and just use tcg_gen_st_i32.
 
-Multiple calls.
+And, as I read further, you need to convert this use to a helper call.
+Otherwise you've still got an unlocked direct modification to cpu->halted
+from within the TCG generated code.
+
+There are several other targets that do the same thing: alpha, cris, hppa,
+mips, microblaze, ppc.  And typically they will do exactly the same thing: set
+the flag and then raise the halt exception.
 
 
 r~
