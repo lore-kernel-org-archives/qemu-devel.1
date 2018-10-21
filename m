@@ -1,26 +1,22 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:60371)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gEJQv-0001hz-Mj
-	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 15:30:42 -0400
+	(envelope-from <edgari@xilinx.com>) id 1gEJQw-0001hz-Cg
+	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 15:30:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gEJLx-0001U8-Eo
-	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 15:25:35 -0400
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:55566)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gEJLq-0001TC-Lk
-	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 15:25:30 -0400
-Date: Sun, 21 Oct 2018 21:25:21 +0200
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20181021192521.mazhhkeunyktoohf@function>
-References: <20180914072616.17771-1-famz@redhat.com>
-	<20180914072616.17771-3-famz@redhat.com>
+	(envelope-from <edgari@xilinx.com>) id 1gEJLk-0001T3-3G
+	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 15:25:21 -0400
+Date: Sun, 21 Oct 2018 21:24:57 +0200
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Message-ID: <20181021192457.GG4229@toto>
+References: <20181017213932.19973-1-edgar.iglesias@gmail.com>
+	<20181017213932.19973-4-edgar.iglesias@gmail.com>
+	<CAFEAcA9Dd3=52zReFVMgitYFeQsRA=guYsVMxy=0zHsLJ_+z_g@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20180914072616.17771-3-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] slirp: Implement RFC2132 TFTP
- server name
+In-Reply-To: <CAFEAcA9Dd3=52zReFVMgitYFeQsRA=guYsVMxy=0zHsLJ_+z_g@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v3 3/4] hw/arm: versal: Add a model of
+ Xilinx Versal SoC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,16 +25,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, KONRAD Frederic <frederic.konrad@adacore.com>, Alistair Francis <alistair@alistair23.me>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Francisco Iglesias <frasse.iglesias@gmail.com>, figlesia@xilinx.com, Stefano Stabellini <sstabellini@kernel.org>, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
 
-Hello,
+On Fri, Oct 19, 2018 at 03:18:24PM +0100, Peter Maydell wrote:
+> On 17 October 2018 at 22:39, Edgar E. Iglesias <edgar.iglesias@gmail.com> wrote:
+> > From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+> >
+> > Add a model of Xilinx Versal SoC.
+> >
+> > Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> > ---
+> >  default-configs/aarch64-softmmu.mak |   1 +
+> >  hw/arm/Makefile.objs                |   1 +
+> >  hw/arm/xlnx-versal.c                | 324 ++++++++++++++++++++++++++++
+> >  include/hw/arm/xlnx-versal.h        | 122 +++++++++++
+> >  4 files changed, 448 insertions(+)
+> >  create mode 100644 hw/arm/xlnx-versal.c
+> >  create mode 100644 include/hw/arm/xlnx-versal.h
+> 
+> > +    if (!kvm_irqchip_in_kernel()) {
+> > +        qdev_prop_set_bit(gicdev, "has-security-extensions", true);
+> > +    }
+> 
+> Do you really support KVM for this board/SoC ?
+>
 
-Fam Zheng, le ven. 14 sept. 2018 15:26:16 +0800, a ecrit:
-> This new usernet option can be used to add data for option 66 (tftp
-> server name) in the BOOTP reply, which is useful in PXE based automatic
-> OS install such as OpenBSD.
 
-Applied to my tree, thanks!
+I haven't tried yet, so probably not, but KVM is something we'd like to support further down the road...
+If you prefer, we can remove this kvm specific check for now though.
 
-Samuel
+Cheers,
+Edgar
