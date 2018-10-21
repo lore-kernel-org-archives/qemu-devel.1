@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46113)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gE5Nh-0003tB-Ro
-	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 00:30:29 -0400
+	(envelope-from <bounces@canonical.com>) id 1gE5Nt-0003xf-M1
+	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 00:30:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gE5NZ-0004zn-I9
-	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 00:30:21 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41572)
+	(envelope-from <bounces@canonical.com>) id 1gE5Np-000592-Pd
+	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 00:30:35 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41732)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gE5NX-0004yJ-5J
-	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 00:30:16 -0400
+	id 1gE5Np-0004zx-Em
+	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 00:30:33 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gE5NU-0006Gl-7b
-	for <qemu-devel@nongnu.org>; Sun, 21 Oct 2018 04:30:12 +0000
+	id 1gE5NZ-0006JL-72
+	for <qemu-devel@nongnu.org>; Sun, 21 Oct 2018 04:30:17 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 209C72E8078
-	for <qemu-devel@nongnu.org>; Sun, 21 Oct 2018 04:30:12 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 2F2732E805B
+	for <qemu-devel@nongnu.org>; Sun, 21 Oct 2018 04:30:17 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 21 Oct 2018 04:17:27 -0000
+Date: Sun, 21 Oct 2018 04:17:29 -0000
 From: Launchpad Bug Tracker <1180777@bugs.launchpad.net>
 Reply-To: Bug 1180777 <1180777@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20130516122510.15619.26740.malonedeb@chaenomeles.canonical.com>
-Message-Id: <154009544740.6632.12784424692105480152.malone@loganberry.canonical.com>
+Message-Id: <154009544934.6632.10513725331473142824.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1180777] Re: RDP traffic freeze on quiet network
 List-Id: <qemu-devel.nongnu.org>
@@ -38,9 +38,10 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-[Expired for QEMU because there has been no activity for 60 days.]
+[Expired for qemu-kvm (Ubuntu) because there has been no activity for 60
+days.]
 
-** Changed in: qemu
+** Changed in: qemu-kvm (Ubuntu)
        Status: Incomplete =3D> Expired
 
 -- =
