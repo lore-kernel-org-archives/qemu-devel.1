@@ -1,21 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gE3ol-0000Yz-0Y
-	for qemu-devel@nongnu.org; Sat, 20 Oct 2018 22:50:15 -0400
+	(envelope-from <bounces@canonical.com>) id 1gE5Jb-0002Fs-Ee
+	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 00:26:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gE3oh-0005b9-2U
-	for qemu-devel@nongnu.org; Sat, 20 Oct 2018 22:50:13 -0400
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:37059)
+	(envelope-from <bounces@canonical.com>) id 1gE5JY-0002HV-9D
+	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 00:26:11 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40812)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gE3od-0005WE-SD
-	for qemu-devel@nongnu.org; Sat, 20 Oct 2018 22:50:09 -0400
-Received: by mail-lj1-x241.google.com with SMTP id 63-v6so33995561ljs.4
-	for <qemu-devel@nongnu.org>; Sat, 20 Oct 2018 19:50:06 -0700 (PDT)
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Sat, 20 Oct 2018 19:49:53 -0700
-Message-Id: <20181021024953.9905-1-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PATCH v2] scripts/qemu-binfmt-conf.sh: add bFL
- handler registration
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gE5JY-0002Gj-2z
+	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 00:26:08 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gE5JV-0004zt-VU
+	for <qemu-devel@nongnu.org>; Sun, 21 Oct 2018 04:26:06 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 5D2782E80AD
+	for <qemu-devel@nongnu.org>; Sun, 21 Oct 2018 04:26:02 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 21 Oct 2018 04:17:26 -0000
+From: Launchpad Bug Tracker <1681439@bugs.launchpad.net>
+Reply-To: Bug 1681439 <1681439@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170410132346.31250.84835.malonedeb@wampee.canonical.com>
+Message-Id: <154009544635.6632.2786143601817542670.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1681439] Re: qemu-system-x86_64:
+ hw/ide/core.c:685: ide_cancel_dma_sync: Assertion `s->bus->dma->aiocb ==
+ NULL' failed.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,97 +39,62 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>, Max Filippov <jcmvbkbc@gmail.com>
 
-bFLT format header doesn't have enough information to register a handler
-for a specific architecture. Add switch -f / --flat that registers one
-of the qemu binaries as a handler for bFLT executable images.
+[Expired for QEMU because there has been no activity for 60 days.]
 
-Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
----
-Changes v1->v2:
-- drop unintended changes to dtc;
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
- scripts/qemu-binfmt-conf.sh | 32 ++++++++++++++++++++++++++++++--
- 1 file changed, 30 insertions(+), 2 deletions(-)
+-- =
 
-diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
-index b5a16742a149..39f61065c698 100755
---- a/scripts/qemu-binfmt-conf.sh
-+++ b/scripts/qemu-binfmt-conf.sh
-@@ -132,6 +132,9 @@ or1k_magic='\x7fELF\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\
- or1k_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
- or1k_family=or1k
- 
-+flat_magic='bFLT\x00\x00\x00\x04'
-+flat_mask='\xff\xff\xff\xff\xff\xff\xff\xff'
-+
- qemu_get_family() {
-     cpu=${HOST_ARCH:-$(uname -m)}
-     case "$cpu" in
-@@ -170,6 +173,7 @@ usage() {
- Usage: qemu-binfmt-conf.sh [--qemu-path PATH][--debian][--systemd CPU]
-                            [--help][--credential yes|no][--exportdir PATH]
-                            [--persistent yes|no][--qemu-suffix SUFFIX]
-+                           [--flat CPU]
- 
-        Configure binfmt_misc to use qemu interpreter
- 
-@@ -188,7 +192,9 @@ Usage: qemu-binfmt-conf.sh [--qemu-path PATH][--debian][--systemd CPU]
-                       calculated according to the binary to interpret
-        --persistent:  if yes, the interpreter is loaded when binfmt is
-                       configured and remains in memory. All future uses
--                      are cloned from the open file.
-+                      are cloned from the open file
-+       --flat:        register QEMU for this CPU architecture as a handler
-+                      for the bFLT executable format.
- 
-     To import templates with update-binfmts, use :
- 
-@@ -311,6 +317,13 @@ qemu_set_binfmts() {
-             $BINFMT_SET
-         fi
-     done
-+    if [ -n "$QEMU_FLAT" ] ; then
-+        cpu="${QEMU_FLAT}_bflt"
-+        qemu="$QEMU_PATH/qemu-$QEMU_FLAT"
-+        magic=$flat_magic
-+        mask=$flat_mask
-+        $BINFMT_SET
-+    fi
- }
- 
- CHECK=qemu_check_bintfmt_misc
-@@ -324,7 +337,7 @@ CREDENTIAL=no
- PERSISTENT=no
- QEMU_SUFFIX=""
- 
--options=$(getopt -o ds:Q:S:e:hc:p: -l debian,systemd:,qemu-path:,qemu-suffix:,exportdir:,help,credential:,persistent: -- "$@")
-+options=$(getopt -o ds:Q:S:e:hc:p:f: -l debian,systemd:,qemu-path:,qemu-suffix:,exportdir:,help,credential:,persistent:,flat: -- "$@")
- eval set -- "$options"
- 
- while true ; do
-@@ -380,6 +393,21 @@ while true ; do
-         shift
-         PERSISTENT="$1"
-         ;;
-+    -f|--flat)
-+        shift
-+        QEMU_FLAT="$1"
-+        for cpu in ${qemu_target_list} ; do
-+            if [ "$cpu" = "$1" ] ; then
-+                break
-+            fi
-+        done
-+
-+        if [ "$cpu" != "$1" ] ; then
-+            echo "ERROR: unknown CPU \"$1\"" 1>&2
-+            usage
-+            exit 1
-+        fi
-+        ;;
-     *)
-         break
-         ;;
--- 
-2.11.0
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1681439
+
+Title:
+  qemu-system-x86_64: hw/ide/core.c:685: ide_cancel_dma_sync: Assertion
+  `s->bus->dma->aiocb =3D=3D NULL' failed.
+
+Status in QEMU:
+  Expired
+
+Bug description:
+  Since upgrading to QEMU 2.8.0, my Windows 7 64-bit virtual machines
+  started crashing due to the assertion quoted in the summary failing.
+  The assertion in question was added by commit 9972354856 ("block: add
+  BDS field to count in-flight requests").  My tests show that setting
+  discard=3Dunmap is needed to reproduce the issue.  Speaking of
+  reproduction, it is a bit flaky, because I have been unable to come up
+  with specific instructions that would allow the issue to be triggered
+  outside of my environment, but I do have a semi-sane way of testing that
+  appears to depend on a specific initial state of data on the underlying
+  storage volume, actions taken within the VM and waiting for about 20
+  minutes.
+
+  Here is the shortest QEMU command line that I managed to reproduce the
+  bug with:
+
+      qemu-system-x86_64 \
+          -machine pc-i440fx-2.7,accel=3Dkvm \
+          -m 3072 \
+          -drive file=3D/dev/lvm/qemu,format=3Draw,if=3Dide,discard=3Dunmap=
+ \
+  	-netdev tap,id=3Dhostnet0,ifname=3Dtap0,script=3Dno,downscript=3Dno,vhos=
+t=3Don \
+          -device virtio-net-pci,netdev=3Dhostnet0 \
+  	-vnc :0
+
+  The underlying storage (/dev/lvm/qemu) is a thin LVM snapshot.
+
+  QEMU was compiled using:
+
+      ./configure --python=3D/usr/bin/python2.7 --target-list=3Dx86_64-soft=
+mmu
+      make -j3
+
+  My virtualization environment is not really a critical one and
+  reproduction is not that much of a hassle, so if you need me to gather
+  further diagnostic information or test patches, I will be happy to help.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1681439/+subscriptions
