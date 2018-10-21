@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45735)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gEFms-00020i-Sh
-	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 11:37:10 -0400
+	(envelope-from <noring@nocrew.org>) id 1gEFnF-0002Fo-AV
+	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 11:37:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gEFmo-0002xR-Bo
-	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 11:37:06 -0400
-Received: from pio-pvt-msa1.bahnhof.se ([79.136.2.40]:35045)
+	(envelope-from <noring@nocrew.org>) id 1gEFn7-00036p-Ce
+	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 11:37:27 -0400
+Received: from pio-pvt-msa3.bahnhof.se ([79.136.2.42]:40751)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gEFmn-0002x3-Vv
-	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 11:37:02 -0400
-Date: Sun, 21 Oct 2018 17:36:54 +0200
+	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gEFn7-00031B-02
+	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 11:37:21 -0400
+Date: Sun, 21 Oct 2018 17:37:06 +0200
 From: Fredrik Noring <noring@nocrew.org>
-Message-ID: <b30e57633f2dd2a10e1104f047945a114c8d7816.1540134918.git.noring@nocrew.org>
+Message-ID: <6a5d1538f90e12c97feac0708fac75e377685f00.1540134918.git.noring@nocrew.org>
 References: <cover.1540134918.git.noring@nocrew.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <cover.1540134918.git.noring@nocrew.org>
-Subject: [Qemu-devel] [PATCH v8 14/38] target/mips: Placeholder for R5900
- MMI1 instruction subclass
+Subject: [Qemu-devel] [PATCH v8 15/38] target/mips: Placeholder for R5900
+ MMI2 instruction subclass
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,44 +32,48 @@ Cc: Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@a
 
 Signed-off-by: Fredrik Noring <noring@nocrew.org>
 ---
- target/mips/translate.c | 36 +++++++++++++++++++++++++++++++++++-
- 1 file changed, 35 insertions(+), 1 deletion(-)
+ target/mips/translate.c | 40 +++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 39 insertions(+), 1 deletion(-)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index c8080844f1..28137cdaf4 100644
+index 28137cdaf4..e5ac9f17e0 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -24459,6 +24459,38 @@ static void decode_tx79_mmi0(CPUMIPSState *env, DisasContext *ctx)
+@@ -24491,6 +24491,42 @@ static void decode_tx79_mmi1(CPUMIPSState *env, DisasContext *ctx)
      }
  }
  
-+static void decode_tx79_mmi1(CPUMIPSState *env, DisasContext *ctx)
++static void decode_tx79_mmi2(CPUMIPSState *env, DisasContext *ctx)
 +{
-+    uint32_t opc = MASK_TX79_MMI1(ctx->opcode);
++    uint32_t opc = MASK_TX79_MMI2(ctx->opcode);
 +
 +    switch (opc) {
-+    case TX79_MMI1_PABSW:     /* TODO: TX79_MMI1_PABSW */
-+    case TX79_MMI1_PCEQW:     /* TODO: TX79_MMI1_PCEQW */
-+    case TX79_MMI1_PMINW:     /* TODO: TX79_MMI1_PMINW */
-+    case TX79_MMI1_PADSBH:    /* TODO: TX79_MMI1_PADSBH */
-+    case TX79_MMI1_PABSH:     /* TODO: TX79_MMI1_PABSH */
-+    case TX79_MMI1_PCEQH:     /* TODO: TX79_MMI1_PCEQH */
-+    case TX79_MMI1_PMINH:     /* TODO: TX79_MMI1_PMINH */
-+    case TX79_MMI1_PCEQB:     /* TODO: TX79_MMI1_PCEQB */
-+    case TX79_MMI1_PADDUW:    /* TODO: TX79_MMI1_PADDUW */
-+    case TX79_MMI1_PSUBUW:    /* TODO: TX79_MMI1_PSUBUW */
-+    case TX79_MMI1_PEXTUW:    /* TODO: TX79_MMI1_PEXTUW */
-+    case TX79_MMI1_PADDUH:    /* TODO: TX79_MMI1_PADDUH */
-+    case TX79_MMI1_PSUBUH:    /* TODO: TX79_MMI1_PSUBUH */
-+    case TX79_MMI1_PEXTUH:    /* TODO: TX79_MMI1_PEXTUH */
-+    case TX79_MMI1_PADDUB:    /* TODO: TX79_MMI1_PADDUB */
-+    case TX79_MMI1_PSUBUB:    /* TODO: TX79_MMI1_PSUBUB */
-+    case TX79_MMI1_PEXTUB:    /* TODO: TX79_MMI1_PEXTUB */
-+    case TX79_MMI1_QFSRV:     /* TODO: TX79_MMI1_QFSRV */
-+        generate_exception_end(ctx, EXCP_RI); /* TODO: TX79_MMI_CLASS_MMI1 */
++    case TX79_MMI2_PMADDW:    /* TODO: TX79_MMI2_PMADDW */
++    case TX79_MMI2_PSLLVW:    /* TODO: TX79_MMI2_PSLLVW */
++    case TX79_MMI2_PSRLVW:    /* TODO: TX79_MMI2_PSRLVW */
++    case TX79_MMI2_PMSUBW:    /* TODO: TX79_MMI2_PMSUBW */
++    case TX79_MMI2_PMFHI:     /* TODO: TX79_MMI2_PMFHI */
++    case TX79_MMI2_PMFLO:     /* TODO: TX79_MMI2_PMFLO */
++    case TX79_MMI2_PINTH:     /* TODO: TX79_MMI2_PINTH */
++    case TX79_MMI2_PMULTW:    /* TODO: TX79_MMI2_PMULTW */
++    case TX79_MMI2_PDIVW:     /* TODO: TX79_MMI2_PDIVW */
++    case TX79_MMI2_PCPYLD:    /* TODO: TX79_MMI2_PCPYLD */
++    case TX79_MMI2_PMADDH:    /* TODO: TX79_MMI2_PMADDH */
++    case TX79_MMI2_PHMADH:    /* TODO: TX79_MMI2_PHMADH */
++    case TX79_MMI2_PAND:      /* TODO: TX79_MMI2_PAND */
++    case TX79_MMI2_PXOR:      /* TODO: TX79_MMI2_PXOR */
++    case TX79_MMI2_PMSUBH:    /* TODO: TX79_MMI2_PMSUBH */
++    case TX79_MMI2_PHMSBH:    /* TODO: TX79_MMI2_PHMSBH */
++    case TX79_MMI2_PEXEH:     /* TODO: TX79_MMI2_PEXEH */
++    case TX79_MMI2_PREVH:     /* TODO: TX79_MMI2_PREVH */
++    case TX79_MMI2_PMULTH:    /* TODO: TX79_MMI2_PMULTH */
++    case TX79_MMI2_PDIVBW:    /* TODO: TX79_MMI2_PDIVBW */
++    case TX79_MMI2_PEXEW:     /* TODO: TX79_MMI2_PEXEW */
++    case TX79_MMI2_PROT3W:    /* TODO: TX79_MMI2_PROT3W */
++        generate_exception_end(ctx, EXCP_RI); /* TODO: TX79_MMI_CLASS_MMI2 */
 +        break;
 +    default:
-+        MIPS_INVAL("TX79 MMI class MMI1");
++        MIPS_INVAL("TX79 MMI class MMI2");
 +        generate_exception_end(ctx, EXCP_RI);
 +        break;
 +    }
@@ -78,23 +82,19 @@ index c8080844f1..28137cdaf4 100644
  static void decode_tx79_mmi(CPUMIPSState *env, DisasContext *ctx)
  {
      uint32_t opc = MASK_TX79_MMI(ctx->opcode);
-@@ -24467,6 +24499,9 @@ static void decode_tx79_mmi(CPUMIPSState *env, DisasContext *ctx)
-     case TX79_MMI_CLASS_MMI0:
-         decode_tx79_mmi0(env, ctx);
+@@ -24502,10 +24538,12 @@ static void decode_tx79_mmi(CPUMIPSState *env, DisasContext *ctx)
+     case TX79_MMI_CLASS_MMI1:
+         decode_tx79_mmi1(env, ctx);
          break;
-+    case TX79_MMI_CLASS_MMI1:
-+        decode_tx79_mmi1(env, ctx);
++    case TX79_MMI_CLASS_MMI2:
++        decode_tx79_mmi2(env, ctx);
 +        break;
      case TX79_MMI_MADD:          /* TODO: TX79_MMI_MADD */
      case TX79_MMI_MADDU:         /* TODO: TX79_MMI_MADDU */
      case TX79_MMI_PLZCW:         /* TODO: TX79_MMI_PLZCW */
-@@ -24481,7 +24516,6 @@ static void decode_tx79_mmi(CPUMIPSState *env, DisasContext *ctx)
-     case TX79_MMI_DIVU1:         /* TODO: TX79_MMI_DIVU1 */
-     case TX79_MMI_MADD1:         /* TODO: TX79_MMI_MADD1 */
-     case TX79_MMI_MADDU1:        /* TODO: TX79_MMI_MADDU1 */
--    case TX79_MMI_CLASS_MMI1:    /* TODO: TX79_MMI_CLASS_MMI1 */
-     case TX79_MMI_CLASS_MMI3:    /* TODO: TX79_MMI_CLASS_MMI3 */
-     case TX79_MMI_PMFHL:         /* TODO: TX79_MMI_PMFHL */
-     case TX79_MMI_PMTHL:         /* TODO: TX79_MMI_PMTHL */
+-    case TX79_MMI_CLASS_MMI2:    /* TODO: TX79_MMI_CLASS_MMI2 */
+     case TX79_MMI_MFHI1:         /* TODO: TX79_MMI_MFHI1 */
+     case TX79_MMI_MTHI1:         /* TODO: TX79_MMI_MTHI1 */
+     case TX79_MMI_MFLO1:         /* TODO: TX79_MMI_MFLO1 */
 -- 
 2.18.1
