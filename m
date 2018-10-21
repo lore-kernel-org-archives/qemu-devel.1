@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46164)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46166)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gE5Nx-0003zZ-02
-	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 00:30:41 -0400
+	(envelope-from <bounces@canonical.com>) id 1gE5Nx-0003zb-1E
+	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 00:30:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gE5Nu-0005Aw-0h
+	(envelope-from <bounces@canonical.com>) id 1gE5Nt-0005Aq-Uw
 	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 00:30:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42052)
+Received: from indium.canonical.com ([91.189.90.7]:42200)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gE5Nt-00055i-Ok
+	id 1gE5Nt-00057B-L5
 	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 00:30:37 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gE5Nf-0006Q5-Qb
-	for <qemu-devel@nongnu.org>; Sun, 21 Oct 2018 04:30:23 +0000
+	id 1gE5Nj-0006a0-8F
+	for <qemu-devel@nongnu.org>; Sun, 21 Oct 2018 04:30:27 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C81502E806B
-	for <qemu-devel@nongnu.org>; Sun, 21 Oct 2018 04:30:23 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 3BFEE2E8078
+	for <qemu-devel@nongnu.org>; Sun, 21 Oct 2018 04:30:27 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 21 Oct 2018 04:17:23 -0000
+Date: Sun, 21 Oct 2018 04:17:25 -0000
 From: Launchpad Bug Tracker <965867@bugs.launchpad.net>
 Reply-To: Bug 965867 <965867@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20120327015624.22022.30085.malonedeb@soybean.canonical.com>
-Message-Id: <154009544325.6632.14278551257679429247.malone@loganberry.canonical.com>
+Message-Id: <154009544536.6632.10440169679380036129.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 965867] Re: 9p virtual file system on qemu slow
 List-Id: <qemu-devel.nongnu.org>
@@ -38,9 +38,10 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-[Expired for QEMU because there has been no activity for 60 days.]
+[Expired for qemu-kvm (Ubuntu) because there has been no activity for 60
+days.]
 
-** Changed in: qemu
+** Changed in: qemu-kvm (Ubuntu)
        Status: Incomplete =3D> Expired
 
 -- =
