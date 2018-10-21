@@ -1,35 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45342)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gE5Jb-0002Fs-Ee
-	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 00:26:12 -0400
+	(envelope-from <bounces@canonical.com>) id 1gE5Nh-0003tB-Ro
+	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 00:30:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gE5JY-0002HV-9D
-	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 00:26:11 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40812)
+	(envelope-from <bounces@canonical.com>) id 1gE5NZ-0004zn-I9
+	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 00:30:21 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41572)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gE5JY-0002Gj-2z
-	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 00:26:08 -0400
+	id 1gE5NX-0004yJ-5J
+	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 00:30:16 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gE5JV-0004zt-VU
-	for <qemu-devel@nongnu.org>; Sun, 21 Oct 2018 04:26:06 +0000
+	id 1gE5NU-0006Gl-7b
+	for <qemu-devel@nongnu.org>; Sun, 21 Oct 2018 04:30:12 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5D2782E80AD
-	for <qemu-devel@nongnu.org>; Sun, 21 Oct 2018 04:26:02 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 209C72E8078
+	for <qemu-devel@nongnu.org>; Sun, 21 Oct 2018 04:30:12 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 21 Oct 2018 04:17:26 -0000
-From: Launchpad Bug Tracker <1681439@bugs.launchpad.net>
-Reply-To: Bug 1681439 <1681439@bugs.launchpad.net>
+Date: Sun, 21 Oct 2018 04:17:27 -0000
+From: Launchpad Bug Tracker <1180777@bugs.launchpad.net>
+Reply-To: Bug 1180777 <1180777@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20170410132346.31250.84835.malonedeb@wampee.canonical.com>
-Message-Id: <154009544635.6632.2786143601817542670.malone@loganberry.canonical.com>
+References: <20130516122510.15619.26740.malonedeb@chaenomeles.canonical.com>
+Message-Id: <154009544740.6632.12784424692105480152.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1681439] Re: qemu-system-x86_64:
- hw/ide/core.c:685: ide_cancel_dma_sync: Assertion `s->bus->dma->aiocb ==
- NULL' failed.
+Subject: [Qemu-devel] [Bug 1180777] Re: RDP traffic freeze on quiet network
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -49,52 +47,83 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1681439
+https://bugs.launchpad.net/bugs/1180777
 
 Title:
-  qemu-system-x86_64: hw/ide/core.c:685: ide_cancel_dma_sync: Assertion
-  `s->bus->dma->aiocb =3D=3D NULL' failed.
+  RDP traffic freeze on quiet network
 
 Status in QEMU:
   Expired
+Status in qemu-kvm package in Ubuntu:
+  Expired
+Status in Debian:
+  Incomplete
 
 Bug description:
-  Since upgrading to QEMU 2.8.0, my Windows 7 64-bit virtual machines
-  started crashing due to the assertion quoted in the summary failing.
-  The assertion in question was added by commit 9972354856 ("block: add
-  BDS field to count in-flight requests").  My tests show that setting
-  discard=3Dunmap is needed to reproduce the issue.  Speaking of
-  reproduction, it is a bit flaky, because I have been unable to come up
-  with specific instructions that would allow the issue to be triggered
-  outside of my environment, but I do have a semi-sane way of testing that
-  appears to depend on a specific initial state of data on the underlying
-  storage volume, actions taken within the VM and waiting for about 20
-  minutes.
+  To summarize what I think has been found so far,
 
-  Here is the shortest QEMU command line that I managed to reproduce the
-  bug with:
+    1. The main symptom is that RDP connections hang after some time
+    2. This bug affects qemu 1.0 .. 1.6.5
+    3. This bug affects at least windows xp and windows 7 guests
+    4. Keeping another network connection open, such as vnc, prevents the R=
+DP connection from hanging.
 
-      qemu-system-x86_64 \
-          -machine pc-i440fx-2.7,accel=3Dkvm \
-          -m 3072 \
-          -drive file=3D/dev/lvm/qemu,format=3Draw,if=3Dide,discard=3Dunmap=
- \
-  	-netdev tap,id=3Dhostnet0,ifname=3Dtap0,script=3Dno,downscript=3Dno,vhos=
-t=3Don \
-          -device virtio-net-pci,netdev=3Dhostnet0 \
-  	-vnc :0
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  Hi,
 
-  The underlying storage (/dev/lvm/qemu) is a thin LVM snapshot.
+  I have recently setup a Windows 7 VM on KVM and started using it
+  through remote desktop.
 
-  QEMU was compiled using:
+  What happens is that, after some hours of usage, the remote desktop
+  connection freezes. I thought it was a remmina bug, as the it was
+  enough to kill and restart it to successfully connect again to the VM.
 
-      ./configure --python=3D/usr/bin/python2.7 --target-list=3Dx86_64-soft=
-mmu
-      make -j3
+  However, today I've switched to a different RDP client (2X Client
+  chromium app) and the freeze just happened again!
 
-  My virtualization environment is not really a critical one and
-  reproduction is not that much of a hassle, so if you need me to gather
-  further diagnostic information or test patches, I will be happy to help.
+  Some information:
+  - the host and the VM are completely idle when the freeze occurs
+  - I've tried sniffing the network packets toward the RDP port during the =
+freeze and found that the client is sending packets but no packet is sent b=
+ack
+
+  Could this be a KVM issue? How can I further debug this one (I expect
+  the freeze to happen again...)?
+
+  ProblemType: Bug
+  DistroRelease: Ubuntu 12.04
+  Package: kvm 1:84+dfsg-0ubuntu16+1.0+noroms+0ubuntu14.8
+  ProcVersionSignature: Ubuntu 3.2.0-41.66-generic 3.2.42
+  Uname: Linux 3.2.0-41-generic x86_64
+  ApportVersion: 2.0.1-0ubuntu17.2
+  Architecture: amd64
+  Date: Thu May 16 14:12:40 2013
+  MachineType: Hewlett-Packard HP ProBook 4520s
+  MarkForUpload: True
+  ProcEnviron:
+  =C2=A0TERM=3Dxterm
+  =C2=A0PATH=3D(custom, no user)
+  =C2=A0LANG=3Den_US.UTF-8
+  =C2=A0SHELL=3D/bin/bash
+  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-3.2.0-41-generic root=3DUUI=
+D=3DD2E20BC3E20BAAB5 loop=3D/hostname/disks/root.disk ro quiet splash vt.ha=
+ndoff=3D7
+  SourcePackage: qemu-kvm
+  UpgradeStatus: No upgrade log present (probably fresh install)
+  dmi.bios.date: 08/26/2010
+  dmi.bios.vendor: Hewlett-Packard
+  dmi.bios.version: 68AZZ Ver. F.0A
+  dmi.board.name: 1411
+  dmi.board.vendor: Hewlett-Packard
+  dmi.board.version: KBC Version 57.30
+  dmi.chassis.type: 10
+  dmi.chassis.vendor: Hewlett-Packard
+  dmi.modalias: dmi:bvnHewlett-Packard:bvr68AZZVer.F.0A:bd08/26/2010:svnHew=
+lett-Packard:pnHPProBook4520s:pvr:rvnHewlett-Packard:rn1411:rvrKBCVersion57=
+.30:cvnHewlett-Packard:ct10:cvr:
+  dmi.product.name: HP ProBook 4520s
+  dmi.sys.vendor: Hewlett-Packard
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1681439/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1180777/+subscriptions
