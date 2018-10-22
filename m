@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38175)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38177)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gEZPo-0002PG-Pu
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:39 -0400
+	(envelope-from <armbru@redhat.com>) id 1gEZPo-0002PJ-QE
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gEZPm-0003Bb-7j
+	(envelope-from <armbru@redhat.com>) id 1gEZPm-0003BT-59
 	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40406)
+Received: from mx1.redhat.com ([209.132.183.28]:45298)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gEZPl-0002xc-PB
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gEZPl-0002w5-LX
 	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:33 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 238B2316499A
-	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 12:34:22 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9C0967F6B3
+	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 12:34:20 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-34.ams2.redhat.com
+	[10.36.117.34])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6786F60925
+	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 12:34:20 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 22 Oct 2018 14:34:12 +0200
-Message-Id: <20181022123413.28044-40-armbru@redhat.com>
+Date: Mon, 22 Oct 2018 14:33:53 +0200
+Message-Id: <20181022123413.28044-21-armbru@redhat.com>
 In-Reply-To: <20181022123413.28044-1-armbru@redhat.com>
 References: <20181022123413.28044-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 39/40] vpc: Fail open on bad header checksum
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 20/40] vl: Clean up error reporting in
+ parse_add_fd()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,38 +38,88 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>
 
-vpc_open() merely prints a warning when it finds a bad header
-checksum.  Turn that into a hard error.
+Calling error_report() in a function that takes an Error ** argument
+is suspicious.  parse_add_fd() does that, and then fails without
+setting an error.  Its caller main(), via qemu_opts_foreach(), is fine
+with it, but clean it up anyway.
 
-Cc: Kevin Wolf <kwolf@redhat.com>
+Also change call of cleanup_add_fd(), which can't fail, for symmetry.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20181017082702.5581-39-armbru@redhat.com>
-[Error message capitalized for local consistency]
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20181017082702.5581-19-armbru@redhat.com>
 ---
- block/vpc.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ vl.c | 22 +++++++++-------------
+ 1 file changed, 9 insertions(+), 13 deletions(-)
 
-diff --git a/block/vpc.c b/block/vpc.c
-index bf294abfa7..984187cadd 100644
---- a/block/vpc.c
-+++ b/block/vpc.c
-@@ -284,9 +284,11 @@ static int vpc_open(BlockDriverState *bs, QDict *options, int flags,
- 
-     checksum = be32_to_cpu(footer->checksum);
-     footer->checksum = 0;
--    if (vpc_checksum(s->footer_buf, HEADER_SIZE) != checksum)
--        fprintf(stderr, "block-vpc: The header checksum of '%s' is "
--            "incorrect.\n", bs->filename);
-+    if (vpc_checksum(s->footer_buf, HEADER_SIZE) != checksum) {
-+        error_setg(errp, "Incorrect header checksum");
-+        ret = -EINVAL;
-+        goto fail;
-+    }
- 
-     /* Write 'checksum' back to footer, or else will leave it with zero. */
-     footer->checksum = cpu_to_be32(checksum);
--- 
+diff --git a/vl.c b/vl.c
+index d7b604c97e..87ad2e7de7 100644
+--- a/vl.c
++++ b/vl.c
+@@ -1059,12 +1059,12 @@ static int parse_add_fd(void *opaque, QemuOpts *o=
+pts, Error **errp)
+     fd_opaque =3D qemu_opt_get(opts, "opaque");
+=20
+     if (fd < 0) {
+-        error_report("fd option is required and must be non-negative");
++        error_setg(errp, "fd option is required and must be non-negative=
+");
+         return -1;
+     }
+=20
+     if (fd <=3D STDERR_FILENO) {
+-        error_report("fd cannot be a standard I/O stream");
++        error_setg(errp, "fd cannot be a standard I/O stream");
+         return -1;
+     }
+=20
+@@ -1074,12 +1074,12 @@ static int parse_add_fd(void *opaque, QemuOpts *o=
+pts, Error **errp)
+      */
+     flags =3D fcntl(fd, F_GETFD);
+     if (flags =3D=3D -1 || (flags & FD_CLOEXEC)) {
+-        error_report("fd is not valid or already in use");
++        error_setg(errp, "fd is not valid or already in use");
+         return -1;
+     }
+=20
+     if (fdset_id < 0) {
+-        error_report("set option is required and must be non-negative");
++        error_setg(errp, "set option is required and must be non-negativ=
+e");
+         return -1;
+     }
+=20
+@@ -1092,7 +1092,7 @@ static int parse_add_fd(void *opaque, QemuOpts *opt=
+s, Error **errp)
+     }
+ #endif
+     if (dupfd =3D=3D -1) {
+-        error_report("error duplicating fd: %s", strerror(errno));
++        error_setg(errp, "error duplicating fd: %s", strerror(errno));
+         return -1;
+     }
+=20
+@@ -3984,15 +3984,11 @@ int main(int argc, char **argv, char **envp)
+     }
+=20
+ #ifndef _WIN32
+-    if (qemu_opts_foreach(qemu_find_opts("add-fd"),
+-                          parse_add_fd, NULL, NULL)) {
+-        exit(1);
+-    }
++    qemu_opts_foreach(qemu_find_opts("add-fd"),
++                      parse_add_fd, NULL, &error_fatal);
+=20
+-    if (qemu_opts_foreach(qemu_find_opts("add-fd"),
+-                          cleanup_add_fd, NULL, NULL)) {
+-        exit(1);
+-    }
++    qemu_opts_foreach(qemu_find_opts("add-fd"),
++                      cleanup_add_fd, NULL, &error_fatal);
+ #endif
+=20
+     current_machine =3D MACHINE(object_new(object_class_get_name(
+--=20
 2.17.2
