@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38027)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gEZPl-0002Ln-7n
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:35 -0400
+	(envelope-from <armbru@redhat.com>) id 1gEZPm-0002Mm-8X
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gEZPk-00038x-8G
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33590)
+	(envelope-from <armbru@redhat.com>) id 1gEZPl-00039f-0U
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50359)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gEZPg-00030X-To
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:30 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AF65D3082E22
-	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 12:34:27 +0000 (UTC)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gEZPk-0002u4-Mr
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:32 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 22 Oct 2018 14:34:00 +0200
-Message-Id: <20181022123413.28044-28-armbru@redhat.com>
+Date: Mon, 22 Oct 2018 14:33:43 +0200
+Message-Id: <20181022123413.28044-11-armbru@redhat.com>
 In-Reply-To: <20181022123413.28044-1-armbru@redhat.com>
 References: <20181022123413.28044-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 27/40] ui/keymaps: Fix handling of erroneous
- include files
+Subject: [Qemu-devel] [PULL 10/40] 9pfs: Fix CLI parsing crash on error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,113 +24,58 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Greg Kurz <groug@kaod.org>
 
-While errors in the keyboard layout named with -k are fatal, errors in
-included files are reported, but otherwise ignored:
+Calling error_report() in a function that takes an Error ** argument
+is suspicious.  9p-handle.c's handle_parse_opts() does that, and then
+fails without setting an error.  Wrong.  Its caller crashes when it
+tries to report the error:
 
-    $ cat worst
-    include bad
-    include worse
-    $ ls -l bad worse
-    ls: cannot access 'bad': No such file or directory
-    ls: cannot access 'worse': No such file or directory
-    $ qemu-system-x86_64 -nodefaults -S -monitor stdio -display vnc=:0 -k bad
-    QEMU 3.0.50 monitor - type 'help' for more information
-    (qemu) Could not read keymap file: 'bad'
-    $ qemu-system-x86_64 -nodefaults -S -monitor stdio -display vnc=:0 -k worst
-    QEMU 3.0.50 monitor - type 'help' for more information
-    (qemu) Could not read keymap file: 'bad'
-    Could not read keymap file: 'worse'
+    $ qemu-system-x86_64 -nodefaults -fsdev id=foo,fsdriver=handle
+    qemu-system-x86_64: -fsdev id=foo,fsdriver=handle: warning: handle backend is deprecated
+    qemu-system-x86_64: -fsdev id=foo,fsdriver=handle: fsdev: No path specified
+    Segmentation fault (core dumped)
 
-Fix that.
+Screwed up when commit 91cda4e8f37 (v2.12.0) converted the function to
+Error.  Fix by calling error_setg() instead of error_report().
 
-Note that parse_keyboard_layout() allocates the keymap, except when
-it's parsing an include file.  To keep error handling simple, move the
-memory management to its caller init_keyboard_layout().
-
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Fixes: 91cda4e8f372602795e3a2f4bd2e3adaf9f82255
+Cc: Greg Kurz <groug@kaod.org>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20181017082702.5581-26-armbru@redhat.com>
-Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+Acked-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20181017082702.5581-9-armbru@redhat.com>
 ---
- ui/keymaps.c | 35 +++++++++++++++++++++++------------
- 1 file changed, 23 insertions(+), 12 deletions(-)
+ hw/9pfs/9p-handle.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/ui/keymaps.c b/ui/keymaps.c
-index 43fe604724..b05fb028dc 100644
---- a/ui/keymaps.c
-+++ b/ui/keymaps.c
-@@ -79,10 +79,11 @@ static void add_keysym(char *line, int keysym, int keycode, kbd_layout_t *k)
-     trace_keymap_add(keysym, keycode, line);
- }
+diff --git a/hw/9pfs/9p-handle.c b/hw/9pfs/9p-handle.c
+index f3641dbe4a..3465b1ef30 100644
+--- a/hw/9pfs/9p-handle.c
++++ b/hw/9pfs/9p-handle.c
+@@ -19,6 +19,7 @@
+ #include <grp.h>
+ #include <sys/socket.h>
+ #include <sys/un.h>
++#include "qapi/error.h"
+ #include "qemu/xattr.h"
+ #include "qemu/cutils.h"
+ #include "qemu/error-report.h"
+@@ -655,12 +656,13 @@ static int handle_parse_opts(QemuOpts *opts, FsDriverEntry *fse, Error **errp)
+     warn_report("handle backend is deprecated");
  
--static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
--                                           const char *language,
--                                           kbd_layout_t *k)
-+static int parse_keyboard_layout(kbd_layout_t *k,
-+                                 const name2keysym_t *table,
-+                                 const char *language)
- {
-+    int ret;
-     FILE *f;
-     char * filename;
-     char line[1024];
-@@ -95,12 +96,7 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
-     g_free(filename);
-     if (!f) {
-         fprintf(stderr, "Could not read keymap file: '%s'\n", language);
--        return NULL;
--    }
--
--    if (!k) {
--        k = g_new0(kbd_layout_t, 1);
--        k->hash = g_hash_table_new(NULL, NULL);
-+        return -1;
+     if (sec_model) {
+-        error_report("Invalid argument security_model specified with handle fsdriver");
++        error_setg(errp,
++                   "Invalid argument security_model specified with handle fsdriver");
+         return -1;
      }
  
-     for(;;) {
-@@ -118,7 +114,10 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
-             continue;
-         }
-         if (!strncmp(line, "include ", 8)) {
--            parse_keyboard_layout(table, line + 8, k);
-+            if (parse_keyboard_layout(k, table, line + 8) < 0) {
-+                ret = -1;
-+                goto out;
-+            }
-         } else {
-             int offset = 0;
-             while (line[offset] != 0 &&
-@@ -164,15 +163,27 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
-             }
-         }
+     if (!path) {
+-        error_report("fsdev: No path specified");
++        error_setg(errp, "fsdev: No path specified");
+         return -1;
      }
-+
-+    ret = 0;
-+out:
-     fclose(f);
--    return k;
-+    return ret;
- }
- 
- 
- kbd_layout_t *init_keyboard_layout(const name2keysym_t *table,
-                                    const char *language)
- {
--    return parse_keyboard_layout(table, language, NULL);
-+    kbd_layout_t *k;
-+
-+    k = g_new0(kbd_layout_t, 1);
-+    k->hash = g_hash_table_new(NULL, NULL);
-+    if (parse_keyboard_layout(k, table, language) < 0) {
-+        g_hash_table_unref(k->hash);
-+        g_free(k);
-+        return NULL;
-+    }
-+    return k;
- }
- 
- 
+     fse->path = g_strdup(path);
 -- 
 2.17.2
