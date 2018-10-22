@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38172)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38283)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gEZPo-0002PE-Pd
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:39 -0400
+	(envelope-from <armbru@redhat.com>) id 1gEZPq-0002Re-SX
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gEZPm-0003CL-D8
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44718)
+	(envelope-from <armbru@redhat.com>) id 1gEZPn-0003FJ-QK
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47878)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gEZPm-0002vl-15
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:34 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gEZPn-0002wL-BG
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:35 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 08D2D30224BA
+	by mx1.redhat.com (Postfix) with ESMTPS id C6A5A30020C8
 	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 12:34:20 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 22 Oct 2018 14:33:42 +0200
-Message-Id: <20181022123413.28044-10-armbru@redhat.com>
+Date: Mon, 22 Oct 2018 14:33:54 +0200
+Message-Id: <20181022123413.28044-22-armbru@redhat.com>
 In-Reply-To: <20181022123413.28044-1-armbru@redhat.com>
 References: <20181022123413.28044-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 09/40] char: Use error_printf() to print help
- and such
+Subject: [Qemu-devel] [PULL 21/40] qom: Clean up error reporting in
+ user_creatable_add_opts_foreach()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,60 +34,120 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
 Calling error_report() in a function that takes an Error ** argument
-is suspicious.  Convert a few that are actually help and such to
-error_printf().
+is suspicious.  user_creatable_add_opts_foreach() does that, and then
+fails without setting an error.  Its caller main(), via
+qemu_opts_foreach(), is fine with it, but clean it up anyway.
 
-Improves output of -chardev help from
-
-    qemu-system-x86_64: -chardev help: Available chardev backend types:
-    serial
-    ...
-
-to
-
-    Available chardev backend types:
-    serial
-    ...
-
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.com>
+Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20181017082702.5581-8-armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20181017082702.5581-20-armbru@redhat.com>
 ---
- chardev/char-pty.c | 2 +-
- chardev/char.c     | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ qemu-io.c               |  8 +++-----
+ qemu-nbd.c              |  8 +++-----
+ qom/object_interfaces.c |  4 +---
+ vl.c                    | 16 ++++++----------
+ 4 files changed, 13 insertions(+), 23 deletions(-)
 
-diff --git a/chardev/char-pty.c b/chardev/char-pty.c
-index e8d9a53476..f681d637c1 100644
---- a/chardev/char-pty.c
-+++ b/chardev/char-pty.c
-@@ -259,7 +259,7 @@ static void char_pty_open(Chardev *chr,
-     qemu_set_nonblock(master_fd);
-=20
-     chr->filename =3D g_strdup_printf("pty:%s", pty_name);
--    error_report("char device redirected to %s (label %s)",
-+    error_printf("char device redirected to %s (label %s)\n",
-                  pty_name, chr->label);
-=20
-     s =3D PTY_CHARDEV(chr);
-diff --git a/chardev/char.c b/chardev/char.c
-index e115166995..7f07a1bfbd 100644
---- a/chardev/char.c
-+++ b/chardev/char.c
-@@ -634,7 +634,7 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts, Error=
- **errp)
-=20
-         chardev_name_foreach(help_string_append, str);
-=20
--        error_report("Available chardev backend types: %s", str->str);
-+        error_printf("Available chardev backend types: %s\n", str->str);
-         g_string_free(str, true);
-         return NULL;
+diff --git a/qemu-io.c b/qemu-io.c
+index 13829f5e21..6df7731af4 100644
+--- a/qemu-io.c
++++ b/qemu-io.c
+@@ -620,11 +620,9 @@ int main(int argc, char **argv)
+         exit(1);
      }
+=20
+-    if (qemu_opts_foreach(&qemu_object_opts,
+-                          user_creatable_add_opts_foreach,
+-                          NULL, NULL)) {
+-        exit(1);
+-    }
++    qemu_opts_foreach(&qemu_object_opts,
++                      user_creatable_add_opts_foreach,
++                      NULL, &error_fatal);
+=20
+     if (!trace_init_backends()) {
+         exit(1);
+diff --git a/qemu-nbd.c b/qemu-nbd.c
+index 7874bc973c..ca7109652e 100644
+--- a/qemu-nbd.c
++++ b/qemu-nbd.c
+@@ -766,11 +766,9 @@ int main(int argc, char **argv)
+         exit(EXIT_FAILURE);
+     }
+=20
+-    if (qemu_opts_foreach(&qemu_object_opts,
+-                          user_creatable_add_opts_foreach,
+-                          NULL, NULL)) {
+-        exit(EXIT_FAILURE);
+-    }
++    qemu_opts_foreach(&qemu_object_opts,
++                      user_creatable_add_opts_foreach,
++                      NULL, &error_fatal);
+=20
+     if (!trace_init_backends()) {
+         exit(1);
+diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
+index 941fd63afd..97b79b48bb 100644
+--- a/qom/object_interfaces.c
++++ b/qom/object_interfaces.c
+@@ -143,7 +143,6 @@ int user_creatable_add_opts_foreach(void *opaque, Qem=
+uOpts *opts, Error **errp)
+ {
+     bool (*type_opt_predicate)(const char *, QemuOpts *) =3D opaque;
+     Object *obj =3D NULL;
+-    Error *err =3D NULL;
+     const char *type;
+=20
+     type =3D qemu_opt_get(opts, "qom-type");
+@@ -152,9 +151,8 @@ int user_creatable_add_opts_foreach(void *opaque, Qem=
+uOpts *opts, Error **errp)
+         return 0;
+     }
+=20
+-    obj =3D user_creatable_add_opts(opts, &err);
++    obj =3D user_creatable_add_opts(opts, errp);
+     if (!obj) {
+-        error_report_err(err);
+         return -1;
+     }
+     object_unref(obj);
+diff --git a/vl.c b/vl.c
+index 87ad2e7de7..f8a13d7070 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4229,11 +4229,9 @@ int main(int argc, char **argv, char **envp)
+     page_size_init();
+     socket_init();
+=20
+-    if (qemu_opts_foreach(qemu_find_opts("object"),
+-                          user_creatable_add_opts_foreach,
+-                          object_create_initial, NULL)) {
+-        exit(1);
+-    }
++    qemu_opts_foreach(qemu_find_opts("object"),
++                      user_creatable_add_opts_foreach,
++                      object_create_initial, &error_fatal);
+=20
+     if (qemu_opts_foreach(qemu_find_opts("chardev"),
+                           chardev_init_func, NULL, NULL)) {
+@@ -4364,11 +4362,9 @@ int main(int argc, char **argv, char **envp)
+         exit(1);
+     }
+=20
+-    if (qemu_opts_foreach(qemu_find_opts("object"),
+-                          user_creatable_add_opts_foreach,
+-                          object_create_delayed, NULL)) {
+-        exit(1);
+-    }
++    qemu_opts_foreach(qemu_find_opts("object"),
++                      user_creatable_add_opts_foreach,
++                      object_create_delayed, &error_fatal);
+=20
+     if (tpm_init() < 0) {
+         exit(1);
 --=20
 2.17.2
