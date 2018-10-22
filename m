@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46450)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47677)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gEjQs-0006xI-HD
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 19:16:24 -0400
+	(envelope-from <philmd@redhat.com>) id 1gEjXQ-0000il-9G
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 19:23:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gEjQp-0006IY-9N
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 19:16:22 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:33708)
+	(envelope-from <philmd@redhat.com>) id 1gEjXN-0007NU-1B
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 19:23:08 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:51405)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gEjQo-0006H9-58
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 19:16:18 -0400
-Received: by mail-wm1-f68.google.com with SMTP id y140-v6so10278550wmd.0
-	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 16:16:17 -0700 (PDT)
-References: <cover.1540134918.git.noring@nocrew.org>
-	<BN6PR2201MB125165723113459889A6EC59C6F40@BN6PR2201MB1251.namprd22.prod.outlook.com>
-	<20181022172343.GB2331@sx9>
-	<alpine.LFD.2.21.1810221901170.19280@eddie.linux-mips.org>
-	<alpine.LFD.2.21.1810221932480.19280@eddie.linux-mips.org>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gEjXM-0007NK-Qv
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 19:23:04 -0400
+Received: by mail-wm1-f66.google.com with SMTP id 143-v6so11881368wmf.1
+	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 16:23:04 -0700 (PDT)
+References: <20181022181035.20104-1-ppandit@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <b784211e-2c26-53ff-a271-e7cd7ccf6892@redhat.com>
-Date: Tue, 23 Oct 2018 01:16:15 +0200
+Message-ID: <31102692-e821-9fb2-c5fa-a6fd021e4c23@redhat.com>
+Date: Tue, 23 Oct 2018 01:23:02 +0200
 MIME-Version: 1.0
-In-Reply-To: <alpine.LFD.2.21.1810221932480.19280@eddie.linux-mips.org>
+In-Reply-To: <20181022181035.20104-1-ppandit@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v8 00/38] target/mips: Limited support for
- the R5900
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v1] arm: check bit index before usage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,16 +29,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Maciej W. Rozycki" <macro@linux-mips.org>, Fredrik Noring <noring@nocrew.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>, =?UTF-8?Q?J=c3=bcrgen_Urban?= <JuergenUrban@gmx.de>, Petar Jovanovic <pjovanovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: P J P <ppandit@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, liqsub1 <liqsub1@163.com>, Moguofang <moguofang@huawei.com>, Prasad J Pandit <pjp@fedoraproject.org>
 
-On 22/10/18 20:40, Maciej W. Rozycki wrote:
-> On Mon, 22 Oct 2018, Maciej W. Rozycki wrote:
-> 
->> Hi Maciej,
-> 
->   What an odd copy & paste thinko!  I can't believe I addressed myself in
-> the opening of my e-mail. :)
+Hi Prasad,
 
-Haha when I saw your mail I thought "weird, there is another Maciej 
-involved in this MIPS specific thread!?"
+On 22/10/18 20:10, P J P wrote:
+> From: Prasad J Pandit <pjp@fedoraproject.org>
+> 
+> While performing gpio write via strongarm_gpio_handler_update
+> routine, the 'bit' index could access beyond s->handler[28] array.
+> Add check to avoid OOB access.
+> 
+> Reported-by: Moguofang <moguofang@huawei.com>
+> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+> ---
+>   hw/arm/strongarm.c | 4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> Update v1: use ARRAY_SIZE macro
+>    -> https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg04826.html
+> 
+> diff --git a/hw/arm/strongarm.c b/hw/arm/strongarm.c
+> index ec2627374d..9225b1ba6e 100644
+> --- a/hw/arm/strongarm.c
+> +++ b/hw/arm/strongarm.c
+> @@ -532,7 +532,9 @@ static void strongarm_gpio_handler_update(StrongARMGPIOInfo *s)
+>   
+>       for (diff = s->prev_level ^ level; diff; diff ^= 1 << bit) {
+>           bit = ctz32(diff);
+> -        qemu_set_irq(s->handler[bit], (level >> bit) & 1);
+> +        if (bit < ARRAY_SIZE(s->handler)) {
+> +            qemu_set_irq(s->handler[bit], (level >> bit) & 1);
+
+            } else {
+                	qemu_log_mask(LOG_GUEST_ERROR, ...
+
+With that:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+> +        }
+>       }
+>   
+>       s->prev_level = level;
+> 
