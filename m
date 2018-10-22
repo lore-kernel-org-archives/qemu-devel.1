@@ -1,25 +1,45 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42112)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59428)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuchenlin@synology.com>) id 1gEPnP-00023B-HT
-	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 22:18:20 -0400
+	(envelope-from <jl4312@columbia.edu>) id 1gERjZ-0006ty-1J
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 00:22:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuchenlin@synology.com>) id 1gEPnJ-0004QM-5J
-	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 22:18:19 -0400
-Received: from synology.com ([59.124.61.242]:33404)
+	(envelope-from <jl4312@columbia.edu>) id 1gERjU-0001mI-Sb
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 00:22:28 -0400
+Received: from outprodmail01.cc.columbia.edu ([128.59.72.39]:44362)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuchenlin@synology.com>)
-	id 1gEPnI-0004PK-KM
-	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 22:18:13 -0400
+	(Exim 4.71) (envelope-from <jl4312@columbia.edu>) id 1gERjT-0001g1-Oc
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 00:22:23 -0400
+Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
+	by outprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
+	w9M4K6nT036546
+	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 00:22:16 -0400
+Received: from hazelnut (localhost.localdomain [127.0.0.1])
+	by hazelnut (Postfix) with ESMTP id 5C8A86D
+	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 00:22:16 -0400 (EDT)
+Received: from sendprodmail04.cc.columbia.edu (sendprodmail04.cc.columbia.edu
+	[128.59.72.16]) by hazelnut (Postfix) with ESMTP id E209E6D
+	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 00:22:15 -0400 (EDT)
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+	[209.85.208.69])
+	by sendprodmail04.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
+	w9M4MFvY058208
+	(version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 00:22:15 -0400
+Received: by mail-ed1-f69.google.com with SMTP id w42-v6so23904850edd.0
+	for <qemu-devel@nongnu.org>; Sun, 21 Oct 2018 21:22:15 -0700 (PDT)
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com.
+	[209.85.128.48]) by smtp.gmail.com with ESMTPSA id
+	38-v6sm13194820edz.33.2018.10.21.21.22.11 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Sun, 21 Oct 2018 21:22:11 -0700 (PDT)
+Received: by mail-wm1-f48.google.com with SMTP id o17-v6so8060631wmh.0
+	for <qemu-devel@nongnu.org>; Sun, 21 Oct 2018 21:22:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Mon, 22 Oct 2018 10:17:59 +0800
-From: yuchenlin <yuchenlin@synology.com>
-In-Reply-To: <20181012090752.31891-1-yuchenlin@synology.com>
-References: <20181012090752.31891-1-yuchenlin@synology.com>
-Message-ID: <d8051b2fc349d58dcd98cd383ae6bf32@synology.com>
-Subject: Re: [Qemu-devel] [PATCH] vhost-scsi: prevent using uninitialized vqs
+From: Jintack Lim <jintack@cs.columbia.edu>
+Date: Mon, 22 Oct 2018 00:22:02 -0400
+Message-ID: <CAHyh4xiVxNOxwWeKDw2ccAURx3zRMTd+nVLD=oav6ShqCBdjXw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] Virtual IOMMU is working for Windows VM?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,44 +48,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: yuchenlin@synology.com
-Cc: qemu-devel@nongnu.org, mst@redhat.com, Forrest Liu <forrestl@synology.com>
+To: QEMU Devel Mailing List <qemu-devel@nongnu.org>
+Cc: Peter Xu <peterx@redhat.com>
 
-Ping?
+Hi,
 
-On 2018-10-12 17:07, yuchenlin@synology.com wrote:
-> From: yuchenlin <yuchenlin@synology.com>
-> 
-> There are 3 virtqueues (ctrl, event and cmd) for virtio scsi device,
-> but seabios will only set the physical address for the 3rd one (cmd).
-> Then in vhost_virtqueue_start(), virtio_queue_get_desc_addr()
-> will be 0 for ctrl and event vq.
-> 
-> In this case, ctrl and event vq are not initialized.
-> vhost_verify_ring_mappings may use uninitialized vhost_virtqueue
-> such that vhost_verify_ring_part_mapping returns ENOMEM.
-> 
-> When encountered this problem, we got the following logs:
-> 
->     qemu-system-x86_64: Unable to map available ring for ring 0
->     qemu-system-x86_64: Verify ring failure on region 0
-> 
-> Signed-off-by: Forrest Liu <forrestl@synology.com>
-> Signed-off-by: yuchenlin <yuchenlin@synology.com>
-> ---
->  hw/scsi/vhost-scsi.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
-> index becf550085..7f21b4f9d6 100644
-> --- a/hw/scsi/vhost-scsi.c
-> +++ b/hw/scsi/vhost-scsi.c
-> @@ -183,7 +183,7 @@ static void vhost_scsi_realize(DeviceState *dev,
-> Error **errp)
->      }
-> 
->      vsc->dev.nvqs = VHOST_SCSI_VQ_NUM_FIXED + vs->conf.num_queues;
-> -    vsc->dev.vqs = g_new(struct vhost_virtqueue, vsc->dev.nvqs);
-> +    vsc->dev.vqs = g_new0(struct vhost_virtqueue, vsc->dev.nvqs);
->      vsc->dev.vq_index = 0;
->      vsc->dev.backend_features = 0;
+I wonder if vIOMMU is working for Windows VM?
+
+I tried it with v2.11.0, but it didn't seem to work. I assume that seaBIOS
+sets IOMMU on by default as is the case when I launched a Linux VM. But I
+might be missing something. Can somebody shed some light on it?
+
+Thanks,
+Jintack
