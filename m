@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46018)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46019)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEZmp-0000Ba-IQ
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEZmp-0000Bb-IX
 	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEZmn-0008BK-BL
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEZmj-00089Q-Ue
 	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:23 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:33440 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:33374 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gEZmk-00084i-Hh
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:18 -0400
+	id 1gEZmj-00083a-Fz
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:17 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 22 Oct 2018 14:57:46 +0200
-Message-Id: <1540213077-15211-24-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 22 Oct 2018 14:57:35 +0200
+Message-Id: <1540213077-15211-13-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1540213077-15211-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1540213077-15211-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL 23/34] tests/tcg/mips: Test R5900 three-operand
- MULT
+Subject: [Qemu-devel] [PULL 12/34] target/mips: Placeholder for R5900 MMI
+ instruction class
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,101 +30,78 @@ Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
 From: Fredrik Noring <noring@nocrew.org>
 
-Add a test for MULT.
+Add a placeholder for MMI class. This is the main palceholder for
+MMI ASE.
 
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Fredrik Noring <noring@nocrew.org>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- tests/tcg/mips/mipsr5900/Makefile | 25 +++++++++++++++++++++
- tests/tcg/mips/mipsr5900/mult.c   | 47 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 72 insertions(+)
- create mode 100644 tests/tcg/mips/mipsr5900/Makefile
- create mode 100644 tests/tcg/mips/mipsr5900/mult.c
+ target/mips/translate.c | 45 ++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 44 insertions(+), 1 deletion(-)
 
-diff --git a/tests/tcg/mips/mipsr5900/Makefile b/tests/tcg/mips/mipsr5900/Makefile
-new file mode 100644
-index 0000000..6757168
---- /dev/null
-+++ b/tests/tcg/mips/mipsr5900/Makefile
-@@ -0,0 +1,25 @@
-+-include ../../config-host.mak
-+
-+CROSS=mipsr5900el-unknown-linux-gnu-
-+
-+SIM=qemu-mipsel
-+SIM_FLAGS=-cpu R5900
-+
-+CC      = $(CROSS)gcc
-+CFLAGS  = -Wall -mabi=32 -march=r5900 -static
-+
-+TESTCASES = mult.tst
-+
-+all: $(TESTCASES)
-+
-+%.tst: %.c
-+	$(CC) $(CFLAGS) $< -o $@
-+
-+check: $(TESTCASES)
-+	@for case in $(TESTCASES); do \
-+        echo $(SIM) $(SIM_FLAGS) ./$$case;\
-+        $(SIM) $(SIM_FLAGS) ./$$case; \
-+	done
-+
-+clean:
-+	$(RM) -rf $(TESTCASES)
-diff --git a/tests/tcg/mips/mipsr5900/mult.c b/tests/tcg/mips/mipsr5900/mult.c
-new file mode 100644
-index 0000000..2c0c16d
---- /dev/null
-+++ b/tests/tcg/mips/mipsr5900/mult.c
-@@ -0,0 +1,47 @@
-+/*
-+ * Test R5900-specific three-operand MULT.
-+ */
-+
-+#include <stdio.h>
-+#include <inttypes.h>
-+#include <assert.h>
-+
-+static int64_t mult(int32_t rs, int32_t rt)
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 2318116..6cb6966 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -24420,6 +24420,45 @@ static void decode_opc_special3_legacy(CPUMIPSState *env, DisasContext *ctx)
+     }
+ }
+ 
++static void decode_tx79_mmi(CPUMIPSState *env, DisasContext *ctx)
 +{
-+    int32_t rd, lo, hi;
-+    int64_t r;
++    uint32_t opc = MASK_TX79_MMI(ctx->opcode);
 +
-+    __asm__ __volatile__ (
-+            "    mult %0, %3, %4\n"
-+            "    mflo %1\n"
-+            "    mfhi %2\n"
-+            : "=r" (rd), "=r" (lo), "=r" (hi)
-+            : "r" (rs), "r" (rt));
-+    r = ((int64_t)hi << 32) | (uint32_t)lo;
-+
-+    assert((int64_t)rs * rt == r);
-+    assert(rd == lo);
-+
-+    return r;
++    switch (opc) {
++    case TX79_MMI_MADD:          /* TODO: TX79_MMI_MADD */
++    case TX79_MMI_MADDU:         /* TODO: TX79_MMI_MADDU */
++    case TX79_MMI_PLZCW:         /* TODO: TX79_MMI_PLZCW */
++    case TX79_MMI_CLASS_MMI0:    /* TODO: TX79_MMI_CLASS_MMI0 */
++    case TX79_MMI_CLASS_MMI2:    /* TODO: TX79_MMI_CLASS_MMI2 */
++    case TX79_MMI_MFHI1:         /* TODO: TX79_MMI_MFHI1 */
++    case TX79_MMI_MTHI1:         /* TODO: TX79_MMI_MTHI1 */
++    case TX79_MMI_MFLO1:         /* TODO: TX79_MMI_MFLO1 */
++    case TX79_MMI_MTLO1:         /* TODO: TX79_MMI_MTLO1 */
++    case TX79_MMI_MULT1:         /* TODO: TX79_MMI_MULT1 */
++    case TX79_MMI_MULTU1:        /* TODO: TX79_MMI_MULTU1 */
++    case TX79_MMI_DIV1:          /* TODO: TX79_MMI_DIV1 */
++    case TX79_MMI_DIVU1:         /* TODO: TX79_MMI_DIVU1 */
++    case TX79_MMI_MADD1:         /* TODO: TX79_MMI_MADD1 */
++    case TX79_MMI_MADDU1:        /* TODO: TX79_MMI_MADDU1 */
++    case TX79_MMI_CLASS_MMI1:    /* TODO: TX79_MMI_CLASS_MMI1 */
++    case TX79_MMI_CLASS_MMI3:    /* TODO: TX79_MMI_CLASS_MMI3 */
++    case TX79_MMI_PMFHL:         /* TODO: TX79_MMI_PMFHL */
++    case TX79_MMI_PMTHL:         /* TODO: TX79_MMI_PMTHL */
++    case TX79_MMI_PSLLH:         /* TODO: TX79_MMI_PSLLH */
++    case TX79_MMI_PSRLH:         /* TODO: TX79_MMI_PSRLH */
++    case TX79_MMI_PSRAH:         /* TODO: TX79_MMI_PSRAH */
++    case TX79_MMI_PSLLW:         /* TODO: TX79_MMI_PSLLW */
++    case TX79_MMI_PSRLW:         /* TODO: TX79_MMI_PSRLW */
++    case TX79_MMI_PSRAW:         /* TODO: TX79_MMI_PSRAW */
++        generate_exception_end(ctx, EXCP_RI);    /* TODO: TX79_CLASS_MMI */
++        break;
++    default:
++        MIPS_INVAL("TX79 MMI class");
++        generate_exception_end(ctx, EXCP_RI);
++        break;
++    }
 +}
 +
-+static void verify_mult_negations(int32_t rs, int32_t rt, int64_t expected)
-+{
-+    assert(mult(rs, rt) == expected);
-+    assert(mult(-rs, rt) == -expected);
-+    assert(mult(rs, -rt) == -expected);
-+    assert(mult(-rs, -rt) == expected);
-+}
-+
-+int main()
-+{
-+    verify_mult_negations(17, 19, 323);
-+    verify_mult_negations(77773, 99991, 7776600043);
-+    verify_mult_negations(12207031, 305175781, 3725290219116211);
-+
-+    assert(mult(-0x80000000,  0x7FFFFFFF) == -0x3FFFFFFF80000000);
-+    assert(mult(-0x80000000, -0x7FFFFFFF) ==  0x3FFFFFFF80000000);
-+    assert(mult(-0x80000000, -0x80000000) ==  0x4000000000000000);
-+
-+    return 0;
-+}
+ static void decode_tx79_lq(CPUMIPSState *env, DisasContext *ctx)
+ {
+     generate_exception_end(ctx, EXCP_RI);    /* TODO: TX79_LQ */
+@@ -25769,7 +25808,11 @@ static void decode_opc(CPUMIPSState *env, DisasContext *ctx)
+         decode_opc_special(env, ctx);
+         break;
+     case OPC_SPECIAL2:
+-        decode_opc_special2_legacy(env, ctx);
++        if ((ctx->insn_flags & INSN_R5900) && (ctx->insn_flags & ASE_MMI)) {
++            decode_tx79_mmi(env, ctx);
++        } else {
++            decode_opc_special2_legacy(env, ctx);
++        }
+         break;
+     case OPC_SPECIAL3:
+         if (ctx->insn_flags & INSN_R5900) {
 -- 
 2.7.4
