@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39562)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gEaeE-00034g-9r
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 09:53:35 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gEaeD-0006Am-66
+	(envelope-from <mreitz@redhat.com>) id 1gEaeD-00030J-F1
 	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 09:53:34 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <mreitz@redhat.com>) id 1gEaeC-0006A8-AV
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 09:53:33 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon, 22 Oct 2018 14:53:00 +0100
-Message-Id: <20181022135307.14398-3-mreitz@redhat.com>
+Date: Mon, 22 Oct 2018 14:52:59 +0100
+Message-Id: <20181022135307.14398-2-mreitz@redhat.com>
 In-Reply-To: <20181022135307.14398-1-mreitz@redhat.com>
 References: <20181022135307.14398-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 2/9] iotests: Flush in iotests.py's
- QemuIoInteractive
+Subject: [Qemu-devel] [PATCH v3 1/9] iotests: Make nbd-fault-injector flush
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,27 +22,84 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-After issuing a command, flush the pipe.  This does not change anything
-in Python 2, but it makes a difference in Python 3.
+When closing a connection, make the nbd-fault-injector flush the socket.
+Without this, the output is a bit unreliable with Python 3.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 Reviewed-by: Cleber Rosa <crosa@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- tests/qemu-iotests/iotests.py | 1 +
- 1 file changed, 1 insertion(+)
+ tests/qemu-iotests/083.out               | 9 +++++++++
+ tests/qemu-iotests/nbd-fault-injector.py | 1 +
+ 2 files changed, 10 insertions(+)
 
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index 4e67fbbe96..10f2d17419 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -178,6 +178,7 @@ class QemuIoInteractive:
-         cmd = cmd.strip()
-         assert cmd != 'q' and cmd != 'quit'
-         self._p.stdin.write(cmd + '\n')
-+        self._p.stdin.flush()
-         return self._read_output()
+diff --git a/tests/qemu-iotests/083.out b/tests/qemu-iotests/083.out
+index be6079d27e..f9af8bb691 100644
+--- a/tests/qemu-iotests/083.out
++++ b/tests/qemu-iotests/083.out
+@@ -41,6 +41,7 @@ can't open device nbd+tcp://127.0.0.1:PORT/foo
  
+ === Check disconnect after neg2 ===
  
++Unable to read from socket: Connection reset by peer
+ Connection closed
+ read failed: Input/output error
+ 
+@@ -54,6 +55,7 @@ can't open device nbd+tcp://127.0.0.1:PORT/foo
+ 
+ === Check disconnect before request ===
+ 
++Unable to read from socket: Connection reset by peer
+ Connection closed
+ read failed: Input/output error
+ 
+@@ -116,6 +118,7 @@ can't open device nbd+tcp://127.0.0.1:PORT/
+ 
+ === Check disconnect after neg-classic ===
+ 
++Unable to read from socket: Connection reset by peer
+ Connection closed
+ read failed: Input/output error
+ 
+@@ -161,6 +164,8 @@ can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
+ 
+ === Check disconnect after neg2 ===
+ 
++Unable to read from socket: Connection reset by peer
++Connection closed
+ read failed: Input/output error
+ 
+ === Check disconnect 8 neg2 ===
+@@ -173,6 +178,8 @@ can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
+ 
+ === Check disconnect before request ===
+ 
++Unable to read from socket: Connection reset by peer
++Connection closed
+ read failed: Input/output error
+ 
+ === Check disconnect after request ===
+@@ -234,6 +241,8 @@ can't open device nbd+unix:///?socket=TEST_DIR/nbd.sock
+ 
+ === Check disconnect after neg-classic ===
+ 
++Unable to read from socket: Connection reset by peer
++Connection closed
+ read failed: Input/output error
+ 
+ *** done
+diff --git a/tests/qemu-iotests/nbd-fault-injector.py b/tests/qemu-iotests/nbd-fault-injector.py
+index f9193c0fae..439a090eb6 100755
+--- a/tests/qemu-iotests/nbd-fault-injector.py
++++ b/tests/qemu-iotests/nbd-fault-injector.py
+@@ -112,6 +112,7 @@ class FaultInjectionSocket(object):
+             if rule.match(event, io):
+                 if rule.when == 0 or bufsize is None:
+                     print('Closing connection on rule match %s' % rule.name)
++                    self.sock.flush()
+                     sys.exit(0)
+                 if rule.when != -1:
+                     return rule.when
 -- 
 2.17.1
