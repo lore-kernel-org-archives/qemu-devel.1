@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gEPju-0007jj-Li
-	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 22:14:45 -0400
+	(envelope-from <yuchenlin@synology.com>) id 1gEPnP-00023B-HT
+	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 22:18:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gEPU2-0002fJ-O2
-	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 21:58:19 -0400
-Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:39646)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1gEPU2-0002eZ-7w
-	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 21:58:18 -0400
-Received: by mail-io1-xd42.google.com with SMTP id z16-v6so26120857iol.6
-	for <qemu-devel@nongnu.org>; Sun, 21 Oct 2018 18:58:17 -0700 (PDT)
+	(envelope-from <yuchenlin@synology.com>) id 1gEPnJ-0004QM-5J
+	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 22:18:19 -0400
+Received: from synology.com ([59.124.61.242]:33404)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yuchenlin@synology.com>)
+	id 1gEPnI-0004PK-KM
+	for qemu-devel@nongnu.org; Sun, 21 Oct 2018 22:18:13 -0400
 MIME-Version: 1.0
-References: <1539926412-21831-1-git-send-email-liq3ea@gmail.com>
-	<1539926412-21831-8-git-send-email-liq3ea@gmail.com>
-	<95818941-44e4-c9fa-6d54-57c909732432@redhat.com>
-In-Reply-To: <95818941-44e4-c9fa-6d54-57c909732432@redhat.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Mon, 22 Oct 2018 09:57:41 +0800
-Message-ID: <CAKXe6SLaS26Amv7cryLkNRfyoFjFofjBsn7yfbVHsr16C9uhtw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 7/7] vfio: platform: destory mutex in error
- path
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Mon, 22 Oct 2018 10:17:59 +0800
+From: yuchenlin <yuchenlin@synology.com>
+In-Reply-To: <20181012090752.31891-1-yuchenlin@synology.com>
+References: <20181012090752.31891-1-yuchenlin@synology.com>
+Message-ID: <d8051b2fc349d58dcd98cd383ae6bf32@synology.com>
+Subject: Re: [Qemu-devel] [PATCH] vhost-scsi: prevent using uninitialized vqs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,77 +28,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger@redhat.com
-Cc: alex.williamson@redhat.com, philmd@redhat.com, Qemu Developers <qemu-devel@nongnu.org>
+To: yuchenlin@synology.com
+Cc: qemu-devel@nongnu.org, mst@redhat.com, Forrest Liu <forrestl@synology.com>
 
-Hello Auger,
+Ping?
 
-Auger Eric <eric.auger@redhat.com> =E4=BA=8E2018=E5=B9=B410=E6=9C=8820=E6=
-=97=A5=E5=91=A8=E5=85=AD =E4=B8=8A=E5=8D=8812:41=E5=86=99=E9=81=93=EF=BC=9A
-
-> Hi Li,
->
-> On 10/19/18 7:20 AM, Li Qiang wrote:
-> > Signed-off-by: Li Qiang <liq3ea@gmail.com>
-> > ---
-> >  hw/vfio/platform.c | 4 +++-
-> >  1 file changed, 3 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
-> > index ba19143..e9d9e80 100644
-> > --- a/hw/vfio/platform.c
-> > +++ b/hw/vfio/platform.c
-> > @@ -668,7 +668,7 @@ static void vfio_platform_realize(DeviceState *dev,
+On 2018-10-12 17:07, yuchenlin@synology.com wrote:
+> From: yuchenlin <yuchenlin@synology.com>
+> 
+> There are 3 virtqueues (ctrl, event and cmd) for virtio scsi device,
+> but seabios will only set the physical address for the 3rd one (cmd).
+> Then in vhost_virtqueue_start(), virtio_queue_get_desc_addr()
+> will be 0 for ctrl and event vq.
+> 
+> In this case, ctrl and event vq are not initialized.
+> vhost_verify_ring_mappings may use uninitialized vhost_virtqueue
+> such that vhost_verify_ring_part_mapping returns ENOMEM.
+> 
+> When encountered this problem, we got the following logs:
+> 
+>     qemu-system-x86_64: Unable to map available ring for ring 0
+>     qemu-system-x86_64: Verify ring failure on region 0
+> 
+> Signed-off-by: Forrest Liu <forrestl@synology.com>
+> Signed-off-by: yuchenlin <yuchenlin@synology.com>
+> ---
+>  hw/scsi/vhost-scsi.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
+> index becf550085..7f21b4f9d6 100644
+> --- a/hw/scsi/vhost-scsi.c
+> +++ b/hw/scsi/vhost-scsi.c
+> @@ -183,7 +183,7 @@ static void vhost_scsi_realize(DeviceState *dev,
 > Error **errp)
-> >              error_setg(errp, "%s", gerr->message);
-> >              g_error_free(gerr);
-> >              g_free(path);
-> > -            return;
-> > +            goto out;
-> You must set ret to !=3D 0 otherwise the qemu_mutex_destroy will not be
-> reached I think.
-
-Also this will fix the fact we are not prepending the
-> vfio error prefix in that case, as we should.
->
-> Besides I am unsure about the cleanup strategy in case or error in
-> vfio_platform_realize(). The qemu process should always exit in case of
-> failure in vfio_platform_realize(). Platform devices can only be
-> cold-plugged through the qemu CLI.
-
-
-Got this.
-
-
-> Cleaning all the allocated resources
-> may add a substantial amount of code.
-
-
-Agree.
-
-
-Thanks,
-Li Qiang
-
-
-> For instance resources allocated
-> in vfio_base_device_init() are not freed either. Comprehensive free in
-> realize() functions may only be needed in case of hotplug I think.
->
-> Thanks
->
-> Eric
-> >          }
-> >          g_free(path);
-> >          vdev->compat =3D contents;
-> > @@ -691,6 +691,8 @@ out:
-> >          return;
-> >      }
-> >
-> > +    qemu_mutex_destroy(&vdev->intp_mutex);
-> > +
-> >      if (vdev->vbasedev.name) {
-> >          error_prepend(errp, ERR_PREFIX, vdev->vbasedev.name);
-> >      } else {
-> >
->
+>      }
+> 
+>      vsc->dev.nvqs = VHOST_SCSI_VQ_NUM_FIXED + vs->conf.num_queues;
+> -    vsc->dev.vqs = g_new(struct vhost_virtqueue, vsc->dev.nvqs);
+> +    vsc->dev.vqs = g_new0(struct vhost_virtqueue, vsc->dev.nvqs);
+>      vsc->dev.vq_index = 0;
+>      vsc->dev.backend_features = 0;
