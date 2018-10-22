@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40485)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40549)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1gEdU9-0005Be-Ck
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 12:55:24 -0400
+	(envelope-from <vkuznets@redhat.com>) id 1gEdUP-0005IN-Kk
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 12:55:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1gEdU5-0005Lq-S3
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 12:55:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59854)
+	(envelope-from <vkuznets@redhat.com>) id 1gEdUI-0005VM-VV
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 12:55:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40466)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1gEdU5-0005KT-H2
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 12:55:17 -0400
+	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1gEdUG-0005Na-3X
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 12:55:29 -0400
 From: Vitaly Kuznetsov <vkuznets@redhat.com>
-Date: Mon, 22 Oct 2018 18:55:05 +0200
-Message-Id: <20181022165506.30332-2-vkuznets@redhat.com>
+Date: Mon, 22 Oct 2018 18:55:06 +0200
+Message-Id: <20181022165506.30332-3-vkuznets@redhat.com>
 In-Reply-To: <20181022165506.30332-1-vkuznets@redhat.com>
 References: <20181022165506.30332-1-vkuznets@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 1/2] linux-headers: update
+Subject: [Qemu-devel] [PATCH v2 2/2] x86: hv_evmcs CPU flag support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,130 +26,128 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>
 
-Update to kvm/next commit 1e58e5e59148 ("KVM: VMX: enable nested
- virtualization by default").
+Adds a new CPU flag to enable the Enlightened VMCS KVM feature.
+QEMU enables KVM_CAP_HYPERV_ENLIGHTENED_VMCS and gets back the
+version to be advertised in lower 16 bits of CPUID.0x4000000A:EAX.
 
-kvm_put_vcpu_events() needs to be fixed as 'pad' was renamed to
-'pending' in 'struct kvm_vcpu_events'
-
+Suggested-by: Ladi Prosek <lprosek@redhat.com>
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- linux-headers/asm-powerpc/kvm.h |  1 +
- linux-headers/asm-x86/kvm.h     |  8 ++++++--
- linux-headers/linux/kvm.h       | 16 ++++++++++++++--
- target/i386/kvm.c               |  2 +-
- 4 files changed, 22 insertions(+), 5 deletions(-)
+Changes since v1:
+- Throw away HV_CPUID_MIN_NESTED.
+- Create zeroed 0x40000006-0x40000009 CPUID leaves.
+---
+ target/i386/cpu.c          |  1 +
+ target/i386/cpu.h          |  1 +
+ target/i386/hyperv-proto.h |  2 ++
+ target/i386/kvm.c          | 30 ++++++++++++++++++++++++++++--
+ 4 files changed, 32 insertions(+), 2 deletions(-)
 
-diff --git a/linux-headers/asm-powerpc/kvm.h b/linux-headers/asm-powerpc/kvm.h
-index 1b32b56a03..8c876c166e 100644
---- a/linux-headers/asm-powerpc/kvm.h
-+++ b/linux-headers/asm-powerpc/kvm.h
-@@ -634,6 +634,7 @@ struct kvm_ppc_cpu_char {
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index c88876dfe3..5c0e84fb99 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -5564,6 +5564,7 @@ static Property x86_cpu_properties[] = {
+     DEFINE_PROP_BOOL("hv-frequencies", X86CPU, hyperv_frequencies, false),
+     DEFINE_PROP_BOOL("hv-reenlightenment", X86CPU, hyperv_reenlightenment, false),
+     DEFINE_PROP_BOOL("hv-tlbflush", X86CPU, hyperv_tlbflush, false),
++    DEFINE_PROP_BOOL("hv-evmcs", X86CPU, hyperv_evmcs, false),
+     DEFINE_PROP_BOOL("check", X86CPU, check_cpuid, true),
+     DEFINE_PROP_BOOL("enforce", X86CPU, enforce_cpuid, false),
+     DEFINE_PROP_BOOL("kvm", X86CPU, expose_kvm, true),
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 730c06f80a..013d953b57 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1382,6 +1382,7 @@ struct X86CPU {
+     bool hyperv_frequencies;
+     bool hyperv_reenlightenment;
+     bool hyperv_tlbflush;
++    bool hyperv_evmcs;
+     bool check_cpuid;
+     bool enforce_cpuid;
+     bool expose_kvm;
+diff --git a/target/i386/hyperv-proto.h b/target/i386/hyperv-proto.h
+index d6d5a79293..1e6800ba43 100644
+--- a/target/i386/hyperv-proto.h
++++ b/target/i386/hyperv-proto.h
+@@ -18,6 +18,7 @@
+ #define HV_CPUID_FEATURES                     0x40000003
+ #define HV_CPUID_ENLIGHTMENT_INFO             0x40000004
+ #define HV_CPUID_IMPLEMENT_LIMITS             0x40000005
++#define HV_CPUID_NESTED_FEATURES              0x4000000A
+ #define HV_CPUID_MIN                          0x40000005
+ #define HV_CPUID_MAX                          0x4000ffff
+ #define HV_HYPERVISOR_PRESENT_BIT             0x80000000
+@@ -59,6 +60,7 @@
+ #define HV_SYSTEM_RESET_RECOMMENDED         (1u << 4)
+ #define HV_RELAXED_TIMING_RECOMMENDED       (1u << 5)
+ #define HV_EX_PROCESSOR_MASKS_RECOMMENDED   (1u << 11)
++#define HV_ENLIGHTENED_VMCS_RECOMMENDED     (1u << 14)
  
- #define KVM_REG_PPC_DEC_EXPIRY	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xbe)
- #define KVM_REG_PPC_ONLINE	(KVM_REG_PPC | KVM_REG_SIZE_U32 | 0xbf)
-+#define KVM_REG_PPC_PTCR	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc0)
- 
- /* Transactional Memory checkpointed state:
-  * This is all GPRs, all VSX regs and a subset of SPRs
-diff --git a/linux-headers/asm-x86/kvm.h b/linux-headers/asm-x86/kvm.h
-index fd23d5778e..dabfcf7c39 100644
---- a/linux-headers/asm-x86/kvm.h
-+++ b/linux-headers/asm-x86/kvm.h
-@@ -288,6 +288,7 @@ struct kvm_reinject_control {
- #define KVM_VCPUEVENT_VALID_SIPI_VECTOR	0x00000002
- #define KVM_VCPUEVENT_VALID_SHADOW	0x00000004
- #define KVM_VCPUEVENT_VALID_SMM		0x00000008
-+#define KVM_VCPUEVENT_VALID_PAYLOAD	0x00000010
- 
- /* Interrupt shadow states */
- #define KVM_X86_SHADOW_INT_MOV_SS	0x01
-@@ -299,7 +300,7 @@ struct kvm_vcpu_events {
- 		__u8 injected;
- 		__u8 nr;
- 		__u8 has_error_code;
--		__u8 pad;
-+		__u8 pending;
- 		__u32 error_code;
- 	} exception;
- 	struct {
-@@ -322,7 +323,9 @@ struct kvm_vcpu_events {
- 		__u8 smm_inside_nmi;
- 		__u8 latched_init;
- 	} smi;
--	__u32 reserved[9];
-+	__u8 reserved[27];
-+	__u8 exception_has_payload;
-+	__u64 exception_payload;
- };
- 
- /* for KVM_GET/SET_DEBUGREGS */
-@@ -381,6 +384,7 @@ struct kvm_sync_regs {
- 
- #define KVM_STATE_NESTED_GUEST_MODE	0x00000001
- #define KVM_STATE_NESTED_RUN_PENDING	0x00000002
-+#define KVM_STATE_NESTED_EVMCS		0x00000004
- 
- #define KVM_STATE_NESTED_SMM_GUEST_MODE	0x00000001
- #define KVM_STATE_NESTED_SMM_VMXON	0x00000002
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index 83ba4eb571..f11a7eb49c 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -420,13 +420,19 @@ struct kvm_run {
- struct kvm_coalesced_mmio_zone {
- 	__u64 addr;
- 	__u32 size;
--	__u32 pad;
-+	union {
-+		__u32 pad;
-+		__u32 pio;
-+	};
- };
- 
- struct kvm_coalesced_mmio {
- 	__u64 phys_addr;
- 	__u32 len;
--	__u32 pad;
-+	union {
-+		__u32 pad;
-+		__u32 pio;
-+	};
- 	__u8  data[8];
- };
- 
-@@ -719,6 +725,7 @@ struct kvm_ppc_one_seg_page_size {
- 
- #define KVM_PPC_PAGE_SIZES_REAL		0x00000001
- #define KVM_PPC_1T_SEGMENTS		0x00000002
-+#define KVM_PPC_NO_HASH			0x00000004
- 
- struct kvm_ppc_smmu_info {
- 	__u64 flags;
-@@ -953,6 +960,11 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_NESTED_STATE 157
- #define KVM_CAP_ARM_INJECT_SERROR_ESR 158
- #define KVM_CAP_MSR_PLATFORM_INFO 159
-+#define KVM_CAP_PPC_NESTED_HV 160
-+#define KVM_CAP_HYPERV_SEND_IPI 161
-+#define KVM_CAP_COALESCED_PIO 162
-+#define KVM_CAP_HYPERV_ENLIGHTENED_VMCS 163
-+#define KVM_CAP_EXCEPTION_PAYLOAD 164
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
+ /*
+  * Basic virtualized MSRs
 diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index dc4047b02f..a46ad102d8 100644
+index a46ad102d8..6f10abcf6f 100644
 --- a/target/i386/kvm.c
 +++ b/target/i386/kvm.c
-@@ -2686,7 +2686,7 @@ static int kvm_put_vcpu_events(X86CPU *cpu, int level)
-     events.exception.nr = env->exception_injected;
-     events.exception.has_error_code = env->has_error_code;
-     events.exception.error_code = env->error_code;
--    events.exception.pad = 0;
-+    events.exception.pending = 0;
+@@ -798,6 +798,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+     uint32_t unused;
+     struct kvm_cpuid_entry2 *c;
+     uint32_t signature[3];
++    uint16_t evmcs_version;
+     int kvm_base = KVM_CPUID_SIGNATURE;
+     int r;
+     Error *local_err = NULL;
+@@ -841,7 +842,8 @@ int kvm_arch_init_vcpu(CPUState *cs)
+             memset(signature, 0, 12);
+             memcpy(signature, cpu->hyperv_vendor_id, len);
+         }
+-        c->eax = HV_CPUID_MIN;
++        c->eax = cpu->hyperv_evmcs ?
++            HV_CPUID_NESTED_FEATURES : HV_CPUID_IMPLEMENT_LIMITS;
+         c->ebx = signature[0];
+         c->ecx = signature[1];
+         c->edx = signature[2];
+@@ -888,7 +890,16 @@ int kvm_arch_init_vcpu(CPUState *cs)
+             c->eax |= HV_REMOTE_TLB_FLUSH_RECOMMENDED;
+             c->eax |= HV_EX_PROCESSOR_MASKS_RECOMMENDED;
+         }
+-
++        if (cpu->hyperv_evmcs) {
++            if (kvm_vcpu_enable_cap(cs, KVM_CAP_HYPERV_ENLIGHTENED_VMCS, 0,
++                                    (uintptr_t)&evmcs_version)) {
++                fprintf(stderr, "Hyper-V Enlightened VMCS "
++                        "(requested by 'hv-evmcs' cpu flag) "
++                        "is not supported by kernel\n");
++                return -ENOSYS;
++            }
++            c->eax |= HV_ENLIGHTENED_VMCS_RECOMMENDED;
++        }
+         c->ebx = cpu->hyperv_spinlock_attempts;
  
-     events.interrupt.injected = (env->interrupt_injected >= 0);
-     events.interrupt.nr = env->interrupt_injected;
+         c = &cpuid_data.entries[cpuid_i++];
+@@ -899,6 +910,21 @@ int kvm_arch_init_vcpu(CPUState *cs)
+ 
+         kvm_base = KVM_CPUID_SIGNATURE_NEXT;
+         has_msr_hv_hypercall = true;
++
++        if (cpu->hyperv_evmcs) {
++            __u32 function;
++
++            /* Create zeroed 0x40000006..0x40000009 leaves */
++            for (function = HV_CPUID_IMPLEMENT_LIMITS + 1;
++                 function < HV_CPUID_NESTED_FEATURES; function++) {
++                c = &cpuid_data.entries[cpuid_i++];
++                c->function = function;
++            }
++
++            c = &cpuid_data.entries[cpuid_i++];
++            c->function = HV_CPUID_NESTED_FEATURES;
++            c->eax = evmcs_version;
++        }
+     }
+ 
+     if (cpu->expose_kvm) {
 -- 
 2.17.2
