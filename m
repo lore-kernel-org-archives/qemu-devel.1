@@ -1,18 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33651)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gEehD-0004KY-GL
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:12:56 -0400
+	(envelope-from <ppandit@redhat.com>) id 1gEeiu-0005kn-Pe
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:14:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gEeh9-0002KZ-Do
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:12:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:5667)
+	(envelope-from <ppandit@redhat.com>) id 1gEeis-00054P-Lt
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:14:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35514)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gEeh8-0002FH-Ua
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:12:51 -0400
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gEeiq-0004wT-IA
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:14:36 -0400
+Date: Mon, 22 Oct 2018 23:44:13 +0530 (IST)
 From: P J P <ppandit@redhat.com>
-Date: Mon, 22 Oct 2018 23:40:35 +0530
-Message-Id: <20181022181035.20104-1-ppandit@redhat.com>
-Subject: [Qemu-devel] [PATCH v1] arm: check bit index before usage
+In-Reply-To: <4d7675ee.374e.1669bb366e4.Coremail.liqsub1@163.com>
+Message-ID: <nycvar.YSQ.7.76.1810222342500.19988@xnncv>
+References: <20181022120908.13285-1-ppandit@redhat.com>
+	<4d7675ee.374e.1669bb366e4.Coremail.liqsub1@163.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH 1/3] arm: check bit index before use
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,38 +26,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Qemu Developers <qemu-devel@nongnu.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, liqsub1 <liqsub1@163.com>, Moguofang <moguofang@huawei.com>, Prasad J Pandit <pjp@fedoraproject.org>
+To: liqsub1 <liqsub1@163.com>
+Cc: Qemu Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Moguofang <moguofang@huawei.com>
 
-From: Prasad J Pandit <pjp@fedoraproject.org>
++-- On Mon, 22 Oct 2018, liqsub1 wrote --+
+| +        if (bit < sizeof(s->handler) / sizeof(s->handler[0])) { 
+| 
+| Maybe you can use ARRAY_SIZE here.
 
-While performing gpio write via strongarm_gpio_handler_update
-routine, the 'bit' index could access beyond s->handler[28] array.
-Add check to avoid OOB access.
+Yes, sent patch v1.
 
-Reported-by: Moguofang <moguofang@huawei.com>
-Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
----
- hw/arm/strongarm.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-Update v1: use ARRAY_SIZE macro
-  -> https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg04826.html
-
-diff --git a/hw/arm/strongarm.c b/hw/arm/strongarm.c
-index ec2627374d..9225b1ba6e 100644
---- a/hw/arm/strongarm.c
-+++ b/hw/arm/strongarm.c
-@@ -532,7 +532,9 @@ static void strongarm_gpio_handler_update(StrongARMGPIOInfo *s)
- 
-     for (diff = s->prev_level ^ level; diff; diff ^= 1 << bit) {
-         bit = ctz32(diff);
--        qemu_set_irq(s->handler[bit], (level >> bit) & 1);
-+        if (bit < ARRAY_SIZE(s->handler)) {
-+            qemu_set_irq(s->handler[bit], (level >> bit) & 1);
-+        }
-     }
- 
-     s->prev_level = level;
--- 
-2.17.2
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
