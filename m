@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38017)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38027)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gEZPk-0002LS-PU
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:33 -0400
+	(envelope-from <armbru@redhat.com>) id 1gEZPl-0002Ln-7n
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gEZPi-00032v-Ql
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49376)
+	(envelope-from <armbru@redhat.com>) id 1gEZPk-00038x-8G
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33590)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gEZPg-0002vb-6r
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:28 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gEZPg-00030X-To
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:30 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BE0361B9A
-	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 12:34:19 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id AF65D3082E22
+	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 12:34:27 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 22 Oct 2018 14:33:45 +0200
-Message-Id: <20181022123413.28044-13-armbru@redhat.com>
+Date: Mon, 22 Oct 2018 14:34:00 +0200
+Message-Id: <20181022123413.28044-28-armbru@redhat.com>
 In-Reply-To: <20181022123413.28044-1-armbru@redhat.com>
 References: <20181022123413.28044-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 12/40] ioapic: Fix error handling in realize()
+Subject: [Qemu-devel] [PULL 27/40] ui/keymaps: Fix handling of erroneous
+ include files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,48 +31,113 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Xu <peterx@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-Calling error_report() in a function that takes an Error ** argument
-is suspicious.  ioapic_realize() does that, and then exit()s.
-Currently mostly harmless, as the device cannot be hot-plugged.
+While errors in the keyboard layout named with -k are fatal, errors in
+included files are reported, but otherwise ignored:
 
-Fixes: 20fd4b7b6d9282fe0cb83601f1821f31bd257458
-Cc: Peter Xu <peterx@redhat.com>
+    $ cat worst
+    include bad
+    include worse
+    $ ls -l bad worse
+    ls: cannot access 'bad': No such file or directory
+    ls: cannot access 'worse': No such file or directory
+    $ qemu-system-x86_64 -nodefaults -S -monitor stdio -display vnc=:0 -k bad
+    QEMU 3.0.50 monitor - type 'help' for more information
+    (qemu) Could not read keymap file: 'bad'
+    $ qemu-system-x86_64 -nodefaults -S -monitor stdio -display vnc=:0 -k worst
+    QEMU 3.0.50 monitor - type 'help' for more information
+    (qemu) Could not read keymap file: 'bad'
+    Could not read keymap file: 'worse'
+
+Fix that.
+
+Note that parse_keyboard_layout() allocates the keymap, except when
+it's parsing an include file.  To keep error handling simple, move the
+memory management to its caller init_keyboard_layout().
+
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20181017082702.5581-11-armbru@redhat.com>
+Message-Id: <20181017082702.5581-26-armbru@redhat.com>
+Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/intc/ioapic.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ ui/keymaps.c | 35 +++++++++++++++++++++++------------
+ 1 file changed, 23 insertions(+), 12 deletions(-)
 
-diff --git a/hw/intc/ioapic.c b/hw/intc/ioapic.c
-index b6896ac4ce..4e529729b4 100644
---- a/hw/intc/ioapic.c
-+++ b/hw/intc/ioapic.c
-@@ -21,7 +21,7 @@
-  */
-=20
- #include "qemu/osdep.h"
--#include "qemu/error-report.h"
-+#include "qapi/error.h"
- #include "monitor/monitor.h"
- #include "hw/hw.h"
- #include "hw/i386/pc.h"
-@@ -393,9 +393,9 @@ static void ioapic_realize(DeviceState *dev, Error **=
-errp)
-     IOAPICCommonState *s =3D IOAPIC_COMMON(dev);
-=20
-     if (s->version !=3D 0x11 && s->version !=3D 0x20) {
--        error_report("IOAPIC only supports version 0x11 or 0x20 "
--                     "(default: 0x%x).", IOAPIC_VER_DEF);
--        exit(1);
-+        error_setg(errp, "IOAPIC only supports version 0x11 or 0x20 "
-+                   "(default: 0x%x).", IOAPIC_VER_DEF);
-+        return;
+diff --git a/ui/keymaps.c b/ui/keymaps.c
+index 43fe604724..b05fb028dc 100644
+--- a/ui/keymaps.c
++++ b/ui/keymaps.c
+@@ -79,10 +79,11 @@ static void add_keysym(char *line, int keysym, int keycode, kbd_layout_t *k)
+     trace_keymap_add(keysym, keycode, line);
+ }
+ 
+-static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
+-                                           const char *language,
+-                                           kbd_layout_t *k)
++static int parse_keyboard_layout(kbd_layout_t *k,
++                                 const name2keysym_t *table,
++                                 const char *language)
+ {
++    int ret;
+     FILE *f;
+     char * filename;
+     char line[1024];
+@@ -95,12 +96,7 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
+     g_free(filename);
+     if (!f) {
+         fprintf(stderr, "Could not read keymap file: '%s'\n", language);
+-        return NULL;
+-    }
+-
+-    if (!k) {
+-        k = g_new0(kbd_layout_t, 1);
+-        k->hash = g_hash_table_new(NULL, NULL);
++        return -1;
      }
-=20
-     memory_region_init_io(&s->io_memory, OBJECT(s), &ioapic_io_ops, s,
---=20
+ 
+     for(;;) {
+@@ -118,7 +114,10 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
+             continue;
+         }
+         if (!strncmp(line, "include ", 8)) {
+-            parse_keyboard_layout(table, line + 8, k);
++            if (parse_keyboard_layout(k, table, line + 8) < 0) {
++                ret = -1;
++                goto out;
++            }
+         } else {
+             int offset = 0;
+             while (line[offset] != 0 &&
+@@ -164,15 +163,27 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
+             }
+         }
+     }
++
++    ret = 0;
++out:
+     fclose(f);
+-    return k;
++    return ret;
+ }
+ 
+ 
+ kbd_layout_t *init_keyboard_layout(const name2keysym_t *table,
+                                    const char *language)
+ {
+-    return parse_keyboard_layout(table, language, NULL);
++    kbd_layout_t *k;
++
++    k = g_new0(kbd_layout_t, 1);
++    k->hash = g_hash_table_new(NULL, NULL);
++    if (parse_keyboard_layout(k, table, language) < 0) {
++        g_hash_table_unref(k->hash);
++        g_free(k);
++        return NULL;
++    }
++    return k;
+ }
+ 
+ 
+-- 
 2.17.2
