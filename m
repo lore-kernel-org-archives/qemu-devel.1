@@ -1,29 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37739)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39060)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <macro@linux-mips.org>) id 1gEezr-0005kb-87
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:32:12 -0400
+	(envelope-from <sameo@linux.intel.com>) id 1gEf5G-0007wx-CH
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:37:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <macro@linux-mips.org>) id 1gEezn-0007fY-3a
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:32:11 -0400
-Received: from eddie.linux-mips.org ([148.251.95.138]:36832
-	helo=cvs.linux-mips.org) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <macro@linux-mips.org>) id 1gEezm-0007ZX-NC
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:32:06 -0400
-Received: (from localhost user: 'macro', uid#1010) by eddie.linux-mips.org
-	with ESMTP id S23994612AbeJVSb5gtqAL (ORCPT
-	<rfc822;qemu-devel@nongnu.org>); Mon, 22 Oct 2018 20:31:57 +0200
-Date: Mon, 22 Oct 2018 19:31:57 +0100 (BST)
-Sender: "Maciej W. Rozycki" <macro@linux-mips.org>
-From: "Maciej W. Rozycki" <macro@linux-mips.org>
-In-Reply-To: <20181022172343.GB2331@sx9>
-Message-ID: <alpine.LFD.2.21.1810221901170.19280@eddie.linux-mips.org>
-References: <cover.1540134918.git.noring@nocrew.org>
-	<BN6PR2201MB125165723113459889A6EC59C6F40@BN6PR2201MB1251.namprd22.prod.outlook.com>
-	<20181022172343.GB2331@sx9>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH v8 00/38] target/mips: Limited support for
- the R5900
+	(envelope-from <sameo@linux.intel.com>) id 1gEf5C-0003ry-9l
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:37:46 -0400
+Received: from mga09.intel.com ([134.134.136.24]:11303)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sameo@linux.intel.com>)
+	id 1gEf5B-0003qC-VS
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:37:42 -0400
+From: Samuel Ortiz <sameo@linux.intel.com>
+Date: Mon, 22 Oct 2018 20:36:30 +0200
+Message-Id: <20181022183656.4902-1-sameo@linux.intel.com>
+Subject: [Qemu-devel] [PATCH 00/27] ACPI hardware-reduced support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,75 +22,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fredrik Noring <noring@nocrew.org>
-Cc: Aleksandar Markovic <amarkovic@wavecomp.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Petar Jovanovic <pjovanovic@wavecomp.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?J=C3=BCrgen_Urban?= <JuergenUrban@gmx.de>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Samuel Ortiz <sameo@linux.intel.com>
 
-Hi Maciej,
+This patch set implements support for the ACPI hardware-reduced
+specification.
 
-> > I added ASE_MMI flag along with INSN_R5900, I think this fits better in
-> > the overall MIPS for QEMU design.
-> 
-> Maciej -- can we add "MMI" under "ASEs implemented" in the kernel too,
-> even if it is a vendor-specific architecture extension that normally
-> isn't counted as an ASE? QEMU simply calls these "vendor specific ASEs".
+The changes are coming from the NEMU [1] project where we're defining
+a new x86 machine type: i386/virt. This is an EFI only, ACPI
+hardware-reduced platform and as such we had to implement support
+for the latter.
 
- I have no authority to approve such a change for the kernel, but it looks 
-reasonable to me and I will support you with it, with one reservation 
-however.  As this is an ISA extension in the vendor-specific space, I 
-think it belongs to a vendor-specific namespace, so as to make it clear it 
-is not a generic architectural feature and also to avoid name clashes.
+As a preliminary for adding hardware-reduced support to QEMU, we did
+some ACPI code reorganization with the following goals:
 
- So it has to be called Toshiba MMI or suchlike, similarly to how I 
-requested that for the Longsoon MMI feature in a recent binutils review 
-(cf <https://sourceware.org/ml/binutils/2018-07/msg00201.html> and 
-binutils commit 8095d2f70e1a ("MIPS/GAS: Split Loongson MMI Instructions 
-from loongson2f/3a")), with all the consequences throughout.
+* Share as much as possible of the current ACPI build APIs between
+  legacy and hardware-reduced ACPI.
+* Share the ACPI build code across machine types and architectures and
+  remove the typical PC machine type dependency.
+  Eventually we hope to see arm/virt also re-use much of that code.
 
-> Aleksandar -- please or ASE_MMI to insn_flags here:
-> 
-> --- a/target/mips/translate_init.inc.c
-> +++ b/target/mips/translate_init.inc.c
-> @@ -466,7 +466,7 @@ const mips_def_t mips_defs[] =
->  #endif /* !CONFIG_USER_ONLY */
->          .SEGBITS = 32,
->          .PABITS = 32,
-> -        .insn_flags = CPU_R5900,
-> +        .insn_flags = CPU_R5900 | ASE_MMI,
->          .mmu_type = MMU_TYPE_R4000,
->      },
->      {
+The rest of the patchset adds the hardware-reduced support on top of
+this code reorganization. Here again, the implementation is machine
+type, platform and architecture independent.
 
- So I think it better be called ASE_TOSHIBA_MMI here.
+[1] https://github.com/intel/nemu
 
-> Strictly speaking, MADD, MADDU, MULT, MULTU, MULT1, MULTU1, DIV1, DIVU1,
-> MADD1, MADDU1, MFHI1, MFLO1, MTHI1 and MTLO1 are not part of what the
-> Toshiba TX System RISC TX79 Core Architecture manual specifies as
-> "Multimedia Instructions", section B.3.2, on page B-3, even though
-> their opcodes are covered by TX79_CLASS_MMI and the decode_tx79_mmi
-> function. Can we adjust ASE_MMI for QEMU accordingly?
 
- NB all but pipeline 1 instructions of these are also implemented by other 
-members of the TXx9 family.  They seem to be referred to as just "multiply 
-and multiply-add instructions" in the TX79 manual (cf Section B.3.1).
+The following changes since commit b312532fd03413d0e6ae6767ec793a3e30f487b8:
 
-> Also, doesn't it make sense to cover LQ and SQ with ASE_MMI as well, as
-> those two really are MMIs?
+  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2018-10-19 19:01:07 +0100)
 
- And they're certainly listed as such in the TX79 manual (cf Section 
-B.3.2).
+are available in the Git repository at:
 
-> Regarding the R5900 FPU: It appears reasonable to introduce an ELF ABI
-> variant for the nonstandard R5900 FPU.
+  git@github.com:intel/nemu topic/upstream/acpi
 
- Indeed and in particular given that the R5900 does not produce any FPU 
-exceptions it should be quite straightforward for the Linux kernel to 
-recognise this specific ABI annotation with ELF binaries and switch its FP 
-environment between R5900 native float and IEEE 754 emulated float 
-accordingly.  We could then make QEMU run in the user emulation mode do 
-the same.
+for you to fetch changes up to 4133ebe0d638d0a3d583bd89aa2360ef35ba746b:
 
- Of course all the pieces of the toolchain as well as the dynamic loader 
-in use would have to taught to prevent incompatible pieces of hard float 
-code from being used together.
+  hw: acpi: reduced: Add PCI hotplug support (2018-10-22 20:32:23 +0200)
 
-  Maciej
+----------------------------------------------------------------
+Jing Liu (2):
+      hw: acpi: reduced: Add shutdown support
+      hw: acpi: reduced: Add reboot support
+
+Samuel Ortiz (10):
+      hw: i386: Decouple the ACPI build from the PC machine type
+      hw: acpi: Export ACPI build alignment API
+      hw: acpi: Export the RSDP build API
+      hw: arm: Switch to the AML build RSDP building routine
+      hw: acpi: Do not create hotplug method when handler is not defined
+      hw: i386: Make the hotpluggable memory size property more generic
+      hw: fw-build: Add firmware build methods and state
+      hw: i386: Convert PC machine type to firmware build methods
+      hw: acpi: Initial hardware-reduced support
+      hw: acpi: reduced: Generic Event Device support
+
+Sebastien Boeuf (4):
+      hw: acpi: Export the PCI hotplug API
+      hw: acpi: Retrieve the PCI bus from AcpiPciHpState
+      hw: acpi: reduced: Add NFIT support
+      hw: acpi: reduced: Add PCI hotplug support
+
+Yang Zhong (10):
+      hw: acpi: Generalize AML build routines
+      hw: acpi: Factorize _OSC AML across architectures
+      hw: i386: Refactor PCI host getter
+      hw: acpi: Export and generalize the PCI host AML API
+      hw: acpi: Export the MCFG getter
+      hw: acpi: Export the SRAT AML build API
+      hw: acpi: Fix memory hotplug AML generation error
+      hw: acpi: reduced: Add MCFG support
+      hw: acpi: reduced: Add memory hotplug support
+      hw: acpi: reduced: Add SRAT table
+
+ default-configs/i386-softmmu.mak |    1 +
+ hw/acpi/Makefile.objs            |    1 +
+ hw/acpi/aml-build.c              | 1139 +++++++++++++++++++++++++++++++++++-
+ hw/acpi/cpu.c                    |    8 +-
+ hw/acpi/cpu_hotplug.c            |    9 +-
+ hw/acpi/memory_hotplug.c         |   21 +-
+ hw/acpi/pcihp.c                  |   10 +-
+ hw/acpi/reduced.c                |  472 +++++++++++++++
+ hw/arm/virt-acpi-build.c         |   86 +--
+ hw/i386/acpi-build.c             | 1172 +++-----------------------------------
+ hw/i386/acpi-build.h             |    4 +-
+ hw/i386/pc.c                     |  188 +++---
+ hw/i386/pc_piix.c                |   21 +-
+ hw/i386/pc_q35.c                 |   21 +-
+ hw/pci-host/piix.c               |    8 -
+ include/hw/acpi/acpi-defs.h      |   15 +
+ include/hw/acpi/acpi.h           |   47 ++
+ include/hw/acpi/aml-build.h      |   48 ++
+ include/hw/acpi/reduced.h        |   46 ++
+ include/hw/boards.h              |    5 +
+ include/hw/fw-build.h            |   57 ++
+ include/hw/i386/acpi.h           |   27 +
+ include/hw/i386/pc.h             |   21 +-
+ include/hw/mem/memory-device.h   |    2 +
+ stubs/Makefile.objs              |    1 -
+ stubs/pci-host-piix.c            |    6 -
+ 26 files changed, 2107 insertions(+), 1329 deletions(-)
+ create mode 100644 hw/acpi/reduced.c
+ create mode 100644 include/hw/acpi/reduced.h
+ create mode 100644 include/hw/fw-build.h
+ create mode 100644 include/hw/i386/acpi.h
+ delete mode 100644 stubs/pci-host-piix.c
+
+-- 
+2.17.2
