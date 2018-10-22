@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45833)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEZmb-0008N1-G4
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:10 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEZmc-0008Ng-9y
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEZmX-00082o-IO
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:09 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:33234 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEZmX-000837-UN
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:10 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:33254 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gEZmX-000818-AO
+	id 1gEZmX-00082c-L3
 	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:05 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 22 Oct 2018 14:57:24 +0200
-Message-Id: <1540213077-15211-2-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 22 Oct 2018 14:57:25 +0200
+Message-Id: <1540213077-15211-3-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1540213077-15211-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1540213077-15211-1-git-send-email-aleksandar.markovic@rt-rk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 01/34] target/mips: Define R5900 ISA, MMI ASE,
- and R5900 CPU preprocessor constants
+Subject: [Qemu-devel] [PULL 02/34] disas/mips: Define R5900 disassembly
+ constants
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,56 +30,61 @@ Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
 From: Fredrik Noring <noring@nocrew.org>
 
-The R5900 implements the 64-bit MIPS III instruction set except
-DMULT, DMULTU, DDIV, DDIVU, LL, SC, LLD and SCD. The MIPS IV
-instructions MOVN, MOVZ and PREF are implemented. It has the
-R5900-specific three-operand instructions MADD, MADDU, MULT and
-MULTU as well as pipeline 1 versions MULT1, MULTU1, DIV1, DIVU1,
-MADD1, MADDU1, MFHI1, MFLO1, MTHI1 and MTLO1. A set of 93 128-bit
-multimedia instructions specific to the R5900 is also implemented.
-
-The Toshiba TX System RISC TX79 Core Architecture manual:
-
-https://wiki.qemu.org/File:C790.pdf
-
-describes the C790 processor that is a follow-up to the R5900. There
-are a few notable differences in that the R5900 FPU
-
-- is not IEEE 754-1985 compliant,
-- does not implement double format, and
-- its machine code is nonstandard.
+Amend definition for MIPS ISAs in disassembler with R5900.
 
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: Fredrik Noring <noring@nocrew.org>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/mips-defs.h | 3 +++
- 1 file changed, 3 insertions(+)
+ disas/mips.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/target/mips/mips-defs.h b/target/mips/mips-defs.h
-index 71ea4ef..5177618 100644
---- a/target/mips/mips-defs.h
-+++ b/target/mips/mips-defs.h
-@@ -64,9 +64,11 @@
- #define INSN_LOONGSON2E   0x0001000000000000ULL
- #define INSN_LOONGSON2F   0x0002000000000000ULL
- #define INSN_VR54XX       0x0004000000000000ULL
-+#define INSN_R5900        0x0008000000000000ULL
- /*
-  *   bits 56-63: vendor-specific ASEs
-  */
-+#define ASE_MMI           0x0100000000000000ULL
-=20
- /* MIPS CPU defines. */
- #define		CPU_MIPS1	(ISA_MIPS1)
-@@ -74,6 +76,7 @@
- #define		CPU_MIPS3	(CPU_MIPS2 | ISA_MIPS3)
- #define		CPU_MIPS4	(CPU_MIPS3 | ISA_MIPS4)
- #define		CPU_VR54XX	(CPU_MIPS4 | INSN_VR54XX)
-+#define         CPU_R5900       (CPU_MIPS3 | INSN_R5900)
- #define		CPU_LOONGSON2E  (CPU_MIPS3 | INSN_LOONGSON2E)
- #define		CPU_LOONGSON2F  (CPU_MIPS3 | INSN_LOONGSON2F)
-=20
---=20
+diff --git a/disas/mips.c b/disas/mips.c
+index 97f661a..ae72059 100644
+--- a/disas/mips.c
++++ b/disas/mips.c
+@@ -611,6 +611,9 @@ struct mips_opcode
+ /* ST Microelectronics Loongson 2F.  */
+ #define INSN_LOONGSON_2F          0x80000000
+ 
++/* Sony/Toshiba R5900 */
++#define INSN_5900                 0x100000000
++
+ /* MIPS ISA defines, use instead of hardcoding ISA level.  */
+ 
+ #define       ISA_UNKNOWN     0               /* Gas internal use.  */
+@@ -646,6 +649,7 @@ struct mips_opcode
+ #define CPU_R5000	5000
+ #define CPU_VR5400	5400
+ #define CPU_VR5500	5500
++#define CPU_R5900       5900
+ #define CPU_R6000	6000
+ #define CPU_RM7000	7000
+ #define CPU_R8000	8000
+@@ -1193,6 +1197,7 @@ extern const int bfd_mips16_num_opcodes;
+ #define N5	(INSN_5400 | INSN_5500)
+ #define N54	INSN_5400
+ #define N55	INSN_5500
++#define EE      INSN_5900    /* Emotion Engine */
+ 
+ #define G1      (T3             \
+                  )
+@@ -3861,6 +3866,7 @@ struct mips_arch_choice
+ #define bfd_mach_mips5000              5000
+ #define bfd_mach_mips5400              5400
+ #define bfd_mach_mips5500              5500
++#define bfd_mach_mips5900              5900
+ #define bfd_mach_mips6000              6000
+ #define bfd_mach_mips7000              7000
+ #define bfd_mach_mips8000              8000
+@@ -3908,6 +3914,8 @@ static const struct mips_arch_choice mips_arch_choices[] =
+     mips_cp0_names_numeric, NULL, 0, mips_hwr_names_numeric },
+   { "vr5500",	1, bfd_mach_mips5500, CPU_VR5500, ISA_MIPS4,
+     mips_cp0_names_numeric, NULL, 0, mips_hwr_names_numeric },
++  { "r5900",    1, bfd_mach_mips5900, CPU_R5900, ISA_MIPS3,
++    mips_cp0_names_numeric, NULL, 0, mips_hwr_names_numeric },
+   { "r6000",	1, bfd_mach_mips6000, CPU_R6000, ISA_MIPS2,
+     mips_cp0_names_numeric, NULL, 0, mips_hwr_names_numeric },
+   { "rm7000",	1, bfd_mach_mips7000, CPU_RM7000, ISA_MIPS4,
+-- 
 2.7.4
