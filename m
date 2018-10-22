@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52091)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gEcdl-0000yh-Er
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 12:01:14 -0400
+	(envelope-from <zhangckid@gmail.com>) id 1gEdGs-0007nJ-QO
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 12:41:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gEcdi-0001vS-De
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 12:01:13 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43074)
+	(envelope-from <zhangckid@gmail.com>) id 1gEdGo-0002V0-Qe
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 12:41:38 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:35204)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gEcdi-0001rD-1g
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 12:01:10 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gEcdd-0002lm-OM
-	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 16:01:05 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B75072E80CC
-	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 16:01:05 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 22 Oct 2018 15:47:04 -0000
-From: Roman Bolshakov <1798451@bugs.launchpad.net>
-Reply-To: Bug 1798451 <1798451@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153980387714.3465.12419240219281347614.malonedeb@soybean.canonical.com>
-Message-Id: <154022322483.16808.6637049594956776412.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1798451] Re: HVF linux on OSX hangs 2nd time
- started after adding socket
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1gEdGo-0002P5-I8
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 12:41:34 -0400
+Received: by mail-pg1-x541.google.com with SMTP id 32-v6so8101169pgu.2
+	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 09:41:34 -0700 (PDT)
+From: Zhang Chen <zhangckid@gmail.com>
+Date: Tue, 23 Oct 2018 00:41:18 +0800
+Message-Id: <20181022164118.5502-1-zhangckid@gmail.com>
+Subject: [Qemu-devel] [PATCH] qapi: Fix COLOStatus and query-colo-status
+ since version
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,66 +24,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Zhang Chen <zhangckid@gmail.com>
 
-I have tried to run the OS and I can confirm that some instructions that
-require VMEXIT are not implemented. In your case that's 0F7F or MOVQ
-(mem from mmxreg) from MMX. In my case that's 0F11 or MOVUPS(xmmreg1 to
-mem) from SSE.
+This structure and command have missed qemu version 3.0, so fix it to since version 3.1.
 
-I'd recommend you to run -cpu host,-mmx,-sse for a while, but the kernel
-of the OS explicitly complains that it won't run on CPUs without SSE
-support.
+Signed-off-by: Zhang Chen <zhangckid@gmail.com>
+---
+ qapi/migration.json | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1798451
-
-Title:
-  HVF linux on OSX hangs 2nd time started after adding socket
-
-Status in QEMU:
-  New
-
-Bug description:
-  =
-
-  Robs-MacBook-Pro-2:~ robmaskell$ qemu-system-x86_64 --version
-  QEMU emulator version 3.0.0
-
-  Host: MacOS - 10.13.6
-    Model Name:	MacBook Pro
-    Model Identifier:	MacBookPro14,3
-    Processor Name:	Intel Core i7
-    Processor Speed:	2.8 GHz
-    Number of Processors:	1
-    Total Number of Cores:	4
-    L2 Cache (per Core):	256 KB
-    L3 Cache:	6 MB
-    Memory:	16 GB
-
-  Guest OS: Elementary Linux Loki 0.4.1, patched up to date
-
-  Command used to start QEMU:
-
-  qemu-system-x86_64 \
-    -name ElementaryLokiDev \
-    -machine pc,accel=3Dhvf \
-    -cpu max \
-    -smp cpus=3D2,sockets=3D2,cores=3D1,threads=3D1,maxcpus=3D2 \
-    -numa node,nodeid=3D0 \
-    -numa cpu,node-id=3D0,socket-id=3D0 -numa cpu,node-id=3D0,socket-id=3D1=
- \
-    -m 8G \
-    -vga vmware \
-    -hda e4.qcow2
-
-  Symptoms: Started without the -smp / -numa commands to install the OS,
-  then added -smp / -numa and the machine boots and lscpu reports extra
-  cpu as expected. Restart VM and it hangs on startup. Remove -smp /
-  -numa and machine starts again.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1798451/+subscriptions
+diff --git a/qapi/migration.json b/qapi/migration.json
+index 0928f4b727..38d4c41d88 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -1317,7 +1317,7 @@
+ #
+ # @reason: describes the reason for the COLO exit.
+ #
+-# Since: 3.0
++# Since: 3.1
+ ##
+ { 'struct': 'COLOStatus',
+   'data': { 'mode': 'COLOMode', 'reason': 'COLOExitReason' } }
+@@ -1334,7 +1334,7 @@
+ # -> { "execute": "query-colo-status" }
+ # <- { "return": { "mode": "primary", "active": true, "reason": "request" } }
+ #
+-# Since: 3.0
++# Since: 3.1
+ ##
+ { 'command': 'query-colo-status',
+   'returns': 'COLOStatus' }
+-- 
+2.17.GIT
