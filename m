@@ -1,32 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41705)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gEXx8-0005Gv-Rs
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 07:00:59 -0400
+	(envelope-from <fli@suse.com>) id 1gEY5c-00013L-He
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 07:09:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gEXx3-0003Qp-PP
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 07:00:54 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58130)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gEXx3-0003Q2-HS
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 07:00:49 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gEXx2-0007pu-2c
-	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 11:00:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 081BA2E8053
-	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 11:00:48 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 22 Oct 2018 10:52:42 -0000
-From: wwb1234 <1799200@bugs.launchpad.net>
-Reply-To: Bug 1799200 <1799200@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <154020556283.828.7303147560096636851.malonedeb@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1799200] [NEW] pointer dereference in tcg_emit_op
+	(envelope-from <fli@suse.com>) id 1gEY5Y-000166-FC
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 07:09:40 -0400
+Received: from smtp.nue.novell.com ([195.135.221.5]:37152)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <fli@suse.com>) id 1gEY5W-0000yi-Mf
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 07:09:36 -0400
+From: Fei Li <fli@suse.com>
+Date: Mon, 22 Oct 2018 19:08:54 +0800
+Message-Id: <20181022110854.10284-3-fli@suse.com>
+In-Reply-To: <20181022110854.10284-1-fli@suse.com>
+References: <20181022110854.10284-1-fli@suse.com>
+Subject: [Qemu-devel] [PATCH RFC 2/2] migration: fix some error handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,171 +24,97 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: quintela@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-Public bug reported:
+Add error handling for qemu_ram_foreach_migratable_block() when
+it fails.
 
-I am insert a custom  tcg helper function in i386_tr_insn_start for
-trace the instructions.
+Always call migrate_set_error() to set the error state without relying
+on whether multifd_save_cleanup() succeeds. As the passed &local_err
+is never used in multifd_save_cleanup(), remove it.
 
-most of time the qemu runed ok ,but when execute some special software
-will lead to crash.
+Signed-off-by: Fei Li <fli@suse.com>
+---
+ migration/migration.c    | 5 +----
+ migration/postcopy-ram.c | 3 +++
+ migration/ram.c          | 7 +++----
+ migration/ram.h          | 2 +-
+ 4 files changed, 8 insertions(+), 9 deletions(-)
 
-
-the below is the insert code:
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
- 8514 static void i386_tr_insn_start(DisasContextBase *dcbase, CPUState *cp=
-u)
- 8515 {
- 8516     DisasContext *dc =3D container_of(dcbase, DisasContext, base);
- 8517     TCGv_ptr ptr=3D tcg_const_ptr((void*)cpu); // inserted hepler code
- 8518     gen_helper_mad_exec(ptr);// insert helper code
- 8519     tcg_gen_insn_start(dc->base.pc_next, dc->cc_op);
- 8520 }
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-below is the callstack
-
-#0  0x000055555581df5e in tcg_emit_op (opc=3Dopc@entry=3DINDEX_op_movi_i64)=
- at /root/qemu/tcg/tcg.c:2205
-#1  0x0000555555825911 in tcg_gen_op2 (opc=3Dopc@entry=3DINDEX_op_movi_i64,=
- a1=3D140734736923704, a2=3Da2@entry=3D792) at /root/qemu/tcg/tcg-op.c:53
-#2  0x000055555581d713 in tcg_const_i64 (opc=3DINDEX_op_movi_i64, a2=3D792,=
- a1=3D0x7378) at /root/qemu/tcg/tcg-op.h:109
-#3  0x000055555581d713 in tcg_const_i64 (arg=3D792, ret=3D<optimized out>) =
-at /root/qemu/tcg/tcg-op.h:579
-#4  0x000055555581d713 in tcg_const_i64 (val=3Dval@entry=3D792) at /root/qe=
-mu/tcg/tcg.c:1314
-#5  0x000055555582732d in tcg_gen_addi_i64 (ret=3D0xd18, arg1=3D0x378, arg2=
-=3Darg2@entry=3D792) at /root/qemu/tcg/tcg-op.c:1200
-#6  0x000055555590ffaf in gen_sse (b=3D792, a=3D<optimized out>, r=3D<optim=
-ized out>) at /root/qemu/tcg/tcg-op.h:1258
-#7  0x000055555590ffaf in gen_sse (env=3Denv@entry=3D0x5555567424d0, s=3Ds@=
-entry=3D0x7fffea99a610, b=3Db@entry=3D366, pc_start=3Dpc_start@entry=3D4513=
-509698, rex_r=3Drex_r@entry=3D0) at /root/qemu/target/i386/translate.c:3150
-#8  0x0000555555911d7f in disas_insn (s=3Ds@entry=3D0x7fffea99a610, cpu=3D<=
-optimized out>) at /root/qemu/target/i386/translate.c:8336
-#9  0x00005555559207a0 in i386_tr_translate_insn (dcbase=3D0x7fffea99a610, =
-cpu=3D<optimized out>) at /root/qemu/target/i386/translate.c:8543
-#10 0x0000555555892649 in translator_loop (ops=3D0x55555622dee0 <i386_tr_op=
-s>, db=3D0x7fffea99a610, cpu=3D0x55555673a220, tb=3D<optimized out>) at /ro=
-ot/qemu/accel/tcg/translator.c:110
-#11 0x00005555559209ef in gen_intermediate_code (cpu=3Dcpu@entry=3D0x555556=
-73a220, tb=3Dtb@entry=3D0x7fff70682040 <code_gen_buffer+208150547>) at /roo=
-t/qemu/target/i386/translate.c:8605
-#12 0x0000555555891437 in tb_gen_code (cpu=3Dcpu@entry=3D0x55555673a220, pc=
-=3Dpc@entry=3D4513506448, cs_base=3Dcs_base@entry=3D0, flags=3Dflags@entry=
-=3D4244147, cflags=3Dcflags@entry=3D0) at /root/qemu/accel/tcg/translate-al=
-l.c:1728
-#13 0x000055555588f97b in cpu_exec (cf_mask=3D0, tb_exit=3D0, last_tb=3D0x0=
-, cpu=3D0x0) at /root/qemu/accel/tcg/cpu-exec.c:410
-#14 0x000055555588f97b in cpu_exec (cpu=3Dcpu@entry=3D0x55555673a220) at /r=
-oot/qemu/accel/tcg/cpu-exec.c:734
-#15 0x000055555584b152 in tcg_cpu_exec (cpu=3D0x55555673a220) at /root/qemu=
-/cpus.c:1405
-#16 0x000055555584d1b8 in qemu_tcg_rr_cpu_thread_fn (arg=3D<optimized out>)=
- at /root/qemu/cpus.c:1505
-#17 0x00007ffff2585e25 in start_thread () at /lib64/libpthread.so.0
-#18 0x00007ffff22afbad in clone () at /lib64/libc.so.6
-
-** Affects: qemu
-     Importance: Undecided
-         Status: In Progress
-
-** Changed in: qemu
-       Status: New =3D> In Progress
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1799200
-
-Title:
-  pointer dereference in tcg_emit_op
-
-Status in QEMU:
-  In Progress
-
-Bug description:
-  I am insert a custom  tcg helper function in i386_tr_insn_start for
-  trace the instructions.
-
-  most of time the qemu runed ok ,but when execute some special software
-  will lead to crash.
-
-  =
-
-  the below is the insert code:
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-   8514 static void i386_tr_insn_start(DisasContextBase *dcbase, CPUState *=
-cpu)
-   8515 {
-   8516     DisasContext *dc =3D container_of(dcbase, DisasContext, base);
-   8517     TCGv_ptr ptr=3D tcg_const_ptr((void*)cpu); // inserted hepler c=
-ode
-   8518     gen_helper_mad_exec(ptr);// insert helper code
-   8519     tcg_gen_insn_start(dc->base.pc_next, dc->cc_op);
-   8520 }
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  below is the callstack
-
-  #0  0x000055555581df5e in tcg_emit_op (opc=3Dopc@entry=3DINDEX_op_movi_i6=
-4) at /root/qemu/tcg/tcg.c:2205
-  #1  0x0000555555825911 in tcg_gen_op2 (opc=3Dopc@entry=3DINDEX_op_movi_i6=
-4, a1=3D140734736923704, a2=3Da2@entry=3D792) at /root/qemu/tcg/tcg-op.c:53
-  #2  0x000055555581d713 in tcg_const_i64 (opc=3DINDEX_op_movi_i64, a2=3D79=
-2, a1=3D0x7378) at /root/qemu/tcg/tcg-op.h:109
-  #3  0x000055555581d713 in tcg_const_i64 (arg=3D792, ret=3D<optimized out>=
-) at /root/qemu/tcg/tcg-op.h:579
-  #4  0x000055555581d713 in tcg_const_i64 (val=3Dval@entry=3D792) at /root/=
-qemu/tcg/tcg.c:1314
-  #5  0x000055555582732d in tcg_gen_addi_i64 (ret=3D0xd18, arg1=3D0x378, ar=
-g2=3Darg2@entry=3D792) at /root/qemu/tcg/tcg-op.c:1200
-  #6  0x000055555590ffaf in gen_sse (b=3D792, a=3D<optimized out>, r=3D<opt=
-imized out>) at /root/qemu/tcg/tcg-op.h:1258
-  #7  0x000055555590ffaf in gen_sse (env=3Denv@entry=3D0x5555567424d0, s=3D=
-s@entry=3D0x7fffea99a610, b=3Db@entry=3D366, pc_start=3Dpc_start@entry=3D45=
-13509698, rex_r=3Drex_r@entry=3D0) at /root/qemu/target/i386/translate.c:31=
-50
-  #8  0x0000555555911d7f in disas_insn (s=3Ds@entry=3D0x7fffea99a610, cpu=
-=3D<optimized out>) at /root/qemu/target/i386/translate.c:8336
-  #9  0x00005555559207a0 in i386_tr_translate_insn (dcbase=3D0x7fffea99a610=
-, cpu=3D<optimized out>) at /root/qemu/target/i386/translate.c:8543
-  #10 0x0000555555892649 in translator_loop (ops=3D0x55555622dee0 <i386_tr_=
-ops>, db=3D0x7fffea99a610, cpu=3D0x55555673a220, tb=3D<optimized out>) at /=
-root/qemu/accel/tcg/translator.c:110
-  #11 0x00005555559209ef in gen_intermediate_code (cpu=3Dcpu@entry=3D0x5555=
-5673a220, tb=3Dtb@entry=3D0x7fff70682040 <code_gen_buffer+208150547>) at /r=
-oot/qemu/target/i386/translate.c:8605
-  #12 0x0000555555891437 in tb_gen_code (cpu=3Dcpu@entry=3D0x55555673a220, =
-pc=3Dpc@entry=3D4513506448, cs_base=3Dcs_base@entry=3D0, flags=3Dflags@entr=
-y=3D4244147, cflags=3Dcflags@entry=3D0) at /root/qemu/accel/tcg/translate-a=
-ll.c:1728
-  #13 0x000055555588f97b in cpu_exec (cf_mask=3D0, tb_exit=3D0, last_tb=3D0=
-x0, cpu=3D0x0) at /root/qemu/accel/tcg/cpu-exec.c:410
-  #14 0x000055555588f97b in cpu_exec (cpu=3Dcpu@entry=3D0x55555673a220) at =
-/root/qemu/accel/tcg/cpu-exec.c:734
-  #15 0x000055555584b152 in tcg_cpu_exec (cpu=3D0x55555673a220) at /root/qe=
-mu/cpus.c:1405
-  #16 0x000055555584d1b8 in qemu_tcg_rr_cpu_thread_fn (arg=3D<optimized out=
->) at /root/qemu/cpus.c:1505
-  #17 0x00007ffff2585e25 in start_thread () at /lib64/libpthread.so.0
-  #18 0x00007ffff22afbad in clone () at /lib64/libc.so.6
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1799200/+subscriptions
+diff --git a/migration/migration.c b/migration/migration.c
+index 7696729340..ca07c243be 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1372,7 +1372,6 @@ static void migrate_fd_cleanup(void *opaque)
+     qemu_savevm_state_cleanup();
+ 
+     if (s->to_dst_file) {
+-        Error *local_err = NULL;
+         QEMUFile *tmp;
+ 
+         trace_migrate_fd_cleanup();
+@@ -1383,9 +1382,7 @@ static void migrate_fd_cleanup(void *opaque)
+         }
+         qemu_mutex_lock_iothread();
+ 
+-        if (multifd_save_cleanup(&local_err) != 0) {
+-            error_report_err(local_err);
+-        }
++        multifd_save_cleanup();
+         qemu_mutex_lock(&s->qemu_file_lock);
+         tmp = s->to_dst_file;
+         s->to_dst_file = NULL;
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index e5c02a32c5..4ca2bc02b3 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -1117,6 +1117,9 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
+ 
+     /* Mark so that we get notified of accesses to unwritten areas */
+     if (qemu_ram_foreach_migratable_block(ram_block_enable_notify, mis)) {
++        error_report("ram_block_enable_notify failed");
++        close(mis->userfault_event_fd);
++        close(mis->userfault_fd);
+         return -1;
+     }
+ 
+diff --git a/migration/ram.c b/migration/ram.c
+index 2dd873ba35..e7c8ccb38a 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -922,7 +922,7 @@ static void multifd_send_terminate_threads(Error *err)
+     }
+ }
+ 
+-int multifd_save_cleanup(Error **errp)
++int multifd_save_cleanup(void)
+ {
+     int i;
+     int ret = 0;
+@@ -1080,9 +1080,8 @@ static void multifd_new_send_channel_async(QIOTask *task, gpointer opaque)
+     }
+ 
+     if (qio_task_propagate_error(task, &local_err)) {
+-        if (multifd_save_cleanup(&local_err) != 0) {
+-            migrate_set_error(migrate_get_current(), local_err);
+-        }
++        multifd_save_cleanup();
++        migrate_set_error(migrate_get_current(), local_err);
+     } else {
+         p->c = QIO_CHANNEL(sioc);
+         qio_channel_set_delay(p->c, false);
+diff --git a/migration/ram.h b/migration/ram.h
+index 83ff1bc11a..c4fafea368 100644
+--- a/migration/ram.h
++++ b/migration/ram.h
+@@ -43,7 +43,7 @@ uint64_t ram_bytes_remaining(void);
+ uint64_t ram_bytes_total(void);
+ 
+ int multifd_save_setup(void);
+-int multifd_save_cleanup(Error **errp);
++int multifd_save_cleanup(void);
+ int multifd_load_setup(void);
+ int multifd_load_cleanup(Error **errp);
+ bool multifd_recv_all_channels_created(void);
+-- 
+2.13.7
