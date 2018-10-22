@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46036)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46048)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEZmp-0000Bl-KX
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEZmq-0000Bq-5z
 	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEZmn-0008BG-An
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:23 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:33435 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEZmp-0008Cf-2j
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:24 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:33459 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gEZmk-00084e-GW
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:18 -0400
+	id 1gEZmk-00084y-On
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:20 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 22 Oct 2018 14:57:44 +0200
-Message-Id: <1540213077-15211-22-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 22 Oct 2018 14:57:47 +0200
+Message-Id: <1540213077-15211-25-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1540213077-15211-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1540213077-15211-1-git-send-email-aleksandar.markovic@rt-rk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 21/34] target/mips: Support R5900 MOVN,
- MOVZ and PREF instructions from MIPS IV
+Subject: [Qemu-devel] [PULL 24/34] tests/tcg/mips: Test R5900 three-operand
+ MULTU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,41 +30,73 @@ Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
 From: Fredrik Noring <noring@nocrew.org>
 
-The R5900 is taken to be MIPS III with certain modifications. From
-MIPS IV it implements the instructions MOVN, MOVZ and PREF.
+Add a test for MULTU.
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Fredrik Noring <noring@nocrew.org>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ tests/tcg/mips/mipsr5900/Makefile |  1 +
+ tests/tcg/mips/mipsr5900/multu.c  | 39 +++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 40 insertions(+)
+ create mode 100644 tests/tcg/mips/mipsr5900/multu.c
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index f2aeaf4..551928d 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -23552,7 +23552,7 @@ static void decode_opc_special_legacy(CPUMIPSStat=
-e *env, DisasContext *ctx)
-     case OPC_MOVN:         /* Conditional move */
-     case OPC_MOVZ:
-         check_insn(ctx, ISA_MIPS4 | ISA_MIPS32 |
--                   INSN_LOONGSON2E | INSN_LOONGSON2F);
-+                   INSN_LOONGSON2E | INSN_LOONGSON2F | INSN_R5900);
-         gen_cond_move(ctx, op1, rd, rs, rt);
-         break;
-     case OPC_MFHI:          /* Move from HI/LO */
-@@ -26388,7 +26388,8 @@ static void decode_opc(CPUMIPSState *env, DisasCo=
-ntext *ctx)
-         break;
-     case OPC_PREF:
-         check_insn_opc_removed(ctx, ISA_MIPS32R6);
--        check_insn(ctx, ISA_MIPS4 | ISA_MIPS32);
-+        check_insn(ctx, ISA_MIPS4 | ISA_MIPS32 |
-+                   INSN_R5900);
-         /* Treat as NOP. */
-         break;
-=20
---=20
+diff --git a/tests/tcg/mips/mipsr5900/Makefile b/tests/tcg/mips/mipsr5900/Makefile
+index 6757168..b3ddb9a 100644
+--- a/tests/tcg/mips/mipsr5900/Makefile
++++ b/tests/tcg/mips/mipsr5900/Makefile
+@@ -9,6 +9,7 @@ CC      = $(CROSS)gcc
+ CFLAGS  = -Wall -mabi=32 -march=r5900 -static
+ 
+ TESTCASES = mult.tst
++TESTCASES += multu.tst
+ 
+ all: $(TESTCASES)
+ 
+diff --git a/tests/tcg/mips/mipsr5900/multu.c b/tests/tcg/mips/mipsr5900/multu.c
+new file mode 100644
+index 0000000..3a59675
+--- /dev/null
++++ b/tests/tcg/mips/mipsr5900/multu.c
+@@ -0,0 +1,39 @@
++/*
++ * Test R5900-specific three-operand MULTU.
++ */
++
++#include <stdio.h>
++#include <inttypes.h>
++#include <assert.h>
++
++static uint64_t multu(uint32_t rs, uint32_t rt)
++{
++    uint32_t rd, lo, hi;
++    uint64_t r;
++
++    __asm__ __volatile__ (
++            "    multu %0, %3, %4\n"
++            "    mflo %1\n"
++            "    mfhi %2\n"
++            : "=r" (rd), "=r" (lo), "=r" (hi)
++            : "r" (rs), "r" (rt));
++    r = ((uint64_t)hi << 32) | (uint32_t)lo;
++
++    assert((uint64_t)rs * rt == r);
++    assert(rd == lo);
++
++    return r;
++}
++
++int main()
++{
++    assert(multu(17, 19) == 323);
++    assert(multu(77773, 99991) == 7776600043);
++    assert(multu(12207031, 305175781) == 3725290219116211);
++
++    assert(multu(0x80000000U, 0x7FFFFFFF) == 0x3FFFFFFF80000000);
++    assert(multu(0x80000000U, 0x80000000U) ==  0x4000000000000000);
++    assert(multu(0xFFFFFFFFU, 0xFFFFFFFFU) ==  0xFFFFFFFE00000001U);
++
++    return 0;
++}
+-- 
 2.7.4
