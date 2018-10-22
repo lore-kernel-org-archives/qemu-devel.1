@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36899)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37963)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liqsub1@163.com>) id 1gEZMe-0000Ub-Ix
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:31:26 -0400
+	(envelope-from <armbru@redhat.com>) id 1gEZPb-0002Gu-Aq
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liqsub1@163.com>) id 1gEZMa-0007nz-1l
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:31:20 -0400
-Received: from m12-244.163.com ([220.181.12.244]:41752)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liqsub1@163.com>) id 1gEZMY-0007j3-TF
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:31:15 -0400
-Date: Mon, 22 Oct 2018 20:15:15 +0800
-From: "liqsub1"<liqsub1@163.com>
-Message-ID: <4d7675ee.374e.1669bb366e4.Coremail.liqsub1@163.com>
-In-Reply-To: <20181022120908.13285-1-ppandit@redhat.com>
-References: <20181022120908.13285-1-ppandit@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [PATCH 1/3] arm: check bit index before use
+	(envelope-from <armbru@redhat.com>) id 1gEZPV-0002uG-U2
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45250)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gEZPV-0002tA-Ho
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:17 -0400
+From: Markus Armbruster <armbru@redhat.com>
+Date: Mon, 22 Oct 2018 14:33:37 +0200
+Message-Id: <20181022123413.28044-5-armbru@redhat.com>
+In-Reply-To: <20181022123413.28044-1-armbru@redhat.com>
+References: <20181022123413.28044-1-armbru@redhat.com>
+Subject: [Qemu-devel] [PULL 04/40] Use error_fatal to simplify obvious fatal
+ errors (again)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,32 +24,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Moguofang <moguofang@huawei.com>, Prasad J Pandit <pjp@fedoraproject.org>
+To: qemu-devel@nongnu.org
+Cc: David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-DQoNCjIwMTgtMTAtMjIgDQoNCmxpcXN1YjEgDQoNCg0KDQrlj5Hku7bkurrvvJpQIEogUCA8cHBh
-bmRpdEByZWRoYXQuY29tPg0K5Y+R6YCB5pe26Ze077yaMjAxOC0xMC0yMyAwMTozOQ0K5Li76aKY
-77yaW1FlbXUtZGV2ZWxdIFtQQVRDSCAxLzNdIGFybTogY2hlY2sgYml0IGluZGV4IGJlZm9yZSB1
-c2UNCuaUtuS7tuS6uu+8miJRZW11IERldmVsb3BlcnMiPHFlbXUtZGV2ZWxAbm9uZ251Lm9yZz4N
-CuaKhOmAge+8miJQZXRlciBNYXlkZWxsIjxwZXRlci5tYXlkZWxsQGxpbmFyby5vcmc+LCJNb2d1
-b2ZhbmciPG1vZ3VvZmFuZ0BodWF3ZWkuY29tPiwiUHJhc2FkIEogUGFuZGl0IjxwanBAZmVkb3Jh
-cHJvamVjdC5vcmc+DQoNCkZyb206IFByYXNhZCBKIFBhbmRpdCA8cGpwQGZlZG9yYXByb2plY3Qu
-b3JnPiANCg0KV2hpbGUgcGVyZm9ybWluZyBncGlvIHdyaXRlIHZpYSBzdHJvbmdhcm1fZ3Bpb19o
-YW5kbGVyX3VwZGF0ZSANCnJvdXRpbmUsIHRoZSAnYml0JyBpbmRleCBjb3VsZCBhY2Nlc3MgYmV5
-b25kIHMtPmhhbmRsZXJbMjhdIGFycmF5LiANCkFkZCBjaGVjayB0byBhdm9pZCBPT0IgYWNjZXNz
-LiANCg0KUmVwb3J0ZWQtYnk6IE1vZ3VvZmFuZyA8bW9ndW9mYW5nQGh1YXdlaS5jb20+IA0KU2ln
-bmVkLW9mZi1ieTogUHJhc2FkIEogUGFuZGl0IDxwanBAZmVkb3JhcHJvamVjdC5vcmc+IA0KLS0t
-IA0KIGh3L2FybS9zdHJvbmdhcm0uYyB8IDQgKysrLSANCiAxIGZpbGUgY2hhbmdlZCwgMyBpbnNl
-cnRpb25zKCspLCAxIGRlbGV0aW9uKC0pIA0KDQpkaWZmIC0tZ2l0IGEvaHcvYXJtL3N0cm9uZ2Fy
-bS5jIGIvaHcvYXJtL3N0cm9uZ2FybS5jIA0KaW5kZXggZWMyNjI3Mzc0ZC4uM2RkYTc1ZmVhZiAx
-MDA2NDQgDQotLS0gYS9ody9hcm0vc3Ryb25nYXJtLmMgDQorKysgYi9ody9hcm0vc3Ryb25nYXJt
-LmMgDQpAQCAtNTMyLDcgKzUzMiw5IEBAIHN0YXRpYyB2b2lkIHN0cm9uZ2FybV9ncGlvX2hhbmRs
-ZXJfdXBkYXRlKFN0cm9uZ0FSTUdQSU9JbmZvICpzKSANCiAgDQogICAgIGZvciAoZGlmZiA9IHMt
-PnByZXZfbGV2ZWwgXiBsZXZlbDsgZGlmZjsgZGlmZiBePSAxIDw8IGJpdCkgeyANCiAgICAgICAg
-IGJpdCA9IGN0ejMyKGRpZmYpOyANCi0gICAgICAgIHFlbXVfc2V0X2lycShzLT5oYW5kbGVyW2Jp
-dF0sIChsZXZlbCA+PiBiaXQpICYgMSk7IA0KKyAgICAgICAgaWYgKGJpdCA8IHNpemVvZihzLT5o
-YW5kbGVyKSAvIHNpemVvZihzLT5oYW5kbGVyWzBdKSkgeyANCg0KSGVsbG8gUHJhc2FkLA0KTWF5
-YmUgeW91IGNhbiB1c2UgQVJSQVlfU0laRSBoZXJlLg0KDQpUaGFua3MsDQpMaSBRaWFuZw0KDQor
-ICAgICAgICAgICAgcWVtdV9zZXRfaXJxKHMtPmhhbmRsZXJbYml0XSwgKGxldmVsID4+IGJpdCkg
-JiAxKTsgDQorICAgICAgICB9IA0KICAgICB9IA0KDQoNCg0KICANCiAgICAgcy0+cHJldl9sZXZl
-bCA9IGxldmVsOyANCi0tICANCjIuMTcuMiA=
+Add a slight improvement of the Coccinelle semantic patch from commit
+007b06578ab, and use it to clean up.  It leaves dead Error * variables
+behind, cleaned up manually.
+
+Cc: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexander Graf <agraf@suse.de>
+Cc: Eric Blake <eblake@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Message-Id: <20181017082702.5581-3-armbru@redhat.com>
+---
+ hw/intc/xics_kvm.c                       |  7 +------
+ qemu-nbd.c                               |  6 +-----
+ scripts/coccinelle/use-error_fatal.cocci | 20 ++++++++++++++++++++
+ vl.c                                     |  7 +------
+ 4 files changed, 23 insertions(+), 17 deletions(-)
+ create mode 100644 scripts/coccinelle/use-error_fatal.cocci
+
+diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+index 30c3769a20..e8fa9a53ae 100644
+--- a/hw/intc/xics_kvm.c
++++ b/hw/intc/xics_kvm.c
+@@ -198,17 +198,12 @@ static void ics_get_kvm_state(ICSState *ics)
+ {
+     uint64_t state;
+     int i;
+-    Error *local_err = NULL;
+ 
+     for (i = 0; i < ics->nr_irqs; i++) {
+         ICSIRQState *irq = &ics->irqs[i];
+ 
+         kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURCES,
+-                          i + ics->offset, &state, false, &local_err);
+-        if (local_err) {
+-            error_report_err(local_err);
+-            exit(1);
+-        }
++                          i + ics->offset, &state, false, &error_fatal);
+ 
+         irq->server = state & KVM_XICS_DESTINATION_MASK;
+         irq->saved_priority = (state >> KVM_XICS_PRIORITY_SHIFT)
+diff --git a/qemu-nbd.c b/qemu-nbd.c
+index e76fe3082a..7874bc973c 100644
+--- a/qemu-nbd.c
++++ b/qemu-nbd.c
+@@ -1002,11 +1002,7 @@ int main(int argc, char **argv)
+     }
+ 
+     exp = nbd_export_new(bs, dev_offset, fd_size, nbdflags, nbd_export_closed,
+-                         writethrough, NULL, &local_err);
+-    if (!exp) {
+-        error_report_err(local_err);
+-        exit(EXIT_FAILURE);
+-    }
++                         writethrough, NULL, &error_fatal);
+     nbd_export_set_name(exp, export_name);
+     nbd_export_set_description(exp, export_description);
+ 
+diff --git a/scripts/coccinelle/use-error_fatal.cocci b/scripts/coccinelle/use-error_fatal.cocci
+new file mode 100644
+index 0000000000..10fff0aec4
+--- /dev/null
++++ b/scripts/coccinelle/use-error_fatal.cocci
+@@ -0,0 +1,20 @@
++@@
++type T;
++identifier FUN, RET;
++expression list ARGS;
++expression ERR, EC, FAIL;
++@@
++(
++-    T RET = FUN(ARGS, &ERR);
+++    T RET = FUN(ARGS, &error_fatal);
++|
++-    RET = FUN(ARGS, &ERR);
+++    RET = FUN(ARGS, &error_fatal);
++|
++-    FUN(ARGS, &ERR);
+++    FUN(ARGS, &error_fatal);
++)
++-    if (FAIL) {
++-        error_report_err(ERR);
++-        exit(EC);
++-    }
+diff --git a/vl.c b/vl.c
+index 61305b5891..db83cfe2e9 100644
+--- a/vl.c
++++ b/vl.c
+@@ -2002,15 +2002,10 @@ static void select_vgahw(const char *p)
+ 
+ static void parse_display_qapi(const char *optarg)
+ {
+-    Error *err = NULL;
+     DisplayOptions *opts;
+     Visitor *v;
+ 
+-    v = qobject_input_visitor_new_str(optarg, "type", &err);
+-    if (!v) {
+-        error_report_err(err);
+-        exit(1);
+-    }
++    v = qobject_input_visitor_new_str(optarg, "type", &error_fatal);
+ 
+     visit_type_DisplayOptions(v, NULL, &opts, &error_fatal);
+     QAPI_CLONE_MEMBERS(DisplayOptions, &dpy, opts);
+-- 
+2.17.2
