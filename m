@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45406)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46032)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gEfRE-0003Tw-2A
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 15:00:33 -0400
+	(envelope-from <bounces@canonical.com>) id 1gEhKZ-00016r-JK
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 17:01:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gEfR0-0006P8-9p
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 15:00:21 -0400
-Received: from ste-pvt-msa1.bahnhof.se ([213.80.101.70]:20013)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gEfQx-0006ML-Ob
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 15:00:12 -0400
-Date: Mon, 22 Oct 2018 21:00:07 +0200
-From: Fredrik Noring <noring@nocrew.org>
-Message-ID: <20181022190007.GD2331@sx9>
-References: <cover.1540134918.git.noring@nocrew.org>
-	<BN6PR2201MB125165723113459889A6EC59C6F40@BN6PR2201MB1251.namprd22.prod.outlook.com>
-	<20181022172343.GB2331@sx9>
-	<BN6PR2201MB12517EFDBB682826E06B8998C6F40@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	(envelope-from <bounces@canonical.com>) id 1gEhKW-0002ZE-Qe
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 17:01:43 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34158)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gEhKU-0002OB-Vr
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 17:01:40 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gEhKN-0007XJ-MZ
+	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 21:01:31 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 8E0462E80DB
+	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 21:01:27 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <BN6PR2201MB12517EFDBB682826E06B8998C6F40@BN6PR2201MB1251.namprd22.prod.outlook.com>
-Subject: Re: [Qemu-devel] [PATCH v8 00/38] target/mips: Limited support for
- the R5900
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 22 Oct 2018 20:44:49 -0000
+From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+Reply-To: Bug 1799200 <1799200@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154020556283.828.7303147560096636851.malonedeb@wampee.canonical.com>
+Message-Id: <154024108986.16358.10810182353526897241.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1799200] Re: null pointer dereference in
+ tcg_emit_op
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +37,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <amarkovic@wavecomp.com>
-Cc: "Maciej W. Rozycki" <macro@linux-mips.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Petar Jovanovic <pjovanovic@wavecomp.com>, Peter Maydell <peter.maydell@linaro.org>, =?utf-8?Q?J=C3=BCrgen?= Urban <JuergenUrban@gmx.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-Hi Aleksandar,
+Does this bug occur with a normal build of QEMU or only with your
+changes to it?
 
-> Pull request with 32 patches from this series is already sent, and I would
-> like to avoid sending v2 of that request. Let's wait for some time until
-> the pull request is hopefully accepted. There will be most likely another
-> one at the beginning of the next week.
-> 
-> We are appoaching QEMU 3.1 soft freeze (Oct 30), and at this point we
-> would like to stabilize the code, and to integrate only crucial patches.
-> I suggest that you create a new series "target/mips: Amend R5900 support".
-> It should be based on the code submitted in the pull request. Place the
-> most crucial patches as the first ones, at the beginning of the series.
+** Changed in: qemu
+       Status: In Progress =3D> Invalid
 
-The R5900 testsuite in tests/tcg/mips/mipsr5900 fails unless ASE_MMI is
-part of insn_flags for the R5900:
+-- =
 
---- a/target/mips/translate_init.inc.c
-+++ b/target/mips/translate_init.inc.c
-@@ -466,7 +466,7 @@ const mips_def_t mips_defs[] =
- #endif /* !CONFIG_USER_ONLY */
-         .SEGBITS = 32,
-         .PABITS = 32,
--        .insn_flags = CPU_R5900,
-+        .insn_flags = CPU_R5900 | ASE_MMI,
-         .mmu_type = MMU_TYPE_R4000,
-     },
-     {
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1799200
 
-Perhaps that is the only (somewhat) crucial problem, depending on how the
-testsuites are used, of course.
+Title:
+  null pointer dereference in tcg_emit_op
 
-The other ASE_MMI changes and the disassembly of MULT1 and MULTU1 can wait,
-as can R5900 support for MADD, MADDU, MADD1 and MADDU1, in my opinion.
+Status in QEMU:
+  Invalid
 
-> FPU changes are too risky at this stage od 3.1 development cycle, and I
-> would leave them for QEMU 3.2+.
+Bug description:
+  I am insert a custom  tcg helper function in i386_tr_insn_start for
+  trace the instructions.
 
-Agreed! As Maciej just noted, there are also toolchain issues that need
-to be addressed for the R5900 FPU.
+  most of time the qemu runed ok ,but when execute some special software
+  will lead to crash.
 
-Fredrik
+  =
+
+  the below is the insert code:
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+   8514 static void i386_tr_insn_start(DisasContextBase *dcbase, CPUState *=
+cpu)
+   8515 {
+   8516     DisasContext *dc =3D container_of(dcbase, DisasContext, base);
+   8517     TCGv_ptr ptr=3D tcg_const_ptr((void*)cpu); // inserted hepler c=
+ode
+   8518     gen_helper_mad_exec(ptr);// insert helper code
+   8519     tcg_gen_insn_start(dc->base.pc_next, dc->cc_op);
+   8520 }
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+  below is the callstack
+
+  #0  0x000055555581df5e in tcg_emit_op (opc=3Dopc@entry=3DINDEX_op_movi_i6=
+4) at /root/qemu/tcg/tcg.c:2205
+  #1  0x0000555555825911 in tcg_gen_op2 (opc=3Dopc@entry=3DINDEX_op_movi_i6=
+4, a1=3D140734736923704, a2=3Da2@entry=3D792) at /root/qemu/tcg/tcg-op.c:53
+  #2  0x000055555581d713 in tcg_const_i64 (opc=3DINDEX_op_movi_i64, a2=3D79=
+2, a1=3D0x7378) at /root/qemu/tcg/tcg-op.h:109
+  #3  0x000055555581d713 in tcg_const_i64 (arg=3D792, ret=3D<optimized out>=
+) at /root/qemu/tcg/tcg-op.h:579
+  #4  0x000055555581d713 in tcg_const_i64 (val=3Dval@entry=3D792) at /root/=
+qemu/tcg/tcg.c:1314
+  #5  0x000055555582732d in tcg_gen_addi_i64 (ret=3D0xd18, arg1=3D0x378, ar=
+g2=3Darg2@entry=3D792) at /root/qemu/tcg/tcg-op.c:1200
+  #6  0x000055555590ffaf in gen_sse (b=3D792, a=3D<optimized out>, r=3D<opt=
+imized out>) at /root/qemu/tcg/tcg-op.h:1258
+  #7  0x000055555590ffaf in gen_sse (env=3Denv@entry=3D0x5555567424d0, s=3D=
+s@entry=3D0x7fffea99a610, b=3Db@entry=3D366, pc_start=3Dpc_start@entry=3D45=
+13509698, rex_r=3Drex_r@entry=3D0) at /root/qemu/target/i386/translate.c:31=
+50
+  #8  0x0000555555911d7f in disas_insn (s=3Ds@entry=3D0x7fffea99a610, cpu=
+=3D<optimized out>) at /root/qemu/target/i386/translate.c:8336
+  #9  0x00005555559207a0 in i386_tr_translate_insn (dcbase=3D0x7fffea99a610=
+, cpu=3D<optimized out>) at /root/qemu/target/i386/translate.c:8543
+  #10 0x0000555555892649 in translator_loop (ops=3D0x55555622dee0 <i386_tr_=
+ops>, db=3D0x7fffea99a610, cpu=3D0x55555673a220, tb=3D<optimized out>) at /=
+root/qemu/accel/tcg/translator.c:110
+  #11 0x00005555559209ef in gen_intermediate_code (cpu=3Dcpu@entry=3D0x5555=
+5673a220, tb=3Dtb@entry=3D0x7fff70682040 <code_gen_buffer+208150547>) at /r=
+oot/qemu/target/i386/translate.c:8605
+  #12 0x0000555555891437 in tb_gen_code (cpu=3Dcpu@entry=3D0x55555673a220, =
+pc=3Dpc@entry=3D4513506448, cs_base=3Dcs_base@entry=3D0, flags=3Dflags@entr=
+y=3D4244147, cflags=3Dcflags@entry=3D0) at /root/qemu/accel/tcg/translate-a=
+ll.c:1728
+  #13 0x000055555588f97b in cpu_exec (cf_mask=3D0, tb_exit=3D0, last_tb=3D0=
+x0, cpu=3D0x0) at /root/qemu/accel/tcg/cpu-exec.c:410
+  #14 0x000055555588f97b in cpu_exec (cpu=3Dcpu@entry=3D0x55555673a220) at =
+/root/qemu/accel/tcg/cpu-exec.c:734
+  #15 0x000055555584b152 in tcg_cpu_exec (cpu=3D0x55555673a220) at /root/qe=
+mu/cpus.c:1405
+  #16 0x000055555584d1b8 in qemu_tcg_rr_cpu_thread_fn (arg=3D<optimized out=
+>) at /root/qemu/cpus.c:1505
+  #17 0x00007ffff2585e25 in start_thread () at /lib64/libpthread.so.0
+  #18 0x00007ffff22afbad in clone () at /lib64/libc.so.6
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1799200/+subscriptions
