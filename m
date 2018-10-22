@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34093)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40140)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gEbji-0002UZ-0X
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 11:03:21 -0400
+	(envelope-from <bounces@canonical.com>) id 1gEc5P-0002he-Ku
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 11:25:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gEbjZ-0006wT-9J
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 11:03:12 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181018200422.4358-1-ehabkost@redhat.com>
-	<CAFEAcA9p0dLoNQy7kBdcXMz0HiMGEZTBX67Lq2SizTY3kgeksw@mail.gmail.com>
-	<20181019184408.GG31060@habkost.net>
-	<20181019215345.521d58d7@igors-macbook-pro.local>
-	<20181019202321.GM31060@habkost.net>
-	<20181022100022.0dc514b9@igors-macbook-pro.local>
-Date: Mon, 22 Oct 2018 17:02:34 +0200
-In-Reply-To: <20181022100022.0dc514b9@igors-macbook-pro.local> (Igor
-	Mammedov's message of "Mon, 22 Oct 2018 10:00:22 +0100")
-Message-ID: <87h8heaut1.fsf@dusky.pond.sub.org>
+	(envelope-from <bounces@canonical.com>) id 1gEc5L-00041K-GK
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 11:25:43 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37008)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gEc5J-0003nf-Ei
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 11:25:37 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gEc58-0000pM-CD
+	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 15:25:26 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 385762E8030
+	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 15:25:26 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/45] Machine queue, 2018-10-18
+Date: Mon, 22 Oct 2018 15:11:55 -0000
+From: martin <omgalvan.86@gmail.com>
+Reply-To: Bug 1364501 <1364501@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20140902163848.4037.99496.malonedeb@soybean.canonical.com>
+Message-Id: <154022111587.864.12784500717437008025.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1364501] Re: Gdb hangs when trying to single-step
+ after an invalid instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,84 +37,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Libvirt <libvir-list@redhat.com>, Jason Wang <jasowang@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, QEMU Developers <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Max Filippov <jcmvbkbc@gmail.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Rob Herring <robh@kernel.org>, Markus Armbruster <armbru@redhat.com>, Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>, Alistair Francis <alistair@alistair23.me>, qemu-arm <qemu-arm@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Michael Walle <michael@walle.cc>, qemu-ppc <qemu-ppc@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>, Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: qemu-devel@nongnu.org
 
-Igor Mammedov <imammedo@redhat.com> writes:
+This shouldn't be "Expired", since the bug is likely still there.
 
-> On Fri, 19 Oct 2018 17:23:21 -0300
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
->
->> On Fri, Oct 19, 2018 at 09:53:45PM +0200, Igor Mammedov wrote:
->> > On Fri, 19 Oct 2018 15:44:08 -0300
->> > Eduardo Habkost <ehabkost@redhat.com> wrote:
->> >=20
->> > > On Fri, Oct 19, 2018 at 03:12:31PM +0100, Peter Maydell wrote:
->> > > > On 18 October 2018 at 21:03, Eduardo Habkost <ehabkost@redhat.com>=
- wrote:
->> > > > > The following changes since commit 09558375a634e17cea6cfbfec883a=
-c2376d2dc7f:
->> > > > >
->> > > > >   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-targe=
-t-arm-20181016-1' into staging (2018-10-16 17:42:56 +0100)
->> > > > >
->> > > > > are available in the Git repository at:
->> > > > >
->> > > > >   git://github.com/ehabkost/qemu.git tags/machine-next-pull-requ=
-est
->> > > > >
->> > > > > for you to fetch changes up to 6d8e1bcc7dd5e819ce81e6a87fffe23e3=
-9c700cc:
->> > > > >
->> > > > >   numa: Clean up error reporting in parse_numa() (2018-10-17 16:=
-33:40 -0300)
->> > > > >
->> > > > > ----------------------------------------------------------------
->> > > > > Machine queue, 2018-10-18
->> > > > >
->> > > > > * sysbus init/realize cleanups
->> > > > >   (C=C3=A9dric Le Goater, Philippe Mathieu-Daud=C3=A9)
->> > > > > * memory-device refactoring (David Hildenbrand)
->> > > > > * -smp: deprecate incorrect CPUs topology (Igor Mammedov)
->> > > > > * -numa parsing cleanups (Markus Armbruster)
->> > > > > * Fix hostmem-file memory leak (Zhang Yi)
->> > > > > * Typo fix (Li Qiang)
->> > > > >
->> > > > > ----------------------------------------------------------------
->> > > > >
->> > > >=20
->> > > > Hi. This had some problems in merge testing, I'm afraid:
->> > > >=20
->> > > > On aarch64 host, warnings running tests/cpu-plug-test for i386 and=
- s390 targets:
->> > > >=20
->> > > > TEST: tests/cpu-plug-test... (pid=3D12602)
->> > > >   /i386/cpu-plug/pc-i440fx-3.0/cpu-add/1x3x2&maxcpus=3D12:
->> > > > qemu-system-i386: warning: Invalid CPU topology deprecated: sockets
->> > > > (1) * cores (3) * threads (2) !=3D maxcpus (12)
->> > > [...]
->> > > >=20
->> > > > (plus similar ppc64, x86_64 targets)
->> > >=20
->> > > Ouch.  Apologies.
->> > >=20
->> > > Can we please do something make sure "make check" will fail on
->> > > these cases?  I'd like to be able to trust CI systems like
->> > > travis-ci.
->> > >=20
->> >=20
->> > we probably don't want make check fail on warning.
->>=20
->> I disagree.  If a warning is blocking a pull request from being
->> merged, it must make CI systems fail too.  Otherwise we're
->> defeating the purpose of CI systems.
->
-> When we deprecate options we are bound to trigger warning which are not e=
-rrors
-> and are meant to be there until deprecated options are removed/tested by =
-make check.
-> So what would you suggest to do wrt tests that use deprecated features,
-> drop testing for it?
+-- =
 
-We commonly suppress the warning when testing.  Search for
-'if (qtest_enabled())'.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1364501
+
+Title:
+  Gdb hangs when trying to single-step after an invalid instruction
+
+Status in QEMU:
+  Expired
+
+Bug description:
+  When using Gdb to remote-debug a program and manually setting its PC
+  to point to an address containing an invalid instruction and then
+  doing a single step, Qemu will never return control to the remote Gdb.
+
+  For instance, let's say address 0x114 contains an invalid instruction.
+  On the remote Gdb, we'd do:
+
+  (gdb) set $pc =3D 0x114
+  (gdb) stepi
+
+  After doing that we won't get the (gdb) prompt unless we do a Ctrl-C.
+  If we do so we'll be left at 0x114 instead of going towards the
+  exception handler as we should. This happens with stepi, step and
+  next. If instead of single-stepping we used continue, the program will
+  proceed into the exception handler as it should.
+
+  The reason this is happening is that when Qemu realizes it's about to
+  translate an instruction it doesn't recognize it'll generate a call to
+  helper_exception_with_syndrome(), which will register the exception
+  and then call cpu_loop_exit(). At the same time, because we're doing a
+  single-step, Qemu will also generate a call to
+  helper_exception_internal() passing it an EXCP_DEBUG, which lets the
+  system know it'll give control back to the remote debugger, and it
+  also ends with a call to cpu_loop_exit(). However, because the
+  syndrome exception calls cpu_loop_exit() first, the call to the
+  internal exception won't be reached and Qemu will be stuck in a loop
+  without returning control to the remote debugger.
+
+  What makes this a bit tricky to fix is that we must call
+  cpu_loop_exit() at the end of helper_exception_with_syndrome(),
+  otherwise the target exception will go undetected and its handler
+  won't be excecuted.
+
+  Tested on latest head by emulating a Stellaris lm3s6965 board and
+  running RTEMS 4.11:
+
+  $ qemu-system-arm -nographic -s -S -M lm3s6965evb -kernel my_rtems_app
+
+  Commit hash in qemu.git: 30eaca3acdf17d7bcbd1213eb149c02037edfb0b
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1364501/+subscriptions
