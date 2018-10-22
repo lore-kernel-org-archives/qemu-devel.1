@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40140)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41722)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gEc5P-0002he-Ku
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 11:25:44 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1gEcAJ-0005JX-1O
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 11:30:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gEc5L-00041K-GK
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 11:25:43 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37008)
+	(envelope-from <pbonzini@redhat.com>) id 1gEcAE-0001Um-Iv
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 11:30:46 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:38503)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gEc5J-0003nf-Ei
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 11:25:37 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gEc58-0000pM-CD
-	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 15:25:26 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 385762E8030
-	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 15:25:26 +0000 (UTC)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gEcAE-0001SA-6j
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 11:30:42 -0400
+Received: by mail-wr1-f65.google.com with SMTP id d10-v6so5862284wrs.5
+	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 08:30:41 -0700 (PDT)
+References: <20181019010625.25294-1-cota@braap.org>
+	<f7067d72-3b2a-9e6e-4636-f18ac1cf5202@redhat.com>
+	<20181019145018.GB7279@flamenco>
+	<6190036c-cd1f-4549-9b7e-9e7913c972d4@redhat.com>
+	<20181019192932.GA17761@flamenco> <20181019234608.GA32420@flamenco>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <74e14727-1174-0b91-94ae-6f07475e583d@redhat.com>
+Date: Mon, 22 Oct 2018 17:30:37 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 22 Oct 2018 15:11:55 -0000
-From: martin <omgalvan.86@gmail.com>
-Reply-To: Bug 1364501 <1364501@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20140902163848.4037.99496.malonedeb@soybean.canonical.com>
-Message-Id: <154022111587.864.12784500717437008025.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1364501] Re: Gdb hangs when trying to single-step
- after an invalid instruction
+In-Reply-To: <20181019234608.GA32420@flamenco>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v3 0/56] per-CPU locks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,62 +33,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>, Alexander Graf <agraf@suse.de>, Alistair Francis <alistair23@gmail.com>, Andrzej Zaborowski <balrogg@gmail.com>, Anthony Green <green@moxielogic.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Chris Wulff <crwulff@gmail.com>, Cornelia Huck <cohuck@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, David Hildenbrand <david@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Fabien Chouteau <chouteau@adacore.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, James Hogan <jhogan@kernel.org>, Laurent Vivier <laurent@vivier.eu>, Marek Vasut <marex@denx.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Max Filippov <jcmvbkbc@gmail.com>, Michael Clark <mjc@sifive.com>, Michael Walle <michael@walle.cc>, Palmer Dabbelt <palmer@sifive.com>, Pavel Dovgalyuk <dovgaluk@ispras.ru>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Stafford Horne <shorne@gmail.com>
 
-This shouldn't be "Expired", since the bug is likely still there.
+On 20/10/2018 01:46, Emilio G. Cota wrote:
+>> So it is possible that it was my implementation, and not the approach,
+>> what was at fault :-)
+> I've just observed a similar hang after adding the "BQL
+> pushdown" patches on top of this series. So it's likely that the
+> hangs come from those patches, and not from the work on
+> cpu->interrupt_request. I just confirmed with the prior
+> series, and removing the pushdown patches fixes the hangs there
+> as well.
 
--- =
+Oh well, not a big deal.  You already wrote these patches and I don't
+have much time for MTTCG anyway, so I am okay with sticking with them.
+Thanks!
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1364501
-
-Title:
-  Gdb hangs when trying to single-step after an invalid instruction
-
-Status in QEMU:
-  Expired
-
-Bug description:
-  When using Gdb to remote-debug a program and manually setting its PC
-  to point to an address containing an invalid instruction and then
-  doing a single step, Qemu will never return control to the remote Gdb.
-
-  For instance, let's say address 0x114 contains an invalid instruction.
-  On the remote Gdb, we'd do:
-
-  (gdb) set $pc =3D 0x114
-  (gdb) stepi
-
-  After doing that we won't get the (gdb) prompt unless we do a Ctrl-C.
-  If we do so we'll be left at 0x114 instead of going towards the
-  exception handler as we should. This happens with stepi, step and
-  next. If instead of single-stepping we used continue, the program will
-  proceed into the exception handler as it should.
-
-  The reason this is happening is that when Qemu realizes it's about to
-  translate an instruction it doesn't recognize it'll generate a call to
-  helper_exception_with_syndrome(), which will register the exception
-  and then call cpu_loop_exit(). At the same time, because we're doing a
-  single-step, Qemu will also generate a call to
-  helper_exception_internal() passing it an EXCP_DEBUG, which lets the
-  system know it'll give control back to the remote debugger, and it
-  also ends with a call to cpu_loop_exit(). However, because the
-  syndrome exception calls cpu_loop_exit() first, the call to the
-  internal exception won't be reached and Qemu will be stuck in a loop
-  without returning control to the remote debugger.
-
-  What makes this a bit tricky to fix is that we must call
-  cpu_loop_exit() at the end of helper_exception_with_syndrome(),
-  otherwise the target exception will go undetected and its handler
-  won't be excecuted.
-
-  Tested on latest head by emulating a Stellaris lm3s6965 board and
-  running RTEMS 4.11:
-
-  $ qemu-system-arm -nographic -s -S -M lm3s6965evb -kernel my_rtems_app
-
-  Commit hash in qemu.git: 30eaca3acdf17d7bcbd1213eb149c02037edfb0b
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1364501/+subscriptions
+Paolo
