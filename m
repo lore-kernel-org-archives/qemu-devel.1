@@ -1,49 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55297)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jl4312@columbia.edu>) id 1gEbQr-00031e-R8
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 10:43:50 -0400
+	(envelope-from <imammedo@redhat.com>) id 1gEbUZ-0004l0-6i
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 10:47:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jl4312@columbia.edu>) id 1gEbQn-0002vs-Qq
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 10:43:49 -0400
-Received: from outprodmail01.cc.columbia.edu ([128.59.72.39]:37222)
+	(envelope-from <imammedo@redhat.com>) id 1gEbUV-0005rs-3T
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 10:47:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33146)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jl4312@columbia.edu>) id 1gEbQn-0002v0-IO
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 10:43:45 -0400
-Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
-	by outprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
-	w9MEhEik023603
-	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 10:43:44 -0400
-Received: from hazelnut (localhost.localdomain [127.0.0.1])
-	by hazelnut (Postfix) with ESMTP id 983336D
-	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 10:43:44 -0400 (EDT)
-Received: from sendprodmail04.cc.columbia.edu (sendprodmail04.cc.columbia.edu
-	[128.59.72.16]) by hazelnut (Postfix) with ESMTP id 78C7080
-	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 10:43:44 -0400 (EDT)
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
-	[209.85.208.71])
-	by sendprodmail04.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
-	w9MEhhE9035269
-	(version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 10:43:44 -0400
-Received: by mail-ed1-f71.google.com with SMTP id h24-v6so24732797eda.10
-	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 07:43:44 -0700 (PDT)
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com.
-	[209.85.128.42]) by smtp.gmail.com with ESMTPSA id
-	gy12-v6sm6820379ejb.32.2018.10.22.07.43.41
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 22 Oct 2018 07:43:41 -0700 (PDT)
-Received: by mail-wm1-f42.google.com with SMTP id y144-v6so10611176wmd.4
-	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 07:43:41 -0700 (PDT)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gEbUU-0005qs-ME
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 10:47:35 -0400
+Date: Mon, 22 Oct 2018 15:47:21 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181022154721.630591b6@igors-macbook-pro.local>
+In-Reply-To: <20180912125531.32131-3-marcandre.lureau@redhat.com>
+References: <20180912125531.32131-1-marcandre.lureau@redhat.com>
+	<20180912125531.32131-3-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-References: <CAHyh4xiVxNOxwWeKDw2ccAURx3zRMTd+nVLD=oav6ShqCBdjXw@mail.gmail.com>
-	<20181022092710.GH32717@xz-x1>
-In-Reply-To: <20181022092710.GH32717@xz-x1>
-From: Jintack Lim <jintack@cs.columbia.edu>
-Date: Mon, 22 Oct 2018 10:43:32 -0400
-Message-ID: <CAHyh4xgOkoPokm5GQSH8dBDRrB-o1_MLhO8SnWK71VahUL8f+w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Virtual IOMMU is working for Windows VM?
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/9] accel: register global_props like
+ machine globals
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -52,60 +28,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: QEMU Devel Mailing List <qemu-devel@nongnu.org>, lprosek@redhat.com
+To: =?UTF-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, sstabellini@kernel.org, Eduardo Habkost <ehabkost@redhat.com>, xen-devel@lists.xenproject.org, Richard Henderson <rth@twiddle.net>
 
-On Mon, Oct 22, 2018 at 5:27 AM Peter Xu <peterx@redhat.com> wrote:
->
-> On Mon, Oct 22, 2018 at 12:22:02AM -0400, Jintack Lim wrote:
-> > Hi,
-> >
-> > I wonder if vIOMMU is working for Windows VM?
-> >
-> > I tried it with v2.11.0, but it didn't seem to work. I assume that seaBIOS
-> > sets IOMMU on by default as is the case when I launched a Linux VM. But I
-> > might be missing something. Can somebody shed some light on it?
->
-> Hi, Jintack,
->
+On Wed, 12 Sep 2018 16:55:24 +0400
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
 
-Thanks Peter,
+> global_props is only used for Xen xen_compat_props. It's a static
+minor nit:
+should be AccelClass::global_props
 
-> I think at least the latest QEMU should work for Windows, but I don't
-> really run Windows that frequently.
->
-> What is the error you've encountered?  Have you tried the latest QEMU,
-> or switching Windows versions to try?
+> array of GlobalProperty, like machine globals in SET_MACHINE_COMPAT().
+> Let's register the globals the same way, without extra copy allocation.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+otherwise looks good to me, CCing xen folks since it concerns them.
 
-I ran Windows commands in Windows Powershell like below. Well, I guess
-this is not the best way to check IOMMU presence, but couldn't find a
-better way to do it.
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-$ (Get-VMHost).IovSupport
-false
-$ (Get-VMHost).IovSupportReasons
-The chipset on the system does not do DMA remapping, ...
 
-I just tried QEMU v3.0.0, but I see the same symptom. I'm using
-Windows server 2016.  Unfortunately, trying another Windows version
-would be hard for me at this point.
-
-I just wonder if there's way to check if Vt-d is on in SeaBIOS?
-
->
-> What I can remember about Windows is that Ladi had fixed a bug for
-> windows-only (8991c460be, "intel_iommu: relax iq tail check on
-> VTD_GCMD_QIE enable", 2017-07-03) but it should be even in 2.10 so I
-> guess it's not the problem you've encountered.
-
-I'm CCing Ladi, just in case he has some idea :)
-
-Thanks,
-Jintack
-
->
-> Regards,
->
-> --
-> Peter Xu
->
+> ---
+>  include/hw/qdev-properties.h | 29 -----------------------------
+>  accel/accel.c                |  9 ++++++++-
+>  hw/core/qdev-properties.c    | 21 ---------------------
+>  3 files changed, 8 insertions(+), 51 deletions(-)
+>=20
+> diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+> index 4f60cc88f3..a95f4a73eb 100644
+> --- a/include/hw/qdev-properties.h
+> +++ b/include/hw/qdev-properties.h
+> @@ -255,35 +255,6 @@ void qdev_prop_set_globals(DeviceState *dev);
+>  void error_set_from_qdev_prop_error(Error **errp, int ret, DeviceState *=
+dev,
+>                                      Property *prop, const char *value);
+> =20
+> -/**
+> - * register_compat_prop:
+> - *
+> - * Register internal (not user-provided) global property, changing the
+> - * default value of a given property in a device type.  This can be used
+> - * for enabling machine-type compatibility or for enabling
+> - * accelerator-specific defaults in devices.
+> - *
+> - * The property values set using this function must be always valid and
+> - * never report setter errors, as the property will have
+> - * GlobalProperty::errp set to &error_abort.
+> - *
+> - * User-provided global properties should override internal global
+> - * properties, so callers of this function should ensure that it is
+> - * called before user-provided global properties are registered.
+> - *
+> - * @driver: Device type to be affected
+> - * @property: Property whose default value is going to be changed
+> - * @value: New default value for the property
+> - */
+> -void register_compat_prop(const char *driver, const char *property,
+> -                          const char *value);
+> -/*
+> - * register_compat_props_array(): using register_compat_prop(), which
+> - * only registers internal global properties (which has lower priority
+> - * than user-provided global properties)
+> - */
+> -void register_compat_props_array(GlobalProperty *prop);
+> -
+>  /**
+>   * qdev_property_add_static:
+>   * @dev: Device to add the property to.
+> diff --git a/accel/accel.c b/accel/accel.c
+> index 966b2d8f53..3da26eb90f 100644
+> --- a/accel/accel.c
+> +++ b/accel/accel.c
+> @@ -34,6 +34,7 @@
+>  #include "qom/object.h"
+>  #include "qemu/error-report.h"
+>  #include "qemu/option.h"
+> +#include "qapi/error.h"
+> =20
+>  static const TypeInfo accel_type =3D {
+>      .name =3D TYPE_ACCEL,
+> @@ -121,7 +122,13 @@ void configure_accelerator(MachineState *ms)
+>  void accel_register_compat_props(AccelState *accel)
+>  {
+>      AccelClass *class =3D ACCEL_GET_CLASS(accel);
+> -    register_compat_props_array(class->global_props);
+> +    GlobalProperty *prop =3D class->global_props;
+> +
+> +    for (; prop && prop->driver; prop++) {
+> +        /* Any compat_props must never cause error */
+> +        prop->errp =3D &error_abort;
+> +        qdev_prop_register_global(prop);
+> +    }
+>  }
+> =20
+>  void accel_setup_post(MachineState *ms)
+> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+> index 35072dec1e..ab61d502fd 100644
+> --- a/hw/core/qdev-properties.c
+> +++ b/hw/core/qdev-properties.c
+> @@ -1180,27 +1180,6 @@ void qdev_prop_register_global(GlobalProperty *pro=
+p)
+>      global_props =3D g_list_append(global_props, prop);
+>  }
+> =20
+> -void register_compat_prop(const char *driver,
+> -                          const char *property,
+> -                          const char *value)
+> -{
+> -    GlobalProperty *p =3D g_new0(GlobalProperty, 1);
+> -
+> -    /* Any compat_props must never cause error */
+> -    p->errp =3D &error_abort;
+> -    p->driver =3D driver;
+> -    p->property =3D property;
+> -    p->value =3D value;
+> -    qdev_prop_register_global(p);
+> -}
+> -
+> -void register_compat_props_array(GlobalProperty *prop)
+> -{
+> -    for (; prop && prop->driver; prop++) {
+> -        register_compat_prop(prop->driver, prop->property, prop->value);
+> -    }
+> -}
+> -
+>  void qdev_prop_register_global_list(GlobalProperty *props)
+>  {
+>      int i;
