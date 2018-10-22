@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46243)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46296)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEZn4-0000f5-EL
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:39 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEZn5-0000gE-Ju
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEZn2-0008MR-IX
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:38 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:33774 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEZn4-0008NZ-D4
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:39 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:33777 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gEZn0-00089V-Cp
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:34 -0400
+	id 1gEZn0-00089m-Go
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:36 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 22 Oct 2018 14:57:48 +0200
-Message-Id: <1540213077-15211-26-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 22 Oct 2018 14:57:52 +0200
+Message-Id: <1540213077-15211-30-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1540213077-15211-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1540213077-15211-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL 25/34] tests/tcg/mips: Test R5900 three-operand
- MULT1
+Subject: [Qemu-devel] [PULL 29/34] tests/tcg/mips: Test R5900 DIV1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,84 +29,109 @@ Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
 From: Fredrik Noring <noring@nocrew.org>
 
-Add a test for MULT1.
+Add a test for DIV1.
 
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Fredrik Noring <noring@nocrew.org>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- tests/tcg/mips/mipsr5900/mult.c | 45 +++++++++++++++++++++++++++++++++--------
- 1 file changed, 37 insertions(+), 8 deletions(-)
+ tests/tcg/mips/mipsr5900/Makefile |  3 +-
+ tests/tcg/mips/mipsr5900/div1.c   | 73 +++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 75 insertions(+), 1 deletion(-)
+ create mode 100644 tests/tcg/mips/mipsr5900/div1.c
 
-diff --git a/tests/tcg/mips/mipsr5900/mult.c b/tests/tcg/mips/mipsr5900/mult.c
-index 2c0c16d..5710b39 100644
---- a/tests/tcg/mips/mipsr5900/mult.c
-+++ b/tests/tcg/mips/mipsr5900/mult.c
-@@ -1,5 +1,5 @@
- /*
-- * Test R5900-specific three-operand MULT.
-+ * Test R5900-specific three-operand MULT and MULT1.
-  */
+diff --git a/tests/tcg/mips/mipsr5900/Makefile b/tests/tcg/mips/mipsr5900/Makefile
+index 287c248..757eb83 100644
+--- a/tests/tcg/mips/mipsr5900/Makefile
++++ b/tests/tcg/mips/mipsr5900/Makefile
+@@ -8,7 +8,8 @@ SIM_FLAGS=-cpu R5900
+ CC      = $(CROSS)gcc
+ CFLAGS  = -Wall -mabi=32 -march=r5900 -static
  
- #include <stdio.h>
-@@ -25,12 +25,41 @@ static int64_t mult(int32_t rs, int32_t rt)
-     return r;
- }
- 
-+static int64_t mult1(int32_t rs, int32_t rt)
+-TESTCASES = mflohi1.tst
++TESTCASES = div1.tst
++TESTCASES += mflohi1.tst
+ TESTCASES += mtlohi1.tst
+ TESTCASES += mult.tst
+ TESTCASES += multu.tst
+diff --git a/tests/tcg/mips/mipsr5900/div1.c b/tests/tcg/mips/mipsr5900/div1.c
+new file mode 100644
+index 0000000..83dafa0
+--- /dev/null
++++ b/tests/tcg/mips/mipsr5900/div1.c
+@@ -0,0 +1,73 @@
++/*
++ * Test R5900-specific DIV1.
++ */
++
++#include <stdio.h>
++#include <inttypes.h>
++#include <assert.h>
++
++struct quotient_remainder { int32_t quotient, remainder; };
++
++static struct quotient_remainder div1(int32_t rs, int32_t rt)
 +{
-+    int32_t rd, lo, hi;
-+    int64_t r;
++    int32_t lo, hi;
 +
 +    __asm__ __volatile__ (
-+            "    mult1 %0, %3, %4\n"
-+            "    mflo1 %1\n"
-+            "    mfhi1 %2\n"
-+            : "=r" (rd), "=r" (lo), "=r" (hi)
++            "    div1 $0, %2, %3\n"
++            "    mflo1 %0\n"
++            "    mfhi1 %1\n"
++            : "=r" (lo), "=r" (hi)
 +            : "r" (rs), "r" (rt));
-+    r = ((int64_t)hi << 32) | (uint32_t)lo;
 +
-+    assert((int64_t)rs * rt == r);
-+    assert(rd == lo);
++    assert(rs / rt == lo);
++    assert(rs % rt == hi);
 +
-+    return r;
++    return (struct quotient_remainder) { .quotient = lo, .remainder = hi };
 +}
 +
-+static int64_t mult_variants(int32_t rs, int32_t rt)
++static void verify_div1(int32_t rs, int32_t rt,
++                        int32_t expected_quotient,
++                        int32_t expected_remainder)
 +{
-+    int64_t rd  = mult(rs, rt);
-+    int64_t rd1 = mult1(rs, rt);
++    struct quotient_remainder qr = div1(rs, rt);
 +
-+    assert(rd == rd1);
-+
-+    return rd;
++    assert(qr.quotient == expected_quotient);
++    assert(qr.remainder == expected_remainder);
 +}
 +
- static void verify_mult_negations(int32_t rs, int32_t rt, int64_t expected)
- {
--    assert(mult(rs, rt) == expected);
--    assert(mult(-rs, rt) == -expected);
--    assert(mult(rs, -rt) == -expected);
--    assert(mult(-rs, -rt) == expected);
-+    assert(mult_variants(rs, rt) == expected);
-+    assert(mult_variants(-rs, rt) == -expected);
-+    assert(mult_variants(rs, -rt) == -expected);
-+    assert(mult_variants(-rs, -rt) == expected);
- }
- 
- int main()
-@@ -39,9 +68,9 @@ int main()
-     verify_mult_negations(77773, 99991, 7776600043);
-     verify_mult_negations(12207031, 305175781, 3725290219116211);
- 
--    assert(mult(-0x80000000,  0x7FFFFFFF) == -0x3FFFFFFF80000000);
--    assert(mult(-0x80000000, -0x7FFFFFFF) ==  0x3FFFFFFF80000000);
--    assert(mult(-0x80000000, -0x80000000) ==  0x4000000000000000);
-+    assert(mult_variants(-0x80000000,  0x7FFFFFFF) == -0x3FFFFFFF80000000);
-+    assert(mult_variants(-0x80000000, -0x7FFFFFFF) ==  0x3FFFFFFF80000000);
-+    assert(mult_variants(-0x80000000, -0x80000000) ==  0x4000000000000000);
- 
-     return 0;
- }
++static void verify_div1_negations(int32_t rs, int32_t rt,
++                                  int32_t expected_quotient,
++                                  int32_t expected_remainder)
++{
++    verify_div1(rs, rt, expected_quotient, expected_remainder);
++    verify_div1(rs, -rt, -expected_quotient, expected_remainder);
++    verify_div1(-rs, rt, -expected_quotient, -expected_remainder);
++    verify_div1(-rs, -rt, expected_quotient, -expected_remainder);
++}
++
++int main()
++{
++    verify_div1_negations(0, 1, 0, 0);
++    verify_div1_negations(1, 1, 1, 0);
++    verify_div1_negations(1, 2, 0, 1);
++    verify_div1_negations(17, 19, 0, 17);
++    verify_div1_negations(19, 17, 1, 2);
++    verify_div1_negations(77773, 101, 770, 3);
++
++    verify_div1(-0x80000000,  1, -0x80000000, 0);
++
++    /*
++     * Supplementary explanation from the Toshiba TX System RISC TX79 Core
++     * Architecture manual, A-38 and B-7, https://wiki.qemu.org/File:C790.pdf
++     *
++     * Normally, when 0x80000000 (-2147483648) the signed minimum value is
++     * divided by 0xFFFFFFFF (-1), the operation will result in an overflow.
++     * However, in this instruction an overflow exception doesn't occur and
++     * the result will be as follows:
++     *
++     * Quotient is 0x80000000 (-2147483648), and remainder is 0x00000000 (0).
++     */
++    verify_div1(-0x80000000, -1, -0x80000000, 0);
++
++    return 0;
++}
 -- 
 2.7.4
