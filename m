@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38185)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45833)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gEZPo-0002PP-RB
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:40 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEZmb-0008N1-G4
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gEZPm-0003BK-4m
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46277)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEZmX-00082o-IO
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:09 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:33234 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gEZPl-0002wG-Nh
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:33 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C198783F3C
-	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 12:34:20 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-34.ams2.redhat.com
-	[10.36.117.34])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 8A8F5751C3
-	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 12:34:20 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 22 Oct 2018 14:33:56 +0200
-Message-Id: <20181022123413.28044-24-armbru@redhat.com>
-In-Reply-To: <20181022123413.28044-1-armbru@redhat.com>
-References: <20181022123413.28044-1-armbru@redhat.com>
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1gEZmX-000818-AO
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:05 -0400
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Date: Mon, 22 Oct 2018 14:57:24 +0200
+Message-Id: <1540213077-15211-2-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1540213077-15211-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1540213077-15211-1-git-send-email-aleksandar.markovic@rt-rk.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 23/40] vl: Clean up error reporting in
- machine_set_property()
+Subject: [Qemu-devel] [PULL 01/34] target/mips: Define R5900 ISA, MMI ASE,
+ and R5900 CPU preprocessor constants
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,48 +29,60 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
-Calling error_report() in a function that takes an Error ** argument
-is suspicious.  machine_set_property() does that, and then fails without
-setting an error.  Its caller main(), via qemu_opts_foreach(), is fine
-with it, but clean it up anyway.
+From: Fredrik Noring <noring@nocrew.org>
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20181017082702.5581-22-armbru@redhat.com>
+The R5900 implements the 64-bit MIPS III instruction set except
+DMULT, DMULTU, DDIV, DDIVU, LL, SC, LLD and SCD. The MIPS IV
+instructions MOVN, MOVZ and PREF are implemented. It has the
+R5900-specific three-operand instructions MADD, MADDU, MULT and
+MULTU as well as pipeline 1 versions MULT1, MULTU1, DIV1, DIVU1,
+MADD1, MADDU1, MFHI1, MFLO1, MTHI1 and MTLO1. A set of 93 128-bit
+multimedia instructions specific to the R5900 is also implemented.
+
+The Toshiba TX System RISC TX79 Core Architecture manual:
+
+https://wiki.qemu.org/File:C790.pdf
+
+describes the C790 processor that is a follow-up to the R5900. There
+are a few notable differences in that the R5900 FPU
+
+- is not IEEE 754-1985 compliant,
+- does not implement double format, and
+- its machine code is nonstandard.
+
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Signed-off-by: Fredrik Noring <noring@nocrew.org>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- vl.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ target/mips/mips-defs.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/vl.c b/vl.c
-index d84857c064..0b69871295 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2677,7 +2677,7 @@ static int machine_set_property(void *opaque,
-     g_free(qom_name);
+diff --git a/target/mips/mips-defs.h b/target/mips/mips-defs.h
+index 71ea4ef..5177618 100644
+--- a/target/mips/mips-defs.h
++++ b/target/mips/mips-defs.h
+@@ -64,9 +64,11 @@
+ #define INSN_LOONGSON2E   0x0001000000000000ULL
+ #define INSN_LOONGSON2F   0x0002000000000000ULL
+ #define INSN_VR54XX       0x0004000000000000ULL
++#define INSN_R5900        0x0008000000000000ULL
+ /*
+  *   bits 56-63: vendor-specific ASEs
+  */
++#define ASE_MMI           0x0100000000000000ULL
 =20
-     if (local_err) {
--        error_report_err(local_err);
-+        error_propagate(errp, local_err);
-         return -1;
-     }
-=20
-@@ -4249,11 +4249,8 @@ int main(int argc, char **argv, char **envp)
-     }
-=20
-     machine_opts =3D qemu_get_machine_opts();
--    if (qemu_opt_foreach(machine_opts, machine_set_property, current_mac=
-hine,
--                         NULL)) {
--        object_unref(OBJECT(current_machine));
--        exit(1);
--    }
-+    qemu_opt_foreach(machine_opts, machine_set_property, current_machine=
-,
-+                     &error_fatal);
-=20
-     configure_accelerator(current_machine);
+ /* MIPS CPU defines. */
+ #define		CPU_MIPS1	(ISA_MIPS1)
+@@ -74,6 +76,7 @@
+ #define		CPU_MIPS3	(CPU_MIPS2 | ISA_MIPS3)
+ #define		CPU_MIPS4	(CPU_MIPS3 | ISA_MIPS4)
+ #define		CPU_VR54XX	(CPU_MIPS4 | INSN_VR54XX)
++#define         CPU_R5900       (CPU_MIPS3 | INSN_R5900)
+ #define		CPU_LOONGSON2E  (CPU_MIPS3 | INSN_LOONGSON2E)
+ #define		CPU_LOONGSON2F  (CPU_MIPS3 | INSN_LOONGSON2F)
 =20
 --=20
-2.17.2
+2.7.4
