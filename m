@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35731)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37739)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gEetg-0002x4-FA
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:25:49 -0400
+	(envelope-from <macro@linux-mips.org>) id 1gEezr-0005kb-87
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:32:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gEetc-0003fd-F0
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:25:48 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:45496)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gEetc-0003cM-7O
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:25:44 -0400
-Received: by mail-wr1-f68.google.com with SMTP id f17-v6so14277865wrs.12
-	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 11:25:41 -0700 (PDT)
-References: <20181022181623.8810-1-richard.henderson@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <615be422-c338-a4bb-cf66-eeda2b553b7c@redhat.com>
-Date: Mon, 22 Oct 2018 20:25:38 +0200
+	(envelope-from <macro@linux-mips.org>) id 1gEezn-0007fY-3a
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:32:11 -0400
+Received: from eddie.linux-mips.org ([148.251.95.138]:36832
+	helo=cvs.linux-mips.org) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <macro@linux-mips.org>) id 1gEezm-0007ZX-NC
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:32:06 -0400
+Received: (from localhost user: 'macro', uid#1010) by eddie.linux-mips.org
+	with ESMTP id S23994612AbeJVSb5gtqAL (ORCPT
+	<rfc822;qemu-devel@nongnu.org>); Mon, 22 Oct 2018 20:31:57 +0200
+Date: Mon, 22 Oct 2018 19:31:57 +0100 (BST)
+Sender: "Maciej W. Rozycki" <macro@linux-mips.org>
+From: "Maciej W. Rozycki" <macro@linux-mips.org>
+In-Reply-To: <20181022172343.GB2331@sx9>
+Message-ID: <alpine.LFD.2.21.1810221901170.19280@eddie.linux-mips.org>
+References: <cover.1540134918.git.noring@nocrew.org>
+	<BN6PR2201MB125165723113459889A6EC59C6F40@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	<20181022172343.GB2331@sx9>
 MIME-Version: 1.0
-In-Reply-To: <20181022181623.8810-1-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH, build fix] osdep: Work around MinGW assert
+Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH v8 00/38] target/mips: Limited support for
+ the R5900
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +32,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: Fredrik Noring <noring@nocrew.org>
+Cc: Aleksandar Markovic <amarkovic@wavecomp.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Petar Jovanovic <pjovanovic@wavecomp.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?J=C3=BCrgen_Urban?= <JuergenUrban@gmx.de>, qemu-devel@nongnu.org
 
-On 22/10/18 20:16, Richard Henderson wrote:
-> In several places we use assert(FEATURE), and assume that if FEATURE
-> is disabled, all following code is removed as unreachable.  Which allows
-> us to compile-out functions that are only present with FEATURE, and
-> have a link-time failure if the functions remain used.
-> 
-> MinGW does not mark its internal function _assert() as noreturn, so the
-> compiler cannot see when code is unreachable, which leads to link errors
-> for this host that are not present elsewhere.
-> 
-> The current build-time failure concerns 62823083b8a2, but I remember
-> having seen this same error before.  Fix it once and for all for MinGW.
-> 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Hi Maciej,
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> > I added ASE_MMI flag along with INSN_R5900, I think this fits better in
+> > the overall MIPS for QEMU design.
+> 
+> Maciej -- can we add "MMI" under "ASEs implemented" in the kernel too,
+> even if it is a vendor-specific architecture extension that normally
+> isn't counted as an ASE? QEMU simply calls these "vendor specific ASEs".
 
-> ---
->   include/qemu/osdep.h | 12 ++++++++++++
->   1 file changed, 12 insertions(+)
+ I have no authority to approve such a change for the kernel, but it looks 
+reasonable to me and I will support you with it, with one reservation 
+however.  As this is an ISA extension in the vendor-specific space, I 
+think it belongs to a vendor-specific namespace, so as to make it clear it 
+is not a generic architectural feature and also to avoid name clashes.
+
+ So it has to be called Toshiba MMI or suchlike, similarly to how I 
+requested that for the Longsoon MMI feature in a recent binutils review 
+(cf <https://sourceware.org/ml/binutils/2018-07/msg00201.html> and 
+binutils commit 8095d2f70e1a ("MIPS/GAS: Split Loongson MMI Instructions 
+from loongson2f/3a")), with all the consequences throughout.
+
+> Aleksandar -- please or ASE_MMI to insn_flags here:
 > 
-> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-> index 4f8559e550..0c1e335a43 100644
-> --- a/include/qemu/osdep.h
-> +++ b/include/qemu/osdep.h
-> @@ -122,6 +122,18 @@ extern int daemon(int, int);
->   #include "glib-compat.h"
->   #include "qemu/typedefs.h"
->   
-> +/*
-> + * For mingw, as of v6.0.0, the function implementing the assert macro is
-> + * not marked a noreturn, so the compiler cannot delete code following an
-> + * assert(false) as unused.  We rely on this within the code base to delete
-> + * code that is unreachable when features are disabled.
-> + * All supported versions of Glib's g_assert() satisfy this requirement.
-> + */
-> +#ifdef __MINGW32__
-> +#undef assert
-> +#define assert(x)  g_assert(x)
-> +#endif
-> +
->   /*
->    * According to waitpid man page:
->    * WCOREDUMP
-> 
+> --- a/target/mips/translate_init.inc.c
+> +++ b/target/mips/translate_init.inc.c
+> @@ -466,7 +466,7 @@ const mips_def_t mips_defs[] =
+>  #endif /* !CONFIG_USER_ONLY */
+>          .SEGBITS = 32,
+>          .PABITS = 32,
+> -        .insn_flags = CPU_R5900,
+> +        .insn_flags = CPU_R5900 | ASE_MMI,
+>          .mmu_type = MMU_TYPE_R4000,
+>      },
+>      {
+
+ So I think it better be called ASE_TOSHIBA_MMI here.
+
+> Strictly speaking, MADD, MADDU, MULT, MULTU, MULT1, MULTU1, DIV1, DIVU1,
+> MADD1, MADDU1, MFHI1, MFLO1, MTHI1 and MTLO1 are not part of what the
+> Toshiba TX System RISC TX79 Core Architecture manual specifies as
+> "Multimedia Instructions", section B.3.2, on page B-3, even though
+> their opcodes are covered by TX79_CLASS_MMI and the decode_tx79_mmi
+> function. Can we adjust ASE_MMI for QEMU accordingly?
+
+ NB all but pipeline 1 instructions of these are also implemented by other 
+members of the TXx9 family.  They seem to be referred to as just "multiply 
+and multiply-add instructions" in the TX79 manual (cf Section B.3.1).
+
+> Also, doesn't it make sense to cover LQ and SQ with ASE_MMI as well, as
+> those two really are MMIs?
+
+ And they're certainly listed as such in the TX79 manual (cf Section 
+B.3.2).
+
+> Regarding the R5900 FPU: It appears reasonable to introduce an ELF ABI
+> variant for the nonstandard R5900 FPU.
+
+ Indeed and in particular given that the R5900 does not produce any FPU 
+exceptions it should be quite straightforward for the Linux kernel to 
+recognise this specific ABI annotation with ELF binaries and switch its FP 
+environment between R5900 native float and IEEE 754 emulated float 
+accordingly.  We could then make QEMU run in the user emulation mode do 
+the same.
+
+ Of course all the pieces of the toolchain as well as the dynamic loader 
+in use would have to taught to prevent incompatible pieces of hard float 
+code from being used together.
+
+  Maciej
