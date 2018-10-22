@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39374)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39436)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gEf65-0000Xg-F0
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:38:40 -0400
+	(envelope-from <sameo@linux.intel.com>) id 1gEf6N-0000sj-4x
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:38:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gEf64-0004YY-Aq
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:38:37 -0400
+	(envelope-from <sameo@linux.intel.com>) id 1gEf6H-0004nG-0w
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:38:53 -0400
 Received: from mga01.intel.com ([192.55.52.88]:7878)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sameo@linux.intel.com>)
-	id 1gEf63-0004Je-Ss
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:38:36 -0400
+	id 1gEf6G-0004Je-KM
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:38:48 -0400
 From: Samuel Ortiz <sameo@linux.intel.com>
-Date: Mon, 22 Oct 2018 20:36:45 +0200
-Message-Id: <20181022183656.4902-16-sameo@linux.intel.com>
+Date: Mon, 22 Oct 2018 20:36:46 +0200
+Message-Id: <20181022183656.4902-17-sameo@linux.intel.com>
 In-Reply-To: <20181022183656.4902-1-sameo@linux.intel.com>
 References: <20181022183656.4902-1-sameo@linux.intel.com>
-Subject: [Qemu-devel] [PATCH 15/26] hw: acpi: Retrieve the PCI bus from
- AcpiPciHpState
+Subject: [Qemu-devel] [PATCH 16/26] hw: fw-build: Add firmware build methods
+ and state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,128 +26,116 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Sebastien Boeuf <sebastien.boeuf@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Samuel Ortiz <sameo@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-From: Sebastien Boeuf <sebastien.boeuf@intel.com>
+In order to decouple ACPI APIs from specific machine types, we are
+adding granular firmware build methods to the generic MachineClass
+structure. This way, a new machine type can re-use the high level ACPI
+APIs and define some custom table build methods, without having to
+duplicate most of the existing implementation only to add small
+variations to it.
 
-Instead of using the machine type specific method find_i440fx() to
-retrieve the PCI bus, this commit aims to rely on the fact that the
-PCI bus is known by the structure AcpiPciHpState.
-
-When the structure is initialized through acpi_pcihp_init() call,
-it saves the PCI bus, which means there is no need to invoke a
-special function later on.
-
-Based on the fact that find_i440fx() was only used there, this
-patch also removes the function find_i440fx() itself from the
-entire codebase.
-
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
 Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
-Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
+Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
 ---
- hw/acpi/pcihp.c       | 10 ++++------
- hw/pci-host/piix.c    |  8 --------
- include/hw/i386/pc.h  |  1 -
- stubs/Makefile.objs   |  1 -
- stubs/pci-host-piix.c |  6 ------
- 5 files changed, 4 insertions(+), 22 deletions(-)
- delete mode 100644 stubs/pci-host-piix.c
+ include/hw/boards.h   |  5 ++++
+ include/hw/fw-build.h | 57 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 62 insertions(+)
+ create mode 100644 include/hw/fw-build.h
 
-diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
-index 80d42e12ff..254b2e50ab 100644
---- a/hw/acpi/pcihp.c
-+++ b/hw/acpi/pcihp.c
-@@ -93,10 +93,9 @@ static void *acpi_set_bsel(PCIBus *bus, void *opaque)
-     return bsel_alloc;
- }
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index f82f28468b..a5c8fe6ed2 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -5,6 +5,7 @@
  
--static void acpi_set_pci_info(void)
-+static void acpi_set_pci_info(AcpiPciHpState *s)
- {
-     static bool bsel_is_set;
--    PCIBus *bus;
-     unsigned bsel_alloc = ACPI_PCIHP_BSEL_DEFAULT;
+ #include "sysemu/blockdev.h"
+ #include "sysemu/accel.h"
++#include "hw/fw-build.h"
+ #include "hw/qdev.h"
+ #include "qom/object.h"
+ #include "qom/cpu.h"
+@@ -214,6 +215,8 @@ struct MachineClass {
+                                                          unsigned cpu_index);
+     const CPUArchIdList *(*possible_cpu_arch_ids)(MachineState *machine);
+     int64_t (*get_default_cpu_node_id)(const MachineState *ms, int idx);
++
++    FirmwareBuildMethods firmware_build_methods;
+ };
  
-     if (bsel_is_set) {
-@@ -104,10 +103,9 @@ static void acpi_set_pci_info(void)
-     }
-     bsel_is_set = true;
+ /**
+@@ -269,6 +272,8 @@ struct MachineState {
+     const char *cpu_type;
+     AccelState *accelerator;
+     CPUArchIdList *possible_cpus;
++
++    FirmwareBuildState firmware_build_state;
+ };
  
--    bus = find_i440fx(); /* TODO: Q35 support */
--    if (bus) {
-+    if (s->root) {
-         /* Scan all PCI buses. Set property to enable acpi based hotplug. */
--        pci_for_each_bus_depth_first(bus, acpi_set_bsel, NULL, &bsel_alloc);
-+        pci_for_each_bus_depth_first(s->root, acpi_set_bsel, NULL, &bsel_alloc);
-     }
- }
- 
-@@ -213,7 +211,7 @@ static void acpi_pcihp_update(AcpiPciHpState *s)
- 
- void acpi_pcihp_reset(AcpiPciHpState *s)
- {
--    acpi_set_pci_info();
-+    acpi_set_pci_info(s);
-     acpi_pcihp_update(s);
- }
- 
-diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
-index da73743fa2..4940f59c9b 100644
---- a/hw/pci-host/piix.c
-+++ b/hw/pci-host/piix.c
-@@ -445,14 +445,6 @@ PCIBus *i440fx_init(const char *host_type, const char *pci_type,
-     return b;
- }
- 
--PCIBus *find_i440fx(void)
--{
--    PCIHostState *s = OBJECT_CHECK(PCIHostState,
--                                   object_resolve_path("/machine/i440fx", NULL),
--                                   TYPE_PCI_HOST_BRIDGE);
--    return s ? s->bus : NULL;
--}
--
- /* PIIX3 PCI to ISA bridge */
- static void piix3_set_irq_pic(PIIX3State *piix3, int pic_irq)
- {
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 7d177cd207..f6b2649cf8 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -260,7 +260,6 @@ PCIBus *i440fx_init(const char *host_type, const char *pci_type,
-                     MemoryRegion *pci_memory,
-                     MemoryRegion *ram_memory);
- 
--PCIBus *find_i440fx(void);
- /* piix4.c */
- extern PCIDevice *piix4_dev;
- int piix4_init(PCIBus *bus, ISABus **isa_bus, int devfn);
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index 5dd0aeeec6..725f78bedc 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -41,6 +41,5 @@ stub-obj-y += pc_madt_cpu_entry.o
- stub-obj-y += vmgenid.o
- stub-obj-y += xen-common.o
- stub-obj-y += xen-hvm.o
--stub-obj-y += pci-host-piix.o
- stub-obj-y += ram-block.o
- stub-obj-y += ramfb.o
-diff --git a/stubs/pci-host-piix.c b/stubs/pci-host-piix.c
-deleted file mode 100644
-index 6ed81b1f21..0000000000
---- a/stubs/pci-host-piix.c
-+++ /dev/null
-@@ -1,6 +0,0 @@
--#include "qemu/osdep.h"
--#include "hw/i386/pc.h"
--PCIBus *find_i440fx(void)
--{
--    return NULL;
--}
+ #define DEFINE_MACHINE(namestr, machine_initfn) \
+diff --git a/include/hw/fw-build.h b/include/hw/fw-build.h
+new file mode 100644
+index 0000000000..c02434d513
+--- /dev/null
++++ b/include/hw/fw-build.h
+@@ -0,0 +1,57 @@
++/*
++ *
++ * Copyright (c) 2018 Intel Corporation
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef FW_BUILD_H
++#define FW_BUILD_H
++
++#include "hw/acpi/bios-linker-loader.h"
++
++typedef struct AcpiConfiguration AcpiConfiguration;
++typedef struct AcpiBuildState AcpiBuildState;
++typedef struct AcpiMcfgInfo AcpiMcfgInfo;
++
++typedef struct FirmwareBuildMethods {
++    union {
++        /* ACPI methods */
++        struct {
++            GArray *(*rsdp)(GArray *table_data, BIOSLinker *linker,
++                            unsigned rsdt_tbl_offset);
++            GArray *(*madt)(GArray *table_data, BIOSLinker *linker,
++                            MachineState *ms, AcpiConfiguration *conf);
++            void    (*mcfg)(GArray *table_data, BIOSLinker *linker,
++                            AcpiMcfgInfo *info);
++            void    (*srat)(GArray *table_data, BIOSLinker *linker,
++                            MachineState *machine, AcpiConfiguration *conf);
++            void    (*slit)(GArray *table_data, BIOSLinker *linker);
++
++            /* Overall ACPI table setup function */
++            void    (*setup)(MachineState *ms, AcpiConfiguration *conf);
++        } acpi;
++    };
++} FirmwareBuildMethods;
++
++typedef struct FirmwareBuildState {
++    union {
++        /* ACPI state and configuration */
++        struct {
++            AcpiConfiguration *conf;
++            AcpiBuildState *state;
++        } acpi;
++    };
++} FirmwareBuildState;
++
++#endif
 -- 
 2.17.2
