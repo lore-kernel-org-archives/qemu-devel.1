@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39800)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39901)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gEf7G-0001mS-HR
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:39:53 -0400
+	(envelope-from <macro@linux-mips.org>) id 1gEf7m-0002JL-Pj
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:40:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gEf7D-0005lu-8t
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:39:50 -0400
-Received: from mga01.intel.com ([192.55.52.88]:7887)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sameo@linux.intel.com>)
-	id 1gEf7B-0004fU-BX
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:39:46 -0400
-From: Samuel Ortiz <sameo@linux.intel.com>
-Date: Mon, 22 Oct 2018 20:36:56 +0200
-Message-Id: <20181022183656.4902-27-sameo@linux.intel.com>
-In-Reply-To: <20181022183656.4902-1-sameo@linux.intel.com>
-References: <20181022183656.4902-1-sameo@linux.intel.com>
-Subject: [Qemu-devel] [PATCH 26/26] hw: acpi: reduced: Add PCI hotplug
- support
+	(envelope-from <macro@linux-mips.org>) id 1gEf7Y-00060f-SZ
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:40:15 -0400
+Received: from eddie.linux-mips.org ([148.251.95.138]:37538
+	helo=cvs.linux-mips.org) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <macro@linux-mips.org>) id 1gEf7X-0005zT-S6
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:40:08 -0400
+Received: (from localhost user: 'macro', uid#1010) by eddie.linux-mips.org
+	with ESMTP id S23994612AbeJVSkEbll6L (ORCPT
+	<rfc822;qemu-devel@nongnu.org>); Mon, 22 Oct 2018 20:40:04 +0200
+Date: Mon, 22 Oct 2018 19:40:04 +0100 (BST)
+Sender: "Maciej W. Rozycki" <macro@linux-mips.org>
+From: "Maciej W. Rozycki" <macro@linux-mips.org>
+In-Reply-To: <alpine.LFD.2.21.1810221901170.19280@eddie.linux-mips.org>
+Message-ID: <alpine.LFD.2.21.1810221932480.19280@eddie.linux-mips.org>
+References: <cover.1540134918.git.noring@nocrew.org>
+	<BN6PR2201MB125165723113459889A6EC59C6F40@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	<20181022172343.GB2331@sx9>
+	<alpine.LFD.2.21.1810221901170.19280@eddie.linux-mips.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH v8 00/38] target/mips: Limited support for
+ the R5900
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,77 +33,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Sebastien Boeuf <sebastien.boeuf@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: Fredrik Noring <noring@nocrew.org>
+Cc: Aleksandar Markovic <amarkovic@wavecomp.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Petar Jovanovic <pjovanovic@wavecomp.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?J=C3=BCrgen_Urban?= <JuergenUrban@gmx.de>, qemu-devel@nongnu.org
 
-From: Sebastien Boeuf <sebastien.boeuf@intel.com>
+On Mon, 22 Oct 2018, Maciej W. Rozycki wrote:
 
-In order to support PCI hotplug through a hardware-reduced GED, we need
-to modify the GED device definition in the DSDT table, so that a PCI hotplug
-related interrupt will trigger a new PCI scan.
-We also need to modify the DSDT PCI bus definition in order to make sure
-a PCI scan of all available slots can be performed when an interrupt
-comes in.
+> Hi Maciej,
 
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
-Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
----
- hw/acpi/aml-build.c | 8 +++++++-
- hw/acpi/reduced.c   | 7 +++++++
- 2 files changed, 14 insertions(+), 1 deletion(-)
+ What an odd copy & paste thinko!  I can't believe I addressed myself in 
+the opening of my e-mail. :)
 
-diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-index 752642a67a..99f04a3e71 100644
---- a/hw/acpi/aml-build.c
-+++ b/hw/acpi/aml-build.c
-@@ -2510,7 +2510,7 @@ void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
- 
- void acpi_dsdt_add_pci_bus(Aml *dsdt, AcpiPciBus *pci_host)
- {
--    Aml *dev, *pci_scope;
-+    Aml *dev, *pci_scope, *hp_scope;
- 
-     dev = aml_device("\\_SB.PCI0");
-     aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0A08")));
-@@ -2522,6 +2522,12 @@ void acpi_dsdt_add_pci_bus(Aml *dsdt, AcpiPciBus *pci_host)
-     aml_append(dev, build_osc_method(0x1F));
-     aml_append(dsdt, dev);
- 
-+    /* PCIHP */
-+    hp_scope =  aml_scope("\\_SB.PCI0");
-+    build_acpi_pci_hotplug(hp_scope);
-+    build_append_pci_bus_devices(hp_scope, pci_host->pci_bus, false);
-+    aml_append(dsdt, hp_scope);
-+
-     pci_scope = build_pci_host_bridge(dsdt, pci_host);
-     aml_append(dsdt, pci_scope);
- }
-diff --git a/hw/acpi/reduced.c b/hw/acpi/reduced.c
-index fac19a978a..7faccdc634 100644
---- a/hw/acpi/reduced.c
-+++ b/hw/acpi/reduced.c
-@@ -331,6 +331,8 @@ void acpi_reduced_setup(MachineState *machine, AcpiConfiguration *conf)
- 
- static Aml *ged_event_aml(GedEvent *event)
- {
-+    Aml *method;
-+
-     if (!event) {
-         return NULL;
-     }
-@@ -343,6 +345,11 @@ static Aml *ged_event_aml(GedEvent *event)
-         /* We run a complete memory SCAN when getting a memory hotplug event */
-         return aml_call0("\\_SB.MHPC." MEMORY_SLOT_SCAN_METHOD);
-     case GED_PCI_HOTPLUG:
-+        /* Take the PCI lock and trigger a PCI rescan */
-+        method = aml_acquire(aml_name("\\_SB.PCI0.BLCK"), 0xFFFF);
-+        aml_append(method, aml_call0("\\_SB.PCI0.PCNT"));
-+        aml_append(method, aml_release(aml_name("\\_SB.PCI0.BLCK")));
-+        return method;
-     case GED_NVDIMM_HOTPLUG:
-         return aml_notify(aml_name("\\_SB.NVDR"), aml_int(0x80));
-     default:
--- 
-2.17.2
+  Maciej
