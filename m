@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48516)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33345)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuchenlin@synology.com>) id 1gEV9R-0006Uy-Rt
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 04:01:26 -0400
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gEVtD-0003H0-W1
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 04:48:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuchenlin@synology.com>) id 1gEV9J-0007aV-PN
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 04:01:25 -0400
-Received: from synology.com ([59.124.61.242]:37690)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuchenlin@synology.com>)
-	id 1gEV98-0007Ta-OO
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 04:01:09 -0400
-From: yuchenlin@synology.com
-Date: Mon, 22 Oct 2018 16:00:53 +0800
-Message-Id: <20181022080053.9379-1-yuchenlin@synology.com>
-Subject: [Qemu-devel] [PATCH] vga_int: remove unused function protype
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gEVt8-0008Bt-WB
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 04:48:43 -0400
+Received: from cmccmta1.chinamobile.com ([221.176.66.79]:49585)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gEVt8-00084W-9f
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 04:48:38 -0400
+From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+Date: Mon, 22 Oct 2018 16:48:24 +0800
+Message-Id: <20181022084824.555-3-maozhongyi@cmss.chinamobile.com>
+In-Reply-To: <20181022084824.555-1-maozhongyi@cmss.chinamobile.com>
+References: <20181022084824.555-1-maozhongyi@cmss.chinamobile.com>
+Subject: [Qemu-devel] [PATCH v3 2/2] po/Makefile: Modern shell scripting
+ (use $() instead of ``)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,26 +25,35 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kraxel@redhat.com, yuchenlin <yuchenlin@synology.com>
+Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, philmd@redhat.com, peter.maydell@linaro.org, thuth@redhat.com, sw@weilnetz.de
 
-From: yuchenlin <yuchenlin@synology.com>
+Various shell files contain a mix between obsolete ``
+and modern $(); It would be nice to convert to using $()
+everywhere.
 
-Signed-off-by: yuchenlin <yuchenlin@synology.com>
+Cc: philmd@redhat.com
+Cc: peter.maydell@linaro.org
+Cc: thuth@redhat.com
+Cc: sw@weilnetz.de
+
+Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/display/vga_int.h | 1 -
- 1 file changed, 1 deletion(-)
+ po/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/display/vga_int.h b/hw/display/vga_int.h
-index 6e4fa48a79..55c418eab5 100644
---- a/hw/display/vga_int.h
-+++ b/hw/display/vga_int.h
-@@ -166,7 +166,6 @@ MemoryRegion *vga_init_io(VGACommonState *s, Object *obj,
-                           const MemoryRegionPortio **vbe_ports);
- void vga_common_reset(VGACommonState *s);
+diff --git a/po/Makefile b/po/Makefile
+index e47e262ee6..c041f4c858 100644
+--- a/po/Makefile
++++ b/po/Makefile
+@@ -36,7 +36,7 @@ clean:
  
--void vga_sync_dirty_bitmap(VGACommonState *s);
- void vga_dirty_log_start(VGACommonState *s);
- void vga_dirty_log_stop(VGACommonState *s);
- 
+ install: $(OBJS)
+ 	for obj in $(OBJS); do \
+-	    base=`basename $$obj .mo`; \
++	    base=$$(basename $$obj .mo); \
+ 	    $(INSTALL) -d $(DESTDIR)$(prefix)/share/locale/$$base/LC_MESSAGES; \
+ 	    $(INSTALL) -m644 $$obj $(DESTDIR)$(prefix)/share/locale/$$base/LC_MESSAGES/qemu.mo; \
+ 	done
 -- 
-2.18.0
+2.17.1
