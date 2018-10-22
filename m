@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEZn6-0000gv-Cd
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:41 -0400
+	(envelope-from <famz@redhat.com>) id 1gEZo4-0001y6-Kw
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:59:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEZn5-0008Om-7h
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:40 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:33784 helo=mail.rt-rk.com)
+	(envelope-from <famz@redhat.com>) id 1gEZny-0000gj-3H
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:59:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34284)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gEZn4-00089t-ON
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:39 -0400
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 22 Oct 2018 14:57:57 +0200
-Message-Id: <1540213077-15211-35-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1540213077-15211-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1540213077-15211-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL 34/34] target/mips: Fix decoding of ALIGN and
- DALIGN instructions
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1gEZnn-0000VS-Ks
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:59:27 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id F3809369C9
+	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 12:59:14 +0000 (UTC)
+Date: Mon, 22 Oct 2018 20:59:11 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20181022125911.GB11958@magic>
+References: <1539886203-33670-1-git-send-email-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1539886203-33670-1-git-send-email-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] tests: docker: update test-mingw for GTK+
+ 2.0 removal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,105 +33,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+On Thu, 10/18 20:10, Paolo Bonzini wrote:
+> --with-gtkabi does not exist anymore; remove it from the configure invocation.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  tests/docker/test-mingw | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/tests/docker/test-mingw b/tests/docker/test-mingw
+> index 7cca7e1..b078f22 100755
+> --- a/tests/docker/test-mingw
+> +++ b/tests/docker/test-mingw
+> @@ -28,8 +28,7 @@ for prefix in x86_64-w64-mingw32- i686-w64-mingw32-; do
+>          --enable-vnc \
+>          --enable-bzip2 \
+>          --enable-guest-agent \
+> -        --with-sdlabi=2.0 \
+> -        --with-gtkabi=3.0
+> +        --with-sdlabi=2.0
+>      install_qemu
+>      make clean
+>  
+> -- 
+> 1.8.3.1
+> 
 
-Opcode for ALIGN and DALIGN must be in fact ranges of opcodes, to
-allow paremeter 'bp' to occupy two and three bits, respectively.
+Queued, thanks.
 
-Reviewed-by: Stefan Markovic <smarkovic@wavecomp.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
----
- target/mips/translate.c | 40 ++++++++++++++++++++++++++++++++--------
- 1 file changed, 32 insertions(+), 8 deletions(-)
-
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 4db21b3..92df8da 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -463,8 +463,10 @@ enum {
-     OPC_WSBH      = (0x02 << 6) | OPC_BSHFL,
-     OPC_SEB       = (0x10 << 6) | OPC_BSHFL,
-     OPC_SEH       = (0x18 << 6) | OPC_BSHFL,
--    OPC_ALIGN     = (0x08 << 6) | OPC_BSHFL, /* 010.bp */
--    OPC_ALIGN_END = (0x0B << 6) | OPC_BSHFL, /* 010.00 to 010.11 */
-+    OPC_ALIGN     = (0x08 << 6) | OPC_BSHFL, /* 010.bp (010.00 to 010.11) */
-+    OPC_ALIGN_1   = (0x09 << 6) | OPC_BSHFL,
-+    OPC_ALIGN_2   = (0x0A << 6) | OPC_BSHFL,
-+    OPC_ALIGN_3   = (0x0B << 6) | OPC_BSHFL,
-     OPC_BITSWAP   = (0x00 << 6) | OPC_BSHFL  /* 00000 */
- };
- 
-@@ -474,8 +476,14 @@ enum {
- enum {
-     OPC_DSBH       = (0x02 << 6) | OPC_DBSHFL,
-     OPC_DSHD       = (0x05 << 6) | OPC_DBSHFL,
--    OPC_DALIGN     = (0x08 << 6) | OPC_DBSHFL, /* 01.bp */
--    OPC_DALIGN_END = (0x0F << 6) | OPC_DBSHFL, /* 01.000 to 01.111 */
-+    OPC_DALIGN     = (0x08 << 6) | OPC_DBSHFL, /* 01.bp (01.000 to 01.111) */
-+    OPC_DALIGN_1   = (0x09 << 6) | OPC_DBSHFL,
-+    OPC_DALIGN_2   = (0x0A << 6) | OPC_DBSHFL,
-+    OPC_DALIGN_3   = (0x0B << 6) | OPC_DBSHFL,
-+    OPC_DALIGN_4   = (0x0C << 6) | OPC_DBSHFL,
-+    OPC_DALIGN_5   = (0x0D << 6) | OPC_DBSHFL,
-+    OPC_DALIGN_6   = (0x0E << 6) | OPC_DBSHFL,
-+    OPC_DALIGN_7   = (0x0F << 6) | OPC_DBSHFL,
-     OPC_DBITSWAP   = (0x00 << 6) | OPC_DBSHFL, /* 00000 */
- };
- 
-@@ -23957,7 +23965,9 @@ static void decode_opc_special3_r6(CPUMIPSState *env, DisasContext *ctx)
-             op2 = MASK_BSHFL(ctx->opcode);
-             switch (op2) {
-             case OPC_ALIGN:
--            case OPC_ALIGN_END:
-+            case OPC_ALIGN_1:
-+            case OPC_ALIGN_2:
-+            case OPC_ALIGN_3:
-                 gen_align(ctx, 32, rd, rs, rt, sa & 3);
-                 break;
-             case OPC_BITSWAP:
-@@ -23983,7 +23993,13 @@ static void decode_opc_special3_r6(CPUMIPSState *env, DisasContext *ctx)
-             op2 = MASK_DBSHFL(ctx->opcode);
-             switch (op2) {
-             case OPC_DALIGN:
--            case OPC_DALIGN_END:
-+            case OPC_DALIGN_1:
-+            case OPC_DALIGN_2:
-+            case OPC_DALIGN_3:
-+            case OPC_DALIGN_4:
-+            case OPC_DALIGN_5:
-+            case OPC_DALIGN_6:
-+            case OPC_DALIGN_7:
-                 gen_align(ctx, 64, rd, rs, rt, sa & 7);
-                 break;
-             case OPC_DBITSWAP:
-@@ -24843,7 +24859,9 @@ static void decode_opc_special3(CPUMIPSState *env, DisasContext *ctx)
-         op2 = MASK_BSHFL(ctx->opcode);
-         switch (op2) {
-         case OPC_ALIGN:
--        case OPC_ALIGN_END:
-+        case OPC_ALIGN_1:
-+        case OPC_ALIGN_2:
-+        case OPC_ALIGN_3:
-         case OPC_BITSWAP:
-             check_insn(ctx, ISA_MIPS32R6);
-             decode_opc_special3_r6(env, ctx);
-@@ -24869,7 +24887,13 @@ static void decode_opc_special3(CPUMIPSState *env, DisasContext *ctx)
-         op2 = MASK_DBSHFL(ctx->opcode);
-         switch (op2) {
-         case OPC_DALIGN:
--        case OPC_DALIGN_END:
-+        case OPC_DALIGN_1:
-+        case OPC_DALIGN_2:
-+        case OPC_DALIGN_3:
-+        case OPC_DALIGN_4:
-+        case OPC_DALIGN_5:
-+        case OPC_DALIGN_6:
-+        case OPC_DALIGN_7:
-         case OPC_DBITSWAP:
-             check_insn(ctx, ISA_MIPS32R6);
-             decode_opc_special3_r6(env, ctx);
--- 
-2.7.4
+Fam
