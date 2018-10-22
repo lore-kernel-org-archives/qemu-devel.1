@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49014)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1gEdUP-0005IN-Kk
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 12:55:38 -0400
+	(envelope-from <noring@nocrew.org>) id 1gEdvs-0007db-GC
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 13:24:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1gEdUI-0005VM-VV
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 12:55:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40466)
+	(envelope-from <noring@nocrew.org>) id 1gEdvp-00029R-5t
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 13:24:00 -0400
+Received: from ste-pvt-msa1.bahnhof.se ([213.80.101.70]:49220)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1gEdUG-0005Na-3X
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 12:55:29 -0400
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-Date: Mon, 22 Oct 2018 18:55:06 +0200
-Message-Id: <20181022165506.30332-3-vkuznets@redhat.com>
-In-Reply-To: <20181022165506.30332-1-vkuznets@redhat.com>
-References: <20181022165506.30332-1-vkuznets@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/2] x86: hv_evmcs CPU flag support
+	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gEdvl-00024k-9e
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 13:23:54 -0400
+Date: Mon, 22 Oct 2018 19:23:43 +0200
+From: Fredrik Noring <noring@nocrew.org>
+Message-ID: <20181022172343.GB2331@sx9>
+References: <cover.1540134918.git.noring@nocrew.org>
+	<BN6PR2201MB125165723113459889A6EC59C6F40@BN6PR2201MB1251.namprd22.prod.outlook.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <BN6PR2201MB125165723113459889A6EC59C6F40@BN6PR2201MB1251.namprd22.prod.outlook.com>
+Subject: Re: [Qemu-devel] [PATCH v8 00/38] target/mips: Limited support for
+ the R5900
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,131 +28,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>
+To: Aleksandar Markovic <amarkovic@wavecomp.com>, "Maciej W. Rozycki" <macro@linux-mips.org>
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Petar Jovanovic <pjovanovic@wavecomp.com>, Peter Maydell <peter.maydell@linaro.org>, =?utf-8?Q?J=C3=BCrgen?= Urban <JuergenUrban@gmx.de>, qemu-devel@nongnu.org
 
-Adds a new CPU flag to enable the Enlightened VMCS KVM feature.
-QEMU enables KVM_CAP_HYPERV_ENLIGHTENED_VMCS and gets back the
-version to be advertised in lower 16 bits of CPUID.0x4000000A:EAX.
+Many thanks, Aleksandar,
 
-Suggested-by: Ladi Prosek <lprosek@redhat.com>
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
-Changes since v1:
-- Throw away HV_CPUID_MIN_NESTED.
-- Create zeroed 0x40000006-0x40000009 CPUID leaves.
----
- target/i386/cpu.c          |  1 +
- target/i386/cpu.h          |  1 +
- target/i386/hyperv-proto.h |  2 ++
- target/i386/kvm.c          | 30 ++++++++++++++++++++++++++++--
- 4 files changed, 32 insertions(+), 2 deletions(-)
+> I added ASE_MMI flag along with INSN_R5900, I think this fits better in
+> the overall MIPS for QEMU design.
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index c88876dfe3..5c0e84fb99 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -5564,6 +5564,7 @@ static Property x86_cpu_properties[] = {
-     DEFINE_PROP_BOOL("hv-frequencies", X86CPU, hyperv_frequencies, false),
-     DEFINE_PROP_BOOL("hv-reenlightenment", X86CPU, hyperv_reenlightenment, false),
-     DEFINE_PROP_BOOL("hv-tlbflush", X86CPU, hyperv_tlbflush, false),
-+    DEFINE_PROP_BOOL("hv-evmcs", X86CPU, hyperv_evmcs, false),
-     DEFINE_PROP_BOOL("check", X86CPU, check_cpuid, true),
-     DEFINE_PROP_BOOL("enforce", X86CPU, enforce_cpuid, false),
-     DEFINE_PROP_BOOL("kvm", X86CPU, expose_kvm, true),
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 730c06f80a..013d953b57 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1382,6 +1382,7 @@ struct X86CPU {
-     bool hyperv_frequencies;
-     bool hyperv_reenlightenment;
-     bool hyperv_tlbflush;
-+    bool hyperv_evmcs;
-     bool check_cpuid;
-     bool enforce_cpuid;
-     bool expose_kvm;
-diff --git a/target/i386/hyperv-proto.h b/target/i386/hyperv-proto.h
-index d6d5a79293..1e6800ba43 100644
---- a/target/i386/hyperv-proto.h
-+++ b/target/i386/hyperv-proto.h
-@@ -18,6 +18,7 @@
- #define HV_CPUID_FEATURES                     0x40000003
- #define HV_CPUID_ENLIGHTMENT_INFO             0x40000004
- #define HV_CPUID_IMPLEMENT_LIMITS             0x40000005
-+#define HV_CPUID_NESTED_FEATURES              0x4000000A
- #define HV_CPUID_MIN                          0x40000005
- #define HV_CPUID_MAX                          0x4000ffff
- #define HV_HYPERVISOR_PRESENT_BIT             0x80000000
-@@ -59,6 +60,7 @@
- #define HV_SYSTEM_RESET_RECOMMENDED         (1u << 4)
- #define HV_RELAXED_TIMING_RECOMMENDED       (1u << 5)
- #define HV_EX_PROCESSOR_MASKS_RECOMMENDED   (1u << 11)
-+#define HV_ENLIGHTENED_VMCS_RECOMMENDED     (1u << 14)
- 
- /*
-  * Basic virtualized MSRs
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index a46ad102d8..6f10abcf6f 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -798,6 +798,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
-     uint32_t unused;
-     struct kvm_cpuid_entry2 *c;
-     uint32_t signature[3];
-+    uint16_t evmcs_version;
-     int kvm_base = KVM_CPUID_SIGNATURE;
-     int r;
-     Error *local_err = NULL;
-@@ -841,7 +842,8 @@ int kvm_arch_init_vcpu(CPUState *cs)
-             memset(signature, 0, 12);
-             memcpy(signature, cpu->hyperv_vendor_id, len);
+Maciej -- can we add "MMI" under "ASEs implemented" in the kernel too,
+even if it is a vendor-specific architecture extension that normally
+isn't counted as an ASE? QEMU simply calls these "vendor specific ASEs".
+
+Aleksandar -- please or ASE_MMI to insn_flags here:
+
+--- a/target/mips/translate_init.inc.c
++++ b/target/mips/translate_init.inc.c
+@@ -466,7 +466,7 @@ const mips_def_t mips_defs[] =
+ #endif /* !CONFIG_USER_ONLY */
+         .SEGBITS = 32,
+         .PABITS = 32,
+-        .insn_flags = CPU_R5900,
++        .insn_flags = CPU_R5900 | ASE_MMI,
+         .mmu_type = MMU_TYPE_R4000,
+     },
+     {
+
+Strictly speaking, MADD, MADDU, MULT, MULTU, MULT1, MULTU1, DIV1, DIVU1,
+MADD1, MADDU1, MFHI1, MFLO1, MTHI1 and MTLO1 are not part of what the
+Toshiba TX System RISC TX79 Core Architecture manual specifies as
+"Multimedia Instructions", section B.3.2, on page B-3, even though
+their opcodes are covered by TX79_CLASS_MMI and the decode_tx79_mmi
+function. Can we adjust ASE_MMI for QEMU accordingly?
+
+Also, doesn't it make sense to cover LQ and SQ with ASE_MMI as well, as
+those two really are MMIs?
+
+Finally, as far as I know, the MMIs cannot be disabled on R5900 hardware.
+
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -26099,7 +26099,7 @@ static void decode_opc(CPUMIPSState *env, DisasContext *ctx)
          }
--        c->eax = HV_CPUID_MIN;
-+        c->eax = cpu->hyperv_evmcs ?
-+            HV_CPUID_NESTED_FEATURES : HV_CPUID_IMPLEMENT_LIMITS;
-         c->ebx = signature[0];
-         c->ecx = signature[1];
-         c->edx = signature[2];
-@@ -888,7 +890,16 @@ int kvm_arch_init_vcpu(CPUState *cs)
-             c->eax |= HV_REMOTE_TLB_FLUSH_RECOMMENDED;
-             c->eax |= HV_EX_PROCESSOR_MASKS_RECOMMENDED;
+         break;
+     case OPC_SPECIAL3:
+-        if (ctx->insn_flags & INSN_R5900) {
++        if ((ctx->insn_flags & INSN_R5900) && (ctx->insn_flags & ASE_MMI)) {
+             decode_tx79_sq(env, ctx);    /* TX79_SQ */
+         } else {
+             decode_opc_special3(env, ctx);
+@@ -26763,7 +26763,7 @@ static void decode_opc(CPUMIPSState *env, DisasContext *ctx)
          }
--
-+        if (cpu->hyperv_evmcs) {
-+            if (kvm_vcpu_enable_cap(cs, KVM_CAP_HYPERV_ENLIGHTENED_VMCS, 0,
-+                                    (uintptr_t)&evmcs_version)) {
-+                fprintf(stderr, "Hyper-V Enlightened VMCS "
-+                        "(requested by 'hv-evmcs' cpu flag) "
-+                        "is not supported by kernel\n");
-+                return -ENOSYS;
-+            }
-+            c->eax |= HV_ENLIGHTENED_VMCS_RECOMMENDED;
-+        }
-         c->ebx = cpu->hyperv_spinlock_attempts;
- 
-         c = &cpuid_data.entries[cpuid_i++];
-@@ -899,6 +910,21 @@ int kvm_arch_init_vcpu(CPUState *cs)
- 
-         kvm_base = KVM_CPUID_SIGNATURE_NEXT;
-         has_msr_hv_hypercall = true;
-+
-+        if (cpu->hyperv_evmcs) {
-+            __u32 function;
-+
-+            /* Create zeroed 0x40000006..0x40000009 leaves */
-+            for (function = HV_CPUID_IMPLEMENT_LIMITS + 1;
-+                 function < HV_CPUID_NESTED_FEATURES; function++) {
-+                c = &cpuid_data.entries[cpuid_i++];
-+                c->function = function;
-+            }
-+
-+            c = &cpuid_data.entries[cpuid_i++];
-+            c->function = HV_CPUID_NESTED_FEATURES;
-+            c->eax = evmcs_version;
-+        }
-     }
- 
-     if (cpu->expose_kvm) {
--- 
-2.17.2
+         break;
+     case OPC_MSA: /* OPC_MDMX */
+-        if (ctx->insn_flags & INSN_R5900) {
++        if ((ctx->insn_flags & INSN_R5900) && (ctx->insn_flags & ASE_MMI)) {
+             decode_tx79_lq(env, ctx);    /* TX79_LQ */
+         } else {
+             /* MDMX: Not implemented. */
+
+> I experienced some build errors (see the end of this mail), so I had to
+> exclude some patches, but all others are fine, and had my "Reviewed-by".
+> 32 patches will be included in the next MIPS queue.
+
+Ah, I didn't test the 64-bit build on the MADD[U][1] instructions. I will
+look into them and post updated patches.
+
+Regarding the R5900 FPU: It appears reasonable to introduce an ELF ABI
+variant for the nonstandard R5900 FPU. A testsuite covering the anomalies
+seems to be needed as well. Careful verification on hardware is needed.
+I think it's probably best to keep the R5900 FPU disabled in QEMU until
+these things have been sorted out.
+
+I discovered that I lost the disassembly of MULT1 and MULTU1 in v8, as
+shown in the attached patch below. This small change belongs to commit
+bebf09ef3977 ("target/mips: Support R5900 three-operand MULT1 and MULTU1
+instructions") in your tags/mips-queue-oct-2018-part-2. Please apply:
+
+--- a/disas/mips.c
++++ b/disas/mips.c
+@@ -2736,10 +2736,14 @@ const struct mips_opcode mips_builtin_opcodes[] =
+ {"mult",    "s,t",      0x00000018, 0xfc00ffff, RD_s|RD_t|WR_HILO|IS_M, 0,		I1	},
+ {"mult",    "7,s,t",	0x00000018, 0xfc00e7ff, WR_a|RD_s|RD_t,         0,              D33	},
+ {"mult",    "d,s,t",    0x00000018, 0xfc0007ff, RD_s|RD_t|WR_HILO|WR_d|IS_M, 0,		G1	},
++{"mult1",   "s,t",      0x70000018, 0xfc00ffff, RD_s | RD_t | WR_HILO | IS_M, 0, EE },
++{"mult1",   "d,s,t",    0x70000018, 0xfc0007ff, WR_d | RD_s | RD_t | WR_HILO | IS_M, 0, EE },
+ {"multp",   "s,t",	0x00000459, 0xfc00ffff,	RD_s|RD_t|MOD_HILO,	0,		SMT	},
+ {"multu",   "s,t",      0x00000019, 0xfc00ffff, RD_s|RD_t|WR_HILO|IS_M, 0,		I1	},
+ {"multu",   "7,s,t",	0x00000019, 0xfc00e7ff, WR_a|RD_s|RD_t,         0,              D33	},
+ {"multu",   "d,s,t",    0x00000019, 0xfc0007ff, RD_s|RD_t|WR_HILO|WR_d|IS_M, 0,		G1	},
++{"multu1",  "s,t",      0x70000019, 0xfc00ffff, RD_s | RD_t | WR_HILO | IS_M, 0, EE },
++{"multu1",  "d,s,t",    0x70000019, 0xfc0007ff, WR_d | RD_s | RD_t | WR_HILO | IS_M, 0, EE },
+ {"mulu",    "d,s,t",	0x00000059, 0xfc0007ff,	RD_s|RD_t|WR_HILO|WR_d,	0,		N5	},
+ {"neg",     "d,w",	0x00000022, 0xffe007ff,	WR_d|RD_t,		0,		I1	}, /* sub 0 */
+ {"negu",    "d,w",	0x00000023, 0xffe007ff,	WR_d|RD_t,		0,		I1	}, /* subu 0 */
+
+Fredrik
