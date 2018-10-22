@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38174)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gEZPo-0002PF-Q5
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:39 -0400
+	(envelope-from <armbru@redhat.com>) id 1gEZPo-0002PM-Qu
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gEZPl-0003Ak-QT
+	(envelope-from <armbru@redhat.com>) id 1gEZPm-0003B9-2d
 	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49708)
+Received: from mx1.redhat.com ([209.132.183.28]:35306)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gEZPl-0002vj-GG
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gEZPl-0002zK-La
 	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:33 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 003E387645
-	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 12:34:19 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id CD9AB308212D
+	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 12:34:24 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 22 Oct 2018 14:33:35 +0200
-Message-Id: <20181022123413.28044-3-armbru@redhat.com>
+Date: Mon, 22 Oct 2018 14:34:02 +0200
+Message-Id: <20181022123413.28044-30-armbru@redhat.com>
 In-Reply-To: <20181022123413.28044-1-armbru@redhat.com>
 References: <20181022123413.28044-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 02/40] vl: Print error when using incorrect
- backend for debugcon
+Subject: [Qemu-devel] [PULL 29/40] vnc: Clean up error reporting in
+ vnc_init_func()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,34 +34,61 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Calling error_report() in a function that takes an Error ** argument
+is suspicious.  vnc_init_func() does that, and then fails without
+setting an error.  Its caller main(), via qemu_opts_foreach(), is fine
+with it, but clean it up anyway.
 
-When using an incorrect backend for the debugcon, QEMU exits silently
-without any error indication, which is confusing.
-Add a message that the character backend is invalid.
+While there, drop a "Failed to start VNC server: " error message
+prefix that doesn't really add value.
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20181011171254.32428-1-philmd@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-Id: <20181017082702.5581-28-armbru@redhat.com>
+Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- vl.c | 1 +
- 1 file changed, 1 insertion(+)
+ ui/vnc.c | 8 ++++----
+ vl.c     | 2 +-
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
+diff --git a/ui/vnc.c b/ui/vnc.c
+index 98e3d3b1d8..0c1b477425 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -4082,13 +4082,13 @@ int vnc_init_func(void *opaque, QemuOpts *opts, E=
+rror **errp)
+     assert(id);
+     vnc_display_init(id, &local_err);
+     if (local_err) {
+-        error_report_err(local_err);
+-        exit(1);
++        error_propagate(errp, local_err);
++        return -1;
+     }
+     vnc_display_open(id, &local_err);
+     if (local_err !=3D NULL) {
+-        error_reportf_err(local_err, "Failed to start VNC server: ");
+-        exit(1);
++        error_propagate(errp, local_err);
++        return -1;
+     }
+     return 0;
+ }
 diff --git a/vl.c b/vl.c
-index 4e25c78bff..61305b5891 100644
+index 1fa1e14853..2ff0c5f32d 100644
 --- a/vl.c
 +++ b/vl.c
-@@ -2466,6 +2466,7 @@ static int debugcon_parse(const char *devname)
-     QemuOpts *opts;
+@@ -4527,7 +4527,7 @@ int main(int argc, char **argv, char **envp)
+     /* init remote displays */
+ #ifdef CONFIG_VNC
+     qemu_opts_foreach(qemu_find_opts("vnc"),
+-                      vnc_init_func, NULL, NULL);
++                      vnc_init_func, NULL, &error_fatal);
+ #endif
 =20
-     if (!qemu_chr_new_mux_mon("debugcon", devname)) {
-+        error_report("invalid character backend '%s'", devname);
-         exit(1);
-     }
-     opts =3D qemu_opts_create(qemu_find_opts("device"), "debugcon", 1, N=
-ULL);
+     if (using_spice) {
 --=20
 2.17.2
