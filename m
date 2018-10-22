@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41722)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gEcAJ-0005JX-1O
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 11:30:47 -0400
+	(envelope-from <vkuznets@redhat.com>) id 1gEcKD-0000Ra-IC
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 11:41:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gEcAE-0001Um-Iv
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 11:30:46 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:38503)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gEcAE-0001SA-6j
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 11:30:42 -0400
-Received: by mail-wr1-f65.google.com with SMTP id d10-v6so5862284wrs.5
-	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 08:30:41 -0700 (PDT)
-References: <20181019010625.25294-1-cota@braap.org>
-	<f7067d72-3b2a-9e6e-4636-f18ac1cf5202@redhat.com>
-	<20181019145018.GB7279@flamenco>
-	<6190036c-cd1f-4549-9b7e-9e7913c972d4@redhat.com>
-	<20181019192932.GA17761@flamenco> <20181019234608.GA32420@flamenco>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <74e14727-1174-0b91-94ae-6f07475e583d@redhat.com>
-Date: Mon, 22 Oct 2018 17:30:37 +0200
+	(envelope-from <vkuznets@redhat.com>) id 1gEcK8-0000Tu-GU
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 11:40:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58776)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1gEcK6-0000Q8-Re
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 11:40:55 -0400
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+In-Reply-To: <20181022143355.GA5839@rkaganb.sw.ru>
+References: <20181019111432.5040-1-vkuznets@redhat.com>
+	<20181019111432.5040-3-vkuznets@redhat.com>
+	<20181022143355.GA5839@rkaganb.sw.ru>
+Date: Mon, 22 Oct 2018 17:40:46 +0200
+Message-ID: <87lg6q9egx.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181019234608.GA32420@flamenco>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v3 0/56] per-CPU locks
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 2/2] x86: hv_evmcs CPU flag support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,21 +27,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>, Alexander Graf <agraf@suse.de>, Alistair Francis <alistair23@gmail.com>, Andrzej Zaborowski <balrogg@gmail.com>, Anthony Green <green@moxielogic.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Chris Wulff <crwulff@gmail.com>, Cornelia Huck <cohuck@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, David Hildenbrand <david@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Fabien Chouteau <chouteau@adacore.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, James Hogan <jhogan@kernel.org>, Laurent Vivier <laurent@vivier.eu>, Marek Vasut <marex@denx.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Max Filippov <jcmvbkbc@gmail.com>, Michael Clark <mjc@sifive.com>, Michael Walle <michael@walle.cc>, Palmer Dabbelt <palmer@sifive.com>, Pavel Dovgalyuk <dovgaluk@ispras.ru>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Stafford Horne <shorne@gmail.com>
+To: Roman Kagan <rkagan@virtuozzo.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
 
-On 20/10/2018 01:46, Emilio G. Cota wrote:
->> So it is possible that it was my implementation, and not the approach,
->> what was at fault :-)
-> I've just observed a similar hang after adding the "BQL
-> pushdown" patches on top of this series. So it's likely that the
-> hangs come from those patches, and not from the work on
-> cpu->interrupt_request. I just confirmed with the prior
-> series, and removing the pushdown patches fixes the hangs there
-> as well.
+Roman Kagan <rkagan@virtuozzo.com> writes:
 
-Oh well, not a big deal.  You already wrote these patches and I don't
-have much time for MTTCG anyway, so I am okay with sticking with them.
-Thanks!
+> On Fri, Oct 19, 2018 at 01:14:32PM +0200, Vitaly Kuznetsov wrote:
+>> --- a/target/i386/kvm.c
+>> +++ b/target/i386/kvm.c
+>> @@ -798,6 +798,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>>      uint32_t unused;
+>>      struct kvm_cpuid_entry2 *c;
+>>      uint32_t signature[3];
+>> +    uint16_t evmcs_version;
+>>      int kvm_base = KVM_CPUID_SIGNATURE;
+>>      int r;
+>>      Error *local_err = NULL;
+>> @@ -841,7 +842,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>>              memset(signature, 0, 12);
+>>              memcpy(signature, cpu->hyperv_vendor_id, len);
+>>          }
+>> -        c->eax = HV_CPUID_MIN;
+>> +        c->eax = cpu->hyperv_evmcs ? HV_CPUID_MIN_NESTED : HV_CPUID_MIN;
+>
+>
+> I think these two aren't meant to be used on the hypervisor side.  My
+> understanding is that HV_CPUID_MIN is only there as a reminder that the
+> real Hyper-V exposes at least that many hypervisor-specific leaves so
+> the guest can rely on that.  So I'd rather use directly
+> HV_CPUID_IMPLEMENT_LIMITS : HV_CPUID_NESTED_FEATURES, and not introduce
+> HV_CPUID_MIN_NESTED.
 
-Paolo
+Makes sense, will do v2.
+
+>  Maybe better yet is to update this field with the
+> maximum value while populating HV_* leaves:
+>
+>     if (hyperv_enabled(cpu)) {
+>         uint32_t *cpuid_40000000_eax;
+>         c = &cpuid_data.entries[cpuid_i++];
+>         c->function = HV_CPUID_VENDOR_AND_MAX_FUNCTIONS;
+>         cpuid_40000000_eax = &c->eax;
+>         *cpuid_40000000_eax = c->function;
+>
+>         ....
+>
+>         c = &cpuid_data.entries[cpuid_i++];
+>         c->function = HV_CPUID_...;
+>         *cpuid_40000000_eax = max(*cpuid_40000000_eax, c->function);
+>
+> but I think it can be done later and doesn't need to hold this patch.
+>
+> Another question related to this: are the guests OK with leaves
+> 0x40000006..0x40000009 missing?
+
+They seem to be, however, after you've asked I'm leaning towards zeroing
+them 'just in case'.
+
+-- 
+Vitaly
