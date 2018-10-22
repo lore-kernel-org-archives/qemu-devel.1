@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38279)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gEZPq-0002RY-Qs
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:40 -0400
+	(envelope-from <armbru@redhat.com>) id 1gEZPq-0002RD-Hi
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gEZPo-0003G1-4L
+	(envelope-from <armbru@redhat.com>) id 1gEZPn-0003Em-F4
 	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:10448)
+Received: from mx1.redhat.com ([209.132.183.28]:58888)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gEZPn-0002yh-Jg
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gEZPm-0002vm-Qo
 	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:35 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9D52F61470
-	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 12:34:23 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 092BB8830B
+	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 12:34:20 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 22 Oct 2018 14:34:05 +0200
-Message-Id: <20181022123413.28044-33-armbru@redhat.com>
+Date: Mon, 22 Oct 2018 14:33:40 +0200
+Message-Id: <20181022123413.28044-8-armbru@redhat.com>
 In-Reply-To: <20181022123413.28044-1-armbru@redhat.com>
 References: <20181022123413.28044-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 32/40] spice: Clean up error reporting in
- add_channel()
+Subject: [Qemu-devel] [PULL 07/40] vfio: Use warn_report() & friends to
+ report warnings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,64 +31,116 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>
 
-Calling error_report() in a function that takes an Error ** argument
-is suspicious.  add_channel() does that, and then exit()s.  Its caller
-main(), via qemu_opts_foreach(), is fine with it, but clean it up
-anyway.
+The vfio code reports warnings like
 
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+    error_report(WARN_PREFIX "Could not frobnicate", DEV-NAME);
+
+where WARN_PREFIX is defined so the message comes out as
+
+    vfio warning: DEV-NAME: Could not frobnicate
+
+This usage predates the introduction of warn_report() & friends in
+commit 97f40301f1d.  It's time to convert to that interface.  Since
+these functions already prefix the message with "warning: ", replace
+WARN_PREFIX by VFIO_MSG_PREFIX, so the messages come out like
+
+    warning: vfio DEV-NAME: Could not frobnicate
+
+The next commit will replace ERR_PREFIX.
+
+Cc: Alex Williamson <alex.williamson@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20181017082702.5581-31-armbru@redhat.com>
-Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+Acked-by: Alex Williamson <alex.williamson@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20181017082702.5581-6-armbru@redhat.com>
 ---
- ui/spice-core.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+ hw/vfio/pci.c                 | 14 +++++++-------
+ hw/vfio/platform.c            |  4 ++--
+ include/hw/vfio/vfio-common.h |  2 +-
+ 3 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/ui/spice-core.c b/ui/spice-core.c
-index a4fbbc3898..ebaae24643 100644
---- a/ui/spice-core.c
-+++ b/ui/spice-core.c
-@@ -597,9 +597,9 @@ static int add_channel(void *opaque, const char *name=
-, const char *value,
-     if (strcmp(name, "tls-channel") =3D=3D 0) {
-         int *tls_port =3D opaque;
-         if (!*tls_port) {
--            error_report("spice: tried to setup tls-channel"
--                         " without specifying a TLS port");
--            exit(1);
-+            error_setg(errp, "spice: tried to setup tls-channel"
-+                       " without specifying a TLS port");
-+            return -1;
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 4404c28360..0c3d245932 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -252,7 +252,7 @@ static void vfio_intx_update(PCIDevice *pdev)
+ 
+     vfio_intx_enable_kvm(vdev, &err);
+     if (err) {
+-        error_reportf_err(err, WARN_PREFIX, vdev->vbasedev.name);
++        warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
+     }
+ 
+     /* Re-enable the interrupt in cased we missed an EOI */
+@@ -317,7 +317,7 @@ static int vfio_intx_enable(VFIOPCIDevice *vdev, Error **errp)
+ 
+     vfio_intx_enable_kvm(vdev, &err);
+     if (err) {
+-        error_reportf_err(err, WARN_PREFIX, vdev->vbasedev.name);
++        warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
+     }
+ 
+     vdev->interrupt = VFIO_INT_INTx;
+@@ -1557,7 +1557,7 @@ static int vfio_msix_setup(VFIOPCIDevice *vdev, int pos, Error **errp)
+                     &err);
+     if (ret < 0) {
+         if (ret == -ENOTSUP) {
+-            error_report_err(err);
++            warn_report_err(err);
+             return 0;
          }
-         security =3D SPICE_CHANNEL_SECURITY_SSL;
+ 
+@@ -2590,9 +2590,9 @@ static void vfio_populate_device(VFIOPCIDevice *vdev, Error **errp)
+     } else if (irq_info.count == 1) {
+         vdev->pci_aer = true;
+     } else {
+-        error_report(WARN_PREFIX
+-                     "Could not enable error recovery for the device",
+-                     vbasedev->name);
++        warn_report(VFIO_MSG_PREFIX
++                    "Could not enable error recovery for the device",
++                    vbasedev->name);
      }
-@@ -615,8 +615,9 @@ static int add_channel(void *opaque, const char *name=
-, const char *value,
-         rc =3D spice_server_set_channel_security(spice_server, value, se=
-curity);
-     }
-     if (rc !=3D 0) {
--        error_report("spice: failed to set channel security for %s", val=
-ue);
--        exit(1);
-+        error_setg(errp, "spice: failed to set channel security for %s",
-+                   value);
-+        return -1;
-     }
-     return 0;
  }
-@@ -787,7 +788,7 @@ void qemu_spice_init(void)
-     spice_server_set_playback_compression
-         (spice_server, qemu_opt_get_bool(opts, "playback-compression", 1=
-));
-=20
--    qemu_opt_foreach(opts, add_channel, &tls_port, NULL);
-+    qemu_opt_foreach(opts, add_channel, &tls_port, &error_fatal);
-=20
-     spice_server_set_name(spice_server, qemu_name);
-     spice_server_set_uuid(spice_server, (unsigned char *)&qemu_uuid);
---=20
+ 
+@@ -2717,7 +2717,7 @@ static void vfio_req_notifier_handler(void *opaque)
+ 
+     qdev_unplug(&vdev->pdev.qdev, &err);
+     if (err) {
+-        error_reportf_err(err, WARN_PREFIX, vdev->vbasedev.name);
++        warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
+     }
+ }
+ 
+diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
+index 64c1af653d..baf236ae79 100644
+--- a/hw/vfio/platform.c
++++ b/hw/vfio/platform.c
+@@ -679,8 +679,8 @@ static void vfio_platform_realize(DeviceState *dev, Error **errp)
+ 
+     for (i = 0; i < vbasedev->num_regions; i++) {
+         if (vfio_region_mmap(vdev->regions[i])) {
+-            error_report("%s mmap unsupported. Performance may be slow",
+-                         memory_region_name(vdev->regions[i]->mem));
++            warn_report("%s mmap unsupported, performance may be slow",
++                        memory_region_name(vdev->regions[i]->mem));
+         }
+         sysbus_init_mmio(sbdev, vdev->regions[i]->mem);
+     }
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index e46a28910a..1d7630345b 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -32,7 +32,7 @@
+ #endif
+ 
+ #define ERR_PREFIX "vfio error: %s: "
+-#define WARN_PREFIX "vfio warning: %s: "
++#define VFIO_MSG_PREFIX "vfio %s: "
+ 
+ enum {
+     VFIO_DEVICE_TYPE_PCI = 0,
+-- 
 2.17.2
