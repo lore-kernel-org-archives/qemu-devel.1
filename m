@@ -1,31 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37957)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37962)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gEZPb-0002Gr-9W
+	(envelope-from <armbru@redhat.com>) id 1gEZPb-0002Gt-Am
 	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gEZPV-0002uL-UM
+	(envelope-from <armbru@redhat.com>) id 1gEZPV-0002u8-Sr
 	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47116)
+Received: from mx1.redhat.com ([209.132.183.28]:53452)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gEZPV-0002sq-Hm
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gEZPV-0002t6-Hn
 	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:17 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B001F3097026
-	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 12:34:15 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-34.ams2.redhat.com
-	[10.36.117.34])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 53905105704C
-	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 12:34:15 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 22 Oct 2018 14:33:33 +0200
-Message-Id: <20181022123413.28044-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 00/40] Error reporting patches for 2018-10-22
+Date: Mon, 22 Oct 2018 14:33:34 +0200
+Message-Id: <20181022123413.28044-2-armbru@redhat.com>
+In-Reply-To: <20181022123413.28044-1-armbru@redhat.com>
+References: <20181022123413.28044-1-armbru@redhat.com>
+Subject: [Qemu-devel] [PULL 01/40] scripts: Remove check-qerror.sh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,152 +24,82 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>
 
-The following changes since commit 1b7490446bf41f54130c2d495dd4c8768c8e1c=
-e3:
+From: Alberto Garcia <berto@igalia.com>
 
-  Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-3.1-p=
-ull-request' into staging (2018-10-19 11:20:05 +0100)
+qerror.h contains leftovers from the now-defunct QError API.
 
-are available in the Git repository at:
+There's only a handful of string macros left, and no one is supposed
+to add anything else. The check-qerror.sh script was used to make sure
+that all definitions on the qerror.c and qerror.h files were sorted
+alphabetically. The former was removed three years ago, and the latter
+is now in a different location, so the script doesn't even work (as
+a matter of fact the alphabetical order was broken last time someone
+added a macro -also in 2015- and no one seemed to notice).
 
-  git://repo.or.cz/qemu/armbru.git tags/pull-error-2018-10-22
+There's no point in fixing this script so let's just remove it.
+The rogue macro is also moved to its correct location.
 
-for you to fetch changes up to 80313fb53d8048882848b6f63daaeb29dc319765:
-
-  error: Drop bogus "use error_setg() instead" admonitions (2018-10-19 15=
-:47:09 +0200)
-
-----------------------------------------------------------------
-Error reporting patches for 2018-10-22
-
-* Replace some unwise uses of error_report() & friends
-* Print error when using incorrect backend for debugcon
-
-----------------------------------------------------------------
-Alberto Garcia (1):
-      scripts: Remove check-qerror.sh
-
-Fei Li (1):
-      ui: Convert vnc_display_init(), init_keyboard_layout() to Error
-
-Markus Armbruster (37):
-      error: Fix use of error_prepend() with &error_fatal, &error_abort
-      Use error_fatal to simplify obvious fatal errors (again)
-      block: Use warn_report() & friends to report warnings
-      cpus hw target: Use warn_report() & friends to report warnings
-      vfio: Use warn_report() & friends to report warnings
-      vfio: Clean up error reporting after previous commit
-      char: Use error_printf() to print help and such
-      9pfs: Fix CLI parsing crash on error
-      pc: Fix machine property nvdimm-persistence error handling
-      ioapic: Fix error handling in realize()
-      smbios: Clean up error handling in smbios_add()
-      migration: Fix !replay_can_snapshot() error handling
-      l2tpv3: Improve -netdev/netdev_add/-net/... error reporting
-      net/socket: Fix invalid socket type error handling
-      numa: Fix QMP command set-numa-node error handling
-      xen/pt: Fix incomplete conversion to realize()
-      seccomp: Clean up error reporting in parse_sandbox()
-      vl: Clean up error reporting in parse_add_fd()
-      qom: Clean up error reporting in user_creatable_add_opts_foreach()
-      vl: Clean up error reporting in chardev_init_func()
-      vl: Clean up error reporting in machine_set_property()
-      vl: Clean up error reporting in mon_init_func()
-      vl: Clean up error reporting in parse_fw_cfg()
-      vl: Clean up error reporting in device_init_func()
-      ui/keymaps: Fix handling of erroneous include files
-      vnc: Clean up error reporting in vnc_init_func()
-      numa: Clean up error reporting in parse_numa()
-      tpm: Clean up error reporting in tpm_init_tpmdev()
-      spice: Clean up error reporting in add_channel()
-      fsdev: Clean up error reporting in qemu_fsdev_add()
-      vl: Assert drive_new() does not fail in default_drive()
-      blockdev: Convert drive_new() to Error
-      vl: Fix exit status for -drive format=3Dhelp
-      vl: Simplify call of parse_name()
-      block: Clean up bdrv_img_create()'s error reporting
-      vpc: Fail open on bad header checksum
-      error: Drop bogus "use error_setg() instead" admonitions
-
-Philippe Mathieu-Daud=C3=A9 (1):
-      vl: Print error when using incorrect backend for debugcon
-
- block.c                                  |   9 +++-----
- block/iscsi.c                            |   2 +-
- block/qcow2.c                            |   4 ++--
- block/qed.c                              |   4 ++--
- block/rbd.c                              |   4 ++--
- block/sheepdog.c                         |   2 +-
- block/vpc.c                              |   8 ++++---
- blockdev.c                               |  27 +++++++++++------------
- chardev/char-pty.c                       |   2 +-
- chardev/char.c                           |   2 +-
- cpus.c                                   |   8 +++----
- device-hotplug.c                         |   5 ++++-
- fsdev/qemu-fsdev-dummy.c                 |   2 +-
- fsdev/qemu-fsdev.c                       |  12 +++++------
- fsdev/qemu-fsdev.h                       |   2 +-
- hw/9pfs/9p-handle.c                      |   6 ++++--
- hw/9pfs/9p-local.c                       |   4 ++--
- hw/9pfs/xen-9p-backend.c                 |   7 +++++-
- hw/display/cg3.c                         |   2 +-
- hw/display/tcx.c                         |   2 +-
- hw/i386/pc.c                             |   5 +++--
- hw/intc/ioapic.c                         |   8 +++----
- hw/intc/xics.c                           |  15 +++++++------
- hw/intc/xics_kvm.c                       |   7 +-----
- hw/misc/ivshmem.c                        |   4 ++--
- hw/net/virtio-net.c                      |   8 +++----
- hw/ppc/pnv_core.c                        |   4 ++--
- hw/ppc/spapr_pci.c                       |   7 +++---
- hw/smbios/smbios.c                       |  90 +++++++++++++++++++++++++=
-++++++++++++++++++++++++++++------------------------
- hw/timer/aspeed_timer.c                  |   3 +--
- hw/usb/bus.c                             |   5 +++--
- hw/vfio/pci-quirks.c                     |   4 ++--
- hw/vfio/pci.c                            |  25 +++++++++++-----------
- hw/vfio/platform.c                       |   6 +++---
- hw/virtio/virtio-pci.c                   |   4 ++--
- hw/xen/xen_pt.c                          |   2 +-
- include/hw/vfio/vfio-common.h            |   3 +--
- include/qapi/error.h                     |  14 ++++++++++++
- include/qapi/qmp/qerror.h                |   6 +++---
- include/sysemu/blockdev.h                |   3 ++-
- include/sysemu/numa.h                    |   1 -
- include/sysemu/tpm.h                     |   2 +-
- include/ui/console.h                     |   2 +-
- migration/migration.c                    |  12 +++++------
- migration/savevm.c                       |   8 +++----
- net/l2tpv3.c                             |  25 +++++++++++-----------
- net/socket.c                             |   4 ++--
- numa.c                                   |  21 ++++++++++--------
- qemu-io.c                                |   8 +++----
- qemu-nbd.c                               |  14 ++++--------
- qemu-seccomp.c                           |  18 ++++++++--------
- qom/object_interfaces.c                  |   4 +---
- scripts/check-qerror.sh                  |  22 -------------------
- scripts/coccinelle/use-error_fatal.cocci |  20 ++++++++++++++++++
- stubs/tpm.c                              |   3 +--
- target/i386/cpu.c                        |  17 ++++++++-------
- target/ppc/translate_init.inc.c          |   4 ++--
- tests/qemu-iotests/049.out               |  12 ++++-------
- tpm.c                                    |  22 ++++++++-----------
- ui/curses.c                              |   6 +++---
- ui/keymaps.c                             |  40 +++++++++++++++++++++++--=
-----------
- ui/keymaps.h                             |   2 +-
- ui/sdl.c                                 |   6 +++---
- ui/spice-core.c                          |  13 ++++++------
- ui/vnc.c                                 |  19 +++++++++++------
- util/error.c                             |  13 ++++++++++++
- util/qemu-error.c                        |   5 -----
- vl.c                                     | 140 +++++++++++++++++++++++++=
-+++++++++++++++++++++----------------------------------------------------=
-----------------------
- 68 files changed, 414 insertions(+), 386 deletions(-)
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+Message-Id: <20181017151738.20299-1-berto@igalia.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ include/qapi/qmp/qerror.h |  6 +++---
+ scripts/check-qerror.sh   | 22 ----------------------
+ 2 files changed, 3 insertions(+), 25 deletions(-)
  delete mode 100755 scripts/check-qerror.sh
- create mode 100644 scripts/coccinelle/use-error_fatal.cocci
 
---=20
+diff --git a/include/qapi/qmp/qerror.h b/include/qapi/qmp/qerror.h
+index 145571f618..7c76e24aa7 100644
+--- a/include/qapi/qmp/qerror.h
++++ b/include/qapi/qmp/qerror.h
+@@ -79,6 +79,9 @@
+ #define QERR_QGA_COMMAND_FAILED \
+     "Guest agent command failed, error was '%s'"
+ 
++#define QERR_REPLAY_NOT_SUPPORTED \
++    "Record/replay feature is not supported for '%s'"
++
+ #define QERR_SET_PASSWD_FAILED \
+     "Could not set password"
+ 
+@@ -88,7 +91,4 @@
+ #define QERR_UNSUPPORTED \
+     "this feature or command is not currently supported"
+ 
+-#define QERR_REPLAY_NOT_SUPPORTED \
+-    "Record/replay feature is not supported for '%s'"
+-
+ #endif /* QERROR_H */
+diff --git a/scripts/check-qerror.sh b/scripts/check-qerror.sh
+deleted file mode 100755
+index af7fbd5249..0000000000
+--- a/scripts/check-qerror.sh
++++ /dev/null
+@@ -1,22 +0,0 @@
+-#!/bin/sh
+-# This script verifies that qerror definitions and table entries are
+-# alphabetically ordered.
+-
+-check_order() {
+-  errmsg=$1
+-  shift
+-
+-  # sort -C verifies order but does not print a message.  sort -c does print a
+-  # message.  These options are both in POSIX.
+-  if ! "$@" | sort -C; then
+-    echo "$errmsg"
+-    "$@" | sort -c
+-    exit 1
+-  fi
+-  return 0
+-}
+-
+-check_order 'Definitions in qerror.h must be in alphabetical order:' \
+-            grep '^#define QERR_' qerror.h
+-check_order 'Entries in qerror.c:qerror_table must be in alphabetical order:' \
+-            sed -n '/^static.*qerror_table\[\]/,/^};/s/QERR_/&/gp' qerror.c
+-- 
 2.17.2
