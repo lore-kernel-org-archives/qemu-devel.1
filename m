@@ -1,30 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38176)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gEZPo-0002PH-Pv
+	(envelope-from <armbru@redhat.com>) id 1gEZPq-0002Qw-8j
 	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gEZPl-0003Aw-Uh
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43796)
+	(envelope-from <armbru@redhat.com>) id 1gEZPn-0003F5-KG
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40402)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gEZPl-0002vJ-Hd
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:33 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gEZPn-0002xU-7b
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:35 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 49B9A4628E
-	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 12:34:19 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0083C315009B
+	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 12:34:22 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-34.ams2.redhat.com
+	[10.36.117.34])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id C203C5D6A9
+	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 12:34:21 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 22 Oct 2018 14:33:48 +0200
-Message-Id: <20181022123413.28044-16-armbru@redhat.com>
+Date: Mon, 22 Oct 2018 14:34:10 +0200
+Message-Id: <20181022123413.28044-38-armbru@redhat.com>
 In-Reply-To: <20181022123413.28044-1-armbru@redhat.com>
 References: <20181022123413.28044-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 15/40] l2tpv3: Improve
- -netdev/netdev_add/-net/... error reporting
+Subject: [Qemu-devel] [PULL 37/40] vl: Simplify call of parse_name()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,125 +37,34 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Jason Wang <jasowang@redhat.com>
 
-When -netdev l2tpv3 fails, it first reports a specific error, then a
-generic one, like this:
+main() checks for parse_name() failure even though it can't actually
+fail.  That's okay.  Simplify it to check by passing &error_fatal,
+like the other users of qemu_opts_foreach().
 
-    $ qemu-system-x86_64 -netdev l2tpv3,id=3Dfoo,src=3D,dst=3D,txsession=3D=
-1
-    qemu-system-x86_64: -netdev l2tpv3,id=3Dfoo,src=3D,dst=3D,txsession=3D=
-1: l2tpv3_open : could not resolve src, errno =3D Name or service not kno=
-wn
-    qemu-system-x86_64: Device 'l2tpv3' could not be initialized
-
-With the command line, the messages go to stderr.  In HMP, they go to
-the monitor.  In QMP, the second one becomes the error reply, and the
-first one goes to stderr.
-
-Convert net_init_tap() to Error.  This suppresses the unwanted second
-message, and makes the specific error the QMP error reply.
-
-Cc: Jason Wang <jasowang@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20181017082702.5581-14-armbru@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-Id: <20181017082702.5581-36-armbru@redhat.com>
 ---
- net/l2tpv3.c | 25 ++++++++++++-------------
- 1 file changed, 12 insertions(+), 13 deletions(-)
+ vl.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/net/l2tpv3.c b/net/l2tpv3.c
-index 6745b78990..81db24dc8c 100644
---- a/net/l2tpv3.c
-+++ b/net/l2tpv3.c
-@@ -28,6 +28,7 @@
- #include <netdb.h>
- #include "net/net.h"
- #include "clients.h"
-+#include "qapi/error.h"
- #include "qemu-common.h"
- #include "qemu/error-report.h"
- #include "qemu/option.h"
-@@ -528,7 +529,6 @@ int net_init_l2tpv3(const Netdev *netdev,
-                     const char *name,
-                     NetClientState *peer, Error **errp)
- {
--    /* FIXME error_setg(errp, ...) on failure */
-     const NetdevL2TPv3Options *l2tpv3;
-     NetL2TPV3State *s;
-     NetClientState *nc;
-@@ -555,7 +555,7 @@ int net_init_l2tpv3(const Netdev *netdev,
+diff --git a/vl.c b/vl.c
+index 812ceba425..d53e2563e9 100644
+--- a/vl.c
++++ b/vl.c
+@@ -3974,10 +3974,8 @@ int main(int argc, char **argv, char **envp)
      }
+ #endif
 =20
-     if ((l2tpv3->has_offset) && (l2tpv3->offset > 256)) {
--        error_report("l2tpv3_open : offset must be less than 256 bytes")=
-;
-+        error_setg(errp, "offset must be less than 256 bytes");
-         goto outerr;
-     }
+-    if (qemu_opts_foreach(qemu_find_opts("name"),
+-                          parse_name, NULL, NULL)) {
+-        exit(1);
+-    }
++    qemu_opts_foreach(qemu_find_opts("name"),
++                      parse_name, NULL, &error_fatal);
 =20
-@@ -563,6 +563,8 @@ int net_init_l2tpv3(const Netdev *netdev,
-         if (l2tpv3->has_rxcookie && l2tpv3->has_txcookie) {
-             s->cookie =3D true;
-         } else {
-+            error_setg(errp,
-+                       "require both 'rxcookie' and 'txcookie' or neithe=
-r");
-             goto outerr;
-         }
-     } else {
-@@ -578,7 +580,7 @@ int net_init_l2tpv3(const Netdev *netdev,
-     if (l2tpv3->has_udp && l2tpv3->udp) {
-         s->udp =3D true;
-         if (!(l2tpv3->has_srcport && l2tpv3->has_dstport)) {
--            error_report("l2tpv3_open : need both src and dst port for u=
-dp");
-+            error_setg(errp, "need both src and dst port for udp");
-             goto outerr;
-         } else {
-             srcport =3D l2tpv3->srcport;
-@@ -639,20 +641,19 @@ int net_init_l2tpv3(const Netdev *netdev,
-     gairet =3D getaddrinfo(l2tpv3->src, srcport, &hints, &result);
-=20
-     if ((gairet !=3D 0) || (result =3D=3D NULL)) {
--        error_report(
--            "l2tpv3_open : could not resolve src, errno =3D %s",
--            gai_strerror(gairet)
--        );
-+        error_setg(errp, "could not resolve src, errno =3D %s",
-+                   gai_strerror(gairet));
-         goto outerr;
-     }
-     fd =3D socket(result->ai_family, result->ai_socktype, result->ai_pro=
-tocol);
-     if (fd =3D=3D -1) {
-         fd =3D -errno;
--        error_report("l2tpv3_open : socket creation failed, errno =3D %d=
-", -fd);
-+        error_setg(errp, "socket creation failed, errno =3D %d",
-+                   -fd);
-         goto outerr;
-     }
-     if (bind(fd, (struct sockaddr *) result->ai_addr, result->ai_addrlen=
-)) {
--        error_report("l2tpv3_open :  could not bind socket err=3D%i", er=
-rno);
-+        error_setg(errp, "could not bind socket err=3D%i", errno);
-         goto outerr;
-     }
-     if (result) {
-@@ -677,10 +678,8 @@ int net_init_l2tpv3(const Netdev *netdev,
-     result =3D NULL;
-     gairet =3D getaddrinfo(l2tpv3->dst, dstport, &hints, &result);
-     if ((gairet !=3D 0) || (result =3D=3D NULL)) {
--        error_report(
--            "l2tpv3_open : could not resolve dst, error =3D %s",
--            gai_strerror(gairet)
--        );
-+        error_setg(errp, "could not resolve dst, error =3D %s",
-+                   gai_strerror(gairet));
-         goto outerr;
-     }
-=20
+ #ifndef _WIN32
+     qemu_opts_foreach(qemu_find_opts("add-fd"),
 --=20
 2.17.2
