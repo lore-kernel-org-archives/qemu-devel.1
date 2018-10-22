@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45857)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEZmc-0008O3-K5
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:12 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEZmc-0008O1-Jt
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEZmX-00082u-O8
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEZmZ-00084t-H4
 	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:10 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:33223 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:33345 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gEZmX-000813-BE
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:05 -0400
+	id 1gEZmZ-00083F-6d
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:07 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 22 Oct 2018 14:57:23 +0200
-Message-Id: <1540213077-15211-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL 00/34] MIPS queue for October 2018 - part 2
+Date: Mon, 22 Oct 2018 14:57:32 +0200
+Message-Id: <1540213077-15211-10-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1540213077-15211-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1540213077-15211-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PULL 09/34] target/mips: Define R5900 MMI3 opcode
+ constants
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,88 +28,64 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Fredrik Noring <noring@nocrew.org>
 
-The following changes since commit b312532fd03413d0e6ae6767ec793a3e30f487b8:
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Fredrik Noring <noring@nocrew.org>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+---
+ target/mips/translate.c | 39 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
 
-  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2018-10-19 19:01:07 +0100)
-
-are available in the git repository at:
-
-  https://github.com/AMarkovic/qemu tags/mips-queue-oct-2018-part-2
-
-for you to fetch changes up to 2ec219776c633df9e43c5fa1557f70ee4f735f9d:
-
-  target/mips: Fix decoding of ALIGN and DALIGN instructions (2018-10-22 14:41:47 +0200)
-
-----------------------------------------------------------------
-MIPS queue for October 2018 - part 2
-
-Limited support for R5900 ISA, MMI ASE, and two misc fixes.
-
-----------------------------------------------------------------
-
-Aleksandar Markovic (2):
-  target/mips: Fix the title of translate.c
-  target/mips: Fix decoding of ALIGN and DALIGN instructions
-
-Fredrik Noring (32):
-  target/mips: Define R5900 ISA, MMI ASE, and R5900 CPU preprocessor
-    constants
-  disas/mips: Define R5900 disassembly constants
-  target/mips: R5900 Multimedia Instruction overview note
-  target/mips: Define R5900 MMI class, and LQ and SQ opcode constants
-  target/mips: Define R5900 MMI{0, 1, 2, 3} subclasses and MMI opcode
-    constants
-  target/mips: Define R5900 MMI0 opcode constants
-  target/mips: Define R5900 MMI1 opcode constants
-  target/mips: Define R5900 MMI2 opcode constants
-  target/mips: Define R5900 MMI3 opcode constants
-  target/mips: Placeholder for R5900 SQ, handle user mode RDHWR
-  target/mips: Placeholder for R5900 LQ
-  target/mips: Placeholder for R5900 MMI instruction class
-  target/mips: Placeholder for R5900 MMI0 instruction subclass
-  target/mips: Placeholder for R5900 MMI1 instruction subclass
-  target/mips: Placeholder for R5900 MMI2 instruction subclass
-  target/mips: Placeholder for R5900 MMI3 instruction subclass
-  target/mips: Support R5900 three-operand MULT and MULTU instructions
-  target/mips: Support R5900 three-operand MULT1 and MULTU1 instructions
-  target/mips: Support R5900 MFLO1, MTLO1, MFHI1 and MTHI1 instructions
-  target/mips: Support R5900 DIV1 and DIVU1 instructions
-  target/mips: Support R5900 MOVN, MOVZ and PREF instructions from MIPS
-    IV
-  target/mips: R5900 DMULT[U], DDIV[U], LL[D] and SC[D] are user only
-  tests/tcg/mips: Test R5900 three-operand MULT
-  tests/tcg/mips: Test R5900 three-operand MULTU
-  tests/tcg/mips: Test R5900 three-operand MULT1
-  tests/tcg/mips: Test R5900 three-operand MULTU1
-  tests/tcg/mips: Test R5900 MFLO1 and MFHI1
-  tests/tcg/mips: Test R5900 MTLO1 and MTHI1
-  tests/tcg/mips: Test R5900 DIV1
-  tests/tcg/mips: Test R5900 DIVU1
-  target/mips: Define the R5900 CPU
-  linux-user/mips: Recognise the R5900 CPU model
-
- disas/mips.c                       |  16 +
- linux-user/mips/target_elf.h       |   3 +
- target/mips/mips-defs.h            |   3 +
- target/mips/translate.c            | 865 ++++++++++++++++++++++++++++++++++++-
- target/mips/translate_init.inc.c   |  59 +++
- tests/tcg/mips/mipsr5900/Makefile  |  30 ++
- tests/tcg/mips/mipsr5900/div1.c    |  73 ++++
- tests/tcg/mips/mipsr5900/divu1.c   |  48 ++
- tests/tcg/mips/mipsr5900/mflohi1.c |  35 ++
- tests/tcg/mips/mipsr5900/mtlohi1.c |  40 ++
- tests/tcg/mips/mipsr5900/mult.c    |  76 ++++
- tests/tcg/mips/mipsr5900/multu.c   |  68 +++
- 12 files changed, 1297 insertions(+), 19 deletions(-)
- create mode 100644 tests/tcg/mips/mipsr5900/Makefile
- create mode 100644 tests/tcg/mips/mipsr5900/div1.c
- create mode 100644 tests/tcg/mips/mipsr5900/divu1.c
- create mode 100644 tests/tcg/mips/mipsr5900/mflohi1.c
- create mode 100644 tests/tcg/mips/mipsr5900/mtlohi1.c
- create mode 100644 tests/tcg/mips/mipsr5900/mult.c
- create mode 100644 tests/tcg/mips/mipsr5900/multu.c
-
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index bd51443..3c6a2c9 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -2323,6 +2323,45 @@ enum {
+     TX79_MMI2_PROT3W = (0x1F << 6) | TX79_MMI_CLASS_MMI2,
+ };
+ 
++/*
++ * TX79 Multimedia Instructions with opcode field = MMI and bits 5..0 = MMI3:
++ *
++ *  31    26                        10     6 5      0
++ * +--------+----------------------+--------+--------+
++ * |   MMI  |                      |function|  MMI3  |
++ * +--------+----------------------+--------+--------+
++ *
++ * function  bits 7..6
++ *     bits |   0   |   1   |   2   |   3
++ *    10..8 |   00  |   01  |   10  |   11
++ *   -------+-------+-------+-------+-------
++ *    0 000 |PMADDUW|   *   |   *   | PSRAVW
++ *    1 001 |   *   |   *   |   *   |   *
++ *    2 010 | PMTHI | PMTLO | PINTEH|   *
++ *    3 011 |PMULTUW| PDIVUW| PCPYUD|   *
++ *    4 100 |   *   |   *   |  POR  |  PNOR
++ *    5 101 |   *   |   *   |   *   |   *
++ *    6 110 |   *   |   *   | PEXCH | PCPYH
++ *    7 111 |   *   |   *   | PEXCW |   *
++ */
++
++#define MASK_TX79_MMI3(op) (MASK_OP_MAJOR(op) | ((op) & 0x7FF))
++enum {
++    TX79_MMI3_PMADDUW = (0x00 << 6) | TX79_MMI_CLASS_MMI3,
++    TX79_MMI3_PSRAVW  = (0x03 << 6) | TX79_MMI_CLASS_MMI3,
++    TX79_MMI3_PMTHI   = (0x08 << 6) | TX79_MMI_CLASS_MMI3,
++    TX79_MMI3_PMTLO   = (0x09 << 6) | TX79_MMI_CLASS_MMI3,
++    TX79_MMI3_PINTEH  = (0x0A << 6) | TX79_MMI_CLASS_MMI3,
++    TX79_MMI3_PMULTUW = (0x0C << 6) | TX79_MMI_CLASS_MMI3,
++    TX79_MMI3_PDIVUW  = (0x0D << 6) | TX79_MMI_CLASS_MMI3,
++    TX79_MMI3_PCPYUD  = (0x0E << 6) | TX79_MMI_CLASS_MMI3,
++    TX79_MMI3_POR     = (0x12 << 6) | TX79_MMI_CLASS_MMI3,
++    TX79_MMI3_PNOR    = (0x13 << 6) | TX79_MMI_CLASS_MMI3,
++    TX79_MMI3_PEXCH   = (0x1A << 6) | TX79_MMI_CLASS_MMI3,
++    TX79_MMI3_PCPYH   = (0x1B << 6) | TX79_MMI_CLASS_MMI3,
++    TX79_MMI3_PEXCW   = (0x1E << 6) | TX79_MMI_CLASS_MMI3,
++};
++
+ /* global register indices */
+ static TCGv cpu_gpr[32], cpu_PC;
+ static TCGv cpu_HI[MIPS_DSP_ACC], cpu_LO[MIPS_DSP_ACC];
 -- 
 2.7.4
