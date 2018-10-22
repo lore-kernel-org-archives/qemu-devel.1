@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39692)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gEaeX-0003rL-Ne
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 09:53:55 -0400
+	(envelope-from <mreitz@redhat.com>) id 1gEaeZ-0003rd-N6
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 09:53:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gEaeT-0006HQ-AN
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 09:53:53 -0400
+	(envelope-from <mreitz@redhat.com>) id 1gEaeX-0006KZ-Mi
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 09:53:55 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon, 22 Oct 2018 14:53:02 +0100
-Message-Id: <20181022135307.14398-5-mreitz@redhat.com>
+Date: Mon, 22 Oct 2018 14:53:03 +0100
+Message-Id: <20181022135307.14398-6-mreitz@redhat.com>
 In-Reply-To: <20181022135307.14398-1-mreitz@redhat.com>
 References: <20181022135307.14398-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 4/9] iotests: Use // for Python integer
- division
+Subject: [Qemu-devel] [PATCH v3 5/9] iotests: Different iterator behavior in
+ Python 3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,266 +23,206 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-In Python 3, / is always a floating-point division.  We usually do not
-want this, and as Python 2.7 understands // as well, change all integer
-divisions to use that.
+In Python 3, several functions now return iterators instead of lists.
+This includes range(), items(), map(), and filter().  This means that if
+we really want a list, we have to wrap those instances with list().  But
+then again, the two instances where this is the case for map() and
+filter(), there are shorter expressions which work without either
+function.
+
+On the other hand, sometimes we do just want an iterator, in which case
+we have sometimes used xrange() and iteritems() which no longer exist in
+Python 3.  Just change these calls to be range() and items(), works in
+both Python 2 and 3, and is really what we want in 3 (which is what
+matters).  But because it is so simple to do (and to find and remove
+once we completely switch to Python 3), make range() be an alias for
+xrange() in the two affected tests (044 and 163).
+
+In one instance, we only wanted the first instance of the result of a
+filter() call.  Instead of using next(filter()) which would work only in
+Python 3, or list(filter())[0] which would work everywhere but is a bit
+weird, this instance is changed to use a generator expression with a
+next() wrapped around, which works both in 2.7 and 3.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 Reviewed-by: Cleber Rosa <crosa@redhat.com>
 ---
- tests/qemu-iotests/030        |  2 +-
- tests/qemu-iotests/040        |  4 ++--
- tests/qemu-iotests/041        |  4 ++--
- tests/qemu-iotests/044        |  2 +-
- tests/qemu-iotests/093        | 18 +++++++++---------
- tests/qemu-iotests/136        |  2 +-
- tests/qemu-iotests/149        |  6 +++---
- tests/qemu-iotests/151        | 12 ++++++------
- tests/qemu-iotests/163        |  2 +-
- tests/qemu-iotests/iotests.py |  2 +-
- tests/qemu-iotests/qed.py     |  6 +++---
- 11 files changed, 30 insertions(+), 30 deletions(-)
+ tests/qemu-iotests/044 | 16 ++++++++++------
+ tests/qemu-iotests/056 |  2 +-
+ tests/qemu-iotests/065 |  4 ++--
+ tests/qemu-iotests/124 |  4 ++--
+ tests/qemu-iotests/139 |  2 +-
+ tests/qemu-iotests/163 | 11 +++++++----
+ 6 files changed, 23 insertions(+), 16 deletions(-)
 
-diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
-index 1dbc2ddc49..276e06b5ba 100755
---- a/tests/qemu-iotests/030
-+++ b/tests/qemu-iotests/030
-@@ -521,7 +521,7 @@ new_state = "2"
- state = "2"
- event = "%s"
- new_state = "1"
--''' % (event, errno, self.STREAM_BUFFER_SIZE / 512, event, event))
-+''' % (event, errno, self.STREAM_BUFFER_SIZE // 512, event, event))
-         file.close()
- 
- class TestEIO(TestErrors):
-diff --git a/tests/qemu-iotests/040 b/tests/qemu-iotests/040
-index 1cb1ceeb33..b81133a474 100755
---- a/tests/qemu-iotests/040
-+++ b/tests/qemu-iotests/040
-@@ -195,7 +195,7 @@ class TestSingleDrive(ImageCommitTestCase):
- 
-         self.assert_no_active_block_jobs()
-         result = self.vm.qmp('block-commit', device='drive0', top=mid_img,
--                             base=backing_img, speed=(self.image_len / 4))
-+                             base=backing_img, speed=(self.image_len // 4))
-         self.assert_qmp(result, 'return', {})
-         result = self.vm.qmp('device_del', id='scsi0')
-         self.assert_qmp(result, 'return', {})
-@@ -225,7 +225,7 @@ class TestSingleDrive(ImageCommitTestCase):
- 
-         self.assert_no_active_block_jobs()
-         result = self.vm.qmp('block-commit', device='drive0', top=mid_img,
--                             base=backing_img, speed=(self.image_len / 4))
-+                             base=backing_img, speed=(self.image_len // 4))
-         self.assert_qmp(result, 'return', {})
- 
-         result = self.vm.qmp('query-block')
-diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
-index 9336ab6ff5..3615011d98 100755
---- a/tests/qemu-iotests/041
-+++ b/tests/qemu-iotests/041
-@@ -404,7 +404,7 @@ new_state = "2"
- state = "2"
- event = "%s"
- new_state = "1"
--''' % (event, errno, self.MIRROR_GRANULARITY / 512, event, event))
-+''' % (event, errno, self.MIRROR_GRANULARITY // 512, event, event))
-         file.close()
- 
-     def setUp(self):
-@@ -569,7 +569,7 @@ new_state = "2"
- state = "2"
- event = "%s"
- new_state = "1"
--''' % (event, errno, self.MIRROR_GRANULARITY / 512, event, event))
-+''' % (event, errno, self.MIRROR_GRANULARITY // 512, event, event))
-         file.close()
- 
-     def setUp(self):
 diff --git a/tests/qemu-iotests/044 b/tests/qemu-iotests/044
-index 69e736f687..7ef5e46fe9 100755
+index 7ef5e46fe9..9ec3dba734 100755
 --- a/tests/qemu-iotests/044
 +++ b/tests/qemu-iotests/044
-@@ -86,7 +86,7 @@ class TestRefcountTableGrowth(iotests.QMPTestCase):
+@@ -26,6 +26,10 @@ import iotests
+ from iotests import qemu_img, qemu_img_verbose, qemu_io
+ import struct
+ import subprocess
++import sys
++
++if sys.version_info.major == 2:
++    range = xrange
+ 
+ test_img = os.path.join(iotests.test_dir, 'test.img')
+ 
+@@ -52,23 +56,23 @@ class TestRefcountTableGrowth(iotests.QMPTestCase):
+             # Write a refcount table
+             fd.seek(off_reftable)
+ 
+-            for i in xrange(0, h.refcount_table_clusters):
++            for i in range(0, h.refcount_table_clusters):
+                 sector = b''.join(struct.pack('>Q',
+                     off_refblock + i * 64 * 512 + j * 512)
+-                    for j in xrange(0, 64))
++                    for j in range(0, 64))
+                 fd.write(sector)
+ 
+             # Write the refcount blocks
+             assert(fd.tell() == off_refblock)
+             sector = b''.join(struct.pack('>H', 1) for j in range(0, 64 * 256))
+-            for block in xrange(0, h.refcount_table_clusters):
++            for block in range(0, h.refcount_table_clusters):
+                 fd.write(sector)
+ 
+             # Write the L1 table
+             assert(fd.tell() == off_l1)
+             assert(off_l2 + 512 * h.l1_size == off_data)
+             table = b''.join(struct.pack('>Q', (1 << 63) | off_l2 + 512 * j)
+-                for j in xrange(0, h.l1_size))
++                for j in range(0, h.l1_size))
+             fd.write(table)
+ 
+             # Write the L2 tables
+@@ -79,14 +83,14 @@ class TestRefcountTableGrowth(iotests.QMPTestCase):
+             off = off_data
+             while remaining > 1024 * 512:
+                 pytable = list((1 << 63) | off + 512 * j
+-                    for j in xrange(0, 1024))
++                    for j in range(0, 1024))
+                 table = struct.pack('>1024Q', *pytable)
+                 fd.write(table)
+                 remaining = remaining - 1024 * 512
                  off = off + 1024 * 512
  
              table = b''.join(struct.pack('>Q', (1 << 63) | off + 512 * j)
--                for j in xrange(0, remaining / 512))
-+                for j in xrange(0, remaining // 512))
+-                for j in xrange(0, remaining // 512))
++                for j in range(0, remaining // 512))
              fd.write(table)
  
  
-diff --git a/tests/qemu-iotests/093 b/tests/qemu-iotests/093
-index 9d1971a56c..d88fbc182e 100755
---- a/tests/qemu-iotests/093
-+++ b/tests/qemu-iotests/093
-@@ -69,18 +69,18 @@ class ThrottleTestCase(iotests.QMPTestCase):
-         # in. The throttled requests won't be executed until we
-         # advance the virtual clock.
-         rq_size = 512
--        rd_nr = max(params['bps'] / rq_size / 2,
--                    params['bps_rd'] / rq_size,
--                    params['iops'] / 2,
-+        rd_nr = max(params['bps'] // rq_size // 2,
-+                    params['bps_rd'] // rq_size,
-+                    params['iops'] // 2,
-                     params['iops_rd'])
-         rd_nr *= seconds * 2
--        rd_nr /= ndrives
--        wr_nr = max(params['bps'] / rq_size / 2,
--                    params['bps_wr'] / rq_size,
--                    params['iops'] / 2,
-+        rd_nr //= ndrives
-+        wr_nr = max(params['bps'] // rq_size // 2,
-+                    params['bps_wr'] // rq_size,
-+                    params['iops'] // 2,
-                     params['iops_wr'])
-         wr_nr *= seconds * 2
--        wr_nr /= ndrives
-+        wr_nr //= ndrives
+diff --git a/tests/qemu-iotests/056 b/tests/qemu-iotests/056
+index 223292175a..3df323984d 100755
+--- a/tests/qemu-iotests/056
++++ b/tests/qemu-iotests/056
+@@ -32,7 +32,7 @@ target_img = os.path.join(iotests.test_dir, 'target.img')
+ def img_create(img, fmt=iotests.imgfmt, size='64M', **kwargs):
+     fullname = os.path.join(iotests.test_dir, '%s.%s' % (img, fmt))
+     optargs = []
+-    for k,v in kwargs.iteritems():
++    for k,v in kwargs.items():
+         optargs = optargs + ['-o', '%s=%s' % (k,v)]
+     args = ['create', '-f', fmt] + optargs + [fullname, size]
+     iotests.qemu_img(*args)
+diff --git a/tests/qemu-iotests/065 b/tests/qemu-iotests/065
+index 72aa9707c7..8bac383ea7 100755
+--- a/tests/qemu-iotests/065
++++ b/tests/qemu-iotests/065
+@@ -59,7 +59,7 @@ class TestQemuImgInfo(TestImageInfoSpecific):
+                     :data.index('')]
+         for field in data:
+             self.assertTrue(re.match('^ {4}[^ ]', field) is not None)
+-        data = map(lambda line: line.strip(), data)
++        data = [line.strip() for line in data]
+         self.assertEqual(data, self.human_compare)
  
-         # Send I/O requests to all drives
-         for i in range(rd_nr):
-@@ -196,7 +196,7 @@ class ThrottleTestCase(iotests.QMPTestCase):
-             self.configure_throttle(ndrives, settings)
+ class TestQMP(TestImageInfoSpecific):
+@@ -80,7 +80,7 @@ class TestQMP(TestImageInfoSpecific):
  
-             # Wait for the bucket to empty so we can do bursts
--            wait_ns = nsec_per_sec * burst_length * burst_rate / rate
-+            wait_ns = nsec_per_sec * burst_length * burst_rate // rate
-             self.vm.qtest("clock_step %d" % wait_ns)
+     def test_qmp(self):
+         result = self.vm.qmp('query-block')['return']
+-        drive = filter(lambda drive: drive['device'] == 'drive0', result)[0]
++        drive = next(drive for drive in result if drive['device'] == 'drive0')
+         data = drive['inserted']['image']['format-specific']
+         self.assertEqual(data['type'], iotests.imgfmt)
+         self.assertEqual(data['data'], self.compare)
+diff --git a/tests/qemu-iotests/124 b/tests/qemu-iotests/124
+index 3ea4ac53f5..9f189e3b54 100755
+--- a/tests/qemu-iotests/124
++++ b/tests/qemu-iotests/124
+@@ -39,7 +39,7 @@ def try_remove(img):
+ def transaction_action(action, **kwargs):
+     return {
+         'type': action,
+-        'data': dict((k.replace('_', '-'), v) for k, v in kwargs.iteritems())
++        'data': dict((k.replace('_', '-'), v) for k, v in kwargs.items())
+     }
  
-             # Test I/O at the max burst rate
-diff --git a/tests/qemu-iotests/136 b/tests/qemu-iotests/136
-index a154d8ef9d..af7ffa4540 100755
---- a/tests/qemu-iotests/136
-+++ b/tests/qemu-iotests/136
-@@ -24,7 +24,7 @@ import os
  
- interval_length = 10
- nsec_per_sec = 1000000000
--op_latency = nsec_per_sec / 1000 # See qtest_latency_ns in accounting.c
-+op_latency = nsec_per_sec // 1000 # See qtest_latency_ns in accounting.c
- bad_sector = 8192
- bad_offset = bad_sector * 512
- blkdebug_file = os.path.join(iotests.test_dir, 'blkdebug.conf')
-diff --git a/tests/qemu-iotests/149 b/tests/qemu-iotests/149
-index 1225334cb8..4f363f295f 100755
---- a/tests/qemu-iotests/149
-+++ b/tests/qemu-iotests/149
-@@ -314,13 +314,13 @@ def test_once(config, qemu_img=False):
-     image_size = 4 * oneTB
-     if qemu_img:
-         iotests.log("# Create image")
--        qemu_img_create(config, image_size / oneMB)
-+        qemu_img_create(config, image_size // oneMB)
-     else:
-         iotests.log("# Create image")
--        create_image(config, image_size / oneMB)
-+        create_image(config, image_size // oneMB)
+@@ -134,7 +134,7 @@ class TestIncrementalBackupBase(iotests.QMPTestCase):
+     def img_create(self, img, fmt=iotests.imgfmt, size='64M',
+                    parent=None, parentFormat=None, **kwargs):
+         optargs = []
+-        for k,v in kwargs.iteritems():
++        for k,v in kwargs.items():
+             optargs = optargs + ['-o', '%s=%s' % (k,v)]
+         args = ['create', '-f', fmt] + optargs + [img, size]
+         if parent:
+diff --git a/tests/qemu-iotests/139 b/tests/qemu-iotests/139
+index cc7fe337f3..62402c1c35 100755
+--- a/tests/qemu-iotests/139
++++ b/tests/qemu-iotests/139
+@@ -51,7 +51,7 @@ class TestBlockdevDel(iotests.QMPTestCase):
+     # Check whether a BlockDriverState exists
+     def checkBlockDriverState(self, node, must_exist = True):
+         result = self.vm.qmp('query-named-block-nodes')
+-        nodes = filter(lambda x: x['node-name'] == node, result['return'])
++        nodes = [x for x in result['return'] if x['node-name'] == node]
+         self.assertLessEqual(len(nodes), 1)
+         self.assertEqual(must_exist, len(nodes) == 1)
  
-     lowOffsetMB = 100
--    highOffsetMB = 3 * oneTB / oneMB
-+    highOffsetMB = 3 * oneTB // oneMB
- 
-     try:
-         if not qemu_img:
-diff --git a/tests/qemu-iotests/151 b/tests/qemu-iotests/151
-index fe53b9f446..1bb74d67c4 100755
---- a/tests/qemu-iotests/151
-+++ b/tests/qemu-iotests/151
-@@ -67,9 +67,9 @@ class TestActiveMirror(iotests.QMPTestCase):
-                             'write -P 1 0 %i' % self.image_len);
- 
-         # Start some background requests
--        for offset in range(1 * self.image_len / 8, 3 * self.image_len / 8, 1024 * 1024):
-+        for offset in range(1 * self.image_len // 8, 3 * self.image_len // 8, 1024 * 1024):
-             self.vm.hmp_qemu_io('source', 'aio_write -P 2 %i 1M' % offset)
--        for offset in range(2 * self.image_len / 8, 3 * self.image_len / 8, 1024 * 1024):
-+        for offset in range(2 * self.image_len // 8, 3 * self.image_len // 8, 1024 * 1024):
-             self.vm.hmp_qemu_io('source', 'aio_write -z %i 1M' % offset)
- 
-         # Start the block job
-@@ -83,9 +83,9 @@ class TestActiveMirror(iotests.QMPTestCase):
-         self.assert_qmp(result, 'return', {})
- 
-         # Start some more requests
--        for offset in range(3 * self.image_len / 8, 5 * self.image_len / 8, 1024 * 1024):
-+        for offset in range(3 * self.image_len // 8, 5 * self.image_len // 8, 1024 * 1024):
-             self.vm.hmp_qemu_io('source', 'aio_write -P 3 %i 1M' % offset)
--        for offset in range(4 * self.image_len / 8, 5 * self.image_len / 8, 1024 * 1024):
-+        for offset in range(4 * self.image_len // 8, 5 * self.image_len // 8, 1024 * 1024):
-             self.vm.hmp_qemu_io('source', 'aio_write -z %i 1M' % offset)
- 
-         # Wait for the READY event
-@@ -95,9 +95,9 @@ class TestActiveMirror(iotests.QMPTestCase):
-         # the source) should be settled using the active mechanism.
-         # The mirror code itself asserts that the source BDS's dirty
-         # bitmap will stay clean between READY and COMPLETED.
--        for offset in range(5 * self.image_len / 8, 7 * self.image_len / 8, 1024 * 1024):
-+        for offset in range(5 * self.image_len // 8, 7 * self.image_len // 8, 1024 * 1024):
-             self.vm.hmp_qemu_io('source', 'aio_write -P 3 %i 1M' % offset)
--        for offset in range(6 * self.image_len / 8, 7 * self.image_len / 8, 1024 * 1024):
-+        for offset in range(6 * self.image_len // 8, 7 * self.image_len // 8, 1024 * 1024):
-             self.vm.hmp_qemu_io('source', 'aio_write -z %i 1M' % offset)
- 
-         if sync_source_and_target:
 diff --git a/tests/qemu-iotests/163 b/tests/qemu-iotests/163
-index 403842354e..5fd424761b 100755
+index 5fd424761b..158ba5d092 100755
 --- a/tests/qemu-iotests/163
 +++ b/tests/qemu-iotests/163
-@@ -38,7 +38,7 @@ class ShrinkBaseClass(iotests.QMPTestCase):
-         entry_bits = 3
-         entry_size = 1 << entry_bits
-         l1_mask = 0x00fffffffffffe00
--        div_roundup = lambda n, d: (n + d - 1) / d
-+        div_roundup = lambda n, d: (n + d - 1) // d
+@@ -18,9 +18,12 @@
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
+ 
+-import os, random, iotests, struct, qcow2
++import os, random, iotests, struct, qcow2, sys
+ from iotests import qemu_img, qemu_io, image_size
+ 
++if sys.version_info.major == 2:
++    range = xrange
++
+ test_img = os.path.join(iotests.test_dir, 'test.img')
+ check_img = os.path.join(iotests.test_dir, 'check.img')
+ 
+@@ -41,7 +44,7 @@ class ShrinkBaseClass(iotests.QMPTestCase):
+         div_roundup = lambda n, d: (n + d - 1) // d
  
          def split_by_n(data, n):
-             for x in xrange(0, len(data), n):
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index 7290c0b159..7ca94e9278 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -199,7 +199,7 @@ def create_image(name, size):
-     file = open(name, 'wb')
-     i = 0
-     while i < size:
--        sector = struct.pack('>l504xl', i / 512, i / 512)
-+        sector = struct.pack('>l504xl', i // 512, i // 512)
-         file.write(sector)
-         i = i + 512
-     file.close()
-diff --git a/tests/qemu-iotests/qed.py b/tests/qemu-iotests/qed.py
-index ea469b9c48..8adaaf46c4 100755
---- a/tests/qemu-iotests/qed.py
-+++ b/tests/qemu-iotests/qed.py
-@@ -80,7 +80,7 @@ class QED(object):
+-            for x in xrange(0, len(data), n):
++            for x in range(0, len(data), n):
+                 yield struct.unpack('>Q', data[x:x + n])[0] & l1_mask
  
-     def load_l1_table(self):
-         self.l1_table = self.read_table(self.header['l1_table_offset'])
--        self.table_nelems = self.header['table_size'] * self.header['cluster_size'] / table_elem_size
-+        self.table_nelems = self.header['table_size'] * self.header['cluster_size'] // table_elem_size
+         def check_l1_table(h, l1_data):
+@@ -135,8 +138,8 @@ class ShrinkBaseClass(iotests.QMPTestCase):
+         self.image_verify()
  
-     def write_table(self, offset, table):
-         s = ''.join(pack_table_elem(x) for x in table)
-@@ -167,14 +167,14 @@ def cmd_zero_cluster(qed, pos, *args):
-         n = int(args[0])
- 
-     for i in xrange(n):
--        l1_index = pos / qed.header['cluster_size'] / len(qed.l1_table)
-+        l1_index = pos // qed.header['cluster_size'] // len(qed.l1_table)
-         if qed.l1_table[l1_index] == 0:
-             err('no l2 table allocated')
- 
-         l2_offset = qed.l1_table[l1_index]
-         l2_table = qed.read_table(l2_offset)
- 
--        l2_index = (pos / qed.header['cluster_size']) % len(qed.l1_table)
-+        l2_index = (pos // qed.header['cluster_size']) % len(qed.l1_table)
-         l2_table[l2_index] = 1 # zero the data cluster
-         qed.write_table(l2_offset, l2_table)
-         pos += qed.header['cluster_size']
+     def test_random_write(self):
+-        offs_list = range(0, size_to_int(self.image_len),
+-                          size_to_int(self.chunk_size))
++        offs_list = list(range(0, size_to_int(self.image_len),
++                               size_to_int(self.chunk_size)))
+         random.shuffle(offs_list)
+         for offs in offs_list:
+             qemu_io('-c', 'write -P 0xff %d %s' % (offs, self.chunk_size),
 -- 
 2.17.1
