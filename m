@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44826)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52091)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1gEcKD-0000Ra-IC
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 11:41:07 -0400
+	(envelope-from <bounces@canonical.com>) id 1gEcdl-0000yh-Er
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 12:01:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1gEcK8-0000Tu-GU
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 11:40:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58776)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1gEcK6-0000Q8-Re
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 11:40:55 -0400
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-In-Reply-To: <20181022143355.GA5839@rkaganb.sw.ru>
-References: <20181019111432.5040-1-vkuznets@redhat.com>
-	<20181019111432.5040-3-vkuznets@redhat.com>
-	<20181022143355.GA5839@rkaganb.sw.ru>
-Date: Mon, 22 Oct 2018 17:40:46 +0200
-Message-ID: <87lg6q9egx.fsf@vitty.brq.redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1gEcdi-0001vS-De
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 12:01:13 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43074)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gEcdi-0001rD-1g
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 12:01:10 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gEcdd-0002lm-OM
+	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 16:01:05 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B75072E80CC
+	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 16:01:05 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 2/2] x86: hv_evmcs CPU flag support
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 22 Oct 2018 15:47:04 -0000
+From: Roman Bolshakov <1798451@bugs.launchpad.net>
+Reply-To: Bug 1798451 <1798451@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153980387714.3465.12419240219281347614.malonedeb@soybean.canonical.com>
+Message-Id: <154022322483.16808.6637049594956776412.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1798451] Re: HVF linux on OSX hangs 2nd time
+ started after adding socket
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,62 +37,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Kagan <rkagan@virtuozzo.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
+To: qemu-devel@nongnu.org
 
-Roman Kagan <rkagan@virtuozzo.com> writes:
+I have tried to run the OS and I can confirm that some instructions that
+require VMEXIT are not implemented. In your case that's 0F7F or MOVQ
+(mem from mmxreg) from MMX. In my case that's 0F11 or MOVUPS(xmmreg1 to
+mem) from SSE.
 
-> On Fri, Oct 19, 2018 at 01:14:32PM +0200, Vitaly Kuznetsov wrote:
->> --- a/target/i386/kvm.c
->> +++ b/target/i386/kvm.c
->> @@ -798,6 +798,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
->>      uint32_t unused;
->>      struct kvm_cpuid_entry2 *c;
->>      uint32_t signature[3];
->> +    uint16_t evmcs_version;
->>      int kvm_base = KVM_CPUID_SIGNATURE;
->>      int r;
->>      Error *local_err = NULL;
->> @@ -841,7 +842,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
->>              memset(signature, 0, 12);
->>              memcpy(signature, cpu->hyperv_vendor_id, len);
->>          }
->> -        c->eax = HV_CPUID_MIN;
->> +        c->eax = cpu->hyperv_evmcs ? HV_CPUID_MIN_NESTED : HV_CPUID_MIN;
->
->
-> I think these two aren't meant to be used on the hypervisor side.  My
-> understanding is that HV_CPUID_MIN is only there as a reminder that the
-> real Hyper-V exposes at least that many hypervisor-specific leaves so
-> the guest can rely on that.  So I'd rather use directly
-> HV_CPUID_IMPLEMENT_LIMITS : HV_CPUID_NESTED_FEATURES, and not introduce
-> HV_CPUID_MIN_NESTED.
+I'd recommend you to run -cpu host,-mmx,-sse for a while, but the kernel
+of the OS explicitly complains that it won't run on CPUs without SSE
+support.
 
-Makes sense, will do v2.
+-- =
 
->  Maybe better yet is to update this field with the
-> maximum value while populating HV_* leaves:
->
->     if (hyperv_enabled(cpu)) {
->         uint32_t *cpuid_40000000_eax;
->         c = &cpuid_data.entries[cpuid_i++];
->         c->function = HV_CPUID_VENDOR_AND_MAX_FUNCTIONS;
->         cpuid_40000000_eax = &c->eax;
->         *cpuid_40000000_eax = c->function;
->
->         ....
->
->         c = &cpuid_data.entries[cpuid_i++];
->         c->function = HV_CPUID_...;
->         *cpuid_40000000_eax = max(*cpuid_40000000_eax, c->function);
->
-> but I think it can be done later and doesn't need to hold this patch.
->
-> Another question related to this: are the guests OK with leaves
-> 0x40000006..0x40000009 missing?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1798451
 
-They seem to be, however, after you've asked I'm leaning towards zeroing
-them 'just in case'.
+Title:
+  HVF linux on OSX hangs 2nd time started after adding socket
 
--- 
-Vitaly
+Status in QEMU:
+  New
+
+Bug description:
+  =
+
+  Robs-MacBook-Pro-2:~ robmaskell$ qemu-system-x86_64 --version
+  QEMU emulator version 3.0.0
+
+  Host: MacOS - 10.13.6
+    Model Name:	MacBook Pro
+    Model Identifier:	MacBookPro14,3
+    Processor Name:	Intel Core i7
+    Processor Speed:	2.8 GHz
+    Number of Processors:	1
+    Total Number of Cores:	4
+    L2 Cache (per Core):	256 KB
+    L3 Cache:	6 MB
+    Memory:	16 GB
+
+  Guest OS: Elementary Linux Loki 0.4.1, patched up to date
+
+  Command used to start QEMU:
+
+  qemu-system-x86_64 \
+    -name ElementaryLokiDev \
+    -machine pc,accel=3Dhvf \
+    -cpu max \
+    -smp cpus=3D2,sockets=3D2,cores=3D1,threads=3D1,maxcpus=3D2 \
+    -numa node,nodeid=3D0 \
+    -numa cpu,node-id=3D0,socket-id=3D0 -numa cpu,node-id=3D0,socket-id=3D1=
+ \
+    -m 8G \
+    -vga vmware \
+    -hda e4.qcow2
+
+  Symptoms: Started without the -smp / -numa commands to install the OS,
+  then added -smp / -numa and the machine boots and lscpu reports extra
+  cpu as expected. Restart VM and it hangs on startup. Remove -smp /
+  -numa and machine starts again.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1798451/+subscriptions
