@@ -1,14 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52197)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1gEamp-0002BY-JU
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 10:02:32 -0400
+	(envelope-from <imammedo@redhat.com>) id 1gEbGP-0006U3-Vt
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 10:33:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1gEamj-0003hW-7W
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 10:02:27 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Mon, 22 Oct 2018 22:02:04 +0800
-Message-Id: <20181022140204.15791-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH] file-posix: Use error API properly
+	(envelope-from <imammedo@redhat.com>) id 1gEbGL-0007hC-3O
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 10:33:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56054)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gEbGK-0007fs-LQ
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 10:32:56 -0400
+Date: Mon, 22 Oct 2018 15:33:30 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181022153330.6996de15@igors-macbook-pro.local>
+In-Reply-To: <20180912125531.32131-2-marcandre.lureau@redhat.com>
+References: <20180912125531.32131-1-marcandre.lureau@redhat.com>
+	<20180912125531.32131-2-marcandre.lureau@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/9] qom/user-creatable: add a few helper
+ macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,94 +28,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, armbru@redhat.com
+To: =?UTF-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, dgilbert@redhat.com, Richard Henderson <rth@twiddle.net>, Andreas =?UTF-8?Q?F=C3=A4rber?= <afaerber@suse.de>, "Michael S. Tsirkin" <mst@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Use error_report for situations that affect user operation (i.e.  we're
-actually returning error), and warn_report/warn_report_err when some
-less critical error happened but the user operation can still carry on.
+On Wed, 12 Sep 2018 16:55:23 +0400
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
 
-Suggested-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- block/file-posix.c | 20 +++++++++-----------
- 1 file changed, 9 insertions(+), 11 deletions(-)
+> Improve a bit code readability.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  include/qom/object_interfaces.h | 4 ++++
+>  qom/object.c                    | 4 ++--
+>  qom/object_interfaces.c         | 9 +++------
+>  3 files changed, 9 insertions(+), 8 deletions(-)
+>=20
+> diff --git a/include/qom/object_interfaces.h b/include/qom/object_interfa=
+ces.h
+> index 4d513fb329..46b0861457 100644
+> --- a/include/qom/object_interfaces.h
+> +++ b/include/qom/object_interfaces.h
+> @@ -9,9 +9,13 @@
+>  #define USER_CREATABLE_CLASS(klass) \
+>       OBJECT_CLASS_CHECK(UserCreatableClass, (klass), \
+>                          TYPE_USER_CREATABLE)
+> +#define IS_USER_CREATABLE_CLASS(klass) \
+> +    object_class_dynamic_cast(OBJECT_CLASS(oc), TYPE_USER_CREATABLE)
+>  #define USER_CREATABLE_GET_CLASS(obj) \
+>       OBJECT_GET_CLASS(UserCreatableClass, (obj), \
+>                        TYPE_USER_CREATABLE)
+> +#define IS_USER_CREATABLE(obj) \
+> +    object_dynamic_cast(OBJECT(obj), TYPE_USER_CREATABLE)
+>  #define USER_CREATABLE(obj) \
+>       INTERFACE_CHECK(UserCreatable, (obj), \
+>                       TYPE_USER_CREATABLE)
+> diff --git a/qom/object.c b/qom/object.c
+> index 75d1d48944..0703e8e4ff 100644
+> --- a/qom/object.c
+> +++ b/qom/object.c
+> @@ -424,7 +424,7 @@ void object_initialize_childv(Object *parentobj, cons=
+t char *propname,
+>          goto out;
+>      }
+> =20
+> -    if (object_dynamic_cast(obj, TYPE_USER_CREATABLE)) {
+> +    if (IS_USER_CREATABLE(obj)) {
+>          user_creatable_complete(obj, &local_err);
+>          if (local_err) {
+>              object_unparent(obj);
+> @@ -605,7 +605,7 @@ Object *object_new_with_propv(const char *typename,
+>          goto error;
+>      }
+> =20
+> -    if (object_dynamic_cast(obj, TYPE_USER_CREATABLE)) {
+> +    if (IS_USER_CREATABLE(obj)) {
+>          user_creatable_complete(obj, &local_err);
+>          if (local_err) {
+>              object_unparent(obj);
+> diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
+> index 72b97a8bed..e3084bc04a 100644
+> --- a/qom/object_interfaces.c
+> +++ b/qom/object_interfaces.c
+> @@ -10,18 +10,15 @@
+> =20
+>  void user_creatable_complete(Object *obj, Error **errp)
+>  {
+> -
+>      UserCreatableClass *ucc;
+> -    UserCreatable *uc =3D
+> -        (UserCreatable *)object_dynamic_cast(obj, TYPE_USER_CREATABLE);
+> =20
+> -    if (!uc) {
+> +    if (!IS_USER_CREATABLE(obj)) {
+>          return;
+>      }
+> =20
+> -    ucc =3D USER_CREATABLE_GET_CLASS(uc);
+> +    ucc =3D USER_CREATABLE_GET_CLASS(obj);
+>      if (ucc->complete) {
+> -        ucc->complete(uc, errp);
+> +        ucc->complete(USER_CREATABLE(obj), errp);
+                         ^^^
+even though function becomes more concise,
+this will call expensive dynamic cast 2nd time (IS_USER_CREATABLE was the 1=
+st and discarded)
+so I'm not sure is a good idea to regress startup time for readability.=20
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 2da3a76355..2a46899313 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -214,8 +214,7 @@ static int raw_normalize_devicepath(const char **filename)
-     fname = *filename;
-     dp = strrchr(fname, '/');
-     if (lstat(fname, &sb) < 0) {
--        fprintf(stderr, "%s: stat failed: %s\n",
--            fname, strerror(errno));
-+        error_report("%s: stat failed: %s", fname, strerror(errno));
-         return -errno;
-     }
- 
-@@ -229,9 +228,8 @@ static int raw_normalize_devicepath(const char **filename)
-         snprintf(namebuf, PATH_MAX, "%.*s/r%s",
-             (int)(dp - fname), fname, dp + 1);
-     }
--    fprintf(stderr, "%s is a block device", fname);
-     *filename = namebuf;
--    fprintf(stderr, ", using %s\n", *filename);
-+    warn_report("%s is a block device, using %s", fname, *filename);
- 
-     return 0;
- }
-@@ -492,11 +490,11 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
-     case ON_OFF_AUTO_ON:
-         s->use_lock = true;
-         if (!qemu_has_ofd_lock()) {
--            fprintf(stderr,
-+            warn_report(
-                     "File lock requested but OFD locking syscall is "
--                    "unavailable, falling back to POSIX file locks.\n"
-+                    "unavailable, falling back to POSIX file locks. "
-                     "Due to the implementation, locks can be lost "
--                    "unexpectedly.\n");
-+                    "unexpectedly.");
-         }
-         break;
-     case ON_OFF_AUTO_OFF:
-@@ -805,7 +803,7 @@ static int raw_handle_perm_lock(BlockDriverState *bs,
-             /* Theoretically the above call only unlocks bytes and it cannot
-              * fail. Something weird happened, report it.
-              */
--            error_report_err(local_err);
-+            warn_report_err(local_err);
-         }
-         break;
-     case RAW_PL_COMMIT:
-@@ -815,7 +813,7 @@ static int raw_handle_perm_lock(BlockDriverState *bs,
-             /* Theoretically the above call only unlocks bytes and it cannot
-              * fail. Something weird happened, report it.
-              */
--            error_report_err(local_err);
-+            warn_report_err(local_err);
-         }
-         break;
-     }
-@@ -1775,7 +1773,7 @@ static int aio_worker(void *arg)
-         ret = handle_aiocb_truncate(aiocb);
-         break;
-     default:
--        fprintf(stderr, "invalid aio request (0x%x)\n", aiocb->aio_type);
-+        error_report("invalid aio request (0x%x)", aiocb->aio_type);
-         ret = -EINVAL;
-         break;
-     }
-@@ -2263,7 +2261,7 @@ out_unlock:
-          * not mean the whole creation operation has failed.  So
-          * report it the user for their convenience, but do not report
-          * it to the caller. */
--        error_report_err(local_err);
-+        warn_report_err(local_err);
-     }
- 
- out_close:
--- 
-2.17.1
+
+>      }
+>  }
+> =20
