@@ -1,20 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38059)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38073)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gEZPm-0002Mm-8X
+	(envelope-from <armbru@redhat.com>) id 1gEZPm-0002N7-KD
 	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gEZPl-00039f-0U
+	(envelope-from <armbru@redhat.com>) id 1gEZPl-0003A5-9i
 	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50359)
+Received: from mx1.redhat.com ([209.132.183.28]:50240)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gEZPk-0002u4-Mr
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:32 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gEZPk-0002wX-Up
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:33 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0962D4E90B
+	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 12:34:21 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-34.ams2.redhat.com
+	[10.36.117.34])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id C663E19484
+	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 12:34:20 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 22 Oct 2018 14:33:43 +0200
-Message-Id: <20181022123413.28044-11-armbru@redhat.com>
+Date: Mon, 22 Oct 2018 14:33:58 +0200
+Message-Id: <20181022123413.28044-26-armbru@redhat.com>
 In-Reply-To: <20181022123413.28044-1-armbru@redhat.com>
 References: <20181022123413.28044-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 10/40] 9pfs: Fix CLI parsing crash on error
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 25/40] vl: Clean up error reporting in
+ parse_fw_cfg()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,58 +38,78 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Greg Kurz <groug@kaod.org>
 
 Calling error_report() in a function that takes an Error ** argument
-is suspicious.  9p-handle.c's handle_parse_opts() does that, and then
-fails without setting an error.  Wrong.  Its caller crashes when it
-tries to report the error:
+is suspicious.  parse_fw_cfg() does that, and then fails without
+setting an error.  Its caller main(), via qemu_opts_foreach(), is fine
+with it, but clean it up anyway.
 
-    $ qemu-system-x86_64 -nodefaults -fsdev id=foo,fsdriver=handle
-    qemu-system-x86_64: -fsdev id=foo,fsdriver=handle: warning: handle backend is deprecated
-    qemu-system-x86_64: -fsdev id=foo,fsdriver=handle: fsdev: No path specified
-    Segmentation fault (core dumped)
-
-Screwed up when commit 91cda4e8f37 (v2.12.0) converted the function to
-Error.  Fix by calling error_setg() instead of error_report().
-
-Fixes: 91cda4e8f372602795e3a2f4bd2e3adaf9f82255
-Cc: Greg Kurz <groug@kaod.org>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Acked-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20181017082702.5581-9-armbru@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20181017082702.5581-24-armbru@redhat.com>
 ---
- hw/9pfs/9p-handle.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ vl.c | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
 
-diff --git a/hw/9pfs/9p-handle.c b/hw/9pfs/9p-handle.c
-index f3641dbe4a..3465b1ef30 100644
---- a/hw/9pfs/9p-handle.c
-+++ b/hw/9pfs/9p-handle.c
-@@ -19,6 +19,7 @@
- #include <grp.h>
- #include <sys/socket.h>
- #include <sys/un.h>
-+#include "qapi/error.h"
- #include "qemu/xattr.h"
- #include "qemu/cutils.h"
- #include "qemu/error-report.h"
-@@ -655,12 +656,13 @@ static int handle_parse_opts(QemuOpts *opts, FsDriverEntry *fse, Error **errp)
-     warn_report("handle backend is deprecated");
- 
-     if (sec_model) {
--        error_report("Invalid argument security_model specified with handle fsdriver");
-+        error_setg(errp,
-+                   "Invalid argument security_model specified with handle fsdriver");
+diff --git a/vl.c b/vl.c
+index 6830fc8d8f..92d15711a5 100644
+--- a/vl.c
++++ b/vl.c
+@@ -2174,7 +2174,7 @@ static int parse_fw_cfg(void *opaque, QemuOpts *opt=
+s, Error **errp)
+     FWCfgState *fw_cfg =3D (FWCfgState *) opaque;
+=20
+     if (fw_cfg =3D=3D NULL) {
+-        error_report("fw_cfg device not available");
++        error_setg(errp, "fw_cfg device not available");
          return -1;
      }
- 
-     if (!path) {
--        error_report("fsdev: No path specified");
-+        error_setg(errp, "fsdev: No path specified");
+     name =3D qemu_opt_get(opts, "name");
+@@ -2183,15 +2183,16 @@ static int parse_fw_cfg(void *opaque, QemuOpts *o=
+pts, Error **errp)
+=20
+     /* we need name and either a file or the content string */
+     if (!(nonempty_str(name) && (nonempty_str(file) || nonempty_str(str)=
+))) {
+-        error_report("invalid argument(s)");
++        error_setg(errp, "invalid argument(s)");
          return -1;
      }
-     fse->path = g_strdup(path);
--- 
+     if (nonempty_str(file) && nonempty_str(str)) {
+-        error_report("file and string are mutually exclusive");
++        error_setg(errp, "file and string are mutually exclusive");
+         return -1;
+     }
+     if (strlen(name) > FW_CFG_MAX_FILE_PATH - 1) {
+-        error_report("name too long (max. %d char)", FW_CFG_MAX_FILE_PAT=
+H - 1);
++        error_setg(errp, "name too long (max. %d char)",
++                   FW_CFG_MAX_FILE_PATH - 1);
+         return -1;
+     }
+     if (strncmp(name, "opt/", 4) !=3D 0) {
+@@ -2203,7 +2204,7 @@ static int parse_fw_cfg(void *opaque, QemuOpts *opt=
+s, Error **errp)
+         buf =3D g_memdup(str, size);
+     } else {
+         if (!g_file_get_contents(file, &buf, &size, NULL)) {
+-            error_report("can't load %s", file);
++            error_setg(errp, "can't load %s", file);
+             return -1;
+         }
+     }
+@@ -4477,10 +4478,8 @@ int main(int argc, char **argv, char **envp)
+         hax_sync_vcpus();
+     }
+=20
+-    if (qemu_opts_foreach(qemu_find_opts("fw_cfg"),
+-                          parse_fw_cfg, fw_cfg_find(), NULL) !=3D 0) {
+-        exit(1);
+-    }
++    qemu_opts_foreach(qemu_find_opts("fw_cfg"),
++                      parse_fw_cfg, fw_cfg_find(), &error_fatal);
+=20
+     /* init USB devices */
+     if (machine_usb(current_machine)) {
+--=20
 2.17.2
