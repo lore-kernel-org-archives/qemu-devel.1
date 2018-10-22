@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46052)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46135)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEZmq-0000Bs-8k
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:26 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEZmt-0000Jc-0n
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEZmp-0008Ce-2f
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:24 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:33432 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEZmp-0008Dr-Nj
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:26 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:33466 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gEZmk-00084Y-JL
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:20 -0400
+	id 1gEZmo-000854-1J
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:23 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 22 Oct 2018 14:57:40 +0200
-Message-Id: <1540213077-15211-18-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 22 Oct 2018 14:57:51 +0200
+Message-Id: <1540213077-15211-29-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1540213077-15211-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1540213077-15211-1-git-send-email-aleksandar.markovic@rt-rk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 17/34] target/mips: Support R5900 three-operand
- MULT and MULTU instructions
+Subject: [Qemu-devel] [PULL 28/34] tests/tcg/mips: Test R5900 MTLO1 and MTHI1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,117 +29,74 @@ Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
 From: Fredrik Noring <noring@nocrew.org>
 
-The three-operand MULT and MULTU are the only R5900-specific
-instructions emitted by GCC 7.3. The R5900 also implements the three-
-operand MADD and MADDU instructions, but they are omitted in QEMU for
-now since they are absent in programs compiled by current GCC versions.
-
-Likewise, the R5900-specific pipeline 1 instruction variants MULT1,
-MULTU1, DIV1, DIVU1, MADD1, MADDU1, MFHI1, MFLO1, MTHI1 and MTLO1
-are omitted here as well.
+Add a test for MTLO1 and MTHI1.
 
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: Fredrik Noring <noring@nocrew.org>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 74 +++++++++++++++++++++++++++++++++++++++++++=
-++++++
- 1 file changed, 74 insertions(+)
+ tests/tcg/mips/mipsr5900/Makefile  |  1 +
+ tests/tcg/mips/mipsr5900/mtlohi1.c | 40 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 41 insertions(+)
+ create mode 100644 tests/tcg/mips/mipsr5900/mtlohi1.c
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 1c0400c..3dc6d80 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -4766,6 +4766,78 @@ static void gen_muldiv(DisasContext *ctx, uint32_t=
- opc,
-     tcg_temp_free(t1);
- }
-=20
+diff --git a/tests/tcg/mips/mipsr5900/Makefile b/tests/tcg/mips/mipsr5900/Makefile
+index fd8ee6b..287c248 100644
+--- a/tests/tcg/mips/mipsr5900/Makefile
++++ b/tests/tcg/mips/mipsr5900/Makefile
+@@ -9,6 +9,7 @@ CC      = $(CROSS)gcc
+ CFLAGS  = -Wall -mabi=32 -march=r5900 -static
+ 
+ TESTCASES = mflohi1.tst
++TESTCASES += mtlohi1.tst
+ TESTCASES += mult.tst
+ TESTCASES += multu.tst
+ 
+diff --git a/tests/tcg/mips/mipsr5900/mtlohi1.c b/tests/tcg/mips/mipsr5900/mtlohi1.c
+new file mode 100644
+index 0000000..7f3e728
+--- /dev/null
++++ b/tests/tcg/mips/mipsr5900/mtlohi1.c
+@@ -0,0 +1,40 @@
 +/*
-+ * These MULT and MULTU instructions implemented in for example the
-+ * Toshiba/Sony R5900 and the Toshiba TX19, TX39 and TX79 core
-+ * architectures are special three-operand variants with the syntax
-+ *
-+ *     MULT[U] rd, rs, rt
-+ *
-+ * such that
-+ *
-+ *     (rd, LO, HI) <- rs * rt
-+ *
-+ * where the low-order 32-bits of the result is placed into both the
-+ * GPR rd and the special register LO. The high-order 32-bits of the
-+ * result is placed into the special register HI.
-+ *
-+ * If the GPR rd is omitted in assembly language, it is taken to be 0,
-+ * which is the zero register that always reads as 0.
++ * Test R5900-specific MTLO1 and MTHI1.
 + */
-+static void gen_mul_txx9(DisasContext *ctx, uint32_t opc,
-+                         int rd, int rs, int rt)
++
++#include <stdio.h>
++#include <inttypes.h>
++#include <assert.h>
++
++int main()
 +{
-+    TCGv t0 =3D tcg_temp_new();
-+    TCGv t1 =3D tcg_temp_new();
-+    int acc =3D 0;
++    int32_t tlo  = 12207031, thi  = 305175781;
++    int32_t tlo1 = 32452867, thi1 = 49979687;
++    int32_t flo, fhi, flo1, fhi1;
 +
-+    gen_load_gpr(t0, rs);
-+    gen_load_gpr(t1, rt);
++    /* Test both LO/HI and LO1/HI1 to verify separation. */
++    __asm__ __volatile__ (
++            "    mtlo  %4\n"
++            "    mthi  %5\n"
++            "    mtlo1 %6\n"
++            "    mthi1 %7\n"
++            "    move  %0, $0\n"
++            "    move  %1, $0\n"
++            "    move  %2, $0\n"
++            "    move  %3, $0\n"
++            "    mflo  %0\n"
++            "    mfhi  %1\n"
++            "    mflo1 %2\n"
++            "    mfhi1 %3\n"
++            : "=r" (flo),  "=r" (fhi),
++              "=r" (flo1), "=r" (fhi1)
++            : "r" (tlo),  "r" (thi),
++              "r" (tlo1), "r" (thi1));
 +
-+    switch (opc) {
-+    case OPC_MULT:
-+        {
-+            TCGv_i32 t2 =3D tcg_temp_new_i32();
-+            TCGv_i32 t3 =3D tcg_temp_new_i32();
-+            tcg_gen_trunc_tl_i32(t2, t0);
-+            tcg_gen_trunc_tl_i32(t3, t1);
-+            tcg_gen_muls2_i32(t2, t3, t2, t3);
-+            if (rd) {
-+                tcg_gen_ext_i32_tl(cpu_gpr[rd], t2);
-+            }
-+            tcg_gen_ext_i32_tl(cpu_LO[acc], t2);
-+            tcg_gen_ext_i32_tl(cpu_HI[acc], t3);
-+            tcg_temp_free_i32(t2);
-+            tcg_temp_free_i32(t3);
-+        }
-+        break;
-+    case OPC_MULTU:
-+        {
-+            TCGv_i32 t2 =3D tcg_temp_new_i32();
-+            TCGv_i32 t3 =3D tcg_temp_new_i32();
-+            tcg_gen_trunc_tl_i32(t2, t0);
-+            tcg_gen_trunc_tl_i32(t3, t1);
-+            tcg_gen_mulu2_i32(t2, t3, t2, t3);
-+            if (rd) {
-+                tcg_gen_ext_i32_tl(cpu_gpr[rd], t2);
-+            }
-+            tcg_gen_ext_i32_tl(cpu_LO[acc], t2);
-+            tcg_gen_ext_i32_tl(cpu_HI[acc], t3);
-+            tcg_temp_free_i32(t2);
-+            tcg_temp_free_i32(t3);
-+        }
-+        break;
-+    default:
-+        MIPS_INVAL("mul TXx9");
-+        generate_exception_end(ctx, EXCP_RI);
-+        goto out;
-+    }
++    assert(flo  == 12207031);
++    assert(fhi  == 305175781);
++    assert(flo1 == 32452867);
++    assert(fhi1 == 49979687);
 +
-+ out:
-+    tcg_temp_free(t0);
-+    tcg_temp_free(t1);
++    return 0;
 +}
-+
- static void gen_mul_vr54xx (DisasContext *ctx, uint32_t opc,
-                             int rd, int rs, int rt)
- {
-@@ -23490,6 +23562,8 @@ static void decode_opc_special_legacy(CPUMIPSStat=
-e *env, DisasContext *ctx)
-             check_insn(ctx, INSN_VR54XX);
-             op1 =3D MASK_MUL_VR54XX(ctx->opcode);
-             gen_mul_vr54xx(ctx, op1, rd, rs, rt);
-+        } else if (ctx->insn_flags & INSN_R5900) {
-+            gen_mul_txx9(ctx, op1, rd, rs, rt);
-         } else {
-             gen_muldiv(ctx, op1, rd & 3, rs, rt);
-         }
---=20
+-- 
 2.7.4
