@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43306)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43305)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gEUqL-00075j-Ay
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gEUqL-00075i-At
 	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 03:41:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gEUq9-0004on-J2
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gEUq9-0004og-Is
 	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 03:41:35 -0400
-Received: from cmccmta2.chinamobile.com ([221.176.66.80]:50649)
+Received: from cmccmta3.chinamobile.com ([221.176.66.81]:64891)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gEUq4-0004gk-Tc
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gEUq2-0004gt-Fv
 	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 03:41:26 -0400
 From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-Date: Mon, 22 Oct 2018 15:40:47 +0800
-Message-Id: <20181022074050.19638-1-maozhongyi@cmss.chinamobile.com>
+Date: Mon, 22 Oct 2018 15:40:48 +0800
+Message-Id: <20181022074050.19638-2-maozhongyi@cmss.chinamobile.com>
+In-Reply-To: <20181022074050.19638-1-maozhongyi@cmss.chinamobile.com>
+References: <20181022074050.19638-1-maozhongyi@cmss.chinamobile.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 0/3] use object link instead of qdev property
+Subject: [Qemu-devel] [PATCH v4 1/3] audio: use TYPE_WM8750 instead of a
+ hardcoded string
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,40 +28,44 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, Jan Kiszka <jan.kiszka@web.de>, Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-
-According to qdev-properties.h, properties of pointer type
-should be avoid, so convert qdev property to link, Whilst we
-are here, also update some hardcoded strings with already
-defineded macros.
-
-v4:
--fixed the "Broken pipe" error when "make check"
-
-v3:
--removed incorrected "To: xxx" tags from commit message
--keep 'dc->user_creatable = false' in mv88w8618_audio_class_init()
-
-v2:
--removed the patch1
--removed the TYPE_name in VMStateDescription.name
+Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, Jan Kiszka <jan.kiszka@web.de>, Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>
 
 Cc: Jan Kiszka <jan.kiszka@web.de>
 Cc: Peter Maydell <peter.maydell@linaro.org>
 Cc: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Cc: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Mao Zhongyi (3):
-  audio: use TYPE_WM8750 instead of a hardcoded string
-  audio: use object link instead of qdev property to pass wm8750
-    reference
-  audio: use TYPE_MV88W8618_AUDIO instead of hardcoded string
+Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ hw/arm/musicpal.c          | 2 +-
+ hw/audio/marvell_88w8618.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
- hw/arm/musicpal.c          |  5 +++--
- hw/audio/marvell_88w8618.c | 14 ++++++--------
- include/hw/audio/wm8750.h  |  1 +
- 3 files changed, 10 insertions(+), 10 deletions(-)
-
+diff --git a/hw/arm/musicpal.c b/hw/arm/musicpal.c
+index c807010e83..3dafb41b0b 100644
+--- a/hw/arm/musicpal.c
++++ b/hw/arm/musicpal.c
+@@ -1695,7 +1695,7 @@ static void musicpal_init(MachineState *machine)
+     wm8750_dev = i2c_create_slave(i2c, TYPE_WM8750, MP_WM_ADDR);
+     dev = qdev_create(NULL, "mv88w8618_audio");
+     s = SYS_BUS_DEVICE(dev);
+-    qdev_prop_set_ptr(dev, "wm8750", wm8750_dev);
++    qdev_prop_set_ptr(dev, TYPE_WM8750, wm8750_dev);
+     qdev_init_nofail(dev);
+     sysbus_mmio_map(s, 0, MP_AUDIO_BASE);
+     sysbus_connect_irq(s, 0, pic[MP_AUDIO_IRQ]);
+diff --git a/hw/audio/marvell_88w8618.c b/hw/audio/marvell_88w8618.c
+index e546892d3c..cf6ce6979b 100644
+--- a/hw/audio/marvell_88w8618.c
++++ b/hw/audio/marvell_88w8618.c
+@@ -280,7 +280,7 @@ static const VMStateDescription mv88w8618_audio_vmsd = {
+ };
+ 
+ static Property mv88w8618_audio_properties[] = {
+-    DEFINE_PROP_PTR("wm8750", mv88w8618_audio_state, wm),
++    DEFINE_PROP_PTR(TYPE_WM8750, mv88w8618_audio_state, wm),
+     {/* end of list */},
+ };
+ 
 -- 
 2.17.1
