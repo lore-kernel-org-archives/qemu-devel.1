@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39113)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gEf5Q-0008BR-Rz
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:37:57 -0400
+	(envelope-from <sameo@linux.intel.com>) id 1gEf5a-0008Ju-NC
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:38:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gEf5P-000442-Uz
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:37:56 -0400
+	(envelope-from <sameo@linux.intel.com>) id 1gEf5Z-00049l-2t
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:38:06 -0400
 Received: from mga01.intel.com ([192.55.52.88]:7827)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sameo@linux.intel.com>)
-	id 1gEf5P-0003wU-IK
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:37:55 -0400
+	id 1gEf5Y-0003wU-NE
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:38:04 -0400
 From: Samuel Ortiz <sameo@linux.intel.com>
-Date: Mon, 22 Oct 2018 20:36:34 +0200
-Message-Id: <20181022183656.4902-5-sameo@linux.intel.com>
+Date: Mon, 22 Oct 2018 20:36:36 +0200
+Message-Id: <20181022183656.4902-7-sameo@linux.intel.com>
 In-Reply-To: <20181022183656.4902-1-sameo@linux.intel.com>
 References: <20181022183656.4902-1-sameo@linux.intel.com>
-Subject: [Qemu-devel] [PATCH 04/26] hw: arm: Switch to the AML build RSDP
- building routine
+Subject: [Qemu-devel] [PATCH 06/26] hw: acpi: Factorize _OSC AML across
+ architectures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,70 +26,253 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Samuel Ortiz <sameo@linux.intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>
+Cc: Yang Zhong <yang.zhong@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, Peter Maydell <peter.maydell@linaro.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-We make the ARM virt ACPI code use the now shared build_rsdp() API from
-aml-build.c. By doing so we fix a bug where the ARM implementation was
-missing adding both the legacy and extended checksums, which was
-building an invalid RSDP table.
+From: Yang Zhong <yang.zhong@intel.com>
+
+The _OSC AML table is almost identical between the i386 Q35 and arm virt
+machine types. We can make it slightly more generic and share it across
+all PCIe architectures.
 
 Cc: "Michael S. Tsirkin" <mst@redhat.com>
 Cc: Igor Mammedov <imammedo@redhat.com>
 Cc: Shannon Zhao <zhaoshenglong@huawei.com>
-Cc:Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Yang Zhong <yang.zhong@intel.com>
 ---
- hw/arm/virt-acpi-build.c | 31 +------------------------------
- 1 file changed, 1 insertion(+), 30 deletions(-)
+ hw/acpi/aml-build.c         | 84 +++++++++++++++++++------------------
+ hw/arm/virt-acpi-build.c    | 45 ++------------------
+ hw/i386/acpi-build.c        |  6 ++-
+ include/hw/acpi/acpi-defs.h | 14 +++++++
+ include/hw/acpi/aml-build.h |  2 +-
+ 5 files changed, 66 insertions(+), 85 deletions(-)
 
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index f28a2faa53..0a6a88380a 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -35,6 +35,7 @@
- #include "target/arm/cpu.h"
- #include "hw/acpi/acpi-defs.h"
- #include "hw/acpi/acpi.h"
-+#include "hw/acpi/aml-build.h"
- #include "hw/nvram/fw_cfg.h"
- #include "hw/acpi/bios-linker-loader.h"
- #include "hw/loader.h"
-@@ -366,36 +367,6 @@ static void acpi_dsdt_add_power_button(Aml *scope)
-     aml_append(scope, dev);
+diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+index 6daa0f6df2..1a9948f6a9 100644
+--- a/hw/acpi/aml-build.c
++++ b/hw/acpi/aml-build.c
+@@ -1869,51 +1869,55 @@ Aml *build_crs(PCIHostState *host, CrsRangeSet *range_set)
+     return crs;
  }
  
--/* RSDP */
--static GArray *
--build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
--{
--    AcpiRsdpDescriptor *rsdp = acpi_data_push(rsdp_table, sizeof *rsdp);
--    unsigned xsdt_pa_size = sizeof(rsdp->xsdt_physical_address);
--    unsigned xsdt_pa_offset =
--        (char *)&rsdp->xsdt_physical_address - rsdp_table->data;
--
--    bios_linker_loader_alloc(linker, ACPI_BUILD_RSDP_FILE, rsdp_table, 16,
--                             true /* fseg memory */);
--
--    memcpy(&rsdp->signature, "RSD PTR ", sizeof(rsdp->signature));
--    memcpy(rsdp->oem_id, ACPI_BUILD_APPNAME6, sizeof(rsdp->oem_id));
--    rsdp->length = cpu_to_le32(sizeof(*rsdp));
--    rsdp->revision = 0x02;
--
--    /* Address to be filled by Guest linker */
--    bios_linker_loader_add_pointer(linker,
--        ACPI_BUILD_RSDP_FILE, xsdt_pa_offset, xsdt_pa_size,
--        ACPI_BUILD_TABLE_FILE, xsdt_tbl_offset);
--
--    /* Checksum to be filled by Guest linker */
--    bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
--        (char *)rsdp - rsdp_table->data, sizeof *rsdp,
--        (char *)&rsdp->checksum - rsdp_table->data);
--
--    return rsdp_table;
--}
--
- static void
- build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+-Aml *build_osc_method(void)
++/*
++ * ctrl_mask is the _OSC capabilities buffer control field mask.
++ */
++Aml *build_osc_method(uint32_t ctrl_mask)
  {
+-    Aml *if_ctx;
+-    Aml *if_ctx2;
+-    Aml *else_ctx;
+-    Aml *method;
+-    Aml *a_cwd1 = aml_name("CDW1");
+-    Aml *a_ctrl = aml_local(0);
++    Aml *ifctx, *ifctx1, *elsectx, *method, *UUID;
+ 
+     method = aml_method("_OSC", 4, AML_NOTSERIALIZED);
+-    aml_append(method, aml_create_dword_field(aml_arg(3), aml_int(0), "CDW1"));
+-
+-    if_ctx = aml_if(aml_equal(
+-        aml_arg(0), aml_touuid("33DB4D5B-1FF7-401C-9657-7441C03DD766")));
+-    aml_append(if_ctx, aml_create_dword_field(aml_arg(3), aml_int(4), "CDW2"));
+-    aml_append(if_ctx, aml_create_dword_field(aml_arg(3), aml_int(8), "CDW3"));
+-
+-    aml_append(if_ctx, aml_store(aml_name("CDW3"), a_ctrl));
+-
+-    /*
+-     * Always allow native PME, AER (no dependencies)
+-     * Allow SHPC (PCI bridges can have SHPC controller)
++    aml_append(method,
++        aml_create_dword_field(aml_arg(3), aml_int(0), "CDW1"));
++
++    /* PCI Firmware Specification 3.0
++     * 4.5.1. _OSC Interface for PCI Host Bridge Devices
++     * The _OSC interface for a PCI/PCI-X/PCI Express hierarchy is
++     * identified by the Universal Unique IDentifier (UUID)
++     * 33DB4D5B-1FF7-401C-9657-7441C03DD766
+      */
+-    aml_append(if_ctx, aml_and(a_ctrl, aml_int(0x1F), a_ctrl));
+-
+-    if_ctx2 = aml_if(aml_lnot(aml_equal(aml_arg(1), aml_int(1))));
+-    /* Unknown revision */
+-    aml_append(if_ctx2, aml_or(a_cwd1, aml_int(0x08), a_cwd1));
+-    aml_append(if_ctx, if_ctx2);
+-
+-    if_ctx2 = aml_if(aml_lnot(aml_equal(aml_name("CDW3"), a_ctrl)));
+-    /* Capabilities bits were masked */
+-    aml_append(if_ctx2, aml_or(a_cwd1, aml_int(0x10), a_cwd1));
+-    aml_append(if_ctx, if_ctx2);
+-
+-    /* Update DWORD3 in the buffer */
+-    aml_append(if_ctx, aml_store(a_ctrl, aml_name("CDW3")));
+-    aml_append(method, if_ctx);
+-
+-    else_ctx = aml_else();
+-    /* Unrecognized UUID */
+-    aml_append(else_ctx, aml_or(a_cwd1, aml_int(4), a_cwd1));
+-    aml_append(method, else_ctx);
++    UUID = aml_touuid("33DB4D5B-1FF7-401C-9657-7441C03DD766");
++    ifctx = aml_if(aml_equal(aml_arg(0), UUID));
++    aml_append(ifctx,
++        aml_create_dword_field(aml_arg(3), aml_int(4), "CDW2"));
++    aml_append(ifctx,
++        aml_create_dword_field(aml_arg(3), aml_int(8), "CDW3"));
++    aml_append(ifctx, aml_store(aml_name("CDW2"), aml_name("SUPP")));
++    aml_append(ifctx, aml_store(aml_name("CDW3"), aml_name("CTRL")));
++    aml_append(ifctx, aml_store(aml_and(aml_name("CTRL"),
++                                        aml_int(ctrl_mask), NULL),
++                                aml_name("CTRL")));
++
++    ifctx1 = aml_if(aml_lnot(aml_equal(aml_arg(1), aml_int(0x1))));
++    aml_append(ifctx1, aml_store(aml_or(aml_name("CDW1"), aml_int(0x08), NULL),
++                                 aml_name("CDW1")));
++    aml_append(ifctx, ifctx1);
++
++    ifctx1 = aml_if(aml_lnot(aml_equal(aml_name("CDW3"), aml_name("CTRL"))));
++    aml_append(ifctx1, aml_store(aml_or(aml_name("CDW1"), aml_int(0x10), NULL),
++                                 aml_name("CDW1")));
++    aml_append(ifctx, ifctx1);
++
++    aml_append(ifctx, aml_store(aml_name("CTRL"), aml_name("CDW3")));
++    aml_append(ifctx, aml_return(aml_arg(3)));
++    aml_append(method, ifctx);
++
++    elsectx = aml_else();
++    aml_append(elsectx, aml_store(aml_or(aml_name("CDW1"), aml_int(4), NULL),
++                                  aml_name("CDW1")));
++    aml_append(elsectx, aml_return(aml_arg(3)));
++    aml_append(method, elsectx);
+ 
+-    aml_append(method, aml_return(aml_arg(3)));
+     return method;
+ }
+ 
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 0a6a88380a..e7eb110ed2 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -154,7 +154,7 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+                               uint32_t irq, bool use_highmem, bool highmem_ecam)
+ {
+     int ecam_id = VIRT_ECAM_ID(highmem_ecam);
+-    Aml *method, *crs, *ifctx, *UUID, *ifctx1, *elsectx, *buf;
++    Aml *method, *crs, *ifctx, *UUID, *ifctx1, *buf;
+     int i, bus_no;
+     hwaddr base_mmio = memmap[VIRT_PCIE_MMIO].base;
+     hwaddr size_mmio = memmap[VIRT_PCIE_MMIO].size;
+@@ -248,47 +248,8 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+     /* Declare an _OSC (OS Control Handoff) method */
+     aml_append(dev, aml_name_decl("SUPP", aml_int(0)));
+     aml_append(dev, aml_name_decl("CTRL", aml_int(0)));
+-    method = aml_method("_OSC", 4, AML_NOTSERIALIZED);
+-    aml_append(method,
+-        aml_create_dword_field(aml_arg(3), aml_int(0), "CDW1"));
+-
+-    /* PCI Firmware Specification 3.0
+-     * 4.5.1. _OSC Interface for PCI Host Bridge Devices
+-     * The _OSC interface for a PCI/PCI-X/PCI Express hierarchy is
+-     * identified by the Universal Unique IDentifier (UUID)
+-     * 33DB4D5B-1FF7-401C-9657-7441C03DD766
+-     */
+-    UUID = aml_touuid("33DB4D5B-1FF7-401C-9657-7441C03DD766");
+-    ifctx = aml_if(aml_equal(aml_arg(0), UUID));
+-    aml_append(ifctx,
+-        aml_create_dword_field(aml_arg(3), aml_int(4), "CDW2"));
+-    aml_append(ifctx,
+-        aml_create_dword_field(aml_arg(3), aml_int(8), "CDW3"));
+-    aml_append(ifctx, aml_store(aml_name("CDW2"), aml_name("SUPP")));
+-    aml_append(ifctx, aml_store(aml_name("CDW3"), aml_name("CTRL")));
+-    aml_append(ifctx, aml_store(aml_and(aml_name("CTRL"), aml_int(0x1D), NULL),
+-                                aml_name("CTRL")));
+-
+-    ifctx1 = aml_if(aml_lnot(aml_equal(aml_arg(1), aml_int(0x1))));
+-    aml_append(ifctx1, aml_store(aml_or(aml_name("CDW1"), aml_int(0x08), NULL),
+-                                 aml_name("CDW1")));
+-    aml_append(ifctx, ifctx1);
+-
+-    ifctx1 = aml_if(aml_lnot(aml_equal(aml_name("CDW3"), aml_name("CTRL"))));
+-    aml_append(ifctx1, aml_store(aml_or(aml_name("CDW1"), aml_int(0x10), NULL),
+-                                 aml_name("CDW1")));
+-    aml_append(ifctx, ifctx1);
+-
+-    aml_append(ifctx, aml_store(aml_name("CTRL"), aml_name("CDW3")));
+-    aml_append(ifctx, aml_return(aml_arg(3)));
+-    aml_append(method, ifctx);
+-
+-    elsectx = aml_else();
+-    aml_append(elsectx, aml_store(aml_or(aml_name("CDW1"), aml_int(4), NULL),
+-                                  aml_name("CDW1")));
+-    aml_append(elsectx, aml_return(aml_arg(3)));
+-    aml_append(method, elsectx);
+-    aml_append(dev, method);
++    aml_append(dev, build_osc_method(ACPI_OSC_CTRL_PCI_ALL &
++                                     ~ACPI_OSC_CTRL_SHPC_NATIVE_HP));
+ 
+     method = aml_method("_DSM", 4, AML_NOTSERIALIZED);
+ 
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 3ab68fd24d..d3cb1b439d 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -1337,7 +1337,9 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+         aml_append(dev, aml_name_decl("_CID", aml_eisaid("PNP0A03")));
+         aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
+         aml_append(dev, aml_name_decl("_UID", aml_int(1)));
+-        aml_append(dev, build_osc_method());
++        aml_append(dev, aml_name_decl("SUPP", aml_int(0)));
++        aml_append(dev, aml_name_decl("CTRL", aml_int(0)));
++        aml_append(dev, build_osc_method(ACPI_OSC_CTRL_PCI_ALL));
+         aml_append(sb_scope, dev);
+         aml_append(dsdt, sb_scope);
+ 
+@@ -1402,7 +1404,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+             aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0A03")));
+             aml_append(dev, aml_name_decl("_BBN", aml_int(bus_num)));
+             if (pci_bus_is_express(bus)) {
+-                aml_append(dev, build_osc_method());
++                aml_append(dev, build_osc_method(0x1F));
+             }
+ 
+             if (numa_node != NUMA_NODE_UNASSIGNED) {
+diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+index af8e023968..6e1726e0a2 100644
+--- a/include/hw/acpi/acpi-defs.h
++++ b/include/hw/acpi/acpi-defs.h
+@@ -652,4 +652,18 @@ struct AcpiIortRC {
+ } QEMU_PACKED;
+ typedef struct AcpiIortRC AcpiIortRC;
+ 
++/* _OSC */
++
++#define ACPI_OSC_CTRL_PCIE_NATIVE_HP (1 << 0)
++#define ACPI_OSC_CTRL_SHPC_NATIVE_HP (1 << 1)
++#define ACPI_OSC_CTRL_PCIE_PM_EVT    (1 << 2)
++#define ACPI_OSC_CTRL_PCIE_AER       (1 << 3)
++#define ACPI_OSC_CTRL_PCIE_CAP_CTRL  (1 << 4)
++#define ACPI_OSC_CTRL_PCI_ALL \
++    (ACPI_OSC_CTRL_PCIE_NATIVE_HP |             \
++     ACPI_OSC_CTRL_SHPC_NATIVE_HP |             \
++     ACPI_OSC_CTRL_PCIE_PM_EVT |                \
++     ACPI_OSC_CTRL_PCIE_AER |                   \
++     ACPI_OSC_CTRL_PCIE_CAP_CTRL)
++
+ #endif
+diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+index d6dbb399a0..a60589d70f 100644
+--- a/include/hw/acpi/aml-build.h
++++ b/include/hw/acpi/aml-build.h
+@@ -405,7 +405,7 @@ void acpi_align_size(GArray *blob, unsigned align);
+ void acpi_add_table(GArray *table_offsets, GArray *table_data);
+ void acpi_build_tables_init(AcpiBuildTables *tables);
+ void acpi_build_tables_cleanup(AcpiBuildTables *tables, bool mfre);
+-Aml *build_osc_method(void);
++Aml *build_osc_method(uint32_t value);
+ void build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info);
+ Aml *build_gsi_link_dev(const char *name, uint8_t uid, uint8_t gsi);
+ Aml *build_prt(bool is_pci0_prt);
 -- 
 2.17.2
