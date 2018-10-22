@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46296)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEZn5-0000gE-Ju
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:40 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEZn5-0000gT-Sv
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEZn4-0008NZ-D4
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEZn4-0008Ni-ED
 	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:39 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:33777 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:33781 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gEZn0-00089m-Go
+	id 1gEZn1-00089o-G0
 	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:58:36 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 22 Oct 2018 14:57:52 +0200
-Message-Id: <1540213077-15211-30-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 22 Oct 2018 14:57:54 +0200
+Message-Id: <1540213077-15211-32-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1540213077-15211-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1540213077-15211-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL 29/34] tests/tcg/mips: Test R5900 DIV1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 31/34] target/mips: Define the R5900 CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,109 +32,144 @@ Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
 From: Fredrik Noring <noring@nocrew.org>
 
-Add a test for DIV1.
+The primary purpose of this change is to support programs compiled by
+GCC for the R5900 target and thereby run R5900 Linux distributions, for
+example Gentoo.
+
+GCC in version 7.3, by itself, by inspection of the GCC source code
+and inspection of the generated machine code, for the R5900 target,
+only emits two instructions that are specific to the R5900: the three-
+operand MULT and MULTU. GCC and libc also emit certain MIPS III
+instructions that are not part of the R5900 ISA. They are normally
+trapped and emulated by the Linux kernel, and therefore need to be
+treated accordingly by QEMU.
+
+A program compiled by GCC is taken to mean source code compiled by GCC
+under the restrictions above. One can, with the apparent limitations,
+with a bit of effort obtain a fully functioning operating system such
+as R5900 Gentoo. Strictly speaking, programs need not be compiled by
+GCC to make use of this change.
+
+Instructions and other facilities of the R5900 not implemented by this
+change are intended to signal provisional exceptions. One such example
+is the FPU that is not compliant with IEEE 754-1985 in system mode. It
+is therefore provisionally disabled. In user space the FPU is trapped
+and emulated by IEEE 754-1985 compliant software in the kernel, and
+this is handled accordingly by QEMU. Another example is the 93
+multimedia instructions specific to the R5900 that generate provisional
+reserved instruction exception signals.
+
+One of the benefits of running a Linux distribution under QEMU is that
+programs can be compiled with a native compiler, where the host and
+target are the same, as opposed to a cross-compiler, where they are
+not the same. This is especially important in cases where the target
+hardware does not have the resources to run a native compiler.
+
+Problems with cross-compilation are often related to host and target
+differences in integer sizes, pointer sizes, endianness, machine code,
+ABI, etc. Sometimes cross-compilation is not even supported by the
+build script for a given package. One effective way to avoid those
+problems is to replace the cross-compiler with a native compiler. This
+change of compilation methods does not resolve the inherent problems
+with cross-compilation.
+
+The native compiler naturally replaces the cross-compiler, because one
+typically uses one or the other, and preferably the native compiler
+when the circumstances admit this. The native compiler is also a good
+test case for the R5900 QEMU user mode. Additionally, Gentoo is well-
+known for compiling and installing its packages from sources.
+
+This change has been tested with Gentoo compiled for R5900, including
+native compilation of several packages under QEMU.
 
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: Fredrik Noring <noring@nocrew.org>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- tests/tcg/mips/mipsr5900/Makefile |  3 +-
- tests/tcg/mips/mipsr5900/div1.c   | 73 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 75 insertions(+), 1 deletion(-)
- create mode 100644 tests/tcg/mips/mipsr5900/div1.c
+ target/mips/translate_init.inc.c | 59 ++++++++++++++++++++++++++++++++++=
+++++++
+ 1 file changed, 59 insertions(+)
 
-diff --git a/tests/tcg/mips/mipsr5900/Makefile b/tests/tcg/mips/mipsr5900/Makefile
-index 287c248..757eb83 100644
---- a/tests/tcg/mips/mipsr5900/Makefile
-+++ b/tests/tcg/mips/mipsr5900/Makefile
-@@ -8,7 +8,8 @@ SIM_FLAGS=-cpu R5900
- CC      = $(CROSS)gcc
- CFLAGS  = -Wall -mabi=32 -march=r5900 -static
- 
--TESTCASES = mflohi1.tst
-+TESTCASES = div1.tst
-+TESTCASES += mflohi1.tst
- TESTCASES += mtlohi1.tst
- TESTCASES += mult.tst
- TESTCASES += multu.tst
-diff --git a/tests/tcg/mips/mipsr5900/div1.c b/tests/tcg/mips/mipsr5900/div1.c
-new file mode 100644
-index 0000000..83dafa0
---- /dev/null
-+++ b/tests/tcg/mips/mipsr5900/div1.c
-@@ -0,0 +1,73 @@
-+/*
-+ * Test R5900-specific DIV1.
-+ */
-+
-+#include <stdio.h>
-+#include <inttypes.h>
-+#include <assert.h>
-+
-+struct quotient_remainder { int32_t quotient, remainder; };
-+
-+static struct quotient_remainder div1(int32_t rs, int32_t rt)
-+{
-+    int32_t lo, hi;
-+
-+    __asm__ __volatile__ (
-+            "    div1 $0, %2, %3\n"
-+            "    mflo1 %0\n"
-+            "    mfhi1 %1\n"
-+            : "=r" (lo), "=r" (hi)
-+            : "r" (rs), "r" (rt));
-+
-+    assert(rs / rt == lo);
-+    assert(rs % rt == hi);
-+
-+    return (struct quotient_remainder) { .quotient = lo, .remainder = hi };
-+}
-+
-+static void verify_div1(int32_t rs, int32_t rt,
-+                        int32_t expected_quotient,
-+                        int32_t expected_remainder)
-+{
-+    struct quotient_remainder qr = div1(rs, rt);
-+
-+    assert(qr.quotient == expected_quotient);
-+    assert(qr.remainder == expected_remainder);
-+}
-+
-+static void verify_div1_negations(int32_t rs, int32_t rt,
-+                                  int32_t expected_quotient,
-+                                  int32_t expected_remainder)
-+{
-+    verify_div1(rs, rt, expected_quotient, expected_remainder);
-+    verify_div1(rs, -rt, -expected_quotient, expected_remainder);
-+    verify_div1(-rs, rt, -expected_quotient, -expected_remainder);
-+    verify_div1(-rs, -rt, expected_quotient, -expected_remainder);
-+}
-+
-+int main()
-+{
-+    verify_div1_negations(0, 1, 0, 0);
-+    verify_div1_negations(1, 1, 1, 0);
-+    verify_div1_negations(1, 2, 0, 1);
-+    verify_div1_negations(17, 19, 0, 17);
-+    verify_div1_negations(19, 17, 1, 2);
-+    verify_div1_negations(77773, 101, 770, 3);
-+
-+    verify_div1(-0x80000000,  1, -0x80000000, 0);
-+
-+    /*
-+     * Supplementary explanation from the Toshiba TX System RISC TX79 Core
-+     * Architecture manual, A-38 and B-7, https://wiki.qemu.org/File:C790.pdf
-+     *
-+     * Normally, when 0x80000000 (-2147483648) the signed minimum value is
-+     * divided by 0xFFFFFFFF (-1), the operation will result in an overflow.
-+     * However, in this instruction an overflow exception doesn't occur and
-+     * the result will be as follows:
-+     *
-+     * Quotient is 0x80000000 (-2147483648), and remainder is 0x00000000 (0).
-+     */
-+    verify_div1(-0x80000000, -1, -0x80000000, 0);
-+
-+    return 0;
-+}
--- 
+diff --git a/target/mips/translate_init.inc.c b/target/mips/translate_ini=
+t.inc.c
+index acab097..07a6c81 100644
+--- a/target/mips/translate_init.inc.c
++++ b/target/mips/translate_init.inc.c
+@@ -411,6 +411,65 @@ const mips_def_t mips_defs[] =3D
+         .mmu_type =3D MMU_TYPE_R4000,
+     },
+     {
++        /*
++         * The Toshiba TX System RISC TX79 Core Architecture manual
++         *
++         * https://wiki.qemu.org/File:C790.pdf
++         *
++         * describes the C790 processor that is a follow-up to the R5900=
+.
++         * There are a few notable differences in that the R5900 FPU
++         *
++         * - is not IEEE 754-1985 compliant,
++         * - does not implement double format, and
++         * - its machine code is nonstandard.
++         */
++        .name =3D "R5900",
++        .CP0_PRid =3D 0x00002E00,
++        /* No L2 cache, icache size 32k, dcache size 32k, uncached coher=
+ency. */
++        .CP0_Config0 =3D (0x3 << 9) | (0x3 << 6) | (0x2 << CP0C0_K0),
++        .CP0_Status_rw_bitmask =3D 0xF4C79C1F,
++#ifdef CONFIG_USER_ONLY
++        /*
++         * R5900 hardware traps to the Linux kernel for IEEE 754-1985 an=
+d LL/SC
++         * emulation. For user only, QEMU is the kernel, so we emulate t=
+he traps
++         * by simply emulating the instructions directly.
++         *
++         * Note: Config1 is only used internally, the R5900 has only Con=
+fig0.
++         */
++        .CP0_Config1 =3D (1 << CP0C1_FP) | (47 << CP0C1_MMU),
++        .CP0_LLAddr_rw_bitmask =3D 0xFFFFFFFF,
++        .CP0_LLAddr_shift =3D 4,
++        .CP1_fcr0 =3D (0x38 << FCR0_PRID) | (0x0 << FCR0_REV),
++        .CP1_fcr31 =3D 0,
++        .CP1_fcr31_rw_bitmask =3D 0x0183FFFF,
++#else
++        /*
++         * The R5900 COP1 FPU implements single-precision floating-point
++         * operations but is not entirely IEEE 754-1985 compatible. In
++         * particular,
++         *
++         * - NaN (not a number) and +/- infinities are not supported;
++         * - exception mechanisms are not fully supported;
++         * - denormalized numbers are not supported;
++         * - rounding towards nearest and +/- infinities are not support=
+ed;
++         * - computed results usually differs in the least significant b=
+it;
++         * - saturations can differ more than the least significant bit.
++         *
++         * Since only rounding towards zero is supported, the two least
++         * significant bits of FCR31 are hardwired to 01.
++         *
++         * FPU emulation is disabled here until it is implemented.
++         *
++         * Note: Config1 is only used internally, the R5900 has only Con=
+fig0.
++         */
++        .CP0_Config1 =3D (47 << CP0C1_MMU),
++#endif /* !CONFIG_USER_ONLY */
++        .SEGBITS =3D 32,
++        .PABITS =3D 32,
++        .insn_flags =3D CPU_R5900,
++        .mmu_type =3D MMU_TYPE_R4000,
++    },
++    {
+         /* A generic CPU supporting MIPS32 Release 6 ISA.
+            FIXME: Support IEEE 754-2008 FP.
+                   Eventually this should be replaced by a real CPU model=
+. */
+--=20
 2.7.4
