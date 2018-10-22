@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39294)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gEf5z-0000Po-O1
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:38:34 -0400
+	(envelope-from <sameo@linux.intel.com>) id 1gEf63-0000V2-Mr
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:38:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gEf5v-0004Ow-F5
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:38:31 -0400
-Received: from mga01.intel.com ([192.55.52.88]:7827)
+	(envelope-from <sameo@linux.intel.com>) id 1gEf61-0004VW-GN
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:38:35 -0400
+Received: from mga01.intel.com ([192.55.52.88]:7878)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sameo@linux.intel.com>)
-	id 1gEf5n-0003wU-GU
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:38:23 -0400
+	id 1gEf60-0004Je-W8
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 14:38:33 -0400
 From: Samuel Ortiz <sameo@linux.intel.com>
-Date: Mon, 22 Oct 2018 20:36:38 +0200
-Message-Id: <20181022183656.4902-9-sameo@linux.intel.com>
+Date: Mon, 22 Oct 2018 20:36:44 +0200
+Message-Id: <20181022183656.4902-15-sameo@linux.intel.com>
 In-Reply-To: <20181022183656.4902-1-sameo@linux.intel.com>
 References: <20181022183656.4902-1-sameo@linux.intel.com>
-Subject: [Qemu-devel] [PATCH 08/26] hw: acpi: Export and generalize the PCI
- host AML API
+Subject: [Qemu-devel] [PATCH 14/26] hw: acpi: Export the PCI hotplug API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,521 +25,466 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Yang Zhong <yang.zhong@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Sebastien Boeuf <sebastien.boeuf@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-From: Yang Zhong <yang.zhong@intel.com>
+From: Sebastien Boeuf <sebastien.boeuf@intel.com>
 
-The AML build routines for the PCI host bridge and the corresponding
-DSDT addition are neither x86 nor PC machine type specific.
-We can move them to the architecture agnostic hw/acpi folder, and by
-carrying all the needed information through a new AcpiPciBus structure,
-we can make them PC machine type independent.
+The ACPI hotplug support for PCI devices APIs are not x86 or even
+machine type specific. In order for future machine types to be able to
+re-use that code, we export it through the architecture agnostic
+hw/acpi folder.
 
 Cc: "Michael S. Tsirkin" <mst@redhat.com>
 Cc: Igor Mammedov <imammedo@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Richard Henderson <rth@twiddle.net>
 Cc: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-Signed-off-by: Rob Bradford <robert.bradford@intel.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
+Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
 ---
- hw/acpi/aml-build.c         | 208 ++++++++++++++++++++++++++++++++++++
- hw/i386/acpi-build.c        | 167 ++---------------------------
- include/hw/acpi/aml-build.h |  10 ++
- 3 files changed, 226 insertions(+), 159 deletions(-)
+ hw/acpi/aml-build.c         | 194 ++++++++++++++++++++++++++++++++++++
+ hw/i386/acpi-build.c        | 192 +----------------------------------
+ include/hw/acpi/aml-build.h |   3 +
+ 3 files changed, 199 insertions(+), 190 deletions(-)
 
 diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-index 1a9948f6a9..3e0511bd46 100644
+index cb706ca975..f462bb8313 100644
 --- a/hw/acpi/aml-build.c
 +++ b/hw/acpi/aml-build.c
-@@ -29,6 +29,25 @@
- #include "hw/pci/pci_bus.h"
- #include "qemu/range.h"
- #include "hw/pci/pci_bridge.h"
-+#include "hw/i386/pc.h"
-+#include "sysemu/tpm.h"
-+#include "hw/acpi/tpm.h"
-+
-+#define PCI_HOST_BRIDGE_CONFIG_ADDR        0xcf8
-+#define PCI_HOST_BRIDGE_IO_0_MIN_ADDR      0x0000
-+#define PCI_HOST_BRIDGE_IO_0_MAX_ADDR      0x0cf7
-+#define PCI_HOST_BRIDGE_IO_1_MIN_ADDR      0x0d00
-+#define PCI_HOST_BRIDGE_IO_1_MAX_ADDR      0xffff
-+#define PCI_VGA_MEM_BASE_ADDR              0x000a0000
-+#define PCI_VGA_MEM_MAX_ADDR               0x000bffff
-+#define IO_0_LEN                           0xcf8
-+#define VGA_MEM_LEN                        0x20000
-+
-+static const char *pci_hosts[] = {
-+   "/machine/i440fx",
-+   "/machine/q35",
-+   NULL,
-+};
+@@ -35,6 +35,7 @@
+ #include "hw/acpi/tpm.h"
+ #include "qom/qom-qobject.h"
+ #include "qapi/qmp/qnum.h"
++#include "hw/acpi/pcihp.h"
  
- static GArray *build_alloc_array(void)
- {
-@@ -1601,6 +1620,51 @@ void acpi_build_tables_cleanup(AcpiBuildTables *tables, bool mfre)
-     g_array_free(tables->vmgenid, mfre);
+ #define PCI_HOST_BRIDGE_CONFIG_ADDR        0xcf8
+ #define PCI_HOST_BRIDGE_IO_0_MIN_ADDR      0x0000
+@@ -2314,6 +2315,199 @@ Aml *build_pci_host_bridge(Aml *table, AcpiPciBus *pci_host)
+     return scope;
  }
  
-+/*
-+ * Because of the PXB hosts we cannot simply query TYPE_PCI_HOST_BRIDGE.
-+ */
-+Object *acpi_get_pci_host(void)
++void build_acpi_pci_hotplug(Aml *scope)
 +{
-+    PCIHostState *host;
-+    int i = 0;
++    Aml *field;
++    Aml *method;
 +
-+    while (pci_hosts[i]) {
-+        host = OBJECT_CHECK(PCIHostState,
-+                            object_resolve_path(pci_hosts[i], NULL),
-+                            TYPE_PCI_HOST_BRIDGE);
-+        if (host) {
-+            return OBJECT(host);
-+        }
++    aml_append(scope,
++        aml_operation_region("PCST", AML_SYSTEM_IO, aml_int(0xae00), 0x08));
++    field = aml_field("PCST", AML_DWORD_ACC, AML_NOLOCK, AML_WRITE_AS_ZEROS);
++    aml_append(field, aml_named_field("PCIU", 32));
++    aml_append(field, aml_named_field("PCID", 32));
++    aml_append(scope, field);
 +
-+        i++;
-+    }
++    aml_append(scope,
++        aml_operation_region("SEJ", AML_SYSTEM_IO, aml_int(0xae08), 0x04));
++    field = aml_field("SEJ", AML_DWORD_ACC, AML_NOLOCK, AML_WRITE_AS_ZEROS);
++    aml_append(field, aml_named_field("B0EJ", 32));
++    aml_append(scope, field);
 +
-+    return NULL;
++    aml_append(scope,
++        aml_operation_region("BNMR", AML_SYSTEM_IO, aml_int(0xae10), 0x04));
++    field = aml_field("BNMR", AML_DWORD_ACC, AML_NOLOCK, AML_WRITE_AS_ZEROS);
++    aml_append(field, aml_named_field("BNUM", 32));
++    aml_append(scope, field);
++
++    aml_append(scope, aml_mutex("BLCK", 0));
++
++    method = aml_method("PCEJ", 2, AML_NOTSERIALIZED);
++    aml_append(method, aml_acquire(aml_name("BLCK"), 0xFFFF));
++    aml_append(method, aml_store(aml_arg(0), aml_name("BNUM")));
++    aml_append(method,
++        aml_store(aml_shiftleft(aml_int(1), aml_arg(1)), aml_name("B0EJ")));
++    aml_append(method, aml_release(aml_name("BLCK")));
++    aml_append(method, aml_return(aml_int(0)));
++    aml_append(scope, method);
 +}
 +
-+void acpi_get_pci_holes(Range *hole, Range *hole64)
++static void build_append_pcihp_notify_entry(Aml *method, int slot)
 +{
-+    Object *pci_host;
++    Aml *if_ctx;
++    int32_t devfn = PCI_DEVFN(slot, 0);
 +
-+    pci_host = acpi_get_pci_host();
-+    g_assert(pci_host);
-+
-+    range_set_bounds1(hole,
-+                      object_property_get_uint(pci_host,
-+                                               PCI_HOST_PROP_PCI_HOLE_START,
-+                                               NULL),
-+                      object_property_get_uint(pci_host,
-+                                               PCI_HOST_PROP_PCI_HOLE_END,
-+                                               NULL));
-+    range_set_bounds1(hole64,
-+                      object_property_get_uint(pci_host,
-+                                               PCI_HOST_PROP_PCI_HOLE64_START,
-+                                               NULL),
-+                      object_property_get_uint(pci_host,
-+                                               PCI_HOST_PROP_PCI_HOLE64_END,
-+                                               NULL));
++    if_ctx = aml_if(aml_and(aml_arg(0), aml_int(0x1U << slot), NULL));
++    aml_append(if_ctx, aml_notify(aml_name("S%.02X", devfn), aml_arg(1)));
++    aml_append(method, if_ctx);
 +}
 +
- static void crs_range_insert(GPtrArray *ranges, uint64_t base, uint64_t limit)
- {
-     CrsRangeEntry *entry;
-@@ -2099,6 +2163,150 @@ Aml *build_prt(bool is_pci0_prt)
-     return method;
- }
- 
-+Aml *build_pci_host_bridge(Aml *table, AcpiPciBus *pci_host)
++void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
++                                  bool pcihp_bridge_en)
 +{
-+    CrsRangeEntry *entry;
-+    Aml *scope, *dev, *crs;
-+    CrsRangeSet crs_range_set;
-+    Range *pci_hole = NULL;
-+    Range *pci_hole64 = NULL;
-+    PCIBus *bus = NULL;
-+    int root_bus_limit = 0xFF;
++    Aml *dev, *notify_method = NULL, *method;
++    QObject *bsel;
++    PCIBus *sec;
 +    int i;
 +
-+    bus = pci_host->pci_bus;
-+    assert(bus);
-+    pci_hole = pci_host->pci_hole;
-+    pci_hole64 = pci_host->pci_hole64;
++    bsel = object_property_get_qobject(OBJECT(bus), ACPI_PCIHP_PROP_BSEL, NULL);
++    if (bsel) {
++        uint64_t bsel_val = qnum_get_uint(qobject_to(QNum, bsel));
 +
-+    crs_range_set_init(&crs_range_set);
-+    QLIST_FOREACH(bus, &bus->child, sibling) {
-+        uint8_t bus_num = pci_bus_num(bus);
-+        uint8_t numa_node = pci_bus_numa_node(bus);
++        aml_append(parent_scope, aml_name_decl("BSEL", aml_int(bsel_val)));
++        notify_method = aml_method("DVNT", 2, AML_NOTSERIALIZED);
++    }
 +
-+        /* look only for expander root buses */
-+        if (!pci_bus_is_root(bus)) {
++    for (i = 0; i < ARRAY_SIZE(bus->devices); i += PCI_FUNC_MAX) {
++        DeviceClass *dc;
++        PCIDeviceClass *pc;
++        PCIDevice *pdev = bus->devices[i];
++        int slot = PCI_SLOT(i);
++        bool hotplug_enabled_dev;
++        bool bridge_in_acpi;
++
++        if (!pdev) {
++            if (bsel) { /* add hotplug slots for non present devices */
++                dev = aml_device("S%.02X", PCI_DEVFN(slot, 0));
++                aml_append(dev, aml_name_decl("_SUN", aml_int(slot)));
++                aml_append(dev, aml_name_decl("_ADR", aml_int(slot << 16)));
++                method = aml_method("_EJ0", 1, AML_NOTSERIALIZED);
++                aml_append(method,
++                    aml_call2("PCEJ", aml_name("BSEL"), aml_name("_SUN"))
++                );
++                aml_append(dev, method);
++                aml_append(parent_scope, dev);
++
++                build_append_pcihp_notify_entry(notify_method, slot);
++            }
 +            continue;
 +        }
 +
-+        if (bus_num < root_bus_limit) {
-+            root_bus_limit = bus_num - 1;
++        pc = PCI_DEVICE_GET_CLASS(pdev);
++        dc = DEVICE_GET_CLASS(pdev);
++
++        /* When hotplug for bridges is enabled, bridges are
++         * described in ACPI separately (see build_pci_bus_end).
++         * In this case they aren't themselves hot-pluggable.
++         * Hotplugged bridges *are* hot-pluggable.
++         */
++        bridge_in_acpi = pc->is_bridge && pcihp_bridge_en &&
++            !DEVICE(pdev)->hotplugged;
++
++        hotplug_enabled_dev = bsel && dc->hotpluggable && !bridge_in_acpi;
++
++        if (pc->class_id == PCI_CLASS_BRIDGE_ISA) {
++            continue;
 +        }
 +
-+        scope = aml_scope("\\_SB");
-+        dev = aml_device("PC%.02X", bus_num);
-+        aml_append(dev, aml_name_decl("_UID", aml_int(bus_num)));
-+        aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0A03")));
-+        aml_append(dev, aml_name_decl("_BBN", aml_int(bus_num)));
-+        if (pci_bus_is_express(bus)) {
-+            aml_append(dev, aml_name_decl("SUPP", aml_int(0)));
-+            aml_append(dev, aml_name_decl("CTRL", aml_int(0)));
-+            aml_append(dev, build_osc_method(0x1F));
++        /* start to compose PCI slot descriptor */
++        dev = aml_device("S%.02X", PCI_DEVFN(slot, 0));
++        aml_append(dev, aml_name_decl("_ADR", aml_int(slot << 16)));
++
++        if (pc->class_id == PCI_CLASS_DISPLAY_VGA) {
++            /* add VGA specific AML methods */
++            int s3d;
++
++            if (object_dynamic_cast(OBJECT(pdev), "qxl-vga")) {
++                s3d = 3;
++            } else {
++                s3d = 0;
++            }
++
++            method = aml_method("_S1D", 0, AML_NOTSERIALIZED);
++            aml_append(method, aml_return(aml_int(0)));
++            aml_append(dev, method);
++
++            method = aml_method("_S2D", 0, AML_NOTSERIALIZED);
++            aml_append(method, aml_return(aml_int(0)));
++            aml_append(dev, method);
++
++            method = aml_method("_S3D", 0, AML_NOTSERIALIZED);
++            aml_append(method, aml_return(aml_int(s3d)));
++            aml_append(dev, method);
++        } else if (hotplug_enabled_dev) {
++            /* add _SUN/_EJ0 to make slot hotpluggable  */
++            aml_append(dev, aml_name_decl("_SUN", aml_int(slot)));
++
++            method = aml_method("_EJ0", 1, AML_NOTSERIALIZED);
++            aml_append(method,
++                aml_call2("PCEJ", aml_name("BSEL"), aml_name("_SUN"))
++            );
++            aml_append(dev, method);
++
++            if (bsel) {
++                build_append_pcihp_notify_entry(notify_method, slot);
++            }
++        } else if (bridge_in_acpi) {
++            /*
++             * device is coldplugged bridge,
++             * add child device descriptions into its scope
++             */
++            PCIBus *sec_bus = pci_bridge_get_sec_bus(PCI_BRIDGE(pdev));
++
++            build_append_pci_bus_devices(dev, sec_bus, pcihp_bridge_en);
 +        }
-+        if (numa_node != NUMA_NODE_UNASSIGNED) {
-+            aml_append(dev, aml_name_decl("_PXM", aml_int(numa_node)));
-+        }
-+
-+        aml_append(dev, build_prt(false));
-+        crs = build_crs(PCI_HOST_BRIDGE(BUS(bus)->parent), &crs_range_set);
-+        aml_append(dev, aml_name_decl("_CRS", crs));
-+        aml_append(scope, dev);
-+        aml_append(table, scope);
-+    }
-+    scope = aml_scope("\\_SB.PCI0");
-+    /* build PCI0._CRS */
-+    crs = aml_resource_template();
-+    /* set the pcie bus num */
-+    aml_append(crs,
-+        aml_word_bus_number(AML_MIN_FIXED, AML_MAX_FIXED, AML_POS_DECODE,
-+                            0x0000, 0x0, root_bus_limit,
-+                            0x0000, root_bus_limit + 1));
-+    aml_append(crs, aml_io(AML_DECODE16, PCI_HOST_BRIDGE_CONFIG_ADDR,
-+                           PCI_HOST_BRIDGE_CONFIG_ADDR, 0x01, 0x08));
-+    /* set the io region 0 in pci host bridge */
-+    aml_append(crs,
-+        aml_word_io(AML_MIN_FIXED, AML_MAX_FIXED,
-+                    AML_POS_DECODE, AML_ENTIRE_RANGE,
-+                    0x0000, PCI_HOST_BRIDGE_IO_0_MIN_ADDR,
-+                    PCI_HOST_BRIDGE_IO_0_MAX_ADDR, 0x0000, IO_0_LEN));
-+
-+    /* set the io region 1 in pci host bridge */
-+    crs_replace_with_free_ranges(crs_range_set.io_ranges,
-+                                 PCI_HOST_BRIDGE_IO_1_MIN_ADDR,
-+                                 PCI_HOST_BRIDGE_IO_1_MAX_ADDR);
-+    for (i = 0; i < crs_range_set.io_ranges->len; i++) {
-+        entry = g_ptr_array_index(crs_range_set.io_ranges, i);
-+        aml_append(crs,
-+            aml_word_io(AML_MIN_FIXED, AML_MAX_FIXED,
-+                        AML_POS_DECODE, AML_ENTIRE_RANGE,
-+                        0x0000, entry->base, entry->limit,
-+                        0x0000, entry->limit - entry->base + 1));
++        /* slot descriptor has been composed, add it into parent context */
++        aml_append(parent_scope, dev);
 +    }
 +
-+    /* set the vga mem region(0) in pci host bridge */
-+    aml_append(crs,
-+        aml_dword_memory(AML_POS_DECODE, AML_MIN_FIXED, AML_MAX_FIXED,
-+                         AML_CACHEABLE, AML_READ_WRITE,
-+                         0, PCI_VGA_MEM_BASE_ADDR, PCI_VGA_MEM_MAX_ADDR,
-+                         0, VGA_MEM_LEN));
-+
-+    /* set the mem region 1 in pci host bridge */
-+    crs_replace_with_free_ranges(crs_range_set.mem_ranges,
-+                                 range_lob(pci_hole),
-+                                 range_upb(pci_hole));
-+    for (i = 0; i < crs_range_set.mem_ranges->len; i++) {
-+        entry = g_ptr_array_index(crs_range_set.mem_ranges, i);
-+        aml_append(crs,
-+            aml_dword_memory(AML_POS_DECODE, AML_MIN_FIXED, AML_MAX_FIXED,
-+                             AML_NON_CACHEABLE, AML_READ_WRITE,
-+                             0, entry->base, entry->limit,
-+                             0, entry->limit - entry->base + 1));
++    if (bsel) {
++        aml_append(parent_scope, notify_method);
 +    }
 +
-+    /* set the mem region 2 in pci host bridge */
-+    if (!range_is_empty(pci_hole64)) {
-+        crs_replace_with_free_ranges(crs_range_set.mem_64bit_ranges,
-+                                     range_lob(pci_hole64),
-+                                     range_upb(pci_hole64));
-+        for (i = 0; i < crs_range_set.mem_64bit_ranges->len; i++) {
-+            entry = g_ptr_array_index(crs_range_set.mem_64bit_ranges, i);
-+            aml_append(crs,
-+                       aml_qword_memory(AML_POS_DECODE, AML_MIN_FIXED,
-+                                        AML_MAX_FIXED,
-+                                        AML_CACHEABLE, AML_READ_WRITE,
-+                                        0, entry->base, entry->limit,
-+                                        0, entry->limit - entry->base + 1));
++    /* Append PCNT method to notify about events on local and child buses.
++     * Add unconditionally for root since DSDT expects it.
++     */
++    method = aml_method("PCNT", 0, AML_NOTSERIALIZED);
++
++    /* If bus supports hotplug select it and notify about local events */
++    if (bsel) {
++        uint64_t bsel_val = qnum_get_uint(qobject_to(QNum, bsel));
++
++        aml_append(method, aml_store(aml_int(bsel_val), aml_name("BNUM")));
++        aml_append(method,
++            aml_call2("DVNT", aml_name("PCIU"), aml_int(1) /* Device Check */)
++        );
++        aml_append(method,
++            aml_call2("DVNT", aml_name("PCID"), aml_int(3)/* Eject Request */)
++        );
++    }
++
++    /* Notify about child bus events in any case */
++    if (pcihp_bridge_en) {
++        QLIST_FOREACH(sec, &bus->child, sibling) {
++            int32_t devfn = sec->parent_dev->devfn;
++
++            if (pci_bus_is_root(sec) || pci_bus_is_express(sec)) {
++                continue;
++            }
++
++            aml_append(method, aml_name("^S%.02X.PCNT", devfn));
 +        }
 +    }
-+
-+    if (TPM_IS_TIS(tpm_find())) {
-+        aml_append(crs, aml_memory32_fixed(TPM_TIS_ADDR_BASE,
-+                   TPM_TIS_ADDR_SIZE, AML_READ_WRITE));
-+    }
-+
-+    aml_append(scope, aml_name_decl("_CRS", crs));
-+    crs_range_set_free(&crs_range_set);
-+    return scope;
++    aml_append(parent_scope, method);
++    qobject_unref(bsel);
 +}
 +
-+void acpi_dsdt_add_pci_bus(Aml *dsdt, AcpiPciBus *pci_host)
-+{
-+    Aml *dev, *pci_scope;
-+
-+    dev = aml_device("\\_SB.PCI0");
-+    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0A08")));
-+    aml_append(dev, aml_name_decl("_CID", aml_eisaid("PNP0A03")));
-+    aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
-+    aml_append(dev, aml_name_decl("_UID", aml_int(1)));
-+    aml_append(dev, aml_name_decl("SUPP", aml_int(0)));
-+    aml_append(dev, aml_name_decl("CTRL", aml_int(0)));
-+    aml_append(dev, build_osc_method(0x1F));
-+    aml_append(dsdt, dev);
-+
-+    pci_scope = build_pci_host_bridge(dsdt, pci_host);
-+    aml_append(dsdt, pci_scope);
-+}
-+
- /* Build rsdt table */
- void
- build_rsdt(GArray *table_data, BIOSLinker *linker, GArray *table_offsets,
+ void acpi_dsdt_add_pci_bus(Aml *dsdt, AcpiPciBus *pci_host)
+ {
+     Aml *dev, *pci_scope;
 diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 6652880c9b..12a8d8210a 100644
+index 5932dbe825..9cb739bf5c 100644
 --- a/hw/i386/acpi-build.c
 +++ b/hw/i386/acpi-build.c
-@@ -114,12 +114,6 @@ typedef struct AcpiBuildPciBusHotplugState {
-     bool pcihp_bridge_en;
- } AcpiBuildPciBusHotplugState;
- 
--static const char *pci_hosts[] = {
--   "/machine/i440fx",
--   "/machine/q35",
--   NULL,
--};
--
- static void init_common_fadt_data(Object *o, AcpiFadtData *data)
- {
-     uint32_t io = object_property_get_uint(o, ACPI_PM_PROP_PM_IO_BASE, NULL);
-@@ -240,52 +234,6 @@ static void acpi_get_misc_info(AcpiMiscInfo *info)
-     info->applesmc_io_base = applesmc_port();
+@@ -362,163 +362,6 @@ build_madt(GArray *table_data, BIOSLinker *linker,
+                  table_data->len - madt_start, 1, NULL, NULL);
  }
  
--/*
-- * Because of the PXB hosts we cannot simply query TYPE_PCI_HOST_BRIDGE.
-- * On i386 arch we only have two pci hosts, so we can look only for them.
-- */
--static Object *acpi_get_pci_host(void)
+-static void build_append_pcihp_notify_entry(Aml *method, int slot)
 -{
--    PCIHostState *host;
--    int i = 0;
+-    Aml *if_ctx;
+-    int32_t devfn = PCI_DEVFN(slot, 0);
 -
--    while (pci_hosts[i]) {
--        host = OBJECT_CHECK(PCIHostState,
--                            object_resolve_path(pci_hosts[i], NULL),
--                            TYPE_PCI_HOST_BRIDGE);
--        if (host) {
--            return OBJECT(host);
--        }
+-    if_ctx = aml_if(aml_and(aml_arg(0), aml_int(0x1U << slot), NULL));
+-    aml_append(if_ctx, aml_notify(aml_name("S%.02X", devfn), aml_arg(1)));
+-    aml_append(method, if_ctx);
+-}
 -
--        i++;
+-static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
+-                                         bool pcihp_bridge_en)
+-{
+-    Aml *dev, *notify_method = NULL, *method;
+-    QObject *bsel;
+-    PCIBus *sec;
+-    int i;
+-
+-    bsel = object_property_get_qobject(OBJECT(bus), ACPI_PCIHP_PROP_BSEL, NULL);
+-    if (bsel) {
+-        uint64_t bsel_val = qnum_get_uint(qobject_to(QNum, bsel));
+-
+-        aml_append(parent_scope, aml_name_decl("BSEL", aml_int(bsel_val)));
+-        notify_method = aml_method("DVNT", 2, AML_NOTSERIALIZED);
 -    }
 -
--    return NULL;
--}
+-    for (i = 0; i < ARRAY_SIZE(bus->devices); i += PCI_FUNC_MAX) {
+-        DeviceClass *dc;
+-        PCIDeviceClass *pc;
+-        PCIDevice *pdev = bus->devices[i];
+-        int slot = PCI_SLOT(i);
+-        bool hotplug_enabled_dev;
+-        bool bridge_in_acpi;
 -
--static void acpi_get_pci_holes(Range *hole, Range *hole64)
--{
--    Object *pci_host;
+-        if (!pdev) {
+-            if (bsel) { /* add hotplug slots for non present devices */
+-                dev = aml_device("S%.02X", PCI_DEVFN(slot, 0));
+-                aml_append(dev, aml_name_decl("_SUN", aml_int(slot)));
+-                aml_append(dev, aml_name_decl("_ADR", aml_int(slot << 16)));
+-                method = aml_method("_EJ0", 1, AML_NOTSERIALIZED);
+-                aml_append(method,
+-                    aml_call2("PCEJ", aml_name("BSEL"), aml_name("_SUN"))
+-                );
+-                aml_append(dev, method);
+-                aml_append(parent_scope, dev);
 -
--    pci_host = acpi_get_pci_host();
--    g_assert(pci_host);
+-                build_append_pcihp_notify_entry(notify_method, slot);
+-            }
+-            continue;
+-        }
 -
--    range_set_bounds1(hole,
--                      object_property_get_uint(pci_host,
--                                               PCI_HOST_PROP_PCI_HOLE_START,
--                                               NULL),
--                      object_property_get_uint(pci_host,
--                                               PCI_HOST_PROP_PCI_HOLE_END,
--                                               NULL));
--    range_set_bounds1(hole64,
--                      object_property_get_uint(pci_host,
--                                               PCI_HOST_PROP_PCI_HOLE64_START,
--                                               NULL),
--                      object_property_get_uint(pci_host,
--                                               PCI_HOST_PROP_PCI_HOLE64_END,
--                                               NULL));
--}
+-        pc = PCI_DEVICE_GET_CLASS(pdev);
+-        dc = DEVICE_GET_CLASS(pdev);
 -
- /* FACS */
- static void
- build_facs(GArray *table_data, BIOSLinker *linker)
-@@ -1307,16 +1255,11 @@ static void build_piix4_pci_hotplug(Aml *table)
- static void
- build_dsdt(GArray *table_data, BIOSLinker *linker,
-            AcpiPmInfo *pm, AcpiMiscInfo *misc,
--           Range *pci_hole, Range *pci_hole64,
-+           AcpiPciBus *pci_host,
-            MachineState *machine, AcpiConfiguration *conf)
- {
--    CrsRangeEntry *entry;
-     Aml *dsdt, *sb_scope, *scope, *dev, *method, *field, *pkg, *crs;
--    CrsRangeSet crs_range_set;
-     uint32_t nr_mem = machine->ram_slots;
--    int root_bus_limit = 0xFF;
--    PCIBus *bus = NULL;
--    int i;
- 
-     dsdt = init_aml_allocator();
- 
-@@ -1391,104 +1334,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-     }
-     aml_append(dsdt, scope);
- 
--    crs_range_set_init(&crs_range_set);
--    bus = PC_MACHINE(machine)->bus;
--    if (bus) {
--        QLIST_FOREACH(bus, &bus->child, sibling) {
--            uint8_t bus_num = pci_bus_num(bus);
--            uint8_t numa_node = pci_bus_numa_node(bus);
+-        /* When hotplug for bridges is enabled, bridges are
+-         * described in ACPI separately (see build_pci_bus_end).
+-         * In this case they aren't themselves hot-pluggable.
+-         * Hotplugged bridges *are* hot-pluggable.
+-         */
+-        bridge_in_acpi = pc->is_bridge && pcihp_bridge_en &&
+-            !DEVICE(pdev)->hotplugged;
 -
--            /* look only for expander root buses */
--            if (!pci_bus_is_root(bus)) {
+-        hotplug_enabled_dev = bsel && dc->hotpluggable && !bridge_in_acpi;
+-
+-        if (pc->class_id == PCI_CLASS_BRIDGE_ISA) {
+-            continue;
+-        }
+-
+-        /* start to compose PCI slot descriptor */
+-        dev = aml_device("S%.02X", PCI_DEVFN(slot, 0));
+-        aml_append(dev, aml_name_decl("_ADR", aml_int(slot << 16)));
+-
+-        if (pc->class_id == PCI_CLASS_DISPLAY_VGA) {
+-            /* add VGA specific AML methods */
+-            int s3d;
+-
+-            if (object_dynamic_cast(OBJECT(pdev), "qxl-vga")) {
+-                s3d = 3;
+-            } else {
+-                s3d = 0;
+-            }
+-
+-            method = aml_method("_S1D", 0, AML_NOTSERIALIZED);
+-            aml_append(method, aml_return(aml_int(0)));
+-            aml_append(dev, method);
+-
+-            method = aml_method("_S2D", 0, AML_NOTSERIALIZED);
+-            aml_append(method, aml_return(aml_int(0)));
+-            aml_append(dev, method);
+-
+-            method = aml_method("_S3D", 0, AML_NOTSERIALIZED);
+-            aml_append(method, aml_return(aml_int(s3d)));
+-            aml_append(dev, method);
+-        } else if (hotplug_enabled_dev) {
+-            /* add _SUN/_EJ0 to make slot hotpluggable  */
+-            aml_append(dev, aml_name_decl("_SUN", aml_int(slot)));
+-
+-            method = aml_method("_EJ0", 1, AML_NOTSERIALIZED);
+-            aml_append(method,
+-                aml_call2("PCEJ", aml_name("BSEL"), aml_name("_SUN"))
+-            );
+-            aml_append(dev, method);
+-
+-            if (bsel) {
+-                build_append_pcihp_notify_entry(notify_method, slot);
+-            }
+-        } else if (bridge_in_acpi) {
+-            /*
+-             * device is coldplugged bridge,
+-             * add child device descriptions into its scope
+-             */
+-            PCIBus *sec_bus = pci_bridge_get_sec_bus(PCI_BRIDGE(pdev));
+-
+-            build_append_pci_bus_devices(dev, sec_bus, pcihp_bridge_en);
+-        }
+-        /* slot descriptor has been composed, add it into parent context */
+-        aml_append(parent_scope, dev);
+-    }
+-
+-    if (bsel) {
+-        aml_append(parent_scope, notify_method);
+-    }
+-
+-    /* Append PCNT method to notify about events on local and child buses.
+-     * Add unconditionally for root since DSDT expects it.
+-     */
+-    method = aml_method("PCNT", 0, AML_NOTSERIALIZED);
+-
+-    /* If bus supports hotplug select it and notify about local events */
+-    if (bsel) {
+-        uint64_t bsel_val = qnum_get_uint(qobject_to(QNum, bsel));
+-
+-        aml_append(method, aml_store(aml_int(bsel_val), aml_name("BNUM")));
+-        aml_append(method,
+-            aml_call2("DVNT", aml_name("PCIU"), aml_int(1) /* Device Check */)
+-        );
+-        aml_append(method,
+-            aml_call2("DVNT", aml_name("PCID"), aml_int(3)/* Eject Request */)
+-        );
+-    }
+-
+-    /* Notify about child bus events in any case */
+-    if (pcihp_bridge_en) {
+-        QLIST_FOREACH(sec, &bus->child, sibling) {
+-            int32_t devfn = sec->parent_dev->devfn;
+-
+-            if (pci_bus_is_root(sec) || pci_bus_is_express(sec)) {
 -                continue;
 -            }
 -
--            if (bus_num < root_bus_limit) {
--                root_bus_limit = bus_num - 1;
--            }
--
--            scope = aml_scope("\\_SB");
--            dev = aml_device("PC%.02X", bus_num);
--            aml_append(dev, aml_name_decl("_UID", aml_int(bus_num)));
--            aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0A03")));
--            aml_append(dev, aml_name_decl("_BBN", aml_int(bus_num)));
--            if (pci_bus_is_express(bus)) {
--                aml_append(dev, build_osc_method(0x1F));
--            }
--
--            if (numa_node != NUMA_NODE_UNASSIGNED) {
--                aml_append(dev, aml_name_decl("_PXM", aml_int(numa_node)));
--            }
--
--            aml_append(dev, build_prt(false));
--            crs = build_crs(PCI_HOST_BRIDGE(BUS(bus)->parent), &crs_range_set);
--            aml_append(dev, aml_name_decl("_CRS", crs));
--            aml_append(scope, dev);
--            aml_append(dsdt, scope);
+-            aml_append(method, aml_name("^S%.02X.PCNT", devfn));
 -        }
 -    }
+-    aml_append(parent_scope, method);
+-    qobject_unref(bsel);
+-}
 -
--    scope = aml_scope("\\_SB.PCI0");
--    /* build PCI0._CRS */
--    crs = aml_resource_template();
--    aml_append(crs,
--        aml_word_bus_number(AML_MIN_FIXED, AML_MAX_FIXED, AML_POS_DECODE,
--                            0x0000, 0x0, root_bus_limit,
--                            0x0000, root_bus_limit + 1));
--    aml_append(crs, aml_io(AML_DECODE16, 0x0CF8, 0x0CF8, 0x01, 0x08));
+ static void build_hpet_aml(Aml *table)
+ {
+     Aml *crs;
+@@ -1214,41 +1057,10 @@ static void build_piix4_isa_bridge(Aml *table)
+ static void build_piix4_pci_hotplug(Aml *table)
+ {
+     Aml *scope;
+-    Aml *field;
+-    Aml *method;
 -
--    aml_append(crs,
--        aml_word_io(AML_MIN_FIXED, AML_MAX_FIXED,
--                    AML_POS_DECODE, AML_ENTIRE_RANGE,
--                    0x0000, 0x0000, 0x0CF7, 0x0000, 0x0CF8));
+-    scope =  aml_scope("_SB.PCI0");
 -
--    crs_replace_with_free_ranges(crs_range_set.io_ranges, 0x0D00, 0xFFFF);
--    for (i = 0; i < crs_range_set.io_ranges->len; i++) {
--        entry = g_ptr_array_index(crs_range_set.io_ranges, i);
--        aml_append(crs,
--            aml_word_io(AML_MIN_FIXED, AML_MAX_FIXED,
--                        AML_POS_DECODE, AML_ENTIRE_RANGE,
--                        0x0000, entry->base, entry->limit,
--                        0x0000, entry->limit - entry->base + 1));
--    }
--
--    aml_append(crs,
--        aml_dword_memory(AML_POS_DECODE, AML_MIN_FIXED, AML_MAX_FIXED,
--                         AML_CACHEABLE, AML_READ_WRITE,
--                         0, 0x000A0000, 0x000BFFFF, 0, 0x00020000));
--
--    crs_replace_with_free_ranges(crs_range_set.mem_ranges,
--                                 range_lob(pci_hole),
--                                 range_upb(pci_hole));
--    for (i = 0; i < crs_range_set.mem_ranges->len; i++) {
--        entry = g_ptr_array_index(crs_range_set.mem_ranges, i);
--        aml_append(crs,
--            aml_dword_memory(AML_POS_DECODE, AML_MIN_FIXED, AML_MAX_FIXED,
--                             AML_NON_CACHEABLE, AML_READ_WRITE,
--                             0, entry->base, entry->limit,
--                             0, entry->limit - entry->base + 1));
--    }
--
--    if (!range_is_empty(pci_hole64)) {
--        crs_replace_with_free_ranges(crs_range_set.mem_64bit_ranges,
--                                     range_lob(pci_hole64),
--                                     range_upb(pci_hole64));
--        for (i = 0; i < crs_range_set.mem_64bit_ranges->len; i++) {
--            entry = g_ptr_array_index(crs_range_set.mem_64bit_ranges, i);
--            aml_append(crs,
--                       aml_qword_memory(AML_POS_DECODE, AML_MIN_FIXED,
--                                        AML_MAX_FIXED,
--                                        AML_CACHEABLE, AML_READ_WRITE,
--                                        0, entry->base, entry->limit,
--                                        0, entry->limit - entry->base + 1));
--        }
--    }
--
--    if (TPM_IS_TIS(tpm_find())) {
--        aml_append(crs, aml_memory32_fixed(TPM_TIS_ADDR_BASE,
--                   TPM_TIS_ADDR_SIZE, AML_READ_WRITE));
--    }
--    aml_append(scope, aml_name_decl("_CRS", crs));
-+    scope = build_pci_host_bridge(dsdt, pci_host);
+-    aml_append(scope,
+-        aml_operation_region("PCST", AML_SYSTEM_IO, aml_int(0xae00), 0x08));
+-    field = aml_field("PCST", AML_DWORD_ACC, AML_NOLOCK, AML_WRITE_AS_ZEROS);
+-    aml_append(field, aml_named_field("PCIU", 32));
+-    aml_append(field, aml_named_field("PCID", 32));
+-    aml_append(scope, field);
  
-     /* reserve GPE0 block resources */
-     dev = aml_device("GPE0");
-@@ -1508,8 +1354,6 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-     aml_append(dev, aml_name_decl("_CRS", crs));
-     aml_append(scope, dev);
- 
--    crs_range_set_free(&crs_range_set);
+-    aml_append(scope,
+-        aml_operation_region("SEJ", AML_SYSTEM_IO, aml_int(0xae08), 0x04));
+-    field = aml_field("SEJ", AML_DWORD_ACC, AML_NOLOCK, AML_WRITE_AS_ZEROS);
+-    aml_append(field, aml_named_field("B0EJ", 32));
+-    aml_append(scope, field);
 -
-     /* reserve PCIHP resources */
-     if (pm->pcihp_io_len) {
-         dev = aml_device("PHPR");
-@@ -2065,6 +1909,11 @@ void acpi_build(AcpiBuildTables *tables,
-                              64 /* Ensure FACS is aligned */,
-                              false /* high memory */);
+-    aml_append(scope,
+-        aml_operation_region("BNMR", AML_SYSTEM_IO, aml_int(0xae10), 0x04));
+-    field = aml_field("BNMR", AML_DWORD_ACC, AML_NOLOCK, AML_WRITE_AS_ZEROS);
+-    aml_append(field, aml_named_field("BNUM", 32));
+-    aml_append(scope, field);
+-
+-    aml_append(scope, aml_mutex("BLCK", 0));
+-
+-    method = aml_method("PCEJ", 2, AML_NOTSERIALIZED);
+-    aml_append(method, aml_acquire(aml_name("BLCK"), 0xFFFF));
+-    aml_append(method, aml_store(aml_arg(0), aml_name("BNUM")));
+-    aml_append(method,
+-        aml_store(aml_shiftleft(aml_int(1), aml_arg(1)), aml_name("B0EJ")));
+-    aml_append(method, aml_release(aml_name("BLCK")));
+-    aml_append(method, aml_return(aml_int(0)));
+-    aml_append(scope, method);
++    scope = aml_scope("_SB.PCI0");
  
-+    AcpiPciBus pci_host = {
-+        .pci_bus    = PC_MACHINE(machine)->bus,
-+        .pci_hole   = &pci_hole,
-+        .pci_hole64 = &pci_hole64,
-+    };
-     /*
-      * FACS is pointed to by FADT.
-      * We place it first since it's the only table that has alignment
-@@ -2076,7 +1925,7 @@ void acpi_build(AcpiBuildTables *tables,
-     /* DSDT is pointed to by FADT */
-     dsdt = tables_blob->len;
-     build_dsdt(tables_blob, tables->linker, &pm, &misc,
--               &pci_hole, &pci_hole64, machine, conf);
-+               &pci_host, machine, conf);
++    build_acpi_pci_hotplug(scope);
+     aml_append(table, scope);
+ }
  
-     /* Count the size of the DSDT and SSDT, we will need it for legacy
-      * sizing of ACPI tables.
 diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
-index a60589d70f..6647fa8791 100644
+index 45dcea711b..06fdbeafa7 100644
 --- a/include/hw/acpi/aml-build.h
 +++ b/include/hw/acpi/aml-build.h
-@@ -230,6 +230,12 @@ typedef struct AcpiMcfgInfo {
-     uint32_t mcfg_size;
- } AcpiMcfgInfo;
- 
-+typedef struct AcpiPciBus {
-+    PCIBus *pci_bus;
-+    Range *pci_hole;
-+    Range *pci_hole64;
-+} AcpiPciBus;
-+
- typedef struct CrsRangeEntry {
-     uint64_t base;
-     uint64_t limit;
-@@ -401,6 +407,8 @@ build_header(BIOSLinker *linker, GArray *table_data,
-              const char *oem_id, const char *oem_table_id);
- void *acpi_data_push(GArray *table_data, unsigned size);
- unsigned acpi_data_len(GArray *table);
-+Object *acpi_get_pci_host(void);
-+void acpi_get_pci_holes(Range *hole, Range *hole64);
- void acpi_align_size(GArray *blob, unsigned align);
- void acpi_add_table(GArray *table_offsets, GArray *table_data);
- void acpi_build_tables_init(AcpiBuildTables *tables);
-@@ -409,6 +417,8 @@ Aml *build_osc_method(uint32_t value);
+@@ -419,6 +419,9 @@ Aml *build_osc_method(uint32_t value);
  void build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info);
  Aml *build_gsi_link_dev(const char *name, uint8_t uid, uint8_t gsi);
  Aml *build_prt(bool is_pci0_prt);
-+void acpi_dsdt_add_pci_bus(Aml *dsdt, AcpiPciBus *pci_host);
-+Aml *build_pci_host_bridge(Aml *table, AcpiPciBus *pci_host);
++void build_acpi_pci_hotplug(Aml *scope);
++void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
++                                  bool pcihp_bridge_en);
+ void acpi_dsdt_add_pci_bus(Aml *dsdt, AcpiPciBus *pci_host);
+ Aml *build_pci_host_bridge(Aml *table, AcpiPciBus *pci_host);
  void crs_range_set_init(CrsRangeSet *range_set);
- Aml *build_crs(PCIHostState *host, CrsRangeSet *range_set);
- void crs_replace_with_free_ranges(GPtrArray *ranges,
 -- 
 2.17.2
