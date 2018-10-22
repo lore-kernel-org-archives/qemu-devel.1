@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45557)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46450)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gEjMy-00057v-TT
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 19:12:24 -0400
+	(envelope-from <philmd@redhat.com>) id 1gEjQs-0006xI-HD
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 19:16:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gEj9E-0001M8-KG
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 18:58:12 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:36159)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gEj9D-0001Kq-Ub
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 18:58:08 -0400
-Date: Mon, 22 Oct 2018 18:58:04 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20181022225804.GA29980@flamenco>
-References: <20181019010625.25294-1-cota@braap.org>
-	<20181019010625.25294-8-cota@braap.org>
-	<38c8c109-c231-696e-2fb8-4fae6f3fb641@linaro.org>
-	<fde51a9d-331b-1456-d93a-cd015e8caba9@linaro.org>
+	(envelope-from <philmd@redhat.com>) id 1gEjQp-0006IY-9N
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 19:16:22 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:33708)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gEjQo-0006H9-58
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 19:16:18 -0400
+Received: by mail-wm1-f68.google.com with SMTP id y140-v6so10278550wmd.0
+	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 16:16:17 -0700 (PDT)
+References: <cover.1540134918.git.noring@nocrew.org>
+	<BN6PR2201MB125165723113459889A6EC59C6F40@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	<20181022172343.GB2331@sx9>
+	<alpine.LFD.2.21.1810221901170.19280@eddie.linux-mips.org>
+	<alpine.LFD.2.21.1810221932480.19280@eddie.linux-mips.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <b784211e-2c26-53ff-a271-e7cd7ccf6892@redhat.com>
+Date: Tue, 23 Oct 2018 01:16:15 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fde51a9d-331b-1456-d93a-cd015e8caba9@linaro.org>
-Subject: Re: [Qemu-devel] [RFC v3 07/56] target/m68k: rename cpu_halted to
- cpu_halt
+In-Reply-To: <alpine.LFD.2.21.1810221932480.19280@eddie.linux-mips.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v8 00/38] target/mips: Limited support for
+ the R5900
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,36 +34,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <laurent@vivier.eu>
+To: "Maciej W. Rozycki" <macro@linux-mips.org>, Fredrik Noring <noring@nocrew.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>, =?UTF-8?Q?J=c3=bcrgen_Urban?= <JuergenUrban@gmx.de>, Petar Jovanovic <pjovanovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-On Sun, Oct 21, 2018 at 14:38:38 +0100, Richard Henderson wrote:
-> On 10/21/18 1:53 PM, Richard Henderson wrote:
-> > On 10/19/18 2:05 AM, Emilio G. Cota wrote:
-> >> To avoid a name clash with the soon-to-be-defined cpu_halted() helper.
-> >>
-> >> Cc: Laurent Vivier <laurent@vivier.eu>
-> >> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> >> ---
-> >>  target/m68k/translate.c | 6 +++---
-> >>  1 file changed, 3 insertions(+), 3 deletions(-)
-> > 
-> > Although for this usage it's probably better to avoid the
-> > tcg_global_mem_new_i32 and just use tcg_gen_st_i32.
+On 22/10/18 20:40, Maciej W. Rozycki wrote:
+> On Mon, 22 Oct 2018, Maciej W. Rozycki wrote:
 > 
-> And, as I read further, you need to convert this use to a helper call.
-> Otherwise you've still got an unlocked direct modification to cpu->halted
-> from within the TCG generated code.
+>> Hi Maciej,
 > 
-> There are several other targets that do the same thing: alpha, cris, hppa,
-> mips, microblaze, ppc.  And typically they will do exactly the same thing: set
-> the flag and then raise the halt exception.
+>   What an odd copy & paste thinko!  I can't believe I addressed myself in
+> the opening of my e-mail. :)
 
-Ouch -- I entirely missed these!
-
-For v4, I defined helper_cpu_halted_set in tcg-runtime, and
-converted all direct setters to it.
-
-Thanks,
-
-		Emilio
+Haha when I saw your mail I thought "weird, there is another Maciej 
+involved in this MIPS specific thread!?"
