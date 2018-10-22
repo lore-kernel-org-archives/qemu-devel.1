@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38073)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gEZPm-0002N7-KD
+	(envelope-from <armbru@redhat.com>) id 1gEZPm-0002ND-NA
 	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gEZPl-0003A5-9i
+	(envelope-from <armbru@redhat.com>) id 1gEZPl-00039t-3Y
 	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50240)
+Received: from mx1.redhat.com ([209.132.183.28]:46276)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gEZPk-0002wX-Up
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:33 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gEZPk-0002wF-PH
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 08:34:32 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0962D4E90B
-	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 12:34:21 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C23C181F09
+	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 12:34:20 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-117-34.ams2.redhat.com
 	[10.36.117.34])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id C663E19484
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 8D068104C529
 	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 12:34:20 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 22 Oct 2018 14:33:58 +0200
-Message-Id: <20181022123413.28044-26-armbru@redhat.com>
+Date: Mon, 22 Oct 2018 14:33:57 +0200
+Message-Id: <20181022123413.28044-25-armbru@redhat.com>
 In-Reply-To: <20181022123413.28044-1-armbru@redhat.com>
 References: <20181022123413.28044-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 25/40] vl: Clean up error reporting in
- parse_fw_cfg()
+Subject: [Qemu-devel] [PULL 24/40] vl: Clean up error reporting in
+ mon_init_func()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,76 +40,58 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 
 Calling error_report() in a function that takes an Error ** argument
-is suspicious.  parse_fw_cfg() does that, and then fails without
+is suspicious.  mon_init_func() does that, and then fails without
 setting an error.  Its caller main(), via qemu_opts_foreach(), is fine
 with it, but clean it up anyway.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20181017082702.5581-24-armbru@redhat.com>
+Message-Id: <20181017082702.5581-23-armbru@redhat.com>
 ---
- vl.c | 17 ++++++++---------
- 1 file changed, 8 insertions(+), 9 deletions(-)
+ vl.c | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
 
 diff --git a/vl.c b/vl.c
-index 6830fc8d8f..92d15711a5 100644
+index 0b69871295..6830fc8d8f 100644
 --- a/vl.c
 +++ b/vl.c
-@@ -2174,7 +2174,7 @@ static int parse_fw_cfg(void *opaque, QemuOpts *opt=
-s, Error **errp)
-     FWCfgState *fw_cfg =3D (FWCfgState *) opaque;
-=20
-     if (fw_cfg =3D=3D NULL) {
--        error_report("fw_cfg device not available");
-+        error_setg(errp, "fw_cfg device not available");
-         return -1;
-     }
-     name =3D qemu_opt_get(opts, "name");
-@@ -2183,15 +2183,16 @@ static int parse_fw_cfg(void *opaque, QemuOpts *o=
-pts, Error **errp)
-=20
-     /* we need name and either a file or the content string */
-     if (!(nonempty_str(name) && (nonempty_str(file) || nonempty_str(str)=
-))) {
--        error_report("invalid argument(s)");
-+        error_setg(errp, "invalid argument(s)");
-         return -1;
-     }
-     if (nonempty_str(file) && nonempty_str(str)) {
--        error_report("file and string are mutually exclusive");
-+        error_setg(errp, "file and string are mutually exclusive");
-         return -1;
-     }
-     if (strlen(name) > FW_CFG_MAX_FILE_PATH - 1) {
--        error_report("name too long (max. %d char)", FW_CFG_MAX_FILE_PAT=
-H - 1);
-+        error_setg(errp, "name too long (max. %d char)",
-+                   FW_CFG_MAX_FILE_PATH - 1);
-         return -1;
-     }
-     if (strncmp(name, "opt/", 4) !=3D 0) {
-@@ -2203,7 +2204,7 @@ static int parse_fw_cfg(void *opaque, QemuOpts *opt=
-s, Error **errp)
-         buf =3D g_memdup(str, size);
+@@ -2270,8 +2270,8 @@ static int mon_init_func(void *opaque, QemuOpts *op=
+ts, Error **errp)
+     } else if (strcmp(mode, "control") =3D=3D 0) {
+         flags =3D MONITOR_USE_CONTROL;
      } else {
-         if (!g_file_get_contents(file, &buf, &size, NULL)) {
--            error_report("can't load %s", file);
-+            error_setg(errp, "can't load %s", file);
-             return -1;
-         }
-     }
-@@ -4477,10 +4478,8 @@ int main(int argc, char **argv, char **envp)
-         hax_sync_vcpus();
+-        error_report("unknown monitor mode \"%s\"", mode);
+-        exit(1);
++        error_setg(errp, "unknown monitor mode \"%s\"", mode);
++        return -1;
      }
 =20
--    if (qemu_opts_foreach(qemu_find_opts("fw_cfg"),
--                          parse_fw_cfg, fw_cfg_find(), NULL) !=3D 0) {
+     if (qemu_opt_get_bool(opts, "pretty", 0))
+@@ -2285,8 +2285,8 @@ static int mon_init_func(void *opaque, QemuOpts *op=
+ts, Error **errp)
+     chardev =3D qemu_opt_get(opts, "chardev");
+     chr =3D qemu_chr_find(chardev);
+     if (chr =3D=3D NULL) {
+-        error_report("chardev \"%s\" not found", chardev);
+-        exit(1);
++        error_setg(errp, "chardev \"%s\" not found", chardev);
++        return -1;
+     }
+=20
+     monitor_init(chr, flags);
+@@ -4413,10 +4413,8 @@ int main(int argc, char **argv, char **envp)
+     default_drive(default_floppy, snapshot, IF_FLOPPY, 0, FD_OPTS);
+     default_drive(default_sdcard, snapshot, IF_SD, 0, SD_OPTS);
+=20
+-    if (qemu_opts_foreach(qemu_find_opts("mon"),
+-                          mon_init_func, NULL, NULL)) {
 -        exit(1);
 -    }
-+    qemu_opts_foreach(qemu_find_opts("fw_cfg"),
-+                      parse_fw_cfg, fw_cfg_find(), &error_fatal);
++    qemu_opts_foreach(qemu_find_opts("mon"),
++                      mon_init_func, NULL, &error_fatal);
 =20
-     /* init USB devices */
-     if (machine_usb(current_machine)) {
+     if (foreach_device_config(DEV_SERIAL, serial_parse) < 0)
+         exit(1);
 --=20
 2.17.2
