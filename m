@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52740)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gEjyB-0001R6-GJ
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 19:50:50 -0400
+	(envelope-from <philmd@redhat.com>) id 1gEk1c-0004qQ-Ek
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 19:54:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gEjy6-0001Nv-Gq
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 19:50:47 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:47933)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gEjy6-0001Ne-9Z
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 19:50:42 -0400
-Date: Mon, 22 Oct 2018 19:50:40 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20181022235040.GB31407@flamenco>
-References: <20181019010625.25294-1-cota@braap.org>
-	<20181019010625.25294-47-cota@braap.org>
-	<8af6bae7-ac35-f419-0a83-8a54cfb5eb0d@linaro.org>
+	(envelope-from <philmd@redhat.com>) id 1gEk1Y-00041c-Ix
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 19:54:19 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:34414)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gEk1W-00040R-MF
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 19:54:14 -0400
+Received: by mail-wr1-f68.google.com with SMTP id l6-v6so46390691wrt.1
+	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 16:54:14 -0700 (PDT)
+References: <20181019133835.16494-1-berrange@redhat.com>
+	<20181019133835.16494-8-berrange@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <3f9167f9-863a-54b7-786f-36e35fbe7898@redhat.com>
+Date: Tue, 23 Oct 2018 01:54:12 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8af6bae7-ac35-f419-0a83-8a54cfb5eb0d@linaro.org>
-Subject: Re: [Qemu-devel] [RFC v3 46/56] accel/tcg: convert to
- cpu_interrupt_request
+In-Reply-To: <20181019133835.16494-8-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v6 07/11] authz: add QAuthZSimple object
+ type for easy whitelist auth checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +31,309 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Sun, Oct 21, 2018 at 14:34:25 +0100, Richard Henderson wrote:
-> On 10/19/18 2:06 AM, Emilio G. Cota wrote:
-> > @@ -540,16 +540,16 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
-> >       */
-> >      atomic_mb_set(&cpu->icount_decr.u16.high, 0);
-> >  
-> > -    if (unlikely(atomic_read(&cpu->interrupt_request))) {
-> > +    if (unlikely(cpu_interrupt_request(cpu))) {
-> >          int interrupt_request;
-> >          qemu_mutex_lock_iothread();
-> > -        interrupt_request = cpu->interrupt_request;
-> > +        interrupt_request = cpu_interrupt_request(cpu);
-> >          if (unlikely(cpu->singlestep_enabled & SSTEP_NOIRQ)) {
-> >              /* Mask out external interrupts for this step. */
-> >              interrupt_request &= ~CPU_INTERRUPT_SSTEP_MASK;
-> >          }
-> >          if (interrupt_request & CPU_INTERRUPT_DEBUG) {
-> > -            cpu->interrupt_request &= ~CPU_INTERRUPT_DEBUG;
-> > +            cpu_reset_interrupt(cpu, CPU_INTERRUPT_DEBUG);
-> >              cpu->exception_index = EXCP_DEBUG;
-> >              qemu_mutex_unlock_iothread();
-> >              return true;
+On 19/10/18 15:38, Daniel P. Berrangé wrote:
+> In many cases a single VM will just need to whilelist a single identity
+> as the allowed user of network services. This is especially the case for
+> TLS live migration (optionally with NBD storage) where we just need to
+> whitelist the x509 certificate distinguished name of the source QEMU
+> host.
 > 
-> Multiple calls.
+> Via QMP this can be configured with:
+> 
+>    {
+>      "execute": "object-add",
+>      "arguments": {
+>        "qom-type": "authz-simple",
+>        "id": "authz0",
+>        "parameters": {
+>          "identity": "fred"
+>        }
+>      }
+>    }
+> 
+> Or via the command line
+> 
+>    -object authz-simple,id=authz0,identity=fred
+> 
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 
-I'd rather keep it as is.
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-The first read takes the lock, and that has to stay unless
-we want to use atomic_set on interrupt_request everywhere.
-
-The second read happens after the BQL has been acquired;
-note that to avoid deadlock we never acquire the BQL after
-a CPU lock; the second (locked) read thus has to stay.
-
-Subsequent accesses are all via cpu_reset_interrupt.
-If we wanted to avoid reacquiring the lock, we'd have
-to explicitly acquire the lock before the 2nd read,
-and add unlocks everywhere (like the many qemu_mutex_unlock_iothread
-calls), which would be ugly. But we'd also have to be careful
-not to longjmp with the CPU mutex held, so we'd have to
-unlock/lock around cc->cpu_exec_interrupt.
-
-Given that the CPU lock is uncontended (so it's cheap to
-acquire) and that the cases where we call cpu_reset_interrupt
-are not that frequent (CPU_INTERRUPT_{DEBUG,HALT,EXITTB}),
-I'd rather just keep the patch as is.
-
-Thanks,
-
-		Emilio
+> ---
+>   include/authz/simple.h |  84 ++++++++++++++++++++++++++++++
+>   authz/simple.c         | 115 +++++++++++++++++++++++++++++++++++++++++
+>   authz/Makefile.objs    |   1 +
+>   authz/trace-events     |   3 ++
+>   qemu-options.hx        |  24 +++++++++
+>   5 files changed, 227 insertions(+)
+>   create mode 100644 include/authz/simple.h
+>   create mode 100644 authz/simple.c
+> 
+> diff --git a/include/authz/simple.h b/include/authz/simple.h
+> new file mode 100644
+> index 0000000000..4686e7676d
+> --- /dev/null
+> +++ b/include/authz/simple.h
+> @@ -0,0 +1,84 @@
+> +/*
+> + * QEMU simple authorization driver
+> + *
+> + * Copyright (c) 2018 Red Hat, Inc.
+> + *
+> + * This library is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU Lesser General Public
+> + * License as published by the Free Software Foundation; either
+> + * version 2 of the License, or (at your option) any later version.
+> + *
+> + * This library is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + * Lesser General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU Lesser General Public
+> + * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+> + *
+> + */
+> +
+> +#ifndef QAUTHZ_SIMPLE_H__
+> +#define QAUTHZ_SIMPLE_H__
+> +
+> +#include "authz/base.h"
+> +
+> +#define TYPE_QAUTHZ_SIMPLE "authz-simple"
+> +
+> +#define QAUTHZ_SIMPLE_CLASS(klass)                        \
+> +    OBJECT_CLASS_CHECK(QAuthZSimpleClass, (klass),        \
+> +                       TYPE_QAUTHZ_SIMPLE)
+> +#define QAUTHZ_SIMPLE_GET_CLASS(obj)              \
+> +    OBJECT_GET_CLASS(QAuthZSimpleClass, (obj),    \
+> +                      TYPE_QAUTHZ_SIMPLE)
+> +#define QAUTHZ_SIMPLE(obj) \
+> +    INTERFACE_CHECK(QAuthZSimple, (obj),          \
+> +                    TYPE_QAUTHZ_SIMPLE)
+> +
+> +typedef struct QAuthZSimple QAuthZSimple;
+> +typedef struct QAuthZSimpleClass QAuthZSimpleClass;
+> +
+> +
+> +/**
+> + * QAuthZSimple:
+> + *
+> + * This authorization driver provides a simple mechanism
+> + * for granting access based on an exact matched username.
+> + *
+> + * To create an instance of this class via QMP:
+> + *
+> + *  {
+> + *    "execute": "object-add",
+> + *    "arguments": {
+> + *      "qom-type": "authz-simple",
+> + *      "id": "authz0",
+> + *      "parameters": {
+> + *        "identity": "fred"
+> + *      }
+> + *    }
+> + *  }
+> + *
+> + * Or via the command line
+> + *
+> + *   -object authz-simple,id=authz0,identity=fred
+> + *
+> + */
+> +struct QAuthZSimple {
+> +    QAuthZ parent_obj;
+> +
+> +    char *identity;
+> +};
+> +
+> +
+> +struct QAuthZSimpleClass {
+> +    QAuthZClass parent_class;
+> +};
+> +
+> +
+> +QAuthZSimple *qauthz_simple_new(const char *id,
+> +                                const char *identity,
+> +                                Error **errp);
+> +
+> +
+> +#endif /* QAUTHZ_SIMPLE_H__ */
+> +
+> diff --git a/authz/simple.c b/authz/simple.c
+> new file mode 100644
+> index 0000000000..8ab718803e
+> --- /dev/null
+> +++ b/authz/simple.c
+> @@ -0,0 +1,115 @@
+> +/*
+> + * QEMU simple authorization driver
+> + *
+> + * Copyright (c) 2018 Red Hat, Inc.
+> + *
+> + * This library is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU Lesser General Public
+> + * License as published by the Free Software Foundation; either
+> + * version 2 of the License, or (at your option) any later version.
+> + *
+> + * This library is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + * Lesser General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU Lesser General Public
+> + * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+> + *
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "authz/simple.h"
+> +#include "authz/trace.h"
+> +#include "qom/object_interfaces.h"
+> +
+> +static bool qauthz_simple_is_allowed(QAuthZ *authz,
+> +                                     const char *identity,
+> +                                     Error **errp)
+> +{
+> +    QAuthZSimple *sauthz = QAUTHZ_SIMPLE(authz);
+> +
+> +    trace_qauthz_simple_is_allowed(authz, sauthz->identity, identity);
+> +    return g_str_equal(identity, sauthz->identity);
+> +}
+> +
+> +static void
+> +qauthz_simple_prop_set_identity(Object *obj,
+> +                                const char *value,
+> +                                Error **errp G_GNUC_UNUSED)
+> +{
+> +    QAuthZSimple *sauthz = QAUTHZ_SIMPLE(obj);
+> +
+> +    g_free(sauthz->identity);
+> +    sauthz->identity = g_strdup(value);
+> +}
+> +
+> +
+> +static char *
+> +qauthz_simple_prop_get_identity(Object *obj,
+> +                                Error **errp G_GNUC_UNUSED)
+> +{
+> +    QAuthZSimple *sauthz = QAUTHZ_SIMPLE(obj);
+> +
+> +    return g_strdup(sauthz->identity);
+> +}
+> +
+> +
+> +static void
+> +qauthz_simple_finalize(Object *obj)
+> +{
+> +    QAuthZSimple *sauthz = QAUTHZ_SIMPLE(obj);
+> +
+> +    g_free(sauthz->identity);
+> +}
+> +
+> +
+> +static void
+> +qauthz_simple_class_init(ObjectClass *oc, void *data)
+> +{
+> +    QAuthZClass *authz = QAUTHZ_CLASS(oc);
+> +
+> +    authz->is_allowed = qauthz_simple_is_allowed;
+> +
+> +    object_class_property_add_str(oc, "identity",
+> +                                  qauthz_simple_prop_get_identity,
+> +                                  qauthz_simple_prop_set_identity,
+> +                                  NULL);
+> +}
+> +
+> +
+> +QAuthZSimple *qauthz_simple_new(const char *id,
+> +                                const char *identity,
+> +                                Error **errp)
+> +{
+> +    return QAUTHZ_SIMPLE(
+> +        object_new_with_props(TYPE_QAUTHZ_SIMPLE,
+> +                              object_get_objects_root(),
+> +                              id, errp,
+> +                              "identity", identity,
+> +                              NULL));
+> +}
+> +
+> +
+> +static const TypeInfo qauthz_simple_info = {
+> +    .parent = TYPE_QAUTHZ,
+> +    .name = TYPE_QAUTHZ_SIMPLE,
+> +    .instance_size = sizeof(QAuthZSimple),
+> +    .instance_finalize = qauthz_simple_finalize,
+> +    .class_size = sizeof(QAuthZSimpleClass),
+> +    .class_init = qauthz_simple_class_init,
+> +    .interfaces = (InterfaceInfo[]) {
+> +        { TYPE_USER_CREATABLE },
+> +        { }
+> +    }
+> +};
+> +
+> +
+> +static void
+> +qauthz_simple_register_types(void)
+> +{
+> +    type_register_static(&qauthz_simple_info);
+> +}
+> +
+> +
+> +type_init(qauthz_simple_register_types);
+> diff --git a/authz/Makefile.objs b/authz/Makefile.objs
+> index 12597c9528..2a75d53840 100644
+> --- a/authz/Makefile.objs
+> +++ b/authz/Makefile.objs
+> @@ -1 +1,2 @@
+>   authz-obj-y += base.o
+> +authz-obj-y += simple.o
+> diff --git a/authz/trace-events b/authz/trace-events
+> index 481c90f511..1ef796c1e1 100644
+> --- a/authz/trace-events
+> +++ b/authz/trace-events
+> @@ -2,3 +2,6 @@
+>   
+>   # authz/base.c
+>   qauthz_is_allowed(void *authz, const char *identity, bool allowed) "AuthZ %p check identity=%s allowed=%d"
+> +
+> +# auth/simple.c
+> +qauthz_simple_is_allowed(void *authz, const char *wantidentity, const char *gotidentity) "AuthZ simple %p check want identity=%s got identity=%s"
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index f139459e80..68eaf39cc4 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -4377,6 +4377,30 @@ e.g to launch a SEV guest
+>        .....
+>   
+>   @end example
+> +
+> +
+> +@item -object authz-simple,id=@var{id},identity=@var{string}
+> +
+> +Create an authorization object that will control access to network services.
+> +
+> +The @option{identity} parameter is identifies the user and its format
+> +depends on the network service that authorization object is associated
+> +with. For authorizing based on TLS x509 certificates, the identity must
+> +be the x509 distinguished name. Note that care must be taken to escape
+> +any commas in the distinguished name.
+> +
+> +An example authorization object to validate a x509 distinguished name
+> +would look like:
+> +@example
+> + # $QEMU \
+> +     ...
+> +     -object 'authz-simple,id=auth0,identity=CN=laptop.example.com,,O=Example Org,,L=London,,ST=London,,C=GB' \
+> +     ...
+> +@end example
+> +
+> +Note the use of quotes due to the x509 distinguished name containing
+> +whitespace, and escaping of ','.
+> +
+>   @end table
+>   
+>   ETEXI
+> 
