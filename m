@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44948)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gEwMe-0001ez-2Q
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 09:04:52 -0400
+	(envelope-from <armbru@redhat.com>) id 1gEwMe-0001ew-14
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 09:04:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gEwMZ-0003g6-5q
+	(envelope-from <armbru@redhat.com>) id 1gEwMZ-0003gB-5q
 	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 09:04:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57452)
+Received: from mx1.redhat.com ([209.132.183.28]:4806)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gEwMX-0003bq-1U
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gEwMX-0003bX-1W
 	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 09:04:46 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BC75537E8F
+	for <qemu-devel@nongnu.org>; Tue, 23 Oct 2018 13:04:42 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-34.ams2.redhat.com
+	[10.36.117.34])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 62BB96031B
+	for <qemu-devel@nongnu.org>; Tue, 23 Oct 2018 13:04:42 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 23 Oct 2018 15:04:40 +0200
-Message-Id: <20181023130440.6323-2-armbru@redhat.com>
-In-Reply-To: <20181023130440.6323-1-armbru@redhat.com>
-References: <20181023130440.6323-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL v2 05/40] block: Use warn_report() & friends to
- report warnings
+Date: Tue, 23 Oct 2018 15:04:39 +0200
+Message-Id: <20181023130440.6323-1-armbru@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v2 00/40] Error reporting patches for 2018-10-22
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,74 +35,151 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Lieven <pl@kamp.de>, Liu Yuan <namei.unix@gmail.com>
 
-Calling error_report() in a function that takes an Error ** argument
-is suspicious.  Convert a few that are actually warnings to
-warn_report().
+The following changes since commit b312532fd03413d0e6ae6767ec793a3e30f487=
+b8:
 
-While there, improve a rather useless warning in sheepdog.c.
+  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into s=
+taging (2018-10-19 19:01:07 +0100)
 
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Lieven <pl@kamp.de>
-Cc: Liu Yuan <namei.unix@gmail.com>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20181017082702.5581-4-armbru@redhat.com>
+are available in the Git repository at:
 
-Drop changes to "without an explicit read-only=on" warnings, because
-there's a series removing them pending.  Also drop a cc: to a former
-Sheepdog maintainer.
+  git://repo.or.cz/qemu/armbru.git tags/pull-error-2018-10-22-v2
 
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
----
- block/iscsi.c    | 2 +-
- block/rbd.c      | 4 ++--
- block/sheepdog.c | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
+for you to fetch changes up to 70f81ac4800c5cf33415c966d63bf89af5cefbb9:
 
-diff --git a/block/iscsi.c b/block/iscsi.c
-index bb69faf34a..73998c2860 100644
---- a/block/iscsi.c
-+++ b/block/iscsi.c
-@@ -1844,7 +1844,7 @@ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
-     iscsi_set_timeout(iscsi, timeout);
- #else
-     if (timeout) {
--        error_report("iSCSI: ignoring timeout value for libiscsi <1.15.0");
-+        warn_report("iSCSI: ignoring timeout value for libiscsi <1.15.0");
-     }
- #endif
- 
-diff --git a/block/rbd.c b/block/rbd.c
-index 014c68d629..e5bf5a146f 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -750,8 +750,8 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-         /* Take care whenever deciding to actually deprecate; once this ability
-          * is removed, we will not be able to open any images with legacy-styled
-          * backing image strings. */
--        error_report("RBD options encoded in the filename as keyvalue pairs "
--                     "is deprecated");
-+        warn_report("RBD options encoded in the filename as keyvalue pairs "
-+                    "is deprecated");
-     }
- 
-     /* Remove the processed options from the QDict (the visitor processes
-diff --git a/block/sheepdog.c b/block/sheepdog.c
-index b229a664d9..0125df9d49 100644
---- a/block/sheepdog.c
-+++ b/block/sheepdog.c
-@@ -572,7 +572,7 @@ static int connect_to_sdog(BDRVSheepdogState *s, Error **errp)
-     if (s->addr->type == SOCKET_ADDRESS_TYPE_INET && fd >= 0) {
-         int ret = socket_set_nodelay(fd);
-         if (ret < 0) {
--            error_report("%s", strerror(errno));
-+            warn_report("can't set TCP_NODELAY: %s", strerror(errno));
-         }
-     }
- 
--- 
+  error: Drop bogus "use error_setg() instead" admonitions (2018-10-23 14=
+:48:32 +0200)
+
+----------------------------------------------------------------
+Error reporting patches for 2018-10-22
+
+* Replace some unwise uses of error_report() & friends
+* Print error when using incorrect backend for debugcon
+
+----------------------------------------------------------------
+v2: Fix a stale sentence in commit message of PATCH 05/40.
+
+Alberto Garcia (1):
+      scripts: Remove check-qerror.sh
+
+Fei Li (1):
+      ui: Convert vnc_display_init(), init_keyboard_layout() to Error
+
+Markus Armbruster (37):
+      error: Fix use of error_prepend() with &error_fatal, &error_abort
+      Use error_fatal to simplify obvious fatal errors (again)
+      block: Use warn_report() & friends to report warnings
+      cpus hw target: Use warn_report() & friends to report warnings
+      vfio: Use warn_report() & friends to report warnings
+      vfio: Clean up error reporting after previous commit
+      char: Use error_printf() to print help and such
+      9pfs: Fix CLI parsing crash on error
+      pc: Fix machine property nvdimm-persistence error handling
+      ioapic: Fix error handling in realize()
+      smbios: Clean up error handling in smbios_add()
+      migration: Fix !replay_can_snapshot() error handling
+      l2tpv3: Improve -netdev/netdev_add/-net/... error reporting
+      net/socket: Fix invalid socket type error handling
+      numa: Fix QMP command set-numa-node error handling
+      xen/pt: Fix incomplete conversion to realize()
+      seccomp: Clean up error reporting in parse_sandbox()
+      vl: Clean up error reporting in parse_add_fd()
+      qom: Clean up error reporting in user_creatable_add_opts_foreach()
+      vl: Clean up error reporting in chardev_init_func()
+      vl: Clean up error reporting in machine_set_property()
+      vl: Clean up error reporting in mon_init_func()
+      vl: Clean up error reporting in parse_fw_cfg()
+      vl: Clean up error reporting in device_init_func()
+      ui/keymaps: Fix handling of erroneous include files
+      vnc: Clean up error reporting in vnc_init_func()
+      numa: Clean up error reporting in parse_numa()
+      tpm: Clean up error reporting in tpm_init_tpmdev()
+      spice: Clean up error reporting in add_channel()
+      fsdev: Clean up error reporting in qemu_fsdev_add()
+      vl: Assert drive_new() does not fail in default_drive()
+      blockdev: Convert drive_new() to Error
+      vl: Fix exit status for -drive format=3Dhelp
+      vl: Simplify call of parse_name()
+      block: Clean up bdrv_img_create()'s error reporting
+      vpc: Fail open on bad header checksum
+      error: Drop bogus "use error_setg() instead" admonitions
+
+Philippe Mathieu-Daud=C3=A9 (1):
+      vl: Print error when using incorrect backend for debugcon
+
+ block.c                                  |   9 +--
+ block/iscsi.c                            |   2 +-
+ block/qcow2.c                            |   4 +-
+ block/qed.c                              |   4 +-
+ block/rbd.c                              |   4 +-
+ block/sheepdog.c                         |   2 +-
+ block/vpc.c                              |   8 +-
+ blockdev.c                               |  27 +++----
+ chardev/char-pty.c                       |   2 +-
+ chardev/char.c                           |   2 +-
+ cpus.c                                   |   8 +-
+ device-hotplug.c                         |   5 +-
+ fsdev/qemu-fsdev-dummy.c                 |   2 +-
+ fsdev/qemu-fsdev.c                       |  12 ++-
+ fsdev/qemu-fsdev.h                       |   2 +-
+ hw/9pfs/9p-handle.c                      |   6 +-
+ hw/9pfs/9p-local.c                       |   4 +-
+ hw/9pfs/xen-9p-backend.c                 |   7 +-
+ hw/display/cg3.c                         |   2 +-
+ hw/display/tcx.c                         |   2 +-
+ hw/i386/pc.c                             |   5 +-
+ hw/intc/ioapic.c                         |   8 +-
+ hw/intc/xics.c                           |  15 ++--
+ hw/intc/xics_kvm.c                       |   7 +-
+ hw/misc/ivshmem.c                        |   4 +-
+ hw/net/virtio-net.c                      |   8 +-
+ hw/ppc/pnv_core.c                        |   4 +-
+ hw/ppc/spapr_pci.c                       |   7 +-
+ hw/smbios/smbios.c                       |  90 +++++++++++++++-------
+ hw/timer/aspeed_timer.c                  |   3 +-
+ hw/usb/bus.c                             |   5 +-
+ hw/vfio/pci-quirks.c                     |   4 +-
+ hw/vfio/pci.c                            |  25 +++---
+ hw/vfio/platform.c                       |   6 +-
+ hw/virtio/virtio-pci.c                   |   4 +-
+ hw/xen/xen_pt.c                          |   2 +-
+ include/hw/vfio/vfio-common.h            |   3 +-
+ include/qapi/error.h                     |  14 ++++
+ include/qapi/qmp/qerror.h                |   6 +-
+ include/sysemu/blockdev.h                |   3 +-
+ include/sysemu/numa.h                    |   1 -
+ include/sysemu/tpm.h                     |   2 +-
+ include/ui/console.h                     |   2 +-
+ migration/migration.c                    |  12 +--
+ migration/savevm.c                       |   8 +-
+ net/l2tpv3.c                             |  25 +++---
+ net/socket.c                             |   4 +-
+ numa.c                                   |  21 ++---
+ qemu-io.c                                |   8 +-
+ qemu-nbd.c                               |  14 +---
+ qemu-seccomp.c                           |  18 ++---
+ qom/object_interfaces.c                  |   4 +-
+ scripts/check-qerror.sh                  |  22 ------
+ scripts/coccinelle/use-error_fatal.cocci |  20 +++++
+ stubs/tpm.c                              |   3 +-
+ target/i386/cpu.c                        |  17 +++--
+ target/ppc/translate_init.inc.c          |   4 +-
+ tests/qemu-iotests/049.out               |  12 +--
+ tpm.c                                    |  22 +++---
+ ui/curses.c                              |   6 +-
+ ui/keymaps.c                             |  40 ++++++----
+ ui/keymaps.h                             |   2 +-
+ ui/sdl.c                                 |   6 +-
+ ui/spice-core.c                          |  13 ++--
+ ui/vnc.c                                 |  19 +++--
+ util/error.c                             |  13 ++++
+ util/qemu-error.c                        |   5 --
+ vl.c                                     | 140 +++++++++++++------------=
+---------
+ 68 files changed, 414 insertions(+), 386 deletions(-)
+ delete mode 100755 scripts/check-qerror.sh
+ create mode 100644 scripts/coccinelle/use-error_fatal.cocci
+
+--=20
 2.17.2
