@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33172)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gF51c-0003W8-H3
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 18:19:45 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1gF52c-0004Fj-Dw
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 18:20:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gF51b-0007Yk-06
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 18:19:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48842)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gF51a-0007WZ-D5
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 18:19:42 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E18ADC050018
-	for <qemu-devel@nongnu.org>; Tue, 23 Oct 2018 22:19:40 +0000 (UTC)
-Date: Tue, 23 Oct 2018 23:19:29 +0100
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20181023221929.GB12892@xz-x1.hotspot.internet-for-guests.com>
-References: <20180929033615.4257-1-peterx@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1gF52X-0001E4-6u
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 18:20:46 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:51526)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gF52W-00018m-Ru
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 18:20:41 -0400
+Received: by mail-wm1-f67.google.com with SMTP id 143-v6so3316498wmf.1
+	for <qemu-devel@nongnu.org>; Tue, 23 Oct 2018 15:20:38 -0700 (PDT)
+References: <20181022183656.4902-1-sameo@linux.intel.com>
+	<20181022183656.4902-18-sameo@linux.intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <bf28ee56-7d18-d98f-d116-3c076a424992@redhat.com>
+Date: Wed, 24 Oct 2018 00:20:34 +0200
 MIME-Version: 1.0
+In-Reply-To: <20181022183656.4902-18-sameo@linux.intel.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180929033615.4257-1-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 0/2] intel_iommu: better handling of
- dmar state switch
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 17/26] hw: i386: Convert PC machine type to
+ firmware build methods
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,33 +31,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>, Eric Auger <eric.auger@redhat.com>, Jason Wang <jasowang@redhat.com>
+To: Samuel Ortiz <sameo@linux.intel.com>, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Hi, Michael,
+On 22/10/2018 20:36, Samuel Ortiz wrote:
+> +    /* Firmware building handler */
+> +    mc->firmware_build_methods.acpi.madt = build_madt;
+> +    mc->firmware_build_methods.acpi.rsdp = build_rsdp_rsdt;
+> +    mc->firmware_build_methods.acpi.setup = acpi_setup;
+> +    mc->firmware_build_methods.acpi.mcfg = build_mcfg;
+> +    mc->firmware_build_methods.acpi.srat = build_srat;
+> +    mc->firmware_build_methods.acpi.slit = build_slit;
+> +
 
-Just a kind reminder that this series has got enough ACKs and please
-consider to merge it in your next pull.  Thanks!
+mc->firmware_build_methods.acpi.setup is not called anywhere, as far as
+I can see?
 
-On Sat, Sep 29, 2018 at 11:36:13AM +0800, Peter Xu wrote:
-> v4:
-> - add a patch to introduce vtd_reset_caches()
-> - reset the caches in the two places where GCMD update happens [Eric]
-> 
-> Please review, thanks.
-> 
-> Peter Xu (2):
->   intel_iommu: introduce vtd_reset_caches()
->   intel_iommu: better handling of dmar state switch
-> 
->  hw/i386/intel_iommu.c | 34 +++++++++++++++++++++++-----------
->  1 file changed, 23 insertions(+), 11 deletions(-)
-> 
-> -- 
-> 2.17.1
-> 
-
-Regards,
-
--- 
-Peter Xu
+Paolo
