@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50210)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gF2JB-0000TS-CQ
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 15:25:42 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gF2gM-0007io-TR
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 15:49:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gF2J6-0001BZ-8w
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 15:25:41 -0400
-Received: from ste-pvt-msa2.bahnhof.se ([213.80.101.71]:42598)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gF2J5-00013s-F1
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 15:25:36 -0400
-Date: Tue, 23 Oct 2018 21:25:25 +0200
-From: Fredrik Noring <noring@nocrew.org>
-Message-ID: <20181023192525.GC2244@sx9>
-References: <cover.1540134918.git.noring@nocrew.org>
-	<BN6PR2201MB125165723113459889A6EC59C6F40@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gF2gL-0008V8-Kf
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 15:49:38 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:37076)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gF2gL-0008U8-8q
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 15:49:37 -0400
+Received: by mail-oi1-x241.google.com with SMTP id e17-v6so2151110oib.4
+	for <qemu-devel@nongnu.org>; Tue, 23 Oct 2018 12:49:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <BN6PR2201MB125165723113459889A6EC59C6F40@BN6PR2201MB1251.namprd22.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v8 00/38] target/mips: Limited support for
- the R5900
+In-Reply-To: <1540213077-15211-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1540213077-15211-1-git-send-email-aleksandar.markovic@rt-rk.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 23 Oct 2018 20:49:15 +0100
+Message-ID: <CAFEAcA_NxFaMcZ+ZzympigE8OoYxfmbmAQOReJN_OT32ceMWoA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/34] MIPS queue for October 2018 - part 2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,20 +28,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <amarkovic@wavecomp.com>
-Cc: "Maciej W. Rozycki" <macro@linux-mips.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Petar Jovanovic <pjovanovic@wavecomp.com>, Peter Maydell <peter.maydell@linaro.org>, =?utf-8?Q?J=C3=BCrgen?= Urban <JuergenUrban@gmx.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Hi Maciej,
+On 22 October 2018 at 13:57, Aleksandar Markovic
+<aleksandar.markovic@rt-rk.com> wrote:
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+>
+> The following changes since commit b312532fd03413d0e6ae6767ec793a3e30f487b8:
+>
+>   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2018-10-19 19:01:07 +0100)
+>
+> are available in the git repository at:
+>
+>   https://github.com/AMarkovic/qemu tags/mips-queue-oct-2018-part-2
+>
+> for you to fetch changes up to 2ec219776c633df9e43c5fa1557f70ee4f735f9d:
+>
+>   target/mips: Fix decoding of ALIGN and DALIGN instructions (2018-10-22 14:41:47 +0200)
+>
+> ----------------------------------------------------------------
+> MIPS queue for October 2018 - part 2
+>
+> Limited support for R5900 ISA, MMI ASE, and two misc fixes.
+>
+> ----------------------------------------------------------------
 
-> target/mips/translate.c:4888:38: error: passing argument 3 of
-> =E2=80=98tcg_gen_add2_i32=E2=80=99 from incompatible pointer type
-> [-Werror=3Dincompatible-pointer-types]
->              tcg_gen_add2_i32(t2, t3, cpu_LO[acc], cpu_HI[acc], t2, t3)=
-;
->                                       ^~~~~~
+Hi: I get compile errors on 32-bit hosts:
 
-Would you know if any MIPS ISA have LO and HI registers that are not
-32-bit? In QEMU they can obviously be either 32-bit or 64-bit, which
-causes the compilation error here.
+/home/petmay01/qemu-for-merges/disas/mips.c:615:35: error: large
+integer implicitly truncated to unsigned type [-Werror=overflow]
+ #define INSN_5900                 0x100000000
+                                   ^
+/home/petmay01/qemu-for-merges/disas/mips.c:1200:17: note: in
+expansion of macro 'INSN_5900'
+ #define EE      INSN_5900    /* Emotion Engine */
+                 ^
+/home/petmay01/qemu-for-merges/disas/mips.c:2326:73: note: in
+expansion of macro 'EE'
+ {"div1",    "z,s,t",  0x7000001a, 0xfc00ffff, RD_s | RD_t | WR_HILO, 0, EE },
+                                                                         ^
 
-Fredrik
+(and repeats on other similar uses).
+
+This is because this line is an initializer for "struct mips_opcode",
+and the final field is "unsigned long membership", which may be only
+32 bits wide, but you're trying to put a number in that's too big for that.
+
+thanks
+-- PMM
