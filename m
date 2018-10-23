@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38872)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42769)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gF1bs-0000YL-Va
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 14:40:57 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gF1sr-0006CP-0R
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 14:58:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gF1bp-00012U-R4
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 14:40:56 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:39083)
+	(envelope-from <peter.maydell@linaro.org>) id 1gF1sq-0000aC-6X
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 14:58:28 -0400
+Received: from mail-ot1-x332.google.com ([2607:f8b0:4864:20::332]:37205)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gF1bn-00010Z-Vk
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 14:40:53 -0400
-Received: by mail-wr1-f68.google.com with SMTP id r10-v6so1923205wrv.6
-	for <qemu-devel@nongnu.org>; Tue, 23 Oct 2018 11:40:51 -0700 (PDT)
-References: <20181023120454.28553-1-richard.henderson@linaro.org>
-	<20181023120454.28553-2-richard.henderson@linaro.org>
-	<2eb3d12f-1a2b-8194-e1a4-cfd6396f3aa5@redhat.com>
-	<fc2e13a8-ee93-9a73-1c19-d9ff6576f793@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <c58275c6-93b0-e0dd-8a66-6b07f8f40f54@redhat.com>
-Date: Tue, 23 Oct 2018 20:40:48 +0200
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gF1sp-0000Zd-Oz
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 14:58:28 -0400
+Received: by mail-ot1-x332.google.com with SMTP id o14so2497043oth.4
+	for <qemu-devel@nongnu.org>; Tue, 23 Oct 2018 11:58:27 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <fc2e13a8-ee93-9a73-1c19-d9ff6576f793@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/7] decodetree: Add !extern flag to
- argument sets
+In-Reply-To: <20181022123413.28044-1-armbru@redhat.com>
+References: <20181022123413.28044-1-armbru@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 23 Oct 2018 19:58:06 +0100
+Message-ID: <CAFEAcA_4MgJ2kePp2mHY5jSFZ9xYGwU=qAYsCaenDw3_40LpDw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/40] Error reporting patches for 2018-10-22
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,25 +28,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: sagark@eecs.berkeley.edu, kbastian@mail.uni-paderborn.de, palmer@sifive.com, peer.adelt@hni.uni-paderborn.de, Alistair.Francis@wdc.com, mjc@sifive.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 23/10/18 15:54, Richard Henderson wrote:
-> On 10/23/18 2:27 PM, Philippe Mathieu-Daudé wrote:
->>> +        if re_fullmatch('!extern', t):
->>> +            extern = True
->>
->> It looks odd to match a negative form then use a positive one.
->>
->> Why not simply use 'extern'?
-> 
-> "!" is an escape character here.
-> Just "escape" would be a field named "escape".
-> 
-> It follows existing similar syntax for !function=foo
+On 22 October 2018 at 13:33, Markus Armbruster <armbru@redhat.com> wrote:
+> The following changes since commit 1b7490446bf41f54130c2d495dd4c8768c8e1ce3:
+>
+>   Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-3.1-pull-request' into staging (2018-10-19 11:20:05 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/armbru.git tags/pull-error-2018-10-22
+>
+> for you to fetch changes up to 80313fb53d8048882848b6f63daaeb29dc319765:
+>
+>   error: Drop bogus "use error_setg() instead" admonitions (2018-10-19 15:47:09 +0200)
+>
+> ----------------------------------------------------------------
+> Error reporting patches for 2018-10-22
+>
+> * Replace some unwise uses of error_report() & friends
+> * Print error when using incorrect backend for debugcon
+>
 
-Oh OK!
 
-Thanks,
+Applied, thanks.
 
-Phil.
+-- PMM
