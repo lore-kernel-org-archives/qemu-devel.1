@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42595)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42710)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gEwDv-0005Ka-32
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 08:55:51 -0400
+	(envelope-from <mst@redhat.com>) id 1gEwEh-0005g8-Qe
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 08:56:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gEwDp-0002mU-Bx
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 08:55:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52290)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gEwDn-0002gL-B2
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 08:55:45 -0400
-Date: Tue, 23 Oct 2018 08:55:37 -0400
+	(envelope-from <mst@redhat.com>) id 1gEwEg-0003e1-Tn
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 08:56:39 -0400
+Date: Tue, 23 Oct 2018 08:56:12 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181023084024-mutt-send-email-mst@kernel.org>
-References: <20181022183656.4902-1-sameo@linux.intel.com>
-	<20181022172616-mutt-send-email-mst@kernel.org>
-	<20181023090018.GA8387@caravaggio>
+Message-ID: <20181023085603-mutt-send-email-mst@kernel.org>
+References: <20181012090752.31891-1-yuchenlin@synology.com>
+	<d8051b2fc349d58dcd98cd383ae6bf32@synology.com>
+	<75b2d7f3-88d3-b79c-e808-c21dcf661174@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20181023090018.GA8387@caravaggio>
-Subject: Re: [Qemu-devel] [PATCH 00/27] ACPI hardware-reduced support
+In-Reply-To: <75b2d7f3-88d3-b79c-e808-c21dcf661174@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] vhost-scsi: prevent using uninitialized vqs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +25,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Ortiz <sameo@linux.intel.com>
-Cc: qemu-devel@nongnu.org
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: yuchenlin <yuchenlin@synology.com>, Forrest Liu <forrestl@synology.com>, qemu-devel@nongnu.org, qemu-stable@nongnu.org
 
-On Tue, Oct 23, 2018 at 11:00:18AM +0200, Samuel Ortiz wrote:
-> > I wonder whether the code can be refactored slightly differently:
-> > instead of common code calling out to platform specific one,
-> > have platform code call out to generic one.
-> > That would avoid indicectiin
+On Tue, Oct 23, 2018 at 01:49:16AM +0200, Philippe Mathieu-Daud=E9 wrote:
+> On 22/10/18 4:17, yuchenlin via Qemu-devel wrote:
+> > Ping?
+> >=20
+> > On 2018-10-12 17:07, yuchenlin@synology.com wrote:
+> > > From: yuchenlin <yuchenlin@synology.com>
+> > >=20
+> > > There are 3 virtqueues (ctrl, event and cmd) for virtio scsi device=
+,
+> > > but seabios will only set the physical address for the 3rd one (cmd=
+).
+> > > Then in vhost_virtqueue_start(), virtio_queue_get_desc_addr()
+> > > will be 0 for ctrl and event vq.
+> > >=20
+> > > In this case, ctrl and event vq are not initialized.
+> > > vhost_verify_ring_mappings may use uninitialized vhost_virtqueue
+> > > such that vhost_verify_ring_part_mapping returns ENOMEM.
+> > >=20
+> > > When encountered this problem, we got the following logs:
+> > >=20
+> > > =A0=A0=A0 qemu-system-x86_64: Unable to map available ring for ring=
+ 0
+> > > =A0=A0=A0 qemu-system-x86_64: Verify ring failure on region 0
+> > >=20
+> > > Signed-off-by: Forrest Liu <forrestl@synology.com>
+> > > Signed-off-by: yuchenlin <yuchenlin@synology.com>
+>=20
+> Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
-should have been indirection
+Thanks I will queue this.
 
-> > but I'm not sure at what cost
-> > in complexity.
-> I may be misunderstanding your point, so forgive me if that's the case.
-> But the code refactoring actually lead to both of the code paths you're
-> describing. The generic code calls into platform specific hooks for
-> potentially calling custom ACPI tables, but the platform code also uses
-> the now shared generic code.
-
-Right. So if instead of both we could have only platform calling generic
-code, we could drop some of the hooks.
-
-What I'm saying is that if I look at patches 1-17 which are supposed to
-be just refactorings, somehow at the surface instead of reducing lines
-of code they add 100 LOC.
-
-And the whole patchset adds about 1000 LOC, by comparison e.g. pc_q35.c
-is just 400 LOC since q35 and pc share a bunch of code.  I wonder why
-can't more code be shared with e.g. ARM which also has a virt machine
-type. In other words, assuming we are doing PV, can't it be more
-portable.
-
-Again all that's still because all I read is the diffstats, it's without
-reading the patches, sorry about that.
-
--- 
-MST
+> > > ---
+> > > =A0hw/scsi/vhost-scsi.c | 2 +-
+> > > =A01 file changed, 1 insertion(+), 1 deletion(-)
+> > >=20
+> > > diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
+> > > index becf550085..7f21b4f9d6 100644
+> > > --- a/hw/scsi/vhost-scsi.c
+> > > +++ b/hw/scsi/vhost-scsi.c
+> > > @@ -183,7 +183,7 @@ static void vhost_scsi_realize(DeviceState *dev=
+,
+> > > Error **errp)
+> > > =A0=A0=A0=A0 }
+> > >=20
+> > > =A0=A0=A0=A0 vsc->dev.nvqs =3D VHOST_SCSI_VQ_NUM_FIXED + vs->conf.n=
+um_queues;
+> > > -=A0=A0=A0 vsc->dev.vqs =3D g_new(struct vhost_virtqueue, vsc->dev.=
+nvqs);
+> > > +=A0=A0=A0 vsc->dev.vqs =3D g_new0(struct vhost_virtqueue, vsc->dev=
+.nvqs);
+> > > =A0=A0=A0=A0 vsc->dev.vq_index =3D 0;
+> > > =A0=A0=A0=A0 vsc->dev.backend_features =3D 0;
+> >=20
+> >=20
