@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54362)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57306)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <d.csapak@proxmox.com>) id 1gErTi-00061l-N7
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 03:51:51 -0400
+	(envelope-from <philmd@redhat.com>) id 1gErkj-0002up-Ig
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 04:09:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <d.csapak@proxmox.com>) id 1gErTf-0000z5-Fz
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 03:51:50 -0400
-Received: from proxmox-new.maurer-it.com ([212.186.127.180]:21901)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <d.csapak@proxmox.com>)
-	id 1gErTf-0000j8-7C
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 03:51:47 -0400
-References: <20181008131924.7377-1-d.csapak@proxmox.com>
-	<1f00827b-4c94-e10c-ab57-4ceb5223bee9@proxmox.com>
-	<d2f89cb6-0ea5-75bc-1bb1-3f0ce6509ec4@redhat.com>
-	<a8739a07-0675-5e16-b357-6bb2179aed11@redhat.com>
-	<9659efd3-3f39-c880-745e-8561e1989f82@redhat.com>
-From: Dominik Csapak <d.csapak@proxmox.com>
-Message-ID: <10c48083-769c-1f29-deca-a359b598912f@proxmox.com>
-Date: Tue, 23 Oct 2018 09:51:22 +0200
+	(envelope-from <philmd@redhat.com>) id 1gErZY-0004i1-Da
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 03:57:57 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:55066)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gErZY-0004hQ-6Z
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 03:57:52 -0400
+Received: by mail-wm1-f66.google.com with SMTP id r63-v6so686424wma.4
+	for <qemu-devel@nongnu.org>; Tue, 23 Oct 2018 00:57:52 -0700 (PDT)
+References: <20181018153134.8493-1-crosa@redhat.com>
+	<20181018153134.8493-2-crosa@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <a0b13130-8371-89a8-5cd1-bac7fc9d23cd@redhat.com>
+Date: Tue, 23 Oct 2018 09:56:42 +0200
 MIME-Version: 1.0
-In-Reply-To: <9659efd3-3f39-c880-745e-8561e1989f82@redhat.com>
+In-Reply-To: <20181018153134.8493-2-crosa@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] qapi: add info about reset to SHUTDOWN
- event
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v7 1/3] Bootstrap Python venv for tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,38 +30,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: armbru@redhat.com
+To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
+Cc: Caio Carrara <ccarrara@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-On 10/17/18 4:43 PM, Paolo Bonzini wrote:
-> On 17/10/2018 15:54, Eric Blake wrote:
->>>
->>> So the problem with shutdown_caused_by_guest is that you get the same
->>> value for both guest reset and guest shutdown.=C2=A0 Could we instead=
- just
->>> pass the ShutdownCause in the event (similar to what was proposed eve=
-n
->>> when discussing commit 08fba7ac9b618516a5f1d096f78a7e2837fe0594)?
->>
->> Indeed, it sounds like we are now at the point where we want to do
->> precisely that - expose more fine-grained details by adding
->> ShutdownCause as a QAPI enum, rather than just adding another bool per
->> reason.
->=20
-> So should we split HOST_QMP into HOST_QMP_{SYSTEM_RESET,QUIT} and add
-> the ShutdownCause instead of was-reset?
->=20
-> Paolo
->=20
->=20
+On 18/10/18 17:31, Cleber Rosa wrote:
+> A number of QEMU tests are written in Python, and may benefit
+> from an untainted Python venv.
+> 
+> By using make rules, tests that depend on specific Python libs
+> can set that rule as a requirement, along with rules that require
+> the presence or installation of specific libraries.
+> 
+> The tests/requirements.txt is supposed to contain the Python
+> requirements that should be added to the venv created by check-venv.
+> 
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Acked-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+> Reviewed-by: Caio Carrara <ccarrara@redhat.com>
 
-this would work for us, should i send patches for this?
-i would (roughly) do this:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-move shutdowncause to qapi json
-split host_qmp into system_reset and quit
-and add the shutdowncause to the shutdown event
-fix iotests
-
-with kind regards
-Dominik
+> ---
+>   tests/Makefile.include | 26 ++++++++++++++++++++++++++
+>   tests/requirements.txt |  3 +++
+>   2 files changed, 29 insertions(+)
+>   create mode 100644 tests/requirements.txt
+> 
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index 7fe8578972..004a86f274 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -12,6 +12,7 @@ check-help:
+>   	@echo " $(MAKE) check-block          Run block tests"
+>   	@echo " $(MAKE) check-tcg            Run TCG tests"
+>   	@echo " $(MAKE) check-report.html    Generates an HTML test report"
+> +	@echo " $(MAKE) check-venv           Creates a Python venv for tests"
+>   	@echo " $(MAKE) check-clean          Clean the tests"
+>   	@echo
+>   	@echo "Please note that HTML reports do not regenerate if the unit tests"
+> @@ -899,6 +900,30 @@ check-decodetree:
+>             ./check.sh "$(PYTHON)" "$(SRC_PATH)/scripts/decodetree.py", \
+>             TEST, decodetree.py)
+>   
+> +# Python venv for running tests
+> +
+> +.PHONY: check-venv
+> +
+> +TESTS_VENV_DIR=$(BUILD_DIR)/tests/venv
+> +TESTS_VENV_REQ=$(SRC_PATH)/tests/requirements.txt
+> +
+> +$(shell $(PYTHON) -c 'import sys; assert sys.version_info >= (3,0)' >/dev/null 2>&1)
+> +ifeq ($(.SHELLSTATUS),0)
+> +$(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
+> +	$(call quiet-command, \
+> +            $(PYTHON) -m venv --system-site-packages $@, \
+> +            VENV, $@)
+> +	$(call quiet-command, \
+> +            $(TESTS_VENV_DIR)/bin/python -m pip -q install -r $(TESTS_VENV_REQ), \
+> +            PIP, $(TESTS_VENV_REQ))
+> +	$(call quiet-command, touch $@)
+> +else
+> +$(TESTS_VENV_DIR):
+> +	$(error "venv directory for tests requires Python 3")
+> +endif
+> +
+> +check-venv: $(TESTS_VENV_DIR)
+> +
+>   # Consolidated targets
+>   
+>   .PHONY: check-qapi-schema check-qtest check-unit check check-clean
+> @@ -912,6 +937,7 @@ check-clean:
+>   	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
+>   	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y)) $(check-qtest-generic-y))
+>   	rm -f tests/test-qapi-gen-timestamp
+> +	rm -rf $(TESTS_VENV_DIR)
+>   
+>   clean: check-clean
+>   
+> diff --git a/tests/requirements.txt b/tests/requirements.txt
+> new file mode 100644
+> index 0000000000..d39f9d1576
+> --- /dev/null
+> +++ b/tests/requirements.txt
+> @@ -0,0 +1,3 @@
+> +# Add Python module requirements, one per line, to be installed
+> +# in the tests/venv Python virtual environment. For more info,
+> +# refer to: https://pip.pypa.io/en/stable/user_guide/#id1
+> 
