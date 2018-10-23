@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37326)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40801)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gF58F-0000BL-3A
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 18:26:36 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1gF5DA-0002Rb-Uq
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 18:31:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gF58B-0007q4-Ra
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 18:26:34 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:35150)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gF58B-0007p2-I3
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 18:26:31 -0400
-Received: by mail-wr1-f67.google.com with SMTP id w5-v6so3389779wrt.2
-	for <qemu-devel@nongnu.org>; Tue, 23 Oct 2018 15:26:31 -0700 (PDT)
-References: <20181022183656.4902-1-sameo@linux.intel.com>
-	<20181022183656.4902-19-sameo@linux.intel.com>
+	(envelope-from <pbonzini@redhat.com>) id 1gF5D5-0003wW-TC
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 18:31:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44280)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gF5Cv-0003mA-FY
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 18:31:29 -0400
+References: <1540243704-17090-1-git-send-email-george.kennedy@oracle.com>
+	<596ea83a-279e-3a76-ead3-14aa8efe0a1d@redhat.com>
+	<43e65c7a-f44d-797b-ab0c-389eaa0c0f82@oracle.com>
+	<0e52d605-871e-cdac-c1ae-b0da912611ba@redhat.com>
+	<adc9e69a-487b-44a6-7029-bff65f25801b@oracle.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <91940d43-d478-e694-0902-e958d54d8d29@redhat.com>
-Date: Wed, 24 Oct 2018 00:26:27 +0200
+Message-ID: <baf9d1db-51b7-939f-1f46-553c4fdd5939@redhat.com>
+Date: Wed, 24 Oct 2018 00:31:08 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181022183656.4902-19-sameo@linux.intel.com>
+In-Reply-To: <adc9e69a-487b-44a6-7029-bff65f25801b@oracle.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 18/26] hw: acpi: Initial hardware-reduced
- support
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] lsi: Reselection needed to remove
+ pending commands from queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,80 +32,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Ortiz <sameo@linux.intel.com>, qemu-devel@nongnu.org
-Cc: Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: George Kennedy <george.kennedy@oracle.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
 
-On 22/10/2018 20:36, Samuel Ortiz wrote:
-> +
-> +static void acpi_reduced_build_update(void *build_opaque)
-> +{
-> +    MachineState *ms = MACHINE(build_opaque);
-> +    AcpiBuildState *build_state = ms->firmware_build_state.acpi.state;
-> +    AcpiConfiguration *conf = ms->firmware_build_state.acpi.conf;
-> +    AcpiBuildTables tables;
-> +
-> +    /* No ACPI configuration? Nothing to do. */
-> +    if (!conf) {
-> +        return;
-> +    }
-> +
-> +    /* No state to update or already patched? Nothing to do. */
-> +    if (!build_state || build_state->patched) {
-> +        return;
-> +    }
-> +    build_state->patched = true;
-> +
-> +    acpi_build_tables_init(&tables);
-> +
-> +    acpi_reduced_build(ms, &tables, conf);
-> +
-> +    acpi_ram_update(build_state->table_mr, tables.table_data);
-> +    acpi_ram_update(build_state->rsdp_mr, tables.rsdp);
-> +    acpi_ram_update(build_state->linker_mr, tables.linker->cmd_blob);
-> +
-> +    acpi_build_tables_cleanup(&tables, true);
-> +}
-> +
+On 24/10/2018 00:11, George Kennedy wrote:
+>>>
+>> What about "req->hba_private !=3D s->current"?=C2=A0 That should cause=
+ a call
+>> to lsi_queue_req, and then you can check s->want_resel in lsi_queue_re=
+q.
+>=20
+> For the extended period of time where lsi_queue_req() is not being
+> called from lsi_transfer_data(), my debug shows "s->waiting" is not "1"
+> and req->hba_private is equal to s->current.
 
-ms is not needed here; just pass the FirmwareBuildState as the opaque
-value in rom_add_blob.
+That would mean indeed that no reselection is needed---but that's wrong.
 
-In fact, here:
+Why didn't lsi_do_command invoke lsi_queue_command?  That would set
+s->current to NULL (on the SCSI level, that means the bus is freed; on
+the QEMU level, the idea is that lsi_transfer_data would then start a
+reselection).
 
-> +    AcpiBuildState *build_state;
-> +
-> +    build_state = g_malloc0(sizeof(*build_state));
-> +    machine->firmware_build_state.acpi.state = build_state;
-> +    machine->firmware_build_state.acpi.conf = conf;
-> +
-
-I would say that you don't need FirmwareBuildState at all.  I cannot be
-100% sure because I cannot see the caller of acpi_reduced_setup, but I
-think you can add an AcpiConfiguration* field to AcpiBuildState and
-encapsulate everything in AcpiBuildState.  In addition, the
-AcpiBuildState need not be stored in the MachineState.
-
-Instead, FirmwareBuildMethods should be a QOM interface (also please
-refer explicitly to ACPI in the names, don't call it "firmware").  The
-setup method of FirmwareBuildMethods can take that QOM interface, not
-the MachineState, i.e. its prototype should be
-
-void (*setup)(AcpiBuildMethods *acpibuild,
-	      AcpiConfiguration *conf);
-
-so that pc_machine_done does
-
-    if (pcms->acpi_build_enabled) {
-        acpi_conf_pc_init(pcms);
-	/* This calls the ->setup method.  */
-        acpi_builder_setup(ACPI_BUILD_METHODS(pcms),
-			   &pcms->acpi_configuration);
-    }
-
-This is because MachineClass is used for dozens of machines that have
-nothing to with ACPI.  Instead, machines that use ACPI (either reduced
-or normal) can define the AcpiBuildMethods interface, and invoke the
-entry point firmware_build_methods->setup (either acpi_setup or
-acpi_reduced_setup) through acpi_builder_setup.
+Thanks,
 
 Paolo
+
+> req->hba_private is set to NULL in lsi_command_complete() and that's
+> where I tried to add a call to lsi_reselect(), but the Scripts are not
+> in the correct state to allow the call.
+>=20
+> lsi_transfer_data() or lsi_command_complete() are probably the 2
+> potential places where a fix could be added if the Script state would
+> allow it.
