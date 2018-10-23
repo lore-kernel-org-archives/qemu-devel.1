@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51756)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gF6JQ-0003MJ-Vf
+	(envelope-from <mst@redhat.com>) id 1gF6JQ-0003MK-Vj
 	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 19:42:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gF6JF-0008Fz-PN
+	(envelope-from <mst@redhat.com>) id 1gF6JF-0008FA-K7
 	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 19:42:12 -0400
-Received: from [185.30.24.106] (port=13484
+Received: from [185.30.24.106] (port=13502
 	helo=hotspot.internet-for-guests.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gF6JE-0008As-BK
+	(envelope-from <mst@redhat.com>) id 1gF6JE-0008C1-MQ
 	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 19:42:01 -0400
-Date: Tue, 23 Oct 2018 19:41:32 -0400
+Date: Tue, 23 Oct 2018 19:41:34 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181023234112.188140-16-mst@redhat.com>
+Message-ID: <20181023234112.188140-29-mst@redhat.com>
 References: <20181023234112.188140-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <20181023234112.188140-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 15/28] x86_iommu/amd: Enable Guest virtual APIC
- support
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 28/28] vhost-scsi: prevent using uninitialized
+ vqs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,64 +30,46 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Singh, Brijesh" <brijesh.singh@amd.com>, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Tom Lendacky <Thomas.Lendacky@amd.com>, Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, yuchenlin <yuchenlin@synology.com>, Forrest Liu <forrestl@synology.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>
 
-From: "Singh, Brijesh" <brijesh.singh@amd.com>
+From: yuchenlin <yuchenlin@synology.com>
 
-Now that amd-iommu support interrupt remapping, enable the GASup in IVRS
-table and GASup in extended feature register to indicate that IOMMU
-support guest virtual APIC mode. GASup provides option to guest OS to
-make use of 128-bit IRTE.
+There are 3 virtqueues (ctrl, event and cmd) for virtio scsi device,
+but seabios will only set the physical address for the 3rd one (cmd).
+Then in vhost_virtqueue_start(), virtio_queue_get_desc_addr()
+will be 0 for ctrl and event vq.
 
-Note that the GAMSup is set to zero to indicate that amd-iommu does not
-support guest virtual APIC mode (aka AVIC) which would be used for the
-nested VMs.
+In this case, ctrl and event vq are not initialized.
+vhost_verify_ring_mappings may use uninitialized vhost_virtqueue
+such that vhost_verify_ring_part_mapping returns ENOMEM.
 
-See Table 21 from IOMMU spec for interrupt virtualization controls
+When encountered this problem, we got the following logs:
 
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: Tom Lendacky <Thomas.Lendacky@amd.com>
-Cc: Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>
+    qemu-system-x86_64: Unable to map available ring for ring 0
+    qemu-system-x86_64: Verify ring failure on region 0
+
+Signed-off-by: Forrest Liu <forrestl@synology.com>
+Signed-off-by: yuchenlin <yuchenlin@synology.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/i386/amd_iommu.h  | 2 +-
- hw/i386/acpi-build.c | 3 ++-
- 2 files changed, 3 insertions(+), 2 deletions(-)
+ hw/scsi/vhost-scsi.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/i386/amd_iommu.h b/hw/i386/amd_iommu.h
-index 8061e9c49c..687fcd8521 100644
---- a/hw/i386/amd_iommu.h
-+++ b/hw/i386/amd_iommu.h
-@@ -176,7 +176,7 @@
- /* extended feature support */
- #define AMDVI_EXT_FEATURES (AMDVI_FEATURE_PREFETCH | AMDVI_FEATURE_PPR | \
-         AMDVI_FEATURE_IA | AMDVI_FEATURE_GT | AMDVI_FEATURE_HE | \
--        AMDVI_GATS_MODE | AMDVI_HATS_MODE)
-+        AMDVI_GATS_MODE | AMDVI_HATS_MODE | AMDVI_FEATURE_GA)
- 
- /* capabilities header */
- #define AMDVI_CAPAB_FEATURES (AMDVI_CAPAB_FLAT_EXT | \
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 1ef396ddbb..236a20eaa8 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2518,7 +2518,8 @@ build_amd_iommu(GArray *table_data, BIOSLinker *linker)
-     build_append_int_noprefix(table_data,
-                              (48UL << 30) | /* HATS   */
-                              (48UL << 28) | /* GATS   */
--                             (1UL << 2),    /* GTSup  */
-+                             (1UL << 2)   | /* GTSup  */
-+                             (1UL << 6),    /* GASup  */
-                              4);
-     /*
-      *   Type 1 device entry reporting all devices
--- 
+diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
+index becf550085..7f21b4f9d6 100644
+--- a/hw/scsi/vhost-scsi.c
++++ b/hw/scsi/vhost-scsi.c
+@@ -183,7 +183,7 @@ static void vhost_scsi_realize(DeviceState *dev, Erro=
+r **errp)
+     }
+=20
+     vsc->dev.nvqs =3D VHOST_SCSI_VQ_NUM_FIXED + vs->conf.num_queues;
+-    vsc->dev.vqs =3D g_new(struct vhost_virtqueue, vsc->dev.nvqs);
++    vsc->dev.vqs =3D g_new0(struct vhost_virtqueue, vsc->dev.nvqs);
+     vsc->dev.vq_index =3D 0;
+     vsc->dev.backend_features =3D 0;
+=20
+--=20
 MST
