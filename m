@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53864)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <th.huth@posteo.de>) id 1gEqVw-00048a-3t
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 02:50:05 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1gEqm3-0008Nf-HZ
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 03:06:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <th.huth@posteo.de>) id 1gEqVs-0001ag-Jk
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 02:50:03 -0400
-Received: from mout02.posteo.de ([185.67.36.66]:35321)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <th.huth@posteo.de>) id 1gEqVs-0001Zi-5h
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 02:50:00 -0400
-Received: from submission (posteo.de [89.146.220.130])
-	by mout02.posteo.de (Postfix) with ESMTPS id B9876240106
-	for <qemu-devel@nongnu.org>; Tue, 23 Oct 2018 08:49:57 +0200 (CEST)
-References: <20181018182856.28001-1-mark.cave-ayland@ilande.co.uk>
-	<20181018182856.28001-3-mark.cave-ayland@ilande.co.uk>
-From: Thomas Huth <th.huth@posteo.de>
-Message-ID: <ab0a9972-57a5-1d97-22f4-13c5c58248bc@posteo.de>
-Date: Tue, 23 Oct 2018 07:49:53 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181018182856.28001-3-mark.cave-ayland@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 02/11] hw/m68k: implement ADB bus
- support for via
+	(envelope-from <richard.henderson@linaro.org>) id 1gEqig-0003xk-3E
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 03:03:17 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44866)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gEqif-0003wn-S2
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 03:03:14 -0400
+Received: by mail-wr1-x444.google.com with SMTP id q6-v6so348027wrw.11
+	for <qemu-devel@nongnu.org>; Tue, 23 Oct 2018 00:03:13 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Tue, 23 Oct 2018 08:02:53 +0100
+Message-Id: <20181023070253.6407-12-richard.henderson@linaro.org>
+In-Reply-To: <20181023070253.6407-1-richard.henderson@linaro.org>
+References: <20181023070253.6407-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH 10/10] cputlb: Remove tlb_c.pending_flushes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,139 +26,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, laurent@vivier.eu
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, jasowang@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, hpoussin@reactos.org, kraxel@redhat.com, pbonzini@redhat.com, yongbok.kim@mips.com, aurelien@aurel32.net
+To: qemu-devel@nongnu.org
+Cc: cota@braap.org
 
-On 2018-10-18 19:28, Mark Cave-Ayland wrote:
-> From: Laurent Vivier <laurent@vivier.eu>
->=20
-> Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> ---
->  hw/input/adb.c            |   2 +
->  hw/misc/mac_via.c         | 166 ++++++++++++++++++++++++++++++++++++++=
-++++++++
->  include/hw/misc/mac_via.h |   7 ++
->  3 files changed, 175 insertions(+)
->=20
-> diff --git a/hw/input/adb.c b/hw/input/adb.c
-> index bbb40aeef1..d69ca74364 100644
-> --- a/hw/input/adb.c
-> +++ b/hw/input/adb.c
-> @@ -25,6 +25,8 @@
->  #include "hw/input/adb.h"
->  #include "adb-internal.h"
-> =20
-> +#define ADB_POLL_FREQ 50
+This is essentially redundant with tlb_c.dirty.
+[??? Collect data to back up this supposition]
 
-A single define without a user in a .c file? Looks suspicious...
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ include/exec/cpu-defs.h |  6 ------
+ accel/tcg/cputlb.c      | 16 ++--------------
+ 2 files changed, 2 insertions(+), 20 deletions(-)
 
-As far as I can see, this has been replace by VIA_ADB_POLL_FREQ which
-has been introduced in the previous patch already, so you can remove
-this define here.
-
->  /* error codes */
->  #define ADB_RET_NOTPRESENT (-2)
-> =20
-> diff --git a/hw/misc/mac_via.c b/hw/misc/mac_via.c
-> index 084974a24d..1ec563a707 100644
-> --- a/hw/misc/mac_via.c
-> +++ b/hw/misc/mac_via.c
-[...]
-> +static int adb_via_send(MacVIAState *s, int state, uint8_t data)
-> +{
-> +    switch (state) {
-> +    case ADB_STATE_NEW:
-> +        s->adb_data_out_index =3D 0;
-> +        break;
-> +    case ADB_STATE_EVEN:
-> +        if ((s->adb_data_out_index & 1) =3D=3D 0) {
-> +            return 0;
-> +        }
-> +        break;
-> +    case ADB_STATE_ODD:
-> +        if (s->adb_data_out_index & 1) {
-> +            return 0;
-> +        }
-> +        break;
-> +    case ADB_STATE_IDLE:
-> +        return 0;
-> +    }
-
-Could you please add a
-
- assert(s->adb_data_out_index < sizeof(s->adb_data_out) -1);
-
-here, just in case?
-
-> +    s->adb_data_out[s->adb_data_out_index++] =3D data;
-> +    qemu_irq_raise(s->adb_data_ready);
-> +    return 1;
-> +}
-> +
-> +static int adb_via_receive(MacVIAState *s, int state, uint8_t *data)
-> +{
-> +    switch (state) {
-> +    case ADB_STATE_NEW:
-> +        return 0;
-> +    case ADB_STATE_EVEN:
-> +        if (s->adb_data_in_size <=3D 0) {
-> +            qemu_irq_raise(s->adb_data_ready);
-> +            return 0;
-> +        }
-> +        if (s->adb_data_in_index >=3D s->adb_data_in_size) {
-> +            *data =3D 0;
-> +            qemu_irq_raise(s->adb_data_ready);
-> +            return 1;
-> +        }
-> +        if ((s->adb_data_in_index & 1) =3D=3D 0) {
-> +            return 0;
-> +        }
-> +        break;
-> +    case ADB_STATE_ODD:
-> +        if (s->adb_data_in_size <=3D 0) {
-> +            qemu_irq_raise(s->adb_data_ready);
-> +            return 0;
-> +        }
-> +        if (s->adb_data_in_index >=3D s->adb_data_in_size) {
-> +            *data =3D 0;
-> +            qemu_irq_raise(s->adb_data_ready);
-> +            return 1;
-> +        }
-> +        if (s->adb_data_in_index & 1) {
-> +            return 0;
-> +        }
-> +        break;
-> +    case ADB_STATE_IDLE:
-> +        if (s->adb_data_out_index =3D=3D 0) {
-> +            return 0;
-> +        }
-> +        s->adb_data_in_size =3D adb_request(&s->adb_bus, s->adb_data_i=
-n,
-> +                                          s->adb_data_out,
-> +                                          s->adb_data_out_index);
-> +        s->adb_data_out_index =3D 0;
-> +        s->adb_data_in_index =3D 0;
-> +        if (s->adb_data_in_size < 0) {
-> +            *data =3D 0xff;
-> +            qemu_irq_raise(s->adb_data_ready);
-> +            return -1;
-> +        }
-> +        if (s->adb_data_in_size =3D=3D 0) {
-> +            return 0;
-> +        }
-> +        break;
-> +    }
-
-Please also add an assert before the next line here - just in case...
-
-> +    *data =3D s->adb_data_in[s->adb_data_in_index++];
-> +    qemu_irq_raise(s->adb_data_ready);
-> +    if (*data =3D=3D 0xff || *data =3D=3D 0) {
-> +        return 0;
-> +    }
-> +    return 1;
-> +}
-
- Thomas
+diff --git a/include/exec/cpu-defs.h b/include/exec/cpu-defs.h
+index ca0fea8b27..6a60f94a41 100644
+--- a/include/exec/cpu-defs.h
++++ b/include/exec/cpu-defs.h
+@@ -160,12 +160,6 @@ typedef struct CPUTLBDesc {
+ typedef struct CPUTLBCommon {
+     /* Serialize updates to tlb_table and tlb_v_table, and others as noted. */
+     QemuSpin lock;
+-    /*
+-     * Within pending_flush, for each bit N, there exists an outstanding
+-     * cross-cpu flush for mmu_idx N.  Further cross-cpu flushes to that
+-     * mmu_idx may be discarded.  Protected by tlb_c.lock.
+-     */
+-    uint16_t pending_flush;
+     /*
+      * Within dirty, for each bit N, modifications have been made to
+      * mmu_idx N since the last time that mmu_idx was flushed.
+diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+index c1b92083d4..fec37bd3bd 100644
+--- a/accel/tcg/cputlb.c
++++ b/accel/tcg/cputlb.c
+@@ -174,20 +174,8 @@ void tlb_flush_by_mmuidx(CPUState *cpu, uint16_t idxmap)
+     tlb_debug("mmu_idx: 0x%" PRIx16 "\n", idxmap);
+ 
+     if (cpu->created && !qemu_cpu_is_self(cpu)) {
+-        CPUArchState *env = cpu->env_ptr;
+-        uint16_t pending, to_clean;
+-
+-        qemu_spin_lock(&env->tlb_c.lock);
+-        pending = env->tlb_c.pending_flush;
+-        to_clean = idxmap & ~pending;
+-        env->tlb_c.pending_flush = pending | idxmap;
+-        qemu_spin_unlock(&env->tlb_c.lock);
+-
+-        if (to_clean) {
+-            tlb_debug("reduced mmu_idx: 0x%" PRIx16 "\n", to_clean);
+-            async_run_on_cpu(cpu, tlb_flush_by_mmuidx_async_work,
+-                             RUN_ON_CPU_HOST_INT(to_clean));
+-        }
++        async_run_on_cpu(cpu, tlb_flush_by_mmuidx_async_work,
++                         RUN_ON_CPU_HOST_INT(idxmap));
+     } else {
+         tlb_flush_by_mmuidx_async_work(cpu, RUN_ON_CPU_HOST_INT(idxmap));
+     }
+-- 
+2.17.2
