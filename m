@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37482)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gEyht-0007NI-M3
+	(envelope-from <david@redhat.com>) id 1gEyhr-0007I5-8O
 	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 11:34:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gEyWl-0001P9-WB
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 11:23:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37670)
+	(envelope-from <david@redhat.com>) id 1gEyXR-0001qo-CS
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 11:24:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:24214)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gEyWi-0001LN-CC
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 11:23:27 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gEyXR-0001pV-37
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 11:24:09 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Tue, 23 Oct 2018 17:23:00 +0200
-Message-Id: <20181023152306.3123-2-david@redhat.com>
+Date: Tue, 23 Oct 2018 17:23:06 +0200
+Message-Id: <20181023152306.3123-8-david@redhat.com>
 In-Reply-To: <20181023152306.3123-1-david@redhat.com>
 References: <20181023152306.3123-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 1/7] qapi: use qemu_strtoi64() in parse_str
+Subject: [Qemu-devel] [PATCH v3 7/7] memory-device: rewrite address
+ assignment using ranges
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,63 +27,131 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, David Hildenbrand <david@redhat.com>
 
-The qemu api claims to be easier to use, and the resulting code seems to
-agree.
+Let's rewrite it properly using ranges. This fixes certain overflows that
+are right now possible. E.g.
+
+qemu-system-x86_64 -m 4G,slots=20,maxmem=40G -M pc \
+    -object memory-backend-file,id=mem1,share,mem-path=/dev/zero,size=2G
+    -device pc-dimm,memdev=mem1,id=dimm1,addr=-0x40000000
+
+Now properly reports an error instead of succeeding.
+
+"can't add memory device [0xffffffffc0000000:0x80000000], range overflow"
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- qapi/string-input-visitor.c | 17 ++++++-----------
- 1 file changed, 6 insertions(+), 11 deletions(-)
+ hw/mem/memory-device.c | 53 ++++++++++++++++++++++++------------------
+ 1 file changed, 30 insertions(+), 23 deletions(-)
 
-diff --git a/qapi/string-input-visitor.c b/qapi/string-input-visitor.c
-index b3fdd0827d..c1454f999f 100644
---- a/qapi/string-input-visitor.c
-+++ b/qapi/string-input-visitor.c
-@@ -20,6 +20,7 @@
- #include "qemu/option.h"
- #include "qemu/queue.h"
- #include "qemu/range.h"
-+#include "qemu/cutils.h"
- 
- 
- struct StringInputVisitor
-@@ -46,10 +47,10 @@ static void free_range(void *range, void *dummy)
- 
- static int parse_str(StringInputVisitor *siv, const char *name, Error **errp)
+diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
+index 8be63c8032..2fb6fc2145 100644
+--- a/hw/mem/memory-device.c
++++ b/hw/mem/memory-device.c
+@@ -100,9 +100,8 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
+                                             uint64_t align, uint64_t size,
+                                             Error **errp)
  {
--    char *str = (char *) siv->string;
--    long long start, end;
-+    const char *str = (char *) siv->string;
-+    const char *endptr;
-+    int64_t start, end;
-     Range *cur;
--    char *endptr;
+-    uint64_t address_space_start, address_space_end;
+     GSList *list = NULL, *item;
+-    uint64_t new_addr = 0;
++    Range as, new = range_empty;
  
-     if (siv->ranges) {
+     if (!ms->device_memory) {
+         error_setg(errp, "memory devices (e.g. for memory hotplug) are not "
+@@ -115,13 +114,11 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
+                          "enabled, please specify the maxmem option");
          return 0;
-@@ -60,9 +61,7 @@ static int parse_str(StringInputVisitor *siv, const char *name, Error **errp)
+     }
+-    address_space_start = ms->device_memory->base;
+-    address_space_end = address_space_start +
+-                        memory_region_size(&ms->device_memory->mr);
+-    g_assert(address_space_end >= address_space_start);
++    range_init_nofail(&as, ms->device_memory->base,
++                      memory_region_size(&ms->device_memory->mr));
+ 
+-    /* address_space_start indicates the maximum alignment we expect */
+-    if (!QEMU_IS_ALIGNED(address_space_start, align)) {
++    /* start of address space indicates the maximum alignment we expect */
++    if (!QEMU_IS_ALIGNED(range_lob(&as), align)) {
+         error_setg(errp, "the alignment (0x%" PRIx64 ") is not supported",
+                    align);
+         return 0;
+@@ -145,20 +142,24 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
      }
  
-     do {
--        errno = 0;
--        start = strtoll(str, &endptr, 0);
--        if (errno == 0 && endptr > str) {
-+        if (!qemu_strtoi64(str, &endptr, 0, &start)) {
-             if (*endptr == '\0') {
-                 cur = g_malloc0(sizeof(*cur));
-                 range_set_bounds(cur, start, start);
-@@ -71,11 +70,7 @@ static int parse_str(StringInputVisitor *siv, const char *name, Error **errp)
-                 str = NULL;
-             } else if (*endptr == '-') {
-                 str = endptr + 1;
--                errno = 0;
--                end = strtoll(str, &endptr, 0);
--                if (errno == 0 && endptr > str && start <= end &&
--                    (start > INT64_MAX - 65536 ||
--                     end < start + 65536)) {
-+                if (!qemu_strtoi64(str, &endptr, 0, &end) && start < end) {
-                     if (*endptr == '\0') {
-                         cur = g_malloc0(sizeof(*cur));
-                         range_set_bounds(cur, start, end);
+     if (hint) {
+-        new_addr = *hint;
+-        if (new_addr < address_space_start) {
++        if (range_init(&new, *hint, size)) {
+             error_setg(errp, "can't add memory device [0x%" PRIx64 ":0x%" PRIx64
+-                       "] before 0x%" PRIx64, new_addr, size,
+-                       address_space_start);
++                       "], range overflow", *hint, size);
+             return 0;
+-        } else if ((new_addr + size) > address_space_end) {
++        }
++        if (!range_contains_range(&as, &new)) {
+             error_setg(errp, "can't add memory device [0x%" PRIx64 ":0x%" PRIx64
+-                       "] beyond 0x%" PRIx64, new_addr, size,
+-                       address_space_end);
++                       "], usable range for memory devices [0x%" PRIx64 ":0x%"
++                       PRIx64 "]", range_lob(&new), range_size(&new),
++                       range_lob(&as), range_size(&as));
+             return 0;
+         }
+     } else {
+-        new_addr = address_space_start;
++        if (range_init(&new, range_lob(&as), size)) {
++            error_setg(errp, "can't add memory device [0x%" PRIx64 ":0x%" PRIx64
++                       "], range overflow", *hint, size);
++            return 0;
++        }
+     }
+ 
+     /* find address range that will fit new memory device */
+@@ -166,30 +167,36 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
+     for (item = list; item; item = g_slist_next(item)) {
+         const MemoryDeviceState *md = item->data;
+         const MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(OBJECT(md));
+-        uint64_t md_size, md_addr;
++        uint64_t next_addr;
++        Range tmp;
+ 
+-        md_addr = mdc->get_addr(md);
+-        md_size = memory_device_get_region_size(md, &error_abort);
++        range_init_nofail(&tmp, mdc->get_addr(md),
++                          memory_device_get_region_size(md, &error_abort));
+ 
+-        if (ranges_overlap(md_addr, md_size, new_addr, size)) {
++        if (range_overlaps_range(&tmp, &new)) {
+             if (hint) {
+                 const DeviceState *d = DEVICE(md);
+                 error_setg(errp, "address range conflicts with memory device"
+                            " id='%s'", d->id ? d->id : "(unnamed)");
+                 goto out;
+             }
+-            new_addr = QEMU_ALIGN_UP(md_addr + md_size, align);
++
++            next_addr = QEMU_ALIGN_UP(range_upb(&tmp) + 1, align);
++            if (range_init(&new, next_addr, range_size(&new))) {
++                range_make_empty(&new);
++                break;
++            }
+         }
+     }
+ 
+-    if (new_addr + size > address_space_end) {
++    if (!range_contains_range(&as, &new)) {
+         error_setg(errp, "could not find position in guest address space for "
+                    "memory device - memory fragmented due to alignments");
+         goto out;
+     }
+ out:
+     g_slist_free(list);
+-    return new_addr;
++    return range_lob(&new);
+ }
+ 
+ MemoryDeviceInfoList *qmp_memory_device_list(void)
 -- 
 2.17.1
