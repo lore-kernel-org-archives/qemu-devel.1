@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55457)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gEkA7-0000cA-Lr
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 20:03:08 -0400
+	(envelope-from <philmd@redhat.com>) id 1gEkD3-0001Sh-A8
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 20:06:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gEkA4-0006xz-DH
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 20:03:07 -0400
+	(envelope-from <philmd@redhat.com>) id 1gEkD0-0000IE-4n
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 20:06:09 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:43102)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gEkCz-0000I0-TF
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 20:06:06 -0400
+Received: by mail-wr1-f65.google.com with SMTP id t10-v6so5226652wrn.10
+	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 17:06:05 -0700 (PDT)
+References: <20181018153134.8493-1-crosa@redhat.com>
+	<20181018153134.8493-3-crosa@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <090fadb9-26db-4152-46e8-eb22bf104b53@redhat.com>
+Date: Tue, 23 Oct 2018 02:06:02 +0200
 MIME-Version: 1.0
-References: <20181018182856.28001-1-mark.cave-ayland@ilande.co.uk>
-	<20181018182856.28001-11-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <20181018182856.28001-11-mark.cave-ayland@ilande.co.uk>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Tue, 23 Oct 2018 02:02:52 +0200
-Message-ID: <CAAdtpL75BvRBRToHWaEvTWBoCopBfYBRMy_fnTc9R=SuWXbKjA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 10/11] dp8393x: manage big endian bus
+In-Reply-To: <20181018153134.8493-3-crosa@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v7 2/3] Acceptance tests: add make rule for
+ running them
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,229 +31,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Laurent Vivier <laurent@vivier.eu>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Jason Wang <jasowang@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>, =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, =?UTF-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>, Aurelien Jarno <aurelien@aurel32.net>
+To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
+Cc: Caio Carrara <ccarrara@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-On Thu, Oct 18, 2018 at 8:43 PM Mark Cave-Ayland
-<mark.cave-ayland@ilande.co.uk> wrote:
->
-> From: Laurent Vivier <laurent@vivier.eu>
->
-> This is needed by Quadra 800, this card can run on little-endian
-> or big-endian bus.
->
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> Tested-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
+On 18/10/18 17:31, Cleber Rosa wrote:
+> The acceptance (aka functional, aka Avocado-based) tests are
+> Python files located in "tests/acceptance" that need to be run
+> with the Avocado libs and test runner.
+> 
+> Let's provide a convenient way for QEMU developers to run them,
+> by making use of the tests-venv with the required setup.
+> 
+> Also, while the Avocado test runner will take care of creating a
+> location to save test results to, it was understood that it's better
+> if the results are kept within the build tree.
+> 
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Acked-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+> Reviewed-by: Caio Carrara <ccarrara@redhat.com>
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 > ---
->  hw/net/dp8393x.c | 88 ++++++++++++++++++++++++++++++++++++--------------=
-------
->  1 file changed, 57 insertions(+), 31 deletions(-)
->
-> diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
-> index b53fcaa8bc..1cf348aea1 100644
-> --- a/hw/net/dp8393x.c
-> +++ b/hw/net/dp8393x.c
-> @@ -150,6 +150,7 @@ typedef struct dp8393xState {
->
->      /* Hardware */
->      uint8_t it_shift;
-> +    bool big_endian;
->      qemu_irq irq;
->  #ifdef DEBUG_SONIC
->      int irq_level;
-> @@ -220,6 +221,29 @@ static uint32_t dp8393x_wt(dp8393xState *s)
->      return s->regs[SONIC_WT1] << 16 | s->regs[SONIC_WT0];
->  }
->
-> +static uint16_t dp8393x_get(dp8393xState *s, int width, uint16_t *base,
-> +                            int offset)
-> +{
-> +    uint16_t val;
+>   docs/devel/testing.rst | 43 +++++++++++++++++++++++++++++++++++++-----
+>   tests/Makefile.include | 21 +++++++++++++++++++--
+>   tests/requirements.txt |  1 +
+>   3 files changed, 58 insertions(+), 7 deletions(-)
+> 
+> diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
+> index fcfad87614..da20be4d27 100644
+> --- a/docs/devel/testing.rst
+> +++ b/docs/devel/testing.rst
+> @@ -543,10 +543,39 @@ Tests based on ``avocado_qemu.Test`` can easily:
+>      - http://avocado-framework.readthedocs.io/en/latest/api/test/avocado.html#avocado.Test
+>      - http://avocado-framework.readthedocs.io/en/latest/api/utils/avocado.utils.html
+>   
+> -Installation
+> -------------
+> +Running tests
+> +-------------
+>   
+> -To install Avocado and its dependencies, run:
+> +You can run the acceptance tests simply by executing:
 > +
-> +    if (s->big_endian) {
-> +        val =3D be16_to_cpu(base[offset * width + width - 1]);
-> +    } else {
-> +        val =3D le16_to_cpu(base[offset * width]);
-> +    }
-> +    return val;
-> +}
+> +.. code::
 > +
-> +static void dp8393x_put(dp8393xState *s, int width, uint16_t *base, int =
-offset,
-> +                        uint16_t val)
-> +{
-> +    if (s->big_endian) {
-> +        base[offset * width + width - 1] =3D cpu_to_be16(val);
-> +    } else {
-> +        base[offset * width] =3D cpu_to_le16(val);
-> +    }
-> +}
+> +  make check-acceptance
 > +
->  static void dp8393x_update_irq(dp8393xState *s)
->  {
->      int level =3D (s->regs[SONIC_IMR] & s->regs[SONIC_ISR]) ? 1 : 0;
-> @@ -251,12 +275,12 @@ static void dp8393x_do_load_cam(dp8393xState *s)
->          /* Fill current entry */
->          address_space_rw(&s->as, dp8393x_cdp(s),
->              MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
-> -        s->cam[index][0] =3D data[1 * width] & 0xff;
-> -        s->cam[index][1] =3D data[1 * width] >> 8;
-> -        s->cam[index][2] =3D data[2 * width] & 0xff;
-> -        s->cam[index][3] =3D data[2 * width] >> 8;
-> -        s->cam[index][4] =3D data[3 * width] & 0xff;
-> -        s->cam[index][5] =3D data[3 * width] >> 8;
-> +        s->cam[index][0] =3D dp8393x_get(s, width, data, 1) & 0xff;
-> +        s->cam[index][1] =3D dp8393x_get(s, width, data, 1) >> 8;
-> +        s->cam[index][2] =3D dp8393x_get(s, width, data, 2) & 0xff;
-> +        s->cam[index][3] =3D dp8393x_get(s, width, data, 2) >> 8;
-> +        s->cam[index][4] =3D dp8393x_get(s, width, data, 3) & 0xff;
-> +        s->cam[index][5] =3D dp8393x_get(s, width, data, 3) >> 8;
->          DPRINTF("load cam[%d] with %02x%02x%02x%02x%02x%02x\n", index,
->              s->cam[index][0], s->cam[index][1], s->cam[index][2],
->              s->cam[index][3], s->cam[index][4], s->cam[index][5]);
-> @@ -269,7 +293,7 @@ static void dp8393x_do_load_cam(dp8393xState *s)
->      /* Read CAM enable */
->      address_space_rw(&s->as, dp8393x_cdp(s),
->          MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
-> -    s->regs[SONIC_CE] =3D data[0 * width];
-> +    s->regs[SONIC_CE] =3D dp8393x_get(s, width, data, 0);
->      DPRINTF("load cam done. cam enable mask 0x%04x\n", s->regs[SONIC_CE]=
-);
->
->      /* Done */
-> @@ -290,10 +314,10 @@ static void dp8393x_do_read_rra(dp8393xState *s)
->          MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
->
->      /* Update SONIC registers */
-> -    s->regs[SONIC_CRBA0] =3D data[0 * width];
-> -    s->regs[SONIC_CRBA1] =3D data[1 * width];
-> -    s->regs[SONIC_RBWC0] =3D data[2 * width];
-> -    s->regs[SONIC_RBWC1] =3D data[3 * width];
-> +    s->regs[SONIC_CRBA0] =3D dp8393x_get(s, width, data, 0);
-> +    s->regs[SONIC_CRBA1] =3D dp8393x_get(s, width, data, 1);
-> +    s->regs[SONIC_RBWC0] =3D dp8393x_get(s, width, data, 2);
-> +    s->regs[SONIC_RBWC1] =3D dp8393x_get(s, width, data, 3);
->      DPRINTF("CRBA0/1: 0x%04x/0x%04x, RBWC0/1: 0x%04x/0x%04x\n",
->          s->regs[SONIC_CRBA0], s->regs[SONIC_CRBA1],
->          s->regs[SONIC_RBWC0], s->regs[SONIC_RBWC1]);
-> @@ -408,12 +432,12 @@ static void dp8393x_do_transmit_packets(dp8393xStat=
-e *s)
->          tx_len =3D 0;
->
->          /* Update registers */
-> -        s->regs[SONIC_TCR] =3D data[0 * width] & 0xf000;
-> -        s->regs[SONIC_TPS] =3D data[1 * width];
-> -        s->regs[SONIC_TFC] =3D data[2 * width];
-> -        s->regs[SONIC_TSA0] =3D data[3 * width];
-> -        s->regs[SONIC_TSA1] =3D data[4 * width];
-> -        s->regs[SONIC_TFS] =3D data[5 * width];
-> +        s->regs[SONIC_TCR] =3D dp8393x_get(s, width, data, 0) & 0xf000;
-> +        s->regs[SONIC_TPS] =3D dp8393x_get(s, width, data, 1);
-> +        s->regs[SONIC_TFC] =3D dp8393x_get(s, width, data, 2);
-> +        s->regs[SONIC_TSA0] =3D dp8393x_get(s, width, data, 3);
-> +        s->regs[SONIC_TSA1] =3D dp8393x_get(s, width, data, 4);
-> +        s->regs[SONIC_TFS] =3D dp8393x_get(s, width, data, 5);
->
->          /* Handle programmable interrupt */
->          if (s->regs[SONIC_TCR] & SONIC_TCR_PINT) {
-> @@ -439,9 +463,9 @@ static void dp8393x_do_transmit_packets(dp8393xState =
-*s)
->                  address_space_rw(&s->as,
->                      dp8393x_ttda(s) + sizeof(uint16_t) * (4 + 3 * i) * w=
-idth,
->                      MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
-> -                s->regs[SONIC_TSA0] =3D data[0 * width];
-> -                s->regs[SONIC_TSA1] =3D data[1 * width];
-> -                s->regs[SONIC_TFS] =3D data[2 * width];
-> +                s->regs[SONIC_TSA0] =3D dp8393x_get(s, width, data, 0);
-> +                s->regs[SONIC_TSA1] =3D dp8393x_get(s, width, data, 1);
-> +                s->regs[SONIC_TFS] =3D dp8393x_get(s, width, data, 2);
->              }
->          }
->
-> @@ -468,7 +492,8 @@ static void dp8393x_do_transmit_packets(dp8393xState =
-*s)
->          s->regs[SONIC_TCR] |=3D SONIC_TCR_PTX;
->
->          /* Write status */
-> -        data[0 * width] =3D s->regs[SONIC_TCR] & 0x0fff; /* status */
-> +        dp8393x_put(s, width, data, 0,
-> +                    s->regs[SONIC_TCR] & 0x0fff); /* status */
->          size =3D sizeof(uint16_t) * width;
->          address_space_rw(&s->as,
->              dp8393x_ttda(s),
-> @@ -482,8 +507,8 @@ static void dp8393x_do_transmit_packets(dp8393xState =
-*s)
->                               sizeof(uint16_t) *
->                               (4 + 3 * s->regs[SONIC_TFC]) * width,
->                  MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
-> -            s->regs[SONIC_CTDA] =3D data[0 * width] & ~0x1;
-> -            if (data[0 * width] & 0x1) {
-> +            s->regs[SONIC_CTDA] =3D dp8393x_get(s, width, data, 0) & ~0x=
-1;
-> +            if (dp8393x_get(s, width, data, 0) & 0x1) {
->                  /* EOL detected */
->                  break;
->              }
-> @@ -746,7 +771,7 @@ static ssize_t dp8393x_receive(NetClientState *nc, co=
-nst uint8_t * buf,
->          address =3D dp8393x_crda(s) + sizeof(uint16_t) * 5 * width;
->          address_space_rw(&s->as, address, MEMTXATTRS_UNSPECIFIED,
->                           (uint8_t *)data, size, 0);
-> -        if (data[0 * width] & 0x1) {
-> +        if (dp8393x_get(s, width, data, 0) & 0x1) {
->              /* Still EOL ; stop reception */
->              return -1;
->          } else {
-> @@ -790,11 +815,11 @@ static ssize_t dp8393x_receive(NetClientState *nc, =
-const uint8_t * buf,
->
->      /* Write status to memory */
->      DPRINTF("Write status at %08x\n", dp8393x_crda(s));
-> -    data[0 * width] =3D s->regs[SONIC_RCR]; /* status */
-> -    data[1 * width] =3D rx_len; /* byte count */
-> -    data[2 * width] =3D s->regs[SONIC_TRBA0]; /* pkt_ptr0 */
-> -    data[3 * width] =3D s->regs[SONIC_TRBA1]; /* pkt_ptr1 */
-> -    data[4 * width] =3D s->regs[SONIC_RSC]; /* seq_no */
-> +    dp8393x_put(s, width, data, 0, s->regs[SONIC_RCR]); /* status */
-> +    dp8393x_put(s, width, data, 1, rx_len); /* byte count */
-> +    dp8393x_put(s, width, data, 2, s->regs[SONIC_TRBA0]); /* pkt_ptr0 */
-> +    dp8393x_put(s, width, data, 3, s->regs[SONIC_TRBA1]); /* pkt_ptr1 */
-> +    dp8393x_put(s, width, data, 4, s->regs[SONIC_RSC]); /* seq_no */
->      size =3D sizeof(uint16_t) * 5 * width;
->      address_space_rw(&s->as, dp8393x_crda(s),
->          MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 1);
-> @@ -803,12 +828,12 @@ static ssize_t dp8393x_receive(NetClientState *nc, =
-const uint8_t * buf,
->      size =3D sizeof(uint16_t) * width;
->      address_space_rw(&s->as, dp8393x_crda(s) + sizeof(uint16_t) * 5 * wi=
-dth,
->          MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
-> -    s->regs[SONIC_LLFA] =3D data[0 * width];
-> +    s->regs[SONIC_LLFA] =3D dp8393x_get(s, width, data, 0);
->      if (s->regs[SONIC_LLFA] & 0x1) {
->          /* EOL detected */
->          s->regs[SONIC_ISR] |=3D SONIC_ISR_RDE;
->      } else {
-> -        data[0 * width] =3D 0; /* in_use */
-> +        dp8393x_put(s, width, data, 0, 0); /* in_use */
->          address_space_rw(&s->as, dp8393x_crda(s) + sizeof(uint16_t) * 6 =
-* width,
->              MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, sizeof(uint16_t), 1=
-);
->          s->regs[SONIC_CRDA] =3D s->regs[SONIC_LLFA];
-> @@ -921,6 +946,7 @@ static Property dp8393x_properties[] =3D {
->      DEFINE_NIC_PROPERTIES(dp8393xState, conf),
->      DEFINE_PROP_PTR("dma_mr", dp8393xState, dma_mr),
->      DEFINE_PROP_UINT8("it_shift", dp8393xState, it_shift, 0),
-> +    DEFINE_PROP_BOOL("big_endian", dp8393xState, big_endian, false),
->      DEFINE_PROP_END_OF_LIST(),
->  };
->
-> --
-> 2.11.0
->
->
+> +This involves the automatic creation of Python virtual environment
+> +within the build tree (at ``tests/venv``) which will have all the
+> +right dependencies, and will save tests results also within the
+> +build tree (at ``tests/results``).
+> +
+> +Note: the build environment must be using a Python 3 stack, and have
+> +the ``venv`` and ``pip`` packages installed.  If necessary, make sure
+> +``configure`` is called with ``--python=`` and that those modules are
+> +available.  On Debian and Ubuntu based systems, depending on the
+> +specific version, they may be on packages named ``python3-venv`` and
+> +``python3-pip``.
+> +
+> +The scripts installed inside the virtual environment may be used
+> +without an "activation".  For instance, the Avocado test runner
+> +may be invoked by running:
+> +
+> + .. code::
+> +
+> +  tests/venv/bin/avocado run $OPTION1 $OPTION2 tests/acceptance/
+> +
+> +Manual Installation
+> +-------------------
+> +
+> +To manually install Avocado and its dependencies, run:
+>   
+>   .. code::
+>   
+> @@ -687,11 +716,15 @@ The exact QEMU binary to be used on QEMUMachine.
+>   Uninstalling Avocado
+>   --------------------
+>   
+> -If you've followed the installation instructions above, you can easily
+> -uninstall Avocado.  Start by listing the packages you have installed::
+> +If you've followed the manual installation instructions above, you can
+> +easily uninstall Avocado.  Start by listing the packages you have
+> +installed::
+>   
+>     pip list --user
+>   
+>   And remove any package you want with::
+>   
+>     pip uninstall <package_name>
+> +
+> +If you've used ``make check-acceptance``, the Python virtual environment where
+> +Avocado is installed will be cleaned up as part of ``make check-clean``.
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index 004a86f274..3e4dac2817 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -11,6 +11,7 @@ check-help:
+>   	@echo " $(MAKE) check-qapi-schema    Run QAPI schema tests"
+>   	@echo " $(MAKE) check-block          Run block tests"
+>   	@echo " $(MAKE) check-tcg            Run TCG tests"
+> +	@echo " $(MAKE) check-acceptance     Run all acceptance (functional) tests"
+>   	@echo " $(MAKE) check-report.html    Generates an HTML test report"
+>   	@echo " $(MAKE) check-venv           Creates a Python venv for tests"
+>   	@echo " $(MAKE) check-clean          Clean the tests"
+> @@ -902,10 +903,15 @@ check-decodetree:
+>   
+>   # Python venv for running tests
+>   
+> -.PHONY: check-venv
+> +.PHONY: check-venv check-acceptance
+>   
+>   TESTS_VENV_DIR=$(BUILD_DIR)/tests/venv
+>   TESTS_VENV_REQ=$(SRC_PATH)/tests/requirements.txt
+> +TESTS_RESULTS_DIR=$(BUILD_DIR)/tests/results
+> +# Controls the output generated by Avocado when running tests.
+> +# Any number of command separated loggers are accepted.  For more
+> +# information please refer to "avocado --help".
+> +AVOCADO_SHOW=none
+>   
+>   $(shell $(PYTHON) -c 'import sys; assert sys.version_info >= (3,0)' >/dev/null 2>&1)
+>   ifeq ($(.SHELLSTATUS),0)
+> @@ -922,8 +928,19 @@ $(TESTS_VENV_DIR):
+>   	$(error "venv directory for tests requires Python 3")
+>   endif
+>   
+> +$(TESTS_RESULTS_DIR):
+> +	$(call quiet-command, mkdir -p $@, \
+> +            MKDIR, $@)
+> +
+>   check-venv: $(TESTS_VENV_DIR)
+>   
+> +check-acceptance: check-venv $(TESTS_RESULTS_DIR)
+> +	$(call quiet-command, \
+> +            $(TESTS_VENV_DIR)/bin/python -m avocado \
+> +            --show=$(AVOCADO_SHOW) run --job-results-dir=$(TESTS_RESULTS_DIR) \
+> +            --failfast=on $(SRC_PATH)/tests/acceptance, \
+> +            "AVOCADO", "tests/acceptance")
+> +
+>   # Consolidated targets
+>   
+>   .PHONY: check-qapi-schema check-qtest check-unit check check-clean
+> @@ -937,7 +954,7 @@ check-clean:
+>   	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
+>   	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y)) $(check-qtest-generic-y))
+>   	rm -f tests/test-qapi-gen-timestamp
+> -	rm -rf $(TESTS_VENV_DIR)
+> +	rm -rf $(TESTS_VENV_DIR) $(TESTS_RESULTS_DIR)
+>   
+>   clean: check-clean
+>   
+> diff --git a/tests/requirements.txt b/tests/requirements.txt
+> index d39f9d1576..64c6e27a94 100644
+> --- a/tests/requirements.txt
+> +++ b/tests/requirements.txt
+> @@ -1,3 +1,4 @@
+>   # Add Python module requirements, one per line, to be installed
+>   # in the tests/venv Python virtual environment. For more info,
+>   # refer to: https://pip.pypa.io/en/stable/user_guide/#id1
+> +avocado-framework==65.0
+> 
