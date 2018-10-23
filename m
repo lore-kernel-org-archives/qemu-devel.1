@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56522)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56582)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEzPA-0005xQ-CB
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 12:19:41 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEzPC-0005ys-5g
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 12:19:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEzP3-0000os-9O
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 12:19:36 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:44823 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEzPB-0000tG-8P
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 12:19:42 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:44942 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gEzOy-0000kQ-Ff
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 12:19:29 -0400
+	id 1gEzPA-0000ra-T9
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 12:19:41 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue, 23 Oct 2018 18:18:13 +0200
-Message-Id: <1540311509-23970-3-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Tue, 23 Oct 2018 18:18:15 +0200
+Message-Id: <1540311509-23970-5-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1540311509-23970-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1540311509-23970-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v6 02/18] target/mips: Define a bit for MXU in
- insn_flags
+Subject: [Qemu-devel] [PATCH v6 04/18] target/mips: Add and integrate MXU
+ decoding engine placeholder
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,29 +28,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: aurelien@aurel32.net, richard.henderson@linaro.org, jancraig@amazon.com, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com
 
-From: Craig Janeczek <jancraig@amazon.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Define a bit for MXU in insn_flags. This is the first non-MIPS
-(third party) ASE supported in QEMU for MIPS, so it is placed in
-the section "bits 56-63: vendor-specific ASEs".
+Provide the placeholder and add the invocation logic for MXU
+decoding engine.
 
-Signed-off-by: Craig Janeczek <jancraig@amazon.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/mips-defs.h | 1 +
- 1 file changed, 1 insertion(+)
+ target/mips/translate.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/target/mips/mips-defs.h b/target/mips/mips-defs.h
-index 5177618..dbdb4b2 100644
---- a/target/mips/mips-defs.h
-+++ b/target/mips/mips-defs.h
-@@ -69,6 +69,7 @@
-  *   bits 56-63: vendor-specific ASEs
-  */
- #define ASE_MMI           0x0100000000000000ULL
-+#define ASE_MXU           0x0200000000000000ULL
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index fefe9ac..128cabe 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -23844,6 +23844,12 @@ static void decode_opc_special(CPUMIPSState *env, DisasContext *ctx)
+     }
+ }
  
- /* MIPS CPU defines. */
- #define		CPU_MIPS1	(ISA_MIPS1)
++static void decode_opc_mxu(CPUMIPSState *env, DisasContext *ctx)
++{
++    MIPS_INVAL("decode_opc_mxu");
++    generate_exception_end(ctx, EXCP_RI);
++}
++
+ static void decode_opc_special2_legacy(CPUMIPSState *env, DisasContext *ctx)
+ {
+     int rs, rt, rd;
+@@ -26087,6 +26093,8 @@ static void decode_opc(CPUMIPSState *env, DisasContext *ctx)
+     case OPC_SPECIAL2:
+         if ((ctx->insn_flags & INSN_R5900) && (ctx->insn_flags & ASE_MMI)) {
+             decode_tx79_mmi(env, ctx);
++        } else if (ctx->insn_flags & ASE_MXU) {
++            decode_opc_mxu(env, ctx);
+         } else {
+             decode_opc_special2_legacy(env, ctx);
+         }
 -- 
 2.7.4
