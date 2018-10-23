@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38275)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gF4LO-0002MC-Da
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 17:36:12 -0400
+	(envelope-from <eblake@redhat.com>) id 1gF4LY-0002lM-Ej
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 17:36:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gF4B4-0007tn-0B
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 17:25:29 -0400
-Date: Tue, 23 Oct 2018 23:25:17 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20181023232517.6b93085b.cohuck@redhat.com>
-In-Reply-To: <698a7fdd-47cc-cb3e-a280-3c4b656d92ef@redhat.com>
-References: <20181022090255.19671-1-zyimin@linux.ibm.com>
-	<698a7fdd-47cc-cb3e-a280-3c4b656d92ef@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] s390x/pci: add common fmb
+	(envelope-from <eblake@redhat.com>) id 1gF4LW-0000mK-9U
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 17:36:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45662)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gF4LU-0000jS-4c
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 17:36:12 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C0B3F3091746
+	for <qemu-devel@nongnu.org>; Tue, 23 Oct 2018 21:36:09 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+Date: Tue, 23 Oct 2018 22:35:59 +0100
+Message-Id: <20181023213600.364086-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH] vl: Avoid crash when -mon is underspecified
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,82 +27,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Yi Min Zhao <zyimin@linux.ibm.com>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, pmorel@linux.ibm.com, qemu-s390x@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: peterx@redhat.com, armbru@redhat.com, marcandre.lureau@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
 
-On Mon, 22 Oct 2018 13:17:34 +0100
-Thomas Huth <thuth@redhat.com> wrote:
+A quick coredump on an incomplete command line:
+./x86_64-softmmu/qemu-system-x86_64 -mon mode=control,pretty=on
 
-> On 2018-10-22 10:02, Yi Min Zhao wrote:
-> > Common function measurement block is used to report counters of
-> > successfully issued pcilg/stg/stb and rpcit instructions. This patch
-> > introduces a new struct ZpciFmb and schedules a timer callback to
-> > copy fmb to the guest memory at a interval time which is set to
-> > 4s by default. While attemping to update fmb failed, an event error
-> > would be generated. After pcilg/stg/stb and rpcit interception
-> > handlers issue successfully, increase the related counter. The guest
-> > could pass null address to switch off FMB and stop corresponding
-> > timer.
-> > 
-> > Signed-off-by: Yi Min Zhao <zyimin@linux.ibm.com>
-> > Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
-> > ---  
-> [...]
-> > +static int fmb_do_update(S390PCIBusDevice *pbdev, uint8_t offset, int len)
-> > +{
-> > +    MemTxResult ret;
-> > +
-> > +    ret = address_space_write(&address_space_memory,
-> > +                              pbdev->fmb_addr + (uint64_t)offset,
-> > +                              MEMTXATTRS_UNSPECIFIED,
-> > +                              (uint8_t *)&pbdev->fmb + offset,
-> > +                              len);
-> > +    if (ret) {
-> > +        s390_pci_generate_error_event(ERR_EVENT_FMBA, pbdev->fh, pbdev->fid,
-> > +                                      pbdev->fmb_addr, 0);
-> > +        fmb_timer_free(pbdev);
-> > +    }
-> > +
-> > +    return ret;
-> > +}
-> > +
-> > +static void fmb_update(void *opaque)
-> > +{
-> > +    S390PCIBusDevice *pbdev = opaque;
-> > +    int64_t t = qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL);
-> > +    uint8_t offset = offsetof(ZpciFmb, last_update);
-> > +
-> > +    /* Update U bit */
-> > +    pbdev->fmb.last_update |= UPDATE_U_BIT;
-> > +    if (fmb_do_update(pbdev, offset, sizeof(uint64_t))) {
-> > +        return;
-> > +    }
-> > +
-> > +    /* Update FMB counters */
-> > +    pbdev->fmb.sample++;
-> > +    if (fmb_do_update(pbdev, 0, sizeof(ZpciFmb))) {
-> > +        return;
-> > +    }
-> > +
-> > +    /* Clear U bit and update the time */
-> > +    pbdev->fmb.last_update = time2tod(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
-> > +    pbdev->fmb.last_update &= ~UPDATE_U_BIT;
-> > +    if (fmb_do_update(pbdev, offset, sizeof(uint64_t))) {
-> > +        return;
-> > +    }
-> > +
-> > +    timer_mod(pbdev->fmb_timer, t + DEFAULT_MUI);
-> > +}  
-> 
-> Sorry for noticing this in v1 already, but is this code endianess-safe?
-> I.e. can this also work with qemu-system-s390x running with TCG on a x86
-> host? I think you might have to use something like this here instead:
-> 
->   pbdev->fmb.sample = cpu_to_be32(be32_to_cpu(pbdev->fmb.sample) + 1);
-> 
-> etc.
+ #0  0x00007ffff723d9e4 in g_str_hash () at /lib64/libglib-2.0.so.0
+ #1  0x00007ffff723ce38 in g_hash_table_lookup () at /lib64/libglib-2.0.so.0
+ #2  0x0000555555cc0073 in object_class_property_find (klass=0x5555566a94b0, name=0x0, errp=0x0) at qom/object.c:1135
+ #3  0x0000555555cc004b in object_class_property_find (klass=0x5555566a9440, name=0x0, errp=0x0) at qom/object.c:1129
+ #4  0x0000555555cbfe6e in object_property_find (obj=0x5555568348c0, name=0x0, errp=0x0) at qom/object.c:1080
+ #5  0x0000555555cc183d in object_resolve_path_component (parent=0x5555568348c0, part=0x0) at qom/object.c:1762
+ #6  0x0000555555d82071 in qemu_chr_find (name=0x0) at chardev/char.c:802
+ #7  0x00005555559d77cb in mon_init_func (opaque=0x0, opts=0x5555566b65a0, errp=0x0) at vl.c:2291
 
-Agreed, that may need some endianness handling.
+Fix it to instead fail gracefully.
 
-I would test this with tcg on a LE host, but how can I verify this? Yi
-Min, do you have some kind of test tooling you can share?
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ vl.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/vl.c b/vl.c
+index 4e25c78bff0..2ed8672eb79 100644
+--- a/vl.c
++++ b/vl.c
+@@ -2288,6 +2288,10 @@ static int mon_init_func(void *opaque, QemuOpts *opts, Error **errp)
+     }
+
+     chardev = qemu_opt_get(opts, "chardev");
++    if (!chardev) {
++        error_report("chardev is required");
++        exit(1);
++    }
+     chr = qemu_chr_find(chardev);
+     if (chr == NULL) {
+         error_report("chardev \"%s\" not found", chardev);
+-- 
+2.17.2
