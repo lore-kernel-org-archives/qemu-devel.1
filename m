@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45277)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gF3f6-0003B5-PK
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 16:52:31 -0400
+	(envelope-from <noring@nocrew.org>) id 1gF3fl-0003EC-Vd
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 16:53:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gF3Yc-0006XC-U1
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 16:45:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35862)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gF3Yb-0006Lk-0K
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 16:45:41 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gF3YR-0003F1-Ue
-	for <qemu-devel@nongnu.org>; Tue, 23 Oct 2018 20:45:31 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E6D582E8052
-	for <qemu-devel@nongnu.org>; Tue, 23 Oct 2018 20:45:31 +0000 (UTC)
+	(envelope-from <noring@nocrew.org>) id 1gF3QQ-0006A5-76
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 16:37:18 -0400
+Received: from pio-pvt-msa3.bahnhof.se ([79.136.2.42]:34382)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gF3QP-00067R-LC
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 16:37:13 -0400
+Date: Tue, 23 Oct 2018 22:37:10 +0200
+From: Fredrik Noring <noring@nocrew.org>
+Message-ID: <20181023203710.GA2239@sx9>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 23 Oct 2018 20:35:57 -0000
-From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-Reply-To: Bug 1796754 <1796754@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153902784309.8245.8166003544722634075.malonedeb@soybean.canonical.com>
-Message-Id: <154032695816.18443.2669950787206102664.launchpad@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1796754] Re: ioctl SIOCGIFCONF causes
- qemu-aarch64-static to crash with "received signal outside vCPU context"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_NxFaMcZ+ZzympigE8OoYxfmbmAQOReJN_OT32ceMWoA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v8 00/38] target/mips: Limited support for
+ the R5900
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,44 +26,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: "Maciej W. Rozycki" <macro@linux-mips.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Petar Jovanovic <pjovanovic@wavecomp.com>, =?utf-8?Q?J=C3=BCrgen?= Urban <JuergenUrban@gmx.de>, qemu-devel@nongnu.org
 
-** Changed in: qemu
-       Status: New =3D> In Progress
+Hi Peter, Aleksandar,
 
--- =
+> Hi: I get compile errors on 32-bit hosts:
+>
+> /home/petmay01/qemu-for-merges/disas/mips.c:615:35: error: large
+> integer implicitly truncated to unsigned type [-Werror=overflow]
+>  #define INSN_5900                 0x100000000
+>                                    ^
+> /home/petmay01/qemu-for-merges/disas/mips.c:1200:17: note: in
+> expansion of macro 'INSN_5900'
+>  #define EE      INSN_5900    /* Emotion Engine */
+>                  ^
+> /home/petmay01/qemu-for-merges/disas/mips.c:2326:73: note: in
+> expansion of macro 'EE'
+>  {"div1",    "z,s,t",  0x7000001a, 0xfc00ffff, RD_s | RD_t | WR_HILO, 0, EE },
+>                                                                          ^
+>
+> (and repeats on other similar uses).
+>
+> This is because this line is an initializer for "struct mips_opcode",
+> and the final field is "unsigned long membership", which may be only
+> 32 bits wide, but you're trying to put a number in that's too big for that.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1796754
+I am sorry about that. We are out of bits.
 
-Title:
-  ioctl SIOCGIFCONF causes qemu-aarch64-static to crash with "received
-  signal outside vCPU context"
+Option 1: Discard all disassembly parts of the series. I would prefer this
+if possible -- they are not essential now in my opinion.
 
-Status in QEMU:
-  In Progress
+Option 2: Drop all R5900 related changes for now.
 
-Bug description:
-  To reproduce it, compile the attached crash.c under aarch64 to a.out and =
-execute on x86_64
-  qemu-aarch64-static ./a.out
+Option 3: Extend the mips_opcode::membership field.
 
-  It will print the following and crash:
-
-  socket=3D3
-  qemu:handle_cpu_signal received signal outside vCPU context @ pc=3D0x6003=
-8cd6
-  qemu:handle_cpu_signal received signal outside vCPU context @ pc=3D0x6000=
-157a
-
-  The version of qemu-aarch64-static is
-
-  qemu-aarch64 version 3.0.0 (qemu-3.0.0-1.fc29)
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-
-  But it did also happen in previous versions so it is not a regression
-  but a bug existed ever since.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1796754/+subscriptions
+Fredrik
