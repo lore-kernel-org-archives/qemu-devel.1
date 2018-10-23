@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55972)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60549)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gEkD3-0001Sh-A8
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 20:06:10 -0400
+	(envelope-from <bounces@canonical.com>) id 1gEkfb-0000u5-Oc
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 20:35:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gEkD0-0000IE-4n
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 20:06:09 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:43102)
+	(envelope-from <bounces@canonical.com>) id 1gEkfW-0002ML-QM
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 20:35:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47508)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gEkCz-0000I0-TF
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 20:06:06 -0400
-Received: by mail-wr1-f65.google.com with SMTP id t10-v6so5226652wrn.10
-	for <qemu-devel@nongnu.org>; Mon, 22 Oct 2018 17:06:05 -0700 (PDT)
-References: <20181018153134.8493-1-crosa@redhat.com>
-	<20181018153134.8493-3-crosa@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <090fadb9-26db-4152-46e8-eb22bf104b53@redhat.com>
-Date: Tue, 23 Oct 2018 02:06:02 +0200
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gEkfV-0002K8-TV
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 20:35:34 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gEkfS-0005yE-30
+	for <qemu-devel@nongnu.org>; Tue, 23 Oct 2018 00:35:30 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 009BD2E804A
+	for <qemu-devel@nongnu.org>; Tue, 23 Oct 2018 00:35:30 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20181018153134.8493-3-crosa@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v7 2/3] Acceptance tests: add make rule for
- running them
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 23 Oct 2018 00:26:00 -0000
+From: "Emilio G. Cota" <1799200@bugs.launchpad.net>
+Reply-To: Bug 1799200 <1799200@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154020556283.828.7303147560096636851.malonedeb@wampee.canonical.com>
+Message-Id: <154025436047.18527.14164883377360137383.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1799200] Re: null pointer dereference in
+ tcg_emit_op
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,164 +37,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
-Cc: Caio Carrara <ccarrara@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
 
-On 18/10/18 17:31, Cleber Rosa wrote:
-> The acceptance (aka functional, aka Avocado-based) tests are
-> Python files located in "tests/acceptance" that need to be run
-> with the Avocado libs and test runner.
-> 
-> Let's provide a convenient way for QEMU developers to run them,
-> by making use of the tests-venv with the required setup.
-> 
-> Also, while the Avocado test runner will take care of creating a
-> location to save test results to, it was understood that it's better
-> if the results are kept within the build tree.
-> 
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Acked-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-> Reviewed-by: Caio Carrara <ccarrara@redhat.com>
+1. You're leaking the "ptr" TCG temp. Fix it, and also test your code with =
+the --enable-debug-tcg configure flag.
+2. Don't insert your helper in .insn_start; you'll have better luck in .tra=
+nslate_insn.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+-- =
 
-> ---
->   docs/devel/testing.rst | 43 +++++++++++++++++++++++++++++++++++++-----
->   tests/Makefile.include | 21 +++++++++++++++++++--
->   tests/requirements.txt |  1 +
->   3 files changed, 58 insertions(+), 7 deletions(-)
-> 
-> diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
-> index fcfad87614..da20be4d27 100644
-> --- a/docs/devel/testing.rst
-> +++ b/docs/devel/testing.rst
-> @@ -543,10 +543,39 @@ Tests based on ``avocado_qemu.Test`` can easily:
->      - http://avocado-framework.readthedocs.io/en/latest/api/test/avocado.html#avocado.Test
->      - http://avocado-framework.readthedocs.io/en/latest/api/utils/avocado.utils.html
->   
-> -Installation
-> -------------
-> +Running tests
-> +-------------
->   
-> -To install Avocado and its dependencies, run:
-> +You can run the acceptance tests simply by executing:
-> +
-> +.. code::
-> +
-> +  make check-acceptance
-> +
-> +This involves the automatic creation of Python virtual environment
-> +within the build tree (at ``tests/venv``) which will have all the
-> +right dependencies, and will save tests results also within the
-> +build tree (at ``tests/results``).
-> +
-> +Note: the build environment must be using a Python 3 stack, and have
-> +the ``venv`` and ``pip`` packages installed.  If necessary, make sure
-> +``configure`` is called with ``--python=`` and that those modules are
-> +available.  On Debian and Ubuntu based systems, depending on the
-> +specific version, they may be on packages named ``python3-venv`` and
-> +``python3-pip``.
-> +
-> +The scripts installed inside the virtual environment may be used
-> +without an "activation".  For instance, the Avocado test runner
-> +may be invoked by running:
-> +
-> + .. code::
-> +
-> +  tests/venv/bin/avocado run $OPTION1 $OPTION2 tests/acceptance/
-> +
-> +Manual Installation
-> +-------------------
-> +
-> +To manually install Avocado and its dependencies, run:
->   
->   .. code::
->   
-> @@ -687,11 +716,15 @@ The exact QEMU binary to be used on QEMUMachine.
->   Uninstalling Avocado
->   --------------------
->   
-> -If you've followed the installation instructions above, you can easily
-> -uninstall Avocado.  Start by listing the packages you have installed::
-> +If you've followed the manual installation instructions above, you can
-> +easily uninstall Avocado.  Start by listing the packages you have
-> +installed::
->   
->     pip list --user
->   
->   And remove any package you want with::
->   
->     pip uninstall <package_name>
-> +
-> +If you've used ``make check-acceptance``, the Python virtual environment where
-> +Avocado is installed will be cleaned up as part of ``make check-clean``.
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 004a86f274..3e4dac2817 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -11,6 +11,7 @@ check-help:
->   	@echo " $(MAKE) check-qapi-schema    Run QAPI schema tests"
->   	@echo " $(MAKE) check-block          Run block tests"
->   	@echo " $(MAKE) check-tcg            Run TCG tests"
-> +	@echo " $(MAKE) check-acceptance     Run all acceptance (functional) tests"
->   	@echo " $(MAKE) check-report.html    Generates an HTML test report"
->   	@echo " $(MAKE) check-venv           Creates a Python venv for tests"
->   	@echo " $(MAKE) check-clean          Clean the tests"
-> @@ -902,10 +903,15 @@ check-decodetree:
->   
->   # Python venv for running tests
->   
-> -.PHONY: check-venv
-> +.PHONY: check-venv check-acceptance
->   
->   TESTS_VENV_DIR=$(BUILD_DIR)/tests/venv
->   TESTS_VENV_REQ=$(SRC_PATH)/tests/requirements.txt
-> +TESTS_RESULTS_DIR=$(BUILD_DIR)/tests/results
-> +# Controls the output generated by Avocado when running tests.
-> +# Any number of command separated loggers are accepted.  For more
-> +# information please refer to "avocado --help".
-> +AVOCADO_SHOW=none
->   
->   $(shell $(PYTHON) -c 'import sys; assert sys.version_info >= (3,0)' >/dev/null 2>&1)
->   ifeq ($(.SHELLSTATUS),0)
-> @@ -922,8 +928,19 @@ $(TESTS_VENV_DIR):
->   	$(error "venv directory for tests requires Python 3")
->   endif
->   
-> +$(TESTS_RESULTS_DIR):
-> +	$(call quiet-command, mkdir -p $@, \
-> +            MKDIR, $@)
-> +
->   check-venv: $(TESTS_VENV_DIR)
->   
-> +check-acceptance: check-venv $(TESTS_RESULTS_DIR)
-> +	$(call quiet-command, \
-> +            $(TESTS_VENV_DIR)/bin/python -m avocado \
-> +            --show=$(AVOCADO_SHOW) run --job-results-dir=$(TESTS_RESULTS_DIR) \
-> +            --failfast=on $(SRC_PATH)/tests/acceptance, \
-> +            "AVOCADO", "tests/acceptance")
-> +
->   # Consolidated targets
->   
->   .PHONY: check-qapi-schema check-qtest check-unit check check-clean
-> @@ -937,7 +954,7 @@ check-clean:
->   	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
->   	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y)) $(check-qtest-generic-y))
->   	rm -f tests/test-qapi-gen-timestamp
-> -	rm -rf $(TESTS_VENV_DIR)
-> +	rm -rf $(TESTS_VENV_DIR) $(TESTS_RESULTS_DIR)
->   
->   clean: check-clean
->   
-> diff --git a/tests/requirements.txt b/tests/requirements.txt
-> index d39f9d1576..64c6e27a94 100644
-> --- a/tests/requirements.txt
-> +++ b/tests/requirements.txt
-> @@ -1,3 +1,4 @@
->   # Add Python module requirements, one per line, to be installed
->   # in the tests/venv Python virtual environment. For more info,
->   # refer to: https://pip.pypa.io/en/stable/user_guide/#id1
-> +avocado-framework==65.0
-> 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1799200
+
+Title:
+  null pointer dereference in tcg_emit_op
+
+Status in QEMU:
+  Invalid
+
+Bug description:
+  I am insert a custom  tcg helper function in i386_tr_insn_start for
+  trace the instructions.
+
+  most of time the qemu runed ok ,but when execute some special software
+  will lead to crash.
+
+  =
+
+  the below is the insert code:
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+   8514 static void i386_tr_insn_start(DisasContextBase *dcbase, CPUState *=
+cpu)
+   8515 {
+   8516     DisasContext *dc =3D container_of(dcbase, DisasContext, base);
+   8517     TCGv_ptr ptr=3D tcg_const_ptr((void*)cpu); // inserted hepler c=
+ode
+   8518     gen_helper_mad_exec(ptr);// insert helper code
+   8519     tcg_gen_insn_start(dc->base.pc_next, dc->cc_op);
+   8520 }
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+  below is the callstack
+
+  #0  0x000055555581df5e in tcg_emit_op (opc=3Dopc@entry=3DINDEX_op_movi_i6=
+4) at /root/qemu/tcg/tcg.c:2205
+  #1  0x0000555555825911 in tcg_gen_op2 (opc=3Dopc@entry=3DINDEX_op_movi_i6=
+4, a1=3D140734736923704, a2=3Da2@entry=3D792) at /root/qemu/tcg/tcg-op.c:53
+  #2  0x000055555581d713 in tcg_const_i64 (opc=3DINDEX_op_movi_i64, a2=3D79=
+2, a1=3D0x7378) at /root/qemu/tcg/tcg-op.h:109
+  #3  0x000055555581d713 in tcg_const_i64 (arg=3D792, ret=3D<optimized out>=
+) at /root/qemu/tcg/tcg-op.h:579
+  #4  0x000055555581d713 in tcg_const_i64 (val=3Dval@entry=3D792) at /root/=
+qemu/tcg/tcg.c:1314
+  #5  0x000055555582732d in tcg_gen_addi_i64 (ret=3D0xd18, arg1=3D0x378, ar=
+g2=3Darg2@entry=3D792) at /root/qemu/tcg/tcg-op.c:1200
+  #6  0x000055555590ffaf in gen_sse (b=3D792, a=3D<optimized out>, r=3D<opt=
+imized out>) at /root/qemu/tcg/tcg-op.h:1258
+  #7  0x000055555590ffaf in gen_sse (env=3Denv@entry=3D0x5555567424d0, s=3D=
+s@entry=3D0x7fffea99a610, b=3Db@entry=3D366, pc_start=3Dpc_start@entry=3D45=
+13509698, rex_r=3Drex_r@entry=3D0) at /root/qemu/target/i386/translate.c:31=
+50
+  #8  0x0000555555911d7f in disas_insn (s=3Ds@entry=3D0x7fffea99a610, cpu=
+=3D<optimized out>) at /root/qemu/target/i386/translate.c:8336
+  #9  0x00005555559207a0 in i386_tr_translate_insn (dcbase=3D0x7fffea99a610=
+, cpu=3D<optimized out>) at /root/qemu/target/i386/translate.c:8543
+  #10 0x0000555555892649 in translator_loop (ops=3D0x55555622dee0 <i386_tr_=
+ops>, db=3D0x7fffea99a610, cpu=3D0x55555673a220, tb=3D<optimized out>) at /=
+root/qemu/accel/tcg/translator.c:110
+  #11 0x00005555559209ef in gen_intermediate_code (cpu=3Dcpu@entry=3D0x5555=
+5673a220, tb=3Dtb@entry=3D0x7fff70682040 <code_gen_buffer+208150547>) at /r=
+oot/qemu/target/i386/translate.c:8605
+  #12 0x0000555555891437 in tb_gen_code (cpu=3Dcpu@entry=3D0x55555673a220, =
+pc=3Dpc@entry=3D4513506448, cs_base=3Dcs_base@entry=3D0, flags=3Dflags@entr=
+y=3D4244147, cflags=3Dcflags@entry=3D0) at /root/qemu/accel/tcg/translate-a=
+ll.c:1728
+  #13 0x000055555588f97b in cpu_exec (cf_mask=3D0, tb_exit=3D0, last_tb=3D0=
+x0, cpu=3D0x0) at /root/qemu/accel/tcg/cpu-exec.c:410
+  #14 0x000055555588f97b in cpu_exec (cpu=3Dcpu@entry=3D0x55555673a220) at =
+/root/qemu/accel/tcg/cpu-exec.c:734
+  #15 0x000055555584b152 in tcg_cpu_exec (cpu=3D0x55555673a220) at /root/qe=
+mu/cpus.c:1405
+  #16 0x000055555584d1b8 in qemu_tcg_rr_cpu_thread_fn (arg=3D<optimized out=
+>) at /root/qemu/cpus.c:1505
+  #17 0x00007ffff2585e25 in start_thread () at /lib64/libpthread.so.0
+  #18 0x00007ffff22afbad in clone () at /lib64/libc.so.6
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1799200/+subscriptions
