@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51711)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gF6JO-0003K4-QH
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 19:42:15 -0400
+	(envelope-from <mst@redhat.com>) id 1gF6JO-0003K9-RW
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 19:42:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gF6JF-0008Ey-Jz
+	(envelope-from <mst@redhat.com>) id 1gF6JF-0008F5-Kr
 	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 19:42:10 -0400
-Received: from [185.30.24.106] (port=13494
+Received: from [185.30.24.106] (port=13498
 	helo=hotspot.internet-for-guests.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gF6JE-0008B8-Dq
+	(envelope-from <mst@redhat.com>) id 1gF6JE-0008BD-9G
 	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 19:42:01 -0400
 Date: Tue, 23 Oct 2018 19:41:33 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181023234112.188140-25-mst@redhat.com>
+Message-ID: <20181023234112.188140-26-mst@redhat.com>
 References: <20181023234112.188140-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <20181023234112.188140-1-mst@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 24/28] pci_bridge: fix typo in comment
+Subject: [Qemu-devel] [PULL 25/28] i440fx: use ARRAY_SIZE for pam_regions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,31 +29,45 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Li Qiang <liq3ea@gmail.com>, qemu-trivial@nongnu.org, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+From: Li Qiang <liq3ea@gmail.com>
 
-Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+Cc: qemu-trivial@nongnu.org
+
+Signed-off-by: Li Qiang <liq3ea@gmail.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/pci/pci_bridge.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/pci-host/piix.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
-index 08b7e44e2e..ee9dff2d3a 100644
---- a/hw/pci/pci_bridge.c
-+++ b/hw/pci/pci_bridge.c
-@@ -399,7 +399,7 @@ void pci_bridge_exitfn(PCIDevice *pci_dev)
+diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
+index 999db824da..82421a86e3 100644
+--- a/hw/pci-host/piix.c
++++ b/hw/pci-host/piix.c
+@@ -142,7 +142,7 @@ static void i440fx_update_memory_mappings(PCII440FXSt=
+ate *d)
+     PCIDevice *pd =3D PCI_DEVICE(d);
 =20
- /*
-  * before qdev initialization(qdev_init()), this function sets bus_name =
-and
-- * map_irq callback which are necessry for pci_bridge_initfn() to
-+ * map_irq callback which are necessary for pci_bridge_initfn() to
-  * initialize bus.
-  */
- void pci_bridge_map_irq(PCIBridge *br, const char* bus_name,
+     memory_region_transaction_begin();
+-    for (i =3D 0; i < 13; i++) {
++    for (i =3D 0; i < ARRAY_SIZE(d->pam_regions); i++) {
+         pam_update(&d->pam_regions[i], i,
+                    pd->config[I440FX_PAM + (DIV_ROUND_UP(i, 2))]);
+     }
+@@ -412,7 +412,7 @@ PCIBus *i440fx_init(const char *host_type, const char=
+ *pci_type,
+=20
+     init_pam(dev, f->ram_memory, f->system_memory, f->pci_address_space,
+              &f->pam_regions[0], PAM_BIOS_BASE, PAM_BIOS_SIZE);
+-    for (i =3D 0; i < 12; ++i) {
++    for (i =3D 0; i < ARRAY_SIZE(f->pam_regions) - 1; ++i) {
+         init_pam(dev, f->ram_memory, f->system_memory, f->pci_address_sp=
+ace,
+                  &f->pam_regions[i+1], PAM_EXPAN_BASE + i * PAM_EXPAN_SI=
+ZE,
+                  PAM_EXPAN_SIZE);
 --=20
 MST
