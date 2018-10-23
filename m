@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43038)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gEnds-0004AV-D3
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 23:46:08 -0400
+	(envelope-from <bounces@canonical.com>) id 1gEnnA-0007IP-1n
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 23:55:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gEndr-0002vm-92
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 23:46:04 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41186)
+	(envelope-from <bounces@canonical.com>) id 1gEnn6-0003U2-PV
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 23:55:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48086)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gEndr-0002m1-3A
-	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 23:46:03 -0400
+	id 1gEnn6-0003Sw-JN
+	for qemu-devel@nongnu.org; Mon, 22 Oct 2018 23:55:36 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gEndf-0005dO-Q4
-	for <qemu-devel@nongnu.org>; Tue, 23 Oct 2018 03:45:51 +0000
+	id 1gEnn4-0000FJ-Pz
+	for <qemu-devel@nongnu.org>; Tue, 23 Oct 2018 03:55:34 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A8E792E80CB
-	for <qemu-devel@nongnu.org>; Tue, 23 Oct 2018 03:45:51 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id BB5722E80C7
+	for <qemu-devel@nongnu.org>; Tue, 23 Oct 2018 03:55:34 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 23 Oct 2018 03:37:27 -0000
+Date: Tue, 23 Oct 2018 03:49:54 -0000
 From: wwb1234 <1799200@bugs.launchpad.net>
 Reply-To: Bug 1799200 <1799200@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <154020556283.828.7303147560096636851.malonedeb@wampee.canonical.com>
-Message-Id: <154026584739.1129.4325997359171002357.malone@wampee.canonical.com>
+Message-Id: <154026659435.29590.501430666599204290.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1799200] Re: null pointer dereference in
  tcg_emit_op
@@ -40,11 +40,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 
 Hi Emilio G. Cota (cota),
- for point 1, I don't know what you mean about leaking the ptr TCG temp
- for point 2. what I want to do is call callback function when execute  eve=
-ry guest instructions
- so I think it's not should inset code in .translate_insn. what do you thin=
-k about it?
+  thank you,
+  after I free the "ptr",there is no crash occur :)
 
 -- =
 
