@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47269)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50210)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gF27Y-0005Ta-5M
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 15:13:40 -0400
+	(envelope-from <noring@nocrew.org>) id 1gF2JB-0000TS-CQ
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 15:25:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gF27V-0005xu-FO
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 15:13:39 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:44579)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gF27N-0005jt-3T
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 15:13:32 -0400
-Received: by mail-oi1-x243.google.com with SMTP id u74-v6so2046810oia.11
-	for <qemu-devel@nongnu.org>; Tue, 23 Oct 2018 12:13:18 -0700 (PDT)
+	(envelope-from <noring@nocrew.org>) id 1gF2J6-0001BZ-8w
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 15:25:41 -0400
+Received: from ste-pvt-msa2.bahnhof.se ([213.80.101.71]:42598)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gF2J5-00013s-F1
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 15:25:36 -0400
+Date: Tue, 23 Oct 2018 21:25:25 +0200
+From: Fredrik Noring <noring@nocrew.org>
+Message-ID: <20181023192525.GC2244@sx9>
+References: <cover.1540134918.git.noring@nocrew.org>
+	<BN6PR2201MB125165723113459889A6EC59C6F40@BN6PR2201MB1251.namprd22.prod.outlook.com>
 MIME-Version: 1.0
-In-Reply-To: <20181023190843.GB8387@caravaggio>
-References: <20181022183656.4902-1-sameo@linux.intel.com>
-	<CAFEAcA9s9hJch1YNtS-0CrL73FTK5nxEEXA-ZnZm+x8+Ov-ZHQ@mail.gmail.com>
-	<20181023190843.GB8387@caravaggio>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 23 Oct 2018 20:12:57 +0100
-Message-ID: <CAFEAcA98gYKv3HbgkQd2CDd8CmmafrTqZSZGDktzLFcA8Zd+0A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 00/27] ACPI hardware-reduced support
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <BN6PR2201MB125165723113459889A6EC59C6F40@BN6PR2201MB1251.namprd22.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v8 00/38] target/mips: Limited support for
+ the R5900
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,24 +29,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Ortiz <sameo@linux.intel.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: "Maciej W. Rozycki" <macro@linux-mips.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Petar Jovanovic <pjovanovic@wavecomp.com>, Peter Maydell <peter.maydell@linaro.org>, =?utf-8?Q?J=C3=BCrgen?= Urban <JuergenUrban@gmx.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On 23 October 2018 at 20:08, Samuel Ortiz <sameo@linux.intel.com> wrote:
-> Hi Peter,
->
-> On Tue, Oct 23, 2018 at 08:01:26PM +0100, Peter Maydell wrote:
->> Hi -- I'd appreciate it if you don't send pull-requests for
->> patch series. They show up in my queue of things to merge directly
->> into master otherwise. Just send them as a patch-series email with
->> a cover letter, please.
-> Apologies, I did not know. I'll fix that with the next revision of
-> this patch set.
+Hi Maciej,
 
-No problem. You can give a git branch URL for reviewers to look
-at if you think it's helpful; just avoid using the stock git
-pull-request email wording about 'for you to fetch changes', because
-that's what my email filters look for :-)
+> target/mips/translate.c:4888:38: error: passing argument 3 of
+> =E2=80=98tcg_gen_add2_i32=E2=80=99 from incompatible pointer type
+> [-Werror=3Dincompatible-pointer-types]
+>              tcg_gen_add2_i32(t2, t3, cpu_LO[acc], cpu_HI[acc], t2, t3)=
+;
+>                                       ^~~~~~
 
-thanks
--- PMM
+Would you know if any MIPS ISA have LO and HI registers that are not
+32-bit? In QEMU they can obviously be either 32-bit or 64-bit, which
+causes the compilation error here.
+
+Fredrik
