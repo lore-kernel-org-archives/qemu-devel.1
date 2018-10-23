@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45959)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gF23l-0002vL-SR
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 15:09:46 -0400
+	(envelope-from <noring@nocrew.org>) id 1gF24q-0003U1-4P
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 15:10:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gF23h-0002Z9-4x
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 15:09:44 -0400
-Received: from mga17.intel.com ([192.55.52.151]:53548)
+	(envelope-from <noring@nocrew.org>) id 1gF24m-0003ig-V6
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 15:10:52 -0400
+Received: from pio-pvt-msa1.bahnhof.se ([79.136.2.40]:60290)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sameo@linux.intel.com>)
-	id 1gF23c-0002Pq-CB
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 15:09:38 -0400
-Date: Tue, 23 Oct 2018 21:08:43 +0200
-From: Samuel Ortiz <sameo@linux.intel.com>
-Message-ID: <20181023190843.GB8387@caravaggio>
-References: <20181022183656.4902-1-sameo@linux.intel.com>
-	<CAFEAcA9s9hJch1YNtS-0CrL73FTK5nxEEXA-ZnZm+x8+Ov-ZHQ@mail.gmail.com>
+	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gF24k-0003PA-Oq
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 15:10:48 -0400
+Date: Tue, 23 Oct 2018 21:10:23 +0200
+From: Fredrik Noring <noring@nocrew.org>
+Message-ID: <20181023191023.GB2244@sx9>
+References: <cover.1540134918.git.noring@nocrew.org>
+	<BN6PR2201MB125165723113459889A6EC59C6F40@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	<20181022172343.GB2331@sx9>
+	<alpine.LFD.2.21.1810221901170.19280@eddie.linux-mips.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA9s9hJch1YNtS-0CrL73FTK5nxEEXA-ZnZm+x8+Ov-ZHQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 00/27] ACPI hardware-reduced support
+In-Reply-To: <alpine.LFD.2.21.1810221901170.19280@eddie.linux-mips.org>
+Subject: Re: [Qemu-devel] [PATCH v8 00/38] target/mips: Limited support for
+ the R5900
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +30,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: "Maciej W. Rozycki" <macro@linux-mips.org>
+Cc: Aleksandar Markovic <amarkovic@wavecomp.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Petar Jovanovic <pjovanovic@wavecomp.com>, Peter Maydell <peter.maydell@linaro.org>, =?utf-8?Q?J=C3=BCrgen?= Urban <JuergenUrban@gmx.de>, qemu-devel@nongnu.org
 
-Hi Peter,
+Hi Maciej,
 
-On Tue, Oct 23, 2018 at 08:01:26PM +0100, Peter Maydell wrote:
-> On 22 October 2018 at 19:36, Samuel Ortiz <sameo@linux.intel.com> wrote:
-> > This patch set implements support for the ACPI hardware-reduced
-> > specification.
-> >
-> > The changes are coming from the NEMU [1] project where we're defining
-> > a new x86 machine type: i386/virt. This is an EFI only, ACPI
-> > hardware-reduced platform and as such we had to implement support
-> > for the latter.
-> >
-> > As a preliminary for adding hardware-reduced support to QEMU, we did
-> > some ACPI code reorganization with the following goals:
-> >
-> > * Share as much as possible of the current ACPI build APIs between
-> >   legacy and hardware-reduced ACPI.
-> > * Share the ACPI build code across machine types and architectures and
-> >   remove the typical PC machine type dependency.
-> >   Eventually we hope to see arm/virt also re-use much of that code.
-> >
-> > The rest of the patchset adds the hardware-reduced support on top of
-> > this code reorganization. Here again, the implementation is machine
-> > type, platform and architecture independent.
-> >
-> > [1] https://github.com/intel/nemu
-> >
-> >
-> > The following changes since commit b312532fd03413d0e6ae6767ec793a3e30f487b8:
-> >
-> >   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2018-10-19 19:01:07 +0100)
-> >
-> > are available in the Git repository at:
-> >
-> >   git@github.com:intel/nemu topic/upstream/acpi
-> >
-> > for you to fetch changes up to 4133ebe0d638d0a3d583bd89aa2360ef35ba746b:
-> >
-> >   hw: acpi: reduced: Add PCI hotplug support (2018-10-22 20:32:23 +0200)
+>  I have no authority to approve such a change for the kernel, but it looks 
+> reasonable to me and I will support you with it, with one reservation 
+> however.  As this is an ISA extension in the vendor-specific space, I 
+> think it belongs to a vendor-specific namespace, so as to make it clear it 
+> is not a generic architectural feature and also to avoid name clashes.
 > 
-> Hi -- I'd appreciate it if you don't send pull-requests for
-> patch series. They show up in my queue of things to merge directly
-> into master otherwise. Just send them as a patch-series email with
-> a cover letter, please.
-Apologies, I did not know. I'll fix that with the next revision of
-this patch set.
+>  So it has to be called Toshiba MMI or suchlike, similarly to how I 
+> requested that for the Longsoon MMI feature in a recent binutils review 
+> (cf <https://sourceware.org/ml/binutils/2018-07/msg00201.html> and 
+> binutils commit 8095d2f70e1a ("MIPS/GAS: Split Loongson MMI Instructions 
+> from loongson2f/3a")), with all the consequences throughout.
 
-Cheers,
-Samuel.
+Vendor ASE namespaces makes sense to me. I can prepare a patch for it.
+
+>  NB all but pipeline 1 instructions of these are also implemented by other 
+> members of the TXx9 family.  They seem to be referred to as just "multiply 
+> and multiply-add instructions" in the TX79 manual (cf Section B.3.1).
+
+Would
+
+ASE_TOSHIBA_MMI  -- TX79 128-bit multimedia instructions
+ASE_TOSHIBA_MAC  -- TXx9 multiply and multiply-add instructions (MADD etc.)
+ASE_TOSHIBA_MAC1 -- TX79 pipeline 1 variant of ASE_TOSHIBA_MAC
+ASE_TOSHIBA_FMA  -- R5900 FPU extensions (MADD.s etc.)
+
+be acceptable for the currently known Toshiba extensions? (Please propose
+better names.) One complication is that it seems only 8 bits are available
+for all vendor ASEs, and Toshiba would then scoop up half of those.
+
+Fredrik
