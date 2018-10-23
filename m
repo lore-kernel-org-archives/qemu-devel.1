@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42710)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gEwEh-0005g8-Qe
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gEwEi-0005g9-0k
 	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 08:56:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gEwEg-0003e1-Tn
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gEwEd-0003Zf-0d
 	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 08:56:39 -0400
-Date: Tue, 23 Oct 2018 08:56:12 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181023085603-mutt-send-email-mst@kernel.org>
-References: <20181012090752.31891-1-yuchenlin@synology.com>
-	<d8051b2fc349d58dcd98cd383ae6bf32@synology.com>
-	<75b2d7f3-88d3-b79c-e808-c21dcf661174@redhat.com>
+Received: from mail.uni-paderborn.de ([131.234.142.9]:57282)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
+	id 1gEwEV-0003KQ-6s
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 08:56:29 -0400
+References: <20181023120454.28553-1-richard.henderson@linaro.org>
+	<20181023120454.28553-2-richard.henderson@linaro.org>
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Message-ID: <d435889c-e4dc-06ae-3e41-56246050d63b@mail.uni-paderborn.de>
+Date: Tue, 23 Oct 2018 14:56:14 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <75b2d7f3-88d3-b79c-e808-c21dcf661174@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] vhost-scsi: prevent using uninitialized vqs
+In-Reply-To: <20181023120454.28553-2-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US-large
+Subject: Re: [Qemu-devel] [PATCH 1/7] decodetree: Add !extern flag to
+ argument sets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,60 +30,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Cc: yuchenlin <yuchenlin@synology.com>, Forrest Liu <forrestl@synology.com>, qemu-devel@nongnu.org, qemu-stable@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: sagark@eecs.berkeley.edu, palmer@sifive.com, peer.adelt@hni.uni-paderborn.de, Alistair.Francis@wdc.com, mjc@sifive.com
 
-On Tue, Oct 23, 2018 at 01:49:16AM +0200, Philippe Mathieu-Daud=E9 wrote:
-> On 22/10/18 4:17, yuchenlin via Qemu-devel wrote:
-> > Ping?
-> >=20
-> > On 2018-10-12 17:07, yuchenlin@synology.com wrote:
-> > > From: yuchenlin <yuchenlin@synology.com>
-> > >=20
-> > > There are 3 virtqueues (ctrl, event and cmd) for virtio scsi device=
-,
-> > > but seabios will only set the physical address for the 3rd one (cmd=
-).
-> > > Then in vhost_virtqueue_start(), virtio_queue_get_desc_addr()
-> > > will be 0 for ctrl and event vq.
-> > >=20
-> > > In this case, ctrl and event vq are not initialized.
-> > > vhost_verify_ring_mappings may use uninitialized vhost_virtqueue
-> > > such that vhost_verify_ring_part_mapping returns ENOMEM.
-> > >=20
-> > > When encountered this problem, we got the following logs:
-> > >=20
-> > > =A0=A0=A0 qemu-system-x86_64: Unable to map available ring for ring=
- 0
-> > > =A0=A0=A0 qemu-system-x86_64: Verify ring failure on region 0
-> > >=20
-> > > Signed-off-by: Forrest Liu <forrestl@synology.com>
-> > > Signed-off-by: yuchenlin <yuchenlin@synology.com>
->=20
-> Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
-Thanks I will queue this.
+On 10/23/18 2:04 PM, Richard Henderson wrote:
+> Allow argument sets to be shared between two decoders by avoiding
+> a re-declaration error.  Make sure that anonymous argument sets
+> have unique names.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>   scripts/decodetree.py | 34 +++++++++++++++++++++++-----------
+>   1 file changed, 23 insertions(+), 11 deletions(-)
+>
 
-> > > ---
-> > > =A0hw/scsi/vhost-scsi.c | 2 +-
-> > > =A01 file changed, 1 insertion(+), 1 deletion(-)
-> > >=20
-> > > diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
-> > > index becf550085..7f21b4f9d6 100644
-> > > --- a/hw/scsi/vhost-scsi.c
-> > > +++ b/hw/scsi/vhost-scsi.c
-> > > @@ -183,7 +183,7 @@ static void vhost_scsi_realize(DeviceState *dev=
-,
-> > > Error **errp)
-> > > =A0=A0=A0=A0 }
-> > >=20
-> > > =A0=A0=A0=A0 vsc->dev.nvqs =3D VHOST_SCSI_VQ_NUM_FIXED + vs->conf.n=
-um_queues;
-> > > -=A0=A0=A0 vsc->dev.vqs =3D g_new(struct vhost_virtqueue, vsc->dev.=
-nvqs);
-> > > +=A0=A0=A0 vsc->dev.vqs =3D g_new0(struct vhost_virtqueue, vsc->dev=
-.nvqs);
-> > > =A0=A0=A0=A0 vsc->dev.vq_index =3D 0;
-> > > =A0=A0=A0=A0 vsc->dev.backend_features =3D 0;
-> >=20
-> >=20
+Reviewed-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+
+Cheers,
+
+Bastian
