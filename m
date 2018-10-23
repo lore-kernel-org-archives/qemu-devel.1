@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51511)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51438)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gF6JI-0003EZ-8R
+	(envelope-from <mst@redhat.com>) id 1gF6JF-0003CR-LE
 	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 19:42:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gF6JF-0008DS-0N
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 19:42:03 -0400
-Received: from [185.30.24.106] (port=13470
+	(envelope-from <mst@redhat.com>) id 1gF6JD-0008AB-8A
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 19:42:01 -0400
+Received: from [185.30.24.106] (port=13370
 	helo=hotspot.internet-for-guests.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gF6JD-00089H-FR
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 19:42:00 -0400
-Date: Tue, 23 Oct 2018 19:41:32 -0400
+	(envelope-from <mst@redhat.com>) id 1gF6JC-0007h3-6f
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 19:41:58 -0400
+Date: Tue, 23 Oct 2018 19:41:31 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181023234112.188140-17-mst@redhat.com>
+Message-ID: <20181023234112.188140-7-mst@redhat.com>
 References: <20181023234112.188140-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20181023234112.188140-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 16/28] MAINTAINERS: list "tests/acpi-test-data"
- files in ACPI/SMBIOS section
+Subject: [Qemu-devel] [PULL 06/28] vhost-user-blk: start vhost when guest
+ kicks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +29,61 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Laszlo Ersek <lersek@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Thomas Huth <thuth@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Yongji Xie <elohimes@gmail.com>, Yongji Xie <xieyongji@baidu.com>, Chai Wen <chaiwen@baidu.com>, Ni Xun <nixun@baidu.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-From: Laszlo Ersek <lersek@redhat.com>
+From: Yongji Xie <elohimes@gmail.com>
 
-The "tests/acpi-test-data" files are currently not covered by any section
-in MAINTAINERS, and "scripts/checkpatch.pl" complains when new data files
-are added.
+Some old guests (before commit 7a11370e5: "virtio_blk: enable VQs early")
+kick virtqueue before setting VIRTIO_CONFIG_S_DRIVER_OK. This violates
+the virtio spec. But virtio 1.0 transitional devices support this behaviour.
+So we should start vhost when guest kicks in this case.
 
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Signed-off-by: Laszlo Ersek <lersek@redhat.com>
-Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
+Signed-off-by: Yongji Xie <xieyongji@baidu.com>
+Signed-off-by: Chai Wen <chaiwen@baidu.com>
+Signed-off-by: Ni Xun <nixun@baidu.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- MAINTAINERS | 2 ++
- 1 file changed, 2 insertions(+)
+ hw/block/vhost-user-blk.c | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 40672c4eba..b4d4bd4129 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1113,6 +1113,8 @@ F: hw/i386/acpi-build.[hc]
- F: hw/arm/virt-acpi-build.c
- F: tests/bios-tables-test.c
- F: tests/acpi-utils.[hc]
-+F: tests/acpi-test-data/*
-+F: tests/acpi-test-data/*/*
+diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
+index d755223643..1451940845 100644
+--- a/hw/block/vhost-user-blk.c
++++ b/hw/block/vhost-user-blk.c
+@@ -217,7 +217,32 @@ static uint64_t vhost_user_blk_get_features(VirtIODevice *vdev,
  
- ppc4xx
- M: Alexander Graf <agraf@suse.de>
+ static void vhost_user_blk_handle_output(VirtIODevice *vdev, VirtQueue *vq)
+ {
++    VHostUserBlk *s = VHOST_USER_BLK(vdev);
++    int i;
+ 
++    if (!(virtio_host_has_feature(vdev, VIRTIO_F_VERSION_1) &&
++        !virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1))) {
++        return;
++    }
++
++    if (s->dev.started) {
++        return;
++    }
++
++    /* Some guests kick before setting VIRTIO_CONFIG_S_DRIVER_OK so start
++     * vhost here instead of waiting for .set_status().
++     */
++    vhost_user_blk_start(vdev);
++
++    /* Kick right away to begin processing requests already in vring */
++    for (i = 0; i < s->dev.nvqs; i++) {
++        VirtQueue *kick_vq = virtio_get_queue(vdev, i);
++
++        if (!virtio_queue_get_desc_addr(vdev, i)) {
++            continue;
++        }
++        event_notifier_set(virtio_queue_get_host_notifier(kick_vq));
++    }
+ }
+ 
+ static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
 -- 
 MST
