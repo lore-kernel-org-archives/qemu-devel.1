@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51474)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gF6JG-0003DV-Pr
+	(envelope-from <mst@redhat.com>) id 1gF6JI-0003EZ-8R
 	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 19:42:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gF6JD-0008Aq-Nf
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 19:42:02 -0400
-Received: from [185.30.24.106] (port=13438
+	(envelope-from <mst@redhat.com>) id 1gF6JF-0008DS-0N
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 19:42:03 -0400
+Received: from [185.30.24.106] (port=13470
 	helo=hotspot.internet-for-guests.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gF6JC-00084l-N6
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 19:41:59 -0400
-Date: Tue, 23 Oct 2018 19:41:31 -0400
+	(envelope-from <mst@redhat.com>) id 1gF6JD-00089H-FR
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 19:42:00 -0400
+Date: Tue, 23 Oct 2018 19:41:32 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181023234112.188140-10-mst@redhat.com>
+Message-ID: <20181023234112.188140-17-mst@redhat.com>
 References: <20181023234112.188140-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20181023234112.188140-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 09/28] x86_iommu/amd: remove V=1 check from
- amdvi_validate_dte()
+Subject: [Qemu-devel] [PULL 16/28] MAINTAINERS: list "tests/acpi-test-data"
+ files in ACPI/SMBIOS section
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,73 +29,39 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Singh, Brijesh" <brijesh.singh@amd.com>, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Tom Lendacky <Thomas.Lendacky@amd.com>, Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Laszlo Ersek <lersek@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Thomas Huth <thuth@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-From: "Singh, Brijesh" <brijesh.singh@amd.com>
+From: Laszlo Ersek <lersek@redhat.com>
 
-Currently, the amdvi_validate_dte() assumes that a valid DTE will
-always have V=1. This is not true. The V=1 means that bit[127:1] are
-valid. A valid DTE can have IV=1 and V=0 (i.e address translation
-disabled and interrupt remapping enabled)
+The "tests/acpi-test-data" files are currently not covered by any section
+in MAINTAINERS, and "scripts/checkpatch.pl" complains when new data files
+are added.
 
-Remove the V=1 check from amdvi_validate_dte(), make the caller
-responsible to check for V or IV bits.
-
-This also fixes a bug in existing code that when error is
-detected during the translation we'll fail the translation
-instead of assuming a passthrough mode.
-
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>
 Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
 Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: Tom Lendacky <Thomas.Lendacky@amd.com>
-Cc: Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>
+Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/i386/amd_iommu.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ MAINTAINERS | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
-index 1fd669fef8..7206bb09c2 100644
---- a/hw/i386/amd_iommu.c
-+++ b/hw/i386/amd_iommu.c
-@@ -807,7 +807,7 @@ static inline uint64_t amdvi_get_perms(uint64_t entry)
-            AMDVI_DEV_PERM_SHIFT;
- }
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 40672c4eba..b4d4bd4129 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1113,6 +1113,8 @@ F: hw/i386/acpi-build.[hc]
+ F: hw/arm/virt-acpi-build.c
+ F: tests/bios-tables-test.c
+ F: tests/acpi-utils.[hc]
++F: tests/acpi-test-data/*
++F: tests/acpi-test-data/*/*
  
--/* a valid entry should have V = 1 and reserved bits honoured */
-+/* validate that reserved bits are honoured */
- static bool amdvi_validate_dte(AMDVIState *s, uint16_t devid,
-                                uint64_t *dte)
- {
-@@ -820,7 +820,7 @@ static bool amdvi_validate_dte(AMDVIState *s, uint16_t devid,
-         return false;
-     }
- 
--    return dte[0] & AMDVI_DEV_VALID;
-+    return true;
- }
- 
- /* get a device table entry given the devid */
-@@ -966,8 +966,12 @@ static void amdvi_do_translate(AMDVIAddressSpace *as, hwaddr addr,
-         return;
-     }
- 
--    /* devices with V = 0 are not translated */
-     if (!amdvi_get_dte(s, devid, entry)) {
-+        return;
-+    }
-+
-+    /* devices with V = 0 are not translated */
-+    if (!(entry[0] & AMDVI_DEV_VALID)) {
-         goto out;
-     }
- 
+ ppc4xx
+ M: Alexander Graf <agraf@suse.de>
 -- 
 MST
