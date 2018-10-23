@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36857)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gEygl-0006fy-G3
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 11:33:49 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1gEyhC-0006ks-AX
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 11:34:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gEycb-0007h6-6K
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 11:29:30 -0400
-Date: Tue, 23 Oct 2018 16:23:50 +0100
+	(envelope-from <dgibson@ozlabs.org>) id 1gEyby-00076i-3M
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 11:28:51 -0400
+Date: Tue, 23 Oct 2018 16:25:57 +0100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181023152350.GQ12127@umbus.hotspot.internet-for-guests.com>
+Message-ID: <20181023152557.GV12127@umbus.hotspot.internet-for-guests.com>
 References: <20181018200422.4358-1-ehabkost@redhat.com>
-	<20181018200422.4358-37-ehabkost@redhat.com>
+	<20181018200422.4358-42-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="eLe8FOcWSbbyMVJD"
+	protocol="application/pgp-signature"; boundary="Zd8I2GZVcdxtyaG/"
 Content-Disposition: inline
-In-Reply-To: <20181018200422.4358-37-ehabkost@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 36/45] net: lan9118: convert SysBus init
+In-Reply-To: <20181018200422.4358-42-ehabkost@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 41/45] net: smc91c111: convert SysBus init
  method to a realize method
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,64 +29,60 @@ To: Eduardo Habkost <ehabkost@redhat.com>
 Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Rob Herring <robh@kernel.org>, libvir-list@redhat.com, Richard Henderson <rth@twiddle.net>, Eric Blake <eblake@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-arm@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Markus Armbruster <armbru@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Michael Walle <michael@walle.cc>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Alistair Francis <alistair@alistair23.me>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-ppc@nongnu.org, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Max Filippov <jcmvbkbc@gmail.com>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 
 
---eLe8FOcWSbbyMVJD
+--Zd8I2GZVcdxtyaG/
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 18, 2018 at 05:04:13PM -0300, Eduardo Habkost wrote:
+On Thu, Oct 18, 2018 at 05:04:18PM -0300, Eduardo Habkost wrote:
 > From: C=E9dric Le Goater <clg@kaod.org>
 >=20
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> Message-Id: <20181001063803.22330-4-clg@kaod.org>
+> Message-Id: <20181001063803.22330-9-clg@kaod.org>
 > Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
 > ---
->  hw/net/lan9118.c | 9 +++------
->  1 file changed, 3 insertions(+), 6 deletions(-)
+>  hw/net/smc91c111.c | 8 +++-----
+>  1 file changed, 3 insertions(+), 5 deletions(-)
 >=20
-> diff --git a/hw/net/lan9118.c b/hw/net/lan9118.c
-> index b9032dac59..a6269d9463 100644
-> --- a/hw/net/lan9118.c
-> +++ b/hw/net/lan9118.c
-> @@ -1320,9 +1320,9 @@ static NetClientInfo net_lan9118_info =3D {
->      .link_status_changed =3D lan9118_set_link,
+> diff --git a/hw/net/smc91c111.c b/hw/net/smc91c111.c
+> index d2fd2040e8..99da2d9297 100644
+> --- a/hw/net/smc91c111.c
+> +++ b/hw/net/smc91c111.c
+> @@ -766,9 +766,9 @@ static NetClientInfo net_smc91c111_info =3D {
+>      .receive =3D smc91c111_receive,
 >  };
 > =20
-> -static int lan9118_init1(SysBusDevice *sbd)
-> +static void lan9118_realize(DeviceState *dev, Error **errp)
+> -static int smc91c111_init1(SysBusDevice *sbd)
+> +static void smc91c111_realize(DeviceState *dev, Error **errp)
 >  {
 > -    DeviceState *dev =3D DEVICE(sbd);
 > +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
->      lan9118_state *s =3D LAN9118(dev);
->      QEMUBH *bh;
->      int i;
-> @@ -1349,8 +1349,6 @@ static int lan9118_init1(SysBusDevice *sbd)
->      s->timer =3D ptimer_init(bh, PTIMER_POLICY_DEFAULT);
->      ptimer_set_freq(s->timer, 10000);
->      ptimer_set_limit(s->timer, 0xffff, 1);
-> -
+>      smc91c111_state *s =3D SMC91C111(dev);
+> =20
+>      memory_region_init_io(&s->mmio, OBJECT(s), &smc91c111_mem_ops, s,
+> @@ -780,7 +780,6 @@ static int smc91c111_init1(SysBusDevice *sbd)
+>                            object_get_typename(OBJECT(dev)), dev->id, s);
+>      qemu_format_nic_info_str(qemu_get_queue(s->nic), s->conf.macaddr.a);
+>      /* ??? Save/restore.  */
 > -    return 0;
 >  }
 > =20
->  static Property lan9118_properties[] =3D {
-> @@ -1362,12 +1360,11 @@ static Property lan9118_properties[] =3D {
->  static void lan9118_class_init(ObjectClass *klass, void *data)
+>  static Property smc91c111_properties[] =3D {
+> @@ -791,9 +790,8 @@ static Property smc91c111_properties[] =3D {
+>  static void smc91c111_class_init(ObjectClass *klass, void *data)
 >  {
 >      DeviceClass *dc =3D DEVICE_CLASS(klass);
 > -    SysBusDeviceClass *k =3D SYS_BUS_DEVICE_CLASS(klass);
 > =20
-> -    k->init =3D lan9118_init1;
->      dc->reset =3D lan9118_reset;
->      dc->props =3D lan9118_properties;
->      dc->vmsd =3D &vmstate_lan9118;
-> +    dc->realize =3D lan9118_realize;
->  }
-> =20
->  static const TypeInfo lan9118_info =3D {
+> -    k->init =3D smc91c111_init1;
+> +    dc->realize =3D smc91c111_realize;
+>      dc->reset =3D smc91c111_reset;
+>      dc->vmsd =3D &vmstate_smc91c111;
+>      dc->props =3D smc91c111_properties;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -94,24 +90,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---eLe8FOcWSbbyMVJD
+--Zd8I2GZVcdxtyaG/
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlvPPQYACgkQbDjKyiDZ
-s5I88A//V2rT/Wje9fcPNIEE/vTsOlANi2zMYzpQMDghToF2hsVOV+X5GSVEAfSW
-ycqt7GFGayATKOVNCLlf9amGtevbKGLqcajoKXcpWERbOnKSCoX267pS4P4Dpeax
-yQRT14WJ21EC9cKMtD30rtxPZl57K0zNXLVSPr4sU5UmxQc5Aki3OnChJ3YtAZr8
-+yax5i79gsrn1YRqY5nxlPnmenJ3vMRLjv3ZCYhUS309HfSyQXl3orrMbWFNcF5u
-JDMwx4s7VYPegh2aI+58O58Su+tTL2xcu4gQ3ADKNXLeBXDQEVG4Fvy1sJ5ZMILc
-sjqXNKDDm0MG6L2SAue3zdDVIXnkiX7gw01gxDpWdq9fa6sVA1VH35Zqi9/KpZxg
-Mkv7aWR4pfcGhH+M2HsFADvjdciYrVaVNWR0Lk7usaDk4AoM7C/dZDLj/osq0dr4
-xQBZcRp1TYMRJuBa3TvmUATNqKu/CdNuERbhaUJ5G0pyWMzteZZ1piubzeaAN18A
-snTrGYKsIZz05IHz+JARFdEcb0RzFXl14SotwpGLN9wktycBflfOZ1H+Fxi7Gqbh
-rEnHG7xP8fwz3KGqrElP2au0BgcR4tQouQ2jCc7CqOHf+BOEcuLgF6lCcxCIk6+y
-kYU+uHC65xoDGeDRpZjFTiRUhUF7lYc/iP5lKXKEXT1ZYhwBkaQ=
-=3Zsw
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlvPPYUACgkQbDjKyiDZ
+s5KYGw/+J49J74ma2Qncbz0rUAlphJfIXryCOepHL/qP8//G4Be71VDPYLWlo+7P
+5Td6W62Ygn6ny/c4MKzKUugQWbWsRLSdhd5aaAE+E0zk23VXFuhr9hWgZOT2ImRW
+CPrYd0LpFEq4+g4l7DQ29JMASlH2Lmwk/DqCEHmTd4YZk8aoRz+BAuKn4EzLAYLd
+fGcqclqbXghvbq2IdEb0Gq7K/6oZOT782eetZ2d6PASsjiLaTx8+HOu0nbFK2S7M
+vQy1wTXYTIl1wq6tzE9UTXVFmi1AbEYihLbo94hZ3lZJteVB7/ycB4f1W/gWc9B7
+h6t1w8udQLTWyMwfhAq7yRGTilx6Z2dJk2ZadU3TyLLoGkd/K/0MryB/k+gSlv0p
+fPJzMFA38UAPxhicouGz051ENnH3duYq0PF1tX4Mf12rWacC1ABjiZlRtRIhujfh
+MJ7T4mqCq9vxoDtzypUHyc5B++JhPg7gRVSRj9fBEeu/auYVplD9/hEsf5EFJe3o
+OabtrWMT6JFyZOpUPOcE5kgtWpkOupm6PPAgUeDSmSpK9Avh5/m0/cRhH9EClM5h
+c89LKAgaW28lcH8tvd0hsJaVEAgBoNCxRgngk8ys75akkG8U9UusOdJVflTZu6h1
+9+DPnNb6QY1xC6CIHssnHJYHoSa+gh2LttvY99lJuXObWA8xf28=
+=/3S7
 -----END PGP SIGNATURE-----
 
---eLe8FOcWSbbyMVJD--
+--Zd8I2GZVcdxtyaG/--
