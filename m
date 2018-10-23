@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57271)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38872)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gF141-0001W7-O0
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 14:05:58 -0400
+	(envelope-from <philmd@redhat.com>) id 1gF1bs-0000YL-Va
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 14:40:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gF13y-0005Xw-V0
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 14:05:57 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:33847)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1gF13y-0005Gv-Kd
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 14:05:54 -0400
-References: <1540300056-7935-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1540300056-7935-3-git-send-email-aleksandar.markovic@rt-rk.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <73c93e70-997e-7ec0-0814-ee2f491d933c@vivier.eu>
-Date: Tue, 23 Oct 2018 19:04:24 +0100
+	(envelope-from <philmd@redhat.com>) id 1gF1bp-00012U-R4
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 14:40:56 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:39083)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gF1bn-00010Z-Vk
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 14:40:53 -0400
+Received: by mail-wr1-f68.google.com with SMTP id r10-v6so1923205wrv.6
+	for <qemu-devel@nongnu.org>; Tue, 23 Oct 2018 11:40:51 -0700 (PDT)
+References: <20181023120454.28553-1-richard.henderson@linaro.org>
+	<20181023120454.28553-2-richard.henderson@linaro.org>
+	<2eb3d12f-1a2b-8194-e1a4-cfd6396f3aa5@redhat.com>
+	<fc2e13a8-ee93-9a73-1c19-d9ff6576f793@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <c58275c6-93b0-e0dd-8a66-6b07f8f40f54@redhat.com>
+Date: Tue, 23 Oct 2018 20:40:48 +0200
 MIME-Version: 1.0
-In-Reply-To: <1540300056-7935-3-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <fc2e13a8-ee93-9a73-1c19-d9ff6576f793@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] linux-user: Add support for
- semtimedop() syscall
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/7] decodetree: Add !extern flag to
+ argument sets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,59 +33,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net, arikalo@wavecomp.com, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, riku.voipio@iki.fi, ysu@wavecomp.com
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: sagark@eecs.berkeley.edu, kbastian@mail.uni-paderborn.de, palmer@sifive.com, peer.adelt@hni.uni-paderborn.de, Alistair.Francis@wdc.com, mjc@sifive.com
 
-On 23/10/2018 14:07, Aleksandar Markovic wrote:
-> From: Aleksandar Rikalo <arikalo@wavecomp.com>
+On 23/10/18 15:54, Richard Henderson wrote:
+> On 10/23/18 2:27 PM, Philippe Mathieu-Daudé wrote:
+>>> +        if re_fullmatch('!extern', t):
+>>> +            extern = True
+>>
+>> It looks odd to match a negative form then use a positive one.
+>>
+>> Why not simply use 'extern'?
 > 
-> Add support for semtimedop() emulation.
+> "!" is an escape character here.
+> Just "escape" would be a field named "escape".
 > 
-> Signed-off-by: Aleksandar Rikalo <arikalo@wavecomp.com>
-> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> ---
->  linux-user/syscall.c | 27 +++++++++++++++++++++++++++
->  1 file changed, 27 insertions(+)
-> 
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 8b01ab0..e722ba8 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -6162,7 +6162,29 @@ static inline abi_long host_to_target_stat64(void *cpu_env,
->      return 0;
->  }
->  #endif
-> +#ifdef TARGET_NR_semtimedop
-> +static inline abi_long do_semtimedop(int semid, abi_long ptr, unsigned nsops,
-> +                                     abi_long timeout)
-> +{
-> +    struct sembuf sops[nsops];
-> +    struct timespec ts, *pts;
-> +
-> +    if (timeout) {
-> +        pts = &ts;
-> +        if (target_to_host_timespec(pts, timeout)) {
-> +            return -TARGET_EFAULT;
-> +        }
-> +    } else {
-> +        pts = NULL;
-> +    }
->  
-> +    if (target_to_host_sembuf(sops, ptr, nsops)) {
-> +        return -TARGET_EFAULT;
-> +    }
-> +
-> +    return get_errno(semtimedop(semid, sops, nsops, pts));
-> +}
+> It follows existing similar syntax for !function=foo
 
-The current function do_semop() actually uses a safe_semtimedop() with a
-NULL timeout pointer. Perhaps you can change/rename this function to
-take the timeout pointer and convert it, and use it for TARGET_NR_semop
-with NULL timeout pointer and with TARGET_NR_semtimeop with the pointer
-to the target timeout.
-
-And agree with Philippe, I think it's a good opportunity to replace the
-stack allocated structure by a g_mallocated_one()
+Oh OK!
 
 Thanks,
-Laurent
+
+Phil.
