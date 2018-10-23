@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gEyht-0007h6-Dl
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 11:34:59 -0400
+	(envelope-from <david@redhat.com>) id 1gEyhr-0007et-Sg
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 11:34:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gEyWi-0001Na-Db
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 11:23:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56746)
+	(envelope-from <david@redhat.com>) id 1gEyXE-0001ge-ON
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 11:23:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40166)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gEyWf-0001Ju-TY
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 11:23:23 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gEyXE-0001eR-Im
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 11:23:56 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Tue, 23 Oct 2018 17:22:59 +0200
-Message-Id: <20181023152306.3123-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 0/7] qapi/range/memory-device: fixes and
- cleanups
+Date: Tue, 23 Oct 2018 17:23:04 +0200
+Message-Id: <20181023152306.3123-6-david@redhat.com>
+In-Reply-To: <20181023152306.3123-1-david@redhat.com>
+References: <20181023152306.3123-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 5/7] memory-device: use QEMU_IS_ALIGNED
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,46 +26,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, David Hildenbrand <david@redhat.com>
 
-While working on memory device code, I noticed that specifiying an uint64_t
-on command line does not work in all cases as we always parse an int64_t.
-So I fix that and also cleanup the old int64_t parser.
+Shorter and easier to read.
 
-To be able to fix some overflows in memory-device code in a clean way,
-I am reusing the range implementation of qemu, for which I need some
-more helpers.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ hw/mem/memory-device.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-This series is based on
-    "[PATCH v5 00/16] memory-device: complete refactoring"
-which should get pulled soon.
-
-v2 -> v3:
-- "qapi: correctly parse uint64_t values from strings"
--- don't parse range
--- don't rename "parse_str"
-
-v1 -> v2:
-- "range: add some more functions"
--- Reduce number of functions
--- make range_init() return an error in case of overflow
--- provide range_init_nofail()
-- "memory-device: rewrite address assignment using ranges"
--- Use new functions range_init/range_init_nofail
--- Use range_contains_range instead of starts_before/ends_after
-
-
-David Hildenbrand (7):
-  qapi: use qemu_strtoi64() in parse_str
-  qapi: correctly parse uint64_t values from strings
-  range: pass const pointer where possible
-  range: add some more functions
-  memory-device: use QEMU_IS_ALIGNED
-  memory-device: avoid overflows on very huge devices
-  memory-device: rewrite address assignment using ranges
-
- hw/mem/memory-device.c      | 60 ++++++++++++++++++--------------
- include/qemu/range.h        | 68 +++++++++++++++++++++++++++++++++++--
- qapi/string-input-visitor.c | 34 ++++++++-----------
- 3 files changed, 114 insertions(+), 48 deletions(-)
-
+diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
+index 7de1ccd497..996ad1490f 100644
+--- a/hw/mem/memory-device.c
++++ b/hw/mem/memory-device.c
+@@ -120,7 +120,7 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
+     g_assert(address_space_end >= address_space_start);
+ 
+     /* address_space_start indicates the maximum alignment we expect */
+-    if (QEMU_ALIGN_UP(address_space_start, align) != address_space_start) {
++    if (!QEMU_IS_ALIGNED(address_space_start, align)) {
+         error_setg(errp, "the alignment (0x%" PRIx64 ") is not supported",
+                    align);
+         return 0;
+@@ -131,13 +131,13 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
+         return 0;
+     }
+ 
+-    if (hint && QEMU_ALIGN_UP(*hint, align) != *hint) {
++    if (hint && !QEMU_IS_ALIGNED(*hint, align)) {
+         error_setg(errp, "address must be aligned to 0x%" PRIx64 " bytes",
+                    align);
+         return 0;
+     }
+ 
+-    if (QEMU_ALIGN_UP(size, align) != size) {
++    if (!QEMU_IS_ALIGNED(size, align)) {
+         error_setg(errp, "backend memory size must be multiple of 0x%"
+                    PRIx64, align);
+         return 0;
 -- 
 2.17.1
