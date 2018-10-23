@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gF6JK-0003Fs-3A
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 19:42:16 -0400
+	(envelope-from <mst@redhat.com>) id 1gF6JQ-0003Lo-FT
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 19:42:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gF6JD-0008B0-PH
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 19:42:05 -0400
-Received: from [185.30.24.106] (port=13444
+	(envelope-from <mst@redhat.com>) id 1gF6JF-0008E4-AY
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 19:42:11 -0400
+Received: from [185.30.24.106] (port=13480
 	helo=hotspot.internet-for-guests.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gF6JC-00086K-EP
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 19:41:59 -0400
-Date: Tue, 23 Oct 2018 19:41:31 -0400
+	(envelope-from <mst@redhat.com>) id 1gF6JD-0008AT-MB
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 19:42:00 -0400
+Date: Tue, 23 Oct 2018 19:41:33 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181023234112.188140-12-mst@redhat.com>
+Message-ID: <20181023234112.188140-20-mst@redhat.com>
 References: <20181023234112.188140-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20181023234112.188140-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 11/28] x86_iommu/amd: Prepare for interrupt
- remap support
+Subject: [Qemu-devel] [PULL 19/28] hw/pci-host/x86: extend the 64-bit PCI
+ hole relative to the fw-assigned base
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,226 +29,146 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Singh, Brijesh" <brijesh.singh@amd.com>, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Tom Lendacky <Thomas.Lendacky@amd.com>, Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Laszlo Ersek <lersek@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-From: "Singh, Brijesh" <brijesh.singh@amd.com>
+From: Laszlo Ersek <lersek@redhat.com>
 
-Register the interrupt remapping callback and read/write ops for the
-amd-iommu-ir memory region.
+In commit 9fa99d2519cb ("hw/pci-host: Fix x86 Host Bridges 64bit PCI
+hole", 2017-11-16), we meant to expose such a 64-bit PCI MMIO aperture in
+the ACPI DSDT that would be at least as large as the new "pci-hole64-size"
+property (2GB on i440fx, 32GB on q35). The goal was to offer "enough"
+64-bit MMIO aperture to the guest OS for hotplug purposes.
 
-amd-iommu-ir is set to higher priority to ensure that this region won't
-be masked out by other memory regions.
+In that commit, we added or modified five functions:
 
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-Cc: Peter Xu <peterx@redhat.com>
+- pc_pci_hole64_start(): shared between i440fx and q35. Provides a default
+  64-bit base, which starts beyond the cold-plugged 64-bit RAM, and skips
+  the DIMM hotplug area too (if any).
+
+- i440fx_pcihost_get_pci_hole64_start(), q35_host_get_pci_hole64_start():
+  board-specific 64-bit base property getters called abstractly by the
+  ACPI generator. Both of these fall back to pc_pci_hole64_start() if the
+  firmware didn't program any 64-bit hole (i.e. if the firmware didn't
+  assign a 64-bit GPA to any MMIO BAR on any device). Otherwise, they
+  honor the firmware's BAR assignments (i.e., they treat the lowest 64-bit
+  GPA programmed by the firmware as the base address for the aperture).
+
+- i440fx_pcihost_get_pci_hole64_end(), q35_host_get_pci_hole64_end():
+  these intended to extend the aperture to our size recommendation,
+  calculated relative to the base of the aperture.
+
+Despite the original intent, i440fx_pcihost_get_pci_hole64_end() and
+q35_host_get_pci_hole64_end() currently only extend the aperture relative
+to the default base (pc_pci_hole64_start()), ignoring any programming done
+by the firmware. This means that our size recommendation may not be met.
+Fix it by honoring the firmware's address assignments.
+
+The strange extension sizes were spotted by Alex, in the log of a guest
+kernel running on top of OVMF (which prefers to assign 64-bit GPAs to
+64-bit BARs).
+
+This change only affects DSDT generation, therefore no new compat property
+is being introduced.
+
+Using an i440fx OVMF guest with 5GB RAM, an example _CRS change is:
+
+> @@ -881,9 +881,9 @@
+>              QWordMemory (ResourceProducer, PosDecode, MinFixed, MaxFixed, Cacheable, ReadWrite,
+>                  0x0000000000000000, // Granularity
+>                  0x0000000800000000, // Range Minimum
+> -                0x000000080001C0FF, // Range Maximum
+> +                0x000000087FFFFFFF, // Range Maximum
+>                  0x0000000000000000, // Translation Offset
+> -                0x000000000001C100, // Length
+> +                0x0000000080000000, // Length
+>                  ,, , AddressRangeMemory, TypeStatic)
+>          })
+>          Device (GPE0)
+
+(On i440fx, the low RAM split is at 3GB, in this case. Therefore, with 5GB
+guest RAM and no DIMM hotplug range, pc_pci_hole64_start() returns 4 +
+(5-3) = 6 GB. Adding the 2GB extension to that yields 8GB, which is below
+the firmware-programmed base of 32GB, before the patch. Therefore, before
+the patch, the extension is ineffective. After the patch, we add the 2GB
+extension to the firmware-programmed base, namely 32GB.)
+
+Using a q35 OVMF guest with 5GB RAM, an example _CRS change is:
+
+> @@ -3162,9 +3162,9 @@
+>              QWordMemory (ResourceProducer, PosDecode, MinFixed, MaxFixed, Cacheable, ReadWrite,
+>                  0x0000000000000000, // Granularity
+>                  0x0000000800000000, // Range Minimum
+> -                0x00000009BFFFFFFF, // Range Maximum
+> +                0x0000000FFFFFFFFF, // Range Maximum
+>                  0x0000000000000000, // Translation Offset
+> -                0x00000001C0000000, // Length
+> +                0x0000000800000000, // Length
+>                  ,, , AddressRangeMemory, TypeStatic)
+>          })
+>          Device (GPE0)
+
+(On Q35, the low RAM split is at 2GB. Therefore, with 5GB guest RAM and no
+DIMM hotplug range, pc_pci_hole64_start() returns 4 + (5-2) = 7 GB. Adding
+the 32GB extension to that yields 39GB (0x0000_0009_BFFF_FFFF + 1), before
+the patch. After the patch, we add the 32GB extension to the
+firmware-programmed base, namely 32GB.)
+
+The ACPI test data for the bios-tables-test case that we added earlier in
+this series are corrected too, as follows:
+
+> @@ -3339,9 +3339,9 @@
+>              QWordMemory (ResourceProducer, PosDecode, MinFixed, MaxFixed, Cacheable, ReadWrite,
+>                  0x0000000000000000, // Granularity
+>                  0x0000000200000000, // Range Minimum
+> -                0x00000009BFFFFFFF, // Range Maximum
+> +                0x00000009FFFFFFFF, // Range Maximum
+>                  0x0000000000000000, // Translation Offset
+> -                0x00000007C0000000, // Length
+> +                0x0000000800000000, // Length
+>                  ,, , AddressRangeMemory, TypeStatic)
+>          })
+>          Device (GPE0)
+
 Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
 Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: Tom Lendacky <Thomas.Lendacky@amd.com>
-Cc: Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Fixes: 9fa99d2519cbf71f871e46871df12cb446dc1c3e
+Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/i386/amd_iommu.h  |  14 +++++-
- hw/i386/amd_iommu.c  | 106 +++++++++++++++++++++++++++++++++++++++++++
- hw/i386/trace-events |   5 ++
- 3 files changed, 123 insertions(+), 2 deletions(-)
+ hw/pci-host/piix.c | 2 +-
+ hw/pci-host/q35.c  | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/i386/amd_iommu.h b/hw/i386/amd_iommu.h
-index 874030582d..4e7cc271c4 100644
---- a/hw/i386/amd_iommu.h
-+++ b/hw/i386/amd_iommu.h
-@@ -206,8 +206,18 @@
- 
- #define AMDVI_COMMAND_SIZE   16
- 
--#define AMDVI_INT_ADDR_FIRST 0xfee00000
--#define AMDVI_INT_ADDR_LAST  0xfeefffff
-+#define AMDVI_INT_ADDR_FIRST    0xfee00000
-+#define AMDVI_INT_ADDR_LAST     0xfeefffff
-+#define AMDVI_INT_ADDR_SIZE     (AMDVI_INT_ADDR_LAST - AMDVI_INT_ADDR_FIRST + 1)
-+#define AMDVI_MSI_ADDR_HI_MASK  (0xffffffff00000000ULL)
-+#define AMDVI_MSI_ADDR_LO_MASK  (0x00000000ffffffffULL)
-+
-+/* SB IOAPIC is always on this device in AMD systems */
-+#define AMDVI_IOAPIC_SB_DEVID   PCI_BUILD_BDF(0, PCI_DEVFN(0x14, 0))
-+
-+/* Interrupt remapping errors */
-+#define AMDVI_IR_ERR            0x1
-+
- 
- #define TYPE_AMD_IOMMU_DEVICE "amd-iommu"
- #define AMD_IOMMU_DEVICE(obj)\
-diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
-index 4bec1c6688..9118a75530 100644
---- a/hw/i386/amd_iommu.c
-+++ b/hw/i386/amd_iommu.c
-@@ -26,6 +26,7 @@
- #include "amd_iommu.h"
- #include "qapi/error.h"
- #include "qemu/error-report.h"
-+#include "hw/i386/apic_internal.h"
- #include "trace.h"
- 
- /* used AMD-Vi MMIO registers */
-@@ -1031,6 +1032,99 @@ static IOMMUTLBEntry amdvi_translate(IOMMUMemoryRegion *iommu, hwaddr addr,
-     return ret;
- }
- 
-+/* Interrupt remapping for MSI/MSI-X entry */
-+static int amdvi_int_remap_msi(AMDVIState *iommu,
-+                               MSIMessage *origin,
-+                               MSIMessage *translated,
-+                               uint16_t sid)
-+{
-+    assert(origin && translated);
-+
-+    trace_amdvi_ir_remap_msi_req(origin->address, origin->data, sid);
-+
-+    if (!iommu || !X86_IOMMU_DEVICE(iommu)->intr_supported) {
-+        memcpy(translated, origin, sizeof(*origin));
-+        goto out;
-+    }
-+
-+    if (origin->address & AMDVI_MSI_ADDR_HI_MASK) {
-+        trace_amdvi_err("MSI address high 32 bits non-zero when "
-+                        "Interrupt Remapping enabled.");
-+        return -AMDVI_IR_ERR;
-+    }
-+
-+    if ((origin->address & AMDVI_MSI_ADDR_LO_MASK) != APIC_DEFAULT_ADDRESS) {
-+        trace_amdvi_err("MSI is not from IOAPIC.");
-+        return -AMDVI_IR_ERR;
-+    }
-+
-+out:
-+    trace_amdvi_ir_remap_msi(origin->address, origin->data,
-+                             translated->address, translated->data);
-+    return 0;
-+}
-+
-+static int amdvi_int_remap(X86IOMMUState *iommu,
-+                           MSIMessage *origin,
-+                           MSIMessage *translated,
-+                           uint16_t sid)
-+{
-+    return amdvi_int_remap_msi(AMD_IOMMU_DEVICE(iommu), origin,
-+                               translated, sid);
-+}
-+
-+static MemTxResult amdvi_mem_ir_write(void *opaque, hwaddr addr,
-+                                      uint64_t value, unsigned size,
-+                                      MemTxAttrs attrs)
-+{
-+    int ret;
-+    MSIMessage from = { 0, 0 }, to = { 0, 0 };
-+    uint16_t sid = AMDVI_IOAPIC_SB_DEVID;
-+
-+    from.address = (uint64_t) addr + AMDVI_INT_ADDR_FIRST;
-+    from.data = (uint32_t) value;
-+
-+    trace_amdvi_mem_ir_write_req(addr, value, size);
-+
-+    if (!attrs.unspecified) {
-+        /* We have explicit Source ID */
-+        sid = attrs.requester_id;
-+    }
-+
-+    ret = amdvi_int_remap_msi(opaque, &from, &to, sid);
-+    if (ret < 0) {
-+        /* TODO: log the event using IOMMU log event interface */
-+        error_report_once("failed to remap interrupt from devid 0x%x", sid);
-+        return MEMTX_ERROR;
-+    }
-+
-+    apic_get_class()->send_msi(&to);
-+
-+    trace_amdvi_mem_ir_write(to.address, to.data);
-+    return MEMTX_OK;
-+}
-+
-+static MemTxResult amdvi_mem_ir_read(void *opaque, hwaddr addr,
-+                                     uint64_t *data, unsigned size,
-+                                     MemTxAttrs attrs)
-+{
-+    return MEMTX_OK;
-+}
-+
-+static const MemoryRegionOps amdvi_ir_ops = {
-+    .read_with_attrs = amdvi_mem_ir_read,
-+    .write_with_attrs = amdvi_mem_ir_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+    .impl = {
-+        .min_access_size = 4,
-+        .max_access_size = 4,
-+    },
-+    .valid = {
-+        .min_access_size = 4,
-+        .max_access_size = 4,
-+    }
-+};
-+
- static AddressSpace *amdvi_host_dma_iommu(PCIBus *bus, void *opaque, int devfn)
+diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
+index 15cc34912e..999db824da 100644
+--- a/hw/pci-host/piix.c
++++ b/hw/pci-host/piix.c
+@@ -285,7 +285,7 @@ static void i440fx_pcihost_get_pci_hole64_end(Object *obj, Visitor *v,
  {
-     char name[128];
-@@ -1066,6 +1160,7 @@ static AddressSpace *amdvi_host_dma_iommu(PCIBus *bus, void *opaque, int devfn)
-          * |-----------------+-------------------+----------+
-          * | amdvi_root      | 00000000-ffffffff |        0 |
-          * |  amdvi_iommu    | 00000000-ffffffff |        1 |
-+         * |  amdvi_iommu_ir | fee00000-feefffff |       64 |
-          * |-----------------+-------------------+----------|
-          */
-         memory_region_init_iommu(&amdvi_dev_as->iommu,
-@@ -1076,6 +1171,13 @@ static AddressSpace *amdvi_host_dma_iommu(PCIBus *bus, void *opaque, int devfn)
-         memory_region_init(&amdvi_dev_as->root, OBJECT(s),
-                            "amdvi_root", UINT64_MAX);
-         address_space_init(&amdvi_dev_as->as, &amdvi_dev_as->root, name);
-+        memory_region_init_io(&amdvi_dev_as->iommu_ir, OBJECT(s),
-+                              &amdvi_ir_ops, s, "amd_iommu_ir",
-+                              AMDVI_INT_ADDR_SIZE);
-+        memory_region_add_subregion_overlap(&amdvi_dev_as->root,
-+                                            AMDVI_INT_ADDR_FIRST,
-+                                            &amdvi_dev_as->iommu_ir,
-+                                            64);
-         memory_region_add_subregion_overlap(&amdvi_dev_as->root, 0,
-                                             MEMORY_REGION(&amdvi_dev_as->iommu),
-                                             1);
-@@ -1196,6 +1298,9 @@ static void amdvi_realize(DeviceState *dev, Error **err)
-         return;
-     }
+     PCIHostState *h = PCI_HOST_BRIDGE(obj);
+     I440FXState *s = I440FX_PCI_HOST_BRIDGE(obj);
+-    uint64_t hole64_start = pc_pci_hole64_start();
++    uint64_t hole64_start = i440fx_pcihost_get_pci_hole64_start_value(obj);
+     Range w64;
+     uint64_t value, hole64_end;
  
-+    /* Pseudo address space under root PCI bus. */
-+    pcms->ioapic_as = amdvi_host_dma_iommu(bus, s, AMDVI_IOAPIC_SB_DEVID);
-+
-     /* set up MMIO */
-     memory_region_init_io(&s->mmio, OBJECT(s), &mmio_mem_ops, s, "amdvi-mmio",
-                           AMDVI_MMIO_SIZE);
-@@ -1229,6 +1334,7 @@ static void amdvi_class_init(ObjectClass *klass, void* data)
-     dc->vmsd = &vmstate_amdvi;
-     dc->hotpluggable = false;
-     dc_class->realize = amdvi_realize;
-+    dc_class->int_remap = amdvi_int_remap;
-     /* Supported by the pc-q35-* machine types */
-     dc->user_creatable = true;
- }
-diff --git a/hw/i386/trace-events b/hw/i386/trace-events
-index 9e6fc4dca9..41d533c250 100644
---- a/hw/i386/trace-events
-+++ b/hw/i386/trace-events
-@@ -101,6 +101,11 @@ amdvi_mode_invalid(uint8_t level, uint64_t addr)"error: translation level 0x%"PR
- amdvi_page_fault(uint64_t addr) "error: page fault accessing guest physical address 0x%"PRIx64
- amdvi_iotlb_hit(uint8_t bus, uint8_t slot, uint8_t func, uint64_t addr, uint64_t txaddr) "hit iotlb devid %02x:%02x.%x gpa 0x%"PRIx64" hpa 0x%"PRIx64
- amdvi_translation_result(uint8_t bus, uint8_t slot, uint8_t func, uint64_t addr, uint64_t txaddr) "devid: %02x:%02x.%x gpa 0x%"PRIx64" hpa 0x%"PRIx64
-+amdvi_mem_ir_write_req(uint64_t addr, uint64_t val, uint32_t size) "addr 0x%"PRIx64" data 0x%"PRIx64" size 0x%"PRIx32
-+amdvi_mem_ir_write(uint64_t addr, uint64_t val) "addr 0x%"PRIx64" data 0x%"PRIx64
-+amdvi_ir_remap_msi_req(uint64_t addr, uint64_t data, uint8_t devid) "addr 0x%"PRIx64" data 0x%"PRIx64" devid 0x%"PRIx8
-+amdvi_ir_remap_msi(uint64_t addr, uint64_t data, uint64_t addr2, uint64_t data2) "(addr 0x%"PRIx64", data 0x%"PRIx64") -> (addr 0x%"PRIx64", data 0x%"PRIx64")"
-+amdvi_err(const char *str) "%s"
+diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
+index 919de104fc..382d61f03d 100644
+--- a/hw/pci-host/q35.c
++++ b/hw/pci-host/q35.c
+@@ -149,7 +149,7 @@ static void q35_host_get_pci_hole64_end(Object *obj, Visitor *v,
+ {
+     PCIHostState *h = PCI_HOST_BRIDGE(obj);
+     Q35PCIHost *s = Q35_HOST_DEVICE(obj);
+-    uint64_t hole64_start = pc_pci_hole64_start();
++    uint64_t hole64_start = q35_host_get_pci_hole64_start_value(obj);
+     Range w64;
+     uint64_t value, hole64_end;
  
- # hw/i386/vmport.c
- vmport_register(unsigned char command, void *func, void *opaque) "command: 0x%02x func: %p opaque: %p"
 -- 
 MST
