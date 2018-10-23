@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45000)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gEwMu-0001pj-F2
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 09:05:15 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gEwP1-0003WW-3Z
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 09:07:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gEwMk-0003sj-BY
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 09:05:04 -0400
-Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:37989)
+	(envelope-from <peter.maydell@linaro.org>) id 1gEwOq-0006N4-VL
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 09:07:15 -0400
+Received: from mail-oi1-x234.google.com ([2607:f8b0:4864:20::234]:44951)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gEwMk-0003rp-3B
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 09:04:58 -0400
-Received: by mail-wm1-x32f.google.com with SMTP id 193-v6so1711348wme.3
-	for <qemu-devel@nongnu.org>; Tue, 23 Oct 2018 06:04:58 -0700 (PDT)
-References: <20181023120454.28553-1-richard.henderson@linaro.org>
-	<20181023120454.28553-6-richard.henderson@linaro.org>
-	<0c6ccdcc-8456-5243-8211-64c81610fb67@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <171c9d49-015d-c3a4-216b-c7c682bc6cd7@linaro.org>
-Date: Tue, 23 Oct 2018 14:04:50 +0100
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gEwOn-0006HW-5x
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 09:07:07 -0400
+Received: by mail-oi1-x234.google.com with SMTP id u74-v6so1010572oia.11
+	for <qemu-devel@nongnu.org>; Tue, 23 Oct 2018 06:07:01 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <0c6ccdcc-8456-5243-8211-64c81610fb67@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 5/7] target/riscv: Convert @cs_2 insns to
- share translation functions
+In-Reply-To: <20181019134318.17155-1-berrange@redhat.com>
+References: <20181019134318.17155-1-berrange@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 23 Oct 2018 14:06:40 +0100
+Message-ID: <CAFEAcA8LNep6uZEhxHeJV2WqskK_9Mj2uwhiXMTb0QJnGrz6hg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 0/3] Qcrypto next patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,21 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
-Cc: sagark@eecs.berkeley.edu, kbastian@mail.uni-paderborn.de, palmer@sifive.com, peer.adelt@hni.uni-paderborn.de, Alistair.Francis@wdc.com, mjc@sifive.com
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 10/23/18 1:26 PM, Philippe Mathieu-Daudé wrote:
->>   +#pragma GCC diagnostic push
->> +#pragma GCC diagnostic ignored "-Wredundant-decls"
-> 
-> We might move that to a generic Makefile rule, this will be useful for other
-> archs.
-> 
-> Something like:
-> 
-> translate*.o: CPPFLAGS += -Wno-redundant-decls
+On 19 October 2018 at 14:43, Daniel P. Berrang=C3=A9 <berrange@redhat.com> =
+wrote:
+> The following changes since commit 2ec24af2379e331d062a6fc1cda65bc262c7c1=
+7b:
+>
+>   Merge remote-tracking branch 'remotes/amarkovic/tags/mips-queue-october=
+-2018-part1-v2' into staging (2018-10-19 10:08:31 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/berrange/qemu tags/qcrypto-next-pull-request
+>
+> for you to fetch changes up to 64dd2f3b5b090c21c3e82142de3fe7b4793ce6c8:
+>
+>   crypto: require nettle >=3D 2.7.1 for building QEMU (2018-10-19 14:41:4=
+7 +0100)
+>
+> ----------------------------------------------------------------
+> Update min required crypto library versions
+>
+> The min required versions for crypto libraries are now
+>
+>  - gnutls >=3D 3.1.18
+>  - nettle >=3D 2.7.1
+>  - libgcrypt >=3D 1.5.0
+>
 
-I did want to restrict that to the one region though.
+Applied, thanks.
 
-
-r~
+-- PMM
