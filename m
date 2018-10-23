@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51737)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gF6JQ-0003Lo-FT
+	(envelope-from <mst@redhat.com>) id 1gF6JK-0003GI-HE
 	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 19:42:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gF6JF-0008E4-AY
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 19:42:11 -0400
-Received: from [185.30.24.106] (port=13480
+	(envelope-from <mst@redhat.com>) id 1gF6JE-0008BS-2J
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 19:42:06 -0400
+Received: from [185.30.24.106] (port=13122
 	helo=hotspot.internet-for-guests.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gF6JD-0008AT-MB
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 19:42:00 -0400
-Date: Tue, 23 Oct 2018 19:41:33 -0400
+	(envelope-from <mst@redhat.com>) id 1gF6JC-0007ZW-M0
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 19:41:59 -0400
+Date: Tue, 23 Oct 2018 19:41:30 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181023234112.188140-20-mst@redhat.com>
+Message-ID: <20181023234112.188140-4-mst@redhat.com>
 References: <20181023234112.188140-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20181023234112.188140-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 19/28] hw/pci-host/x86: extend the 64-bit PCI
- hole relative to the fw-assigned base
+Subject: [Qemu-devel] [PULL 03/28] intel_iommu: better handling of dmar
+ state switch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,146 +29,135 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Laszlo Ersek <lersek@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Xu <peterx@redhat.com>, QEMU Stable <qemu-stable@nongnu.org>, Cong Li <coli@redhat.com>, Eric Auger <eric.auger@redhat.com>, Jason Wang <jasowang@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-From: Laszlo Ersek <lersek@redhat.com>
+From: Peter Xu <peterx@redhat.com>
 
-In commit 9fa99d2519cb ("hw/pci-host: Fix x86 Host Bridges 64bit PCI
-hole", 2017-11-16), we meant to expose such a 64-bit PCI MMIO aperture in
-the ACPI DSDT that would be at least as large as the new "pci-hole64-size"
-property (2GB on i440fx, 32GB on q35). The goal was to offer "enough"
-64-bit MMIO aperture to the guest OS for hotplug purposes.
+QEMU is not handling the global DMAR switch well, especially when from
+"on" to "off".
 
-In that commit, we added or modified five functions:
+Let's first take the example of system reset.
 
-- pc_pci_hole64_start(): shared between i440fx and q35. Provides a default
-  64-bit base, which starts beyond the cold-plugged 64-bit RAM, and skips
-  the DIMM hotplug area too (if any).
+Assuming that a guest has IOMMU enabled.  When it reboots, we will drop
+all the existing DMAR mappings to handle the system reset, however we'll
+still keep the existing memory layouts which has the IOMMU memory region
+enabled.  So after the reboot and before the kernel reloads again, there
+will be no mapping at all for the host device.  That's problematic since
+any software (for example, SeaBIOS) that runs earlier than the kernel
+after the reboot will assume the IOMMU is disabled, so any DMA from the
+software will fail.
 
-- i440fx_pcihost_get_pci_hole64_start(), q35_host_get_pci_hole64_start():
-  board-specific 64-bit base property getters called abstractly by the
-  ACPI generator. Both of these fall back to pc_pci_hole64_start() if the
-  firmware didn't program any 64-bit hole (i.e. if the firmware didn't
-  assign a 64-bit GPA to any MMIO BAR on any device). Otherwise, they
-  honor the firmware's BAR assignments (i.e., they treat the lowest 64-bit
-  GPA programmed by the firmware as the base address for the aperture).
+For example, a guest that boots on an assigned NVMe device might fail to
+find the boot device after a system reboot/reset and we'll be able to
+observe SeaBIOS errors if we capture the debugging log:
 
-- i440fx_pcihost_get_pci_hole64_end(), q35_host_get_pci_hole64_end():
-  these intended to extend the aperture to our size recommendation,
-  calculated relative to the base of the aperture.
+  WARNING - Timeout at nvme_wait:144!
 
-Despite the original intent, i440fx_pcihost_get_pci_hole64_end() and
-q35_host_get_pci_hole64_end() currently only extend the aperture relative
-to the default base (pc_pci_hole64_start()), ignoring any programming done
-by the firmware. This means that our size recommendation may not be met.
-Fix it by honoring the firmware's address assignments.
+Meanwhile, we should see DMAR errors on the host of that NVMe device.
+It's the DMA fault that caused a NVMe driver timeout.
 
-The strange extension sizes were spotted by Alex, in the log of a guest
-kernel running on top of OVMF (which prefers to assign 64-bit GPAs to
-64-bit BARs).
+The correct fix should be that we do proper switching of device DMA
+address spaces when system resets, which will setup correct memory
+regions and notify the backend of the devices.  This might not affect
+much on non-assigned devices since QEMU VT-d emulation will assume a
+default passthrough mapping if DMAR is not enabled in the GCMD
+register (please refer to vtd_iommu_translate).  However that's required
+for an assigned devices, since that'll rebuild the correct GPA to HPA
+mapping that is needed for any DMA operation during guest bootstrap.
 
-This change only affects DSDT generation, therefore no new compat property
-is being introduced.
+Besides the system reset, we have some other places that might change
+the global DMAR status and we'd better do the same thing there.  For
+example, when we change the state of GCMD register, or the DMAR root
+pointer.  Do the same refresh for all these places.  For these two
+places we'll also need to explicitly invalidate the context entry cache
+and iotlb cache.
 
-Using an i440fx OVMF guest with 5GB RAM, an example _CRS change is:
-
-> @@ -881,9 +881,9 @@
->              QWordMemory (ResourceProducer, PosDecode, MinFixed, MaxFixed, Cacheable, ReadWrite,
->                  0x0000000000000000, // Granularity
->                  0x0000000800000000, // Range Minimum
-> -                0x000000080001C0FF, // Range Maximum
-> +                0x000000087FFFFFFF, // Range Maximum
->                  0x0000000000000000, // Translation Offset
-> -                0x000000000001C100, // Length
-> +                0x0000000080000000, // Length
->                  ,, , AddressRangeMemory, TypeStatic)
->          })
->          Device (GPE0)
-
-(On i440fx, the low RAM split is at 3GB, in this case. Therefore, with 5GB
-guest RAM and no DIMM hotplug range, pc_pci_hole64_start() returns 4 +
-(5-3) = 6 GB. Adding the 2GB extension to that yields 8GB, which is below
-the firmware-programmed base of 32GB, before the patch. Therefore, before
-the patch, the extension is ineffective. After the patch, we add the 2GB
-extension to the firmware-programmed base, namely 32GB.)
-
-Using a q35 OVMF guest with 5GB RAM, an example _CRS change is:
-
-> @@ -3162,9 +3162,9 @@
->              QWordMemory (ResourceProducer, PosDecode, MinFixed, MaxFixed, Cacheable, ReadWrite,
->                  0x0000000000000000, // Granularity
->                  0x0000000800000000, // Range Minimum
-> -                0x00000009BFFFFFFF, // Range Maximum
-> +                0x0000000FFFFFFFFF, // Range Maximum
->                  0x0000000000000000, // Translation Offset
-> -                0x00000001C0000000, // Length
-> +                0x0000000800000000, // Length
->                  ,, , AddressRangeMemory, TypeStatic)
->          })
->          Device (GPE0)
-
-(On Q35, the low RAM split is at 2GB. Therefore, with 5GB guest RAM and no
-DIMM hotplug range, pc_pci_hole64_start() returns 4 + (5-2) = 7 GB. Adding
-the 32GB extension to that yields 39GB (0x0000_0009_BFFF_FFFF + 1), before
-the patch. After the patch, we add the 32GB extension to the
-firmware-programmed base, namely 32GB.)
-
-The ACPI test data for the bios-tables-test case that we added earlier in
-this series are corrected too, as follows:
-
-> @@ -3339,9 +3339,9 @@
->              QWordMemory (ResourceProducer, PosDecode, MinFixed, MaxFixed, Cacheable, ReadWrite,
->                  0x0000000000000000, // Granularity
->                  0x0000000200000000, // Range Minimum
-> -                0x00000009BFFFFFFF, // Range Maximum
-> +                0x00000009FFFFFFFF, // Range Maximum
->                  0x0000000000000000, // Translation Offset
-> -                0x00000007C0000000, // Length
-> +                0x0000000800000000, // Length
->                  ,, , AddressRangeMemory, TypeStatic)
->          })
->          Device (GPE0)
-
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Fixes: 9fa99d2519cbf71f871e46871df12cb446dc1c3e
-Signed-off-by: Laszlo Ersek <lersek@redhat.com>
-Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1625173
+CC: QEMU Stable <qemu-stable@nongnu.org>
+Reported-by: Cong Li <coli@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+--
+v2:
+- do the same for GCMD write, or root pointer update [Alex]
+- test is carried out by me this time, by observing the
+  vtd_switch_address_space tracepoint after system reboot
+v3:
+- rewrite commit message as suggested by Alex
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Jason Wang <jasowang@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/pci-host/piix.c | 2 +-
- hw/pci-host/q35.c  | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ hw/i386/intel_iommu.c | 21 ++++++++++++++-------
+ 1 file changed, 14 insertions(+), 7 deletions(-)
 
-diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
-index 15cc34912e..999db824da 100644
---- a/hw/pci-host/piix.c
-+++ b/hw/pci-host/piix.c
-@@ -285,7 +285,7 @@ static void i440fx_pcihost_get_pci_hole64_end(Object *obj, Visitor *v,
- {
-     PCIHostState *h = PCI_HOST_BRIDGE(obj);
-     I440FXState *s = I440FX_PCI_HOST_BRIDGE(obj);
--    uint64_t hole64_start = pc_pci_hole64_start();
-+    uint64_t hole64_start = i440fx_pcihost_get_pci_hole64_start_value(obj);
-     Range w64;
-     uint64_t value, hole64_end;
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index 1137861a9d..306708eb3b 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -37,6 +37,8 @@
+ #include "kvm_i386.h"
+ #include "trace.h"
  
-diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
-index 919de104fc..382d61f03d 100644
---- a/hw/pci-host/q35.c
-+++ b/hw/pci-host/q35.c
-@@ -149,7 +149,7 @@ static void q35_host_get_pci_hole64_end(Object *obj, Visitor *v,
++static void vtd_address_space_refresh_all(IntelIOMMUState *s);
++
+ static void vtd_define_quad(IntelIOMMUState *s, hwaddr addr, uint64_t val,
+                             uint64_t wmask, uint64_t w1cmask)
  {
-     PCIHostState *h = PCI_HOST_BRIDGE(obj);
-     Q35PCIHost *s = Q35_HOST_DEVICE(obj);
--    uint64_t hole64_start = pc_pci_hole64_start();
-+    uint64_t hole64_start = q35_host_get_pci_hole64_start_value(obj);
-     Range w64;
-     uint64_t value, hole64_end;
+@@ -1436,7 +1438,7 @@ static void vtd_context_global_invalidate(IntelIOMMUState *s)
+         vtd_reset_context_cache_locked(s);
+     }
+     vtd_iommu_unlock(s);
+-    vtd_switch_address_space_all(s);
++    vtd_address_space_refresh_all(s);
+     /*
+      * From VT-d spec 6.5.2.1, a global context entry invalidation
+      * should be followed by a IOTLB global invalidation, so we should
+@@ -1727,6 +1729,8 @@ static void vtd_handle_gcmd_srtp(IntelIOMMUState *s)
+     vtd_root_table_setup(s);
+     /* Ok - report back to driver */
+     vtd_set_clear_mask_long(s, DMAR_GSTS_REG, 0, VTD_GSTS_RTPS);
++    vtd_reset_caches(s);
++    vtd_address_space_refresh_all(s);
+ }
  
+ /* Set Interrupt Remap Table Pointer */
+@@ -1759,7 +1763,8 @@ static void vtd_handle_gcmd_te(IntelIOMMUState *s, bool en)
+         vtd_set_clear_mask_long(s, DMAR_GSTS_REG, VTD_GSTS_TES, 0);
+     }
+ 
+-    vtd_switch_address_space_all(s);
++    vtd_reset_caches(s);
++    vtd_address_space_refresh_all(s);
+ }
+ 
+ /* Handle Interrupt Remap Enable/Disable */
+@@ -3059,6 +3064,12 @@ static void vtd_address_space_unmap_all(IntelIOMMUState *s)
+     }
+ }
+ 
++static void vtd_address_space_refresh_all(IntelIOMMUState *s)
++{
++    vtd_address_space_unmap_all(s);
++    vtd_switch_address_space_all(s);
++}
++
+ static int vtd_replay_hook(IOMMUTLBEntry *entry, void *private)
+ {
+     memory_region_notify_one((IOMMUNotifier *)private, entry);
+@@ -3231,11 +3242,7 @@ static void vtd_reset(DeviceState *dev)
+     IntelIOMMUState *s = INTEL_IOMMU_DEVICE(dev);
+ 
+     vtd_init(s);
+-
+-    /*
+-     * When device reset, throw away all mappings and external caches
+-     */
+-    vtd_address_space_unmap_all(s);
++    vtd_address_space_refresh_all(s);
+ }
+ 
+ static AddressSpace *vtd_host_dma_iommu(PCIBus *bus, void *opaque, int devfn)
 -- 
 MST
