@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55369)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gF2gM-0007io-TR
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 15:49:39 -0400
+	(envelope-from <cota@braap.org>) id 1gF3BN-0001yX-ET
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 16:21:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gF2gL-0008V8-Kf
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 15:49:38 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:37076)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gF2gL-0008U8-8q
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 15:49:37 -0400
-Received: by mail-oi1-x241.google.com with SMTP id e17-v6so2151110oib.4
-	for <qemu-devel@nongnu.org>; Tue, 23 Oct 2018 12:49:37 -0700 (PDT)
+	(envelope-from <cota@braap.org>) id 1gF3BD-00009k-0M
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 16:21:36 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:44123)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gF3B9-0008Oh-9V
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 16:21:29 -0400
+Date: Tue, 23 Oct 2018 16:21:15 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20181023202115.GA20137@flamenco>
+References: <20181019010625.25294-1-cota@braap.org>
+	<20181019010625.25294-47-cota@braap.org>
+	<8af6bae7-ac35-f419-0a83-8a54cfb5eb0d@linaro.org>
+	<20181022235040.GB31407@flamenco>
+	<33d570f5-5837-09ff-a599-c50c9f3ea331@twiddle.net>
 MIME-Version: 1.0
-In-Reply-To: <1540213077-15211-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1540213077-15211-1-git-send-email-aleksandar.markovic@rt-rk.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 23 Oct 2018 20:49:15 +0100
-Message-ID: <CAFEAcA_NxFaMcZ+ZzympigE8OoYxfmbmAQOReJN_OT32ceMWoA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/34] MIPS queue for October 2018 - part 2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <33d570f5-5837-09ff-a599-c50c9f3ea331@twiddle.net>
+Subject: Re: [Qemu-devel] [RFC v3 46/56] accel/tcg: convert to
+ cpu_interrupt_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,52 +31,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>
+To: Richard Henderson <rth@twiddle.net>
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-On 22 October 2018 at 13:57, Aleksandar Markovic
-<aleksandar.markovic@rt-rk.com> wrote:
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
->
-> The following changes since commit b312532fd03413d0e6ae6767ec793a3e30f487b8:
->
->   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2018-10-19 19:01:07 +0100)
->
-> are available in the git repository at:
->
->   https://github.com/AMarkovic/qemu tags/mips-queue-oct-2018-part-2
->
-> for you to fetch changes up to 2ec219776c633df9e43c5fa1557f70ee4f735f9d:
->
->   target/mips: Fix decoding of ALIGN and DALIGN instructions (2018-10-22 14:41:47 +0200)
->
-> ----------------------------------------------------------------
-> MIPS queue for October 2018 - part 2
->
-> Limited support for R5900 ISA, MMI ASE, and two misc fixes.
->
-> ----------------------------------------------------------------
+On Tue, Oct 23, 2018 at 03:17:11 +0100, Richard Henderson wrote:
+> On 10/23/18 12:50 AM, Emilio G. Cota wrote:
+> > On Sun, Oct 21, 2018 at 14:34:25 +0100, Richard Henderson wrote:
+> >> On 10/19/18 2:06 AM, Emilio G. Cota wrote:
+> >>> @@ -540,16 +540,16 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
+> >>>       */
+> >>>      atomic_mb_set(&cpu->icount_decr.u16.high, 0);
+> >>>  
+> >>> -    if (unlikely(atomic_read(&cpu->interrupt_request))) {
+> >>> +    if (unlikely(cpu_interrupt_request(cpu))) {
+> >>>          int interrupt_request;
+> >>>          qemu_mutex_lock_iothread();
+> >>> -        interrupt_request = cpu->interrupt_request;
+> >>> +        interrupt_request = cpu_interrupt_request(cpu);
+> >>>          if (unlikely(cpu->singlestep_enabled & SSTEP_NOIRQ)) {
+> >>>              /* Mask out external interrupts for this step. */
+> >>>              interrupt_request &= ~CPU_INTERRUPT_SSTEP_MASK;
+> >>>          }
+> >>>          if (interrupt_request & CPU_INTERRUPT_DEBUG) {
+> >>> -            cpu->interrupt_request &= ~CPU_INTERRUPT_DEBUG;
+> >>> +            cpu_reset_interrupt(cpu, CPU_INTERRUPT_DEBUG);
+> >>>              cpu->exception_index = EXCP_DEBUG;
+> >>>              qemu_mutex_unlock_iothread();
+> >>>              return true;
+> >>
+> >> Multiple calls.
+> > 
+> > I'd rather keep it as is.
+> > 
+> > The first read takes the lock, and that has to stay unless
+> > we want to use atomic_set on interrupt_request everywhere.
+> 
+> Why not?  That's even cheaper.
+> 
+> > Given that the CPU lock is uncontended (so it's cheap to
+> > acquire) ...
+> 
+> It still requires at minimum a "lock xchg" (or equivalent on non-x86), which
+> isn't free -- think 50-ish cycles minimum just for that one insn, plus call
+> overhead.
 
-Hi: I get compile errors on 32-bit hosts:
+OK, I changed the first read to atomic_read (changing all the other
+writers to atomic_set, but thanks to the helpers it's just very
+few of them), and then I'm holding both the BQL + cpu->lock throughout.
 
-/home/petmay01/qemu-for-merges/disas/mips.c:615:35: error: large
-integer implicitly truncated to unsigned type [-Werror=overflow]
- #define INSN_5900                 0x100000000
-                                   ^
-/home/petmay01/qemu-for-merges/disas/mips.c:1200:17: note: in
-expansion of macro 'INSN_5900'
- #define EE      INSN_5900    /* Emotion Engine */
-                 ^
-/home/petmay01/qemu-for-merges/disas/mips.c:2326:73: note: in
-expansion of macro 'EE'
- {"div1",    "z,s,t",  0x7000001a, 0xfc00ffff, RD_s | RD_t | WR_HILO, 0, EE },
-                                                                         ^
+Thanks,
 
-(and repeats on other similar uses).
-
-This is because this line is an initializer for "struct mips_opcode",
-and the final field is "unsigned long membership", which may be only
-32 bits wide, but you're trying to put a number in that's too big for that.
-
-thanks
--- PMM
+		Emilio
