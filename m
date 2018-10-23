@@ -1,21 +1,18 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:42154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEtca-0004V2-KN
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 06:09:12 -0400
+	(envelope-from <laurent@vivier.eu>) id 1gEtd1-0004V2-U5
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 06:09:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEtSH-00017v-AR
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 05:58:32 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:57563 helo=mail.rt-rk.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gEtSD-0000yg-Ie
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 05:58:26 -0400
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue, 23 Oct 2018 11:58:06 +0200
-Message-Id: <1540288688-4482-2-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1540288688-4482-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1540288688-4482-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH 1/3] linux-user: Add support for statx() syscall
+	(envelope-from <laurent@vivier.eu>) id 1gEtYu-0007DD-Do
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 06:05:25 -0400
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <38b0df70-338e-c842-95bb-c1a5fbd54b7b@vivier.eu>
+Date: Tue, 23 Oct 2018 11:04:36 +0100
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] Call for patches for the qemu-trivial pull request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,210 +21,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net, arikalo@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, riku.voipio@iki.fi, laurent@vivier.eu, ysu@wavecomp.com
+To: QEMU Trivial <qemu-trivial@nongnu.org>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
+Cc: Michael Tokarev <mjt@tls.msk.ru>
 
-From: Aleksandar Rikalo <arikalo@wavecomp.com>
+Hi,
 
-Implement support for translation of system call statx(). The
-implementation includes invoking other (more mature) syscalls
-(from the same 'stat' family) on the host side. This way,
-problems of availability of statx() on the host side are
-avoided.
+I'm going to collect patches for the next pull request for the
+qemu-trivial I'd like to do before the softfreeze.
 
-Signed-off-by: Aleksandar Rikalo <arikalo@wavecomp.com>
-Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
----
- linux-user/syscall.c      | 121 +++++++++++++++++++++++++++++++++++++++++++++-
- linux-user/syscall_defs.h |  38 +++++++++++++++
- 2 files changed, 158 insertions(+), 1 deletion(-)
+As we didn't have any pull request for more than 3 months and some of
+the patches have been pushed through another maintainer branches, it's a
+little bit difficult to collect correctly the patches to send.
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index d2cc971..b8435f2 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -6710,7 +6710,8 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-     abi_long ret;
- #if defined(TARGET_NR_stat) || defined(TARGET_NR_stat64) \
-     || defined(TARGET_NR_lstat) || defined(TARGET_NR_lstat64) \
--    || defined(TARGET_NR_fstat) || defined(TARGET_NR_fstat64)
-+    || defined(TARGET_NR_fstat) || defined(TARGET_NR_fstat64) \
-+    || defined(TARGET_NR_statx)
-     struct stat st;
- #endif
- #if defined(TARGET_NR_statfs) || defined(TARGET_NR_statfs64) \
-@@ -9635,6 +9636,124 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-             ret = host_to_target_stat64(cpu_env, arg3, &st);
-         return ret;
- #endif
-+#if defined(TARGET_NR_statx)
-+    case TARGET_NR_statx:
-+        {
-+            struct target_statx *target_stx;
-+            int dirfd = tswap32(arg1);
-+            int flags = tswap32(arg3);
-+
-+            p = lock_user_string(arg2);
-+            if (p == NULL) {
-+                goto efault;
-+            }
-+#if defined(__NR_statx)
-+            {
-+                /* We assume that struct statx is arhitecture independent */
-+                struct target_statx host_stx;
-+                int mask = tswap32(arg4);
-+
-+                ret = get_errno(syscall(__NR_statx, dirfd, p, flags, mask,
-+                                        &host_stx));
-+                if (!is_error(ret)) {
-+                    unlock_user(p, arg2, 0);
-+                    if (!lock_user_struct(VERIFY_WRITE, target_stx, arg5, 0)) {
-+                        goto efault;
-+                    }
-+                    memset(target_stx, 0, sizeof(*target_stx));
-+
-+                    __put_user(host_stx.stx_mask, &target_stx->stx_mask);
-+                    __put_user(host_stx.stx_blksize, &target_stx->stx_blksize);
-+                    __put_user(host_stx.stx_attributes,
-+                               &target_stx->stx_attributes);
-+                    __put_user(host_stx.stx_nlink, &target_stx->stx_nlink);
-+                    __put_user(host_stx.stx_uid, &target_stx->stx_uid);
-+                    __put_user(host_stx.stx_gid, &target_stx->stx_gid);
-+                    __put_user(host_stx.stx_mode, &target_stx->stx_mode);
-+                    __put_user(host_stx.stx_ino, &target_stx->stx_ino);
-+                    __put_user(host_stx.stx_size, &target_stx->stx_size);
-+                    __put_user(host_stx.stx_blocks, &target_stx->stx_blocks);
-+                    __put_user(host_stx.stx_attributes_mask,
-+                               &target_stx->stx_attributes_mask);
-+                    __put_user(host_stx.stx_atime.tv_sec,
-+                               &target_stx->stx_atime.tv_sec);
-+                    __put_user(host_stx.stx_atime.tv_nsec,
-+                               &target_stx->stx_atime.tv_nsec);
-+                    __put_user(host_stx.stx_btime.tv_sec,
-+                               &target_stx->stx_atime.tv_sec);
-+                    __put_user(host_stx.stx_btime.tv_nsec,
-+                               &target_stx->stx_atime.tv_nsec);
-+                    __put_user(host_stx.stx_ctime.tv_sec,
-+                               &target_stx->stx_atime.tv_sec);
-+                    __put_user(host_stx.stx_ctime.tv_nsec,
-+                               &target_stx->stx_atime.tv_nsec);
-+                    __put_user(host_stx.stx_mtime.tv_sec,
-+                               &target_stx->stx_atime.tv_sec);
-+                    __put_user(host_stx.stx_mtime.tv_nsec,
-+                               &target_stx->stx_atime.tv_nsec);
-+                    __put_user(host_stx.stx_rdev_major,
-+                               &target_stx->stx_rdev_major);
-+                    __put_user(host_stx.stx_rdev_minor,
-+                               &target_stx->stx_rdev_minor);
-+                    __put_user(host_stx.stx_dev_major,
-+                               &target_stx->stx_dev_major);
-+                    __put_user(host_stx.stx_dev_minor,
-+                               &target_stx->stx_dev_minor);
-+                }
-+
-+                if (ret != TARGET_ENOSYS) {
-+                    break;
-+                }
-+            }
-+#endif
-+            if ((p == NULL) || (*((char *)p) == 0)) {
-+                /* By file descriptor */
-+                ret = get_errno(fstat(dirfd, &st));
-+                unlock_user(p, arg2, 0);
-+            } else if (*((char *)p) == '/') {
-+                /* Absolute pathname */
-+                ret = get_errno(stat(path(p), &st));
-+                unlock_user(p, arg2, 0);
-+            } else {
-+                if (dirfd == AT_FDCWD) {
-+                    /* Pathname relative to the current working directory */
-+                    ret = get_errno(stat(path(p), &st));
-+                    unlock_user(p, arg2, 0);
-+                } else {
-+                    /*
-+                     * Pathname relative to the directory referred to by the
-+                     * file descriptor dirfd
-+                     */
-+                    ret = get_errno(fstatat(dirfd, path(p), &st, flags));
-+                    unlock_user(p, arg2, 0);
-+                }
-+            }
-+
-+            if (!is_error(ret)) {
-+                if (!lock_user_struct(VERIFY_WRITE, target_stx, arg5, 0)) {
-+                    goto efault;
-+                }
-+                memset(target_stx, 0, sizeof(*target_stx));
-+                __put_user(major(st.st_dev), &target_stx->stx_dev_major);
-+                __put_user(minor(st.st_dev), &target_stx->stx_dev_minor);
-+                __put_user(st.st_ino, &target_stx->stx_ino);
-+                __put_user(st.st_mode, &target_stx->stx_mode);
-+                __put_user(st.st_uid, &target_stx->stx_uid);
-+                __put_user(st.st_gid, &target_stx->stx_gid);
-+                __put_user(st.st_nlink, &target_stx->stx_nlink);
-+                __put_user(major(st.st_rdev), &target_stx->stx_rdev_major);
-+                __put_user(minor(st.st_rdev), &target_stx->stx_rdev_minor);
-+                __put_user(st.st_size, &target_stx->stx_size);
-+                __put_user(st.st_blksize, &target_stx->stx_blksize);
-+                __put_user(st.st_blocks, &target_stx->stx_blocks);
-+                __put_user(st.st_atime, &target_stx->stx_atime.tv_sec);
-+                __put_user(st.st_mtime, &target_stx->stx_mtime.tv_sec);
-+                __put_user(st.st_ctime, &target_stx->stx_ctime.tv_sec);
-+                unlock_user_struct(target_stx, arg5, 1);
-+            }
-+        }
-+        break;
-+#endif
- #ifdef TARGET_NR_lchown
-     case TARGET_NR_lchown:
-         if (!(p = lock_user_string(arg1)))
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 18d434d..b6c5c4f 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -2488,4 +2488,42 @@ struct target_user_cap_data {
- /* Return size of the log buffer */
- #define TARGET_SYSLOG_ACTION_SIZE_BUFFER   10
- 
-+struct target_statx_timestamp {
-+   int64_t tv_sec;
-+   uint32_t tv_nsec;
-+   int32_t __reserved;
-+};
-+
-+struct target_statx {
-+   /* 0x00 */
-+   uint32_t stx_mask;       /* What results were written [uncond] */
-+   uint32_t stx_blksize;    /* Preferred general I/O size [uncond] */
-+   uint64_t stx_attributes; /* Flags conveying information about the file */
-+   /* 0x10 */
-+   uint32_t stx_nlink;      /* Number of hard links */
-+   uint32_t stx_uid;        /* User ID of owner */
-+   uint32_t stx_gid;        /* Group ID of owner */
-+   uint16_t stx_mode;       /* File mode */
-+   uint16_t __spare0[1];
-+   /* 0x20 */
-+   uint64_t stx_ino;        /* Inode number */
-+   uint64_t stx_size;       /* File size */
-+   uint64_t stx_blocks;     /* Number of 512-byte blocks allocated */
-+   uint64_t stx_attributes_mask; /* Mask to show what's supported in
-+                                    stx_attributes */
-+   /* 0x40 */
-+   struct target_statx_timestamp  stx_atime;  /* Last access time */
-+   struct target_statx_timestamp  stx_btime;  /* File creation time */
-+   struct target_statx_timestamp  stx_ctime;  /* Last attribute change time */
-+   struct target_statx_timestamp  stx_mtime;  /* Last data modification time */
-+   /* 0x80 */
-+   uint32_t stx_rdev_major;   /* Device ID of special file [if bdev/cdev] */
-+   uint32_t stx_rdev_minor;
-+   uint32_t stx_dev_major; /* ID of device containing file [uncond] */
-+   uint32_t stx_dev_minor;
-+   /* 0x90 */
-+   uint64_t __spare2[14];  /* Spare space for future expansion */
-+   /* 0x100 */
-+};
-+
- #endif
--- 
-2.7.4
+So, it would be helpful if any of you knowing that some patches have to
+be added to the pull request send me their list.
+
+After the next release, I will try to do pull-requests on a weekly basis.
+
+Thanks,
+Laurent
