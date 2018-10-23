@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Manish.Jaggi@cavium.com>) id 1gEt2S-0001Pq-Fk
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 05:31:49 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEtca-0004V2-KN
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 06:09:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Manish.Jaggi@cavium.com>) id 1gEt2O-0007M2-Ok
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 05:31:48 -0400
-Received: from mail-eopbgr690088.outbound.protection.outlook.com
-	([40.107.69.88]:17488
-	helo=NAM04-CO1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Manish.Jaggi@cavium.com>)
-	id 1gEt2O-000724-FY
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 05:31:44 -0400
-From: <mjaggi@caviumnetworks.com>
-Date: Tue, 23 Oct 2018 09:31:19 +0000
-Message-ID: <492d066a988d7f22c9438c19f312c2e1f2b3d473.1536948621.git.manish.jaggi@cavium.com>
-References: <cover.1536948621.git.manish.jaggi@cavium.com>
-In-Reply-To: <cover.1536948621.git.manish.jaggi@cavium.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v2 2/2] [RFC] arm: program migrated guests'
- invariant registers with host ones
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gEtSH-00017v-AR
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 05:58:32 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:57563 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1gEtSD-0000yg-Ie
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 05:58:26 -0400
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Date: Tue, 23 Oct 2018 11:58:06 +0200
+Message-Id: <1540288688-4482-2-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1540288688-4482-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1540288688-4482-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PATCH 1/3] linux-user: Add support for statx() syscall
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,57 +24,210 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Jaggi, Manish" <Manish.Jaggi@cavium.com>, "quintela@redhat.com" <quintela@redhat.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "Nair, Jayachandran" <Jayachandran.Nair@cavium.com>, "Nowicki,
-	Tomasz" <Tomasz.Nowicki@cavium.com>
+To: qemu-devel@nongnu.org
+Cc: aurelien@aurel32.net, arikalo@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, riku.voipio@iki.fi, laurent@vivier.eu, ysu@wavecomp.com
 
-From: Manish Jaggi <manish.jaggi@cavium.com>
+From: Aleksandar Rikalo <arikalo@wavecomp.com>
 
-When KVM_SET_ONE_REG returns KVM_EINVARIANT call KVM_GET_ONE_REG to query
-and then replace the particular guest invariant register value with destina=
-tion
-hosts register.
+Implement support for translation of system call statx(). The
+implementation includes invoking other (more mature) syscalls
+(from the same 'stat' family) on the host side. This way,
+problems of availability of statx() on the host side are
+avoided.
 
-Signed-off-by: Manish Jaggi <manish.jaggi@cavium.com>
+Signed-off-by: Aleksandar Rikalo <arikalo@wavecomp.com>
+Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+---
+ linux-user/syscall.c      | 121 +++++++++++++++++++++++++++++++++++++++++++++-
+ linux-user/syscall_defs.h |  38 +++++++++++++++
+ 2 files changed, 158 insertions(+), 1 deletion(-)
 
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 65f867d..8cf4dc9 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -19,6 +19,7 @@
- #include "sysemu/sysemu.h"
- #include "sysemu/kvm.h"
- #include "kvm_arm.h"
-+#include "standard-headers/asm-arm/kvm_para.h"
- #include "cpu.h"
- #include "trace.h"
- #include "internals.h"
-@@ -37,6 +38,8 @@ static bool cap_has_mp_state;
-=20
- static ARMHostCPUFeatures arm_host_cpu_features;
-=20
-+extern bool enable_hostinvariant;
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index d2cc971..b8435f2 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -6710,7 +6710,8 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+     abi_long ret;
+ #if defined(TARGET_NR_stat) || defined(TARGET_NR_stat64) \
+     || defined(TARGET_NR_lstat) || defined(TARGET_NR_lstat64) \
+-    || defined(TARGET_NR_fstat) || defined(TARGET_NR_fstat64)
++    || defined(TARGET_NR_fstat) || defined(TARGET_NR_fstat64) \
++    || defined(TARGET_NR_statx)
+     struct stat st;
+ #endif
+ #if defined(TARGET_NR_statfs) || defined(TARGET_NR_statfs64) \
+@@ -9635,6 +9636,124 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+             ret = host_to_target_stat64(cpu_env, arg3, &st);
+         return ret;
+ #endif
++#if defined(TARGET_NR_statx)
++    case TARGET_NR_statx:
++        {
++            struct target_statx *target_stx;
++            int dirfd = tswap32(arg1);
++            int flags = tswap32(arg3);
 +
- int kvm_arm_vcpu_init(CPUState *cs)
- {
-     ARMCPU *cpu =3D ARM_CPU(cs);
-@@ -451,8 +454,16 @@ bool write_list_to_kvmstate(ARMCPU *cpu, int level)
-         default:
-             abort();
-         }
--        ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &r);
--        if (ret) {
-+	ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &r);
-+	if (enable_hostinvariant && ret =3D=3D -KVM_EINVARIANT) {
-+		/* Update Guest invariant to match with migrated host regs*/
-+		ret =3D kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &r);
-+		if (ret)
-+			ok =3D false;
-+		else
-+                	cpu->cpreg_values[i] =3D r.addr;
++            p = lock_user_string(arg2);
++            if (p == NULL) {
++                goto efault;
++            }
++#if defined(__NR_statx)
++            {
++                /* We assume that struct statx is arhitecture independent */
++                struct target_statx host_stx;
++                int mask = tswap32(arg4);
++
++                ret = get_errno(syscall(__NR_statx, dirfd, p, flags, mask,
++                                        &host_stx));
++                if (!is_error(ret)) {
++                    unlock_user(p, arg2, 0);
++                    if (!lock_user_struct(VERIFY_WRITE, target_stx, arg5, 0)) {
++                        goto efault;
++                    }
++                    memset(target_stx, 0, sizeof(*target_stx));
++
++                    __put_user(host_stx.stx_mask, &target_stx->stx_mask);
++                    __put_user(host_stx.stx_blksize, &target_stx->stx_blksize);
++                    __put_user(host_stx.stx_attributes,
++                               &target_stx->stx_attributes);
++                    __put_user(host_stx.stx_nlink, &target_stx->stx_nlink);
++                    __put_user(host_stx.stx_uid, &target_stx->stx_uid);
++                    __put_user(host_stx.stx_gid, &target_stx->stx_gid);
++                    __put_user(host_stx.stx_mode, &target_stx->stx_mode);
++                    __put_user(host_stx.stx_ino, &target_stx->stx_ino);
++                    __put_user(host_stx.stx_size, &target_stx->stx_size);
++                    __put_user(host_stx.stx_blocks, &target_stx->stx_blocks);
++                    __put_user(host_stx.stx_attributes_mask,
++                               &target_stx->stx_attributes_mask);
++                    __put_user(host_stx.stx_atime.tv_sec,
++                               &target_stx->stx_atime.tv_sec);
++                    __put_user(host_stx.stx_atime.tv_nsec,
++                               &target_stx->stx_atime.tv_nsec);
++                    __put_user(host_stx.stx_btime.tv_sec,
++                               &target_stx->stx_atime.tv_sec);
++                    __put_user(host_stx.stx_btime.tv_nsec,
++                               &target_stx->stx_atime.tv_nsec);
++                    __put_user(host_stx.stx_ctime.tv_sec,
++                               &target_stx->stx_atime.tv_sec);
++                    __put_user(host_stx.stx_ctime.tv_nsec,
++                               &target_stx->stx_atime.tv_nsec);
++                    __put_user(host_stx.stx_mtime.tv_sec,
++                               &target_stx->stx_atime.tv_sec);
++                    __put_user(host_stx.stx_mtime.tv_nsec,
++                               &target_stx->stx_atime.tv_nsec);
++                    __put_user(host_stx.stx_rdev_major,
++                               &target_stx->stx_rdev_major);
++                    __put_user(host_stx.stx_rdev_minor,
++                               &target_stx->stx_rdev_minor);
++                    __put_user(host_stx.stx_dev_major,
++                               &target_stx->stx_dev_major);
++                    __put_user(host_stx.stx_dev_minor,
++                               &target_stx->stx_dev_minor);
++                }
++
++                if (ret != TARGET_ENOSYS) {
++                    break;
++                }
++            }
++#endif
++            if ((p == NULL) || (*((char *)p) == 0)) {
++                /* By file descriptor */
++                ret = get_errno(fstat(dirfd, &st));
++                unlock_user(p, arg2, 0);
++            } else if (*((char *)p) == '/') {
++                /* Absolute pathname */
++                ret = get_errno(stat(path(p), &st));
++                unlock_user(p, arg2, 0);
++            } else {
++                if (dirfd == AT_FDCWD) {
++                    /* Pathname relative to the current working directory */
++                    ret = get_errno(stat(path(p), &st));
++                    unlock_user(p, arg2, 0);
++                } else {
++                    /*
++                     * Pathname relative to the directory referred to by the
++                     * file descriptor dirfd
++                     */
++                    ret = get_errno(fstatat(dirfd, path(p), &st, flags));
++                    unlock_user(p, arg2, 0);
++                }
++            }
++
++            if (!is_error(ret)) {
++                if (!lock_user_struct(VERIFY_WRITE, target_stx, arg5, 0)) {
++                    goto efault;
++                }
++                memset(target_stx, 0, sizeof(*target_stx));
++                __put_user(major(st.st_dev), &target_stx->stx_dev_major);
++                __put_user(minor(st.st_dev), &target_stx->stx_dev_minor);
++                __put_user(st.st_ino, &target_stx->stx_ino);
++                __put_user(st.st_mode, &target_stx->stx_mode);
++                __put_user(st.st_uid, &target_stx->stx_uid);
++                __put_user(st.st_gid, &target_stx->stx_gid);
++                __put_user(st.st_nlink, &target_stx->stx_nlink);
++                __put_user(major(st.st_rdev), &target_stx->stx_rdev_major);
++                __put_user(minor(st.st_rdev), &target_stx->stx_rdev_minor);
++                __put_user(st.st_size, &target_stx->stx_size);
++                __put_user(st.st_blksize, &target_stx->stx_blksize);
++                __put_user(st.st_blocks, &target_stx->stx_blocks);
++                __put_user(st.st_atime, &target_stx->stx_atime.tv_sec);
++                __put_user(st.st_mtime, &target_stx->stx_mtime.tv_sec);
++                __put_user(st.st_ctime, &target_stx->stx_ctime.tv_sec);
++                unlock_user_struct(target_stx, arg5, 1);
++            }
 +        }
-+        else if (ret) {
-             /* We might fail for "unknown register" and also for
-              * "you tried to set a register which is constant with
-              * a different value from what it actually contains".
---=20
-1.8.3.1
++        break;
++#endif
+ #ifdef TARGET_NR_lchown
+     case TARGET_NR_lchown:
+         if (!(p = lock_user_string(arg1)))
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index 18d434d..b6c5c4f 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -2488,4 +2488,42 @@ struct target_user_cap_data {
+ /* Return size of the log buffer */
+ #define TARGET_SYSLOG_ACTION_SIZE_BUFFER   10
+ 
++struct target_statx_timestamp {
++   int64_t tv_sec;
++   uint32_t tv_nsec;
++   int32_t __reserved;
++};
++
++struct target_statx {
++   /* 0x00 */
++   uint32_t stx_mask;       /* What results were written [uncond] */
++   uint32_t stx_blksize;    /* Preferred general I/O size [uncond] */
++   uint64_t stx_attributes; /* Flags conveying information about the file */
++   /* 0x10 */
++   uint32_t stx_nlink;      /* Number of hard links */
++   uint32_t stx_uid;        /* User ID of owner */
++   uint32_t stx_gid;        /* Group ID of owner */
++   uint16_t stx_mode;       /* File mode */
++   uint16_t __spare0[1];
++   /* 0x20 */
++   uint64_t stx_ino;        /* Inode number */
++   uint64_t stx_size;       /* File size */
++   uint64_t stx_blocks;     /* Number of 512-byte blocks allocated */
++   uint64_t stx_attributes_mask; /* Mask to show what's supported in
++                                    stx_attributes */
++   /* 0x40 */
++   struct target_statx_timestamp  stx_atime;  /* Last access time */
++   struct target_statx_timestamp  stx_btime;  /* File creation time */
++   struct target_statx_timestamp  stx_ctime;  /* Last attribute change time */
++   struct target_statx_timestamp  stx_mtime;  /* Last data modification time */
++   /* 0x80 */
++   uint32_t stx_rdev_major;   /* Device ID of special file [if bdev/cdev] */
++   uint32_t stx_rdev_minor;
++   uint32_t stx_dev_major; /* ID of device containing file [uncond] */
++   uint32_t stx_dev_minor;
++   /* 0x90 */
++   uint64_t __spare2[14];  /* Spare space for future expansion */
++   /* 0x100 */
++};
++
+ #endif
+-- 
+2.7.4
