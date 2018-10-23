@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58727)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lfy@google.com>) id 1gEyDh-0002WS-26
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 11:03:47 -0400
+	(envelope-from <david@redhat.com>) id 1gEyHQ-0005H7-3c
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 11:07:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lfy@google.com>) id 1gEyDe-00072Q-LD
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 11:03:44 -0400
-Received: from mail-qk1-x735.google.com ([2607:f8b0:4864:20::735]:33771)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lfy@google.com>) id 1gEyDe-0006KP-CS
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 11:03:42 -0400
-Received: by mail-qk1-x735.google.com with SMTP id o89so1026447qko.0
-	for <qemu-devel@nongnu.org>; Tue, 23 Oct 2018 08:03:03 -0700 (PDT)
+	(envelope-from <david@redhat.com>) id 1gEyHE-0003pj-Em
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 11:07:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59238)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gEyHC-0003if-3D
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 11:07:22 -0400
+From: David Hildenbrand <david@redhat.com>
+References: <20181012114916.23532-1-david@redhat.com>
+	<20181012114916.23532-2-david@redhat.com>
+	<87lg6wpwvo.fsf@dusky.pond.sub.org>
+	<2129f52a-0b08-8d6f-3067-e08c8ccc0978@redhat.com>
+Message-ID: <e29ca0c3-e77b-e30a-1c70-be0652897407@redhat.com>
+Date: Tue, 23 Oct 2018 17:07:15 +0200
 MIME-Version: 1.0
-References: <CAEkmjvWv=CCf-Y4kDqG=Z-Fb2jPBUBVzHzy69rTxDinPZQ72YQ@mail.gmail.com>
-	<cc2c7265-193c-257f-6594-6d538133b8b2@redhat.com>
-In-Reply-To: <cc2c7265-193c-257f-6594-6d538133b8b2@redhat.com>
-From: Frank Yang <lfy@google.com>
-Date: Tue, 23 Oct 2018 08:02:51 -0700
-Message-ID: <CAEkmjvWGiCoQDXxdNXAsbZOkmxo-H6-yw10nYp3ffGt6cVCEtQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] QEMU hangs in main_loop_wait
+In-Reply-To: <2129f52a-0b08-8d6f-3067-e08c8ccc0978@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/7] qapi: correctly parse uint64_t
+ values from strings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,72 +31,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Igor Mammedov <imammedo@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-We don't yet have visibility into that, but is there a way to enumerate
-what callbacks are running? We see that sometimes, actually qemu_poll_ns
-takes much, much longer than the specified timeout to return:
-
-    qemu_mutex_unlock_iothread();
-    replay_mutex_unlock();
-
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-
-    uint64_t start_us = tv.tv_usec + tv.tv_sec * 1000000LL;
-    uint64_t duration = 0;
-        ret = qemu_poll_ns((GPollFD *)gpollfds->data, gpollfds->len,
-timeout);
-        gettimeofday(&tv, NULL);
-        uint64_t end_us = tv.tv_usec + tv.tv_sec * 1000000LL;
-        duration = end_us - start_us;
-
-    if (duration > 100000LL) {
-        fprintf(stderr, "%s: polled for %f ms (timeout: %f ms) ret: %d
-nfds: %d\n", __func__, duration / 1000.0f, timeout / 1000000.0f, ret,
-gpollfds->len);
-    }
-
-prints:
-
-os_host_main_loop_wait: polled for 580.517029 ms (timeout: 6.150904 ms)
-ret: 1 nfds: 50
-os_host_main_loop_wait: polled for 10001.063477 ms (timeout: 1.277816 ms)
-ret: 0 nfds: 50
-os_host_main_loop_wait: polled for 792.466003 ms (timeout: 0.149536 ms)
-ret: 1 nfds: 47
-os_host_main_loop_wait: polled for 8359.308594 ms (timeout: 1.791392 ms)
-ret: 1 nfds: 47
-os_host_main_loop_wait: polled for 2478.096924 ms (timeout: 5.850920 ms)
-ret: 1 nfds: 47
-os_host_main_loop_wait: polled for 139.272995 ms (timeout: 5.442976 ms)
-ret: 1 nfds: 47
-os_host_main_loop_wait: polled for 10001.864258 ms (timeout: 1.946600 ms)
-ret: 0 nfds: 47
-
-
-On Wed, Oct 17, 2018 at 10:03 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
-
-> On 17/10/2018 17:44, Frank Yang wrote:
-> >
-> > we are not seeing hangs in flatview_do_translate, but are still getting
-> > hangs in main-loop:
-> >
-> >     qemu_mutex_unlock_iothread();
-> >     replay_mutex_unlock();
-> >
-> >     ret = qemu_poll_ns((GPollFD *)gpollfds->data, gpollfds->len,
-> > timeout); <-------------this seems to be the hanging part
-> >
-> >     replay_mutex_lock();
-> >     qemu_mutex_lock_iothread();
-> >
-> > Any idea how to diagnose the cause of taking too much time in g_poll in
-> > qemu_poll_ns?
+On 23/10/2018 14:10, David Hildenbrand wrote:
+> On 17/10/2018 14:42, Markus Armbruster wrote:
+>> Quick peek only for now.
+>>
+>> David Hildenbrand <david@redhat.com> writes:
+>>
+>>> Right now, we parse uint64_t values just like int64_t values, resulti=
+ng
+>>> in negative values getting accepted and certain valid large numbers o=
+nly
+>>> being representable as negative numbers. Also, reported errors indica=
+te
+>>> that an int64_t is expected.
+>>>
+>>> Parse uin64_t separately. Implementation inspired by original
+>>> parse_str() implementation.
+>>>
+>>> E.g. we can now specify
+>>>     -device nvdimm,memdev=3Dmem1,id=3Dnv1,addr=3D0xFFFFFFFFC0000000
+>>> Instead of going via negative values
+>>>     -device nvdimm,memdev=3Dmem1,id=3Dnv1,addr=3D-0x40000000
+>>>
+>>> Resulting in the same values
+>>>
+>>> (qemu) info memory-devices
+>>> Memory device [nvdimm]: "nv1"
+>>>   addr: 0xffffffffc0000000
+>>>   slot: 0
+>>>   node: 0
+>>>
+>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>
+>> Related work on the QObject input visitor:
+>>
+>> commit 5923f85fb82df7c8c60a89458a5ae856045e5ab1
+>> Author: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> Date:   Wed Jun 7 20:36:03 2017 +0400
+>>
+>>     qapi: update the qobject visitor to use QNUM_U64
+>>    =20
+>>     Switch to use QNum/uint where appropriate to remove i64 limitation=
+.
+>>    =20
+>>     The input visitor will cast i64 input to u64 for compatibility
+>>     reasons (existing json QMP client already use negative i64 for lar=
+ge
+>>     u64, and expect an implicit cast in qemu).
+>>    =20
+>>     Note: before the patch, uint64_t values above INT64_MAX are sent o=
+ver
+>>     json QMP as negative values, e.g. UINT64_MAX is sent as -1. After =
+the
+>>     patch, they are sent unmodified.  Clearly a bug fix, but we have t=
+o
+>>     consider compatibility issues anyway.  libvirt should cope fine,
+>>     because its parsing of unsigned integers accepts negative values
+>>     modulo 2^64.  There's hope that other clients will, too.
+>>    =20
+>>     Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com=
 >
-> Is there any event (timer or file descriptor) that you know should be
-> ready, but is not causing a wakeup?
->
-> Paolo
->
+>>     Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>>     Message-Id: <20170607163635.17635-12-marcandre.lureau@redhat.com>
+>>     [check_native_list() tweaked for consistency with signed case]
+>>     Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>>
+>> Note who it considers backward compatibility.  Have you done that for
+>> the string input visitor?  The commit message should tell.
+>=20
+> There should be no compat issues, negative values are still accepted. A=
+t
+> least I can't think of any :) We simply allow accepting bigger values.
+>=20
+>>
+>>> ---
+>>>  qapi/string-input-visitor.c | 117 ++++++++++++++++++++++++++++++++--=
+--
+>>>  1 file changed, 106 insertions(+), 11 deletions(-)
+>>>
+>>> diff --git a/qapi/string-input-visitor.c b/qapi/string-input-visitor.=
+c
+>>> index b3fdd0827d..af0a841152 100644
+>>> --- a/qapi/string-input-visitor.c
+>>> +++ b/qapi/string-input-visitor.c
+>>> @@ -19,6 +19,7 @@
+>>>  #include "qapi/qmp/qnull.h"
+>>>  #include "qemu/option.h"
+>>>  #include "qemu/queue.h"
+>>> +#include "qemu/cutils.h"
+>>>  #include "qemu/range.h"
+>>> =20
+>>> =20
+>>> @@ -44,7 +45,8 @@ static void free_range(void *range, void *dummy)
+>>>      g_free(range);
+>>>  }
+>>> =20
+>>> -static int parse_str(StringInputVisitor *siv, const char *name, Erro=
+r **errp)
+>>> +static int parse_str_int64(StringInputVisitor *siv, const char *name=
+,
+>>> +                           Error **errp)
+>>>  {
+>>>      char *str =3D (char *) siv->string;
+>>>      long long start, end;
+>>> @@ -118,6 +120,75 @@ error:
+>>>      return -1;
+>>>  }
+>>> =20
+>>> +static int parse_str_uint64(StringInputVisitor *siv, const char *nam=
+e,
+>>> +                            Error **errp)
+>>> +{
+>>> +    const char *str =3D (char *) siv->string;
+>>> +    uint64_t start, end;
+>>> +    const char *endptr;
+>>> +    Range *cur;
+>>> +
+>>> +    if (siv->ranges) {
+>>> +        return 0;
+>>> +    }
+>>> +
+>>> +    if (!*str) {
+>>> +        return 0;
+>>> +    }
+>>> +
+>>> +    do {
+>>> +        if (!qemu_strtou64(str, &endptr, 0, &start)) {
+>>> +            if (*endptr =3D=3D '\0') {
+>>> +                cur =3D g_malloc0(sizeof(*cur));
+>>> +                range_set_bounds(cur, start, start);
+>>> +                siv->ranges =3D range_list_insert(siv->ranges, cur);
+>>> +                cur =3D NULL;
+>>> +                str =3D NULL;
+>>> +            } else if (*endptr =3D=3D '-') {
+>>> +                str =3D endptr + 1;
+>>> +                if (!qemu_strtou64(str, &endptr, 0, &end) && start <=
+=3D end) {
+>>> +                    if (*endptr =3D=3D '\0') {
+>>> +                        cur =3D g_malloc0(sizeof(*cur));
+>>> +                        range_set_bounds(cur, start, end);
+>>> +                        siv->ranges =3D range_list_insert(siv->range=
+s, cur);
+>>> +                        cur =3D NULL;
+>>> +                        str =3D NULL;
+>>> +                    } else if (*endptr =3D=3D ',') {
+>>> +                        str =3D endptr + 1;
+>>> +                        cur =3D g_malloc0(sizeof(*cur));
+>>> +                        range_set_bounds(cur, start, end);
+>>> +                        siv->ranges =3D range_list_insert(siv->range=
+s, cur);
+>>> +                        cur =3D NULL;
+>>> +                    } else {
+>>> +                        goto error;
+>>> +                    }
+>>> +                } else {
+>>> +                    goto error;
+>>> +                }
+>>> +            } else if (*endptr =3D=3D ',') {
+>>> +                str =3D endptr + 1;
+>>> +                cur =3D g_malloc0(sizeof(*cur));
+>>> +                range_set_bounds(cur, start, start);
+>>> +                siv->ranges =3D range_list_insert(siv->ranges, cur);
+>>> +                cur =3D NULL;
+>>> +            } else {
+>>> +                goto error;
+>>> +            }
+>>> +        } else {
+>>> +            goto error;
+>>> +        }
+>>> +    } while (str);
+>>> +
+>>> +    return 0;
+>>> +error:
+>>> +    g_list_foreach(siv->ranges, free_range, NULL);
+>>> +    g_list_free(siv->ranges);
+>>> +    siv->ranges =3D NULL;
+>>> +    error_setg(errp, QERR_INVALID_PARAMETER_VALUE, name ? name : "nu=
+ll",
+>>> +               "an uint64 value or range");
+>>> +    return -1;
+>>> +}
+>>> +
+>>
+>> Do we actually need unsigned ranges?  I'm asking because I hate this
+>> code, and duplicating can only make it worse.
+>>
+>> [...]
+>=20
+> I don't think we need unsigned ranges BUT I am concerned about backward=
+s
+> compatibility. I'll have to check all users to make sure no property
+> flagged as uint64_t will actually expect ranges. Then we can drop it.
+> (and simplify this code)
+>=20
+>=20
+
+... looking at the details, I think you are right, we should not need
+that range code at all. I will drop it. Makes things a lot simpler :)
+
+--=20
+
+Thanks,
+
+David / dhildenb
