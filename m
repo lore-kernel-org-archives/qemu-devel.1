@@ -1,54 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54120)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zyimin@linux.ibm.com>) id 1gErSu-0005jC-Kt
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 03:51:01 -0400
+	(envelope-from <d.csapak@proxmox.com>) id 1gErTi-00061l-N7
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 03:51:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zyimin@linux.ibm.com>) id 1gErSr-0000X7-F5
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 03:51:00 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33844)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <zyimin@linux.ibm.com>)
-	id 1gErSr-0000Uf-07
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 03:50:57 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w9N7iW1B145242
-	for <qemu-devel@nongnu.org>; Tue, 23 Oct 2018 03:50:54 -0400
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2n9xmktj0f-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 23 Oct 2018 03:50:53 -0400
-Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <zyimin@linux.ibm.com>;
-	Tue, 23 Oct 2018 01:50:53 -0600
-Received: from b03ledav004.gho.boulder.ibm.com
-	(b03ledav004.gho.boulder.ibm.com [9.17.130.235])
-	by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id w9N7ooTD23593140
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=FAIL)
-	for <qemu-devel@nongnu.org>; Tue, 23 Oct 2018 00:50:51 -0700
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C0E517805E
-	for <qemu-devel@nongnu.org>; Tue, 23 Oct 2018 07:50:50 +0000 (GMT)
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 54C7E7805F
-	for <qemu-devel@nongnu.org>; Tue, 23 Oct 2018 07:50:50 +0000 (GMT)
-Received: from zyimindembp.cn.ibm.com (unknown [9.115.192.238])
-	by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP
-	for <qemu-devel@nongnu.org>; Tue, 23 Oct 2018 07:50:50 +0000 (GMT)
-References: <20181022090255.19671-1-zyimin@linux.ibm.com>
-	<698a7fdd-47cc-cb3e-a280-3c4b656d92ef@redhat.com>
-From: Yi Min Zhao <zyimin@linux.ibm.com>
-Date: Tue, 23 Oct 2018 15:50:48 +0800
+	(envelope-from <d.csapak@proxmox.com>) id 1gErTf-0000z5-Fz
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 03:51:50 -0400
+Received: from proxmox-new.maurer-it.com ([212.186.127.180]:21901)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <d.csapak@proxmox.com>)
+	id 1gErTf-0000j8-7C
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 03:51:47 -0400
+References: <20181008131924.7377-1-d.csapak@proxmox.com>
+	<1f00827b-4c94-e10c-ab57-4ceb5223bee9@proxmox.com>
+	<d2f89cb6-0ea5-75bc-1bb1-3f0ce6509ec4@redhat.com>
+	<a8739a07-0675-5e16-b357-6bb2179aed11@redhat.com>
+	<9659efd3-3f39-c880-745e-8561e1989f82@redhat.com>
+From: Dominik Csapak <d.csapak@proxmox.com>
+Message-ID: <10c48083-769c-1f29-deca-a359b598912f@proxmox.com>
+Date: Tue, 23 Oct 2018 09:51:22 +0200
 MIME-Version: 1.0
-In-Reply-To: <698a7fdd-47cc-cb3e-a280-3c4b656d92ef@redhat.com>
+In-Reply-To: <9659efd3-3f39-c880-745e-8561e1989f82@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Message-Id: <ea0d4408-7cef-5ce9-feb2-dcd2c5321919@linux.ibm.com>
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] s390x/pci: add common fmb
+Subject: Re: [Qemu-devel] [PATCH] qapi: add info about reset to SHUTDOWN
+ event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -57,89 +33,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: armbru@redhat.com
 
-
-
-=E5=9C=A8 2018/10/22 =E4=B8=8B=E5=8D=888:17, Thomas Huth =E5=86=99=E9=81=93=
-:
-> On 2018-10-22 10:02, Yi Min Zhao wrote:
->> Common function measurement block is used to report counters of
->> successfully issued pcilg/stg/stb and rpcit instructions. This patch
->> introduces a new struct ZpciFmb and schedules a timer callback to
->> copy fmb to the guest memory at a interval time which is set to
->> 4s by default. While attemping to update fmb failed, an event error
->> would be generated. After pcilg/stg/stb and rpcit interception
->> handlers issue successfully, increase the related counter. The guest
->> could pass null address to switch off FMB and stop corresponding
->> timer.
+On 10/17/18 4:43 PM, Paolo Bonzini wrote:
+> On 17/10/2018 15:54, Eric Blake wrote:
+>>>
+>>> So the problem with shutdown_caused_by_guest is that you get the same
+>>> value for both guest reset and guest shutdown.=C2=A0 Could we instead=
+ just
+>>> pass the ShutdownCause in the event (similar to what was proposed eve=
+n
+>>> when discussing commit 08fba7ac9b618516a5f1d096f78a7e2837fe0594)?
 >>
->> Signed-off-by: Yi Min Zhao <zyimin@linux.ibm.com>
->> Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
-> [...]
->> +static int fmb_do_update(S390PCIBusDevice *pbdev, uint8_t offset, int=
- len)
->> +{
->> +    MemTxResult ret;
->> +
->> +    ret =3D address_space_write(&address_space_memory,
->> +                              pbdev->fmb_addr + (uint64_t)offset,
->> +                              MEMTXATTRS_UNSPECIFIED,
->> +                              (uint8_t *)&pbdev->fmb + offset,
->> +                              len);
->> +    if (ret) {
->> +        s390_pci_generate_error_event(ERR_EVENT_FMBA, pbdev->fh, pbde=
-v->fid,
->> +                                      pbdev->fmb_addr, 0);
->> +        fmb_timer_free(pbdev);
->> +    }
->> +
->> +    return ret;
->> +}
->> +
->> +static void fmb_update(void *opaque)
->> +{
->> +    S390PCIBusDevice *pbdev =3D opaque;
->> +    int64_t t =3D qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL);
->> +    uint8_t offset =3D offsetof(ZpciFmb, last_update);
->> +
->> +    /* Update U bit */
->> +    pbdev->fmb.last_update |=3D UPDATE_U_BIT;
->> +    if (fmb_do_update(pbdev, offset, sizeof(uint64_t))) {
->> +        return;
->> +    }
->> +
->> +    /* Update FMB counters */
->> +    pbdev->fmb.sample++;
->> +    if (fmb_do_update(pbdev, 0, sizeof(ZpciFmb))) {
->> +        return;
->> +    }
->> +
->> +    /* Clear U bit and update the time */
->> +    pbdev->fmb.last_update =3D time2tod(qemu_clock_get_ns(QEMU_CLOCK_=
-VIRTUAL));
->> +    pbdev->fmb.last_update &=3D ~UPDATE_U_BIT;
->> +    if (fmb_do_update(pbdev, offset, sizeof(uint64_t))) {
->> +        return;
->> +    }
->> +
->> +    timer_mod(pbdev->fmb_timer, t + DEFAULT_MUI);
->> +}
-> Sorry for noticing this in v1 already, but is this code endianess-safe?
-> I.e. can this also work with qemu-system-s390x running with TCG on a x8=
-6
-> host? I think you might have to use something like this here instead:
->
->    pbdev->fmb.sample =3D cpu_to_be32(be32_to_cpu(pbdev->fmb.sample) + 1=
-);
->
-> etc.
->
->   Thomas
->
->
-Aha!!! Yes, I think you're right. Indeed, we should consider endianess.
+>> Indeed, it sounds like we are now at the point where we want to do
+>> precisely that - expose more fine-grained details by adding
+>> ShutdownCause as a QAPI enum, rather than just adding another bool per
+>> reason.
+>=20
+> So should we split HOST_QMP into HOST_QMP_{SYSTEM_RESET,QUIT} and add
+> the ShutdownCause instead of was-reset?
+>=20
+> Paolo
+>=20
+>=20
 
---=20
-Yi Min
+this would work for us, should i send patches for this?
+i would (roughly) do this:
+
+move shutdowncause to qapi json
+split host_qmp into system_reset and quit
+and add the shutdowncause to the shutdown event
+fix iotests
+
+with kind regards
+Dominik
