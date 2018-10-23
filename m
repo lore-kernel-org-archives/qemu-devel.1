@@ -1,22 +1,21 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:37363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gEyhc-0007I5-KL
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 11:34:45 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1gEyhh-0007I5-Hp
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 11:34:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gEybh-0006q9-Br
-	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 11:28:37 -0400
-Date: Tue, 23 Oct 2018 16:06:24 +0100
+	(envelope-from <dgibson@ozlabs.org>) id 1gEybR-0006g2-Ko
+	for qemu-devel@nongnu.org; Tue, 23 Oct 2018 11:28:20 -0400
+Date: Tue, 23 Oct 2018 16:08:13 +0100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181023150624.GB12127@umbus.hotspot.internet-for-guests.com>
+Message-ID: <20181023150813.GD12127@umbus.hotspot.internet-for-guests.com>
 References: <20181018200422.4358-1-ehabkost@redhat.com>
-	<20181018200422.4358-4-ehabkost@redhat.com>
+	<20181018200422.4358-6-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="IiVenqGWf+H9Y6IX"
+	protocol="application/pgp-signature"; boundary="gE7i1rD7pdK0Ng3j"
 Content-Disposition: inline
-In-Reply-To: <20181018200422.4358-4-ehabkost@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 03/45] vl:c: make sure that sockets are
- calculated correctly in '-smp X' case
+In-Reply-To: <20181018200422.4358-6-ehabkost@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 05/45] trace-events: Fix copy/paste typo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,69 +25,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Rob Herring <robh@kernel.org>, libvir-list@redhat.com, Richard Henderson <rth@twiddle.net>, Eric Blake <eblake@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-arm@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Markus Armbruster <armbru@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Michael Walle <michael@walle.cc>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Alistair Francis <alistair@alistair23.me>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-ppc@nongnu.org, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Max Filippov <jcmvbkbc@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Rob Herring <robh@kernel.org>, libvir-list@redhat.com, Richard Henderson <rth@twiddle.net>, Eric Blake <eblake@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-arm@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Markus Armbruster <armbru@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Michael Walle <michael@walle.cc>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Alistair Francis <alistair@alistair23.me>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-ppc@nongnu.org, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Max Filippov <jcmvbkbc@gmail.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
 
 
---IiVenqGWf+H9Y6IX
-Content-Type: text/plain; charset=us-ascii
+--gE7i1rD7pdK0Ng3j
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 18, 2018 at 05:03:40PM -0300, Eduardo Habkost wrote:
-> From: Igor Mammedov <imammedo@redhat.com>
+On Thu, Oct 18, 2018 at 05:03:42PM -0300, Eduardo Habkost wrote:
+> From: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
 >=20
-> commit
->   (5cdc9b76e3 vl.c: Remove dead assignment)
-> removed sockets calculation when 'sockets' weren't provided on CLI
-> since there wasn't any users for it back then. Exiting checks
-> are neither reachable
->    } else if (sockets * cores * threads < cpus) {
-> or nor triggerable
->    if (sockets * cores * threads > max_cpus)
-> so we weren't noticing wrong topology since then, since users
-> recalculate sockets adhoc on their own.
+> Missed while reviewing 5dd85b4b486.
 >=20
-> However with deprecation check it becomes noticable, for example
->   -smp 2
-> will start printing warning:
->   "warning: Invalid CPU topology deprecated: sockets (1) * cores (1) * th=
-reads (1) !=3D maxcpus (2)"
-> calculating sockets if they weren't specified.
->=20
-> Fix it by returning back sockets calculation if it's omitted on CLI.
->=20
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
-> Message-Id: <1536836762-273036-3-git-send-email-imammedo@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Reviewed-by: C=E9dric Le Goater <clg@kaod.org>
+> Message-Id: <20181002212522.23303-2-f4bug@amsat.org>
 > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
 > ---
->  vl.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
+>  hw/timer/trace-events | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >=20
-> diff --git a/vl.c b/vl.c
-> index 027d04c7ca..2324321d91 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -1199,11 +1199,14 @@ static void smp_parse(QemuOpts *opts)
+> diff --git a/hw/timer/trace-events b/hw/timer/trace-events
+> index fa4213df5b..ca9ad6321a 100644
+> --- a/hw/timer/trace-events
+> +++ b/hw/timer/trace-events
+> @@ -56,7 +56,7 @@ systick_timer_tick(void) "systick reload"
+>  systick_read(uint64_t addr, uint32_t value, unsigned size) "systick read=
+ addr 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
+>  systick_write(uint64_t addr, uint32_t value, unsigned size) "systick wri=
+te addr 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
 > =20
->          /* compute missing values, prefer sockets over cores over thread=
-s */
->          if (cpus =3D=3D 0 || sockets =3D=3D 0) {
-> -            sockets =3D sockets > 0 ? sockets : 1;
->              cores =3D cores > 0 ? cores : 1;
->              threads =3D threads > 0 ? threads : 1;
->              if (cpus =3D=3D 0) {
-> +                sockets =3D sockets > 0 ? sockets : 1;
->                  cpus =3D cores * threads * sockets;
-> +            } else {
-> +                max_cpus =3D qemu_opt_get_number(opts, "maxcpus", cpus);
-> +                sockets =3D max_cpus / (cores * threads);
->              }
->          } else if (cores =3D=3D 0) {
->              threads =3D threads > 0 ? threads : 1;
+> -# hw/char/cmsdk_apb_timer.c
+> +# hw/timer/cmsdk_apb_timer.c
+>  cmsdk_apb_timer_read(uint64_t offset, uint64_t data, unsigned size) "CMS=
+DK APB timer read: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
+>  cmsdk_apb_timer_write(uint64_t offset, uint64_t data, unsigned size) "CM=
+SDK APB timer write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
+>  cmsdk_apb_timer_reset(void) "CMSDK APB timer: reset"
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -96,24 +74,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---IiVenqGWf+H9Y6IX
+--gE7i1rD7pdK0Ng3j
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlvPOO4ACgkQbDjKyiDZ
-s5IiUw//VhezYLeCt4lAvdb30JLSMMOaZBavHbln1mK/xMpu+ky/d1zCo80z9Fyy
-Lm+yZONfiHHw15XReRIHIJ7dILPvXkpC7hYPLgOAE6/6LxqrQhg4T2dbObDy4W7R
-R30GnpV52BWP74QVdkCuU95Jn/R/jqknJPWJnYnvsyrktIWA3JoY6zQIJUYRfw32
-s3Q4SgC5Id4PNsj4f3LTj2WujnKRcKdIWgy/Zwv47ol8toh4NpF7PA5+QTE7ZbKE
-vT6r84IUGlW2JQ7q5Bi3N3+jrKSkb5rKLoW8SLvnE3fIfV7vTcN0dNimuIbUXUXk
-ECiVQT5VWihdPpgB5mmqztSTxIHiajCgL9KiAiSpZC/zbfsBlEyKKqriiyILNTLM
-2DMtJeXEAxi5FUoAcc6aHoHPps0uhkOEVoGHq5uhTR9yfvYJU7ufMninFoCtMNQD
-uYOq5BYjuot2phjR3/xjJGvxFHSQk3+s7UW37fCs0eIQeeHwBb1PqV7VBn8+cHfN
-S76O3F3yG3EZ5/Y9f9hmuG2c716COIKXtgAgmUEN4WT490aumClhirfE/Ck4919h
-C8/2tKcF91k4Z1e2dXuXeuPn6B/ljnC63dVIK5ucwzh+qSfzdGmrEADDp6xqgH/T
-3irqqT14TL9rha8ywoTt0tfurr87juq7Dcson1BPcrZl9669FWQ=
-=Sbi6
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlvPOV0ACgkQbDjKyiDZ
+s5LzKQ/+JeGuzYfQU510G1hxIW1ZS17M5QYhQkpELWUAIXY98JHrlqbyOvH2to16
+6QjvpsEkbJK5eJNMh7eTYRCiySlNUaVALarclyC/adkhn9j9HcP8gJZ59jpCheoe
+C7nte8GH14gMDBCMLXS5yLHTOyAiVRp8fHH9L7Ljs+jDtIu4aIWQkNqVMn5gjxTS
+Hs9vUfok6PtRbiyudKpPjDOg1gTyX3TqhmDRwtbYaxCZ8zEZ8JWTmXKGEOTXq1j5
+uvRrXMujvBS+2g0DReg6FyeJokjadEnBMjheDPrNY3gWNYm4m3oCkLGMkbkq+ESU
+HSp98b54dXH1lRnHk+4VOMCqhxPY67UWr4LX0t3mRxIu3OIN7sEEg9kMCKo5eVDt
+5ZWlxz+KengLZUzoa4YbPzOOTV0VbkQOGYgfTF09g/JLjH9ImAo5SE0ijnTfTptv
+iA2c3+Jst+qokJ0C8HkzbmbS5eCi5NpLk/tx/OZG766KgONHnafozCJq0AAPSKgz
+IVAViNVfVKpayRJS1zCeUdVf0xNV3pip/vIayRXM67d2xOUQtWymJVhMB75PBXzr
+qgbj3gkqzaKJ70fdxTe9M/Osdy18EKuNNfrJoPujuiqXGbl1IuHzrH+b2viIfM52
+y+CPI9InOLujfhqqp4Dg+jCCZDCCQv4rp4MuYqyrw4wFAXZ88Sg=
+=OmoP
 -----END PGP SIGNATURE-----
 
---IiVenqGWf+H9Y6IX--
+--gE7i1rD7pdK0Ng3j--
