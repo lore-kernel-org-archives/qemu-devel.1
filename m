@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gFIAN-0001xF-8v
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 08:21:40 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gFIAW-00025n-Hj
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 08:21:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gFIAL-0003yY-98
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 08:21:39 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:41236 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gFIAV-00048P-OG
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 08:21:48 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:42156 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gFIAK-0003rY-OW
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 08:21:37 -0400
+	id 1gFIAV-00047G-Fo
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 08:21:47 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Wed, 24 Oct 2018 14:18:39 +0200
-Message-Id: <1540383527-7923-13-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Wed, 24 Oct 2018 14:18:40 +0200
+Message-Id: <1540383527-7923-14-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1540383527-7923-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1540383527-7923-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v7 12/20] target/mips: Add emulation of MXU
- instructions S32I2M and S32M2I
+Subject: [Qemu-devel] [PATCH v7 13/20] target/mips: Move MUL, S32M2I,
+ S32I2M handling out of main MXU switch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,135 +28,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: aurelien@aurel32.net, richard.henderson@linaro.org, jancraig@amazon.com, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com
 
-From: Craig Janeczek <jancraig@amazon.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add support for emulating the S32I2M and S32M2I MXU instructions.
-This commit also contains utility functions for reading/writing
-to MXU registers. This is required for overall MXU instruction
-support.
+Move MUL, S32M2I, S32I2M handling out of switch. These are all
+instructions that do not depend on MXU_EN flag of MXU_CR.
 
-Signed-off-by: Craig Janeczek <jancraig@amazon.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 90 +++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 84 insertions(+), 6 deletions(-)
+ target/mips/translate.c | 41 +++++++++++++++++++++++------------------
+ 1 file changed, 23 insertions(+), 18 deletions(-)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 29df4ce..c8c71c4 100644
+index c8c71c4..111affb 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -2575,6 +2575,35 @@ static inline void gen_store_srsgpr (int from, int to)
-     }
- }
- 
-+/* MXU General purpose registers moves. */
-+static inline void gen_load_mxu_gpr(TCGv t, unsigned int reg)
-+{
-+    if (reg == 0) {
-+        tcg_gen_movi_tl(t, 0);
-+    } else if (reg <= 15) {
-+        tcg_gen_mov_tl(t, mxu_gpr[reg - 1]);
-+    }
-+}
-+
-+static inline void gen_store_mxu_gpr(TCGv t, unsigned int reg)
-+{
-+    if (reg > 0 && reg <= 15) {
-+        tcg_gen_mov_tl(mxu_gpr[reg - 1], t);
-+    }
-+}
-+
-+/* MXU control register moves. */
-+static inline void gen_load_mxu_cr(TCGv t)
-+{
-+    tcg_gen_mov_tl(t, mxu_CR);
-+}
-+
-+static inline void gen_store_mxu_cr(TCGv t)
-+{
-+    tcg_gen_mov_tl(mxu_CR, t);
-+}
-+
-+
- /* Tests */
- static inline void gen_save_pc(target_ulong pc)
+@@ -24859,6 +24859,29 @@ static void decode_opc_mxu(CPUMIPSState *env, DisasContext *ctx)
  {
-@@ -23879,6 +23908,59 @@ static void decode_opc_special(CPUMIPSState *env, DisasContext *ctx)
+     uint32_t opcode = extract32(ctx->opcode, 0, 6);
  
- 
- /*
-+ * S32I2M XRa, rb - Register move from GRF to XRF
-+ */
-+static void gen_mxu_s32i2m(DisasContext *ctx)
-+{
-+    TCGv t0;
-+    uint32_t XRa, Rb;
++    if (opcode == OPC__MXU_MUL) {
++        uint32_t  rs, rt, rd, op1;
 +
-+    t0 = tcg_temp_new();
++        rs = extract32(ctx->opcode, 21, 5);
++        rt = extract32(ctx->opcode, 16, 5);
++        rd = extract32(ctx->opcode, 11, 5);
++        op1 = MASK_SPECIAL2(ctx->opcode);
 +
-+    XRa = extract32(ctx->opcode, 6, 5);
-+    Rb = extract32(ctx->opcode, 16, 5);
++        gen_arith(ctx, op1, rd, rs, rt);
 +
-+    gen_load_gpr(t0, Rb);
-+    if (XRa <= 15) {
-+        gen_store_mxu_gpr(t0, XRa);
-+    } else if (XRa == 16) {
-+        gen_store_mxu_cr(t0);
++        return;
 +    }
 +
-+    tcg_temp_free(t0);
-+}
-+
-+/*
-+ * S32M2I XRa, rb - Register move from XRF to GRF
-+ */
-+static void gen_mxu_s32m2i(DisasContext *ctx)
-+{
-+    TCGv t0;
-+    uint32_t XRa, Rb;
-+
-+    t0 = tcg_temp_new();
-+
-+    XRa = extract32(ctx->opcode, 6, 5);
-+    Rb = extract32(ctx->opcode, 16, 5);
-+
-+    if (XRa <= 15) {
-+        gen_load_mxu_gpr(t0, XRa);
-+    } else if (XRa == 16) {
-+        gen_load_mxu_cr(t0);
++    if (opcode == OPC_MXU_S32M2I) {
++        gen_mxu_s32m2i(ctx);
++        return;
 +    }
 +
-+    gen_store_gpr(t0, Rb);
++    if (opcode == OPC_MXU_S32I2M) {
++        gen_mxu_s32i2m(ctx);
++        return;
++    }
 +
-+    tcg_temp_free(t0);
-+}
-+
-+
-+/*
-+ * Decoding engine for MXU
-+ * =======================
-+ */
-+
-+/*
-  *
-  * Decode MXU pool00
-  *
-@@ -24952,14 +25034,10 @@ static void decode_opc_mxu(CPUMIPSState *env, DisasContext *ctx)
+     switch (opcode) {
+     case OPC_MXU_S32MADD:
+         /* TODO: Implement emulation of S32MADD instruction. */
+@@ -24870,18 +24893,6 @@ static void decode_opc_mxu(CPUMIPSState *env, DisasContext *ctx)
+         MIPS_INVAL("OPC_MXU_S32MADDU");
          generate_exception_end(ctx, EXCP_RI);
          break;
-     case OPC_MXU_S32M2I:
--        /* TODO: Implement emulation of S32M2I instruction. */
--        MIPS_INVAL("OPC_MXU_S32M2I");
--        generate_exception_end(ctx, EXCP_RI);
-+        gen_mxu_s32m2i(ctx);
+-    case OPC__MXU_MUL:     /* 0x2 - unused in MXU specs */
+-        {
+-            uint32_t  rs, rt, rd, op1;
+-
+-            rs = extract32(ctx->opcode, 21, 5);
+-            rt = extract32(ctx->opcode, 16, 5);
+-            rd = extract32(ctx->opcode, 11, 5);
+-            op1 = MASK_SPECIAL2(ctx->opcode);
+-
+-            gen_arith(ctx, op1, rd, rs, rt);
+-        }
+-        break;
+     case OPC_MXU__POOL00:
+         decode_opc_mxu__pool00(env, ctx);
          break;
-     case OPC_MXU_S32I2M:
--        /* TODO: Implement emulation of S32I2M instruction. */
--        MIPS_INVAL("OPC_MXU_S32I2M");
--        generate_exception_end(ctx, EXCP_RI);
-+        gen_mxu_s32i2m(ctx);
+@@ -25033,12 +25044,6 @@ static void decode_opc_mxu(CPUMIPSState *env, DisasContext *ctx)
+         MIPS_INVAL("OPC_MXU_S16SDI");
+         generate_exception_end(ctx, EXCP_RI);
          break;
+-    case OPC_MXU_S32M2I:
+-        gen_mxu_s32m2i(ctx);
+-        break;
+-    case OPC_MXU_S32I2M:
+-        gen_mxu_s32i2m(ctx);
+-        break;
      case OPC_MXU_D32SLL:
          /* TODO: Implement emulation of D32SLL instruction. */
+         MIPS_INVAL("OPC_MXU_D32SLL");
 -- 
 2.7.4
