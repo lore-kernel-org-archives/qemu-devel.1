@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60158)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gFJQd-0005AU-5y
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 09:42:32 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gFJQh-0005Fy-7i
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 09:42:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gFJQb-00021A-0g
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 09:42:30 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:49957 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gFJQd-000238-3L
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 09:42:33 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:49940 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gFJQY-0001s0-Pn
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 09:42:28 -0400
+	id 1gFJQa-0001qL-V7
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 09:42:30 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Wed, 24 Oct 2018 15:40:35 +0200
-Message-Id: <1540388447-27062-22-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Wed, 24 Oct 2018 15:40:29 +0200
+Message-Id: <1540388447-27062-16-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1540388447-27062-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1540388447-27062-1-git-send-email-aleksandar.markovic@rt-rk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 21/33] target/mips: Make R5900 DMULT[U],
- DDIV[U], LL[D] and SC[D] user only
+Subject: [Qemu-devel] [PULL v2 15/33] target/mips: Add a placeholder for
+ R5900 MMI3 instruction subclass
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,104 +30,70 @@ Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
 From: Fredrik Noring <noring@nocrew.org>
 
-The Linux kernel traps certain reserved instruction exceptions to
-emulate the corresponding instructions. QEMU plays the role of the
-kernel in user mode, so those traps are emulated by accepting the
-instructions.
-
-This change adds the function check_insn_opc_user_only to signal a
-reserved instruction exception for flagged CPUs in QEMU system mode.
-
-The MIPS III instructions DMULT[U], DDIV[U], LL[D] and SC[D] are not
-implemented in R5900 hardware. They are trapped and emulated by the
-Linux kernel and, accordingly, therefore QEMU user only instructions.
+Add a placeholder for MMI3 subclass.
 
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: Fredrik Noring <noring@nocrew.org>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 23 ++++++++++++++++++++++-
- 1 file changed, 22 insertions(+), 1 deletion(-)
+ target/mips/translate.c | 31 ++++++++++++++++++++++++++++++-
+ 1 file changed, 30 insertions(+), 1 deletion(-)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 551928d..6c50485 100644
+index cc00429..1c0400c 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -2872,6 +2872,21 @@ static inline void check_insn_opc_removed(DisasCon=
-text *ctx, uint64_t flags)
+@@ -24527,6 +24527,33 @@ static void decode_tx79_mmi2(CPUMIPSState *env, DisasContext *ctx)
      }
  }
-=20
-+/*
-+ * The Linux kernel traps certain reserved instruction exceptions to
-+ * emulate the corresponding instructions. QEMU is the kernel in user
-+ * mode, so those traps are emulated by accepting the instructions.
-+ *
-+ * A reserved instruction exception is generated for flagged CPUs if
-+ * QEMU runs in system mode.
-+ */
-+static inline void check_insn_opc_user_only(DisasContext *ctx, uint64_t =
-flags)
+ 
++static void decode_tx79_mmi3(CPUMIPSState *env, DisasContext *ctx)
 +{
-+#ifndef CONFIG_USER_ONLY
-+    check_insn_opc_removed(ctx, flags);
-+#endif
++    uint32_t opc = MASK_TX79_MMI3(ctx->opcode);
++
++    switch (opc) {
++    case TX79_MMI3_PMADDUW:    /* TODO: TX79_MMI3_PMADDUW */
++    case TX79_MMI3_PSRAVW:     /* TODO: TX79_MMI3_PSRAVW */
++    case TX79_MMI3_PMTHI:      /* TODO: TX79_MMI3_PMTHI */
++    case TX79_MMI3_PMTLO:      /* TODO: TX79_MMI3_PMTLO */
++    case TX79_MMI3_PINTEH:     /* TODO: TX79_MMI3_PINTEH */
++    case TX79_MMI3_PMULTUW:    /* TODO: TX79_MMI3_PMULTUW */
++    case TX79_MMI3_PDIVUW:     /* TODO: TX79_MMI3_PDIVUW */
++    case TX79_MMI3_PCPYUD:     /* TODO: TX79_MMI3_PCPYUD */
++    case TX79_MMI3_POR:        /* TODO: TX79_MMI3_POR */
++    case TX79_MMI3_PNOR:       /* TODO: TX79_MMI3_PNOR */
++    case TX79_MMI3_PEXCH:      /* TODO: TX79_MMI3_PEXCH */
++    case TX79_MMI3_PCPYH:      /* TODO: TX79_MMI3_PCPYH */
++    case TX79_MMI3_PEXCW:      /* TODO: TX79_MMI3_PEXCW */
++        generate_exception_end(ctx, EXCP_RI); /* TODO: TX79_MMI_CLASS_MMI3 */
++        break;
++    default:
++        MIPS_INVAL("TX79 MMI class MMI3");
++        generate_exception_end(ctx, EXCP_RI);
++        break;
++    }
 +}
 +
- /* This code generates a "reserved instruction" exception if the
-    CPU does not support 64-bit paired-single (PS) floating point data ty=
-pe */
- static inline void check_ps(DisasContext *ctx)
-@@ -23595,6 +23610,7 @@ static void decode_opc_special_legacy(CPUMIPSStat=
-e *env, DisasContext *ctx)
-     case OPC_DDIV:
-     case OPC_DDIVU:
-         check_insn(ctx, ISA_MIPS3);
-+        check_insn_opc_user_only(ctx, INSN_R5900);
-         check_mips_64(ctx);
-         gen_muldiv(ctx, op1, 0, rs, rt);
+ static void decode_tx79_mmi(CPUMIPSState *env, DisasContext *ctx)
+ {
+     uint32_t opc = MASK_TX79_MMI(ctx->opcode);
+@@ -24541,6 +24568,9 @@ static void decode_tx79_mmi(CPUMIPSState *env, DisasContext *ctx)
+     case TX79_MMI_CLASS_MMI2:
+         decode_tx79_mmi2(env, ctx);
          break;
-@@ -26350,6 +26366,7 @@ static void decode_opc(CPUMIPSState *env, DisasCo=
-ntext *ctx)
-          break;
-     case OPC_LL: /* Load and stores */
-         check_insn(ctx, ISA_MIPS2);
-+        check_insn_opc_user_only(ctx, INSN_R5900);
-         /* Fallthrough */
-     case OPC_LWL:
-     case OPC_LWR:
-@@ -26375,6 +26392,7 @@ static void decode_opc(CPUMIPSState *env, DisasCo=
-ntext *ctx)
-     case OPC_SC:
-         check_insn(ctx, ISA_MIPS2);
-          check_insn_opc_removed(ctx, ISA_MIPS32R6);
-+        check_insn_opc_user_only(ctx, INSN_R5900);
-          gen_st_cond(ctx, op, rt, rs, imm);
-          break;
-     case OPC_CACHE:
-@@ -26641,9 +26659,11 @@ static void decode_opc(CPUMIPSState *env, DisasC=
-ontext *ctx)
-=20
- #if defined(TARGET_MIPS64)
-     /* MIPS64 opcodes */
-+    case OPC_LLD:
-+        check_insn_opc_user_only(ctx, INSN_R5900);
-+        /* fall through */
-     case OPC_LDL:
-     case OPC_LDR:
--    case OPC_LLD:
-         check_insn_opc_removed(ctx, ISA_MIPS32R6);
-         /* fall through */
-     case OPC_LWU:
-@@ -26664,6 +26684,7 @@ static void decode_opc(CPUMIPSState *env, DisasCo=
-ntext *ctx)
-     case OPC_SCD:
-         check_insn_opc_removed(ctx, ISA_MIPS32R6);
-         check_insn(ctx, ISA_MIPS3);
-+        check_insn_opc_user_only(ctx, INSN_R5900);
-         check_mips_64(ctx);
-         gen_st_cond(ctx, op, rt, rs, imm);
-         break;
---=20
++    case TX79_MMI_CLASS_MMI3:
++        decode_tx79_mmi3(env, ctx);
++        break;
+     case TX79_MMI_MADD:          /* TODO: TX79_MMI_MADD */
+     case TX79_MMI_MADDU:         /* TODO: TX79_MMI_MADDU */
+     case TX79_MMI_PLZCW:         /* TODO: TX79_MMI_PLZCW */
+@@ -24554,7 +24584,6 @@ static void decode_tx79_mmi(CPUMIPSState *env, DisasContext *ctx)
+     case TX79_MMI_DIVU1:         /* TODO: TX79_MMI_DIVU1 */
+     case TX79_MMI_MADD1:         /* TODO: TX79_MMI_MADD1 */
+     case TX79_MMI_MADDU1:        /* TODO: TX79_MMI_MADDU1 */
+-    case TX79_MMI_CLASS_MMI3:    /* TODO: TX79_MMI_CLASS_MMI3 */
+     case TX79_MMI_PMFHL:         /* TODO: TX79_MMI_PMFHL */
+     case TX79_MMI_PMTHL:         /* TODO: TX79_MMI_PMTHL */
+     case TX79_MMI_PSLLH:         /* TODO: TX79_MMI_PSLLH */
+-- 
 2.7.4
