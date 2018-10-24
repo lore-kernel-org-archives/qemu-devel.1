@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35475)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gFS8d-000673-3J
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 19:00:31 -0400
+	(envelope-from <philmd@redhat.com>) id 1gFSQC-0003d1-DW
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 19:18:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gFS8V-0003gZ-Ku
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 19:00:28 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:53134)
+	(envelope-from <philmd@redhat.com>) id 1gFSQ9-0004qm-32
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 19:18:40 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:51471)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gFS8Q-0003My-Cc
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 19:00:22 -0400
-Received: by mail-wm1-f65.google.com with SMTP id 189-v6so7016605wmw.2
-	for <qemu-devel@nongnu.org>; Wed, 24 Oct 2018 16:00:11 -0700 (PDT)
-References: <1540357921-4199-1-git-send-email-liq3ea@gmail.com>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gFSQ6-0004l5-TQ
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 19:18:35 -0400
+Received: by mail-wm1-f67.google.com with SMTP id 143-v6so6980628wmf.1
+	for <qemu-devel@nongnu.org>; Wed, 24 Oct 2018 16:18:33 -0700 (PDT)
+References: <1540376314-5727-1-git-send-email-thuth@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <9943c62b-3d87-3359-a17f-d975ae228c0c@redhat.com>
-Date: Thu, 25 Oct 2018 01:00:09 +0200
+Message-ID: <3a04e8e5-22a7-efe4-2187-aaf5fcc95099@redhat.com>
+Date: Thu, 25 Oct 2018 01:18:30 +0200
 MIME-Version: 1.0
-In-Reply-To: <1540357921-4199-1-git-send-email-liq3ea@gmail.com>
+In-Reply-To: <1540376314-5727-1-git-send-email-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] fw_cfg: print error message when reading
- splashfile failed
+Subject: Re: [Qemu-devel] [PATCH] configs/alpha: Remove unused
+ CONFIG_PARALLEL_ISA switch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,46 +30,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@gmail.com>, lersek@redhat.com, peter.maydell@linaro.org, pbonzini@redhat.com
-Cc: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-On 24/10/18 7:12, Li Qiang wrote:
-> Also remove unnecessary 'res' variable.
+On 24/10/18 12:18, Thomas Huth wrote:
+> We don't use CONFIG_PARALLEL_ISA in any of our Makefiles, so this
+> is just a dead config option which can be removed.
 > 
-> Signed-off-by: Li Qiang <liq3ea@gmail.com>
-> ---
->   hw/nvram/fw_cfg.c | 7 +++----
->   1 file changed, 3 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-> index 946f765..f4a52d8 100644
-> --- a/hw/nvram/fw_cfg.c
-> +++ b/hw/nvram/fw_cfg.c
-> @@ -68,15 +68,14 @@ static char *read_splashfile(char *filename, gsize *file_sizep,
->                                int *file_typep)
->   {
->       GError *err = NULL;
-> -    gboolean res;
->       gchar *content;
->       int file_type;
->       unsigned int filehead;
->       int bmp_bpp;
->   
-> -    res = g_file_get_contents(filename, &content, file_sizep, &err);
-> -    if (res == FALSE) {
-> -        error_report("failed to read splash file '%s'", filename);
-> +    if (!g_file_get_contents(filename, &content, file_sizep, &err)) {
-> +        error_report("failed to read splash file '%s', %s",
+> Fixes: a4cb773928e047b137c6998209cf2eec857fac6b
 
-Can you use a column like the rest of the codebase?
+Oops, this slipped while refactoring the series, this is part of a 
+further cleanup that I never finished. Hopefully Kconfig will outdate it.
 
-i.e.: "failed to read splash file '%s': %s"
+Thanks for cleaning this!
 
-The maintainer taking this patch can do this minor change, so:
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-> +                     filename, err->message);
->           g_error_free(err);
->           return NULL;
->       }
+> ---
+>   default-configs/alpha-softmmu.mak | 1 -
+>   1 file changed, 1 deletion(-)
+> 
+> diff --git a/default-configs/alpha-softmmu.mak b/default-configs/alpha-softmmu.mak
+> index bbe361f..61435cc 100644
+> --- a/default-configs/alpha-softmmu.mak
+> +++ b/default-configs/alpha-softmmu.mak
+> @@ -8,7 +8,6 @@ CONFIG_I82374=y
+>   CONFIG_I8254=y
+>   CONFIG_I8257=y
+>   CONFIG_PARALLEL=y
+> -CONFIG_PARALLEL_ISA=y
+>   CONFIG_FDC=y
+>   CONFIG_PCKBD=y
+>   CONFIG_VGA_CIRRUS=y
 > 
