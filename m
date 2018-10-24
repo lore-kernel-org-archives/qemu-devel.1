@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51974)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51357)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <seba.dos1@gmail.com>) id 1gFKXp-0000E7-QB
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 10:54:05 -0400
+	(envelope-from <laurent@vivier.eu>) id 1gFM7b-0007bj-ET
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 12:35:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <seba.dos1@gmail.com>) id 1gFKIE-0002zm-4P
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 10:37:56 -0400
-From: Sebastian Krzyszkowiak <dos@dosowisko.net>
-Date: Wed, 24 Oct 2018 16:37:48 +0200
-Message-Id: <20181024143748.4425-1-dos@dosowisko.net>
+	(envelope-from <laurent@vivier.eu>) id 1gFM7Y-0005pd-AJ
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 12:35:03 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:36935)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1gFM7X-0005p1-VM
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 12:35:00 -0400
+References: <20181021165542.8692-1-jcmvbkbc@gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <46f658a3-836d-73aa-30cc-3a15f6ba1016@vivier.eu>
+Date: Wed, 24 Oct 2018 17:34:49 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] SDL: set a hint to not bypass the window
- compositor
+In-Reply-To: <20181021165542.8692-1-jcmvbkbc@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3] scripts/qemu-binfmt-conf.sh: add bFLT
+ handler registration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,30 +28,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, dos@dosowisko.net
+To: Max Filippov <jcmvbkbc@gmail.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 
-Without that, window effects in KWin get suspended as soon as any
-qemu-sdl window becomes visible. While the SDL default makes sense
-for games, it's not really suitable for QEMU.
+On 21/10/2018 17:55, Max Filippov wrote:
+> bFLT format header doesn't have enough information to register a handler
+> for a specific architecture. Add switch -f / --flat that registers one
+> of the qemu binaries as a handler for bFLT executable images.
+> 
+> Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+> ---
+> Changes v2->v3:
+> - fix bFLT in the patch subject
+> 
+> Changes v1->v2:
+> - drop unintended changes to dtc;
+> 
+>  scripts/qemu-binfmt-conf.sh | 32 ++++++++++++++++++++++++++++++--
+>  1 file changed, 30 insertions(+), 2 deletions(-)
 
-Signed-off-by: Sebastian Krzyszkowiak <dos@dosowisko.net>
----
- ui/sdl2.c | 3 +++
- 1 file changed, 3 insertions(+)
 
-diff --git a/ui/sdl2.c b/ui/sdl2.c
-index 2696b95c79..a10b6e3a08 100644
---- a/ui/sdl2.c
-+++ b/ui/sdl2.c
-@@ -786,6 +786,9 @@ static void sdl2_display_init(DisplayState *ds, DisplayOptions *o)
-                 SDL_GetError());
-         exit(1);
-     }
-+#ifdef SDL_HINT_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR /* only available since SDL 2.0.8 */
-+    SDL_SetHint(SDL_HINT_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR, "0");
-+#endif
-     SDL_SetHint(SDL_HINT_GRAB_KEYBOARD, "1");
-     memset(&info, 0, sizeof(info));
-     SDL_VERSION(&info.version);
--- 
-2.19.1
+BTW, I'm not sure it's the good way to do that. The script has been
+written with ELF in mind and no other alternative format.
+
+Perhaps we can add a format parameter, like "--format elf" (default),
+"--format bflt"  and then take the availabled CPU and mask/magic from
+the list corresponding for the selected format.
+
+And then rename qemu_set_binfmts() to qemu_elf_set_binfmts(), add
+function qemu_bflt_set_binfmt() and call the one you you need according
+the format you have selected.
+
+Somehing like:
+
+FORMAT_BINFMT_MISC_SET=qemu_elf_set_binfmts
+...
+    -F|--format)
+       shift
+       FORMAT_BINFMT_MISC_SET=qemu_$1_set_binfmts
+       ;;
+...
+
+$CHECK
+$FORMAT_BINFMT_MISC_SET
+
+and then
+
+qemu_bflt_set_binfmts()
+{
+   for cpu in ${qemu_target_list} ; do
+       magic='bFLT\x00\x00\x00\x04'
+       mask='\xff\xff\xff\xff\xff\xff\xff\xff'
+       qemu="$QEMU_PATH/qemu-$cpu"
+       qemu="$qemu$QEMU_SUFFIX"
+       $BINFMT_SET
+   done
+}
+
+Then with --systemd you provide only the cpu you want to generate, with
+--debian you use update-binfmts to select the only one to import, for
+/proc case we could add another parameter to only register one
+interpreter (--proc CPU ?)
+
+Thanks,
+Laurent
