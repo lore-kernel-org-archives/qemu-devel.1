@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34055)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35269)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gFL6E-0002Fq-Tk
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 11:29:35 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gFL9I-0004wd-5D
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 11:32:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gFL6D-0006yF-9y
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 11:29:34 -0400
-Received: from mail-oi1-x22b.google.com ([2607:f8b0:4864:20::22b]:38659)
+	(envelope-from <peter.maydell@linaro.org>) id 1gFL9H-00013Z-5G
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 11:32:44 -0400
+Received: from mail-ot1-x331.google.com ([2607:f8b0:4864:20::331]:38141)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gFL6C-0006xT-Tp
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 11:29:33 -0400
-Received: by mail-oi1-x22b.google.com with SMTP id k19-v6so4419100oiw.5
-	for <qemu-devel@nongnu.org>; Wed, 24 Oct 2018 08:29:30 -0700 (PDT)
+	id 1gFL9G-0000z0-TU
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 11:32:43 -0400
+Received: by mail-ot1-x331.google.com with SMTP id l1so5446353otj.5
+	for <qemu-devel@nongnu.org>; Wed, 24 Oct 2018 08:32:25 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <4ad07cff.15b5b.166a5cab84c.Coremail.wj193102@163.com>
-References: <4ad07cff.15b5b.166a5cab84c.Coremail.wj193102@163.com>
+In-Reply-To: <1540374728-27579-1-git-send-email-thuth@redhat.com>
+References: <1540374728-27579-1-git-send-email-thuth@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 24 Oct 2018 16:29:09 +0100
-Message-ID: <CAFEAcA9dC5acqJV4gjoaf=-mRK2H2gnzTORbfr90m+7_RnuUVA@mail.gmail.com>
+Date: Wed, 24 Oct 2018 16:32:04 +0100
+Message-ID: <CAFEAcA_MJb06vGTonXEvJWUeETf2gqQokE5CpwxeLkb+uQe_fQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] qemu3.0.0 use wine for the application of X86
+Subject: Re: [Qemu-devel] [PULL 0/6] qtest,
+ Makefiles and shell script improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,28 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: wj193102 <wj193102@163.com>
+To: Thomas Huth <thuth@redhat.com>
 Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 24 October 2018 at 12:16, wj193102 <wj193102@163.com> wrote:
-> Hi=EF=BC=8Ceverybody=E3=80=82
-> Now I have installed QEMU3.0.0. I want to launch wine by QEMU. But I can'=
-t find qemu-runtime-i386-XXX.tar.gz and qemu-XXX-i386-wine.tar.gz on the QE=
-MU web page.
-> Please tell me how I can get them  and use the wine by QEMU? Thank you ve=
-ry much.
+On 24 October 2018 at 10:52, Thomas Huth <thuth@redhat.com> wrote:
+>  Hi Peter,
+>
+> the following changes since commit 13399aad4fa87b2878c49d02a5d3bafa6c966ba3:
+>
+>   Merge remote-tracking branch 'remotes/armbru/tags/pull-error-2018-10-22' into staging (2018-10-23 17:20:23 +0100)
+>
+> are available in the git repository at:
+>
+>   https://gitlab.com/huth/qemu.git tags/pull-request-2018-10-24
+>
+> for you to fetch changes up to 86583a07c4a7d55b04db5942a70d176f5299144a:
+>
+>   configure: Provide option to explicitly disable AVX2 (2018-10-24 07:39:10 +0100)
+>
+> ----------------------------------------------------------------
+> - Disable migration-test with TCG on s390x (since there are known problems)
+> - Small Makefile improvements
+> - More modern shell scripting changes (use $() instead of ``)
+> - Add a configure option to disable AVX2
+> ----------------------------------------------------------------
 
-I'm not sure what you think those tarballs are or why they
-would be on the QEMU web page? If you've installed QEMU then
-you should be able to run an i386 wine binary in it, like
-any other guest binary, but we don't provide guest binaries.
-We assume you already have those.
 
-PS: try something simple first, like an "ls" binary, to
-check your setup is working, before you try to get wine
-running under QEMU.
 
-PPS: do you really want i386 and not x86-64 ?
+Applied, thanks.
 
-thanks
 -- PMM
