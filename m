@@ -1,14 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56343)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gFEy1-0007EL-CO
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 04:56:45 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1gFF21-0000gZ-Tt
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 05:00:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gFExs-00031i-PW
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 04:56:39 -0400
-From: Eric Auger <eric.auger@redhat.com>
-Date: Wed, 24 Oct 2018 10:56:02 +0200
-Message-Id: <20181024085602.16611-1-eric.auger@redhat.com>
-Subject: [Qemu-devel] [PATCH] hw/arm/virt: Set VIRT_COMPAT_3_0 compat
+	(envelope-from <eric.auger@redhat.com>) id 1gFF1w-000576-SA
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 05:00:49 -0400
+References: <20180921081819.9203-1-eric.auger@redhat.com>
+	<20180921081819.9203-8-eric.auger@redhat.com>
+	<20181022163923.35ad7a4e@bahia.lan>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <ff16761c-9524-4a3e-b000-6cb2ade91b8f@redhat.com>
+Date: Wed, 24 Oct 2018 11:00:14 +0200
+MIME-Version: 1.0
+In-Reply-To: <20181022163923.35ad7a4e@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v2 07/28] hw/vfio/common: Refactor container
+ initialization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,38 +26,187 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
-Cc: drjones@redhat.com
+To: Greg Kurz <groug@kaod.org>
+Cc: peter.maydell@linaro.org, yi.l.liu@intel.com, cdall@kernel.org, mst@redhat.com, jean-philippe.brucker@arm.com, qemu-devel@nongnu.org, peterx@redhat.com, alex.williamson@redhat.com, qemu-arm@nongnu.org, eric.auger.pro@gmail.com
 
-We are missing the VIRT_COMPAT_3_0 definition and setting.
-Let's add them.
+Hi Greg,
+On 10/22/18 4:39 PM, Greg Kurz wrote:
+> On Fri, 21 Sep 2018 10:17:58 +0200
+> Eric Auger <eric.auger@redhat.com> wrote:
+> 
+>> To prepare for testing yet another extension, let's
+>> refactor the code. We introduce vfio_iommu_get_type()
+>> helper which selects the richest API (v2 first). Then
+>> vfio_init_container() does the SET_CONTAINER and
+>> SET_IOMMU ioctl calls. So we end up with a switch/case
+>> on the iommu_type which should be a little bit more readable
+>> when introducing the NESTING extension check. Also ioctl's
+>> get called once per iommu_type.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> ---
+>>  hw/vfio/common.c | 102 ++++++++++++++++++++++++++++++-----------------
+>>  1 file changed, 65 insertions(+), 37 deletions(-)
+>>
+>> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+>> index 7c185e5a2e..53b8f773cc 100644
+>> --- a/hw/vfio/common.c
+>> +++ b/hw/vfio/common.c
+>> @@ -1036,12 +1036,58 @@ static void vfio_put_address_space(VFIOAddressSpace *space)
+>>      }
+>>  }
+>>  
+>> +/*
+>> + * vfio_iommu_get_type - selects the richest iommu_type (v2 first)
+>> + * nested only is selected if requested by @force_nested
+> 
+> It seems the second line belongs to patch 8.
+Yes it does. thanks for spotting that.
+> 
+> Appart from that, this definitely makes the code more readable.
+> 
+> Reviewed-by: Greg Kurz <groug@kaod.org>
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- hw/arm/virt.c | 4 ++++
- 1 file changed, 4 insertions(+)
+I will send this patch separately.
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 9f677825f9..a2b8d8f7c2 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1871,6 +1871,9 @@ static void virt_machine_3_1_options(MachineClass *mc)
- }
- DEFINE_VIRT_MACHINE_AS_LATEST(3, 1)
- 
-+#define VIRT_COMPAT_3_0 \
-+    HW_COMPAT_3_0
-+
- static void virt_3_0_instance_init(Object *obj)
- {
-     virt_3_1_instance_init(obj);
-@@ -1879,6 +1882,7 @@ static void virt_3_0_instance_init(Object *obj)
- static void virt_machine_3_0_options(MachineClass *mc)
- {
-     virt_machine_3_1_options(mc);
-+    SET_MACHINE_COMPAT(mc, VIRT_COMPAT_3_0);
- }
- DEFINE_VIRT_MACHINE(3, 0)
- 
--- 
-2.17.2
+Thanks
+
+Eric
+> 
+>> + */
+>> +static int vfio_iommu_get_type(VFIOContainer *container,
+>> +                               Error **errp)
+>> +{
+>> +    int fd = container->fd;
+>> +
+>> +    if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1v2_IOMMU)) {
+>> +        return VFIO_TYPE1v2_IOMMU;
+>> +    } else if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1_IOMMU)) {
+>> +        return VFIO_TYPE1_IOMMU;
+>> +    } else if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_v2_IOMMU)) {
+>> +        return VFIO_SPAPR_TCE_v2_IOMMU;
+>> +    } else if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_IOMMU)) {
+>> +        return VFIO_SPAPR_TCE_IOMMU;
+>> +    } else {
+>> +        error_setg(errp, "No available IOMMU models");
+>> +        return -EINVAL;
+>> +    }
+>> +}
+>> +
+>> +static int vfio_init_container(VFIOContainer *container, int group_fd,
+>> +                               int iommu_type, Error **errp)
+>> +{
+>> +    int ret;
+>> +
+>> +    ret = ioctl(group_fd, VFIO_GROUP_SET_CONTAINER, &container->fd);
+>> +    if (ret) {
+>> +        error_setg_errno(errp, errno, "failed to set group container");
+>> +        return -errno;
+>> +    }
+>> +
+>> +    ret = ioctl(container->fd, VFIO_SET_IOMMU, iommu_type);
+>> +    if (ret) {
+>> +        error_setg_errno(errp, errno, "failed to set iommu for container");
+>> +        return -errno;
+>> +    }
+>> +    container->iommu_type = iommu_type;
+>> +    return 0;
+>> +}
+>> +
+>>  static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+>>                                    Error **errp)
+>>  {
+>>      VFIOContainer *container;
+>>      int ret, fd;
+>>      VFIOAddressSpace *space;
+>> +    int iommu_type;
+>> +    bool v2 = false;
+>> +
+>>  
+>>      space = vfio_get_address_space(as);
+>>  
+>> @@ -1101,23 +1147,20 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+>>      container->fd = fd;
+>>      QLIST_INIT(&container->giommu_list);
+>>      QLIST_INIT(&container->hostwin_list);
+>> -    if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1_IOMMU) ||
+>> -        ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1v2_IOMMU)) {
+>> -        bool v2 = !!ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1v2_IOMMU);
+>> +
+>> +    iommu_type = vfio_iommu_get_type(container, errp);
+>> +    if (iommu_type < 0) {
+>> +            goto free_container_exit;
+>> +    }
+>> +
+>> +    switch (iommu_type) {
+>> +    case VFIO_TYPE1v2_IOMMU:
+>> +    case VFIO_TYPE1_IOMMU:
+>> +    {
+>>          struct vfio_iommu_type1_info info;
+>>  
+>> -        ret = ioctl(group->fd, VFIO_GROUP_SET_CONTAINER, &fd);
+>> +        ret = vfio_init_container(container, group->fd, iommu_type, errp);
+>>          if (ret) {
+>> -            error_setg_errno(errp, errno, "failed to set group container");
+>> -            ret = -errno;
+>> -            goto free_container_exit;
+>> -        }
+>> -
+>> -        container->iommu_type = v2 ? VFIO_TYPE1v2_IOMMU : VFIO_TYPE1_IOMMU;
+>> -        ret = ioctl(fd, VFIO_SET_IOMMU, container->iommu_type);
+>> -        if (ret) {
+>> -            error_setg_errno(errp, errno, "failed to set iommu for container");
+>> -            ret = -errno;
+>>              goto free_container_exit;
+>>          }
+>>  
+>> @@ -1137,28 +1180,16 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+>>          }
+>>          vfio_host_win_add(container, 0, (hwaddr)-1, info.iova_pgsizes);
+>>          container->pgsizes = info.iova_pgsizes;
+>> -    } else if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_IOMMU) ||
+>> -               ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_v2_IOMMU)) {
+>> +        break;
+>> +    }
+>> +    case VFIO_SPAPR_TCE_v2_IOMMU:
+>> +        v2 = true;
+>> +    case VFIO_SPAPR_TCE_IOMMU:
+>> +    {
+>>          struct vfio_iommu_spapr_tce_info info;
+>> -        bool v2 = !!ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_v2_IOMMU);
+>>  
+>> -        ret = ioctl(group->fd, VFIO_GROUP_SET_CONTAINER, &fd);
+>> +        ret = vfio_init_container(container, group->fd, iommu_type, errp);
+>>          if (ret) {
+>> -            error_setg_errno(errp, errno, "failed to set group container");
+>> -            ret = -errno;
+>> -            goto free_container_exit;
+>> -        }
+>> -        container->iommu_type =
+>> -            v2 ? VFIO_SPAPR_TCE_v2_IOMMU : VFIO_SPAPR_TCE_IOMMU;
+>> -        ret = ioctl(fd, VFIO_SET_IOMMU, container->iommu_type);
+>> -        if (ret) {
+>> -            container->iommu_type = VFIO_SPAPR_TCE_IOMMU;
+>> -            v2 = false;
+>> -            ret = ioctl(fd, VFIO_SET_IOMMU, container->iommu_type);
+>> -        }
+>> -        if (ret) {
+>> -            error_setg_errno(errp, errno, "failed to set iommu for container");
+>> -            ret = -errno;
+>>              goto free_container_exit;
+>>          }
+>>  
+>> @@ -1222,10 +1253,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+>>                                info.dma32_window_size - 1,
+>>                                0x1000);
+>>          }
+>> -    } else {
+>> -        error_setg(errp, "No available IOMMU models");
+>> -        ret = -EINVAL;
+>> -        goto free_container_exit;
+>> +    }
+>>      }
+>>  
+>>      vfio_kvm_device_add_group(group);
+> 
+> 
