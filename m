@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46328)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52500)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gFNbW-0004Y0-CB
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 14:10:03 -0400
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gFNvl-0001QW-N2
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 14:30:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gFNP9-00022k-0H
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 13:57:16 -0400
-Received: from mail-ot1-x332.google.com ([2607:f8b0:4864:20::332]:39917)
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gFNvk-0001TK-Ve
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 14:30:57 -0400
+Received: from mail-yw1-xc41.google.com ([2607:f8b0:4864:20::c41]:40988)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gFNP8-00021h-N9
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 13:57:14 -0400
-Received: by mail-ot1-x332.google.com with SMTP id a18so5941419otl.6
-	for <qemu-devel@nongnu.org>; Wed, 24 Oct 2018 10:57:14 -0700 (PDT)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gFNvk-0001T7-PV
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 14:30:56 -0400
+Received: by mail-yw1-xc41.google.com with SMTP id 135-v6so2486224ywo.8
+	for <qemu-devel@nongnu.org>; Wed, 24 Oct 2018 11:30:56 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1540388447-27062-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1540388447-27062-1-git-send-email-aleksandar.markovic@rt-rk.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 24 Oct 2018 18:56:53 +0100
-Message-ID: <CAFEAcA-XiRBFYPSGgreq6m6F7Hdk4fOKTCO2UQKiDz3FZgqKOQ@mail.gmail.com>
+References: <20181024023831.2529-1-jcmvbkbc@gmail.com>
+	<eac0b0b9-351f-20bf-c5e9-b4fb1f8885d1@vivier.eu>
+	<CAMo8Bf+SEQmHMct+ONPb4YanHMiP18Z5iYJTzLbUPGDDLf0uKA@mail.gmail.com>
+In-Reply-To: <CAMo8Bf+SEQmHMct+ONPb4YanHMiP18Z5iYJTzLbUPGDDLf0uKA@mail.gmail.com>
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Wed, 24 Oct 2018 11:30:44 -0700
+Message-ID: <CAMo8BfKCQ1-j7yx_hijvCaBMn_UfU25DVDmc67WYLOZ==26S6Q@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v2 00/33] MIPS queue for October 2018 - part
- 2 - v2
+Subject: Re: [Qemu-devel] [PATCH] linux-user/flatload: fix initial stack
+ pointer alignment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +30,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-On 24 October 2018 at 14:40, Aleksandar Markovic
-<aleksandar.markovic@rt-rk.com> wrote:
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+On Wed, Oct 24, 2018 at 10:19 AM Max Filippov <jcmvbkbc@gmail.com> wrote:
 >
-> The following changes since commit 13399aad4fa87b2878c49d02a5d3bafa6c966ba3:
+> On Wed, Oct 24, 2018 at 4:35 AM Laurent Vivier <laurent@vivier.eu> wrote:
+> > > diff --git a/linux-user/flatload.c b/linux-user/flatload.c
+> > > index 2eefe55e5000..1893966b5b30 100644
+> > > --- a/linux-user/flatload.c
+> > > +++ b/linux-user/flatload.c
 >
->   Merge remote-tracking branch 'remotes/armbru/tags/pull-error-2018-10-22' into staging (2018-10-23 17:20:23 +0100)
+> > > -        sp -= 16 - ((sp + stack_len) & 15);
+> > > +    if ((sp - stack_len) & 15) {
+> > > +        sp -= ((sp - stack_len) & 15);
+> > > +    }
+> >
+> > If I understand correctly the purpose, I think it could be clearer like:
+> >
+> >     sp = (sp - stack_len) & ~15;
 >
-> are available in the git repository at:
->
->   https://github.com/AMarkovic/qemu tags/mips-queue-oct-2018-part-2-v2
->
-> for you to fetch changes up to 373ecd3823f949fd550ec49685299e287af5753e:
->
->   target/mips: Fix decoding of ALIGN and DALIGN instructions (2018-10-24 15:20:32 +0200)
->
-> ----------------------------------------------------------------
-> MIPS queue for October 2018 - part 2 - v2
->
-> v1->v2:
->   - disassembler for R5900 feature removed (one whole patch and
->       parts of several other patches are excluded)
->   - amended R5900 CPU definition with respect to ASE_MMI
->   - minor improvements of patch titles, commit messages and comments
->
-> ----------------------------------------------------------------
->
-Applied, thanks.
+> Yes, you're right. I'll send v2.
 
--- PMM
+Well, not exactly. The sp is not moved down stack_len + alignment bytes,
+only the alignment bytes. I'll send v2 anyway.
+
+-- 
+Thanks.
+-- Max
