@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59946)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44186)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gFDhg-0006KY-AJ
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 03:35:45 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1gFEA1-0000H1-0O
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 04:05:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gFDhc-0005Rj-SQ
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 03:35:44 -0400
-Received: from mga09.intel.com ([134.134.136.24]:21197)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.z.zhang@linux.intel.com>)
-	id 1gFDhb-0005H1-U0
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 03:35:40 -0400
-From: Zhang Yi <yi.z.zhang@linux.intel.com>
-Date: Wed, 24 Oct 2018 22:14:56 +0800
-Message-Id: <a6491f996827f4039c1a52198ed5dcc7727cb0f9.1540389255.git.yi.z.zhang@linux.intel.com>
-In-Reply-To: <cover.1540389255.git.yi.z.zhang@linux.intel.com>
-References: <cover.1540389255.git.yi.z.zhang@linux.intel.com>
-Subject: [Qemu-devel] [PATCH 1/1] hostmem-file: remove the invalid pmem
- object id.
+	(envelope-from <richard.henderson@linaro.org>) id 1gFE9w-0005Pf-QJ
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 04:05:00 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:40073)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gFE9w-0005Jq-5W
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 04:04:56 -0400
+Received: by mail-wr1-x443.google.com with SMTP id d2-v6so4471788wro.7
+	for <qemu-devel@nongnu.org>; Wed, 24 Oct 2018 01:04:55 -0700 (PDT)
+References: <20181023203710.GA2239@sx9>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <9aea2b05-24d7-f845-d899-0c6fec033672@linaro.org>
+Date: Wed, 24 Oct 2018 09:04:51 +0100
+MIME-Version: 1.0
+In-Reply-To: <20181023203710.GA2239@sx9>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v8 00/38] target/mips: Limited support for
+ the R5900
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,51 +31,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, peter.maydell@linaro.org, yu.c.zhang@linux.intel.com, ehabkost@redhat.com, imammedo@redhat.com
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, stefanha@redhat.com, crosthwaite.peter@gmail.com, richard.henderson@linaro.org, xiaoguangrong.eric@gmail.com, Zhang Yi <yi.z.zhang@linux.intel.com>
+To: Fredrik Noring <noring@nocrew.org>, Peter Maydell <peter.maydell@linaro.org>, Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: "Maciej W. Rozycki" <macro@linux-mips.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Aurelien Jarno <aurelien@aurel32.net>, Petar Jovanovic <pjovanovic@wavecomp.com>, =?UTF-8?Q?J=c3=bcrgen_Urban?= <JuergenUrban@gmx.de>, qemu-devel@nongnu.org
 
-We will never get the canonical path from the object
-before object_property_add_child.
+On 10/23/18 9:37 PM, Fredrik Noring wrote:
+> Hi Peter, Aleksandar,
+> 
+>> Hi: I get compile errors on 32-bit hosts:
+>>
+>> /home/petmay01/qemu-for-merges/disas/mips.c:615:35: error: large
+>> integer implicitly truncated to unsigned type [-Werror=overflow]
+>>  #define INSN_5900                 0x100000000
+>>                                    ^
+>> /home/petmay01/qemu-for-merges/disas/mips.c:1200:17: note: in
+>> expansion of macro 'INSN_5900'
+>>  #define EE      INSN_5900    /* Emotion Engine */
+>>                  ^
+>> /home/petmay01/qemu-for-merges/disas/mips.c:2326:73: note: in
+>> expansion of macro 'EE'
+>>  {"div1",    "z,s,t",  0x7000001a, 0xfc00ffff, RD_s | RD_t | WR_HILO, 0, EE },
+>>                                                                          ^
+>>
+>> (and repeats on other similar uses).
+>>
+>> This is because this line is an initializer for "struct mips_opcode",
+>> and the final field is "unsigned long membership", which may be only
+>> 32 bits wide, but you're trying to put a number in that's too big for that.
+> 
+> I am sorry about that. We are out of bits.
+> 
+> Option 1: Discard all disassembly parts of the series. I would prefer this
+> if possible -- they are not essential now in my opinion.
+> 
+> Option 2: Drop all R5900 related changes for now.
+> 
+> Option 3: Extend the mips_opcode::membership field.
 
-Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
----
- backends/hostmem-file.c | 14 ++++----------
- 1 file changed, 4 insertions(+), 10 deletions(-)
+It's trivial to extend the field to uint64_t.
 
-diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
-index 639c8d4..9691c48 100644
---- a/backends/hostmem-file.c
-+++ b/backends/hostmem-file.c
-@@ -145,26 +145,20 @@ static void file_memory_backend_set_pmem(Object *o, bool value, Error **errp)
-     HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(o);
- 
-     if (host_memory_backend_mr_inited(backend)) {
--        char *path = object_get_canonical_path_component(o);
- 
--        error_setg(errp, "cannot change property 'pmem' of %s '%s'",
--                   object_get_typename(o),
--                   path);
--        g_free(path);
-+        error_setg(errp, "cannot change property 'pmem' of %s.",
-+                   object_get_typename(o));
-         return;
-     }
- 
- #ifndef CONFIG_LIBPMEM
-     if (value) {
-         Error *local_err = NULL;
--        char *path = object_get_canonical_path_component(o);
- 
-         error_setg(&local_err,
-                    "Lack of libpmem support while setting the 'pmem=on'"
--                   " of %s '%s'. We can't ensure data persistence.",
--                   object_get_typename(o),
--                   path);
--        g_free(path);
-+                   " of %s. We can't ensure data persistence.",
-+                   object_get_typename(o));
-         error_propagate(errp, local_err);
-         return;
-     }
--- 
-2.7.4
+
+r~
