@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56182)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gFRX0-0006Kt-Lo
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 18:21:39 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1gFRcc-0001Ca-5b
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 18:27:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gFRWw-0005N5-3y
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 18:21:38 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:40526)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gFRWv-0005IG-RC
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 18:21:34 -0400
-Received: by mail-pg1-x543.google.com with SMTP id o14-v6so3001265pgv.7
-	for <qemu-devel@nongnu.org>; Wed, 24 Oct 2018 15:21:27 -0700 (PDT)
-Date: Wed, 24 Oct 2018 15:21:25 -0700 (PDT)
-In-Reply-To: <20181020071451.27808-1-kbastian@mail.uni-paderborn.de>
-From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-a68ddfc1-c1f3-4c28-97a5-bf5dfc9db931@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 00/29] target/riscv: Convert to
- decodetree
+	(envelope-from <pbonzini@redhat.com>) id 1gFRcQ-00015h-ER
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 18:27:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50940)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gFRcP-000103-PP
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 18:27:14 -0400
+References: <1540243704-17090-1-git-send-email-george.kennedy@oracle.com>
+	<596ea83a-279e-3a76-ead3-14aa8efe0a1d@redhat.com>
+	<43e65c7a-f44d-797b-ab0c-389eaa0c0f82@oracle.com>
+	<0e52d605-871e-cdac-c1ae-b0da912611ba@redhat.com>
+	<adc9e69a-487b-44a6-7029-bff65f25801b@oracle.com>
+	<baf9d1db-51b7-939f-1f46-553c4fdd5939@redhat.com>
+	<51309caa-23eb-9c3b-329e-2885fe13d905@oracle.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <394610f8-1bfd-62ef-247b-8ad6330f3d4a@redhat.com>
+Date: Thu, 25 Oct 2018 00:27:01 +0200
+MIME-Version: 1.0
+In-Reply-To: <51309caa-23eb-9c3b-329e-2885fe13d905@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] lsi: Reselection needed to remove
+ pending commands from queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,133 +34,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Michael Clark <mjc@sifive.com>, sagark@eecs.berkeley.edu, kbastian@mail.uni-paderborn.de, peer.adelt@hni.uni-paderborn.de, Alistair Francis <Alistair.Francis@wdc.com>, richard.henderson@linaro.org, qemu-devel@nongnu.org
+To: George Kennedy <george.kennedy@oracle.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
 
-On Sat, 20 Oct 2018 00:14:22 PDT (-0700), kbastian@mail.uni-paderborn.de wrote:
-> Hi,
->
-> this patchset converts the RISC-V decoder to decodetree in three major steps:
->
-> 1) Convert 32-bit instructions to decodetree [Patch 1-14]:
->     Many of the gen_* functions are called by the decode functions for 16-bit
->     and 32-bit functions. If we move translation code from the gen_*
->     functions to the generated trans_* functions of decode-tree, we get a lot of
->     duplication. Therefore, we mostly generate calls to the old gen_* function
->     which are properly replaced after step 2).
->
->     Each of the trans_ functions are grouped into files corresponding to their
->     ISA extension, e.g. addi which is in RV32I is translated in the file
->     'trans_rvi.inc.c'.
->
-> 2) Convert 16-bit instructions to decodetree [Patch 15-17]:
->     All 16 bit instructions have a direct mapping to a 32 bit instruction. Thus,
->     we convert the arguments in the 16 bit trans_ function to the arguments of
->     the corresponding 32 bit instruction and call the 32 bit trans_ function.
->
-> 3) Remove old manual decoding in gen_* function [Patch 17-28]:
->     this move all manual translation code into the trans_* instructions of
->     decode tree, such that we can remove the old decode_* functions.
->
-> the full tree can be found here:
-> https://github.com/bkoppelmann/qemu/tree/riscv-dt-v2
+On 24/10/2018 15:06, George Kennedy wrote:
+>>
+>>
+>> Why didn't lsi_do_command invoke lsi_queue_command?=C2=A0 That would s=
+et
+>> s->current to NULL (on the SCSI level, that means the bus is freed; on
+>> the QEMU level, the idea is that lsi_transfer_data would then start a
+>> reselection).
+>=20
+> Through the extended period of time with no call to lsi_reselect(), the
+> check of "s->command_complete" in lsi_do_command() is always "1" and
+> therefore no call to lsi_queue_command() occurs.
+>=20
+> "s->command_complete" is set to "1" in lsi_transfer_data().
 
-Thanks!
+Ok, I think we're getting closer.  If the data transfer is from the
+device (read), then you can disconnect until the read is complete.
 
-I dropped this on top of master and it appears I'm getting a bunch of oops when 
-trying to boot Linux.  They're fairly far into the boot process and may be a 
-mistake on my end, I was just wondering if you'd booted Linux?
+If the data transfer however is to the device (write), there will be
+immediately a call to scsi_transfer_data, in order to get the written
+data, and s->command_complete is set to 1.
 
-I'll go through the patches and review them.
+However, this is wrong: the DMA transfer doesn't per se prevent a
+disconnect and a later reselect, and this might be the bug.  Basically
+we want to get rid of the "s->command_complete =3D 1" case completely.
+The patch to do this change in the SCSI bus handling would look
+something like this (untested):
 
->
-> Cheers,
-> Bastian
->
-> v1->v2:
->         - ex_shift_amount returns uint32_t
->         - use ctx->env instead of current_cpu->env_ptr
->         - fixed functionspacing
->         - RISCV32 now returns false instead of raising an exception
->         - shift translators now also use gen_arithm_imm()
->         - simplified fence/fence_i as suggested by Richard
->         - simplified gen_amo() with function pointers
->         - rs2 @atom_ld is now decimal
->         - use simplfied gen_amo() with function pointers
->         - REQUIRE_FPU uses do {} while (0)
->         - Add REQUIRE_FPU to arithm helpers
->         - RISCV32 now returns false instead of raising an exception
->         - Add REQUIRE_FPU to arithm helpers
->         - Stack allocate arg_c_* structs
->         - ex_rvc_register returns int
->         - special case of trans_c_addi4spn() returns false
->         - consistently return false for reserved cases instead of raising an
->           exception
->         - simplified trans_c_srli by Richard's suggestion
->         - remove extract_cj() since its result isn't used
->         - trans_branch -> gen_branch
->         - trans_load -> gen_load
->         - removed negative memop check
->         - trans_store -> gen_store
->         - removed negative memop check
->         - trans_arith_imm -> gen_arith_imm
->         - Add missing TARGET_RISC64 checks
->         - Reimplement shift translators that were omited in [0004/0028]
->         - trans_shift -> gen_shift
->         - Add missing TARGET_RISCV64 conditions
->         - trans_arith_w -> gen_arith_w
->         - Add missing gen_exception_illegal
->         - dropped 0028
->
->
-> Bastian Koppelmann (29):
->   target/riscv: Move CPURISCVState pointer to DisasContext
->   targer/riscv: Activate decodetree and implemnt LUI & AUIPC
->   target/riscv: Convert RVXI branch insns to decodetree
->   target/riscv: Convert RVXI load/store insns to decodetree
->   target/riscv: Convert RVXI arithmetic insns to decodetree
->   target/riscv: Convert RVXI fence insns to decodetree
->   target/riscv: Convert RVXI csr insns to decodetree
->   target/riscv: Convert RVXM insns to decodetree
->   target/riscv: Convert RV32A insns to decodetree
->   target/riscv: Convert RV64A insns to decodetree
->   target/riscv: Convert RV32F insns to decodetree
->   target/riscv: Convert RV64F insns to decodetree
->   target/riscv: Convert RV32D insns to decodetree
->   target/riscv: Convert RV64D insns to decodetree
->   target/riscv: Convert RV priv insns to decodetree
->   target/riscv: Convert quadrant 0 of RVXC insns to decodetree
->   target/riscv: Convert quadrant 1 of RVXC insns to decodetree
->   target/riscv: Convert quadrant 2 of RVXC insns to decodetree
->   target/riscv: Remove gen_jalr()
->   target/riscv: Remove manual decoding from gen_branch()
->   target/riscv: Remove manual decoding from gen_load()
->   target/riscv: Remove manual decoding from gen_store()
->   target/riscv: Move gen_arith_imm() decoding into trans_* functions
->   target/riscv: make ADD/SUB/OR/XOR/AND insn use arg lists
->   target/riscv: Remove shift and slt insn manual decoding
->   target/riscv: Remove manual decoding of RV32/64M insn
->   target/riscv: Remove gen_system()
->   target/riscv: Remove decode_RV32_64G()
->   target/riscv: Rename trans_arith to gen_arith
->
->  target/riscv/Makefile.objs                    |   17 +
->  target/riscv/insn16.decode                    |  126 ++
->  target/riscv/insn32.decode                    |  256 +++
->  .../riscv/insn_trans/trans_privileged.inc.c   |  111 ++
->  target/riscv/insn_trans/trans_rva.inc.c       |  244 +++
->  target/riscv/insn_trans/trans_rvc.inc.c       |  337 ++++
->  target/riscv/insn_trans/trans_rvd.inc.c       |  413 ++++
->  target/riscv/insn_trans/trans_rvf.inc.c       |  402 ++++
->  target/riscv/insn_trans/trans_rvi.inc.c       |  629 ++++++
->  target/riscv/insn_trans/trans_rvm.inc.c       |  125 ++
->  target/riscv/translate.c                      | 1756 ++---------------
->  11 files changed, 2853 insertions(+), 1563 deletions(-)
->  create mode 100644 target/riscv/insn16.decode
->  create mode 100644 target/riscv/insn32.decode
->  create mode 100644 target/riscv/insn_trans/trans_privileged.inc.c
->  create mode 100644 target/riscv/insn_trans/trans_rva.inc.c
->  create mode 100644 target/riscv/insn_trans/trans_rvc.inc.c
->  create mode 100644 target/riscv/insn_trans/trans_rvd.inc.c
->  create mode 100644 target/riscv/insn_trans/trans_rvf.inc.c
->  create mode 100644 target/riscv/insn_trans/trans_rvi.inc.c
->  create mode 100644 target/riscv/insn_trans/trans_rvm.inc.c
+diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
+index d1e6534311..c32ef40e78 100644
+--- a/hw/scsi/lsi53c895a.c
++++ b/hw/scsi/lsi53c895a.c
+@@ -565,6 +565,21 @@ static void lsi_bad_selection(LSIState *s, uint32_t =
+id)
+     lsi_disconnect(s);
+ }
+
++/* Disconnect when DMA has finished but the command did not
++ * complete immediately.
++ */
++static void lsi_maybe_disconnect(LSIState *s)
++{
++    if (!s->current->dma_len && !s->command_complete) {
++        lsi_add_msg_byte(s, 2); /* SAVE DATA POINTER */
++        lsi_add_msg_byte(s, 4); /* DISCONNECT */
++        /* wait data */
++        lsi_set_phase(s, PHASE_MI);
++        s->msg_action =3D 1;
++        lsi_queue_command(s);
++    }
++}
++
+ /* Initiate a SCSI layer data transfer.  */
+ static void lsi_do_dma(LSIState *s, int out)
+ {
+@@ -612,6 +627,7 @@ static void lsi_do_dma(LSIState *s, int out)
+     if (s->current->dma_len =3D=3D 0) {
+         s->current->dma_buf =3D NULL;
+         scsi_req_continue(s->current->req);
++        lsi_maybe_disconnect(s);
+     } else {
+         s->current->dma_buf +=3D count;
+         lsi_resume_script(s);
+@@ -631,7 +647,6 @@ static void lsi_queue_command(LSIState *s)
+     s->current =3D NULL;
+
+     p->pending =3D 0;
+-    p->out =3D (s->sstat1 & PHASE_MASK) =3D=3D PHASE_DO;
+ }
+
+ /* Queue a byte for a MSG IN phase.  */
+@@ -746,7 +761,7 @@ static void lsi_command_complete(SCSIRequest *req,
+     out =3D (s->sstat1 & PHASE_MASK) =3D=3D PHASE_DO;
+     trace_lsi_command_complete(status);
+     s->status =3D status;
+-    s->command_complete =3D 2;
++    s->command_complete =3D 1;
+     if (s->waiting && s->dbc !=3D 0) {
+         /* Raise phase mismatch for short transfers.  */
+         lsi_bad_phase(s, out, PHASE_ST);
+@@ -781,7 +796,6 @@ static void lsi_transfer_data(SCSIRequest *req,
+     /* host adapter (re)connected */
+     trace_lsi_transfer_data(req->tag, len);
+     s->current->dma_len =3D len;
+-    s->command_complete =3D 1;
+     if (s->waiting) {
+         if (s->waiting =3D=3D 1 || s->dbc =3D=3D 0) {
+             lsi_resume_script(s);
+@@ -819,28 +833,12 @@ static void lsi_do_command(LSIState *s)
+                                    s->current);
+
+     n =3D scsi_req_enqueue(s->current->req);
++    s->current->out =3D (n < 0);
++    lsi_set_phase(s, s->current->out ? PHASE_DO : PHASE_DI);
+     if (n) {
+-        if (n > 0) {
+-            lsi_set_phase(s, PHASE_DI);
+-        } else if (n < 0) {
+-            lsi_set_phase(s, PHASE_DO);
+-        }
+         scsi_req_continue(s->current->req);
+     }
+-    if (!s->command_complete) {
+-        if (n) {
+-            /* Command did not complete immediately so disconnect.  */
+-            lsi_add_msg_byte(s, 2); /* SAVE DATA POINTER */
+-            lsi_add_msg_byte(s, 4); /* DISCONNECT */
+-            /* wait data */
+-            lsi_set_phase(s, PHASE_MI);
+-            s->msg_action =3D 1;
+-            lsi_queue_command(s);
+-        } else {
+-            /* wait command complete */
+-            lsi_set_phase(s, PHASE_DI);
+-        }
+-    }
++    lsi_maybe_disconnect(s);
+ }
+
+ static void lsi_do_status(LSIState *s)
+
+
+Of course, this doesn't include the change to WAIT RESELECT handling.
+It only ensures (or attempts to ensure) that the bus is disconnected and
+later reselected on long-running I/O, no matter the data direction.
+
+Thanks,
+
+Paolo
