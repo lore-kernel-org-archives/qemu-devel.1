@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59974)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59971)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gFJQM-0004uQ-OP
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 09:42:17 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gFJQM-0004uL-Kn
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 09:42:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gFJQK-0001sk-UA
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gFJQK-0001sE-Mj
 	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 09:42:14 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:49941 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:49882 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gFJQK-0001qP-GC
+	id 1gFJQK-0001l8-5J
 	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 09:42:12 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Wed, 24 Oct 2018 15:40:30 +0200
-Message-Id: <1540388447-27062-17-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Wed, 24 Oct 2018 15:40:19 +0200
+Message-Id: <1540388447-27062-6-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1540388447-27062-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1540388447-27062-1-git-send-email-aleksandar.markovic@rt-rk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 16/33] target/mips: Support R5900
- three-operand MULT and MULTU instructions
+Subject: [Qemu-devel] [PULL v2 05/33] target/mips: Define R5900 MMI0 opcode
+ constants
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,117 +30,76 @@ Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
 From: Fredrik Noring <noring@nocrew.org>
 
-The three-operand MULT and MULTU are the only R5900-specific
-instructions emitted by GCC 7.3. The R5900 also implements the three-
-operand MADD and MADDU instructions, but they are omitted in QEMU for
-now since they are absent in programs compiled by current GCC versions.
-
-Likewise, the R5900-specific pipeline 1 instruction variants MULT1,
-MULTU1, DIV1, DIVU1, MADD1, MADDU1, MFHI1, MFLO1, MTHI1 and MTLO1
-are omitted here as well.
+Add definition of MI0 opcodes.
 
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: Fredrik Noring <noring@nocrew.org>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 74 +++++++++++++++++++++++++++++++++++++++++++=
-++++++
- 1 file changed, 74 insertions(+)
+ target/mips/translate.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 1c0400c..3dc6d80 100644
+index ae98817..242f2df 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -4766,6 +4766,78 @@ static void gen_muldiv(DisasContext *ctx, uint32_t=
- opc,
-     tcg_temp_free(t1);
- }
-=20
+@@ -2180,6 +2180,57 @@ enum {
+     TX79_MMI_PSRAW      = 0x3F | TX79_CLASS_MMI,
+ };
+ 
 +/*
-+ * These MULT and MULTU instructions implemented in for example the
-+ * Toshiba/Sony R5900 and the Toshiba TX19, TX39 and TX79 core
-+ * architectures are special three-operand variants with the syntax
++ * TX79 Multimedia Instructions with opcode field = MMI and bits 5..0 = MMI0:
 + *
-+ *     MULT[U] rd, rs, rt
++ *  31    26                        10     6 5      0
++ * +--------+----------------------+--------+--------+
++ * |   MMI  |                      |function|  MMI0  |
++ * +--------+----------------------+--------+--------+
 + *
-+ * such that
-+ *
-+ *     (rd, LO, HI) <- rs * rt
-+ *
-+ * where the low-order 32-bits of the result is placed into both the
-+ * GPR rd and the special register LO. The high-order 32-bits of the
-+ * result is placed into the special register HI.
-+ *
-+ * If the GPR rd is omitted in assembly language, it is taken to be 0,
-+ * which is the zero register that always reads as 0.
++ * function  bits 7..6
++ *     bits |   0   |   1   |   2   |   3
++ *    10..8 |   00  |   01  |   10  |   11
++ *   -------+-------+-------+-------+-------
++ *    0 000 | PADDW | PSUBW | PCGTW | PMAXW
++ *    1 001 | PADDH | PSUBH | PCGTH | PMAXH
++ *    2 010 | PADDB | PSUBB | PCGTB |   *
++ *    3 011 |   *   |   *   |   *   |   *
++ *    4 100 | PADDSW| PSUBSW| PEXTLW| PPACW
++ *    5 101 | PADDSH| PSUBSH| PEXTLH| PPACH
++ *    6 110 | PADDSB| PSUBSB| PEXTLB| PPACB
++ *    7 111 |   *   |   *   | PEXT5 | PPAC5
 + */
-+static void gen_mul_txx9(DisasContext *ctx, uint32_t opc,
-+                         int rd, int rs, int rt)
-+{
-+    TCGv t0 =3D tcg_temp_new();
-+    TCGv t1 =3D tcg_temp_new();
-+    int acc =3D 0;
 +
-+    gen_load_gpr(t0, rs);
-+    gen_load_gpr(t1, rt);
++#define MASK_TX79_MMI0(op) (MASK_OP_MAJOR(op) | ((op) & 0x7FF))
++enum {
++    TX79_MMI0_PADDW  = (0x00 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PSUBW  = (0x01 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PCGTW  = (0x02 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PMAXW  = (0x03 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PADDH  = (0x04 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PSUBH  = (0x05 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PCGTH  = (0x06 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PMAXH  = (0x07 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PADDB  = (0x08 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PSUBB  = (0x09 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PCGTB  = (0x0A << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PADDSW = (0x10 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PSUBSW = (0x11 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PEXTLW = (0x12 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PPACW  = (0x13 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PADDSH = (0x14 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PSUBSH = (0x15 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PEXTLH = (0x16 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PPACH  = (0x17 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PADDSB = (0x18 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PSUBSB = (0x19 << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PEXTLB = (0x1A << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PPACB  = (0x1B << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PEXT5  = (0x1E << 6) | TX79_MMI_CLASS_MMI0,
++    TX79_MMI0_PPAC5  = (0x1F << 6) | TX79_MMI_CLASS_MMI0,
++};
 +
-+    switch (opc) {
-+    case OPC_MULT:
-+        {
-+            TCGv_i32 t2 =3D tcg_temp_new_i32();
-+            TCGv_i32 t3 =3D tcg_temp_new_i32();
-+            tcg_gen_trunc_tl_i32(t2, t0);
-+            tcg_gen_trunc_tl_i32(t3, t1);
-+            tcg_gen_muls2_i32(t2, t3, t2, t3);
-+            if (rd) {
-+                tcg_gen_ext_i32_tl(cpu_gpr[rd], t2);
-+            }
-+            tcg_gen_ext_i32_tl(cpu_LO[acc], t2);
-+            tcg_gen_ext_i32_tl(cpu_HI[acc], t3);
-+            tcg_temp_free_i32(t2);
-+            tcg_temp_free_i32(t3);
-+        }
-+        break;
-+    case OPC_MULTU:
-+        {
-+            TCGv_i32 t2 =3D tcg_temp_new_i32();
-+            TCGv_i32 t3 =3D tcg_temp_new_i32();
-+            tcg_gen_trunc_tl_i32(t2, t0);
-+            tcg_gen_trunc_tl_i32(t3, t1);
-+            tcg_gen_mulu2_i32(t2, t3, t2, t3);
-+            if (rd) {
-+                tcg_gen_ext_i32_tl(cpu_gpr[rd], t2);
-+            }
-+            tcg_gen_ext_i32_tl(cpu_LO[acc], t2);
-+            tcg_gen_ext_i32_tl(cpu_HI[acc], t3);
-+            tcg_temp_free_i32(t2);
-+            tcg_temp_free_i32(t3);
-+        }
-+        break;
-+    default:
-+        MIPS_INVAL("mul TXx9");
-+        generate_exception_end(ctx, EXCP_RI);
-+        goto out;
-+    }
-+
-+ out:
-+    tcg_temp_free(t0);
-+    tcg_temp_free(t1);
-+}
-+
- static void gen_mul_vr54xx (DisasContext *ctx, uint32_t opc,
-                             int rd, int rs, int rt)
- {
-@@ -23490,6 +23562,8 @@ static void decode_opc_special_legacy(CPUMIPSStat=
-e *env, DisasContext *ctx)
-             check_insn(ctx, INSN_VR54XX);
-             op1 =3D MASK_MUL_VR54XX(ctx->opcode);
-             gen_mul_vr54xx(ctx, op1, rd, rs, rt);
-+        } else if (ctx->insn_flags & INSN_R5900) {
-+            gen_mul_txx9(ctx, op1, rd, rs, rt);
-         } else {
-             gen_muldiv(ctx, op1, rd & 3, rs, rt);
-         }
---=20
+ /* global register indices */
+ static TCGv cpu_gpr[32], cpu_PC;
+ static TCGv cpu_HI[MIPS_DSP_ACC], cpu_LO[MIPS_DSP_ACC];
+-- 
 2.7.4
