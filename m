@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57458)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gFF21-0000gZ-Tt
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 05:00:53 -0400
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gFF8y-000495-8g
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 05:08:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gFF1w-000576-SA
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 05:00:49 -0400
-References: <20180921081819.9203-1-eric.auger@redhat.com>
-	<20180921081819.9203-8-eric.auger@redhat.com>
-	<20181022163923.35ad7a4e@bahia.lan>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <ff16761c-9524-4a3e-b000-6cb2ade91b8f@redhat.com>
-Date: Wed, 24 Oct 2018 11:00:14 +0200
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gFF8u-0001cD-3P
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 05:08:00 -0400
+Received: from mail.uni-paderborn.de ([131.234.142.9]:59624)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
+	id 1gFF8t-0001a0-Ox
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 05:07:55 -0400
+References: <20181020071451.27808-1-kbastian@mail.uni-paderborn.de>
+	<20181020071451.27808-24-kbastian@mail.uni-paderborn.de>
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Message-ID: <eaf7c217-885e-9652-bfde-5e3cfd9e1e18@mail.uni-paderborn.de>
+Date: Wed, 24 Oct 2018 11:07:51 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181022163923.35ad7a4e@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20181020071451.27808-24-kbastian@mail.uni-paderborn.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v2 07/28] hw/vfio/common: Refactor container
- initialization
+Content-Language: en-US-large
+Subject: Re: [Qemu-devel] [PATCH v2 23/29] target/riscv: Move
+ gen_arith_imm() decoding into trans_* functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,187 +30,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: peter.maydell@linaro.org, yi.l.liu@intel.com, cdall@kernel.org, mst@redhat.com, jean-philippe.brucker@arm.com, qemu-devel@nongnu.org, peterx@redhat.com, alex.williamson@redhat.com, qemu-arm@nongnu.org, eric.auger.pro@gmail.com
+To: mjc@sifive.com, sagark@eecs.berkeley.edu, palmer@sifive.com
+Cc: richard.henderson@linaro.org, peer.adelt@hni.uni-paderborn.de, Alistair.Francis@wdc.com, qemu-devel@nongnu.org
 
-Hi Greg,
-On 10/22/18 4:39 PM, Greg Kurz wrote:
-> On Fri, 21 Sep 2018 10:17:58 +0200
-> Eric Auger <eric.auger@redhat.com> wrote:
-> 
->> To prepare for testing yet another extension, let's
->> refactor the code. We introduce vfio_iommu_get_type()
->> helper which selects the richest API (v2 first). Then
->> vfio_init_container() does the SET_CONTAINER and
->> SET_IOMMU ioctl calls. So we end up with a switch/case
->> on the iommu_type which should be a little bit more readable
->> when introducing the NESTING extension check. Also ioctl's
->> get called once per iommu_type.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> ---
->>  hw/vfio/common.c | 102 ++++++++++++++++++++++++++++++-----------------
->>  1 file changed, 65 insertions(+), 37 deletions(-)
->>
->> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
->> index 7c185e5a2e..53b8f773cc 100644
->> --- a/hw/vfio/common.c
->> +++ b/hw/vfio/common.c
->> @@ -1036,12 +1036,58 @@ static void vfio_put_address_space(VFIOAddressSpace *space)
->>      }
->>  }
->>  
->> +/*
->> + * vfio_iommu_get_type - selects the richest iommu_type (v2 first)
->> + * nested only is selected if requested by @force_nested
-> 
-> It seems the second line belongs to patch 8.
-Yes it does. thanks for spotting that.
-> 
-> Appart from that, this definitely makes the code more readable.
-> 
-> Reviewed-by: Greg Kurz <groug@kaod.org>
 
-I will send this patch separately.
+On 10/20/18 9:14 AM, Bastian Koppelmann wrote:
+> @@ -338,27 +375,63 @@ static bool trans_and(DisasContext *ctx, arg_and *a, uint32_t insn)
+>   
+>   static bool trans_addiw(DisasContext *ctx, arg_addiw *a, uint32_t insn)
+>   {
+> -    gen_arith_imm(ctx, OPC_RISC_ADDIW, a->rd, a->rs1, a->imm);
+> -    return true;
+> +#ifdef TARGET_RISCV64
+> +    bool res = gen_arith_imm(ctx, a, &tcg_gen_add_tl);
+> +    tcg_gen_ext32s_tl(cpu_gpr[a->rd], cpu_gpr[a->rd]);
 
-Thanks
 
-Eric
-> 
->> + */
->> +static int vfio_iommu_get_type(VFIOContainer *container,
->> +                               Error **errp)
->> +{
->> +    int fd = container->fd;
->> +
->> +    if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1v2_IOMMU)) {
->> +        return VFIO_TYPE1v2_IOMMU;
->> +    } else if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1_IOMMU)) {
->> +        return VFIO_TYPE1_IOMMU;
->> +    } else if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_v2_IOMMU)) {
->> +        return VFIO_SPAPR_TCE_v2_IOMMU;
->> +    } else if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_IOMMU)) {
->> +        return VFIO_SPAPR_TCE_IOMMU;
->> +    } else {
->> +        error_setg(errp, "No available IOMMU models");
->> +        return -EINVAL;
->> +    }
->> +}
->> +
->> +static int vfio_init_container(VFIOContainer *container, int group_fd,
->> +                               int iommu_type, Error **errp)
->> +{
->> +    int ret;
->> +
->> +    ret = ioctl(group_fd, VFIO_GROUP_SET_CONTAINER, &container->fd);
->> +    if (ret) {
->> +        error_setg_errno(errp, errno, "failed to set group container");
->> +        return -errno;
->> +    }
->> +
->> +    ret = ioctl(container->fd, VFIO_SET_IOMMU, iommu_type);
->> +    if (ret) {
->> +        error_setg_errno(errp, errno, "failed to set iommu for container");
->> +        return -errno;
->> +    }
->> +    container->iommu_type = iommu_type;
->> +    return 0;
->> +}
->> +
->>  static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
->>                                    Error **errp)
->>  {
->>      VFIOContainer *container;
->>      int ret, fd;
->>      VFIOAddressSpace *space;
->> +    int iommu_type;
->> +    bool v2 = false;
->> +
->>  
->>      space = vfio_get_address_space(as);
->>  
->> @@ -1101,23 +1147,20 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
->>      container->fd = fd;
->>      QLIST_INIT(&container->giommu_list);
->>      QLIST_INIT(&container->hostwin_list);
->> -    if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1_IOMMU) ||
->> -        ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1v2_IOMMU)) {
->> -        bool v2 = !!ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1v2_IOMMU);
->> +
->> +    iommu_type = vfio_iommu_get_type(container, errp);
->> +    if (iommu_type < 0) {
->> +            goto free_container_exit;
->> +    }
->> +
->> +    switch (iommu_type) {
->> +    case VFIO_TYPE1v2_IOMMU:
->> +    case VFIO_TYPE1_IOMMU:
->> +    {
->>          struct vfio_iommu_type1_info info;
->>  
->> -        ret = ioctl(group->fd, VFIO_GROUP_SET_CONTAINER, &fd);
->> +        ret = vfio_init_container(container, group->fd, iommu_type, errp);
->>          if (ret) {
->> -            error_setg_errno(errp, errno, "failed to set group container");
->> -            ret = -errno;
->> -            goto free_container_exit;
->> -        }
->> -
->> -        container->iommu_type = v2 ? VFIO_TYPE1v2_IOMMU : VFIO_TYPE1_IOMMU;
->> -        ret = ioctl(fd, VFIO_SET_IOMMU, container->iommu_type);
->> -        if (ret) {
->> -            error_setg_errno(errp, errno, "failed to set iommu for container");
->> -            ret = -errno;
->>              goto free_container_exit;
->>          }
->>  
->> @@ -1137,28 +1180,16 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
->>          }
->>          vfio_host_win_add(container, 0, (hwaddr)-1, info.iova_pgsizes);
->>          container->pgsizes = info.iova_pgsizes;
->> -    } else if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_IOMMU) ||
->> -               ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_v2_IOMMU)) {
->> +        break;
->> +    }
->> +    case VFIO_SPAPR_TCE_v2_IOMMU:
->> +        v2 = true;
->> +    case VFIO_SPAPR_TCE_IOMMU:
->> +    {
->>          struct vfio_iommu_spapr_tce_info info;
->> -        bool v2 = !!ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_v2_IOMMU);
->>  
->> -        ret = ioctl(group->fd, VFIO_GROUP_SET_CONTAINER, &fd);
->> +        ret = vfio_init_container(container, group->fd, iommu_type, errp);
->>          if (ret) {
->> -            error_setg_errno(errp, errno, "failed to set group container");
->> -            ret = -errno;
->> -            goto free_container_exit;
->> -        }
->> -        container->iommu_type =
->> -            v2 ? VFIO_SPAPR_TCE_v2_IOMMU : VFIO_SPAPR_TCE_IOMMU;
->> -        ret = ioctl(fd, VFIO_SET_IOMMU, container->iommu_type);
->> -        if (ret) {
->> -            container->iommu_type = VFIO_SPAPR_TCE_IOMMU;
->> -            v2 = false;
->> -            ret = ioctl(fd, VFIO_SET_IOMMU, container->iommu_type);
->> -        }
->> -        if (ret) {
->> -            error_setg_errno(errp, errno, "failed to set iommu for container");
->> -            ret = -errno;
->>              goto free_container_exit;
->>          }
->>  
->> @@ -1222,10 +1253,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
->>                                info.dma32_window_size - 1,
->>                                0x1000);
->>          }
->> -    } else {
->> -        error_setg(errp, "No available IOMMU models");
->> -        ret = -EINVAL;
->> -        goto free_container_exit;
->> +    }
->>      }
->>  
->>      vfio_kvm_device_add_group(group);
-> 
-> 
+This obviously does not work if a->rd is register zero which is never 
+allocated.
+
+Cheers,
+
+Bastian
