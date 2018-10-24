@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59571)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gFIAW-00025n-Hj
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 08:21:49 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gFIAY-00027n-Tl
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 08:21:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gFIAV-00048P-OG
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 08:21:48 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:42156 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gFIAY-0004BA-3g
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 08:21:50 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:42202 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gFIAV-00047G-Fo
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 08:21:47 -0400
+	id 1gFIAX-0004AN-MG
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 08:21:49 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Wed, 24 Oct 2018 14:18:40 +0200
-Message-Id: <1540383527-7923-14-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Wed, 24 Oct 2018 14:18:41 +0200
+Message-Id: <1540383527-7923-15-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1540383527-7923-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1540383527-7923-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v7 13/20] target/mips: Move MUL, S32M2I,
- S32I2M handling out of main MXU switch
+Subject: [Qemu-devel] [PATCH v7 14/20] target/mips: Add emulation of MXU
+ instruction S8LDD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,81 +28,123 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: aurelien@aurel32.net, richard.henderson@linaro.org, jancraig@amazon.com, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Craig Janeczek <jancraig@amazon.com>
 
-Move MUL, S32M2I, S32I2M handling out of switch. These are all
-instructions that do not depend on MXU_EN flag of MXU_CR.
+Add support for emulating the S8LDD MXU instruction.
 
+Signed-off-by: Craig Janeczek <jancraig@amazon.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 41 +++++++++++++++++++++++------------------
- 1 file changed, 23 insertions(+), 18 deletions(-)
+ target/mips/translate.c | 90 +++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 87 insertions(+), 3 deletions(-)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index c8c71c4..111affb 100644
+index 111affb..a9915c4 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -24859,6 +24859,29 @@ static void decode_opc_mxu(CPUMIPSState *env, DisasContext *ctx)
- {
-     uint32_t opcode = extract32(ctx->opcode, 0, 6);
+@@ -23954,6 +23954,92 @@ static void gen_mxu_s32m2i(DisasContext *ctx)
+     tcg_temp_free(t0);
+ }
  
-+    if (opcode == OPC__MXU_MUL) {
-+        uint32_t  rs, rt, rd, op1;
++/*
++ * S8LDD XRa, Rb, s8, optn3 - Load a byte from memory to XRF
++ */
++static void gen_mxu_s8ldd(DisasContext *ctx)
++{
++    TCGv t0, t1;
++    TCGLabel *l0;
++    uint32_t XRa, Rb, s8, optn3;
 +
-+        rs = extract32(ctx->opcode, 21, 5);
-+        rt = extract32(ctx->opcode, 16, 5);
-+        rd = extract32(ctx->opcode, 11, 5);
-+        op1 = MASK_SPECIAL2(ctx->opcode);
++    t0 = tcg_temp_new();
++    t1 = tcg_temp_new();
 +
-+        gen_arith(ctx, op1, rd, rs, rt);
++    l0 = gen_new_label();
 +
-+        return;
++    XRa = extract32(ctx->opcode, 6, 4);
++    s8 = extract32(ctx->opcode, 10, 8);
++    optn3 = extract32(ctx->opcode, 18, 3);
++    Rb = extract32(ctx->opcode, 21, 5);
++
++    gen_load_mxu_cr(t0);
++    tcg_gen_andi_tl(t0, t0, MXU_CR_MXU_EN);
++    tcg_gen_brcondi_tl(TCG_COND_NE, t0, MXU_CR_MXU_EN, l0);
++
++    gen_load_gpr(t0, Rb);
++    tcg_gen_addi_tl(t0, t0, (int8_t)s8);
++
++    switch (optn3) {
++    /* XRa[7:0] = tmp8 */
++    case MXU_OPTN3_PTN0:
++        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
++        gen_load_mxu_gpr(t0, XRa);
++        tcg_gen_deposit_tl(t0, t0, t1, 0, 8);
++        break;
++    /* XRa[15:8] = tmp8 */
++    case MXU_OPTN3_PTN1:
++        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
++        gen_load_mxu_gpr(t0, XRa);
++        tcg_gen_deposit_tl(t0, t0, t1, 8, 8);
++        break;
++    /* XRa[23:16] = tmp8 */
++    case MXU_OPTN3_PTN2:
++        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
++        gen_load_mxu_gpr(t0, XRa);
++        tcg_gen_deposit_tl(t0, t0, t1, 16, 8);
++        break;
++    /* XRa[31:24] = tmp8 */
++    case MXU_OPTN3_PTN3:
++        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
++        gen_load_mxu_gpr(t0, XRa);
++        tcg_gen_deposit_tl(t0, t0, t1, 24, 8);
++        break;
++    /* XRa = {8'b0, tmp8, 8'b0, tmp8} */
++    case MXU_OPTN3_PTN4:
++        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
++        tcg_gen_deposit_tl(t0, t1, t1, 16, 16);
++        break;
++    /* XRa = {tmp8, 8'b0, tmp8, 8'b0} */
++    case MXU_OPTN3_PTN5:
++        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
++        tcg_gen_shli_tl(t1, t1, 8);
++        tcg_gen_deposit_tl(t0, t1, t1, 16, 16);
++        break;
++    /* XRa = {{8{sign of tmp8}}, tmp8, {8{sign of tmp8}}, tmp8} */
++    case MXU_OPTN3_PTN6:
++        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_SB);
++        tcg_gen_mov_tl(t0, t1);
++        tcg_gen_andi_tl(t0, t0, 0xFF00FFFF);
++        tcg_gen_shli_tl(t1, t1, 16);
++        tcg_gen_or_tl(t0, t0, t1);
++        break;
++    /* XRa = {tmp8, tmp8, tmp8, tmp8} */
++    case MXU_OPTN3_PTN7:
++        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
++        tcg_gen_deposit_tl(t1, t1, t1, 8, 8);
++        tcg_gen_deposit_tl(t0, t1, t1, 16, 16);
++        break;
 +    }
 +
-+    if (opcode == OPC_MXU_S32M2I) {
-+        gen_mxu_s32m2i(ctx);
-+        return;
-+    }
++    gen_store_mxu_gpr(t0, XRa);
 +
-+    if (opcode == OPC_MXU_S32I2M) {
-+        gen_mxu_s32i2m(ctx);
-+        return;
-+    }
++    gen_set_label(l0);
 +
-     switch (opcode) {
-     case OPC_MXU_S32MADD:
-         /* TODO: Implement emulation of S32MADD instruction. */
-@@ -24870,18 +24893,6 @@ static void decode_opc_mxu(CPUMIPSState *env, DisasContext *ctx)
-         MIPS_INVAL("OPC_MXU_S32MADDU");
++    tcg_temp_free(t0);
++    tcg_temp_free(t1);
++}
++
+ 
+ /*
+  * Decoding engine for MXU
+@@ -24994,9 +25080,7 @@ static void decode_opc_mxu(CPUMIPSState *env, DisasContext *ctx)
          generate_exception_end(ctx, EXCP_RI);
          break;
--    case OPC__MXU_MUL:     /* 0x2 - unused in MXU specs */
--        {
--            uint32_t  rs, rt, rd, op1;
--
--            rs = extract32(ctx->opcode, 21, 5);
--            rt = extract32(ctx->opcode, 16, 5);
--            rd = extract32(ctx->opcode, 11, 5);
--            op1 = MASK_SPECIAL2(ctx->opcode);
--
--            gen_arith(ctx, op1, rd, rs, rt);
--        }
--        break;
-     case OPC_MXU__POOL00:
-         decode_opc_mxu__pool00(env, ctx);
+     case OPC_MXU_S8LDD:
+-        /* TODO: Implement emulation of S8LDD instruction. */
+-        MIPS_INVAL("OPC_MXU_S8LDD");
+-        generate_exception_end(ctx, EXCP_RI);
++        gen_mxu_s8ldd(ctx);
          break;
-@@ -25033,12 +25044,6 @@ static void decode_opc_mxu(CPUMIPSState *env, DisasContext *ctx)
-         MIPS_INVAL("OPC_MXU_S16SDI");
-         generate_exception_end(ctx, EXCP_RI);
-         break;
--    case OPC_MXU_S32M2I:
--        gen_mxu_s32m2i(ctx);
--        break;
--    case OPC_MXU_S32I2M:
--        gen_mxu_s32i2m(ctx);
--        break;
-     case OPC_MXU_D32SLL:
-         /* TODO: Implement emulation of D32SLL instruction. */
-         MIPS_INVAL("OPC_MXU_D32SLL");
+     case OPC_MXU_S8STD:
+         /* TODO: Implement emulation of S8STD instruction. */
 -- 
 2.7.4
