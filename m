@@ -1,17 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35760)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gFGIF-00062G-5w
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 06:21:39 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gFGrM-0005nc-Dm
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 06:57:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gFGID-000153-FW
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 06:21:39 -0400
-From: David Hildenbrand <david@redhat.com>
-Date: Wed, 24 Oct 2018 12:19:30 +0200
-Message-Id: <20181024101930.20674-8-david@redhat.com>
-In-Reply-To: <20181024101930.20674-1-david@redhat.com>
-References: <20181024101930.20674-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 7/7] spapr_pci: route unplug via the hotplug
- handler
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gFGrH-0001T5-KY
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 06:57:56 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:35995)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gFGrA-0001Kq-P0
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 06:57:45 -0400
+Received: by mail-wr1-x441.google.com with SMTP id y16so5095131wrw.3
+	for <qemu-devel@nongnu.org>; Wed, 24 Oct 2018 03:57:41 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Wed, 24 Oct 2018 12:57:32 +0200
+Message-Id: <20181024105733.18605-1-f4bug@amsat.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] disas/mips: Increase 'member of ISAs' flag
+ holder size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,73 +32,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-ppc@nongnu.org, David Hildenbrand <david@redhat.com>
+To: Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>, Fredrik Noring <noring@nocrew.org>, Richard Henderson <rth@twiddle.net>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-Preparation for multi-stage hotplug handlers.
+Increase the size of 'membership' holder size to 64 bits. This is
+needed for future extensions since existing bits are almost all used.
+(This change is related to f9c9cd63e3),
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/ppc/spapr_pci.c | 33 +++++++++++++++++++++------------
- 1 file changed, 21 insertions(+), 12 deletions(-)
+ disas/mips.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index 58afa46204..64b8591023 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -1370,18 +1370,9 @@ static int spapr_create_pci_child_dt(sPAPRPHBState *phb, PCIDevice *dev,
- /* Callback to be called during DRC release. */
- void spapr_phb_remove_pci_device_cb(DeviceState *dev)
- {
--    /* some version guests do not wait for completion of a device
--     * cleanup (generally done asynchronously by the kernel) before
--     * signaling to QEMU that the device is safe, but instead sleep
--     * for some 'safe' period of time. unfortunately on a busy host
--     * this sleep isn't guaranteed to be long enough, resulting in
--     * bad things like IRQ lines being left asserted during final
--     * device removal. to deal with this we call reset just prior
--     * to finalizing the device, which will put the device back into
--     * an 'idle' state, as the device cleanup code expects.
--     */
--    pci_device_reset(PCI_DEVICE(dev));
--    object_unparent(OBJECT(dev));
-+    HotplugHandler *hotplug_ctrl = qdev_get_hotplug_handler(dev);
-+
-+    hotplug_handler_unplug(hotplug_ctrl, dev, &error_abort);
- }
+diff --git a/disas/mips.c b/disas/mips.c
+index 97f661a37e..d73d4094d8 100644
+--- a/disas/mips.c
++++ b/disas/mips.c
+@@ -301,7 +301,7 @@ struct mips_opcode
+   unsigned long pinfo2;
+   /* A collection of bits describing the instruction sets of which this
+      instruction or macro is a member. */
+-  unsigned long membership;
++  uint64_t membership;
+ };
  
- static sPAPRDRConnector *spapr_phb_get_pci_func_drc(sPAPRPHBState *phb,
-@@ -1490,6 +1481,23 @@ out:
-     }
- }
- 
-+static void spapr_pci_unplug(HotplugHandler *plug_handler,
-+                             DeviceState *plugged_dev, Error **errp)
-+{
-+    /* some version guests do not wait for completion of a device
-+     * cleanup (generally done asynchronously by the kernel) before
-+     * signaling to QEMU that the device is safe, but instead sleep
-+     * for some 'safe' period of time. unfortunately on a busy host
-+     * this sleep isn't guaranteed to be long enough, resulting in
-+     * bad things like IRQ lines being left asserted during final
-+     * device removal. to deal with this we call reset just prior
-+     * to finalizing the device, which will put the device back into
-+     * an 'idle' state, as the device cleanup code expects.
-+     */
-+    pci_device_reset(PCI_DEVICE(plugged_dev));
-+    object_unparent(OBJECT(plugged_dev));
-+}
-+
- static void spapr_pci_unplug_request(HotplugHandler *plug_handler,
-                                      DeviceState *plugged_dev, Error **errp)
- {
-@@ -1965,6 +1973,7 @@ static void spapr_phb_class_init(ObjectClass *klass, void *data)
-     dc->user_creatable = true;
-     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-     hp->plug = spapr_pci_plug;
-+    hp->unplug = spapr_pci_unplug;
-     hp->unplug_request = spapr_pci_unplug_request;
- }
- 
+ /* These are the characters which may appear in the args field of an
 -- 
-2.17.2
+2.19.1
