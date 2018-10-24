@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44378)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gFAVB-00047a-Ef
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 00:10:38 -0400
+	(envelope-from <liq3ea@gmail.com>) id 1gFBU8-00058k-TN
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 01:13:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gFAV7-0000U8-Gp
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 00:10:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52912)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gFAV3-0000NZ-Ay
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 00:10:29 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181023130440.6323-1-armbru@redhat.com>
-	<CAFEAcA9Ob=W85L2wwPisS5p+k9Ah3V_mni3D-ociz-uf2nqL8A@mail.gmail.com>
-Date: Wed, 24 Oct 2018 06:10:24 +0200
-In-Reply-To: <CAFEAcA9Ob=W85L2wwPisS5p+k9Ah3V_mni3D-ociz-uf2nqL8A@mail.gmail.com>
-	(Peter Maydell's message of "Tue, 23 Oct 2018 19:59:39 +0100")
-Message-ID: <877ei856j3.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PULL v2 00/40] Error reporting patches for
- 2018-10-22
+	(envelope-from <liq3ea@gmail.com>) id 1gFBSn-0001R1-OX
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 01:12:17 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:44553)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1gFBSj-0001Cj-9y
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 01:12:11 -0400
+Received: by mail-pg1-x542.google.com with SMTP id w3-v6so1743712pgs.11
+	for <qemu-devel@nongnu.org>; Tue, 23 Oct 2018 22:12:07 -0700 (PDT)
+From: Li Qiang <liq3ea@gmail.com>
+Date: Tue, 23 Oct 2018 22:12:01 -0700
+Message-Id: <1540357921-4199-1-git-send-email-liq3ea@gmail.com>
+Subject: [Qemu-devel] [PATCH] fw_cfg: print error message when reading
+ splashfile failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +24,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: lersek@redhat.com, peter.maydell@linaro.org, pbonzini@redhat.com
+Cc: qemu-devel@nongnu.org, Li Qiang <liq3ea@gmail.com>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+Also remove unnecessary 'res' variable.
 
-> On 23 October 2018 at 14:04, Markus Armbruster <armbru@redhat.com> wrote:
->> The following changes since commit b312532fd03413d0e6ae6767ec793a3e30f487b8:
->>
->>   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2018-10-19 19:01:07 +0100)
->>
->> are available in the Git repository at:
->>
->>   git://repo.or.cz/qemu/armbru.git tags/pull-error-2018-10-22-v2
->>
->> for you to fetch changes up to 70f81ac4800c5cf33415c966d63bf89af5cefbb9:
->>
->>   error: Drop bogus "use error_setg() instead" admonitions (2018-10-23 14:48:32 +0200)
->>
->> ----------------------------------------------------------------
->> Error reporting patches for 2018-10-22
->>
->> * Replace some unwise uses of error_report() & friends
->> * Print error when using incorrect backend for debugcon
->>
->> ----------------------------------------------------------------
->> v2: Fix a stale sentence in commit message of PATCH 05/40.
->
-> Sorry, I'd already pushed the merge of v1 to master before I saw this one.
+Signed-off-by: Li Qiang <liq3ea@gmail.com>
+---
+ hw/nvram/fw_cfg.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-No biggie.  It was worth a try.
+diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+index 946f765..f4a52d8 100644
+--- a/hw/nvram/fw_cfg.c
++++ b/hw/nvram/fw_cfg.c
+@@ -68,15 +68,14 @@ static char *read_splashfile(char *filename, gsize *file_sizep,
+                              int *file_typep)
+ {
+     GError *err = NULL;
+-    gboolean res;
+     gchar *content;
+     int file_type;
+     unsigned int filehead;
+     int bmp_bpp;
+ 
+-    res = g_file_get_contents(filename, &content, file_sizep, &err);
+-    if (res == FALSE) {
+-        error_report("failed to read splash file '%s'", filename);
++    if (!g_file_get_contents(filename, &content, file_sizep, &err)) {
++        error_report("failed to read splash file '%s', %s",
++                     filename, err->message);
+         g_error_free(err);
+         return NULL;
+     }
+-- 
+1.8.3.1
