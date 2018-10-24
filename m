@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50231)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49531)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gFJ4R-0000xh-Ke
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 09:19:37 -0400
+	(envelope-from <george.kennedy@oracle.com>) id 1gFJ4i-0000ZX-Ei
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 09:19:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gFIux-0005LQ-C5
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 09:09:52 -0400
-References: <1539696820-273275-1-git-send-email-imammedo@redhat.com>
-	<20181016155600.31de8883@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <9d503a8b-5847-a1ae-2d2c-a2d1f0e7ac95@redhat.com>
-Date: Wed, 24 Oct 2018 15:09:36 +0200
+	(envelope-from <george.kennedy@oracle.com>) id 1gFIrw-0003Xn-UQ
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 09:06:45 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:42864)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <george.kennedy@oracle.com>)
+	id 1gFIrw-0003UP-Gf
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 09:06:40 -0400
+References: <1540243704-17090-1-git-send-email-george.kennedy@oracle.com>
+	<596ea83a-279e-3a76-ead3-14aa8efe0a1d@redhat.com>
+	<43e65c7a-f44d-797b-ab0c-389eaa0c0f82@oracle.com>
+	<0e52d605-871e-cdac-c1ae-b0da912611ba@redhat.com>
+	<adc9e69a-487b-44a6-7029-bff65f25801b@oracle.com>
+	<baf9d1db-51b7-939f-1f46-553c4fdd5939@redhat.com>
+From: George Kennedy <george.kennedy@oracle.com>
+Message-ID: <51309caa-23eb-9c3b-329e-2885fe13d905@oracle.com>
+Date: Wed, 24 Oct 2018 09:06:30 -0400
 MIME-Version: 1.0
-In-Reply-To: <20181016155600.31de8883@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <baf9d1db-51b7-939f-1f46-553c4fdd5939@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH] call HotplugHandler->plug()
- as the last step in device realization
+Subject: Re: [Qemu-devel] [PATCH v2] lsi: Reselection needed to remove
+ pending commands from queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,70 +34,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: cohuck@redhat.com, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, stefanha@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
+To: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
 
-On 16.10.18 15:56, Igor Mammedov wrote:
-> On Tue, 16 Oct 2018 15:33:40 +0200
-> Igor Mammedov <imammedo@redhat.com> wrote:
->=20
->> When [2] was fixed it was agreed that adding and calling post_plug()
->> callback after device_reset() was low risk approach to hotfix issue
->> right before release. So it was merged instead of moving already
->> existing plug() callback after device_reset() is called which would
->> be more risky and require all plug() callbacks audit.
+
+
+On 10/23/2018 6:31 PM, Paolo Bonzini wrote:
+> On 24/10/2018 00:11, George Kennedy wrote:
+>>> What about "req->hba_private !=3D s->current"?=C2=A0 That should caus=
+e a call
+>>> to lsi_queue_req, and then you can check s->want_resel in lsi_queue_r=
+eq.
+>> For the extended period of time where lsi_queue_req() is not being
+>> called from lsi_transfer_data(), my debug shows "s->waiting" is not "1=
+"
+>> and req->hba_private is equal to s->current.
+> That would mean indeed that no reselection is needed---but that's wrong.
+>
+> Why didn't lsi_do_command invoke lsi_queue_command?  That would set
+> s->current to NULL (on the SCSI level, that means the bus is freed; on
+> the QEMU level, the idea is that lsi_transfer_data would then start a
+> reselection).
+
+Through the extended period of time with no call to lsi_reselect(), the=20
+check of "s->command_complete" in lsi_do_command() is always "1" and=20
+therefore no call to lsi_queue_command() occurs.
+
+"s->command_complete" is set to "1" in lsi_transfer_data().
+
+>
+> Thanks,
+>
+> Paolo
+>
+>> req->hba_private is set to NULL in lsi_command_complete() and that's
+>> where I tried to add a call to lsi_reselect(), but the Scripts are not
+>> in the correct state to allow the call.
 >>
->> Looking at the current plug() callbacks, it doesn't seem that moving
->> plug() callback after device_reset() is breaking anything, so here
->> goes agreed upon [3] proper fix which essentially reverts [1][2]
->> and moves plug() callback after device_reset().
->> This way devices always comes to plug() stage, after it's been fully
->> initialized (including being reset), which fixes race condition [2]
->> without need for an extra post_plug() callback.
->>
->>  1. (25e897881 "qdev: add HotplugHandler->post_plug() callback")
->>  2. (8449bcf94 "virtio-scsi: fix hotplug ->reset() vs event race")
->>  3. https://www.mail-archive.com/qemu-devel@nongnu.org/msg549915.html
->>
->> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
->> ---
->> TODO:
->>  remove usage of Error** from plug() callback, we need to factor out
->>  pre_plug part from plug() callbacks, before proceeding with it.
->>  DavidH has recently finished it for pc-dimm/memory_devices, cpus
->>  mostly have pre_plug parts factored out, but there still are parts
->>  that could fail so it needs some more work to eliminate failure point=
-s
->>  from plug() callbacks. Meanwhile, I'll plan to treat other misc
->>  handlers (pci[e]/acpi/usb/...) and introduce pre_plug() where
->>  necessary.
-
-Saw this mail just now. I guess we should do more. Especially what seems
-to be fragile is errors during unrealize() and unplug().
-
-Errors during unplug() should only ever happen if it was not triggered
-via unplug_request(). Otherwise, unplug_request() should check for all
-possible errors and unplug() will not result in errors.
-
-Also, errors during unrealize() should definitely be avoided. Or even
-forbidden. E.g. looking at hw/core/qdev.c:device_set_realized,
-
-1. failing to unrealize might already have resulted in the unplug
-handler getting called.
-2. will result in a unparent of the device and therefore removal
-3. will have already eventually unrealized child devices or buses.
-
-To summarize, failing in unrealize() is a bad idea and might leave the
-rest of the system in a very unpredictable state. Failing in unplug() is
-a bad idea unless we don't have a unplug_request().
-
->=20
-> Forgot to CC spapr/s390 folks to give it an extra scrutiny.
->=20
-
-
---=20
-
-Thanks,
-
-David / dhildenb
+>> lsi_transfer_data() or lsi_command_complete() are probably the 2
+>> potential places where a fix could be added if the Script state would
+>> allow it.
+>
