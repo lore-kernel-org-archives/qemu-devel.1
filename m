@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51357)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51570)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gFM7b-0007bj-ET
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 12:35:04 -0400
+	(envelope-from <zhangckid@gmail.com>) id 1gFM8I-0007va-2g
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 12:35:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gFM7Y-0005pd-AJ
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 12:35:03 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:36935)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1gFM7X-0005p1-VM
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 12:35:00 -0400
-References: <20181021165542.8692-1-jcmvbkbc@gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <46f658a3-836d-73aa-30cc-3a15f6ba1016@vivier.eu>
-Date: Wed, 24 Oct 2018 17:34:49 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181021165542.8692-1-jcmvbkbc@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] scripts/qemu-binfmt-conf.sh: add bFLT
- handler registration
+	(envelope-from <zhangckid@gmail.com>) id 1gFM8E-0006Gm-U7
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 12:35:46 -0400
+Received: from mail-pf1-x436.google.com ([2607:f8b0:4864:20::436]:43351)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1gFM8E-0006GJ-Md
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 12:35:42 -0400
+Received: by mail-pf1-x436.google.com with SMTP id q1-v6so2680913pfh.10
+	for <qemu-devel@nongnu.org>; Wed, 24 Oct 2018 09:35:42 -0700 (PDT)
+From: Zhang Chen <zhangckid@gmail.com>
+Date: Thu, 25 Oct 2018 00:35:29 +0800
+Message-Id: <20181024163529.15665-1-zhangckid@gmail.com>
+Subject: [Qemu-devel] [PATCH] migration/colo.c: Fix compilation issue when
+ disable replication
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,67 +24,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Filippov <jcmvbkbc@gmail.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org, zhanghailiang <zhang.zhanghailiang@huawei.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Zhang Chen <zhangckid@gmail.com>, Thomas Huth <thuth@redhat.com>
 
-On 21/10/2018 17:55, Max Filippov wrote:
-> bFLT format header doesn't have enough information to register a handler
-> for a specific architecture. Add switch -f / --flat that registers one
-> of the qemu binaries as a handler for bFLT executable images.
-> 
-> Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
-> ---
-> Changes v2->v3:
-> - fix bFLT in the patch subject
-> 
-> Changes v1->v2:
-> - drop unintended changes to dtc;
-> 
->  scripts/qemu-binfmt-conf.sh | 32 ++++++++++++++++++++++++++++++--
->  1 file changed, 30 insertions(+), 2 deletions(-)
+This compilation issue will occur when user use --disable-replication
+to config Qemu.
 
+Reported-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Zhang Chen <zhangckid@gmail.com>
+---
+ migration/colo.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
-BTW, I'm not sure it's the good way to do that. The script has been
-written with ELF in mind and no other alternative format.
-
-Perhaps we can add a format parameter, like "--format elf" (default),
-"--format bflt"  and then take the availabled CPU and mask/magic from
-the list corresponding for the selected format.
-
-And then rename qemu_set_binfmts() to qemu_elf_set_binfmts(), add
-function qemu_bflt_set_binfmt() and call the one you you need according
-the format you have selected.
-
-Somehing like:
-
-FORMAT_BINFMT_MISC_SET=qemu_elf_set_binfmts
-...
-    -F|--format)
-       shift
-       FORMAT_BINFMT_MISC_SET=qemu_$1_set_binfmts
-       ;;
-...
-
-$CHECK
-$FORMAT_BINFMT_MISC_SET
-
-and then
-
-qemu_bflt_set_binfmts()
-{
-   for cpu in ${qemu_target_list} ; do
-       magic='bFLT\x00\x00\x00\x04'
-       mask='\xff\xff\xff\xff\xff\xff\xff\xff'
-       qemu="$QEMU_PATH/qemu-$cpu"
-       qemu="$qemu$QEMU_SUFFIX"
-       $BINFMT_SET
-   done
-}
-
-Then with --systemd you provide only the cpu you want to generate, with
---debian you use update-binfmts to select the only one to import, for
-/proc case we could add another parameter to only register one
-interpreter (--proc CPU ?)
-
-Thanks,
-Laurent
+diff --git a/migration/colo.c b/migration/colo.c
+index 956ac236b7..b81e6ec5bb 100644
+--- a/migration/colo.c
++++ b/migration/colo.c
+@@ -59,6 +59,8 @@ static bool colo_runstate_is_stopped(void)
+ 
+ static void secondary_vm_do_failover(void)
+ {
++/* COLO needs enable block-replication */
++#ifdef CONFIG_REPLICATION
+     int old_state;
+     MigrationIncomingState *mis = migration_incoming_get_current();
+     Error *local_err = NULL;
+@@ -121,10 +123,14 @@ static void secondary_vm_do_failover(void)
+     if (mis->migration_incoming_co) {
+         qemu_coroutine_enter(mis->migration_incoming_co);
+     }
++#else
++    abort();
++#endif
+ }
+ 
+ static void primary_vm_do_failover(void)
+ {
++#ifdef CONFIG_REPLICATION
+     MigrationState *s = migrate_get_current();
+     int old_state;
+     Error *local_err = NULL;
+@@ -165,6 +171,9 @@ static void primary_vm_do_failover(void)
+ 
+     /* Notify COLO thread that failover work is finished */
+     qemu_sem_post(&s->colo_exit_sem);
++#else
++    abort();
++#endif
+ }
+ 
+ COLOMode get_colo_mode(void)
+@@ -373,6 +382,7 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
+                                           QIOChannelBuffer *bioc,
+                                           QEMUFile *fb)
+ {
++#ifdef CONFIG_REPLICATION
+     Error *local_err = NULL;
+     int ret = -1;
+ 
+@@ -483,6 +493,9 @@ out:
+         error_report_err(local_err);
+     }
+     return ret;
++#else
++    abort();
++#endif
+ }
+ 
+ static void colo_compare_notify_checkpoint(Notifier *notifier, void *data)
+@@ -790,13 +803,16 @@ void *colo_process_incoming_thread(void *opaque)
+             qemu_mutex_unlock_iothread();
+             goto out;
+         }
++#ifdef CONFIG_REPLICATION
+         /* discard colo disk buffer */
+         replication_do_checkpoint_all(&local_err);
+         if (local_err) {
+             qemu_mutex_unlock_iothread();
+             goto out;
+         }
+-
++#else
++        abort();
++#endif
+         /* Notify all filters of all NIC to do checkpoint */
+         colo_notify_filters_event(COLO_EVENT_CHECKPOINT, &local_err);
+ 
+-- 
+2.17.GIT
