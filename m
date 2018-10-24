@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59889)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59895)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gFJQK-0004s4-59
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gFJQK-0004sG-Dg
 	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 09:42:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gFJQI-0001pq-EK
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 09:42:11 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:49893 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gFJQE-0001lS-1U
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 09:42:12 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:48994 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gFJQG-0001m3-Bz
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 09:42:09 -0400
+	id 1gFJQC-0001H7-7d
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 09:42:05 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Wed, 24 Oct 2018 15:40:23 +0200
-Message-Id: <1540388447-27062-10-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Wed, 24 Oct 2018 15:40:18 +0200
+Message-Id: <1540388447-27062-5-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1540388447-27062-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1540388447-27062-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v2 09/33] target/mips: Add a placeholder for
- R5900 SQ, handle user mode RDHWR
+Subject: [Qemu-devel] [PULL v2 04/33] target/mips: Define R5900 MMI<0|1|2|3>
+ subclasses and opcode constants
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,85 +30,77 @@ Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
 From: Fredrik Noring <noring@nocrew.org>
 
-Add placeholder for SQ instruction, handle RDHWR.
+Define MMI0, MMI1, MMI2, MMI3 subclass opcodes, and other opcodes of
+instructions in MMI class.
 
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Fredrik Noring <noring@nocrew.org>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 52 insertions(+), 1 deletion(-)
+ target/mips/translate.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 3c6a2c9..19a8aba 100644
+index e205c3e..ae98817 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -24420,6 +24420,53 @@ static void decode_opc_special3_legacy(CPUMIPSState *env, DisasContext *ctx)
-     }
- }
+@@ -2129,6 +2129,57 @@ enum {
+     TX79_SQ        = 0x1F << 26,    /* Same as OPC_SPECIAL3 */
+ };
  
-+static void gen_tx79_sq(DisasContext *ctx, int base, int rt, int offset)
-+{
-+    generate_exception_end(ctx, EXCP_RI);    /* TODO: TX79_SQ */
-+}
-+
 +/*
-+ * The TX79-specific instruction Store Quadword
++ * TX79 Multimedia Instructions with opcode field = MMI:
 + *
-+ * +--------+-------+-------+------------------------+
-+ * | 011111 |  base |   rt  |           offset       | SQ
-+ * +--------+-------+-------+------------------------+
-+ *      6       5       5                 16
++ *  31    26                                 5      0
++ * +--------+-------------------------------+--------+
++ * |   MMI  |                               |function|
++ * +--------+-------------------------------+--------+
 + *
-+ * has the same opcode as the Read Hardware Register instruction
-+ *
-+ * +--------+-------+-------+-------+-------+--------+
-+ * | 011111 | 00000 |   rt  |   rd  | 00000 | 111011 | RDHWR
-+ * +--------+-------+-------+-------+-------+--------+
-+ *      6       5       5       5       5        6
-+ *
-+ * that is required, trapped and emulated by the Linux kernel. However, all
-+ * RDHWR encodings yield address error exceptions on the TX79 since the SQ
-+ * offset is odd. Therefore all valid SQ instructions can execute normally.
-+ * In user mode, QEMU must verify the upper and lower 11 bits to distinguish
-+ * between SQ and RDHWR, as the Linux kernel does.
++ * function  bits 2..0
++ *     bits |   0   |   1   |   2   |   3   |   4   |   5   |   6   |   7
++ *     5..3 |  000  |  001  |  010  |  011  |  100  |  101  |  110  |  111
++ *   -------+-------+-------+-------+-------+-------+-------+-------+-------
++ *    0 000 |  MADD | MADDU |   *   |   *   | PLZCW |   *   |   *   |   *
++ *    1 001 | MMI0% | MMI2% |   *   |   *   |   *   |   *   |   *   |   *
++ *    2 010 | MFHI1 | MTHI1 | MFLO1 | MTLO1 |   *   |   *   |   *   |   *
++ *    3 011 | MULT1 | MULTU1|  DIV1 | DIVU1 |   *   |   *   |   *   |   *
++ *    4 100 | MADD1 | MADDU1|   *   |   *   |   *   |   *   |   *   |   *
++ *    5 101 | MMI1% | MMI3% |   *   |   *   |   *   |   *   |   *   |   *
++ *    6 110 | PMFHL | PMTHL |   *   |   *   | PSLLH |   *   | PSRLH | PSRAH
++ *    7 111 |   *   |   *   |   *   |   *   | PSLLW |   *   | PSRLW | PSRAW
 + */
-+static void decode_tx79_sq(CPUMIPSState *env, DisasContext *ctx)
-+{
-+    int base = extract32(ctx->opcode, 21, 5);
-+    int rt = extract32(ctx->opcode, 16, 5);
-+    int offset = extract32(ctx->opcode, 0, 16);
 +
-+#ifdef CONFIG_USER_ONLY
-+    uint32_t op1 = MASK_SPECIAL3(ctx->opcode);
-+    uint32_t op2 = extract32(ctx->opcode, 6, 5);
++#define MASK_TX79_MMI(op) (MASK_OP_MAJOR(op) | ((op) & 0x3F))
++enum {
++    TX79_MMI_MADD       = 0x00 | TX79_CLASS_MMI, /* Same as OPC_MADD */
++    TX79_MMI_MADDU      = 0x01 | TX79_CLASS_MMI, /* Same as OPC_MADDU */
++    TX79_MMI_PLZCW      = 0x04 | TX79_CLASS_MMI,
++    TX79_MMI_CLASS_MMI0 = 0x08 | TX79_CLASS_MMI,
++    TX79_MMI_CLASS_MMI2 = 0x09 | TX79_CLASS_MMI,
++    TX79_MMI_MFHI1      = 0x10 | TX79_CLASS_MMI, /* Same minor as OPC_MFHI */
++    TX79_MMI_MTHI1      = 0x11 | TX79_CLASS_MMI, /* Same minor as OPC_MTHI */
++    TX79_MMI_MFLO1      = 0x12 | TX79_CLASS_MMI, /* Same minor as OPC_MFLO */
++    TX79_MMI_MTLO1      = 0x13 | TX79_CLASS_MMI, /* Same minor as OPC_MTLO */
++    TX79_MMI_MULT1      = 0x18 | TX79_CLASS_MMI, /* Same minor as OPC_MULT */
++    TX79_MMI_MULTU1     = 0x19 | TX79_CLASS_MMI, /* Same minor as OPC_MULTU */
++    TX79_MMI_DIV1       = 0x1A | TX79_CLASS_MMI, /* Same minor as OPC_DIV */
++    TX79_MMI_DIVU1      = 0x1B | TX79_CLASS_MMI, /* Same minor as OPC_DIVU */
++    TX79_MMI_MADD1      = 0x20 | TX79_CLASS_MMI,
++    TX79_MMI_MADDU1     = 0x21 | TX79_CLASS_MMI,
++    TX79_MMI_CLASS_MMI1 = 0x28 | TX79_CLASS_MMI,
++    TX79_MMI_CLASS_MMI3 = 0x29 | TX79_CLASS_MMI,
++    TX79_MMI_PMFHL      = 0x30 | TX79_CLASS_MMI,
++    TX79_MMI_PMTHL      = 0x31 | TX79_CLASS_MMI,
++    TX79_MMI_PSLLH      = 0x34 | TX79_CLASS_MMI,
++    TX79_MMI_PSRLH      = 0x36 | TX79_CLASS_MMI,
++    TX79_MMI_PSRAH      = 0x37 | TX79_CLASS_MMI,
++    TX79_MMI_PSLLW      = 0x3C | TX79_CLASS_MMI,
++    TX79_MMI_PSRLW      = 0x3E | TX79_CLASS_MMI,
++    TX79_MMI_PSRAW      = 0x3F | TX79_CLASS_MMI,
++};
 +
-+    if (base == 0 && op2 == 0 && op1 == OPC_RDHWR) {
-+        int rd = extract32(ctx->opcode, 11, 5);
-+
-+        gen_rdhwr(ctx, rt, rd, 0);
-+        return;
-+    }
-+#endif
-+
-+    gen_tx79_sq(ctx, base, rt, offset);
-+}
-+
- static void decode_opc_special3(CPUMIPSState *env, DisasContext *ctx)
- {
-     int rs, rt, rd, sa;
-@@ -25720,7 +25767,11 @@ static void decode_opc(CPUMIPSState *env, DisasContext *ctx)
-         decode_opc_special2_legacy(env, ctx);
-         break;
-     case OPC_SPECIAL3:
--        decode_opc_special3(env, ctx);
-+        if (ctx->insn_flags & INSN_R5900) {
-+            decode_tx79_sq(env, ctx);    /* TX79_SQ */
-+        } else {
-+            decode_opc_special3(env, ctx);
-+        }
-         break;
-     case OPC_REGIMM:
-         op1 = MASK_REGIMM(ctx->opcode);
+ /* global register indices */
+ static TCGv cpu_gpr[32], cpu_PC;
+ static TCGv cpu_HI[MIPS_DSP_ACC], cpu_LO[MIPS_DSP_ACC];
 -- 
 2.7.4
