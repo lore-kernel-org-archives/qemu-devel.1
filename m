@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59198)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59405)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gFI9j-0001SF-Ma
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 08:21:00 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gFIAJ-0001tY-FW
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 08:21:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gFI9i-0003cv-KU
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 08:20:59 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:40042 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gFIAD-0003t4-52
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 08:21:34 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:40869 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gFI9i-0003cE-Ao
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 08:20:58 -0400
+	id 1gFIA9-0003oY-Po
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 08:21:26 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Wed, 24 Oct 2018 14:18:37 +0200
-Message-Id: <1540383527-7923-11-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Wed, 24 Oct 2018 14:18:38 +0200
+Message-Id: <1540383527-7923-12-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1540383527-7923-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1540383527-7923-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v7 10/20] target/mips: Add bit encoding for MXU
- operand getting pattern 'optn3'
+Subject: [Qemu-devel] [PATCH v7 11/20] target/mips: Add emulation of non-MXU
+ MULL within MXU decoding engine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +30,45 @@ Cc: aurelien@aurel32.net, richard.henderson@linaro.org, jancraig@amazon.com, ama
 
 From: Craig Janeczek <jancraig@amazon.com>
 
-Add bit encoding for MXU operand getting pattern 'optn3'.
+Add emulation of non-MXU MULL within MXU decoding engine.
 
 Signed-off-by: Craig Janeczek <jancraig@amazon.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ target/mips/translate.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index f3e87ce..5bcf6a4 100644
+index 5bcf6a4..29df4ce 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -23867,6 +23867,16 @@ static void decode_opc_special(CPUMIPSState *env, DisasContext *ctx)
- #define MXU_OPTN2_HW    2
- #define MXU_OPTN2_XW    3
- 
-+/* MXU operand getting pattern 'optn3' */
-+#define MXU_OPTN3_PTN0  0
-+#define MXU_OPTN3_PTN1  1
-+#define MXU_OPTN3_PTN2  2
-+#define MXU_OPTN3_PTN3  3
-+#define MXU_OPTN3_PTN4  4
-+#define MXU_OPTN3_PTN5  5
-+#define MXU_OPTN3_PTN6  6
-+#define MXU_OPTN3_PTN7  7
+@@ -1654,7 +1654,7 @@ enum {
+ enum {
+     OPC_MXU_S32MADD  = 0x00,
+     OPC_MXU_S32MADDU = 0x01,
+-    /* not assigned 0x02 */
++    OPC__MXU_MUL     = 0x02,
+     OPC_MXU__POOL00  = 0x03,
+     OPC_MXU_S32MSUB  = 0x04,
+     OPC_MXU_S32MSUBU = 0x05,
+@@ -24788,6 +24788,18 @@ static void decode_opc_mxu(CPUMIPSState *env, DisasContext *ctx)
+         MIPS_INVAL("OPC_MXU_S32MADDU");
+         generate_exception_end(ctx, EXCP_RI);
+         break;
++    case OPC__MXU_MUL:     /* 0x2 - unused in MXU specs */
++        {
++            uint32_t  rs, rt, rd, op1;
 +
- 
- /*
-  *
++            rs = extract32(ctx->opcode, 21, 5);
++            rt = extract32(ctx->opcode, 16, 5);
++            rd = extract32(ctx->opcode, 11, 5);
++            op1 = MASK_SPECIAL2(ctx->opcode);
++
++            gen_arith(ctx, op1, rd, rs, rt);
++        }
++        break;
+     case OPC_MXU__POOL00:
+         decode_opc_mxu__pool00(env, ctx);
+         break;
 -- 
 2.7.4
