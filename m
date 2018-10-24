@@ -1,19 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50661)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <likan_999.student@sina.com>) id 1gFPX5-0006nS-Lz
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 16:13:37 -0400
+	(envelope-from <bounces@canonical.com>) id 1gFQ0T-0003lc-KC
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 16:44:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <likan_999.student@sina.com>) id 1gFPX2-00011K-Cy
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 16:13:35 -0400
-Received: from mail7-212.sinamail.sina.com.cn ([202.108.7.212]:52745)
-	by eggs.gnu.org with smtp (Exim 4.71)
-	(envelope-from <likan_999.student@sina.com>) id 1gFPWv-0000ne-HQ
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 16:13:29 -0400
-From: Kan Li <likan_999.student@sina.com>
-Date: Wed, 24 Oct 2018 20:13:03 +0000
-Message-Id: <20181024201303.114-1-likan_999.student@sina.com>
-Subject: [Qemu-devel] [PATCH v2] Fix linux-user crashes in
- ioctl(SIOCGIFCONF) when ifc_buf is NULL.
+	(envelope-from <bounces@canonical.com>) id 1gFPxb-0005jt-9y
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 16:41:03 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44402)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gFPxb-0005iS-30
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 16:40:59 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gFPxZ-0000rX-7z
+	for <qemu-devel@nongnu.org>; Wed, 24 Oct 2018 20:40:57 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 35F292E8019
+	for <qemu-devel@nongnu.org>; Wed, 24 Oct 2018 20:40:57 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 24 Oct 2018 20:31:42 -0000
+From: Sebastian Krzyszkowiak <1799792@bugs.launchpad.net>
+Reply-To: Bug 1799792 <1799792@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <154041310239.24736.3249552536528955636.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1799792] [NEW] Broken scaling with gtk,
+ gl=on on a hidpi display
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,97 +37,57 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
+Public bug reported:
 
-Summary:
-This is to fix bug https://bugs.launchpad.net/qemu/+bug/1796754.
-It is valid for ifc_buf to be NULL according to
-http://man7.org/linux/man-pages/man7/netdevice.7.html.
+Tested on QEMU 3.0.0 on Arch Linux.
 
-Signed-off-by: Kan Li <likan_999.student@sina.com>
----
- linux-user/syscall.c | 55 ++++++++++++++++++++++++++++------------------------
- 1 file changed, 30 insertions(+), 25 deletions(-)
+I'm using a hidpi screen, and therefore use those environment variables
+in order to have GTK+ apps properly scaled:
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 15b03e17b9..2453778cfd 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -4138,28 +4138,32 @@ static abi_long do_ioctl_ifconf(const IOCTLEntry *ie, uint8_t *buf_temp,
-     unlock_user(argptr, arg, 0);
- 
-     host_ifconf = (struct ifconf *)(unsigned long)buf_temp;
--    target_ifc_len = host_ifconf->ifc_len;
-     target_ifc_buf = (abi_long)(unsigned long)host_ifconf->ifc_buf;
--
-     target_ifreq_size = thunk_type_size(ifreq_arg_type, 0);
--    nb_ifreq = target_ifc_len / target_ifreq_size;
--    host_ifc_len = nb_ifreq * sizeof(struct ifreq);
- 
--    outbufsz = sizeof(*host_ifconf) + host_ifc_len;
--    if (outbufsz > MAX_STRUCT_SIZE) {
--        /* We can't fit all the extents into the fixed size buffer.
--         * Allocate one that is large enough and use it instead.
--         */
--        host_ifconf = malloc(outbufsz);
--        if (!host_ifconf) {
--            return -TARGET_ENOMEM;
-+    if (target_ifc_buf != 0) {
-+        target_ifc_len = host_ifconf->ifc_len;
-+        nb_ifreq = target_ifc_len / target_ifreq_size;
-+        host_ifc_len = nb_ifreq * sizeof(struct ifreq);
-+
-+        outbufsz = sizeof(*host_ifconf) + host_ifc_len;
-+        if (outbufsz > MAX_STRUCT_SIZE) {
-+            /* We can't fit all the extents into the fixed size buffer.
-+             * Allocate one that is large enough and use it instead.
-+             */
-+            host_ifconf = malloc(outbufsz);
-+            if (!host_ifconf) {
-+                return -TARGET_ENOMEM;
-+            }
-+            memcpy(host_ifconf, buf_temp, sizeof(*host_ifconf));
-+            free_buf = 1;
-         }
--        memcpy(host_ifconf, buf_temp, sizeof(*host_ifconf));
--        free_buf = 1;
-+        host_ifc_buf = (char*)host_ifconf + sizeof(*host_ifconf);
-+
-+        host_ifconf->ifc_len = host_ifc_len;
-+    } else {
-+      host_ifc_buf = NULL;
-     }
--    host_ifc_buf = (char*)host_ifconf + sizeof(*host_ifconf);
--
--    host_ifconf->ifc_len = host_ifc_len;
-     host_ifconf->ifc_buf = host_ifc_buf;
- 
-     ret = get_errno(safe_ioctl(fd, ie->host_cmd, host_ifconf));
-@@ -4182,15 +4186,16 @@ static abi_long do_ioctl_ifconf(const IOCTLEntry *ie, uint8_t *buf_temp,
-         thunk_convert(argptr, host_ifconf, arg_type, THUNK_TARGET);
-         unlock_user(argptr, arg, target_size);
- 
--	/* copy ifreq[] to target user */
--
--        argptr = lock_user(VERIFY_WRITE, target_ifc_buf, target_ifc_len, 0);
--        for (i = 0; i < nb_ifreq ; i++) {
--            thunk_convert(argptr + i * target_ifreq_size,
--                          host_ifc_buf + i * sizeof(struct ifreq),
--                          ifreq_arg_type, THUNK_TARGET);
-+        if (target_ifc_buf != 0) {
-+            /* copy ifreq[] to target user */
-+            argptr = lock_user(VERIFY_WRITE, target_ifc_buf, target_ifc_len, 0);
-+            for (i = 0; i < nb_ifreq ; i++) {
-+                thunk_convert(argptr + i * target_ifreq_size,
-+                              host_ifc_buf + i * sizeof(struct ifreq),
-+                              ifreq_arg_type, THUNK_TARGET);
-+            }
-+            unlock_user(argptr, target_ifc_buf, target_ifc_len);
-         }
--        unlock_user(argptr, target_ifc_buf, target_ifc_len);
-     }
- 
-     if (free_buf) {
--- 
-2.14.5
+GDK_SCALE=3D2
+GDK_DPI_SCALE=3D0.5
+
+However, QEMU, when launched with "-display gtk,gl=3Don" option, doesn't
+scale the window content properly, as seen on the attached screenshot.
+
+Switching to "-display gtk,gl=3Doff" and "-display sdl,gl=3Don" makes it
+work fine.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+** Attachment added: "Screenshot_20181024_222447.png"
+   https://bugs.launchpad.net/bugs/1799792/+attachment/5205039/+files/Scree=
+nshot_20181024_222447.png
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1799792
+
+Title:
+  Broken scaling with gtk,gl=3Don on a hidpi display
+
+Status in QEMU:
+  New
+
+Bug description:
+  Tested on QEMU 3.0.0 on Arch Linux.
+
+  I'm using a hidpi screen, and therefore use those environment
+  variables in order to have GTK+ apps properly scaled:
+
+  GDK_SCALE=3D2
+  GDK_DPI_SCALE=3D0.5
+
+  However, QEMU, when launched with "-display gtk,gl=3Don" option, doesn't
+  scale the window content properly, as seen on the attached screenshot.
+
+  Switching to "-display gtk,gl=3Doff" and "-display sdl,gl=3Don" makes it
+  work fine.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1799792/+subscriptions
