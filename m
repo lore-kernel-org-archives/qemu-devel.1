@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60229)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32940)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gFJQh-0005G6-9j
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 09:42:38 -0400
+	(envelope-from <bounces@canonical.com>) id 1gFJT5-0007lj-DG
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 09:45:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gFJQd-00023X-7O
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 09:42:33 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:49892 helo=mail.rt-rk.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gFJQc-0001lz-Qu
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 09:42:31 -0400
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Wed, 24 Oct 2018 15:40:24 +0200
-Message-Id: <1540388447-27062-11-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1540388447-27062-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1540388447-27062-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v2 10/33] target/mips: Add a placeholder for
- R5900 LQ
+	(envelope-from <bounces@canonical.com>) id 1gFJSy-0004Ai-RC
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 09:45:03 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48784)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gFJSy-00047a-KQ
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 09:44:56 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gFIe7-00082x-OG
+	for <qemu-devel@nongnu.org>; Wed, 24 Oct 2018 12:52:23 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 7E69A2E853E
+	for <qemu-devel@nongnu.org>; Wed, 24 Oct 2018 12:50:50 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 24 Oct 2018 12:38:05 -0000
+From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+Reply-To: Bug 1796520 <1796520@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153886120838.22456.12836438866392888832.malonedeb@gac.canonical.com>
+Message-Id: <154038468663.28767.3014440709096802846.launchpad@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1796520] Re: autogen crashes on qemu-sh4-user
+ after 61dedf2af7
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,49 +38,62 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
-From: Fredrik Noring <noring@nocrew.org>
+** Tags added: linux-user sh4
 
-Add a placeholder for LQ instruction.
+-- =
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Fredrik Noring <noring@nocrew.org>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
----
- target/mips/translate.c | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1796520
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 19a8aba..2318116 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -24420,6 +24420,11 @@ static void decode_opc_special3_legacy(CPUMIPSState *env, DisasContext *ctx)
-     }
- }
- 
-+static void decode_tx79_lq(CPUMIPSState *env, DisasContext *ctx)
-+{
-+    generate_exception_end(ctx, EXCP_RI);    /* TODO: TX79_LQ */
-+}
-+
- static void gen_tx79_sq(DisasContext *ctx, int base, int rt, int offset)
- {
-     generate_exception_end(ctx, EXCP_RI);    /* TODO: TX79_SQ */
-@@ -26425,8 +26430,12 @@ static void decode_opc(CPUMIPSState *env, DisasContext *ctx)
-         }
-         break;
-     case OPC_MSA: /* OPC_MDMX */
--        /* MDMX: Not implemented. */
--        gen_msa(env, ctx);
-+        if (ctx->insn_flags & INSN_R5900) {
-+            decode_tx79_lq(env, ctx);    /* TX79_LQ */
-+        } else {
-+            /* MDMX: Not implemented. */
-+            gen_msa(env, ctx);
-+        }
-         break;
-     case OPC_PCREL:
-         check_insn(ctx, ISA_MIPS32R6);
--- 
-2.7.4
+Title:
+  autogen crashes on qemu-sh4-user after 61dedf2af7
+
+Status in QEMU:
+  New
+
+Bug description:
+  Running "autogen --help" crashes on qemu-sh4-user with:
+
+  (sid-sh4-sbuild)root@nofan:/# autogen --help
+  Unhandled trap: 0x180
+  pc=3D0xf64dd2de sr=3D0x00000000 pr=3D0xf63b9c74 fpscr=3D0x00080000
+  spc=3D0x00000000 ssr=3D0x00000000 gbr=3D0xf61102a8 vbr=3D0x00000000
+  sgr=3D0x00000000 dbr=3D0x00000000 delayed_pc=3D0xf64dd2a0 fpul=3D0x000000=
+03
+  r0=3D0xf6fc1320 r1=3D0x00000000 r2=3D0xffff5dc4 r3=3D0xf67bfb50
+  r4=3D0xf6fc1230 r5=3D0xf6fc141c r6=3D0x000003ff r7=3D0x00000000
+  r8=3D0x00000004 r9=3D0xf63e20bc r10=3D0xf6fc141c r11=3D0xf63e28f0
+  r12=3D0xf63e2258 r13=3D0xf63eae1c r14=3D0x00000804 r15=3D0xf6fc1220
+  r16=3D0x00000000 r17=3D0x00000000 r18=3D0x00000000 r19=3D0x00000000
+  r20=3D0x00000000 r21=3D0x00000000 r22=3D0x00000000 r23=3D0x00000000
+  (sid-sh4-sbuild)root@nofan:/#
+
+  Bi-secting found this commit to be the culprit:
+
+  61dedf2af79fb5866dc7a0f972093682f2185e17 is the first bad commit
+  commit 61dedf2af79fb5866dc7a0f972093682f2185e17
+  Author: Richard Henderson <rth@twiddle.net>
+  Date:   Tue Jul 18 10:02:50 2017 -1000
+
+      target/sh4: Add missing FPSCR.PR =3D=3D 0 checks
+      =
+
+      Both frchg and fschg require PR =3D=3D 0, otherwise undefined_operati=
+on.
+      =
+
+      Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
+      Signed-off-by: Richard Henderson <rth@twiddle.net>
+      Message-Id: <20170718200255.31647-26-rth@twiddle.net>
+      Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
+
+  :040000 040000 980d79b69ae712f23a1e4c56983e97a843153b4a
+  1024c109f506c7ad57367c63bc8bbbc8a7a36cd7 M      target
+
+  Reverting 61dedf2af79fb5866dc7a0f972093682f2185e17 fixes the problem
+  for me.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1796520/+subscriptions
