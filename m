@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46094)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gFHSF-0000vg-No
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 07:36:07 -0400
+	(envelope-from <drjones@redhat.com>) id 1gFHST-0000w4-Lp
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 07:36:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gFHMr-0000uw-G3
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 07:30:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50062)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gFHMf-0000m0-4z
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 07:30:20 -0400
-References: <1540357921-4199-1-git-send-email-liq3ea@gmail.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <a78c9c53-e89a-8b39-31a8-f04e98ea9478@redhat.com>
-Date: Wed, 24 Oct 2018 13:30:09 +0200
+	(envelope-from <drjones@redhat.com>) id 1gFHIF-0006kT-41
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 07:25:43 -0400
+Date: Wed, 24 Oct 2018 12:25:25 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20181024112525.wdysex6exqd5aued@kamzik.brq.redhat.com>
+References: <20181024085602.16611-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1540357921-4199-1-git-send-email-liq3ea@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] fw_cfg: print error message when reading
- splashfile failed
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181024085602.16611-1-eric.auger@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/virt: Set VIRT_COMPAT_3_0 compat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +22,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@gmail.com>, peter.maydell@linaro.org, pbonzini@redhat.com
-Cc: qemu-devel@nongnu.org
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
 
-On 10/24/18 07:12, Li Qiang wrote:
-> Also remove unnecessary 'res' variable.
+On Wed, Oct 24, 2018 at 10:56:02AM +0200, Eric Auger wrote:
+> We are missing the VIRT_COMPAT_3_0 definition and setting.
+> Let's add them.
 > 
-> Signed-off-by: Li Qiang <liq3ea@gmail.com>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > ---
->  hw/nvram/fw_cfg.c | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
+>  hw/arm/virt.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
-> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-> index 946f765..f4a52d8 100644
-> --- a/hw/nvram/fw_cfg.c
-> +++ b/hw/nvram/fw_cfg.c
-> @@ -68,15 +68,14 @@ static char *read_splashfile(char *filename, gsize *file_sizep,
->                               int *file_typep)
->  {
->      GError *err = NULL;
-> -    gboolean res;
->      gchar *content;
->      int file_type;
->      unsigned int filehead;
->      int bmp_bpp;
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 9f677825f9..a2b8d8f7c2 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -1871,6 +1871,9 @@ static void virt_machine_3_1_options(MachineClass *mc)
+>  }
+>  DEFINE_VIRT_MACHINE_AS_LATEST(3, 1)
 >  
-> -    res = g_file_get_contents(filename, &content, file_sizep, &err);
-> -    if (res == FALSE) {
-> -        error_report("failed to read splash file '%s'", filename);
-> +    if (!g_file_get_contents(filename, &content, file_sizep, &err)) {
-> +        error_report("failed to read splash file '%s', %s",
-> +                     filename, err->message);
->          g_error_free(err);
->          return NULL;
->      }
+> +#define VIRT_COMPAT_3_0 \
+> +    HW_COMPAT_3_0
+> +
+>  static void virt_3_0_instance_init(Object *obj)
+>  {
+>      virt_3_1_instance_init(obj);
+> @@ -1879,6 +1882,7 @@ static void virt_3_0_instance_init(Object *obj)
+>  static void virt_machine_3_0_options(MachineClass *mc)
+>  {
+>      virt_machine_3_1_options(mc);
+> +    SET_MACHINE_COMPAT(mc, VIRT_COMPAT_3_0);
+>  }
+>  DEFINE_VIRT_MACHINE(3, 0)
+>  
+> -- 
+> 2.17.2
 > 
+>
 
-Seems to be OK, according to
-<https://developer.gnome.org/glib/stable/glib-Error-Reporting.html#glib-Error-Reporting.description>.
+Oops, I should have done this with the 3.1 machine type. Thanks for the
+catching and patching.
 
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
