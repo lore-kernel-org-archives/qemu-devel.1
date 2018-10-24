@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42883)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gFIcm-0007dz-Lc
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 08:51:01 -0400
+	(envelope-from <bounces@canonical.com>) id 1gFIdh-0008In-Fx
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 08:51:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gFIcj-0006ET-EL
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 08:51:00 -0400
-Received: from 5.mo68.mail-out.ovh.net ([46.105.62.179]:53848)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gFIce-00067w-Rv
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 08:50:54 -0400
-Received: from player770.ha.ovh.net (unknown [10.109.160.93])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id C1FED101904
-	for <qemu-devel@nongnu.org>; Wed, 24 Oct 2018 14:50:43 +0200 (CEST)
-Date: Wed, 24 Oct 2018 14:50:33 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20181024145033.2ef8b8b8@bahia.lan>
-In-Reply-To: <20181024101930.20674-8-david@redhat.com>
-References: <20181024101930.20674-1-david@redhat.com>
-	<20181024101930.20674-8-david@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1gFIde-0006eL-08
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 08:51:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47082)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gFIdd-0006ci-QW
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 08:51:53 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gFIdZ-00082n-4Q
+	for <qemu-devel@nongnu.org>; Wed, 24 Oct 2018 12:51:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 6DC5B2E945E
+	for <qemu-devel@nongnu.org>; Wed, 24 Oct 2018 12:44:31 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v1 7/7] spapr_pci: route unplug
- via the hotplug handler
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 24 Oct 2018 12:34:35 -0000
+From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+Reply-To: Bug 1759333 <1759333@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152217002978.21179.18362367542097684091.malonedeb@wampee.canonical.com>
+Message-Id: <154038447634.18133.4500703498980325622.launchpad@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1759333] Re: Illegal Instruction with HVF when
+ encountering SSE instructions in the emulator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,78 +37,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S
-	. Tsirkin" <mst@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
 
-On Wed, 24 Oct 2018 12:19:30 +0200
-David Hildenbrand <david@redhat.com> wrote:
+** Tags added: tcg x86
 
-> Preparation for multi-stage hotplug handlers.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
+-- =
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1759333
 
->  hw/ppc/spapr_pci.c | 33 +++++++++++++++++++++------------
->  1 file changed, 21 insertions(+), 12 deletions(-)
-> 
-> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> index 58afa46204..64b8591023 100644
-> --- a/hw/ppc/spapr_pci.c
-> +++ b/hw/ppc/spapr_pci.c
-> @@ -1370,18 +1370,9 @@ static int spapr_create_pci_child_dt(sPAPRPHBState *phb, PCIDevice *dev,
->  /* Callback to be called during DRC release. */
->  void spapr_phb_remove_pci_device_cb(DeviceState *dev)
->  {
-> -    /* some version guests do not wait for completion of a device
-> -     * cleanup (generally done asynchronously by the kernel) before
-> -     * signaling to QEMU that the device is safe, but instead sleep
-> -     * for some 'safe' period of time. unfortunately on a busy host
-> -     * this sleep isn't guaranteed to be long enough, resulting in
-> -     * bad things like IRQ lines being left asserted during final
-> -     * device removal. to deal with this we call reset just prior
-> -     * to finalizing the device, which will put the device back into
-> -     * an 'idle' state, as the device cleanup code expects.
-> -     */
-> -    pci_device_reset(PCI_DEVICE(dev));
-> -    object_unparent(OBJECT(dev));
-> +    HotplugHandler *hotplug_ctrl = qdev_get_hotplug_handler(dev);
-> +
-> +    hotplug_handler_unplug(hotplug_ctrl, dev, &error_abort);
->  }
->  
->  static sPAPRDRConnector *spapr_phb_get_pci_func_drc(sPAPRPHBState *phb,
-> @@ -1490,6 +1481,23 @@ out:
->      }
->  }
->  
-> +static void spapr_pci_unplug(HotplugHandler *plug_handler,
-> +                             DeviceState *plugged_dev, Error **errp)
-> +{
-> +    /* some version guests do not wait for completion of a device
-> +     * cleanup (generally done asynchronously by the kernel) before
-> +     * signaling to QEMU that the device is safe, but instead sleep
-> +     * for some 'safe' period of time. unfortunately on a busy host
-> +     * this sleep isn't guaranteed to be long enough, resulting in
-> +     * bad things like IRQ lines being left asserted during final
-> +     * device removal. to deal with this we call reset just prior
-> +     * to finalizing the device, which will put the device back into
-> +     * an 'idle' state, as the device cleanup code expects.
-> +     */
-> +    pci_device_reset(PCI_DEVICE(plugged_dev));
-> +    object_unparent(OBJECT(plugged_dev));
-> +}
-> +
->  static void spapr_pci_unplug_request(HotplugHandler *plug_handler,
->                                       DeviceState *plugged_dev, Error **errp)
->  {
-> @@ -1965,6 +1973,7 @@ static void spapr_phb_class_init(ObjectClass *klass, void *data)
->      dc->user_creatable = true;
->      set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
->      hp->plug = spapr_pci_plug;
-> +    hp->unplug = spapr_pci_unplug;
->      hp->unplug_request = spapr_pci_unplug_request;
->  }
->  
+Title:
+  Illegal Instruction with HVF when encountering SSE instructions in the
+  emulator
+
+Status in QEMU:
+  New
+
+Bug description:
+  The latest version of QEMU doesn't seem to support emulated SSE instructi=
+ons with HVF acceleration on macOS.
+  The decoder will treat SSE instructions as invalid, get the instruction s=
+izes wrong and quickly crash the guest OS because of illegal instructions.
+  After having a quick look at target/i386/hvf/x86_decode.c, it seems that =
+SSE instruction emulation isn't implemented in the current version of the x=
+86 emulator.
+
+  A way to reproduce the issue is to run a macOS 10.13 guest with HVF
+  acceleration enabled, this will crash in the guest once it's loading
+  up the GUI (and also print a "Unimplemented handler" warning from
+  target/i386/hvf/x86_emu.c).
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1759333/+subscriptions
