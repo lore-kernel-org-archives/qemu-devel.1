@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59838)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60311)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gFQ9J-0001O3-BG
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 16:53:06 -0400
+	(envelope-from <mst@redhat.com>) id 1gFQAR-00025V-TK
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 16:54:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gFQ9G-0002X8-1R
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 16:53:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59230)
+	(envelope-from <mst@redhat.com>) id 1gFQAN-0003XB-Pw
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 16:54:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58958)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gFQ9F-0002Tp-1s
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 16:53:01 -0400
-Date: Wed, 24 Oct 2018 16:52:55 -0400
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gFQAN-0003Wh-JF
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 16:54:11 -0400
+Date: Wed, 24 Oct 2018 16:54:09 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181024165231-mutt-send-email-mst@kernel.org>
-References: <20181022183656.4902-1-sameo@linux.intel.com>
-	<20181022183656.4902-19-sameo@linux.intel.com>
-	<0f69efce-a104-00ae-ef8a-899aea0a801c@redhat.com>
+Message-ID: <20181024165328-mutt-send-email-mst@kernel.org>
+References: <20181023234112.188140-1-mst@redhat.com>
+	<CAFEAcA_SPT=Ypyep9QgdyjKyFCFTjnH_ZG+99H008HCpnhbFqg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <0f69efce-a104-00ae-ef8a-899aea0a801c@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 18/26] hw: acpi: Initial hardware-reduced
- support
+In-Reply-To: <CAFEAcA_SPT=Ypyep9QgdyjKyFCFTjnH_ZG+99H008HCpnhbFqg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL 00/28] pci, pc, virtio: fixes, features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,34 +27,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Samuel Ortiz <sameo@linux.intel.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Wed, Oct 24, 2018 at 12:09:18AM +0200, Paolo Bonzini wrote:
-> On 22/10/2018 20:36, Samuel Ortiz wrote:
-> > We build a minimal set of ACPI hardware-reduced tables: XSDT,
-> > FADT, MADT and a DSDT pointed by a RSDP.
-> > The DSDT only contains one PCI host bridge for now.
-> > 
-> > This API will be consumed by new x86 machine type but also potentially
-> > by the ARM virt one.
-> > 
-> > Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> > Cc: Igor Mammedov <imammedo@redhat.com>
-> > Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+On Wed, Oct 24, 2018 at 07:21:17AM +0100, Peter Maydell wrote:
+> On 24 October 2018 at 00:41, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > The following changes since commit 13399aad4fa87b2878c49d02a5d3bafa6c966ba3:
+> >
+> >   Merge remote-tracking branch 'remotes/armbru/tags/pull-error-2018-10-22' into staging (2018-10-23 17:20:23 +0100)
+> >
+> > are available in the Git repository at:
+> >
+> >   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+> >
+> > for you to fetch changes up to 57b279df457c2c4ef66ce9e1b813df35abde69f7:
+> >
+> >   vhost-scsi: prevent using uninitialized vqs (2018-10-23 19:29:58 -0400)
+> >
+> > ----------------------------------------------------------------
+> > pci, pc, virtio: fixes, features
+> >
+> > AMD IOMMU VAPIC support + fixes all over the place.
+> >
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> >
+> > ----------------------------------------------------------------
 > 
-> Do not include patches that essentially add dead code.  It is nice to
-> have hardware-reduced support, but if you want to contribute it you need
-> to add a user as well, for example the ARM virt machine type.
+> >  dtc                                  |   2 +-
 > 
-> In fact, using it in the ARM virt machine type is a no-brainer, so doing
-> that change (even if it's not yet part of NEMU) would be an excellent
-> way to reduce your delta, without going through the processing of
-> convincing QEMU maintainers of the advantages of your new x86 machine type.
+> Hi. This pull request seems to include an accidental update
+> to the dtc submodule. It's in the "intel_iommu: move ce fetching out
+> when sync shadow" commit, and it's not mentioned in the commit
+> message, so I am assuming it is unintentional.
 > 
-> Paolo
+> Could you fix that and resubmit, please?
+> 
+> thanks
+> -- PMM
 
-Excellent point, thanks Paolo.
+Oh not again. At least now you have scripts that catch it,
+I should write a script for that too. Thanks and sorry.
 
 -- 
 MST
