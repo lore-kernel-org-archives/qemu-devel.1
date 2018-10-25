@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32770)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40031)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <robert.hu@linux.intel.com>) id 1gFVzI-0000zE-3d
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 23:07:08 -0400
+	(envelope-from <robert.hu@linux.intel.com>) id 1gFW80-0005dA-3Y
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 23:16:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <robert.hu@linux.intel.com>) id 1gFVzF-0007Jo-Bt
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 23:07:08 -0400
-Received: from mga17.intel.com ([192.55.52.151]:21673)
+	(envelope-from <robert.hu@linux.intel.com>) id 1gFW7x-0007wp-Es
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 23:16:08 -0400
+Received: from mga17.intel.com ([192.55.52.151]:22287)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <robert.hu@linux.intel.com>)
-	id 1gFVzF-0007I7-3e
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 23:07:05 -0400
-Message-ID: <1540436819.80634.2.camel@linux.intel.com>
+	id 1gFW7x-0007vq-4N
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 23:16:05 -0400
+Message-ID: <1540437361.80634.4.camel@linux.intel.com>
 From: Robert Hoo <robert.hu@linux.intel.com>
-Date: Thu, 25 Oct 2018 11:06:59 +0800
-In-Reply-To: <20181024101643.GE4096@habkost.net>
+Date: Thu, 25 Oct 2018 11:16:01 +0800
+In-Reply-To: <20181024100612.GD4096@habkost.net>
 References: <1539578845-37944-1-git-send-email-robert.hu@linux.intel.com>
-	<1539578845-37944-3-git-send-email-robert.hu@linux.intel.com>
-	<20181024101643.GE4096@habkost.net>
+	<1539578845-37944-4-git-send-email-robert.hu@linux.intel.com>
+	<20181024100612.GD4096@habkost.net>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5 2/3] x86: Data structure changes to
- support MSR based features
+Subject: Re: [Qemu-devel] [PATCH v5 3/3] x86: define a new MSR based feature
+ word -- FEATURE_WORDS_ARCH_CAPABILITIES
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,80 +33,147 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Eduardo Habkost <ehabkost@redhat.com>
 Cc: robert.hu@intel.com, robert.hu@linux.intel.com, pbonzini@redhat.com, rth@twiddle.net, thomas.lendacky@amd.com, qemu-devel@nongnu.org
 
-On Wed, 2018-10-24 at 07:16 -0300, Eduardo Habkost wrote:
-> On Mon, Oct 15, 2018 at 12:47:24PM +0800, Robert Hoo wrote:
-> > Add FeatureWordType indicator in struct FeatureWordInfo.
-> > Change feature_word_info[] accordingly.
-> > Change existing functions that refer to feature_word_info[]
-> > accordingly.
+On Wed, 2018-10-24 at 07:06 -0300, Eduardo Habkost wrote:
+> On Mon, Oct 15, 2018 at 12:47:25PM +0800, Robert Hoo wrote:
+> > Note RSBA is specially treated -- no matter host support it or not,
+> > qemu
+> > pretends it is supported.
 > > 
 > > Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
+> 
+> I am now wondering what else we need to be able to remove
+> CPUID_7_0_EDX_ARCH_CAPABILITIES from
+> feature_word_info[FEAT_7_0_EDX].unmigratable_flags.
+
+Let me know once some thought comes out to you.
+> 
+> This series is necessary for that, be I think we still can't let
+> the VM be migrated if arch-capabilities is enabled and we're
+> running on a host that doesn't have MSR_IA32_ARCH_CAPABILITIES on
+> kvm_feature_msrs.
+
+Agree. So I still keep CPUID_7_0_EDX_ARCH_CAPABILITIES in
+feature_word_info[FEAT_7_0_EDX].unmigratable_flags for now.
+> 
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+> 
 > > ---
-> >  target/i386/cpu.c | 188 +++++++++++++++++++++++++++++++++++++++---
-> > ------------
-> >  1 file changed, 136 insertions(+), 52 deletions(-)
+> >  target/i386/cpu.c | 31 ++++++++++++++++++++++++++++++-
+> >  target/i386/cpu.h |  8 ++++++++
+> >  target/i386/kvm.c | 11 +++++++++++
+> >  3 files changed, 49 insertions(+), 1 deletion(-)
 > > 
 > > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> > index c88876d..d191b9c 100644
+> > index d191b9c..51c8fd8 100644
 > > --- a/target/i386/cpu.c
 > > +++ b/target/i386/cpu.c
-> > @@ -770,17 +770,36 @@ static void x86_cpu_vendor_words2str(char
-> > *dst, uint32_t vendor1,
-> >            /* missing:
-> >            CPUID_XSAVE_XSAVEC, CPUID_XSAVE_XSAVES */
+> > @@ -1141,6 +1141,27 @@ static FeatureWordInfo
+> > feature_word_info[FEATURE_WORDS] = {
+> >          },
+> >          .tcg_features = ~0U,
+> >      },
+> > +    /*Below are MSR exposed features*/
+> > +    [FEAT_ARCH_CAPABILITIES] = {
+> > +        .type = MSR_FEATURE_WORD,
+> > +        .feat_names = {
+> > +            "rdctl-no", "ibrs-all", "rsba", "skip-l1dfl-vmentry",
+> > +            "ssb-no", NULL, NULL, NULL,
+> > +            NULL, NULL, NULL, NULL,
+> > +            NULL, NULL, NULL, NULL,
+> > +            NULL, NULL, NULL, NULL,
+> > +            NULL, NULL, NULL, NULL,
+> > +            NULL, NULL, NULL, NULL,
+> > +            NULL, NULL, NULL, NULL,
+> > +        },
+> > +        .msr = {
+> > +            .index = MSR_IA32_ARCH_CAPABILITIES,
+> > +            .cpuid_dep = {
+> > +                FEAT_7_0_EDX,
+> > +                CPUID_7_0_EDX_ARCH_CAPABILITIES
+> > +            }
+> > +        },
+> > +    },
+> >  };
 > >  
-> > +typedef enum FeatureWordType {
-> > +   CPUID_FEATURE_WORD,
-> > +   MSR_FEATURE_WORD,
-> > +} FeatureWordType;
+> >  typedef struct X86RegisterInfo32 {
+> > @@ -3696,7 +3717,15 @@ static uint32_t
+> > x86_cpu_get_supported_feature_word(FeatureWord w,
+> >                                                          wi-
+> > >cpuid.reg);
+> >              break;
+> >          case MSR_FEATURE_WORD:
+> > -            r = kvm_arch_get_supported_msr_feature(kvm_state, wi-
+> > >msr.index);
+> > +            /* Special case:
+> > +             * No matter host status, IA32_ARCH_CAPABILITIES.RSBA
+> > [bit 2]
+> > +             * is always supported in guest.
+> > +             */
+> > +            if (wi->msr.index == MSR_IA32_ARCH_CAPABILITIES) {
+> > +                r = MSR_ARCH_CAP_RSBA;
+> > +            }
+> > +            r |= kvm_arch_get_supported_msr_feature(kvm_state,
+> > +                        wi->msr.index);
+> >              break;
+> >          }
+> >      } else if (hvf_enabled()) {
+> > diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> > index 730c06f..52a52ec 100644
+> > --- a/target/i386/cpu.h
+> > +++ b/target/i386/cpu.h
+> > @@ -502,6 +502,7 @@ typedef enum FeatureWord {
+> >      FEAT_6_EAX,         /* CPUID[6].EAX */
+> >      FEAT_XSAVE_COMP_LO, /* CPUID[EAX=0xd,ECX=0].EAX */
+> >      FEAT_XSAVE_COMP_HI, /* CPUID[EAX=0xd,ECX=0].EDX */
+> > +    FEAT_ARCH_CAPABILITIES,
+> >      FEATURE_WORDS,
+> >  } FeatureWord;
+> >  
+> > @@ -730,6 +731,13 @@ typedef uint32_t
+> > FeatureWordArray[FEATURE_WORDS];
+> >  #define CPUID_TOPOLOGY_LEVEL_SMT      (1U << 8)
+> >  #define CPUID_TOPOLOGY_LEVEL_CORE     (2U << 8)
+> >  
+> > +/* MSR Feature Bits */
+> > +#define MSR_ARCH_CAP_RDCL_NO    (1U << 0)
+> > +#define MSR_ARCH_CAP_IBRS_ALL   (1U << 1)
+> > +#define MSR_ARCH_CAP_RSBA       (1U << 2)
+> > +#define MSR_ARCH_CAP_SKIP_L1DFL_VMENTRY (1U << 3)
+> > +#define MSR_ARCH_CAP_SSB_NO     (1U << 4)
 > > +
-> >  typedef struct FeatureWordInfo {
-> > +    FeatureWordType type;
-> >      /* feature flags names are taken from "Intel Processor
-> > Identification and
-> >       * the CPUID Instruction" and AMD's "CPUID Specification".
-> >       * In cases of disagreement between feature naming
-> > conventions,
-> >       * aliases may be added.
-> >       */
-> >      const char *feat_names[32];
-> > -    uint32_t cpuid_eax;   /* Input EAX for CPUID */
-> > -    bool cpuid_needs_ecx; /* CPUID instruction uses ECX as input
-> > */
-> > -    uint32_t cpuid_ecx;   /* Input ECX value for CPUID */
-> > -    int cpuid_reg;        /* output register (R_* constant) */
-> > +    union {
-> > +        /* If type==CPUID_FEATURE_WORD */
-> > +        struct {
-> > +            uint32_t eax;   /* Input EAX for CPUID */
-> > +            bool needs_ecx; /* CPUID instruction uses ECX as input
-> > */
-> > +            uint32_t ecx;   /* Input ECX value for CPUID */
-> > +            int reg;        /* output register (R_* constant) */
-> > +        } cpuid;
-> > +        /* If type==MSR_FEATURE_WORD */
-> > +        struct {
-> > +            uint32_t index;
-> > +            struct {   /*CPUID that enumerate this MSR*/
-> > +                FeatureWord cpuid_class;
-> > +                uint32_t    cpuid_flag;
-> > +            } cpuid_dep;
+> >  #ifndef HYPERV_SPINLOCK_NEVER_RETRY
+> >  #define HYPERV_SPINLOCK_NEVER_RETRY             0xFFFFFFFF
+> >  #endif
+> > diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> > index db79dad..2f7b40d 100644
+> > --- a/target/i386/kvm.c
+> > +++ b/target/i386/kvm.c
+> > @@ -1928,6 +1928,17 @@ static int kvm_put_msrs(X86CPU *cpu, int
+> > level)
+> >      }
+> >  #endif
+> >  
+> > +    /* If host supports feature MSR, write down. */
+> > +    if (kvm_feature_msrs) {
+> > +        int i;
+> > +        for (i = 0; i < kvm_feature_msrs->nmsrs; i++)
+> > +            if (kvm_feature_msrs->indices[i] ==
+> > MSR_IA32_ARCH_CAPABILITIES) {
+> > +                kvm_msr_entry_add(cpu, MSR_IA32_ARCH_CAPABILITIES,
+> > +                              env-
+> > >features[FEAT_ARCH_CAPABILITIES]);
+> > +                break;
+> > +            }
+> > +    }
+> > +
+> >      /*
+> >       * The following MSRs have side effects on the guest or are
+> > too heavy
+> >       * for normal writeback. Limit them to reset or full state
+> > updates.
+> > -- 
+> > 1.8.3.1
+> > 
+> > 
 > 
-> Aren't you going to use this field anywhere?  Probably we want to
-> prevent the VM from starting if a bit is set in the feature world
-> but the cpuid_dep bit is not set.
-> 
-> e.g.:
->   qemu-system-x86_64 -cpu Skylake-Client,-arch-capabilities,+rsba
-> probably should fail to start.
-
-How about in x86_cpu_filter_features() filters the MSR feature word, if
- its dependent CPUID feature bit is not set?
-The filter results will be record in cpu->filtered_features, and print
-out, like other filtered features.
-> 
-> > +        } msr;
-> > +    };
-> 
-> [...]
 > 
