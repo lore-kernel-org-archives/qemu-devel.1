@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45422)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gFmNE-0002ra-GX
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 16:36:57 -0400
+	(envelope-from <berrange@redhat.com>) id 1gFmOd-0005Bw-J5
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 16:38:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gFmND-0001S3-Eb
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 16:36:56 -0400
-References: <20181018182856.28001-1-mark.cave-ayland@ilande.co.uk>
-	<20181018182856.28001-12-mark.cave-ayland@ilande.co.uk>
-	<dea80569-ff85-7b29-ad49-b1c54aadf003@posteo.de>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <9303f78e-e2d7-a6b2-6ca2-9510bb0ea1fe@ilande.co.uk>
-Date: Thu, 25 Oct 2018 21:36:25 +0100
+	(envelope-from <berrange@redhat.com>) id 1gFmOW-00029H-GS
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 16:38:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45698)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gFmOW-00026z-7p
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 16:38:16 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DC23B81DF0
+	for <qemu-devel@nongnu.org>; Thu, 25 Oct 2018 20:38:14 +0000 (UTC)
+Date: Thu, 25 Oct 2018 21:37:58 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181025203758.GA29995@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20181025085256.20522-1-kraxel@redhat.com>
+	<20181025085256.20522-4-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <dea80569-ff85-7b29-ad49-b1c54aadf003@posteo.de>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 11/11] hw/m68k: define Macintosh Quadra
- 800
+Content-Disposition: inline
+In-Reply-To: <20181025085256.20522-4-kraxel@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/3] cirrus: mark as deprecated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,107 +34,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <th.huth@posteo.de>, qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, jasowang@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, hpoussin@reactos.org, kraxel@redhat.com, pbonzini@redhat.com, aurelien@aurel32.net, laurent@vivier.eu
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, Prasad J Pandit <ppandit@redhat.com>
 
-On 23/10/2018 12:20, Thomas Huth wrote:
-
-> On 2018-10-18 19:28, Mark Cave-Ayland wrote:
->> From: Laurent Vivier <laurent@vivier.eu>
->>
->> Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
->> ---
-> [...]
->> diff --git a/hw/m68k/Makefile.objs b/hw/m68k/Makefile.objs
->> index d1f089c08a..18ebf1937a 100644
->> --- a/hw/m68k/Makefile.objs
->> +++ b/hw/m68k/Makefile.objs
->> @@ -1,2 +1,4 @@
->> -obj-y += an5206.o mcf5208.o
->> -obj-y += mcf5206.o mcf_intc.o
->> +obj-$(CONFIG_COLDFIRE) += an5206.o mcf5208.o
->> +obj-$(CONFIG_MAC) += q800.o
->> +
->> +obj-$(CONFIG_COLDFIRE) += mcf5206.o mcf_intc.o
+On Thu, Oct 25, 2018 at 10:52:56AM +0200, Gerd Hoffmann wrote:
+> While being at it deprecate cirrus too.
 > 
-> Cosmetic nit: Keep the coldfire lines together instead of splitting them?
+> Reason (short version): use stdvga instead.
+> Verbose version:
+>     https://www.kraxel.org/blog/2014/10/qemu-using-cirrus-considered-harmful
 
-Cosmetic nit fixed in the latest version ;)
+Every single one of my guests is using cirrus. This wasn't an explicit
+choice on my part, so I believe it is being used as the default in
+virt-install.
 
->> diff --git a/hw/m68k/q800.c b/hw/m68k/q800.c
->> new file mode 100644
->> index 0000000000..bbf34262f0
->> --- /dev/null
->> +++ b/hw/m68k/q800.c
->> @@ -0,0 +1,367 @@
->> +/*
->> + * QEMU Motorla 680x0 Macintosh hardware System Emulator
->> + *
->> + * Permission is hereby granted, free of charge, to any person obtaining a copy
->> + * of this software and associated documentation files (the "Software"), to deal
->> + * in the Software without restriction, including without limitation the rights
->> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
->> + * copies of the Software, and to permit persons to whom the Software is
->> + * furnished to do so, subject to the following conditions:
->> + *
->> + * The above copyright notice and this permission notice shall be included in
->> + * all copies or substantial portions of the Software.
->> + *
->> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
->> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
->> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
->> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
->> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
->> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
->> + * THE SOFTWARE.
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +#include "sysemu/sysemu.h"
->> +#include "cpu.h"
->> +#include "hw/hw.h"
->> +#include "hw/boards.h"
->> +#include "elf.h"
->> +#include "hw/loader.h"
->> +#include "hw/display/framebuffer.h"
->> +#include "ui/console.h"
->> +#include "exec/address-spaces.h"
->> +#include "hw/char/escc.h"
->> +#include "hw/sysbus.h"
->> +#include "hw/scsi/esp.h"
->> +#include "bootinfo.h"
->> +#include "hw/misc/mac_via.h"
->> +#include "hw/input/adb.h"
->> +#include "hw/audio/asc.h"
->> +#include "hw/nubus/mac-nubus-bridge.h"
->> +#include "hw/display/macfb.h"
->> +#include "hw/intc/q800_irq.h"
->> +#include "hw/block/swim.h"
->> +#include "net/net.h"
->> +#include "qapi/error.h"
->> +#include "sysemu/qtest.h"
->> +
->> +#define MACROM_ADDR     0x40000000
->> +#define MACROM_SIZE     0x00100000
->> +
->> +/*
->> + *              .ident          = MAC_MODEL_Q800,
->> + *              .name           = "Quadra 800",
->> + *              .adb_type       = MAC_ADB_II,
->> + *              .via_type       = MAC_VIA_QUADRA,
->> + *              .scsi_type      = MAC_SCSI_QUADRA,
->> + *              .scc_type       = MAC_SCC_QUADRA,
->> + *              .ether_type     = MAC_ETHER_SONIC,
->> + *              .nubus_type     = MAC_NUBUS
->> + */
+I don't debate the points in the blog post above that stdvga is a
+better choice, but I don't think that's enough to justify deprecating
+cirrus at this point in time, because when it then gets deleted it
+will break way too many existing deployments.
+
+We need to socialize info in that blog post above more widely and
+especially ensure that apps are not using that by default. I don't
+see it being viable to formally deprecate it in QEMU any time soon
+though given existing usage.
+
 > 
-> Is this comment intentional or left-over code from an older rebase?
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  hw/display/cirrus_vga.c     | 2 ++
+>  hw/display/cirrus_vga_isa.c | 2 ++
+>  qemu-deprecated.texi        | 4 ++++
+>  3 files changed, 8 insertions(+)
+> 
+> diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
+> index d9b854d..2f16ba9 100644
+> --- a/hw/display/cirrus_vga.c
+> +++ b/hw/display/cirrus_vga.c
+> @@ -3024,6 +3024,8 @@ static void cirrus_vga_class_init(ObjectClass *klass, void *data)
+>      dc->vmsd = &vmstate_pci_cirrus_vga;
+>      dc->props = pci_vga_cirrus_properties;
+>      dc->hotpluggable = false;
+> +    dc->deprecation_reason =
+> +        "https://www.kraxel.org/blog/2014/10/qemu-using-cirrus-considered-harmful";
+>  }
+>  
+>  static const TypeInfo cirrus_vga_info = {
+> diff --git a/hw/display/cirrus_vga_isa.c b/hw/display/cirrus_vga_isa.c
+> index fa10b74..c2d853c 100644
+> --- a/hw/display/cirrus_vga_isa.c
+> +++ b/hw/display/cirrus_vga_isa.c
+> @@ -81,6 +81,8 @@ static void isa_cirrus_vga_class_init(ObjectClass *klass, void *data)
+>      dc->realize = isa_cirrus_vga_realizefn;
+>      dc->props = isa_cirrus_vga_properties;
+>      set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
+> +    dc->deprecation_reason =
+> +        "https://www.kraxel.org/blog/2014/10/qemu-using-cirrus-considered-harmful";
+>  }
+>  
+>  static const TypeInfo isa_cirrus_vga_info = {
+> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+> index 7951a4f..1b1d434 100644
+> --- a/qemu-deprecated.texi
+> +++ b/qemu-deprecated.texi
+> @@ -120,6 +120,10 @@ or ``ivshmem-doorbell`` device types.
+>  
+>  Has known buffer overflow.
+>  
+> +@subsection cirrus (since 3.1)
+> +
+> +Use stdvga instead (-vga std or -device VGA).
+> +
+>  @section System emulator machines
+>  
+>  @subsection pc-0.10 and pc-0.11 (since 3.0)
+> -- 
+> 2.9.3
+> 
+> 
 
-I suspect this has come from another Linux file somewhere, but as it's nothing
-related to QEMU then I've removed it for now.
-
-
-ATB,
-
-Mark.
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
