@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43142)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52575)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gFkfT-0001ER-8u
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 14:47:40 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gFl7z-0004rR-5X
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 15:17:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gFkfP-0006zk-CM
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 14:47:38 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:35044)
+	(envelope-from <peter.maydell@linaro.org>) id 1gFl7x-0000FK-Uv
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 15:17:06 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:43016)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gFkfK-0006u9-Cv
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 14:47:33 -0400
-Received: by mail-oi1-x244.google.com with SMTP id 22-v6so7593558oiz.2
-	for <qemu-devel@nongnu.org>; Thu, 25 Oct 2018 11:47:25 -0700 (PDT)
+	id 1gFl7x-0000Eq-FH
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 15:17:05 -0400
+Received: by mail-ot1-x343.google.com with SMTP id k9so10222934otl.10
+	for <qemu-devel@nongnu.org>; Thu, 25 Oct 2018 12:17:05 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <727db304cd3676f89da0f2f9c5ba12e65795683c.1538683492.git.alistair.francis@wdc.com>
-References: <cover.1538683492.git.alistair.francis@wdc.com>
-	<727db304cd3676f89da0f2f9c5ba12e65795683c.1538683492.git.alistair.francis@wdc.com>
+In-Reply-To: <20181025005110.249256-1-mst@redhat.com>
+References: <20181025005110.249256-1-mst@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 25 Oct 2018 19:47:04 +0100
-Message-ID: <CAFEAcA_o0_Yq130modYZ9L3WSq6GaLhdVOwicefz9xgFE+mi2A@mail.gmail.com>
+Date: Thu, 25 Oct 2018 20:16:44 +0100
+Message-ID: <CAFEAcA9zqAOr7F_Pu1tqxJYd=4JMHa3XgR703Mb4B9LibOGB-w@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 2/5] hw/riscv/virt: Connect the gpex PCIe
+Subject: Re: [Qemu-devel] [PULL v2 00/28] pci, pc, virtio: fixes, features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,72 +28,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <Alistair.Francis@wdc.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mjc@sifive.com" <mjc@sifive.com>, "alistair23@gmail.com" <alistair23@gmail.com>, "palmer@sifive.com" <palmer@sifive.com>, "stephen@eideticom.com" <stephen@eideticom.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 4 October 2018 at 21:06, Alistair Francis <Alistair.Francis@wdc.com> wrote:
-> Connect the gpex PCIe device based on the device tree included in the
-> HiFive Unleashed ROM.
+On 25 October 2018 at 01:52, Michael S. Tsirkin <mst@redhat.com> wrote:
+> The following changes since commit 13399aad4fa87b2878c49d02a5d3bafa6c966ba3:
 >
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> ---
->  default-configs/riscv32-softmmu.mak |  6 ++-
->  default-configs/riscv64-softmmu.mak |  6 ++-
->  hw/riscv/virt.c                     | 58 +++++++++++++++++++++++++++++
->  include/hw/riscv/virt.h             |  4 +-
->  4 files changed, 71 insertions(+), 3 deletions(-)
-
-> +static inline DeviceState *
-> +gpex_pcie_init(MemoryRegion *sys_mem, uint32_t bus_nr,
-> +                 hwaddr cfg_base, uint64_t cfg_size,
-> +                 hwaddr mmio_base, uint64_t mmio_size,
-> +                 qemu_irq irq, bool link_up)
-> +{
-> +    DeviceState *dev;
-> +    MemoryRegion *cfg, *mmio;
-> +
-> +    dev = qdev_create(NULL, TYPE_GPEX_HOST);
-> +
-> +    qdev_init_nofail(dev);
-> +
-> +    cfg = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
-> +    memory_region_add_subregion_overlap(sys_mem, cfg_base, cfg, 0);
-> +
-> +    mmio = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 1);
-> +    memory_region_add_subregion_overlap(sys_mem, 0, mmio, 0);
-
-You probably also want to map the gpex's mmio region 2,
-which is the PCI IO BAR window. Otherwise PCI devices
-with IO BARs won't work right.
-
-> +
-> +    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, irq);
-
-GPEX has 4 interrupt lines, corresponding to classic PCI
-IRQs A, B, C, D. You need to wire them all up, or only the
-first PCI device plugged in will have a working interrupt.
-You also don't look to have the bit of device-tree generation
-that sets up the interrupt-map, which tells the guest about
-the mapping from PCI devfns (ie, which slot the card is in) to
-IRQ lines.
-
-> +
-> +    return dev;
-> +}
-> +
->  static void riscv_virt_board_init(MachineState *machine)
->  {
->      const struct MemmapEntry *memmap = virt_memmap;
-> @@ -382,6 +436,10 @@ static void riscv_virt_board_init(MachineState *machine)
->              qdev_get_gpio_in(DEVICE(s->plic), VIRTIO_IRQ + i));
->      }
+>   Merge remote-tracking branch 'remotes/armbru/tags/pull-error-2018-10-22' into staging (2018-10-23 17:20:23 +0100)
 >
-> +    gpex_pcie_init(system_memory, 0, memmap[VIRT_PCIE].base,
-> +                           memmap[VIRT_PCIE].size, 0x40000000, 0x20000000,
+> are available in the Git repository at:
+>
+>   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+>
+> for you to fetch changes up to 6a9fb4e1ba5594cde7739068617ad88e6117db93:
+>
+>   vhost-scsi: prevent using uninitialized vqs (2018-10-24 20:50:13 -0400)
+>
+> ----------------------------------------------------------------
+> pci, pc, virtio: fixes, features
+>
+> AMD IOMMU VAPIC support + fixes all over the place.
+>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
-You could put the MMIO BAR window base and size in your memmap[] too...
+Hi; I get some compile failures and a test assertion, I'm afraid:
 
-> +                           qdev_get_gpio_in(DEVICE(s->plic), PCIE_IRQ), true);
+On 32-bit hosts (where uint64_t and size_t are not the same):
+
+/home/peter.maydell/qemu/include/qemu/compiler.h:80:35: error: invalid
+operands to binary - (have 'uint64_t * {aka long long unsigned int *}'
+and 'size_t * {aka unsigned int *}')
+ #define type_check(t1,t2) ((t1*)0 - (t2*)0)
+                                   ^
+/home/peter.maydell/qemu/include/hw/qdev-properties.h:77:15: note: in
+expansion of macro 'type_check'
+             + type_check(_type, typeof_field(_state, _field)),          \
+               ^
+/home/peter.maydell/qemu/include/hw/qdev-properties.h:168:5: note: in
+expansion of macro 'DEFINE_PROP_UNSIGNED'
+     DEFINE_PROP_UNSIGNED(_n, _s, _f, _d, qdev_prop_size, uint64_t)
+     ^
+/home/peter.maydell/qemu/hw/misc/pci-testdev.c:322:5: note: in
+expansion of macro 'DEFINE_PROP_SIZE'
+     DEFINE_PROP_SIZE("membar", PCITestDevState, membar_size, 0),
+     ^
+/home/peter.maydell/qemu/rules.mak:69: recipe for target
+'hw/misc/pci-testdev.o' failed
+
+On the Windows w64 cross-compile:
+
+In file included from /home/petmay01/qemu-for-merges/hw/i386/amd_iommu.c:26:0:
+/home/petmay01/qemu-for-merges/hw/i386/amd_iommu.c: In function
+'amdvi_int_remap_msi':
+/home/petmay01/qemu-for-merges/hw/i386/amd_iommu.h:247:46: error: left
+shift count >= width of type [-Werror=shift-count-overflow]
+ #define AMDVI_DEV_NMI_PASS_MASK         (1UL << 58)
+                                              ^
+/home/petmay01/qemu-for-merges/hw/i386/amd_iommu.c:1281:25: note: in
+expansion of macro 'AMDVI_DEV_NMI_PASS_MASK'
+         pass = dte[3] & AMDVI_DEV_NMI_PASS_MASK;
+                         ^
+/home/petmay01/qemu-for-merges/hw/i386/amd_iommu.h:245:46: error: left
+shift count >= width of type [-Werror=shift-count-overflow]
+ #define AMDVI_DEV_INT_PASS_MASK         (1UL << 56)
+                                              ^
+/home/petmay01/qemu-for-merges/hw/i386/amd_iommu.c:1285:25: note: in
+expansion of macro 'AMDVI_DEV_INT_PASS_MASK'
+         pass = dte[3] & AMDVI_DEV_INT_PASS_MASK;
+                         ^
+/home/petmay01/qemu-for-merges/hw/i386/amd_iommu.h:246:46: error: left
+shift count >= width of type [-Werror=shift-count-overflow]
+ #define AMDVI_DEV_EINT_PASS_MASK        (1UL << 57)
+                                              ^
+/home/petmay01/qemu-for-merges/hw/i386/amd_iommu.c:1289:25: note: in
+expansion of macro 'AMDVI_DEV_EINT_PASS_MASK'
+         pass = dte[3] & AMDVI_DEV_EINT_PASS_MASK;
+                         ^
+
+These should presumably all be "ULL". (The "UL" suffix is
+usually a bug, as it's either unnecessary or should be ULL.)
+
+On various Linux hosts (aarch64, s390, x86-64, sparc)
+I get this assertion in the bios-tables-test:
+
+  /x86_64/acpi/q35/mmio64:
+Looking for expected file 'tests/acpi-test-data/q35/DSDT.mmio64'
+
+Looking for expected file 'tests/acpi-test-data/q35/DSDT'
+
+Using expected file 'tests/acpi-test-data/q35/DSDT'
+
+Looking for expected file 'tests/acpi-test-data/q35/FACP.mmio64'
+
+Looking for expected file 'tests/acpi-test-data/q35/FACP'
+
+Using expected file 'tests/acpi-test-data/q35/FACP'
+
+Looking for expected file 'tests/acpi-test-data/q35/APIC.mmio64'
+
+Looking for expected file 'tests/acpi-test-data/q35/APIC'
+
+Using expected file 'tests/acpi-test-data/q35/APIC'
+
+Looking for expected file 'tests/acpi-test-data/q35/HPET.mmio64'
+
+Looking for expected file 'tests/acpi-test-data/q35/HPET'
+
+Using expected file 'tests/acpi-test-data/q35/HPET'
+
+Looking for expected file 'tests/acpi-test-data/q35/SRAT.mmio64'
+
+Looking for expected file 'tests/acpi-test-data/q35/SRAT'
+**
+ERROR:/home/petmay01/linaro/qemu-for-merges/tests/bios-tables-test.c:398:load_expected_aml:
+assertion failed: (exp_sdt.aml_file)
+FAIL
+
 
 thanks
 -- PMM
