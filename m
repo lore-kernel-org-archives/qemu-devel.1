@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59966)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFh5Q-0003lE-6L
+	(envelope-from <cota@braap.org>) id 1gFh5P-0004Pv-0n
 	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:58:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFgv6-00087C-Lv
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:34 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:50663)
+	(envelope-from <cota@braap.org>) id 1gFgv8-00088F-7V
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:36 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:44321)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gFgv6-0007vB-EW
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gFgv6-0007sj-My
 	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:32 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 25 Oct 2018 10:46:03 -0400
-Message-Id: <20181025144644.15464-30-cota@braap.org>
+Date: Thu, 25 Oct 2018 10:45:58 -0400
+Message-Id: <20181025144644.15464-25-cota@braap.org>
 In-Reply-To: <20181025144644.15464-1-cota@braap.org>
 References: <20181025144644.15464-1-cota@braap.org>
-Subject: [Qemu-devel] [RFC v4 30/71] cpu: define cpu_interrupt_request
- helpers
+Subject: [Qemu-devel] [RFC v4 25/71] sparc: convert to cpu_halted
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,109 +24,107 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Fabien Chouteau <chouteau@adacore.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
 
-Add a comment about how atomic_read works here. The comment refers to
-a "BQL-less CPU loop", which will materialize toward the end
-of this series.
-
-Note that the modifications to cpu_reset_interrupt are there to
-avoid deadlock during the CPU lock transition; once that is complete,
-cpu_interrupt_request will be simple again.
-
+Cc: Fabien Chouteau <chouteau@adacore.com>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Artyom Tarasenko <atar4qemu@gmail.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- include/qom/cpu.h | 37 +++++++++++++++++++++++++++++++++++++
- qom/cpu.c         | 27 +++++++++++++++++++++------
- 2 files changed, 58 insertions(+), 6 deletions(-)
+ hw/sparc/leon3.c      | 2 +-
+ hw/sparc/sun4m.c      | 8 ++++----
+ hw/sparc64/sparc64.c  | 4 ++--
+ target/sparc/helper.c | 2 +-
+ 4 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index aeed63a705..a86690c7a5 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -511,6 +511,43 @@ static inline void cpu_halted_set(CPUState *cpu, uint32_t val)
-     cpu_mutex_unlock(cpu);
+diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
+index fa98ab8177..0746001f91 100644
+--- a/hw/sparc/leon3.c
++++ b/hw/sparc/leon3.c
+@@ -61,7 +61,7 @@ static void main_cpu_reset(void *opaque)
+ 
+     cpu_reset(cpu);
+ 
+-    cpu->halted = 0;
++    cpu_halted_set(cpu, 0);
+     env->pc     = s->entry;
+     env->npc    = s->entry + 4;
+     env->regbase[6] = s->sp;
+diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+index 3c29b68e67..5bd6512b2b 100644
+--- a/hw/sparc/sun4m.c
++++ b/hw/sparc/sun4m.c
+@@ -168,7 +168,7 @@ static void cpu_kick_irq(SPARCCPU *cpu)
+     CPUSPARCState *env = &cpu->env;
+     CPUState *cs = CPU(cpu);
+ 
+-    cs->halted = 0;
++    cpu_halted_set(cs, 0);
+     cpu_check_irqs(env);
+     qemu_cpu_kick(cs);
+ }
+@@ -199,7 +199,7 @@ static void main_cpu_reset(void *opaque)
+     CPUState *cs = CPU(cpu);
+ 
+     cpu_reset(cs);
+-    cs->halted = 0;
++    cpu_halted_set(cs, 0);
  }
  
-+/*
-+ * When sending an interrupt, setters OR the appropriate bit and kick the
-+ * destination vCPU. The latter can then read interrupt_request without
-+ * acquiring the CPU lock, because once the kick-induced completes, they'll read
-+ * an up-to-date interrupt_request.
-+ * Setters always acquire the lock, which guarantees that (1) concurrent
-+ * updates from different threads won't result in data races, and (2) the
-+ * BQL-less CPU loop will always see an up-to-date interrupt_request, since the
-+ * loop holds the CPU lock.
-+ */
-+static inline uint32_t cpu_interrupt_request(CPUState *cpu)
-+{
-+    return atomic_read(&cpu->interrupt_request);
-+}
-+
-+static inline void cpu_interrupt_request_or(CPUState *cpu, uint32_t mask)
-+{
-+    if (cpu_mutex_locked(cpu)) {
-+        atomic_set(&cpu->interrupt_request, cpu->interrupt_request | mask);
-+        return;
-+    }
-+    cpu_mutex_lock(cpu);
-+    atomic_set(&cpu->interrupt_request, cpu->interrupt_request | mask);
-+    cpu_mutex_unlock(cpu);
-+}
-+
-+static inline void cpu_interrupt_request_set(CPUState *cpu, uint32_t val)
-+{
-+    if (cpu_mutex_locked(cpu)) {
-+        atomic_set(&cpu->interrupt_request, val);
-+        return;
-+    }
-+    cpu_mutex_lock(cpu);
-+    atomic_set(&cpu->interrupt_request, val);
-+    cpu_mutex_unlock(cpu);
-+}
-+
- static inline void cpu_tb_jmp_cache_clear(CPUState *cpu)
- {
-     unsigned int i;
-diff --git a/qom/cpu.c b/qom/cpu.c
-index bb031a3a6a..ecdf8e7aac 100644
---- a/qom/cpu.c
-+++ b/qom/cpu.c
-@@ -98,14 +98,29 @@ static void cpu_common_get_memory_mapping(CPUState *cpu,
-  * BQL here if we need to.  cpu_interrupt assumes it is held.*/
- void cpu_reset_interrupt(CPUState *cpu, int mask)
- {
--    bool need_lock = !qemu_mutex_iothread_locked();
-+    bool has_bql = qemu_mutex_iothread_locked();
-+    bool has_cpu_lock = cpu_mutex_locked(cpu);
+ static void secondary_cpu_reset(void *opaque)
+@@ -208,7 +208,7 @@ static void secondary_cpu_reset(void *opaque)
+     CPUState *cs = CPU(cpu);
  
--    if (need_lock) {
--        qemu_mutex_lock_iothread();
-+    if (has_bql) {
-+        if (has_cpu_lock) {
-+            atomic_set(&cpu->interrupt_request, cpu->interrupt_request & ~mask);
-+        } else {
-+            cpu_mutex_lock(cpu);
-+            atomic_set(&cpu->interrupt_request, cpu->interrupt_request & ~mask);
-+            cpu_mutex_unlock(cpu);
-+        }
-+        return;
-+    }
-+
-+    if (has_cpu_lock) {
-+        cpu_mutex_unlock(cpu);
-     }
--    cpu->interrupt_request &= ~mask;
--    if (need_lock) {
--        qemu_mutex_unlock_iothread();
-+    qemu_mutex_lock_iothread();
-+    cpu_mutex_lock(cpu);
-+    atomic_set(&cpu->interrupt_request, cpu->interrupt_request & ~mask);
-+    qemu_mutex_unlock_iothread();
-+    if (!has_cpu_lock) {
-+        cpu_mutex_unlock(cpu);
-     }
+     cpu_reset(cs);
+-    cs->halted = 1;
++    cpu_halted_set(cs, 1);
  }
  
+ static void cpu_halt_signal(void *opaque, int irq, int level)
+@@ -825,7 +825,7 @@ static void cpu_devinit(const char *cpu_type, unsigned int id,
+     } else {
+         qemu_register_reset(secondary_cpu_reset, cpu);
+         cs = CPU(cpu);
+-        cs->halted = 1;
++        cpu_halted_set(cs, 1);
+     }
+     *cpu_irqs = qemu_allocate_irqs(cpu_set_irq, cpu, MAX_PILS);
+     env->prom_addr = prom_addr;
+diff --git a/hw/sparc64/sparc64.c b/hw/sparc64/sparc64.c
+index 408388945e..372bbd4f5b 100644
+--- a/hw/sparc64/sparc64.c
++++ b/hw/sparc64/sparc64.c
+@@ -100,7 +100,7 @@ static void cpu_kick_irq(SPARCCPU *cpu)
+     CPUState *cs = CPU(cpu);
+     CPUSPARCState *env = &cpu->env;
+ 
+-    cs->halted = 0;
++    cpu_halted_set(cs, 0);
+     cpu_check_irqs(env);
+     qemu_cpu_kick(cs);
+ }
+@@ -115,7 +115,7 @@ void sparc64_cpu_set_ivec_irq(void *opaque, int irq, int level)
+         if (!(env->ivec_status & 0x20)) {
+             trace_sparc64_cpu_ivec_raise_irq(irq);
+             cs = CPU(cpu);
+-            cs->halted = 0;
++            cpu_halted_set(cs, 0);
+             env->interrupt_index = TT_IVEC;
+             env->ivec_status |= 0x20;
+             env->ivec_data[0] = (0x1f << 6) | irq;
+diff --git a/target/sparc/helper.c b/target/sparc/helper.c
+index 46232788c8..dd00cf7cac 100644
+--- a/target/sparc/helper.c
++++ b/target/sparc/helper.c
+@@ -245,7 +245,7 @@ void helper_power_down(CPUSPARCState *env)
+ {
+     CPUState *cs = CPU(sparc_env_get_cpu(env));
+ 
+-    cs->halted = 1;
++    cpu_halted_set(cs, 1);
+     cs->exception_index = EXCP_HLT;
+     env->pc = env->npc;
+     env->npc = env->pc + 4;
 -- 
 2.17.1
