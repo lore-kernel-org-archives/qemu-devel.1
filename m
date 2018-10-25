@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45666)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48525)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gFdMZ-0001Y0-K5
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 06:59:40 -0400
+	(envelope-from <philmd@redhat.com>) id 1gFdZ2-0005l2-7u
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 07:12:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gFdMW-0002Ry-9B
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 06:59:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35868)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gFdMU-0002PN-7u
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 06:59:36 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5E29115561
-	for <qemu-devel@nongnu.org>; Thu, 25 Oct 2018 10:59:25 +0000 (UTC)
-Date: Thu, 25 Oct 2018 16:29:13 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-In-Reply-To: <20181025085256.20522-4-kraxel@redhat.com>
-Message-ID: <nycvar.YSQ.7.76.1810251627260.11480@xnncv>
+	(envelope-from <philmd@redhat.com>) id 1gFdYp-0000MR-5k
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 07:12:26 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:39241)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gFdYo-0000Lf-SF
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 07:12:19 -0400
+Received: by mail-wr1-f68.google.com with SMTP id r10-v6so7974211wrv.6
+	for <qemu-devel@nongnu.org>; Thu, 25 Oct 2018 04:12:17 -0700 (PDT)
 References: <20181025085256.20522-1-kraxel@redhat.com>
-	<20181025085256.20522-4-kraxel@redhat.com>
+	<20181025085256.20522-2-kraxel@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <34baf361-0f1a-cdb2-9b2e-bef68dbfd154@redhat.com>
+Date: Thu, 25 Oct 2018 13:12:15 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH 3/3] cirrus: mark as deprecated
+In-Reply-To: <20181025085256.20522-2-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/3] qdev: add deprecation_reason to
+ DeviceClass
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,69 +31,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, libvir-list@redhat.com
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: libvir-list@redhat.com, Prasad J Pandit <ppandit@redhat.com>
 
-+-- On Thu, 25 Oct 2018, Gerd Hoffmann wrote --+
-| While being at it deprecate cirrus too.
-| 
-| Reason (short version): use stdvga instead.
-| Verbose version:
-|     https://www.kraxel.org/blog/2014/10/qemu-using-cirrus-considered-harmful
-| 
-| Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-| ---
-|  hw/display/cirrus_vga.c     | 2 ++
-|  hw/display/cirrus_vga_isa.c | 2 ++
-|  qemu-deprecated.texi        | 4 ++++
-|  3 files changed, 8 insertions(+)
-| 
-| diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
-| index d9b854d..2f16ba9 100644
-| --- a/hw/display/cirrus_vga.c
-| +++ b/hw/display/cirrus_vga.c
-| @@ -3024,6 +3024,8 @@ static void cirrus_vga_class_init(ObjectClass *klass, void *data)
-|      dc->vmsd = &vmstate_pci_cirrus_vga;
-|      dc->props = pci_vga_cirrus_properties;
-|      dc->hotpluggable = false;
-| +    dc->deprecation_reason =
-| +        "https://www.kraxel.org/blog/2014/10/qemu-using-cirrus-considered-harmful";
-|  }
-|  
-|  static const TypeInfo cirrus_vga_info = {
-| diff --git a/hw/display/cirrus_vga_isa.c b/hw/display/cirrus_vga_isa.c
-| index fa10b74..c2d853c 100644
-| --- a/hw/display/cirrus_vga_isa.c
-| +++ b/hw/display/cirrus_vga_isa.c
-| @@ -81,6 +81,8 @@ static void isa_cirrus_vga_class_init(ObjectClass *klass, void *data)
-|      dc->realize = isa_cirrus_vga_realizefn;
-|      dc->props = isa_cirrus_vga_properties;
-|      set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
-| +    dc->deprecation_reason =
-| +        "https://www.kraxel.org/blog/2014/10/qemu-using-cirrus-considered-harmful";
-|  }
-|  
-|  static const TypeInfo isa_cirrus_vga_info = {
-| diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-| index 7951a4f..1b1d434 100644
-| --- a/qemu-deprecated.texi
-| +++ b/qemu-deprecated.texi
-| @@ -120,6 +120,10 @@ or ``ivshmem-doorbell`` device types.
-|  
-|  Has known buffer overflow.
-|  
-| +@subsection cirrus (since 3.1)
-| +
-| +Use stdvga instead (-vga std or -device VGA).
-| +
-|  @section System emulator machines
-|  
-|  @subsection pc-0.10 and pc-0.11 (since 3.0)
-| 
+Hi Gerd,
 
-Reviewed-by: Prasad J Pandit <pjp@fedoraproject.org>
+On 25/10/18 10:52, Gerd Hoffmann wrote:
+> Simliar to deprecated machine types.
 
-Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
+"Similar"
+
+> Print a warning when creating a deprecated device.
+> Add deprecation notice to -device help.
+> 
+> TODO: add to intospection.
+
+"introspection"
+
+Do we want the TODO in the git history?
+
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>   hw/core/qdev.c         | 9 ++++++++-
+>   include/hw/qdev-core.h | 1 +
+>   qdev-monitor.c         | 7 +++++++
+>   3 files changed, 16 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> index 046d8f1..3b27a74 100644
+> --- a/hw/core/qdev.c
+> +++ b/hw/core/qdev.c
+> @@ -133,11 +133,18 @@ DeviceState *qdev_create(BusState *bus, const char *name)
+>   
+>   DeviceState *qdev_try_create(BusState *bus, const char *type)
+>   {
+> +    DeviceClass *dc;
+>       DeviceState *dev;
+>   
+> -    if (object_class_by_name(type) == NULL) {
+> +    dc = DEVICE_CLASS(object_class_by_name(type));
+> +    if (dc == NULL) {
+>           return NULL;
+>       }
+> +    if (dc->deprecation_reason) {
+> +        warn_report("device %s is deprecated (%s)",
+> +                    type, dc->deprecation_reason);
+> +    }
+> +
+>       dev = DEVICE(object_new(type));
+>       if (!dev) {
+>           return NULL;
+> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+> index a24d0dd..a352eaa 100644
+> --- a/include/hw/qdev-core.h
+> +++ b/include/hw/qdev-core.h
+> @@ -105,6 +105,7 @@ typedef struct DeviceClass {
+>        */
+>       bool user_creatable;
+>       bool hotpluggable;
+> +    const char *deprecation_reason;
+>   
+>       /* callbacks */
+>       DeviceReset reset;
+> diff --git a/qdev-monitor.c b/qdev-monitor.c
+> index 802c18a..bbba2bc 100644
+> --- a/qdev-monitor.c
+> +++ b/qdev-monitor.c
+> @@ -128,6 +128,9 @@ static void qdev_print_devinfo(DeviceClass *dc)
+>       if (!dc->user_creatable) {
+>           out_printf(", no-user");
+>       }
+> +    if (!dc->deprecation_reason) {
+
+This is the opposite condition:
+
+        if (dc->deprecation_reason) {
+            out_printf(", deprecated");
+
+With it fixed:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+> +        out_printf(", deprecated");
+> +    }
+>       out_printf("\n");
+>   }
+>   
+> @@ -579,6 +582,10 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
+>       if (!dc) {
+>           return NULL;
+>       }
+> +    if (dc->deprecation_reason) {
+> +        warn_report("device %s is deprecated (%s)",
+> +                    driver, dc->deprecation_reason);
+> +    }
+>   
+>       /* find bus */
+>       path = qemu_opt_get(opts, "bus");
+> 
