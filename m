@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44409)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gFmMU-0001U5-9d
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 16:36:12 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gFmNE-0002ra-GX
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 16:36:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gFm6p-0002aU-AD
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 16:20:01 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gFmND-0001S3-Eb
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 16:36:56 -0400
 References: <20181018182856.28001-1-mark.cave-ayland@ilande.co.uk>
-	<20181018182856.28001-2-mark.cave-ayland@ilande.co.uk>
-	<06fc6b51-4989-658e-c525-8a30d8513d8e@posteo.de>
+	<20181018182856.28001-12-mark.cave-ayland@ilande.co.uk>
+	<dea80569-ff85-7b29-ad49-b1c54aadf003@posteo.de>
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <c7717891-ba5b-5beb-ebe8-7006b0a24658@ilande.co.uk>
-Date: Thu, 25 Oct 2018 21:19:14 +0100
+Message-ID: <9303f78e-e2d7-a6b2-6ca2-9510bb0ea1fe@ilande.co.uk>
+Date: Thu, 25 Oct 2018 21:36:25 +0100
 MIME-Version: 1.0
-In-Reply-To: <06fc6b51-4989-658e-c525-8a30d8513d8e@posteo.de>
+In-Reply-To: <dea80569-ff85-7b29-ad49-b1c54aadf003@posteo.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 01/11] hw/m68k: add via support
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 11/11] hw/m68k: define Macintosh Quadra
+ 800
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,10 +26,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <th.huth@posteo.de>, qemu-devel@nongnu.org, laurent@vivier.eu
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, jasowang@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, hpoussin@reactos.org, kraxel@redhat.com, pbonzini@redhat.com, yongbok.kim@mips.com, aurelien@aurel32.net
+To: Thomas Huth <th.huth@posteo.de>, qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, jasowang@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, hpoussin@reactos.org, kraxel@redhat.com, pbonzini@redhat.com, aurelien@aurel32.net, laurent@vivier.eu
 
-On 23/10/2018 07:22, Thomas Huth wrote:
+On 23/10/2018 12:20, Thomas Huth wrote:
 
 > On 2018-10-18 19:28, Mark Cave-Ayland wrote:
 >> From: Laurent Vivier <laurent@vivier.eu>
@@ -38,382 +38,93 @@ On 23/10/2018 07:22, Thomas Huth wrote:
 >> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 >> ---
 > [...]
->> diff --git a/hw/misc/mac_via.c b/hw/misc/mac_via.c
+>> diff --git a/hw/m68k/Makefile.objs b/hw/m68k/Makefile.objs
+>> index d1f089c08a..18ebf1937a 100644
+>> --- a/hw/m68k/Makefile.objs
+>> +++ b/hw/m68k/Makefile.objs
+>> @@ -1,2 +1,4 @@
+>> -obj-y += an5206.o mcf5208.o
+>> -obj-y += mcf5206.o mcf_intc.o
+>> +obj-$(CONFIG_COLDFIRE) += an5206.o mcf5208.o
+>> +obj-$(CONFIG_MAC) += q800.o
+>> +
+>> +obj-$(CONFIG_COLDFIRE) += mcf5206.o mcf_intc.o
+> 
+> Cosmetic nit: Keep the coldfire lines together instead of splitting them?
+
+Cosmetic nit fixed in the latest version ;)
+
+>> diff --git a/hw/m68k/q800.c b/hw/m68k/q800.c
 >> new file mode 100644
->> index 0000000000..084974a24d
+>> index 0000000000..bbf34262f0
 >> --- /dev/null
->> +++ b/hw/misc/mac_via.c
->> @@ -0,0 +1,668 @@
+>> +++ b/hw/m68k/q800.c
+>> @@ -0,0 +1,367 @@
 >> +/*
->> + * QEMU m68k Macintosh VIA device support
+>> + * QEMU Motorla 680x0 Macintosh hardware System Emulator
 >> + *
->> + * Copyright (c) 2011-2018 Laurent Vivier
-> 
-> Should Mark be listed here, too? (since it has been co-developed?)
-
-I don't mind so much as I have the tag above, but FWIW I've added my copyright here too.
-
+>> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+>> + * of this software and associated documentation files (the "Software"), to deal
+>> + * in the Software without restriction, including without limitation the rights
+>> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+>> + * copies of the Software, and to permit persons to whom the Software is
+>> + * furnished to do so, subject to the following conditions:
 >> + *
->> + * Some parts from hw/cuda.c
-> 
-> That's hw/misc/macio/cuda.c now.
-
-Fixed.
-
+>> + * The above copyright notice and this permission notice shall be included in
+>> + * all copies or substantial portions of the Software.
 >> + *
->> + * Copyright (c) 2004-2007 Fabrice Bellard
->> + * Copyright (c) 2007 Jocelyn Mayer
->> + *
->> + * some parts from linux-2.6.29, arch/m68k/include/asm/mac_via.h
->> + *
->> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
->> + * See the COPYING file in the top-level directory.
->> + *
-> 
-> Maybe remove the empty line?
-> 
+>> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+>> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+>> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+>> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+>> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+>> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+>> + * THE SOFTWARE.
 >> + */
 >> +
 >> +#include "qemu/osdep.h"
->> +#include "hw/sysbus.h"
->> +#include "qemu/timer.h"
->> +#include "hw/misc/mac_via.h"
->> +#include "hw/misc/mos6522.h"
->> +#include "hw/input/adb.h"
 >> +#include "sysemu/sysemu.h"
+>> +#include "cpu.h"
+>> +#include "hw/hw.h"
+>> +#include "hw/boards.h"
+>> +#include "elf.h"
+>> +#include "hw/loader.h"
+>> +#include "hw/display/framebuffer.h"
+>> +#include "ui/console.h"
+>> +#include "exec/address-spaces.h"
+>> +#include "hw/char/escc.h"
+>> +#include "hw/sysbus.h"
+>> +#include "hw/scsi/esp.h"
+>> +#include "bootinfo.h"
+>> +#include "hw/misc/mac_via.h"
+>> +#include "hw/input/adb.h"
+>> +#include "hw/audio/asc.h"
+>> +#include "hw/nubus/mac-nubus-bridge.h"
+>> +#include "hw/display/macfb.h"
+>> +#include "hw/intc/q800_irq.h"
+>> +#include "hw/block/swim.h"
+>> +#include "net/net.h"
 >> +#include "qapi/error.h"
->> +#include "qemu/cutils.h"
+>> +#include "sysemu/qtest.h"
 >> +
->> +
->> +/*
->> + * VIAs: There are two in every machine,
-> 
-> Remove the comma at the end. And maybe add a very short description what
-> a "VIA" is (for those who don't know this chip)
-> 
->> + */
->> +
->> +#define VIA_SIZE (0x2000)
+>> +#define MACROM_ADDR     0x40000000
+>> +#define MACROM_SIZE     0x00100000
 >> +
 >> +/*
->> + * Not all of these are true post MacII I think.
->> + * CSA: probably the ones CHRP marks as 'unused' change purposes
-> 
-> What is CSA?
-> 
->> + * when the IWM becomes the SWIM.
->> + * http://www.rs6000.ibm.com/resource/technology/chrpio/via5.mak.html
->> + * ftp://ftp.austin.ibm.com/pub/technology/spec/chrp/inwork/CHRP_IORef_1.0.pdf
->> + *
->> + * also, http://developer.apple.com/technotes/hw/hw_09.html claims the
-> 
-> All three URLs seem to be dead. Use archive.org?
-> 
->> + * following changes for IIfx:
->> + * VIA1A_vSccWrReq not available and that VIA1A_vSync has moved to an IOP.
->> + * Also, "All of the functionality of VIA2 has been moved to other chips".
->> + */
->> +
->> +#define VIA1A_vSccWrReq 0x80   /* SCC write. (input)
->> +                                * [CHRP] SCC WREQ: Reflects the state of the
->> +                                * Wait/Request pins from the SCC.
->> +                                * [Macintosh Family Hardware]
->> +                                * as CHRP on SE/30,II,IIx,IIcx,IIci.
->> +                                * on IIfx, "0 means an active request"
->> +                                */
->> +#define VIA1A_vRev8     0x40   /* Revision 8 board ???
->> +                                * [CHRP] En WaitReqB: Lets the WaitReq_L
->> +                                * signal from port B of the SCC appear on
->> +                                * the PA7 input pin. Output.
->> +                                * [Macintosh Family] On the SE/30, this
->> +                                * is the bit to flip screen buffers.
->> +                                * 0=alternate, 1=main.
->> +                                * on II,IIx,IIcx,IIci,IIfx this is a bit
->> +                                * for Rev ID. 0=II,IIx, 1=IIcx,IIci,IIfx
->> +                                */
->> +#define VIA1A_vHeadSel  0x20   /* Head select for IWM.
->> +                                * [CHRP] unused.
->> +                                * [Macintosh Family] "Floppy disk
->> +                                * state-control line SEL" on all but IIfx
->> +                                */
->> +#define VIA1A_vOverlay  0x10   /* [Macintosh Family] On SE/30,II,IIx,IIcx
->> +                                * this bit enables the "Overlay" address
->> +                                * map in the address decoders as it is on
->> +                                * reset for mapping the ROM over the reset
->> +                                * vector. 1=use overlay map.
->> +                                * On the IIci,IIfx it is another bit of the
->> +                                * CPU ID: 0=normal IIci, 1=IIci with parity
->> +                                * feature or IIfx.
->> +                                * [CHRP] En WaitReqA: Lets the WaitReq_L
->> +                                * signal from port A of the SCC appear
->> +                                * on the PA7 input pin (CHRP). Output.
->> +                                * [MkLinux] "Drive Select"
->> +                                *  (with 0x20 being 'disk head select')
->> +                                */
->> +#define VIA1A_vSync     0x08   /* [CHRP] Sync Modem: modem clock select:
->> +                                * 1: select the external serial clock to
->> +                                *    drive the SCC's /RTxCA pin.
->> +                                * 0: Select the 3.6864MHz clock to drive
->> +                                *    the SCC cell.
->> +                                * [Macintosh Family] Correct on all but IIfx
->> +                                */
->> +
->> +/* Macintosh Family Hardware sez: bits 0-2 of VIA1A are volume control
-> 
-> sez?
-> 
->> + * on Macs which had the PWM sound hardware.  Reserved on newer models.
->> + * On IIci,IIfx, bits 1-2 are the rest of the CPU ID:
->> + * bit 2: 1=IIci, 0=IIfx
->> + * bit 1: 1 on both IIci and IIfx.
->> + * MkLinux sez bit 0 is 'burnin flag' in this case.
-> 
-> sez?? sets?
-> 
->> +/* common */
->> +
->> +#define VIA_IRQ_TIMER1      0x40
->> +#define VIA_IRQ_TIMER2      0x20
->> +
->> +/* Apple sez: http://developer.apple.com/technotes/ov/ov_04.html
-> 
-> sez? ... and the URL does not work anymore.
-> 
->> + * Another example of a valid function that has no ROM support is the use
->> + * of the alternate video page for page-flipping animation. Since there
->> + * is no ROM call to flip pages, it is necessary to go play with the
->> + * right bit in the VIA chip (6522 Versatile Interface Adapter).
->> + * [CSA: don't know which one this is, but it's one of 'em!]
+>> + *              .ident          = MAC_MODEL_Q800,
+>> + *              .name           = "Quadra 800",
+>> + *              .adb_type       = MAC_ADB_II,
+>> + *              .via_type       = MAC_VIA_QUADRA,
+>> + *              .scsi_type      = MAC_SCSI_QUADRA,
+>> + *              .scc_type       = MAC_SCC_QUADRA,
+>> + *              .ether_type     = MAC_ETHER_SONIC,
+>> + *              .nubus_type     = MAC_NUBUS
 >> + */
 > 
-> Who is CSA? ... ah, now I've got it, this has been copied from the Linux
-> header. Do you want to keep it in the QEMU sources, or rather take the
-> opportunity to clean the comments up a little bit?
+> Is this comment intentional or left-over code from an older rebase?
 
-Right. I'm not sure what is the right thing to do here? If the sources are still in
-the kernel tree then I'd be okay with deleting the comments. Laurent, any thoughts?
-
-> [...]
->> +static void via2_irq_request(void *opaque, int irq, int level)
->> +{
->> +    MOS6522Q800VIA2State *v2s = opaque;
->> +    MOS6522State *s = MOS6522(v2s);
->> +    MOS6522DeviceClass *mdc = MOS6522_DEVICE_GET_CLASS(s);
->> +
->> +    if (level) {
->> +        s->ifr |= 1 << irq;
->> +    } else {
->> +        s->ifr &= ~(1 << irq);
->> +    }
->> +
->> +    mdc->update_irq(s);
->> +}
->> +
->> +#define RTC_OFFSET 2082844800
->> +static uint8_t PRAM[256];
-> 
-> Shouldn't that PRAM array rather be part of the MacVIAState or so?
-
-Yes actually I think it should - I've now moved it there so this will be fixed in v5.
-
->> +
->> +static void via1_rtc_update(MacVIAState *m)
->> +{
->> +    MOS6522Q800VIA1State *v1s = MOS6522_Q800_VIA1(&m->mos6522_via1);
->> +    MOS6522State *s = MOS6522(v1s);
->> +
->> +    if (s->b & VIA1B_vRTCEnb) {
->> +        return;
->> +    }
->> +
->> +    if (s->dirb & VIA1B_vRTCData) {
->> +        /* send bits to the RTC */
->> +        if (!(v1s->last_b & VIA1B_vRTCClk) && (s->b & VIA1B_vRTCClk)) {
->> +            m->data_out <<= 1;
->> +            m->data_out |= s->b & VIA1B_vRTCData;
->> +            m->data_out_cnt++;
->> +        }
->> +    } else {
->> +        /* receive bits from the RTC */
->> +        if ((v1s->last_b & VIA1B_vRTCClk) &&
->> +            !(s->b & VIA1B_vRTCClk) &&
->> +            m->data_in_cnt) {
->> +            s->b = (s->b & ~VIA1B_vRTCData) |
->> +                   ((m->data_in >> 7) & VIA1B_vRTCData);
->> +            m->data_in <<= 1;
->> +            m->data_in_cnt--;
->> +        }
->> +    }
->> +
->> +    if (m->data_out_cnt == 8) {
->> +        m->data_out_cnt = 0;
->> +
->> +        if (m->cmd == 0) {
->> +            if (m->data_out & 0x80) {
->> +                /* this is a read command */
->> +                uint32_t time = m->tick_offset +
->> +                               (qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) /
->> +                               NANOSECONDS_PER_SECOND);
->> +                if (m->data_out == 0x81) {        /* seconds register 0 */
->> +                    m->data_in = time & 0xff;
->> +                    m->data_in_cnt = 8;
->> +                } else if (m->data_out == 0x85) { /* seconds register 1 */
->> +                    m->data_in = (time >> 8) & 0xff;
->> +                    m->data_in_cnt = 8;
->> +                } else if (m->data_out == 0x89) { /* seconds register 2 */
->> +                    m->data_in = (time >> 16) & 0xff;
->> +                    m->data_in_cnt = 8;
->> +                } else if (m->data_out == 0x8d) { /* seconds register 3 */
->> +                    m->data_in = (time >> 24) & 0xff;
->> +                    m->data_in_cnt = 8;
->> +                } else if ((m->data_out & 0xf3) == 0xa1) {
->> +                    /* PRAM address 0x10 -> 0x13 */
->> +                    int addr = (m->data_out >> 2) & 0x03;
->> +                    m->data_in = PRAM[addr];
->> +                    m->data_in_cnt = 8;
->> +                } else if ((m->data_out & 0xf3) == 0xa1) {
->> +                    /* PRAM address 0x00 -> 0x0f */
->> +                    int addr = (m->data_out >> 2) & 0x0f;
->> +                    m->data_in = PRAM[addr];
->> +                    m->data_in_cnt = 8;
->> +                } else if ((m->data_out & 0xf8) == 0xb8) {
->> +                    /* extended memory designator and sector number */
->> +                    m->cmd = m->data_out;
->> +                }
->> +            } else {
->> +                /* this is a write command */
->> +                m->cmd = m->data_out;
->> +            }
->> +        } else {
->> +            if (m->cmd & 0x80) {
->> +                if ((m->cmd & 0xf8) == 0xb8) {
->> +                    /* extended memory designator and sector number */
->> +                    int sector = m->cmd & 0x07;
->> +                    int addr = (m->data_out >> 2) & 0x1f;
->> +
->> +                    m->data_in = PRAM[sector * 8 + addr];
->> +                    m->data_in_cnt = 8;
->> +                }
->> +            } else if (!m->wprotect) {
->> +                /* this is a write command */
->> +                if (m->alt != 0) {
->> +                    /* extended memory designator and sector number */
->> +                    int sector = m->cmd & 0x07;
->> +                    int addr = (m->alt >> 2) & 0x1f;
->> +
->> +                    PRAM[sector * 8 + addr] = m->data_out;
->> +
->> +                    m->alt = 0;
->> +                } else if (m->cmd == 0x01) { /* seconds register 0 */
->> +                    /* FIXME */
->> +                } else if (m->cmd == 0x05) { /* seconds register 1 */
->> +                    /* FIXME */
->> +                } else if (m->cmd == 0x09) { /* seconds register 2 */
->> +                    /* FIXME */
->> +                } else if (m->cmd == 0x0d) { /* seconds register 3 */
->> +                    /* FIXME */
->> +                } else if (m->cmd == 0x31) {
->> +                    /* Test Register */
->> +                } else if (m->cmd == 0x35) {
->> +                    /* Write Protect register */
->> +                    m->wprotect = m->data_out & 1;
->> +                } else if ((m->cmd & 0xf3) == 0xa1) {
->> +                    /* PRAM address 0x10 -> 0x13 */
->> +                    int addr = (m->cmd >> 2) & 0x03;
->> +                    PRAM[addr] = m->data_out;
->> +                } else if ((m->cmd & 0xf3) == 0xa1) {
->> +                    /* PRAM address 0x00 -> 0x0f */
->> +                    int addr = (m->cmd >> 2) & 0x0f;
->> +                    PRAM[addr] = m->data_out;
->> +                } else if ((m->cmd & 0xf8) == 0xb8) {
->> +                    /* extended memory designator and sector number */
->> +                    m->alt = m->cmd;
->> +                }
->> +            }
->> +        }
->> +        m->data_out = 0;
->> +    }
->> +}
->> +
->> +static uint64_t mos6522_q800_via1_read(void *opaque, hwaddr addr, unsigned size)
->> +{
->> +    MOS6522Q800VIA1State *s = opaque;
->> +    MOS6522State *ms = MOS6522(s);
-> 
-> Replace the above two lines with:
-> 
-> 	MOS6522State *ms = MOS6522(opaque);
-> 
-> ?
-> 
-> Or use MOS6522_Q800_VIA1() in the first line instead?
-
-I've gone for adding MOS6522_Q800_VIA1() to the opaque above.
-
->> +    addr = (addr >> 9) & 0xf;
->> +    return mos6522_read(ms, addr, size);
->> +}
->> +
->> +static void mos6522_q800_via1_write(void *opaque, hwaddr addr, uint64_t val,
->> +                                    unsigned size)
->> +{
->> +    MOS6522Q800VIA1State *s = opaque;
->> +    MOS6522State *ms = MOS6522(s);
-> 
-> dito.
-
-And MOS6522_Q800_VIA2() to this opaque too.
-
->> +    addr = (addr >> 9) & 0xf;
->> +    mos6522_write(ms, addr, val, size);
->> +}
->> +
->> +static const MemoryRegionOps mos6522_q800_via1_ops = {
->> +    .read = mos6522_q800_via1_read,
->> +    .write = mos6522_q800_via1_write,
->> +    .endianness = DEVICE_BIG_ENDIAN,
->> +    .valid = {
->> +        .min_access_size = 1,
->> +        .max_access_size = 1,
->> +    },
->> +};
->> +
->> +static uint64_t mos6522_q800_via2_read(void *opaque, hwaddr addr, unsigned size)
->> +{
->> +    MOS6522Q800VIA2State *s = opaque;
->> +    MOS6522State *ms = MOS6522(s);
->> +
->> +    addr = (addr >> 9) & 0xf;
->> +    return mos6522_read(ms, addr, size);
->> +}
->> +
->> +static void mos6522_q800_via2_write(void *opaque, hwaddr addr, uint64_t val,
->> +                                    unsigned size)
->> +{
->> +    MOS6522Q800VIA2State *s = opaque;
->> +    MOS6522State *ms = MOS6522(s);
->> +
->> +    addr = (addr >> 9) & 0xf;
->> +    mos6522_write(ms, addr, val, size);
->> +}
->> +
->> +static const MemoryRegionOps mos6522_q800_via2_ops = {
->> +    .read = mos6522_q800_via2_read,
->> +    .write = mos6522_q800_via2_write,
->> +    .endianness = DEVICE_BIG_ENDIAN,
->> +    .valid = {
->> +        .min_access_size = 1,
->> +        .max_access_size = 1,
->> +    },
->> +};
-> 
-> Do you really need the separate via2_ops? The look pretty much the same
-> like the via1_ops? Isn't it enough to have the opaque parameter for
-> differentiation?
-
-I'd like to keep them for now because it makes it slightly easier to add breakpoints
-when debugging accesses to a particular VIA, rather than having to start digging into
-the opaque.
+I suspect this has come from another Linux file somewhere, but as it's nothing
+related to QEMU then I've removed it for now.
 
 
 ATB,
