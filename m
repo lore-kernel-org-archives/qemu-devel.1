@@ -1,17 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59076)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gFfqE-0006CA-8r
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 09:38:29 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gFfqX-0006Pu-LG
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 09:38:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gFfq4-0001eF-Ve
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 09:38:22 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gFfqU-0001zb-T1
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 09:38:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:16274)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gFfqU-0001z6-LY
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 09:38:42 -0400
+Date: Thu, 25 Oct 2018 10:36:37 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 25 Oct 2018 10:32:46 -0300
-Message-Id: <20181025133301.16578-29-ehabkost@redhat.com>
-In-Reply-To: <20181025133301.16578-1-ehabkost@redhat.com>
-References: <20181025133301.16578-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL v2 28/43] memory-device: add device class
- function set_addr()
+Message-ID: <20181025133637.GH4096@habkost.net>
+References: <1539578845-37944-1-git-send-email-robert.hu@linux.intel.com>
+	<1539578845-37944-3-git-send-email-robert.hu@linux.intel.com>
+	<20181024101643.GE4096@habkost.net>
+	<1540436819.80634.2.camel@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <1540436819.80634.2.camel@linux.intel.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 2/3] x86: Data structure changes to
+ support MSR based features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,83 +31,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Rob Herring <robh@kernel.org>, libvir-list@redhat.com, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-arm@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Markus Armbruster <armbru@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Eduardo Habkost <ehabkost@redhat.com>, Michael Walle <michael@walle.cc>, Thomas Huth <thuth@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Alistair Francis <alistair@alistair23.me>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Laurent Vivier <lvivier@redhat.com>, qemu-ppc@nongnu.org, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Max Filippov <jcmvbkbc@gmail.com>, David Hildenbrand <david@redhat.com>
+To: Robert Hoo <robert.hu@linux.intel.com>
+Cc: robert.hu@intel.com, pbonzini@redhat.com, rth@twiddle.net, thomas.lendacky@amd.com, qemu-devel@nongnu.org
 
-From: David Hildenbrand <david@redhat.com>
+On Thu, Oct 25, 2018 at 11:06:59AM +0800, Robert Hoo wrote:
+> On Wed, 2018-10-24 at 07:16 -0300, Eduardo Habkost wrote:
+[...]
+> > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0struct {=A0=A0=A0/*CPUID that =
+enumerate this MSR*/
+> > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0FeatureWord cpuid_=
+class;
+> > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0uint32_t=A0=A0=A0=A0=
+cpuid_flag;
+> > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0} cpuid_dep;
+> >=20
+> > Aren't you going to use this field anywhere?=A0=A0Probably we want to
+> > prevent the VM from starting if a bit is set in the feature world
+> > but the cpuid_dep bit is not set.
+> >=20
+> > e.g.:
+> > =A0 qemu-system-x86_64 -cpu Skylake-Client,-arch-capabilities,+rsba
+> > probably should fail to start.
+>=20
+> How about in x86_cpu_filter_features() filters the MSR feature word, if
+>  its dependent CPUID feature bit is not set?
+> The filter results will be record in cpu->filtered_features, and print
+> out, like other filtered features.
 
-To be able to factor out address assignment of memory devices, we will
-have to read (get_addr()) and write (set_addr()) the address.
+Sounds good to me.
 
-We can't use properties for this purpose, as properties are device
-specific. E.g. while the address property for a DIMM is called "addr", it
-might be called differently (e.g. "memaddr") for other devices.
-
-Especially virtio based memory devices cannot use "addr" as that is already
-reserved and used for the address on the bus (for the proxy device).
-
-Also, it might be possible to have memory devices without address
-properties (e.g. internal DIMM-like thingies).
-
-In contrast to get_addr(), we expect that set_addr() can fail.
-
-Keep it simple for now for pc-dimm and simply set the static property, that
-will fail once realized.
-
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20181005092024.14344-13-david@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- include/hw/mem/memory-device.h | 8 ++++++++
- hw/mem/pc-dimm.c               | 7 +++++++
- 2 files changed, 15 insertions(+)
-
-diff --git a/include/hw/mem/memory-device.h b/include/hw/mem/memory-device.h
-index 9c3398bc4a..ed7cf5bf4b 100644
---- a/include/hw/mem/memory-device.h
-+++ b/include/hw/mem/memory-device.h
-@@ -59,6 +59,14 @@ typedef struct MemoryDeviceClass {
-      */
-     uint64_t (*get_addr)(const MemoryDeviceState *md);
- 
-+    /*
-+     * Set the address of the memory device in guest physical memory.
-+     *
-+     * Called when plugging the memory device to configure the determined
-+     * address in guest physical memory.
-+     */
-+    void (*set_addr)(MemoryDeviceState *md, uint64_t addr, Error **errp);
-+
-     /*
-      * Return the amount of memory provided by the memory device currently
-      * usable ("plugged") by the VM.
-diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-index 47b2e83389..4a15091734 100644
---- a/hw/mem/pc-dimm.c
-+++ b/hw/mem/pc-dimm.c
-@@ -236,6 +236,12 @@ static uint64_t pc_dimm_md_get_addr(const MemoryDeviceState *md)
-     return dimm->addr;
- }
- 
-+static void pc_dimm_md_set_addr(MemoryDeviceState *md, uint64_t addr,
-+                                Error **errp)
-+{
-+    object_property_set_uint(OBJECT(md), addr, PC_DIMM_ADDR_PROP, errp);
-+}
-+
- static MemoryRegion *pc_dimm_md_get_memory_region(MemoryDeviceState *md,
-                                                   Error **errp)
- {
-@@ -286,6 +292,7 @@ static void pc_dimm_class_init(ObjectClass *oc, void *data)
-     ddc->get_vmstate_memory_region = pc_dimm_get_memory_region;
- 
-     mdc->get_addr = pc_dimm_md_get_addr;
-+    mdc->set_addr = pc_dimm_md_set_addr;
-     /* for a dimm plugged_size == region_size */
-     mdc->get_plugged_size = memory_device_get_region_size;
-     mdc->get_memory_region = pc_dimm_md_get_memory_region;
--- 
-2.18.0.rc1.1.g3f1ff2140
+--=20
+Eduardo
