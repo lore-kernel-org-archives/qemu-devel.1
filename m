@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48745)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48790)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gFdZj-0006Jh-Ob
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 07:13:19 -0400
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gFda0-0006fW-Qp
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 07:13:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gFdZU-0000fH-NB
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 07:13:05 -0400
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gFdZf-0000j8-3k
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 07:13:24 -0400
 From: Peng Hao <peng.hao2@zte.com.cn>
-Date: Fri, 26 Oct 2018 03:23:15 +0800
-Message-Id: <1540495397-88089-4-git-send-email-peng.hao2@zte.com.cn>
+Date: Fri, 26 Oct 2018 03:23:16 +0800
+Message-Id: <1540495397-88089-5-git-send-email-peng.hao2@zte.com.cn>
 In-Reply-To: <1540495397-88089-1-git-send-email-peng.hao2@zte.com.cn>
 References: <1540495397-88089-1-git-send-email-peng.hao2@zte.com.cn>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH V4 3/5] hw/misc/pvpanic: Add the MMIO interface
+Subject: [Qemu-devel] [PATCH V4 4/5]  hw/arm/virt: Use the pvpanic device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,185 +25,93 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org, philmd@redhat.com
 Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Peng Hao <peng.hao2@zte.com.cn>
 
+add pvpanic device in aarch64 virt machine.
+
 Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/misc/pvpanic.c         | 74 ++++++++++++++++++++++++++++++++++++++-----=
-----
- include/hw/misc/pvpanic.h |  2 ++
- 2 files changed, 62 insertions(+), 14 deletions(-)
+ default-configs/aarch64-softmmu.mak |  1 +
+ hw/arm/virt.c                       | 21 +++++++++++++++++++++
+ include/hw/arm/virt.h               |  1 +
+ 3 files changed, 23 insertions(+)
 
-diff --git a/hw/misc/pvpanic.c b/hw/misc/pvpanic.c
-index dd3aef2..b575e01 100644
---- a/hw/misc/pvpanic.c
-+++ b/hw/misc/pvpanic.c
-@@ -2,10 +2,12 @@
-  * QEMU simulated pvpanic device.
-  *
-  * Copyright Fujitsu, Corp. 2013
-+ * Copyright (c) 2018 ZTE Ltd.
-  *
-  * Authors:
-  *     Wen Congyang <wency@cn.fujitsu.com>
-  *     Hu Tao <hutao@cn.fujitsu.com>
-+ *     Peng Hao <peng.hao2@zte.com.cn>
-  *
-  * This work is licensed under the terms of the GNU GPL, version 2 or late=
-r.
-  * See the COPYING file in the top-level directory.
-@@ -45,30 +47,48 @@ static void handle=5Fevent(int event)
+diff --git a/default-configs/aarch64-softmmu.mak b/default-configs/aarch64-=
+softmmu.mak
+index 6f790f0..57c6ca5 100644
+--- a/default-configs/aarch64-softmmu.mak
++++ b/default-configs/aarch64-softmmu.mak
+@@ -9,3 +9,4 @@ CONFIG=5FDPCD=3Dy
+ CONFIG=5FXLNX=5FZYNQMP=3Dy
+ CONFIG=5FXLNX=5FZYNQMP=5FARM=3Dy
+ CONFIG=5FARM=5FSMMUV3=3Dy
++CONFIG=5FPVPANIC=3Dy
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 9f67782..ffe8d00 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -59,6 +59,7 @@
+ #include "qapi/visitor.h"
+ #include "standard-headers/linux/input.h"
+ #include "hw/arm/smmuv3.h"
++#include "hw/misc/pvpanic.h"
 =20
- #include "hw/isa/isa.h"
-=20
--typedef struct PVPanicState {
-+typedef struct PVPanicCommonState {
-+    MemoryRegion mr;
-+} PVPanicCommonState;
-+
-+typedef struct PVPanicISAState {
-     /* private */
-     ISADevice isadev;
-+    uint16=5Ft ioport;
-+    /* public */
-+    PVPanicCommonState common;
-+} PVPanicISAState;
-+
-+typedef struct PVPanicMMIOState {
-+    /* private */
-+    SysBusDevice busdev;
-=20
-     /* public */
--    MemoryRegion mr;
--    uint16=5Ft ioport;
--} PVPanicState;
-+    PVPanicCommonState common;
-+} PVPanicMMIOState;
-+
-+#define PVPANIC=5FISA(obj)    \
-+    OBJECT=5FCHECK(PVPanicISAState, (obj), TYPE=5FPVPANIC)
-+
-+#define PVPANIC=5FMMIO(obj)    \
-+    OBJECT=5FCHECK(PVPanicMMIOState, (obj), TYPE=5FPVPANIC=5FMMIO)
-+
-=20
- /* return supported events on read */
--static uint64=5Ft pvpanic=5Fioport=5Fread(void *opaque, hwaddr addr, unsig=
-ned size)
-+static uint64=5Ft pvpanic=5Fread(void *opaque, hwaddr addr, unsigned size)
- {
-     return PVPANIC=5FPANICKED;
+ #define DEFINE=5FVIRT=5FMACHINE=5FLATEST(major, minor, latest) \
+     static void virt=5F##major##=5F##minor##=5Fclass=5Finit(ObjectClass *o=
+c, \
+@@ -143,6 +144,7 @@ static const MemMapEntry a15memmap[] =3D {
+     [VIRT=5FGPIO] =3D               { 0x09030000, 0x00001000 },
+     [VIRT=5FSECURE=5FUART] =3D        { 0x09040000, 0x00001000 },
+     [VIRT=5FSMMU] =3D               { 0x09050000, 0x00020000 },
++    [VIRT=5FPVPANIC=5FMMIO] =3D       { 0x09060000, 0x00000002 },
+     [VIRT=5FMMIO] =3D               { 0x0a000000, 0x00000200 },
+     /* ...repeating for a total of NUM=5FVIRTIO=5FTRANSPORTS, each of that=
+ size */
+     [VIRT=5FPLATFORM=5FBUS] =3D       { 0x0c000000, 0x02000000 },
+@@ -190,6 +192,23 @@ static bool cpu=5Ftype=5Fvalid(const char *cpu)
+     return false;
  }
 =20
--static void pvpanic=5Fioport=5Fwrite(void *opaque, hwaddr addr, uint64=5Ft=
- val,
-+static void pvpanic=5Fwrite(void *opaque, hwaddr addr, uint64=5Ft val,
-                                  unsigned size)
- {
-     handle=5Fevent(val);
- }
-=20
- static const MemoryRegionOps pvpanic=5Fops =3D {
--    .read =3D pvpanic=5Fioport=5Fread,
--    .write =3D pvpanic=5Fioport=5Fwrite,
-+    .read =3D pvpanic=5Fread,
-+    .write =3D pvpanic=5Fwrite,
-     .impl =3D {
-         .min=5Faccess=5Fsize =3D 1,
-         .max=5Faccess=5Fsize =3D 1,
-@@ -77,15 +97,15 @@ static const MemoryRegionOps pvpanic=5Fops =3D {
-=20
- static void pvpanic=5Fisa=5Finitfn(Object *obj)
- {
--    PVPanicState *s =3D PVPANIC(obj);
-+    PVPanicISAState *s =3D PVPANIC=5FISA(obj);
-=20
--    memory=5Fregion=5Finit=5Fio(&s->mr, OBJECT(s), &pvpanic=5Fops, s, "pvp=
-anic", 1);
-+    memory=5Fregion=5Finit=5Fio(&s->common.mr, OBJECT(s), &pvpanic=5Fops, =
-s, TYPE=5FPVPANIC, 1);
- }
-=20
- static void pvpanic=5Fisa=5Frealizefn(DeviceState *dev, Error **errp)
- {
-     ISADevice *d =3D ISA=5FDEVICE(dev);
--    PVPanicState *s =3D PVPANIC(dev);
-+    PVPanicISAState *s =3D PVPANIC=5FISA(dev);
-     FWCfgState *fw=5Fcfg =3D fw=5Fcfg=5Ffind();
-     uint16=5Ft *pvpanic=5Fport;
-=20
-@@ -98,11 +118,11 @@ static void pvpanic=5Fisa=5Frealizefn(DeviceState *dev=
-, Error **errp)
-     fw=5Fcfg=5Fadd=5Ffile(fw=5Fcfg, "etc/pvpanic-port", pvpanic=5Fport,
-                     sizeof(*pvpanic=5Fport));
-=20
--    isa=5Fregister=5Fioport(d, &s->mr, s->ioport);
-+    isa=5Fregister=5Fioport(d, &s->common.mr, s->ioport);
- }
-=20
- static Property pvpanic=5Fisa=5Fproperties[] =3D {
--    DEFINE=5FPROP=5FUINT16(PVPANIC=5FIOPORT=5FPROP, PVPanicState, ioport, =
-0x505),
-+    DEFINE=5FPROP=5FUINT16(PVPANIC=5FIOPORT=5FPROP, PVPanicISAState, iopor=
-t, 0x505),
-     DEFINE=5FPROP=5FEND=5FOF=5FLIST(),
- };
-=20
-@@ -118,14 +138,40 @@ static void pvpanic=5Fisa=5Fclass=5Finit(ObjectClass =
-*klass, void *data)
- static TypeInfo pvpanic=5Fisa=5Finfo =3D {
-     .name          =3D TYPE=5FPVPANIC,
-     .parent        =3D TYPE=5FISA=5FDEVICE,
--    .instance=5Fsize =3D sizeof(PVPanicState),
-+    .instance=5Fsize =3D sizeof(PVPanicISAState),
-     .instance=5Finit =3D pvpanic=5Fisa=5Finitfn,
-     .class=5Finit    =3D pvpanic=5Fisa=5Fclass=5Finit,
- };
-=20
-+static void pvpanic=5Fmmio=5Finitfn(Object *obj)
++static void create=5Fpvpanic=5Fdevice(const VirtMachineState *vms)
 +{
-+    PVPanicMMIOState *s =3D PVPANIC=5FMMIO(obj);
-+    SysBusDevice *sbd =3D SYS=5FBUS=5FDEVICE(obj);
++    char *nodename;
++    hwaddr base =3D vms->memmap[VIRT=5FPVPANIC=5FMMIO].base;
++    hwaddr size =3D vms->memmap[VIRT=5FPVPANIC=5FMMIO].size;
 +
-+    memory=5Fregion=5Finit=5Fio(&s->common.mr, OBJECT(s), &pvpanic=5Fops, =
-s,
-+                          TYPE=5FPVPANIC=5FMMIO, 2);
-+    sysbus=5Finit=5Fmmio(sbd, &s->common.mr);
++    sysbus=5Fcreate=5Fsimple(TYPE=5FPVPANIC=5FMMIO, base, NULL);
++
++    nodename =3D g=5Fstrdup=5Fprintf("/pvpanic-mmio@%" PRIx64, base);
++    qemu=5Ffdt=5Fadd=5Fsubnode(vms->fdt, nodename);
++    qemu=5Ffdt=5Fsetprop=5Fstring(vms->fdt, nodename,
++                            "compatible", "qemu,pvpanic-mmio");
++    qemu=5Ffdt=5Fsetprop=5Fsized=5Fcells(vms->fdt, nodename, "reg",
++                                 2, base, 2, size);
++    g=5Ffree(nodename);
 +}
 +
-+static void pvpanic=5Fmmio=5Fclass=5Finit(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE=5FCLASS(klass);
-+
-+    set=5Fbit(DEVICE=5FCATEGORY=5FMISC, dc->categories);
-+}
-+
-+static TypeInfo pvpanic=5Fmmio=5Finfo =3D {
-+    .name          =3D TYPE=5FPVPANIC=5FMMIO,
-+    .parent        =3D TYPE=5FSYS=5FBUS=5FDEVICE,
-+    .instance=5Fsize =3D sizeof(PVPanicMMIOState),
-+    .instance=5Finit =3D pvpanic=5Fmmio=5Finitfn,
-+    .class=5Finit    =3D pvpanic=5Fmmio=5Fclass=5Finit,
-+};
-+
- static void pvpanic=5Fregister=5Ftypes(void)
+ static void create=5Ffdt(VirtMachineState *vms)
  {
-     type=5Fregister=5Fstatic(&pvpanic=5Fisa=5Finfo);
-+    type=5Fregister=5Fstatic(&pvpanic=5Fmmio=5Finfo);
- }
+     void *fdt =3D create=5Fdevice=5Ftree(&vms->fdt=5Fsize);
+@@ -1531,6 +1550,8 @@ static void machvirt=5Finit(MachineState *machine)
 =20
- type=5Finit(pvpanic=5Fregister=5Ftypes)
-diff --git a/include/hw/misc/pvpanic.h b/include/hw/misc/pvpanic.h
-index 1ee071a..c0d2d38 100644
---- a/include/hw/misc/pvpanic.h
-+++ b/include/hw/misc/pvpanic.h
-@@ -16,6 +16,8 @@
+     create=5Fflash(vms, sysmem, secure=5Fsysmem ? secure=5Fsysmem : sysmem=
+);
 =20
- #define TYPE=5FPVPANIC "pvpanic"
-=20
-+#define TYPE=5FPVPANIC=5FMMIO "pvpanic-mmio"
++    create=5Fpvpanic=5Fdevice(vms);
 +
- #define PVPANIC=5FIOPORT=5FPROP "ioport"
+     create=5Fgic(vms, pic);
 =20
- static inline uint16=5Ft pvpanic=5Fport(void)
+     fdt=5Fadd=5Fpmu=5Fnodes(vms);
+diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+index 4cc57a7..ba54b84 100644
+--- a/include/hw/arm/virt.h
++++ b/include/hw/arm/virt.h
+@@ -66,6 +66,7 @@ enum {
+     VIRT=5FGIC=5FREDIST,
+     VIRT=5FGIC=5FREDIST2,
+     VIRT=5FSMMU,
++    VIRT=5FPVPANIC=5FMMIO,
+     VIRT=5FUART,
+     VIRT=5FMMIO,
+     VIRT=5FRTC,
 --=20
 1.8.3.1
