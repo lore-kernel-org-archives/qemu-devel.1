@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59599)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59966)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFh5M-00033X-Ib
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:58:09 -0400
+	(envelope-from <cota@braap.org>) id 1gFh5J-0003lE-Aj
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:58:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFgvG-0008En-Mv
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:43 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:33787)
+	(envelope-from <cota@braap.org>) id 1gFgvP-0008QP-PB
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:52 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:44599)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gFgvG-00083V-Bs
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:42 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gFgvP-0008By-FQ
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:51 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 25 Oct 2018 10:46:16 -0400
-Message-Id: <20181025144644.15464-43-cota@braap.org>
+Date: Thu, 25 Oct 2018 10:46:43 -0400
+Message-Id: <20181025144644.15464-70-cota@braap.org>
 In-Reply-To: <20181025144644.15464-1-cota@braap.org>
 References: <20181025144644.15464-1-cota@braap.org>
-Subject: [Qemu-devel] [RFC v4 43/71] sh4: convert to cpu_interrupt_request
+Subject: [Qemu-devel] [RFC v4 70/71] cpus-common: move exclusive_idle higher
+ in the file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,41 +25,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
 
-Cc: Aurelien Jarno <aurelien@aurel32.net>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+This will simplify the following commit's diff.
+
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/sh4/cpu.c    | 2 +-
- target/sh4/helper.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ cpus-common.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/target/sh4/cpu.c b/target/sh4/cpu.c
-index b9f393b7c7..58ea212f53 100644
---- a/target/sh4/cpu.c
-+++ b/target/sh4/cpu.c
-@@ -45,7 +45,7 @@ static void superh_cpu_synchronize_from_tb(CPUState *cs, TranslationBlock *tb)
- 
- static bool superh_cpu_has_work(CPUState *cs)
- {
--    return cs->interrupt_request & CPU_INTERRUPT_HARD;
-+    return cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD;
+diff --git a/cpus-common.c b/cpus-common.c
+index 232cb12c46..ad8a8ef535 100644
+--- a/cpus-common.c
++++ b/cpus-common.c
+@@ -73,6 +73,15 @@ static void finish_safe_work(CPUState *cpu)
+     cpu_exec_end(cpu);
  }
  
- /* CPUClass::reset() */
-diff --git a/target/sh4/helper.c b/target/sh4/helper.c
-index 2ff0cf4060..8463da5bc8 100644
---- a/target/sh4/helper.c
-+++ b/target/sh4/helper.c
-@@ -83,7 +83,7 @@ void superh_cpu_do_interrupt(CPUState *cs)
++/* Wait for pending exclusive operations to complete.  The CPU list lock
++   must be held.  */
++static inline void exclusive_idle(void)
++{
++    while (pending_cpus) {
++        qemu_cond_wait(&exclusive_resume, &qemu_cpu_list_lock);
++    }
++}
++
+ void cpu_list_add(CPUState *cpu)
  {
-     SuperHCPU *cpu = SUPERH_CPU(cs);
-     CPUSH4State *env = &cpu->env;
--    int do_irq = cs->interrupt_request & CPU_INTERRUPT_HARD;
-+    int do_irq = cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD;
-     int do_exp, irq_vector = cs->exception_index;
+     qemu_mutex_lock(&qemu_cpu_list_lock);
+@@ -200,15 +209,6 @@ void async_run_on_cpu_no_bql(CPUState *cpu, run_on_cpu_func func,
+     queue_work_on_cpu(cpu, wi);
+ }
  
-     /* prioritize exceptions over interrupts */
+-/* Wait for pending exclusive operations to complete.  The CPU list lock
+-   must be held.  */
+-static inline void exclusive_idle(void)
+-{
+-    while (pending_cpus) {
+-        qemu_cond_wait(&exclusive_resume, &qemu_cpu_list_lock);
+-    }
+-}
+-
+ /* Start an exclusive operation.
+    Must only be called from outside cpu_exec.  */
+ void start_exclusive(void)
 -- 
 2.17.1
