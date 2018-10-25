@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60330)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFh5V-0004FR-RJ
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:58:19 -0400
+	(envelope-from <cota@braap.org>) id 1gFhI5-0000mb-PT
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 11:11:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFguW-0007gB-Gt
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:46:58 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:37685)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gFguV-0007TY-ES
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:46:55 -0400
+	(envelope-from <cota@braap.org>) id 1gFhI4-0002tU-QU
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 11:11:17 -0400
+Date: Thu, 25 Oct 2018 11:11:03 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 25 Oct 2018 10:45:37 -0400
-Message-Id: <20181025144644.15464-4-cota@braap.org>
-In-Reply-To: <20181025144644.15464-1-cota@braap.org>
+Message-ID: <20181025151103.GA19931@flamenco>
 References: <20181025144644.15464-1-cota@braap.org>
-Subject: [Qemu-devel] [RFC v4 04/71] cpu: make qemu_work_cond per-cpu
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181025144644.15464-1-cota@braap.org>
+Subject: [Qemu-devel] [RFC v4 00/71] per-CPU locks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,222 +23,95 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Aleksandar Markovic <amarkovic@wavecomp.com>, Alexander Graf <agraf@suse.de>, Alistair Francis <alistair23@gmail.com>, Andrzej Zaborowski <balrogg@gmail.com>, Anthony Green <green@moxielogic.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Chris Wulff <crwulff@gmail.com>, Cornelia Huck <cohuck@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, David Hildenbrand <david@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Fabien Chouteau <chouteau@adacore.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, James Hogan <jhogan@kernel.org>, Laurent Vivier <laurent@vivier.eu>, Marek Vasut <marex@denx.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Max Filippov <jcmvbkbc@gmail.com>, Michael Clark <mjc@sifive.com>, Michael Walle <michael@walle.cc>, Palmer Dabbelt <palmer@sifive.com>, Pavel Dovgalyuk <dovgaluk@ispras.ru>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Sagar Karandikar <sagark@eecs.berkeley.edu>, Stafford Horne <shorne@gmail.com>
 
-This eliminates the need to use the BQL to queue CPU work.
+[I forgot to add the cover letter to git send-email; here it is]
 
-While at it, give the per-cpu field a generic name ("cond") since
-it will soon be used for more than just queueing CPU work.
+v3: https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg04179.html
 
-Signed-off-by: Emilio G. Cota <cota@braap.org>
----
- include/qom/cpu.h |  6 ++--
- cpus-common.c     | 72 ++++++++++++++++++++++++++++++++++++++---------
- cpus.c            |  2 +-
- qom/cpu.c         |  1 +
- 4 files changed, 63 insertions(+), 18 deletions(-)
+"Why is this an RFC?" See v3 link above. Also, see comment at
+the bottom of this message regarding the last patch of this series.
 
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index 7fdb5a2be0..2fad537a4f 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -316,6 +316,7 @@ struct qemu_work_item;
-  * @mem_io_vaddr: Target virtual address at which the memory was accessed.
-  * @kvm_fd: vCPU file descriptor for KVM.
-  * @lock: Lock to prevent multiple access to per-CPU fields.
-+ * @cond: Condition variable for per-CPU events.
-  * @work_list: List of pending asynchronous work.
-  * @trace_dstate_delayed: Delayed changes to trace_dstate (includes all changes
-  *                        to @trace_dstate).
-@@ -358,6 +359,7 @@ struct CPUState {
- 
-     QemuMutex lock;
-     /* fields below protected by @lock */
-+    QemuCond cond;
-     QSIMPLEQ_HEAD(, qemu_work_item) work_list;
- 
-     CPUAddressSpace *cpu_ases;
-@@ -769,12 +771,10 @@ bool cpu_is_stopped(CPUState *cpu);
-  * @cpu: The vCPU to run on.
-  * @func: The function to be executed.
-  * @data: Data to pass to the function.
-- * @mutex: Mutex to release while waiting for @func to run.
-  *
-  * Used internally in the implementation of run_on_cpu.
-  */
--void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data,
--                   QemuMutex *mutex);
-+void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data);
- 
- /**
-  * run_on_cpu:
-diff --git a/cpus-common.c b/cpus-common.c
-index 2913294cb7..71469c85ce 100644
---- a/cpus-common.c
-+++ b/cpus-common.c
-@@ -26,7 +26,6 @@
- static QemuMutex qemu_cpu_list_lock;
- static QemuCond exclusive_cond;
- static QemuCond exclusive_resume;
--static QemuCond qemu_work_cond;
- 
- /* >= 1 if a thread is inside start_exclusive/end_exclusive.  Written
-  * under qemu_cpu_list_lock, read with atomic operations.
-@@ -42,7 +41,6 @@ void qemu_init_cpu_list(void)
-     qemu_mutex_init(&qemu_cpu_list_lock);
-     qemu_cond_init(&exclusive_cond);
-     qemu_cond_init(&exclusive_resume);
--    qemu_cond_init(&qemu_work_cond);
- }
- 
- void cpu_list_lock(void)
-@@ -113,23 +111,37 @@ struct qemu_work_item {
-     bool free, exclusive, done;
- };
- 
--static void queue_work_on_cpu(CPUState *cpu, struct qemu_work_item *wi)
-+/* Called with the CPU's lock held */
-+static void queue_work_on_cpu_locked(CPUState *cpu, struct qemu_work_item *wi)
- {
--    qemu_mutex_lock(&cpu->lock);
-     QSIMPLEQ_INSERT_TAIL(&cpu->work_list, wi, node);
-     wi->done = false;
--    qemu_mutex_unlock(&cpu->lock);
- 
-     qemu_cpu_kick(cpu);
- }
- 
--void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data,
--                   QemuMutex *mutex)
-+static void queue_work_on_cpu(CPUState *cpu, struct qemu_work_item *wi)
-+{
-+    cpu_mutex_lock(cpu);
-+    queue_work_on_cpu_locked(cpu, wi);
-+    cpu_mutex_unlock(cpu);
-+}
-+
-+void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
- {
-     struct qemu_work_item wi;
-+    bool has_bql = qemu_mutex_iothread_locked();
-+
-+    g_assert(no_cpu_mutex_locked());
- 
-     if (qemu_cpu_is_self(cpu)) {
--        func(cpu, data);
-+        if (has_bql) {
-+            func(cpu, data);
-+        } else {
-+            qemu_mutex_lock_iothread();
-+            func(cpu, data);
-+            qemu_mutex_unlock_iothread();
-+        }
-         return;
-     }
- 
-@@ -139,13 +151,34 @@ void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data,
-     wi.free = false;
-     wi.exclusive = false;
- 
--    queue_work_on_cpu(cpu, &wi);
-+    cpu_mutex_lock(cpu);
-+    queue_work_on_cpu_locked(cpu, &wi);
-+
-+    /*
-+     * We are going to sleep on the CPU lock, so release the BQL.
-+     *
-+     * During the transition to per-CPU locks, we release the BQL _after_
-+     * having kicked the destination CPU (from queue_work_on_cpu_locked above).
-+     * This makes sure that the enqueued work will be seen by the CPU
-+     * after being woken up from the kick, since the CPU sleeps on the BQL.
-+     * Once we complete the transition to per-CPU locks, we will release
-+     * the BQL earlier in this function.
-+     */
-+    if (has_bql) {
-+        qemu_mutex_unlock_iothread();
-+    }
-+
-     while (!atomic_mb_read(&wi.done)) {
-         CPUState *self_cpu = current_cpu;
- 
--        qemu_cond_wait(&qemu_work_cond, mutex);
-+        qemu_cond_wait(&cpu->cond, &cpu->lock);
-         current_cpu = self_cpu;
-     }
-+    cpu_mutex_unlock(cpu);
-+
-+    if (has_bql) {
-+        qemu_mutex_lock_iothread();
-+    }
- }
- 
- void async_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
-@@ -307,6 +340,7 @@ void async_safe_run_on_cpu(CPUState *cpu, run_on_cpu_func func,
- void process_queued_cpu_work(CPUState *cpu)
- {
-     struct qemu_work_item *wi;
-+    bool has_bql = qemu_mutex_iothread_locked();
- 
-     qemu_mutex_lock(&cpu->lock);
-     if (QSIMPLEQ_EMPTY(&cpu->work_list)) {
-@@ -324,13 +358,23 @@ void process_queued_cpu_work(CPUState *cpu)
-              * BQL, so it goes to sleep; start_exclusive() is sleeping too, so
-              * neither CPU can proceed.
-              */
--            qemu_mutex_unlock_iothread();
-+            if (has_bql) {
-+                qemu_mutex_unlock_iothread();
-+            }
-             start_exclusive();
-             wi->func(cpu, wi->data);
-             end_exclusive();
--            qemu_mutex_lock_iothread();
-+            if (has_bql) {
-+                qemu_mutex_lock_iothread();
-+            }
-         } else {
--            wi->func(cpu, wi->data);
-+            if (has_bql) {
-+                wi->func(cpu, wi->data);
-+            } else {
-+                qemu_mutex_lock_iothread();
-+                wi->func(cpu, wi->data);
-+                qemu_mutex_unlock_iothread();
-+            }
-         }
-         qemu_mutex_lock(&cpu->lock);
-         if (wi->free) {
-@@ -340,5 +384,5 @@ void process_queued_cpu_work(CPUState *cpu)
-         }
-     }
-     qemu_mutex_unlock(&cpu->lock);
--    qemu_cond_broadcast(&qemu_work_cond);
-+    qemu_cond_broadcast(&cpu->cond);
- }
-diff --git a/cpus.c b/cpus.c
-index 38cc9e1278..d0b7f8e02d 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -1236,7 +1236,7 @@ void qemu_init_cpu_loop(void)
- 
- void run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
- {
--    do_run_on_cpu(cpu, func, data, &qemu_global_mutex);
-+    do_run_on_cpu(cpu, func, data);
- }
- 
- static void qemu_kvm_destroy_vcpu(CPUState *cpu)
-diff --git a/qom/cpu.c b/qom/cpu.c
-index d0758c907d..bb031a3a6a 100644
---- a/qom/cpu.c
-+++ b/qom/cpu.c
-@@ -373,6 +373,7 @@ static void cpu_common_initfn(Object *obj)
-     cpu->nr_threads = 1;
- 
-     qemu_mutex_init(&cpu->lock);
-+    qemu_cond_init(&cpu->cond);
-     QSIMPLEQ_INIT(&cpu->work_list);
-     QTAILQ_INIT(&cpu->breakpoints);
-     QTAILQ_INIT(&cpu->watchpoints);
--- 
-2.17.1
+Changes since v3:
+
+- Add R-b's -- rth: thanks for all the reviews!
+
+- Partially bring back the approach in the v1 series, that is,
+  do not acquire the CPU mutex in cpu_interrupt_request; use
+  atomic_read instead. The lock is not needed because of the
+  OR+kick sequence; note that when we do not have the BQL
+  (i.e. in MTTCG's CPU loop), we do have the lock while reading
+  cpu_interrupt_request, so no writes can be missed there.
+  This simplifies the calling code quite a bit, since we do
+  not hold cpu_mutex across large portions of code (this is
+  a very bad idea, e.g. could lead to deadlock for instance
+  if we tried to queue work on another CPU).
+  Setters still acquire the lock, since it's the cost is
+  very similar to that of a locked atomic, and makes the
+  code simpler.
+
+- Use an intermediate interrupt_request variable wherever
+  this is trivial to do. Whenever there's a chance that
+  cpu->interrupt_request might have been updated between
+  reads, just use cpu_interrupt_request to perform a load
+  via atomic_read.
+
+- Drop the BQL assert in run_on_cpu. Keep the guarantee that
+  the queued work holds the BQL, though.
+
+- Add a no_cpu_mutex_lock_held assert to run_on_cpu; note that
+  acquiring CPU locks can only be done in CPU_FOREACH order,
+  otherwise we might deadlock.
+
+- Remove qemu_cpu_cond leftovers; it's superseded by cpu->cond.
+
+- Export no_cpu_mutex_lock_held.
+
+- Do not export process_queued_work_locked from cpus-common.c;
+  at some point we need to drop cpu_mutex for other vCPUs to queue
+  work on the current vCPU, and process_queued_work is a good
+  place to do that. Add comment about this.
+
+- Add helper_cpu_halted_set helper to tcg-runtime. Convert
+  the TCG targets that were setting cpu->halted directly.
+
+- Fix cpu_reset_interrupt in cpu_common_post_load, as reported
+  by Richard.
+
+- Fix a hang after making qemu_work_cond per-cpu. The hang can
+  only happen between that commit and the commit that completes
+  the transition to per-CPU locks. This would break bisect, so
+  fix it. In addition, add a comment about it, and add a tiny
+  patch to undo the fix once the transition is complete and the
+  fix isn't needed any more.
+
+- Fix a possible deadlock (acquiring the BQL *after* having
+  acquired the CPU mutex) in cpu_reset_interrupt. This would break
+  bisection until the transition to per-CPU locks, so fix it
+  and add a comment about it to the commit log of the "cpu: define
+  cpu_interrupt_request helpers" patch.
+
+- Add cc->has_work_with_iothread_lock, as suggested by Paolo,
+  and convert the targets that need it.
+
+- Add a patch to reduce contention when doing exclusive work.
+  In my tests I've only found aarch64 to benefit (very minimally)
+  from this; for other targets this patch is perf-neutral.
+  In aarch64, the problem is that frequent global TLB invalidations
+  require frequent exclusive work; sync-profile points to unnecessary
+  contention on cpu_list_lock, which all waiters wait on
+  while the exclusive work completes. To fix this, make the
+  waiters wait on their CPU lock, so that their wakeup is uncontended.
+  The perf impact is that the scalability collapse due to exclusive
+  work is mitigated, but not fixed.
+  So I'm including this patch to raise awareness about the issue,
+  but I don't feel strongly at all about merging it.
+
+The series is checkpatch-clean (single warning about __COVERITY__).
+
+You can fetch it from:
+  https://github.com/cota/qemu/tree/cpu-lock-v4
+
+Thanks,
+
+		Emilio
