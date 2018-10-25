@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58333)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gFTv5-0003wd-Ru
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 20:54:41 -0400
+	(envelope-from <mst@redhat.com>) id 1gFTvF-000453-Fp
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 20:54:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gFTv2-0006Km-FI
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 20:54:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48896)
+	(envelope-from <mst@redhat.com>) id 1gFTvD-0006Xc-DC
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 20:54:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46992)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gFTv2-0006FC-08
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 20:54:36 -0400
-Date: Wed, 24 Oct 2018 20:54:28 -0400
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gFTvB-0006US-EL
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 20:54:46 -0400
+Date: Wed, 24 Oct 2018 20:54:41 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181025005110.249256-20-mst@redhat.com>
+Message-ID: <20181025005110.249256-22-mst@redhat.com>
 References: <20181025005110.249256-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <20181025005110.249256-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v2 19/28] hw/pci-host/x86: extend the 64-bit PCI
- hole relative to the fw-assigned base
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v2 21/28] hw/pci-bridge/xio3130: Remove unused
+ functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,146 +29,158 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Laszlo Ersek <lersek@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-From: Laszlo Ersek <lersek@redhat.com>
+From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-In commit 9fa99d2519cb ("hw/pci-host: Fix x86 Host Bridges 64bit PCI
-hole", 2017-11-16), we meant to expose such a 64-bit PCI MMIO aperture in
-the ACPI DSDT that would be at least as large as the new "pci-hole64-size"
-property (2GB on i440fx, 32GB on q35). The goal was to offer "enough"
-64-bit MMIO aperture to the guest OS for hotplug purposes.
+Introduced in 48ebf2f90f8 and faf1e708d5b, these functions
+were never used. Remove them.
 
-In that commit, we added or modified five functions:
-
-- pc_pci_hole64_start(): shared between i440fx and q35. Provides a default
-  64-bit base, which starts beyond the cold-plugged 64-bit RAM, and skips
-  the DIMM hotplug area too (if any).
-
-- i440fx_pcihost_get_pci_hole64_start(), q35_host_get_pci_hole64_start():
-  board-specific 64-bit base property getters called abstractly by the
-  ACPI generator. Both of these fall back to pc_pci_hole64_start() if the
-  firmware didn't program any 64-bit hole (i.e. if the firmware didn't
-  assign a 64-bit GPA to any MMIO BAR on any device). Otherwise, they
-  honor the firmware's BAR assignments (i.e., they treat the lowest 64-bit
-  GPA programmed by the firmware as the base address for the aperture).
-
-- i440fx_pcihost_get_pci_hole64_end(), q35_host_get_pci_hole64_end():
-  these intended to extend the aperture to our size recommendation,
-  calculated relative to the base of the aperture.
-
-Despite the original intent, i440fx_pcihost_get_pci_hole64_end() and
-q35_host_get_pci_hole64_end() currently only extend the aperture relative
-to the default base (pc_pci_hole64_start()), ignoring any programming done
-by the firmware. This means that our size recommendation may not be met.
-Fix it by honoring the firmware's address assignments.
-
-The strange extension sizes were spotted by Alex, in the log of a guest
-kernel running on top of OVMF (which prefers to assign 64-bit GPAs to
-64-bit BARs).
-
-This change only affects DSDT generation, therefore no new compat property
-is being introduced.
-
-Using an i440fx OVMF guest with 5GB RAM, an example _CRS change is:
-
-> @@ -881,9 +881,9 @@
->              QWordMemory (ResourceProducer, PosDecode, MinFixed, MaxFixed, Cacheable, ReadWrite,
->                  0x0000000000000000, // Granularity
->                  0x0000000800000000, // Range Minimum
-> -                0x000000080001C0FF, // Range Maximum
-> +                0x000000087FFFFFFF, // Range Maximum
->                  0x0000000000000000, // Translation Offset
-> -                0x000000000001C100, // Length
-> +                0x0000000080000000, // Length
->                  ,, , AddressRangeMemory, TypeStatic)
->          })
->          Device (GPE0)
-
-(On i440fx, the low RAM split is at 3GB, in this case. Therefore, with 5GB
-guest RAM and no DIMM hotplug range, pc_pci_hole64_start() returns 4 +
-(5-3) = 6 GB. Adding the 2GB extension to that yields 8GB, which is below
-the firmware-programmed base of 32GB, before the patch. Therefore, before
-the patch, the extension is ineffective. After the patch, we add the 2GB
-extension to the firmware-programmed base, namely 32GB.)
-
-Using a q35 OVMF guest with 5GB RAM, an example _CRS change is:
-
-> @@ -3162,9 +3162,9 @@
->              QWordMemory (ResourceProducer, PosDecode, MinFixed, MaxFixed, Cacheable, ReadWrite,
->                  0x0000000000000000, // Granularity
->                  0x0000000800000000, // Range Minimum
-> -                0x00000009BFFFFFFF, // Range Maximum
-> +                0x0000000FFFFFFFFF, // Range Maximum
->                  0x0000000000000000, // Translation Offset
-> -                0x00000001C0000000, // Length
-> +                0x0000000800000000, // Length
->                  ,, , AddressRangeMemory, TypeStatic)
->          })
->          Device (GPE0)
-
-(On Q35, the low RAM split is at 2GB. Therefore, with 5GB guest RAM and no
-DIMM hotplug range, pc_pci_hole64_start() returns 4 + (5-2) = 7 GB. Adding
-the 32GB extension to that yields 39GB (0x0000_0009_BFFF_FFFF + 1), before
-the patch. After the patch, we add the 32GB extension to the
-firmware-programmed base, namely 32GB.)
-
-The ACPI test data for the bios-tables-test case that we added earlier in
-this series are corrected too, as follows:
-
-> @@ -3339,9 +3339,9 @@
->              QWordMemory (ResourceProducer, PosDecode, MinFixed, MaxFixed, Cacheable, ReadWrite,
->                  0x0000000000000000, // Granularity
->                  0x0000000200000000, // Range Minimum
-> -                0x00000009BFFFFFFF, // Range Maximum
-> +                0x00000009FFFFFFFF, // Range Maximum
->                  0x0000000000000000, // Translation Offset
-> -                0x00000007C0000000, // Length
-> +                0x0000000800000000, // Length
->                  ,, , AddressRangeMemory, TypeStatic)
->          })
->          Device (GPE0)
-
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Fixes: 9fa99d2519cbf71f871e46871df12cb446dc1c3e
-Signed-off-by: Laszlo Ersek <lersek@redhat.com>
-Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/pci-host/piix.c | 2 +-
- hw/pci-host/q35.c  | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ hw/pci-bridge/xio3130_downstream.h | 11 -----------
+ hw/pci-bridge/xio3130_upstream.h   | 10 ----------
+ hw/pci-bridge/xio3130_downstream.c | 28 +---------------------------
+ hw/pci-bridge/xio3130_upstream.c   | 24 +-----------------------
+ 4 files changed, 2 insertions(+), 71 deletions(-)
+ delete mode 100644 hw/pci-bridge/xio3130_downstream.h
+ delete mode 100644 hw/pci-bridge/xio3130_upstream.h
 
-diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
-index 15cc34912e..999db824da 100644
---- a/hw/pci-host/piix.c
-+++ b/hw/pci-host/piix.c
-@@ -285,7 +285,7 @@ static void i440fx_pcihost_get_pci_hole64_end(Object *obj, Visitor *v,
- {
-     PCIHostState *h = PCI_HOST_BRIDGE(obj);
-     I440FXState *s = I440FX_PCI_HOST_BRIDGE(obj);
--    uint64_t hole64_start = pc_pci_hole64_start();
-+    uint64_t hole64_start = i440fx_pcihost_get_pci_hole64_start_value(obj);
-     Range w64;
-     uint64_t value, hole64_end;
- 
-diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
-index 919de104fc..382d61f03d 100644
---- a/hw/pci-host/q35.c
-+++ b/hw/pci-host/q35.c
-@@ -149,7 +149,7 @@ static void q35_host_get_pci_hole64_end(Object *obj, Visitor *v,
- {
-     PCIHostState *h = PCI_HOST_BRIDGE(obj);
-     Q35PCIHost *s = Q35_HOST_DEVICE(obj);
--    uint64_t hole64_start = pc_pci_hole64_start();
-+    uint64_t hole64_start = q35_host_get_pci_hole64_start_value(obj);
-     Range w64;
-     uint64_t value, hole64_end;
- 
--- 
+diff --git a/hw/pci-bridge/xio3130_downstream.h b/hw/pci-bridge/xio3130_d=
+ownstream.h
+deleted file mode 100644
+index 8426d9ffa6..0000000000
+--- a/hw/pci-bridge/xio3130_downstream.h
++++ /dev/null
+@@ -1,11 +0,0 @@
+-#ifndef QEMU_XIO3130_DOWNSTREAM_H
+-#define QEMU_XIO3130_DOWNSTREAM_H
+-
+-#include "hw/pci/pcie_port.h"
+-
+-PCIESlot *xio3130_downstream_init(PCIBus *bus, int devfn, bool multifunc=
+tion,
+-                                  const char *bus_name, pci_map_irq_fn m=
+ap_irq,
+-                                  uint8_t port, uint8_t chassis,
+-                                  uint16_t slot);
+-
+-#endif /* QEMU_XIO3130_DOWNSTREAM_H */
+diff --git a/hw/pci-bridge/xio3130_upstream.h b/hw/pci-bridge/xio3130_ups=
+tream.h
+deleted file mode 100644
+index d0ab7577e2..0000000000
+--- a/hw/pci-bridge/xio3130_upstream.h
++++ /dev/null
+@@ -1,10 +0,0 @@
+-#ifndef QEMU_XIO3130_UPSTREAM_H
+-#define QEMU_XIO3130_UPSTREAM_H
+-
+-#include "hw/pci/pcie_port.h"
+-
+-PCIEPort *xio3130_upstream_init(PCIBus *bus, int devfn, bool multifuncti=
+on,
+-                                const char *bus_name, pci_map_irq_fn map=
+_irq,
+-                                uint8_t port);
+-
+-#endif /* QEMU_XIO3130_UPSTREAM_H */
+diff --git a/hw/pci-bridge/xio3130_downstream.c b/hw/pci-bridge/xio3130_d=
+ownstream.c
+index b202657954..467bbabe4c 100644
+--- a/hw/pci-bridge/xio3130_downstream.c
++++ b/hw/pci-bridge/xio3130_downstream.c
+@@ -23,7 +23,7 @@
+ #include "hw/pci/pci_ids.h"
+ #include "hw/pci/msi.h"
+ #include "hw/pci/pcie.h"
+-#include "xio3130_downstream.h"
++#include "hw/pci/pcie_port.h"
+ #include "qapi/error.h"
+=20
+ #define PCI_DEVICE_ID_TI_XIO3130D       0x8233  /* downstream port */
+@@ -127,32 +127,6 @@ static void xio3130_downstream_exitfn(PCIDevice *d)
+     pci_bridge_exitfn(d);
+ }
+=20
+-PCIESlot *xio3130_downstream_init(PCIBus *bus, int devfn, bool multifunc=
+tion,
+-                                  const char *bus_name, pci_map_irq_fn m=
+ap_irq,
+-                                  uint8_t port, uint8_t chassis,
+-                                  uint16_t slot)
+-{
+-    PCIDevice *d;
+-    PCIBridge *br;
+-    DeviceState *qdev;
+-
+-    d =3D pci_create_multifunction(bus, devfn, multifunction,
+-                                 "xio3130-downstream");
+-    if (!d) {
+-        return NULL;
+-    }
+-    br =3D PCI_BRIDGE(d);
+-
+-    qdev =3D DEVICE(d);
+-    pci_bridge_map_irq(br, bus_name, map_irq);
+-    qdev_prop_set_uint8(qdev, "port", port);
+-    qdev_prop_set_uint8(qdev, "chassis", chassis);
+-    qdev_prop_set_uint16(qdev, "slot", slot);
+-    qdev_init_nofail(qdev);
+-
+-    return PCIE_SLOT(d);
+-}
+-
+ static Property xio3130_downstream_props[] =3D {
+     DEFINE_PROP_BIT(COMPAT_PROP_PCP, PCIDevice, cap_present,
+                     QEMU_PCIE_SLTCAP_PCP_BITNR, true),
+diff --git a/hw/pci-bridge/xio3130_upstream.c b/hw/pci-bridge/xio3130_ups=
+tream.c
+index bca2f9a5ea..b524908cf1 100644
+--- a/hw/pci-bridge/xio3130_upstream.c
++++ b/hw/pci-bridge/xio3130_upstream.c
+@@ -23,7 +23,7 @@
+ #include "hw/pci/pci_ids.h"
+ #include "hw/pci/msi.h"
+ #include "hw/pci/pcie.h"
+-#include "xio3130_upstream.h"
++#include "hw/pci/pcie_port.h"
+=20
+ #define PCI_DEVICE_ID_TI_XIO3130U       0x8232  /* upstream port */
+ #define XIO3130_REVISION                0x2
+@@ -108,28 +108,6 @@ static void xio3130_upstream_exitfn(PCIDevice *d)
+     pci_bridge_exitfn(d);
+ }
+=20
+-PCIEPort *xio3130_upstream_init(PCIBus *bus, int devfn, bool multifuncti=
+on,
+-                             const char *bus_name, pci_map_irq_fn map_ir=
+q,
+-                             uint8_t port)
+-{
+-    PCIDevice *d;
+-    PCIBridge *br;
+-    DeviceState *qdev;
+-
+-    d =3D pci_create_multifunction(bus, devfn, multifunction, "x3130-ups=
+tream");
+-    if (!d) {
+-        return NULL;
+-    }
+-    br =3D PCI_BRIDGE(d);
+-
+-    qdev =3D DEVICE(d);
+-    pci_bridge_map_irq(br, bus_name, map_irq);
+-    qdev_prop_set_uint8(qdev, "port", port);
+-    qdev_init_nofail(qdev);
+-
+-    return PCIE_PORT(d);
+-}
+-
+ static const VMStateDescription vmstate_xio3130_upstream =3D {
+     .name =3D "xio3130-express-upstream-port",
+     .priority =3D MIG_PRI_PCI_BUS,
+--=20
 MST
