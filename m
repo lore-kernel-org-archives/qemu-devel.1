@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60299)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFh5N-0004D4-Ah
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:58:10 -0400
+	(envelope-from <cota@braap.org>) id 1gFh5V-00045Y-Hi
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:58:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFgvE-0008Bf-EG
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:42 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:52279)
+	(envelope-from <cota@braap.org>) id 1gFgun-0007mh-0i
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:17 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:57963)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gFgvE-00082d-3T
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:40 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gFgum-0007ev-NY
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:12 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 25 Oct 2018 10:46:12 -0400
-Message-Id: <20181025144644.15464-39-cota@braap.org>
+Date: Thu, 25 Oct 2018 10:45:39 -0400
+Message-Id: <20181025144644.15464-6-cota@braap.org>
 In-Reply-To: <20181025144644.15464-1-cota@braap.org>
 References: <20181025144644.15464-1-cota@braap.org>
-Subject: [Qemu-devel] [RFC v4 39/71] i386/hax-all: convert to
- cpu_interrupt_request
+Subject: [Qemu-devel] [RFC v4 06/71] cpu: introduce
+ process_queued_cpu_work_locked
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,89 +27,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
 
+This completes the conversion to cpu_mutex_lock/unlock in the file.
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/i386/hax-all.c | 30 +++++++++++++++++-------------
- 1 file changed, 17 insertions(+), 13 deletions(-)
+ cpus-common.c | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
 
-diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
-index 8b53a9708f..70cea8b1a1 100644
---- a/target/i386/hax-all.c
-+++ b/target/i386/hax-all.c
-@@ -293,7 +293,7 @@ int hax_vm_destroy(struct hax_vm *vm)
+diff --git a/cpus-common.c b/cpus-common.c
+index 3fccee5585..c2ad554d54 100644
+--- a/cpus-common.c
++++ b/cpus-common.c
+@@ -337,20 +337,19 @@ void async_safe_run_on_cpu(CPUState *cpu, run_on_cpu_func func,
+     queue_work_on_cpu(cpu, wi);
+ }
  
- static void hax_handle_interrupt(CPUState *cpu, int mask)
+-void process_queued_cpu_work(CPUState *cpu)
++/* Called with the CPU's lock held */
++static void process_queued_cpu_work_locked(CPUState *cpu)
  {
--    cpu->interrupt_request |= mask;
-+    cpu_interrupt_request_or(cpu, mask);
+     struct qemu_work_item *wi;
+     bool has_bql = qemu_mutex_iothread_locked();
  
-     if (!qemu_cpu_is_self(cpu)) {
-         qemu_cpu_kick(cpu);
-@@ -427,7 +427,7 @@ static int hax_vcpu_interrupt(CPUArchState *env)
-      * Unlike KVM, HAX kernel check for the eflags, instead of qemu
-      */
-     if (ht->ready_for_interrupt_injection &&
--        (cpu->interrupt_request & CPU_INTERRUPT_HARD)) {
-+        (cpu_interrupt_request(cpu) & CPU_INTERRUPT_HARD)) {
-         int irq;
- 
-         irq = cpu_get_pic_interrupt(env);
-@@ -441,7 +441,7 @@ static int hax_vcpu_interrupt(CPUArchState *env)
-      * interrupt, request an interrupt window exit.  This will
-      * cause a return to userspace as soon as the guest is ready to
-      * receive interrupts. */
--    if ((cpu->interrupt_request & CPU_INTERRUPT_HARD)) {
-+    if ((cpu_interrupt_request(cpu) & CPU_INTERRUPT_HARD)) {
-         ht->request_interrupt_window = 1;
-     } else {
-         ht->request_interrupt_window = 0;
-@@ -482,19 +482,19 @@ static int hax_vcpu_hax_exec(CPUArchState *env)
- 
-     cpu_halted_set(cpu, 0);
- 
--    if (cpu->interrupt_request & CPU_INTERRUPT_POLL) {
-+    if (cpu_interrupt_request(cpu) & CPU_INTERRUPT_POLL) {
-         cpu_reset_interrupt(cpu, CPU_INTERRUPT_POLL);
-         apic_poll_irq(x86_cpu->apic_state);
+-    qemu_mutex_lock(&cpu->lock);
+     if (QSIMPLEQ_EMPTY(&cpu->work_list)) {
+-        qemu_mutex_unlock(&cpu->lock);
+         return;
      }
- 
--    if (cpu->interrupt_request & CPU_INTERRUPT_INIT) {
-+    if (cpu_interrupt_request(cpu) & CPU_INTERRUPT_INIT) {
-         DPRINTF("\nhax_vcpu_hax_exec: handling INIT for %d\n",
-                 cpu->cpu_index);
-         do_cpu_init(x86_cpu);
-         hax_vcpu_sync_state(env, 1);
-     }
- 
--    if (cpu->interrupt_request & CPU_INTERRUPT_SIPI) {
-+    if (cpu_interrupt_request(cpu) & CPU_INTERRUPT_SIPI) {
-         DPRINTF("hax_vcpu_hax_exec: handling SIPI for %d\n",
-                 cpu->cpu_index);
-         hax_vcpu_sync_state(env, 0);
-@@ -553,13 +553,17 @@ static int hax_vcpu_hax_exec(CPUArchState *env)
-             ret = -1;
-             break;
-         case HAX_EXIT_HLT:
--            if (!(cpu->interrupt_request & CPU_INTERRUPT_HARD) &&
--                !(cpu->interrupt_request & CPU_INTERRUPT_NMI)) {
--                /* hlt instruction with interrupt disabled is shutdown */
--                env->eflags |= IF_MASK;
--                cpu_halted_set(cpu, 1);
--                cpu->exception_index = EXCP_HLT;
--                ret = 1;
-+            {
-+                uint32_t interrupt_request = cpu_interrupt_request(cpu);
-+
-+                if (!(interrupt_request & CPU_INTERRUPT_HARD) &&
-+                    !(interrupt_request & CPU_INTERRUPT_NMI)) {
-+                    /* hlt instruction with interrupt disabled is shutdown */
-+                    env->eflags |= IF_MASK;
-+                    cpu_halted_set(cpu, 1);
-+                    cpu->exception_index = EXCP_HLT;
-+                    ret = 1;
-+                }
+     while (!QSIMPLEQ_EMPTY(&cpu->work_list)) {
+         wi = QSIMPLEQ_FIRST(&cpu->work_list);
+         QSIMPLEQ_REMOVE_HEAD(&cpu->work_list, node);
+-        qemu_mutex_unlock(&cpu->lock);
++        cpu_mutex_unlock(cpu);
+         if (wi->exclusive) {
+             /* Running work items outside the BQL avoids the following deadlock:
+              * 1) start_exclusive() is called with the BQL taken while another
+@@ -376,13 +375,19 @@ void process_queued_cpu_work(CPUState *cpu)
+                 qemu_mutex_unlock_iothread();
              }
-             break;
-         /* these situations will continue to hax module */
+         }
+-        qemu_mutex_lock(&cpu->lock);
++        cpu_mutex_lock(cpu);
+         if (wi->free) {
+             g_free(wi);
+         } else {
+             atomic_mb_set(&wi->done, true);
+         }
+     }
+-    qemu_mutex_unlock(&cpu->lock);
+     qemu_cond_broadcast(&cpu->cond);
+ }
++
++void process_queued_cpu_work(CPUState *cpu)
++{
++    cpu_mutex_lock(cpu);
++    process_queued_cpu_work_locked(cpu);
++    cpu_mutex_unlock(cpu);
++}
 -- 
 2.17.1
