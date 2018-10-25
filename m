@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59609)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gFh5V-00034O-6s
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:58:18 -0400
+	(envelope-from <cota@braap.org>) id 1gFh5V-0004FR-RJ
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:58:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gFgus-0007sz-KD
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:20 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:58057)
+	(envelope-from <cota@braap.org>) id 1gFguW-0007gB-Gt
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:46:58 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:37685)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1gFgur-0007hi-EN
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:18 -0400
-Date: Thu, 25 Oct 2018 15:44:37 +0100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181025144436.GE2697@umbus.hotspot.internet-for-guests.com>
-References: <20181023152306.3123-1-david@redhat.com>
-	<20181023152306.3123-7-david@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="WBsA/oQW3eTA3LlM"
-Content-Disposition: inline
-In-Reply-To: <20181023152306.3123-7-david@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 6/7] memory-device: avoid overflows on
- very huge devices
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gFguV-0007TY-ES
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:46:55 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Date: Thu, 25 Oct 2018 10:45:37 -0400
+Message-Id: <20181025144644.15464-4-cota@braap.org>
+In-Reply-To: <20181025144644.15464-1-cota@braap.org>
+References: <20181025144644.15464-1-cota@braap.org>
+Subject: [Qemu-devel] [RFC v4 04/71] cpu: make qemu_work_cond per-cpu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,68 +23,223 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Eduardo Habkost <ehabkost@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
 
+This eliminates the need to use the BQL to queue CPU work.
 
---WBsA/oQW3eTA3LlM
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+While at it, give the per-cpu field a generic name ("cond") since
+it will soon be used for more than just queueing CPU work.
 
-On Tue, Oct 23, 2018 at 05:23:05PM +0200, David Hildenbrand wrote:
-> Should not be a problem right now, but it could theoretically happen
-> in the future.
->=20
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+---
+ include/qom/cpu.h |  6 ++--
+ cpus-common.c     | 72 ++++++++++++++++++++++++++++++++++++++---------
+ cpus.c            |  2 +-
+ qom/cpu.c         |  1 +
+ 4 files changed, 63 insertions(+), 18 deletions(-)
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-
-> ---
->  hw/mem/memory-device.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
-> index 996ad1490f..8be63c8032 100644
-> --- a/hw/mem/memory-device.c
-> +++ b/hw/mem/memory-device.c
-> @@ -85,7 +85,8 @@ static void memory_device_check_addable(MachineState *m=
-s, uint64_t size,
-> =20
->      /* will we exceed the total amount of memory specified */
->      memory_device_used_region_size(OBJECT(ms), &used_region_size);
-> -    if (used_region_size + size > ms->maxram_size - ms->ram_size) {
-> +    if (used_region_size + size < used_region_size ||
-> +        used_region_size + size > ms->maxram_size - ms->ram_size) {
->          error_setg(errp, "not enough space, currently 0x%" PRIx64
->                     " in use of total space for memory devices 0x" RAM_AD=
-DR_FMT,
->                     used_region_size, ms->maxram_size - ms->ram_size);
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---WBsA/oQW3eTA3LlM
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlvR1tQACgkQbDjKyiDZ
-s5JqoA//V9fKXSheOiVCXfZg2rMFZSQiOT2CSiPgCiDqQifym9Gu0xxT5V/ny+zr
-FlPIcu0SNNYR0r0YyL6rbnxT9xxfWTITbXWJnvBDXxGYVA9f5+3CbnYBzSh6rSwB
-nHjUruw10ba7M/ExRJmFOeB6o+YVpRmOALsTka4yhi/IKFYteDP8Jg/eC2+3sH8E
-VxvERKUUgQRWbHlWx70vmsoSeedxkx0BzA9odXE5sKQbPyEq2RSgBUhPlZo/i5gd
-FbdxZv+ob5MKIzwbGAi+Im7z8KMRKoke0GhOLVlbJRBv5MUnzVcnCUgiXlMCbefF
-BO75UObQ0TV2e2eii19ncVNPwNH5ulfT21TpX1hV9GWZRBXX1jMyEvsvXdDMJAfg
-c0av1hiY9cFiTImP4OYR3k7b5P4nj9E9xu367Q0k+O09ryWEQj7KzHD4X0o98ogD
-c8u+w1l6cGu9SqRTkgJ8dia8Oi1dNnSPpbQ16YLe7wyrC8Zh/pl7QzDG4r+cJdch
-aMRFCzZrQHDYFnvF1EpXeA2Cwcpf79BZsRGD6mcoBobcIjqHLkS06E/k0OYkJmM0
-eghqp0u/3XD29mC1AZrQetlnRjIC/uZf3rOzP/z7vrik0hSh76Byk4So/DXNbt5U
-JYPa3/u6B69XVuItau/hHU2rYGLWiG4kVnG8tz56sph7J5FWqrw=
-=nRgD
------END PGP SIGNATURE-----
-
---WBsA/oQW3eTA3LlM--
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index 7fdb5a2be0..2fad537a4f 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -316,6 +316,7 @@ struct qemu_work_item;
+  * @mem_io_vaddr: Target virtual address at which the memory was accessed.
+  * @kvm_fd: vCPU file descriptor for KVM.
+  * @lock: Lock to prevent multiple access to per-CPU fields.
++ * @cond: Condition variable for per-CPU events.
+  * @work_list: List of pending asynchronous work.
+  * @trace_dstate_delayed: Delayed changes to trace_dstate (includes all changes
+  *                        to @trace_dstate).
+@@ -358,6 +359,7 @@ struct CPUState {
+ 
+     QemuMutex lock;
+     /* fields below protected by @lock */
++    QemuCond cond;
+     QSIMPLEQ_HEAD(, qemu_work_item) work_list;
+ 
+     CPUAddressSpace *cpu_ases;
+@@ -769,12 +771,10 @@ bool cpu_is_stopped(CPUState *cpu);
+  * @cpu: The vCPU to run on.
+  * @func: The function to be executed.
+  * @data: Data to pass to the function.
+- * @mutex: Mutex to release while waiting for @func to run.
+  *
+  * Used internally in the implementation of run_on_cpu.
+  */
+-void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data,
+-                   QemuMutex *mutex);
++void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data);
+ 
+ /**
+  * run_on_cpu:
+diff --git a/cpus-common.c b/cpus-common.c
+index 2913294cb7..71469c85ce 100644
+--- a/cpus-common.c
++++ b/cpus-common.c
+@@ -26,7 +26,6 @@
+ static QemuMutex qemu_cpu_list_lock;
+ static QemuCond exclusive_cond;
+ static QemuCond exclusive_resume;
+-static QemuCond qemu_work_cond;
+ 
+ /* >= 1 if a thread is inside start_exclusive/end_exclusive.  Written
+  * under qemu_cpu_list_lock, read with atomic operations.
+@@ -42,7 +41,6 @@ void qemu_init_cpu_list(void)
+     qemu_mutex_init(&qemu_cpu_list_lock);
+     qemu_cond_init(&exclusive_cond);
+     qemu_cond_init(&exclusive_resume);
+-    qemu_cond_init(&qemu_work_cond);
+ }
+ 
+ void cpu_list_lock(void)
+@@ -113,23 +111,37 @@ struct qemu_work_item {
+     bool free, exclusive, done;
+ };
+ 
+-static void queue_work_on_cpu(CPUState *cpu, struct qemu_work_item *wi)
++/* Called with the CPU's lock held */
++static void queue_work_on_cpu_locked(CPUState *cpu, struct qemu_work_item *wi)
+ {
+-    qemu_mutex_lock(&cpu->lock);
+     QSIMPLEQ_INSERT_TAIL(&cpu->work_list, wi, node);
+     wi->done = false;
+-    qemu_mutex_unlock(&cpu->lock);
+ 
+     qemu_cpu_kick(cpu);
+ }
+ 
+-void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data,
+-                   QemuMutex *mutex)
++static void queue_work_on_cpu(CPUState *cpu, struct qemu_work_item *wi)
++{
++    cpu_mutex_lock(cpu);
++    queue_work_on_cpu_locked(cpu, wi);
++    cpu_mutex_unlock(cpu);
++}
++
++void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
+ {
+     struct qemu_work_item wi;
++    bool has_bql = qemu_mutex_iothread_locked();
++
++    g_assert(no_cpu_mutex_locked());
+ 
+     if (qemu_cpu_is_self(cpu)) {
+-        func(cpu, data);
++        if (has_bql) {
++            func(cpu, data);
++        } else {
++            qemu_mutex_lock_iothread();
++            func(cpu, data);
++            qemu_mutex_unlock_iothread();
++        }
+         return;
+     }
+ 
+@@ -139,13 +151,34 @@ void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data,
+     wi.free = false;
+     wi.exclusive = false;
+ 
+-    queue_work_on_cpu(cpu, &wi);
++    cpu_mutex_lock(cpu);
++    queue_work_on_cpu_locked(cpu, &wi);
++
++    /*
++     * We are going to sleep on the CPU lock, so release the BQL.
++     *
++     * During the transition to per-CPU locks, we release the BQL _after_
++     * having kicked the destination CPU (from queue_work_on_cpu_locked above).
++     * This makes sure that the enqueued work will be seen by the CPU
++     * after being woken up from the kick, since the CPU sleeps on the BQL.
++     * Once we complete the transition to per-CPU locks, we will release
++     * the BQL earlier in this function.
++     */
++    if (has_bql) {
++        qemu_mutex_unlock_iothread();
++    }
++
+     while (!atomic_mb_read(&wi.done)) {
+         CPUState *self_cpu = current_cpu;
+ 
+-        qemu_cond_wait(&qemu_work_cond, mutex);
++        qemu_cond_wait(&cpu->cond, &cpu->lock);
+         current_cpu = self_cpu;
+     }
++    cpu_mutex_unlock(cpu);
++
++    if (has_bql) {
++        qemu_mutex_lock_iothread();
++    }
+ }
+ 
+ void async_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
+@@ -307,6 +340,7 @@ void async_safe_run_on_cpu(CPUState *cpu, run_on_cpu_func func,
+ void process_queued_cpu_work(CPUState *cpu)
+ {
+     struct qemu_work_item *wi;
++    bool has_bql = qemu_mutex_iothread_locked();
+ 
+     qemu_mutex_lock(&cpu->lock);
+     if (QSIMPLEQ_EMPTY(&cpu->work_list)) {
+@@ -324,13 +358,23 @@ void process_queued_cpu_work(CPUState *cpu)
+              * BQL, so it goes to sleep; start_exclusive() is sleeping too, so
+              * neither CPU can proceed.
+              */
+-            qemu_mutex_unlock_iothread();
++            if (has_bql) {
++                qemu_mutex_unlock_iothread();
++            }
+             start_exclusive();
+             wi->func(cpu, wi->data);
+             end_exclusive();
+-            qemu_mutex_lock_iothread();
++            if (has_bql) {
++                qemu_mutex_lock_iothread();
++            }
+         } else {
+-            wi->func(cpu, wi->data);
++            if (has_bql) {
++                wi->func(cpu, wi->data);
++            } else {
++                qemu_mutex_lock_iothread();
++                wi->func(cpu, wi->data);
++                qemu_mutex_unlock_iothread();
++            }
+         }
+         qemu_mutex_lock(&cpu->lock);
+         if (wi->free) {
+@@ -340,5 +384,5 @@ void process_queued_cpu_work(CPUState *cpu)
+         }
+     }
+     qemu_mutex_unlock(&cpu->lock);
+-    qemu_cond_broadcast(&qemu_work_cond);
++    qemu_cond_broadcast(&cpu->cond);
+ }
+diff --git a/cpus.c b/cpus.c
+index 38cc9e1278..d0b7f8e02d 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1236,7 +1236,7 @@ void qemu_init_cpu_loop(void)
+ 
+ void run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
+ {
+-    do_run_on_cpu(cpu, func, data, &qemu_global_mutex);
++    do_run_on_cpu(cpu, func, data);
+ }
+ 
+ static void qemu_kvm_destroy_vcpu(CPUState *cpu)
+diff --git a/qom/cpu.c b/qom/cpu.c
+index d0758c907d..bb031a3a6a 100644
+--- a/qom/cpu.c
++++ b/qom/cpu.c
+@@ -373,6 +373,7 @@ static void cpu_common_initfn(Object *obj)
+     cpu->nr_threads = 1;
+ 
+     qemu_mutex_init(&cpu->lock);
++    qemu_cond_init(&cpu->cond);
+     QSIMPLEQ_INIT(&cpu->work_list);
+     QTAILQ_INIT(&cpu->breakpoints);
+     QTAILQ_INIT(&cpu->watchpoints);
+-- 
+2.17.1
