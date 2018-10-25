@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60299)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFh5G-0004D4-23
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:58:05 -0400
+	(envelope-from <cota@braap.org>) id 1gFh5K-0004FR-Nd
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:58:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFgvY-00009F-GD
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:48:01 -0400
+	(envelope-from <cota@braap.org>) id 1gFgvG-0008Et-Pa
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:48 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 25 Oct 2018 10:46:35 -0400
-Message-Id: <20181025144644.15464-62-cota@braap.org>
+Date: Thu, 25 Oct 2018 10:45:49 -0400
+Message-Id: <20181025144644.15464-16-cota@braap.org>
 In-Reply-To: <20181025144644.15464-1-cota@braap.org>
 References: <20181025144644.15464-1-cota@braap.org>
-Subject: [Qemu-devel] [RFC v4 62/71] s390x: convert to
- cpu_has_work_with_iothread_lock
+Subject: [Qemu-devel] [RFC v4 16/71] arm: convert to cpu_halted
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,40 +20,117 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
 
-Soon we will call cpu_has_work without the BQL.
-
-Cc: Cornelia Huck <cohuck@redhat.com>
-Cc: Alexander Graf <agraf@suse.de>
-Cc: David Hildenbrand <david@redhat.com>
-Cc: qemu-s390x@nongnu.org
+Cc: Andrzej Zaborowski <balrogg@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/s390x/cpu.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ hw/arm/omap1.c            | 4 ++--
+ hw/arm/pxa2xx_gpio.c      | 2 +-
+ hw/arm/pxa2xx_pic.c       | 2 +-
+ target/arm/arm-powerctl.c | 4 ++--
+ target/arm/cpu.c          | 2 +-
+ target/arm/op_helper.c    | 2 +-
+ 6 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index 1f91df57bc..2a2d1227b3 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -59,6 +59,8 @@ static bool s390_cpu_has_work(CPUState *cs)
- {
-     S390CPU *cpu = S390_CPU(cs);
+diff --git a/hw/arm/omap1.c b/hw/arm/omap1.c
+index 539d29ef9c..55a7672976 100644
+--- a/hw/arm/omap1.c
++++ b/hw/arm/omap1.c
+@@ -1769,7 +1769,7 @@ static uint64_t omap_clkdsp_read(void *opaque, hwaddr addr,
+     case 0x18:	/* DSP_SYSST */
+         cpu = CPU(s->cpu);
+         return (s->clkm.clocking_scheme << 11) | s->clkm.cold_start |
+-                (cpu->halted << 6);      /* Quite useless... */
++                (cpu_halted(cpu) << 6);      /* Quite useless... */
+     }
  
-+    g_assert(qemu_mutex_iothread_locked());
-+
-     /* STOPPED cpus can never wake up */
-     if (s390_cpu_get_state(cpu) != S390_CPU_STATE_LOAD &&
-         s390_cpu_get_state(cpu) != S390_CPU_STATE_OPERATING) {
-@@ -469,7 +471,7 @@ static void s390_cpu_class_init(ObjectClass *oc, void *data)
-     scc->initial_cpu_reset = s390_cpu_initial_reset;
-     cc->reset = s390_cpu_full_reset;
-     cc->class_by_name = s390_cpu_class_by_name,
--    cc->has_work = s390_cpu_has_work;
-+    cc->has_work_with_iothread_lock = s390_cpu_has_work;
- #ifdef CONFIG_TCG
-     cc->do_interrupt = s390_cpu_do_interrupt;
- #endif
+     OMAP_BAD_REG(addr);
+@@ -3790,7 +3790,7 @@ void omap_mpu_wakeup(void *opaque, int irq, int req)
+     struct omap_mpu_state_s *mpu = (struct omap_mpu_state_s *) opaque;
+     CPUState *cpu = CPU(mpu->cpu);
+ 
+-    if (cpu->halted) {
++    if (cpu_halted(cpu)) {
+         cpu_interrupt(cpu, CPU_INTERRUPT_EXITTB);
+     }
+ }
+diff --git a/hw/arm/pxa2xx_gpio.c b/hw/arm/pxa2xx_gpio.c
+index e15070188e..5c3fea42e9 100644
+--- a/hw/arm/pxa2xx_gpio.c
++++ b/hw/arm/pxa2xx_gpio.c
+@@ -128,7 +128,7 @@ static void pxa2xx_gpio_set(void *opaque, int line, int level)
+         pxa2xx_gpio_irq_update(s);
+ 
+     /* Wake-up GPIOs */
+-    if (cpu->halted && (mask & ~s->dir[bank] & pxa2xx_gpio_wake[bank])) {
++    if (cpu_halted(cpu) && (mask & ~s->dir[bank] & pxa2xx_gpio_wake[bank])) {
+         cpu_interrupt(cpu, CPU_INTERRUPT_EXITTB);
+     }
+ }
+diff --git a/hw/arm/pxa2xx_pic.c b/hw/arm/pxa2xx_pic.c
+index 61275fa040..46ab4c3fc2 100644
+--- a/hw/arm/pxa2xx_pic.c
++++ b/hw/arm/pxa2xx_pic.c
+@@ -58,7 +58,7 @@ static void pxa2xx_pic_update(void *opaque)
+     PXA2xxPICState *s = (PXA2xxPICState *) opaque;
+     CPUState *cpu = CPU(s->cpu);
+ 
+-    if (cpu->halted) {
++    if (cpu_halted(cpu)) {
+         mask[0] = s->int_pending[0] & (s->int_enabled[0] | s->int_idle);
+         mask[1] = s->int_pending[1] & (s->int_enabled[1] | s->int_idle);
+         if (mask[0] || mask[1]) {
+diff --git a/target/arm/arm-powerctl.c b/target/arm/arm-powerctl.c
+index ce55eeb682..e4477444fc 100644
+--- a/target/arm/arm-powerctl.c
++++ b/target/arm/arm-powerctl.c
+@@ -64,7 +64,7 @@ static void arm_set_cpu_on_async_work(CPUState *target_cpu_state,
+ 
+     /* Initialize the cpu we are turning on */
+     cpu_reset(target_cpu_state);
+-    target_cpu_state->halted = 0;
++    cpu_halted_set(target_cpu_state, 0);
+ 
+     if (info->target_aa64) {
+         if ((info->target_el < 3) && arm_feature(&target_cpu->env,
+@@ -228,7 +228,7 @@ static void arm_set_cpu_off_async_work(CPUState *target_cpu_state,
+ 
+     assert(qemu_mutex_iothread_locked());
+     target_cpu->power_state = PSCI_OFF;
+-    target_cpu_state->halted = 1;
++    cpu_halted_set(target_cpu_state, 1);
+     target_cpu_state->exception_index = EXCP_HLT;
+ }
+ 
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index b5e61cc177..9c5cda8eb7 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -149,7 +149,7 @@ static void arm_cpu_reset(CPUState *s)
+     env->vfp.xregs[ARM_VFP_MVFR2] = cpu->mvfr2;
+ 
+     cpu->power_state = cpu->start_powered_off ? PSCI_OFF : PSCI_ON;
+-    s->halted = cpu->start_powered_off;
++    cpu_halted_set(s, cpu->start_powered_off);
+ 
+     if (arm_feature(env, ARM_FEATURE_IWMMXT)) {
+         env->iwmmxt.cregs[ARM_IWMMXT_wCID] = 0x69051000 | 'Q';
+diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+index fb15a13e6c..8e393823f8 100644
+--- a/target/arm/op_helper.c
++++ b/target/arm/op_helper.c
+@@ -465,7 +465,7 @@ void HELPER(wfi)(CPUARMState *env, uint32_t insn_len)
+     }
+ 
+     cs->exception_index = EXCP_HLT;
+-    cs->halted = 1;
++    cpu_halted_set(cs, 1);
+     cpu_loop_exit(cs);
+ }
+ 
 -- 
 2.17.1
