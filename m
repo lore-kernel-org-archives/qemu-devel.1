@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60142)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59966)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFh5V-0003ub-Vw
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:58:19 -0400
+	(envelope-from <cota@braap.org>) id 1gFh5N-0003lE-Pl
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:58:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFguW-0007gA-Gj
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:46:58 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:56941)
+	(envelope-from <cota@braap.org>) id 1gFgvE-0008BZ-DT
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:42 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:41141)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gFguV-0007TS-EV
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:46:55 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gFgvE-00082e-2w
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:40 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 25 Oct 2018 10:45:34 -0400
-Message-Id: <20181025144644.15464-1-cota@braap.org>
-Subject: [Qemu-devel] [RFC v4 01/71] cpu: convert queued work to a QSIMPLEQ
+Date: Thu, 25 Oct 2018 10:46:11 -0400
+Message-Id: <20181025144644.15464-38-cota@braap.org>
+In-Reply-To: <20181025144644.15464-1-cota@braap.org>
+References: <20181025144644.15464-1-cota@braap.org>
+Subject: [Qemu-devel] [RFC v4 38/71] i386/kvm: convert to
+ cpu_interrupt_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,141 +27,165 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
 
-Instead of open-coding it.
-
-While at it, make sure that all accesses to the list are
-performed while holding the list's lock.
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- include/qom/cpu.h |  6 +++---
- cpus-common.c     | 25 ++++++++-----------------
- cpus.c            | 14 ++++++++++++--
- qom/cpu.c         |  1 +
- 4 files changed, 24 insertions(+), 22 deletions(-)
+ target/i386/kvm.c | 54 +++++++++++++++++++++++++++--------------------
+ 1 file changed, 31 insertions(+), 23 deletions(-)
 
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index dc130cd307..53488b202f 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -315,8 +315,8 @@ struct qemu_work_item;
-  * @mem_io_pc: Host Program Counter at which the memory was accessed.
-  * @mem_io_vaddr: Target virtual address at which the memory was accessed.
-  * @kvm_fd: vCPU file descriptor for KVM.
-- * @work_mutex: Lock to prevent multiple access to queued_work_*.
-- * @queued_work_first: First asynchronous work pending.
-+ * @work_mutex: Lock to prevent multiple access to @work_list.
-+ * @work_list: List of pending asynchronous work.
-  * @trace_dstate_delayed: Delayed changes to trace_dstate (includes all changes
-  *                        to @trace_dstate).
-  * @trace_dstate: Dynamic tracing state of events for this vCPU (bitmask).
-@@ -357,7 +357,7 @@ struct CPUState {
-     sigjmp_buf jmp_env;
- 
-     QemuMutex work_mutex;
--    struct qemu_work_item *queued_work_first, *queued_work_last;
-+    QSIMPLEQ_HEAD(, qemu_work_item) work_list;
- 
-     CPUAddressSpace *cpu_ases;
-     int num_ases;
-diff --git a/cpus-common.c b/cpus-common.c
-index 98dd8c6ff1..a2a6cd93a1 100644
---- a/cpus-common.c
-+++ b/cpus-common.c
-@@ -107,7 +107,7 @@ void cpu_list_remove(CPUState *cpu)
- }
- 
- struct qemu_work_item {
--    struct qemu_work_item *next;
-+    QSIMPLEQ_ENTRY(qemu_work_item) node;
-     run_on_cpu_func func;
-     run_on_cpu_data data;
-     bool free, exclusive, done;
-@@ -116,13 +116,7 @@ struct qemu_work_item {
- static void queue_work_on_cpu(CPUState *cpu, struct qemu_work_item *wi)
- {
-     qemu_mutex_lock(&cpu->work_mutex);
--    if (cpu->queued_work_first == NULL) {
--        cpu->queued_work_first = wi;
--    } else {
--        cpu->queued_work_last->next = wi;
--    }
--    cpu->queued_work_last = wi;
--    wi->next = NULL;
-+    QSIMPLEQ_INSERT_TAIL(&cpu->work_list, wi, node);
-     wi->done = false;
-     qemu_mutex_unlock(&cpu->work_mutex);
- 
-@@ -314,17 +308,14 @@ void process_queued_cpu_work(CPUState *cpu)
- {
-     struct qemu_work_item *wi;
- 
--    if (cpu->queued_work_first == NULL) {
-+    qemu_mutex_lock(&cpu->work_mutex);
-+    if (QSIMPLEQ_EMPTY(&cpu->work_list)) {
-+        qemu_mutex_unlock(&cpu->work_mutex);
-         return;
-     }
--
--    qemu_mutex_lock(&cpu->work_mutex);
--    while (cpu->queued_work_first != NULL) {
--        wi = cpu->queued_work_first;
--        cpu->queued_work_first = wi->next;
--        if (!cpu->queued_work_first) {
--            cpu->queued_work_last = NULL;
--        }
-+    while (!QSIMPLEQ_EMPTY(&cpu->work_list)) {
-+        wi = QSIMPLEQ_FIRST(&cpu->work_list);
-+        QSIMPLEQ_REMOVE_HEAD(&cpu->work_list, node);
-         qemu_mutex_unlock(&cpu->work_mutex);
-         if (wi->exclusive) {
-             /* Running work items outside the BQL avoids the following deadlock:
-diff --git a/cpus.c b/cpus.c
-index cce64874e6..6d86522031 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -88,9 +88,19 @@ bool cpu_is_stopped(CPUState *cpu)
-     return cpu->stopped || !runstate_is_running();
- }
- 
-+static inline bool cpu_work_list_empty(CPUState *cpu)
-+{
-+    bool ret;
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index effaf87f01..f4b96d6963 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -2704,11 +2704,14 @@ static int kvm_put_vcpu_events(X86CPU *cpu, int level)
+         events.smi.smm = !!(env->hflags & HF_SMM_MASK);
+         events.smi.smm_inside_nmi = !!(env->hflags2 & HF2_SMM_INSIDE_NMI_MASK);
+         if (kvm_irqchip_in_kernel()) {
++            uint32_t interrupt_request;
 +
-+    qemu_mutex_lock(&cpu->work_mutex);
-+    ret = QSIMPLEQ_EMPTY(&cpu->work_list);
-+    qemu_mutex_unlock(&cpu->work_mutex);
-+    return ret;
-+}
-+
- static bool cpu_thread_is_idle(CPUState *cpu)
+             /* As soon as these are moved to the kernel, remove them
+              * from cs->interrupt_request.
+              */
+-            events.smi.pending = cs->interrupt_request & CPU_INTERRUPT_SMI;
+-            events.smi.latched_init = cs->interrupt_request & CPU_INTERRUPT_INIT;
++            interrupt_request = cpu_interrupt_request(cs);
++            events.smi.pending = interrupt_request & CPU_INTERRUPT_SMI;
++            events.smi.latched_init = interrupt_request & CPU_INTERRUPT_INIT;
+             cpu_reset_interrupt(cs, CPU_INTERRUPT_INIT | CPU_INTERRUPT_SMI);
+         } else {
+             /* Keep these in cs->interrupt_request.  */
+@@ -2999,14 +3002,14 @@ void kvm_arch_pre_run(CPUState *cpu, struct kvm_run *run)
  {
--    if (cpu->stop || cpu->queued_work_first) {
-+    if (cpu->stop || !cpu_work_list_empty(cpu)) {
-         return false;
-     }
-     if (cpu_is_stopped(cpu)) {
-@@ -1509,7 +1519,7 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
-             cpu = first_cpu;
+     X86CPU *x86_cpu = X86_CPU(cpu);
+     CPUX86State *env = &x86_cpu->env;
++    uint32_t interrupt_request;
+     int ret;
+ 
++    interrupt_request = cpu_interrupt_request(cpu);
+     /* Inject NMI */
+-    if (cpu->interrupt_request & (CPU_INTERRUPT_NMI | CPU_INTERRUPT_SMI)) {
+-        if (cpu->interrupt_request & CPU_INTERRUPT_NMI) {
+-            qemu_mutex_lock_iothread();
++    if (interrupt_request & (CPU_INTERRUPT_NMI | CPU_INTERRUPT_SMI)) {
++        if (interrupt_request & CPU_INTERRUPT_NMI) {
+             cpu_reset_interrupt(cpu, CPU_INTERRUPT_NMI);
+-            qemu_mutex_unlock_iothread();
+             DPRINTF("injected NMI\n");
+             ret = kvm_vcpu_ioctl(cpu, KVM_NMI);
+             if (ret < 0) {
+@@ -3014,10 +3017,8 @@ void kvm_arch_pre_run(CPUState *cpu, struct kvm_run *run)
+                         strerror(-ret));
+             }
          }
+-        if (cpu->interrupt_request & CPU_INTERRUPT_SMI) {
+-            qemu_mutex_lock_iothread();
++        if (interrupt_request & CPU_INTERRUPT_SMI) {
+             cpu_reset_interrupt(cpu, CPU_INTERRUPT_SMI);
+-            qemu_mutex_unlock_iothread();
+             DPRINTF("injected SMI\n");
+             ret = kvm_vcpu_ioctl(cpu, KVM_SMI);
+             if (ret < 0) {
+@@ -3031,16 +3032,18 @@ void kvm_arch_pre_run(CPUState *cpu, struct kvm_run *run)
+         qemu_mutex_lock_iothread();
+     }
  
--        while (cpu && !cpu->queued_work_first && !cpu->exit_request) {
-+        while (cpu && cpu_work_list_empty(cpu) && !cpu->exit_request) {
++    interrupt_request = cpu_interrupt_request(cpu);
++
+     /* Force the VCPU out of its inner loop to process any INIT requests
+      * or (for userspace APIC, but it is cheap to combine the checks here)
+      * pending TPR access reports.
+      */
+-    if (cpu->interrupt_request & (CPU_INTERRUPT_INIT | CPU_INTERRUPT_TPR)) {
+-        if ((cpu->interrupt_request & CPU_INTERRUPT_INIT) &&
++    if (interrupt_request & (CPU_INTERRUPT_INIT | CPU_INTERRUPT_TPR)) {
++        if ((interrupt_request & CPU_INTERRUPT_INIT) &&
+             !(env->hflags & HF_SMM_MASK)) {
+             cpu->exit_request = 1;
+         }
+-        if (cpu->interrupt_request & CPU_INTERRUPT_TPR) {
++        if (interrupt_request & CPU_INTERRUPT_TPR) {
+             cpu->exit_request = 1;
+         }
+     }
+@@ -3048,7 +3051,7 @@ void kvm_arch_pre_run(CPUState *cpu, struct kvm_run *run)
+     if (!kvm_pic_in_kernel()) {
+         /* Try to inject an interrupt if the guest can accept it */
+         if (run->ready_for_interrupt_injection &&
+-            (cpu->interrupt_request & CPU_INTERRUPT_HARD) &&
++            (interrupt_request & CPU_INTERRUPT_HARD) &&
+             (env->eflags & IF_MASK)) {
+             int irq;
  
-             atomic_mb_set(&tcg_current_rr_cpu, cpu);
-             current_cpu = cpu;
-diff --git a/qom/cpu.c b/qom/cpu.c
-index 20ad54d43f..c47169896e 100644
---- a/qom/cpu.c
-+++ b/qom/cpu.c
-@@ -373,6 +373,7 @@ static void cpu_common_initfn(Object *obj)
-     cpu->nr_threads = 1;
+@@ -3072,7 +3075,7 @@ void kvm_arch_pre_run(CPUState *cpu, struct kvm_run *run)
+          * interrupt, request an interrupt window exit.  This will
+          * cause a return to userspace as soon as the guest is ready to
+          * receive interrupts. */
+-        if ((cpu->interrupt_request & CPU_INTERRUPT_HARD)) {
++        if ((cpu_interrupt_request(cpu) & CPU_INTERRUPT_HARD)) {
+             run->request_interrupt_window = 1;
+         } else {
+             run->request_interrupt_window = 0;
+@@ -3118,8 +3121,9 @@ int kvm_arch_process_async_events(CPUState *cs)
+ {
+     X86CPU *cpu = X86_CPU(cs);
+     CPUX86State *env = &cpu->env;
++    uint32_t interrupt_request;
  
-     qemu_mutex_init(&cpu->work_mutex);
-+    QSIMPLEQ_INIT(&cpu->work_list);
-     QTAILQ_INIT(&cpu->breakpoints);
-     QTAILQ_INIT(&cpu->watchpoints);
+-    if (cs->interrupt_request & CPU_INTERRUPT_MCE) {
++    if (cpu_interrupt_request(cs) & CPU_INTERRUPT_MCE) {
+         /* We must not raise CPU_INTERRUPT_MCE if it's not supported. */
+         assert(env->mcg_cap);
  
+@@ -3142,7 +3146,7 @@ int kvm_arch_process_async_events(CPUState *cs)
+         }
+     }
+ 
+-    if ((cs->interrupt_request & CPU_INTERRUPT_INIT) &&
++    if ((cpu_interrupt_request(cs) & CPU_INTERRUPT_INIT) &&
+         !(env->hflags & HF_SMM_MASK)) {
+         kvm_cpu_synchronize_state(cs);
+         do_cpu_init(cpu);
+@@ -3152,20 +3156,21 @@ int kvm_arch_process_async_events(CPUState *cs)
+         return 0;
+     }
+ 
+-    if (cs->interrupt_request & CPU_INTERRUPT_POLL) {
++    if (cpu_interrupt_request(cs) & CPU_INTERRUPT_POLL) {
+         cpu_reset_interrupt(cs, CPU_INTERRUPT_POLL);
+         apic_poll_irq(cpu->apic_state);
+     }
+-    if (((cs->interrupt_request & CPU_INTERRUPT_HARD) &&
++    interrupt_request = cpu_interrupt_request(cs);
++    if (((interrupt_request & CPU_INTERRUPT_HARD) &&
+          (env->eflags & IF_MASK)) ||
+-        (cs->interrupt_request & CPU_INTERRUPT_NMI)) {
++        (interrupt_request & CPU_INTERRUPT_NMI)) {
+         cpu_halted_set(cs, 0);
+     }
+-    if (cs->interrupt_request & CPU_INTERRUPT_SIPI) {
++    if (interrupt_request & CPU_INTERRUPT_SIPI) {
+         kvm_cpu_synchronize_state(cs);
+         do_cpu_sipi(cpu);
+     }
+-    if (cs->interrupt_request & CPU_INTERRUPT_TPR) {
++    if (cpu_interrupt_request(cs) & CPU_INTERRUPT_TPR) {
+         cpu_reset_interrupt(cs, CPU_INTERRUPT_TPR);
+         kvm_cpu_synchronize_state(cs);
+         apic_handle_tpr_access_report(cpu->apic_state, env->eip,
+@@ -3179,10 +3184,13 @@ static int kvm_handle_halt(X86CPU *cpu)
+ {
+     CPUState *cs = CPU(cpu);
+     CPUX86State *env = &cpu->env;
++    uint32_t interrupt_request;
++
++    interrupt_request = cpu_interrupt_request(cs);
+ 
+-    if (!((cs->interrupt_request & CPU_INTERRUPT_HARD) &&
++    if (!((interrupt_request & CPU_INTERRUPT_HARD) &&
+           (env->eflags & IF_MASK)) &&
+-        !(cs->interrupt_request & CPU_INTERRUPT_NMI)) {
++        !(interrupt_request & CPU_INTERRUPT_NMI)) {
+         cpu_halted_set(cs, 1);
+         return EXCP_HLT;
+     }
 -- 
 2.17.1
