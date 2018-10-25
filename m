@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gFfnh-00032N-Ri
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 09:35:55 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gFfnt-0003Cq-L7
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 09:36:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gFfnf-00008d-P7
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 09:35:49 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gFfno-0000Gz-3p
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 09:35:57 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 25 Oct 2018 10:32:37 -0300
-Message-Id: <20181025133301.16578-20-ehabkost@redhat.com>
+Date: Thu, 25 Oct 2018 10:32:32 -0300
+Message-Id: <20181025133301.16578-15-ehabkost@redhat.com>
 In-Reply-To: <20181025133301.16578-1-ehabkost@redhat.com>
 References: <20181025133301.16578-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 19/43] memory-device: improve "range
- conflicts" error message
+Subject: [Qemu-devel] [PULL v2 14/43] hw/hppa/dino: Remove unuseful code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,38 +23,39 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Rob Herring <robh@kernel.org>, libvir-list@redhat.com, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-arm@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Markus Armbruster <armbru@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Eduardo Habkost <ehabkost@redhat.com>, Michael Walle <michael@walle.cc>, Thomas Huth <thuth@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Alistair Francis <alistair@alistair23.me>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Laurent Vivier <lvivier@redhat.com>, qemu-ppc@nongnu.org, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Max Filippov <jcmvbkbc@gmail.com>, David Hildenbrand <david@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Rob Herring <robh@kernel.org>, libvir-list@redhat.com, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-arm@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Markus Armbruster <armbru@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Eduardo Habkost <ehabkost@redhat.com>, Michael Walle <michael@walle.cc>, Thomas Huth <thuth@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Alistair Francis <alistair@alistair23.me>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Laurent Vivier <lvivier@redhat.com>, qemu-ppc@nongnu.org, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Max Filippov <jcmvbkbc@gmail.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-From: David Hildenbrand <david@redhat.com>
+From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Handle id=3D=3DNULL better and indicate that we are dealing with memory
-devices.
-
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20181005092024.14344-4-david@redhat.com>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20181002212522.23303-12-f4bug@amsat.org>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/mem/memory-device.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ hw/hppa/dino.c | 7 -------
+ 1 file changed, 7 deletions(-)
 
-diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
-index 7c706fadfc..0624184c40 100644
---- a/hw/mem/memory-device.c
-+++ b/hw/mem/memory-device.c
-@@ -175,7 +175,8 @@ uint64_t memory_device_get_free_addr(MachineState *ms=
-, const uint64_t *hint,
-         if (ranges_overlap(md_addr, md_size, new_addr, size)) {
-             if (hint) {
-                 const DeviceState *d =3D DEVICE(md);
--                error_setg(errp, "address range conflicts with '%s'", d-=
->id);
-+                error_setg(errp, "address range conflicts with memory de=
-vice"
-+                           " id=3D'%s'", d->id ? d->id : "(unnamed)");
-                 goto out;
-             }
-             new_addr =3D QEMU_ALIGN_UP(md_addr + md_size, align);
+diff --git a/hw/hppa/dino.c b/hw/hppa/dino.c
+index 564b938e3a..31e09942b5 100644
+--- a/hw/hppa/dino.c
++++ b/hw/hppa/dino.c
+@@ -488,17 +488,10 @@ PCIBus *dino_init(MemoryRegion *addr_space,
+     return b;
+ }
+=20
+-static int dino_pcihost_init(SysBusDevice *dev)
+-{
+-    return 0;
+-}
+-
+ static void dino_pcihost_class_init(ObjectClass *klass, void *data)
+ {
+-    SysBusDeviceClass *k =3D SYS_BUS_DEVICE_CLASS(klass);
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+=20
+-    k->init =3D dino_pcihost_init;
+     dc->vmsd =3D &vmstate_dino;
+ }
+=20
 --=20
 2.18.0.rc1.1.g3f1ff2140
