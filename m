@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48787)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gFda0-0006fS-Qk
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gFda0-0006fU-Qj
 	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 07:13:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gFdZj-0000nE-PE
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gFdZj-0000n7-Oy
 	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 07:13:24 -0400
 From: Peng Hao <peng.hao2@zte.com.cn>
-Date: Fri, 26 Oct 2018 03:23:12 +0800
-Message-Id: <1540495397-88089-1-git-send-email-peng.hao2@zte.com.cn>
+Date: Fri, 26 Oct 2018 03:23:14 +0800
+Message-Id: <1540495397-88089-3-git-send-email-peng.hao2@zte.com.cn>
+In-Reply-To: <1540495397-88089-1-git-send-email-peng.hao2@zte.com.cn>
+References: <1540495397-88089-1-git-send-email-peng.hao2@zte.com.cn>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH V4 0/5]
+Subject: [Qemu-devel] [PATCH V4 2/5]  hw/misc/pvpanic: Cosmetic renaming
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,49 +23,77 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, philmd@redhat.com
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Peng Hao <peng.hao2@zte.com.cn>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org
 
-The first patches are simple cleanups:
-- patch 1 move the pvpanic device with the 'ocmmon objects' so we compile
-  it once for the x86/arm/aarch64 archs,
-- patch 2 simply renames ISA fields/definitions to generic ones.
+From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Then instead of add/use the MMIO pvpanic device in the virt machine in an
-unique patch, I split it in two distinct patches:
-- patch 3 uses Peng Hao's work, but add the MMIO interface to the existing
-  device (no logical change).
-- patch 4 is Peng Hao's work in the virt machine (no logical change).
-- patch 5 add pvpanic device in acpi table in virt machine
-v2 from Peng Hao is:
-https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg03433.html
+To ease the MMIO device addition in the next patch, rename:
+- ISA=5FPVPANIC=5FDEVICE -> PVPANIC (this just returns a generic Object),
+- ISADevice parent=5Fobj -> isadev,
+- MemoryRegion io -> mr.
 
-v3 --> v4
-  patch 1,2 no modification.
-  patch 3, add TYPE=5FPANIC=5FMMIO for distinguishing different bus device,
-           virt + isa=5Fpvpanic will abnormally terminate virtual machine. =
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ hw/misc/pvpanic.c | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
 
-  patch 4, "pvpanic,mmio" --> "qemu,pvpanic-mmio".
-  patch 5, newly added.
-
-
-Philippe Mathieu-Daud=C3=A9 (2):
-  hw/misc/pvpanic: Build the pvpanic device in $(common-obj)
-  hw/misc/pvpanic: Cosmetic renaming
-
-Peng Hao (3):
-  hw/misc/pvpanic: Add the MMIO interface
-  hw/arm/virt: Use the pvpanic device
-  hw/arm/virt: add pvpanic device in virt acpi table
-
- default-configs/aarch64-softmmu.mak |  1 +
- hw/arm/virt-acpi-build.c            | 16 ++++++++
- hw/arm/virt.c                       | 21 ++++++++++
- hw/misc/Makefile.objs               |  2 +-
- hw/misc/pvpanic.c                   | 78 ++++++++++++++++++++++++++++++---=
-----
- include/hw/arm/virt.h               |  1 +
- include/hw/misc/pvpanic.h           |  2 +
- 7 files changed, 105 insertions(+), 16 deletions(-)
-
+diff --git a/hw/misc/pvpanic.c b/hw/misc/pvpanic.c
+index 9d8961b..dd3aef2 100644
+--- a/hw/misc/pvpanic.c
++++ b/hw/misc/pvpanic.c
+@@ -25,7 +25,7 @@
+ /* The pv event value */
+ #define PVPANIC=5FPANICKED        (1 << PVPANIC=5FF=5FPANICKED)
+=20
+-#define ISA=5FPVPANIC=5FDEVICE(obj)    \
++#define PVPANIC(obj)    \
+     OBJECT=5FCHECK(PVPanicState, (obj), TYPE=5FPVPANIC)
+=20
+ static void handle=5Fevent(int event)
+@@ -46,9 +46,11 @@ static void handle=5Fevent(int event)
+ #include "hw/isa/isa.h"
+=20
+ typedef struct PVPanicState {
+-    ISADevice parent=5Fobj;
++    /* private */
++    ISADevice isadev;
+=20
+-    MemoryRegion io;
++    /* public */
++    MemoryRegion mr;
+     uint16=5Ft ioport;
+ } PVPanicState;
+=20
+@@ -75,15 +77,15 @@ static const MemoryRegionOps pvpanic=5Fops =3D {
+=20
+ static void pvpanic=5Fisa=5Finitfn(Object *obj)
+ {
+-    PVPanicState *s =3D ISA=5FPVPANIC=5FDEVICE(obj);
++    PVPanicState *s =3D PVPANIC(obj);
+=20
+-    memory=5Fregion=5Finit=5Fio(&s->io, OBJECT(s), &pvpanic=5Fops, s, "pvp=
+anic", 1);
++    memory=5Fregion=5Finit=5Fio(&s->mr, OBJECT(s), &pvpanic=5Fops, s, "pvp=
+anic", 1);
+ }
+=20
+ static void pvpanic=5Fisa=5Frealizefn(DeviceState *dev, Error **errp)
+ {
+     ISADevice *d =3D ISA=5FDEVICE(dev);
+-    PVPanicState *s =3D ISA=5FPVPANIC=5FDEVICE(dev);
++    PVPanicState *s =3D PVPANIC(dev);
+     FWCfgState *fw=5Fcfg =3D fw=5Fcfg=5Ffind();
+     uint16=5Ft *pvpanic=5Fport;
+=20
+@@ -96,7 +98,7 @@ static void pvpanic=5Fisa=5Frealizefn(DeviceState *dev, E=
+rror **errp)
+     fw=5Fcfg=5Fadd=5Ffile(fw=5Fcfg, "etc/pvpanic-port", pvpanic=5Fport,
+                     sizeof(*pvpanic=5Fport));
+=20
+-    isa=5Fregister=5Fioport(d, &s->io, s->ioport);
++    isa=5Fregister=5Fioport(d, &s->mr, s->ioport);
+ }
+=20
+ static Property pvpanic=5Fisa=5Fproperties[] =3D {
 --=20
 1.8.3.1
