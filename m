@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59966)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFh5N-0003lE-Pl
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:58:12 -0400
+	(envelope-from <cota@braap.org>) id 1gFh5P-0003ub-3S
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:58:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFgvE-0008BZ-DT
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:42 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:41141)
+	(envelope-from <cota@braap.org>) id 1gFgv7-00087k-ES
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:35 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:45029)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gFgvE-00082e-2w
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:40 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gFgv6-0007qC-Ju
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:32 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 25 Oct 2018 10:46:11 -0400
-Message-Id: <20181025144644.15464-38-cota@braap.org>
+Date: Thu, 25 Oct 2018 10:45:55 -0400
+Message-Id: <20181025144644.15464-22-cota@braap.org>
 In-Reply-To: <20181025144644.15464-1-cota@braap.org>
 References: <20181025144644.15464-1-cota@braap.org>
-Subject: [Qemu-devel] [RFC v4 38/71] i386/kvm: convert to
- cpu_interrupt_request
+Subject: [Qemu-devel] [RFC v4 22/71] mips: convert to cpu_halted
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,167 +24,130 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>, James Hogan <jhogan@kernel.org>
 
+Cc: Aurelien Jarno <aurelien@aurel32.net>
+Cc: Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: James Hogan <jhogan@kernel.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/i386/kvm.c | 54 +++++++++++++++++++++++++++--------------------
- 1 file changed, 31 insertions(+), 23 deletions(-)
+ hw/mips/cps.c           | 2 +-
+ hw/misc/mips_itu.c      | 4 ++--
+ target/mips/kvm.c       | 2 +-
+ target/mips/op_helper.c | 8 ++++----
+ target/mips/translate.c | 4 ++--
+ 5 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index effaf87f01..f4b96d6963 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -2704,11 +2704,14 @@ static int kvm_put_vcpu_events(X86CPU *cpu, int level)
-         events.smi.smm = !!(env->hflags & HF_SMM_MASK);
-         events.smi.smm_inside_nmi = !!(env->hflags2 & HF2_SMM_INSIDE_NMI_MASK);
-         if (kvm_irqchip_in_kernel()) {
-+            uint32_t interrupt_request;
-+
-             /* As soon as these are moved to the kernel, remove them
-              * from cs->interrupt_request.
-              */
--            events.smi.pending = cs->interrupt_request & CPU_INTERRUPT_SMI;
--            events.smi.latched_init = cs->interrupt_request & CPU_INTERRUPT_INIT;
-+            interrupt_request = cpu_interrupt_request(cs);
-+            events.smi.pending = interrupt_request & CPU_INTERRUPT_SMI;
-+            events.smi.latched_init = interrupt_request & CPU_INTERRUPT_INIT;
-             cpu_reset_interrupt(cs, CPU_INTERRUPT_INIT | CPU_INTERRUPT_SMI);
-         } else {
-             /* Keep these in cs->interrupt_request.  */
-@@ -2999,14 +3002,14 @@ void kvm_arch_pre_run(CPUState *cpu, struct kvm_run *run)
+diff --git a/hw/mips/cps.c b/hw/mips/cps.c
+index 4285d1964e..a8b27eee78 100644
+--- a/hw/mips/cps.c
++++ b/hw/mips/cps.c
+@@ -49,7 +49,7 @@ static void main_cpu_reset(void *opaque)
+     cpu_reset(cs);
+ 
+     /* All VPs are halted on reset. Leave powering up to CPC. */
+-    cs->halted = 1;
++    cpu_halted_set(cs, 1);
+ }
+ 
+ static bool cpu_mips_itu_supported(CPUMIPSState *env)
+diff --git a/hw/misc/mips_itu.c b/hw/misc/mips_itu.c
+index 43bbec46cf..7c383939a7 100644
+--- a/hw/misc/mips_itu.c
++++ b/hw/misc/mips_itu.c
+@@ -162,7 +162,7 @@ static void wake_blocked_threads(ITCStorageCell *c)
  {
-     X86CPU *x86_cpu = X86_CPU(cpu);
-     CPUX86State *env = &x86_cpu->env;
-+    uint32_t interrupt_request;
-     int ret;
- 
-+    interrupt_request = cpu_interrupt_request(cpu);
-     /* Inject NMI */
--    if (cpu->interrupt_request & (CPU_INTERRUPT_NMI | CPU_INTERRUPT_SMI)) {
--        if (cpu->interrupt_request & CPU_INTERRUPT_NMI) {
--            qemu_mutex_lock_iothread();
-+    if (interrupt_request & (CPU_INTERRUPT_NMI | CPU_INTERRUPT_SMI)) {
-+        if (interrupt_request & CPU_INTERRUPT_NMI) {
-             cpu_reset_interrupt(cpu, CPU_INTERRUPT_NMI);
--            qemu_mutex_unlock_iothread();
-             DPRINTF("injected NMI\n");
-             ret = kvm_vcpu_ioctl(cpu, KVM_NMI);
-             if (ret < 0) {
-@@ -3014,10 +3017,8 @@ void kvm_arch_pre_run(CPUState *cpu, struct kvm_run *run)
-                         strerror(-ret));
-             }
-         }
--        if (cpu->interrupt_request & CPU_INTERRUPT_SMI) {
--            qemu_mutex_lock_iothread();
-+        if (interrupt_request & CPU_INTERRUPT_SMI) {
-             cpu_reset_interrupt(cpu, CPU_INTERRUPT_SMI);
--            qemu_mutex_unlock_iothread();
-             DPRINTF("injected SMI\n");
-             ret = kvm_vcpu_ioctl(cpu, KVM_SMI);
-             if (ret < 0) {
-@@ -3031,16 +3032,18 @@ void kvm_arch_pre_run(CPUState *cpu, struct kvm_run *run)
-         qemu_mutex_lock_iothread();
-     }
- 
-+    interrupt_request = cpu_interrupt_request(cpu);
-+
-     /* Force the VCPU out of its inner loop to process any INIT requests
-      * or (for userspace APIC, but it is cheap to combine the checks here)
-      * pending TPR access reports.
-      */
--    if (cpu->interrupt_request & (CPU_INTERRUPT_INIT | CPU_INTERRUPT_TPR)) {
--        if ((cpu->interrupt_request & CPU_INTERRUPT_INIT) &&
-+    if (interrupt_request & (CPU_INTERRUPT_INIT | CPU_INTERRUPT_TPR)) {
-+        if ((interrupt_request & CPU_INTERRUPT_INIT) &&
-             !(env->hflags & HF_SMM_MASK)) {
-             cpu->exit_request = 1;
-         }
--        if (cpu->interrupt_request & CPU_INTERRUPT_TPR) {
-+        if (interrupt_request & CPU_INTERRUPT_TPR) {
-             cpu->exit_request = 1;
+     CPUState *cs;
+     CPU_FOREACH(cs) {
+-        if (cs->halted && (c->blocked_threads & (1ULL << cs->cpu_index))) {
++        if (cpu_halted(cs) && (c->blocked_threads & (1ULL << cs->cpu_index))) {
+             cpu_interrupt(cs, CPU_INTERRUPT_WAKE);
          }
      }
-@@ -3048,7 +3051,7 @@ void kvm_arch_pre_run(CPUState *cpu, struct kvm_run *run)
-     if (!kvm_pic_in_kernel()) {
-         /* Try to inject an interrupt if the guest can accept it */
-         if (run->ready_for_interrupt_injection &&
--            (cpu->interrupt_request & CPU_INTERRUPT_HARD) &&
-+            (interrupt_request & CPU_INTERRUPT_HARD) &&
-             (env->eflags & IF_MASK)) {
-             int irq;
- 
-@@ -3072,7 +3075,7 @@ void kvm_arch_pre_run(CPUState *cpu, struct kvm_run *run)
-          * interrupt, request an interrupt window exit.  This will
-          * cause a return to userspace as soon as the guest is ready to
-          * receive interrupts. */
--        if ((cpu->interrupt_request & CPU_INTERRUPT_HARD)) {
-+        if ((cpu_interrupt_request(cpu) & CPU_INTERRUPT_HARD)) {
-             run->request_interrupt_window = 1;
-         } else {
-             run->request_interrupt_window = 0;
-@@ -3118,8 +3121,9 @@ int kvm_arch_process_async_events(CPUState *cs)
+@@ -172,7 +172,7 @@ static void wake_blocked_threads(ITCStorageCell *c)
+ static void QEMU_NORETURN block_thread_and_exit(ITCStorageCell *c)
  {
-     X86CPU *cpu = X86_CPU(cs);
-     CPUX86State *env = &cpu->env;
-+    uint32_t interrupt_request;
+     c->blocked_threads |= 1ULL << current_cpu->cpu_index;
+-    current_cpu->halted = 1;
++    cpu_halted_set(current_cpu, 1);
+     current_cpu->exception_index = EXCP_HLT;
+     cpu_loop_exit_restore(current_cpu, current_cpu->mem_io_pc);
+ }
+diff --git a/target/mips/kvm.c b/target/mips/kvm.c
+index 8e72850962..0b177a7577 100644
+--- a/target/mips/kvm.c
++++ b/target/mips/kvm.c
+@@ -156,7 +156,7 @@ MemTxAttrs kvm_arch_post_run(CPUState *cs, struct kvm_run *run)
  
--    if (cs->interrupt_request & CPU_INTERRUPT_MCE) {
-+    if (cpu_interrupt_request(cs) & CPU_INTERRUPT_MCE) {
-         /* We must not raise CPU_INTERRUPT_MCE if it's not supported. */
-         assert(env->mcg_cap);
- 
-@@ -3142,7 +3146,7 @@ int kvm_arch_process_async_events(CPUState *cs)
-         }
-     }
- 
--    if ((cs->interrupt_request & CPU_INTERRUPT_INIT) &&
-+    if ((cpu_interrupt_request(cs) & CPU_INTERRUPT_INIT) &&
-         !(env->hflags & HF_SMM_MASK)) {
-         kvm_cpu_synchronize_state(cs);
-         do_cpu_init(cpu);
-@@ -3152,20 +3156,21 @@ int kvm_arch_process_async_events(CPUState *cs)
-         return 0;
-     }
- 
--    if (cs->interrupt_request & CPU_INTERRUPT_POLL) {
-+    if (cpu_interrupt_request(cs) & CPU_INTERRUPT_POLL) {
-         cpu_reset_interrupt(cs, CPU_INTERRUPT_POLL);
-         apic_poll_irq(cpu->apic_state);
-     }
--    if (((cs->interrupt_request & CPU_INTERRUPT_HARD) &&
-+    interrupt_request = cpu_interrupt_request(cs);
-+    if (((interrupt_request & CPU_INTERRUPT_HARD) &&
-          (env->eflags & IF_MASK)) ||
--        (cs->interrupt_request & CPU_INTERRUPT_NMI)) {
-+        (interrupt_request & CPU_INTERRUPT_NMI)) {
-         cpu_halted_set(cs, 0);
-     }
--    if (cs->interrupt_request & CPU_INTERRUPT_SIPI) {
-+    if (interrupt_request & CPU_INTERRUPT_SIPI) {
-         kvm_cpu_synchronize_state(cs);
-         do_cpu_sipi(cpu);
-     }
--    if (cs->interrupt_request & CPU_INTERRUPT_TPR) {
-+    if (cpu_interrupt_request(cs) & CPU_INTERRUPT_TPR) {
-         cpu_reset_interrupt(cs, CPU_INTERRUPT_TPR);
-         kvm_cpu_synchronize_state(cs);
-         apic_handle_tpr_access_report(cpu->apic_state, env->eip,
-@@ -3179,10 +3184,13 @@ static int kvm_handle_halt(X86CPU *cpu)
+ int kvm_arch_process_async_events(CPUState *cs)
  {
-     CPUState *cs = CPU(cpu);
-     CPUX86State *env = &cpu->env;
-+    uint32_t interrupt_request;
-+
-+    interrupt_request = cpu_interrupt_request(cs);
+-    return cs->halted;
++    return cpu_halted(cs);
+ }
  
--    if (!((cs->interrupt_request & CPU_INTERRUPT_HARD) &&
-+    if (!((interrupt_request & CPU_INTERRUPT_HARD) &&
-           (env->eflags & IF_MASK)) &&
--        !(cs->interrupt_request & CPU_INTERRUPT_NMI)) {
-+        !(interrupt_request & CPU_INTERRUPT_NMI)) {
-         cpu_halted_set(cs, 1);
-         return EXCP_HLT;
-     }
+ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
+index c148b310cd..8904dfa2b4 100644
+--- a/target/mips/op_helper.c
++++ b/target/mips/op_helper.c
+@@ -649,7 +649,7 @@ static bool mips_vpe_is_wfi(MIPSCPU *c)
+ 
+     /* If the VPE is halted but otherwise active, it means it's waiting for
+        an interrupt.  */
+-    return cpu->halted && mips_vpe_active(env);
++    return cpu_halted(cpu) && mips_vpe_active(env);
+ }
+ 
+ static bool mips_vp_is_wfi(MIPSCPU *c)
+@@ -657,7 +657,7 @@ static bool mips_vp_is_wfi(MIPSCPU *c)
+     CPUState *cpu = CPU(c);
+     CPUMIPSState *env = &c->env;
+ 
+-    return cpu->halted && mips_vp_active(env);
++    return cpu_halted(cpu) && mips_vp_active(env);
+ }
+ 
+ static inline void mips_vpe_wake(MIPSCPU *c)
+@@ -674,7 +674,7 @@ static inline void mips_vpe_sleep(MIPSCPU *cpu)
+ 
+     /* The VPE was shut off, really go to bed.
+        Reset any old _WAKE requests.  */
+-    cs->halted = 1;
++    cpu_halted_set(cs, 1);
+     cpu_reset_interrupt(cs, CPU_INTERRUPT_WAKE);
+ }
+ 
+@@ -2519,7 +2519,7 @@ void helper_wait(CPUMIPSState *env)
+ {
+     CPUState *cs = CPU(mips_env_get_cpu(env));
+ 
+-    cs->halted = 1;
++    cpu_halted_set(cs, 1);
+     cpu_reset_interrupt(cs, CPU_INTERRUPT_WAKE);
+     /* Last instruction in the block, PC was updated before
+        - no need to recover PC and icount */
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index ab16cdb911..544e4dc19c 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -25753,7 +25753,7 @@ void cpu_state_reset(CPUMIPSState *env)
+             env->tcs[i].CP0_TCHalt = 1;
+         }
+         env->active_tc.CP0_TCHalt = 1;
+-        cs->halted = 1;
++        cpu_halted_set(cs, 1);
+ 
+         if (cs->cpu_index == 0) {
+             /* VPE0 starts up enabled.  */
+@@ -25761,7 +25761,7 @@ void cpu_state_reset(CPUMIPSState *env)
+             env->CP0_VPEConf0 |= (1 << CP0VPEC0_MVP) | (1 << CP0VPEC0_VPA);
+ 
+             /* TC0 starts up unhalted.  */
+-            cs->halted = 0;
++            cpu_halted_set(cs, 0);
+             env->active_tc.CP0_TCHalt = 0;
+             env->tcs[0].CP0_TCHalt = 0;
+             /* With thread 0 active.  */
 -- 
 2.17.1
