@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58419)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gFfoT-0003jW-QW
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 09:36:42 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gFfou-00042J-0H
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 09:37:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gFfoS-0000gE-Eq
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 09:36:37 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gFfos-0000zn-Ot
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 09:37:03 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 25 Oct 2018 10:32:42 -0300
-Message-Id: <20181025133301.16578-25-ehabkost@redhat.com>
+Date: Thu, 25 Oct 2018 10:32:43 -0300
+Message-Id: <20181025133301.16578-26-ehabkost@redhat.com>
 In-Reply-To: <20181025133301.16578-1-ehabkost@redhat.com>
 References: <20181025133301.16578-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL v2 24/43] memory-device: document
- MemoryDeviceClass
+Subject: [Qemu-devel] [PULL v2 25/43] memory-device: add and use
+ memory_device_get_region_size()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,73 +25,176 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Rob Her
 
 From: David Hildenbrand <david@redhat.com>
 
-Document the functions. Don't document get_region_size(), as we will be
-dropping/replacing that one soon.
+We will factor out get_memory_region() from pc-dimm to memory device code
+soon. Once that is done, get_region_size() can be implemented
+generically and essentially be replaced by
+memory_device_get_region_size (and work only on get_memory_region()).
 
-Use same documentation style as in include/exec/memory.h, but don't
-document the parameters, as they are self-explanatory.
+We have some users of get_memory_region() (spapr and pc-dimm code) that are
+only interested in the size. So let's rework them to use
+memory_device_get_region_size() first, then we can factor out
+get_memory_region() and eventually remove get_region_size() without
+touching the same code multiple times.
 
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20181005092024.14344-9-david@redhat.com>
+Message-Id: <20181005092024.14344-10-david@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- include/hw/mem/memory-device.h | 36 ++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ include/hw/mem/memory-device.h |  2 ++
+ hw/mem/memory-device.c         | 13 ++++++++++---
+ hw/mem/pc-dimm.c               | 10 ++++------
+ hw/ppc/spapr.c                 | 21 +++++++--------------
+ 4 files changed, 23 insertions(+), 23 deletions(-)
 
 diff --git a/include/hw/mem/memory-device.h b/include/hw/mem/memory-device.h
-index f02b229837..0474a3dd11 100644
+index 0474a3dd11..898df3057d 100644
 --- a/include/hw/mem/memory-device.h
 +++ b/include/hw/mem/memory-device.h
-@@ -29,12 +29,48 @@ typedef struct MemoryDeviceState {
-     Object parent_obj;
- } MemoryDeviceState;
+@@ -83,5 +83,7 @@ uint64_t memory_device_get_free_addr(MachineState *ms, const uint64_t *hint,
+ void memory_device_plug_region(MachineState *ms, MemoryRegion *mr,
+                                uint64_t addr);
+ void memory_device_unplug_region(MachineState *ms, MemoryRegion *mr);
++uint64_t memory_device_get_region_size(const MemoryDeviceState *md,
++                                       Error **errp);
  
-+/**
-+ * MemoryDeviceClass:
-+ *
-+ * All memory devices need to implement TYPE_MEMORY_DEVICE as an interface.
-+ *
-+ * A memory device is a device that owns a memory region which is
-+ * mapped into guest physical address space at a certain address. The
-+ * address in guest physical memory can either be specified explicitly
-+ * or get assigned automatically.
-+ */
- typedef struct MemoryDeviceClass {
-+    /* private */
-     InterfaceClass parent_class;
+ #endif
+diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
+index c1e1b81cf2..425830c65c 100644
+--- a/hw/mem/memory-device.c
++++ b/hw/mem/memory-device.c
+@@ -57,10 +57,9 @@ static int memory_device_used_region_size(Object *obj, void *opaque)
+     if (object_dynamic_cast(obj, TYPE_MEMORY_DEVICE)) {
+         const DeviceState *dev = DEVICE(obj);
+         const MemoryDeviceState *md = MEMORY_DEVICE(obj);
+-        const MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(obj);
  
-+    /*
-+     * Return the address of the memory device in guest physical memory.
-+     *
-+     * Called when (un)plugging a memory device or when iterating over
-+     * all memory devices mapped into guest physical address space.
-+     *
-+     * If "0" is returned, no address has been specified by the user and
-+     * no address has been assigned to this memory device yet.
-+     */
-     uint64_t (*get_addr)(const MemoryDeviceState *md);
+         if (dev->realized) {
+-            *size += mdc->get_region_size(md, &error_abort);
++            *size += memory_device_get_region_size(md, &error_abort);
+         }
+     }
+ 
+@@ -167,7 +166,7 @@ uint64_t memory_device_get_free_addr(MachineState *ms, const uint64_t *hint,
+         uint64_t md_size, md_addr;
+ 
+         md_addr = mdc->get_addr(md);
+-        md_size = mdc->get_region_size(md, &error_abort);
++        md_size = memory_device_get_region_size(md, &error_abort);
+ 
+         if (ranges_overlap(md_addr, md_size, new_addr, size)) {
+             if (hint) {
+@@ -266,6 +265,14 @@ void memory_device_unplug_region(MachineState *ms, MemoryRegion *mr)
+     memory_region_del_subregion(&ms->device_memory->mr, mr);
+ }
+ 
++uint64_t memory_device_get_region_size(const MemoryDeviceState *md,
++                                       Error **errp)
++{
++    MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(md);
 +
-+    /*
-+     * Return the amount of memory provided by the memory device currently
-+     * usable ("plugged") by the VM.
-+     *
-+     * Called when calculating the total amount of ram available to the
-+     * VM (e.g. to report memory stats to the user).
-+     *
-+     * This is helpful for devices that dynamically manage the amount of
-+     * memory accessible by the guest via the reserved memory region. For
-+     * most devices, this corresponds to the size of the memory region.
-+     */
-     uint64_t (*get_plugged_size)(const MemoryDeviceState *md, Error **errp);
-     uint64_t (*get_region_size)(const MemoryDeviceState *md, Error **errp);
++    return mdc->get_region_size(md, errp);
++}
 +
-+    /*
-+     * Translate the memory device into #MemoryDeviceInfo.
-+     */
-     void (*fill_device_info)(const MemoryDeviceState *md,
-                              MemoryDeviceInfo *info);
- } MemoryDeviceClass;
+ static const TypeInfo memory_device_info = {
+     .name          = TYPE_MEMORY_DEVICE,
+     .parent        = TYPE_INTERFACE,
+diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+index 130f78d0de..3e43ec8742 100644
+--- a/hw/mem/pc-dimm.c
++++ b/hw/mem/pc-dimm.c
+@@ -161,16 +161,14 @@ static Property pc_dimm_properties[] = {
+ static void pc_dimm_get_size(Object *obj, Visitor *v, const char *name,
+                              void *opaque, Error **errp)
+ {
++    Error *local_err = NULL;
+     uint64_t value;
+-    MemoryRegion *mr;
+-    PCDIMMDevice *dimm = PC_DIMM(obj);
+-    PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(obj);
+ 
+-    mr = ddc->get_memory_region(dimm, errp);
+-    if (!mr) {
++    value = memory_device_get_region_size(MEMORY_DEVICE(obj), &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
+         return;
+     }
+-    value = memory_region_size(mr);
+ 
+     visit_type_uint64(v, name, &value, errp);
+ }
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index c078347b66..c08130facb 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3128,12 +3128,10 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     Error *local_err = NULL;
+     sPAPRMachineState *ms = SPAPR_MACHINE(hotplug_dev);
+     PCDIMMDevice *dimm = PC_DIMM(dev);
+-    PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+-    MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
+     uint64_t size, addr;
+     uint32_t node;
+ 
+-    size = memory_region_size(mr);
++    size = memory_device_get_region_size(MEMORY_DEVICE(dev), &error_abort);
+ 
+     pc_dimm_plug(dimm, MACHINE(ms), &local_err);
+     if (local_err) {
+@@ -3169,9 +3167,7 @@ static void spapr_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     const sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(hotplug_dev);
+     sPAPRMachineState *spapr = SPAPR_MACHINE(hotplug_dev);
+     PCDIMMDevice *dimm = PC_DIMM(dev);
+-    PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+     Error *local_err = NULL;
+-    MemoryRegion *mr;
+     uint64_t size;
+     Object *memdev;
+     hwaddr pagesize;
+@@ -3181,11 +3177,11 @@ static void spapr_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+         return;
+     }
+ 
+-    mr = ddc->get_memory_region(dimm, errp);
+-    if (!mr) {
++    size = memory_device_get_region_size(MEMORY_DEVICE(dimm), &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
+         return;
+     }
+-    size = memory_region_size(mr);
+ 
+     if (size % SPAPR_MEMORY_BLOCK_SIZE) {
+         error_setg(errp, "Hotplugged memory size must be a multiple of "
+@@ -3257,9 +3253,8 @@ static sPAPRDIMMState *spapr_recover_pending_dimm_state(sPAPRMachineState *ms,
+                                                         PCDIMMDevice *dimm)
+ {
+     sPAPRDRConnector *drc;
+-    PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+-    MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
+-    uint64_t size = memory_region_size(mr);
++    uint64_t size = memory_device_get_region_size(MEMORY_DEVICE(dimm),
++                                                  &error_abort);
+     uint32_t nr_lmbs = size / SPAPR_MEMORY_BLOCK_SIZE;
+     uint32_t avail_lmbs = 0;
+     uint64_t addr_start, addr;
+@@ -3325,14 +3320,12 @@ static void spapr_memory_unplug_request(HotplugHandler *hotplug_dev,
+     sPAPRMachineState *spapr = SPAPR_MACHINE(hotplug_dev);
+     Error *local_err = NULL;
+     PCDIMMDevice *dimm = PC_DIMM(dev);
+-    PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+-    MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
+     uint32_t nr_lmbs;
+     uint64_t size, addr_start, addr;
+     int i;
+     sPAPRDRConnector *drc;
+ 
+-    size = memory_region_size(mr);
++    size = memory_device_get_region_size(MEMORY_DEVICE(dimm), &error_abort);
+     nr_lmbs = size / SPAPR_MEMORY_BLOCK_SIZE;
+ 
+     addr_start = object_property_get_uint(OBJECT(dimm), PC_DIMM_ADDR_PROP,
 -- 
 2.18.0.rc1.1.g3f1ff2140
