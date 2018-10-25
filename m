@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60299)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFh5W-0004Pv-8E
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:58:20 -0400
+	(envelope-from <imammedo@redhat.com>) id 1gFh5g-0004D4-0P
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:58:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFguV-0007ej-N5
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:46:58 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:47977)
+	(envelope-from <imammedo@redhat.com>) id 1gFgsz-0006gN-E8
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:45:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57652)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gFguT-0007TR-Vq
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:46:55 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 25 Oct 2018 10:45:36 -0400
-Message-Id: <20181025144644.15464-3-cota@braap.org>
-In-Reply-To: <20181025144644.15464-1-cota@braap.org>
-References: <20181025144644.15464-1-cota@braap.org>
-Subject: [Qemu-devel] [RFC v4 03/71] cpu: introduce cpu_mutex_lock/unlock
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gFgsx-0006et-4l
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:45:20 -0400
+Date: Thu, 25 Oct 2018 15:45:04 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181025154509.219e21bb@Igors-MacBook-Pro.local>
+In-Reply-To: <20181023152306.3123-7-david@redhat.com>
+References: <20181023152306.3123-1-david@redhat.com>
+	<20181023152306.3123-7-david@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 6/7] memory-device: avoid overflows on
+ very huge devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,175 +28,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-The few direct users of &cpu->lock will be converted soon.
+On Tue, 23 Oct 2018 17:23:05 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-Signed-off-by: Emilio G. Cota <cota@braap.org>
----
- include/qom/cpu.h   | 33 +++++++++++++++++++++++++++++++
- cpus.c              | 48 +++++++++++++++++++++++++++++++++++++++++++--
- stubs/cpu-lock.c    | 20 +++++++++++++++++++
- stubs/Makefile.objs |  1 +
- 4 files changed, 100 insertions(+), 2 deletions(-)
- create mode 100644 stubs/cpu-lock.c
+> Should not be a problem right now, but it could theoretically happen
+> in the future.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index b813ca28fa..7fdb5a2be0 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -452,6 +452,39 @@ extern struct CPUTailQ cpus;
- 
- extern __thread CPUState *current_cpu;
- 
-+/**
-+ * cpu_mutex_lock - lock a CPU's mutex
-+ * @cpu: the CPU whose mutex is to be locked
-+ *
-+ * To avoid deadlock, a CPU's mutex must be acquired after the BQL.
-+ */
-+#define cpu_mutex_lock(cpu)                             \
-+    cpu_mutex_lock_impl(cpu, __FILE__, __LINE__)
-+void cpu_mutex_lock_impl(CPUState *cpu, const char *file, int line);
-+
-+/**
-+ * cpu_mutex_unlock - unlock a CPU's mutex
-+ * @cpu: the CPU whose mutex is to be unlocked
-+ */
-+#define cpu_mutex_unlock(cpu)                           \
-+    cpu_mutex_unlock_impl(cpu, __FILE__, __LINE__)
-+void cpu_mutex_unlock_impl(CPUState *cpu, const char *file, int line);
-+
-+/**
-+ * cpu_mutex_locked - check whether a CPU's mutex is locked
-+ * @cpu: the CPU of interest
-+ *
-+ * Returns true if the calling thread is currently holding the CPU's mutex.
-+ */
-+bool cpu_mutex_locked(const CPUState *cpu);
-+
-+/**
-+ * no_cpu_mutex_locked - check whether any CPU mutex is held
-+ *
-+ * Returns true if the calling thread is not holding any CPU mutex.
-+ */
-+bool no_cpu_mutex_locked(void);
-+
- static inline void cpu_tb_jmp_cache_clear(CPUState *cpu)
- {
-     unsigned int i;
-diff --git a/cpus.c b/cpus.c
-index b2a9698dc0..38cc9e1278 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -83,6 +83,47 @@ static unsigned int throttle_percentage;
- #define CPU_THROTTLE_PCT_MAX 99
- #define CPU_THROTTLE_TIMESLICE_NS 10000000
- 
-+/* XXX: is this really the max number of CPUs? */
-+#define CPU_LOCK_BITMAP_SIZE 2048
-+
-+/*
-+ * Note: we index the bitmap with cpu->cpu_index + 1 so that the logic
-+ * also works during early CPU initialization, when cpu->cpu_index is set to
-+ * UNASSIGNED_CPU_INDEX == -1.
-+ */
-+static __thread DECLARE_BITMAP(cpu_lock_bitmap, CPU_LOCK_BITMAP_SIZE);
-+
-+bool no_cpu_mutex_locked(void)
-+{
-+    return bitmap_empty(cpu_lock_bitmap, CPU_LOCK_BITMAP_SIZE);
-+}
-+
-+void cpu_mutex_lock_impl(CPUState *cpu, const char *file, int line)
-+{
-+/* coverity gets confused by the indirect function call */
-+#ifdef __COVERITY__
-+    qemu_mutex_lock_impl(&cpu->lock, file, line);
-+#else
-+    QemuMutexLockFunc f = atomic_read(&qemu_mutex_lock_func);
-+
-+    g_assert(!cpu_mutex_locked(cpu));
-+    set_bit(cpu->cpu_index + 1, cpu_lock_bitmap);
-+    f(&cpu->lock, file, line);
-+#endif
-+}
-+
-+void cpu_mutex_unlock_impl(CPUState *cpu, const char *file, int line)
-+{
-+    g_assert(cpu_mutex_locked(cpu));
-+    qemu_mutex_unlock_impl(&cpu->lock, file, line);
-+    clear_bit(cpu->cpu_index + 1, cpu_lock_bitmap);
-+}
-+
-+bool cpu_mutex_locked(const CPUState *cpu)
-+{
-+    return test_bit(cpu->cpu_index + 1, cpu_lock_bitmap);
-+}
-+
- bool cpu_is_stopped(CPUState *cpu)
- {
-     return cpu->stopped || !runstate_is_running();
-@@ -92,9 +133,9 @@ static inline bool cpu_work_list_empty(CPUState *cpu)
- {
-     bool ret;
- 
--    qemu_mutex_lock(&cpu->lock);
-+    cpu_mutex_lock(cpu);
-     ret = QSIMPLEQ_EMPTY(&cpu->work_list);
--    qemu_mutex_unlock(&cpu->lock);
-+    cpu_mutex_unlock(cpu);
-     return ret;
- }
- 
-@@ -1843,6 +1884,9 @@ void qemu_mutex_lock_iothread_impl(const char *file, int line)
- {
-     QemuMutexLockFunc bql_lock = atomic_read(&qemu_bql_mutex_lock_func);
- 
-+    /* prevent deadlock with CPU mutex */
-+    g_assert(no_cpu_mutex_locked());
-+
-     g_assert(!qemu_mutex_iothread_locked());
-     bql_lock(&qemu_global_mutex, file, line);
-     iothread_locked = true;
-diff --git a/stubs/cpu-lock.c b/stubs/cpu-lock.c
-new file mode 100644
-index 0000000000..7c09af3768
---- /dev/null
-+++ b/stubs/cpu-lock.c
-@@ -0,0 +1,20 @@
-+#include "qemu/osdep.h"
-+#include "qom/cpu.h"
-+
-+void cpu_mutex_lock_impl(CPUState *cpu, const char *file, int line)
-+{
-+}
-+
-+void cpu_mutex_unlock_impl(CPUState *cpu, const char *file, int line)
-+{
-+}
-+
-+bool cpu_mutex_locked(const CPUState *cpu)
-+{
-+    return true;
-+}
-+
-+bool no_cpu_mutex_locked(void)
-+{
-+    return true;
-+}
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index 53d3f32cb2..fbcdc0256d 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -8,6 +8,7 @@ stub-obj-y += blockdev-close-all-bdrv-states.o
- stub-obj-y += clock-warp.o
- stub-obj-y += cpu-get-clock.o
- stub-obj-y += cpu-get-icount.o
-+stub-obj-y += cpu-lock.o
- stub-obj-y += dump.o
- stub-obj-y += error-printf.o
- stub-obj-y += fdset.o
--- 
-2.17.1
+> ---
+>  hw/mem/memory-device.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
+> index 996ad1490f..8be63c8032 100644
+> --- a/hw/mem/memory-device.c
+> +++ b/hw/mem/memory-device.c
+> @@ -85,7 +85,8 @@ static void memory_device_check_addable(MachineState *ms, uint64_t size,
+>  
+>      /* will we exceed the total amount of memory specified */
+>      memory_device_used_region_size(OBJECT(ms), &used_region_size);
+> -    if (used_region_size + size > ms->maxram_size - ms->ram_size) {
+> +    if (used_region_size + size < used_region_size ||
+> +        used_region_size + size > ms->maxram_size - ms->ram_size) {
+>          error_setg(errp, "not enough space, currently 0x%" PRIx64
+>                     " in use of total space for memory devices 0x" RAM_ADDR_FMT,
+>                     used_region_size, ms->maxram_size - ms->ram_size);
