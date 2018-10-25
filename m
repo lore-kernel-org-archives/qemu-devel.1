@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57345)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameeh@daynix.com>) id 1gFk3o-0003ew-Ib
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 14:08:45 -0400
+	(envelope-from <noring@nocrew.org>) id 1gFkFZ-0007YZ-L5
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 14:20:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameeh@daynix.com>) id 1gFjx1-0005Bi-MP
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 14:01:44 -0400
-Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:38287)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1gFjx1-00053r-D8
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 14:01:43 -0400
-Received: by mail-ed1-x543.google.com with SMTP id c1-v6so9341402ede.5
-	for <qemu-devel@nongnu.org>; Thu, 25 Oct 2018 11:01:24 -0700 (PDT)
+	(envelope-from <noring@nocrew.org>) id 1gFkFW-0002zJ-Gy
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 14:20:53 -0400
+Received: from pio-pvt-msa1.bahnhof.se ([79.136.2.40]:37860)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gFkFW-0002yQ-82
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 14:20:50 -0400
+Date: Thu, 25 Oct 2018 20:20:46 +0200
+From: Fredrik Noring <noring@nocrew.org>
+Message-ID: <20181025182046.GA13326@sx9>
+References: <20181023203710.GA2239@sx9>
+	<9aea2b05-24d7-f845-d899-0c6fec033672@linaro.org>
+	<20181025170128.GA2309@sx9>
+	<alpine.LFD.2.21.1810251839110.19280@eddie.linux-mips.org>
 MIME-Version: 1.0
-References: <20181025140631.634922-1-sameeh@daynix.com>
-In-Reply-To: <20181025140631.634922-1-sameeh@daynix.com>
-From: Sameeh Jubran <sameeh@daynix.com>
-Date: Thu, 25 Oct 2018 21:01:10 +0300
-Message-ID: <CAKPgXcE1zoFiBgbEqn6VAdsQuR7GfCNTn+pHgekH1XwLAdq-ig@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC 0/2] Attempt to implement the standby feature
- for assigned network devices
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <alpine.LFD.2.21.1810251839110.19280@eddie.linux-mips.org>
+Subject: Re: [Qemu-devel] [PATCH v8 00/38] target/mips: Limited support for
+ the R5900
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,88 +30,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Yan Vugenfirer <yan@daynix.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: "Maciej W. Rozycki" <macro@linux-mips.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Aleksandar Markovic <amarkovic@wavecomp.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Aurelien Jarno <aurelien@aurel32.net>, Petar Jovanovic <pjovanovic@wavecomp.com>, =?utf-8?Q?J=C3=BCrgen?= Urban <JuergenUrban@gmx.de>, qemu-devel@nongnu.org
 
-On Thu, Oct 25, 2018 at 5:06 PM Sameeh Jubran <sameeh@daynix.com> wrote:
->
-> From: Sameeh Jubran <sjubran@redhat.com>
->
-> Hi all,
->
-> Background:
->
-> There has been a few attempts to implement the standby feature for vfio
-> assigned devices which aims to enable the migration of such devices. This
-> is another attempt.
->
-> The series implements an infrastructure for hiding devices from the bus
-> upon boot. What it does is the following:
->
-> * In the first patch the infrastructure for hiding the device is added
->   for the qbus and qdev APIs. A "hidden" boolean is added to the device
->   state and it is set based on a callback to the standby device which
->   registers itself for handling the assessment: "should the primary device
->   be hidden?" by cross validating the ids of the devices.
->
-> * In the second patch the virtio-net uses the API to hide the vfio
->   device and unhides it when the feature is acked.
->
-> Disclaimers:
->
-> * I have only scratch tested this and from qemu side, it seems to be
->   working.
-> * This is an RFC so it lacks some proper error handling in few cases
->   and proper resource freeing. I wanted to get some feedback first
->   before it is finalized.
->
-> Command line example:
->
-> /home/sameeh/Builds/failover/qemu/x86_64-softmmu/qemu-system-x86_64 \
-> -netdev tap,id=hostnet0,script=world_bridge_standalone.sh,downscript=no,ifname=cc1_71 \
-> -netdev tap,vhost=on,id=hostnet1,script=world_bridge_standalone.sh,downscript=no,ifname=cc1_72,queues=4 \
-> -device virtio-net,host_mtu=1500,netdev=hostnet1,id=cc1_72,vectors=10,mq=on,primary=cc1_71 \
-> -device e1000,netdev=hostnet0,id=cc1_71,standby=cc1_72 \
->
-> Migration support:
->
-> Pre migration or during setup phase of the migration we should send an
-> unplug request to the guest to unplug the primary device. I haven't had
-> the chance to implement that part yet but should do soon. Do you know
-> what's the best approach to do so? I wanted to have a callback to the
-> virtio-net device which tries to send an unplug request to the guest and
-> if succeeds then the migration continues. It needs to handle the case where
-> the migration fails and then it has to replug the primary device back.
-I think that the "add_migration_state_change_notifier" API call can be used
-from within the virtio-net device to achieve this, what do you think?
->
-> The following terms are used as interchangeable:
-> standby - virtio-net
-> primary - vfio-device - physical device - assigned device
->
-> Please share your thoughts and suggestions,
-> Thanks!
->
-> Sameeh Jubran (2):
->   qdev/qbus: Add hidden device support
->   virtio-net: Implement VIRTIO_NET_F_STANDBY feature
->
->  hw/core/qdev.c                 | 48 +++++++++++++++++++++++++---
->  hw/net/virtio-net.c            | 25 +++++++++++++++
->  hw/pci/pci.c                   |  1 +
->  include/hw/pci/pci.h           |  2 ++
->  include/hw/qdev-core.h         | 11 ++++++-
->  include/hw/virtio/virtio-net.h |  5 +++
->  qdev-monitor.c                 | 58 ++++++++++++++++++++++++++++++++--
->  7 files changed, 142 insertions(+), 8 deletions(-)
->
-> --
-> 2.17.0
->
+Hi Maciej,
 
+> > Is the membership field intended to be used? The opcodes for CLZ and CLO
+> > clash with the R5900 opcodes for MADD1 and MADDU1, resulting in incorrect
+> > disassembly of MADD1 and MADDU1. For example:
+> > 
+> > 	0x70853020 madd1  a2,a0,a1  disassembles into  clz a2 or a1,a0
+> > 	0x70853021 maddu1 a2,a0,a1  disassembles into  clo a2 or a1,a0
+> > 
+> > (CLZ and CLO are members of I32|N55, whereas MADD1 and MADDU1 are EE.)
+> 
+>  It looks like a disassembler bug somewhere then (maybe in your patched 
+> version only), because the R5900 is not supposed to match I32 (because it 
+> does not implement the MIPS32 ISA; it's only MIPS I aka I1 with additions 
+> or MIPS IV aka I4 with exclusions, or anything between with both additions 
+> and exclusions, with I believe MIPS III aka I3 being the closest match), 
+> and it is not supposed to match N55 either (because it is obviously not a 
+> Vr5500 processor).
 
--- 
-Respectfully,
-Sameeh Jubran
-Linkedin
-Software Engineer @ Daynix.
+I think the "bug" is that the membership field is defined but unused, so
+opcode memberships are simply ignored. OPCODE_IS_MEMBER is defined to be
+always true, for all opcodes and all ISAs.
+
+>  Overall this source file is clearly a modified copy of an ancient version 
+> of the opcode table included with the opcodes library from binutils and I 
+> think it would benefit from a refresh.  In particular separating an ASE 
+> field and adding an exclusions field, as it has been done with opcodes, 
+> would make it much easier to maintain this table.  The table in opcodes is 
+> already messy due to several exceptions to the alphabetical order (and it 
+> could be improved a bit I believe), but I find its QEMU version even 
+> messier.
+
+Agreed! QEMU's scripts/checkpatch.pl warns and errors on 80 and 90 column
+violations, so trying avoid check breakage leaves the table unaligned too.
+
+Fredrik
