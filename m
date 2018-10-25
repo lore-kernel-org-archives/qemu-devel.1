@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57767)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gFTtH-0002JJ-Ks
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 20:52:48 -0400
+	(envelope-from <mst@redhat.com>) id 1gFTtP-0002b1-C8
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 20:52:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gFTtG-0004DW-9s
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 20:52:47 -0400
-Date: Wed, 24 Oct 2018 20:52:32 -0400
+	(envelope-from <mst@redhat.com>) id 1gFTtO-0004Oj-Fu
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 20:52:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59044)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gFTtO-0004Mu-4f
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 20:52:54 -0400
+Date: Wed, 24 Oct 2018 20:52:41 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181025005110.249256-4-mst@redhat.com>
+Message-ID: <20181025005110.249256-5-mst@redhat.com>
 References: <20181025005110.249256-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20181025005110.249256-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v2 03/28] intel_iommu: better handling of dmar
- state switch
+Subject: [Qemu-devel] [PULL v2 04/28] intel_iommu: move ce fetching out when
+ sync shadow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,135 +28,96 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Xu <peterx@redhat.com>, QEMU Stable <qemu-stable@nongnu.org>, Cong Li <coli@redhat.com>, Eric Auger <eric.auger@redhat.com>, Jason Wang <jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Xu <peterx@redhat.com>, Eric Auger <eric.auger@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
 From: Peter Xu <peterx@redhat.com>
 
-QEMU is not handling the global DMAR switch well, especially when from
-"on" to "off".
+There are two callers for vtd_sync_shadow_page_table_range(): one
+provided a valid context entry and one not.  Move that fetching
+operation into the caller vtd_sync_shadow_page_table() where we need to
+fetch the context entry.
 
-Let's first take the example of system reset.
+Meanwhile, remove the error_report_once() directly since we're already
+tracing all the error cases in the previous call.  Instead, return error
+number back to caller.  This will not change anything functional since
+callers are dropping it after all.
 
-Assuming that a guest has IOMMU enabled.  When it reboots, we will drop
-all the existing DMAR mappings to handle the system reset, however we'll
-still keep the existing memory layouts which has the IOMMU memory region
-enabled.  So after the reboot and before the kernel reloads again, there
-will be no mapping at all for the host device.  That's problematic since
-any software (for example, SeaBIOS) that runs earlier than the kernel
-after the reboot will assume the IOMMU is disabled, so any DMA from the
-software will fail.
+We do this move majorly because we want to do something more later in
+vtd_sync_shadow_page_table().
 
-For example, a guest that boots on an assigned NVMe device might fail to
-find the boot device after a system reboot/reset and we'll be able to
-observe SeaBIOS errors if we capture the debugging log:
-
-  WARNING - Timeout at nvme_wait:144!
-
-Meanwhile, we should see DMAR errors on the host of that NVMe device.
-It's the DMA fault that caused a NVMe driver timeout.
-
-The correct fix should be that we do proper switching of device DMA
-address spaces when system resets, which will setup correct memory
-regions and notify the backend of the devices.  This might not affect
-much on non-assigned devices since QEMU VT-d emulation will assume a
-default passthrough mapping if DMAR is not enabled in the GCMD
-register (please refer to vtd_iommu_translate).  However that's required
-for an assigned devices, since that'll rebuild the correct GPA to HPA
-mapping that is needed for any DMA operation during guest bootstrap.
-
-Besides the system reset, we have some other places that might change
-the global DMAR status and we'd better do the same thing there.  For
-example, when we change the state of GCMD register, or the DMAR root
-pointer.  Do the same refresh for all these places.  For these two
-places we'll also need to explicitly invalidate the context entry cache
-and iotlb cache.
-
-Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1625173
-CC: QEMU Stable <qemu-stable@nongnu.org>
-Reported-by: Cong Li <coli@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
---
-v2:
-- do the same for GCMD write, or root pointer update [Alex]
-- test is carried out by me this time, by observing the
-  vtd_switch_address_space tracepoint after system reboot
-v3:
-- rewrite commit message as suggested by Alex
 Signed-off-by: Peter Xu <peterx@redhat.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Jason Wang <jasowang@redhat.com>
+Reviewed-by: Maxime Coquelin <maxime.coquelin@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/i386/intel_iommu.c | 21 ++++++++++++++-------
- 1 file changed, 14 insertions(+), 7 deletions(-)
+ hw/i386/intel_iommu.c | 41 +++++++++++++----------------------------
+ 1 file changed, 13 insertions(+), 28 deletions(-)
 
 diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 1137861a9d..306708eb3b 100644
+index 306708eb3b..25e54671f4 100644
 --- a/hw/i386/intel_iommu.c
 +++ b/hw/i386/intel_iommu.c
-@@ -37,6 +37,8 @@
- #include "kvm_i386.h"
- #include "trace.h"
- 
-+static void vtd_address_space_refresh_all(IntelIOMMUState *s);
-+
- static void vtd_define_quad(IntelIOMMUState *s, hwaddr addr, uint64_t val,
-                             uint64_t wmask, uint64_t w1cmask)
- {
-@@ -1436,7 +1438,7 @@ static void vtd_context_global_invalidate(IntelIOMMUState *s)
-         vtd_reset_context_cache_locked(s);
-     }
-     vtd_iommu_unlock(s);
--    vtd_switch_address_space_all(s);
-+    vtd_address_space_refresh_all(s);
-     /*
-      * From VT-d spec 6.5.2.1, a global context entry invalidation
-      * should be followed by a IOTLB global invalidation, so we should
-@@ -1727,6 +1729,8 @@ static void vtd_handle_gcmd_srtp(IntelIOMMUState *s)
-     vtd_root_table_setup(s);
-     /* Ok - report back to driver */
-     vtd_set_clear_mask_long(s, DMAR_GSTS_REG, 0, VTD_GSTS_RTPS);
-+    vtd_reset_caches(s);
-+    vtd_address_space_refresh_all(s);
+@@ -1045,7 +1045,6 @@ static int vtd_sync_shadow_page_hook(IOMMUTLBEntry *entry,
+     return 0;
  }
  
- /* Set Interrupt Remap Table Pointer */
-@@ -1759,7 +1763,8 @@ static void vtd_handle_gcmd_te(IntelIOMMUState *s, bool en)
-         vtd_set_clear_mask_long(s, DMAR_GSTS_REG, VTD_GSTS_TES, 0);
-     }
+-/* If context entry is NULL, we'll try to fetch it on our own. */
+ static int vtd_sync_shadow_page_table_range(VTDAddressSpace *vtd_as,
+                                             VTDContextEntry *ce,
+                                             hwaddr addr, hwaddr size)
+@@ -1057,39 +1056,25 @@ static int vtd_sync_shadow_page_table_range(VTDAddressSpace *vtd_as,
+         .notify_unmap = true,
+         .aw = s->aw_bits,
+         .as = vtd_as,
++        .domain_id = VTD_CONTEXT_ENTRY_DID(ce->hi),
+     };
+-    VTDContextEntry ce_cache;
+-    int ret;
  
--    vtd_switch_address_space_all(s);
-+    vtd_reset_caches(s);
-+    vtd_address_space_refresh_all(s);
- }
- 
- /* Handle Interrupt Remap Enable/Disable */
-@@ -3059,6 +3064,12 @@ static void vtd_address_space_unmap_all(IntelIOMMUState *s)
-     }
- }
- 
-+static void vtd_address_space_refresh_all(IntelIOMMUState *s)
-+{
-+    vtd_address_space_unmap_all(s);
-+    vtd_switch_address_space_all(s);
-+}
-+
- static int vtd_replay_hook(IOMMUTLBEntry *entry, void *private)
- {
-     memory_region_notify_one((IOMMUNotifier *)private, entry);
-@@ -3231,11 +3242,7 @@ static void vtd_reset(DeviceState *dev)
-     IntelIOMMUState *s = INTEL_IOMMU_DEVICE(dev);
- 
-     vtd_init(s);
+-    if (ce) {
+-        /* If the caller provided context entry, use it */
+-        ce_cache = *ce;
+-    } else {
+-        /* If the caller didn't provide ce, try to fetch */
+-        ret = vtd_dev_to_context_entry(s, pci_bus_num(vtd_as->bus),
+-                                       vtd_as->devfn, &ce_cache);
+-        if (ret) {
+-            /*
+-             * This should not really happen, but in case it happens,
+-             * we just skip the sync for this time.  After all we even
+-             * don't have the root table pointer!
+-             */
+-            error_report_once("%s: invalid context entry for bus 0x%x"
+-                              " devfn 0x%x",
+-                              __func__, pci_bus_num(vtd_as->bus),
+-                              vtd_as->devfn);
+-            return 0;
+-        }
+-    }
 -
--    /*
--     * When device reset, throw away all mappings and external caches
--     */
--    vtd_address_space_unmap_all(s);
-+    vtd_address_space_refresh_all(s);
+-    info.domain_id = VTD_CONTEXT_ENTRY_DID(ce_cache.hi);
+-
+-    return vtd_page_walk(&ce_cache, addr, addr + size, &info);
++    return vtd_page_walk(ce, addr, addr + size, &info);
  }
  
- static AddressSpace *vtd_host_dma_iommu(PCIBus *bus, void *opaque, int devfn)
+ static int vtd_sync_shadow_page_table(VTDAddressSpace *vtd_as)
+ {
+-    return vtd_sync_shadow_page_table_range(vtd_as, NULL, 0, UINT64_MAX);
++    int ret;
++    VTDContextEntry ce;
++
++    ret = vtd_dev_to_context_entry(vtd_as->iommu_state,
++                                   pci_bus_num(vtd_as->bus),
++                                   vtd_as->devfn, &ce);
++    if (ret) {
++        return ret;
++    }
++
++    return vtd_sync_shadow_page_table_range(vtd_as, &ce, 0, UINT64_MAX);
+ }
+ 
+ /*
 -- 
 MST
