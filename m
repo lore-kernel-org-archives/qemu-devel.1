@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58223)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58242)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gFTuY-0003Wc-Rc
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 20:54:07 -0400
+	(envelope-from <mst@redhat.com>) id 1gFTui-0003e3-Jo
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 20:54:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gFTuV-0005iS-Mf
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 20:54:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55222)
+	(envelope-from <mst@redhat.com>) id 1gFTuf-0005t0-KW
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 20:54:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42654)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gFTuV-0005hC-GA
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 20:54:03 -0400
-Date: Wed, 24 Oct 2018 20:53:57 -0400
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gFTuf-0005st-EQ
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 20:54:13 -0400
+Date: Wed, 24 Oct 2018 20:54:02 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181025005110.249256-16-mst@redhat.com>
+Message-ID: <20181025005110.249256-17-mst@redhat.com>
 References: <20181025005110.249256-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20181025005110.249256-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v2 15/28] x86_iommu/amd: Enable Guest virtual
- APIC support
+Subject: [Qemu-devel] [PULL v2 16/28] MAINTAINERS: list
+ "tests/acpi-test-data" files in ACPI/SMBIOS section
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,64 +28,39 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Singh, Brijesh" <brijesh.singh@amd.com>, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Tom Lendacky <Thomas.Lendacky@amd.com>, Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Laszlo Ersek <lersek@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Thomas Huth <thuth@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-From: "Singh, Brijesh" <brijesh.singh@amd.com>
+From: Laszlo Ersek <lersek@redhat.com>
 
-Now that amd-iommu support interrupt remapping, enable the GASup in IVRS
-table and GASup in extended feature register to indicate that IOMMU
-support guest virtual APIC mode. GASup provides option to guest OS to
-make use of 128-bit IRTE.
+The "tests/acpi-test-data" files are currently not covered by any section
+in MAINTAINERS, and "scripts/checkpatch.pl" complains when new data files
+are added.
 
-Note that the GAMSup is set to zero to indicate that amd-iommu does not
-support guest virtual APIC mode (aka AVIC) which would be used for the
-nested VMs.
-
-See Table 21 from IOMMU spec for interrupt virtualization controls
-
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>
 Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
 Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: Tom Lendacky <Thomas.Lendacky@amd.com>
-Cc: Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>
+Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/i386/amd_iommu.h  | 2 +-
- hw/i386/acpi-build.c | 3 ++-
- 2 files changed, 3 insertions(+), 2 deletions(-)
+ MAINTAINERS | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/hw/i386/amd_iommu.h b/hw/i386/amd_iommu.h
-index 8061e9c49c..687fcd8521 100644
---- a/hw/i386/amd_iommu.h
-+++ b/hw/i386/amd_iommu.h
-@@ -176,7 +176,7 @@
- /* extended feature support */
- #define AMDVI_EXT_FEATURES (AMDVI_FEATURE_PREFETCH | AMDVI_FEATURE_PPR | \
-         AMDVI_FEATURE_IA | AMDVI_FEATURE_GT | AMDVI_FEATURE_HE | \
--        AMDVI_GATS_MODE | AMDVI_HATS_MODE)
-+        AMDVI_GATS_MODE | AMDVI_HATS_MODE | AMDVI_FEATURE_GA)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 40672c4eba..b4d4bd4129 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1113,6 +1113,8 @@ F: hw/i386/acpi-build.[hc]
+ F: hw/arm/virt-acpi-build.c
+ F: tests/bios-tables-test.c
+ F: tests/acpi-utils.[hc]
++F: tests/acpi-test-data/*
++F: tests/acpi-test-data/*/*
  
- /* capabilities header */
- #define AMDVI_CAPAB_FEATURES (AMDVI_CAPAB_FLAT_EXT | \
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 1ef396ddbb..236a20eaa8 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2518,7 +2518,8 @@ build_amd_iommu(GArray *table_data, BIOSLinker *linker)
-     build_append_int_noprefix(table_data,
-                              (48UL << 30) | /* HATS   */
-                              (48UL << 28) | /* GATS   */
--                             (1UL << 2),    /* GTSup  */
-+                             (1UL << 2)   | /* GTSup  */
-+                             (1UL << 6),    /* GASup  */
-                              4);
-     /*
-      *   Type 1 device entry reporting all devices
+ ppc4xx
+ M: Alexander Graf <agraf@suse.de>
 -- 
 MST
