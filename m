@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59786)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59515)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFh5M-0003Zd-Kk
+	(envelope-from <cota@braap.org>) id 1gFh5N-0002yu-7g
 	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:58:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFgvE-0008CS-VY
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:43 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:43393)
+	(envelope-from <cota@braap.org>) id 1gFgvF-0008DV-Dp
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:42 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:51317)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gFgvE-000830-Hp
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:40 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gFgvF-000841-4y
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:41 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 25 Oct 2018 10:46:13 -0400
-Message-Id: <20181025144644.15464-40-cota@braap.org>
+Date: Thu, 25 Oct 2018 10:46:17 -0400
+Message-Id: <20181025144644.15464-44-cota@braap.org>
 In-Reply-To: <20181025144644.15464-1-cota@braap.org>
 References: <20181025144644.15464-1-cota@braap.org>
-Subject: [Qemu-devel] [RFC v4 40/71] i386/whpx-all: convert to
- cpu_interrupt_request
+Subject: [Qemu-devel] [RFC v4 44/71] cris: convert to cpu_interrupt_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,150 +24,59 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 
+Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/i386/whpx-all.c | 41 ++++++++++++++++++++++++-----------------
- 1 file changed, 24 insertions(+), 17 deletions(-)
+ target/cris/cpu.c    | 2 +-
+ target/cris/helper.c | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
-index 9673bdc219..0d8cfa3a19 100644
---- a/target/i386/whpx-all.c
-+++ b/target/i386/whpx-all.c
-@@ -690,12 +690,14 @@ static int whpx_handle_portio(CPUState *cpu,
- static int whpx_handle_halt(CPUState *cpu)
+diff --git a/target/cris/cpu.c b/target/cris/cpu.c
+index a23aba2688..3cdba581e6 100644
+--- a/target/cris/cpu.c
++++ b/target/cris/cpu.c
+@@ -37,7 +37,7 @@ static void cris_cpu_set_pc(CPUState *cs, vaddr value)
+ 
+ static bool cris_cpu_has_work(CPUState *cs)
  {
-     struct CPUX86State *env = (CPUArchState *)(cpu->env_ptr);
-+    uint32_t interrupt_request;
-     int ret = 0;
+-    return cs->interrupt_request & (CPU_INTERRUPT_HARD | CPU_INTERRUPT_NMI);
++    return cpu_interrupt_request(cs) & (CPU_INTERRUPT_HARD | CPU_INTERRUPT_NMI);
+ }
  
-     qemu_mutex_lock_iothread();
--    if (!((cpu->interrupt_request & CPU_INTERRUPT_HARD) &&
-+    interrupt_request = cpu_interrupt_request(cpu);
-+    if (!((interrupt_request & CPU_INTERRUPT_HARD) &&
-           (env->eflags & IF_MASK)) &&
--        !(cpu->interrupt_request & CPU_INTERRUPT_NMI)) {
-+        !(interrupt_request & CPU_INTERRUPT_NMI)) {
-         cpu->exception_index = EXCP_HLT;
-         cpu_halted_set(cpu, true);
-         ret = 1;
-@@ -713,6 +715,7 @@ static void whpx_vcpu_pre_run(CPUState *cpu)
-     struct CPUX86State *env = (CPUArchState *)(cpu->env_ptr);
-     X86CPU *x86_cpu = X86_CPU(cpu);
-     int irq;
-+    uint32_t interrupt_request;
-     uint8_t tpr;
-     WHV_X64_PENDING_INTERRUPTION_REGISTER new_int;
-     UINT32 reg_count = 0;
-@@ -724,17 +727,19 @@ static void whpx_vcpu_pre_run(CPUState *cpu)
- 
-     qemu_mutex_lock_iothread();
- 
-+    interrupt_request = cpu_interrupt_request(cpu);
-+
-     /* Inject NMI */
-     if (!vcpu->interruption_pending &&
--        cpu->interrupt_request & (CPU_INTERRUPT_NMI | CPU_INTERRUPT_SMI)) {
--        if (cpu->interrupt_request & CPU_INTERRUPT_NMI) {
-+        interrupt_request & (CPU_INTERRUPT_NMI | CPU_INTERRUPT_SMI)) {
-+        if (interrupt_request & CPU_INTERRUPT_NMI) {
-             cpu_reset_interrupt(cpu, CPU_INTERRUPT_NMI);
-             vcpu->interruptable = false;
-             new_int.InterruptionType = WHvX64PendingNmi;
-             new_int.InterruptionPending = 1;
-             new_int.InterruptionVector = 2;
-         }
--        if (cpu->interrupt_request & CPU_INTERRUPT_SMI) {
-+        if (interrupt_request & CPU_INTERRUPT_SMI) {
-             cpu_reset_interrupt(cpu, CPU_INTERRUPT_SMI);
-         }
+ /* CPUClass::reset() */
+diff --git a/target/cris/helper.c b/target/cris/helper.c
+index d2ec349191..e3fa19363f 100644
+--- a/target/cris/helper.c
++++ b/target/cris/helper.c
+@@ -116,7 +116,7 @@ int cris_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
+     if (r > 0) {
+         qemu_log_mask(CPU_LOG_MMU,
+                 "%s returns %d irqreq=%x addr=%" VADDR_PRIx " phy=%x vec=%x"
+-                " pc=%x\n", __func__, r, cs->interrupt_request, address,
++                " pc=%x\n", __func__, r, cpu_interrupt_request(cs), address,
+                 res.phy, res.bf_vec, env->pc);
      }
-@@ -743,12 +748,12 @@ static void whpx_vcpu_pre_run(CPUState *cpu)
-      * Force the VCPU out of its inner loop to process any INIT requests or
-      * commit pending TPR access.
-      */
--    if (cpu->interrupt_request & (CPU_INTERRUPT_INIT | CPU_INTERRUPT_TPR)) {
--        if ((cpu->interrupt_request & CPU_INTERRUPT_INIT) &&
-+    if (interrupt_request & (CPU_INTERRUPT_INIT | CPU_INTERRUPT_TPR)) {
-+        if ((interrupt_request & CPU_INTERRUPT_INIT) &&
-             !(env->hflags & HF_SMM_MASK)) {
-             cpu->exit_request = 1;
-         }
--        if (cpu->interrupt_request & CPU_INTERRUPT_TPR) {
-+        if (interrupt_request & CPU_INTERRUPT_TPR) {
-             cpu->exit_request = 1;
-         }
-     }
-@@ -757,7 +762,7 @@ static void whpx_vcpu_pre_run(CPUState *cpu)
-     if (!vcpu->interruption_pending &&
-         vcpu->interruptable && (env->eflags & IF_MASK)) {
-         assert(!new_int.InterruptionPending);
--        if (cpu->interrupt_request & CPU_INTERRUPT_HARD) {
-+        if (interrupt_request & CPU_INTERRUPT_HARD) {
-             cpu_reset_interrupt(cpu, CPU_INTERRUPT_HARD);
-             irq = cpu_get_pic_interrupt(env);
-             if (irq >= 0) {
-@@ -787,7 +792,7 @@ static void whpx_vcpu_pre_run(CPUState *cpu)
+     return r;
+@@ -130,7 +130,7 @@ void crisv10_cpu_do_interrupt(CPUState *cs)
  
-     /* Update the state of the interrupt delivery notification */
-     if (!vcpu->window_registered &&
--        cpu->interrupt_request & CPU_INTERRUPT_HARD) {
-+        cpu_interrupt_request(cpu) & CPU_INTERRUPT_HARD) {
-         reg_values[reg_count].DeliverabilityNotifications.InterruptNotification
-             = 1;
-         vcpu->window_registered = 1;
-@@ -840,8 +845,9 @@ static void whpx_vcpu_process_async_events(CPUState *cpu)
-     struct CPUX86State *env = (CPUArchState *)(cpu->env_ptr);
-     X86CPU *x86_cpu = X86_CPU(cpu);
-     struct whpx_vcpu *vcpu = get_whpx_vcpu(cpu);
-+    uint32_t interrupt_request;
+     D_LOG("exception index=%d interrupt_req=%d\n",
+           cs->exception_index,
+-          cs->interrupt_request);
++          cpu_interrupt_request(cs));
  
--    if ((cpu->interrupt_request & CPU_INTERRUPT_INIT) &&
-+    if ((cpu_interrupt_request(cpu) & CPU_INTERRUPT_INIT) &&
-         !(env->hflags & HF_SMM_MASK)) {
+     if (env->dslot) {
+         /* CRISv10 never takes interrupts while in a delay-slot.  */
+@@ -192,7 +192,7 @@ void cris_cpu_do_interrupt(CPUState *cs)
  
-         do_cpu_init(x86_cpu);
-@@ -849,25 +855,26 @@ static void whpx_vcpu_process_async_events(CPUState *cpu)
-         vcpu->interruptable = true;
-     }
+     D_LOG("exception index=%d interrupt_req=%d\n",
+           cs->exception_index,
+-          cs->interrupt_request);
++          cpu_interrupt_request(cs));
  
--    if (cpu->interrupt_request & CPU_INTERRUPT_POLL) {
-+    if (cpu_interrupt_request(cpu) & CPU_INTERRUPT_POLL) {
-         cpu_reset_interrupt(cpu, CPU_INTERRUPT_POLL);
-         apic_poll_irq(x86_cpu->apic_state);
-     }
- 
--    if (((cpu->interrupt_request & CPU_INTERRUPT_HARD) &&
-+    interrupt_request = cpu_interrupt_request(cpu);
-+    if (((interrupt_request & CPU_INTERRUPT_HARD) &&
-          (env->eflags & IF_MASK)) ||
--        (cpu->interrupt_request & CPU_INTERRUPT_NMI)) {
-+        (interrupt_request & CPU_INTERRUPT_NMI)) {
-         cpu_halted_set(cpu, false);
-     }
- 
--    if (cpu->interrupt_request & CPU_INTERRUPT_SIPI) {
-+    if (interrupt_request & CPU_INTERRUPT_SIPI) {
-         if (!cpu->vcpu_dirty) {
-             whpx_get_registers(cpu);
-         }
-         do_cpu_sipi(x86_cpu);
-     }
- 
--    if (cpu->interrupt_request & CPU_INTERRUPT_TPR) {
-+    if (cpu_interrupt_request(cpu) & CPU_INTERRUPT_TPR) {
-         cpu_reset_interrupt(cpu, CPU_INTERRUPT_TPR);
-         if (!cpu->vcpu_dirty) {
-             whpx_get_registers(cpu);
-@@ -1350,7 +1357,7 @@ static void whpx_memory_init(void)
- 
- static void whpx_handle_interrupt(CPUState *cpu, int mask)
- {
--    cpu->interrupt_request |= mask;
-+    cpu_interrupt_request_or(cpu, mask);
- 
-     if (!qemu_cpu_is_self(cpu)) {
-         qemu_cpu_kick(cpu);
+     switch (cs->exception_index) {
+     case EXCP_BREAK:
 -- 
 2.17.1
