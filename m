@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37535)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <smarkovic@wavecomp.com>) id 1gFcuh-0005lI-1N
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 06:30:55 -0400
+	(envelope-from <ppandit@redhat.com>) id 1gFdHk-0006W9-Vw
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 06:54:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <smarkovic@wavecomp.com>) id 1gFctZ-0001ni-2b
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 06:29:46 -0400
-Received: from mail-sn1nam02on0106.outbound.protection.outlook.com
-	([104.47.36.106]:18256
-	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <smarkovic@wavecomp.com>)
-	id 1gFctY-0001n9-PO
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 06:29:40 -0400
-From: Stefan Markovic <smarkovic@wavecomp.com>
-Date: Thu, 25 Oct 2018 10:29:37 +0000
-Message-ID: <4060a530-0eae-a303-66ec-3a1474990849@wavecomp.com>
-References: <1540457346-30999-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1540457346-30999-3-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1540457346-30999-3-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <27520574CC2FDA40B5F055D9EED7F156@namprd22.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <ppandit@redhat.com>) id 1gFdDQ-0006HY-NS
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 06:50:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55538)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gFdDQ-0006H6-GU
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 06:50:12 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AFB84308624F
+	for <qemu-devel@nongnu.org>; Thu, 25 Oct 2018 10:50:11 +0000 (UTC)
+Date: Thu, 25 Oct 2018 16:20:00 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+In-Reply-To: <20181025085256.20522-2-kraxel@redhat.com>
+Message-ID: <nycvar.YSQ.7.76.1810251608550.11480@xnncv>
+References: <20181025085256.20522-1-kraxel@redhat.com>
+	<20181025085256.20522-2-kraxel@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] target/mips: Implement emulation of
- nanoMIPS EVA instructions
+Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH 1/3] qdev: add deprecation_reason to
+ DeviceClass
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,124 +33,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, libvir-list@redhat.com
 
-DQpPbiAyNS4xMC4xOC4gMTA6NDksIEFsZWtzYW5kYXIgTWFya292aWMgd3JvdGU6DQo+IEZyb206
-IERpbWl0cmlqZSBOaWtvbGljIDxkbmlrb2xpY0B3YXZlY29tcC5jb20+DQo+DQo+IEltcGxlbWVu
-dCBlbXVsYXRpb24gb2YgbmFub01JUFMgRVZBIGluc3RydWN0aW9ucy4gVGhleSBhcmUgYWxsDQo+
-IHBhcnQgb2YgUC5MUy5FMCBpbnN0cnVjdGlvbiBwb29sLCBvciBvbmUgb2YgaXRzIHN1YnBvb2xz
-Lg0KPg0KPiBTaWduZWQtb2ZmLWJ5OiBEaW1pdHJpamUgTmlrb2xpYyA8ZG5pa29saWNAd2F2ZWNv
-bXAuY29tPg0KPiBTaWduZWQtb2ZmLWJ5OiBBbGVrc2FuZGFyIE1hcmtvdmljIDxhbWFya292aWNA
-d2F2ZWNvbXAuY29tPg0KPiAtLS0NCj4gICB0YXJnZXQvbWlwcy90cmFuc2xhdGUuYyB8IDEyOCAr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4gICAxIGZp
-bGUgY2hhbmdlZCwgMTI4IGluc2VydGlvbnMoKykNCj4NCj4gZGlmZiAtLWdpdCBhL3RhcmdldC9t
-aXBzL3RyYW5zbGF0ZS5jIGIvdGFyZ2V0L21pcHMvdHJhbnNsYXRlLmMNCj4gaW5kZXggNDMzOGI5
-YS4uNjA5NjRjOSAxMDA2NDQNCj4gLS0tIGEvdGFyZ2V0L21pcHMvdHJhbnNsYXRlLmMNCj4gKysr
-IGIvdGFyZ2V0L21pcHMvdHJhbnNsYXRlLmMNCj4gQEAgLTI5ODksNiArMjk4OSwzNSBAQCBzdGF0
-aWMgaW5saW5lIHZvaWQgY2hlY2tfbm1zKERpc2FzQ29udGV4dCAqY3R4KQ0KPiAgICAgICB9DQo+
-ICAgfQ0KPiAgIA0KPiArLyoNCj4gKyAqIFRoaXMgY29kZSBnZW5lcmF0ZXMgYSAicmVzZXJ2ZWQg
-aW5zdHJ1Y3Rpb24iIGV4Y2VwdGlvbiBpZiB0aGUNCj4gKyAqIENvbmZpZzUgTk1TIGJpdCBpcyBz
-ZXQsIGFuZCBDb25maWcxIERMLCBDb25maWcxIElMLCBDb25maWcyIFNMLA0KPiArICogQ29uZmln
-MiBUTCwgYW5kIENvbmZpZzUgTDJDIGFyZSB1bnNldC4NCj4gKyAqLw0KPiArc3RhdGljIGlubGlu
-ZSB2b2lkIGNoZWNrX25tc19kbF9pbF9zbF90bF9sMmMoRGlzYXNDb250ZXh0ICpjdHgpDQo+ICt7
-DQo+ICsgICAgaWYgKHVubGlrZWx5KGN0eC0+Q1AwX0NvbmZpZzUgJiAoMSA8PCBDUDBDNV9OTVMp
-KSAmJg0KPiArICAgICAgICAhKGN0eC0+Q1AwX0NvbmZpZzEgJiAoMSA8PCBDUDBDMV9ETCkpICYm
-DQo+ICsgICAgICAgICEoY3R4LT5DUDBfQ29uZmlnMSAmICgxIDw8IENQMEMxX0lMKSkgJiYNCj4g
-KyAgICAgICAgIShjdHgtPkNQMF9Db25maWcyICYgKDEgPDwgQ1AwQzJfU0wpKSAmJg0KPiArICAg
-ICAgICAhKGN0eC0+Q1AwX0NvbmZpZzIgJiAoMSA8PCBDUDBDMl9UTCkpICYmDQo+ICsgICAgICAg
-ICEoY3R4LT5DUDBfQ29uZmlnNSAmICgxIDw8IENQMEM1X0wyQykpKQ0KPiArICAgIHsNCj4gKyAg
-ICAgICAgZ2VuZXJhdGVfZXhjZXB0aW9uX2VuZChjdHgsIEVYQ1BfUkkpOw0KPiArICAgIH0NCj4g
-K30NCj4gKw0KPiArLyoNCj4gKyAqIFRoaXMgY29kZSBnZW5lcmF0ZXMgYSAicmVzZXJ2ZWQgaW5z
-dHJ1Y3Rpb24iIGV4Y2VwdGlvbiBpZiB0aGUNCj4gKyAqIENvbmZpZzUgRVZBIGJpdCBpcyBOT1Qg
-c2V0Lg0KPiArICovDQo+ICtzdGF0aWMgaW5saW5lIHZvaWQgY2hlY2tfZXZhKERpc2FzQ29udGV4
-dCAqY3R4KQ0KPiArew0KPiArICAgIGlmICghdW5saWtlbHkoY3R4LT5DUDBfQ29uZmlnNSAmICgx
-IDw8IENQMEM1X0VWQSkpKSB7DQoNCg0KUHJvcGVyIGNvbmRpdGlvbiB3b3VsZCBiZToNCg0KdW5s
-aWtlbHkoIShjdHgtPkNQMF9Db25maWc1ICYgKDEgPDwgQ1AwQzVfRVZBKSkpKQ0KDQoNCk90aGVy
-d2lzZToNCg0KUmV2aWV3ZWQtYnk6IFN0ZWZhbiBNYXJrb3ZpYyA8c21hcmtvdmljQHdhdmVjb21w
-LmNvbT4NCg0KDQo+ICsgICAgICAgIGdlbmVyYXRlX2V4Y2VwdGlvbl9lbmQoY3R4LCBFWENQX1JJ
-KTsNCj4gKyAgICB9DQo+ICt9DQo+ICsNCj4gICANCj4gICAvKiBEZWZpbmUgc21hbGwgd3JhcHBl
-cnMgZm9yIGdlbl9sb2FkX2Zwciogc28gdGhhdCB3ZSBoYXZlIGEgdW5pZm9ybQ0KPiAgICAgIGNh
-bGxpbmcgaW50ZXJmYWNlIGZvciAzMiBhbmQgNjQtYml0IEZQUnMuICBObyBzZW5zZSBpbiBjaGFu
-Z2luZw0KPiBAQCAtMjEyMTgsNiArMjEyNDcsMTA1IEBAIHN0YXRpYyBpbnQgZGVjb2RlX25hbm9t
-aXBzXzMyXzQ4X29wYyhDUFVNSVBTU3RhdGUgKmVudiwgRGlzYXNDb250ZXh0ICpjdHgpDQo+ICAg
-ICAgICAgICAgICAgICAgICAgICBicmVhazsNCj4gICAgICAgICAgICAgICAgICAgfQ0KPiAgICAg
-ICAgICAgICAgICAgICBicmVhazsNCj4gKyAgICAgICAgICAgIGNhc2UgTk1fUF9MU19FMDoNCj4g
-KyAgICAgICAgICAgICAgICBzd2l0Y2ggKGV4dHJhY3QzMihjdHgtPm9wY29kZSwgMTEsIDQpKSB7
-DQo+ICsgICAgICAgICAgICAgICAgY2FzZSBOTV9MQkU6DQo+ICsgICAgICAgICAgICAgICAgICAg
-IGNoZWNrX2V2YShjdHgpOw0KPiArICAgICAgICAgICAgICAgICAgICBjaGVja19jcDBfZW5hYmxl
-ZChjdHgpOw0KPiArICAgICAgICAgICAgICAgICAgICBnZW5fbGQoY3R4LCBPUENfTEJFLCBydCwg
-cnMsIHMpOw0KPiArICAgICAgICAgICAgICAgICAgICBicmVhazsNCj4gKyAgICAgICAgICAgICAg
-ICBjYXNlIE5NX1NCRToNCj4gKyAgICAgICAgICAgICAgICAgICAgY2hlY2tfZXZhKGN0eCk7DQo+
-ICsgICAgICAgICAgICAgICAgICAgIGNoZWNrX2NwMF9lbmFibGVkKGN0eCk7DQo+ICsgICAgICAg
-ICAgICAgICAgICAgIGdlbl9zdChjdHgsIE9QQ19TQkUsIHJ0LCBycywgcyk7DQo+ICsgICAgICAg
-ICAgICAgICAgICAgIGJyZWFrOw0KPiArICAgICAgICAgICAgICAgIGNhc2UgTk1fTEJVRToNCj4g
-KyAgICAgICAgICAgICAgICAgICAgY2hlY2tfZXZhKGN0eCk7DQo+ICsgICAgICAgICAgICAgICAg
-ICAgIGNoZWNrX2NwMF9lbmFibGVkKGN0eCk7DQo+ICsgICAgICAgICAgICAgICAgICAgIGdlbl9s
-ZChjdHgsIE9QQ19MQlVFLCBydCwgcnMsIHMpOw0KPiArICAgICAgICAgICAgICAgICAgICBicmVh
-azsNCj4gKyAgICAgICAgICAgICAgICBjYXNlIE5NX1BfUFJFRkU6DQo+ICsgICAgICAgICAgICAg
-ICAgICAgIGlmIChydCA9PSAzMSkgew0KPiArICAgICAgICAgICAgICAgICAgICAgICAgLyogY2Fz
-ZSBOTV9TWU5DSUUgKi8NCj4gKyAgICAgICAgICAgICAgICAgICAgICAgIGNoZWNrX2V2YShjdHgp
-Ow0KPiArICAgICAgICAgICAgICAgICAgICAgICAgY2hlY2tfY3AwX2VuYWJsZWQoY3R4KTsNCj4g
-KyAgICAgICAgICAgICAgICAgICAgICAgIC8qIEJyZWFrIHRoZSBUQiB0byBiZSBhYmxlIHRvIHN5
-bmMgY29waWVkIGluc3RydWN0aW9ucw0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgaW1t
-ZWRpYXRlbHkgKi8NCj4gKyAgICAgICAgICAgICAgICAgICAgICAgIGN0eC0+YmFzZS5pc19qbXAg
-PSBESVNBU19TVE9QOw0KPiArICAgICAgICAgICAgICAgICAgICB9IGVsc2Ugew0KPiArICAgICAg
-ICAgICAgICAgICAgICAgICAgLyogY2FzZSBOTV9QUkVGRSAqLw0KPiArICAgICAgICAgICAgICAg
-ICAgICAgICAgY2hlY2tfZXZhKGN0eCk7DQo+ICsgICAgICAgICAgICAgICAgICAgICAgICBjaGVj
-a19jcDBfZW5hYmxlZChjdHgpOw0KPiArICAgICAgICAgICAgICAgICAgICAgICAgLyogVHJlYXQg
-YXMgTk9QLiAqLw0KPiArICAgICAgICAgICAgICAgICAgICB9DQo+ICsgICAgICAgICAgICAgICAg
-ICAgIGJyZWFrOw0KPiArICAgICAgICAgICAgICAgIGNhc2UgTk1fTEhFOg0KPiArICAgICAgICAg
-ICAgICAgICAgICBjaGVja19ldmEoY3R4KTsNCj4gKyAgICAgICAgICAgICAgICAgICAgY2hlY2tf
-Y3AwX2VuYWJsZWQoY3R4KTsNCj4gKyAgICAgICAgICAgICAgICAgICAgZ2VuX2xkKGN0eCwgT1BD
-X0xIRSwgcnQsIHJzLCBzKTsNCj4gKyAgICAgICAgICAgICAgICAgICAgYnJlYWs7DQo+ICsgICAg
-ICAgICAgICAgICAgY2FzZSBOTV9TSEU6DQo+ICsgICAgICAgICAgICAgICAgICAgIGNoZWNrX2V2
-YShjdHgpOw0KPiArICAgICAgICAgICAgICAgICAgICBjaGVja19jcDBfZW5hYmxlZChjdHgpOw0K
-PiArICAgICAgICAgICAgICAgICAgICBnZW5fc3QoY3R4LCBPUENfU0hFLCBydCwgcnMsIHMpOw0K
-PiArICAgICAgICAgICAgICAgICAgICBicmVhazsNCj4gKyAgICAgICAgICAgICAgICBjYXNlIE5N
-X0xIVUU6DQo+ICsgICAgICAgICAgICAgICAgICAgIGNoZWNrX2V2YShjdHgpOw0KPiArICAgICAg
-ICAgICAgICAgICAgICBjaGVja19jcDBfZW5hYmxlZChjdHgpOw0KPiArICAgICAgICAgICAgICAg
-ICAgICBnZW5fbGQoY3R4LCBPUENfTEhVRSwgcnQsIHJzLCBzKTsNCj4gKyAgICAgICAgICAgICAg
-ICAgICAgYnJlYWs7DQo+ICsgICAgICAgICAgICAgICAgY2FzZSBOTV9DQUNIRUU6DQo+ICsgICAg
-ICAgICAgICAgICAgICAgIGNoZWNrX25tc19kbF9pbF9zbF90bF9sMmMoY3R4KTsNCj4gKyAgICAg
-ICAgICAgICAgICAgICAgZ2VuX2NhY2hlX29wZXJhdGlvbihjdHgsIHJ0LCBycywgcyk7DQo+ICsg
-ICAgICAgICAgICAgICAgICAgIGJyZWFrOw0KPiArICAgICAgICAgICAgICAgIGNhc2UgTk1fTFdF
-Og0KPiArICAgICAgICAgICAgICAgICAgICBjaGVja19ldmEoY3R4KTsNCj4gKyAgICAgICAgICAg
-ICAgICAgICAgY2hlY2tfY3AwX2VuYWJsZWQoY3R4KTsNCj4gKyAgICAgICAgICAgICAgICAgICAg
-Z2VuX2xkKGN0eCwgT1BDX0xXRSwgcnQsIHJzLCBzKTsNCj4gKyAgICAgICAgICAgICAgICAgICAg
-YnJlYWs7DQo+ICsgICAgICAgICAgICAgICAgY2FzZSBOTV9TV0U6DQo+ICsgICAgICAgICAgICAg
-ICAgICAgIGNoZWNrX2V2YShjdHgpOw0KPiArICAgICAgICAgICAgICAgICAgICBjaGVja19jcDBf
-ZW5hYmxlZChjdHgpOw0KPiArICAgICAgICAgICAgICAgICAgICBnZW5fc3QoY3R4LCBPUENfU1dF
-LCBydCwgcnMsIHMpOw0KPiArICAgICAgICAgICAgICAgICAgICBicmVhazsNCj4gKyAgICAgICAg
-ICAgICAgICBjYXNlIE5NX1BfTExFOg0KPiArICAgICAgICAgICAgICAgICAgICBzd2l0Y2ggKGV4
-dHJhY3QzMihjdHgtPm9wY29kZSwgMiwgMikpIHsNCj4gKyAgICAgICAgICAgICAgICAgICAgY2Fz
-ZSBOTV9MTEU6DQo+ICsgICAgICAgICAgICAgICAgICAgICAgICBjaGVja194bnAoY3R4KTsNCj4g
-KyAgICAgICAgICAgICAgICAgICAgICAgIGNoZWNrX2V2YShjdHgpOw0KPiArICAgICAgICAgICAg
-ICAgICAgICAgICAgY2hlY2tfY3AwX2VuYWJsZWQoY3R4KTsNCj4gKyAgICAgICAgICAgICAgICAg
-ICAgICAgIGdlbl9sZChjdHgsIE9QQ19MTEUsIHJ0LCBycywgcyk7DQo+ICsgICAgICAgICAgICAg
-ICAgICAgICAgICBicmVhazsNCj4gKyAgICAgICAgICAgICAgICAgICAgY2FzZSBOTV9MTFdQRToN
-Cj4gKyAgICAgICAgICAgICAgICAgICAgICAgIGNoZWNrX3hucChjdHgpOw0KPiArICAgICAgICAg
-ICAgICAgICAgICAgICAgY2hlY2tfZXZhKGN0eCk7DQo+ICsgICAgICAgICAgICAgICAgICAgICAg
-ICBjaGVja19jcDBfZW5hYmxlZChjdHgpOw0KPiArICAgICAgICAgICAgICAgICAgICAgICAgZ2Vu
-X2xsd3AoY3R4LCBycywgMCwgcnQsIGV4dHJhY3QzMihjdHgtPm9wY29kZSwgMywgNSkpOw0KPiAr
-ICAgICAgICAgICAgICAgICAgICBkZWZhdWx0Og0KPiArICAgICAgICAgICAgICAgICAgICAgICAg
-Z2VuZXJhdGVfZXhjZXB0aW9uX2VuZChjdHgsIEVYQ1BfUkkpOw0KPiArICAgICAgICAgICAgICAg
-ICAgICAgICAgYnJlYWs7DQo+ICsgICAgICAgICAgICAgICAgICAgIH0NCj4gKyAgICAgICAgICAg
-ICAgICAgICAgYnJlYWs7DQo+ICsgICAgICAgICAgICAgICAgY2FzZSBOTV9QX1NDRToNCj4gKyAg
-ICAgICAgICAgICAgICAgICAgc3dpdGNoIChleHRyYWN0MzIoY3R4LT5vcGNvZGUsIDIsIDIpKSB7
-DQo+ICsgICAgICAgICAgICAgICAgICAgIGNhc2UgTk1fU0NFOg0KPiArICAgICAgICAgICAgICAg
-ICAgICAgICAgY2hlY2tfeG5wKGN0eCk7DQo+ICsgICAgICAgICAgICAgICAgICAgICAgICBjaGVj
-a19ldmEoY3R4KTsNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgIGNoZWNrX2NwMF9lbmFibGVk
-KGN0eCk7DQo+ICsgICAgICAgICAgICAgICAgICAgICAgICBnZW5fc3RfY29uZChjdHgsIE9QQ19T
-Q0UsIHJ0LCBycywgcyk7DQo+ICsgICAgICAgICAgICAgICAgICAgICAgICBicmVhazsNCj4gKyAg
-ICAgICAgICAgICAgICAgICAgY2FzZSBOTV9TQ1dQRToNCj4gKyAgICAgICAgICAgICAgICAgICAg
-ICAgIGNoZWNrX3hucChjdHgpOw0KPiArICAgICAgICAgICAgICAgICAgICAgICAgY2hlY2tfZXZh
-KGN0eCk7DQo+ICsgICAgICAgICAgICAgICAgICAgICAgICBjaGVja19jcDBfZW5hYmxlZChjdHgp
-Ow0KPiArICAgICAgICAgICAgICAgICAgICAgICAgZ2VuX3Njd3AoY3R4LCBycywgMCwgcnQsIGV4
-dHJhY3QzMihjdHgtPm9wY29kZSwgMywgNSkpOw0KPiArICAgICAgICAgICAgICAgICAgICBkZWZh
-dWx0Og0KPiArICAgICAgICAgICAgICAgICAgICAgICAgZ2VuZXJhdGVfZXhjZXB0aW9uX2VuZChj
-dHgsIEVYQ1BfUkkpOw0KPiArICAgICAgICAgICAgICAgICAgICAgICAgYnJlYWs7DQo+ICsgICAg
-ICAgICAgICAgICAgICAgIH0NCj4gKyAgICAgICAgICAgICAgICAgICAgYnJlYWs7DQo+ICsgICAg
-ICAgICAgICAgICAgfQ0KPiArICAgICAgICAgICAgICAgIGJyZWFrOw0KPiAgICAgICAgICAgICAg
-IGNhc2UgTk1fUF9MU19XTToNCj4gICAgICAgICAgICAgICBjYXNlIE5NX1BfTFNfVUFXTToNCj4g
-ICAgICAgICAgICAgICAgICAgY2hlY2tfbm1zKGN0eCk7DQo=
++-- On Thu, 25 Oct 2018, Gerd Hoffmann wrote --+
+| Simliar to deprecated machine types.
+| Print a warning when creating a deprecated device.
+| Add deprecation notice to -device help.
+| 
+| TODO: add to intospection.
+
+ s/intospection/introspection ..?
+
+| diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+| index 046d8f1..3b27a74 100644
+| --- a/hw/core/qdev.c
+| +++ b/hw/core/qdev.c
+| @@ -133,11 +133,18 @@ DeviceState *qdev_create(BusState *bus, const char *name)
+|  
+|  DeviceState *qdev_try_create(BusState *bus, const char *type)
+|  {
+| +    DeviceClass *dc;
+|      DeviceState *dev;
+|  
+| -    if (object_class_by_name(type) == NULL) {
+| +    dc = DEVICE_CLASS(object_class_by_name(type));
+| +    if (dc == NULL) {
+|          return NULL;
+|      }
+| +    if (dc->deprecation_reason) {
+| +        warn_report("device %s is deprecated (%s)",
+| +                    type, dc->deprecation_reason);
+| +    }
+| +
+|      dev = DEVICE(object_new(type));
+|      if (!dev) {
+|          return NULL;
+| diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+| index a24d0dd..a352eaa 100644
+| --- a/include/hw/qdev-core.h
+| +++ b/include/hw/qdev-core.h
+| @@ -105,6 +105,7 @@ typedef struct DeviceClass {
+|       */
+|      bool user_creatable;
+|      bool hotpluggable;
+| +    const char *deprecation_reason;
+|  
+|      /* callbacks */
+|      DeviceReset reset;
+| diff --git a/qdev-monitor.c b/qdev-monitor.c
+| index 802c18a..bbba2bc 100644
+| --- a/qdev-monitor.c
+| +++ b/qdev-monitor.c
+| @@ -128,6 +128,9 @@ static void qdev_print_devinfo(DeviceClass *dc)
+|      if (!dc->user_creatable) {
+|          out_printf(", no-user");
+|      }
+| +    if (!dc->deprecation_reason) {
+| +        out_printf(", deprecated");
+| +    }
+|      out_printf("\n");
+|  }
+|  
+| @@ -579,6 +582,10 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
+|      if (!dc) {
+|          return NULL;
+|      }
+| +    if (dc->deprecation_reason) {
+| +        warn_report("device %s is deprecated (%s)",
+| +                    driver, dc->deprecation_reason);
+| +    }
+|  
+|      /* find bus */
+|      path = qemu_opt_get(opts, "bus");
+| 
+
+Looks good. Should 'deprecation_reason' be listed in qdev_device_help()?
+
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
