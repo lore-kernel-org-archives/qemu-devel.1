@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60330)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59609)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFh5K-0004FR-Nd
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:58:08 -0400
+	(envelope-from <cota@braap.org>) id 1gFh5G-00034O-0V
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:58:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFgvG-0008Et-Pa
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:48 -0400
+	(envelope-from <cota@braap.org>) id 1gFgvW-00007z-Ar
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:48:01 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 25 Oct 2018 10:45:49 -0400
-Message-Id: <20181025144644.15464-16-cota@braap.org>
+Date: Thu, 25 Oct 2018 10:46:33 -0400
+Message-Id: <20181025144644.15464-60-cota@braap.org>
 In-Reply-To: <20181025144644.15464-1-cota@braap.org>
 References: <20181025144644.15464-1-cota@braap.org>
-Subject: [Qemu-devel] [RFC v4 16/71] arm: convert to cpu_halted
+Subject: [Qemu-devel] [RFC v4 60/71] ppc: convert to
+ cpu_has_work_with_iothread_lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,117 +21,93 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
 
-Cc: Andrzej Zaborowski <balrogg@gmail.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Soon we will call cpu_has_work without the BQL.
+
+Cc: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexander Graf <agraf@suse.de>
+Cc: qemu-ppc@nongnu.org
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- hw/arm/omap1.c            | 4 ++--
- hw/arm/pxa2xx_gpio.c      | 2 +-
- hw/arm/pxa2xx_pic.c       | 2 +-
- target/arm/arm-powerctl.c | 4 ++--
- target/arm/cpu.c          | 2 +-
- target/arm/op_helper.c    | 2 +-
- 6 files changed, 8 insertions(+), 8 deletions(-)
+ target/ppc/translate_init.inc.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/hw/arm/omap1.c b/hw/arm/omap1.c
-index 539d29ef9c..55a7672976 100644
---- a/hw/arm/omap1.c
-+++ b/hw/arm/omap1.c
-@@ -1769,7 +1769,7 @@ static uint64_t omap_clkdsp_read(void *opaque, hwaddr addr,
-     case 0x18:	/* DSP_SYSST */
-         cpu = CPU(s->cpu);
-         return (s->clkm.clocking_scheme << 11) | s->clkm.cold_start |
--                (cpu->halted << 6);      /* Quite useless... */
-+                (cpu_halted(cpu) << 6);      /* Quite useless... */
-     }
+diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
+index 6827db14b6..263977aa32 100644
+--- a/target/ppc/translate_init.inc.c
++++ b/target/ppc/translate_init.inc.c
+@@ -8445,6 +8445,8 @@ static bool cpu_has_work_POWER7(CPUState *cs)
+     PowerPCCPU *cpu = POWERPC_CPU(cs);
+     CPUPPCState *env = &cpu->env;
  
-     OMAP_BAD_REG(addr);
-@@ -3790,7 +3790,7 @@ void omap_mpu_wakeup(void *opaque, int irq, int req)
-     struct omap_mpu_state_s *mpu = (struct omap_mpu_state_s *) opaque;
-     CPUState *cpu = CPU(mpu->cpu);
++    g_assert(qemu_mutex_iothread_locked());
++
+     if (cpu_halted(cs)) {
+         if (!(cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD)) {
+             return false;
+@@ -8488,7 +8490,7 @@ POWERPC_FAMILY(POWER7)(ObjectClass *oc, void *data)
+     pcc->pcr_supported = PCR_COMPAT_2_06 | PCR_COMPAT_2_05;
+     pcc->init_proc = init_proc_POWER7;
+     pcc->check_pow = check_pow_nocheck;
+-    cc->has_work = cpu_has_work_POWER7;
++    cc->has_work_with_iothread_lock = cpu_has_work_POWER7;
+     pcc->insns_flags = PPC_INSNS_BASE | PPC_ISEL | PPC_STRING | PPC_MFTB |
+                        PPC_FLOAT | PPC_FLOAT_FSEL | PPC_FLOAT_FRES |
+                        PPC_FLOAT_FSQRT | PPC_FLOAT_FRSQRTE |
+@@ -8599,6 +8601,8 @@ static bool cpu_has_work_POWER8(CPUState *cs)
+     PowerPCCPU *cpu = POWERPC_CPU(cs);
+     CPUPPCState *env = &cpu->env;
  
--    if (cpu->halted) {
-+    if (cpu_halted(cpu)) {
-         cpu_interrupt(cpu, CPU_INTERRUPT_EXITTB);
-     }
- }
-diff --git a/hw/arm/pxa2xx_gpio.c b/hw/arm/pxa2xx_gpio.c
-index e15070188e..5c3fea42e9 100644
---- a/hw/arm/pxa2xx_gpio.c
-+++ b/hw/arm/pxa2xx_gpio.c
-@@ -128,7 +128,7 @@ static void pxa2xx_gpio_set(void *opaque, int line, int level)
-         pxa2xx_gpio_irq_update(s);
++    g_assert(qemu_mutex_iothread_locked());
++
+     if (cpu_halted(cs)) {
+         if (!(cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD)) {
+             return false;
+@@ -8650,7 +8654,7 @@ POWERPC_FAMILY(POWER8)(ObjectClass *oc, void *data)
+     pcc->pcr_supported = PCR_COMPAT_2_07 | PCR_COMPAT_2_06 | PCR_COMPAT_2_05;
+     pcc->init_proc = init_proc_POWER8;
+     pcc->check_pow = check_pow_nocheck;
+-    cc->has_work = cpu_has_work_POWER8;
++    cc->has_work_with_iothread_lock = cpu_has_work_POWER8;
+     pcc->insns_flags = PPC_INSNS_BASE | PPC_ISEL | PPC_STRING | PPC_MFTB |
+                        PPC_FLOAT | PPC_FLOAT_FSEL | PPC_FLOAT_FRES |
+                        PPC_FLOAT_FSQRT | PPC_FLOAT_FRSQRTE |
+@@ -8791,6 +8795,8 @@ static bool cpu_has_work_POWER9(CPUState *cs)
+     PowerPCCPU *cpu = POWERPC_CPU(cs);
+     CPUPPCState *env = &cpu->env;
  
-     /* Wake-up GPIOs */
--    if (cpu->halted && (mask & ~s->dir[bank] & pxa2xx_gpio_wake[bank])) {
-+    if (cpu_halted(cpu) && (mask & ~s->dir[bank] & pxa2xx_gpio_wake[bank])) {
-         cpu_interrupt(cpu, CPU_INTERRUPT_EXITTB);
-     }
- }
-diff --git a/hw/arm/pxa2xx_pic.c b/hw/arm/pxa2xx_pic.c
-index 61275fa040..46ab4c3fc2 100644
---- a/hw/arm/pxa2xx_pic.c
-+++ b/hw/arm/pxa2xx_pic.c
-@@ -58,7 +58,7 @@ static void pxa2xx_pic_update(void *opaque)
-     PXA2xxPICState *s = (PXA2xxPICState *) opaque;
-     CPUState *cpu = CPU(s->cpu);
++    g_assert(qemu_mutex_iothread_locked());
++
+     if (cpu_halted(cs)) {
+         if (!(cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD)) {
+             return false;
+@@ -8844,7 +8850,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
+                          PCR_COMPAT_2_05;
+     pcc->init_proc = init_proc_POWER9;
+     pcc->check_pow = check_pow_nocheck;
+-    cc->has_work = cpu_has_work_POWER9;
++    cc->has_work_with_iothread_lock = cpu_has_work_POWER9;
+     pcc->insns_flags = PPC_INSNS_BASE | PPC_ISEL | PPC_STRING | PPC_MFTB |
+                        PPC_FLOAT | PPC_FLOAT_FSEL | PPC_FLOAT_FRES |
+                        PPC_FLOAT_FSQRT | PPC_FLOAT_FRSQRTE |
+@@ -10236,6 +10242,8 @@ static bool ppc_cpu_has_work(CPUState *cs)
+     PowerPCCPU *cpu = POWERPC_CPU(cs);
+     CPUPPCState *env = &cpu->env;
  
--    if (cpu->halted) {
-+    if (cpu_halted(cpu)) {
-         mask[0] = s->int_pending[0] & (s->int_enabled[0] | s->int_idle);
-         mask[1] = s->int_pending[1] & (s->int_enabled[1] | s->int_idle);
-         if (mask[0] || mask[1]) {
-diff --git a/target/arm/arm-powerctl.c b/target/arm/arm-powerctl.c
-index ce55eeb682..e4477444fc 100644
---- a/target/arm/arm-powerctl.c
-+++ b/target/arm/arm-powerctl.c
-@@ -64,7 +64,7 @@ static void arm_set_cpu_on_async_work(CPUState *target_cpu_state,
- 
-     /* Initialize the cpu we are turning on */
-     cpu_reset(target_cpu_state);
--    target_cpu_state->halted = 0;
-+    cpu_halted_set(target_cpu_state, 0);
- 
-     if (info->target_aa64) {
-         if ((info->target_el < 3) && arm_feature(&target_cpu->env,
-@@ -228,7 +228,7 @@ static void arm_set_cpu_off_async_work(CPUState *target_cpu_state,
- 
-     assert(qemu_mutex_iothread_locked());
-     target_cpu->power_state = PSCI_OFF;
--    target_cpu_state->halted = 1;
-+    cpu_halted_set(target_cpu_state, 1);
-     target_cpu_state->exception_index = EXCP_HLT;
++    g_assert(qemu_mutex_iothread_locked());
++
+     return msr_ee && (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD);
  }
  
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index b5e61cc177..9c5cda8eb7 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -149,7 +149,7 @@ static void arm_cpu_reset(CPUState *s)
-     env->vfp.xregs[ARM_VFP_MVFR2] = cpu->mvfr2;
- 
-     cpu->power_state = cpu->start_powered_off ? PSCI_OFF : PSCI_ON;
--    s->halted = cpu->start_powered_off;
-+    cpu_halted_set(s, cpu->start_powered_off);
- 
-     if (arm_feature(env, ARM_FEATURE_IWMMXT)) {
-         env->iwmmxt.cregs[ARM_IWMMXT_wCID] = 0x69051000 | 'Q';
-diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-index fb15a13e6c..8e393823f8 100644
---- a/target/arm/op_helper.c
-+++ b/target/arm/op_helper.c
-@@ -465,7 +465,7 @@ void HELPER(wfi)(CPUARMState *env, uint32_t insn_len)
-     }
- 
-     cs->exception_index = EXCP_HLT;
--    cs->halted = 1;
-+    cpu_halted_set(cs, 1);
-     cpu_loop_exit(cs);
- }
- 
+@@ -10435,7 +10443,7 @@ static void ppc_cpu_class_init(ObjectClass *oc, void *data)
+     cc->class_by_name = ppc_cpu_class_by_name;
+     pcc->parent_parse_features = cc->parse_features;
+     cc->parse_features = ppc_cpu_parse_featurestr;
+-    cc->has_work = ppc_cpu_has_work;
++    cc->has_work_with_iothread_lock = ppc_cpu_has_work;
+     cc->do_interrupt = ppc_cpu_do_interrupt;
+     cc->cpu_exec_interrupt = ppc_cpu_exec_interrupt;
+     cc->dump_state = ppc_cpu_dump_state;
 -- 
 2.17.1
