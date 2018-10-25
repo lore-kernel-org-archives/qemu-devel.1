@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40776)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40930)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gFgC3-0002U2-Is
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:01:05 -0400
+	(envelope-from <laurent@vivier.eu>) id 1gFgCa-0002wR-UB
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:01:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gFgC2-0002KB-Ky
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:00:59 -0400
+	(envelope-from <laurent@vivier.eu>) id 1gFgCI-0002Xo-QA
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:01:25 -0400
 References: <20181004161852.11673-1-crosa@redhat.com>
-	<20181004161852.11673-11-crosa@redhat.com>
+	<20181004161852.11673-8-crosa@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <a49bbe8f-7c63-a7c7-64e1-01f9842a76ef@vivier.eu>
-Date: Thu, 25 Oct 2018 15:00:32 +0100
+Message-ID: <34917edc-d40f-e4f7-0093-acd892815642@vivier.eu>
+Date: Thu, 25 Oct 2018 14:59:50 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181004161852.11673-11-crosa@redhat.com>
+In-Reply-To: <20181004161852.11673-8-crosa@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH 10/10] scripts/qemu.py:
- remove trailing quotes on docstring
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH 07/10]
+ scripts/decodetree.py: remove unused imports
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,22 +31,26 @@ Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-b
 On 04/10/2018 17:18, Cleber Rosa wrote:
 > Signed-off-by: Cleber Rosa <crosa@redhat.com>
 > ---
->  scripts/qemu.py | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  scripts/decodetree.py | 2 --
+>  1 file changed, 2 deletions(-)
 > 
-> diff --git a/scripts/qemu.py b/scripts/qemu.py
-> index 7abe26de69..676eb9709a 100644
-> --- a/scripts/qemu.py
-> +++ b/scripts/qemu.py
-> @@ -88,7 +88,7 @@ class QEMUMachine(object):
->          @param name: prefix for socket and log file names (default: qemu-PID)
->          @param test_dir: where to create socket and log file
->          @param monitor_address: address for QMP monitor
-> -        @param socket_scm_helper: helper program, required for send_fd_scm()"
-> +        @param socket_scm_helper: helper program, required for send_fd_scm()
->          @note: Qemu process is not started until launch() is used.
->          '''
->          if args is None:
+> diff --git a/scripts/decodetree.py b/scripts/decodetree.py
+> index 277f9a9bba..457cffea90 100755
+> --- a/scripts/decodetree.py
+> +++ b/scripts/decodetree.py
+> @@ -149,12 +149,10 @@
+>  #   trans_addl_i(ctx, &arg_opi, insn)
+>  #
+>  
+> -import io
+>  import os
+>  import re
+>  import sys
+>  import getopt
+> -import pdb
+>  
+>  insnwidth = 32
+>  insnmask = 0xffffffff
 > 
 
 Applied
