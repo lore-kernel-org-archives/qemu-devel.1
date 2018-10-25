@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44276)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44353)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gFmLg-0001PO-HR
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 16:35:25 -0400
+	(envelope-from <thuth@redhat.com>) id 1gFmLj-0001Rk-JC
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 16:35:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gFmG6-0006Yt-30
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 16:29:35 -0400
-References: <20181018182856.28001-1-mark.cave-ayland@ilande.co.uk>
-	<20181018182856.28001-6-mark.cave-ayland@ilande.co.uk>
-	<19364d5d-005b-eae5-b61c-e16b211667ea@posteo.de>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <648293b0-3ad1-45fc-bb57-c51e11b5cb51@ilande.co.uk>
-Date: Thu, 25 Oct 2018 21:29:01 +0100
+	(envelope-from <thuth@redhat.com>) id 1gFmFL-0006HH-DG
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 16:28:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53866)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gFmFL-0006GG-4n
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 16:28:47 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8469F30001DF
+	for <qemu-devel@nongnu.org>; Thu, 25 Oct 2018 20:28:46 +0000 (UTC)
+References: <20181025085256.20522-1-kraxel@redhat.com>
+	<20181025085256.20522-4-kraxel@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <824b1ea0-525f-e912-a610-61cc0896d86d@redhat.com>
+Date: Thu, 25 Oct 2018 21:28:40 +0100
 MIME-Version: 1.0
-In-Reply-To: <19364d5d-005b-eae5-b61c-e16b211667ea@posteo.de>
+In-Reply-To: <20181025085256.20522-4-kraxel@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 05/11] hw/m68k: Apple Sound Chip (ASC)
- emulation
+Subject: Re: [Qemu-devel] [PATCH 3/3] cirrus: mark as deprecated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,24 +34,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <th.huth@posteo.de>, qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, jasowang@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, hpoussin@reactos.org, kraxel@redhat.com, pbonzini@redhat.com, yongbok.kim@mips.com, afaerber@suse.de, aurelien@aurel32.net, laurent@vivier.eu
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: libvir-list@redhat.com, Prasad J Pandit <ppandit@redhat.com>
 
-On 23/10/2018 08:18, Thomas Huth wrote:
-
-> On 2018-10-18 19:28, Mark Cave-Ayland wrote:
->> From: Laurent Vivier <laurent@vivier.eu>
->>
->> This is broken as the linux driver seems broken too...
+On 2018-10-25 09:52, Gerd Hoffmann wrote:
+> While being at it deprecate cirrus too.
 > 
-> So is this required for the initial version, or does Linux also boot
-> without this device in the emulated machine? In the first case, please
-> mention it in the cover letter. In the latter case, maybe skip the patch
-> for now and add it later instead, once this has been fixed...?
+> Reason (short version): use stdvga instead.
+> Verbose version:
+>     https://www.kraxel.org/blog/2014/10/qemu-using-cirrus-considered-harmful
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  hw/display/cirrus_vga.c     | 2 ++
+>  hw/display/cirrus_vga_isa.c | 2 ++
+>  qemu-deprecated.texi        | 4 ++++
+>  3 files changed, 8 insertions(+)
+> 
+> diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
+> index d9b854d..2f16ba9 100644
+> --- a/hw/display/cirrus_vga.c
+> +++ b/hw/display/cirrus_vga.c
+> @@ -3024,6 +3024,8 @@ static void cirrus_vga_class_init(ObjectClass *klass, void *data)
+>      dc->vmsd = &vmstate_pci_cirrus_vga;
+>      dc->props = pci_vga_cirrus_properties;
+>      dc->hotpluggable = false;
+> +    dc->deprecation_reason =
+> +        "https://www.kraxel.org/blog/2014/10/qemu-using-cirrus-considered-harmful";
+>  }
+>  
+>  static const TypeInfo cirrus_vga_info = {
+> diff --git a/hw/display/cirrus_vga_isa.c b/hw/display/cirrus_vga_isa.c
+> index fa10b74..c2d853c 100644
+> --- a/hw/display/cirrus_vga_isa.c
+> +++ b/hw/display/cirrus_vga_isa.c
+> @@ -81,6 +81,8 @@ static void isa_cirrus_vga_class_init(ObjectClass *klass, void *data)
+>      dc->realize = isa_cirrus_vga_realizefn;
+>      dc->props = isa_cirrus_vga_properties;
+>      set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
+> +    dc->deprecation_reason =
+> +        "https://www.kraxel.org/blog/2014/10/qemu-using-cirrus-considered-harmful";
+>  }
+>  
+>  static const TypeInfo isa_cirrus_vga_info = {
+> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+> index 7951a4f..1b1d434 100644
+> --- a/qemu-deprecated.texi
+> +++ b/qemu-deprecated.texi
+> @@ -120,6 +120,10 @@ or ``ivshmem-doorbell`` device types.
+>  
+>  Has known buffer overflow.
+>  
+> +@subsection cirrus (since 3.1)
+> +
+> +Use stdvga instead (-vga std or -device VGA).
+> +
+>  @section System emulator machines
+>  
+>  @subsection pc-0.10 and pc-0.11 (since 3.0)
+> 
 
-Hmmm I'm not sure whether or not having this device missing is enough to break Linux
-boot? Laurent?
-
-
-ATB,
-
-Mark.
+Reviewed-by: Thomas Huth <thuth@redhat.com>
