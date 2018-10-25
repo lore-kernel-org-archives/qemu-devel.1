@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60299)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60776)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gFh5g-0004D4-0P
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:58:31 -0400
+	(envelope-from <cota@braap.org>) id 1gFh5U-0004Uf-Re
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:58:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gFgsz-0006gN-E8
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:45:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57652)
+	(envelope-from <cota@braap.org>) id 1gFgus-0007ta-S2
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:20 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:55409)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gFgsx-0006et-4l
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:45:20 -0400
-Date: Thu, 25 Oct 2018 15:45:04 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181025154509.219e21bb@Igors-MacBook-Pro.local>
-In-Reply-To: <20181023152306.3123-7-david@redhat.com>
-References: <20181023152306.3123-1-david@redhat.com>
-	<20181023152306.3123-7-david@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 6/7] memory-device: avoid overflows on
- very huge devices
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gFgus-0007gJ-JN
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:18 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Date: Thu, 25 Oct 2018 10:45:43 -0400
+Message-Id: <20181025144644.15464-10-cota@braap.org>
+In-Reply-To: <20181025144644.15464-1-cota@braap.org>
+References: <20181025144644.15464-1-cota@braap.org>
+Subject: [Qemu-devel] [RFC v4 10/71] hppa: convert to helper_cpu_halted_set
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +23,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
 
-On Tue, 23 Oct 2018 17:23:05 +0200
-David Hildenbrand <david@redhat.com> wrote:
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+---
+ target/hppa/translate.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-> Should not be a problem right now, but it could theoretically happen
-> in the future.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-> ---
->  hw/mem/memory-device.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
-> index 996ad1490f..8be63c8032 100644
-> --- a/hw/mem/memory-device.c
-> +++ b/hw/mem/memory-device.c
-> @@ -85,7 +85,8 @@ static void memory_device_check_addable(MachineState *ms, uint64_t size,
->  
->      /* will we exceed the total amount of memory specified */
->      memory_device_used_region_size(OBJECT(ms), &used_region_size);
-> -    if (used_region_size + size > ms->maxram_size - ms->ram_size) {
-> +    if (used_region_size + size < used_region_size ||
-> +        used_region_size + size > ms->maxram_size - ms->ram_size) {
->          error_setg(errp, "not enough space, currently 0x%" PRIx64
->                     " in use of total space for memory devices 0x" RAM_ADDR_FMT,
->                     used_region_size, ms->maxram_size - ms->ram_size);
+diff --git a/target/hppa/translate.c b/target/hppa/translate.c
+index ce05d5619d..df9179e70f 100644
+--- a/target/hppa/translate.c
++++ b/target/hppa/translate.c
+@@ -2845,8 +2845,7 @@ static DisasJumpType trans_pause(DisasContext *ctx, uint32_t insn,
+ 
+     /* Tell the qemu main loop to halt until this cpu has work.  */
+     tmp = tcg_const_i32(1);
+-    tcg_gen_st_i32(tmp, cpu_env, -offsetof(HPPACPU, env) +
+-                                 offsetof(CPUState, halted));
++    gen_helper_cpu_halted_set(cpu_env, tmp);
+     tcg_temp_free_i32(tmp);
+     gen_excp_1(EXCP_HALTED);
+ 
+-- 
+2.17.1
