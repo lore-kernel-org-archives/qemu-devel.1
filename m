@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40350)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFjKj-0006hs-0S
+	(envelope-from <cota@braap.org>) id 1gFjKj-0006ix-9V
 	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 13:22:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFjKU-0000GD-BL
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 13:21:56 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:44461)
+	(envelope-from <cota@braap.org>) id 1gFjKh-0000Q4-T8
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 13:22:09 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:34201)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gFjKT-00005s-PJ
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 13:21:53 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gFjKh-0000CD-KQ
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 13:22:07 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 25 Oct 2018 13:20:35 -0400
-Message-Id: <20181025172057.20414-27-cota@braap.org>
+Date: Thu, 25 Oct 2018 13:20:52 -0400
+Message-Id: <20181025172057.20414-44-cota@braap.org>
 In-Reply-To: <20181025172057.20414-1-cota@braap.org>
 References: <20181025172057.20414-1-cota@braap.org>
-Subject: [Qemu-devel] [RFC 26/48] target/ppc: prepare for 2-pass translation
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [RFC 43/48] linux-user: support -plugin option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,33 +29,71 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>
 
+From: Lluís Vilanova <vilanova@ac.upc.edu>
+
+Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
+[ cota: s/instrument/plugin ]
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/ppc/translate.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ linux-user/main.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index 34c3ed0a41..88f88adaff 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -7565,6 +7565,9 @@ static void ppc_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs,
-               ctx->opcode, opc1(ctx->opcode), opc2(ctx->opcode),
-               opc3(ctx->opcode), opc4(ctx->opcode),
-               ctx->le_mode ? "little" : "big");
-+
-+    qemu_plugin_insn_append(plugin_insn, &ctx->opcode, sizeof(ctx->opcode));
-+
-     ctx->base.pc_next += 4;
-     table = env->opcodes;
-     handler = table[opc1(ctx->opcode)];
-@@ -7664,6 +7667,8 @@ static const TranslatorOps ppc_tr_ops = {
-     .translate_insn     = ppc_tr_translate_insn,
-     .tb_stop            = ppc_tr_tb_stop,
-     .disas_log          = ppc_tr_disas_log,
-+    .ctx_base_offset    = offsetof(DisasContext, base),
-+    .ctx_size           = sizeof(DisasContext),
- };
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 923cbb753a..0244ad736c 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -28,6 +28,7 @@
+ #include "qemu/config-file.h"
+ #include "qemu/cutils.h"
+ #include "qemu/help_option.h"
++#include "qemu/plugin.h"
+ #include "cpu.h"
+ #include "exec/exec-all.h"
+ #include "tcg.h"
+@@ -385,6 +386,15 @@ static void handle_arg_trace(const char *arg)
+     trace_file = trace_opt_parse(arg);
+ }
  
- void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
++static struct qemu_plugin_list plugins = QTAILQ_HEAD_INITIALIZER(plugins);
++
++#ifdef CONFIG_PLUGINS
++static void handle_arg_plugin(const char *arg)
++{
++    qemu_plugin_opt_parse(arg, &plugins);
++}
++#endif
++
+ struct qemu_argument {
+     const char *argv;
+     const char *env;
+@@ -436,6 +446,10 @@ static const struct qemu_argument arg_table[] = {
+      "",           "Seed for pseudo-random number generator"},
+     {"trace",      "QEMU_TRACE",       true,  handle_arg_trace,
+      "",           "[[enable=]<pattern>][,events=<file>][,file=<file>]"},
++#ifdef CONFIG_PLUGINS
++    {"plugin",     "QEMU_PLUGIN",      true,  handle_arg_plugin,
++     "",           "[file=]<file>[,arg=<string>]"},
++#endif
+     {"version",    "QEMU_VERSION",     false, handle_arg_version,
+      "",           "display version information and exit"},
+     {NULL, NULL, false, NULL, NULL, NULL}
+@@ -627,6 +641,7 @@ int main(int argc, char **argv, char **envp)
+     srand(time(NULL));
+ 
+     qemu_add_opts(&qemu_trace_opts);
++    qemu_plugin_add_opts();
+ 
+     optind = parse_args(argc, argv);
+ 
+@@ -634,6 +649,9 @@ int main(int argc, char **argv, char **envp)
+         exit(1);
+     }
+     trace_init_file(trace_file);
++    if (qemu_plugin_load_list(&plugins)) {
++        exit(1);
++    }
+ 
+     /* Zero out regs */
+     memset(regs, 0, sizeof(struct target_pt_regs));
 -- 
 2.17.1
