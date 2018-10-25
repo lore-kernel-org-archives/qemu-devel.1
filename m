@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40316)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40359)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFjKg-0006ho-2n
+	(envelope-from <cota@braap.org>) id 1gFjKh-0006hv-Ey
 	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 13:22:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFjKc-0000Mt-KR
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 13:22:04 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:36879)
+	(envelope-from <cota@braap.org>) id 1gFjKf-0000Ny-GQ
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 13:22:07 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:41303)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gFjKb-000085-SL
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gFjKc-0008Vr-4x
 	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 13:22:02 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 25 Oct 2018 13:20:38 -0400
-Message-Id: <20181025172057.20414-30-cota@braap.org>
+Date: Thu, 25 Oct 2018 13:20:30 -0400
+Message-Id: <20181025172057.20414-22-cota@braap.org>
 In-Reply-To: <20181025172057.20414-1-cota@braap.org>
 References: <20181025172057.20414-1-cota@braap.org>
-Subject: [Qemu-devel] [RFC 29/48] target/hppa: prepare for 2-pass translation
+Subject: [Qemu-devel] [RFC 21/48] *-user: plugin syscalls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +28,84 @@ Cc: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?
 
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/hppa/translate.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ bsd-user/syscall.c   | 9 +++++++++
+ linux-user/syscall.c | 3 +++
+ 2 files changed, 12 insertions(+)
 
-diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index 6c2a7fbc46..08ebbeb21c 100644
---- a/target/hppa/translate.c
-+++ b/target/hppa/translate.c
-@@ -4757,6 +4757,8 @@ static void hppa_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs,
-            the page permissions for execute.  */
-         uint32_t insn = cpu_ldl_code(env, ctx->base.pc_next);
+diff --git a/bsd-user/syscall.c b/bsd-user/syscall.c
+index b7818af450..4993f81b2b 100644
+--- a/bsd-user/syscall.c
++++ b/bsd-user/syscall.c
+@@ -323,6 +323,8 @@ abi_long do_freebsd_syscall(void *cpu_env, int num, abi_long arg1,
+     gemu_log("freebsd syscall %d\n", num);
+ #endif
+     trace_guest_user_syscall(cpu, num, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
++    qemu_plugin_vcpu_syscall(cpu, num, arg1, arg2, arg3, arg4, arg5, arg6, arg7,
++                             arg8);
+     if(do_strace)
+         print_freebsd_syscall(num, arg1, arg2, arg3, arg4, arg5, arg6);
  
-+        qemu_plugin_insn_append(plugin_insn, &insn, sizeof(insn));
-+
-         /* Set up the IA queue for the next insn.
-            This will be overwritten by a branch.  */
-         if (ctx->iaoq_b == -1) {
-@@ -4887,6 +4889,8 @@ static const TranslatorOps hppa_tr_ops = {
-     .translate_insn     = hppa_tr_translate_insn,
-     .tb_stop            = hppa_tr_tb_stop,
-     .disas_log          = hppa_tr_disas_log,
-+    .ctx_base_offset    = offsetof(DisasContext, base),
-+    .ctx_size           = sizeof(DisasContext),
- };
+@@ -404,6 +406,7 @@ abi_long do_freebsd_syscall(void *cpu_env, int num, abi_long arg1,
+     if (do_strace)
+         print_freebsd_syscall_ret(num, ret);
+     trace_guest_user_syscall_ret(cpu, num, ret);
++    qemu_plugin_vcpu_syscall_ret(cpu, num, ret);
+     return ret;
+  efault:
+     ret = -TARGET_EFAULT;
+@@ -422,6 +425,8 @@ abi_long do_netbsd_syscall(void *cpu_env, int num, abi_long arg1,
+     gemu_log("netbsd syscall %d\n", num);
+ #endif
+     trace_guest_user_syscall(cpu, num, arg1, arg2, arg3, arg4, arg5, arg6, 0, 0);
++    qemu_plugin_vcpu_syscall(cpu, num, arg1, arg2, arg3, arg4, arg5, arg6, 0,
++                             0);
+     if(do_strace)
+         print_netbsd_syscall(num, arg1, arg2, arg3, arg4, arg5, arg6);
  
- void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
+@@ -480,6 +485,7 @@ abi_long do_netbsd_syscall(void *cpu_env, int num, abi_long arg1,
+     if (do_strace)
+         print_netbsd_syscall_ret(num, ret);
+     trace_guest_user_syscall_ret(cpu, num, ret);
++    qemu_plugin_vcpu_syscall_ret(cpu, num, ret);
+     return ret;
+  efault:
+     ret = -TARGET_EFAULT;
+@@ -498,6 +504,8 @@ abi_long do_openbsd_syscall(void *cpu_env, int num, abi_long arg1,
+     gemu_log("openbsd syscall %d\n", num);
+ #endif
+     trace_guest_user_syscall(cpu, num, arg1, arg2, arg3, arg4, arg5, arg6, 0, 0);
++    qemu_plugin_vcpu_syscall(cpu, num, arg1, arg2, arg3, arg4, arg5, arg6, 0,
++                             0);
+     if(do_strace)
+         print_openbsd_syscall(num, arg1, arg2, arg3, arg4, arg5, arg6);
+ 
+@@ -556,6 +564,7 @@ abi_long do_openbsd_syscall(void *cpu_env, int num, abi_long arg1,
+     if (do_strace)
+         print_openbsd_syscall_ret(num, ret);
+     trace_guest_user_syscall_ret(cpu, num, ret);
++    qemu_plugin_vcpu_syscall_ret(cpu, num, ret);
+     return ret;
+  efault:
+     ret = -TARGET_EFAULT;
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index ae3c0dfef7..a6d17a9f37 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -11232,6 +11232,8 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+ 
+     trace_guest_user_syscall(cpu, num, arg1, arg2, arg3, arg4,
+                              arg5, arg6, arg7, arg8);
++    qemu_plugin_vcpu_syscall(cpu, num, arg1, arg2, arg3, arg4, arg5, arg6, arg7,
++                             arg8);
+ 
+     if (unlikely(do_strace)) {
+         print_syscall(num, arg1, arg2, arg3, arg4, arg5, arg6);
+@@ -11244,5 +11246,6 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+     }
+ 
+     trace_guest_user_syscall_ret(cpu, num, ret);
++    qemu_plugin_vcpu_syscall_ret(cpu, num, ret);
+     return ret;
+ }
 -- 
 2.17.1
