@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60299)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFh5J-0004D4-DX
+	(envelope-from <cota@braap.org>) id 1gFh5J-0004FR-F2
 	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:58:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFgvO-0008O8-Ji
+	(envelope-from <cota@braap.org>) id 1gFgvM-0008LK-HC
 	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:51 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:44397)
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:44129)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gFgvO-00087r-Cn
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:50 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gFgvM-00088K-Cu
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:48 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 25 Oct 2018 10:46:26 -0400
-Message-Id: <20181025144644.15464-53-cota@braap.org>
+Date: Thu, 25 Oct 2018 10:46:28 -0400
+Message-Id: <20181025144644.15464-55-cota@braap.org>
 In-Reply-To: <20181025144644.15464-1-cota@braap.org>
 References: <20181025144644.15464-1-cota@braap.org>
-Subject: [Qemu-devel] [RFC v4 53/71] sparc: convert to cpu_interrupt_request
+Subject: [Qemu-devel] [RFC v4 55/71] unicore32: convert to
+ cpu_interrupt_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,51 +25,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Guan Xuetao <gxt@mprc.pku.edu.cn>
 
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: Guan Xuetao <gxt@mprc.pku.edu.cn>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- hw/sparc64/sparc64.c | 4 ++--
- target/sparc/cpu.c   | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ target/unicore32/cpu.c     | 2 +-
+ target/unicore32/softmmu.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/sparc64/sparc64.c b/hw/sparc64/sparc64.c
-index 372bbd4f5b..58faeb111a 100644
---- a/hw/sparc64/sparc64.c
-+++ b/hw/sparc64/sparc64.c
-@@ -56,7 +56,7 @@ void cpu_check_irqs(CPUSPARCState *env)
-     /* The bit corresponding to psrpil is (1<< psrpil), the next bit
-        is (2 << psrpil). */
-     if (pil < (2 << env->psrpil)) {
--        if (cs->interrupt_request & CPU_INTERRUPT_HARD) {
-+        if (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD) {
-             trace_sparc64_cpu_check_irqs_reset_irq(env->interrupt_index);
-             env->interrupt_index = 0;
-             cpu_reset_interrupt(cs, CPU_INTERRUPT_HARD);
-@@ -87,7 +87,7 @@ void cpu_check_irqs(CPUSPARCState *env)
-                 break;
-             }
-         }
--    } else if (cs->interrupt_request & CPU_INTERRUPT_HARD) {
-+    } else if (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD) {
-         trace_sparc64_cpu_check_irqs_disabled(pil, env->pil_in, env->softint,
-                                               env->interrupt_index);
-         env->interrupt_index = 0;
-diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
-index 0f090ece54..88427283c1 100644
---- a/target/sparc/cpu.c
-+++ b/target/sparc/cpu.c
-@@ -709,7 +709,7 @@ static bool sparc_cpu_has_work(CPUState *cs)
-     SPARCCPU *cpu = SPARC_CPU(cs);
-     CPUSPARCState *env = &cpu->env;
+diff --git a/target/unicore32/cpu.c b/target/unicore32/cpu.c
+index 2b49d1ca40..65c5334551 100644
+--- a/target/unicore32/cpu.c
++++ b/target/unicore32/cpu.c
+@@ -29,7 +29,7 @@ static void uc32_cpu_set_pc(CPUState *cs, vaddr value)
  
--    return (cs->interrupt_request & CPU_INTERRUPT_HARD) &&
-+    return (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD) &&
-            cpu_interrupts_enabled(env);
+ static bool uc32_cpu_has_work(CPUState *cs)
+ {
+-    return cs->interrupt_request &
++    return cpu_interrupt_request(cs) &
+         (CPU_INTERRUPT_HARD | CPU_INTERRUPT_EXITTB);
  }
  
+diff --git a/target/unicore32/softmmu.c b/target/unicore32/softmmu.c
+index 00c7e0d028..f58e2361e0 100644
+--- a/target/unicore32/softmmu.c
++++ b/target/unicore32/softmmu.c
+@@ -119,7 +119,7 @@ void uc32_cpu_do_interrupt(CPUState *cs)
+     /* The PC already points to the proper instruction.  */
+     env->regs[30] = env->regs[31];
+     env->regs[31] = addr;
+-    cs->interrupt_request |= CPU_INTERRUPT_EXITTB;
++    cpu_interrupt_request_or(cs, CPU_INTERRUPT_EXITTB);
+ }
+ 
+ static int get_phys_addr_ucv2(CPUUniCore32State *env, uint32_t address,
 -- 
 2.17.1
