@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45357)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46012)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gFjXY-0003P8-Ll
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 13:35:29 -0400
+	(envelope-from <macro@linux-mips.org>) id 1gFjaV-0006Ee-Fy
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 13:38:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gFjXO-0001Wo-1W
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 13:35:20 -0400
-Received: from pio-pvt-msa1.bahnhof.se ([79.136.2.40]:36176)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gFjXN-0001W9-M7
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 13:35:13 -0400
-Date: Thu, 25 Oct 2018 19:34:59 +0200
-From: Fredrik Noring <noring@nocrew.org>
-Message-ID: <8793a3ae5c451894a5a7a7dfc1d958b2b3ab1b86.1540487815.git.noring@nocrew.org>
-References: <cover.1540487815.git.noring@nocrew.org>
+	(envelope-from <macro@linux-mips.org>) id 1gFjaJ-0004Bb-Ps
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 13:38:22 -0400
+Received: from eddie.linux-mips.org ([148.251.95.138]:51130
+	helo=cvs.linux-mips.org) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <macro@linux-mips.org>) id 1gFjaH-00045i-Kj
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 13:38:15 -0400
+Received: (from localhost user: 'macro', uid#1010) by eddie.linux-mips.org
+	with ESMTP id S23992735AbeJYRiDYy8kI (ORCPT
+	<rfc822;qemu-devel@nongnu.org>); Thu, 25 Oct 2018 19:38:03 +0200
+Date: Thu, 25 Oct 2018 18:38:03 +0100 (BST)
+Sender: "Maciej W. Rozycki" <macro@linux-mips.org>
+From: "Maciej W. Rozycki" <macro@linux-mips.org>
+In-Reply-To: <20181023191023.GB2244@sx9>
+Message-ID: <alpine.LFD.2.21.1810240213290.19280@eddie.linux-mips.org>
+References: <cover.1540134918.git.noring@nocrew.org>
+	<BN6PR2201MB125165723113459889A6EC59C6F40@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	<20181022172343.GB2331@sx9>
+	<alpine.LFD.2.21.1810221901170.19280@eddie.linux-mips.org>
+	<20181023191023.GB2244@sx9>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <cover.1540487815.git.noring@nocrew.org>
-Subject: [Qemu-devel] [PATCH 11/11] disas/mips: Disassemble R5900 DIV[U]1,
- M{F, T}{LO, HI}1 and MULT[U]1
+Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH v8 00/38] target/mips: Limited support for
+ the R5900
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,75 +34,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: =?utf-8?Q?J=C3=BCrgen?= Urban <JuergenUrban@gmx.de>, "Maciej W. Rozycki" <macro@linux-mips.org>, qemu-devel@nongnu.org
+To: Fredrik Noring <noring@nocrew.org>
+Cc: Aleksandar Markovic <amarkovic@wavecomp.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Petar Jovanovic <pjovanovic@wavecomp.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?J=C3=BCrgen_Urban?= <JuergenUrban@gmx.de>, qemu-devel@nongnu.org
 
-Disassemble the R5900 instructions DIV1, DIVU1, MFLO1, MTLO1, MFHI1,
-MTHI1, MULT1 and MULTU1.
+Hi Fredrik,
 
-Signed-off-by: Fredrik Noring <noring@nocrew.org>
----
- disas/mips.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+> >  NB all but pipeline 1 instructions of these are also implemented by other 
+> > members of the TXx9 family.  They seem to be referred to as just "multiply 
+> > and multiply-add instructions" in the TX79 manual (cf Section B.3.1).
+> 
+> Would
+> 
+> ASE_TOSHIBA_MMI  -- TX79 128-bit multimedia instructions
+> ASE_TOSHIBA_MAC  -- TXx9 multiply and multiply-add instructions (MADD etc.)
+> ASE_TOSHIBA_MAC1 -- TX79 pipeline 1 variant of ASE_TOSHIBA_MAC
+> ASE_TOSHIBA_FMA  -- R5900 FPU extensions (MADD.s etc.)
+> 
+> be acceptable for the currently known Toshiba extensions? (Please propose
+> better names.) One complication is that it seems only 8 bits are available
+> for all vendor ASEs, and Toshiba would then scoop up half of those.
 
-diff --git a/disas/mips.c b/disas/mips.c
-index 9f01fda8bd..eddfb59325 100644
---- a/disas/mips.c
-+++ b/disas/mips.c
-@@ -2323,6 +2323,8 @@ const struct mips_opcode mips_builtin_opcodes[] =
- {"div",     "z,t",      0x0000001a, 0xffe0ffff, RD_s|RD_t|WR_HILO,      0,		I1      },
- {"div",     "d,v,t",	0,    (int) M_DIV_3,	INSN_MACRO,		0,		I1	},
- {"div",     "d,v,I",	0,    (int) M_DIV_3I,	INSN_MACRO,		0,		I1	},
-+{"div1",    "z,s,t",  0x7000001a, 0xfc00ffff, RD_s | RD_t | WR_HILO, 0, EE },
-+{"div1",    "z,t",    0x7000001a, 0xffe0ffff, RD_s | RD_t | WR_HILO, 0, EE },
- {"div.d",   "D,V,T",	0x46200003, 0xffe0003f,	WR_D|RD_S|RD_T|FP_D,	0,		I1	},
- {"div.s",   "D,V,T",	0x46000003, 0xffe0003f,	WR_D|RD_S|RD_T|FP_S,	0,		I1	},
- {"div.ps",  "D,V,T",	0x46c00003, 0xffe0003f,	WR_D|RD_S|RD_T|FP_D,	0,		SB1	},
-@@ -2331,6 +2333,8 @@ const struct mips_opcode mips_builtin_opcodes[] =
- {"divu",    "z,t",      0x0000001b, 0xffe0ffff, RD_s|RD_t|WR_HILO,      0,		I1      },
- {"divu",    "d,v,t",	0,    (int) M_DIVU_3,	INSN_MACRO,		0,		I1	},
- {"divu",    "d,v,I",	0,    (int) M_DIVU_3I,	INSN_MACRO,		0,		I1	},
-+{"divu1",   "z,s,t",  0x7000001b, 0xfc00ffff, RD_s | RD_t | WR_HILO, 0, EE },
-+{"divu1",   "z,t",    0x7000001b, 0xffe0ffff, RD_s | WR_HILO       , 0, EE },
- {"dla",     "t,A(b)",	0,    (int) M_DLA_AB,	INSN_MACRO,		0,		I3	},
- {"dlca",    "t,A(b)",	0,    (int) M_DLCA_AB,	INSN_MACRO,		0,		I3	},
- {"dli",     "t,j",      0x24000000, 0xffe00000, WR_t,			0,		I3	}, /* addiu */
-@@ -2594,8 +2598,10 @@ const struct mips_opcode mips_builtin_opcodes[] =
- {"mfdr",    "t,G",	0x7000003d, 0xffe007ff,	LCD|WR_t|RD_C0,		0,		N5      },
- {"mfhi",    "d",	0x00000010, 0xffff07ff,	WR_d|RD_HI,		0,		I1	},
- {"mfhi",    "d,9",	0x00000010, 0xff9f07ff, WR_d|RD_HI,		0,		D32	},
-+{"mfhi1",   "d",  0x70000010, 0xffff07ff, WR_d | RD_HI, 0, EE},
- {"mflo",    "d",	0x00000012, 0xffff07ff,	WR_d|RD_LO,		0,		I1	},
- {"mflo",    "d,9",	0x00000012, 0xff9f07ff, WR_d|RD_LO,		0,		D32	},
-+{"mflo1",   "d",  0x70000012, 0xffff07ff, WR_d | RD_LO, 0, EE},
- {"mflhxu",  "d",	0x00000052, 0xffff07ff,	WR_d|MOD_HILO,		0,		SMT	},
- {"min.ob",  "X,Y,Q",	0x78000006, 0xfc20003f,	WR_D|RD_S|RD_T|FP_D,	0,		MX|SB1	},
- {"min.ob",  "D,S,T",	0x4ac00006, 0xffe0003f,	WR_D|RD_S|RD_T,		0,		N54	},
-@@ -2661,8 +2667,10 @@ const struct mips_opcode mips_builtin_opcodes[] =
- {"mtdr",    "t,G",	0x7080003d, 0xffe007ff,	COD|RD_t|WR_C0,		0,		N5	},
- {"mthi",    "s",	0x00000011, 0xfc1fffff,	RD_s|WR_HI,		0,		I1	},
- {"mthi",    "s,7",	0x00000011, 0xfc1fe7ff, RD_s|WR_HI,		0,		D32	},
-+{"mthi1",   "s",  0x70000011, 0xfc1fffff, RD_s | WR_HI, 0, EE },
- {"mtlo",    "s",	0x00000013, 0xfc1fffff,	RD_s|WR_LO,		0,		I1	},
- {"mtlo",    "s,7",	0x00000013, 0xfc1fe7ff, RD_s|WR_LO,		0,		D32	},
-+{"mtlo1",   "s",  0x70000013, 0xfc1fffff, RD_s | WR_LO, 0, EE },
- {"mtlhx",   "s",	0x00000053, 0xfc1fffff,	RD_s|MOD_HILO,		0,		SMT	},
- {"mttc0",   "t,G",	0x41800000, 0xffe007ff, TRAP|COD|RD_t|WR_C0|WR_CC, 0,		MT32	},
- {"mttc0",   "t,+D",	0x41800000, 0xffe007f8, TRAP|COD|RD_t|WR_C0|WR_CC, 0,		MT32	},
-@@ -2728,10 +2736,14 @@ const struct mips_opcode mips_builtin_opcodes[] =
- {"mult",    "s,t",      0x00000018, 0xfc00ffff, RD_s|RD_t|WR_HILO|IS_M, 0,		I1	},
- {"mult",    "7,s,t",	0x00000018, 0xfc00e7ff, WR_a|RD_s|RD_t,         0,              D33	},
- {"mult",    "d,s,t",    0x00000018, 0xfc0007ff, RD_s|RD_t|WR_HILO|WR_d|IS_M, 0,		G1	},
-+{"mult1",   "s,t",      0x70000018, 0xfc00ffff, RD_s | RD_t | WR_HILO | IS_M, 0, EE },
-+{"mult1",   "d,s,t", 0x70000018, 0xfc0007ff, WR_d | RD_s | RD_t | WR_HILO | IS_M, 0, EE },
- {"multp",   "s,t",	0x00000459, 0xfc00ffff,	RD_s|RD_t|MOD_HILO,	0,		SMT	},
- {"multu",   "s,t",      0x00000019, 0xfc00ffff, RD_s|RD_t|WR_HILO|IS_M, 0,		I1	},
- {"multu",   "7,s,t",	0x00000019, 0xfc00e7ff, WR_a|RD_s|RD_t,         0,              D33	},
- {"multu",   "d,s,t",    0x00000019, 0xfc0007ff, RD_s|RD_t|WR_HILO|WR_d|IS_M, 0,		G1	},
-+{"multu1",  "s,t",      0x70000019, 0xfc00ffff, RD_s | RD_t | WR_HILO | IS_M, 0, EE },
-+{"multu1",  "d,s,t", 0x70000019, 0xfc0007ff, WR_d | RD_s | RD_t | WR_HILO | IS_M, 0, EE },
- {"mulu",    "d,s,t",	0x00000059, 0xfc0007ff,	RD_s|RD_t|WR_HILO|WR_d,	0,		N5	},
- {"neg",     "d,w",	0x00000022, 0xffe007ff,	WR_d|RD_t,		0,		I1	}, /* sub 0 */
- {"negu",    "d,w",	0x00000023, 0xffe007ff,	WR_d|RD_t,		0,		I1	}, /* subu 0 */
--- 
-2.18.1
+ I'm not sure if every single random vendor-specific instruction (or a 
+bunch of) deserves its own ASE designation, be it internal or externally 
+exposed.  I think the MMI set being a substantial architectural feature 
+makes sense to be shown in /proc/cpuinfo (in Linux), but I don't think 
+there's much more about it.  It's limited to 2 implementations only, so 
+internally I think it can well be handled with a macro or static inline 
+function (as appropriate) which boil down to (CPU_R5900 || CPU_TX79).
+
+ And if you run out of bits for ASEs regardless, then I suggest just to 
+expand the field in question.  In QEMU you can rely on the presence of the 
+`uint64_t' data type, so with only 8 bits exhausted you're far from 
+getting into trouble.
+
+  Maciej
