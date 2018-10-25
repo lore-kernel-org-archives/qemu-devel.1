@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58497)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58495)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gFTvN-0004Df-Hj
+	(envelope-from <mst@redhat.com>) id 1gFTvN-0004Dc-Ee
 	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 20:54:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gFTvM-0006nn-PZ
+	(envelope-from <mst@redhat.com>) id 1gFTvK-0006iL-AB
 	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 20:54:57 -0400
-Date: Wed, 24 Oct 2018 20:54:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:19810)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gFTvK-0006i5-3r
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 20:54:54 -0400
+Date: Wed, 24 Oct 2018 20:54:48 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181025005110.249256-26-mst@redhat.com>
+Message-ID: <20181025005110.249256-25-mst@redhat.com>
 References: <20181025005110.249256-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <20181025005110.249256-1-mst@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 25/28] i440fx: use ARRAY_SIZE for pam_regions
+Subject: [Qemu-devel] [PULL v2 24/28] pci_bridge: fix typo in comment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,45 +28,31 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Li Qiang <liq3ea@gmail.com>, qemu-trivial@nongnu.org, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-From: Li Qiang <liq3ea@gmail.com>
+From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 
-Cc: qemu-trivial@nongnu.org
-
-Signed-off-by: Li Qiang <liq3ea@gmail.com>
+Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/pci-host/piix.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/pci/pci_bridge.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
-index 999db824da..82421a86e3 100644
---- a/hw/pci-host/piix.c
-+++ b/hw/pci-host/piix.c
-@@ -142,7 +142,7 @@ static void i440fx_update_memory_mappings(PCII440FXSt=
-ate *d)
-     PCIDevice *pd =3D PCI_DEVICE(d);
+diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
+index 08b7e44e2e..ee9dff2d3a 100644
+--- a/hw/pci/pci_bridge.c
++++ b/hw/pci/pci_bridge.c
+@@ -399,7 +399,7 @@ void pci_bridge_exitfn(PCIDevice *pci_dev)
 =20
-     memory_region_transaction_begin();
--    for (i =3D 0; i < 13; i++) {
-+    for (i =3D 0; i < ARRAY_SIZE(d->pam_regions); i++) {
-         pam_update(&d->pam_regions[i], i,
-                    pd->config[I440FX_PAM + (DIV_ROUND_UP(i, 2))]);
-     }
-@@ -412,7 +412,7 @@ PCIBus *i440fx_init(const char *host_type, const char=
- *pci_type,
-=20
-     init_pam(dev, f->ram_memory, f->system_memory, f->pci_address_space,
-              &f->pam_regions[0], PAM_BIOS_BASE, PAM_BIOS_SIZE);
--    for (i =3D 0; i < 12; ++i) {
-+    for (i =3D 0; i < ARRAY_SIZE(f->pam_regions) - 1; ++i) {
-         init_pam(dev, f->ram_memory, f->system_memory, f->pci_address_sp=
-ace,
-                  &f->pam_regions[i+1], PAM_EXPAN_BASE + i * PAM_EXPAN_SI=
-ZE,
-                  PAM_EXPAN_SIZE);
+ /*
+  * before qdev initialization(qdev_init()), this function sets bus_name =
+and
+- * map_irq callback which are necessry for pci_bridge_initfn() to
++ * map_irq callback which are necessary for pci_bridge_initfn() to
+  * initialize bus.
+  */
+ void pci_bridge_map_irq(PCIBridge *br, const char* bus_name,
 --=20
 MST
