@@ -1,21 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60142)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFh5N-0003ub-5s
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:58:10 -0400
+	(envelope-from <cota@braap.org>) id 1gFh5J-00033X-CO
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:58:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFgvE-0008CM-UK
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:42 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:54609)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gFgvE-000831-HF
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:40 -0400
+	(envelope-from <cota@braap.org>) id 1gFgvO-0008OK-Th
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:51 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 25 Oct 2018 10:46:14 -0400
-Message-Id: <20181025144644.15464-41-cota@braap.org>
+Date: Thu, 25 Oct 2018 10:46:15 -0400
+Message-Id: <20181025144644.15464-42-cota@braap.org>
 In-Reply-To: <20181025144644.15464-1-cota@braap.org>
 References: <20181025144644.15464-1-cota@braap.org>
-Subject: [Qemu-devel] [RFC v4 41/71] i386/hvf: convert to
- cpu_request_interrupt
+Subject: [Qemu-devel] [RFC v4 42/71] ppc: convert to cpu_interrupt_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,123 +20,133 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
 
+Cc: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexander Graf <agraf@suse.de>
+Cc: qemu-ppc@nongnu.org
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/i386/hvf/hvf.c    |  8 +++++---
- target/i386/hvf/x86hvf.c | 26 +++++++++++++++-----------
- 2 files changed, 20 insertions(+), 14 deletions(-)
+ hw/ppc/ppc.c                    |  2 +-
+ target/ppc/excp_helper.c        |  2 +-
+ target/ppc/kvm.c                |  4 ++--
+ target/ppc/translate_init.inc.c | 14 +++++++-------
+ 4 files changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
-index fb3b2a26a1..da789117c8 100644
---- a/target/i386/hvf/hvf.c
-+++ b/target/i386/hvf/hvf.c
-@@ -250,7 +250,7 @@ void update_apic_tpr(CPUState *cpu)
+diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
+index d1a5a0b877..bc1cefa13f 100644
+--- a/hw/ppc/ppc.c
++++ b/hw/ppc/ppc.c
+@@ -91,7 +91,7 @@ void ppc_set_irq(PowerPCCPU *cpu, int n_IRQ, int level)
  
- static void hvf_handle_interrupt(CPUState * cpu, int mask)
- {
--    cpu->interrupt_request |= mask;
-+    cpu_interrupt_request_or(cpu, mask);
-     if (!qemu_cpu_is_self(cpu)) {
-         qemu_cpu_kick(cpu);
+     LOG_IRQ("%s: %p n_IRQ %d level %d => pending %08" PRIx32
+                 "req %08x\n", __func__, env, n_IRQ, level,
+-                env->pending_interrupts, CPU(cpu)->interrupt_request);
++                env->pending_interrupts, cpu_interrupt_request(CPU(cpu)));
+ 
+     if (locked) {
+         qemu_mutex_unlock_iothread();
+diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
+index 737c9c72be..75a434f46b 100644
+--- a/target/ppc/excp_helper.c
++++ b/target/ppc/excp_helper.c
+@@ -753,7 +753,7 @@ static void ppc_hw_interrupt(CPUPPCState *env)
+ 
+     qemu_log_mask(CPU_LOG_INT, "%s: %p pending %08x req %08x me %d ee %d\n",
+                   __func__, env, env->pending_interrupts,
+-                  cs->interrupt_request, (int)msr_me, (int)msr_ee);
++                  cpu_interrupt_request(cs), (int)msr_me, (int)msr_ee);
+ #endif
+     /* External reset */
+     if (env->pending_interrupts & (1 << PPC_INTERRUPT_RESET)) {
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index dc6b8d5e9e..438e30b6cb 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -1334,7 +1334,7 @@ void kvm_arch_pre_run(CPUState *cs, struct kvm_run *run)
+      * interrupt, reset, etc) in PPC-specific env->irq_input_state. */
+     if (!cap_interrupt_level &&
+         run->ready_for_interrupt_injection &&
+-        (cs->interrupt_request & CPU_INTERRUPT_HARD) &&
++        (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD) &&
+         (env->irq_input_state & (1<<PPC_INPUT_INT)))
+     {
+         /* For now KVM disregards the 'irq' argument. However, in the
+@@ -1376,7 +1376,7 @@ static int kvmppc_handle_halt(PowerPCCPU *cpu)
+     CPUState *cs = CPU(cpu);
+     CPUPPCState *env = &cpu->env;
+ 
+-    if (!(cs->interrupt_request & CPU_INTERRUPT_HARD) && (msr_ee)) {
++    if (!(cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD) && (msr_ee)) {
+         cpu_halted_set(cs, 1);
+         cs->exception_index = EXCP_HLT;
      }
-@@ -712,10 +712,12 @@ int hvf_vcpu_exec(CPUState *cpu)
-         ret = 0;
-         switch (exit_reason) {
-         case EXIT_REASON_HLT: {
-+            uint32_t interrupt_request = cpu_interrupt_request(cpu);
-+
-             macvm_set_rip(cpu, rip + ins_len);
--            if (!((cpu->interrupt_request & CPU_INTERRUPT_HARD) &&
-+            if (!((interrupt_request & CPU_INTERRUPT_HARD) &&
-                 (EFLAGS(env) & IF_MASK))
--                && !(cpu->interrupt_request & CPU_INTERRUPT_NMI) &&
-+                && !(interrupt_request & CPU_INTERRUPT_NMI) &&
-                 !(idtvec_info & VMCS_IDT_VEC_VALID)) {
-                 cpu_halted_set(cpu, 1);
-                 ret = EXCP_HLT;
-diff --git a/target/i386/hvf/x86hvf.c b/target/i386/hvf/x86hvf.c
-index e8b13ed534..91feafeedc 100644
---- a/target/i386/hvf/x86hvf.c
-+++ b/target/i386/hvf/x86hvf.c
-@@ -358,6 +358,7 @@ bool hvf_inject_interrupts(CPUState *cpu_state)
+diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
+index 0e423bea69..6827db14b6 100644
+--- a/target/ppc/translate_init.inc.c
++++ b/target/ppc/translate_init.inc.c
+@@ -8446,7 +8446,7 @@ static bool cpu_has_work_POWER7(CPUState *cs)
+     CPUPPCState *env = &cpu->env;
  
-     uint8_t vector;
-     uint64_t intr_type;
-+    uint32_t interrupt_request;
-     bool have_event = true;
-     if (env->interrupt_injected != -1) {
-         vector = env->interrupt_injected;
-@@ -400,7 +401,7 @@ bool hvf_inject_interrupts(CPUState *cpu_state)
-         };
-     }
- 
--    if (cpu_state->interrupt_request & CPU_INTERRUPT_NMI) {
-+    if (cpu_interrupt_request(cpu_state) & CPU_INTERRUPT_NMI) {
-         if (!(env->hflags2 & HF2_NMI_MASK) && !(info & VMCS_INTR_VALID)) {
-             cpu_reset_interrupt(cpu_state, CPU_INTERRUPT_NMI);
-             info = VMCS_INTR_VALID | VMCS_INTR_T_NMI | NMI_VEC;
-@@ -411,7 +412,7 @@ bool hvf_inject_interrupts(CPUState *cpu_state)
-     }
- 
-     if (!(env->hflags & HF_INHIBIT_IRQ_MASK) &&
--        (cpu_state->interrupt_request & CPU_INTERRUPT_HARD) &&
-+        (cpu_interrupt_request(cpu_state) & CPU_INTERRUPT_HARD) &&
-         (EFLAGS(env) & IF_MASK) && !(info & VMCS_INTR_VALID)) {
-         int line = cpu_get_pic_interrupt(&x86cpu->env);
-         cpu_reset_interrupt(cpu_state, CPU_INTERRUPT_HARD);
-@@ -420,39 +421,42 @@ bool hvf_inject_interrupts(CPUState *cpu_state)
-                   VMCS_INTR_VALID | VMCS_INTR_T_HWINTR);
+     if (cpu_halted(cs)) {
+-        if (!(cs->interrupt_request & CPU_INTERRUPT_HARD)) {
++        if (!(cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD)) {
+             return false;
          }
+         if ((env->pending_interrupts & (1u << PPC_INTERRUPT_EXT)) &&
+@@ -8470,7 +8470,7 @@ static bool cpu_has_work_POWER7(CPUState *cs)
+         }
+         return false;
+     } else {
+-        return msr_ee && (cs->interrupt_request & CPU_INTERRUPT_HARD);
++        return msr_ee && (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD);
      }
--    if (cpu_state->interrupt_request & CPU_INTERRUPT_HARD) {
-+    if (cpu_interrupt_request(cpu_state) & CPU_INTERRUPT_HARD) {
-         vmx_set_int_window_exiting(cpu_state);
-     }
--    return (cpu_state->interrupt_request
--            & (CPU_INTERRUPT_INIT | CPU_INTERRUPT_TPR));
-+    return cpu_interrupt_request(cpu_state) & (CPU_INTERRUPT_INIT |
-+                                               CPU_INTERRUPT_TPR);
  }
  
- int hvf_process_events(CPUState *cpu_state)
- {
-     X86CPU *cpu = X86_CPU(cpu_state);
-     CPUX86State *env = &cpu->env;
-+    uint32_t interrupt_request;
+@@ -8600,7 +8600,7 @@ static bool cpu_has_work_POWER8(CPUState *cs)
+     CPUPPCState *env = &cpu->env;
  
-     EFLAGS(env) = rreg(cpu_state->hvf_fd, HV_X86_RFLAGS);
+     if (cpu_halted(cs)) {
+-        if (!(cs->interrupt_request & CPU_INTERRUPT_HARD)) {
++        if (!(cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD)) {
+             return false;
+         }
+         if ((env->pending_interrupts & (1u << PPC_INTERRUPT_EXT)) &&
+@@ -8632,7 +8632,7 @@ static bool cpu_has_work_POWER8(CPUState *cs)
+         }
+         return false;
+     } else {
+-        return msr_ee && (cs->interrupt_request & CPU_INTERRUPT_HARD);
++        return msr_ee && (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD);
+     }
+ }
  
--    if (cpu_state->interrupt_request & CPU_INTERRUPT_INIT) {
-+    if (cpu_interrupt_request(cpu_state) & CPU_INTERRUPT_INIT) {
-         hvf_cpu_synchronize_state(cpu_state);
-         do_cpu_init(cpu);
-     }
+@@ -8792,7 +8792,7 @@ static bool cpu_has_work_POWER9(CPUState *cs)
+     CPUPPCState *env = &cpu->env;
  
--    if (cpu_state->interrupt_request & CPU_INTERRUPT_POLL) {
-+    if (cpu_interrupt_request(cpu_state) & CPU_INTERRUPT_POLL) {
-         cpu_reset_interrupt(cpu_state, CPU_INTERRUPT_POLL);
-         apic_poll_irq(cpu->apic_state);
+     if (cpu_halted(cs)) {
+-        if (!(cs->interrupt_request & CPU_INTERRUPT_HARD)) {
++        if (!(cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD)) {
+             return false;
+         }
+         /* External Exception */
+@@ -8825,7 +8825,7 @@ static bool cpu_has_work_POWER9(CPUState *cs)
+         }
+         return false;
+     } else {
+-        return msr_ee && (cs->interrupt_request & CPU_INTERRUPT_HARD);
++        return msr_ee && (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD);
      }
--    if (((cpu_state->interrupt_request & CPU_INTERRUPT_HARD) &&
-+
-+    interrupt_request = cpu_interrupt_request(cpu_state);
-+    if (((interrupt_request & CPU_INTERRUPT_HARD) &&
-         (EFLAGS(env) & IF_MASK)) ||
--        (cpu_state->interrupt_request & CPU_INTERRUPT_NMI)) {
-+        (interrupt_request & CPU_INTERRUPT_NMI)) {
-         cpu_halted_set(cpu_state, 0);
-     }
--    if (cpu_state->interrupt_request & CPU_INTERRUPT_SIPI) {
-+    if (interrupt_request & CPU_INTERRUPT_SIPI) {
-         hvf_cpu_synchronize_state(cpu_state);
-         do_cpu_sipi(cpu);
-     }
--    if (cpu_state->interrupt_request & CPU_INTERRUPT_TPR) {
-+    if (cpu_interrupt_request(cpu_state) & CPU_INTERRUPT_TPR) {
-         cpu_reset_interrupt(cpu_state, CPU_INTERRUPT_TPR);
-         hvf_cpu_synchronize_state(cpu_state);
-         apic_handle_tpr_access_report(cpu->apic_state, env->eip,
+ }
+ 
+@@ -10236,7 +10236,7 @@ static bool ppc_cpu_has_work(CPUState *cs)
+     PowerPCCPU *cpu = POWERPC_CPU(cs);
+     CPUPPCState *env = &cpu->env;
+ 
+-    return msr_ee && (cs->interrupt_request & CPU_INTERRUPT_HARD);
++    return msr_ee && (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD);
+ }
+ 
+ /* CPUClass::reset() */
 -- 
 2.17.1
