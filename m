@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57521)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57677)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1gFTsC-0000dG-93
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 20:51:41 -0400
+	(envelope-from <mst@redhat.com>) id 1gFTt1-0001Aj-I6
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 20:52:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1gFTs9-0001fw-7W
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 20:51:40 -0400
-Received: from smtp36.i.mail.ru ([94.100.177.96]:51270)
+	(envelope-from <mst@redhat.com>) id 1gFTso-0003ho-Ul
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 20:52:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42248)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1gFTs2-00013U-Ql
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 20:51:33 -0400
-From: Julia Suvorova <jusual@mail.ru>
-Date: Thu, 25 Oct 2018 03:50:51 +0300
-Message-Id: <20181025005052.27661-3-jusual@mail.ru>
-In-Reply-To: <20181025005052.27661-1-jusual@mail.ru>
-References: <20181025005052.27661-1-jusual@mail.ru>
-Subject: [Qemu-devel] [PATCH v3 2/3] hw/arm/nrf51_soc: Connect UART to nRF51
- SoC
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gFTso-0003g4-7G
+	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 20:52:18 -0400
+Date: Wed, 24 Oct 2018 20:52:14 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181025005110.249256-1-mst@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v2 00/28] pci, pc, virtio: fixes, features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,105 +26,114 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <mail@steffen-goertz.de>, Thomas Huth <thuth@redhat.com>, Julia Suvorova <jusual@mail.ru>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-Wire up nRF51 UART in the corresponding SoC.
+The following changes since commit 13399aad4fa87b2878c49d02a5d3bafa6c966b=
+a3:
 
-Signed-off-by: Julia Suvorova <jusual@mail.ru>
----
- hw/arm/microbit.c          |  2 ++
- hw/arm/nrf51_soc.c         | 20 ++++++++++++++++++++
- include/hw/arm/nrf51_soc.h |  3 +++
- 3 files changed, 25 insertions(+)
+  Merge remote-tracking branch 'remotes/armbru/tags/pull-error-2018-10-22=
+' into staging (2018-10-23 17:20:23 +0100)
 
-diff --git a/hw/arm/microbit.c b/hw/arm/microbit.c
-index e7d74116a5..a734e7f650 100644
---- a/hw/arm/microbit.c
-+++ b/hw/arm/microbit.c
-@@ -12,6 +12,7 @@
- #include "qapi/error.h"
- #include "hw/boards.h"
- #include "hw/arm/arm.h"
-+#include "sysemu/sysemu.h"
- #include "exec/address-spaces.h"
- 
- #include "hw/arm/nrf51_soc.h"
-@@ -35,6 +36,7 @@ static void microbit_init(MachineState *machine)
- 
-     sysbus_init_child_obj(OBJECT(machine), "nrf51", soc, sizeof(s->nrf51),
-                           TYPE_NRF51_SOC);
-+    qdev_prop_set_chr(DEVICE(&s->nrf51), "serial0", serial_hd(0));
-     object_property_set_link(soc, OBJECT(system_memory), "memory",
-                              &error_fatal);
-     object_property_set_bool(soc, true, "realized", &error_fatal);
-diff --git a/hw/arm/nrf51_soc.c b/hw/arm/nrf51_soc.c
-index 1a59ef4552..b89c1bdea0 100644
---- a/hw/arm/nrf51_soc.c
-+++ b/hw/arm/nrf51_soc.c
-@@ -43,9 +43,12 @@
- #define NRF51822_FLASH_SIZE     (256 * 1024)
- #define NRF51822_SRAM_SIZE      (16 * 1024)
- 
-+#define BASE_TO_IRQ(base) ((base >> 12) & 0x1F)
-+
- static void nrf51_soc_realize(DeviceState *dev_soc, Error **errp)
- {
-     NRF51State *s = NRF51_SOC(dev_soc);
-+    MemoryRegion *mr;
-     Error *err = NULL;
- 
-     if (!s->board_memory) {
-@@ -82,6 +85,18 @@ static void nrf51_soc_realize(DeviceState *dev_soc, Error **errp)
-     }
-     memory_region_add_subregion(&s->container, SRAM_BASE, &s->sram);
- 
-+    /* UART */
-+    object_property_set_bool(OBJECT(&s->uart), true, "realized", &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+    mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->uart), 0);
-+    memory_region_add_subregion_overlap(&s->container, UART_BASE, mr, 0);
-+    sysbus_connect_irq(SYS_BUS_DEVICE(&s->uart), 0,
-+                       qdev_get_gpio_in(DEVICE(&s->cpu),
-+                       BASE_TO_IRQ(UART_BASE)));
-+
-     create_unimplemented_device("nrf51_soc.io", IOMEM_BASE, IOMEM_SIZE);
-     create_unimplemented_device("nrf51_soc.ficr", FICR_BASE, FICR_SIZE);
-     create_unimplemented_device("nrf51_soc.private",
-@@ -99,6 +114,11 @@ static void nrf51_soc_init(Object *obj)
-     qdev_prop_set_string(DEVICE(&s->cpu), "cpu-type",
-                          ARM_CPU_TYPE_NAME("cortex-m0"));
-     qdev_prop_set_uint32(DEVICE(&s->cpu), "num-irq", 32);
-+
-+    sysbus_init_child_obj(obj, "uart", &s->uart, sizeof(s->uart),
-+                           TYPE_NRF51_UART);
-+    object_property_add_alias(obj, "serial0", OBJECT(&s->uart), "chardev",
-+                              &error_abort);
- }
- 
- static Property nrf51_soc_properties[] = {
-diff --git a/include/hw/arm/nrf51_soc.h b/include/hw/arm/nrf51_soc.h
-index f4e092b554..73fc92e9a8 100644
---- a/include/hw/arm/nrf51_soc.h
-+++ b/include/hw/arm/nrf51_soc.h
-@@ -12,6 +12,7 @@
- 
- #include "hw/sysbus.h"
- #include "hw/arm/armv7m.h"
-+#include "hw/char/nrf51_uart.h"
- 
- #define TYPE_NRF51_SOC "nrf51-soc"
- #define NRF51_SOC(obj) \
-@@ -24,6 +25,8 @@ typedef struct NRF51State {
-     /*< public >*/
-     ARMv7MState cpu;
- 
-+    NRF51UARTState uart;
-+
-     MemoryRegion iomem;
-     MemoryRegion sram;
-     MemoryRegion flash;
--- 
-2.17.1
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+
+for you to fetch changes up to 6a9fb4e1ba5594cde7739068617ad88e6117db93:
+
+  vhost-scsi: prevent using uninitialized vqs (2018-10-24 20:50:13 -0400)
+
+----------------------------------------------------------------
+pci, pc, virtio: fixes, features
+
+AMD IOMMU VAPIC support + fixes all over the place.
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+Gerd Hoffmann (1):
+      pci-testdev: add optional memory bar
+
+Laszlo Ersek (4):
+      MAINTAINERS: list "tests/acpi-test-data" files in ACPI/SMBIOS secti=
+on
+      hw/pci-host/x86: extract get_pci_hole64_start_value() helpers
+      hw/pci-host/x86: extend the 64-bit PCI hole relative to the fw-assi=
+gned base
+      tests/bios-tables-test: add 64-bit PCI MMIO aperture round-up test =
+on Q35
+
+Li Qiang (3):
+      i440fx: use ARRAY_SIZE for pam_regions
+      piix: use TYPE_FOO constants than string constats
+      piix_pci: fix i440fx data sheet link
+
+Mao Zhongyi (1):
+      pci_bridge: fix typo in comment
+
+Peter Xu (4):
+      intel_iommu: introduce vtd_reset_caches()
+      intel_iommu: better handling of dmar state switch
+      intel_iommu: move ce fetching out when sync shadow
+      intel_iommu: handle invalid ce for shadow sync
+
+Philippe Mathieu-Daud=C3=A9 (3):
+      hw/pci-bridge/xio3130: Remove unused functions
+      hw/pci-bridge/ioh3420: Remove unuseful header
+      hw/pci: Add missing include
+
+Singh, Brijesh (9):
+      x86_iommu: move the kernel-irqchip check in common code
+      x86_iommu: move vtd_generate_msi_message in common file
+      x86_iommu/amd: remove V=3D1 check from amdvi_validate_dte()
+      x86_iommu/amd: make the address space naming consistent with intel-=
+iommu
+      x86_iommu/amd: Prepare for interrupt remap support
+      x86_iommu/amd: Add interrupt remap support when VAPIC is not enable=
+d
+      i386: acpi: add IVHD device entry for IOAPIC
+      x86_iommu/amd: Add interrupt remap support when VAPIC is enabled
+      x86_iommu/amd: Enable Guest virtual APIC support
+
+Yaowei Bai (1):
+      virtio-blk: fix comment for virtio_blk_rw_complete
+
+Yongji Xie (1):
+      vhost-user-blk: start vhost when guest kicks
+
+yuchenlin (1):
+      vhost-scsi: prevent using uninitialized vqs
+
+ docs/specs/pci-testdev.txt           |  15 +-
+ hw/i386/amd_iommu.h                  |  96 +++++++-
+ hw/pci-bridge/ioh3420.h              |   6 -
+ hw/pci-bridge/xio3130_downstream.h   |  11 -
+ hw/pci-bridge/xio3130_upstream.h     |  10 -
+ include/hw/i386/intel_iommu.h        |  59 -----
+ include/hw/i386/x86-iommu.h          |  66 ++++++
+ include/hw/pci/pci_bus.h             |   2 +
+ hw/block/vhost-user-blk.c            |  25 +++
+ hw/block/virtio-blk.c                |   4 +-
+ hw/i386/acpi-build.c                 |  31 ++-
+ hw/i386/amd_iommu.c                  | 414 +++++++++++++++++++++++++++++=
++++++-
+ hw/i386/intel_iommu.c                | 131 +++++------
+ hw/i386/x86-iommu.c                  |  33 +++
+ hw/misc/pci-testdev.c                |  19 ++
+ hw/pci-bridge/ioh3420.c              |   2 +-
+ hw/pci-bridge/xio3130_downstream.c   |  28 +--
+ hw/pci-bridge/xio3130_upstream.c     |  24 +-
+ hw/pci-host/piix.c                   |  34 ++-
+ hw/pci-host/q35.c                    |  17 +-
+ hw/pci/pci_bridge.c                  |   2 +-
+ hw/scsi/vhost-scsi.c                 |   2 +-
+ tests/bios-tables-test.c             |  16 ++
+ MAINTAINERS                          |   2 +
+ hw/i386/trace-events                 |  14 ++
+ tests/acpi-test-data/q35/DSDT.mmio64 | Bin 0 -> 8947 bytes
+ tests/acpi-test-data/q35/SRAT.mmio64 | Bin 0 -> 224 bytes
+ 27 files changed, 811 insertions(+), 252 deletions(-)
+ delete mode 100644 hw/pci-bridge/ioh3420.h
+ delete mode 100644 hw/pci-bridge/xio3130_downstream.h
+ delete mode 100644 hw/pci-bridge/xio3130_upstream.h
+ create mode 100644 tests/acpi-test-data/q35/DSDT.mmio64
+ create mode 100644 tests/acpi-test-data/q35/SRAT.mmio64
