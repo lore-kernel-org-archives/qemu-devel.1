@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44913)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gFnzi-0003DE-BL
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 18:20:47 -0400
+	(envelope-from <bounces@canonical.com>) id 1gFomM-0006tp-NN
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 19:11:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gFnzd-0002qU-9k
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 18:20:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52696)
+	(envelope-from <bounces@canonical.com>) id 1gFomK-00008b-2x
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 19:11:02 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33110)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gFnzd-0002q6-3R
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 18:20:41 -0400
+	id 1gFomJ-00008A-P9
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 19:10:59 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gFnzb-0006rd-72
-	for <qemu-devel@nongnu.org>; Thu, 25 Oct 2018 22:20:39 +0000
+	id 1gFomH-00039b-Ai
+	for <qemu-devel@nongnu.org>; Thu, 25 Oct 2018 23:10:57 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1CA5D2E80CC
-	for <qemu-devel@nongnu.org>; Thu, 25 Oct 2018 22:20:39 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id BECF02E80D8
+	for <qemu-devel@nongnu.org>; Thu, 25 Oct 2018 23:10:54 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 25 Oct 2018 22:11:35 -0000
-From: Jose Carlos Venegas Munoz <1762707@bugs.launchpad.net>
+Date: Thu, 25 Oct 2018 23:04:58 -0000
+From: Alex Williamson <alex.l.williamson@gmail.com>
 Reply-To: Bug 1762707 <1762707@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <152335683378.30174.9724305388945769166.malonedeb@gac.canonical.com>
-Message-Id: <154050549549.13720.2363106623081279823.malone@chaenomeles.canonical.com>
+Message-Id: <154050869894.20671.222073409353141682.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1762707] Re: VFIO device gets DMA failures when
  virtio-balloon leak from highmem to lowmem
@@ -39,25 +39,20 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Alex, I see this issue is closed but I have a question, do you know if
-the problem only comes the balloon is resized to return memory to the
-host. I ask because we have a situation where we will start a VM with
-balloon enabled, and later it maybe possible a devices is assigned via
-hot-plug. So I would like to avoid this issue by doing the following:
-
-if a vfio devices is assigned;
-   resize the balloon size the the maximal guest memory
-end =
-
-
-Then because we know we added a vfio devices never resize the balloon to
-return memory again.
-
-More information about what we want to do: https://github.com/kata-
-containers/runtime/pull/793
-
-Regards,
-Carlos
+There are two scenarios here, if we have a regular, directly assigned
+physical device (including VFs), vfio's page pinning will populate the
+full memory footprint of the guest regardless of the balloon.  The
+balloon is effectively fully deflated, but the balloon driver in the
+guest hasn't released the pages back for guest kernel use.  In that case
+marking the balloon as deflated at least allows those pages to be used
+since they're allocated.  However, if the assigned device is an mdev
+device, then the pages might only be pinned on usage, depending on the
+vendor driver, and pages acquired by the guest balloon driver are
+unlikely to be used by the in-guest driver for the device.  It's always
+possible that the mdev vendor driver could pin them anyway, but there is
+a chance that those pages are actually still freed to the host until
+that point.  Latest QEMU will of course enable the  balloon inhibitor
+for either case so further balloon inflation will no longer zap pages.
 
 -- =
 
