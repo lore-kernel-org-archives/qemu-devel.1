@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57186)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57123)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gFfmr-00029R-4j
+	(envelope-from <ehabkost@redhat.com>) id 1gFfmr-00026L-CO
 	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 09:34:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gFflz-0007LE-Jk
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 09:34:04 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gFflr-0007A9-Vv
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 09:33:56 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 25 Oct 2018 10:32:25 -0300
-Message-Id: <20181025133301.16578-8-ehabkost@redhat.com>
+Date: Thu, 25 Oct 2018 10:32:24 -0300
+Message-Id: <20181025133301.16578-7-ehabkost@redhat.com>
 In-Reply-To: <20181025133301.16578-1-ehabkost@redhat.com>
 References: <20181025133301.16578-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 07/43] hw/ssi/xilinx_spi: Use
+Subject: [Qemu-devel] [PULL v2 06/43] hw/timer/sun4v-rtc: Use
  DeviceState::realize rather than SysBusDevice::init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -34,47 +34,42 @@ ize.
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Message-Id: <20181002212522.23303-5-f4bug@amsat.org>
+Message-Id: <20181002212522.23303-4-f4bug@amsat.org>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/ssi/xilinx_spi.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ hw/timer/sun4v-rtc.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/hw/ssi/xilinx_spi.c b/hw/ssi/xilinx_spi.c
-index 83585bc8b2..3dae303d5b 100644
---- a/hw/ssi/xilinx_spi.c
-+++ b/hw/ssi/xilinx_spi.c
-@@ -319,9 +319,9 @@ static const MemoryRegionOps spi_ops =3D {
-     }
- };
-=20
--static int xilinx_spi_init(SysBusDevice *sbd)
-+static void xilinx_spi_realize(DeviceState *dev, Error **errp)
- {
--    DeviceState *dev =3D DEVICE(sbd);
-+    SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
-     XilinxSPI *s =3D XILINX_SPI(dev);
-     int i;
-=20
-@@ -344,8 +344,6 @@ static int xilinx_spi_init(SysBusDevice *sbd)
-=20
-     fifo8_create(&s->tx_fifo, FIFO_CAPACITY);
-     fifo8_create(&s->rx_fifo, FIFO_CAPACITY);
--
--    return 0;
+diff --git a/hw/timer/sun4v-rtc.c b/hw/timer/sun4v-rtc.c
+index 13be94f8da..4e7f6a1eff 100644
+--- a/hw/timer/sun4v-rtc.c
++++ b/hw/timer/sun4v-rtc.c
+@@ -63,21 +63,21 @@ void sun4v_rtc_init(hwaddr addr)
+     sysbus_mmio_map(s, 0, addr);
  }
 =20
- static const VMStateDescription vmstate_xilinx_spi =3D {
-@@ -368,9 +366,8 @@ static Property xilinx_spi_properties[] =3D {
- static void xilinx_spi_class_init(ObjectClass *klass, void *data)
+-static int sun4v_rtc_init1(SysBusDevice *dev)
++static void sun4v_rtc_realize(DeviceState *dev, Error **errp)
  {
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
--    SysBusDeviceClass *k =3D SYS_BUS_DEVICE_CLASS(klass);
++    SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
+     Sun4vRtc *s =3D SUN4V_RTC(dev);
 =20
--    k->init =3D xilinx_spi_init;
-+    dc->realize =3D xilinx_spi_realize;
-     dc->reset =3D xlx_spi_reset;
-     dc->props =3D xilinx_spi_properties;
-     dc->vmsd =3D &vmstate_xilinx_spi;
+     memory_region_init_io(&s->iomem, OBJECT(s), &sun4v_rtc_ops, s,
+                           "sun4v-rtc", 0x08ULL);
+-    sysbus_init_mmio(dev, &s->iomem);
+-    return 0;
++    sysbus_init_mmio(sbd, &s->iomem);
+ }
+=20
+ static void sun4v_rtc_class_init(ObjectClass *klass, void *data)
+ {
+-    SysBusDeviceClass *k =3D SYS_BUS_DEVICE_CLASS(klass);
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
+=20
+-    k->init =3D sun4v_rtc_init1;
++    dc->realize =3D sun4v_rtc_realize;
+ }
+=20
+ static const TypeInfo sun4v_rtc_info =3D {
 --=20
 2.18.0.rc1.1.g3f1ff2140
