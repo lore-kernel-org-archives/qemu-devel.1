@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59966)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59897)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFh5W-0003lE-3M
+	(envelope-from <cota@braap.org>) id 1gFh5W-0003jm-4d
 	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:58:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFguV-0007fR-Pi
+	(envelope-from <cota@braap.org>) id 1gFguV-0007ep-N3
 	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:46:58 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:50339)
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:48009)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gFguT-0007U3-WE
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gFguT-0007TQ-Vt
 	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:46:55 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 25 Oct 2018 10:45:38 -0400
-Message-Id: <20181025144644.15464-5-cota@braap.org>
+Date: Thu, 25 Oct 2018 10:45:35 -0400
+Message-Id: <20181025144644.15464-2-cota@braap.org>
 In-Reply-To: <20181025144644.15464-1-cota@braap.org>
 References: <20181025144644.15464-1-cota@braap.org>
-Subject: [Qemu-devel] [RFC v4 05/71] cpu: move run_on_cpu to cpus-common
+Subject: [Qemu-devel] [RFC v4 02/71] cpu: rename cpu->work_mutex to cpu->lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,65 +26,121 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
 
-We don't pass a pointer to qemu_global_mutex anymore.
+This lock will soon protect more fields of the struct. Give
+it a more appropriate name.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- include/qom/cpu.h | 10 ----------
- cpus-common.c     |  2 +-
- cpus.c            |  5 -----
- 3 files changed, 1 insertion(+), 16 deletions(-)
+ include/qom/cpu.h |  5 +++--
+ cpus-common.c     | 14 +++++++-------
+ cpus.c            |  4 ++--
+ qom/cpu.c         |  2 +-
+ 4 files changed, 13 insertions(+), 12 deletions(-)
 
 diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index 2fad537a4f..11cbf21f00 100644
+index 53488b202f..b813ca28fa 100644
 --- a/include/qom/cpu.h
 +++ b/include/qom/cpu.h
-@@ -766,16 +766,6 @@ void qemu_cpu_kick(CPUState *cpu);
-  */
- bool cpu_is_stopped(CPUState *cpu);
+@@ -315,7 +315,7 @@ struct qemu_work_item;
+  * @mem_io_pc: Host Program Counter at which the memory was accessed.
+  * @mem_io_vaddr: Target virtual address at which the memory was accessed.
+  * @kvm_fd: vCPU file descriptor for KVM.
+- * @work_mutex: Lock to prevent multiple access to @work_list.
++ * @lock: Lock to prevent multiple access to per-CPU fields.
+  * @work_list: List of pending asynchronous work.
+  * @trace_dstate_delayed: Delayed changes to trace_dstate (includes all changes
+  *                        to @trace_dstate).
+@@ -356,7 +356,8 @@ struct CPUState {
+     int64_t icount_extra;
+     sigjmp_buf jmp_env;
  
--/**
-- * do_run_on_cpu:
-- * @cpu: The vCPU to run on.
-- * @func: The function to be executed.
-- * @data: Data to pass to the function.
-- *
-- * Used internally in the implementation of run_on_cpu.
-- */
--void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data);
--
- /**
-  * run_on_cpu:
-  * @cpu: The vCPU to run on.
+-    QemuMutex work_mutex;
++    QemuMutex lock;
++    /* fields below protected by @lock */
+     QSIMPLEQ_HEAD(, qemu_work_item) work_list;
+ 
+     CPUAddressSpace *cpu_ases;
 diff --git a/cpus-common.c b/cpus-common.c
-index 71469c85ce..3fccee5585 100644
+index a2a6cd93a1..2913294cb7 100644
 --- a/cpus-common.c
 +++ b/cpus-common.c
-@@ -127,7 +127,7 @@ static void queue_work_on_cpu(CPUState *cpu, struct qemu_work_item *wi)
-     cpu_mutex_unlock(cpu);
- }
+@@ -115,10 +115,10 @@ struct qemu_work_item {
  
--void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
-+void run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
+ static void queue_work_on_cpu(CPUState *cpu, struct qemu_work_item *wi)
  {
-     struct qemu_work_item wi;
-     bool has_bql = qemu_mutex_iothread_locked();
+-    qemu_mutex_lock(&cpu->work_mutex);
++    qemu_mutex_lock(&cpu->lock);
+     QSIMPLEQ_INSERT_TAIL(&cpu->work_list, wi, node);
+     wi->done = false;
+-    qemu_mutex_unlock(&cpu->work_mutex);
++    qemu_mutex_unlock(&cpu->lock);
+ 
+     qemu_cpu_kick(cpu);
+ }
+@@ -308,15 +308,15 @@ void process_queued_cpu_work(CPUState *cpu)
+ {
+     struct qemu_work_item *wi;
+ 
+-    qemu_mutex_lock(&cpu->work_mutex);
++    qemu_mutex_lock(&cpu->lock);
+     if (QSIMPLEQ_EMPTY(&cpu->work_list)) {
+-        qemu_mutex_unlock(&cpu->work_mutex);
++        qemu_mutex_unlock(&cpu->lock);
+         return;
+     }
+     while (!QSIMPLEQ_EMPTY(&cpu->work_list)) {
+         wi = QSIMPLEQ_FIRST(&cpu->work_list);
+         QSIMPLEQ_REMOVE_HEAD(&cpu->work_list, node);
+-        qemu_mutex_unlock(&cpu->work_mutex);
++        qemu_mutex_unlock(&cpu->lock);
+         if (wi->exclusive) {
+             /* Running work items outside the BQL avoids the following deadlock:
+              * 1) start_exclusive() is called with the BQL taken while another
+@@ -332,13 +332,13 @@ void process_queued_cpu_work(CPUState *cpu)
+         } else {
+             wi->func(cpu, wi->data);
+         }
+-        qemu_mutex_lock(&cpu->work_mutex);
++        qemu_mutex_lock(&cpu->lock);
+         if (wi->free) {
+             g_free(wi);
+         } else {
+             atomic_mb_set(&wi->done, true);
+         }
+     }
+-    qemu_mutex_unlock(&cpu->work_mutex);
++    qemu_mutex_unlock(&cpu->lock);
+     qemu_cond_broadcast(&qemu_work_cond);
+ }
 diff --git a/cpus.c b/cpus.c
-index d0b7f8e02d..913db6a8a4 100644
+index 6d86522031..b2a9698dc0 100644
 --- a/cpus.c
 +++ b/cpus.c
-@@ -1234,11 +1234,6 @@ void qemu_init_cpu_loop(void)
-     qemu_thread_get_self(&io_thread);
+@@ -92,9 +92,9 @@ static inline bool cpu_work_list_empty(CPUState *cpu)
+ {
+     bool ret;
+ 
+-    qemu_mutex_lock(&cpu->work_mutex);
++    qemu_mutex_lock(&cpu->lock);
+     ret = QSIMPLEQ_EMPTY(&cpu->work_list);
+-    qemu_mutex_unlock(&cpu->work_mutex);
++    qemu_mutex_unlock(&cpu->lock);
+     return ret;
  }
  
--void run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
--{
--    do_run_on_cpu(cpu, func, data);
--}
--
- static void qemu_kvm_destroy_vcpu(CPUState *cpu)
- {
-     if (kvm_destroy_vcpu(cpu) < 0) {
+diff --git a/qom/cpu.c b/qom/cpu.c
+index c47169896e..d0758c907d 100644
+--- a/qom/cpu.c
++++ b/qom/cpu.c
+@@ -372,7 +372,7 @@ static void cpu_common_initfn(Object *obj)
+     cpu->nr_cores = 1;
+     cpu->nr_threads = 1;
+ 
+-    qemu_mutex_init(&cpu->work_mutex);
++    qemu_mutex_init(&cpu->lock);
+     QSIMPLEQ_INIT(&cpu->work_list);
+     QTAILQ_INIT(&cpu->breakpoints);
+     QTAILQ_INIT(&cpu->watchpoints);
 -- 
 2.17.1
