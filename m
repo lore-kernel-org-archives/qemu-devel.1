@@ -1,20 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39627)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39626)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gFm1l-0001Vq-O4
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 16:14:46 -0400
+	(envelope-from <ppandit@redhat.com>) id 1gFm1v-0001Vp-7c
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 16:15:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gFm0p-0005xs-On
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 16:13:52 -0400
-References: <38b0df70-338e-c842-95bb-c1a5fbd54b7b@vivier.eu>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <f0a16cde-5fbc-b3b2-f5c6-105855d356c8@redhat.com>
-Date: Thu, 25 Oct 2018 21:13:41 +0100
-MIME-Version: 1.0
-In-Reply-To: <38b0df70-338e-c842-95bb-c1a5fbd54b7b@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Call for patches for the qemu-trivial pull request
+	(envelope-from <ppandit@redhat.com>) id 1gFlz0-00058w-Ad
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 16:11:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38986)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gFlz0-00056g-4t
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 16:11:54 -0400
+From: P J P <ppandit@redhat.com>
+Date: Fri, 26 Oct 2018 01:39:44 +0530
+Message-Id: <20181025200944.12113-1-ppandit@redhat.com>
+Subject: [Qemu-devel] [PATCH] lsi53c895a: check message length value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,71 +21,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, QEMU Trivial <qemu-trivial@nongnu.org>
-Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Qemu Developers <qemu-devel@nongnu.org>
+Cc: Ameya More <ameya.more@oracle.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Prasad J Pandit <pjp@fedoraproject.org>
 
-On 2018-10-23 11:04, Laurent Vivier wrote:
-> Hi,
->=20
-> I'm going to collect patches for the next pull request for the
-> qemu-trivial I'd like to do before the softfreeze.
->=20
-> As we didn't have any pull request for more than 3 months and some of
-> the patches have been pushed through another maintainer branches, it's =
-a
-> little bit difficult to collect correctly the patches to send.
->=20
-> So, it would be helpful if any of you knowing that some patches have to
-> be added to the pull request send me their list.
+From: Prasad J Pandit <pjp@fedoraproject.org>
 
-For June to September, I'd like to suggest:
+While writing a message in 'lsi_do_msgin', message length value
+in msg_len could be invalid, add check to avoid OOB access issue.
 
- cpu.h: fix a typo in comment
- https://lists.nongnu.org/archive/html/qemu-trivial/2018-09/msg00021.html
+Reported-by: Ameya More <ameya.more@oracle.com>
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+---
+ hw/scsi/lsi53c895a.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
- linux-user: fix comment s/atomic_write/atomic_set
- https://lists.nongnu.org/archive/html/qemu-trivial/2018-08/msg00017.html
-
- tests: Fix typos in comments and help message (found by codespell)
- https://lists.nongnu.org/archive/html/qemu-trivial/2018-07/msg00039.html
-
- configure: Support pkg-config for zlib
- https://lists.nongnu.org/archive/html/qemu-trivial/2018-07/msg00032.html
- (this had a suggestion for dropping the fallback test, but I think
- that could be done as an additional patch after the next release instead=
-)
-
- qobject: Catch another straggler for use of qdict_put_str()
- https://lists.nongnu.org/archive/html/qemu-trivial/2018-07/msg00006.html
-
- xen: Use the PCI_DEVICE macro
- https://lists.nongnu.org/archive/html/qemu-trivial/2018-07/msg00008.html
-
- tests/bios-tables-test: Remove an useless cast
- https://lists.nongnu.org/archive/html/qemu-trivial/2018-07/msg00009.html
-
- hw/pci-host: Remove useless parenthesis around DIV_ROUND_UP macro
- https://lists.nongnu.org/archive/html/qemu-trivial/2018-07/msg00011.html
-
- hw/intc/gicv3: Remove useless parenthesis around DIV_ROUND_UP macro
- https://lists.nongnu.org/archive/html/qemu-trivial/2018-07/msg00012.html
-
- dump: fix a typo
- https://lists.nongnu.org/archive/html/qemu-trivial/2018-07/msg00002.html
-
- milkymist-minimac2: Use qemu_log_mask(GUEST_ERROR) instead of error_repo=
-rt
- https://lists.nongnu.org/archive/html/qemu-trivial/2018-07/msg00001.html
-
- Makefile: Remove qemu-version.h and qemu-options.def during 'make distcl=
-ean'
- https://lists.nongnu.org/archive/html/qemu-trivial/2018-06/msg00050.html
-
- ppc: move at24c to its own CONFIG_ symbol
- https://lists.nongnu.org/archive/html/qemu-trivial/2018-05/msg00118.html
-
-Additionally you could also include the reviewed patches from the the
-"use qemu_log_mask instead of fprintf" series here:
-https://lists.nongnu.org/archive/html/qemu-trivial/2018-06/msg00276.html
-
- Thomas
+diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
+index d1e6534311..a266c5a113 100644
+--- a/hw/scsi/lsi53c895a.c
++++ b/hw/scsi/lsi53c895a.c
+@@ -205,7 +205,7 @@ typedef struct {
+     /* Action to take at the end of a MSG IN phase.
+        0 = COMMAND, 1 = disconnect, 2 = DATA OUT, 3 = DATA IN.  */
+     int msg_action;
+-    int msg_len;
++    uint8_t msg_len;
+     uint8_t msg[LSI_MAX_MSGIN_LEN];
+     /* 0 if SCRIPTS are running or stopped.
+      * 1 if a Wait Reselect instruction has been issued.
+@@ -861,12 +861,15 @@ static void lsi_do_status(LSIState *s)
+ 
+ static void lsi_do_msgin(LSIState *s)
+ {
+-    int len;
++    uint8_t len;
+     trace_lsi_do_msgin(s->dbc, s->msg_len);
+     s->sfbr = s->msg[0];
+     len = s->msg_len;
+     if (len > s->dbc)
+         len = s->dbc;
++    if (len > LSI_MAX_MSGIN_LEN) {
++        len = LSI_MAX_MSGIN_LEN;
++    }
+     pci_dma_write(PCI_DEVICE(s), s->dnad, s->msg, len);
+     /* Linux drivers rely on the last byte being in the SIDL.  */
+     s->sidl = s->msg[len - 1];
+@@ -2114,7 +2117,7 @@ static const VMStateDescription vmstate_lsi_scsi = {
+         VMSTATE_INT32(carry, LSIState),
+         VMSTATE_INT32(status, LSIState),
+         VMSTATE_INT32(msg_action, LSIState),
+-        VMSTATE_INT32(msg_len, LSIState),
++        VMSTATE_UINT8(msg_len, LSIState),
+         VMSTATE_BUFFER(msg, LSIState),
+         VMSTATE_INT32(waiting, LSIState),
+ 
+-- 
+2.17.2
