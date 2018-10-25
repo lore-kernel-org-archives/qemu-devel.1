@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40031)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <robert.hu@linux.intel.com>) id 1gFW80-0005dA-3Y
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 23:16:09 -0400
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gFYUd-0002x8-CF
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 01:47:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <robert.hu@linux.intel.com>) id 1gFW7x-0007wp-Es
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 23:16:08 -0400
-Received: from mga17.intel.com ([192.55.52.151]:22287)
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gFYUZ-0002be-Cs
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 01:47:39 -0400
+Received: from mxhk.zte.com.cn ([63.217.80.70]:6518)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <robert.hu@linux.intel.com>)
-	id 1gFW7x-0007vq-4N
-	for qemu-devel@nongnu.org; Wed, 24 Oct 2018 23:16:05 -0400
-Message-ID: <1540437361.80634.4.camel@linux.intel.com>
-From: Robert Hoo <robert.hu@linux.intel.com>
-Date: Thu, 25 Oct 2018 11:16:01 +0800
-In-Reply-To: <20181024100612.GD4096@habkost.net>
-References: <1539578845-37944-1-git-send-email-robert.hu@linux.intel.com>
-	<1539578845-37944-4-git-send-email-robert.hu@linux.intel.com>
-	<20181024100612.GD4096@habkost.net>
-Content-Type: text/plain; charset="UTF-8"
+	(Exim 4.71) (envelope-from <peng.hao2@zte.com.cn>)
+	id 1gFYUT-0002CZ-Iw
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 01:47:31 -0400
+Date: Thu, 25 Oct 2018 13:47:12 +0800 (CST)
+Message-ID: <201810251347121915659@zte.com.cn>
+In-Reply-To: <43045a7f-4092-c039-af58-6221db22d3f4@redhat.com>
+References: 20181018130434.23237-1-philmd@redhat.com,
+	43045a7f-4092-c039-af58-6221db22d3f4@redhat.com
 Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5 3/3] x86: define a new MSR based feature
- word -- FEATURE_WORDS_ARCH_CAPABILITIES
+From: <peng.hao2@zte.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel]
+ =?utf-8?q?=5BPATCH_v3_0/4=5D_hw/misc=3A_Add_a_MMIO_?=
+ =?utf-8?q?interface_to_the_pvpanicdevice?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,150 +31,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: robert.hu@intel.com, robert.hu@linux.intel.com, pbonzini@redhat.com, rth@twiddle.net, thomas.lendacky@amd.com, qemu-devel@nongnu.org
+To: philmd@redhat.com, peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, wency@cn.fujitsu.com, hutao@cn.fujitsu.com
 
-On Wed, 2018-10-24 at 07:06 -0300, Eduardo Habkost wrote:
-> On Mon, Oct 15, 2018 at 12:47:25PM +0800, Robert Hoo wrote:
-> > Note RSBA is specially treated -- no matter host support it or not,
-> > qemu
-> > pretends it is supported.
-> > 
-> > Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
-> 
-> I am now wondering what else we need to be able to remove
-> CPUID_7_0_EDX_ARCH_CAPABILITIES from
-> feature_word_info[FEAT_7_0_EDX].unmigratable_flags.
-
-Let me know once some thought comes out to you.
-> 
-> This series is necessary for that, be I think we still can't let
-> the VM be migrated if arch-capabilities is enabled and we're
-> running on a host that doesn't have MSR_IA32_ARCH_CAPABILITIES on
-> kvm_feature_msrs.
-
-Agree. So I still keep CPUID_7_0_EDX_ARCH_CAPABILITIES in
-feature_word_info[FEAT_7_0_EDX].unmigratable_flags for now.
-> 
-> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-> 
-> > ---
-> >  target/i386/cpu.c | 31 ++++++++++++++++++++++++++++++-
-> >  target/i386/cpu.h |  8 ++++++++
-> >  target/i386/kvm.c | 11 +++++++++++
-> >  3 files changed, 49 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> > index d191b9c..51c8fd8 100644
-> > --- a/target/i386/cpu.c
-> > +++ b/target/i386/cpu.c
-> > @@ -1141,6 +1141,27 @@ static FeatureWordInfo
-> > feature_word_info[FEATURE_WORDS] = {
-> >          },
-> >          .tcg_features = ~0U,
-> >      },
-> > +    /*Below are MSR exposed features*/
-> > +    [FEAT_ARCH_CAPABILITIES] = {
-> > +        .type = MSR_FEATURE_WORD,
-> > +        .feat_names = {
-> > +            "rdctl-no", "ibrs-all", "rsba", "skip-l1dfl-vmentry",
-> > +            "ssb-no", NULL, NULL, NULL,
-> > +            NULL, NULL, NULL, NULL,
-> > +            NULL, NULL, NULL, NULL,
-> > +            NULL, NULL, NULL, NULL,
-> > +            NULL, NULL, NULL, NULL,
-> > +            NULL, NULL, NULL, NULL,
-> > +            NULL, NULL, NULL, NULL,
-> > +        },
-> > +        .msr = {
-> > +            .index = MSR_IA32_ARCH_CAPABILITIES,
-> > +            .cpuid_dep = {
-> > +                FEAT_7_0_EDX,
-> > +                CPUID_7_0_EDX_ARCH_CAPABILITIES
-> > +            }
-> > +        },
-> > +    },
-> >  };
-> >  
-> >  typedef struct X86RegisterInfo32 {
-> > @@ -3696,7 +3717,15 @@ static uint32_t
-> > x86_cpu_get_supported_feature_word(FeatureWord w,
-> >                                                          wi-
-> > >cpuid.reg);
-> >              break;
-> >          case MSR_FEATURE_WORD:
-> > -            r = kvm_arch_get_supported_msr_feature(kvm_state, wi-
-> > >msr.index);
-> > +            /* Special case:
-> > +             * No matter host status, IA32_ARCH_CAPABILITIES.RSBA
-> > [bit 2]
-> > +             * is always supported in guest.
-> > +             */
-> > +            if (wi->msr.index == MSR_IA32_ARCH_CAPABILITIES) {
-> > +                r = MSR_ARCH_CAP_RSBA;
-> > +            }
-> > +            r |= kvm_arch_get_supported_msr_feature(kvm_state,
-> > +                        wi->msr.index);
-> >              break;
-> >          }
-> >      } else if (hvf_enabled()) {
-> > diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> > index 730c06f..52a52ec 100644
-> > --- a/target/i386/cpu.h
-> > +++ b/target/i386/cpu.h
-> > @@ -502,6 +502,7 @@ typedef enum FeatureWord {
-> >      FEAT_6_EAX,         /* CPUID[6].EAX */
-> >      FEAT_XSAVE_COMP_LO, /* CPUID[EAX=0xd,ECX=0].EAX */
-> >      FEAT_XSAVE_COMP_HI, /* CPUID[EAX=0xd,ECX=0].EDX */
-> > +    FEAT_ARCH_CAPABILITIES,
-> >      FEATURE_WORDS,
-> >  } FeatureWord;
-> >  
-> > @@ -730,6 +731,13 @@ typedef uint32_t
-> > FeatureWordArray[FEATURE_WORDS];
-> >  #define CPUID_TOPOLOGY_LEVEL_SMT      (1U << 8)
-> >  #define CPUID_TOPOLOGY_LEVEL_CORE     (2U << 8)
-> >  
-> > +/* MSR Feature Bits */
-> > +#define MSR_ARCH_CAP_RDCL_NO    (1U << 0)
-> > +#define MSR_ARCH_CAP_IBRS_ALL   (1U << 1)
-> > +#define MSR_ARCH_CAP_RSBA       (1U << 2)
-> > +#define MSR_ARCH_CAP_SKIP_L1DFL_VMENTRY (1U << 3)
-> > +#define MSR_ARCH_CAP_SSB_NO     (1U << 4)
-> > +
-> >  #ifndef HYPERV_SPINLOCK_NEVER_RETRY
-> >  #define HYPERV_SPINLOCK_NEVER_RETRY             0xFFFFFFFF
-> >  #endif
-> > diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> > index db79dad..2f7b40d 100644
-> > --- a/target/i386/kvm.c
-> > +++ b/target/i386/kvm.c
-> > @@ -1928,6 +1928,17 @@ static int kvm_put_msrs(X86CPU *cpu, int
-> > level)
-> >      }
-> >  #endif
-> >  
-> > +    /* If host supports feature MSR, write down. */
-> > +    if (kvm_feature_msrs) {
-> > +        int i;
-> > +        for (i = 0; i < kvm_feature_msrs->nmsrs; i++)
-> > +            if (kvm_feature_msrs->indices[i] ==
-> > MSR_IA32_ARCH_CAPABILITIES) {
-> > +                kvm_msr_entry_add(cpu, MSR_IA32_ARCH_CAPABILITIES,
-> > +                              env-
-> > >features[FEAT_ARCH_CAPABILITIES]);
-> > +                break;
-> > +            }
-> > +    }
-> > +
-> >      /*
-> >       * The following MSRs have side effects on the guest or are
-> > too heavy
-> >       * for normal writeback. Limit them to reset or full state
-> > updates.
-> > -- 
-> > 1.8.3.1
-> > 
-> > 
-> 
-> 
+Pk9uIDE4LzEwLzIwMTggMTU6MDQsIFBoaWxpcHBlIE1hdGhpZXUtRGF1ZMOpIHdyb3RlOgo+PiBI
+aSwgdGhpcyBzZXJpZXMgdGFrZXMgUGVuZyBIYW8ncyBwcmV2aW91cyB3b3JrIGJ1dCByYXRoZXIg
+dGhhbiBhZGRpbmcgeWV0Cj4+IGFub3RoZXIgZGV2aWNlLCBzaW1wbHkgYWRkIHRoZSBNTUlPIGlu
+dGVyZmFjZSB0byB0aGUgY3VycmVudCBkZXZpY2UgKHdoaWNoCj4+IG9ubHkgaW1wbGVtZW50cyB0
+aGUgSS9PIHBvcnQgYWNjZXNzKS4KPj4KPj4gVGhlIGZpcnN0IHBhdGNoZXMgYXJlIHNpbXBsZSBj
+bGVhbnVwczoKPj4gLSBwYXRjaCAxIG1vdmUgdGhlIHB2cGFuaWMgZGV2aWNlIHdpdGggdGhlICdv
+Y21tb24gb2JqZWN0cycgc28gd2UgY29tcGlsZQo+PiAgIGl0IG9uY2UgZm9yIHRoZSB4ODYvYXJt
+L2FhcmNoNjQgYXJjaHMsCj4+IC0gcGF0Y2ggMiBzaW1wbHkgcmVuYW1lcyBJU0EgZmllbGRzL2Rl
+ZmluaXRpb25zIHRvIGdlbmVyaWMgb25lcy4KPj4KPj4gVGhlbiBpbnN0ZWFkIG9mIGFkZC91c2Ug
+dGhlIE1NSU8gcHZwYW5pYyBkZXZpY2UgaW4gdGhlIHZpcnQgbWFjaGluZSBpbiBhbgo+PiB1bmlx
+dWUgcGF0Y2gsIEkgc3BsaXQgaXQgaW4gdHdvIGRpc3RpbmN0IHBhdGNoZXM6Cj4+IC0gcGF0Y2gg
+MyB1c2VzIFBlbmcgSGFvJ3Mgd29yaywgYnV0IGFkZCB0aGUgTU1JTyBpbnRlcmZhY2UgdG8gdGhl
+IGV4aXN0aW5nCj4+ICAgZGV2aWNlIChubyBsb2dpY2FsIGNoYW5nZSkuCj4+IC0gcGF0Y2ggNCBp
+cyBQZW5nIEhhbydzIHdvcmsgaW4gdGhlIHZpcnQgbWFjaGluZSAobm8gbG9naWNhbCBjaGFuZ2Up
+Lgo+Pgo+PiB2MiBmcm9tIFBlbmcgSGFvIGlzOgo+PiBodHRwczovL2xpc3RzLmdudS5vcmcvYXJj
+aGl2ZS9odG1sL3FlbXUtZGV2ZWwvMjAxOC0xMC9tc2cwMzQzMy5odG1sCj4+Cj4+IFJlZ2FyZHMs
+Cj4+Cj4+IFBoaWwuCj4+Cj4+IFBoaWxpcHBlIE1hdGhpZXUtRGF1ZMOpICg0KToKPj4gICBody9t
+aXNjL3B2cGFuaWM6IEJ1aWxkIHRoZSBwdnBhbmljIGRldmljZSBpbiAkKGNvbW1vbi1vYmopCj4+
+ICAgaHcvbWlzYy9wdnBhbmljOiBDb3NtZXRpYyByZW5hbWluZwo+Cj5Pb3BzIEkgZmFpbGVkIHdo
+ZW4gcmViYXNpbmcsIHRoZXNlIHR3byBhcmUgc3VwcG9zZWQgdG8gYmUgZnJvbQo+Cj5QZW5nIEhh
+bwo+Cm5vdyBpdCBjYW4gd29ya3MuCkluIHJlZmFjdG9yaW5nIGNvZGUsIHRoZXJlIGlzIHN0aWxs
+IGEgbmVlZCB0byBhZGQgYSB0eXBlIHRvIGRpc3Rpbmd1aXNoIGRpZmZlcmVudCBidXMgZGV2aWNl
+LgpJIGFkZCBhIHR5cGUgVFlQRV9QVlBBTklDX01NSU8gZm9yIHN5c2J1cyBwdnBhbmljIGRldmlj
+ZSBhbmQgCm9yaWduYWwgVFlQRV9QVlBBTklDICBmb3IgaXNhIHB2cGFuaWMgZGVpdmNlLgoKYmlu
+ZGxpbmctRFQgInFlbXUscHZwYW5pYy1tbWlvIiBpbiBrZXJuZWwgIGlzIGluIHJldmlldy4KSSB3
+aWxsIHJlc3VibWl0IHBhdGNoZXMuCgpUaGFua3MuCgo+d2l0aCBiZWxvdyBteSBTLW8tYjoKPltQ
+TUQ6IFVzZSBUWVBFX1BWUEFOSUMgZGVmaW5pdGlvbiwgc3BsaXQgaW4gMiBwYXRjaGVzLAo+aW1w
+cm92ZWQgcGF0Y2ggc3ViamVjdF0KPgo+PiAgIGh3L21pc2MvcHZwYW5pYzogQWRkIHRoZSBNTUlP
+IGludGVyZmFjZQo+PiAgIGh3L2FybS92aXJ0OiBVc2UgdGhlIHB2cGFuaWMgZGV2aWNlCj4+Cj4+
+ICBkZWZhdWx0LWNvbmZpZ3MvYXJtLXNvZnRtbXUubWFrIHwgIDIgKy0KPj4gIGh3L2FybS92aXJ0
+LmMgICAgICAgICAgICAgICAgICAgfCAyMSArKysrKysrKysrCj4+ICBody9taXNjL01ha2VmaWxl
+Lm9ianMgICAgICAgICAgIHwgIDIgKy0KPj4gIGh3L21pc2MvcHZwYW5pYy5jICAgICAgICAgICAg
+ICAgfCA2OCArKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0KPj4gIGluY2x1ZGUvaHcv
+YXJtL3ZpcnQuaCAgICAgICAgICAgfCAgMSArCj4+ICA1IGZpbGVzIGNoYW5nZWQsIDg0IGluc2Vy
+dGlvbnMoKyksIDEwIGRlbGV0aW9ucygtKQo+Pg==
