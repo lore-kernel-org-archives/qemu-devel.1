@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gFfq5-000659-2B
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 09:38:23 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gFfqE-0006CA-8r
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 09:38:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gFfpx-0001ZR-5Y
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 09:38:16 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gFfq4-0001eF-Ve
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 09:38:22 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 25 Oct 2018 10:32:45 -0300
-Message-Id: <20181025133301.16578-28-ehabkost@redhat.com>
+Date: Thu, 25 Oct 2018 10:32:46 -0300
+Message-Id: <20181025133301.16578-29-ehabkost@redhat.com>
 In-Reply-To: <20181025133301.16578-1-ehabkost@redhat.com>
 References: <20181025133301.16578-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL v2 27/43] memory-device: drop get_region_size()
+Subject: [Qemu-devel] [PULL v2 28/43] memory-device: add device class
+ function set_addr()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,95 +25,78 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Rob Her
 
 From: David Hildenbrand <david@redhat.com>
 
-There are no remaining users of get_region_size() except
-memory_device_get_region_size() itself. We can make
-memory_device_get_region_size() work directly on get_memory_region()
-instead and drop get_region_size().
+To be able to factor out address assignment of memory devices, we will
+have to read (get_addr()) and write (set_addr()) the address.
 
-In addition, we can now use memory_device_get_region_size() in pc-dimm
-code to implement get_plugged_size()"
+We can't use properties for this purpose, as properties are device
+specific. E.g. while the address property for a DIMM is called "addr", it
+might be called differently (e.g. "memaddr") for other devices.
+
+Especially virtio based memory devices cannot use "addr" as that is already
+reserved and used for the address on the bus (for the proxy device).
+
+Also, it might be possible to have memory devices without address
+properties (e.g. internal DIMM-like thingies).
+
+In contrast to get_addr(), we expect that set_addr() can fail.
+
+Keep it simple for now for pc-dimm and simply set the static property, that
+will fail once realized.
 
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20181005092024.14344-12-david@redhat.com>
+Message-Id: <20181005092024.14344-13-david@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- include/hw/mem/memory-device.h |  1 -
- hw/mem/memory-device.c         | 11 +++++++++--
- hw/mem/pc-dimm.c               | 18 +-----------------
- 3 files changed, 10 insertions(+), 20 deletions(-)
+ include/hw/mem/memory-device.h | 8 ++++++++
+ hw/mem/pc-dimm.c               | 7 +++++++
+ 2 files changed, 15 insertions(+)
 
 diff --git a/include/hw/mem/memory-device.h b/include/hw/mem/memory-device.h
-index 659f38385c..9c3398bc4a 100644
+index 9c3398bc4a..ed7cf5bf4b 100644
 --- a/include/hw/mem/memory-device.h
 +++ b/include/hw/mem/memory-device.h
-@@ -71,7 +71,6 @@ typedef struct MemoryDeviceClass {
-      * most devices, this corresponds to the size of the memory region.
+@@ -59,6 +59,14 @@ typedef struct MemoryDeviceClass {
       */
-     uint64_t (*get_plugged_size)(const MemoryDeviceState *md, Error **errp);
--    uint64_t (*get_region_size)(const MemoryDeviceState *md, Error **errp);
+     uint64_t (*get_addr)(const MemoryDeviceState *md);
  
-     /*
-      * Return the memory region of the memory device.
-diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
-index 425830c65c..07749bab69 100644
---- a/hw/mem/memory-device.c
-+++ b/hw/mem/memory-device.c
-@@ -268,9 +268,16 @@ void memory_device_unplug_region(MachineState *ms, MemoryRegion *mr)
- uint64_t memory_device_get_region_size(const MemoryDeviceState *md,
-                                        Error **errp)
- {
--    MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(md);
-+    const MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(md);
-+    MemoryRegion *mr;
- 
--    return mdc->get_region_size(md, errp);
-+    /* dropping const here is fine as we don't touch the memory region */
-+    mr = mdc->get_memory_region((MemoryDeviceState *)md, errp);
-+    if (!mr) {
-+        return 0;
-+    }
++    /*
++     * Set the address of the memory device in guest physical memory.
++     *
++     * Called when plugging the memory device to configure the determined
++     * address in guest physical memory.
++     */
++    void (*set_addr)(MemoryDeviceState *md, uint64_t addr, Error **errp);
 +
-+    return memory_region_size(mr);
- }
- 
- static const TypeInfo memory_device_info = {
+     /*
+      * Return the amount of memory provided by the memory device currently
+      * usable ("plugged") by the VM.
 diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-index c9f6ad589e..47b2e83389 100644
+index 47b2e83389..4a15091734 100644
 --- a/hw/mem/pc-dimm.c
 +++ b/hw/mem/pc-dimm.c
-@@ -236,21 +236,6 @@ static uint64_t pc_dimm_md_get_addr(const MemoryDeviceState *md)
+@@ -236,6 +236,12 @@ static uint64_t pc_dimm_md_get_addr(const MemoryDeviceState *md)
      return dimm->addr;
  }
  
--static uint64_t pc_dimm_md_get_region_size(const MemoryDeviceState *md,
--                                           Error **errp)
--{
--    MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(md);
--    MemoryRegion *mr;
--
--    /* dropping const here is fine as we don't touch the memory region */
--    mr = mdc->get_memory_region((MemoryDeviceState *)md, errp);
--    if (!mr) {
--        return 0;
--    }
--
--    return memory_region_size(mr);
--}
--
++static void pc_dimm_md_set_addr(MemoryDeviceState *md, uint64_t addr,
++                                Error **errp)
++{
++    object_property_set_uint(OBJECT(md), addr, PC_DIMM_ADDR_PROP, errp);
++}
++
  static MemoryRegion *pc_dimm_md_get_memory_region(MemoryDeviceState *md,
                                                    Error **errp)
  {
-@@ -302,8 +287,7 @@ static void pc_dimm_class_init(ObjectClass *oc, void *data)
+@@ -286,6 +292,7 @@ static void pc_dimm_class_init(ObjectClass *oc, void *data)
+     ddc->get_vmstate_memory_region = pc_dimm_get_memory_region;
  
      mdc->get_addr = pc_dimm_md_get_addr;
++    mdc->set_addr = pc_dimm_md_set_addr;
      /* for a dimm plugged_size == region_size */
--    mdc->get_plugged_size = pc_dimm_md_get_region_size;
--    mdc->get_region_size = pc_dimm_md_get_region_size;
-+    mdc->get_plugged_size = memory_device_get_region_size;
+     mdc->get_plugged_size = memory_device_get_region_size;
      mdc->get_memory_region = pc_dimm_md_get_memory_region;
-     mdc->fill_device_info = pc_dimm_md_fill_device_info;
- }
 -- 
 2.18.0.rc1.1.g3f1ff2140
