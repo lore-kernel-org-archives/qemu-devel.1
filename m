@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57123)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gFfms-00026L-Im
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 09:34:59 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gFfmu-000259-5d
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 09:35:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gFflh-0006tu-FU
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 09:33:49 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gFflP-0006hC-GU
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 09:33:31 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 25 Oct 2018 10:32:22 -0300
-Message-Id: <20181025133301.16578-5-ehabkost@redhat.com>
+Date: Thu, 25 Oct 2018 10:32:19 -0300
+Message-Id: <20181025133301.16578-2-ehabkost@redhat.com>
 In-Reply-To: <20181025133301.16578-1-ehabkost@redhat.com>
 References: <20181025133301.16578-1-ehabkost@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 04/43] trace-events: Fix copy/paste typo
+Subject: [Qemu-devel] [PULL v2 01/43] hostmem-file: fixed the memory leak
+ while get pmem path.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,37 +21,55 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Rob Herring <robh@kernel.org>, libvir-list@redhat.com, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-arm@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Markus Armbruster <armbru@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Eduardo Habkost <ehabkost@redhat.com>, Michael Walle <michael@walle.cc>, Thomas Huth <thuth@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Alistair Francis <alistair@alistair23.me>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Laurent Vivier <lvivier@redhat.com>, qemu-ppc@nongnu.org, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Max Filippov <jcmvbkbc@gmail.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Rob Herring <robh@kernel.org>, libvir-list@redhat.com, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-arm@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Markus Armbruster <armbru@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Eduardo Habkost <ehabkost@redhat.com>, Michael Walle <michael@walle.cc>, Thomas Huth <thuth@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Alistair Francis <alistair@alistair23.me>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Laurent Vivier <lvivier@redhat.com>, qemu-ppc@nongnu.org, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Max Filippov <jcmvbkbc@gmail.com>, Zhang Yi <yi.z.zhang@linux.intel.com>
 
-From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+From: Zhang Yi <yi.z.zhang@linux.intel.com>
 
-Missed while reviewing 5dd85b4b486.
+object_get_canonical_path_component() returns a string which
+must be freed using g_free().
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Message-Id: <20181002212522.23303-2-f4bug@amsat.org>
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
+Message-Id: <7328fb16c394eaf5d65437d11c2a9343647b6d3d.1535471899.git.yi.z.zhang@linux.intel.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/timer/trace-events | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ backends/hostmem-file.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/hw/timer/trace-events b/hw/timer/trace-events
-index fa4213df5b..ca9ad6321a 100644
---- a/hw/timer/trace-events
-+++ b/hw/timer/trace-events
-@@ -56,7 +56,7 @@ systick_timer_tick(void) "systick reload"
- systick_read(uint64_t addr, uint32_t value, unsigned size) "systick read=
- addr 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
- systick_write(uint64_t addr, uint32_t value, unsigned size) "systick wri=
-te addr 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
-=20
--# hw/char/cmsdk_apb_timer.c
-+# hw/timer/cmsdk_apb_timer.c
- cmsdk_apb_timer_read(uint64_t offset, uint64_t data, unsigned size) "CMS=
-DK APB timer read: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
- cmsdk_apb_timer_write(uint64_t offset, uint64_t data, unsigned size) "CM=
-SDK APB timer write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
- cmsdk_apb_timer_reset(void) "CMSDK APB timer: reset"
---=20
+diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
+index e64074954f..639c8d4307 100644
+--- a/backends/hostmem-file.c
++++ b/backends/hostmem-file.c
+@@ -145,20 +145,26 @@ static void file_memory_backend_set_pmem(Object *o, bool value, Error **errp)
+     HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(o);
+ 
+     if (host_memory_backend_mr_inited(backend)) {
++        char *path = object_get_canonical_path_component(o);
++
+         error_setg(errp, "cannot change property 'pmem' of %s '%s'",
+                    object_get_typename(o),
+-                   object_get_canonical_path_component(o));
++                   path);
++        g_free(path);
+         return;
+     }
+ 
+ #ifndef CONFIG_LIBPMEM
+     if (value) {
+         Error *local_err = NULL;
++        char *path = object_get_canonical_path_component(o);
++
+         error_setg(&local_err,
+                    "Lack of libpmem support while setting the 'pmem=on'"
+                    " of %s '%s'. We can't ensure data persistence.",
+                    object_get_typename(o),
+-                   object_get_canonical_path_component(o));
++                   path);
++        g_free(path);
+         error_propagate(errp, local_err);
+         return;
+     }
+-- 
 2.18.0.rc1.1.g3f1ff2140
