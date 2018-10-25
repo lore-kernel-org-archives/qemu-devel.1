@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59897)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFh5N-0004Pv-5M
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:58:10 -0400
+	(envelope-from <cota@braap.org>) id 1gFh5O-0003jm-8R
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:58:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFgvG-0008ER-D9
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:43 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:59559)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gFgvG-000840-3C
+	(envelope-from <cota@braap.org>) id 1gFgvE-0008BF-3B
 	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:42 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:46155)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gFgvD-0007xP-2j
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:39 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 25 Oct 2018 10:46:18 -0400
-Message-Id: <20181025144644.15464-45-cota@braap.org>
+Date: Thu, 25 Oct 2018 10:46:08 -0400
+Message-Id: <20181025144644.15464-35-cota@braap.org>
 In-Reply-To: <20181025144644.15464-1-cota@braap.org>
 References: <20181025144644.15464-1-cota@braap.org>
-Subject: [Qemu-devel] [RFC v4 45/71] hppa: convert to cpu_interrupt_request
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [RFC v4 35/71] openrisc: use cpu_reset_interrupt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,26 +27,31 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Stafford Horne <shorne@gmail.com>
 
+From: Paolo Bonzini <pbonzini@redhat.com>
+
+Cc: Stafford Horne <shorne@gmail.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/hppa/cpu.c | 2 +-
+ target/openrisc/sys_helper.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/hppa/cpu.c b/target/hppa/cpu.c
-index 00bf444620..1ab4e62850 100644
---- a/target/hppa/cpu.c
-+++ b/target/hppa/cpu.c
-@@ -60,7 +60,7 @@ static void hppa_cpu_synchronize_from_tb(CPUState *cs, TranslationBlock *tb)
+diff --git a/target/openrisc/sys_helper.c b/target/openrisc/sys_helper.c
+index ab4d8fb520..c645cc896d 100644
+--- a/target/openrisc/sys_helper.c
++++ b/target/openrisc/sys_helper.c
+@@ -170,7 +170,7 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
+                 env->ttmr = (rb & ~TTMR_IP) | ip;
+             } else {    /* Clear IP bit.  */
+                 env->ttmr = rb & ~TTMR_IP;
+-                cs->interrupt_request &= ~CPU_INTERRUPT_TIMER;
++                cpu_reset_interrupt(cs, CPU_INTERRUPT_TIMER);
+             }
  
- static bool hppa_cpu_has_work(CPUState *cs)
- {
--    return cs->interrupt_request & CPU_INTERRUPT_HARD;
-+    return cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD;
- }
- 
- static void hppa_cpu_disas_set_info(CPUState *cs, disassemble_info *info)
+             cpu_openrisc_timer_update(cpu);
 -- 
 2.17.1
