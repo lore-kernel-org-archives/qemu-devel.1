@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40350)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40309)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFjKh-0006hs-91
+	(envelope-from <cota@braap.org>) id 1gFjKg-0006hl-1v
 	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 13:22:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFjKd-0000NB-68
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 13:22:05 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:40625)
+	(envelope-from <cota@braap.org>) id 1gFjKc-0000MV-5f
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 13:22:03 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:37971)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gFjKb-00008k-U3
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 13:22:02 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gFjKb-0000C5-Oq
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 13:22:01 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 25 Oct 2018 13:20:45 -0400
-Message-Id: <20181025172057.20414-37-cota@braap.org>
+Date: Thu, 25 Oct 2018 13:20:51 -0400
+Message-Id: <20181025172057.20414-43-cota@braap.org>
 In-Reply-To: <20181025172057.20414-1-cota@braap.org>
 References: <20181025172057.20414-1-cota@braap.org>
-Subject: [Qemu-devel] [RFC 36/48] target/xtensa: prepare for 2-pass
- translation
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [RFC 42/48] vl: support -plugin option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,50 +29,93 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>
 
+From: Lluís Vilanova <vilanova@ac.upc.edu>
+
+Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
+[ cota: s/instrument/plugin ]
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/xtensa/translate.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ vl.c            | 11 +++++++++++
+ qemu-options.hx | 17 +++++++++++++++++
+ 2 files changed, 28 insertions(+)
 
-diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
-index 14ab1c5ceb..83711f2a18 100644
---- a/target/xtensa/translate.c
-+++ b/target/xtensa/translate.c
-@@ -879,7 +879,8 @@ static inline unsigned xtensa_op0_insn_len(DisasContext *dc, uint8_t op0)
-     return xtensa_isa_length_from_chars(dc->config->isa, &op0);
- }
+diff --git a/vl.c b/vl.c
+index 4e25c78bff..ebb188552e 100644
+--- a/vl.c
++++ b/vl.c
+@@ -111,6 +111,7 @@ int main(int argc, char **argv)
  
--static void disas_xtensa_insn(CPUXtensaState *env, DisasContext *dc)
-+static void disas_xtensa_insn(CPUXtensaState *env, DisasContext *dc,
-+                              struct qemu_plugin_insn *plugin_insn)
- {
-     xtensa_isa isa = dc->config->isa;
-     unsigned char b[MAX_INSN_LENGTH] = {cpu_ldub_code(env, dc->pc)};
-@@ -916,6 +917,7 @@ static void disas_xtensa_insn(CPUXtensaState *env, DisasContext *dc)
-     for (i = 1; i < len; ++i) {
-         b[i] = cpu_ldub_code(env, dc->pc + i);
+ #include "trace-root.h"
+ #include "trace/control.h"
++#include "qemu/plugin.h"
+ #include "qemu/queue.h"
+ #include "sysemu/arch_init.h"
+ 
+@@ -2962,6 +2963,7 @@ int main(int argc, char **argv, char **envp)
+     } BlockdevOptions_queue;
+     QSIMPLEQ_HEAD(, BlockdevOptions_queue) bdo_queue
+         = QSIMPLEQ_HEAD_INITIALIZER(bdo_queue);
++    struct qemu_plugin_list plugin_list = QTAILQ_HEAD_INITIALIZER(plugin_list);
+ 
+     module_call_init(MODULE_INIT_TRACE);
+ 
+@@ -2990,6 +2992,7 @@ int main(int argc, char **argv, char **envp)
+     qemu_add_opts(&qemu_global_opts);
+     qemu_add_opts(&qemu_mon_opts);
+     qemu_add_opts(&qemu_trace_opts);
++    qemu_plugin_add_opts();
+     qemu_add_opts(&qemu_option_rom_opts);
+     qemu_add_opts(&qemu_machine_opts);
+     qemu_add_opts(&qemu_accel_opts);
+@@ -3806,6 +3809,9 @@ int main(int argc, char **argv, char **envp)
+                 g_free(trace_file);
+                 trace_file = trace_opt_parse(optarg);
+                 break;
++            case QEMU_OPTION_plugin:
++                qemu_plugin_opt_parse(optarg, &plugin_list);
++                break;
+             case QEMU_OPTION_readconfig:
+                 {
+                     int ret = qemu_read_config_file(optarg);
+@@ -4107,6 +4113,11 @@ int main(int argc, char **argv, char **envp)
+                                machine_class->default_machine_opts, 0);
      }
-+    qemu_plugin_insn_append(plugin_insn, b, len);
-     xtensa_insnbuf_from_chars(isa, dc->insnbuf, b, len);
-     fmt = xtensa_format_decode(isa, dc->insnbuf);
-     if (fmt == XTENSA_UNDEFINED) {
-@@ -1183,7 +1185,7 @@ static void xtensa_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu,
-         gen_ibreak_check(env, dc);
-     }
  
--    disas_xtensa_insn(env, dc);
-+    disas_xtensa_insn(env, dc, plugin_insn);
++    /* process plugin before CPUs are created, but once -smp has been parsed */
++    if (qemu_plugin_load_list(&plugin_list)) {
++        exit(1);
++    }
++
+     qemu_opts_foreach(qemu_find_opts("device"),
+                       default_driver_check, NULL, NULL);
+     qemu_opts_foreach(qemu_find_opts("global"),
+diff --git a/qemu-options.hx b/qemu-options.hx
+index f139459e80..5cd1d84df4 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -3838,6 +3838,23 @@ HXCOMM HX does not support conditional compilation of text.
+ @findex -trace
+ @include qemu-option-trace.texi
+ ETEXI
++DEF("plugin", HAS_ARG, QEMU_OPTION_plugin,
++    "-plugin [file=]<file>[,arg=<string>]\n"
++    "                load a plugin\n",
++    QEMU_ARCH_ALL)
++STEXI
++@item -plugin file=@var{file}[,arg=@var{string}]
++@findex -plugin
++
++Load a plugin.
++
++@table @option
++@item file=@var{file}
++Load the given plugin from a shared library file.
++@item arg=@var{string}
++Argument string passed to the plugin. (Can be given multiple times.)
++@end table
++ETEXI
  
-     if (dc->icount) {
-         tcg_gen_mov_i32(cpu_SR[ICOUNT], dc->next_icount);
-@@ -1241,6 +1243,8 @@ static const TranslatorOps xtensa_translator_ops = {
-     .translate_insn     = xtensa_tr_translate_insn,
-     .tb_stop            = xtensa_tr_tb_stop,
-     .disas_log          = xtensa_tr_disas_log,
-+    .ctx_base_offset    = offsetof(DisasContext, base),
-+    .ctx_size           = sizeof(DisasContext),
- };
- 
- void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb)
+ HXCOMM Internal use
+ DEF("qtest", HAS_ARG, QEMU_OPTION_qtest, "", QEMU_ARCH_ALL)
 -- 
 2.17.1
