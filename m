@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59786)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59609)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFh5J-0003Zd-BK
+	(envelope-from <cota@braap.org>) id 1gFh5J-00034O-Iu
 	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:58:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gFgvP-0008OT-44
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:52 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:48479)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gFgvO-0008BN-Uw
+	(envelope-from <cota@braap.org>) id 1gFgvM-0008L2-9h
 	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:51 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:45551)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gFgvM-00088N-0x
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 10:47:48 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 25 Oct 2018 10:46:40 -0400
-Message-Id: <20181025144644.15464-67-cota@braap.org>
+Date: Thu, 25 Oct 2018 10:46:30 -0400
+Message-Id: <20181025144644.15464-57-cota@braap.org>
 In-Reply-To: <20181025144644.15464-1-cota@braap.org>
 References: <20181025144644.15464-1-cota@braap.org>
-Subject: [Qemu-devel] [RFC v4 67/71] cpus-common: release BQL earlier in
- run_on_cpu
+Subject: [Qemu-devel] [RFC v4 57/71] accel/tcg: convert to
+ cpu_interrupt_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,51 +27,105 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
 
-After completing the conversion to per-CPU locks, there is no need
-to release the BQL after having called cpu_kick.
-
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- cpus-common.c | 20 +++++---------------
- 1 file changed, 5 insertions(+), 15 deletions(-)
+ accel/tcg/cpu-exec.c      | 15 ++++++++-------
+ accel/tcg/tcg-all.c       | 12 +++++++++---
+ accel/tcg/translate-all.c |  2 +-
+ 3 files changed, 18 insertions(+), 11 deletions(-)
 
-diff --git a/cpus-common.c b/cpus-common.c
-index c2ad554d54..80d7e300eb 100644
---- a/cpus-common.c
-+++ b/cpus-common.c
-@@ -145,6 +145,11 @@ void run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
-         return;
-     }
+diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+index f37c9b1e94..d590f1f6c0 100644
+--- a/accel/tcg/cpu-exec.c
++++ b/accel/tcg/cpu-exec.c
+@@ -428,7 +428,7 @@ static inline bool cpu_handle_halt_locked(CPUState *cpu)
  
-+    /* We are going to sleep on the CPU lock, so release the BQL */
-+    if (has_bql) {
-+        qemu_mutex_unlock_iothread();
-+    }
+     if (cpu_halted(cpu)) {
+ #if defined(TARGET_I386) && !defined(CONFIG_USER_ONLY)
+-        if ((cpu->interrupt_request & CPU_INTERRUPT_POLL)
++        if ((cpu_interrupt_request(cpu) & CPU_INTERRUPT_POLL)
+             && replay_interrupt()) {
+             X86CPU *x86_cpu = X86_CPU(cpu);
+ 
+@@ -540,16 +540,17 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
+      */
+     atomic_mb_set(&cpu->icount_decr.u16.high, 0);
+ 
+-    if (unlikely(atomic_read(&cpu->interrupt_request))) {
++    if (unlikely(cpu_interrupt_request(cpu))) {
+         int interrupt_request;
 +
-     wi.func = func;
-     wi.data = data;
-     wi.done = false;
-@@ -153,21 +158,6 @@ void run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
+         qemu_mutex_lock_iothread();
+-        interrupt_request = cpu->interrupt_request;
++        interrupt_request = cpu_interrupt_request(cpu);
+         if (unlikely(cpu->singlestep_enabled & SSTEP_NOIRQ)) {
+             /* Mask out external interrupts for this step. */
+             interrupt_request &= ~CPU_INTERRUPT_SSTEP_MASK;
+         }
+         if (interrupt_request & CPU_INTERRUPT_DEBUG) {
+-            cpu->interrupt_request &= ~CPU_INTERRUPT_DEBUG;
++            cpu_reset_interrupt(cpu, CPU_INTERRUPT_DEBUG);
+             cpu->exception_index = EXCP_DEBUG;
+             qemu_mutex_unlock_iothread();
+             return true;
+@@ -558,7 +559,7 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
+             /* Do nothing */
+         } else if (interrupt_request & CPU_INTERRUPT_HALT) {
+             replay_interrupt();
+-            cpu->interrupt_request &= ~CPU_INTERRUPT_HALT;
++            cpu_reset_interrupt(cpu, CPU_INTERRUPT_HALT);
+             cpu_halted_set(cpu, 1);
+             cpu->exception_index = EXCP_HLT;
+             qemu_mutex_unlock_iothread();
+@@ -595,10 +596,10 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
+             }
+             /* The target hook may have updated the 'cpu->interrupt_request';
+              * reload the 'interrupt_request' value */
+-            interrupt_request = cpu->interrupt_request;
++            interrupt_request = cpu_interrupt_request(cpu);
+         }
+         if (interrupt_request & CPU_INTERRUPT_EXITTB) {
+-            cpu->interrupt_request &= ~CPU_INTERRUPT_EXITTB;
++            cpu_reset_interrupt(cpu, CPU_INTERRUPT_EXITTB);
+             /* ensure that no TB jump will be modified as
+                the program flow was changed */
+             *last_tb = NULL;
+diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
+index 3d25bdcc17..4e2fe70350 100644
+--- a/accel/tcg/tcg-all.c
++++ b/accel/tcg/tcg-all.c
+@@ -39,10 +39,16 @@ unsigned long tcg_tb_size;
+ static void tcg_handle_interrupt(CPUState *cpu, int mask)
+ {
+     int old_mask;
+-    g_assert(qemu_mutex_iothread_locked());
  
-     cpu_mutex_lock(cpu);
-     queue_work_on_cpu_locked(cpu, &wi);
--
--    /*
--     * We are going to sleep on the CPU lock, so release the BQL.
--     *
--     * During the transition to per-CPU locks, we release the BQL _after_
--     * having kicked the destination CPU (from queue_work_on_cpu_locked above).
--     * This makes sure that the enqueued work will be seen by the CPU
--     * after being woken up from the kick, since the CPU sleeps on the BQL.
--     * Once we complete the transition to per-CPU locks, we will release
--     * the BQL earlier in this function.
--     */
--    if (has_bql) {
--        qemu_mutex_unlock_iothread();
--    }
--
-     while (!atomic_mb_read(&wi.done)) {
-         CPUState *self_cpu = current_cpu;
+-    old_mask = cpu->interrupt_request;
+-    cpu->interrupt_request |= mask;
++    if (!cpu_mutex_locked(cpu)) {
++        cpu_mutex_lock(cpu);
++        old_mask = cpu_interrupt_request(cpu);
++        cpu_interrupt_request_or(cpu, mask);
++        cpu_mutex_unlock(cpu);
++    } else {
++        old_mask = cpu_interrupt_request(cpu);
++        cpu_interrupt_request_or(cpu, mask);
++    }
+ 
+     /*
+      * If called from iothread context, wake the target cpu in
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index 356dcd0948..038d82fdb5 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -2340,7 +2340,7 @@ void dump_opcount_info(FILE *f, fprintf_function cpu_fprintf)
+ void cpu_interrupt(CPUState *cpu, int mask)
+ {
+     g_assert(qemu_mutex_iothread_locked());
+-    cpu->interrupt_request |= mask;
++    cpu_interrupt_request_or(cpu, mask);
+     atomic_set(&cpu->icount_decr.u16.high, -1);
+ }
  
 -- 
 2.17.1
