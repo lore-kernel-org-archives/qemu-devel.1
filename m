@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55608)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57123)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gG4XN-0002cG-6a
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 12:00:41 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1gG4cQ-0002nd-JG
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 12:05:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gG4X5-0005CU-HJ
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 12:00:30 -0400
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:39022)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gG4X5-0005C6-81
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 12:00:19 -0400
-Received: by mail-wm1-x334.google.com with SMTP id y144-v6so1916070wmd.4
-	for <qemu-devel@nongnu.org>; Fri, 26 Oct 2018 09:00:19 -0700 (PDT)
-References: <20181025144644.15464-1-cota@braap.org>
-	<20181025144644.15464-68-cota@braap.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <a4917dce-43a2-d16b-0baf-bcf7ebfab283@linaro.org>
-Date: Fri, 26 Oct 2018 17:00:15 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181025144644.15464-68-cota@braap.org>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <amarkovic@wavecomp.com>) id 1gG4cL-0000HK-Mr
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 12:05:50 -0400
+Received: from mail-sn1nam01on0722.outbound.protection.outlook.com
+	([2a01:111:f400:fe40::722]:51258
+	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1gG4cL-0000GF-Ct
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 12:05:45 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Fri, 26 Oct 2018 16:05:39 +0000
+Message-ID: <BN6PR2201MB1251A120B9F7C6EE381C6A72C6F00@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <1540563667-23300-1-git-send-email-stefan.markovic@rt-rk.com>,
+	<1540563667-23300-7-git-send-email-stefan.markovic@rt-rk.com>
+In-Reply-To: <1540563667-23300-7-git-send-email-stefan.markovic@rt-rk.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v4 68/71] cpu: add async_run_on_cpu_no_bql
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 6/6] Add prctl() PR_SET_FP_MODE and
+ PR_GET_FP_MODE implementations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,18 +32,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+To: Stefan Markovic <stefan.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Petar Jovanovic <pjovanovic@wavecomp.com>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "laurent@vivier.eu" <laurent@vivier.eu>
 
-On 10/25/18 3:46 PM, Emilio G. Cota wrote:
-> Some async jobs do not need the BQL.
-> 
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> ---
->  include/qom/cpu.h | 14 ++++++++++++++
->  cpus-common.c     | 39 ++++++++++++++++++++++++++++++++++-----
->  2 files changed, 48 insertions(+), 5 deletions(-)
+> From: Stefan Markovic <stefan.markovic@rt-rk.com>
+> Subject: [PATCH 6/6] Add prctl() PR_SET_FP_MODE and PR_GET_FP_MODE implem=
+entations
+>=20
+> From: Stefan Markovic <smarkovic@wavecomp.com>
+>=20
+> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>  #define TARGET_PR_SET_FP_MODE  45
+>  #define TARGET_PR_GET_FP_MODE  46
+> +#define TARGET_PR_FP_MODE_FR  (1 << 0)
+> +#define TARGET_PR_FP_MODE_FRE (1 << 1)
 
-r~
+There should be one space more to the left of (1 << 0) and (1 << 1) to achi=
+eve nicer alignment.
+
+A short commit message is needed too. Other than that:
+
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
