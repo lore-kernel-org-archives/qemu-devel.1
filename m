@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41202)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gG2Ks-0005Un-B4
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 09:39:35 -0400
+	(envelope-from <noring@nocrew.org>) id 1gG2NS-00075Q-Ld
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 09:42:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gG2Km-0003eP-HD
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 09:39:34 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37526)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gG2Ki-0003ba-Lk
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 09:39:26 -0400
-Received: by mail-wr1-x441.google.com with SMTP id g9-v6so1410154wrq.4
-	for <qemu-devel@nongnu.org>; Fri, 26 Oct 2018 06:39:24 -0700 (PDT)
-References: <20181025144644.15464-1-cota@braap.org>
-	<20181025144644.15464-36-cota@braap.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181025144644.15464-36-cota@braap.org>
-Date: Fri, 26 Oct 2018 14:39:21 +0100
-Message-ID: <87d0rw25fa.fsf@linaro.org>
+	(envelope-from <noring@nocrew.org>) id 1gG2NN-0005kv-Mc
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 09:42:14 -0400
+Received: from pio-pvt-msa3.bahnhof.se ([79.136.2.42]:40138)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gG2NJ-0005bM-EU
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 09:42:07 -0400
+Date: Fri, 26 Oct 2018 15:42:00 +0200
+From: Fredrik Noring <noring@nocrew.org>
+Message-ID: <20181026134200.GA2377@sx9>
+References: <cover.1540134918.git.noring@nocrew.org>
+	<BN6PR2201MB125165723113459889A6EC59C6F40@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	<20181022172343.GB2331@sx9>
+	<alpine.LFD.2.21.1810221901170.19280@eddie.linux-mips.org>
+	<20181023191023.GB2244@sx9>
+	<alpine.LFD.2.21.1810240213290.19280@eddie.linux-mips.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v4 36/71] arm: convert to
- cpu_interrupt_request
+Content-Disposition: inline
+In-Reply-To: <alpine.LFD.2.21.1810240213290.19280@eddie.linux-mips.org>
+Subject: Re: [Qemu-devel] [PATCH v8 00/38] target/mips: Limited support for
+ the R5900
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,79 +32,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
+To: "Maciej W. Rozycki" <macro@linux-mips.org>
+Cc: Aleksandar Markovic <amarkovic@wavecomp.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Petar Jovanovic <pjovanovic@wavecomp.com>, Peter Maydell <peter.maydell@linaro.org>, =?utf-8?Q?J=C3=BCrgen?= Urban <JuergenUrban@gmx.de>, qemu-devel@nongnu.org
 
+Hi Maciej,
 
-Emilio G. Cota <cota@braap.org> writes:
+>  I'm not sure if every single random vendor-specific instruction (or a 
+> bunch of) deserves its own ASE designation, be it internal or externally 
+> exposed.  I think the MMI set being a substantial architectural feature 
+> makes sense to be shown in /proc/cpuinfo (in Linux), but I don't think 
+> there's much more about it.  It's limited to 2 implementations only, so 
+> internally I think it can well be handled with a macro or static inline 
+> function (as appropriate) which boil down to (CPU_R5900 || CPU_TX79).
 
-> Cc: Peter Maydell <peter.maydell@linaro.org>
+Are there benefits in leaving out features? Their utility, such as
+in choosing compiler options, may not correlate with their (lack of)
+architectural weight.
 
-This will need to catch-up in the next re-base as there is a merge conflict.
+A random pc, for instance, comes fully dressed flying the flags of
 
-> Cc: qemu-arm@nongnu.org
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> ---
->  target/arm/cpu.c    |  2 +-
->  target/arm/helper.c | 12 +++++-------
->  2 files changed, 6 insertions(+), 8 deletions(-)
->
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index 9c5cda8eb7..7330c2dae1 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -49,7 +49,7 @@ static bool arm_cpu_has_work(CPUState *cs)
->      ARMCPU *cpu =3D ARM_CPU(cs);
->
->      return (cpu->power_state !=3D PSCI_OFF)
-> -        && cs->interrupt_request &
-> +        && cpu_interrupt_request(cs) &
->          (CPU_INTERRUPT_FIQ | CPU_INTERRUPT_HARD
->           | CPU_INTERRUPT_VFIQ | CPU_INTERRUPT_VIRQ
->           | CPU_INTERRUPT_EXITTB);
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index c83f7c1109..454954a56c 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -1294,11 +1294,12 @@ static uint64_t isr_read(CPUARMState *env, const =
-ARMCPRegInfo *ri)
->  {
->      CPUState *cs =3D ENV_GET_CPU(env);
->      uint64_t ret =3D 0;
-> +    uint32_t interrupt_request =3D cpu_interrupt_request(cs);
->
-> -    if (cs->interrupt_request & CPU_INTERRUPT_HARD) {
-> +    if (interrupt_request & CPU_INTERRUPT_HARD) {
->          ret |=3D CPSR_I;
->      }
-> -    if (cs->interrupt_request & CPU_INTERRUPT_FIQ) {
-> +    if (interrupt_request & CPU_INTERRUPT_FIQ) {
->          ret |=3D CPSR_F;
->      }
->      /* External aborts are not possible in QEMU so A bit is always clear=
- */
-> @@ -8579,10 +8580,7 @@ void arm_cpu_do_interrupt(CPUState *cs)
->          return;
->      }
->
-> -    /* Hooks may change global state so BQL should be held, also the
-> -     * BQL needs to be held for any modification of
-> -     * cs->interrupt_request.
-> -     */
-> +    /* Hooks may change global state so BQL should be held */
->      g_assert(qemu_mutex_iothread_locked());
->
->      arm_call_pre_el_change_hook(cpu);
-> @@ -8597,7 +8595,7 @@ void arm_cpu_do_interrupt(CPUState *cs)
->      arm_call_el_change_hook(cpu);
->
->      if (!kvm_enabled()) {
-> -        cs->interrupt_request |=3D CPU_INTERRUPT_EXITTB;
-> +        cpu_interrupt_request_or(cs, CPU_INTERRUPT_EXITTB);
->      }
->  }
+	fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca
+	cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm
+	pbe syscall nx rdtscp lm constant_tsc arch_perfmon pebs bts
+	rep_good nopl xtopology nonstop_tsc aperfmperf eagerfpu pni
+	pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 cx16
+	xtpr pdcm pcid sse4_1 sse4_2 x2apic popcnt tsc_deadline_timer
+	aes xsave avx lahf_lm epb kaiser tpr_shadow vnmi flexpriority
+	ept vpid xsaveopt dtherm ida arat pln pts
 
+in its /proc/cpuinfo. It also has a bugs field with
 
---
-Alex Benn=C3=A9e
+	cpu_meltdown spectre_v1 spectre_v2
+
+where the R5900 could have an entry for its short loop bug.
+
+>  And if you run out of bits for ASEs regardless, then I suggest just to 
+> expand the field in question.  In QEMU you can rely on the presence of the 
+> `uint64_t' data type, so with only 8 bits exhausted you're far from 
+> getting into trouble.
+
+DisasContext::insn_flags is already uint64_t, where bits 63..56 are
+reserved for vendor-specific ASEs. Of course, one could organise them
+differently, especially since they may be mutually exclusive, or one
+could use a new ASE-specific field for them.
+
+Fredrik
