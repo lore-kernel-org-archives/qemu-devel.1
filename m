@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52052)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52520)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gFyeY-0006TS-K5
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 05:43:39 -0400
+	(envelope-from <smarkovic@wavecomp.com>) id 1gFygA-0007NK-Dp
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 05:45:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gFyeU-0000Wz-Sj
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 05:43:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45416)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gFyeQ-0000V0-Gj
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 05:43:32 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1FD983001FB6
-	for <qemu-devel@nongnu.org>; Fri, 26 Oct 2018 09:43:27 +0000 (UTC)
-Date: Fri, 26 Oct 2018 10:43:14 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181026094314.GE31390@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181025085256.20522-1-kraxel@redhat.com>
-	<20181025085256.20522-4-kraxel@redhat.com>
-	<20181025203758.GA29995@redhat.com>
-	<b833e608-007a-c77f-9e35-41175203b634@redhat.com>
+	(envelope-from <smarkovic@wavecomp.com>) id 1gFyg2-00015O-OV
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 05:45:14 -0400
+Received: from mail-eopbgr680091.outbound.protection.outlook.com
+	([40.107.68.91]:44180
+	helo=NAM04-BN3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <smarkovic@wavecomp.com>)
+	id 1gFyg0-00012s-Us
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 05:45:10 -0400
+From: Stefan Markovic <smarkovic@wavecomp.com>
+Date: Fri, 26 Oct 2018 09:45:04 +0000
+Message-ID: <b5584814-9201-c809-dd75-8b03ed11ef1a@wavecomp.com>
+References: <1540383527-7923-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1540383527-7923-14-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1540383527-7923-14-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <8B4F8B103E73C640AE729DA5A96824A4@namprd22.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <b833e608-007a-c77f-9e35-41175203b634@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [libvirt]  [PATCH 3/3] cirrus: mark as deprecated
+Subject: Re: [Qemu-devel] [PATCH v7 13/20] target/mips: Move MUL, S32M2I,
+ S32I2M handling out of main MXU switch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,50 +33,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cole Robinson <crobinso@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, libvir-list@redhat.com, qemu-devel@nongnu.org, Prasad J Pandit <ppandit@redhat.com>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>, "jancraig@amazon.com" <jancraig@amazon.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>
 
-On Fri, Oct 26, 2018 at 09:48:35AM +0100, Cole Robinson wrote:
-> On 10/25/2018 09:37 PM, Daniel P. Berrang=C3=A9 wrote:
-> > On Thu, Oct 25, 2018 at 10:52:56AM +0200, Gerd Hoffmann wrote:
-> > > While being at it deprecate cirrus too.
-> > >=20
-> > > Reason (short version): use stdvga instead.
-> > > Verbose version:
-> > >      https://www.kraxel.org/blog/2014/10/qemu-using-cirrus-consider=
-ed-harmful
-> >=20
-> > Every single one of my guests is using cirrus. This wasn't an explici=
-t
-> > choice on my part, so I believe it is being used as the default in
-> > virt-install.
-> >=20
->=20
-> virt-manager/virt-install 2.0.0 will never explicitly set cirrus, but t=
-hat
-> release is quite new. The previous release's default for x86 was roughl=
-y:
->=20
-> if using spice graphics:
->     use qxl
-> elif guest os is windows:
->     use vga
-> else:
->     use cirrus
->=20
-> It was definitely sub optimal. Maybe your virt-install commands were
-> explicitly setting --graphics vnc which would trigger cirrus in that ca=
-se.
-
-Yep, I've always tended to use vnc, since QXL has historically been a
-pretty buggy & unreliable device model with guests often breaking.
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+DQpPbiAyNC4xMC4xOC4gMTQ6MTgsIEFsZWtzYW5kYXIgTWFya292aWMgd3JvdGU6DQo+IEZyb206
+IEFsZWtzYW5kYXIgTWFya292aWMgPGFtYXJrb3ZpY0B3YXZlY29tcC5jb20+DQo+DQo+IE1vdmUg
+TVVMLCBTMzJNMkksIFMzMkkyTSBoYW5kbGluZyBvdXQgb2Ygc3dpdGNoLiBUaGVzZSBhcmUgYWxs
+DQo+IGluc3RydWN0aW9ucyB0aGF0IGRvIG5vdCBkZXBlbmQgb24gTVhVX0VOIGZsYWcgb2YgTVhV
+X0NSLg0KPg0KPiBTaWduZWQtb2ZmLWJ5OiBBbGVrc2FuZGFyIE1hcmtvdmljIDxhbWFya292aWNA
+d2F2ZWNvbXAuY29tPg0KPiAtLS0NCj4gICB0YXJnZXQvbWlwcy90cmFuc2xhdGUuYyB8IDQxICsr
+KysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0tLS0tDQo+ICAgMSBmaWxlIGNoYW5n
+ZWQsIDIzIGluc2VydGlvbnMoKyksIDE4IGRlbGV0aW9ucygtKQ0KDQoNClNlZSBteSBjb21tZW50
+IGZvciBwYXRjaCAwNC8yMC4NCg0KQ0xaLCBDTE8sIFNERFAgYXJlIG1pc3Npbmc/DQoNCg0KPiBk
+aWZmIC0tZ2l0IGEvdGFyZ2V0L21pcHMvdHJhbnNsYXRlLmMgYi90YXJnZXQvbWlwcy90cmFuc2xh
+dGUuYw0KPiBpbmRleCBjOGM3MWM0Li4xMTFhZmZiIDEwMDY0NA0KPiAtLS0gYS90YXJnZXQvbWlw
+cy90cmFuc2xhdGUuYw0KPiArKysgYi90YXJnZXQvbWlwcy90cmFuc2xhdGUuYw0KPiBAQCAtMjQ4
+NTksNiArMjQ4NTksMjkgQEAgc3RhdGljIHZvaWQgZGVjb2RlX29wY19teHUoQ1BVTUlQU1N0YXRl
+ICplbnYsIERpc2FzQ29udGV4dCAqY3R4KQ0KPiAgIHsNCj4gICAgICAgdWludDMyX3Qgb3Bjb2Rl
+ID0gZXh0cmFjdDMyKGN0eC0+b3Bjb2RlLCAwLCA2KTsNCj4gICANCj4gKyAgICBpZiAob3Bjb2Rl
+ID09IE9QQ19fTVhVX01VTCkgew0KPiArICAgICAgICB1aW50MzJfdCAgcnMsIHJ0LCByZCwgb3Ax
+Ow0KPiArDQo+ICsgICAgICAgIHJzID0gZXh0cmFjdDMyKGN0eC0+b3Bjb2RlLCAyMSwgNSk7DQo+
+ICsgICAgICAgIHJ0ID0gZXh0cmFjdDMyKGN0eC0+b3Bjb2RlLCAxNiwgNSk7DQo+ICsgICAgICAg
+IHJkID0gZXh0cmFjdDMyKGN0eC0+b3Bjb2RlLCAxMSwgNSk7DQo+ICsgICAgICAgIG9wMSA9IE1B
+U0tfU1BFQ0lBTDIoY3R4LT5vcGNvZGUpOw0KPiArDQo+ICsgICAgICAgIGdlbl9hcml0aChjdHgs
+IG9wMSwgcmQsIHJzLCBydCk7DQo+ICsNCj4gKyAgICAgICAgcmV0dXJuOw0KPiArICAgIH0NCj4g
+Kw0KPiArICAgIGlmIChvcGNvZGUgPT0gT1BDX01YVV9TMzJNMkkpIHsNCj4gKyAgICAgICAgZ2Vu
+X214dV9zMzJtMmkoY3R4KTsNCj4gKyAgICAgICAgcmV0dXJuOw0KPiArICAgIH0NCj4gKw0KPiAr
+ICAgIGlmIChvcGNvZGUgPT0gT1BDX01YVV9TMzJJMk0pIHsNCj4gKyAgICAgICAgZ2VuX214dV9z
+MzJpMm0oY3R4KTsNCj4gKyAgICAgICAgcmV0dXJuOw0KPiArICAgIH0NCj4gKw0KPiAgICAgICBz
+d2l0Y2ggKG9wY29kZSkgew0KPiAgICAgICBjYXNlIE9QQ19NWFVfUzMyTUFERDoNCj4gICAgICAg
+ICAgIC8qIFRPRE86IEltcGxlbWVudCBlbXVsYXRpb24gb2YgUzMyTUFERCBpbnN0cnVjdGlvbi4g
+Ki8NCj4gQEAgLTI0ODcwLDE4ICsyNDg5Myw2IEBAIHN0YXRpYyB2b2lkIGRlY29kZV9vcGNfbXh1
+KENQVU1JUFNTdGF0ZSAqZW52LCBEaXNhc0NvbnRleHQgKmN0eCkNCj4gICAgICAgICAgIE1JUFNf
+SU5WQUwoIk9QQ19NWFVfUzMyTUFERFUiKTsNCj4gICAgICAgICAgIGdlbmVyYXRlX2V4Y2VwdGlv
+bl9lbmQoY3R4LCBFWENQX1JJKTsNCj4gICAgICAgICAgIGJyZWFrOw0KPiAtICAgIGNhc2UgT1BD
+X19NWFVfTVVMOiAgICAgLyogMHgyIC0gdW51c2VkIGluIE1YVSBzcGVjcyAqLw0KPiAtICAgICAg
+ICB7DQo+IC0gICAgICAgICAgICB1aW50MzJfdCAgcnMsIHJ0LCByZCwgb3AxOw0KPiAtDQo+IC0g
+ICAgICAgICAgICBycyA9IGV4dHJhY3QzMihjdHgtPm9wY29kZSwgMjEsIDUpOw0KPiAtICAgICAg
+ICAgICAgcnQgPSBleHRyYWN0MzIoY3R4LT5vcGNvZGUsIDE2LCA1KTsNCj4gLSAgICAgICAgICAg
+IHJkID0gZXh0cmFjdDMyKGN0eC0+b3Bjb2RlLCAxMSwgNSk7DQo+IC0gICAgICAgICAgICBvcDEg
+PSBNQVNLX1NQRUNJQUwyKGN0eC0+b3Bjb2RlKTsNCj4gLQ0KPiAtICAgICAgICAgICAgZ2VuX2Fy
+aXRoKGN0eCwgb3AxLCByZCwgcnMsIHJ0KTsNCj4gLSAgICAgICAgfQ0KPiAtICAgICAgICBicmVh
+azsNCj4gICAgICAgY2FzZSBPUENfTVhVX19QT09MMDA6DQo+ICAgICAgICAgICBkZWNvZGVfb3Bj
+X214dV9fcG9vbDAwKGVudiwgY3R4KTsNCj4gICAgICAgICAgIGJyZWFrOw0KPiBAQCAtMjUwMzMs
+MTIgKzI1MDQ0LDYgQEAgc3RhdGljIHZvaWQgZGVjb2RlX29wY19teHUoQ1BVTUlQU1N0YXRlICpl
+bnYsIERpc2FzQ29udGV4dCAqY3R4KQ0KPiAgICAgICAgICAgTUlQU19JTlZBTCgiT1BDX01YVV9T
+MTZTREkiKTsNCj4gICAgICAgICAgIGdlbmVyYXRlX2V4Y2VwdGlvbl9lbmQoY3R4LCBFWENQX1JJ
+KTsNCj4gICAgICAgICAgIGJyZWFrOw0KPiAtICAgIGNhc2UgT1BDX01YVV9TMzJNMkk6DQo+IC0g
+ICAgICAgIGdlbl9teHVfczMybTJpKGN0eCk7DQo+IC0gICAgICAgIGJyZWFrOw0KPiAtICAgIGNh
+c2UgT1BDX01YVV9TMzJJMk06DQo+IC0gICAgICAgIGdlbl9teHVfczMyaTJtKGN0eCk7DQo+IC0g
+ICAgICAgIGJyZWFrOw0KPiAgICAgICBjYXNlIE9QQ19NWFVfRDMyU0xMOg0KPiAgICAgICAgICAg
+LyogVE9ETzogSW1wbGVtZW50IGVtdWxhdGlvbiBvZiBEMzJTTEwgaW5zdHJ1Y3Rpb24uICovDQo+
+ICAgICAgICAgICBNSVBTX0lOVkFMKCJPUENfTVhVX0QzMlNMTCIpOw0K
