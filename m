@@ -1,20 +1,16 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:49903)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gG4J8-0003tU-N2
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 11:45:56 -0400
+	(envelope-from <laurent@vivier.eu>) id 1gG4JB-0003tU-Lz
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 11:45:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gG47B-0005XS-Ab
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 11:33:37 -0400
+	(envelope-from <laurent@vivier.eu>) id 1gG46r-0005OE-F6
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 11:33:17 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Fri, 26 Oct 2018 17:31:13 +0200
-Message-Id: <20181026153125.24738-9-laurent@vivier.eu>
+Date: Fri, 26 Oct 2018 17:31:14 +0200
+Message-Id: <20181026153125.24738-10-laurent@vivier.eu>
 In-Reply-To: <20181026153125.24738-1-laurent@vivier.eu>
 References: <20181026153125.24738-1-laurent@vivier.eu>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 08/20] scripts/qemu.py: remove trailing quotes
- on docstring
+Subject: [Qemu-devel] [PULL 09/20] qemu-iotests: make 218 executable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,26 +24,19 @@ Cc: Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>, Jason 
 
 From: Cleber Rosa <crosa@redhat.com>
 
+Commit 990dc39c made all tests executable at the time, but 218 came in
+later, and missing those permissions.
+
 Signed-off-by: Cleber Rosa <crosa@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20181004161852.11673-11-crosa@redhat.com>
+Message-Id: <20181004161852.11673-4-crosa@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- scripts/qemu.py | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/qemu-iotests/218 | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ mode change 100644 => 100755 tests/qemu-iotests/218
 
-diff --git a/scripts/qemu.py b/scripts/qemu.py
-index f099ce7278..b0b2f12ce6 100644
---- a/scripts/qemu.py
-+++ b/scripts/qemu.py
-@@ -87,7 +87,7 @@ class QEMUMachine(object):
-         @param name: prefix for socket and log file names (default: qemu-PID)
-         @param test_dir: where to create socket and log file
-         @param monitor_address: address for QMP monitor
--        @param socket_scm_helper: helper program, required for send_fd_scm()"
-+        @param socket_scm_helper: helper program, required for send_fd_scm()
-         @note: Qemu process is not started until launch() is used.
-         '''
-         if args is None:
+diff --git a/tests/qemu-iotests/218 b/tests/qemu-iotests/218
+old mode 100644
+new mode 100755
 -- 
 2.17.2
