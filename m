@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59943)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59989)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gFxTP-0000LS-IV
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 04:28:06 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gFxTc-0000gN-M3
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 04:28:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gFxRD-0000sH-Ua
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 04:25:51 -0400
-Received: from 6.mo2.mail-out.ovh.net ([87.98.165.38]:51476)
+	(envelope-from <ehabkost@redhat.com>) id 1gFxNp-0007el-Ra
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 04:22:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51772)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gFxRD-0000pj-OA
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 04:25:47 -0400
-Received: from player799.ha.ovh.net (unknown [10.109.160.5])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 1AFE416FF0E
-	for <qemu-devel@nongnu.org>; Fri, 26 Oct 2018 10:25:38 +0200 (CEST)
-References: <20181022121907.13635-1-ppandit@redhat.com>
-	<20181023153710.GZ12127@umbus.hotspot.internet-for-guests.com>
-	<679f5ba4-749b-72ee-62a0-40e5efc178e0@kaod.org>
-	<nycvar.YSQ.7.76.1810251204450.11480@xnncv>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <987110b6-9f7d-d82a-69b7-dcd78094c1a6@kaod.org>
-Date: Fri, 26 Oct 2018 10:25:29 +0200
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gFxNp-0007Uk-Je
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 04:22:17 -0400
+Date: Fri, 26 Oct 2018 05:22:13 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181026082213.GJ4096@habkost.net>
+References: <20181017093053.8811-1-tao3.xu@intel.com>
+	<20181017093053.8811-2-tao3.xu@intel.com>
+	<6b494abe-93ae-71fc-01f3-e149df5e24b5@redhat.com>
+	<20181025132831.GG4096@habkost.net>
+	<128b40da-f34e-9a45-e798-25e33855a51f@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <nycvar.YSQ.7.76.1810251204450.11480@xnncv>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <128b40da-f34e-9a45-e798-25e33855a51f@intel.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/3] ppc/pnv: check size before data buffer
- access
+Subject: Re: [Qemu-devel] [PATCH 1/1] i386: Add PKU/OSPKE on Skylake-Server
+ CPU model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,82 +32,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Qemu Developers <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Moguofang <moguofang@huawei.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Tao Xu <tao3.xu@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, rth@twiddle.net, jingqi.liu@intel.com, robert.hu@intel.com, qemu-devel@nongnu.org
 
-Hello Prasad,
-
-On 10/25/18 8:45 AM, P J P wrote:
->   Hello Cedric,
->=20
-> +-- On Wed, 24 Oct 2018, C=E9dric Le Goater wrote --+
-> | I think using a data[8] would be more appropriate. It would make the=20
-> | pnv_lpc_do_eccb() routine a little more complex. I tried to rewrite i=
-t to=20
-> | have a common one with the P9 LPC model but could not find a common p=
-attern.=20
-> | P9 is purely MMIO based. Something on the TODO list.
-> |=20
-> | 8 bytes accesses will then fail anyhow because all MemoryRegionOps ha=
-ve a=20
-> | max_access_size =3D 4.
->=20
-> Thank you for these inputs, appreciate it. To confirm,
->=20
->  - You plan to send a v2 patch to fix the OOB access issue along with=20
->    refactoring pnv_lpc_do_eccb?=20
-
-we might improve pnv_lpc_do_eccb() when the P9 LPC model is sent. I am no=
-t
-sure of that as this is for P8 only.
-
-> If yes, kindly include me in CC please.
-
-yes sure. =20
-
-> OR
->=20
->  - While we refactor the routine for better, a patch below seem okay to=
- fix=20
->    the OOB access issue?
-
-I think it is fine. Please add something like : =20
-
-	qemu_log_mask(LOG_GUEST_ERROR, "ECCB: invalid operation at @0x%08x"=20
-			" size %d\n", opb_addr, sz);
-
-
-Thanks,
-
-C.
-
-> =3D=3D=3D
-> diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
-> index d7721320a2..655d5f3d07 100644
-> --- a/hw/ppc/pnv_lpc.c
-> +++ b/hw/ppc/pnv_lpc.c
-> @@ -155,9 +155,13 @@ static void pnv_lpc_do_eccb(PnvLpcController *lpc,=
-=20
-> uint64_t cmd)
->      /* XXX Check for magic bits at the top, addr size etc... */
->      unsigned int sz =3D (cmd & ECCB_CTL_SZ_MASK) >> ECCB_CTL_SZ_LSH;
->      uint32_t opb_addr =3D cmd & ECCB_CTL_ADDR_MASK;
-> -    uint8_t data[4];
-> +    uint8_t data[8];
->      bool success;
-> =20
-> +    if (sz > sizeof(data)) {
-> +        return;
-> +    }
-> +
->      if (cmd & ECCB_CTL_READ) {
->          success =3D opb_read(lpc, opb_addr, data, sz);
->          if (success) {
-> =3D=3D=3D
+On Fri, Oct 26, 2018 at 01:53:10PM +0800, Tao Xu wrote:
+> On 10/25/18 9:28 PM, Eduardo Habkost wrote:
+> > On Wed, Oct 17, 2018 at 12:48:58PM +0200, Paolo Bonzini wrote:
+> > > On 17/10/2018 11:30, Tao Xu wrote:
+> > > > As the release document ref below link (page 13):
+> > > > https://software.intel.com/sites/default/files/managed/c5/15/\
+> > > > architecture-instruction-set-extensions-programming-reference.pdf
+> > > >=20
+> > > > PKU is supported in Skylake Server (Only Server) and later, and
+> > > > on Intel(R) Xeon(R) Processor Scalable Family. OSPKE is to reads
+> > > > the value of PKRU (Instruction of PKU) into EAX and clears EDX.
+> > > > So PKU/OSPKE are supposed to be in Skylake-Server CPU model.
+> > > > And PKU/OSPKE 's CPUID has been exposed to QEMU. But PKU/OSPKE
+> > > > can't be find in Skylake-Server CPU model in the code.
+> > > > So this patch will fix PKU/OSPKE this issue in Skylake-Server
+> > > > CPU model.
+> > > OSPKE is not needed, since it is added automatically based on CR4 (=
+and
+> > > is not set on boot).
+> > Correct.
+> >=20
+> > > Also, the guru of CPU model compatibility is Eduardo, so I'll wait =
+for
+> > > him to chime in anyway.
+> > Sorry for taking so long to reply.  This can be safely done only
+> > if every host that is able to run Skylake-Server today is
+> > guaranteed to support PKU.  Is that the case?
+> >=20
+> > You'll also need Skylake-Server-*-cpu.pku=3Doff entries on
+> > PC_COMPAT_3_0 to keep PKU disabled on pc-*-3.0 and older.
+> >=20
+> Thank you Eduardo,
 >=20
 >=20
-> Thank you.
-> --
-> Prasad J Pandit / Red Hat Product Security Team
-> 47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
+> But I can't find PC_COMPAT_3_0 in=A0 include/hw/i386/pc.h. Will it exis=
+t on
 >=20
+> QEMU 3.1 and will I add "pku=3Doff" after QEMU 3.1=A0 release?
+
+PC_COMPAT_3_0 was added to qemu.git master a few weeks ago, by
+commit 9b4cf107b09d18ac30f46fd1c4de8585ccba030c.
+
+--=20
+Eduardo
