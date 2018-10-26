@@ -1,35 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58251)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gFyuU-0001EP-Qz
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 06:00:10 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1gFywG-0002KT-3y
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 06:02:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gFyuK-0000eR-4F
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 06:00:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53772)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gFyuJ-0000ds-QP
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 05:59:56 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EEABA311C3D0
-	for <qemu-devel@nongnu.org>; Fri, 26 Oct 2018 09:59:54 +0000 (UTC)
-Date: Fri, 26 Oct 2018 10:59:43 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181026095943.GG31390@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1gFyw7-0001yw-Q8
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 06:01:55 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:33043)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gFyw7-0001x2-EX
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 06:01:47 -0400
+Received: by mail-wm1-f68.google.com with SMTP id y140-v6so3835693wmd.0
+	for <qemu-devel@nongnu.org>; Fri, 26 Oct 2018 03:01:46 -0700 (PDT)
 References: <20181025085256.20522-1-kraxel@redhat.com>
-	<20181025085256.20522-4-kraxel@redhat.com>
-	<20181025203758.GA29995@redhat.com>
-	<nycvar.YSQ.7.76.1810261213001.8270@xnncv>
-	<20181026094208.GD31390@redhat.com>
+	<20181025085256.20522-3-kraxel@redhat.com>
+	<7210c7e6-4b85-053c-83c5-524a3b74ef6f@redhat.com>
+	<nycvar.YSQ.7.76.1810261458190.8270@xnncv>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6a284fc1-e948-3c32-dba1-9740be5a2d82@redhat.com>
+Date: Fri, 26 Oct 2018 12:01:42 +0200
 MIME-Version: 1.0
+In-Reply-To: <nycvar.YSQ.7.76.1810261458190.8270@xnncv>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20181026094208.GD31390@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/3] cirrus: mark as deprecated
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/3] adlib: mark as insecure and deprecated.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,79 +32,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>
-Cc: libvir-list@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: P J P <ppandit@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, libvir-list@redhat.com
 
-On Fri, Oct 26, 2018 at 10:42:08AM +0100, Daniel P. Berrang=C3=A9 wrote:
-> On Fri, Oct 26, 2018 at 12:33:55PM +0530, P J P wrote:
-> >   Hello Dan, all
-> >=20
-> > +-- On Thu, 25 Oct 2018, Daniel P. Berrang=C3=A9 wrote --+
-> > | On Thu, Oct 25, 2018 at 10:52:56AM +0200, Gerd Hoffmann wrote:
-> > | > While being at it deprecate cirrus too.
-> > | >=20
-> > | > Reason (short version): use stdvga instead.
-> > | > Verbose version:
-> > | >     https://www.kraxel.org/blog/2014/10/qemu-using-cirrus-conside=
-red-harmful
-> > |=20
-> > |=20
-> > | I don't debate the points in the blog post above that stdvga is a
-> > | better choice, but I don't think that's enough to justify deprecati=
-ng
-> > | cirrus at this point in time, because when it then gets deleted it
-> > | will break way too many existing deployments.
-> > |=20
-> > | We need to socialize info in that blog post above more widely and
-> > | especially ensure that apps are not using that by default. I don't
-> > | see it being viable to formally deprecate it in QEMU any time soon
-> > | though given existing usage.
-> >=20
-> > To note, IMO there are other devices/sources in QEMU which are potent=
-ial=20
-> > candidates for deprecation, similar to adlib etc. It'll help if we co=
-uld=20
-> > device a process to deprecate/remove such code base. Other than maint=
-enance it=20
-> > invariably also becomes source of security issues.
-> >=20
-> > Ex.(similar to Fedora) we could announce such candidate on qemu-devel=
- list and=20
-> > after review over a period of say a month, candidate will be
-> > deprecated/expunged. (thinking aloud)
->=20
-> QEMU has a deprecation process:
->=20
->   https://qemu.weilnetz.de/doc/qemu-doc.html#Deprecated-features
->=20
-> Most of the stuff deprecated is CLI args / monitor commands, etc where
-> mgmt apps just adjust the way they are calling QEMU, so end user's VMs
-> are largely not impacted.
->=20
-> Deprecating a device type that is widely used is not desirable because
-> that will cause breakage of existing guests.  Distros are free to disab=
-le
-> devices in their builds if they want to reduce the scope for CVEs in
-> packages they maintain, but again they should think carefully about how
-> many users they are going to break by doing so.
+On 26/10/2018 11:34, P J P wrote:
+> +-- On Fri, 26 Oct 2018, Paolo Bonzini wrote --+
+> | I am dumb and I don't understand.  In set_ar_dr you get
+> | 
+> | 	v = 0xff
+> | 	ar = 15
+> | 	dr = 15
+> | 
+> | and OPL->AR_TABLE[60] is accessed.  The size of the array is 75, which
+> | seems to be actually 14 more than required.  Likewise OPL->DR_TABLE[60]
+> | is accessed.
+> | 
+> | The next accesses use SLOT->ksr which is 0 so it's fine too.
+> 
+> In set_ar_dr
+> 
+>   SLOT->AR = ar ? &OPL->AR_TABLE[ar<<2] : RATE_0;
+> 
+> SLOT->AR is set to point to OPL->DR_TABLE[60] and while so if s->ksr is set to 
+> 15, in CALC_FCSLOT()
+> 
+>   SLOT->evsa = SLOT->AR[ksr];  <= accesses OPL->AR_TABLE[60 + 15];
 
-I should also say that QEMU as an upstream project has multiple goals.
-Running KVM guests with modern PV hardware is only one of them, albeit
-a widely used one. Being able to run old legacy OS with old hardware,
-and running arbitrary embedded boards/devices with emulation are both
-use cases that QEMU project aims to address. To eliminate all the old
-"crufty" device emulation in name of improving security for KVM, would
-be to eliminate core use cases of the project. THis is why we're trying
-to persue the direction of making it easier for vendors to disable
-features and devices they don't wish to support & thus limit their
-downstream CVE exposure.
+Oh, thanks!  I said I was dumb. :)  So the fix is just this:
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+diff --git a/hw/audio/fmopl.h b/hw/audio/fmopl.h
+index e7e578a48e..7199afaa3c 100644
+--- a/hw/audio/fmopl.h
++++ b/hw/audio/fmopl.h
+@@ -72,8 +72,8 @@ typedef struct fm_opl_f {
+ 	/* Rhythm sention */
+ 	uint8_t rhythm;		/* Rhythm mode , key flag */
+ 	/* time tables */
+-	int32_t AR_TABLE[75];	/* atttack rate tables */
+-	int32_t DR_TABLE[75];	/* decay rate tables   */
++	int32_t AR_TABLE[76];	/* atttack rate tables */
++	int32_t DR_TABLE[76];	/* decay rate tables   */
+ 	uint32_t FN_TABLE[1024];  /* fnumber -> increment counter */
+ 	/* LFO */
+ 	int32_t *ams_table;
+
+and init_timetables will just fill it with the right value?  (I checked
+against another implementation at http://opl3.cozendey.com/).
+
+Thanks,
+
+Paolo
