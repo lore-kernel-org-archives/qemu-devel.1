@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57140)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gG9Tq-0006d2-Fv
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 17:17:19 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gG9Z3-0000x8-1e
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 17:22:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gG9Tl-0004Q2-Hd
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 17:17:18 -0400
-Received: from pio-pvt-msa2.bahnhof.se ([79.136.2.41]:33964)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gG9Tl-0004O5-8m
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 17:17:13 -0400
-Date: Fri, 26 Oct 2018 23:17:08 +0200
-From: Fredrik Noring <noring@nocrew.org>
-Message-ID: <20181026211708.GA22187@sx9>
-References: <1540586148-11285-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gG9Z0-0007eY-Px
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 17:22:40 -0400
+Received: from mail-oi1-x231.google.com ([2607:f8b0:4864:20::231]:34942)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gG9Yt-0007bi-PL
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 17:22:34 -0400
+Received: by mail-oi1-x231.google.com with SMTP id 22-v6so2260717oiz.2
+	for <qemu-devel@nongnu.org>; Fri, 26 Oct 2018 14:22:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1540586148-11285-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: Re: [Qemu-devel] [PATCH 0/3] target/mips: Rename MMI-related code
- elements
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 26 Oct 2018 22:21:58 +0100
+Message-ID: <CAFEAcA-7Vizmx55kNSXDCdozb+-eQ+jNr_6jSr11POatt1oZ1A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] template for a script for running an ad-hoc QEMU image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,31 +26,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, Aleksandar Markovic <amarkovic@wavecomp.com>
-Cc: qemu-devel@nongnu.org, aurelien@aurel32.net, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, juergenurban@gmx.de, "Maciej W. Rozycki" <macro@linux-mips.org>
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Hi Aleksandar,
+In a conversation this week I mentioned the scripts I use for running
+ad-hoc QEMU guest images that I have. The idea here is just that
+by making sure that whenever I get a test image I set it up to be
+run in the same way, I don't have the problem of trying to remember
+how to run the guest if I come back to it after six months.
+Here's an example -- I generally just copy-paste-and-edit an older
+script when I get a new test image.
 
-> This series renames MMI-related code elements so that they do not
-> contain TX79 substring. Tx79 is one of CPUs that support MMI ASE.
-> Opcodes and other code elements should be as generic as possible,
-> and should not contain CPU name if they are supported by multiple
-> CPUs. In cases when there is a single-CPU-specific opcode, an
-> anoter special convention should apply, like, for example,
-> MMI_OPC__TX79_XXX or MMI_OPC__R5900_YYY. So far these cases were
-> not identified, but there will be some in the future. But overall,
-> the great MMI opcodes are shared (stay the same) between different
-> CPUs that support MMI.
-> 
-> Aleksandar Markovic (3):
->   target/mips: Rename MMI-related masks
->   target/mips: Rename MMI-related opcodes
->   target/mips: Rename MMI-related functions
-> 
->  target/mips/translate.c | 518 ++++++++++++++++++++++++------------------------
->  1 file changed, 259 insertions(+), 259 deletions(-)
+============
+#!/bin/sh -e
+TESTDIR="$(cd "$(dirname "$0")"; pwd)"
+QEMU="$@"
 
-This is interesting. Could you name a few other ISAs, beside the R5900
-and the TX79, that have 128-bit GPRs and equivalent MMIs?
+${QEMU} -M lm3s6965evb -kernel "${TESTDIR}"/qs_ek-lm3s6965.bin
+============
 
-Fredrik
+I put each guest image in its own directory, and the script is
+always named "runme" and is executable. Then any test can be run with
+path/to/test/runme path/to/qemu-system-whatever
+
+There's no magic here but there are a couple of nice nuances here:
+ * the rune at the top sets TESTDIR to the directory containing the
+   script, regardless of what the current working directory is when
+   you run the script; references to kernels, disk files, etc should
+   then all use $TESTDIR rather than being absolute or relative paths
+ * the use of $@ means you can also do
+
+path/to/test/runme gdb --args path/to/qemu-system-whatever
+path/to/test/runme valgrind path/to/qemu-system-whatever
+
+and other similar things.
+
+This doesn't fix any of the problems of using ad-hoc human-run
+images for testing, but at least it makes them all be runnable in
+the same way, reducing the barrier to randomly running one of them.
+
+thanks
+-- PMM
