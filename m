@@ -1,36 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55969)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gFypM-0005KW-14
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 05:54:48 -0400
+	(envelope-from <smarkovic@wavecomp.com>) id 1gFyrG-0006mE-An
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 05:56:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gFypH-0006Ep-TG
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 05:54:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56689)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gFypF-0006Dj-VN
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 05:54:43 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 76F2730B7EC6
-	for <qemu-devel@nongnu.org>; Fri, 26 Oct 2018 09:54:39 +0000 (UTC)
-Date: Fri, 26 Oct 2018 10:54:33 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181026095433.GF31390@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181025085256.20522-1-kraxel@redhat.com>
-	<20181025085256.20522-3-kraxel@redhat.com>
-	<nycvar.YSQ.7.76.1810251622450.11480@xnncv>
-	<20181025204029.GB29995@redhat.com>
-	<nycvar.YSQ.7.76.1810261237090.8270@xnncv>
+	(envelope-from <smarkovic@wavecomp.com>) id 1gFyrB-0007LO-6p
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 05:56:46 -0400
+Received: from mail-eopbgr700099.outbound.protection.outlook.com
+	([40.107.70.99]:61760
+	helo=NAM04-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <smarkovic@wavecomp.com>)
+	id 1gFyr9-0007EX-A3
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 05:56:39 -0400
+From: Stefan Markovic <smarkovic@wavecomp.com>
+Date: Fri, 26 Oct 2018 09:56:23 +0000
+Message-ID: <97bc6413-716d-bb91-3789-6428558c8d60@wavecomp.com>
+References: <1540383527-7923-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1540383527-7923-21-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1540383527-7923-21-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <1A607BDE08CF424CBBE6262E99E09205@namprd22.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <nycvar.YSQ.7.76.1810261237090.8270@xnncv>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [libvirt] [PATCH 2/3] adlib: mark as insecure and
- deprecated.
+Subject: Re: [Qemu-devel] [PATCH v7 20/20] target/mips: Amend MXU ASE
+ overview note
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,44 +33,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, libvir-list@redhat.com, qemu-devel@nongnu.org
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>, "jancraig@amazon.com" <jancraig@amazon.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>
 
-On Fri, Oct 26, 2018 at 12:38:53PM +0530, P J P wrote:
-> +-- On Thu, 25 Oct 2018, Daniel P. Berrang=C3=A9 wrote --+
-> | On Thu, Oct 25, 2018 at 04:26:16PM +0530, P J P wrote:
-> | > +-- On Thu, 25 Oct 2018, Gerd Hoffmann wrote --+
-> | > | We have a lovely, guest-triggerable buffer overflow in opl2 emula=
-tion.
-> | > |=20
-> | > | Reproducer:
-> | > |     outw(0xff60, 0x220);
-> | > |     outw(0x1020, 0x220);
-> | > |     outw(0xffb0, 0x220);
-> | > | Result:
-> | > |     Will overflow FM_OPL->AR_TABLE[] (see hw/audio/fmopl.[ch])
-> | >=20
-> | > + Reported-by: Wangjunqing <wangjunqing@huawei.com>
-> |=20
-> | So you have a CVE number for this ?
->=20
-> No, since the adlib device is not used as much and is being deprecated,=
- I'm=20
-> not inclined to get one.
-
-Any security issue that affects code in QEMU that is currently being
-shipped by distros should have a CVE.
-
-Whether we intend to deprecate & delete it later should not be a factor
-because we are free to cancel the deprecation process at any time if we
-find a reason to keep the feature around.
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+DQpPbiAyNC4xMC4xOC4gMTQ6MTgsIEFsZWtzYW5kYXIgTWFya292aWMgd3JvdGU6DQo+IEZyb206
+IEFsZWtzYW5kYXIgTWFya292aWMgPGFtYXJrb3ZpY0B3YXZlY29tcC5jb20+DQo+DQo+IEFkZCBw
+cmVmaXgsIHN1ZmZpeCwgb3BlcmF0aW9uIGRlc2NyaXB0aW9ucywgYW5kIG90aGVyIGNvcnJlY3Rp
+b25zDQo+IGFuZCBhbWVuZG1lbnRzIHRvIHRoZSBjb21tZW50IHRoYXQgZGVzY3JpYmVzIE1YVSBB
+U0UuDQo+DQo+IFNpZ25lZC1vZmYtYnk6IEFsZWtzYW5kYXIgTWFya292aWMgPGFtYXJrb3ZpY0B3
+YXZlY29tcC5jb20+DQo+IC0tLQ0KPiAgIHRhcmdldC9taXBzL3RyYW5zbGF0ZS5jIHwgODQgKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLQ0KPiAgIDEgZmls
+ZSBjaGFuZ2VkLCA3NCBpbnNlcnRpb25zKCspLCAxMCBkZWxldGlvbnMoLSkNCg0KDQpSZXZpZXdl
+ZC1ieTogU3RlZmFuIE1hcmtvdmljIDxzbWFya292aWNAd2F2ZWNvbXAuY29tPg0KDQoNCj4gZGlm
+ZiAtLWdpdCBhL3RhcmdldC9taXBzL3RyYW5zbGF0ZS5jIGIvdGFyZ2V0L21pcHMvdHJhbnNsYXRl
+LmMNCj4gaW5kZXggMzYyMGFlNS4uOWJkNWYyNyAxMDA2NDQNCj4gLS0tIGEvdGFyZ2V0L21pcHMv
+dHJhbnNsYXRlLmMNCj4gKysrIGIvdGFyZ2V0L21pcHMvdHJhbnNsYXRlLmMNCj4gQEAgLTE0MTAs
+MjUgKzE0MTAsODkgQEAgZW51bSB7DQo+ICAgICogTVhVIHVuaXQgY29udGFpbnMgMTcgcmVnaXN0
+ZXJzIGNhbGxlZCBYMC1YMTYuIFgwIGlzIGFsd2F5cyB6ZXJvLCBhbmQgWDE2IGlzDQo+ICAgICog
+dGhlIGNvbnRyb2wgcmVnaXN0ZXIuDQo+ICAgICoNCj4gLSAqIFRoZSBub3RhdGlvbiB1c2VkIGlu
+IE1YVSBhc3NlbWJsZXIgbW5lbW9uaWNzOg0KPiArICogVGhlIG5vdGF0aW9uIHVzZWQgaW4gTVhV
+IGFzc2VtYmxlciBtbmVtb25pY3MNCj4gKyAqIC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tDQo+ICsgKg0KPiArICogIFJlZ2lzdGVyczoNCj4gICAgKg0KPiAgICAq
+ICAgWFJhLCBYUmIsIFhSYywgWFJkIC0gTVhVIHJlZ2lzdGVycw0KPiAgICAqICAgUmIsIFJjLCBS
+ZCwgUnMsIFJ0IC0gZ2VuZXJhbCBwdXJwb3NlIE1JUFMgcmVnaXN0ZXJzDQo+IC0gKiAgIHMxMiAg
+ICAgICAgICAgICAgICAtIGEgc3ViZmllbGQgb2YgYW4gaW5zdHJ1Y3Rpb24gY29kZQ0KPiAtICog
+ICBzdHJkMiAgICAgICAgICAgICAgLSBhIHN1YmZpZWxkIG9mIGFuIGluc3RydWN0aW9uIGNvZGUN
+Cj4gLSAqICAgZXB0bjIgICAgICAgICAgICAgIC0gYSBzdWJmaWVsZCBvZiBhbiBpbnN0cnVjdGlv
+biBjb2RlDQo+IC0gKiAgIGVwdG4zICAgICAgICAgICAgICAtIGEgc3ViZmllbGQgb2YgYW4gaW5z
+dHJ1Y3Rpb24gY29kZQ0KPiAtICogICBvcHRuMiAgICAgICAgICAgICAgLSBhIHN1YmZpZWxkIG9m
+IGFuIGluc3RydWN0aW9uIGNvZGUNCj4gLSAqICAgb3B0bjMgICAgICAgICAgICAgIC0gYSBzdWJm
+aWVsZCBvZiBhbiBpbnN0cnVjdGlvbiBjb2RlDQo+IC0gKiAgIHNmdDQgICAgICAgICAgICAgICAt
+IGEgc3ViZmllbGQgb2YgYW4gaW5zdHJ1Y3Rpb24gY29kZQ0KPiArICoNCj4gKyAqICBTdWJmaWVs
+ZHM6DQo+ICsgKg0KPiArICogICBhcHRuMSAgICAgICAgICAgICAgLSAxLWJpdCBhY2N1bXVsYXRl
+IGFkZC9zdWJ0cmFjdCBwYXR0ZXJuDQo+ICsgKiAgIGFwdG4yICAgICAgICAgICAgICAtIDItYml0
+IGFjY3VtdWxhdGUgYWRkL3N1YnRyYWN0IHBhdHRlcm4NCj4gKyAqICAgZXB0bjIgICAgICAgICAg
+ICAgIC0gMi1iaXQgZXhlY3V0ZSBhZGQvc3VidHJhY3QgcGF0dGVybg0KPiArICogICBvcHRuMiAg
+ICAgICAgICAgICAgLSAyLWJpdCBvcGVyYW5kIHBhdHRlcm4NCj4gKyAqICAgb3B0bjMgICAgICAg
+ICAgICAgIC0gMy1iaXQgb3BlcmFuZCBwYXR0ZXJuDQo+ICsgKiAgIHNmdDQgICAgICAgICAgICAg
+ICAtIDQtYml0IHNoaWZ0IGFtb3VudA0KPiArICogICBzdHJkMiAgICAgICAgICAgICAgLSAyLWJp
+dCBzdHJpZGUgYW1vdW50DQo+ICsgKg0KPiArICogIFByZWZpeGVzOg0KPiArICoNCj4gKyAqICAg
+PE9wZXJhdGlvbiBwYXJhbGxlbCBsZXZlbD48T3BlcmFuZCBzaXplPg0KPiArICogICAgIFMgICAg
+ICAgICAgICAgICAgICAgICAgICAgMzINCj4gKyAqICAgICBEICAgICAgICAgICAgICAgICAgICAg
+ICAgIDE2DQo+ICsgKiAgICAgUSAgICAgICAgICAgICAgICAgICAgICAgICAgOA0KPiArICoNCj4g
+KyAqICBTdWZmaXhlczoNCj4gKyAqDQo+ICsgKiAgIEUgLSBFeHBhbmQgcmVzdWx0cw0KPiArICog
+ICBGIC0gRml4ZWQgcG9pbnQgbXVsdGlwbGljYXRpb24NCj4gKyAqICAgTCAtIExvdyBwYXJ0IHJl
+c3VsdA0KPiArICogICBSIC0gRG9pbmcgcm91bmRpbmcNCj4gKyAqICAgViAtIFZhcmlhYmxlIGlu
+c3RlYWQgb2YgaW1tZWRpYXRlDQo+ICsgKiAgIFcgLSBDb21iaW5lIGFib3ZlIEwgYW5kIFYNCj4g
+KyAqDQo+ICsgKiAgT3BlcmF0aW9uczoNCj4gKyAqDQo+ICsgKiAgIEFERCAgIC0gQWRkIG9yIHN1
+YnRyYWN0DQo+ICsgKiAgIEFEREMgIC0gQWRkIHdpdGggY2FycnktaW4NCj4gKyAqICAgQUNDICAg
+LSBBY2N1bXVsYXRlDQo+ICsgKiAgIEFTVU0gIC0gU3VtIHRvZ2V0aGVyIHRoZW4gYWNjdW11bGF0
+ZSAoYWRkIG9yIHN1YnRyYWN0KQ0KPiArICogICBBU1VNQyAtIFN1bSB0b2dldGhlciB0aGVuIGFj
+Y3VtdWxhdGUgKGFkZCBvciBzdWJ0cmFjdCkgd2l0aCBjYXJyeS1pbg0KPiArICogICBBVkcgICAt
+IEF2ZXJhZ2UgYmV0d2VlbiAyIG9wZXJhbmRzDQo+ICsgKiAgIEFCRCAgIC0gQWJzb2x1dGUgZGlm
+ZmVyZW5jZQ0KPiArICogICBBTE4gICAtIEFsaWduIGRhdGENCj4gKyAqICAgQU5EICAgLSBMb2dp
+Y2FsIGJpdHdpc2UgJ2FuZCcgb3BlcmF0aW9uDQo+ICsgKiAgIENQUyAgIC0gQ29weSBzaWduDQo+
+ICsgKiAgIEVYVFIgIC0gRXh0cmFjdCBiaXRzDQo+ICsgKiAgIEkyTSAgIC0gTW92ZSBmcm9tIEdQ
+UiByZWdpc3RlciB0byBNWFUgcmVnaXN0ZXINCj4gKyAqICAgTEREICAgLSBMb2FkIGRhdGEgZnJv
+bSBtZW1vcnkgdG8gWFJGDQo+ICsgKiAgIExESSAgIC0gTG9hZCBkYXRhIGZyb20gbWVtb3J5IHRv
+IFhSRiAoYW5kIGluY3JlYXNlIHRoZSBhZGRyZXNzIGJhc2UpDQo+ICsgKiAgIExVSSAgIC0gTG9h
+ZCB1bnNpZ25lZCBpbW1lZGlhdGUNCj4gKyAqICAgTVVMICAgLSBNdWx0aXBseQ0KPiArICogICBN
+VUxVICAtIFVuc2lnbmVkIG11bHRpcGx5DQo+ICsgKiAgIE1BREQgIC0gNjQtYml0IG9wZXJhbmQg
+YWRkIDMyeDMyIHByb2R1Y3QNCj4gKyAqICAgTVNVQiAgLSA2NC1iaXQgb3BlcmFuZCBzdWJ0cmFj
+dCAzMngzMiBwcm9kdWN0DQo+ICsgKiAgIE1BQyAgIC0gTXVsdGlwbHkgYW5kIGFjY3VtdWxhdGUg
+KGFkZCBvciBzdWJ0cmFjdCkNCj4gKyAqICAgTUFEICAgLSBNdWx0aXBseSBhbmQgYWRkIG9yIHN1
+YnRyYWN0DQo+ICsgKiAgIE1BWCAgIC0gTWF4aW11bSBiZXR3ZWVuIDIgb3BlcmFuZHMNCj4gKyAq
+ICAgTUlOICAgLSBNaW5pbXVtIGJldHdlZW4gMiBvcGVyYW5kcw0KPiArICogICBNMkkgICAtIE1v
+dmUgZnJvbSBNWFUgcmVnaXN0ZXIgdG8gR1BSIHJlZ2lzdGVyDQo+ICsgKiAgIE1PVlogIC0gTW92
+ZSBpZiB6ZXJvDQo+ICsgKiAgIE1PVk4gIC0gTW92ZSBpZiBub24temVybw0KPiArICogICBOT1Ig
+ICAtIExvZ2ljYWwgYml0d2lzZSAnbm9yJyBvcGVyYXRpb24NCj4gKyAqICAgT1IgICAgLSBMb2dp
+Y2FsIGJpdHdpc2UgJ29yJyBvcGVyYXRpb24NCj4gKyAqICAgU1REICAgLSBTdG9yZSBkYXRhIGZy
+b20gWFJGIHRvIG1lbW9yeQ0KPiArICogICBTREkgICAtIFN0b3JlIGRhdGEgZnJvbSBYUkYgdG8g
+bWVtb3J5IChhbmQgaW5jcmVhc2UgdGhlIGFkZHJlc3MgYmFzZSkNCj4gKyAqICAgU0xUICAgLSBT
+ZXQgb2YgbGVzcyB0aGFuIGNvbXBhcmlzb24NCj4gKyAqICAgU0FEICAgLSBTdW0gb2YgYWJzb2x1
+dGUgZGlmZmVyZW5jZXMNCj4gKyAqICAgU0xMICAgLSBMb2dpY2FsIHNoaWZ0IGxlZnQNCj4gKyAq
+ICAgU0xSICAgLSBMb2dpY2FsIHNoaWZ0IHJpZ2h0DQo+ICsgKiAgIFNBUiAgIC0gQXJpdGhtZXRp
+YyBzaGlmdCByaWdodA0KPiArICogICBTQVQgICAtIFNhdHVyYXRpb24NCj4gKyAqICAgU0ZMICAg
+LSBTaHVmZmxlDQo+ICsgKiAgIFNDT1AgIC0gQ2FsY3VsYXRlIHjigJlzIHNjb3BlICgtMSwgbWVh
+bnMgeDwwOyAwLCBtZWFucyB4PT0wOyAxLCBtZWFucyB4PjApDQo+ICsgKiAgIFhPUiAgIC0gTG9n
+aWNhbCBiaXR3aXNlICdleGNsdXNpdmUgb3InIG9wZXJhdGlvbg0KPiAgICAqDQo+ICAgICogTG9h
+ZC9TdG9yZSBpbnN0cnVjdGlvbnMgICAgICAgICAgIE11bHRpcGxpY2F0aW9uIGluc3RydWN0aW9u
+cw0KPiAgICAqIC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tICAgICAgICAgICAtLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0NCj4gICAgKg0KPiAgICAqICBTMzJMREQgWFJhLCBSYiwgczEyICAgICAg
+ICAgICAgICAgUzMyTUFERCBYUmEsIFhSZCwgUnMsIFJ0DQo+ICAgICogIFMzMlNURCBYUmEsIFJi
+LCBzMTIgICAgICAgICAgICAgICBTMzJNQUREVSBYUmEsIFhSZCwgUnMsIFJ0DQo+IC0gKiAgUzMy
+TEREViBYUmEsIFJiLCByYywgc3RyZDIgICAgICAgIFMzMlNVQiBYUmEsIFhSZCwgUnMsIFJ0DQo+
+IC0gKiAgUzMyU1REViBYUmEsIFJiLCByYywgc3RyZDIgICAgICAgIFMzMlNVQlUgWFJhLCBYUmQs
+IFJzLCBSdA0KPiArICogIFMzMkxERFYgWFJhLCBSYiwgcmMsIHN0cmQyICAgICAgICBTMzJNU1VC
+IFhSYSwgWFJkLCBScywgUnQNCj4gKyAqICBTMzJTVERWIFhSYSwgUmIsIHJjLCBzdHJkMiAgICAg
+ICAgUzMyTVNVQlUgWFJhLCBYUmQsIFJzLCBSdA0KPiAgICAqICBTMzJMREkgWFJhLCBSYiwgczEy
+ICAgICAgICAgICAgICAgUzMyTVVMIFhSYSwgWFJkLCBScywgUnQNCj4gICAgKiAgUzMyU0RJIFhS
+YSwgUmIsIHMxMiAgICAgICAgICAgICAgIFMzMk1VTFUgWFJhLCBYUmQsIFJzLCBSdA0KPiAgICAq
+ICBTMzJMRElWIFhSYSwgUmIsIHJjLCBzdHJkMiAgICAgICAgRDE2TVVMIFhSYSwgWFJiLCBYUmMs
+IFhSZCwgb3B0bjINCg==
