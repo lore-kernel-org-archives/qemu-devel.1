@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50642)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gG4JO-0004sw-8c
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 11:46:12 -0400
+	(envelope-from <laurent@vivier.eu>) id 1gG4JR-00041t-74
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 11:46:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gG46n-0005K1-IT
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 11:33:11 -0400
+	(envelope-from <laurent@vivier.eu>) id 1gG46j-0005GK-AR
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 11:33:07 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Fri, 26 Oct 2018 17:31:11 +0200
-Message-Id: <20181026153125.24738-7-laurent@vivier.eu>
+Date: Fri, 26 Oct 2018 17:31:10 +0200
+Message-Id: <20181026153125.24738-6-laurent@vivier.eu>
 In-Reply-To: <20181026153125.24738-1-laurent@vivier.eu>
 References: <20181026153125.24738-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 06/20] docs/devel/testing.rst: add missing
- newlines after code block
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 05/20] qemu-iotests: fix filename containing
+ checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,52 +28,40 @@ Cc: Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>, Jason 
 
 From: Cleber Rosa <crosa@redhat.com>
 
-The line immediate following a ".. code::" block is considered
-to contains arguments to the "code directive".  The lack of a
-new line gives me during at parse time:
-
-   testing.rst:63: (ERROR/3) Error in "code" directive:
-   maximum 1 argument(s) allowed, 3 supplied.
-
-   .. code::
-     make check-unit V=1
-
-   testing.rst:120: (ERROR/3) Error in "code" directive:
-   maximum 1 argument(s) allowed, 3 supplied.
-
-   .. code::
-     make check-qtest V=1
-
-Let's add the missing newlines, both for consistency and to
-avoid the parsing errors.
+Commit cce293a2945 moved some functions from common.config to
+common.rc, but the error messages still reference the old file
+location.
 
 Signed-off-by: Cleber Rosa <crosa@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Message-Id: <20181004161852.11673-6-crosa@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20181004161852.11673-5-crosa@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- docs/devel/testing.rst | 2 ++
- 1 file changed, 2 insertions(+)
+ tests/qemu-iotests/common.rc | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
-index fcfad87614..a227754f86 100644
---- a/docs/devel/testing.rst
-+++ b/docs/devel/testing.rst
-@@ -59,6 +59,7 @@ variable (which affects memory reclamation and catches invalid pointers better)
- and gtester options. If necessary, you can run
+diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
+index 44bee16a5e..70ca65b49b 100644
+--- a/tests/qemu-iotests/common.rc
++++ b/tests/qemu-iotests/common.rc
+@@ -170,7 +170,7 @@ if [ ! -e "$TEST_DIR" ]; then
+ fi
  
- .. code::
-+
-   make check-unit V=1
+ if [ ! -d "$TEST_DIR" ]; then
+-    echo "common.config: Error: \$TEST_DIR ($TEST_DIR) is not a directory"
++    echo "common.rc: Error: \$TEST_DIR ($TEST_DIR) is not a directory"
+     exit 1
+ fi
  
- and copy the actual command line which executes the unit test, then run
-@@ -116,6 +117,7 @@ and using gdb on the test is still simple to do: find out the actual command
- from the output of
+@@ -179,7 +179,7 @@ if [ -z "$REMOTE_TEST_DIR" ]; then
+ fi
  
- .. code::
-+
-   make check-qtest V=1
+ if [ ! -d "$SAMPLE_IMG_DIR" ]; then
+-    echo "common.config: Error: \$SAMPLE_IMG_DIR ($SAMPLE_IMG_DIR) is not a directory"
++    echo "common.rc: Error: \$SAMPLE_IMG_DIR ($SAMPLE_IMG_DIR) is not a directory"
+     exit 1
+ fi
  
- which you can run manually.
 -- 
 2.17.2
