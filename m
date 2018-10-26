@@ -1,16 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50000)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gG4Jk-00041v-Tm
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 11:46:36 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1gG4LO-0006lr-A3
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 11:48:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gG46Z-00052K-JB
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 11:32:59 -0400
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Fri, 26 Oct 2018 17:31:16 +0200
-Message-Id: <20181026153125.24738-12-laurent@vivier.eu>
-In-Reply-To: <20181026153125.24738-1-laurent@vivier.eu>
-References: <20181026153125.24738-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 11/20] cpu.h: fix a typo in comment
+	(envelope-from <richard.henderson@linaro.org>) id 1gG4LL-0005Q0-4L
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 11:48:14 -0400
+Received: from mail-pg1-x532.google.com ([2607:f8b0:4864:20::532]:43266)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gG4LK-0005Os-N7
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 11:48:11 -0400
+Received: by mail-pg1-x532.google.com with SMTP id n10-v6so713172pgv.10
+	for <qemu-devel@nongnu.org>; Fri, 26 Oct 2018 08:48:10 -0700 (PDT)
+References: <20181025144644.15464-1-cota@braap.org>
+	<20181025144644.15464-57-cota@braap.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <bf57bb53-d388-eee8-e233-f2812b0141b4@linaro.org>
+Date: Fri, 26 Oct 2018 16:48:05 +0100
+MIME-Version: 1.0
+In-Reply-To: <20181025144644.15464-57-cota@braap.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v4 57/71] accel/tcg: convert to
+ cpu_interrupt_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,32 +32,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>, Jason Wang <jasowang@redhat.com>, qemu-arm@nongnu.org, Michael Walle <michael@walle.cc>, Laurent Vivier <lvivier@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Cleber Rosa <crosa@redhat.com>, Igor Mammedov <imammedo@redhat.com>, xen-devel@lists.xenproject.org, Aleksandar Markovic <amarkovic@wavecomp.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Anthony Perard <anthony.perard@citrix.com>, Aurelien Jarno <aurelien@aurel32.net>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, Gerd Hoffmann <kraxel@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, Eduardo Habkost <ehabkost@redhat.com>, Li Qiang <liq3ea@gmail.com>
+To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 
-From: Li Qiang <liq3ea@gmail.com>
+On 10/25/18 3:46 PM, Emilio G. Cota wrote:
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+> ---
+>  accel/tcg/cpu-exec.c      | 15 ++++++++-------
+>  accel/tcg/tcg-all.c       | 12 +++++++++---
+>  accel/tcg/translate-all.c |  2 +-
+>  3 files changed, 18 insertions(+), 11 deletions(-)
 
-Found by reading the code.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Signed-off-by: Li Qiang <liq3ea@gmail.com>
-Message-Id: <1536150548-2797-1-git-send-email-liq3ea@gmail.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- include/qom/cpu.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index 4e238b0d9f..def0c64308 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -852,7 +852,7 @@ extern CPUInterruptHandler cpu_interrupt_handler;
- /**
-  * cpu_interrupt:
-  * @cpu: The CPU to set an interrupt on.
-- * @mask: The interupts to set.
-+ * @mask: The interrupts to set.
-  *
-  * Invokes the interrupt handler.
-  */
--- 
-2.17.2
+r~
