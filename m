@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40244)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dayeol@berkeley.edu>) id 1gG6TU-0000eo-Gn
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 14:04:45 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gG6ba-0004oM-Vl
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 14:13:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dayeol@berkeley.edu>) id 1gG6TR-0007TK-AM
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 14:04:44 -0400
-Received: from mail-qt1-x841.google.com ([2607:f8b0:4864:20::841]:35634)
+	(envelope-from <peter.maydell@linaro.org>) id 1gG6ba-0003tC-1x
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 14:13:06 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:33163)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dayeol@berkeley.edu>) id 1gG6TR-0007QI-2E
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 14:04:41 -0400
-Received: by mail-qt1-x841.google.com with SMTP id a10-v6so2250780qtp.2
-	for <qemu-devel@nongnu.org>; Fri, 26 Oct 2018 11:04:35 -0700 (PDT)
-From: Dayeol Lee <dayeol@berkeley.edu>
-Date: Fri, 26 Oct 2018 18:04:27 +0000
-Message-Id: <1540577067-8235-1-git-send-email-dayeol@berkeley.edu>
-Subject: [Qemu-devel] [PATCH] target/riscv/pmp.c: pmpcfg_csr_read returns
- bogus value on RV64
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gG6bZ-0003sk-LY
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 14:13:05 -0400
+Received: by mail-oi1-x241.google.com with SMTP id c25-v6so1818113oiy.0
+	for <qemu-devel@nongnu.org>; Fri, 26 Oct 2018 11:13:05 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <1540563667-23300-6-git-send-email-stefan.markovic@rt-rk.com>
+References: <1540563667-23300-1-git-send-email-stefan.markovic@rt-rk.com>
+	<1540563667-23300-6-git-send-email-stefan.markovic@rt-rk.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 26 Oct 2018 19:12:44 +0100
+Message-ID: <CAFEAcA8-nJ1pKtNautOJ-+Zh0Onw3HoK26ABZozSj3_VR7C=Jg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 5/6] Determine the desired FPU mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,32 +29,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Dayeol Lee <dayeol@berkeley.edu>, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+To: Stefan Markovic <stefan.markovic@rt-rk.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Petar Jovanovic <pjovanovic@wavecomp.com>, Riku Voipio <riku.voipio@iki.fi>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Laurent Vivier <laurent@vivier.eu>
 
-pmp_read_cfg() returns 8-bit value, which is combined together to form a single pmpcfg CSR. 
-The default promotion rules will result in an integer here ("i*8" is integer, which
-flows through) resulting in a 32-bit signed value on most hosts.
-That's bogus on RV64I, with the high bits of the CSR being wrong.
+On 26 October 2018 at 15:21, Stefan Markovic <stefan.markovic@rt-rk.com> wrote:
+> From: Stefan Markovic <smarkovic@wavecomp.com>
+>
+> Floating-point mode is calculated from MIPS.abiflags FP ABI value
+> (based on kernel implementation). Illegal combinations are rejected.
+>
+> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+> ---
+>  linux-user/mips/cpu_loop.c | 75 ++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 75 insertions(+)
 
-Signed-off-by: Dayeol Lee <dayeol@berkeley.edu>
-Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
----
- target/riscv/pmp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> +     if ((info->fp_abi > MAX_FP_ABI && info->fp_abi != MIPS_ABI_FP_UNKNOWN)
+> +        || (info->interp_fp_abi > MAX_FP_ABI &&
+> +            info->interp_fp_abi != MIPS_ABI_FP_UNKNOWN)) {
+> +        fprintf(stderr, "qemu: Program and interpreter have "
+> +                        "unexpected FPU modes\n");
+> +        exit(137);
 
-diff --git a/target/riscv/pmp.c b/target/riscv/pmp.c
-index c828950..3d3906a 100644
---- a/target/riscv/pmp.c
-+++ b/target/riscv/pmp.c
-@@ -330,7 +330,7 @@ target_ulong pmpcfg_csr_read(CPURISCVState *env, uint32_t reg_index)
- {
-     int i;
-     target_ulong cfg_val = 0;
--    uint8_t val = 0;
-+    target_ulong val = 0;
- 
-     if(sizeof(target_ulong) == 8)
-         reg_index /= 2;
--- 
-2.7.4
+Why are we exit()ing with a funny exit status code here?
+
+If this is a "can't happen" case, then we should assert(). If
+it is a "can happen if fed an odd binary" case, then we should just
+exit(1) as we do already in this function for an unsupported NaN mode.
+
+> +    }
+> +
+> +    prog_req = (info->fp_abi == MIPS_ABI_FP_UNKNOWN) ? none_req
+> +                                            : fpu_reqs[info->fp_abi];
+> +    interp_req = (info->interp_fp_abi == MIPS_ABI_FP_UNKNOWN) ? none_req
+> +                                            : fpu_reqs[info->interp_fp_abi];
+> +
+> +    prog_req.single &= interp_req.single;
+> +    prog_req.soft &= interp_req.soft;
+> +    prog_req.fr1 &= interp_req.fr1;
+> +    prog_req.frdefault &= interp_req.frdefault;
+> +    prog_req.fre &= interp_req.fre;
+> +
+> +    bool cpu_has_mips_r2_r6 = env->insn_flags & ISA_MIPS32R2 ||
+> +                              env->insn_flags & ISA_MIPS64R2 ||
+> +                              env->insn_flags & ISA_MIPS32R6 ||
+> +                              env->insn_flags & ISA_MIPS64R6;
+> +
+> +    if (prog_req.fre && !prog_req.frdefault && !prog_req.fr1) {
+> +        env->CP0_Config5 |= (1 << CP0C5_FRE);
+> +        if (env->active_fpu.fcr0 & (1 << FCR0_FREP)) {
+> +            env->hflags |= MIPS_HFLAG_FRE;
+> +        }
+> +    } else if ((prog_req.fr1 && prog_req.frdefault) ||
+> +         (prog_req.single && !prog_req.frdefault)) {
+> +        if ((env->active_fpu.fcr0 & (1 << FCR0_F64)
+> +            && cpu_has_mips_r2_r6) || prog_req.fr1) {
+> +            env->CP0_Status |= (1 << CP0St_FR);
+> +            env->hflags |= MIPS_HFLAG_F64;
+> +        }
+> +    } else  if (!prog_req.fre && !prog_req.frdefault &&
+> +          !prog_req.fr1 && !prog_req.single && !prog_req.soft) {
+> +        exit(137);
+> +    }
+
+Ditto here (and we haven't printed any error message here...)
+
+thanks
+-- PMM
