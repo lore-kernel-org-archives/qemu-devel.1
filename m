@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44812)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45353)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gG2dQ-0006rU-7K
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 09:58:44 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1gG2fD-0007tc-3r
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 10:00:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gG2dN-0000It-29
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 09:58:44 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:38203)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gG2dM-0000Dn-Ix
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 09:58:40 -0400
-Received: by mail-wm1-x343.google.com with SMTP id b14-v6so1548661wmj.3
-	for <qemu-devel@nongnu.org>; Fri, 26 Oct 2018 06:58:27 -0700 (PDT)
-References: <mhng-9e056850-7b5b-4869-befa-d37d0f37346b@palmer-si-x1c4>
-	<0496ac53-1bcf-2aa6-44b8-5901901be889@mail.uni-paderborn.de>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <4de7646a-6898-0ef1-9198-8e66501e0b41@linaro.org>
-Date: Fri, 26 Oct 2018 14:58:23 +0100
-MIME-Version: 1.0
-In-Reply-To: <0496ac53-1bcf-2aa6-44b8-5901901be889@mail.uni-paderborn.de>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <amarkovic@wavecomp.com>) id 1gG2f9-0001LF-Sz
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 10:00:35 -0400
+Received: from mail-dm3nam05on0700.outbound.protection.outlook.com
+	([2a01:111:f400:fe51::700]:13024
+	helo=NAM05-DM3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1gG2f9-0001Kr-LM
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 10:00:31 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Fri, 26 Oct 2018 14:00:26 +0000
+Message-ID: <BN6PR2201MB1251E37E85DA42FB5A6E2157C6F00@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <cover.1540487815.git.noring@nocrew.org>,
+	<658cb95479c9b6debebe43ec06ff498ebf624653.1540487815.git.noring@nocrew.org>
+In-Reply-To: <658cb95479c9b6debebe43ec06ff498ebf624653.1540487815.git.noring@nocrew.org>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 02/29] targer/riscv: Activate decodetree
- and implemnt LUI & AUIPC
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 01/11] target/mips: Rename ASE_MMI to
+ ASE_TOSHIBA_MMI, with Toshiba namespace
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,16 +32,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>
-Cc: sagark@eecs.berkeley.edu, qemu-devel@nongnu.org, peer.adelt@hni.uni-paderborn.de, Alistair Francis <Alistair.Francis@wdc.com>, Michael Clark <mjc@sifive.com>
+To: Fredrik Noring <noring@nocrew.org>, Aurelien Jarno <aurelien@aurel32.net>, "Maciej W. Rozycki" <macro@linux-mips.org>, =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: =?iso-8859-1?Q?J=FCrgen_Urban?= <JuergenUrban@gmx.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Petar Jovanovic <pjovanovic@wavecomp.com>
 
-On 10/26/18 11:49 AM, Bastian Koppelmann wrote:
-> I think you can pick up everything up to the RVC conversion which still needs
-> the work suggested by Richard. Thanks, for picking it up :)
+> From: Fredrik Noring <noring@nocrew.org>
+> Subject: [PATCH 01/11] target/mips: Rename ASE_MMI to ASE_TOSHIBA_MMI, wi=
+th Toshiba namespace
+>=20
+> Several vendors have multimedia instruction (MMI) sets and other
+> extensions of various kinds. ASE vendor namespaces make it clear these
+> are not generic architectural features and also avoid name clashes.
 
-Even then I thought we were talking about splitting the RV64 insns
-into a separate file, reducing the ifdefs, and renaming the arg-sets
-to match the instruction formats described in the riscv spec.
+ASE_XXX flags are not meant to identify a CPU or vendor. They are not wired=
+ to any configuration bit or CPU model. They are purely QEMU internal const=
+ructs, whose purpose was to make internal QEMU MIPS-specific code organizat=
+ion easier. In this case, ASE_MMI is an umbrella for all MMI-like ASEs, int=
+roduced with intent to make encapsulation of MMI-specific code better and e=
+asier. Differences between CPUs should be resolved by other means. Name 'AS=
+E_MMI' is fine.
 
-
-r~
+Thanks,
+Aleksandar=
