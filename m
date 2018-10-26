@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37033)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38208)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1gG286-0006UB-Co
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 09:26:23 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1gG2CE-0000c0-M8
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 09:30:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1gG282-0007nL-OU
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 09:26:22 -0400
-Received: from mail-by2nam01on0041.outbound.protection.outlook.com
-	([104.47.34.41]:27424
-	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1gG282-0007ld-Es
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 09:26:18 -0400
-From: "Singh, Brijesh" <brijesh.singh@amd.com>
-Date: Fri, 26 Oct 2018 13:26:14 +0000
-Message-ID: <cb0e3ee3-6f69-b501-d5c9-f2297886a376@amd.com>
-References: <20181025005110.249256-1-mst@redhat.com>
-	<CAFEAcA9zqAOr7F_Pu1tqxJYd=4JMHa3XgR703Mb4B9LibOGB-w@mail.gmail.com>
-	<20181025205612-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20181025205612-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <7C7DCA9DC186B14A9278781DD0B333BF@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <alex.bennee@linaro.org>) id 1gG2CB-0002St-Dv
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 09:30:38 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:54499)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gG2CA-0002Oi-W3
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 09:30:35 -0400
+Received: by mail-wm1-x341.google.com with SMTP id r63-v6so1523397wma.4
+	for <qemu-devel@nongnu.org>; Fri, 26 Oct 2018 06:30:30 -0700 (PDT)
+References: <784f1213-282f-14ca-4126-145dead59a77@gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <784f1213-282f-14ca-4126-145dead59a77@gmail.com>
+Date: Fri, 26 Oct 2018 14:30:27 +0100
+Message-ID: <87efcc25u4.fsf@linaro.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PULL v2 00/28] pci, pc, virtio: fixes, features
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Guest application exit point.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,80 +29,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: "Singh, Brijesh" <brijesh.singh@amd.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: "Rafael K. V. Maeda" <rafaelkioji@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-DQoNCk9uIDEwLzI1LzIwMTggMDc6NTkgUE0sIE1pY2hhZWwgUy4gVHNpcmtpbiB3cm90ZToNCj4g
-T24gVGh1LCBPY3QgMjUsIDIwMTggYXQgMDg6MTY6NDRQTSArMDEwMCwgUGV0ZXIgTWF5ZGVsbCB3
-cm90ZToNCj4+IE9uIDI1IE9jdG9iZXIgMjAxOCBhdCAwMTo1MiwgTWljaGFlbCBTLiBUc2lya2lu
-IDxtc3RAcmVkaGF0LmNvbT4gd3JvdGU6DQo+Pj4gVGhlIGZvbGxvd2luZyBjaGFuZ2VzIHNpbmNl
-IGNvbW1pdCAxMzM5OWFhZDRmYTg3YjI4NzhjNDlkMDJhNWQzYmFmYTZjOTY2YmEzOg0KPj4+DQo+
-Pj4gICAgTWVyZ2UgcmVtb3RlLXRyYWNraW5nIGJyYW5jaCAncmVtb3Rlcy9hcm1icnUvdGFncy9w
-dWxsLWVycm9yLTIwMTgtMTAtMjInIGludG8gc3RhZ2luZyAoMjAxOC0xMC0yMyAxNzoyMDoyMyAr
-MDEwMCkNCj4+Pg0KPj4+IGFyZSBhdmFpbGFibGUgaW4gdGhlIEdpdCByZXBvc2l0b3J5IGF0Og0K
-Pj4+DQo+Pj4gICAgZ2l0Oi8vZ2l0Lmtlcm5lbC5vcmcvcHViL3NjbS92aXJ0L2t2bS9tc3QvcWVt
-dS5naXQgdGFncy9mb3JfdXBzdHJlYW0NCj4+Pg0KPj4+IGZvciB5b3UgdG8gZmV0Y2ggY2hhbmdl
-cyB1cCB0byA2YTlmYjRlMWJhNTU5NGNkZTc3MzkwNjg2MTdhZDg4ZTYxMTdkYjkzOg0KPj4+DQo+
-Pj4gICAgdmhvc3Qtc2NzaTogcHJldmVudCB1c2luZyB1bmluaXRpYWxpemVkIHZxcyAoMjAxOC0x
-MC0yNCAyMDo1MDoxMyAtMDQwMCkNCj4+Pg0KPj4+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCj4+PiBwY2ksIHBjLCB2aXJ0
-aW86IGZpeGVzLCBmZWF0dXJlcw0KPj4+DQo+Pj4gQU1EIElPTU1VIFZBUElDIHN1cHBvcnQgKyBm
-aXhlcyBhbGwgb3ZlciB0aGUgcGxhY2UuDQo+Pj4NCj4+PiBTaWduZWQtb2ZmLWJ5OiBNaWNoYWVs
-IFMuIFRzaXJraW4gPG1zdEByZWRoYXQuY29tPg0KPj4NCj4+IEhpOyBJIGdldCBzb21lIGNvbXBp
-bGUgZmFpbHVyZXMgYW5kIGEgdGVzdCBhc3NlcnRpb24sIEknbSBhZnJhaWQ6DQo+Pg0KPj4gT24g
-MzItYml0IGhvc3RzICh3aGVyZSB1aW50NjRfdCBhbmQgc2l6ZV90IGFyZSBub3QgdGhlIHNhbWUp
-Og0KPj4NCj4+IC9ob21lL3BldGVyLm1heWRlbGwvcWVtdS9pbmNsdWRlL3FlbXUvY29tcGlsZXIu
-aDo4MDozNTogZXJyb3I6IGludmFsaWQNCj4+IG9wZXJhbmRzIHRvIGJpbmFyeSAtIChoYXZlICd1
-aW50NjRfdCAqIHtha2EgbG9uZyBsb25nIHVuc2lnbmVkIGludCAqfScNCj4+IGFuZCAnc2l6ZV90
-ICoge2FrYSB1bnNpZ25lZCBpbnQgKn0nKQ0KPj4gICAjZGVmaW5lIHR5cGVfY2hlY2sodDEsdDIp
-ICgodDEqKTAgLSAodDIqKTApDQo+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICBeDQo+PiAvaG9tZS9wZXRlci5tYXlkZWxsL3FlbXUvaW5jbHVkZS9ody9xZGV2LXByb3BlcnRp
-ZXMuaDo3NzoxNTogbm90ZTogaW4NCj4+IGV4cGFuc2lvbiBvZiBtYWNybyAndHlwZV9jaGVjaycN
-Cj4+ICAgICAgICAgICAgICAgKyB0eXBlX2NoZWNrKF90eXBlLCB0eXBlb2ZfZmllbGQoX3N0YXRl
-LCBfZmllbGQpKSwgICAgICAgICAgXA0KPj4gICAgICAgICAgICAgICAgIF4NCj4+IC9ob21lL3Bl
-dGVyLm1heWRlbGwvcWVtdS9pbmNsdWRlL2h3L3FkZXYtcHJvcGVydGllcy5oOjE2ODo1OiBub3Rl
-OiBpbg0KPj4gZXhwYW5zaW9uIG9mIG1hY3JvICdERUZJTkVfUFJPUF9VTlNJR05FRCcNCj4+ICAg
-ICAgIERFRklORV9QUk9QX1VOU0lHTkVEKF9uLCBfcywgX2YsIF9kLCBxZGV2X3Byb3Bfc2l6ZSwg
-dWludDY0X3QpDQo+PiAgICAgICBeDQo+PiAvaG9tZS9wZXRlci5tYXlkZWxsL3FlbXUvaHcvbWlz
-Yy9wY2ktdGVzdGRldi5jOjMyMjo1OiBub3RlOiBpbg0KPj4gZXhwYW5zaW9uIG9mIG1hY3JvICdE
-RUZJTkVfUFJPUF9TSVpFJw0KPj4gICAgICAgREVGSU5FX1BST1BfU0laRSgibWVtYmFyIiwgUENJ
-VGVzdERldlN0YXRlLCBtZW1iYXJfc2l6ZSwgMCksDQo+PiAgICAgICBeDQo+PiAvaG9tZS9wZXRl
-ci5tYXlkZWxsL3FlbXUvcnVsZXMubWFrOjY5OiByZWNpcGUgZm9yIHRhcmdldA0KPj4gJ2h3L21p
-c2MvcGNpLXRlc3RkZXYubycgZmFpbGVkDQo+Pg0KPj4gT24gdGhlIFdpbmRvd3MgdzY0IGNyb3Nz
-LWNvbXBpbGU6DQo+Pg0KPj4gSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC9ob21lL3BldG1heTAxL3Fl
-bXUtZm9yLW1lcmdlcy9ody9pMzg2L2FtZF9pb21tdS5jOjI2OjA6DQo+PiAvaG9tZS9wZXRtYXkw
-MS9xZW11LWZvci1tZXJnZXMvaHcvaTM4Ni9hbWRfaW9tbXUuYzogSW4gZnVuY3Rpb24NCj4+ICdh
-bWR2aV9pbnRfcmVtYXBfbXNpJzoNCj4+IC9ob21lL3BldG1heTAxL3FlbXUtZm9yLW1lcmdlcy9o
-dy9pMzg2L2FtZF9pb21tdS5oOjI0Nzo0NjogZXJyb3I6IGxlZnQNCj4+IHNoaWZ0IGNvdW50ID49
-IHdpZHRoIG9mIHR5cGUgWy1XZXJyb3I9c2hpZnQtY291bnQtb3ZlcmZsb3ddDQo+PiAgICNkZWZp
-bmUgQU1EVklfREVWX05NSV9QQVNTX01BU0sgICAgICAgICAoMVVMIDw8IDU4KQ0KPj4gICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeDQo+PiAvaG9tZS9wZXRt
-YXkwMS9xZW11LWZvci1tZXJnZXMvaHcvaTM4Ni9hbWRfaW9tbXUuYzoxMjgxOjI1OiBub3RlOiBp
-bg0KPj4gZXhwYW5zaW9uIG9mIG1hY3JvICdBTURWSV9ERVZfTk1JX1BBU1NfTUFTSycNCj4+ICAg
-ICAgICAgICBwYXNzID0gZHRlWzNdICYgQU1EVklfREVWX05NSV9QQVNTX01BU0s7DQo+PiAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIF4NCj4+IC9ob21lL3BldG1heTAxL3FlbXUtZm9yLW1lcmdl
-cy9ody9pMzg2L2FtZF9pb21tdS5oOjI0NTo0NjogZXJyb3I6IGxlZnQNCj4+IHNoaWZ0IGNvdW50
-ID49IHdpZHRoIG9mIHR5cGUgWy1XZXJyb3I9c2hpZnQtY291bnQtb3ZlcmZsb3ddDQo+PiAgICNk
-ZWZpbmUgQU1EVklfREVWX0lOVF9QQVNTX01BU0sgICAgICAgICAoMVVMIDw8IDU2KQ0KPj4gICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeDQo+PiAvaG9tZS9w
-ZXRtYXkwMS9xZW11LWZvci1tZXJnZXMvaHcvaTM4Ni9hbWRfaW9tbXUuYzoxMjg1OjI1OiBub3Rl
-OiBpbg0KPj4gZXhwYW5zaW9uIG9mIG1hY3JvICdBTURWSV9ERVZfSU5UX1BBU1NfTUFTSycNCj4+
-ICAgICAgICAgICBwYXNzID0gZHRlWzNdICYgQU1EVklfREVWX0lOVF9QQVNTX01BU0s7DQo+PiAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIF4NCj4+IC9ob21lL3BldG1heTAxL3FlbXUtZm9yLW1l
-cmdlcy9ody9pMzg2L2FtZF9pb21tdS5oOjI0Njo0NjogZXJyb3I6IGxlZnQNCj4+IHNoaWZ0IGNv
-dW50ID49IHdpZHRoIG9mIHR5cGUgWy1XZXJyb3I9c2hpZnQtY291bnQtb3ZlcmZsb3ddDQo+PiAg
-ICNkZWZpbmUgQU1EVklfREVWX0VJTlRfUEFTU19NQVNLICAgICAgICAoMVVMIDw8IDU3KQ0KPj4g
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeDQo+PiAvaG9t
-ZS9wZXRtYXkwMS9xZW11LWZvci1tZXJnZXMvaHcvaTM4Ni9hbWRfaW9tbXUuYzoxMjg5OjI1OiBu
-b3RlOiBpbg0KPj4gZXhwYW5zaW9uIG9mIG1hY3JvICdBTURWSV9ERVZfRUlOVF9QQVNTX01BU0sn
-DQo+PiAgICAgICAgICAgcGFzcyA9IGR0ZVszXSAmIEFNRFZJX0RFVl9FSU5UX1BBU1NfTUFTSzsN
-Cj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgXg0KPj4NCj4+IFRoZXNlIHNob3VsZCBwcmVz
-dW1hYmx5IGFsbCBiZSAiVUxMIi4gKFRoZSAiVUwiIHN1ZmZpeCBpcw0KPj4gdXN1YWxseSBhIGJ1
-ZywgYXMgaXQncyBlaXRoZXIgdW5uZWNlc3Nhcnkgb3Igc2hvdWxkIGJlIFVMTC4pDQo+IA0KPiBZ
-ZWEuICBGaXhlZC4gQnJpamVzaCBjb3VsZCB5b3Ugc3RhcnQgY2xlYW5pbmcgdXAgdGhhdCBoZWFk
-ZXIgZ2VuZXJhbGx5Pw0KPiBJdCBoYXMgYWxsIGtpbmQgb2Ygd2VpcmQgY29kZSBsaWtlIHVzaW5n
-IGJpdGZpZWxkcyBmb3IgaGFyZHdhcmUNCj4gYWNjZXNzZXMuIFRoYXQgaXNuJ3QgcG9ydGFibGUg
-LSBzd2l0Y2ggdG8gZnVsbCBkd29yZCBmaWVsZHMgd2l0aCBzaGlmdA0KPiBhbmQgfCB0byBvcGVy
-YXRlIHRoZW0gYW5kIHByb3BlciBjcHVfdG9fbGUgQVBJcyBvciBzaW1pbGFyIHBsZWFzZS4NCj4g
-DQoNCg0KTm90ZWQsIEkgd2lsbCBsb29rIGludG8gY2xlYW5pbmcgdXAgdGhpcyBhbmQgc2VuZCBw
-YXRjaGVzIGZvciByZXZpZXdzLg0KDQp0aGFua3MNCg0K
+
+Rafael K. V. Maeda <rafaelkioji@gmail.com> writes:
+
+> Hi,
+>
+> I am implementing a plugin that allocates several resources. I need to
+> cleanup some of these resources when QEMU finishes executing the guest
+> application. Where is the best exit point to place my cleanup
+> functions?
+>
+> I have tried registering a function call "atexit" but it does not seem
+> to work. Any suggestions? At the moment, I am looking for a solution
+> for x86_64 (user emulation mode).
+
+For linux-user have a look at preexit_cleanup() in linux-user/exit.c
+
+>
+> Kind regards,
+> Rafael
+
+
+--
+Alex Benn=C3=A9e
