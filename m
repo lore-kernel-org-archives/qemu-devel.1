@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49291)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49639)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gFyUQ-0007eR-2P
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 05:33:10 -0400
+	(envelope-from <ppandit@redhat.com>) id 1gFyWK-0000Fn-Tk
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 05:35:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gFyUM-0004dE-TP
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 05:33:09 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:42157)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gFyUM-0004cs-MN
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 05:33:06 -0400
-Received: by mail-wr1-f65.google.com with SMTP id y15-v6so605323wru.9
-	for <qemu-devel@nongnu.org>; Fri, 26 Oct 2018 02:33:06 -0700 (PDT)
-References: <20181022120908.13285-1-ppandit@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <de9d3da6-a06c-0a32-9245-7779e927b44e@redhat.com>
-Date: Fri, 26 Oct 2018 11:33:03 +0200
+	(envelope-from <ppandit@redhat.com>) id 1gFyWH-0007No-Mn
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 05:35:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54656)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gFyWH-0007NL-GV
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 05:35:05 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C3B8A81F0F
+	for <qemu-devel@nongnu.org>; Fri, 26 Oct 2018 09:35:04 +0000 (UTC)
+Date: Fri, 26 Oct 2018 15:04:55 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+In-Reply-To: <7210c7e6-4b85-053c-83c5-524a3b74ef6f@redhat.com>
+Message-ID: <nycvar.YSQ.7.76.1810261458190.8270@xnncv>
+References: <20181025085256.20522-1-kraxel@redhat.com>
+	<20181025085256.20522-3-kraxel@redhat.com>
+	<7210c7e6-4b85-053c-83c5-524a3b74ef6f@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181022120908.13285-1-ppandit@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/3] arm: check bit index before use
+Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH 2/3] adlib: mark as insecure and deprecated.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +33,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Moguofang <moguofang@huawei.com>, Prasad J Pandit <pjp@fedoraproject.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com
 
-On 22/10/2018 14:09, P J P wrote:
-> From: Prasad J Pandit <pjp@fedoraproject.org>
-> 
-> While performing gpio write via strongarm_gpio_handler_update
-> routine, the 'bit' index could access beyond s->handler[28] array.
-> Add check to avoid OOB access.
-> 
-> Reported-by: Moguofang <moguofang@huawei.com>
-> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
-> ---
->  hw/arm/strongarm.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/arm/strongarm.c b/hw/arm/strongarm.c
-> index ec2627374d..3dda75feaf 100644
-> --- a/hw/arm/strongarm.c
-> +++ b/hw/arm/strongarm.c
-> @@ -532,7 +532,9 @@ static void strongarm_gpio_handler_update(StrongARMGPIOInfo *s)
->  
->      for (diff = s->prev_level ^ level; diff; diff ^= 1 << bit) {
->          bit = ctz32(diff);
-> -        qemu_set_irq(s->handler[bit], (level >> bit) & 1);
-> +        if (bit < sizeof(s->handler) / sizeof(s->handler[0])) {
-> +            qemu_set_irq(s->handler[bit], (level >> bit) & 1);
-> +        }
->      }
->  
->      s->prev_level = level;
-> 
++-- On Fri, 26 Oct 2018, Paolo Bonzini wrote --+
+| I am dumb and I don't understand.  In set_ar_dr you get
+| 
+| 	v = 0xff
+| 	ar = 15
+| 	dr = 15
+| 
+| and OPL->AR_TABLE[60] is accessed.  The size of the array is 75, which
+| seems to be actually 14 more than required.  Likewise OPL->DR_TABLE[60]
+| is accessed.
+| 
+| The next accesses use SLOT->ksr which is 0 so it's fine too.
 
-This is correct, but please use ARRAY_SIZE(s->handler).
+In set_ar_dr
 
-Paolo
+  SLOT->AR = ar ? &OPL->AR_TABLE[ar<<2] : RATE_0;
+
+SLOT->AR is set to point to OPL->DR_TABLE[60] and while so if s->ksr is set to 
+15, in CALC_FCSLOT()
+
+  SLOT->evsa = SLOT->AR[ksr];  <= accesses OPL->AR_TABLE[60 + 15];
+
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
