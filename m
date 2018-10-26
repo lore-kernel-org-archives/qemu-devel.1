@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48714)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50105)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.kanda@oracle.com>) id 1gG76g-0000Sf-60
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 14:45:14 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1gG7Bn-00034W-HU
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 14:50:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.kanda@oracle.com>) id 1gG76c-0006wo-7E
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 14:45:14 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:43816)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.kanda@oracle.com>)
-	id 1gG76b-0006wC-Th
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 14:45:10 -0400
-References: <20181025200944.12113-1-ppandit@redhat.com>
-	<5b8a68c1-2787-af0d-959f-e0c9132f7004@oracle.com>
-	<nycvar.YSQ.7.76.1810261452510.8270@xnncv>
-	<deaad764-a684-2d17-043d-69fda37460f4@oracle.com>
-	<nycvar.YSQ.7.76.1810270001580.7551@xnncv>
-From: Mark Kanda <mark.kanda@oracle.com>
-Message-ID: <893c5399-85c2-1eef-9733-2655e4ca6225@oracle.com>
-Date: Fri, 26 Oct 2018 13:45:05 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gG7Bc-0001Op-0U
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 14:50:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57216)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gG7BY-0001Mt-9E
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 14:50:18 -0400
+Date: Fri, 26 Oct 2018 19:50:09 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20181026185009.GB3854@work-vm>
+References: <20181026083620.10172-1-jialina01@baidu.com>
 MIME-Version: 1.0
-In-Reply-To: <nycvar.YSQ.7.76.1810270001580.7551@xnncv>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] lsi53c895a: check message length value
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181026083620.10172-1-jialina01@baidu.com>
+Subject: Re: [Qemu-devel] [PATCH v2] migration: avoid segmentfault when take
+ a snapshot of a VM which being migrated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,26 +27,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>
-Cc: Ameya More <ameya.more@oracle.com>, Qemu Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>
+To: Jia Lina <jialina01@baidu.com>
+Cc: quintela@redhat.com, qemu-devel@nongnu.org, Chai Wen <chaiwen@baidu.com>, Zhang Yu <zhangyu31@baidu.com>
 
-On 10/26/2018 1:37 PM, P J P wrote:
-> +-- On Fri, 26 Oct 2018, Mark Kanda wrote --+
-> | Deja vu requested that we include the following text in the commit message:
-> |
-> | 	Discovered by Deja vu Security. Reported by Oracle.
-> |
-> | Would that be acceptable?
+* Jia Lina (jialina01@baidu.com) wrote:
+> During an active background migration, snapshot will trigger a
+> segmentfault. As snapshot clears the "current_migration" struct
+> and updates "to_dst_file" before it finds out that there is a
+> migration task, Migration accesses the null pointer in
+> "current_migration" struct and qemu crashes eventually.
 > 
-> Generally an email-id is used/preferred in the commit log message. We could
-> use above for acknowledgement and avoid Reported-by in the commit log message
-> if that suits Deja vu team.
+> Signed-off-by: Jia Lina <jialina01@baidu.com>
+> Signed-off-by: Chai Wen <chaiwen@baidu.com>
+> Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
+
+Thanks, that looks better.
+
+
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> ---
+>  migration/migration.c |  2 +-
+>  migration/migration.h |  2 ++
+>  migration/savevm.c    | 19 +++++++++++--------
+>  3 files changed, 14 insertions(+), 9 deletions(-)
 > 
-> Please let me know your/their preference.
+> diff --git a/migration/migration.c b/migration/migration.c
+> index d6ae879dc8..b5e71c7bfc 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -711,7 +711,7 @@ MigrationParameters *qmp_query_migrate_parameters(Error **errp)
+>   * Return true if we're already in the middle of a migration
+>   * (i.e. any of the active or setup states)
+>   */
+> -static bool migration_is_setup_or_active(int state)
+> +bool migration_is_setup_or_active(int state)
+>  {
+>      switch (state) {
+>      case MIGRATION_STATUS_ACTIVE:
+> diff --git a/migration/migration.h b/migration/migration.h
+> index f7813f8261..e413d4d8b6 100644
+> --- a/migration/migration.h
+> +++ b/migration/migration.h
+> @@ -241,6 +241,8 @@ void migrate_fd_error(MigrationState *s, const Error *error);
+>  
+>  void migrate_fd_connect(MigrationState *s, Error *error_in);
+>  
+> +bool migration_is_setup_or_active(int state);
+> +
+>  void migrate_init(MigrationState *s);
+>  bool migration_is_blocked(Error **errp);
+>  /* True if outgoing migration has entered postcopy phase */
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index 2d10e45582..eeade8cb92 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -1319,21 +1319,25 @@ static int qemu_savevm_state(QEMUFile *f, Error **errp)
+>      MigrationState *ms = migrate_get_current();
+>      MigrationStatus status;
+>  
+> -    migrate_init(ms);
+> -
+> -    ms->to_dst_file = f;
+> +    if (migration_is_setup_or_active(ms->state) ||
+> +        ms->state == MIGRATION_STATUS_CANCELLING ||
+> +        ms->state == MIGRATION_STATUS_COLO) {
+> +        error_setg(errp, QERR_MIGRATION_ACTIVE);
+> +        return -EINVAL;
+> +    }
+>  
+>      if (migration_is_blocked(errp)) {
+> -        ret = -EINVAL;
+> -        goto done;
+> +        return -EINVAL;
+>      }
+>  
+>      if (migrate_use_block()) {
+>          error_setg(errp, "Block migration and snapshots are incompatible");
+> -        ret = -EINVAL;
+> -        goto done;
+> +        return -EINVAL;
+>      }
+>  
+> +    migrate_init(ms);
+> +    ms->to_dst_file = f;
+> +
+>      qemu_mutex_unlock_iothread();
+>      qemu_savevm_state_header(f);
+>      qemu_savevm_state_setup(f);
+> @@ -1355,7 +1359,6 @@ static int qemu_savevm_state(QEMUFile *f, Error **errp)
+>          error_setg_errno(errp, -ret, "Error while writing VM state");
+>      }
+>  
+> -done:
+>      if (ret != 0) {
+>          status = MIGRATION_STATUS_FAILED;
+>      } else {
+> -- 
+> 2.13.2.windows.1
 > 
-
-Yes, please use that acknowledgement text in lieu of a 'Reported-by' line.
-
-Thanks,
-
--Mark
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
