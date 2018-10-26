@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60010)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59943)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gFxUI-0000gX-De
+	(envelope-from <luc.michel@greensocs.com>) id 1gFxUH-0000LS-Ek
 	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 04:29:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gFxJD-0004oZ-Js
+	(envelope-from <luc.michel@greensocs.com>) id 1gFxJE-0004pY-Ew
 	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 04:17:33 -0400
 From: Luc Michel <luc.michel@greensocs.com>
-Date: Fri, 26 Oct 2018 10:16:39 +0200
-Message-Id: <20181026081653.24602-3-luc.michel@greensocs.com>
+Date: Fri, 26 Oct 2018 10:16:44 +0200
+Message-Id: <20181026081653.24602-8-luc.michel@greensocs.com>
 In-Reply-To: <20181026081653.24602-1-luc.michel@greensocs.com>
 References: <20181026081653.24602-1-luc.michel@greensocs.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 02/16] gdbstub: introduce GDB processes
+Subject: [Qemu-devel] [PATCH v3 07/16] gdbstub: add multiprocess support to
+ (f|s)ThreadInfo and ThreadExtraInfo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,191 +26,93 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Luc Michel <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, alistair@alistair23.me, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, mark.burton@greensocs.com, Eduardo Habkost <ehabkost@redhat.com>
 
-Add a structure GDBProcess that represent processes from the GDB
-semantic point of view.
+Change the thread info related packets handling to support multiprocess
+extension.
 
-CPUs can be split into different processes, by grouping them under
-different cpu-cluster objects.  Each occurrence of a cpu-cluster object
-implies the existence of the corresponding process in the GDB stub. The
-GDB process ID is derived from the corresponding cluster ID as follows:
-
-  GDB PID =3D cluster ID + 1
-
-This is because PIDs -1 and 0 are reserved in GDB and cannot be used by
-processes.
-
-When no such container are found, all the CPUs are put in a unique GDB
-process (create_unique_process()). This is also the case when compiled
-in user mode, where multi-processes do not make much sense for now.
+Add the CPUs class name in the extra info to help differentiate
+them in multiprocess mode.
 
 Signed-off-by: Luc Michel <luc.michel@greensocs.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- gdbstub.c | 75 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 75 insertions(+)
+ gdbstub.c | 35 +++++++++++++++++++++++++----------
+ 1 file changed, 25 insertions(+), 10 deletions(-)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index c4e4f9f082..096ac8e99c 100644
+index 17fec8a41c..b8aa4b34af 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -27,10 +27,11 @@
- #include "monitor/monitor.h"
- #include "chardev/char.h"
- #include "chardev/char-fe.h"
- #include "sysemu/sysemu.h"
- #include "exec/gdbstub.h"
-+#include "hw/cpu/cluster.h"
- #endif
-=20
- #define MAX_PACKET_LENGTH 4096
-=20
- #include "qemu/sockets.h"
-@@ -294,10 +295,15 @@ typedef struct GDBRegisterState {
-     gdb_reg_cb set_reg;
-     const char *xml;
-     struct GDBRegisterState *next;
- } GDBRegisterState;
-=20
-+typedef struct GDBProcess {
-+    uint32_t pid;
-+    bool attached;
-+} GDBProcess;
-+
- enum RSState {
-     RS_INACTIVE,
-     RS_IDLE,
-     RS_GETLINE,
-     RS_GETLINE_ESC,
-@@ -322,10 +328,13 @@ typedef struct GDBState {
-     int running_state;
- #else
-     CharBackend chr;
-     Chardev *mon_chr;
- #endif
-+    bool multiprocess;
-+    GDBProcess *processes;
-+    int process_num;
-     char syscall_buf[256];
-     gdb_syscall_complete_cb current_syscall_cb;
- } GDBState;
-=20
- /* By default use no IRQs and no timers while single stepping so as to
-@@ -1749,10 +1758,24 @@ void gdb_exit(CPUArchState *env, int code)
- #ifndef CONFIG_USER_ONLY
-   qemu_chr_fe_deinit(&s->chr, true);
- #endif
- }
-=20
-+/*
-+ * Create a unique process containing all the CPUs.
-+ */
-+static void create_unique_process(GDBState *s)
-+{
-+    GDBProcess *process;
-+
-+    s->processes =3D g_malloc0(sizeof(GDBProcess));
-+    s->process_num =3D 1;
-+    process =3D &s->processes[0];
-+
-+    process->pid =3D 1;
-+}
-+
- #ifdef CONFIG_USER_ONLY
- int
- gdb_handlesig(CPUState *cpu, int sig)
+@@ -1257,11 +1257,10 @@ out:
+ static int gdb_handle_packet(GDBState *s, const char *line_buf)
  {
-     GDBState *s;
-@@ -1846,10 +1869,11 @@ static bool gdb_accept(void)
-     }
-=20
-     s =3D g_malloc0(sizeof(GDBState));
-     s->c_cpu =3D first_cpu;
-     s->g_cpu =3D first_cpu;
-+    create_unique_process(s);
-     s->fd =3D fd;
-     gdb_has_xml =3D false;
-=20
-     gdbserver_state =3D s;
-     return true;
-@@ -2002,10 +2026,57 @@ static const TypeInfo char_gdb_type_info =3D {
-     .name =3D TYPE_CHARDEV_GDB,
-     .parent =3D TYPE_CHARDEV,
-     .class_init =3D char_gdb_class_init,
- };
-=20
-+static int find_cpu_clusters(Object *child, void *opaque)
-+{
-+    if (object_dynamic_cast(child, TYPE_CPU_CLUSTER)) {
-+        GDBState *s =3D (GDBState *) opaque;
-+        CPUClusterState *cluster =3D CPU_CLUSTER(child);
+     CPUState *cpu;
+     CPUClass *cc;
+     const char *p;
+-    uint32_t thread;
+     uint32_t pid, tid;
+     int ch, reg_size, type, res;
+     uint8_t mem_buf[MAX_PACKET_LENGTH];
+     char buf[sizeof(mem_buf) + 1 /* trailing NUL */];
+     char thread_id[16];
+@@ -1553,30 +1552,46 @@ static int gdb_handle_packet(GDBState *s, const c=
+har *line_buf)
+             snprintf(buf, sizeof(buf), "QC%s",
+                      gdb_fmt_thread_id(s, cpu, thread_id, sizeof(thread_=
+id)));
+             put_packet(s, buf);
+             break;
+         } else if (strcmp(p,"fThreadInfo") =3D=3D 0) {
+-            s->query_cpu =3D first_cpu;
++            s->query_cpu =3D gdb_first_cpu(s);
+             goto report_cpuinfo;
+         } else if (strcmp(p,"sThreadInfo") =3D=3D 0) {
+         report_cpuinfo:
+             if (s->query_cpu) {
+-                snprintf(buf, sizeof(buf), "m%x", cpu_gdb_index(s->query=
+_cpu));
++                snprintf(buf, sizeof(buf), "m%s",
++                         gdb_fmt_thread_id(s, s->query_cpu,
++                                       thread_id, sizeof(thread_id)));
+                 put_packet(s, buf);
+-                s->query_cpu =3D CPU_NEXT(s->query_cpu);
++                s->query_cpu =3D gdb_next_cpu(s, s->query_cpu);
+             } else
+                 put_packet(s, "l");
+             break;
+         } else if (strncmp(p,"ThreadExtraInfo,", 16) =3D=3D 0) {
+-            thread =3D strtoull(p+16, (char **)&p, 16);
+-            cpu =3D find_cpu(thread);
++            if (read_thread_id(p + 16, &p, &pid, &tid) =3D=3D GDB_READ_T=
+HREAD_ERR) {
++                put_packet(s, "E22");
++                break;
++            }
++            cpu =3D gdb_get_cpu(s, pid, tid);
+             if (cpu !=3D NULL) {
+                 cpu_synchronize_state(cpu);
+-                /* memtohex() doubles the required space */
+-                len =3D snprintf((char *)mem_buf, sizeof(buf) / 2,
+-                               "CPU#%d [%s]", cpu->cpu_index,
+-                               cpu->halted ? "halted " : "running");
 +
-+        s->processes =3D g_renew(GDBProcess, s->processes, ++s->process_=
-num);
-+
-+        GDBProcess *process =3D &s->processes[s->process_num - 1];
-+
-+        /* GDB process IDs -1 and 0 are reserved */
-+        process->pid =3D cluster->cluster_id + 1;
-+        process->attached =3D false;
-+        return 0;
-+    }
-+
-+    return object_child_foreach(child, find_cpu_clusters, opaque);
-+}
-+
-+static int pid_order(const void *a, const void *b)
-+{
-+    GDBProcess *pa =3D (GDBProcess *) a;
-+    GDBProcess *pb =3D (GDBProcess *) b;
-+
-+    return pa->pid - pb->pid;
-+}
-+
-+static void create_processes(GDBState *s)
-+{
-+    object_child_foreach(object_get_root(), find_cpu_clusters, s);
-+
-+    if (!s->processes) {
-+        /* No CPU cluster specified by the machine */
-+        create_unique_process(s);
-+    } else {
-+        /* Sort by PID */
-+        qsort(s->processes, s->process_num, sizeof(s->processes[0]), pid=
-_order);
-+    }
-+}
-+
-+static void cleanup_processes(GDBState *s)
-+{
-+    g_free(s->processes);
-+    s->process_num =3D 0;
-+    s->processes =3D NULL;
-+}
-+
- int gdbserver_start(const char *device)
- {
-     trace_gdbstub_op_start(device);
-=20
-     GDBState *s;
-@@ -2058,15 +2129,19 @@ int gdbserver_start(const char *device)
-                                    NULL, &error_abort);
-         monitor_init(mon_chr, 0);
-     } else {
-         qemu_chr_fe_deinit(&s->chr, true);
-         mon_chr =3D s->mon_chr;
-+        cleanup_processes(s);
-         memset(s, 0, sizeof(GDBState));
-         s->mon_chr =3D mon_chr;
-     }
-     s->c_cpu =3D first_cpu;
-     s->g_cpu =3D first_cpu;
-+
-+    create_processes(s);
-+
-     if (chr) {
-         qemu_chr_fe_init(&s->chr, chr, &error_abort);
-         qemu_chr_fe_set_handlers(&s->chr, gdb_chr_can_receive, gdb_chr_r=
-eceive,
-                                  gdb_chr_event, NULL, NULL, NULL, true);
-     }
++                if (s->multiprocess && (s->process_num > 1)) {
++                    /* Print the CPU model in multiprocess mode */
++                    ObjectClass *oc =3D object_get_class(OBJECT(cpu));
++                    const char *cpu_model =3D object_class_get_name(oc);
++                    len =3D snprintf((char *)mem_buf, sizeof(buf) / 2,
++                                   "CPU#%d %s [%s]", cpu->cpu_index,
++                                   cpu_model,
++                                   cpu->halted ? "halted " : "running");
++                } else {
++                    /* memtohex() doubles the required space */
++                    len =3D snprintf((char *)mem_buf, sizeof(buf) / 2,
++                                   "CPU#%d [%s]", cpu->cpu_index,
++                                   cpu->halted ? "halted " : "running");
++                }
+                 trace_gdbstub_op_extra_info((char *)mem_buf);
+                 memtohex(buf, mem_buf, len);
+                 put_packet(s, buf);
+             }
+             break;
 --=20
 2.19.1
