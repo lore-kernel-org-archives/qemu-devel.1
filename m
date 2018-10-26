@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50294)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50488)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gFyZ0-0002cP-Cg
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 05:37:55 -0400
+	(envelope-from <ppandit@redhat.com>) id 1gFyZo-0003Wi-6g
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 05:38:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gFyYv-0004DL-Oq
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 05:37:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:16291)
+	(envelope-from <ppandit@redhat.com>) id 1gFyZl-00052Q-1K
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 05:38:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58048)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gFyYt-0003zn-IU
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 05:37:49 -0400
-Date: Fri, 26 Oct 2018 15:07:34 +0530 (IST)
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gFyZk-000525-N0
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 05:38:40 -0400
+Date: Fri, 26 Oct 2018 15:08:33 +0530 (IST)
 From: P J P <ppandit@redhat.com>
-In-Reply-To: <CAFEAcA-Mp_ovLRzHFpUCTmd6r-bmGZ2-V3OHSxo+5Mg+zw2=aA@mail.gmail.com>
-Message-ID: <nycvar.YSQ.7.76.1810261507060.8270@xnncv>
-References: <20181022181035.20104-1-ppandit@redhat.com>
-	<CAFEAcA-6djmjK_x_n5z7cnicdgu+eeJF3QJw4iaCOMDLPkEJ7w@mail.gmail.com>
-	<nycvar.YSQ.7.76.1810252239320.26372@xnncv>
-	<CAFEAcA-Mp_ovLRzHFpUCTmd6r-bmGZ2-V3OHSxo+5Mg+zw2=aA@mail.gmail.com>
+In-Reply-To: <987110b6-9f7d-d82a-69b7-dcd78094c1a6@kaod.org>
+Message-ID: <nycvar.YSQ.7.76.1810261507480.8270@xnncv>
+References: <20181022121907.13635-1-ppandit@redhat.com>
+	<20181023153710.GZ12127@umbus.hotspot.internet-for-guests.com>
+	<679f5ba4-749b-72ee-62a0-40e5efc178e0@kaod.org>
+	<nycvar.YSQ.7.76.1810251204450.11480@xnncv>
+	<987110b6-9f7d-d82a-69b7-dcd78094c1a6@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH v1] arm: check bit index before usage
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/3] ppc/pnv: check size before data buffer
+ access
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +31,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, liqsub1 <liqsub1@163.com>, Moguofang <moguofang@huawei.com>
+To: =?ISO-8859-15?Q?C=E9dric_Le_Goater?= <clg@kaod.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, Qemu Developers <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Moguofang <moguofang@huawei.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-+-- On Fri, 26 Oct 2018, Peter Maydell wrote --+
-| > ===
-| > diff --git a/hw/arm/strongarm.c b/hw/arm/strongarm.c
-| > index ec2627374d..dd8c4b1f2e 100644
-| > --- a/hw/arm/strongarm.c
-| > +++ b/hw/arm/strongarm.c
-| > @@ -587,12 +587,12 @@ static void strongarm_gpio_write(void *opaque, hwaddr
-| > offset,
-| >
-| >      switch (offset) {
-| >      case GPDR:        /* GPIO Pin-Direction registers */
-| > -        s->dir = value;
-| > +        s->dir = value & 0x3fffff;
-| >          strongarm_gpio_handler_update(s);
-| >          break;
-| >
-| >      case GPSR:        /* GPIO Pin-Output Set registers */
-| > -        s->olevel |= value;
-| > +        s->olevel |= value & 0x3fffff;
-| >          strongarm_gpio_handler_update(s);
-| >          break;
-| > ===
-| >
-| > does this seem okay?
-| 
-| Yes, that's what I had in mind.
++-- On Fri, 26 Oct 2018, C=E9dric Le Goater wrote --+
+| On 10/25/18 8:45 AM, P J P wrote:
+| >  - While we refactor the routine for better, a patch below seem okay =
+to fix=20
+| >    the OOB access issue?
+|=20
+| I think it is fine. Please add something like : =20
+|=20
+| 	qemu_log_mask(LOG_GUEST_ERROR, "ECCB: invalid operation at @0x%08x"=20
+| 			" size %d\n", opb_addr, sz);
 
-Cool, patch sent.
+Okay, will do.
 
 Thank you.
 --
