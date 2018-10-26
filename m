@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55187)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gG1bN-0005Vb-Gt
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 08:52:36 -0400
+	(envelope-from <robert.hu@linux.intel.com>) id 1gG1en-0000KJ-Ev
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 08:56:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gG1XZ-0000kD-TX
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 08:48:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45118)
+	(envelope-from <robert.hu@linux.intel.com>) id 1gG1em-0006hk-7e
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 08:56:05 -0400
+Received: from mga14.intel.com ([192.55.52.115]:32031)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gG1XU-0000fn-4f
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 08:48:35 -0400
-References: <20181023152306.3123-1-david@redhat.com>
-	<20181023152306.3123-3-david@redhat.com>
-	<20181025144107.GB2697@umbus.hotspot.internet-for-guests.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <305a3492-4b16-84b2-2757-1c8e1cf481da@redhat.com>
-Date: Fri, 26 Oct 2018 14:48:20 +0200
-MIME-Version: 1.0
-In-Reply-To: <20181025144107.GB2697@umbus.hotspot.internet-for-guests.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/7] qapi: correctly parse uint64_t
- values from strings
+	(Exim 4.71) (envelope-from <robert.hu@linux.intel.com>)
+	id 1gG1el-0006es-Vw
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 08:56:04 -0400
+From: Robert Hoo <robert.hu@linux.intel.com>
+Date: Fri, 26 Oct 2018 20:55:55 +0800
+Message-Id: <1540558555-75679-4-git-send-email-robert.hu@linux.intel.com>
+In-Reply-To: <1540558555-75679-1-git-send-email-robert.hu@linux.intel.com>
+References: <1540558555-75679-1-git-send-email-robert.hu@linux.intel.com>
+Subject: [Qemu-devel] [PATCH v6 3/3] x86: define a new MSR based feature
+ word -- FEATURE_WORDS_ARCH_CAPABILITIES
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,30 +25,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Eduardo Habkost <ehabkost@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, thomas.lendacky@amd.com
+Cc: qemu-devel@nongnu.org, robert.hu@intel.com, Robert Hoo <robert.hu@linux.intel.com>
 
+Note RSBA is specially treated -- no matter host support it or not, qemu
+pretends it is supported.
 
-> 
-> It's not obvious to me why this looks so different from the code in
-> parse_type_int64().  Should we be using qemu_strtoi64() in the
-> pre-existing function, instead of what's there now?
+Changes in v6: filter out MSR features whose dependent CPUID enumeration is not
+there.
 
-The existing function has to be that complicated because it calls into
-the same function used to parse ranges. We don't need ranges (or
-create/modify) any, so this is not necessary.
+Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ target/i386/cpu.c | 31 ++++++++++++++++++++++++++++++-
+ target/i386/cpu.h |  8 ++++++++
+ target/i386/kvm.c | 11 +++++++++++
+ 3 files changed, 49 insertions(+), 1 deletion(-)
 
-This function is similar to the other parse functions (not parsing
-ranges), e.g. parse_type_bool(). Thanks!
-
-> 
->>  
->>  static void parse_type_size(Visitor *v, const char *name, uint64_t *obj,
-> 
-
-
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 0de21fa..6371722 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -1141,6 +1141,27 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+         },
+         .tcg_features = ~0U,
+     },
++    /*Below are MSR exposed features*/
++    [FEAT_ARCH_CAPABILITIES] = {
++        .type = MSR_FEATURE_WORD,
++        .feat_names = {
++            "rdctl-no", "ibrs-all", "rsba", "skip-l1dfl-vmentry",
++            "ssb-no", NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++        },
++        .msr = {
++            .index = MSR_IA32_ARCH_CAPABILITIES,
++            .cpuid_dep = {
++                FEAT_7_0_EDX,
++                CPUID_7_0_EDX_ARCH_CAPABILITIES
++            }
++        },
++    },
+ };
+ 
+ typedef struct X86RegisterInfo32 {
+@@ -3696,7 +3717,15 @@ static uint32_t x86_cpu_get_supported_feature_word(FeatureWord w,
+                                                         wi->cpuid.reg);
+             break;
+         case MSR_FEATURE_WORD:
+-            r = kvm_arch_get_supported_msr_feature(kvm_state, wi->msr.index);
++            /* Special case:
++             * No matter host status, IA32_ARCH_CAPABILITIES.RSBA [bit 2]
++             * is always supported in guest.
++             */
++            if (wi->msr.index == MSR_IA32_ARCH_CAPABILITIES) {
++                r = MSR_ARCH_CAP_RSBA;
++            }
++            r |= kvm_arch_get_supported_msr_feature(kvm_state,
++                        wi->msr.index);
+             break;
+         }
+     } else if (hvf_enabled()) {
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index dd3de97..ff1ae32 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -507,6 +507,7 @@ typedef enum FeatureWord {
+     FEAT_XSAVE_COMP_LO, /* CPUID[EAX=0xd,ECX=0].EAX */
+     FEAT_XSAVE_COMP_HI, /* CPUID[EAX=0xd,ECX=0].EDX */
+     MSR_FEATURE_WORD_BEGIN, /* Define MSR feature words below */
++    FEAT_ARCH_CAPABILITIES = MSR_FEATURE_WORD_BEGIN,
+     FEATURE_WORDS,
+ } FeatureWord;
+ 
+@@ -735,6 +736,13 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+ #define CPUID_TOPOLOGY_LEVEL_SMT      (1U << 8)
+ #define CPUID_TOPOLOGY_LEVEL_CORE     (2U << 8)
+ 
++/* MSR Feature Bits */
++#define MSR_ARCH_CAP_RDCL_NO    (1U << 0)
++#define MSR_ARCH_CAP_IBRS_ALL   (1U << 1)
++#define MSR_ARCH_CAP_RSBA       (1U << 2)
++#define MSR_ARCH_CAP_SKIP_L1DFL_VMENTRY (1U << 3)
++#define MSR_ARCH_CAP_SSB_NO     (1U << 4)
++
+ #ifndef HYPERV_SPINLOCK_NEVER_RETRY
+ #define HYPERV_SPINLOCK_NEVER_RETRY             0xFFFFFFFF
+ #endif
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 161fc38..796a049 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1975,6 +1975,17 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+     }
+ #endif
+ 
++    /* If host supports feature MSR, write down. */
++    if (kvm_feature_msrs) {
++        int i;
++        for (i = 0; i < kvm_feature_msrs->nmsrs; i++)
++            if (kvm_feature_msrs->indices[i] == MSR_IA32_ARCH_CAPABILITIES) {
++                kvm_msr_entry_add(cpu, MSR_IA32_ARCH_CAPABILITIES,
++                              env->features[FEAT_ARCH_CAPABILITIES]);
++                break;
++            }
++    }
++
+     /*
+      * The following MSRs have side effects on the guest or are too heavy
+      * for normal writeback. Limit them to reset or full state updates.
 -- 
-
-Thanks,
-
-David / dhildenb
+1.8.3.1
