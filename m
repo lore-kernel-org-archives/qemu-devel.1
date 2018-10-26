@@ -1,31 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gFwW7-0000gf-G7
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 03:26:48 -0400
+	(envelope-from <ppandit@redhat.com>) id 1gFwbx-0004TJ-Bz
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 03:32:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gFwW3-00027K-Gf
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 03:26:47 -0400
-Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:52798)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gFwW3-00026T-3P
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 03:26:43 -0400
-Received: by mail-wm1-x333.google.com with SMTP id 189-v6so428045wmw.2
-	for <qemu-devel@nongnu.org>; Fri, 26 Oct 2018 00:26:42 -0700 (PDT)
-References: <20181023203710.GA2239@sx9>
-	<9aea2b05-24d7-f845-d899-0c6fec033672@linaro.org>
-	<20181025170128.GA2309@sx9>
-	<alpine.LFD.2.21.1810251839110.19280@eddie.linux-mips.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <a6a9b9eb-3bb3-eeba-84c2-65097185cea4@linaro.org>
-Date: Fri, 26 Oct 2018 08:26:38 +0100
-MIME-Version: 1.0
-In-Reply-To: <alpine.LFD.2.21.1810251839110.19280@eddie.linux-mips.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v8 00/38] target/mips: Limited support for
- the R5900
+	(envelope-from <ppandit@redhat.com>) id 1gFwbt-00072N-D9
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 03:32:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52284)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gFwbt-00071q-65
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 03:32:45 -0400
+From: P J P <ppandit@redhat.com>
+Date: Fri, 26 Oct 2018 13:00:34 +0530
+Message-Id: <20181026073034.16648-1-ppandit@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] strongarm: mask off high[32:28] bits from
+ dir and state registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,15 +22,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Maciej W. Rozycki" <macro@linux-mips.org>, Fredrik Noring <noring@nocrew.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Aleksandar Markovic <amarkovic@wavecomp.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Aurelien Jarno <aurelien@aurel32.net>, Petar Jovanovic <pjovanovic@wavecomp.com>, =?UTF-8?Q?J=c3=bcrgen_Urban?= <JuergenUrban@gmx.de>, qemu-devel@nongnu.org
+To: Qemu Developers <qemu-devel@nongnu.org>
+Cc: Moguofang <moguofang@huawei.com>, Peter Maydell <peter.maydell@linaro.org>, liqsub1 <liqsub1@163.com>, Prasad J Pandit <pjp@fedoraproject.org>
 
-On 10/25/18 7:03 PM, Maciej W. Rozycki wrote:
-> Overall this source file is clearly a modified copy of an ancient version 
-> of the opcode table included with the opcodes library from binutils and I 
-> think it would benefit from a refresh.
+From: Prasad J Pandit <pjp@fedoraproject.org>
 
-You can't do that because of GPL v3, sadly.
+The high[32:28] bits of 'direction' and 'state' registers of
+SA-1100/SA-1110 device are reserved. Setting them may lead to
+OOB 's->handler[]' array access issue. Mask off [32:28] bits to
+avoid it.
 
+Reported-by: Moguofang <moguofang@huawei.com>
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+---
+ hw/arm/strongarm.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-r~
+Update v2: mask off high[32:28] bits
+  -> https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg05746.html
+
+diff --git a/hw/arm/strongarm.c b/hw/arm/strongarm.c
+index ec2627374d..dd8c4b1f2e 100644
+--- a/hw/arm/strongarm.c
++++ b/hw/arm/strongarm.c
+@@ -587,12 +587,12 @@ static void strongarm_gpio_write(void *opaque, hwaddr offset,
+ 
+     switch (offset) {
+     case GPDR:        /* GPIO Pin-Direction registers */
+-        s->dir = value;
++        s->dir = value & 0x3fffff;
+         strongarm_gpio_handler_update(s);
+         break;
+ 
+     case GPSR:        /* GPIO Pin-Output Set registers */
+-        s->olevel |= value;
++        s->olevel |= value & 0x3fffff;
+         strongarm_gpio_handler_update(s);
+         break;
+ 
+-- 
+2.17.2
