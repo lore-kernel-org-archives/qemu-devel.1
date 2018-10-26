@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58283)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gG9Z7-0001Ca-SN
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 17:22:46 -0400
+	(envelope-from <cota@braap.org>) id 1gGBcD-0006Ge-Gh
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 19:34:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gG9Z6-0007gq-6F
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 17:22:45 -0400
-Received: from mail-oi1-x233.google.com ([2607:f8b0:4864:20::233]:36293)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gG9Z6-0007gj-0Z
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 17:22:44 -0400
-Received: by mail-oi1-x233.google.com with SMTP id r127-v6so519423oie.3
-	for <qemu-devel@nongnu.org>; Fri, 26 Oct 2018 14:22:43 -0700 (PDT)
+	(envelope-from <cota@braap.org>) id 1gGBc8-0005uu-Dw
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 19:34:05 -0400
+Received: from wout1-smtp.messagingengine.com ([64.147.123.24]:49209)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gGBc8-0005uK-4G
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 19:34:00 -0400
+Date: Fri, 26 Oct 2018 19:33:54 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20181026233354.GA31660@flamenco>
+References: <20181016111006.629-1-xiaoguangrong@tencent.com>
+	<20181016111006.629-3-xiaoguangrong@tencent.com>
+	<873d9b11-3643-28d1-e7d8-44657402fa56@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1540498768-8736-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1540498768-8736-1-git-send-email-aleksandar.markovic@rt-rk.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 26 Oct 2018 22:22:22 +0100
-Message-ID: <CAFEAcA8O1uMw1OJ-E_Nm7NtzOfqLT-dOTKqY+7z=3s0QRgLHOA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/3] MIPS queue for October 2018 - part 3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <873d9b11-3643-28d1-e7d8-44657402fa56@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/4] migration: introduce lockless
+ multithreads model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: guangrong.xiao@gmail.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, quintela@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-On 25 October 2018 at 21:19, Aleksandar Markovic
-<aleksandar.markovic@rt-rk.com> wrote:
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
->
-> The following changes since commit 808ebd66e467f77c0d1f8c6346235f81e9c99cf2:
->
->   Merge remote-tracking branch 'remotes/riscv/tags/riscv-for-master-3.1-sf0' into staging (2018-10-25 17:41:03 +0100)
->
-> are available in the git repository at:
->
->   https://github.com/AMarkovic/qemu tags/mips-queue-oct-2018-part-3
->
-> for you to fetch changes up to 89a955e8df3dba6f96859cd0339356243b6c996f:
->
->   target/mips: Add disassembler support for nanoMIPS (2018-10-25 22:13:33 +0200)
->
-> ----------------------------------------------------------------
-> MIPS queue for October 2018 - part 3
->
->   - this pull request contains three assorted nanoMIPS issues
->   - three checkpatch.pl warnings are known and should be ignored
-> ----------------------------------------------------------------
->
+On Wed, Oct 17, 2018 at 12:10:15 +0200, Paolo Bonzini wrote:
+> On 16/10/2018 13:10, guangrong.xiao@gmail.com wrote:
 
+> An idea: the total number of requests is going to be very small, and a
+> PtrRing is not the nicest data structure for multiple producer/single
+> consumer.  So you could instead:
+(snip)
+> - now that you have request indices, you can replace the completion
+> ptr_ring with a bitmap, and set a bit in the bitmap with set_bit_atomic
+> to report completion.  On the writer side you use find_next_bit to find
+(snip)
+> Emilio, can you review the above ideas?
 
-Applied, thanks.
+Sorry it took me a while to go through this.
 
--- PMM
+I like your suggestions. Just one nit; I'm not sure I understood
+the use case very well, but I think using a bitmap to signal
+completion might be suboptimal, since we'd have several
+thread spinning on the same cacheline yet caring about
+different bits.
+
+Xiao: a couple of suggestions
+
+- Since you'll be adding a generic module, make its commit and
+  description self-contained. That is, mentioning in the
+  log that this will be used for migration is fine, but please
+  describe the module (and the assumptions it makes about its
+  users) in general, so that someone that doesn't know anything
+  about migration can still understand this module (and hopefully
+  adopt it for other use cases).
+
+- I'd like to see a simple test program (or rather, benchmark)
+  that shows how this works. This benchmark would be completely
+  unrelated to migration; it should just be a simple test of
+  the performance/scalability of this module.
+  Having this benchmark would help (1) discuss and quantitately
+  evaluate modifications to the module, and (2) help others to
+  quickly understand what the module does.
+  See tests/qht-bench.c for an example.
+
+Thanks,
+
+		Emilio
