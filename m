@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35710)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gFw8P-0005xq-PM
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 03:02:20 -0400
+	(envelope-from <ppandit@redhat.com>) id 1gFwAJ-00083l-SM
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 03:04:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gFw8K-0004lF-EC
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 03:02:16 -0400
-References: <cover.1532984236.git.jcd@tribudubois.net>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <2cfde3e3-7c63-d96f-921b-5a49fdc91762@redhat.com>
-Date: Fri, 26 Oct 2018 08:01:57 +0100
+	(envelope-from <ppandit@redhat.com>) id 1gFwAF-0005nc-KR
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 03:04:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60816)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gFwAF-0005mn-Er
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 03:04:11 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D61E33097085
+	for <qemu-devel@nongnu.org>; Fri, 26 Oct 2018 07:04:09 +0000 (UTC)
+Date: Fri, 26 Oct 2018 12:33:55 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+In-Reply-To: <20181025203758.GA29995@redhat.com>
+Message-ID: <nycvar.YSQ.7.76.1810261213001.8270@xnncv>
+References: <20181025085256.20522-1-kraxel@redhat.com>
+	<20181025085256.20522-4-kraxel@redhat.com>
+	<20181025203758.GA29995@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <cover.1532984236.git.jcd@tribudubois.net>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 0/3] i.MX: Add the i.MX6UL SOC and a
- reference board.
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/3] cirrus: mark as deprecated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,38 +34,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jean-Christophe Dubois <jcd@tribudubois.net>, qemu-devel@nongnu.org, peter.maydell@linaro.org, peter.chubb@nicta.com.au, andrew.smirnov@gmail.com, qemu-arm <qemu-arm@nongnu.org>
+To: =?ISO-8859-15?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com
 
-On 2018-07-30 22:03, Jean-Christophe Dubois wrote:
-> This series adds the i.MX6UL SOC from NXP/Freescale and the reference
-> evaluation board.
-> 
-> This series was tested by booting linux 4.18 (built using imx_v6_v7_defconfig)
-> on the emulated board (with the appropriate device tree).
-> 
-> Jean-Christophe Dubois (3):
->   i.MX6UL: Add i.MX6UL specific CCM device
->   i.MX6UL: Add i.MX6UL SOC
->   i.MX6UL: Add Freescale i.MX6 UltraLite 14x14 EVK Board
-> 
->  default-configs/arm-softmmu.mak |   1 +
->  hw/arm/Makefile.objs            |   1 +
->  hw/arm/fsl-imx6ul.c             | 617 ++++++++++++++++++++++
->  hw/arm/mcimx6ul-evk.c           |  85 +++
->  hw/misc/Makefile.objs           |   1 +
->  hw/misc/imx6ul_ccm.c            | 890 ++++++++++++++++++++++++++++++++
->  hw/misc/trace-events            |   7 +
->  include/hw/arm/fsl-imx6ul.h     | 339 ++++++++++++
->  include/hw/misc/imx6ul_ccm.h    | 226 ++++++++
->  9 files changed, 2167 insertions(+)
->  create mode 100644 hw/arm/fsl-imx6ul.c
->  create mode 100644 hw/arm/mcimx6ul-evk.c
->  create mode 100644 hw/misc/imx6ul_ccm.c
->  create mode 100644 include/hw/arm/fsl-imx6ul.h
->  create mode 100644 include/hw/misc/imx6ul_ccm.h
+  Hello Dan, all
 
-Can we please also get an entry to the MAINTAINERS file for this new
-board / files?
++-- On Thu, 25 Oct 2018, Daniel P. Berrang=C3=A9 wrote --+
+| On Thu, Oct 25, 2018 at 10:52:56AM +0200, Gerd Hoffmann wrote:
+| > While being at it deprecate cirrus too.
+| >=20
+| > Reason (short version): use stdvga instead.
+| > Verbose version:
+| >     https://www.kraxel.org/blog/2014/10/qemu-using-cirrus-considered-=
+harmful
+|=20
+|=20
+| I don't debate the points in the blog post above that stdvga is a
+| better choice, but I don't think that's enough to justify deprecating
+| cirrus at this point in time, because when it then gets deleted it
+| will break way too many existing deployments.
+|=20
+| We need to socialize info in that blog post above more widely and
+| especially ensure that apps are not using that by default. I don't
+| see it being viable to formally deprecate it in QEMU any time soon
+| though given existing usage.
 
- Thanks,
-  Thomas
+To note, IMO there are other devices/sources in QEMU which are potential=20
+candidates for deprecation, similar to adlib etc. It'll help if we could=20
+device a process to deprecate/remove such code base. Other than maintenan=
+ce it=20
+invariably also becomes source of security issues.
+
+Ex.(similar to Fedora) we could announce such candidate on qemu-devel lis=
+t and=20
+after review over a period of say a month, candidate will be=20
+deprecated/expunged. (thinking aloud)
+
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
