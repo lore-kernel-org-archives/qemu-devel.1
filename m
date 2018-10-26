@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59678)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gG3I4-0004f1-De
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 10:40:44 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1gG3Mu-0008UY-PF
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 10:45:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gG3Hy-0005pS-PA
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 10:40:43 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:52453)
+	(envelope-from <richard.henderson@linaro.org>) id 1gG3Mr-0008AK-JN
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 10:45:44 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:52477)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gG3Hs-0005nj-KN
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 10:40:34 -0400
-Received: by mail-wm1-x343.google.com with SMTP id 189-v6so1763742wmw.2
-	for <qemu-devel@nongnu.org>; Fri, 26 Oct 2018 07:40:32 -0700 (PDT)
+	id 1gG3Mh-0007yG-UC
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 10:45:34 -0400
+Received: by mail-wm1-x341.google.com with SMTP id 189-v6so1778347wmw.2
+	for <qemu-devel@nongnu.org>; Fri, 26 Oct 2018 07:45:21 -0700 (PDT)
 References: <20181025144644.15464-1-cota@braap.org>
-	<20181025144644.15464-3-cota@braap.org>
+	<20181025144644.15464-4-cota@braap.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <87aa6cc4-34cd-f364-30ce-d2459b3355ea@linaro.org>
-Date: Fri, 26 Oct 2018 15:40:28 +0100
+Message-ID: <ec52ac9e-52c5-2e89-1315-fb10dbbd2103@linaro.org>
+Date: Fri, 26 Oct 2018 15:45:17 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181025144644.15464-3-cota@braap.org>
+In-Reply-To: <20181025144644.15464-4-cota@braap.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v4 03/71] cpu: introduce cpu_mutex_lock/unlock
+Subject: Re: [Qemu-devel] [RFC v4 04/71] cpu: make qemu_work_cond per-cpu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,16 +35,18 @@ To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 
 On 10/25/18 3:45 PM, Emilio G. Cota wrote:
-> The few direct users of &cpu->lock will be converted soon.
+> This eliminates the need to use the BQL to queue CPU work.
+> 
+> While at it, give the per-cpu field a generic name ("cond") since
+> it will soon be used for more than just queueing CPU work.
 > 
 > Signed-off-by: Emilio G. Cota <cota@braap.org>
 > ---
->  include/qom/cpu.h   | 33 +++++++++++++++++++++++++++++++
->  cpus.c              | 48 +++++++++++++++++++++++++++++++++++++++++++--
->  stubs/cpu-lock.c    | 20 +++++++++++++++++++
->  stubs/Makefile.objs |  1 +
->  4 files changed, 100 insertions(+), 2 deletions(-)
->  create mode 100644 stubs/cpu-lock.c
+>  include/qom/cpu.h |  6 ++--
+>  cpus-common.c     | 72 ++++++++++++++++++++++++++++++++++++++---------
+>  cpus.c            |  2 +-
+>  qom/cpu.c         |  1 +
+>  4 files changed, 63 insertions(+), 18 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
