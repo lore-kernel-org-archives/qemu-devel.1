@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49917)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51869)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tao3.xu@intel.com>) id 1gFvGz-0008HY-FM
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 02:07:09 -0400
+	(envelope-from <thuth@redhat.com>) id 1gFvOI-0004kT-4R
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 02:14:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tao3.xu@intel.com>) id 1gFv4k-0005d9-Do
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 01:54:32 -0400
-Received: from mga03.intel.com ([134.134.136.65]:55176)
+	(envelope-from <thuth@redhat.com>) id 1gFvOD-0001vR-CI
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 02:14:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35370)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1gFv4g-0005YW-UC
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 01:54:24 -0400
-References: <20181017093053.8811-1-tao3.xu@intel.com>
-	<20181017093053.8811-2-tao3.xu@intel.com>
-	<6b494abe-93ae-71fc-01f3-e149df5e24b5@redhat.com>
-	<20181025132831.GG4096@habkost.net>
-From: Tao Xu <tao3.xu@intel.com>
-Message-ID: <128b40da-f34e-9a45-e798-25e33855a51f@intel.com>
-Date: Fri, 26 Oct 2018 13:53:10 +0800
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gFvOC-0001up-J0
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 02:14:33 -0400
+References: <1540512223-21199-1-git-send-email-max7255@yandex-team.ru>
+	<1540512223-21199-5-git-send-email-max7255@yandex-team.ru>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <ba3b8e2d-8d3a-b738-3d87-d56def3ab1e3@redhat.com>
+Date: Fri, 26 Oct 2018 07:14:27 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181025132831.GG4096@habkost.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <1540512223-21199-5-git-send-email-max7255@yandex-team.ru>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 1/1] i386: Add PKU/OSPKE on Skylake-Server
- CPU model
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH RFC 4/4] net/slirp: add ipv6-hostfwd option
+ for user netdev type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,45 +29,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, rth@twiddle.net, jingqi.liu@intel.com, robert.hu@intel.com, qemu-devel@nongnu.org
+To: Maxim Samoylov <max7255@yandex-team.ru>, qemu-devel@nongnu.org
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-On 10/25/18 9:28 PM, Eduardo Habkost wrote:
-> On Wed, Oct 17, 2018 at 12:48:58PM +0200, Paolo Bonzini wrote:
->> On 17/10/2018 11:30, Tao Xu wrote:
->>> As the release document ref below link (page 13):
->>> https://software.intel.com/sites/default/files/managed/c5/15/\
->>> architecture-instruction-set-extensions-programming-reference.pdf
->>>
->>> PKU is supported in Skylake Server (Only Server) and later, and
->>> on Intel(R) Xeon(R) Processor Scalable Family. OSPKE is to reads
->>> the value of PKRU (Instruction of PKU) into EAX and clears EDX.
->>> So PKU/OSPKE are supposed to be in Skylake-Server CPU model.
->>> And PKU/OSPKE 's CPUID has been exposed to QEMU. But PKU/OSPKE
->>> can't be find in Skylake-Server CPU model in the code.
->>> So this patch will fix PKU/OSPKE this issue in Skylake-Server
->>> CPU model.
->> OSPKE is not needed, since it is added automatically based on CR4 (and
->> is not set on boot).
-> Correct.
->
->> Also, the guru of CPU model compatibility is Eduardo, so I'll wait for
->> him to chime in anyway.
-> Sorry for taking so long to reply.  This can be safely done only
-> if every host that is able to run Skylake-Server today is
-> guaranteed to support PKU.  Is that the case?
->
-> You'll also need Skylake-Server-*-cpu.pku=off entries on
-> PC_COMPAT_3_0 to keep PKU disabled on pc-*-3.0 and older.
->
-Thank you Eduardo,
+On 2018-10-26 01:03, Maxim Samoylov wrote:
+> This allows forwarding TCP6 and UDP6 connections down to
+> netdev=3Duser connected guests.
+>=20
+> Signed-off-by: Maxim Samoylov <max7255@yandex-team.ru>
+> ---
+>  hmp-commands.hx     |  31 ++++++++
+>  include/net/slirp.h |   2 +
+>  net/slirp.c         | 214 ++++++++++++++++++++++++++++++++++++++++++++=
+++++++++
+>  qapi/net.json       |   3 +-
+>  4 files changed, 249 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hmp-commands.hx b/hmp-commands.hx
+> index db0c681..b0e1a08 100644
+> --- a/hmp-commands.hx
+> +++ b/hmp-commands.hx
+> @@ -1448,6 +1448,37 @@ STEXI
+>  Remove host-to-guest TCP or UDP redirection.
+>  ETEXI
+> =20
+> +#ifdef CONFIG_SLIRP
+> +    {
+> +        .name       =3D "ipv6_hostfwd_add",
+> +        .args_type  =3D "arg1:s,arg2:s?,arg3:s?",
+> +        .params     =3D "[hub_id name]|[netdev_id] [tcp|udp]:[hostaddr=
+6]:hostport-guestaddr6:guestport",
+> +        .help       =3D "redirect TCP6 or UDP6 connections from host t=
+o guest (requires -net user)",
+> +        .cmd        =3D hmp_ipv6_hostfwd_add,
+> +    },
+> +#endif
+> +STEXI
+> +@item hostfwd_add
+> +@findex hostfwd_add
+> +Redirect TCP6 or UDP6 connections from host to guest (requires -net us=
+er).
+> +ETEXI
+> +
+> +#ifdef CONFIG_SLIRP
+> +    {
+> +        .name       =3D "ipv6_hostfwd_remove",
+> +        .args_type  =3D "arg1:s,arg2:s?,arg3:s?",
+> +        .params     =3D "[hub_id name]|[netdev_id] [tcp|udp]:[hostaddr=
+6]:hostport",
+> +        .help       =3D "remove host-to-guest TCP6 or UDP6 redirection=
+",
+> +        .cmd        =3D hmp_ipv6_hostfwd_remove,
+> +    },
 
+ Hi,
 
-But I can't find PC_COMPAT_3_0 in  include/hw/i386/pc.h. Will it exist on
+could you please remove the "[hub_id name]" touple here? I recently sent
+a patch to deprecate it for the IPv4 version, too:
 
-QEMU 3.1 and will I add "pku=off" after QEMU 3.1  release?
+https://lists.gnu.org/archive/html/qemu-devel/2018-09/msg03198.html
 
+Also I think it would make sense if you mention in the help text that
+IPv6 addresses have to be given with square brackets?
 
-Best Regard
-
-Tao Xu
+ Thanks,
+  Thomas
