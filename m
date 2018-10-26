@@ -1,32 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44219)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52022)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gG0gc-0001lx-2k
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 07:53:54 -0400
+	(envelope-from <ppandit@redhat.com>) id 1gG1L8-0007hq-Tr
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 08:35:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gG0gX-0005m5-AO
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 07:53:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37532)
+	(envelope-from <ppandit@redhat.com>) id 1gG1L3-0007lv-Fb
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 08:35:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37812)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gG0gW-0005lp-MH
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 07:53:48 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gG1L2-0007i9-Vf
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 08:35:41 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B49E43B46C
-	for <qemu-devel@nongnu.org>; Fri, 26 Oct 2018 11:53:47 +0000 (UTC)
-Date: Fri, 26 Oct 2018 17:23:37 +0530 (IST)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0B026C050DFB
+	for <qemu-devel@nongnu.org>; Fri, 26 Oct 2018 12:35:40 +0000 (UTC)
+Date: Fri, 26 Oct 2018 18:05:30 +0530 (IST)
 From: P J P <ppandit@redhat.com>
-In-Reply-To: <6a284fc1-e948-3c32-dba1-9740be5a2d82@redhat.com>
-Message-ID: <nycvar.YSQ.7.76.1810261720070.8270@xnncv>
+In-Reply-To: <20181026095433.GF31390@redhat.com>
+Message-ID: <nycvar.YSQ.7.76.1810261804380.8270@xnncv>
 References: <20181025085256.20522-1-kraxel@redhat.com>
 	<20181025085256.20522-3-kraxel@redhat.com>
-	<7210c7e6-4b85-053c-83c5-524a3b74ef6f@redhat.com>
-	<nycvar.YSQ.7.76.1810261458190.8270@xnncv>
-	<6a284fc1-e948-3c32-dba1-9740be5a2d82@redhat.com>
+	<nycvar.YSQ.7.76.1810251622450.11480@xnncv>
+	<20181025204029.GB29995@redhat.com>
+	<nycvar.YSQ.7.76.1810261237090.8270@xnncv>
+	<20181026095433.GF31390@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH 2/3] adlib: mark as insecure and deprecated.
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [libvirt] [PATCH 2/3] adlib: mark as insecure and
+ deprecated.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,35 +38,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, libvir-list@redhat.com
+To: =?ISO-8859-15?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, libvir-list@redhat.com, qemu-devel@nongnu.org
 
-+-- On Fri, 26 Oct 2018, Paolo Bonzini wrote --+
-| Oh, thanks!  I said I was dumb. :)  So the fix is just this:
-| 
-| diff --git a/hw/audio/fmopl.h b/hw/audio/fmopl.h
-| index e7e578a48e..7199afaa3c 100644
-| --- a/hw/audio/fmopl.h
-| +++ b/hw/audio/fmopl.h
-| @@ -72,8 +72,8 @@ typedef struct fm_opl_f {
-|  	/* Rhythm sention */
-|  	uint8_t rhythm;		/* Rhythm mode , key flag */
-|  	/* time tables */
-| -	int32_t AR_TABLE[75];	/* atttack rate tables */
-| -	int32_t DR_TABLE[75];	/* decay rate tables   */
-| +	int32_t AR_TABLE[76];	/* atttack rate tables */
-| +	int32_t DR_TABLE[76];	/* decay rate tables   */
-|  	uint32_t FN_TABLE[1024];  /* fnumber -> increment counter */
-|  	/* LFO */
-|  	int32_t *ams_table;
-| 
-| and init_timetables will just fill it with the right value?  (I checked
-| against another implementation at http://opl3.cozendey.com/).
++-- On Fri, 26 Oct 2018, Daniel P. Berrang=C3=A9 wrote --+
+| > No, since the adlib device is not used as much and is being deprecate=
+d, I'm=20
+| > not inclined to get one.
+|=20
+| Any security issue that affects code in QEMU that is currently being
+| shipped by distros should have a CVE.
+|=20
+| Whether we intend to deprecate & delete it later should not be a factor
+| because we are free to cancel the deprecation process at any time if we
+| find a reason to keep the feature around.
 
-Gerd has proposed to a patch to deprecate adlib, as it's not used as much. IMO 
-deprecation is better option. But if that is not happening, above seems good.
-
-Thank you.
+Okay, will follow up with a CVE process. Thank you.
 --
 Prasad J Pandit / Red Hat Product Security Team
 47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
