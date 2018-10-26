@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60243)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33318)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gFrJz-0007DH-FM
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 21:53:56 -0400
+	(envelope-from <mst@redhat.com>) id 1gFrQC-0001w0-5z
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 22:00:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gFrJu-0004LK-Dt
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 21:53:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54920)
+	(envelope-from <mst@redhat.com>) id 1gFrQ6-0000CA-Dz
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 22:00:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59174)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gFrJu-0004L9-7q
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 21:53:50 -0400
-Date: Thu, 25 Oct 2018 21:53:47 -0400
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gFrQ6-0000Br-5D
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 22:00:14 -0400
+Date: Thu, 25 Oct 2018 22:00:11 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181025215317-mutt-send-email-mst@kernel.org>
+Message-ID: <20181025215914-mutt-send-email-mst@kernel.org>
 References: <20181025005110.249256-1-mst@redhat.com>
 	<CAFEAcA9zqAOr7F_Pu1tqxJYd=4JMHa3XgR703Mb4B9LibOGB-w@mail.gmail.com>
 MIME-Version: 1.0
@@ -50,19 +50,16 @@ On Thu, Oct 25, 2018 at 08:16:44PM +0100, Peter Maydell wrote:
 > > AMD IOMMU VAPIC support + fixes all over the place.
 > >
 > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> Looking for expected file 'tests/acpi-test-data/q35/SRAT.mmio64'
 > 
-> Looking for expected file 'tests/acpi-test-data/q35/SRAT'
-> **
-> ERROR:/home/petmay01/linaro/qemu-for-merges/tests/bios-tables-test.c:398:load_expected_aml:
-> assertion failed: (exp_sdt.aml_file)
-> FAIL
-> 
-> 
-> thanks
-> -- PMM
+> Hi; I get some compile failures and a test assertion, I'm afraid:
 
-Stumped by this one. Doesn't SRAT.mmio64 exist for you?
+OK  I fixed 32 bit issues. Could not reproduce the test issues,
+could it be that it was a side effect of build issues maybe?
+
+Could you retyr?
+If it still ails I will drop the test for now.
+
+Thanks!
 
 -- 
 MST
