@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45635)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.kanda@oracle.com>) id 1gG2gW-0008Th-Hw
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 10:01:59 -0400
+	(envelope-from <armbru@redhat.com>) id 1gG2ic-0001V5-BV
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 10:04:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.kanda@oracle.com>) id 1gG2gQ-0001nS-Iv
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 10:01:56 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:34768)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.kanda@oracle.com>)
-	id 1gG2gQ-0001lT-6J
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 10:01:50 -0400
-References: <20181025200944.12113-1-ppandit@redhat.com>
-	<5b8a68c1-2787-af0d-959f-e0c9132f7004@oracle.com>
-	<nycvar.YSQ.7.76.1810261452510.8270@xnncv>
-From: Mark Kanda <mark.kanda@oracle.com>
-Message-ID: <deaad764-a684-2d17-043d-69fda37460f4@oracle.com>
-Date: Fri, 26 Oct 2018 09:01:41 -0500
+	(envelope-from <armbru@redhat.com>) id 1gG2iZ-0003ZE-4g
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 10:04:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44656)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gG2iY-0003Yk-Ru
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 10:04:03 -0400
+From: Markus Armbruster <armbru@redhat.com>
+Date: Fri, 26 Oct 2018 16:03:51 +0200
+Message-ID: <87mur0ls8o.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <nycvar.YSQ.7.76.1810261452510.8270@xnncv>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] lsi53c895a: check message length value
+Content-Type: text/plain
+Subject: [Qemu-devel] Minutes of KVM Forum BoF on deprecating stuff
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,26 +23,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>, Ameya More <ameya.more@oracle.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, Andrea Bolognani <abologna@redhat.com>, Christophe de Dinechin <cdupontd@redhat.com>, =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laine Stump <laine@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Pino Toscano <ptoscano@redhat.com>, Thomas Huth <thuth@redhat.com>
 
+This is from my (imperfect) notes, corrections welcome.
 
+Motivation: QEMU contains stuff of dubious value, which gets in the way
+in various (sometimes painful and expensive) ways.
 
-On 10/26/2018 4:25 AM, P J P wrote:
-> +-- On Thu, 25 Oct 2018, Ameya More wrote --+
-> | While Mark and I reported this issue to you, it was actually discovered by
-> | Dejvau Security and they should receive credit for reporting this issue.
-> | http://www.dejavusecurity.com
-> 
-> I see; Would it be possible to share email-id of the original reporter to
-> include in the commit log message?
+Deprecation is the marking of an external interface as "we intend to
+remove this, you should stop using it" (preferably with advice on what
+to use instead).  We have a deprecation policy to guide us through this
+process.
 
-Deja vu requested that we include the following text in the commit message:
+Topics we covered, reordered for readability:
 
-	Discovered by Deja vu Security. Reported by Oracle.
+* Dropping features inconveniences their users.  Keeping them impedes
+  forward movement, and thus inconveniences other users.  We need to
+  engage with the tradeoffs.
 
-Would that be acceptable?
+* The cost of keeping both old and new for a deprecation grace period
+  (currently two releases) can be painfully high.  Tradeoff again.
+  However, there's rough consensus not to mess with the deprecation
+  policy right now.
 
-Thanks,
+* When something has been broken for the customary deprecation grace
+  period, removing it without going through the deprecation process
+  should be okay.
 
--Mark
+* We may have to deprecate interfaces, but we may also have a need to
+  deprecate guarantees interfaces provide.  Worse when the guarantees
+  are tacit.  No good answers.  Let's attack less thorny problems first.
+
+* One obvious class of candidates for removal is machines we don't know
+  how to boot, or can't boot, say because we lack required firmware
+  and/or OS.
+
+  Of course, "can boot" should be an automated test.  As a first step
+  towards that, we should at least document how to boot each machine.
+  We're going to ask machine maintainers to do that.
+
+* We need to communicate "you're using something that is deprecated".
+  How?  Right now, we print a deprecation message.  Okay when humans use
+  QEMU directly in a shell.  However, when QEMU sits at the bottom of a
+  software stack, the message will likely end up in a log file that is
+  effectively write-only.
+ 
+  - The one way to get people read log files is crashing their
+    application.  A command line option --future could make QEMU crash
+    right after printing a deprecation message.  This could help with
+    finding use of deprecated features in a testing environment.
+
+  - A less destructive way to grab people's attention is to make things
+    run really, really slow: have QEMU go to sleep for a while after
+    printing a deprecation message.
+    
+  - We can also pass the buck to the next layer up: emit a QMP event.
+
+    Sadly, by the time the next layer connects to QMP, plenty of stuff
+    already happened.  We'd have to buffer deprecation events somehow.
+
+    What would libvirt do with such an event?  Log it, taint the domain,
+    emit a (libvirt) event to pass it on to the next layer up.
+
+  - A completely different idea is to have a configuratin linter.  To
+    support doing this at the libvirt level, QEMU could expose "is
+    deprecated" in interface introspection.  Feels feasible for QMP,
+    where we already have sufficiently expressive introspection.  For
+    CLI, we'd first have to provide that (but we want that anyway).
+
+  - We might also want to dispay deprecation messages in QEMU's GUI
+    somehow, or on serial consoles.
