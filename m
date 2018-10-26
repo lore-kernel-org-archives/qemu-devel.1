@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57143)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gFzjx-0003O1-No
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 06:53:18 -0400
+	(envelope-from <cohuck@redhat.com>) id 1gFznv-0004ux-8I
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 06:57:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gFzjt-0002u3-5F
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 06:53:17 -0400
-Received: from mail.uni-paderborn.de ([131.234.142.9]:57584)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
-	id 1gFzjs-0002tW-UI
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 06:53:13 -0400
-References: <mhng-a68ddfc1-c1f3-4c28-97a5-bf5dfc9db931@palmer-si-x1c4>
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Message-ID: <a0916ce9-da94-7a38-52d6-61be33e3c67d@mail.uni-paderborn.de>
-Date: Fri, 26 Oct 2018 12:53:11 +0200
-MIME-Version: 1.0
-In-Reply-To: <mhng-a68ddfc1-c1f3-4c28-97a5-bf5dfc9db931@palmer-si-x1c4>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US-large
-Subject: Re: [Qemu-devel] [PATCH v2 00/29] target/riscv: Convert to
- decodetree
+	(envelope-from <cohuck@redhat.com>) id 1gFznq-0005jN-MT
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 06:57:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58804)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1gFznq-0005ix-H2
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 06:57:18 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8CF8580F7B
+	for <qemu-devel@nongnu.org>; Fri, 26 Oct 2018 10:57:16 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Fri, 26 Oct 2018 12:57:11 +0200
+Message-Id: <20181026105711.29605-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PATCH RFC] MAINTAINERS: clarify some of the tags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,59 +27,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Palmer Dabbelt <palmer@sifive.com>
-Cc: sagark@eecs.berkeley.edu, richard.henderson@linaro.org, qemu-devel@nongnu.org, peer.adelt@hni.uni-paderborn.de, Alistair Francis <Alistair.Francis@wdc.com>, Michael Clark <mjc@sifive.com>
+To: qemu-devel@nongnu.org
+Cc: Cornelia Huck <cohuck@redhat.com>
 
+The MAINTAINERS file is a bit sparse on information about what
+the different designators are. Let's add some more information
+to give contributors a better idea about what the different
+roles are.
 
-On 10/25/18 12:21 AM, Palmer Dabbelt wrote:
-> On Sat, 20 Oct 2018 00:14:22 PDT (-0700), 
-> kbastian@mail.uni-paderborn.de wrote:
->> Hi,
->>
->> this patchset converts the RISC-V decoder to decodetree in three 
->> major steps:
->>
->> 1) Convert 32-bit instructions to decodetree [Patch 1-14]:
->>     Many of the gen_* functions are called by the decode functions 
->> for 16-bit
->>     and 32-bit functions. If we move translation code from the gen_*
->>     functions to the generated trans_* functions of decode-tree, we 
->> get a lot of
->>     duplication. Therefore, we mostly generate calls to the old gen_* 
->> function
->>     which are properly replaced after step 2).
->>
->>     Each of the trans_ functions are grouped into files corresponding 
->> to their
->>     ISA extension, e.g. addi which is in RV32I is translated in the file
->>     'trans_rvi.inc.c'.
->>
->> 2) Convert 16-bit instructions to decodetree [Patch 15-17]:
->>     All 16 bit instructions have a direct mapping to a 32 bit 
->> instruction. Thus,
->>     we convert the arguments in the 16 bit trans_ function to the 
->> arguments of
->>     the corresponding 32 bit instruction and call the 32 bit trans_ 
->> function.
->>
->> 3) Remove old manual decoding in gen_* function [Patch 17-28]:
->>     this move all manual translation code into the trans_* 
->> instructions of
->>     decode tree, such that we can remove the old decode_* functions.
->>
->> the full tree can be found here:
->> https://github.com/bkoppelmann/qemu/tree/riscv-dt-v2
->
-> Thanks!
->
-> I dropped this on top of master and it appears I'm getting a bunch of 
-> oops when trying to boot Linux.  They're fairly far into the boot 
-> process and may be a mistake on my end, I was just wondering if you'd 
-> booted Linux?
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
 
-Are there non fatal oops in booting Linux? I only checked whether I 
-could get a terminal on Fedora Linux.
+This came out of a discussion about what being a 'reviewer' listed in
+this file actually means. A reviewer probably should already have a
+track record of doing helpful reviews before being listed in here.
 
-Cheers,
+While at it, I also tried to add some more hints for the other entries.
+This patch is supposed to be a starting point for further discussion.
 
-Bastian
+---
+ MAINTAINERS | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 40672c4eba..7d9dbc6724 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -12,9 +12,14 @@ consult qemu-devel and not any specific individual privately.
+ Descriptions of section entries:
+ 
+ 	M: Mail patches to: FullName <address@domain>
++	   Maintainers are looking after a certain area and must be CCed on
++	   patches. They are considered the main contact point.
+ 	R: Designated reviewer: FullName <address@domain>
+ 	   These reviewers should be CCed on patches.
++	   Reviewers are familiar with the subject matter and provide feedback
++	   even though they are not maintainers.
+ 	L: Mailing list that is relevant to this area
++	   These lists should be CCed on patches.
+ 	W: Web-page with status/info
+ 	Q: Patchwork web based patch tracking system site
+ 	T: SCM tree type and location.  Type is one of: git, hg, quilt, stgit.
+-- 
+2.14.4
