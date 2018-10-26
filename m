@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51869)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57152)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gFvOI-0004kT-4R
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 02:14:39 -0400
+	(envelope-from <bounces@canonical.com>) id 1gFvio-0003W2-4d
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 02:35:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gFvOD-0001vR-CI
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 02:14:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35370)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gFvOC-0001up-J0
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 02:14:33 -0400
-References: <1540512223-21199-1-git-send-email-max7255@yandex-team.ru>
-	<1540512223-21199-5-git-send-email-max7255@yandex-team.ru>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <ba3b8e2d-8d3a-b738-3d87-d56def3ab1e3@redhat.com>
-Date: Fri, 26 Oct 2018 07:14:27 +0100
+	(envelope-from <bounces@canonical.com>) id 1gFvij-00071N-Dr
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 02:35:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51996)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gFvih-0006td-I5
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 02:35:45 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gFviT-0004OC-F6
+	for <qemu-devel@nongnu.org>; Fri, 26 Oct 2018 06:35:29 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 6BD912E80C7
+	for <qemu-devel@nongnu.org>; Fri, 26 Oct 2018 06:35:29 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1540512223-21199-5-git-send-email-max7255@yandex-team.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC 4/4] net/slirp: add ipv6-hostfwd option
- for user netdev type
+Date: Fri, 26 Oct 2018 06:29:09 -0000
+From: yueyihua <1800088@bugs.launchpad.net>
+Reply-To: Bug 1800088 <1800088@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <154053534939.13909.2595594313857584610.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1800088] [NEW] Assertion fail while usb camera
+ redirect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,68 +36,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxim Samoylov <max7255@yandex-team.ru>, qemu-devel@nongnu.org
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>
+To: qemu-devel@nongnu.org
 
-On 2018-10-26 01:03, Maxim Samoylov wrote:
-> This allows forwarding TCP6 and UDP6 connections down to
-> netdev=3Duser connected guests.
->=20
-> Signed-off-by: Maxim Samoylov <max7255@yandex-team.ru>
-> ---
->  hmp-commands.hx     |  31 ++++++++
->  include/net/slirp.h |   2 +
->  net/slirp.c         | 214 ++++++++++++++++++++++++++++++++++++++++++++=
-++++++++
->  qapi/net.json       |   3 +-
->  4 files changed, 249 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hmp-commands.hx b/hmp-commands.hx
-> index db0c681..b0e1a08 100644
-> --- a/hmp-commands.hx
-> +++ b/hmp-commands.hx
-> @@ -1448,6 +1448,37 @@ STEXI
->  Remove host-to-guest TCP or UDP redirection.
->  ETEXI
-> =20
-> +#ifdef CONFIG_SLIRP
-> +    {
-> +        .name       =3D "ipv6_hostfwd_add",
-> +        .args_type  =3D "arg1:s,arg2:s?,arg3:s?",
-> +        .params     =3D "[hub_id name]|[netdev_id] [tcp|udp]:[hostaddr=
-6]:hostport-guestaddr6:guestport",
-> +        .help       =3D "redirect TCP6 or UDP6 connections from host t=
-o guest (requires -net user)",
-> +        .cmd        =3D hmp_ipv6_hostfwd_add,
-> +    },
-> +#endif
-> +STEXI
-> +@item hostfwd_add
-> +@findex hostfwd_add
-> +Redirect TCP6 or UDP6 connections from host to guest (requires -net us=
-er).
-> +ETEXI
-> +
-> +#ifdef CONFIG_SLIRP
-> +    {
-> +        .name       =3D "ipv6_hostfwd_remove",
-> +        .args_type  =3D "arg1:s,arg2:s?,arg3:s?",
-> +        .params     =3D "[hub_id name]|[netdev_id] [tcp|udp]:[hostaddr=
-6]:hostport",
-> +        .help       =3D "remove host-to-guest TCP6 or UDP6 redirection=
-",
-> +        .cmd        =3D hmp_ipv6_hostfwd_remove,
-> +    },
+Public bug reported:
 
- Hi,
+This may happen during usb camera redirect. But if i move the camera
+lens from left to right or up to down, this always happen. My qemu-
+version is 2.10.0 and following is the error information:
 
-could you please remove the "[hub_id name]" touple here? I recently sent
-a patch to deprecate it for the IPv4 version, too:
+2018-10-26T03:37:54.925231Z qemu-kvm: usbredirparser: error unexpected extr=
+a data ep 00
+qemu-kvm: hw/usb/redirect.c:1313: usbredir_chardev_read: Assertion `dev->re=
+ad_buf =3D=3D ((void *)0)' failed.
+2018-10-26 03:37:57.120+0000: shutting down, reason=3Dcrashed
 
-https://lists.gnu.org/archive/html/qemu-devel/2018-09/msg03198.html
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
-Also I think it would make sense if you mention in the help text that
-IPv6 addresses have to be given with square brackets?
+-- =
 
- Thanks,
-  Thomas
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1800088
+
+Title:
+  Assertion fail while usb camera redirect
+
+Status in QEMU:
+  New
+
+Bug description:
+  This may happen during usb camera redirect. But if i move the camera
+  lens from left to right or up to down, this always happen. My qemu-
+  version is 2.10.0 and following is the error information:
+
+  2018-10-26T03:37:54.925231Z qemu-kvm: usbredirparser: error unexpected ex=
+tra data ep 00
+  qemu-kvm: hw/usb/redirect.c:1313: usbredir_chardev_read: Assertion `dev->=
+read_buf =3D=3D ((void *)0)' failed.
+  2018-10-26 03:37:57.120+0000: shutting down, reason=3Dcrashed
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1800088/+subscriptions
