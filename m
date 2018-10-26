@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37602)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37623)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <max7255@yandex-team.ru>) id 1gFpbm-0002v5-A8
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 20:04:10 -0400
+	(envelope-from <max7255@yandex-team.ru>) id 1gFpbn-0002vG-OR
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 20:04:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <max7255@yandex-team.ru>) id 1gFpbk-0007eJ-Hx
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 20:04:10 -0400
-Received: from forwardcorp1j.cmail.yandex.net ([2a02:6b8:0:1630::190]:34832)
+	(envelope-from <max7255@yandex-team.ru>) id 1gFpbk-0007e3-D4
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 20:04:11 -0400
+Received: from forwardcorp1o.cmail.yandex.net ([37.9.109.47]:35276)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <max7255@yandex-team.ru>)
-	id 1gFpbk-0007dL-0D
+	id 1gFpbj-0007d2-VZ
 	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 20:04:08 -0400
-Received: from mxbackcorp1o.mail.yandex.net (mxbackcorp1o.mail.yandex.net
-	[IPv6:2a02:6b8:0:1a2d::301])
-	by forwardcorp1j.cmail.yandex.net (Yandex) with ESMTP id 637D920F69
-	for <qemu-devel@nongnu.org>; Fri, 26 Oct 2018 03:04:04 +0300 (MSK)
+Received: from mxbackcorp1j.mail.yandex.net (mxbackcorp1j.mail.yandex.net
+	[IPv6:2a02:6b8:0:1619::162])
+	by forwardcorp1o.cmail.yandex.net (Yandex) with ESMTP id E64A520F73
+	for <qemu-devel@nongnu.org>; Fri, 26 Oct 2018 03:04:02 +0300 (MSK)
 From: Maxim Samoylov <max7255@yandex-team.ru>
-Date: Fri, 26 Oct 2018 03:03:41 +0300
-Message-Id: <1540512223-21199-3-git-send-email-max7255@yandex-team.ru>
-In-Reply-To: <1540512223-21199-1-git-send-email-max7255@yandex-team.ru>
-References: <1540512223-21199-1-git-send-email-max7255@yandex-team.ru>
-Subject: [Qemu-devel] [PATCH RFC 2/4] slirp: add helper for udp6 socket
- creation
+Date: Fri, 26 Oct 2018 03:03:39 +0300
+Message-Id: <1540512223-21199-1-git-send-email-max7255@yandex-team.ru>
+Subject: [Qemu-devel] [PATCH RFC 0/4] slirp: support hostfwd for ipv6
+ addresses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,80 +30,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: max7255@yandex-team.ru
 
-Signed-off-by: Maxim Samoylov <max7255@yandex-team.ru>
----
- slirp/udp.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
- slirp/udp.h |  2 ++
- 2 files changed, 50 insertions(+)
+The following patch implements ipv6 host port forwarding support
+for qemu slirp net subsystem.
 
-diff --git a/slirp/udp.c b/slirp/udp.c
-index e5bf065..ab24935 100644
---- a/slirp/udp.c
-+++ b/slirp/udp.c
-@@ -366,3 +366,51 @@ udp_listen(Slirp *slirp, uint32_t haddr, u_int hport, uint32_t laddr,
- 
- 	return so;
- }
-+
-+struct socket *
-+udp6_listen(Slirp *slirp, struct in6_addr haddr, u_int hport,
-+            struct in6_addr laddr, u_int lport, int flags)
-+{
-+    struct sockaddr_in6 addr;
-+    struct socket *so;
-+    socklen_t addrlen = sizeof(addr);
-+
-+    memset(&addr, 0, sizeof(addr));
-+
-+    so = socreate(slirp);
-+    if (!so) {
-+        return NULL;
-+    }
-+    so->s = qemu_socket(AF_INET6, SOCK_DGRAM, 0);
-+        if (so->s < 0) {
-+            sofree(so);
-+            return NULL;
-+        }
-+    so->so_expire = curtime + SO_EXPIRE;
-+    insque(so, &slirp->udb);
-+
-+    addr.sin6_family = AF_INET6;
-+    addr.sin6_addr = haddr;
-+    addr.sin6_port = hport;
-+
-+    if (bind(so->s, (struct sockaddr *)&addr, addrlen) < 0) {
-+        udp_detach(so);
-+        return NULL;
-+    }
-+    socket_set_fast_reuse(so->s);
-+
-+    getsockname(so->s, (struct sockaddr *)&addr, &addrlen);
-+    so->fhost.sin6 = addr;
-+    sotranslate_accept(so);
-+    so->so_lfamily = AF_INET6;
-+    so->so_lport = lport;
-+    so->so_laddr6 = laddr;
-+    if (flags != SS_FACCEPTONCE) {
-+        so->so_expire = 0;
-+    }
-+
-+    so->so_state &= SS_PERSISTENT_MASK;
-+    so->so_state |= SS_ISFCONNECTED | flags;
-+
-+    return so;
-+}
-diff --git a/slirp/udp.h b/slirp/udp.h
-index be657cf..862c6e8 100644
---- a/slirp/udp.h
-+++ b/slirp/udp.h
-@@ -80,6 +80,8 @@ int udp_attach(struct socket *, unsigned short af);
- void udp_detach(struct socket *);
- struct socket * udp_listen(Slirp *, uint32_t, u_int, uint32_t, u_int,
-                            int);
-+struct socket *udp6_listen(Slirp *slirp, struct in6_addr, u_int,
-+                            struct in6_addr, u_int, int);
- int udp_output(struct socket *so, struct mbuf *m,
-                 struct sockaddr_in *saddr, struct sockaddr_in *daddr,
-                 int iptos);
+The slirp itself supports ipv6 communication, but
+hostfwd currently does not allow listening on and forwarding
+ports for ipv6 addresses.
+
+This should be useful, when host works in v6-capable environment
+and guests should be accessible there.
+
+Turns out the only thing should be done is to properly parse 
+ipv6 addresses and pass them down to listening socket create logic.
+
+The proposed option ipv6-hostfwd syntax is the same as for the hostfwd option,
+but one should enclose their ipv6 addresses into square brackets, e.g.:
+
+ipv6-hostfwd=tcp::7255-[fec0::5054:ff:fe12:3456]:80
+
+The guest ipv6 address intended to be specified explicitly,
+because there is no dhcpv6 server in slirp.
+
+
+Maxim Samoylov (4):
+  slirp: add helper for tcp6 socket creation
+  slirp: add helper for udp6 socket creation
+  slirp: add helpers for ipv6 hostfwd manipulation
+  net/slirp: add ipv6-hostfwd option for user netdev type
+
+ hmp-commands.hx     |  31 ++++++++
+ include/net/slirp.h |   2 +
+ net/slirp.c         | 214 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ qapi/net.json       |   3 +-
+ slirp/libslirp.h    |   6 ++
+ slirp/slirp.c       |  43 +++++++++++
+ slirp/socket.c      |  73 ++++++++++++++++++
+ slirp/socket.h      |   2 +
+ slirp/udp.c         |  48 ++++++++++++
+ slirp/udp.h         |   2 +
+ 10 files changed, 423 insertions(+), 1 deletion(-)
+
 -- 
 2.7.4
