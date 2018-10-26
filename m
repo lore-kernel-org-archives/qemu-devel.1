@@ -1,20 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46112)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gG2ic-0001V5-BV
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 10:04:07 -0400
+	(envelope-from <berrange@redhat.com>) id 1gG2tT-0001bB-Fo
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 10:15:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gG2iZ-0003ZE-4g
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 10:04:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44656)
+	(envelope-from <berrange@redhat.com>) id 1gG2tH-0005Ji-9h
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 10:15:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41738)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gG2iY-0003Yk-Ru
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 10:04:03 -0400
-From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 26 Oct 2018 16:03:51 +0200
-Message-ID: <87mur0ls8o.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gG2tG-0005Go-Rr
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 10:15:07 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 95DEA80F9A
+	for <qemu-devel@nongnu.org>; Fri, 26 Oct 2018 14:15:05 +0000 (UTC)
+Date: Fri, 26 Oct 2018 15:14:58 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181026141458.GA493@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20181025085256.20522-1-kraxel@redhat.com>
+	<20181025085256.20522-4-kraxel@redhat.com>
+	<20181025203758.GA29995@redhat.com>
+	<nycvar.YSQ.7.76.1810261213001.8270@xnncv>
+	<20181026094208.GD31390@redhat.com>
+	<20181026095943.GG31390@redhat.com>
+	<4e377111-8b95-c65a-e456-a7a8a4580ecb@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] Minutes of KVM Forum BoF on deprecating stuff
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <4e377111-8b95-c65a-e456-a7a8a4580ecb@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/3] cirrus: mark as deprecated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,74 +40,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alberto Garcia <berto@igalia.com>, Andrea Bolognani <abologna@redhat.com>, Christophe de Dinechin <cdupontd@redhat.com>, =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laine Stump <laine@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Pino Toscano <ptoscano@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: P J P <ppandit@redhat.com>, libvir-list@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
 
-This is from my (imperfect) notes, corrections welcome.
+On Fri, Oct 26, 2018 at 12:03:35PM +0200, Paolo Bonzini wrote:
+> On 26/10/2018 11:59, Daniel P. Berrang=C3=A9 wrote:
+> > I should also say that QEMU as an upstream project has multiple goals=
+.
+> > Running KVM guests with modern PV hardware is only one of them, albei=
+t
+> > a widely used one. Being able to run old legacy OS with old hardware,
+> > and running arbitrary embedded boards/devices with emulation are both
+> > use cases that QEMU project aims to address. To eliminate all the old
+> > "crufty" device emulation in name of improving security for KVM, woul=
+d
+> > be to eliminate core use cases of the project. THis is why we're tryi=
+ng
+> > to persue the direction of making it easier for vendors to disable
+> > features and devices they don't wish to support & thus limit their
+> > downstream CVE exposure.
+>=20
+> Indeed.  If we had to deprecate a feature just because it had an
+> off-by-one bug, no C program would grow beyond 1000 lines of code...
 
-Motivation: QEMU contains stuff of dubious value, which gets in the way
-in various (sometimes painful and expensive) ways.
+One thing we should do, however, is to make it clear which of the
+device models we consider secure, and which we consider only usable
+in a friendly guest environment, as we have very different code
+maintainership & quality standards for different parts of QEMU.
 
-Deprecation is the marking of an external interface as "we intend to
-remove this, you should stop using it" (preferably with advice on what
-to use instead).  We have a deprecation policy to guide us through this
-process.
+Essentially virtio devices, and then only a handful of the emulated
+devices are things we consider suitable for usage in secure envs.
+Likewise for machine types probably.
 
-Topics we covered, reordered for readability:
 
-* Dropping features inconveniences their users.  Keeping them impedes
-  forward movement, and thus inconveniences other users.  We need to
-  engage with the tradeoffs.
-
-* The cost of keeping both old and new for a deprecation grace period
-  (currently two releases) can be painfully high.  Tradeoff again.
-  However, there's rough consensus not to mess with the deprecation
-  policy right now.
-
-* When something has been broken for the customary deprecation grace
-  period, removing it without going through the deprecation process
-  should be okay.
-
-* We may have to deprecate interfaces, but we may also have a need to
-  deprecate guarantees interfaces provide.  Worse when the guarantees
-  are tacit.  No good answers.  Let's attack less thorny problems first.
-
-* One obvious class of candidates for removal is machines we don't know
-  how to boot, or can't boot, say because we lack required firmware
-  and/or OS.
-
-  Of course, "can boot" should be an automated test.  As a first step
-  towards that, we should at least document how to boot each machine.
-  We're going to ask machine maintainers to do that.
-
-* We need to communicate "you're using something that is deprecated".
-  How?  Right now, we print a deprecation message.  Okay when humans use
-  QEMU directly in a shell.  However, when QEMU sits at the bottom of a
-  software stack, the message will likely end up in a log file that is
-  effectively write-only.
- 
-  - The one way to get people read log files is crashing their
-    application.  A command line option --future could make QEMU crash
-    right after printing a deprecation message.  This could help with
-    finding use of deprecated features in a testing environment.
-
-  - A less destructive way to grab people's attention is to make things
-    run really, really slow: have QEMU go to sleep for a while after
-    printing a deprecation message.
-    
-  - We can also pass the buck to the next layer up: emit a QMP event.
-
-    Sadly, by the time the next layer connects to QMP, plenty of stuff
-    already happened.  We'd have to buffer deprecation events somehow.
-
-    What would libvirt do with such an event?  Log it, taint the domain,
-    emit a (libvirt) event to pass it on to the next layer up.
-
-  - A completely different idea is to have a configuratin linter.  To
-    support doing this at the libvirt level, QEMU could expose "is
-    deprecated" in interface introspection.  Feels feasible for QMP,
-    where we already have sufficiently expressive introspection.  For
-    CLI, we'd first have to provide that (but we want that anyway).
-
-  - We might also want to dispay deprecation messages in QEMU's GUI
-    somehow, or on serial consoles.
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
