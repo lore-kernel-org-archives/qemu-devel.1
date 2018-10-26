@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49850)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gG4J3-0003mJ-II
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 11:45:52 -0400
+	(envelope-from <laurent@vivier.eu>) id 1gG4J6-00041t-1k
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 11:45:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gG47O-0005gr-M7
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 11:33:47 -0400
+	(envelope-from <laurent@vivier.eu>) id 1gG47G-0005ZU-5P
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 11:33:42 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Fri, 26 Oct 2018 17:31:21 +0200
-Message-Id: <20181026153125.24738-17-laurent@vivier.eu>
+Date: Fri, 26 Oct 2018 17:31:23 +0200
+Message-Id: <20181026153125.24738-19-laurent@vivier.eu>
 In-Reply-To: <20181026153125.24738-1-laurent@vivier.eu>
 References: <20181026153125.24738-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 16/20] tests/bios-tables-test: Remove an useless
- cast
+Subject: [Qemu-devel] [PULL 18/20] hw/intc/gicv3: Remove useless parenthesis
+ around DIV_ROUND_UP macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,31 +30,30 @@ From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 Patch created mechanically by rerunning:
 
-  $  spatch --sp-file scripts/coccinelle/typecast.cocci \
+  $  spatch --sp-file scripts/coccinelle/round.cocci \
             --macro-file scripts/cocci-macro-file.h \
             --dir . --in-place
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Acked-by: Michael S. Tsirkin <mst@redhat.com>
-Message-Id: <20180705155811.20366-5-f4bug@amsat.org>
+Message-Id: <20180705155811.20366-8-f4bug@amsat.org>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- tests/bios-tables-test.c | 2 +-
+ include/hw/intc/arm_gicv3_common.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index af4b1fb6bd..02e77ec811 100644
---- a/tests/bios-tables-test.c
-+++ b/tests/bios-tables-test.c
-@@ -319,7 +319,7 @@ static bool load_asl(GArray *sdts, AcpiSdtTable *sdt)
-     ret = g_spawn_command_line_sync(command_line->str, &out, &out_err, NULL, &error);
-     g_assert_no_error(error);
-     if (ret) {
--        ret = g_file_get_contents(sdt->asl_file, (gchar **)&sdt->asl,
-+        ret = g_file_get_contents(sdt->asl_file, &sdt->asl,
-                                   &sdt->asl_len, &error);
-         g_assert(ret);
-         g_assert_no_error(error);
+diff --git a/include/hw/intc/arm_gicv3_common.h b/include/hw/intc/arm_gicv3_common.h
+index b798486ecf..31ec9a1ae4 100644
+--- a/include/hw/intc/arm_gicv3_common.h
++++ b/include/hw/intc/arm_gicv3_common.h
+@@ -62,7 +62,7 @@
+  * avoids bugs where we forget to subtract GIC_INTERNAL from an
+  * interrupt number.
+  */
+-#define GICV3_BMP_SIZE (DIV_ROUND_UP(GICV3_MAXIRQ, 32))
++#define GICV3_BMP_SIZE DIV_ROUND_UP(GICV3_MAXIRQ, 32)
+ 
+ #define GIC_DECLARE_BITMAP(name) \
+     uint32_t name[GICV3_BMP_SIZE]
 -- 
 2.17.2
