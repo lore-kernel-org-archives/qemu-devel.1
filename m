@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32799)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rafaelkioji@gmail.com>) id 1gFtdE-0007AA-JR
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 00:21:59 -0400
+	(envelope-from <tao3.xu@intel.com>) id 1gFvGz-0008HY-FM
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 02:07:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rafaelkioji@gmail.com>) id 1gFtcB-00048M-RZ
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 00:20:55 -0400
-Received: from mail-pf1-x432.google.com ([2607:f8b0:4864:20::432]:42396)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rafaelkioji@gmail.com>)
-	id 1gFtcB-000489-JY
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 00:20:51 -0400
-Received: by mail-pf1-x432.google.com with SMTP id f26-v6so5259171pfn.9
-	for <qemu-devel@nongnu.org>; Thu, 25 Oct 2018 21:20:51 -0700 (PDT)
-Received: from [143.89.131.93] (eepc93.ee.ust.hk. [143.89.131.93])
-	by smtp.gmail.com with ESMTPSA id
-	n79-v6sm15849533pfk.19.2018.10.25.21.20.49
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 25 Oct 2018 21:20:49 -0700 (PDT)
-From: "Rafael K. V. Maeda" <rafaelkioji@gmail.com>
-Message-ID: <784f1213-282f-14ca-4126-145dead59a77@gmail.com>
-Date: Fri, 26 Oct 2018 12:20:41 +0800
+	(envelope-from <tao3.xu@intel.com>) id 1gFv4k-0005d9-Do
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 01:54:32 -0400
+Received: from mga03.intel.com ([134.134.136.65]:55176)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1gFv4g-0005YW-UC
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 01:54:24 -0400
+References: <20181017093053.8811-1-tao3.xu@intel.com>
+	<20181017093053.8811-2-tao3.xu@intel.com>
+	<6b494abe-93ae-71fc-01f3-e149df5e24b5@redhat.com>
+	<20181025132831.GG4096@habkost.net>
+From: Tao Xu <tao3.xu@intel.com>
+Message-ID: <128b40da-f34e-9a45-e798-25e33855a51f@intel.com>
+Date: Fri, 26 Oct 2018 13:53:10 +0800
 MIME-Version: 1.0
+In-Reply-To: <20181025132831.GG4096@habkost.net>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Subject: [Qemu-devel] Guest application exit point.
+Subject: Re: [Qemu-devel] [PATCH 1/1] i386: Add PKU/OSPKE on Skylake-Server
+ CPU model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,17 +31,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, rth@twiddle.net, jingqi.liu@intel.com, robert.hu@intel.com, qemu-devel@nongnu.org
 
-Hi,
+On 10/25/18 9:28 PM, Eduardo Habkost wrote:
+> On Wed, Oct 17, 2018 at 12:48:58PM +0200, Paolo Bonzini wrote:
+>> On 17/10/2018 11:30, Tao Xu wrote:
+>>> As the release document ref below link (page 13):
+>>> https://software.intel.com/sites/default/files/managed/c5/15/\
+>>> architecture-instruction-set-extensions-programming-reference.pdf
+>>>
+>>> PKU is supported in Skylake Server (Only Server) and later, and
+>>> on Intel(R) Xeon(R) Processor Scalable Family. OSPKE is to reads
+>>> the value of PKRU (Instruction of PKU) into EAX and clears EDX.
+>>> So PKU/OSPKE are supposed to be in Skylake-Server CPU model.
+>>> And PKU/OSPKE 's CPUID has been exposed to QEMU. But PKU/OSPKE
+>>> can't be find in Skylake-Server CPU model in the code.
+>>> So this patch will fix PKU/OSPKE this issue in Skylake-Server
+>>> CPU model.
+>> OSPKE is not needed, since it is added automatically based on CR4 (and
+>> is not set on boot).
+> Correct.
+>
+>> Also, the guru of CPU model compatibility is Eduardo, so I'll wait for
+>> him to chime in anyway.
+> Sorry for taking so long to reply.  This can be safely done only
+> if every host that is able to run Skylake-Server today is
+> guaranteed to support PKU.  Is that the case?
+>
+> You'll also need Skylake-Server-*-cpu.pku=off entries on
+> PC_COMPAT_3_0 to keep PKU disabled on pc-*-3.0 and older.
+>
+Thank you Eduardo,
 
-I am implementing a plugin that allocates several resources. I need to 
-cleanup some of these resources when QEMU finishes executing the guest 
-application. Where is the best exit point to place my cleanup functions?
 
-I have tried registering a function call "atexit" but it does not seem 
-to work. Any suggestions? At the moment, I am looking for a solution for 
-x86_64 (user emulation mode).
+But I can't find PC_COMPAT_3_0 in  include/hw/i386/pc.h. Will it exist on
 
-Kind regards,
-Rafael
+QEMU 3.1 and will I add "pku=off" after QEMU 3.1  release?
+
+
+Best Regard
+
+Tao Xu
