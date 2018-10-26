@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37604)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <max7255@yandex-team.ru>) id 1gFpbm-0002v6-Af
-	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 20:04:11 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <max7255@yandex-team.ru>) id 1gFpbk-0007eK-Hy
+	(envelope-from <max7255@yandex-team.ru>) id 1gFpbm-0002v5-A8
 	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 20:04:10 -0400
-Received: from forwardcorp1j.cmail.yandex.net ([2a02:6b8:0:1630::190]:34835)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <max7255@yandex-team.ru>) id 1gFpbk-0007eJ-Hx
+	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 20:04:10 -0400
+Received: from forwardcorp1j.cmail.yandex.net ([2a02:6b8:0:1630::190]:34832)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <max7255@yandex-team.ru>)
-	id 1gFpbk-0007dP-0C
+	id 1gFpbk-0007dL-0D
 	for qemu-devel@nongnu.org; Thu, 25 Oct 2018 20:04:08 -0400
-Received: from mxbackcorp2j.mail.yandex.net (mxbackcorp2j.mail.yandex.net
-	[IPv6:2a02:6b8:0:1619::119])
-	by forwardcorp1j.cmail.yandex.net (Yandex) with ESMTP id 0F65F20F6F
-	for <qemu-devel@nongnu.org>; Fri, 26 Oct 2018 03:04:05 +0300 (MSK)
+Received: from mxbackcorp1o.mail.yandex.net (mxbackcorp1o.mail.yandex.net
+	[IPv6:2a02:6b8:0:1a2d::301])
+	by forwardcorp1j.cmail.yandex.net (Yandex) with ESMTP id 637D920F69
+	for <qemu-devel@nongnu.org>; Fri, 26 Oct 2018 03:04:04 +0300 (MSK)
 From: Maxim Samoylov <max7255@yandex-team.ru>
-Date: Fri, 26 Oct 2018 03:03:42 +0300
-Message-Id: <1540512223-21199-4-git-send-email-max7255@yandex-team.ru>
+Date: Fri, 26 Oct 2018 03:03:41 +0300
+Message-Id: <1540512223-21199-3-git-send-email-max7255@yandex-team.ru>
 In-Reply-To: <1540512223-21199-1-git-send-email-max7255@yandex-team.ru>
 References: <1540512223-21199-1-git-send-email-max7255@yandex-team.ru>
-Subject: [Qemu-devel] [PATCH RFC 3/4] slirp: add helpers for ipv6 hostfwd
- manipulation
+Subject: [Qemu-devel] [PATCH RFC 2/4] slirp: add helper for udp6 socket
+ creation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,80 +34,78 @@ Cc: max7255@yandex-team.ru
 
 Signed-off-by: Maxim Samoylov <max7255@yandex-team.ru>
 ---
- slirp/libslirp.h |  6 ++++++
- slirp/slirp.c    | 43 +++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 49 insertions(+)
+ slirp/udp.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ slirp/udp.h |  2 ++
+ 2 files changed, 50 insertions(+)
 
-diff --git a/slirp/libslirp.h b/slirp/libslirp.h
-index 42e42e9..3710650 100644
---- a/slirp/libslirp.h
-+++ b/slirp/libslirp.h
-@@ -34,6 +34,12 @@ int slirp_add_hostfwd(Slirp *slirp, int is_udp,
-                       struct in_addr guest_addr, int guest_port);
- int slirp_remove_hostfwd(Slirp *slirp, int is_udp,
-                          struct in_addr host_addr, int host_port);
-+int slirp_add_ipv6_hostfwd(Slirp *slirp, int is_udp,
-+                           struct in6_addr host_addr, int host_port,
-+                           struct in6_addr guest_addr, int guest_port);
-+int slirp_remove_ipv6_hostfwd(Slirp *slirp, int is_udp,
-+                              struct in6_addr host_addr, int host_port);
-+
- int slirp_add_exec(Slirp *slirp, int do_pty, const void *args,
-                    struct in_addr *guest_addr, int guest_port);
+diff --git a/slirp/udp.c b/slirp/udp.c
+index e5bf065..ab24935 100644
+--- a/slirp/udp.c
++++ b/slirp/udp.c
+@@ -366,3 +366,51 @@ udp_listen(Slirp *slirp, uint32_t haddr, u_int hport, uint32_t laddr,
  
-diff --git a/slirp/slirp.c b/slirp/slirp.c
-index 51de41f..143ddea 100644
---- a/slirp/slirp.c
-+++ b/slirp/slirp.c
-@@ -1065,6 +1065,49 @@ int slirp_add_hostfwd(Slirp *slirp, int is_udp, struct in_addr host_addr,
-     return 0;
+ 	return so;
  }
- 
-+int slirp_remove_ipv6_hostfwd(Slirp *slirp, int is_udp,
-+                              struct in6_addr host_addr, int host_port)
++
++struct socket *
++udp6_listen(Slirp *slirp, struct in6_addr haddr, u_int hport,
++            struct in6_addr laddr, u_int lport, int flags)
 +{
-+    struct socket *so;
-+    struct socket *head = (is_udp ? &slirp->udb : &slirp->tcb);
 +    struct sockaddr_in6 addr;
-+    int port = htons(host_port);
-+    socklen_t addr_len;
++    struct socket *so;
++    socklen_t addrlen = sizeof(addr);
 +
-+    for (so = head->so_next; so != head; so = so->so_next) {
-+        addr_len = sizeof(addr);
-+        if ((so->so_state & SS_HOSTFWD) &&
-+            getsockname(so->s, (struct sockaddr *)&addr, &addr_len) == 0 &&
-+            addr_len == sizeof(host_addr) &&
-+            !memcmp(&host_addr, &addr, addr_len) &&
-+            addr.sin6_port == port) {
++    memset(&addr, 0, sizeof(addr));
 +
-+            close(so->s);
++    so = socreate(slirp);
++    if (!so) {
++        return NULL;
++    }
++    so->s = qemu_socket(AF_INET6, SOCK_DGRAM, 0);
++        if (so->s < 0) {
 +            sofree(so);
-+            return 0;
++            return NULL;
 +        }
++    so->so_expire = curtime + SO_EXPIRE;
++    insque(so, &slirp->udb);
++
++    addr.sin6_family = AF_INET6;
++    addr.sin6_addr = haddr;
++    addr.sin6_port = hport;
++
++    if (bind(so->s, (struct sockaddr *)&addr, addrlen) < 0) {
++        udp_detach(so);
++        return NULL;
++    }
++    socket_set_fast_reuse(so->s);
++
++    getsockname(so->s, (struct sockaddr *)&addr, &addrlen);
++    so->fhost.sin6 = addr;
++    sotranslate_accept(so);
++    so->so_lfamily = AF_INET6;
++    so->so_lport = lport;
++    so->so_laddr6 = laddr;
++    if (flags != SS_FACCEPTONCE) {
++        so->so_expire = 0;
 +    }
 +
-+    return -1;
++    so->so_state &= SS_PERSISTENT_MASK;
++    so->so_state |= SS_ISFCONNECTED | flags;
++
++    return so;
 +}
-+
-+int slirp_add_ipv6_hostfwd(Slirp *slirp, int is_udp,
-+                          struct in6_addr host_addr, int host_port,
-+                          struct in6_addr guest_addr, int guest_port)
-+{
-+    if (is_udp) {
-+        if (!udp6_listen(slirp, host_addr, htons(host_port),
-+                         guest_addr, htons(guest_port), SS_HOSTFWD))
-+            return -1;
-+    } else {
-+        if (!tcp6_listen(slirp, host_addr, htons(host_port),
-+                         guest_addr, htons(guest_port), SS_HOSTFWD))
-+            return -1;
-+    }
-+
-+    return 0;
-+}
-+
- int slirp_add_exec(Slirp *slirp, int do_pty, const void *args,
-                    struct in_addr *guest_addr, int guest_port)
- {
+diff --git a/slirp/udp.h b/slirp/udp.h
+index be657cf..862c6e8 100644
+--- a/slirp/udp.h
++++ b/slirp/udp.h
+@@ -80,6 +80,8 @@ int udp_attach(struct socket *, unsigned short af);
+ void udp_detach(struct socket *);
+ struct socket * udp_listen(Slirp *, uint32_t, u_int, uint32_t, u_int,
+                            int);
++struct socket *udp6_listen(Slirp *slirp, struct in6_addr, u_int,
++                            struct in6_addr, u_int, int);
+ int udp_output(struct socket *so, struct mbuf *m,
+                 struct sockaddr_in *saddr, struct sockaddr_in *daddr,
+                 int iptos);
 -- 
 2.7.4
