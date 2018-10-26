@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gG4dJ-0003Qv-CZ
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 12:06:46 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1gG4dh-0003pQ-Fu
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 12:07:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gG4dE-0000bH-Vg
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 12:06:45 -0400
-Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:52145)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gG4dE-0000X6-GA
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 12:06:40 -0400
-Received: by mail-wm1-x336.google.com with SMTP id 143-v6so2008132wmf.1
-	for <qemu-devel@nongnu.org>; Fri, 26 Oct 2018 09:06:26 -0700 (PDT)
-References: <20181025144644.15464-1-cota@braap.org>
-	<20181025144644.15464-70-cota@braap.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <6837d44e-f611-a711-4c11-efa916319e42@linaro.org>
-Date: Fri, 26 Oct 2018 17:06:23 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181025144644.15464-70-cota@braap.org>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <amarkovic@wavecomp.com>) id 1gG4db-0000mG-JM
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 12:07:09 -0400
+Received: from mail-sn1nam01on0712.outbound.protection.outlook.com
+	([2a01:111:f400:fe40::712]:29632
+	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1gG4db-0000lo-Cz
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 12:07:03 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Fri, 26 Oct 2018 16:06:57 +0000
+Message-ID: <BN6PR2201MB12510E130C76B60DA64DADE4C6F00@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <1540563667-23300-1-git-send-email-stefan.markovic@rt-rk.com>,
+	<1540563667-23300-6-git-send-email-stefan.markovic@rt-rk.com>
+In-Reply-To: <1540563667-23300-6-git-send-email-stefan.markovic@rt-rk.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v4 70/71] cpus-common: move exclusive_idle
- higher in the file
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 5/6] Determine the desired FPU mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,17 +31,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+To: Stefan Markovic <stefan.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Petar Jovanovic <pjovanovic@wavecomp.com>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "laurent@vivier.eu" <laurent@vivier.eu>
 
-On 10/25/18 3:46 PM, Emilio G. Cota wrote:
-> This will simplify the following commit's diff.
-> 
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
+> Subject: [PATCH 5/6] Determine the desired FPU mode
+>=20
+> From: Stefan Markovic <smarkovic@wavecomp.com>
+>=20
+> Floating-point mode is calculated from MIPS.abiflags FP ABI value
+> (based on kernel implementation). Illegal combinations are rejected.
+>=20
+> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 > ---
->  cpus-common.c | 18 +++++++++---------
->  1 file changed, 9 insertions(+), 9 deletions(-)
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-r~
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
