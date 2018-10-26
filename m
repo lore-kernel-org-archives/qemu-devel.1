@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40367)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gG2HM-0002ku-T5
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 09:35:57 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1gG2Ks-0005Un-B4
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 09:39:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gG2HJ-0000aQ-OC
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 09:35:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44702)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gG2HJ-0000Zo-E6
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 09:35:53 -0400
-Date: Fri, 26 Oct 2018 14:35:46 +0100
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20181026133546.GA5411@xz-x1>
-References: <20181022110854.10284-1-fli@suse.com>
-	<20181024212742.GB30830@xz-x1.hotspot.internet-for-guests.com>
-	<45194647-7b30-df97-5517-1c758947a91e@suse.com>
-	<20181025113229.GC30830@xz-x1.hotspot.internet-for-guests.com>
-	<f528529e-e0e8-0264-422c-36e1a3881c49@suse.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1gG2Km-0003eP-HD
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 09:39:34 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37526)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gG2Ki-0003ba-Lk
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 09:39:26 -0400
+Received: by mail-wr1-x441.google.com with SMTP id g9-v6so1410154wrq.4
+	for <qemu-devel@nongnu.org>; Fri, 26 Oct 2018 06:39:24 -0700 (PDT)
+References: <20181025144644.15464-1-cota@braap.org>
+	<20181025144644.15464-36-cota@braap.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20181025144644.15464-36-cota@braap.org>
+Date: Fri, 26 Oct 2018 14:39:21 +0100
+Message-ID: <87d0rw25fa.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <f528529e-e0e8-0264-422c-36e1a3881c49@suse.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC 0/2] Fix migration issues
+Subject: Re: [Qemu-devel] [RFC v4 36/71] arm: convert to
+ cpu_interrupt_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,98 +31,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fei Li <fli@suse.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, quintela@redhat.com
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
 
-On Fri, Oct 26, 2018 at 09:10:19PM +0800, Fei Li wrote:
->=20
->=20
-> On 10/25/2018 08:58 PM, Peter Xu wrote:
-> > On Thu, Oct 25, 2018 at 05:04:00PM +0800, Fei Li wrote:
-> >=20
-> > [...]
-> >=20
-> > > @@ -1325,22 +1325,24 @@ bool multifd_recv_all_channels_created(void=
-)
-> > >  =C2=A0/* Return true if multifd is ready for the migration, otherw=
-ise false */
-> > >  =C2=A0bool multifd_recv_new_channel(QIOChannel *ioc)
-> > >  =C2=A0{
-> > > +=C2=A0=C2=A0=C2=A0 MigrationIncomingState *mis =3D migration_incom=
-ing_get_current();
-> > >  =C2=A0=C2=A0=C2=A0=C2=A0 MultiFDRecvParams *p;
-> > >  =C2=A0=C2=A0=C2=A0=C2=A0 Error *local_err =3D NULL;
-> > >  =C2=A0=C2=A0=C2=A0=C2=A0 int id;
-> > >=20
-> > >  =C2=A0=C2=A0=C2=A0=C2=A0 id =3D multifd_recv_initial_packet(ioc, &=
-local_err);
-> > >  =C2=A0=C2=A0=C2=A0=C2=A0 if (id < 0) {
-> > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 multifd_recv_terminate_=
-threads(local_err);
-> > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return false;
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_reportf_err(local=
-_err,
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 "failed to receive packet via multifd channel %x:
-> > > ",
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 multifd_recv_state->count);
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto fail;
-> > >  =C2=A0=C2=A0=C2=A0=C2=A0 }
-> > >=20
-> > >  =C2=A0=C2=A0=C2=A0=C2=A0 p =3D &multifd_recv_state->params[id];
-> > >  =C2=A0=C2=A0=C2=A0=C2=A0 if (p->c !=3D NULL) {
-> > >  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg(&local=
-_err, "multifd: received id '%d' already setup'",
-> > >  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 id);
-> > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 multifd_recv_terminate_=
-threads(local_err);
-> > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return false;
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto fail;
-> > >  =C2=A0=C2=A0=C2=A0=C2=A0 }
-> > >  =C2=A0=C2=A0=C2=A0=C2=A0 p->c =3D ioc;
-> > >  =C2=A0=C2=A0=C2=A0=C2=A0 object_ref(OBJECT(ioc));
-> > > @@ -1352,6 +1354,11 @@ bool multifd_recv_new_channel(QIOChannel *io=
-c)
-> > >  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-QEMU_THREAD_JOINABLE);
-> > >  =C2=A0=C2=A0=C2=A0=C2=A0 atomic_inc(&multifd_recv_state->count);
-> > >  =C2=A0=C2=A0=C2=A0=C2=A0 return multifd_recv_state->count =3D=3D m=
-igrate_multifd_channels();
-> > > +fail:
-> > > +=C2=A0=C2=A0=C2=A0 multifd_recv_terminate_threads(local_err);
-> > > +=C2=A0=C2=A0=C2=A0 qemu_fclose(mis->from_src_file);
-> > > +=C2=A0=C2=A0=C2=A0 mis->from_src_file =3D NULL;
-> > > +=C2=A0=C2=A0=C2=A0 exit(EXIT_FAILURE);
-> > >  =C2=A0}
-> > Yeah I think it makes sense to at least report some details when erro=
-r
-> > happens, but I'm not sure whether it's good to explicitly exit() here=
-.
-> > IMHO you can add an Error** in multifd_recv_new_channel() parameter
-> > list to do that, and even through migration_ioc_process_incoming().
-> > What do you think?
-> >=20
-> > Regards,
-> >=20
-> You mean exit() in migration_ioc_process_incoming(), or further
-> caller migration_channel_process_incoming()? Actually either is
-> ok for me. :) But today I find if using postcopy and multifd together
-> to do live migration, it seems the hang still occurs even with the
-> above codes, so sad about that. I will keep debugging and see
-> how to fix this.
 
-Maybe you can move the error_report_err() in
-migration_channel_process_incoming() out of the TLS path so we can
-report the error if either TLS or non-TLS case got something wrong.
+Emilio G. Cota <cota@braap.org> writes:
 
-And I don't even know whether multifd could work with postcopy...
+> Cc: Peter Maydell <peter.maydell@linaro.org>
 
-Regards,
+This will need to catch-up in the next re-base as there is a merge conflict.
 
---=20
-Peter Xu
+> Cc: qemu-arm@nongnu.org
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+> ---
+>  target/arm/cpu.c    |  2 +-
+>  target/arm/helper.c | 12 +++++-------
+>  2 files changed, 6 insertions(+), 8 deletions(-)
+>
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index 9c5cda8eb7..7330c2dae1 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -49,7 +49,7 @@ static bool arm_cpu_has_work(CPUState *cs)
+>      ARMCPU *cpu =3D ARM_CPU(cs);
+>
+>      return (cpu->power_state !=3D PSCI_OFF)
+> -        && cs->interrupt_request &
+> +        && cpu_interrupt_request(cs) &
+>          (CPU_INTERRUPT_FIQ | CPU_INTERRUPT_HARD
+>           | CPU_INTERRUPT_VFIQ | CPU_INTERRUPT_VIRQ
+>           | CPU_INTERRUPT_EXITTB);
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index c83f7c1109..454954a56c 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -1294,11 +1294,12 @@ static uint64_t isr_read(CPUARMState *env, const =
+ARMCPRegInfo *ri)
+>  {
+>      CPUState *cs =3D ENV_GET_CPU(env);
+>      uint64_t ret =3D 0;
+> +    uint32_t interrupt_request =3D cpu_interrupt_request(cs);
+>
+> -    if (cs->interrupt_request & CPU_INTERRUPT_HARD) {
+> +    if (interrupt_request & CPU_INTERRUPT_HARD) {
+>          ret |=3D CPSR_I;
+>      }
+> -    if (cs->interrupt_request & CPU_INTERRUPT_FIQ) {
+> +    if (interrupt_request & CPU_INTERRUPT_FIQ) {
+>          ret |=3D CPSR_F;
+>      }
+>      /* External aborts are not possible in QEMU so A bit is always clear=
+ */
+> @@ -8579,10 +8580,7 @@ void arm_cpu_do_interrupt(CPUState *cs)
+>          return;
+>      }
+>
+> -    /* Hooks may change global state so BQL should be held, also the
+> -     * BQL needs to be held for any modification of
+> -     * cs->interrupt_request.
+> -     */
+> +    /* Hooks may change global state so BQL should be held */
+>      g_assert(qemu_mutex_iothread_locked());
+>
+>      arm_call_pre_el_change_hook(cpu);
+> @@ -8597,7 +8595,7 @@ void arm_cpu_do_interrupt(CPUState *cs)
+>      arm_call_el_change_hook(cpu);
+>
+>      if (!kvm_enabled()) {
+> -        cs->interrupt_request |=3D CPU_INTERRUPT_EXITTB;
+> +        cpu_interrupt_request_or(cs, CPU_INTERRUPT_EXITTB);
+>      }
+>  }
+
+
+--
+Alex Benn=C3=A9e
