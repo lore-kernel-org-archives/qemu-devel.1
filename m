@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50000)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50642)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gG4JM-00041v-Ai
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 11:46:11 -0400
+	(envelope-from <laurent@vivier.eu>) id 1gG4JO-0004sw-8c
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 11:46:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gG46n-0005Kw-Mm
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 11:33:13 -0400
+	(envelope-from <laurent@vivier.eu>) id 1gG46n-0005K1-IT
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 11:33:11 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Fri, 26 Oct 2018 17:31:12 +0200
-Message-Id: <20181026153125.24738-8-laurent@vivier.eu>
+Date: Fri, 26 Oct 2018 17:31:11 +0200
+Message-Id: <20181026153125.24738-7-laurent@vivier.eu>
 In-Reply-To: <20181026153125.24738-1-laurent@vivier.eu>
 References: <20181026153125.24738-1-laurent@vivier.eu>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 07/20] scripts/decodetree.py: remove unused
- imports
+Subject: [Qemu-devel] [PULL 06/20] docs/devel/testing.rst: add missing
+ newlines after code block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +25,52 @@ Cc: Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>, Jason 
 
 From: Cleber Rosa <crosa@redhat.com>
 
+The line immediate following a ".. code::" block is considered
+to contains arguments to the "code directive".  The lack of a
+new line gives me during at parse time:
+
+   testing.rst:63: (ERROR/3) Error in "code" directive:
+   maximum 1 argument(s) allowed, 3 supplied.
+
+   .. code::
+     make check-unit V=1
+
+   testing.rst:120: (ERROR/3) Error in "code" directive:
+   maximum 1 argument(s) allowed, 3 supplied.
+
+   .. code::
+     make check-qtest V=1
+
+Let's add the missing newlines, both for consistency and to
+avoid the parsing errors.
+
 Signed-off-by: Cleber Rosa <crosa@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20181004161852.11673-8-crosa@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Message-Id: <20181004161852.11673-6-crosa@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- scripts/decodetree.py | 2 --
- 1 file changed, 2 deletions(-)
+ docs/devel/testing.rst | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/scripts/decodetree.py b/scripts/decodetree.py
-index 277f9a9bba..457cffea90 100755
---- a/scripts/decodetree.py
-+++ b/scripts/decodetree.py
-@@ -149,12 +149,10 @@
- #   trans_addl_i(ctx, &arg_opi, insn)
- #
+diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
+index fcfad87614..a227754f86 100644
+--- a/docs/devel/testing.rst
++++ b/docs/devel/testing.rst
+@@ -59,6 +59,7 @@ variable (which affects memory reclamation and catches invalid pointers better)
+ and gtester options. If necessary, you can run
  
--import io
- import os
- import re
- import sys
- import getopt
--import pdb
+ .. code::
++
+   make check-unit V=1
  
- insnwidth = 32
- insnmask = 0xffffffff
+ and copy the actual command line which executes the unit test, then run
+@@ -116,6 +117,7 @@ and using gdb on the test is still simple to do: find out the actual command
+ from the output of
+ 
+ .. code::
++
+   make check-qtest V=1
+ 
+ which you can run manually.
 -- 
 2.17.2
