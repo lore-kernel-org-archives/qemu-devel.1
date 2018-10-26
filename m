@@ -1,29 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59989)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60010)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gFxTc-0000gN-M3
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 04:28:19 -0400
+	(envelope-from <luc.michel@greensocs.com>) id 1gFxU8-0000gX-JZ
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 04:28:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gFxNp-0007el-Ra
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 04:22:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51772)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gFxNp-0007Uk-Je
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 04:22:17 -0400
-Date: Fri, 26 Oct 2018 05:22:13 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181026082213.GJ4096@habkost.net>
-References: <20181017093053.8811-1-tao3.xu@intel.com>
-	<20181017093053.8811-2-tao3.xu@intel.com>
-	<6b494abe-93ae-71fc-01f3-e149df5e24b5@redhat.com>
-	<20181025132831.GG4096@habkost.net>
-	<128b40da-f34e-9a45-e798-25e33855a51f@intel.com>
+	(envelope-from <luc.michel@greensocs.com>) id 1gFxJY-0004y3-FR
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 04:17:53 -0400
+From: Luc Michel <luc.michel@greensocs.com>
+Date: Fri, 26 Oct 2018 10:16:53 +0200
+Message-Id: <20181026081653.24602-17-luc.michel@greensocs.com>
+In-Reply-To: <20181026081653.24602-1-luc.michel@greensocs.com>
+References: <20181026081653.24602-1-luc.michel@greensocs.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <128b40da-f34e-9a45-e798-25e33855a51f@intel.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/1] i386: Add PKU/OSPKE on Skylake-Server
- CPU model
+Subject: [Qemu-devel] [PATCH v3 16/16] arm/xlnx-zynqmp: put APUs and RPUs in
+ separate CPU clusters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,50 +22,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tao Xu <tao3.xu@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, rth@twiddle.net, jingqi.liu@intel.com, robert.hu@intel.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Luc Michel <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, alistair@alistair23.me, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, mark.burton@greensocs.com, Eduardo Habkost <ehabkost@redhat.com>
 
-On Fri, Oct 26, 2018 at 01:53:10PM +0800, Tao Xu wrote:
-> On 10/25/18 9:28 PM, Eduardo Habkost wrote:
-> > On Wed, Oct 17, 2018 at 12:48:58PM +0200, Paolo Bonzini wrote:
-> > > On 17/10/2018 11:30, Tao Xu wrote:
-> > > > As the release document ref below link (page 13):
-> > > > https://software.intel.com/sites/default/files/managed/c5/15/\
-> > > > architecture-instruction-set-extensions-programming-reference.pdf
-> > > >=20
-> > > > PKU is supported in Skylake Server (Only Server) and later, and
-> > > > on Intel(R) Xeon(R) Processor Scalable Family. OSPKE is to reads
-> > > > the value of PKRU (Instruction of PKU) into EAX and clears EDX.
-> > > > So PKU/OSPKE are supposed to be in Skylake-Server CPU model.
-> > > > And PKU/OSPKE 's CPUID has been exposed to QEMU. But PKU/OSPKE
-> > > > can't be find in Skylake-Server CPU model in the code.
-> > > > So this patch will fix PKU/OSPKE this issue in Skylake-Server
-> > > > CPU model.
-> > > OSPKE is not needed, since it is added automatically based on CR4 (=
-and
-> > > is not set on boot).
-> > Correct.
-> >=20
-> > > Also, the guru of CPU model compatibility is Eduardo, so I'll wait =
-for
-> > > him to chime in anyway.
-> > Sorry for taking so long to reply.  This can be safely done only
-> > if every host that is able to run Skylake-Server today is
-> > guaranteed to support PKU.  Is that the case?
-> >=20
-> > You'll also need Skylake-Server-*-cpu.pku=3Doff entries on
-> > PC_COMPAT_3_0 to keep PKU disabled on pc-*-3.0 and older.
-> >=20
-> Thank you Eduardo,
->=20
->=20
-> But I can't find PC_COMPAT_3_0 in=A0 include/hw/i386/pc.h. Will it exis=
-t on
->=20
-> QEMU 3.1 and will I add "pku=3Doff" after QEMU 3.1=A0 release?
+Create two separate CPU clusters for APUs and RPUs.
 
-PC_COMPAT_3_0 was added to qemu.git master a few weeks ago, by
-commit 9b4cf107b09d18ac30f46fd1c4de8585ccba030c.
+Signed-off-by: Luc Michel <luc.michel@greensocs.com>
+---
+ include/hw/arm/xlnx-zynqmp.h |  3 +++
+ hw/arm/xlnx-zynqmp.c         | 23 +++++++++++++++++++----
+ 2 files changed, 22 insertions(+), 4 deletions(-)
 
+diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
+index 98f925ab84..591515c760 100644
+--- a/include/hw/arm/xlnx-zynqmp.h
++++ b/include/hw/arm/xlnx-zynqmp.h
+@@ -29,10 +29,11 @@
+ #include "hw/dma/xlnx_dpdma.h"
+ #include "hw/dma/xlnx-zdma.h"
+ #include "hw/display/xlnx_dp.h"
+ #include "hw/intc/xlnx-zynqmp-ipi.h"
+ #include "hw/timer/xlnx-zynqmp-rtc.h"
++#include "hw/cpu/cluster.h"
+=20
+ #define TYPE_XLNX_ZYNQMP "xlnx,zynqmp"
+ #define XLNX_ZYNQMP(obj) OBJECT_CHECK(XlnxZynqMPState, (obj), \
+                                        TYPE_XLNX_ZYNQMP)
+=20
+@@ -75,10 +76,12 @@
+ typedef struct XlnxZynqMPState {
+     /*< private >*/
+     DeviceState parent_obj;
+=20
+     /*< public >*/
++    CPUClusterState apu_cluster;
++    CPUClusterState rpu_cluster;
+     ARMCPU apu_cpu[XLNX_ZYNQMP_NUM_APU_CPUS];
+     ARMCPU rpu_cpu[XLNX_ZYNQMP_NUM_RPU_CPUS];
+     GICState gic;
+     MemoryRegion gic_mr[XLNX_ZYNQMP_GIC_REGIONS][XLNX_ZYNQMP_GIC_ALIASES=
+];
+=20
+diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+index c195040350..7cc01f0b77 100644
+--- a/hw/arm/xlnx-zynqmp.c
++++ b/hw/arm/xlnx-zynqmp.c
+@@ -176,16 +176,23 @@ static void xlnx_zynqmp_create_rpu(XlnxZynqMPState =
+*s, const char *boot_cpu,
+ {
+     Error *err =3D NULL;
+     int i;
+     int num_rpus =3D MIN(smp_cpus - XLNX_ZYNQMP_NUM_APU_CPUS, XLNX_ZYNQM=
+P_NUM_RPU_CPUS);
+=20
++    object_initialize_child(OBJECT(s), "rpu-cluster", &s->rpu_cluster,
++                            sizeof(s->rpu_cluster), TYPE_CPU_CLUSTER,
++                            &error_abort, NULL);
++
++    qdev_prop_set_uint32(DEVICE(&s->rpu_cluster), "cluster-id", 1);
++    qdev_init_nofail(DEVICE(&s->rpu_cluster));
++
+     for (i =3D 0; i < num_rpus; i++) {
+         char *name;
+=20
+         object_initialize(&s->rpu_cpu[i], sizeof(s->rpu_cpu[i]),
+                           "cortex-r5f-" TYPE_ARM_CPU);
+-        object_property_add_child(OBJECT(s), "rpu-cpu[*]",
++        object_property_add_child(OBJECT(&s->rpu_cluster), "rpu-cpu[*]",
+                                   OBJECT(&s->rpu_cpu[i]), &error_abort);
+=20
+         name =3D object_get_canonical_path_component(OBJECT(&s->rpu_cpu[=
+i]));
+         if (strcmp(name, boot_cpu)) {
+             /* Secondary CPUs start in PSCI powered-down state */
+@@ -211,14 +218,19 @@ static void xlnx_zynqmp_init(Object *obj)
+ {
+     XlnxZynqMPState *s =3D XLNX_ZYNQMP(obj);
+     int i;
+     int num_apus =3D MIN(smp_cpus, XLNX_ZYNQMP_NUM_APU_CPUS);
+=20
++    object_initialize_child(obj, "apu-cluster", &s->apu_cluster,
++                            sizeof(s->apu_cluster), TYPE_CPU_CLUSTER,
++                            &error_abort, NULL);
++
+     for (i =3D 0; i < num_apus; i++) {
+-        object_initialize_child(obj, "apu-cpu[*]", &s->apu_cpu[i],
+-                                sizeof(s->apu_cpu[i]),
+-                                "cortex-a53-" TYPE_ARM_CPU, &error_abort=
+, NULL);
++        object_initialize_child(OBJECT(&s->apu_cluster), "apu-cpu[*]",
++                                &s->apu_cpu[i], sizeof(s->apu_cpu[i]),
++                                "cortex-a53-" TYPE_ARM_CPU, &error_abort=
+,
++                                NULL);
+     }
+=20
+     sysbus_init_child_obj(obj, "gic", &s->gic, sizeof(s->gic),
+                           gic_class_name());
+=20
+@@ -331,10 +343,13 @@ static void xlnx_zynqmp_realize(DeviceState *dev, E=
+rror **errp)
+     qdev_prop_set_uint32(DEVICE(&s->gic), "num-cpu", num_apus);
+     qdev_prop_set_bit(DEVICE(&s->gic), "has-security-extensions", s->sec=
+ure);
+     qdev_prop_set_bit(DEVICE(&s->gic),
+                       "has-virtualization-extensions", s->virt);
+=20
++    qdev_prop_set_uint32(DEVICE(&s->apu_cluster), "cluster-id", 0);
++    qdev_init_nofail(DEVICE(&s->apu_cluster));
++
+     /* Realize APUs before realizing the GIC. KVM requires this.  */
+     for (i =3D 0; i < num_apus; i++) {
+         char *name;
+=20
+         object_property_set_int(OBJECT(&s->apu_cpu[i]), QEMU_PSCI_CONDUI=
+T_SMC,
 --=20
-Eduardo
+2.19.1
