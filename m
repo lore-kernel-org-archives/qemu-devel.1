@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49835)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gG4IG-0003lx-9u
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 11:45:03 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1gG4IT-00041t-Iv
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 11:45:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gG4GD-0000ui-4W
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 11:42:56 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:39221)
+	(envelope-from <richard.henderson@linaro.org>) id 1gG4IQ-00021j-Cz
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 11:45:13 -0400
+Received: from mail-pg1-x534.google.com ([2607:f8b0:4864:20::534]:42583)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gG4GC-0000uN-LN
-	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 11:42:53 -0400
-Received: by mail-pl1-x643.google.com with SMTP id b5-v6so76100pla.6
-	for <qemu-devel@nongnu.org>; Fri, 26 Oct 2018 08:42:52 -0700 (PDT)
-Date: Fri, 26 Oct 2018 08:42:49 -0700 (PDT)
-In-Reply-To: <35fa718e-1ee0-9ed1-9af3-045852275c7d@mail.uni-paderborn.de>
-From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-65acecc6-386e-4cfc-9be3-c2c522880ce1@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 02/29] targer/riscv: Activate decodetree
- and implemnt LUI & AUIPC
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gG4IO-0001qh-1e
+	for qemu-devel@nongnu.org; Fri, 26 Oct 2018 11:45:08 -0400
+Received: by mail-pg1-x534.google.com with SMTP id i4-v6so713401pgq.9
+	for <qemu-devel@nongnu.org>; Fri, 26 Oct 2018 08:45:08 -0700 (PDT)
+References: <20181025144644.15464-1-cota@braap.org>
+	<20181025144644.15464-42-cota@braap.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <551e66ac-cfb8-0d27-e290-75070d8b1eb9@linaro.org>
+Date: Fri, 26 Oct 2018 16:45:00 +0100
+MIME-Version: 1.0
+In-Reply-To: <20181025144644.15464-42-cota@braap.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v4 42/71] ppc: convert to
+ cpu_interrupt_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,20 +32,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Cc: richard.henderson@linaro.org, sagark@eecs.berkeley.edu, qemu-devel@nongnu.org, peer.adelt@hni.uni-paderborn.de, Alistair Francis <Alistair.Francis@wdc.com>, Michael Clark <mjc@sifive.com>
+To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
 
-On Fri, 26 Oct 2018 07:53:17 PDT (-0700), Bastian Koppelmann wrote:
->
-> On 10/26/18 3:58 PM, Richard Henderson wrote:
->> On 10/26/18 11:49 AM, Bastian Koppelmann wrote:
->>> I think you can pick up everything up to the RVC conversion which still needs
->>> the work suggested by Richard. Thanks, for picking it up :)
->> Even then I thought we were talking about splitting the RV64 insns
->> into a separate file, reducing the ifdefs, and renaming the arg-sets
->> to match the instruction formats described in the riscv spec.
->
->
-> Yes, you are right I forgot that.
+On 10/25/18 3:46 PM, Emilio G. Cota wrote:
+> Cc: David Gibson <david@gibson.dropbear.id.au>
+> Cc: Alexander Graf <agraf@suse.de>
+> Cc: qemu-ppc@nongnu.org
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+> ---
+>  hw/ppc/ppc.c                    |  2 +-
+>  target/ppc/excp_helper.c        |  2 +-
+>  target/ppc/kvm.c                |  4 ++--
+>  target/ppc/translate_init.inc.c | 14 +++++++-------
+>  4 files changed, 11 insertions(+), 11 deletions(-)
 
-OK, so I think I'll hold off for a v3, then.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+r~
