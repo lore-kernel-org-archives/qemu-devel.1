@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50133)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gGNMn-00014y-T9
-	for qemu-devel@nongnu.org; Sat, 27 Oct 2018 08:06:58 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gGTj1-0003ol-Mb
+	for qemu-devel@nongnu.org; Sat, 27 Oct 2018 14:54:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gGNMn-0006uI-3Q
-	for qemu-devel@nongnu.org; Sat, 27 Oct 2018 08:06:57 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53456)
+	(envelope-from <peter.maydell@linaro.org>) id 1gGTj0-0000sQ-Lt
+	for qemu-devel@nongnu.org; Sat, 27 Oct 2018 14:54:19 -0400
+Received: from mail-ot1-x333.google.com ([2607:f8b0:4864:20::333]:34508)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1gGNMm-0006tm-Sb
-	for qemu-devel@nongnu.org; Sat, 27 Oct 2018 08:06:57 -0400
-Received: by mail-wm1-x341.google.com with SMTP id l26-v6so3832149wmh.3
-	for <qemu-devel@nongnu.org>; Sat, 27 Oct 2018 05:06:56 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gGTj0-0000rr-A9
+	for qemu-devel@nongnu.org; Sat, 27 Oct 2018 14:54:18 -0400
+Received: by mail-ot1-x333.google.com with SMTP id e9so2545259oti.1
+	for <qemu-devel@nongnu.org>; Sat, 27 Oct 2018 11:54:17 -0700 (PDT)
 MIME-Version: 1.0
-References: <20181018182130.799406-1-stefanb@linux.vnet.ibm.com>
-In-Reply-To: <20181018182130.799406-1-stefanb@linux.vnet.ibm.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Sat, 27 Oct 2018 16:06:44 +0400
-Message-ID: <CAJ+F1C+Qj3nQ3EdBAe9MJ-th=0Re_9T1H662wphb1_LG3h=nrw@mail.gmail.com>
+In-Reply-To: <20181025215914-mutt-send-email-mst@kernel.org>
+References: <20181025005110.249256-1-mst@redhat.com>
+	<CAFEAcA9zqAOr7F_Pu1tqxJYd=4JMHa3XgR703Mb4B9LibOGB-w@mail.gmail.com>
+	<20181025215914-mutt-send-email-mst@kernel.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 27 Oct 2018 19:53:56 +0100
+Message-ID: <CAFEAcA9-g-h8S7wucyMw+kmrZLnkeCSqnXc8ohNW_KhNxLv7hw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] docs: tpm: Mention implemented TPM CRB
- interface emulation and specs
+Subject: Re: [Qemu-devel] [PULL v2 00/28] pci, pc, virtio: fixes, features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,56 +30,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: QEMU <qemu-devel@nongnu.org>, stefanb@linux.ibm.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, Oct 18, 2018 at 10:21 PM Stefan Berger
-<stefanb@linux.vnet.ibm.com> wrote:
+On 26 October 2018 at 03:00, Michael S. Tsirkin <mst@redhat.com> wrote:
+> OK  I fixed 32 bit issues. Could not reproduce the test issues,
+> could it be that it was a side effect of build issues maybe?
 >
-> Add a few sentences about the implemented emulation of the TPM CRB
-> interface and its specification.
->
-> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+> Could you retyr?
+> If it still ails I will drop the test for now.
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Compiles OK, but still asserts
+ERROR:/home/pm215/qemu/tests/bios-tables-test.c:398:load_expected_aml: assertion
+ failed: (exp_sdt.aml_file)
 
-> ---
->  docs/specs/tpm.txt | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
->
-> diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
-> index 0e9bbebe1d..1af82bba86 100644
-> --- a/docs/specs/tpm.txt
-> +++ b/docs/specs/tpm.txt
-> @@ -20,6 +20,21 @@ QEMU files related to TPM TIS interface:
->   - hw/tpm/tpm_tis.h
->
->
-> +QEMU also implements a TPM CRB interface following the Trusted Computing
-> +Group's specification "TCG PC Client Platform TPM Profile (PTP)
-> +Specification", Family "2.0", Level 00 Revision 01.03 v22, May 22, 2017.
-> +This specification, or a later version of it, can be accessed from the
-> +following URL:
-> +
-> +https://trustedcomputinggroup.org/resource/pc-client-platform-tpm-profil=
-e-ptp-specification/
-> +
-> +The CRB interface makes a memory mapped IO region in the area 0xfed40000=
- -
-> +0xfed40fff (1 locality) available to the guest operating system.
-> +
-> +QEMU files related to TPM CRB interface:
-> + - hw/tpm/tpm_crb.c
-> +
-> +
->  =3D ACPI Interface =3D
->
->  The TPM device is defined with ACPI ID "PNP0C31". QEMU builds a SSDT and=
- passes
-> --
-> 2.17.1
->
+on Linux/aarch64, Linux/arm32, Linux/SPARC, Linux/s390x.
 
+pm215@gcc113:~/qemu/build/all$
+QTEST_QEMU_BINARY=i386-softmmu/qemu-system-i386
+./tests/bios-tables-test
+/i386/acpi/piix4: OK
+/i386/acpi/q35: ^[[AOK
+/i386/acpi/piix4/bridge: OK
+/i386/acpi/piix4/ipmi: OK
+/i386/acpi/piix4/cpuhp: OK
+/i386/acpi/piix4/memhp: OK
+/i386/acpi/piix4/numamem: OK
+/i386/acpi/piix4/dimmpxm: OK
+/i386/acpi/q35/bridge: OK
+/i386/acpi/q35/mmio64: **
+ERROR:/home/pm215/qemu/tests/bios-tables-test.c:398:load_expected_aml:
+assertion failed: (exp_sdt.aml_file)
+Aborted (core dumped)
 
---=20
-Marc-Andr=C3=A9 Lureau
+With V=1 it says
+/i386/acpi/q35/mmio64:
+Looking for expected file 'tests/acpi-test-data/q35/DSDT.mmio64'
+
+Looking for expected file 'tests/acpi-test-data/q35/DSDT'
+
+Using expected file 'tests/acpi-test-data/q35/DSDT'
+
+Looking for expected file 'tests/acpi-test-data/q35/FACP.mmio64'
+
+Looking for expected file 'tests/acpi-test-data/q35/FACP'
+
+Using expected file 'tests/acpi-test-data/q35/FACP'
+
+Looking for expected file 'tests/acpi-test-data/q35/APIC.mmio64'
+
+Looking for expected file 'tests/acpi-test-data/q35/APIC'
+
+Using expected file 'tests/acpi-test-data/q35/APIC'
+
+Looking for expected file 'tests/acpi-test-data/q35/HPET.mmio64'
+
+Looking for expected file 'tests/acpi-test-data/q35/HPET'
+
+Using expected file 'tests/acpi-test-data/q35/HPET'
+
+Looking for expected file 'tests/acpi-test-data/q35/SRAT.mmio64'
+
+Looking for expected file 'tests/acpi-test-data/q35/SRAT'
+**
+ERROR:/home/pm215/qemu/tests/bios-tables-test.c:398:load_expected_aml:
+assertion failed: (exp_sdt.aml_file)
+
+ET'
+
+On an x86-64 host which works it says
+/i386/acpi/q35/mmio64:
+Looking for expected file 'tests/acpi-test-data/q35/DSDT.mmio64'
+
+Using expected file 'tests/acpi-test-data/q35/DSDT.mmio64'
+
+Looking for expected file 'tests/acpi-test-data/q35/FACP.mmio64'
+
+Looking for expected file 'tests/acpi-test-data/q35/FACP'
+
+Using expected file 'tests/acpi-test-data/q35/FACP'
+
+Looking for expected file 'tests/acpi-test-data/q35/APIC.mmio64'
+
+Looking for expected file 'tests/acpi-test-data/q35/APIC'
+
+Using expected file 'tests/acpi-test-data/q35/APIC'
+
+Looking for expected file 'tests/acpi-test-data/q35/HPET.mmio64'
+
+Looking for expected file 'tests/acpi-test-data/q35/HPET'
+
+Using expected file 'tests/acpi-test-data/q35/HPET'
+
+Looking for expected file 'tests/acpi-test-data/q35/SRAT.mmio64'
+
+Using expected file 'tests/acpi-test-data/q35/SRAT.mmio64'
+
+Looking for expected file 'tests/acpi-test-data/q35/MCFG.mmio64'
+
+Looking for expected file 'tests/acpi-test-data/q35/MCFG'
+
+Using expected file 'tests/acpi-test-data/q35/MCFG'
+OK
+
+So the difference is that the failing setup doesn't use
+the SRAT.mmio64, and there is no SRAT file available for
+fallback. (It also doesn't use DSDT.mmio64, but there there
+is a fallback DSDT file in the tests/acpi-test-data/ directory.)
+
+It looks like the test/acpi-test-data/ in the build directory
+has not been populated with the MCFG.mmio64 file -- some of
+the data files have symlinks from that directory back to the
+source directory, but some do not. This seems to be done in
+configure, but there is nothing in the makefile rules which
+causes configure to be rerun because there is a new file
+in your test data directory. A manual rerun of configure
+adds the missing symlinks and causes the test to pass.
+
+So I would characterise this as a makefile issue.
+
+(PS: can we fix the extraneous extra blank lines in the test output
+when run with V=1, please?)
+
+thanks
+-- PMM
