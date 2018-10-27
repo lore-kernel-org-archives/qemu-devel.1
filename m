@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38390)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39833)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groeck7@gmail.com>) id 1gGMON-0001xc-1d
-	for qemu-devel@nongnu.org; Sat, 27 Oct 2018 07:04:31 -0400
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gGMVO-0004S8-FX
+	for qemu-devel@nongnu.org; Sat, 27 Oct 2018 07:11:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groeck7@gmail.com>) id 1gGMOJ-00058p-Qu
-	for qemu-devel@nongnu.org; Sat, 27 Oct 2018 07:04:30 -0400
-Sender: Guenter Roeck <groeck7@gmail.com>
-References: <1540548409-22560-1-git-send-email-thuth@redhat.com>
-	<CAFEAcA8EubWya8ey9VxhaCw4m2U=KA+i2C-R9P-p+P6oEBBLew@mail.gmail.com>
-From: Guenter Roeck <linux@roeck-us.net>
-Message-ID: <7fc49925-36ff-bd9a-0cd7-e5f8d4bb3672@roeck-us.net>
-Date: Sat, 27 Oct 2018 04:04:23 -0700
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gGMVN-0001zI-Il
+	for qemu-devel@nongnu.org; Sat, 27 Oct 2018 07:11:46 -0400
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:37372)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1gGMVN-0001yQ-Am
+	for qemu-devel@nongnu.org; Sat, 27 Oct 2018 07:11:45 -0400
+Date: Sat, 27 Oct 2018 13:11:41 +0200
+From: Samuel Thibault <samuel.thibault@gnu.org>
+Message-ID: <20181027111141.tpzhv6xcrhxet6li@function>
+References: <1540512223-21199-1-git-send-email-max7255@yandex-team.ru>
+	<1540512223-21199-2-git-send-email-max7255@yandex-team.ru>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8EubWya8ey9VxhaCw4m2U=KA+i2C-R9P-p+P6oEBBLew@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/2] Deprecate the "collie" machine and
- Strongarm devices
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1540512223-21199-2-git-send-email-max7255@yandex-team.ru>
+Subject: Re: [Qemu-devel] [PATCH RFC 1/4] slirp: add helper for tcp6 socket
+ creation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,27 +29,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
+To: Maxim Samoylov <max7255@yandex-team.ru>
+Cc: qemu-devel@nongnu.org
 
-On 10/26/18 3:12 AM, Peter Maydell wrote:
-> On 26 October 2018 at 11:06, Thomas Huth <thuth@redhat.com> wrote:
->> These files lack an entry in the MAINTAINERS file, and according to
->> the initial commits, the board and devices are incomplete. Since there
->> have hardly been any commits in the past to really improve them, we
->> should consider to mark them as deprecated now.
->>
->> Thomas Huth (2):
->>    hw/arm: Deprecate the "collie" board
->>    arm: Deprecate the Strongarm sa1100 and sa1110 processors
-> 
-> Hi Guenter; there's a proposal here to deprecate (and eventually
-> remove) the 'collie' board (strongarm) from QEMU. Is that one of
-> the ones you're currently using in your automated testing of Linux
-> kernels on QEMU?
-> 
+Hello,
 
-Yes. I can run the test with older versions of qemu, so it is ok for me
-if it is removed (as long as that removal is not backported).
+Thanks for working on this!
 
-Guenter
+There is a lot of overlap with tcp_listen. It'd be much better to
+refactor it this way:
+
+struct socket *
+tcpx_listen(Slirp *slirp, struct sockaddr *addr, socklen_t *addrlen, int flags)
+{
+	... The current content of tcp_listen, with all heading and
+	trailing addr manipulations removed...
+	
+	... so->so_lfamily = addr->sa_family;...
+	... s = qemu_socket(addr->sa_family, SOCK_STREAM, 0);...
+        ... (bind(s, addr, *addrlen) < 0) ||...
+	... getsockname(s, addr, addrlen);
+}
+
+struct socket *
+tcp_listen(Slirp *slirp, uint32_t haddr, u_int hport, uint32_t laddr,
+           u_int lport, int flags)
+{
+	struct sockaddr_in addr;
+	struct socket *so;
+	socklen_t addrsize = sizeof(addr);
+
+	addr.sin_family = AF_INET;
+	addr.sin_addr.s_addr = haddr;
+	addr.sin_port = hport;
+
+	so = tcpx_listen(slirp, (struct sockaddr *) &addr, &addrsize, flags);
+
+	so->so_lport = lport; /* Kept in network format */
+	so->so_laddr.s_addr = laddr; /* Ditto */
+
+	so->so_ffamily = AF_INET;
+	so->so_fport = addr.sin_port;
+	if (addr.sin_addr.s_addr == 0 || addr.sin_addr.s_addr == loopback_addr.s_addr)
+	   so->so_faddr = slirp->vhost_addr;
+	else
+	   so->so_faddr = addr.sin_addr;
+}
+
+The v6 version then boils down to
+
+struct socket *
+tcp6_listen(Slirp *slirp, struct in6_addr haddr, u_int hport, struct
+	    in6_addr laddr, u_int lport, int flags)
+{
+	struct sockaddr_in6 addr;
+	struct socket *so;
+	socklen_t addrsize = sizeof(addr);
+
+	addr.sin6_family = AF_INET6;
+	addr.sin6_addr = haddr;
+	addr.sin6_port = hport;
+
+	so = tcpx_listen(slirp, (struct sockaddr *) &addr, &addrsize, flags);
+
+	so->so_lport6 = lport; /* Kept in network format */
+	so->so_laddr6 = laddr; /* Ditto */
+
+	so->fhost.sin6 = addr;
+	    
+	if (!memcmp(&addr.sin6_addr, &in6addr_any, sizeof(in6addr_any)) ||
+	    !memcmp(&addr.sin6_addr, &in6addr_loopback,
+	            sizeof(in6addr_loopback))) {
+	
+	    memcpy(&so->so_faddr6, &slirp->vhost_addr6, sizeof(slirp->vhost_addr6));
+	}
+}
+
+modulo all typos etc. I may have done.
+
+Maxim Samoylov, le ven. 26 oct. 2018 03:03:40 +0300, a ecrit:
+> +    qemu_setsockopt(s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int));
+
+Is there a reason why you set SO_OOBINLINE, but not TCP_NODELAY? That's
+the kind of discrepancy we don't want to let unseen, thus the reason for
+a shared implementation :)
+
+Samuel
