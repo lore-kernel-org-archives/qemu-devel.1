@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53056)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gGGFK-0001dt-TS
-	for qemu-devel@nongnu.org; Sat, 27 Oct 2018 00:30:48 -0400
+	(envelope-from <palmer@sifive.com>) id 1gGHxH-0002KL-Jp
+	for qemu-devel@nongnu.org; Sat, 27 Oct 2018 02:20:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gGGFG-0004Mp-Tu
-	for qemu-devel@nongnu.org; Sat, 27 Oct 2018 00:30:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59160)
+	(envelope-from <palmer@sifive.com>) id 1gGHxD-0004N8-5m
+	for qemu-devel@nongnu.org; Sat, 27 Oct 2018 02:20:14 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:34958)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gGGFG-0004Gw-MD
-	for qemu-devel@nongnu.org; Sat, 27 Oct 2018 00:30:42 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gGGF6-00074R-40
-	for <qemu-devel@nongnu.org>; Sat, 27 Oct 2018 04:30:32 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 13FD62E80CF
-	for <qemu-devel@nongnu.org>; Sat, 27 Oct 2018 04:30:32 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 27 Oct 2018 04:17:19 -0000
-From: Launchpad Bug Tracker <1493033@bugs.launchpad.net>
-Reply-To: Bug 1493033 <1493033@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150907121719.19946.55925.malonedeb@soybean.canonical.com>
-Message-Id: <154061383931.28633.14789522702613481643.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1493033] Re: memory leak/high memory usage with
- spice webdav feature
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gGHxC-0004Eq-NN
+	for qemu-devel@nongnu.org; Sat, 27 Oct 2018 02:20:11 -0400
+Received: by mail-pl1-x644.google.com with SMTP id n4-v6so881016plp.2
+	for <qemu-devel@nongnu.org>; Fri, 26 Oct 2018 23:20:10 -0700 (PDT)
+Date: Fri, 26 Oct 2018 23:20:08 -0700 (PDT)
+In-Reply-To: <a0916ce9-da94-7a38-52d6-61be33e3c67d@mail.uni-paderborn.de>
+From: Palmer Dabbelt <palmer@sifive.com>
+Message-ID: <mhng-98b3d015-bbe8-46ca-90fd-cec7ba3bc90f@palmer-mbp2014>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 00/29] target/riscv: Convert to
+ decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,82 +28,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: kbastian@mail.uni-paderborn.de
+Cc: sagark@eecs.berkeley.edu, richard.henderson@linaro.org, qemu-devel@nongnu.org, peer.adelt@hni.uni-paderborn.de, Alistair.Francis@wdc.com, Michael Clark <mjc@sifive.com>
 
-[Expired for QEMU because there has been no activity for 60 days.]
+On Fri, 26 Oct 2018 03:53:11 PDT (-0700), kbastian@mail.uni-paderborn.de wrote:
+>
+> On 10/25/18 12:21 AM, Palmer Dabbelt wrote:
+>> On Sat, 20 Oct 2018 00:14:22 PDT (-0700),
+>> kbastian@mail.uni-paderborn.de wrote:
+>>> Hi,
+>>>
+>>> this patchset converts the RISC-V decoder to decodetree in three
+>>> major steps:
+>>>
+>>> 1) Convert 32-bit instructions to decodetree [Patch 1-14]:
+>>>     Many of the gen_* functions are called by the decode functions
+>>> for 16-bit
+>>>     and 32-bit functions. If we move translation code from the gen_*
+>>>     functions to the generated trans_* functions of decode-tree, we
+>>> get a lot of
+>>>     duplication. Therefore, we mostly generate calls to the old gen_*
+>>> function
+>>>     which are properly replaced after step 2).
+>>>
+>>>     Each of the trans_ functions are grouped into files corresponding
+>>> to their
+>>>     ISA extension, e.g. addi which is in RV32I is translated in the file
+>>>     'trans_rvi.inc.c'.
+>>>
+>>> 2) Convert 16-bit instructions to decodetree [Patch 15-17]:
+>>>     All 16 bit instructions have a direct mapping to a 32 bit
+>>> instruction. Thus,
+>>>     we convert the arguments in the 16 bit trans_ function to the
+>>> arguments of
+>>>     the corresponding 32 bit instruction and call the 32 bit trans_
+>>> function.
+>>>
+>>> 3) Remove old manual decoding in gen_* function [Patch 17-28]:
+>>>     this move all manual translation code into the trans_*
+>>> instructions of
+>>>     decode tree, such that we can remove the old decode_* functions.
+>>>
+>>> the full tree can be found here:
+>>> https://github.com/bkoppelmann/qemu/tree/riscv-dt-v2
+>>
+>> Thanks!
+>>
+>> I dropped this on top of master and it appears I'm getting a bunch of
+>> oops when trying to boot Linux.  They're fairly far into the boot
+>> process and may be a mistake on my end, I was just wondering if you'd
+>> booted Linux?
+>
+> Are there non fatal oops in booting Linux? I only checked whether I
+> could get a terminal on Fedora Linux.
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+Most of the stuff past early boot is, as if it's in a userspace process or 
+kernel thread you can recover.  My system eventually made it to a shell, but 
+there was a lot of carnage on the way in -- most system services blew up.
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1493033
-
-Title:
-  memory leak/high memory usage with spice webdav feature
-
-Status in QEMU:
-  Expired
-
-Bug description:
-  This bug is being open due the comment:
-  https://bugs.freedesktop.org/show_bug.cgi?id=3D91350#c9
-
-  Description of problem:
-  When copying big files from client to guest, the memory usage in the host=
- grows by about the size of the file. This is partially spice problem due t=
-he memory pool being able to increase as much as necessary without a limit =
-which should be handled by the patches sent in the mailing list [0]
-
-  [0] http://lists.freedesktop.org/archives/spice-
-  devel/2015-August/021644.html
-
-  At the same time, massif shows high memory usage by qemu as well [1]
-  (output attached)
-
-  [1] (peak)
-  ->49.64% (267,580,319B) 0x308B89: malloc_and_trace (vl.c:2724)
-  | ->49.38% (266,167,561B) 0x67CE678: g_malloc (gmem.c:97)
-  | | ->49.03% (264,241,152B) 0x511D8E: qemu_coroutine_new (coroutine-ucont=
-ext.c:106)
-  | | | ->49.03% (264,241,152B) 0x510E24: qemu_coroutine_create (qemu-corou=
-tine.c:74)
-  (...)
-
-  The file being shared was a 320M ogv video.
-
-  Version-Release number of selected component (if applicable):
-  QEMU emulator version 2.3.93
-  SPICE and SPICE-GTK: from git master
-
-  How reproducible:
-  100%
-
-  Steps to Reproduce:
-  1-) build spice-gtk with --enable-webdav=3Dyes
-  2-) enable webdav in your VM by following:
-  https://elmarco.fedorapeople.org/manual.html#_folder_sharing
-  3-) using remote-viewer with webdav patches, connects to a fedora guest
-  4-) Open nautilus, go to 'Browse Network'
-  5-) On remote-viewer, enable shared folder by File > Preferences > [X] Sh=
-are folder
-  6-) The spice client folder should appear: Double-click to mount it.
-  7-) Check the memory of your qemu process
-  8-) Copy a big file (let's say, 300 MB) from the shared folder to local VM
-  9-) See the memory consumption of qemu grows by a lot;
-
-  Actual results:
-  Memory usage grows during copy and is not freed
-
-  Expected results:
-  Memory should have an upper limit to grow and should be freed after copy
-
-  Additional info:
-  Also reported in Fedora/rawhide: https://bugzilla.redhat.com/show_bug.cgi=
-?id=3D1256376
-  SPICE upstream bug: https://bugs.freedesktop.org/show_bug.cgi?id=3D91350
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1493033/+subscriptions
+I tested the same kernel+rootfs on master and it booted cleanly.
