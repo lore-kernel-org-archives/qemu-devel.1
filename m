@@ -1,27 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41030)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gGKgI-0005gD-FE
-	for qemu-devel@nongnu.org; Sat, 27 Oct 2018 05:14:55 -0400
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gGLL5-00068D-W6
+	for qemu-devel@nongnu.org; Sat, 27 Oct 2018 05:57:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gGKgF-0006kF-5a
-	for qemu-devel@nongnu.org; Sat, 27 Oct 2018 05:14:54 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:43840)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gGKgE-0006jL-Mn
-	for qemu-devel@nongnu.org; Sat, 27 Oct 2018 05:14:51 -0400
-Received: by mail-wr1-x444.google.com with SMTP id t10-v6so3563243wrn.10
-	for <qemu-devel@nongnu.org>; Sat, 27 Oct 2018 02:14:50 -0700 (PDT)
-References: <20181025144644.15464-1-cota@braap.org>
-	<20181025151103.GA19931@flamenco>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181025151103.GA19931@flamenco>
-Date: Sat, 27 Oct 2018 10:14:47 +0100
-Message-ID: <878t2j21ko.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] [RFC v4 00/71] per-CPU locks
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gGLL5-0003WH-3D
+	for qemu-devel@nongnu.org; Sat, 27 Oct 2018 05:57:03 -0400
+From: Peng Hao <peng.hao2@zte.com.cn>
+Date: Sun, 28 Oct 2018 02:07:30 +0800
+Message-Id: <1540663650-106694-6-git-send-email-peng.hao2@zte.com.cn>
+In-Reply-To: <1540663650-106694-1-git-send-email-peng.hao2@zte.com.cn>
+References: <1540663650-106694-1-git-send-email-peng.hao2@zte.com.cn>
+Subject: [Qemu-devel] [PATCH V5 5/5] hw/arm/virt: add pvpanic device in virt
+ acpi table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,23 +20,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Chris Wulff <crwulff@gmail.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, David Hildenbrand <david@redhat.com>, James Hogan <jhogan@kernel.org>, Anthony Green <green@moxielogic.com>, Palmer Dabbelt <palmer@sifive.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Max Filippov <jcmvbkbc@gmail.com>, Michael Clark <mjc@sifive.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Marek Vasut <marex@denx.de>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Pavel Dovgalyuk <dovgaluk@ispras.ru>, Andrzej Zaborowski <balrogg@gmail.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Fabien Chouteau <chouteau@adacore.com>, qemu-s390x@nongnu.org, qemu-arm@nongnu.org, Alistair Francis <alistair23@gmail.com>, Stafford Horne <shorne@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Cornelia Huck <cohuck@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>, Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: peter.maydell@linaro.org, philmd@redhat.com
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Peng Hao <peng.hao2@zte.com.cn>
 
+add pvpanic device in virt acpi table, so when kenrel command line uses
+acpi=force, kernel can get info from acpi table in aarch64.
 
-Emilio G. Cota <cota@braap.org> writes:
+Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+---
+ hw/arm/virt-acpi-build.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-> [I forgot to add the cover letter to git send-email; here it is]
->
-> v3: https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg04179.html
->
-> "Why is this an RFC?" See v3 link above. Also, see comment at
-> the bottom of this message regarding the last patch of this series.
-
-I'm also seeing his hang on check-tcg, specifically qemu-aarch64 ./tests/li=
-nux-test
-
-<snip>
-
---
-Alex Benn=C3=A9e
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 5785fb6..d126cee 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -61,6 +61,21 @@ static void acpi_dsdt_add_cpus(Aml *scope, int smp_cpus)
+     }
+ }
+ 
++static void acpi_dsdt_add_pvpanic(Aml *scope, const MemMapEntry *pvpanic_memmap)
++{
++    Aml *dev = aml_device("PANC");
++    aml_append(dev, aml_name_decl("_HID", aml_string("QEMU0001")));
++    aml_append(dev, aml_name_decl("_UID", aml_int(0)));
++
++    Aml *crs = aml_resource_template();
++    aml_append(crs, aml_memory32_fixed(pvpanic_memmap->base,
++                                       pvpanic_memmap->size, AML_READ_WRITE));
++
++    aml_append(dev, aml_name_decl("_CRS", crs));
++
++    aml_append(scope, dev);
++}
++
+ static void acpi_dsdt_add_uart(Aml *scope, const MemMapEntry *uart_memmap,
+                                            uint32_t uart_irq)
+ {
+@@ -770,6 +785,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+     acpi_dsdt_add_cpus(scope, vms->smp_cpus);
+     acpi_dsdt_add_uart(scope, &memmap[VIRT_UART],
+                        (irqmap[VIRT_UART] + ARM_SPI_BASE));
++    acpi_dsdt_add_pvpanic(scope, &memmap[VIRT_PVPANIC]);
+     acpi_dsdt_add_flash(scope, &memmap[VIRT_FLASH]);
+     acpi_dsdt_add_fw_cfg(scope, &memmap[VIRT_FW_CFG]);
+     acpi_dsdt_add_virtio(scope, &memmap[VIRT_MMIO],
+-- 
+1.8.3.1
