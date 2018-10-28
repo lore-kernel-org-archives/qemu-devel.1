@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40252)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55166)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gGTj1-0003ol-Mb
-	for qemu-devel@nongnu.org; Sat, 27 Oct 2018 14:54:20 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1gGaqr-00050T-5Z
+	for qemu-devel@nongnu.org; Sat, 27 Oct 2018 22:30:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gGTj0-0000sQ-Lt
-	for qemu-devel@nongnu.org; Sat, 27 Oct 2018 14:54:19 -0400
-Received: from mail-ot1-x333.google.com ([2607:f8b0:4864:20::333]:34508)
+	(envelope-from <richard.henderson@linaro.org>) id 1gGaqo-0006Py-0x
+	for qemu-devel@nongnu.org; Sat, 27 Oct 2018 22:30:53 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51066)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gGTj0-0000rr-A9
-	for qemu-devel@nongnu.org; Sat, 27 Oct 2018 14:54:18 -0400
-Received: by mail-ot1-x333.google.com with SMTP id e9so2545259oti.1
-	for <qemu-devel@nongnu.org>; Sat, 27 Oct 2018 11:54:17 -0700 (PDT)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gGaqn-0006PP-CM
+	for qemu-devel@nongnu.org; Sat, 27 Oct 2018 22:30:49 -0400
+Received: by mail-wm1-x342.google.com with SMTP id h2-v6so1053786wmb.0
+	for <qemu-devel@nongnu.org>; Sat, 27 Oct 2018 19:30:48 -0700 (PDT)
+References: <20181023070253.6407-1-richard.henderson@linaro.org>
+	<20181023070253.6407-6-richard.henderson@linaro.org>
+	<20181027001652.GA12509@flamenco>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <581bbe04-c0b5-fb55-ce96-f2378dd38968@linaro.org>
+Date: Sun, 28 Oct 2018 02:30:44 +0000
 MIME-Version: 1.0
-In-Reply-To: <20181025215914-mutt-send-email-mst@kernel.org>
-References: <20181025005110.249256-1-mst@redhat.com>
-	<CAFEAcA9zqAOr7F_Pu1tqxJYd=4JMHa3XgR703Mb4B9LibOGB-w@mail.gmail.com>
-	<20181025215914-mutt-send-email-mst@kernel.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 27 Oct 2018 19:53:56 +0100
-Message-ID: <CAFEAcA9-g-h8S7wucyMw+kmrZLnkeCSqnXc8ohNW_KhNxLv7hw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v2 00/28] pci, pc, virtio: fixes, features
+In-Reply-To: <20181027001652.GA12509@flamenco>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 04/10] cputlb: Split large page tracking
+ per mmu_idx
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,127 +33,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org
 
-On 26 October 2018 at 03:00, Michael S. Tsirkin <mst@redhat.com> wrote:
-> OK  I fixed 32 bit issues. Could not reproduce the test issues,
-> could it be that it was a side effect of build issues maybe?
->
-> Could you retyr?
-> If it still ails I will drop the test for now.
+On 10/27/18 1:16 AM, Emilio G. Cota wrote:
+> On Tue, Oct 23, 2018 at 08:02:47 +0100, Richard Henderson wrote:
+>> +static void tlb_flush_page_locked(CPUArchState *env, int midx,
+>> +                                  target_ulong addr)
+>> +{
+>> +    target_ulong lp_addr = env->tlb_d[midx].large_page_addr;
+>> +    target_ulong lp_mask = env->tlb_d[midx].large_page_mask;
+>> +
+>> +    /* Check if we need to flush due to large pages.  */
+>> +    if ((addr & lp_mask) == lp_addr) {
+>> +        tlb_debug("forcing full flush midx %d ("
+>> +                  TARGET_FMT_lx "/" TARGET_FMT_lx ")\n",
+>> +                  midx, lp_addr, lp_mask);
+>> +        tlb_flush_one_mmuidx_locked(env, midx);
+>> +    } else {
+>> +        int pidx = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
+>> +        tlb_flush_entry_locked(&env->tlb_table[midx][pidx], addr);
+>> +        tlb_flush_vtlb_page_locked(env, midx, addr);
+> 
+> Just noticed that we should use tlb_entry here, e.g.:
+> 
+>      } else {
+> -        int pidx = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
+> -        tlb_flush_entry_locked(&env->tlb_table[midx][pidx], addr);
+> +        CPUTLBEntry *entry = tlb_entry(env, midx, addr);
+> +
+> +        tlb_flush_entry_locked(entry, addr);
+>          tlb_flush_vtlb_page_locked(env, midx, addr);
+>      }
 
-Compiles OK, but still asserts
-ERROR:/home/pm215/qemu/tests/bios-tables-test.c:398:load_expected_aml: assertion
- failed: (exp_sdt.aml_file)
+Fixed, thanks.
 
-on Linux/aarch64, Linux/arm32, Linux/SPARC, Linux/s390x.
-
-pm215@gcc113:~/qemu/build/all$
-QTEST_QEMU_BINARY=i386-softmmu/qemu-system-i386
-./tests/bios-tables-test
-/i386/acpi/piix4: OK
-/i386/acpi/q35: ^[[AOK
-/i386/acpi/piix4/bridge: OK
-/i386/acpi/piix4/ipmi: OK
-/i386/acpi/piix4/cpuhp: OK
-/i386/acpi/piix4/memhp: OK
-/i386/acpi/piix4/numamem: OK
-/i386/acpi/piix4/dimmpxm: OK
-/i386/acpi/q35/bridge: OK
-/i386/acpi/q35/mmio64: **
-ERROR:/home/pm215/qemu/tests/bios-tables-test.c:398:load_expected_aml:
-assertion failed: (exp_sdt.aml_file)
-Aborted (core dumped)
-
-With V=1 it says
-/i386/acpi/q35/mmio64:
-Looking for expected file 'tests/acpi-test-data/q35/DSDT.mmio64'
-
-Looking for expected file 'tests/acpi-test-data/q35/DSDT'
-
-Using expected file 'tests/acpi-test-data/q35/DSDT'
-
-Looking for expected file 'tests/acpi-test-data/q35/FACP.mmio64'
-
-Looking for expected file 'tests/acpi-test-data/q35/FACP'
-
-Using expected file 'tests/acpi-test-data/q35/FACP'
-
-Looking for expected file 'tests/acpi-test-data/q35/APIC.mmio64'
-
-Looking for expected file 'tests/acpi-test-data/q35/APIC'
-
-Using expected file 'tests/acpi-test-data/q35/APIC'
-
-Looking for expected file 'tests/acpi-test-data/q35/HPET.mmio64'
-
-Looking for expected file 'tests/acpi-test-data/q35/HPET'
-
-Using expected file 'tests/acpi-test-data/q35/HPET'
-
-Looking for expected file 'tests/acpi-test-data/q35/SRAT.mmio64'
-
-Looking for expected file 'tests/acpi-test-data/q35/SRAT'
-**
-ERROR:/home/pm215/qemu/tests/bios-tables-test.c:398:load_expected_aml:
-assertion failed: (exp_sdt.aml_file)
-
-ET'
-
-On an x86-64 host which works it says
-/i386/acpi/q35/mmio64:
-Looking for expected file 'tests/acpi-test-data/q35/DSDT.mmio64'
-
-Using expected file 'tests/acpi-test-data/q35/DSDT.mmio64'
-
-Looking for expected file 'tests/acpi-test-data/q35/FACP.mmio64'
-
-Looking for expected file 'tests/acpi-test-data/q35/FACP'
-
-Using expected file 'tests/acpi-test-data/q35/FACP'
-
-Looking for expected file 'tests/acpi-test-data/q35/APIC.mmio64'
-
-Looking for expected file 'tests/acpi-test-data/q35/APIC'
-
-Using expected file 'tests/acpi-test-data/q35/APIC'
-
-Looking for expected file 'tests/acpi-test-data/q35/HPET.mmio64'
-
-Looking for expected file 'tests/acpi-test-data/q35/HPET'
-
-Using expected file 'tests/acpi-test-data/q35/HPET'
-
-Looking for expected file 'tests/acpi-test-data/q35/SRAT.mmio64'
-
-Using expected file 'tests/acpi-test-data/q35/SRAT.mmio64'
-
-Looking for expected file 'tests/acpi-test-data/q35/MCFG.mmio64'
-
-Looking for expected file 'tests/acpi-test-data/q35/MCFG'
-
-Using expected file 'tests/acpi-test-data/q35/MCFG'
-OK
-
-So the difference is that the failing setup doesn't use
-the SRAT.mmio64, and there is no SRAT file available for
-fallback. (It also doesn't use DSDT.mmio64, but there there
-is a fallback DSDT file in the tests/acpi-test-data/ directory.)
-
-It looks like the test/acpi-test-data/ in the build directory
-has not been populated with the MCFG.mmio64 file -- some of
-the data files have symlinks from that directory back to the
-source directory, but some do not. This seems to be done in
-configure, but there is nothing in the makefile rules which
-causes configure to be rerun because there is a new file
-in your test data directory. A manual rerun of configure
-adds the missing symlinks and causes the test to pass.
-
-So I would characterise this as a makefile issue.
-
-(PS: can we fix the extraneous extra blank lines in the test output
-when run with V=1, please?)
-
-thanks
--- PMM
+r~
