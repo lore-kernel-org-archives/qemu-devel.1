@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55166)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gGaqr-00050T-5Z
-	for qemu-devel@nongnu.org; Sat, 27 Oct 2018 22:30:53 -0400
+	(envelope-from <armbru@redhat.com>) id 1gGdrh-0006sK-HD
+	for qemu-devel@nongnu.org; Sun, 28 Oct 2018 01:43:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gGaqo-0006Py-0x
-	for qemu-devel@nongnu.org; Sat, 27 Oct 2018 22:30:53 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51066)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gGaqn-0006PP-CM
-	for qemu-devel@nongnu.org; Sat, 27 Oct 2018 22:30:49 -0400
-Received: by mail-wm1-x342.google.com with SMTP id h2-v6so1053786wmb.0
-	for <qemu-devel@nongnu.org>; Sat, 27 Oct 2018 19:30:48 -0700 (PDT)
-References: <20181023070253.6407-1-richard.henderson@linaro.org>
-	<20181023070253.6407-6-richard.henderson@linaro.org>
-	<20181027001652.GA12509@flamenco>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <581bbe04-c0b5-fb55-ce96-f2378dd38968@linaro.org>
-Date: Sun, 28 Oct 2018 02:30:44 +0000
+	(envelope-from <armbru@redhat.com>) id 1gGdrc-0003eJ-JU
+	for qemu-devel@nongnu.org; Sun, 28 Oct 2018 01:43:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34146)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gGdrc-0003dS-Df
+	for qemu-devel@nongnu.org; Sun, 28 Oct 2018 01:43:52 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <87mur0ls8o.fsf@dusky.pond.sub.org>
+	<20181026142216.GB493@redhat.com>
+Date: Sun, 28 Oct 2018 06:43:44 +0100
+In-Reply-To: <20181026142216.GB493@redhat.com> ("Daniel P. =?utf-8?Q?Berra?=
+	=?utf-8?Q?ng=C3=A9=22's?= message
+	of "Fri, 26 Oct 2018 15:22:16 +0100")
+Message-ID: <87d0ruiq27.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20181027001652.GA12509@flamenco>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 04/10] cputlb: Split large page tracking
- per mmu_idx
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Minutes of KVM Forum BoF on deprecating stuff
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,39 +29,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org
+To: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Pino Toscano <ptoscano@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Alberto Garcia <berto@igalia.com>, Eduardo Habkost <ehabkost@redhat.com>, Christophe de Dinechin <cdupontd@redhat.com>, qemu-devel@nongnu.org, Laine Stump <laine@redhat.com>, Thomas Huth <thuth@redhat.com>, Andrea Bolognani <abologna@redhat.com>
 
-On 10/27/18 1:16 AM, Emilio G. Cota wrote:
-> On Tue, Oct 23, 2018 at 08:02:47 +0100, Richard Henderson wrote:
->> +static void tlb_flush_page_locked(CPUArchState *env, int midx,
->> +                                  target_ulong addr)
->> +{
->> +    target_ulong lp_addr = env->tlb_d[midx].large_page_addr;
->> +    target_ulong lp_mask = env->tlb_d[midx].large_page_mask;
->> +
->> +    /* Check if we need to flush due to large pages.  */
->> +    if ((addr & lp_mask) == lp_addr) {
->> +        tlb_debug("forcing full flush midx %d ("
->> +                  TARGET_FMT_lx "/" TARGET_FMT_lx ")\n",
->> +                  midx, lp_addr, lp_mask);
->> +        tlb_flush_one_mmuidx_locked(env, midx);
->> +    } else {
->> +        int pidx = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
->> +        tlb_flush_entry_locked(&env->tlb_table[midx][pidx], addr);
->> +        tlb_flush_vtlb_page_locked(env, midx, addr);
-> 
-> Just noticed that we should use tlb_entry here, e.g.:
-> 
->      } else {
-> -        int pidx = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
-> -        tlb_flush_entry_locked(&env->tlb_table[midx][pidx], addr);
-> +        CPUTLBEntry *entry = tlb_entry(env, midx, addr);
-> +
-> +        tlb_flush_entry_locked(entry, addr);
->          tlb_flush_vtlb_page_locked(env, midx, addr);
->      }
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
 
-Fixed, thanks.
+> On Fri, Oct 26, 2018 at 04:03:51PM +0200, Markus Armbruster wrote:
+>> This is from my (imperfect) notes, corrections welcome.
+>>=20
+>> Motivation: QEMU contains stuff of dubious value, which gets in the way
+>> in various (sometimes painful and expensive) ways.
+>>
+>> Deprecation is the marking of an external interface as "we intend to
+>> remove this, you should stop using it" (preferably with advice on what
+>> to use instead).  We have a deprecation policy to guide us through this
+>> process.
+>
+>
+> Something I meant to bring up but forgot is about the classification
+> of devices, especially with a view towards security. It is not directly
+> about deprecation, but it is somewhat related as it is related  to the
+> state of maintainence and quality level
+>
+> We've got alot of devices, but only a subset are written and maintained
+> to a level where we'd consider them robust wrt malcious guests. Other
+> devices are only suitable for friendly guest environments. We should
+> clearly document which are the devices that we consider to provide
+> a secure boundary to guests, so users can make suitably informed choices.
+> I'd guess this means all virtio devices, and then few of the emulated
+> devices that are commonly used & maintained in a KVM environment.
 
-r~
+A machine whose mandatory devices don't all provide a security boundary
+also doesn't provide one.  Thus, classification of devices leads to a
+classification of machines.
+
+> This would be useful for distros/vendors/users who wish to limit their
+> potential attack surface once we have a KConfig system for fine grained
+> disablement of features.
+
+Yes.
