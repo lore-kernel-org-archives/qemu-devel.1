@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49462)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60719)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gHFG6-00014s-Ir
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 17:39:39 -0400
+	(envelope-from <philmd@redhat.com>) id 1gHFqW-00013a-AE
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 18:17:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gHFG1-0002rc-08
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 17:39:36 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:59369)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gHFG0-0002q6-D5
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 17:39:32 -0400
-Date: Mon, 29 Oct 2018 17:39:27 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20181029213927.GA19216@flamenco>
-References: <20181025144644.15464-1-cota@braap.org>
-	<20181025144644.15464-5-cota@braap.org> <87zhuw90eu.fsf@linaro.org>
+	(envelope-from <philmd@redhat.com>) id 1gHFqS-00071i-4R
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 18:17:16 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:40895)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gHFqR-00071B-S7
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 18:17:12 -0400
+Received: by mail-wm1-f67.google.com with SMTP id b203-v6so9513401wme.5
+	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 15:17:11 -0700 (PDT)
+References: <1540548409-22560-1-git-send-email-thuth@redhat.com>
+	<CAFEAcA8EubWya8ey9VxhaCw4m2U=KA+i2C-R9P-p+P6oEBBLew@mail.gmail.com>
+	<7fc49925-36ff-bd9a-0cd7-e5f8d4bb3672@roeck-us.net>
+	<CAFEAcA-UF+SyXvcU+NGZsbqBF2qg+s_x4HPU7yvf7B2G-=HPOg@mail.gmail.com>
+	<b4f6cbd2-68fe-5b07-e8fb-93b1c4d8a6de@roeck-us.net>
+	<2eb2b4ef-725d-cbee-1676-feb6bd800aea@redhat.com>
+	<20181029202450.GB24689@roeck-us.net>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <034785b2-0126-e480-2f3f-2295152b11ae@redhat.com>
+Date: Mon, 29 Oct 2018 23:17:06 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+In-Reply-To: <20181029202450.GB24689@roeck-us.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <87zhuw90eu.fsf@linaro.org>
-Subject: Re: [Qemu-devel] [RFC v4 05/71] cpu: move run_on_cpu to cpus-common
+Subject: Re: [Qemu-devel] [PATCH 0/2] Deprecate the "collie" machine and
+ Strongarm devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,42 +36,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 
-On Mon, Oct 29, 2018 at 16:34:49 +0000, Alex Bennée wrote:
+On 29/10/18 21:24, Guenter Roeck wrote:
+> On Mon, Oct 29, 2018 at 04:03:40PM +0100, Philippe Mathieu-DaudÃ© wrote:
+>> On 29/10/18 15:09, Guenter Roeck wrote:
+>>> On 10/29/18 6:24 AM, Peter Maydell wrote:
+>>>> On 27 October 2018 at 12:04, Guenter Roeck <linux@roeck-us.net> wrote:
+>>>>> On 10/26/18 3:12 AM, Peter Maydell wrote:
+>>>>>> Hi Guenter; there's a proposal here to deprecate (and eventually
+>>>>>> remove) the 'collie' board (strongarm) from QEMU. Is that one of
+>>>>>> the ones you're currently using in your automated testing of Linux
+>>>>>> kernels on QEMU?
+>>>>>>
+>>>>>
+>>>>> Yes. I can run the test with older versions of qemu, so it is ok for me
+>>>>> if it is removed (as long as that removal is not backported).
+
+[...]
+
+>>> Though not all of them are supported by upstream qemu. For some of them I
+>>> carry local patches,
+>>> for others I use out-of-tree versions of qemu (beagle/beaglexm).
+>>
+>> Are these patches upstream-able?
+>>
 > 
-> Emilio G. Cota <cota@braap.org> writes:
+> Some of the patches (eg to be able to boot a Linux kernel image for mps2-an385
+> directly from qemu, or zynq CPU clock rate changes to be able to do the same)
+> have been rejected. A few patches were submitted at some point but got lost.
+> I don't keep track, so I don't know the exact number. For some patches, such
+> as basic BCM283x CPRMAN support (needed to boot raspi2), a better
+> implementation was suggested, but didn't go anywhere as far as I know.
 > 
-> > We don't pass a pointer to qemu_global_mutex anymore.
-> >
-> > Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> > Signed-off-by: Emilio G. Cota <cota@braap.org>
+> Some machines, such as beagle support, are from Linaro's tree and were never
+> upstreamed by Linaro. The Linaro branch is based off qemu 2.3, so applying
+> the changes to upstream qemu would be a major effort. I also use the m68k
+> branch from github.com:vivier/qemu-m68k.git for m68k tests.
 > 
-> As discussed on IRC I don't fundamentally object to this being in
-> cpus-common given we have the other work queue stuff there. However
-> given it now lives there we should assert we are in system emulation
-> mode so if a user-mode instruction attempts to use one of the
-> _run_on_cpu() functions we break.
+> I carry some 20+ patches locally in my qemu tree. Some may be obsolete or
+> not or no longer needed (my understanding of qemu is evolving). Sometimes,
+> if and when I find the time, I pick some and try to upstream, but I often
+> don't follow up if there is no response or if the requested changes are
+> too substantial.
+> 
+> Please feel free to have a look at https://github.com/groeck/qemu
+> (check the <version>-local branches) and let me know what might be
+> upstreamable. I'll be happy to (re-)submit the respective patches.
+> Note that I won't be able to make any substantial changes, though.
+> Time is a scarce commodity nowadays, unfortunately.
 
-Thanks for looking into this. I fixed up the commit to add stubs for
-cpu_lock/unlock, since the former cpu->work_mutex has to keep working.
+Thank you for pointing your work, I'll try to salvage what I can.
 
-I'm not convinced about adding an "assert(!user-mode)" to run_on_cpu.
-Given that now it does not depend on the BQL, it could actually
-work in user-mode if called. If we really wanted to make sure
-that no user-mode would call it, then a compile-time check
-would be better than an assert. But again, I fail to see what
-we'd gain from that.
+Regards,
 
-For context, do_run_on_cpu et al. were moved to cpus-common.c by
-d148d90ee8 ("cpus-common: move CPU work item management to
-common code", 2016-09-27). The point was to consolidate the
-run-on-cpu code in a common (softmmu & user-mode) file, since
-user-mode needed async_run_on_cpu for exclusive work.
-
-Now we can finally make run_on_cpu generic as well.
-
-Thanks,
-
-		Emilio
+Phil.
