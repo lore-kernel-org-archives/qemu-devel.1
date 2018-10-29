@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34494)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gH9Li-0008TZ-BP
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gH9Lg-0008Sr-Ec
 	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:21:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gH9Lc-0003Po-Ah
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:21:02 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:39509 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gH9Lb-0003PS-Td
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:21:00 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:39627 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gH9Lb-0003ID-La
+	id 1gH9Lb-0003Ja-Dg
 	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:20:55 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 29 Oct 2018 16:20:06 +0100
-Message-Id: <1540826418-5501-16-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 29 Oct 2018 16:20:17 +0100
+Message-Id: <1540826418-5501-27-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1540826418-5501-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1540826418-5501-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL 15/27] target/mips: Add emulation of MXU
- instruction S8LDD
+Subject: [Qemu-devel] [PULL 26/27] linux-user: Determine the desired FPU
+ mode from MIPS.abiflags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,124 +28,109 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
-From: Craig Janeczek <jancraig@amazon.com>
+From: Stefan Markovic <smarkovic@wavecomp.com>
 
-Add support for emulating the S8LDD MXU instruction.
+Floating-point mode is calculated from MIPS.abiflags FP ABI value
+(based on kernel implementation). Illegal combinations are rejected.
 
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Craig Janeczek <jancraig@amazon.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 90 +++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 87 insertions(+), 3 deletions(-)
+ linux-user/mips/cpu_loop.c | 75 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 75 insertions(+)
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 9d5bf7a..cb7a24b 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -24089,6 +24089,92 @@ static void gen_mxu_s32m2i(DisasContext *ctx)
-     tcg_temp_free(t0);
- }
+diff --git a/linux-user/mips/cpu_loop.c b/linux-user/mips/cpu_loop.c
+index c9c20cf..97e4957 100644
+--- a/linux-user/mips/cpu_loop.c
++++ b/linux-user/mips/cpu_loop.c
+@@ -740,6 +740,34 @@ void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
+     struct image_info *info = ts->info;
+     int i;
  
-+/*
-+ * S8LDD XRa, Rb, s8, optn3 - Load a byte from memory to XRF
-+ */
-+static void gen_mxu_s8ldd(DisasContext *ctx)
-+{
-+    TCGv t0, t1;
-+    TCGLabel *l0;
-+    uint32_t XRa, Rb, s8, optn3;
++    struct mode_req {
++        bool single;
++        bool soft;
++        bool fr1;
++        bool frdefault;
++        bool fre;
++    };
 +
-+    t0 = tcg_temp_new();
-+    t1 = tcg_temp_new();
++    static const struct mode_req fpu_reqs[] = {
++        [MIPS_ABI_FP_ANY]    = { true,  true,  true,  true,  true  },
++        [MIPS_ABI_FP_DOUBLE] = { false, false, false, true,  true  },
++        [MIPS_ABI_FP_SINGLE] = { true,  false, false, false, false },
++        [MIPS_ABI_FP_SOFT]   = { false, true,  false, false, false },
++        [MIPS_ABI_FP_OLD_64] = { false, false, false, false, false },
++        [MIPS_ABI_FP_XX]     = { false, false, true,  true,  true  },
++        [MIPS_ABI_FP_64]     = { false, false, true,  false, false },
++        [MIPS_ABI_FP_64A]    = { false, false, true,  false, true  }
++    };
 +
-+    l0 = gen_new_label();
++    /*
++     * Mode requirements when .MIPS.abiflags is not present in the ELF.
++     * Not present means that everything is acceptable except FR1.
++     */
++    static struct mode_req none_req = { true, true, false, true, true };
 +
-+    XRa = extract32(ctx->opcode, 6, 4);
-+    s8 = extract32(ctx->opcode, 10, 8);
-+    optn3 = extract32(ctx->opcode, 18, 3);
-+    Rb = extract32(ctx->opcode, 21, 5);
++    struct mode_req prog_req;
++    struct mode_req interp_req;
 +
-+    gen_load_mxu_cr(t0);
-+    tcg_gen_andi_tl(t0, t0, MXU_CR_MXU_EN);
-+    tcg_gen_brcondi_tl(TCG_COND_NE, t0, MXU_CR_MXU_EN, l0);
+     for(i = 0; i < 32; i++) {
+         env->active_tc.gpr[i] = regs->regs[i];
+     }
+@@ -747,6 +775,53 @@ void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
+     if (regs->cp0_epc & 1) {
+         env->hflags |= MIPS_HFLAG_M16;
+     }
 +
-+    gen_load_gpr(t0, Rb);
-+    tcg_gen_addi_tl(t0, t0, (int8_t)s8);
-+
-+    switch (optn3) {
-+    /* XRa[7:0] = tmp8 */
-+    case MXU_OPTN3_PTN0:
-+        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
-+        gen_load_mxu_gpr(t0, XRa);
-+        tcg_gen_deposit_tl(t0, t0, t1, 0, 8);
-+        break;
-+    /* XRa[15:8] = tmp8 */
-+    case MXU_OPTN3_PTN1:
-+        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
-+        gen_load_mxu_gpr(t0, XRa);
-+        tcg_gen_deposit_tl(t0, t0, t1, 8, 8);
-+        break;
-+    /* XRa[23:16] = tmp8 */
-+    case MXU_OPTN3_PTN2:
-+        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
-+        gen_load_mxu_gpr(t0, XRa);
-+        tcg_gen_deposit_tl(t0, t0, t1, 16, 8);
-+        break;
-+    /* XRa[31:24] = tmp8 */
-+    case MXU_OPTN3_PTN3:
-+        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
-+        gen_load_mxu_gpr(t0, XRa);
-+        tcg_gen_deposit_tl(t0, t0, t1, 24, 8);
-+        break;
-+    /* XRa = {8'b0, tmp8, 8'b0, tmp8} */
-+    case MXU_OPTN3_PTN4:
-+        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
-+        tcg_gen_deposit_tl(t0, t1, t1, 16, 16);
-+        break;
-+    /* XRa = {tmp8, 8'b0, tmp8, 8'b0} */
-+    case MXU_OPTN3_PTN5:
-+        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
-+        tcg_gen_shli_tl(t1, t1, 8);
-+        tcg_gen_deposit_tl(t0, t1, t1, 16, 16);
-+        break;
-+    /* XRa = {{8{sign of tmp8}}, tmp8, {8{sign of tmp8}}, tmp8} */
-+    case MXU_OPTN3_PTN6:
-+        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_SB);
-+        tcg_gen_mov_tl(t0, t1);
-+        tcg_gen_andi_tl(t0, t0, 0xFF00FFFF);
-+        tcg_gen_shli_tl(t1, t1, 16);
-+        tcg_gen_or_tl(t0, t0, t1);
-+        break;
-+    /* XRa = {tmp8, tmp8, tmp8, tmp8} */
-+    case MXU_OPTN3_PTN7:
-+        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
-+        tcg_gen_deposit_tl(t1, t1, t1, 8, 8);
-+        tcg_gen_deposit_tl(t0, t1, t1, 16, 16);
-+        break;
++#ifdef TARGET_ABI_MIPSO32
++# define MAX_FP_ABI MIPS_ABI_FP_64A
++#else
++# define MAX_FP_ABI MIPS_ABI_FP_SOFT
++#endif
++     if ((info->fp_abi > MAX_FP_ABI && info->fp_abi != MIPS_ABI_FP_UNKNOWN)
++        || (info->interp_fp_abi > MAX_FP_ABI &&
++            info->interp_fp_abi != MIPS_ABI_FP_UNKNOWN)) {
++        fprintf(stderr, "qemu: Unexpected FPU mode\n");
++        exit(1);
 +    }
 +
-+    gen_store_mxu_gpr(t0, XRa);
++    prog_req = (info->fp_abi == MIPS_ABI_FP_UNKNOWN) ? none_req
++                                            : fpu_reqs[info->fp_abi];
++    interp_req = (info->interp_fp_abi == MIPS_ABI_FP_UNKNOWN) ? none_req
++                                            : fpu_reqs[info->interp_fp_abi];
 +
-+    gen_set_label(l0);
++    prog_req.single &= interp_req.single;
++    prog_req.soft &= interp_req.soft;
++    prog_req.fr1 &= interp_req.fr1;
++    prog_req.frdefault &= interp_req.frdefault;
++    prog_req.fre &= interp_req.fre;
 +
-+    tcg_temp_free(t0);
-+    tcg_temp_free(t1);
-+}
++    bool cpu_has_mips_r2_r6 = env->insn_flags & ISA_MIPS32R2 ||
++                              env->insn_flags & ISA_MIPS64R2 ||
++                              env->insn_flags & ISA_MIPS32R6 ||
++                              env->insn_flags & ISA_MIPS64R6;
 +
- 
- /*
-  * Decoding engine for MXU
-@@ -25134,9 +25220,7 @@ static void decode_opc_mxu(CPUMIPSState *env, DisasContext *ctx)
-         generate_exception_end(ctx, EXCP_RI);
-         break;
-     case OPC_MXU_S8LDD:
--        /* TODO: Implement emulation of S8LDD instruction. */
--        MIPS_INVAL("OPC_MXU_S8LDD");
--        generate_exception_end(ctx, EXCP_RI);
-+        gen_mxu_s8ldd(ctx);
-         break;
-     case OPC_MXU_S8STD:
-         /* TODO: Implement emulation of S8STD instruction. */
++    if (prog_req.fre && !prog_req.frdefault && !prog_req.fr1) {
++        env->CP0_Config5 |= (1 << CP0C5_FRE);
++        if (env->active_fpu.fcr0 & (1 << FCR0_FREP)) {
++            env->hflags |= MIPS_HFLAG_FRE;
++        }
++    } else if ((prog_req.fr1 && prog_req.frdefault) ||
++         (prog_req.single && !prog_req.frdefault)) {
++        if ((env->active_fpu.fcr0 & (1 << FCR0_F64)
++            && cpu_has_mips_r2_r6) || prog_req.fr1) {
++            env->CP0_Status |= (1 << CP0St_FR);
++            env->hflags |= MIPS_HFLAG_F64;
++        }
++    } else  if (!prog_req.fre && !prog_req.frdefault &&
++          !prog_req.fr1 && !prog_req.single && !prog_req.soft) {
++        fprintf(stderr, "qemu: Can't find a matching FPU mode\n");
++        exit(1);
++    }
++
+     if (env->insn_flags & ISA_NANOMIPS32) {
+         return;
+     }
 -- 
 2.7.4
