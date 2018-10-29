@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59852)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33698)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <smarkovic@wavecomp.com>) id 1gH4XJ-00010A-7b
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 06:12:41 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gH4hL-0005VB-RK
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 06:23:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <smarkovic@wavecomp.com>) id 1gH4XF-0005EQ-CY
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 06:12:41 -0400
-Received: from mail-bn3nam01on071c.outbound.protection.outlook.com
-	([2a01:111:f400:fe41::71c]:6122
-	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <smarkovic@wavecomp.com>)
-	id 1gH4XD-00055b-MR
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 06:12:37 -0400
-From: Stefan Markovic <smarkovic@wavecomp.com>
-Date: Mon, 29 Oct 2018 10:12:30 +0000
-Message-ID: <0238df02-b2bd-f8e5-cbb8-9cf6d4773284@wavecomp.com>
-References: <1540383527-7923-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1540383527-7923-14-git-send-email-aleksandar.markovic@rt-rk.com>
-	<b5584814-9201-c809-dd75-8b03ed11ef1a@wavecomp.com>
-In-Reply-To: <b5584814-9201-c809-dd75-8b03ed11ef1a@wavecomp.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <2C248A3E48F97B408333B33AD874B6C8@namprd22.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <peter.maydell@linaro.org>) id 1gH4hF-0002mc-U9
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 06:23:02 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:35339)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gH4hB-0002X5-2b
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 06:22:55 -0400
+Received: by mail-ot1-x344.google.com with SMTP id 14so7015155oth.2
+	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 03:22:50 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v7 13/20] target/mips: Move MUL, S32M2I,
- S32I2M handling out of main MXU switch
+In-Reply-To: <20181026141529.4305-1-famz@redhat.com>
+References: <20181026141529.4305-1-famz@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 29 Oct 2018 10:22:29 +0000
+Message-ID: <CAFEAcA_eLyuYydQAwCrcm_MPsHXR_K79GvfDCthdnfAwQOLZ_A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/9] Testing patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,66 +28,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>, "jancraig@amazon.com" <jancraig@amazon.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Rm9sbG93aW5nIHRoZSBwYXRjaCAwNC8yMCBkaXNjdXNzaW9uOg0KDQoNClJldmlld2VkLWJ5OiBT
-dGVmYW4gTWFya292aWMgPHNtYXJrb3ZpY0B3YXZlY29tcC5jb20+DQoNCg0KT24gMjYuMTAuMTgu
-IDExOjQ1LCBTdGVmYW4gTWFya292aWMgd3JvdGU6DQo+DQo+IE9uIDI0LjEwLjE4LiAxNDoxOCwg
-QWxla3NhbmRhciBNYXJrb3ZpYyB3cm90ZToNCj4+IEZyb206IEFsZWtzYW5kYXIgTWFya292aWMg
-PGFtYXJrb3ZpY0B3YXZlY29tcC5jb20+DQo+Pg0KPj4gTW92ZSBNVUwsIFMzMk0ySSwgUzMySTJN
-IGhhbmRsaW5nIG91dCBvZiBzd2l0Y2guIFRoZXNlIGFyZSBhbGwNCj4+IGluc3RydWN0aW9ucyB0
-aGF0IGRvIG5vdCBkZXBlbmQgb24gTVhVX0VOIGZsYWcgb2YgTVhVX0NSLg0KPj4NCj4+IFNpZ25l
-ZC1vZmYtYnk6IEFsZWtzYW5kYXIgTWFya292aWMgPGFtYXJrb3ZpY0B3YXZlY29tcC5jb20+DQo+
-PiAtLS0NCj4+IMKgIHRhcmdldC9taXBzL3RyYW5zbGF0ZS5jIHwgNDEgKysrKysrKysrKysrKysr
-KysrKysrKystLS0tLS0tLS0tLS0tLS0tLS0NCj4+IMKgIDEgZmlsZSBjaGFuZ2VkLCAyMyBpbnNl
-cnRpb25zKCspLCAxOCBkZWxldGlvbnMoLSkNCj4NCj4NCj4gU2VlIG15IGNvbW1lbnQgZm9yIHBh
-dGNoIDA0LzIwLg0KPg0KPiBDTFosIENMTywgU0REUCBhcmUgbWlzc2luZz8NCj4NCj4NCj4+IGRp
-ZmYgLS1naXQgYS90YXJnZXQvbWlwcy90cmFuc2xhdGUuYyBiL3RhcmdldC9taXBzL3RyYW5zbGF0
-ZS5jDQo+PiBpbmRleCBjOGM3MWM0Li4xMTFhZmZiIDEwMDY0NA0KPj4gLS0tIGEvdGFyZ2V0L21p
-cHMvdHJhbnNsYXRlLmMNCj4+ICsrKyBiL3RhcmdldC9taXBzL3RyYW5zbGF0ZS5jDQo+PiBAQCAt
-MjQ4NTksNiArMjQ4NTksMjkgQEAgc3RhdGljIHZvaWQgZGVjb2RlX29wY19teHUoQ1BVTUlQU1N0
-YXRlIA0KPj4gKmVudiwgRGlzYXNDb250ZXh0ICpjdHgpDQo+PiDCoCB7DQo+PiDCoMKgwqDCoMKg
-IHVpbnQzMl90IG9wY29kZSA9IGV4dHJhY3QzMihjdHgtPm9wY29kZSwgMCwgNik7DQo+PiDCoCAr
-wqDCoMKgIGlmIChvcGNvZGUgPT0gT1BDX19NWFVfTVVMKSB7DQo+PiArwqDCoMKgwqDCoMKgwqAg
-dWludDMyX3TCoCBycywgcnQsIHJkLCBvcDE7DQo+PiArDQo+PiArwqDCoMKgwqDCoMKgwqAgcnMg
-PSBleHRyYWN0MzIoY3R4LT5vcGNvZGUsIDIxLCA1KTsNCj4+ICvCoMKgwqDCoMKgwqDCoCBydCA9
-IGV4dHJhY3QzMihjdHgtPm9wY29kZSwgMTYsIDUpOw0KPj4gK8KgwqDCoMKgwqDCoMKgIHJkID0g
-ZXh0cmFjdDMyKGN0eC0+b3Bjb2RlLCAxMSwgNSk7DQo+PiArwqDCoMKgwqDCoMKgwqAgb3AxID0g
-TUFTS19TUEVDSUFMMihjdHgtPm9wY29kZSk7DQo+PiArDQo+PiArwqDCoMKgwqDCoMKgwqAgZ2Vu
-X2FyaXRoKGN0eCwgb3AxLCByZCwgcnMsIHJ0KTsNCj4+ICsNCj4+ICvCoMKgwqDCoMKgwqDCoCBy
-ZXR1cm47DQo+PiArwqDCoMKgIH0NCj4+ICsNCj4+ICvCoMKgwqAgaWYgKG9wY29kZSA9PSBPUENf
-TVhVX1MzMk0ySSkgew0KPj4gK8KgwqDCoMKgwqDCoMKgIGdlbl9teHVfczMybTJpKGN0eCk7DQo+
-PiArwqDCoMKgwqDCoMKgwqAgcmV0dXJuOw0KPj4gK8KgwqDCoCB9DQo+PiArDQo+PiArwqDCoMKg
-IGlmIChvcGNvZGUgPT0gT1BDX01YVV9TMzJJMk0pIHsNCj4+ICvCoMKgwqDCoMKgwqDCoCBnZW5f
-bXh1X3MzMmkybShjdHgpOw0KPj4gK8KgwqDCoMKgwqDCoMKgIHJldHVybjsNCj4+ICvCoMKgwqAg
-fQ0KPj4gKw0KPj4gwqDCoMKgwqDCoCBzd2l0Y2ggKG9wY29kZSkgew0KPj4gwqDCoMKgwqDCoCBj
-YXNlIE9QQ19NWFVfUzMyTUFERDoNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoCAvKiBUT0RPOiBJbXBs
-ZW1lbnQgZW11bGF0aW9uIG9mIFMzMk1BREQgaW5zdHJ1Y3Rpb24uICovDQo+PiBAQCAtMjQ4NzAs
-MTggKzI0ODkzLDYgQEAgc3RhdGljIHZvaWQgZGVjb2RlX29wY19teHUoQ1BVTUlQU1N0YXRlIA0K
-Pj4gKmVudiwgRGlzYXNDb250ZXh0ICpjdHgpDQo+PiDCoMKgwqDCoMKgwqDCoMKgwqAgTUlQU19J
-TlZBTCgiT1BDX01YVV9TMzJNQUREVSIpOw0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgIGdlbmVyYXRl
-X2V4Y2VwdGlvbl9lbmQoY3R4LCBFWENQX1JJKTsNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoCBicmVh
-azsNCj4+IC3CoMKgwqAgY2FzZSBPUENfX01YVV9NVUw6wqDCoMKgwqAgLyogMHgyIC0gdW51c2Vk
-IGluIE1YVSBzcGVjcyAqLw0KPj4gLcKgwqDCoMKgwqDCoMKgIHsNCj4+IC3CoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgIHVpbnQzMl90wqAgcnMsIHJ0LCByZCwgb3AxOw0KPj4gLQ0KPj4gLcKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqAgcnMgPSBleHRyYWN0MzIoY3R4LT5vcGNvZGUsIDIxLCA1KTsNCj4+IC3C
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJ0ID0gZXh0cmFjdDMyKGN0eC0+b3Bjb2RlLCAxNiwgNSk7
-DQo+PiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCByZCA9IGV4dHJhY3QzMihjdHgtPm9wY29kZSwg
-MTEsIDUpOw0KPj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgb3AxID0gTUFTS19TUEVDSUFMMihj
-dHgtPm9wY29kZSk7DQo+PiAtDQo+PiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBnZW5fYXJpdGgo
-Y3R4LCBvcDEsIHJkLCBycywgcnQpOw0KPj4gLcKgwqDCoMKgwqDCoMKgIH0NCj4+IC3CoMKgwqDC
-oMKgwqDCoCBicmVhazsNCj4+IMKgwqDCoMKgwqAgY2FzZSBPUENfTVhVX19QT09MMDA6DQo+PiDC
-oMKgwqDCoMKgwqDCoMKgwqAgZGVjb2RlX29wY19teHVfX3Bvb2wwMChlbnYsIGN0eCk7DQo+PiDC
-oMKgwqDCoMKgwqDCoMKgwqAgYnJlYWs7DQo+PiBAQCAtMjUwMzMsMTIgKzI1MDQ0LDYgQEAgc3Rh
-dGljIHZvaWQgZGVjb2RlX29wY19teHUoQ1BVTUlQU1N0YXRlIA0KPj4gKmVudiwgRGlzYXNDb250
-ZXh0ICpjdHgpDQo+PiDCoMKgwqDCoMKgwqDCoMKgwqAgTUlQU19JTlZBTCgiT1BDX01YVV9TMTZT
-REkiKTsNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoCBnZW5lcmF0ZV9leGNlcHRpb25fZW5kKGN0eCwg
-RVhDUF9SSSk7DQo+PiDCoMKgwqDCoMKgwqDCoMKgwqAgYnJlYWs7DQo+PiAtwqDCoMKgIGNhc2Ug
-T1BDX01YVV9TMzJNMkk6DQo+PiAtwqDCoMKgwqDCoMKgwqAgZ2VuX214dV9zMzJtMmkoY3R4KTsN
-Cj4+IC3CoMKgwqDCoMKgwqDCoCBicmVhazsNCj4+IC3CoMKgwqAgY2FzZSBPUENfTVhVX1MzMkky
-TToNCj4+IC3CoMKgwqDCoMKgwqDCoCBnZW5fbXh1X3MzMmkybShjdHgpOw0KPj4gLcKgwqDCoMKg
-wqDCoMKgIGJyZWFrOw0KPj4gwqDCoMKgwqDCoCBjYXNlIE9QQ19NWFVfRDMyU0xMOg0KPj4gwqDC
-oMKgwqDCoMKgwqDCoMKgIC8qIFRPRE86IEltcGxlbWVudCBlbXVsYXRpb24gb2YgRDMyU0xMIGlu
-c3RydWN0aW9uLiAqLw0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgIE1JUFNfSU5WQUwoIk9QQ19NWFVf
-RDMyU0xMIik7DQo=
+On 26 October 2018 at 15:15, Fam Zheng <famz@redhat.com> wrote:
+> The following changes since commit 808ebd66e467f77c0d1f8c6346235f81e9c99cf2:
+>
+>   Merge remote-tracking branch 'remotes/riscv/tags/riscv-for-master-3.1-sf0' into staging (2018-10-25 17:41:03 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/famz/qemu.git tags/testing-pull-request
+>
+> for you to fetch changes up to 63a24c5e2354833a84f18bdf0e857fad8812f65b:
+>
+>   tests/vm: Do not abuse parallelism when HOST != TARGET architecture (2018-10-26 22:03:21 +0800)
+>
+> ----------------------------------------------------------------
+> Testing patches
+>
+> One fix for mingw build and some improvements in VM based testing, many thanks
+> to Paolo and Phil.
+
+Applied, thanks.
+
+-- PMM
