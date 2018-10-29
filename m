@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59674)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gHAN3-0000q2-Gy
+	(envelope-from <sameo@linux.intel.com>) id 1gHAN3-0000qH-Te
 	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 12:26:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gHAMz-0008Bt-AW
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 12:26:27 -0400
-Received: from mga06.intel.com ([134.134.136.31]:12989)
+	(envelope-from <sameo@linux.intel.com>) id 1gHAMz-0008Bb-8Y
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 12:26:29 -0400
+Received: from mga07.intel.com ([134.134.136.100]:22748)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sameo@linux.intel.com>)
-	id 1gHAMy-00083a-8C
+	id 1gHAMw-0008AB-SR
 	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 12:26:24 -0400
 From: Samuel Ortiz <sameo@linux.intel.com>
-Date: Mon, 29 Oct 2018 17:24:39 +0100
-Message-Id: <20181029162441.31631-18-sameo@linux.intel.com>
+Date: Mon, 29 Oct 2018 17:24:41 +0100
+Message-Id: <20181029162441.31631-20-sameo@linux.intel.com>
 In-Reply-To: <20181029162441.31631-1-sameo@linux.intel.com>
 References: <20181029162441.31631-1-sameo@linux.intel.com>
-Subject: [Qemu-devel] [PATCH v2 17/19] hw: acpi: Define ACPI tables builder
- interface
+Subject: [Qemu-devel] [PATCH v2 19/19] hw: i386: Implement the ACPI builder
+ interface for PC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,243 +26,148 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-In order to decouple ACPI APIs from specific machine types, we are
-creating an ACPI builder interface that each ACPI platform can choose to
-implement.
-This way, a new machine type can re-use the high level ACPI APIs and
-define some custom table build methods, without having to duplicate most
-of the existing implementation only to add small variations to it.
+All PC machine type derivatives will use the same ACPI table build
+methods. But with that change in place, any new x86 machine type will be
+able to re-use the acpi-build API and customize part of it by defining
+its own ACPI table build methods.
 
-Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
 Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
 ---
- hw/acpi/Makefile.objs     |  1 +
- hw/acpi/builder.c         | 97 +++++++++++++++++++++++++++++++++++++++
- include/hw/acpi/builder.h | 97 +++++++++++++++++++++++++++++++++++++++
- 3 files changed, 195 insertions(+)
- create mode 100644 hw/acpi/builder.c
- create mode 100644 include/hw/acpi/builder.h
+ hw/i386/acpi-build.c | 15 ++++++++++-----
+ hw/i386/pc.c         | 19 +++++++++++++++++++
+ 2 files changed, 29 insertions(+), 5 deletions(-)
 
-diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
-index 11c35bcb44..2f383adc6f 100644
---- a/hw/acpi/Makefile.objs
-+++ b/hw/acpi/Makefile.objs
-@@ -11,6 +11,7 @@ common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
- common-obj-y += acpi_interface.o
- common-obj-y += bios-linker-loader.o
- common-obj-y += aml-build.o
-+common-obj-y += builder.o
- 
- common-obj-$(CONFIG_IPMI) += ipmi.o
- common-obj-$(call lnot,$(CONFIG_IPMI)) += ipmi-stub.o
-diff --git a/hw/acpi/builder.c b/hw/acpi/builder.c
-new file mode 100644
-index 0000000000..c29a614793
---- /dev/null
-+++ b/hw/acpi/builder.c
-@@ -0,0 +1,97 @@
-+/*
-+ *
-+ * Copyright (c) 2018 Intel Corporation
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/module.h"
-+#include "qom/object.h"
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 5035dac556..d40599e6d1 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -35,6 +35,7 @@
+ #include "hw/acpi/acpi-defs.h"
+ #include "hw/acpi/acpi.h"
+ #include "hw/acpi/cpu.h"
 +#include "hw/acpi/builder.h"
+ #include "hw/nvram/fw_cfg.h"
+ #include "hw/acpi/bios-linker-loader.h"
+ #include "hw/loader.h"
+@@ -1556,6 +1557,7 @@ void acpi_build(AcpiBuildTables *tables,
+     GArray *tables_blob = tables->table_data;
+     AcpiSlicOem slic_oem = { .id = NULL, .table_id = NULL };
+     Object *vmgenid_dev;
++    AcpiBuilder *ab = ACPI_BUILDER(machine);
+ 
+     acpi_get_pm_info(&pm);
+     acpi_get_misc_info(&misc);
+@@ -1605,7 +1607,8 @@ void acpi_build(AcpiBuildTables *tables,
+     aml_len += tables_blob->len - fadt;
+ 
+     acpi_add_table(table_offsets, tables_blob);
+-    build_madt(tables_blob, tables->linker, machine, conf);
++    acpi_builder_madt(ab, tables_blob, tables->linker,
++                      machine, conf);
+ 
+     vmgenid_dev = find_vmgenid_dev();
+     if (vmgenid_dev) {
+@@ -1629,15 +1632,17 @@ void acpi_build(AcpiBuildTables *tables,
+     }
+     if (conf->numa_nodes) {
+         acpi_add_table(table_offsets, tables_blob);
+-        build_srat(tables_blob, tables->linker, machine, conf);
 +
-+void acpi_builder_rsdp(AcpiBuilder *builder,
-+                       GArray *table_data, BIOSLinker *linker,
-+                       unsigned rsdt_tbl_offset)
++        acpi_builder_srat(ab, tables_blob, tables->linker,
++                          machine, conf);
+         if (have_numa_distance) {
+             acpi_add_table(table_offsets, tables_blob);
+-            build_slit(tables_blob, tables->linker);
++            acpi_builder_slit(ab, tables_blob, tables->linker);
+         }
+     }
+     if (acpi_get_mcfg(&mcfg)) {
+         acpi_add_table(table_offsets, tables_blob);
+-        build_mcfg(tables_blob, tables->linker, &mcfg);
++        acpi_builder_mcfg(ab, tables_blob, tables->linker, &mcfg);
+     }
+     if (x86_iommu_get_default()) {
+         IommuType IOMMUType = x86_iommu_get_type();
+@@ -1668,7 +1673,7 @@ void acpi_build(AcpiBuildTables *tables,
+                slic_oem.id, slic_oem.table_id);
+ 
+     /* RSDP is in FSEG memory, so allocate it separately */
+-    build_rsdp_rsdt(tables->rsdp, tables->linker, rsdt);
++    acpi_builder_rsdp(ab, tables->rsdp, tables->linker, rsdt);
+ 
+     /* We'll expose it all to Guest so we want to reduce
+      * chance of size changes.
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 1dcbbd5139..986ed0eabd 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -64,6 +64,7 @@
+ #include "qemu/option.h"
+ #include "hw/acpi/acpi.h"
+ #include "hw/acpi/cpu_hotplug.h"
++#include "hw/acpi/builder.h"
+ #include "hw/boards.h"
+ #include "acpi-build.h"
+ #include "hw/mem/pc-dimm.h"
+@@ -75,6 +76,7 @@
+ #include "hw/nmi.h"
+ #include "hw/i386/intel_iommu.h"
+ #include "hw/net/ne2000-isa.h"
++#include "hw/i386/acpi.h"
+ 
+ /* debug PC/ISA interrupts */
+ //#define DEBUG_IRQ
+@@ -2403,12 +2405,20 @@ static void x86_nmi(NMIState *n, int cpu_index, Error **errp)
+     }
+ }
+ 
++static AcpiConfiguration *pc_acpi_configuration(AcpiBuilder *builder)
 +{
-+    AcpiBuilderMethods *abm = ACPI_BUILDER_GET_METHODS(builder);
++    PCMachineState *pcms = PC_MACHINE(builder);
 +
-+    if (abm && abm->rsdp) {
-+        abm->rsdp(table_data, linker, rsdt_tbl_offset);
-+    }
++    return &pcms->acpi_configuration;
 +}
 +
-+void acpi_builder_madt(AcpiBuilder *builder,
-+                       GArray *table_data, BIOSLinker *linker,
-+                       MachineState *ms, AcpiConfiguration *conf)
-+{
-+    AcpiBuilderMethods *abm = ACPI_BUILDER_GET_METHODS(builder);
+ static void pc_machine_class_init(ObjectClass *oc, void *data)
+ {
+     MachineClass *mc = MACHINE_CLASS(oc);
+     PCMachineClass *pcmc = PC_MACHINE_CLASS(oc);
+     HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(oc);
+     NMIClass *nc = NMI_CLASS(oc);
++    AcpiBuilderMethods *abm = ACPI_BUILDER_METHODS(oc);
+ 
+     pcmc->pci_enabled = true;
+     pcmc->has_acpi_build = true;
+@@ -2443,6 +2453,14 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+     nc->nmi_monitor_handler = x86_nmi;
+     mc->default_cpu_type = TARGET_DEFAULT_CPU_TYPE;
+ 
++    /* ACPI building methods */
++    abm->madt = build_madt;
++    abm->rsdp = build_rsdp_rsdt;
++    abm->mcfg = build_mcfg;
++    abm->srat = build_srat;
++    abm->slit = build_slit;
++    abm->configuration = pc_acpi_configuration;
 +
-+    if (abm && abm->madt) {
-+        abm->madt(table_data, linker, ms, conf);
-+    }
-+}
-+
-+void acpi_builder_mcfg(AcpiBuilder *builder,
-+                       GArray *table_data, BIOSLinker *linker,
-+                       AcpiMcfgInfo *info)
-+{
-+    AcpiBuilderMethods *abm = ACPI_BUILDER_GET_METHODS(builder);
-+
-+    if (abm && abm->mcfg) {
-+        abm->mcfg(table_data, linker, info);
-+    }
-+}
-+
-+void acpi_builder_srat(AcpiBuilder *builder,
-+                       GArray *table_data, BIOSLinker *linker,
-+                       MachineState *machine, AcpiConfiguration *conf)
-+{
-+    AcpiBuilderMethods *abm = ACPI_BUILDER_GET_METHODS(builder);
-+
-+    if (abm && abm->srat) {
-+        abm->srat(table_data, linker, machine, conf);
-+    }
-+}
-+
-+void acpi_builder_slit(AcpiBuilder *builder,
-+                       GArray *table_data, BIOSLinker *linker)
-+{
-+    AcpiBuilderMethods *abm = ACPI_BUILDER_GET_METHODS(builder);
-+
-+    if (abm && abm->slit) {
-+        abm->slit(table_data, linker);
-+    }
-+}
-+
-+AcpiConfiguration *acpi_builder_configuration(AcpiBuilder *builder)
-+{
-+    AcpiBuilderMethods *abm = ACPI_BUILDER_GET_METHODS(builder);
-+    if (abm && abm->configuration) {
-+        return abm->configuration(builder);
-+    }
-+    return NULL;
-+}
-+
-+static const TypeInfo acpi_builder_info = {
-+    .name          = TYPE_ACPI_BUILDER,
-+    .parent        = TYPE_INTERFACE,
-+    .class_size    = sizeof(AcpiBuilderMethods),
-+};
-+
-+static void acpi_builder_register_type(void)
-+{
-+    type_register_static(&acpi_builder_info);
-+}
-+
-+type_init(acpi_builder_register_type)
-diff --git a/include/hw/acpi/builder.h b/include/hw/acpi/builder.h
-new file mode 100644
-index 0000000000..639b554de3
---- /dev/null
-+++ b/include/hw/acpi/builder.h
-@@ -0,0 +1,97 @@
-+/*
-+ *
-+ * Copyright (c) 2018 Intel Corporation
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef ACPI_BUILDER_H
-+#define ACPI_BUILDER_H
-+
-+#include "qemu/osdep.h"
-+#include "hw/acpi/bios-linker-loader.h"
-+#include "qom/object.h"
-+
-+#define TYPE_ACPI_BUILDER "acpi-builder"
-+
-+#define ACPI_BUILDER_METHODS(klass) \
-+     OBJECT_CLASS_CHECK(AcpiBuilderMethods, (klass), TYPE_ACPI_BUILDER)
-+#define ACPI_BUILDER_GET_METHODS(obj) \
-+     OBJECT_GET_CLASS(AcpiBuilderMethods, (obj), TYPE_ACPI_BUILDER)
-+#define ACPI_BUILDER(obj)                                       \
-+     INTERFACE_CHECK(AcpiBuilder, (obj), TYPE_ACPI_BUILDER)
-+
-+typedef struct AcpiConfiguration AcpiConfiguration;
-+typedef struct AcpiBuildState AcpiBuildState;
-+typedef struct AcpiMcfgInfo AcpiMcfgInfo;
-+
-+typedef struct AcpiBuilder {
-+    /* <private> */
-+    Object Parent;
-+} AcpiBuilder;
-+
-+/**
-+ * AcpiBuildMethods:
-+ *
-+ * Interface to be implemented by a machine type that needs to provide
-+ * custom ACPI tables build method.
-+ *
-+ * @parent: Opaque parent interface.
-+ *
-+ * @rsdp:
-+ * @madt:
-+ * @mcfg:
-+ * @srat:
-+ * @slit:
-+ * @setup:
-+ */
-+typedef struct AcpiBuilderMethods {
-+    /* <private> */
-+    InterfaceClass parent;
-+
-+    /* <public> */
-+    void (*rsdp)(GArray *table_data, BIOSLinker *linker,
-+                 unsigned rsdt_tbl_offset);
-+    void (*madt)(GArray *table_data, BIOSLinker *linker,
-+                 MachineState *ms, AcpiConfiguration *conf);
-+    void (*mcfg)(GArray *table_data, BIOSLinker *linker,
-+                 AcpiMcfgInfo *info);
-+    void (*srat)(GArray *table_data, BIOSLinker *linker,
-+                 MachineState *machine, AcpiConfiguration *conf);
-+    void (*slit)(GArray *table_data, BIOSLinker *linker);
-+
-+    AcpiConfiguration *(*configuration)(AcpiBuilder *builder);
-+} AcpiBuilderMethods;
-+
-+void acpi_builder_rsdp(AcpiBuilder *builder,
-+                       GArray *table_data, BIOSLinker *linker,
-+                       unsigned rsdt_tbl_offset);
-+
-+void acpi_builder_madt(AcpiBuilder *builder,
-+                       GArray *table_data, BIOSLinker *linker,
-+                       MachineState *ms, AcpiConfiguration *conf);
-+
-+void acpi_builder_mcfg(AcpiBuilder *builder,
-+                       GArray *table_data, BIOSLinker *linker,
-+                       AcpiMcfgInfo *info);
-+
-+void acpi_builder_srat(AcpiBuilder *builder,
-+                       GArray *table_data, BIOSLinker *linker,
-+                       MachineState *machine, AcpiConfiguration *conf);
-+
-+void acpi_builder_slit(AcpiBuilder *builder,
-+                       GArray *table_data, BIOSLinker *linker);
-+
-+AcpiConfiguration *acpi_builder_configuration(AcpiBuilder *builder);
-+
-+#endif
+     object_class_property_add(oc, MEMORY_DEVICE_REGION_SIZE, "int",
+         pc_machine_get_device_memory_region_size, NULL,
+         NULL, NULL, &error_abort);
+@@ -2494,6 +2512,7 @@ static const TypeInfo pc_machine_info = {
+     .interfaces = (InterfaceInfo[]) {
+          { TYPE_HOTPLUG_HANDLER },
+          { TYPE_NMI },
++         { TYPE_ACPI_BUILDER },
+          { }
+     },
+ };
 -- 
 2.17.2
