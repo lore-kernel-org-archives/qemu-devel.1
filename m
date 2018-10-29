@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gH6nt-0004HD-Sv
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 08:37:58 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gH6qY-0005DI-K0
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 08:40:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gH6nn-00017H-QN
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 08:37:57 -0400
-Received: from mail-wm1-f49.google.com ([209.85.128.49]:38829)
+	(envelope-from <peter.maydell@linaro.org>) id 1gH6qX-0004Ns-QM
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 08:40:42 -0400
+Received: from mail-ot1-x32f.google.com ([2607:f8b0:4864:20::32f]:34253)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gH6nn-00015x-JM
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 08:37:51 -0400
-Received: by mail-wm1-f49.google.com with SMTP id l2-v6so2275141wmh.3
-	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 05:37:51 -0700 (PDT)
-References: <CAFEAcA-=Wqxp1GOtBOZpck9J-LUgDhthP5u9PQuT-2fGdz9mwQ@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <a649936a-dccd-cb60-7225-a497ffdcaa7f@redhat.com>
-Date: Mon, 29 Oct 2018 13:37:48 +0100
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gH6qV-0004IO-7A
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 08:40:40 -0400
+Received: by mail-ot1-x32f.google.com with SMTP id e9so5856029oti.1
+	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 05:40:37 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-=Wqxp1GOtBOZpck9J-LUgDhthP5u9PQuT-2fGdz9mwQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <27ed2a56-987d-677b-1457-3428aca19d49@linaro.org>
+References: <CAFEAcA-=Wqxp1GOtBOZpck9J-LUgDhthP5u9PQuT-2fGdz9mwQ@mail.gmail.com>
+	<27ed2a56-987d-677b-1457-3428aca19d49@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 29 Oct 2018 12:40:16 +0000
+Message-ID: <CAFEAcA-zQQBhqm376guhMXzbXg-1d1V--5opTatUXRvbb3uUDA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Subject: Re: [Qemu-devel] a64 simd decode in handle_vec_simd_shli()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,37 +29,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Richard Henderson <richard.henderson@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-On 29/10/18 13:06, Peter Maydell wrote:
-> Hi; Coverity is complaining (in CID 1396476) about a problem in the
-> handle_vec_simd_shli() function, where we might dereference sli_op[]
-> with a size that's greater than 3. It thinks size might be > 3 because
-> we do a check
->       if (size > 3 && !is_q) {
->           unallocated_encoding(s);
->           return;
->       }
-> suggesting that we could have is_q and size > 3.
-> 
-> I'm having difficulty figuring out where this check has come from;
-> it doesn't seem to match up with the pseudocode and in any case
-> I don't think size can ever be > 3. We calculate:
-> 
->      int size = 32 - clz32(immh) - 1;
-> where immh is a 4 bit field which we know cannot be all-zeroes.
-> So the clz32() return must be in {28,29,30,31} and the resulting
-> size is in {0,1,2,3}, so the check above can't ever fire.
+On 29 October 2018 at 12:32, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> On 10/29/18 12:06 PM, Peter Maydell wrote:
+>> I'm having difficulty figuring out where this check has come from;
+>> it doesn't seem to match up with the pseudocode and in any case
+>> I don't think size can ever be > 3. We calculate:
+>>
+>>     int size = 32 - clz32(immh) - 1;
+>> where immh is a 4 bit field which we know cannot be all-zeroes.
+>> So the clz32() return must be in {28,29,30,31} and the resulting
+>> size is in {0,1,2,3}, so the check above can't ever fire.
+>
+> Correct.
+>
+> The check appeared with the initial commit for aa64 support, so perhaps Alex
+> just trying to be defensive in his coding?
+>
+>> Am I missing something? As far as I can see we should simply delete
+>> the can't-happen condition, which will probably satisfy coverity.
+>
+> Agreed.
 
-Clang was emitting the same warning in 
-memory_region_oldmmio_read_accessor() before you remove it:
+As assert that size is in [0..3] would probably be reasonable too,
+since the thing that requires it (that the immh field is 4-bit non-zero)
+is something implicitly determined by the decode so it's a bit
+action-at-a-distance. I'll put together a patch.
 
-     tmp = mr->ops->old_mmio.read[ctz32(size)](mr->opaque, addr);
-
-> Am I missing something? As far as I can see we should simply delete
-> the can't-happen condition, which will probably satisfy coverity.
-> 
-> thanks
-> -- PMM
-> 
+thanks
+-- PMM
