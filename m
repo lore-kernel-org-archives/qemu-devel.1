@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47669)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gH9tN-0002mh-CJ
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:55:50 -0400
+	(envelope-from <marc.zyngier@arm.com>) id 1gH9ug-0003qK-8T
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:57:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gH9tI-000206-H0
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:55:49 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:59423)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gH9tG-0001wI-HO
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:55:43 -0400
-Date: Mon, 29 Oct 2018 11:55:36 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20181029155536.GB17805@flamenco>
-References: <20181025144644.15464-1-cota@braap.org> <874ld4ahji.fsf@linaro.org>
+	(envelope-from <marc.zyngier@arm.com>) id 1gH9ua-00037t-7L
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:57:09 -0400
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:50112
+	helo=foss.arm.com) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <marc.zyngier@arm.com>) id 1gH9uZ-00033e-OY
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:57:04 -0400
+References: <20181024113709.16599-1-richard.henderson@linaro.org>
+	<20181024113709.16599-5-richard.henderson@linaro.org>
+	<CAFEAcA_WJ7hRd8RfM2OTQBPcryUVDOJkFbRzb69xWTM-yNBLmA@mail.gmail.com>
+	<CAFEAcA_zK8n0Bkwn-4x8M-CFduOviCmUGS-uSfw45SzRriE9Rg@mail.gmail.com>
+	<cebd5ce7-f33e-454c-0796-82b10515362d@arm.com>
+	<CAFEAcA_x_g3TEnC=A=EjugWRo33C1BwL2YL=iJQXgzre7gJQLA@mail.gmail.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Message-ID: <1ca884ee-8bf5-77fa-dfd8-b275da1ec846@arm.com>
+Date: Mon, 29 Oct 2018 15:56:58 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <874ld4ahji.fsf@linaro.org>
-Subject: Re: [Qemu-devel] [RFC v4 01/71] cpu: convert queued work to a
- QSIMPLEQ
+In-Reply-To: <CAFEAcA_x_g3TEnC=A=EjugWRo33C1BwL2YL=iJQXgzre7gJQLA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 4/5] target/arm: Fill in ARMISARegisters
+ for kvm32
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,63 +33,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Christoffer Dall <christoffer.dall@arm.com>
 
-On Mon, Oct 29, 2018 at 15:39:29 +0000, Alex Bennée wrote:
+On 29/10/18 15:48, Peter Maydell wrote:
+> On 29 October 2018 at 15:40, Marc Zyngier <marc.zyngier@arm.com> wrote:
+>> My temptation would be not to expose it at all when running on a v7
+>> core, and return an error rather than zero.
+>>
+>> The other issue is that we currently don't support running 32bit KVM on
+>> any ARMv8 platform, as we strictly check the CPUs we want to run on (A7
+>> and A15). I remember seeing patches that would allow any host core to be
+>> used (similar to what we have on the 64bit side), but that never made it
+>> in the tree.
 > 
-> Emilio G. Cota <cota@braap.org> writes:
-(snip)
-> > @@ -357,7 +357,7 @@ struct CPUState {
-> >      sigjmp_buf jmp_env;
-> >
-> >      QemuMutex work_mutex;
-> > -    struct qemu_work_item *queued_work_first, *queued_work_last;
-> > +    QSIMPLEQ_HEAD(, qemu_work_item) work_list;
+> Ah, that's convenient in some ways. It means we can define the
+> API to be "for v7, no register available via the ONE_REG API;
+> for v8, always present", provided we add the constant and the
+> support before we turn on any actual v8 CPUs for 32-bit KVM
+> (avoiding the awkward case of "v8 but kernel doesn't expose
+> MVFR2").
 > 
-> Would:
-> 
->   QSIMPLEQ_HEAD(work_list, qemu_work_item);
-> 
-> be neater?
+> I don't think we particularly care about the 32-bit-kvm-on-v8
+> part, but it would be good to nail down this wrinkle so we don't
+> forget about it, maybe ?
 
-That would expand to
+Absolutely. I'll write something up.
 
-struct CPUState {
-	...
-	struct work_list {
-		struct qemu_work_item *sqh_first;
-		struct qemu_work_item **sqh_last;
-	}; // <-- missing field name
-	...
-};
+Thanks,
 
-, which doesn't declare an actual field in the struct.
-
-> > +static inline bool cpu_work_list_empty(CPUState *cpu)
-> > +{
-> > +    bool ret;
-> > +
-> > +    qemu_mutex_lock(&cpu->work_mutex);
-> > +    ret = QSIMPLEQ_EMPTY(&cpu->work_list);
-> > +    qemu_mutex_unlock(&cpu->work_mutex);
-> > +    return ret;
-> 
-> This could just be:
-> 
->   return QSIMPLEQ_EMPTY_ATOMIC(&cpu->work_list)
-
-Not quite; (1) the non-RCU version of the list does not set
-pointers with atomic_set, so an atomic_read here would not be enough,
-and (2) using the lock ensures that the read is up-to-date. These
-two points are not a big deal though, since later in the
-series ("cpu: protect most CPU state with cpu->lock") we hold the
-CPU lock when calling this.
-
-> Otherwise:
-> 
-> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-
-Thanks!
-
-		Emilio
+	M.
+-- 
+Jazz is not dead. It just smells funny...
