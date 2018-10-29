@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60405)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gH7js-0001GF-Ra
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:37:56 -0400
+	(envelope-from <kraxel@redhat.com>) id 1gH7jw-0001Ou-Vy
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:37:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gH7jn-0004ew-PH
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:37:52 -0400
+	(envelope-from <kraxel@redhat.com>) id 1gH7jv-0004gs-BE
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:37:56 -0400
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 29 Oct 2018 14:37:20 +0100
-Message-Id: <20181029133722.12415-3-kraxel@redhat.com>
+Date: Mon, 29 Oct 2018 14:37:19 +0100
+Message-Id: <20181029133722.12415-2-kraxel@redhat.com>
 In-Reply-To: <20181029133722.12415-1-kraxel@redhat.com>
 References: <20181029133722.12415-1-kraxel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 2/4] audio: use TYPE_WM8750 instead of a
- hardcoded string
+Subject: [Qemu-devel] [PULL 1/4] hw: AC97: make it more QOMconventional
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,49 +23,70 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Jan Kiszka <jan.kiszka@web.de>, qemu-arm@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+Cc: Jan Kiszka <jan.kiszka@web.de>, qemu-arm@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Li Qiang <liq3ea@163.com>
 
-From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+From: Li Qiang <liq3ea@163.com>
 
-Cc: Jan Kiszka <jan.kiszka@web.de>
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-
-Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-id: 20181022074050.19638-2-maozhongyi@cmss.chinamobile.com
+Signed-off-by: Li Qiang <liq3ea@163.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Message-id: 20181013060809.52496-1-liq3ea@163.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/arm/musicpal.c          | 2 +-
- hw/audio/marvell_88w8618.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ hw/audio/ac97.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/hw/arm/musicpal.c b/hw/arm/musicpal.c
-index c807010e83..3dafb41b0b 100644
---- a/hw/arm/musicpal.c
-+++ b/hw/arm/musicpal.c
-@@ -1695,7 +1695,7 @@ static void musicpal_init(MachineState *machine)
-     wm8750_dev =3D i2c_create_slave(i2c, TYPE_WM8750, MP_WM_ADDR);
-     dev =3D qdev_create(NULL, "mv88w8618_audio");
-     s =3D SYS_BUS_DEVICE(dev);
--    qdev_prop_set_ptr(dev, "wm8750", wm8750_dev);
-+    qdev_prop_set_ptr(dev, TYPE_WM8750, wm8750_dev);
-     qdev_init_nofail(dev);
-     sysbus_mmio_map(s, 0, MP_AUDIO_BASE);
-     sysbus_connect_irq(s, 0, pic[MP_AUDIO_IRQ]);
-diff --git a/hw/audio/marvell_88w8618.c b/hw/audio/marvell_88w8618.c
-index e546892d3c..cf6ce6979b 100644
---- a/hw/audio/marvell_88w8618.c
-+++ b/hw/audio/marvell_88w8618.c
-@@ -280,7 +280,7 @@ static const VMStateDescription mv88w8618_audio_vmsd =
-=3D {
- };
+diff --git a/hw/audio/ac97.c b/hw/audio/ac97.c
+index 337402e9c6..d799533aa9 100644
+--- a/hw/audio/ac97.c
++++ b/hw/audio/ac97.c
+@@ -123,6 +123,10 @@ enum {
 =20
- static Property mv88w8618_audio_properties[] =3D {
--    DEFINE_PROP_PTR("wm8750", mv88w8618_audio_state, wm),
-+    DEFINE_PROP_PTR(TYPE_WM8750, mv88w8618_audio_state, wm),
-     {/* end of list */},
- };
+ #define MUTE_SHIFT 15
 =20
++#define TYPE_AC97 "AC97"
++#define AC97(obj) \
++    OBJECT_CHECK(AC97LinkState, (obj), TYPE_AC97)
++
+ #define REC_MASK 7
+ enum {
+     REC_MIC =3D 0,
+@@ -1340,7 +1344,7 @@ static void ac97_on_reset (DeviceState *dev)
+=20
+ static void ac97_realize(PCIDevice *dev, Error **errp)
+ {
+-    AC97LinkState *s =3D DO_UPCAST (AC97LinkState, dev, dev);
++    AC97LinkState *s =3D AC97(dev);
+     uint8_t *c =3D s->dev.config;
+=20
+     /* TODO: no need to override */
+@@ -1389,7 +1393,7 @@ static void ac97_realize(PCIDevice *dev, Error **er=
+rp)
+=20
+ static void ac97_exit(PCIDevice *dev)
+ {
+-    AC97LinkState *s =3D DO_UPCAST(AC97LinkState, dev, dev);
++    AC97LinkState *s =3D AC97(dev);
+=20
+     AUD_close_in(&s->card, s->voice_pi);
+     AUD_close_out(&s->card, s->voice_po);
+@@ -1399,7 +1403,7 @@ static void ac97_exit(PCIDevice *dev)
+=20
+ static int ac97_init (PCIBus *bus)
+ {
+-    pci_create_simple (bus, -1, "AC97");
++    pci_create_simple(bus, -1, TYPE_AC97);
+     return 0;
+ }
+=20
+@@ -1427,7 +1431,7 @@ static void ac97_class_init (ObjectClass *klass, vo=
+id *data)
+ }
+=20
+ static const TypeInfo ac97_info =3D {
+-    .name          =3D "AC97",
++    .name          =3D TYPE_AC97,
+     .parent        =3D TYPE_PCI_DEVICE,
+     .instance_size =3D sizeof (AC97LinkState),
+     .class_init    =3D ac97_class_init,
 --=20
 2.9.3
