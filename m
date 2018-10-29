@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36547)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38149)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gHEbN-0003TM-1c
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 16:57:36 -0400
+	(envelope-from <philmd@redhat.com>) id 1gHEg9-0007Eg-1e
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 17:02:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gHEbC-0002Gh-F5
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 16:57:27 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:50593)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1gHEbB-0002Dp-Te
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 16:57:22 -0400
-References: <1540821315-28346-1-git-send-email-stefan.markovic@rt-rk.com>
-	<BN6PR2201MB1251DB91FBD5E2C3FF3F3A67C6F30@BN6PR2201MB1251.namprd22.prod.outlook.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <ffa4f303-311b-a6f2-f591-e6ead03c885e@vivier.eu>
-Date: Mon, 29 Oct 2018 21:56:11 +0100
+	(envelope-from <philmd@redhat.com>) id 1gHEg5-00076b-Rq
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 17:02:28 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:40733)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gHEg5-0006va-Ke
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 17:02:25 -0400
+Received: by mail-wr1-f66.google.com with SMTP id i17-v6so10194124wre.7
+	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 14:02:24 -0700 (PDT)
+References: <20181029170159.3801-1-sameo@linux.intel.com>
+	<20181029170159.3801-17-sameo@linux.intel.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <5d77ee72-8073-d5c3-6859-842846442cce@redhat.com>
+Date: Mon, 29 Oct 2018 22:02:20 +0100
 MIME-Version: 1.0
-In-Reply-To: <BN6PR2201MB1251DB91FBD5E2C3FF3F3A67C6F30@BN6PR2201MB1251.namprd22.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20181029170159.3801-17-sameo@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/6] target/mips: Add support for
- prctl() PR_GET_FP_MODE and PR_SET_FP_MODE
+Subject: Re: [Qemu-devel] [PATCH v3 16/19] hw: acpi: Retrieve the PCI bus
+ from AcpiPciHpState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,23 +31,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <amarkovic@wavecomp.com>, Stefan Markovic <stefan.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>
+To: Samuel Ortiz <sameo@linux.intel.com>, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jing Liu <jing2.liu@linux.intel.com>, Sebastien Boeuf <sebastien.boeuf@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-Le 29/10/2018 à 15:53, Aleksandar Markovic a écrit :
->> From: Stefan Markovic <stefan.markovic@rt-rk.com>
->> Subject: [PATCH v2 0/6] target/mips: Add support for prctl() PR_GET_FP_MODE and PR_SET_FP_MODE
->>
->> From: Stefan Markovic <smarkovic@wavecomp.com>
->>
->> This series includes support for prctl() PR_GET_FP_MODE and PR_SET_FP_MODE. This requires
->> extracting MIPS.abiflags section from ELF file and fp_abi value handling.
+On 29/10/18 18:01, Samuel Ortiz wrote:
+> From: Sebastien Boeuf <sebastien.boeuf@intel.com>
 > 
-> Stefan, the patch titles don't have appropriate prefixes "elf:" and "user-mode:", but I can fix that while integrating.
+> Instead of using the machine type specific method find_i440fx() to
+> retrieve the PCI bus, this commit aims to rely on the fact that the
+> PCI bus is known by the structure AcpiPciHpState.
 > 
-> Laurent, heads up: I plan to include this series in a MIPS pull request that is planned for today.
+> When the structure is initialized through acpi_pcihp_init() call,
+> it saves the PCI bus, which means there is no need to invoke a
+> special function later on.
+> 
+> Based on the fact that find_i440fx() was only used there, this
+> patch also removes the function find_i440fx() itself from the
+> entire codebase.
 
-No problem. I didn't have the time to do anything today.
+Nice :)
 
-Thanks,
-Laurent
+> 
+> Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
+> Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+> ---
+>   hw/acpi/pcihp.c       | 10 ++++------
+>   hw/pci-host/piix.c    |  8 --------
+>   include/hw/i386/pc.h  |  1 -
+>   stubs/Makefile.objs   |  1 -
+>   stubs/pci-host-piix.c |  6 ------
+>   5 files changed, 4 insertions(+), 22 deletions(-)
+>   delete mode 100644 stubs/pci-host-piix.c
+> 
+> diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
+> index 80d42e12ff..254b2e50ab 100644
+> --- a/hw/acpi/pcihp.c
+> +++ b/hw/acpi/pcihp.c
+> @@ -93,10 +93,9 @@ static void *acpi_set_bsel(PCIBus *bus, void *opaque)
+>       return bsel_alloc;
+>   }
+>   
+> -static void acpi_set_pci_info(void)
+> +static void acpi_set_pci_info(AcpiPciHpState *s)
+>   {
+>       static bool bsel_is_set;
+> -    PCIBus *bus;
+>       unsigned bsel_alloc = ACPI_PCIHP_BSEL_DEFAULT;
+>   
+>       if (bsel_is_set) {
+> @@ -104,10 +103,9 @@ static void acpi_set_pci_info(void)
+>       }
+>       bsel_is_set = true;
+>   
+> -    bus = find_i440fx(); /* TODO: Q35 support */
+> -    if (bus) {
+> +    if (s->root) {
+>           /* Scan all PCI buses. Set property to enable acpi based hotplug. */
+> -        pci_for_each_bus_depth_first(bus, acpi_set_bsel, NULL, &bsel_alloc);
+> +        pci_for_each_bus_depth_first(s->root, acpi_set_bsel, NULL, &bsel_alloc);
+>       }
+>   }
+>   
+> @@ -213,7 +211,7 @@ static void acpi_pcihp_update(AcpiPciHpState *s)
+>   
+>   void acpi_pcihp_reset(AcpiPciHpState *s)
+>   {
+> -    acpi_set_pci_info();
+> +    acpi_set_pci_info(s);
+>       acpi_pcihp_update(s);
+>   }
+>   
+> diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
+> index da73743fa2..4940f59c9b 100644
+> --- a/hw/pci-host/piix.c
+> +++ b/hw/pci-host/piix.c
+> @@ -445,14 +445,6 @@ PCIBus *i440fx_init(const char *host_type, const char *pci_type,
+>       return b;
+>   }
+>   
+> -PCIBus *find_i440fx(void)
+> -{
+> -    PCIHostState *s = OBJECT_CHECK(PCIHostState,
+> -                                   object_resolve_path("/machine/i440fx", NULL),
+> -                                   TYPE_PCI_HOST_BRIDGE);
+> -    return s ? s->bus : NULL;
+> -}
+> -
+>   /* PIIX3 PCI to ISA bridge */
+>   static void piix3_set_irq_pic(PIIX3State *piix3, int pic_irq)
+>   {
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index 7d177cd207..f6b2649cf8 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -260,7 +260,6 @@ PCIBus *i440fx_init(const char *host_type, const char *pci_type,
+>                       MemoryRegion *pci_memory,
+>                       MemoryRegion *ram_memory);
+>   
+> -PCIBus *find_i440fx(void);
+>   /* piix4.c */
+>   extern PCIDevice *piix4_dev;
+>   int piix4_init(PCIBus *bus, ISABus **isa_bus, int devfn);
+> diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+> index 5dd0aeeec6..725f78bedc 100644
+> --- a/stubs/Makefile.objs
+> +++ b/stubs/Makefile.objs
+> @@ -41,6 +41,5 @@ stub-obj-y += pc_madt_cpu_entry.o
+>   stub-obj-y += vmgenid.o
+>   stub-obj-y += xen-common.o
+>   stub-obj-y += xen-hvm.o
+> -stub-obj-y += pci-host-piix.o
+>   stub-obj-y += ram-block.o
+>   stub-obj-y += ramfb.o
+> diff --git a/stubs/pci-host-piix.c b/stubs/pci-host-piix.c
+> deleted file mode 100644
+> index 6ed81b1f21..0000000000
+> --- a/stubs/pci-host-piix.c
+> +++ /dev/null
+> @@ -1,6 +0,0 @@
+> -#include "qemu/osdep.h"
+> -#include "hw/i386/pc.h"
+> -PCIBus *find_i440fx(void)
+> -{
+> -    return NULL;
+> -}
+> 
