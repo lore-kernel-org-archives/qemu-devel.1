@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49667)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gH77c-0008Bi-Ci
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 08:58:21 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gH77y-0008Rl-20
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 08:58:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gH77b-0001gx-Ge
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 08:58:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36626)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gH77t-00024D-SH
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 08:58:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46432)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gH77b-0001cA-7S
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 08:58:19 -0400
+	id 1gH77m-0001mZ-2F
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 08:58:31 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
 	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1249C792BC
-	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 12:58:18 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id D5D7730A4818
+	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 12:58:22 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon, 29 Oct 2018 16:57:29 +0400
-Message-Id: <20181029125733.14597-3-marcandre.lureau@redhat.com>
+Date: Mon, 29 Oct 2018 16:57:30 +0400
+Message-Id: <20181029125733.14597-4-marcandre.lureau@redhat.com>
 In-Reply-To: <20181029125733.14597-1-marcandre.lureau@redhat.com>
 References: <20181029125733.14597-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 2/6] monitor: accept chardev input from
- iothread
+Subject: [Qemu-devel] [PATCH v2 3/6] char: add a QEMU_CHAR_FEATURE_GCONTEXT
+ flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,63 +37,59 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, peterx@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Chardev backends may not handle safely IO events from concurrent
-threads. Better to wake up the chardev from the monitor IO thread if
-it's being used as the chardev context.
-
-Unify code paths by using a BH in all cases.
-
-Drop the now redundant aio_notify() call.
+The feature should be set if the chardev is able to switch
+GMainContext. Callers that want to put a chardev in a different thread
+context can/should check this capabilities.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- monitor.c | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
+ include/chardev/char.h |  3 +++
+ chardev/char.c         | 11 +++++++++++
+ 2 files changed, 14 insertions(+)
 
-diff --git a/monitor.c b/monitor.c
-index 07712d89f9..511dd11d1c 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -4304,6 +4304,13 @@ int monitor_suspend(Monitor *mon)
-     return 0;
+diff --git a/include/chardev/char.h b/include/chardev/char.h
+index 7becd8c80c..014566c3de 100644
+--- a/include/chardev/char.h
++++ b/include/chardev/char.h
+@@ -47,6 +47,9 @@ typedef enum {
+     QEMU_CHAR_FEATURE_FD_PASS,
+     /* Whether replay or record mode is enabled */
+     QEMU_CHAR_FEATURE_REPLAY,
++    /* Whether the gcontext can be changed after calling
++     * qemu_chr_be_update_read_handlers() */
++    QEMU_CHAR_FEATURE_GCONTEXT,
+=20
+     QEMU_CHAR_FEATURE_LAST,
+ } ChardevFeature;
+diff --git a/chardev/char.c b/chardev/char.c
+index 7f07a1bfbd..b5ee58b7d2 100644
+--- a/chardev/char.c
++++ b/chardev/char.c
+@@ -196,6 +196,8 @@ void qemu_chr_be_update_read_handlers(Chardev *s,
+     s->gcontext =3D context;
+     if (cc->chr_update_read_handler) {
+         cc->chr_update_read_handler(s);
++    } else if (s->gcontext) {
++        error_report("switching context isn't supported by this chardev"=
+);
+     }
  }
 =20
-+static void monitor_accept_input(void *opaque)
-+{
-+    Monitor *mon =3D opaque;
-+
-+    qemu_chr_fe_accept_input(&mon->chr);
-+}
-+
- void monitor_resume(Monitor *mon)
- {
-     if (monitor_is_hmp_non_interactive(mon)) {
-@@ -4311,20 +4318,24 @@ void monitor_resume(Monitor *mon)
-     }
+@@ -240,6 +242,15 @@ static void char_init(Object *obj)
 =20
-     if (atomic_dec_fetch(&mon->suspend_cnt) =3D=3D 0) {
-+        AioContext *ctx =3D qemu_get_aio_context();
+     chr->logfd =3D -1;
+     qemu_mutex_init(&chr->chr_write_lock);
 +
-         if (monitor_is_qmp(mon)) {
-             /*
-              * For QMP monitors that are running in the I/O thread,
-              * let's kick the thread in case it's sleeping.
-              */
-             if (mon->use_io_thread) {
--                aio_notify(iothread_get_aio_context(mon_iothread));
-+                ctx =3D iothread_get_aio_context(mon_iothread);
-             }
-         } else {
-             assert(mon->rs);
-             readline_show_prompt(mon->rs);
-         }
--        qemu_chr_fe_accept_input(&mon->chr);
++    /*
++     * Assume if chr_update_read_handler is implemented it will
++     * take the updated gcontext into account.
++     */
++    if (CHARDEV_GET_CLASS(chr)->chr_update_read_handler) {
++        qemu_chr_set_feature(chr, QEMU_CHAR_FEATURE_GCONTEXT);
++    }
 +
-+        aio_bh_schedule_oneshot(ctx, monitor_accept_input, mon);
-     }
-+
-     trace_monitor_suspend(mon, -1);
  }
 =20
+ static int null_chr_write(Chardev *chr, const uint8_t *buf, int len)
 --=20
 2.19.0.271.gfe8321ec05
