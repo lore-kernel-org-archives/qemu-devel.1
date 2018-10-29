@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50609)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51849)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gH5l9-0004QD-Ex
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:31:05 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gH5oa-0007z2-5i
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:34:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gH5l3-0001ot-EV
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:31:03 -0400
-Received: from mail-by2nam01on0092.outbound.protection.outlook.com
-	([104.47.34.92]:17312
-	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1gH5l3-00011Y-0u
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:30:57 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Mon, 29 Oct 2018 11:30:12 +0000
-Message-ID: <BN6PR2201MB1251104F3707E401744C8448C6F30@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <1540812328-16163-1-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1540812328-16163-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gH5oZ-0006HM-ER
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:34:36 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43764)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1gH5oX-000690-F1
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:34:33 -0400
+Received: by mail-wr1-x442.google.com with SMTP id t10-v6so8258643wrn.10
+	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 04:34:29 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v8 00/20] target/mips: Add limited support
- for Ingenic's MXU ASE
+References: <20181009131251.721-1-marcandre.lureau@redhat.com>
+	<20181009131251.721-3-marcandre.lureau@redhat.com>
+	<20181010034525.GM18728@xz-x1>
+In-Reply-To: <20181010034525.GM18728@xz-x1>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Mon, 29 Oct 2018 15:34:16 +0400
+Message-ID: <CAJ+F1C+mXtAMt2JG9tS03dJFP4qOK=1qkhtB3GsrNAEaSyL-gw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/6] monitor: accept chardev input from
+ iothread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,81 +32,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "jancraig@amazon.com" <jancraig@amazon.com>
-Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-> From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-> Subject: [PATCH v8 00/20] target/mips: Add limited support for Ingenic's =
-MXU ASE
->=20
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
->=20
-> This patch set begins to add MXU ASE instruction support.
->=20
+Hi
 
-Craig, do you have any comments/suggestions on this series?
+On Wed, Oct 10, 2018 at 7:45 AM Peter Xu <peterx@redhat.com> wrote:
+>
+> On Tue, Oct 09, 2018 at 05:12:47PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> > Chardev backends may not handle safely IO events from concurrent
+> > threads. Better to wake up the chardev from the monitor IO thread if
+> > it's being used as the chardev context.
+> >
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >  monitor.c | 12 ++++++++++--
+> >  1 file changed, 10 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/monitor.c b/monitor.c
+> > index ab60c9f87e..a25514490a 100644
+> > --- a/monitor.c
+> > +++ b/monitor.c
+> > @@ -4297,6 +4297,13 @@ int monitor_suspend(Monitor *mon)
+> >      return 0;
+> >  }
+> >
+> > +static void monitor_accept_input(void *opaque)
+> > +{
+> > +    Monitor *mon =3D opaque;
+> > +
+> > +    qemu_chr_fe_accept_input(&mon->chr);
+> > +}
+> > +
+> >  void monitor_resume(Monitor *mon)
+> >  {
+> >      if (monitor_is_hmp_non_interactive(mon)) {
+> > @@ -4310,13 +4317,14 @@ void monitor_resume(Monitor *mon)
+> >               * let's kick the thread in case it's sleeping.
+> >               */
+> >              if (mon->use_io_thread) {
+> > -                aio_notify(iothread_get_aio_context(mon_iothread));
+> > +                aio_bh_schedule_oneshot(iothread_get_aio_context(mon_i=
+othread),
+> > +                                        monitor_accept_input, mon);
+>
+> Just to make sure: this will definitely cover the previous
+> aio_notify(), am I right?
+>
+> Imho some comment would always be nice here because QMPs with
+> use_io_thread=3Dtrue seems special anyway.
+>
+> >              }
+> >          } else {
+> >              assert(mon->rs);
+> >              readline_show_prompt(mon->rs);
+> > +            monitor_accept_input(mon);
+> >          }
+> > -        qemu_chr_fe_accept_input(&mon->chr);
+>
+> How about the QMP monitors with oob=3Doff?  Will it miss the call?
 
-Regards,
-Aleksandar
+good catch
 
-> v7->v8:
->=20
->   - corrected several mistakes in MXU ASE overview note
->   - add several clarifying comments
->   - rebased to the latest code
->=20
-> v6->v7:
->=20
->   - move MXU_EN check to the main MXU decoding function
->   - amend MXU ASE overview note
->=20
-> v5->v6:
->=20
->   - added bit definitions for 'aptn1' and 'eptn2'.
->   - pool04 eliminated, since it is covered by a single instruction.
->   - moved MUL, S32M2I, S32I2M handling out of main MXU switch.
->   - rebased to the latest code (this series applies on top of
->     the current MIPS pull request)
->=20
-> v4->v5:
->=20
->   - added full decoding engine for MXU ASE
->   - changes on aptn2, optn2, optn3 are now stand-alone patches
->   - all patches on individual instructions are reworked to fit
->     new decoding engine, and also cosmetically improved
->   - rebased to the latest code
->=20
-> Aleksandar Markovic (8):
->   target/mips: Amend MXU instruction opcodes
->   target/mips: Add and integrate MXU decoding engine placeholder
->   target/mips: Add MXU decoding engine
->   target/mips: Add bit encoding for MXU accumulate add/sub 1-bit pattern
->     'aptn1'
->   target/mips: Add bit encoding for MXU execute add/sub pattern 'eptn2'
->   target/mips: Move MUL, S32M2I, S32I2M handling out of main MXU switch
->   target/mips: Move MXU_EN check one level higher
->   target/mips: Amend MXU ASE overview note
->=20
-> Craig Janeczek (12):
->   target/mips: Introduce MXU registers
->   target/mips: Define a bit for MXU in insn_flags
->   target/mips: Add bit encoding for MXU accumulate add/sub 2-bit pattern
->     'aptn2'
->   target/mips: Add bit encoding for MXU operand getting pattern 'optn2'
->   target/mips: Add bit encoding for MXU operand getting pattern 'optn3'
->   target/mips: Add emulation of non-MXU MULL within MXU decoding engine
->   target/mips: Add emulation of MXU instructions S32I2M and S32M2I
->   target/mips: Add emulation of MXU instruction S8LDD
->   target/mips: Add emulation of MXU instruction D16MUL
->   target/mips: Add emulation of MXU instruction D16MAC
->   target/mips: Add emulation of MXU instructions Q8MUL and Q8MULSU
->   target/mips: Add emulation of MXU instructions S32LDD and S32LDDR
->=20
->  target/mips/cpu.h       |   10 +
->  target/mips/mips-defs.h |    1 +
->  target/mips/translate.c | 2104 +++++++++++++++++++++++++++++++++++++++++=
-+-----
->  3 files changed, 1896 insertions(+), 219 deletions(-)
->=20
+>
+> I would consider caching the aio context into Monitor struct when
+> monitor init, then call aio_bh_schedule_oneshot() always with the
+> per-monitor aio cache.  This could unify the code paths too so we keep
+> the oob special path as less as possible.
+
+Saving the aio context isn't really necessary. However, I'll unify the
+code paths in v2.
+
+thanks
+
+>
+> >      }
+> >      trace_monitor_suspend(mon, -1);
+> >  }
+> > --
+> > 2.19.0.271.gfe8321ec05
+> >
+>
+> Regards,
+>
 > --
-> 2.7.4
+> Peter Xu
+>
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
