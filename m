@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37666)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37687)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefan.markovic@rt-rk.com>) id 1gH825-0003I8-13
+	(envelope-from <stefan.markovic@rt-rk.com>) id 1gH825-0003J7-RV
 	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:56:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefan.markovic@rt-rk.com>) id 1gH823-0003Em-4q
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:56:40 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:43869 helo=mail.rt-rk.com)
+	(envelope-from <stefan.markovic@rt-rk.com>) id 1gH825-0003Fv-02
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:56:41 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:44016 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefan.markovic@rt-rk.com>)
-	id 1gH81z-0002Td-Dq
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:56:37 -0400
+	id 1gH823-0002aC-04
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:56:40 -0400
 From: Stefan Markovic <stefan.markovic@rt-rk.com>
-Date: Mon, 29 Oct 2018 14:55:11 +0100
-Message-Id: <1540821315-28346-3-git-send-email-stefan.markovic@rt-rk.com>
+Date: Mon, 29 Oct 2018 14:55:12 +0100
+Message-Id: <1540821315-28346-4-git-send-email-stefan.markovic@rt-rk.com>
 In-Reply-To: <1540821315-28346-1-git-send-email-stefan.markovic@rt-rk.com>
 References: <1540821315-28346-1-git-send-email-stefan.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v2 2/6] Extend image_info struct with MIPS
- specific fp_abi and interp_fp_abi fields
+Subject: [Qemu-devel] [PATCH v2 3/6] Extract MIPS abiflags from ELF file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,30 +29,69 @@ Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovan
 
 From: Stefan Markovic <smarkovic@wavecomp.com>
 
-Add MIPS specific image_info struct fields fp_abi and interp_fp_abi
-to store executable and interpreter fp_abi values (based on kernel
-struct arch_elf_state in mips/include/asm/elf.h).
+Read MIPS.abiflags section from ELF file into Mips_elf_abiflags_v0 struct.
 
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- linux-user/qemu.h | 4 ++++
- 1 file changed, 4 insertions(+)
+ linux-user/elfload.c | 33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
 
-diff --git a/linux-user/qemu.h b/linux-user/qemu.h
-index 1beb6a2..a752c1c 100644
---- a/linux-user/qemu.h
-+++ b/linux-user/qemu.h
-@@ -61,6 +61,10 @@ struct image_info {
-         abi_ulong       interpreter_loadmap_addr;
-         abi_ulong       interpreter_pt_dynamic_addr;
-         struct image_info *other_info;
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index 055f6a9..5881233 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -1517,11 +1517,25 @@ static void bswap_sym(struct elf_sym *sym)
+     bswaptls(&sym->st_size);
+     bswap16s(&sym->st_shndx);
+ }
++
 +#ifdef TARGET_MIPS
-+        int             fp_abi;
-+        int             interp_fp_abi;
++static void bswap_mips_abiflags(Mips_elf_abiflags_v0 *abiflags)
++{
++    bswap16s(&abiflags->version);
++    bswap32s(&abiflags->ases);
++    bswap32s(&abiflags->isa_ext);
++    bswap32s(&abiflags->flags1);
++    bswap32s(&abiflags->flags2);
++}
 +#endif
- };
+ #else
+ static inline void bswap_ehdr(struct elfhdr *ehdr) { }
+ static inline void bswap_phdr(struct elf_phdr *phdr, int phnum) { }
+ static inline void bswap_shdr(struct elf_shdr *shdr, int shnum) { }
+ static inline void bswap_sym(struct elf_sym *sym) { }
++#ifdef TARGET_MIPS
++static inline void bswap_mips_abiflags(Mips_elf_abiflags_v0 *abiflags) { }
++#endif
+ #endif
  
- #ifdef TARGET_I386
+ #ifdef USE_ELF_CORE_DUMP
+@@ -2364,6 +2378,25 @@ static void load_elf_image(const char *image_name, int image_fd,
+                 goto exit_errmsg;
+             }
+             *pinterp_name = interp_name;
++#ifdef TARGET_MIPS
++        } else if (eppnt->p_type == PT_MIPS_ABIFLAGS) {
++            Mips_elf_abiflags_v0 abiflags;
++            if (eppnt->p_filesz < sizeof(Mips_elf_abiflags_v0)) {
++                errmsg = "Invalid PT_MIPS_ABIFLAGS entry";
++                goto exit_errmsg;
++            }
++            if (eppnt->p_offset + eppnt->p_filesz <= BPRM_BUF_SIZE) {
++                memcpy(&abiflags, bprm_buf + eppnt->p_offset,
++                       sizeof(Mips_elf_abiflags_v0));
++            } else {
++                retval = pread(image_fd, &abiflags, sizeof(Mips_elf_abiflags_v0),
++                               eppnt->p_offset);
++                if (retval != sizeof(Mips_elf_abiflags_v0)) {
++                    goto exit_perror;
++                }
++            }
++            bswap_mips_abiflags(&abiflags);
++#endif
+         }
+     }
+ 
 -- 
 1.9.1
