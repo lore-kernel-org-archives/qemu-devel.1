@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39167)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39219)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gH9ZS-0005C6-4e
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:35:16 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1gH9ZY-0005IC-Hm
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:35:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gH9ZQ-00049K-Bo
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:35:14 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1gH9ZT-0004CZ-Vt
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:35:17 -0400
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:52104)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1gH9ZP-0003rj-Vj
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:35:12 -0400
+	id 1gH9ZT-0003rj-Ne
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:35:15 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1gH9Yu-00005K-6r
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 15:34:40 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1gH9Yq-0008WK-TH
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 15:34:36 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 29 Oct 2018 15:34:30 +0000
-Message-Id: <20181029153432.23273-5-peter.maydell@linaro.org>
+Date: Mon, 29 Oct 2018 15:34:27 +0000
+Message-Id: <20181029153432.23273-2-peter.maydell@linaro.org>
 In-Reply-To: <20181029153432.23273-1-peter.maydell@linaro.org>
 References: <20181029153432.23273-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 4/6] hw/char: Implement nRF51 SoC UART
+Subject: [Qemu-devel] [PULL 1/6] hw/arm/virt: Set VIRT_COMPAT_3_0 compat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,464 +31,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Julia Suvorova via Qemu-devel <qemu-devel@nongnu.org>
+From: Eric Auger <eric.auger@redhat.com>
 
-Not implemented: CTS/NCTS, PSEL*.
+We are missing the VIRT_COMPAT_3_0 definition and setting.
+Let's add them.
 
-Signed-off-by: Julia Suvorova <jusual@mail.ru>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+Message-id: 20181024085602.16611-1-eric.auger@redhat.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/char/Makefile.objs        |   1 +
- include/hw/char/nrf51_uart.h |  78 +++++++++
- hw/char/nrf51_uart.c         | 330 +++++++++++++++++++++++++++++++++++
- hw/char/trace-events         |   4 +
- 4 files changed, 413 insertions(+)
- create mode 100644 include/hw/char/nrf51_uart.h
- create mode 100644 hw/char/nrf51_uart.c
+ hw/arm/virt.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
-index b5705312910..c4947d7ae7b 100644
---- a/hw/char/Makefile.objs
-+++ b/hw/char/Makefile.objs
-@@ -1,5 +1,6 @@
- common-obj-$(CONFIG_IPACK) += ipoctal232.o
- common-obj-$(CONFIG_ESCC) += escc.o
-+common-obj-$(CONFIG_NRF51_SOC) += nrf51_uart.o
- common-obj-$(CONFIG_PARALLEL) += parallel.o
- common-obj-$(CONFIG_PARALLEL) += parallel-isa.o
- common-obj-$(CONFIG_PL011) += pl011.o
-diff --git a/include/hw/char/nrf51_uart.h b/include/hw/char/nrf51_uart.h
-new file mode 100644
-index 00000000000..e3ecb7c81c2
---- /dev/null
-+++ b/include/hw/char/nrf51_uart.h
-@@ -0,0 +1,78 @@
-+/*
-+ * nRF51 SoC UART emulation
-+ *
-+ * Copyright (c) 2018 Julia Suvorova <jusual@mail.ru>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 or
-+ * (at your option) any later version.
-+ */
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 9f677825f9f..a2b8d8f7c2c 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -1871,6 +1871,9 @@ static void virt_machine_3_1_options(MachineClass *mc)
+ }
+ DEFINE_VIRT_MACHINE_AS_LATEST(3, 1)
+ 
++#define VIRT_COMPAT_3_0 \
++    HW_COMPAT_3_0
 +
-+#ifndef NRF51_UART_H
-+#define NRF51_UART_H
-+
-+#include "hw/sysbus.h"
-+#include "chardev/char-fe.h"
-+#include "hw/registerfields.h"
-+
-+#define UART_FIFO_LENGTH 6
-+#define UART_BASE 0x40002000
-+#define UART_SIZE 0x1000
-+
-+#define TYPE_NRF51_UART "nrf51_soc.uart"
-+#define NRF51_UART(obj) OBJECT_CHECK(NRF51UARTState, (obj), TYPE_NRF51_UART)
-+
-+REG32(UART_STARTRX, 0x000)
-+REG32(UART_STOPRX, 0x004)
-+REG32(UART_STARTTX, 0x008)
-+REG32(UART_STOPTX, 0x00C)
-+REG32(UART_SUSPEND, 0x01C)
-+
-+REG32(UART_CTS, 0x100)
-+REG32(UART_NCTS, 0x104)
-+REG32(UART_RXDRDY, 0x108)
-+REG32(UART_TXDRDY, 0x11C)
-+REG32(UART_ERROR, 0x124)
-+REG32(UART_RXTO, 0x144)
-+
-+REG32(UART_INTEN, 0x300)
-+    FIELD(UART_INTEN, CTS, 0, 1)
-+    FIELD(UART_INTEN, NCTS, 1, 1)
-+    FIELD(UART_INTEN, RXDRDY, 2, 1)
-+    FIELD(UART_INTEN, TXDRDY, 7, 1)
-+    FIELD(UART_INTEN, ERROR, 9, 1)
-+    FIELD(UART_INTEN, RXTO, 17, 1)
-+REG32(UART_INTENSET, 0x304)
-+REG32(UART_INTENCLR, 0x308)
-+REG32(UART_ERRORSRC, 0x480)
-+REG32(UART_ENABLE, 0x500)
-+REG32(UART_PSELRTS, 0x508)
-+REG32(UART_PSELTXD, 0x50C)
-+REG32(UART_PSELCTS, 0x510)
-+REG32(UART_PSELRXD, 0x514)
-+REG32(UART_RXD, 0x518)
-+REG32(UART_TXD, 0x51C)
-+REG32(UART_BAUDRATE, 0x524)
-+REG32(UART_CONFIG, 0x56C)
-+
-+typedef struct NRF51UARTState {
-+    SysBusDevice parent_obj;
-+
-+    MemoryRegion iomem;
-+    CharBackend chr;
-+    qemu_irq irq;
-+    guint watch_tag;
-+
-+    uint8_t rx_fifo[UART_FIFO_LENGTH];
-+    unsigned int rx_fifo_pos;
-+    unsigned int rx_fifo_len;
-+
-+    uint32_t reg[0x56C];
-+
-+    bool rx_started;
-+    bool tx_started;
-+    bool pending_tx_byte;
-+    bool enabled;
-+} NRF51UARTState;
-+
-+#endif
-diff --git a/hw/char/nrf51_uart.c b/hw/char/nrf51_uart.c
-new file mode 100644
-index 00000000000..2f5fae61671
---- /dev/null
-+++ b/hw/char/nrf51_uart.c
-@@ -0,0 +1,330 @@
-+/*
-+ * nRF51 SoC UART emulation
-+ *
-+ * See nRF51 Series Reference Manual, "29 Universal Asynchronous
-+ * Receiver/Transmitter" for hardware specifications:
-+ * http://infocenter.nordicsemi.com/pdf/nRF51_RM_v3.0.pdf
-+ *
-+ * Copyright (c) 2018 Julia Suvorova <jusual@mail.ru>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 or
-+ * (at your option) any later version.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/log.h"
-+#include "hw/char/nrf51_uart.h"
-+#include "trace.h"
-+
-+static void nrf51_uart_update_irq(NRF51UARTState *s)
-+{
-+    bool irq = false;
-+
-+    irq |= (s->reg[R_UART_RXDRDY] &&
-+            (s->reg[R_UART_INTEN] & R_UART_INTEN_RXDRDY_MASK));
-+    irq |= (s->reg[R_UART_TXDRDY] &&
-+            (s->reg[R_UART_INTEN] & R_UART_INTEN_TXDRDY_MASK));
-+    irq |= (s->reg[R_UART_ERROR]  &&
-+            (s->reg[R_UART_INTEN] & R_UART_INTEN_ERROR_MASK));
-+    irq |= (s->reg[R_UART_RXTO]   &&
-+            (s->reg[R_UART_INTEN] & R_UART_INTEN_RXTO_MASK));
-+
-+    qemu_set_irq(s->irq, irq);
-+}
-+
-+static uint64_t uart_read(void *opaque, hwaddr addr, unsigned int size)
-+{
-+    NRF51UARTState *s = NRF51_UART(opaque);
-+    uint64_t r;
-+
-+    if (!s->enabled) {
-+        return 0;
-+    }
-+
-+    switch (addr) {
-+    case A_UART_RXD:
-+        r = s->rx_fifo[s->rx_fifo_pos];
-+        if (s->rx_started && s->rx_fifo_len) {
-+            s->rx_fifo_pos = (s->rx_fifo_pos + 1) % UART_FIFO_LENGTH;
-+            s->rx_fifo_len--;
-+            if (s->rx_fifo_len) {
-+                s->reg[R_UART_RXDRDY] = 1;
-+                nrf51_uart_update_irq(s);
-+            }
-+            qemu_chr_fe_accept_input(&s->chr);
-+        }
-+        break;
-+    case A_UART_INTENSET:
-+    case A_UART_INTENCLR:
-+    case A_UART_INTEN:
-+        r = s->reg[R_UART_INTEN];
-+        break;
-+    default:
-+        r = s->reg[addr / 4];
-+        break;
-+    }
-+
-+    trace_nrf51_uart_read(addr, r, size);
-+
-+    return r;
-+}
-+
-+static gboolean uart_transmit(GIOChannel *chan, GIOCondition cond, void *opaque)
-+{
-+    NRF51UARTState *s = NRF51_UART(opaque);
-+    int r;
-+    uint8_t c = s->reg[R_UART_TXD];
-+
-+    s->watch_tag = 0;
-+
-+    r = qemu_chr_fe_write(&s->chr, &c, 1);
-+    if (r <= 0) {
-+        s->watch_tag = qemu_chr_fe_add_watch(&s->chr, G_IO_OUT | G_IO_HUP,
-+                                             uart_transmit, s);
-+        if (!s->watch_tag) {
-+            /* The hardware has no transmit error reporting,
-+             * so silently drop the byte
-+             */
-+            goto buffer_drained;
-+        }
-+        return FALSE;
-+    }
-+
-+buffer_drained:
-+    s->reg[R_UART_TXDRDY] = 1;
-+    s->pending_tx_byte = false;
-+    return FALSE;
-+}
-+
-+static void uart_cancel_transmit(NRF51UARTState *s)
-+{
-+    if (s->watch_tag) {
-+        g_source_remove(s->watch_tag);
-+        s->watch_tag = 0;
-+    }
-+}
-+
-+static void uart_write(void *opaque, hwaddr addr,
-+                       uint64_t value, unsigned int size)
-+{
-+    NRF51UARTState *s = NRF51_UART(opaque);
-+
-+    trace_nrf51_uart_write(addr, value, size);
-+
-+    if (!s->enabled && (addr != A_UART_ENABLE)) {
-+        return;
-+    }
-+
-+    switch (addr) {
-+    case A_UART_TXD:
-+        if (!s->pending_tx_byte && s->tx_started) {
-+            s->reg[R_UART_TXD] = value;
-+            s->pending_tx_byte = true;
-+            uart_transmit(NULL, G_IO_OUT, s);
-+        }
-+        break;
-+    case A_UART_INTEN:
-+        s->reg[R_UART_INTEN] = value;
-+        break;
-+    case A_UART_INTENSET:
-+        s->reg[R_UART_INTEN] |= value;
-+        break;
-+    case A_UART_INTENCLR:
-+        s->reg[R_UART_INTEN] &= ~value;
-+        break;
-+    case A_UART_TXDRDY ... A_UART_RXTO:
-+        s->reg[addr / 4] = value;
-+        break;
-+    case A_UART_ERRORSRC:
-+        s->reg[addr / 4] &= ~value;
-+        break;
-+    case A_UART_RXD:
-+        break;
-+    case A_UART_RXDRDY:
-+        if (value == 0) {
-+            s->reg[R_UART_RXDRDY] = 0;
-+        }
-+        break;
-+    case A_UART_STARTTX:
-+        if (value == 1) {
-+            s->tx_started = true;
-+        }
-+        break;
-+    case A_UART_STARTRX:
-+        if (value == 1) {
-+            s->rx_started = true;
-+        }
-+        break;
-+    case A_UART_ENABLE:
-+        if (value) {
-+            if (value == 4) {
-+                s->enabled = true;
-+            }
-+            break;
-+        }
-+        s->enabled = false;
-+        value = 1;
-+        /* fall through */
-+    case A_UART_SUSPEND:
-+    case A_UART_STOPTX:
-+        if (value == 1) {
-+            s->tx_started = false;
-+        }
-+        /* fall through */
-+    case A_UART_STOPRX:
-+        if (addr != A_UART_STOPTX && value == 1) {
-+            s->rx_started = false;
-+            s->reg[R_UART_RXTO] = 1;
-+        }
-+        break;
-+    default:
-+        s->reg[addr / 4] = value;
-+        break;
-+    }
-+    nrf51_uart_update_irq(s);
-+}
-+
-+static const MemoryRegionOps uart_ops = {
-+    .read =  uart_read,
-+    .write = uart_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+};
-+
-+static void nrf51_uart_reset(DeviceState *dev)
-+{
-+    NRF51UARTState *s = NRF51_UART(dev);
-+
-+    s->pending_tx_byte = 0;
-+
-+    uart_cancel_transmit(s);
-+
-+    memset(s->reg, 0, sizeof(s->reg));
-+
-+    s->reg[R_UART_PSELRTS] = 0xFFFFFFFF;
-+    s->reg[R_UART_PSELTXD] = 0xFFFFFFFF;
-+    s->reg[R_UART_PSELCTS] = 0xFFFFFFFF;
-+    s->reg[R_UART_PSELRXD] = 0xFFFFFFFF;
-+    s->reg[R_UART_BAUDRATE] = 0x4000000;
-+
-+    s->rx_fifo_len = 0;
-+    s->rx_fifo_pos = 0;
-+    s->rx_started = false;
-+    s->tx_started = false;
-+    s->enabled = false;
-+}
-+
-+static void uart_receive(void *opaque, const uint8_t *buf, int size)
-+{
-+
-+    NRF51UARTState *s = NRF51_UART(opaque);
-+    int i;
-+
-+    if (size == 0 || s->rx_fifo_len >= UART_FIFO_LENGTH) {
-+        return;
-+    }
-+
-+    for (i = 0; i < size; i++) {
-+        uint32_t pos = (s->rx_fifo_pos + s->rx_fifo_len) % UART_FIFO_LENGTH;
-+        s->rx_fifo[pos] = buf[i];
-+        s->rx_fifo_len++;
-+    }
-+
-+    s->reg[R_UART_RXDRDY] = 1;
-+    nrf51_uart_update_irq(s);
-+}
-+
-+static int uart_can_receive(void *opaque)
-+{
-+    NRF51UARTState *s = NRF51_UART(opaque);
-+
-+    return s->rx_started ? (UART_FIFO_LENGTH - s->rx_fifo_len) : 0;
-+}
-+
-+static void uart_event(void *opaque, int event)
-+{
-+    NRF51UARTState *s = NRF51_UART(opaque);
-+
-+    if (event == CHR_EVENT_BREAK) {
-+        s->reg[R_UART_ERRORSRC] |= 3;
-+        s->reg[R_UART_ERROR] = 1;
-+        nrf51_uart_update_irq(s);
-+    }
-+}
-+
-+static void nrf51_uart_realize(DeviceState *dev, Error **errp)
-+{
-+    NRF51UARTState *s = NRF51_UART(dev);
-+
-+    qemu_chr_fe_set_handlers(&s->chr, uart_can_receive, uart_receive,
-+                             uart_event, NULL, s, NULL, true);
-+}
-+
-+static void nrf51_uart_init(Object *obj)
-+{
-+    NRF51UARTState *s = NRF51_UART(obj);
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+
-+    memory_region_init_io(&s->iomem, obj, &uart_ops, s,
-+                          "nrf51_soc.uart", UART_SIZE);
-+    sysbus_init_mmio(sbd, &s->iomem);
-+    sysbus_init_irq(sbd, &s->irq);
-+}
-+
-+static int nrf51_uart_post_load(void *opaque, int version_id)
-+{
-+    NRF51UARTState *s = NRF51_UART(opaque);
-+
-+    if (s->pending_tx_byte) {
-+        s->watch_tag = qemu_chr_fe_add_watch(&s->chr, G_IO_OUT | G_IO_HUP,
-+                                             uart_transmit, s);
-+    }
-+
-+    return 0;
-+}
-+
-+static const VMStateDescription nrf51_uart_vmstate = {
-+    .name = "nrf51_soc.uart",
-+    .post_load = nrf51_uart_post_load,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32_ARRAY(reg, NRF51UARTState, 0x56C),
-+        VMSTATE_UINT8_ARRAY(rx_fifo, NRF51UARTState, UART_FIFO_LENGTH),
-+        VMSTATE_UINT32(rx_fifo_pos, NRF51UARTState),
-+        VMSTATE_UINT32(rx_fifo_len, NRF51UARTState),
-+        VMSTATE_BOOL(rx_started, NRF51UARTState),
-+        VMSTATE_BOOL(tx_started, NRF51UARTState),
-+        VMSTATE_BOOL(pending_tx_byte, NRF51UARTState),
-+        VMSTATE_BOOL(enabled, NRF51UARTState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static Property nrf51_uart_properties[] = {
-+    DEFINE_PROP_CHR("chardev", NRF51UARTState, chr),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void nrf51_uart_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->reset = nrf51_uart_reset;
-+    dc->realize = nrf51_uart_realize;
-+    dc->props = nrf51_uart_properties;
-+    dc->vmsd = &nrf51_uart_vmstate;
-+}
-+
-+static const TypeInfo nrf51_uart_info = {
-+    .name = TYPE_NRF51_UART,
-+    .parent = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(NRF51UARTState),
-+    .instance_init = nrf51_uart_init,
-+    .class_init = nrf51_uart_class_init
-+};
-+
-+static void nrf51_uart_register_types(void)
-+{
-+    type_register_static(&nrf51_uart_info);
-+}
-+
-+type_init(nrf51_uart_register_types)
-diff --git a/hw/char/trace-events b/hw/char/trace-events
-index b64213d4dd1..de34a74399b 100644
---- a/hw/char/trace-events
-+++ b/hw/char/trace-events
-@@ -73,3 +73,7 @@ cmsdk_apb_uart_receive(uint8_t c) "CMSDK APB UART: got character 0x%x from backe
- cmsdk_apb_uart_tx_pending(void) "CMSDK APB UART: character send to backend pending"
- cmsdk_apb_uart_tx(uint8_t c) "CMSDK APB UART: character 0x%x sent to backend"
- cmsdk_apb_uart_set_params(int speed) "CMSDK APB UART: params set to %d 8N1"
-+
-+# hw/char/nrf51_uart.c
-+nrf51_uart_read(uint64_t addr, uint64_t r, unsigned int size) "addr 0x%" PRIx64 " value 0x%" PRIx64 " size %u"
-+nrf51_uart_write(uint64_t addr, uint64_t value, unsigned int size) "addr 0x%" PRIx64 " value 0x%" PRIx64 " size %u"
+ static void virt_3_0_instance_init(Object *obj)
+ {
+     virt_3_1_instance_init(obj);
+@@ -1879,6 +1882,7 @@ static void virt_3_0_instance_init(Object *obj)
+ static void virt_machine_3_0_options(MachineClass *mc)
+ {
+     virt_machine_3_1_options(mc);
++    SET_MACHINE_COMPAT(mc, VIRT_COMPAT_3_0);
+ }
+ DEFINE_VIRT_MACHINE(3, 0)
+ 
 -- 
 2.19.1
