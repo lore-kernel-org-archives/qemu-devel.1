@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45185)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gHF27-00040x-7i
+	(envelope-from <jsnow@redhat.com>) id 1gHF27-00040z-7i
 	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 17:25:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gHF24-0002G6-JC
+	(envelope-from <jsnow@redhat.com>) id 1gHF23-0002Fc-CW
 	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 17:25:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33422)
+Received: from mx1.redhat.com ([209.132.183.28]:55206)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1gHF24-0002Fr-D1
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 17:25:08 -0400
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1gHF23-0002FA-2v
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 17:25:07 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Mon, 29 Oct 2018 17:24:45 -0400
-Message-Id: <20181029212501.5897-4-jsnow@redhat.com>
+Date: Mon, 29 Oct 2018 17:24:43 -0400
+Message-Id: <20181029212501.5897-2-jsnow@redhat.com>
 In-Reply-To: <20181029212501.5897-1-jsnow@redhat.com>
 References: <20181029212501.5897-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PULL 03/19] dirty-bitmap: rename
- bdrv_undo_clear_dirty_bitmap
+Subject: [Qemu-devel] [PULL 01/19] blockdev-backup: add bitmap argument
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,66 +24,86 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: jsnow@redhat.com, peter.maydell@linaro.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: jsnow@redhat.com, peter.maydell@linaro.org
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+It is only an oversight that we don't allow incremental backup with
+blockdev-backup. Add the bitmap argument which enables this.
 
-Use more generic names to reuse the function for bitmap merge in the
-following commit.
-
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
+Signed-off-by: John Snow <jsnow@redhat.com>
+Message-id: 20180830211605.13683-2-jsnow@redhat.com
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- block/dirty-bitmap.c      | 4 ++--
- blockdev.c                | 2 +-
- include/block/block_int.h | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
+ blockdev.c           | 18 +++++++++++++++++-
+ qapi/block-core.json |  7 ++++++-
+ 2 files changed, 23 insertions(+), 2 deletions(-)
 
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 6c8761e027..017ee9db46 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -633,12 +633,12 @@ void bdrv_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap **out)
-     bdrv_dirty_bitmap_unlock(bitmap);
- }
- 
--void bdrv_undo_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap *in)
-+void bdrv_restore_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap *backup)
- {
-     HBitmap *tmp = bitmap->bitmap;
-     assert(bdrv_dirty_bitmap_enabled(bitmap));
-     assert(!bdrv_dirty_bitmap_readonly(bitmap));
--    bitmap->bitmap = in;
-+    bitmap->bitmap = backup;
-     hbitmap_free(tmp);
- }
- 
 diff --git a/blockdev.c b/blockdev.c
-index e3398e141a..598ff87519 100644
+index 574adbcb7f..1869f9aaf3 100644
 --- a/blockdev.c
 +++ b/blockdev.c
-@@ -2033,7 +2033,7 @@ static void block_dirty_bitmap_clear_abort(BlkActionState *common)
-                                              common, common);
- 
-     if (state->backup) {
--        bdrv_undo_clear_dirty_bitmap(state->bitmap, state->backup);
-+        bdrv_restore_dirty_bitmap(state->bitmap, state->backup);
+@@ -3545,6 +3545,7 @@ BlockJob *do_blockdev_backup(BlockdevBackup *backup, JobTxn *txn,
+     BlockDriverState *bs;
+     BlockDriverState *target_bs;
+     Error *local_err = NULL;
++    BdrvDirtyBitmap *bmap = NULL;
+     AioContext *aio_context;
+     BlockJob *job = NULL;
+     int job_flags = JOB_DEFAULT;
+@@ -3595,6 +3596,21 @@ BlockJob *do_blockdev_backup(BlockdevBackup *backup, JobTxn *txn,
+             goto out;
+         }
      }
- }
- 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 92ecbd866e..f605622216 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -1155,7 +1155,7 @@ bool blk_dev_is_medium_locked(BlockBackend *blk);
- void bdrv_set_dirty(BlockDriverState *bs, int64_t offset, int64_t bytes);
- 
- void bdrv_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap **out);
--void bdrv_undo_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap *in);
-+void bdrv_restore_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap *backup);
- 
- void bdrv_inc_in_flight(BlockDriverState *bs);
- void bdrv_dec_in_flight(BlockDriverState *bs);
++
++    if (backup->has_bitmap) {
++        bmap = bdrv_find_dirty_bitmap(bs, backup->bitmap);
++        if (!bmap) {
++            error_setg(errp, "Bitmap '%s' could not be found", backup->bitmap);
++            goto out;
++        }
++        if (bdrv_dirty_bitmap_qmp_locked(bmap)) {
++            error_setg(errp,
++                       "Bitmap '%s' is currently locked and cannot be used for "
++                       "backup", backup->bitmap);
++            goto out;
++        }
++    }
++
+     if (!backup->auto_finalize) {
+         job_flags |= JOB_MANUAL_FINALIZE;
+     }
+@@ -3602,7 +3618,7 @@ BlockJob *do_blockdev_backup(BlockdevBackup *backup, JobTxn *txn,
+         job_flags |= JOB_MANUAL_DISMISS;
+     }
+     job = backup_job_create(backup->job_id, bs, target_bs, backup->speed,
+-                            backup->sync, NULL, backup->compress,
++                            backup->sync, bmap, backup->compress,
+                             backup->on_source_error, backup->on_target_error,
+                             job_flags, NULL, NULL, txn, &local_err);
+     if (local_err != NULL) {
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index cfb37f8c1d..0fc1590c1b 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -1316,6 +1316,10 @@
+ # @speed: the maximum speed, in bytes per second. The default is 0,
+ #         for unlimited.
+ #
++# @bitmap: the name of dirty bitmap if sync is "incremental".
++#          Must be present if sync is "incremental", must NOT be present
++#          otherwise. (Since 3.1)
++#
+ # @compress: true to compress data, if the target format supports it.
+ #            (default: false) (since 2.8)
+ #
+@@ -1348,7 +1352,8 @@
+ ##
+ { 'struct': 'BlockdevBackup',
+   'data': { '*job-id': 'str', 'device': 'str', 'target': 'str',
+-            'sync': 'MirrorSyncMode', '*speed': 'int', '*compress': 'bool',
++            'sync': 'MirrorSyncMode', '*speed': 'int',
++            '*bitmap': 'str', '*compress': 'bool',
+             '*on-source-error': 'BlockdevOnError',
+             '*on-target-error': 'BlockdevOnError',
+             '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
 -- 
 2.14.5
