@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53710)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gH49b-0006Qy-MC
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 05:48:13 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1gH4CN-0007cp-7q
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 05:51:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gH49W-0001yQ-NK
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 05:48:11 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:41260)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gH49W-0001xV-ED
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 05:48:06 -0400
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20181025172057.20414-1-cota@braap.org>
-In-Reply-To: <20181025172057.20414-1-cota@braap.org>
-Date: Mon, 29 Oct 2018 12:48:05 +0300
-Message-ID: <000701d46f6c$7dc635c0$7952a140$@ru>
+	(envelope-from <pbonzini@redhat.com>) id 1gH4CI-0004UI-5k
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 05:51:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59670)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gH4CH-0004Ll-Sp
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 05:50:58 -0400
+References: <20181003114454.5662-1-marcandre.lureau@redhat.com>
+	<20181003114454.5662-4-marcandre.lureau@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f4e920ad-e51a-6783-0522-6ed5f0351ca0@redhat.com>
+Date: Mon, 29 Oct 2018 10:50:31 +0100
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [RFC 00/48] Plugin support
+In-Reply-To: <20181003114454.5662-4-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/3] memory-mapping: skip non-volatile
+ memory regions in GuestPhysBlockList
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "'Emilio G. Cota'" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, =?utf-8?Q?'Llu=C3=ADs_Vilanova'?= <vilanova@ac.upc.edu>, 'Peter Maydell' <peter.maydell@linaro.org>, =?utf-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>, 'Stefan Hajnoczi' <stefanha@gmail.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: Igor Mammedov <imammedo@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Juan Quintela <quintela@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, lersek@redhat.com
 
-> From: Emilio G. Cota [mailto:cota@braap.org]
-> - 2-pass translation. Once a "TB translation" callback is called,
->   the plugin must know the span of the TB. We should not
->   force plugins to guess where the TB will end; that is strictly
->   QEMU's job, and can change any time. A TB is thus a sequence
->   of instructions of whatever length the particular QEMU
->   implementation decides. Thus, for each TB, a 3-step process
->   is followed: (1) the plugin layer keeps a copy of the contents
->   of the current TB, (2) once the TB is well-defined, its
->   descriptor and contents are passed to plugins, which then
->   register their desired instrumentation (e.g. "call me back
->   on this particular instruction", or "call me back when
->   the whole TB executes"); note that plugins can use a disassembler
->   like capstone to decide what to do with each instruction; they
->   can also allocate memory and then get a pointer to it passed
->   back from the callbacks. And finally, (3) the target translator
->   is called again to generate the final instrumented translated TB.
->   This is what I called the "2-pass translation", since we go
->   twice over the translation loop in translator.c. Note that the
->   2-pass approach has virtually no overhead (0.40% for SPEC06int);
->   translation is much cheaper than execution. But anyway, if no
->   plugins have subscribed to TB translation, we only do one pass.
+On 03/10/2018 13:44, Marc-Andr=C3=A9 Lureau wrote:
+> diff --git a/memory_mapping.c b/memory_mapping.c
+> index 775466f3a8..724dd0b417 100644
+> --- a/memory_mapping.c
+> +++ b/memory_mapping.c
+> @@ -206,7 +206,8 @@ static void guest_phys_blocks_region_add(MemoryList=
+ener *listener,
+> =20
+>      /* we only care about RAM */
+>      if (!memory_region_is_ram(section->mr) ||
+> -        memory_region_is_ram_device(section->mr)) {
+> +        memory_region_is_ram_device(section->mr) ||
+> +        memory_region_is_nonvolatile(section->mr)) {
+>          return;
+>      }
+> =20
 
-Can plugin affect the translation somehow to force flushing cached registers?
-E.g. callback may need correct EFLAGS which usually does not updated
-until the end of the block.
+We should also have
 
-> - Support for inlining instrumentation. This is done via an
->   explicit API, i.e. we do not export TCG ops, which are internal
->   to QEMU. For now, I just have support for incrementing a u64
->   with an immediate, e.g. to increment a counter.
+diff --git a/scripts/dump-guest-memory.py b/scripts/dump-guest-memory.py
+index 5a857cebcf..dd180b531c 100644
+--- a/scripts/dump-guest-memory.py
++++ b/scripts/dump-guest-memory.py
+@@ -417,7 +417,9 @@ def get_guest_phys_blocks():
+         memory_region =3D flat_range["mr"].dereference()
 
-It means that we'll have "yet another one TCG"?
+         # we only care about RAM
+-        if not memory_region["ram"]:
++        if not memory_region["ram"] \
++           or memory_region["ram_device"] \
++           or memory_region["nonvolatile"]:
+             continue
 
-Pavel Dovgalyuk
+         section_size =3D int128_get64(flat_range["addr"]["size"])
+
+here.  I queued the patches and will post this soon as a separate patch.
+
+Paolo
