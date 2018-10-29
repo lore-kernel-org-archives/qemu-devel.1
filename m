@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53015)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gHHF8-0005q8-TZ
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 19:46:47 -0400
+	(envelope-from <alistair23@gmail.com>) id 1gHHG7-0006KS-2b
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 19:47:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gHHF5-0004FA-Dg
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 19:46:46 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:37366)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gHHF5-0004Do-08
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 19:46:43 -0400
-Received: by mail-wr1-f68.google.com with SMTP id g9-v6so10568684wrq.4
-	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 16:46:42 -0700 (PDT)
-References: <20181028124004.30494-1-liq3ea@163.com>
-	<20181028124004.30494-2-liq3ea@163.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <8b181c7d-338f-3612-48bb-751bab8f020a@redhat.com>
-Date: Tue, 30 Oct 2018 00:46:39 +0100
+	(envelope-from <alistair23@gmail.com>) id 1gHHG6-0005Bh-BS
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 19:47:47 -0400
 MIME-Version: 1.0
-In-Reply-To: <20181028124004.30494-2-liq3ea@163.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] tests: fw_cfg: add a function to get
- the fw_cfg file entry
+References: <20181029232100.8454-1-philmd@redhat.com>
+	<20181029232100.8454-4-philmd@redhat.com>
+In-Reply-To: <20181029232100.8454-4-philmd@redhat.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 29 Oct 2018 16:47:14 -0700
+Message-ID: <CAKmqyKMjJvt3zQuaTc0yX-LaZhTaVR=CQQ-3uKHw7sCNF_aQxg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/3] arm: exynos4: Add dma support for
+ smdkc210
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,106 +24,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@163.com>, pbonzini@redhat.com, thuth@redhat.com, lvivier@redhat.com
-Cc: qemu-devel@nongnu.org
+To: philmd@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, Guenter Roeck <linux@roeck-us.net>, Edgar Iglesias <edgar.iglesias@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Alistair Francis <alistair@alistair23.me>, qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-Hi Li,
+On Mon, Oct 29, 2018 at 4:21 PM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
+>
+> From: Guenter Roeck <linux@roeck-us.net>
+>
+> QEMU already supports pl330. Instantiate it for smdkc210.
+>
+> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> [PMD: Use pl330_init from "hw/dma/pl330.h"]
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-On 28/10/18 13:40, Li Qiang wrote:
-> This is useful to write qtest abount fw_cfg file entry.
-> 
-> Signed-off-by: Li Qiang <liq3ea@163.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+
+Alistair
+
 > ---
->   tests/libqos/fw_cfg.c | 30 ++++++++++++++++++++++++++++++
->   tests/libqos/fw_cfg.h |  2 ++
->   2 files changed, 32 insertions(+)
-> 
-> diff --git a/tests/libqos/fw_cfg.c b/tests/libqos/fw_cfg.c
-> index d0889d1e22..2dd7a498ab 100644
-> --- a/tests/libqos/fw_cfg.c
-> +++ b/tests/libqos/fw_cfg.c
-> @@ -16,6 +16,7 @@
->   #include "libqos/fw_cfg.h"
->   #include "libqtest.h"
->   #include "qemu/bswap.h"
-> +#include "standard-headers/linux/qemu_fw_cfg.h"
->   
->   void qfw_cfg_select(QFWCFG *fw_cfg, uint16_t key)
->   {
-> @@ -54,6 +55,35 @@ uint64_t qfw_cfg_get_u64(QFWCFG *fw_cfg, uint16_t key)
->       return le64_to_cpu(value);
->   }
->   
-
-Can this return size_t the size of the file?
-So qfw_cfg_get_file(..., buflen=0) returns the file size.
-
-> +void qfw_cfg_get_file(QFWCFG *fw_cfg, const char *filename,
-> +                      void *data, size_t buflen)
-> +{
-> +    uint32_t count;
-> +    uint32_t i;
-> +    unsigned char *filesbuf = NULL;
-> +    uint32_t dsize;
-> +    struct fw_cfg_file *p;
-
-        size_t filesize = 0;
-
+>  hw/arm/exynos4_boards.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+>
+> diff --git a/hw/arm/exynos4_boards.c b/hw/arm/exynos4_boards.c
+> index 750162cc95..b36f407a52 100644
+> --- a/hw/arm/exynos4_boards.c
+> +++ b/hw/arm/exynos4_boards.c
+> @@ -32,6 +32,7 @@
+>  #include "hw/arm/arm.h"
+>  #include "exec/address-spaces.h"
+>  #include "hw/arm/exynos4210.h"
+> +#include "hw/dma/pl330.h"
+>  #include "hw/boards.h"
+>
+>  #undef DEBUG
+> @@ -49,6 +50,9 @@
+>  #endif
+>
+>  #define SMDK_LAN9118_BASE_ADDR      0x05000000
+> +#define SMDK_PL330_BASE0_ADDR       0x12680000
+> +#define SMDK_PL330_BASE1_ADDR       0x12690000
+> +#define SMDK_PL330_BASE2_ADDR       0x12850000
+>
+>  typedef enum Exynos4BoardType {
+>      EXYNOS4_BOARD_NURI,
+> @@ -171,6 +175,14 @@ static void smdkc210_init(MachineState *machine)
+>
+>      lan9215_init(SMDK_LAN9118_BASE_ADDR,
+>              qemu_irq_invert(s->soc->irq_table[exynos4210_get_irq(37, 1)]=
+));
 > +
-> +    qfw_cfg_get(fw_cfg, FW_CFG_FILE_DIR, &count, sizeof(count));
-> +    count = be32_to_cpu(count);
-> +    dsize = sizeof(uint32_t) + count * sizeof(struct fw_cfg_file);
-> +    filesbuf = g_malloc0(dsize);
-> +    qfw_cfg_get(fw_cfg, FW_CFG_FILE_DIR, filesbuf, dsize);
-> +    p = (struct fw_cfg_file *)(filesbuf + 4);
-> +    for (i = 0; i < count; ++i, ++p) {
-> +        if (!strcmp(p->name, filename)) {
-> +            uint32_t len = be32_to_cpu(p->size);
-
-
-> +            uint16_t sel = be16_to_cpu(p->select);
-> +            void *buf = g_malloc0(len);
-
-Why call malloc() here?
-
-> +            qfw_cfg_get(fw_cfg, sel, buf, len);
-
-And not copy directly to 'data':
-
-                filesize = len;
-                if (len > buflen) {
-                    len = buflen;
-                }
-                qfw_cfg_get(fw_cfg, sel, data, len);
-
-> +            memcpy(data, buf, buflen);
-> +            g_free(buf);
-
-Dropping 2 previous lines.
-
-> +            break;
-> +        }
-> +    }
-> +    g_free(filesbuf);
-
-        return filesize;
-
-> +}
+> +    pl330_init(SMDK_PL330_BASE0_ADDR,
+> +            qemu_irq_invert(s->soc->irq_table[exynos4210_get_irq(35, 1)]=
+), 32);
+> +    pl330_init(SMDK_PL330_BASE1_ADDR,
+> +            qemu_irq_invert(s->soc->irq_table[exynos4210_get_irq(36, 1)]=
+), 32);
+> +    pl330_init(SMDK_PL330_BASE2_ADDR,
+> +            qemu_irq_invert(s->soc->irq_table[exynos4210_get_irq(34, 1)]=
+), 1);
 > +
->   static void mm_fw_cfg_select(QFWCFG *fw_cfg, uint16_t key)
->   {
->       qtest_writew(fw_cfg->qts, fw_cfg->base, key);
-> diff --git a/tests/libqos/fw_cfg.h b/tests/libqos/fw_cfg.h
-> index 0353416af0..50e4227638 100644
-> --- a/tests/libqos/fw_cfg.h
-> +++ b/tests/libqos/fw_cfg.h
-> @@ -31,6 +31,8 @@ void qfw_cfg_get(QFWCFG *fw_cfg, uint16_t key, void *data, size_t len);
->   uint16_t qfw_cfg_get_u16(QFWCFG *fw_cfg, uint16_t key);
->   uint32_t qfw_cfg_get_u32(QFWCFG *fw_cfg, uint16_t key);
->   uint64_t qfw_cfg_get_u64(QFWCFG *fw_cfg, uint16_t key);
-> +void qfw_cfg_get_file(QFWCFG *fw_cfg, const char *filename,
-> +                      void *data, size_t buflen);
->   
->   QFWCFG *mm_fw_cfg_init(QTestState *qts, uint64_t base);
->   QFWCFG *io_fw_cfg_init(QTestState *qts, uint16_t base);
-> 
+>      arm_load_kernel(ARM_CPU(first_cpu), &exynos4_board_binfo);
+>  }
+>
+> --
+> 2.17.2
+>
+>
