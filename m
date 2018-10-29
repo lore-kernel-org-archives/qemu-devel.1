@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35323)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37629)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gHAZ7-00060F-RZ
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 12:38:58 -0400
+	(envelope-from <cota@braap.org>) id 1gHAfv-0005Ze-O4
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 12:46:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gHAZ3-000059-PE
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 12:38:57 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:52019)
+	(envelope-from <cota@braap.org>) id 1gHAfq-0005Np-9e
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 12:45:59 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:34253)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gHAZ3-00004y-Ii
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 12:38:53 -0400
-Date: Mon, 29 Oct 2018 12:38:50 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gHAfp-0005LC-NC
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 12:45:54 -0400
+Date: Mon, 29 Oct 2018 12:45:48 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20181029163850.GC17805@flamenco>
+Message-ID: <20181029164548.GD17805@flamenco>
 References: <20181025172057.20414-1-cota@braap.org>
-	<20181025172057.20414-49-cota@braap.org>
-	<000b01d46f76$67926b20$36b74160$@ru>
+	<000701d46f6c$7dc635c0$7952a140$@ru>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <000b01d46f76$67926b20$36b74160$@ru>
-Subject: Re: [Qemu-devel] [RFC 48/48] plugin: add a couple of very simple
- examples
+In-Reply-To: <000701d46f6c$7dc635c0$7952a140$@ru>
+Subject: Re: [Qemu-devel] [RFC 00/48] Plugin support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,91 +30,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
 Cc: qemu-devel@nongnu.org, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, =?iso-8859-1?Q?'Llu=EDs?= Vilanova' <vilanova@ac.upc.edu>, 'Peter Maydell' <peter.maydell@linaro.org>, 'Alex =?iso-8859-1?Q?Benn=E9e'?= <alex.bennee@linaro.org>, 'Stefan Hajnoczi' <stefanha@gmail.com>
 
-On Mon, Oct 29, 2018 at 13:59:03 +0300, Pavel Dovgalyuk wrote:
+On Mon, Oct 29, 2018 at 12:48:05 +0300, Pavel Dovgalyuk wrote:
 > > From: Emilio G. Cota [mailto:cota@braap.org]
-> > Signed-off-by: Emilio G. Cota <cota@braap.org>
-(snip)
-> Thanks for the series.
-> Can you provide more plugin examples for better understanding of double-translate idea?
-> E.g., plugins that hook specific instructions or addresses.
+> > - 2-pass translation. Once a "TB translation" callback is called,
+> >   the plugin must know the span of the TB. We should not
+> >   force plugins to guess where the TB will end; that is strictly
+> >   QEMU's job, and can change any time. A TB is thus a sequence
+> >   of instructions of whatever length the particular QEMU
+> >   implementation decides. Thus, for each TB, a 3-step process
+> >   is followed: (1) the plugin layer keeps a copy of the contents
+> >   of the current TB, (2) once the TB is well-defined, its
+> >   descriptor and contents are passed to plugins, which then
+> >   register their desired instrumentation (e.g. "call me back
+> >   on this particular instruction", or "call me back when
+> >   the whole TB executes"); note that plugins can use a disassembler
+> >   like capstone to decide what to do with each instruction; they
+> >   can also allocate memory and then get a pointer to it passed
+> >   back from the callbacks. And finally, (3) the target translator
+> >   is called again to generate the final instrumented translated TB.
+> >   This is what I called the "2-pass translation", since we go
+> >   twice over the translation loop in translator.c. Note that the
+> >   2-pass approach has virtually no overhead (0.40% for SPEC06int);
+> >   translation is much cheaper than execution. But anyway, if no
+> >   plugins have subscribed to TB translation, we only do one pass.
+> 
+> Can plugin affect the translation somehow to force flushing cached registers?
+> E.g. callback may need correct EFLAGS which usually does not updated
+> until the end of the block.
 
-Here's a plugin that at TB translation time, disassembles the
-instructions provided via capstone. It doesn't do anything
-with that info (vcpu_tb_exec is empty), but say a simulator
-would pass via the *udata pointer some descriptor (allocated
-at translation time) based on the instructions in the TB.
+I'd provide an API call to get those up to date, since the common
+case is that callbacks won't require those to be up to date.
 
-Note that the disassembly happens because we already have
-a fully formed TB thanks to the 2-pass translation. Without it,
-we'd have to (1) perform additional loads in the guest to read
-instructions given the PC, and (2) guess when the TB would end
-(recall that when to finish a TB is a decision internal to QEMU).
+> > - Support for inlining instrumentation. This is done via an
+> >   explicit API, i.e. we do not export TCG ops, which are internal
+> >   to QEMU. For now, I just have support for incrementing a u64
+> >   with an immediate, e.g. to increment a counter.
+> 
+> It means that we'll have "yet another one TCG"?
+
+That's certainly not my intention.
+
+I'd only export common ops that are trivial to implement,
+whether with TCG or whatever we use in 100 years time. I think
+incrementing a counter is a good use of this; letting plugins
+go wild by exporting a "TCG-like API" is not at all the
+point. Users that demand that can be just told to fork QEMU.
 
 Thanks,
 
 		Emilio
-
-PS. Compile with -lcapstone
----
-#include <inttypes.h>
-#include <assert.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <stdio.h>
-
-#include <capstone/capstone.h>
-#include <qemu-plugin.h>
-
-struct tb {
-	size_t n_insns;
-};
-
-static csh cap_handle;
-static cs_insn *cap_insn;
-
-static void vcpu_mem(unsigned int cpu_index, qemu_plugin_meminfo_t meminfo,
-		     uint64_t vaddr, void *udata)
-{ }
-
-static void vcpu_tb_exec(unsigned int cpu_index, void *udata)
-{ }
-
-static void vcpu_tb_trans(qemu_plugin_id_t id, unsigned int cpu_index, struct qemu_plugin_tb *tb)
-{
-	struct tb *desc;
-	size_t n = qemu_plugin_tb_n_insns(tb);
-	size_t i;
-
-	for (i = 0; i < n; i++) {
-		struct qemu_plugin_insn *insn = qemu_plugin_tb_get_insn(tb, i);
-		size_t size = qemu_plugin_insn_size(insn);
-		const uint8_t *code = qemu_plugin_insn_data(insn);
-		uint64_t offset = 0;
-		bool success;
-
-		success = cs_disasm_iter(cap_handle, &code, &size, &offset, cap_insn);
-		assert(success);
-		qemu_plugin_register_vcpu_mem_cb(insn, vcpu_mem,
-						 QEMU_PLUGIN_CB_NO_REGS, NULL);
-	}
-	desc = malloc(sizeof(*desc));
-	assert(desc);
-	desc->n_insns = n;
-
-	qemu_plugin_register_vcpu_tb_exec_cb(tb, vcpu_tb_exec,
-					     QEMU_PLUGIN_CB_NO_REGS, desc);
-}
-
-QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id, int argc, char **argv)
-{
-	if (cs_open(CS_ARCH_X86, CS_MODE_64, &cap_handle) != CS_ERR_OK) {
-		return -1;
-	}
-	cap_insn = cs_malloc(cap_handle);
-	if (cap_insn == NULL) {
-		return -1;
-	}
-	qemu_plugin_register_vcpu_tb_trans_cb(id, vcpu_tb_trans);
-	return 0;
-}
