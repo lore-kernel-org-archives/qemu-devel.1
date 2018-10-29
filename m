@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42559)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44579)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gH5JI-0004cQ-Ru
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:02:17 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gH5RT-0008Mj-TM
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:10:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gH5JG-00047D-UW
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:02:16 -0400
-Received: from mail-ot1-x32a.google.com ([2607:f8b0:4864:20::32a]:44797)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gH5RS-0001cP-Q1
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:10:43 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:54099)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gH5JE-00041R-OH
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:02:14 -0400
-Received: by mail-ot1-x32a.google.com with SMTP id p23so7075771otf.11
-	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 04:02:05 -0700 (PDT)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1gH5RI-0000xf-35
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:10:35 -0400
+Received: by mail-wm1-x341.google.com with SMTP id l26-v6so7761562wmh.3
+	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 04:10:22 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1539919345-10703-2-git-send-email-jasowang@redhat.com>
-References: <1539919345-10703-1-git-send-email-jasowang@redhat.com>
-	<1539919345-10703-2-git-send-email-jasowang@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 29 Oct 2018 11:01:44 +0000
-Message-ID: <CAFEAcA8fcR47WmOqkNYJfp2K=Zgt+vE_O+2ANKj6dJiFtKdBaA@mail.gmail.com>
+References: <20181009062718.1914-1-peterx@redhat.com>
+	<20181009062718.1914-3-peterx@redhat.com>
+	<CAJ+F1CJwK4cC5xXviefrOFiQCcrP7fsrDwx2E9mZSg_UtFPXrA@mail.gmail.com>
+	<20181010032154.GL18728@xz-x1>
+In-Reply-To: <20181010032154.GL18728@xz-x1>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Mon, 29 Oct 2018 15:10:08 +0400
+Message-ID: <CAJ+F1C+DQcQAeOi=YipQRwC4eg=kEWEsvAvDERKmUjVDLBru=g@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL V2 01/26] filter-rewriter: Add TCP state
- machine and fix memory leak in connection_track_table
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v9 2/6] monitor: resume the monitor earlier
+ if needed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +33,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Zhang Chen <zhangckid@gmail.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Zhang Chen <chen.zhang@intel.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On 19 October 2018 at 04:22, Jason Wang <jasowang@redhat.com> wrote:
-> From: Zhang Chen <zhangckid@gmail.com>
+Hi
+
+On Wed, Oct 10, 2018 at 7:22 AM Peter Xu <peterx@redhat.com> wrote:
 >
-> We add almost full TCP state machine in filter-rewriter, except
-> TCPS_LISTEN and some simplify in VM active close FIN states.
-> The reason for this simplify job is because guest kernel will track
-> the TCP status and wait 2MSL time too, if client resend the FIN packet,
-> guest will resend the last ACK, so we needn't wait 2MSL time in filter-rewriter.
+> On Tue, Oct 09, 2018 at 12:54:37PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> > Hi
+> > On Tue, Oct 9, 2018 at 10:28 AM Peter Xu <peterx@redhat.com> wrote:
+> > >
+> > > Currently when QMP request queue full we won't resume the monitor unt=
+il
+> > > we have completely handled the current command.  It's not necessary
+> > > since even before it's handled the queue is already non-full.  Moving
+> > > the resume logic earlier before the command execution.
+> > >
+> > > Note that now monitor_resume() is heavy weighted after 8af6bb14a3a8 a=
+nd
+> > > it's even possible (as pointed out by Marc-Andr=C3=A9) that the funct=
+ion
+> > > itself may try to take the monitor lock again, so let's do the resume
+> > > after the monitor lock is released to avoid possible dead lock.
+> > >
+> > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > > ---
+> > >  monitor.c | 10 ++++++----
+> > >  1 file changed, 6 insertions(+), 4 deletions(-)
+> > >
+> > > diff --git a/monitor.c b/monitor.c
+> > > index 1f83775fff..f5911399d8 100644
+> > > --- a/monitor.c
+> > > +++ b/monitor.c
+> > > @@ -4149,6 +4149,12 @@ static void monitor_qmp_bh_dispatcher(void *da=
+ta)
+> > >      need_resume =3D !qmp_oob_enabled(mon) ||
+> > >          mon->qmp.qmp_requests->length =3D=3D QMP_REQ_QUEUE_LEN_MAX -=
+ 1;
+> > >      qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
+> > > +
+> > > +    if (need_resume) {
+> > > +        /* Pairs with the monitor_suspend() in handle_qmp_command() =
+*/
+> > > +        monitor_resume(mon);
+> > > +    }
+> >
+> > "need_resume" is only set on non-oob enabled monitors.
 >
-> After a net connection is closed, we didn't clear its related resources
-> in connection_track_table, which will lead to memory leak.
+> ... or on oob-enabled monitors when queue full?
+
+yes, after patch 1
+
 >
-> Let's track the state of net connection, if it is closed, its related
-> resources will be cleared up.
+> >
+> > On monitor_resume(), monitor_qmp_read() may end up being called, which
+> > may call handle_qmp_command().
+> >
+> > With regular commands, a new command is queued. But if the command is
+> > "exec-oob", it will dispatch immediately, thus not following the QMP
+> > reply ordering constrain.
+> >
+> > Shouldn't it be an error to call exec-oob on non-oob enabled monitors?
+>
+> Do you mean a "qmp_capabilities" command to enable oob, and a
+> continuous "exec-oob" command?
 
-Hi. Coverity (CID 1396477) points out that here:
+No I meant calling "exec-oob" on a monitor without oob capability. I
+checked again, and it does already fail with "QMP input member
+'exec-oob' is unexpected". So nevermind.
 
-> +        /*
-> +         * Active close step 2.
-> +         */
-> +        if (conn->tcp_state == TCPS_FIN_WAIT_1) {
-> +            conn->tcp_state = TCPS_TIME_WAIT;
+>
+> I can't say I fully understand the scenario you mentioned, but I think
+> it does violate the rule if we resume the monitor before we finish
+> executing the "qmp_capabilities" command since that command should
+> still be run with "non-oob" context.  So in that case we should do the
+> resume after dispatching.  For the other queue-full case we shouldn't
+> need to, as Markus suggested.
+>
+> Instead of bothering with all these, how about I drop this patch?  We
+> might resume the monitor a little bit later when queue full, but I
+> don't think that's a big deal for now.
 
-...this assignment to conn->tcp_state has no effect, because...
-
-> +            /*
-> +             * For simplify implementation, we needn't wait 2MSL time
-> +             * in filter rewriter. Because guest kernel will track the
-> +             * TCP status and wait 2MSL time, if client resend the FIN
-> +             * packet, guest will apply the last ACK too.
-> +             */
-> +            conn->tcp_state = TCPS_CLOSED;
-
-...we immediately overwrite it with a different value.
-
-> +            g_hash_table_remove(rf->connection_track_table, key);
-> +        }
->      }
-
-What was the intention of the code here?
+Yes, if it's a minor optimization, we can postpone it for now.
 
 thanks
--- PMM
+
+>
+> Regards,
+>
+> --
+> Peter Xu
+
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
