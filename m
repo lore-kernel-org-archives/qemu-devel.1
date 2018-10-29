@@ -1,16 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37667)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37666)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gH825-0003I9-13
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:56:41 -0400
+	(envelope-from <stefan.markovic@rt-rk.com>) id 1gH825-0003I8-13
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:56:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gH823-0003Ec-46
+	(envelope-from <stefan.markovic@rt-rk.com>) id 1gH823-0003Em-4q
 	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:56:40 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Mon, 29 Oct 2018 13:56:06 +0000
-Message-Id: <20181029135607.4485-2-stefanha@redhat.com>
-In-Reply-To: <20181029135607.4485-1-stefanha@redhat.com>
-References: <20181029135607.4485-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL 1/2] util: aio-posix: fix a typo
+Received: from mx2.rt-rk.com ([89.216.37.149]:43869 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefan.markovic@rt-rk.com>)
+	id 1gH81z-0002Td-Dq
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:56:37 -0400
+From: Stefan Markovic <stefan.markovic@rt-rk.com>
+Date: Mon, 29 Oct 2018 14:55:11 +0100
+Message-Id: <1540821315-28346-3-git-send-email-stefan.markovic@rt-rk.com>
+In-Reply-To: <1540821315-28346-1-git-send-email-stefan.markovic@rt-rk.com>
+References: <1540821315-28346-1-git-send-email-stefan.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PATCH v2 2/6] Extend image_info struct with MIPS
+ specific fp_abi and interp_fp_abi fields
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,32 +26,34 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Li Qiang <liq3ea@gmail.com>, qemu-trivial@nongnu.org
+Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, riku.voipio@iki.fi, laurent@vivier.eu
 
-From: Li Qiang <liq3ea@gmail.com>
+From: Stefan Markovic <smarkovic@wavecomp.com>
 
-Cc: qemu-trivial@nongnu.org
-Signed-off-by: Li Qiang <liq3ea@gmail.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Fam Zheng <famz@redhat.com>
-Message-id: 1538964972-3223-1-git-send-email-liq3ea@gmail.com
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Add MIPS specific image_info struct fields fp_abi and interp_fp_abi
+to store executable and interpreter fp_abi values (based on kernel
+struct arch_elf_state in mips/include/asm/elf.h).
+
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- util/aio-posix.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ linux-user/qemu.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/util/aio-posix.c b/util/aio-posix.c
-index 621b3025d8..51c41ed3c9 100644
---- a/util/aio-posix.c
-+++ b/util/aio-posix.c
-@@ -40,7 +40,7 @@ struct AioHandler
+diff --git a/linux-user/qemu.h b/linux-user/qemu.h
+index 1beb6a2..a752c1c 100644
+--- a/linux-user/qemu.h
++++ b/linux-user/qemu.h
+@@ -61,6 +61,10 @@ struct image_info {
+         abi_ulong       interpreter_loadmap_addr;
+         abi_ulong       interpreter_pt_dynamic_addr;
+         struct image_info *other_info;
++#ifdef TARGET_MIPS
++        int             fp_abi;
++        int             interp_fp_abi;
++#endif
+ };
  
- #ifdef CONFIG_EPOLL_CREATE1
- 
--/* The fd number threashold to switch to epoll */
-+/* The fd number threshold to switch to epoll */
- #define EPOLL_ENABLE_THRESHOLD 64
- 
- static void aio_epoll_disable(AioContext *ctx)
+ #ifdef TARGET_I386
 -- 
-2.17.2
+1.9.1
