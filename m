@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54057)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55255)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gH8vB-0007zc-P7
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 10:53:40 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gH8z2-0001g1-Sz
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 10:57:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gH8v2-0003LV-1G
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 10:53:33 -0400
-Received: from mail-cys01nam02on0700.outbound.protection.outlook.com
-	([2a01:111:f400:fe45::700]:51569
-	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1gH8v1-0003Ka-Ma
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 10:53:27 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Mon, 29 Oct 2018 14:53:18 +0000
-Message-ID: <BN6PR2201MB1251DB91FBD5E2C3FF3F3A67C6F30@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <1540821315-28346-1-git-send-email-stefan.markovic@rt-rk.com>
-In-Reply-To: <1540821315-28346-1-git-send-email-stefan.markovic@rt-rk.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gH8yz-0005vH-5l
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 10:57:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55264)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1gH8yx-0005q7-PW
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 10:57:32 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1A07830DD2BA
+	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 14:57:25 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Mon, 29 Oct 2018 18:57:09 +0400
+Message-Id: <20181029145709.26359-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 0/6] target/mips: Add support for
- prctl() PR_GET_FP_MODE and PR_SET_FP_MODE
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] tests: add qmp/missing-any-arg test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,24 +31,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Markovic <stefan.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "laurent@vivier.eu" <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-> From: Stefan Markovic <stefan.markovic@rt-rk.com>
-> Subject: [PATCH v2 0/6] target/mips: Add support for prctl() PR_GET_FP_MO=
-DE and PR_SET_FP_MODE
->=20
-> From: Stefan Markovic <smarkovic@wavecomp.com>
->=20
-> This series includes support for prctl() PR_GET_FP_MODE and PR_SET_FP_MOD=
-E. This requires
-> extracting MIPS.abiflags section from ELF file and fp_abi value handling.
+test_qmp_missing_any_arg() is about a bug in infrastructure used by
+the QMP core, fixed in commit c489780203.  We covered the bug in
+infrastructure unit tests (commit bce3035a44).  I wrote that test
+earlier, to cover QMP level as well, the test could go into qmp-test.
 
-Stefan, the patch titles don't have appropriate prefixes "elf:" and "user-m=
-ode:", but I can fix that while integrating.
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ tests/qmp-test.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-Laurent, heads up: I plan to include this series in a MIPS pull request tha=
-t is planned for today.
-
-Thanks,
-Aleksandar=
+diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+index 6c419f6023..7517be4654 100644
+--- a/tests/qmp-test.c
++++ b/tests/qmp-test.c
+@@ -318,6 +318,19 @@ static void test_qmp_preconfig(void)
+     qtest_quit(qs);
+ }
+=20
++static void test_qmp_missing_any_arg(void)
++{
++    QTestState *qts;
++    QDict *resp;
++
++    qts =3D qtest_init(common_args);
++    resp =3D qtest_qmp(qts, "{'execute': 'qom-set', 'arguments':"
++                     " { 'path': '/machine', 'property': 'rtc-time' } }"=
+);
++    g_assert_nonnull(resp);
++    qmp_assert_error_class(resp, "GenericError");
++    qtest_quit(qts);
++}
++
+ int main(int argc, char *argv[])
+ {
+     g_test_init(&argc, &argv, NULL);
+@@ -325,6 +338,7 @@ int main(int argc, char *argv[])
+     qtest_add_func("qmp/protocol", test_qmp_protocol);
+     qtest_add_func("qmp/oob", test_qmp_oob);
+     qtest_add_func("qmp/preconfig", test_qmp_preconfig);
++    qtest_add_func("qmp/missing-any-arg", test_qmp_missing_any_arg);
+=20
+     return g_test_run();
+ }
+--=20
+2.19.0.271.gfe8321ec05
