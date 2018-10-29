@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34201)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gH9LR-0008JF-IW
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gH9LR-0008JC-IK
 	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:20:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gH9LJ-0003Gm-KR
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gH9LN-0003Il-Nb
 	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:20:43 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:38719 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:39351 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gH9LJ-0003D7-5N
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:20:37 -0400
+	id 1gH9LL-0003GN-Io
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:20:39 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 29 Oct 2018 16:19:54 +0100
-Message-Id: <1540826418-5501-4-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 29 Oct 2018 16:19:59 +0100
+Message-Id: <1540826418-5501-9-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1540826418-5501-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1540826418-5501-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL 03/27] target/mips: Define a bit for MXU in
- insn_flags
+Subject: [Qemu-devel] [PULL 08/27] target/mips: Add bit encoding for MXU
+ accumulate add/sub 2-bit pattern 'aptn2'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,28 +30,32 @@ Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
 From: Craig Janeczek <jancraig@amazon.com>
 
-Define a bit for MXU in insn_flags. This is the first non-MIPS
-(third party) ASE supported in QEMU for MIPS, so it is placed in
-the section "bits 56-63: vendor-specific ASEs".
+Add bit encoding for MXU accumulate add/subtract 2-bit pattern
+'aptn2'.
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Stefan Markovic <smarkovic@wavecomp.com>
 Signed-off-by: Craig Janeczek <jancraig@amazon.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/mips-defs.h | 1 +
- 1 file changed, 1 insertion(+)
+ target/mips/translate.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/target/mips/mips-defs.h b/target/mips/mips-defs.h
-index 5177618..dbdb4b2 100644
---- a/target/mips/mips-defs.h
-+++ b/target/mips/mips-defs.h
-@@ -69,6 +69,7 @@
-  *   bits 56-63: vendor-specific ASEs
-  */
- #define ASE_MMI           0x0100000000000000ULL
-+#define ASE_MXU           0x0200000000000000ULL
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 848b0ef..4ccb1a9 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -23983,6 +23983,12 @@ static void decode_opc_special(CPUMIPSState *env, DisasContext *ctx)
+ #define MXU_APTN1_A    0
+ #define MXU_APTN1_S    1
  
- /* MIPS CPU defines. */
- #define		CPU_MIPS1	(ISA_MIPS1)
++/* MXU accumulate add/subtract 2-bit pattern 'aptn2' */
++#define MXU_APTN2_AA    0
++#define MXU_APTN2_AS    1
++#define MXU_APTN2_SA    2
++#define MXU_APTN2_SS    3
++
+ 
+ /*
+  *
 -- 
 2.7.4
