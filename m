@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45342)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gHF2a-0004VH-C9
+	(envelope-from <jsnow@redhat.com>) id 1gHF2a-0004VI-CB
 	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 17:25:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gHF2V-0002Sf-Te
+	(envelope-from <jsnow@redhat.com>) id 1gHF2W-0002Sr-5J
 	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 17:25:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33494)
+Received: from mx1.redhat.com ([209.132.183.28]:52720)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1gHF2T-0002L1-TS
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 17:25:35 -0400
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1gHF2V-0002LD-RX
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 17:25:36 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Mon, 29 Oct 2018 17:25:00 -0400
-Message-Id: <20181029212501.5897-19-jsnow@redhat.com>
+Date: Mon, 29 Oct 2018 17:25:01 -0400
+Message-Id: <20181029212501.5897-20-jsnow@redhat.com>
 In-Reply-To: <20181029212501.5897-1-jsnow@redhat.com>
 References: <20181029212501.5897-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PULL 18/19] iotests: improve 169
+Subject: [Qemu-devel] [PULL 19/19] iotests: 169: add cases for source vm
+ resuming
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,53 +29,112 @@ Cc: jsnow@redhat.com, peter.maydell@linaro.org, Vladimir Sementsov-Ogievskiy <vs
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Before previous patch, iotest 169 was actually broken for the case
-test_persistent__not_migbitmap__offline_shared, while formally
-passing.
-
-After migration log of vm_b had message:
-
-    qemu-system-x86_64: Could not reopen qcow2 layer: Bitmap already
-    exists: bitmap0
-
-which means that invalidation failed and bs->drv = NULL.
-
-It was because we've loaded bitmap twice: on open and on invalidation.
-
-Add code to 169, to catch such fails.
+Test that we can resume source vm after [failed] migration, and bitmaps
+are ok.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- tests/qemu-iotests/169 | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ tests/qemu-iotests/169     | 60 +++++++++++++++++++++++++++++++++++++++++++++-
+ tests/qemu-iotests/169.out |  4 ++--
+ 2 files changed, 61 insertions(+), 3 deletions(-)
 
 diff --git a/tests/qemu-iotests/169 b/tests/qemu-iotests/169
-index df408f8367..8b7947d650 100755
+index 8b7947d650..69850c4c67 100755
 --- a/tests/qemu-iotests/169
 +++ b/tests/qemu-iotests/169
-@@ -24,6 +24,7 @@ import time
- import itertools
- import operator
- import new
-+import re
- from iotests import qemu_img
+@@ -77,6 +77,58 @@ class TestDirtyBitmapMigration(iotests.QMPTestCase):
+             self.assert_qmp(result, 'error/desc',
+                             "Dirty bitmap 'bitmap0' not found");
  
- 
-@@ -133,6 +134,14 @@ class TestDirtyBitmapMigration(iotests.QMPTestCase):
- 
-         if should_migrate:
-             self.vm_b.shutdown()
++    def do_test_migration_resume_source(self, persistent, migrate_bitmaps):
++        granularity = 512
 +
-+            # catch 'Could not reopen qcow2 layer: Bitmap already exists'
-+            # possible error
-+            log = self.vm_b.get_log()
-+            log = re.sub(r'^\[I \d+\.\d+\] OPENED\n', '', log)
-+            log = re.sub(r'\[I \+\d+\.\d+\] CLOSED\n?$', '', log)
-+            self.assertEqual(log, '')
++        # regions = ((start, count), ...)
++        regions = ((0, 0x10000),
++                   (0xf0000, 0x10000),
++                   (0xa0201, 0x1000))
 +
-             # recreate vm_b, as we don't want -incoming option (this will lead
-             # to "cat" process left alive after test finish)
-             self.vm_b = iotests.VM(path_suffix='b')
++        mig_caps = [{'capability': 'events', 'state': True}]
++        if migrate_bitmaps:
++            mig_caps.append({'capability': 'dirty-bitmaps', 'state': True})
++
++        result = self.vm_a.qmp('migrate-set-capabilities',
++                               capabilities=mig_caps)
++        self.assert_qmp(result, 'return', {})
++
++        self.add_bitmap(self.vm_a, granularity, persistent)
++        for r in regions:
++            self.vm_a.hmp_qemu_io('drive0', 'write %d %d' % r)
++        sha256 = self.get_bitmap_hash(self.vm_a)
++
++        result = self.vm_a.qmp('migrate', uri=mig_cmd)
++        while True:
++            event = self.vm_a.event_wait('MIGRATION')
++            if event['data']['status'] == 'completed':
++                break
++
++        # test that bitmap is still here
++        removed = (not migrate_bitmaps) and persistent
++        self.check_bitmap(self.vm_a, False if removed else sha256)
++
++        self.vm_a.qmp('cont')
++
++        # test that bitmap is still here after invalidation
++        self.check_bitmap(self.vm_a, sha256)
++
++        # shutdown and check that invalidation didn't fail
++        self.vm_a.shutdown()
++
++        # catch 'Could not reopen qcow2 layer: Bitmap already exists'
++        # possible error
++        log = self.vm_a.get_log()
++        log = re.sub(r'^\[I \d+\.\d+\] OPENED\n', '', log)
++        log = re.sub(r'^(wrote .* bytes at offset .*\n.*KiB.*ops.*sec.*\n){3}',
++                     '', log)
++        log = re.sub(r'\[I \+\d+\.\d+\] CLOSED\n?$', '', log)
++        self.assertEqual(log, '')
++
++        # test that bitmap is still persistent
++        self.vm_a.launch()
++        self.check_bitmap(self.vm_a, sha256 if persistent else False)
++
+     def do_test_migration(self, persistent, migrate_bitmaps, online,
+                           shared_storage):
+         granularity = 512
+@@ -152,7 +204,7 @@ class TestDirtyBitmapMigration(iotests.QMPTestCase):
+ 
+ def inject_test_case(klass, name, method, *args, **kwargs):
+     mc = operator.methodcaller(method, *args, **kwargs)
+-    setattr(klass, 'test_' + name, new.instancemethod(mc, None, klass))
++    setattr(klass, 'test_' + method + name, new.instancemethod(mc, None, klass))
+ 
+ for cmb in list(itertools.product((True, False), repeat=4)):
+     name = ('_' if cmb[0] else '_not_') + 'persistent_'
+@@ -163,6 +215,12 @@ for cmb in list(itertools.product((True, False), repeat=4)):
+     inject_test_case(TestDirtyBitmapMigration, name, 'do_test_migration',
+                      *list(cmb))
+ 
++for cmb in list(itertools.product((True, False), repeat=2)):
++    name = ('_' if cmb[0] else '_not_') + 'persistent_'
++    name += ('_' if cmb[1] else '_not_') + 'migbitmap'
++
++    inject_test_case(TestDirtyBitmapMigration, name,
++                     'do_test_migration_resume_source', *list(cmb))
+ 
+ if __name__ == '__main__':
+     iotests.main(supported_fmts=['qcow2'])
+diff --git a/tests/qemu-iotests/169.out b/tests/qemu-iotests/169.out
+index b6f257674e..3a89159833 100644
+--- a/tests/qemu-iotests/169.out
++++ b/tests/qemu-iotests/169.out
+@@ -1,5 +1,5 @@
+-................
++....................
+ ----------------------------------------------------------------------
+-Ran 16 tests
++Ran 20 tests
+ 
+ OK
 -- 
 2.14.5
