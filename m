@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49141)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49325)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gH5i7-0001to-2b
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:27:56 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gH5iJ-00026g-9o
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:28:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gH5i4-0005JV-71
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:27:54 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:34612 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gH5iG-0005WI-5Y
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:28:07 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:35376 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gH5i3-0004bu-Q2
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:27:52 -0400
+	id 1gH5iF-0005KZ-Q8
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:28:04 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 29 Oct 2018 12:25:19 +0100
-Message-Id: <1540812328-16163-12-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 29 Oct 2018 12:25:28 +0100
+Message-Id: <1540812328-16163-21-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1540812328-16163-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1540812328-16163-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v8 11/20] target/mips: Add emulation of non-MXU
- MULL within MXU decoding engine
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v8 20/20] target/mips: Amend MXU ASE overview
+ note
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,60 +31,126 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: aurelien@aurel32.net, richard.henderson@linaro.org, jancraig@amazon.com, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com
 
-From: Craig Janeczek <jancraig@amazon.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add emulation of non-MXU MULL within MXU decoding engine.
+Add prefix, suffix, operation descriptions, and other corrections
+and amendments to the comment that describes MXU ASE.
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Craig Janeczek <jancraig@amazon.com>
+Reviewed-by: Stefan Markovic <smarkovic@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
+ target/mips/translate.c | 84 +++++++++++++++++++++++++++++++++++++++++++=
+------
+ 1 file changed, 74 insertions(+), 10 deletions(-)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 13e158a..a98de28 100644
+index ce88039..6112e72 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -1648,7 +1648,7 @@ enum {
- enum {
-     OPC_MXU_S32MADD  = 0x00,
-     OPC_MXU_S32MADDU = 0x01,
--    /* not assigned 0x02 */
-+    OPC__MXU_MUL     = 0x02,
-     OPC_MXU__POOL00  = 0x03,
-     OPC_MXU_S32MSUB  = 0x04,
-     OPC_MXU_S32MSUBU = 0x05,
-@@ -24907,6 +24907,11 @@ static void decode_opc_mxu__pool20(CPUMIPSState *env, DisasContext *ctx)
-  */
- static void decode_opc_mxu(CPUMIPSState *env, DisasContext *ctx)
- {
-+    /*
-+     * TODO: Investigate necessity of including handling of
-+     * CLZ, CLO, SDBB in this function, as they belong to
-+     * SPECIAL2 opcode space for regular pre-R6 MIPS ISAs.
-+     */
-     uint32_t opcode = extract32(ctx->opcode, 0, 6);
- 
-     switch (opcode) {
-@@ -24920,6 +24925,18 @@ static void decode_opc_mxu(CPUMIPSState *env, DisasContext *ctx)
-         MIPS_INVAL("OPC_MXU_S32MADDU");
-         generate_exception_end(ctx, EXCP_RI);
-         break;
-+    case OPC__MXU_MUL:     /* 0x2 - unused in MXU specs */
-+        {
-+            uint32_t  rs, rt, rd, op1;
-+
-+            rs = extract32(ctx->opcode, 21, 5);
-+            rt = extract32(ctx->opcode, 16, 5);
-+            rd = extract32(ctx->opcode, 11, 5);
-+            op1 = MASK_SPECIAL2(ctx->opcode);
-+
-+            gen_arith(ctx, op1, rd, rs, rt);
-+        }
-+        break;
-     case OPC_MXU__POOL00:
-         decode_opc_mxu__pool00(env, ctx);
-         break;
--- 
+@@ -1410,25 +1410,89 @@ enum {
+  * MXU unit contains 17 registers called X0-X16. X0 is always zero, and =
+X16 is
+  * the control register.
+  *
+- * The notation used in MXU assembler mnemonics:
++ * The notation used in MXU assembler mnemonics
++ * --------------------------------------------
++ *
++ *  Registers:
+  *
+  *   XRa, XRb, XRc, XRd - MXU registers
+  *   Rb, Rc, Rd, Rs, Rt - general purpose MIPS registers
+- *   s12                - a subfield of an instruction code
+- *   strd2              - a subfield of an instruction code
+- *   eptn2              - a subfield of an instruction code
+- *   eptn3              - a subfield of an instruction code
+- *   optn2              - a subfield of an instruction code
+- *   optn3              - a subfield of an instruction code
+- *   sft4               - a subfield of an instruction code
++ *
++ *  Subfields:
++ *
++ *   aptn1              - 1-bit accumulate add/subtract pattern
++ *   aptn2              - 2-bit accumulate add/subtract pattern
++ *   eptn2              - 2-bit execute add/subtract pattern
++ *   optn2              - 2-bit operand pattern
++ *   optn3              - 3-bit operand pattern
++ *   sft4               - 4-bit shift amount
++ *   strd2              - 2-bit stride amount
++ *
++ *  Prefixes:
++ *
++ *   <Operation parallel level><Operand size>
++ *     S                         32
++ *     D                         16
++ *     Q                          8
++ *
++ *  Suffixes:
++ *
++ *   E - Expand results
++ *   F - Fixed point multiplication
++ *   L - Low part result
++ *   R - Doing rounding
++ *   V - Variable instead of immediate
++ *   W - Combine above L and V
++ *
++ *  Operations:
++ *
++ *   ADD   - Add or subtract
++ *   ADDC  - Add with carry-in
++ *   ACC   - Accumulate
++ *   ASUM  - Sum together then accumulate (add or subtract)
++ *   ASUMC - Sum together then accumulate (add or subtract) with carry-i=
+n
++ *   AVG   - Average between 2 operands
++ *   ABD   - Absolute difference
++ *   ALN   - Align data
++ *   AND   - Logical bitwise 'and' operation
++ *   CPS   - Copy sign
++ *   EXTR  - Extract bits
++ *   I2M   - Move from GPR register to MXU register
++ *   LDD   - Load data from memory to XRF
++ *   LDI   - Load data from memory to XRF (and increase the address base=
+)
++ *   LUI   - Load unsigned immediate
++ *   MUL   - Multiply
++ *   MULU  - Unsigned multiply
++ *   MADD  - 64-bit operand add 32x32 product
++ *   MSUB  - 64-bit operand subtract 32x32 product
++ *   MAC   - Multiply and accumulate (add or subtract)
++ *   MAD   - Multiply and add or subtract
++ *   MAX   - Maximum between 2 operands
++ *   MIN   - Minimum between 2 operands
++ *   M2I   - Move from MXU register to GPR register
++ *   MOVZ  - Move if zero
++ *   MOVN  - Move if non-zero
++ *   NOR   - Logical bitwise 'nor' operation
++ *   OR    - Logical bitwise 'or' operation
++ *   STD   - Store data from XRF to memory
++ *   SDI   - Store data from XRF to memory (and increase the address bas=
+e)
++ *   SLT   - Set of less than comparison
++ *   SAD   - Sum of absolute differences
++ *   SLL   - Logical shift left
++ *   SLR   - Logical shift right
++ *   SAR   - Arithmetic shift right
++ *   SAT   - Saturation
++ *   SFL   - Shuffle
++ *   SCOP  - Calculate x=E2=80=99s scope (-1, means x<0; 0, means x=3D=3D=
+0; 1, means x>0)
++ *   XOR   - Logical bitwise 'exclusive or' operation
+  *
+  * Load/Store instructions           Multiplication instructions
+  * -----------------------           ---------------------------
+  *
+  *  S32LDD XRa, Rb, s12               S32MADD XRa, XRd, Rs, Rt
+  *  S32STD XRa, Rb, s12               S32MADDU XRa, XRd, Rs, Rt
+- *  S32LDDV XRa, Rb, rc, strd2        S32SUB XRa, XRd, Rs, Rt
+- *  S32STDV XRa, Rb, rc, strd2        S32SUBU XRa, XRd, Rs, Rt
++ *  S32LDDV XRa, Rb, rc, strd2        S32MSUB XRa, XRd, Rs, Rt
++ *  S32STDV XRa, Rb, rc, strd2        S32MSUBU XRa, XRd, Rs, Rt
+  *  S32LDI XRa, Rb, s12               S32MUL XRa, XRd, Rs, Rt
+  *  S32SDI XRa, Rb, s12               S32MULU XRa, XRd, Rs, Rt
+  *  S32LDIV XRa, Rb, rc, strd2        D16MUL XRa, XRb, XRc, XRd, optn2
+--=20
 2.7.4
