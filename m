@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gH5GH-0001ts-Ir
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 06:59:11 -0400
+	(envelope-from <kraxel@redhat.com>) id 1gH5Hi-0003Mu-D6
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:00:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gH5GC-0008Ch-Ik
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 06:59:09 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:49862)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gH5GC-0008AT-98
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 06:59:04 -0400
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20181025172057.20414-1-cota@braap.org>
-	<20181025172057.20414-49-cota@braap.org>
-In-Reply-To: <20181025172057.20414-49-cota@braap.org>
-Date: Mon, 29 Oct 2018 13:59:03 +0300
-Message-ID: <000b01d46f76$67926b20$36b74160$@ru>
+	(envelope-from <kraxel@redhat.com>) id 1gH5Hc-0001ko-7s
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:00:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45726)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gH5HY-0001S9-9A
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:00:30 -0400
+Date: Mon, 29 Oct 2018 12:00:12 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20181029110012.3bw4t5juygnnex36@sirius.home.kraxel.org>
+References: <9179e8bc-1b89-1ed3-687a-467fc45797e0@physik.fu-berlin.de>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [RFC 48/48] plugin: add a couple of very simple
- examples
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9179e8bc-1b89-1ed3-687a-467fc45797e0@physik.fu-berlin.de>
+Subject: Re: [Qemu-devel] bochs-display and the future of VGA support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,90 +26,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "'Emilio G. Cota'" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, =?utf-8?Q?'Llu=C3=ADs_Vilanova'?= <vilanova@ac.upc.edu>, 'Peter Maydell' <peter.maydell@linaro.org>, =?utf-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>, 'Stefan Hajnoczi' <stefanha@gmail.com>
+To: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-> From: Emilio G. Cota [mailto:cota@braap.org]
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> ---
->  plugin-examples/bbcount_avgsize_racy.c | 50 ++++++++++++++++++++++
->  plugin-examples/mem_count_racy_both.c  | 58 ++++++++++++++++++++++++++
->  plugin-examples/Makefile               | 31 ++++++++++++++
->  3 files changed, 139 insertions(+)
->  create mode 100644 plugin-examples/bbcount_avgsize_racy.c
->  create mode 100644 plugin-examples/mem_count_racy_both.c
->  create mode 100644 plugin-examples/Makefile
+On Sun, Oct 28, 2018 at 01:40:29PM +0100, John Paul Adrian Glaubitz wrote:
+> Hi!
 > 
+> I just happened to read Gerd Hoffmann's post on the bochs-display [1] driver
+> and was wondering what the future plans for VGA support are.
+> 
+> Phoronix makes it sound like [2] that VGA support for guests is supposed to
+> be removed which I find hard to believe.
 
-<snip>
+No plans to remove vga support.
 
-> diff --git a/plugin-examples/mem_count_racy_both.c b/plugin-examples/mem_count_racy_both.c
-> new file mode 100644
-> index 0000000000..a47f2025bf
-> --- /dev/null
-> +++ b/plugin-examples/mem_count_racy_both.c
-> @@ -0,0 +1,58 @@
-> +#include <inttypes.h>
-> +#include <assert.h>
-> +#include <stdlib.h>
-> +#include <string.h>
-> +#include <unistd.h>
-> +#include <stdio.h>
-> +
-> +#include <qemu-plugin.h>
-> +
-> +static uint64_t mem_count;
-> +static int stdout_fd;
-> +static bool do_inline;
-> +
-> +static void plugin_exit(qemu_plugin_id_t id, void *p)
-> +{
-> +    dprintf(stdout_fd, "accesses: %" PRIu64 "\n", mem_count);
-> +}
-> +
-> +static void vcpu_mem(unsigned int cpu_index, qemu_plugin_meminfo_t meminfo,
-> +                     uint64_t vaddr, void *udata)
-> +{
-> +    mem_count++;
-> +}
-> +
-> +static void vcpu_tb_trans(qemu_plugin_id_t id, unsigned int cpu_index,
-> +                          struct qemu_plugin_tb *tb)
-> +{
-> +    size_t n = qemu_plugin_tb_n_insns(tb);
-> +    size_t i;
-> +
-> +    for (i = 0; i < n; i++) {
-> +        struct qemu_plugin_insn *insn = qemu_plugin_tb_get_insn(tb, i);
-> +
-> +        if (do_inline) {
-> +            qemu_plugin_register_vcpu_mem_inline(insn,
-> +                                                 QEMU_PLUGIN_INLINE_ADD_U64,
-> +                                                 &mem_count, 1);
-> +        } else {
-> +            qemu_plugin_register_vcpu_mem_cb(insn, vcpu_mem,
-> +                                             QEMU_PLUGIN_CB_NO_REGS, NULL);
-> +        }
-> +    }
-> +}
-> +
-> +QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id, int argc,
-> +                                           char **argv)
-> +{
-> +    if (argc && strcmp(argv[0], "inline") == 0) {
-> +        do_inline = true;
-> +    }
-> +    /* plugin_exit might write to stdout after stdout has been closed */
-> +    stdout_fd = dup(STDOUT_FILENO);
-> +    assert(stdout_fd);
-> +
-> +    qemu_plugin_register_vcpu_tb_trans_cb(id, vcpu_tb_trans);
-> +    qemu_plugin_register_atexit_cb(id, plugin_exit, NULL);
-> +    return 0;
-> +}
+> Since once VGA support is gone, QEMU would no longer be able to run
+> older operating systems which is one of the key features of an
+> emulator in my opinion.
+> 
+> Can anyone tell me what the plans are?
 
-Thanks for the series.
-Can you provide more plugin examples for better understanding of double-translate idea?
-E.g., plugins that hook specific instructions or addresses.
+Well, the plan is to be able to run guests which wouldn't use the VGA
+anyway without the rather complex VGA emulation enabled.
 
-Pavel Dovgalyuk
+cheers,
+  Gerd
