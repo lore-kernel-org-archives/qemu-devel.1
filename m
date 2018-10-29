@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58871)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34669)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gH67s-0007Pb-6A
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:54:33 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gH6Jg-0004Is-6g
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 08:06:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gH67q-0007ht-Q0
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:54:32 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:44813)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gH6Jf-00088j-Bt
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 08:06:44 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:35079)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gH67q-0007bz-EL
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:54:30 -0400
-Received: by mail-oi1-x243.google.com with SMTP id k19-v6so6742185oic.11
-	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 04:54:27 -0700 (PDT)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1gH6Je-00082Y-WC
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 08:06:43 -0400
+Received: by mail-wm1-x343.google.com with SMTP id q12-v6so4964708wmq.0
+	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 05:06:39 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20181026153125.24738-1-laurent@vivier.eu>
-References: <20181026153125.24738-1-laurent@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 29 Oct 2018 11:54:06 +0000
-Message-ID: <CAFEAcA-8sN2MGK6OcK5uMbMuw33MMOAgsdr9y4Uj2qmpbTkeig@mail.gmail.com>
+References: <20181009131251.721-1-marcandre.lureau@redhat.com>
+	<20181009131251.721-5-marcandre.lureau@redhat.com>
+	<20181010043700.GO18728@xz-x1>
+In-Reply-To: <20181010043700.GO18728@xz-x1>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Mon, 29 Oct 2018 16:06:21 +0400
+Message-ID: <CAJ+F1CJaERBCgaZUHZ5+KFNBXJfe6Pm52H-D6jF3j0msOSsVWQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/20] Trivial patches patches
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 4/6] monitor: check if chardev can switch
+ gcontext for OOB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +32,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Michael Tokarev <mjt@tls.msk.ru>, Jason Wang <jasowang@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, Michael Walle <michael@walle.cc>, Laurent Vivier <lvivier@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Cleber Rosa <crosa@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "open list:X86" <xen-devel@lists.xenproject.org>, Aleksandar Markovic <amarkovic@wavecomp.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Anthony Perard <anthony.perard@citrix.com>, Aurelien Jarno <aurelien@aurel32.net>, Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Stefano Stabellini <sstabellini@kernel.org>, Gerd Hoffmann <kraxel@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Thomas Huth <thuth@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>, Eduardo Habkost <ehabkost@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On 26 October 2018 at 16:31, Laurent Vivier <laurent@vivier.eu> wrote:
-> The following changes since commit 808ebd66e467f77c0d1f8c6346235f81e9c99cf2:
->
->   Merge remote-tracking branch 'remotes/riscv/tags/riscv-for-master-3.1-sf0' into staging (2018-10-25 17:41:03 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/vivier/qemu.git tags/trivial-patches-pull-request
->
-> for you to fetch changes up to 4b03da6e87c34793137a231b558231fd406c05e8:
->
->   ppc: move at24c to its own CONFIG_ symbol (2018-10-26 17:17:32 +0200)
->
-> ----------------------------------------------------------------
-> QEMU trivial patches collected between June and October 2018
-> (Thank you to Thomas Huth)
->
-> ----------------------------------------------------------------
+Hi
 
-Hi; I get a compile error due to a format string issue:
+On Wed, Oct 10, 2018 at 8:38 AM Peter Xu <peterx@redhat.com> wrote:
+>
+> On Tue, Oct 09, 2018 at 05:12:49PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> > Note: this patch will conflict with Peter "[PATCH v9 3/6] monitor:
+> > remove "x-oob", turn oob on by default", but can be trivially updated.
+> >
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >  monitor.c | 5 +++--
+> >  1 file changed, 3 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/monitor.c b/monitor.c
+> > index a25514490a..c175cf6f0d 100644
+> > --- a/monitor.c
+> > +++ b/monitor.c
+> > @@ -4550,9 +4550,10 @@ void monitor_init(Chardev *chr, int flags)
+> >      bool use_oob =3D flags & MONITOR_USE_OOB;
+> >
+> >      if (use_oob) {
+> > -        if (CHARDEV_IS_MUX(chr)) {
+> > +        if (!qemu_chr_has_feature(chr, QEMU_CHAR_FEATURE_GCONTEXT)) {
+> >              error_report("Monitor out-of-band is not supported with "
+> > -                         "MUX typed chardev backend");
+> > +                         "%s typed chardev backend",
+> > +                         object_get_typename(OBJECT(chr)));
+>
+> This seems a bit confusing to me at the first glance since we forbid
+> mux because not all frontends are ready to run outside main loop (and
+> now we have mon_iothread so it'll be odd too to run anything
+> non-monitor on that too...), rather than whether the backend can
+> dynamically switch its context.
+>
+> I'm not sure, but do you mean you want to disable oob for backends
+> like spice or braille?  I just noticed that it seems even legal if we
+> pipe a qmp monitor with a windows mouse...
 
-In file included from
-/home/petmay01/qemu-for-merges/hw/net/milkymist-minimac2.c:33:0:
-/home/petmay01/qemu-for-merges/hw/net/milkymist-minimac2.c: In
-function 'minimac2_write':
-/home/petmay01/qemu-for-merges/hw/net/milkymist-minimac2.c:420:23:
-error: format '%lx' expects
- argument of type 'long unsigned int', but argument 4 has type
-'uint64_t {aka long long unsign
-ed int}' [-Werror=format=]
-                       "milkymist_minimac2_wr%d: 0x%" HWADDR_PRIx " = 0x%lx\n",
-                       ^
-/home/petmay01/qemu-for-merges/include/qemu/log.h:85:22: note: in
-definition of macro 'qemu_lo
-g_mask'
-             qemu_log(FMT, ## __VA_ARGS__);              \
-                      ^
-cc1: all warnings being treated as errors
+yes, basically any chardev that doesn't handle the gcontext argument.
 
-(affects windows crossbuilds, OSX and 32-bit hosts).
+They match those that don't implement chr_update_read_handler at this point=
+.
+
+> I believe in all cases the commit message can be enhanced on
+> explaining "why" of this patch. :)
+
+ok, I'll keep the explicit mux case, even if it overlaps with gcontext
+feature, and update commit message.
 
 thanks
--- PMM
+
+>
+> Regards,
+>
+> --
+> Peter Xu
+>
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
