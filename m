@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41879)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44817)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groeck7@gmail.com>) id 1gH8Ej-0005lX-Qs
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 10:09:47 -0400
+	(envelope-from <kraxel@redhat.com>) id 1gH8NT-0003Wd-3x
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 10:18:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groeck7@gmail.com>) id 1gH8Ei-0004mf-Gv
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 10:09:45 -0400
-Sender: Guenter Roeck <groeck7@gmail.com>
-References: <1540548409-22560-1-git-send-email-thuth@redhat.com>
-	<CAFEAcA8EubWya8ey9VxhaCw4m2U=KA+i2C-R9P-p+P6oEBBLew@mail.gmail.com>
-	<7fc49925-36ff-bd9a-0cd7-e5f8d4bb3672@roeck-us.net>
-	<CAFEAcA-UF+SyXvcU+NGZsbqBF2qg+s_x4HPU7yvf7B2G-=HPOg@mail.gmail.com>
-From: Guenter Roeck <linux@roeck-us.net>
-Message-ID: <b4f6cbd2-68fe-5b07-e8fb-93b1c4d8a6de@roeck-us.net>
-Date: Mon, 29 Oct 2018 07:09:29 -0700
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-UF+SyXvcU+NGZsbqBF2qg+s_x4HPU7yvf7B2G-=HPOg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/2] Deprecate the "collie" machine and
- Strongarm devices
+	(envelope-from <kraxel@redhat.com>) id 1gH8NP-00043E-Rd
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 10:18:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50658)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gH8NO-00040H-Os
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 10:18:43 -0400
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 29 Oct 2018 15:18:33 +0100
+Message-Id: <20181029141834.8794-2-kraxel@redhat.com>
+In-Reply-To: <20181029141834.8794-1-kraxel@redhat.com>
+References: <20181029141834.8794-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL 1/2] SDL: set a hint to not bypass the window
+ compositor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,64 +24,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Sebastian Krzyszkowiak <dos@dosowisko.net>
 
-On 10/29/18 6:24 AM, Peter Maydell wrote:
-> On 27 October 2018 at 12:04, Guenter Roeck <linux@roeck-us.net> wrote:
->> On 10/26/18 3:12 AM, Peter Maydell wrote:
->>> Hi Guenter; there's a proposal here to deprecate (and eventually
->>> remove) the 'collie' board (strongarm) from QEMU. Is that one of
->>> the ones you're currently using in your automated testing of Linux
->>> kernels on QEMU?
->>>
->>
->> Yes. I can run the test with older versions of qemu, so it is ok for me
->> if it is removed (as long as that removal is not backported).
-> 
-> Mmm, but if we have an active user who's testing them then they
-> probably shouldn't be in the frontline of boards to remove.
-> Which other boards do you test with mainline QEMU?
-> 
+From: Sebastian Krzyszkowiak <dos@dosowisko.net>
 
-For arm:
+Without that, window effects in KWin get suspended as soon as any
+qemu-sdl window becomes visible. While the SDL default makes sense
+for games, it's not really suitable for QEMU.
 
-akita
-ast2500-evb
-beagle
-beaglexm
-borzoi
-collie
-cubieboard
-imx25-pdk
-integratorcp
-kzm
-mainstone
-midway
-mps2-an385
-overo
-palmetto-bmc
-raspi2
-realview-eb
-realview-eb-mpcore
-realview-pb-a8
-realview-pbx-a9
-romulus-bmc
-sabrelite
-smdkc210
-spitz
-terrier
-tosa
-versatileab
-versatilepb
-vexpress-a15
-vexpress-a15-a7
-vexpress-a9
-witherspoon-bmc
-xilinx-zynq-a9
-z2
+Signed-off-by: Sebastian Krzyszkowiak <dos@dosowisko.net>
+Message-id: 20181024143748.4425-1-dos@dosowisko.net
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ ui/sdl2.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Though not all of them are supported by upstream qemu. For some of them I carry local patches,
-for others I use out-of-tree versions of qemu (beagle/beaglexm).
-
-Guenter
+diff --git a/ui/sdl2.c b/ui/sdl2.c
+index 2696b95c79..a10b6e3a08 100644
+--- a/ui/sdl2.c
++++ b/ui/sdl2.c
+@@ -786,6 +786,9 @@ static void sdl2_display_init(DisplayState *ds, DisplayOptions *o)
+                 SDL_GetError());
+         exit(1);
+     }
++#ifdef SDL_HINT_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR /* only available since SDL 2.0.8 */
++    SDL_SetHint(SDL_HINT_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR, "0");
++#endif
+     SDL_SetHint(SDL_HINT_GRAB_KEYBOARD, "1");
+     memset(&info, 0, sizeof(info));
+     SDL_VERSION(&info.version);
+-- 
+2.9.3
