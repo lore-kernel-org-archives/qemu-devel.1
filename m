@@ -1,27 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gH8zy-00036D-N2
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 10:58:36 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1gH958-0006Mh-92
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:03:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gH8zy-0006bO-0K
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 10:58:34 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:36023)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gH8zx-0006ZD-QP
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 10:58:33 -0400
-Received: by mail-oi1-x243.google.com with SMTP id r127-v6so5594739oie.3
-	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 07:58:30 -0700 (PDT)
+	(envelope-from <amarkovic@wavecomp.com>) id 1gH953-0000sv-9D
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:03:54 -0400
+Received: from mail-eopbgr710102.outbound.protection.outlook.com
+	([40.107.71.102]:6391
+	helo=NAM05-BY2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1gH94z-0000ou-SL
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:03:47 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Mon, 29 Oct 2018 15:03:35 +0000
+Message-ID: <BN6PR2201MB1251F9D0D28E1177AF8E6B8DC6F30@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <20181014142928.2784-1-f4bug@amsat.org> <20181014164140.GB2319@sx9>
+	<CAAdtpL5xQYwyR0VxqAhA3dW9ec2KW07n-GKrMCt=UjQqwsuYHQ@mail.gmail.com>
+	<alpine.LFD.2.21.1810142320320.16498@eddie.linux-mips.org>
+	<20181015170202.GB2364@sx9>
+	<BN6PR2201MB125130DFBDFBBE67B4CD57A9C6FE0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	<20181016181916.GB2323@sx9>
+	<300f223b-2013-5e31-0dd1-cd9adf0948ba@linaro.org>
+	<BN6PR2201MB12512B1ED5C412208990CC5FC6F20@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	<BN6PR2201MB1251A375F642CB64E85135EFC6F30@BN6PR2201MB1251.namprd22.prod.outlook.com>,
+	<20181029145106.GA2294@sx9>
+In-Reply-To: <20181029145106.GA2294@sx9>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <20181024113709.16599-3-richard.henderson@linaro.org>
-References: <20181024113709.16599-1-richard.henderson@linaro.org>
-	<20181024113709.16599-3-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 29 Oct 2018 14:58:09 +0000
-Message-ID: <CAFEAcA-ft-mktP5fz=fHvWzvJtZN1m86WHWYvXKba0Bv0hqPtw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 2/5] target/arm: Fill in ARMISARegisters
- for kvm64
+Subject: Re: [Qemu-devel] [PATCH] target/mips: Support Toshiba specific
+ three-operand MADD and MADDU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,66 +40,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Fredrik Noring <noring@nocrew.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, "Maciej W. Rozycki" <macro@linux-mips.org>, =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>, Aurelien Jarno <aurelien@aurel32.net>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, =?iso-8859-1?Q?J=FCrgen_Urban?= <JuergenUrban@gmx.de>
 
-On 24 October 2018 at 12:37, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/kvm64.c | 63 ++++++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 61 insertions(+), 2 deletions(-)
->
-> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-> index 5de8ff0ac5..6ed80eadc2 100644
-> --- a/target/arm/kvm64.c
-> +++ b/target/arm/kvm64.c
-> @@ -443,17 +443,41 @@ static inline void unset_feature(uint64_t *features, int feature)
->      *features &= ~(1ULL << feature);
->  }
->
-> +static int read_sys_reg32(int fd, uint32_t *pret, uint64_t id)
-> +{
-> +    uint64_t ret;
-> +    struct kvm_one_reg idreg = { .id = id, .addr = (uintptr_t)&ret };
-> +    int err;
-> +
-> +    assert((id & KVM_REG_SIZE_MASK) == KVM_REG_SIZE_U64);
-> +    err = ioctl(fd, KVM_GET_ONE_REG, &idreg);
-> +    if (err < 0) {
-> +        return -1;
-> +    }
-> +    assert(ret <= UINT32_MAX);
+> From: Fredrik Noring <noring@nocrew.org>
+> Subject: Re: [PATCH] target/mips: Support Toshiba specific three-operand =
+MADD and MADDU
+>=20
+> Hi Aleksandar,
+>=20
+> > Without TARGET_MIPS64, we can't say we emulate R5900 - we are emulating
+> > some other CPU that never existed.
+> >
+> > Convince me that I am wrong.
+>=20
+> R5900 O32 is usable.
 
-In AArch64, there isn't really any such thing as a 32 bit sysreg.
-Where the Arm ARM refers to 32 bit system registers this is just
-a shorthand for "64-bit register where the top 32 bits are currently
-RES0". This assert() would result in QEMU crashing if we ever ran
-it on a host for some hypothetical future architecture which
-assigned meanings to some of the high bits. (Granted, this is
-unlikely for the specific case of the ID registers which track
-the AArch32 ID register values.)
+Absolutely not. This kind of emulation infidelity can't be in QEMU upstream=
+. Even one step further, this should be forbidden, impossible to build.
 
-I think I would prefer it if we expanded the id_isar* fields
-in the ARMISARegisters struct to uint64_t. If you dislike
-that, I think we should make this code fail a bit more gracefully
-in the presence of an unexpected extension into the high bits
-of these registers. Or just ignore the high bits, since we're
-effectively trusting that future architecture versions use
-a compatible meaning for these registers anyway.
-
-> +    *pret = ret;
-> +    return 0;
-> +}
-> +
-> +static int read_sys_reg64(int fd, uint64_t *pret, uint64_t id)
-> +{
-> +    struct kvm_one_reg idreg = { .id = id, .addr = (uintptr_t)pret };
-> +
-> +    assert((id & KVM_REG_SIZE_MASK) == KVM_REG_SIZE_U64);
-> +    return ioctl(fd, KVM_GET_ONE_REG, &idreg);
-> +}
->
-
-thanks
--- PMM
+Thanks,
+Aleksandar=
