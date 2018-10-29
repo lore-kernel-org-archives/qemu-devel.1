@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47540)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47575)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gHAxF-0002GT-F3
+	(envelope-from <sameo@linux.intel.com>) id 1gHAxH-0002Ic-2z
 	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 13:03:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gHAxD-0004qy-NU
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 13:03:53 -0400
+	(envelope-from <sameo@linux.intel.com>) id 1gHAxB-0004pA-13
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 13:03:54 -0400
+Received: from mga03.intel.com ([134.134.136.65]:15363)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sameo@linux.intel.com>)
+	id 1gHAxA-0004jD-LD
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 13:03:48 -0400
 From: Samuel Ortiz <sameo@linux.intel.com>
-Date: Mon, 29 Oct 2018 18:01:53 +0100
-Message-Id: <20181029170159.3801-14-sameo@linux.intel.com>
+Date: Mon, 29 Oct 2018 18:01:57 +0100
+Message-Id: <20181029170159.3801-18-sameo@linux.intel.com>
 In-Reply-To: <20181029170159.3801-1-sameo@linux.intel.com>
 References: <20181029170159.3801-1-sameo@linux.intel.com>
-Subject: [Qemu-devel] [PATCH v3 13/19] hw: acpi: Export the SRAT AML build
- API
+Subject: [Qemu-devel] [PATCH v3 17/19] hw: acpi: Define ACPI tables builder
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,355 +26,243 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Yang Zhong <yang.zhong@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "open list:ARM ACPI Subsystem" <qemu-arm@nongnu.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-From: Yang Zhong <yang.zhong@intel.com>
+In order to decouple ACPI APIs from specific machine types, we are
+creating an ACPI builder interface that each ACPI platform can choose to
+implement.
+This way, a new machine type can re-use the high level ACPI APIs and
+define some custom table build methods, without having to duplicate most
+of the existing implementation only to add small variations to it.
 
-The SRAT ACPI table is not x86 specific and will be needed for the
-Hardware-reduced ACPI implementation. So we should export it through the
-architecture independent hw/acpi folder.
-
-Also, now that the generic build_srat() API is exported, we have to
-rename the ARM static one in order to avoid build time conflicts.
-
-Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
 ---
- hw/acpi/aml-build.c         | 130 ++++++++++++++++++++++++++++++++++++
- hw/arm/virt-acpi-build.c    |   4 +-
- hw/i386/acpi-build.c        | 129 -----------------------------------
- include/hw/acpi/aml-build.h |   3 +
- 4 files changed, 135 insertions(+), 131 deletions(-)
+ hw/acpi/Makefile.objs     |  1 +
+ hw/acpi/builder.c         | 97 +++++++++++++++++++++++++++++++++++++++
+ include/hw/acpi/builder.h | 97 +++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 195 insertions(+)
+ create mode 100644 hw/acpi/builder.c
+ create mode 100644 include/hw/acpi/builder.h
 
-diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-index 2110e18799..c3f652a68f 100644
---- a/hw/acpi/aml-build.c
-+++ b/hw/acpi/aml-build.c
-@@ -22,6 +22,7 @@
- #include "qemu/osdep.h"
- #include <glib/gprintf.h>
- #include "hw/acpi/aml-build.h"
-+#include "hw/mem/memory-device.h"
- #include "qemu/bswap.h"
- #include "qemu/bitops.h"
- #include "sysemu/numa.h"
-@@ -2459,6 +2460,135 @@ void build_srat_memory(AcpiSratMemoryAffinity *numamem, uint64_t base,
-     numamem->range_length = cpu_to_le64(len);
- }
+diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
+index 11c35bcb44..2f383adc6f 100644
+--- a/hw/acpi/Makefile.objs
++++ b/hw/acpi/Makefile.objs
+@@ -11,6 +11,7 @@ common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
+ common-obj-y += acpi_interface.o
+ common-obj-y += bios-linker-loader.o
+ common-obj-y += aml-build.o
++common-obj-y += builder.o
  
-+#define HOLE_640K_START  (640 * KiB)
-+#define HOLE_640K_END   (1 * MiB)
+ common-obj-$(CONFIG_IPMI) += ipmi.o
+ common-obj-$(call lnot,$(CONFIG_IPMI)) += ipmi-stub.o
+diff --git a/hw/acpi/builder.c b/hw/acpi/builder.c
+new file mode 100644
+index 0000000000..c29a614793
+--- /dev/null
++++ b/hw/acpi/builder.c
+@@ -0,0 +1,97 @@
++/*
++ *
++ * Copyright (c) 2018 Intel Corporation
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
 +
-+void
-+build_srat(GArray *table_data, BIOSLinker *linker,
-+           MachineState *machine, AcpiConfiguration *conf)
++#include "qemu/osdep.h"
++#include "qemu/module.h"
++#include "qom/object.h"
++#include "hw/acpi/builder.h"
++
++void acpi_builder_rsdp(AcpiBuilder *builder,
++                       GArray *table_data, BIOSLinker *linker,
++                       unsigned rsdt_tbl_offset)
 +{
-+    AcpiSystemResourceAffinityTable *srat;
-+    AcpiSratMemoryAffinity *numamem;
++    AcpiBuilderMethods *abm = ACPI_BUILDER_GET_METHODS(builder);
 +
-+    int i;
-+    int srat_start, numa_start, slots;
-+    uint64_t mem_len, mem_base, next_base;
-+    MachineClass *mc = MACHINE_GET_CLASS(machine);
-+    const CPUArchIdList *apic_ids = mc->possible_cpu_arch_ids(machine);
-+    ram_addr_t hotplugabble_address_space_size =
-+        object_property_get_int(OBJECT(machine), MEMORY_DEVICE_REGION_SIZE,
-+                                NULL);
-+
-+    srat_start = table_data->len;
-+
-+    srat = acpi_data_push(table_data, sizeof *srat);
-+    srat->reserved1 = cpu_to_le32(1);
-+
-+    for (i = 0; i < apic_ids->len; i++) {
-+        int node_id = apic_ids->cpus[i].props.node_id;
-+        uint32_t apic_id = apic_ids->cpus[i].arch_id;
-+
-+        if (apic_id < 255) {
-+            AcpiSratProcessorAffinity *core;
-+
-+            core = acpi_data_push(table_data, sizeof *core);
-+            core->type = ACPI_SRAT_PROCESSOR_APIC;
-+            core->length = sizeof(*core);
-+            core->local_apic_id = apic_id;
-+            core->proximity_lo = node_id;
-+            memset(core->proximity_hi, 0, 3);
-+            core->local_sapic_eid = 0;
-+            core->flags = cpu_to_le32(1);
-+        } else {
-+            AcpiSratProcessorX2ApicAffinity *core;
-+
-+            core = acpi_data_push(table_data, sizeof *core);
-+            core->type = ACPI_SRAT_PROCESSOR_x2APIC;
-+            core->length = sizeof(*core);
-+            core->x2apic_id = cpu_to_le32(apic_id);
-+            core->proximity_domain = cpu_to_le32(node_id);
-+            core->flags = cpu_to_le32(1);
-+        }
++    if (abm && abm->rsdp) {
++        abm->rsdp(table_data, linker, rsdt_tbl_offset);
 +    }
-+
-+
-+    /* the memory map is a bit tricky, it contains at least one hole
-+     * from 640k-1M and possibly another one from 3.5G-4G.
-+     */
-+    next_base = 0;
-+    numa_start = table_data->len;
-+
-+    for (i = 1; i < conf->numa_nodes + 1; ++i) {
-+        mem_base = next_base;
-+        mem_len = conf->node_mem[i - 1];
-+        next_base = mem_base + mem_len;
-+
-+        /* Cut out the 640K hole */
-+        if (mem_base <= HOLE_640K_START &&
-+            next_base > HOLE_640K_START) {
-+            mem_len -= next_base - HOLE_640K_START;
-+            if (mem_len > 0) {
-+                numamem = acpi_data_push(table_data, sizeof *numamem);
-+                build_srat_memory(numamem, mem_base, mem_len, i - 1,
-+                                  MEM_AFFINITY_ENABLED);
-+            }
-+
-+            /* Check for the rare case: 640K < RAM < 1M */
-+            if (next_base <= HOLE_640K_END) {
-+                next_base = HOLE_640K_END;
-+                continue;
-+            }
-+            mem_base = HOLE_640K_END;
-+            mem_len = next_base - HOLE_640K_END;
-+        }
-+
-+        /* Cut out the ACPI_PCI hole */
-+        if (mem_base <= conf->below_4g_mem_size &&
-+            next_base > conf->below_4g_mem_size) {
-+            mem_len -= next_base - conf->below_4g_mem_size;
-+            if (mem_len > 0) {
-+                numamem = acpi_data_push(table_data, sizeof *numamem);
-+                build_srat_memory(numamem, mem_base, mem_len, i - 1,
-+                                  MEM_AFFINITY_ENABLED);
-+            }
-+            mem_base = 1ULL << 32;
-+            mem_len = next_base - conf->below_4g_mem_size;
-+            next_base = mem_base + mem_len;
-+        }
-+
-+        if (mem_len > 0) {
-+            numamem = acpi_data_push(table_data, sizeof *numamem);
-+            build_srat_memory(numamem, mem_base, mem_len, i - 1,
-+                              MEM_AFFINITY_ENABLED);
-+        }
-+    }
-+    slots = (table_data->len - numa_start) / sizeof *numamem;
-+    for (; slots < conf->numa_nodes + 2; slots++) {
-+        numamem = acpi_data_push(table_data, sizeof *numamem);
-+        build_srat_memory(numamem, 0, 0, 0, MEM_AFFINITY_NOFLAGS);
-+    }
-+
-+    /*
-+     * Entry is required for Windows to enable memory hotplug in OS
-+     * and for Linux to enable SWIOTLB when booted with less than
-+     * 4G of RAM. Windows works better if the entry sets proximity
-+     * to the highest NUMA node in the machine.
-+     * Memory devices may override proximity set by this entry,
-+     * providing _PXM method if necessary.
-+     */
-+    if (hotplugabble_address_space_size) {
-+        numamem = acpi_data_push(table_data, sizeof *numamem);
-+        build_srat_memory(numamem, machine->device_memory->base,
-+                          hotplugabble_address_space_size, conf->numa_nodes - 1,
-+                          MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
-+    }
-+
-+    build_header(linker, table_data,
-+                 (void *)(table_data->data + srat_start),
-+                 "SRAT",
-+                 table_data->len - srat_start, 1, NULL, NULL);
 +}
 +
- /*
-  * ACPI spec 5.2.17 System Locality Distance Information Table
-  * (Revision 2.0 or later)
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index f9a60907f1..353aa55357 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -469,7 +469,7 @@ build_spcr(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
- }
- 
- static void
--build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-+virt_build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
- {
-     AcpiSystemResourceAffinityTable *srat;
-     AcpiSratProcessorGiccAffinity *core;
-@@ -759,7 +759,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
- 
-     if (nb_numa_nodes > 0) {
-         acpi_add_table(table_offsets, tables_blob);
--        build_srat(tables_blob, tables->linker, vms);
-+        virt_build_srat(tables_blob, tables->linker, vms);
-         if (have_numa_distance) {
-             acpi_add_table(table_offsets, tables_blob);
-             build_slit(tables_blob, tables->linker);
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index dfc02a8a85..5932dbe825 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -1614,135 +1614,6 @@ build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
-                  (void *)tpm2_ptr, "TPM2", sizeof(*tpm2_ptr), 4, NULL, NULL);
- }
- 
--#define HOLE_640K_START  (640 * KiB)
--#define HOLE_640K_END   (1 * MiB)
--
--static void
--build_srat(GArray *table_data, BIOSLinker *linker,
--           MachineState *machine, AcpiConfiguration *conf)
--{
--    AcpiSystemResourceAffinityTable *srat;
--    AcpiSratMemoryAffinity *numamem;
--
--    int i;
--    int srat_start, numa_start, slots;
--    uint64_t mem_len, mem_base, next_base;
--    MachineClass *mc = MACHINE_GET_CLASS(machine);
--    const CPUArchIdList *apic_ids = mc->possible_cpu_arch_ids(machine);
--    ram_addr_t hotplugabble_address_space_size =
--        object_property_get_int(OBJECT(machine), MEMORY_DEVICE_REGION_SIZE,
--                                NULL);
--
--    srat_start = table_data->len;
--
--    srat = acpi_data_push(table_data, sizeof *srat);
--    srat->reserved1 = cpu_to_le32(1);
--
--    for (i = 0; i < apic_ids->len; i++) {
--        int node_id = apic_ids->cpus[i].props.node_id;
--        uint32_t apic_id = apic_ids->cpus[i].arch_id;
--
--        if (apic_id < 255) {
--            AcpiSratProcessorAffinity *core;
--
--            core = acpi_data_push(table_data, sizeof *core);
--            core->type = ACPI_SRAT_PROCESSOR_APIC;
--            core->length = sizeof(*core);
--            core->local_apic_id = apic_id;
--            core->proximity_lo = node_id;
--            memset(core->proximity_hi, 0, 3);
--            core->local_sapic_eid = 0;
--            core->flags = cpu_to_le32(1);
--        } else {
--            AcpiSratProcessorX2ApicAffinity *core;
--
--            core = acpi_data_push(table_data, sizeof *core);
--            core->type = ACPI_SRAT_PROCESSOR_x2APIC;
--            core->length = sizeof(*core);
--            core->x2apic_id = cpu_to_le32(apic_id);
--            core->proximity_domain = cpu_to_le32(node_id);
--            core->flags = cpu_to_le32(1);
--        }
--    }
--
--
--    /* the memory map is a bit tricky, it contains at least one hole
--     * from 640k-1M and possibly another one from 3.5G-4G.
--     */
--    next_base = 0;
--    numa_start = table_data->len;
--
--    for (i = 1; i < conf->numa_nodes + 1; ++i) {
--        mem_base = next_base;
--        mem_len = conf->node_mem[i - 1];
--        next_base = mem_base + mem_len;
--
--        /* Cut out the 640K hole */
--        if (mem_base <= HOLE_640K_START &&
--            next_base > HOLE_640K_START) {
--            mem_len -= next_base - HOLE_640K_START;
--            if (mem_len > 0) {
--                numamem = acpi_data_push(table_data, sizeof *numamem);
--                build_srat_memory(numamem, mem_base, mem_len, i - 1,
--                                  MEM_AFFINITY_ENABLED);
--            }
--
--            /* Check for the rare case: 640K < RAM < 1M */
--            if (next_base <= HOLE_640K_END) {
--                next_base = HOLE_640K_END;
--                continue;
--            }
--            mem_base = HOLE_640K_END;
--            mem_len = next_base - HOLE_640K_END;
--        }
--
--        /* Cut out the ACPI_PCI hole */
--        if (mem_base <= conf->below_4g_mem_size &&
--            next_base > conf->below_4g_mem_size) {
--            mem_len -= next_base - conf->below_4g_mem_size;
--            if (mem_len > 0) {
--                numamem = acpi_data_push(table_data, sizeof *numamem);
--                build_srat_memory(numamem, mem_base, mem_len, i - 1,
--                                  MEM_AFFINITY_ENABLED);
--            }
--            mem_base = 1ULL << 32;
--            mem_len = next_base - conf->below_4g_mem_size;
--            next_base = mem_base + mem_len;
--        }
--
--        if (mem_len > 0) {
--            numamem = acpi_data_push(table_data, sizeof *numamem);
--            build_srat_memory(numamem, mem_base, mem_len, i - 1,
--                              MEM_AFFINITY_ENABLED);
--        }
--    }
--    slots = (table_data->len - numa_start) / sizeof *numamem;
--    for (; slots < conf->numa_nodes + 2; slots++) {
--        numamem = acpi_data_push(table_data, sizeof *numamem);
--        build_srat_memory(numamem, 0, 0, 0, MEM_AFFINITY_NOFLAGS);
--    }
--
--    /*
--     * Entry is required for Windows to enable memory hotplug in OS
--     * and for Linux to enable SWIOTLB when booted with less than
--     * 4G of RAM. Windows works better if the entry sets proximity
--     * to the highest NUMA node in the machine.
--     * Memory devices may override proximity set by this entry,
--     * providing _PXM method if necessary.
--     */
--    if (hotplugabble_address_space_size) {
--        numamem = acpi_data_push(table_data, sizeof *numamem);
--        build_srat_memory(numamem, machine->device_memory->base,
--                          hotplugabble_address_space_size, conf->numa_nodes - 1,
--                          MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
--    }
--
--    build_header(linker, table_data,
--                 (void *)(table_data->data + srat_start),
--                 "SRAT",
--                 table_data->len - srat_start, 1, NULL, NULL);
--}
--
- /*
-  * VT-d spec 8.1 DMA Remapping Reporting Structure
-  * (version Oct. 2014 or later)
-diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
-index 1fabf58df2..654ce2ec26 100644
---- a/include/hw/acpi/aml-build.h
-+++ b/include/hw/acpi/aml-build.h
-@@ -1,6 +1,7 @@
- #ifndef HW_ACPI_AML_BUILD_H
- #define HW_ACPI_AML_BUILD_H
- 
-+#include "hw/acpi/acpi.h"
- #include "hw/acpi/acpi-defs.h"
- #include "hw/acpi/bios-linker-loader.h"
- #include "hw/pci/pcie_host.h"
-@@ -438,6 +439,8 @@ void
- build_xsdt(GArray *table_data, BIOSLinker *linker, GArray *table_offsets,
-            const char *oem_id, const char *oem_table_id);
- 
-+void build_srat(GArray *table_data, BIOSLinker *linker,
-+                MachineState *machine, AcpiConfiguration *conf);
- int
- build_append_named_dword(GArray *array, const char *name_format, ...)
- GCC_FMT_ATTR(2, 3);
++void acpi_builder_madt(AcpiBuilder *builder,
++                       GArray *table_data, BIOSLinker *linker,
++                       MachineState *ms, AcpiConfiguration *conf)
++{
++    AcpiBuilderMethods *abm = ACPI_BUILDER_GET_METHODS(builder);
++
++    if (abm && abm->madt) {
++        abm->madt(table_data, linker, ms, conf);
++    }
++}
++
++void acpi_builder_mcfg(AcpiBuilder *builder,
++                       GArray *table_data, BIOSLinker *linker,
++                       AcpiMcfgInfo *info)
++{
++    AcpiBuilderMethods *abm = ACPI_BUILDER_GET_METHODS(builder);
++
++    if (abm && abm->mcfg) {
++        abm->mcfg(table_data, linker, info);
++    }
++}
++
++void acpi_builder_srat(AcpiBuilder *builder,
++                       GArray *table_data, BIOSLinker *linker,
++                       MachineState *machine, AcpiConfiguration *conf)
++{
++    AcpiBuilderMethods *abm = ACPI_BUILDER_GET_METHODS(builder);
++
++    if (abm && abm->srat) {
++        abm->srat(table_data, linker, machine, conf);
++    }
++}
++
++void acpi_builder_slit(AcpiBuilder *builder,
++                       GArray *table_data, BIOSLinker *linker)
++{
++    AcpiBuilderMethods *abm = ACPI_BUILDER_GET_METHODS(builder);
++
++    if (abm && abm->slit) {
++        abm->slit(table_data, linker);
++    }
++}
++
++AcpiConfiguration *acpi_builder_configuration(AcpiBuilder *builder)
++{
++    AcpiBuilderMethods *abm = ACPI_BUILDER_GET_METHODS(builder);
++    if (abm && abm->configuration) {
++        return abm->configuration(builder);
++    }
++    return NULL;
++}
++
++static const TypeInfo acpi_builder_info = {
++    .name          = TYPE_ACPI_BUILDER,
++    .parent        = TYPE_INTERFACE,
++    .class_size    = sizeof(AcpiBuilderMethods),
++};
++
++static void acpi_builder_register_type(void)
++{
++    type_register_static(&acpi_builder_info);
++}
++
++type_init(acpi_builder_register_type)
+diff --git a/include/hw/acpi/builder.h b/include/hw/acpi/builder.h
+new file mode 100644
+index 0000000000..639b554de3
+--- /dev/null
++++ b/include/hw/acpi/builder.h
+@@ -0,0 +1,97 @@
++/*
++ *
++ * Copyright (c) 2018 Intel Corporation
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef ACPI_BUILDER_H
++#define ACPI_BUILDER_H
++
++#include "qemu/osdep.h"
++#include "hw/acpi/bios-linker-loader.h"
++#include "qom/object.h"
++
++#define TYPE_ACPI_BUILDER "acpi-builder"
++
++#define ACPI_BUILDER_METHODS(klass) \
++     OBJECT_CLASS_CHECK(AcpiBuilderMethods, (klass), TYPE_ACPI_BUILDER)
++#define ACPI_BUILDER_GET_METHODS(obj) \
++     OBJECT_GET_CLASS(AcpiBuilderMethods, (obj), TYPE_ACPI_BUILDER)
++#define ACPI_BUILDER(obj)                                       \
++     INTERFACE_CHECK(AcpiBuilder, (obj), TYPE_ACPI_BUILDER)
++
++typedef struct AcpiConfiguration AcpiConfiguration;
++typedef struct AcpiBuildState AcpiBuildState;
++typedef struct AcpiMcfgInfo AcpiMcfgInfo;
++
++typedef struct AcpiBuilder {
++    /* <private> */
++    Object Parent;
++} AcpiBuilder;
++
++/**
++ * AcpiBuildMethods:
++ *
++ * Interface to be implemented by a machine type that needs to provide
++ * custom ACPI tables build method.
++ *
++ * @parent: Opaque parent interface.
++ *
++ * @rsdp:
++ * @madt:
++ * @mcfg:
++ * @srat:
++ * @slit:
++ * @setup:
++ */
++typedef struct AcpiBuilderMethods {
++    /* <private> */
++    InterfaceClass parent;
++
++    /* <public> */
++    void (*rsdp)(GArray *table_data, BIOSLinker *linker,
++                 unsigned rsdt_tbl_offset);
++    void (*madt)(GArray *table_data, BIOSLinker *linker,
++                 MachineState *ms, AcpiConfiguration *conf);
++    void (*mcfg)(GArray *table_data, BIOSLinker *linker,
++                 AcpiMcfgInfo *info);
++    void (*srat)(GArray *table_data, BIOSLinker *linker,
++                 MachineState *machine, AcpiConfiguration *conf);
++    void (*slit)(GArray *table_data, BIOSLinker *linker);
++
++    AcpiConfiguration *(*configuration)(AcpiBuilder *builder);
++} AcpiBuilderMethods;
++
++void acpi_builder_rsdp(AcpiBuilder *builder,
++                       GArray *table_data, BIOSLinker *linker,
++                       unsigned rsdt_tbl_offset);
++
++void acpi_builder_madt(AcpiBuilder *builder,
++                       GArray *table_data, BIOSLinker *linker,
++                       MachineState *ms, AcpiConfiguration *conf);
++
++void acpi_builder_mcfg(AcpiBuilder *builder,
++                       GArray *table_data, BIOSLinker *linker,
++                       AcpiMcfgInfo *info);
++
++void acpi_builder_srat(AcpiBuilder *builder,
++                       GArray *table_data, BIOSLinker *linker,
++                       MachineState *machine, AcpiConfiguration *conf);
++
++void acpi_builder_slit(AcpiBuilder *builder,
++                       GArray *table_data, BIOSLinker *linker);
++
++AcpiConfiguration *acpi_builder_configuration(AcpiBuilder *builder);
++
++#endif
 -- 
 2.17.2
