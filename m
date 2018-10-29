@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45186)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gHF27-00040y-7h
+	(envelope-from <jsnow@redhat.com>) id 1gHF27-00040w-7h
 	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 17:25:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gHF26-0002Gn-08
+	(envelope-from <jsnow@redhat.com>) id 1gHF23-0002Fn-Sp
 	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 17:25:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59184)
+Received: from mx1.redhat.com ([209.132.183.28]:42742)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1gHF25-0002GL-OB
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 17:25:09 -0400
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1gHF23-0002FQ-MI
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 17:25:07 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Mon, 29 Oct 2018 17:24:47 -0400
-Message-Id: <20181029212501.5897-6-jsnow@redhat.com>
+Date: Mon, 29 Oct 2018 17:24:44 -0400
+Message-Id: <20181029212501.5897-3-jsnow@redhat.com>
 In-Reply-To: <20181029212501.5897-1-jsnow@redhat.com>
 References: <20181029212501.5897-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PULL 05/19] blockdev: rename block-dirty-bitmap-clear
- transaction handlers
+Subject: [Qemu-devel] [PULL 02/19] dirty-bitmap: switch assert-fails to
+ errors in bdrv_merge_dirty_bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +29,71 @@ Cc: jsnow@redhat.com, peter.maydell@linaro.org, Vladimir Sementsov-Ogievskiy <vs
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Rename block-dirty-bitmap-clear transaction handlers to reuse them for
-x-block-dirty-bitmap-merge transaction in the following patch.
+Move checks from qmp_x_block_dirty_bitmap_merge() to
+bdrv_merge_dirty_bitmap(), to share them with dirty bitmap merge
+transaction action in future commit.
+
+Note: for now, only qmp_x_block_dirty_bitmap_merge() calls
+bdrv_merge_dirty_bitmap().
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- blockdev.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ block/dirty-bitmap.c | 15 +++++++++++++--
+ blockdev.c           | 10 ----------
+ 2 files changed, 13 insertions(+), 12 deletions(-)
 
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index c9b8a6fd52..6c8761e027 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -798,12 +798,23 @@ void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, const BdrvDirtyBitmap *src,
+ 
+     qemu_mutex_lock(dest->mutex);
+ 
+-    assert(bdrv_dirty_bitmap_enabled(dest));
+-    assert(!bdrv_dirty_bitmap_readonly(dest));
++    if (bdrv_dirty_bitmap_frozen(dest)) {
++        error_setg(errp, "Bitmap '%s' is frozen and cannot be modified",
++                   dest->name);
++        goto out;
++    }
++
++    if (bdrv_dirty_bitmap_readonly(dest)) {
++        error_setg(errp, "Bitmap '%s' is readonly and cannot be modified",
++                   dest->name);
++        goto out;
++    }
+ 
+     if (!hbitmap_merge(dest->bitmap, src->bitmap)) {
+         error_setg(errp, "Bitmaps are incompatible and can't be merged");
++        goto out;
+     }
+ 
++out:
+     qemu_mutex_unlock(dest->mutex);
+ }
 diff --git a/blockdev.c b/blockdev.c
-index b8a854fba5..d7776cbd4c 100644
+index 1869f9aaf3..e3398e141a 100644
 --- a/blockdev.c
 +++ b/blockdev.c
-@@ -2027,7 +2027,7 @@ static void block_dirty_bitmap_clear_prepare(BlkActionState *common,
-     bdrv_clear_dirty_bitmap(state->bitmap, &state->backup);
- }
- 
--static void block_dirty_bitmap_clear_abort(BlkActionState *common)
-+static void block_dirty_bitmap_restore(BlkActionState *common)
- {
-     BlockDirtyBitmapState *state = DO_UPCAST(BlockDirtyBitmapState,
-                                              common, common);
-@@ -2037,7 +2037,7 @@ static void block_dirty_bitmap_clear_abort(BlkActionState *common)
+@@ -2962,16 +2962,6 @@ void qmp_x_block_dirty_bitmap_merge(const char *node, const char *dst_name,
+         return;
      }
- }
  
--static void block_dirty_bitmap_clear_commit(BlkActionState *common)
-+static void block_dirty_bitmap_free_backup(BlkActionState *common)
- {
-     BlockDirtyBitmapState *state = DO_UPCAST(BlockDirtyBitmapState,
-                                              common, common);
-@@ -2171,8 +2171,8 @@ static const BlkActionOps actions[] = {
-     [TRANSACTION_ACTION_KIND_BLOCK_DIRTY_BITMAP_CLEAR] = {
-         .instance_size = sizeof(BlockDirtyBitmapState),
-         .prepare = block_dirty_bitmap_clear_prepare,
--        .commit = block_dirty_bitmap_clear_commit,
--        .abort = block_dirty_bitmap_clear_abort,
-+        .commit = block_dirty_bitmap_free_backup,
-+        .abort = block_dirty_bitmap_restore,
-     },
-     [TRANSACTION_ACTION_KIND_X_BLOCK_DIRTY_BITMAP_ENABLE] = {
-         .instance_size = sizeof(BlockDirtyBitmapState),
+-    if (bdrv_dirty_bitmap_frozen(dst)) {
+-        error_setg(errp, "Bitmap '%s' is frozen and cannot be modified",
+-                   dst_name);
+-        return;
+-    } else if (bdrv_dirty_bitmap_readonly(dst)) {
+-        error_setg(errp, "Bitmap '%s' is readonly and cannot be modified",
+-                   dst_name);
+-        return;
+-    }
+-
+     src = bdrv_find_dirty_bitmap(bs, src_name);
+     if (!src) {
+         error_setg(errp, "Dirty bitmap '%s' not found", src_name);
 -- 
 2.14.5
