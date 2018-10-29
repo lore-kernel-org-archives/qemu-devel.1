@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47449)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47443)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gHAxA-0002CL-CH
+	(envelope-from <sameo@linux.intel.com>) id 1gHAxA-0002CE-CD
 	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 13:03:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gHAx6-0004lO-N8
+	(envelope-from <sameo@linux.intel.com>) id 1gHAx8-0004mp-8a
 	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 13:03:48 -0400
-Received: from mga06.intel.com ([134.134.136.31]:16085)
+Received: from mga03.intel.com ([134.134.136.65]:15363)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sameo@linux.intel.com>)
-	id 1gHAx6-0004bl-Ax
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 13:03:44 -0400
+	id 1gHAx7-0004jD-Sa
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 13:03:46 -0400
 From: Samuel Ortiz <sameo@linux.intel.com>
-Date: Mon, 29 Oct 2018 18:01:51 +0100
-Message-Id: <20181029170159.3801-12-sameo@linux.intel.com>
+Date: Mon, 29 Oct 2018 18:01:56 +0100
+Message-Id: <20181029170159.3801-17-sameo@linux.intel.com>
 In-Reply-To: <20181029170159.3801-1-sameo@linux.intel.com>
 References: <20181029170159.3801-1-sameo@linux.intel.com>
-Subject: [Qemu-devel] [PATCH v3 11/19] hw: acpi: Do not create hotplug
- method when handler is not defined
+Subject: [Qemu-devel] [PATCH v3 16/19] hw: acpi: Retrieve the PCI bus from
+ AcpiPciHpState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,61 +26,124 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: Sebastien Boeuf <sebastien.boeuf@intel.com>, Jing Liu <jing2.liu@linux.intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-CPU and memory ACPI hotplug are not necessarily handled through SCI
-events. For example, with Hardware-reduced ACPI, the GED device will
-manage ACPI hotplug entirely.
-As a consequence, we make the CPU and memory specific events AML
-generation optional. The code will only be added when the method name is
-not NULL.
+From: Sebastien Boeuf <sebastien.boeuf@intel.com>
 
-Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+Instead of using the machine type specific method find_i440fx() to
+retrieve the PCI bus, this commit aims to rely on the fact that the
+PCI bus is known by the structure AcpiPciHpState.
+
+When the structure is initialized through acpi_pcihp_init() call,
+it saves the PCI bus, which means there is no need to invoke a
+special function later on.
+
+Based on the fact that find_i440fx() was only used there, this
+patch also removes the function find_i440fx() itself from the
+entire codebase.
+
+Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
+Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
 ---
- hw/acpi/cpu.c            |  8 +++++---
- hw/acpi/memory_hotplug.c | 11 +++++++----
- 2 files changed, 12 insertions(+), 7 deletions(-)
+ hw/acpi/pcihp.c       | 10 ++++------
+ hw/pci-host/piix.c    |  8 --------
+ include/hw/i386/pc.h  |  1 -
+ stubs/Makefile.objs   |  1 -
+ stubs/pci-host-piix.c |  6 ------
+ 5 files changed, 4 insertions(+), 22 deletions(-)
+ delete mode 100644 stubs/pci-host-piix.c
 
-diff --git a/hw/acpi/cpu.c b/hw/acpi/cpu.c
-index f10b190019..cd41377b5a 100644
---- a/hw/acpi/cpu.c
-+++ b/hw/acpi/cpu.c
-@@ -569,9 +569,11 @@ void build_cpus_aml(Aml *table, MachineState *machine, CPUHotplugFeatures opts,
-     aml_append(sb_scope, cpus_dev);
-     aml_append(table, sb_scope);
- 
--    method = aml_method(event_handler_method, 0, AML_NOTSERIALIZED);
--    aml_append(method, aml_call0("\\_SB.CPUS." CPU_SCAN_METHOD));
--    aml_append(table, method);
-+    if (event_handler_method) {
-+        method = aml_method(event_handler_method, 0, AML_NOTSERIALIZED);
-+        aml_append(method, aml_call0("\\_SB.CPUS." CPU_SCAN_METHOD));
-+        aml_append(table, method);
-+    }
- 
-     g_free(cphp_res_path);
+diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
+index 80d42e12ff..254b2e50ab 100644
+--- a/hw/acpi/pcihp.c
++++ b/hw/acpi/pcihp.c
+@@ -93,10 +93,9 @@ static void *acpi_set_bsel(PCIBus *bus, void *opaque)
+     return bsel_alloc;
  }
-diff --git a/hw/acpi/memory_hotplug.c b/hw/acpi/memory_hotplug.c
-index 8c7c1013f3..db2c4df961 100644
---- a/hw/acpi/memory_hotplug.c
-+++ b/hw/acpi/memory_hotplug.c
-@@ -715,10 +715,13 @@ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+ 
+-static void acpi_set_pci_info(void)
++static void acpi_set_pci_info(AcpiPciHpState *s)
+ {
+     static bool bsel_is_set;
+-    PCIBus *bus;
+     unsigned bsel_alloc = ACPI_PCIHP_BSEL_DEFAULT;
+ 
+     if (bsel_is_set) {
+@@ -104,10 +103,9 @@ static void acpi_set_pci_info(void)
      }
-     aml_append(table, dev_container);
+     bsel_is_set = true;
  
--    method = aml_method(event_handler_method, 0, AML_NOTSERIALIZED);
--    aml_append(method,
--        aml_call0(MEMORY_DEVICES_CONTAINER "." MEMORY_SLOT_SCAN_METHOD));
--    aml_append(table, method);
-+    if (event_handler_method) {
-+        method = aml_method(event_handler_method, 0, AML_NOTSERIALIZED);
-+        aml_append(method,
-+                   aml_call0(MEMORY_DEVICES_CONTAINER "."
-+                             MEMORY_SLOT_SCAN_METHOD));
-+        aml_append(table, method);
-+    }
- 
-     g_free(mhp_res_path);
+-    bus = find_i440fx(); /* TODO: Q35 support */
+-    if (bus) {
++    if (s->root) {
+         /* Scan all PCI buses. Set property to enable acpi based hotplug. */
+-        pci_for_each_bus_depth_first(bus, acpi_set_bsel, NULL, &bsel_alloc);
++        pci_for_each_bus_depth_first(s->root, acpi_set_bsel, NULL, &bsel_alloc);
+     }
  }
+ 
+@@ -213,7 +211,7 @@ static void acpi_pcihp_update(AcpiPciHpState *s)
+ 
+ void acpi_pcihp_reset(AcpiPciHpState *s)
+ {
+-    acpi_set_pci_info();
++    acpi_set_pci_info(s);
+     acpi_pcihp_update(s);
+ }
+ 
+diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
+index da73743fa2..4940f59c9b 100644
+--- a/hw/pci-host/piix.c
++++ b/hw/pci-host/piix.c
+@@ -445,14 +445,6 @@ PCIBus *i440fx_init(const char *host_type, const char *pci_type,
+     return b;
+ }
+ 
+-PCIBus *find_i440fx(void)
+-{
+-    PCIHostState *s = OBJECT_CHECK(PCIHostState,
+-                                   object_resolve_path("/machine/i440fx", NULL),
+-                                   TYPE_PCI_HOST_BRIDGE);
+-    return s ? s->bus : NULL;
+-}
+-
+ /* PIIX3 PCI to ISA bridge */
+ static void piix3_set_irq_pic(PIIX3State *piix3, int pic_irq)
+ {
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index 7d177cd207..f6b2649cf8 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -260,7 +260,6 @@ PCIBus *i440fx_init(const char *host_type, const char *pci_type,
+                     MemoryRegion *pci_memory,
+                     MemoryRegion *ram_memory);
+ 
+-PCIBus *find_i440fx(void);
+ /* piix4.c */
+ extern PCIDevice *piix4_dev;
+ int piix4_init(PCIBus *bus, ISABus **isa_bus, int devfn);
+diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+index 5dd0aeeec6..725f78bedc 100644
+--- a/stubs/Makefile.objs
++++ b/stubs/Makefile.objs
+@@ -41,6 +41,5 @@ stub-obj-y += pc_madt_cpu_entry.o
+ stub-obj-y += vmgenid.o
+ stub-obj-y += xen-common.o
+ stub-obj-y += xen-hvm.o
+-stub-obj-y += pci-host-piix.o
+ stub-obj-y += ram-block.o
+ stub-obj-y += ramfb.o
+diff --git a/stubs/pci-host-piix.c b/stubs/pci-host-piix.c
+deleted file mode 100644
+index 6ed81b1f21..0000000000
+--- a/stubs/pci-host-piix.c
++++ /dev/null
+@@ -1,6 +0,0 @@
+-#include "qemu/osdep.h"
+-#include "hw/i386/pc.h"
+-PCIBus *find_i440fx(void)
+-{
+-    return NULL;
+-}
 -- 
 2.17.2
