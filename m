@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50162)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50193)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fli@suse.com>) id 1gH78I-0000H5-Vt
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 08:59:04 -0400
+	(envelope-from <fli@suse.com>) id 1gH78M-0000MW-BO
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 08:59:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fli@suse.com>) id 1gH78E-0002bj-T0
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 08:59:02 -0400
-Received: from smtp.nue.novell.com ([195.135.221.5]:55822)
+	(envelope-from <fli@suse.com>) id 1gH78L-0002kc-Gz
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 08:59:06 -0400
+Received: from smtp.nue.novell.com ([195.135.221.5]:58017)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <fli@suse.com>) id 1gH78E-0002aD-It
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 08:58:58 -0400
+	(Exim 4.71) (envelope-from <fli@suse.com>) id 1gH78L-0002j2-6Y
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 08:59:05 -0400
 From: Fei Li <fli@suse.com>
-Date: Mon, 29 Oct 2018 20:58:15 +0800
-Message-Id: <20181029125818.28720-5-fli@suse.com>
+Date: Mon, 29 Oct 2018 20:58:17 +0800
+Message-Id: <20181029125818.28720-7-fli@suse.com>
 In-Reply-To: <20181029125818.28720-1-fli@suse.com>
 References: <20181029125818.28720-1-fli@suse.com>
-Subject: [Qemu-devel] [PATCH RFC v6 4/7] migration: fix some segmentation
- faults when using multifd
+Subject: [Qemu-devel] [PATCH RFC v6 6/7] migration: fix some error handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,124 +26,95 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: armbru@redhat.com, dgilbert@redhat.com, famz@redhat.com, peterx@redhat.com, quintela@redhat.com
 
-When multifd is used during migration, a segmentaion fault will
-occur in the source when multifd_save_cleanup() is called again if
-the multifd_send_state has been freed in earlier error handling. This
-can happen when migrate_fd_connect() fails and multifd_fd_cleanup()
-is called, and then multifd_new_send_channel_async() fails and
-multifd_save_cleanup() is called again.
+Add error handling for qemu_ram_foreach_migratable_block() when
+it fails.
 
-If the QIOChannel *c of multifd_recv_state->params[i] (p->c) is not
-initialized, there is no need to close the channel. Or else a
-segmentation fault will occur in multifd_recv_terminate_threads()
-when multifd_recv_initial_packet() fails.
+Always call migrate_set_error() to set the error state without relying
+on whether multifd_save_cleanup() succeeds. As the passed &local_err
+is never used in multifd_save_cleanup(), remove it.
 
 Signed-off-by: Fei Li <fli@suse.com>
 ---
- migration/ram.c | 28 +++++++++++++++++++++-------
- 1 file changed, 21 insertions(+), 7 deletions(-)
+ migration/migration.c    | 5 +----
+ migration/postcopy-ram.c | 3 +++
+ migration/ram.c          | 7 +++----
+ migration/ram.h          | 2 +-
+ 4 files changed, 8 insertions(+), 9 deletions(-)
 
+diff --git a/migration/migration.c b/migration/migration.c
+index 87dfc7374f..3b8b7ab4f9 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1377,7 +1377,6 @@ static void migrate_fd_cleanup(void *opaque)
+     qemu_savevm_state_cleanup();
+ 
+     if (s->to_dst_file) {
+-        Error *local_err = NULL;
+         QEMUFile *tmp;
+ 
+         trace_migrate_fd_cleanup();
+@@ -1388,9 +1387,7 @@ static void migrate_fd_cleanup(void *opaque)
+         }
+         qemu_mutex_lock_iothread();
+ 
+-        if (multifd_save_cleanup(&local_err) != 0) {
+-            error_report_err(local_err);
+-        }
++        multifd_save_cleanup();
+         qemu_mutex_lock(&s->qemu_file_lock);
+         tmp = s->to_dst_file;
+         s->to_dst_file = NULL;
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index e5c02a32c5..4ca2bc02b3 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -1117,6 +1117,9 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
+ 
+     /* Mark so that we get notified of accesses to unwritten areas */
+     if (qemu_ram_foreach_migratable_block(ram_block_enable_notify, mis)) {
++        error_report("ram_block_enable_notify failed");
++        close(mis->userfault_event_fd);
++        close(mis->userfault_fd);
+         return -1;
+     }
+ 
 diff --git a/migration/ram.c b/migration/ram.c
-index 7e7deec4d8..4db3b3e8f4 100644
+index 8f03afe228..57cb1bee3d 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -907,6 +907,11 @@ static void multifd_send_terminate_threads(Error *err)
-         }
+@@ -922,7 +922,7 @@ static void multifd_send_terminate_threads(Error *err)
      }
+ }
  
-+    /* in case multifd_send_state has been freed earlier */
-+    if (!multifd_send_state) {
-+        return;
-+    }
-+
-     for (i = 0; i < migrate_multifd_channels(); i++) {
-         MultiFDSendParams *p = &multifd_send_state->params[i];
- 
-@@ -922,7 +927,7 @@ int multifd_save_cleanup(Error **errp)
+-int multifd_save_cleanup(Error **errp)
++int multifd_save_cleanup(void)
+ {
      int i;
      int ret = 0;
+@@ -1082,9 +1082,8 @@ static void multifd_new_send_channel_async(QIOTask *task, gpointer opaque)
  
--    if (!migrate_use_multifd()) {
-+    if (!migrate_use_multifd() || !multifd_send_state) {
-         return 0;
-     }
-     multifd_send_terminate_threads(NULL);
-@@ -960,7 +965,7 @@ static void multifd_send_sync_main(void)
- {
-     int i;
- 
--    if (!migrate_use_multifd()) {
-+    if (!migrate_use_multifd() || !multifd_send_state) {
-         return;
-     }
-     if (multifd_send_state->pages->used) {
-@@ -1070,6 +1075,10 @@ static void multifd_new_send_channel_async(QIOTask *task, gpointer opaque)
-     QIOChannel *sioc = QIO_CHANNEL(qio_task_get_source(task));
-     Error *local_err = NULL;
- 
-+    if (!multifd_send_state) {
-+        return;
-+    }
-+
      if (qio_task_propagate_error(task, &local_err)) {
-         if (multifd_save_cleanup(&local_err) != 0) {
-             migrate_set_error(migrate_get_current(), local_err);
-@@ -1131,7 +1140,7 @@ struct {
-     uint64_t packet_num;
- } *multifd_recv_state;
+         migrate_set_state(&s->state, s->state, MIGRATION_STATUS_FAILED);
+-        if (multifd_save_cleanup(&local_err) != 0) {
+-            migrate_set_error(migrate_get_current(), local_err);
+-        }
++        multifd_save_cleanup();
++        migrate_set_error(migrate_get_current(), local_err);
+     } else {
+         p->c = QIO_CHANNEL(sioc);
+         qio_channel_set_delay(p->c, false);
+diff --git a/migration/ram.h b/migration/ram.h
+index 046d3074be..0d1215209e 100644
+--- a/migration/ram.h
++++ b/migration/ram.h
+@@ -43,7 +43,7 @@ uint64_t ram_bytes_remaining(void);
+ uint64_t ram_bytes_total(void);
  
--static void multifd_recv_terminate_threads(Error *err)
-+static void multifd_recv_terminate_threads(Error *err, bool channel)
- {
-     int i;
- 
-@@ -1145,6 +1154,11 @@ static void multifd_recv_terminate_threads(Error *err)
-         }
-     }
- 
-+    /* in case p->c is not initialized */
-+    if (!channel) {
-+        return;
-+    }
-+
-     for (i = 0; i < migrate_multifd_channels(); i++) {
-         MultiFDRecvParams *p = &multifd_recv_state->params[i];
- 
-@@ -1166,7 +1180,7 @@ int multifd_load_cleanup(Error **errp)
-     if (!migrate_use_multifd()) {
-         return 0;
-     }
--    multifd_recv_terminate_threads(NULL);
-+    multifd_recv_terminate_threads(NULL, true);
-     for (i = 0; i < migrate_multifd_channels(); i++) {
-         MultiFDRecvParams *p = &multifd_recv_state->params[i];
- 
-@@ -1269,7 +1283,7 @@ static void *multifd_recv_thread(void *opaque)
-     }
- 
-     if (local_err) {
--        multifd_recv_terminate_threads(local_err);
-+        multifd_recv_terminate_threads(local_err, true);
-     }
-     qemu_mutex_lock(&p->mutex);
-     p->running = false;
-@@ -1331,7 +1345,7 @@ bool multifd_recv_new_channel(QIOChannel *ioc)
- 
-     id = multifd_recv_initial_packet(ioc, &local_err);
-     if (id < 0) {
--        multifd_recv_terminate_threads(local_err);
-+        multifd_recv_terminate_threads(local_err, false);
-         return false;
-     }
- 
-@@ -1339,7 +1353,7 @@ bool multifd_recv_new_channel(QIOChannel *ioc)
-     if (p->c != NULL) {
-         error_setg(&local_err, "multifd: received id '%d' already setup'",
-                    id);
--        multifd_recv_terminate_threads(local_err);
-+        multifd_recv_terminate_threads(local_err, true);
-         return false;
-     }
-     p->c = ioc;
+ int multifd_save_setup(void);
+-int multifd_save_cleanup(Error **errp);
++int multifd_save_cleanup(void);
+ int multifd_load_setup(void);
+ int multifd_load_cleanup(Error **errp);
+ bool multifd_recv_all_channels_created(void);
 -- 
 2.13.7
