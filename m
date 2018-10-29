@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34577)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gH9Lu-0000GO-VV
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:21:15 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gH9MV-0000fH-Ar
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:21:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gH9Lp-0003ZB-Sw
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:21:14 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:40260 helo=mail.rt-rk.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gH9Lo-0003PA-W1
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:21:09 -0400
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 29 Oct 2018 16:20:18 +0100
-Message-Id: <1540826418-5501-28-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1540826418-5501-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1540826418-5501-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL 27/27] linux-user: Add prctl() PR_SET_FP_MODE
- and PR_GET_FP_MODE implementations
+	(envelope-from <peter.maydell@linaro.org>) id 1gH9MR-0003lk-Hh
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:21:49 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:41924)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gH9MM-0003kL-2g
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:21:43 -0400
+Received: by mail-oi1-x242.google.com with SMTP id i10-v6so7405404oik.8
+	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 08:21:42 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA_WJ7hRd8RfM2OTQBPcryUVDOJkFbRzb69xWTM-yNBLmA@mail.gmail.com>
+References: <20181024113709.16599-1-richard.henderson@linaro.org>
+	<20181024113709.16599-5-richard.henderson@linaro.org>
+	<CAFEAcA_WJ7hRd8RfM2OTQBPcryUVDOJkFbRzb69xWTM-yNBLmA@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 29 Oct 2018 15:21:20 +0000
+Message-ID: <CAFEAcA_zK8n0Bkwn-4x8M-CFduOviCmUGS-uSfw45SzRriE9Rg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 4/5] target/arm: Fill in ARMISARegisters
+ for kvm32
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,118 +31,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>
 
-From: Stefan Markovic <smarkovic@wavecomp.com>
+On 29 October 2018 at 15:13, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 24 October 2018 at 12:37, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>  target/arm/kvm32.c | 33 ++++++++++++++++++++++++++++-----
+>>  1 file changed, 28 insertions(+), 5 deletions(-)
+>
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+>
+>> +    /*
+>> +     * FIXME: There is not yet a way to read MVFR2.
+>> +     * Fortunately there is not yet anything in there that affects migration.
+>> +     */
+>
+> We should bring that up with the KVM folks (cc'd)...
+>
+> Presumably KVM_REG_ARM_VFP_MVFR2 should be 0x1005 and the code
+> in the kernel for handling this bit of the get/set-one-reg
+> ioctls needs to have code for it (including returning 0
+> for v7 CPUs, where this VMRS register encoding was UNPREDICTABLE).
 
-Implement MIPS specific prctl() PR_SET_FP_MODE and PR_GET_FP_MODE emulation.
+There's an argument for "fail the ioctl on v7 CPUs" rather than
+"return 0"; I don't think I have a strong opinion, since in
+practice userspace needs to handle the "doesn't exist" case
+when it's running on an older kernel anyway.
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
----
- linux-user/mips/target_syscall.h   |  2 ++
- linux-user/mips64/target_syscall.h |  2 ++
- linux-user/syscall.c               | 62 +++++++++++++++++++++++++++++++++++---
- 3 files changed, 62 insertions(+), 4 deletions(-)
-
-diff --git a/linux-user/mips/target_syscall.h b/linux-user/mips/target_syscall.h
-index 33177af..d5509a3 100644
---- a/linux-user/mips/target_syscall.h
-+++ b/linux-user/mips/target_syscall.h
-@@ -247,5 +247,7 @@ static inline abi_ulong target_shmlba(CPUMIPSState *env)
- /* MIPS-specific prctl() options */
- #define TARGET_PR_SET_FP_MODE  45
- #define TARGET_PR_GET_FP_MODE  46
-+#define TARGET_PR_FP_MODE_FR   (1 << 0)
-+#define TARGET_PR_FP_MODE_FRE  (1 << 1)
- 
- #endif /* MIPS_TARGET_SYSCALL_H */
-diff --git a/linux-user/mips64/target_syscall.h b/linux-user/mips64/target_syscall.h
-index c1160e6..8ccc468 100644
---- a/linux-user/mips64/target_syscall.h
-+++ b/linux-user/mips64/target_syscall.h
-@@ -244,5 +244,7 @@ static inline abi_ulong target_shmlba(CPUMIPSState *env)
- /* MIPS-specific prctl() options */
- #define TARGET_PR_SET_FP_MODE  45
- #define TARGET_PR_GET_FP_MODE  46
-+#define TARGET_PR_FP_MODE_FR   (1 << 0)
-+#define TARGET_PR_FP_MODE_FRE  (1 << 1)
- 
- #endif /* MIPS64_TARGET_SYSCALL_H */
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 15b03e1..810a58b 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -9529,11 +9529,65 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
- #endif
- #ifdef TARGET_MIPS
-         case TARGET_PR_GET_FP_MODE:
--            /* TODO: Implement TARGET_PR_SET_FP_MODE handling.*/
--            return -TARGET_EINVAL;
-+        {
-+            CPUMIPSState *env = ((CPUMIPSState *)cpu_env);
-+            ret = 0;
-+            if (env->CP0_Status & (1 << CP0St_FR)) {
-+                ret |= TARGET_PR_FP_MODE_FR;
-+            }
-+            if (env->CP0_Config5 & (1 << CP0C5_FRE)) {
-+                ret |= TARGET_PR_FP_MODE_FRE;
-+            }
-+            return ret;
-+        }
-         case TARGET_PR_SET_FP_MODE:
--            /* TODO: Implement TARGET_PR_GET_FP_MODE handling.*/
--            return -TARGET_EINVAL;
-+        {
-+            CPUMIPSState *env = ((CPUMIPSState *)cpu_env);
-+            bool old_fr = env->CP0_Status & (1 << CP0St_FR);
-+            bool new_fr = arg2 & TARGET_PR_FP_MODE_FR;
-+            bool new_fre = arg2 & TARGET_PR_FP_MODE_FRE;
-+
-+            if (new_fr && !(env->active_fpu.fcr0 & (1 << FCR0_F64))) {
-+                /* FR1 is not supported */
-+                return -TARGET_EOPNOTSUPP;
-+            }
-+            if (!new_fr && (env->active_fpu.fcr0 & (1 << FCR0_F64))
-+                && !(env->CP0_Status_rw_bitmask & (1 << CP0St_FR))) {
-+                /* cannot set FR=0 */
-+                return -TARGET_EOPNOTSUPP;
-+            }
-+            if (new_fre && !(env->active_fpu.fcr0 & (1 << FCR0_FREP))) {
-+                /* Cannot set FRE=1 */
-+                return -TARGET_EOPNOTSUPP;
-+            }
-+
-+            int i;
-+            fpr_t *fpr = env->active_fpu.fpr;
-+            for (i = 0; i < 32 ; i += 2) {
-+                if (!old_fr && new_fr) {
-+                    fpr[i].w[!FP_ENDIAN_IDX] = fpr[i + 1].w[FP_ENDIAN_IDX];
-+                } else if (old_fr && !new_fr) {
-+                    fpr[i + 1].w[FP_ENDIAN_IDX] = fpr[i].w[!FP_ENDIAN_IDX];
-+                }
-+            }
-+
-+            if (new_fr) {
-+                env->CP0_Status |= (1 << CP0St_FR);
-+                env->hflags |= MIPS_HFLAG_F64;
-+            } else {
-+                env->CP0_Status &= ~(1 << CP0St_FR);
-+            }
-+            if (new_fre) {
-+                env->CP0_Config5 |= (1 << CP0C5_FRE);
-+                if (env->active_fpu.fcr0 & (1 << FCR0_FREP)) {
-+                    env->hflags |= MIPS_HFLAG_FRE;
-+                }
-+            } else {
-+                env->CP0_Config5 &= ~(1 << CP0C5_FRE);
-+            }
-+
-+            return 0;
-+        }
- #endif /* MIPS */
- #ifdef TARGET_AARCH64
-         case TARGET_PR_SVE_SET_VL:
--- 
-2.7.4
+thanks
+-- PMM
