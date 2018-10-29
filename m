@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47448)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47444)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gHAxA-0002CK-CJ
+	(envelope-from <sameo@linux.intel.com>) id 1gHAxA-0002CG-CF
 	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 13:03:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gHAx7-0004m4-8Q
+	(envelope-from <sameo@linux.intel.com>) id 1gHAx6-0004l2-K5
 	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 13:03:48 -0400
-Received: from mga06.intel.com ([134.134.136.31]:16083)
+Received: from mga03.intel.com ([134.134.136.65]:15359)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sameo@linux.intel.com>)
-	id 1gHAx6-0004bA-TJ
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 13:03:45 -0400
+	id 1gHAx6-0004he-77
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 13:03:44 -0400
 From: Samuel Ortiz <sameo@linux.intel.com>
-Date: Mon, 29 Oct 2018 18:01:52 +0100
-Message-Id: <20181029170159.3801-13-sameo@linux.intel.com>
+Date: Mon, 29 Oct 2018 18:01:54 +0100
+Message-Id: <20181029170159.3801-15-sameo@linux.intel.com>
 In-Reply-To: <20181029170159.3801-1-sameo@linux.intel.com>
 References: <20181029170159.3801-1-sameo@linux.intel.com>
-Subject: [Qemu-devel] [PATCH v3 12/19] hw: i386: Make the hotpluggable
- memory size property more generic
+Subject: [Qemu-devel] [PATCH v3 14/19] hw: acpi: Fix memory hotplug AML
+ generation error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,80 +26,45 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Yang Zhong <yang.zhong@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-This property is currently defined under i386/pc while it only describes
-a region size that's eventually fetched from the AML ACPI code.
+From: Yang Zhong <yang.zhong@intel.com>
 
-We can make it more generic and shareable across machine types by moving
-it to memory-device.h instead.
+When using the generated memory hotplug AML, the iasl
+compiler would give the following error:
 
-Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+dsdt.dsl 266: Return (MOST (_UID, Arg0, Arg1, Arg2))
+Error 6080 - Called method returns no value ^
+
+Signed-off-by: Yang Zhong <yang.zhong@intel.com>
 ---
- hw/i386/acpi-build.c           | 2 +-
- hw/i386/pc.c                   | 3 ++-
- include/hw/i386/pc.h           | 1 -
- include/hw/mem/memory-device.h | 2 ++
- 4 files changed, 5 insertions(+), 3 deletions(-)
+ hw/acpi/memory_hotplug.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 414a6c4c4e..dfc02a8a85 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -1630,7 +1630,7 @@ build_srat(GArray *table_data, BIOSLinker *linker,
-     MachineClass *mc = MACHINE_GET_CLASS(machine);
-     const CPUArchIdList *apic_ids = mc->possible_cpu_arch_ids(machine);
-     ram_addr_t hotplugabble_address_space_size =
--        object_property_get_int(OBJECT(machine), PC_MACHINE_DEVMEM_REGION_SIZE,
-+        object_property_get_int(OBJECT(machine), MEMORY_DEVICE_REGION_SIZE,
-                                 NULL);
+diff --git a/hw/acpi/memory_hotplug.c b/hw/acpi/memory_hotplug.c
+index db2c4df961..893fc2bd27 100644
+--- a/hw/acpi/memory_hotplug.c
++++ b/hw/acpi/memory_hotplug.c
+@@ -686,15 +686,15 @@ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
  
-     srat_start = table_data->len;
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index bd4a77b856..1dcbbd5139 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -67,6 +67,7 @@
- #include "hw/boards.h"
- #include "acpi-build.h"
- #include "hw/mem/pc-dimm.h"
-+#include "hw/mem/memory-device.h"
- #include "qapi/error.h"
- #include "qapi/qapi-visit-common.h"
- #include "qapi/visitor.h"
-@@ -2442,7 +2443,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
-     nc->nmi_monitor_handler = x86_nmi;
-     mc->default_cpu_type = TARGET_DEFAULT_CPU_TYPE;
+             method = aml_method("_OST", 3, AML_NOTSERIALIZED);
+             s = MEMORY_SLOT_OST_METHOD;
+-            aml_append(method, aml_return(aml_call4(
+-                s, aml_name("_UID"), aml_arg(0), aml_arg(1), aml_arg(2)
+-            )));
++            aml_append(method,
++                       aml_call4(s, aml_name("_UID"), aml_arg(0),
++                                 aml_arg(1), aml_arg(2)));
+             aml_append(dev, method);
  
--    object_class_property_add(oc, PC_MACHINE_DEVMEM_REGION_SIZE, "int",
-+    object_class_property_add(oc, MEMORY_DEVICE_REGION_SIZE, "int",
-         pc_machine_get_device_memory_region_size, NULL,
-         NULL, NULL, &error_abort);
+             method = aml_method("_EJ0", 1, AML_NOTSERIALIZED);
+             s = MEMORY_SLOT_EJECT_METHOD;
+-            aml_append(method, aml_return(aml_call2(
+-                       s, aml_name("_UID"), aml_arg(0))));
++            aml_append(method,
++                       aml_call2(s, aml_name("_UID"), aml_arg(0)));
+             aml_append(dev, method);
  
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index da0bd39741..7d177cd207 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -62,7 +62,6 @@ struct PCMachineState {
- };
- 
- #define PC_MACHINE_ACPI_DEVICE_PROP "acpi-device"
--#define PC_MACHINE_DEVMEM_REGION_SIZE "device-memory-region-size"
- #define PC_MACHINE_MAX_RAM_BELOW_4G "max-ram-below-4g"
- #define PC_MACHINE_VMPORT           "vmport"
- #define PC_MACHINE_SMM              "smm"
-diff --git a/include/hw/mem/memory-device.h b/include/hw/mem/memory-device.h
-index e904e194d5..d9a4fc7c3e 100644
---- a/include/hw/mem/memory-device.h
-+++ b/include/hw/mem/memory-device.h
-@@ -97,6 +97,8 @@ typedef struct MemoryDeviceClass {
-                              MemoryDeviceInfo *info);
- } MemoryDeviceClass;
- 
-+#define MEMORY_DEVICE_REGION_SIZE "memory-device-region-size"
-+
- MemoryDeviceInfoList *qmp_memory_device_list(void);
- uint64_t get_plugged_memory_size(void);
- void memory_device_pre_plug(MemoryDeviceState *md, MachineState *ms,
+             aml_append(dev_container, dev);
 -- 
 2.17.2
