@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53205)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gH7Iw-0001rQ-Pg
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:10:08 -0400
+	(envelope-from <imammedo@redhat.com>) id 1gH7Km-0003PS-0E
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:11:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gH7Iu-0004tN-UP
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:10:02 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:37904)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gH7Is-0004oq-Pc
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:09:59 -0400
-Received: by mail-ot1-x343.google.com with SMTP id f24so1706332otl.5
-	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 06:09:55 -0700 (PDT)
+	(envelope-from <imammedo@redhat.com>) id 1gH7Ki-0006VW-OI
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:11:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:18671)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gH7Ki-0006UC-9P
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:11:52 -0400
+Date: Mon, 29 Oct 2018 14:11:48 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181029141148.170dad3f@redhat.com>
+In-Reply-To: <20180912125531.32131-6-marcandre.lureau@redhat.com>
+References: <20180912125531.32131-1-marcandre.lureau@redhat.com>
+	<20180912125531.32131-6-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181024112525.wdysex6exqd5aued@kamzik.brq.redhat.com>
-References: <20181024085602.16611-1-eric.auger@redhat.com>
-	<20181024112525.wdysex6exqd5aued@kamzik.brq.redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 29 Oct 2018 13:09:34 +0000
-Message-ID: <CAFEAcA8aEMUjPs=Y4-Zra___T15HryY4NDgxxqXMHhSQ4_+sLg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/virt: Set VIRT_COMPAT_3_0 compat
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 5/9] qom/globals: generalize
+ object_property_set_globals()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,53 +28,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: Eric Auger <eric.auger@redhat.com>, Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael
+	S. Tsirkin" <mst@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, dgilbert@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Andreas =?UTF-8?B?RsOkcmJlcg==?= <afaerber@suse.de>, Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-On 24 October 2018 at 12:25, Andrew Jones <drjones@redhat.com> wrote:
-> On Wed, Oct 24, 2018 at 10:56:02AM +0200, Eric Auger wrote:
->> We are missing the VIRT_COMPAT_3_0 definition and setting.
->> Let's add them.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> ---
->>  hw/arm/virt.c | 4 ++++
->>  1 file changed, 4 insertions(+)
->>
->> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
->> index 9f677825f9..a2b8d8f7c2 100644
->> --- a/hw/arm/virt.c
->> +++ b/hw/arm/virt.c
->> @@ -1871,6 +1871,9 @@ static void virt_machine_3_1_options(MachineClass *mc)
->>  }
->>  DEFINE_VIRT_MACHINE_AS_LATEST(3, 1)
->>
->> +#define VIRT_COMPAT_3_0 \
->> +    HW_COMPAT_3_0
->> +
->>  static void virt_3_0_instance_init(Object *obj)
->>  {
->>      virt_3_1_instance_init(obj);
->> @@ -1879,6 +1882,7 @@ static void virt_3_0_instance_init(Object *obj)
->>  static void virt_machine_3_0_options(MachineClass *mc)
->>  {
->>      virt_machine_3_1_options(mc);
->> +    SET_MACHINE_COMPAT(mc, VIRT_COMPAT_3_0);
->>  }
->>  DEFINE_VIRT_MACHINE(3, 0)
->>
->> --
->> 2.17.2
->>
->>
->
-> Oops, I should have done this with the 3.1 machine type. Thanks for the
-> catching and patching.
->
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
+On Wed, 12 Sep 2018 16:55:27 +0400
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
 
+> Handle calls of object_property_set_globals() with any object type,
+> but only apply globals to TYPE_DEVICE & TYPE_USER_CREATABLE.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  qom/globals.c | 22 ++++++++++++++--------
+>  1 file changed, 14 insertions(+), 8 deletions(-)
+>=20
+> diff --git a/qom/globals.c b/qom/globals.c
+> index 587f4a1b5c..8664baebe0 100644
+> --- a/qom/globals.c
+> +++ b/qom/globals.c
+> @@ -15,22 +15,28 @@ void object_property_register_global(GlobalProperty *=
+prop)
+> =20
+>  void object_property_set_globals(Object *obj)
+>  {
+> -    DeviceState *dev =3D DEVICE(obj);
+>      GList *l;
+> +    DeviceState *dev =3D (DeviceState *)object_dynamic_cast(obj, TYPE_DE=
+VICE);
+> +
+> +    if (!dev && !IS_USER_CREATABLE(obj)) {
+> +        /* only TYPE_DEVICE and TYPE_USER_CREATABLE support globals */
+> +        return;
+> +    }
+more dynamic casts but now imposed on every create object :(
 
+Maybe we should add ObjectClass::check/set_globals hook?
+It would be cheap to check and only objects we intend to work with
+it would be affected. On top of that hooks could be different so
+that device/user_creatable specifics won't be in generic code
+(like it's implemented here).
 
-Applied to target-arm.next, thanks.
-
--- PMM
+> =20
+>      for (l =3D global_props; l; l =3D l->next) {
+>          GlobalProperty *prop =3D l->data;
+>          Error *err =3D NULL;
+> =20
+> -        if (object_dynamic_cast(OBJECT(dev), prop->driver) =3D=3D NULL) {
+> +        if (object_dynamic_cast(obj, prop->driver) =3D=3D NULL) {
+>              continue;
+>          }
+>          prop->used =3D true;
+> -        object_property_parse(OBJECT(dev), prop->value, prop->property, =
+&err);
+> +        object_property_parse(obj, prop->value, prop->property, &err);
+>          if (err !=3D NULL) {
+>              error_prepend(&err, "can't apply global %s.%s=3D%s: ",
+>                            prop->driver, prop->property, prop->value);
+> -            if (!dev->hotplugged && prop->errp) {
+> +
+> +            if (dev && !dev->hotplugged && prop->errp) {
+>                  error_propagate(prop->errp, err);
+>              } else {
+>                  assert(prop->user_provided);
+> @@ -56,15 +62,15 @@ int object_property_check_globals(void)
+>              continue;
+>          }
+>          oc =3D object_class_by_name(prop->driver);
+> -        oc =3D object_class_dynamic_cast(oc, TYPE_DEVICE);
+> -        if (!oc) {
+> +        dc =3D (DeviceClass *)object_class_dynamic_cast(oc, TYPE_DEVICE);
+> +        if (!IS_USER_CREATABLE_CLASS(oc) && !dc) {
+>              warn_report("global %s.%s has invalid class name",
+>                          prop->driver, prop->property);
+>              ret =3D 1;
+>              continue;
+>          }
+> -        dc =3D DEVICE_CLASS(oc);
+> -        if (!dc->hotpluggable && !prop->used) {
+> +
+> +        if (dc && !dc->hotpluggable) {
+>              warn_report("global %s.%s=3D%s not used",
+>                          prop->driver, prop->property, prop->value);
+>              ret =3D 1;
