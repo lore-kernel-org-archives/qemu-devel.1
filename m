@@ -1,37 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57202)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gH958-0006Mh-92
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:03:57 -0400
+	(envelope-from <philmd@redhat.com>) id 1gH95C-0006Mr-5G
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:03:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gH953-0000sv-9D
+	(envelope-from <philmd@redhat.com>) id 1gH958-0000vr-8r
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:03:57 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:53700)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gH956-0000qB-9q
 	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:03:54 -0400
-Received: from mail-eopbgr710102.outbound.protection.outlook.com
-	([40.107.71.102]:6391
-	helo=NAM05-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1gH94z-0000ou-SL
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:03:47 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Mon, 29 Oct 2018 15:03:35 +0000
-Message-ID: <BN6PR2201MB1251F9D0D28E1177AF8E6B8DC6F30@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <20181014142928.2784-1-f4bug@amsat.org> <20181014164140.GB2319@sx9>
-	<CAAdtpL5xQYwyR0VxqAhA3dW9ec2KW07n-GKrMCt=UjQqwsuYHQ@mail.gmail.com>
-	<alpine.LFD.2.21.1810142320320.16498@eddie.linux-mips.org>
-	<20181015170202.GB2364@sx9>
-	<BN6PR2201MB125130DFBDFBBE67B4CD57A9C6FE0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-	<20181016181916.GB2323@sx9>
-	<300f223b-2013-5e31-0dd1-cd9adf0948ba@linaro.org>
-	<BN6PR2201MB12512B1ED5C412208990CC5FC6F20@BN6PR2201MB1251.namprd22.prod.outlook.com>
-	<BN6PR2201MB1251A375F642CB64E85135EFC6F30@BN6PR2201MB1251.namprd22.prod.outlook.com>,
-	<20181029145106.GA2294@sx9>
-In-Reply-To: <20181029145106.GA2294@sx9>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Received: by mail-wm1-f67.google.com with SMTP id l26-v6so8582785wmh.3
+	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 08:03:44 -0700 (PDT)
+References: <1540548409-22560-1-git-send-email-thuth@redhat.com>
+	<CAFEAcA8EubWya8ey9VxhaCw4m2U=KA+i2C-R9P-p+P6oEBBLew@mail.gmail.com>
+	<7fc49925-36ff-bd9a-0cd7-e5f8d4bb3672@roeck-us.net>
+	<CAFEAcA-UF+SyXvcU+NGZsbqBF2qg+s_x4HPU7yvf7B2G-=HPOg@mail.gmail.com>
+	<b4f6cbd2-68fe-5b07-e8fb-93b1c4d8a6de@roeck-us.net>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <2eb2b4ef-725d-cbee-1676-feb6bd800aea@redhat.com>
+Date: Mon, 29 Oct 2018 16:03:40 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] target/mips: Support Toshiba specific
- three-operand MADD and MADDU
+In-Reply-To: <b4f6cbd2-68fe-5b07-e8fb-93b1c4d8a6de@roeck-us.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/2] Deprecate the "collie" machine and
+ Strongarm devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,24 +34,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fredrik Noring <noring@nocrew.org>
-Cc: Richard Henderson <richard.henderson@linaro.org>, "Maciej W. Rozycki" <macro@linux-mips.org>, =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>, Aurelien Jarno <aurelien@aurel32.net>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, =?iso-8859-1?Q?J=FCrgen_Urban?= <JuergenUrban@gmx.de>
+To: Guenter Roeck <linux@roeck-us.net>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 
-> From: Fredrik Noring <noring@nocrew.org>
-> Subject: Re: [PATCH] target/mips: Support Toshiba specific three-operand =
-MADD and MADDU
->=20
-> Hi Aleksandar,
->=20
-> > Without TARGET_MIPS64, we can't say we emulate R5900 - we are emulating
-> > some other CPU that never existed.
-> >
-> > Convince me that I am wrong.
->=20
-> R5900 O32 is usable.
+Hi Guenter,
 
-Absolutely not. This kind of emulation infidelity can't be in QEMU upstream=
-. Even one step further, this should be forbidden, impossible to build.
+On 29/10/18 15:09, Guenter Roeck wrote:
+> On 10/29/18 6:24 AM, Peter Maydell wrote:
+>> On 27 October 2018 at 12:04, Guenter Roeck <linux@roeck-us.net> wrote:
+>>> On 10/26/18 3:12 AM, Peter Maydell wrote:
+>>>> Hi Guenter; there's a proposal here to deprecate (and eventually
+>>>> remove) the 'collie' board (strongarm) from QEMU. Is that one of
+>>>> the ones you're currently using in your automated testing of Linux
+>>>> kernels on QEMU?
+>>>>
+>>>
+>>> Yes. I can run the test with older versions of qemu, so it is ok for me
+>>> if it is removed (as long as that removal is not backported).
+>>
+>> Mmm, but if we have an active user who's testing them then they
+>> probably shouldn't be in the frontline of boards to remove.
+>> Which other boards do you test with mainline QEMU?
+>>
+> 
+> For arm:
+> 
+> akita
+> ast2500-evb
+> beagle
+> beaglexm
+> borzoi
+> collie
+> cubieboard
+> imx25-pdk
+> integratorcp
+> kzm
+> mainstone
+> midway
+> mps2-an385
+> overo
+> palmetto-bmc
+> raspi2
+> realview-eb
+> realview-eb-mpcore
+> realview-pb-a8
+> realview-pbx-a9
+> romulus-bmc
+> sabrelite
+> smdkc210
+> spitz
+> terrier
+> tosa
+> versatileab
+> versatilepb
+> vexpress-a15
+> vexpress-a15-a7
+> vexpress-a9
+> witherspoon-bmc
+> xilinx-zynq-a9
+> z2
+> 
+> Though not all of them are supported by upstream qemu. For some of them 
+> I carry local patches,
+> for others I use out-of-tree versions of qemu (beagle/beaglexm).
+
+Are these patches upstream-able?
+
+If not, what do we need to get them into upstream qemu?
 
 Thanks,
-Aleksandar=
+
+Phil.
