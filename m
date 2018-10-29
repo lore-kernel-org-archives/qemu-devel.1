@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55137)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gH7Nf-00081Y-UQ
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:14:56 -0400
+	(envelope-from <Stefan.Markovic@rt-rk.com>) id 1gH7Pm-0000rQ-B1
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:17:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gH7Ne-0001Se-1P
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:14:55 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:34525)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gH7Na-0001Ft-Eu
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:14:52 -0400
-Received: by mail-ot1-x343.google.com with SMTP id e9so5960737oti.1
-	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 06:14:41 -0700 (PDT)
+	(envelope-from <Stefan.Markovic@rt-rk.com>) id 1gH7Pj-0003fa-1I
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:17:06 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:37643 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Stefan.Markovic@rt-rk.com>)
+	id 1gH7Pi-0002qS-J3
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:17:02 -0400
+in-reply-to: <CAFEAcA8-nJ1pKtNautOJ-+Zh0Onw3HoK26ABZozSj3_VR7C=Jg@mail.gmail.com>
+from: "Stefan Markovic" <Stefan.Markovic@rt-rk.com>
+message-id: <ec5-5bd70800-1f-6e41d300@100209352>
+date: Mon, 29 Oct 2018 14:15:57 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181026073034.16648-1-ppandit@redhat.com>
-References: <20181026073034.16648-1-ppandit@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 29 Oct 2018 13:14:20 +0000
-Message-ID: <CAFEAcA_WduaLJZG-gu9oywCaUb2mR9DeBJ9WKqsTkKu4uGT7Uw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2] strongarm: mask off high[32:28] bits
- from dir and state registers
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel]
+ =?utf-8?b?Pz09P3V0Zi04P3E/ID89PT91dGYtOD9xPyBbUEFU?=
+ =?utf-8?q?CH_5/6=5D_Determine_the_desired_FPU_mode?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +28,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Moguofang <moguofang@huawei.com>, liqsub1 <liqsub1@163.com>, Prasad J Pandit <pjp@fedoraproject.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Petar Jovanovic <pjovanovic@wavecomp.com>, Riku Voipio <riku.voipio@iki.fi>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Laurent Vivier <laurent@vivier.eu>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 26 October 2018 at 08:30, P J P <ppandit@redhat.com> wrote:
-> From: Prasad J Pandit <pjp@fedoraproject.org>
+
+exit() error codes are taken and left over from related kernel code. Wi=
+ll be set to 1 in next series version. Also, appropriate error messages=
+ printing will be added.
+
+Regards,
+Stefan
+
+-------- Original Message --------
+Subject: Re: [Qemu-devel] [PATCH 5/6] Determine the desired FPU mode
+Date: Friday, October 26, 2018 20:12 CEST
+From: Peter Maydell <peter.maydell@linaro.org>
+To: Stefan Markovic <stefan.markovic@rt-rk.com>
+CC: QEMU Developers <qemu-devel@nongnu.org>, Petar Jovanovic <pjovanovi=
+c@wavecomp.com>, Riku Voipio <riku.voipio@iki.fi>, Aleksandar Markovic =
+<amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Lauren=
+t Vivier <laurent@vivier.eu>
+References: <1540563667-23300-1-git-send-email-stefan.markovic@rt-rk.co=
+m> <1540563667-23300-6-git-send-email-stefan.markovic@rt-rk.com>
+
+
+=C2=A0On 26 October 2018 at 15:21, Stefan Markovic <stefan.markovic@rt-=
+rk.com> wrote:
+> From: Stefan Markovic <smarkovic@wavecomp.com>
 >
-> The high[32:28] bits of 'direction' and 'state' registers of
-> SA-1100/SA-1110 device are reserved. Setting them may lead to
-> OOB 's->handler[]' array access issue. Mask off [32:28] bits to
-> avoid it.
-
-There is no bit 32 in a 32-bit value; you mean 31.
-
+> Floating-point mode is calculated from MIPS.abiflags FP ABI value
+> (based on kernel implementation). Illegal combinations are rejected.
 >
-> Reported-by: Moguofang <moguofang@huawei.com>
-> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 > ---
->  hw/arm/strongarm.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> Update v2: mask off high[32:28] bits
->   -> https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg05746.html
->
-> diff --git a/hw/arm/strongarm.c b/hw/arm/strongarm.c
-> index ec2627374d..dd8c4b1f2e 100644
-> --- a/hw/arm/strongarm.c
-> +++ b/hw/arm/strongarm.c
-> @@ -587,12 +587,12 @@ static void strongarm_gpio_write(void *opaque, hwaddr offset,
->
->      switch (offset) {
->      case GPDR:        /* GPIO Pin-Direction registers */
-> -        s->dir = value;
-> +        s->dir = value & 0x3fffff;
+> linux-user/mips/cpu=5Floop.c | 75 +++++++++++++++++++++++++++++++++++=
++++++++++++
+> 1 file changed, 75 insertions(+)
 
-The commit message says it's masking [31:28], but the
-code is masking [31:22]. The SA1110 spec suggests the
-commit message is correct and the code is not.
+> + if ((info->fp=5Fabi > MAX=5FFP=5FABI && info->fp=5Fabi !=3D MIPS=5F=
+ABI=5FFP=5FUNKNOWN)
+> + || (info->interp=5Ffp=5Fabi > MAX=5FFP=5FABI &&
+> + info->interp=5Ffp=5Fabi !=3D MIPS=5FABI=5FFP=5FUNKNOWN)) {
+> + fprintf(stderr, "qemu: Program and interpreter have "
+> + "unexpected FPU modes\n");
+> + exit(137);
+
+Why are we exit()ing with a funny exit status code here?
+
+If this is a "can't happen" case, then we should assert(). If
+it is a "can happen if fed an odd binary" case, then we should just
+exit(1) as we do already in this function for an unsupported NaN mode.
+
+> + }
+> +
+> + prog=5Freq =3D (info->fp=5Fabi =3D=3D MIPS=5FABI=5FFP=5FUNKNOWN) ? =
+none=5Freq
+> + : fpu=5Freqs[info->fp=5Fabi];
+> + interp=5Freq =3D (info->interp=5Ffp=5Fabi =3D=3D MIPS=5FABI=5FFP=5F=
+UNKNOWN) ? none=5Freq
+> + : fpu=5Freqs[info->interp=5Ffp=5Fabi];
+> +
+> + prog=5Freq.single &=3D interp=5Freq.single;
+> + prog=5Freq.soft &=3D interp=5Freq.soft;
+> + prog=5Freq.fr1 &=3D interp=5Freq.fr1;
+> + prog=5Freq.frdefault &=3D interp=5Freq.frdefault;
+> + prog=5Freq.fre &=3D interp=5Freq.fre;
+> +
+> + bool cpu=5Fhas=5Fmips=5Fr2=5Fr6 =3D env->insn=5Fflags & ISA=5FMIPS3=
+2R2 ||
+> + env->insn=5Fflags & ISA=5FMIPS64R2 ||
+> + env->insn=5Fflags & ISA=5FMIPS32R6 ||
+> + env->insn=5Fflags & ISA=5FMIPS64R6;
+> +
+> + if (prog=5Freq.fre && !prog=5Freq.frdefault && !prog=5Freq.fr1) {
+> + env->CP0=5FConfig5 |=3D (1 << CP0C5=5FFRE);
+> + if (env->active=5Ffpu.fcr0 & (1 << FCR0=5FFREP)) {
+> + env->hflags |=3D MIPS=5FHFLAG=5FFRE;
+> + }
+> + } else if ((prog=5Freq.fr1 && prog=5Freq.frdefault) ||
+> + (prog=5Freq.single && !prog=5Freq.frdefault)) {
+> + if ((env->active=5Ffpu.fcr0 & (1 << FCR0=5FF64)
+> + && cpu=5Fhas=5Fmips=5Fr2=5Fr6) || prog=5Freq.fr1) {
+> + env->CP0=5FStatus |=3D (1 << CP0St=5FFR);
+> + env->hflags |=3D MIPS=5FHFLAG=5FF64;
+> + }
+> + } else if (!prog=5Freq.fre && !prog=5Freq.frdefault &&
+> + !prog=5Freq.fr1 && !prog=5Freq.single && !prog=5Freq.soft) {
+> + exit(137);
+> + }
+
+Ditto here (and we haven't printed any error message here...)
 
 thanks
 -- PMM
+=C2=A0
