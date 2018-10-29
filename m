@@ -1,40 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37865)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <farman@linux.ibm.com>) id 1gHAgf-0006K0-2m
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 12:46:45 -0400
+	(envelope-from <alistair23@gmail.com>) id 1gHAir-0007p6-KJ
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 12:49:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <farman@linux.ibm.com>) id 1gHAgZ-0005rV-NF
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 12:46:44 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48786)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <farman@linux.ibm.com>)
-	id 1gHAgZ-0005q5-1H
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 12:46:39 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w9TGiSfU020834
-	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 12:46:37 -0400
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ne5xh07wu-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 12:46:37 -0400
-Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <farman@linux.ibm.com>;
-	Mon, 29 Oct 2018 10:46:36 -0600
-References: <1540827745-20795-1-git-send-email-borntraeger@de.ibm.com>
-	<1540827745-20795-2-git-send-email-borntraeger@de.ibm.com>
-From: Eric Farman <farman@linux.ibm.com>
-Date: Mon, 29 Oct 2018 12:46:31 -0400
+	(envelope-from <alistair23@gmail.com>) id 1gHAiq-0000cX-Sx
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 12:49:01 -0400
+Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:43109)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1gHAiq-0000ap-JU
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 12:49:00 -0400
+Received: by mail-lf1-x143.google.com with SMTP id u18so6568309lff.10
+	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 09:48:59 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1540827745-20795-2-git-send-email-borntraeger@de.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <c0866eef-f08b-e913-b2c8-0f4d026edfa8@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/4] MAINTAINERS: s390: more maintainers
- for vfio-ccw
+References: <20181029161605.11486-1-palmer@sifive.com>
+	<9cf83a16-250c-ff01-0783-74d5b2077999@redhat.com>
+In-Reply-To: <9cf83a16-250c-ff01-0783-74d5b2077999@redhat.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 29 Oct 2018 09:48:30 -0700
+Message-ID: <CAKmqyKPXFOw3hv+wYbVPn2c4xPCiUXVyzDPJ3XpOuBx0zp9xGw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] Add Alistair as a RISC-V Maintainer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,33 +30,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, David Hildenbrand <david@redhat.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Janosch Frank <frankja@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, Farhan Ali <alifm@linux.ibm.com>, Collin Walling <walling@linux.ibm.com>
+To: philmd@redhat.com
+Cc: Palmer Dabbelt <palmer@sifive.com>, Peter Maydell <peter.maydell@linaro.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Michael Clark <mjc@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>
 
+On Mon, Oct 29, 2018 at 9:44 AM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
+>
+> On 29/10/18 17:16, Palmer Dabbelt wrote:
+> > Alistair has been contributing to the RISC-V QEMU port for a while now
+> > so I'd like him to be officially listed as a maintainer.  I've checked
+> > with the other RISC-V mainatiners and there are no objectics, and I've
+>
+> "maintainers" "objections"
+>
+> > also checked with Alistair so he knows I'm volunteering him.
+> >
+> > Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+>
+> FWIW:
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-On 10/29/2018 11:42 AM, Christian Borntraeger wrote:
-> Eric and Farhan will help with maintaining vfio-ccw.
-> 
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+I can send a pull request with this patch (and the other RISC-V
+patch). I'll fix the typos in the PR.
 
-Acked-by: Eric Farman <farman@linux.ibm.com>
+Alistair
 
-> ---
->   MAINTAINERS | 2 ++
->   1 file changed, 2 insertions(+)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index d794bd7..10045b6 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1204,6 +1204,8 @@ F: include/hw/vfio/
->   
->   vfio-ccw
->   M: Cornelia Huck <cohuck@redhat.com>
-> +M: Eric Farman <farman@linux.ibm.com>
-> +M: Farhan Ali <alifm@linux.ibm.com>
->   S: Supported
->   F: hw/vfio/ccw.c
->   F: hw/s390x/s390-ccw.c
-> 
+>
+> > ---
+> >   MAINTAINERS | 1 +
+> >   1 file changed, 1 insertion(+)
+> >
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > index d794bd7a66fe..d550fd8b809c 100644
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -241,6 +241,7 @@ F: disas/ppc.c
+> >   RISC-V
+> >   M: Michael Clark <mjc@sifive.com>
+> >   M: Palmer Dabbelt <palmer@sifive.com>
+> > +M: Alistair Francis <Alistair.Francis@wdc.com>
+> >   M: Sagar Karandikar <sagark@eecs.berkeley.edu>
+> >   M: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+> >   S: Maintained
+> >
+>
