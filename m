@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51849)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gH5oa-0007z2-5i
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:34:36 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gH5zg-0000pd-Hw
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:46:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gH5oZ-0006HM-ER
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:34:36 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43764)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gH5zf-0005VD-LV
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:46:04 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:40604)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1gH5oX-000690-F1
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:34:33 -0400
-Received: by mail-wr1-x442.google.com with SMTP id t10-v6so8258643wrn.10
-	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 04:34:29 -0700 (PDT)
+	id 1gH5zf-0005Tk-Dw
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:46:03 -0400
+Received: by mail-wr1-x441.google.com with SMTP id i17-v6so8270238wre.7
+	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 04:46:03 -0700 (PDT)
 MIME-Version: 1.0
 References: <20181009131251.721-1-marcandre.lureau@redhat.com>
-	<20181009131251.721-3-marcandre.lureau@redhat.com>
-	<20181010034525.GM18728@xz-x1>
-In-Reply-To: <20181010034525.GM18728@xz-x1>
+	<20181009131251.721-4-marcandre.lureau@redhat.com>
+	<20181010035411.GN18728@xz-x1>
+In-Reply-To: <20181010035411.GN18728@xz-x1>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 29 Oct 2018 15:34:16 +0400
-Message-ID: <CAJ+F1C+mXtAMt2JG9tS03dJFP4qOK=1qkhtB3GsrNAEaSyL-gw@mail.gmail.com>
+Date: Mon, 29 Oct 2018 15:45:49 +0400
+Message-ID: <CAJ+F1C+yWsqN0A8575Fu=rfz7xrZZ6MY0+qog=kAFpApWXHfbQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/6] monitor: accept chardev input from
- iothread
+Subject: Re: [Qemu-devel] [PATCH 3/6] char: add a QEMU_CHAR_FEATURE_GCONTEXT
+ flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,78 +37,82 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>, "Dr. Davi
 
 Hi
 
-On Wed, Oct 10, 2018 at 7:45 AM Peter Xu <peterx@redhat.com> wrote:
+On Wed, Oct 10, 2018 at 7:54 AM Peter Xu <peterx@redhat.com> wrote:
 >
-> On Tue, Oct 09, 2018 at 05:12:47PM +0400, Marc-Andr=C3=A9 Lureau wrote:
-> > Chardev backends may not handle safely IO events from concurrent
-> > threads. Better to wake up the chardev from the monitor IO thread if
-> > it's being used as the chardev context.
-> >
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > ---
-> >  monitor.c | 12 ++++++++++--
-> >  1 file changed, 10 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/monitor.c b/monitor.c
-> > index ab60c9f87e..a25514490a 100644
-> > --- a/monitor.c
-> > +++ b/monitor.c
-> > @@ -4297,6 +4297,13 @@ int monitor_suspend(Monitor *mon)
-> >      return 0;
-> >  }
-> >
-> > +static void monitor_accept_input(void *opaque)
-> > +{
-> > +    Monitor *mon =3D opaque;
-> > +
-> > +    qemu_chr_fe_accept_input(&mon->chr);
-> > +}
-> > +
-> >  void monitor_resume(Monitor *mon)
-> >  {
-> >      if (monitor_is_hmp_non_interactive(mon)) {
-> > @@ -4310,13 +4317,14 @@ void monitor_resume(Monitor *mon)
-> >               * let's kick the thread in case it's sleeping.
-> >               */
-> >              if (mon->use_io_thread) {
-> > -                aio_notify(iothread_get_aio_context(mon_iothread));
-> > +                aio_bh_schedule_oneshot(iothread_get_aio_context(mon_i=
-othread),
-> > +                                        monitor_accept_input, mon);
+> On Tue, Oct 09, 2018 at 05:12:48PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> > The feature should be set if the chardev is able to switch
+> > GMainContext. Callers that want to put a chardev in a different thread
+> > context can/should check this capabilities.
 >
-> Just to make sure: this will definitely cover the previous
-> aio_notify(), am I right?
->
-> Imho some comment would always be nice here because QMPs with
-> use_io_thread=3Dtrue seems special anyway.
->
-> >              }
-> >          } else {
-> >              assert(mon->rs);
-> >              readline_show_prompt(mon->rs);
-> > +            monitor_accept_input(mon);
-> >          }
-> > -        qemu_chr_fe_accept_input(&mon->chr);
->
-> How about the QMP monitors with oob=3Doff?  Will it miss the call?
+> IIRC we've had some discussion about whether we should allow to
+> dynamically switch context for chardevs, and a (temporarily)
+> conclusion is that we'd prefer to forbidden it for simplicity
+> (although it's still allowed in current master).  Does this patch mean
+> that we'd still want to allow that for some future scenarios?
 
-good catch
+Currently, the API let you change context dynamically, although doing
+it safely is left for the caller to handle. And it's not guarantee to
+work with all backends: some chardev don't simply allow you to use a
+different gcontext, this is what this flag should be about.
 
->
-> I would consider caching the aio context into Monitor struct when
-> monitor init, then call aio_bh_schedule_oneshot() always with the
-> per-monitor aio cache.  This could unify the code paths too so we keep
-> the oob special path as less as possible.
-
-Saving the aio context isn't really necessary. However, I'll unify the
-code paths in v2.
+The flag may become obsolete if we change the API to restrict setting
+context at creation time. For now, I think we should consider this
+patch and the following one.
 
 thanks
 
 >
+> >
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >  include/chardev/char.h |  3 +++
+> >  chardev/char.c         | 11 +++++++++++
+> >  2 files changed, 14 insertions(+)
+> >
+> > diff --git a/include/chardev/char.h b/include/chardev/char.h
+> > index 7becd8c80c..014566c3de 100644
+> > --- a/include/chardev/char.h
+> > +++ b/include/chardev/char.h
+> > @@ -47,6 +47,9 @@ typedef enum {
+> >      QEMU_CHAR_FEATURE_FD_PASS,
+> >      /* Whether replay or record mode is enabled */
+> >      QEMU_CHAR_FEATURE_REPLAY,
+> > +    /* Whether the gcontext can be changed after calling
+> > +     * qemu_chr_be_update_read_handlers() */
+> > +    QEMU_CHAR_FEATURE_GCONTEXT,
+> >
+> >      QEMU_CHAR_FEATURE_LAST,
+> >  } ChardevFeature;
+> > diff --git a/chardev/char.c b/chardev/char.c
+> > index e115166995..fa1b74e0d9 100644
+> > --- a/chardev/char.c
+> > +++ b/chardev/char.c
+> > @@ -196,6 +196,8 @@ void qemu_chr_be_update_read_handlers(Chardev *s,
+> >      s->gcontext =3D context;
+> >      if (cc->chr_update_read_handler) {
+> >          cc->chr_update_read_handler(s);
+> > +    } else if (s->gcontext) {
+> > +        error_report("switching context isn't supported by this charde=
+v");
 > >      }
-> >      trace_monitor_suspend(mon, -1);
 > >  }
+> >
+> > @@ -240,6 +242,15 @@ static void char_init(Object *obj)
+> >
+> >      chr->logfd =3D -1;
+> >      qemu_mutex_init(&chr->chr_write_lock);
+> > +
+> > +    /*
+> > +     * Assume if chr_update_read_handler is implemented it will
+> > +     * take the updated gcontext into account.
+> > +     */
+> > +    if (CHARDEV_GET_CLASS(chr)->chr_update_read_handler) {
+> > +        qemu_chr_set_feature(chr, QEMU_CHAR_FEATURE_GCONTEXT);
+> > +    }
+> > +
+> >  }
+> >
+> >  static int null_chr_write(Chardev *chr, const uint8_t *buf, int len)
 > > --
 > > 2.19.0.271.gfe8321ec05
 > >
