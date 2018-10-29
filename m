@@ -1,31 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49940)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gH783-0008VR-HM
+	(envelope-from <fli@suse.com>) id 1gH787-00007K-Pc
 	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 08:58:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gH77y-0002CC-AT
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 08:58:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37464)
+	(envelope-from <fli@suse.com>) id 1gH782-0002Jy-Uv
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 08:58:51 -0400
+Received: from smtp.nue.novell.com ([195.135.221.5]:42954)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gH77y-0001zI-0y
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 08:58:42 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 72C9DC7C21
-	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 12:58:33 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon, 29 Oct 2018 16:57:32 +0400
-Message-Id: <20181029125733.14597-6-marcandre.lureau@redhat.com>
-In-Reply-To: <20181029125733.14597-1-marcandre.lureau@redhat.com>
-References: <20181029125733.14597-1-marcandre.lureau@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 5/6] monitor: prevent inserting new monitors
- after cleanup
+	(Exim 4.71) (envelope-from <fli@suse.com>) id 1gH782-0002Ft-EM
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 08:58:46 -0400
+From: Fei Li <fli@suse.com>
+Date: Mon, 29 Oct 2018 20:58:11 +0800
+Message-Id: <20181029125818.28720-1-fli@suse.com>
+Subject: [Qemu-devel] [PATCH RFC v6 0/7] qemu_thread_create: propagate
+ errors to callers to check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,60 +23,121 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, peterx@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: armbru@redhat.com, dgilbert@redhat.com, famz@redhat.com, peterx@redhat.com, quintela@redhat.com
 
-Add a monitor_destroyed global to check if monitor_cleanup() has been
-already called. In this case, don't insert the new monitor in the
-list, but free it instead.
+Hi,
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- monitor.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+This idea comes from BiteSizedTasks, and this patch series implement
+the error checking of qemu_thread_create: make qemu_thread_create
+return a flag to indicate if it succeeded rather than failing with an
+error; make all callers check it.
 
-diff --git a/monitor.c b/monitor.c
-index fffeb27ef9..7fe89daa87 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -263,10 +263,11 @@ typedef struct QMPRequest QMPRequest;
- /* QMP checker flags */
- #define QMP_ACCEPT_UNKNOWNS 1
-=20
--/* Protects mon_list, monitor_qapi_event_state.  */
-+/* Protects mon_list, monitor_qapi_event_state, monitor_destroyed.  */
- static QemuMutex monitor_lock;
- static GHashTable *monitor_qapi_event_state;
- static QTAILQ_HEAD(mon_list, Monitor) mon_list;
-+static bool monitor_destroyed;
-=20
- /* Protects mon_fdsets */
- static QemuMutex mon_fdsets_lock;
-@@ -4536,8 +4537,16 @@ void error_vprintf_unless_qmp(const char *fmt, va_=
-list ap)
- static void monitor_list_append(Monitor *mon)
- {
-     qemu_mutex_lock(&monitor_lock);
--    QTAILQ_INSERT_HEAD(&mon_list, mon, entry);
-+    if (!monitor_destroyed) {
-+        QTAILQ_INSERT_HEAD(&mon_list, mon, entry);
-+        mon =3D NULL;
-+    }
-     qemu_mutex_unlock(&monitor_lock);
-+
-+    if (mon) {
-+        monitor_data_destroy(mon);
-+        g_free(mon);
-+    }
- }
-=20
- static void monitor_qmp_setup_handlers_bh(void *opaque)
-@@ -4631,6 +4640,7 @@ void monitor_cleanup(void)
-=20
-     /* Flush output buffers and destroy monitors */
-     qemu_mutex_lock(&monitor_lock);
-+    monitor_destroyed =3D true;
-     QTAILQ_FOREACH_SAFE(mon, &mon_list, entry, next) {
-         QTAILQ_REMOVE(&mon_list, mon, entry);
-         monitor_flush(mon);
---=20
-2.19.0.271.gfe8321ec05
+The first and the third patch fixes some segmentation faults occured
+during the debugging.   The second patch paves the way for the last
+patch as that patch is too long.   The last patch modifies the
+qemu_thread_create() and makes it return a bool to all direct callers
+to indicate if it succeeds.   The middle three fixes some migration
+issues.
+
+Please help to review, thanks. :)
+
+v6:
+- Add a new migration-multifd related patch. BTW, delete the previous
+  vnc related patch as it has been upstreamed.
+- Use error_setg_errno() to set the errno when qemu_thread_create()
+  fails for both Linux and Windows implementation.
+- Optimize the first patch, less codes are needed
+
+v5:
+- Remove `errno = err` in qemu_thread_create() for Linux, and change
+  `return errno` to `return -1` in qemu_signal_init() to indicate
+  the error in case qemu_thread_create() fails.
+- Delete the v4-added qemu_cond/mutex_destroy() in iothread_complete()
+  as the destroy() will be done by its callers' object_unref().
+
+v4:
+- Separate the migration compression patch from this series
+- Add one more error handling patch related with migration
+- Add more cleaning up code for touched functions
+
+v3:
+- Add two migration related patches to fix the segmentaion fault
+- Extract the segmentation fault fix from v2's last patch to be a 
+  separate patch
+- Add cleaning up code for touched functions
+- Update some error messages
+
+v2:
+- Pass errp straightly instead of using a local_err & error_propagate
+- Return a bool: false/true to indicate if one function succeeds
+- Merge v1's last two patches into one to avoid the compile error
+- Fix one omitted error in patch1 and update some error messages
+
+Fei Li (7):
+  Fix segmentation fault when qemu_signal_init fails
+  qemu_init_vcpu: add a new Error parameter to propagate
+  qemu_thread_join: fix segmentation fault
+  migration: fix some segmentation faults when using multifd
+  migration: fix the multifd code when receiving less channels
+  migration: fix some error handling
+  qemu_thread_create: propagate the error to callers to handle
+
+ accel/tcg/user-exec-stub.c      |  3 +-
+ cpus.c                          | 79 +++++++++++++++++++++-------------
+ dump.c                          |  6 ++-
+ hw/misc/edu.c                   |  6 ++-
+ hw/ppc/spapr_hcall.c            | 10 ++++-
+ hw/rdma/rdma_backend.c          |  4 +-
+ hw/usb/ccid-card-emulated.c     | 13 ++++--
+ include/qemu/thread.h           |  4 +-
+ include/qom/cpu.h               |  2 +-
+ io/task.c                       |  3 +-
+ iothread.c                      | 16 ++++---
+ migration/channel.c             |  7 +++-
+ migration/migration.c           | 66 ++++++++++++++++++-----------
+ migration/migration.h           |  2 +-
+ migration/postcopy-ram.c        | 17 +++++++-
+ migration/ram.c                 | 93 ++++++++++++++++++++++++++++++-----------
+ migration/ram.h                 |  4 +-
+ migration/savevm.c              | 11 +++--
+ target/alpha/cpu.c              |  4 +-
+ target/arm/cpu.c                |  4 +-
+ target/cris/cpu.c               |  4 +-
+ target/hppa/cpu.c               |  4 +-
+ target/i386/cpu.c               |  4 +-
+ target/lm32/cpu.c               |  4 +-
+ target/m68k/cpu.c               |  4 +-
+ target/microblaze/cpu.c         |  4 +-
+ target/mips/cpu.c               |  4 +-
+ target/moxie/cpu.c              |  4 +-
+ target/nios2/cpu.c              |  4 +-
+ target/openrisc/cpu.c           |  4 +-
+ target/ppc/translate_init.inc.c |  4 +-
+ target/riscv/cpu.c              |  4 +-
+ target/s390x/cpu.c              |  4 +-
+ target/sh4/cpu.c                |  4 +-
+ target/sparc/cpu.c              |  4 +-
+ target/tilegx/cpu.c             |  4 +-
+ target/tricore/cpu.c            |  4 +-
+ target/unicore32/cpu.c          |  4 +-
+ target/xtensa/cpu.c             |  4 +-
+ tests/atomic_add-bench.c        |  3 +-
+ tests/iothread.c                |  2 +-
+ tests/qht-bench.c               |  3 +-
+ tests/rcutorture.c              |  3 +-
+ tests/test-aio.c                |  2 +-
+ tests/test-rcu-list.c           |  3 +-
+ ui/vnc-jobs.c                   | 17 +++++---
+ ui/vnc-jobs.h                   |  2 +-
+ ui/vnc.c                        |  4 +-
+ util/compatfd.c                 | 12 +++++-
+ util/main-loop.c                |  8 ++--
+ util/oslib-posix.c              | 17 ++++++--
+ util/qemu-thread-posix.c        | 27 ++++++++----
+ util/qemu-thread-win32.c        | 18 +++++---
+ util/rcu.c                      |  3 +-
+ util/thread-pool.c              |  4 +-
+ 55 files changed, 393 insertions(+), 165 deletions(-)
+
+-- 
+2.13.7
