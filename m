@@ -1,39 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34161)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.ibm.com>) id 1gH9Kv-0007rx-Pk
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:20:21 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gH9LN-0008Fp-SD
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:20:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.ibm.com>) id 1gH9Kq-00032W-AD
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:20:13 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54750
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.ibm.com>)
-	id 1gH9Kq-00031P-1S
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:20:08 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w9TFJKiG109714
-	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 11:20:06 -0400
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2ne3yp2pwp-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 11:20:05 -0400
-Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.ibm.com>;
-	Mon, 29 Oct 2018 11:20:05 -0400
-From: Stefan Berger <stefanb@linux.ibm.com>
-Date: Mon, 29 Oct 2018 11:19:54 -0400
-In-Reply-To: <20181029151956.2164336-1-stefanb@linux.ibm.com>
-References: <20181029151956.2164336-1-stefanb@linux.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <20181029151956.2164336-4-stefanb@linux.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v1 3/5] docs: tpm: Mention implemented TPM CRB
- interface emulation and specs
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gH9LI-0003Fl-VS
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:20:41 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:38701 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1gH9LH-0003Cy-GL
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 11:20:36 -0400
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Date: Mon, 29 Oct 2018 16:19:53 +0100
+Message-Id: <1540826418-5501-3-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1540826418-5501-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1540826418-5501-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PULL 02/27] target/mips: Introduce MXU registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,47 +25,87 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Stefan Berger <stefanb@linux.vnet.ibm.com>, Stefan Berger <stefanb@linux.ibm.com>
+Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+From: Craig Janeczek <jancraig@amazon.com>
 
-Add a few sentences about the implemented emulation of the TPM CRB
-interface and its specification.
+Define and initialize the 16 MXU registers - 15 general computational
+register, and 1 control register). There is also a zero register, but
+it does not have any corresponding variable.
 
-Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Craig Janeczek <jancraig@amazon.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- docs/specs/tpm.txt | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ target/mips/cpu.h       | 10 ++++++++++
+ target/mips/translate.c | 20 ++++++++++++++++++++
+ 2 files changed, 30 insertions(+)
 
-diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
-index 0e9bbebe1d..1af82bba86 100644
---- a/docs/specs/tpm.txt
-+++ b/docs/specs/tpm.txt
-@@ -20,6 +20,21 @@ QEMU files related to TPM TIS interface:
-  - hw/tpm/tpm_tis.h
-=20
-=20
-+QEMU also implements a TPM CRB interface following the Trusted Computing
-+Group's specification "TCG PC Client Platform TPM Profile (PTP)
-+Specification", Family "2.0", Level 00 Revision 01.03 v22, May 22, 2017.
-+This specification, or a later version of it, can be accessed from the
-+following URL:
+diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+index e48be4b..03c03fd 100644
+--- a/target/mips/cpu.h
++++ b/target/mips/cpu.h
+@@ -170,6 +170,16 @@ struct TCState {
+         MSACSR_FS_MASK)
+ 
+     float_status msa_fp_status;
 +
-+https://trustedcomputinggroup.org/resource/pc-client-platform-tpm-profil=
-e-ptp-specification/
++#define NUMBER_OF_MXU_REGISTERS 16
++    target_ulong mxu_gpr[NUMBER_OF_MXU_REGISTERS - 1];
++    target_ulong mxu_cr;
++#define MXU_CR_LC       31
++#define MXU_CR_RC       30
++#define MXU_CR_BIAS     2
++#define MXU_CR_RD_EN    1
++#define MXU_CR_MXU_EN   0
 +
-+The CRB interface makes a memory mapped IO region in the area 0xfed40000=
- -
-+0xfed40fff (1 locality) available to the guest operating system.
+ };
+ 
+ typedef struct CPUMIPSState CPUMIPSState;
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 3bdefc0..d6e733f 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -2379,6 +2379,10 @@ static TCGv_i32 fpu_fcr0, fpu_fcr31;
+ static TCGv_i64 fpu_f64[32];
+ static TCGv_i64 msa_wr_d[64];
+ 
++/* MXU registers */
++static TCGv mxu_gpr[NUMBER_OF_MXU_REGISTERS - 1];
++static TCGv mxu_CR;
 +
-+QEMU files related to TPM CRB interface:
-+ - hw/tpm/tpm_crb.c
+ #include "exec/gen-icount.h"
+ 
+ #define gen_helper_0e0i(name, arg) do {                           \
+@@ -2501,6 +2505,11 @@ static const char * const msaregnames[] = {
+     "w30.d0", "w30.d1", "w31.d0", "w31.d1",
+ };
+ 
++static const char * const mxuregnames[] = {
++    "XR1",  "XR2",  "XR3",  "XR4",  "XR5",  "XR6",  "XR7",  "XR8",
++    "XR9",  "XR10", "XR11", "XR12", "XR13", "XR14", "XR15", "MXU_CR",
++};
 +
+ #define LOG_DISAS(...)                                                        \
+     do {                                                                      \
+         if (MIPS_DEBUG_DISAS) {                                               \
+@@ -27231,6 +27240,17 @@ void mips_tcg_init(void)
+     fpu_fcr31 = tcg_global_mem_new_i32(cpu_env,
+                                        offsetof(CPUMIPSState, active_fpu.fcr31),
+                                        "fcr31");
 +
- =3D ACPI Interface =3D
-=20
- The TPM device is defined with ACPI ID "PNP0C31". QEMU builds a SSDT and=
- passes
---=20
-2.17.1
++    for (i = 0; i < NUMBER_OF_MXU_REGISTERS - 1; i++) {
++        mxu_gpr[i] = tcg_global_mem_new(cpu_env,
++                                        offsetof(CPUMIPSState,
++                                                 active_tc.mxu_gpr[i]),
++                                        mxuregnames[i]);
++    }
++
++    mxu_CR = tcg_global_mem_new(cpu_env,
++                                offsetof(CPUMIPSState, active_tc.mxu_cr),
++                                mxuregnames[NUMBER_OF_MXU_REGISTERS - 1]);
+ }
+ 
+ #include "translate_init.inc.c"
+-- 
+2.7.4
