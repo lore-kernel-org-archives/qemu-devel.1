@@ -1,21 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45384)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gHF2f-0004ab-SS
+	(envelope-from <jsnow@redhat.com>) id 1gHF2k-0004bs-UB
 	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 17:25:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gHF2c-0002Ub-U9
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 17:25:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53662)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1gHF2a-0002JM-TU
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 17:25:41 -0400
+	(envelope-from <jsnow@redhat.com>) id 1gHF2f-0002VL-D0
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 17:25:50 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Mon, 29 Oct 2018 17:24:56 -0400
-Message-Id: <20181029212501.5897-15-jsnow@redhat.com>
+Date: Mon, 29 Oct 2018 17:24:58 -0400
+Message-Id: <20181029212501.5897-17-jsnow@redhat.com>
 In-Reply-To: <20181029212501.5897-1-jsnow@redhat.com>
 References: <20181029212501.5897-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PULL 14/19] block/backup: prohibit backup from using
- in use bitmaps
+Subject: [Qemu-devel] [PULL 16/19] bitmap: Update count after a merge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,49 +20,43 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: jsnow@redhat.com, peter.maydell@linaro.org
+Cc: jsnow@redhat.com, peter.maydell@linaro.org, Eric Blake <eblake@redhat.com>, qemu-stable@nongnu.org
 
-If the bitmap is frozen, we shouldn't touch it.
+From: Eric Blake <eblake@redhat.com>
 
+We need an accurate count of the number of bits set in a bitmap
+after a merge. In particular, since the merge operation short-circuits
+a merge from an empty source, if you have bitmaps A, B, and C where
+B started empty, then merge C into B, and B into A, an inaccurate
+count meant that A did not get the contents of C.
+
+In the worst case, we may falsely regard the bitmap as empty when
+it has had new writes merged into it.
+
+Fixes: be58721db
+CC: qemu-stable@nongnu.org
+Signed-off-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-id: 20181002230218.13949-6-jsnow@redhat.com
+Message-id: 20181002233314.30159-1-jsnow@redhat.com
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- blockdev.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ util/hbitmap.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/blockdev.c b/blockdev.c
-index 35097b92cc..c30495d035 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3513,10 +3513,10 @@ static BlockJob *do_drive_backup(DriveBackup *backup, JobTxn *txn,
-             bdrv_unref(target_bs);
-             goto out;
-         }
--        if (bdrv_dirty_bitmap_qmp_locked(bmap)) {
-+        if (bdrv_dirty_bitmap_user_locked(bmap)) {
-             error_setg(errp,
--                       "Bitmap '%s' is currently locked and cannot be used for "
--                       "backup", backup->bitmap);
-+                       "Bitmap '%s' is currently in use by another operation"
-+                       " and cannot be used for backup", backup->bitmap);
-             goto out;
+diff --git a/util/hbitmap.c b/util/hbitmap.c
+index d5aca5159f..8d402c59d9 100644
+--- a/util/hbitmap.c
++++ b/util/hbitmap.c
+@@ -759,6 +759,9 @@ bool hbitmap_merge(const HBitmap *a, const HBitmap *b, HBitmap *result)
          }
      }
-@@ -3621,10 +3621,10 @@ BlockJob *do_blockdev_backup(BlockdevBackup *backup, JobTxn *txn,
-             error_setg(errp, "Bitmap '%s' could not be found", backup->bitmap);
-             goto out;
-         }
--        if (bdrv_dirty_bitmap_qmp_locked(bmap)) {
-+        if (bdrv_dirty_bitmap_user_locked(bmap)) {
-             error_setg(errp,
--                       "Bitmap '%s' is currently locked and cannot be used for "
--                       "backup", backup->bitmap);
-+                       "Bitmap '%s' is currently in use by another operation"
-+                       " and cannot be used for backup", backup->bitmap);
-             goto out;
-         }
-     }
+ 
++    /* Recompute the dirty count */
++    result->count = hb_count_between(result, 0, result->size - 1);
++
+     return true;
+ }
+ 
 -- 
 2.14.5
