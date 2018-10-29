@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59911)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1gH7hm-0008QE-Jb
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:35:44 -0400
+	(envelope-from <kraxel@redhat.com>) id 1gH7jk-00014y-39
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:37:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1gH7hk-0003KF-4k
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:35:42 -0400
-Received: from forwardcorp1g.cmail.yandex.net ([2a02:6b8:0:1465::fd]:35945)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
-	id 1gH7hf-0003DY-7P
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:35:37 -0400
-From: Yury Kotov <yury-kotov@yandex-team.ru>
-In-Reply-To: <CAJ+F1CK0PKp1+RYf-x=uy7B6cDYWGjY+0eb76hStNKxmQoe5eg@mail.gmail.com>
-References: <155951540214563@sas1-fc7737ec834f.qloud-c.yandex.net>
-	<CAJ+F1CK0PKp1+RYf-x=uy7B6cDYWGjY+0eb76hStNKxmQoe5eg@mail.gmail.com>
+	(envelope-from <kraxel@redhat.com>) id 1gH7jg-0004Zv-8r
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:37:43 -0400
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 29 Oct 2018 14:37:22 +0100
+Message-Id: <20181029133722.12415-5-kraxel@redhat.com>
+In-Reply-To: <20181029133722.12415-1-kraxel@redhat.com>
+References: <20181029133722.12415-1-kraxel@redhat.com>
 MIME-Version: 1.0
-Date: Mon, 29 Oct 2018 16:35:24 +0300
-Message-Id: <191141540820124@myt4-a988562a11ab.qloud-c.yandex.net>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] vhost-user devices work with chardev from
- different threads
+Subject: [Qemu-devel] [PULL 4/4] audio: use TYPE_MV88W8618_AUDIO instead of
+ hardcoded string
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,74 +23,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU <qemu-devel@nongnu.org>, "wrfsh@yandex-team.ru" <wrfsh@yandex-team.ru>
+To: qemu-devel@nongnu.org
+Cc: Jan Kiszka <jan.kiszka@web.de>, qemu-arm@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
+From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 
+Cc: Jan Kiszka <jan.kiszka@web.de>
+Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-29.10.2018, 09:46, "Marc-Andr=C3=A9 Lureau" <marcandre.lureau@gmail.com>:
-> Hi
->
-> On Mon, Oct 22, 2018 at 5:24 PM Yury Kotov <yury-kotov@yandex-team.ru> =
-wrote:
->
->> =C2=A0Hi,
->>
->> =C2=A0I examined vhost-user devices and found some chardev using stran=
-geness.
->>
->> =C2=A0Is it ok, that vhost-user's set_status do sync chardev io ops fr=
-om KVM thread?
->> =C2=A0It seems that chardev doesn't support working with different thr=
-eads.
->>
->> =C2=A0For example, I think such race is possible (two simultaneous eve=
-nts):
->> =C2=A01) Vhost-user server was killed (main thread will handle G_IO_HU=
-P),
->> =C2=A02) Virtio-pci bus handles guest driver's set_status command.
->> =C2=A0=C2=A0=C2=A0=C2=A0Some io op from vhost-user backend will fail b=
-ecause of 1).
->>
->> =C2=A0So, it is possible to enter tcp_chr_disconnect twice from the ma=
-in thread and
->> =C2=A0from KVM thread.
->>
->> =C2=A0Backtrace examples:
->>
->> =C2=A0KVM thread (handle set_status of guest):
->> =C2=A0tcp_chr_disconnect
->> =C2=A0tcp_chr_write (cc->chr_write)
->> =C2=A0qemu_chr_write_buffer
->> =C2=A0qemu_chr_write
->> =C2=A0qemu_chr_fe_write_all
->> =C2=A0vhost_user_write
->> =C2=A0vhost_user_set_mem_table (hdev->vhost_ops->vhost_set_mem_table)
->> =C2=A0vhost_dev_start
->> =C2=A0vhost_user_blk_start (or another vhost-user device)
->> =C2=A0vhost_user_blk_set_status (vdc->set_status)
->>
->> =C2=A0Main thread (handle vhost server disconnect):
->> =C2=A0tcp_chr_disconnect
->> =C2=A0tcp_chr_hup
->> =C2=A0g_main_context_dispatch
->> =C2=A0glib_pollfds_poll
->> =C2=A0os_host_main_loop_wait
->> =C2=A0main_loop_wait
->> =C2=A0main_loop
->> =C2=A0main
->>
->> =C2=A0Is it really a problem or do I misunderstand?
->
-> I think you are correct, it's a problem. Are you working on a
-> solution? (either using the chardev lock, or perhaps relying on main
-> thread HUP handler only, or a combination of both approaches)
+Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-id: 20181022074050.19638-4-maozhongyi@cmss.chinamobile.com
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ include/hw/audio/wm8750.h  | 1 +
+ hw/arm/musicpal.c          | 2 +-
+ hw/audio/marvell_88w8618.c | 1 -
+ 3 files changed, 2 insertions(+), 2 deletions(-)
 
-So, chardev is thread safe by design? I thought it is vhost's problem...
-Anyway I plan to fix that.
-
->
-> thanks
->
-> --
-> Marc-Andr=C3=A9 Lureau
+diff --git a/include/hw/audio/wm8750.h b/include/hw/audio/wm8750.h
+index 84e7a119bb..e12cb886d1 100644
+--- a/include/hw/audio/wm8750.h
++++ b/include/hw/audio/wm8750.h
+@@ -17,6 +17,7 @@
+ #include "hw/hw.h"
+=20
+ #define TYPE_WM8750 "wm8750"
++#define TYPE_MV88W8618_AUDIO "mv88w8618_audio"
+=20
+ typedef void data_req_cb(void *opaque, int free_out, int free_in);
+=20
+diff --git a/hw/arm/musicpal.c b/hw/arm/musicpal.c
+index ac266f9253..9648b3af44 100644
+--- a/hw/arm/musicpal.c
++++ b/hw/arm/musicpal.c
+@@ -1693,7 +1693,7 @@ static void musicpal_init(MachineState *machine)
+     }
+=20
+     wm8750_dev =3D i2c_create_slave(i2c, TYPE_WM8750, MP_WM_ADDR);
+-    dev =3D qdev_create(NULL, "mv88w8618_audio");
++    dev =3D qdev_create(NULL, TYPE_MV88W8618_AUDIO);
+     s =3D SYS_BUS_DEVICE(dev);
+     object_property_set_link(OBJECT(dev), OBJECT(wm8750_dev),
+                              TYPE_WM8750, NULL);
+diff --git a/hw/audio/marvell_88w8618.c b/hw/audio/marvell_88w8618.c
+index 1c7080e844..6600ab4851 100644
+--- a/hw/audio/marvell_88w8618.c
++++ b/hw/audio/marvell_88w8618.c
+@@ -39,7 +39,6 @@
+ #define MP_AUDIO_CLOCK_24MHZ    (1 << 9)
+ #define MP_AUDIO_MONO           (1 << 14)
+=20
+-#define TYPE_MV88W8618_AUDIO "mv88w8618_audio"
+ #define MV88W8618_AUDIO(obj) \
+     OBJECT_CHECK(mv88w8618_audio_state, (obj), TYPE_MV88W8618_AUDIO)
+=20
+--=20
+2.9.3
