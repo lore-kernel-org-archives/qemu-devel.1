@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56433)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groeck7@gmail.com>) id 1gHE5r-00078K-PY
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 16:25:00 -0400
+	(envelope-from <laurent@vivier.eu>) id 1gHEbN-0003TM-1c
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 16:57:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groeck7@gmail.com>) id 1gHE5q-0001XC-R3
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 16:24:59 -0400
-Sender: Guenter Roeck <groeck7@gmail.com>
-Date: Mon, 29 Oct 2018 13:24:50 -0700
-From: Guenter Roeck <linux@roeck-us.net>
-Message-ID: <20181029202450.GB24689@roeck-us.net>
-References: <1540548409-22560-1-git-send-email-thuth@redhat.com>
-	<CAFEAcA8EubWya8ey9VxhaCw4m2U=KA+i2C-R9P-p+P6oEBBLew@mail.gmail.com>
-	<7fc49925-36ff-bd9a-0cd7-e5f8d4bb3672@roeck-us.net>
-	<CAFEAcA-UF+SyXvcU+NGZsbqBF2qg+s_x4HPU7yvf7B2G-=HPOg@mail.gmail.com>
-	<b4f6cbd2-68fe-5b07-e8fb-93b1c4d8a6de@roeck-us.net>
-	<2eb2b4ef-725d-cbee-1676-feb6bd800aea@redhat.com>
+	(envelope-from <laurent@vivier.eu>) id 1gHEbC-0002Gh-F5
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 16:57:27 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:50593)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1gHEbB-0002Dp-Te
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 16:57:22 -0400
+References: <1540821315-28346-1-git-send-email-stefan.markovic@rt-rk.com>
+	<BN6PR2201MB1251DB91FBD5E2C3FF3F3A67C6F30@BN6PR2201MB1251.namprd22.prod.outlook.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <ffa4f303-311b-a6f2-f591-e6ead03c885e@vivier.eu>
+Date: Mon, 29 Oct 2018 21:56:11 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+In-Reply-To: <BN6PR2201MB1251DB91FBD5E2C3FF3F3A67C6F30@BN6PR2201MB1251.namprd22.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <2eb2b4ef-725d-cbee-1676-feb6bd800aea@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/2] Deprecate the "collie" machine and
- Strongarm devices
+Subject: Re: [Qemu-devel] [PATCH v2 0/6] target/mips: Add support for
+ prctl() PR_GET_FP_MODE and PR_SET_FP_MODE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,96 +29,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
+To: Aleksandar Markovic <amarkovic@wavecomp.com>, Stefan Markovic <stefan.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>
 
-On Mon, Oct 29, 2018 at 04:03:40PM +0100, Philippe Mathieu-Daud� wrote:
-> Hi Guenter,
+Le 29/10/2018 à 15:53, Aleksandar Markovic a écrit :
+>> From: Stefan Markovic <stefan.markovic@rt-rk.com>
+>> Subject: [PATCH v2 0/6] target/mips: Add support for prctl() PR_GET_FP_MODE and PR_SET_FP_MODE
+>>
+>> From: Stefan Markovic <smarkovic@wavecomp.com>
+>>
+>> This series includes support for prctl() PR_GET_FP_MODE and PR_SET_FP_MODE. This requires
+>> extracting MIPS.abiflags section from ELF file and fp_abi value handling.
 > 
-> On 29/10/18 15:09, Guenter Roeck wrote:
-> >On 10/29/18 6:24 AM, Peter Maydell wrote:
-> >>On 27 October 2018 at 12:04, Guenter Roeck <linux@roeck-us.net> wrote:
-> >>>On 10/26/18 3:12 AM, Peter Maydell wrote:
-> >>>>Hi Guenter; there's a proposal here to deprecate (and eventually
-> >>>>remove) the 'collie' board (strongarm) from QEMU. Is that one of
-> >>>>the ones you're currently using in your automated testing of Linux
-> >>>>kernels on QEMU?
-> >>>>
-> >>>
-> >>>Yes. I can run the test with older versions of qemu, so it is ok for me
-> >>>if it is removed (as long as that removal is not backported).
-> >>
-> >>Mmm, but if we have an active user who's testing them then they
-> >>probably shouldn't be in the frontline of boards to remove.
-> >>Which other boards do you test with mainline QEMU?
-> >>
-> >
-> >For arm:
-> >
-> >akita
-> >ast2500-evb
-> >beagle
-> >beaglexm
-> >borzoi
-> >collie
-> >cubieboard
-> >imx25-pdk
-> >integratorcp
-> >kzm
-> >mainstone
-> >midway
-> >mps2-an385
-> >overo
-> >palmetto-bmc
-> >raspi2
-> >realview-eb
-> >realview-eb-mpcore
-> >realview-pb-a8
-> >realview-pbx-a9
-> >romulus-bmc
-> >sabrelite
-> >smdkc210
-> >spitz
-> >terrier
-> >tosa
-> >versatileab
-> >versatilepb
-> >vexpress-a15
-> >vexpress-a15-a7
-> >vexpress-a9
-> >witherspoon-bmc
-> >xilinx-zynq-a9
-> >z2
-> >
-> >Though not all of them are supported by upstream qemu. For some of them I
-> >carry local patches,
-> >for others I use out-of-tree versions of qemu (beagle/beaglexm).
+> Stefan, the patch titles don't have appropriate prefixes "elf:" and "user-mode:", but I can fix that while integrating.
 > 
-> Are these patches upstream-able?
-> 
+> Laurent, heads up: I plan to include this series in a MIPS pull request that is planned for today.
 
-Some of the patches (eg to be able to boot a Linux kernel image for mps2-an385
-directly from qemu, or zynq CPU clock rate changes to be able to do the same)
-have been rejected. A few patches were submitted at some point but got lost.
-I don't keep track, so I don't know the exact number. For some patches, such
-as basic BCM283x CPRMAN support (needed to boot raspi2), a better
-implementation was suggested, but didn't go anywhere as far as I know.
+No problem. I didn't have the time to do anything today.
 
-Some machines, such as beagle support, are from Linaro's tree and were never
-upstreamed by Linaro. The Linaro branch is based off qemu 2.3, so applying
-the changes to upstream qemu would be a major effort. I also use the m68k
-branch from github.com:vivier/qemu-m68k.git for m68k tests.
-
-I carry some 20+ patches locally in my qemu tree. Some may be obsolete or
-not or no longer needed (my understanding of qemu is evolving). Sometimes,
-if and when I find the time, I pick some and try to upstream, but I often
-don't follow up if there is no response or if the requested changes are
-too substantial.
-
-Please feel free to have a look at https://github.com/groeck/qemu
-(check the <version>-local branches) and let me know what might be
-upstreamable. I'll be happy to (re-)submit the respective patches.
-Note that I won't be able to make any substantial changes, though.
-Time is a scarce commodity nowadays, unfortunately.
-
-Guenter
+Thanks,
+Laurent
