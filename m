@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32935)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gH7mV-0005AG-Jm
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:40:38 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gH7mX-0005CR-N9
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:40:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gH7mS-0006eS-8S
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:40:35 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gH7mU-0006gh-Tv
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:40:37 -0400
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Mon, 29 Oct 2018 13:39:54 +0000
-Message-Id: <20181029134000.11157-6-mark.cave-ayland@ilande.co.uk>
+Date: Mon, 29 Oct 2018 13:39:56 +0000
+Message-Id: <20181029134000.11157-8-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <20181029134000.11157-1-mark.cave-ayland@ilande.co.uk>
 References: <20181029134000.11157-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH v5 05/11] hw/m68k: Apple Sound Chip (ASC)
- emulation
+Subject: [Qemu-devel] [PATCH v5 07/11] hw/m68k: add Nubus support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,41 +23,57 @@ To: qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.
 
 From: Laurent Vivier <laurent@vivier.eu>
 
-This is broken as the linux driver seems broken too...
-
 Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/audio/Makefile.objs |   1 +
- hw/audio/asc.c         | 446 +++++++++++++++++++++++++++++++++++++++++++++++++
- include/hw/audio/asc.h |  48 ++++++
- 3 files changed, 495 insertions(+)
- create mode 100644 hw/audio/asc.c
- create mode 100644 include/hw/audio/asc.h
+ hw/Makefile.objs                    |   1 +
+ hw/nubus/Makefile.objs              |   4 +
+ hw/nubus/mac-nubus-bridge.c         |  45 ++++++++
+ hw/nubus/nubus-bridge.c             |  34 ++++++
+ hw/nubus/nubus-bus.c                | 111 +++++++++++++++++++
+ hw/nubus/nubus-device.c             | 214 ++++++++++++++++++++++++++++++++++++
+ include/hw/nubus/mac-nubus-bridge.h |  24 ++++
+ include/hw/nubus/nubus.h            |  69 ++++++++++++
+ 8 files changed, 502 insertions(+)
+ create mode 100644 hw/nubus/Makefile.objs
+ create mode 100644 hw/nubus/mac-nubus-bridge.c
+ create mode 100644 hw/nubus/nubus-bridge.c
+ create mode 100644 hw/nubus/nubus-bus.c
+ create mode 100644 hw/nubus/nubus-device.c
+ create mode 100644 include/hw/nubus/mac-nubus-bridge.h
+ create mode 100644 include/hw/nubus/nubus.h
 
-diff --git a/hw/audio/Makefile.objs b/hw/audio/Makefile.objs
-index 63db383709..44d1ada7b0 100644
---- a/hw/audio/Makefile.objs
-+++ b/hw/audio/Makefile.objs
-@@ -16,3 +16,4 @@ common-obj-$(CONFIG_MARVELL_88W8618) += marvell_88w8618.o
- common-obj-$(CONFIG_MILKYMIST) += milkymist-ac97.o
- 
- common-obj-y += soundhw.o
-+common-obj-$(CONFIG_ASC) += asc.o
-diff --git a/hw/audio/asc.c b/hw/audio/asc.c
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index 39d882af6f..92dc338759 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -36,6 +36,7 @@ devices-dirs-$(CONFIG_SOFTMMU) += watchdog/
+ devices-dirs-$(CONFIG_SOFTMMU) += xen/
+ devices-dirs-$(CONFIG_MEM_DEVICE) += mem/
+ devices-dirs-$(CONFIG_SOFTMMU) += smbios/
++devices-dirs-$(CONFIG_NUBUS) += nubus/
+ devices-dirs-y += core/
+ common-obj-y += $(devices-dirs-y)
+ obj-y += $(devices-dirs-y)
+diff --git a/hw/nubus/Makefile.objs b/hw/nubus/Makefile.objs
 new file mode 100644
-index 0000000000..4fd23eb8e1
+index 0000000000..ebb050a4ad
 --- /dev/null
-+++ b/hw/audio/asc.c
-@@ -0,0 +1,446 @@
++++ b/hw/nubus/Makefile.objs
+@@ -0,0 +1,4 @@
++common-obj-y += nubus-device.o
++common-obj-y += nubus-bus.o
++common-obj-y += nubus-bridge.o
++common-obj-$(CONFIG_MAC) += mac-nubus-bridge.o
+diff --git a/hw/nubus/mac-nubus-bridge.c b/hw/nubus/mac-nubus-bridge.c
+new file mode 100644
+index 0000000000..7c329300b8
+--- /dev/null
++++ b/hw/nubus/mac-nubus-bridge.c
+@@ -0,0 +1,45 @@
 +/*
-+ *  QEMU Apple Sound Chip emulation
-+ *
-+ *  Apple Sound Chip (ASC) 344S0063
-+ *  Enhanced Apple Sound Chip (EASC) 343S1063
-+ *
-+ *  Copyright (c) 2012-2018 Laurent Vivier <laurent@vivier.eu>
++ *  Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
 + *
 + * This work is licensed under the terms of the GNU GPL, version 2 or later.
 + * See the COPYING file in the top-level directory.
@@ -67,489 +82,521 @@ index 0000000000..4fd23eb8e1
 +
 +#include "qemu/osdep.h"
 +#include "hw/sysbus.h"
-+#include "audio/audio.h"
-+#include "hw/audio/asc.h"
++#include "hw/nubus/mac-nubus-bridge.h"
 +
-+/*
-+ * Linux doesn't provide information about ASC, see arch/m68k/mac/macboing.c
-+ * and arch/m68k/include/asm/mac_asc.h
-+ *
-+ * best information is coming from MAME:
-+ *   http://mamedev.org/source/src/emu/sound/asc.h.html
-+ *   http://mamedev.org/source/src/emu/sound/asc.c.html
-+ *   Emulation by R. Belmont
-+ *
-+ *     0x800: VERSION
-+ *     0x801: MODE
-+ *            1=FIFO mode,
-+ *            2=wavetable mode
-+ *     0x802: CONTROL
-+ *            bit 0=analog or PWM output,
-+ *                1=stereo/mono,
-+ *                7=processing time exceeded
-+ *     0x803: FIFO MODE
-+ *            bit 7=clear FIFO,
-+ *            bit 1="non-ROM companding",
-+ *            bit 0="ROM companding")
-+ *     0x804: FIFO IRQ STATUS
-+ *            bit 0=ch A 1/2 full,
-+ *                1=ch A full,
-+ *                2=ch B 1/2 full,
-+ *                3=ch B full)
-+ *     0x805: WAVETABLE CONTROL
-+ *            bits 0-3 wavetables 0-3 start
-+ *     0x806: VOLUME
-+ *            bits 2-4 = 3 bit internal ASC volume,
-+ *            bits 5-7 = volume control sent to Sony sound chip
-+ *     0x807: CLOCK RATE
-+ *            0 = Mac 22257 Hz,
-+ *            1 = undefined,
-+ *            2 = 22050 Hz,
-+ *            3 = 44100 Hz
-+ *     0x80a: PLAY REC A
-+ *     0x80f: TEST
-+ *            bits 6-7 = digital test,
-+ *            bits 4-5 = analog test
-+ *     0x810: WAVETABLE 0 PHASE
-+ *            big-endian 9.15 fixed-point, only 24 bits valid
-+ *     0x814: WAVETABLE 0 INCREMENT
-+ *            big-endian 9.15 fixed-point, only 24 bits valid
-+ *     0x818: WAVETABLE 1 PHASE
-+ *     0x81C: WAVETABLE 1 INCREMENT
-+ *     0x820: WAVETABLE 2 PHASE
-+ *     0x824: WAVETABLE 2 INCREMENT
-+ *     0x828: WAVETABLE 3 PHASE
-+ *     0x82C: WAVETABLE 3 INCREMENT
-+ */
 +
-+#define ASC_LENGTH   0x2000
-+#define ASC_BUF_SIZE 0x0800
++static void mac_nubus_bridge_init(Object *obj)
++{
++    MacNubusState *s = MAC_NUBUS_BRIDGE(obj);
++    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
 +
-+#define ASC_REG_BASE 0x0800
-+enum {
-+    ASC_VERSION     = 0x00,
-+    ASC_MODE        = 0x01,
-+    ASC_CONTROL     = 0x02,
-+    ASC_FIFOMODE    = 0x03,
-+    ASC_FIFOIRQ     = 0x04,
-+    ASC_WAVECTRL    = 0x05,
-+    ASC_VOLUME      = 0x06,
-+    ASC_CLOCK       = 0x07,
-+    ASC_PLAYRECA    = 0x0a,
-+    ASC_TEST        = 0x0f,
-+    ASC_WAVETABLE   = 0x10
++    s->bus = NUBUS_BUS(qbus_create(TYPE_NUBUS_BUS, DEVICE(s), NULL));
++
++    sysbus_init_mmio(sbd, &s->bus->super_slot_io);
++    sysbus_init_mmio(sbd, &s->bus->slot_io);
++}
++
++static void mac_nubus_bridge_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->desc = "Nubus bridge";
++}
++
++static const TypeInfo mac_nubus_bridge_info = {
++    .name          = TYPE_MAC_NUBUS_BRIDGE,
++    .parent        = TYPE_NUBUS_BRIDGE,
++    .instance_init = mac_nubus_bridge_init,
++    .instance_size = sizeof(MacNubusState),
++    .class_init    = mac_nubus_bridge_class_init,
 +};
 +
-+static inline uint32_t get_phase(ASCState *s, int channel)
++static void mac_nubus_bridge_register_types(void)
 +{
-+    return be32_to_cpu(*(uint32_t *)(s->regs + ASC_WAVETABLE + channel * 8));
++    type_register_static(&mac_nubus_bridge_info);
 +}
 +
-+static inline void set_phase(ASCState *s, int channel, uint32_t phase)
++type_init(mac_nubus_bridge_register_types)
+diff --git a/hw/nubus/nubus-bridge.c b/hw/nubus/nubus-bridge.c
+new file mode 100644
+index 0000000000..cd8c6a91eb
+--- /dev/null
++++ b/hw/nubus/nubus-bridge.c
+@@ -0,0 +1,34 @@
++/*
++ * QEMU Macintosh Nubus
++ *
++ * Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "hw/sysbus.h"
++#include "hw/nubus/nubus.h"
++
++static void nubus_bridge_class_init(ObjectClass *klass, void *data)
 +{
-+    *(uint32_t *)(s->regs + ASC_WAVETABLE + channel * 8) = cpu_to_be32(phase);
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->fw_name = "nubus";
 +}
 +
-+static inline uint32_t get_incr(ASCState *s, int channel)
++static const TypeInfo nubus_bridge_info = {
++    .name          = TYPE_NUBUS_BRIDGE,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(SysBusDevice),
++    .class_init    = nubus_bridge_class_init,
++};
++
++static void nubus_register_types(void)
 +{
-+    return be32_to_cpu(*(uint32_t *)(s->regs + ASC_WAVETABLE + 4 +
-+                                     channel * 8));
++    type_register_static(&nubus_bridge_info);
 +}
 +
-+static inline uint32_t incr_phase(ASCState *s, int channel)
++type_init(nubus_register_types)
+diff --git a/hw/nubus/nubus-bus.c b/hw/nubus/nubus-bus.c
+new file mode 100644
+index 0000000000..448fa95600
+--- /dev/null
++++ b/hw/nubus/nubus-bus.c
+@@ -0,0 +1,111 @@
++/*
++ * QEMU Macintosh Nubus
++ *
++ * Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "hw/nubus/nubus.h"
++#include "hw/sysbus.h"
++#include "qapi/error.h"
++
++
++static NubusBus *nubus_find(void)
 +{
-+    uint32_t incr = get_incr(s, channel);
-+    uint32_t phase = get_phase(s, channel);
-+
-+    set_phase(s, channel, phase + incr);
-+
-+    return get_phase(s, channel);
++    /* Returns NULL unless there is exactly one nubus device */
++    return NUBUS_BUS(object_resolve_path_type("", TYPE_NUBUS_BUS, NULL));
 +}
 +
-+static void generate_fifo(ASCState *s, int free_b)
++static void nubus_slot_write(void *opaque, hwaddr addr, uint64_t val,
++                             unsigned int size)
 +{
-+    int8_t buf[2048];
-+    int i;
-+    int to_copy;
-+
-+    do {
-+        to_copy = audio_MIN(sizeof(buf), free_b);
-+        for (i = 0; i < (to_copy >> 1); to_copy++) {
-+            int8_t left, right;
-+
-+            left = s->fifo[s->a_rptr] ^ 0x80;
-+            right = s->fifo[s->b_rptr + 0x400] ^ 0x80;
-+
-+            if (s->a_cnt) {
-+                s->a_rptr++;
-+                s->a_rptr &= 0x3ff;
-+                s->a_cnt--;
-+            }
-+
-+            if (s->b_cnt) {
-+                s->b_rptr++;
-+                s->b_rptr &= 0x3ff;
-+                s->b_cnt--;
-+            }
-+
-+            if (s->type == ASC_TYPE_SONORA) {
-+                if (s->a_cnt < 0x200) {
-+                    s->regs[ASC_FIFOIRQ] |= 4; /* FIFO A less than half full */
-+                    qemu_irq_raise(s->irq);
-+                }
-+                if (s->b_cnt < 0x200) {
-+                    s->regs[ASC_FIFOIRQ] |= 8; /* FIFO B less than half full */
-+                    qemu_irq_raise(s->irq);
-+                }
-+            } else {
-+                if (s->a_cnt == 0x1ff) {
-+                    s->regs[ASC_FIFOIRQ] |= 1; /* FIFO A half empty */
-+                    qemu_irq_raise(s->irq);
-+                } else if (s->a_cnt == 0x001) {
-+                    s->regs[ASC_FIFOIRQ] |= 2; /* FIFO A half empty */
-+                    qemu_irq_raise(s->irq);
-+                }
-+                if (s->b_cnt == 0x1ff) {
-+                    s->regs[ASC_FIFOIRQ] |= 4; /* FIFO A half empty */
-+                    qemu_irq_raise(s->irq);
-+                } else if (s->b_cnt == 0x001) {
-+                    s->regs[ASC_FIFOIRQ] |= 8; /* FIFO A half empty */
-+                    qemu_irq_raise(s->irq);
-+                }
-+            }
-+            buf[i * 2] = left;
-+            buf[i * 2 + 1] = right;
-+        }
-+        AUD_write(s->channel, buf, to_copy);
-+        free_b -= to_copy;
-+    } while (free_b);
++    return;
 +}
 +
-+static void generate_wavetable(ASCState *s, int free_b)
++
++static uint64_t nubus_slot_read(void *opaque, hwaddr addr,
++                                unsigned int size)
 +{
-+    int8_t buf[2048];
-+    int i;
-+    int channel;
-+    int to_copy;
-+    int control = s->regs[ASC_WAVECTRL];
-+
-+    do {
-+        to_copy = audio_MIN(sizeof(buf), free_b);
-+        for (i = 0; i < (to_copy >> 1); i++) {
-+                int32_t left, right;
-+                int8_t sample;
-+
-+                left = 0;
-+                right = 0;
-+
-+                if (control) { /* FIXME: how to use it ? */
-+                    for (channel = 0; channel < 4; channel++) {
-+                        uint32_t phase = incr_phase(s, channel);
-+
-+                        phase = (phase >> 15) & 0x1ff;
-+                        sample = s->fifo[0x200 * channel + phase] ^ 0x80;
-+
-+                        left += sample;
-+                        right += sample;
-+                    }
-+                    buf[i * 2] = left >> 2;
-+                    buf[i * 2 + 1] = right >> 2;
-+                } else {
-+                    /* FIXME: only works with linux macboing.c */
-+                    uint32_t phase = incr_phase(s, 0);
-+                    phase = (phase >> 15) & 0x7ff;
-+                    sample = s->fifo[phase];
-+                    buf[i * 2] = sample;
-+                    buf[i * 2 + 1] = sample;
-+                }
-+        }
-+        AUD_write(s->channel, buf, to_copy);
-+        free_b -= to_copy;
-+    } while (free_b);
++    return 0;
 +}
 +
-+static void asc_out_cb(void *opaque, int free_b)
-+{
-+    ASCState *s = opaque;
-+
-+    switch (s->regs[ASC_MODE] & 3) {
-+    case 0: /* Off */
-+        break;
-+    case 1: /* FIFO mode */
-+        generate_fifo(s, free_b);
-+        break;
-+    case 2: /* Wave table mode */
-+        generate_wavetable(s, free_b);
-+        break;
-+    }
-+}
-+
-+static uint64_t asc_read(void *opaque, hwaddr addr,
-+                              unsigned size)
-+{
-+    ASCState *s = opaque;
-+    uint64_t prev;
-+
-+    if (addr < 0x800) {
-+        return s->fifo[addr];
-+    }
-+
-+    addr -= 0x800;
-+
-+    if (addr >= 0x030) {
-+        return 0;
-+    }
-+
-+    switch (addr) {
-+    case ASC_VERSION:
-+        switch (s->type) {
-+        case ASC_TYPE_ASC:
-+            return 0;
-+        case ASC_TYPE_V8:
-+        case ASC_TYPE_EAGLE:
-+        case ASC_TYPE_SPICE:
-+        case ASC_TYPE_VASP:
-+            return 0xe8;
-+        case ASC_TYPE_SONORA:
-+            return 0xbc;
-+        default:
-+            break;
-+        }
-+        break;
-+    case ASC_MODE:
-+        switch (s->type) {
-+        case ASC_TYPE_V8:
-+        case ASC_TYPE_EAGLE:
-+        case ASC_TYPE_SPICE:
-+        case ASC_TYPE_VASP:
-+            return 1;
-+        default:
-+            break;
-+        }
-+        break;
-+    case ASC_CONTROL:
-+        switch (s->type) {
-+        case ASC_TYPE_V8:
-+        case ASC_TYPE_EAGLE:
-+        case ASC_TYPE_SPICE:
-+        case ASC_TYPE_VASP:
-+            return 1;
-+        default:
-+            break;
-+        }
-+        break;
-+    case ASC_FIFOIRQ:
-+        if (s->type == ASC_TYPE_V8) {
-+            prev = 3;
-+        } else {
-+            prev = s->regs[ASC_FIFOIRQ];
-+        }
-+        s->regs[ASC_FIFOIRQ] = 0;
-+        qemu_irq_lower(s->irq);
-+        return prev;
-+    default:
-+        break;
-+    }
-+
-+    return s->regs[addr];
-+}
-+
-+static void asc_write(void *opaque, hwaddr addr, uint64_t value,
-+                           unsigned size)
-+{
-+    ASCState *s = opaque;
-+
-+    if (addr < 0x800) {
-+        if (s->regs[ASC_MODE] == 1) {
-+            if (addr < 0x400) {
-+                /* FIFO A */
-+                s->fifo[s->a_wptr++] = value;
-+                s->a_cnt++;
-+                if (s->a_cnt == 0x3ff) {
-+                    s->regs[ASC_FIFOIRQ] |= 2; /* FIFO A Full */
-+                }
-+                s->a_wptr &= 0x3ff;
-+            } else {
-+                /* FIFO B */
-+                s->fifo[s->b_wptr++ + 0x400] = value;
-+                s->b_cnt++;
-+                if (s->b_cnt == 0x3ff) {
-+                    s->regs[ASC_FIFOIRQ] |= 8; /* FIFO B Full */
-+                }
-+                s->b_wptr &= 0x3ff;
-+            }
-+        } else {
-+            s->fifo[addr] = value;
-+        }
-+        return;
-+    }
-+
-+    addr -= 0x800;
-+    if (addr >= 0x30) {
-+        return;
-+    }
-+    switch (addr) {
-+    case ASC_MODE:
-+        value &= 3;
-+        if (value != s->regs[ASC_MODE]) {
-+            s->a_rptr = 0;
-+            s->a_wptr = 0;
-+            s->a_cnt = 0;
-+            s->b_rptr = 0;
-+            s->b_wptr = 0;
-+            s->b_cnt = 0;
-+            if (value != 0) {
-+                AUD_set_active_out(s->channel, 1);
-+            } else {
-+                AUD_set_active_out(s->channel, 0);
-+            }
-+        }
-+        break;
-+    case ASC_FIFOMODE:
-+        if (value & 0x80) {
-+            s->a_rptr = 0;
-+            s->a_wptr = 0;
-+            s->a_cnt = 0;
-+            s->b_rptr = 0;
-+            s->b_wptr = 0;
-+            s->b_cnt = 0;
-+        }
-+        break;
-+    case ASC_WAVECTRL:
-+        break;
-+    }
-+    s->regs[addr] = value;
-+}
-+
-+static const MemoryRegionOps asc_mmio_ops = {
-+    .read = asc_read,
-+    .write = asc_write,
-+    .impl = {
++static const MemoryRegionOps nubus_slot_ops = {
++    .read  = nubus_slot_read,
++    .write = nubus_slot_write,
++    .endianness = DEVICE_BIG_ENDIAN,
++    .valid = {
 +        .min_access_size = 1,
 +        .max_access_size = 1,
 +    },
++};
++
++static void nubus_super_slot_write(void *opaque, hwaddr addr, uint64_t val,
++                                   unsigned int size)
++{
++    return;
++}
++
++static uint64_t nubus_super_slot_read(void *opaque, hwaddr addr,
++                                      unsigned int size)
++{
++    return 0;
++}
++
++static const MemoryRegionOps nubus_super_slot_ops = {
++    .read  = nubus_super_slot_read,
++    .write = nubus_super_slot_write,
 +    .endianness = DEVICE_BIG_ENDIAN,
++    .valid = {
++        .min_access_size = 1,
++        .max_access_size = 1,
++    },
 +};
 +
-+static void asc_reset(DeviceState *d)
++static void nubus_realize(BusState *bus, Error **errp)
 +{
-+    ASCState *s = ASC(d);
-+
-+    AUD_set_active_out(s->channel, 0);
-+
-+    memset(s->regs, 0, sizeof(s->regs));
-+    s->a_wptr = 0;
-+    s->a_rptr = 0;
-+    s->a_cnt = 0;
-+    s->b_wptr = 0;
-+    s->b_rptr = 0;
-+    s->b_cnt = 0;
++    if (!nubus_find()) {
++        error_setg(errp, "at most one %s device is permitted", TYPE_NUBUS_BUS);
++        return;
++    }
 +}
 +
-+static void asc_init(Object *obj)
++static void nubus_init(Object *obj)
 +{
-+    ASCState *s = ASC(obj);
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    struct audsettings as;
++    NubusBus *nubus = NUBUS_BUS(obj);
 +
-+    AUD_register_card("Apple Sound Chip", &s->card);
++    memory_region_init_io(&nubus->super_slot_io, obj, &nubus_super_slot_ops,
++                          nubus, "nubus-super-slots",
++                          NUBUS_SUPER_SLOT_NB * NUBUS_SUPER_SLOT_SIZE);
 +
-+    as.freq = 22257;
-+    as.nchannels = 2;
-+    as.fmt = AUD_FMT_S8;
-+    as.endianness = 0;
++    memory_region_init_io(&nubus->slot_io, obj, &nubus_slot_ops,
++                          nubus, "nubus-slots",
++                          NUBUS_SLOT_NB * NUBUS_SLOT_SIZE);
 +
-+    s->channel = AUD_open_out(&s->card, s->channel, "asc.out",
-+                              s, asc_out_cb, &as);
-+
-+    s->fifo = g_malloc0(ASC_BUF_SIZE);
-+
-+    memory_region_init_io(&s->mem_regs, obj, &asc_mmio_ops, s, "asc",
-+                          ASC_LENGTH);
-+
-+    sysbus_init_irq(sbd, &s->irq);
-+    sysbus_init_mmio(sbd, &s->mem_regs);
++    nubus->current_slot = NUBUS_FIRST_SLOT;
 +}
 +
-+static Property asc_properties[] = {
-+    DEFINE_PROP_UINT8("asctype", ASCState, type, ASC_TYPE_ASC),
-+    DEFINE_PROP_END_OF_LIST(),
++static void nubus_class_init(ObjectClass *oc, void *data)
++{
++    BusClass *bc = BUS_CLASS(oc);
++
++    bc->realize = nubus_realize;
++}
++
++static const TypeInfo nubus_bus_info = {
++    .name = TYPE_NUBUS_BUS,
++    .parent = TYPE_BUS,
++    .instance_size = sizeof(NubusBus),
++    .instance_init = nubus_init,
++    .class_init = nubus_class_init,
 +};
 +
-+static void asc_class_init(ObjectClass *oc, void *data)
++static void nubus_register_types(void)
 +{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+
-+    dc->reset = asc_reset;
-+    dc->props = asc_properties;
++    type_register_static(&nubus_bus_info);
 +}
 +
-+static TypeInfo asc_info = {
-+    .name = TYPE_ASC,
-+    .parent = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(ASCState),
-+    .instance_init = asc_init,
-+    .class_init = asc_class_init,
-+};
-+
-+static void asc_register_types(void)
-+{
-+    type_register_static(&asc_info);
-+}
-+
-+type_init(asc_register_types)
-diff --git a/include/hw/audio/asc.h b/include/hw/audio/asc.h
++type_init(nubus_register_types)
+diff --git a/hw/nubus/nubus-device.c b/hw/nubus/nubus-device.c
 new file mode 100644
-index 0000000000..3540e32f69
+index 0000000000..670a8c4d53
 --- /dev/null
-+++ b/include/hw/audio/asc.h
-@@ -0,0 +1,48 @@
++++ b/hw/nubus/nubus-device.c
+@@ -0,0 +1,214 @@
 +/*
-+ *  Copyright (c) 2012-2018 Laurent Vivier <laurent@vivier.eu>
++ * QEMU Macintosh Nubus
++ *
++ * Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
 + *
 + * This work is licensed under the terms of the GNU GPL, version 2 or later.
 + * See the COPYING file in the top-level directory.
 + *
 + */
 +
-+#ifndef HW_AUDIO_ASC_H
-+#define HW_AUDIO_ASC_H
-+
 +#include "qemu/osdep.h"
-+#include "hw/sysbus.h"
-+#include "audio/audio.h"
++#include "hw/nubus/nubus.h"
++#include "qapi/error.h"
 +
-+enum {
-+    ASC_TYPE_ASC    = 0,  /* original discrete Apple Sound Chip */
-+    ASC_TYPE_EASC   = 1,  /* discrete Enhanced Apple Sound Chip */
-+    ASC_TYPE_V8     = 2,  /* ASC included in the V8 ASIC (LC/LCII) */
-+    ASC_TYPE_EAGLE  = 3,  /* ASC included in the Eagle ASIC (Classic II) */
-+    ASC_TYPE_SPICE  = 4,  /* ASC included in the Spice ASIC (Color Classic) */
-+    ASC_TYPE_SONORA = 5,  /* ASC included in the Sonora ASIC (LCIII) */
-+    ASC_TYPE_VASP   = 6,  /* ASC included in the VASP ASIC  (IIvx/IIvi) */
-+    ASC_TYPE_ARDBEG = 7   /* ASC included in the Ardbeg ASIC (LC520) */
++
++/* The Format Block Structure */
++
++#define FBLOCK_DIRECTORY_OFFSET 0
++#define FBLOCK_LENGTH           4
++#define FBLOCK_CRC              8
++#define FBLOCK_REVISION_LEVEL   12
++#define FBLOCK_FORMAT           13
++#define FBLOCK_TEST_PATTERN     14
++#define FBLOCK_RESERVED         18
++#define FBLOCK_BYTE_LANES       19
++
++#define FBLOCK_SIZE             20
++#define FBLOCK_PATTERN_VAL      0x5a932bc7
++
++static uint64_t nubus_fblock_read(void *opaque, hwaddr addr, unsigned int size)
++{
++    NubusDevice *dev = opaque;
++    uint64_t val;
++
++#define BYTE(v, b) (((v) >> (24 - 8 * (b))) & 0xff)
++    switch (addr) {
++    case FBLOCK_BYTE_LANES:
++        val = dev->byte_lanes;
++        val |= (val ^ 0xf) << 4;
++        break;
++    case FBLOCK_RESERVED:
++        val = 0x00;
++        break;
++    case FBLOCK_TEST_PATTERN...FBLOCK_TEST_PATTERN + 3:
++        val = BYTE(FBLOCK_PATTERN_VAL, addr - FBLOCK_TEST_PATTERN);
++        break;
++    case FBLOCK_FORMAT:
++        val = dev->rom_format;
++        break;
++    case FBLOCK_REVISION_LEVEL:
++        val = dev->rom_rev;
++        break;
++    case FBLOCK_CRC...FBLOCK_CRC + 3:
++        val = BYTE(dev->rom_crc, addr - FBLOCK_CRC);
++        break;
++    case FBLOCK_LENGTH...FBLOCK_LENGTH + 3:
++        val = BYTE(dev->rom_length, addr - FBLOCK_LENGTH);
++        break;
++    case FBLOCK_DIRECTORY_OFFSET...FBLOCK_DIRECTORY_OFFSET + 3:
++        val = BYTE(dev->directory_offset, addr - FBLOCK_DIRECTORY_OFFSET);
++        break;
++    default:
++        val = 0;
++        break;
++    }
++    return val;
++}
++
++static void nubus_fblock_write(void *opaque, hwaddr addr, uint64_t val,
++                               unsigned int size)
++{
++    /* READ-ONLY */
++}
++
++static const MemoryRegionOps nubus_format_block_ops = {
++    .read = nubus_fblock_read,
++    .write = nubus_fblock_write,
++    .endianness = DEVICE_BIG_ENDIAN,
++    .valid = {
++        .min_access_size = 1,
++        .max_access_size = 1,
++    }
 +};
 +
-+typedef struct ASCState {
-+    SysBusDevice parent_obj;
++static void nubus_register_format_block(NubusDevice *dev)
++{
++    char *fblock_name;
 +
-+    MemoryRegion mem_regs;
-+    QEMUSoundCard card;
-+    SWVoiceOut *channel;
++    fblock_name = g_strdup_printf("nubus-slot-%d-format-block",
++                                  dev->slot_nb);
 +
-+    qemu_irq irq;
++    hwaddr fblock_offset = memory_region_size(&dev->slot_mem) - FBLOCK_SIZE;
++    memory_region_init_io(&dev->fblock_io, NULL, &nubus_format_block_ops,
++                          dev, fblock_name, FBLOCK_SIZE);
++    memory_region_add_subregion(&dev->slot_mem, fblock_offset,
++                                &dev->fblock_io);
 +
-+    uint8_t type;
-+    int a_wptr, a_rptr, a_cnt;
-+    int b_wptr, b_rptr, b_cnt;
++    g_free(fblock_name);
++}
 +
-+    uint8_t *fifo;
++static void mac_nubus_rom_write(void *opaque, hwaddr addr, uint64_t val,
++                                       unsigned int size)
++{
++}
 +
-+    uint8_t regs[48];
-+} ASCState;
++static uint64_t mac_nubus_rom_read(void *opaque, hwaddr addr,
++                                    unsigned int size)
++{
++    NubusDevice *dev = opaque;
 +
-+#define TYPE_ASC "apple-sound-chip"
-+#define ASC(obj) OBJECT_CHECK(ASCState, (obj), TYPE_ASC)
++    return dev->rom[addr];
++}
++
++static const MemoryRegionOps mac_nubus_rom_ops = {
++    .read  = mac_nubus_rom_read,
++    .write = mac_nubus_rom_write,
++    .endianness = DEVICE_BIG_ENDIAN,
++    .valid = {
++        .min_access_size = 1,
++        .max_access_size = 1,
++    },
++};
++
++
++void nubus_register_rom(NubusDevice *dev, const uint8_t *rom, uint32_t size,
++                        int revision, int format, uint8_t byte_lanes)
++{
++    hwaddr rom_offset;
++    char *rom_name;
++
++    /* FIXME : really compute CRC */
++    dev->rom_length = 0;
++    dev->rom_crc = 0;
++
++    dev->rom_rev = revision;
++    dev->rom_format = format;
++
++    dev->byte_lanes = byte_lanes;
++    dev->directory_offset = -size;
++
++    /* ROM */
++
++    dev->rom = rom;
++    rom_name = g_strdup_printf("nubus-slot-%d-rom", dev->slot_nb);
++    memory_region_init_io(&dev->rom_io, NULL, &mac_nubus_rom_ops,
++                          dev, rom_name, size);
++    memory_region_set_readonly(&dev->rom_io, true);
++
++    rom_offset = memory_region_size(&dev->slot_mem) - FBLOCK_SIZE +
++                 dev->directory_offset;
++    memory_region_add_subregion(&dev->slot_mem, rom_offset, &dev->rom_io);
++
++    g_free(rom_name);
++}
++
++static void nubus_device_realize(DeviceState *dev, Error **errp)
++{
++    NubusBus *nubus = NUBUS_BUS(qdev_get_parent_bus(DEVICE(dev)));
++    NubusDevice *nd = NUBUS_DEVICE(dev);
++    char *name;
++    hwaddr slot_offset;
++
++    if (nubus->current_slot < NUBUS_FIRST_SLOT ||
++            nubus->current_slot > NUBUS_LAST_SLOT) {
++        error_setg(errp, "Cannot register nubus card, not enough slots");
++        return;
++    }
++
++    nd->slot_nb = nubus->current_slot++;
++    name = g_strdup_printf("nubus-slot-%d", nd->slot_nb);
++
++    if (nd->slot_nb < NUBUS_FIRST_SLOT) {
++        /* Super */
++        slot_offset = (nd->slot_nb - 6) * NUBUS_SUPER_SLOT_SIZE;
++
++        memory_region_init(&nd->slot_mem, OBJECT(dev), name,
++                           NUBUS_SUPER_SLOT_SIZE);
++        memory_region_add_subregion(&nubus->super_slot_io, slot_offset,
++                                    &nd->slot_mem);
++    } else {
++        /* Normal */
++        slot_offset = nd->slot_nb * NUBUS_SLOT_SIZE;
++
++        memory_region_init(&nd->slot_mem, OBJECT(dev), name, NUBUS_SLOT_SIZE);
++        memory_region_add_subregion(&nubus->slot_io, slot_offset,
++                                    &nd->slot_mem);
++    }
++
++    g_free(name);
++    nubus_register_format_block(nd);
++}
++
++static void nubus_device_class_init(ObjectClass *oc, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(oc);
++
++    dc->realize = nubus_device_realize;
++    dc->bus_type = TYPE_NUBUS_BUS;
++}
++
++static const TypeInfo nubus_device_type_info = {
++    .name = TYPE_NUBUS_DEVICE,
++    .parent = TYPE_DEVICE,
++    .abstract = true,
++    .instance_size = sizeof(NubusDevice),
++    .class_init = nubus_device_class_init,
++};
++
++static void nubus_register_types(void)
++{
++    type_register_static(&nubus_device_type_info);
++}
++
++type_init(nubus_register_types)
+diff --git a/include/hw/nubus/mac-nubus-bridge.h b/include/hw/nubus/mac-nubus-bridge.h
+new file mode 100644
+index 0000000000..ce9c789d99
+--- /dev/null
++++ b/include/hw/nubus/mac-nubus-bridge.h
+@@ -0,0 +1,24 @@
++/*
++ * Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#ifndef HW_NUBUS_MAC_H
++#define HW_NUBUS_MAC_H
++
++#include "hw/nubus/nubus.h"
++
++#define TYPE_MAC_NUBUS_BRIDGE "mac-nubus-bridge"
++#define MAC_NUBUS_BRIDGE(obj) OBJECT_CHECK(MacNubusState, (obj), \
++                                           TYPE_MAC_NUBUS_BRIDGE)
++
++typedef struct MacNubusState {
++    SysBusDevice sysbus_dev;
++
++    NubusBus *bus;
++} MacNubusState;
++
++#endif
+diff --git a/include/hw/nubus/nubus.h b/include/hw/nubus/nubus.h
+new file mode 100644
+index 0000000000..096bafb322
+--- /dev/null
++++ b/include/hw/nubus/nubus.h
+@@ -0,0 +1,69 @@
++/*
++ * Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#ifndef HW_NUBUS_NUBUS_H
++#define HW_NUBUS_NUBUS_H
++
++#include "hw/qdev.h"
++#include "exec/address-spaces.h"
++
++#define NUBUS_SUPER_SLOT_SIZE 0x10000000U
++#define NUBUS_SUPER_SLOT_NB   0x9
++
++#define NUBUS_SLOT_SIZE       0x01000000
++#define NUBUS_SLOT_NB         0xF
++
++#define NUBUS_FIRST_SLOT      0x9
++#define NUBUS_LAST_SLOT       0xF
++
++#define TYPE_NUBUS_DEVICE "nubus-device"
++#define NUBUS_DEVICE(obj) \
++     OBJECT_CHECK(NubusDevice, (obj), TYPE_NUBUS_DEVICE)
++
++#define TYPE_NUBUS_BUS "nubus-bus"
++#define NUBUS_BUS(obj) OBJECT_CHECK(NubusBus, (obj), TYPE_NUBUS_BUS)
++
++#define TYPE_NUBUS_BRIDGE "nubus-bridge"
++#define NUBUS_BRIDGE(obj) OBJECT_CHECK(NubusBridge, (obj), TYPE_NUBUS_BRIDGE)
++
++typedef struct NubusBus {
++    BusState qbus;
++
++    MemoryRegion super_slot_io;
++    MemoryRegion slot_io;
++
++    int current_slot;
++} NubusBus;
++
++typedef struct NubusDevice {
++    DeviceState qdev;
++
++    int slot_nb;
++    MemoryRegion slot_mem;
++
++    /* Format Block */
++
++    MemoryRegion fblock_io;
++
++    uint32_t rom_length;
++    uint32_t rom_crc;
++    uint8_t rom_rev;
++    uint8_t rom_format;
++    uint8_t byte_lanes;
++    int32_t directory_offset;
++
++    /* ROM */
++
++    MemoryRegion rom_io;
++    const uint8_t *rom;
++} NubusDevice;
++
++void nubus_register_rom(NubusDevice *dev, const uint8_t *rom, uint32_t size,
++                        int revision, int format, uint8_t byte_lanes);
 +
 +#endif
 -- 
