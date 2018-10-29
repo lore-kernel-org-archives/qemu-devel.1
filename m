@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43028)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gH6qY-0005DI-K0
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 08:40:43 -0400
+	(envelope-from <kraxel@redhat.com>) id 1gH6wq-0007wD-4v
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 08:47:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gH6qX-0004Ns-QM
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 08:40:42 -0400
-Received: from mail-ot1-x32f.google.com ([2607:f8b0:4864:20::32f]:34253)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gH6qV-0004IO-7A
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 08:40:40 -0400
-Received: by mail-ot1-x32f.google.com with SMTP id e9so5856029oti.1
-	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 05:40:37 -0700 (PDT)
+	(envelope-from <kraxel@redhat.com>) id 1gH6wj-0005MA-RL
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 08:47:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39954)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gH6wj-0005Im-IP
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 08:47:05 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 72C5A31A5451
+	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 12:47:04 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 29 Oct 2018 13:47:01 +0100
+Message-Id: <20181029124703.11123-1-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <27ed2a56-987d-677b-1457-3428aca19d49@linaro.org>
-References: <CAFEAcA-=Wqxp1GOtBOZpck9J-LUgDhthP5u9PQuT-2fGdz9mwQ@mail.gmail.com>
-	<27ed2a56-987d-677b-1457-3428aca19d49@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 29 Oct 2018 12:40:16 +0000
-Message-ID: <CAFEAcA-zQQBhqm376guhMXzbXg-1d1V--5opTatUXRvbb3uUDA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] a64 simd decode in handle_vec_simd_shli()
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/2] Vga 20181029 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +30,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-On 29 October 2018 at 12:32, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> On 10/29/18 12:06 PM, Peter Maydell wrote:
->> I'm having difficulty figuring out where this check has come from;
->> it doesn't seem to match up with the pseudocode and in any case
->> I don't think size can ever be > 3. We calculate:
->>
->>     int size = 32 - clz32(immh) - 1;
->> where immh is a 4 bit field which we know cannot be all-zeroes.
->> So the clz32() return must be in {28,29,30,31} and the resulting
->> size is in {0,1,2,3}, so the check above can't ever fire.
->
-> Correct.
->
-> The check appeared with the initial commit for aa64 support, so perhaps Alex
-> just trying to be defensive in his coding?
->
->> Am I missing something? As far as I can see we should simply delete
->> the can't-happen condition, which will probably satisfy coverity.
->
-> Agreed.
+The following changes since commit b312532fd03413d0e6ae6767ec793a3e30f487=
+b8:
 
-As assert that size is in [0..3] would probably be reasonable too,
-since the thing that requires it (that the immh field is 4-bit non-zero)
-is something implicitly determined by the decode so it's a bit
-action-at-a-distance. I'll put together a patch.
+  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into s=
+taging (2018-10-19 19:01:07 +0100)
 
-thanks
--- PMM
+are available in the git repository at:
+
+  git://git.kraxel.org/qemu tags/vga-20181029-pull-request
+
+for you to fetch changes up to e69a10f468d8f6aa6c00a4308f5a8e1f2fd6b3a1:
+
+  vga_int: remove unused function protype (2018-10-29 10:43:48 +0100)
+
+----------------------------------------------------------------
+vga: two fixes.
+
+----------------------------------------------------------------
+
+Gerd Hoffmann (1):
+  qxl: store channel id in qxl->id
+
+yuchenlin (1):
+  vga_int: remove unused function protype
+
+ hw/display/qxl.h     |  1 +
+ hw/display/vga_int.h |  1 -
+ hw/display/qxl.c     | 19 ++++++++++++-------
+ 3 files changed, 13 insertions(+), 8 deletions(-)
+
+--=20
+2.9.3
