@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59506)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gHAMb-0000PO-DP
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 12:26:02 -0400
+	(envelope-from <sameo@linux.intel.com>) id 1gHAMo-0000bn-3U
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 12:26:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gHAMY-00084A-Ka
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 12:26:00 -0400
-Received: from mga06.intel.com ([134.134.136.31]:12989)
+	(envelope-from <sameo@linux.intel.com>) id 1gHAMj-00087Y-7Y
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 12:26:14 -0400
+Received: from mga06.intel.com ([134.134.136.31]:12971)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sameo@linux.intel.com>)
-	id 1gHAMX-00083a-On
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 12:25:58 -0400
+	id 1gHAMi-0007zZ-M2
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 12:26:09 -0400
 From: Samuel Ortiz <sameo@linux.intel.com>
-Date: Mon, 29 Oct 2018 17:24:34 +0100
-Message-Id: <20181029162441.31631-13-sameo@linux.intel.com>
+Date: Mon, 29 Oct 2018 17:24:35 +0100
+Message-Id: <20181029162441.31631-14-sameo@linux.intel.com>
 In-Reply-To: <20181029162441.31631-1-sameo@linux.intel.com>
 References: <20181029162441.31631-1-sameo@linux.intel.com>
-Subject: [Qemu-devel] [PATCH v2 12/19] hw: i386: Make the hotpluggable
- memory size property more generic
+Subject: [Qemu-devel] [PATCH v2 13/19] hw: acpi: Export the SRAT AML build
+ API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,79 +26,355 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Yang Zhong <yang.zhong@intel.com>
 
-This property is currently defined under i386/pc while it only describes
-a region size that's eventually fetched from the AML ACPI code.
+From: Yang Zhong <yang.zhong@intel.com>
 
-We can make it more generic and shareable across machine types by moving
-it to memory-device.h instead.
+The SRAT ACPI table is not x86 specific and will be needed for the
+Hardware-reduced ACPI implementation. So we should export it through the
+architecture independent hw/acpi folder.
 
-Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+Also, now that the generic build_srat() API is exported, we have to
+rename the ARM static one in order to avoid build time conflicts.
+
+Signed-off-by: Yang Zhong <yang.zhong@intel.com>
 ---
- hw/i386/acpi-build.c           | 2 +-
- hw/i386/pc.c                   | 3 ++-
- include/hw/i386/pc.h           | 1 -
- include/hw/mem/memory-device.h | 2 ++
- 4 files changed, 5 insertions(+), 3 deletions(-)
+ hw/acpi/aml-build.c         | 130 ++++++++++++++++++++++++++++++++++++
+ hw/arm/virt-acpi-build.c    |   4 +-
+ hw/i386/acpi-build.c        | 129 -----------------------------------
+ include/hw/acpi/aml-build.h |   3 +
+ 4 files changed, 135 insertions(+), 131 deletions(-)
 
+diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+index 2110e18799..c3f652a68f 100644
+--- a/hw/acpi/aml-build.c
++++ b/hw/acpi/aml-build.c
+@@ -22,6 +22,7 @@
+ #include "qemu/osdep.h"
+ #include <glib/gprintf.h>
+ #include "hw/acpi/aml-build.h"
++#include "hw/mem/memory-device.h"
+ #include "qemu/bswap.h"
+ #include "qemu/bitops.h"
+ #include "sysemu/numa.h"
+@@ -2459,6 +2460,135 @@ void build_srat_memory(AcpiSratMemoryAffinity *numamem, uint64_t base,
+     numamem->range_length = cpu_to_le64(len);
+ }
+ 
++#define HOLE_640K_START  (640 * KiB)
++#define HOLE_640K_END   (1 * MiB)
++
++void
++build_srat(GArray *table_data, BIOSLinker *linker,
++           MachineState *machine, AcpiConfiguration *conf)
++{
++    AcpiSystemResourceAffinityTable *srat;
++    AcpiSratMemoryAffinity *numamem;
++
++    int i;
++    int srat_start, numa_start, slots;
++    uint64_t mem_len, mem_base, next_base;
++    MachineClass *mc = MACHINE_GET_CLASS(machine);
++    const CPUArchIdList *apic_ids = mc->possible_cpu_arch_ids(machine);
++    ram_addr_t hotplugabble_address_space_size =
++        object_property_get_int(OBJECT(machine), MEMORY_DEVICE_REGION_SIZE,
++                                NULL);
++
++    srat_start = table_data->len;
++
++    srat = acpi_data_push(table_data, sizeof *srat);
++    srat->reserved1 = cpu_to_le32(1);
++
++    for (i = 0; i < apic_ids->len; i++) {
++        int node_id = apic_ids->cpus[i].props.node_id;
++        uint32_t apic_id = apic_ids->cpus[i].arch_id;
++
++        if (apic_id < 255) {
++            AcpiSratProcessorAffinity *core;
++
++            core = acpi_data_push(table_data, sizeof *core);
++            core->type = ACPI_SRAT_PROCESSOR_APIC;
++            core->length = sizeof(*core);
++            core->local_apic_id = apic_id;
++            core->proximity_lo = node_id;
++            memset(core->proximity_hi, 0, 3);
++            core->local_sapic_eid = 0;
++            core->flags = cpu_to_le32(1);
++        } else {
++            AcpiSratProcessorX2ApicAffinity *core;
++
++            core = acpi_data_push(table_data, sizeof *core);
++            core->type = ACPI_SRAT_PROCESSOR_x2APIC;
++            core->length = sizeof(*core);
++            core->x2apic_id = cpu_to_le32(apic_id);
++            core->proximity_domain = cpu_to_le32(node_id);
++            core->flags = cpu_to_le32(1);
++        }
++    }
++
++
++    /* the memory map is a bit tricky, it contains at least one hole
++     * from 640k-1M and possibly another one from 3.5G-4G.
++     */
++    next_base = 0;
++    numa_start = table_data->len;
++
++    for (i = 1; i < conf->numa_nodes + 1; ++i) {
++        mem_base = next_base;
++        mem_len = conf->node_mem[i - 1];
++        next_base = mem_base + mem_len;
++
++        /* Cut out the 640K hole */
++        if (mem_base <= HOLE_640K_START &&
++            next_base > HOLE_640K_START) {
++            mem_len -= next_base - HOLE_640K_START;
++            if (mem_len > 0) {
++                numamem = acpi_data_push(table_data, sizeof *numamem);
++                build_srat_memory(numamem, mem_base, mem_len, i - 1,
++                                  MEM_AFFINITY_ENABLED);
++            }
++
++            /* Check for the rare case: 640K < RAM < 1M */
++            if (next_base <= HOLE_640K_END) {
++                next_base = HOLE_640K_END;
++                continue;
++            }
++            mem_base = HOLE_640K_END;
++            mem_len = next_base - HOLE_640K_END;
++        }
++
++        /* Cut out the ACPI_PCI hole */
++        if (mem_base <= conf->below_4g_mem_size &&
++            next_base > conf->below_4g_mem_size) {
++            mem_len -= next_base - conf->below_4g_mem_size;
++            if (mem_len > 0) {
++                numamem = acpi_data_push(table_data, sizeof *numamem);
++                build_srat_memory(numamem, mem_base, mem_len, i - 1,
++                                  MEM_AFFINITY_ENABLED);
++            }
++            mem_base = 1ULL << 32;
++            mem_len = next_base - conf->below_4g_mem_size;
++            next_base = mem_base + mem_len;
++        }
++
++        if (mem_len > 0) {
++            numamem = acpi_data_push(table_data, sizeof *numamem);
++            build_srat_memory(numamem, mem_base, mem_len, i - 1,
++                              MEM_AFFINITY_ENABLED);
++        }
++    }
++    slots = (table_data->len - numa_start) / sizeof *numamem;
++    for (; slots < conf->numa_nodes + 2; slots++) {
++        numamem = acpi_data_push(table_data, sizeof *numamem);
++        build_srat_memory(numamem, 0, 0, 0, MEM_AFFINITY_NOFLAGS);
++    }
++
++    /*
++     * Entry is required for Windows to enable memory hotplug in OS
++     * and for Linux to enable SWIOTLB when booted with less than
++     * 4G of RAM. Windows works better if the entry sets proximity
++     * to the highest NUMA node in the machine.
++     * Memory devices may override proximity set by this entry,
++     * providing _PXM method if necessary.
++     */
++    if (hotplugabble_address_space_size) {
++        numamem = acpi_data_push(table_data, sizeof *numamem);
++        build_srat_memory(numamem, machine->device_memory->base,
++                          hotplugabble_address_space_size, conf->numa_nodes - 1,
++                          MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
++    }
++
++    build_header(linker, table_data,
++                 (void *)(table_data->data + srat_start),
++                 "SRAT",
++                 table_data->len - srat_start, 1, NULL, NULL);
++}
++
+ /*
+  * ACPI spec 5.2.17 System Locality Distance Information Table
+  * (Revision 2.0 or later)
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index f9a60907f1..353aa55357 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -469,7 +469,7 @@ build_spcr(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+ }
+ 
+ static void
+-build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
++virt_build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+ {
+     AcpiSystemResourceAffinityTable *srat;
+     AcpiSratProcessorGiccAffinity *core;
+@@ -759,7 +759,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+ 
+     if (nb_numa_nodes > 0) {
+         acpi_add_table(table_offsets, tables_blob);
+-        build_srat(tables_blob, tables->linker, vms);
++        virt_build_srat(tables_blob, tables->linker, vms);
+         if (have_numa_distance) {
+             acpi_add_table(table_offsets, tables_blob);
+             build_slit(tables_blob, tables->linker);
 diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 414a6c4c4e..dfc02a8a85 100644
+index dfc02a8a85..5932dbe825 100644
 --- a/hw/i386/acpi-build.c
 +++ b/hw/i386/acpi-build.c
-@@ -1630,7 +1630,7 @@ build_srat(GArray *table_data, BIOSLinker *linker,
-     MachineClass *mc = MACHINE_GET_CLASS(machine);
-     const CPUArchIdList *apic_ids = mc->possible_cpu_arch_ids(machine);
-     ram_addr_t hotplugabble_address_space_size =
--        object_property_get_int(OBJECT(machine), PC_MACHINE_DEVMEM_REGION_SIZE,
-+        object_property_get_int(OBJECT(machine), MEMORY_DEVICE_REGION_SIZE,
-                                 NULL);
+@@ -1614,135 +1614,6 @@ build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
+                  (void *)tpm2_ptr, "TPM2", sizeof(*tpm2_ptr), 4, NULL, NULL);
+ }
  
-     srat_start = table_data->len;
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index bd4a77b856..1dcbbd5139 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -67,6 +67,7 @@
- #include "hw/boards.h"
- #include "acpi-build.h"
- #include "hw/mem/pc-dimm.h"
-+#include "hw/mem/memory-device.h"
- #include "qapi/error.h"
- #include "qapi/qapi-visit-common.h"
- #include "qapi/visitor.h"
-@@ -2442,7 +2443,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
-     nc->nmi_monitor_handler = x86_nmi;
-     mc->default_cpu_type = TARGET_DEFAULT_CPU_TYPE;
+-#define HOLE_640K_START  (640 * KiB)
+-#define HOLE_640K_END   (1 * MiB)
+-
+-static void
+-build_srat(GArray *table_data, BIOSLinker *linker,
+-           MachineState *machine, AcpiConfiguration *conf)
+-{
+-    AcpiSystemResourceAffinityTable *srat;
+-    AcpiSratMemoryAffinity *numamem;
+-
+-    int i;
+-    int srat_start, numa_start, slots;
+-    uint64_t mem_len, mem_base, next_base;
+-    MachineClass *mc = MACHINE_GET_CLASS(machine);
+-    const CPUArchIdList *apic_ids = mc->possible_cpu_arch_ids(machine);
+-    ram_addr_t hotplugabble_address_space_size =
+-        object_property_get_int(OBJECT(machine), MEMORY_DEVICE_REGION_SIZE,
+-                                NULL);
+-
+-    srat_start = table_data->len;
+-
+-    srat = acpi_data_push(table_data, sizeof *srat);
+-    srat->reserved1 = cpu_to_le32(1);
+-
+-    for (i = 0; i < apic_ids->len; i++) {
+-        int node_id = apic_ids->cpus[i].props.node_id;
+-        uint32_t apic_id = apic_ids->cpus[i].arch_id;
+-
+-        if (apic_id < 255) {
+-            AcpiSratProcessorAffinity *core;
+-
+-            core = acpi_data_push(table_data, sizeof *core);
+-            core->type = ACPI_SRAT_PROCESSOR_APIC;
+-            core->length = sizeof(*core);
+-            core->local_apic_id = apic_id;
+-            core->proximity_lo = node_id;
+-            memset(core->proximity_hi, 0, 3);
+-            core->local_sapic_eid = 0;
+-            core->flags = cpu_to_le32(1);
+-        } else {
+-            AcpiSratProcessorX2ApicAffinity *core;
+-
+-            core = acpi_data_push(table_data, sizeof *core);
+-            core->type = ACPI_SRAT_PROCESSOR_x2APIC;
+-            core->length = sizeof(*core);
+-            core->x2apic_id = cpu_to_le32(apic_id);
+-            core->proximity_domain = cpu_to_le32(node_id);
+-            core->flags = cpu_to_le32(1);
+-        }
+-    }
+-
+-
+-    /* the memory map is a bit tricky, it contains at least one hole
+-     * from 640k-1M and possibly another one from 3.5G-4G.
+-     */
+-    next_base = 0;
+-    numa_start = table_data->len;
+-
+-    for (i = 1; i < conf->numa_nodes + 1; ++i) {
+-        mem_base = next_base;
+-        mem_len = conf->node_mem[i - 1];
+-        next_base = mem_base + mem_len;
+-
+-        /* Cut out the 640K hole */
+-        if (mem_base <= HOLE_640K_START &&
+-            next_base > HOLE_640K_START) {
+-            mem_len -= next_base - HOLE_640K_START;
+-            if (mem_len > 0) {
+-                numamem = acpi_data_push(table_data, sizeof *numamem);
+-                build_srat_memory(numamem, mem_base, mem_len, i - 1,
+-                                  MEM_AFFINITY_ENABLED);
+-            }
+-
+-            /* Check for the rare case: 640K < RAM < 1M */
+-            if (next_base <= HOLE_640K_END) {
+-                next_base = HOLE_640K_END;
+-                continue;
+-            }
+-            mem_base = HOLE_640K_END;
+-            mem_len = next_base - HOLE_640K_END;
+-        }
+-
+-        /* Cut out the ACPI_PCI hole */
+-        if (mem_base <= conf->below_4g_mem_size &&
+-            next_base > conf->below_4g_mem_size) {
+-            mem_len -= next_base - conf->below_4g_mem_size;
+-            if (mem_len > 0) {
+-                numamem = acpi_data_push(table_data, sizeof *numamem);
+-                build_srat_memory(numamem, mem_base, mem_len, i - 1,
+-                                  MEM_AFFINITY_ENABLED);
+-            }
+-            mem_base = 1ULL << 32;
+-            mem_len = next_base - conf->below_4g_mem_size;
+-            next_base = mem_base + mem_len;
+-        }
+-
+-        if (mem_len > 0) {
+-            numamem = acpi_data_push(table_data, sizeof *numamem);
+-            build_srat_memory(numamem, mem_base, mem_len, i - 1,
+-                              MEM_AFFINITY_ENABLED);
+-        }
+-    }
+-    slots = (table_data->len - numa_start) / sizeof *numamem;
+-    for (; slots < conf->numa_nodes + 2; slots++) {
+-        numamem = acpi_data_push(table_data, sizeof *numamem);
+-        build_srat_memory(numamem, 0, 0, 0, MEM_AFFINITY_NOFLAGS);
+-    }
+-
+-    /*
+-     * Entry is required for Windows to enable memory hotplug in OS
+-     * and for Linux to enable SWIOTLB when booted with less than
+-     * 4G of RAM. Windows works better if the entry sets proximity
+-     * to the highest NUMA node in the machine.
+-     * Memory devices may override proximity set by this entry,
+-     * providing _PXM method if necessary.
+-     */
+-    if (hotplugabble_address_space_size) {
+-        numamem = acpi_data_push(table_data, sizeof *numamem);
+-        build_srat_memory(numamem, machine->device_memory->base,
+-                          hotplugabble_address_space_size, conf->numa_nodes - 1,
+-                          MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
+-    }
+-
+-    build_header(linker, table_data,
+-                 (void *)(table_data->data + srat_start),
+-                 "SRAT",
+-                 table_data->len - srat_start, 1, NULL, NULL);
+-}
+-
+ /*
+  * VT-d spec 8.1 DMA Remapping Reporting Structure
+  * (version Oct. 2014 or later)
+diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+index 1fabf58df2..654ce2ec26 100644
+--- a/include/hw/acpi/aml-build.h
++++ b/include/hw/acpi/aml-build.h
+@@ -1,6 +1,7 @@
+ #ifndef HW_ACPI_AML_BUILD_H
+ #define HW_ACPI_AML_BUILD_H
  
--    object_class_property_add(oc, PC_MACHINE_DEVMEM_REGION_SIZE, "int",
-+    object_class_property_add(oc, MEMORY_DEVICE_REGION_SIZE, "int",
-         pc_machine_get_device_memory_region_size, NULL,
-         NULL, NULL, &error_abort);
++#include "hw/acpi/acpi.h"
+ #include "hw/acpi/acpi-defs.h"
+ #include "hw/acpi/bios-linker-loader.h"
+ #include "hw/pci/pcie_host.h"
+@@ -438,6 +439,8 @@ void
+ build_xsdt(GArray *table_data, BIOSLinker *linker, GArray *table_offsets,
+            const char *oem_id, const char *oem_table_id);
  
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index da0bd39741..7d177cd207 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -62,7 +62,6 @@ struct PCMachineState {
- };
- 
- #define PC_MACHINE_ACPI_DEVICE_PROP "acpi-device"
--#define PC_MACHINE_DEVMEM_REGION_SIZE "device-memory-region-size"
- #define PC_MACHINE_MAX_RAM_BELOW_4G "max-ram-below-4g"
- #define PC_MACHINE_VMPORT           "vmport"
- #define PC_MACHINE_SMM              "smm"
-diff --git a/include/hw/mem/memory-device.h b/include/hw/mem/memory-device.h
-index e904e194d5..d9a4fc7c3e 100644
---- a/include/hw/mem/memory-device.h
-+++ b/include/hw/mem/memory-device.h
-@@ -97,6 +97,8 @@ typedef struct MemoryDeviceClass {
-                              MemoryDeviceInfo *info);
- } MemoryDeviceClass;
- 
-+#define MEMORY_DEVICE_REGION_SIZE "memory-device-region-size"
-+
- MemoryDeviceInfoList *qmp_memory_device_list(void);
- uint64_t get_plugged_memory_size(void);
- void memory_device_pre_plug(MemoryDeviceState *md, MachineState *ms,
++void build_srat(GArray *table_data, BIOSLinker *linker,
++                MachineState *machine, AcpiConfiguration *conf);
+ int
+ build_append_named_dword(GArray *array, const char *name_format, ...)
+ GCC_FMT_ATTR(2, 3);
 -- 
 2.17.2
