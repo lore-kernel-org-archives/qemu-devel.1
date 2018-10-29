@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50746)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gH7AB-0001vD-5m
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:01:00 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gH7Iw-0001rQ-Pg
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:10:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gH7A7-0004G0-2I
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:00:59 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 29 Oct 2018 14:00:34 +0100
-Message-Id: <20181029130034.26750-1-f4bug@amsat.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1gH7Iu-0004tN-UP
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:10:02 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:37904)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gH7Is-0004oq-Pc
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:09:59 -0400
+Received: by mail-ot1-x343.google.com with SMTP id f24so1706332otl.5
+	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 06:09:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3] milkymist-minimac2: Use
- qemu_log_mask(GUEST_ERROR) instead of error_report
+In-Reply-To: <20181024112525.wdysex6exqd5aued@kamzik.brq.redhat.com>
+References: <20181024085602.16611-1-eric.auger@redhat.com>
+	<20181024112525.wdysex6exqd5aued@kamzik.brq.redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 29 Oct 2018 13:09:34 +0000
+Message-ID: <CAFEAcA8aEMUjPs=Y4-Zra___T15HryY4NDgxxqXMHhSQ4_+sLg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/virt: Set VIRT_COMPAT_3_0 compat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,69 +29,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Walle <michael@walle.cc>, Jason Wang <jasowang@redhat.com>, Laurent Vivier <laurent@vivier.eu>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: Andrew Jones <drjones@redhat.com>
+Cc: Eric Auger <eric.auger@redhat.com>, Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-qemu_log_mask(GUEST_ERROR) is more appropriate:
+On 24 October 2018 at 12:25, Andrew Jones <drjones@redhat.com> wrote:
+> On Wed, Oct 24, 2018 at 10:56:02AM +0200, Eric Auger wrote:
+>> We are missing the VIRT_COMPAT_3_0 definition and setting.
+>> Let's add them.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> ---
+>>  hw/arm/virt.c | 4 ++++
+>>  1 file changed, 4 insertions(+)
+>>
+>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+>> index 9f677825f9..a2b8d8f7c2 100644
+>> --- a/hw/arm/virt.c
+>> +++ b/hw/arm/virt.c
+>> @@ -1871,6 +1871,9 @@ static void virt_machine_3_1_options(MachineClass *mc)
+>>  }
+>>  DEFINE_VIRT_MACHINE_AS_LATEST(3, 1)
+>>
+>> +#define VIRT_COMPAT_3_0 \
+>> +    HW_COMPAT_3_0
+>> +
+>>  static void virt_3_0_instance_init(Object *obj)
+>>  {
+>>      virt_3_1_instance_init(obj);
+>> @@ -1879,6 +1882,7 @@ static void virt_3_0_instance_init(Object *obj)
+>>  static void virt_machine_3_0_options(MachineClass *mc)
+>>  {
+>>      virt_machine_3_1_options(mc);
+>> +    SET_MACHINE_COMPAT(mc, VIRT_COMPAT_3_0);
+>>  }
+>>  DEFINE_VIRT_MACHINE(3, 0)
+>>
+>> --
+>> 2.17.2
+>>
+>>
+>
+> Oops, I should have done this with the 3.1 machine type. Thanks for the
+> catching and patching.
+>
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
 
-  $ qemu -d help
-  Log items (comma separated):
-  guest_errors    log when the guest OS does something invalid (eg accessing a non-existent register)
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Acked-by: Michael Walle <michael@walle.cc>
----
-v3: Fixed format string (Peter Maydell)
 
- hw/net/milkymist-minimac2.c | 15 ++++++++++-----
- 1 file changed, 10 insertions(+), 5 deletions(-)
+Applied to target-arm.next, thanks.
 
-diff --git a/hw/net/milkymist-minimac2.c b/hw/net/milkymist-minimac2.c
-index 7ef1daee41..85c9fc0b65 100644
---- a/hw/net/milkymist-minimac2.c
-+++ b/hw/net/milkymist-minimac2.c
-@@ -30,6 +30,7 @@
- #include "hw/sysbus.h"
- #include "trace.h"
- #include "net/net.h"
-+#include "qemu/log.h"
- #include "qemu/error-report.h"
- 
- #include <zlib.h>
-@@ -214,7 +215,8 @@ static size_t assemble_frame(uint8_t *buf, size_t size,
-     uint32_t crc;
- 
-     if (size < payload_size + 12) {
--        error_report("milkymist_minimac2: received too big ethernet frame");
-+        qemu_log_mask(LOG_GUEST_ERROR, "milkymist_minimac2: frame too big "
-+                      "(%zd bytes)\n", payload_size);
-         return 0;
-     }
- 
-@@ -347,8 +349,9 @@ minimac2_read(void *opaque, hwaddr addr, unsigned size)
-         break;
- 
-     default:
--        error_report("milkymist_minimac2: read access to unknown register 0x"
--                TARGET_FMT_plx, addr << 2);
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "milkymist_minimac2_rd%d: 0x%" HWADDR_PRIx "\n",
-+                      size, addr << 2);
-         break;
-     }
- 
-@@ -413,8 +416,10 @@ minimac2_write(void *opaque, hwaddr addr, uint64_t value,
-         break;
- 
-     default:
--        error_report("milkymist_minimac2: write access to unknown register 0x"
--                TARGET_FMT_plx, addr << 2);
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "milkymist_minimac2_wr%d: 0x%" HWADDR_PRIx
-+                      " = 0x%" PRIx64 "\n",
-+                      size, addr << 2, value);
-         break;
-     }
- }
--- 
-2.19.1
+-- PMM
