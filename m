@@ -1,35 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57849)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gH65W-000561-CW
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:52:08 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gH67s-0007Pb-6A
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:54:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gH65T-0004KF-6x
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:52:06 -0400
-Received: from mail-cys01nam02on0118.outbound.protection.outlook.com
-	([104.47.37.118]:14217
-	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1gH65S-0004GJ-Tk
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:52:03 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Mon, 29 Oct 2018 11:52:00 +0000
-Message-ID: <BN6PR2201MB1251A375F642CB64E85135EFC6F30@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <20181014142928.2784-1-f4bug@amsat.org> <20181014164140.GB2319@sx9>
-	<CAAdtpL5xQYwyR0VxqAhA3dW9ec2KW07n-GKrMCt=UjQqwsuYHQ@mail.gmail.com>
-	<alpine.LFD.2.21.1810142320320.16498@eddie.linux-mips.org>
-	<20181015170202.GB2364@sx9>
-	<BN6PR2201MB125130DFBDFBBE67B4CD57A9C6FE0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-	<20181016181916.GB2323@sx9>,
-	<300f223b-2013-5e31-0dd1-cd9adf0948ba@linaro.org>,
-	<BN6PR2201MB12512B1ED5C412208990CC5FC6F20@BN6PR2201MB1251.namprd22.prod.outlook.com>
-In-Reply-To: <BN6PR2201MB12512B1ED5C412208990CC5FC6F20@BN6PR2201MB1251.namprd22.prod.outlook.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <peter.maydell@linaro.org>) id 1gH67q-0007ht-Q0
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:54:32 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:44813)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gH67q-0007bz-EL
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 07:54:30 -0400
+Received: by mail-oi1-x243.google.com with SMTP id k19-v6so6742185oic.11
+	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 04:54:27 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] target/mips: Support Toshiba specific
- three-operand MADD and MADDU
+In-Reply-To: <20181026153125.24738-1-laurent@vivier.eu>
+References: <20181026153125.24738-1-laurent@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 29 Oct 2018 11:54:06 +0000
+Message-ID: <CAFEAcA-8sN2MGK6OcK5uMbMuw33MMOAgsdr9y4Uj2qmpbTkeig@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/20] Trivial patches patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,65 +28,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, Fredrik Noring <noring@nocrew.org>
-Cc: "Maciej W. Rozycki" <macro@linux-mips.org>, =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>, Aurelien Jarno <aurelien@aurel32.net>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, =?iso-8859-1?Q?J=FCrgen_Urban?= <JuergenUrban@gmx.de>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Michael Tokarev <mjt@tls.msk.ru>, Jason Wang <jasowang@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, Michael Walle <michael@walle.cc>, Laurent Vivier <lvivier@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Cleber Rosa <crosa@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "open list:X86" <xen-devel@lists.xenproject.org>, Aleksandar Markovic <amarkovic@wavecomp.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Anthony Perard <anthony.perard@citrix.com>, Aurelien Jarno <aurelien@aurel32.net>, Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Stefano Stabellini <sstabellini@kernel.org>, Gerd Hoffmann <kraxel@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Thomas Huth <thuth@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>, Eduardo Habkost <ehabkost@redhat.com>
 
->=20
-> From: Aleksandar Markovic
-> Subject: Re: [PATCH] target/mips: Support Toshiba specific three-operand =
-MADD and MADDU
->=20
-> > From: Richard Henderson <richard.henderson@linaro.org>
-> > Sent: Tuesday, October 16, 2018 8:37 PM
-> > Subject: Re: [PATCH] target/mips: Support Toshiba specific three-operan=
-d MADD and > MADDU
-> >
-> > On 10/16/18 11:19 AM, Fredrik Noring wrote:
-> > > /* global register indices */
-> > > static TCGv cpu_gpr[32], cpu_PC;
-> > > static TCGv cpu_HI[MIPS_DSP_ACC], cpu_LO[MIPS_DSP_ACC];
-> > >
-> > > One option is to create a new array such as
-> > >
-> > > static TCGv_i64 mmi_gpr[32];
-> > >
-> > > that represents the upper 64 bits of each GPR. Then cpu_gpr must be o=
-f
-> > > a 64-bit type too, even when QEMU runs in 32-bit user mode. The R5900
-> > > does not implement CP0.Status.UX in hardware, though, so system mode =
-is
-> > > 64 bits, regardless.
-> >
-> > I would not implement r5900 for mips32 in that case,
-> > I would implement it only for TARGET_MIPS64.
-> >
-> > r~
->=20
-> Hello, Richard.
->=20
-> I truly need your help here. As you can conclude from the discussion, R59=
-00 folks
-> (anybody correct me if I am wrong) have some problems using any ABI other=
- than O32.
-> (For example, the standard gcc switch are "-mabi=3D32 -march=3Dr5900".) O=
-ther similar CPUs,
-> for example R4000, are built with TARGET_MIPS64, both user and system mod=
-e. R5900
-> would not have TARGET_MIPS64 in such arrangement. This looks outlandish t=
-o me. Given
-> that R5900 is a 64-bit MIPS III-like processor, is there any anomaly in t=
-his
-> arrangement, or this should work and is OK?
->=20
-> Thanks,
-> Aleksandar
->=20
+On 26 October 2018 at 16:31, Laurent Vivier <laurent@vivier.eu> wrote:
+> The following changes since commit 808ebd66e467f77c0d1f8c6346235f81e9c99cf2:
+>
+>   Merge remote-tracking branch 'remotes/riscv/tags/riscv-for-master-3.1-sf0' into staging (2018-10-25 17:41:03 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/vivier/qemu.git tags/trivial-patches-pull-request
+>
+> for you to fetch changes up to 4b03da6e87c34793137a231b558231fd406c05e8:
+>
+>   ppc: move at24c to its own CONFIG_ symbol (2018-10-26 17:17:32 +0200)
+>
+> ----------------------------------------------------------------
+> QEMU trivial patches collected between June and October 2018
+> (Thank you to Thomas Huth)
+>
+> ----------------------------------------------------------------
 
-Guys,
+Hi; I get a compile error due to a format string issue:
 
-Without TARGET_MIPS64, we can't say we emulate R5900 - we are emulating som=
-e other CPU that never existed.
+In file included from
+/home/petmay01/qemu-for-merges/hw/net/milkymist-minimac2.c:33:0:
+/home/petmay01/qemu-for-merges/hw/net/milkymist-minimac2.c: In
+function 'minimac2_write':
+/home/petmay01/qemu-for-merges/hw/net/milkymist-minimac2.c:420:23:
+error: format '%lx' expects
+ argument of type 'long unsigned int', but argument 4 has type
+'uint64_t {aka long long unsign
+ed int}' [-Werror=format=]
+                       "milkymist_minimac2_wr%d: 0x%" HWADDR_PRIx " = 0x%lx\n",
+                       ^
+/home/petmay01/qemu-for-merges/include/qemu/log.h:85:22: note: in
+definition of macro 'qemu_lo
+g_mask'
+             qemu_log(FMT, ## __VA_ARGS__);              \
+                      ^
+cc1: all warnings being treated as errors
 
-Convince me that I am wrong.
+(affects windows crossbuilds, OSX and 32-bit hosts).
 
-Aleksandar=
+thanks
+-- PMM
