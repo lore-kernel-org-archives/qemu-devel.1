@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53633)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gHHIG-00007B-45
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 19:50:01 -0400
+	(envelope-from <philmd@redhat.com>) id 1gHHIw-0000cu-8y
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 19:50:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gHHIF-000703-52
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 19:50:00 -0400
+	(envelope-from <philmd@redhat.com>) id 1gHHIs-0007FR-Bu
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 19:50:41 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:45896)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gHHIr-0007ES-5s
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 19:50:38 -0400
+Received: by mail-wr1-f65.google.com with SMTP id n5-v6so10543379wrw.12
+	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 16:50:36 -0700 (PDT)
+References: <1540365080-6844-1-git-send-email-liq3ea@gmail.com>
+	<4d64d42a-8727-81aa-6015-a9db92abca76@redhat.com>
+	<6afc1723-633c-34af-d5ff-4dea3fbf6b89@redhat.com>
+	<CAKXe6SJQUtBRbOtiy1xtt+griLoxc_JOd3D4oKwR9d3B2GCWyQ@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <1d47f5d7-e85c-44a0-2499-180eac24965e@redhat.com>
+Date: Tue, 30 Oct 2018 00:50:32 +0100
 MIME-Version: 1.0
-References: <20181029232100.8454-1-philmd@redhat.com>
-	<20181029232100.8454-3-philmd@redhat.com>
-In-Reply-To: <20181029232100.8454-3-philmd@redhat.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 29 Oct 2018 16:49:26 -0700
-Message-ID: <CAKmqyKM5p26jF2ZASmEiE-qDJOc5g7Znw9EsgOi3keGu9NjMXA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/3] hw/dma/pl330: Factor out pl330_init()
- from hw/arm/xilinx_zynq.c
+In-Reply-To: <CAKXe6SJQUtBRbOtiy1xtt+griLoxc_JOd3D4oKwR9d3B2GCWyQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] fw_cfg_reboot: ensure reboot_time is
+ nonegative
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,146 +33,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: philmd@redhat.com
-Cc: Peter Maydell <peter.maydell@linaro.org>, Guenter Roeck <linux@roeck-us.net>, Edgar Iglesias <edgar.iglesias@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Alistair Francis <alistair@alistair23.me>, qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Li Qiang <liq3ea@gmail.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 
-On Mon, Oct 29, 2018 at 4:24 PM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+On 25/10/18 3:45, Li Qiang wrote:
+> Hello Laszlo and Philippe ,
+> 
+> Thanks for your review,
+> 
+> 
+> 
+> Philippe Mathieu-Daudé <philmd@redhat.com <mailto:philmd@redhat.com>> 于 
+> 2018年10月25日周四 上午6:56写道：
+> 
+>     Hi,
+> 
+>     On 24/10/18 13:35, Laszlo Ersek wrote:
+>      > On 10/24/18 09:11, Li Qiang wrote:
+>      >> This can avoid setting a negative value to
+>      >> etc/boot-fail-wait.
+> 
+>     Li Qiang, can you add a qtest for this?
+> 
+> 
+> I will try to write one.
+> Is it ok to write it without this patch, as the test will be not passed?
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+It is OK to add the test after the fix, else the test would fail.
+But now your test protect from future regressions.
 
-Alistair
-
-> ---
->  MAINTAINERS            |  1 +
->  hw/arm/xilinx_zynq.c   | 18 ++----------------
->  hw/dma/pl330.c         |  2 +-
->  include/hw/dma/pl330.h | 41 +++++++++++++++++++++++++++++++++++++++++
->  4 files changed, 45 insertions(+), 17 deletions(-)
->  create mode 100644 include/hw/dma/pl330.h
->
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index d794bd7a66..647e2aa0d5 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -452,6 +452,7 @@ F: hw/display/pl110*
->  F: hw/dma/pl080.c
->  F: include/hw/dma/pl080.h
->  F: hw/dma/pl330.c
-> +F: include/hw/dma/pl330.h
->  F: hw/gpio/pl061.c
->  F: hw/input/pl050.c
->  F: hw/intc/pl190.c
-> diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
-> index 57497b0c4d..a4c4d44f00 100644
-> --- a/hw/arm/xilinx_zynq.c
-> +++ b/hw/arm/xilinx_zynq.c
-> @@ -34,6 +34,7 @@
->  #include "hw/char/cadence_uart.h"
->  #include "hw/net/cadence_gem.h"
->  #include "hw/cpu/a9mpcore.h"
-> +#include "hw/dma/pl330.h"
->
->  #define NUM_SPI_FLASHES 4
->  #define NUM_QSPI_FLASHES 2
-> @@ -278,22 +279,7 @@ static void zynq_init(MachineState *machine)
->      sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0xF8007100);
->      sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[39-IRQ_OFFSET]);
->
-> -    dev =3D qdev_create(NULL, "pl330");
-> -    qdev_prop_set_uint8(dev, "num_chnls",  8);
-> -    qdev_prop_set_uint8(dev, "num_periph_req",  4);
-> -    qdev_prop_set_uint8(dev, "num_events",  16);
-> -
-> -    qdev_prop_set_uint8(dev, "data_width",  64);
-> -    qdev_prop_set_uint8(dev, "wr_cap",  8);
-> -    qdev_prop_set_uint8(dev, "wr_q_dep",  16);
-> -    qdev_prop_set_uint8(dev, "rd_cap",  8);
-> -    qdev_prop_set_uint8(dev, "rd_q_dep",  16);
-> -    qdev_prop_set_uint16(dev, "data_buffer_dep",  256);
-> -
-> -    qdev_init_nofail(dev);
-> -    busdev =3D SYS_BUS_DEVICE(dev);
-> -    sysbus_mmio_map(busdev, 0, 0xF8003000);
-> -    sysbus_connect_irq(busdev, 0, pic[45-IRQ_OFFSET]); /* abort irq line=
- */
-> +    pl330_init(0xf8003000, pic[45 - IRQ_OFFSET], 4); /* abort irq line *=
-/
->      for (n =3D 0; n < ARRAY_SIZE(dma_irqs); ++n) { /* event irqs */
->          sysbus_connect_irq(busdev, n + 1, pic[dma_irqs[n] - IRQ_OFFSET])=
-;
->      }
-> diff --git a/hw/dma/pl330.c b/hw/dma/pl330.c
-> index d071049233..711cf9a605 100644
-> --- a/hw/dma/pl330.c
-> +++ b/hw/dma/pl330.c
-> @@ -20,6 +20,7 @@
->  #include "qemu/timer.h"
->  #include "sysemu/dma.h"
->  #include "qemu/log.h"
-> +#include "hw/dma/pl330.h"
->
->  #ifndef PL330_ERR_DEBUG
->  #define PL330_ERR_DEBUG 0
-> @@ -271,7 +272,6 @@ struct PL330State {
->
->  };
->
-> -#define TYPE_PL330 "pl330"
->  #define PL330(obj) OBJECT_CHECK(PL330State, (obj), TYPE_PL330)
->
->  static const VMStateDescription vmstate_pl330 =3D {
-> diff --git a/include/hw/dma/pl330.h b/include/hw/dma/pl330.h
-> new file mode 100644
-> index 0000000000..9a586c0df9
-> --- /dev/null
-> +++ b/include/hw/dma/pl330.h
-> @@ -0,0 +1,41 @@
-> +/*
-> + * ARM PrimeCell PL330 DMA Controller
-> + *
-> + * Copyright (c) 2009 Samsung Electronics.
-> + * Contributed by Kirill Batuzov <batuzovk@ispras.ru>
-> + * Copyright (c) 2012 Peter A.G. Crosthwaite (peter.crosthwaite@petalogi=
-x.com)
-> + * Copyright (c) 2012 PetaLogix Pty Ltd.
-> + *
-> + * SPDX-License-Identifier: GPL-2.0-or-later
-> + */
-> +
-> +#ifndef HW_DMA_PL330_H
-> +#define HW_DMA_PL330_H
-> +
-> +#include "hw/sysbus.h"
-> +
-> +#define TYPE_PL330 "pl330"
-> +
-> +static inline void pl330_init(uint32_t base, qemu_irq irq, int nreq)
-> +{
-> +    SysBusDevice *busdev;
-> +    DeviceState *dev;
-> +
-> +    dev =3D qdev_create(NULL, TYPE_PL330);
-> +    qdev_prop_set_uint8(dev, "num_chnls", 8);
-> +    qdev_prop_set_uint8(dev, "num_periph_req", nreq);
-> +    qdev_prop_set_uint8(dev, "num_events", 16);
-> +    qdev_prop_set_uint8(dev, "data_width", 64);
-> +    qdev_prop_set_uint8(dev, "wr_cap", 8);
-> +    qdev_prop_set_uint8(dev, "wr_q_dep", 16);
-> +    qdev_prop_set_uint8(dev, "rd_cap", 8);
-> +    qdev_prop_set_uint8(dev, "rd_q_dep", 16);
-> +    qdev_prop_set_uint16(dev, "data_buffer_dep", 256);
-> +    qdev_init_nofail(dev);
-> +
-> +    busdev =3D SYS_BUS_DEVICE(dev);
-> +    sysbus_mmio_map(busdev, 0, base);
-> +    sysbus_connect_irq(busdev, 0, irq);
-> +}
-> +
-> +#endif /* HW_DMA_PL330_H */
-> --
-> 2.17.2
->
->
+> 
+> Thanks,
+> Li Qiang
+> 
+> 
+>      >>
+>      >> Signed-off-by: Li Qiang <liq3ea@gmail.com <mailto:liq3ea@gmail.com>>
+>      >> ---
+>      >>   hw/nvram/fw_cfg.c | 15 ++++++++++-----
+>      >>   1 file changed, 10 insertions(+), 5 deletions(-)
+>      >>
+>      >> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+>      >> index f4a52d8..276dcb1 100644
+>      >> --- a/hw/nvram/fw_cfg.c
+>      >> +++ b/hw/nvram/fw_cfg.c
+>      >> @@ -199,12 +199,17 @@ static void fw_cfg_reboot(FWCfgState *s)
+>      >>               reboot_timeout = strtol(p, &p, 10);
+>      >>           }
+>      >>       }
+>      >> -    /* validate the input */
+>      >> -    if (reboot_timeout > 0xffff) {
+>      >> -        error_report("reboot timeout is larger than 65535,
+>     force it to 65535.");
+>      >> -        reboot_timeout = 0xffff;
+>      >> +
+>      >> +    if (reboot_timeout >= 0) {
+>      >> +        /* validate the input */
+>      >> +        if (reboot_timeout > 0xffff) {
+>      >> +            error_report("reboot timeout is larger than 65535,"
+>      >> +                         "force it to 65535.");
+>      >> +            reboot_timeout = 0xffff;
+>      >> +        }
+>      >> +        fw_cfg_add_file(s, "etc/boot-fail-wait",
+>      >> +                        g_memdup(&reboot_timeout, 4), 4);
+>      >>       }
+>      >> -    fw_cfg_add_file(s, "etc/boot-fail-wait",
+>     g_memdup(&reboot_timeout, 4), 4);
+>      >>   }
+>      >>
+>      >>   static void fw_cfg_write(FWCfgState *s, uint8_t value)
+>      >>
+>      >
+>      > I don't feel strongly about fixing this issue.
+>      >
+>      > However, if we decide to fix it, we should start with the bare-bones
+>      > strtol() call, visible at the top of the context. I'm not
+>     up-to-date on
+>      > what's the best QEMU helper function for this, but I seem to
+>     remember it
+>      > checks for trailing garbage, and perhaps even for range. Maybe we
+>     should
+> 
+>     Are you suggesting qemu_strtoul()? I agree this would be cleaner.
+> 
+> 
+> 
+> I reference the 'boot_splash_time' in fw_cfg_bootsplash.
+> We can also change there.
+> 
+>      > even use a different (better) option parsing facility thatn
+>      > qemu_opt_get(). Adding Eric and Markus.
+>      >
+>      > Also, I would suggest forcing negative values (that were explicitly
+>      > specified) to some sensible positive default, such as 5 seconds
+>     or so.
+>      >
+>      > Thanks
+>      > Laszlo
+>      >
+> 
