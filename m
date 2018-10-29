@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45593)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50834)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gH1MT-0003im-Lf
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 02:49:18 -0400
+	(envelope-from <fli@suse.com>) id 1gH1mP-0004Lx-QD
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 03:16:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gH1MS-0002dY-Jv
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 02:49:17 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:44884)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1gH1MS-0002d4-Cb
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 02:49:16 -0400
-Received: by mail-wr1-x442.google.com with SMTP id d17-v6so7051706wre.11
-	for <qemu-devel@nongnu.org>; Sun, 28 Oct 2018 23:49:16 -0700 (PDT)
+	(envelope-from <fli@suse.com>) id 1gH1mK-0007QJ-OR
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 03:16:05 -0400
+Received: from mx2.suse.de ([195.135.220.15]:45632 helo=mx1.suse.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <fli@suse.com>) id 1gH1mI-0007Pr-QM
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 03:15:59 -0400
+References: <20181022110854.10284-1-fli@suse.com>
+	<20181024212742.GB30830@xz-x1.hotspot.internet-for-guests.com>
+	<45194647-7b30-df97-5517-1c758947a91e@suse.com>
+	<20181025113229.GC30830@xz-x1.hotspot.internet-for-guests.com>
+	<f528529e-e0e8-0264-422c-36e1a3881c49@suse.com>
+	<20181026133546.GA5411@xz-x1> <20181026152458.GC2388@work-vm>
+From: Fei Li <fli@suse.com>
+Message-ID: <df58a52f-c81f-2a61-1a9f-2da0bc864159@suse.com>
+Date: Mon, 29 Oct 2018 15:15:50 +0800
 MIME-Version: 1.0
-References: <1535704738-8986-1-git-send-email-thuth@redhat.com>
-	<1535704738-8986-9-git-send-email-thuth@redhat.com>
-	<87efeerbcu.fsf@dusky.pond.sub.org>
-	<593af39a-cc9b-d4e8-7e6c-efdbbe169096@redhat.com>
-	<CAJ+F1CLX15g+QOCyjaBHJN1n0oLtQCH390RivRQkTcyptWf+cw@mail.gmail.com>
-	<5b4cef8c-084c-5a2b-1fb6-210388054d38@redhat.com>
-	<87va7qli3f.fsf@dusky.pond.sub.org>
-	<87y3b7rs2b.fsf@dusky.pond.sub.org>
-In-Reply-To: <87y3b7rs2b.fsf@dusky.pond.sub.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 29 Oct 2018 10:49:03 +0400
-Message-ID: <CAJ+F1CJfan6r47fG8PpvT+xh1UZa+z=LBchyJ6zML_8AZ=uxVg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20181026152458.GC2388@work-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 8/9] tests: add qmp/qom-set-without-value
- test
+Subject: Re: [Qemu-devel] [PATCH RFC 0/2] Fix migration issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,127 +32,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com
 
-Hi
 
-On Tue, Oct 9, 2018 at 8:41 PM Markus Armbruster <armbru@redhat.com> wrote:
->
-> Markus Armbruster <armbru@redhat.com> writes:
->
-> > Thomas Huth <thuth@redhat.com> writes:
-> >
-> >> On 2018-08-31 15:24, Marc-Andr=C3=A9 Lureau wrote:
-> >>> Hi
-> >>> On Fri, Aug 31, 2018 at 3:18 PM Thomas Huth <thuth@redhat.com> wrote:
-> >>>>
-> >>>> On 2018-08-31 14:04, Markus Armbruster wrote:
-> >>>>> Thomas Huth <thuth@redhat.com> writes:
-> >>>>>
-> >>>>>> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> >>>>>>
-> >>>>>> test_qom_set_without_value() is about a bug in infrastructure used=
- by
-> >>>>>> the QMP core, fixed in commit c489780203.  We covered the bug in
-> >>>>>> infrastructure unit tests (commit bce3035a44).  I wrote that test
-> >>>>>> earlier, to cover QMP level as well, the test could go into qmp-te=
-st.
-> >>>>>>
-> >>>>>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com=
->
-> >>>>>> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> >>>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> >>>>>> ---
-> >>>>>>  tests/qmp-test.c | 14 ++++++++++++++
-> >>>>>>  1 file changed, 14 insertions(+)
-> >>>>>>
-> >>>>>> diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-> >>>>>> index b347228..2b923f0 100644
-> >>>>>> --- a/tests/qmp-test.c
-> >>>>>> +++ b/tests/qmp-test.c
-> >>>>>> @@ -321,6 +321,19 @@ static void test_qmp_preconfig(void)
-> >>>>>>      qtest_quit(qs);
-> >>>>>>  }
-> >>>>>>
-> >>>>>> +static void test_qom_set_without_value(void)
-> >>>>>> +{
-> >>>>>> +    QTestState *qts;
-> >>>>>> +    QDict *resp;
-> >>>>>> +
-> >>>>>> +    qts =3D qtest_init(common_args);
-> >>>>>> +    resp =3D qtest_qmp(qts, "{'execute': 'qom-set', 'arguments':"
-> >>>>>> +                     " { 'path': '/machine', 'property': 'rtc-tim=
-e' } }");
-> >>>>>> +    g_assert_nonnull(resp);
-> >>>>>> +    qmp_assert_error_class(resp, "GenericError");
-> >>>>>> +    qtest_quit(qts);
-> >>>>>> +}
-> >>>>>> +
-> >>>>>>  int main(int argc, char *argv[])
-> >>>>>>  {
-> >>>>>>      g_test_init(&argc, &argv, NULL);
-> >>>>>> @@ -328,6 +341,7 @@ int main(int argc, char *argv[])
-> >>>>>>      qtest_add_func("qmp/protocol", test_qmp_protocol);
-> >>>>>>      qtest_add_func("qmp/oob", test_qmp_oob);
-> >>>>>>      qtest_add_func("qmp/preconfig", test_qmp_preconfig);
-> >>>>>> +    qtest_add_func("qmp/qom-set-without-value", test_qom_set_with=
-out_value);
-> >>>>>>
-> >>>>>>      return g_test_run();
-> >>>>>>  }
-> >>>>>
-> >>>>> I'm afraid you missed my objection to naming:
-> >>>>> Message-ID: <8736uvujxx.fsf@dusky.pond.sub.org>
-> >>>>> https://lists.nongnu.org/archive/html/qemu-devel/2018-08/msg06368.h=
-tml
-> >>>>
-> >>>> Sorry about that, I was not on CC: for that series. I used the patch=
-es
-> >>>> from v5 where Marc-Andr=C3=A9 put me on CC:.
-> >>>>
-> >>>>> If you could work that into PULL v2, I'd be obliged.  If not, I'll =
-have
-> >>>>> to address it in a follow-up patch.
-> >>>>
-> >>>> IMHO the naming is not that bad ... OTOH, I think Peter might alread=
-y be
-> >>>> away? ... so we've got plenty of time to sort this out anyway.
-> >>>> Marc-Andr=C3=A9, could you send a new version of the patch?
-> >>>
-> >>> Tbh, I don't care so much about the naming of the test, but (for once=
+
+On 10/26/2018 11:24 PM, Dr. David Alan Gilbert wrote:
+> * Peter Xu (peterx@redhat.com) wrote:
+>> On Fri, Oct 26, 2018 at 09:10:19PM +0800, Fei Li wrote:
+>>>
+>>> On 10/25/2018 08:58 PM, Peter Xu wrote:
+>>>> On Thu, Oct 25, 2018 at 05:04:00PM +0800, Fei Li wrote:
+>>>>
+>>>> [...]
+>>>>
+>>>>> @@ -1325,22 +1325,24 @@ bool multifd_recv_all_channels_created(void=
 )
-> >>> I respectfully don't think Markus suggestion is better.
-> >>>
-> >>> The function checks "qom-set" without 'value' argument:
-> >>> "qom-set-without-value", no brainer..
-> >
-> > Nope, that's not what it tests.  It tests the visitor, the marshalling
-> > code generator, and the QMP core handle a certain kind of invalid
-> > arguments correctly.  It does not test qom-set.  I explained all that
-> > already.
-> >
-> >>> Naming it "invalid-arg" is so generic that I wouldn't be able what it=
- does.
-> >
-> > I can accept "missing-any" or "missing-any-arg".  I object to any name
-> > involving qom-set, because the test is not about qom-set at all.
-> >
-> > If it was, then putting it in qmp-test.c would be wrong.
-> >
-> >> Ok, then let's keep it this way. As I said, IMHO the current naming is
-> >> not really bad, and I also don't have any suggestions for a perfect na=
-me
-> >> right now.
-> >
-> > We don't need a perfect name.  We need one that's not actively
-> > misleading.
+>>>>>   =C2=A0/* Return true if multifd is ready for the migration, other=
+wise false */
+>>>>>   =C2=A0bool multifd_recv_new_channel(QIOChannel *ioc)
+>>>>>   =C2=A0{
+>>>>> +=C2=A0=C2=A0=C2=A0 MigrationIncomingState *mis =3D migration_incom=
+ing_get_current();
+>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0 MultiFDRecvParams *p;
+>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0 Error *local_err =3D NULL;
+>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0 int id;
+>>>>>
+>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0 id =3D multifd_recv_initial_packet(ioc, =
+&local_err);
+>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0 if (id < 0) {
+>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 multifd_recv_terminate_=
+threads(local_err);
+>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return false;
+>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_reportf_err(local=
+_err,
+>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 "failed to receive packet via multifd channel %x:
+>>>>> ",
+>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 multifd_recv_state->count);
+>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto fail;
+>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0 }
+>>>>>
+>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0 p =3D &multifd_recv_state->params[id];
+>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0 if (p->c !=3D NULL) {
+>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg(&loca=
+l_err, "multifd: received id '%d' already setup'",
+>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 id);
+>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 multifd_recv_terminate_=
+threads(local_err);
+>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return false;
+>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto fail;
+>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0 }
+>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0 p->c =3D ioc;
+>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0 object_ref(OBJECT(ioc));
+>>>>> @@ -1352,6 +1354,11 @@ bool multifd_recv_new_channel(QIOChannel *io=
+c)
+>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+QEMU_THREAD_JOINABLE);
+>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0 atomic_inc(&multifd_recv_state->count);
+>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0 return multifd_recv_state->count =3D=3D =
+migrate_multifd_channels();
+>>>>> +fail:
+>>>>> +=C2=A0=C2=A0=C2=A0 multifd_recv_terminate_threads(local_err);
+>>>>> +=C2=A0=C2=A0=C2=A0 qemu_fclose(mis->from_src_file);
+>>>>> +=C2=A0=C2=A0=C2=A0 mis->from_src_file =3D NULL;
+>>>>> +=C2=A0=C2=A0=C2=A0 exit(EXIT_FAILURE);
+>>>>>   =C2=A0}
+>>>> Yeah I think it makes sense to at least report some details when err=
+or
+>>>> happens, but I'm not sure whether it's good to explicitly exit() her=
+e.
+>>>> IMHO you can add an Error** in multifd_recv_new_channel() parameter
+>>>> list to do that, and even through migration_ioc_process_incoming().
+>>>> What do you think?
+>>>>
+>>>> Regards,
+>>>>
+>>> You mean exit() in migration_ioc_process_incoming(), or further
+>>> caller migration_channel_process_incoming()? Actually either is
+>>> ok for me. :) But today I find if using postcopy and multifd together
+>>> to do live migration, it seems the hang still occurs even with the
+>>> above codes, so sad about that. I will keep debugging and see
+>>> how to fix this.
+>> Maybe you can move the error_report_err() in
+>> migration_channel_process_incoming() out of the TLS path so we can
+>> report the error if either TLS or non-TLS case got something wrong.
+Thanks for the advice. I will do the update in the next version. :)
+>>
+>> And I don't even know whether multifd could work with postcopy...
+> Nope, it's not expected to work yet.
 >
-> Marc-Andr=C3=A9, would "qmp/missing-any-arg" and test_missing_any_arg() w=
-ork
-> for you?
+> Dave
+Thanks for the helpful information. :)
 
-Yes, do you want me to update the patch?
+BTW, in the next version, I'd like to merge these three migration=20
+patches into
+the "[PATCH RFC v6 ] qemu_thread_create: propagate the error to callers=20
+to handle",
+and cc you inside the patches. Please help to review.
 
---=20
-Marc-Andr=C3=A9 Lureau
+Have a nice day, thanks again
+Fei
+>
+>> Regards,
+>>
+>> --=20
+>> Peter Xu
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
+>
