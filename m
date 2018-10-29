@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37587)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37616)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefan.markovic@rt-rk.com>) id 1gH81u-0003B0-Od
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:56:31 -0400
+	(envelope-from <stefan.markovic@rt-rk.com>) id 1gH81z-0003DC-Dw
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:56:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefan.markovic@rt-rk.com>) id 1gH81f-0002wk-EB
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:56:22 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:44849 helo=mail.rt-rk.com)
+	(envelope-from <stefan.markovic@rt-rk.com>) id 1gH81u-000397-Oo
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:56:32 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:43669 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefan.markovic@rt-rk.com>)
-	id 1gH81e-0002vZ-VZ
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:56:15 -0400
+	id 1gH81k-0002GS-0E
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:56:22 -0400
 From: Stefan Markovic <stefan.markovic@rt-rk.com>
-Date: Mon, 29 Oct 2018 14:55:14 +0100
-Message-Id: <1540821315-28346-6-git-send-email-stefan.markovic@rt-rk.com>
+Date: Mon, 29 Oct 2018 14:55:10 +0100
+Message-Id: <1540821315-28346-2-git-send-email-stefan.markovic@rt-rk.com>
 In-Reply-To: <1540821315-28346-1-git-send-email-stefan.markovic@rt-rk.com>
 References: <1540821315-28346-1-git-send-email-stefan.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v2 5/6] Determine the desired FPU mode
+Subject: [Qemu-devel] [PATCH v2 1/6] Define MIPS_ABI_FP_UNKNOWN macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,107 +29,27 @@ Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovan
 
 From: Stefan Markovic <smarkovic@wavecomp.com>
 
-Floating-point mode is calculated from MIPS.abiflags FP ABI value
-(based on kernel implementation). Illegal combinations are rejected.
+Add MIPS_ABI_FP_UNKNOWN as QEMU internal value to represent
+unknown fp_abi (based on kernel mips/include/asm/elf.h definition)
 
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- linux-user/mips/cpu_loop.c | 75 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 75 insertions(+)
+ include/elf.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/linux-user/mips/cpu_loop.c b/linux-user/mips/cpu_loop.c
-index c9c20cf..97e4957 100644
---- a/linux-user/mips/cpu_loop.c
-+++ b/linux-user/mips/cpu_loop.c
-@@ -740,6 +740,34 @@ void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
-     struct image_info *info = ts->info;
-     int i;
+diff --git a/include/elf.h b/include/elf.h
+index 5f45f9b..c151164 100644
+--- a/include/elf.h
++++ b/include/elf.h
+@@ -87,6 +87,8 @@ typedef int64_t  Elf64_Sxword;
+ #define EF_MIPS_MACH_LS3A     0x00a20000  /* ST Microelectronics Loongson 3A */
+ #define EF_MIPS_MACH          0x00ff0000  /* EF_MIPS_MACH_xxx selection mask */
  
-+    struct mode_req {
-+        bool single;
-+        bool soft;
-+        bool fr1;
-+        bool frdefault;
-+        bool fre;
-+    };
++#define MIPS_ABI_FP_UNKNOWN   (-1)        /* Unknown FP ABI (internal)       */
 +
-+    static const struct mode_req fpu_reqs[] = {
-+        [MIPS_ABI_FP_ANY]    = { true,  true,  true,  true,  true  },
-+        [MIPS_ABI_FP_DOUBLE] = { false, false, false, true,  true  },
-+        [MIPS_ABI_FP_SINGLE] = { true,  false, false, false, false },
-+        [MIPS_ABI_FP_SOFT]   = { false, true,  false, false, false },
-+        [MIPS_ABI_FP_OLD_64] = { false, false, false, false, false },
-+        [MIPS_ABI_FP_XX]     = { false, false, true,  true,  true  },
-+        [MIPS_ABI_FP_64]     = { false, false, true,  false, false },
-+        [MIPS_ABI_FP_64A]    = { false, false, true,  false, true  }
-+    };
-+
-+    /*
-+     * Mode requirements when .MIPS.abiflags is not present in the ELF.
-+     * Not present means that everything is acceptable except FR1.
-+     */
-+    static struct mode_req none_req = { true, true, false, true, true };
-+
-+    struct mode_req prog_req;
-+    struct mode_req interp_req;
-+
-     for(i = 0; i < 32; i++) {
-         env->active_tc.gpr[i] = regs->regs[i];
-     }
-@@ -747,6 +775,53 @@ void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
-     if (regs->cp0_epc & 1) {
-         env->hflags |= MIPS_HFLAG_M16;
-     }
-+
-+#ifdef TARGET_ABI_MIPSO32
-+# define MAX_FP_ABI MIPS_ABI_FP_64A
-+#else
-+# define MAX_FP_ABI MIPS_ABI_FP_SOFT
-+#endif
-+     if ((info->fp_abi > MAX_FP_ABI && info->fp_abi != MIPS_ABI_FP_UNKNOWN)
-+        || (info->interp_fp_abi > MAX_FP_ABI &&
-+            info->interp_fp_abi != MIPS_ABI_FP_UNKNOWN)) {
-+        fprintf(stderr, "qemu: Unexpected FPU mode\n");
-+        exit(1);
-+    }
-+
-+    prog_req = (info->fp_abi == MIPS_ABI_FP_UNKNOWN) ? none_req
-+                                            : fpu_reqs[info->fp_abi];
-+    interp_req = (info->interp_fp_abi == MIPS_ABI_FP_UNKNOWN) ? none_req
-+                                            : fpu_reqs[info->interp_fp_abi];
-+
-+    prog_req.single &= interp_req.single;
-+    prog_req.soft &= interp_req.soft;
-+    prog_req.fr1 &= interp_req.fr1;
-+    prog_req.frdefault &= interp_req.frdefault;
-+    prog_req.fre &= interp_req.fre;
-+
-+    bool cpu_has_mips_r2_r6 = env->insn_flags & ISA_MIPS32R2 ||
-+                              env->insn_flags & ISA_MIPS64R2 ||
-+                              env->insn_flags & ISA_MIPS32R6 ||
-+                              env->insn_flags & ISA_MIPS64R6;
-+
-+    if (prog_req.fre && !prog_req.frdefault && !prog_req.fr1) {
-+        env->CP0_Config5 |= (1 << CP0C5_FRE);
-+        if (env->active_fpu.fcr0 & (1 << FCR0_FREP)) {
-+            env->hflags |= MIPS_HFLAG_FRE;
-+        }
-+    } else if ((prog_req.fr1 && prog_req.frdefault) ||
-+         (prog_req.single && !prog_req.frdefault)) {
-+        if ((env->active_fpu.fcr0 & (1 << FCR0_F64)
-+            && cpu_has_mips_r2_r6) || prog_req.fr1) {
-+            env->CP0_Status |= (1 << CP0St_FR);
-+            env->hflags |= MIPS_HFLAG_F64;
-+        }
-+    } else  if (!prog_req.fre && !prog_req.frdefault &&
-+          !prog_req.fr1 && !prog_req.single && !prog_req.soft) {
-+        fprintf(stderr, "qemu: Can't find a matching FPU mode\n");
-+        exit(1);
-+    }
-+
-     if (env->insn_flags & ISA_NANOMIPS32) {
-         return;
-     }
+ #define MIPS_ABI_FP_ANY       0x0         /* FP ABI doesn't matter           */
+ #define MIPS_ABI_FP_DOUBLE    0x1         /* -mdouble-float                  */
+ #define MIPS_ABI_FP_SINGLE    0x2         /* -msingle-float                  */
 -- 
 1.9.1
