@@ -1,14 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37628)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37667)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gH821-0003F5-NI
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:56:38 -0400
+	(envelope-from <stefanha@redhat.com>) id 1gH825-0003I9-13
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:56:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gH81w-0003A5-7J
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:56:33 -0400
+	(envelope-from <stefanha@redhat.com>) id 1gH823-0003Ec-46
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 09:56:40 -0400
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Mon, 29 Oct 2018 13:56:05 +0000
-Message-Id: <20181029135607.4485-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL 0/2] Block patches
+Date: Mon, 29 Oct 2018 13:56:06 +0000
+Message-Id: <20181029135607.4485-2-stefanha@redhat.com>
+In-Reply-To: <20181029135607.4485-1-stefanha@redhat.com>
+References: <20181029135607.4485-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PULL 1/2] util: aio-posix: fix a typo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,36 +20,32 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Li Qiang <liq3ea@gmail.com>, qemu-trivial@nongnu.org
 
-The following changes since commit 285278ca785f5fa9a570927e1c0958a2ca2b2150:
+From: Li Qiang <liq3ea@gmail.com>
 
-  Merge remote-tracking branch 'remotes/famz/tags/testing-pull-request' into staging (2018-10-27 19:55:08 +0100)
-
-are available in the Git repository at:
-
-  git://github.com/stefanha/qemu.git tags/block-pull-request
-
-for you to fetch changes up to bd54b11062c4baa7d2e4efadcf71b8cfd55311fd:
-
-  nvdimm: Add docs hint for Linux driver name (2018-10-29 13:35:22 +0000)
-
-----------------------------------------------------------------
-Pull request
-
-No changelog-worthy entries, just small tweaks.
-
-----------------------------------------------------------------
-
-Kees Cook (1):
-  nvdimm: Add docs hint for Linux driver name
-
-Li Qiang (1):
-  util: aio-posix: fix a typo
-
- docs/nvdimm.txt  | 5 +++--
+Cc: qemu-trivial@nongnu.org
+Signed-off-by: Li Qiang <liq3ea@gmail.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Fam Zheng <famz@redhat.com>
+Message-id: 1538964972-3223-1-git-send-email-liq3ea@gmail.com
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
  util/aio-posix.c | 2 +-
- 2 files changed, 4 insertions(+), 3 deletions(-)
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/util/aio-posix.c b/util/aio-posix.c
+index 621b3025d8..51c41ed3c9 100644
+--- a/util/aio-posix.c
++++ b/util/aio-posix.c
+@@ -40,7 +40,7 @@ struct AioHandler
+ 
+ #ifdef CONFIG_EPOLL_CREATE1
+ 
+-/* The fd number threashold to switch to epoll */
++/* The fd number threshold to switch to epoll */
+ #define EPOLL_ENABLE_THRESHOLD 64
+ 
+ static void aio_epoll_disable(AioContext *ctx)
 -- 
 2.17.2
