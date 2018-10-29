@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38381)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38382)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gGvbt-0000Ss-HV
+	(envelope-from <bounces@canonical.com>) id 1gGvbt-0000St-Hd
 	for qemu-devel@nongnu.org; Sun, 28 Oct 2018 20:40:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gGvbq-0008Qi-QS
+	(envelope-from <bounces@canonical.com>) id 1gGvbr-0008RM-Tf
 	for qemu-devel@nongnu.org; Sun, 28 Oct 2018 20:40:49 -0400
-Received: from indium.canonical.com ([91.189.90.7]:54226)
+Received: from indium.canonical.com ([91.189.90.7]:54258)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gGvbq-0008Q0-GE
-	for qemu-devel@nongnu.org; Sun, 28 Oct 2018 20:40:46 -0400
+	id 1gGvbr-0008QZ-KK
+	for qemu-devel@nongnu.org; Sun, 28 Oct 2018 20:40:47 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gGvbp-0004xT-Lj
-	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 00:40:45 +0000
+	id 1gGvbq-0004xS-BB
+	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 00:40:46 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A032E2E8078
-	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 00:40:45 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 52E4C2E8078
+	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 00:40:46 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 29 Oct 2018 00:33:02 -0000
+Date: Mon, 29 Oct 2018 00:34:18 -0000
 From: Nicholas Vinson <1800401@bugs.launchpad.net>
 Reply-To: Bug 1800401 <1800401@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <154077313146.29068.467827083588404194.malonedeb@soybean.canonical.com>
-Message-Id: <154077318294.28521.11114455781540955095.malone@soybean.canonical.com>
+Message-Id: <154077325843.13863.18350973629765921246.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1800401] Re: efifb on Linux guest fails to load
  when using VGA passthrough
@@ -39,10 +39,10 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Attachment added: "Gentoo_qxl.sh -- systemrescuecd-x86-5.3.1 -- dmesg.lo=
-g"
-   https://bugs.launchpad.net/qemu/+bug/1800401/+attachment/5206601/+files/=
-Gentoo_qxl.sh%20--%20systemrescuecd-x86-5.3.1%20--%20dmesg.log
+** Attachment added: "Shell script used to invoke qemu with only vga-passth=
+rough"
+   https://bugs.launchpad.net/qemu/+bug/1800401/+attachment/5206602/+files/=
+Gentoo.sh
 
 -- =
 
