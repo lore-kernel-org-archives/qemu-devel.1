@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52628)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52565)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gHU8Y-0003om-W5
+	(envelope-from <peter.maydell@linaro.org>) id 1gHU8U-0003ns-3S
 	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 09:32:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gHU8U-0004uZ-BC
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 09:32:50 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:40248)
+	(envelope-from <peter.maydell@linaro.org>) id 1gHU8T-0004rg-3C
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 09:32:45 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:37729)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gHU8T-0004qZ-Vd
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 09:32:46 -0400
-Received: by mail-wm1-f66.google.com with SMTP id b203-v6so11380977wme.5
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 06:32:45 -0700 (PDT)
-References: <20181030111348.14713-1-kraxel@redhat.com>
-	<20181030111348.14713-2-kraxel@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <8c224534-c929-7c7f-a126-a9390bbdb77f@redhat.com>
-Date: Tue, 30 Oct 2018 14:32:40 +0100
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gHU8S-0004mZ-Rn
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 09:32:44 -0400
+Received: by mail-ot1-x342.google.com with SMTP id o14so11069755oth.4
+	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 06:32:42 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20181030111348.14713-2-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/4] add QemuSupportState
+In-Reply-To: <20181030132343.22658-1-peter.maydell@linaro.org>
+References: <20181030132343.22658-1-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 30 Oct 2018 13:32:20 +0000
+Message-ID: <CAFEAcA9x7E_krWUxj7d7kOm5RE0vkarnDdcs9HXH0THz0Tu7NQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v2 0/6] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,122 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>
+To: QEMU Developers <qemu-devel@nongnu.org>
 
-Hi Gerd,
+On 30 October 2018 at 13:23, Peter Maydell <peter.maydell@linaro.org> wrote:
+> Respin to fix some accidental wrong Author lines, no content
+> changes.
+>
+> -- PMM
+>
+> The following changes since commit 0bbba1665ca2e7f1c80d4797077fe57bad58898e:
+>
+>   Merge remote-tracking branch 'remotes/amarkovic/tags/mips-queue-october-2018-part-4' into staging (2018-10-30 10:45:49 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20181030
+>
+> for you to fetch changes up to 1f5a65a188210509bfb0c025fc91635c8436b98a:
+>
+>   tests/boot-serial-test: Add microbit board testcase (2018-10-30 13:20:18 +0000)
+>
+> ----------------------------------------------------------------
+> target-arm queue:
+>  * microbit: Add the UART to our nRF51 SoC model
+>  * Add a virtual Xilinx Versal board "xlnx-versal-virt"
+>  * hw/arm/virt: Set VIRT_COMPAT_3_0 compat
+>
+> ----------------------------------------------------------------
+> Edgar E. Iglesias (2):
+>       hw/arm: versal: Add a model of Xilinx Versal SoC
+>       hw/arm: versal: Add a virtual Xilinx Versal board
+>
+> Eric Auger (1):
+>       hw/arm/virt: Set VIRT_COMPAT_3_0 compat
+>
+> Julia Suvorova (3):
+>       hw/char: Implement nRF51 SoC UART
+>       hw/arm/nrf51_soc: Connect UART to nRF51 SoC
+>       tests/boot-serial-test: Add microbit board testcase
 
-On 30/10/18 12:13, Gerd Hoffmann wrote:
-> Indicates support state for somerhing (device, backend, subsystem, ...)
+Bah, and now I find a compile failure in the versal board patches.
 
-"something"
+v3 coming up at some point.
 
-> in qemu.  Modeled roughly after the "S:" states we have in MAINTANERS.
-> 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->   include/qemu/support-state.h | 17 +++++++++++++++++
->   util/support-state.c         | 23 +++++++++++++++++++++++
->   qapi/common.json             | 16 ++++++++++++++++
->   util/Makefile.objs           |  1 +
->   4 files changed, 57 insertions(+)
->   create mode 100644 include/qemu/support-state.h
->   create mode 100644 util/support-state.c
-> 
-> diff --git a/include/qemu/support-state.h b/include/qemu/support-state.h
-> new file mode 100644
-> index 0000000000..5fd3c83eee
-> --- /dev/null
-> +++ b/include/qemu/support-state.h
-> @@ -0,0 +1,17 @@
-> +#ifndef QEMU_SUPPORT_STATE_H
-> +#define QEMU_SUPPORT_STATE_H
-> +
-> +#include "qapi/qapi-types-common.h"
-> +
-> +typedef struct QemuSupportState {
-> +    SupportState state;
-> +    const char *reason;
-> +} QemuSupportState;
-> +
-> +void qemu_warn_support_state(const char *type, const char *name,
-> +                             QemuSupportState *state);
-> +
-> +bool qemu_is_deprecated(QemuSupportState *state);
-> +bool qemu_is_obsolete(QemuSupportState *state);
-> +
-> +#endif /* QEMU_SUPPORT_STATE_H */
-> diff --git a/util/support-state.c b/util/support-state.c
-> new file mode 100644
-> index 0000000000..7966fa0fc7
-> --- /dev/null
-> +++ b/util/support-state.c
-> @@ -0,0 +1,23 @@
-> +#include "qemu/osdep.h"
-> +#include "qemu/error-report.h"
-> +#include "qemu/support-state.h"
-> +
-> +void qemu_warn_support_state(const char *type, const char *name,
-> +                             QemuSupportState *state)
-> +{
-> +    warn_report("%s %s is %s%s%s%s", type, name,
-> +                SupportState_str(state->state),
-> +                state->reason ? " ("          : "",
-> +                state->reason ? state->reason : "",
-> +                state->reason ? ")"           : "");
-> +}
-> +
-> +bool qemu_is_deprecated(QemuSupportState *state)
-> +{
-> +    return state->state == SUPPORT_STATE_DEPRECATED;
-> +}
-> +
-> +bool qemu_is_obsolete(QemuSupportState *state)
-> +{
-> +    return state->state == SUPPORT_STATE_OBSOLETE;
-> +}
-> diff --git a/qapi/common.json b/qapi/common.json
-> index 021174f04e..78176151af 100644
-> --- a/qapi/common.json
-> +++ b/qapi/common.json
-> @@ -151,3 +151,19 @@
->                'ppc64', 'riscv32', 'riscv64', 's390x', 'sh4',
->                'sh4eb', 'sparc', 'sparc64', 'tricore', 'unicore32',
->                'x86_64', 'xtensa', 'xtensaeb' ] }
-> +
-> +##
-> +# @SupportState:
-> +#
-> +# Indicate Support level of qemu devices, backends, subsystems, ...
-> +#
-> +# Since: 3.2
-> +##
-> +{ 'enum': 'SupportState',
-> +  'data': [ 'unknown',
-
-'unknown' is scary and should be fixed.
-
-> +            'supported',
-> +            'maintained',
-> +            'odd-fixes',
-
-All those fit in 'supported'
-
-> +            'orphan',
-> +            'obsolete',
-> +            'deprecated' ] }
-
-And all those should appear as 'deprecated' IMHO.
-
-> diff --git a/util/Makefile.objs b/util/Makefile.objs
-> index 0820923c18..6e5f8faf82 100644
-> --- a/util/Makefile.objs
-> +++ b/util/Makefile.objs
-> @@ -50,5 +50,6 @@ util-obj-y += range.o
->   util-obj-y += stats64.o
->   util-obj-y += systemd.o
->   util-obj-y += iova-tree.o
-> +util-obj-y += support-state.o
->   util-obj-$(CONFIG_LINUX) += vfio-helpers.o
->   util-obj-$(CONFIG_OPENGL) += drm.o
-> 
+thanks
+-- PMM
