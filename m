@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50922)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gHXri-0003a3-OD
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 13:31:43 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gHXwj-0007eo-1g
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 13:36:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gHXrh-0004Ke-F4
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 13:31:42 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:32852)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gHXrZ-0004G6-Kr
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 13:31:36 -0400
-Received: by mail-ot1-x343.google.com with SMTP id q1so2455822otk.0
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 10:31:29 -0700 (PDT)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gHXwb-0008UL-DD
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 13:36:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53226)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1gHXwX-0008Ne-Pg
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 13:36:41 -0400
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Tue, 30 Oct 2018 21:36:20 +0400
+Message-Id: <20181030173627.7711-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181030112337.17973-1-laurent@vivier.eu>
-References: <20181030112337.17973-1-laurent@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 30 Oct 2018 17:31:08 +0000
-Message-ID: <CAFEAcA9wOKFxRQDqaxtz5krfskGnxrDjTApE8BZxDH--0bWLew@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v2 00/20] Qemu trivial for 3.1 patches
+Subject: [Qemu-devel] [PULL 0/7] Chardev patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,34 +25,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Cleber Rosa <crosa@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Thomas Huth <thuth@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, Aurelien Jarno <aurelien@aurel32.net>, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Stefano Stabellini <sstabellini@kernel.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Qemu-block <qemu-block@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, "open list:X86" <xen-devel@lists.xenproject.org>, Gerd Hoffmann <kraxel@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <lvivier@redhat.com>, Michael Walle <michael@walle.cc>, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On 30 October 2018 at 11:23, Laurent Vivier <laurent@vivier.eu> wrote:
-> The following changes since commit 808ebd66e467f77c0d1f8c6346235f81e9c99c=
-f2:
->
->   Merge remote-tracking branch 'remotes/riscv/tags/riscv-for-master-3.1-s=
-f0' into staging (2018-10-25 17:41:03 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/vivier/qemu.git tags/qemu-trivial-for-3.1-pull-request
->
-> for you to fetch changes up to 7b2b797cf0addac789ba858fdbd95c55128d72d5:
->
->   milkymist-minimac2: Use qemu_log_mask(GUEST_ERROR) instead of error_rep=
-ort (2018-10-30 09:13:31 +0100)
->
-> ----------------------------------------------------------------
-> QEMU trivial patches collected between June and October 2018
-> (Thank you to Thomas Huth)
->
-> v2: fix 32bit build with updated patch (v3) from Philippe Mathieu-Daud=C3=
-=A9
->     built in a 32bit debian sid chroot
->
+The following changes since commit 3f3285491dd52014852a56135c90e428c8b507=
+ea:
 
-Applied, thanks.
+  Merge remote-tracking branch 'remotes/jnsnow/tags/bitmaps-pull-request'=
+ into staging (2018-10-30 14:09:25 +0000)
 
--- PMM
+are available in the Git repository at:
+
+  https://github.com/elmarco/qemu.git tags/chrdev-pull-request
+
+for you to fetch changes up to 22333dd533e2a93d9da18479aee5fb49302c7933:
+
+  editorconfig: set emacs mode (2018-10-30 21:30:22 +0400)
+
+----------------------------------------------------------------
+- add websocket support
+- socket: make 'fd' incompatible with 'reconnect'
+- fix a websocket leak
+- unrelated editorconfig patch that missed -trivial (included for
+  convenience)
+
+----------------------------------------------------------------
+
+Julia Suvorova (3):
+  chardev/char-socket: Function headers refactoring
+  chardev: Add websocket support
+  tests/test-char: Check websocket chardev functionality
+
+Marc-Andr=C3=A9 Lureau (4):
+  websock: fix handshake leak
+  char-socket: correctly set has_reconnect when parsing QemuOpts
+  char-socket: make 'fd' incompatible with 'reconnect'
+  editorconfig: set emacs mode
+
+ qapi/char.json        |   3 +
+ chardev/char-socket.c | 123 ++++++++++++++++++++++++++++++-----------
+ chardev/char.c        |   8 ++-
+ io/channel-websock.c  |   1 +
+ tests/test-char.c     | 125 ++++++++++++++++++++++++++++++++++++++++++
+ .editorconfig         |  21 ++++++-
+ qemu-options.hx       |  13 ++++-
+ 7 files changed, 257 insertions(+), 37 deletions(-)
+
+--=20
+2.19.1.708.g4ede3d42df
