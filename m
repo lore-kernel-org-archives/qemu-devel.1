@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38096)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44783)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gHRDs-0002Ja-6Q
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 06:26:11 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gHRVw-0003pk-RN
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 06:44:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gHRDi-0005lD-Ka
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 06:26:04 -0400
-References: <20181029134000.11157-1-mark.cave-ayland@ilande.co.uk>
-	<20181029134000.11157-10-mark.cave-ayland@ilande.co.uk>
-	<bc310af5-2423-f6c7-d478-c386efb95004@reactos.org>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <ab61e42e-4379-6632-2ed5-2a0d3098949c@ilande.co.uk>
-Date: Tue, 30 Oct 2018 10:25:15 +0000
+	(envelope-from <peter.maydell@linaro.org>) id 1gHRVu-0006MX-OQ
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 06:44:48 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:42403)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gHRVu-0006Iv-5K
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 06:44:46 -0400
+Received: by mail-oi1-x243.google.com with SMTP id h23-v6so9922628oih.9
+	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 03:44:41 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <bc310af5-2423-f6c7-d478-c386efb95004@reactos.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5 09/11] hw/m68k: add a dummy SWIM floppy
- controller
+In-Reply-To: <20181029151956.2164336-1-stefanb@linux.ibm.com>
+References: <20181029151956.2164336-1-stefanb@linux.ibm.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 30 Oct 2018 10:44:20 +0000
+Message-ID: <CAFEAcA8OOWbfC-ZpL7GuP81WYC6gGk2XC05DhGeXnceUUfv2mA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL v1 0/5] Merge tpm 2018/10/29 v1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,58 +29,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, jasowang@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, kraxel@redhat.com, pbonzini@redhat.com, afaerber@suse.de, aurelien@aurel32.net, laurent@vivier.eu
+To: Stefan Berger <stefanb@linux.ibm.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-On 30/10/2018 06:48, Hervé Poussineau wrote:
+On 29 October 2018 at 15:19, Stefan Berger <stefanb@linux.ibm.com> wrote:
+> From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+>
+> This pull request fixes a couple of TPM support related issues,
+> such as full initialization of a variable to quiet down valgrind,
+> a possible race in the TPM related test cases and marking test
+> cases as skipped if swtpm was not found in PATH.
+>
+>    Stefan
+>
+> The following changes since commit a4d710251fa5aa9ec26de4626f11c78500195d=
+12:
+>
+>   Merge remote-tracking branch 'remotes/berrange/tags/qcrypto-next-pull-r=
+equest' into staging (2018-10-24 22:08:42 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/stefanberger/qemu-tpm.git tags/pull-tpm-2018-10-29-1
+>
+> for you to fetch changes up to f9da599490730cf0c3016f15225d7f1ee15bec75:
+>
+>   tpm: Zero-init structure to avoid uninitialized variables in valgrind l=
+og (2018-10-27 10:33:18 -0400)
+>
+> ----------------------------------------------------------------
+> Marc-Andr=C3=A9 Lureau (2):
+>       tests/tpm: fix tpm_util_swtpm_has_tpm2()
+>       tests/tpm: mark swtpm test as skipped instead of successful
+>
+> Stefan Berger (3):
+>       docs: tpm: Mention implemented TPM CRB interface emulation and spec=
+s
+>       MAINTAINERS: Change my email address to the new domain
+>       tpm: Zero-init structure to avoid uninitialized variables in valgri=
+nd log
 
-> Le 29/10/2018 à 14:39, Mark Cave-Ayland a écrit :
->> From: Laurent Vivier <laurent@vivier.eu>
->>
->> Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
->> ---
->>   hw/block/Makefile.objs  |   1 +
->>   hw/block/swim.c         | 415 ++++++++++++++++++++++++++++++++++++++++++++++++
->>   include/hw/block/swim.h |  76 +++++++++
->>   3 files changed, 492 insertions(+)
->>   create mode 100644 hw/block/swim.c
->>   create mode 100644 include/hw/block/swim.h
-> 
-> [...]
-> 
->> diff --git a/include/hw/block/swim.h b/include/hw/block/swim.h
->> new file mode 100644
->> index 0000000000..d6fbdc11ac
->> --- /dev/null
->> +++ b/include/hw/block/swim.h
->> @@ -0,0 +1,76 @@
->> +/*
->> + * QEMU Macintosh floppy disk controller emulator (SWIM)
->> + *
->> + * Copyright (c) 2014-2018 Laurent Vivier <laurent@vivier.eu>
->> + *
->> + * This work is licensed under the terms of the GNU GPL, version 2.  See
->> + * the COPYING file in the top-level directory.
->> + *
->> + */
->> +
->> +#ifndef SWIM_H
->> +#define SWIM_H
->> +
->> +#include "qemu/osdep.h"
->> +#include "hw/sysbus.h"
->> +
->> +#define MAX_FD                  2
-> 
-> Maybe rename MAX_FD to SWIM_MAX_FD, to prevent conflicts with MAX_FD in other files?
-> Excepted that:
-> Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
+Hi; this gives some test failures (all hosts):
 
-Yes, that's a good idea (I can see this might clash with in-built OS headers). I'll
-make the change and add your R-B to the next version.
+TEST: tests/tpm-crb-swtpm-test... (pid=3D305)
+  /i386/tpm/crb-swtpm/test:                                            FAIL
+GTester: last random seed: R02Sf628ca48da88252a6b95465fef3b855f
+  /i386/tpm/crb-swtpm-migration/test:                                  FAIL
+GTester: last random seed: R02Sf628ca48da88252a6b95465fef3b855f
+FAIL: tests/tpm-crb-swtpm-test
+TEST: tests/tpm-crb-test... (pid=3D311)
+  /i386/tpm-crb/test:                                                  OK
+PASS: tests/tpm-crb-test
+TEST: tests/tpm-tis-swtpm-test... (pid=3D324)
+  /i386/tpm/tis-swtpm/test:                                            FAIL
+GTester: last random seed: R02Sca4f303959770d4ca9f8f12b784dba0d
+  /i386/tpm/tis-swtpm-migration/test:                                  FAIL
+GTester: last random seed: R02Sca4f303959770d4ca9f8f12b784dba0d
+FAIL: tests/tpm-tis-swtpm-test
+TEST: tests/tpm-tis-test... (pid=3D331)
+  /i386/tpm-tis/test_check_localities:                                 OK
+  /i386/tpm-tis/test_check_access_reg:                                 OK
+  /i386/tpm-tis/test_check_access_reg_seize:                           OK
+  /i386/tpm-tis/test_check_access_reg_release:                         OK
+  /i386/tpm-tis/test_check_transmit:                                   OK
+PASS: tests/tpm-tis-test
 
+and a compile failure on OSX:
+/Users/pm215/src/qemu-for-merges/hw/tpm/tpm_emulator.c:161:21: error:
+suggest braces around initialization of subobject
+[-Werror,-Wmissing-braces]
+    ptm_loc loc =3D { 0 };
+                    ^
+                    {}
 
-ATB,
+(what you want here is just "ptm_loc loc =3D {};" -- the "{ 0 }" syntax
+is the C standard one but not all compilers can handle it without warnings
+if the first member in the struct happens to be a substruct.)
 
-Mark.
+thanks
+-- PMM
