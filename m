@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36087)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37862)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gHW8a-0007bs-VB
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:41:11 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gHWCH-0002c3-Cy
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:44:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gHW8L-0001rT-Gd
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:41:00 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:47615)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gHWCD-0001oT-Oz
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:44:49 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:51561 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gHW8L-0001oB-0Z
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:40:45 -0400
-Date: Tue, 30 Oct 2018 11:40:41 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20181030154041.GA31885@flamenco>
-References: <20181029155339.15280-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181029155339.15280-1-richard.henderson@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 0/4] target/arm: Minimize TLB flushing for
- ASID changes
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1gHWCD-0008WA-8Q
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:44:45 -0400
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Date: Tue, 30 Oct 2018 16:44:08 +0100
+Message-Id: <1540914249-3392-5-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1540914249-3392-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1540914249-3392-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PATCH v3 4/5] target/mips: Misc R5900-related
+ cosmetic changes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,46 +25,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: qemu-devel@nongnu.org
+Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com
 
-On Mon, Oct 29, 2018 at 15:53:35 +0000, Richard Henderson wrote:
-> In http://lists.nongnu.org/archive/html/qemu-devel/2018-10/msg04181.html
-> (already upstream) I added a check for ASID changes without realizing
-> that TTBCR_EL1 has the A1 bit, controlling which register actually
-> contains the active ASID.
-> 
-> In http://lists.nongnu.org/archive/html/qemu-devel/2018-10/msg04182.html
-> I suggested a set of mmu_idx to flush when the ASID does change.  In
-> follow-up, Peter suggested more.
-> 
-> I now choose secure vs non-secure mmu_idx based on which register is being
-> modified, not the current state of the cpu.  Unless I am mistaken, secure
-> state can write to the non-secure registers.  Which means that the current
-> state of the cpu is irrelevant and only the register matters.
-> 
-> Peter suggested flushing S1E3 when changing ttbr0_s.  I can see how this
-> is overlapped onto the EL3 (Secure Monitor) state, but I cannot see how
-> the ASID is used from EL3.  The best evidence I can find for this is that
-> there is no TLBIASID* register that is applicable to flushing EL3; that's
-> not conclusive proof though.  So while I'm not sure it's necessary, I'm
-> also not sure it isn't necessary, and so I've included S1E3 in the flush.
-> 
-> I now also use the VMID to conditionally invalidate the stage 2 translation
-> state.  This shows how I anticipaged @depmap to be used in patch 1.
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-I've tested this series and the one it depends on (tlb-dirty). I had
-yesterday a guest running parallel compilation jobs for ~12h with
-no issues. So
+Misc changes in comments and strings for R5900.
 
-Tested-by: Emilio G. Cota <cota@braap.org>
+Reviewed-by: Stefan Markovic <smarkovic@wavecomp.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+---
+ target/mips/translate_init.inc.c | 12 ------------
+ 1 file changed, 12 deletions(-)
 
-for this and the tlb-dirty series.
-
-Richard: the crash I reported on IRC must have been due to unrelated
-changes. I was testing some TLB experiments over the weekend so I must
-have forgotten to rebuild.
-
-Thanks,
-
-		Emilio
+diff --git a/target/mips/translate_init.inc.c b/target/mips/translate_init.inc.c
+index 85da4a2..cab2003 100644
+--- a/target/mips/translate_init.inc.c
++++ b/target/mips/translate_init.inc.c
+@@ -411,18 +411,6 @@ const mips_def_t mips_defs[] =
+         .mmu_type = MMU_TYPE_R4000,
+     },
+     {
+-        /*
+-         * The Toshiba TX System RISC TX79 Core Architecture manual
+-         *
+-         * https://wiki.qemu.org/File:C790.pdf
+-         *
+-         * describes the C790 processor that is a follow-up to the R5900.
+-         * There are a few notable differences in that the R5900 FPU
+-         *
+-         * - is not IEEE 754-1985 compliant,
+-         * - does not implement double format, and
+-         * - its machine code is nonstandard.
+-         */
+         .name = "R5900",
+         .CP0_PRid = 0x00002E00,
+         /* No L2 cache, icache size 32k, dcache size 32k, uncached coherency. */
+-- 
+2.7.4
