@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55941)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56286)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gHT3v-0005Co-Ht
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:24:00 -0400
+	(envelope-from <wj193102@163.com>) id 1gHT5Z-0006JN-3g
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:25:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gHT3q-0007oP-HL
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:23:59 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:39063)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gHT3q-0007ng-9d
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:23:54 -0400
-Received: by mail-wr1-x442.google.com with SMTP id r10-v6so12367851wrv.6
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 05:23:54 -0700 (PDT)
-References: <20181025144644.15464-1-cota@braap.org>
-	<20181025144644.15464-5-cota@braap.org>
-	<87zhuw90eu.fsf@linaro.org> <20181029213927.GA19216@flamenco>
-	<bae4de31-20da-c2c9-a3cf-e8e0b06a9a63@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <bae4de31-20da-c2c9-a3cf-e8e0b06a9a63@redhat.com>
-Date: Tue, 30 Oct 2018 12:23:51 +0000
-Message-ID: <87tvl38vxk.fsf@linaro.org>
+	(envelope-from <wj193102@163.com>) id 1gHT5U-0000zc-QP
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:25:40 -0400
+Received: from m13-74.163.com ([220.181.13.74]:35607)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <wj193102@163.com>) id 1gHT5N-0000cR-Nu
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:25:32 -0400
+Date: Tue, 30 Oct 2018 20:10:02 +0800 (CST)
+From: wj193102  <wj193102@163.com>
+In-Reply-To: <CAFEAcA-r=71qgPByUWuKsSAwiRA2S7qidtrrWyRuHvrckAvxSQ@mail.gmail.com>
+References: <c097d8c.a587.166c2c22a77.Coremail.wj193102@163.com>
+	<CAFEAcA-r=71qgPByUWuKsSAwiRA2S7qidtrrWyRuHvrckAvxSQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v4 05/71] cpu: move run_on_cpu to cpus-common
+Message-ID: <1e1a8483.155c9.166c4e17888.Coremail.wj193102@163.com>
+Content-Type: text/plain; charset=GBK
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] qemu3.0.0: Linux on non x86 CPUs run Wine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,40 +27,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-
-Paolo Bonzini <pbonzini@redhat.com> writes:
-
-> On 29/10/2018 22:39, Emilio G. Cota wrote:
->> I'm not convinced about adding an "assert(!user-mode)" to run_on_cpu.
->> Given that now it does not depend on the BQL, it could actually
->> work in user-mode if called. If we really wanted to make sure
->> that no user-mode would call it, then a compile-time check
->> would be better than an assert. But again, I fail to see what
->> we'd gain from that.
->>
->> For context, do_run_on_cpu et al. were moved to cpus-common.c by
->> d148d90ee8 ("cpus-common: move CPU work item management to
->> common code", 2016-09-27). The point was to consolidate the
->> run-on-cpu code in a common (softmmu & user-mode) file, since
->> user-mode needed async_run_on_cpu for exclusive work.
->>
->> Now we can finally make run_on_cpu generic as well.
->
-> I agree, the run_on_cpu stuff should not be system-specific at all.
-
-I'm happy to for it to be generic - just not broken ;-)
-
-I'm not sure what sort of use cases it has at the moment given we use
-start/end_exclusive for both atomics and system call marshalling in
-linux-user. However have a common toolbox across system and linux-user
-is a good thing.
-
->
-> Paolo
-
-
---
-Alex Benn=C3=A9e
+VGhhbmtzIGZvciB5b3VyIHJlcGx5LgoKQXQgMjAxOC0xMC0zMCAxNjozMzoxNSwgIlBldGVyIE1h
+eWRlbGwiIDxwZXRlci5tYXlkZWxsQGxpbmFyby5vcmc+IHdyb3RlOgo+T24gMzAgT2N0b2JlciAy
+MDE4IGF0IDAyOjE2LCB3ajE5MzEwMiA8d2oxOTMxMDJAMTYzLmNvbT4gd3JvdGU6Cj4+IEhpLCBl
+dmVyeW9uZS4KPj4gICAgIFdoZW4gSSBoYXZlIGluc3RhbGxlZCB0aGUgUUVNVTMuMC4wIGluIHRo
+ZSBMaW51eCBvbiBub24gWDg2IENQVVMsIEkgd2FudCB0byB1c2UgdXNlciBzcGFjZSBlbXVsYXRv
+ciB0byBydW4gV2luZS4gSSBjYW4gZ2V0IHRoZSBzb3VyY2UgY29kZSBmb3IgV2luZSBhbmQgdGhl
+IFJQTSBmaWxlIGZvciBXaW5lIGZyb20gdGhlIFdpbmVIUSB3ZWIgcGFnZS4KPj4gSSB1c2VkIHRv
+IGNvbXBpbGUgV2luZSBpbiB0aGUgWDg2LWJhc2VkIExpbnV4IHN5c3RlbSBhbmQgdXNlZCBpdCB0
+byBydW4gbW9zdCBXaW4zMiBwcm9ncmFtcy4gTm93IEkgd2FudCB0byAgdXNlIGl0IG9uIHRoZSBu
+b24gWDg2IENQVVMgYnkgUUVNVS4gQnV0IEkgY2FuJ3QgZ2V0IHRoZSBmdW5jdGlvbiB0byBpbnN0
+YWxsIGFuZCB1c2UgdGhlIFdpbmUuIFBsZWFzZSBnaXZlIG1lIHNvbWUgYWR2aWNlCj4+IG9yIHNv
+bWUgZnVuY3Rpb25zIHRvIGZpbmlzaCBpdC4gVGhhbmtzIGEgbG90Lgo+Cj5JJ20gYWZyYWlkIHlv
+dSB3aWxsIG5lZWQgdG8gcHJvdmlkZSBtb3JlIGRldGFpbCBmb3IgdXMgdG8KPmhlbHAgaGVyZS4g
+V2hhdCBleGFjdGx5IGFyZSB5b3UgZG9pbmc/IFdoaWNoIGNvbW1hbmRzIGFyZSB5b3UKPnJ1bm5p
+bmc/IFdoYXQgaXMgdGhlIGV4YWN0IGVycm9yIG1lc3NhZ2Ugb3IgZmFpbHVyZSB5b3Ugc2VlPwoK
+CgpJIGhhdmUgaW5zdGFsbGVkIHRoZSBXaW5lIGluIExpbnV4KGZlZG9yYSkgb24gdGhlIFg4NiBD
+UFVzIGZyb20gdGhlIHNvdXJjZSBjb2RlLiBDYW4gSSBjb3B5IHRoZSByZWxhdGVkIGZpbGUgb2Yg
+V2luZSBmcm9tIHRoZSBMaW51eCBvbiBYODYgQ1BVcyB0byB0aGUgTGludXggb24gdGhlIG5vbiBY
+ODYgQ1BVUyBmb3IgcnVubmluZyB0aGUgY29tbWFuZCAid2luZSIgb3IgIndpbmVjZmciLgoKCj4+
+ICAgIE1lYW53aGlsZSwgSSB1c2UgdGhlIGNvbW1hbmQgInFlbXUtaTM4Ni9xZW11LXg4Nl82NCAq
+LnNoIiB0bwo+PiBydW4gdGhlIGFwcGxpY2F0aW9uIGZyb20gdGhlIFg4NiBDUFVTIG9uIG5vbiBY
+ODYgQ1BVUywgSSBnZXQgdGhlCj4+IGVycm9yIGluZm9ybWF0aW9uOiJJbnZhbGlkIEVMRiBpbWFn
+ZSBmb3IgdGhpcyBhcmNoaXRlY3R1cmUiLiBXaHkKPj4gdGhlIGVycm9yIGlzIGNvbW1pbmc/IFdo
+YXQgY2FuIEkgZG8gdG8gcmVzb2x2ZSB0aGlzIHByb2JsZW0/Cj4KPlRoaXMgaXMgcHJvYmFibHkg
+YmVjYXVzZSB5b3UgYXJlIHRyeWluZyB0byBydW4gYSBzaGVsbCBzY3JpcHQuCj4oSSdtIGd1ZXNz
+aW5nIHRoaXMgZnJvbSB0aGUgJy5zaCcgZXh0ZW5zaW9uKS4gVGhpcyB3b24ndCB3b3JrLgo+UUVN
+VSBvbmx5IHJ1bnMgYWN0dWFsIGV4ZWN1dGFibGVzIChFTEYgZmlsZXMpLgoKVGhhdCBpcyBteSBm
+YXVsdC4gSSBkb24ndCBydW4gdGhlICouc2ggZmlsZS4gSSBjb3B5IHRoZSBmaWxlICIvYmluL2xz
+IiBmcm9tIHRoZSBMaW51eCBvbiB4ODYgQ1BVcyB0byB0aGUgTGludXggb24gbm9uIFg4NiBDUFVz
+LiBJIHB1dCB0aGUgZmlsZSBpbiB0aGUgbmV3IGNyZWF0ZWQgZGlyZWN0b3J5LCBzdWNoIGFzICIv
+aG9tZS9hZG1pbi91c2VyL3Rlc3QvIi4KVGhlbiBJIHJ1biB0aGUgZXhlY3V0YWJsZSBmaWxlLHVz
+aW5nICJxZW11LWkzODYgLi9scyIsIEkgZ2V0IHRoZSBmb2xsb3dpbmcgZXJyb3I6ICIuL2xzOiBl
+cnJvciB3aGlsZSBsb2FkaW5nIHNoYXJlZCBsaWJyYXJpZXM6IGxpYnNlbGludXguc28uMTogY2Fu
+bm90IG9wZW4gc2hhcmVkIG9iamVjdCBmaWxlOiBObyBzdWNoIGZpbGUgb3IgZGlyZWN0b3J5LiIK
+SG93IGNhbiBJIHJlc29sdmUgdGhpcyAgcHJvYmxlbT8gCgoKPlVzdWFsbHkgdGhlIHNldHVwIGlz
+IHRoYXQgdGhlIGhvc3QgTGludXggc3lzdGVtIGlzIHNldCB1cAo+d2l0aCBiaW5mbXQtbWlzYywg
+c28gdGhhdCBpZiBpdCBlbmNvdW50ZXJzIGEgZ3Vlc3QtYXJjaGl0ZWN0dXJlCj5iaW5hcnkgaXQg
+d2lsbCBhdXRvbWF0aWNhbGx5IHJ1biBpdCB1bmRlciBRRU1VLiBVc3VhbGx5Cj50aGlzIGlzIGRv
+bmUgdG8gYWxsb3cgcnVubmluZyBndWVzdCBiaW5hcmllcyBpbnNpZGUgYSBjaHJvb3QuCj4KPnRo
+YW5rcwoKPi0tIFBNTQoKClRoYW5rcyBhIGxvdC4KLS1XYW5nSmkKCgoK
