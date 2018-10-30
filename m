@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47438)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gHVJo-0002IN-HC
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:48:38 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gHVPg-0000lh-Jo
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:54:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gHVJW-0004me-78
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:48:23 -0400
-Received: from mail-bn3nam01on0108.outbound.protection.outlook.com
-	([104.47.33.108]:6127
-	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1gHVJW-0004iF-1W
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:48:14 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Tue, 30 Oct 2018 14:48:08 +0000
-Message-ID: <BN6PR2201MB125136875C6C4CCFC2B2DF62C6CC0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <BN6PR2201MB1251EA1F1F5E486A889A827CC6CC0@BN6PR2201MB1251.namprd22.prod.outlook.com>,
-	<e1aa7445-8eb5-f63c-ad85-7ad9c25d8ac5@redhat.com>
-In-Reply-To: <e1aa7445-8eb5-f63c-ad85-7ad9c25d8ac5@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <ehabkost@redhat.com>) id 1gHVPb-0002Mz-HQ
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:54:36 -0400
+Date: Tue, 30 Oct 2018 11:54:07 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181030145407.GV3902@habkost.net>
+References: <20181030111348.14713-1-kraxel@redhat.com>
+	<20181030111348.14713-2-kraxel@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] Question: Perfecting checkpatch.pl
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181030111348.14713-2-kraxel@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/4] add QemuSupportState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,13 +23,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "stefanha@redhat.com" <stefanha@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>, Markus Armbruster <armbru@redhat.com>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>
+
+On Tue, Oct 30, 2018 at 12:13:45PM +0100, Gerd Hoffmann wrote:
+> Indicates support state for somerhing (device, backend, subsystem, ...)
+> in qemu.  Modeled roughly after the "S:" states we have in MAINTANERS.
+> 
+
+Personally, I would prefer to start with a very simple data model
+(e.g. a 'deprecated' boolean flag), instead of trying to model
+every possibility in the first version.
+
+With a detailed maintenance status flag, the meaning of the
+values would be confusing for somebody using a downstream
+distribution of QEMU.  Would it reflect upstream maintenance
+status, or downstream vendor guarantees about support?  Would
+downstream vendors be required to patch QEMU to update
+DeviceClass::supported on every device they ship?  I think this
+would cause confusion and require extra work for every downstream
+vendor, and not solve any real world problems.
+
+A 'deprecated' flag could still require extra work, but only in a
+few specific cases: deprecated devices are the exception, not the
+rule, and downstream vendors would only need to touch device code
+if their deprecation status is different from upstream.
 
 
-> From: Paolo Bonzini <pbonzini@redhat.com>
->
-> Sure, both are good ideas.  Can you write a patch for it?
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+[...]
+> +
+> +##
+> +# @SupportState:
+> +#
+> +# Indicate Support level of qemu devices, backends, subsystems, ...
 
-I would rather not, I prefer to see it as a black box.
+If we're following that path, I would like to get each possible
+value for this enum to be clearly documented.  Especially
+considering that this don't match the list on MAINTAINERS
+exactly.
 
-Aleksandar=
+For example, I don't understand the difference between "obsolete"
+and "deprecated".
+
+> +#
+> +# Since: 3.2
+> +##
+> +{ 'enum': 'SupportState',
+> +  'data': [ 'unknown',
+> +            'supported',
+> +            'maintained',
+> +            'odd-fixes',
+> +            'orphan',
+> +            'obsolete',
+> +            'deprecated' ] }
+> diff --git a/util/Makefile.objs b/util/Makefile.objs
+> index 0820923c18..6e5f8faf82 100644
+> --- a/util/Makefile.objs
+> +++ b/util/Makefile.objs
+> @@ -50,5 +50,6 @@ util-obj-y += range.o
+>  util-obj-y += stats64.o
+>  util-obj-y += systemd.o
+>  util-obj-y += iova-tree.o
+> +util-obj-y += support-state.o
+>  util-obj-$(CONFIG_LINUX) += vfio-helpers.o
+>  util-obj-$(CONFIG_OPENGL) += drm.o
+> -- 
+> 2.9.3
+> 
+
+-- 
+Eduardo
