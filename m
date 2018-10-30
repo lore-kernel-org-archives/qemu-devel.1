@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1gHL3N-0003OM-VI
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 23:50:54 -0400
+	(envelope-from <liq3ea@gmail.com>) id 1gHLeM-0002R0-OK
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 00:29:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1gHL3K-0006gY-83
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 23:50:53 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:34088)
+	(envelope-from <liq3ea@gmail.com>) id 1gHLeL-0001ib-R8
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 00:29:06 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:43885)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1gHL3K-0006fp-0f
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 23:50:50 -0400
-Received: by mail-pl1-x641.google.com with SMTP id f10-v6so4847710plr.1
-	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 20:50:49 -0700 (PDT)
-From: Zhang Chen <zhangckid@gmail.com>
-Date: Tue, 30 Oct 2018 11:50:30 +0800
-Message-Id: <20181030035030.4542-1-zhangckid@gmail.com>
-Subject: [Qemu-devel] [PATCH] net/filter-rewirter.c: Fix coverity static
- analysis issue
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1gHLeL-0001hw-JY
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 00:29:05 -0400
+Received: by mail-pf1-x442.google.com with SMTP id h4-v6so5125989pfi.10
+	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 21:29:05 -0700 (PDT)
+From: Li Qiang <liq3ea@gmail.com>
+Date: Mon, 29 Oct 2018 21:28:51 -0700
+Message-Id: <1540873732-3503-2-git-send-email-liq3ea@gmail.com>
+In-Reply-To: <1540873732-3503-1-git-send-email-liq3ea@gmail.com>
+References: <1540873732-3503-1-git-send-email-liq3ea@gmail.com>
+Subject: [Qemu-devel] [PATCH v2 1/2] tests: fw_cfg: add a function to get
+ the fw_cfg file entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,36 +26,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>
-Cc: Zhang Chen <zhangckid@gmail.com>, Zhang Chen <chen.zhang@intel.com>
+To: pbonzini@redhat.com, thuth@redhat.com, lvivier@redhat.com, philmd@redhat.com
+Cc: qemu-devel@nongnu.org, Li Qiang <liq3ea@gmail.com>
 
-The original code just follow the TCP state diagram,
-but in this case, we can skip the TCPS_TIME_WAIT state to simplify
-the implementation.
+This is useful to write qtest about fw_cfg file entry.
 
-Signed-off-by: Zhang Chen <zhangckid@gmail.com>
+Signed-off-by: Li Qiang <liq3ea@gmail.com>
 ---
- net/filter-rewriter.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ tests/libqos/fw_cfg.c | 33 +++++++++++++++++++++++++++++++++
+ tests/libqos/fw_cfg.h |  2 ++
+ 2 files changed, 35 insertions(+)
 
-diff --git a/net/filter-rewriter.c b/net/filter-rewriter.c
-index bb8f4d93b1..2e26839bc2 100644
---- a/net/filter-rewriter.c
-+++ b/net/filter-rewriter.c
-@@ -155,12 +155,13 @@ static int handle_primary_tcp_pkt(RewriterState *rf,
-          * Active close step 2.
-          */
-         if (conn->tcp_state == TCPS_FIN_WAIT_1) {
--            conn->tcp_state = TCPS_TIME_WAIT;
-             /*
-              * For simplify implementation, we needn't wait 2MSL time
-              * in filter rewriter. Because guest kernel will track the
-              * TCP status and wait 2MSL time, if client resend the FIN
-              * packet, guest will apply the last ACK too.
-+             * So, we skip the TCPS_TIME_WAIT state here and go straight
-+             * to TCPS_CLOSED state.
-              */
-             conn->tcp_state = TCPS_CLOSED;
-             g_hash_table_remove(rf->connection_track_table, key);
+diff --git a/tests/libqos/fw_cfg.c b/tests/libqos/fw_cfg.c
+index d0889d1e22..45338655f4 100644
+--- a/tests/libqos/fw_cfg.c
++++ b/tests/libqos/fw_cfg.c
+@@ -16,6 +16,7 @@
+ #include "libqos/fw_cfg.h"
+ #include "libqtest.h"
+ #include "qemu/bswap.h"
++#include "standard-headers/linux/qemu_fw_cfg.h"
+ 
+ void qfw_cfg_select(QFWCFG *fw_cfg, uint16_t key)
+ {
+@@ -54,6 +55,38 @@ uint64_t qfw_cfg_get_u64(QFWCFG *fw_cfg, uint16_t key)
+     return le64_to_cpu(value);
+ }
+ 
++size_t qfw_cfg_get_file(QFWCFG *fw_cfg, const char *filename,
++                      void *data, size_t buflen)
++{
++    uint32_t count;
++    uint32_t i;
++    unsigned char *filesbuf = NULL;
++    uint32_t dsize;
++    struct fw_cfg_file *p;
++    size_t filesize = 0;
++
++    qfw_cfg_get(fw_cfg, FW_CFG_FILE_DIR, &count, sizeof(count));
++    count = be32_to_cpu(count);
++    dsize = sizeof(uint32_t) + count * sizeof(struct fw_cfg_file);
++    filesbuf = g_malloc0(dsize);
++    qfw_cfg_get(fw_cfg, FW_CFG_FILE_DIR, filesbuf, dsize);
++    p = (struct fw_cfg_file *)(filesbuf + 4);
++    for (i = 0; i < count; ++i, ++p) {
++        if (!strcmp(p->name, filename)) {
++            uint32_t len = be32_to_cpu(p->size);
++            uint16_t sel = be16_to_cpu(p->select);
++            filesize = len;
++            if (len > buflen) {
++                len = buflen;
++            }
++            qfw_cfg_get(fw_cfg, sel, data, len);
++            break;
++        }
++    }
++    g_free(filesbuf);
++    return filesize;
++}
++
+ static void mm_fw_cfg_select(QFWCFG *fw_cfg, uint16_t key)
+ {
+     qtest_writew(fw_cfg->qts, fw_cfg->base, key);
+diff --git a/tests/libqos/fw_cfg.h b/tests/libqos/fw_cfg.h
+index 0353416af0..de73722e67 100644
+--- a/tests/libqos/fw_cfg.h
++++ b/tests/libqos/fw_cfg.h
+@@ -31,6 +31,8 @@ void qfw_cfg_get(QFWCFG *fw_cfg, uint16_t key, void *data, size_t len);
+ uint16_t qfw_cfg_get_u16(QFWCFG *fw_cfg, uint16_t key);
+ uint32_t qfw_cfg_get_u32(QFWCFG *fw_cfg, uint16_t key);
+ uint64_t qfw_cfg_get_u64(QFWCFG *fw_cfg, uint16_t key);
++size_t qfw_cfg_get_file(QFWCFG *fw_cfg, const char *filename,
++                      void *data, size_t buflen);
+ 
+ QFWCFG *mm_fw_cfg_init(QTestState *qts, uint64_t base);
+ QFWCFG *io_fw_cfg_init(QTestState *qts, uint16_t base);
 -- 
-2.17.GIT
+2.11.0
