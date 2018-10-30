@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53394)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53397)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gHVcd-0005tr-HG
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:08:01 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gHVcd-0005tw-HR
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:08:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gHVcZ-0006Bs-B1
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gHVca-0006HL-FQ
 	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:07:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:27880)
+Received: from mx1.redhat.com ([209.132.183.28]:32782)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gHVcX-00058I-Jy
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:07:54 -0400
+	id 1gHVca-0005MP-3O
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:07:56 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 30 Oct 2018 19:04:50 +0400
-Message-Id: <20181030150453.9344-8-marcandre.lureau@redhat.com>
+Date: Tue, 30 Oct 2018 19:04:51 +0400
+Message-Id: <20181030150453.9344-9-marcandre.lureau@redhat.com>
 In-Reply-To: <20181030150453.9344-1-marcandre.lureau@redhat.com>
 References: <20181030150453.9344-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 07/10] qom/object: add set_globals flags
+Subject: [Qemu-devel] [PATCH v2 08/10] tests: add user-creatable test to
+ test-qdev-global-props
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,112 +31,246 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Amit Shah <amit@kernel.org>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, dgilbert@redhat.com, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Guard against calling object_property_set_globals() for all objects,
-check that the class flag set_globals is set before. No need to guard
-in object_property_set_globals() anymore.
+Add a TYPE_USER_CREATABLE object global property check.
 
-Only QDev & user-creatable objects have set_globals set at this point.
+Rename the test, since it is no longer QDev-specific.
 
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- include/qom/object.h    | 1 +
- hw/core/qdev.c          | 1 +
- qom/globals.c           | 5 -----
- qom/object.c            | 5 ++++-
- qom/object_interfaces.c | 7 +++++++
- 5 files changed, 13 insertions(+), 6 deletions(-)
+ ...dev-global-props.c =3D> test-global-props.c} | 128 ++++++++++++++++--
+ tests/Makefile.include                        |   4 +-
+ 2 files changed, 117 insertions(+), 15 deletions(-)
+ rename tests/{test-qdev-global-props.c =3D> test-global-props.c} (74%)
 
-diff --git a/include/qom/object.h b/include/qom/object.h
-index f0b0bf39cc..205099bc7e 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -400,6 +400,7 @@ struct ObjectClass
-     ObjectUnparent *unparent;
+diff --git a/tests/test-qdev-global-props.c b/tests/test-global-props.c
+similarity index 74%
+rename from tests/test-qdev-global-props.c
+rename to tests/test-global-props.c
+index 08e7f5c8e5..df047bfa1c 100644
+--- a/tests/test-qdev-global-props.c
++++ b/tests/test-global-props.c
+@@ -27,7 +27,100 @@
+ #include "hw/qdev.h"
+ #include "qom/object.h"
+ #include "qapi/visitor.h"
++#include "qom/object_interfaces.h"
 =20
-     GHashTable *properties;
-+    bool set_globals;
- };
-=20
- /**
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 6a25fa027c..78ce9a3095 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -1042,6 +1042,7 @@ static void device_class_init(ObjectClass *class, v=
-oid *data)
-      */
-     dc->hotpluggable =3D true;
-     dc->user_creatable =3D true;
-+    class->set_globals =3D true;
- }
-=20
- void device_class_set_parent_reset(DeviceClass *dc,
-diff --git a/qom/globals.c b/qom/globals.c
-index 8664baebe0..e94e6f2bf9 100644
---- a/qom/globals.c
-+++ b/qom/globals.c
-@@ -18,11 +18,6 @@ void object_property_set_globals(Object *obj)
-     GList *l;
-     DeviceState *dev =3D (DeviceState *)object_dynamic_cast(obj, TYPE_DE=
-VICE);
-=20
--    if (!dev && !IS_USER_CREATABLE(obj)) {
--        /* only TYPE_DEVICE and TYPE_USER_CREATABLE support globals */
--        return;
--    }
--
-     for (l =3D global_props; l; l =3D l->next) {
-         GlobalProperty *prop =3D l->data;
-         Error *err =3D NULL;
-diff --git a/qom/object.c b/qom/object.c
-index 7300878125..c18e630159 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -259,6 +259,7 @@ static void type_initialize_interface(TypeImpl *ti, T=
-ypeImpl *interface_type,
-=20
-     ti->class->interfaces =3D g_slist_append(ti->class->interfaces,
-                                            iface_impl->class);
-+    ti->class->set_globals |=3D iface_impl->class->set_globals;
- }
-=20
- static void object_property_free(gpointer data)
-@@ -391,7 +392,9 @@ static void object_initialize_with_type(void *data, s=
-ize_t size, TypeImpl *type)
-                                             NULL, object_property_free);
-     object_init_with_type(obj, type);
-     object_post_init_with_type(obj, type);
--    object_property_set_globals(obj);
-+    if (object_get_class(obj)->set_globals) {
-+        object_property_set_globals(obj);
-+    }
- }
-=20
- void object_initialize(void *data, size_t size, const char *typename)
-diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
-index db85d1eb75..67886845e7 100644
---- a/qom/object_interfaces.c
-+++ b/qom/object_interfaces.c
-@@ -184,12 +184,19 @@ void user_creatable_cleanup(void)
-     object_unparent(object_get_objects_root());
- }
-=20
-+static void user_creatable_class_init(ObjectClass *klass, void *data)
++#define TYPE_DUMMY "qemu-dummy"
++
++typedef struct DummyObject DummyObject;
++typedef struct DummyObjectClass DummyObjectClass;
++
++#define DUMMY_OBJECT(obj)                           \
++    OBJECT_CHECK(DummyObject, (obj), TYPE_DUMMY)
++
++struct DummyObject {
++    Object parent_obj;
++
++    char *sv;
++};
++
++struct DummyObjectClass {
++    ObjectClass parent_class;
++};
++
++static void dummy_set_sv(Object *obj,
++                         const char *value,
++                         Error **errp)
 +{
-+    klass->set_globals =3D true;
++    DummyObject *dobj =3D DUMMY_OBJECT(obj);
++
++    g_free(dobj->sv);
++    dobj->sv =3D g_strdup(value);
++}
++
++static char *dummy_get_sv(Object *obj,
++                          Error **errp)
++{
++    DummyObject *dobj =3D DUMMY_OBJECT(obj);
++
++    return g_strdup(dobj->sv);
 +}
 +
 +
- static void register_types(void)
- {
-     static const TypeInfo uc_interface_info =3D {
-         .name          =3D TYPE_USER_CREATABLE,
-         .parent        =3D TYPE_INTERFACE,
-         .class_size =3D sizeof(UserCreatableClass),
-+        .class_init =3D user_creatable_class_init,
-     };
++
++static void dummy_class_init(ObjectClass *cls, void *data)
++{
++    object_class_property_add_str(cls, "sv",
++                                  dummy_get_sv,
++                                  dummy_set_sv,
++                                  NULL);
++}
++
++
++static void dummy_finalize(Object *obj)
++{
++    DummyObject *dobj =3D DUMMY_OBJECT(obj);
++
++    g_free(dobj->sv);
++}
++
++
++static const TypeInfo dummy_info =3D {
++    .name          =3D TYPE_DUMMY,
++    .parent        =3D TYPE_OBJECT,
++    .instance_size =3D sizeof(DummyObject),
++    .instance_finalize =3D dummy_finalize,
++    .class_size =3D sizeof(DummyObjectClass),
++    .class_init =3D dummy_class_init,
++    .interfaces =3D (InterfaceInfo[]) {
++        { TYPE_USER_CREATABLE },
++        { }
++    }
++};
++
++static void test_global_props_uc_subprocess(void)
++{
++    DummyObject *d;
++    static GlobalProperty gp =3D {
++        TYPE_DUMMY, "sv", "foobar",
++    };
++
++    d =3D DUMMY_OBJECT(object_new(TYPE_DUMMY));
++    g_assert_null(d->sv);
++    object_unref(OBJECT(d));
++
++    object_property_register_global(&gp);
++    d =3D DUMMY_OBJECT(object_new(TYPE_DUMMY));
++    g_assert_cmpstr(d->sv, =3D=3D, "foobar");
++    object_unref(OBJECT(d));
++}
++
++static void test_global_props_uc(void)
++{
++    g_test_trap_subprocess("/global-props/usercreatable/subprocess", 0, =
+0);
++    g_test_trap_assert_passed();
++    g_test_trap_assert_stderr("");
++    g_test_trap_assert_stdout("");
++}
 =20
-     type_register_static(&uc_interface_info);
+ #define TYPE_STATIC_PROPS "static_prop_type"
+ #define STATIC_TYPE(obj) \
+@@ -83,7 +176,8 @@ static void test_static_prop_subprocess(void)
+=20
+ static void test_static_prop(void)
+ {
+-    g_test_trap_subprocess("/qdev/properties/static/default/subprocess",=
+ 0, 0);
++    g_test_trap_subprocess("/global-props/qdev/static/default/subprocess=
+",
++                           0, 0);
+     g_test_trap_assert_passed();
+     g_test_trap_assert_stderr("");
+     g_test_trap_assert_stdout("");
+@@ -119,7 +213,7 @@ static void test_static_globalprop_subprocess(void)
+=20
+ static void test_static_globalprop(void)
+ {
+-    g_test_trap_subprocess("/qdev/properties/static/global/subprocess", =
+0, 0);
++    g_test_trap_subprocess("/global-props/qdev/static/global/subprocess"=
+, 0, 0);
+     g_test_trap_assert_passed();
+     g_test_trap_assert_stderr("");
+     g_test_trap_assert_stdout("");
+@@ -245,7 +339,8 @@ static void test_dynamic_globalprop_subprocess(void)
+=20
+ static void test_dynamic_globalprop(void)
+ {
+-    g_test_trap_subprocess("/qdev/properties/dynamic/global/subprocess",=
+ 0, 0);
++    g_test_trap_subprocess("/global-props/qdev/dynamic/global/subprocess=
+",
++                           0, 0);
+     g_test_trap_assert_passed();
+     g_test_trap_assert_stderr_unmatched("*prop1*");
+     g_test_trap_assert_stderr_unmatched("*prop2*");
+@@ -290,7 +385,8 @@ static void test_dynamic_globalprop_nouser_subprocess=
+(void)
+=20
+ static void test_dynamic_globalprop_nouser(void)
+ {
+-    g_test_trap_subprocess("/qdev/properties/dynamic/global/nouser/subpr=
+ocess", 0, 0);
++    g_test_trap_subprocess("/global-props/qdev"
++                           "/dynamic/global/nouser/subprocess", 0, 0);
+     g_test_trap_assert_passed();
+     g_test_trap_assert_stderr("");
+     g_test_trap_assert_stdout("");
+@@ -323,6 +419,7 @@ int main(int argc, char **argv)
+     g_test_init(&argc, &argv, NULL);
+=20
+     module_call_init(MODULE_INIT_QOM);
++    type_register_static(&dummy_info);
+     type_register_static(&static_prop_type);
+     type_register_static(&subclass_type);
+     type_register_static(&dynamic_prop_type);
+@@ -330,27 +427,32 @@ int main(int argc, char **argv)
+     type_register_static(&nohotplug_type);
+     type_register_static(&nondevice_type);
+=20
+-    g_test_add_func("/qdev/properties/static/default/subprocess",
++    g_test_add_func("/global-props/usercreatable/subprocess",
++                    test_global_props_uc_subprocess);
++    g_test_add_func("/global-props/usercreatable",
++                    test_global_props_uc);
++
++    g_test_add_func("/global-props/qdev/static/default/subprocess",
+                     test_static_prop_subprocess);
+-    g_test_add_func("/qdev/properties/static/default",
++    g_test_add_func("/global-props/qdev/static/default",
+                     test_static_prop);
+=20
+-    g_test_add_func("/qdev/properties/static/global/subprocess",
++    g_test_add_func("/global-props/qdev/static/global/subprocess",
+                     test_static_globalprop_subprocess);
+-    g_test_add_func("/qdev/properties/static/global",
++    g_test_add_func("/global-props/qdev/static/global",
+                     test_static_globalprop);
+=20
+-    g_test_add_func("/qdev/properties/dynamic/global/subprocess",
++    g_test_add_func("/global-props/qdev/dynamic/global/subprocess",
+                     test_dynamic_globalprop_subprocess);
+-    g_test_add_func("/qdev/properties/dynamic/global",
++    g_test_add_func("/global-props/qdev/dynamic/global",
+                     test_dynamic_globalprop);
+=20
+-    g_test_add_func("/qdev/properties/dynamic/global/nouser/subprocess",
++    g_test_add_func("/global-props/qdev/dynamic/global/nouser/subprocess=
+",
+                     test_dynamic_globalprop_nouser_subprocess);
+-    g_test_add_func("/qdev/properties/dynamic/global/nouser",
++    g_test_add_func("/global-props/qdev/dynamic/global/nouser",
+                     test_dynamic_globalprop_nouser);
+=20
+-    g_test_add_func("/qdev/properties/global/subclass",
++    g_test_add_func("/global-props/qdev/global/subclass",
+                     test_subclass_global_props);
+=20
+     g_test_run();
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index f77a495109..446de4afda 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -88,7 +88,7 @@ check-unit-y +=3D tests/test-qht$(EXESUF)
+ check-unit-y +=3D tests/test-qht-par$(EXESUF)
+ check-unit-y +=3D tests/test-bitops$(EXESUF)
+ check-unit-y +=3D tests/test-bitcnt$(EXESUF)
+-check-unit-y +=3D tests/test-qdev-global-props$(EXESUF)
++check-unit-y +=3D tests/test-global-props$(EXESUF)
+ check-unit-y +=3D tests/check-qom-interface$(EXESUF)
+ check-unit-y +=3D tests/check-qom-proplist$(EXESUF)
+ check-unit-y +=3D tests/test-qemu-opts$(EXESUF)
+@@ -557,7 +557,7 @@ tests/atomic64-bench$(EXESUF): tests/atomic64-bench.o=
+ $(test-util-obj-y)
+ tests/fp/%:
+ 	$(MAKE) -C $(dir $@) $(notdir $@)
+=20
+-tests/test-qdev-global-props$(EXESUF): tests/test-qdev-global-props.o \
++tests/test-global-props$(EXESUF): tests/test-global-props.o \
+ 	hw/core/qdev.o hw/core/qdev-properties.o hw/core/hotplug.o\
+ 	hw/core/bus.o \
+ 	hw/core/irq.o \
 --=20
 2.19.0.271.gfe8321ec05
