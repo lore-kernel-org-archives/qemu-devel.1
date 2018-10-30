@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46281)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHVGB-0007W8-9B
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:44:48 -0400
+	(envelope-from <flukshun@gmail.com>) id 1gHVG8-0007Va-R3
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:44:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHVG9-0000Dm-6V
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:44:47 -0400
-Received: from mail-qt1-x833.google.com ([2607:f8b0:4864:20::833]:33588)
+	(envelope-from <flukshun@gmail.com>) id 1gHVG6-00007V-TK
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:44:44 -0400
+Received: from mail-qt1-x832.google.com ([2607:f8b0:4864:20::832]:46270)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHVG8-0000B8-R3
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:44:45 -0400
-Received: by mail-qt1-x833.google.com with SMTP id i15-v6so13758995qtr.0
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 07:44:44 -0700 (PDT)
+	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHVG6-0008HR-Lk
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:44:42 -0400
+Received: by mail-qt1-x832.google.com with SMTP id c16-v6so13683820qtj.13
+	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 07:44:27 -0700 (PDT)
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue, 30 Oct 2018 09:43:49 -0500
-Message-Id: <20181030144358.23144-16-mdroth@linux.vnet.ibm.com>
+Date: Tue, 30 Oct 2018 09:43:44 -0500
+Message-Id: <20181030144358.23144-11-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20181030144358.23144-1-mdroth@linux.vnet.ibm.com>
 References: <20181030144358.23144-1-mdroth@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 15/24] qga-win: return disk device in
- guest-get-fsinfo
+Subject: [Qemu-devel] [PULL 10/24] qga-win: add debugging information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,83 +32,105 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
 
-From: Tomáš Golembiovský <tgolembi@redhat.com>
-
-Report device UNC of the disk. It is reported as "\\.\PhysicalDriveX".
+The windows code generaly lacks debug information (compared to posix
+code). This patch adds some related to HW info in guest-get-fsinfo
+command.
 
 Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- qga/commands-win32.c | 21 +++++++++++----------
- 1 file changed, 11 insertions(+), 10 deletions(-)
+ qga/commands-win32.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
 diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-index 90432bbfce..30d6c639c3 100644
+index 4fe1517778..1a21aac5ad 100644
 --- a/qga/commands-win32.c
 +++ b/qga/commands-win32.c
-@@ -684,8 +684,7 @@ out_free:
-     return;
- }
+@@ -89,6 +89,12 @@ static OpenFlags guest_file_open_modes[] = {
+     {"a+b", FILE_GENERIC_APPEND|GENERIC_READ, OPEN_ALWAYS  }
+ };
  
--static void get_single_disk_info(char *name, GuestDiskAddress *disk,
--    Error **errp)
-+static void get_single_disk_info(GuestDiskAddress *disk, Error **errp)
- {
-     SCSI_ADDRESS addr, *scsi_ad;
-     DWORD len;
-@@ -694,8 +693,8 @@ static void get_single_disk_info(char *name, GuestDiskAddress *disk,
- 
-     scsi_ad = &addr;
- 
--    g_debug("getting disk info for: %s", name);
--    disk_h = CreateFile(name, 0, FILE_SHARE_READ, NULL, OPEN_EXISTING,
-+    g_debug("getting disk info for: %s", disk->dev);
-+    disk_h = CreateFile(disk->dev, 0, FILE_SHARE_READ, NULL, OPEN_EXISTING,
-                        0, NULL);
-     if (disk_h == INVALID_HANDLE_VALUE) {
-         error_setg_win32(errp, GetLastError(), "failed to open disk");
-@@ -714,7 +713,7 @@ static void get_single_disk_info(char *name, GuestDiskAddress *disk,
-      * if that doesn't hold since that suggests some other unexpected
-      * breakage
-      */
--    disk->pci_controller = get_pci_info(name, &local_err);
-+    disk->pci_controller = get_pci_info(disk->dev, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         goto err_close;
-@@ -797,7 +796,9 @@ static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
-             /* Possibly CD-ROM or a shared drive. Try to pass the volume */
-             g_debug("volume not on disk");
-             disk = g_malloc0(sizeof(GuestDiskAddress));
--            get_single_disk_info(name, disk, &local_err);
-+            disk->has_dev = true;
-+            disk->dev = g_strdup(name);
-+            get_single_disk_info(disk, &local_err);
-             if (local_err) {
-                 g_debug("failed to get disk info, ignoring error: %s",
-                     error_get_pretty(local_err));
-@@ -819,7 +820,6 @@ static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
- 
-     /* Go through each extent */
-     for (i = 0; i < extents->NumberOfDiskExtents; i++) {
--        char *disk_name = NULL;
-         disk = g_malloc0(sizeof(GuestDiskAddress));
- 
-         /* Disk numbers directly correspond to numbers used in UNCs
-@@ -830,10 +830,11 @@ static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
-          * See also Naming Files, Paths and Namespaces:
-          * https://docs.microsoft.com/en-us/windows/desktop/FileIO/naming-a-file#win32-device-namespaces
-          */
--        disk_name = g_strdup_printf("\\\\.\\PhysicalDrive%lu",
-+        disk->has_dev = true;
-+        disk->dev = g_strdup_printf("\\\\.\\PhysicalDrive%lu",
-             extents->Extents[i].DiskNumber);
--        get_single_disk_info(disk_name, disk, &local_err);
--        g_free(disk_name);
++#define debug_error(msg) do { \
++    char *suffix = g_win32_error_message(GetLastError()); \
++    g_debug("%s: %s", (msg), suffix); \
++    g_free(suffix); \
++} while (0)
 +
-+        get_single_disk_info(disk, &local_err);
-         if (local_err) {
-             error_propagate(errp, local_err);
-             goto out;
+ static OpenFlags *find_open_flag(const char *mode_str)
+ {
+     int mode;
+@@ -518,6 +524,7 @@ static GuestPCIAddress *get_pci_info(char *guid, Error **errp)
+         goto out;
+     }
+ 
++    g_debug("enumerating devices");
+     dev_info_data.cbSize = sizeof(SP_DEVINFO_DATA);
+     for (i = 0; SetupDiEnumDeviceInfo(dev_info, i, &dev_info_data); i++) {
+         DWORD addr, bus, slot, data, size2;
+@@ -543,6 +550,7 @@ static GuestPCIAddress *get_pci_info(char *guid, Error **errp)
+         if (g_strcmp0(buffer, dev_name)) {
+             continue;
+         }
++        g_debug("found device %s", dev_name);
+ 
+         /* There is no need to allocate buffer in the next functions. The size
+          * is known and ULONG according to
+@@ -551,6 +559,7 @@ static GuestPCIAddress *get_pci_info(char *guid, Error **errp)
+          */
+         if (!SetupDiGetDeviceRegistryProperty(dev_info, &dev_info_data,
+                    SPDRP_BUSNUMBER, &data, (PBYTE)&bus, size, NULL)) {
++            debug_error("failed to get bus");
+             bus = -1;
+             partial_pci = true;
+         }
+@@ -559,6 +568,7 @@ static GuestPCIAddress *get_pci_info(char *guid, Error **errp)
+          * transformed into device function and number */
+         if (!SetupDiGetDeviceRegistryProperty(dev_info, &dev_info_data,
+                    SPDRP_ADDRESS, &data, (PBYTE)&addr, size, NULL)) {
++            debug_error("failed to get address");
+             addr = -1;
+             partial_pci = true;
+         }
+@@ -567,6 +577,7 @@ static GuestPCIAddress *get_pci_info(char *guid, Error **errp)
+          * This number is typically a user-perceived slot number. */
+         if (!SetupDiGetDeviceRegistryProperty(dev_info, &dev_info_data,
+                    SPDRP_UI_NUMBER, &data, (PBYTE)&slot, size, NULL)) {
++            debug_error("failed to get slot");
+             slot = -1;
+             partial_pci = true;
+         }
+@@ -639,6 +650,7 @@ static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
+     scsi_ad = &addr;
+     char *name = g_strndup(guid, strlen(guid)-1);
+ 
++    g_debug("getting disk info for: %s", name);
+     vol_h = CreateFile(name, 0, FILE_SHARE_READ, NULL, OPEN_EXISTING,
+                        0, NULL);
+     if (vol_h == INVALID_HANDLE_VALUE) {
+@@ -646,6 +658,7 @@ static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
+         goto out_free;
+     }
+ 
++    g_debug("getting bus type");
+     bus = get_disk_bus_type(vol_h, errp);
+     if (bus < 0) {
+         goto out_close;
+@@ -653,6 +666,7 @@ static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
+ 
+     disk = g_malloc0(sizeof(*disk));
+     disk->bus_type = find_bus_type(bus);
++    g_debug("bus type %d", disk->bus_type);
+     /* always set pci_controller as required by schema. get_pci_info() should
+      * report -1 values for non-PCI buses rather than fail. fail the command
+      * if that doesn't hold since that suggests some other unexpected
+@@ -672,6 +686,7 @@ static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
+         /* We are able to use the same ioctls for different bus types
+          * according to Microsoft docs
+          * https://technet.microsoft.com/en-us/library/ee851589(v=ws.10).aspx */
++        g_debug("getting pci-controller info");
+         if (DeviceIoControl(vol_h, IOCTL_SCSI_GET_ADDRESS, NULL, 0, scsi_ad,
+                             sizeof(SCSI_ADDRESS), &len, NULL)) {
+             disk->unit = addr.Lun;
 -- 
 2.17.1
