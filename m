@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46424)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHVGV-0007n7-Nj
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:45:08 -0400
+	(envelope-from <flukshun@gmail.com>) id 1gHVH4-0008Lm-BV
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:45:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHVGQ-0000cA-JF
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:45:07 -0400
-Received: from mail-qk1-x72f.google.com ([2607:f8b0:4864:20::72f]:35458)
+	(envelope-from <flukshun@gmail.com>) id 1gHVGw-0001KU-6l
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:45:41 -0400
+Received: from mail-qt1-x831.google.com ([2607:f8b0:4864:20::831]:35642)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHVGQ-0000bm-En
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:45:02 -0400
-Received: by mail-qk1-x72f.google.com with SMTP id v68-v6so7396843qka.2
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 07:45:02 -0700 (PDT)
+	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHVGn-00019g-Ql
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:45:26 -0400
+Received: by mail-qt1-x831.google.com with SMTP id a10-v6so13733158qtp.2
+	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 07:45:25 -0700 (PDT)
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue, 30 Oct 2018 09:43:35 -0500
-Message-Id: <20181030144358.23144-2-mdroth@linux.vnet.ibm.com>
+Date: Tue, 30 Oct 2018 09:43:39 -0500
+Message-Id: <20181030144358.23144-6-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20181030144358.23144-1-mdroth@linux.vnet.ibm.com>
 References: <20181030144358.23144-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PULL 01/24] qga: Support Unicode paths in
- guest-file-open on win32
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 05/24] qga: linux: report disk serial number
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,89 +30,134 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Jonathon Reinhart <jreinhart@cc-sw.com>
+Cc: peter.maydell@linaro.org, =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
 
-From: Jonathon Reinhart <jreinhart@cc-sw.com>
+From: Tomáš Golembiovský <tgolembi@redhat.com>
 
-Currently, the win32 port of QEMU Guest Agent does not properly handle Unicode
-paths. The JSON decoder produces a valid UTF-8 path string, but this is passed
-directly to CreateFileA, which is expecting an ANSI string and not UTF-8. This
-leads to mangled filenames.
+Add reporting of disk serial number on Linux guests. The feature depends
+on libudev.
 
-This patch follows the example of qmp_guest_set_user_password() and uses
-g_utf8_to_utf16() to convert the string to UTF-16 and calls CreateFileW()
-explicitly.
+Example:
 
-Signed-off-by: Jonathon Reinhart <jreinhart@cc-sw.com>
+    {
+      "name": "dm-2",
+      "mountpoint": "/",
+      ...
+      "disk": [
+        {
+          "serial": "SAMSUNG_MZ7LN512HCHP-000L1_S1ZKNXAG822493",
+          ...
+        }
+      ],
+    }
+
+Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- qga/commands-win32.c | 24 +++++++++++++++++++-----
- 1 file changed, 19 insertions(+), 5 deletions(-)
+ qga/Makefile.objs    |  1 +
+ qga/commands-posix.c | 32 ++++++++++++++++++++++++++++++--
+ qga/qapi-schema.json |  4 +++-
+ 3 files changed, 34 insertions(+), 3 deletions(-)
 
-diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-index 98d9735389..416343b97b 100644
---- a/qga/commands-win32.c
-+++ b/qga/commands-win32.c
-@@ -160,13 +160,15 @@ static void handle_set_nonblocking(HANDLE fh)
- int64_t qmp_guest_file_open(const char *path, bool has_mode,
-                             const char *mode, Error **errp)
- {
--    int64_t fd;
-+    int64_t fd = -1;
-     HANDLE fh;
-     HANDLE templ_file = NULL;
-     DWORD share_mode = FILE_SHARE_READ;
-     DWORD flags_and_attr = FILE_ATTRIBUTE_NORMAL;
-     LPSECURITY_ATTRIBUTES sa_attr = NULL;
-     OpenFlags *guest_flags;
-+    GError *gerr = NULL;
-+    wchar_t *w_path = NULL;
+diff --git a/qga/Makefile.objs b/qga/Makefile.objs
+index ed08c5917c..80e6bb3c2e 100644
+--- a/qga/Makefile.objs
++++ b/qga/Makefile.objs
+@@ -1,3 +1,4 @@
++commands-posix.o-libs := $(LIBUDEV_LIBS)
+ qga-obj-y = commands.o guest-agent-command-state.o main.o
+ qga-obj-$(CONFIG_POSIX) += commands-posix.o channel-posix.o
+ qga-obj-$(CONFIG_WIN32) += commands-win32.o channel-win32.o service-win32.o
+diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+index 42d30f078e..41bd11b2b5 100644
+--- a/qga/commands-posix.c
++++ b/qga/commands-posix.c
+@@ -48,6 +48,10 @@ extern char **environ;
+ #include <net/if.h>
+ #include <sys/statvfs.h>
  
-     if (!has_mode) {
-         mode = "r";
-@@ -175,16 +177,21 @@ int64_t qmp_guest_file_open(const char *path, bool has_mode,
-     guest_flags = find_open_flag(mode);
-     if (guest_flags == NULL) {
-         error_setg(errp, "invalid file open mode");
--        return -1;
-+        goto done;
-+    }
++#ifdef CONFIG_LIBUDEV
++#include <libudev.h>
++#endif
 +
-+    w_path = g_utf8_to_utf16(path, -1, NULL, NULL, &gerr);
-+    if (!w_path) {
-+        goto done;
-     }
+ #ifdef FIFREEZE
+ #define CONFIG_FSFREEZE
+ #endif
+@@ -872,6 +876,10 @@ static void build_guest_fsinfo_for_real_device(char const *syspath,
+     GuestDiskAddressList *list = NULL;
+     bool has_ata = false, has_host = false, has_tgt = false;
+     char *p, *q, *driver = NULL;
++#ifdef CONFIG_LIBUDEV
++    struct udev *udev = NULL;
++    struct udev_device *udevice = NULL;
++#endif
  
--    fh = CreateFile(path, guest_flags->desired_access, share_mode, sa_attr,
-+    fh = CreateFileW(w_path, guest_flags->desired_access, share_mode, sa_attr,
-                     guest_flags->creation_disposition, flags_and_attr,
-                     templ_file);
-     if (fh == INVALID_HANDLE_VALUE) {
-         error_setg_win32(errp, GetLastError(), "failed to open file '%s'",
-                          path);
--        return -1;
-+        goto done;
-     }
+     p = strstr(syspath, "/devices/pci");
+     if (!p || sscanf(p + 12, "%*x:%*x/%x:%x:%x.%x%n",
+@@ -936,6 +944,21 @@ static void build_guest_fsinfo_for_real_device(char const *syspath,
+     list = g_malloc0(sizeof(*list));
+     list->value = disk;
  
-     /* set fd non-blocking to avoid common use cases (like reading from a
-@@ -196,10 +203,17 @@ int64_t qmp_guest_file_open(const char *path, bool has_mode,
-     if (fd < 0) {
-         CloseHandle(fh);
-         error_setg(errp, "failed to add handle to qmp handle table");
--        return -1;
-+        goto done;
-     }
- 
-     slog("guest-file-open, handle: % " PRId64, fd);
-+
-+done:
-+    if (gerr) {
-+        error_setg(errp, QERR_QGA_COMMAND_FAILED, gerr->message);
-+        g_error_free(gerr);
++#ifdef CONFIG_LIBUDEV
++    udev = udev_new();
++    udevice = udev_device_new_from_syspath(udev, syspath);
++    if (udev == NULL || udevice == NULL) {
++        g_debug("failed to query udev");
++    } else {
++        const char *serial;
++        serial = udev_device_get_property_value(udevice, "ID_SERIAL");
++        if (serial != NULL && *serial != 0) {
++            disk->serial = g_strdup(serial);
++            disk->has_serial = true;
++        }
 +    }
-+    g_free(w_path);
-     return fd;
++#endif
++
+     if (strcmp(driver, "ata_piix") == 0) {
+         /* a host per ide bus, target*:0:<unit>:0 */
+         if (!has_host || !has_tgt) {
+@@ -995,14 +1018,19 @@ static void build_guest_fsinfo_for_real_device(char const *syspath,
+ 
+     list->next = fs->disk;
+     fs->disk = list;
+-    g_free(driver);
+-    return;
++    goto out;
+ 
+ cleanup:
+     if (list) {
+         qapi_free_GuestDiskAddressList(list);
+     }
++out:
+     g_free(driver);
++#ifdef CONFIG_LIBUDEV
++    udev_unref(udev);
++    udev_device_unref(udevice);
++#endif
++    return;
  }
  
+ static void build_guest_fsinfo_for_device(char const *devpath,
+diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
+index dfbc4a5e32..3bcda6257e 100644
+--- a/qga/qapi-schema.json
++++ b/qga/qapi-schema.json
+@@ -834,13 +834,15 @@
+ # @bus: bus id
+ # @target: target id
+ # @unit: unit id
++# @serial: serial number (since: 3.1)
+ #
+ # Since: 2.2
+ ##
+ { 'struct': 'GuestDiskAddress',
+   'data': {'pci-controller': 'GuestPCIAddress',
+            'bus-type': 'GuestDiskBusType',
+-           'bus': 'int', 'target': 'int', 'unit': 'int'} }
++           'bus': 'int', 'target': 'int', 'unit': 'int',
++           '*serial': 'str'} }
+ 
+ ##
+ # @GuestFilesystemInfo:
 -- 
 2.17.1
