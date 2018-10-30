@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34714)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gHUZi-0004HI-CD
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:00:59 -0400
+	(envelope-from <laurent@vivier.eu>) id 1gHUbP-0005lX-Ut
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:02:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gHUZX-000393-Kl
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:00:54 -0400
-Date: Tue, 30 Oct 2018 15:00:30 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20181030140030.gh5aa7jcgszrfajs@sirius.home.kraxel.org>
-References: <20181030111348.14713-1-kraxel@redhat.com>
-	<20181030111348.14713-2-kraxel@redhat.com>
-	<8c224534-c929-7c7f-a126-a9390bbdb77f@redhat.com>
+	(envelope-from <laurent@vivier.eu>) id 1gHUbF-0004Lq-UW
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:02:39 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:38099)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1gHUbF-0004Kw-L7
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:02:29 -0400
+References: <1540904108-30873-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1540904108-30873-3-git-send-email-aleksandar.markovic@rt-rk.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <d94b7042-7ab7-9848-c13e-b20c114ed4fe@vivier.eu>
+Date: Tue, 30 Oct 2018 15:01:48 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <8c224534-c929-7c7f-a126-a9390bbdb77f@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/4] add QemuSupportState
+In-Reply-To: <1540904108-30873-3-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 2/3] linux-user: Add support for
+ semtimedop() syscall
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,50 +29,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, =?utf-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+Cc: aurelien@aurel32.net, arikalo@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, riku.voipio@iki.fi, ysu@wavecomp.com
 
-On Tue, Oct 30, 2018 at 02:32:40PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> Hi Gerd,
->=20
-> On 30/10/18 12:13, Gerd Hoffmann wrote:
-> > Indicates support state for somerhing (device, backend, subsystem, ..=
-.)
->=20
-> "something"
+Le 30/10/2018 à 13:55, Aleksandar Markovic a écrit :
+> From: Aleksandar Rikalo <arikalo@wavecomp.com>
+> 
+> Add support for semtimedop() emulation. It is based on invocation
+> of safe_semtimedop().
+> 
+> Conversion is left out of safe_semtimedop(), since other safe_xxx()
+> usually don't contain similar conversions.
+> 
+> Signed-off-by: Aleksandar Rikalo <arikalo@wavecomp.com>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> ---
+>  linux-user/syscall.c | 36 ++++++++++++++++++++++++++++++++++++
+>  1 file changed, 36 insertions(+)
+> 
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 1d3aaf5..709d9a7 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -6384,7 +6384,39 @@ static inline abi_long host_to_target_statx(struct target_statx *host_stx,
+>      return 0;
+>  }
+>  #endif
+> +#ifdef TARGET_NR_semtimedop
+> +static inline abi_long do_semtimedop(int semid, abi_long ptr, unsigned nsops,
+> +                                     abi_long timeout)
+> +{
+> +    struct sembuf *sops;
+> +    struct timespec ts, *pts;
+> +    abi_long ret;
+> +
+> +    if (timeout) {
+> +        pts = &ts;
+> +        if (target_to_host_timespec(pts, timeout)) {
+> +            return -TARGET_EFAULT;
+> +        }
+> +    } else {
+> +        pts = NULL;
+> +    }
+>  
+> +    sops = g_malloc(sizeof(struct sembuf) * nsops);
+> +    if (sops == NULL) {
+> +        return -TARGET_EFAULT;
+> +    }
+> +
+> +    if (target_to_host_sembuf(sops, ptr, nsops)) {
+> +        g_free(sops);
+> +        return -TARGET_EFAULT;
+> +    }
+> +
+> +    ret = get_errno(safe_semtimedop(semid, sops, nsops, pts));
+> +    g_free(sops);
+> +
+> +    return ret;
+> +}
+> +#endif
+>  
+>  /* ??? Using host futex calls even when target atomic operations
+>     are not really atomic probably breaks things.  However implementing
+> @@ -8888,6 +8920,10 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+>      case TARGET_NR_semop:
+>          return do_semop(arg1, arg2, arg3);
+>  #endif
+> +#ifdef TARGET_NR_semtimedop
+> +    case TARGET_NR_semtimedop:
+> +        return do_semtimedop(arg1, arg2, arg3, arg4);
+> +#endif
+>  #ifdef TARGET_NR_semctl
+>      case TARGET_NR_semctl:
+>          return do_semctl(arg1, arg2, arg3, arg4);
+> 
 
-Oops, I'll fix.
+To avoid duplicate code (and cleanup the stack allocation), you should
+remove do_semop()  and call do_semtimedop(..., NULL) from IPCOP_semop
+and TARGET_NR_semop.
 
-> > +##
-> > +# @SupportState:
-> > +#
-> > +# Indicate Support level of qemu devices, backends, subsystems, ...
-> > +#
-> > +# Since: 3.2
-> > +##
-> > +{ 'enum': 'SupportState',
-> > +  'data': [ 'unknown',
->=20
-> 'unknown' is scary and should be fixed.
-
-'unknown' maps to "0" due to being first in list, so this is what you
-get when it isn't explicitly set to something else.  Which make sense
-IMHO.
-
-> > +            'supported',
-> > +            'maintained',
-> > +            'odd-fixes',
->=20
-> All those fit in 'supported'
->=20
-> > +            'orphan',
-> > +            'obsolete',
-> > +            'deprecated' ] }
->=20
-> And all those should appear as 'deprecated' IMHO.
-
-See minutes on deprecation discussion.  Seems there is agreement we
-need something more finegrained than "supported" and "deprecated".
-
-cheers,
-  Gerd
+Thanks,
+Laurent
