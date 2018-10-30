@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57936)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57985)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gHS8f-0001ZL-FQ
+	(envelope-from <peter.maydell@linaro.org>) id 1gHS8g-0001aY-8T
 	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 07:24:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gHS8e-0002bE-Cl
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 07:24:49 -0400
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue, 30 Oct 2018 12:23:18 +0100
-Message-Id: <20181030112337.17973-2-laurent@vivier.eu>
-In-Reply-To: <20181030112337.17973-1-laurent@vivier.eu>
-References: <20181030112337.17973-1-laurent@vivier.eu>
+	(envelope-from <peter.maydell@linaro.org>) id 1gHS8f-0002cZ-1Q
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 07:24:50 -0400
+Received: from mail-oi1-x22f.google.com ([2607:f8b0:4864:20::22f]:36971)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gHS8e-0002XN-FC
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 07:24:48 -0400
+Received: by mail-oi1-x22f.google.com with SMTP id w66-v6so5713377oiw.4
+	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 04:24:46 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 01/20] configs/alpha: Remove unused
- CONFIG_PARALLEL_ISA switch
+In-Reply-To: <CAFEAcA9-g-h8S7wucyMw+kmrZLnkeCSqnXc8ohNW_KhNxLv7hw@mail.gmail.com>
+References: <20181025005110.249256-1-mst@redhat.com>
+	<CAFEAcA9zqAOr7F_Pu1tqxJYd=4JMHa3XgR703Mb4B9LibOGB-w@mail.gmail.com>
+	<20181025215914-mutt-send-email-mst@kernel.org>
+	<CAFEAcA9-g-h8S7wucyMw+kmrZLnkeCSqnXc8ohNW_KhNxLv7hw@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 30 Oct 2018 11:24:25 +0000
+Message-ID: <CAFEAcA-J4RmLR8kagRS3PBymFTF4qNqwE2MfbrYjNHUuXz1Tqg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v2 00/28] pci, pc, virtio: fixes, features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,35 +31,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Cleber Rosa <crosa@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-arm@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Aleksandar Markovic <amarkovic@wavecomp.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Thomas Huth <thuth@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, Aurelien Jarno <aurelien@aurel32.net>, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Stefano Stabellini <sstabellini@kernel.org>, qemu-trivial@nongnu.org, qemu-block@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, xen-devel@lists.xenproject.org, Gerd Hoffmann <kraxel@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <lvivier@redhat.com>, Michael Walle <michael@walle.cc>, Markus Armbruster <armbru@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-From: Thomas Huth <thuth@redhat.com>
+On 27 October 2018 at 19:53, Peter Maydell <peter.maydell@linaro.org> wrote:
+> It looks like the test/acpi-test-data/ in the build directory
+> has not been populated with the MCFG.mmio64 file -- some of
+> the data files have symlinks from that directory back to the
+> source directory, but some do not. This seems to be done in
+> configure, but there is nothing in the makefile rules which
+> causes configure to be rerun because there is a new file
+> in your test data directory. A manual rerun of configure
+> adds the missing symlinks and causes the test to pass.
+>
+> So I would characterise this as a makefile issue.
 
-We don't use CONFIG_PARALLEL_ISA in any of our Makefiles, so this
-is just a dead config option which can be removed.
+Is there a reason why we need to symlink all the data files
+in tests/acpi-test-data/ individually, rather than just
+having tests/acpi-test-data itself be a symlink back to
+the directory in the source tree ? That would avoid this
+problem; it's how we handle tests/acceptance and tests/data.
 
-Fixes: a4cb773928e047b137c6998209cf2eec857fac6b
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Acked-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <1540376314-5727-1-git-send-email-thuth@redhat.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- default-configs/alpha-softmmu.mak | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/default-configs/alpha-softmmu.mak b/default-configs/alpha-softmmu.mak
-index eb58b40254..4d654eaa0b 100644
---- a/default-configs/alpha-softmmu.mak
-+++ b/default-configs/alpha-softmmu.mak
-@@ -8,7 +8,6 @@ CONFIG_I82374=y
- CONFIG_I8254=y
- CONFIG_I8257=y
- CONFIG_PARALLEL=y
--CONFIG_PARALLEL_ISA=y
- CONFIG_FDC=y
- CONFIG_PCKBD=y
- CONFIG_VGA_CIRRUS=y
--- 
-2.17.2
+thanks
+-- PMM
