@@ -1,24 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gHXp1-0001Co-32
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 13:28:56 -0400
+	(envelope-from <muriloo@linux.ibm.com>) id 1gHXqN-0002Pc-QQ
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 13:30:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gHXot-0002o9-KJ
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 13:28:54 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:44249 helo=mail.rt-rk.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gHXot-0002iS-28
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 13:28:47 -0400
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue, 30 Oct 2018 18:28:16 +0100
-Message-Id: <1540920498-5133-4-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1540920498-5133-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1540920498-5133-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	(envelope-from <muriloo@linux.ibm.com>) id 1gHXqI-0003SJ-A9
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 13:30:19 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50388)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <muriloo@linux.ibm.com>)
+	id 1gHXqH-0003Rd-Rj
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 13:30:14 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w9UHTgXH080653
+	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 13:30:11 -0400
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2neufe8uhk-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 13:30:11 -0400
+Received: from localhost
+	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <muriloo@linux.ibm.com>;
+	Tue, 30 Oct 2018 13:30:10 -0400
+Date: Tue, 30 Oct 2018 14:30:02 -0300
+From: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+References: <20181030111348.14713-1-kraxel@redhat.com>
+	<20181030111348.14713-2-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 3/5] target/mips: Rename MMI-related functions
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181030111348.14713-2-kraxel@redhat.com>
+Message-Id: <20181030173002.GA4914@kermit-br-ibm-com.br.ibm.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/4] add QemuSupportState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,203 +41,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eric Blake <eblake@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Hi, Gerd.
 
-Rename MMI-related functions.
+On Tue, Oct 30, 2018 at 12:13:45PM +0100, Gerd Hoffmann wrote:
+> Indicates support state for somerhing (device, backend, subsystem, ...)
+> in qemu.  Modeled roughly after the "S:" states we have in MAINTANERS.
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  include/qemu/support-state.h | 17 +++++++++++++++++
+>  util/support-state.c         | 23 +++++++++++++++++++++++
+>  qapi/common.json             | 16 ++++++++++++++++
+>  util/Makefile.objs           |  1 +
+>  4 files changed, 57 insertions(+)
+>  create mode 100644 include/qemu/support-state.h
+>  create mode 100644 util/support-state.c
+> 
+> diff --git a/include/qemu/support-state.h b/include/qemu/support-state.h
+> new file mode 100644
+> index 0000000000..5fd3c83eee
+> --- /dev/null
+> +++ b/include/qemu/support-state.h
+> @@ -0,0 +1,17 @@
+> +#ifndef QEMU_SUPPORT_STATE_H
+> +#define QEMU_SUPPORT_STATE_H
+> +
+> +#include "qapi/qapi-types-common.h"
+> +
+> +typedef struct QemuSupportState {
+> +    SupportState state;
+> +    const char *reason;
+> +} QemuSupportState;
+> +
+> +void qemu_warn_support_state(const char *type, const char *name,
+> +                             QemuSupportState *state);
+> +
+> +bool qemu_is_deprecated(QemuSupportState *state);
+> +bool qemu_is_obsolete(QemuSupportState *state);
+> +
+> +#endif /* QEMU_SUPPORT_STATE_H */
+> diff --git a/util/support-state.c b/util/support-state.c
+> new file mode 100644
+> index 0000000000..7966fa0fc7
+> --- /dev/null
+> +++ b/util/support-state.c
+> @@ -0,0 +1,23 @@
+> +#include "qemu/osdep.h"
+> +#include "qemu/error-report.h"
+> +#include "qemu/support-state.h"
+> +
+> +void qemu_warn_support_state(const char *type, const char *name,
+> +                             QemuSupportState *state)
+> +{
+> +    warn_report("%s %s is %s%s%s%s", type, name,
+> +                SupportState_str(state->state),
+> +                state->reason ? " ("          : "",
+> +                state->reason ? state->reason : "",
+> +                state->reason ? ")"           : "");
+> +}
+> +
+> +bool qemu_is_deprecated(QemuSupportState *state)
+> +{
+> +    return state->state == SUPPORT_STATE_DEPRECATED;
+> +}
+> +
+> +bool qemu_is_obsolete(QemuSupportState *state)
+> +{
+> +    return state->state == SUPPORT_STATE_OBSOLETE;
+> +}
+> diff --git a/qapi/common.json b/qapi/common.json
+> index 021174f04e..78176151af 100644
+> --- a/qapi/common.json
+> +++ b/qapi/common.json
+> @@ -151,3 +151,19 @@
+>               'ppc64', 'riscv32', 'riscv64', 's390x', 'sh4',
+>               'sh4eb', 'sparc', 'sparc64', 'tricore', 'unicore32',
+>               'x86_64', 'xtensa', 'xtensaeb' ] }
+> +
+> +##
+> +# @SupportState:
+> +#
+> +# Indicate Support level of qemu devices, backends, subsystems, ...
+> +#
+> +# Since: 3.2
+> +##
+> +{ 'enum': 'SupportState',
+> +  'data': [ 'unknown',
+> +            'supported',
+> +            'maintained',
+> +            'odd-fixes',
+> +            'orphan',
+> +            'obsolete',
+> +            'deprecated' ] }
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Stefan Markovic <smarkovic@wavecomp.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
----
- target/mips/translate.c | 42 +++++++++++++++++++++---------------------
- 1 file changed, 21 insertions(+), 21 deletions(-)
+Regardless how fine-grained we decide to be here, is it possible that
+you describe in the documentation comment where each state shall be
+used?
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 89126b4..dd96195 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -26337,7 +26337,7 @@ static void decode_opc_special3_legacy(CPUMIPSSta=
-te *env, DisasContext *ctx)
-     }
- }
-=20
--static void decode_tx79_mmi0(CPUMIPSState *env, DisasContext *ctx)
-+static void decode_mmi0(CPUMIPSState *env, DisasContext *ctx)
- {
-     uint32_t opc =3D MASK_MMI0(ctx->opcode);
-=20
-@@ -26370,13 +26370,13 @@ static void decode_tx79_mmi0(CPUMIPSState *env,=
- DisasContext *ctx)
-         generate_exception_end(ctx, EXCP_RI); /* TODO: MMI_OPC_CLASS_MMI=
-0 */
-         break;
-     default:
--        MIPS_INVAL("TX79 MMI class MMI0");
-+        MIPS_INVAL("MMI class MMI0");
-         generate_exception_end(ctx, EXCP_RI);
-         break;
-     }
- }
-=20
--static void decode_tx79_mmi1(CPUMIPSState *env, DisasContext *ctx)
-+static void decode_mmi1(CPUMIPSState *env, DisasContext *ctx)
- {
-     uint32_t opc =3D MASK_MMI1(ctx->opcode);
-=20
-@@ -26402,13 +26402,13 @@ static void decode_tx79_mmi1(CPUMIPSState *env,=
- DisasContext *ctx)
-         generate_exception_end(ctx, EXCP_RI); /* TODO: MMI_OPC_CLASS_MMI=
-1 */
-         break;
-     default:
--        MIPS_INVAL("TX79 MMI class MMI1");
-+        MIPS_INVAL("MMI class MMI1");
-         generate_exception_end(ctx, EXCP_RI);
-         break;
-     }
- }
-=20
--static void decode_tx79_mmi2(CPUMIPSState *env, DisasContext *ctx)
-+static void decode_mmi2(CPUMIPSState *env, DisasContext *ctx)
- {
-     uint32_t opc =3D MASK_MMI2(ctx->opcode);
-=20
-@@ -26438,13 +26438,13 @@ static void decode_tx79_mmi2(CPUMIPSState *env,=
- DisasContext *ctx)
-         generate_exception_end(ctx, EXCP_RI); /* TODO: MMI_OPC_CLASS_MMI=
-2 */
-         break;
-     default:
--        MIPS_INVAL("TX79 MMI class MMI2");
-+        MIPS_INVAL("MMI class MMI2");
-         generate_exception_end(ctx, EXCP_RI);
-         break;
-     }
- }
-=20
--static void decode_tx79_mmi3(CPUMIPSState *env, DisasContext *ctx)
-+static void decode_mmi3(CPUMIPSState *env, DisasContext *ctx)
- {
-     uint32_t opc =3D MASK_MMI3(ctx->opcode);
-=20
-@@ -26465,13 +26465,13 @@ static void decode_tx79_mmi3(CPUMIPSState *env,=
- DisasContext *ctx)
-         generate_exception_end(ctx, EXCP_RI); /* TODO: MMI_OPC_CLASS_MMI=
-3 */
-         break;
-     default:
--        MIPS_INVAL("TX79 MMI class MMI3");
-+        MIPS_INVAL("MMI class MMI3");
-         generate_exception_end(ctx, EXCP_RI);
-         break;
-     }
- }
-=20
--static void decode_tx79_mmi(CPUMIPSState *env, DisasContext *ctx)
-+static void decode_mmi(CPUMIPSState *env, DisasContext *ctx)
- {
-     uint32_t opc =3D MASK_MMI(ctx->opcode);
-     int rs =3D extract32(ctx->opcode, 21, 5);
-@@ -26480,16 +26480,16 @@ static void decode_tx79_mmi(CPUMIPSState *env, =
-DisasContext *ctx)
-=20
-     switch (opc) {
-     case MMI_OPC_CLASS_MMI0:
--        decode_tx79_mmi0(env, ctx);
-+        decode_mmi0(env, ctx);
-         break;
-     case MMI_OPC_CLASS_MMI1:
--        decode_tx79_mmi1(env, ctx);
-+        decode_mmi1(env, ctx);
-         break;
-     case MMI_OPC_CLASS_MMI2:
--        decode_tx79_mmi2(env, ctx);
-+        decode_mmi2(env, ctx);
-         break;
-     case MMI_OPC_CLASS_MMI3:
--        decode_tx79_mmi3(env, ctx);
-+        decode_mmi3(env, ctx);
-         break;
-     case MMI_OPC_MULT1:
-     case MMI_OPC_MULTU1:
-@@ -26523,18 +26523,18 @@ static void decode_tx79_mmi(CPUMIPSState *env, =
-DisasContext *ctx)
-         generate_exception_end(ctx, EXCP_RI);    /* TODO: MMI_CLASS_MMI =
-*/
-         break;
-     default:
--        MIPS_INVAL("TX79 MMI class");
-+        MIPS_INVAL("MMI class");
-         generate_exception_end(ctx, EXCP_RI);
-         break;
-     }
- }
-=20
--static void decode_tx79_lq(CPUMIPSState *env, DisasContext *ctx)
-+static void decode_mmi_lq(CPUMIPSState *env, DisasContext *ctx)
- {
-     generate_exception_end(ctx, EXCP_RI);    /* TODO: MMI_LQ */
- }
-=20
--static void gen_tx79_sq(DisasContext *ctx, int base, int rt, int offset)
-+static void gen_mmi_sq(DisasContext *ctx, int base, int rt, int offset)
- {
-     generate_exception_end(ctx, EXCP_RI);    /* TODO: MMI_SQ */
- }
-@@ -26560,7 +26560,7 @@ static void gen_tx79_sq(DisasContext *ctx, int ba=
-se, int rt, int offset)
-  * In user mode, QEMU must verify the upper and lower 11 bits to disting=
-uish
-  * between SQ and RDHWR, as the Linux kernel does.
-  */
--static void decode_tx79_sq(CPUMIPSState *env, DisasContext *ctx)
-+static void decode_mmi_sq(CPUMIPSState *env, DisasContext *ctx)
- {
-     int base =3D extract32(ctx->opcode, 21, 5);
-     int rt =3D extract32(ctx->opcode, 16, 5);
-@@ -26578,7 +26578,7 @@ static void decode_tx79_sq(CPUMIPSState *env, Dis=
-asContext *ctx)
-     }
- #endif
-=20
--    gen_tx79_sq(ctx, base, rt, offset);
-+    gen_mmi_sq(ctx, base, rt, offset);
- }
-=20
- static void decode_opc_special3(CPUMIPSState *env, DisasContext *ctx)
-@@ -27887,7 +27887,7 @@ static void decode_opc(CPUMIPSState *env, DisasCo=
-ntext *ctx)
-         break;
-     case OPC_SPECIAL2:
-         if ((ctx->insn_flags & INSN_R5900) && (ctx->insn_flags & ASE_MMI=
-)) {
--            decode_tx79_mmi(env, ctx);
-+            decode_mmi(env, ctx);
-         } else if (ctx->insn_flags & ASE_MXU) {
-             decode_opc_mxu(env, ctx);
-         } else {
-@@ -27896,7 +27896,7 @@ static void decode_opc(CPUMIPSState *env, DisasCo=
-ntext *ctx)
-         break;
-     case OPC_SPECIAL3:
-         if (ctx->insn_flags & INSN_R5900) {
--            decode_tx79_sq(env, ctx);    /* MMI_SQ */
-+            decode_mmi_sq(env, ctx);    /* MMI_SQ */
-         } else {
-             decode_opc_special3(env, ctx);
-         }
-@@ -28560,7 +28560,7 @@ static void decode_opc(CPUMIPSState *env, DisasCo=
-ntext *ctx)
-         break;
-     case OPC_MSA: /* OPC_MDMX */
-         if (ctx->insn_flags & INSN_R5900) {
--            decode_tx79_lq(env, ctx);    /* MMI_LQ */
-+            decode_mmi_lq(env, ctx);    /* MMI_LQ */
-         } else {
-             /* MDMX: Not implemented. */
-             gen_msa(env, ctx);
---=20
-2.7.4
+-- 
+Murilo
