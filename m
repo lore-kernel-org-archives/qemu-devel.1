@@ -1,37 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41767)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1gHcbW-00062G-FP
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 18:35:19 -0400
+	(envelope-from <philmd@redhat.com>) id 1gHcfi-0008Da-KO
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 18:39:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1gHcbO-0004XS-5N
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 18:35:16 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41296)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1gHbsQ-0006Lt-E5
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 17:48:43 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w9ULi5rd050702
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 17:48:32 -0400
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2nexwxs8tr-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 17:48:32 -0400
-Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Tue, 30 Oct 2018 21:48:31 -0000
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Tue, 30 Oct 2018 17:47:36 -0400
-In-Reply-To: <20181030214740.2294043-1-stefanb@linux.vnet.ibm.com>
-References: <20181030214740.2294043-1-stefanb@linux.vnet.ibm.com>
+	(envelope-from <philmd@redhat.com>) id 1gHcfc-00078d-9H
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 18:39:38 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:36450)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gHcfa-00075v-Bo
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 18:39:32 -0400
+Received: by mail-wm1-f66.google.com with SMTP id a8-v6so12799121wmf.1
+	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 15:39:27 -0700 (PDT)
+References: <20181029223207.31878-1-philmd@redhat.com>
+	<20181029223207.31878-4-philmd@redhat.com>
+	<20181030063830.edjacusffvgwvnt2@sirius.home.kraxel.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <fc4b00b2-dda0-a0fb-e7b8-487065dbf6cc@redhat.com>
+Date: Tue, 30 Oct 2018 23:39:23 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <20181030214740.2294043-2-stefanb@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 1/5] tests/tpm: fix tpm_util_swtpm_has_tpm2()
+In-Reply-To: <20181030063830.edjacusffvgwvnt2@sirius.home.kraxel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 3/3] arm: allwinner: Enable USB EHCI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,90 +31,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Icenowy Zheng <icenowy@aosc.xyz>, Guenter Roeck <linux@roeck-us.net>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Beniamino Galvani <b.galvani@gmail.com>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Hi Gerd,
 
-Using g_spawn_async_with_pipes() is more complicated than running the
-sync version. The async version returns a file descriptor for stdout, whi=
-ch may
-not be fully read. Sometime "--tpm2" will failed to be read, and will
-cause the related test to be silently skipped.
+On 30/10/18 7:38, Gerd Hoffmann wrote:
+> On Mon, Oct 29, 2018 at 11:32:07PM +0100, Philippe Mathieu-Daudé wrote:
+>> From: Guenter Roeck <linux@roeck-us.net>
+>>
+>> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+>> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> [PMD: Intented tabs -> space]
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> ---
+>>   hw/arm/allwinner-a10.c | 2 ++
+>>   1 file changed, 2 insertions(+)
+>>
+>> diff --git a/hw/arm/allwinner-a10.c b/hw/arm/allwinner-a10.c
+>> index 0a8ac929f5..92ab66354a 100644
+>> --- a/hw/arm/allwinner-a10.c
+>> +++ b/hw/arm/allwinner-a10.c
+>> @@ -116,6 +116,8 @@ static void aw_a10_realize(DeviceState *dev, Error **errp)
+>>       if (machine_usb(current_machine)) {
+>>           sysbus_create_simple("sysbus-ohci", 0x01c14400, s->irq[64]);
+>>           sysbus_create_simple("sysbus-ohci", 0x01c1c400, s->irq[65]);
+>> +        sysbus_create_simple(TYPE_AW_A10_EHCI, 0x01c14000, s->irq[39]);
+>> +        sysbus_create_simple(TYPE_AW_A10_EHCI, 0x01c1c000, s->irq[40]);
+> 
+> Hmm, is this a companion controller setup?  If so, then this is a bit
+> more complicated  (see ehci_create_ich9_with_companions()).
 
-Use g_spawn_sync() instead, simplifying the code and fixing the race.
+I don't have enough USB knowledge. Can we have companion setup without PCI?
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
----
- tests/tpm-util.c | 46 ++++++++++++++++++++--------------------------
- 1 file changed, 20 insertions(+), 26 deletions(-)
+Per the datashit [1] p. 215 "21. USB Host Controller", each controller 
+share the same PHY. There is no mention of companion setup:
 
-diff --git a/tests/tpm-util.c b/tests/tpm-util.c
-index 9f3f156e42..ae4aaf35ca 100644
---- a/tests/tpm-util.c
-+++ b/tests/tpm-util.c
-@@ -145,39 +145,33 @@ void tpm_util_pcrread(QTestState *s, tx_func *tx,
-     g_assert_cmpmem(buffer, exp_resp_size, exp_resp, exp_resp_size);
- }
-=20
--static gboolean tpm_util_swtpm_has_tpm2(void)
-+static bool tpm_util_swtpm_has_tpm2(void)
- {
--    gint mystdout;
--    gboolean succ;
--    unsigned i;
--    char buffer[10240];
--    ssize_t n;
--    gchar *swtpm_argv[] =3D {
--        g_strdup("swtpm"), g_strdup("socket"), g_strdup("--help"), NULL
-+    bool has_tpm2 =3D false;
-+    char *out =3D NULL;
-+    static const char *argv[] =3D {
-+        "swtpm", "socket", "--help", NULL
-     };
-=20
--    succ =3D g_spawn_async_with_pipes(NULL, swtpm_argv, NULL,
--                                    G_SPAWN_SEARCH_PATH, NULL, NULL, NUL=
-L,
--                                    NULL, &mystdout, NULL, NULL);
--    if (!succ) {
--        goto cleanup;
-+    if (!g_spawn_sync(NULL /* working_dir */,
-+                      (char **)argv,
-+                      NULL /* envp */,
-+                      G_SPAWN_SEARCH_PATH,
-+                      NULL /* child_setup */,
-+                      NULL /* user_data */,
-+                      &out,
-+                      NULL /* err */,
-+                      NULL /* exit_status */,
-+                      NULL)) {
-+        return false;
-     }
-=20
--    n =3D read(mystdout, buffer, sizeof(buffer) - 1);
--    if (n < 0) {
--        goto cleanup;
--    }
--    buffer[n] =3D 0;
--    if (!strstr(buffer, "--tpm2")) {
--        succ =3D false;
--    }
--
-- cleanup:
--    for (i =3D 0; swtpm_argv[i]; i++) {
--        g_free(swtpm_argv[i]);
-+    if (strstr(out, "--tpm2")) {
-+        has_tpm2 =3D true;
-     }
-=20
--    return succ;
-+    g_free(out);
-+    return has_tpm2;
- }
-=20
- gboolean tpm_util_swtpm_start(const char *path, GPid *pid,
---=20
-2.17.1
+   The USB host controller includes the following features:
+   ..
+   - Complies with EHCI Specification, Version 1.0,
+   - and  the OHCI Specification, Version 1.0a.
+   ..
+   - Support only 1 USB Root Port shared between EHCI and OHCI.
+
+
+[1] http://linux-sunxi.org/images/1/1e/Allwinner_A10_User_manual_V1.5.pdf
+
+> 
+> cheers,
+>    Gerd
+> 
