@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50881)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gHWiy-0007oH-95
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 12:18:36 -0400
+	(envelope-from <armbru@redhat.com>) id 1gHWm3-0001sW-LU
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 12:21:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gHWix-0004Ru-NK
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 12:18:36 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:45992)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gHWix-0004Nv-99
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 12:18:35 -0400
-Received: by mail-ot1-x342.google.com with SMTP id g10so583586otl.12
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 09:18:35 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1gHWlz-0003EP-HR
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 12:21:47 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181029162441.31631-1-sameo@linux.intel.com>
+	<874ld4mzlb.fsf@dusky.pond.sub.org>
+	<20181030152041.GD5291@caravaggio.home>
+Date: Tue, 30 Oct 2018 17:21:15 +0100
+In-Reply-To: <20181030152041.GD5291@caravaggio.home> (Samuel Ortiz's message
+	of "Tue, 30 Oct 2018 16:20:41 +0100")
+Message-ID: <874ld3h0ck.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20181030035030.4542-1-zhangckid@gmail.com>
-References: <20181030035030.4542-1-zhangckid@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 30 Oct 2018 16:18:13 +0000
-Message-ID: <CAFEAcA_T8WCimGtgErMjQvBL9yh8_kR9XpykaY=MJPCM7ghw+g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] net/filter-rewirter.c: Fix coverity static
- analysis issue
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 00/19] ACPI reorganization for
+ hardware-reduced support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,22 +25,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangckid@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>, Zhang Chen <chen.zhang@intel.com>
+To: Samuel Ortiz <sameo@linux.intel.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu-arm@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>
 
-On 30 October 2018 at 03:50, Zhang Chen <zhangckid@gmail.com> wrote:
-> The original code just follow the TCP state diagram,
-> but in this case, we can skip the TCPS_TIME_WAIT state to simplify
-> the implementation.
+Samuel Ortiz <sameo@linux.intel.com> writes:
+
+> Hi Markus,
 >
-> Signed-off-by: Zhang Chen <zhangckid@gmail.com>
-> ---
->  net/filter-rewriter.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> On Mon, Oct 29, 2018 at 06:28:48PM +0100, Markus Armbruster wrote:
+>> You neglected to cc: maintainers.  I'm doing that for you now.
+>> scripts/get_maintainer.pl can help you finding maintainers.
+> Sorry about that. I sent a v3 with all maintainers cc'ed.
 
-NB: typo in Subject: s/rewirter/rewriter/
-
-Hopefully whoever commits this patch can fix that up for you.
-
-thanks
--- PMM
+I don't think that's necessary unless you add more people than I did.
