@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37688)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37690)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gHZVL-00031J-3D
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:16:44 -0400
+	(envelope-from <armbru@redhat.com>) id 1gHZVL-00031K-3y
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:16:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gHZVI-0005rh-FY
+	(envelope-from <armbru@redhat.com>) id 1gHZVG-0005pl-GC
 	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:16:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38477)
+Received: from mx1.redhat.com ([209.132.183.28]:40012)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gHZVI-0005jU-6L
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:16:40 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gHZVE-0005jW-H9
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:16:37 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 612073DD47
+	by mx1.redhat.com (Postfix) with ESMTPS id 65499AB976
 	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 19:16:24 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 30 Oct 2018 20:16:20 +0100
-Message-Id: <20181030191620.32168-9-armbru@redhat.com>
+Date: Tue, 30 Oct 2018 20:16:17 +0100
+Message-Id: <20181030191620.32168-6-armbru@redhat.com>
 In-Reply-To: <20181030191620.32168-1-armbru@redhat.com>
 References: <20181030191620.32168-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 8/8] vl: Avoid crash when -mon is underspecified
+Subject: [Qemu-devel] [PULL 5/8] Revert "tests: Add parameter to
+ qtest_init_without_qmp_handshake"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,55 +34,112 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Peter Xu <peterx@redhat.com>
 
-From: Eric Blake <eblake@redhat.com>
+From: Peter Xu <peterx@redhat.com>
 
-A quick coredump on an incomplete command line:
-./x86_64-softmmu/qemu-system-x86_64 -mon mode=3Dcontrol,pretty=3Don
+This reverts commit ddee57e0176f6ab53b13c6c97605b62737a8fd7a.
 
- #0  0x00007ffff723d9e4 in g_str_hash () at /lib64/libglib-2.0.so.0
- #1  0x00007ffff723ce38 in g_hash_table_lookup () at /lib64/libglib-2.0.s=
-o.0
- #2  0x0000555555cc0073 in object_class_property_find (klass=3D0x5555566a=
-94b0, name=3D0x0, errp=3D0x0) at qom/object.c:1135
- #3  0x0000555555cc004b in object_class_property_find (klass=3D0x5555566a=
-9440, name=3D0x0, errp=3D0x0) at qom/object.c:1129
- #4  0x0000555555cbfe6e in object_property_find (obj=3D0x5555568348c0, na=
-me=3D0x0, errp=3D0x0) at qom/object.c:1080
- #5  0x0000555555cc183d in object_resolve_path_component (parent=3D0x5555=
-568348c0, part=3D0x0) at qom/object.c:1762
- #6  0x0000555555d82071 in qemu_chr_find (name=3D0x0) at chardev/char.c:8=
-02
- #7  0x00005555559d77cb in mon_init_func (opaque=3D0x0, opts=3D0x5555566b=
-65a0, errp=3D0x0) at vl.c:2291
+Meanwhile, revert one line from fa198ad9bdef to make sure
+qtest_init_without_qmp_handshake() will only pass in one parameter.
 
-Fix it to instead fail gracefully.
-
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20181023213600.364086-1-eblake@redhat.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Message-Id: <20181009062718.1914-5-peterx@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- vl.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ tests/libqtest.c | 10 ++++------
+ tests/libqtest.h |  4 +---
+ tests/qmp-test.c |  4 ++--
+ 3 files changed, 7 insertions(+), 11 deletions(-)
 
-diff --git a/vl.c b/vl.c
-index 7d9bcf442e..0a5cc9aa75 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2318,6 +2318,10 @@ static int mon_init_func(void *opaque, QemuOpts *o=
-pts, Error **errp)
-         flags |=3D MONITOR_USE_PRETTY;
+diff --git a/tests/libqtest.c b/tests/libqtest.c
+index 90084522f6..48d710d89e 100644
+--- a/tests/libqtest.c
++++ b/tests/libqtest.c
+@@ -187,8 +187,7 @@ static const char *qtest_qemu_binary(void)
+     return qemu_bin;
+ }
 =20
-     chardev =3D qemu_opt_get(opts, "chardev");
-+    if (!chardev) {
-+        error_report("chardev is required");
-+        exit(1);
-+    }
-     chr =3D qemu_chr_find(chardev);
-     if (chr =3D=3D NULL) {
-         error_setg(errp, "chardev \"%s\" not found", chardev);
+-QTestState *qtest_init_without_qmp_handshake(bool use_oob,
+-                                             const char *extra_args)
++QTestState *qtest_init_without_qmp_handshake(const char *extra_args)
+ {
+     QTestState *s;
+     int sock, qmpsock, i;
+@@ -221,13 +220,12 @@ QTestState *qtest_init_without_qmp_handshake(bool u=
+se_oob,
+         command =3D g_strdup_printf("exec %s "
+                                   "-qtest unix:%s,nowait "
+                                   "-qtest-log %s "
+-                                  "-chardev socket,path=3D%s,nowait,id=3D=
+char0 "
+-                                  "-mon chardev=3Dchar0,mode=3Dcontrol%s=
+ "
++                                  "-qmp unix:%s,nowait "
+                                   "-machine accel=3Dqtest "
+                                   "-display none "
+                                   "%s", qemu_binary, socket_path,
+                                   getenv("QTEST_LOG") ? "/dev/fd/2" : "/=
+dev/null",
+-                                  qmp_socket_path, "",
++                                  qmp_socket_path,
+                                   extra_args ?: "");
+         execlp("/bin/sh", "sh", "-c", command, NULL);
+         exit(1);
+@@ -262,7 +260,7 @@ QTestState *qtest_init_without_qmp_handshake(bool use=
+_oob,
+=20
+ QTestState *qtest_init(const char *extra_args)
+ {
+-    QTestState *s =3D qtest_init_without_qmp_handshake(false, extra_args=
+);
++    QTestState *s =3D qtest_init_without_qmp_handshake(extra_args);
+     QDict *greeting;
+=20
+     /* Read the QMP greeting and then do the handshake */
+diff --git a/tests/libqtest.h b/tests/libqtest.h
+index ed88ff99d5..96a6c01352 100644
+--- a/tests/libqtest.h
++++ b/tests/libqtest.h
+@@ -55,14 +55,12 @@ QTestState *qtest_init(const char *extra_args);
+=20
+ /**
+  * qtest_init_without_qmp_handshake:
+- * @use_oob: true to have the server advertise OOB support
+  * @extra_args: other arguments to pass to QEMU.  CAUTION: these
+  * arguments are subject to word splitting and shell evaluation.
+  *
+  * Returns: #QTestState instance.
+  */
+-QTestState *qtest_init_without_qmp_handshake(bool use_oob,
+-                                             const char *extra_args);
++QTestState *qtest_init_without_qmp_handshake(const char *extra_args);
+=20
+ /**
+  * qtest_quit:
+diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+index 030d813f77..cc9907b525 100644
+--- a/tests/qmp-test.c
++++ b/tests/qmp-test.c
+@@ -108,7 +108,7 @@ static void test_qmp_protocol(void)
+     QList *capabilities;
+     QTestState *qts;
+=20
+-    qts =3D qtest_init_without_qmp_handshake(false, common_args);
++    qts =3D qtest_init_without_qmp_handshake(common_args);
+=20
+     /* Test greeting */
+     resp =3D qtest_qmp_receive(qts);
+@@ -219,7 +219,7 @@ static void test_qmp_oob(void)
+     QList *capabilities;
+     QString *qstr;
+=20
+-    qts =3D qtest_init_without_qmp_handshake(true, common_args);
++    qts =3D qtest_init_without_qmp_handshake(common_args);
+=20
+     /* Check the greeting message. */
+     resp =3D qtest_qmp_receive(qts);
 --=20
 2.17.2
