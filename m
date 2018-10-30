@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43136)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43623)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHV4W-00066v-3Z
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:32:45 -0400
+	(envelope-from <philmd@redhat.com>) id 1gHV6T-0007RJ-MY
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:34:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHV4S-0007BH-2Q
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:32:43 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:40502)
+	(envelope-from <philmd@redhat.com>) id 1gHV6Q-0000ZW-Ei
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:34:45 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:35968)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHV4R-00078r-Pa
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:32:39 -0400
-Received: by mail-oi1-x244.google.com with SMTP id u130-v6so5826834oie.7
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 07:32:37 -0700 (PDT)
-Sender: fluxion <flukshun@gmail.com>
-Content-Type: text/plain; charset="utf-8"
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gHV6Q-0000E1-4z
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:34:42 -0400
+Received: by mail-wr1-f68.google.com with SMTP id y16so12859807wrw.3
+	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 07:34:20 -0700 (PDT)
+References: <20181030093715.18793-1-agraf@suse.de>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <1b52fd6d-1ae1-3659-8ec9-4b28b3327661@redhat.com>
+Date: Tue, 30 Oct 2018 15:34:16 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20181007110223.129692-1-bishara@daynix.com>
-References: <20181007110223.129692-1-bishara@daynix.com>
-Message-ID: <154090993308.20054.3946200530560282137@sif>
-Date: Tue, 30 Oct 2018 09:32:13 -0500
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] qga: add support for re-opening
- channel on error
+In-Reply-To: <20181030093715.18793-1-agraf@suse.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: s390: Remove myself
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,92 +29,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bishara AbuHattoum <bishara@daynix.com>, qemu-devel@nongnu.org
-Cc: Yan Vugenfirer <yan@daynix.com>, Sameeh Jubran <sameeh@daynix.com>
+To: Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org
+Cc: qemu-s390x <qemu-s390x@nongnu.org>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Quoting Bishara AbuHattoum (2018-10-07 06:02:16)
-> Changes from v1:
->  [1/7] qga: group agent init/cleanup init separate routines
->          Fixed typo in the commit message and dropped the unnecessary mes=
-sage ID
->  [2/7] qga: hang GAConfig/socket_activation off of GAState global
->          Dropped the unnecessary message ID
->  [3/7] qga: move w32 service handling out of run_agent()
->          Fixed run_agent() extra call and dropped the unnecessary message=
- ID =
+On 30/10/18 10:37, Alexander Graf wrote:
+> I haven't realistically maintained s390 related parts for quite a while
+> now, so let's remove my name from the MATINAINERS file to reflect reality.
 
->  [4/7] qga: add --retry-path option for re-initializing channel on failure
->          Dropped the unnecessary message ID
->  [5/7] qga-win: install service with --retry-path set by default
->          Dropped the unnecessary message ID
->  [6/7] qga-win: report specific error when failing to open channel
->          Dropped the unnecessary message ID
->  [7/7] qga-win: changing --retry-path option behavior
->          Dropped the use of two events and WaitForMultipleObjects, and us=
-ed
->          one 'wakeup_event'.
-> =
+To the s390 maintainer taking this:    "MAINTAINERS"
 
-> A patch series was firstly introduced about a year ago which resolves an =
-issue
-> with qemu-ga and virtio-serial functionality. The issue was discussed in =
-the
-> following thread:
->   https://lists.gnu.org/archive/html/qemu-devel/2018-01/msg06256.html
-> =
-
-> In short, Sameeh sent an implementation which uses udev on Linux and devi=
-ce
-> events API on Windows. Since udev API is only supported for kernels 2.6+ =
-it is
-> not a good approach and Michael suggested his alternative series which us=
-es a
-> loop and checks if the serial is present or not. Since the Windows API is
-> supported and has backward compatibility up until Windows xp, there is no=
- reason
-> for not using the Windows API. It was finally agreed by Michael and Samee=
-h that
-> a combination of both approaches should be used.
-> =
-
-> This series does just that, it rebases Michael's patches on top of upstre=
-am and
-> merges Sameeh's patches for Windows API into Michael's implementation.
-> =
-
-> Michael's series:
->   https://github.com/mdroth/qemu/commits/qga-retry-path
-> Sameeh's series:
->   https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg02400.html
->   https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg02399.html
->   https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg02401.html
-
-Thanks, applied to qga tree with some minor fix-ups:
-  https://github.com/mdroth/qemu/commits/qga
-
-> =
-
-> Bishara AbuHattoum (1):
->   qga-win: changing --retry-path option behavior
-> =
-
-> Michael Roth (6):
->   qga: group agent init/cleanup init separate routines
->   qga: hang GAConfig/socket_activation off of GAState global
->   qga: move w32 service handling out of run_agent()
->   qga: add --retry-path option for re-initializing channel on failure
->   qga-win: install service with --retry-path set by default
->   qga-win: report specific error when failing to open channel
-> =
-
->  qga/channel-win32.c       |   3 +-
->  qga/installer/qemu-ga.wxs |   2 +-
->  qga/main.c                | 288 +++++++++++++++++++++++++++++---------
->  qga/service-win32.h       |   4 +
->  4 files changed, 229 insertions(+), 68 deletions(-)
-> =
-
-> -- =
-
-> 2.17.0
->=20
+> 
+> Signed-off-by: Alexander Graf <agraf@suse.de>
+> ---
+>   MAINTAINERS | 4 ----
+>   1 file changed, 4 deletions(-)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index d1a6d3c740..8bc9a594da 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -250,7 +250,6 @@ F: disas/riscv.c
+>   
+>   S390
+>   M: Richard Henderson <rth@twiddle.net>
+> -M: Alexander Graf <agraf@suse.de>
+>   M: David Hildenbrand <david@redhat.com>
+>   S: Maintained
+>   F: target/s390x/
+> @@ -346,7 +345,6 @@ F: target/ppc/kvm.c
+>   S390
+>   M: Christian Borntraeger <borntraeger@de.ibm.com>
+>   M: Cornelia Huck <cohuck@redhat.com>
+> -M: Alexander Graf <agraf@suse.de>
+>   S: Maintained
+>   F: target/s390x/kvm.c
+>   F: target/s390x/kvm_s390x.h
+> @@ -931,7 +929,6 @@ S390 Machines
+>   S390 Virtio-ccw
+>   M: Cornelia Huck <cohuck@redhat.com>
+>   M: Christian Borntraeger <borntraeger@de.ibm.com>
+> -M: Alexander Graf <agraf@suse.de>
+>   S: Supported
+>   F: hw/char/sclp*.[hc]
+>   F: hw/char/terminal3270.c
+> @@ -1987,7 +1984,6 @@ F: tcg/ppc/
+>   F: disas/ppc.c
+>   
+>   S390 target
+> -M: Alexander Graf <agraf@suse.de>
+>   M: Richard Henderson <rth@twiddle.net>
+>   S: Maintained
+>   F: tcg/s390/
+> 
