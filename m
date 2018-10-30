@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gHWCH-0002cH-Uj
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:44:52 -0400
+	(envelope-from <contrib@steffen-goertz.de>) id 1gHWD9-0003ON-Pf
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:45:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gHWCF-0001yN-SD
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:44:49 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:55997 helo=mail.rt-rk.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gHWCF-0001m6-BT
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:44:47 -0400
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue, 30 Oct 2018 16:44:09 +0100
-Message-Id: <1540914249-3392-6-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1540914249-3392-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1540914249-3392-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v3 5/5] target/mips: Enable only tested modes
- for R5900
+	(envelope-from <contrib@steffen-goertz.de>) id 1gHWD5-0005NJ-Ae
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:45:43 -0400
+Received: from steffen-goertz.de ([88.198.119.201]:60132)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <contrib@steffen-goertz.de>) id 1gHWD3-00056B-DV
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:45:37 -0400
+From: =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>
+Date: Tue, 30 Oct 2018 11:45:03 -0400
+Message-Id: <20181030154510.29868-3-contrib@steffen-goertz.de>
+In-Reply-To: <20181030154510.29868-1-contrib@steffen-goertz.de>
+References: <20181030154510.29868-1-contrib@steffen-goertz.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 2/8] arm: Add header to hosts common
+ definition for nRF51 SOC peripherals
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,51 +28,65 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Adds a header that provides definitions that are used
+across nRF51 peripherals
 
-Enable MIPS 032 user mode for R5900.
-
-Expose to end-user only features that make sense and are appropriately
-tested. In this case, enable only MIPS 032 user mode for R5900.
-
-About defined(CONFIG_USER_ONLY), it is just because a reasonable
-testing was not provided for system mode. Some reasonable
-("acceptance") testing should be done, and made available
-to others. A system image, kernel, and command line + plus
-some relatively mild testing of system mode should suffice.
-
-About !defined(TARGET_MIPS64), this is because O32 is the only
-supported user-mode ABI for this CPU.
-
-Reviewed-by: Stefan Markovic <smarkovic@wavecomp.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
 ---
- target/mips/translate_init.inc.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ include/hw/arm/nrf51.h | 40 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
+ create mode 100644 include/hw/arm/nrf51.h
 
-diff --git a/target/mips/translate_init.inc.c b/target/mips/translate_init.inc.c
-index cab2003..d84c58e 100644
---- a/target/mips/translate_init.inc.c
-+++ b/target/mips/translate_init.inc.c
-@@ -410,6 +410,8 @@ const mips_def_t mips_defs[] =
-         .insn_flags = CPU_MIPS32R5 | ASE_MSA,
-         .mmu_type = MMU_TYPE_R4000,
-     },
-+#if defined(CONFIG_USER_ONLY)
-+#if !defined(TARGET_MIPS64)
-     {
-         .name = "R5900",
-         .CP0_PRid = 0x00002E00,
-@@ -457,6 +459,8 @@ const mips_def_t mips_defs[] =
-         .insn_flags = CPU_R5900 | ASE_MMI,
-         .mmu_type = MMU_TYPE_R4000,
-     },
+diff --git a/include/hw/arm/nrf51.h b/include/hw/arm/nrf51.h
+new file mode 100644
+index 0000000000..aea420ee69
+--- /dev/null
++++ b/include/hw/arm/nrf51.h
+@@ -0,0 +1,40 @@
++/*
++ * Nordic Semiconductor nRF51 Series SOC Common Defines
++ *
++ * This file hosts generic defines used in various nRF51 peripheral devi=
+ces.
++ *
++ * Reference Manual: http://infocenter.nordicsemi.com/pdf/nRF51_RM_v3.0.=
+pdf
++ * Product Spec: http://infocenter.nordicsemi.com/pdf/nRF51822_PS_v3.1.p=
+df
++ *
++ * Copyright 2018 Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
++ *
++ * This code is licensed under the GPL version 2 or later.  See
++ * the COPYING file in the top-level directory.
++ */
++
++#ifndef NRF51_H
++#define NRF51_H
++
++#define NRF51_FLASH_BASE      0x00000000
++#define NRF51_FICR_BASE       0x10000000
++#define NRF51_UICR_BASE       0x10001000
++#define NRF51_SRAM_BASE       0x20000000
++
++#define NRF51_IOMEM_BASE      0x40000000
++#define NRF51_IOMEM_SIZE      0x20000000
++
++#define NRF51_UART_BASE       0x40002000
++#define NRF51_TIMER_BASE      0x40008000
++#define NRF51_RNG_BASE        0x4000D000
++#define NRF51_NVMC_BASE       0x4001E000
++#define NRF51_GPIO_BASE       0x50000000
++
++#define NRF51_PAGE_SIZE       1024
++
++/* Trigger */
++#define NRF51_TRIGGER_TASK 0x01
++
++/* Events */
++#define NRF51_EVENT_CLEAR  0x00
++
 +#endif
-+#endif
-     {
-         /* A generic CPU supporting MIPS32 Release 6 ISA.
-            FIXME: Support IEEE 754-2008 FP.
--- 
-2.7.4
+--=20
+2.19.1
