@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47174)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48504)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gHSjk-0005nZ-TS
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:03:09 -0400
+	(envelope-from <laurent@vivier.eu>) id 1gHSmT-0000YX-Px
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:05:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gHSjf-0006tY-2i
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:03:08 -0400
-Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:41771)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gHSjb-0006ig-15
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:03:01 -0400
-Received: by mail-ot1-x32b.google.com with SMTP id c32so10779295otb.8
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 05:02:47 -0700 (PDT)
+	(envelope-from <laurent@vivier.eu>) id 1gHSmO-0000U8-IT
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:05:57 -0400
+References: <20181029134000.11157-1-mark.cave-ayland@ilande.co.uk>
+	<20181029134000.11157-6-mark.cave-ayland@ilande.co.uk>
+	<e361c22a-3a0e-6e28-ef03-8a527798836c@reactos.org>
+	<ef9f3b7a-d9f7-d163-3bd2-16bac2947ce6@ilande.co.uk>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <930fd4d9-5f58-6aeb-8bcf-4e6debfb8308@vivier.eu>
+Date: Tue, 30 Oct 2018 13:05:23 +0100
 MIME-Version: 1.0
-In-Reply-To: <1540826418-5501-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1540826418-5501-1-git-send-email-aleksandar.markovic@rt-rk.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 30 Oct 2018 12:02:25 +0000
-Message-ID: <CAFEAcA_yLPivG+VvQSpLrqxPgJixYWf=xfc95abDgT45hQR8eA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/27] MIPS queue for October 2018, part 4
+In-Reply-To: <ef9f3b7a-d9f7-d163-3bd2-16bac2947ce6@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 05/11] hw/m68k: Apple Sound Chip (ASC)
+ emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +27,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, jasowang@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, kraxel@redhat.com, pbonzini@redhat.com, afaerber@suse.de, aurelien@aurel32.net
 
-On 29 October 2018 at 15:19, Aleksandar Markovic
-<aleksandar.markovic@rt-rk.com> wrote:
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
->
-> The following changes since commit 03f400883a1dd92fac5b0d9127b38e34c9a722d7:
->
->   target/mips: Add MXU decoding engine (2018-10-29 14:13:47 +0100)
->
-> are available in the git repository at:
->
->   https://github.com/AMarkovic/qemu tags/mips-queue-october-2018-part-4
->
-> for you to fetch changes up to 64ea3d676d9447ecdb987deab5a1542ea088bd31:
->
->   linux-user: Add prctl() PR_SET_FP_MODE and PR_GET_FP_MODE implementations (2018-10-29 15:50:31 +0100)
->
-> ----------------------------------------------------------------
-> MIPS queue for October 2018, part 4
->
->   - fix for two missing break statements
->   - series on Ingenic's MXU ASE support
->   - series on MIPS-specific prctl()
-> ----------------------------------------------------------------
+Le 30/10/2018 à 11:46, Mark Cave-Ayland a écrit :
+> On 30/10/2018 06:46, Hervé Poussineau wrote:
+> 
+>> Le 29/10/2018 à 14:39, Mark Cave-Ayland a écrit :
+>>> From: Laurent Vivier <laurent@vivier.eu>
+>>>
+>>> This is broken as the linux driver seems broken too...
+>>>
+>>> Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>>> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+>>> ---
+>>>   hw/audio/Makefile.objs |   1 +
+>>>   hw/audio/asc.c         | 446 +++++++++++++++++++++++++++++++++++++++++++++++++
+>>>   include/hw/audio/asc.h |  48 ++++++
+>>>   3 files changed, 495 insertions(+)
+>>>   create mode 100644 hw/audio/asc.c
+>>>   create mode 100644 include/hw/audio/asc.h
+>>
+>> According to above comment, this device is broken.
+>> Is it necessary for Q800 emulation? What happens if you remove it?
+> 
+> A quick test here shows that I can still boot without it, so it doesn't seem to be
+> essential. Laurent, should we remove this from the next revision of the patchset? The
+> general consensus seems to be that if a device isn't required (for now) then it
+> shouldn't be included.
 
-Applied, thanks.
+It can be removed.
 
--- PMM
+I've just checked the kernel and in the case of the Quadra 800 the ASC
+is not supported at all.
+
+Thanks,
+Laurent
