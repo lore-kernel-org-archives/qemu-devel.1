@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38402)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <contrib@steffen-goertz.de>) id 1gHWDG-0003Us-63
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:45:54 -0400
+	(envelope-from <contrib@steffen-goertz.de>) id 1gHWDK-0003Yx-G7
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:45:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <contrib@steffen-goertz.de>) id 1gHWD9-0005cQ-Hm
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:45:46 -0400
-Received: from steffen-goertz.de ([88.198.119.201]:60186)
+	(envelope-from <contrib@steffen-goertz.de>) id 1gHWDA-0005go-IM
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:45:52 -0400
+Received: from steffen-goertz.de ([88.198.119.201]:60208)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <contrib@steffen-goertz.de>) id 1gHWD8-0005QX-By
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:45:43 -0400
+	(envelope-from <contrib@steffen-goertz.de>) id 1gHWDA-0005Z4-1M
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:45:44 -0400
 From: =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>
-Date: Tue, 30 Oct 2018 11:45:07 -0400
-Message-Id: <20181030154510.29868-7-contrib@steffen-goertz.de>
+Date: Tue, 30 Oct 2018 11:45:09 -0400
+Message-Id: <20181030154510.29868-9-contrib@steffen-goertz.de>
 In-Reply-To: <20181030154510.29868-1-contrib@steffen-goertz.de>
 References: <20181030154510.29868-1-contrib@steffen-goertz.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 6/8] hw/gpio/nrf51_gpio: Add nRF51 GPIO
+Subject: [Qemu-devel] [PATCH v2 8/8] hw/timer/nrf51_timer: Add nRF51 Timer
  peripheral
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -30,61 +30,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>
 
-This adds a model of the nRF51 GPIO peripheral.
-
-Reference Manual: http://infocenter.nordicsemi.com/pdf/nRF51_RM_v3.0.pdf
-
-The nRF51 series microcontrollers support up to 32 GPIO pins in various c=
-onfigurations.
-The pins can be used as input pins with pull-ups or pull-down.
-Furthermore, three different output driver modes per level are
-available (disconnected, standard, high-current).
-
-The GPIO-Peripheral has a mechanism for detecting level changes which is
-not featured in this model.
+This patch adds the model for the nRF51 timer peripheral.
+Currently, only the TIMER mode is implemented.
 
 Signed-off-by: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- Makefile.objs                |   1 +
- hw/gpio/Makefile.objs        |   1 +
- hw/gpio/nrf51_gpio.c         | 292 +++++++++++++++++++++++++++++++++++
- hw/gpio/trace-events         |   7 +
- include/hw/gpio/nrf51_gpio.h |  69 +++++++++
- 5 files changed, 370 insertions(+)
- create mode 100644 hw/gpio/nrf51_gpio.c
- create mode 100644 hw/gpio/trace-events
- create mode 100644 include/hw/gpio/nrf51_gpio.h
+ hw/timer/Makefile.objs         |   1 +
+ hw/timer/nrf51_timer.c         | 358 +++++++++++++++++++++++++++++++++
+ hw/timer/trace-events          |   5 +
+ include/hw/timer/nrf51_timer.h |  77 +++++++
+ 4 files changed, 441 insertions(+)
+ create mode 100644 hw/timer/nrf51_timer.c
+ create mode 100644 include/hw/timer/nrf51_timer.h
 
-diff --git a/Makefile.objs b/Makefile.objs
-index 1e1ff387d7..fbc3bad1e1 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -243,6 +243,7 @@ trace-events-subdirs +=3D hw/vfio
- trace-events-subdirs +=3D hw/virtio
- trace-events-subdirs +=3D hw/watchdog
- trace-events-subdirs +=3D hw/xen
-+trace-events-subdirs +=3D hw/gpio
- trace-events-subdirs +=3D io
- trace-events-subdirs +=3D linux-user
- trace-events-subdirs +=3D migration
-diff --git a/hw/gpio/Makefile.objs b/hw/gpio/Makefile.objs
-index fa0a72e6d0..e5da0cb54f 100644
---- a/hw/gpio/Makefile.objs
-+++ b/hw/gpio/Makefile.objs
-@@ -8,3 +8,4 @@ common-obj-$(CONFIG_GPIO_KEY) +=3D gpio_key.o
- obj-$(CONFIG_OMAP) +=3D omap_gpio.o
- obj-$(CONFIG_IMX) +=3D imx_gpio.o
- obj-$(CONFIG_RASPI) +=3D bcm2835_gpio.o
-+obj-$(CONFIG_NRF51_SOC) +=3D nrf51_gpio.o
-diff --git a/hw/gpio/nrf51_gpio.c b/hw/gpio/nrf51_gpio.c
+diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
+index b32194d153..0e9a4530f8 100644
+--- a/hw/timer/Makefile.objs
++++ b/hw/timer/Makefile.objs
+@@ -23,6 +23,7 @@ common-obj-$(CONFIG_IMX) +=3D imx_gpt.o
+ common-obj-$(CONFIG_LM32) +=3D lm32_timer.o
+ common-obj-$(CONFIG_MILKYMIST) +=3D milkymist-sysctl.o
+ common-obj-$(CONFIG_XLNX_ZYNQMP) +=3D xlnx-zynqmp-rtc.o
++common-obj-$(CONFIG_NRF51_SOC) +=3D nrf51_timer.o
+=20
+ obj-$(CONFIG_ALTERA_TIMER) +=3D altera_timer.o
+ obj-$(CONFIG_EXYNOS4) +=3D exynos4210_mct.o
+diff --git a/hw/timer/nrf51_timer.c b/hw/timer/nrf51_timer.c
 new file mode 100644
-index 0000000000..eeb6a092ea
+index 0000000000..0546b84578
 --- /dev/null
-+++ b/hw/gpio/nrf51_gpio.c
-@@ -0,0 +1,292 @@
++++ b/hw/timer/nrf51_timer.c
+@@ -0,0 +1,358 @@
 +/*
-+ * nRF51 System-on-Chip general purpose input/output register definition
++ * nRF51 System-on-Chip Timer peripheral
 + *
 + * Reference Manual: http://infocenter.nordicsemi.com/pdf/nRF51_RM_v3.0.=
 pdf
@@ -99,382 +77,463 @@ df
 +
 +#include "qemu/osdep.h"
 +#include "qemu/log.h"
-+#include "hw/gpio/nrf51_gpio.h"
++#include "hw/arm/nrf51.h"
++#include "hw/timer/nrf51_timer.h"
 +#include "trace.h"
 +
-+/*
-+ * Check if the output driver is connected to the direction switch
-+ * given the current configuration and logic level.
-+ * It is not differentiated between standard and "high"(-power) drive mo=
-des.
-+ */
-+static bool is_connected(uint32_t config, uint32_t level)
++#define TIMER_CLK 16000000ULL
++
++static uint8_t const bitwidths[] =3D {16, 8, 24, 32};
++#define BWM(x) ((1UL << bitwidths[x]) - 1)
++
++typedef enum {
++    NRF51_TIMER_TIMER =3D 0,
++    NRF51_TIMER_COUNTER =3D 1
++} Nrf51TimerMode;
++
++
++static inline uint64_t ns_to_ticks(Nrf51TimerState *s, uint64_t ns)
 +{
-+    bool state;
-+    uint32_t drive_config =3D extract32(config, 8, 3);
-+
-+    switch (drive_config) {
-+    case 0 ... 3:
-+        state =3D true;
-+        break;
-+    case 4 ... 5:
-+        state =3D level !=3D 0;
-+        break;
-+    case 6 ... 7:
-+        state =3D level =3D=3D 0;
-+        break;
-+    }
-+
-+    return state;
++    uint64_t t =3D NANOSECONDS_PER_SECOND * (1 << s->prescaler);
++    return muldiv64(ns, TIMER_CLK, t);
 +}
 +
-+static void update_output_irq(Nrf51GPIOState *s, size_t i,
-+                              bool connected, bool level)
++static inline uint64_t ticks_to_ns(Nrf51TimerState *s, uint64_t ticks)
 +{
-+    int64_t irq_level =3D connected ? level : -1;
-+    bool old_connected =3D extract32(s->old_out_connected, i, 1);
-+    bool old_level =3D extract32(s->old_out, i, 1);
-+
-+    if ((old_connected !=3D connected) || (old_level !=3D level)) {
-+        qemu_set_irq(s->output[i], irq_level);
-+        trace_nrf51_gpio_update_output_irq(i, irq_level);
-+    }
-+
-+    s->old_out =3D deposit32(s->old_out, i, 1, level);
-+    s->old_out_connected =3D deposit32(s->old_out_connected, i, 1, conne=
-cted);
++    ticks *=3D (1 << s->prescaler);
++    return muldiv64(ticks, NANOSECONDS_PER_SECOND, TIMER_CLK);
 +}
 +
-+static void update_state(Nrf51GPIOState *s)
++static void update_irq(Nrf51TimerState *s)
 +{
-+    uint32_t pull;
-+    bool connected_out, dir, connected_in, out, input;
++    bool flag =3D false;
++    size_t i;
 +
-+    for (size_t i =3D 0; i < NRF51_GPIO_PINS; i++) {
-+        pull =3D extract32(s->cnf[i], 2, 2);
-+        dir =3D extract32(s->cnf[i], 0, 1);
-+        connected_in =3D extract32(s->in_mask, i, 1);
-+        out =3D extract32(s->out, i, 1);
-+        input =3D !extract32(s->cnf[i], 1, 1);
-+        connected_out =3D is_connected(s->cnf[i], out) && dir;
++    for (i =3D 0; i < NRF51_TIMER_REG_COUNT; i++) {
++        flag |=3D s->events_compare[i] && extract32(s->inten, 16 + i, 1)=
+;
++    }
++    qemu_set_irq(s->irq, flag);
++}
 +
-+        update_output_irq(s, i, connected_out, out);
++static void update_events(Nrf51TimerState *s, uint64_t now)
++{
++    uint64_t strobe;
++    uint64_t tick;
++    uint64_t cc;
++    size_t i;
++    bool occured;
 +
-+        /* Pin both driven externally and internally */
-+        if (connected_out && connected_in) {
-+            qemu_log_mask(LOG_GUEST_ERROR, "GPIO pin %zu short circuited=
-\n", i);
++    strobe =3D ns_to_ticks(s, now - s->last_visited);
++    tick =3D ns_to_ticks(s, s->last_visited - s->time_offset) & BWM(s->b=
+itmode);
++
++    for (i =3D 0; i < NRF51_TIMER_REG_COUNT; i++) {
++        cc =3D s->cc[i];
++
++        if (tick < cc) {
++            occured =3D (cc - tick) <=3D strobe;
++        } else {
++            occured =3D ((cc + (1UL << bitwidths[s->bitmode])) - tick) <=
+=3D strobe;
 +        }
 +
-+        /*
-+         * Input buffer disconnected from internal/external drives, so
-+         * pull-up/pull-down becomes relevant
-+         */
-+        if (!input || (input && !connected_in && !connected_out)) {
-+            if (pull =3D=3D NRF51_GPIO_PULLDOWN) {
-+                s->in =3D deposit32(s->in, i, 1, 0);
-+            } else if (pull =3D=3D NRF51_GPIO_PULLUP) {
-+                s->in =3D deposit32(s->in, i, 1, 1);
-+            }
-+        }
-+
-+        /* Self stimulation through internal output driver */
-+        if (connected_out && !connected_in && input) {
-+            s->in =3D deposit32(s->in, i, 1, out);
-+        }
++        s->events_compare[i] |=3D occured;
 +    }
 +
++    s->last_visited =3D now;
 +}
 +
-+/*
-+ * Direction is exposed in both the DIR register and the DIR bit
-+ * of each PINs CNF configuration register. Reflect bits for pins in DIR
-+ * to individual pin configuration registers.
-+ */
-+static void reflect_dir_bit_in_cnf(Nrf51GPIOState *s)
++static int cmpfunc(const void *a, const void *b)
 +{
-+    uint32_t value =3D s->dir;
-+    for (size_t i =3D 0; i < NRF51_GPIO_PINS; i++) {
-+        s->cnf[i] =3D (s->cnf[i] & ~(1UL)) | ((value >> i) & 0x01);
-+    }
++   return *(uint32_t *)a - *(uint32_t *)b;
 +}
 +
-+static uint64_t nrf51_gpio_read(void *opaque, hwaddr offset, unsigned in=
-t size)
++static uint64_t get_next_timeout(Nrf51TimerState *s, uint64_t now)
 +{
-+    Nrf51GPIOState *s =3D NRF51_GPIO(opaque);
-+    uint64_t r =3D 0;
++    uint64_t r;
 +    size_t idx;
 +
++    uint64_t tick =3D (ns_to_ticks(s, now - s->time_offset)) & BWM(s->bi=
+tmode);
++    int8_t next =3D -1;
++
++    for (idx =3D 0; idx < NRF51_TIMER_REG_COUNT; idx++) {
++        if (s->cc_sorted[idx] > tick) {
++            next =3D idx;
++            break;
++        }
++    }
++
++    if (next =3D=3D -1) {
++        r =3D s->cc_sorted[0] + (1UL << bitwidths[s->bitmode]);
++    } else {
++        r =3D s->cc_sorted[next];
++    }
++
++    return now + ticks_to_ns(s, r - tick);
++}
++
++static void update_internal_state(Nrf51TimerState *s, uint64_t now)
++{
++    if (s->running) {
++        timer_mod(&s->timer, get_next_timeout(s, now));
++    } else {
++        timer_del(&s->timer);
++    }
++
++    update_irq(s);
++}
++
++static void timer_expire(void *opaque)
++{
++    Nrf51TimerState *s =3D NRF51_TIMER(opaque);
++    uint64_t now =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++    update_events(s, now);
++    update_internal_state(s, now);
++}
++
++static uint64_t nrf51_timer_read(void *opaque, hwaddr offset, unsigned i=
+nt size)
++{
++    Nrf51TimerState *s =3D NRF51_TIMER(opaque);
++    uint64_t r =3D 0;
++
 +    switch (offset) {
-+    case NRF51_GPIO_REG_OUT ... NRF51_GPIO_REG_OUTCLR:
-+        r =3D s->out;
++    case NRF51_TIMER_EVENT_COMPARE_0 ... NRF51_TIMER_EVENT_COMPARE_3:
++        r =3D s->events_compare[(offset - NRF51_TIMER_EVENT_COMPARE_0) /=
+ 4];
 +        break;
-+
-+    case NRF51_GPIO_REG_IN:
-+        r =3D s->in;
++    case NRF51_TIMER_REG_SHORTS:
++        r =3D s->shorts;
 +        break;
-+
-+    case NRF51_GPIO_REG_DIR ... NRF51_GPIO_REG_DIRCLR:
-+        r =3D s->dir;
++    case NRF51_TIMER_REG_INTENSET:
++        r =3D s->inten;
 +        break;
-+
-+    case NRF51_GPIO_REG_CNF_START ... NRF51_GPIO_REG_CNF_END:
-+        idx =3D (offset - NRF51_GPIO_REG_CNF_START) / 4;
-+        r =3D s->cnf[idx];
++    case NRF51_TIMER_REG_INTENCLR:
++        r =3D s->inten;
 +        break;
-+
++    case NRF51_TIMER_REG_MODE:
++        r =3D s->mode;
++        break;
++    case NRF51_TIMER_REG_BITMODE:
++        r =3D s->bitmode;
++        break;
++    case NRF51_TIMER_REG_PRESCALER:
++        r =3D s->prescaler;
++        break;
++    case NRF51_TIMER_REG_CC0 ... NRF51_TIMER_REG_CC3:
++        r =3D s->cc[(offset - NRF51_TIMER_REG_CC0) / 4];
++        break;
 +    default:
 +        qemu_log_mask(LOG_GUEST_ERROR,
 +                "%s: bad read offset 0x%" HWADDR_PRIx "\n",
 +                      __func__, offset);
 +    }
 +
-+    trace_nrf51_gpio_read(offset, r);
++    trace_nrf51_timer_read(offset, r, size);
 +
 +    return r;
 +}
 +
-+static void nrf51_gpio_write(void *opaque, hwaddr offset,
++static inline void update_cc_sorted(Nrf51TimerState *s)
++{
++    memcpy(s->cc_sorted, s->cc, sizeof(s->cc_sorted));
++    qsort(s->cc_sorted, NRF51_TIMER_REG_COUNT, sizeof(uint32_t), cmpfunc=
+);
++}
++
++static void nrf51_timer_write(void *opaque, hwaddr offset,
 +                       uint64_t value, unsigned int size)
 +{
-+    Nrf51GPIOState *s =3D NRF51_GPIO(opaque);
++    Nrf51TimerState *s =3D NRF51_TIMER(opaque);
++    uint64_t now =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
 +    size_t idx;
 +
-+    trace_nrf51_gpio_write(offset, value);
++    trace_nrf51_timer_write(offset, value, size);
 +
 +    switch (offset) {
-+    case NRF51_GPIO_REG_OUT:
-+        s->out =3D value;
++    case NRF51_TIMER_TASK_START:
++        if (value =3D=3D NRF51_TRIGGER_TASK) {
++            s->running =3D true;
++        }
 +        break;
-+
-+    case NRF51_GPIO_REG_OUTSET:
-+        s->out |=3D value;
++    case NRF51_TIMER_TASK_STOP:
++    case NRF51_TIMER_TASK_SHUTDOWN:
++        if (value =3D=3D NRF51_TRIGGER_TASK) {
++            s->running =3D false;
++        }
 +        break;
-+
-+    case NRF51_GPIO_REG_OUTCLR:
-+        s->out &=3D ~value;
++    case NRF51_TIMER_TASK_COUNT:
++        if (value =3D=3D NRF51_TRIGGER_TASK) {
++            qemu_log_mask(LOG_UNIMP, "COUNTER mode not implemented\n");
++        }
 +        break;
-+
-+    case NRF51_GPIO_REG_DIR:
-+        s->dir =3D value;
-+        reflect_dir_bit_in_cnf(s);
++    case NRF51_TIMER_TASK_CLEAR:
++        if (value =3D=3D NRF51_TRIGGER_TASK) {
++            s->time_offset =3D now;
++            s->last_visited =3D now;
++        }
 +        break;
-+
-+    case NRF51_GPIO_REG_DIRSET:
-+        s->dir |=3D value;
-+        reflect_dir_bit_in_cnf(s);
++    case NRF51_TIMER_TASK_CAPTURE_0 ... NRF51_TIMER_TASK_CAPTURE_3:
++        if (value =3D=3D NRF51_TRIGGER_TASK) {
++            idx =3D (offset - NRF51_TIMER_TASK_CAPTURE_0) / 4;
++            s->cc[idx] =3D ns_to_ticks(s, now - s->time_offset) & BWM(s-=
+>bitmode);
++            update_cc_sorted(s);
++        }
 +        break;
-+
-+    case NRF51_GPIO_REG_DIRCLR:
-+        s->dir &=3D ~value;
-+        reflect_dir_bit_in_cnf(s);
++    case NRF51_TIMER_EVENT_COMPARE_0 ... NRF51_TIMER_EVENT_COMPARE_3:
++        if (value =3D=3D NRF51_EVENT_CLEAR) {
++            s->events_compare[(offset - NRF51_TIMER_EVENT_COMPARE_0) / 4=
+] =3D 0;
++        }
 +        break;
-+
-+    case NRF51_GPIO_REG_CNF_START ... NRF51_GPIO_REG_CNF_END:
-+        idx =3D (offset - NRF51_GPIO_REG_CNF_START) / 4;
-+        s->cnf[idx] =3D value;
-+        /* direction is exposed in both the DIR register and the DIR bit
-+         * of each PINs CNF configuration register. */
-+        s->dir =3D (s->dir & ~(1UL << idx)) | ((value & 0x01) << idx);
++    case NRF51_TIMER_REG_SHORTS:
++        s->shorts =3D value & NRF51_TIMER_REG_SHORTS_MASK;
 +        break;
-+
++    case NRF51_TIMER_REG_INTENSET:
++        s->inten |=3D value & NRF51_TIMER_REG_INTEN_MASK;
++        break;
++    case NRF51_TIMER_REG_INTENCLR:
++        s->inten &=3D ~(value & NRF51_TIMER_REG_INTEN_MASK);
++        break;
++    case NRF51_TIMER_REG_MODE:
++        if (s->mode !=3D NRF51_TIMER_TIMER) {
++            qemu_log_mask(LOG_UNIMP, "COUNTER mode not implemented\n");
++            return;
++        }
++        s->mode =3D value;
++        break;
++    case NRF51_TIMER_REG_BITMODE:
++        if (s->mode =3D=3D NRF51_TIMER_TIMER && s->running) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                "%s: erroneous change of BITMODE while timer is running\=
+n",
++                __func__);
++        }
++        s->bitmode =3D value & NRF51_TIMER_REG_BITMODE_MASK;
++        s->time_offset =3D now;
++        s->last_visited =3D now;
++        break;
++    case NRF51_TIMER_REG_PRESCALER:
++        if (s->mode =3D=3D NRF51_TIMER_TIMER && s->running) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                "%s: erroneous change of PRESCALER while timer is runnin=
+g\n",
++                __func__);
++        }
++        s->prescaler =3D value & NRF51_TIMER_REG_PRESCALER_MASK;
++        s->time_offset =3D now;
++        s->last_visited =3D now;
++        break;
++    case NRF51_TIMER_REG_CC0 ... NRF51_TIMER_REG_CC3:
++        s->cc[(offset - NRF51_TIMER_REG_CC0) / 4] =3D value & BWM(s->bit=
+mode);
++        update_cc_sorted(s);
++        break;
 +    default:
 +        qemu_log_mask(LOG_GUEST_ERROR,
 +                      "%s: bad write offset 0x%" HWADDR_PRIx "\n",
 +                      __func__, offset);
 +    }
 +
-+    update_state(s);
++    update_internal_state(s, now);
 +}
 +
-+static const MemoryRegionOps gpio_ops =3D {
-+    .read =3D  nrf51_gpio_read,
-+    .write =3D nrf51_gpio_write,
++static const MemoryRegionOps rng_ops =3D {
++    .read =3D  nrf51_timer_read,
++    .write =3D nrf51_timer_write,
 +    .endianness =3D DEVICE_LITTLE_ENDIAN,
 +    .impl.min_access_size =3D 4,
 +    .impl.max_access_size =3D 4,
 +};
 +
-+static void nrf51_gpio_set(void *opaque, int line, int value)
++static void nrf51_timer_init(Object *obj)
 +{
-+    Nrf51GPIOState *s =3D NRF51_GPIO(opaque);
++    Nrf51TimerState *s =3D NRF51_TIMER(obj);
++    SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
 +
-+    trace_nrf51_gpio_set(line, value);
++    memory_region_init_io(&s->iomem, obj, &rng_ops, s,
++            TYPE_NRF51_TIMER, NRF51_TIMER_SIZE);
++    sysbus_init_mmio(sbd, &s->iomem);
++    sysbus_init_irq(sbd, &s->irq);
 +
-+    assert(line >=3D 0 && line < NRF51_GPIO_PINS);
-+
-+    s->in_mask =3D deposit32(s->in_mask, line, 1, value >=3D 0);
-+    if (value >=3D 0) {
-+        s->in =3D deposit32(s->in, line, 1, value !=3D 0);
-+    }
-+
-+    update_state(s);
++    timer_init_ns(&s->timer, QEMU_CLOCK_VIRTUAL, timer_expire, s);
 +}
 +
-+static void nrf51_gpio_reset(DeviceState *dev)
++static void nrf51_timer_reset(DeviceState *dev)
 +{
-+    Nrf51GPIOState *s =3D NRF51_GPIO(dev);
-+    size_t i;
++    Nrf51TimerState *s =3D NRF51_TIMER(dev);
 +
-+    s->out =3D 0;
-+    s->old_out =3D 0;
-+    s->old_out_connected =3D 0;
-+    s->in =3D 0;
-+    s->in_mask =3D 0;
-+    s->dir =3D 0;
++    s->running =3D false;
 +
-+    for (i =3D 0; i < NRF51_GPIO_PINS; i++) {
-+        s->cnf[i] =3D 0x00000002;
-+    }
++    memset(s->events_compare, 0x00, sizeof(s->events_compare));
++    memset(s->cc, 0x00, sizeof(s->cc));
++    memset(s->cc_sorted, 0x00, sizeof(s->cc_sorted));
++    s->shorts =3D 0x00;
++    s->inten =3D 0x00;
++    s->mode =3D 0x00;
++    s->bitmode =3D 0x00;
++    s->prescaler =3D 0x00;
++
++    uint64_t now =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++    s->time_offset =3D now;
++    s->last_visited =3D now;
++
++    update_internal_state(s, now);
 +}
 +
-+static const VMStateDescription vmstate_nrf51_gpio =3D {
-+    .name =3D TYPE_NRF51_GPIO,
++static const VMStateDescription vmstate_nrf51_timer =3D {
++    .name =3D TYPE_NRF51_TIMER,
 +    .version_id =3D 1,
 +    .minimum_version_id =3D 1,
-+    .minimum_version_id_old =3D 1,
 +    .fields =3D (VMStateField[]) {
-+        VMSTATE_UINT32(out, Nrf51GPIOState),
-+        VMSTATE_UINT32(in, Nrf51GPIOState),
-+        VMSTATE_UINT32(in_mask, Nrf51GPIOState),
-+        VMSTATE_UINT32(dir, Nrf51GPIOState),
-+        VMSTATE_UINT32_ARRAY(cnf, Nrf51GPIOState, NRF51_GPIO_PINS),
-+        VMSTATE_UINT32(old_out, Nrf51GPIOState),
-+        VMSTATE_UINT32(old_out_connected, Nrf51GPIOState),
++        VMSTATE_TIMER(timer, Nrf51TimerState),
++        VMSTATE_BOOL(running, Nrf51TimerState),
++        VMSTATE_UINT64(time_offset, Nrf51TimerState),
++        VMSTATE_UINT64(last_visited, Nrf51TimerState),
++        VMSTATE_UINT8_ARRAY(events_compare, Nrf51TimerState,
++                            NRF51_TIMER_REG_COUNT),
++        VMSTATE_UINT32_ARRAY(cc, Nrf51TimerState, NRF51_TIMER_REG_COUNT)=
+,
++        VMSTATE_UINT32_ARRAY(cc_sorted, Nrf51TimerState, NRF51_TIMER_REG=
+_COUNT),
++        VMSTATE_UINT32(shorts, Nrf51TimerState),
++        VMSTATE_UINT32(inten, Nrf51TimerState),
++        VMSTATE_UINT32(mode, Nrf51TimerState),
++        VMSTATE_UINT32(bitmode, Nrf51TimerState),
++        VMSTATE_UINT32(prescaler, Nrf51TimerState),
 +        VMSTATE_END_OF_LIST()
 +    }
 +};
 +
-+static void nrf51_gpio_init(Object *obj)
-+{
-+    Nrf51GPIOState *s =3D NRF51_GPIO(obj);
++static Property nrf51_timer_properties[] =3D {
++    DEFINE_PROP_END_OF_LIST(),
++};
 +
-+    memory_region_init_io(&s->mmio, obj, &gpio_ops, s,
-+            TYPE_NRF51_GPIO, NRF51_GPIO_SIZE);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
-+
-+    qdev_init_gpio_in(DEVICE(s), nrf51_gpio_set, NRF51_GPIO_PINS);
-+    qdev_init_gpio_out(DEVICE(s), s->output, NRF51_GPIO_PINS);
-+}
-+
-+static void nrf51_gpio_class_init(ObjectClass *klass, void *data)
++static void nrf51_timer_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc =3D DEVICE_CLASS(klass);
 +
-+    dc->vmsd =3D &vmstate_nrf51_gpio;
-+    dc->reset =3D nrf51_gpio_reset;
-+    dc->desc =3D "nRF51 GPIO";
++    dc->props =3D nrf51_timer_properties;
++    dc->reset =3D nrf51_timer_reset;
++    dc->vmsd =3D &vmstate_nrf51_timer;
 +}
 +
-+static const TypeInfo nrf51_gpio_info =3D {
-+    .name =3D TYPE_NRF51_GPIO,
++static const TypeInfo nrf51_timer_info =3D {
++    .name =3D TYPE_NRF51_TIMER,
 +    .parent =3D TYPE_SYS_BUS_DEVICE,
-+    .instance_size =3D sizeof(Nrf51GPIOState),
-+    .instance_init =3D nrf51_gpio_init,
-+    .class_init =3D nrf51_gpio_class_init
++    .instance_size =3D sizeof(Nrf51TimerState),
++    .instance_init =3D nrf51_timer_init,
++    .class_init =3D nrf51_timer_class_init
 +};
 +
-+static void nrf51_gpio_register_types(void)
++static void nrf51_timer_register_types(void)
 +{
-+    type_register_static(&nrf51_gpio_info);
++    type_register_static(&nrf51_timer_info);
 +}
 +
-+type_init(nrf51_gpio_register_types)
-diff --git a/hw/gpio/trace-events b/hw/gpio/trace-events
-new file mode 100644
-index 0000000000..cb41a89756
---- /dev/null
-+++ b/hw/gpio/trace-events
-@@ -0,0 +1,7 @@
-+# See docs/devel/tracing.txt for syntax documentation.
++type_init(nrf51_timer_register_types)
+diff --git a/hw/timer/trace-events b/hw/timer/trace-events
+index 75bd3b1042..0144a68951 100644
+--- a/hw/timer/trace-events
++++ b/hw/timer/trace-events
+@@ -72,3 +72,8 @@ sun4v_rtc_write(uint64_t addr, uint64_t value) "write: =
+addr 0x%" PRIx64 " value
+=20
+ # hw/timer/xlnx-zynqmp-rtc.c
+ xlnx_zynqmp_rtc_gettime(int year, int month, int day, int hour, int min,=
+ int sec) "Get time from host: %d-%d-%d %2d:%02d:%02d"
 +
-+# hw/gpio/nrf51_gpio.c
-+nrf51_gpio_read(uint64_t offset, uint64_t r) "offset 0x%" PRIx64 " value=
- 0x%" PRIx64
-+nrf51_gpio_write(uint64_t offset, uint64_t value) "offset 0x%" PRIx64 " =
-value 0x%" PRIx64
-+nrf51_gpio_set(int64_t line, int64_t value) "line %" PRIi64 " value %" P=
-RIi64
-+nrf51_gpio_update_output_irq(int64_t line, int64_t value) "line %" PRIi6=
-4 " value %" PRIi64
-\ No newline at end of file
-diff --git a/include/hw/gpio/nrf51_gpio.h b/include/hw/gpio/nrf51_gpio.h
++# hw/timer/nrf51_timer.c
++nrf51_timer_read(uint64_t addr, uint32_t value, unsigned size) "read add=
+r 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
++nrf51_timer_write(uint64_t addr, uint32_t value, unsigned size) "write a=
+ddr 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
++
+diff --git a/include/hw/timer/nrf51_timer.h b/include/hw/timer/nrf51_time=
+r.h
 new file mode 100644
-index 0000000000..94bd2fee48
+index 0000000000..b0f5848b00
 --- /dev/null
-+++ b/include/hw/gpio/nrf51_gpio.h
-@@ -0,0 +1,69 @@
++++ b/include/hw/timer/nrf51_timer.h
+@@ -0,0 +1,77 @@
 +/*
-+ * nRF51 System-on-Chip general purpose input/output register definition
++ * nRF51 System-on-Chip Timer peripheral
 + *
 + * QEMU interface:
 + * + sysbus MMIO regions 0: GPIO registers
-+ * + Unnamed GPIO inputs 0-31: Set tri-state input level for GPIO pin.
-+ *   Level -1: Externally Disconnected/Floating; Pull-up/down will be re=
-garded
-+ *   Level 0: Input externally driven LOW
-+ *   Level 1: Input externally driven HIGH
-+ * + Unnamed GPIO outputs 0-31:
-+ *   Level -1: Disconnected/Floating
-+ *   Level 0: Driven LOW
-+ *   Level 1: Driven HIGH
++ * + sysbus irq
 + *
 + * Accuracy of the peripheral model:
-+ * + The nRF51 GPIO output driver supports two modes, standard and high-=
-current
-+ *   mode. These different drive modes are not modeled and handled the s=
-ame.
-+ * + Pin SENSEing is not modeled/implemented.
++ * + Only TIMER mode is implemented, COUNTER mode is not implemented.
 + *
 + * Copyright 2018 Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
 + *
 + * This code is licensed under the GPL version 2 or later.  See
 + * the COPYING file in the top-level directory.
-+ *
 + */
-+#ifndef NRF51_GPIO_H
-+#define NRF51_GPIO_H
++#ifndef NRF51_TIMER_H
++#define NRF51_TIMER_H
 +
 +#include "hw/sysbus.h"
-+#define TYPE_NRF51_GPIO "nrf51_soc.gpio"
-+#define NRF51_GPIO(obj) OBJECT_CHECK(Nrf51GPIOState, (obj), TYPE_NRF51_G=
-PIO)
++#include "qemu/timer.h"
++#define TYPE_NRF51_TIMER "nrf51_soc.timer"
++#define NRF51_TIMER(obj) OBJECT_CHECK(Nrf51TimerState, (obj), TYPE_NRF51=
+_TIMER)
 +
-+#define NRF51_GPIO_PINS 32
++#define NRF51_TIMER_REG_COUNT 4
 +
-+#define NRF51_GPIO_SIZE 0x1000
++#define NRF51_TIMER_SIZE         0x1000
 +
-+#define NRF51_GPIO_REG_OUT          0x504
-+#define NRF51_GPIO_REG_OUTSET       0x508
-+#define NRF51_GPIO_REG_OUTCLR       0x50C
-+#define NRF51_GPIO_REG_IN           0x510
-+#define NRF51_GPIO_REG_DIR          0x514
-+#define NRF51_GPIO_REG_DIRSET       0x518
-+#define NRF51_GPIO_REG_DIRCLR       0x51C
-+#define NRF51_GPIO_REG_CNF_START    0x700
-+#define NRF51_GPIO_REG_CNF_END      0x77F
++#define NRF51_TIMER_TASK_START 0x000
++#define NRF51_TIMER_TASK_STOP 0x004
++#define NRF51_TIMER_TASK_COUNT 0x008
++#define NRF51_TIMER_TASK_CLEAR 0x00C
++#define NRF51_TIMER_TASK_SHUTDOWN 0x010
++#define NRF51_TIMER_TASK_CAPTURE_0 0x040
++#define NRF51_TIMER_TASK_CAPTURE_3 0x04C
 +
-+#define NRF51_GPIO_PULLDOWN 1
-+#define NRF51_GPIO_PULLUP 3
++#define NRF51_TIMER_EVENT_COMPARE_0 0x140
++#define NRF51_TIMER_EVENT_COMPARE_3 0x14C
 +
-+typedef struct Nrf51GPIOState {
++#define NRF51_TIMER_REG_SHORTS 0x200
++#define NRF51_TIMER_REG_SHORTS_MASK 0xf0f
++#define NRF51_TIMER_REG_INTENSET 0x304
++#define NRF51_TIMER_REG_INTENCLR 0x308
++#define NRF51_TIMER_REG_INTEN_MASK 0xf0000
++#define NRF51_TIMER_REG_MODE 0x504
++#define NRF51_TIMER_REG_MODE_MASK 0x01
++#define NRF51_TIMER_REG_BITMODE 0x508
++#define NRF51_TIMER_REG_BITMODE_MASK 0x03
++#define NRF51_TIMER_REG_PRESCALER 0x510
++#define NRF51_TIMER_REG_PRESCALER_MASK 0x0F
++#define NRF51_TIMER_REG_CC0 0x540
++#define NRF51_TIMER_REG_CC3 0x54C
++
++typedef struct Nrf51TimerState {
 +    SysBusDevice parent_obj;
 +
-+    MemoryRegion mmio;
++    MemoryRegion iomem;
 +    qemu_irq irq;
 +
-+    uint32_t out;
-+    uint32_t in;
-+    uint32_t in_mask;
-+    uint32_t dir;
-+    uint32_t cnf[NRF51_GPIO_PINS];
++    QEMUTimer timer;
 +
-+    uint32_t old_out;
-+    uint32_t old_out_connected;
++    bool running;
 +
-+    qemu_irq output[NRF51_GPIO_PINS];
-+} Nrf51GPIOState;
++    uint64_t time_offset;
++    uint64_t last_visited;
++
++    uint8_t events_compare[NRF51_TIMER_REG_COUNT];
++    uint32_t cc[NRF51_TIMER_REG_COUNT];
++    uint32_t cc_sorted[NRF51_TIMER_REG_COUNT];
++    uint32_t shorts;
++    uint32_t inten;
++    uint32_t mode;
++    uint32_t bitmode;
++    uint32_t prescaler;
++} Nrf51TimerState;
 +
 +
 +#endif
