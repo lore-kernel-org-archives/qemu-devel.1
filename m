@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37707)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gHZVL-00031O-5H
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:16:45 -0400
+	(envelope-from <philmd@redhat.com>) id 1gHZjn-0005dG-Bw
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:31:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gHZVI-0005ri-FY
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:16:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39711)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gHZVI-0005j4-3a
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:16:40 -0400
-From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 30 Oct 2018 20:16:14 +0100
-Message-Id: <20181030191620.32168-3-armbru@redhat.com>
-In-Reply-To: <20181030191620.32168-1-armbru@redhat.com>
-References: <20181030191620.32168-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 2/8] monitor: delay monitor iothread creation
+	(envelope-from <philmd@redhat.com>) id 1gHZjd-0007wK-GN
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:31:34 -0400
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Tue, 30 Oct 2018 20:30:43 +0100
+Message-Id: <20181030193044.25954-1-philmd@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3] arm: exynos4: Add dma support for smdkc210
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,111 +20,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Wolfgang Bumiller <w.bumiller@proxmox.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Guenter Roeck <linux@roeck-us.net>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Alistair Francis <alistair@alistair23.me>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-From: Wolfgang Bumiller <w.bumiller@proxmox.com>
+From: Guenter Roeck <linux@roeck-us.net>
 
-Commit d32749deb615 moved the call to monitor_init_globals()
-to before os_daemonize(), making it an unsuitable place to
-spawn the monitor iothread as it won't be inherited over the
-fork() in os_daemonize().
+QEMU already supports pl330. Instantiate it for smdkc210.
 
-We now spawn the thread the first time we instantiate a
-monitor which actually has use_io_thread == true.
-Instantiation of monitors happens only after os_daemonize().
-We still need to create the qmp_dispatcher_bh when not using
-iothreads, so this now still happens in
-monitor_init_globals().
+Relevant part of Linux arch/arm/boot/dts/exynos4.dtsi:
 
-Signed-off-by: Wolfgang Bumiller <w.bumiller@proxmox.com>
-Fixes: d32749deb615 ("monitor: move init global earlier")
-Message-Id: <20180925081507.11873-3-w.bumiller@proxmox.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Tested-by: Peter Xu <peterx@redhat.com>
-[This fixes a crash on shutdown with --daemonize]
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
+/ {
+    soc: soc {
+        amba {
+            pdma0: pdma@12680000 {
+                compatible =3D "arm,pl330", "arm,primecell";
+                reg =3D <0x12680000 0x1000>;
+                interrupts =3D <GIC_SPI 35 IRQ_TYPE_LEVEL_HIGH>;
+                clocks =3D <&clock CLK_PDMA0>;
+                clock-names =3D "apb_pclk";
+                #dma-cells =3D <1>;
+                #dma-channels =3D <8>;
+                #dma-requests =3D <32>;
+            };
+            pdma1: pdma@12690000 {
+                compatible =3D "arm,pl330", "arm,primecell";
+                reg =3D <0x12690000 0x1000>;
+                interrupts =3D <GIC_SPI 36 IRQ_TYPE_LEVEL_HIGH>;
+                clocks =3D <&clock CLK_PDMA1>;
+                clock-names =3D "apb_pclk";
+                #dma-cells =3D <1>;
+                #dma-channels =3D <8>;
+                #dma-requests =3D <32>;
+            };
+            mdma1: mdma@12850000 {
+                compatible =3D "arm,pl330", "arm,primecell";
+                reg =3D <0x12850000 0x1000>;
+                interrupts =3D <GIC_SPI 34 IRQ_TYPE_LEVEL_HIGH>;
+                clocks =3D <&clock CLK_MDMA>;
+                clock-names =3D "apb_pclk";
+                #dma-cells =3D <1>;
+                #dma-channels =3D <8>;
+                #dma-requests =3D <1>;
+            };
+        };
+    };
+};
+
+Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+[PMD: Do not set default qdev properties, create the controllers in the S=
+oC
+      rather than the board (Peter Maydell), add dtsi in commit message]
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- monitor.c | 35 +++++++++++++++++++++--------------
- 1 file changed, 21 insertions(+), 14 deletions(-)
+Another intent to salvage previous work from Guenter Roeck:
+https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg06302.html
 
-diff --git a/monitor.c b/monitor.c
-index 66f149c1dc..d39390c2f2 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -708,9 +708,14 @@ static void monitor_qapi_event_init(void)
- 
- static void handle_hmp_command(Monitor *mon, const char *cmdline);
- 
-+static void monitor_iothread_init(void);
+Since v2: https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg06459.=
+html
+- rename init -> create
+- create controllers in SoC rather than the board (Peter Maydell)
+- add Linux dtsi in commit message
+
+Since v1: https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg06335.=
+html
+- Do not factor out pl330_init, which resulted in buggy v1, see:
+  https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg06448.html
+
+ hw/arm/exynos4210.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+
+diff --git a/hw/arm/exynos4210.c b/hw/arm/exynos4210.c
+index 827318a003..cd27b9387c 100644
+--- a/hw/arm/exynos4210.c
++++ b/hw/arm/exynos4210.c
+@@ -96,6 +96,11 @@
+ /* EHCI */
+ #define EXYNOS4210_EHCI_BASE_ADDR           0x12580000
+=20
++/* DMA */
++#define EXYNOS4210_PL330_BASE0_ADDR         0x12680000
++#define EXYNOS4210_PL330_BASE1_ADDR         0x12690000
++#define EXYNOS4210_PL330_BASE2_ADDR         0x12850000
 +
- static void monitor_data_init(Monitor *mon, bool skip_flush,
-                               bool use_io_thread)
- {
-+    if (use_io_thread && !mon_iothread) {
-+        monitor_iothread_init();
-+    }
-     memset(mon, 0, sizeof(Monitor));
-     qemu_mutex_init(&mon->mon_lock);
-     qemu_mutex_init(&mon->qmp.qmp_queue_lock);
-@@ -4461,15 +4466,6 @@ static AioContext *monitor_get_aio_context(void)
- static void monitor_iothread_init(void)
- {
-     mon_iothread = iothread_create("mon_iothread", &error_abort);
--
--    /*
--     * The dispatcher BH must run in the main loop thread, since we
--     * have commands assuming that context.  It would be nice to get
--     * rid of those assumptions.
--     */
--    qmp_dispatcher_bh = aio_bh_new(iohandler_get_aio_context(),
--                                   monitor_qmp_bh_dispatcher,
--                                   NULL);
+ static uint8_t chipid_and_omr[] =3D { 0x11, 0x02, 0x21, 0x43,
+                                     0x09, 0x00, 0x00, 0x00 };
+=20
+@@ -160,6 +165,19 @@ static uint64_t exynos4210_calc_affinity(int cpu)
+     return (0x9 << ARM_AFF1_SHIFT) | cpu;
  }
- 
- void monitor_init_globals(void)
-@@ -4479,7 +4475,15 @@ void monitor_init_globals(void)
-     sortcmdlist();
-     qemu_mutex_init(&monitor_lock);
-     qemu_mutex_init(&mon_fdsets_lock);
--    monitor_iothread_init();
+=20
++static void pl330_create(uint32_t base, qemu_irq irq, int nreq)
++{
++    SysBusDevice *busdev;
++    DeviceState *dev;
 +
-+    /*
-+     * The dispatcher BH must run in the main loop thread, since we
-+     * have commands assuming that context.  It would be nice to get
-+     * rid of those assumptions.
-+     */
-+    qmp_dispatcher_bh = aio_bh_new(iohandler_get_aio_context(),
-+                                   monitor_qmp_bh_dispatcher,
-+                                   NULL);
++    dev =3D qdev_create(NULL, "pl330");
++    qdev_prop_set_uint8(dev, "num_periph_req",  nreq);
++    qdev_init_nofail(dev);
++    busdev =3D SYS_BUS_DEVICE(dev);
++    sysbus_mmio_map(busdev, 0, base);
++    sysbus_connect_irq(busdev, 0, irq);
++}
++
+ Exynos4210State *exynos4210_init(MemoryRegion *system_mem)
+ {
+     Exynos4210State *s =3D g_new(Exynos4210State, 1);
+@@ -410,5 +428,13 @@ Exynos4210State *exynos4210_init(MemoryRegion *syste=
+m_mem)
+     sysbus_create_simple(TYPE_EXYNOS4210_EHCI, EXYNOS4210_EHCI_BASE_ADDR=
+,
+             s->irq_table[exynos4210_get_irq(28, 3)]);
+=20
++    /*** DMA controllers ***/
++    pl330_create(EXYNOS4210_PL330_BASE0_ADDR,
++                 qemu_irq_invert(s->irq_table[exynos4210_get_irq(35, 1)]=
+), 32);
++    pl330_create(EXYNOS4210_PL330_BASE1_ADDR,
++                 qemu_irq_invert(s->irq_table[exynos4210_get_irq(36, 1)]=
+), 32);
++    pl330_create(EXYNOS4210_PL330_BASE2_ADDR,
++                 qemu_irq_invert(s->irq_table[exynos4210_get_irq(34, 1)]=
+), 1);
++
+     return s;
  }
- 
- /* These functions just adapt the readline interface in a typesafe way.  We
-@@ -4624,7 +4628,9 @@ void monitor_cleanup(void)
-      * we need to unregister from chardev below in
-      * monitor_data_destroy(), and chardev is not thread-safe yet
-      */
--    iothread_stop(mon_iothread);
-+    if (mon_iothread) {
-+        iothread_stop(mon_iothread);
-+    }
- 
-     /* Flush output buffers and destroy monitors */
-     qemu_mutex_lock(&monitor_lock);
-@@ -4639,9 +4645,10 @@ void monitor_cleanup(void)
-     /* QEMUBHs needs to be deleted before destroying the I/O thread */
-     qemu_bh_delete(qmp_dispatcher_bh);
-     qmp_dispatcher_bh = NULL;
--
--    iothread_destroy(mon_iothread);
--    mon_iothread = NULL;
-+    if (mon_iothread) {
-+        iothread_destroy(mon_iothread);
-+        mon_iothread = NULL;
-+    }
- }
- 
- QemuOptsList qemu_mon_opts = {
--- 
+--=20
 2.17.2
