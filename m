@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53024)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53220)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gHQPF-0000Pq-OL
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 05:33:50 -0400
+	(envelope-from <ppandit@redhat.com>) id 1gHQQB-0000oI-CG
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 05:34:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gHQPD-0003PO-Iu
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 05:33:49 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:45638)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gHQP7-0003JU-HF
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 05:33:43 -0400
-Received: by mail-ot1-x341.google.com with SMTP id q25so10403014otn.12
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 02:33:37 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <c097d8c.a587.166c2c22a77.Coremail.wj193102@163.com>
-References: <c097d8c.a587.166c2c22a77.Coremail.wj193102@163.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 30 Oct 2018 09:33:15 +0000
-Message-ID: <CAFEAcA-r=71qgPByUWuKsSAwiRA2S7qidtrrWyRuHvrckAvxSQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] qemu3.0.0: Linux on non x86 CPUs run Wine
+	(envelope-from <ppandit@redhat.com>) id 1gHQQ7-0003zk-A5
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 05:34:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50999)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gHQQ7-0003wl-3h
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 05:34:43 -0400
+From: P J P <ppandit@redhat.com>
+Date: Tue, 30 Oct 2018 15:02:32 +0530
+Message-Id: <20181030093232.15660-1-ppandit@redhat.com>
+Subject: [Qemu-devel] [PATCH v3] lsi53c895a: check message length value is
+ valid
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +22,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: wj193102 <wj193102@163.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Qemu Developers <qemu-devel@nongnu.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Fam Zheng <famz@redhat.com>, Ameya More <ameya.more@oracle.com>, Prasad J Pandit <pjp@fedoraproject.org>
 
-On 30 October 2018 at 02:16, wj193102 <wj193102@163.com> wrote:
-> Hi, everyone.
->     When I have installed the QEMU3.0.0 in the Linux on non X86 CPUS, I want to use user space emulator to run Wine. I can get the source code for Wine and the RPM file for Wine from the WineHQ web page.
-> I used to compile Wine in the X86-based Linux system and used it to run most Win32 programs. Now I want to  use it on the non X86 CPUS by QEMU. But I can't get the function to install and use the Wine. Please give me some advice
-> or some functions to finish it. Thanks a lot.
+From: Prasad J Pandit <pjp@fedoraproject.org>
 
-I'm afraid you will need to provide more detail for us to
-help here. What exactly are you doing? Which commands are you
-running? What is the exact error message or failure you see?
+While writing a message in 'lsi_do_msgin', message length value
+in 'msg_len' could be invalid. Add check to avoid OOB access issue.
 
->    Meanwhile, I use the command "qemu-i386/qemu-x86_64 *.sh" to
-> run the application from the X86 CPUS on non X86 CPUS, I get the
-> error information:"Invalid ELF image for this architecture". Why
-> the error is comming? What can I do to resolve this problem?
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+---
+ hw/scsi/lsi53c895a.c | 19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
 
-This is probably because you are trying to run a shell script.
-(I'm guessing this from the '.sh' extension). This won't work.
-QEMU only runs actual executables (ELF files).
+Update v3: modify assert to say s->msg_len > 0
+  -> https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg06392.html
 
-Usually the setup is that the host Linux system is set up
-with binfmt-misc, so that if it encounters a guest-architecture
-binary it will automatically run it under QEMU. Usually
-this is done to allow running guest binaries inside a chroot.
-
-thanks
--- PMM
+diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
+index d1e6534311..3f207f607c 100644
+--- a/hw/scsi/lsi53c895a.c
++++ b/hw/scsi/lsi53c895a.c
+@@ -861,10 +861,11 @@ static void lsi_do_status(LSIState *s)
+ 
+ static void lsi_do_msgin(LSIState *s)
+ {
+-    int len;
++    uint8_t len;
+     trace_lsi_do_msgin(s->dbc, s->msg_len);
+     s->sfbr = s->msg[0];
+     len = s->msg_len;
++    assert(len > 0 && len <= LSI_MAX_MSGIN_LEN);
+     if (len > s->dbc)
+         len = s->dbc;
+     pci_dma_write(PCI_DEVICE(s), s->dnad, s->msg, len);
+@@ -1705,8 +1706,10 @@ static uint8_t lsi_reg_readb(LSIState *s, int offset)
+         break;
+     case 0x58: /* SBDL */
+         /* Some drivers peek at the data bus during the MSG IN phase.  */
+-        if ((s->sstat1 & PHASE_MASK) == PHASE_MI)
++        if ((s->sstat1 & PHASE_MASK) == PHASE_MI) {
++            assert(s->msg_len > 0);
+             return s->msg[0];
++        }
+         ret = 0;
+         break;
+     case 0x59: /* SBDL high */
+@@ -2103,11 +2106,23 @@ static int lsi_pre_save(void *opaque)
+     return 0;
+ }
+ 
++static int lsi_post_load(void *opaque, int version_id)
++{
++    LSIState *s = opaque;
++
++    if (s->msg_len < 0 || s->msg_len > LSI_MAX_MSGIN_LEN) {
++        return -EINVAL;
++    }
++
++    return 0;
++}
++
+ static const VMStateDescription vmstate_lsi_scsi = {
+     .name = "lsiscsi",
+     .version_id = 0,
+     .minimum_version_id = 0,
+     .pre_save = lsi_pre_save,
++    .post_load = lsi_post_load,
+     .fields = (VMStateField[]) {
+         VMSTATE_PCI_DEVICE(parent_obj, LSIState),
+ 
+-- 
+2.17.2
