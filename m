@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34639)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <max7255@yandex-team.ru>) id 1gHUZT-0004CY-Q3
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:00:45 -0400
+	(envelope-from <kraxel@redhat.com>) id 1gHUZi-0004HI-CD
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:00:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <max7255@yandex-team.ru>) id 1gHUZM-00031p-9k
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:00:39 -0400
-Received: from forwardcorp1o.cmail.yandex.net ([2a02:6b8:0:1a72::290]:35007)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <max7255@yandex-team.ru>)
-	id 1gHUZL-0002wG-Lk
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:00:32 -0400
-References: <1540512223-21199-1-git-send-email-max7255@yandex-team.ru>
-	<1540512223-21199-5-git-send-email-max7255@yandex-team.ru>
-	<ba3b8e2d-8d3a-b738-3d87-d56def3ab1e3@redhat.com>
-From: Maxim Samoylov <max7255@yandex-team.ru>
-Message-ID: <f16cf85c-61ee-ed2a-f089-050fb32607aa@yandex-team.ru>
-Date: Tue, 30 Oct 2018 17:00:26 +0300
+	(envelope-from <kraxel@redhat.com>) id 1gHUZX-000393-Kl
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:00:54 -0400
+Date: Tue, 30 Oct 2018 15:00:30 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20181030140030.gh5aa7jcgszrfajs@sirius.home.kraxel.org>
+References: <20181030111348.14713-1-kraxel@redhat.com>
+	<20181030111348.14713-2-kraxel@redhat.com>
+	<8c224534-c929-7c7f-a126-a9390bbdb77f@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <ba3b8e2d-8d3a-b738-3d87-d56def3ab1e3@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC 4/4] net/slirp: add ipv6-hostfwd option
- for user netdev type
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <8c224534-c929-7c7f-a126-a9390bbdb77f@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/4] add QemuSupportState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,74 +25,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, =?utf-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>
 
+On Tue, Oct 30, 2018 at 02:32:40PM +0100, Philippe Mathieu-Daud=E9 wrote:
+> Hi Gerd,
+>=20
+> On 30/10/18 12:13, Gerd Hoffmann wrote:
+> > Indicates support state for somerhing (device, backend, subsystem, ..=
+.)
+>=20
+> "something"
 
+Oops, I'll fix.
 
-On 26.10.2018 09:14, Thomas Huth wrote:
-> On 2018-10-26 01:03, Maxim Samoylov wrote:
->> This allows forwarding TCP6 and UDP6 connections down to
->> netdev=user connected guests.
->>
->> Signed-off-by: Maxim Samoylov <max7255@yandex-team.ru>
->> ---
->>   hmp-commands.hx     |  31 ++++++++
->>   include/net/slirp.h |   2 +
->>   net/slirp.c         | 214 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->>   qapi/net.json       |   3 +-
->>   4 files changed, 249 insertions(+), 1 deletion(-)
->>
->> diff --git a/hmp-commands.hx b/hmp-commands.hx
->> index db0c681..b0e1a08 100644
->> --- a/hmp-commands.hx
->> +++ b/hmp-commands.hx
->> @@ -1448,6 +1448,37 @@ STEXI
->>   Remove host-to-guest TCP or UDP redirection.
->>   ETEXI
->>   
->> +#ifdef CONFIG_SLIRP
->> +    {
->> +        .name       = "ipv6_hostfwd_add",
->> +        .args_type  = "arg1:s,arg2:s?,arg3:s?",
->> +        .params     = "[hub_id name]|[netdev_id] [tcp|udp]:[hostaddr6]:hostport-guestaddr6:guestport",
->> +        .help       = "redirect TCP6 or UDP6 connections from host to guest (requires -net user)",
->> +        .cmd        = hmp_ipv6_hostfwd_add,
->> +    },
->> +#endif
->> +STEXI
->> +@item hostfwd_add
->> +@findex hostfwd_add
->> +Redirect TCP6 or UDP6 connections from host to guest (requires -net user).
->> +ETEXI
->> +
->> +#ifdef CONFIG_SLIRP
->> +    {
->> +        .name       = "ipv6_hostfwd_remove",
->> +        .args_type  = "arg1:s,arg2:s?,arg3:s?",
->> +        .params     = "[hub_id name]|[netdev_id] [tcp|udp]:[hostaddr6]:hostport",
->> +        .help       = "remove host-to-guest TCP6 or UDP6 redirection",
->> +        .cmd        = hmp_ipv6_hostfwd_remove,
->> +    },
-> 
->   Hi,
-> 
-> could you please remove the "[hub_id name]" touple here? I recently sent
-> a patch to deprecate it for the IPv4 version, too:
-> 
-> https://lists.gnu.org/archive/html/qemu-devel/2018-09/msg03198.html
-> 
+> > +##
+> > +# @SupportState:
+> > +#
+> > +# Indicate Support level of qemu devices, backends, subsystems, ...
+> > +#
+> > +# Since: 3.2
+> > +##
+> > +{ 'enum': 'SupportState',
+> > +  'data': [ 'unknown',
+>=20
+> 'unknown' is scary and should be fixed.
 
-Ok
+'unknown' maps to "0" due to being first in list, so this is what you
+get when it isn't explicitly set to something else.  Which make sense
+IMHO.
 
-> Also I think it would make sense if you mention in the help text that
-> IPv6 addresses have to be given with square brackets?
-> 
->   Thanks,
->    Thomas
->
+> > +            'supported',
+> > +            'maintained',
+> > +            'odd-fixes',
+>=20
+> All those fit in 'supported'
+>=20
+> > +            'orphan',
+> > +            'obsolete',
+> > +            'deprecated' ] }
+>=20
+> And all those should appear as 'deprecated' IMHO.
 
-Sure, missed that thing.
+See minutes on deprecation discussion.  Seems there is agreement we
+need something more finegrained than "supported" and "deprecated".
 
----
-Maxim Samoylov, max7255@yandex-team.ru
+cheers,
+  Gerd
