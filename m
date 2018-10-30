@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52371)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gHbjy-0000Le-Nt
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 17:39:59 -0400
+	(envelope-from <philmd@redhat.com>) id 1gHbmg-0002Id-50
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 17:42:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gHbjx-0006mU-Ug
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 17:39:58 -0400
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:46632)
+	(envelope-from <philmd@redhat.com>) id 1gHbmd-0002eh-Ea
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 17:42:46 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:33976)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1gHbjx-0006m7-Mt
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 17:39:57 -0400
-Received: by mail-lj1-x242.google.com with SMTP id x3-v6so12865085lji.13
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 14:39:57 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gHbmd-0002b0-5t
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 17:42:43 -0400
+Received: by mail-wm1-f65.google.com with SMTP id f1-v6so12828447wmg.1
+	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 14:42:33 -0700 (PDT)
+References: <20181026081653.24602-1-luc.michel@greensocs.com>
+	<20181026081653.24602-2-luc.michel@greensocs.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <54d908e0-2704-a3b6-5fb9-9cf751308bdc@redhat.com>
+Date: Tue, 30 Oct 2018 22:42:29 +0100
 MIME-Version: 1.0
-References: <cover.1538683492.git.alistair.francis@wdc.com>
-	<727db304cd3676f89da0f2f9c5ba12e65795683c.1538683492.git.alistair.francis@wdc.com>
-	<CAFEAcA_o0_Yq130modYZ9L3WSq6GaLhdVOwicefz9xgFE+mi2A@mail.gmail.com>
-In-Reply-To: <CAFEAcA_o0_Yq130modYZ9L3WSq6GaLhdVOwicefz9xgFE+mi2A@mail.gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 30 Oct 2018 14:39:29 -0700
-Message-ID: <CAKmqyKNntu=ih2rqDEwsiia4T62uky3eXiu5j2FeJk5qrND4RA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 2/5] hw/riscv/virt: Connect the gpex PCIe
+In-Reply-To: <20181026081653.24602-2-luc.michel@greensocs.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 01/16] hw/cpu: introduce CPU clusters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,87 +30,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, stephen@eideticom.com
+To: Luc Michel <luc.michel@greensocs.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, alistair@alistair23.me, mark.burton@greensocs.com, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, saipava@xilinx.com, edgari@xilinx.com, qemu-arm@nongnu.org
 
-On Thu, Oct 25, 2018 at 11:47 AM Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> On 4 October 2018 at 21:06, Alistair Francis <Alistair.Francis@wdc.com> wrote:
-> > Connect the gpex PCIe device based on the device tree included in the
-> > HiFive Unleashed ROM.
-> >
-> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> > ---
-> >  default-configs/riscv32-softmmu.mak |  6 ++-
-> >  default-configs/riscv64-softmmu.mak |  6 ++-
-> >  hw/riscv/virt.c                     | 58 +++++++++++++++++++++++++++++
-> >  include/hw/riscv/virt.h             |  4 +-
-> >  4 files changed, 71 insertions(+), 3 deletions(-)
->
-> > +static inline DeviceState *
-> > +gpex_pcie_init(MemoryRegion *sys_mem, uint32_t bus_nr,
-> > +                 hwaddr cfg_base, uint64_t cfg_size,
-> > +                 hwaddr mmio_base, uint64_t mmio_size,
-> > +                 qemu_irq irq, bool link_up)
-> > +{
-> > +    DeviceState *dev;
-> > +    MemoryRegion *cfg, *mmio;
-> > +
-> > +    dev = qdev_create(NULL, TYPE_GPEX_HOST);
-> > +
-> > +    qdev_init_nofail(dev);
-> > +
-> > +    cfg = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
-> > +    memory_region_add_subregion_overlap(sys_mem, cfg_base, cfg, 0);
-> > +
-> > +    mmio = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 1);
-> > +    memory_region_add_subregion_overlap(sys_mem, 0, mmio, 0);
->
-> You probably also want to map the gpex's mmio region 2,
-> which is the PCI IO BAR window. Otherwise PCI devices
-> with IO BARs won't work right.
+Hi Luc,
 
-Ah, I missed this one. Fixed in the next version.
+On 26/10/18 10:16, Luc Michel wrote:
+> This commit adds the cpu-cluster type. It aims at gathering CPUs from
+> the same cluster in a machine.
+> 
+> For now it only has a `cluster-id` property.
+> 
+> Signed-off-by: Luc Michel <luc.michel@greensocs.com>
+> ---
+>   include/hw/cpu/cluster.h | 38 +++++++++++++++++++++++++++++++
+>   hw/cpu/cluster.c         | 49 ++++++++++++++++++++++++++++++++++++++++
+>   hw/cpu/Makefile.objs     |  2 +-
+>   3 files changed, 88 insertions(+), 1 deletion(-)
+>   create mode 100644 include/hw/cpu/cluster.h
+>   create mode 100644 hw/cpu/cluster.c
+> 
+> diff --git a/include/hw/cpu/cluster.h b/include/hw/cpu/cluster.h
+> new file mode 100644
+> index 0000000000..f233a47a4a
+> --- /dev/null
+> +++ b/include/hw/cpu/cluster.h
+> @@ -0,0 +1,38 @@
+> +/*
+> + * QEMU CPU cluster
+> + *
+> + * Copyright (c) 2018 GreenSocs SAS
+> + *
+> + * This program is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU General Public License
+> + * as published by the Free Software Foundation; either version 2
+> + * of the License, or (at your option) any later version.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License
+> + * along with this program; if not, see
+> + * <http://www.gnu.org/licenses/gpl-2.0.html>
+> + */
+> +#ifndef QEMU_HW_CPU_CLUSTER_H
+> +#define QEMU_HW_CPU_CLUSTER_H
+> +
+> +#include "qemu/osdep.h"
+> +#include "hw/qdev.h"
+> +
+> +#define TYPE_CPU_CLUSTER "cpu-cluster"
+> +#define CPU_CLUSTER(obj) \
+> +    OBJECT_CHECK(CPUClusterState, (obj), TYPE_CPU_CLUSTER)
+> +
+> +typedef struct CPUClusterState {
+> +    /*< private >*/
+> +    DeviceState parent_obj;
+> +
+> +    /*< public >*/
+> +    uint32_t cluster_id;
 
->
-> > +
-> > +    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, irq);
->
-> GPEX has 4 interrupt lines, corresponding to classic PCI
-> IRQs A, B, C, D. You need to wire them all up, or only the
-> first PCI device plugged in will have a working interrupt.
-> You also don't look to have the bit of device-tree generation
-> that sets up the interrupt-map, which tells the guest about
-> the mapping from PCI devfns (ie, which slot the card is in) to
-> IRQ lines.
+32-bit is future proof!
 
-Yep, I based this on the Xilinx PCIe as that's what I started with. I
-have updated to use an interrupt-map similar to the ARM virt board.
-Interrupts look like they are working now.
+> +} CPUClusterState;
+> +
+> +#endif
+> diff --git a/hw/cpu/cluster.c b/hw/cpu/cluster.c
+> new file mode 100644
+> index 0000000000..11121e6f26
+> --- /dev/null
+> +++ b/hw/cpu/cluster.c
+> @@ -0,0 +1,49 @@
+> +/*
+> + * QEMU CPU cluster
+> + *
+> + * Copyright (c) 2018 GreenSocs SAS
+> + *
+> + * This program is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU General Public License
+> + * as published by the Free Software Foundation; either version 2
+> + * of the License, or (at your option) any later version.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License
+> + * along with this program; if not, see
+> + * <http://www.gnu.org/licenses/gpl-2.0.html>
+> + */
+> +
+> +#include "hw/cpu/cluster.h"
+> +#include "qapi/error.h"
+> +#include "qemu/module.h"
+> +
+> +static Property cpu_cluster_properties[] = {
+> +    DEFINE_PROP_UINT32("cluster-id", CPUClusterState, cluster_id, 0),
+> +    DEFINE_PROP_END_OF_LIST()
+> +};
+> +
+> +static void cpu_cluster_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    dc->props = cpu_cluster_properties;
+> +}
+> +
 
->
-> > +
-> > +    return dev;
-> > +}
-> > +
-> >  static void riscv_virt_board_init(MachineState *machine)
-> >  {
-> >      const struct MemmapEntry *memmap = virt_memmap;
-> > @@ -382,6 +436,10 @@ static void riscv_virt_board_init(MachineState *machine)
-> >              qdev_get_gpio_in(DEVICE(s->plic), VIRTIO_IRQ + i));
-> >      }
-> >
-> > +    gpex_pcie_init(system_memory, 0, memmap[VIRT_PCIE].base,
-> > +                           memmap[VIRT_PCIE].size, 0x40000000, 0x20000000,
->
-> You could put the MMIO BAR window base and size in your memmap[] too...
+Can we unburden the CPU_CLUSTER user of setting the cluster_id?
+('qdev_prop_set_uint32(cpu_cluster, "cluster-id", id);' calls in patch #16)
 
-Fixed in v6.
+Something like:
 
-Alistair
+static void cpu_cluster_instance_init(Object *obj)
+{
+     CPUClusterState *s = CPU_CLUSTER(obj);
+     static uint32_t cpu_cluster_auto_increment_id;
 
->
-> > +                           qdev_get_gpio_in(DEVICE(s->plic), PCIE_IRQ), true);
->
-> thanks
-> -- PMM
+     s->cluster_id = cpu_cluster_auto_increment_id++;
+}
+
+> +static const TypeInfo cpu_cluster_type_info = {
+> +    .name = TYPE_CPU_CLUSTER,
+> +    .parent = TYPE_DEVICE,
+> +    .instance_size = sizeof(CPUClusterState),
+
+        .instance_init = cpu_cluster_instance_init,
+
+
+> +    .class_init = cpu_cluster_class_init,
+> +};
+> +
+> +static void cpu_cluster_register_types(void)
+> +{
+> +    type_register_static(&cpu_cluster_type_info);
+> +}
+> +
+> +type_init(cpu_cluster_register_types)
+> diff --git a/hw/cpu/Makefile.objs b/hw/cpu/Makefile.objs
+> index cd52d20b65..8db9e8a7b3 100644
+> --- a/hw/cpu/Makefile.objs
+> +++ b/hw/cpu/Makefile.objs
+> @@ -1,5 +1,5 @@
+>   obj-$(CONFIG_ARM11MPCORE) += arm11mpcore.o
+>   obj-$(CONFIG_REALVIEW) += realview_mpcore.o
+>   obj-$(CONFIG_A9MPCORE) += a9mpcore.o
+>   obj-$(CONFIG_A15MPCORE) += a15mpcore.o
+> -common-obj-y += core.o
+> +common-obj-y += core.o cluster.o
+> 
