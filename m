@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46212)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHVG9-0007Vc-6f
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:44:46 -0400
+	(envelope-from <flukshun@gmail.com>) id 1gHVGJ-0007dJ-Fj
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:44:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHVG7-00009V-LS
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:44:45 -0400
-Received: from mail-qt1-x829.google.com ([2607:f8b0:4864:20::829]:36241)
+	(envelope-from <flukshun@gmail.com>) id 1gHVGH-0000SL-Q5
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:44:55 -0400
+Received: from mail-qk1-x732.google.com ([2607:f8b0:4864:20::732]:34007)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHVG7-0008TW-AN
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:44:43 -0400
-Received: by mail-qt1-x829.google.com with SMTP id u34-v6so13726271qth.3
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 07:44:39 -0700 (PDT)
+	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHVGH-0000Rb-Kf
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:44:53 -0400
+Received: by mail-qk1-x732.google.com with SMTP id a132so7407382qkg.1
+	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 07:44:53 -0700 (PDT)
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue, 30 Oct 2018 09:43:47 -0500
-Message-Id: <20181030144358.23144-14-mdroth@linux.vnet.ibm.com>
+Date: Tue, 30 Oct 2018 09:43:52 -0500
+Message-Id: <20181030144358.23144-19-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20181030144358.23144-1-mdroth@linux.vnet.ibm.com>
 References: <20181030144358.23144-1-mdroth@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 13/24] qga-win: refactor disk info
+Subject: [Qemu-devel] [PULL 18/24] qga: group agent init/cleanup init
+ separate routines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,108 +31,174 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
+Cc: peter.maydell@linaro.org
 
-From: Tomáš Golembiovský <tgolembi@redhat.com>
+This patch better separates the init/cleanup routines out into
+separate functions to make the start-up procedure a bit easier to
+follow. This will be useful when we eventually break out the actual
+start/stop of the agent's main loop into separates routines that
+can be called multiple times after the init phase.
 
-Refactor building of disk info into a function that builds the list and
-a function that returns infor for single disk. This will be used in
-future commit that will handle multi-disk volumes.
-
-Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- qga/commands-win32.c | 52 +++++++++++++++++++++++++++++---------------
- 1 file changed, 35 insertions(+), 17 deletions(-)
+ qga/main.c | 82 +++++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 50 insertions(+), 32 deletions(-)
 
-diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-index 2d7b56d538..21a88d31e1 100644
---- a/qga/commands-win32.c
-+++ b/qga/commands-win32.c
-@@ -667,20 +667,15 @@ out_free:
-     return;
+diff --git a/qga/main.c b/qga/main.c
+index afcd268ee3..ab3eaa5163 100644
+--- a/qga/main.c
++++ b/qga/main.c
+@@ -1211,9 +1211,21 @@ static bool check_is_frozen(GAState *s)
+     return false;
  }
  
--/* VSS provider works with volumes, thus there is no difference if
-- * the volume consist of spanned disks. Info about the first disk in the
-- * volume is returned for the spanned disk group (LVM) */
--static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
-+static void get_single_disk_info(char *name, GuestDiskAddress *disk,
-+    Error **errp)
+-static int run_agent(GAState *s, GAConfig *config, int socket_activation)
++static GAState *initialize_agent(GAConfig *config)
  {
--    GuestDiskAddressList *list = NULL;
--    GuestDiskAddress *disk;
-     SCSI_ADDRESS addr, *scsi_ad;
-     DWORD len;
-     HANDLE vol_h;
-     Error *local_err = NULL;
+-    ga_state = s;
++    GAState *s = g_new0(GAState, 1);
++
++    g_assert(ga_state == NULL);
++
++    s->log_level = config->log_level;
++    s->log_file = stderr;
++#ifdef CONFIG_FSFREEZE
++    s->fsfreeze_hook = config->fsfreeze_hook;
++#endif
++    s->pstate_filepath = g_strdup_printf("%s/qga.state", config->state_dir);
++    s->state_filepath_isfrozen = g_strdup_printf("%s/qga.state.isfrozen",
++                                                 config->state_dir);
++    s->frozen = check_is_frozen(s);
  
-     scsi_ad = &addr;
--    char *name = g_strndup(guid, strlen(guid)-1);
+     g_log_set_default_handler(ga_log, s);
+     g_log_set_fatal_mask(NULL, G_LOG_LEVEL_ERROR);
+@@ -1229,7 +1241,7 @@ static int run_agent(GAState *s, GAConfig *config, int socket_activation)
+     if (g_mkdir_with_parents(config->state_dir, S_IRWXU) == -1) {
+         g_critical("unable to create (an ancestor of) the state directory"
+                    " '%s': %s", config->state_dir, strerror(errno));
+-        return EXIT_FAILURE;
++        return NULL;
+     }
+ #endif
  
-     g_debug("getting disk info for: %s", name);
-     vol_h = CreateFile(name, 0, FILE_SHARE_READ, NULL, OPEN_EXISTING,
-@@ -690,7 +685,6 @@ static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
-         goto err;
+@@ -1254,7 +1266,7 @@ static int run_agent(GAState *s, GAConfig *config, int socket_activation)
+             if (!log_file) {
+                 g_critical("unable to open specified log file: %s",
+                            strerror(errno));
+-                return EXIT_FAILURE;
++                return NULL;
+             }
+             s->log_file = log_file;
+         }
+@@ -1265,7 +1277,7 @@ static int run_agent(GAState *s, GAConfig *config, int socket_activation)
+                                s->pstate_filepath,
+                                ga_is_frozen(s))) {
+         g_critical("failed to load persistent state");
+-        return EXIT_FAILURE;
++        return NULL;
      }
  
--    disk = g_malloc0(sizeof(*disk));
-     get_disk_properties(vol_h, disk, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-@@ -730,20 +724,44 @@ static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
-          * information about volume. */
+     config->blacklist = ga_command_blacklist_init(config->blacklist);
+@@ -1286,12 +1298,37 @@ static int run_agent(GAState *s, GAConfig *config, int socket_activation)
+ #ifndef _WIN32
+     if (!register_signal_handlers()) {
+         g_critical("failed to register signal handlers");
+-        return EXIT_FAILURE;
++        return NULL;
      }
+ #endif
  
--    list = g_malloc0(sizeof(*list));
--    list->value = disk;
--    list->next = NULL;
--    CloseHandle(vol_h);
--    g_free(name);
--    return list;
--
- err_close:
--    g_free(disk);
-     CloseHandle(vol_h);
- err:
-+    return;
+     s->main_loop = g_main_loop_new(NULL, false);
+ 
++    ga_state = s;
++    return s;
 +}
 +
-+/* VSS provider works with volumes, thus there is no difference if
-+ * the volume consist of spanned disks. Info about the first disk in the
-+ * volume is returned for the spanned disk group (LVM) */
-+static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
++static void cleanup_agent(GAState *s)
 +{
-+    Error *local_err = NULL;
-+    GuestDiskAddressList *list = NULL, *cur_item = NULL;
-+    GuestDiskAddress *disk = NULL;
-+
-+    /* strip final backslash */
-+    char *name = g_strdup(guid);
-+    if (g_str_has_suffix(name, "\\")) {
-+        name[strlen(name) - 1] = 0;
++    if (s->command_state) {
++        ga_command_state_cleanup_all(s->command_state);
++        ga_command_state_free(s->command_state);
++        json_message_parser_destroy(&s->parser);
 +    }
-+
-+    disk = g_malloc0(sizeof(GuestDiskAddress));
-+    get_single_disk_info(name, disk, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        goto out;
++    if (s->channel) {
++        ga_channel_free(s->channel);
 +    }
++    g_free(s->pstate_filepath);
++    g_free(s->state_filepath_isfrozen);
++    if (s->main_loop) {
++        g_main_loop_unref(s->main_loop);
++    }
++    g_free(s);
++    ga_state = NULL;
++}
 +
-+    cur_item = g_malloc0(sizeof(*list));
-+    cur_item->value = disk;
-+    disk = NULL;
-+    list = cur_item;
-+
-+out:
-+    qapi_free_GuestDiskAddress(disk);
-     g_free(name);
++static int run_agent(GAState *s, GAConfig *config, int socket_activation)
++{
+     if (!channel_init(ga_state, config->method, config->channel_path,
+                       socket_activation ? FIRST_SOCKET_ACTIVATION_FD : -1)) {
+         g_critical("failed to initialize guest agent channel");
+@@ -1315,7 +1352,7 @@ static int run_agent(GAState *s, GAConfig *config, int socket_activation)
+ int main(int argc, char **argv)
+ {
+     int ret = EXIT_SUCCESS;
+-    GAState *s = g_new0(GAState, 1);
++    GAState *s;
+     GAConfig *config = g_new0(GAConfig, 1);
+     int socket_activation;
  
--    return NULL;
-+    return list;
+@@ -1383,44 +1420,25 @@ int main(int argc, char **argv)
+         }
+     }
+ 
+-    s->log_level = config->log_level;
+-    s->log_file = stderr;
+-#ifdef CONFIG_FSFREEZE
+-    s->fsfreeze_hook = config->fsfreeze_hook;
+-#endif
+-    s->pstate_filepath = g_strdup_printf("%s/qga.state", config->state_dir);
+-    s->state_filepath_isfrozen = g_strdup_printf("%s/qga.state.isfrozen",
+-                                                 config->state_dir);
+-    s->frozen = check_is_frozen(s);
+-
+     if (config->dumpconf) {
+         config_dump(config);
+         goto end;
+     }
+ 
++    s = initialize_agent(config);
++    if (!s) {
++        g_critical("error initializing guest agent");
++        goto end;
++    }
+     ret = run_agent(s, config, socket_activation);
++    cleanup_agent(s);
+ 
+ end:
+-    if (s->command_state) {
+-        ga_command_state_cleanup_all(s->command_state);
+-        ga_command_state_free(s->command_state);
+-        json_message_parser_destroy(&s->parser);
+-    }
+-    if (s->channel) {
+-        ga_channel_free(s->channel);
+-    }
+-    g_free(s->pstate_filepath);
+-    g_free(s->state_filepath_isfrozen);
+-
+     if (config->daemonize) {
+         unlink(config->pid_filepath);
+     }
+ 
+     config_free(config);
+-    if (s->main_loop) {
+-        g_main_loop_unref(s->main_loop);
+-    }
+-    g_free(s);
+ 
+     return ret;
  }
- 
- #else
 -- 
 2.17.1
