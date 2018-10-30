@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58312)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <smarkovic@wavecomp.com>) id 1gHTAx-0002kZ-6Y
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:31:16 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1gHTFC-0005qA-Se
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:35:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <smarkovic@wavecomp.com>) id 1gHTAs-0005sB-Kt
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:31:14 -0400
-Received: from mail-sn1nam01on0102.outbound.protection.outlook.com
-	([104.47.32.102]:46564
-	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
+	(envelope-from <amarkovic@wavecomp.com>) id 1gHTF7-0002Uo-MK
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:35:38 -0400
+Received: from mail-cys01nam02on0109.outbound.protection.outlook.com
+	([104.47.37.109]:12802
+	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <smarkovic@wavecomp.com>)
-	id 1gHTAs-0005qK-9U
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:31:10 -0400
-From: Stefan Markovic <smarkovic@wavecomp.com>
-Date: Tue, 30 Oct 2018 12:31:05 +0000
-Message-ID: <d59581ae-c9f0-f62d-da5f-f8b52eaca0f7@wavecomp.com>
-References: <1540899411-16761-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1540899411-16761-2-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1540899411-16761-2-git-send-email-aleksandar.markovic@rt-rk.com>
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1gHTF1-0002AJ-0J
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:35:29 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Tue, 30 Oct 2018 12:35:15 +0000
+Message-ID: <BN6PR2201MB1251EA1F1F5E486A889A827CC6CC0@BN6PR2201MB1251.namprd22.prod.outlook.com>
 Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <6145D8DB26D3CA4C9FCC7F2F56886072@namprd22.prod.outlook.com>
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 1/5] target/mips: Rename MMI-related
- masks
+Subject: [Qemu-devel] Question: Perfecting checkpatch.pl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,83 +28,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "stefanha@redhat.com" <stefanha@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
 
-DQpPbiAzMC4xMC4xOC4gMTI6MzYsIEFsZWtzYW5kYXIgTWFya292aWMgd3JvdGU6DQo+IEZyb206
-IEFsZWtzYW5kYXIgTWFya292aWMgPGFtYXJrb3ZpY0B3YXZlY29tcC5jb20+DQo+DQo+IFJlbmFt
-ZSBNTUktcmVsYXRlZCBtYXNrcy4NCj4NCj4gU2lnbmVkLW9mZi1ieTogQWxla3NhbmRhciBNYXJr
-b3ZpYyA8YW1hcmtvdmljQHdhdmVjb21wLmNvbT4NCj4gLS0tDQo+ICAgdGFyZ2V0L21pcHMvdHJh
-bnNsYXRlLmMgfCAyMCArKysrKysrKysrLS0tLS0tLS0tLQ0KPiAgIDEgZmlsZSBjaGFuZ2VkLCAx
-MCBpbnNlcnRpb25zKCspLCAxMCBkZWxldGlvbnMoLSkNCg0KDQpSZXZpZXdlZC1ieTogU3RlZmFu
-IE1hcmtvdmljIDxzbWFya292aWNAd2F2ZWNvbXAuY29tPg0KDQoNCj4gZGlmZiAtLWdpdCBhL3Rh
-cmdldC9taXBzL3RyYW5zbGF0ZS5jIGIvdGFyZ2V0L21pcHMvdHJhbnNsYXRlLmMNCj4gaW5kZXgg
-NTFhNTQ4OC4uZTM4ZDUwZCAxMDA2NDQNCj4gLS0tIGEvdGFyZ2V0L21pcHMvdHJhbnNsYXRlLmMN
-Cj4gKysrIGIvdGFyZ2V0L21pcHMvdHJhbnNsYXRlLmMNCj4gQEAgLTIxNTksNyArMjE1OSw3IEBA
-IGVudW0gew0KPiAgICAqICAgIDcgMTExIHwgICAqICAgfCAgICogICB8ICAgKiAgIHwgICAqICAg
-fCBQU0xMVyB8ICAgKiAgIHwgUFNSTFcgfCBQU1JBVw0KPiAgICAqLw0KPiAgIA0KPiAtI2RlZmlu
-ZSBNQVNLX1RYNzlfTU1JKG9wKSAoTUFTS19PUF9NQUpPUihvcCkgfCAoKG9wKSAmIDB4M0YpKQ0K
-PiArI2RlZmluZSBNQVNLX01NSShvcCkgKE1BU0tfT1BfTUFKT1Iob3ApIHwgKChvcCkgJiAweDNG
-KSkNCj4gICBlbnVtIHsNCj4gICAgICAgVFg3OV9NTUlfTUFERCAgICAgICA9IDB4MDAgfCBUWDc5
-X0NMQVNTX01NSSwgLyogU2FtZSBhcyBPUENfTUFERCAqLw0KPiAgICAgICBUWDc5X01NSV9NQURE
-VSAgICAgID0gMHgwMSB8IFRYNzlfQ0xBU1NfTU1JLCAvKiBTYW1lIGFzIE9QQ19NQUREVSAqLw0K
-PiBAQCAtMjIxMCw3ICsyMjEwLDcgQEAgZW51bSB7DQo+ICAgICogICAgNyAxMTEgfCAgICogICB8
-ICAgKiAgIHwgUEVYVDUgfCBQUEFDNQ0KPiAgICAqLw0KPiAgIA0KPiAtI2RlZmluZSBNQVNLX1RY
-NzlfTU1JMChvcCkgKE1BU0tfT1BfTUFKT1Iob3ApIHwgKChvcCkgJiAweDdGRikpDQo+ICsjZGVm
-aW5lIE1BU0tfTU1JMChvcCkgKE1BU0tfT1BfTUFKT1Iob3ApIHwgKChvcCkgJiAweDdGRikpDQo+
-ICAgZW51bSB7DQo+ICAgICAgIFRYNzlfTU1JMF9QQUREVyAgPSAoMHgwMCA8PCA2KSB8IFRYNzlf
-TU1JX0NMQVNTX01NSTAsDQo+ICAgICAgIFRYNzlfTU1JMF9QU1VCVyAgPSAoMHgwMSA8PCA2KSB8
-IFRYNzlfTU1JX0NMQVNTX01NSTAsDQo+IEBAIC0yMjYxLDcgKzIyNjEsNyBAQCBlbnVtIHsNCj4g
-ICAgKiAgICA3IDExMSB8ICAgKiAgIHwgICAqICAgfCAgICogICB8ICAgKg0KPiAgICAqLw0KPiAg
-IA0KPiAtI2RlZmluZSBNQVNLX1RYNzlfTU1JMShvcCkgKE1BU0tfT1BfTUFKT1Iob3ApIHwgKChv
-cCkgJiAweDdGRikpDQo+ICsjZGVmaW5lIE1BU0tfTU1JMShvcCkgKE1BU0tfT1BfTUFKT1Iob3Ap
-IHwgKChvcCkgJiAweDdGRikpDQo+ICAgZW51bSB7DQo+ICAgICAgIFRYNzlfTU1JMV9QQUJTVyAg
-PSAoMHgwMSA8PCA2KSB8IFRYNzlfTU1JX0NMQVNTX01NSTEsDQo+ICAgICAgIFRYNzlfTU1JMV9Q
-Q0VRVyAgPSAoMHgwMiA8PCA2KSB8IFRYNzlfTU1JX0NMQVNTX01NSTEsDQo+IEBAIC0yMzA1LDcg
-KzIzMDUsNyBAQCBlbnVtIHsNCj4gICAgKiAgICA3IDExMSB8IFBNVUxUSHwgUERJVkJXfCBQRVhF
-VyB8IFBST1QzVw0KPiAgICAqLw0KPiAgIA0KPiAtI2RlZmluZSBNQVNLX1RYNzlfTU1JMihvcCkg
-KE1BU0tfT1BfTUFKT1Iob3ApIHwgKChvcCkgJiAweDdGRikpDQo+ICsjZGVmaW5lIE1BU0tfTU1J
-MihvcCkgKE1BU0tfT1BfTUFKT1Iob3ApIHwgKChvcCkgJiAweDdGRikpDQo+ICAgZW51bSB7DQo+
-ICAgICAgIFRYNzlfTU1JMl9QTUFERFcgPSAoMHgwMCA8PCA2KSB8IFRYNzlfTU1JX0NMQVNTX01N
-STIsDQo+ICAgICAgIFRYNzlfTU1JMl9QU0xMVlcgPSAoMHgwMiA8PCA2KSB8IFRYNzlfTU1JX0NM
-QVNTX01NSTIsDQo+IEBAIC0yMzUzLDcgKzIzNTMsNyBAQCBlbnVtIHsNCj4gICAgKiAgICA3IDEx
-MSB8ICAgKiAgIHwgICAqICAgfCBQRVhDVyB8ICAgKg0KPiAgICAqLw0KPiAgIA0KPiAtI2RlZmlu
-ZSBNQVNLX1RYNzlfTU1JMyhvcCkgKE1BU0tfT1BfTUFKT1Iob3ApIHwgKChvcCkgJiAweDdGRikp
-DQo+ICsjZGVmaW5lIE1BU0tfTU1JMyhvcCkgKE1BU0tfT1BfTUFKT1Iob3ApIHwgKChvcCkgJiAw
-eDdGRikpDQo+ICAgZW51bSB7DQo+ICAgICAgIFRYNzlfTU1JM19QTUFERFVXID0gKDB4MDAgPDwg
-NikgfCBUWDc5X01NSV9DTEFTU19NTUkzLA0KPiAgICAgICBUWDc5X01NSTNfUFNSQVZXICA9ICgw
-eDAzIDw8IDYpIHwgVFg3OV9NTUlfQ0xBU1NfTU1JMywNCj4gQEAgLTI0NjgzLDcgKzI0NjgzLDcg
-QEAgc3RhdGljIHZvaWQgZGVjb2RlX29wY19zcGVjaWFsM19sZWdhY3koQ1BVTUlQU1N0YXRlICpl
-bnYsIERpc2FzQ29udGV4dCAqY3R4KQ0KPiAgIA0KPiAgIHN0YXRpYyB2b2lkIGRlY29kZV90eDc5
-X21taTAoQ1BVTUlQU1N0YXRlICplbnYsIERpc2FzQ29udGV4dCAqY3R4KQ0KPiAgIHsNCj4gLSAg
-ICB1aW50MzJfdCBvcGMgPSBNQVNLX1RYNzlfTU1JMChjdHgtPm9wY29kZSk7DQo+ICsgICAgdWlu
-dDMyX3Qgb3BjID0gTUFTS19NTUkwKGN0eC0+b3Bjb2RlKTsNCj4gICANCj4gICAgICAgc3dpdGNo
-IChvcGMpIHsNCj4gICAgICAgY2FzZSBUWDc5X01NSTBfUEFERFc6ICAgICAvKiBUT0RPOiBUWDc5
-X01NSTBfUEFERFcgKi8NCj4gQEAgLTI0NzIyLDcgKzI0NzIyLDcgQEAgc3RhdGljIHZvaWQgZGVj
-b2RlX3R4NzlfbW1pMChDUFVNSVBTU3RhdGUgKmVudiwgRGlzYXNDb250ZXh0ICpjdHgpDQo+ICAg
-DQo+ICAgc3RhdGljIHZvaWQgZGVjb2RlX3R4NzlfbW1pMShDUFVNSVBTU3RhdGUgKmVudiwgRGlz
-YXNDb250ZXh0ICpjdHgpDQo+ICAgew0KPiAtICAgIHVpbnQzMl90IG9wYyA9IE1BU0tfVFg3OV9N
-TUkxKGN0eC0+b3Bjb2RlKTsNCj4gKyAgICB1aW50MzJfdCBvcGMgPSBNQVNLX01NSTEoY3R4LT5v
-cGNvZGUpOw0KPiAgIA0KPiAgICAgICBzd2l0Y2ggKG9wYykgew0KPiAgICAgICBjYXNlIFRYNzlf
-TU1JMV9QQUJTVzogICAgIC8qIFRPRE86IFRYNzlfTU1JMV9QQUJTVyAqLw0KPiBAQCAtMjQ3NTQs
-NyArMjQ3NTQsNyBAQCBzdGF0aWMgdm9pZCBkZWNvZGVfdHg3OV9tbWkxKENQVU1JUFNTdGF0ZSAq
-ZW52LCBEaXNhc0NvbnRleHQgKmN0eCkNCj4gICANCj4gICBzdGF0aWMgdm9pZCBkZWNvZGVfdHg3
-OV9tbWkyKENQVU1JUFNTdGF0ZSAqZW52LCBEaXNhc0NvbnRleHQgKmN0eCkNCj4gICB7DQo+IC0g
-ICAgdWludDMyX3Qgb3BjID0gTUFTS19UWDc5X01NSTIoY3R4LT5vcGNvZGUpOw0KPiArICAgIHVp
-bnQzMl90IG9wYyA9IE1BU0tfTU1JMihjdHgtPm9wY29kZSk7DQo+ICAgDQo+ICAgICAgIHN3aXRj
-aCAob3BjKSB7DQo+ICAgICAgIGNhc2UgVFg3OV9NTUkyX1BNQUREVzogICAgLyogVE9ETzogVFg3
-OV9NTUkyX1BNQUREVyAqLw0KPiBAQCAtMjQ3OTAsNyArMjQ3OTAsNyBAQCBzdGF0aWMgdm9pZCBk
-ZWNvZGVfdHg3OV9tbWkyKENQVU1JUFNTdGF0ZSAqZW52LCBEaXNhc0NvbnRleHQgKmN0eCkNCj4g
-ICANCj4gICBzdGF0aWMgdm9pZCBkZWNvZGVfdHg3OV9tbWkzKENQVU1JUFNTdGF0ZSAqZW52LCBE
-aXNhc0NvbnRleHQgKmN0eCkNCj4gICB7DQo+IC0gICAgdWludDMyX3Qgb3BjID0gTUFTS19UWDc5
-X01NSTMoY3R4LT5vcGNvZGUpOw0KPiArICAgIHVpbnQzMl90IG9wYyA9IE1BU0tfTU1JMyhjdHgt
-Pm9wY29kZSk7DQo+ICAgDQo+ICAgICAgIHN3aXRjaCAob3BjKSB7DQo+ICAgICAgIGNhc2UgVFg3
-OV9NTUkzX1BNQUREVVc6ICAgIC8qIFRPRE86IFRYNzlfTU1JM19QTUFERFVXICovDQo+IEBAIC0y
-NDgxNyw3ICsyNDgxNyw3IEBAIHN0YXRpYyB2b2lkIGRlY29kZV90eDc5X21taTMoQ1BVTUlQU1N0
-YXRlICplbnYsIERpc2FzQ29udGV4dCAqY3R4KQ0KPiAgIA0KPiAgIHN0YXRpYyB2b2lkIGRlY29k
-ZV90eDc5X21taShDUFVNSVBTU3RhdGUgKmVudiwgRGlzYXNDb250ZXh0ICpjdHgpDQo+ICAgew0K
-PiAtICAgIHVpbnQzMl90IG9wYyA9IE1BU0tfVFg3OV9NTUkoY3R4LT5vcGNvZGUpOw0KPiArICAg
-IHVpbnQzMl90IG9wYyA9IE1BU0tfTU1JKGN0eC0+b3Bjb2RlKTsNCj4gICAgICAgaW50IHJzID0g
-ZXh0cmFjdDMyKGN0eC0+b3Bjb2RlLCAyMSwgNSk7DQo+ICAgICAgIGludCBydCA9IGV4dHJhY3Qz
-MihjdHgtPm9wY29kZSwgMTYsIDUpOw0KPiAgICAgICBpbnQgcmQgPSBleHRyYWN0MzIoY3R4LT5v
-cGNvZGUsIDExLCA1KTsNCg==
+Perhaps checkpatch.pl should make sure the commit messages do not contain "=
+address@hidden" and "Reviewed-off-by"?
+
+$ git log | grep address@hidden
+    Signed-off-by: Michael S. Tsirkin <address@hidden>
+    Signed-off-by: Ronald Hecht <address@hidden>
+    Signed-off-by: Justin Chevrier <address@hidden>
+    Signed-off-by: Justin Chevrier <address@hidden>
+    Signed-off-by: Justin Chevrier <address@hidden>
+
+$ git log | grep Reviewed-off-by
+    Reviewed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+    Reviewed-off-by: Anthony Liguori <aliguori@us.ibm.com>
+
+Aleksandar=
