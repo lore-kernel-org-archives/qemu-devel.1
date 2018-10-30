@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46483)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHVGk-00087n-MQ
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:45:23 -0400
+	(envelope-from <flukshun@gmail.com>) id 1gHVGn-00088z-C3
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:45:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHVGe-0000vn-Pu
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:45:22 -0400
-Received: from mail-qk1-x72f.google.com ([2607:f8b0:4864:20::72f]:39581)
+	(envelope-from <flukshun@gmail.com>) id 1gHVGk-00016K-Kc
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:45:24 -0400
+Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:36193)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHVGc-0000tk-Qf
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:45:15 -0400
-Received: by mail-qk1-x72f.google.com with SMTP id e4so7379190qkh.6
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 07:45:14 -0700 (PDT)
+	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHVGi-00011u-KE
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:45:21 -0400
+Received: by mail-qt1-x842.google.com with SMTP id u34-v6so13729479qth.3
+	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 07:45:20 -0700 (PDT)
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue, 30 Oct 2018 09:43:58 -0500
-Message-Id: <20181030144358.23144-25-mdroth@linux.vnet.ibm.com>
+Date: Tue, 30 Oct 2018 09:43:37 -0500
+Message-Id: <20181030144358.23144-4-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20181030144358.23144-1-mdroth@linux.vnet.ibm.com>
 References: <20181030144358.23144-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PULL 24/24] qga-win: changing --retry-path option
- behavior
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 03/24] qga: ignore non present cpus when
+ handling qmp_guest_get_vcpus()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,212 +31,178 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Bishara AbuHattoum <bishara@daynix.com>, Sameeh Jubran <sameeh@daynix.com>
+Cc: peter.maydell@linaro.org, Igor Mammedov <imammedo@redhat.com>
 
-From: Bishara AbuHattoum <bishara@daynix.com>
+From: Igor Mammedov <imammedo@redhat.com>
 
-Currently whenever the qemu-ga's service doesn't find the virtio-serial
-the run_agent() loops in a QGA_RETRY_INTERVAL (default 5 seconds)
-intervals and try to restart the qemu-ga which causes a synchronous loop.
-Changed to wait and listen for the serial events by registering for
-notifications a proper serial event handler that deals with events:
-  DBT_DEVICEARRIVAL        indicates that the device has been inserted and
-                           is available
-  DBT_DEVICEREMOVECOMPLETE indicates that the devive has been removed
-Which allow us to determine when the channel path is available for the
-qemu-ga to restart.
+If VM has VCPUs plugged sparselly (for example a VM started with
+3 VCPUs (cpu0, cpu1 and cpu2) and then cpu1 was hotunplugged so
+only cpu0 and cpu2 are present), QGA will rise a error
+  error: internal error: unable to execute QEMU agent command 'guest-get-vcpus':
+  open("/sys/devices/system/cpu/cpu1/"): No such file or directory
+when
+  virsh vcpucount FOO --guest
+is executed.
+Fix it by ignoring non present CPUs when fetching CPUs status from sysfs.
 
-Signed-off-by: Bishara AbuHattoum <bishara@daynix.com>
-Signed-off-by: Sameeh Jubran <sameeh@daynix.com>
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- qga/main.c          | 86 ++++++++++++++++++++++++++++++++++++++++++++-
- qga/service-win32.h |  4 +++
- 2 files changed, 89 insertions(+), 1 deletion(-)
+ qga/commands-posix.c | 115 ++++++++++++++++++++++---------------------
+ 1 file changed, 59 insertions(+), 56 deletions(-)
 
-diff --git a/qga/main.c b/qga/main.c
-index 506a314140..87a0711c14 100644
---- a/qga/main.c
-+++ b/qga/main.c
-@@ -34,6 +34,7 @@
- #include "qemu/systemd.h"
- #include "qemu-version.h"
- #ifdef _WIN32
-+#include <dbt.h>
- #include "qga/service-win32.h"
- #include "qga/vss-win32.h"
- #endif
-@@ -83,6 +84,7 @@ struct GAState {
-     bool logging_enabled;
- #ifdef _WIN32
-     GAService service;
-+    HANDLE wakeup_event;
- #endif
-     bool delimit_response;
-     bool frozen;
-@@ -119,6 +121,7 @@ static const char *ga_freeze_whitelist[] = {
- #ifdef _WIN32
- DWORD WINAPI service_ctrl_handler(DWORD ctrl, DWORD type, LPVOID data,
-                                   LPVOID ctx);
-+DWORD WINAPI handle_serial_device_events(DWORD type, LPVOID data);
- VOID WINAPI service_main(DWORD argc, TCHAR *argv[]);
- #endif
- static int run_agent(GAState *s);
-@@ -677,6 +680,36 @@ static gboolean channel_init(GAState *s, const gchar *method, const gchar *path,
- }
- 
- #ifdef _WIN32
-+DWORD WINAPI handle_serial_device_events(DWORD type, LPVOID data)
-+{
-+    DWORD ret = NO_ERROR;
-+    PDEV_BROADCAST_HDR broadcast_header = (PDEV_BROADCAST_HDR)data;
-+
-+    if (broadcast_header->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE) {
-+        switch (type) {
-+            /* Device inserted */
-+        case DBT_DEVICEARRIVAL:
-+            /* Start QEMU-ga's service */
-+            if (!SetEvent(ga_state->wakeup_event)) {
-+                ret = GetLastError();
-+            }
-+            break;
-+            /* Device removed */
-+        case DBT_DEVICEQUERYREMOVE:
-+        case DBT_DEVICEREMOVEPENDING:
-+        case DBT_DEVICEREMOVECOMPLETE:
-+            /* Stop QEMU-ga's service */
-+            if (!ResetEvent(ga_state->wakeup_event)) {
-+                ret = GetLastError();
-+            }
-+            break;
-+        default:
-+            ret = ERROR_CALL_NOT_IMPLEMENTED;
-+        }
-+    }
-+    return ret;
-+}
-+
- DWORD WINAPI service_ctrl_handler(DWORD ctrl, DWORD type, LPVOID data,
-                                   LPVOID ctx)
+diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+index 37e8a2d791..42d30f078e 100644
+--- a/qga/commands-posix.c
++++ b/qga/commands-posix.c
+@@ -2035,61 +2035,56 @@ static long sysconf_exact(int name, const char *name_str, Error **errp)
+  * Written members remain unmodified on error.
+  */
+ static void transfer_vcpu(GuestLogicalProcessor *vcpu, bool sys2vcpu,
+-                          Error **errp)
++                          char *dirpath, Error **errp)
  {
-@@ -688,9 +721,13 @@ DWORD WINAPI service_ctrl_handler(DWORD ctrl, DWORD type, LPVOID data,
-         case SERVICE_CONTROL_STOP:
-         case SERVICE_CONTROL_SHUTDOWN:
-             quit_handler(SIGTERM);
-+            SetEvent(ga_state->wakeup_event);
-             service->status.dwCurrentState = SERVICE_STOP_PENDING;
-             SetServiceStatus(service->status_handle, &service->status);
-             break;
-+        case SERVICE_CONTROL_DEVICEEVENT:
-+            handle_serial_device_events(type, data);
-+            break;
+-    char *dirpath;
++    int fd;
++    int res;
+     int dirfd;
++    static const char fn[] = "online";
  
-         default:
-             ret = ERROR_CALL_NOT_IMPLEMENTED;
-@@ -717,10 +754,24 @@ VOID WINAPI service_main(DWORD argc, TCHAR *argv[])
-     service->status.dwServiceSpecificExitCode = NO_ERROR;
-     service->status.dwCheckPoint = 0;
-     service->status.dwWaitHint = 0;
-+    DEV_BROADCAST_DEVICEINTERFACE notification_filter;
-+    ZeroMemory(&notification_filter, sizeof(notification_filter));
-+    notification_filter.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
-+    notification_filter.dbcc_size = sizeof(DEV_BROADCAST_DEVICEINTERFACE);
-+    notification_filter.dbcc_classguid = GUID_VIOSERIAL_PORT;
-+
-+    service->device_notification_handle =
-+        RegisterDeviceNotification(service->status_handle,
-+            &notification_filter, DEVICE_NOTIFY_SERVICE_HANDLE);
-+    if (!service->device_notification_handle) {
-+        g_critical("Failed to register device notification handle!\n");
+-    dirpath = g_strdup_printf("/sys/devices/system/cpu/cpu%" PRId64 "/",
+-                              vcpu->logical_id);
+     dirfd = open(dirpath, O_RDONLY | O_DIRECTORY);
+     if (dirfd == -1) {
+         error_setg_errno(errp, errno, "open(\"%s\")", dirpath);
+-    } else {
+-        static const char fn[] = "online";
+-        int fd;
+-        int res;
+-
+-        fd = openat(dirfd, fn, sys2vcpu ? O_RDONLY : O_RDWR);
+-        if (fd == -1) {
+-            if (errno != ENOENT) {
+-                error_setg_errno(errp, errno, "open(\"%s/%s\")", dirpath, fn);
+-            } else if (sys2vcpu) {
+-                vcpu->online = true;
+-                vcpu->can_offline = false;
+-            } else if (!vcpu->online) {
+-                error_setg(errp, "logical processor #%" PRId64 " can't be "
+-                           "offlined", vcpu->logical_id);
+-            } /* otherwise pretend successful re-onlining */
+-        } else {
+-            unsigned char status;
+-
+-            res = pread(fd, &status, 1, 0);
+-            if (res == -1) {
+-                error_setg_errno(errp, errno, "pread(\"%s/%s\")", dirpath, fn);
+-            } else if (res == 0) {
+-                error_setg(errp, "pread(\"%s/%s\"): unexpected EOF", dirpath,
+-                           fn);
+-            } else if (sys2vcpu) {
+-                vcpu->online = (status != '0');
+-                vcpu->can_offline = true;
+-            } else if (vcpu->online != (status != '0')) {
+-                status = '0' + vcpu->online;
+-                if (pwrite(fd, &status, 1, 0) == -1) {
+-                    error_setg_errno(errp, errno, "pwrite(\"%s/%s\")", dirpath,
+-                                     fn);
+-                }
+-            } /* otherwise pretend successful re-(on|off)-lining */
 +        return;
 +    }
-     SetServiceStatus(service->status_handle, &service->status);
  
-     run_agent(ga_state);
+-            res = close(fd);
+-            g_assert(res == 0);
+-        }
++    fd = openat(dirfd, fn, sys2vcpu ? O_RDONLY : O_RDWR);
++    if (fd == -1) {
++        if (errno != ENOENT) {
++            error_setg_errno(errp, errno, "open(\"%s/%s\")", dirpath, fn);
++        } else if (sys2vcpu) {
++            vcpu->online = true;
++            vcpu->can_offline = false;
++        } else if (!vcpu->online) {
++            error_setg(errp, "logical processor #%" PRId64 " can't be "
++                       "offlined", vcpu->logical_id);
++        } /* otherwise pretend successful re-onlining */
++    } else {
++        unsigned char status;
++
++        res = pread(fd, &status, 1, 0);
++        if (res == -1) {
++            error_setg_errno(errp, errno, "pread(\"%s/%s\")", dirpath, fn);
++        } else if (res == 0) {
++            error_setg(errp, "pread(\"%s/%s\"): unexpected EOF", dirpath,
++                       fn);
++        } else if (sys2vcpu) {
++            vcpu->online = (status != '0');
++            vcpu->can_offline = true;
++        } else if (vcpu->online != (status != '0')) {
++            status = '0' + vcpu->online;
++            if (pwrite(fd, &status, 1, 0) == -1) {
++                error_setg_errno(errp, errno, "pwrite(\"%s/%s\")", dirpath,
++                                 fn);
++            }
++        } /* otherwise pretend successful re-(on|off)-lining */
  
-+    UnregisterDeviceNotification(service->device_notification_handle);
-     service->status.dwCurrentState = SERVICE_STOPPED;
-     SetServiceStatus(service->status_handle, &service->status);
+-        res = close(dirfd);
++        res = close(fd);
+         g_assert(res == 0);
+     }
+ 
+-    g_free(dirpath);
++    res = close(dirfd);
++    g_assert(res == 0);
  }
-@@ -1328,12 +1379,24 @@ static GAState *initialize_agent(GAConfig *config, int socket_activation)
  
-     s->config = config;
-     s->socket_activation = socket_activation;
+ GuestLogicalProcessorList *qmp_guest_get_vcpus(Error **errp)
+@@ -2107,17 +2102,21 @@ GuestLogicalProcessorList *qmp_guest_get_vcpus(Error **errp)
+     while (local_err == NULL && current < sc_max) {
+         GuestLogicalProcessor *vcpu;
+         GuestLogicalProcessorList *entry;
+-
+-        vcpu = g_malloc0(sizeof *vcpu);
+-        vcpu->logical_id = current++;
+-        vcpu->has_can_offline = true; /* lolspeak ftw */
+-        transfer_vcpu(vcpu, true, &local_err);
+-
+-        entry = g_malloc0(sizeof *entry);
+-        entry->value = vcpu;
+-
+-        *link = entry;
+-        link = &entry->next;
++        int64_t id = current++;
++        char *path = g_strdup_printf("/sys/devices/system/cpu/cpu%" PRId64 "/",
++                                     id);
 +
-+#ifdef _WIN32
-+    s->wakeup_event = CreateEvent(NULL, TRUE, FALSE, TEXT("WakeUp"));
-+    if (s->wakeup_event == NULL) {
-+        g_critical("CreateEvent failed");
-+        return NULL;
-+    }
-+#endif
-+
-     ga_state = s;
-     return s;
- }
++        if (g_file_test(path, G_FILE_TEST_EXISTS)) {
++            vcpu = g_malloc0(sizeof *vcpu);
++            vcpu->logical_id = id;
++            vcpu->has_can_offline = true; /* lolspeak ftw */
++            transfer_vcpu(vcpu, true, path, &local_err);
++            entry = g_malloc0(sizeof *entry);
++            entry->value = vcpu;
++            *link = entry;
++            link = &entry->next;
++        }
++        g_free(path);
+     }
  
- static void cleanup_agent(GAState *s)
- {
-+#ifdef _WIN32
-+    CloseHandle(s->wakeup_event);
-+#endif
-     if (s->command_state) {
-         ga_command_state_cleanup_all(s->command_state);
-         ga_command_state_free(s->command_state);
-@@ -1365,6 +1428,27 @@ static int run_agent_once(GAState *s)
-     return EXIT_SUCCESS;
- }
+     if (local_err == NULL) {
+@@ -2138,7 +2137,11 @@ int64_t qmp_guest_set_vcpus(GuestLogicalProcessorList *vcpus, Error **errp)
  
-+static void wait_for_channel_availability(GAState *s)
-+{
-+    g_warning("waiting for channel path...");
-+#ifndef _WIN32
-+    sleep(QGA_RETRY_INTERVAL);
-+#else
-+    DWORD dwWaitResult;
+     processed = 0;
+     while (vcpus != NULL) {
+-        transfer_vcpu(vcpus->value, false, &local_err);
++        char *path = g_strdup_printf("/sys/devices/system/cpu/cpu%" PRId64 "/",
++                                     vcpus->value->logical_id);
 +
-+    dwWaitResult = WaitForSingleObject(s->wakeup_event, INFINITE);
-+
-+    switch (dwWaitResult) {
-+    case WAIT_OBJECT_0:
-+        break;
-+    case WAIT_TIMEOUT:
-+        break;
-+    default:
-+        g_critical("WaitForSingleObject failed");
-+    }
-+#endif
-+}
-+
- static int run_agent(GAState *s)
- {
-     int ret = EXIT_SUCCESS;
-@@ -1375,7 +1459,7 @@ static int run_agent(GAState *s)
-         ret = run_agent_once(s);
-         if (s->config->retry_path && !s->force_exit) {
-             g_warning("agent stopped unexpectedly, restarting...");
--            sleep(QGA_RETRY_INTERVAL);
-+            wait_for_channel_availability(s);
++        transfer_vcpu(vcpus->value, false, path, &local_err);
++        g_free(path);
+         if (local_err != NULL) {
+             break;
          }
-     } while (s->config->retry_path && !s->force_exit);
- 
-diff --git a/qga/service-win32.h b/qga/service-win32.h
-index 89e99dfede..7b16d69b57 100644
---- a/qga/service-win32.h
-+++ b/qga/service-win32.h
-@@ -20,9 +20,13 @@
- #define QGA_SERVICE_NAME         "qemu-ga"
- #define QGA_SERVICE_DESCRIPTION  "Enables integration with QEMU machine emulator and virtualizer."
- 
-+static const GUID GUID_VIOSERIAL_PORT = { 0x6fde7521, 0x1b65, 0x48ae,
-+{ 0xb6, 0x28, 0x80, 0xbe, 0x62, 0x1, 0x60, 0x26 } };
-+
- typedef struct GAService {
-     SERVICE_STATUS status;
-     SERVICE_STATUS_HANDLE status_handle;
-+    HDEVNOTIFY device_notification_handle;
- } GAService;
- 
- int ga_install_service(const char *path, const char *logfile,
 -- 
 2.17.1
