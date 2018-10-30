@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36748)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gHNdT-0007GG-Ng
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 02:36:20 -0400
+	(envelope-from <kraxel@redhat.com>) id 1gHNeO-0007gw-A8
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 02:37:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gHNdQ-0003Nv-EN
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 02:36:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37680)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gHNdQ-0003Kp-6P
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 02:36:16 -0400
-Date: Tue, 30 Oct 2018 12:06:05 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-In-Reply-To: <2dd73225-1e25-423e-5284-8f6fc60d47e3@redhat.com>
-Message-ID: <nycvar.YSQ.7.76.1810301204510.30516@xnncv>
-References: <20181026194314.18663-1-ppandit@redhat.com>
-	<CAFEAcA8auV_NMER=nfrMnHOQ8oSSAupCt8ap2W+XJ4ypsR5uDA@mail.gmail.com>
-	<1b9136bd-47b8-4a39-59c1-5831498a2578@redhat.com>
-	<2dd73225-1e25-423e-5284-8f6fc60d47e3@redhat.com>
+	(envelope-from <kraxel@redhat.com>) id 1gHNeN-0004aZ-Bb
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 02:37:16 -0400
+Date: Tue, 30 Oct 2018 07:37:08 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20181030063708.w6l2hslpoirsdhmn@sirius.home.kraxel.org>
+References: <20181029223207.31878-1-philmd@redhat.com>
+	<20181029223207.31878-3-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH v1] lsi53c895a: check message length value
- is valid
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20181029223207.31878-3-philmd@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/3] usb: ehci: Add support for Allwinner
+ A10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +25,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Ameya More <ameya.more@oracle.com>, Thomas Huth <thuth@redhat.com>, Fam Zheng <famz@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Icenowy Zheng <icenowy@aosc.xyz>, Guenter Roeck <linux@roeck-us.net>, qemu-devel@nongnu.org, qemu-arm@nongnu.org
 
-+-- On Mon, 29 Oct 2018, Paolo Bonzini wrote --+
-| On 29/10/2018 18:56, Paolo Bonzini wrote:
-| > On 26/10/2018 22:55, Peter Maydell wrote:
-| >>> +    assert(len <= LSI_MAX_MSGIN_LEN);
-| >>>      pci_dma_write(PCI_DEVICE(s), s->dnad, s->msg, len);
-| >>>      /* Linux drivers rely on the last byte being in the SIDL.  */
-| >>>      s->sidl = s->msg[len - 1];
-| >> Is it possible to get here with len == 0 ?
-| > 
-| > No, all calls to
-| > 
-| >     lsi_set_phase(s, PHASE_MI);
-| > 
-| > are followed or preceded by lsi_add_msg_byte.  But an assertion is good
-| > to add.  What do you think of squashing this on top:
-| > 
-| > diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
-| > index 3a40e62853..72d85c42dd 100644
-| > --- a/hw/scsi/lsi53c895a.c
-| > +++ b/hw/scsi/lsi53c895a.c
-| > @@ -865,9 +865,9 @@ static void lsi_do_msgin(LSIState *s)
-| >      trace_lsi_do_msgin(s->dbc, s->msg_len);
-| >      s->sfbr = s->msg[0];
-| >      len = s->msg_len;
-| > +    assert(len >= 0 && len <= LSI_MAX_MSGIN_LEN);
-| 
-| Ahem, len > 0.  Is there a CVE number?
+On Mon, Oct 29, 2018 at 11:32:06PM +0100, Philippe Mathieu-Daud=E9 wrote:
+> From: Guenter Roeck <linux@roeck-us.net>
+>=20
+> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> ---
+> Gerd: You already review this code here:
+> https://lists.gnu.org/archive/html/qemu-arm/2017-01/msg00345.html
+> Can we use your R-b again?
 
-Sent revised patch v2. I'll request CVE once patch is reviewed/approved here.
+Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
 
-Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
+cheers,
+  Gerd
