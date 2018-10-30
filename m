@@ -1,38 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50557)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50673)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <muriloo@linux.ibm.com>) id 1gHXqN-0002Pc-QQ
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 13:30:20 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1gHXqw-0002y4-Kw
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 13:30:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <muriloo@linux.ibm.com>) id 1gHXqI-0003SJ-A9
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 13:30:19 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50388)
+	(envelope-from <amarkovic@wavecomp.com>) id 1gHXqr-0003yW-Ee
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 13:30:54 -0400
+Received: from mail-eopbgr810092.outbound.protection.outlook.com
+	([40.107.81.92]:11578
+	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <muriloo@linux.ibm.com>)
-	id 1gHXqH-0003Rd-Rj
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 13:30:14 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w9UHTgXH080653
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 13:30:11 -0400
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2neufe8uhk-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 13:30:11 -0400
-Received: from localhost
-	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <muriloo@linux.ibm.com>;
-	Tue, 30 Oct 2018 13:30:10 -0400
-Date: Tue, 30 Oct 2018 14:30:02 -0300
-From: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
-References: <20181030111348.14713-1-kraxel@redhat.com>
-	<20181030111348.14713-2-kraxel@redhat.com>
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1gHXqn-0003oE-Pw
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 13:30:49 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Tue, 30 Oct 2018 17:30:40 +0000
+Message-ID: <BN6PR2201MB12513C67816C9FEDCB2AB09BC6CC0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <1540914249-3392-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1540914249-3392-6-git-send-email-aleksandar.markovic@rt-rk.com>,
+	<bd184613-b6c5-57c8-6c7d-bea5feb283eb@redhat.com>
+In-Reply-To: <bd184613-b6c5-57c8-6c7d-bea5feb283eb@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181030111348.14713-2-kraxel@redhat.com>
-Message-Id: <20181030173002.GA4914@kermit-br-ibm-com.br.ibm.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/4] add QemuSupportState
+Subject: Re: [Qemu-devel] [PATCH v3 5/5] target/mips: Enable only tested
+ modes for R5900
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,105 +33,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eric Blake <eblake@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>, Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>
 
-Hi, Gerd.
+> Do you mind adding those one line comment when applying this series?
+>=20
+> > +#if defined(CONFIG_USER_ONLY)
+>=20
+>    #if defined(CONFIG_USER_ONLY) /* System mode not implemented */
+>=20
+> > +#if !defined(TARGET_MIPS64)
+>=20
+>    #if !defined(TARGET_MIPS64) /* Only O32 user-mode ABI is supported */
 
-On Tue, Oct 30, 2018 at 12:13:45PM +0100, Gerd Hoffmann wrote:
-> Indicates support state for somerhing (device, backend, subsystem, ...)
-> in qemu.  Modeled roughly after the "S:" states we have in MAINTANERS.
-> 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  include/qemu/support-state.h | 17 +++++++++++++++++
->  util/support-state.c         | 23 +++++++++++++++++++++++
->  qapi/common.json             | 16 ++++++++++++++++
->  util/Makefile.objs           |  1 +
->  4 files changed, 57 insertions(+)
->  create mode 100644 include/qemu/support-state.h
->  create mode 100644 util/support-state.c
-> 
-> diff --git a/include/qemu/support-state.h b/include/qemu/support-state.h
-> new file mode 100644
-> index 0000000000..5fd3c83eee
-> --- /dev/null
-> +++ b/include/qemu/support-state.h
-> @@ -0,0 +1,17 @@
-> +#ifndef QEMU_SUPPORT_STATE_H
-> +#define QEMU_SUPPORT_STATE_H
-> +
-> +#include "qapi/qapi-types-common.h"
-> +
-> +typedef struct QemuSupportState {
-> +    SupportState state;
-> +    const char *reason;
-> +} QemuSupportState;
-> +
-> +void qemu_warn_support_state(const char *type, const char *name,
-> +                             QemuSupportState *state);
-> +
-> +bool qemu_is_deprecated(QemuSupportState *state);
-> +bool qemu_is_obsolete(QemuSupportState *state);
-> +
-> +#endif /* QEMU_SUPPORT_STATE_H */
-> diff --git a/util/support-state.c b/util/support-state.c
-> new file mode 100644
-> index 0000000000..7966fa0fc7
-> --- /dev/null
-> +++ b/util/support-state.c
-> @@ -0,0 +1,23 @@
-> +#include "qemu/osdep.h"
-> +#include "qemu/error-report.h"
-> +#include "qemu/support-state.h"
-> +
-> +void qemu_warn_support_state(const char *type, const char *name,
-> +                             QemuSupportState *state)
-> +{
-> +    warn_report("%s %s is %s%s%s%s", type, name,
-> +                SupportState_str(state->state),
-> +                state->reason ? " ("          : "",
-> +                state->reason ? state->reason : "",
-> +                state->reason ? ")"           : "");
-> +}
-> +
-> +bool qemu_is_deprecated(QemuSupportState *state)
-> +{
-> +    return state->state == SUPPORT_STATE_DEPRECATED;
-> +}
-> +
-> +bool qemu_is_obsolete(QemuSupportState *state)
-> +{
-> +    return state->state == SUPPORT_STATE_OBSOLETE;
-> +}
-> diff --git a/qapi/common.json b/qapi/common.json
-> index 021174f04e..78176151af 100644
-> --- a/qapi/common.json
-> +++ b/qapi/common.json
-> @@ -151,3 +151,19 @@
->               'ppc64', 'riscv32', 'riscv64', 's390x', 'sh4',
->               'sh4eb', 'sparc', 'sparc64', 'tricore', 'unicore32',
->               'x86_64', 'xtensa', 'xtensaeb' ] }
-> +
-> +##
-> +# @SupportState:
-> +#
-> +# Indicate Support level of qemu devices, backends, subsystems, ...
-> +#
-> +# Since: 3.2
-> +##
-> +{ 'enum': 'SupportState',
-> +  'data': [ 'unknown',
-> +            'supported',
-> +            'maintained',
-> +            'odd-fixes',
-> +            'orphan',
-> +            'obsolete',
-> +            'deprecated' ] }
+I do think this is a very good idea, but it was too late - I was already we=
+ll into preparing pull request when I read this.
 
-Regardless how fine-grained we decide to be here, is it possible that
-you describe in the documentation comment where each state shall be
-used?
-
--- 
-Murilo
+Thanks,
+Aleksandar=
