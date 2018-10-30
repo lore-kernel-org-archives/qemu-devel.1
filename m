@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49411)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gHa6E-00047F-1i
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:54:50 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1gHa6y-0004l9-1I
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:55:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gHa6A-00052Y-QS
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:54:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58034)
+	(envelope-from <dgilbert@redhat.com>) id 1gHa6h-0005OI-6U
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:55:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34692)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gHa67-0004xt-08
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:54:44 -0400
-Date: Tue, 30 Oct 2018 19:54:30 +0000
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gHa6g-0005JS-Vc
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:55:19 -0400
+Date: Tue, 30 Oct 2018 19:55:12 +0000
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20181030195430.GE2441@work-vm>
+Message-ID: <20181030195512.GF2441@work-vm>
 References: <20181024163529.15665-1-zhangckid@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -37,11 +37,7 @@ Cc: qemu-devel@nongnu.org, zhanghailiang <zhang.zhanghailiang@huawei.com>, Thoma
 > Reported-by: Thomas Huth <thuth@redhat.com>
 > Signed-off-by: Zhang Chen <zhangckid@gmail.com>
 
-OK; do we need to add a check to migrate_caps_check to stop you enabling
-colo in this case?
-
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Queued.
 
 > ---
 >  migration/colo.c | 18 +++++++++++++++++-
