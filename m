@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53319)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57508)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@outlook.com>) id 1gHJ6F-0001Ng-E5
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 21:45:44 -0400
+	(envelope-from <jasowang@redhat.com>) id 1gHJMt-00008h-Vr
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 22:02:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@outlook.com>) id 1gHJ6B-0003rr-BX
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 21:45:43 -0400
-Received: from mail-oln040092006033.outbound.protection.outlook.com
-	([40.92.6.33]:23533
-	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liq3ea@outlook.com>) id 1gHJ6B-0003rA-26
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 21:45:39 -0400
-From: li qiang <liq3ea@outlook.com>
-Date: Tue, 30 Oct 2018 01:45:36 +0000
-Message-ID: <BN6PR18MB1220A7FBDA0D20E03CD698C99FCC0@BN6PR18MB1220.namprd18.prod.outlook.com>
-References: <20181028124004.30494-1-liq3ea@163.com>
-	<20181028124004.30494-2-liq3ea@163.com>
-	<8b181c7d-338f-3612-48bb-751bab8f020a@redhat.com>
-In-Reply-To: <8b181c7d-338f-3612-48bb-751bab8f020a@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <42DE7F213A5234479277A70BC61F5B6C@namprd18.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <jasowang@redhat.com>) id 1gHJMk-0003so-TH
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 22:02:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57432)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gHJMf-0003oN-8Y
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 22:02:44 -0400
+References: <1539919345-10703-1-git-send-email-jasowang@redhat.com>
+	<1539919345-10703-2-git-send-email-jasowang@redhat.com>
+	<CAFEAcA8fcR47WmOqkNYJfp2K=Zgt+vE_O+2ANKj6dJiFtKdBaA@mail.gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <dffc1be5-95ee-9721-9326-77ad1505ab84@redhat.com>
+Date: Tue, 30 Oct 2018 10:02:29 +0800
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 1/2] tests: fw_cfg: add a function to get
- the fw_cfg file entry
+In-Reply-To: <CAFEAcA8fcR47WmOqkNYJfp2K=Zgt+vE_O+2ANKj6dJiFtKdBaA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL V2 01/26] filter-rewriter: Add TCP state
+ machine and fix memory leak in connection_track_table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,71 +30,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, Li Qiang <liq3ea@163.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "thuth@redhat.com" <thuth@redhat.com>, "lvivier@redhat.com" <lvivier@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>, Zhang Chen <chen.zhang@intel.com>, Zhang Chen <zhangckid@gmail.com>
+Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-DQpIZWxsbyBQaGlsaXBwZSwNCg0KDQpUaGFua3MgZm9yIHlvdXIgcmV2aWV3LA0KDQpJIHdpbGwg
-c2VuZCB2MiBsYXRlci4NCg0KDQpUaGFua3MuDQoNCkxpIFFpYW5nDQoNCuWcqCAyMDE4LzEwLzMw
-IDc6NDYsIFBoaWxpcHBlIE1hdGhpZXUtRGF1ZMOpIOWGmemBkzoNCj4gSGkgTGksDQo+DQo+IE9u
-IDI4LzEwLzE4IDEzOjQwLCBMaSBRaWFuZyB3cm90ZToNCj4+IFRoaXMgaXMgdXNlZnVsIHRvIHdy
-aXRlIHF0ZXN0IGFib3VudCBmd19jZmcgZmlsZSBlbnRyeS4NCj4+DQo+PiBTaWduZWQtb2ZmLWJ5
-OiBMaSBRaWFuZyA8bGlxM2VhQDE2My5jb20+DQo+PiAtLS0NCj4+IMKgIHRlc3RzL2xpYnFvcy9m
-d19jZmcuYyB8IDMwICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKw0KPj4gwqAgdGVzdHMv
-bGlicW9zL2Z3X2NmZy5oIHzCoCAyICsrDQo+PiDCoCAyIGZpbGVzIGNoYW5nZWQsIDMyIGluc2Vy
-dGlvbnMoKykNCj4+DQo+PiBkaWZmIC0tZ2l0IGEvdGVzdHMvbGlicW9zL2Z3X2NmZy5jIGIvdGVz
-dHMvbGlicW9zL2Z3X2NmZy5jDQo+PiBpbmRleCBkMDg4OWQxZTIyLi4yZGQ3YTQ5OGFiIDEwMDY0
-NA0KPj4gLS0tIGEvdGVzdHMvbGlicW9zL2Z3X2NmZy5jDQo+PiArKysgYi90ZXN0cy9saWJxb3Mv
-ZndfY2ZnLmMNCj4+IEBAIC0xNiw2ICsxNiw3IEBADQo+PiDCoCAjaW5jbHVkZSAibGlicW9zL2Z3
-X2NmZy5oIg0KPj4gwqAgI2luY2x1ZGUgImxpYnF0ZXN0LmgiDQo+PiDCoCAjaW5jbHVkZSAicWVt
-dS9ic3dhcC5oIg0KPj4gKyNpbmNsdWRlICJzdGFuZGFyZC1oZWFkZXJzL2xpbnV4L3FlbXVfZndf
-Y2ZnLmgiDQo+PiDCoCDCoCB2b2lkIHFmd19jZmdfc2VsZWN0KFFGV0NGRyAqZndfY2ZnLCB1aW50
-MTZfdCBrZXkpDQo+PiDCoCB7DQo+PiBAQCAtNTQsNiArNTUsMzUgQEAgdWludDY0X3QgcWZ3X2Nm
-Z19nZXRfdTY0KFFGV0NGRyAqZndfY2ZnLCB1aW50MTZfdCANCj4+IGtleSkNCj4+IMKgwqDCoMKg
-wqAgcmV0dXJuIGxlNjRfdG9fY3B1KHZhbHVlKTsNCj4+IMKgIH0NCj4NCj4gQ2FuIHRoaXMgcmV0
-dXJuIHNpemVfdCB0aGUgc2l6ZSBvZiB0aGUgZmlsZT8NCj4gU28gcWZ3X2NmZ19nZXRfZmlsZSgu
-Li4sIGJ1Zmxlbj0wKSByZXR1cm5zIHRoZSBmaWxlIHNpemUuDQo+DQo+PiArdm9pZCBxZndfY2Zn
-X2dldF9maWxlKFFGV0NGRyAqZndfY2ZnLCBjb25zdCBjaGFyICpmaWxlbmFtZSwNCj4+ICvCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgdm9pZCAqZGF0YSwgc2l6ZV90
-IGJ1ZmxlbikNCj4+ICt7DQo+PiArwqDCoMKgIHVpbnQzMl90IGNvdW50Ow0KPj4gK8KgwqDCoCB1
-aW50MzJfdCBpOw0KPj4gK8KgwqDCoCB1bnNpZ25lZCBjaGFyICpmaWxlc2J1ZiA9IE5VTEw7DQo+
-PiArwqDCoMKgIHVpbnQzMl90IGRzaXplOw0KPj4gK8KgwqDCoCBzdHJ1Y3QgZndfY2ZnX2ZpbGUg
-KnA7DQo+DQo+IMKgwqDCoMKgwqDCoCBzaXplX3QgZmlsZXNpemUgPSAwOw0KPg0KPj4gKw0KPj4g
-K8KgwqDCoCBxZndfY2ZnX2dldChmd19jZmcsIEZXX0NGR19GSUxFX0RJUiwgJmNvdW50LCBzaXpl
-b2YoY291bnQpKTsNCj4+ICvCoMKgwqAgY291bnQgPSBiZTMyX3RvX2NwdShjb3VudCk7DQo+PiAr
-wqDCoMKgIGRzaXplID0gc2l6ZW9mKHVpbnQzMl90KSArIGNvdW50ICogc2l6ZW9mKHN0cnVjdCBm
-d19jZmdfZmlsZSk7DQo+PiArwqDCoMKgIGZpbGVzYnVmID0gZ19tYWxsb2MwKGRzaXplKTsNCj4+
-ICvCoMKgwqAgcWZ3X2NmZ19nZXQoZndfY2ZnLCBGV19DRkdfRklMRV9ESVIsIGZpbGVzYnVmLCBk
-c2l6ZSk7DQo+PiArwqDCoMKgIHAgPSAoc3RydWN0IGZ3X2NmZ19maWxlICopKGZpbGVzYnVmICsg
-NCk7DQo+PiArwqDCoMKgIGZvciAoaSA9IDA7IGkgPCBjb3VudDsgKytpLCArK3ApIHsNCj4+ICvC
-oMKgwqDCoMKgwqDCoCBpZiAoIXN0cmNtcChwLT5uYW1lLCBmaWxlbmFtZSkpIHsNCj4+ICvCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgIHVpbnQzMl90IGxlbiA9IGJlMzJfdG9fY3B1KHAtPnNpemUpOw0K
-Pg0KPg0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgdWludDE2X3Qgc2VsID0gYmUxNl90b19j
-cHUocC0+c2VsZWN0KTsNCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHZvaWQgKmJ1ZiA9IGdf
-bWFsbG9jMChsZW4pOw0KPg0KPiBXaHkgY2FsbCBtYWxsb2MoKSBoZXJlPw0KPg0KPj4gK8KgwqDC
-oMKgwqDCoMKgwqDCoMKgwqAgcWZ3X2NmZ19nZXQoZndfY2ZnLCBzZWwsIGJ1ZiwgbGVuKTsNCj4N
-Cj4gQW5kIG5vdCBjb3B5IGRpcmVjdGx5IHRvICdkYXRhJzoNCj4NCj4gwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoCBmaWxlc2l6ZSA9IGxlbjsNCj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoCBpZiAobGVuID4gYnVmbGVuKSB7DQo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoCBsZW4gPSBidWZsZW47DQo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfQ0K
-PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHFmd19jZmdfZ2V0KGZ3X2NmZywgc2VsLCBk
-YXRhLCBsZW4pOw0KPg0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgbWVtY3B5KGRhdGEsIGJ1
-ZiwgYnVmbGVuKTsNCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGdfZnJlZShidWYpOw0KPg0K
-PiBEcm9wcGluZyAyIHByZXZpb3VzIGxpbmVzLg0KPg0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKg
-wqAgYnJlYWs7DQo+PiArwqDCoMKgwqDCoMKgwqAgfQ0KPj4gK8KgwqDCoCB9DQo+PiArwqDCoMKg
-IGdfZnJlZShmaWxlc2J1Zik7DQo+DQo+IMKgwqDCoMKgwqDCoCByZXR1cm4gZmlsZXNpemU7DQo+
-DQo+PiArfQ0KPj4gKw0KPj4gwqAgc3RhdGljIHZvaWQgbW1fZndfY2ZnX3NlbGVjdChRRldDRkcg
-KmZ3X2NmZywgdWludDE2X3Qga2V5KQ0KPj4gwqAgew0KPj4gwqDCoMKgwqDCoCBxdGVzdF93cml0
-ZXcoZndfY2ZnLT5xdHMsIGZ3X2NmZy0+YmFzZSwga2V5KTsNCj4+IGRpZmYgLS1naXQgYS90ZXN0
-cy9saWJxb3MvZndfY2ZnLmggYi90ZXN0cy9saWJxb3MvZndfY2ZnLmgNCj4+IGluZGV4IDAzNTM0
-MTZhZjAuLjUwZTQyMjc2MzggMTAwNjQ0DQo+PiAtLS0gYS90ZXN0cy9saWJxb3MvZndfY2ZnLmgN
-Cj4+ICsrKyBiL3Rlc3RzL2xpYnFvcy9md19jZmcuaA0KPj4gQEAgLTMxLDYgKzMxLDggQEAgdm9p
-ZCBxZndfY2ZnX2dldChRRldDRkcgKmZ3X2NmZywgdWludDE2X3Qga2V5LCB2b2lkIA0KPj4gKmRh
-dGEsIHNpemVfdCBsZW4pOw0KPj4gwqAgdWludDE2X3QgcWZ3X2NmZ19nZXRfdTE2KFFGV0NGRyAq
-ZndfY2ZnLCB1aW50MTZfdCBrZXkpOw0KPj4gwqAgdWludDMyX3QgcWZ3X2NmZ19nZXRfdTMyKFFG
-V0NGRyAqZndfY2ZnLCB1aW50MTZfdCBrZXkpOw0KPj4gwqAgdWludDY0X3QgcWZ3X2NmZ19nZXRf
-dTY0KFFGV0NGRyAqZndfY2ZnLCB1aW50MTZfdCBrZXkpOw0KPj4gK3ZvaWQgcWZ3X2NmZ19nZXRf
-ZmlsZShRRldDRkcgKmZ3X2NmZywgY29uc3QgY2hhciAqZmlsZW5hbWUsDQo+PiArwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHZvaWQgKmRhdGEsIHNpemVfdCBidWZs
-ZW4pOw0KPj4gwqAgwqAgUUZXQ0ZHICptbV9md19jZmdfaW5pdChRVGVzdFN0YXRlICpxdHMsIHVp
-bnQ2NF90IGJhc2UpOw0KPj4gwqAgUUZXQ0ZHICppb19md19jZmdfaW5pdChRVGVzdFN0YXRlICpx
-dHMsIHVpbnQxNl90IGJhc2UpOw0KPj4NCj4NCg==
+
+On 2018/10/29 =E4=B8=8B=E5=8D=887:01, Peter Maydell wrote:
+> On 19 October 2018 at 04:22, Jason Wang <jasowang@redhat.com> wrote:
+>> From: Zhang Chen <zhangckid@gmail.com>
+>>
+>> We add almost full TCP state machine in filter-rewriter, except
+>> TCPS_LISTEN and some simplify in VM active close FIN states.
+>> The reason for this simplify job is because guest kernel will track
+>> the TCP status and wait 2MSL time too, if client resend the FIN packet=
+,
+>> guest will resend the last ACK, so we needn't wait 2MSL time in filter=
+-rewriter.
+>>
+>> After a net connection is closed, we didn't clear its related resource=
+s
+>> in connection_track_table, which will lead to memory leak.
+>>
+>> Let's track the state of net connection, if it is closed, its related
+>> resources will be cleared up.
+> Hi. Coverity (CID 1396477) points out that here:
+>
+>> +        /*
+>> +         * Active close step 2.
+>> +         */
+>> +        if (conn->tcp_state =3D=3D TCPS_FIN_WAIT_1) {
+>> +            conn->tcp_state =3D TCPS_TIME_WAIT;
+> ...this assignment to conn->tcp_state has no effect, because...
+>
+>> +            /*
+>> +             * For simplify implementation, we needn't wait 2MSL time
+>> +             * in filter rewriter. Because guest kernel will track th=
+e
+>> +             * TCP status and wait 2MSL time, if client resend the FI=
+N
+>> +             * packet, guest will apply the last ACK too.
+>> +             */
+>> +            conn->tcp_state =3D TCPS_CLOSED;
+> ...we immediately overwrite it with a different value.
+>
+>> +            g_hash_table_remove(rf->connection_track_table, key);
+>> +        }
+>>       }
+> What was the intention of the code here?
+>
+> thanks
+> -- PMM
+
+
+Looks not.
+
+Chen, can you please send a patch to fix this?
+
+Thanks
