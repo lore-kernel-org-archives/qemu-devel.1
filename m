@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56286)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57014)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wj193102@163.com>) id 1gHT5Z-0006JN-3g
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:25:42 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1gHT7n-00088N-KF
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:28:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wj193102@163.com>) id 1gHT5U-0000zc-QP
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:25:40 -0400
-Received: from m13-74.163.com ([220.181.13.74]:35607)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wj193102@163.com>) id 1gHT5N-0000cR-Nu
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:25:32 -0400
-Date: Tue, 30 Oct 2018 20:10:02 +0800 (CST)
-From: wj193102  <wj193102@163.com>
-In-Reply-To: <CAFEAcA-r=71qgPByUWuKsSAwiRA2S7qidtrrWyRuHvrckAvxSQ@mail.gmail.com>
-References: <c097d8c.a587.166c2c22a77.Coremail.wj193102@163.com>
-	<CAFEAcA-r=71qgPByUWuKsSAwiRA2S7qidtrrWyRuHvrckAvxSQ@mail.gmail.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1gHT7j-0002rj-Et
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:27:59 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:55844)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gHT7i-0002qk-MS
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:27:55 -0400
+Received: by mail-wm1-x344.google.com with SMTP id s10-v6so11549893wmc.5
+	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 05:27:54 -0700 (PDT)
+References: <20181025144644.15464-1-cota@braap.org>
+	<20181025144644.15464-4-cota@braap.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20181025144644.15464-4-cota@braap.org>
+Date: Tue, 30 Oct 2018 12:27:51 +0000
+Message-ID: <87sh0n8vqw.fsf@linaro.org>
 MIME-Version: 1.0
-Message-ID: <1e1a8483.155c9.166c4e17888.Coremail.wj193102@163.com>
-Content-Type: text/plain; charset=GBK
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] qemu3.0.0: Linux on non x86 CPUs run Wine
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC v4 04/71] cpu: make qemu_work_cond per-cpu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,46 +30,245 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
 
-VGhhbmtzIGZvciB5b3VyIHJlcGx5LgoKQXQgMjAxOC0xMC0zMCAxNjozMzoxNSwgIlBldGVyIE1h
-eWRlbGwiIDxwZXRlci5tYXlkZWxsQGxpbmFyby5vcmc+IHdyb3RlOgo+T24gMzAgT2N0b2JlciAy
-MDE4IGF0IDAyOjE2LCB3ajE5MzEwMiA8d2oxOTMxMDJAMTYzLmNvbT4gd3JvdGU6Cj4+IEhpLCBl
-dmVyeW9uZS4KPj4gICAgIFdoZW4gSSBoYXZlIGluc3RhbGxlZCB0aGUgUUVNVTMuMC4wIGluIHRo
-ZSBMaW51eCBvbiBub24gWDg2IENQVVMsIEkgd2FudCB0byB1c2UgdXNlciBzcGFjZSBlbXVsYXRv
-ciB0byBydW4gV2luZS4gSSBjYW4gZ2V0IHRoZSBzb3VyY2UgY29kZSBmb3IgV2luZSBhbmQgdGhl
-IFJQTSBmaWxlIGZvciBXaW5lIGZyb20gdGhlIFdpbmVIUSB3ZWIgcGFnZS4KPj4gSSB1c2VkIHRv
-IGNvbXBpbGUgV2luZSBpbiB0aGUgWDg2LWJhc2VkIExpbnV4IHN5c3RlbSBhbmQgdXNlZCBpdCB0
-byBydW4gbW9zdCBXaW4zMiBwcm9ncmFtcy4gTm93IEkgd2FudCB0byAgdXNlIGl0IG9uIHRoZSBu
-b24gWDg2IENQVVMgYnkgUUVNVS4gQnV0IEkgY2FuJ3QgZ2V0IHRoZSBmdW5jdGlvbiB0byBpbnN0
-YWxsIGFuZCB1c2UgdGhlIFdpbmUuIFBsZWFzZSBnaXZlIG1lIHNvbWUgYWR2aWNlCj4+IG9yIHNv
-bWUgZnVuY3Rpb25zIHRvIGZpbmlzaCBpdC4gVGhhbmtzIGEgbG90Lgo+Cj5JJ20gYWZyYWlkIHlv
-dSB3aWxsIG5lZWQgdG8gcHJvdmlkZSBtb3JlIGRldGFpbCBmb3IgdXMgdG8KPmhlbHAgaGVyZS4g
-V2hhdCBleGFjdGx5IGFyZSB5b3UgZG9pbmc/IFdoaWNoIGNvbW1hbmRzIGFyZSB5b3UKPnJ1bm5p
-bmc/IFdoYXQgaXMgdGhlIGV4YWN0IGVycm9yIG1lc3NhZ2Ugb3IgZmFpbHVyZSB5b3Ugc2VlPwoK
-CgpJIGhhdmUgaW5zdGFsbGVkIHRoZSBXaW5lIGluIExpbnV4KGZlZG9yYSkgb24gdGhlIFg4NiBD
-UFVzIGZyb20gdGhlIHNvdXJjZSBjb2RlLiBDYW4gSSBjb3B5IHRoZSByZWxhdGVkIGZpbGUgb2Yg
-V2luZSBmcm9tIHRoZSBMaW51eCBvbiBYODYgQ1BVcyB0byB0aGUgTGludXggb24gdGhlIG5vbiBY
-ODYgQ1BVUyBmb3IgcnVubmluZyB0aGUgY29tbWFuZCAid2luZSIgb3IgIndpbmVjZmciLgoKCj4+
-ICAgIE1lYW53aGlsZSwgSSB1c2UgdGhlIGNvbW1hbmQgInFlbXUtaTM4Ni9xZW11LXg4Nl82NCAq
-LnNoIiB0bwo+PiBydW4gdGhlIGFwcGxpY2F0aW9uIGZyb20gdGhlIFg4NiBDUFVTIG9uIG5vbiBY
-ODYgQ1BVUywgSSBnZXQgdGhlCj4+IGVycm9yIGluZm9ybWF0aW9uOiJJbnZhbGlkIEVMRiBpbWFn
-ZSBmb3IgdGhpcyBhcmNoaXRlY3R1cmUiLiBXaHkKPj4gdGhlIGVycm9yIGlzIGNvbW1pbmc/IFdo
-YXQgY2FuIEkgZG8gdG8gcmVzb2x2ZSB0aGlzIHByb2JsZW0/Cj4KPlRoaXMgaXMgcHJvYmFibHkg
-YmVjYXVzZSB5b3UgYXJlIHRyeWluZyB0byBydW4gYSBzaGVsbCBzY3JpcHQuCj4oSSdtIGd1ZXNz
-aW5nIHRoaXMgZnJvbSB0aGUgJy5zaCcgZXh0ZW5zaW9uKS4gVGhpcyB3b24ndCB3b3JrLgo+UUVN
-VSBvbmx5IHJ1bnMgYWN0dWFsIGV4ZWN1dGFibGVzIChFTEYgZmlsZXMpLgoKVGhhdCBpcyBteSBm
-YXVsdC4gSSBkb24ndCBydW4gdGhlICouc2ggZmlsZS4gSSBjb3B5IHRoZSBmaWxlICIvYmluL2xz
-IiBmcm9tIHRoZSBMaW51eCBvbiB4ODYgQ1BVcyB0byB0aGUgTGludXggb24gbm9uIFg4NiBDUFVz
-LiBJIHB1dCB0aGUgZmlsZSBpbiB0aGUgbmV3IGNyZWF0ZWQgZGlyZWN0b3J5LCBzdWNoIGFzICIv
-aG9tZS9hZG1pbi91c2VyL3Rlc3QvIi4KVGhlbiBJIHJ1biB0aGUgZXhlY3V0YWJsZSBmaWxlLHVz
-aW5nICJxZW11LWkzODYgLi9scyIsIEkgZ2V0IHRoZSBmb2xsb3dpbmcgZXJyb3I6ICIuL2xzOiBl
-cnJvciB3aGlsZSBsb2FkaW5nIHNoYXJlZCBsaWJyYXJpZXM6IGxpYnNlbGludXguc28uMTogY2Fu
-bm90IG9wZW4gc2hhcmVkIG9iamVjdCBmaWxlOiBObyBzdWNoIGZpbGUgb3IgZGlyZWN0b3J5LiIK
-SG93IGNhbiBJIHJlc29sdmUgdGhpcyAgcHJvYmxlbT8gCgoKPlVzdWFsbHkgdGhlIHNldHVwIGlz
-IHRoYXQgdGhlIGhvc3QgTGludXggc3lzdGVtIGlzIHNldCB1cAo+d2l0aCBiaW5mbXQtbWlzYywg
-c28gdGhhdCBpZiBpdCBlbmNvdW50ZXJzIGEgZ3Vlc3QtYXJjaGl0ZWN0dXJlCj5iaW5hcnkgaXQg
-d2lsbCBhdXRvbWF0aWNhbGx5IHJ1biBpdCB1bmRlciBRRU1VLiBVc3VhbGx5Cj50aGlzIGlzIGRv
-bmUgdG8gYWxsb3cgcnVubmluZyBndWVzdCBiaW5hcmllcyBpbnNpZGUgYSBjaHJvb3QuCj4KPnRo
-YW5rcwoKPi0tIFBNTQoKClRoYW5rcyBhIGxvdC4KLS1XYW5nSmkKCgoK
+
+Emilio G. Cota <cota@braap.org> writes:
+
+> This eliminates the need to use the BQL to queue CPU work.
+>
+> While at it, give the per-cpu field a generic name ("cond") since
+> it will soon be used for more than just queueing CPU work.
+>
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  include/qom/cpu.h |  6 ++--
+>  cpus-common.c     | 72 ++++++++++++++++++++++++++++++++++++++---------
+>  cpus.c            |  2 +-
+>  qom/cpu.c         |  1 +
+>  4 files changed, 63 insertions(+), 18 deletions(-)
+>
+> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+> index 7fdb5a2be0..2fad537a4f 100644
+> --- a/include/qom/cpu.h
+> +++ b/include/qom/cpu.h
+> @@ -316,6 +316,7 @@ struct qemu_work_item;
+>   * @mem_io_vaddr: Target virtual address at which the memory was accesse=
+d.
+>   * @kvm_fd: vCPU file descriptor for KVM.
+>   * @lock: Lock to prevent multiple access to per-CPU fields.
+> + * @cond: Condition variable for per-CPU events.
+>   * @work_list: List of pending asynchronous work.
+>   * @trace_dstate_delayed: Delayed changes to trace_dstate (includes all =
+changes
+>   *                        to @trace_dstate).
+> @@ -358,6 +359,7 @@ struct CPUState {
+>
+>      QemuMutex lock;
+>      /* fields below protected by @lock */
+> +    QemuCond cond;
+>      QSIMPLEQ_HEAD(, qemu_work_item) work_list;
+>
+>      CPUAddressSpace *cpu_ases;
+> @@ -769,12 +771,10 @@ bool cpu_is_stopped(CPUState *cpu);
+>   * @cpu: The vCPU to run on.
+>   * @func: The function to be executed.
+>   * @data: Data to pass to the function.
+> - * @mutex: Mutex to release while waiting for @func to run.
+>   *
+>   * Used internally in the implementation of run_on_cpu.
+>   */
+> -void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data =
+data,
+> -                   QemuMutex *mutex);
+> +void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data =
+data);
+>
+>  /**
+>   * run_on_cpu:
+> diff --git a/cpus-common.c b/cpus-common.c
+> index 2913294cb7..71469c85ce 100644
+> --- a/cpus-common.c
+> +++ b/cpus-common.c
+> @@ -26,7 +26,6 @@
+>  static QemuMutex qemu_cpu_list_lock;
+>  static QemuCond exclusive_cond;
+>  static QemuCond exclusive_resume;
+> -static QemuCond qemu_work_cond;
+>
+>  /* >=3D 1 if a thread is inside start_exclusive/end_exclusive.  Written
+>   * under qemu_cpu_list_lock, read with atomic operations.
+> @@ -42,7 +41,6 @@ void qemu_init_cpu_list(void)
+>      qemu_mutex_init(&qemu_cpu_list_lock);
+>      qemu_cond_init(&exclusive_cond);
+>      qemu_cond_init(&exclusive_resume);
+> -    qemu_cond_init(&qemu_work_cond);
+>  }
+>
+>  void cpu_list_lock(void)
+> @@ -113,23 +111,37 @@ struct qemu_work_item {
+>      bool free, exclusive, done;
+>  };
+>
+> -static void queue_work_on_cpu(CPUState *cpu, struct qemu_work_item *wi)
+> +/* Called with the CPU's lock held */
+> +static void queue_work_on_cpu_locked(CPUState *cpu, struct qemu_work_ite=
+m *wi)
+>  {
+> -    qemu_mutex_lock(&cpu->lock);
+>      QSIMPLEQ_INSERT_TAIL(&cpu->work_list, wi, node);
+>      wi->done =3D false;
+> -    qemu_mutex_unlock(&cpu->lock);
+>
+>      qemu_cpu_kick(cpu);
+>  }
+>
+> -void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data =
+data,
+> -                   QemuMutex *mutex)
+> +static void queue_work_on_cpu(CPUState *cpu, struct qemu_work_item *wi)
+> +{
+> +    cpu_mutex_lock(cpu);
+> +    queue_work_on_cpu_locked(cpu, wi);
+> +    cpu_mutex_unlock(cpu);
+> +}
+> +
+> +void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data =
+data)
+>  {
+>      struct qemu_work_item wi;
+> +    bool has_bql =3D qemu_mutex_iothread_locked();
+> +
+> +    g_assert(no_cpu_mutex_locked());
+>
+>      if (qemu_cpu_is_self(cpu)) {
+> -        func(cpu, data);
+> +        if (has_bql) {
+> +            func(cpu, data);
+> +        } else {
+> +            qemu_mutex_lock_iothread();
+> +            func(cpu, data);
+> +            qemu_mutex_unlock_iothread();
+> +        }
+>          return;
+>      }
+>
+> @@ -139,13 +151,34 @@ void do_run_on_cpu(CPUState *cpu, run_on_cpu_func f=
+unc, run_on_cpu_data data,
+>      wi.free =3D false;
+>      wi.exclusive =3D false;
+>
+> -    queue_work_on_cpu(cpu, &wi);
+> +    cpu_mutex_lock(cpu);
+> +    queue_work_on_cpu_locked(cpu, &wi);
+> +
+> +    /*
+> +     * We are going to sleep on the CPU lock, so release the BQL.
+> +     *
+> +     * During the transition to per-CPU locks, we release the BQL _after_
+> +     * having kicked the destination CPU (from queue_work_on_cpu_locked =
+above).
+> +     * This makes sure that the enqueued work will be seen by the CPU
+> +     * after being woken up from the kick, since the CPU sleeps on the B=
+QL.
+> +     * Once we complete the transition to per-CPU locks, we will release
+> +     * the BQL earlier in this function.
+> +     */
+> +    if (has_bql) {
+> +        qemu_mutex_unlock_iothread();
+> +    }
+> +
+>      while (!atomic_mb_read(&wi.done)) {
+>          CPUState *self_cpu =3D current_cpu;
+>
+> -        qemu_cond_wait(&qemu_work_cond, mutex);
+> +        qemu_cond_wait(&cpu->cond, &cpu->lock);
+>          current_cpu =3D self_cpu;
+>      }
+> +    cpu_mutex_unlock(cpu);
+> +
+> +    if (has_bql) {
+> +        qemu_mutex_lock_iothread();
+> +    }
+>  }
+>
+>  void async_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_da=
+ta data)
+> @@ -307,6 +340,7 @@ void async_safe_run_on_cpu(CPUState *cpu, run_on_cpu_=
+func func,
+>  void process_queued_cpu_work(CPUState *cpu)
+>  {
+>      struct qemu_work_item *wi;
+> +    bool has_bql =3D qemu_mutex_iothread_locked();
+>
+>      qemu_mutex_lock(&cpu->lock);
+>      if (QSIMPLEQ_EMPTY(&cpu->work_list)) {
+> @@ -324,13 +358,23 @@ void process_queued_cpu_work(CPUState *cpu)
+>               * BQL, so it goes to sleep; start_exclusive() is sleeping t=
+oo, so
+>               * neither CPU can proceed.
+>               */
+> -            qemu_mutex_unlock_iothread();
+> +            if (has_bql) {
+> +                qemu_mutex_unlock_iothread();
+> +            }
+>              start_exclusive();
+>              wi->func(cpu, wi->data);
+>              end_exclusive();
+> -            qemu_mutex_lock_iothread();
+> +            if (has_bql) {
+> +                qemu_mutex_lock_iothread();
+> +            }
+>          } else {
+> -            wi->func(cpu, wi->data);
+> +            if (has_bql) {
+> +                wi->func(cpu, wi->data);
+> +            } else {
+> +                qemu_mutex_lock_iothread();
+> +                wi->func(cpu, wi->data);
+> +                qemu_mutex_unlock_iothread();
+> +            }
+>          }
+>          qemu_mutex_lock(&cpu->lock);
+>          if (wi->free) {
+> @@ -340,5 +384,5 @@ void process_queued_cpu_work(CPUState *cpu)
+>          }
+>      }
+>      qemu_mutex_unlock(&cpu->lock);
+> -    qemu_cond_broadcast(&qemu_work_cond);
+> +    qemu_cond_broadcast(&cpu->cond);
+>  }
+> diff --git a/cpus.c b/cpus.c
+> index 38cc9e1278..d0b7f8e02d 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -1236,7 +1236,7 @@ void qemu_init_cpu_loop(void)
+>
+>  void run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data dat=
+a)
+>  {
+> -    do_run_on_cpu(cpu, func, data, &qemu_global_mutex);
+> +    do_run_on_cpu(cpu, func, data);
+>  }
+>
+>  static void qemu_kvm_destroy_vcpu(CPUState *cpu)
+> diff --git a/qom/cpu.c b/qom/cpu.c
+> index d0758c907d..bb031a3a6a 100644
+> --- a/qom/cpu.c
+> +++ b/qom/cpu.c
+> @@ -373,6 +373,7 @@ static void cpu_common_initfn(Object *obj)
+>      cpu->nr_threads =3D 1;
+>
+>      qemu_mutex_init(&cpu->lock);
+> +    qemu_cond_init(&cpu->cond);
+>      QSIMPLEQ_INIT(&cpu->work_list);
+>      QTAILQ_INIT(&cpu->breakpoints);
+>      QTAILQ_INIT(&cpu->watchpoints);
+
+
+--
+Alex Benn=C3=A9e
