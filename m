@@ -1,26 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40889)
+Received: from eggs.gnu.org ([208.118.235.92]:57241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1gHLxg-0002sp-So
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 00:49:05 -0400
+	(envelope-from <liq3ea@gmail.com>) id 1gHMQX-0005en-JW
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 01:18:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1gHLxa-0004IG-Ai
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 00:49:04 -0400
-Received: from m13-82.163.com ([220.181.13.82]:1690)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1gHLxY-0004H1-Ud
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 00:48:58 -0400
-Date: Tue, 30 Oct 2018 12:33:01 +0800 (CST)
-From: =?GBK?B?wO7Hvw==?= <liq3ea@163.com>
-In-Reply-To: <3a1b60e0-fe90-4da7-210e-4519f220bb9f@redhat.com>
-References: <20181028124004.30494-1-liq3ea@163.com>
-	<20181028124004.30494-3-liq3ea@163.com>
-	<3a1b60e0-fe90-4da7-210e-4519f220bb9f@redhat.com>
-MIME-Version: 1.0
-Message-ID: <689cc088.f04a.166c33f0f26.Coremail.liq3ea@163.com>
-Content-Type: text/plain; charset=GBK
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [PATCH 2/2] tests: fw_cfg: add reboot_timeout test
- case
+	(envelope-from <liq3ea@gmail.com>) id 1gHMQX-0005PK-0K
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 01:18:53 -0400
+From: Li Qiang <liq3ea@gmail.com>
+Date: Mon, 29 Oct 2018 22:18:36 -0700
+Message-Id: <1540876720-9574-1-git-send-email-liq3ea@gmail.com>
+Subject: [Qemu-devel] [PATCH 0/4] nvme: some small fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,68 +17,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?GBK?Q?Philippe_Mathieu-Daud=A8=A6?= <philmd@redhat.com>
-Cc: pbonzini@redhat.com, thuth@redhat.com, lvivier@redhat.com, qemu-devel@nongnu.org
+To: keith.busch@intel.com, kwolf@redhat.com, mreitz@redhat.com
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Li Qiang <liq3ea@gmail.com>
 
-CgoKCgoKCgoKQXQgMjAxOC0xMC0zMCAwODowODo1NSwgIlBoaWxpcHBlIE1hdGhpZXUtRGF1ZKim
-IiA8cGhpbG1kQHJlZGhhdC5jb20+IHdyb3RlOgo+T24gMjgvMTAvMTggMTM6NDAsIExpIFFpYW5n
-IHdyb3RlOgo+PiBTaWduZWQtb2ZmLWJ5OiBMaSBRaWFuZyA8bGlxM2VhQDE2My5jb20+Cj4+IC0t
-LQo+PiAgIHRlc3RzL2Z3X2NmZy10ZXN0LmMgfCAxMyArKysrKysrKysrKystCj4+ICAgMSBmaWxl
-IGNoYW5nZWQsIDEyIGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkKPj4gCj4+IGRpZmYgLS1n
-aXQgYS90ZXN0cy9md19jZmctdGVzdC5jIGIvdGVzdHMvZndfY2ZnLXRlc3QuYwo+PiBpbmRleCAx
-YzUxMDNmZTFjLi4zNzc2NWYxNWY4IDEwMDY0NAo+PiAtLS0gYS90ZXN0cy9md19jZmctdGVzdC5j
-Cj4+ICsrKyBiL3Rlc3RzL2Z3X2NmZy10ZXN0LmMKPj4gQEAgLTk5LDYgKzk5LDE1IEBAIHN0YXRp
-YyB2b2lkIHRlc3RfZndfY2ZnX2Jvb3RfbWVudSh2b2lkKQo+PiAgICAgICBnX2Fzc2VydF9jbXBp
-bnQocWZ3X2NmZ19nZXRfdTE2KGZ3X2NmZywgRldfQ0ZHX0JPT1RfTUVOVSksID09LCBib290X21l
-bnUpOwo+PiAgIH0KPj4gICAKPj4gK3N0YXRpYyB2b2lkIHRlc3RfZndfY2ZnX3JlYm9vdF90aW1l
-b3V0KHZvaWQpCj4+ICt7Cj4+ICsgICAgdWludDMyX3QgcmVib290X3RpbWVvdXQ7Cj4+ICsKPj4g
-KyAgICBxZndfY2ZnX2dldF9maWxlKGZ3X2NmZywgImV0Yy9ib290LWZhaWwtd2FpdCIsCj4+ICsg
-ICAgICAgICAgICAgICAgICAgICAmcmVib290X3RpbWVvdXQsIHNpemVvZihyZWJvb3RfdGltZW91
-dCkpOwo+PiArICAgIGdfYXNzZXJ0X2NtcGludChyZWJvb3RfdGltZW91dCwgPD0sIDY1NTM1KTsK
-Pj4gK30KPj4gKwo+PiAgIGludCBtYWluKGludCBhcmdjLCBjaGFyICoqYXJndikKPj4gICB7Cj4+
-ICAgICAgIFFUZXN0U3RhdGUgKnM7Cj4+IEBAIC0xMDYsNyArMTE1LDggQEAgaW50IG1haW4oaW50
-IGFyZ2MsIGNoYXIgKiphcmd2KQo+PiAgIAo+PiAgICAgICBnX3Rlc3RfaW5pdCgmYXJnYywgJmFy
-Z3YsIE5VTEwpOwo+PiAgIAo+PiAtICAgIHMgPSBxdGVzdF9pbml0KCItdXVpZCA0NjAwY2IzMi0z
-OGVjLTRiMmYtOGFjYi04MWM2ZWE1NGYyZDgiKTsKPj4gKyAgICBzID0gcXRlc3RfaW5pdCgiLXV1
-aWQgNDYwMGNiMzItMzhlYy00YjJmLThhY2ItODFjNmVhNTRmMmQ4Igo+PiArICAgICAgICAgICAg
-ICAgICAgICIgLWJvb3QgcmVib290LXRpbWVvdXQ9NDI5NDk2NzI5NSIpOwo+Cj5JJ2QgcmF0aGVy
-IGNoYW5nZSB0aGlzIHRlc3QgdG8gdXNlIHF0ZXN0X2FkZF9kYXRhX2Z1bmMoKSAuLi46Cj4KPiAg
-ICAgICAgIHF0ZXN0X2FkZF9kYXRhX2Z1bmMoImZ3X2NmZy9yZWJvb3RfdGltZW91dCIsICItYm9v
-dCAKPnJlYm9vdC10aW1lb3V0PTQyOTQ5NjcyOTUgIiwgdGVzdF9md19jZmdfcmVib290X3RpbWVv
-dXQpOwoKPgoKCkhpIGhlcmUgSSB0aGluayB1c2UgcXRlc3RfYWRkX2Z1bmMgaXMgb2sgYmVjYXVz
-ZSB0aGVyZSBpcyBubyBuZWVkCnRvIG1ha2Ugc3VjaCBhbiBleGNlcHRpb24gYXMgYWxsIG9mIHRo
-ZW0gdXNlcyBxdGVzdF9hZGRfZnVuYy4KCgpTZWNvbmQsIHRoZSB1dWlkIGlzIGFsc28gdXNlcyBi
-eSBhbGwgdGhlIGNhc2VzIHRob3VnaCBzb21lIG9mIHRoZW0gYXJlIG5vdCBuZWVkZWQuClRoaXJk
-LCB0aGUgLWJvb3Qgb3B0aW9uIHdpbGwgbm90IGFmZmVjdCB0aGUgb3RoZXIgY2FzZXMuCgoKVGhh
-bmtzLApMaSBRaWFuZwoKCj4uLi4gdG8gYXZvaWQgYWRkaW5nIHRoaXMgY29tbWFuZCBsaW5lIG9w
-dGlvbiB0byBhbGwgdGhlIHRlc3RzLCBiZWNhdXNlIAo+YWxsIHRlc3RzIGFyZSBub3cgZmFpbGlu
-ZzoKPgo+JCBtYWtlIGNoZWNrLXF0ZXN0LWkzODYKPlsuLi5dCj5FUlJPUjpxZW11L3Rlc3RzL2Z3
-X2NmZy10ZXN0LmM6MzM6dGVzdF9md19jZmdfc2lnbmF0dXJlOiBhc3NlcnRpb24gCj5mYWlsZWQg
-KGJ1ZiA9PSAiUUVNVSIpOiAoIlwzNzdcMzc3XDM3N1wzNzciID09ICJRRU1VIikKPkVSUk9SOnFl
-bXUvdGVzdHMvZndfY2ZnLXRlc3QuYzo0MDp0ZXN0X2Z3X2NmZ19pZDogYXNzZXJ0aW9uIGZhaWxl
-ZDogKChpZCAKPj09IDEpIHx8IChpZCA9PSAzKSkKPkVSUk9SOnFlbXUvdGVzdHMvZndfY2ZnLXRl
-c3QuYzo1Mjp0ZXN0X2Z3X2NmZ191dWlkOiBhc3NlcnRpb24gZmFpbGVkOiAKPihtZW1jbXAoYnVm
-LCB1dWlkLCBzaXplb2YoYnVmKSkgPT0gMCkKPkVSUk9SOnFlbXUvdGVzdHMvZndfY2ZnLXRlc3Qu
-Yzo1Nzp0ZXN0X2Z3X2NmZ19yYW1fc2l6ZTogYXNzZXJ0aW9uIGZhaWxlZCAKPihxZndfY2ZnX2dl
-dF91NjQoZndfY2ZnLCBGV19DRkdfUkFNX1NJWkUpID09IHJhbV9zaXplKTogKC0xID09IDEzNDIx
-NzcyOCkKPkVSUk9SOnFlbXUvdGVzdHMvZndfY2ZnLXRlc3QuYzo2Mjp0ZXN0X2Z3X2NmZ19ub2dy
-YXBoaWM6IGFzc2VydGlvbiAKPmZhaWxlZCAocWZ3X2NmZ19nZXRfdTE2KGZ3X2NmZywgRldfQ0ZH
-X05PR1JBUEhJQykgPT0gMCk6ICg2NTUzNSA9PSAwKQo+RVJST1I6cWVtdS90ZXN0cy9md19jZmct
-dGVzdC5jOjY3OnRlc3RfZndfY2ZnX25iX2NwdXM6IGFzc2VydGlvbiBmYWlsZWQgCj4ocWZ3X2Nm
-Z19nZXRfdTE2KGZ3X2NmZywgRldfQ0ZHX05CX0NQVVMpID09IG5iX2NwdXMpOiAoNjU1MzUgPT0g
-MSkKPkVSUk9SOnFlbXUvdGVzdHMvZndfY2ZnLXRlc3QuYzo3Mjp0ZXN0X2Z3X2NmZ19tYXhfY3B1
-czogYXNzZXJ0aW9uIGZhaWxlZCAKPihxZndfY2ZnX2dldF91MTYoZndfY2ZnLCBGV19DRkdfTUFY
-X0NQVVMpID09IG1heF9jcHVzKTogKDY1NTM1ID09IDEpCj5FUlJPUjpxZW11L3Rlc3RzL2Z3X2Nm
-Zy10ZXN0LmM6ODA6dGVzdF9md19jZmdfbnVtYTogYXNzZXJ0aW9uIGZhaWxlZCAKPihxZndfY2Zn
-X2dldF91NjQoZndfY2ZnLCBGV19DRkdfTlVNQSkgPT0gbmJfbm9kZXMpOiAoLTEgPT0gMCkKPkVS
-Uk9SOnFlbXUvdGVzdHMvZndfY2ZnLXRlc3QuYzo5OTp0ZXN0X2Z3X2NmZ19ib290X21lbnU6IGFz
-c2VydGlvbiAKPmZhaWxlZCAocWZ3X2NmZ19nZXRfdTE2KGZ3X2NmZywgRldfQ0ZHX0JPT1RfTUVO
-VSkgPT0gYm9vdF9tZW51KTogKDY1NTM1IAo+PT0gMCkKPgo+Cj4oZGlkIHlvdSB0ZXN0IHlvdXIg
-cGF0Y2g/KQo+Cj4+ICAgCj4+ICAgICAgIGZ3X2NmZyA9IHBjX2Z3X2NmZ19pbml0KHMpOwo+PiAg
-IAo+PiBAQCAtMTI1LDYgKzEzNSw3IEBAIGludCBtYWluKGludCBhcmdjLCBjaGFyICoqYXJndikK
-Pj4gICAgICAgcXRlc3RfYWRkX2Z1bmMoImZ3X2NmZy9tYXhfY3B1cyIsIHRlc3RfZndfY2ZnX21h
-eF9jcHVzKTsKPj4gICAgICAgcXRlc3RfYWRkX2Z1bmMoImZ3X2NmZy9udW1hIiwgdGVzdF9md19j
-ZmdfbnVtYSk7Cj4+ICAgICAgIHF0ZXN0X2FkZF9mdW5jKCJmd19jZmcvYm9vdF9tZW51IiwgdGVz
-dF9md19jZmdfYm9vdF9tZW51KTsKPj4gKyAgICBxdGVzdF9hZGRfZnVuYygiZndfY2ZnL3JlYm9v
-dF90aW1lb3V0IiwgdGVzdF9md19jZmdfcmVib290X3RpbWVvdXQpOwo+PiAgIAo+PiAgICAgICBy
-ZXQgPSBnX3Rlc3RfcnVuKCk7Cj4+ICAgCj4+IAo=
+Including sanity check and code cleanup.
+
+Li Qiang (4):
+  nvme: use TYPE_NVME instead of constant string
+  nvme: ensure the num_queues is not zero
+  nvme: check msix_init_exclusive_bar return value
+  nvme: use pci_dev directly in nvme_realize
+
+ hw/block/nvme.c | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
+
+-- 
+1.8.3.1
