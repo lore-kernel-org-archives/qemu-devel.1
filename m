@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48306)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49411)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gHa2A-00083w-Ud
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:50:39 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1gHa6E-00047F-1i
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:54:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gHa29-0002Ma-Oa
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:50:38 -0400
-Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:41580)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gHa29-0002KY-Em
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:50:37 -0400
-Received: by mail-wr1-x435.google.com with SMTP id x12-v6so13961008wrw.8
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 12:50:37 -0700 (PDT)
-Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
-	g76-v6sm17480094wmd.25.2018.10.30.12.50.34
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 30 Oct 2018 12:50:35 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 30 Oct 2018 20:50:10 +0100
-Message-Id: <1540929011-19894-10-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1540929011-19894-1-git-send-email-pbonzini@redhat.com>
-References: <1540929011-19894-1-git-send-email-pbonzini@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1gHa6A-00052Y-QS
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:54:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58034)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gHa67-0004xt-08
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:54:44 -0400
+Date: Tue, 30 Oct 2018 19:54:30 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20181030195430.GE2441@work-vm>
+References: <20181024163529.15665-1-zhangckid@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 09/10] scripts/dump-guest-memory: Synchronize
- with guest_phys_blocks_region_add
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181024163529.15665-1-zhangckid@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] migration/colo.c: Fix compilation issue
+ when disable replication
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,32 +27,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Zhang Chen <zhangckid@gmail.com>
+Cc: qemu-devel@nongnu.org, zhanghailiang <zhang.zhanghailiang@huawei.com>, Thomas Huth <thuth@redhat.com>
 
-Recent patches have removed ram_device and nonvolatile RAM
-from dump-guest-memory's output.  Do the same for dumps
-that are extracted from a QEMU core file.
+* Zhang Chen (zhangckid@gmail.com) wrote:
+> This compilation issue will occur when user use --disable-replication
+> to config Qemu.
+> 
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Zhang Chen <zhangckid@gmail.com>
 
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- scripts/dump-guest-memory.py | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+OK; do we need to add a check to migrate_caps_check to stop you enabling
+colo in this case?
 
-diff --git a/scripts/dump-guest-memory.py b/scripts/dump-guest-memory.py
-index 5a857ce..f04697b 100644
---- a/scripts/dump-guest-memory.py
-+++ b/scripts/dump-guest-memory.py
-@@ -417,7 +417,9 @@ def get_guest_phys_blocks():
-         memory_region = flat_range["mr"].dereference()
- 
-         # we only care about RAM
--        if not memory_region["ram"]:
-+        if not memory_region["ram"] \
-+           or memory_region["ram_device"] \
-+           or memory_region["nonvolatile"]:
-             continue
- 
-         section_size = int128_get64(flat_range["addr"]["size"])
--- 
-1.8.3.1
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> ---
+>  migration/colo.c | 18 +++++++++++++++++-
+>  1 file changed, 17 insertions(+), 1 deletion(-)
+> 
+> diff --git a/migration/colo.c b/migration/colo.c
+> index 956ac236b7..b81e6ec5bb 100644
+> --- a/migration/colo.c
+> +++ b/migration/colo.c
+> @@ -59,6 +59,8 @@ static bool colo_runstate_is_stopped(void)
+>  
+>  static void secondary_vm_do_failover(void)
+>  {
+> +/* COLO needs enable block-replication */
+> +#ifdef CONFIG_REPLICATION
+>      int old_state;
+>      MigrationIncomingState *mis = migration_incoming_get_current();
+>      Error *local_err = NULL;
+> @@ -121,10 +123,14 @@ static void secondary_vm_do_failover(void)
+>      if (mis->migration_incoming_co) {
+>          qemu_coroutine_enter(mis->migration_incoming_co);
+>      }
+> +#else
+> +    abort();
+> +#endif
+>  }
+>  
+>  static void primary_vm_do_failover(void)
+>  {
+> +#ifdef CONFIG_REPLICATION
+>      MigrationState *s = migrate_get_current();
+>      int old_state;
+>      Error *local_err = NULL;
+> @@ -165,6 +171,9 @@ static void primary_vm_do_failover(void)
+>  
+>      /* Notify COLO thread that failover work is finished */
+>      qemu_sem_post(&s->colo_exit_sem);
+> +#else
+> +    abort();
+> +#endif
+>  }
+>  
+>  COLOMode get_colo_mode(void)
+> @@ -373,6 +382,7 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
+>                                            QIOChannelBuffer *bioc,
+>                                            QEMUFile *fb)
+>  {
+> +#ifdef CONFIG_REPLICATION
+>      Error *local_err = NULL;
+>      int ret = -1;
+>  
+> @@ -483,6 +493,9 @@ out:
+>          error_report_err(local_err);
+>      }
+>      return ret;
+> +#else
+> +    abort();
+> +#endif
+>  }
+>  
+>  static void colo_compare_notify_checkpoint(Notifier *notifier, void *data)
+> @@ -790,13 +803,16 @@ void *colo_process_incoming_thread(void *opaque)
+>              qemu_mutex_unlock_iothread();
+>              goto out;
+>          }
+> +#ifdef CONFIG_REPLICATION
+>          /* discard colo disk buffer */
+>          replication_do_checkpoint_all(&local_err);
+>          if (local_err) {
+>              qemu_mutex_unlock_iothread();
+>              goto out;
+>          }
+> -
+> +#else
+> +        abort();
+> +#endif
+>          /* Notify all filters of all NIC to do checkpoint */
+>          colo_notify_filters_event(COLO_EVENT_CHECKPOINT, &local_err);
+>  
+> -- 
+> 2.17.GIT
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
