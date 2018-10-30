@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42665)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gHZjn-0005dG-Bw
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:31:45 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1gHa1H-0007be-HU
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:49:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gHZjd-0007wK-GN
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:31:34 -0400
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Tue, 30 Oct 2018 20:30:43 +0100
-Message-Id: <20181030193044.25954-1-philmd@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1gHa1E-0001TJ-54
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:49:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41099)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gHa1B-0001Ny-A0
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:49:38 -0400
+Date: Tue, 30 Oct 2018 19:49:24 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20181030194923.GD2441@work-vm>
+References: <20181029125818.28720-1-fli@suse.com>
+	<20181029125818.28720-7-fli@suse.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3] arm: exynos4: Add dma support for smdkc210
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181029125818.28720-7-fli@suse.com>
+Subject: Re: [Qemu-devel] [PATCH RFC v6 6/7] migration: fix some error
+ handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,131 +28,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Guenter Roeck <linux@roeck-us.net>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Alistair Francis <alistair@alistair23.me>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: Fei Li <fli@suse.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, famz@redhat.com, peterx@redhat.com, quintela@redhat.com
 
-From: Guenter Roeck <linux@roeck-us.net>
+* Fei Li (fli@suse.com) wrote:
+> Add error handling for qemu_ram_foreach_migratable_block() when
+> it fails.
+> 
+> Always call migrate_set_error() to set the error state without relying
+> on whether multifd_save_cleanup() succeeds. As the passed &local_err
+> is never used in multifd_save_cleanup(), remove it.
+> 
+> Signed-off-by: Fei Li <fli@suse.com>
+> ---
+>  migration/migration.c    | 5 +----
+>  migration/postcopy-ram.c | 3 +++
+>  migration/ram.c          | 7 +++----
+>  migration/ram.h          | 2 +-
+>  4 files changed, 8 insertions(+), 9 deletions(-)
+> 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 87dfc7374f..3b8b7ab4f9 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -1377,7 +1377,6 @@ static void migrate_fd_cleanup(void *opaque)
+>      qemu_savevm_state_cleanup();
+>  
+>      if (s->to_dst_file) {
+> -        Error *local_err = NULL;
+>          QEMUFile *tmp;
+>  
+>          trace_migrate_fd_cleanup();
+> @@ -1388,9 +1387,7 @@ static void migrate_fd_cleanup(void *opaque)
+>          }
+>          qemu_mutex_lock_iothread();
+>  
+> -        if (multifd_save_cleanup(&local_err) != 0) {
+> -            error_report_err(local_err);
+> -        }
+> +        multifd_save_cleanup();
+>          qemu_mutex_lock(&s->qemu_file_lock);
+>          tmp = s->to_dst_file;
+>          s->to_dst_file = NULL;
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index e5c02a32c5..4ca2bc02b3 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -1117,6 +1117,9 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
+>  
+>      /* Mark so that we get notified of accesses to unwritten areas */
+>      if (qemu_ram_foreach_migratable_block(ram_block_enable_notify, mis)) {
+> +        error_report("ram_block_enable_notify failed");
+> +        close(mis->userfault_event_fd);
+> +        close(mis->userfault_fd);
 
-QEMU already supports pl330. Instantiate it for smdkc210.
+I don't think these close() calls are safe.  This code is just after
+starting the fault thread, and the fault thread has a poll() call on
+these fd's, so we can't close them until we've instructed that thread
+to exit.
 
-Relevant part of Linux arch/arm/boot/dts/exynos4.dtsi:
+We should fall out through postcopy_ram_incoming_cleanup, and because
+the thread exists it should do a notify to the thread, a join and then
+only later do the close calls.
 
-/ {
-    soc: soc {
-        amba {
-            pdma0: pdma@12680000 {
-                compatible =3D "arm,pl330", "arm,primecell";
-                reg =3D <0x12680000 0x1000>;
-                interrupts =3D <GIC_SPI 35 IRQ_TYPE_LEVEL_HIGH>;
-                clocks =3D <&clock CLK_PDMA0>;
-                clock-names =3D "apb_pclk";
-                #dma-cells =3D <1>;
-                #dma-channels =3D <8>;
-                #dma-requests =3D <32>;
-            };
-            pdma1: pdma@12690000 {
-                compatible =3D "arm,pl330", "arm,primecell";
-                reg =3D <0x12690000 0x1000>;
-                interrupts =3D <GIC_SPI 36 IRQ_TYPE_LEVEL_HIGH>;
-                clocks =3D <&clock CLK_PDMA1>;
-                clock-names =3D "apb_pclk";
-                #dma-cells =3D <1>;
-                #dma-channels =3D <8>;
-                #dma-requests =3D <32>;
-            };
-            mdma1: mdma@12850000 {
-                compatible =3D "arm,pl330", "arm,primecell";
-                reg =3D <0x12850000 0x1000>;
-                interrupts =3D <GIC_SPI 34 IRQ_TYPE_LEVEL_HIGH>;
-                clocks =3D <&clock CLK_MDMA>;
-                clock-names =3D "apb_pclk";
-                #dma-cells =3D <1>;
-                #dma-channels =3D <8>;
-                #dma-requests =3D <1>;
-            };
-        };
-    };
-};
+Dave
 
-Signed-off-by: Guenter Roeck <linux@roeck-us.net>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-[PMD: Do not set default qdev properties, create the controllers in the S=
-oC
-      rather than the board (Peter Maydell), add dtsi in commit message]
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
-Another intent to salvage previous work from Guenter Roeck:
-https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg06302.html
-
-Since v2: https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg06459.=
-html
-- rename init -> create
-- create controllers in SoC rather than the board (Peter Maydell)
-- add Linux dtsi in commit message
-
-Since v1: https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg06335.=
-html
-- Do not factor out pl330_init, which resulted in buggy v1, see:
-  https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg06448.html
-
- hw/arm/exynos4210.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
-
-diff --git a/hw/arm/exynos4210.c b/hw/arm/exynos4210.c
-index 827318a003..cd27b9387c 100644
---- a/hw/arm/exynos4210.c
-+++ b/hw/arm/exynos4210.c
-@@ -96,6 +96,11 @@
- /* EHCI */
- #define EXYNOS4210_EHCI_BASE_ADDR           0x12580000
-=20
-+/* DMA */
-+#define EXYNOS4210_PL330_BASE0_ADDR         0x12680000
-+#define EXYNOS4210_PL330_BASE1_ADDR         0x12690000
-+#define EXYNOS4210_PL330_BASE2_ADDR         0x12850000
-+
- static uint8_t chipid_and_omr[] =3D { 0x11, 0x02, 0x21, 0x43,
-                                     0x09, 0x00, 0x00, 0x00 };
-=20
-@@ -160,6 +165,19 @@ static uint64_t exynos4210_calc_affinity(int cpu)
-     return (0x9 << ARM_AFF1_SHIFT) | cpu;
- }
-=20
-+static void pl330_create(uint32_t base, qemu_irq irq, int nreq)
-+{
-+    SysBusDevice *busdev;
-+    DeviceState *dev;
-+
-+    dev =3D qdev_create(NULL, "pl330");
-+    qdev_prop_set_uint8(dev, "num_periph_req",  nreq);
-+    qdev_init_nofail(dev);
-+    busdev =3D SYS_BUS_DEVICE(dev);
-+    sysbus_mmio_map(busdev, 0, base);
-+    sysbus_connect_irq(busdev, 0, irq);
-+}
-+
- Exynos4210State *exynos4210_init(MemoryRegion *system_mem)
- {
-     Exynos4210State *s =3D g_new(Exynos4210State, 1);
-@@ -410,5 +428,13 @@ Exynos4210State *exynos4210_init(MemoryRegion *syste=
-m_mem)
-     sysbus_create_simple(TYPE_EXYNOS4210_EHCI, EXYNOS4210_EHCI_BASE_ADDR=
-,
-             s->irq_table[exynos4210_get_irq(28, 3)]);
-=20
-+    /*** DMA controllers ***/
-+    pl330_create(EXYNOS4210_PL330_BASE0_ADDR,
-+                 qemu_irq_invert(s->irq_table[exynos4210_get_irq(35, 1)]=
-), 32);
-+    pl330_create(EXYNOS4210_PL330_BASE1_ADDR,
-+                 qemu_irq_invert(s->irq_table[exynos4210_get_irq(36, 1)]=
-), 32);
-+    pl330_create(EXYNOS4210_PL330_BASE2_ADDR,
-+                 qemu_irq_invert(s->irq_table[exynos4210_get_irq(34, 1)]=
-), 1);
-+
-     return s;
- }
---=20
-2.17.2
+>          return -1;
+>      }
+>  
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 8f03afe228..57cb1bee3d 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -922,7 +922,7 @@ static void multifd_send_terminate_threads(Error *err)
+>      }
+>  }
+>  
+> -int multifd_save_cleanup(Error **errp)
+> +int multifd_save_cleanup(void)
+>  {
+>      int i;
+>      int ret = 0;
+> @@ -1082,9 +1082,8 @@ static void multifd_new_send_channel_async(QIOTask *task, gpointer opaque)
+>  
+>      if (qio_task_propagate_error(task, &local_err)) {
+>          migrate_set_state(&s->state, s->state, MIGRATION_STATUS_FAILED);
+> -        if (multifd_save_cleanup(&local_err) != 0) {
+> -            migrate_set_error(migrate_get_current(), local_err);
+> -        }
+> +        multifd_save_cleanup();
+> +        migrate_set_error(migrate_get_current(), local_err);
+>      } else {
+>          p->c = QIO_CHANNEL(sioc);
+>          qio_channel_set_delay(p->c, false);
+> diff --git a/migration/ram.h b/migration/ram.h
+> index 046d3074be..0d1215209e 100644
+> --- a/migration/ram.h
+> +++ b/migration/ram.h
+> @@ -43,7 +43,7 @@ uint64_t ram_bytes_remaining(void);
+>  uint64_t ram_bytes_total(void);
+>  
+>  int multifd_save_setup(void);
+> -int multifd_save_cleanup(Error **errp);
+> +int multifd_save_cleanup(void);
+>  int multifd_load_setup(void);
+>  int multifd_load_cleanup(Error **errp);
+>  bool multifd_recv_all_channels_created(void);
+> -- 
+> 2.13.7
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
