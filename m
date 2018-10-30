@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36009)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36087)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gHW8O-0007bX-Uk
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:41:05 -0400
+	(envelope-from <cota@braap.org>) id 1gHW8a-0007bs-VB
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:41:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gHW8J-0001kE-Ge
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:40:48 -0400
-References: <1539696820-273275-1-git-send-email-imammedo@redhat.com>
-	<20181016155600.31de8883@redhat.com>
-	<9d503a8b-5847-a1ae-2d2c-a2d1f0e7ac95@redhat.com>
-	<20181030161552.073b6f6a@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <e05f722e-b1ca-8f91-54ba-1b2c3103bc4f@redhat.com>
-Date: Tue, 30 Oct 2018 16:40:28 +0100
+	(envelope-from <cota@braap.org>) id 1gHW8L-0001rT-Gd
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:41:00 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:47615)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gHW8L-0001oB-0Z
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:40:45 -0400
+Date: Tue, 30 Oct 2018 11:40:41 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20181030154041.GA31885@flamenco>
+References: <20181029155339.15280-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20181030161552.073b6f6a@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH] call HotplugHandler->plug()
- as the last step in device realization
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181029155339.15280-1-richard.henderson@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH 0/4] target/arm: Minimize TLB flushing for
+ ASID changes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,125 +27,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, cohuck@redhat.com, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, stefanha@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-On 30.10.18 16:15, Igor Mammedov wrote:
-> On Wed, 24 Oct 2018 15:09:36 +0200
-> David Hildenbrand <david@redhat.com> wrote:
->=20
->> On 16.10.18 15:56, Igor Mammedov wrote:
->>> On Tue, 16 Oct 2018 15:33:40 +0200
->>> Igor Mammedov <imammedo@redhat.com> wrote:
->>>  =20
->>>> When [2] was fixed it was agreed that adding and calling post_plug()
->>>> callback after device_reset() was low risk approach to hotfix issue
->>>> right before release. So it was merged instead of moving already
->>>> existing plug() callback after device_reset() is called which would
->>>> be more risky and require all plug() callbacks audit.
->>>>
->>>> Looking at the current plug() callbacks, it doesn't seem that moving
->>>> plug() callback after device_reset() is breaking anything, so here
->>>> goes agreed upon [3] proper fix which essentially reverts [1][2]
->>>> and moves plug() callback after device_reset().
->>>> This way devices always comes to plug() stage, after it's been fully
->>>> initialized (including being reset), which fixes race condition [2]
->>>> without need for an extra post_plug() callback.
->>>>
->>>>  1. (25e897881 "qdev: add HotplugHandler->post_plug() callback")
->>>>  2. (8449bcf94 "virtio-scsi: fix hotplug ->reset() vs event race")
->>>>  3. https://www.mail-archive.com/qemu-devel@nongnu.org/msg549915.htm=
-l
->>>>
->>>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
->>>> ---
->>>> TODO:
->>>>  remove usage of Error** from plug() callback, we need to factor out
->>>>  pre_plug part from plug() callbacks, before proceeding with it.
->>>>  DavidH has recently finished it for pc-dimm/memory_devices, cpus
->>>>  mostly have pre_plug parts factored out, but there still are parts
->>>>  that could fail so it needs some more work to eliminate failure poi=
-nts
->>>>  from plug() callbacks. Meanwhile, I'll plan to treat other misc
->>>>  handlers (pci[e]/acpi/usb/...) and introduce pre_plug() where
->>>>  necessary. =20
->>
->> Saw this mail just now. I guess we should do more. Especially what see=
-ms
->> to be fragile is errors during unrealize() and unplug().
->>
->> Errors during unplug() should only ever happen if it was not triggered
->> via unplug_request(). Otherwise, unplug_request() should check for all
->> possible errors and unplug() will not result in errors.
-> Not sure that I read it right, I see 2 cases:
->  1: unplug_request =3D=3D NULL (i.e. where surprise device removal is s=
-upported)
->      should not fail
+On Mon, Oct 29, 2018 at 15:53:35 +0000, Richard Henderson wrote:
+> In http://lists.nongnu.org/archive/html/qemu-devel/2018-10/msg04181.html
+> (already upstream) I added a check for ASID changes without realizing
+> that TTBCR_EL1 has the A1 bit, controlling which register actually
+> contains the active ASID.
+> 
+> In http://lists.nongnu.org/archive/html/qemu-devel/2018-10/msg04182.html
+> I suggested a set of mmu_idx to flush when the ASID does change.  In
+> follow-up, Peter suggested more.
+> 
+> I now choose secure vs non-secure mmu_idx based on which register is being
+> modified, not the current state of the cpu.  Unless I am mistaken, secure
+> state can write to the non-secure registers.  Which means that the current
+> state of the cpu is irrelevant and only the register matters.
+> 
+> Peter suggested flushing S1E3 when changing ttbr0_s.  I can see how this
+> is overlapped onto the EL3 (Secure Monitor) state, but I cannot see how
+> the ASID is used from EL3.  The best evidence I can find for this is that
+> there is no TLBIASID* register that is applicable to flushing EL3; that's
+> not conclusive proof though.  So while I'm not sure it's necessary, I'm
+> also not sure it isn't necessary, and so I've included S1E3 in the flush.
+> 
+> I now also use the VMID to conditionally invalidate the stage 2 translation
+> state.  This shows how I anticipaged @depmap to be used in patch 1.
 
-So for now, we should not report errors.
+I've tested this series and the one it depends on (tlb-dirty). I had
+yesterday a guest running parallel compilation jobs for ~12h with
+no issues. So
 
->  2: unplug_request !=3D NULL && unplug() is called by guest side, it's =
-caller
->     policy to decide what to do on failure. One use case is NOP, i.e. c=
-aller
->     should not destroy object if unplug() fails and unplug() should fai=
-l without
->     side effects, and possibly notify guest about it if such mechanism =
-is supported.
->     Could be tricky to handle errors in case of chained handlers.
-My assumption would be that unplug_request() performs all necessary
-checks and triggers the guest.
+Tested-by: Emilio G. Cota <cota@braap.org>
 
-The guest action should eventually result in an unplug(), which should
-in my opinion also never fail. The code calling into unplug() should
-perform checks if the guest is actually doing something sane and/or
-something that was actually requested.
+for this and the tlb-dirty series.
 
-Right now I am not sure if unplug() should be allowed to fail at all.
-Maybe I am missing once piece.
-
-Chained handlers for memory devices should not be a problem as far as I
-can see.
-
->=20
->=20
->> Also, errors during unrealize() should definitely be avoided. Or even
->> forbidden. E.g. looking at hw/core/qdev.c:device_set_realized,
->>
->> 1. failing to unrealize might already have resulted in the unplug
->> handler getting called.
->> 2. will result in a unparent of the device and therefore removal
->> 3. will have already eventually unrealized child devices or buses.
->>
->> To summarize, failing in unrealize() is a bad idea and might leave the
->> rest of the system in a very unpredictable state.
-> failure path isn't really usable here, I'd assume that initial idea
-> was that unrealize() could fail cleanly and let caller to decide on
-> what to do. But with child bus handling and co it won't really work.
-
-Exactly, we should maybe clean that up. It seems to easy for people that
-implement devices to just stop unplug by trying to fail unrealize(). But
-it will break things.
-
->=20
-> BTW what devices are the users of DeviceState::child_bus,
-> I don't think that we have any composite devices that actually
-> exercise realize() part of it and maybe unrealize() part.
-
-For unrealize(): This should be called for all virtio proxy devices to
-unrealize the child virtio device. So recursive unrealize is in place.
-
-For realize(): Not really used yet. See the comment in
-bus_set_realized() on realize part: "TODO: recursive realization".
-That's why e.g. virtio proxy devices explicitly trigger "realize=3Dtrue"
-for the child on device realization.
-
-I remember Andreas used to work on this a long time ago but we never
-completed it.
-
-
---=20
+Richard: the crash I reported on IRC must have been due to unrelated
+changes. I was testing some TLB experiments over the weekend so I must
+have forgotten to rebuild.
 
 Thanks,
 
-David / dhildenb
+		Emilio
