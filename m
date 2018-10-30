@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58200)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gHX8H-0005W0-Cu
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 12:44:46 -0400
+	(envelope-from <cohuck@redhat.com>) id 1gHXI8-00017A-Fl
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 12:54:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gHX8C-0008Tu-I5
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 12:44:45 -0400
-References: <20181030151637.37207-1-liq3ea@163.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <9b666a59-bfd2-ddc7-e851-495fbb39386a@vivier.eu>
-Date: Tue, 30 Oct 2018 17:44:14 +0100
+	(envelope-from <cohuck@redhat.com>) id 1gHXI3-0007Sz-Hp
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 12:54:56 -0400
+Date: Tue, 30 Oct 2018 17:54:27 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181030175427.20dc6f2e.cohuck@redhat.com>
+In-Reply-To: <1540827745-20795-1-git-send-email-borntraeger@de.ibm.com>
+References: <1540827745-20795-1-git-send-email-borntraeger@de.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20181030151637.37207-1-liq3ea@163.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] hw: qdev: fix error in comment
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/4] MAINTAINERS: s390: several updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,33 +22,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@163.com>, f4bug@amsat.org, armbru@redhat.com
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, David Hildenbrand <david@redhat.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Janosch Frank <frankja@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Collin Walling <walling@linux.ibm.com>
 
-Le 30/10/2018 à 16:16, Li Qiang a écrit :
-> Cc: qemu-trivial@nongnu.org
+On Mon, 29 Oct 2018 16:42:21 +0100
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+
+> I discussed the following maintainer updates at the kvm forum with
+> Conny. This is the first set of changes.
+> Can the affected persons please Ack the relevant patches?
+
+Thank you to all of the folks agreeing to help with this!
+
 > 
-> Signed-off-by: Li Qiang <liq3ea@163.com>
-> ---
->  include/hw/qdev-core.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> PS: Alex, do you still want to be listed?
 > 
-> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-> index a24d0dd566..92851e55df 100644
-> --- a/include/hw/qdev-core.h
-> +++ b/include/hw/qdev-core.h
-> @@ -197,7 +197,7 @@ typedef struct BusChild {
->  
->  /**
->   * BusState:
-> - * @hotplug_device: link to a hotplug device associated with bus.
-> + * @hotplug_handler: link to a hotplug handler associated with bus.
->   */
->  struct BusState {
->      Object obj;
+> Christian Borntraeger (4):
+>   MAINTAINERS: s390: more maintainers for vfio-ccw
+>   MAINTAINERS: s390/virtio-ccw: drop Christian add Halil
+>   MAINTAINERS: s390/pci: add Collin Walling as maintainer for zpci
+>   MAINTAINERS: s390/boot: the ipl code and the bios belong together
+> 
+>  MAINTAINERS | 13 +++++++++++--
+>  1 file changed, 11 insertions(+), 2 deletions(-)
 > 
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-
-Fixes: 0ee4de6ce1d403b3d8017b340cec772c3c5c106f
-       (qdev: add to BusState "hotplug-handler" link)
+I'm holding off on patch 4 (waiting for Thomas' ack when he's online
+again), but patches 1-3 are now queued to s390-next.
