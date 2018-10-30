@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49630)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gHU1n-00006A-Fy
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 09:25:52 -0400
+	(envelope-from <liq3ea@gmail.com>) id 1gHU7g-0003OB-Mz
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 09:31:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gHU1i-0007zF-H4
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 09:25:51 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:46350)
+	(envelope-from <liq3ea@gmail.com>) id 1gHU7W-0003fr-PD
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 09:31:53 -0400
+Received: from mail-it1-x142.google.com ([2607:f8b0:4864:20::142]:52435)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gHU1i-0007ti-A0
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 09:25:46 -0400
-Received: by mail-wr1-f68.google.com with SMTP id 74-v6so4375903wrb.13
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 06:25:37 -0700 (PDT)
-References: <20181026073034.16648-1-ppandit@redhat.com>
-	<CAFEAcA_WduaLJZG-gu9oywCaUb2mR9DeBJ9WKqsTkKu4uGT7Uw@mail.gmail.com>
-	<nycvar.YSQ.7.76.1810301716590.30516@xnncv>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <f15fc5de-43ff-0178-f4da-559b5008fdce@redhat.com>
-Date: Tue, 30 Oct 2018 14:25:33 +0100
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1gHU7W-0003ev-EQ
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 09:31:46 -0400
+Received: by mail-it1-x142.google.com with SMTP id r5-v6so11685865ith.2
+	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 06:31:46 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <nycvar.YSQ.7.76.1810301716590.30516@xnncv>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] strongarm: mask off high[32:28] bits
- from dir and state registers
+References: <1540873732-3503-1-git-send-email-liq3ea@gmail.com>
+	<1540873732-3503-3-git-send-email-liq3ea@gmail.com>
+	<8554a03c-4409-c7f5-bd9e-613d03779e73@redhat.com>
+In-Reply-To: <8554a03c-4409-c7f5-bd9e-613d03779e73@redhat.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Tue, 30 Oct 2018 21:31:08 +0800
+Message-ID: <CAKXe6S+VVucg1khc1Wk-QYnJOy6j92+5LJ22FMxOspa3Q-Duyg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] tests: fw_cfg: add reboot_timeout
+ test case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,28 +31,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: liqsub1 <liqsub1@163.com>, Qemu Developers <qemu-devel@nongnu.org>, Moguofang <moguofang@huawei.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: thuth@redhat.com, lvivier@redhat.com, philmd@redhat.com, Qemu Developers <qemu-devel@nongnu.org>
 
-On 30/10/18 12:49, P J P wrote:
-> +-- On Mon, 29 Oct 2018, Peter Maydell wrote --+
-> | >      switch (offset) {
-> | >      case GPDR:        /* GPIO Pin-Direction registers */
-> | > -        s->dir = value;
-> | > +        s->dir = value & 0x3fffff;
-> |
-> | The commit message says it's masking [31:28], but the
-> | code is masking [31:22]. The SA1110 spec suggests the
-> | commit message is correct and the code is not.
-> 
-> Ouch, sorry! Sent revised patch v3.
+Hi Paolo,
 
-That's where the extract32() is more convenient and less bug prone:
+Paolo Bonzini <pbonzini@redhat.com> =E4=BA=8E2018=E5=B9=B410=E6=9C=8830=E6=
+=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=886:52=E5=86=99=E9=81=93=EF=BC=9A
 
-                s->dir = extract32(value, 0, 28); /* mask off [31:28] */
-> 
-> Thank you.
-> --
-> Prasad J Pandit / Red Hat Product Security Team
-> 47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
-> 
+> On 30/10/2018 05:28, Li Qiang wrote:
+> > Signed-off-by: Li Qiang <liq3ea@gmail.com>
+> > ---
+> >  tests/fw_cfg-test.c | 10 ++++++++++
+> >  1 file changed, 10 insertions(+)
+> >
+> > diff --git a/tests/fw_cfg-test.c b/tests/fw_cfg-test.c
+> > index 1c5103fe1c..aeabd17ec0 100644
+> > --- a/tests/fw_cfg-test.c
+> > +++ b/tests/fw_cfg-test.c
+> > @@ -99,6 +99,15 @@ static void test_fw_cfg_boot_menu(void)
+> >      g_assert_cmpint(qfw_cfg_get_u16(fw_cfg, FW_CFG_BOOT_MENU), =3D=3D,
+> boot_menu);
+> >  }
+> >
+> > +static void test_fw_cfg_reboot_timeout(void)
+> > +{
+> > +    uint32_t reboot_timeout;
+> > +
+> > +    qfw_cfg_get_file(fw_cfg, "etc/boot-fail-wait",
+> > +                     &reboot_timeout, sizeof(reboot_timeout));
+> > +    g_assert_cmpint(reboot_timeout, <=3D, 65535);
+> > +}
+> > +
+> >  int main(int argc, char **argv)
+> >  {
+> >      QTestState *s;
+> > @@ -125,6 +134,7 @@ int main(int argc, char **argv)
+> >      qtest_add_func("fw_cfg/max_cpus", test_fw_cfg_max_cpus);
+> >      qtest_add_func("fw_cfg/numa", test_fw_cfg_numa);
+> >      qtest_add_func("fw_cfg/boot_menu", test_fw_cfg_boot_menu);
+> > +    qtest_add_func("fw_cfg/reboot_timeout", test_fw_cfg_reboot_timeout=
+);
+> >
+> >      ret =3D g_test_run();
+>
+> This test is not doing much; you could add "-boot reboot-timeout=3D15" an=
+d
+> check the value.
+>
+>
+This test is for this fix:
+https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg05254.html
+As the reboot_timeout will be negative.
+
+May I add another  "-boot reboot-timeout=3D15"  test?
+
+Thanks,
+Li QIang
+
+
+> Paolo
+>
+>
