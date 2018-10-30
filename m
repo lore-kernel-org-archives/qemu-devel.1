@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gHa28-00082R-Vp
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gHa28-00082L-V5
 	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:50:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gHa26-0002Il-EJ
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gHa26-0002IO-6h
 	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:50:36 -0400
-Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:37514)
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:33939)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gHa26-00022C-2H
+	id 1gHa25-0001yK-R9
 	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:50:34 -0400
-Received: by mail-wm1-x330.google.com with SMTP id p2-v6so12455445wmc.2
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 12:50:19 -0700 (PDT)
+Received: by mail-wr1-x42e.google.com with SMTP id l6-v6so13982594wrt.1
+	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 12:50:14 -0700 (PDT)
+Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
+	g76-v6sm17480094wmd.25.2018.10.30.12.50.12
+	for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 30 Oct 2018 12:50:12 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 30 Oct 2018 20:50:02 +0100
-Message-Id: <1540929011-19894-2-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1540929011-19894-1-git-send-email-pbonzini@redhat.com>
-References: <1540929011-19894-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 01/10] icount: fix deadlock when all cpus are
- sleeping
+Date: Tue, 30 Oct 2018 20:50:01 +0100
+Message-Id: <1540929011-19894-1-git-send-email-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 00/10] Misc patches for 2018-10-30
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +34,71 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Clement Deschamps <clement.deschamps@greensocs.com>
 
-From: Clement Deschamps <clement.deschamps@greensocs.com>
+The following changes since commit a2e002ff7913ce93aa0f7dbedd2123dce5f1a9cd:
 
-When all cpus are sleeping (e.g in WFI), to avoid a deadlock
-in the main_loop, wake it up in order to start the warp timer.
+  Merge remote-tracking branch 'remotes/vivier2/tags/qemu-trivial-for-3.1-pull-request' into staging (2018-10-30 15:49:55 +0000)
 
-Signed-off-by: Clement Deschamps <clement.deschamps@greensocs.com>
-Message-Id: <20181021142103.19014-1-clement.deschamps@greensocs.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- cpus.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+are available in the git repository at:
 
-diff --git a/cpus.c b/cpus.c
-index 3978f63..a2b33cc 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -1554,6 +1554,14 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
-             atomic_mb_set(&cpu->exit_request, 0);
-         }
- 
-+        if (use_icount && all_cpu_threads_idle()) {
-+            /*
-+             * When all cpus are sleeping (e.g in WFI), to avoid a deadlock
-+             * in the main_loop, wake it up in order to start the warp timer.
-+             */
-+            qemu_notify_event();
-+        }
-+
-         qemu_tcg_rr_wait_io_event(cpu ? cpu : first_cpu);
-         deal_with_unplugged_cpus();
-     }
+
+  git://github.com/bonzini/qemu.git tags/for-upstream
+
+for you to fetch changes up to 2e14019d2a37f32ccecd786d8be4e9a70094e7f7:
+
+  lsi53c895a: check message length value is valid (2018-10-30 20:46:25 +0100)
+
+Already all bugfixes except for a single patch by Vitaly.
+
+----------------------------------------------------------------
+* icount fix (Clement)
+* dumping fixes for non-volatile memory (Marc-André, myself)
+* x86 emulation fix (Rudolf)
+* recent Hyper-V CPUID flag (Vitaly)
+* Q35 doc fix (Daniel)
+* lsi fix (Prasad)
+
+----------------------------------------------------------------
+Clement Deschamps (1):
+      icount: fix deadlock when all cpus are sleeping
+
+Daniel P. Berrangé (1):
+      i386: clarify that the Q35 machine type implements a P35 chipset
+
+Marc-André Lureau (3):
+      memory: learn about non-volatile memory region
+      nvdimm: set non-volatile on the memory region
+      memory-mapping: skip non-volatile memory regions in GuestPhysBlockList
+
+Paolo Bonzini (2):
+      MAINTAINERS: remove or downgrade myself to reviewer from some subsystems
+      scripts/dump-guest-memory: Synchronize with guest_phys_blocks_region_add
+
+Prasad J Pandit (1):
+      lsi53c895a: check message length value is valid
+
+Rudolf Marek (1):
+      target/i386: Clear RF on SYSCALL instruction
+
+Vitaly Kuznetsov (1):
+      x86: hv_evmcs CPU flag support
+
+ MAINTAINERS                  | 13 ++++++-------
+ cpus.c                       |  8 ++++++++
+ docs/devel/migration.rst     |  1 +
+ hw/mem/nvdimm.c              |  1 +
+ hw/pci-host/q35.c            | 10 +++++++++-
+ hw/scsi/lsi53c895a.c         | 19 +++++++++++++++++--
+ include/exec/memory.h        | 25 ++++++++++++++++++++++++
+ include/hw/pci/pci_ids.h     |  2 +-
+ memory.c                     | 45 ++++++++++++++++++++++++++++++++++----------
+ memory_mapping.c             |  3 ++-
+ scripts/dump-guest-memory.py |  4 +++-
+ target/i386/cpu.c            |  1 +
+ target/i386/cpu.h            |  1 +
+ target/i386/hyperv-proto.h   |  2 ++
+ target/i386/kvm.c            | 30 +++++++++++++++++++++++++++--
+ target/i386/seg_helper.c     |  4 ++--
+ 16 files changed, 142 insertions(+), 27 deletions(-)
 -- 
 1.8.3.1
