@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37692)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37695)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gHZVL-00031L-3R
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:16:44 -0400
+	(envelope-from <armbru@redhat.com>) id 1gHZVL-00031N-3f
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:16:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gHZVI-0005r7-0E
+	(envelope-from <armbru@redhat.com>) id 1gHZVI-0005rO-9W
 	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:16:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:13484)
+Received: from mx1.redhat.com ([209.132.183.28]:50408)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gHZVH-0005ir-Je
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:16:39 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gHZVH-0005iu-W4
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:16:40 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D3AF485A07
+	by mx1.redhat.com (Postfix) with ESMTPS id DD27E30820EE
 	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 19:16:22 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 30 Oct 2018 20:16:16 +0100
-Message-Id: <20181030191620.32168-5-armbru@redhat.com>
+Date: Tue, 30 Oct 2018 20:16:15 +0100
+Message-Id: <20181030191620.32168-4-armbru@redhat.com>
 In-Reply-To: <20181030191620.32168-1-armbru@redhat.com>
 References: <20181030191620.32168-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 4/8] monitor: remove "x-oob",
- turn oob on by default
+Subject: [Qemu-devel] [PULL 3/8] monitor: Suspend monitor instead dropping
+ commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,136 +38,263 @@ Cc: Peter Xu <peterx@redhat.com>
 
 From: Peter Xu <peterx@redhat.com>
 
-OOB commands were introduced in commit cf869d53172.  Unfortunately, we
-ran into a regression, and had to disable them by default for 2.12
-(commit be933ffc23).
+When a QMP client sends in-band commands more quickly that we can
+process them, we can either queue them without limit (QUEUE), drop
+commands when the queue is full (DROP), or suspend receiving commands
+when the queue is full (SUSPEND).  None of them is ideal:
 
-  http://lists.gnu.org/archive/html/qemu-devel/2018-03/msg06231.html
+* QUEUE lets a misbehaving client make QEMU eat memory without bounds.
+Not such a hot idea.
 
-The regression has since been fixed (commit 951702f39c7 "monitor: bind
-dispatch bh to iohandler context").  Time to re-enable OOB.
+* With DROP, the client has to cope with dropped in-band commands.  To
+inform the client, we send a COMMAND_DROPPED event then.  The event is
+flawed by design in two ways: it's ambiguous (see commit d621cfe0a17),
+and it brings back the "eat memory without bounds" problem.
 
-This patch partly reverts be933ffc23 (monitor: new parameter "x-oob"),
-and turns it on again for non-MUX QMPs.  Note that we can't enable
-Out-Of-Band for monitors with MUX-typed chardev backends, because not
-all the chardev frontends can run without main thread, or can run in
-multiple threads.
+* With SUSPEND, the client has to manage the flow of in-band commands to
+keep the monitor available for out-of-band commands.
 
-Some trivial touch-up in the test code is required to make sure qmp-test
-won't break.
+We currently DROP.  Switch to SUSPEND.
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Managing the flow of in-band commands to keep the monitor available for
+out-of-band commands isn't really hard: just count the number of
+"outstanding" in-band commands (commands sent minus replies received),
+and if it exceeds the limit, hold back additional ones until it drops
+below the limit again.
+
+Note that we need to be careful pairing the suspend with a resume, or
+else the monitor will hang, possibly forever.  And here since we need to
+make sure both:
+
+     (1) popping request from the req queue, and
+     (2) reading length of the req queue
+
+will be in the same critical section, we let the pop function take the
+corresponding queue lock when there is a request, then we release the
+lock from the caller.
+
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <20181009062718.1914-4-peterx@redhat.com>
+Message-Id: <20181009062718.1914-2-peterx@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- include/monitor/monitor.h |  1 -
- monitor.c                 | 22 ++++++----------------
- tests/libqtest.c          |  2 +-
- tests/qmp-test.c          |  2 +-
- vl.c                      |  5 -----
- 5 files changed, 8 insertions(+), 24 deletions(-)
+ docs/interop/qmp-spec.txt |  5 ++--
+ include/monitor/monitor.h |  2 ++
+ monitor.c                 | 52 +++++++++++++++++----------------------
+ qapi/misc.json            | 40 ------------------------------
+ 4 files changed, 28 insertions(+), 71 deletions(-)
 
+diff --git a/docs/interop/qmp-spec.txt b/docs/interop/qmp-spec.txt
+index 8f7da0245d..67e44a8120 100644
+--- a/docs/interop/qmp-spec.txt
++++ b/docs/interop/qmp-spec.txt
+@@ -130,8 +130,9 @@ to pass "id" with out-of-band commands.  Passing it w=
+ith all commands
+ is recommended for clients that accept capability "oob".
+=20
+ If the client sends in-band commands faster than the server can
+-execute them, the server will eventually drop commands to limit the
+-queue length.  The sever sends event COMMAND_DROPPED then.
++execute them, the server will stop reading the requests from the QMP
++channel until the request queue length is reduced to an acceptable
++range.
+=20
+ Only a few commands support out-of-band execution.  The ones that do
+ have "allow-oob": true in output of query-qmp-schema.
 diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
-index 0c0a37d8cb..c1b40a9cac 100644
+index 6fd2c53b09..0c0a37d8cb 100644
 --- a/include/monitor/monitor.h
 +++ b/include/monitor/monitor.h
-@@ -13,7 +13,6 @@ extern __thread Monitor *cur_mon;
- #define MONITOR_USE_READLINE  0x02
- #define MONITOR_USE_CONTROL   0x04
+@@ -15,6 +15,8 @@ extern __thread Monitor *cur_mon;
  #define MONITOR_USE_PRETTY    0x08
--#define MONITOR_USE_OOB       0x10
+ #define MONITOR_USE_OOB       0x10
 =20
- #define QMP_REQ_QUEUE_LEN_MAX 8
++#define QMP_REQ_QUEUE_LEN_MAX 8
++
+ bool monitor_cur_is_qmp(void);
 =20
+ void monitor_init_globals(void);
 diff --git a/monitor.c b/monitor.c
-index 9334867110..431795d686 100644
+index d39390c2f2..9334867110 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -4554,19 +4554,12 @@ void monitor_init(Chardev *chr, int flags)
+@@ -4109,8 +4109,12 @@ static void monitor_qmp_dispatch(Monitor *mon, QOb=
+ject *req, QObject *id)
+  * processing commands only on a very busy monitor.  To achieve that,
+  * when we process one request on a specific monitor, we put that
+  * monitor to the end of mon_list queue.
++ *
++ * Note: if the function returned with non-NULL, then the caller will
++ * be with mon->qmp.qmp_queue_lock held, and the caller is responsible
++ * to release it.
+  */
+-static QMPRequest *monitor_qmp_requests_pop_any(void)
++static QMPRequest *monitor_qmp_requests_pop_any_with_lock(void)
  {
-     Monitor *mon =3D g_malloc(sizeof(*mon));
-     bool use_readline =3D flags & MONITOR_USE_READLINE;
--    bool use_oob =3D flags & MONITOR_USE_OOB;
+     QMPRequest *req_obj =3D NULL;
+     Monitor *mon;
+@@ -4120,10 +4124,11 @@ static QMPRequest *monitor_qmp_requests_pop_any(v=
+oid)
+     QTAILQ_FOREACH(mon, &mon_list, entry) {
+         qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
+         req_obj =3D g_queue_pop_head(mon->qmp.qmp_requests);
+-        qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
+         if (req_obj) {
++            /* With the lock of corresponding queue held */
+             break;
+         }
++        qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
+     }
+=20
+     if (req_obj) {
+@@ -4142,30 +4147,34 @@ static QMPRequest *monitor_qmp_requests_pop_any(v=
+oid)
+=20
+ static void monitor_qmp_bh_dispatcher(void *data)
+ {
+-    QMPRequest *req_obj =3D monitor_qmp_requests_pop_any();
++    QMPRequest *req_obj =3D monitor_qmp_requests_pop_any_with_lock();
+     QDict *rsp;
+     bool need_resume;
++    Monitor *mon;
+=20
+     if (!req_obj) {
+         return;
+     }
+=20
++    mon =3D req_obj->mon;
+     /*  qmp_oob_enabled() might change after "qmp_capabilities" */
+-    need_resume =3D !qmp_oob_enabled(req_obj->mon);
++    need_resume =3D !qmp_oob_enabled(mon) ||
++        mon->qmp.qmp_requests->length =3D=3D QMP_REQ_QUEUE_LEN_MAX - 1;
++    qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
+     if (req_obj->req) {
+         trace_monitor_qmp_cmd_in_band(qobject_get_try_str(req_obj->id) ?=
+: "");
+-        monitor_qmp_dispatch(req_obj->mon, req_obj->req, req_obj->id);
++        monitor_qmp_dispatch(mon, req_obj->req, req_obj->id);
+     } else {
+         assert(req_obj->err);
+         rsp =3D qmp_error_response(req_obj->err);
+         req_obj->err =3D NULL;
+-        monitor_qmp_respond(req_obj->mon, rsp, NULL);
++        monitor_qmp_respond(mon, rsp, NULL);
+         qobject_unref(rsp);
+     }
+=20
+     if (need_resume) {
+         /* Pairs with the monitor_suspend() in handle_qmp_command() */
+-        monitor_resume(req_obj->mon);
++        monitor_resume(mon);
+     }
+     qmp_request_free(req_obj);
+=20
+@@ -4173,8 +4182,6 @@ static void monitor_qmp_bh_dispatcher(void *data)
+     qemu_bh_schedule(qmp_dispatcher_bh);
+ }
+=20
+-#define  QMP_REQ_QUEUE_LEN_MAX  (8)
 -
--    if (use_oob) {
--        if (CHARDEV_IS_MUX(chr)) {
--            error_report("Monitor out-of-band is not supported with "
--                         "MUX typed chardev backend");
--            exit(1);
+ static void handle_qmp_command(void *opaque, QObject *req, Error *err)
+ {
+     Monitor *mon =3D opaque;
+@@ -4216,28 +4223,14 @@ static void handle_qmp_command(void *opaque, QObj=
+ect *req, Error *err)
+     qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
+=20
+     /*
+-     * If OOB is not enabled on the current monitor, we'll emulate the
+-     * old behavior that we won't process the current monitor any more
+-     * until it has responded.  This helps make sure that as long as
+-     * OOB is not enabled, the server will never drop any command.
++     * Suspend the monitor when we can't queue more requests after
++     * this one.  Dequeuing in monitor_qmp_bh_dispatcher() will resume
++     * it.  Note that when OOB is disabled, we queue at most one
++     * command, for backward compatibility.
+      */
+-    if (!qmp_oob_enabled(mon)) {
++    if (!qmp_oob_enabled(mon) ||
++        mon->qmp.qmp_requests->length =3D=3D QMP_REQ_QUEUE_LEN_MAX - 1) =
+{
+         monitor_suspend(mon);
+-    } else {
+-        /* Drop the request if queue is full. */
+-        if (mon->qmp.qmp_requests->length >=3D QMP_REQ_QUEUE_LEN_MAX) {
+-            qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
+-            /*
+-             * FIXME @id's scope is just @mon, and broadcasting it is
+-             * wrong.  If another monitor's client has a command with
+-             * the same ID in flight, the event will incorrectly claim
+-             * that command was dropped.
+-             */
+-            qapi_event_send_command_dropped(id,
+-                                            COMMAND_DROP_REASON_QUEUE_FU=
+LL);
+-            qmp_request_free(req_obj);
+-            return;
 -        }
--        if (use_readline) {
--            error_report("Monitor out-of-band is only supported by QMP")=
-;
--            exit(1);
--        }
--    }
-+    /*
-+     * Note: we can't enable Out-Of-Band for monitors with MUX-typed
-+     * chardev backends, because not all the chardev frontends can run
-+     * without main thread, or can run in multiple threads.
-+     */
-+    bool use_oob =3D (flags & MONITOR_USE_CONTROL) && !CHARDEV_IS_MUX(ch=
-r);
+     }
 =20
-     monitor_data_init(mon, false, use_oob);
+     /*
+@@ -4245,6 +4238,7 @@ static void handle_qmp_command(void *opaque, QObjec=
+t *req, Error *err)
+      * handled in time order.  Ownership for req_obj, req, id,
+      * etc. will be delivered to the handler side.
+      */
++    assert(mon->qmp.qmp_requests->length < QMP_REQ_QUEUE_LEN_MAX);
+     g_queue_push_tail(mon->qmp.qmp_requests, req_obj);
+     qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
 =20
-@@ -4659,9 +4652,6 @@ QemuOptsList qemu_mon_opts =3D {
-         },{
-             .name =3D "pretty",
-             .type =3D QEMU_OPT_BOOL,
--        },{
--            .name =3D "x-oob",
--            .type =3D QEMU_OPT_BOOL,
-         },
-         { /* end of list */ }
-     },
-diff --git a/tests/libqtest.c b/tests/libqtest.c
-index 44ce118cfc..90084522f6 100644
---- a/tests/libqtest.c
-+++ b/tests/libqtest.c
-@@ -227,7 +227,7 @@ QTestState *qtest_init_without_qmp_handshake(bool use=
-_oob,
-                                   "-display none "
-                                   "%s", qemu_binary, socket_path,
-                                   getenv("QTEST_LOG") ? "/dev/fd/2" : "/=
-dev/null",
--                                  qmp_socket_path, use_oob ? ",x-oob=3Do=
-n" : "",
-+                                  qmp_socket_path, "",
-                                   extra_args ?: "");
-         execlp("/bin/sh", "sh", "-c", command, NULL);
-         exit(1);
-diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-index 6c419f6023..030d813f77 100644
---- a/tests/qmp-test.c
-+++ b/tests/qmp-test.c
-@@ -116,7 +116,7 @@ static void test_qmp_protocol(void)
-     g_assert(q);
-     test_version(qdict_get(q, "version"));
-     capabilities =3D qdict_get_qlist(q, "capabilities");
--    g_assert(capabilities && qlist_empty(capabilities));
-+    g_assert(capabilities);
-     qobject_unref(resp);
+diff --git a/qapi/misc.json b/qapi/misc.json
+index 6c1c5c0a37..1cd9aa29a1 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -3438,46 +3438,6 @@
+ ##
+ { 'command': 'query-sev-capabilities', 'returns': 'SevCapability' }
 =20
-     /* Test valid command before handshake */
-diff --git a/vl.c b/vl.c
-index 1fcacc5caa..7d9bcf442e 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2317,11 +2317,6 @@ static int mon_init_func(void *opaque, QemuOpts *o=
-pts, Error **errp)
-     if (qemu_opt_get_bool(opts, "pretty", 0))
-         flags |=3D MONITOR_USE_PRETTY;
-=20
--    /* OOB is off by default */
--    if (qemu_opt_get_bool(opts, "x-oob", 0)) {
--        flags |=3D MONITOR_USE_OOB;
--    }
+-##
+-# @CommandDropReason:
+-#
+-# Reasons that caused one command to be dropped.
+-#
+-# @queue-full: the command queue is full. This can only occur when
+-#              the client sends a new non-oob command before the
+-#              response to the previous non-oob command has been
+-#              received.
+-#
+-# Since: 2.12
+-##
+-{ 'enum': 'CommandDropReason',
+-  'data': [ 'queue-full' ] }
 -
-     chardev =3D qemu_opt_get(opts, "chardev");
-     chr =3D qemu_chr_find(chardev);
-     if (chr =3D=3D NULL) {
+-##
+-# @COMMAND_DROPPED:
+-#
+-# Emitted when a command is dropped due to some reason.  Commands can
+-# only be dropped when the oob capability is enabled.
+-#
+-# @id: The dropped command's "id" field.
+-# FIXME Broken by design.  Events are broadcast to all monitors.  If
+-# another monitor's client has a command with the same ID in flight,
+-# the event will incorrectly claim that command was dropped.
+-#
+-# @reason: The reason why the command is dropped.
+-#
+-# Since: 2.12
+-#
+-# Example:
+-#
+-# { "event": "COMMAND_DROPPED",
+-#   "data": {"result": {"id": "libvirt-102",
+-#                       "reason": "queue-full" } } }
+-#
+-##
+-{ 'event': 'COMMAND_DROPPED' ,
+-  'data': { 'id': 'any', 'reason': 'CommandDropReason' } }
+-
+ ##
+ # @set-numa-node:
+ #
 --=20
 2.17.2
