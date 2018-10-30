@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58755)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gHS9N-0002Ml-64
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 07:25:36 -0400
+	(envelope-from <laurent@vivier.eu>) id 1gHS9N-0002Mm-69
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 07:25:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gHS9H-0003ug-Fo
+	(envelope-from <laurent@vivier.eu>) id 1gHS9H-0003uh-Fm
 	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 07:25:30 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue, 30 Oct 2018 12:23:21 +0100
-Message-Id: <20181030112337.17973-5-laurent@vivier.eu>
+Date: Tue, 30 Oct 2018 12:23:22 +0100
+Message-Id: <20181030112337.17973-6-laurent@vivier.eu>
 In-Reply-To: <20181030112337.17973-1-laurent@vivier.eu>
 References: <20181030112337.17973-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 04/20] tests/tcg/README: fix location for
- lm32 tests
+Subject: [Qemu-devel] [PULL v2 05/20] qemu-iotests: fix filename containing
+ checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +28,40 @@ Cc: "Michael S. Tsirkin" <mst@redhat.com>, Cleber Rosa <crosa@redhat.com>, Jason
 
 From: Cleber Rosa <crosa@redhat.com>
 
-Point to the right and obvious location for lm32 tests.
+Commit cce293a2945 moved some functions from common.config to
+common.rc, but the error messages still reference the old file
+location.
 
 Signed-off-by: Cleber Rosa <crosa@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Acked-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20181004161852.11673-3-crosa@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20181004161852.11673-5-crosa@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- tests/tcg/README | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/qemu-iotests/common.rc | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tests/tcg/README b/tests/tcg/README
-index a5643d33e7..2a58f9a058 100644
---- a/tests/tcg/README
-+++ b/tests/tcg/README
-@@ -10,6 +10,6 @@ with "make test-cris".
+diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
+index 44bee16a5e..70ca65b49b 100644
+--- a/tests/qemu-iotests/common.rc
++++ b/tests/qemu-iotests/common.rc
+@@ -170,7 +170,7 @@ if [ ! -e "$TEST_DIR" ]; then
+ fi
  
- LM32
- ====
--The testsuite for LM32 is in tests/tcg/cris.  You can run it
-+The testsuite for LM32 is in tests/tcg/lm32.  You can run it
- with "make test-lm32".
+ if [ ! -d "$TEST_DIR" ]; then
+-    echo "common.config: Error: \$TEST_DIR ($TEST_DIR) is not a directory"
++    echo "common.rc: Error: \$TEST_DIR ($TEST_DIR) is not a directory"
+     exit 1
+ fi
+ 
+@@ -179,7 +179,7 @@ if [ -z "$REMOTE_TEST_DIR" ]; then
+ fi
+ 
+ if [ ! -d "$SAMPLE_IMG_DIR" ]; then
+-    echo "common.config: Error: \$SAMPLE_IMG_DIR ($SAMPLE_IMG_DIR) is not a directory"
++    echo "common.rc: Error: \$SAMPLE_IMG_DIR ($SAMPLE_IMG_DIR) is not a directory"
+     exit 1
+ fi
  
 -- 
 2.17.2
