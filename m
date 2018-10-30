@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57966)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gHP3K-0000eo-Nj
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 04:07:08 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1gHPBg-0004VA-2a
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 04:15:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gHP3H-0001qF-JU
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 04:07:06 -0400
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:36715)
+	(envelope-from <richard.henderson@linaro.org>) id 1gHPBe-000159-E1
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 04:15:43 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38883)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gHP3H-0001p5-Ee
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 04:07:03 -0400
-Received: by mail-qt1-f196.google.com with SMTP id u34-v6so12427852qth.3
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 01:07:03 -0700 (PDT)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gHPBd-0000ZX-UT
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 04:15:42 -0400
+Received: by mail-wr1-x442.google.com with SMTP id d10-v6so11487973wrs.5
+	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 01:15:15 -0700 (PDT)
+References: <20181029134000.11157-1-mark.cave-ayland@ilande.co.uk>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <97900b04-28f0-975f-b3c0-2c0aa7039a4f@linaro.org>
+Date: Tue, 30 Oct 2018 08:15:11 +0000
 MIME-Version: 1.0
-References: <20181029125733.14597-1-marcandre.lureau@redhat.com>
-	<20181030054848.GF22523@xz-x1>
-In-Reply-To: <20181030054848.GF22523@xz-x1>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Tue, 30 Oct 2018 12:06:51 +0400
-Message-ID: <CAMxuvawJnOXvJYFPGQ-5Vutmft+RwV616FxTtZk1i8K8NhGTWA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 0/6] monitor: misc fixes
+In-Reply-To: <20181029134000.11157-1-mark.cave-ayland@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 00/11] hw/m68k: add Apple Machintosh
+ Quadra 800 machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +31,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: "Armbruster, Markus" <armbru@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, "Bonzini, Paolo" <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, jasowang@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, hpoussin@reactos.org, kraxel@redhat.com, pbonzini@redhat.com, afaerber@suse.de, aurelien@aurel32.net, laurent@vivier.eu
 
-Hi
+On 10/29/18 1:39 PM, Mark Cave-Ayland wrote:
+> You can install your own disk using debian-installer, with:
+> 
+>     ...
+>     -M q800 \
+>     -serial none -serial mon:stdio \
+>     -m 1000M -drive file=m68k.qcow2,format=qcow2 \
+>     -net nic,model=dp83932,addr=09:00:07:12:34:57 \
+>     -append "console=ttyS0 vga=off" \
+>     -kernel vmlinux-4.15.0-2-m68k \
+>     -initrd initrd.gz \
+>     -drive file=debian-9.0-m68k-NETINST-1.iso \
+>     -drive file=m68k.qcow2,format=qcow2 \
+>     -nographic
 
-On Tue, Oct 30, 2018 at 9:48 AM Peter Xu <peterx@redhat.com> wrote:
->
-> On Mon, Oct 29, 2018 at 04:57:27PM +0400, Marc-Andr=C3=A9 Lureau wrote:
-> > Hi,
-> >
-> > Here is a small series of fixes for the monitor, mostly related to
-> > threading issues.
->
-> Hi, Marc-Andr=C3=A9, Markus,
->
-> I'd be glad to know how you think about these monitor series,
-> considering that I just noticed it's exactly softfreeze for QEMU 3.1
-> today...
->
-> I gave a quick look on this series, IMHO patch 1,2,6 could be
-> candidate for 3.1 (though I'm not sure for patch 6; it seems even fine
-> to me with some comments there but I'd like to see how other people
-> think about it too, and whether it's really possible to insert a new
-> monitor at that time) and I'm not sure whether the rest can be
+I tried this and got
 
-Patch 5 & 6 are the result of the discussion of the previous proposed fixed=
-:
-https://lists.nongnu.org/archive/html/qemu-devel/2018-08/msg00018.html
+Trace 0: 0x7f2e886c7140 [00000000/0000d404/0xe000]
+INT      1: Unassigned(0xf4) pc=0000d404 sp=00393e60 sr=2700
+INT      2: Access Fault(0x8) pc=00000000 sp=00393e58 sr=2700
+            ssw:  00000506 ea:   00000000 sfc:  5    dfc: 5
 
-They fix a dead-lock on cleanup, so it should be considered for 3.1.
+which lead straight to buserr and panic.  This happens way early in boot --
+only 1926 TranslationBlocks generated.
 
-> postponed (say, patch 3,4,5).  Meanwhile, I think we need Wolfgang's
+Is there some device missing from the command-line that the kernel is expecting?
 
-Patch 3 & 4 should also be considered, as OOB won't have the expected
-behaviour with all chardevs. With non-gcontext feature chardev, they
-will behave more or less like non-oob.
 
-> patches to fix the daemonize chaos, and hopefully I also like to know
-> your thoughts on my oob enablement series (especially Marc-Andr=C3=A9,
-> since I talked to Markus face to face during the forum after all :).
-> I would like it to be in 3.1 as well but I'll see my luck.
-
-I acked the series already (except "monitor: resume the monitor
-earlier if needed" which we agreed could be dropped for now), so it's
-in Markus hand.
-
-Thanks
+r~
