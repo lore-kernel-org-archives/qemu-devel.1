@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47640)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50881)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1gHWZY-0000ju-9H
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 12:08:53 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gHWiy-0007oH-95
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 12:18:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1gHWZU-0002kJ-Qc
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 12:08:52 -0400
-Received: from m12-12.163.com ([220.181.12.12]:42178)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1gHWZT-0000hb-Om
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 12:08:48 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gHWix-0004Ru-NK
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 12:18:36 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:45992)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gHWix-0004Nv-99
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 12:18:35 -0400
+Received: by mail-ot1-x342.google.com with SMTP id g10so583586otl.12
+	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 09:18:35 -0700 (PDT)
 MIME-Version: 1.0
-From: Li Qiang <liq3ea@163.com>
-Date: Wed, 31 Oct 2018 00:08:21 +0800
-Message-Id: <5BD881F6.0B8479.13021@m12-12.163.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [Question] About object oriented programming in qemu
+In-Reply-To: <20181030035030.4542-1-zhangckid@gmail.com>
+References: <20181030035030.4542-1-zhangckid@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 30 Oct 2018 16:18:13 +0000
+Message-ID: <CAFEAcA_T8WCimGtgErMjQvBL9yh8_kR9XpykaY=MJPCM7ghw+g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] net/filter-rewirter.c: Fix coverity static
+ analysis issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,30 +29,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "pbonzini@redhat.com" <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Zhang Chen <zhangckid@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>, Zhang Chen <chen.zhang@intel.com>
 
-Hello all,
+On 30 October 2018 at 03:50, Zhang Chen <zhangckid@gmail.com> wrote:
+> The original code just follow the TCP state diagram,
+> but in this case, we can skip the TCPS_TIME_WAIT state to simplify
+> the implementation.
+>
+> Signed-off-by: Zhang Chen <zhangckid@gmail.com>
+> ---
+>  net/filter-rewriter.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 
-Today I read the BusClass=E2=80=99 definition.
+NB: typo in Subject: s/rewirter/rewriter/
 
-The comment=20
-/* FIXME first arg should be BusState */
-remind me that OOP in qemu is not very OOP.
+Hopefully whoever commits this patch can fix that up for you.
 
-Maybe we should take the first arg as the Object pointer, just as the cpp=
-=E2=80=99s this pointer.
-
-For example, we can define the BusClass function as this
-
-void (*print_dev)(BusState*, Monitor *mon, DeviceState *dev, int indent);
-char *(*get_dev_path)(BusState*,  DeviceState *dev);
-char *(*get_fw_dev_path)(BusState*, DeviceState *dev);
-
-So we don=E2=80=99t need get the BusState in the callback function, such as=
- =E2=80=98usb_bus_dev_print=E2=80=99.
-
-I want to know do do you think it make senses?
-If not I will not spend time to write the patch.
-
-Thanks,
-Li Qiang
+thanks
+-- PMM
