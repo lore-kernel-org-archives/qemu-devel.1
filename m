@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51601)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51927)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gHVX2-0008JB-BF
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:02:13 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gHVXv-0001rx-16
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:03:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gHVWw-0007tF-VG
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:02:10 -0400
-Date: Tue, 30 Oct 2018 12:02:00 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181030150200.GW3902@habkost.net>
-References: <20181030111348.14713-1-kraxel@redhat.com>
-	<20181030111348.14713-2-kraxel@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gHVXq-0001fP-Es
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:03:06 -0400
+Received: from mail-ot1-x32c.google.com ([2607:f8b0:4864:20::32c]:35962)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gHVXp-0001cy-VR
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:03:02 -0400
+Received: by mail-ot1-x32c.google.com with SMTP id x4so11389280otg.3
+	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 08:03:01 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181030111348.14713-2-kraxel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/4] add QemuSupportState
+In-Reply-To: <BN6PR2201MB125136875C6C4CCFC2B2DF62C6CC0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <BN6PR2201MB1251EA1F1F5E486A889A827CC6CC0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	<e1aa7445-8eb5-f63c-ad85-7ad9c25d8ac5@redhat.com>
+	<BN6PR2201MB125136875C6C4CCFC2B2DF62C6CC0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 30 Oct 2018 15:02:40 +0000
+Message-ID: <CAFEAcA9bLwe_pmNRBCwPNOeDLFdVcPgvFysg0kxodFg+aj9M1A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Question: Perfecting checkpatch.pl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,29 +30,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>, Markus Armbruster <armbru@redhat.com>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>
+To: Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "stefanha@redhat.com" <stefanha@redhat.com>
 
-On Tue, Oct 30, 2018 at 12:13:45PM +0100, Gerd Hoffmann wrote:
-> Indicates support state for somerhing (device, backend, subsystem, ...)
-> in qemu.  Modeled roughly after the "S:" states we have in MAINTANERS.
-> 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-[...]
-> +typedef struct QemuSupportState {
-> +    SupportState state;
-> +    const char *reason;
-> +} QemuSupportState;
+On 30 October 2018 at 14:48, Aleksandar Markovic <amarkovic@wavecomp.com> wrote:
+>
+>> From: Paolo Bonzini <pbonzini@redhat.com>
+>>
+>> Sure, both are good ideas.  Can you write a patch for it?
+>
+> I would rather not, I prefer to see it as a black box.
 
-I find it weird that we're calling this field "reason", while
-this is how the field is being actually used:
+So do most of the rest of us :-)  This is why sometimes
+it does not have all the features that might seem nice for
+it to have...
 
-* "use a newer machine type instead"
-* "use 40p machine type instead"
-* "use '-vga std' instead"
-
-These are not reasons for deprecation, they are just suggested
-alternatives.
-
--- 
-Eduardo
+thanks
+-- PMM
