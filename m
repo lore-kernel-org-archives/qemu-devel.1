@@ -1,26 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47511)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53670)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gHRdh-0008UJ-1F
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 06:52:50 -0400
+	(envelope-from <kraxel@redhat.com>) id 1gHRyC-0000xu-LB
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 07:14:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gHRdc-0004iV-0n
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 06:52:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36588)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gHRdb-0004dH-LS
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 06:52:43 -0400
-References: <1540873732-3503-1-git-send-email-liq3ea@gmail.com>
-	<1540873732-3503-3-git-send-email-liq3ea@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8554a03c-4409-c7f5-bd9e-613d03779e73@redhat.com>
-Date: Tue, 30 Oct 2018 11:52:31 +0100
-MIME-Version: 1.0
-In-Reply-To: <1540873732-3503-3-git-send-email-liq3ea@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] tests: fw_cfg: add reboot_timeout
- test case
+	(envelope-from <kraxel@redhat.com>) id 1gHRy9-00085Y-6r
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 07:14:00 -0400
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue, 30 Oct 2018 12:13:46 +0100
+Message-Id: <20181030111348.14713-3-kraxel@redhat.com>
+In-Reply-To: <20181030111348.14713-1-kraxel@redhat.com>
+References: <20181030111348.14713-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH 2/4] add QemuSupportState to DeviceClass
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +19,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@gmail.com>, thuth@redhat.com, lvivier@redhat.com, philmd@redhat.com
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>, Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
 
-On 30/10/2018 05:28, Li Qiang wrote:
-> Signed-off-by: Li Qiang <liq3ea@gmail.com>
-> ---
->  tests/fw_cfg-test.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
-> 
-> diff --git a/tests/fw_cfg-test.c b/tests/fw_cfg-test.c
-> index 1c5103fe1c..aeabd17ec0 100644
-> --- a/tests/fw_cfg-test.c
-> +++ b/tests/fw_cfg-test.c
-> @@ -99,6 +99,15 @@ static void test_fw_cfg_boot_menu(void)
->      g_assert_cmpint(qfw_cfg_get_u16(fw_cfg, FW_CFG_BOOT_MENU), ==, boot_menu);
->  }
->  
-> +static void test_fw_cfg_reboot_timeout(void)
-> +{
-> +    uint32_t reboot_timeout;
-> +
-> +    qfw_cfg_get_file(fw_cfg, "etc/boot-fail-wait",
-> +                     &reboot_timeout, sizeof(reboot_timeout));
-> +    g_assert_cmpint(reboot_timeout, <=, 65535);
-> +}
-> +
->  int main(int argc, char **argv)
->  {
->      QTestState *s;
-> @@ -125,6 +134,7 @@ int main(int argc, char **argv)
->      qtest_add_func("fw_cfg/max_cpus", test_fw_cfg_max_cpus);
->      qtest_add_func("fw_cfg/numa", test_fw_cfg_numa);
->      qtest_add_func("fw_cfg/boot_menu", test_fw_cfg_boot_menu);
-> +    qtest_add_func("fw_cfg/reboot_timeout", test_fw_cfg_reboot_timeout);
->  
->      ret = g_test_run();
+So we can tag device support state.
 
-This test is not doing much; you could add "-boot reboot-timeout=15" and
-check the value.
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ include/hw/qdev-core.h | 2 ++
+ hw/core/qdev.c         | 8 +++++++-
+ qdev-monitor.c         | 7 +++++++
+ 3 files changed, 16 insertions(+), 1 deletion(-)
 
-Paolo
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index a24d0dd566..ff6bd3f08f 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -3,6 +3,7 @@
+ 
+ #include "qemu/queue.h"
+ #include "qemu/bitmap.h"
++#include "qemu/support-state.h"
+ #include "qom/object.h"
+ #include "hw/irq.h"
+ #include "hw/hotplug.h"
+@@ -105,6 +106,7 @@ typedef struct DeviceClass {
+      */
+     bool user_creatable;
+     bool hotpluggable;
++    QemuSupportState supported;
+ 
+     /* callbacks */
+     DeviceReset reset;
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 6b3cc55b27..e788fca257 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -133,11 +133,17 @@ DeviceState *qdev_create(BusState *bus, const char *name)
+ 
+ DeviceState *qdev_try_create(BusState *bus, const char *type)
+ {
++    DeviceClass *dc;
+     DeviceState *dev;
+ 
+-    if (object_class_by_name(type) == NULL) {
++    dc = DEVICE_CLASS(object_class_by_name(type));
++    if (dc == NULL) {
+         return NULL;
+     }
++    if (qemu_is_deprecated(&dc->supported) ||
++        qemu_is_obsolete(&dc->supported)) {
++        qemu_warn_support_state("device", type, &dc->supported);
++    }
+     dev = DEVICE(object_new(type));
+     if (!dev) {
+         return NULL;
+diff --git a/qdev-monitor.c b/qdev-monitor.c
+index 802c18a74e..63cb43691c 100644
+--- a/qdev-monitor.c
++++ b/qdev-monitor.c
+@@ -128,6 +128,9 @@ static void qdev_print_devinfo(DeviceClass *dc)
+     if (!dc->user_creatable) {
+         out_printf(", no-user");
+     }
++    if (dc->supported.state != SUPPORT_STATE_UNKNOWN) {
++        out_printf(", %s", SupportState_str(dc->supported.state));
++    }
+     out_printf("\n");
+ }
+ 
+@@ -579,6 +582,10 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
+     if (!dc) {
+         return NULL;
+     }
++    if (qemu_is_deprecated(&dc->supported) ||
++        qemu_is_obsolete(&dc->supported)) {
++        qemu_warn_support_state("device", driver, &dc->supported);
++    }
+ 
+     /* find bus */
+     path = qemu_opt_get(opts, "bus");
+-- 
+2.9.3
