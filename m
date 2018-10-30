@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35461)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gHNYI-0002hh-9H
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 02:30:59 -0400
+	(envelope-from <ppandit@redhat.com>) id 1gHNdT-0007GG-Ng
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 02:36:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gHNYE-0007tK-UW
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 02:30:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34724)
+	(envelope-from <ppandit@redhat.com>) id 1gHNdQ-0003Nv-EN
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 02:36:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37680)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gHNYE-0007sk-Oj
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 02:30:54 -0400
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gHNdQ-0003Kp-6P
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 02:36:16 -0400
+Date: Tue, 30 Oct 2018 12:06:05 +0530 (IST)
 From: P J P <ppandit@redhat.com>
-Date: Tue, 30 Oct 2018 11:58:42 +0530
-Message-Id: <20181030062842.9792-1-ppandit@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] lsi53c895a: check message length value is
- valid
+In-Reply-To: <2dd73225-1e25-423e-5284-8f6fc60d47e3@redhat.com>
+Message-ID: <nycvar.YSQ.7.76.1810301204510.30516@xnncv>
+References: <20181026194314.18663-1-ppandit@redhat.com>
+	<CAFEAcA8auV_NMER=nfrMnHOQ8oSSAupCt8ap2W+XJ4ypsR5uDA@mail.gmail.com>
+	<1b9136bd-47b8-4a39-59c1-5831498a2578@redhat.com>
+	<2dd73225-1e25-423e-5284-8f6fc60d47e3@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH v1] lsi53c895a: check message length value
+ is valid
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,74 +29,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Qemu Developers <qemu-devel@nongnu.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Fam Zheng <famz@redhat.com>, Ameya More <ameya.more@oracle.com>, Prasad J Pandit <pjp@fedoraproject.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Ameya More <ameya.more@oracle.com>, Thomas Huth <thuth@redhat.com>, Fam Zheng <famz@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
 
-From: Prasad J Pandit <pjp@fedoraproject.org>
++-- On Mon, 29 Oct 2018, Paolo Bonzini wrote --+
+| On 29/10/2018 18:56, Paolo Bonzini wrote:
+| > On 26/10/2018 22:55, Peter Maydell wrote:
+| >>> +    assert(len <= LSI_MAX_MSGIN_LEN);
+| >>>      pci_dma_write(PCI_DEVICE(s), s->dnad, s->msg, len);
+| >>>      /* Linux drivers rely on the last byte being in the SIDL.  */
+| >>>      s->sidl = s->msg[len - 1];
+| >> Is it possible to get here with len == 0 ?
+| > 
+| > No, all calls to
+| > 
+| >     lsi_set_phase(s, PHASE_MI);
+| > 
+| > are followed or preceded by lsi_add_msg_byte.  But an assertion is good
+| > to add.  What do you think of squashing this on top:
+| > 
+| > diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
+| > index 3a40e62853..72d85c42dd 100644
+| > --- a/hw/scsi/lsi53c895a.c
+| > +++ b/hw/scsi/lsi53c895a.c
+| > @@ -865,9 +865,9 @@ static void lsi_do_msgin(LSIState *s)
+| >      trace_lsi_do_msgin(s->dbc, s->msg_len);
+| >      s->sfbr = s->msg[0];
+| >      len = s->msg_len;
+| > +    assert(len >= 0 && len <= LSI_MAX_MSGIN_LEN);
+| 
+| Ahem, len > 0.  Is there a CVE number?
 
-While writing a message in 'lsi_do_msgin', message length value
-in 'msg_len' could be invalid. Add check to avoid OOB access issue.
+Sent revised patch v2. I'll request CVE once patch is reviewed/approved here.
 
-Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
----
- hw/scsi/lsi53c895a.c | 19 +++++++++++++++++--
- 1 file changed, 17 insertions(+), 2 deletions(-)
-
-Update v2: modify assert()
-  -> https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg06273.html
-
-diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
-index d1e6534311..dc39f4c3ee 100644
---- a/hw/scsi/lsi53c895a.c
-+++ b/hw/scsi/lsi53c895a.c
-@@ -861,10 +861,11 @@ static void lsi_do_status(LSIState *s)
- 
- static void lsi_do_msgin(LSIState *s)
- {
--    int len;
-+    uint8_t len;
-     trace_lsi_do_msgin(s->dbc, s->msg_len);
-     s->sfbr = s->msg[0];
-     len = s->msg_len;
-+    assert(len > 0 && len <= LSI_MAX_MSGIN_LEN);
-     if (len > s->dbc)
-         len = s->dbc;
-     pci_dma_write(PCI_DEVICE(s), s->dnad, s->msg, len);
-@@ -1705,8 +1706,10 @@ static uint8_t lsi_reg_readb(LSIState *s, int offset)
-         break;
-     case 0x58: /* SBDL */
-         /* Some drivers peek at the data bus during the MSG IN phase.  */
--        if ((s->sstat1 & PHASE_MASK) == PHASE_MI)
-+        if ((s->sstat1 & PHASE_MASK) == PHASE_MI) {
-+            assert(s->msg_len >= 0);
-             return s->msg[0];
-+        }
-         ret = 0;
-         break;
-     case 0x59: /* SBDL high */
-@@ -2103,11 +2106,23 @@ static int lsi_pre_save(void *opaque)
-     return 0;
- }
- 
-+static int lsi_post_load(void *opaque, int version_id)
-+{
-+    LSIState *s = opaque;
-+
-+    if (s->msg_len < 0 || s->msg_len > LSI_MAX_MSGIN_LEN) {
-+        return -EINVAL;
-+    }
-+
-+    return 0;
-+}
-+
- static const VMStateDescription vmstate_lsi_scsi = {
-     .name = "lsiscsi",
-     .version_id = 0,
-     .minimum_version_id = 0,
-     .pre_save = lsi_pre_save,
-+    .post_load = lsi_post_load,
-     .fields = (VMStateField[]) {
-         VMSTATE_PCI_DEVICE(parent_obj, LSIState),
- 
--- 
-2.17.2
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
