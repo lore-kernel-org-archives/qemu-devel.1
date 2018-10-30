@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53734)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gHHIw-0000cu-8y
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 19:50:43 -0400
+	(envelope-from <philmd@redhat.com>) id 1gHHaq-0001w7-UY
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 20:09:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gHHIs-0007FR-Bu
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 19:50:41 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:45896)
+	(envelope-from <philmd@redhat.com>) id 1gHHai-0002Ia-Lg
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 20:09:12 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:41548)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gHHIr-0007ES-5s
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 19:50:38 -0400
-Received: by mail-wr1-f65.google.com with SMTP id n5-v6so10543379wrw.12
-	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 16:50:36 -0700 (PDT)
-References: <1540365080-6844-1-git-send-email-liq3ea@gmail.com>
-	<4d64d42a-8727-81aa-6015-a9db92abca76@redhat.com>
-	<6afc1723-633c-34af-d5ff-4dea3fbf6b89@redhat.com>
-	<CAKXe6SJQUtBRbOtiy1xtt+griLoxc_JOd3D4oKwR9d3B2GCWyQ@mail.gmail.com>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gHHag-0002Gn-Gh
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 20:09:04 -0400
+Received: by mail-wr1-f67.google.com with SMTP id x12-v6so10596212wrw.8
+	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 17:08:58 -0700 (PDT)
+References: <20181028124004.30494-1-liq3ea@163.com>
+	<20181028124004.30494-3-liq3ea@163.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <1d47f5d7-e85c-44a0-2499-180eac24965e@redhat.com>
-Date: Tue, 30 Oct 2018 00:50:32 +0100
+Message-ID: <3a1b60e0-fe90-4da7-210e-4519f220bb9f@redhat.com>
+Date: Tue, 30 Oct 2018 01:08:55 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAKXe6SJQUtBRbOtiy1xtt+griLoxc_JOd3D4oKwR9d3B2GCWyQ@mail.gmail.com>
+In-Reply-To: <20181028124004.30494-3-liq3ea@163.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] fw_cfg_reboot: ensure reboot_time is
- nonegative
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] tests: fw_cfg: add reboot_timeout test
+ case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,102 +31,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@gmail.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
+To: Li Qiang <liq3ea@163.com>, pbonzini@redhat.com, thuth@redhat.com, lvivier@redhat.com
+Cc: qemu-devel@nongnu.org
 
-On 25/10/18 3:45, Li Qiang wrote:
-> Hello Laszlo and Philippe ,
+On 28/10/18 13:40, Li Qiang wrote:
+> Signed-off-by: Li Qiang <liq3ea@163.com>
+> ---
+>   tests/fw_cfg-test.c | 13 ++++++++++++-
+>   1 file changed, 12 insertions(+), 1 deletion(-)
 > 
-> Thanks for your review,
-> 
-> 
-> 
-> Philippe Mathieu-Daudé <philmd@redhat.com <mailto:philmd@redhat.com>> 于 
-> 2018年10月25日周四 上午6:56写道：
-> 
->     Hi,
-> 
->     On 24/10/18 13:35, Laszlo Ersek wrote:
->      > On 10/24/18 09:11, Li Qiang wrote:
->      >> This can avoid setting a negative value to
->      >> etc/boot-fail-wait.
-> 
->     Li Qiang, can you add a qtest for this?
-> 
-> 
-> I will try to write one.
-> Is it ok to write it without this patch, as the test will be not passed?
+> diff --git a/tests/fw_cfg-test.c b/tests/fw_cfg-test.c
+> index 1c5103fe1c..37765f15f8 100644
+> --- a/tests/fw_cfg-test.c
+> +++ b/tests/fw_cfg-test.c
+> @@ -99,6 +99,15 @@ static void test_fw_cfg_boot_menu(void)
+>       g_assert_cmpint(qfw_cfg_get_u16(fw_cfg, FW_CFG_BOOT_MENU), ==, boot_menu);
+>   }
+>   
+> +static void test_fw_cfg_reboot_timeout(void)
+> +{
+> +    uint32_t reboot_timeout;
+> +
+> +    qfw_cfg_get_file(fw_cfg, "etc/boot-fail-wait",
+> +                     &reboot_timeout, sizeof(reboot_timeout));
+> +    g_assert_cmpint(reboot_timeout, <=, 65535);
+> +}
+> +
+>   int main(int argc, char **argv)
+>   {
+>       QTestState *s;
+> @@ -106,7 +115,8 @@ int main(int argc, char **argv)
+>   
+>       g_test_init(&argc, &argv, NULL);
+>   
+> -    s = qtest_init("-uuid 4600cb32-38ec-4b2f-8acb-81c6ea54f2d8");
+> +    s = qtest_init("-uuid 4600cb32-38ec-4b2f-8acb-81c6ea54f2d8"
+> +                   " -boot reboot-timeout=4294967295");
 
-It is OK to add the test after the fix, else the test would fail.
-But now your test protect from future regressions.
+I'd rather change this test to use qtest_add_data_func() ...:
 
-> 
-> Thanks,
-> Li Qiang
-> 
-> 
->      >>
->      >> Signed-off-by: Li Qiang <liq3ea@gmail.com <mailto:liq3ea@gmail.com>>
->      >> ---
->      >>   hw/nvram/fw_cfg.c | 15 ++++++++++-----
->      >>   1 file changed, 10 insertions(+), 5 deletions(-)
->      >>
->      >> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
->      >> index f4a52d8..276dcb1 100644
->      >> --- a/hw/nvram/fw_cfg.c
->      >> +++ b/hw/nvram/fw_cfg.c
->      >> @@ -199,12 +199,17 @@ static void fw_cfg_reboot(FWCfgState *s)
->      >>               reboot_timeout = strtol(p, &p, 10);
->      >>           }
->      >>       }
->      >> -    /* validate the input */
->      >> -    if (reboot_timeout > 0xffff) {
->      >> -        error_report("reboot timeout is larger than 65535,
->     force it to 65535.");
->      >> -        reboot_timeout = 0xffff;
->      >> +
->      >> +    if (reboot_timeout >= 0) {
->      >> +        /* validate the input */
->      >> +        if (reboot_timeout > 0xffff) {
->      >> +            error_report("reboot timeout is larger than 65535,"
->      >> +                         "force it to 65535.");
->      >> +            reboot_timeout = 0xffff;
->      >> +        }
->      >> +        fw_cfg_add_file(s, "etc/boot-fail-wait",
->      >> +                        g_memdup(&reboot_timeout, 4), 4);
->      >>       }
->      >> -    fw_cfg_add_file(s, "etc/boot-fail-wait",
->     g_memdup(&reboot_timeout, 4), 4);
->      >>   }
->      >>
->      >>   static void fw_cfg_write(FWCfgState *s, uint8_t value)
->      >>
->      >
->      > I don't feel strongly about fixing this issue.
->      >
->      > However, if we decide to fix it, we should start with the bare-bones
->      > strtol() call, visible at the top of the context. I'm not
->     up-to-date on
->      > what's the best QEMU helper function for this, but I seem to
->     remember it
->      > checks for trailing garbage, and perhaps even for range. Maybe we
->     should
-> 
->     Are you suggesting qemu_strtoul()? I agree this would be cleaner.
-> 
-> 
-> 
-> I reference the 'boot_splash_time' in fw_cfg_bootsplash.
-> We can also change there.
-> 
->      > even use a different (better) option parsing facility thatn
->      > qemu_opt_get(). Adding Eric and Markus.
->      >
->      > Also, I would suggest forcing negative values (that were explicitly
->      > specified) to some sensible positive default, such as 5 seconds
->     or so.
->      >
->      > Thanks
->      > Laszlo
->      >
+         qtest_add_data_func("fw_cfg/reboot_timeout", "-boot 
+reboot-timeout=4294967295 ", test_fw_cfg_reboot_timeout);
+
+... to avoid adding this command line option to all the tests, because 
+all tests are now failing:
+
+$ make check-qtest-i386
+[...]
+ERROR:qemu/tests/fw_cfg-test.c:33:test_fw_cfg_signature: assertion 
+failed (buf == "QEMU"): ("\377\377\377\377" == "QEMU")
+ERROR:qemu/tests/fw_cfg-test.c:40:test_fw_cfg_id: assertion failed: ((id 
+== 1) || (id == 3))
+ERROR:qemu/tests/fw_cfg-test.c:52:test_fw_cfg_uuid: assertion failed: 
+(memcmp(buf, uuid, sizeof(buf)) == 0)
+ERROR:qemu/tests/fw_cfg-test.c:57:test_fw_cfg_ram_size: assertion failed 
+(qfw_cfg_get_u64(fw_cfg, FW_CFG_RAM_SIZE) == ram_size): (-1 == 134217728)
+ERROR:qemu/tests/fw_cfg-test.c:62:test_fw_cfg_nographic: assertion 
+failed (qfw_cfg_get_u16(fw_cfg, FW_CFG_NOGRAPHIC) == 0): (65535 == 0)
+ERROR:qemu/tests/fw_cfg-test.c:67:test_fw_cfg_nb_cpus: assertion failed 
+(qfw_cfg_get_u16(fw_cfg, FW_CFG_NB_CPUS) == nb_cpus): (65535 == 1)
+ERROR:qemu/tests/fw_cfg-test.c:72:test_fw_cfg_max_cpus: assertion failed 
+(qfw_cfg_get_u16(fw_cfg, FW_CFG_MAX_CPUS) == max_cpus): (65535 == 1)
+ERROR:qemu/tests/fw_cfg-test.c:80:test_fw_cfg_numa: assertion failed 
+(qfw_cfg_get_u64(fw_cfg, FW_CFG_NUMA) == nb_nodes): (-1 == 0)
+ERROR:qemu/tests/fw_cfg-test.c:99:test_fw_cfg_boot_menu: assertion 
+failed (qfw_cfg_get_u16(fw_cfg, FW_CFG_BOOT_MENU) == boot_menu): (65535 
+== 0)
+
+
+(did you test your patch?)
+
+>   
+>       fw_cfg = pc_fw_cfg_init(s);
+>   
+> @@ -125,6 +135,7 @@ int main(int argc, char **argv)
+>       qtest_add_func("fw_cfg/max_cpus", test_fw_cfg_max_cpus);
+>       qtest_add_func("fw_cfg/numa", test_fw_cfg_numa);
+>       qtest_add_func("fw_cfg/boot_menu", test_fw_cfg_boot_menu);
+> +    qtest_add_func("fw_cfg/reboot_timeout", test_fw_cfg_reboot_timeout);
+>   
+>       ret = g_test_run();
+>   
 > 
