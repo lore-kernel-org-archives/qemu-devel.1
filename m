@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33283)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gHYE7-0000HQ-4y
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 13:54:51 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gHYEI-0000WF-AH
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 13:55:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gHYE6-0005mh-6j
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 13:54:50 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gHYEE-0005qm-8E
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 13:55:02 -0400
+Received: from mail-yb1-f194.google.com ([209.85.219.194]:37269)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gHYEE-0005qJ-3Z
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 13:54:58 -0400
+Received: by mail-yb1-f194.google.com with SMTP id d18-v6so5423276yba.4
+	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 10:54:57 -0700 (PDT)
 MIME-Version: 1.0
-References: <20181030174356.16915-1-palmer@sifive.com>
-	<dc417db4-7add-0870-b6b7-6a3e4ae92305@redhat.com>
-In-Reply-To: <dc417db4-7add-0870-b6b7-6a3e4ae92305@redhat.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 30 Oct 2018 10:54:08 -0700
-Message-ID: <CAKmqyKPKgGuArcN+46sHt5iPmEzGGanaOtjke+ku6dKaAu_U0A@mail.gmail.com>
+References: <CAFEAcA_oMG2qo_W_OFfdkPomu7-hc4vkFSZnC0CLQ_PD6zmW+Q@mail.gmail.com>
+	<mhng-b2717513-e93b-43da-b724-f2adca348413@palmer-si-x1c4>
+	<CAFEAcA_AYKP0ApmkdSXFn_pQRq3vVBbijbg7WDfTawPkvApQxw@mail.gmail.com>
+In-Reply-To: <CAFEAcA_AYKP0ApmkdSXFn_pQRq3vVBbijbg7WDfTawPkvApQxw@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philippe@mathieu-daude.net>
+Date: Tue, 30 Oct 2018 18:54:45 +0100
+Message-ID: <CAAdtpL5c21ZTKEVTh3iBP=gJVbuHrkq8k5YBY0KN8dRWBSVjRw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] Add qemu-riscv@nongnu.org as the RISC-V
- list
+Subject: Re: [Qemu-devel] [PATCH] Add Alistair as a RISC-V Maintainer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,40 +32,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: philmd@redhat.com
-Cc: Palmer Dabbelt <palmer@sifive.com>, qemu-riscv@nongnu.org, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Michael Clark <mjc@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, Alistair Francis <alistair23@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 
-On Tue, Oct 30, 2018 at 10:53 AM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
+On Tue, Oct 30, 2018 at 4:04 PM Peter Maydell <peter.maydell@linaro.org> wrote:
 >
-> On 30/10/18 18:43, Palmer Dabbelt wrote:
-> > We now have a RISC-V specific QEMU development list.
+> On 29 October 2018 at 18:41, Palmer Dabbelt <palmer@sifive.com> wrote:
+> > On Mon, 29 Oct 2018 10:59:47 PDT (-0700), Peter Maydell wrote:
+> >>
+> >> On 29 October 2018 at 17:14, Palmer Dabbelt <palmer@sifive.com> wrote:
+> >>>
+> >>> I don't think we have anything ready to go right now: your PCIe patches
+> >>> still have some outstanding feedback (on interrupt stuff), and Bastian's
+> >>> decodetree stuff has some patches from Richard Henderson that should be
+> >>> merged in.  I was hoping to get through reviewing Michael's patches to
+> >>> fix
+> >>> the FS dirty bit, but haven't had time yet -- they're tested, but I
+> >>> haven't
+> >>> actually read through them.
+> >>>
+> >>> Maybe we should get a RISC-V QEMU mailing list so we can keep everyone in
+> >>> sync without spamming the whole world?
+> >>
+> >>
+> >> We can sort out a qemu-riscv mailing list like the ones we have
+> >> for ppc and arm if you like:
+> >> https://wiki.qemu.org/Contribute/MailingLists
 > >
-> > Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+> >
+> > I think that'd be good.  It makes things a bit easier on my end as I can
+> > ensure I don't miss any patches that end up on our list.
 >
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> OK, I have set one up. The subscription page is at:
+> https://lists.nongnu.org/mailman/listinfo/qemu-riscv
 
-That's for testing, I was worried this would break the Linux boot :P
+Thanks!
 
-Alistair
+> I think I have got the list config correct but let me know if you
+> notice anything weird.
+
+http://lists.nongnu.org/archive/html/qemu-riscv/ returns 404 Not
+found: The requested URL /archive/html/qemu-riscv/ was not found on
+this server.
+
+This might be a cron job and I need to wait.
 
 >
-> > ---
-> >   MAINTAINERS | 1 +
-> >   1 file changed, 1 insertion(+)
-> >
-> > diff --git a/MAINTAINERS b/MAINTAINERS
-> > index d550fd8b809c..10983bd52d64 100644
-> > --- a/MAINTAINERS
-> > +++ b/MAINTAINERS
-> > @@ -244,6 +244,7 @@ M: Palmer Dabbelt <palmer@sifive.com>
-> >   M: Alistair Francis <Alistair.Francis@wdc.com>
-> >   M: Sagar Karandikar <sagark@eecs.berkeley.edu>
-> >   M: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-> > +L: qemu-riscv@nongnu.org
-> >   S: Maintained
-> >   F: target/riscv/
-> >   F: hw/riscv/
-> >
+> I suggest submitting a patch to MAINTAINERS that adds an
+> L: qemu-riscv@nongnu.org
+> line to the RISC-V section of that file.
+>
+> thanks
+> -- PMM
 >
