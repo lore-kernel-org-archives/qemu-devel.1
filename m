@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38874)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39966)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gHWEO-0004H6-P7
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:47:01 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gHWHG-0007dj-Hx
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:49:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gHWEK-00026m-GB
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:47:00 -0400
-Date: Tue, 30 Oct 2018 16:46:33 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20181030164633.2c8f21d3.cohuck@redhat.com>
-In-Reply-To: <6fd9e9f8-838a-a13c-e957-a8e6bcb74c42@redhat.com>
-References: <20181030111348.14713-1-kraxel@redhat.com>
-	<20181030111348.14713-2-kraxel@redhat.com>
-	<8c224534-c929-7c7f-a126-a9390bbdb77f@redhat.com>
-	<20181030140030.gh5aa7jcgszrfajs@sirius.home.kraxel.org>
-	<6fd9e9f8-838a-a13c-e957-a8e6bcb74c42@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gHWHF-0006OQ-LU
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:49:58 -0400
+Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:37856)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gHWHF-0006Kh-7c
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:49:57 -0400
+Received: by mail-ot1-x32b.google.com with SMTP id o14so11555536oth.4
+	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 08:49:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/4] add QemuSupportState
+In-Reply-To: <20181029212501.5897-1-jsnow@redhat.com>
+References: <20181029212501.5897-1-jsnow@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 30 Oct 2018 15:49:36 +0000
+Message-ID: <CAFEAcA8ro+Hcq6y6Q=4e0kVNzuai36jWxsBKwRsgAUrB_PgdMQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/19] Bitmaps patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,92 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, =?UTF-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>
+To: John Snow <jsnow@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue, 30 Oct 2018 15:13:45 +0100
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
+On 29 October 2018 at 21:24, John Snow <jsnow@redhat.com> wrote:
+> The following changes since commit 62b658db1df7c6fa574caae038144f24bf6ca495:
+>
+>   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2018-10-29 17:03:27 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/jnsnow/qemu.git tags/bitmaps-pull-request
+>
+> for you to fetch changes up to 3e6d88f280a53b5b399e73b1f80efe4c3db306f1:
+>
+>   iotests: 169: add cases for source vm resuming (2018-10-29 16:23:17 -0400)
+>
+> ----------------------------------------------------------------
+> Pull request
+>
+> ----------------------------------------------------------------
 
-> On 30/10/18 15:00, Gerd Hoffmann wrote:
-> > On Tue, Oct 30, 2018 at 02:32:40PM +0100, Philippe Mathieu-Daud=C3=A9 w=
-rote: =20
-> >>> +##
-> >>> +# @SupportState:
-> >>> +#
-> >>> +# Indicate Support level of qemu devices, backends, subsystems, ...
-> >>> +#
-> >>> +# Since: 3.2
-> >>> +##
-> >>> +{ 'enum': 'SupportState',
-> >>> +  'data': [ 'unknown', =20
-> >>
-> >> 'unknown' is scary and should be fixed. =20
-> >=20
-> > 'unknown' maps to "0" due to being first in list, so this is what you
-> > get when it isn't explicitly set to something else.  Which make sense
-> > IMHO. =20
->=20
-> Yes, I understand in your next patch, this case won't display warning to=
-=20
-> the user.
->=20
-> I wanted to say "we should fix those entries in the MAINTAINERS file".
+Applied, thanks.
 
-I think that has been an ongoing quest for years :)
-
->=20
-> >  =20
-> >>> +            'supported',
-> >>> +            'maintained',
-> >>> +            'odd-fixes', =20
-> >>
-> >> All those fit in 'supported'
-> >> =20
-> >>> +            'orphan',
-> >>> +            'obsolete',
-> >>> +            'deprecated' ] } =20
-> >>
-> >> And all those should appear as 'deprecated' IMHO. =20
-> >=20
-> > See minutes on deprecation discussion.  Seems there is agreement we
-> > need something more finegrained than "supported" and "deprecated". =20
->=20
-> I read again the "Minutes of KVM Forum BoF on deprecating stuff" thread=20
-> and don't find details on finegrains, can you point it to me?
->=20
-> I think these are fine in the MAINTAINERS entries, but don't give useful=
-=20
-> information to a QEMU user that is not custom to MAINTAINERS.
-
-We might squash 'supported' and 'maintained' together (as their only
-real difference is whether someone gets paid for it), but 'odd fixes'
-is different IMO (you have someone to talk to, but they don't dedicate
-much of their time to it.)
-
->=20
-> As a user I'd expect anything not "supported" to be eventually "deprecate=
-d".
-
-But there are differences:
-- 'orphan' - nobody is looking after it; should become 'deprecated' if
-  nobody steps up, but may move to one of the 'someone looks after it'
-  states
-- 'obsolete' - don't use this; should move to 'deprecated' once a
-  replacement is ready (or it is not needed anymore)
-- 'deprecated' - on the removal schedule; has not necessarily been in
-  'orphan' or 'obsolete' before
-
->=20
-> Should we continue this discussion on the "Minutes of KVM Forum BoF on=20
-> deprecating stuff" thread?
->=20
-> Thanks,
->=20
-> Phil.
->=20
-> >=20
-> > cheers,
-> >    Gerd
-> >=20
-> >  =20
->=20
+-- PMM
