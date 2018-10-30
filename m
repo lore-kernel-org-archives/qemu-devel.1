@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53024)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1gHQML-0006lH-Bi
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 05:30:50 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gHQPF-0000Pq-OL
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 05:33:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1gHQMH-0001Pr-9u
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 05:30:49 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:34410)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1gHQMH-00018k-02
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 05:30:45 -0400
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Tue, 30 Oct 2018 12:30:31 +0300
-Message-ID: <20181030093031.10131.17221.stgit@pasha-VirtualBox>
+	(envelope-from <peter.maydell@linaro.org>) id 1gHQPD-0003PO-Iu
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 05:33:49 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:45638)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gHQP7-0003JU-HF
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 05:33:43 -0400
+Received: by mail-ot1-x341.google.com with SMTP id q25so10403014otn.12
+	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 02:33:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] target/ppc: fix mtmsr instruction for icount
+In-Reply-To: <c097d8c.a587.166c2c22a77.Coremail.wj193102@163.com>
+References: <c097d8c.a587.166c2c22a77.Coremail.wj193102@163.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 30 Oct 2018 09:33:15 +0000
+Message-ID: <CAFEAcA-r=71qgPByUWuKsSAwiRA2S7qidtrrWyRuHvrckAvxSQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] qemu3.0.0: Linux on non x86 CPUs run Wine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,59 +28,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, agraf@suse.de, pavel.dovgaluk@ispras.ru, david@gibson.dropbear.id.au
+To: wj193102 <wj193102@163.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-This patch fixes processing of mtmsr instructions in icount mode.
-In this mode writing to interrupt/peripheral state is controlled
-by can_do_io flag. This flag must be set explicitly before helper
-function invocation.
+On 30 October 2018 at 02:16, wj193102 <wj193102@163.com> wrote:
+> Hi, everyone.
+>     When I have installed the QEMU3.0.0 in the Linux on non X86 CPUS, I want to use user space emulator to run Wine. I can get the source code for Wine and the RPM file for Wine from the WineHQ web page.
+> I used to compile Wine in the X86-based Linux system and used it to run most Win32 programs. Now I want to  use it on the non X86 CPUS by QEMU. But I can't get the function to install and use the Wine. Please give me some advice
+> or some functions to finish it. Thanks a lot.
 
-Signed-off-by: Maria Klimushenkova <maria.klimushenkova@ispras.ru>
-Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
----
- target/ppc/translate.c |   12 ++++++++++++
- 1 file changed, 12 insertions(+)
+I'm afraid you will need to provide more detail for us to
+help here. What exactly are you doing? Which commands are you
+running? What is the exact error message or failure you see?
 
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index 4e59dd5..987ce6e 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -4257,11 +4257,17 @@ static void gen_mtmsrd(DisasContext *ctx)
-          *      if we enter power saving mode, we will exit the loop
-          *      directly from ppc_store_msr
-          */
-+        if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-+            gen_io_start();
-+        }
-         gen_update_nip(ctx, ctx->base.pc_next);
-         gen_helper_store_msr(cpu_env, cpu_gpr[rS(ctx->opcode)]);
-         /* Must stop the translation as machine state (may have) changed */
-         /* Note that mtmsr is not always defined as context-synchronizing */
-         gen_stop_exception(ctx);
-+        if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-+            gen_io_end();
-+        }
-     }
- #endif /* !defined(CONFIG_USER_ONLY) */
- }
-@@ -4286,6 +4292,9 @@ static void gen_mtmsr(DisasContext *ctx)
-          *      if we enter power saving mode, we will exit the loop
-          *      directly from ppc_store_msr
-          */
-+        if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-+            gen_io_start();
-+        }
-         gen_update_nip(ctx, ctx->base.pc_next);
- #if defined(TARGET_PPC64)
-         tcg_gen_deposit_tl(msr, cpu_msr, cpu_gpr[rS(ctx->opcode)], 0, 32);
-@@ -4293,6 +4302,9 @@ static void gen_mtmsr(DisasContext *ctx)
-         tcg_gen_mov_tl(msr, cpu_gpr[rS(ctx->opcode)]);
- #endif
-         gen_helper_store_msr(cpu_env, msr);
-+        if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-+            gen_io_end();
-+        }
-         tcg_temp_free(msr);
-         /* Must stop the translation as machine state (may have) changed */
-         /* Note that mtmsr is not always defined as context-synchronizing */
+>    Meanwhile, I use the command "qemu-i386/qemu-x86_64 *.sh" to
+> run the application from the X86 CPUS on non X86 CPUS, I get the
+> error information:"Invalid ELF image for this architecture". Why
+> the error is comming? What can I do to resolve this problem?
+
+This is probably because you are trying to run a shell script.
+(I'm guessing this from the '.sh' extension). This won't work.
+QEMU only runs actual executables (ELF files).
+
+Usually the setup is that the host Linux system is set up
+with binfmt-misc, so that if it encounters a guest-architecture
+binary it will automatically run it under QEMU. Usually
+this is done to allow running guest binaries inside a chroot.
+
+thanks
+-- PMM
