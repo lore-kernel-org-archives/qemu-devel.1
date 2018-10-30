@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48218)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48313)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gHa28-00082L-V5
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:50:38 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gHa2B-00084D-Cg
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:50:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gHa26-0002IO-6h
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:50:36 -0400
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:33939)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gHa2A-0002NV-HE
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:50:39 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33605)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gHa25-0001yK-R9
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:50:34 -0400
-Received: by mail-wr1-x42e.google.com with SMTP id l6-v6so13982594wrt.1
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 12:50:14 -0700 (PDT)
-Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
-	g76-v6sm17480094wmd.25.2018.10.30.12.50.12
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 30 Oct 2018 12:50:12 -0700 (PDT)
+	id 1gHa2A-0002MN-7e
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:50:38 -0400
+Received: by mail-wr1-x444.google.com with SMTP id u1-v6so14003950wrn.0
+	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 12:50:38 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 30 Oct 2018 20:50:01 +0100
-Message-Id: <1540929011-19894-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 00/10] Misc patches for 2018-10-30
+Date: Tue, 30 Oct 2018 20:50:11 +0100
+Message-Id: <1540929011-19894-11-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1540929011-19894-1-git-send-email-pbonzini@redhat.com>
+References: <1540929011-19894-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PULL 10/10] lsi53c895a: check message length value is
+ valid
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,71 +29,77 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Prasad J Pandit <pjp@fedoraproject.org>
 
-The following changes since commit a2e002ff7913ce93aa0f7dbedd2123dce5f1a9cd:
+From: Prasad J Pandit <pjp@fedoraproject.org>
 
-  Merge remote-tracking branch 'remotes/vivier2/tags/qemu-trivial-for-3.1-pull-request' into staging (2018-10-30 15:49:55 +0000)
+While writing a message in 'lsi_do_msgin', message length value
+in 'msg_len' could be invalid due to an invalid migration stream.
+Add an assertion to avoid an out of bounds access, and reject
+the incoming migration data if it contains an invalid message
+length.
 
-are available in the git repository at:
+Discovered by Deja vu Security. Reported by Oracle.
 
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+Message-Id: <20181026194314.18663-1-ppandit@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ hw/scsi/lsi53c895a.c | 19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
 
-  git://github.com/bonzini/qemu.git tags/for-upstream
-
-for you to fetch changes up to 2e14019d2a37f32ccecd786d8be4e9a70094e7f7:
-
-  lsi53c895a: check message length value is valid (2018-10-30 20:46:25 +0100)
-
-Already all bugfixes except for a single patch by Vitaly.
-
-----------------------------------------------------------------
-* icount fix (Clement)
-* dumping fixes for non-volatile memory (Marc-André, myself)
-* x86 emulation fix (Rudolf)
-* recent Hyper-V CPUID flag (Vitaly)
-* Q35 doc fix (Daniel)
-* lsi fix (Prasad)
-
-----------------------------------------------------------------
-Clement Deschamps (1):
-      icount: fix deadlock when all cpus are sleeping
-
-Daniel P. Berrangé (1):
-      i386: clarify that the Q35 machine type implements a P35 chipset
-
-Marc-André Lureau (3):
-      memory: learn about non-volatile memory region
-      nvdimm: set non-volatile on the memory region
-      memory-mapping: skip non-volatile memory regions in GuestPhysBlockList
-
-Paolo Bonzini (2):
-      MAINTAINERS: remove or downgrade myself to reviewer from some subsystems
-      scripts/dump-guest-memory: Synchronize with guest_phys_blocks_region_add
-
-Prasad J Pandit (1):
-      lsi53c895a: check message length value is valid
-
-Rudolf Marek (1):
-      target/i386: Clear RF on SYSCALL instruction
-
-Vitaly Kuznetsov (1):
-      x86: hv_evmcs CPU flag support
-
- MAINTAINERS                  | 13 ++++++-------
- cpus.c                       |  8 ++++++++
- docs/devel/migration.rst     |  1 +
- hw/mem/nvdimm.c              |  1 +
- hw/pci-host/q35.c            | 10 +++++++++-
- hw/scsi/lsi53c895a.c         | 19 +++++++++++++++++--
- include/exec/memory.h        | 25 ++++++++++++++++++++++++
- include/hw/pci/pci_ids.h     |  2 +-
- memory.c                     | 45 ++++++++++++++++++++++++++++++++++----------
- memory_mapping.c             |  3 ++-
- scripts/dump-guest-memory.py |  4 +++-
- target/i386/cpu.c            |  1 +
- target/i386/cpu.h            |  1 +
- target/i386/hyperv-proto.h   |  2 ++
- target/i386/kvm.c            | 30 +++++++++++++++++++++++++++--
- target/i386/seg_helper.c     |  4 ++--
- 16 files changed, 142 insertions(+), 27 deletions(-)
+diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
+index d1e6534..3f207f6 100644
+--- a/hw/scsi/lsi53c895a.c
++++ b/hw/scsi/lsi53c895a.c
+@@ -861,10 +861,11 @@ static void lsi_do_status(LSIState *s)
+ 
+ static void lsi_do_msgin(LSIState *s)
+ {
+-    int len;
++    uint8_t len;
+     trace_lsi_do_msgin(s->dbc, s->msg_len);
+     s->sfbr = s->msg[0];
+     len = s->msg_len;
++    assert(len > 0 && len <= LSI_MAX_MSGIN_LEN);
+     if (len > s->dbc)
+         len = s->dbc;
+     pci_dma_write(PCI_DEVICE(s), s->dnad, s->msg, len);
+@@ -1705,8 +1706,10 @@ static uint8_t lsi_reg_readb(LSIState *s, int offset)
+         break;
+     case 0x58: /* SBDL */
+         /* Some drivers peek at the data bus during the MSG IN phase.  */
+-        if ((s->sstat1 & PHASE_MASK) == PHASE_MI)
++        if ((s->sstat1 & PHASE_MASK) == PHASE_MI) {
++            assert(s->msg_len > 0);
+             return s->msg[0];
++        }
+         ret = 0;
+         break;
+     case 0x59: /* SBDL high */
+@@ -2103,11 +2106,23 @@ static int lsi_pre_save(void *opaque)
+     return 0;
+ }
+ 
++static int lsi_post_load(void *opaque, int version_id)
++{
++    LSIState *s = opaque;
++
++    if (s->msg_len < 0 || s->msg_len > LSI_MAX_MSGIN_LEN) {
++        return -EINVAL;
++    }
++
++    return 0;
++}
++
+ static const VMStateDescription vmstate_lsi_scsi = {
+     .name = "lsiscsi",
+     .version_id = 0,
+     .minimum_version_id = 0,
+     .pre_save = lsi_pre_save,
++    .post_load = lsi_post_load,
+     .fields = (VMStateField[]) {
+         VMSTATE_PCI_DEVICE(parent_obj, LSIState),
+ 
 -- 
 1.8.3.1
