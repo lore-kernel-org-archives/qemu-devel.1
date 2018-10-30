@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46534)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46424)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHVGw-0008Ez-6p
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:45:39 -0400
+	(envelope-from <flukshun@gmail.com>) id 1gHVGV-0007n7-Nj
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:45:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHVGn-0001AH-HZ
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:45:28 -0400
-Received: from mail-qt1-x82a.google.com ([2607:f8b0:4864:20::82a]:35635)
+	(envelope-from <flukshun@gmail.com>) id 1gHVGQ-0000cA-JF
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:45:07 -0400
+Received: from mail-qk1-x72f.google.com ([2607:f8b0:4864:20::72f]:35458)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHVGn-000168-8x
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:45:25 -0400
-Received: by mail-qt1-x82a.google.com with SMTP id a10-v6so13732970qtp.2
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 07:45:22 -0700 (PDT)
+	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHVGQ-0000bm-En
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:45:02 -0400
+Received: by mail-qk1-x72f.google.com with SMTP id v68-v6so7396843qka.2
+	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 07:45:02 -0700 (PDT)
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue, 30 Oct 2018 09:43:38 -0500
-Message-Id: <20181030144358.23144-5-mdroth@linux.vnet.ibm.com>
+Date: Tue, 30 Oct 2018 09:43:35 -0500
+Message-Id: <20181030144358.23144-2-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20181030144358.23144-1-mdroth@linux.vnet.ibm.com>
 References: <20181030144358.23144-1-mdroth@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 04/24] configure: add test for libudev
+Subject: [Qemu-devel] [PULL 01/24] qga: Support Unicode paths in
+ guest-file-open on win32
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,75 +28,89 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
+Cc: peter.maydell@linaro.org, Jonathon Reinhart <jreinhart@cc-sw.com>
 
-From: Tomáš Golembiovský <tgolembi@redhat.com>
+From: Jonathon Reinhart <jreinhart@cc-sw.com>
 
-Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-*make libudev optional to avoid breaking existing build/test environments
+Currently, the win32 port of QEMU Guest Agent does not properly handle Unicode
+paths. The JSON decoder produces a valid UTF-8 path string, but this is passed
+directly to CreateFileA, which is expecting an ANSI string and not UTF-8. This
+leads to mangled filenames.
+
+This patch follows the example of qmp_guest_set_user_password() and uses
+g_utf8_to_utf16() to convert the string to UTF-16 and calls CreateFileW()
+explicitly.
+
+Signed-off-by: Jonathon Reinhart <jreinhart@cc-sw.com>
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- configure | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ qga/commands-win32.c | 24 +++++++++++++++++++-----
+ 1 file changed, 19 insertions(+), 5 deletions(-)
 
-diff --git a/configure b/configure
-index 1c473ce95b..eea3b0c7a4 100755
---- a/configure
-+++ b/configure
-@@ -474,6 +474,7 @@ libxml2=""
- docker="no"
- debug_mutex="no"
- libpmem=""
-+libudev="no"
+diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+index 98d9735389..416343b97b 100644
+--- a/qga/commands-win32.c
++++ b/qga/commands-win32.c
+@@ -160,13 +160,15 @@ static void handle_set_nonblocking(HANDLE fh)
+ int64_t qmp_guest_file_open(const char *path, bool has_mode,
+                             const char *mode, Error **errp)
+ {
+-    int64_t fd;
++    int64_t fd = -1;
+     HANDLE fh;
+     HANDLE templ_file = NULL;
+     DWORD share_mode = FILE_SHARE_READ;
+     DWORD flags_and_attr = FILE_ATTRIBUTE_NORMAL;
+     LPSECURITY_ATTRIBUTES sa_attr = NULL;
+     OpenFlags *guest_flags;
++    GError *gerr = NULL;
++    wchar_t *w_path = NULL;
  
- # cross compilers defaults, can be overridden with --cross-cc-ARCH
- cross_cc_aarch64="aarch64-linux-gnu-gcc"
-@@ -870,6 +871,7 @@ Linux)
-   vhost_vsock="yes"
-   QEMU_INCLUDES="-I\$(SRC_PATH)/linux-headers -I$(pwd)/linux-headers $QEMU_INCLUDES"
-   supported_os="yes"
-+  libudev="yes"
- ;;
- esac
- 
-@@ -5603,6 +5605,17 @@ if test "$libnfs" != "no" ; then
-   fi
- fi
- 
-+##########################################
-+# Do we have libudev
-+if test "$libudev" != "no" ; then
-+  if $pkg_config libudev; then
-+    libudev="yes"
-+    libudev_libs=$($pkg_config --libs libudev)
-+  else
-+    libudev="no"
-+  fi
-+fi
+     if (!has_mode) {
+         mode = "r";
+@@ -175,16 +177,21 @@ int64_t qmp_guest_file_open(const char *path, bool has_mode,
+     guest_flags = find_open_flag(mode);
+     if (guest_flags == NULL) {
+         error_setg(errp, "invalid file open mode");
+-        return -1;
++        goto done;
++    }
 +
- # Now we've finished running tests it's OK to add -Werror to the compiler flags
- if test "$werror" = "yes"; then
-     QEMU_CFLAGS="-Werror $QEMU_CFLAGS"
-@@ -6027,6 +6040,7 @@ echo "VxHS block device $vxhs"
- echo "capstone          $capstone"
- echo "docker            $docker"
- echo "libpmem support   $libpmem"
-+echo "libudev           $libudev"
++    w_path = g_utf8_to_utf16(path, -1, NULL, NULL, &gerr);
++    if (!w_path) {
++        goto done;
+     }
  
- if test "$sdl_too_old" = "yes"; then
- echo "-> Your SDL version is too old - please upgrade to have SDL support"
-@@ -6862,6 +6876,11 @@ if test "$docker" != "no"; then
-     echo "HAVE_USER_DOCKER=y" >> $config_host_mak
- fi
+-    fh = CreateFile(path, guest_flags->desired_access, share_mode, sa_attr,
++    fh = CreateFileW(w_path, guest_flags->desired_access, share_mode, sa_attr,
+                     guest_flags->creation_disposition, flags_and_attr,
+                     templ_file);
+     if (fh == INVALID_HANDLE_VALUE) {
+         error_setg_win32(errp, GetLastError(), "failed to open file '%s'",
+                          path);
+-        return -1;
++        goto done;
+     }
  
-+if test "$libudev" != "no"; then
-+    echo "CONFIG_LIBUDEV=y" >> $config_host_mak
-+    echo "LIBUDEV_LIBS=$libudev_libs" >> $config_host_mak
-+fi
+     /* set fd non-blocking to avoid common use cases (like reading from a
+@@ -196,10 +203,17 @@ int64_t qmp_guest_file_open(const char *path, bool has_mode,
+     if (fd < 0) {
+         CloseHandle(fh);
+         error_setg(errp, "failed to add handle to qmp handle table");
+-        return -1;
++        goto done;
+     }
+ 
+     slog("guest-file-open, handle: % " PRId64, fd);
 +
- # use included Linux headers
- if test "$linux" = "yes" ; then
-   mkdir -p linux-headers
++done:
++    if (gerr) {
++        error_setg(errp, QERR_QGA_COMMAND_FAILED, gerr->message);
++        g_error_free(gerr);
++    }
++    g_free(w_path);
+     return fd;
+ }
+ 
 -- 
 2.17.1
