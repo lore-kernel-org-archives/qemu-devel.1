@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57014)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gHT7n-00088N-KF
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:28:00 -0400
+	(envelope-from <smarkovic@wavecomp.com>) id 1gHTAx-0002kZ-6Y
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:31:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gHT7j-0002rj-Et
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:27:59 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:55844)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gHT7i-0002qk-MS
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:27:55 -0400
-Received: by mail-wm1-x344.google.com with SMTP id s10-v6so11549893wmc.5
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 05:27:54 -0700 (PDT)
-References: <20181025144644.15464-1-cota@braap.org>
-	<20181025144644.15464-4-cota@braap.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181025144644.15464-4-cota@braap.org>
-Date: Tue, 30 Oct 2018 12:27:51 +0000
-Message-ID: <87sh0n8vqw.fsf@linaro.org>
+	(envelope-from <smarkovic@wavecomp.com>) id 1gHTAs-0005sB-Kt
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:31:14 -0400
+Received: from mail-sn1nam01on0102.outbound.protection.outlook.com
+	([104.47.32.102]:46564
+	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <smarkovic@wavecomp.com>)
+	id 1gHTAs-0005qK-9U
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:31:10 -0400
+From: Stefan Markovic <smarkovic@wavecomp.com>
+Date: Tue, 30 Oct 2018 12:31:05 +0000
+Message-ID: <d59581ae-c9f0-f62d-da5f-f8b52eaca0f7@wavecomp.com>
+References: <1540899411-16761-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1540899411-16761-2-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1540899411-16761-2-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <6145D8DB26D3CA4C9FCC7F2F56886072@namprd22.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v4 04/71] cpu: make qemu_work_cond per-cpu
+Subject: Re: [Qemu-devel] [PATCH v2 1/5] target/mips: Rename MMI-related
+ masks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,245 +33,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>
 
-
-Emilio G. Cota <cota@braap.org> writes:
-
-> This eliminates the need to use the BQL to queue CPU work.
->
-> While at it, give the per-cpu field a generic name ("cond") since
-> it will soon be used for more than just queueing CPU work.
->
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  include/qom/cpu.h |  6 ++--
->  cpus-common.c     | 72 ++++++++++++++++++++++++++++++++++++++---------
->  cpus.c            |  2 +-
->  qom/cpu.c         |  1 +
->  4 files changed, 63 insertions(+), 18 deletions(-)
->
-> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-> index 7fdb5a2be0..2fad537a4f 100644
-> --- a/include/qom/cpu.h
-> +++ b/include/qom/cpu.h
-> @@ -316,6 +316,7 @@ struct qemu_work_item;
->   * @mem_io_vaddr: Target virtual address at which the memory was accesse=
-d.
->   * @kvm_fd: vCPU file descriptor for KVM.
->   * @lock: Lock to prevent multiple access to per-CPU fields.
-> + * @cond: Condition variable for per-CPU events.
->   * @work_list: List of pending asynchronous work.
->   * @trace_dstate_delayed: Delayed changes to trace_dstate (includes all =
-changes
->   *                        to @trace_dstate).
-> @@ -358,6 +359,7 @@ struct CPUState {
->
->      QemuMutex lock;
->      /* fields below protected by @lock */
-> +    QemuCond cond;
->      QSIMPLEQ_HEAD(, qemu_work_item) work_list;
->
->      CPUAddressSpace *cpu_ases;
-> @@ -769,12 +771,10 @@ bool cpu_is_stopped(CPUState *cpu);
->   * @cpu: The vCPU to run on.
->   * @func: The function to be executed.
->   * @data: Data to pass to the function.
-> - * @mutex: Mutex to release while waiting for @func to run.
->   *
->   * Used internally in the implementation of run_on_cpu.
->   */
-> -void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data =
-data,
-> -                   QemuMutex *mutex);
-> +void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data =
-data);
->
->  /**
->   * run_on_cpu:
-> diff --git a/cpus-common.c b/cpus-common.c
-> index 2913294cb7..71469c85ce 100644
-> --- a/cpus-common.c
-> +++ b/cpus-common.c
-> @@ -26,7 +26,6 @@
->  static QemuMutex qemu_cpu_list_lock;
->  static QemuCond exclusive_cond;
->  static QemuCond exclusive_resume;
-> -static QemuCond qemu_work_cond;
->
->  /* >=3D 1 if a thread is inside start_exclusive/end_exclusive.  Written
->   * under qemu_cpu_list_lock, read with atomic operations.
-> @@ -42,7 +41,6 @@ void qemu_init_cpu_list(void)
->      qemu_mutex_init(&qemu_cpu_list_lock);
->      qemu_cond_init(&exclusive_cond);
->      qemu_cond_init(&exclusive_resume);
-> -    qemu_cond_init(&qemu_work_cond);
->  }
->
->  void cpu_list_lock(void)
-> @@ -113,23 +111,37 @@ struct qemu_work_item {
->      bool free, exclusive, done;
->  };
->
-> -static void queue_work_on_cpu(CPUState *cpu, struct qemu_work_item *wi)
-> +/* Called with the CPU's lock held */
-> +static void queue_work_on_cpu_locked(CPUState *cpu, struct qemu_work_ite=
-m *wi)
->  {
-> -    qemu_mutex_lock(&cpu->lock);
->      QSIMPLEQ_INSERT_TAIL(&cpu->work_list, wi, node);
->      wi->done =3D false;
-> -    qemu_mutex_unlock(&cpu->lock);
->
->      qemu_cpu_kick(cpu);
->  }
->
-> -void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data =
-data,
-> -                   QemuMutex *mutex)
-> +static void queue_work_on_cpu(CPUState *cpu, struct qemu_work_item *wi)
-> +{
-> +    cpu_mutex_lock(cpu);
-> +    queue_work_on_cpu_locked(cpu, wi);
-> +    cpu_mutex_unlock(cpu);
-> +}
-> +
-> +void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data =
-data)
->  {
->      struct qemu_work_item wi;
-> +    bool has_bql =3D qemu_mutex_iothread_locked();
-> +
-> +    g_assert(no_cpu_mutex_locked());
->
->      if (qemu_cpu_is_self(cpu)) {
-> -        func(cpu, data);
-> +        if (has_bql) {
-> +            func(cpu, data);
-> +        } else {
-> +            qemu_mutex_lock_iothread();
-> +            func(cpu, data);
-> +            qemu_mutex_unlock_iothread();
-> +        }
->          return;
->      }
->
-> @@ -139,13 +151,34 @@ void do_run_on_cpu(CPUState *cpu, run_on_cpu_func f=
-unc, run_on_cpu_data data,
->      wi.free =3D false;
->      wi.exclusive =3D false;
->
-> -    queue_work_on_cpu(cpu, &wi);
-> +    cpu_mutex_lock(cpu);
-> +    queue_work_on_cpu_locked(cpu, &wi);
-> +
-> +    /*
-> +     * We are going to sleep on the CPU lock, so release the BQL.
-> +     *
-> +     * During the transition to per-CPU locks, we release the BQL _after_
-> +     * having kicked the destination CPU (from queue_work_on_cpu_locked =
-above).
-> +     * This makes sure that the enqueued work will be seen by the CPU
-> +     * after being woken up from the kick, since the CPU sleeps on the B=
-QL.
-> +     * Once we complete the transition to per-CPU locks, we will release
-> +     * the BQL earlier in this function.
-> +     */
-> +    if (has_bql) {
-> +        qemu_mutex_unlock_iothread();
-> +    }
-> +
->      while (!atomic_mb_read(&wi.done)) {
->          CPUState *self_cpu =3D current_cpu;
->
-> -        qemu_cond_wait(&qemu_work_cond, mutex);
-> +        qemu_cond_wait(&cpu->cond, &cpu->lock);
->          current_cpu =3D self_cpu;
->      }
-> +    cpu_mutex_unlock(cpu);
-> +
-> +    if (has_bql) {
-> +        qemu_mutex_lock_iothread();
-> +    }
->  }
->
->  void async_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_da=
-ta data)
-> @@ -307,6 +340,7 @@ void async_safe_run_on_cpu(CPUState *cpu, run_on_cpu_=
-func func,
->  void process_queued_cpu_work(CPUState *cpu)
->  {
->      struct qemu_work_item *wi;
-> +    bool has_bql =3D qemu_mutex_iothread_locked();
->
->      qemu_mutex_lock(&cpu->lock);
->      if (QSIMPLEQ_EMPTY(&cpu->work_list)) {
-> @@ -324,13 +358,23 @@ void process_queued_cpu_work(CPUState *cpu)
->               * BQL, so it goes to sleep; start_exclusive() is sleeping t=
-oo, so
->               * neither CPU can proceed.
->               */
-> -            qemu_mutex_unlock_iothread();
-> +            if (has_bql) {
-> +                qemu_mutex_unlock_iothread();
-> +            }
->              start_exclusive();
->              wi->func(cpu, wi->data);
->              end_exclusive();
-> -            qemu_mutex_lock_iothread();
-> +            if (has_bql) {
-> +                qemu_mutex_lock_iothread();
-> +            }
->          } else {
-> -            wi->func(cpu, wi->data);
-> +            if (has_bql) {
-> +                wi->func(cpu, wi->data);
-> +            } else {
-> +                qemu_mutex_lock_iothread();
-> +                wi->func(cpu, wi->data);
-> +                qemu_mutex_unlock_iothread();
-> +            }
->          }
->          qemu_mutex_lock(&cpu->lock);
->          if (wi->free) {
-> @@ -340,5 +384,5 @@ void process_queued_cpu_work(CPUState *cpu)
->          }
->      }
->      qemu_mutex_unlock(&cpu->lock);
-> -    qemu_cond_broadcast(&qemu_work_cond);
-> +    qemu_cond_broadcast(&cpu->cond);
->  }
-> diff --git a/cpus.c b/cpus.c
-> index 38cc9e1278..d0b7f8e02d 100644
-> --- a/cpus.c
-> +++ b/cpus.c
-> @@ -1236,7 +1236,7 @@ void qemu_init_cpu_loop(void)
->
->  void run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data dat=
-a)
->  {
-> -    do_run_on_cpu(cpu, func, data, &qemu_global_mutex);
-> +    do_run_on_cpu(cpu, func, data);
->  }
->
->  static void qemu_kvm_destroy_vcpu(CPUState *cpu)
-> diff --git a/qom/cpu.c b/qom/cpu.c
-> index d0758c907d..bb031a3a6a 100644
-> --- a/qom/cpu.c
-> +++ b/qom/cpu.c
-> @@ -373,6 +373,7 @@ static void cpu_common_initfn(Object *obj)
->      cpu->nr_threads =3D 1;
->
->      qemu_mutex_init(&cpu->lock);
-> +    qemu_cond_init(&cpu->cond);
->      QSIMPLEQ_INIT(&cpu->work_list);
->      QTAILQ_INIT(&cpu->breakpoints);
->      QTAILQ_INIT(&cpu->watchpoints);
-
-
---
-Alex Benn=C3=A9e
+DQpPbiAzMC4xMC4xOC4gMTI6MzYsIEFsZWtzYW5kYXIgTWFya292aWMgd3JvdGU6DQo+IEZyb206
+IEFsZWtzYW5kYXIgTWFya292aWMgPGFtYXJrb3ZpY0B3YXZlY29tcC5jb20+DQo+DQo+IFJlbmFt
+ZSBNTUktcmVsYXRlZCBtYXNrcy4NCj4NCj4gU2lnbmVkLW9mZi1ieTogQWxla3NhbmRhciBNYXJr
+b3ZpYyA8YW1hcmtvdmljQHdhdmVjb21wLmNvbT4NCj4gLS0tDQo+ICAgdGFyZ2V0L21pcHMvdHJh
+bnNsYXRlLmMgfCAyMCArKysrKysrKysrLS0tLS0tLS0tLQ0KPiAgIDEgZmlsZSBjaGFuZ2VkLCAx
+MCBpbnNlcnRpb25zKCspLCAxMCBkZWxldGlvbnMoLSkNCg0KDQpSZXZpZXdlZC1ieTogU3RlZmFu
+IE1hcmtvdmljIDxzbWFya292aWNAd2F2ZWNvbXAuY29tPg0KDQoNCj4gZGlmZiAtLWdpdCBhL3Rh
+cmdldC9taXBzL3RyYW5zbGF0ZS5jIGIvdGFyZ2V0L21pcHMvdHJhbnNsYXRlLmMNCj4gaW5kZXgg
+NTFhNTQ4OC4uZTM4ZDUwZCAxMDA2NDQNCj4gLS0tIGEvdGFyZ2V0L21pcHMvdHJhbnNsYXRlLmMN
+Cj4gKysrIGIvdGFyZ2V0L21pcHMvdHJhbnNsYXRlLmMNCj4gQEAgLTIxNTksNyArMjE1OSw3IEBA
+IGVudW0gew0KPiAgICAqICAgIDcgMTExIHwgICAqICAgfCAgICogICB8ICAgKiAgIHwgICAqICAg
+fCBQU0xMVyB8ICAgKiAgIHwgUFNSTFcgfCBQU1JBVw0KPiAgICAqLw0KPiAgIA0KPiAtI2RlZmlu
+ZSBNQVNLX1RYNzlfTU1JKG9wKSAoTUFTS19PUF9NQUpPUihvcCkgfCAoKG9wKSAmIDB4M0YpKQ0K
+PiArI2RlZmluZSBNQVNLX01NSShvcCkgKE1BU0tfT1BfTUFKT1Iob3ApIHwgKChvcCkgJiAweDNG
+KSkNCj4gICBlbnVtIHsNCj4gICAgICAgVFg3OV9NTUlfTUFERCAgICAgICA9IDB4MDAgfCBUWDc5
+X0NMQVNTX01NSSwgLyogU2FtZSBhcyBPUENfTUFERCAqLw0KPiAgICAgICBUWDc5X01NSV9NQURE
+VSAgICAgID0gMHgwMSB8IFRYNzlfQ0xBU1NfTU1JLCAvKiBTYW1lIGFzIE9QQ19NQUREVSAqLw0K
+PiBAQCAtMjIxMCw3ICsyMjEwLDcgQEAgZW51bSB7DQo+ICAgICogICAgNyAxMTEgfCAgICogICB8
+ICAgKiAgIHwgUEVYVDUgfCBQUEFDNQ0KPiAgICAqLw0KPiAgIA0KPiAtI2RlZmluZSBNQVNLX1RY
+NzlfTU1JMChvcCkgKE1BU0tfT1BfTUFKT1Iob3ApIHwgKChvcCkgJiAweDdGRikpDQo+ICsjZGVm
+aW5lIE1BU0tfTU1JMChvcCkgKE1BU0tfT1BfTUFKT1Iob3ApIHwgKChvcCkgJiAweDdGRikpDQo+
+ICAgZW51bSB7DQo+ICAgICAgIFRYNzlfTU1JMF9QQUREVyAgPSAoMHgwMCA8PCA2KSB8IFRYNzlf
+TU1JX0NMQVNTX01NSTAsDQo+ICAgICAgIFRYNzlfTU1JMF9QU1VCVyAgPSAoMHgwMSA8PCA2KSB8
+IFRYNzlfTU1JX0NMQVNTX01NSTAsDQo+IEBAIC0yMjYxLDcgKzIyNjEsNyBAQCBlbnVtIHsNCj4g
+ICAgKiAgICA3IDExMSB8ICAgKiAgIHwgICAqICAgfCAgICogICB8ICAgKg0KPiAgICAqLw0KPiAg
+IA0KPiAtI2RlZmluZSBNQVNLX1RYNzlfTU1JMShvcCkgKE1BU0tfT1BfTUFKT1Iob3ApIHwgKChv
+cCkgJiAweDdGRikpDQo+ICsjZGVmaW5lIE1BU0tfTU1JMShvcCkgKE1BU0tfT1BfTUFKT1Iob3Ap
+IHwgKChvcCkgJiAweDdGRikpDQo+ICAgZW51bSB7DQo+ICAgICAgIFRYNzlfTU1JMV9QQUJTVyAg
+PSAoMHgwMSA8PCA2KSB8IFRYNzlfTU1JX0NMQVNTX01NSTEsDQo+ICAgICAgIFRYNzlfTU1JMV9Q
+Q0VRVyAgPSAoMHgwMiA8PCA2KSB8IFRYNzlfTU1JX0NMQVNTX01NSTEsDQo+IEBAIC0yMzA1LDcg
+KzIzMDUsNyBAQCBlbnVtIHsNCj4gICAgKiAgICA3IDExMSB8IFBNVUxUSHwgUERJVkJXfCBQRVhF
+VyB8IFBST1QzVw0KPiAgICAqLw0KPiAgIA0KPiAtI2RlZmluZSBNQVNLX1RYNzlfTU1JMihvcCkg
+KE1BU0tfT1BfTUFKT1Iob3ApIHwgKChvcCkgJiAweDdGRikpDQo+ICsjZGVmaW5lIE1BU0tfTU1J
+MihvcCkgKE1BU0tfT1BfTUFKT1Iob3ApIHwgKChvcCkgJiAweDdGRikpDQo+ICAgZW51bSB7DQo+
+ICAgICAgIFRYNzlfTU1JMl9QTUFERFcgPSAoMHgwMCA8PCA2KSB8IFRYNzlfTU1JX0NMQVNTX01N
+STIsDQo+ICAgICAgIFRYNzlfTU1JMl9QU0xMVlcgPSAoMHgwMiA8PCA2KSB8IFRYNzlfTU1JX0NM
+QVNTX01NSTIsDQo+IEBAIC0yMzUzLDcgKzIzNTMsNyBAQCBlbnVtIHsNCj4gICAgKiAgICA3IDEx
+MSB8ICAgKiAgIHwgICAqICAgfCBQRVhDVyB8ICAgKg0KPiAgICAqLw0KPiAgIA0KPiAtI2RlZmlu
+ZSBNQVNLX1RYNzlfTU1JMyhvcCkgKE1BU0tfT1BfTUFKT1Iob3ApIHwgKChvcCkgJiAweDdGRikp
+DQo+ICsjZGVmaW5lIE1BU0tfTU1JMyhvcCkgKE1BU0tfT1BfTUFKT1Iob3ApIHwgKChvcCkgJiAw
+eDdGRikpDQo+ICAgZW51bSB7DQo+ICAgICAgIFRYNzlfTU1JM19QTUFERFVXID0gKDB4MDAgPDwg
+NikgfCBUWDc5X01NSV9DTEFTU19NTUkzLA0KPiAgICAgICBUWDc5X01NSTNfUFNSQVZXICA9ICgw
+eDAzIDw8IDYpIHwgVFg3OV9NTUlfQ0xBU1NfTU1JMywNCj4gQEAgLTI0NjgzLDcgKzI0NjgzLDcg
+QEAgc3RhdGljIHZvaWQgZGVjb2RlX29wY19zcGVjaWFsM19sZWdhY3koQ1BVTUlQU1N0YXRlICpl
+bnYsIERpc2FzQ29udGV4dCAqY3R4KQ0KPiAgIA0KPiAgIHN0YXRpYyB2b2lkIGRlY29kZV90eDc5
+X21taTAoQ1BVTUlQU1N0YXRlICplbnYsIERpc2FzQ29udGV4dCAqY3R4KQ0KPiAgIHsNCj4gLSAg
+ICB1aW50MzJfdCBvcGMgPSBNQVNLX1RYNzlfTU1JMChjdHgtPm9wY29kZSk7DQo+ICsgICAgdWlu
+dDMyX3Qgb3BjID0gTUFTS19NTUkwKGN0eC0+b3Bjb2RlKTsNCj4gICANCj4gICAgICAgc3dpdGNo
+IChvcGMpIHsNCj4gICAgICAgY2FzZSBUWDc5X01NSTBfUEFERFc6ICAgICAvKiBUT0RPOiBUWDc5
+X01NSTBfUEFERFcgKi8NCj4gQEAgLTI0NzIyLDcgKzI0NzIyLDcgQEAgc3RhdGljIHZvaWQgZGVj
+b2RlX3R4NzlfbW1pMChDUFVNSVBTU3RhdGUgKmVudiwgRGlzYXNDb250ZXh0ICpjdHgpDQo+ICAg
+DQo+ICAgc3RhdGljIHZvaWQgZGVjb2RlX3R4NzlfbW1pMShDUFVNSVBTU3RhdGUgKmVudiwgRGlz
+YXNDb250ZXh0ICpjdHgpDQo+ICAgew0KPiAtICAgIHVpbnQzMl90IG9wYyA9IE1BU0tfVFg3OV9N
+TUkxKGN0eC0+b3Bjb2RlKTsNCj4gKyAgICB1aW50MzJfdCBvcGMgPSBNQVNLX01NSTEoY3R4LT5v
+cGNvZGUpOw0KPiAgIA0KPiAgICAgICBzd2l0Y2ggKG9wYykgew0KPiAgICAgICBjYXNlIFRYNzlf
+TU1JMV9QQUJTVzogICAgIC8qIFRPRE86IFRYNzlfTU1JMV9QQUJTVyAqLw0KPiBAQCAtMjQ3NTQs
+NyArMjQ3NTQsNyBAQCBzdGF0aWMgdm9pZCBkZWNvZGVfdHg3OV9tbWkxKENQVU1JUFNTdGF0ZSAq
+ZW52LCBEaXNhc0NvbnRleHQgKmN0eCkNCj4gICANCj4gICBzdGF0aWMgdm9pZCBkZWNvZGVfdHg3
+OV9tbWkyKENQVU1JUFNTdGF0ZSAqZW52LCBEaXNhc0NvbnRleHQgKmN0eCkNCj4gICB7DQo+IC0g
+ICAgdWludDMyX3Qgb3BjID0gTUFTS19UWDc5X01NSTIoY3R4LT5vcGNvZGUpOw0KPiArICAgIHVp
+bnQzMl90IG9wYyA9IE1BU0tfTU1JMihjdHgtPm9wY29kZSk7DQo+ICAgDQo+ICAgICAgIHN3aXRj
+aCAob3BjKSB7DQo+ICAgICAgIGNhc2UgVFg3OV9NTUkyX1BNQUREVzogICAgLyogVE9ETzogVFg3
+OV9NTUkyX1BNQUREVyAqLw0KPiBAQCAtMjQ3OTAsNyArMjQ3OTAsNyBAQCBzdGF0aWMgdm9pZCBk
+ZWNvZGVfdHg3OV9tbWkyKENQVU1JUFNTdGF0ZSAqZW52LCBEaXNhc0NvbnRleHQgKmN0eCkNCj4g
+ICANCj4gICBzdGF0aWMgdm9pZCBkZWNvZGVfdHg3OV9tbWkzKENQVU1JUFNTdGF0ZSAqZW52LCBE
+aXNhc0NvbnRleHQgKmN0eCkNCj4gICB7DQo+IC0gICAgdWludDMyX3Qgb3BjID0gTUFTS19UWDc5
+X01NSTMoY3R4LT5vcGNvZGUpOw0KPiArICAgIHVpbnQzMl90IG9wYyA9IE1BU0tfTU1JMyhjdHgt
+Pm9wY29kZSk7DQo+ICAgDQo+ICAgICAgIHN3aXRjaCAob3BjKSB7DQo+ICAgICAgIGNhc2UgVFg3
+OV9NTUkzX1BNQUREVVc6ICAgIC8qIFRPRE86IFRYNzlfTU1JM19QTUFERFVXICovDQo+IEBAIC0y
+NDgxNyw3ICsyNDgxNyw3IEBAIHN0YXRpYyB2b2lkIGRlY29kZV90eDc5X21taTMoQ1BVTUlQU1N0
+YXRlICplbnYsIERpc2FzQ29udGV4dCAqY3R4KQ0KPiAgIA0KPiAgIHN0YXRpYyB2b2lkIGRlY29k
+ZV90eDc5X21taShDUFVNSVBTU3RhdGUgKmVudiwgRGlzYXNDb250ZXh0ICpjdHgpDQo+ICAgew0K
+PiAtICAgIHVpbnQzMl90IG9wYyA9IE1BU0tfVFg3OV9NTUkoY3R4LT5vcGNvZGUpOw0KPiArICAg
+IHVpbnQzMl90IG9wYyA9IE1BU0tfTU1JKGN0eC0+b3Bjb2RlKTsNCj4gICAgICAgaW50IHJzID0g
+ZXh0cmFjdDMyKGN0eC0+b3Bjb2RlLCAyMSwgNSk7DQo+ICAgICAgIGludCBydCA9IGV4dHJhY3Qz
+MihjdHgtPm9wY29kZSwgMTYsIDUpOw0KPiAgICAgICBpbnQgcmQgPSBleHRyYWN0MzIoY3R4LT5v
+cGNvZGUsIDExLCA1KTsNCg==
