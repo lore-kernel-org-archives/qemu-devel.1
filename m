@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50671)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44029)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sebastien.boeuf@intel.com>) id 1gHH4W-0008TT-Q0
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 19:35:52 -0400
+	(envelope-from <liq3ea@outlook.com>) id 1gHIi3-0006ZU-I9
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 21:20:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sebastien.boeuf@intel.com>) id 1gHH4S-00080O-5m
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 19:35:48 -0400
-Received: from mga03.intel.com ([134.134.136.65]:46842)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sebastien.boeuf@intel.com>)
-	id 1gHH4Q-0007wN-4E
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 19:35:44 -0400
-From: "Boeuf, Sebastien" <sebastien.boeuf@intel.com>
-Date: Mon, 29 Oct 2018 23:35:26 +0000
-Message-ID: <1E91073893EF8F498411079ED374F91245EE1730@ORSMSX115.amr.corp.intel.com>
-References: <20181029170159.3801-1-sameo@linux.intel.com>
-	<20181029170159.3801-17-sameo@linux.intel.com>,
-	<5d77ee72-8073-d5c3-6859-842846442cce@redhat.com>
-In-Reply-To: <5d77ee72-8073-d5c3-6859-842846442cce@redhat.com>
+	(envelope-from <liq3ea@outlook.com>) id 1gHIhz-0006NU-Gk
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 21:20:43 -0400
+Received: from mail-oln040092011010.outbound.protection.outlook.com
+	([40.92.11.10]:6031
+	helo=NAM04-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <liq3ea@outlook.com>) id 1gHIhv-0006Ei-QF
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 21:20:37 -0400
+From: li qiang <liq3ea@outlook.com>
+Date: Tue, 30 Oct 2018 01:20:15 +0000
+Message-ID: <BN6PR18MB1220E5E9E7F8856800C675239FCC0@BN6PR18MB1220.namprd18.prod.outlook.com>
+References: <20181028124004.30494-1-liq3ea@163.com>
+	<20181028124004.30494-3-liq3ea@163.com>
+	<3a1b60e0-fe90-4da7-210e-4519f220bb9f@redhat.com>
+In-Reply-To: <3a1b60e0-fe90-4da7-210e-4519f220bb9f@redhat.com>
 Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <74A235F32216D34C92E18C156BF978C6@namprd18.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 16/19] hw: acpi: Retrieve the PCI bus
- from AcpiPciHpState
+Subject: Re: [Qemu-devel] [PATCH 2/2] tests: fw_cfg: add reboot_timeout test
+ case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,154 +33,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>, Samuel
-	Ortiz <sameo@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jing Liu <jing2.liu@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor
-	Mammedov <imammedo@redhat.com>
+To: =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, Li Qiang <liq3ea@163.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "thuth@redhat.com" <thuth@redhat.com>, "lvivier@redhat.com" <lvivier@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Glad you think it's worth it.=0A=
-=0A=
-Thanks,=0A=
-Sebastien=0A=
-________________________________________=0A=
-From: Philippe Mathieu-Daud=E9 [philmd@redhat.com]=0A=
-Sent: Monday, October 29, 2018 2:02 PM=0A=
-To: Samuel Ortiz; qemu-devel@nongnu.org=0A=
-Cc: Michael S. Tsirkin; Jing Liu; Boeuf, Sebastien; Paolo Bonzini; Igor Mam=
-medov=0A=
-Subject: Re: [Qemu-devel] [PATCH v3 16/19] hw: acpi: Retrieve the PCI bus f=
-rom AcpiPciHpState=0A=
-=0A=
-On 29/10/18 18:01, Samuel Ortiz wrote:=0A=
-> From: Sebastien Boeuf <sebastien.boeuf@intel.com>=0A=
->=0A=
-> Instead of using the machine type specific method find_i440fx() to=0A=
-> retrieve the PCI bus, this commit aims to rely on the fact that the=0A=
-> PCI bus is known by the structure AcpiPciHpState.=0A=
->=0A=
-> When the structure is initialized through acpi_pcihp_init() call,=0A=
-> it saves the PCI bus, which means there is no need to invoke a=0A=
-> special function later on.=0A=
->=0A=
-> Based on the fact that find_i440fx() was only used there, this=0A=
-> patch also removes the function find_i440fx() itself from the=0A=
-> entire codebase.=0A=
-=0A=
-Nice :)=0A=
-=0A=
->=0A=
-> Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>=0A=
-> Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>=0A=
-=0A=
-Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>=0A=
-Tested-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>=0A=
-=0A=
-> ---=0A=
->   hw/acpi/pcihp.c       | 10 ++++------=0A=
->   hw/pci-host/piix.c    |  8 --------=0A=
->   include/hw/i386/pc.h  |  1 -=0A=
->   stubs/Makefile.objs   |  1 -=0A=
->   stubs/pci-host-piix.c |  6 ------=0A=
->   5 files changed, 4 insertions(+), 22 deletions(-)=0A=
->   delete mode 100644 stubs/pci-host-piix.c=0A=
->=0A=
-> diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c=0A=
-> index 80d42e12ff..254b2e50ab 100644=0A=
-> --- a/hw/acpi/pcihp.c=0A=
-> +++ b/hw/acpi/pcihp.c=0A=
-> @@ -93,10 +93,9 @@ static void *acpi_set_bsel(PCIBus *bus, void *opaque)=
-=0A=
->       return bsel_alloc;=0A=
->   }=0A=
->=0A=
-> -static void acpi_set_pci_info(void)=0A=
-> +static void acpi_set_pci_info(AcpiPciHpState *s)=0A=
->   {=0A=
->       static bool bsel_is_set;=0A=
-> -    PCIBus *bus;=0A=
->       unsigned bsel_alloc =3D ACPI_PCIHP_BSEL_DEFAULT;=0A=
->=0A=
->       if (bsel_is_set) {=0A=
-> @@ -104,10 +103,9 @@ static void acpi_set_pci_info(void)=0A=
->       }=0A=
->       bsel_is_set =3D true;=0A=
->=0A=
-> -    bus =3D find_i440fx(); /* TODO: Q35 support */=0A=
-> -    if (bus) {=0A=
-> +    if (s->root) {=0A=
->           /* Scan all PCI buses. Set property to enable acpi based hotplu=
-g. */=0A=
-> -        pci_for_each_bus_depth_first(bus, acpi_set_bsel, NULL, &bsel_all=
-oc);=0A=
-> +        pci_for_each_bus_depth_first(s->root, acpi_set_bsel, NULL, &bsel=
-_alloc);=0A=
->       }=0A=
->   }=0A=
->=0A=
-> @@ -213,7 +211,7 @@ static void acpi_pcihp_update(AcpiPciHpState *s)=0A=
->=0A=
->   void acpi_pcihp_reset(AcpiPciHpState *s)=0A=
->   {=0A=
-> -    acpi_set_pci_info();=0A=
-> +    acpi_set_pci_info(s);=0A=
->       acpi_pcihp_update(s);=0A=
->   }=0A=
->=0A=
-> diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c=0A=
-> index da73743fa2..4940f59c9b 100644=0A=
-> --- a/hw/pci-host/piix.c=0A=
-> +++ b/hw/pci-host/piix.c=0A=
-> @@ -445,14 +445,6 @@ PCIBus *i440fx_init(const char *host_type, const cha=
-r *pci_type,=0A=
->       return b;=0A=
->   }=0A=
->=0A=
-> -PCIBus *find_i440fx(void)=0A=
-> -{=0A=
-> -    PCIHostState *s =3D OBJECT_CHECK(PCIHostState,=0A=
-> -                                   object_resolve_path("/machine/i440fx"=
-, NULL),=0A=
-> -                                   TYPE_PCI_HOST_BRIDGE);=0A=
-> -    return s ? s->bus : NULL;=0A=
-> -}=0A=
-> -=0A=
->   /* PIIX3 PCI to ISA bridge */=0A=
->   static void piix3_set_irq_pic(PIIX3State *piix3, int pic_irq)=0A=
->   {=0A=
-> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h=0A=
-> index 7d177cd207..f6b2649cf8 100644=0A=
-> --- a/include/hw/i386/pc.h=0A=
-> +++ b/include/hw/i386/pc.h=0A=
-> @@ -260,7 +260,6 @@ PCIBus *i440fx_init(const char *host_type, const char=
- *pci_type,=0A=
->                       MemoryRegion *pci_memory,=0A=
->                       MemoryRegion *ram_memory);=0A=
->=0A=
-> -PCIBus *find_i440fx(void);=0A=
->   /* piix4.c */=0A=
->   extern PCIDevice *piix4_dev;=0A=
->   int piix4_init(PCIBus *bus, ISABus **isa_bus, int devfn);=0A=
-> diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs=0A=
-> index 5dd0aeeec6..725f78bedc 100644=0A=
-> --- a/stubs/Makefile.objs=0A=
-> +++ b/stubs/Makefile.objs=0A=
-> @@ -41,6 +41,5 @@ stub-obj-y +=3D pc_madt_cpu_entry.o=0A=
->   stub-obj-y +=3D vmgenid.o=0A=
->   stub-obj-y +=3D xen-common.o=0A=
->   stub-obj-y +=3D xen-hvm.o=0A=
-> -stub-obj-y +=3D pci-host-piix.o=0A=
->   stub-obj-y +=3D ram-block.o=0A=
->   stub-obj-y +=3D ramfb.o=0A=
-> diff --git a/stubs/pci-host-piix.c b/stubs/pci-host-piix.c=0A=
-> deleted file mode 100644=0A=
-> index 6ed81b1f21..0000000000=0A=
-> --- a/stubs/pci-host-piix.c=0A=
-> +++ /dev/null=0A=
-> @@ -1,6 +0,0 @@=0A=
-> -#include "qemu/osdep.h"=0A=
-> -#include "hw/i386/pc.h"=0A=
-> -PCIBus *find_i440fx(void)=0A=
-> -{=0A=
-> -    return NULL;=0A=
-> -}=0A=
->=0A=
+DQrlnKggMjAxOC8xMC8zMCA4OjA4LCBQaGlsaXBwZSBNYXRoaWV1LURhdWTDqSDlhpnpgZM6DQo+
+IE9uIDI4LzEwLzE4IDEzOjQwLCBMaSBRaWFuZyB3cm90ZToNCj4+IFNpZ25lZC1vZmYtYnk6IExp
+IFFpYW5nIDxsaXEzZWFAMTYzLmNvbT4NCj4+IC0tLQ0KPj4gwqAgdGVzdHMvZndfY2ZnLXRlc3Qu
+YyB8IDEzICsrKysrKysrKysrKy0NCj4+IMKgIDEgZmlsZSBjaGFuZ2VkLCAxMiBpbnNlcnRpb25z
+KCspLCAxIGRlbGV0aW9uKC0pDQo+Pg0KPj4gZGlmZiAtLWdpdCBhL3Rlc3RzL2Z3X2NmZy10ZXN0
+LmMgYi90ZXN0cy9md19jZmctdGVzdC5jDQo+PiBpbmRleCAxYzUxMDNmZTFjLi4zNzc2NWYxNWY4
+IDEwMDY0NA0KPj4gLS0tIGEvdGVzdHMvZndfY2ZnLXRlc3QuYw0KPj4gKysrIGIvdGVzdHMvZndf
+Y2ZnLXRlc3QuYw0KPj4gQEAgLTk5LDYgKzk5LDE1IEBAIHN0YXRpYyB2b2lkIHRlc3RfZndfY2Zn
+X2Jvb3RfbWVudSh2b2lkKQ0KPj4gwqDCoMKgwqDCoCBnX2Fzc2VydF9jbXBpbnQocWZ3X2NmZ19n
+ZXRfdTE2KGZ3X2NmZywgRldfQ0ZHX0JPT1RfTUVOVSksID09LCANCj4+IGJvb3RfbWVudSk7DQo+
+PiDCoCB9DQo+PiDCoCArc3RhdGljIHZvaWQgdGVzdF9md19jZmdfcmVib290X3RpbWVvdXQodm9p
+ZCkNCj4+ICt7DQo+PiArwqDCoMKgIHVpbnQzMl90IHJlYm9vdF90aW1lb3V0Ow0KPj4gKw0KPj4g
+K8KgwqDCoCBxZndfY2ZnX2dldF9maWxlKGZ3X2NmZywgImV0Yy9ib290LWZhaWwtd2FpdCIsDQo+
+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAmcmVib290X3RpbWVv
+dXQsIHNpemVvZihyZWJvb3RfdGltZW91dCkpOw0KPj4gK8KgwqDCoCBnX2Fzc2VydF9jbXBpbnQo
+cmVib290X3RpbWVvdXQsIDw9LCA2NTUzNSk7DQo+PiArfQ0KPj4gKw0KPj4gwqAgaW50IG1haW4o
+aW50IGFyZ2MsIGNoYXIgKiphcmd2KQ0KPj4gwqAgew0KPj4gwqDCoMKgwqDCoCBRVGVzdFN0YXRl
+ICpzOw0KPj4gQEAgLTEwNiw3ICsxMTUsOCBAQCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqKmFy
+Z3YpDQo+PiDCoCDCoMKgwqDCoMKgIGdfdGVzdF9pbml0KCZhcmdjLCAmYXJndiwgTlVMTCk7DQo+
+PiDCoCAtwqDCoMKgIHMgPSBxdGVzdF9pbml0KCItdXVpZCA0NjAwY2IzMi0zOGVjLTRiMmYtOGFj
+Yi04MWM2ZWE1NGYyZDgiKTsNCj4+ICvCoMKgwqAgcyA9IHF0ZXN0X2luaXQoIi11dWlkIDQ2MDBj
+YjMyLTM4ZWMtNGIyZi04YWNiLTgxYzZlYTU0ZjJkOCINCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqAgIiAtYm9vdCByZWJvb3QtdGltZW91dD00Mjk0OTY3Mjk1Iik7DQo+
+DQo+IEknZCByYXRoZXIgY2hhbmdlIHRoaXMgdGVzdCB0byB1c2UgcXRlc3RfYWRkX2RhdGFfZnVu
+YygpIC4uLjoNCj4NCj4gwqDCoMKgwqDCoMKgwqAgcXRlc3RfYWRkX2RhdGFfZnVuYygiZndfY2Zn
+L3JlYm9vdF90aW1lb3V0IiwgIi1ib290IA0KPiByZWJvb3QtdGltZW91dD00Mjk0OTY3Mjk1ICIs
+IHRlc3RfZndfY2ZnX3JlYm9vdF90aW1lb3V0KTsNCj4NCj4gLi4uIHRvIGF2b2lkIGFkZGluZyB0
+aGlzIGNvbW1hbmQgbGluZSBvcHRpb24gdG8gYWxsIHRoZSB0ZXN0cywgYmVjYXVzZSANCj4gYWxs
+IHRlc3RzIGFyZSBub3cgZmFpbGluZzoNCj4NCj4gJCBtYWtlIGNoZWNrLXF0ZXN0LWkzODYNCj4g
+Wy4uLl0NCj4gRVJST1I6cWVtdS90ZXN0cy9md19jZmctdGVzdC5jOjMzOnRlc3RfZndfY2ZnX3Np
+Z25hdHVyZTogYXNzZXJ0aW9uIA0KPiBmYWlsZWQgKGJ1ZiA9PSAiUUVNVSIpOiAoIlwzNzdcMzc3
+XDM3N1wzNzciID09ICJRRU1VIikNCj4gRVJST1I6cWVtdS90ZXN0cy9md19jZmctdGVzdC5jOjQw
+OnRlc3RfZndfY2ZnX2lkOiBhc3NlcnRpb24gZmFpbGVkOiANCj4gKChpZCA9PSAxKSB8fCAoaWQg
+PT0gMykpDQo+IEVSUk9SOnFlbXUvdGVzdHMvZndfY2ZnLXRlc3QuYzo1Mjp0ZXN0X2Z3X2NmZ191
+dWlkOiBhc3NlcnRpb24gZmFpbGVkOiANCj4gKG1lbWNtcChidWYsIHV1aWQsIHNpemVvZihidWYp
+KSA9PSAwKQ0KPiBFUlJPUjpxZW11L3Rlc3RzL2Z3X2NmZy10ZXN0LmM6NTc6dGVzdF9md19jZmdf
+cmFtX3NpemU6IGFzc2VydGlvbiANCj4gZmFpbGVkIChxZndfY2ZnX2dldF91NjQoZndfY2ZnLCBG
+V19DRkdfUkFNX1NJWkUpID09IHJhbV9zaXplKTogKC0xID09IA0KPiAxMzQyMTc3MjgpDQo+IEVS
+Uk9SOnFlbXUvdGVzdHMvZndfY2ZnLXRlc3QuYzo2Mjp0ZXN0X2Z3X2NmZ19ub2dyYXBoaWM6IGFz
+c2VydGlvbiANCj4gZmFpbGVkIChxZndfY2ZnX2dldF91MTYoZndfY2ZnLCBGV19DRkdfTk9HUkFQ
+SElDKSA9PSAwKTogKDY1NTM1ID09IDApDQo+IEVSUk9SOnFlbXUvdGVzdHMvZndfY2ZnLXRlc3Qu
+Yzo2Nzp0ZXN0X2Z3X2NmZ19uYl9jcHVzOiBhc3NlcnRpb24gDQo+IGZhaWxlZCAocWZ3X2NmZ19n
+ZXRfdTE2KGZ3X2NmZywgRldfQ0ZHX05CX0NQVVMpID09IG5iX2NwdXMpOiAoNjU1MzUgPT0gMSkN
+Cj4gRVJST1I6cWVtdS90ZXN0cy9md19jZmctdGVzdC5jOjcyOnRlc3RfZndfY2ZnX21heF9jcHVz
+OiBhc3NlcnRpb24gDQo+IGZhaWxlZCAocWZ3X2NmZ19nZXRfdTE2KGZ3X2NmZywgRldfQ0ZHX01B
+WF9DUFVTKSA9PSBtYXhfY3B1cyk6ICg2NTUzNSANCj4gPT0gMSkNCj4gRVJST1I6cWVtdS90ZXN0
+cy9md19jZmctdGVzdC5jOjgwOnRlc3RfZndfY2ZnX251bWE6IGFzc2VydGlvbiBmYWlsZWQgDQo+
+IChxZndfY2ZnX2dldF91NjQoZndfY2ZnLCBGV19DRkdfTlVNQSkgPT0gbmJfbm9kZXMpOiAoLTEg
+PT0gMCkNCj4gRVJST1I6cWVtdS90ZXN0cy9md19jZmctdGVzdC5jOjk5OnRlc3RfZndfY2ZnX2Jv
+b3RfbWVudTogYXNzZXJ0aW9uIA0KPiBmYWlsZWQgKHFmd19jZmdfZ2V0X3UxNihmd19jZmcsIEZX
+X0NGR19CT09UX01FTlUpID09IGJvb3RfbWVudSk6IA0KPiAoNjU1MzUgPT0gMCkNCj4NCj4NCj4g
+KGRpZCB5b3UgdGVzdCB5b3VyIHBhdGNoPykNCj4NCk9mIGNvdXJzZSBJIHRlc3QgaXQsIGJ1dCBv
+bmx5IGluIHg4Nl82NC4NCg0KDQpIZXJlIGlzIHRoZSByZXN1bHQgd2l0aG91dCB0aGUgZml4IHBh
+dGNoLg0KDQp4eHhxZW11IyBRVEVTVF9RRU1VX0JJTkFSWT14ODZfNjQtc29mdG1tdS9xZW11LXN5
+c3RlbS14ODZfNjQgDQp0ZXN0cy9md19jZmctdGVzdA0KL3g4Nl82NC9md19jZmcvc2lnbmF0dXJl
+OiBPSw0KL3g4Nl82NC9md19jZmcvaWQ6IE9LDQoveDg2XzY0L2Z3X2NmZy91dWlkOiBPSw0KL3g4
+Nl82NC9md19jZmcvcmFtX3NpemU6IE9LDQoveDg2XzY0L2Z3X2NmZy9ub2dyYXBoaWM6IE9LDQov
+eDg2XzY0L2Z3X2NmZy9uYl9jcHVzOiBPSw0KL3g4Nl82NC9md19jZmcvbWF4X2NwdXM6IE9LDQov
+eDg2XzY0L2Z3X2NmZy9udW1hOiBPSw0KL3g4Nl82NC9md19jZmcvYm9vdF9tZW51OiBPSw0KL3g4
+Nl82NC9md19jZmcvcmVib290X3RpbWVvdXQ6ICoqDQpFUlJPUjp0ZXN0cy9md19jZmctdGVzdC5j
+OjEwODp0ZXN0X2Z3X2NmZ19yZWJvb3RfdGltZW91dDogYXNzZXJ0aW9uIA0KZmFpbGVkIChyZWJv
+b3RfdGltZW91dCA8PSA2NTUzNSk6ICg0Mjk0OTY3Mjk1IDw9IDY1NTM1KQ0KQWJvcnRlZA0KeHh4
+cWVtdSMgbWFrZSBjaGVjay1xdGVzdC14ODZfNjQNCiDCoCBHVEVTVEVSIGNoZWNrLXF0ZXN0LXg4
+Nl82NA0KKioNCkVSUk9SOnRlc3RzL2Z3X2NmZy10ZXN0LmM6MTA4OnRlc3RfZndfY2ZnX3JlYm9v
+dF90aW1lb3V0OiBhc3NlcnRpb24gDQpmYWlsZWQgKHJlYm9vdF90aW1lb3V0IDw9IDY1NTM1KTog
+KDQyOTQ5NjcyOTUgPD0gNjU1MzUpDQpHVGVzdGVyOiBsYXN0IHJhbmRvbSBzZWVkOiBSMDJTZmVk
+NzE5MWVkZTRlZDYwZDRmMzA2OWY5ZWM4MDhlNzMNCnh4eHFlbXUvdGVzdHMvTWFrZWZpbGUuaW5j
+bHVkZTo4MDU6IHJlY2lwZSBmb3IgdGFyZ2V0IA0KJ2NoZWNrLXF0ZXN0LXg4Nl82NCcgZmFpbGVk
+DQptYWtlOiAqKiogW2NoZWNrLXF0ZXN0LXg4Nl82NF0gRXJyb3IgMQ0KDQpJIGRpZCBpdCBpbiBp
+Mzg2IHJpZ2h0IG5vdy4gRm9sbG93aW5nIGlzIHRoZSByZXN1bHRzOg0KDQp4eHhxZW11IyBRVEVT
+VF9RRU1VX0JJTkFSWT1pMzg2LXNvZnRtbXUvcWVtdS1zeXN0ZW0taTM4NiB0ZXN0cy9md19jZmct
+dGVzdA0KL2kzODYvZndfY2ZnL3NpZ25hdHVyZTogT0sNCi9pMzg2L2Z3X2NmZy9pZDogT0sNCi9p
+Mzg2L2Z3X2NmZy91dWlkOiBPSw0KL2kzODYvZndfY2ZnL3JhbV9zaXplOiBPSw0KL2kzODYvZndf
+Y2ZnL25vZ3JhcGhpYzogT0sNCi9pMzg2L2Z3X2NmZy9uYl9jcHVzOiBPSw0KL2kzODYvZndfY2Zn
+L21heF9jcHVzOiBPSw0KL2kzODYvZndfY2ZnL251bWE6IE9LDQovaTM4Ni9md19jZmcvYm9vdF9t
+ZW51OiBPSw0KL2kzODYvZndfY2ZnL3JlYm9vdF90aW1lb3V0OiAqKg0KRVJST1I6dGVzdHMvZndf
+Y2ZnLXRlc3QuYzoxMDg6dGVzdF9md19jZmdfcmVib290X3RpbWVvdXQ6IGFzc2VydGlvbiANCmZh
+aWxlZCAocmVib290X3RpbWVvdXQgPD0gNjU1MzUpOiAoNDI5NDk2NzI5NSA8PSA2NTUzNSkNCkFi
+b3J0ZWQNCnh4eHFlbXUjIG1ha2UgY2hlay1xdGVzdC1pMzg2DQptYWtlOiAqKiogTm8gcnVsZSB0
+byBtYWtlIHRhcmdldCAnY2hlay1xdGVzdC1pMzg2Jy7CoCBTdG9wLg0KeHh4cWVtdSMgbWFrZSBj
+aGVjay1xdGVzdC1pMzg2DQogwqAgR1RFU1RFUiBjaGVjay1xdGVzdC1pMzg2DQoqKg0KRVJST1I6
+dGVzdHMvZndfY2ZnLXRlc3QuYzoxMDg6dGVzdF9md19jZmdfcmVib290X3RpbWVvdXQ6IGFzc2Vy
+dGlvbiANCmZhaWxlZCAocmVib290X3RpbWVvdXQgPD0gNjU1MzUpOiAoNDI5NDk2NzI5NSA8PSA2
+NTUzNSkNCkdUZXN0ZXI6IGxhc3QgcmFuZG9tIHNlZWQ6IFIwMlM3NjU5YjM3OWU2NjU5NjFlMDA2
+MGFmZWI0NDk5NDhiMg0KeHh4cWVtdS90ZXN0cy9NYWtlZmlsZS5pbmNsdWRlOjgwNTogcmVjaXBl
+IGZvciB0YXJnZXQgJ2NoZWNrLXF0ZXN0LWkzODYnIA0KZmFpbGVkDQptYWtlOiAqKiogW2NoZWNr
+LXF0ZXN0LWkzODZdIEVycm9yIDENCg0KDQpUaGFua3MsDQoNCkxpIFFpYW5nDQoNCj4+IMKgIMKg
+wqDCoMKgwqAgZndfY2ZnID0gcGNfZndfY2ZnX2luaXQocyk7DQo+PiDCoCBAQCAtMTI1LDYgKzEz
+NSw3IEBAIGludCBtYWluKGludCBhcmdjLCBjaGFyICoqYXJndikNCj4+IMKgwqDCoMKgwqAgcXRl
+c3RfYWRkX2Z1bmMoImZ3X2NmZy9tYXhfY3B1cyIsIHRlc3RfZndfY2ZnX21heF9jcHVzKTsNCj4+
+IMKgwqDCoMKgwqAgcXRlc3RfYWRkX2Z1bmMoImZ3X2NmZy9udW1hIiwgdGVzdF9md19jZmdfbnVt
+YSk7DQo+PiDCoMKgwqDCoMKgIHF0ZXN0X2FkZF9mdW5jKCJmd19jZmcvYm9vdF9tZW51IiwgdGVz
+dF9md19jZmdfYm9vdF9tZW51KTsNCj4+ICvCoMKgwqAgcXRlc3RfYWRkX2Z1bmMoImZ3X2NmZy9y
+ZWJvb3RfdGltZW91dCIsIA0KPj4gdGVzdF9md19jZmdfcmVib290X3RpbWVvdXQpOw0KPj4gwqAg
+wqDCoMKgwqDCoCByZXQgPSBnX3Rlc3RfcnVuKCk7DQo+Pg0KPg0K
