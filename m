@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53397)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gHVcd-0005tw-HR
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:08:04 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gHVcn-0006Hg-Aa
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:08:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gHVca-0006HL-FQ
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:07:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32782)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gHVcj-0006kJ-10
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:08:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58866)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gHVca-0005MP-3O
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:07:56 -0400
+	id 1gHVci-0006h9-IQ
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:08:04 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 30 Oct 2018 19:04:51 +0400
-Message-Id: <20181030150453.9344-9-marcandre.lureau@redhat.com>
+Date: Tue, 30 Oct 2018 19:04:53 +0400
+Message-Id: <20181030150453.9344-11-marcandre.lureau@redhat.com>
 In-Reply-To: <20181030150453.9344-1-marcandre.lureau@redhat.com>
 References: <20181030150453.9344-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 08/10] tests: add user-creatable test to
- test-qdev-global-props
+Subject: [Qemu-devel] [PATCH v2 10/10] hostmem: use object id for memory
+ region name with >= 3.1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,246 +31,222 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Amit Shah <amit@kernel.org>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, dgilbert@redhat.com, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Add a TYPE_USER_CREATABLE object global property check.
+hostmem-file and hostmem-memfd use the whole object path for the
+memory region name, and hostname-ram uses only the path component (the
+object id, or canonical path basename):
 
-Rename the test, since it is no longer QDev-specific.
+qemu -m 1024 -object memory-backend-file,id=3Dmem,size=3D1G,mem-path=3D/t=
+mp/foo -numa node,memdev=3Dmem -monitor stdio
+(qemu) info ramblock
+              Block Name    PSize              Offset               Used =
+             Total
+            /objects/mem    4 KiB  0x0000000000000000 0x0000000040000000 =
+0x0000000040000000
+
+qemu -m 1024 -object memory-backend-memfd,id=3Dmem,size=3D1G -numa node,m=
+emdev=3Dmem -monitor stdio
+(qemu) info ramblock
+              Block Name    PSize              Offset               Used =
+             Total
+            /objects/mem    4 KiB  0x0000000000000000 0x0000000040000000 =
+0x0000000040000000
+
+qemu -m 1024 -object memory-backend-ram,id=3Dmem,size=3D1G -numa node,mem=
+dev=3Dmem -monitor stdio
+(qemu) info ramblock
+              Block Name    PSize              Offset               Used =
+             Total
+                     mem    4 KiB  0x0000000000000000 0x0000000040000000 =
+0x0000000040000000
+
+Use the object id for -file and -memfd with >=3D 3.1 for consistency.
+Having a consistent naming allow to migrate to different hostmem
+backends.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- ...dev-global-props.c =3D> test-global-props.c} | 128 ++++++++++++++++--
- tests/Makefile.include                        |   4 +-
- 2 files changed, 117 insertions(+), 15 deletions(-)
- rename tests/{test-qdev-global-props.c =3D> test-global-props.c} (74%)
+ include/hw/compat.h      | 11 ++++++++++-
+ include/sysemu/hostmem.h |  3 ++-
+ backends/hostmem-file.c  |  8 ++++----
+ backends/hostmem-memfd.c |  2 +-
+ backends/hostmem-ram.c   |  9 ++++-----
+ backends/hostmem.c       | 30 ++++++++++++++++++++++++++++++
+ 6 files changed, 51 insertions(+), 12 deletions(-)
 
-diff --git a/tests/test-qdev-global-props.c b/tests/test-global-props.c
-similarity index 74%
-rename from tests/test-qdev-global-props.c
-rename to tests/test-global-props.c
-index 08e7f5c8e5..df047bfa1c 100644
---- a/tests/test-qdev-global-props.c
-+++ b/tests/test-global-props.c
-@@ -27,7 +27,100 @@
- #include "hw/qdev.h"
- #include "qom/object.h"
- #include "qapi/visitor.h"
-+#include "qom/object_interfaces.h"
+diff --git a/include/hw/compat.h b/include/hw/compat.h
+index 6f4d5fc647..60f4a939a7 100644
+--- a/include/hw/compat.h
++++ b/include/hw/compat.h
+@@ -2,7 +2,16 @@
+ #define HW_COMPAT_H
 =20
-+#define TYPE_DUMMY "qemu-dummy"
-+
-+typedef struct DummyObject DummyObject;
-+typedef struct DummyObjectClass DummyObjectClass;
-+
-+#define DUMMY_OBJECT(obj)                           \
-+    OBJECT_CHECK(DummyObject, (obj), TYPE_DUMMY)
-+
-+struct DummyObject {
-+    Object parent_obj;
-+
-+    char *sv;
-+};
-+
-+struct DummyObjectClass {
-+    ObjectClass parent_class;
-+};
-+
-+static void dummy_set_sv(Object *obj,
-+                         const char *value,
-+                         Error **errp)
+ #define HW_COMPAT_3_0 \
+-    /* empty */
++    {\
++        .driver   =3D "memory-backend-file",\
++        .property =3D "x-use-canonical-path-for-ramblock-id",\
++        .value    =3D "true",\
++    },\
++    {\
++        .driver   =3D "memory-backend-memfd",\
++        .property =3D "x-use-canonical-path-for-ramblock-id",\
++        .value    =3D "true",\
++    },
+=20
+ #define HW_COMPAT_2_12 \
+     {\
+diff --git a/include/sysemu/hostmem.h b/include/sysemu/hostmem.h
+index 6e6bd2c1cb..a023b372a4 100644
+--- a/include/sysemu/hostmem.h
++++ b/include/sysemu/hostmem.h
+@@ -53,7 +53,7 @@ struct HostMemoryBackend {
+=20
+     /* protected */
+     uint64_t size;
+-    bool merge, dump;
++    bool merge, dump, use_canonical_path;
+     bool prealloc, force_prealloc, is_mapped, share;
+     DECLARE_BITMAP(host_nodes, MAX_NODES + 1);
+     HostMemPolicy policy;
+@@ -67,5 +67,6 @@ MemoryRegion *host_memory_backend_get_memory(HostMemory=
+Backend *backend);
+ void host_memory_backend_set_mapped(HostMemoryBackend *backend, bool map=
+ped);
+ bool host_memory_backend_is_mapped(HostMemoryBackend *backend);
+ size_t host_memory_backend_pagesize(HostMemoryBackend *memdev);
++char *host_memory_backend_get_name(HostMemoryBackend *backend);
+=20
+ #endif
+diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
+index 639c8d4307..c01a7cdf8d 100644
+--- a/backends/hostmem-file.c
++++ b/backends/hostmem-file.c
+@@ -55,16 +55,16 @@ file_backend_memory_alloc(HostMemoryBackend *backend,=
+ Error **errp)
+     error_setg(errp, "-mem-path not supported on this host");
+ #else
+     if (!host_memory_backend_mr_inited(backend)) {
+-        gchar *path;
++        gchar *name;
+         backend->force_prealloc =3D mem_prealloc;
+-        path =3D object_get_canonical_path(OBJECT(backend));
++        name =3D host_memory_backend_get_name(backend);
+         memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
+-                                 path,
++                                 name,
+                                  backend->size, fb->align,
+                                  (backend->share ? RAM_SHARED : 0) |
+                                  (fb->is_pmem ? RAM_PMEM : 0),
+                                  fb->mem_path, errp);
+-        g_free(path);
++        g_free(name);
+     }
+ #endif
+ }
+diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
+index b6836b28e5..c5a4a9b530 100644
+--- a/backends/hostmem-memfd.c
++++ b/backends/hostmem-memfd.c
+@@ -57,7 +57,7 @@ memfd_backend_memory_alloc(HostMemoryBackend *backend, =
+Error **errp)
+         return;
+     }
+=20
+-    name =3D object_get_canonical_path(OBJECT(backend));
++    name =3D host_memory_backend_get_name(backend);
+     memory_region_init_ram_from_fd(&backend->mr, OBJECT(backend),
+                                    name, backend->size, true, fd, errp);
+     g_free(name);
+diff --git a/backends/hostmem-ram.c b/backends/hostmem-ram.c
+index 7ddd08d370..24b65d9ae3 100644
+--- a/backends/hostmem-ram.c
++++ b/backends/hostmem-ram.c
+@@ -16,21 +16,20 @@
+=20
+ #define TYPE_MEMORY_BACKEND_RAM "memory-backend-ram"
+=20
+-
+ static void
+ ram_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
+ {
+-    char *path;
++    char *name;
+=20
+     if (!backend->size) {
+         error_setg(errp, "can't create backend with size 0");
+         return;
+     }
+=20
+-    path =3D object_get_canonical_path_component(OBJECT(backend));
+-    memory_region_init_ram_shared_nomigrate(&backend->mr, OBJECT(backend=
+), path,
++    name =3D host_memory_backend_get_name(backend);
++    memory_region_init_ram_shared_nomigrate(&backend->mr, OBJECT(backend=
+), name,
+                            backend->size, backend->share, errp);
+-    g_free(path);
++    g_free(name);
+ }
+=20
+ static void
+diff --git a/backends/hostmem.c b/backends/hostmem.c
+index 1a89342039..0032232866 100644
+--- a/backends/hostmem.c
++++ b/backends/hostmem.c
+@@ -28,6 +28,16 @@ QEMU_BUILD_BUG_ON(HOST_MEM_POLICY_BIND !=3D MPOL_BIND)=
+;
+ QEMU_BUILD_BUG_ON(HOST_MEM_POLICY_INTERLEAVE !=3D MPOL_INTERLEAVE);
+ #endif
+=20
++char *
++host_memory_backend_get_name(HostMemoryBackend *self)
 +{
-+    DummyObject *dobj =3D DUMMY_OBJECT(obj);
-+
-+    g_free(dobj->sv);
-+    dobj->sv =3D g_strdup(value);
-+}
-+
-+static char *dummy_get_sv(Object *obj,
-+                          Error **errp)
-+{
-+    DummyObject *dobj =3D DUMMY_OBJECT(obj);
-+
-+    return g_strdup(dobj->sv);
-+}
-+
-+
-+
-+static void dummy_class_init(ObjectClass *cls, void *data)
-+{
-+    object_class_property_add_str(cls, "sv",
-+                                  dummy_get_sv,
-+                                  dummy_set_sv,
-+                                  NULL);
-+}
-+
-+
-+static void dummy_finalize(Object *obj)
-+{
-+    DummyObject *dobj =3D DUMMY_OBJECT(obj);
-+
-+    g_free(dobj->sv);
-+}
-+
-+
-+static const TypeInfo dummy_info =3D {
-+    .name          =3D TYPE_DUMMY,
-+    .parent        =3D TYPE_OBJECT,
-+    .instance_size =3D sizeof(DummyObject),
-+    .instance_finalize =3D dummy_finalize,
-+    .class_size =3D sizeof(DummyObjectClass),
-+    .class_init =3D dummy_class_init,
-+    .interfaces =3D (InterfaceInfo[]) {
-+        { TYPE_USER_CREATABLE },
-+        { }
++    if (!self->use_canonical_path) {
++        return object_get_canonical_path_component(OBJECT(self));
 +    }
-+};
 +
-+static void test_global_props_uc_subprocess(void)
-+{
-+    DummyObject *d;
-+    static GlobalProperty gp =3D {
-+        TYPE_DUMMY, "sv", "foobar",
-+    };
-+
-+    d =3D DUMMY_OBJECT(object_new(TYPE_DUMMY));
-+    g_assert_null(d->sv);
-+    object_unref(OBJECT(d));
-+
-+    object_property_register_global(&gp);
-+    d =3D DUMMY_OBJECT(object_new(TYPE_DUMMY));
-+    g_assert_cmpstr(d->sv, =3D=3D, "foobar");
-+    object_unref(OBJECT(d));
++    return object_get_canonical_path(OBJECT(self));
 +}
 +
-+static void test_global_props_uc(void)
+ static void
+ host_memory_backend_get_size(Object *obj, Visitor *v, const char *name,
+                              void *opaque, Error **errp)
+@@ -386,6 +396,23 @@ static void host_memory_backend_set_share(Object *o,=
+ bool value, Error **errp)
+     backend->share =3D value;
+ }
+=20
++static bool
++host_memory_backend_get_use_canonical_path(Object *obj, Error **errp)
 +{
-+    g_test_trap_subprocess("/global-props/usercreatable/subprocess", 0, =
-0);
-+    g_test_trap_assert_passed();
-+    g_test_trap_assert_stderr("");
-+    g_test_trap_assert_stdout("");
-+}
-=20
- #define TYPE_STATIC_PROPS "static_prop_type"
- #define STATIC_TYPE(obj) \
-@@ -83,7 +176,8 @@ static void test_static_prop_subprocess(void)
-=20
- static void test_static_prop(void)
- {
--    g_test_trap_subprocess("/qdev/properties/static/default/subprocess",=
- 0, 0);
-+    g_test_trap_subprocess("/global-props/qdev/static/default/subprocess=
-",
-+                           0, 0);
-     g_test_trap_assert_passed();
-     g_test_trap_assert_stderr("");
-     g_test_trap_assert_stdout("");
-@@ -119,7 +213,7 @@ static void test_static_globalprop_subprocess(void)
-=20
- static void test_static_globalprop(void)
- {
--    g_test_trap_subprocess("/qdev/properties/static/global/subprocess", =
-0, 0);
-+    g_test_trap_subprocess("/global-props/qdev/static/global/subprocess"=
-, 0, 0);
-     g_test_trap_assert_passed();
-     g_test_trap_assert_stderr("");
-     g_test_trap_assert_stdout("");
-@@ -245,7 +339,8 @@ static void test_dynamic_globalprop_subprocess(void)
-=20
- static void test_dynamic_globalprop(void)
- {
--    g_test_trap_subprocess("/qdev/properties/dynamic/global/subprocess",=
- 0, 0);
-+    g_test_trap_subprocess("/global-props/qdev/dynamic/global/subprocess=
-",
-+                           0, 0);
-     g_test_trap_assert_passed();
-     g_test_trap_assert_stderr_unmatched("*prop1*");
-     g_test_trap_assert_stderr_unmatched("*prop2*");
-@@ -290,7 +385,8 @@ static void test_dynamic_globalprop_nouser_subprocess=
-(void)
-=20
- static void test_dynamic_globalprop_nouser(void)
- {
--    g_test_trap_subprocess("/qdev/properties/dynamic/global/nouser/subpr=
-ocess", 0, 0);
-+    g_test_trap_subprocess("/global-props/qdev"
-+                           "/dynamic/global/nouser/subprocess", 0, 0);
-     g_test_trap_assert_passed();
-     g_test_trap_assert_stderr("");
-     g_test_trap_assert_stdout("");
-@@ -323,6 +419,7 @@ int main(int argc, char **argv)
-     g_test_init(&argc, &argv, NULL);
-=20
-     module_call_init(MODULE_INIT_QOM);
-+    type_register_static(&dummy_info);
-     type_register_static(&static_prop_type);
-     type_register_static(&subclass_type);
-     type_register_static(&dynamic_prop_type);
-@@ -330,27 +427,32 @@ int main(int argc, char **argv)
-     type_register_static(&nohotplug_type);
-     type_register_static(&nondevice_type);
-=20
--    g_test_add_func("/qdev/properties/static/default/subprocess",
-+    g_test_add_func("/global-props/usercreatable/subprocess",
-+                    test_global_props_uc_subprocess);
-+    g_test_add_func("/global-props/usercreatable",
-+                    test_global_props_uc);
++    HostMemoryBackend *self =3D MEMORY_BACKEND(obj);
 +
-+    g_test_add_func("/global-props/qdev/static/default/subprocess",
-                     test_static_prop_subprocess);
--    g_test_add_func("/qdev/properties/static/default",
-+    g_test_add_func("/global-props/qdev/static/default",
-                     test_static_prop);
++    return self->use_canonical_path;
++}
++
++static void
++host_memory_backend_set_use_canonical_path(Object *obj, bool value,
++                                           Error **errp)
++{
++    HostMemoryBackend *self =3D MEMORY_BACKEND(obj);
++
++    self->use_canonical_path =3D value;
++}
++
+ static void
+ host_memory_backend_class_init(ObjectClass *oc, void *data)
+ {
+@@ -432,6 +459,9 @@ host_memory_backend_class_init(ObjectClass *oc, void =
+*data)
+         &error_abort);
+     object_class_property_set_description(oc, "share",
+         "Mark the memory as private to QEMU or shared", &error_abort);
++    object_class_property_add_bool(oc, "x-use-canonical-path-for-rambloc=
+k-id",
++        host_memory_backend_get_use_canonical_path,
++        host_memory_backend_set_use_canonical_path, &error_abort);
+ }
 =20
--    g_test_add_func("/qdev/properties/static/global/subprocess",
-+    g_test_add_func("/global-props/qdev/static/global/subprocess",
-                     test_static_globalprop_subprocess);
--    g_test_add_func("/qdev/properties/static/global",
-+    g_test_add_func("/global-props/qdev/static/global",
-                     test_static_globalprop);
-=20
--    g_test_add_func("/qdev/properties/dynamic/global/subprocess",
-+    g_test_add_func("/global-props/qdev/dynamic/global/subprocess",
-                     test_dynamic_globalprop_subprocess);
--    g_test_add_func("/qdev/properties/dynamic/global",
-+    g_test_add_func("/global-props/qdev/dynamic/global",
-                     test_dynamic_globalprop);
-=20
--    g_test_add_func("/qdev/properties/dynamic/global/nouser/subprocess",
-+    g_test_add_func("/global-props/qdev/dynamic/global/nouser/subprocess=
-",
-                     test_dynamic_globalprop_nouser_subprocess);
--    g_test_add_func("/qdev/properties/dynamic/global/nouser",
-+    g_test_add_func("/global-props/qdev/dynamic/global/nouser",
-                     test_dynamic_globalprop_nouser);
-=20
--    g_test_add_func("/qdev/properties/global/subclass",
-+    g_test_add_func("/global-props/qdev/global/subclass",
-                     test_subclass_global_props);
-=20
-     g_test_run();
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index f77a495109..446de4afda 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -88,7 +88,7 @@ check-unit-y +=3D tests/test-qht$(EXESUF)
- check-unit-y +=3D tests/test-qht-par$(EXESUF)
- check-unit-y +=3D tests/test-bitops$(EXESUF)
- check-unit-y +=3D tests/test-bitcnt$(EXESUF)
--check-unit-y +=3D tests/test-qdev-global-props$(EXESUF)
-+check-unit-y +=3D tests/test-global-props$(EXESUF)
- check-unit-y +=3D tests/check-qom-interface$(EXESUF)
- check-unit-y +=3D tests/check-qom-proplist$(EXESUF)
- check-unit-y +=3D tests/test-qemu-opts$(EXESUF)
-@@ -557,7 +557,7 @@ tests/atomic64-bench$(EXESUF): tests/atomic64-bench.o=
- $(test-util-obj-y)
- tests/fp/%:
- 	$(MAKE) -C $(dir $@) $(notdir $@)
-=20
--tests/test-qdev-global-props$(EXESUF): tests/test-qdev-global-props.o \
-+tests/test-global-props$(EXESUF): tests/test-global-props.o \
- 	hw/core/qdev.o hw/core/qdev-properties.o hw/core/hotplug.o\
- 	hw/core/bus.o \
- 	hw/core/irq.o \
+ static const TypeInfo host_memory_backend_info =3D {
 --=20
 2.19.0.271.gfe8321ec05
