@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58756)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gHS9N-0002Mm-69
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 07:25:37 -0400
+	(envelope-from <laurent@vivier.eu>) id 1gHS9K-0002L7-PU
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 07:25:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gHS9H-0003uh-Fm
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 07:25:30 -0400
+	(envelope-from <laurent@vivier.eu>) id 1gHS9D-0003lm-Qq
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 07:25:26 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue, 30 Oct 2018 12:23:22 +0100
-Message-Id: <20181030112337.17973-6-laurent@vivier.eu>
+Date: Tue, 30 Oct 2018 12:23:33 +0100
+Message-Id: <20181030112337.17973-17-laurent@vivier.eu>
 In-Reply-To: <20181030112337.17973-1-laurent@vivier.eu>
 References: <20181030112337.17973-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 05/20] qemu-iotests: fix filename containing
- checks
+Subject: [Qemu-devel] [PULL v2 16/20] tests/bios-tables-test: Remove an
+ useless cast
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,42 +26,35 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Michael S. Tsirkin" <mst@redhat.com>, Cleber Rosa <crosa@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-arm@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Aleksandar Markovic <amarkovic@wavecomp.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Thomas Huth <thuth@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, Aurelien Jarno <aurelien@aurel32.net>, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Stefano Stabellini <sstabellini@kernel.org>, qemu-trivial@nongnu.org, qemu-block@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, xen-devel@lists.xenproject.org, Gerd Hoffmann <kraxel@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <lvivier@redhat.com>, Michael Walle <michael@walle.cc>, Markus Armbruster <armbru@redhat.com>
 
-From: Cleber Rosa <crosa@redhat.com>
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Commit cce293a2945 moved some functions from common.config to
-common.rc, but the error messages still reference the old file
-location.
+Patch created mechanically by rerunning:
 
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20181004161852.11673-5-crosa@redhat.com>
+  $  spatch --sp-file scripts/coccinelle/typecast.cocci \
+            --macro-file scripts/cocci-macro-file.h \
+            --dir . --in-place
+
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Message-Id: <20180705155811.20366-5-f4bug@amsat.org>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- tests/qemu-iotests/common.rc | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ tests/bios-tables-test.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
-index 44bee16a5e..70ca65b49b 100644
---- a/tests/qemu-iotests/common.rc
-+++ b/tests/qemu-iotests/common.rc
-@@ -170,7 +170,7 @@ if [ ! -e "$TEST_DIR" ]; then
- fi
- 
- if [ ! -d "$TEST_DIR" ]; then
--    echo "common.config: Error: \$TEST_DIR ($TEST_DIR) is not a directory"
-+    echo "common.rc: Error: \$TEST_DIR ($TEST_DIR) is not a directory"
-     exit 1
- fi
- 
-@@ -179,7 +179,7 @@ if [ -z "$REMOTE_TEST_DIR" ]; then
- fi
- 
- if [ ! -d "$SAMPLE_IMG_DIR" ]; then
--    echo "common.config: Error: \$SAMPLE_IMG_DIR ($SAMPLE_IMG_DIR) is not a directory"
-+    echo "common.rc: Error: \$SAMPLE_IMG_DIR ($SAMPLE_IMG_DIR) is not a directory"
-     exit 1
- fi
- 
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index af4b1fb6bd..02e77ec811 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -319,7 +319,7 @@ static bool load_asl(GArray *sdts, AcpiSdtTable *sdt)
+     ret = g_spawn_command_line_sync(command_line->str, &out, &out_err, NULL, &error);
+     g_assert_no_error(error);
+     if (ret) {
+-        ret = g_file_get_contents(sdt->asl_file, (gchar **)&sdt->asl,
++        ret = g_file_get_contents(sdt->asl_file, &sdt->asl,
+                                   &sdt->asl_len, &error);
+         g_assert(ret);
+         g_assert_no_error(error);
 -- 
 2.17.2
