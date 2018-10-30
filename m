@@ -1,42 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.ibm.com>) id 1gHTT0-0000s6-BW
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:49:55 -0400
+	(envelope-from <laurent@vivier.eu>) id 1gHTT7-0000xH-GJ
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:50:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.ibm.com>) id 1gHTSw-0000px-RK
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:49:54 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40436
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.ibm.com>)
-	id 1gHTSw-0000ow-Iu
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:49:50 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w9UCnFH1017169
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 08:49:49 -0400
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2nenb26ddd-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 08:49:49 -0400
-Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.ibm.com>;
-	Tue, 30 Oct 2018 08:49:48 -0400
-References: <20181029151956.2164336-1-stefanb@linux.ibm.com>
-	<CAFEAcA8OOWbfC-ZpL7GuP81WYC6gGk2XC05DhGeXnceUUfv2mA@mail.gmail.com>
-	<CAJ+F1CLkm7Y6_XsqoQ=UOsAarqTDKGyBnAYUeZpQOH1dginbiA@mail.gmail.com>
-	<CAFEAcA8=8zQiGt90PDkZGiYvn5f-PO7uveXSP6qyVr+PKSfZkw@mail.gmail.com>
-From: Stefan Berger <stefanb@linux.ibm.com>
-Date: Tue, 30 Oct 2018 08:49:45 -0400
+	(envelope-from <laurent@vivier.eu>) id 1gHTT4-0000yI-5s
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:50:01 -0400
+References: <20181029134000.11157-1-mark.cave-ayland@ilande.co.uk>
+	<97900b04-28f0-975f-b3c0-2c0aa7039a4f@linaro.org>
+	<5c41b46c-70e3-33a0-76cf-ba2fd8155d33@ilande.co.uk>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <393eca98-a092-80aa-2016-f14cd2e02d45@vivier.eu>
+Date: Tue, 30 Oct 2018 13:49:35 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8=8zQiGt90PDkZGiYvn5f-PO7uveXSP6qyVr+PKSfZkw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-MW
-Message-Id: <50cb13d4-0c8f-d90f-3960-afae8d944788@linux.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v1 0/5] Merge tpm 2018/10/29 v1
+In-Reply-To: <5c41b46c-70e3-33a0-76cf-ba2fd8155d33@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 00/11] hw/m68k: add Apple Machintosh
+ Quadra 800 machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,61 +26,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Stefan Berger <stefanb@linux.vnet.ibm.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, jasowang@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, hpoussin@reactos.org, kraxel@redhat.com, pbonzini@redhat.com, afaerber@suse.de, aurelien@aurel32.net
 
-On 10/30/18 7:26 AM, Peter Maydell wrote:
-> On 30 October 2018 at 11:14, Marc-Andr=C3=A9 Lureau
-> <marcandre.lureau@gmail.com> wrote:
->> Hi Peter
+Le 30/10/2018 à 12:48, Mark Cave-Ayland a écrit :
+> On 30/10/2018 08:15, Richard Henderson wrote:
+> 
+>> On 10/29/18 1:39 PM, Mark Cave-Ayland wrote:
+>>> You can install your own disk using debian-installer, with:
+>>>
+>>>     ...
+>>>     -M q800 \
+>>>     -serial none -serial mon:stdio \
+>>>     -m 1000M -drive file=m68k.qcow2,format=qcow2 \
+>>>     -net nic,model=dp83932,addr=09:00:07:12:34:57 \
+>>>     -append "console=ttyS0 vga=off" \
+>>>     -kernel vmlinux-4.15.0-2-m68k \
+>>>     -initrd initrd.gz \
+>>>     -drive file=debian-9.0-m68k-NETINST-1.iso \
+>>>     -drive file=m68k.qcow2,format=qcow2 \
+>>>     -nographic
 >>
->> On Tue, Oct 30, 2018 at 2:45 PM Peter Maydell <peter.maydell@linaro.or=
-g> wrote:
->>> Hi; this gives some test failures (all hosts):
->>>
->>> TEST: tests/tpm-crb-swtpm-test... (pid=3D305)
->>>    /i386/tpm/crb-swtpm/test:                                         =
-   FAIL
->>> GTester: last random seed: R02Sf628ca48da88252a6b95465fef3b855f
->>>    /i386/tpm/crb-swtpm-migration/test:                               =
-   FAIL
->>> GTester: last random seed: R02Sf628ca48da88252a6b95465fef3b855f
->>> FAIL: tests/tpm-crb-swtpm-test
->>> TEST: tests/tpm-crb-test... (pid=3D311)
->>>    /i386/tpm-crb/test:                                               =
-   OK
->>> PASS: tests/tpm-crb-test
->>> TEST: tests/tpm-tis-swtpm-test... (pid=3D324)
->>>    /i386/tpm/tis-swtpm/test:                                         =
-   FAIL
->>> GTester: last random seed: R02Sca4f303959770d4ca9f8f12b784dba0d
->>>    /i386/tpm/tis-swtpm-migration/test:                               =
-   FAIL
->>> GTester: last random seed: R02Sca4f303959770d4ca9f8f12b784dba0d
->>> FAIL: tests/tpm-tis-swtpm-test
->>> TEST: tests/tpm-tis-test... (pid=3D331)
->>>    /i386/tpm-tis/test_check_localities:                              =
-   OK
->>>    /i386/tpm-tis/test_check_access_reg:                              =
-   OK
->>>    /i386/tpm-tis/test_check_access_reg_seize:                        =
-   OK
->>>    /i386/tpm-tis/test_check_access_reg_release:                      =
-   OK
->>>    /i386/tpm-tis/test_check_transmit:                                =
-   OK
->>> PASS: tests/tpm-tis-test
->>>
->> What version of swtpm & libtpms is installed?
-> No idea, how do I tell? On my x86 Ubuntu machine which is one of those
-> which failed there are no packages whose name includes either "swtpm"
-> or "tpms".
+>> I tried this and got
+>>
+>> Trace 0: 0x7f2e886c7140 [00000000/0000d404/0xe000]
+>> INT      1: Unassigned(0xf4) pc=0000d404 sp=00393e60 sr=2700
+>> INT      2: Access Fault(0x8) pc=00000000 sp=00393e58 sr=2700
+>>             ssw:  00000506 ea:   00000000 sfc:  5    dfc: 5
+>>
+>> which lead straight to buserr and panic.  This happens way early in boot --
+>> only 1926 TranslationBlocks generated.
+>>
+>> Is there some device missing from the command-line that the kernel is expecting?
+> 
+> Heh that's annoying. The original branch I forked that Laurent was working on had
+> some extra patches at the start of the series: some were required for q800 whilst
+> others were for new development. I thought that all of the patches required for q800
+> had been applied over the past few months, but sadly that isn't the case :(
+> 
+> I've pushed an updated branch to https://github.com/mcayland/qemu/tree/q800-test
+> which contains the patchset plus two extra patches that are still needed to boot to
+> the debian installer here:
+> 
+> 9281a5371f "tmp"
+> 629754d847 "target/m68k: manage FPU exceptions"
+> 
+> Laurent, are these patches ready for upstream or do they need work in which case we
+> should leave q800 until the 3.2 cycle?
 
-Probably it's failing without it being installed. I had also tried=20
-running it on my machine without swtpm being installed and it didn't fail.
+The only needed part is from 9281a5371f.
 
+--- a/target/m68k/translate.c
++++ b/target/m68k/translate.c
+@@ -1552,7 +1552,7 @@ DISAS_INSN(undef)
+        but actually illegal for CPU32 or pre-68020.  */
+     qemu_log_mask(LOG_UNIMP, "Illegal instruction: %04x @ %08x\n",
+                   insn, s->base.pc_next);
+-    gen_exception(s, s->base.pc_next, EXCP_UNSUPPORTED);
++    gen_exception(s, s->base.pc_next, EXCP_ILLEGAL);
+ }
 
->
-> thanks
-> -- PMM
->
+ DISAS_INSN(mulw)
+@@ -2799,7 +2799,7 @@ DISAS_INSN(mull)
+
+     if (ext & 0x400) {
+         if (!m68k_feature(s->env, M68K_FEATURE_QUAD_MULDIV)) {
+-            gen_exception(s, s->base.pc_next, EXCP_UNSUPPORTED);
++            gen_exception(s, s->base.pc_next, EXCP_ILLEGAL);
+             return;
+         }
+
+@@ -4509,7 +4509,7 @@ DISAS_INSN(strldsr)
+     addr = s->pc - 2;
+     ext = read_im16(env, s);
+     if (ext != 0x46FC) {
+-        gen_exception(s, addr, EXCP_UNSUPPORTED);
++        gen_exception(s, addr, EXCP_ILLEGAL);
+         return;
+     }
+     ext = read_im16(env, s);
+
+Because kernel only manages illegal instruction exception not unsupported.
+
+Without the patch, we have:
+
+IN:
+0x0000d454:  071400
+
+INT      1: Unassigned(0xf4) pc=0000d454 sp=00331e60 sr=2700
+
+with the patch:
+
+IN:
+0x0000d454:  071400
+
+INT      1: Illegal Instruction(0x10) pc=0000d454 sp=00331e60 sr=2700
+
+We have in linux/arch/m68k/kernel/vectors.c:
+
+/*
+ * this must be called very early as the kernel might
+ * use some instruction that are emulated on the 060
+ * and so we're prepared for early probe attempts (e.g. nf_init).
+ */
+void __init base_trap_init(void)
+{
+...
+
+        vectors[VEC_BUSERR] = buserr;
+        vectors[VEC_ILLEGAL] = trap;
+        vectors[VEC_SYS] = system_call;
+}
+
+So I think the unsupported vector jumps to an invalid address.
+
+This seems triggered by the aranym native feature:
+
+    d454:       7300            mvsb %d0,%d1
+
+from linux/arch/m68k/emu/natfeat.c
+
+Thanks,
+Laurent
