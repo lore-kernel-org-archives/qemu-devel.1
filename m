@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44142)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gHTnZ-00024o-Gl
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 09:11:15 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gHTqC-0006Qb-K8
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 09:13:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gHTnU-0004WT-Kn
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 09:11:09 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:39078)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gHTnU-0004Vt-DM
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 09:11:04 -0400
-Received: by mail-wm1-f65.google.com with SMTP id y144-v6so11239974wmd.4
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 06:11:04 -0700 (PDT)
-References: <1540899411-16761-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1540899411-16761-4-git-send-email-aleksandar.markovic@rt-rk.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <dcf9f0c0-c077-89de-c209-d0a38c2e0319@redhat.com>
-Date: Tue, 30 Oct 2018 14:11:01 +0100
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gHTqB-0006lH-BF
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 09:13:52 -0400
+References: <20181029134000.11157-1-mark.cave-ayland@ilande.co.uk>
+	<97900b04-28f0-975f-b3c0-2c0aa7039a4f@linaro.org>
+	<5c41b46c-70e3-33a0-76cf-ba2fd8155d33@ilande.co.uk>
+	<393eca98-a092-80aa-2016-f14cd2e02d45@vivier.eu>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <3b1f8942-d8c7-04db-45bc-a7c30de9d769@ilande.co.uk>
+Date: Tue, 30 Oct 2018 13:12:54 +0000
 MIME-Version: 1.0
-In-Reply-To: <1540899411-16761-4-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+In-Reply-To: <393eca98-a092-80aa-2016-f14cd2e02d45@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/5] target/mips: Rename MMI-related
- functions
+Subject: Re: [Qemu-devel] [PATCH v5 00/11] hw/m68k: add Apple Machintosh
+ Quadra 800 machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,149 +27,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
-Cc: smarkovic@wavecomp.com, pjovanovic@wavecomp.com, amarkovic@wavecomp.com, aurelien@aurel32.net
+To: Laurent Vivier <laurent@vivier.eu>, Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, jasowang@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, hpoussin@reactos.org, kraxel@redhat.com, pbonzini@redhat.com, aurelien@aurel32.net
 
-On 30/10/18 12:36, Aleksandar Markovic wrote:
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
-> 
-> Rename MMI-related functions.
-> 
-> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+On 30/10/2018 12:49, Laurent Vivier wrote:
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Le 30/10/2018 à 12:48, Mark Cave-Ayland a écrit :
+>> On 30/10/2018 08:15, Richard Henderson wrote:
+>>
+>>> On 10/29/18 1:39 PM, Mark Cave-Ayland wrote:
+>>>> You can install your own disk using debian-installer, with:
+>>>>
+>>>>     ...
+>>>>     -M q800 \
+>>>>     -serial none -serial mon:stdio \
+>>>>     -m 1000M -drive file=m68k.qcow2,format=qcow2 \
+>>>>     -net nic,model=dp83932,addr=09:00:07:12:34:57 \
+>>>>     -append "console=ttyS0 vga=off" \
+>>>>     -kernel vmlinux-4.15.0-2-m68k \
+>>>>     -initrd initrd.gz \
+>>>>     -drive file=debian-9.0-m68k-NETINST-1.iso \
+>>>>     -drive file=m68k.qcow2,format=qcow2 \
+>>>>     -nographic
+>>>
+>>> I tried this and got
+>>>
+>>> Trace 0: 0x7f2e886c7140 [00000000/0000d404/0xe000]
+>>> INT      1: Unassigned(0xf4) pc=0000d404 sp=00393e60 sr=2700
+>>> INT      2: Access Fault(0x8) pc=00000000 sp=00393e58 sr=2700
+>>>             ssw:  00000506 ea:   00000000 sfc:  5    dfc: 5
+>>>
+>>> which lead straight to buserr and panic.  This happens way early in boot --
+>>> only 1926 TranslationBlocks generated.
+>>>
+>>> Is there some device missing from the command-line that the kernel is expecting?
+>>
+>> Heh that's annoying. The original branch I forked that Laurent was working on had
+>> some extra patches at the start of the series: some were required for q800 whilst
+>> others were for new development. I thought that all of the patches required for q800
+>> had been applied over the past few months, but sadly that isn't the case :(
+>>
+>> I've pushed an updated branch to https://github.com/mcayland/qemu/tree/q800-test
+>> which contains the patchset plus two extra patches that are still needed to boot to
+>> the debian installer here:
+>>
+>> 9281a5371f "tmp"
+>> 629754d847 "target/m68k: manage FPU exceptions"
+>>
+>> Laurent, are these patches ready for upstream or do they need work in which case we
+>> should leave q800 until the 3.2 cycle?
+> 
+> The only needed part is from 9281a5371f.
 
-> ---
->   target/mips/translate.c | 32 ++++++++++++++++----------------
->   1 file changed, 16 insertions(+), 16 deletions(-)
+Yeah I think you're right, sorry about that. I'm sure I tried without 629754d847 and
+I got a premature exit from QEMU but only in graphic mode, but I've just tried again
+and can't seem to recreate it now.
+
+> --- a/target/m68k/translate.c
+> +++ b/target/m68k/translate.c
+> @@ -1552,7 +1552,7 @@ DISAS_INSN(undef)
+>         but actually illegal for CPU32 or pre-68020.  */
+>      qemu_log_mask(LOG_UNIMP, "Illegal instruction: %04x @ %08x\n",
+>                    insn, s->base.pc_next);
+> -    gen_exception(s, s->base.pc_next, EXCP_UNSUPPORTED);
+> +    gen_exception(s, s->base.pc_next, EXCP_ILLEGAL);
+>  }
 > 
-> diff --git a/target/mips/translate.c b/target/mips/translate.c
-> index 4b008d8..155331f 100644
-> --- a/target/mips/translate.c
-> +++ b/target/mips/translate.c
-> @@ -24681,7 +24681,7 @@ static void decode_opc_special3_legacy(CPUMIPSState *env, DisasContext *ctx)
->       }
->   }
->   
-> -static void decode_tx79_mmi0(CPUMIPSState *env, DisasContext *ctx)
-> +static void decode_mmi0(CPUMIPSState *env, DisasContext *ctx)
->   {
->       uint32_t opc = MASK_MMI0(ctx->opcode);
->   
-> @@ -24720,7 +24720,7 @@ static void decode_tx79_mmi0(CPUMIPSState *env, DisasContext *ctx)
->       }
->   }
->   
-> -static void decode_tx79_mmi1(CPUMIPSState *env, DisasContext *ctx)
-> +static void decode_mmi1(CPUMIPSState *env, DisasContext *ctx)
->   {
->       uint32_t opc = MASK_MMI1(ctx->opcode);
->   
-> @@ -24752,7 +24752,7 @@ static void decode_tx79_mmi1(CPUMIPSState *env, DisasContext *ctx)
->       }
->   }
->   
-> -static void decode_tx79_mmi2(CPUMIPSState *env, DisasContext *ctx)
-> +static void decode_mmi2(CPUMIPSState *env, DisasContext *ctx)
->   {
->       uint32_t opc = MASK_MMI2(ctx->opcode);
->   
-> @@ -24788,7 +24788,7 @@ static void decode_tx79_mmi2(CPUMIPSState *env, DisasContext *ctx)
->       }
->   }
->   
-> -static void decode_tx79_mmi3(CPUMIPSState *env, DisasContext *ctx)
-> +static void decode_mmi3(CPUMIPSState *env, DisasContext *ctx)
->   {
->       uint32_t opc = MASK_MMI3(ctx->opcode);
->   
-> @@ -24815,7 +24815,7 @@ static void decode_tx79_mmi3(CPUMIPSState *env, DisasContext *ctx)
->       }
->   }
->   
-> -static void decode_tx79_mmi(CPUMIPSState *env, DisasContext *ctx)
-> +static void decode_mmi(CPUMIPSState *env, DisasContext *ctx)
->   {
->       uint32_t opc = MASK_MMI(ctx->opcode);
->       int rs = extract32(ctx->opcode, 21, 5);
-> @@ -24824,16 +24824,16 @@ static void decode_tx79_mmi(CPUMIPSState *env, DisasContext *ctx)
->   
->       switch (opc) {
->       case MMI_OPC_CLASS_MMI0:
-> -        decode_tx79_mmi0(env, ctx);
-> +        decode_mmi0(env, ctx);
->           break;
->       case MMI_OPC_CLASS_MMI1:
-> -        decode_tx79_mmi1(env, ctx);
-> +        decode_mmi1(env, ctx);
->           break;
->       case MMI_OPC_CLASS_MMI2:
-> -        decode_tx79_mmi2(env, ctx);
-> +        decode_mmi2(env, ctx);
->           break;
->       case MMI_OPC_CLASS_MMI3:
-> -        decode_tx79_mmi3(env, ctx);
-> +        decode_mmi3(env, ctx);
->           break;
->       case MMI_OPC_MULT1:
->       case MMI_OPC_MULTU1:
-> @@ -24873,12 +24873,12 @@ static void decode_tx79_mmi(CPUMIPSState *env, DisasContext *ctx)
->       }
->   }
->   
-> -static void decode_tx79_lq(CPUMIPSState *env, DisasContext *ctx)
-> +static void decode_mmi_lq(CPUMIPSState *env, DisasContext *ctx)
->   {
->       generate_exception_end(ctx, EXCP_RI);    /* TODO: MMI_LQ */
->   }
->   
-> -static void gen_tx79_sq(DisasContext *ctx, int base, int rt, int offset)
-> +static void gen_mmi_sq(DisasContext *ctx, int base, int rt, int offset)
->   {
->       generate_exception_end(ctx, EXCP_RI);    /* TODO: MMI_SQ */
->   }
-> @@ -24904,7 +24904,7 @@ static void gen_tx79_sq(DisasContext *ctx, int base, int rt, int offset)
->    * In user mode, QEMU must verify the upper and lower 11 bits to distinguish
->    * between SQ and RDHWR, as the Linux kernel does.
->    */
-> -static void decode_tx79_sq(CPUMIPSState *env, DisasContext *ctx)
-> +static void decode_mmi_sq(CPUMIPSState *env, DisasContext *ctx)
->   {
->       int base = extract32(ctx->opcode, 21, 5);
->       int rt = extract32(ctx->opcode, 16, 5);
-> @@ -24922,7 +24922,7 @@ static void decode_tx79_sq(CPUMIPSState *env, DisasContext *ctx)
->       }
->   #endif
->   
-> -    gen_tx79_sq(ctx, base, rt, offset);
-> +    gen_mmi_sq(ctx, base, rt, offset);
->   }
->   
->   static void decode_opc_special3(CPUMIPSState *env, DisasContext *ctx)
-> @@ -26231,14 +26231,14 @@ static void decode_opc(CPUMIPSState *env, DisasContext *ctx)
->           break;
->       case OPC_SPECIAL2:
->           if ((ctx->insn_flags & INSN_R5900) && (ctx->insn_flags & ASE_MMI)) {
-> -            decode_tx79_mmi(env, ctx);
-> +            decode_mmi(env, ctx);
->           } else {
->               decode_opc_special2_legacy(env, ctx);
->           }
->           break;
->       case OPC_SPECIAL3:
->           if (ctx->insn_flags & INSN_R5900) {
-> -            decode_tx79_sq(env, ctx);    /* MMI_SQ */
-> +            decode_mmi_sq(env, ctx);    /* MMI_SQ */
->           } else {
->               decode_opc_special3(env, ctx);
->           }
-> @@ -26902,7 +26902,7 @@ static void decode_opc(CPUMIPSState *env, DisasContext *ctx)
->           break;
->       case OPC_MSA: /* OPC_MDMX */
->           if (ctx->insn_flags & INSN_R5900) {
-> -            decode_tx79_lq(env, ctx);    /* MMI_LQ */
-> +            decode_mmi_lq(env, ctx);    /* MMI_LQ */
->           } else {
->               /* MDMX: Not implemented. */
->               gen_msa(env, ctx);
+>  DISAS_INSN(mulw)
+> @@ -2799,7 +2799,7 @@ DISAS_INSN(mull)
 > 
+>      if (ext & 0x400) {
+>          if (!m68k_feature(s->env, M68K_FEATURE_QUAD_MULDIV)) {
+> -            gen_exception(s, s->base.pc_next, EXCP_UNSUPPORTED);
+> +            gen_exception(s, s->base.pc_next, EXCP_ILLEGAL);
+>              return;
+>          }
+> 
+> @@ -4509,7 +4509,7 @@ DISAS_INSN(strldsr)
+>      addr = s->pc - 2;
+>      ext = read_im16(env, s);
+>      if (ext != 0x46FC) {
+> -        gen_exception(s, addr, EXCP_UNSUPPORTED);
+> +        gen_exception(s, addr, EXCP_ILLEGAL);
+>          return;
+>      }
+>      ext = read_im16(env, s);
+> 
+> Because kernel only manages illegal instruction exception not unsupported.
+> 
+> Without the patch, we have:
+> 
+> IN:
+> 0x0000d454:  071400
+> 
+> INT      1: Unassigned(0xf4) pc=0000d454 sp=00331e60 sr=2700
+> 
+> with the patch:
+> 
+> IN:
+> 0x0000d454:  071400
+> 
+> INT      1: Illegal Instruction(0x10) pc=0000d454 sp=00331e60 sr=2700
+> 
+> We have in linux/arch/m68k/kernel/vectors.c:
+> 
+> /*
+>  * this must be called very early as the kernel might
+>  * use some instruction that are emulated on the 060
+>  * and so we're prepared for early probe attempts (e.g. nf_init).
+>  */
+> void __init base_trap_init(void)
+> {
+> ...
+> 
+>         vectors[VEC_BUSERR] = buserr;
+>         vectors[VEC_ILLEGAL] = trap;
+>         vectors[VEC_SYS] = system_call;
+> }
+> 
+> So I think the unsupported vector jumps to an invalid address.
+> 
+> This seems triggered by the aranym native feature:
+> 
+>     d454:       7300            mvsb %d0,%d1
+> 
+> from linux/arch/m68k/emu/natfeat.c
+
+Interesting. So is this an actual bug in QEMU in terms of implementing the processor
+specification, or is it relying on undefined behaviour on real hardware?
+
+
+ATB,
+
+Mark.
