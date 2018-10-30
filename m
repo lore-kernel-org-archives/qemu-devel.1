@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49598)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gHa6y-0004l9-1I
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:55:39 -0400
+	(envelope-from <laurent@vivier.eu>) id 1gHaJi-00086k-35
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 16:08:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gHa6h-0005OI-6U
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:55:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34692)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gHa6g-0005JS-Vc
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 15:55:19 -0400
-Date: Tue, 30 Oct 2018 19:55:12 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20181030195512.GF2441@work-vm>
-References: <20181024163529.15665-1-zhangckid@gmail.com>
+	(envelope-from <laurent@vivier.eu>) id 1gHaJh-0007DJ-5X
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 16:08:46 -0400
+References: <20181029134000.11157-1-mark.cave-ayland@ilande.co.uk>
+	<20181029134000.11157-7-mark.cave-ayland@ilande.co.uk>
+	<d86f51e6-0f5d-e78a-3aba-cad233e83efa@reactos.org>
+	<02f4cde5-e82b-ed63-5e02-ff83d591f05d@ilande.co.uk>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <af7fa5d2-7da4-0827-9e7c-e210ca78b82f@vivier.eu>
+Date: Tue, 30 Oct 2018 21:08:05 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181024163529.15665-1-zhangckid@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] migration/colo.c: Fix compilation issue
- when disable replication
+In-Reply-To: <02f4cde5-e82b-ed63-5e02-ff83d591f05d@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 06/11] esp: add pseudo-DMA as used by
+ Macintosh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,98 +27,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangckid@gmail.com>
-Cc: qemu-devel@nongnu.org, zhanghailiang <zhang.zhanghailiang@huawei.com>, Thomas Huth <thuth@redhat.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, jasowang@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, kraxel@redhat.com, pbonzini@redhat.com, aurelien@aurel32.net
 
-* Zhang Chen (zhangckid@gmail.com) wrote:
-> This compilation issue will occur when user use --disable-replication
-> to config Qemu.
+On 30/10/2018 11:09, Mark Cave-Ayland wrote:
+> On 30/10/2018 06:47, Hervé Poussineau wrote:
 > 
-> Reported-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Zhang Chen <zhangckid@gmail.com>
+>> Le 29/10/2018 à 14:39, Mark Cave-Ayland a écrit :
+>>> From: Laurent Vivier <laurent@vivier.eu>
+>>>
+>>> Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>>> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+>>> ---
+>>>   hw/scsi/esp.c         | 292 +++++++++++++++++++++++++++++++++++++++++++++-----
+>>>   include/hw/scsi/esp.h |   7 ++
+>>>   2 files changed, 270 insertions(+), 29 deletions(-)
+>>>
+>>
+>> [...]
+>>
+>>>   @@ -409,6 +564,7 @@ uint64_t esp_reg_read(ESPState *s, uint32_t saddr)
+>>>               s->ti_size--;
+>>>               s->rregs[ESP_FIFO] = s->ti_buf[s->ti_rptr++];
+>>>           }
+>>> +        esp_raise_irq(s);
+>>>           if (s->ti_rptr == s->ti_wptr) {
+>>>               s->ti_rptr = 0;
+>>>               s->ti_wptr = 0;
+>>
+>> You're now raising irq (not drq) when reading registers. In my opinion, this deserves
+>> its own patch with an explanation.
 
-Queued.
+This line must be removed.
 
-> ---
->  migration/colo.c | 18 +++++++++++++++++-
->  1 file changed, 17 insertions(+), 1 deletion(-)
+> Oooh good spot. Laurent, can you explain a bit more as to how the pseudo-DMA is wired
+> up for ESP?
 > 
-> diff --git a/migration/colo.c b/migration/colo.c
-> index 956ac236b7..b81e6ec5bb 100644
-> --- a/migration/colo.c
-> +++ b/migration/colo.c
-> @@ -59,6 +59,8 @@ static bool colo_runstate_is_stopped(void)
->  
->  static void secondary_vm_do_failover(void)
->  {
-> +/* COLO needs enable block-replication */
-> +#ifdef CONFIG_REPLICATION
->      int old_state;
->      MigrationIncomingState *mis = migration_incoming_get_current();
->      Error *local_err = NULL;
-> @@ -121,10 +123,14 @@ static void secondary_vm_do_failover(void)
->      if (mis->migration_incoming_co) {
->          qemu_coroutine_enter(mis->migration_incoming_co);
->      }
-> +#else
-> +    abort();
-> +#endif
->  }
->  
->  static void primary_vm_do_failover(void)
->  {
-> +#ifdef CONFIG_REPLICATION
->      MigrationState *s = migrate_get_current();
->      int old_state;
->      Error *local_err = NULL;
-> @@ -165,6 +171,9 @@ static void primary_vm_do_failover(void)
->  
->      /* Notify COLO thread that failover work is finished */
->      qemu_sem_post(&s->colo_exit_sem);
-> +#else
-> +    abort();
-> +#endif
->  }
->  
->  COLOMode get_colo_mode(void)
-> @@ -373,6 +382,7 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
->                                            QIOChannelBuffer *bioc,
->                                            QEMUFile *fb)
->  {
-> +#ifdef CONFIG_REPLICATION
->      Error *local_err = NULL;
->      int ret = -1;
->  
-> @@ -483,6 +493,9 @@ out:
->          error_report_err(local_err);
->      }
->      return ret;
-> +#else
-> +    abort();
-> +#endif
->  }
->  
->  static void colo_compare_notify_checkpoint(Notifier *notifier, void *data)
-> @@ -790,13 +803,16 @@ void *colo_process_incoming_thread(void *opaque)
->              qemu_mutex_unlock_iothread();
->              goto out;
->          }
-> +#ifdef CONFIG_REPLICATION
->          /* discard colo disk buffer */
->          replication_do_checkpoint_all(&local_err);
->          if (local_err) {
->              qemu_mutex_unlock_iothread();
->              goto out;
->          }
-> -
-> +#else
-> +        abort();
-> +#endif
->          /* Notify all filters of all NIC to do checkpoint */
->          colo_notify_filters_event(COLO_EVENT_CHECKPOINT, &local_err);
->  
-> -- 
-> 2.17.GIT
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+There is no DMA in Quadra 800, so the CPU reads/writes the data from the
+PDMA register (offset 0x100, ESP_PDMA in hw/m68k/q800.c) and copies them
+to/from the memory.
+
+There is a nice assembly loop in the kernel to do that, see
+linux/drivers/scsi/mac_esp.c:MAC_ESP_PDMA_LOOP().
+
+The start of the transfer is triggered by the DREQ interrupt (see linux
+mac_esp_send_pdma_cmd()), the CPU polls on the IRQ flag to start the
+transfer after a SCSI command has been sent (in Quadra 800 it goes
+through the VIA2, the via2-irq line and the vIFR register)
+
+The Macintosh hardware includes hardware handshaking to prevent the CPU
+from reading invalid data or writing data faster than the peripheral
+device can accept it.
+
+This is the "blind mode", and from the doc:
+"Approximate maximum SCSI transfer rates within a blocks are 1.4 MB per
+second for blind transfers in the Macintosh II"
+
+Some references can be found in:
+  Apple Macintosh Family Hardware Reference, ISBN 0-201-19255-1
+  Guide to the Macintosh Family Hardware, ISBN-0-201-52405-8
+
+Thanks,
+Laurent
