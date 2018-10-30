@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42135)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gHUzv-0004AR-TE
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:28:00 -0400
+	(envelope-from <flukshun@gmail.com>) id 1gHV4U-00066O-5Q
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:32:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gHUzs-0003wF-MH
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:27:59 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:56117)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1gHUzs-0003vf-Ce
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:27:56 -0400
-References: <1540904108-30873-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1540904108-30873-2-git-send-email-aleksandar.markovic@rt-rk.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <186fc673-3d5f-31c7-6e4e-204af713395e@vivier.eu>
-Date: Tue, 30 Oct 2018 15:26:52 +0100
+	(envelope-from <flukshun@gmail.com>) id 1gHV4S-0007BM-2T
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:32:42 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:44633)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHV4R-00076u-PN
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:32:39 -0400
+Received: by mail-ot1-x343.google.com with SMTP id p23so11255175otf.11
+	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 07:32:35 -0700 (PDT)
+Sender: fluxion <flukshun@gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1540904108-30873-2-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/3] linux-user: Add support for statx()
- syscall
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <1539828637-2907-1-git-send-email-liq3ea@gmail.com>
+References: <1539828637-2907-1-git-send-email-liq3ea@gmail.com>
+Message-ID: <154090989284.20054.765071955666358201@sif>
+Date: Tue, 30 Oct 2018 09:31:32 -0500
+Subject: Re: [Qemu-devel] [PATCH] qga: fix an off-by-one issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +29,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net, arikalo@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, riku.voipio@iki.fi, ysu@wavecomp.com
+To: Li Qiang <liq3ea@gmail.com>, qemu-devel@nongnu.org
 
-Le 30/10/2018 à 13:55, Aleksandar Markovic a écrit :
-> From: Aleksandar Rikalo <arikalo@wavecomp.com>
-> 
-> Implement support for translation of system call statx(). The
-> implementation includes invoking other (more mature) syscalls
-> (from the same 'stat' family) on the host side. This way,
-> problems of availability of statx() on the host side are
-> avoided.
-> 
-> On some systems with __NR_statx defined, there are some difficulties
-> defining variables using "struct statx", so definitions with "struct
-> target_statx" is used, and this works in all cases.
+Quoting Li Qiang (2018-10-17 21:10:37)
+> Signed-off-by: Li Qiang <liq3ea@gmail.com>
 
-Could you give more details?
+Thanks, applied to qga tree:
+  https://github.com/mdroth/qemu/commits/qga
 
-This is not consistent to use the target_struct type with the host
-variable, even if the struct is the same on host and target.
+> ---
+>  qga/commands-win32.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> =
 
-The size of the field can be the same, but the alignment can differ
-according to the system ABI.
+> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+> index 98d9735..e3842d1 100644
+> --- a/qga/commands-win32.c
+> +++ b/qga/commands-win32.c
+> @@ -465,7 +465,7 @@ static STORAGE_BUS_TYPE win2qemu[] =3D {
+> =
 
-Thanks,
-Laurent
+>  static GuestDiskBusType find_bus_type(STORAGE_BUS_TYPE bus)
+>  {
+> -    if (bus > ARRAY_SIZE(win2qemu) || (int)bus < 0) {
+> +    if (bus >=3D ARRAY_SIZE(win2qemu) || (int)bus < 0) {
+>          return GUEST_DISK_BUS_TYPE_UNKNOWN;
+>      }
+>      return win2qemu[(int)bus];
+> -- =
+
+> 1.8.3.1
+>=20
