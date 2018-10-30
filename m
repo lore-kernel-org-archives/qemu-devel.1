@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38457)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gHUmM-0005Y6-Gw
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:13:59 -0400
+	(envelope-from <sameo@linux.intel.com>) id 1gHUmo-0005qw-Is
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:14:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gHUmG-0006jc-I1
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:13:56 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:36320)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gHUmE-0006hf-II
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:13:52 -0400
-Received: by mail-wm1-f68.google.com with SMTP id a8-v6so11466154wmf.1
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 07:13:49 -0700 (PDT)
-References: <20181030111348.14713-1-kraxel@redhat.com>
-	<20181030111348.14713-2-kraxel@redhat.com>
-	<8c224534-c929-7c7f-a126-a9390bbdb77f@redhat.com>
-	<20181030140030.gh5aa7jcgszrfajs@sirius.home.kraxel.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <6fd9e9f8-838a-a13c-e957-a8e6bcb74c42@redhat.com>
-Date: Tue, 30 Oct 2018 15:13:45 +0100
+	(envelope-from <sameo@linux.intel.com>) id 1gHUmj-00073l-3Z
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:14:26 -0400
+Received: from mga01.intel.com ([192.55.52.88]:30794)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sameo@linux.intel.com>)
+	id 1gHUmi-000735-Q2
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:14:21 -0400
+Date: Tue, 30 Oct 2018 15:13:35 +0100
+From: Samuel Ortiz <sameo@linux.intel.com>
+Message-ID: <20181030141335.GB5291@caravaggio.home>
+References: <20181029170159.3801-1-sameo@linux.intel.com>
+	<20181029170159.3801-20-sameo@linux.intel.com>
+	<7023e8f9-a7e3-ae11-e1d7-429434e895d3@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181030140030.gh5aa7jcgszrfajs@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/4] add QemuSupportState
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7023e8f9-a7e3-ae11-e1d7-429434e895d3@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 19/19] hw: i386: Implement the ACPI
+ builder interface for PC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,74 +30,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Paolo Bonzini <pbonzini@redhat.com>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 30/10/18 15:00, Gerd Hoffmann wrote:
-> On Tue, Oct 30, 2018 at 02:32:40PM +0100, Philippe Mathieu-Daudé wrote:
->> Hi Gerd,
->>
->> On 30/10/18 12:13, Gerd Hoffmann wrote:
->>> Indicates support state for somerhing (device, backend, subsystem, ...)
->>
->> "something"
+Hi Paolo,
+
+On Mon, Oct 29, 2018 at 06:28:39PM +0100, Paolo Bonzini wrote:
+> On 29/10/2018 18:01, Samuel Ortiz wrote:
+> > @@ -1556,6 +1557,7 @@ void acpi_build(AcpiBuildTables *tables,
+> >      GArray *tables_blob = tables->table_data;
+> >      AcpiSlicOem slic_oem = { .id = NULL, .table_id = NULL };
+> >      Object *vmgenid_dev;
+> > +    AcpiBuilder *ab = ACPI_BUILDER(machine);
+> >  
+> >      acpi_get_pm_info(&pm);
+> >      acpi_get_misc_info(&misc);
+> > @@ -1605,7 +1607,8 @@ void acpi_build(AcpiBuildTables *tables,
+> >      aml_len += tables_blob->len - fadt;
+> >  
+> >      acpi_add_table(table_offsets, tables_blob);
+> > -    build_madt(tables_blob, tables->linker, machine, conf);
+> > +    acpi_builder_madt(ab, tables_blob, tables->linker,
+> > +                      machine, conf);
+> >  
+> >      vmgenid_dev = find_vmgenid_dev();
+> >      if (vmgenid_dev) {
 > 
-> Oops, I'll fix.
-> 
->>> +##
->>> +# @SupportState:
->>> +#
->>> +# Indicate Support level of qemu devices, backends, subsystems, ...
->>> +#
->>> +# Since: 3.2
->>> +##
->>> +{ 'enum': 'SupportState',
->>> +  'data': [ 'unknown',
->>
->> 'unknown' is scary and should be fixed.
-> 
-> 'unknown' maps to "0" due to being first in list, so this is what you
-> get when it isn't explicitly set to something else.  Which make sense
-> IMHO.
+> Just a quick question before I go and actually apply the patches to look
+> at the resulting code: is there any reason why you didn't add the
+> MachineState and/or AcpiBuilder to AcpiBuildState, similar to how it was
+> in v1?
+With v1 I was not adding MachineState to AcpiBuildState, I may be
+missing your point.
+Do you mean adding an AcpiBuilder pointer to AcpiConfiguration?
 
-Yes, I understand in your next patch, this case won't display warning to 
-the user.
-
-I wanted to say "we should fix those entries in the MAINTAINERS file".
-
-> 
->>> +            'supported',
->>> +            'maintained',
->>> +            'odd-fixes',
->>
->> All those fit in 'supported'
->>
->>> +            'orphan',
->>> +            'obsolete',
->>> +            'deprecated' ] }
->>
->> And all those should appear as 'deprecated' IMHO.
-> 
-> See minutes on deprecation discussion.  Seems there is agreement we
-> need something more finegrained than "supported" and "deprecated".
-
-I read again the "Minutes of KVM Forum BoF on deprecating stuff" thread 
-and don't find details on finegrains, can you point it to me?
-
-I think these are fine in the MAINTAINERS entries, but don't give useful 
-information to a QEMU user that is not custom to MAINTAINERS.
-
-As a user I'd expect anything not "supported" to be eventually "deprecated".
-
-Should we continue this discussion on the "Minutes of KVM Forum BoF on 
-deprecating stuff" thread?
-
-Thanks,
-
-Phil.
-
-> 
-> cheers,
->    Gerd
-> 
-> 
+Cheers,
+Samuel.
