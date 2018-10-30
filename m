@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46504)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHVGn-000890-D0
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:45:27 -0400
+	(envelope-from <flukshun@gmail.com>) id 1gHVGV-0007n8-OM
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:45:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHVGk-00016Q-LO
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:45:25 -0400
-Received: from mail-qt1-x82c.google.com ([2607:f8b0:4864:20::82c]:46272)
+	(envelope-from <flukshun@gmail.com>) id 1gHVGT-0000eS-CJ
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:45:07 -0400
+Received: from mail-qt1-x82f.google.com ([2607:f8b0:4864:20::82f]:33587)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHVGi-0000wu-IK
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:45:21 -0400
-Received: by mail-qt1-x82c.google.com with SMTP id c16-v6so13687730qtj.13
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 07:45:17 -0700 (PDT)
+	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHVGT-0000e2-6z
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:45:05 -0400
+Received: by mail-qt1-x82f.google.com with SMTP id i15-v6so13760459qtr.0
+	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 07:45:05 -0700 (PDT)
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue, 30 Oct 2018 09:43:36 -0500
-Message-Id: <20181030144358.23144-3-mdroth@linux.vnet.ibm.com>
+Date: Tue, 30 Oct 2018 09:43:55 -0500
+Message-Id: <20181030144358.23144-22-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20181030144358.23144-1-mdroth@linux.vnet.ibm.com>
 References: <20181030144358.23144-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PULL 02/24] qga-win: add support for
- qmp_guest_fsfreeze_freeze_list
+Subject: [Qemu-devel] [PULL 21/24] qga: add --retry-path option for
+ re-initializing channel on failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,306 +28,204 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Chen Hanxiao <chenhanxiao@gmail.com>
+Cc: peter.maydell@linaro.org
 
-From: Chen Hanxiao <chenhanxiao@gmail.com>
+This adds an option to instruct the agent to periodically attempt
+re-opening the communication channel after a channel error has
+occurred. The main use-case for this is providing an OS-independent
+way of allowing the agent to survive situations like hotplug/unplug of
+the communication channel, or initial guest set up where the agent may
+be installed/started prior to the installation of the channel device's
+driver.
 
-This patch add support for freeze specified fs.
+There are nicer ways of implementing this functionality via things
+like systemd services, but this option is useful for platforms like
+*BSD/w32.
 
-The valid mountpoints list member are [1]:
+Currently a channel error will result in the GSource for that channel
+being removed from the GMainLoop, but the main loop continuing to run.
+That behavior results in a dead loop when --retry-path isn't set, and
+prevents us from knowing when to attempt re-opening the channel when
+it is set, so we also force the loop to exit as part of this patch.
 
-  The path of a mounted folder, for example, Y:\MountX\
-  A drive letter, for example, D:\
-  A volume GUID path of the form \\?\Volume{GUID}\,
-      where GUID identifies the volume
-  A UNC path that specifies a remote file share,
-      for example, \\Clusterx\Share1\
-
-[1] https://docs.microsoft.com/en-us/windows/desktop/api/vsbackup/nf-vsbackup-ivssbackupcomponents-addtosnapshotset
-
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
-Signed-off-by: Chen Hanxiao <chenhanxiao@gmail.com>
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- qga/commands-win32.c        | 21 ++++-----
- qga/main.c                  |  2 +-
- qga/vss-win32.c             |  5 +-
- qga/vss-win32.h             |  3 +-
- qga/vss-win32/requester.cpp | 92 ++++++++++++++++++++++++++-----------
- qga/vss-win32/requester.h   | 13 ++++--
- 6 files changed, 91 insertions(+), 45 deletions(-)
+ qga/main.c | 62 +++++++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 54 insertions(+), 8 deletions(-)
 
-diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-index 416343b97b..347577f2a4 100644
---- a/qga/commands-win32.c
-+++ b/qga/commands-win32.c
-@@ -790,6 +790,13 @@ GuestFsfreezeStatus qmp_guest_fsfreeze_status(Error **errp)
-  * The frozen state is limited for up to 10 seconds by VSS.
-  */
- int64_t qmp_guest_fsfreeze_freeze(Error **errp)
-+{
-+    return qmp_guest_fsfreeze_freeze_list(false, NULL, errp);
-+}
-+
-+int64_t qmp_guest_fsfreeze_freeze_list(bool has_mountpoints,
-+                                       strList *mountpoints,
-+                                       Error **errp)
- {
-     int i;
-     Error *local_err = NULL;
-@@ -804,7 +811,7 @@ int64_t qmp_guest_fsfreeze_freeze(Error **errp)
-     /* cannot risk guest agent blocking itself on a write in this state */
-     ga_set_frozen(ga_state);
- 
--    qga_vss_fsfreeze(&i, true, &local_err);
-+    qga_vss_fsfreeze(&i, true, mountpoints, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         goto error;
-@@ -822,15 +829,6 @@ error:
-     return 0;
- }
- 
--int64_t qmp_guest_fsfreeze_freeze_list(bool has_mountpoints,
--                                       strList *mountpoints,
--                                       Error **errp)
--{
--    error_setg(errp, QERR_UNSUPPORTED);
--
--    return 0;
--}
--
- /*
-  * Thaw local file systems using Volume Shadow-copy Service.
-  */
-@@ -843,7 +841,7 @@ int64_t qmp_guest_fsfreeze_thaw(Error **errp)
-         return 0;
-     }
- 
--    qga_vss_fsfreeze(&i, false, errp);
-+    qga_vss_fsfreeze(&i, false, NULL, errp);
- 
-     ga_unset_frozen(ga_state);
-     return i;
-@@ -1660,7 +1658,6 @@ GList *ga_command_blacklist_init(GList *blacklist)
-         "guest-set-vcpus",
-         "guest-get-memory-blocks", "guest-set-memory-blocks",
-         "guest-get-memory-block-size",
--        "guest-fsfreeze-freeze-list",
-         NULL};
-     char **p = (char **)list_unsupported;
- 
 diff --git a/qga/main.c b/qga/main.c
-index c399320d3c..afcd268ee3 100644
+index 761007deb4..506a314140 100644
 --- a/qga/main.c
 +++ b/qga/main.c
-@@ -151,7 +151,7 @@ static void quit_handler(int sig)
-             WaitForSingleObject(hEventTimeout, 0);
-             CloseHandle(hEventTimeout);
-         }
--        qga_vss_fsfreeze(&i, false, &err);
-+        qga_vss_fsfreeze(&i, false, NULL, &err);
-         if (err) {
-             g_debug("Error unfreezing filesystems prior to exiting: %s",
-                 error_get_pretty(err));
-diff --git a/qga/vss-win32.c b/qga/vss-win32.c
-index a541f3ae01..f444a25a70 100644
---- a/qga/vss-win32.c
-+++ b/qga/vss-win32.c
-@@ -147,7 +147,8 @@ void ga_uninstall_vss_provider(void)
- }
- 
- /* Call VSS requester and freeze/thaw filesystems and applications */
--void qga_vss_fsfreeze(int *nr_volume, bool freeze, Error **errp)
-+void qga_vss_fsfreeze(int *nr_volume, bool freeze,
-+                      strList *mountpoints, Error **errp)
- {
-     const char *func_name = freeze ? "requester_freeze" : "requester_thaw";
-     QGAVSSRequesterFunc func;
-@@ -164,5 +165,5 @@ void qga_vss_fsfreeze(int *nr_volume, bool freeze, Error **errp)
-         return;
-     }
- 
--    func(nr_volume, &errset);
-+    func(nr_volume, mountpoints, &errset);
- }
-diff --git a/qga/vss-win32.h b/qga/vss-win32.h
-index 4f8e39aa5c..ce2abe5a72 100644
---- a/qga/vss-win32.h
-+++ b/qga/vss-win32.h
-@@ -22,6 +22,7 @@ bool vss_initialized(void);
- int ga_install_vss_provider(void);
- void ga_uninstall_vss_provider(void);
- 
--void qga_vss_fsfreeze(int *nr_volume, bool freeze, Error **errp);
-+void qga_vss_fsfreeze(int *nr_volume, bool freeze,
-+                      strList *mountpints, Error **errp);
- 
+@@ -58,6 +58,7 @@
  #endif
-diff --git a/qga/vss-win32/requester.cpp b/qga/vss-win32/requester.cpp
-index 3d9c9716c0..5378c55d23 100644
---- a/qga/vss-win32/requester.cpp
-+++ b/qga/vss-win32/requester.cpp
-@@ -234,7 +234,7 @@ out:
+ #define QGA_SENTINEL_BYTE 0xFF
+ #define QGA_CONF_DEFAULT CONFIG_QEMU_CONFDIR G_DIR_SEPARATOR_S "qemu-ga.conf"
++#define QGA_RETRY_INTERVAL 5
+ 
+ static struct {
+     const char *state_dir;
+@@ -98,6 +99,7 @@ struct GAState {
+     GAPersistentState pstate;
+     GAConfig *config;
+     int socket_activation;
++    bool force_exit;
+ };
+ 
+ struct GAState *ga_state;
+@@ -120,6 +122,7 @@ DWORD WINAPI service_ctrl_handler(DWORD ctrl, DWORD type, LPVOID data,
+ VOID WINAPI service_main(DWORD argc, TCHAR *argv[]);
+ #endif
+ static int run_agent(GAState *s);
++static void stop_agent(GAState *s, bool requested);
+ 
+ static void
+ init_dfl_pathnames(void)
+@@ -168,9 +171,7 @@ static void quit_handler(int sig)
      }
+     g_debug("received signal num %d, quitting", sig);
+ 
+-    if (g_main_loop_is_running(ga_state->main_loop)) {
+-        g_main_loop_quit(ga_state->main_loop);
+-    }
++    stop_agent(ga_state, true);
  }
  
--void requester_freeze(int *num_vols, ErrorSet *errset)
-+void requester_freeze(int *num_vols, void *mountpoints, ErrorSet *errset)
+ #ifndef _WIN32
+@@ -255,6 +256,10 @@ QEMU_COPYRIGHT "\n"
+ "                    to list available RPCs)\n"
+ "  -D, --dump-conf   dump a qemu-ga config file based on current config\n"
+ "                    options / command-line parameters to stdout\n"
++"  -r, --retry-path  attempt re-opening path if it's unavailable or closed\n"
++"                    due to an error which may be recoverable in the future\n"
++"                    (virtio-serial driver re-install, serial device hot\n"
++"                    plug/unplug, etc.)\n"
+ "  -h, --help        display this help and exit\n"
+ "\n"
+ QEMU_HELP_BOTTOM "\n"
+@@ -614,6 +619,7 @@ static gboolean channel_event_cb(GIOCondition condition, gpointer data)
+     switch (status) {
+     case G_IO_STATUS_ERROR:
+         g_warning("error reading channel");
++        stop_agent(s, false);
+         return false;
+     case G_IO_STATUS_NORMAL:
+         buf[count] = 0;
+@@ -927,6 +933,7 @@ struct GAConfig {
+     int daemonize;
+     GLogLevelFlags log_level;
+     int dumpconf;
++    bool retry_path;
+ };
+ 
+ static void config_load(GAConfig *config)
+@@ -976,6 +983,10 @@ static void config_load(GAConfig *config)
+         /* enable all log levels */
+         config->log_level = G_LOG_LEVEL_MASK;
+     }
++    if (g_key_file_has_key(keyfile, "general", "retry-path", NULL)) {
++        config->retry_path =
++            g_key_file_get_boolean(keyfile, "general", "retry-path", &gerr);
++    }
+     if (g_key_file_has_key(keyfile, "general", "blacklist", NULL)) {
+         config->bliststr =
+             g_key_file_get_string(keyfile, "general", "blacklist", &gerr);
+@@ -1037,6 +1048,8 @@ static void config_dump(GAConfig *config)
+     g_key_file_set_string(keyfile, "general", "statedir", config->state_dir);
+     g_key_file_set_boolean(keyfile, "general", "verbose",
+                            config->log_level == G_LOG_LEVEL_MASK);
++    g_key_file_set_boolean(keyfile, "general", "retry-path",
++                           config->retry_path);
+     tmp = list_join(config->blacklist, ',');
+     g_key_file_set_string(keyfile, "general", "blacklist", tmp);
+     g_free(tmp);
+@@ -1055,7 +1068,7 @@ static void config_dump(GAConfig *config)
+ 
+ static void config_parse(GAConfig *config, int argc, char **argv)
  {
-     COMPointer<IVssAsync> pAsync;
-     HANDLE volume;
-@@ -246,6 +246,7 @@ void requester_freeze(int *num_vols, ErrorSet *errset)
-     WCHAR short_volume_name[64], *display_name = short_volume_name;
-     DWORD wait_status;
-     int num_fixed_drives = 0, i;
-+    int num_mount_points = 0;
+-    const char *sopt = "hVvdm:p:l:f:F::b:s:t:D";
++    const char *sopt = "hVvdm:p:l:f:F::b:s:t:Dr";
+     int opt_ind = 0, ch;
+     const struct option lopt[] = {
+         { "help", 0, NULL, 'h' },
+@@ -1075,6 +1088,7 @@ static void config_parse(GAConfig *config, int argc, char **argv)
+         { "service", 1, NULL, 's' },
+ #endif
+         { "statedir", 1, NULL, 't' },
++        { "retry-path", 0, NULL, 'r' },
+         { NULL, 0, NULL, 0 }
+     };
  
-     if (vss_ctx.pVssbc) { /* already frozen */
-         *num_vols = 0;
-@@ -337,39 +338,73 @@ void requester_freeze(int *num_vols, ErrorSet *errset)
-         goto out;
+@@ -1119,6 +1133,9 @@ static void config_parse(GAConfig *config, int argc, char **argv)
+         case 'D':
+             config->dumpconf = 1;
+             break;
++        case 'r':
++            config->retry_path = true;
++            break;
+         case 'b': {
+             if (is_help_option(optarg)) {
+                 qmp_for_each_command(&ga_commands, ga_print_cmd, NULL);
+@@ -1322,9 +1339,6 @@ static void cleanup_agent(GAState *s)
+         ga_command_state_free(s->command_state);
+         json_message_parser_destroy(&s->parser);
      }
- 
--    volume = FindFirstVolumeW(short_volume_name, sizeof(short_volume_name));
--    if (volume == INVALID_HANDLE_VALUE) {
--        err_set(errset, hr, "failed to find first volume");
--        goto out;
+-    if (s->channel) {
+-        ga_channel_free(s->channel);
 -    }
--    for (;;) {
--        if (GetDriveTypeW(short_volume_name) == DRIVE_FIXED) {
-+    if (mountpoints) {
-+        PWCHAR volume_name_wchar;
-+        for (volList *list = (volList *)mountpoints; list; list = list->next) {
-+            size_t len = strlen(list->value) + 1;
-+            size_t converted = 0;
-             VSS_ID pid;
--            hr = vss_ctx.pVssbc->AddToSnapshotSet(short_volume_name,
-+
-+            volume_name_wchar = new wchar_t[len];
-+            mbstowcs_s(&converted, volume_name_wchar, len,
-+                       list->value, _TRUNCATE);
-+
-+            hr = vss_ctx.pVssbc->AddToSnapshotSet(volume_name_wchar,
-                                                   g_gProviderId, &pid);
-             if (FAILED(hr)) {
--                WCHAR volume_path_name[PATH_MAX];
--                if (GetVolumePathNamesForVolumeNameW(
--                        short_volume_name, volume_path_name,
--                        sizeof(volume_path_name), NULL) && *volume_path_name) {
--                    display_name = volume_path_name;
--                }
-                 err_set(errset, hr, "failed to add %S to snapshot set",
--                                 display_name);
--                FindVolumeClose(volume);
-+                        volume_name_wchar);
-+                delete volume_name_wchar;
-                 goto out;
-             }
--            num_fixed_drives++;
-+            num_mount_points++;
-+
-+            delete volume_name_wchar;
-         }
--        if (!FindNextVolumeW(volume, short_volume_name,
--                             sizeof(short_volume_name))) {
--            FindVolumeClose(volume);
--            break;
-+
-+        if (num_mount_points == 0) {
-+            /* If there is no valid mount points, just exit. */
-+            goto out;
-         }
-     }
+     g_free(s->pstate_filepath);
+     g_free(s->state_filepath_isfrozen);
+     if (s->main_loop) {
+@@ -1334,7 +1348,7 @@ static void cleanup_agent(GAState *s)
+     ga_state = NULL;
+ }
  
--    if (num_fixed_drives == 0) {
--        goto out; /* If there is no fixed drive, just exit. */
-+    if (!mountpoints) {
-+        volume = FindFirstVolumeW(short_volume_name, sizeof(short_volume_name));
-+        if (volume == INVALID_HANDLE_VALUE) {
-+            err_set(errset, hr, "failed to find first volume");
-+            goto out;
-+        }
-+
-+        for (;;) {
-+            if (GetDriveTypeW(short_volume_name) == DRIVE_FIXED) {
-+                VSS_ID pid;
-+                hr = vss_ctx.pVssbc->AddToSnapshotSet(short_volume_name,
-+                                                      g_gProviderId, &pid);
-+                if (FAILED(hr)) {
-+                    WCHAR volume_path_name[PATH_MAX];
-+                    if (GetVolumePathNamesForVolumeNameW(
-+                            short_volume_name, volume_path_name,
-+                            sizeof(volume_path_name), NULL) &&
-+                            *volume_path_name) {
-+                        display_name = volume_path_name;
-+                    }
-+                    err_set(errset, hr, "failed to add %S to snapshot set",
-+                            display_name);
-+                    FindVolumeClose(volume);
-+                    goto out;
-+                }
-+                num_fixed_drives++;
-+            }
-+            if (!FindNextVolumeW(volume, short_volume_name,
-+                                 sizeof(short_volume_name))) {
-+                FindVolumeClose(volume);
-+                break;
-+            }
-+        }
-+
-+        if (num_fixed_drives == 0) {
-+            goto out; /* If there is no fixed drive, just exit. */
-+        }
-     }
+-static int run_agent(GAState *s)
++static int run_agent_once(GAState *s)
+ {
+     if (!channel_init(s, s->config->method, s->config->channel_path,
+                       s->socket_activation ? FIRST_SOCKET_ACTIVATION_FD : -1)) {
+@@ -1344,9 +1358,41 @@ static int run_agent(GAState *s)
  
-     hr = vss_ctx.pVssbc->PrepareForBackup(pAsync.replace());
-@@ -435,7 +470,12 @@ void requester_freeze(int *num_vols, ErrorSet *errset)
-         goto out;
-     }
+     g_main_loop_run(ga_state->main_loop);
  
--    *num_vols = vss_ctx.cFrozenVols = num_fixed_drives;
-+    if (mountpoints) {
-+        *num_vols = vss_ctx.cFrozenVols = num_mount_points;
-+    } else {
-+        *num_vols = vss_ctx.cFrozenVols = num_fixed_drives;
++    if (s->channel) {
++        ga_channel_free(s->channel);
 +    }
 +
-     return;
- 
- out:
-@@ -449,7 +489,7 @@ out1:
+     return EXIT_SUCCESS;
  }
  
- 
--void requester_thaw(int *num_vols, ErrorSet *errset)
-+void requester_thaw(int *num_vols, void *mountpints, ErrorSet *errset)
++static int run_agent(GAState *s)
++{
++    int ret = EXIT_SUCCESS;
++
++    s->force_exit = false;
++
++    do {
++        ret = run_agent_once(s);
++        if (s->config->retry_path && !s->force_exit) {
++            g_warning("agent stopped unexpectedly, restarting...");
++            sleep(QGA_RETRY_INTERVAL);
++        }
++    } while (s->config->retry_path && !s->force_exit);
++
++    return ret;
++}
++
++static void stop_agent(GAState *s, bool requested)
++{
++    if (!s->force_exit) {
++        s->force_exit = requested;
++    }
++
++    if (g_main_loop_is_running(s->main_loop)) {
++        g_main_loop_quit(s->main_loop);
++    }
++}
++
+ int main(int argc, char **argv)
  {
-     COMPointer<IVssAsync> pAsync;
- 
-diff --git a/qga/vss-win32/requester.h b/qga/vss-win32/requester.h
-index 2a39d734a2..5a8e8faf0c 100644
---- a/qga/vss-win32/requester.h
-+++ b/qga/vss-win32/requester.h
-@@ -34,9 +34,16 @@ typedef struct ErrorSet {
- STDAPI requester_init(void);
- STDAPI requester_deinit(void);
- 
--typedef void (*QGAVSSRequesterFunc)(int *, ErrorSet *);
--void requester_freeze(int *num_vols, ErrorSet *errset);
--void requester_thaw(int *num_vols, ErrorSet *errset);
-+typedef struct volList volList;
-+
-+struct volList {
-+    volList *next;
-+    char *value;
-+};
-+
-+typedef void (*QGAVSSRequesterFunc)(int *, void *, ErrorSet *);
-+void requester_freeze(int *num_vols, void *volList, ErrorSet *errset);
-+void requester_thaw(int *num_vols, void *volList, ErrorSet *errset);
- 
- #ifdef __cplusplus
- }
+     int ret = EXIT_SUCCESS;
 -- 
 2.17.1
