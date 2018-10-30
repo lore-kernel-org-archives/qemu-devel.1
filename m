@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39624)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48482)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gHPek-0003mM-CW
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 04:45:47 -0400
+	(envelope-from <armbru@redhat.com>) id 1gHQAG-0007nT-Al
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 05:18:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gHPeg-0000JV-AT
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 04:45:46 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:39473)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gHPeg-0000C9-2t
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 04:45:42 -0400
-Received: by mail-wr1-f65.google.com with SMTP id r10-v6so11586372wrv.6
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 01:45:30 -0700 (PDT)
-References: <20181030082340.17170-1-kraxel@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <c6c8e609-9daa-0f60-81d0-50d51db5ba3a@redhat.com>
-Date: Tue, 30 Oct 2018 09:45:27 +0100
+	(envelope-from <armbru@redhat.com>) id 1gHQA4-0000pE-OF
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 05:18:17 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1540548409-22560-1-git-send-email-thuth@redhat.com>
+	<CAFEAcA8EubWya8ey9VxhaCw4m2U=KA+i2C-R9P-p+P6oEBBLew@mail.gmail.com>
+	<7fc49925-36ff-bd9a-0cd7-e5f8d4bb3672@roeck-us.net>
+	<CAFEAcA-UF+SyXvcU+NGZsbqBF2qg+s_x4HPU7yvf7B2G-=HPOg@mail.gmail.com>
+	<b4f6cbd2-68fe-5b07-e8fb-93b1c4d8a6de@roeck-us.net>
+Date: Tue, 30 Oct 2018 10:17:51 +0100
+In-Reply-To: <b4f6cbd2-68fe-5b07-e8fb-93b1c4d8a6de@roeck-us.net> (Guenter
+	Roeck's message of "Mon, 29 Oct 2018 07:09:29 -0700")
+Message-ID: <87pnvriyio.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20181030082340.17170-1-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] fmops: fix off-by-one in AR_TABLE and
- DR_TABLE array size
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 0/2] Deprecate the "collie" machine and
+ Strongarm devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,62 +27,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: Prasad J Pandit <ppandit@redhat.com>
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Hi Gerd,
+Guenter Roeck <linux@roeck-us.net> writes:
 
-On 30/10/18 9:23, Gerd Hoffmann wrote:
+> On 10/29/18 6:24 AM, Peter Maydell wrote:
+>> On 27 October 2018 at 12:04, Guenter Roeck <linux@roeck-us.net> wrote:
+>>> On 10/26/18 3:12 AM, Peter Maydell wrote:
+>>>> Hi Guenter; there's a proposal here to deprecate (and eventually
+>>>> remove) the 'collie' board (strongarm) from QEMU. Is that one of
+>>>> the ones you're currently using in your automated testing of Linux
+>>>> kernels on QEMU?
+>>>>
+>>>
+>>> Yes. I can run the test with older versions of qemu, so it is ok for me
+>>> if it is removed (as long as that removal is not backported).
+>>
+>> Mmm, but if we have an active user who's testing them then they
+>> probably shouldn't be in the frontline of boards to remove.
+>> Which other boards do you test with mainline QEMU?
+>>
+>
+> For arm:
+>
+> akita
+> ast2500-evb
+> beagle
+> beaglexm
+> borzoi
+> collie
+> cubieboard
+> imx25-pdk
+> integratorcp
+> kzm
+> mainstone
+> midway
+> mps2-an385
+> overo
+> palmetto-bmc
+> raspi2
+> realview-eb
+> realview-eb-mpcore
+> realview-pb-a8
+> realview-pbx-a9
+> romulus-bmc
+> sabrelite
+> smdkc210
+> spitz
+> terrier
+> tosa
+> versatileab
+> versatilepb
+> vexpress-a15
+> vexpress-a15-a7
+> vexpress-a9
+> witherspoon-bmc
+> xilinx-zynq-a9
+> z2
+>
+> Though not all of them are supported by upstream qemu. For some of them I carry local patches,
+> for others I use out-of-tree versions of qemu (beagle/beaglexm).
 
-Can you add your previous patch description,
+Would it be possible to get useful parts of your automated testing into
+upstream QEMU's CI?
 
-   We have a lovely, guest-triggerable buffer overflow in opl2 emulation.
-
-   Reproducer:
-       outw(0xff60, 0x220);
-       outw(0x1020, 0x220);
-       outw(0xffb0, 0x220);
-   Result:
-       Will overflow FM_OPL->AR_TABLE[] (see hw/audio/fmopl.[ch])
-
-And Prasad Pandit triggering flow:
-
-   In set_ar_dr
-
-     SLOT->AR = ar ? &OPL->AR_TABLE[ar<<2] : RATE_0;
-
-   SLOT->AR is set to point to OPL->DR_TABLE[60] and while so if s->ksr
-   is set to 15, in CALC_FCSLOT()
-
-   SLOT->evsa = SLOT->AR[ksr];  <= accesses OPL->AR_TABLE[60 + 15];
-
-Thanks.
-
-> Fixes: CVE-2018-???
-> Cc: P J P <ppandit@redhat.com>
-> Reported-by: Wangjunqing <wangjunqing@huawei.com>
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> ---
->   hw/audio/fmopl.h | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/audio/fmopl.h b/hw/audio/fmopl.h
-> index e7e578a48e..7199afaa3c 100644
-> --- a/hw/audio/fmopl.h
-> +++ b/hw/audio/fmopl.h
-> @@ -72,8 +72,8 @@ typedef struct fm_opl_f {
->   	/* Rhythm sention */
->   	uint8_t rhythm;		/* Rhythm mode , key flag */
->   	/* time tables */
-> -	int32_t AR_TABLE[75];	/* atttack rate tables */
-> -	int32_t DR_TABLE[75];	/* decay rate tables   */
-> +	int32_t AR_TABLE[76];	/* atttack rate tables */
-> +	int32_t DR_TABLE[76];	/* decay rate tables   */
->   	uint32_t FN_TABLE[1024];  /* fnumber -> increment counter */
->   	/* LFO */
->   	int32_t *ams_table;
-> 
+I'm asking because I think we should require at least a smoke test in CI
+for all machine types, and drop the ones that lack it.  Not today, but
+in the not-too-distant future.
