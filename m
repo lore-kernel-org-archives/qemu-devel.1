@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52495)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gHVZv-00037Q-Hm
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:05:15 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gHVao-0003te-DD
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:06:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gHVZq-0006I9-0J
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:05:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36670)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gHVaj-0000WT-Rw
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:06:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57302)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gHVZm-0005zY-BB
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:05:04 -0400
+	id 1gHVaj-0007rw-E1
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 11:06:01 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 30 Oct 2018 19:04:43 +0400
-Message-Id: <20181030150453.9344-1-marcandre.lureau@redhat.com>
+Date: Tue, 30 Oct 2018 19:04:44 +0400
+Message-Id: <20181030150453.9344-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20181030150453.9344-1-marcandre.lureau@redhat.com>
+References: <20181030150453.9344-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 00/10] hostmem: use object "id" for memory
- region name with >= 3.1
+Subject: [Qemu-devel] [PATCH v2 01/10] qom: make user_creatable_complete()
+ specific to UserCreatable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,80 +31,153 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Amit Shah <amit@kernel.org>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, dgilbert@redhat.com, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Hi,
+Instead of accepting any Object*, change user_creatable_complete() to
+require a UserCreatable*. Modify the callers to pass the appropriate
+argument, removing redundant dynamic cast checks in object creation.
 
-The migration code expects the RAM block name to match between the
-source and destination.  However the backend type may change, so it is
-possible (so far) to migrate from a hostmem-file to a hostmem-memfd
-for example.
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ include/qom/object_interfaces.h |  4 ++--
+ hw/misc/ivshmem.c               |  2 +-
+ hw/virtio/virtio-rng.c          |  2 +-
+ qom/object.c                    | 12 ++++++++----
+ qom/object_interfaces.c         | 14 +++-----------
+ 5 files changed, 15 insertions(+), 19 deletions(-)
 
-However, hostmem backends use inconsistent RAM naming, which can cause
-a name mismatch. hostmem-file and hostmem-memfd use the whole object
-path as memory name, while -ram use only the object "id".
-
-This series adds global property support for objects others than
-TYPE_DEVICE (only TYPE_USER_CREATABLE for now), and a new compat
-property "x-use-canonical-path-for-ramblock-id" to hostmem for legacy
-canonical path names, set to true for -file and -memfd with qemu < 3.1.
-
-v2:
-- replace "qom/user-creatable: add a few helper macros" patch for a
-  more optimized "qom: make user_creatable_complete() specific to
-  UserCreatable"
-- rename register_global_list() to register_global_properties()
-- call object_property_set_globals() after post-init
-- add and use a ObjectClass.set_globals flag, instead of dynamically
-  check object class in object_property_set_globals()
-- use object "id" in >=3D 3.1 instead of canonical path, add compat
-  property "x-use-canonical-path-for-ramblock-id" in base hostmem
-  class.
-
-Marc-Andr=C3=A9 Lureau (10):
-  qom: make user_creatable_complete() specific to UserCreatable
-  accel: register global_props like machine globals
-  qdev: move qdev_prop_register_global_list() to tests
-  qom/globals: move qdev globals to qom
-  qom/globals: generalize object_property_set_globals()
-  qom/object: set globals when initializing object
-  qom/object: add set_globals flags
-  tests: add user-creatable test to test-qdev-global-props
-  hw/i386: add pc-i440fx-3.1 & pc-q35-3.1
-  hostmem: use object id for memory region name with >=3D 3.1
-
- include/hw/compat.h                           |  11 +-
- include/hw/i386/pc.h                          |   2 +-
- include/hw/qdev-core.h                        |  20 ---
- include/hw/qdev-properties.h                  |  34 +---
- include/qom/globals.h                         |  32 ++++
- include/qom/object.h                          |   1 +
- include/qom/object_interfaces.h               |   4 +-
- include/sysemu/hostmem.h                      |   3 +-
- accel/accel.c                                 |   9 +-
- backends/hostmem-file.c                       |   8 +-
- backends/hostmem-memfd.c                      |   2 +-
- backends/hostmem-ram.c                        |   9 +-
- backends/hostmem.c                            |  30 ++++
- hw/core/machine.c                             |   2 +-
- hw/core/qdev-properties.c                     |  97 -----------
- hw/core/qdev.c                                |   7 +-
- hw/i386/pc_piix.c                             |  15 +-
- hw/i386/pc_q35.c                              |  13 +-
- hw/misc/ivshmem.c                             |   2 +-
- hw/virtio/virtio-rng.c                        |   2 +-
- qom/cpu.c                                     |   2 +-
- qom/globals.c                                 |  76 +++++++++
- qom/object.c                                  |  17 +-
- qom/object_interfaces.c                       |  21 ++-
- target/i386/cpu.c                             |   2 +-
- target/sparc/cpu.c                            |   2 +-
- ...dev-global-props.c =3D> test-global-props.c} | 150 +++++++++++++++---
- vl.c                                          |   6 +-
- qom/Makefile.objs                             |   2 +-
- tests/Makefile.include                        |   4 +-
- 30 files changed, 362 insertions(+), 223 deletions(-)
- create mode 100644 include/qom/globals.h
- create mode 100644 qom/globals.c
- rename tests/{test-qdev-global-props.c =3D> test-global-props.c} (71%)
-
+diff --git a/include/qom/object_interfaces.h b/include/qom/object_interfa=
+ces.h
+index 4d513fb329..7450cff908 100644
+--- a/include/qom/object_interfaces.h
++++ b/include/qom/object_interfaces.h
+@@ -55,14 +55,14 @@ typedef struct UserCreatableClass {
+=20
+ /**
+  * user_creatable_complete:
+- * @obj: the object whose complete() method is called if defined
++ * @uc: the user-creatable object whose complete() method is called if d=
+efined
+  * @errp: if an error occurs, a pointer to an area to store the error
+  *
+  * Wrapper to call complete() method if one of types it's inherited
+  * from implements USER_CREATABLE interface, otherwise the call does
+  * nothing.
+  */
+-void user_creatable_complete(Object *obj, Error **errp);
++void user_creatable_complete(UserCreatable *uc, Error **errp);
+=20
+ /**
+  * user_creatable_can_be_deleted:
+diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
+index f88910e55c..478f41044c 100644
+--- a/hw/misc/ivshmem.c
++++ b/hw/misc/ivshmem.c
+@@ -1279,7 +1279,7 @@ static void desugar_shm(IVShmemState *s)
+     object_property_set_bool(obj, true, "share", &error_abort);
+     object_property_add_child(OBJECT(s), "internal-shm-backend", obj,
+                               &error_abort);
+-    user_creatable_complete(obj, &error_abort);
++    user_creatable_complete(USER_CREATABLE(obj), &error_abort);
+     s->hostmem =3D MEMORY_BACKEND(obj);
+ }
+=20
+diff --git a/hw/virtio/virtio-rng.c b/hw/virtio/virtio-rng.c
+index 855f1b41d1..30493a2586 100644
+--- a/hw/virtio/virtio-rng.c
++++ b/hw/virtio/virtio-rng.c
+@@ -191,7 +191,7 @@ static void virtio_rng_device_realize(DeviceState *de=
+v, Error **errp)
+     if (vrng->conf.rng =3D=3D NULL) {
+         vrng->conf.default_backend =3D RNG_RANDOM(object_new(TYPE_RNG_RA=
+NDOM));
+=20
+-        user_creatable_complete(OBJECT(vrng->conf.default_backend),
++        user_creatable_complete(USER_CREATABLE(vrng->conf.default_backen=
+d),
+                                 &local_err);
+         if (local_err) {
+             error_propagate(errp, local_err);
+diff --git a/qom/object.c b/qom/object.c
+index 547dcf97c3..eb770dbf7f 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -417,6 +417,7 @@ void object_initialize_childv(Object *parentobj, cons=
+t char *propname,
+ {
+     Error *local_err =3D NULL;
+     Object *obj;
++    UserCreatable *uc;
+=20
+     object_initialize(childobj, size, type);
+     obj =3D OBJECT(childobj);
+@@ -431,8 +432,9 @@ void object_initialize_childv(Object *parentobj, cons=
+t char *propname,
+         goto out;
+     }
+=20
+-    if (object_dynamic_cast(obj, TYPE_USER_CREATABLE)) {
+-        user_creatable_complete(obj, &local_err);
++    uc =3D (UserCreatable *)object_dynamic_cast(obj, TYPE_USER_CREATABLE=
+);
++    if (uc) {
++        user_creatable_complete(uc, &local_err);
+         if (local_err) {
+             object_unparent(obj);
+             goto out;
+@@ -590,6 +592,7 @@ Object *object_new_with_propv(const char *typename,
+     Object *obj;
+     ObjectClass *klass;
+     Error *local_err =3D NULL;
++    UserCreatable *uc;
+=20
+     klass =3D object_class_by_name(typename);
+     if (!klass) {
+@@ -612,8 +615,9 @@ Object *object_new_with_propv(const char *typename,
+         goto error;
+     }
+=20
+-    if (object_dynamic_cast(obj, TYPE_USER_CREATABLE)) {
+-        user_creatable_complete(obj, &local_err);
++    uc =3D (UserCreatable *)object_dynamic_cast(obj, TYPE_USER_CREATABLE=
+);
++    if (uc) {
++        user_creatable_complete(uc, &local_err);
+         if (local_err) {
+             object_unparent(obj);
+             goto error;
+diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
+index 97b79b48bb..db85d1eb75 100644
+--- a/qom/object_interfaces.c
++++ b/qom/object_interfaces.c
+@@ -8,18 +8,10 @@
+ #include "qapi/opts-visitor.h"
+ #include "qemu/config-file.h"
+=20
+-void user_creatable_complete(Object *obj, Error **errp)
++void user_creatable_complete(UserCreatable *uc, Error **errp)
+ {
++    UserCreatableClass *ucc =3D USER_CREATABLE_GET_CLASS(uc);
+=20
+-    UserCreatableClass *ucc;
+-    UserCreatable *uc =3D
+-        (UserCreatable *)object_dynamic_cast(obj, TYPE_USER_CREATABLE);
+-
+-    if (!uc) {
+-        return;
+-    }
+-
+-    ucc =3D USER_CREATABLE_GET_CLASS(uc);
+     if (ucc->complete) {
+         ucc->complete(uc, errp);
+     }
+@@ -89,7 +81,7 @@ Object *user_creatable_add_type(const char *type, const=
+ char *id,
+         goto out;
+     }
+=20
+-    user_creatable_complete(obj, &local_err);
++    user_creatable_complete(USER_CREATABLE(obj), &local_err);
+     if (local_err) {
+         object_property_del(object_get_objects_root(),
+                             id, &error_abort);
 --=20
 2.19.0.271.gfe8321ec05
