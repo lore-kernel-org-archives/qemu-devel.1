@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48234)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gHTzt-0007Qc-DN
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 09:23:54 -0400
+	(envelope-from <philmd@redhat.com>) id 1gHU1n-00006A-Fy
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 09:25:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gHTzp-0006Bb-7D
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 09:23:52 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:52130)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1gHTzo-00069K-Ep
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 09:23:48 -0400
-Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1gHTzm-00016G-Cd
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 13:23:46 +0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 30 Oct 2018 13:23:43 +0000
-Message-Id: <20181030132343.22658-1-peter.maydell@linaro.org>
+	(envelope-from <philmd@redhat.com>) id 1gHU1i-0007zF-H4
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 09:25:51 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:46350)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gHU1i-0007ti-A0
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 09:25:46 -0400
+Received: by mail-wr1-f68.google.com with SMTP id 74-v6so4375903wrb.13
+	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 06:25:37 -0700 (PDT)
+References: <20181026073034.16648-1-ppandit@redhat.com>
+	<CAFEAcA_WduaLJZG-gu9oywCaUb2mR9DeBJ9WKqsTkKu4uGT7Uw@mail.gmail.com>
+	<nycvar.YSQ.7.76.1810301716590.30516@xnncv>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <f15fc5de-43ff-0178-f4da-559b5008fdce@redhat.com>
+Date: Tue, 30 Oct 2018 14:25:33 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 0/6] target-arm queue
+In-Reply-To: <nycvar.YSQ.7.76.1810301716590.30516@xnncv>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] strongarm: mask off high[32:28] bits
+ from dir and state registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,61 +32,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: P J P <ppandit@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: liqsub1 <liqsub1@163.com>, Qemu Developers <qemu-devel@nongnu.org>, Moguofang <moguofang@huawei.com>
 
-Respin to fix some accidental wrong Author lines, no content
-changes.
+On 30/10/18 12:49, P J P wrote:
+> +-- On Mon, 29 Oct 2018, Peter Maydell wrote --+
+> | >      switch (offset) {
+> | >      case GPDR:        /* GPIO Pin-Direction registers */
+> | > -        s->dir = value;
+> | > +        s->dir = value & 0x3fffff;
+> |
+> | The commit message says it's masking [31:28], but the
+> | code is masking [31:22]. The SA1110 spec suggests the
+> | commit message is correct and the code is not.
+> 
+> Ouch, sorry! Sent revised patch v3.
 
--- PMM
+That's where the extract32() is more convenient and less bug prone:
 
-The following changes since commit 0bbba1665ca2e7f1c80d4797077fe57bad58898e:
-
-  Merge remote-tracking branch 'remotes/amarkovic/tags/mips-queue-october-2018-part-4' into staging (2018-10-30 10:45:49 +0000)
-
-are available in the Git repository at:
-
-  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20181030
-
-for you to fetch changes up to 1f5a65a188210509bfb0c025fc91635c8436b98a:
-
-  tests/boot-serial-test: Add microbit board testcase (2018-10-30 13:20:18 +0000)
-
-----------------------------------------------------------------
-target-arm queue:
- * microbit: Add the UART to our nRF51 SoC model
- * Add a virtual Xilinx Versal board "xlnx-versal-virt"
- * hw/arm/virt: Set VIRT_COMPAT_3_0 compat
-
-----------------------------------------------------------------
-Edgar E. Iglesias (2):
-      hw/arm: versal: Add a model of Xilinx Versal SoC
-      hw/arm: versal: Add a virtual Xilinx Versal board
-
-Eric Auger (1):
-      hw/arm/virt: Set VIRT_COMPAT_3_0 compat
-
-Julia Suvorova (3):
-      hw/char: Implement nRF51 SoC UART
-      hw/arm/nrf51_soc: Connect UART to nRF51 SoC
-      tests/boot-serial-test: Add microbit board testcase
-
- hw/arm/Makefile.objs                |   1 +
- hw/char/Makefile.objs               |   1 +
- include/hw/arm/nrf51_soc.h          |   3 +
- include/hw/arm/xlnx-versal.h        | 122 +++++++++
- include/hw/char/nrf51_uart.h        |  78 ++++++
- hw/arm/microbit.c                   |   2 +
- hw/arm/nrf51_soc.c                  |  20 ++
- hw/arm/virt.c                       |   4 +
- hw/arm/xlnx-versal-virt.c           | 493 ++++++++++++++++++++++++++++++++++++
- hw/arm/xlnx-versal.c                | 323 +++++++++++++++++++++++
- hw/char/nrf51_uart.c                | 330 ++++++++++++++++++++++++
- tests/boot-serial-test.c            |  19 ++
- default-configs/aarch64-softmmu.mak |   1 +
- hw/char/trace-events                |   4 +
- 14 files changed, 1401 insertions(+)
- create mode 100644 include/hw/arm/xlnx-versal.h
- create mode 100644 include/hw/char/nrf51_uart.h
- create mode 100644 hw/arm/xlnx-versal-virt.c
- create mode 100644 hw/arm/xlnx-versal.c
- create mode 100644 hw/char/nrf51_uart.c
+                s->dir = extract32(value, 0, 28); /* mask off [31:28] */
+> 
+> Thank you.
+> --
+> Prasad J Pandit / Red Hat Product Security Team
+> 47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
+> 
