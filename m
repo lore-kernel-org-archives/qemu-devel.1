@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46710)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHVHR-0000CY-V2
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:46:07 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gHVIU-0000yM-3h
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:47:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHVHL-0001zt-Lq
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:46:05 -0400
-Received: from mail-qk1-x735.google.com ([2607:f8b0:4864:20::735]:44766)
+	(envelope-from <peter.maydell@linaro.org>) id 1gHVIT-0003UK-3Q
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:47:10 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:42526)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHVHJ-0001Jq-Mw
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:45:58 -0400
-Received: by mail-qk1-x735.google.com with SMTP id n12so7367654qkh.11
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 07:45:33 -0700 (PDT)
-Sender: fluxion <flukshun@gmail.com>
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue, 30 Oct 2018 09:43:42 -0500
-Message-Id: <20181030144358.23144-9-mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20181030144358.23144-1-mdroth@linux.vnet.ibm.com>
-References: <20181030144358.23144-1-mdroth@linux.vnet.ibm.com>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gHVIS-0003Qn-L9
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:47:08 -0400
+Received: by mail-ot1-x343.google.com with SMTP id j3so5511641otl.9
+	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 07:47:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 08/24] qga-win: fsinfo: pci-info: allow partial
- info
+In-Reply-To: <mhng-b2717513-e93b-43da-b724-f2adca348413@palmer-si-x1c4>
+References: <CAFEAcA_oMG2qo_W_OFfdkPomu7-hc4vkFSZnC0CLQ_PD6zmW+Q@mail.gmail.com>
+	<mhng-b2717513-e93b-43da-b724-f2adca348413@palmer-si-x1c4>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 30 Oct 2018 14:46:46 +0000
+Message-ID: <CAFEAcA_AYKP0ApmkdSXFn_pQRq3vVBbijbg7WDfTawPkvApQxw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] Add Alistair as a RISC-V Maintainer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,140 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Sameeh Jubran <sjubran@redhat.com>, =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
+To: Palmer Dabbelt <palmer@sifive.com>
+Cc: Alistair Francis <alistair23@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Michael Clark <mjc@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, QEMU Developers <qemu-devel@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>
 
-From: Sameeh Jubran <sjubran@redhat.com>
+On 29 October 2018 at 18:41, Palmer Dabbelt <palmer@sifive.com> wrote:
+> On Mon, 29 Oct 2018 10:59:47 PDT (-0700), Peter Maydell wrote:
+>>
+>> On 29 October 2018 at 17:14, Palmer Dabbelt <palmer@sifive.com> wrote:
+>>>
+>>> I don't think we have anything ready to go right now: your PCIe patches
+>>> still have some outstanding feedback (on interrupt stuff), and Bastian's
+>>> decodetree stuff has some patches from Richard Henderson that should be
+>>> merged in.  I was hoping to get through reviewing Michael's patches to
+>>> fix
+>>> the FS dirty bit, but haven't had time yet -- they're tested, but I
+>>> haven't
+>>> actually read through them.
+>>>
+>>> Maybe we should get a RISC-V QEMU mailing list so we can keep everyone in
+>>> sync without spamming the whole world?
+>>
+>>
+>> We can sort out a qemu-riscv mailing list like the ones we have
+>> for ppc and arm if you like:
+>> https://wiki.qemu.org/Contribute/MailingLists
+>
+>
+> I think that'd be good.  It makes things a bit easier on my end as I can
+> ensure I don't miss any patches that end up on our list.
 
-The call to SetupDiGetDeviceRegistryProperty might fail because the
-value doesn't exist in the registry, in this case we shouldn't exit from
-the loop but instead continue to look for other available values in the
-registry and set this value as unavailable (-1).
+OK, I have set one up. The subscription page is at:
+https://lists.nongnu.org/mailman/listinfo/qemu-riscv
 
-Signed-off-by: Sameeh Jubran <sjubran@redhat.com>
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
-*squash in fix for when get_pci_info() returns NULL pci_controller field
-*fix handling for error_set() cases in get_pci_info(), not just NULL return
-*force all -1 PCI addr fields if any single one of them isn't found
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
----
- qga/commands-win32.c | 46 +++++++++++++++++++++++++++++++-------------
- 1 file changed, 33 insertions(+), 13 deletions(-)
+I think I have got the list config correct but let me know if you
+notice anything weird.
 
-diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-index f0e6f6128b..4fe1517778 100644
---- a/qga/commands-win32.c
-+++ b/qga/commands-win32.c
-@@ -499,6 +499,7 @@ static GuestPCIAddress *get_pci_info(char *guid, Error **errp)
-     char *buffer = NULL;
-     GuestPCIAddress *pci = NULL;
-     char *name = g_strdup(&guid[4]);
-+    bool partial_pci = false;
-     pci = g_malloc0(sizeof(*pci));
-     pci->domain = -1;
-     pci->slot = -1;
-@@ -519,7 +520,8 @@ static GuestPCIAddress *get_pci_info(char *guid, Error **errp)
- 
-     dev_info_data.cbSize = sizeof(SP_DEVINFO_DATA);
-     for (i = 0; SetupDiEnumDeviceInfo(dev_info, i, &dev_info_data); i++) {
--        DWORD addr, bus, slot, func, dev, data, size2;
-+        DWORD addr, bus, slot, data, size2;
-+        int func, dev;
-         while (!SetupDiGetDeviceRegistryProperty(dev_info, &dev_info_data,
-                                             SPDRP_PHYSICAL_DEVICE_OBJECT_NAME,
-                                             &data, (PBYTE)buffer, size,
-@@ -549,21 +551,24 @@ static GuestPCIAddress *get_pci_info(char *guid, Error **errp)
-          */
-         if (!SetupDiGetDeviceRegistryProperty(dev_info, &dev_info_data,
-                    SPDRP_BUSNUMBER, &data, (PBYTE)&bus, size, NULL)) {
--            break;
-+            bus = -1;
-+            partial_pci = true;
-         }
- 
-         /* The function retrieves the device's address. This value will be
-          * transformed into device function and number */
-         if (!SetupDiGetDeviceRegistryProperty(dev_info, &dev_info_data,
-                    SPDRP_ADDRESS, &data, (PBYTE)&addr, size, NULL)) {
--            break;
-+            addr = -1;
-+            partial_pci = true;
-         }
- 
-         /* This call returns UINumber of DEVICE_CAPABILITIES structure.
-          * This number is typically a user-perceived slot number. */
-         if (!SetupDiGetDeviceRegistryProperty(dev_info, &dev_info_data,
-                    SPDRP_UI_NUMBER, &data, (PBYTE)&slot, size, NULL)) {
--            break;
-+            slot = -1;
-+            partial_pci = true;
-         }
- 
-         /* SetupApi gives us the same information as driver with
-@@ -573,12 +578,19 @@ static GuestPCIAddress *get_pci_info(char *guid, Error **errp)
-          * DeviceNumber = (USHORT)(((propertyAddress) >> 16) & 0x0000FFFF);
-          * SPDRP_ADDRESS is propertyAddress, so we do the same.*/
- 
--        func = addr & 0x0000FFFF;
--        dev = (addr >> 16) & 0x0000FFFF;
--        pci->domain = dev;
--        pci->slot = slot;
--        pci->function = func;
--        pci->bus = bus;
-+        if (partial_pci) {
-+            pci->domain = -1;
-+            pci->slot = -1;
-+            pci->function = -1;
-+            pci->bus = -1;
-+        } else {
-+            func = ((int) addr == -1) ? -1 : addr & 0x0000FFFF;
-+            dev = ((int) addr == -1) ? -1 : (addr >> 16) & 0x0000FFFF;
-+            pci->domain = dev;
-+            pci->slot = (int) slot;
-+            pci->function = func;
-+            pci->bus = (int) bus;
-+        }
-         break;
-     }
- 
-@@ -622,6 +634,7 @@ static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
-     DWORD len;
-     int bus;
-     HANDLE vol_h;
-+    Error *local_err = NULL;
- 
-     scsi_ad = &addr;
-     char *name = g_strndup(guid, strlen(guid)-1);
-@@ -640,6 +653,16 @@ static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
- 
-     disk = g_malloc0(sizeof(*disk));
-     disk->bus_type = find_bus_type(bus);
-+    /* always set pci_controller as required by schema. get_pci_info() should
-+     * report -1 values for non-PCI buses rather than fail. fail the command
-+     * if that doesn't hold since that suggests some other unexpected
-+     * breakage
-+     */
-+    disk->pci_controller = get_pci_info(name, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        goto out_close;
-+    }
-     if (bus == BusTypeScsi || bus == BusTypeAta || bus == BusTypeRAID
- #if (_WIN32_WINNT >= 0x0600)
-             /* This bus type is not supported before Windows Server 2003 SP1 */
-@@ -654,12 +677,9 @@ static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
-             disk->unit = addr.Lun;
-             disk->target = addr.TargetId;
-             disk->bus = addr.PathId;
--            disk->pci_controller = get_pci_info(name, errp);
-         }
-         /* We do not set error in this case, because we still have enough
-          * information about volume. */
--    } else {
--         disk->pci_controller = NULL;
-     }
- 
-     list = g_malloc0(sizeof(*list));
--- 
-2.17.1
+I suggest submitting a patch to MAINTAINERS that adds an
+L: qemu-riscv@nongnu.org
+line to the RISC-V section of that file.
+
+thanks
+-- PMM
