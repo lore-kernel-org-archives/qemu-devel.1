@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35607)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36345)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gHYK8-0005nk-TC
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 14:01:05 -0400
+	(envelope-from <laurent@vivier.eu>) id 1gHYML-0007zO-K4
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 14:03:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gHYK5-0001cO-A7
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 14:01:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35618)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gHYK5-0001bm-00
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 14:01:01 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EB1AF307DAA1
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 18:00:59 +0000 (UTC)
-Date: Tue, 30 Oct 2018 18:00:50 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181030180050.GD3541@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181025085256.20522-1-kraxel@redhat.com>
-	<20181025085256.20522-4-kraxel@redhat.com>
-	<20181025203758.GA29995@redhat.com>
-	<20181029091244.mgq4xhodjv62quof@sirius.home.kraxel.org>
+	(envelope-from <laurent@vivier.eu>) id 1gHYMB-0002uZ-VV
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 14:03:16 -0400
+References: <20181029134000.11157-1-mark.cave-ayland@ilande.co.uk>
+	<20181029134000.11157-7-mark.cave-ayland@ilande.co.uk>
+	<d86f51e6-0f5d-e78a-3aba-cad233e83efa@reactos.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <ba96cec6-f1c1-9922-b11a-d337e74bc66f@vivier.eu>
+Date: Tue, 30 Oct 2018 19:02:51 +0100
 MIME-Version: 1.0
+In-Reply-To: <d86f51e6-0f5d-e78a-3aba-cad233e83efa@reactos.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20181029091244.mgq4xhodjv62quof@sirius.home.kraxel.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/3] cirrus: mark as deprecated
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 06/11] esp: add pseudo-DMA as used by
+ Macintosh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,57 +26,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, Prasad J Pandit <ppandit@redhat.com>
+To: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, jasowang@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, kraxel@redhat.com, pbonzini@redhat.com, aurelien@aurel32.net
 
-On Mon, Oct 29, 2018 at 10:12:44AM +0100, Gerd Hoffmann wrote:
-> On Thu, Oct 25, 2018 at 09:37:58PM +0100, Daniel P. Berrang=C3=A9 wrote=
-:
-> > On Thu, Oct 25, 2018 at 10:52:56AM +0200, Gerd Hoffmann wrote:
-> > > While being at it deprecate cirrus too.
-> > >=20
-> > > Reason (short version): use stdvga instead.
-> > > Verbose version:
-> > >     https://www.kraxel.org/blog/2014/10/qemu-using-cirrus-considere=
-d-harmful
-> >=20
-> > Every single one of my guests is using cirrus. This wasn't an explici=
-t
-> > choice on my part, so I believe it is being used as the default in
-> > virt-install.
-> >=20
-> > I don't debate the points in the blog post above that stdvga is a
-> > better choice, but I don't think that's enough to justify deprecating
-> > cirrus at this point in time, because when it then gets deleted it
-> > will break way too many existing deployments.
-> >=20
-> > We need to socialize info in that blog post above more widely and
-> > especially ensure that apps are not using that by default. I don't
-> > see it being viable to formally deprecate it in QEMU any time soon
-> > though given existing usage.
->=20
-> Well, getting that message to the users is the point of deprecating it.
-> I think in this specific case we'll need a longer (maybe much longer)
-> deprecation period than only two releases.  But I think it still makes
-> sense to deprecate it now.
+On 30/10/2018 07:47, Hervé Poussineau wrote:
+> Le 29/10/2018 à 14:39, Mark Cave-Ayland a écrit :
+>> From: Laurent Vivier <laurent@vivier.eu>
+>>
+>> Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+>> ---
+>>   hw/scsi/esp.c         | 292
+>> +++++++++++++++++++++++++++++++++++++++++++++-----
+>>   include/hw/scsi/esp.h |   7 ++
+>>   2 files changed, 270 insertions(+), 29 deletions(-)
+>>
+> 
+> [...]
+> 
+>>   @@ -409,6 +564,7 @@ uint64_t esp_reg_read(ESPState *s, uint32_t saddr)
+>>               s->ti_size--;
+>>               s->rregs[ESP_FIFO] = s->ti_buf[s->ti_rptr++];
+>>           }
+>> +        esp_raise_irq(s);
+>>           if (s->ti_rptr == s->ti_wptr) {
+>>               s->ti_rptr = 0;
+>>               s->ti_wptr = 0;
+> 
+> You're now raising irq (not drq) when reading registers. In my opinion,
+> this deserves its own patch with an explanation.
 
-As mentioned elsewhere in this thread, I think it is important that
-QEMU distinction between devices that are best practice / recommended
-for use with KVM virt, vs devices that exist solely for sake of
-emulating hardware for use with old platforms.
+Good catch. This line is not needed at all.
 
-I agree that cirrus doesn't have a place in a KVM guest for future,
-but I don't thjink that means it should be deprecated & removed from
-QEMU entirely, as its still relevant from POV of QEMU's goal to
-emulate old hardware platforms.
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Thanks,
+Laurent
