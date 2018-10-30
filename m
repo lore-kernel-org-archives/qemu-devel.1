@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46426)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHVGV-0007n8-OM
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:45:08 -0400
+	(envelope-from <flukshun@gmail.com>) id 1gHVGk-00087n-MQ
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:45:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHVGT-0000eS-CJ
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:45:07 -0400
-Received: from mail-qt1-x82f.google.com ([2607:f8b0:4864:20::82f]:33587)
+	(envelope-from <flukshun@gmail.com>) id 1gHVGe-0000vn-Pu
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:45:22 -0400
+Received: from mail-qk1-x72f.google.com ([2607:f8b0:4864:20::72f]:39581)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHVGT-0000e2-6z
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:45:05 -0400
-Received: by mail-qt1-x82f.google.com with SMTP id i15-v6so13760459qtr.0
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 07:45:05 -0700 (PDT)
+	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHVGc-0000tk-Qf
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 10:45:15 -0400
+Received: by mail-qk1-x72f.google.com with SMTP id e4so7379190qkh.6
+	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 07:45:14 -0700 (PDT)
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue, 30 Oct 2018 09:43:55 -0500
-Message-Id: <20181030144358.23144-22-mdroth@linux.vnet.ibm.com>
+Date: Tue, 30 Oct 2018 09:43:58 -0500
+Message-Id: <20181030144358.23144-25-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20181030144358.23144-1-mdroth@linux.vnet.ibm.com>
 References: <20181030144358.23144-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PULL 21/24] qga: add --retry-path option for
- re-initializing channel on failure
+Subject: [Qemu-devel] [PULL 24/24] qga-win: changing --retry-path option
+ behavior
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,204 +28,212 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+Cc: peter.maydell@linaro.org, Bishara AbuHattoum <bishara@daynix.com>, Sameeh Jubran <sameeh@daynix.com>
 
-This adds an option to instruct the agent to periodically attempt
-re-opening the communication channel after a channel error has
-occurred. The main use-case for this is providing an OS-independent
-way of allowing the agent to survive situations like hotplug/unplug of
-the communication channel, or initial guest set up where the agent may
-be installed/started prior to the installation of the channel device's
-driver.
+From: Bishara AbuHattoum <bishara@daynix.com>
 
-There are nicer ways of implementing this functionality via things
-like systemd services, but this option is useful for platforms like
-*BSD/w32.
+Currently whenever the qemu-ga's service doesn't find the virtio-serial
+the run_agent() loops in a QGA_RETRY_INTERVAL (default 5 seconds)
+intervals and try to restart the qemu-ga which causes a synchronous loop.
+Changed to wait and listen for the serial events by registering for
+notifications a proper serial event handler that deals with events:
+  DBT_DEVICEARRIVAL        indicates that the device has been inserted and
+                           is available
+  DBT_DEVICEREMOVECOMPLETE indicates that the devive has been removed
+Which allow us to determine when the channel path is available for the
+qemu-ga to restart.
 
-Currently a channel error will result in the GSource for that channel
-being removed from the GMainLoop, but the main loop continuing to run.
-That behavior results in a dead loop when --retry-path isn't set, and
-prevents us from knowing when to attempt re-opening the channel when
-it is set, so we also force the loop to exit as part of this patch.
-
+Signed-off-by: Bishara AbuHattoum <bishara@daynix.com>
+Signed-off-by: Sameeh Jubran <sameeh@daynix.com>
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- qga/main.c | 62 +++++++++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 54 insertions(+), 8 deletions(-)
+ qga/main.c          | 86 ++++++++++++++++++++++++++++++++++++++++++++-
+ qga/service-win32.h |  4 +++
+ 2 files changed, 89 insertions(+), 1 deletion(-)
 
 diff --git a/qga/main.c b/qga/main.c
-index 761007deb4..506a314140 100644
+index 506a314140..87a0711c14 100644
 --- a/qga/main.c
 +++ b/qga/main.c
-@@ -58,6 +58,7 @@
+@@ -34,6 +34,7 @@
+ #include "qemu/systemd.h"
+ #include "qemu-version.h"
+ #ifdef _WIN32
++#include <dbt.h>
+ #include "qga/service-win32.h"
+ #include "qga/vss-win32.h"
  #endif
- #define QGA_SENTINEL_BYTE 0xFF
- #define QGA_CONF_DEFAULT CONFIG_QEMU_CONFDIR G_DIR_SEPARATOR_S "qemu-ga.conf"
-+#define QGA_RETRY_INTERVAL 5
- 
- static struct {
-     const char *state_dir;
-@@ -98,6 +99,7 @@ struct GAState {
-     GAPersistentState pstate;
-     GAConfig *config;
-     int socket_activation;
-+    bool force_exit;
- };
- 
- struct GAState *ga_state;
-@@ -120,6 +122,7 @@ DWORD WINAPI service_ctrl_handler(DWORD ctrl, DWORD type, LPVOID data,
+@@ -83,6 +84,7 @@ struct GAState {
+     bool logging_enabled;
+ #ifdef _WIN32
+     GAService service;
++    HANDLE wakeup_event;
+ #endif
+     bool delimit_response;
+     bool frozen;
+@@ -119,6 +121,7 @@ static const char *ga_freeze_whitelist[] = {
+ #ifdef _WIN32
+ DWORD WINAPI service_ctrl_handler(DWORD ctrl, DWORD type, LPVOID data,
+                                   LPVOID ctx);
++DWORD WINAPI handle_serial_device_events(DWORD type, LPVOID data);
  VOID WINAPI service_main(DWORD argc, TCHAR *argv[]);
  #endif
  static int run_agent(GAState *s);
-+static void stop_agent(GAState *s, bool requested);
- 
- static void
- init_dfl_pathnames(void)
-@@ -168,9 +171,7 @@ static void quit_handler(int sig)
-     }
-     g_debug("received signal num %d, quitting", sig);
- 
--    if (g_main_loop_is_running(ga_state->main_loop)) {
--        g_main_loop_quit(ga_state->main_loop);
--    }
-+    stop_agent(ga_state, true);
+@@ -677,6 +680,36 @@ static gboolean channel_init(GAState *s, const gchar *method, const gchar *path,
  }
  
- #ifndef _WIN32
-@@ -255,6 +256,10 @@ QEMU_COPYRIGHT "\n"
- "                    to list available RPCs)\n"
- "  -D, --dump-conf   dump a qemu-ga config file based on current config\n"
- "                    options / command-line parameters to stdout\n"
-+"  -r, --retry-path  attempt re-opening path if it's unavailable or closed\n"
-+"                    due to an error which may be recoverable in the future\n"
-+"                    (virtio-serial driver re-install, serial device hot\n"
-+"                    plug/unplug, etc.)\n"
- "  -h, --help        display this help and exit\n"
- "\n"
- QEMU_HELP_BOTTOM "\n"
-@@ -614,6 +619,7 @@ static gboolean channel_event_cb(GIOCondition condition, gpointer data)
-     switch (status) {
-     case G_IO_STATUS_ERROR:
-         g_warning("error reading channel");
-+        stop_agent(s, false);
-         return false;
-     case G_IO_STATUS_NORMAL:
-         buf[count] = 0;
-@@ -927,6 +933,7 @@ struct GAConfig {
-     int daemonize;
-     GLogLevelFlags log_level;
-     int dumpconf;
-+    bool retry_path;
- };
- 
- static void config_load(GAConfig *config)
-@@ -976,6 +983,10 @@ static void config_load(GAConfig *config)
-         /* enable all log levels */
-         config->log_level = G_LOG_LEVEL_MASK;
-     }
-+    if (g_key_file_has_key(keyfile, "general", "retry-path", NULL)) {
-+        config->retry_path =
-+            g_key_file_get_boolean(keyfile, "general", "retry-path", &gerr);
-+    }
-     if (g_key_file_has_key(keyfile, "general", "blacklist", NULL)) {
-         config->bliststr =
-             g_key_file_get_string(keyfile, "general", "blacklist", &gerr);
-@@ -1037,6 +1048,8 @@ static void config_dump(GAConfig *config)
-     g_key_file_set_string(keyfile, "general", "statedir", config->state_dir);
-     g_key_file_set_boolean(keyfile, "general", "verbose",
-                            config->log_level == G_LOG_LEVEL_MASK);
-+    g_key_file_set_boolean(keyfile, "general", "retry-path",
-+                           config->retry_path);
-     tmp = list_join(config->blacklist, ',');
-     g_key_file_set_string(keyfile, "general", "blacklist", tmp);
-     g_free(tmp);
-@@ -1055,7 +1068,7 @@ static void config_dump(GAConfig *config)
- 
- static void config_parse(GAConfig *config, int argc, char **argv)
- {
--    const char *sopt = "hVvdm:p:l:f:F::b:s:t:D";
-+    const char *sopt = "hVvdm:p:l:f:F::b:s:t:Dr";
-     int opt_ind = 0, ch;
-     const struct option lopt[] = {
-         { "help", 0, NULL, 'h' },
-@@ -1075,6 +1088,7 @@ static void config_parse(GAConfig *config, int argc, char **argv)
-         { "service", 1, NULL, 's' },
- #endif
-         { "statedir", 1, NULL, 't' },
-+        { "retry-path", 0, NULL, 'r' },
-         { NULL, 0, NULL, 0 }
-     };
- 
-@@ -1119,6 +1133,9 @@ static void config_parse(GAConfig *config, int argc, char **argv)
-         case 'D':
-             config->dumpconf = 1;
-             break;
-+        case 'r':
-+            config->retry_path = true;
-+            break;
-         case 'b': {
-             if (is_help_option(optarg)) {
-                 qmp_for_each_command(&ga_commands, ga_print_cmd, NULL);
-@@ -1322,9 +1339,6 @@ static void cleanup_agent(GAState *s)
-         ga_command_state_free(s->command_state);
-         json_message_parser_destroy(&s->parser);
-     }
--    if (s->channel) {
--        ga_channel_free(s->channel);
--    }
-     g_free(s->pstate_filepath);
-     g_free(s->state_filepath_isfrozen);
-     if (s->main_loop) {
-@@ -1334,7 +1348,7 @@ static void cleanup_agent(GAState *s)
-     ga_state = NULL;
- }
- 
--static int run_agent(GAState *s)
-+static int run_agent_once(GAState *s)
- {
-     if (!channel_init(s, s->config->method, s->config->channel_path,
-                       s->socket_activation ? FIRST_SOCKET_ACTIVATION_FD : -1)) {
-@@ -1344,9 +1358,41 @@ static int run_agent(GAState *s)
- 
-     g_main_loop_run(ga_state->main_loop);
- 
-+    if (s->channel) {
-+        ga_channel_free(s->channel);
-+    }
-+
-     return EXIT_SUCCESS;
- }
- 
-+static int run_agent(GAState *s)
+ #ifdef _WIN32
++DWORD WINAPI handle_serial_device_events(DWORD type, LPVOID data)
 +{
-+    int ret = EXIT_SUCCESS;
++    DWORD ret = NO_ERROR;
++    PDEV_BROADCAST_HDR broadcast_header = (PDEV_BROADCAST_HDR)data;
 +
-+    s->force_exit = false;
-+
-+    do {
-+        ret = run_agent_once(s);
-+        if (s->config->retry_path && !s->force_exit) {
-+            g_warning("agent stopped unexpectedly, restarting...");
-+            sleep(QGA_RETRY_INTERVAL);
++    if (broadcast_header->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE) {
++        switch (type) {
++            /* Device inserted */
++        case DBT_DEVICEARRIVAL:
++            /* Start QEMU-ga's service */
++            if (!SetEvent(ga_state->wakeup_event)) {
++                ret = GetLastError();
++            }
++            break;
++            /* Device removed */
++        case DBT_DEVICEQUERYREMOVE:
++        case DBT_DEVICEREMOVEPENDING:
++        case DBT_DEVICEREMOVECOMPLETE:
++            /* Stop QEMU-ga's service */
++            if (!ResetEvent(ga_state->wakeup_event)) {
++                ret = GetLastError();
++            }
++            break;
++        default:
++            ret = ERROR_CALL_NOT_IMPLEMENTED;
 +        }
-+    } while (s->config->retry_path && !s->force_exit);
-+
++    }
 +    return ret;
 +}
 +
-+static void stop_agent(GAState *s, bool requested)
-+{
-+    if (!s->force_exit) {
-+        s->force_exit = requested;
-+    }
+ DWORD WINAPI service_ctrl_handler(DWORD ctrl, DWORD type, LPVOID data,
+                                   LPVOID ctx)
+ {
+@@ -688,9 +721,13 @@ DWORD WINAPI service_ctrl_handler(DWORD ctrl, DWORD type, LPVOID data,
+         case SERVICE_CONTROL_STOP:
+         case SERVICE_CONTROL_SHUTDOWN:
+             quit_handler(SIGTERM);
++            SetEvent(ga_state->wakeup_event);
+             service->status.dwCurrentState = SERVICE_STOP_PENDING;
+             SetServiceStatus(service->status_handle, &service->status);
+             break;
++        case SERVICE_CONTROL_DEVICEEVENT:
++            handle_serial_device_events(type, data);
++            break;
+ 
+         default:
+             ret = ERROR_CALL_NOT_IMPLEMENTED;
+@@ -717,10 +754,24 @@ VOID WINAPI service_main(DWORD argc, TCHAR *argv[])
+     service->status.dwServiceSpecificExitCode = NO_ERROR;
+     service->status.dwCheckPoint = 0;
+     service->status.dwWaitHint = 0;
++    DEV_BROADCAST_DEVICEINTERFACE notification_filter;
++    ZeroMemory(&notification_filter, sizeof(notification_filter));
++    notification_filter.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
++    notification_filter.dbcc_size = sizeof(DEV_BROADCAST_DEVICEINTERFACE);
++    notification_filter.dbcc_classguid = GUID_VIOSERIAL_PORT;
 +
-+    if (g_main_loop_is_running(s->main_loop)) {
-+        g_main_loop_quit(s->main_loop);
++    service->device_notification_handle =
++        RegisterDeviceNotification(service->status_handle,
++            &notification_filter, DEVICE_NOTIFY_SERVICE_HANDLE);
++    if (!service->device_notification_handle) {
++        g_critical("Failed to register device notification handle!\n");
++        return;
 +    }
+     SetServiceStatus(service->status_handle, &service->status);
+ 
+     run_agent(ga_state);
+ 
++    UnregisterDeviceNotification(service->device_notification_handle);
+     service->status.dwCurrentState = SERVICE_STOPPED;
+     SetServiceStatus(service->status_handle, &service->status);
+ }
+@@ -1328,12 +1379,24 @@ static GAState *initialize_agent(GAConfig *config, int socket_activation)
+ 
+     s->config = config;
+     s->socket_activation = socket_activation;
++
++#ifdef _WIN32
++    s->wakeup_event = CreateEvent(NULL, TRUE, FALSE, TEXT("WakeUp"));
++    if (s->wakeup_event == NULL) {
++        g_critical("CreateEvent failed");
++        return NULL;
++    }
++#endif
++
+     ga_state = s;
+     return s;
+ }
+ 
+ static void cleanup_agent(GAState *s)
+ {
++#ifdef _WIN32
++    CloseHandle(s->wakeup_event);
++#endif
+     if (s->command_state) {
+         ga_command_state_cleanup_all(s->command_state);
+         ga_command_state_free(s->command_state);
+@@ -1365,6 +1428,27 @@ static int run_agent_once(GAState *s)
+     return EXIT_SUCCESS;
+ }
+ 
++static void wait_for_channel_availability(GAState *s)
++{
++    g_warning("waiting for channel path...");
++#ifndef _WIN32
++    sleep(QGA_RETRY_INTERVAL);
++#else
++    DWORD dwWaitResult;
++
++    dwWaitResult = WaitForSingleObject(s->wakeup_event, INFINITE);
++
++    switch (dwWaitResult) {
++    case WAIT_OBJECT_0:
++        break;
++    case WAIT_TIMEOUT:
++        break;
++    default:
++        g_critical("WaitForSingleObject failed");
++    }
++#endif
 +}
 +
- int main(int argc, char **argv)
+ static int run_agent(GAState *s)
  {
      int ret = EXIT_SUCCESS;
+@@ -1375,7 +1459,7 @@ static int run_agent(GAState *s)
+         ret = run_agent_once(s);
+         if (s->config->retry_path && !s->force_exit) {
+             g_warning("agent stopped unexpectedly, restarting...");
+-            sleep(QGA_RETRY_INTERVAL);
++            wait_for_channel_availability(s);
+         }
+     } while (s->config->retry_path && !s->force_exit);
+ 
+diff --git a/qga/service-win32.h b/qga/service-win32.h
+index 89e99dfede..7b16d69b57 100644
+--- a/qga/service-win32.h
++++ b/qga/service-win32.h
+@@ -20,9 +20,13 @@
+ #define QGA_SERVICE_NAME         "qemu-ga"
+ #define QGA_SERVICE_DESCRIPTION  "Enables integration with QEMU machine emulator and virtualizer."
+ 
++static const GUID GUID_VIOSERIAL_PORT = { 0x6fde7521, 0x1b65, 0x48ae,
++{ 0xb6, 0x28, 0x80, 0xbe, 0x62, 0x1, 0x60, 0x26 } };
++
+ typedef struct GAService {
+     SERVICE_STATUS status;
+     SERVICE_STATUS_HANDLE status_handle;
++    HDEVNOTIFY device_notification_handle;
+ } GAService;
+ 
+ int ga_install_service(const char *path, const char *logfile,
 -- 
 2.17.1
