@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37328)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38287)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gHNfq-0001Ll-GO
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 02:38:47 -0400
+	(envelope-from <hpoussin@reactos.org>) id 1gHNnV-0003r7-0j
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 02:46:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gHNfp-0005d6-OO
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 02:38:46 -0400
-Date: Tue, 30 Oct 2018 07:38:30 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20181030063830.edjacusffvgwvnt2@sirius.home.kraxel.org>
-References: <20181029223207.31878-1-philmd@redhat.com>
-	<20181029223207.31878-4-philmd@redhat.com>
+	(envelope-from <hpoussin@reactos.org>) id 1gHNnQ-00033J-7m
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 02:46:39 -0400
+References: <20181029134000.11157-1-mark.cave-ayland@ilande.co.uk>
+	<20181029134000.11157-2-mark.cave-ayland@ilande.co.uk>
+From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+Message-ID: <94f027a2-1f30-4ab0-0c04-3039041edf69@reactos.org>
+Date: Tue, 30 Oct 2018 07:46:04 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20181029223207.31878-4-philmd@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/3] arm: allwinner: Enable USB EHCI
+In-Reply-To: <20181029134000.11157-2-mark.cave-ayland@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 01/11] hw/m68k: add via support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,36 +24,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Icenowy Zheng <icenowy@aosc.xyz>, Guenter Roeck <linux@roeck-us.net>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Beniamino Galvani <b.galvani@gmail.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, jasowang@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, kraxel@redhat.com, pbonzini@redhat.com, afaerber@suse.de, aurelien@aurel32.net, laurent@vivier.eu
 
-On Mon, Oct 29, 2018 at 11:32:07PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> From: Guenter Roeck <linux@roeck-us.net>
->=20
-> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
-> Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> [PMD: Intented tabs -> space]
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+Le 29/10/2018 à 14:39, Mark Cave-Ayland a écrit :
+> From: Laurent Vivier <laurent@vivier.eu>
+> 
+> Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 > ---
->  hw/arm/allwinner-a10.c | 2 ++
->  1 file changed, 2 insertions(+)
->=20
-> diff --git a/hw/arm/allwinner-a10.c b/hw/arm/allwinner-a10.c
-> index 0a8ac929f5..92ab66354a 100644
-> --- a/hw/arm/allwinner-a10.c
-> +++ b/hw/arm/allwinner-a10.c
-> @@ -116,6 +116,8 @@ static void aw_a10_realize(DeviceState *dev, Error =
-**errp)
->      if (machine_usb(current_machine)) {
->          sysbus_create_simple("sysbus-ohci", 0x01c14400, s->irq[64]);
->          sysbus_create_simple("sysbus-ohci", 0x01c1c400, s->irq[65]);
-> +        sysbus_create_simple(TYPE_AW_A10_EHCI, 0x01c14000, s->irq[39])=
-;
-> +        sysbus_create_simple(TYPE_AW_A10_EHCI, 0x01c1c000, s->irq[40])=
-;
+>   hw/misc/Makefile.objs     |   1 +
+>   hw/misc/mac_via.c         | 666 ++++++++++++++++++++++++++++++++++++++++++++++
+>   include/hw/misc/mac_via.h | 107 ++++++++
+>   3 files changed, 774 insertions(+)
+>   create mode 100644 hw/misc/mac_via.c
+>   create mode 100644 include/hw/misc/mac_via.h
 
-Hmm, is this a companion controller setup?  If so, then this is a bit
-more complicated  (see ehci_create_ich9_with_companions()).
-
-cheers,
-  Gerd
+Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
