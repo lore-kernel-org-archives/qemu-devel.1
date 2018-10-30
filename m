@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35010)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gHTMA-0004EJ-JB
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:42:51 -0400
+	(envelope-from <smarkovic@wavecomp.com>) id 1gHTMD-0004P5-Kq
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:42:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gHTM7-00036C-Bz
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:42:50 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:43347)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gHTM6-0002gQ-U7
+	(envelope-from <smarkovic@wavecomp.com>) id 1gHTM7-00036T-Jg
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:42:53 -0400
+Received: from mail-co1nam04on072b.outbound.protection.outlook.com
+	([2a01:111:f400:fe4d::72b]:28336
+	helo=NAM04-CO1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <smarkovic@wavecomp.com>)
+	id 1gHTM6-0002Yw-W3
 	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:42:47 -0400
-Received: by mail-ot1-x341.google.com with SMTP id k9so10881301otl.10
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 05:42:27 -0700 (PDT)
+From: Stefan Markovic <smarkovic@wavecomp.com>
+Date: Tue, 30 Oct 2018 12:42:15 +0000
+Message-ID: <e4885084-7700-fd82-f6cb-544b78fd52ae@wavecomp.com>
+References: <1540899411-16761-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1540899411-16761-4-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1540899411-16761-4-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <9B1A6D238003114FBBD6B70A1621501D@namprd22.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <f2832be6-83ab-83ac-2063-13bf0b556d80@redhat.com>
-References: <20181029232100.8454-1-philmd@redhat.com>
-	<20181029232100.8454-3-philmd@redhat.com>
-	<CAFEAcA_yde+Ppuqet7KFE-AvZrjnrfYeY=R1aWD86cox+WYsxg@mail.gmail.com>
-	<f2832be6-83ab-83ac-2063-13bf0b556d80@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 30 Oct 2018 12:42:06 +0000
-Message-ID: <CAFEAcA_6mDdxVU_TY583uOTgAX_eT-s52QRCDWTd0_uCrUTwhA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/3] hw/dma/pl330: Factor out pl330_init()
- from hw/arm/xilinx_zynq.c
+Subject: Re: [Qemu-devel] [PATCH v2 3/5] target/mips: Rename MMI-related
+ functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,58 +33,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: Guenter Roeck <linux@roeck-us.net>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Alistair Francis <alistair@alistair23.me>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>
 
-On 30 October 2018 at 11:28, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
-> wrote:
-> On 30/10/18 10:36, Peter Maydell wrote:
->>
->> On 29 October 2018 at 23:20, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
-com>
->> wrote:
->>>
->>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>> ---
->>>   MAINTAINERS            |  1 +
->>>   hw/arm/xilinx_zynq.c   | 18 ++----------------
->>>   hw/dma/pl330.c         |  2 +-
->>>   include/hw/dma/pl330.h | 41 +++++++++++++++++++++++++++++++++++++++++
->>>   4 files changed, 45 insertions(+), 17 deletions(-)
->>>   create mode 100644 include/hw/dma/pl330.h
->>
->>
->>> +static inline void pl330_init(uint32_t base, qemu_irq irq, int nreq)
->>> +{
->>> +    SysBusDevice *busdev;
->>> +    DeviceState *dev;
->>> +
->>> +    dev =3D qdev_create(NULL, TYPE_PL330);
->>> +    qdev_prop_set_uint8(dev, "num_chnls", 8);
->>> +    qdev_prop_set_uint8(dev, "num_periph_req", nreq);
->>> +    qdev_prop_set_uint8(dev, "num_events", 16);
->>> +    qdev_prop_set_uint8(dev, "data_width", 64);
->>> +    qdev_prop_set_uint8(dev, "wr_cap", 8);
->>> +    qdev_prop_set_uint8(dev, "wr_q_dep", 16);
->>> +    qdev_prop_set_uint8(dev, "rd_cap", 8);
->>> +    qdev_prop_set_uint8(dev, "rd_q_dep", 16);
->>> +    qdev_prop_set_uint16(dev, "data_buffer_dep", 256);
->>> +    qdev_init_nofail(dev);
->>
->>
->> These are the settings the Xilinx board uses, but are
->> they really the settings every SoC that has a PL330 will use ?
->
->
-> Except "num_periph_req", all are pl330_properties defaults.
-
-If they're all the device's defaults there's not much point
-in setting them by hand. But my point is that the reason they're
-properties is that in the real hardware these are configurable
-values in the RTL. So any given SoC model needs to be able to
-set them appropriately. Having a helper function that doesn't
-let you set them makes it too easy for people modelling SoCs
-not to think about the question, I think...
-
-thanks
--- PMM
+DQpPbiAzMC4xMC4xOC4gMTI6MzYsIEFsZWtzYW5kYXIgTWFya292aWMgd3JvdGU6DQo+IEZyb206
+IEFsZWtzYW5kYXIgTWFya292aWMgPGFtYXJrb3ZpY0B3YXZlY29tcC5jb20+DQo+DQo+IFJlbmFt
+ZSBNTUktcmVsYXRlZCBmdW5jdGlvbnMuDQo+DQo+IFNpZ25lZC1vZmYtYnk6IEFsZWtzYW5kYXIg
+TWFya292aWMgPGFtYXJrb3ZpY0B3YXZlY29tcC5jb20+DQo+IC0tLQ0KPiAgIHRhcmdldC9taXBz
+L3RyYW5zbGF0ZS5jIHwgMzIgKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0NCj4gICAx
+IGZpbGUgY2hhbmdlZCwgMTYgaW5zZXJ0aW9ucygrKSwgMTYgZGVsZXRpb25zKC0pDQoNCg0KUmV2
+aWV3ZWQtYnk6IFN0ZWZhbiBNYXJrb3ZpYyA8c21hcmtvdmljQHdhdmVjb21wLmNvbT4NCg0KDQo+
+IGRpZmYgLS1naXQgYS90YXJnZXQvbWlwcy90cmFuc2xhdGUuYyBiL3RhcmdldC9taXBzL3RyYW5z
+bGF0ZS5jDQo+IGluZGV4IDRiMDA4ZDguLjE1NTMzMWYgMTAwNjQ0DQo+IC0tLSBhL3RhcmdldC9t
+aXBzL3RyYW5zbGF0ZS5jDQo+ICsrKyBiL3RhcmdldC9taXBzL3RyYW5zbGF0ZS5jDQo+IEBAIC0y
+NDY4MSw3ICsyNDY4MSw3IEBAIHN0YXRpYyB2b2lkIGRlY29kZV9vcGNfc3BlY2lhbDNfbGVnYWN5
+KENQVU1JUFNTdGF0ZSAqZW52LCBEaXNhc0NvbnRleHQgKmN0eCkNCj4gICAgICAgfQ0KPiAgIH0N
+Cj4gICANCj4gLXN0YXRpYyB2b2lkIGRlY29kZV90eDc5X21taTAoQ1BVTUlQU1N0YXRlICplbnYs
+IERpc2FzQ29udGV4dCAqY3R4KQ0KPiArc3RhdGljIHZvaWQgZGVjb2RlX21taTAoQ1BVTUlQU1N0
+YXRlICplbnYsIERpc2FzQ29udGV4dCAqY3R4KQ0KPiAgIHsNCj4gICAgICAgdWludDMyX3Qgb3Bj
+ID0gTUFTS19NTUkwKGN0eC0+b3Bjb2RlKTsNCj4gICANCj4gQEAgLTI0NzIwLDcgKzI0NzIwLDcg
+QEAgc3RhdGljIHZvaWQgZGVjb2RlX3R4NzlfbW1pMChDUFVNSVBTU3RhdGUgKmVudiwgRGlzYXND
+b250ZXh0ICpjdHgpDQo+ICAgICAgIH0NCj4gICB9DQo+ICAgDQo+IC1zdGF0aWMgdm9pZCBkZWNv
+ZGVfdHg3OV9tbWkxKENQVU1JUFNTdGF0ZSAqZW52LCBEaXNhc0NvbnRleHQgKmN0eCkNCj4gK3N0
+YXRpYyB2b2lkIGRlY29kZV9tbWkxKENQVU1JUFNTdGF0ZSAqZW52LCBEaXNhc0NvbnRleHQgKmN0
+eCkNCj4gICB7DQo+ICAgICAgIHVpbnQzMl90IG9wYyA9IE1BU0tfTU1JMShjdHgtPm9wY29kZSk7
+DQo+ICAgDQo+IEBAIC0yNDc1Miw3ICsyNDc1Miw3IEBAIHN0YXRpYyB2b2lkIGRlY29kZV90eDc5
+X21taTEoQ1BVTUlQU1N0YXRlICplbnYsIERpc2FzQ29udGV4dCAqY3R4KQ0KPiAgICAgICB9DQo+
+ICAgfQ0KPiAgIA0KPiAtc3RhdGljIHZvaWQgZGVjb2RlX3R4NzlfbW1pMihDUFVNSVBTU3RhdGUg
+KmVudiwgRGlzYXNDb250ZXh0ICpjdHgpDQo+ICtzdGF0aWMgdm9pZCBkZWNvZGVfbW1pMihDUFVN
+SVBTU3RhdGUgKmVudiwgRGlzYXNDb250ZXh0ICpjdHgpDQo+ICAgew0KPiAgICAgICB1aW50MzJf
+dCBvcGMgPSBNQVNLX01NSTIoY3R4LT5vcGNvZGUpOw0KPiAgIA0KPiBAQCAtMjQ3ODgsNyArMjQ3
+ODgsNyBAQCBzdGF0aWMgdm9pZCBkZWNvZGVfdHg3OV9tbWkyKENQVU1JUFNTdGF0ZSAqZW52LCBE
+aXNhc0NvbnRleHQgKmN0eCkNCj4gICAgICAgfQ0KPiAgIH0NCj4gICANCj4gLXN0YXRpYyB2b2lk
+IGRlY29kZV90eDc5X21taTMoQ1BVTUlQU1N0YXRlICplbnYsIERpc2FzQ29udGV4dCAqY3R4KQ0K
+PiArc3RhdGljIHZvaWQgZGVjb2RlX21taTMoQ1BVTUlQU1N0YXRlICplbnYsIERpc2FzQ29udGV4
+dCAqY3R4KQ0KPiAgIHsNCj4gICAgICAgdWludDMyX3Qgb3BjID0gTUFTS19NTUkzKGN0eC0+b3Bj
+b2RlKTsNCj4gICANCj4gQEAgLTI0ODE1LDcgKzI0ODE1LDcgQEAgc3RhdGljIHZvaWQgZGVjb2Rl
+X3R4NzlfbW1pMyhDUFVNSVBTU3RhdGUgKmVudiwgRGlzYXNDb250ZXh0ICpjdHgpDQo+ICAgICAg
+IH0NCj4gICB9DQo+ICAgDQo+IC1zdGF0aWMgdm9pZCBkZWNvZGVfdHg3OV9tbWkoQ1BVTUlQU1N0
+YXRlICplbnYsIERpc2FzQ29udGV4dCAqY3R4KQ0KPiArc3RhdGljIHZvaWQgZGVjb2RlX21taShD
+UFVNSVBTU3RhdGUgKmVudiwgRGlzYXNDb250ZXh0ICpjdHgpDQo+ICAgew0KPiAgICAgICB1aW50
+MzJfdCBvcGMgPSBNQVNLX01NSShjdHgtPm9wY29kZSk7DQo+ICAgICAgIGludCBycyA9IGV4dHJh
+Y3QzMihjdHgtPm9wY29kZSwgMjEsIDUpOw0KPiBAQCAtMjQ4MjQsMTYgKzI0ODI0LDE2IEBAIHN0
+YXRpYyB2b2lkIGRlY29kZV90eDc5X21taShDUFVNSVBTU3RhdGUgKmVudiwgRGlzYXNDb250ZXh0
+ICpjdHgpDQo+ICAgDQo+ICAgICAgIHN3aXRjaCAob3BjKSB7DQo+ICAgICAgIGNhc2UgTU1JX09Q
+Q19DTEFTU19NTUkwOg0KPiAtICAgICAgICBkZWNvZGVfdHg3OV9tbWkwKGVudiwgY3R4KTsNCj4g
+KyAgICAgICAgZGVjb2RlX21taTAoZW52LCBjdHgpOw0KPiAgICAgICAgICAgYnJlYWs7DQo+ICAg
+ICAgIGNhc2UgTU1JX09QQ19DTEFTU19NTUkxOg0KPiAtICAgICAgICBkZWNvZGVfdHg3OV9tbWkx
+KGVudiwgY3R4KTsNCj4gKyAgICAgICAgZGVjb2RlX21taTEoZW52LCBjdHgpOw0KPiAgICAgICAg
+ICAgYnJlYWs7DQo+ICAgICAgIGNhc2UgTU1JX09QQ19DTEFTU19NTUkyOg0KPiAtICAgICAgICBk
+ZWNvZGVfdHg3OV9tbWkyKGVudiwgY3R4KTsNCj4gKyAgICAgICAgZGVjb2RlX21taTIoZW52LCBj
+dHgpOw0KPiAgICAgICAgICAgYnJlYWs7DQo+ICAgICAgIGNhc2UgTU1JX09QQ19DTEFTU19NTUkz
+Og0KPiAtICAgICAgICBkZWNvZGVfdHg3OV9tbWkzKGVudiwgY3R4KTsNCj4gKyAgICAgICAgZGVj
+b2RlX21taTMoZW52LCBjdHgpOw0KPiAgICAgICAgICAgYnJlYWs7DQo+ICAgICAgIGNhc2UgTU1J
+X09QQ19NVUxUMToNCj4gICAgICAgY2FzZSBNTUlfT1BDX01VTFRVMToNCj4gQEAgLTI0ODczLDEy
+ICsyNDg3MywxMiBAQCBzdGF0aWMgdm9pZCBkZWNvZGVfdHg3OV9tbWkoQ1BVTUlQU1N0YXRlICpl
+bnYsIERpc2FzQ29udGV4dCAqY3R4KQ0KPiAgICAgICB9DQo+ICAgfQ0KPiAgIA0KPiAtc3RhdGlj
+IHZvaWQgZGVjb2RlX3R4NzlfbHEoQ1BVTUlQU1N0YXRlICplbnYsIERpc2FzQ29udGV4dCAqY3R4
+KQ0KPiArc3RhdGljIHZvaWQgZGVjb2RlX21taV9scShDUFVNSVBTU3RhdGUgKmVudiwgRGlzYXND
+b250ZXh0ICpjdHgpDQo+ICAgew0KPiAgICAgICBnZW5lcmF0ZV9leGNlcHRpb25fZW5kKGN0eCwg
+RVhDUF9SSSk7ICAgIC8qIFRPRE86IE1NSV9MUSAqLw0KPiAgIH0NCj4gICANCj4gLXN0YXRpYyB2
+b2lkIGdlbl90eDc5X3NxKERpc2FzQ29udGV4dCAqY3R4LCBpbnQgYmFzZSwgaW50IHJ0LCBpbnQg
+b2Zmc2V0KQ0KPiArc3RhdGljIHZvaWQgZ2VuX21taV9zcShEaXNhc0NvbnRleHQgKmN0eCwgaW50
+IGJhc2UsIGludCBydCwgaW50IG9mZnNldCkNCj4gICB7DQo+ICAgICAgIGdlbmVyYXRlX2V4Y2Vw
+dGlvbl9lbmQoY3R4LCBFWENQX1JJKTsgICAgLyogVE9ETzogTU1JX1NRICovDQo+ICAgfQ0KPiBA
+QCAtMjQ5MDQsNyArMjQ5MDQsNyBAQCBzdGF0aWMgdm9pZCBnZW5fdHg3OV9zcShEaXNhc0NvbnRl
+eHQgKmN0eCwgaW50IGJhc2UsIGludCBydCwgaW50IG9mZnNldCkNCj4gICAgKiBJbiB1c2VyIG1v
+ZGUsIFFFTVUgbXVzdCB2ZXJpZnkgdGhlIHVwcGVyIGFuZCBsb3dlciAxMSBiaXRzIHRvIGRpc3Rp
+bmd1aXNoDQo+ICAgICogYmV0d2VlbiBTUSBhbmQgUkRIV1IsIGFzIHRoZSBMaW51eCBrZXJuZWwg
+ZG9lcy4NCj4gICAgKi8NCj4gLXN0YXRpYyB2b2lkIGRlY29kZV90eDc5X3NxKENQVU1JUFNTdGF0
+ZSAqZW52LCBEaXNhc0NvbnRleHQgKmN0eCkNCj4gK3N0YXRpYyB2b2lkIGRlY29kZV9tbWlfc3Eo
+Q1BVTUlQU1N0YXRlICplbnYsIERpc2FzQ29udGV4dCAqY3R4KQ0KPiAgIHsNCj4gICAgICAgaW50
+IGJhc2UgPSBleHRyYWN0MzIoY3R4LT5vcGNvZGUsIDIxLCA1KTsNCj4gICAgICAgaW50IHJ0ID0g
+ZXh0cmFjdDMyKGN0eC0+b3Bjb2RlLCAxNiwgNSk7DQo+IEBAIC0yNDkyMiw3ICsyNDkyMiw3IEBA
+IHN0YXRpYyB2b2lkIGRlY29kZV90eDc5X3NxKENQVU1JUFNTdGF0ZSAqZW52LCBEaXNhc0NvbnRl
+eHQgKmN0eCkNCj4gICAgICAgfQ0KPiAgICNlbmRpZg0KPiAgIA0KPiAtICAgIGdlbl90eDc5X3Nx
+KGN0eCwgYmFzZSwgcnQsIG9mZnNldCk7DQo+ICsgICAgZ2VuX21taV9zcShjdHgsIGJhc2UsIHJ0
+LCBvZmZzZXQpOw0KPiAgIH0NCj4gICANCj4gICBzdGF0aWMgdm9pZCBkZWNvZGVfb3BjX3NwZWNp
+YWwzKENQVU1JUFNTdGF0ZSAqZW52LCBEaXNhc0NvbnRleHQgKmN0eCkNCj4gQEAgLTI2MjMxLDE0
+ICsyNjIzMSwxNCBAQCBzdGF0aWMgdm9pZCBkZWNvZGVfb3BjKENQVU1JUFNTdGF0ZSAqZW52LCBE
+aXNhc0NvbnRleHQgKmN0eCkNCj4gICAgICAgICAgIGJyZWFrOw0KPiAgICAgICBjYXNlIE9QQ19T
+UEVDSUFMMjoNCj4gICAgICAgICAgIGlmICgoY3R4LT5pbnNuX2ZsYWdzICYgSU5TTl9SNTkwMCkg
+JiYgKGN0eC0+aW5zbl9mbGFncyAmIEFTRV9NTUkpKSB7DQo+IC0gICAgICAgICAgICBkZWNvZGVf
+dHg3OV9tbWkoZW52LCBjdHgpOw0KPiArICAgICAgICAgICAgZGVjb2RlX21taShlbnYsIGN0eCk7
+DQo+ICAgICAgICAgICB9IGVsc2Ugew0KPiAgICAgICAgICAgICAgIGRlY29kZV9vcGNfc3BlY2lh
+bDJfbGVnYWN5KGVudiwgY3R4KTsNCj4gICAgICAgICAgIH0NCj4gICAgICAgICAgIGJyZWFrOw0K
+PiAgICAgICBjYXNlIE9QQ19TUEVDSUFMMzoNCj4gICAgICAgICAgIGlmIChjdHgtPmluc25fZmxh
+Z3MgJiBJTlNOX1I1OTAwKSB7DQo+IC0gICAgICAgICAgICBkZWNvZGVfdHg3OV9zcShlbnYsIGN0
+eCk7ICAgIC8qIE1NSV9TUSAqLw0KPiArICAgICAgICAgICAgZGVjb2RlX21taV9zcShlbnYsIGN0
+eCk7ICAgIC8qIE1NSV9TUSAqLw0KPiAgICAgICAgICAgfSBlbHNlIHsNCj4gICAgICAgICAgICAg
+ICBkZWNvZGVfb3BjX3NwZWNpYWwzKGVudiwgY3R4KTsNCj4gICAgICAgICAgIH0NCj4gQEAgLTI2
+OTAyLDcgKzI2OTAyLDcgQEAgc3RhdGljIHZvaWQgZGVjb2RlX29wYyhDUFVNSVBTU3RhdGUgKmVu
+diwgRGlzYXNDb250ZXh0ICpjdHgpDQo+ICAgICAgICAgICBicmVhazsNCj4gICAgICAgY2FzZSBP
+UENfTVNBOiAvKiBPUENfTURNWCAqLw0KPiAgICAgICAgICAgaWYgKGN0eC0+aW5zbl9mbGFncyAm
+IElOU05fUjU5MDApIHsNCj4gLSAgICAgICAgICAgIGRlY29kZV90eDc5X2xxKGVudiwgY3R4KTsg
+ICAgLyogTU1JX0xRICovDQo+ICsgICAgICAgICAgICBkZWNvZGVfbW1pX2xxKGVudiwgY3R4KTsg
+ICAgLyogTU1JX0xRICovDQo+ICAgICAgICAgICB9IGVsc2Ugew0KPiAgICAgICAgICAgICAgIC8q
+IE1ETVg6IE5vdCBpbXBsZW1lbnRlZC4gKi8NCj4gICAgICAgICAgICAgICBnZW5fbXNhKGVudiwg
+Y3R4KTsNCg==
