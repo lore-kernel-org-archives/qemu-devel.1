@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44029)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46313)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@outlook.com>) id 1gHIi3-0006ZU-I9
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 21:20:44 -0400
+	(envelope-from <liq3ea@gmail.com>) id 1gHIri-0002VQ-7x
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 21:30:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@outlook.com>) id 1gHIhz-0006NU-Gk
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 21:20:43 -0400
-Received: from mail-oln040092011010.outbound.protection.outlook.com
-	([40.92.11.10]:6031
-	helo=NAM04-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liq3ea@outlook.com>) id 1gHIhv-0006Ei-QF
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 21:20:37 -0400
-From: li qiang <liq3ea@outlook.com>
-Date: Tue, 30 Oct 2018 01:20:15 +0000
-Message-ID: <BN6PR18MB1220E5E9E7F8856800C675239FCC0@BN6PR18MB1220.namprd18.prod.outlook.com>
-References: <20181028124004.30494-1-liq3ea@163.com>
-	<20181028124004.30494-3-liq3ea@163.com>
-	<3a1b60e0-fe90-4da7-210e-4519f220bb9f@redhat.com>
-In-Reply-To: <3a1b60e0-fe90-4da7-210e-4519f220bb9f@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <74A235F32216D34C92E18C156BF978C6@namprd18.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <liq3ea@gmail.com>) id 1gHIrc-0002NT-LB
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 21:30:38 -0400
+Received: from mail-it1-x142.google.com ([2607:f8b0:4864:20::142]:52875)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1gHIrY-0002DF-T4
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 21:30:35 -0400
+Received: by mail-it1-x142.google.com with SMTP id r5-v6so9963572ith.2
+	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 18:30:17 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 2/2] tests: fw_cfg: add reboot_timeout test
- case
+References: <1540365080-6844-1-git-send-email-liq3ea@gmail.com>
+	<4d64d42a-8727-81aa-6015-a9db92abca76@redhat.com>
+	<6afc1723-633c-34af-d5ff-4dea3fbf6b89@redhat.com>
+	<CAKXe6SJQUtBRbOtiy1xtt+griLoxc_JOd3D4oKwR9d3B2GCWyQ@mail.gmail.com>
+	<1d47f5d7-e85c-44a0-2499-180eac24965e@redhat.com>
+In-Reply-To: <1d47f5d7-e85c-44a0-2499-180eac24965e@redhat.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Tue, 30 Oct 2018 09:29:40 +0800
+Message-ID: <CAKXe6SLFwyq0KZX0BgcdwK3aUw2qkSS7ou-=utjA52ksPVk5Lg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] fw_cfg_reboot: ensure reboot_time is
+ nonegative
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,101 +33,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, Li Qiang <liq3ea@163.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "thuth@redhat.com" <thuth@redhat.com>, "lvivier@redhat.com" <lvivier@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: philmd@redhat.com
+Cc: Laszlo Ersek <lersek@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 
-DQrlnKggMjAxOC8xMC8zMCA4OjA4LCBQaGlsaXBwZSBNYXRoaWV1LURhdWTDqSDlhpnpgZM6DQo+
-IE9uIDI4LzEwLzE4IDEzOjQwLCBMaSBRaWFuZyB3cm90ZToNCj4+IFNpZ25lZC1vZmYtYnk6IExp
-IFFpYW5nIDxsaXEzZWFAMTYzLmNvbT4NCj4+IC0tLQ0KPj4gwqAgdGVzdHMvZndfY2ZnLXRlc3Qu
-YyB8IDEzICsrKysrKysrKysrKy0NCj4+IMKgIDEgZmlsZSBjaGFuZ2VkLCAxMiBpbnNlcnRpb25z
-KCspLCAxIGRlbGV0aW9uKC0pDQo+Pg0KPj4gZGlmZiAtLWdpdCBhL3Rlc3RzL2Z3X2NmZy10ZXN0
-LmMgYi90ZXN0cy9md19jZmctdGVzdC5jDQo+PiBpbmRleCAxYzUxMDNmZTFjLi4zNzc2NWYxNWY4
-IDEwMDY0NA0KPj4gLS0tIGEvdGVzdHMvZndfY2ZnLXRlc3QuYw0KPj4gKysrIGIvdGVzdHMvZndf
-Y2ZnLXRlc3QuYw0KPj4gQEAgLTk5LDYgKzk5LDE1IEBAIHN0YXRpYyB2b2lkIHRlc3RfZndfY2Zn
-X2Jvb3RfbWVudSh2b2lkKQ0KPj4gwqDCoMKgwqDCoCBnX2Fzc2VydF9jbXBpbnQocWZ3X2NmZ19n
-ZXRfdTE2KGZ3X2NmZywgRldfQ0ZHX0JPT1RfTUVOVSksID09LCANCj4+IGJvb3RfbWVudSk7DQo+
-PiDCoCB9DQo+PiDCoCArc3RhdGljIHZvaWQgdGVzdF9md19jZmdfcmVib290X3RpbWVvdXQodm9p
-ZCkNCj4+ICt7DQo+PiArwqDCoMKgIHVpbnQzMl90IHJlYm9vdF90aW1lb3V0Ow0KPj4gKw0KPj4g
-K8KgwqDCoCBxZndfY2ZnX2dldF9maWxlKGZ3X2NmZywgImV0Yy9ib290LWZhaWwtd2FpdCIsDQo+
-PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAmcmVib290X3RpbWVv
-dXQsIHNpemVvZihyZWJvb3RfdGltZW91dCkpOw0KPj4gK8KgwqDCoCBnX2Fzc2VydF9jbXBpbnQo
-cmVib290X3RpbWVvdXQsIDw9LCA2NTUzNSk7DQo+PiArfQ0KPj4gKw0KPj4gwqAgaW50IG1haW4o
-aW50IGFyZ2MsIGNoYXIgKiphcmd2KQ0KPj4gwqAgew0KPj4gwqDCoMKgwqDCoCBRVGVzdFN0YXRl
-ICpzOw0KPj4gQEAgLTEwNiw3ICsxMTUsOCBAQCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqKmFy
-Z3YpDQo+PiDCoCDCoMKgwqDCoMKgIGdfdGVzdF9pbml0KCZhcmdjLCAmYXJndiwgTlVMTCk7DQo+
-PiDCoCAtwqDCoMKgIHMgPSBxdGVzdF9pbml0KCItdXVpZCA0NjAwY2IzMi0zOGVjLTRiMmYtOGFj
-Yi04MWM2ZWE1NGYyZDgiKTsNCj4+ICvCoMKgwqAgcyA9IHF0ZXN0X2luaXQoIi11dWlkIDQ2MDBj
-YjMyLTM4ZWMtNGIyZi04YWNiLTgxYzZlYTU0ZjJkOCINCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqAgIiAtYm9vdCByZWJvb3QtdGltZW91dD00Mjk0OTY3Mjk1Iik7DQo+
-DQo+IEknZCByYXRoZXIgY2hhbmdlIHRoaXMgdGVzdCB0byB1c2UgcXRlc3RfYWRkX2RhdGFfZnVu
-YygpIC4uLjoNCj4NCj4gwqDCoMKgwqDCoMKgwqAgcXRlc3RfYWRkX2RhdGFfZnVuYygiZndfY2Zn
-L3JlYm9vdF90aW1lb3V0IiwgIi1ib290IA0KPiByZWJvb3QtdGltZW91dD00Mjk0OTY3Mjk1ICIs
-IHRlc3RfZndfY2ZnX3JlYm9vdF90aW1lb3V0KTsNCj4NCj4gLi4uIHRvIGF2b2lkIGFkZGluZyB0
-aGlzIGNvbW1hbmQgbGluZSBvcHRpb24gdG8gYWxsIHRoZSB0ZXN0cywgYmVjYXVzZSANCj4gYWxs
-IHRlc3RzIGFyZSBub3cgZmFpbGluZzoNCj4NCj4gJCBtYWtlIGNoZWNrLXF0ZXN0LWkzODYNCj4g
-Wy4uLl0NCj4gRVJST1I6cWVtdS90ZXN0cy9md19jZmctdGVzdC5jOjMzOnRlc3RfZndfY2ZnX3Np
-Z25hdHVyZTogYXNzZXJ0aW9uIA0KPiBmYWlsZWQgKGJ1ZiA9PSAiUUVNVSIpOiAoIlwzNzdcMzc3
-XDM3N1wzNzciID09ICJRRU1VIikNCj4gRVJST1I6cWVtdS90ZXN0cy9md19jZmctdGVzdC5jOjQw
-OnRlc3RfZndfY2ZnX2lkOiBhc3NlcnRpb24gZmFpbGVkOiANCj4gKChpZCA9PSAxKSB8fCAoaWQg
-PT0gMykpDQo+IEVSUk9SOnFlbXUvdGVzdHMvZndfY2ZnLXRlc3QuYzo1Mjp0ZXN0X2Z3X2NmZ191
-dWlkOiBhc3NlcnRpb24gZmFpbGVkOiANCj4gKG1lbWNtcChidWYsIHV1aWQsIHNpemVvZihidWYp
-KSA9PSAwKQ0KPiBFUlJPUjpxZW11L3Rlc3RzL2Z3X2NmZy10ZXN0LmM6NTc6dGVzdF9md19jZmdf
-cmFtX3NpemU6IGFzc2VydGlvbiANCj4gZmFpbGVkIChxZndfY2ZnX2dldF91NjQoZndfY2ZnLCBG
-V19DRkdfUkFNX1NJWkUpID09IHJhbV9zaXplKTogKC0xID09IA0KPiAxMzQyMTc3MjgpDQo+IEVS
-Uk9SOnFlbXUvdGVzdHMvZndfY2ZnLXRlc3QuYzo2Mjp0ZXN0X2Z3X2NmZ19ub2dyYXBoaWM6IGFz
-c2VydGlvbiANCj4gZmFpbGVkIChxZndfY2ZnX2dldF91MTYoZndfY2ZnLCBGV19DRkdfTk9HUkFQ
-SElDKSA9PSAwKTogKDY1NTM1ID09IDApDQo+IEVSUk9SOnFlbXUvdGVzdHMvZndfY2ZnLXRlc3Qu
-Yzo2Nzp0ZXN0X2Z3X2NmZ19uYl9jcHVzOiBhc3NlcnRpb24gDQo+IGZhaWxlZCAocWZ3X2NmZ19n
-ZXRfdTE2KGZ3X2NmZywgRldfQ0ZHX05CX0NQVVMpID09IG5iX2NwdXMpOiAoNjU1MzUgPT0gMSkN
-Cj4gRVJST1I6cWVtdS90ZXN0cy9md19jZmctdGVzdC5jOjcyOnRlc3RfZndfY2ZnX21heF9jcHVz
-OiBhc3NlcnRpb24gDQo+IGZhaWxlZCAocWZ3X2NmZ19nZXRfdTE2KGZ3X2NmZywgRldfQ0ZHX01B
-WF9DUFVTKSA9PSBtYXhfY3B1cyk6ICg2NTUzNSANCj4gPT0gMSkNCj4gRVJST1I6cWVtdS90ZXN0
-cy9md19jZmctdGVzdC5jOjgwOnRlc3RfZndfY2ZnX251bWE6IGFzc2VydGlvbiBmYWlsZWQgDQo+
-IChxZndfY2ZnX2dldF91NjQoZndfY2ZnLCBGV19DRkdfTlVNQSkgPT0gbmJfbm9kZXMpOiAoLTEg
-PT0gMCkNCj4gRVJST1I6cWVtdS90ZXN0cy9md19jZmctdGVzdC5jOjk5OnRlc3RfZndfY2ZnX2Jv
-b3RfbWVudTogYXNzZXJ0aW9uIA0KPiBmYWlsZWQgKHFmd19jZmdfZ2V0X3UxNihmd19jZmcsIEZX
-X0NGR19CT09UX01FTlUpID09IGJvb3RfbWVudSk6IA0KPiAoNjU1MzUgPT0gMCkNCj4NCj4NCj4g
-KGRpZCB5b3UgdGVzdCB5b3VyIHBhdGNoPykNCj4NCk9mIGNvdXJzZSBJIHRlc3QgaXQsIGJ1dCBv
-bmx5IGluIHg4Nl82NC4NCg0KDQpIZXJlIGlzIHRoZSByZXN1bHQgd2l0aG91dCB0aGUgZml4IHBh
-dGNoLg0KDQp4eHhxZW11IyBRVEVTVF9RRU1VX0JJTkFSWT14ODZfNjQtc29mdG1tdS9xZW11LXN5
-c3RlbS14ODZfNjQgDQp0ZXN0cy9md19jZmctdGVzdA0KL3g4Nl82NC9md19jZmcvc2lnbmF0dXJl
-OiBPSw0KL3g4Nl82NC9md19jZmcvaWQ6IE9LDQoveDg2XzY0L2Z3X2NmZy91dWlkOiBPSw0KL3g4
-Nl82NC9md19jZmcvcmFtX3NpemU6IE9LDQoveDg2XzY0L2Z3X2NmZy9ub2dyYXBoaWM6IE9LDQov
-eDg2XzY0L2Z3X2NmZy9uYl9jcHVzOiBPSw0KL3g4Nl82NC9md19jZmcvbWF4X2NwdXM6IE9LDQov
-eDg2XzY0L2Z3X2NmZy9udW1hOiBPSw0KL3g4Nl82NC9md19jZmcvYm9vdF9tZW51OiBPSw0KL3g4
-Nl82NC9md19jZmcvcmVib290X3RpbWVvdXQ6ICoqDQpFUlJPUjp0ZXN0cy9md19jZmctdGVzdC5j
-OjEwODp0ZXN0X2Z3X2NmZ19yZWJvb3RfdGltZW91dDogYXNzZXJ0aW9uIA0KZmFpbGVkIChyZWJv
-b3RfdGltZW91dCA8PSA2NTUzNSk6ICg0Mjk0OTY3Mjk1IDw9IDY1NTM1KQ0KQWJvcnRlZA0KeHh4
-cWVtdSMgbWFrZSBjaGVjay1xdGVzdC14ODZfNjQNCiDCoCBHVEVTVEVSIGNoZWNrLXF0ZXN0LXg4
-Nl82NA0KKioNCkVSUk9SOnRlc3RzL2Z3X2NmZy10ZXN0LmM6MTA4OnRlc3RfZndfY2ZnX3JlYm9v
-dF90aW1lb3V0OiBhc3NlcnRpb24gDQpmYWlsZWQgKHJlYm9vdF90aW1lb3V0IDw9IDY1NTM1KTog
-KDQyOTQ5NjcyOTUgPD0gNjU1MzUpDQpHVGVzdGVyOiBsYXN0IHJhbmRvbSBzZWVkOiBSMDJTZmVk
-NzE5MWVkZTRlZDYwZDRmMzA2OWY5ZWM4MDhlNzMNCnh4eHFlbXUvdGVzdHMvTWFrZWZpbGUuaW5j
-bHVkZTo4MDU6IHJlY2lwZSBmb3IgdGFyZ2V0IA0KJ2NoZWNrLXF0ZXN0LXg4Nl82NCcgZmFpbGVk
-DQptYWtlOiAqKiogW2NoZWNrLXF0ZXN0LXg4Nl82NF0gRXJyb3IgMQ0KDQpJIGRpZCBpdCBpbiBp
-Mzg2IHJpZ2h0IG5vdy4gRm9sbG93aW5nIGlzIHRoZSByZXN1bHRzOg0KDQp4eHhxZW11IyBRVEVT
-VF9RRU1VX0JJTkFSWT1pMzg2LXNvZnRtbXUvcWVtdS1zeXN0ZW0taTM4NiB0ZXN0cy9md19jZmct
-dGVzdA0KL2kzODYvZndfY2ZnL3NpZ25hdHVyZTogT0sNCi9pMzg2L2Z3X2NmZy9pZDogT0sNCi9p
-Mzg2L2Z3X2NmZy91dWlkOiBPSw0KL2kzODYvZndfY2ZnL3JhbV9zaXplOiBPSw0KL2kzODYvZndf
-Y2ZnL25vZ3JhcGhpYzogT0sNCi9pMzg2L2Z3X2NmZy9uYl9jcHVzOiBPSw0KL2kzODYvZndfY2Zn
-L21heF9jcHVzOiBPSw0KL2kzODYvZndfY2ZnL251bWE6IE9LDQovaTM4Ni9md19jZmcvYm9vdF9t
-ZW51OiBPSw0KL2kzODYvZndfY2ZnL3JlYm9vdF90aW1lb3V0OiAqKg0KRVJST1I6dGVzdHMvZndf
-Y2ZnLXRlc3QuYzoxMDg6dGVzdF9md19jZmdfcmVib290X3RpbWVvdXQ6IGFzc2VydGlvbiANCmZh
-aWxlZCAocmVib290X3RpbWVvdXQgPD0gNjU1MzUpOiAoNDI5NDk2NzI5NSA8PSA2NTUzNSkNCkFi
-b3J0ZWQNCnh4eHFlbXUjIG1ha2UgY2hlay1xdGVzdC1pMzg2DQptYWtlOiAqKiogTm8gcnVsZSB0
-byBtYWtlIHRhcmdldCAnY2hlay1xdGVzdC1pMzg2Jy7CoCBTdG9wLg0KeHh4cWVtdSMgbWFrZSBj
-aGVjay1xdGVzdC1pMzg2DQogwqAgR1RFU1RFUiBjaGVjay1xdGVzdC1pMzg2DQoqKg0KRVJST1I6
-dGVzdHMvZndfY2ZnLXRlc3QuYzoxMDg6dGVzdF9md19jZmdfcmVib290X3RpbWVvdXQ6IGFzc2Vy
-dGlvbiANCmZhaWxlZCAocmVib290X3RpbWVvdXQgPD0gNjU1MzUpOiAoNDI5NDk2NzI5NSA8PSA2
-NTUzNSkNCkdUZXN0ZXI6IGxhc3QgcmFuZG9tIHNlZWQ6IFIwMlM3NjU5YjM3OWU2NjU5NjFlMDA2
-MGFmZWI0NDk5NDhiMg0KeHh4cWVtdS90ZXN0cy9NYWtlZmlsZS5pbmNsdWRlOjgwNTogcmVjaXBl
-IGZvciB0YXJnZXQgJ2NoZWNrLXF0ZXN0LWkzODYnIA0KZmFpbGVkDQptYWtlOiAqKiogW2NoZWNr
-LXF0ZXN0LWkzODZdIEVycm9yIDENCg0KDQpUaGFua3MsDQoNCkxpIFFpYW5nDQoNCj4+IMKgIMKg
-wqDCoMKgwqAgZndfY2ZnID0gcGNfZndfY2ZnX2luaXQocyk7DQo+PiDCoCBAQCAtMTI1LDYgKzEz
-NSw3IEBAIGludCBtYWluKGludCBhcmdjLCBjaGFyICoqYXJndikNCj4+IMKgwqDCoMKgwqAgcXRl
-c3RfYWRkX2Z1bmMoImZ3X2NmZy9tYXhfY3B1cyIsIHRlc3RfZndfY2ZnX21heF9jcHVzKTsNCj4+
-IMKgwqDCoMKgwqAgcXRlc3RfYWRkX2Z1bmMoImZ3X2NmZy9udW1hIiwgdGVzdF9md19jZmdfbnVt
-YSk7DQo+PiDCoMKgwqDCoMKgIHF0ZXN0X2FkZF9mdW5jKCJmd19jZmcvYm9vdF9tZW51IiwgdGVz
-dF9md19jZmdfYm9vdF9tZW51KTsNCj4+ICvCoMKgwqAgcXRlc3RfYWRkX2Z1bmMoImZ3X2NmZy9y
-ZWJvb3RfdGltZW91dCIsIA0KPj4gdGVzdF9md19jZmdfcmVib290X3RpbWVvdXQpOw0KPj4gwqAg
-wqDCoMKgwqDCoCByZXQgPSBnX3Rlc3RfcnVuKCk7DQo+Pg0KPg0K
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> =E4=BA=8E2018=E5=B9=B410=E6=
+=9C=8830=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8A=E5=8D=887:50=E5=86=99=E9=81=
+=93=EF=BC=9A
+
+> On 25/10/18 3:45, Li Qiang wrote:
+> > Hello Laszlo and Philippe ,
+> >
+> > Thanks for your review,
+> >
+> >
+> >
+> > Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com <mailto:philmd@redhat.co=
+m>> =E4=BA=8E
+> > 2018=E5=B9=B410=E6=9C=8825=E6=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8A=E5=8D=
+=886:56=E5=86=99=E9=81=93=EF=BC=9A
+> >
+> >     Hi,
+> >
+> >     On 24/10/18 13:35, Laszlo Ersek wrote:
+> >      > On 10/24/18 09:11, Li Qiang wrote:
+> >      >> This can avoid setting a negative value to
+> >      >> etc/boot-fail-wait.
+> >
+> >     Li Qiang, can you add a qtest for this?
+> >
+> >
+> > I will try to write one.
+> > Is it ok to write it without this patch, as the test will be not passed=
+?
+>
+> It is OK to add the test after the fix, else the test would fail.
+> But now your test protect from future regressions.
+>
+>
+Ok, I think this fix is not that bad, this is the same as
+'boot_splash_time'.
+ As for Laszlo's consideration,  we think we can send another patch to
+drop strtol in both 'boot_splash_time' and this 'reboot-timeout'.
+
+Thanks,
+Li Qiang
+
+
+>
+> > Thanks,
+> > Li Qiang
+> >
+> >
+> >      >>
+> >      >> Signed-off-by: Li Qiang <liq3ea@gmail.com <mailto:
+> liq3ea@gmail.com>>
+> >      >> ---
+> >      >>   hw/nvram/fw_cfg.c | 15 ++++++++++-----
+> >      >>   1 file changed, 10 insertions(+), 5 deletions(-)
+> >      >>
+> >      >> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> >      >> index f4a52d8..276dcb1 100644
+> >      >> --- a/hw/nvram/fw_cfg.c
+> >      >> +++ b/hw/nvram/fw_cfg.c
+> >      >> @@ -199,12 +199,17 @@ static void fw_cfg_reboot(FWCfgState *s)
+> >      >>               reboot_timeout =3D strtol(p, &p, 10);
+> >      >>           }
+> >      >>       }
+> >      >> -    /* validate the input */
+> >      >> -    if (reboot_timeout > 0xffff) {
+> >      >> -        error_report("reboot timeout is larger than 65535,
+> >     force it to 65535.");
+> >      >> -        reboot_timeout =3D 0xffff;
+> >      >> +
+> >      >> +    if (reboot_timeout >=3D 0) {
+> >      >> +        /* validate the input */
+> >      >> +        if (reboot_timeout > 0xffff) {
+> >      >> +            error_report("reboot timeout is larger than 65535,=
+"
+> >      >> +                         "force it to 65535.");
+> >      >> +            reboot_timeout =3D 0xffff;
+> >      >> +        }
+> >      >> +        fw_cfg_add_file(s, "etc/boot-fail-wait",
+> >      >> +                        g_memdup(&reboot_timeout, 4), 4);
+> >      >>       }
+> >      >> -    fw_cfg_add_file(s, "etc/boot-fail-wait",
+> >     g_memdup(&reboot_timeout, 4), 4);
+> >      >>   }
+> >      >>
+> >      >>   static void fw_cfg_write(FWCfgState *s, uint8_t value)
+> >      >>
+> >      >
+> >      > I don't feel strongly about fixing this issue.
+> >      >
+> >      > However, if we decide to fix it, we should start with the
+> bare-bones
+> >      > strtol() call, visible at the top of the context. I'm not
+> >     up-to-date on
+> >      > what's the best QEMU helper function for this, but I seem to
+> >     remember it
+> >      > checks for trailing garbage, and perhaps even for range. Maybe w=
+e
+> >     should
+> >
+> >     Are you suggesting qemu_strtoul()? I agree this would be cleaner.
+> >
+> >
+> >
+> > I reference the 'boot_splash_time' in fw_cfg_bootsplash.
+> > We can also change there.
+> >
+> >      > even use a different (better) option parsing facility thatn
+> >      > qemu_opt_get(). Adding Eric and Markus.
+> >      >
+> >      > Also, I would suggest forcing negative values (that were
+> explicitly
+> >      > specified) to some sensible positive default, such as 5 seconds
+> >     or so.
+> >      >
+> >      > Thanks
+> >      > Laszlo
+> >      >
+> >
+>
