@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50092)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gHIyL-0005EB-HQ
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 21:37:38 -0400
+	(envelope-from <liq3ea@outlook.com>) id 1gHJ6F-0001Ng-E5
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 21:45:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gHIy5-0007HC-Tm
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 21:37:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52970)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gHIy5-00076b-B5
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 21:37:17 -0400
-Date: Mon, 29 Oct 2018 22:37:02 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181030013702.GQ3902@habkost.net>
-References: <20180912125531.32131-1-marcandre.lureau@redhat.com>
-	<20180912125531.32131-2-marcandre.lureau@redhat.com>
-	<20181022153330.6996de15@igors-macbook-pro.local>
-	<20181026151321.GE3902@habkost.net>
-	<20181029105657.5106265f@redhat.com>
+	(envelope-from <liq3ea@outlook.com>) id 1gHJ6B-0003rr-BX
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 21:45:43 -0400
+Received: from mail-oln040092006033.outbound.protection.outlook.com
+	([40.92.6.33]:23533
+	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <liq3ea@outlook.com>) id 1gHJ6B-0003rA-26
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 21:45:39 -0400
+From: li qiang <liq3ea@outlook.com>
+Date: Tue, 30 Oct 2018 01:45:36 +0000
+Message-ID: <BN6PR18MB1220A7FBDA0D20E03CD698C99FCC0@BN6PR18MB1220.namprd18.prod.outlook.com>
+References: <20181028124004.30494-1-liq3ea@163.com>
+	<20181028124004.30494-2-liq3ea@163.com>
+	<8b181c7d-338f-3612-48bb-751bab8f020a@redhat.com>
+In-Reply-To: <8b181c7d-338f-3612-48bb-751bab8f020a@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <42DE7F213A5234479277A70BC61F5B6C@namprd18.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20181029105657.5106265f@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/9] qom/user-creatable: add a few helper
- macros
+Subject: Re: [Qemu-devel] [PATCH 1/2] tests: fw_cfg: add a function to get
+ the fw_cfg file entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,111 +33,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, dgilbert@redhat.com, Richard Henderson <rth@twiddle.net>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, "Michael S. Tsirkin" <mst@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, Li Qiang <liq3ea@163.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "thuth@redhat.com" <thuth@redhat.com>, "lvivier@redhat.com" <lvivier@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Mon, Oct 29, 2018 at 10:56:57AM +0100, Igor Mammedov wrote:
-> On Fri, 26 Oct 2018 12:13:21 -0300
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
->=20
-> > On Mon, Oct 22, 2018 at 03:33:30PM +0100, Igor Mammedov wrote:
-> > > On Wed, 12 Sep 2018 16:55:23 +0400
-> > > Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com> wrote:
-> > >  =20
-> > > > Improve a bit code readability.
-> > > >=20
-> > > > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
-> > > > ---
-> > > >  include/qom/object_interfaces.h | 4 ++++
-> > > >  qom/object.c                    | 4 ++--
-> > > >  qom/object_interfaces.c         | 9 +++------
-> > > >  3 files changed, 9 insertions(+), 8 deletions(-)
-> > > >=20
-> > > > diff --git a/include/qom/object_interfaces.h b/include/qom/object=
-_interfaces.h
-> > > > index 4d513fb329..46b0861457 100644
-> > > > --- a/include/qom/object_interfaces.h
-> > > > +++ b/include/qom/object_interfaces.h
-> > > > @@ -9,9 +9,13 @@
-> > > >  #define USER_CREATABLE_CLASS(klass) \
-> > > >       OBJECT_CLASS_CHECK(UserCreatableClass, (klass), \
-> > > >                          TYPE_USER_CREATABLE)
-> > > > +#define IS_USER_CREATABLE_CLASS(klass) \
-> > > > +    object_class_dynamic_cast(OBJECT_CLASS(oc), TYPE_USER_CREATA=
-BLE)
-> > > >  #define USER_CREATABLE_GET_CLASS(obj) \
-> > > >       OBJECT_GET_CLASS(UserCreatableClass, (obj), \
-> > > >                        TYPE_USER_CREATABLE)
-> > > > +#define IS_USER_CREATABLE(obj) \
-> > > > +    object_dynamic_cast(OBJECT(obj), TYPE_USER_CREATABLE)
-> > > >  #define USER_CREATABLE(obj) \
-> > > >       INTERFACE_CHECK(UserCreatable, (obj), \
-> > > >                       TYPE_USER_CREATABLE)
-> > > > diff --git a/qom/object.c b/qom/object.c
-> > > > index 75d1d48944..0703e8e4ff 100644
-> > > > --- a/qom/object.c
-> > > > +++ b/qom/object.c
-> > > > @@ -424,7 +424,7 @@ void object_initialize_childv(Object *parento=
-bj, const char *propname,
-> > > >          goto out;
-> > > >      }
-> > > > =20
-> > > > -    if (object_dynamic_cast(obj, TYPE_USER_CREATABLE)) {
-> > > > +    if (IS_USER_CREATABLE(obj)) {
-> > > >          user_creatable_complete(obj, &local_err);
-> > > >          if (local_err) {
-> > > >              object_unparent(obj);
-> > > > @@ -605,7 +605,7 @@ Object *object_new_with_propv(const char *typ=
-ename,
-> > > >          goto error;
-> > > >      }
-> > > > =20
-> > > > -    if (object_dynamic_cast(obj, TYPE_USER_CREATABLE)) {
-> > > > +    if (IS_USER_CREATABLE(obj)) {
-> > > >          user_creatable_complete(obj, &local_err);
-> > > >          if (local_err) {
-> > > >              object_unparent(obj);
-> > > > diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
-> > > > index 72b97a8bed..e3084bc04a 100644
-> > > > --- a/qom/object_interfaces.c
-> > > > +++ b/qom/object_interfaces.c
-> > > > @@ -10,18 +10,15 @@
-> > > > =20
-> > > >  void user_creatable_complete(Object *obj, Error **errp)
-> > > >  {
-> > > > -
-> > > >      UserCreatableClass *ucc;
-> > > > -    UserCreatable *uc =3D
-> > > > -        (UserCreatable *)object_dynamic_cast(obj, TYPE_USER_CREA=
-TABLE);
-> > > > =20
-> > > > -    if (!uc) {
-> > > > +    if (!IS_USER_CREATABLE(obj)) {
-> > > >          return;
-> > > >      }
-> > > > =20
-> > > > -    ucc =3D USER_CREATABLE_GET_CLASS(uc);
-> > > > +    ucc =3D USER_CREATABLE_GET_CLASS(obj);
-> > > >      if (ucc->complete) {
-> > > > -        ucc->complete(uc, errp);
-> > > > +        ucc->complete(USER_CREATABLE(obj), errp); =20
-> > >                          ^^^
-> > > even though function becomes more concise,
-> > > this will call expensive dynamic cast 2nd time (IS_USER_CREATABLE w=
-as the 1st and discarded)
-> > > so I'm not sure is a good idea to regress startup time for readabil=
-ity.  =20
-> >=20
-> > (INTERFACE_CHECK is a nop if CONFIG_QOM_CAST_DEBUG is not
-> > enabled, so I don't understand how it would regress startup time.
-> Isn't it enabled by default though?
-> Maybe we should flip default to disabled then cast should be ok and ena=
-ble it
-> when generic '--debug' is enabled.
-
-This is called only once for each -object option.  Even if QOM
-debugging is enabled by default I don't see why it wouldn't be OK
-to call object_dynamic_cast_assert() here.
-
---=20
-Eduardo
+DQpIZWxsbyBQaGlsaXBwZSwNCg0KDQpUaGFua3MgZm9yIHlvdXIgcmV2aWV3LA0KDQpJIHdpbGwg
+c2VuZCB2MiBsYXRlci4NCg0KDQpUaGFua3MuDQoNCkxpIFFpYW5nDQoNCuWcqCAyMDE4LzEwLzMw
+IDc6NDYsIFBoaWxpcHBlIE1hdGhpZXUtRGF1ZMOpIOWGmemBkzoNCj4gSGkgTGksDQo+DQo+IE9u
+IDI4LzEwLzE4IDEzOjQwLCBMaSBRaWFuZyB3cm90ZToNCj4+IFRoaXMgaXMgdXNlZnVsIHRvIHdy
+aXRlIHF0ZXN0IGFib3VudCBmd19jZmcgZmlsZSBlbnRyeS4NCj4+DQo+PiBTaWduZWQtb2ZmLWJ5
+OiBMaSBRaWFuZyA8bGlxM2VhQDE2My5jb20+DQo+PiAtLS0NCj4+IMKgIHRlc3RzL2xpYnFvcy9m
+d19jZmcuYyB8IDMwICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKw0KPj4gwqAgdGVzdHMv
+bGlicW9zL2Z3X2NmZy5oIHzCoCAyICsrDQo+PiDCoCAyIGZpbGVzIGNoYW5nZWQsIDMyIGluc2Vy
+dGlvbnMoKykNCj4+DQo+PiBkaWZmIC0tZ2l0IGEvdGVzdHMvbGlicW9zL2Z3X2NmZy5jIGIvdGVz
+dHMvbGlicW9zL2Z3X2NmZy5jDQo+PiBpbmRleCBkMDg4OWQxZTIyLi4yZGQ3YTQ5OGFiIDEwMDY0
+NA0KPj4gLS0tIGEvdGVzdHMvbGlicW9zL2Z3X2NmZy5jDQo+PiArKysgYi90ZXN0cy9saWJxb3Mv
+ZndfY2ZnLmMNCj4+IEBAIC0xNiw2ICsxNiw3IEBADQo+PiDCoCAjaW5jbHVkZSAibGlicW9zL2Z3
+X2NmZy5oIg0KPj4gwqAgI2luY2x1ZGUgImxpYnF0ZXN0LmgiDQo+PiDCoCAjaW5jbHVkZSAicWVt
+dS9ic3dhcC5oIg0KPj4gKyNpbmNsdWRlICJzdGFuZGFyZC1oZWFkZXJzL2xpbnV4L3FlbXVfZndf
+Y2ZnLmgiDQo+PiDCoCDCoCB2b2lkIHFmd19jZmdfc2VsZWN0KFFGV0NGRyAqZndfY2ZnLCB1aW50
+MTZfdCBrZXkpDQo+PiDCoCB7DQo+PiBAQCAtNTQsNiArNTUsMzUgQEAgdWludDY0X3QgcWZ3X2Nm
+Z19nZXRfdTY0KFFGV0NGRyAqZndfY2ZnLCB1aW50MTZfdCANCj4+IGtleSkNCj4+IMKgwqDCoMKg
+wqAgcmV0dXJuIGxlNjRfdG9fY3B1KHZhbHVlKTsNCj4+IMKgIH0NCj4NCj4gQ2FuIHRoaXMgcmV0
+dXJuIHNpemVfdCB0aGUgc2l6ZSBvZiB0aGUgZmlsZT8NCj4gU28gcWZ3X2NmZ19nZXRfZmlsZSgu
+Li4sIGJ1Zmxlbj0wKSByZXR1cm5zIHRoZSBmaWxlIHNpemUuDQo+DQo+PiArdm9pZCBxZndfY2Zn
+X2dldF9maWxlKFFGV0NGRyAqZndfY2ZnLCBjb25zdCBjaGFyICpmaWxlbmFtZSwNCj4+ICvCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgdm9pZCAqZGF0YSwgc2l6ZV90
+IGJ1ZmxlbikNCj4+ICt7DQo+PiArwqDCoMKgIHVpbnQzMl90IGNvdW50Ow0KPj4gK8KgwqDCoCB1
+aW50MzJfdCBpOw0KPj4gK8KgwqDCoCB1bnNpZ25lZCBjaGFyICpmaWxlc2J1ZiA9IE5VTEw7DQo+
+PiArwqDCoMKgIHVpbnQzMl90IGRzaXplOw0KPj4gK8KgwqDCoCBzdHJ1Y3QgZndfY2ZnX2ZpbGUg
+KnA7DQo+DQo+IMKgwqDCoMKgwqDCoCBzaXplX3QgZmlsZXNpemUgPSAwOw0KPg0KPj4gKw0KPj4g
+K8KgwqDCoCBxZndfY2ZnX2dldChmd19jZmcsIEZXX0NGR19GSUxFX0RJUiwgJmNvdW50LCBzaXpl
+b2YoY291bnQpKTsNCj4+ICvCoMKgwqAgY291bnQgPSBiZTMyX3RvX2NwdShjb3VudCk7DQo+PiAr
+wqDCoMKgIGRzaXplID0gc2l6ZW9mKHVpbnQzMl90KSArIGNvdW50ICogc2l6ZW9mKHN0cnVjdCBm
+d19jZmdfZmlsZSk7DQo+PiArwqDCoMKgIGZpbGVzYnVmID0gZ19tYWxsb2MwKGRzaXplKTsNCj4+
+ICvCoMKgwqAgcWZ3X2NmZ19nZXQoZndfY2ZnLCBGV19DRkdfRklMRV9ESVIsIGZpbGVzYnVmLCBk
+c2l6ZSk7DQo+PiArwqDCoMKgIHAgPSAoc3RydWN0IGZ3X2NmZ19maWxlICopKGZpbGVzYnVmICsg
+NCk7DQo+PiArwqDCoMKgIGZvciAoaSA9IDA7IGkgPCBjb3VudDsgKytpLCArK3ApIHsNCj4+ICvC
+oMKgwqDCoMKgwqDCoCBpZiAoIXN0cmNtcChwLT5uYW1lLCBmaWxlbmFtZSkpIHsNCj4+ICvCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgIHVpbnQzMl90IGxlbiA9IGJlMzJfdG9fY3B1KHAtPnNpemUpOw0K
+Pg0KPg0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgdWludDE2X3Qgc2VsID0gYmUxNl90b19j
+cHUocC0+c2VsZWN0KTsNCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHZvaWQgKmJ1ZiA9IGdf
+bWFsbG9jMChsZW4pOw0KPg0KPiBXaHkgY2FsbCBtYWxsb2MoKSBoZXJlPw0KPg0KPj4gK8KgwqDC
+oMKgwqDCoMKgwqDCoMKgwqAgcWZ3X2NmZ19nZXQoZndfY2ZnLCBzZWwsIGJ1ZiwgbGVuKTsNCj4N
+Cj4gQW5kIG5vdCBjb3B5IGRpcmVjdGx5IHRvICdkYXRhJzoNCj4NCj4gwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoCBmaWxlc2l6ZSA9IGxlbjsNCj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoCBpZiAobGVuID4gYnVmbGVuKSB7DQo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoCBsZW4gPSBidWZsZW47DQo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfQ0K
+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHFmd19jZmdfZ2V0KGZ3X2NmZywgc2VsLCBk
+YXRhLCBsZW4pOw0KPg0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgbWVtY3B5KGRhdGEsIGJ1
+ZiwgYnVmbGVuKTsNCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGdfZnJlZShidWYpOw0KPg0K
+PiBEcm9wcGluZyAyIHByZXZpb3VzIGxpbmVzLg0KPg0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKg
+wqAgYnJlYWs7DQo+PiArwqDCoMKgwqDCoMKgwqAgfQ0KPj4gK8KgwqDCoCB9DQo+PiArwqDCoMKg
+IGdfZnJlZShmaWxlc2J1Zik7DQo+DQo+IMKgwqDCoMKgwqDCoCByZXR1cm4gZmlsZXNpemU7DQo+
+DQo+PiArfQ0KPj4gKw0KPj4gwqAgc3RhdGljIHZvaWQgbW1fZndfY2ZnX3NlbGVjdChRRldDRkcg
+KmZ3X2NmZywgdWludDE2X3Qga2V5KQ0KPj4gwqAgew0KPj4gwqDCoMKgwqDCoCBxdGVzdF93cml0
+ZXcoZndfY2ZnLT5xdHMsIGZ3X2NmZy0+YmFzZSwga2V5KTsNCj4+IGRpZmYgLS1naXQgYS90ZXN0
+cy9saWJxb3MvZndfY2ZnLmggYi90ZXN0cy9saWJxb3MvZndfY2ZnLmgNCj4+IGluZGV4IDAzNTM0
+MTZhZjAuLjUwZTQyMjc2MzggMTAwNjQ0DQo+PiAtLS0gYS90ZXN0cy9saWJxb3MvZndfY2ZnLmgN
+Cj4+ICsrKyBiL3Rlc3RzL2xpYnFvcy9md19jZmcuaA0KPj4gQEAgLTMxLDYgKzMxLDggQEAgdm9p
+ZCBxZndfY2ZnX2dldChRRldDRkcgKmZ3X2NmZywgdWludDE2X3Qga2V5LCB2b2lkIA0KPj4gKmRh
+dGEsIHNpemVfdCBsZW4pOw0KPj4gwqAgdWludDE2X3QgcWZ3X2NmZ19nZXRfdTE2KFFGV0NGRyAq
+ZndfY2ZnLCB1aW50MTZfdCBrZXkpOw0KPj4gwqAgdWludDMyX3QgcWZ3X2NmZ19nZXRfdTMyKFFG
+V0NGRyAqZndfY2ZnLCB1aW50MTZfdCBrZXkpOw0KPj4gwqAgdWludDY0X3QgcWZ3X2NmZ19nZXRf
+dTY0KFFGV0NGRyAqZndfY2ZnLCB1aW50MTZfdCBrZXkpOw0KPj4gK3ZvaWQgcWZ3X2NmZ19nZXRf
+ZmlsZShRRldDRkcgKmZ3X2NmZywgY29uc3QgY2hhciAqZmlsZW5hbWUsDQo+PiArwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHZvaWQgKmRhdGEsIHNpemVfdCBidWZs
+ZW4pOw0KPj4gwqAgwqAgUUZXQ0ZHICptbV9md19jZmdfaW5pdChRVGVzdFN0YXRlICpxdHMsIHVp
+bnQ2NF90IGJhc2UpOw0KPj4gwqAgUUZXQ0ZHICppb19md19jZmdfaW5pdChRVGVzdFN0YXRlICpx
+dHMsIHVpbnQxNl90IGJhc2UpOw0KPj4NCj4NCg==
