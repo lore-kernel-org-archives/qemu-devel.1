@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46313)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gHIri-0002VQ-7x
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 21:30:43 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gHIyL-0005EB-HQ
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 21:37:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gHIrc-0002NT-LB
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 21:30:38 -0400
-Received: from mail-it1-x142.google.com ([2607:f8b0:4864:20::142]:52875)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1gHIrY-0002DF-T4
-	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 21:30:35 -0400
-Received: by mail-it1-x142.google.com with SMTP id r5-v6so9963572ith.2
-	for <qemu-devel@nongnu.org>; Mon, 29 Oct 2018 18:30:17 -0700 (PDT)
+	(envelope-from <ehabkost@redhat.com>) id 1gHIy5-0007HC-Tm
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 21:37:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52970)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gHIy5-00076b-B5
+	for qemu-devel@nongnu.org; Mon, 29 Oct 2018 21:37:17 -0400
+Date: Mon, 29 Oct 2018 22:37:02 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181030013702.GQ3902@habkost.net>
+References: <20180912125531.32131-1-marcandre.lureau@redhat.com>
+	<20180912125531.32131-2-marcandre.lureau@redhat.com>
+	<20181022153330.6996de15@igors-macbook-pro.local>
+	<20181026151321.GE3902@habkost.net>
+	<20181029105657.5106265f@redhat.com>
 MIME-Version: 1.0
-References: <1540365080-6844-1-git-send-email-liq3ea@gmail.com>
-	<4d64d42a-8727-81aa-6015-a9db92abca76@redhat.com>
-	<6afc1723-633c-34af-d5ff-4dea3fbf6b89@redhat.com>
-	<CAKXe6SJQUtBRbOtiy1xtt+griLoxc_JOd3D4oKwR9d3B2GCWyQ@mail.gmail.com>
-	<1d47f5d7-e85c-44a0-2499-180eac24965e@redhat.com>
-In-Reply-To: <1d47f5d7-e85c-44a0-2499-180eac24965e@redhat.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Tue, 30 Oct 2018 09:29:40 +0800
-Message-ID: <CAKXe6SLFwyq0KZX0BgcdwK3aUw2qkSS7ou-=utjA52ksPVk5Lg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20181029105657.5106265f@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] fw_cfg_reboot: ensure reboot_time is
- nonegative
+Subject: Re: [Qemu-devel] [PATCH 1/9] qom/user-creatable: add a few helper
+ macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,125 +32,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: philmd@redhat.com
-Cc: Laszlo Ersek <lersek@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, dgilbert@redhat.com, Richard Henderson <rth@twiddle.net>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, "Michael S. Tsirkin" <mst@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> =E4=BA=8E2018=E5=B9=B410=E6=
-=9C=8830=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8A=E5=8D=887:50=E5=86=99=E9=81=
-=93=EF=BC=9A
+On Mon, Oct 29, 2018 at 10:56:57AM +0100, Igor Mammedov wrote:
+> On Fri, 26 Oct 2018 12:13:21 -0300
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
+>=20
+> > On Mon, Oct 22, 2018 at 03:33:30PM +0100, Igor Mammedov wrote:
+> > > On Wed, 12 Sep 2018 16:55:23 +0400
+> > > Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com> wrote:
+> > >  =20
+> > > > Improve a bit code readability.
+> > > >=20
+> > > > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> > > > ---
+> > > >  include/qom/object_interfaces.h | 4 ++++
+> > > >  qom/object.c                    | 4 ++--
+> > > >  qom/object_interfaces.c         | 9 +++------
+> > > >  3 files changed, 9 insertions(+), 8 deletions(-)
+> > > >=20
+> > > > diff --git a/include/qom/object_interfaces.h b/include/qom/object=
+_interfaces.h
+> > > > index 4d513fb329..46b0861457 100644
+> > > > --- a/include/qom/object_interfaces.h
+> > > > +++ b/include/qom/object_interfaces.h
+> > > > @@ -9,9 +9,13 @@
+> > > >  #define USER_CREATABLE_CLASS(klass) \
+> > > >       OBJECT_CLASS_CHECK(UserCreatableClass, (klass), \
+> > > >                          TYPE_USER_CREATABLE)
+> > > > +#define IS_USER_CREATABLE_CLASS(klass) \
+> > > > +    object_class_dynamic_cast(OBJECT_CLASS(oc), TYPE_USER_CREATA=
+BLE)
+> > > >  #define USER_CREATABLE_GET_CLASS(obj) \
+> > > >       OBJECT_GET_CLASS(UserCreatableClass, (obj), \
+> > > >                        TYPE_USER_CREATABLE)
+> > > > +#define IS_USER_CREATABLE(obj) \
+> > > > +    object_dynamic_cast(OBJECT(obj), TYPE_USER_CREATABLE)
+> > > >  #define USER_CREATABLE(obj) \
+> > > >       INTERFACE_CHECK(UserCreatable, (obj), \
+> > > >                       TYPE_USER_CREATABLE)
+> > > > diff --git a/qom/object.c b/qom/object.c
+> > > > index 75d1d48944..0703e8e4ff 100644
+> > > > --- a/qom/object.c
+> > > > +++ b/qom/object.c
+> > > > @@ -424,7 +424,7 @@ void object_initialize_childv(Object *parento=
+bj, const char *propname,
+> > > >          goto out;
+> > > >      }
+> > > > =20
+> > > > -    if (object_dynamic_cast(obj, TYPE_USER_CREATABLE)) {
+> > > > +    if (IS_USER_CREATABLE(obj)) {
+> > > >          user_creatable_complete(obj, &local_err);
+> > > >          if (local_err) {
+> > > >              object_unparent(obj);
+> > > > @@ -605,7 +605,7 @@ Object *object_new_with_propv(const char *typ=
+ename,
+> > > >          goto error;
+> > > >      }
+> > > > =20
+> > > > -    if (object_dynamic_cast(obj, TYPE_USER_CREATABLE)) {
+> > > > +    if (IS_USER_CREATABLE(obj)) {
+> > > >          user_creatable_complete(obj, &local_err);
+> > > >          if (local_err) {
+> > > >              object_unparent(obj);
+> > > > diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
+> > > > index 72b97a8bed..e3084bc04a 100644
+> > > > --- a/qom/object_interfaces.c
+> > > > +++ b/qom/object_interfaces.c
+> > > > @@ -10,18 +10,15 @@
+> > > > =20
+> > > >  void user_creatable_complete(Object *obj, Error **errp)
+> > > >  {
+> > > > -
+> > > >      UserCreatableClass *ucc;
+> > > > -    UserCreatable *uc =3D
+> > > > -        (UserCreatable *)object_dynamic_cast(obj, TYPE_USER_CREA=
+TABLE);
+> > > > =20
+> > > > -    if (!uc) {
+> > > > +    if (!IS_USER_CREATABLE(obj)) {
+> > > >          return;
+> > > >      }
+> > > > =20
+> > > > -    ucc =3D USER_CREATABLE_GET_CLASS(uc);
+> > > > +    ucc =3D USER_CREATABLE_GET_CLASS(obj);
+> > > >      if (ucc->complete) {
+> > > > -        ucc->complete(uc, errp);
+> > > > +        ucc->complete(USER_CREATABLE(obj), errp); =20
+> > >                          ^^^
+> > > even though function becomes more concise,
+> > > this will call expensive dynamic cast 2nd time (IS_USER_CREATABLE w=
+as the 1st and discarded)
+> > > so I'm not sure is a good idea to regress startup time for readabil=
+ity.  =20
+> >=20
+> > (INTERFACE_CHECK is a nop if CONFIG_QOM_CAST_DEBUG is not
+> > enabled, so I don't understand how it would regress startup time.
+> Isn't it enabled by default though?
+> Maybe we should flip default to disabled then cast should be ok and ena=
+ble it
+> when generic '--debug' is enabled.
 
-> On 25/10/18 3:45, Li Qiang wrote:
-> > Hello Laszlo and Philippe ,
-> >
-> > Thanks for your review,
-> >
-> >
-> >
-> > Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com <mailto:philmd@redhat.co=
-m>> =E4=BA=8E
-> > 2018=E5=B9=B410=E6=9C=8825=E6=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8A=E5=8D=
-=886:56=E5=86=99=E9=81=93=EF=BC=9A
-> >
-> >     Hi,
-> >
-> >     On 24/10/18 13:35, Laszlo Ersek wrote:
-> >      > On 10/24/18 09:11, Li Qiang wrote:
-> >      >> This can avoid setting a negative value to
-> >      >> etc/boot-fail-wait.
-> >
-> >     Li Qiang, can you add a qtest for this?
-> >
-> >
-> > I will try to write one.
-> > Is it ok to write it without this patch, as the test will be not passed=
-?
->
-> It is OK to add the test after the fix, else the test would fail.
-> But now your test protect from future regressions.
->
->
-Ok, I think this fix is not that bad, this is the same as
-'boot_splash_time'.
- As for Laszlo's consideration,  we think we can send another patch to
-drop strtol in both 'boot_splash_time' and this 'reboot-timeout'.
+This is called only once for each -object option.  Even if QOM
+debugging is enabled by default I don't see why it wouldn't be OK
+to call object_dynamic_cast_assert() here.
 
-Thanks,
-Li Qiang
-
-
->
-> > Thanks,
-> > Li Qiang
-> >
-> >
-> >      >>
-> >      >> Signed-off-by: Li Qiang <liq3ea@gmail.com <mailto:
-> liq3ea@gmail.com>>
-> >      >> ---
-> >      >>   hw/nvram/fw_cfg.c | 15 ++++++++++-----
-> >      >>   1 file changed, 10 insertions(+), 5 deletions(-)
-> >      >>
-> >      >> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-> >      >> index f4a52d8..276dcb1 100644
-> >      >> --- a/hw/nvram/fw_cfg.c
-> >      >> +++ b/hw/nvram/fw_cfg.c
-> >      >> @@ -199,12 +199,17 @@ static void fw_cfg_reboot(FWCfgState *s)
-> >      >>               reboot_timeout =3D strtol(p, &p, 10);
-> >      >>           }
-> >      >>       }
-> >      >> -    /* validate the input */
-> >      >> -    if (reboot_timeout > 0xffff) {
-> >      >> -        error_report("reboot timeout is larger than 65535,
-> >     force it to 65535.");
-> >      >> -        reboot_timeout =3D 0xffff;
-> >      >> +
-> >      >> +    if (reboot_timeout >=3D 0) {
-> >      >> +        /* validate the input */
-> >      >> +        if (reboot_timeout > 0xffff) {
-> >      >> +            error_report("reboot timeout is larger than 65535,=
-"
-> >      >> +                         "force it to 65535.");
-> >      >> +            reboot_timeout =3D 0xffff;
-> >      >> +        }
-> >      >> +        fw_cfg_add_file(s, "etc/boot-fail-wait",
-> >      >> +                        g_memdup(&reboot_timeout, 4), 4);
-> >      >>       }
-> >      >> -    fw_cfg_add_file(s, "etc/boot-fail-wait",
-> >     g_memdup(&reboot_timeout, 4), 4);
-> >      >>   }
-> >      >>
-> >      >>   static void fw_cfg_write(FWCfgState *s, uint8_t value)
-> >      >>
-> >      >
-> >      > I don't feel strongly about fixing this issue.
-> >      >
-> >      > However, if we decide to fix it, we should start with the
-> bare-bones
-> >      > strtol() call, visible at the top of the context. I'm not
-> >     up-to-date on
-> >      > what's the best QEMU helper function for this, but I seem to
-> >     remember it
-> >      > checks for trailing garbage, and perhaps even for range. Maybe w=
-e
-> >     should
-> >
-> >     Are you suggesting qemu_strtoul()? I agree this would be cleaner.
-> >
-> >
-> >
-> > I reference the 'boot_splash_time' in fw_cfg_bootsplash.
-> > We can also change there.
-> >
-> >      > even use a different (better) option parsing facility thatn
-> >      > qemu_opt_get(). Adding Eric and Markus.
-> >      >
-> >      > Also, I would suggest forcing negative values (that were
-> explicitly
-> >      > specified) to some sensible positive default, such as 5 seconds
-> >     or so.
-> >      >
-> >      > Thanks
-> >      > Laszlo
-> >      >
-> >
->
+--=20
+Eduardo
