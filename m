@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47385)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gHTxF-0004RQ-FH
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 09:21:11 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1gHTzt-0007Qc-DN
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 09:23:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gHTxB-0004YX-Vu
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 09:21:09 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:42464)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gHTxB-0004Xt-P1
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 09:21:05 -0400
-Received: by mail-wr1-f68.google.com with SMTP id y15-v6so12566958wru.9
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 06:21:05 -0700 (PDT)
-References: <BN6PR2201MB1251EA1F1F5E486A889A827CC6CC0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <390ae5f6-8392-e26b-adf7-1979f32a06f0@redhat.com>
-Date: Tue, 30 Oct 2018 14:21:02 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1gHTzp-0006Bb-7D
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 09:23:52 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:52130)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1gHTzo-00069K-Ep
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 09:23:48 -0400
+Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
+	(envelope-from <pm215@archaic.org.uk>) id 1gHTzm-00016G-Cd
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 13:23:46 +0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 30 Oct 2018 13:23:43 +0000
+Message-Id: <20181030132343.22658-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <BN6PR2201MB1251EA1F1F5E486A889A827CC6CC0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Question: Perfecting checkpatch.pl
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL v2 0/6] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,32 +27,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <amarkovic@wavecomp.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "stefanha@redhat.com" <stefanha@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
 
-On 30/10/18 13:35, Aleksandar Markovic wrote:
-> Perhaps checkpatch.pl should make sure the commit messages do not contain "address@hidden" and "Reviewed-off-by"?
-> 
-> $ git log | grep address@hidden
->      Signed-off-by: Michael S. Tsirkin <address@hidden>
->      Signed-off-by: Ronald Hecht <address@hidden>
->      Signed-off-by: Justin Chevrier <address@hidden>
->      Signed-off-by: Justin Chevrier <address@hidden>
->      Signed-off-by: Justin Chevrier <address@hidden>
+Respin to fix some accidental wrong Author lines, no content
+changes.
 
-Having a check for that is a good idea, but I don't think checkpatch 
-would help, these incorrect emails only appear once maintainer applied 
-patches, maybe the good place to check would be Peter's magic scripts, see:
-https://git.linaro.org/people/peter.maydell/misc-scripts.git/tree/apply-pullreq?id=eeb001fcc1aabd8f077cd2846724120a3aa8f962#n118
+-- PMM
 
-Those emails also entered the tree:
+The following changes since commit 0bbba1665ca2e7f1c80d4797077fe57bad58898e:
 
-hw/usb/hcd-ehci.c:4: * Copyright(c) 2008  Emutex Ltd. (address@hidden)
-include/qemu/pmem.h:6: * Author: Haozhong Zhang <address@hidden>
+  Merge remote-tracking branch 'remotes/amarkovic/tags/mips-queue-october-2018-part-4' into staging (2018-10-30 10:45:49 +0000)
 
-> 
-> $ git log | grep Reviewed-off-by
->      Reviewed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
->      Reviewed-off-by: Anthony Liguori <aliguori@us.ibm.com>
-> 
-> Aleksandar
-> 
+are available in the Git repository at:
+
+  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20181030
+
+for you to fetch changes up to 1f5a65a188210509bfb0c025fc91635c8436b98a:
+
+  tests/boot-serial-test: Add microbit board testcase (2018-10-30 13:20:18 +0000)
+
+----------------------------------------------------------------
+target-arm queue:
+ * microbit: Add the UART to our nRF51 SoC model
+ * Add a virtual Xilinx Versal board "xlnx-versal-virt"
+ * hw/arm/virt: Set VIRT_COMPAT_3_0 compat
+
+----------------------------------------------------------------
+Edgar E. Iglesias (2):
+      hw/arm: versal: Add a model of Xilinx Versal SoC
+      hw/arm: versal: Add a virtual Xilinx Versal board
+
+Eric Auger (1):
+      hw/arm/virt: Set VIRT_COMPAT_3_0 compat
+
+Julia Suvorova (3):
+      hw/char: Implement nRF51 SoC UART
+      hw/arm/nrf51_soc: Connect UART to nRF51 SoC
+      tests/boot-serial-test: Add microbit board testcase
+
+ hw/arm/Makefile.objs                |   1 +
+ hw/char/Makefile.objs               |   1 +
+ include/hw/arm/nrf51_soc.h          |   3 +
+ include/hw/arm/xlnx-versal.h        | 122 +++++++++
+ include/hw/char/nrf51_uart.h        |  78 ++++++
+ hw/arm/microbit.c                   |   2 +
+ hw/arm/nrf51_soc.c                  |  20 ++
+ hw/arm/virt.c                       |   4 +
+ hw/arm/xlnx-versal-virt.c           | 493 ++++++++++++++++++++++++++++++++++++
+ hw/arm/xlnx-versal.c                | 323 +++++++++++++++++++++++
+ hw/char/nrf51_uart.c                | 330 ++++++++++++++++++++++++
+ tests/boot-serial-test.c            |  19 ++
+ default-configs/aarch64-softmmu.mak |   1 +
+ hw/char/trace-events                |   4 +
+ 14 files changed, 1401 insertions(+)
+ create mode 100644 include/hw/arm/xlnx-versal.h
+ create mode 100644 include/hw/char/nrf51_uart.h
+ create mode 100644 hw/arm/xlnx-versal-virt.c
+ create mode 100644 hw/arm/xlnx-versal.c
+ create mode 100644 hw/char/nrf51_uart.c
