@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38009)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38019)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gHTTI-00012R-PZ
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:50:13 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1gHTTJ-00013B-FU
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:50:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gHTTG-00019T-Mr
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:50:12 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:52112)
+	(envelope-from <pm215@archaic.org.uk>) id 1gHTTI-0001CW-GP
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:50:13 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:52126)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1gHTTG-000188-Ee
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:50:10 -0400
+	id 1gHTTI-0001A1-4T
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 08:50:12 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 30 Oct 2018 12:50:02 +0000
-Message-Id: <20181030125005.28151-1-peter.maydell@linaro.org>
+Date: Tue, 30 Oct 2018 12:50:05 +0000
+Message-Id: <20181030125005.28151-4-peter.maydell@linaro.org>
+In-Reply-To: <20181030125005.28151-1-peter.maydell@linaro.org>
+References: <20181030125005.28151-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 0/3] configure: symlink directories,
- not wildcarded files
+Subject: [Qemu-devel] [PATCH 3/3] configure: Use FILES loop for all build
+ tree symlinks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +30,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: patches@linaro.org, "Michael S. Tsirkin" <mst@redhat.com>
 
-This patchset fixes a problem with our build infrastructure
-that meant that MST's recent 'pci, pc, virtio' pullreq failed
-tests.
+A few places in configure were doing ad-hoc calls to
+the symlink function to set up symlinks from the build tree
+back to the source tree. We have a loop that does this
+already for all files and directories listed in the FILES
+environment variable; use that instead.
 
-Currently our configure script has a wildcard loop that creates
-symlinks for every data file in tests/acpi-test-data from the
-source tree to the build tree. However, if a new data file is
-added in git, there is nothing that causes configure to be rerun,
-and so it is not available in the build tree, which can cause
-test failures.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ configure | 14 ++------------
+ 1 file changed, 2 insertions(+), 12 deletions(-)
 
-The core of the change here is that instead of linking every
-individual data file, we just symlink the directory itself (which
-we do in patch 2 for this and also tests/hex-loader-check-data).
-The rest of the patchset deals with:
- * renaming a shell variable to make it clearer that it's OK
-   to put directories to symlink in it, not just files
- * adding a comment about why wildcarding is a bad idea
- * cleaning up a couple of places that did their own symlinking
-   when they could have just used the existing code
-
-We do still use wildcarding to construct a list of files in
-pc-bios to be symlinked; we get away with this because we don't
-in practice add new BIOS images often and if we do there's also
-usually a change that means configure is rerun anyway. We can't
-just symlink all of pc-bios into the build tree because it
-contains other things than just generated binaries. There's
-scope for fixing this, I think, but I wanted to get this fix out.
-
-thanks
--- PMM
-
-Peter Maydell (3):
-  configure: Rename FILES variable to LINKS
-  configure: Symlink entire test directories rather than individual
-    files
-  configure: Use FILES loop for all build tree symlinks
-
- configure | 58 ++++++++++++++++++++++++-------------------------------
- 1 file changed, 25 insertions(+), 33 deletions(-)
-
+diff --git a/configure b/configure
+index acb9a4d39e5..11ca69472a6 100755
+--- a/configure
++++ b/configure
+@@ -7392,6 +7392,8 @@ LINKS="$LINKS roms/seabios/Makefile roms/vgabios/Makefile"
+ LINKS="$LINKS pc-bios/qemu-icon.bmp"
+ LINKS="$LINKS .gdbinit scripts" # scripts needed by relative path in .gdbinit
+ LINKS="$LINKS tests/acpi-test-data tests/hex-loader-check-data"
++LINKS="$LINKS tests/acceptance tests/data"
++LINKS="$LINKS tests/qemu-iotests/check"
+ for bios_file in \
+     $source_path/pc-bios/*.bin \
+     $source_path/pc-bios/*.lid \
+@@ -7428,25 +7430,13 @@ for rom in seabios vgabios ; do
+     echo "RANLIB=$ranlib" >> $config_mak
+ done
+ 
+-# set up tests data directory
+-for tests_subdir in acceptance data; do
+-    if [ ! -e tests/$tests_subdir ]; then
+-        symlink "$source_path/tests/$tests_subdir" tests/$tests_subdir
+-    fi
+-done
+-
+ # set up qemu-iotests in this build directory
+ iotests_common_env="tests/qemu-iotests/common.env"
+-iotests_check="tests/qemu-iotests/check"
+ 
+ echo "# Automatically generated by configure - do not modify" > "$iotests_common_env"
+ echo >> "$iotests_common_env"
+ echo "export PYTHON='$python'" >> "$iotests_common_env"
+ 
+-if [ ! -e "$iotests_check" ]; then
+-    symlink "$source_path/$iotests_check" "$iotests_check"
+-fi
+-
+ # Save the configure command line for later reuse.
+ cat <<EOD >config.status
+ #!/bin/sh
 -- 
 2.19.1
