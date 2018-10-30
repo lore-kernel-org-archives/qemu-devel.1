@@ -1,22 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50007)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50004)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gHXp1-0001Cp-34
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 13:28:55 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gHXp1-0001Cn-2y
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 13:28:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gHXou-0002oe-Iy
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gHXot-0002nz-Gp
 	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 13:28:54 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:44620 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:44221 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gHXou-0002nd-An
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 13:28:48 -0400
+	id 1gHXot-0002iG-3E
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 13:28:47 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue, 30 Oct 2018 18:28:18 +0100
-Message-Id: <1540920498-5133-6-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1540920498-5133-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1540920498-5133-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL 5/5] target/mips: Enable only tested modes for
- R5900
+Date: Tue, 30 Oct 2018 18:28:13 +0100
+Message-Id: <1540920498-5133-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PULL 0/5] MIPS queue for October 2018, part 5
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +27,33 @@ Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Enable MIPS 032 user mode for R5900.
+The following changes since commit 3f3285491dd52014852a56135c90e428c8b507ea:
 
-Expose to end-user only features that make sense and are appropriately
-tested. In this case, enable only MIPS 032 user mode for R5900.
+  Merge remote-tracking branch 'remotes/jnsnow/tags/bitmaps-pull-request' into staging (2018-10-30 14:09:25 +0000)
 
-About defined(CONFIG_USER_ONLY), it is just because a reasonable
-testing was not provided for system mode. Some reasonable
-("acceptance") testing should be done, and made available
-to others. A system image, kernel, and command line + plus
-some relatively mild testing of system mode should suffice.
+are available in the git repository at:
 
-About !defined(TARGET_MIPS64), this is because O32 is the only
-supported user-mode ABI for this CPU.
+  https://github.com/AMarkovic/qemu tags/mips-queue-october-2018-part-5
 
-Reviewed-by: Stefan Markovic <smarkovic@wavecomp.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
----
- target/mips/translate_init.inc.c | 4 ++++
- 1 file changed, 4 insertions(+)
+for you to fetch changes up to 12ccc41b192a0a65e9379bafa947d1ed7de79750:
 
-diff --git a/target/mips/translate_init.inc.c b/target/mips/translate_init.inc.c
-index cab2003..d84c58e 100644
---- a/target/mips/translate_init.inc.c
-+++ b/target/mips/translate_init.inc.c
-@@ -410,6 +410,8 @@ const mips_def_t mips_defs[] =
-         .insn_flags = CPU_MIPS32R5 | ASE_MSA,
-         .mmu_type = MMU_TYPE_R4000,
-     },
-+#if defined(CONFIG_USER_ONLY)
-+#if !defined(TARGET_MIPS64)
-     {
-         .name = "R5900",
-         .CP0_PRid = 0x00002E00,
-@@ -457,6 +459,8 @@ const mips_def_t mips_defs[] =
-         .insn_flags = CPU_R5900 | ASE_MMI,
-         .mmu_type = MMU_TYPE_R4000,
-     },
-+#endif
-+#endif
-     {
-         /* A generic CPU supporting MIPS32 Release 6 ISA.
-            FIXME: Support IEEE 754-2008 FP.
+  target/mips: Enable only tested modes for R5900 (2018-10-30 18:17:17 +0100)
+
+----------------------------------------------------------------
+MIPS queue for October 2018, part 5
+
+  - some cleanup of R5900 support
+----------------------------------------------------------------
+Aleksandar Markovic (5):
+  target/mips: Rename MMI-related masks
+  target/mips: Rename MMI-related opcodes
+  target/mips: Rename MMI-related functions
+  target/mips: Remove some spurious R5900-related comments
+  target/mips: Enable only tested modes for R5900
+
+ target/mips/translate.c          | 533 ++++++++++++++++++++-------------------
+ target/mips/translate_init.inc.c |  16 +-
+ 2 files changed, 271 insertions(+), 278 deletions(-)
+
 -- 
 2.7.4
