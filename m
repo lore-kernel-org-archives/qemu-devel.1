@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58486)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gHn8E-0001wW-LR
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 05:49:47 -0400
+	(envelope-from <berrange@redhat.com>) id 1gHnAF-0003hY-Dn
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 05:51:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gHn89-0006p0-G7
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 05:49:46 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 31 Oct 2018 09:49:33 +0000
-Message-ID: <35d42adb-ea8e-c34c-7227-777b6659ad69@virtuozzo.com>
-References: <a4205609-576c-49cd-1ef6-650491222ff0@bytedance.com>
-In-Reply-To: <a4205609-576c-49cd-1ef6-650491222ff0@bytedance.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <65C89D4B4BC857418475491A5C386F63@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <berrange@redhat.com>) id 1gHnA9-0000dU-Gs
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 05:51:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54230)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gHnA9-0000R8-AM
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 05:51:45 -0400
+Date: Wed, 31 Oct 2018 09:51:25 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181031095125.GB9625@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20181031084309.9227-1-stefanha@redhat.com>
+	<20181031084309.9227-2-stefanha@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] blockdev: report error on block latency
- histogram set error
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20181031084309.9227-2-stefanha@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/4] README: use 'https://' instead of
+ 'git://'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,58 +30,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: zhenwei pi <pizhenwei@bytedance.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-MTguMTAuMjAxOCAxMzo0MiwgemhlbndlaSBwaSB3cm90ZToNCj4gRnVuY3Rpb24gYmxvY2tfbGF0
-ZW5jeV9oaXN0b2dyYW1fc2V0IG1heSByZXR1cm4gZXJyb3IsIGJ1dCBxYXBpIGlnbm9yZSANCj4g
-dGhpcy4NCj4gVGhpcyBjYW4gYmUgcmVwcm9kdWNlZCBlYXNpbHkgYnkgcW1wIGNvbW1hbmQ6DQo+
-IHZpcnNoIHFlbXUtbW9uaXRvci1jb21tYW5kIElOU1RBTkNFIA0KPiAneyJleGVjdXRlIjoieC1i
-bG9jay1sYXRlbmN5LWhpc3RvZ3JhbS1zZXQiLA0KPiAiYXJndW1lbnRzIjp7ImRldmljZSI6ImRy
-aXZlLXZpcnRpby1kaXNrMSIsImJvdW5kYXJpZXMiOlsxMCwyMDAsNDBdfX0nDQo+IEluIGZhY3Qg
-dGhpcyBjb21tYW5kIGRvZXMgbm90IHdvcmssIGJ1dCB3ZSBzdGlsbCBnZXQgc3VjY2VzcyByZXN1
-bHQuDQo+DQo+IHFtcF94X2Jsb2NrX2xhdGVuY3lfaGlzdG9ncmFtX3NldCBpcyBhIGJhdGNoIHNl
-dHRpbmcgQVBJLCByZXBvcnQgZXJyb3IgDQo+IEFTQVAuDQoNCkdvb2QgY2F0Y2gsIHRoYW5rIHlv
-dSwgaXQncyBteSBmYXVsdCENCg0KVGhlIHByb2JsZW0gb2YgdGhlIHBhdGNoIGlzIHRoYXQgaW4g
-Y2FzZSBvZiBlcnJvciwgYm91bmRhcmllcyBmb3IgcmVhZCANCihvciB3cml0ZSkgbWF5IGJlIHNl
-dCwgd2hlbiBvdGhlcnMgYXJlIG5vdC4NCkJldHRlciB0aGluZyBpcyByZWZhY3RvciBpdCBzb21l
-aG93IHNvIHRoYXQgaW4gY2FzZSBvZiBlcnJvciBub3RoaW5nIA0KY2hhbmdlZCBmaW5hbGx5Lg0K
-DQo+DQo+IFNpZ25lZC1vZmYtYnk6IHpoZW53ZWkgcGkgPHBpemhlbndlaUBieXRlZGFuY2UuY29t
-Pg0KPiAtLS0NCj4gwqBibG9ja2Rldi5jIHwgMTkgKysrKysrKysrKysrKysrKy0tLQ0KPiDCoDEg
-ZmlsZSBjaGFuZ2VkLCAxNiBpbnNlcnRpb25zKCspLCAzIGRlbGV0aW9ucygtKQ0KPg0KPiBkaWZm
-IC0tZ2l0IGEvYmxvY2tkZXYuYyBiL2Jsb2NrZGV2LmMNCj4gaW5kZXggYTg3NTViZC4uMDNiMWFh
-MyAxMDA2NDQNCj4gLS0tIGEvYmxvY2tkZXYuYw0KPiArKysgYi9ibG9ja2Rldi5jDQo+IEBAIC00
-Mzc3LDYgKzQzNzcsNyBAQCB2b2lkIHFtcF94X2Jsb2NrX2xhdGVuY3lfaGlzdG9ncmFtX3NldCgN
-Cj4gwqB7DQo+IMKgwqDCoMKgIEJsb2NrQmFja2VuZCAqYmxrID0gYmxrX2J5X25hbWUoZGV2aWNl
-KTsNCj4gwqDCoMKgwqAgQmxvY2tBY2N0U3RhdHMgKnN0YXRzOw0KPiArwqDCoMKgIGludCByZXQ7
-DQo+DQo+IMKgwqDCoMKgIGlmICghYmxrKSB7DQo+IMKgwqDCoMKgwqDCoMKgwqAgZXJyb3Jfc2V0
-ZyhlcnJwLCAiRGV2aWNlICclcycgbm90IGZvdW5kIiwgZGV2aWNlKTsNCj4gQEAgLTQzOTIsMjEg
-KzQzOTMsMzMgQEAgdm9pZCBxbXBfeF9ibG9ja19sYXRlbmN5X2hpc3RvZ3JhbV9zZXQoDQo+IMKg
-wqDCoMKgIH0NCj4NCj4gwqDCoMKgwqAgaWYgKGhhc19ib3VuZGFyaWVzIHx8IGhhc19ib3VuZGFy
-aWVzX3JlYWQpIHsNCj4gLcKgwqDCoMKgwqDCoMKgIGJsb2NrX2xhdGVuY3lfaGlzdG9ncmFtX3Nl
-dCgNCj4gK8KgwqDCoMKgwqDCoMKgIHJldCA9IGJsb2NrX2xhdGVuY3lfaGlzdG9ncmFtX3NldCgN
-Cj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHN0YXRzLCBCTE9DS19BQ0NUX1JFQUQsDQo+IMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBoYXNfYm91bmRhcmllc19yZWFkID8gYm91bmRhcmllc19y
-ZWFkIDogYm91bmRhcmllcyk7DQo+ICvCoMKgwqDCoMKgwqDCoCBpZiAocmV0KSB7DQo+ICvCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgIGVycm9yX3NldGcoZXJycCwgIkRldmljZSAnJXMnIHNldCByZWFk
-IGJvdW5kYXJpZXMgZmFpbCIsIA0KPiBkZXZpY2UpOw0KPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oCByZXR1cm47DQo+ICvCoMKgwqDCoMKgwqDCoCB9DQo+IMKgwqDCoMKgIH0NCj4NCj4gwqDCoMKg
-wqAgaWYgKGhhc19ib3VuZGFyaWVzIHx8IGhhc19ib3VuZGFyaWVzX3dyaXRlKSB7DQo+IC3CoMKg
-wqDCoMKgwqDCoCBibG9ja19sYXRlbmN5X2hpc3RvZ3JhbV9zZXQoDQo+ICvCoMKgwqDCoMKgwqDC
-oCByZXQgPSBibG9ja19sYXRlbmN5X2hpc3RvZ3JhbV9zZXQoDQo+IMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoCBzdGF0cywgQkxPQ0tfQUNDVF9XUklURSwNCj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgIGhhc19ib3VuZGFyaWVzX3dyaXRlID8gYm91bmRhcmllc193cml0ZSA6IGJvdW5kYXJpZXMp
-Ow0KPiArwqDCoMKgwqDCoMKgwqAgaWYgKHJldCkgew0KPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oCBlcnJvcl9zZXRnKGVycnAsICJEZXZpY2UgJyVzJyBzZXQgd3JpdGUgYm91bmRhcmllcyBmYWls
-IiwgDQo+IGRldmljZSk7DQo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJldHVybjsNCj4gK8Kg
-wqDCoMKgwqDCoMKgIH0NCj4gwqDCoMKgwqAgfQ0KPg0KPiDCoMKgwqDCoCBpZiAoaGFzX2JvdW5k
-YXJpZXMgfHwgaGFzX2JvdW5kYXJpZXNfZmx1c2gpIHsNCj4gLcKgwqDCoMKgwqDCoMKgIGJsb2Nr
-X2xhdGVuY3lfaGlzdG9ncmFtX3NldCgNCj4gK8KgwqDCoMKgwqDCoMKgIHJldCA9IGJsb2NrX2xh
-dGVuY3lfaGlzdG9ncmFtX3NldCgNCj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHN0YXRzLCBC
-TE9DS19BQ0NUX0ZMVVNILA0KPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgaGFzX2JvdW5kYXJp
-ZXNfZmx1c2ggPyBib3VuZGFyaWVzX2ZsdXNoIDogYm91bmRhcmllcyk7DQo+ICvCoMKgwqDCoMKg
-wqDCoCBpZiAocmV0KSB7DQo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGVycm9yX3NldGcoZXJy
-cCwgIkRldmljZSAnJXMnIHNldCBmbHVzaCBib3VuZGFyaWVzIGZhaWwiLCANCj4gZGV2aWNlKTsN
-Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0dXJuOw0KPiArwqDCoMKgwqDCoMKgwqAgfQ0K
-PiDCoMKgwqDCoCB9DQo+IMKgfQ0KPg0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXIN
-Cg0K
+On Wed, Oct 31, 2018 at 08:43:06AM +0000, Stefan Hajnoczi wrote:
+> When you clone the repository without previous commit history, 'git://'
+> doesn't protect from man-in-the-middle attacks.  HTTPS is more secure
+> since the client verifies the server certificate.
+>=20
+> Reported-by: Jann Horn <jannh@google.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  README         | 4 ++--
+>  pc-bios/README | 4 ++--
+>  2 files changed, 4 insertions(+), 4 deletions(-)
+
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
