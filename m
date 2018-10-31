@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60511)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60548)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHfV9-0000kU-Ts
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 21:41:00 -0400
+	(envelope-from <flukshun@gmail.com>) id 1gHfVF-0000oN-4A
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 21:41:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHfV7-0002TN-UD
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 21:40:55 -0400
-Received: from mail-qk1-x72b.google.com ([2607:f8b0:4864:20::72b]:35556)
+	(envelope-from <flukshun@gmail.com>) id 1gHfVA-0002X3-Ju
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 21:41:01 -0400
+Received: from mail-qt1-x82f.google.com ([2607:f8b0:4864:20::82f]:38509)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHfV7-0002SZ-Mo
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 21:40:53 -0400
-Received: by mail-qk1-x72b.google.com with SMTP id v68-v6so8591835qka.2
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 18:40:53 -0700 (PDT)
+	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHfVA-0002RD-BC
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 21:40:56 -0400
+Received: by mail-qt1-x82f.google.com with SMTP id v1-v6so11757965qtq.5
+	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 18:40:50 -0700 (PDT)
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue, 30 Oct 2018 20:37:59 -0500
-Message-Id: <20181031013821.24023-3-mdroth@linux.vnet.ibm.com>
+Date: Tue, 30 Oct 2018 20:38:21 -0500
+Message-Id: <20181031013821.24023-25-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20181031013821.24023-1-mdroth@linux.vnet.ibm.com>
 References: <20181031013821.24023-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PULL v2 02/24] qga-win: add support for
- qmp_guest_fsfreeze_freeze_list
+Subject: [Qemu-devel] [PULL v2 24/24] qga-win: changing --retry-path option
+ behavior
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,306 +28,212 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Chen Hanxiao <chenhanxiao@gmail.com>
+Cc: peter.maydell@linaro.org, Bishara AbuHattoum <bishara@daynix.com>, Sameeh Jubran <sameeh@daynix.com>
 
-From: Chen Hanxiao <chenhanxiao@gmail.com>
+From: Bishara AbuHattoum <bishara@daynix.com>
 
-This patch add support for freeze specified fs.
+Currently whenever the qemu-ga's service doesn't find the virtio-serial
+the run_agent() loops in a QGA_RETRY_INTERVAL (default 5 seconds)
+intervals and try to restart the qemu-ga which causes a synchronous loop.
+Changed to wait and listen for the serial events by registering for
+notifications a proper serial event handler that deals with events:
+  DBT_DEVICEARRIVAL        indicates that the device has been inserted and
+                           is available
+  DBT_DEVICEREMOVECOMPLETE indicates that the devive has been removed
+Which allow us to determine when the channel path is available for the
+qemu-ga to restart.
 
-The valid mountpoints list member are [1]:
-
-  The path of a mounted folder, for example, Y:\MountX\
-  A drive letter, for example, D:\
-  A volume GUID path of the form \\?\Volume{GUID}\,
-      where GUID identifies the volume
-  A UNC path that specifies a remote file share,
-      for example, \\Clusterx\Share1\
-
-[1] https://docs.microsoft.com/en-us/windows/desktop/api/vsbackup/nf-vsbackup-ivssbackupcomponents-addtosnapshotset
-
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
-Signed-off-by: Chen Hanxiao <chenhanxiao@gmail.com>
+Signed-off-by: Bishara AbuHattoum <bishara@daynix.com>
+Signed-off-by: Sameeh Jubran <sameeh@daynix.com>
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- qga/commands-win32.c        | 21 ++++-----
- qga/main.c                  |  2 +-
- qga/vss-win32.c             |  5 +-
- qga/vss-win32.h             |  3 +-
- qga/vss-win32/requester.cpp | 92 ++++++++++++++++++++++++++-----------
- qga/vss-win32/requester.h   | 13 ++++--
- 6 files changed, 91 insertions(+), 45 deletions(-)
+ qga/main.c          | 86 ++++++++++++++++++++++++++++++++++++++++++++-
+ qga/service-win32.h |  4 +++
+ 2 files changed, 89 insertions(+), 1 deletion(-)
 
-diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-index 416343b97b..347577f2a4 100644
---- a/qga/commands-win32.c
-+++ b/qga/commands-win32.c
-@@ -790,6 +790,13 @@ GuestFsfreezeStatus qmp_guest_fsfreeze_status(Error **errp)
-  * The frozen state is limited for up to 10 seconds by VSS.
-  */
- int64_t qmp_guest_fsfreeze_freeze(Error **errp)
-+{
-+    return qmp_guest_fsfreeze_freeze_list(false, NULL, errp);
-+}
-+
-+int64_t qmp_guest_fsfreeze_freeze_list(bool has_mountpoints,
-+                                       strList *mountpoints,
-+                                       Error **errp)
- {
-     int i;
-     Error *local_err = NULL;
-@@ -804,7 +811,7 @@ int64_t qmp_guest_fsfreeze_freeze(Error **errp)
-     /* cannot risk guest agent blocking itself on a write in this state */
-     ga_set_frozen(ga_state);
- 
--    qga_vss_fsfreeze(&i, true, &local_err);
-+    qga_vss_fsfreeze(&i, true, mountpoints, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         goto error;
-@@ -822,15 +829,6 @@ error:
-     return 0;
- }
- 
--int64_t qmp_guest_fsfreeze_freeze_list(bool has_mountpoints,
--                                       strList *mountpoints,
--                                       Error **errp)
--{
--    error_setg(errp, QERR_UNSUPPORTED);
--
--    return 0;
--}
--
- /*
-  * Thaw local file systems using Volume Shadow-copy Service.
-  */
-@@ -843,7 +841,7 @@ int64_t qmp_guest_fsfreeze_thaw(Error **errp)
-         return 0;
-     }
- 
--    qga_vss_fsfreeze(&i, false, errp);
-+    qga_vss_fsfreeze(&i, false, NULL, errp);
- 
-     ga_unset_frozen(ga_state);
-     return i;
-@@ -1660,7 +1658,6 @@ GList *ga_command_blacklist_init(GList *blacklist)
-         "guest-set-vcpus",
-         "guest-get-memory-blocks", "guest-set-memory-blocks",
-         "guest-get-memory-block-size",
--        "guest-fsfreeze-freeze-list",
-         NULL};
-     char **p = (char **)list_unsupported;
- 
 diff --git a/qga/main.c b/qga/main.c
-index c399320d3c..afcd268ee3 100644
+index 506a314140..87a0711c14 100644
 --- a/qga/main.c
 +++ b/qga/main.c
-@@ -151,7 +151,7 @@ static void quit_handler(int sig)
-             WaitForSingleObject(hEventTimeout, 0);
-             CloseHandle(hEventTimeout);
-         }
--        qga_vss_fsfreeze(&i, false, &err);
-+        qga_vss_fsfreeze(&i, false, NULL, &err);
-         if (err) {
-             g_debug("Error unfreezing filesystems prior to exiting: %s",
-                 error_get_pretty(err));
-diff --git a/qga/vss-win32.c b/qga/vss-win32.c
-index a541f3ae01..f444a25a70 100644
---- a/qga/vss-win32.c
-+++ b/qga/vss-win32.c
-@@ -147,7 +147,8 @@ void ga_uninstall_vss_provider(void)
- }
- 
- /* Call VSS requester and freeze/thaw filesystems and applications */
--void qga_vss_fsfreeze(int *nr_volume, bool freeze, Error **errp)
-+void qga_vss_fsfreeze(int *nr_volume, bool freeze,
-+                      strList *mountpoints, Error **errp)
- {
-     const char *func_name = freeze ? "requester_freeze" : "requester_thaw";
-     QGAVSSRequesterFunc func;
-@@ -164,5 +165,5 @@ void qga_vss_fsfreeze(int *nr_volume, bool freeze, Error **errp)
-         return;
-     }
- 
--    func(nr_volume, &errset);
-+    func(nr_volume, mountpoints, &errset);
- }
-diff --git a/qga/vss-win32.h b/qga/vss-win32.h
-index 4f8e39aa5c..ce2abe5a72 100644
---- a/qga/vss-win32.h
-+++ b/qga/vss-win32.h
-@@ -22,6 +22,7 @@ bool vss_initialized(void);
- int ga_install_vss_provider(void);
- void ga_uninstall_vss_provider(void);
- 
--void qga_vss_fsfreeze(int *nr_volume, bool freeze, Error **errp);
-+void qga_vss_fsfreeze(int *nr_volume, bool freeze,
-+                      strList *mountpints, Error **errp);
- 
+@@ -34,6 +34,7 @@
+ #include "qemu/systemd.h"
+ #include "qemu-version.h"
+ #ifdef _WIN32
++#include <dbt.h>
+ #include "qga/service-win32.h"
+ #include "qga/vss-win32.h"
  #endif
-diff --git a/qga/vss-win32/requester.cpp b/qga/vss-win32/requester.cpp
-index 3d9c9716c0..5378c55d23 100644
---- a/qga/vss-win32/requester.cpp
-+++ b/qga/vss-win32/requester.cpp
-@@ -234,7 +234,7 @@ out:
-     }
+@@ -83,6 +84,7 @@ struct GAState {
+     bool logging_enabled;
+ #ifdef _WIN32
+     GAService service;
++    HANDLE wakeup_event;
+ #endif
+     bool delimit_response;
+     bool frozen;
+@@ -119,6 +121,7 @@ static const char *ga_freeze_whitelist[] = {
+ #ifdef _WIN32
+ DWORD WINAPI service_ctrl_handler(DWORD ctrl, DWORD type, LPVOID data,
+                                   LPVOID ctx);
++DWORD WINAPI handle_serial_device_events(DWORD type, LPVOID data);
+ VOID WINAPI service_main(DWORD argc, TCHAR *argv[]);
+ #endif
+ static int run_agent(GAState *s);
+@@ -677,6 +680,36 @@ static gboolean channel_init(GAState *s, const gchar *method, const gchar *path,
  }
  
--void requester_freeze(int *num_vols, ErrorSet *errset)
-+void requester_freeze(int *num_vols, void *mountpoints, ErrorSet *errset)
- {
-     COMPointer<IVssAsync> pAsync;
-     HANDLE volume;
-@@ -246,6 +246,7 @@ void requester_freeze(int *num_vols, ErrorSet *errset)
-     WCHAR short_volume_name[64], *display_name = short_volume_name;
-     DWORD wait_status;
-     int num_fixed_drives = 0, i;
-+    int num_mount_points = 0;
- 
-     if (vss_ctx.pVssbc) { /* already frozen */
-         *num_vols = 0;
-@@ -337,39 +338,73 @@ void requester_freeze(int *num_vols, ErrorSet *errset)
-         goto out;
-     }
- 
--    volume = FindFirstVolumeW(short_volume_name, sizeof(short_volume_name));
--    if (volume == INVALID_HANDLE_VALUE) {
--        err_set(errset, hr, "failed to find first volume");
--        goto out;
--    }
--    for (;;) {
--        if (GetDriveTypeW(short_volume_name) == DRIVE_FIXED) {
-+    if (mountpoints) {
-+        PWCHAR volume_name_wchar;
-+        for (volList *list = (volList *)mountpoints; list; list = list->next) {
-+            size_t len = strlen(list->value) + 1;
-+            size_t converted = 0;
-             VSS_ID pid;
--            hr = vss_ctx.pVssbc->AddToSnapshotSet(short_volume_name,
+ #ifdef _WIN32
++DWORD WINAPI handle_serial_device_events(DWORD type, LPVOID data)
++{
++    DWORD ret = NO_ERROR;
++    PDEV_BROADCAST_HDR broadcast_header = (PDEV_BROADCAST_HDR)data;
 +
-+            volume_name_wchar = new wchar_t[len];
-+            mbstowcs_s(&converted, volume_name_wchar, len,
-+                       list->value, _TRUNCATE);
-+
-+            hr = vss_ctx.pVssbc->AddToSnapshotSet(volume_name_wchar,
-                                                   g_gProviderId, &pid);
-             if (FAILED(hr)) {
--                WCHAR volume_path_name[PATH_MAX];
--                if (GetVolumePathNamesForVolumeNameW(
--                        short_volume_name, volume_path_name,
--                        sizeof(volume_path_name), NULL) && *volume_path_name) {
--                    display_name = volume_path_name;
--                }
-                 err_set(errset, hr, "failed to add %S to snapshot set",
--                                 display_name);
--                FindVolumeClose(volume);
-+                        volume_name_wchar);
-+                delete volume_name_wchar;
-                 goto out;
-             }
--            num_fixed_drives++;
-+            num_mount_points++;
-+
-+            delete volume_name_wchar;
-         }
--        if (!FindNextVolumeW(volume, short_volume_name,
--                             sizeof(short_volume_name))) {
--            FindVolumeClose(volume);
--            break;
-+
-+        if (num_mount_points == 0) {
-+            /* If there is no valid mount points, just exit. */
-+            goto out;
-         }
-     }
- 
--    if (num_fixed_drives == 0) {
--        goto out; /* If there is no fixed drive, just exit. */
-+    if (!mountpoints) {
-+        volume = FindFirstVolumeW(short_volume_name, sizeof(short_volume_name));
-+        if (volume == INVALID_HANDLE_VALUE) {
-+            err_set(errset, hr, "failed to find first volume");
-+            goto out;
-+        }
-+
-+        for (;;) {
-+            if (GetDriveTypeW(short_volume_name) == DRIVE_FIXED) {
-+                VSS_ID pid;
-+                hr = vss_ctx.pVssbc->AddToSnapshotSet(short_volume_name,
-+                                                      g_gProviderId, &pid);
-+                if (FAILED(hr)) {
-+                    WCHAR volume_path_name[PATH_MAX];
-+                    if (GetVolumePathNamesForVolumeNameW(
-+                            short_volume_name, volume_path_name,
-+                            sizeof(volume_path_name), NULL) &&
-+                            *volume_path_name) {
-+                        display_name = volume_path_name;
-+                    }
-+                    err_set(errset, hr, "failed to add %S to snapshot set",
-+                            display_name);
-+                    FindVolumeClose(volume);
-+                    goto out;
-+                }
-+                num_fixed_drives++;
++    if (broadcast_header->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE) {
++        switch (type) {
++            /* Device inserted */
++        case DBT_DEVICEARRIVAL:
++            /* Start QEMU-ga's service */
++            if (!SetEvent(ga_state->wakeup_event)) {
++                ret = GetLastError();
 +            }
-+            if (!FindNextVolumeW(volume, short_volume_name,
-+                                 sizeof(short_volume_name))) {
-+                FindVolumeClose(volume);
-+                break;
++            break;
++            /* Device removed */
++        case DBT_DEVICEQUERYREMOVE:
++        case DBT_DEVICEREMOVEPENDING:
++        case DBT_DEVICEREMOVECOMPLETE:
++            /* Stop QEMU-ga's service */
++            if (!ResetEvent(ga_state->wakeup_event)) {
++                ret = GetLastError();
 +            }
++            break;
++        default:
++            ret = ERROR_CALL_NOT_IMPLEMENTED;
 +        }
-+
-+        if (num_fixed_drives == 0) {
-+            goto out; /* If there is no fixed drive, just exit. */
-+        }
-     }
- 
-     hr = vss_ctx.pVssbc->PrepareForBackup(pAsync.replace());
-@@ -435,7 +470,12 @@ void requester_freeze(int *num_vols, ErrorSet *errset)
-         goto out;
-     }
- 
--    *num_vols = vss_ctx.cFrozenVols = num_fixed_drives;
-+    if (mountpoints) {
-+        *num_vols = vss_ctx.cFrozenVols = num_mount_points;
-+    } else {
-+        *num_vols = vss_ctx.cFrozenVols = num_fixed_drives;
 +    }
++    return ret;
++}
 +
-     return;
- 
- out:
-@@ -449,7 +489,7 @@ out1:
- }
- 
- 
--void requester_thaw(int *num_vols, ErrorSet *errset)
-+void requester_thaw(int *num_vols, void *mountpints, ErrorSet *errset)
+ DWORD WINAPI service_ctrl_handler(DWORD ctrl, DWORD type, LPVOID data,
+                                   LPVOID ctx)
  {
-     COMPointer<IVssAsync> pAsync;
+@@ -688,9 +721,13 @@ DWORD WINAPI service_ctrl_handler(DWORD ctrl, DWORD type, LPVOID data,
+         case SERVICE_CONTROL_STOP:
+         case SERVICE_CONTROL_SHUTDOWN:
+             quit_handler(SIGTERM);
++            SetEvent(ga_state->wakeup_event);
+             service->status.dwCurrentState = SERVICE_STOP_PENDING;
+             SetServiceStatus(service->status_handle, &service->status);
+             break;
++        case SERVICE_CONTROL_DEVICEEVENT:
++            handle_serial_device_events(type, data);
++            break;
  
-diff --git a/qga/vss-win32/requester.h b/qga/vss-win32/requester.h
-index 2a39d734a2..5a8e8faf0c 100644
---- a/qga/vss-win32/requester.h
-+++ b/qga/vss-win32/requester.h
-@@ -34,9 +34,16 @@ typedef struct ErrorSet {
- STDAPI requester_init(void);
- STDAPI requester_deinit(void);
- 
--typedef void (*QGAVSSRequesterFunc)(int *, ErrorSet *);
--void requester_freeze(int *num_vols, ErrorSet *errset);
--void requester_thaw(int *num_vols, ErrorSet *errset);
-+typedef struct volList volList;
+         default:
+             ret = ERROR_CALL_NOT_IMPLEMENTED;
+@@ -717,10 +754,24 @@ VOID WINAPI service_main(DWORD argc, TCHAR *argv[])
+     service->status.dwServiceSpecificExitCode = NO_ERROR;
+     service->status.dwCheckPoint = 0;
+     service->status.dwWaitHint = 0;
++    DEV_BROADCAST_DEVICEINTERFACE notification_filter;
++    ZeroMemory(&notification_filter, sizeof(notification_filter));
++    notification_filter.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
++    notification_filter.dbcc_size = sizeof(DEV_BROADCAST_DEVICEINTERFACE);
++    notification_filter.dbcc_classguid = GUID_VIOSERIAL_PORT;
 +
-+struct volList {
-+    volList *next;
-+    char *value;
-+};
-+
-+typedef void (*QGAVSSRequesterFunc)(int *, void *, ErrorSet *);
-+void requester_freeze(int *num_vols, void *volList, ErrorSet *errset);
-+void requester_thaw(int *num_vols, void *volList, ErrorSet *errset);
++    service->device_notification_handle =
++        RegisterDeviceNotification(service->status_handle,
++            &notification_filter, DEVICE_NOTIFY_SERVICE_HANDLE);
++    if (!service->device_notification_handle) {
++        g_critical("Failed to register device notification handle!\n");
++        return;
++    }
+     SetServiceStatus(service->status_handle, &service->status);
  
- #ifdef __cplusplus
+     run_agent(ga_state);
+ 
++    UnregisterDeviceNotification(service->device_notification_handle);
+     service->status.dwCurrentState = SERVICE_STOPPED;
+     SetServiceStatus(service->status_handle, &service->status);
  }
+@@ -1328,12 +1379,24 @@ static GAState *initialize_agent(GAConfig *config, int socket_activation)
+ 
+     s->config = config;
+     s->socket_activation = socket_activation;
++
++#ifdef _WIN32
++    s->wakeup_event = CreateEvent(NULL, TRUE, FALSE, TEXT("WakeUp"));
++    if (s->wakeup_event == NULL) {
++        g_critical("CreateEvent failed");
++        return NULL;
++    }
++#endif
++
+     ga_state = s;
+     return s;
+ }
+ 
+ static void cleanup_agent(GAState *s)
+ {
++#ifdef _WIN32
++    CloseHandle(s->wakeup_event);
++#endif
+     if (s->command_state) {
+         ga_command_state_cleanup_all(s->command_state);
+         ga_command_state_free(s->command_state);
+@@ -1365,6 +1428,27 @@ static int run_agent_once(GAState *s)
+     return EXIT_SUCCESS;
+ }
+ 
++static void wait_for_channel_availability(GAState *s)
++{
++    g_warning("waiting for channel path...");
++#ifndef _WIN32
++    sleep(QGA_RETRY_INTERVAL);
++#else
++    DWORD dwWaitResult;
++
++    dwWaitResult = WaitForSingleObject(s->wakeup_event, INFINITE);
++
++    switch (dwWaitResult) {
++    case WAIT_OBJECT_0:
++        break;
++    case WAIT_TIMEOUT:
++        break;
++    default:
++        g_critical("WaitForSingleObject failed");
++    }
++#endif
++}
++
+ static int run_agent(GAState *s)
+ {
+     int ret = EXIT_SUCCESS;
+@@ -1375,7 +1459,7 @@ static int run_agent(GAState *s)
+         ret = run_agent_once(s);
+         if (s->config->retry_path && !s->force_exit) {
+             g_warning("agent stopped unexpectedly, restarting...");
+-            sleep(QGA_RETRY_INTERVAL);
++            wait_for_channel_availability(s);
+         }
+     } while (s->config->retry_path && !s->force_exit);
+ 
+diff --git a/qga/service-win32.h b/qga/service-win32.h
+index 89e99dfede..7b16d69b57 100644
+--- a/qga/service-win32.h
++++ b/qga/service-win32.h
+@@ -20,9 +20,13 @@
+ #define QGA_SERVICE_NAME         "qemu-ga"
+ #define QGA_SERVICE_DESCRIPTION  "Enables integration with QEMU machine emulator and virtualizer."
+ 
++static const GUID GUID_VIOSERIAL_PORT = { 0x6fde7521, 0x1b65, 0x48ae,
++{ 0xb6, 0x28, 0x80, 0xbe, 0x62, 0x1, 0x60, 0x26 } };
++
+ typedef struct GAService {
+     SERVICE_STATUS status;
+     SERVICE_STATUS_HANDLE status_handle;
++    HDEVNOTIFY device_notification_handle;
+ } GAService;
+ 
+ int ga_install_service(const char *path, const char *logfile,
 -- 
 2.17.1
