@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58939)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gHsjT-0001Eg-SB
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 11:48:36 -0400
+	(envelope-from <eblake@redhat.com>) id 1gHspm-0004pg-AN
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 11:55:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gHsjR-0001XF-E0
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 11:48:35 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:46484)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gHsjP-0001EF-CV
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 11:48:31 -0400
-Received: by mail-pg1-x543.google.com with SMTP id m9-v6so4861057pgl.13
-	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 08:48:20 -0700 (PDT)
-Date: Wed, 31 Oct 2018 08:48:17 -0700 (PDT)
-In-Reply-To: <CAKmqyKP8sic_SEiqugH2=119GcyZQthv=QVds0c00J0W5uXc2A@mail.gmail.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-6c6dfbeb-7205-45c2-a533-15badb047dd1@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
+	(envelope-from <eblake@redhat.com>) id 1gHsph-0007eB-30
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 11:55:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33818)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gHspg-0007dY-Sq
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 11:55:01 -0400
+References: <1540365080-6844-1-git-send-email-liq3ea@gmail.com>
+	<4d64d42a-8727-81aa-6015-a9db92abca76@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b8e3151d-b453-67a7-89ef-cdf2ff257a6b@redhat.com>
+Date: Wed, 31 Oct 2018 10:54:56 -0500
+MIME-Version: 1.0
+In-Reply-To: <4d64d42a-8727-81aa-6015-a9db92abca76@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL 2/3] Add Alistair as a RISC-V Maintainer
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] fw_cfg_reboot: ensure reboot_time is
+ nonegative
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,49 +29,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alistair23@gmail.com
-Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org
+To: Laszlo Ersek <lersek@redhat.com>, Li Qiang <liq3ea@gmail.com>, peter.maydell@linaro.org, pbonzini@redhat.com
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
-On Tue, 30 Oct 2018 14:33:23 PDT (-0700), alistair23@gmail.com wrote:
-> On Tue, Oct 30, 2018 at 2:23 PM Palmer Dabbelt <palmer@sifive.com> wrote:
+On 10/24/18 6:35 AM, Laszlo Ersek wrote:
+> On 10/24/18 09:11, Li Qiang wrote:
+>> This can avoid setting a negative value to
+>> etc/boot-fail-wait.
 >>
->> Alistair has been contributing to the RISC-V QEMU port for a while now
->> so I'd like him to be officially listed as a maintainer.  I've checked
->> with the other RISC-V maintainers and there are no objections, and I've
->> also checked with Alistair so he knows I'm volunteering him.
->>
->> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
->
-> Hey Palmer,
->
-> It looks like you dropped a Reviewed by here. It's not super important
-> in this case but for future patches it could be an issue.
->
-> If you use QEMU's patches it should apply the tags for you:
-> https://github.com/stefanha/patches
-
-Sorry about that.  I'll take a look at patches.
-
->
-> Alistair
->
+>> Signed-off-by: Li Qiang <liq3ea@gmail.com>
 >> ---
->>  MAINTAINERS | 1 +
->>  1 file changed, 1 insertion(+)
+>>   hw/nvram/fw_cfg.c | 15 ++++++++++-----
+>>   1 file changed, 10 insertions(+), 5 deletions(-)
 >>
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index d794bd7a66fe..d550fd8b809c 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -241,6 +241,7 @@ F: disas/ppc.c
->>  RISC-V
->>  M: Michael Clark <mjc@sifive.com>
->>  M: Palmer Dabbelt <palmer@sifive.com>
->> +M: Alistair Francis <Alistair.Francis@wdc.com>
->>  M: Sagar Karandikar <sagark@eecs.berkeley.edu>
->>  M: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
->>  S: Maintained
->> --
->> 2.18.1
->>
->>
+>> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+>> index f4a52d8..276dcb1 100644
+>> --- a/hw/nvram/fw_cfg.c
+>> +++ b/hw/nvram/fw_cfg.c
+>> @@ -199,12 +199,17 @@ static void fw_cfg_reboot(FWCfgState *s)
+>>               reboot_timeout = strtol(p, &p, 10);
+
+Looks like Markus handled the question about replacing strtol(), so I'll 
+just point out one additional nit:
+
+>>           }
+>>       }
+>> -    /* validate the input */
+>> -    if (reboot_timeout > 0xffff) {
+>> -        error_report("reboot timeout is larger than 65535, force it to 65535.");
+
+Pre-existing, but now's as good a time as any to improve it:
+
+>> -        reboot_timeout = 0xffff;
+>> +
+>> +    if (reboot_timeout >= 0) {
+>> +        /* validate the input */
+>> +        if (reboot_timeout > 0xffff) {
+>> +            error_report("reboot timeout is larger than 65535,"
+>> +                         "force it to 65535.");
+
+error_report() callers generally do not end with trailing '.'
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
