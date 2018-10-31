@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60020)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fli@suse.com>) id 1gHodE-0003ve-AO
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 07:25:53 -0400
+	(envelope-from <george.kennedy@oracle.com>) id 1gHogO-0000ne-Vr
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 07:29:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fli@suse.com>) id 1gHod9-0006s6-7N
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 07:25:52 -0400
-Received: from mx2.suse.de ([195.135.220.15]:42472 helo=mx1.suse.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <fli@suse.com>) id 1gHod8-0006O8-OY
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 07:25:47 -0400
-References: <20181029125818.28720-1-fli@suse.com>
-	<20181029125818.28720-7-fli@suse.com> <20181030194923.GD2441@work-vm>
-From: Fei Li <fli@suse.com>
-Message-ID: <fd8629e3-cb6f-3e86-ba1a-cbda26373847@suse.com>
-Date: Wed, 31 Oct 2018 19:25:29 +0800
+	(envelope-from <george.kennedy@oracle.com>) id 1gHogK-00033f-Vy
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 07:29:08 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:58368)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <george.kennedy@oracle.com>)
+	id 1gHogK-000323-LE
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 07:29:04 -0400
+References: <1540935767-21467-1-git-send-email-george.kennedy@oracle.com>
+	<580389b2-4462-ca99-6f80-752c49f603b6@redhat.com>
+From: George Kennedy <george.kennedy@oracle.com>
+Message-ID: <fb9cafab-8a35-2220-4c60-b74d247bb649@oracle.com>
+Date: Wed, 31 Oct 2018 07:29:02 -0400
 MIME-Version: 1.0
-In-Reply-To: <20181030194923.GD2441@work-vm>
+In-Reply-To: <580389b2-4462-ca99-6f80-752c49f603b6@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH RFC v6 6/7] migration: fix some error
- handling
+Subject: Re: [Qemu-devel] [PATCH v3] lsi_scsi: Reselection needed to remove
+ pending commands from queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,130 +30,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, famz@redhat.com, peterx@redhat.com, quintela@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, famz@redhat.com, qemu-devel@nongnu.org, boris.ostrovsky@oracle.com
 
 
 
-On 10/31/2018 03:49 AM, Dr. David Alan Gilbert wrote:
-> * Fei Li (fli@suse.com) wrote:
->> Add error handling for qemu_ram_foreach_migratable_block() when
->> it fails.
+On 10/31/2018 5:21 AM, Paolo Bonzini wrote:
+> On 30/10/2018 22:42, George Kennedy wrote:
+>> Under heavy IO (e.g. fio) the queue is not checked frequently enough for
+>> pending commands. As a result some pending commands are timed out by the
+>> linux sym53c8xx driver, which sends SCSI Abort messages for the timed out
+>> commands. The SCSI Abort messages result in linux errors, which show up
+>> on the console and in /var/log/messages.
 >>
->> Always call migrate_set_error() to set the error state without relying
->> on whether multifd_save_cleanup() succeeds. As the passed &local_err
->> is never used in multifd_save_cleanup(), remove it.
+>> e.g.
+>> sd 0:0:3:0: [sdd] tag#33 ABORT operation started
+>> scsi target0:0:3: control msgout:
+>> 80 20 47 d
+>> sd 0:0:3:0: ABORT operation complete.
+>> scsi target0:0:4: message d sent on bad reselection
 >>
->> Signed-off-by: Fei Li <fli@suse.com>
+>> When the current command completes, check if there is a pending command
+>> on the queue and if a pending command exists, set a flag indicating
+>> that a Wait Reselect command is needed to handle a queued pending command.
+>>
+>> When a Wait Reselect is needed, intercept and save the current DMA Scripts
+>> Ptr (DSP) contents and load it instead with the pointer to the Reselection
+>> Scripts.  When Reselection has completed, restore the original DSP contents.
+>>
+>> Signed-off-by: George Kennedy <george.kennedy@oracle.com>
 >> ---
->>   migration/migration.c    | 5 +----
->>   migration/postcopy-ram.c | 3 +++
->>   migration/ram.c          | 7 +++----
->>   migration/ram.h          | 2 +-
->>   4 files changed, 8 insertions(+), 9 deletions(-)
+>>   hw/scsi/lsi53c895a.c | 51 ++++++++++++++++++++++++++++++++++++++++-----------
+>>   1 file changed, 40 insertions(+), 11 deletions(-)
 >>
->> diff --git a/migration/migration.c b/migration/migration.c
->> index 87dfc7374f..3b8b7ab4f9 100644
->> --- a/migration/migration.c
->> +++ b/migration/migration.c
->> @@ -1377,7 +1377,6 @@ static void migrate_fd_cleanup(void *opaque)
->>       qemu_savevm_state_cleanup();
+>> diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
+>> index d1e6534..b783d72 100644
+>> --- a/hw/scsi/lsi53c895a.c
+>> +++ b/hw/scsi/lsi53c895a.c
+>> @@ -219,6 +219,8 @@ typedef struct {
+>>       int command_complete;
+>>       QTAILQ_HEAD(, lsi_request) queue;
+>>       lsi_request *current;
+>> +    bool want_resel;    /* need resel to handle queued completed cmds */
+>> +    uint32_t resel_dsp; /* DMA Scripts Ptr (DSP) of reselection scsi scripts */
 >>   
->>       if (s->to_dst_file) {
->> -        Error *local_err = NULL;
->>           QEMUFile *tmp;
->>   
->>           trace_migrate_fd_cleanup();
->> @@ -1388,9 +1387,7 @@ static void migrate_fd_cleanup(void *opaque)
->>           }
->>           qemu_mutex_lock_iothread();
->>   
->> -        if (multifd_save_cleanup(&local_err) != 0) {
->> -            error_report_err(local_err);
->> -        }
->> +        multifd_save_cleanup();
->>           qemu_mutex_lock(&s->qemu_file_lock);
->>           tmp = s->to_dst_file;
->>           s->to_dst_file = NULL;
->> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
->> index e5c02a32c5..4ca2bc02b3 100644
->> --- a/migration/postcopy-ram.c
->> +++ b/migration/postcopy-ram.c
->> @@ -1117,6 +1117,9 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
->>   
->>       /* Mark so that we get notified of accesses to unwritten areas */
->>       if (qemu_ram_foreach_migratable_block(ram_block_enable_notify, mis)) {
->> +        error_report("ram_block_enable_notify failed");
->> +        close(mis->userfault_event_fd);
->> +        close(mis->userfault_fd);
-> I don't think these close() calls are safe.  This code is just after
-> starting the fault thread, and the fault thread has a poll() call on
-> these fd's, so we can't close them until we've instructed that thread
-> to exit.
->
-> We should fall out through postcopy_ram_incoming_cleanup, and because
-> the thread exists it should do a notify to the thread, a join and then
-> only later do the close calls.
->
-> Dave
-I see the postcopy_ram_incoming_cleanup() already include the
-notify & join the fault thread & close these two fds and other more cleanup,
-thus that means directly replace the above two close() with
-postcopy_ram_incoming_cleanup() is ok, right? :)
-
-BTW, does the parameter "&local_err" for multifd_save_cleanup(&local_err) is
-reserved for some reason? As I notice no code is using this error parameter,
-and if it is reserved for nothing I'd like to delete it just as the 
-second paragraph
-of the commit message said. :)
-
-Have a nice day, thanks
-Fei
->
->>           return -1;
->>       }
->>   
->> diff --git a/migration/ram.c b/migration/ram.c
->> index 8f03afe228..57cb1bee3d 100644
->> --- a/migration/ram.c
->> +++ b/migration/ram.c
->> @@ -922,7 +922,7 @@ static void multifd_send_terminate_threads(Error *err)
->>       }
+>>       uint32_t dsa;
+>>       uint32_t temp;
+>> @@ -298,6 +300,18 @@ static inline int lsi_irq_on_rsl(LSIState *s)
+>>       return (s->sien0 & LSI_SIST0_RSL) && (s->scid & LSI_SCID_RRE);
 >>   }
 >>   
->> -int multifd_save_cleanup(Error **errp)
->> +int multifd_save_cleanup(void)
+>> +static lsi_request *get_pending_req(LSIState *s)
+>> +{
+>> +    lsi_request *p;
+>> +
+>> +    QTAILQ_FOREACH(p, &s->queue, next) {
+>> +        if (p->pending) {
+>> +            return p;
+>> +        }
+>> +    }
+>> +    return NULL;
+>> +}
+>> +
+>>   static void lsi_soft_reset(LSIState *s)
 >>   {
->>       int i;
->>       int ret = 0;
->> @@ -1082,9 +1082,8 @@ static void multifd_new_send_channel_async(QIOTask *task, gpointer opaque)
+>>       trace_lsi_reset();
+>> @@ -446,7 +460,6 @@ static void lsi_update_irq(LSIState *s)
+>>   {
+>>       int level;
+>>       static int last_level;
+>> -    lsi_request *p;
 >>   
->>       if (qio_task_propagate_error(task, &local_err)) {
->>           migrate_set_state(&s->state, s->state, MIGRATION_STATUS_FAILED);
->> -        if (multifd_save_cleanup(&local_err) != 0) {
->> -            migrate_set_error(migrate_get_current(), local_err);
+>>       /* It's unclear whether the DIP/SIP bits should be cleared when the
+>>          Interrupt Status Registers are cleared or when istat0 is read.
+>> @@ -477,12 +490,12 @@ static void lsi_update_irq(LSIState *s)
+>>       lsi_set_irq(s, level);
+>>   
+>>       if (!level && lsi_irq_on_rsl(s) && !(s->scntl1 & LSI_SCNTL1_CON)) {
+>> +        lsi_request *p;
+>> +
+>>           trace_lsi_update_irq_disconnected();
+>> -        QTAILQ_FOREACH(p, &s->queue, next) {
+>> -            if (p->pending) {
+>> -                lsi_reselect(s, p);
+>> -                break;
+>> -            }
+>> +        p = get_pending_req(s);
+>> +        if (p) {
+>> +            lsi_reselect(s, p);
+>>           }
+>>       }
+>>   }
+>> @@ -759,6 +772,8 @@ static void lsi_command_complete(SCSIRequest *req, uint32_t status, size_t resid
+>>           lsi_request_free(s, s->current);
+>>           scsi_req_unref(req);
+>>       }
+>> +    s->want_resel = get_pending_req(s) ? true : false;
+>> +
+>>       lsi_resume_script(s);
+>>   }
+>>   
+>> @@ -1064,11 +1079,13 @@ static void lsi_wait_reselect(LSIState *s)
+>>   
+>>       trace_lsi_wait_reselect();
+>>   
+>> -    QTAILQ_FOREACH(p, &s->queue, next) {
+>> -        if (p->pending) {
+>> -            lsi_reselect(s, p);
+>> -            break;
 >> -        }
->> +        multifd_save_cleanup();
->> +        migrate_set_error(migrate_get_current(), local_err);
->>       } else {
->>           p->c = QIO_CHANNEL(sioc);
->>           qio_channel_set_delay(p->c, false);
->> diff --git a/migration/ram.h b/migration/ram.h
->> index 046d3074be..0d1215209e 100644
->> --- a/migration/ram.h
->> +++ b/migration/ram.h
->> @@ -43,7 +43,7 @@ uint64_t ram_bytes_remaining(void);
->>   uint64_t ram_bytes_total(void);
+>> +    if (s->current) {
+>> +        return;
+>> +    }
+>> +
+>> +    p = get_pending_req(s);
+>> +    if (p) {
+>> +        lsi_reselect(s, p);
+>>       }
+>>       if (s->current == NULL) {
+>>           s->waiting = 1;
+>> @@ -1082,6 +1099,7 @@ static void lsi_execute_script(LSIState *s)
+>>       uint32_t addr, addr_high;
+>>       int opcode;
+>>       int insn_processed = 0;
+>> +    uint32_t save_dsp = 0;
 >>   
->>   int multifd_save_setup(void);
->> -int multifd_save_cleanup(Error **errp);
->> +int multifd_save_cleanup(void);
->>   int multifd_load_setup(void);
->>   int multifd_load_cleanup(Error **errp);
->>   bool multifd_recv_all_channels_created(void);
->> -- 
->> 2.13.7
->>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>>       s->istat1 |= LSI_ISTAT1_SRUN;
+>>   again:
+>> @@ -1260,7 +1278,14 @@ again:
+>>                   s->scntl1 &= ~LSI_SCNTL1_CON;
+>>                   break;
+>>               case 2: /* Wait Reselect */
+>> +                if (!s->resel_dsp) {
+>> +                    s->resel_dsp = s->dsp - 8;
+>> +                }
+> What is the reason for the "if"?
+The save of the Rselection Script address only needs to be done once
+>
+>>                   if (!lsi_irq_on_rsl(s)) {
+>> +                    if (save_dsp) {
+>> +                        s->dsp = save_dsp;
+>> +                        save_dsp = 0;
+>> +                    }
+>>                       lsi_wait_reselect(s);
+>>                   }
+>>                   break;
+>> @@ -1476,6 +1501,10 @@ again:
+>>   
+>>               if (insn & (1 << 28)) {
+>>                   addr = s->dsa + sextract32(addr, 0, 24);
+>> +            } else if (s->want_resel && s->resel_dsp && !(insn & (1 << 24))) {
+>> +                save_dsp = s->dsp;
+>> +                s->dsp = s->resel_dsp;
+>> +                s->want_resel = false;
+>>               }
+> Can you explain why this is placed under the LOAD AND STORE instruction?
+>
+> Your previous patch has, more specifically, a store from the scratch
+> register into memory.  In the Linux scripts this occurs twice, both
+> after a DISCONNECT instruction.  Is that the place where you want to hook?
+Yes. I can revert to what was in the previous patch. I had figured that, 
+like the change to capture the Reselection Script address, the point 
+where the DSP address gets loaded with the Script Reselection address 
+could be handled in a similar manner.
+>
+> (All this is a bit of a hack of course, and I would rather have the
+> actual solution that adds the appropriate RESELECTION and MESSAGE IN
+> phases whenever the device has finished the data transfer.  But with a
+> FIXME comment I guess it might be okay).
+I will add a FIXME with a description of the problem that we had 
+discussed along with how we ultimately want the code flow to work.
+
+Thank you,
+George
+>
+> Paolo
 >
