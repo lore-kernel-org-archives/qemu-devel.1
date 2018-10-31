@@ -1,15 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52910)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gHy9n-0003JM-KP
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 17:36:08 -0400
+	(envelope-from <kwolf@redhat.com>) id 1gHyTo-0004Tl-DQ
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 17:56:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gHy9m-0006eY-TW
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 17:36:07 -0400
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Wed, 31 Oct 2018 14:35:50 -0700
-Message-Id: <20181031213550.4544-1-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PATCH] target/xtensa: drop num_[core_]regs from
- dc232b/dc233c configs
+	(envelope-from <kwolf@redhat.com>) id 1gHyTl-0008BV-8q
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 17:56:46 -0400
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Wed, 31 Oct 2018 22:56:12 +0100
+Message-Id: <20181031215622.27690-3-kwolf@redhat.com>
+In-Reply-To: <20181031215622.27690-1-kwolf@redhat.com>
+References: <20181031215622.27690-1-kwolf@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 02/12] file-posix: Factor out
+ raw_thread_pool_submit()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,53 +22,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Max Filippov <jcmvbkbc@gmail.com>, qemu-stable@nongnu.org
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-gdb_regmap::num_core_regs field is initialized incorrectly in the dc232b
-and dc233c configurations. As a result the following message is
-displayed when attaching to an xtensa linux-user process:
+Getting the thread pool of the AioContext of a block node and scheduling
+some work in it is an operation that is already done twice, and we'll
+get more instances. Factor it out into a separate function.
 
-  "Register 105 is not available",
-
-and gdb is unable to control the inferior.
-
-Now that xtensa_count_regs does the right thing, remove manual
-initialization of these fields from the affected configurations and let
-xtensa_finalize_config initialize them.
-
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- target/xtensa/core-dc232b.c | 2 --
- target/xtensa/core-dc233c.c | 2 --
- 2 files changed, 4 deletions(-)
+ block/file-posix.c | 17 ++++++++++-------
+ 1 file changed, 10 insertions(+), 7 deletions(-)
 
-diff --git a/target/xtensa/core-dc232b.c b/target/xtensa/core-dc232b.c
-index 71313378409e..7851bcb63687 100644
---- a/target/xtensa/core-dc232b.c
-+++ b/target/xtensa/core-dc232b.c
-@@ -40,8 +40,6 @@
- static XtensaConfig dc232b __attribute__((unused)) = {
-     .name = "dc232b",
-     .gdb_regmap = {
--        .num_regs = 120,
--        .num_core_regs = 52,
-         .reg = {
- #include "core-dc232b/gdb-config.inc.c"
-         }
-diff --git a/target/xtensa/core-dc233c.c b/target/xtensa/core-dc233c.c
-index d701e3f5de07..8853bfd4d08f 100644
---- a/target/xtensa/core-dc233c.c
-+++ b/target/xtensa/core-dc233c.c
-@@ -40,8 +40,6 @@
- static XtensaConfig dc233c __attribute__((unused)) = {
-     .name = "dc233c",
-     .gdb_regmap = {
--        .num_regs = 121,
--        .num_core_regs = 52,
-         .reg = {
- #include "core-dc233c/gdb-config.inc.c"
-         }
--- 
-2.11.0
+diff --git a/block/file-posix.c b/block/file-posix.c
+index 68cea7685a..28eb55c29e 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -1803,13 +1803,20 @@ static int aio_worker(void *arg)
+     return ret;
+ }
+=20
++static int coroutine_fn raw_thread_pool_submit(BlockDriverState *bs,
++                                               ThreadPoolFunc func, void=
+ *arg)
++{
++    /* @bs can be NULL, bdrv_get_aio_context() returns the main context =
+then */
++    ThreadPool *pool =3D aio_get_thread_pool(bdrv_get_aio_context(bs));
++    return thread_pool_submit_co(pool, func, arg);
++}
++
+ static int paio_submit_co_full(BlockDriverState *bs, int fd,
+                                int64_t offset, int fd2, int64_t offset2,
+                                QEMUIOVector *qiov,
+                                int bytes, int type)
+ {
+     RawPosixAIOData *acb =3D g_new(RawPosixAIOData, 1);
+-    ThreadPool *pool;
+=20
+     acb->bs =3D bs;
+     acb->aio_type =3D type;
+@@ -1828,8 +1835,7 @@ static int paio_submit_co_full(BlockDriverState *bs=
+, int fd,
+     }
+=20
+     trace_file_paio_submit_co(offset, bytes, type);
+-    pool =3D aio_get_thread_pool(bdrv_get_aio_context(bs));
+-    return thread_pool_submit_co(pool, aio_worker, acb);
++    return raw_thread_pool_submit(bs, aio_worker, acb);
+ }
+=20
+ static inline int paio_submit_co(BlockDriverState *bs, int fd,
+@@ -1959,7 +1965,6 @@ raw_regular_truncate(BlockDriverState *bs, int fd, =
+int64_t offset,
+                      PreallocMode prealloc, Error **errp)
+ {
+     RawPosixAIOData *acb =3D g_new(RawPosixAIOData, 1);
+-    ThreadPool *pool;
+=20
+     *acb =3D (RawPosixAIOData) {
+         .bs             =3D bs,
+@@ -1972,9 +1977,7 @@ raw_regular_truncate(BlockDriverState *bs, int fd, =
+int64_t offset,
+         },
+     };
+=20
+-    /* @bs can be NULL, bdrv_get_aio_context() returns the main context =
+then */
+-    pool =3D aio_get_thread_pool(bdrv_get_aio_context(bs));
+-    return thread_pool_submit_co(pool, aio_worker, acb);
++    return raw_thread_pool_submit(bs, aio_worker, acb);
+ }
+=20
+ static int coroutine_fn raw_co_truncate(BlockDriverState *bs, int64_t of=
+fset,
+--=20
+2.19.1
