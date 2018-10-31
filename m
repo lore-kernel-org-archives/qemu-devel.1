@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41534)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <contrib@steffen-goertz.de>) id 1gHeKb-0004mp-Ru
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:25:58 -0400
+	(envelope-from <contrib@steffen-goertz.de>) id 1gHeKg-0004on-DY
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:26:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <contrib@steffen-goertz.de>) id 1gHeKY-000082-Mb
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:25:57 -0400
-Received: from steffen-goertz.de ([88.198.119.201]:60358)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <contrib@steffen-goertz.de>) id 1gHeKY-00007a-DB
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:25:54 -0400
+	(envelope-from <contrib@steffen-goertz.de>) id 1gHeKf-0000Bx-JH
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:26:02 -0400
 From: =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>
-Date: Tue, 30 Oct 2018 20:25:14 -0400
-Message-Id: <20181031002526.14262-1-contrib@steffen-goertz.de>
+Date: Tue, 30 Oct 2018 20:25:18 -0400
+Message-Id: <20181031002526.14262-5-contrib@steffen-goertz.de>
+In-Reply-To: <20181031002526.14262-1-contrib@steffen-goertz.de>
+References: <20181031002526.14262-1-contrib@steffen-goertz.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 00/13] arm: nRF51 Devices and Microbit
- Support
+Subject: [Qemu-devel] [PATCH v3 04/13] arm: Instantiate NRF51 random number
+ generator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,85 +24,72 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>, "open list:NRF51" <qemu-arm@nongnu.org>
 
-This series contains additional peripheral devices for the nRF51822
-microcontroller.=20
+Use RNG in SOC.
 
-Included devices:
-- Random Number Generator
-- Non-volatile Memories
-- General purpose I/O
-- Timer=20
-- Stub for clock peripheral
+Signed-off-by: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
+---
+ hw/arm/nrf51_soc.c         | 16 ++++++++++++++++
+ include/hw/arm/nrf51_soc.h |  2 ++
+ 2 files changed, 18 insertions(+)
 
-v3:
-    * Included device instantiation in this patch
-    * All devices use the common definitions provided by the header
-    * Removed obsolete comment from NVM header
-    * Device Struct names have consistent capitalisation
-
-v2:
-    * Factored out common definitions to won header (Stefan)
-    * Add set_irq_in command to support tests for GPIO
-    * Add tests for GPIO
-    * Removed LED matrix from this patch set
-    * Small tidy ups on RNG, NVM, GPIO and Timer
-
-
-Based-on: 20181025005052.27661-1-jusual@mail.ru
-
-Steffen G=C3=B6rtz (13):
-  qtest: Add set_irq_in command to set IRQ/GPIO level
-  arm: Add header to host common definition for nRF51 SOC peripherals
-  hw/misc/nrf51_rng: Add NRF51 random number generator peripheral
-  arm: Instantiate NRF51 random number generator
-  hw/nvram/nrf51_nvm: Add nRF51 non-volatile memories
-  arm: Instantiate NRF51 special NVM's and NVMC
-  tests: Add bbc:microbit / nRF51 test suite
-  hw/gpio/nrf51_gpio: Add nRF51 GPIO peripheral
-  arm: Instantiate NRF51 general purpose I/O
-  tests/microbit-test: Add Tests for nRF51 GPIO
-  hw/timer/nrf51_timer: Add nRF51 Timer peripheral
-  arm: Instantiate NRF51 Timers
-  arm: Add Clock peripheral stub to NRF51 SOC
-
- Makefile.objs                  |   1 +
- hw/arm/nrf51_soc.c             | 150 ++++++++++++--
- hw/gpio/Makefile.objs          |   1 +
- hw/gpio/nrf51_gpio.c           | 292 +++++++++++++++++++++++++++
- hw/gpio/trace-events           |   7 +
- hw/misc/Makefile.objs          |   1 +
- hw/misc/nrf51_rng.c            | 262 ++++++++++++++++++++++++
- hw/nvram/Makefile.objs         |   1 +
- hw/nvram/nrf51_nvm.c           | 339 +++++++++++++++++++++++++++++++
- hw/timer/Makefile.objs         |   1 +
- hw/timer/nrf51_timer.c         | 358 +++++++++++++++++++++++++++++++++
- hw/timer/trace-events          |   5 +
- include/hw/arm/nrf51.h         |  44 ++++
- include/hw/arm/nrf51_soc.h     |  11 +
- include/hw/char/nrf51_uart.h   |   1 -
- include/hw/gpio/nrf51_gpio.h   |  69 +++++++
- include/hw/misc/nrf51_rng.h    |  83 ++++++++
- include/hw/nvram/nrf51_nvm.h   |  70 +++++++
- include/hw/timer/nrf51_timer.h |  77 +++++++
- qtest.c                        |  40 ++++
- tests/Makefile.include         |   2 +
- tests/libqtest.c               |  10 +
- tests/libqtest.h               |  28 +++
- tests/microbit-test.c          | 239 ++++++++++++++++++++++
- 24 files changed, 2070 insertions(+), 22 deletions(-)
- create mode 100644 hw/gpio/nrf51_gpio.c
- create mode 100644 hw/gpio/trace-events
- create mode 100644 hw/misc/nrf51_rng.c
- create mode 100644 hw/nvram/nrf51_nvm.c
- create mode 100644 hw/timer/nrf51_timer.c
- create mode 100644 include/hw/arm/nrf51.h
- create mode 100644 include/hw/gpio/nrf51_gpio.h
- create mode 100644 include/hw/misc/nrf51_rng.h
- create mode 100644 include/hw/nvram/nrf51_nvm.h
- create mode 100644 include/hw/timer/nrf51_timer.h
- create mode 100644 tests/microbit-test.c
-
+diff --git a/hw/arm/nrf51_soc.c b/hw/arm/nrf51_soc.c
+index 55f8eaafcb..d2a19b8ead 100644
+--- a/hw/arm/nrf51_soc.c
++++ b/hw/arm/nrf51_soc.c
+@@ -86,6 +86,19 @@ static void nrf51_soc_realize(DeviceState *dev_soc, Er=
+ror **errp)
+                        qdev_get_gpio_in(DEVICE(&s->cpu),
+                        BASE_TO_IRQ(NRF51_UART_BASE)));
+=20
++    /* RNG */
++    object_property_set_bool(OBJECT(&s->rng), true, "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++
++    mr =3D sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->rng), 0);
++    memory_region_add_subregion_overlap(&s->container, NRF51_RNG_BASE, m=
+r, 0);
++    sysbus_connect_irq(SYS_BUS_DEVICE(&s->rng), 0,
++                       qdev_get_gpio_in(DEVICE(&s->cpu),
++                       BASE_TO_IRQ(NRF51_RNG_BASE)));
++
+     create_unimplemented_device("nrf51_soc.io", NRF51_IOMEM_BASE,
+                                 NRF51_IOMEM_SIZE);
+     create_unimplemented_device("nrf51_soc.ficr", NRF51_FICR_BASE,
+@@ -110,6 +123,9 @@ static void nrf51_soc_init(Object *obj)
+                            TYPE_NRF51_UART);
+     object_property_add_alias(obj, "serial0", OBJECT(&s->uart), "chardev=
+",
+                               &error_abort);
++
++    sysbus_init_child_obj(obj, "rng", &s->rng, sizeof(s->rng),
++                           TYPE_NRF51_RNG);
+ }
+=20
+ static Property nrf51_soc_properties[] =3D {
+diff --git a/include/hw/arm/nrf51_soc.h b/include/hw/arm/nrf51_soc.h
+index 73fc92e9a8..9e3ba916bd 100644
+--- a/include/hw/arm/nrf51_soc.h
++++ b/include/hw/arm/nrf51_soc.h
+@@ -13,6 +13,7 @@
+ #include "hw/sysbus.h"
+ #include "hw/arm/armv7m.h"
+ #include "hw/char/nrf51_uart.h"
++#include "hw/misc/nrf51_rng.h"
+=20
+ #define TYPE_NRF51_SOC "nrf51-soc"
+ #define NRF51_SOC(obj) \
+@@ -26,6 +27,7 @@ typedef struct NRF51State {
+     ARMv7MState cpu;
+=20
+     NRF51UARTState uart;
++    NRF51RNGState rng;
+=20
+     MemoryRegion iomem;
+     MemoryRegion sram;
 --=20
 2.19.1
