@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34833)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gHomX-0003io-1Y
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 07:35:33 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gHoml-0003tR-9u
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 07:35:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gHomR-0001y8-0T
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 07:35:27 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gHomg-0002L3-Nj
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 07:35:43 -0400
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Wed, 31 Oct 2018 11:35:02 +0000
-Message-ID: <20181031113418.29796-9-anton.nefedov@virtuozzo.com>
+Date: Wed, 31 Oct 2018 11:34:56 +0000
+Message-ID: <20181031113418.29796-7-anton.nefedov@virtuozzo.com>
 References: <20181031113418.29796-1-anton.nefedov@virtuozzo.com>
 In-Reply-To: <20181031113418.29796-1-anton.nefedov@virtuozzo.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v5 8/9] file-posix: account discard operations
+Subject: [Qemu-devel] [PATCH v5 6/9] scsi: move unmap error checking to the
+ complete callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,82 +27,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "famz@redhat.com" <famz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-This will help to identify how many of the user-issued discard operations
-(accounted on a device level) have actually suceeded down on the host file
-(even though the numbers will not be exactly the same if non-raw format
-driver is used (e.g. qcow2 sending metadata discards)).
+This will help to account the operation in the following commit.
 
-Note that these numbers will not include discards triggered by
-write-zeroes + MAY_UNMAP calls.
+The difference is that we don't call scsi_disk_req_check_error() before
+the 1st discard iteration anymore. That function also checks if
+the request is cancelled, however it shouldn't get canceled until it
+yields in blk_aio() functions anyway.
+Same approach is already used for emulate_write_same.
 
 Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- block/file-posix.c | 28 +++++++++++++++++++++++++---
- 1 file changed, 25 insertions(+), 3 deletions(-)
+ hw/scsi/scsi-disk.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 2da3a76355..1a7126046c 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -163,6 +163,11 @@ typedef struct BDRVRawState {
-     bool has_fallocate;
-     bool needs_alignment;
-     bool check_cache_dropped;
-+    struct {
-+        int64_t discard_nb_ok;
-+        int64_t discard_nb_failed;
-+        int64_t discard_bytes_ok;
-+    } stats;
+diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+index 661228b569..e132504913 100644
+--- a/hw/scsi/scsi-disk.c
++++ b/hw/scsi/scsi-disk.c
+@@ -1658,9 +1658,6 @@ static void scsi_unmap_complete_noio(UnmapCBData *dat=
+a, int ret)
+     SCSIDiskState *s =3D DO_UPCAST(SCSIDiskState, qdev, r->req.dev);
 =20
-     PRManager *pr_mgr;
- } BDRVRawState;
-@@ -2582,12 +2587,25 @@ static void coroutine_fn raw_co_invalidate_cache(Bl=
-ockDriverState *bs,
- #endif /* !__linux__ */
- }
+     assert(r->req.aiocb =3D=3D NULL);
+-    if (scsi_disk_req_check_error(r, ret, false)) {
+-        goto done;
+-    }
 =20
-+static void raw_account_discard(BDRVRawState *s, uint64_t nbytes, int ret)
-+{
-+    if (ret) {
-+        s->stats.discard_nb_failed++;
+     if (data->count > 0) {
+         r->sector =3D ldq_be_p(&data->inbuf[0]);
+@@ -1696,7 +1693,12 @@ static void scsi_unmap_complete(void *opaque, int re=
+t)
+     r->req.aiocb =3D NULL;
+=20
+     aio_context_acquire(blk_get_aio_context(s->qdev.conf.blk));
+-    scsi_unmap_complete_noio(data, ret);
++    if (scsi_disk_req_check_error(r, ret, false)) {
++        scsi_req_unref(&r->req);
++        g_free(data);
 +    } else {
-+        s->stats.discard_nb_ok++;
-+        s->stats.discard_bytes_ok +=3D nbytes;
++        scsi_unmap_complete_noio(data, ret);
 +    }
-+}
-+
- static coroutine_fn int
- raw_co_pdiscard(BlockDriverState *bs, int64_t offset, int bytes)
- {
-     BDRVRawState *s =3D bs->opaque;
-+    int ret;
-=20
--    return paio_submit_co(bs, s->fd, offset, NULL, bytes, QEMU_AIO_DISCARD=
-);
-+    ret =3D paio_submit_co(bs, s->fd, offset, NULL, bytes, QEMU_AIO_DISCAR=
-D);
-+    raw_account_discard(s, bytes, ret);
-+    return ret;
+     aio_context_release(blk_get_aio_context(s->qdev.conf.blk));
  }
 =20
- static int coroutine_fn raw_co_pwrite_zeroes(
-@@ -3084,10 +3102,14 @@ hdev_co_pdiscard(BlockDriverState *bs, int64_t offs=
-et, int bytes)
-=20
-     ret =3D fd_open(bs);
-     if (ret < 0) {
-+        raw_account_discard(s, bytes, ret);
-         return ret;
-     }
--    return paio_submit_co(bs, s->fd, offset, NULL, bytes,
--                          QEMU_AIO_DISCARD | QEMU_AIO_BLKDEV);
-+
-+    ret =3D paio_submit_co(bs, s->fd, offset, NULL, bytes,
-+                         QEMU_AIO_DISCARD | QEMU_AIO_BLKDEV);
-+    raw_account_discard(s, bytes, ret);
-+    return ret;
- }
-=20
- static coroutine_fn int hdev_co_pwrite_zeroes(BlockDriverState *bs,
 --=20
 2.17.1
