@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33794)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHrNU-0001Yx-Ee
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:21:49 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHrNT-0007eX-Jq
+	(envelope-from <flukshun@gmail.com>) id 1gHrNS-0001X6-Nh
 	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:21:48 -0400
-Received: from mail-oi1-x22c.google.com ([2607:f8b0:4864:20::22c]:36636)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <flukshun@gmail.com>) id 1gHrNQ-0007cy-VK
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:21:46 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:43430)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHrNT-0007OW-BU
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:21:47 -0400
-Received: by mail-oi1-x22c.google.com with SMTP id r127-v6so12003127oie.3
-	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 07:21:13 -0700 (PDT)
+	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHrNO-0007QA-RU
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:21:43 -0400
+Received: by mail-ot1-x341.google.com with SMTP id k9so14659673otl.10
+	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 07:21:16 -0700 (PDT)
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Wed, 31 Oct 2018 09:19:06 -0500
-Message-Id: <20181031141925.30026-6-mdroth@linux.vnet.ibm.com>
+Date: Wed, 31 Oct 2018 09:19:07 -0500
+Message-Id: <20181031141925.30026-7-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20181031141925.30026-1-mdroth@linux.vnet.ibm.com>
 References: <20181031141925.30026-1-mdroth@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v3 05/24] qga: linux: report disk serial number
+Subject: [Qemu-devel] [PULL v3 06/24] qga: linux: return disk device in
+ guest-get-fsinfo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,128 +35,52 @@ Cc: peter.maydell@linaro.org, =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <t
 
 From: Tomáš Golembiovský <tgolembi@redhat.com>
 
-Add reporting of disk serial number on Linux guests. The feature depends
-on libudev.
-
-Example:
-
-    {
-      "name": "dm-2",
-      "mountpoint": "/",
-      ...
-      "disk": [
-        {
-          "serial": "SAMSUNG_MZ7LN512HCHP-000L1_S1ZKNXAG822493",
-          ...
-        }
-      ],
-    }
+Report device node of the disk on Linux (e.g. "/dev/sda2").
+Requirs libudev.
 
 Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- qga/Makefile.objs    |  1 +
- qga/commands-posix.c | 32 ++++++++++++++++++++++++++++++--
- qga/qapi-schema.json |  4 +++-
- 3 files changed, 34 insertions(+), 3 deletions(-)
+ qga/commands-posix.c | 7 ++++++-
+ qga/qapi-schema.json | 3 ++-
+ 2 files changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/qga/Makefile.objs b/qga/Makefile.objs
-index ed08c5917c..80e6bb3c2e 100644
---- a/qga/Makefile.objs
-+++ b/qga/Makefile.objs
-@@ -1,3 +1,4 @@
-+commands-posix.o-libs := $(LIBUDEV_LIBS)
- qga-obj-y = commands.o guest-agent-command-state.o main.o
- qga-obj-$(CONFIG_POSIX) += commands-posix.o channel-posix.o
- qga-obj-$(CONFIG_WIN32) += commands-win32.o channel-win32.o service-win32.o
 diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-index 42d30f078e..41bd11b2b5 100644
+index 41bd11b2b5..1877976522 100644
 --- a/qga/commands-posix.c
 +++ b/qga/commands-posix.c
-@@ -48,6 +48,10 @@ extern char **environ;
- #include <net/if.h>
- #include <sys/statvfs.h>
- 
-+#ifdef CONFIG_LIBUDEV
-+#include <libudev.h>
-+#endif
-+
- #ifdef FIFREEZE
- #define CONFIG_FSFREEZE
- #endif
-@@ -872,6 +876,10 @@ static void build_guest_fsinfo_for_real_device(char const *syspath,
-     GuestDiskAddressList *list = NULL;
-     bool has_ata = false, has_host = false, has_tgt = false;
-     char *p, *q, *driver = NULL;
-+#ifdef CONFIG_LIBUDEV
-+    struct udev *udev = NULL;
-+    struct udev_device *udevice = NULL;
-+#endif
- 
-     p = strstr(syspath, "/devices/pci");
-     if (!p || sscanf(p + 12, "%*x:%*x/%x:%x:%x.%x%n",
-@@ -936,6 +944,21 @@ static void build_guest_fsinfo_for_real_device(char const *syspath,
-     list = g_malloc0(sizeof(*list));
-     list->value = disk;
- 
-+#ifdef CONFIG_LIBUDEV
-+    udev = udev_new();
-+    udevice = udev_device_new_from_syspath(udev, syspath);
-+    if (udev == NULL || udevice == NULL) {
-+        g_debug("failed to query udev");
-+    } else {
-+        const char *serial;
-+        serial = udev_device_get_property_value(udevice, "ID_SERIAL");
-+        if (serial != NULL && *serial != 0) {
-+            disk->serial = g_strdup(serial);
-+            disk->has_serial = true;
+@@ -950,7 +950,12 @@ static void build_guest_fsinfo_for_real_device(char const *syspath,
+     if (udev == NULL || udevice == NULL) {
+         g_debug("failed to query udev");
+     } else {
+-        const char *serial;
++        const char *devnode, *serial;
++        devnode = udev_device_get_devnode(udevice);
++        if (devnode != NULL) {
++            disk->dev = g_strdup(devnode);
++            disk->has_dev = true;
 +        }
-+    }
-+#endif
-+
-     if (strcmp(driver, "ata_piix") == 0) {
-         /* a host per ide bus, target*:0:<unit>:0 */
-         if (!has_host || !has_tgt) {
-@@ -995,14 +1018,19 @@ static void build_guest_fsinfo_for_real_device(char const *syspath,
- 
-     list->next = fs->disk;
-     fs->disk = list;
--    g_free(driver);
--    return;
-+    goto out;
- 
- cleanup:
-     if (list) {
-         qapi_free_GuestDiskAddressList(list);
-     }
-+out:
-     g_free(driver);
-+#ifdef CONFIG_LIBUDEV
-+    udev_unref(udev);
-+    udev_device_unref(udevice);
-+#endif
-+    return;
- }
- 
- static void build_guest_fsinfo_for_device(char const *devpath,
+         serial = udev_device_get_property_value(udevice, "ID_SERIAL");
+         if (serial != NULL && *serial != 0) {
+             disk->serial = g_strdup(serial);
 diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
-index dfbc4a5e32..3bcda6257e 100644
+index 3bcda6257e..c6725b3ec8 100644
 --- a/qga/qapi-schema.json
 +++ b/qga/qapi-schema.json
-@@ -834,13 +834,15 @@
- # @bus: bus id
+@@ -835,6 +835,7 @@
  # @target: target id
  # @unit: unit id
-+# @serial: serial number (since: 3.1)
+ # @serial: serial number (since: 3.1)
++# @dev: device node (POSIX) or device UNC (Windows) (since: 3.1)
  #
  # Since: 2.2
  ##
- { 'struct': 'GuestDiskAddress',
+@@ -842,7 +843,7 @@
    'data': {'pci-controller': 'GuestPCIAddress',
             'bus-type': 'GuestDiskBusType',
--           'bus': 'int', 'target': 'int', 'unit': 'int'} }
-+           'bus': 'int', 'target': 'int', 'unit': 'int',
-+           '*serial': 'str'} }
+            'bus': 'int', 'target': 'int', 'unit': 'int',
+-           '*serial': 'str'} }
++           '*serial': 'str', '*dev': 'str'} }
  
  ##
  # @GuestFilesystemInfo:
