@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gHyTo-0004Tm-DU
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 17:56:50 -0400
+	(envelope-from <kwolf@redhat.com>) id 1gHyTu-0004Zj-6c
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 17:56:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gHyTl-0008BW-8o
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 17:56:46 -0400
+	(envelope-from <kwolf@redhat.com>) id 1gHyTm-0008CA-Go
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 17:56:52 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 31 Oct 2018 22:56:13 +0100
-Message-Id: <20181031215622.27690-4-kwolf@redhat.com>
+Date: Wed, 31 Oct 2018 22:56:16 +0100
+Message-Id: <20181031215622.27690-7-kwolf@redhat.com>
 In-Reply-To: <20181031215622.27690-1-kwolf@redhat.com>
 References: <20181031215622.27690-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 03/12] file-posix: Avoid aio_worker() for
- QEMU_AIO_TRUNCATE
+Subject: [Qemu-devel] [PATCH 06/12] file-posix: Avoid aio_worker() for
+ QEMU_AIO_DISCARD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,58 +34,85 @@ we can keep RawPosixAIOData on the stack.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/file-posix.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ block/file-posix.c | 32 ++++++++++++++++++++++++--------
+ 1 file changed, 24 insertions(+), 8 deletions(-)
 
 diff --git a/block/file-posix.c b/block/file-posix.c
-index 28eb55c29e..69e1b761b4 100644
+index 3d3bddd511..291ffaeded 100644
 --- a/block/file-posix.c
 +++ b/block/file-posix.c
-@@ -1624,8 +1624,9 @@ static ssize_t handle_aiocb_discard(RawPosixAIOData=
- *aiocb)
-     return ret;
+@@ -1587,8 +1587,9 @@ static int handle_aiocb_copy_range(void *opaque)
+     return 0;
  }
 =20
--static int handle_aiocb_truncate(RawPosixAIOData *aiocb)
-+static int handle_aiocb_truncate(void *opaque)
+-static ssize_t handle_aiocb_discard(RawPosixAIOData *aiocb)
++static int handle_aiocb_discard(void *opaque)
  {
 +    RawPosixAIOData *aiocb =3D opaque;
-     int result =3D 0;
-     int64_t current_length =3D 0;
-     char *buf =3D NULL;
-@@ -1791,8 +1792,7 @@ static int aio_worker(void *arg)
-         ret =3D handle_aiocb_copy_range(aiocb);
+     int ret =3D -EOPNOTSUPP;
+     BDRVRawState *s =3D aiocb->bs->opaque;
+=20
+@@ -1783,8 +1784,6 @@ static int aio_worker(void *arg)
+         ret =3D handle_aiocb_ioctl(aiocb);
          break;
-     case QEMU_AIO_TRUNCATE:
--        ret =3D handle_aiocb_truncate(aiocb);
+     case QEMU_AIO_DISCARD:
+-        ret =3D handle_aiocb_discard(aiocb);
 -        break;
-+        g_assert_not_reached();
-     default:
-         fprintf(stderr, "invalid aio request (0x%x)\n", aiocb->aio_type)=
-;
-         ret =3D -EINVAL;
-@@ -1964,9 +1964,9 @@ static int coroutine_fn
- raw_regular_truncate(BlockDriverState *bs, int fd, int64_t offset,
-                      PreallocMode prealloc, Error **errp)
- {
--    RawPosixAIOData *acb =3D g_new(RawPosixAIOData, 1);
-+    RawPosixAIOData acb;
-=20
--    *acb =3D (RawPosixAIOData) {
-+    acb =3D (RawPosixAIOData) {
-         .bs             =3D bs,
-         .aio_fildes     =3D fd,
-         .aio_type       =3D QEMU_AIO_TRUNCATE,
-@@ -1977,7 +1977,7 @@ raw_regular_truncate(BlockDriverState *bs, int fd, =
-int64_t offset,
-         },
-     };
-=20
--    return raw_thread_pool_submit(bs, aio_worker, acb);
-+    return raw_thread_pool_submit(bs, handle_aiocb_truncate, &acb);
+     case QEMU_AIO_WRITE_ZEROES:
+     case QEMU_AIO_WRITE_ZEROES | QEMU_AIO_DISCARD:
+     case QEMU_AIO_COPY_RANGE:
+@@ -2605,11 +2604,30 @@ static void coroutine_fn raw_co_invalidate_cache(=
+BlockDriverState *bs,
  }
 =20
- static int coroutine_fn raw_co_truncate(BlockDriverState *bs, int64_t of=
-fset,
+ static coroutine_fn int
+-raw_co_pdiscard(BlockDriverState *bs, int64_t offset, int bytes)
++raw_do_pdiscard(BlockDriverState *bs, int64_t offset, int bytes, bool bl=
+kdev)
+ {
+     BDRVRawState *s =3D bs->opaque;
++    RawPosixAIOData acb;
++
++    acb =3D (RawPosixAIOData) {
++        .bs             =3D bs,
++        .aio_fildes     =3D s->fd,
++        .aio_type       =3D QEMU_AIO_DISCARD,
++        .aio_offset     =3D offset,
++        .aio_nbytes     =3D bytes,
++    };
+=20
+-    return paio_submit_co(bs, s->fd, offset, NULL, bytes, QEMU_AIO_DISCA=
+RD);
++    if (blkdev) {
++        acb.aio_type |=3D QEMU_AIO_BLKDEV;
++    }
++
++    return raw_thread_pool_submit(bs, handle_aiocb_discard, &acb);
++}
++
++static coroutine_fn int
++raw_co_pdiscard(BlockDriverState *bs, int64_t offset, int bytes)
++{
++    return raw_do_pdiscard(bs, offset, bytes, false);
+ }
+=20
+ static int coroutine_fn
+@@ -3137,15 +3155,13 @@ static int fd_open(BlockDriverState *bs)
+ static coroutine_fn int
+ hdev_co_pdiscard(BlockDriverState *bs, int64_t offset, int bytes)
+ {
+-    BDRVRawState *s =3D bs->opaque;
+     int ret;
+=20
+     ret =3D fd_open(bs);
+     if (ret < 0) {
+         return ret;
+     }
+-    return paio_submit_co(bs, s->fd, offset, NULL, bytes,
+-                          QEMU_AIO_DISCARD | QEMU_AIO_BLKDEV);
++    return raw_do_pdiscard(bs, offset, bytes, true);
+ }
+=20
+ static coroutine_fn int hdev_co_pwrite_zeroes(BlockDriverState *bs,
 --=20
 2.19.1
