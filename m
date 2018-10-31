@@ -1,14 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52741)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59108)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1gHjEJ-00014e-41
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 01:39:48 -0400
+	(envelope-from <famz@redhat.com>) id 1gHlUe-0007ZQ-Vc
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 04:04:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1gHjEH-0008S3-4R
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 01:39:47 -0400
+	(envelope-from <famz@redhat.com>) id 1gHlUX-0000lW-Dt
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 04:04:47 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Wed, 31 Oct 2018 13:39:20 +0800
-Message-Id: <20181031053920.7565-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] file-posix: Use error API properly
+Date: Wed, 31 Oct 2018 16:04:15 +0800
+Message-Id: <20181031080415.23637-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH] iotests: 082: Update output
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,152 +18,1112 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, armbru@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-Use error_report for situations that affect user operation (i.e.  we're
-actually returning error), and warn_report/warn_report_err when some
-less critical error happened but the user operation can still carry on.
+Commit 9cbef9d68e (qemu-option: improve qemu_opts_print_help() output)
+affected qemu-img help output, and broke this test case.
 
-For raw_normalize_devicepath, add Error parameter to propagate to
-its callers.
+Update the output reference to fix it.
 
-Suggested-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Fam Zheng <famz@redhat.com>
 
 ---
 
-v2: Add Error ** to raw_normalize_devicepath. [Markus]
-    Use error_printf for splitting multi-sentence message. [Markus]
+I'm once again looking at enabling iotests on patchew (via vm based
+tests), but immediately got blocked by this. :(
 ---
- block/file-posix.c | 39 ++++++++++++++++-----------------------
- 1 file changed, 16 insertions(+), 23 deletions(-)
+ tests/qemu-iotests/082.out | 956 ++++++++++++++++++-------------------
+ 1 file changed, 478 insertions(+), 478 deletions(-)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 2da3a76355..b7f0316005 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -205,7 +205,7 @@ static int cdrom_reopen(BlockDriverState *bs);
- #endif
+diff --git a/tests/qemu-iotests/082.out b/tests/qemu-iotests/082.out
+index 19e9fb13ff..2672349e1d 100644
+--- a/tests/qemu-iotests/082.out
++++ b/tests/qemu-iotests/082.out
+@@ -44,171 +44,171 @@ cluster_size: 8192
  
- #if defined(__NetBSD__)
--static int raw_normalize_devicepath(const char **filename)
-+static int raw_normalize_devicepath(const char **filename, Error **errp)
- {
-     static char namebuf[PATH_MAX];
-     const char *dp, *fname;
-@@ -214,8 +214,7 @@ static int raw_normalize_devicepath(const char **filename)
-     fname = *filename;
-     dp = strrchr(fname, '/');
-     if (lstat(fname, &sb) < 0) {
--        fprintf(stderr, "%s: stat failed: %s\n",
--            fname, strerror(errno));
-+        error_setg(errp, "%s: stat failed: %s", fname, strerror(errno));
-         return -errno;
-     }
+ Testing: create -f qcow2 -o help TEST_DIR/t.qcow2 128M
+ Supported options:
+-size             Virtual disk size
+-compat           Compatibility level (0.10 or 1.1)
+-backing_file     File name of a base image
+-backing_fmt      Image format of the base image
+-encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+-encrypt.format   Encrypt the image, format choices: 'aes', 'luks'
+-encrypt.key-secret ID of secret providing qcow AES key or LUKS passphrase
+-encrypt.cipher-alg Name of encryption cipher algorithm
+-encrypt.cipher-mode Name of encryption cipher mode
+-encrypt.ivgen-alg Name of IV generator algorithm
+-encrypt.ivgen-hash-alg Name of IV generator hash algorithm
+-encrypt.hash-alg Name of encryption hash algorithm
+-encrypt.iter-time Time to spend in PBKDF in milliseconds
+-cluster_size     qcow2 cluster size
+-preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+-lazy_refcounts   Postpone refcount updates
+-refcount_bits    Width of a reference count entry in bits
+-nocow            Turn off copy-on-write (valid only on btrfs)
++backing_file=str - File name of a base image
++backing_fmt=str - Image format of the base image
++cluster_size=size - qcow2 cluster size
++compat=str - Compatibility level (0.10 or 1.1)
++encrypt.cipher-alg=str - Name of encryption cipher algorithm
++encrypt.cipher-mode=str - Name of encryption cipher mode
++encrypt.format=str - Encrypt the image, format choices: 'aes', 'luks'
++encrypt.hash-alg=str - Name of encryption hash algorithm
++encrypt.iter-time=num - Time to spend in PBKDF in milliseconds
++encrypt.ivgen-alg=str - Name of IV generator algorithm
++encrypt.ivgen-hash-alg=str - Name of IV generator hash algorithm
++encrypt.key-secret=str - ID of secret providing qcow AES key or LUKS passphrase
++encryption=bool (on/off) - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++lazy_refcounts=bool (on/off) - Postpone refcount updates
++nocow=bool (on/off) - Turn off copy-on-write (valid only on btrfs)
++preallocation=str - Preallocation mode (allowed values: off, metadata, falloc, full)
++refcount_bits=num - Width of a reference count entry in bits
++size=size - Virtual disk size
  
-@@ -229,14 +228,13 @@ static int raw_normalize_devicepath(const char **filename)
-         snprintf(namebuf, PATH_MAX, "%.*s/r%s",
-             (int)(dp - fname), fname, dp + 1);
-     }
--    fprintf(stderr, "%s is a block device", fname);
-     *filename = namebuf;
--    fprintf(stderr, ", using %s\n", *filename);
-+    warn_report("%s is a block device, using %s", fname, *filename);
+ Testing: create -f qcow2 -o ? TEST_DIR/t.qcow2 128M
+ Supported options:
+-size             Virtual disk size
+-compat           Compatibility level (0.10 or 1.1)
+-backing_file     File name of a base image
+-backing_fmt      Image format of the base image
+-encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+-encrypt.format   Encrypt the image, format choices: 'aes', 'luks'
+-encrypt.key-secret ID of secret providing qcow AES key or LUKS passphrase
+-encrypt.cipher-alg Name of encryption cipher algorithm
+-encrypt.cipher-mode Name of encryption cipher mode
+-encrypt.ivgen-alg Name of IV generator algorithm
+-encrypt.ivgen-hash-alg Name of IV generator hash algorithm
+-encrypt.hash-alg Name of encryption hash algorithm
+-encrypt.iter-time Time to spend in PBKDF in milliseconds
+-cluster_size     qcow2 cluster size
+-preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+-lazy_refcounts   Postpone refcount updates
+-refcount_bits    Width of a reference count entry in bits
+-nocow            Turn off copy-on-write (valid only on btrfs)
++backing_file=str - File name of a base image
++backing_fmt=str - Image format of the base image
++cluster_size=size - qcow2 cluster size
++compat=str - Compatibility level (0.10 or 1.1)
++encrypt.cipher-alg=str - Name of encryption cipher algorithm
++encrypt.cipher-mode=str - Name of encryption cipher mode
++encrypt.format=str - Encrypt the image, format choices: 'aes', 'luks'
++encrypt.hash-alg=str - Name of encryption hash algorithm
++encrypt.iter-time=num - Time to spend in PBKDF in milliseconds
++encrypt.ivgen-alg=str - Name of IV generator algorithm
++encrypt.ivgen-hash-alg=str - Name of IV generator hash algorithm
++encrypt.key-secret=str - ID of secret providing qcow AES key or LUKS passphrase
++encryption=bool (on/off) - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++lazy_refcounts=bool (on/off) - Postpone refcount updates
++nocow=bool (on/off) - Turn off copy-on-write (valid only on btrfs)
++preallocation=str - Preallocation mode (allowed values: off, metadata, falloc, full)
++refcount_bits=num - Width of a reference count entry in bits
++size=size - Virtual disk size
  
-     return 0;
- }
- #else
--static int raw_normalize_devicepath(const char **filename)
-+static int raw_normalize_devicepath(const char **filename, Error **errp)
- {
-     return 0;
- }
-@@ -461,9 +459,8 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
+ Testing: create -f qcow2 -o cluster_size=4k,help TEST_DIR/t.qcow2 128M
+ Supported options:
+-size             Virtual disk size
+-compat           Compatibility level (0.10 or 1.1)
+-backing_file     File name of a base image
+-backing_fmt      Image format of the base image
+-encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+-encrypt.format   Encrypt the image, format choices: 'aes', 'luks'
+-encrypt.key-secret ID of secret providing qcow AES key or LUKS passphrase
+-encrypt.cipher-alg Name of encryption cipher algorithm
+-encrypt.cipher-mode Name of encryption cipher mode
+-encrypt.ivgen-alg Name of IV generator algorithm
+-encrypt.ivgen-hash-alg Name of IV generator hash algorithm
+-encrypt.hash-alg Name of encryption hash algorithm
+-encrypt.iter-time Time to spend in PBKDF in milliseconds
+-cluster_size     qcow2 cluster size
+-preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+-lazy_refcounts   Postpone refcount updates
+-refcount_bits    Width of a reference count entry in bits
+-nocow            Turn off copy-on-write (valid only on btrfs)
++backing_file=str - File name of a base image
++backing_fmt=str - Image format of the base image
++cluster_size=size - qcow2 cluster size
++compat=str - Compatibility level (0.10 or 1.1)
++encrypt.cipher-alg=str - Name of encryption cipher algorithm
++encrypt.cipher-mode=str - Name of encryption cipher mode
++encrypt.format=str - Encrypt the image, format choices: 'aes', 'luks'
++encrypt.hash-alg=str - Name of encryption hash algorithm
++encrypt.iter-time=num - Time to spend in PBKDF in milliseconds
++encrypt.ivgen-alg=str - Name of IV generator algorithm
++encrypt.ivgen-hash-alg=str - Name of IV generator hash algorithm
++encrypt.key-secret=str - ID of secret providing qcow AES key or LUKS passphrase
++encryption=bool (on/off) - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++lazy_refcounts=bool (on/off) - Postpone refcount updates
++nocow=bool (on/off) - Turn off copy-on-write (valid only on btrfs)
++preallocation=str - Preallocation mode (allowed values: off, metadata, falloc, full)
++refcount_bits=num - Width of a reference count entry in bits
++size=size - Virtual disk size
  
-     filename = qemu_opt_get(opts, "filename");
+ Testing: create -f qcow2 -o cluster_size=4k,? TEST_DIR/t.qcow2 128M
+ Supported options:
+-size             Virtual disk size
+-compat           Compatibility level (0.10 or 1.1)
+-backing_file     File name of a base image
+-backing_fmt      Image format of the base image
+-encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+-encrypt.format   Encrypt the image, format choices: 'aes', 'luks'
+-encrypt.key-secret ID of secret providing qcow AES key or LUKS passphrase
+-encrypt.cipher-alg Name of encryption cipher algorithm
+-encrypt.cipher-mode Name of encryption cipher mode
+-encrypt.ivgen-alg Name of IV generator algorithm
+-encrypt.ivgen-hash-alg Name of IV generator hash algorithm
+-encrypt.hash-alg Name of encryption hash algorithm
+-encrypt.iter-time Time to spend in PBKDF in milliseconds
+-cluster_size     qcow2 cluster size
+-preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+-lazy_refcounts   Postpone refcount updates
+-refcount_bits    Width of a reference count entry in bits
+-nocow            Turn off copy-on-write (valid only on btrfs)
++backing_file=str - File name of a base image
++backing_fmt=str - Image format of the base image
++cluster_size=size - qcow2 cluster size
++compat=str - Compatibility level (0.10 or 1.1)
++encrypt.cipher-alg=str - Name of encryption cipher algorithm
++encrypt.cipher-mode=str - Name of encryption cipher mode
++encrypt.format=str - Encrypt the image, format choices: 'aes', 'luks'
++encrypt.hash-alg=str - Name of encryption hash algorithm
++encrypt.iter-time=num - Time to spend in PBKDF in milliseconds
++encrypt.ivgen-alg=str - Name of IV generator algorithm
++encrypt.ivgen-hash-alg=str - Name of IV generator hash algorithm
++encrypt.key-secret=str - ID of secret providing qcow AES key or LUKS passphrase
++encryption=bool (on/off) - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++lazy_refcounts=bool (on/off) - Postpone refcount updates
++nocow=bool (on/off) - Turn off copy-on-write (valid only on btrfs)
++preallocation=str - Preallocation mode (allowed values: off, metadata, falloc, full)
++refcount_bits=num - Width of a reference count entry in bits
++size=size - Virtual disk size
  
--    ret = raw_normalize_devicepath(&filename);
-+    ret = raw_normalize_devicepath(&filename, errp);
-     if (ret != 0) {
--        error_setg_errno(errp, -ret, "Could not normalize device path");
-         goto fail;
-     }
+ Testing: create -f qcow2 -o help,cluster_size=4k TEST_DIR/t.qcow2 128M
+ Supported options:
+-size             Virtual disk size
+-compat           Compatibility level (0.10 or 1.1)
+-backing_file     File name of a base image
+-backing_fmt      Image format of the base image
+-encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+-encrypt.format   Encrypt the image, format choices: 'aes', 'luks'
+-encrypt.key-secret ID of secret providing qcow AES key or LUKS passphrase
+-encrypt.cipher-alg Name of encryption cipher algorithm
+-encrypt.cipher-mode Name of encryption cipher mode
+-encrypt.ivgen-alg Name of IV generator algorithm
+-encrypt.ivgen-hash-alg Name of IV generator hash algorithm
+-encrypt.hash-alg Name of encryption hash algorithm
+-encrypt.iter-time Time to spend in PBKDF in milliseconds
+-cluster_size     qcow2 cluster size
+-preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+-lazy_refcounts   Postpone refcount updates
+-refcount_bits    Width of a reference count entry in bits
+-nocow            Turn off copy-on-write (valid only on btrfs)
++backing_file=str - File name of a base image
++backing_fmt=str - Image format of the base image
++cluster_size=size - qcow2 cluster size
++compat=str - Compatibility level (0.10 or 1.1)
++encrypt.cipher-alg=str - Name of encryption cipher algorithm
++encrypt.cipher-mode=str - Name of encryption cipher mode
++encrypt.format=str - Encrypt the image, format choices: 'aes', 'luks'
++encrypt.hash-alg=str - Name of encryption hash algorithm
++encrypt.iter-time=num - Time to spend in PBKDF in milliseconds
++encrypt.ivgen-alg=str - Name of IV generator algorithm
++encrypt.ivgen-hash-alg=str - Name of IV generator hash algorithm
++encrypt.key-secret=str - ID of secret providing qcow AES key or LUKS passphrase
++encryption=bool (on/off) - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++lazy_refcounts=bool (on/off) - Postpone refcount updates
++nocow=bool (on/off) - Turn off copy-on-write (valid only on btrfs)
++preallocation=str - Preallocation mode (allowed values: off, metadata, falloc, full)
++refcount_bits=num - Width of a reference count entry in bits
++size=size - Virtual disk size
  
-@@ -492,11 +489,10 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
-     case ON_OFF_AUTO_ON:
-         s->use_lock = true;
-         if (!qemu_has_ofd_lock()) {
--            fprintf(stderr,
--                    "File lock requested but OFD locking syscall is "
--                    "unavailable, falling back to POSIX file locks.\n"
--                    "Due to the implementation, locks can be lost "
--                    "unexpectedly.\n");
-+            warn_report("File lock requested but OFD locking syscall is "
-+                        "unavailable, falling back to POSIX file locks");
-+            error_printf("Due to the implementation, locks can be lost "
-+                         "unexpectedly.\n");
-         }
-         break;
-     case ON_OFF_AUTO_OFF:
-@@ -805,7 +801,7 @@ static int raw_handle_perm_lock(BlockDriverState *bs,
-             /* Theoretically the above call only unlocks bytes and it cannot
-              * fail. Something weird happened, report it.
-              */
--            error_report_err(local_err);
-+            warn_report_err(local_err);
-         }
-         break;
-     case RAW_PL_COMMIT:
-@@ -815,7 +811,7 @@ static int raw_handle_perm_lock(BlockDriverState *bs,
-             /* Theoretically the above call only unlocks bytes and it cannot
-              * fail. Something weird happened, report it.
-              */
--            error_report_err(local_err);
-+            warn_report_err(local_err);
-         }
-         break;
-     }
-@@ -892,10 +888,8 @@ static int raw_reopen_prepare(BDRVReopenState *state,
-     /* If we cannot use fcntl, or fcntl failed, fall back to qemu_open() */
-     if (rs->fd == -1) {
-         const char *normalized_filename = state->bs->filename;
--        ret = raw_normalize_devicepath(&normalized_filename);
--        if (ret < 0) {
--            error_setg_errno(errp, -ret, "Could not normalize device path");
--        } else {
-+        ret = raw_normalize_devicepath(&normalized_filename, errp);
-+        if (ret >= 0) {
-             assert(!(rs->open_flags & O_CREAT));
-             rs->fd = qemu_open(normalized_filename, rs->open_flags);
-             if (rs->fd == -1) {
-@@ -1775,7 +1769,7 @@ static int aio_worker(void *arg)
-         ret = handle_aiocb_truncate(aiocb);
-         break;
-     default:
--        fprintf(stderr, "invalid aio request (0x%x)\n", aiocb->aio_type);
-+        error_report("invalid aio request (0x%x)", aiocb->aio_type);
-         ret = -EINVAL;
-         break;
-     }
-@@ -2263,7 +2257,7 @@ out_unlock:
-          * not mean the whole creation operation has failed.  So
-          * report it the user for their convenience, but do not report
-          * it to the caller. */
--        error_report_err(local_err);
-+        warn_report_err(local_err);
-     }
+ Testing: create -f qcow2 -o ?,cluster_size=4k TEST_DIR/t.qcow2 128M
+ Supported options:
+-size             Virtual disk size
+-compat           Compatibility level (0.10 or 1.1)
+-backing_file     File name of a base image
+-backing_fmt      Image format of the base image
+-encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+-encrypt.format   Encrypt the image, format choices: 'aes', 'luks'
+-encrypt.key-secret ID of secret providing qcow AES key or LUKS passphrase
+-encrypt.cipher-alg Name of encryption cipher algorithm
+-encrypt.cipher-mode Name of encryption cipher mode
+-encrypt.ivgen-alg Name of IV generator algorithm
+-encrypt.ivgen-hash-alg Name of IV generator hash algorithm
+-encrypt.hash-alg Name of encryption hash algorithm
+-encrypt.iter-time Time to spend in PBKDF in milliseconds
+-cluster_size     qcow2 cluster size
+-preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+-lazy_refcounts   Postpone refcount updates
+-refcount_bits    Width of a reference count entry in bits
+-nocow            Turn off copy-on-write (valid only on btrfs)
++backing_file=str - File name of a base image
++backing_fmt=str - Image format of the base image
++cluster_size=size - qcow2 cluster size
++compat=str - Compatibility level (0.10 or 1.1)
++encrypt.cipher-alg=str - Name of encryption cipher algorithm
++encrypt.cipher-mode=str - Name of encryption cipher mode
++encrypt.format=str - Encrypt the image, format choices: 'aes', 'luks'
++encrypt.hash-alg=str - Name of encryption hash algorithm
++encrypt.iter-time=num - Time to spend in PBKDF in milliseconds
++encrypt.ivgen-alg=str - Name of IV generator algorithm
++encrypt.ivgen-hash-alg=str - Name of IV generator hash algorithm
++encrypt.key-secret=str - ID of secret providing qcow AES key or LUKS passphrase
++encryption=bool (on/off) - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++lazy_refcounts=bool (on/off) - Postpone refcount updates
++nocow=bool (on/off) - Turn off copy-on-write (valid only on btrfs)
++preallocation=str - Preallocation mode (allowed values: off, metadata, falloc, full)
++refcount_bits=num - Width of a reference count entry in bits
++size=size - Virtual disk size
  
- out_close:
-@@ -3128,9 +3122,8 @@ static int coroutine_fn hdev_co_create_opts(const char *filename, QemuOpts *opts
+ Testing: create -f qcow2 -o cluster_size=4k -o help TEST_DIR/t.qcow2 128M
+ Supported options:
+-size             Virtual disk size
+-compat           Compatibility level (0.10 or 1.1)
+-backing_file     File name of a base image
+-backing_fmt      Image format of the base image
+-encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+-encrypt.format   Encrypt the image, format choices: 'aes', 'luks'
+-encrypt.key-secret ID of secret providing qcow AES key or LUKS passphrase
+-encrypt.cipher-alg Name of encryption cipher algorithm
+-encrypt.cipher-mode Name of encryption cipher mode
+-encrypt.ivgen-alg Name of IV generator algorithm
+-encrypt.ivgen-hash-alg Name of IV generator hash algorithm
+-encrypt.hash-alg Name of encryption hash algorithm
+-encrypt.iter-time Time to spend in PBKDF in milliseconds
+-cluster_size     qcow2 cluster size
+-preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+-lazy_refcounts   Postpone refcount updates
+-refcount_bits    Width of a reference count entry in bits
+-nocow            Turn off copy-on-write (valid only on btrfs)
++backing_file=str - File name of a base image
++backing_fmt=str - Image format of the base image
++cluster_size=size - qcow2 cluster size
++compat=str - Compatibility level (0.10 or 1.1)
++encrypt.cipher-alg=str - Name of encryption cipher algorithm
++encrypt.cipher-mode=str - Name of encryption cipher mode
++encrypt.format=str - Encrypt the image, format choices: 'aes', 'luks'
++encrypt.hash-alg=str - Name of encryption hash algorithm
++encrypt.iter-time=num - Time to spend in PBKDF in milliseconds
++encrypt.ivgen-alg=str - Name of IV generator algorithm
++encrypt.ivgen-hash-alg=str - Name of IV generator hash algorithm
++encrypt.key-secret=str - ID of secret providing qcow AES key or LUKS passphrase
++encryption=bool (on/off) - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++lazy_refcounts=bool (on/off) - Postpone refcount updates
++nocow=bool (on/off) - Turn off copy-on-write (valid only on btrfs)
++preallocation=str - Preallocation mode (allowed values: off, metadata, falloc, full)
++refcount_bits=num - Width of a reference count entry in bits
++size=size - Virtual disk size
  
-     (void)has_prefix;
+ Testing: create -f qcow2 -o cluster_size=4k -o ? TEST_DIR/t.qcow2 128M
+ Supported options:
+-size             Virtual disk size
+-compat           Compatibility level (0.10 or 1.1)
+-backing_file     File name of a base image
+-backing_fmt      Image format of the base image
+-encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+-encrypt.format   Encrypt the image, format choices: 'aes', 'luks'
+-encrypt.key-secret ID of secret providing qcow AES key or LUKS passphrase
+-encrypt.cipher-alg Name of encryption cipher algorithm
+-encrypt.cipher-mode Name of encryption cipher mode
+-encrypt.ivgen-alg Name of IV generator algorithm
+-encrypt.ivgen-hash-alg Name of IV generator hash algorithm
+-encrypt.hash-alg Name of encryption hash algorithm
+-encrypt.iter-time Time to spend in PBKDF in milliseconds
+-cluster_size     qcow2 cluster size
+-preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+-lazy_refcounts   Postpone refcount updates
+-refcount_bits    Width of a reference count entry in bits
+-nocow            Turn off copy-on-write (valid only on btrfs)
++backing_file=str - File name of a base image
++backing_fmt=str - Image format of the base image
++cluster_size=size - qcow2 cluster size
++compat=str - Compatibility level (0.10 or 1.1)
++encrypt.cipher-alg=str - Name of encryption cipher algorithm
++encrypt.cipher-mode=str - Name of encryption cipher mode
++encrypt.format=str - Encrypt the image, format choices: 'aes', 'luks'
++encrypt.hash-alg=str - Name of encryption hash algorithm
++encrypt.iter-time=num - Time to spend in PBKDF in milliseconds
++encrypt.ivgen-alg=str - Name of IV generator algorithm
++encrypt.ivgen-hash-alg=str - Name of IV generator hash algorithm
++encrypt.key-secret=str - ID of secret providing qcow AES key or LUKS passphrase
++encryption=bool (on/off) - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++lazy_refcounts=bool (on/off) - Postpone refcount updates
++nocow=bool (on/off) - Turn off copy-on-write (valid only on btrfs)
++preallocation=str - Preallocation mode (allowed values: off, metadata, falloc, full)
++refcount_bits=num - Width of a reference count entry in bits
++size=size - Virtual disk size
  
--    ret = raw_normalize_devicepath(&filename);
-+    ret = raw_normalize_devicepath(&filename, errp);
-     if (ret < 0) {
--        error_setg_errno(errp, -ret, "Could not normalize device path");
-         return ret;
-     }
+ Testing: create -f qcow2 -u -o backing_file=TEST_DIR/t.qcow2,,help TEST_DIR/t.qcow2 128M
+ Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/t.qcow2,,help cluster_size=65536 lazy_refcounts=off refcount_bits=16
+@@ -227,27 +227,27 @@ qemu-img: Invalid option list: ,,
  
+ Testing: create -f qcow2 -o help
+ Supported options:
+-size             Virtual disk size
+-compat           Compatibility level (0.10 or 1.1)
+-backing_file     File name of a base image
+-backing_fmt      Image format of the base image
+-encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+-encrypt.format   Encrypt the image, format choices: 'aes', 'luks'
+-encrypt.key-secret ID of secret providing qcow AES key or LUKS passphrase
+-encrypt.cipher-alg Name of encryption cipher algorithm
+-encrypt.cipher-mode Name of encryption cipher mode
+-encrypt.ivgen-alg Name of IV generator algorithm
+-encrypt.ivgen-hash-alg Name of IV generator hash algorithm
+-encrypt.hash-alg Name of encryption hash algorithm
+-encrypt.iter-time Time to spend in PBKDF in milliseconds
+-cluster_size     qcow2 cluster size
+-preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+-lazy_refcounts   Postpone refcount updates
+-refcount_bits    Width of a reference count entry in bits
++backing_file=str - File name of a base image
++backing_fmt=str - Image format of the base image
++cluster_size=size - qcow2 cluster size
++compat=str - Compatibility level (0.10 or 1.1)
++encrypt.cipher-alg=str - Name of encryption cipher algorithm
++encrypt.cipher-mode=str - Name of encryption cipher mode
++encrypt.format=str - Encrypt the image, format choices: 'aes', 'luks'
++encrypt.hash-alg=str - Name of encryption hash algorithm
++encrypt.iter-time=num - Time to spend in PBKDF in milliseconds
++encrypt.ivgen-alg=str - Name of IV generator algorithm
++encrypt.ivgen-hash-alg=str - Name of IV generator hash algorithm
++encrypt.key-secret=str - ID of secret providing qcow AES key or LUKS passphrase
++encryption=bool (on/off) - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++lazy_refcounts=bool (on/off) - Postpone refcount updates
++preallocation=str - Preallocation mode (allowed values: off, metadata, falloc, full)
++refcount_bits=num - Width of a reference count entry in bits
++size=size - Virtual disk size
+ 
+ Testing: create -o help
+ Supported options:
+-size             Virtual disk size
++size=size - Virtual disk size
+ 
+ Testing: create -f bochs -o help
+ qemu-img: Format driver 'bochs' does not support image creation
+@@ -300,171 +300,171 @@ cluster_size: 8192
+ 
+ Testing: convert -O qcow2 -o help TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.base
+ Supported options:
+-size             Virtual disk size
+-compat           Compatibility level (0.10 or 1.1)
+-backing_file     File name of a base image
+-backing_fmt      Image format of the base image
+-encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+-encrypt.format   Encrypt the image, format choices: 'aes', 'luks'
+-encrypt.key-secret ID of secret providing qcow AES key or LUKS passphrase
+-encrypt.cipher-alg Name of encryption cipher algorithm
+-encrypt.cipher-mode Name of encryption cipher mode
+-encrypt.ivgen-alg Name of IV generator algorithm
+-encrypt.ivgen-hash-alg Name of IV generator hash algorithm
+-encrypt.hash-alg Name of encryption hash algorithm
+-encrypt.iter-time Time to spend in PBKDF in milliseconds
+-cluster_size     qcow2 cluster size
+-preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+-lazy_refcounts   Postpone refcount updates
+-refcount_bits    Width of a reference count entry in bits
+-nocow            Turn off copy-on-write (valid only on btrfs)
++backing_file=str - File name of a base image
++backing_fmt=str - Image format of the base image
++cluster_size=size - qcow2 cluster size
++compat=str - Compatibility level (0.10 or 1.1)
++encrypt.cipher-alg=str - Name of encryption cipher algorithm
++encrypt.cipher-mode=str - Name of encryption cipher mode
++encrypt.format=str - Encrypt the image, format choices: 'aes', 'luks'
++encrypt.hash-alg=str - Name of encryption hash algorithm
++encrypt.iter-time=num - Time to spend in PBKDF in milliseconds
++encrypt.ivgen-alg=str - Name of IV generator algorithm
++encrypt.ivgen-hash-alg=str - Name of IV generator hash algorithm
++encrypt.key-secret=str - ID of secret providing qcow AES key or LUKS passphrase
++encryption=bool (on/off) - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++lazy_refcounts=bool (on/off) - Postpone refcount updates
++nocow=bool (on/off) - Turn off copy-on-write (valid only on btrfs)
++preallocation=str - Preallocation mode (allowed values: off, metadata, falloc, full)
++refcount_bits=num - Width of a reference count entry in bits
++size=size - Virtual disk size
+ 
+ Testing: convert -O qcow2 -o ? TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.base
+ Supported options:
+-size             Virtual disk size
+-compat           Compatibility level (0.10 or 1.1)
+-backing_file     File name of a base image
+-backing_fmt      Image format of the base image
+-encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+-encrypt.format   Encrypt the image, format choices: 'aes', 'luks'
+-encrypt.key-secret ID of secret providing qcow AES key or LUKS passphrase
+-encrypt.cipher-alg Name of encryption cipher algorithm
+-encrypt.cipher-mode Name of encryption cipher mode
+-encrypt.ivgen-alg Name of IV generator algorithm
+-encrypt.ivgen-hash-alg Name of IV generator hash algorithm
+-encrypt.hash-alg Name of encryption hash algorithm
+-encrypt.iter-time Time to spend in PBKDF in milliseconds
+-cluster_size     qcow2 cluster size
+-preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+-lazy_refcounts   Postpone refcount updates
+-refcount_bits    Width of a reference count entry in bits
+-nocow            Turn off copy-on-write (valid only on btrfs)
++backing_file=str - File name of a base image
++backing_fmt=str - Image format of the base image
++cluster_size=size - qcow2 cluster size
++compat=str - Compatibility level (0.10 or 1.1)
++encrypt.cipher-alg=str - Name of encryption cipher algorithm
++encrypt.cipher-mode=str - Name of encryption cipher mode
++encrypt.format=str - Encrypt the image, format choices: 'aes', 'luks'
++encrypt.hash-alg=str - Name of encryption hash algorithm
++encrypt.iter-time=num - Time to spend in PBKDF in milliseconds
++encrypt.ivgen-alg=str - Name of IV generator algorithm
++encrypt.ivgen-hash-alg=str - Name of IV generator hash algorithm
++encrypt.key-secret=str - ID of secret providing qcow AES key or LUKS passphrase
++encryption=bool (on/off) - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++lazy_refcounts=bool (on/off) - Postpone refcount updates
++nocow=bool (on/off) - Turn off copy-on-write (valid only on btrfs)
++preallocation=str - Preallocation mode (allowed values: off, metadata, falloc, full)
++refcount_bits=num - Width of a reference count entry in bits
++size=size - Virtual disk size
+ 
+ Testing: convert -O qcow2 -o cluster_size=4k,help TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.base
+ Supported options:
+-size             Virtual disk size
+-compat           Compatibility level (0.10 or 1.1)
+-backing_file     File name of a base image
+-backing_fmt      Image format of the base image
+-encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+-encrypt.format   Encrypt the image, format choices: 'aes', 'luks'
+-encrypt.key-secret ID of secret providing qcow AES key or LUKS passphrase
+-encrypt.cipher-alg Name of encryption cipher algorithm
+-encrypt.cipher-mode Name of encryption cipher mode
+-encrypt.ivgen-alg Name of IV generator algorithm
+-encrypt.ivgen-hash-alg Name of IV generator hash algorithm
+-encrypt.hash-alg Name of encryption hash algorithm
+-encrypt.iter-time Time to spend in PBKDF in milliseconds
+-cluster_size     qcow2 cluster size
+-preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+-lazy_refcounts   Postpone refcount updates
+-refcount_bits    Width of a reference count entry in bits
+-nocow            Turn off copy-on-write (valid only on btrfs)
++backing_file=str - File name of a base image
++backing_fmt=str - Image format of the base image
++cluster_size=size - qcow2 cluster size
++compat=str - Compatibility level (0.10 or 1.1)
++encrypt.cipher-alg=str - Name of encryption cipher algorithm
++encrypt.cipher-mode=str - Name of encryption cipher mode
++encrypt.format=str - Encrypt the image, format choices: 'aes', 'luks'
++encrypt.hash-alg=str - Name of encryption hash algorithm
++encrypt.iter-time=num - Time to spend in PBKDF in milliseconds
++encrypt.ivgen-alg=str - Name of IV generator algorithm
++encrypt.ivgen-hash-alg=str - Name of IV generator hash algorithm
++encrypt.key-secret=str - ID of secret providing qcow AES key or LUKS passphrase
++encryption=bool (on/off) - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++lazy_refcounts=bool (on/off) - Postpone refcount updates
++nocow=bool (on/off) - Turn off copy-on-write (valid only on btrfs)
++preallocation=str - Preallocation mode (allowed values: off, metadata, falloc, full)
++refcount_bits=num - Width of a reference count entry in bits
++size=size - Virtual disk size
+ 
+ Testing: convert -O qcow2 -o cluster_size=4k,? TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.base
+ Supported options:
+-size             Virtual disk size
+-compat           Compatibility level (0.10 or 1.1)
+-backing_file     File name of a base image
+-backing_fmt      Image format of the base image
+-encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+-encrypt.format   Encrypt the image, format choices: 'aes', 'luks'
+-encrypt.key-secret ID of secret providing qcow AES key or LUKS passphrase
+-encrypt.cipher-alg Name of encryption cipher algorithm
+-encrypt.cipher-mode Name of encryption cipher mode
+-encrypt.ivgen-alg Name of IV generator algorithm
+-encrypt.ivgen-hash-alg Name of IV generator hash algorithm
+-encrypt.hash-alg Name of encryption hash algorithm
+-encrypt.iter-time Time to spend in PBKDF in milliseconds
+-cluster_size     qcow2 cluster size
+-preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+-lazy_refcounts   Postpone refcount updates
+-refcount_bits    Width of a reference count entry in bits
+-nocow            Turn off copy-on-write (valid only on btrfs)
++backing_file=str - File name of a base image
++backing_fmt=str - Image format of the base image
++cluster_size=size - qcow2 cluster size
++compat=str - Compatibility level (0.10 or 1.1)
++encrypt.cipher-alg=str - Name of encryption cipher algorithm
++encrypt.cipher-mode=str - Name of encryption cipher mode
++encrypt.format=str - Encrypt the image, format choices: 'aes', 'luks'
++encrypt.hash-alg=str - Name of encryption hash algorithm
++encrypt.iter-time=num - Time to spend in PBKDF in milliseconds
++encrypt.ivgen-alg=str - Name of IV generator algorithm
++encrypt.ivgen-hash-alg=str - Name of IV generator hash algorithm
++encrypt.key-secret=str - ID of secret providing qcow AES key or LUKS passphrase
++encryption=bool (on/off) - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++lazy_refcounts=bool (on/off) - Postpone refcount updates
++nocow=bool (on/off) - Turn off copy-on-write (valid only on btrfs)
++preallocation=str - Preallocation mode (allowed values: off, metadata, falloc, full)
++refcount_bits=num - Width of a reference count entry in bits
++size=size - Virtual disk size
+ 
+ Testing: convert -O qcow2 -o help,cluster_size=4k TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.base
+ Supported options:
+-size             Virtual disk size
+-compat           Compatibility level (0.10 or 1.1)
+-backing_file     File name of a base image
+-backing_fmt      Image format of the base image
+-encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+-encrypt.format   Encrypt the image, format choices: 'aes', 'luks'
+-encrypt.key-secret ID of secret providing qcow AES key or LUKS passphrase
+-encrypt.cipher-alg Name of encryption cipher algorithm
+-encrypt.cipher-mode Name of encryption cipher mode
+-encrypt.ivgen-alg Name of IV generator algorithm
+-encrypt.ivgen-hash-alg Name of IV generator hash algorithm
+-encrypt.hash-alg Name of encryption hash algorithm
+-encrypt.iter-time Time to spend in PBKDF in milliseconds
+-cluster_size     qcow2 cluster size
+-preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+-lazy_refcounts   Postpone refcount updates
+-refcount_bits    Width of a reference count entry in bits
+-nocow            Turn off copy-on-write (valid only on btrfs)
++backing_file=str - File name of a base image
++backing_fmt=str - Image format of the base image
++cluster_size=size - qcow2 cluster size
++compat=str - Compatibility level (0.10 or 1.1)
++encrypt.cipher-alg=str - Name of encryption cipher algorithm
++encrypt.cipher-mode=str - Name of encryption cipher mode
++encrypt.format=str - Encrypt the image, format choices: 'aes', 'luks'
++encrypt.hash-alg=str - Name of encryption hash algorithm
++encrypt.iter-time=num - Time to spend in PBKDF in milliseconds
++encrypt.ivgen-alg=str - Name of IV generator algorithm
++encrypt.ivgen-hash-alg=str - Name of IV generator hash algorithm
++encrypt.key-secret=str - ID of secret providing qcow AES key or LUKS passphrase
++encryption=bool (on/off) - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++lazy_refcounts=bool (on/off) - Postpone refcount updates
++nocow=bool (on/off) - Turn off copy-on-write (valid only on btrfs)
++preallocation=str - Preallocation mode (allowed values: off, metadata, falloc, full)
++refcount_bits=num - Width of a reference count entry in bits
++size=size - Virtual disk size
+ 
+ Testing: convert -O qcow2 -o ?,cluster_size=4k TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.base
+ Supported options:
+-size             Virtual disk size
+-compat           Compatibility level (0.10 or 1.1)
+-backing_file     File name of a base image
+-backing_fmt      Image format of the base image
+-encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+-encrypt.format   Encrypt the image, format choices: 'aes', 'luks'
+-encrypt.key-secret ID of secret providing qcow AES key or LUKS passphrase
+-encrypt.cipher-alg Name of encryption cipher algorithm
+-encrypt.cipher-mode Name of encryption cipher mode
+-encrypt.ivgen-alg Name of IV generator algorithm
+-encrypt.ivgen-hash-alg Name of IV generator hash algorithm
+-encrypt.hash-alg Name of encryption hash algorithm
+-encrypt.iter-time Time to spend in PBKDF in milliseconds
+-cluster_size     qcow2 cluster size
+-preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+-lazy_refcounts   Postpone refcount updates
+-refcount_bits    Width of a reference count entry in bits
+-nocow            Turn off copy-on-write (valid only on btrfs)
++backing_file=str - File name of a base image
++backing_fmt=str - Image format of the base image
++cluster_size=size - qcow2 cluster size
++compat=str - Compatibility level (0.10 or 1.1)
++encrypt.cipher-alg=str - Name of encryption cipher algorithm
++encrypt.cipher-mode=str - Name of encryption cipher mode
++encrypt.format=str - Encrypt the image, format choices: 'aes', 'luks'
++encrypt.hash-alg=str - Name of encryption hash algorithm
++encrypt.iter-time=num - Time to spend in PBKDF in milliseconds
++encrypt.ivgen-alg=str - Name of IV generator algorithm
++encrypt.ivgen-hash-alg=str - Name of IV generator hash algorithm
++encrypt.key-secret=str - ID of secret providing qcow AES key or LUKS passphrase
++encryption=bool (on/off) - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++lazy_refcounts=bool (on/off) - Postpone refcount updates
++nocow=bool (on/off) - Turn off copy-on-write (valid only on btrfs)
++preallocation=str - Preallocation mode (allowed values: off, metadata, falloc, full)
++refcount_bits=num - Width of a reference count entry in bits
++size=size - Virtual disk size
+ 
+ Testing: convert -O qcow2 -o cluster_size=4k -o help TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.base
+ Supported options:
+-size             Virtual disk size
+-compat           Compatibility level (0.10 or 1.1)
+-backing_file     File name of a base image
+-backing_fmt      Image format of the base image
+-encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+-encrypt.format   Encrypt the image, format choices: 'aes', 'luks'
+-encrypt.key-secret ID of secret providing qcow AES key or LUKS passphrase
+-encrypt.cipher-alg Name of encryption cipher algorithm
+-encrypt.cipher-mode Name of encryption cipher mode
+-encrypt.ivgen-alg Name of IV generator algorithm
+-encrypt.ivgen-hash-alg Name of IV generator hash algorithm
+-encrypt.hash-alg Name of encryption hash algorithm
+-encrypt.iter-time Time to spend in PBKDF in milliseconds
+-cluster_size     qcow2 cluster size
+-preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+-lazy_refcounts   Postpone refcount updates
+-refcount_bits    Width of a reference count entry in bits
+-nocow            Turn off copy-on-write (valid only on btrfs)
++backing_file=str - File name of a base image
++backing_fmt=str - Image format of the base image
++cluster_size=size - qcow2 cluster size
++compat=str - Compatibility level (0.10 or 1.1)
++encrypt.cipher-alg=str - Name of encryption cipher algorithm
++encrypt.cipher-mode=str - Name of encryption cipher mode
++encrypt.format=str - Encrypt the image, format choices: 'aes', 'luks'
++encrypt.hash-alg=str - Name of encryption hash algorithm
++encrypt.iter-time=num - Time to spend in PBKDF in milliseconds
++encrypt.ivgen-alg=str - Name of IV generator algorithm
++encrypt.ivgen-hash-alg=str - Name of IV generator hash algorithm
++encrypt.key-secret=str - ID of secret providing qcow AES key or LUKS passphrase
++encryption=bool (on/off) - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++lazy_refcounts=bool (on/off) - Postpone refcount updates
++nocow=bool (on/off) - Turn off copy-on-write (valid only on btrfs)
++preallocation=str - Preallocation mode (allowed values: off, metadata, falloc, full)
++refcount_bits=num - Width of a reference count entry in bits
++size=size - Virtual disk size
+ 
+ Testing: convert -O qcow2 -o cluster_size=4k -o ? TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.base
+ Supported options:
+-size             Virtual disk size
+-compat           Compatibility level (0.10 or 1.1)
+-backing_file     File name of a base image
+-backing_fmt      Image format of the base image
+-encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+-encrypt.format   Encrypt the image, format choices: 'aes', 'luks'
+-encrypt.key-secret ID of secret providing qcow AES key or LUKS passphrase
+-encrypt.cipher-alg Name of encryption cipher algorithm
+-encrypt.cipher-mode Name of encryption cipher mode
+-encrypt.ivgen-alg Name of IV generator algorithm
+-encrypt.ivgen-hash-alg Name of IV generator hash algorithm
+-encrypt.hash-alg Name of encryption hash algorithm
+-encrypt.iter-time Time to spend in PBKDF in milliseconds
+-cluster_size     qcow2 cluster size
+-preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+-lazy_refcounts   Postpone refcount updates
+-refcount_bits    Width of a reference count entry in bits
+-nocow            Turn off copy-on-write (valid only on btrfs)
++backing_file=str - File name of a base image
++backing_fmt=str - Image format of the base image
++cluster_size=size - qcow2 cluster size
++compat=str - Compatibility level (0.10 or 1.1)
++encrypt.cipher-alg=str - Name of encryption cipher algorithm
++encrypt.cipher-mode=str - Name of encryption cipher mode
++encrypt.format=str - Encrypt the image, format choices: 'aes', 'luks'
++encrypt.hash-alg=str - Name of encryption hash algorithm
++encrypt.iter-time=num - Time to spend in PBKDF in milliseconds
++encrypt.ivgen-alg=str - Name of IV generator algorithm
++encrypt.ivgen-hash-alg=str - Name of IV generator hash algorithm
++encrypt.key-secret=str - ID of secret providing qcow AES key or LUKS passphrase
++encryption=bool (on/off) - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++lazy_refcounts=bool (on/off) - Postpone refcount updates
++nocow=bool (on/off) - Turn off copy-on-write (valid only on btrfs)
++preallocation=str - Preallocation mode (allowed values: off, metadata, falloc, full)
++refcount_bits=num - Width of a reference count entry in bits
++size=size - Virtual disk size
+ 
+ Testing: convert -O qcow2 -o backing_file=TEST_DIR/t.qcow2,,help TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.base
+ qemu-img: Could not open 'TEST_DIR/t.qcow2.base': Could not open backing file: Could not open 'TEST_DIR/t.qcow2,help': No such file or directory
+@@ -483,27 +483,27 @@ qemu-img: Invalid option list: ,,
+ 
+ Testing: convert -O qcow2 -o help
+ Supported options:
+-size             Virtual disk size
+-compat           Compatibility level (0.10 or 1.1)
+-backing_file     File name of a base image
+-backing_fmt      Image format of the base image
+-encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+-encrypt.format   Encrypt the image, format choices: 'aes', 'luks'
+-encrypt.key-secret ID of secret providing qcow AES key or LUKS passphrase
+-encrypt.cipher-alg Name of encryption cipher algorithm
+-encrypt.cipher-mode Name of encryption cipher mode
+-encrypt.ivgen-alg Name of IV generator algorithm
+-encrypt.ivgen-hash-alg Name of IV generator hash algorithm
+-encrypt.hash-alg Name of encryption hash algorithm
+-encrypt.iter-time Time to spend in PBKDF in milliseconds
+-cluster_size     qcow2 cluster size
+-preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+-lazy_refcounts   Postpone refcount updates
+-refcount_bits    Width of a reference count entry in bits
++backing_file=str - File name of a base image
++backing_fmt=str - Image format of the base image
++cluster_size=size - qcow2 cluster size
++compat=str - Compatibility level (0.10 or 1.1)
++encrypt.cipher-alg=str - Name of encryption cipher algorithm
++encrypt.cipher-mode=str - Name of encryption cipher mode
++encrypt.format=str - Encrypt the image, format choices: 'aes', 'luks'
++encrypt.hash-alg=str - Name of encryption hash algorithm
++encrypt.iter-time=num - Time to spend in PBKDF in milliseconds
++encrypt.ivgen-alg=str - Name of IV generator algorithm
++encrypt.ivgen-hash-alg=str - Name of IV generator hash algorithm
++encrypt.key-secret=str - ID of secret providing qcow AES key or LUKS passphrase
++encryption=bool (on/off) - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++lazy_refcounts=bool (on/off) - Postpone refcount updates
++preallocation=str - Preallocation mode (allowed values: off, metadata, falloc, full)
++refcount_bits=num - Width of a reference count entry in bits
++size=size - Virtual disk size
+ 
+ Testing: convert -o help
+ Supported options:
+-size             Virtual disk size
++size=size - Virtual disk size
+ 
+ Testing: convert -O bochs -o help
+ qemu-img: Format driver 'bochs' does not support image creation
+@@ -564,177 +564,177 @@ cluster_size: 65536
+ 
+ Testing: amend -f qcow2 -o help TEST_DIR/t.qcow2
+ Creation options for 'qcow2':
+-size             Virtual disk size
+-compat           Compatibility level (0.10 or 1.1)
+-backing_file     File name of a base image
+-backing_fmt      Image format of the base image
+-encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+-encrypt.format   Encrypt the image, format choices: 'aes', 'luks'
+-encrypt.key-secret ID of secret providing qcow AES key or LUKS passphrase
+-encrypt.cipher-alg Name of encryption cipher algorithm
+-encrypt.cipher-mode Name of encryption cipher mode
+-encrypt.ivgen-alg Name of IV generator algorithm
+-encrypt.ivgen-hash-alg Name of IV generator hash algorithm
+-encrypt.hash-alg Name of encryption hash algorithm
+-encrypt.iter-time Time to spend in PBKDF in milliseconds
+-cluster_size     qcow2 cluster size
+-preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+-lazy_refcounts   Postpone refcount updates
+-refcount_bits    Width of a reference count entry in bits
++qcow2-create-opts.backing_file=str - File name of a base image
++qcow2-create-opts.backing_fmt=str - Image format of the base image
++qcow2-create-opts.cluster_size=size - qcow2 cluster size
++qcow2-create-opts.compat=str - Compatibility level (0.10 or 1.1)
++qcow2-create-opts.encrypt.cipher-alg=str - Name of encryption cipher algorithm
++qcow2-create-opts.encrypt.cipher-mode=str - Name of encryption cipher mode
++qcow2-create-opts.encrypt.format=str - Encrypt the image, format choices: 'aes', 'luks'
++qcow2-create-opts.encrypt.hash-alg=str - Name of encryption hash algorithm
++qcow2-create-opts.encrypt.iter-time=num - Time to spend in PBKDF in milliseconds
++qcow2-create-opts.encrypt.ivgen-alg=str - Name of IV generator algorithm
++qcow2-create-opts.encrypt.ivgen-hash-alg=str - Name of IV generator hash algorithm
++qcow2-create-opts.encrypt.key-secret=str - ID of secret providing qcow AES key or LUKS passphrase
++qcow2-create-opts.encryption=bool (on/off) - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++qcow2-create-opts.lazy_refcounts=bool (on/off) - Postpone refcount updates
++qcow2-create-opts.preallocation=str - Preallocation mode (allowed values: off, metadata, falloc, full)
++qcow2-create-opts.refcount_bits=num - Width of a reference count entry in bits
++qcow2-create-opts.size=size - Virtual disk size
+ 
+ Note that not all of these options may be amendable.
+ 
+ Testing: amend -f qcow2 -o ? TEST_DIR/t.qcow2
+ Creation options for 'qcow2':
+-size             Virtual disk size
+-compat           Compatibility level (0.10 or 1.1)
+-backing_file     File name of a base image
+-backing_fmt      Image format of the base image
+-encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+-encrypt.format   Encrypt the image, format choices: 'aes', 'luks'
+-encrypt.key-secret ID of secret providing qcow AES key or LUKS passphrase
+-encrypt.cipher-alg Name of encryption cipher algorithm
+-encrypt.cipher-mode Name of encryption cipher mode
+-encrypt.ivgen-alg Name of IV generator algorithm
+-encrypt.ivgen-hash-alg Name of IV generator hash algorithm
+-encrypt.hash-alg Name of encryption hash algorithm
+-encrypt.iter-time Time to spend in PBKDF in milliseconds
+-cluster_size     qcow2 cluster size
+-preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+-lazy_refcounts   Postpone refcount updates
+-refcount_bits    Width of a reference count entry in bits
++qcow2-create-opts.backing_file=str - File name of a base image
++qcow2-create-opts.backing_fmt=str - Image format of the base image
++qcow2-create-opts.cluster_size=size - qcow2 cluster size
++qcow2-create-opts.compat=str - Compatibility level (0.10 or 1.1)
++qcow2-create-opts.encrypt.cipher-alg=str - Name of encryption cipher algorithm
++qcow2-create-opts.encrypt.cipher-mode=str - Name of encryption cipher mode
++qcow2-create-opts.encrypt.format=str - Encrypt the image, format choices: 'aes', 'luks'
++qcow2-create-opts.encrypt.hash-alg=str - Name of encryption hash algorithm
++qcow2-create-opts.encrypt.iter-time=num - Time to spend in PBKDF in milliseconds
++qcow2-create-opts.encrypt.ivgen-alg=str - Name of IV generator algorithm
++qcow2-create-opts.encrypt.ivgen-hash-alg=str - Name of IV generator hash algorithm
++qcow2-create-opts.encrypt.key-secret=str - ID of secret providing qcow AES key or LUKS passphrase
++qcow2-create-opts.encryption=bool (on/off) - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++qcow2-create-opts.lazy_refcounts=bool (on/off) - Postpone refcount updates
++qcow2-create-opts.preallocation=str - Preallocation mode (allowed values: off, metadata, falloc, full)
++qcow2-create-opts.refcount_bits=num - Width of a reference count entry in bits
++qcow2-create-opts.size=size - Virtual disk size
+ 
+ Note that not all of these options may be amendable.
+ 
+ Testing: amend -f qcow2 -o cluster_size=4k,help TEST_DIR/t.qcow2
+ Creation options for 'qcow2':
+-size             Virtual disk size
+-compat           Compatibility level (0.10 or 1.1)
+-backing_file     File name of a base image
+-backing_fmt      Image format of the base image
+-encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+-encrypt.format   Encrypt the image, format choices: 'aes', 'luks'
+-encrypt.key-secret ID of secret providing qcow AES key or LUKS passphrase
+-encrypt.cipher-alg Name of encryption cipher algorithm
+-encrypt.cipher-mode Name of encryption cipher mode
+-encrypt.ivgen-alg Name of IV generator algorithm
+-encrypt.ivgen-hash-alg Name of IV generator hash algorithm
+-encrypt.hash-alg Name of encryption hash algorithm
+-encrypt.iter-time Time to spend in PBKDF in milliseconds
+-cluster_size     qcow2 cluster size
+-preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+-lazy_refcounts   Postpone refcount updates
+-refcount_bits    Width of a reference count entry in bits
++qcow2-create-opts.backing_file=str - File name of a base image
++qcow2-create-opts.backing_fmt=str - Image format of the base image
++qcow2-create-opts.cluster_size=size - qcow2 cluster size
++qcow2-create-opts.compat=str - Compatibility level (0.10 or 1.1)
++qcow2-create-opts.encrypt.cipher-alg=str - Name of encryption cipher algorithm
++qcow2-create-opts.encrypt.cipher-mode=str - Name of encryption cipher mode
++qcow2-create-opts.encrypt.format=str - Encrypt the image, format choices: 'aes', 'luks'
++qcow2-create-opts.encrypt.hash-alg=str - Name of encryption hash algorithm
++qcow2-create-opts.encrypt.iter-time=num - Time to spend in PBKDF in milliseconds
++qcow2-create-opts.encrypt.ivgen-alg=str - Name of IV generator algorithm
++qcow2-create-opts.encrypt.ivgen-hash-alg=str - Name of IV generator hash algorithm
++qcow2-create-opts.encrypt.key-secret=str - ID of secret providing qcow AES key or LUKS passphrase
++qcow2-create-opts.encryption=bool (on/off) - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++qcow2-create-opts.lazy_refcounts=bool (on/off) - Postpone refcount updates
++qcow2-create-opts.preallocation=str - Preallocation mode (allowed values: off, metadata, falloc, full)
++qcow2-create-opts.refcount_bits=num - Width of a reference count entry in bits
++qcow2-create-opts.size=size - Virtual disk size
+ 
+ Note that not all of these options may be amendable.
+ 
+ Testing: amend -f qcow2 -o cluster_size=4k,? TEST_DIR/t.qcow2
+ Creation options for 'qcow2':
+-size             Virtual disk size
+-compat           Compatibility level (0.10 or 1.1)
+-backing_file     File name of a base image
+-backing_fmt      Image format of the base image
+-encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+-encrypt.format   Encrypt the image, format choices: 'aes', 'luks'
+-encrypt.key-secret ID of secret providing qcow AES key or LUKS passphrase
+-encrypt.cipher-alg Name of encryption cipher algorithm
+-encrypt.cipher-mode Name of encryption cipher mode
+-encrypt.ivgen-alg Name of IV generator algorithm
+-encrypt.ivgen-hash-alg Name of IV generator hash algorithm
+-encrypt.hash-alg Name of encryption hash algorithm
+-encrypt.iter-time Time to spend in PBKDF in milliseconds
+-cluster_size     qcow2 cluster size
+-preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+-lazy_refcounts   Postpone refcount updates
+-refcount_bits    Width of a reference count entry in bits
++qcow2-create-opts.backing_file=str - File name of a base image
++qcow2-create-opts.backing_fmt=str - Image format of the base image
++qcow2-create-opts.cluster_size=size - qcow2 cluster size
++qcow2-create-opts.compat=str - Compatibility level (0.10 or 1.1)
++qcow2-create-opts.encrypt.cipher-alg=str - Name of encryption cipher algorithm
++qcow2-create-opts.encrypt.cipher-mode=str - Name of encryption cipher mode
++qcow2-create-opts.encrypt.format=str - Encrypt the image, format choices: 'aes', 'luks'
++qcow2-create-opts.encrypt.hash-alg=str - Name of encryption hash algorithm
++qcow2-create-opts.encrypt.iter-time=num - Time to spend in PBKDF in milliseconds
++qcow2-create-opts.encrypt.ivgen-alg=str - Name of IV generator algorithm
++qcow2-create-opts.encrypt.ivgen-hash-alg=str - Name of IV generator hash algorithm
++qcow2-create-opts.encrypt.key-secret=str - ID of secret providing qcow AES key or LUKS passphrase
++qcow2-create-opts.encryption=bool (on/off) - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++qcow2-create-opts.lazy_refcounts=bool (on/off) - Postpone refcount updates
++qcow2-create-opts.preallocation=str - Preallocation mode (allowed values: off, metadata, falloc, full)
++qcow2-create-opts.refcount_bits=num - Width of a reference count entry in bits
++qcow2-create-opts.size=size - Virtual disk size
+ 
+ Note that not all of these options may be amendable.
+ 
+ Testing: amend -f qcow2 -o help,cluster_size=4k TEST_DIR/t.qcow2
+ Creation options for 'qcow2':
+-size             Virtual disk size
+-compat           Compatibility level (0.10 or 1.1)
+-backing_file     File name of a base image
+-backing_fmt      Image format of the base image
+-encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+-encrypt.format   Encrypt the image, format choices: 'aes', 'luks'
+-encrypt.key-secret ID of secret providing qcow AES key or LUKS passphrase
+-encrypt.cipher-alg Name of encryption cipher algorithm
+-encrypt.cipher-mode Name of encryption cipher mode
+-encrypt.ivgen-alg Name of IV generator algorithm
+-encrypt.ivgen-hash-alg Name of IV generator hash algorithm
+-encrypt.hash-alg Name of encryption hash algorithm
+-encrypt.iter-time Time to spend in PBKDF in milliseconds
+-cluster_size     qcow2 cluster size
+-preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+-lazy_refcounts   Postpone refcount updates
+-refcount_bits    Width of a reference count entry in bits
++qcow2-create-opts.backing_file=str - File name of a base image
++qcow2-create-opts.backing_fmt=str - Image format of the base image
++qcow2-create-opts.cluster_size=size - qcow2 cluster size
++qcow2-create-opts.compat=str - Compatibility level (0.10 or 1.1)
++qcow2-create-opts.encrypt.cipher-alg=str - Name of encryption cipher algorithm
++qcow2-create-opts.encrypt.cipher-mode=str - Name of encryption cipher mode
++qcow2-create-opts.encrypt.format=str - Encrypt the image, format choices: 'aes', 'luks'
++qcow2-create-opts.encrypt.hash-alg=str - Name of encryption hash algorithm
++qcow2-create-opts.encrypt.iter-time=num - Time to spend in PBKDF in milliseconds
++qcow2-create-opts.encrypt.ivgen-alg=str - Name of IV generator algorithm
++qcow2-create-opts.encrypt.ivgen-hash-alg=str - Name of IV generator hash algorithm
++qcow2-create-opts.encrypt.key-secret=str - ID of secret providing qcow AES key or LUKS passphrase
++qcow2-create-opts.encryption=bool (on/off) - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++qcow2-create-opts.lazy_refcounts=bool (on/off) - Postpone refcount updates
++qcow2-create-opts.preallocation=str - Preallocation mode (allowed values: off, metadata, falloc, full)
++qcow2-create-opts.refcount_bits=num - Width of a reference count entry in bits
++qcow2-create-opts.size=size - Virtual disk size
+ 
+ Note that not all of these options may be amendable.
+ 
+ Testing: amend -f qcow2 -o ?,cluster_size=4k TEST_DIR/t.qcow2
+ Creation options for 'qcow2':
+-size             Virtual disk size
+-compat           Compatibility level (0.10 or 1.1)
+-backing_file     File name of a base image
+-backing_fmt      Image format of the base image
+-encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+-encrypt.format   Encrypt the image, format choices: 'aes', 'luks'
+-encrypt.key-secret ID of secret providing qcow AES key or LUKS passphrase
+-encrypt.cipher-alg Name of encryption cipher algorithm
+-encrypt.cipher-mode Name of encryption cipher mode
+-encrypt.ivgen-alg Name of IV generator algorithm
+-encrypt.ivgen-hash-alg Name of IV generator hash algorithm
+-encrypt.hash-alg Name of encryption hash algorithm
+-encrypt.iter-time Time to spend in PBKDF in milliseconds
+-cluster_size     qcow2 cluster size
+-preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+-lazy_refcounts   Postpone refcount updates
+-refcount_bits    Width of a reference count entry in bits
++qcow2-create-opts.backing_file=str - File name of a base image
++qcow2-create-opts.backing_fmt=str - Image format of the base image
++qcow2-create-opts.cluster_size=size - qcow2 cluster size
++qcow2-create-opts.compat=str - Compatibility level (0.10 or 1.1)
++qcow2-create-opts.encrypt.cipher-alg=str - Name of encryption cipher algorithm
++qcow2-create-opts.encrypt.cipher-mode=str - Name of encryption cipher mode
++qcow2-create-opts.encrypt.format=str - Encrypt the image, format choices: 'aes', 'luks'
++qcow2-create-opts.encrypt.hash-alg=str - Name of encryption hash algorithm
++qcow2-create-opts.encrypt.iter-time=num - Time to spend in PBKDF in milliseconds
++qcow2-create-opts.encrypt.ivgen-alg=str - Name of IV generator algorithm
++qcow2-create-opts.encrypt.ivgen-hash-alg=str - Name of IV generator hash algorithm
++qcow2-create-opts.encrypt.key-secret=str - ID of secret providing qcow AES key or LUKS passphrase
++qcow2-create-opts.encryption=bool (on/off) - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++qcow2-create-opts.lazy_refcounts=bool (on/off) - Postpone refcount updates
++qcow2-create-opts.preallocation=str - Preallocation mode (allowed values: off, metadata, falloc, full)
++qcow2-create-opts.refcount_bits=num - Width of a reference count entry in bits
++qcow2-create-opts.size=size - Virtual disk size
+ 
+ Note that not all of these options may be amendable.
+ 
+ Testing: amend -f qcow2 -o cluster_size=4k -o help TEST_DIR/t.qcow2
+ Creation options for 'qcow2':
+-size             Virtual disk size
+-compat           Compatibility level (0.10 or 1.1)
+-backing_file     File name of a base image
+-backing_fmt      Image format of the base image
+-encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+-encrypt.format   Encrypt the image, format choices: 'aes', 'luks'
+-encrypt.key-secret ID of secret providing qcow AES key or LUKS passphrase
+-encrypt.cipher-alg Name of encryption cipher algorithm
+-encrypt.cipher-mode Name of encryption cipher mode
+-encrypt.ivgen-alg Name of IV generator algorithm
+-encrypt.ivgen-hash-alg Name of IV generator hash algorithm
+-encrypt.hash-alg Name of encryption hash algorithm
+-encrypt.iter-time Time to spend in PBKDF in milliseconds
+-cluster_size     qcow2 cluster size
+-preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+-lazy_refcounts   Postpone refcount updates
+-refcount_bits    Width of a reference count entry in bits
++qcow2-create-opts.backing_file=str - File name of a base image
++qcow2-create-opts.backing_fmt=str - Image format of the base image
++qcow2-create-opts.cluster_size=size - qcow2 cluster size
++qcow2-create-opts.compat=str - Compatibility level (0.10 or 1.1)
++qcow2-create-opts.encrypt.cipher-alg=str - Name of encryption cipher algorithm
++qcow2-create-opts.encrypt.cipher-mode=str - Name of encryption cipher mode
++qcow2-create-opts.encrypt.format=str - Encrypt the image, format choices: 'aes', 'luks'
++qcow2-create-opts.encrypt.hash-alg=str - Name of encryption hash algorithm
++qcow2-create-opts.encrypt.iter-time=num - Time to spend in PBKDF in milliseconds
++qcow2-create-opts.encrypt.ivgen-alg=str - Name of IV generator algorithm
++qcow2-create-opts.encrypt.ivgen-hash-alg=str - Name of IV generator hash algorithm
++qcow2-create-opts.encrypt.key-secret=str - ID of secret providing qcow AES key or LUKS passphrase
++qcow2-create-opts.encryption=bool (on/off) - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++qcow2-create-opts.lazy_refcounts=bool (on/off) - Postpone refcount updates
++qcow2-create-opts.preallocation=str - Preallocation mode (allowed values: off, metadata, falloc, full)
++qcow2-create-opts.refcount_bits=num - Width of a reference count entry in bits
++qcow2-create-opts.size=size - Virtual disk size
+ 
+ Note that not all of these options may be amendable.
+ 
+ Testing: amend -f qcow2 -o cluster_size=4k -o ? TEST_DIR/t.qcow2
+ Creation options for 'qcow2':
+-size             Virtual disk size
+-compat           Compatibility level (0.10 or 1.1)
+-backing_file     File name of a base image
+-backing_fmt      Image format of the base image
+-encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+-encrypt.format   Encrypt the image, format choices: 'aes', 'luks'
+-encrypt.key-secret ID of secret providing qcow AES key or LUKS passphrase
+-encrypt.cipher-alg Name of encryption cipher algorithm
+-encrypt.cipher-mode Name of encryption cipher mode
+-encrypt.ivgen-alg Name of IV generator algorithm
+-encrypt.ivgen-hash-alg Name of IV generator hash algorithm
+-encrypt.hash-alg Name of encryption hash algorithm
+-encrypt.iter-time Time to spend in PBKDF in milliseconds
+-cluster_size     qcow2 cluster size
+-preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+-lazy_refcounts   Postpone refcount updates
+-refcount_bits    Width of a reference count entry in bits
++qcow2-create-opts.backing_file=str - File name of a base image
++qcow2-create-opts.backing_fmt=str - Image format of the base image
++qcow2-create-opts.cluster_size=size - qcow2 cluster size
++qcow2-create-opts.compat=str - Compatibility level (0.10 or 1.1)
++qcow2-create-opts.encrypt.cipher-alg=str - Name of encryption cipher algorithm
++qcow2-create-opts.encrypt.cipher-mode=str - Name of encryption cipher mode
++qcow2-create-opts.encrypt.format=str - Encrypt the image, format choices: 'aes', 'luks'
++qcow2-create-opts.encrypt.hash-alg=str - Name of encryption hash algorithm
++qcow2-create-opts.encrypt.iter-time=num - Time to spend in PBKDF in milliseconds
++qcow2-create-opts.encrypt.ivgen-alg=str - Name of IV generator algorithm
++qcow2-create-opts.encrypt.ivgen-hash-alg=str - Name of IV generator hash algorithm
++qcow2-create-opts.encrypt.key-secret=str - ID of secret providing qcow AES key or LUKS passphrase
++qcow2-create-opts.encryption=bool (on/off) - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++qcow2-create-opts.lazy_refcounts=bool (on/off) - Postpone refcount updates
++qcow2-create-opts.preallocation=str - Preallocation mode (allowed values: off, metadata, falloc, full)
++qcow2-create-opts.refcount_bits=num - Width of a reference count entry in bits
++qcow2-create-opts.size=size - Virtual disk size
+ 
+ Note that not all of these options may be amendable.
+ 
+@@ -757,29 +757,29 @@ qemu-img: Invalid option list: ,,
+ 
+ Testing: amend -f qcow2 -o help
+ Creation options for 'qcow2':
+-size             Virtual disk size
+-compat           Compatibility level (0.10 or 1.1)
+-backing_file     File name of a base image
+-backing_fmt      Image format of the base image
+-encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+-encrypt.format   Encrypt the image, format choices: 'aes', 'luks'
+-encrypt.key-secret ID of secret providing qcow AES key or LUKS passphrase
+-encrypt.cipher-alg Name of encryption cipher algorithm
+-encrypt.cipher-mode Name of encryption cipher mode
+-encrypt.ivgen-alg Name of IV generator algorithm
+-encrypt.ivgen-hash-alg Name of IV generator hash algorithm
+-encrypt.hash-alg Name of encryption hash algorithm
+-encrypt.iter-time Time to spend in PBKDF in milliseconds
+-cluster_size     qcow2 cluster size
+-preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+-lazy_refcounts   Postpone refcount updates
+-refcount_bits    Width of a reference count entry in bits
++qcow2-create-opts.backing_file=str - File name of a base image
++qcow2-create-opts.backing_fmt=str - Image format of the base image
++qcow2-create-opts.cluster_size=size - qcow2 cluster size
++qcow2-create-opts.compat=str - Compatibility level (0.10 or 1.1)
++qcow2-create-opts.encrypt.cipher-alg=str - Name of encryption cipher algorithm
++qcow2-create-opts.encrypt.cipher-mode=str - Name of encryption cipher mode
++qcow2-create-opts.encrypt.format=str - Encrypt the image, format choices: 'aes', 'luks'
++qcow2-create-opts.encrypt.hash-alg=str - Name of encryption hash algorithm
++qcow2-create-opts.encrypt.iter-time=num - Time to spend in PBKDF in milliseconds
++qcow2-create-opts.encrypt.ivgen-alg=str - Name of IV generator algorithm
++qcow2-create-opts.encrypt.ivgen-hash-alg=str - Name of IV generator hash algorithm
++qcow2-create-opts.encrypt.key-secret=str - ID of secret providing qcow AES key or LUKS passphrase
++qcow2-create-opts.encryption=bool (on/off) - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++qcow2-create-opts.lazy_refcounts=bool (on/off) - Postpone refcount updates
++qcow2-create-opts.preallocation=str - Preallocation mode (allowed values: off, metadata, falloc, full)
++qcow2-create-opts.refcount_bits=num - Width of a reference count entry in bits
++qcow2-create-opts.size=size - Virtual disk size
+ 
+ Note that not all of these options may be amendable.
+ 
+ Testing: convert -o help
+ Supported options:
+-size             Virtual disk size
++size=size - Virtual disk size
+ 
+ Testing: amend -f bochs -o help
+ qemu-img: Format driver 'bochs' does not support option amendment
 -- 
 2.17.2
