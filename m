@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40841)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42226)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gHqb0-0007iU-Ew
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 09:31:47 -0400
+	(envelope-from <berrange@redhat.com>) id 1gHqdL-0001FE-Kt
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 09:34:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gHqat-0000Tb-OU
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 09:31:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45278)
+	(envelope-from <berrange@redhat.com>) id 1gHqdF-0002DF-Rq
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 09:34:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:23078)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gHqar-0000Go-Pd
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 09:31:34 -0400
-References: <20181031084309.9227-1-stefanha@redhat.com>
-	<20181031084309.9227-4-stefanha@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <6142c381-af70-e0d6-88e6-a2f82943e4ea@redhat.com>
-Date: Wed, 31 Oct 2018 08:31:09 -0500
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gHqdF-0002CP-L8
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 09:34:01 -0400
+Date: Wed, 31 Oct 2018 13:33:34 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181031133334.GL9625@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <BN6PR2201MB1251EA1F1F5E486A889A827CC6CC0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	<20181031120049.GH9625@redhat.com>
+	<CAFEAcA-20HUdGyNYFoqzhPdBbxpJ5iRH+F0WWNwgjs=JpsN7Xw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20181031084309.9227-4-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/4] MAINTAINERS: use 'https://' instead of
- 'git://' for GitHub
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-20HUdGyNYFoqzhPdBbxpJ5iRH+F0WWNwgjs=JpsN7Xw@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Question: Perfecting checkpatch.pl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +30,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Aleksandar Markovic <amarkovic@wavecomp.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "stefanha@redhat.com" <stefanha@redhat.com>
 
-On 10/31/18 3:43 AM, Stefan Hajnoczi wrote:
-> When you clone the repository without previous commit history, 'git://'
-> doesn't protect from man-in-the-middle attacks.  HTTPS is more secure
-> since the client verifies the server certificate.
-> 
-> Reported-by: Jann Horn <jannh@google.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->   MAINTAINERS | 74 ++++++++++++++++++++++++++---------------------------
->   1 file changed, 37 insertions(+), 37 deletions(-)
+On Wed, Oct 31, 2018 at 01:27:15PM +0000, Peter Maydell wrote:
+> On 31 October 2018 at 12:00, Daniel P. Berrang=C3=A9 <berrange@redhat.c=
+om> wrote:
+> > On Tue, Oct 30, 2018 at 12:35:15PM +0000, Aleksandar Markovic wrote:
+> >> Perhaps checkpatch.pl should make sure the commit messages do not co=
+ntain "address@hidden" and "Reviewed-off-by"?
+> >>
+> >> $ git log | grep address@hidden
+> >>     Signed-off-by: Michael S. Tsirkin <address@hidden>
+> >>     Signed-off-by: Ronald Hecht <address@hidden>
+> >>     Signed-off-by: Justin Chevrier <address@hidden>
+> >>     Signed-off-by: Justin Chevrier <address@hidden>
+> >>     Signed-off-by: Justin Chevrier <address@hidden>
+> >
+> > This makes sense...
+> >
+> >>
+> >> $ git log | grep Reviewed-off-by
+> >>     Reviewed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+> >>     Reviewed-off-by: Anthony Liguori <aliguori@us.ibm.com>
+> >
+> > but I'm not convinced it is worth doing this, because the set of
+> > mistakes people have made is enourmous, so it turns into a game
+> > of whack-a-mole.
+>=20
+> You could have checkpatch whitelist the sensible ones:
+>=20
+> >    3127 Acked-by
+> >    1834 Reported-by
+> >   30991 Reviewed-by
+> >   97837 Signed-off-by
+> >     660 Suggested-by
+> >    1951 Tested-by
+>=20
+> and warn about the rest...
 
-We should also do the same for maintainers using git://repo.or.cz:
+I guess warning would be ok - I don't want to discourage people from
+being creative and "singing off" their patches :-)
 
-$ wget -S 
-'https://repo.or.cz/qemu/ericb.git/info/refs?service=git-upload-pack' 
-2>&1 | grep Content-Type
-   Content-Type: application/x-git-upload-pack-advertisement
-
-For example, my entry would benefit from:
-
-diff --git i/MAINTAINERS w/MAINTAINERS
-index 3275cc6bbed..b4b6a5b5df1 100644
---- i/MAINTAINERS
-+++ w/MAINTAINERS
-@@ -2049,7 +2049,7 @@ F: include/block/nbd*
-  F: qemu-nbd.*
-  F: blockdev-nbd.c
-  F: docs/interop/nbd.txt
--T: git git://repo.or.cz/qemu/ericb.git nbd
-+T: git https://repo.or.cz/qemu/ericb.git nbd
-
-  NFS
-  M: Jeff Cody <jcody@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
