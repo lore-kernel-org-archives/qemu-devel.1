@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33393)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHrMa-0000q6-BM
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:20:53 -0400
+	(envelope-from <flukshun@gmail.com>) id 1gHrMa-0000qE-H5
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:20:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHrMZ-0007C0-7I
+	(envelope-from <flukshun@gmail.com>) id 1gHrMY-0007BZ-UF
 	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:20:52 -0400
-Received: from mail-oi1-x22c.google.com ([2607:f8b0:4864:20::22c]:40297)
+Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:33452)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHrMY-00075e-R1
+	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHrMY-00078k-Ko
 	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:20:50 -0400
-Received: by mail-oi1-x22c.google.com with SMTP id u130-v6so8990148oie.7
-	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 07:20:43 -0700 (PDT)
+Received: by mail-ot1-x32b.google.com with SMTP id q1so5239573otk.0
+	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 07:20:48 -0700 (PDT)
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Wed, 31 Oct 2018 09:19:17 -0500
-Message-Id: <20181031141925.30026-17-mdroth@linux.vnet.ibm.com>
+Date: Wed, 31 Oct 2018 09:19:19 -0500
+Message-Id: <20181031141925.30026-19-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20181031141925.30026-1-mdroth@linux.vnet.ibm.com>
 References: <20181031141925.30026-1-mdroth@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v3 16/24] qga-win: demystify namespace stripping
+Subject: [Qemu-devel] [PULL v3 18/24] qga: group agent init/cleanup init
+ separate routines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +31,174 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
+Cc: peter.maydell@linaro.org
 
-From: Tomáš Golembiovský <tgolembi@redhat.com>
+This patch better separates the init/cleanup routines out into
+separate functions to make the start-up procedure a bit easier to
+follow. This will be useful when we eventually break out the actual
+start/stop of the agent's main loop into separates routines that
+can be called multiple times after the init phase.
 
-It was not obvious what exactly the cryptic string copying does to the
-GUID. This change makes the intent clearer.
-
-Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- qga/commands-win32.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ qga/main.c | 82 +++++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 50 insertions(+), 32 deletions(-)
 
-diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-index 30d6c639c3..a1b7512d46 100644
---- a/qga/commands-win32.c
-+++ b/qga/commands-win32.c
-@@ -521,7 +521,7 @@ static GuestPCIAddress *get_pci_info(char *guid, Error **errp)
-     char dev_name[MAX_PATH];
-     char *buffer = NULL;
-     GuestPCIAddress *pci = NULL;
--    char *name = g_strdup(&guid[4]);
-+    char *name = NULL;
-     bool partial_pci = false;
-     pci = g_malloc0(sizeof(*pci));
-     pci->domain = -1;
-@@ -529,6 +529,13 @@ static GuestPCIAddress *get_pci_info(char *guid, Error **errp)
-     pci->function = -1;
-     pci->bus = -1;
+diff --git a/qga/main.c b/qga/main.c
+index afcd268ee3..ab3eaa5163 100644
+--- a/qga/main.c
++++ b/qga/main.c
+@@ -1211,9 +1211,21 @@ static bool check_is_frozen(GAState *s)
+     return false;
+ }
  
-+    if (g_str_has_prefix(guid, "\\\\.\\") ||
-+        g_str_has_prefix(guid, "\\\\?\\")) {
-+        name = g_strdup(guid + 4);
-+    } else {
-+        name = g_strdup(guid);
-+    }
+-static int run_agent(GAState *s, GAConfig *config, int socket_activation)
++static GAState *initialize_agent(GAConfig *config)
+ {
+-    ga_state = s;
++    GAState *s = g_new0(GAState, 1);
 +
-     if (!QueryDosDevice(name, dev_name, ARRAY_SIZE(dev_name))) {
-         error_setg_win32(errp, GetLastError(), "failed to get dos device name");
-         goto out;
++    g_assert(ga_state == NULL);
++
++    s->log_level = config->log_level;
++    s->log_file = stderr;
++#ifdef CONFIG_FSFREEZE
++    s->fsfreeze_hook = config->fsfreeze_hook;
++#endif
++    s->pstate_filepath = g_strdup_printf("%s/qga.state", config->state_dir);
++    s->state_filepath_isfrozen = g_strdup_printf("%s/qga.state.isfrozen",
++                                                 config->state_dir);
++    s->frozen = check_is_frozen(s);
+ 
+     g_log_set_default_handler(ga_log, s);
+     g_log_set_fatal_mask(NULL, G_LOG_LEVEL_ERROR);
+@@ -1229,7 +1241,7 @@ static int run_agent(GAState *s, GAConfig *config, int socket_activation)
+     if (g_mkdir_with_parents(config->state_dir, S_IRWXU) == -1) {
+         g_critical("unable to create (an ancestor of) the state directory"
+                    " '%s': %s", config->state_dir, strerror(errno));
+-        return EXIT_FAILURE;
++        return NULL;
+     }
+ #endif
+ 
+@@ -1254,7 +1266,7 @@ static int run_agent(GAState *s, GAConfig *config, int socket_activation)
+             if (!log_file) {
+                 g_critical("unable to open specified log file: %s",
+                            strerror(errno));
+-                return EXIT_FAILURE;
++                return NULL;
+             }
+             s->log_file = log_file;
+         }
+@@ -1265,7 +1277,7 @@ static int run_agent(GAState *s, GAConfig *config, int socket_activation)
+                                s->pstate_filepath,
+                                ga_is_frozen(s))) {
+         g_critical("failed to load persistent state");
+-        return EXIT_FAILURE;
++        return NULL;
+     }
+ 
+     config->blacklist = ga_command_blacklist_init(config->blacklist);
+@@ -1286,12 +1298,37 @@ static int run_agent(GAState *s, GAConfig *config, int socket_activation)
+ #ifndef _WIN32
+     if (!register_signal_handlers()) {
+         g_critical("failed to register signal handlers");
+-        return EXIT_FAILURE;
++        return NULL;
+     }
+ #endif
+ 
+     s->main_loop = g_main_loop_new(NULL, false);
+ 
++    ga_state = s;
++    return s;
++}
++
++static void cleanup_agent(GAState *s)
++{
++    if (s->command_state) {
++        ga_command_state_cleanup_all(s->command_state);
++        ga_command_state_free(s->command_state);
++        json_message_parser_destroy(&s->parser);
++    }
++    if (s->channel) {
++        ga_channel_free(s->channel);
++    }
++    g_free(s->pstate_filepath);
++    g_free(s->state_filepath_isfrozen);
++    if (s->main_loop) {
++        g_main_loop_unref(s->main_loop);
++    }
++    g_free(s);
++    ga_state = NULL;
++}
++
++static int run_agent(GAState *s, GAConfig *config, int socket_activation)
++{
+     if (!channel_init(ga_state, config->method, config->channel_path,
+                       socket_activation ? FIRST_SOCKET_ACTIVATION_FD : -1)) {
+         g_critical("failed to initialize guest agent channel");
+@@ -1315,7 +1352,7 @@ static int run_agent(GAState *s, GAConfig *config, int socket_activation)
+ int main(int argc, char **argv)
+ {
+     int ret = EXIT_SUCCESS;
+-    GAState *s = g_new0(GAState, 1);
++    GAState *s;
+     GAConfig *config = g_new0(GAConfig, 1);
+     int socket_activation;
+ 
+@@ -1383,44 +1420,25 @@ int main(int argc, char **argv)
+         }
+     }
+ 
+-    s->log_level = config->log_level;
+-    s->log_file = stderr;
+-#ifdef CONFIG_FSFREEZE
+-    s->fsfreeze_hook = config->fsfreeze_hook;
+-#endif
+-    s->pstate_filepath = g_strdup_printf("%s/qga.state", config->state_dir);
+-    s->state_filepath_isfrozen = g_strdup_printf("%s/qga.state.isfrozen",
+-                                                 config->state_dir);
+-    s->frozen = check_is_frozen(s);
+-
+     if (config->dumpconf) {
+         config_dump(config);
+         goto end;
+     }
+ 
++    s = initialize_agent(config);
++    if (!s) {
++        g_critical("error initializing guest agent");
++        goto end;
++    }
+     ret = run_agent(s, config, socket_activation);
++    cleanup_agent(s);
+ 
+ end:
+-    if (s->command_state) {
+-        ga_command_state_cleanup_all(s->command_state);
+-        ga_command_state_free(s->command_state);
+-        json_message_parser_destroy(&s->parser);
+-    }
+-    if (s->channel) {
+-        ga_channel_free(s->channel);
+-    }
+-    g_free(s->pstate_filepath);
+-    g_free(s->state_filepath_isfrozen);
+-
+     if (config->daemonize) {
+         unlink(config->pid_filepath);
+     }
+ 
+     config_free(config);
+-    if (s->main_loop) {
+-        g_main_loop_unref(s->main_loop);
+-    }
+-    g_free(s);
+ 
+     return ret;
+ }
 -- 
 2.17.1
