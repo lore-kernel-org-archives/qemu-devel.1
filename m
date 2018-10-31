@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHfVF-0000oN-4A
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 21:41:02 -0400
+	(envelope-from <flukshun@gmail.com>) id 1gHfVI-0000rZ-8J
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 21:41:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHfVA-0002X3-Ju
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 21:41:01 -0400
-Received: from mail-qt1-x82f.google.com ([2607:f8b0:4864:20::82f]:38509)
+	(envelope-from <flukshun@gmail.com>) id 1gHfVF-0002ZR-Gl
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 21:41:04 -0400
+Received: from mail-qt1-x82e.google.com ([2607:f8b0:4864:20::82e]:34667)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHfVA-0002RD-BC
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 21:40:56 -0400
-Received: by mail-qt1-x82f.google.com with SMTP id v1-v6so11757965qtq.5
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 18:40:50 -0700 (PDT)
+	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHfVF-0002YD-8q
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 21:41:01 -0400
+Received: by mail-qt1-x82e.google.com with SMTP id z2-v6so16023830qts.1
+	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 18:40:59 -0700 (PDT)
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue, 30 Oct 2018 20:38:21 -0500
-Message-Id: <20181031013821.24023-25-mdroth@linux.vnet.ibm.com>
+Date: Tue, 30 Oct 2018 20:38:01 -0500
+Message-Id: <20181031013821.24023-5-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20181031013821.24023-1-mdroth@linux.vnet.ibm.com>
 References: <20181031013821.24023-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PULL v2 24/24] qga-win: changing --retry-path option
- behavior
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL v2 04/24] configure: add test for libudev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,212 +30,78 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Bishara AbuHattoum <bishara@daynix.com>, Sameeh Jubran <sameeh@daynix.com>
+Cc: peter.maydell@linaro.org, =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
 
-From: Bishara AbuHattoum <bishara@daynix.com>
+From: Tomáš Golembiovský <tgolembi@redhat.com>
 
-Currently whenever the qemu-ga's service doesn't find the virtio-serial
-the run_agent() loops in a QGA_RETRY_INTERVAL (default 5 seconds)
-intervals and try to restart the qemu-ga which causes a synchronous loop.
-Changed to wait and listen for the serial events by registering for
-notifications a proper serial event handler that deals with events:
-  DBT_DEVICEARRIVAL        indicates that the device has been inserted and
-                           is available
-  DBT_DEVICEREMOVECOMPLETE indicates that the devive has been removed
-Which allow us to determine when the channel path is available for the
-qemu-ga to restart.
-
-Signed-off-by: Bishara AbuHattoum <bishara@daynix.com>
-Signed-off-by: Sameeh Jubran <sameeh@daynix.com>
+Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+*make libudev optional to avoid breaking existing build/test environments
+*disable libudev for --static builds
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- qga/main.c          | 86 ++++++++++++++++++++++++++++++++++++++++++++-
- qga/service-win32.h |  4 +++
- 2 files changed, 89 insertions(+), 1 deletion(-)
+ configure | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-diff --git a/qga/main.c b/qga/main.c
-index 506a314140..87a0711c14 100644
---- a/qga/main.c
-+++ b/qga/main.c
-@@ -34,6 +34,7 @@
- #include "qemu/systemd.h"
- #include "qemu-version.h"
- #ifdef _WIN32
-+#include <dbt.h>
- #include "qga/service-win32.h"
- #include "qga/vss-win32.h"
- #endif
-@@ -83,6 +84,7 @@ struct GAState {
-     bool logging_enabled;
- #ifdef _WIN32
-     GAService service;
-+    HANDLE wakeup_event;
- #endif
-     bool delimit_response;
-     bool frozen;
-@@ -119,6 +121,7 @@ static const char *ga_freeze_whitelist[] = {
- #ifdef _WIN32
- DWORD WINAPI service_ctrl_handler(DWORD ctrl, DWORD type, LPVOID data,
-                                   LPVOID ctx);
-+DWORD WINAPI handle_serial_device_events(DWORD type, LPVOID data);
- VOID WINAPI service_main(DWORD argc, TCHAR *argv[]);
- #endif
- static int run_agent(GAState *s);
-@@ -677,6 +680,36 @@ static gboolean channel_init(GAState *s, const gchar *method, const gchar *path,
- }
+diff --git a/configure b/configure
+index a898e21c68..406f48f46e 100755
+--- a/configure
++++ b/configure
+@@ -474,6 +474,7 @@ libxml2=""
+ docker="no"
+ debug_mutex="no"
+ libpmem=""
++libudev="no"
  
- #ifdef _WIN32
-+DWORD WINAPI handle_serial_device_events(DWORD type, LPVOID data)
-+{
-+    DWORD ret = NO_ERROR;
-+    PDEV_BROADCAST_HDR broadcast_header = (PDEV_BROADCAST_HDR)data;
+ # cross compilers defaults, can be overridden with --cross-cc-ARCH
+ cross_cc_aarch64="aarch64-linux-gnu-gcc"
+@@ -870,6 +871,7 @@ Linux)
+   vhost_vsock="yes"
+   QEMU_INCLUDES="-I\$(SRC_PATH)/linux-headers -I$(pwd)/linux-headers $QEMU_INCLUDES"
+   supported_os="yes"
++  libudev="yes"
+ ;;
+ esac
+ 
+@@ -5609,6 +5611,19 @@ if test "$libnfs" != "no" ; then
+   fi
+ fi
+ 
++##########################################
++# Do we have libudev
++if test "$libudev" != "no" ; then
++  if $pkg_config libudev && test "$static" != "yes"; then
++    if test "$static" != "yes"; then
++      libudev="yes"
++      libudev_libs=$($pkg_config --libs libudev)
++    fi
++  else
++    libudev="no"
++  fi
++fi
 +
-+    if (broadcast_header->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE) {
-+        switch (type) {
-+            /* Device inserted */
-+        case DBT_DEVICEARRIVAL:
-+            /* Start QEMU-ga's service */
-+            if (!SetEvent(ga_state->wakeup_event)) {
-+                ret = GetLastError();
-+            }
-+            break;
-+            /* Device removed */
-+        case DBT_DEVICEQUERYREMOVE:
-+        case DBT_DEVICEREMOVEPENDING:
-+        case DBT_DEVICEREMOVECOMPLETE:
-+            /* Stop QEMU-ga's service */
-+            if (!ResetEvent(ga_state->wakeup_event)) {
-+                ret = GetLastError();
-+            }
-+            break;
-+        default:
-+            ret = ERROR_CALL_NOT_IMPLEMENTED;
-+        }
-+    }
-+    return ret;
-+}
+ # Now we've finished running tests it's OK to add -Werror to the compiler flags
+ if test "$werror" = "yes"; then
+     QEMU_CFLAGS="-Werror $QEMU_CFLAGS"
+@@ -6033,6 +6048,7 @@ echo "VxHS block device $vxhs"
+ echo "capstone          $capstone"
+ echo "docker            $docker"
+ echo "libpmem support   $libpmem"
++echo "libudev           $libudev"
+ 
+ if test "$sdl_too_old" = "yes"; then
+ echo "-> Your SDL version is too old - please upgrade to have SDL support"
+@@ -6868,6 +6884,11 @@ if test "$docker" != "no"; then
+     echo "HAVE_USER_DOCKER=y" >> $config_host_mak
+ fi
+ 
++if test "$libudev" != "no"; then
++    echo "CONFIG_LIBUDEV=y" >> $config_host_mak
++    echo "LIBUDEV_LIBS=$libudev_libs" >> $config_host_mak
++fi
 +
- DWORD WINAPI service_ctrl_handler(DWORD ctrl, DWORD type, LPVOID data,
-                                   LPVOID ctx)
- {
-@@ -688,9 +721,13 @@ DWORD WINAPI service_ctrl_handler(DWORD ctrl, DWORD type, LPVOID data,
-         case SERVICE_CONTROL_STOP:
-         case SERVICE_CONTROL_SHUTDOWN:
-             quit_handler(SIGTERM);
-+            SetEvent(ga_state->wakeup_event);
-             service->status.dwCurrentState = SERVICE_STOP_PENDING;
-             SetServiceStatus(service->status_handle, &service->status);
-             break;
-+        case SERVICE_CONTROL_DEVICEEVENT:
-+            handle_serial_device_events(type, data);
-+            break;
- 
-         default:
-             ret = ERROR_CALL_NOT_IMPLEMENTED;
-@@ -717,10 +754,24 @@ VOID WINAPI service_main(DWORD argc, TCHAR *argv[])
-     service->status.dwServiceSpecificExitCode = NO_ERROR;
-     service->status.dwCheckPoint = 0;
-     service->status.dwWaitHint = 0;
-+    DEV_BROADCAST_DEVICEINTERFACE notification_filter;
-+    ZeroMemory(&notification_filter, sizeof(notification_filter));
-+    notification_filter.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
-+    notification_filter.dbcc_size = sizeof(DEV_BROADCAST_DEVICEINTERFACE);
-+    notification_filter.dbcc_classguid = GUID_VIOSERIAL_PORT;
-+
-+    service->device_notification_handle =
-+        RegisterDeviceNotification(service->status_handle,
-+            &notification_filter, DEVICE_NOTIFY_SERVICE_HANDLE);
-+    if (!service->device_notification_handle) {
-+        g_critical("Failed to register device notification handle!\n");
-+        return;
-+    }
-     SetServiceStatus(service->status_handle, &service->status);
- 
-     run_agent(ga_state);
- 
-+    UnregisterDeviceNotification(service->device_notification_handle);
-     service->status.dwCurrentState = SERVICE_STOPPED;
-     SetServiceStatus(service->status_handle, &service->status);
- }
-@@ -1328,12 +1379,24 @@ static GAState *initialize_agent(GAConfig *config, int socket_activation)
- 
-     s->config = config;
-     s->socket_activation = socket_activation;
-+
-+#ifdef _WIN32
-+    s->wakeup_event = CreateEvent(NULL, TRUE, FALSE, TEXT("WakeUp"));
-+    if (s->wakeup_event == NULL) {
-+        g_critical("CreateEvent failed");
-+        return NULL;
-+    }
-+#endif
-+
-     ga_state = s;
-     return s;
- }
- 
- static void cleanup_agent(GAState *s)
- {
-+#ifdef _WIN32
-+    CloseHandle(s->wakeup_event);
-+#endif
-     if (s->command_state) {
-         ga_command_state_cleanup_all(s->command_state);
-         ga_command_state_free(s->command_state);
-@@ -1365,6 +1428,27 @@ static int run_agent_once(GAState *s)
-     return EXIT_SUCCESS;
- }
- 
-+static void wait_for_channel_availability(GAState *s)
-+{
-+    g_warning("waiting for channel path...");
-+#ifndef _WIN32
-+    sleep(QGA_RETRY_INTERVAL);
-+#else
-+    DWORD dwWaitResult;
-+
-+    dwWaitResult = WaitForSingleObject(s->wakeup_event, INFINITE);
-+
-+    switch (dwWaitResult) {
-+    case WAIT_OBJECT_0:
-+        break;
-+    case WAIT_TIMEOUT:
-+        break;
-+    default:
-+        g_critical("WaitForSingleObject failed");
-+    }
-+#endif
-+}
-+
- static int run_agent(GAState *s)
- {
-     int ret = EXIT_SUCCESS;
-@@ -1375,7 +1459,7 @@ static int run_agent(GAState *s)
-         ret = run_agent_once(s);
-         if (s->config->retry_path && !s->force_exit) {
-             g_warning("agent stopped unexpectedly, restarting...");
--            sleep(QGA_RETRY_INTERVAL);
-+            wait_for_channel_availability(s);
-         }
-     } while (s->config->retry_path && !s->force_exit);
- 
-diff --git a/qga/service-win32.h b/qga/service-win32.h
-index 89e99dfede..7b16d69b57 100644
---- a/qga/service-win32.h
-+++ b/qga/service-win32.h
-@@ -20,9 +20,13 @@
- #define QGA_SERVICE_NAME         "qemu-ga"
- #define QGA_SERVICE_DESCRIPTION  "Enables integration with QEMU machine emulator and virtualizer."
- 
-+static const GUID GUID_VIOSERIAL_PORT = { 0x6fde7521, 0x1b65, 0x48ae,
-+{ 0xb6, 0x28, 0x80, 0xbe, 0x62, 0x1, 0x60, 0x26 } };
-+
- typedef struct GAService {
-     SERVICE_STATUS status;
-     SERVICE_STATUS_HANDLE status_handle;
-+    HDEVNOTIFY device_notification_handle;
- } GAService;
- 
- int ga_install_service(const char *path, const char *logfile,
+ # use included Linux headers
+ if test "$linux" = "yes" ; then
+   mkdir -p linux-headers
 -- 
 2.17.1
