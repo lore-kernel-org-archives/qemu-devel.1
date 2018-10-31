@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47480)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1gHefh-0002CX-43
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:47:48 -0400
+	(envelope-from <zhangckid@gmail.com>) id 1gHeii-0005Cn-PV
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:50:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1gHefg-0007hj-8y
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:47:44 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:39573)
+	(envelope-from <zhangckid@gmail.com>) id 1gHeid-0002Vs-Ou
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:50:52 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:34079)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1gHefg-0007cV-0U
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:47:44 -0400
-Received: by mail-wr1-x442.google.com with SMTP id r10-v6so14595227wrv.6
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 17:47:32 -0700 (PDT)
-MIME-Version: 1.0
-References: <20181030035030.4542-1-zhangckid@gmail.com>
-	<CAFEAcA_T8WCimGtgErMjQvBL9yh8_kR9XpykaY=MJPCM7ghw+g@mail.gmail.com>
-In-Reply-To: <CAFEAcA_T8WCimGtgErMjQvBL9yh8_kR9XpykaY=MJPCM7ghw+g@mail.gmail.com>
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1gHeid-0001tK-H7
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:50:47 -0400
+Received: by mail-pf1-x441.google.com with SMTP id f78-v6so6728441pfe.1
+	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 17:50:27 -0700 (PDT)
 From: Zhang Chen <zhangckid@gmail.com>
-Date: Wed, 31 Oct 2018 08:47:19 +0800
-Message-ID: <CAK3tnvLfkkdNvzXJeF1LKGAujDsxyuzxJSWRd33T8Q0Pj+zPxA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] net/filter-rewirter.c: Fix coverity static
+Date: Wed, 31 Oct 2018 08:50:15 +0800
+Message-Id: <20181031005015.5433-1-zhangckid@gmail.com>
+Subject: [Qemu-devel] [PATCH V2] net/filter-rewriter.c: Fix coverity static
  analysis issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,32 +24,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, jasowang@redhat.com, Zhang Chen <chen.zhang@intel.com>
+To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>
+Cc: Zhang Chen <zhangckid@gmail.com>, Zhang Chen <chen.zhang@intel.com>
 
-Oh, Sorry.
-I will send the V2 patch.
+The original code just follow the TCP state diagram,
+but in this case, we can skip the TCPS_TIME_WAIT state to simplify
+the implementation.
 
-Thank
-Zhang Chen
+Signed-off-by: Zhang Chen <zhangckid@gmail.com>
+---
+ net/filter-rewriter.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-On Wed, Oct 31, 2018 at 12:18 AM Peter Maydell <peter.maydell@linaro.org>
-wrote:
-
-> On 30 October 2018 at 03:50, Zhang Chen <zhangckid@gmail.com> wrote:
-> > The original code just follow the TCP state diagram,
-> > but in this case, we can skip the TCPS_TIME_WAIT state to simplify
-> > the implementation.
-> >
-> > Signed-off-by: Zhang Chen <zhangckid@gmail.com>
-> > ---
-> >  net/filter-rewriter.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> NB: typo in Subject: s/rewirter/rewriter/
->
-> Hopefully whoever commits this patch can fix that up for you.
->
-> thanks
-> -- PMM
->
+diff --git a/net/filter-rewriter.c b/net/filter-rewriter.c
+index bb8f4d93b1..2e26839bc2 100644
+--- a/net/filter-rewriter.c
++++ b/net/filter-rewriter.c
+@@ -155,12 +155,13 @@ static int handle_primary_tcp_pkt(RewriterState *rf,
+          * Active close step 2.
+          */
+         if (conn->tcp_state == TCPS_FIN_WAIT_1) {
+-            conn->tcp_state = TCPS_TIME_WAIT;
+             /*
+              * For simplify implementation, we needn't wait 2MSL time
+              * in filter rewriter. Because guest kernel will track the
+              * TCP status and wait 2MSL time, if client resend the FIN
+              * packet, guest will apply the last ACK too.
++             * So, we skip the TCPS_TIME_WAIT state here and go straight
++             * to TCPS_CLOSED state.
+              */
+             conn->tcp_state = TCPS_CLOSED;
+             g_hash_table_remove(rf->connection_track_table, key);
+-- 
+2.17.1
