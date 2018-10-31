@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47842)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gHtOj-0006Jm-Qa
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:31:15 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1gHtS6-0000Xd-41
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:34:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gHtOa-00026b-C5
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:31:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58568)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gHtOT-0001ti-Q1
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:30:58 -0400
-Date: Wed, 31 Oct 2018 16:30:41 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20181031163040.GA2402@work-vm>
-References: <20181029125818.28720-1-fli@suse.com>
-	<20181029125818.28720-7-fli@suse.com>
-	<20181030194923.GD2441@work-vm>
-	<fd8629e3-cb6f-3e86-ba1a-cbda26373847@suse.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1gHtS4-0004oT-7j
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:34:42 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38386)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gHtS3-0004mU-NC
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:34:40 -0400
+Received: by mail-wr1-x444.google.com with SMTP id d10-v6so17226098wrs.5
+	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 09:34:38 -0700 (PDT)
+References: <20181025144644.15464-1-cota@braap.org>
+	<20181025144644.15464-33-cota@braap.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20181025144644.15464-33-cota@braap.org>
+Date: Wed, 31 Oct 2018 16:34:35 +0000
+Message-ID: <87o9ba6pno.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fd8629e3-cb6f-3e86-ba1a-cbda26373847@suse.com>
-Subject: Re: [Qemu-devel] [PATCH RFC v6 6/7] migration: fix some error
- handling
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC v4 33/71] i386: use cpu_reset_interrupt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,137 +30,289 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fei Li <fli@suse.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, famz@redhat.com, peterx@redhat.com, quintela@redhat.com
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
 
-* Fei Li (fli@suse.com) wrote:
-> 
-> 
-> On 10/31/2018 03:49 AM, Dr. David Alan Gilbert wrote:
-> > * Fei Li (fli@suse.com) wrote:
-> > > Add error handling for qemu_ram_foreach_migratable_block() when
-> > > it fails.
-> > > 
-> > > Always call migrate_set_error() to set the error state without relying
-> > > on whether multifd_save_cleanup() succeeds. As the passed &local_err
-> > > is never used in multifd_save_cleanup(), remove it.
-> > > 
-> > > Signed-off-by: Fei Li <fli@suse.com>
-> > > ---
-> > >   migration/migration.c    | 5 +----
-> > >   migration/postcopy-ram.c | 3 +++
-> > >   migration/ram.c          | 7 +++----
-> > >   migration/ram.h          | 2 +-
-> > >   4 files changed, 8 insertions(+), 9 deletions(-)
-> > > 
-> > > diff --git a/migration/migration.c b/migration/migration.c
-> > > index 87dfc7374f..3b8b7ab4f9 100644
-> > > --- a/migration/migration.c
-> > > +++ b/migration/migration.c
-> > > @@ -1377,7 +1377,6 @@ static void migrate_fd_cleanup(void *opaque)
-> > >       qemu_savevm_state_cleanup();
-> > >       if (s->to_dst_file) {
-> > > -        Error *local_err = NULL;
-> > >           QEMUFile *tmp;
-> > >           trace_migrate_fd_cleanup();
-> > > @@ -1388,9 +1387,7 @@ static void migrate_fd_cleanup(void *opaque)
-> > >           }
-> > >           qemu_mutex_lock_iothread();
-> > > -        if (multifd_save_cleanup(&local_err) != 0) {
-> > > -            error_report_err(local_err);
-> > > -        }
-> > > +        multifd_save_cleanup();
-> > >           qemu_mutex_lock(&s->qemu_file_lock);
-> > >           tmp = s->to_dst_file;
-> > >           s->to_dst_file = NULL;
-> > > diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> > > index e5c02a32c5..4ca2bc02b3 100644
-> > > --- a/migration/postcopy-ram.c
-> > > +++ b/migration/postcopy-ram.c
-> > > @@ -1117,6 +1117,9 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
-> > >       /* Mark so that we get notified of accesses to unwritten areas */
-> > >       if (qemu_ram_foreach_migratable_block(ram_block_enable_notify, mis)) {
-> > > +        error_report("ram_block_enable_notify failed");
-> > > +        close(mis->userfault_event_fd);
-> > > +        close(mis->userfault_fd);
-> > I don't think these close() calls are safe.  This code is just after
-> > starting the fault thread, and the fault thread has a poll() call on
-> > these fd's, so we can't close them until we've instructed that thread
-> > to exit.
-> > 
-> > We should fall out through postcopy_ram_incoming_cleanup, and because
-> > the thread exists it should do a notify to the thread, a join and then
-> > only later do the close calls.
-> > 
-> > Dave
-> I see the postcopy_ram_incoming_cleanup() already include the
-> notify & join the fault thread & close these two fds and other more cleanup,
-> thus that means directly replace the above two close() with
-> postcopy_ram_incoming_cleanup() is ok, right? :)
 
-Yes; I think I'd do that in loadvm_postcopy_handle_listen perhaps.
-It's a weird case, normally if it fails before 'listen' then we call
-cleanup in process_incoming_migration_co,  but after listen we call it
-at the bottom of the listen thread.  Here we've got a half-state where
-we're trying and failing to enter listen.
+Emilio G. Cota <cota@braap.org> writes:
 
-> BTW, does the parameter "&local_err" for multifd_save_cleanup(&local_err) is
-> reserved for some reason? As I notice no code is using this error parameter,
-> and if it is reserved for nothing I'd like to delete it just as the second
-> paragraph
-> of the commit message said. :)
+> From: Paolo Bonzini <pbonzini@redhat.com>
+>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
 
-Yes, that's OK; it might be better as a separate patch;  I suspect maybe
-in an earlier version it had an error case.
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-Dave
+> ---
+>  target/i386/hax-all.c    |  4 ++--
+>  target/i386/hvf/x86hvf.c |  8 ++++----
+>  target/i386/kvm.c        | 14 +++++++-------
+>  target/i386/seg_helper.c | 13 ++++++-------
+>  target/i386/svm_helper.c |  2 +-
+>  target/i386/whpx-all.c   | 10 +++++-----
+>  6 files changed, 25 insertions(+), 26 deletions(-)
+>
+> diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
+> index f095c527e3..8b53a9708f 100644
+> --- a/target/i386/hax-all.c
+> +++ b/target/i386/hax-all.c
+> @@ -433,7 +433,7 @@ static int hax_vcpu_interrupt(CPUArchState *env)
+>          irq =3D cpu_get_pic_interrupt(env);
+>          if (irq >=3D 0) {
+>              hax_inject_interrupt(env, irq);
+> -            cpu->interrupt_request &=3D ~CPU_INTERRUPT_HARD;
+> +            cpu_reset_interrupt(cpu, CPU_INTERRUPT_HARD);
+>          }
+>      }
+>
+> @@ -483,7 +483,7 @@ static int hax_vcpu_hax_exec(CPUArchState *env)
+>      cpu_halted_set(cpu, 0);
+>
+>      if (cpu->interrupt_request & CPU_INTERRUPT_POLL) {
+> -        cpu->interrupt_request &=3D ~CPU_INTERRUPT_POLL;
+> +        cpu_reset_interrupt(cpu, CPU_INTERRUPT_POLL);
+>          apic_poll_irq(x86_cpu->apic_state);
+>      }
+>
+> diff --git a/target/i386/hvf/x86hvf.c b/target/i386/hvf/x86hvf.c
+> index 163bbed23f..e8b13ed534 100644
+> --- a/target/i386/hvf/x86hvf.c
+> +++ b/target/i386/hvf/x86hvf.c
+> @@ -402,7 +402,7 @@ bool hvf_inject_interrupts(CPUState *cpu_state)
+>
+>      if (cpu_state->interrupt_request & CPU_INTERRUPT_NMI) {
+>          if (!(env->hflags2 & HF2_NMI_MASK) && !(info & VMCS_INTR_VALID))=
+ {
+> -            cpu_state->interrupt_request &=3D ~CPU_INTERRUPT_NMI;
+> +            cpu_reset_interrupt(cpu_state, CPU_INTERRUPT_NMI);
+>              info =3D VMCS_INTR_VALID | VMCS_INTR_T_NMI | NMI_VEC;
+>              wvmcs(cpu_state->hvf_fd, VMCS_ENTRY_INTR_INFO, info);
+>          } else {
+> @@ -414,7 +414,7 @@ bool hvf_inject_interrupts(CPUState *cpu_state)
+>          (cpu_state->interrupt_request & CPU_INTERRUPT_HARD) &&
+>          (EFLAGS(env) & IF_MASK) && !(info & VMCS_INTR_VALID)) {
+>          int line =3D cpu_get_pic_interrupt(&x86cpu->env);
+> -        cpu_state->interrupt_request &=3D ~CPU_INTERRUPT_HARD;
+> +        cpu_reset_interrupt(cpu_state, CPU_INTERRUPT_HARD);
+>          if (line >=3D 0) {
+>              wvmcs(cpu_state->hvf_fd, VMCS_ENTRY_INTR_INFO, line |
+>                    VMCS_INTR_VALID | VMCS_INTR_T_HWINTR);
+> @@ -440,7 +440,7 @@ int hvf_process_events(CPUState *cpu_state)
+>      }
+>
+>      if (cpu_state->interrupt_request & CPU_INTERRUPT_POLL) {
+> -        cpu_state->interrupt_request &=3D ~CPU_INTERRUPT_POLL;
+> +        cpu_reset_interrupt(cpu_state, CPU_INTERRUPT_POLL);
+>          apic_poll_irq(cpu->apic_state);
+>      }
+>      if (((cpu_state->interrupt_request & CPU_INTERRUPT_HARD) &&
+> @@ -453,7 +453,7 @@ int hvf_process_events(CPUState *cpu_state)
+>          do_cpu_sipi(cpu);
+>      }
+>      if (cpu_state->interrupt_request & CPU_INTERRUPT_TPR) {
+> -        cpu_state->interrupt_request &=3D ~CPU_INTERRUPT_TPR;
+> +        cpu_reset_interrupt(cpu_state, CPU_INTERRUPT_TPR);
+>          hvf_cpu_synchronize_state(cpu_state);
+>          apic_handle_tpr_access_report(cpu->apic_state, env->eip,
+>                                        env->tpr_access_type);
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index d593818cd5..effaf87f01 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -2709,7 +2709,7 @@ static int kvm_put_vcpu_events(X86CPU *cpu, int lev=
+el)
+>               */
+>              events.smi.pending =3D cs->interrupt_request & CPU_INTERRUPT=
+_SMI;
+>              events.smi.latched_init =3D cs->interrupt_request & CPU_INTE=
+RRUPT_INIT;
+> -            cs->interrupt_request &=3D ~(CPU_INTERRUPT_INIT | CPU_INTERR=
+UPT_SMI);
+> +            cpu_reset_interrupt(cs, CPU_INTERRUPT_INIT | CPU_INTERRUPT_S=
+MI);
+>          } else {
+>              /* Keep these in cs->interrupt_request.  */
+>              events.smi.pending =3D 0;
+> @@ -3005,7 +3005,7 @@ void kvm_arch_pre_run(CPUState *cpu, struct kvm_run=
+ *run)
+>      if (cpu->interrupt_request & (CPU_INTERRUPT_NMI | CPU_INTERRUPT_SMI)=
+) {
+>          if (cpu->interrupt_request & CPU_INTERRUPT_NMI) {
+>              qemu_mutex_lock_iothread();
+> -            cpu->interrupt_request &=3D ~CPU_INTERRUPT_NMI;
+> +            cpu_reset_interrupt(cpu, CPU_INTERRUPT_NMI);
+>              qemu_mutex_unlock_iothread();
+>              DPRINTF("injected NMI\n");
+>              ret =3D kvm_vcpu_ioctl(cpu, KVM_NMI);
+> @@ -3016,7 +3016,7 @@ void kvm_arch_pre_run(CPUState *cpu, struct kvm_run=
+ *run)
+>          }
+>          if (cpu->interrupt_request & CPU_INTERRUPT_SMI) {
+>              qemu_mutex_lock_iothread();
+> -            cpu->interrupt_request &=3D ~CPU_INTERRUPT_SMI;
+> +            cpu_reset_interrupt(cpu, CPU_INTERRUPT_SMI);
+>              qemu_mutex_unlock_iothread();
+>              DPRINTF("injected SMI\n");
+>              ret =3D kvm_vcpu_ioctl(cpu, KVM_SMI);
+> @@ -3052,7 +3052,7 @@ void kvm_arch_pre_run(CPUState *cpu, struct kvm_run=
+ *run)
+>              (env->eflags & IF_MASK)) {
+>              int irq;
+>
+> -            cpu->interrupt_request &=3D ~CPU_INTERRUPT_HARD;
+> +            cpu_reset_interrupt(cpu, CPU_INTERRUPT_HARD);
+>              irq =3D cpu_get_pic_interrupt(env);
+>              if (irq >=3D 0) {
+>                  struct kvm_interrupt intr;
+> @@ -3123,7 +3123,7 @@ int kvm_arch_process_async_events(CPUState *cs)
+>          /* We must not raise CPU_INTERRUPT_MCE if it's not supported. */
+>          assert(env->mcg_cap);
+>
+> -        cs->interrupt_request &=3D ~CPU_INTERRUPT_MCE;
+> +        cpu_reset_interrupt(cs, CPU_INTERRUPT_MCE);
+>
+>          kvm_cpu_synchronize_state(cs);
+>
+> @@ -3153,7 +3153,7 @@ int kvm_arch_process_async_events(CPUState *cs)
+>      }
+>
+>      if (cs->interrupt_request & CPU_INTERRUPT_POLL) {
+> -        cs->interrupt_request &=3D ~CPU_INTERRUPT_POLL;
+> +        cpu_reset_interrupt(cs, CPU_INTERRUPT_POLL);
+>          apic_poll_irq(cpu->apic_state);
+>      }
+>      if (((cs->interrupt_request & CPU_INTERRUPT_HARD) &&
+> @@ -3166,7 +3166,7 @@ int kvm_arch_process_async_events(CPUState *cs)
+>          do_cpu_sipi(cpu);
+>      }
+>      if (cs->interrupt_request & CPU_INTERRUPT_TPR) {
+> -        cs->interrupt_request &=3D ~CPU_INTERRUPT_TPR;
+> +        cpu_reset_interrupt(cs, CPU_INTERRUPT_TPR);
+>          kvm_cpu_synchronize_state(cs);
+>          apic_handle_tpr_access_report(cpu->apic_state, env->eip,
+>                                        env->tpr_access_type);
+> diff --git a/target/i386/seg_helper.c b/target/i386/seg_helper.c
+> index 33714bc6e1..ac5497de79 100644
+> --- a/target/i386/seg_helper.c
+> +++ b/target/i386/seg_helper.c
+> @@ -1332,7 +1332,7 @@ bool x86_cpu_exec_interrupt(CPUState *cs, int inter=
+rupt_request)
+>      switch (interrupt_request) {
+>  #if !defined(CONFIG_USER_ONLY)
+>      case CPU_INTERRUPT_POLL:
+> -        cs->interrupt_request &=3D ~CPU_INTERRUPT_POLL;
+> +        cpu_reset_interrupt(cs, CPU_INTERRUPT_POLL);
+>          apic_poll_irq(cpu->apic_state);
+>          break;
+>  #endif
+> @@ -1341,23 +1341,22 @@ bool x86_cpu_exec_interrupt(CPUState *cs, int int=
+errupt_request)
+>          break;
+>      case CPU_INTERRUPT_SMI:
+>          cpu_svm_check_intercept_param(env, SVM_EXIT_SMI, 0, 0);
+> -        cs->interrupt_request &=3D ~CPU_INTERRUPT_SMI;
+> +        cpu_reset_interrupt(cs, CPU_INTERRUPT_SMI);
+>          do_smm_enter(cpu);
+>          break;
+>      case CPU_INTERRUPT_NMI:
+>          cpu_svm_check_intercept_param(env, SVM_EXIT_NMI, 0, 0);
+> -        cs->interrupt_request &=3D ~CPU_INTERRUPT_NMI;
+> +        cpu_reset_interrupt(cs, CPU_INTERRUPT_NMI);
+>          env->hflags2 |=3D HF2_NMI_MASK;
+>          do_interrupt_x86_hardirq(env, EXCP02_NMI, 1);
+>          break;
+>      case CPU_INTERRUPT_MCE:
+> -        cs->interrupt_request &=3D ~CPU_INTERRUPT_MCE;
+> +        cpu_reset_interrupt(cs, CPU_INTERRUPT_MCE);
+>          do_interrupt_x86_hardirq(env, EXCP12_MCHK, 0);
+>          break;
+>      case CPU_INTERRUPT_HARD:
+>          cpu_svm_check_intercept_param(env, SVM_EXIT_INTR, 0, 0);
+> -        cs->interrupt_request &=3D ~(CPU_INTERRUPT_HARD |
+> -                                   CPU_INTERRUPT_VIRQ);
+> +        cpu_reset_interrupt(cs, CPU_INTERRUPT_HARD | CPU_INTERRUPT_VIRQ);
+>          intno =3D cpu_get_pic_interrupt(env);
+>          qemu_log_mask(CPU_LOG_TB_IN_ASM,
+>                        "Servicing hardware INT=3D0x%02x\n", intno);
+> @@ -1372,7 +1371,7 @@ bool x86_cpu_exec_interrupt(CPUState *cs, int inter=
+rupt_request)
+>          qemu_log_mask(CPU_LOG_TB_IN_ASM,
+>                        "Servicing virtual hardware INT=3D0x%02x\n", intno=
+);
+>          do_interrupt_x86_hardirq(env, intno, 1);
+> -        cs->interrupt_request &=3D ~CPU_INTERRUPT_VIRQ;
+> +        cpu_reset_interrupt(cs, CPU_INTERRUPT_VIRQ);
+>          break;
+>  #endif
+>      }
+> diff --git a/target/i386/svm_helper.c b/target/i386/svm_helper.c
+> index 9fd22a883b..a6d33e55d8 100644
+> --- a/target/i386/svm_helper.c
+> +++ b/target/i386/svm_helper.c
+> @@ -700,7 +700,7 @@ void do_vmexit(CPUX86State *env, uint32_t exit_code, =
+uint64_t exit_info_1)
+>      env->hflags &=3D ~HF_GUEST_MASK;
+>      env->intercept =3D 0;
+>      env->intercept_exceptions =3D 0;
+> -    cs->interrupt_request &=3D ~CPU_INTERRUPT_VIRQ;
+> +    cpu_reset_interrupt(cs, CPU_INTERRUPT_VIRQ);
+>      env->tsc_offset =3D 0;
+>
+>      env->gdt.base  =3D x86_ldq_phys(cs, env->vm_hsave + offsetof(struct =
+vmcb,
+> diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
+> index b9c79ccd99..9673bdc219 100644
+> --- a/target/i386/whpx-all.c
+> +++ b/target/i386/whpx-all.c
+> @@ -728,14 +728,14 @@ static void whpx_vcpu_pre_run(CPUState *cpu)
+>      if (!vcpu->interruption_pending &&
+>          cpu->interrupt_request & (CPU_INTERRUPT_NMI | CPU_INTERRUPT_SMI)=
+) {
+>          if (cpu->interrupt_request & CPU_INTERRUPT_NMI) {
+> -            cpu->interrupt_request &=3D ~CPU_INTERRUPT_NMI;
+> +            cpu_reset_interrupt(cpu, CPU_INTERRUPT_NMI);
+>              vcpu->interruptable =3D false;
+>              new_int.InterruptionType =3D WHvX64PendingNmi;
+>              new_int.InterruptionPending =3D 1;
+>              new_int.InterruptionVector =3D 2;
+>          }
+>          if (cpu->interrupt_request & CPU_INTERRUPT_SMI) {
+> -            cpu->interrupt_request &=3D ~CPU_INTERRUPT_SMI;
+> +            cpu_reset_interrupt(cpu, CPU_INTERRUPT_SMI);
+>          }
+>      }
+>
+> @@ -758,7 +758,7 @@ static void whpx_vcpu_pre_run(CPUState *cpu)
+>          vcpu->interruptable && (env->eflags & IF_MASK)) {
+>          assert(!new_int.InterruptionPending);
+>          if (cpu->interrupt_request & CPU_INTERRUPT_HARD) {
+> -            cpu->interrupt_request &=3D ~CPU_INTERRUPT_HARD;
+> +            cpu_reset_interrupt(cpu, CPU_INTERRUPT_HARD);
+>              irq =3D cpu_get_pic_interrupt(env);
+>              if (irq >=3D 0) {
+>                  new_int.InterruptionType =3D WHvX64PendingInterrupt;
+> @@ -850,7 +850,7 @@ static void whpx_vcpu_process_async_events(CPUState *=
+cpu)
+>      }
+>
+>      if (cpu->interrupt_request & CPU_INTERRUPT_POLL) {
+> -        cpu->interrupt_request &=3D ~CPU_INTERRUPT_POLL;
+> +        cpu_reset_interrupt(cpu, CPU_INTERRUPT_POLL);
+>          apic_poll_irq(x86_cpu->apic_state);
+>      }
+>
+> @@ -868,7 +868,7 @@ static void whpx_vcpu_process_async_events(CPUState *=
+cpu)
+>      }
+>
+>      if (cpu->interrupt_request & CPU_INTERRUPT_TPR) {
+> -        cpu->interrupt_request &=3D ~CPU_INTERRUPT_TPR;
+> +        cpu_reset_interrupt(cpu, CPU_INTERRUPT_TPR);
+>          if (!cpu->vcpu_dirty) {
+>              whpx_get_registers(cpu);
+>          }
 
-> Have a nice day, thanks
-> Fei
-> > 
-> > >           return -1;
-> > >       }
-> > > diff --git a/migration/ram.c b/migration/ram.c
-> > > index 8f03afe228..57cb1bee3d 100644
-> > > --- a/migration/ram.c
-> > > +++ b/migration/ram.c
-> > > @@ -922,7 +922,7 @@ static void multifd_send_terminate_threads(Error *err)
-> > >       }
-> > >   }
-> > > -int multifd_save_cleanup(Error **errp)
-> > > +int multifd_save_cleanup(void)
-> > >   {
-> > >       int i;
-> > >       int ret = 0;
-> > > @@ -1082,9 +1082,8 @@ static void multifd_new_send_channel_async(QIOTask *task, gpointer opaque)
-> > >       if (qio_task_propagate_error(task, &local_err)) {
-> > >           migrate_set_state(&s->state, s->state, MIGRATION_STATUS_FAILED);
-> > > -        if (multifd_save_cleanup(&local_err) != 0) {
-> > > -            migrate_set_error(migrate_get_current(), local_err);
-> > > -        }
-> > > +        multifd_save_cleanup();
-> > > +        migrate_set_error(migrate_get_current(), local_err);
-> > >       } else {
-> > >           p->c = QIO_CHANNEL(sioc);
-> > >           qio_channel_set_delay(p->c, false);
-> > > diff --git a/migration/ram.h b/migration/ram.h
-> > > index 046d3074be..0d1215209e 100644
-> > > --- a/migration/ram.h
-> > > +++ b/migration/ram.h
-> > > @@ -43,7 +43,7 @@ uint64_t ram_bytes_remaining(void);
-> > >   uint64_t ram_bytes_total(void);
-> > >   int multifd_save_setup(void);
-> > > -int multifd_save_cleanup(Error **errp);
-> > > +int multifd_save_cleanup(void);
-> > >   int multifd_load_setup(void);
-> > >   int multifd_load_cleanup(Error **errp);
-> > >   bool multifd_recv_all_channels_created(void);
-> > > -- 
-> > > 2.13.7
-> > > 
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > 
-> 
+
 --
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Alex Benn=C3=A9e
