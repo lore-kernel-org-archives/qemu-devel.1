@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33387)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33489)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHrMa-0000qB-EP
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:20:54 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1gHrMh-0000wX-58
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:21:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHrMY-0007BI-Kd
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:20:52 -0400
-Received: from mail-ot1-x330.google.com ([2607:f8b0:4864:20::330]:45632)
+	(envelope-from <alex.bennee@linaro.org>) id 1gHrMZ-0007Bn-1Q
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:20:58 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35955)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHrMY-00074C-9Q
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gHrMY-000760-BA
 	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:20:50 -0400
-Received: by mail-ot1-x330.google.com with SMTP id g10so3611733otl.12
-	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 07:20:38 -0700 (PDT)
-Sender: fluxion <flukshun@gmail.com>
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Wed, 31 Oct 2018 09:19:15 -0500
-Message-Id: <20181031141925.30026-15-mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20181031141925.30026-1-mdroth@linux.vnet.ibm.com>
-References: <20181031141925.30026-1-mdroth@linux.vnet.ibm.com>
+Received: by mail-wr1-x444.google.com with SMTP id y16so16699492wrw.3
+	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 07:20:44 -0700 (PDT)
+References: <20181025144644.15464-1-cota@braap.org>
+	<20181025144644.15464-19-cota@braap.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20181025144644.15464-19-cota@braap.org>
+Date: Wed, 31 Oct 2018 14:20:41 +0000
+Message-ID: <877ehy8afa.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v3 14/24] qga-win: handle multi-disk volumes
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC v4 19/71] i386: convert to cpu_halted
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,220 +30,260 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>
 
-From: Tomáš Golembiovský <tgolembi@redhat.com>
 
-Probe the volume for disk extents and return list of all disks.
-Originally only first disk of composite volume was returned.
+Emilio G. Cota <cota@braap.org> writes:
 
-Note that the patch changes get_pci_info() from one state of brokenness
-into a different state of brokenness. In other words it still does not do
-what it's supposed to do (see comment in code). If anyone knows how to
-fix it, please step in.
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
 
-Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
----
- qga/commands-win32.c | 126 ++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 108 insertions(+), 18 deletions(-)
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-index 21a88d31e1..90432bbfce 100644
---- a/qga/commands-win32.c
-+++ b/qga/commands-win32.c
-@@ -491,9 +491,26 @@ static GuestDiskBusType find_bus_type(STORAGE_BUS_TYPE bus)
-     return win2qemu[(int)bus];
- }
- 
-+/* XXX: The following function is BROKEN!
-+ *
-+ * It does not work and probably has never worked. When we query for list of
-+ * disks we get cryptic names like "\Device\0000001d" instead of
-+ * "\PhysicalDriveX" or "\HarddiskX". Whether the names can be translated one
-+ * way or the other for comparison is an open question.
-+ *
-+ * When we query volume names (the original version) we are able to match those
-+ * but then the property queries report error "Invalid function". (duh!)
-+ */
-+
-+/*
- DEFINE_GUID(GUID_DEVINTERFACE_VOLUME,
-         0x53f5630dL, 0xb6bf, 0x11d0, 0x94, 0xf2,
-         0x00, 0xa0, 0xc9, 0x1e, 0xfb, 0x8b);
-+*/
-+DEFINE_GUID(GUID_DEVINTERFACE_DISK,
-+        0x53f56307L, 0xb6bf, 0x11d0, 0x94, 0xf2,
-+        0x00, 0xa0, 0xc9, 0x1e, 0xfb, 0x8b);
-+
- 
- static GuestPCIAddress *get_pci_info(char *guid, Error **errp)
- {
-@@ -517,7 +534,7 @@ static GuestPCIAddress *get_pci_info(char *guid, Error **errp)
-         goto out;
-     }
- 
--    dev_info = SetupDiGetClassDevs(&GUID_DEVINTERFACE_VOLUME, 0, 0,
-+    dev_info = SetupDiGetClassDevs(&GUID_DEVINTERFACE_DISK, 0, 0,
-                                    DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
-     if (dev_info == INVALID_HANDLE_VALUE) {
-         error_setg_win32(errp, GetLastError(), "failed to get devices tree");
-@@ -672,20 +689,20 @@ static void get_single_disk_info(char *name, GuestDiskAddress *disk,
- {
-     SCSI_ADDRESS addr, *scsi_ad;
-     DWORD len;
--    HANDLE vol_h;
-+    HANDLE disk_h;
-     Error *local_err = NULL;
- 
-     scsi_ad = &addr;
- 
-     g_debug("getting disk info for: %s", name);
--    vol_h = CreateFile(name, 0, FILE_SHARE_READ, NULL, OPEN_EXISTING,
-+    disk_h = CreateFile(name, 0, FILE_SHARE_READ, NULL, OPEN_EXISTING,
-                        0, NULL);
--    if (vol_h == INVALID_HANDLE_VALUE) {
--        error_setg_win32(errp, GetLastError(), "failed to open volume");
--        goto err;
-+    if (disk_h == INVALID_HANDLE_VALUE) {
-+        error_setg_win32(errp, GetLastError(), "failed to open disk");
-+        return;
-     }
- 
--    get_disk_properties(vol_h, disk, &local_err);
-+    get_disk_properties(disk_h, disk, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         goto err_close;
-@@ -714,7 +731,7 @@ static void get_single_disk_info(char *name, GuestDiskAddress *disk,
-          * according to Microsoft docs
-          * https://technet.microsoft.com/en-us/library/ee851589(v=ws.10).aspx */
-         g_debug("getting pci-controller info");
--        if (DeviceIoControl(vol_h, IOCTL_SCSI_GET_ADDRESS, NULL, 0, scsi_ad,
-+        if (DeviceIoControl(disk_h, IOCTL_SCSI_GET_ADDRESS, NULL, 0, scsi_ad,
-                             sizeof(SCSI_ADDRESS), &len, NULL)) {
-             disk->unit = addr.Lun;
-             disk->target = addr.TargetId;
-@@ -725,8 +742,7 @@ static void get_single_disk_info(char *name, GuestDiskAddress *disk,
-     }
- 
- err_close:
--    CloseHandle(vol_h);
--err:
-+    CloseHandle(disk_h);
-     return;
- }
- 
-@@ -738,6 +754,10 @@ static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
-     Error *local_err = NULL;
-     GuestDiskAddressList *list = NULL, *cur_item = NULL;
-     GuestDiskAddress *disk = NULL;
-+    int i;
-+    HANDLE vol_h;
-+    DWORD size;
-+    PVOLUME_DISK_EXTENTS extents = NULL;
- 
-     /* strip final backslash */
-     char *name = g_strdup(guid);
-@@ -745,20 +765,90 @@ static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
-         name[strlen(name) - 1] = 0;
-     }
- 
--    disk = g_malloc0(sizeof(GuestDiskAddress));
--    get_single_disk_info(name, disk, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    g_debug("opening %s", name);
-+    vol_h = CreateFile(name, 0, FILE_SHARE_READ, NULL, OPEN_EXISTING,
-+                       0, NULL);
-+    if (vol_h == INVALID_HANDLE_VALUE) {
-+        error_setg_win32(errp, GetLastError(), "failed to open volume");
-         goto out;
-     }
- 
--    cur_item = g_malloc0(sizeof(*list));
--    cur_item->value = disk;
--    disk = NULL;
--    list = cur_item;
-+    /* Get list of extents */
-+    g_debug("getting disk extents");
-+    size = sizeof(VOLUME_DISK_EXTENTS);
-+    extents = g_malloc0(size);
-+    if (!DeviceIoControl(vol_h, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, NULL,
-+                         0, extents, size, NULL, NULL)) {
-+        DWORD last_err = GetLastError();
-+        if (last_err == ERROR_MORE_DATA) {
-+            /* Try once more with big enough buffer */
-+            size = sizeof(VOLUME_DISK_EXTENTS)
-+                + extents->NumberOfDiskExtents*sizeof(DISK_EXTENT);
-+            g_free(extents);
-+            extents = g_malloc0(size);
-+            if (!DeviceIoControl(
-+                    vol_h, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, NULL,
-+                    0, extents, size, NULL, NULL)) {
-+                error_setg_win32(errp, GetLastError(),
-+                    "failed to get disk extents");
-+                return NULL;
-+            }
-+        } else if (last_err == ERROR_INVALID_FUNCTION) {
-+            /* Possibly CD-ROM or a shared drive. Try to pass the volume */
-+            g_debug("volume not on disk");
-+            disk = g_malloc0(sizeof(GuestDiskAddress));
-+            get_single_disk_info(name, disk, &local_err);
-+            if (local_err) {
-+                g_debug("failed to get disk info, ignoring error: %s",
-+                    error_get_pretty(local_err));
-+                error_free(local_err);
-+                goto out;
-+            }
-+            list = g_malloc0(sizeof(*list));
-+            list->value = disk;
-+            disk = NULL;
-+            list->next = NULL;
-+            goto out;
-+        } else {
-+            error_setg_win32(errp, GetLastError(),
-+                "failed to get disk extents");
-+            goto out;
-+        }
-+    }
-+    g_debug("Number of extents: %lu", extents->NumberOfDiskExtents);
-+
-+    /* Go through each extent */
-+    for (i = 0; i < extents->NumberOfDiskExtents; i++) {
-+        char *disk_name = NULL;
-+        disk = g_malloc0(sizeof(GuestDiskAddress));
-+
-+        /* Disk numbers directly correspond to numbers used in UNCs
-+         *
-+         * See documentation for DISK_EXTENT:
-+         * https://docs.microsoft.com/en-us/windows/desktop/api/winioctl/ns-winioctl-_disk_extent
-+         *
-+         * See also Naming Files, Paths and Namespaces:
-+         * https://docs.microsoft.com/en-us/windows/desktop/FileIO/naming-a-file#win32-device-namespaces
-+         */
-+        disk_name = g_strdup_printf("\\\\.\\PhysicalDrive%lu",
-+            extents->Extents[i].DiskNumber);
-+        get_single_disk_info(disk_name, disk, &local_err);
-+        g_free(disk_name);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            goto out;
-+        }
-+        cur_item = g_malloc0(sizeof(*list));
-+        cur_item->value = disk;
-+        disk = NULL;
-+        cur_item->next = list;
-+        list = cur_item;
-+    }
-+
- 
- out:
-     qapi_free_GuestDiskAddress(disk);
-+    g_free(extents);
-     g_free(name);
- 
-     return list;
--- 
-2.17.1
+> ---
+>  target/i386/cpu.h         |  2 +-
+>  target/i386/cpu.c         |  2 +-
+>  target/i386/hax-all.c     |  4 ++--
+>  target/i386/helper.c      |  4 ++--
+>  target/i386/hvf/hvf.c     |  8 ++++----
+>  target/i386/hvf/x86hvf.c  |  4 ++--
+>  target/i386/kvm.c         | 10 +++++-----
+>  target/i386/misc_helper.c |  2 +-
+>  target/i386/whpx-all.c    |  6 +++---
+>  9 files changed, 21 insertions(+), 21 deletions(-)
+>
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index 730c06f80a..461459520a 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -1600,7 +1600,7 @@ static inline void cpu_x86_load_seg_cache_sipi(X86C=
+PU *cpu,
+>                             sipi_vector << 12,
+>                             env->segs[R_CS].limit,
+>                             env->segs[R_CS].flags);
+> -    cs->halted =3D 0;
+> +    cpu_halted_set(cs, 0);
+>  }
+>
+>  int cpu_x86_get_descr_debug(CPUX86State *env, unsigned int selector,
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index c88876dfe3..b91d80af0a 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -4524,7 +4524,7 @@ static void x86_cpu_reset(CPUState *s)
+>      /* We hard-wire the BSP to the first CPU. */
+>      apic_designate_bsp(cpu->apic_state, s->cpu_index =3D=3D 0);
+>
+> -    s->halted =3D !cpu_is_bsp(cpu);
+> +    cpu_halted_set(s, !cpu_is_bsp(cpu));
+>
+>      if (kvm_enabled()) {
+>          kvm_arch_reset_vcpu(cpu);
+> diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
+> index d2e512856b..f095c527e3 100644
+> --- a/target/i386/hax-all.c
+> +++ b/target/i386/hax-all.c
+> @@ -480,7 +480,7 @@ static int hax_vcpu_hax_exec(CPUArchState *env)
+>          return 0;
+>      }
+>
+> -    cpu->halted =3D 0;
+> +    cpu_halted_set(cpu, 0);
+>
+>      if (cpu->interrupt_request & CPU_INTERRUPT_POLL) {
+>          cpu->interrupt_request &=3D ~CPU_INTERRUPT_POLL;
+> @@ -557,7 +557,7 @@ static int hax_vcpu_hax_exec(CPUArchState *env)
+>                  !(cpu->interrupt_request & CPU_INTERRUPT_NMI)) {
+>                  /* hlt instruction with interrupt disabled is shutdown */
+>                  env->eflags |=3D IF_MASK;
+> -                cpu->halted =3D 1;
+> +                cpu_halted_set(cpu, 1);
+>                  cpu->exception_index =3D EXCP_HLT;
+>                  ret =3D 1;
+>              }
+> diff --git a/target/i386/helper.c b/target/i386/helper.c
+> index e695f8ba7a..a75278f954 100644
+> --- a/target/i386/helper.c
+> +++ b/target/i386/helper.c
+> @@ -454,7 +454,7 @@ void x86_cpu_dump_state(CPUState *cs, FILE *f, fprint=
+f_function cpu_fprintf,
+>                      (env->hflags >> HF_INHIBIT_IRQ_SHIFT) & 1,
+>                      (env->a20_mask >> 20) & 1,
+>                      (env->hflags >> HF_SMM_SHIFT) & 1,
+> -                    cs->halted);
+> +                    cpu_halted(cs));
+>      } else
+>  #endif
+>      {
+> @@ -481,7 +481,7 @@ void x86_cpu_dump_state(CPUState *cs, FILE *f, fprint=
+f_function cpu_fprintf,
+>                      (env->hflags >> HF_INHIBIT_IRQ_SHIFT) & 1,
+>                      (env->a20_mask >> 20) & 1,
+>                      (env->hflags >> HF_SMM_SHIFT) & 1,
+> -                    cs->halted);
+> +                    cpu_halted(cs));
+>      }
+>
+>      for(i =3D 0; i < 6; i++) {
+> diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
+> index 9f52bc413a..fb3b2a26a1 100644
+> --- a/target/i386/hvf/hvf.c
+> +++ b/target/i386/hvf/hvf.c
+> @@ -500,7 +500,7 @@ void hvf_reset_vcpu(CPUState *cpu) {
+>      }
+>
+>      hv_vm_sync_tsc(0);
+> -    cpu->halted =3D 0;
+> +    cpu_halted_set(cpu, 0);
+>      hv_vcpu_invalidate_tlb(cpu->hvf_fd);
+>      hv_vcpu_flush(cpu->hvf_fd);
+>  }
+> @@ -665,7 +665,7 @@ int hvf_vcpu_exec(CPUState *cpu)
+>      int ret =3D 0;
+>      uint64_t rip =3D 0;
+>
+> -    cpu->halted =3D 0;
+> +    cpu_halted_set(cpu, 0);
+>
+>      if (hvf_process_events(cpu)) {
+>          return EXCP_HLT;
+> @@ -683,7 +683,7 @@ int hvf_vcpu_exec(CPUState *cpu)
+>          vmx_update_tpr(cpu);
+>
+>          qemu_mutex_unlock_iothread();
+> -        if (!cpu_is_bsp(X86_CPU(cpu)) && cpu->halted) {
+> +        if (!cpu_is_bsp(X86_CPU(cpu)) && cpu_halted(cpu)) {
+>              qemu_mutex_lock_iothread();
+>              return EXCP_HLT;
+>          }
+> @@ -717,7 +717,7 @@ int hvf_vcpu_exec(CPUState *cpu)
+>                  (EFLAGS(env) & IF_MASK))
+>                  && !(cpu->interrupt_request & CPU_INTERRUPT_NMI) &&
+>                  !(idtvec_info & VMCS_IDT_VEC_VALID)) {
+> -                cpu->halted =3D 1;
+> +                cpu_halted_set(cpu, 1);
+>                  ret =3D EXCP_HLT;
+>              }
+>              ret =3D EXCP_INTERRUPT;
+> diff --git a/target/i386/hvf/x86hvf.c b/target/i386/hvf/x86hvf.c
+> index df8e946fbc..163bbed23f 100644
+> --- a/target/i386/hvf/x86hvf.c
+> +++ b/target/i386/hvf/x86hvf.c
+> @@ -446,7 +446,7 @@ int hvf_process_events(CPUState *cpu_state)
+>      if (((cpu_state->interrupt_request & CPU_INTERRUPT_HARD) &&
+>          (EFLAGS(env) & IF_MASK)) ||
+>          (cpu_state->interrupt_request & CPU_INTERRUPT_NMI)) {
+> -        cpu_state->halted =3D 0;
+> +        cpu_halted_set(cpu_state, 0);
+>      }
+>      if (cpu_state->interrupt_request & CPU_INTERRUPT_SIPI) {
+>          hvf_cpu_synchronize_state(cpu_state);
+> @@ -458,5 +458,5 @@ int hvf_process_events(CPUState *cpu_state)
+>          apic_handle_tpr_access_report(cpu->apic_state, env->eip,
+>                                        env->tpr_access_type);
+>      }
+> -    return cpu_state->halted;
+> +    return cpu_halted(cpu);
+>  }
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index dc4047b02f..d593818cd5 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -2650,7 +2650,7 @@ static int kvm_get_mp_state(X86CPU *cpu)
+>      }
+>      env->mp_state =3D mp_state.mp_state;
+>      if (kvm_irqchip_in_kernel()) {
+> -        cs->halted =3D (mp_state.mp_state =3D=3D KVM_MP_STATE_HALTED);
+> +        cpu_halted_set(cs, mp_state.mp_state =3D=3D KVM_MP_STATE_HALTED);
+>      }
+>      return 0;
+>  }
+> @@ -3136,7 +3136,7 @@ int kvm_arch_process_async_events(CPUState *cs)
+>          env->exception_injected =3D EXCP12_MCHK;
+>          env->has_error_code =3D 0;
+>
+> -        cs->halted =3D 0;
+> +        cpu_halted_set(cs, 0);
+>          if (kvm_irqchip_in_kernel() && env->mp_state =3D=3D KVM_MP_STATE=
+_HALTED) {
+>              env->mp_state =3D KVM_MP_STATE_RUNNABLE;
+>          }
+> @@ -3159,7 +3159,7 @@ int kvm_arch_process_async_events(CPUState *cs)
+>      if (((cs->interrupt_request & CPU_INTERRUPT_HARD) &&
+>           (env->eflags & IF_MASK)) ||
+>          (cs->interrupt_request & CPU_INTERRUPT_NMI)) {
+> -        cs->halted =3D 0;
+> +        cpu_halted_set(cs, 0);
+>      }
+>      if (cs->interrupt_request & CPU_INTERRUPT_SIPI) {
+>          kvm_cpu_synchronize_state(cs);
+> @@ -3172,7 +3172,7 @@ int kvm_arch_process_async_events(CPUState *cs)
+>                                        env->tpr_access_type);
+>      }
+>
+> -    return cs->halted;
+> +    return cpu_halted(cs);
+>  }
+>
+>  static int kvm_handle_halt(X86CPU *cpu)
+> @@ -3183,7 +3183,7 @@ static int kvm_handle_halt(X86CPU *cpu)
+>      if (!((cs->interrupt_request & CPU_INTERRUPT_HARD) &&
+>            (env->eflags & IF_MASK)) &&
+>          !(cs->interrupt_request & CPU_INTERRUPT_NMI)) {
+> -        cs->halted =3D 1;
+> +        cpu_halted_set(cs, 1);
+>          return EXCP_HLT;
+>      }
+>
+> diff --git a/target/i386/misc_helper.c b/target/i386/misc_helper.c
+> index 78f2020ef2..fcd6d833e8 100644
+> --- a/target/i386/misc_helper.c
+> +++ b/target/i386/misc_helper.c
+> @@ -554,7 +554,7 @@ static void do_hlt(X86CPU *cpu)
+>      CPUX86State *env =3D &cpu->env;
+>
+>      env->hflags &=3D ~HF_INHIBIT_IRQ_MASK; /* needed if sti is just befo=
+re */
+> -    cs->halted =3D 1;
+> +    cpu_halted_set(cs, 1);
+>      cs->exception_index =3D EXCP_HLT;
+>      cpu_loop_exit(cs);
+>  }
+> diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
+> index 57e53e1f1f..b9c79ccd99 100644
+> --- a/target/i386/whpx-all.c
+> +++ b/target/i386/whpx-all.c
+> @@ -697,7 +697,7 @@ static int whpx_handle_halt(CPUState *cpu)
+>            (env->eflags & IF_MASK)) &&
+>          !(cpu->interrupt_request & CPU_INTERRUPT_NMI)) {
+>          cpu->exception_index =3D EXCP_HLT;
+> -        cpu->halted =3D true;
+> +        cpu_halted_set(cpu, true);
+>          ret =3D 1;
+>      }
+>      qemu_mutex_unlock_iothread();
+> @@ -857,7 +857,7 @@ static void whpx_vcpu_process_async_events(CPUState *=
+cpu)
+>      if (((cpu->interrupt_request & CPU_INTERRUPT_HARD) &&
+>           (env->eflags & IF_MASK)) ||
+>          (cpu->interrupt_request & CPU_INTERRUPT_NMI)) {
+> -        cpu->halted =3D false;
+> +        cpu_halted_set(cpu, false);
+>      }
+>
+>      if (cpu->interrupt_request & CPU_INTERRUPT_SIPI) {
+> @@ -887,7 +887,7 @@ static int whpx_vcpu_run(CPUState *cpu)
+>      int ret;
+>
+>      whpx_vcpu_process_async_events(cpu);
+> -    if (cpu->halted) {
+> +    if (cpu_halted(cpu)) {
+>          cpu->exception_index =3D EXCP_HLT;
+>          atomic_set(&cpu->exit_request, false);
+>          return 0;
+
+
+--
+Alex Benn=C3=A9e
