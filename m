@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49034)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50442)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gHpVk-0000sa-Uz
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 08:22:13 -0400
+	(envelope-from <fli@suse.com>) id 1gHpa9-0005j7-It
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 08:26:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gHpVe-0001tC-C8
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 08:22:12 -0400
-Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:39827)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gHpVa-0001Fw-Es
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 08:22:04 -0400
-Received: by mail-wr1-x42a.google.com with SMTP id r10-v6so16263122wrv.6
-	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 05:21:30 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 31 Oct 2018 12:21:19 +0000
-Message-Id: <20181031122119.1669-11-richard.henderson@linaro.org>
-In-Reply-To: <20181031122119.1669-1-richard.henderson@linaro.org>
-References: <20181031122119.1669-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 10/10] cputlb: Remove tlb_c.pending_flushes
+	(envelope-from <fli@suse.com>) id 1gHpa3-00071M-P3
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 08:26:45 -0400
+Received: from mx2.suse.de ([195.135.220.15]:54026 helo=mx1.suse.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <fli@suse.com>) id 1gHpa3-00070b-F5
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 08:26:39 -0400
+References: <20181029125818.28720-1-fli@suse.com>
+	<20181029125818.28720-6-fli@suse.com> <20181030060502.GG22523@xz-x1>
+	<0273e52f-ba16-fef0-22bc-bb3103dbdab2@suse.com>
+	<20181030221858.GB2032@xz-x1>
+From: Fei Li <fli@suse.com>
+Message-ID: <d79100d4-8c4b-7308-651f-cc38963a85a1@suse.com>
+Date: Wed, 31 Oct 2018 20:26:32 +0800
+MIME-Version: 1.0
+In-Reply-To: <20181030221858.GB2032@xz-x1>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH RFC v6 5/7] migration: fix the multifd code
+ when receiving less channels
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,62 +31,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, dgilbert@redhat.com, famz@redhat.com, quintela@redhat.com
 
-This is essentially redundant with tlb_c.dirty.
 
-Tested-by: Emilio G. Cota <cota@braap.org>
-Reviewed-by: Emilio G. Cota <cota@braap.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- include/exec/cpu-defs.h |  6 ------
- accel/tcg/cputlb.c      | 16 ++--------------
- 2 files changed, 2 insertions(+), 20 deletions(-)
 
-diff --git a/include/exec/cpu-defs.h b/include/exec/cpu-defs.h
-index ca0fea8b27..6a60f94a41 100644
---- a/include/exec/cpu-defs.h
-+++ b/include/exec/cpu-defs.h
-@@ -160,12 +160,6 @@ typedef struct CPUTLBDesc {
- typedef struct CPUTLBCommon {
-     /* Serialize updates to tlb_table and tlb_v_table, and others as noted. */
-     QemuSpin lock;
--    /*
--     * Within pending_flush, for each bit N, there exists an outstanding
--     * cross-cpu flush for mmu_idx N.  Further cross-cpu flushes to that
--     * mmu_idx may be discarded.  Protected by tlb_c.lock.
--     */
--    uint16_t pending_flush;
-     /*
-      * Within dirty, for each bit N, modifications have been made to
-      * mmu_idx N since the last time that mmu_idx was flushed.
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index f6c37bc4db..af6bd8ccf9 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -174,20 +174,8 @@ void tlb_flush_by_mmuidx(CPUState *cpu, uint16_t idxmap)
-     tlb_debug("mmu_idx: 0x%" PRIx16 "\n", idxmap);
- 
-     if (cpu->created && !qemu_cpu_is_self(cpu)) {
--        CPUArchState *env = cpu->env_ptr;
--        uint16_t pending, to_clean;
--
--        qemu_spin_lock(&env->tlb_c.lock);
--        pending = env->tlb_c.pending_flush;
--        to_clean = idxmap & ~pending;
--        env->tlb_c.pending_flush = pending | idxmap;
--        qemu_spin_unlock(&env->tlb_c.lock);
--
--        if (to_clean) {
--            tlb_debug("reduced mmu_idx: 0x%" PRIx16 "\n", to_clean);
--            async_run_on_cpu(cpu, tlb_flush_by_mmuidx_async_work,
--                             RUN_ON_CPU_HOST_INT(to_clean));
--        }
-+        async_run_on_cpu(cpu, tlb_flush_by_mmuidx_async_work,
-+                         RUN_ON_CPU_HOST_INT(idxmap));
-     } else {
-         tlb_flush_by_mmuidx_async_work(cpu, RUN_ON_CPU_HOST_INT(idxmap));
-     }
--- 
-2.17.2
+On 10/31/2018 06:18 AM, Peter Xu wrote:
+> On Tue, Oct 30, 2018 at 06:05:18PM +0800, Fei Li wrote:
+>
+> [...]
+>
+>>>> @@ -1366,6 +1373,10 @@ bool multifd_recv_new_channel(QIOChannel *ioc)
+>>>>                           QEMU_THREAD_JOINABLE);
+>>>>        atomic_inc(&multifd_recv_state->count);
+>>>>        return multifd_recv_state->count == migrate_multifd_channels();
+>>>> +fail:
+>>>> +    qemu_fclose(mis->from_src_file);
+>>>> +    mis->from_src_file = NULL;
+>>>> +    return false;
+>>> Do we need this?
+>>>
+>>> I'd suggest to put all cleanups into a single function.  For dest vm
+>>> I say it's process_incoming_migration_bh.
+>>>
+>>> Regards,
+>>>
+>> Not sure whether I understand correctly, if multifd_recv_new_channel()
+>> fails,
+>> that means migration_incoming_process() will not be called, then
+>> process_incoming_migration_co() and process_incoming_migration_bh()
+>> will not be called either. In that way, there is no cleanup.
+> Sorry the funtion name I wanted to paste is something like
+> migration_incoming_state_destroy()...  Anyway I still don't feel that
+> right to close the mis->from_src_file in a multifd special path.
+>
+> For now, I'll either ignore the cleanup part (AFAIU the TLS failure
+> will also ignore it when migration_tls_channel_process_incoming fails)
+> and just print the extra error message,
+I will adopt this option, thanks for the suggestion :)
+
+Have a nice day, thanks
+Fei
+>   or you can also look into how
+> to cleanup the dest vm in a better way.  That could be someting like
+> calling migration_incoming_state_destroy() somewhere in
+> migration_channel_process_incoming() when failure happens but I'm not
+> sure.
+>
+> Regards,
+>
