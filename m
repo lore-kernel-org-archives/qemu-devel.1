@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47011)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gHeeG-0000Nk-Cw
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:46:17 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gHeeO-0000V2-4L
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:46:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gHeeB-0006S4-Ce
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:46:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45910)
+	(envelope-from <ehabkost@redhat.com>) id 1gHeeL-0006aX-27
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:46:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50240)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gHeeB-0006RV-4q
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:46:11 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gHeeK-0006Zj-Nf
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:46:20 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Tue, 30 Oct 2018 21:45:43 -0300
-Message-Id: <20181031004550.15410-1-ehabkost@redhat.com>
+Date: Tue, 30 Oct 2018 21:45:44 -0300
+Message-Id: <20181031004550.15410-2-ehabkost@redhat.com>
+In-Reply-To: <20181031004550.15410-1-ehabkost@redhat.com>
+References: <20181031004550.15410-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/7] x86 queue, 2018-10-30
+Subject: [Qemu-devel] [PULL 1/7] i386: correct cpu_x86_cpuid(0xd)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,60 +27,43 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 
-Sorry for submitting this at the last minute.
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 
-The following changes since commit a2e002ff7913ce93aa0f7dbedd2123dce5f1a9=
-cd:
+Intel SDM says for CPUID function 0DH, sub-function 0:
 
-  Merge remote-tracking branch 'remotes/vivier2/tags/qemu-trivial-for-3.1=
--pull-request' into staging (2018-10-30 15:49:55 +0000)
+| =E2=80=A2 ECX enumerates the size (in bytes) required by the XSAVE inst=
+ruction for an
+|   XSAVE area containing all the user state components supported by this
+|   processor.
+| =E2=80=A2 EBX enumerates the size (in bytes) required by the XSAVE inst=
+ruction for an
+|   XSAVE area containing all the user state components corresponding to =
+bits
+|   currently set in XCR0.
 
-are available in the Git repository at:
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Message-Id: <20180928104319.3296-1-bigeasy@linutronix.de>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ target/i386/cpu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-  git://github.com/ehabkost/qemu.git tags/x86-next-pull-request
-
-for you to fetch changes up to c4fc3c4d9b456a145e8f3fd75496e1dacb578473:
-
-  i386: Add PKU on Skylake-Server CPU model (2018-10-30 21:14:43 -0300)
-
-----------------------------------------------------------------
-x86 queue, 2018-10-30
-
-* MSR-based feature support for
-  MSR_IA32_ARCH_CAPABILITIES bits (Robert Hoo)
-* Cascadelake-Server CPU model (Tao Xu)
-* Add PKU on Skylake-Server CPU model (Tao Xu)
-* Correct cpu_x86_cpuid(0xd) (Sebastian Andrzej Siewior)
-* Remove dead code (Peter Maydell)
-
-----------------------------------------------------------------
-
-Peter Maydell (1):
-  target/i386: Remove #ifdeffed-out icebp debugging hack
-
-Robert Hoo (3):
-  kvm: Add support to KVM_GET_MSR_FEATURE_INDEX_LIST and KVM_GET_MSRS
-    system ioctl
-  x86: Data structure changes to support MSR based features
-  x86: define a new MSR based feature word --
-    FEATURE_WORDS_ARCH_CAPABILITIES
-
-Sebastian Andrzej Siewior (1):
-  i386: correct cpu_x86_cpuid(0xd)
-
-Tao Xu (2):
-  i386: Add new model of Cascadelake-Server
-  i386: Add PKU on Skylake-Server CPU model
-
- include/hw/i386/pc.h    |  10 +-
- include/sysemu/kvm.h    |   2 +
- target/i386/cpu.h       |   8 ++
- target/i386/cpu.c       | 279 ++++++++++++++++++++++++++++++++--------
- target/i386/kvm.c       |  91 +++++++++++++
- target/i386/translate.c |   6 -
- 6 files changed, 333 insertions(+), 63 deletions(-)
-
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 1469a1be01..fe7c963e5e 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -4178,7 +4178,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index=
+, uint32_t count,
+             *ecx =3D xsave_area_size(x86_cpu_xsave_components(cpu));
+             *eax =3D env->features[FEAT_XSAVE_COMP_LO];
+             *edx =3D env->features[FEAT_XSAVE_COMP_HI];
+-            *ebx =3D *ecx;
++            *ebx =3D xsave_area_size(env->xcr0);
+         } else if (count =3D=3D 1) {
+             *eax =3D env->features[FEAT_XSAVE];
+         } else if (count < ARRAY_SIZE(x86_ext_save_areas)) {
 --=20
 2.18.0.rc1.1.g3f1ff2140
