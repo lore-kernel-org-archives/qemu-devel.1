@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45878)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gHzTR-00058x-FO
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 19:00:30 -0400
+	(envelope-from <no-reply@patchew.org>) id 1gHzk4-0005PO-K1
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 19:17:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gHzTN-00087W-BP
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 19:00:29 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:50290)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gHzTK-00082z-OT
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 19:00:24 -0400
-Received: by mail-wm1-x342.google.com with SMTP id h2-v6so12805492wmb.0
-	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 16:00:16 -0700 (PDT)
-References: <20181031213550.4544-1-jcmvbkbc@gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <13f47aff-593a-e35e-959b-4ddd9f6c6121@linaro.org>
-Date: Wed, 31 Oct 2018 23:00:12 +0000
+	(envelope-from <no-reply@patchew.org>) id 1gHzjz-0000lC-M1
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 19:17:40 -0400
+Resent-Message-Id: <E1gHzjz-0000lC-M1@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21484)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gHzjz-0000kv-DQ
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 19:17:35 -0400
+Message-ID: <154102783848.10499.13095414365589023966@015909e0f939>
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <20181029173437.32559-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181031213550.4544-1-jcmvbkbc@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target/xtensa: drop num_[core_]regs from
- dc232b/dc233c configs
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 31 Oct 2018 16:17:19 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/4] scsi-generic: fixes for Block Limits
+ emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,30 +29,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Filippov <jcmvbkbc@gmail.com>, qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org
+To: pbonzini@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, danielhb413@gmail.com, mreitz@redhat.com
 
-On 10/31/18 9:35 PM, Max Filippov wrote:
-> gdb_regmap::num_core_regs field is initialized incorrectly in the dc232b
-> and dc233c configurations. As a result the following message is
-> displayed when attaching to an xtensa linux-user process:
-> 
->   "Register 105 is not available",
-> 
-> and gdb is unable to control the inferior.
-> 
-> Now that xtensa_count_regs does the right thing, remove manual
-> initialization of these fields from the affected configurations and let
-> xtensa_finalize_config initialize them.
-> 
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
-> ---
->  target/xtensa/core-dc232b.c | 2 --
->  target/xtensa/core-dc233c.c | 2 --
->  2 files changed, 4 deletions(-)
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-
-r~
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgxMDI5MTczNDM3LjMyNTU5LTEtcGJvbnppbmlAcmVkaGF0LmNvbQpTdWJq
+ZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvNF0gc2NzaS1nZW5lcmljOiBmaXhlcyBmb3IgQmxv
+Y2sgTGltaXRzIGVtdWxhdGlvbgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFz
+aAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAt
+bCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNv
+bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFs
+Z29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVy
+c2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFU
+Q0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAh
+IGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1t
+YWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAg
+bj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVw
+ZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQg
+dG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo0MjU4MDA2OTliIHNjc2ktZ2VuZXJpYzogZG8gbm90IGRv
+IFZQRCBlbXVsYXRpb24gZm9yIHNlbnNlIG90aGVyIHRoYW4gSUxMRUdBTF9SRVFVRVNUCjY3MWI5
+NTE0ZDYgc2NzaS1nZW5lcmljOiBhdm9pZCBpbnZhbGlkIGFjY2VzcyB0byBzdHJ1Y3Qgd2hlbiBl
+bXVsYXRpbmcgYmxvY2sgbGltaXRzCmVhZDkzM2ZkMzQgc2NzaS1nZW5lcmljOiBhdm9pZCBvdXQt
+b2YtYm91bmRzIGFjY2VzcyB0byBWUEQgcGFnZSBsaXN0CjU0NzdjYTYwOWYgc2NzaS1nZW5lcmlj
+OiBrZWVwIFZQRCBwYWdlIGxpc3Qgc29ydGVkCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2lu
+ZyBQQVRDSCAxLzQ6IHNjc2ktZ2VuZXJpYzoga2VlcCBWUEQgcGFnZSBsaXN0IHNvcnRlZC4uLgpD
+aGVja2luZyBQQVRDSCAyLzQ6IHNjc2ktZ2VuZXJpYzogYXZvaWQgb3V0LW9mLWJvdW5kcyBhY2Nl
+c3MgdG8gVlBEIHBhZ2UgbGlzdC4uLgpDaGVja2luZyBQQVRDSCAzLzQ6IHNjc2ktZ2VuZXJpYzog
+YXZvaWQgaW52YWxpZCBhY2Nlc3MgdG8gc3RydWN0IHdoZW4gZW11bGF0aW5nIGJsb2NrIGxpbWl0
+cy4uLgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5U
+QUlORVJTIG5lZWQgdXBkYXRpbmc/CiMzMTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDog
+MCBlcnJvcnMsIDEgd2FybmluZ3MsIDIzMyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBz
+dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
+IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
+UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDQvNDogc2NzaS1nZW5lcmljOiBk
+byBub3QgZG8gVlBEIGVtdWxhdGlvbiBmb3Igc2Vuc2Ugb3RoZXIgdGhhbiBJTExFR0FMX1JFUVVF
+U1QuLi4KRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMzMzogRklMRTogaHcvc2NzaS9z
+Y3NpLWdlbmVyaWMuYzoyNzM6CisgICAgICAgIHNjc2lfcGFyc2Vfc2Vuc2VfYnVmKHItPnJlcS5z
+ZW5zZSwgci0+aW9faGVhZGVyLnNiX2xlbl93cikua2V5ID09IElMTEVHQUxfUkVRVUVTVCAmJgoK
+dG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyNCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNo
+IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
+cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
+CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29t
+bWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNh
+bGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZl
+ZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
