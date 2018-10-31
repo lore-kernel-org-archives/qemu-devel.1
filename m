@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38819)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40541)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gHoyT-0000Cv-FP
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 07:47:50 -0400
+	(envelope-from <dcsapak@zita.proxmox.com>) id 1gHp3I-0004Xh-Qy
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 07:52:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gHoyQ-0007X8-8x
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 07:47:49 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:40049)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gHoyP-0007A6-Uf
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 07:47:46 -0400
-Received: by mail-wr1-x444.google.com with SMTP id i17-v6so16081376wre.7
-	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 04:47:25 -0700 (PDT)
-References: <20181025144644.15464-1-cota@braap.org>
-	<20181025144644.15464-13-cota@braap.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181025144644.15464-13-cota@braap.org>
-Date: Wed, 31 Oct 2018 11:47:22 +0000
-Message-ID: <87efc68hit.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v4 13/71] microblaze: convert to
- helper_cpu_halted_set
+	(envelope-from <dcsapak@zita.proxmox.com>) id 1gHp3F-00042U-MX
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 07:52:48 -0400
+Received: from proxmox-new.maurer-it.com ([212.186.127.180]:11378)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dcsapak@zita.proxmox.com>)
+	id 1gHp3F-00040Z-6f
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 07:52:45 -0400
+From: Dominik Csapak <d.csapak@proxmox.com>
+Date: Wed, 31 Oct 2018 12:52:40 +0100
+Message-Id: <20181031115242.6558-2-d.csapak@proxmox.com>
+In-Reply-To: <20181031115242.6558-1-d.csapak@proxmox.com>
+References: <20181031115242.6558-1-d.csapak@proxmox.com>
+Subject: [Qemu-devel] [PATCH 1/3] qapi: move ShutdownCause to
+ qapi/run-state.json
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,37 +25,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, kwolf@redhat.com, mreitz@redhat.com
 
+this makes it possible to use the reason as return value
+in a QMP event, such as SHUTDOWN
 
-Emilio G. Cota <cota@braap.org> writes:
+Signed-off-by: Dominik Csapak <d.csapak@proxmox.com>
+---
+ include/sysemu/sysemu.h | 20 --------------------
+ qapi/run-state.json     | 33 +++++++++++++++++++++++++++++++++
+ 2 files changed, 33 insertions(+), 20 deletions(-)
 
-> Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  target/microblaze/translate.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
->
-> diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-> index 78ca265b04..008b84d456 100644
-> --- a/target/microblaze/translate.c
-> +++ b/target/microblaze/translate.c
-> @@ -1233,9 +1233,7 @@ static void dec_br(DisasContext *dc)
->              LOG_DIS("sleep\n");
->
->              t_sync_flags(dc);
-> -            tcg_gen_st_i32(tmp_1, cpu_env,
-> -                           -offsetof(MicroBlazeCPU, env)
-> -                           +offsetof(CPUState, halted));
-> +            gen_helper_cpu_halted_set(cpu_env, tmp_1);
->              tcg_gen_movi_i64(cpu_SR[SR_PC], dc->pc + 4);
->              gen_helper_raise_exception(cpu_env, tmp_hlt);
->              tcg_temp_free_i32(tmp_hlt);
-
-
---
-Alex Benn=C3=A9e
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 8d6095d98b..f83522c7e7 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -31,26 +31,6 @@ VMChangeStateEntry *qemu_add_vm_change_state_handler(VMChangeStateHandler *cb,
+ void qemu_del_vm_change_state_handler(VMChangeStateEntry *e);
+ void vm_state_notify(int running, RunState state);
+ 
+-/* Enumeration of various causes for shutdown. */
+-typedef enum ShutdownCause {
+-    SHUTDOWN_CAUSE_NONE,          /* No shutdown request pending */
+-    SHUTDOWN_CAUSE_HOST_ERROR,    /* An error prevents further use of guest */
+-    SHUTDOWN_CAUSE_HOST_QMP,      /* Reaction to a QMP command, like 'quit' */
+-    SHUTDOWN_CAUSE_HOST_SIGNAL,   /* Reaction to a signal, such as SIGINT */
+-    SHUTDOWN_CAUSE_HOST_UI,       /* Reaction to UI event, like window close */
+-    SHUTDOWN_CAUSE_GUEST_SHUTDOWN,/* Guest shutdown/suspend request, via
+-                                     ACPI or other hardware-specific means */
+-    SHUTDOWN_CAUSE_GUEST_RESET,   /* Guest reset request, and command line
+-                                     turns that into a shutdown */
+-    SHUTDOWN_CAUSE_GUEST_PANIC,   /* Guest panicked, and command line turns
+-                                     that into a shutdown */
+-    SHUTDOWN_CAUSE_SUBSYSTEM_RESET,/* Partial guest reset that does not trigger
+-                                      QMP events and ignores --no-reboot. This
+-                                      is useful for sanitize hypercalls on s390
+-                                      that are used during kexec/kdump/boot */
+-    SHUTDOWN_CAUSE__MAX,
+-} ShutdownCause;
+-
+ static inline bool shutdown_caused_by_guest(ShutdownCause cause)
+ {
+     return cause >= SHUTDOWN_CAUSE_GUEST_SHUTDOWN;
+diff --git a/qapi/run-state.json b/qapi/run-state.json
+index 332e44897b..883bed167c 100644
+--- a/qapi/run-state.json
++++ b/qapi/run-state.json
+@@ -60,6 +60,39 @@
+             'guest-panicked', 'colo', 'preconfig' ] }
+ 
+ ##
++# @ShutdownCause:
++#
++# An enumeration of reasons for a Shutdown.
++#
++# @none: No shutdown request pending
++#
++# @host-error: An error prevented further use of guest
++#
++# @host-qmp: Reaction to a QMP command, like 'quit'
++#
++# @host-signal: Reaction to a signal, such as SIGINT
++#
++# @host-ui: Reaction to a UI event, like window close
++#
++# @guest-shutdown: Guest shutdown/suspend request, via ACPI or other
++#                  hardware-specific means
++#
++# @guest-reset: Guest reset request, and command line turns that into
++#               a shutdown
++#
++# @guest-panic: Guest panicked, and command line turns that into a shutdown
++#
++# @subsystem-reset: Partial guest reset that does not trigger QMP events and
++#                  ignores --no-reboot. This is useful for sanitizing
++#                  hypercalls on s390 that are used during kexec/kdump/boot
++#
++##
++{ 'enum': 'ShutdownCause',
++  'data': [ 'none', 'host-error', 'host-qmp', 'host-signal', 'host-ui',
++            'guest-shutdown', 'guest-reset', 'guest-panic',
++            'subsystem-reset'] }
++
++##
+ # @StatusInfo:
+ #
+ # Information about VCPU run state
+-- 
+2.11.0
