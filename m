@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33588)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHrMr-00015d-R6
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:21:10 -0400
+	(envelope-from <flukshun@gmail.com>) id 1gHrMs-00016I-Gr
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:21:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHrMn-0007KV-FW
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:21:09 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:34529)
+	(envelope-from <flukshun@gmail.com>) id 1gHrMr-0007Lu-6z
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:21:10 -0400
+Received: from mail-ot1-x32f.google.com ([2607:f8b0:4864:20::32f]:34568)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHrMm-0007Et-6Y
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:21:04 -0400
-Received: by mail-oi1-x243.google.com with SMTP id f21-v6so10586605oig.1
-	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 07:20:55 -0700 (PDT)
+	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHrMq-0007FO-Mr
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:21:08 -0400
+Received: by mail-ot1-x32f.google.com with SMTP id e9so13179908oti.1
+	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 07:20:57 -0700 (PDT)
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Wed, 31 Oct 2018 09:19:02 -0500
-Message-Id: <20181031141925.30026-2-mdroth@linux.vnet.ibm.com>
+Date: Wed, 31 Oct 2018 09:19:22 -0500
+Message-Id: <20181031141925.30026-22-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20181031141925.30026-1-mdroth@linux.vnet.ibm.com>
 References: <20181031141925.30026-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PULL v3 01/24] qga: Support Unicode paths in
- guest-file-open on win32
+Subject: [Qemu-devel] [PULL v3 21/24] qga: add --retry-path option for
+ re-initializing channel on failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,89 +28,204 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Jonathon Reinhart <jreinhart@cc-sw.com>
+Cc: peter.maydell@linaro.org
 
-From: Jonathon Reinhart <jreinhart@cc-sw.com>
+This adds an option to instruct the agent to periodically attempt
+re-opening the communication channel after a channel error has
+occurred. The main use-case for this is providing an OS-independent
+way of allowing the agent to survive situations like hotplug/unplug of
+the communication channel, or initial guest set up where the agent may
+be installed/started prior to the installation of the channel device's
+driver.
 
-Currently, the win32 port of QEMU Guest Agent does not properly handle Unicode
-paths. The JSON decoder produces a valid UTF-8 path string, but this is passed
-directly to CreateFileA, which is expecting an ANSI string and not UTF-8. This
-leads to mangled filenames.
+There are nicer ways of implementing this functionality via things
+like systemd services, but this option is useful for platforms like
+*BSD/w32.
 
-This patch follows the example of qmp_guest_set_user_password() and uses
-g_utf8_to_utf16() to convert the string to UTF-16 and calls CreateFileW()
-explicitly.
+Currently a channel error will result in the GSource for that channel
+being removed from the GMainLoop, but the main loop continuing to run.
+That behavior results in a dead loop when --retry-path isn't set, and
+prevents us from knowing when to attempt re-opening the channel when
+it is set, so we also force the loop to exit as part of this patch.
 
-Signed-off-by: Jonathon Reinhart <jreinhart@cc-sw.com>
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- qga/commands-win32.c | 24 +++++++++++++++++++-----
- 1 file changed, 19 insertions(+), 5 deletions(-)
+ qga/main.c | 62 +++++++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 54 insertions(+), 8 deletions(-)
 
-diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-index 98d9735389..416343b97b 100644
---- a/qga/commands-win32.c
-+++ b/qga/commands-win32.c
-@@ -160,13 +160,15 @@ static void handle_set_nonblocking(HANDLE fh)
- int64_t qmp_guest_file_open(const char *path, bool has_mode,
-                             const char *mode, Error **errp)
- {
--    int64_t fd;
-+    int64_t fd = -1;
-     HANDLE fh;
-     HANDLE templ_file = NULL;
-     DWORD share_mode = FILE_SHARE_READ;
-     DWORD flags_and_attr = FILE_ATTRIBUTE_NORMAL;
-     LPSECURITY_ATTRIBUTES sa_attr = NULL;
-     OpenFlags *guest_flags;
-+    GError *gerr = NULL;
-+    wchar_t *w_path = NULL;
+diff --git a/qga/main.c b/qga/main.c
+index 761007deb4..506a314140 100644
+--- a/qga/main.c
++++ b/qga/main.c
+@@ -58,6 +58,7 @@
+ #endif
+ #define QGA_SENTINEL_BYTE 0xFF
+ #define QGA_CONF_DEFAULT CONFIG_QEMU_CONFDIR G_DIR_SEPARATOR_S "qemu-ga.conf"
++#define QGA_RETRY_INTERVAL 5
  
-     if (!has_mode) {
-         mode = "r";
-@@ -175,16 +177,21 @@ int64_t qmp_guest_file_open(const char *path, bool has_mode,
-     guest_flags = find_open_flag(mode);
-     if (guest_flags == NULL) {
-         error_setg(errp, "invalid file open mode");
--        return -1;
-+        goto done;
-+    }
-+
-+    w_path = g_utf8_to_utf16(path, -1, NULL, NULL, &gerr);
-+    if (!w_path) {
-+        goto done;
+ static struct {
+     const char *state_dir;
+@@ -98,6 +99,7 @@ struct GAState {
+     GAPersistentState pstate;
+     GAConfig *config;
+     int socket_activation;
++    bool force_exit;
+ };
+ 
+ struct GAState *ga_state;
+@@ -120,6 +122,7 @@ DWORD WINAPI service_ctrl_handler(DWORD ctrl, DWORD type, LPVOID data,
+ VOID WINAPI service_main(DWORD argc, TCHAR *argv[]);
+ #endif
+ static int run_agent(GAState *s);
++static void stop_agent(GAState *s, bool requested);
+ 
+ static void
+ init_dfl_pathnames(void)
+@@ -168,9 +171,7 @@ static void quit_handler(int sig)
      }
+     g_debug("received signal num %d, quitting", sig);
  
--    fh = CreateFile(path, guest_flags->desired_access, share_mode, sa_attr,
-+    fh = CreateFileW(w_path, guest_flags->desired_access, share_mode, sa_attr,
-                     guest_flags->creation_disposition, flags_and_attr,
-                     templ_file);
-     if (fh == INVALID_HANDLE_VALUE) {
-         error_setg_win32(errp, GetLastError(), "failed to open file '%s'",
-                          path);
--        return -1;
-+        goto done;
-     }
- 
-     /* set fd non-blocking to avoid common use cases (like reading from a
-@@ -196,10 +203,17 @@ int64_t qmp_guest_file_open(const char *path, bool has_mode,
-     if (fd < 0) {
-         CloseHandle(fh);
-         error_setg(errp, "failed to add handle to qmp handle table");
--        return -1;
-+        goto done;
-     }
- 
-     slog("guest-file-open, handle: % " PRId64, fd);
-+
-+done:
-+    if (gerr) {
-+        error_setg(errp, QERR_QGA_COMMAND_FAILED, gerr->message);
-+        g_error_free(gerr);
-+    }
-+    g_free(w_path);
-     return fd;
+-    if (g_main_loop_is_running(ga_state->main_loop)) {
+-        g_main_loop_quit(ga_state->main_loop);
+-    }
++    stop_agent(ga_state, true);
  }
  
+ #ifndef _WIN32
+@@ -255,6 +256,10 @@ QEMU_COPYRIGHT "\n"
+ "                    to list available RPCs)\n"
+ "  -D, --dump-conf   dump a qemu-ga config file based on current config\n"
+ "                    options / command-line parameters to stdout\n"
++"  -r, --retry-path  attempt re-opening path if it's unavailable or closed\n"
++"                    due to an error which may be recoverable in the future\n"
++"                    (virtio-serial driver re-install, serial device hot\n"
++"                    plug/unplug, etc.)\n"
+ "  -h, --help        display this help and exit\n"
+ "\n"
+ QEMU_HELP_BOTTOM "\n"
+@@ -614,6 +619,7 @@ static gboolean channel_event_cb(GIOCondition condition, gpointer data)
+     switch (status) {
+     case G_IO_STATUS_ERROR:
+         g_warning("error reading channel");
++        stop_agent(s, false);
+         return false;
+     case G_IO_STATUS_NORMAL:
+         buf[count] = 0;
+@@ -927,6 +933,7 @@ struct GAConfig {
+     int daemonize;
+     GLogLevelFlags log_level;
+     int dumpconf;
++    bool retry_path;
+ };
+ 
+ static void config_load(GAConfig *config)
+@@ -976,6 +983,10 @@ static void config_load(GAConfig *config)
+         /* enable all log levels */
+         config->log_level = G_LOG_LEVEL_MASK;
+     }
++    if (g_key_file_has_key(keyfile, "general", "retry-path", NULL)) {
++        config->retry_path =
++            g_key_file_get_boolean(keyfile, "general", "retry-path", &gerr);
++    }
+     if (g_key_file_has_key(keyfile, "general", "blacklist", NULL)) {
+         config->bliststr =
+             g_key_file_get_string(keyfile, "general", "blacklist", &gerr);
+@@ -1037,6 +1048,8 @@ static void config_dump(GAConfig *config)
+     g_key_file_set_string(keyfile, "general", "statedir", config->state_dir);
+     g_key_file_set_boolean(keyfile, "general", "verbose",
+                            config->log_level == G_LOG_LEVEL_MASK);
++    g_key_file_set_boolean(keyfile, "general", "retry-path",
++                           config->retry_path);
+     tmp = list_join(config->blacklist, ',');
+     g_key_file_set_string(keyfile, "general", "blacklist", tmp);
+     g_free(tmp);
+@@ -1055,7 +1068,7 @@ static void config_dump(GAConfig *config)
+ 
+ static void config_parse(GAConfig *config, int argc, char **argv)
+ {
+-    const char *sopt = "hVvdm:p:l:f:F::b:s:t:D";
++    const char *sopt = "hVvdm:p:l:f:F::b:s:t:Dr";
+     int opt_ind = 0, ch;
+     const struct option lopt[] = {
+         { "help", 0, NULL, 'h' },
+@@ -1075,6 +1088,7 @@ static void config_parse(GAConfig *config, int argc, char **argv)
+         { "service", 1, NULL, 's' },
+ #endif
+         { "statedir", 1, NULL, 't' },
++        { "retry-path", 0, NULL, 'r' },
+         { NULL, 0, NULL, 0 }
+     };
+ 
+@@ -1119,6 +1133,9 @@ static void config_parse(GAConfig *config, int argc, char **argv)
+         case 'D':
+             config->dumpconf = 1;
+             break;
++        case 'r':
++            config->retry_path = true;
++            break;
+         case 'b': {
+             if (is_help_option(optarg)) {
+                 qmp_for_each_command(&ga_commands, ga_print_cmd, NULL);
+@@ -1322,9 +1339,6 @@ static void cleanup_agent(GAState *s)
+         ga_command_state_free(s->command_state);
+         json_message_parser_destroy(&s->parser);
+     }
+-    if (s->channel) {
+-        ga_channel_free(s->channel);
+-    }
+     g_free(s->pstate_filepath);
+     g_free(s->state_filepath_isfrozen);
+     if (s->main_loop) {
+@@ -1334,7 +1348,7 @@ static void cleanup_agent(GAState *s)
+     ga_state = NULL;
+ }
+ 
+-static int run_agent(GAState *s)
++static int run_agent_once(GAState *s)
+ {
+     if (!channel_init(s, s->config->method, s->config->channel_path,
+                       s->socket_activation ? FIRST_SOCKET_ACTIVATION_FD : -1)) {
+@@ -1344,9 +1358,41 @@ static int run_agent(GAState *s)
+ 
+     g_main_loop_run(ga_state->main_loop);
+ 
++    if (s->channel) {
++        ga_channel_free(s->channel);
++    }
++
+     return EXIT_SUCCESS;
+ }
+ 
++static int run_agent(GAState *s)
++{
++    int ret = EXIT_SUCCESS;
++
++    s->force_exit = false;
++
++    do {
++        ret = run_agent_once(s);
++        if (s->config->retry_path && !s->force_exit) {
++            g_warning("agent stopped unexpectedly, restarting...");
++            sleep(QGA_RETRY_INTERVAL);
++        }
++    } while (s->config->retry_path && !s->force_exit);
++
++    return ret;
++}
++
++static void stop_agent(GAState *s, bool requested)
++{
++    if (!s->force_exit) {
++        s->force_exit = requested;
++    }
++
++    if (g_main_loop_is_running(s->main_loop)) {
++        g_main_loop_quit(s->main_loop);
++    }
++}
++
+ int main(int argc, char **argv)
+ {
+     int ret = EXIT_SUCCESS;
 -- 
 2.17.1
