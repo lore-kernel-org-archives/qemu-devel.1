@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53691)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53752)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gHteD-00059D-Gn
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:47:14 -0400
+	(envelope-from <david@redhat.com>) id 1gHteW-0005XD-KE
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:47:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gHte8-0004Md-NV
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:47:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59346)
+	(envelope-from <david@redhat.com>) id 1gHteK-0004R9-Ux
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:47:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48862)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gHte7-0004M8-Se
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:47:08 -0400
-Date: Wed, 31 Oct 2018 16:47:03 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20181031164702.GB2403@work-vm>
-References: <20181024163529.15665-1-zhangckid@gmail.com>
-	<20181030195512.GF2441@work-vm>
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gHteK-0004QU-Lc
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:47:20 -0400
+References: <20181023152306.3123-1-david@redhat.com>
+	<20181023152306.3123-2-david@redhat.com>
+	<87pnvqdvsj.fsf@dusky.pond.sub.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <e8fe86a1-d075-2ea8-d1f4-e08e5dceee07@redhat.com>
+Date: Wed, 31 Oct 2018 17:47:13 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181030195512.GF2441@work-vm>
-Subject: Re: [Qemu-devel] [PATCH] migration/colo.c: Fix compilation issue
- when disable replication
+In-Reply-To: <87pnvqdvsj.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/7] qapi: use qemu_strtoi64() in
+ parse_str
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,110 +30,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangckid@gmail.com>
-Cc: qemu-devel@nongnu.org, zhanghailiang <zhang.zhanghailiang@huawei.com>, Thomas Huth <thuth@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Igor Mammedov <imammedo@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-* Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
-> * Zhang Chen (zhangckid@gmail.com) wrote:
-> > This compilation issue will occur when user use --disable-replication
-> > to config Qemu.
-> > 
-> > Reported-by: Thomas Huth <thuth@redhat.com>
-> > Signed-off-by: Zhang Chen <zhangckid@gmail.com>
+On 31.10.18 15:40, Markus Armbruster wrote:
+> David Hildenbrand <david@redhat.com> writes:
 > 
-> Queued.
+>> The qemu api claims to be easier to use, and the resulting code seems to
+>> agree.
+> 
+> Ah, an opportunity to nitpick spelling!  "The QEMU API", and "qapi: Use
+> qemu_strtoi64() ..."
 
-Unqueued; this still isn't building for me with replication disabled;
-I'm hitting one problem where the compiler is complaining that
-colo_send_message_value is unused, and then I'm hitting a bunch of link
-time errors.
+Whatever floats your boat ;) Will change.
 
-This needs a few more fixes first.
+> 
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  qapi/string-input-visitor.c | 17 ++++++-----------
+>>  1 file changed, 6 insertions(+), 11 deletions(-)
+>>
+>> diff --git a/qapi/string-input-visitor.c b/qapi/string-input-visitor.c
+>> index b3fdd0827d..c1454f999f 100644
+>> --- a/qapi/string-input-visitor.c
+>> +++ b/qapi/string-input-visitor.c
+>> @@ -20,6 +20,7 @@
+>>  #include "qemu/option.h"
+>>  #include "qemu/queue.h"
+>>  #include "qemu/range.h"
+>> +#include "qemu/cutils.h"
+>>  
+>>  
+>>  struct StringInputVisitor
+>> @@ -46,10 +47,10 @@ static void free_range(void *range, void *dummy)
+>>  
+>>  static int parse_str(StringInputVisitor *siv, const char *name, Error **errp)
+>>  {
+>> -    char *str = (char *) siv->string;
+>> -    long long start, end;
+>> +    const char *str = (char *) siv->string;
+> 
+> And an opportunity to nitpick whitespace!  Drop the space between (char
+> *) and siv->string while there.
 
-Dave
+Shouldn't checkpatch complain, too? Will fix.
 
-> > ---
-> >  migration/colo.c | 18 +++++++++++++++++-
-> >  1 file changed, 17 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/migration/colo.c b/migration/colo.c
-> > index 956ac236b7..b81e6ec5bb 100644
-> > --- a/migration/colo.c
-> > +++ b/migration/colo.c
-> > @@ -59,6 +59,8 @@ static bool colo_runstate_is_stopped(void)
-> >  
-> >  static void secondary_vm_do_failover(void)
-> >  {
-> > +/* COLO needs enable block-replication */
-> > +#ifdef CONFIG_REPLICATION
-> >      int old_state;
-> >      MigrationIncomingState *mis = migration_incoming_get_current();
-> >      Error *local_err = NULL;
-> > @@ -121,10 +123,14 @@ static void secondary_vm_do_failover(void)
-> >      if (mis->migration_incoming_co) {
-> >          qemu_coroutine_enter(mis->migration_incoming_co);
-> >      }
-> > +#else
-> > +    abort();
-> > +#endif
-> >  }
-> >  
-> >  static void primary_vm_do_failover(void)
-> >  {
-> > +#ifdef CONFIG_REPLICATION
-> >      MigrationState *s = migrate_get_current();
-> >      int old_state;
-> >      Error *local_err = NULL;
-> > @@ -165,6 +171,9 @@ static void primary_vm_do_failover(void)
-> >  
-> >      /* Notify COLO thread that failover work is finished */
-> >      qemu_sem_post(&s->colo_exit_sem);
-> > +#else
-> > +    abort();
-> > +#endif
-> >  }
-> >  
-> >  COLOMode get_colo_mode(void)
-> > @@ -373,6 +382,7 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
-> >                                            QIOChannelBuffer *bioc,
-> >                                            QEMUFile *fb)
-> >  {
-> > +#ifdef CONFIG_REPLICATION
-> >      Error *local_err = NULL;
-> >      int ret = -1;
-> >  
-> > @@ -483,6 +493,9 @@ out:
-> >          error_report_err(local_err);
-> >      }
-> >      return ret;
-> > +#else
-> > +    abort();
-> > +#endif
-> >  }
-> >  
-> >  static void colo_compare_notify_checkpoint(Notifier *notifier, void *data)
-> > @@ -790,13 +803,16 @@ void *colo_process_incoming_thread(void *opaque)
-> >              qemu_mutex_unlock_iothread();
-> >              goto out;
-> >          }
-> > +#ifdef CONFIG_REPLICATION
-> >          /* discard colo disk buffer */
-> >          replication_do_checkpoint_all(&local_err);
-> >          if (local_err) {
-> >              qemu_mutex_unlock_iothread();
-> >              goto out;
-> >          }
-> > -
-> > +#else
-> > +        abort();
-> > +#endif
-> >          /* Notify all filters of all NIC to do checkpoint */
-> >          colo_notify_filters_event(COLO_EVENT_CHECKPOINT, &local_err);
-> >  
-> > -- 
-> > 2.17.GIT
-> > 
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
+>> +    const char *endptr;
+>> +    int64_t start, end;
+>>      Range *cur;
+>> -    char *endptr;
+>>  
+>>      if (siv->ranges) {
+>>          return 0;
+>> @@ -60,9 +61,7 @@ static int parse_str(StringInputVisitor *siv, const char *name, Error **errp)
+>>      }
+>>  
+>>      do {
+>> -        errno = 0;
+>> -        start = strtoll(str, &endptr, 0);
+>> -        if (errno == 0 && endptr > str) {
+>> +        if (!qemu_strtoi64(str, &endptr, 0, &start)) {
+>>              if (*endptr == '\0') {
+>>                  cur = g_malloc0(sizeof(*cur));
+>>                  range_set_bounds(cur, start, start);
+>> @@ -71,11 +70,7 @@ static int parse_str(StringInputVisitor *siv, const char *name, Error **errp)
+>>                  str = NULL;
+>>              } else if (*endptr == '-') {
+>>                  str = endptr + 1;
+>> -                errno = 0;
+>> -                end = strtoll(str, &endptr, 0);
+>> -                if (errno == 0 && endptr > str && start <= end &&
+>> -                    (start > INT64_MAX - 65536 ||
+>> -                     end < start + 65536)) {
+>> +                if (!qemu_strtoi64(str, &endptr, 0, &end) && start < end) {
+> 
+> You deleted (start > INT64_MAX - 65536 || end < start + 65536).  Can you
+> explain that to me?  I'm feeling particularly dense today...
+
+qemu_strtoi64 performs all different kinds of error handling completely
+internally. This old code here was an attempt to filter out -EWHATEVER
+from the response. No longer needed as errors and the actual value are
+reported via different ways.
+
+Thanks!
+
+> 
+>>                      if (*endptr == '\0') {
+>>                          cur = g_malloc0(sizeof(*cur));
+>>                          range_set_bounds(cur, start, end);
+
+
+-- 
+
+Thanks,
+
+David / dhildenb
