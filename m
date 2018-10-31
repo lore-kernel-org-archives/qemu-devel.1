@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41580)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <contrib@steffen-goertz.de>) id 1gHeKk-0004sR-5n
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:26:08 -0400
+	(envelope-from <contrib@steffen-goertz.de>) id 1gHeKo-0004v4-Ep
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:26:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <contrib@steffen-goertz.de>) id 1gHeKi-0000Dz-H8
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:26:06 -0400
-Received: from steffen-goertz.de ([88.198.119.201]:60440)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <contrib@steffen-goertz.de>) id 1gHeKi-0000DY-5x
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:26:04 -0400
+	(envelope-from <contrib@steffen-goertz.de>) id 1gHeKn-0000Go-8B
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:26:10 -0400
 From: =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>
-Date: Tue, 30 Oct 2018 20:25:21 -0400
-Message-Id: <20181031002526.14262-8-contrib@steffen-goertz.de>
+Date: Tue, 30 Oct 2018 20:25:23 -0400
+Message-Id: <20181031002526.14262-10-contrib@steffen-goertz.de>
 In-Reply-To: <20181031002526.14262-1-contrib@steffen-goertz.de>
 References: <20181031002526.14262-1-contrib@steffen-goertz.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 07/13] tests: Add bbc:microbit / nRF51 test
- suite
+Subject: [Qemu-devel] [PATCH v3 09/13] arm: Instantiate NRF51 general
+ purpose I/O
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,173 +24,74 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>, "open list:NRF51" <qemu-arm@nongnu.org>
 
-The microbit-test includes tests for the nRF51 NVMC
-peripheral and will host future nRF51 peripheral tests
-and board-level bbc:microbit tests.
+Instantiates GPIO peripheral model
 
 Signed-off-by: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
 ---
- tests/Makefile.include |   2 +
- tests/microbit-test.c  | 117 +++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 119 insertions(+)
- create mode 100644 tests/microbit-test.c
+ hw/arm/nrf51_soc.c         | 16 ++++++++++++++++
+ include/hw/arm/nrf51_soc.h |  2 ++
+ 2 files changed, 18 insertions(+)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index f77a495109..602346eeed 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -274,6 +274,7 @@ check-qtest-sparc64-y +=3D tests/boot-serial-test$(EX=
-ESUF)
- check-qtest-arm-y +=3D tests/tmp105-test$(EXESUF)
- check-qtest-arm-y +=3D tests/pca9552-test$(EXESUF)
- check-qtest-arm-y +=3D tests/ds1338-test$(EXESUF)
-+check-qtest-arm-y +=3D tests/microbit-test$(EXESUF)
- check-qtest-arm-y +=3D tests/m25p80-test$(EXESUF)
- check-qtest-arm-y +=3D tests/virtio-blk-test$(EXESUF)
- check-qtest-arm-y +=3D tests/test-arm-mptimer$(EXESUF)
-@@ -695,6 +696,7 @@ tests/pxe-test$(EXESUF): tests/pxe-test.o tests/boot-=
-sector.o $(libqos-obj-y)
- tests/tmp105-test$(EXESUF): tests/tmp105-test.o $(libqos-omap-obj-y)
- tests/pca9552-test$(EXESUF): tests/pca9552-test.o $(libqos-omap-obj-y)
- tests/ds1338-test$(EXESUF): tests/ds1338-test.o $(libqos-imx-obj-y)
-+tests/microbit-test$(EXESUF): tests/microbit-test.o
- tests/m25p80-test$(EXESUF): tests/m25p80-test.o
- tests/i440fx-test$(EXESUF): tests/i440fx-test.o $(libqos-pc-obj-y)
- tests/q35-test$(EXESUF): tests/q35-test.o $(libqos-pc-obj-y)
-diff --git a/tests/microbit-test.c b/tests/microbit-test.c
-new file mode 100644
-index 0000000000..981a36ed82
---- /dev/null
-+++ b/tests/microbit-test.c
-@@ -0,0 +1,117 @@
-+ /*
-+ * QTest testcase for Microbit board using the Nordic Semiconductor nRF5=
-1 SoC.
-+ *
-+ * nRF51:
-+ * Reference Manual: http://infocenter.nordicsemi.com/pdf/nRF51_RM_v3.0.=
-pdf
-+ * Product Spec: http://infocenter.nordicsemi.com/pdf/nRF51822_PS_v3.1.p=
-df
-+ *
-+ * Microbit Board: http://microbit.org/
-+ *
-+ * Copyright 2018 Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
-+ *
-+ * This code is licensed under the GPL version 2 or later.  See
-+ * the COPYING file in the top-level directory.
-+ */
-+
-+
-+#include "qemu/osdep.h"
-+#include "exec/hwaddr.h"
-+#include "libqtest.h"
-+
-+#include "hw/arm/nrf51.h"
-+#include "hw/nvram/nrf51_nvm.h"
-+
-+#define FLASH_SIZE          (256 * NRF51_PAGE_SIZE)
-+
-+static void fill_and_erase(hwaddr base, hwaddr size, uint32_t address_re=
-g)
-+{
-+    /* Fill memory */
-+    writel(NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x01);
-+    for (hwaddr i =3D 0; i < size; ++i) {
-+        writeb(base + i, i);
-+        g_assert_cmpuint(readb(base + i), =3D=3D, i & 0xFF);
-+    }
-+    writel(NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
-+
-+    /* Erase Page */
-+    writel(NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x02);
-+    writel(NRF51_NVMC_BASE + address_reg, base);
-+    writel(NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
-+
-+    /* Check memory */
-+    for (hwaddr i =3D 0; i < size; ++i) {
-+        g_assert_cmpuint(readb(base + i), =3D=3D, 0xFF);
-+    }
-+}
-+
-+static void test_nrf51_nvmc(void)
-+{
-+    uint32_t value;
-+    /* Test always ready */
-+    value =3D readl(NRF51_NVMC_BASE + NRF51_NVMC_READY);
-+    g_assert_cmpuint(value & 0x01, =3D=3D, 0x01);
-+
-+    /* Test write-read config register */
-+    writel(NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x03);
-+    g_assert_cmpuint(readl(NRF51_NVMC_BASE + NRF51_NVMC_CONFIG), =3D=3D,=
- 0x03);
-+    writel(NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
-+    g_assert_cmpuint(readl(NRF51_NVMC_BASE + NRF51_NVMC_CONFIG), =3D=3D,=
- 0x00);
-+
-+    /* Test PCR0 */
-+    fill_and_erase(NRF51_FLASH_BASE, NRF51_PAGE_SIZE, NRF51_NVMC_ERASEPC=
-R0);
-+    fill_and_erase(NRF51_FLASH_BASE + NRF51_PAGE_SIZE,
-+                   NRF51_PAGE_SIZE, NRF51_NVMC_ERASEPCR0);
-+
-+    /* Test PCR1 */
-+    fill_and_erase(NRF51_FLASH_BASE, NRF51_PAGE_SIZE, NRF51_NVMC_ERASEPC=
-R1);
-+    fill_and_erase(NRF51_FLASH_BASE + NRF51_PAGE_SIZE,
-+                   NRF51_PAGE_SIZE, NRF51_NVMC_ERASEPCR1);
-+
-+    /* Erase all */
-+    writel(NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x01);
-+    for (hwaddr i =3D 0; i < FLASH_SIZE / 4; i++) {
-+        writel(NRF51_FLASH_BASE + i * 4, i);
-+        g_assert_cmpuint(readl(NRF51_FLASH_BASE + i * 4), =3D=3D, i);
-+    }
-+    writel(NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
-+
-+    writel(NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x02);
-+    writel(NRF51_NVMC_BASE + NRF51_NVMC_ERASEALL, 0x01);
-+    writel(NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
-+
-+    for (hwaddr i =3D 0; i < FLASH_SIZE / 4; i++) {
-+        g_assert_cmpuint(readl(NRF51_FLASH_BASE + i * 4), =3D=3D, 0xFFFF=
-FFFF);
+diff --git a/hw/arm/nrf51_soc.c b/hw/arm/nrf51_soc.c
+index fd0efd0ee8..695b335dc5 100644
+--- a/hw/arm/nrf51_soc.c
++++ b/hw/arm/nrf51_soc.c
+@@ -128,6 +128,19 @@ static void nrf51_soc_realize(DeviceState *dev_soc, =
+Error **errp)
+     mr =3D sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->nvm), 2);
+     memory_region_add_subregion_overlap(&s->container, NRF51_UICR_BASE, =
+mr, 0);
+=20
++    /* GPIO */
++    object_property_set_bool(OBJECT(&s->gpio), true, "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
 +    }
 +
-+    /* Erase UICR */
-+    writel(NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x01);
-+    for (hwaddr i =3D 0; i < NRF51_UICR_SIZE / 4; i++) {
-+        writel(NRF51_UICR_BASE + i * 4, i);
-+        g_assert_cmpuint(readl(NRF51_UICR_BASE + i * 4), =3D=3D, i);
-+    }
-+    writel(NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
++    mr =3D sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->gpio), 0);
++    memory_region_add_subregion_overlap(&s->container, NRF51_GPIO_BASE, =
+mr, 0);
 +
-+    writel(NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x02);
-+    writel(NRF51_NVMC_BASE + NRF51_NVMC_ERASEUICR, 0x01);
-+    writel(NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
++    /* Pass all GPIOs to the SOC layer so they are available to the boar=
+d */
++    qdev_pass_gpios(DEVICE(&s->gpio), dev_soc, NULL);
 +
-+    for (hwaddr i =3D 0; i < NRF51_UICR_SIZE / 4; i++) {
-+        g_assert_cmpuint(readl(NRF51_UICR_BASE + i * 4), =3D=3D, 0xFFFFF=
-FFF);
-+    }
-+}
+=20
+     create_unimplemented_device("nrf51_soc.io", NRF51_IOMEM_BASE,
+                                 NRF51_IOMEM_SIZE);
+@@ -157,6 +170,9 @@ static void nrf51_soc_init(Object *obj)
+=20
+     sysbus_init_child_obj(obj, "nvm", &s->nvm, sizeof(s->nvm), TYPE_NRF5=
+1_NVM);
+=20
++    sysbus_init_child_obj(obj, "gpio", &s->gpio, sizeof(s->gpio),
++                          TYPE_NRF51_GPIO);
 +
-+int main(int argc, char **argv)
-+{
-+    int ret;
-+
-+    g_test_init(&argc, &argv, NULL);
-+
-+    global_qtest =3D qtest_initf("-machine microbit");
-+
-+    qtest_add_func("/microbit/nrf51/nvmc", test_nrf51_nvmc);
-+
-+    ret =3D g_test_run();
-+
-+    qtest_quit(global_qtest);
-+    return ret;
-+}
+ }
+=20
+ static Property nrf51_soc_properties[] =3D {
+diff --git a/include/hw/arm/nrf51_soc.h b/include/hw/arm/nrf51_soc.h
+index c3f4d5bcdc..d4a48ccf91 100644
+--- a/include/hw/arm/nrf51_soc.h
++++ b/include/hw/arm/nrf51_soc.h
+@@ -15,6 +15,7 @@
+ #include "hw/char/nrf51_uart.h"
+ #include "hw/misc/nrf51_rng.h"
+ #include "hw/nvram/nrf51_nvm.h"
++#include "hw/gpio/nrf51_gpio.h"
+=20
+ #define TYPE_NRF51_SOC "nrf51-soc"
+ #define NRF51_SOC(obj) \
+@@ -30,6 +31,7 @@ typedef struct NRF51State {
+     NRF51UARTState uart;
+     NRF51RNGState rng;
+     NRF51NVMState nvm;
++    NRF51GPIOState gpio;
+=20
+     MemoryRegion iomem;
+     MemoryRegion sram;
 --=20
 2.19.1
