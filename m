@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gHqxB-00065Y-7N
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 09:54:41 -0400
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gHqxQ-0006Hq-6z
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 09:54:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gHqwv-0003yE-2u
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 09:54:30 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:35877)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gHqwu-0003up-Fh
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 09:54:20 -0400
-Received: by mail-wm1-x341.google.com with SMTP id a8-v6so14581124wmf.1
-	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 06:54:16 -0700 (PDT)
-References: <20181025144644.15464-1-cota@braap.org>
-	<20181025144644.15464-18-cota@braap.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181025144644.15464-18-cota@braap.org>
-Date: Wed, 31 Oct 2018 13:54:14 +0000
-Message-ID: <878t2e8bnd.fsf@linaro.org>
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gHqxL-0004DU-Vn
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 09:54:52 -0400
+Received: from mail.uni-paderborn.de ([131.234.142.9]:41066)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
+	id 1gHqxL-00042y-El
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 09:54:47 -0400
+References: <20181031121443.605-1-richard.henderson@linaro.org>
+	<20181031121443.605-4-richard.henderson@linaro.org>
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Message-ID: <f5695608-19ff-6418-5b81-20abcb05d299@mail.uni-paderborn.de>
+Date: Wed, 31 Oct 2018 14:54:30 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v4 18/71] sh4: convert to cpu_halted
+In-Reply-To: <20181031121443.605-4-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US-large
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] decodetree: Allow multiple input
+ files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +30,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 
 
-Emilio G. Cota <cota@braap.org> writes:
-
-> Cc: Aurelien Jarno <aurelien@aurel32.net>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
+On 10/31/18 1:14 PM, Richard Henderson wrote:
+> While it would be possible to concatenate input files with make,
+> passing the original input files to decodetree.py allows us to
+> generate error messages which allows compilation environments
+> (read: emacs) to next-error to the correct input file.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  target/sh4/op_helper.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/target/sh4/op_helper.c b/target/sh4/op_helper.c
-> index 4f825bae5a..57cc363ccc 100644
-> --- a/target/sh4/op_helper.c
-> +++ b/target/sh4/op_helper.c
-> @@ -105,7 +105,7 @@ void helper_sleep(CPUSH4State *env)
->  {
->      CPUState *cs =3D CPU(sh_env_get_cpu(env));
->
-> -    cs->halted =3D 1;
-> +    cpu_halted_set(cs, 1);
+>   scripts/decodetree.py | 25 +++++++++++++++----------
+>   1 file changed, 15 insertions(+), 10 deletions(-)
 
-Looks good:
+Reviewed-by: Bastian Koppelmann<kbastian@mail.uni-paderborn.de>
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
->      env->in_sleep =3D 1;
-
-I wonder if you could drop env->in_sleep from CPUSH4State?
-The test in superh_cpu_do_interrupt:
-
-        if (do_irq && !env->in_sleep) {
-            return; /* masked */
-        }
-    }
-    env->in_sleep =3D 0;
-
-maybe be simplified is we cpu_set_halted(cs, 0) when servicing a
-delivered irq?
-
->      raise_exception(env, EXCP_HLT, 0);
->  }
-
-
---
-Alex Benn=C3=A9e
+Cheers,
+Bastian
