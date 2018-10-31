@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60572)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60590)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHfVI-0000rZ-8J
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 21:41:04 -0400
+	(envelope-from <flukshun@gmail.com>) id 1gHfVL-0000vN-QP
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 21:41:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHfVF-0002ZR-Gl
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 21:41:04 -0400
-Received: from mail-qt1-x82e.google.com ([2607:f8b0:4864:20::82e]:34667)
+	(envelope-from <flukshun@gmail.com>) id 1gHfVI-0002aq-J5
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 21:41:07 -0400
+Received: from mail-qt1-x82f.google.com ([2607:f8b0:4864:20::82f]:33439)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHfVF-0002YD-8q
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 21:41:01 -0400
-Received: by mail-qt1-x82e.google.com with SMTP id z2-v6so16023830qts.1
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 18:40:59 -0700 (PDT)
+	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHfVI-0002Zw-C7
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 21:41:04 -0400
+Received: by mail-qt1-x82f.google.com with SMTP id i15-v6so16014231qtr.0
+	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 18:41:02 -0700 (PDT)
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue, 30 Oct 2018 20:38:01 -0500
-Message-Id: <20181031013821.24023-5-mdroth@linux.vnet.ibm.com>
+Date: Tue, 30 Oct 2018 20:38:02 -0500
+Message-Id: <20181031013821.24023-6-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20181031013821.24023-1-mdroth@linux.vnet.ibm.com>
 References: <20181031013821.24023-1-mdroth@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 04/24] configure: add test for libudev
+Subject: [Qemu-devel] [PULL v2 05/24] qga: linux: report disk serial number
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,74 +34,130 @@ Cc: peter.maydell@linaro.org, =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <t
 
 From: Tomáš Golembiovský <tgolembi@redhat.com>
 
+Add reporting of disk serial number on Linux guests. The feature depends
+on libudev.
+
+Example:
+
+    {
+      "name": "dm-2",
+      "mountpoint": "/",
+      ...
+      "disk": [
+        {
+          "serial": "SAMSUNG_MZ7LN512HCHP-000L1_S1ZKNXAG822493",
+          ...
+        }
+      ],
+    }
+
 Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-*make libudev optional to avoid breaking existing build/test environments
-*disable libudev for --static builds
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- configure | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ qga/Makefile.objs    |  1 +
+ qga/commands-posix.c | 32 ++++++++++++++++++++++++++++++--
+ qga/qapi-schema.json |  4 +++-
+ 3 files changed, 34 insertions(+), 3 deletions(-)
 
-diff --git a/configure b/configure
-index a898e21c68..406f48f46e 100755
---- a/configure
-+++ b/configure
-@@ -474,6 +474,7 @@ libxml2=""
- docker="no"
- debug_mutex="no"
- libpmem=""
-+libudev="no"
+diff --git a/qga/Makefile.objs b/qga/Makefile.objs
+index ed08c5917c..80e6bb3c2e 100644
+--- a/qga/Makefile.objs
++++ b/qga/Makefile.objs
+@@ -1,3 +1,4 @@
++commands-posix.o-libs := $(LIBUDEV_LIBS)
+ qga-obj-y = commands.o guest-agent-command-state.o main.o
+ qga-obj-$(CONFIG_POSIX) += commands-posix.o channel-posix.o
+ qga-obj-$(CONFIG_WIN32) += commands-win32.o channel-win32.o service-win32.o
+diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+index 42d30f078e..41bd11b2b5 100644
+--- a/qga/commands-posix.c
++++ b/qga/commands-posix.c
+@@ -48,6 +48,10 @@ extern char **environ;
+ #include <net/if.h>
+ #include <sys/statvfs.h>
  
- # cross compilers defaults, can be overridden with --cross-cc-ARCH
- cross_cc_aarch64="aarch64-linux-gnu-gcc"
-@@ -870,6 +871,7 @@ Linux)
-   vhost_vsock="yes"
-   QEMU_INCLUDES="-I\$(SRC_PATH)/linux-headers -I$(pwd)/linux-headers $QEMU_INCLUDES"
-   supported_os="yes"
-+  libudev="yes"
- ;;
- esac
- 
-@@ -5609,6 +5611,19 @@ if test "$libnfs" != "no" ; then
-   fi
- fi
- 
-+##########################################
-+# Do we have libudev
-+if test "$libudev" != "no" ; then
-+  if $pkg_config libudev && test "$static" != "yes"; then
-+    if test "$static" != "yes"; then
-+      libudev="yes"
-+      libudev_libs=$($pkg_config --libs libudev)
-+    fi
-+  else
-+    libudev="no"
-+  fi
-+fi
++#ifdef CONFIG_LIBUDEV
++#include <libudev.h>
++#endif
 +
- # Now we've finished running tests it's OK to add -Werror to the compiler flags
- if test "$werror" = "yes"; then
-     QEMU_CFLAGS="-Werror $QEMU_CFLAGS"
-@@ -6033,6 +6048,7 @@ echo "VxHS block device $vxhs"
- echo "capstone          $capstone"
- echo "docker            $docker"
- echo "libpmem support   $libpmem"
-+echo "libudev           $libudev"
+ #ifdef FIFREEZE
+ #define CONFIG_FSFREEZE
+ #endif
+@@ -872,6 +876,10 @@ static void build_guest_fsinfo_for_real_device(char const *syspath,
+     GuestDiskAddressList *list = NULL;
+     bool has_ata = false, has_host = false, has_tgt = false;
+     char *p, *q, *driver = NULL;
++#ifdef CONFIG_LIBUDEV
++    struct udev *udev = NULL;
++    struct udev_device *udevice = NULL;
++#endif
  
- if test "$sdl_too_old" = "yes"; then
- echo "-> Your SDL version is too old - please upgrade to have SDL support"
-@@ -6868,6 +6884,11 @@ if test "$docker" != "no"; then
-     echo "HAVE_USER_DOCKER=y" >> $config_host_mak
- fi
+     p = strstr(syspath, "/devices/pci");
+     if (!p || sscanf(p + 12, "%*x:%*x/%x:%x:%x.%x%n",
+@@ -936,6 +944,21 @@ static void build_guest_fsinfo_for_real_device(char const *syspath,
+     list = g_malloc0(sizeof(*list));
+     list->value = disk;
  
-+if test "$libudev" != "no"; then
-+    echo "CONFIG_LIBUDEV=y" >> $config_host_mak
-+    echo "LIBUDEV_LIBS=$libudev_libs" >> $config_host_mak
-+fi
++#ifdef CONFIG_LIBUDEV
++    udev = udev_new();
++    udevice = udev_device_new_from_syspath(udev, syspath);
++    if (udev == NULL || udevice == NULL) {
++        g_debug("failed to query udev");
++    } else {
++        const char *serial;
++        serial = udev_device_get_property_value(udevice, "ID_SERIAL");
++        if (serial != NULL && *serial != 0) {
++            disk->serial = g_strdup(serial);
++            disk->has_serial = true;
++        }
++    }
++#endif
 +
- # use included Linux headers
- if test "$linux" = "yes" ; then
-   mkdir -p linux-headers
+     if (strcmp(driver, "ata_piix") == 0) {
+         /* a host per ide bus, target*:0:<unit>:0 */
+         if (!has_host || !has_tgt) {
+@@ -995,14 +1018,19 @@ static void build_guest_fsinfo_for_real_device(char const *syspath,
+ 
+     list->next = fs->disk;
+     fs->disk = list;
+-    g_free(driver);
+-    return;
++    goto out;
+ 
+ cleanup:
+     if (list) {
+         qapi_free_GuestDiskAddressList(list);
+     }
++out:
+     g_free(driver);
++#ifdef CONFIG_LIBUDEV
++    udev_unref(udev);
++    udev_device_unref(udevice);
++#endif
++    return;
+ }
+ 
+ static void build_guest_fsinfo_for_device(char const *devpath,
+diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
+index dfbc4a5e32..3bcda6257e 100644
+--- a/qga/qapi-schema.json
++++ b/qga/qapi-schema.json
+@@ -834,13 +834,15 @@
+ # @bus: bus id
+ # @target: target id
+ # @unit: unit id
++# @serial: serial number (since: 3.1)
+ #
+ # Since: 2.2
+ ##
+ { 'struct': 'GuestDiskAddress',
+   'data': {'pci-controller': 'GuestPCIAddress',
+            'bus-type': 'GuestDiskBusType',
+-           'bus': 'int', 'target': 'int', 'unit': 'int'} }
++           'bus': 'int', 'target': 'int', 'unit': 'int',
++           '*serial': 'str'} }
+ 
+ ##
+ # @GuestFilesystemInfo:
 -- 
 2.17.1
