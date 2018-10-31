@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51232)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53436)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gHqxQ-0006Hq-6z
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 09:54:57 -0400
+	(envelope-from <armbru@redhat.com>) id 1gHr28-0004Pk-Tp
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 09:59:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gHqxL-0004DU-Vn
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 09:54:52 -0400
-Received: from mail.uni-paderborn.de ([131.234.142.9]:41066)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
-	id 1gHqxL-00042y-El
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 09:54:47 -0400
-References: <20181031121443.605-1-richard.henderson@linaro.org>
-	<20181031121443.605-4-richard.henderson@linaro.org>
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Message-ID: <f5695608-19ff-6418-5b81-20abcb05d299@mail.uni-paderborn.de>
-Date: Wed, 31 Oct 2018 14:54:30 +0100
+	(envelope-from <armbru@redhat.com>) id 1gHr24-0007IO-I5
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 09:59:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60282)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gHr24-00076f-6c
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 09:59:40 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 212DA89ACE
+	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 13:59:26 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181009062718.1914-1-peterx@redhat.com>
+Date: Wed, 31 Oct 2018 14:59:23 +0100
+In-Reply-To: <20181009062718.1914-1-peterx@redhat.com> (Peter Xu's message of
+	"Tue, 9 Oct 2018 14:27:12 +0800")
+Message-ID: <87lg6egqtg.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20181031121443.605-4-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US-large
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] decodetree: Allow multiple input
- files
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v9 0/6] monitor: enable OOB by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,21 +33,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
+Queued except for PATCH 2/6.  Thanks!
 
-On 10/31/18 1:14 PM, Richard Henderson wrote:
-> While it would be possible to concatenate input files with make,
-> passing the original input files to decodetree.py allows us to
-> generate error messages which allows compilation environments
-> (read: emacs) to next-error to the correct input file.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->   scripts/decodetree.py | 25 +++++++++++++++----------
->   1 file changed, 15 insertions(+), 10 deletions(-)
-
-Reviewed-by: Bastian Koppelmann<kbastian@mail.uni-paderborn.de>
-
-Cheers,
-Bastian
+We'll want Marc-Andr=C3=A9's fixes on top.
