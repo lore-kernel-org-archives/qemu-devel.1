@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60309)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHfUx-0000bU-BC
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 21:40:44 -0400
+	(envelope-from <flukshun@gmail.com>) id 1gHfUs-0000YJ-Il
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 21:40:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHfUv-0002Kb-Le
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 21:40:42 -0400
-Received: from mail-qk1-x729.google.com ([2607:f8b0:4864:20::729]:44838)
+	(envelope-from <flukshun@gmail.com>) id 1gHfUn-0002Ev-Ez
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 21:40:38 -0400
+Received: from mail-qt1-x82f.google.com ([2607:f8b0:4864:20::82f]:39087)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHfUv-0002KD-GN
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 21:40:41 -0400
-Received: by mail-qk1-x729.google.com with SMTP id n12so8565530qkh.11
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 18:40:41 -0700 (PDT)
+	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHfUm-0002D2-ME
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 21:40:33 -0400
+Received: by mail-qt1-x82f.google.com with SMTP id g10-v6so15970012qtq.6
+	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 18:40:30 -0700 (PDT)
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue, 30 Oct 2018 20:38:18 -0500
-Message-Id: <20181031013821.24023-22-mdroth@linux.vnet.ibm.com>
+Date: Tue, 30 Oct 2018 20:38:15 -0500
+Message-Id: <20181031013821.24023-19-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20181031013821.24023-1-mdroth@linux.vnet.ibm.com>
 References: <20181031013821.24023-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PULL v2 21/24] qga: add --retry-path option for
- re-initializing channel on failure
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL v2 18/24] qga: group agent init/cleanup init
+ separate routines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,202 +33,172 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-This adds an option to instruct the agent to periodically attempt
-re-opening the communication channel after a channel error has
-occurred. The main use-case for this is providing an OS-independent
-way of allowing the agent to survive situations like hotplug/unplug of
-the communication channel, or initial guest set up where the agent may
-be installed/started prior to the installation of the channel device's
-driver.
-
-There are nicer ways of implementing this functionality via things
-like systemd services, but this option is useful for platforms like
-*BSD/w32.
-
-Currently a channel error will result in the GSource for that channel
-being removed from the GMainLoop, but the main loop continuing to run.
-That behavior results in a dead loop when --retry-path isn't set, and
-prevents us from knowing when to attempt re-opening the channel when
-it is set, so we also force the loop to exit as part of this patch.
+This patch better separates the init/cleanup routines out into
+separate functions to make the start-up procedure a bit easier to
+follow. This will be useful when we eventually break out the actual
+start/stop of the agent's main loop into separates routines that
+can be called multiple times after the init phase.
 
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- qga/main.c | 62 +++++++++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 54 insertions(+), 8 deletions(-)
+ qga/main.c | 82 +++++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 50 insertions(+), 32 deletions(-)
 
 diff --git a/qga/main.c b/qga/main.c
-index 761007deb4..506a314140 100644
+index afcd268ee3..ab3eaa5163 100644
 --- a/qga/main.c
 +++ b/qga/main.c
-@@ -58,6 +58,7 @@
- #endif
- #define QGA_SENTINEL_BYTE 0xFF
- #define QGA_CONF_DEFAULT CONFIG_QEMU_CONFDIR G_DIR_SEPARATOR_S "qemu-ga.conf"
-+#define QGA_RETRY_INTERVAL 5
- 
- static struct {
-     const char *state_dir;
-@@ -98,6 +99,7 @@ struct GAState {
-     GAPersistentState pstate;
-     GAConfig *config;
-     int socket_activation;
-+    bool force_exit;
- };
- 
- struct GAState *ga_state;
-@@ -120,6 +122,7 @@ DWORD WINAPI service_ctrl_handler(DWORD ctrl, DWORD type, LPVOID data,
- VOID WINAPI service_main(DWORD argc, TCHAR *argv[]);
- #endif
- static int run_agent(GAState *s);
-+static void stop_agent(GAState *s, bool requested);
- 
- static void
- init_dfl_pathnames(void)
-@@ -168,9 +171,7 @@ static void quit_handler(int sig)
-     }
-     g_debug("received signal num %d, quitting", sig);
- 
--    if (g_main_loop_is_running(ga_state->main_loop)) {
--        g_main_loop_quit(ga_state->main_loop);
--    }
-+    stop_agent(ga_state, true);
+@@ -1211,9 +1211,21 @@ static bool check_is_frozen(GAState *s)
+     return false;
  }
  
+-static int run_agent(GAState *s, GAConfig *config, int socket_activation)
++static GAState *initialize_agent(GAConfig *config)
+ {
+-    ga_state = s;
++    GAState *s = g_new0(GAState, 1);
++
++    g_assert(ga_state == NULL);
++
++    s->log_level = config->log_level;
++    s->log_file = stderr;
++#ifdef CONFIG_FSFREEZE
++    s->fsfreeze_hook = config->fsfreeze_hook;
++#endif
++    s->pstate_filepath = g_strdup_printf("%s/qga.state", config->state_dir);
++    s->state_filepath_isfrozen = g_strdup_printf("%s/qga.state.isfrozen",
++                                                 config->state_dir);
++    s->frozen = check_is_frozen(s);
+ 
+     g_log_set_default_handler(ga_log, s);
+     g_log_set_fatal_mask(NULL, G_LOG_LEVEL_ERROR);
+@@ -1229,7 +1241,7 @@ static int run_agent(GAState *s, GAConfig *config, int socket_activation)
+     if (g_mkdir_with_parents(config->state_dir, S_IRWXU) == -1) {
+         g_critical("unable to create (an ancestor of) the state directory"
+                    " '%s': %s", config->state_dir, strerror(errno));
+-        return EXIT_FAILURE;
++        return NULL;
+     }
+ #endif
+ 
+@@ -1254,7 +1266,7 @@ static int run_agent(GAState *s, GAConfig *config, int socket_activation)
+             if (!log_file) {
+                 g_critical("unable to open specified log file: %s",
+                            strerror(errno));
+-                return EXIT_FAILURE;
++                return NULL;
+             }
+             s->log_file = log_file;
+         }
+@@ -1265,7 +1277,7 @@ static int run_agent(GAState *s, GAConfig *config, int socket_activation)
+                                s->pstate_filepath,
+                                ga_is_frozen(s))) {
+         g_critical("failed to load persistent state");
+-        return EXIT_FAILURE;
++        return NULL;
+     }
+ 
+     config->blacklist = ga_command_blacklist_init(config->blacklist);
+@@ -1286,12 +1298,37 @@ static int run_agent(GAState *s, GAConfig *config, int socket_activation)
  #ifndef _WIN32
-@@ -255,6 +256,10 @@ QEMU_COPYRIGHT "\n"
- "                    to list available RPCs)\n"
- "  -D, --dump-conf   dump a qemu-ga config file based on current config\n"
- "                    options / command-line parameters to stdout\n"
-+"  -r, --retry-path  attempt re-opening path if it's unavailable or closed\n"
-+"                    due to an error which may be recoverable in the future\n"
-+"                    (virtio-serial driver re-install, serial device hot\n"
-+"                    plug/unplug, etc.)\n"
- "  -h, --help        display this help and exit\n"
- "\n"
- QEMU_HELP_BOTTOM "\n"
-@@ -614,6 +619,7 @@ static gboolean channel_event_cb(GIOCondition condition, gpointer data)
-     switch (status) {
-     case G_IO_STATUS_ERROR:
-         g_warning("error reading channel");
-+        stop_agent(s, false);
-         return false;
-     case G_IO_STATUS_NORMAL:
-         buf[count] = 0;
-@@ -927,6 +933,7 @@ struct GAConfig {
-     int daemonize;
-     GLogLevelFlags log_level;
-     int dumpconf;
-+    bool retry_path;
- };
- 
- static void config_load(GAConfig *config)
-@@ -976,6 +983,10 @@ static void config_load(GAConfig *config)
-         /* enable all log levels */
-         config->log_level = G_LOG_LEVEL_MASK;
+     if (!register_signal_handlers()) {
+         g_critical("failed to register signal handlers");
+-        return EXIT_FAILURE;
++        return NULL;
      }
-+    if (g_key_file_has_key(keyfile, "general", "retry-path", NULL)) {
-+        config->retry_path =
-+            g_key_file_get_boolean(keyfile, "general", "retry-path", &gerr);
-+    }
-     if (g_key_file_has_key(keyfile, "general", "blacklist", NULL)) {
-         config->bliststr =
-             g_key_file_get_string(keyfile, "general", "blacklist", &gerr);
-@@ -1037,6 +1048,8 @@ static void config_dump(GAConfig *config)
-     g_key_file_set_string(keyfile, "general", "statedir", config->state_dir);
-     g_key_file_set_boolean(keyfile, "general", "verbose",
-                            config->log_level == G_LOG_LEVEL_MASK);
-+    g_key_file_set_boolean(keyfile, "general", "retry-path",
-+                           config->retry_path);
-     tmp = list_join(config->blacklist, ',');
-     g_key_file_set_string(keyfile, "general", "blacklist", tmp);
-     g_free(tmp);
-@@ -1055,7 +1068,7 @@ static void config_dump(GAConfig *config)
- 
- static void config_parse(GAConfig *config, int argc, char **argv)
- {
--    const char *sopt = "hVvdm:p:l:f:F::b:s:t:D";
-+    const char *sopt = "hVvdm:p:l:f:F::b:s:t:Dr";
-     int opt_ind = 0, ch;
-     const struct option lopt[] = {
-         { "help", 0, NULL, 'h' },
-@@ -1075,6 +1088,7 @@ static void config_parse(GAConfig *config, int argc, char **argv)
-         { "service", 1, NULL, 's' },
  #endif
-         { "statedir", 1, NULL, 't' },
-+        { "retry-path", 0, NULL, 'r' },
-         { NULL, 0, NULL, 0 }
-     };
  
-@@ -1119,6 +1133,9 @@ static void config_parse(GAConfig *config, int argc, char **argv)
-         case 'D':
-             config->dumpconf = 1;
-             break;
-+        case 'r':
-+            config->retry_path = true;
-+            break;
-         case 'b': {
-             if (is_help_option(optarg)) {
-                 qmp_for_each_command(&ga_commands, ga_print_cmd, NULL);
-@@ -1322,9 +1339,6 @@ static void cleanup_agent(GAState *s)
-         ga_command_state_free(s->command_state);
-         json_message_parser_destroy(&s->parser);
-     }
--    if (s->channel) {
--        ga_channel_free(s->channel);
--    }
-     g_free(s->pstate_filepath);
-     g_free(s->state_filepath_isfrozen);
-     if (s->main_loop) {
-@@ -1334,7 +1348,7 @@ static void cleanup_agent(GAState *s)
-     ga_state = NULL;
- }
+     s->main_loop = g_main_loop_new(NULL, false);
  
--static int run_agent(GAState *s)
-+static int run_agent_once(GAState *s)
- {
-     if (!channel_init(s, s->config->method, s->config->channel_path,
-                       s->socket_activation ? FIRST_SOCKET_ACTIVATION_FD : -1)) {
-@@ -1344,9 +1358,41 @@ static int run_agent(GAState *s)
- 
-     g_main_loop_run(ga_state->main_loop);
- 
++    ga_state = s;
++    return s;
++}
++
++static void cleanup_agent(GAState *s)
++{
++    if (s->command_state) {
++        ga_command_state_cleanup_all(s->command_state);
++        ga_command_state_free(s->command_state);
++        json_message_parser_destroy(&s->parser);
++    }
 +    if (s->channel) {
 +        ga_channel_free(s->channel);
 +    }
-+
-     return EXIT_SUCCESS;
- }
- 
-+static int run_agent(GAState *s)
-+{
-+    int ret = EXIT_SUCCESS;
-+
-+    s->force_exit = false;
-+
-+    do {
-+        ret = run_agent_once(s);
-+        if (s->config->retry_path && !s->force_exit) {
-+            g_warning("agent stopped unexpectedly, restarting...");
-+            sleep(QGA_RETRY_INTERVAL);
-+        }
-+    } while (s->config->retry_path && !s->force_exit);
-+
-+    return ret;
++    g_free(s->pstate_filepath);
++    g_free(s->state_filepath_isfrozen);
++    if (s->main_loop) {
++        g_main_loop_unref(s->main_loop);
++    }
++    g_free(s);
++    ga_state = NULL;
 +}
 +
-+static void stop_agent(GAState *s, bool requested)
++static int run_agent(GAState *s, GAConfig *config, int socket_activation)
 +{
-+    if (!s->force_exit) {
-+        s->force_exit = requested;
-+    }
-+
-+    if (g_main_loop_is_running(s->main_loop)) {
-+        g_main_loop_quit(s->main_loop);
-+    }
-+}
-+
+     if (!channel_init(ga_state, config->method, config->channel_path,
+                       socket_activation ? FIRST_SOCKET_ACTIVATION_FD : -1)) {
+         g_critical("failed to initialize guest agent channel");
+@@ -1315,7 +1352,7 @@ static int run_agent(GAState *s, GAConfig *config, int socket_activation)
  int main(int argc, char **argv)
  {
      int ret = EXIT_SUCCESS;
+-    GAState *s = g_new0(GAState, 1);
++    GAState *s;
+     GAConfig *config = g_new0(GAConfig, 1);
+     int socket_activation;
+ 
+@@ -1383,44 +1420,25 @@ int main(int argc, char **argv)
+         }
+     }
+ 
+-    s->log_level = config->log_level;
+-    s->log_file = stderr;
+-#ifdef CONFIG_FSFREEZE
+-    s->fsfreeze_hook = config->fsfreeze_hook;
+-#endif
+-    s->pstate_filepath = g_strdup_printf("%s/qga.state", config->state_dir);
+-    s->state_filepath_isfrozen = g_strdup_printf("%s/qga.state.isfrozen",
+-                                                 config->state_dir);
+-    s->frozen = check_is_frozen(s);
+-
+     if (config->dumpconf) {
+         config_dump(config);
+         goto end;
+     }
+ 
++    s = initialize_agent(config);
++    if (!s) {
++        g_critical("error initializing guest agent");
++        goto end;
++    }
+     ret = run_agent(s, config, socket_activation);
++    cleanup_agent(s);
+ 
+ end:
+-    if (s->command_state) {
+-        ga_command_state_cleanup_all(s->command_state);
+-        ga_command_state_free(s->command_state);
+-        json_message_parser_destroy(&s->parser);
+-    }
+-    if (s->channel) {
+-        ga_channel_free(s->channel);
+-    }
+-    g_free(s->pstate_filepath);
+-    g_free(s->state_filepath_isfrozen);
+-
+     if (config->daemonize) {
+         unlink(config->pid_filepath);
+     }
+ 
+     config_free(config);
+-    if (s->main_loop) {
+-        g_main_loop_unref(s->main_loop);
+-    }
+-    g_free(s);
+ 
+     return ret;
+ }
 -- 
 2.17.1
