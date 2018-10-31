@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59858)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gHwpg-0004ld-5Z
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 16:11:16 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gHwrU-0007XF-1A
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 16:13:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gHwpd-0008Vu-S1
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 16:11:15 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gHwrP-0001eO-Qf
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 16:13:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47006)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gHwrP-0001du-GK
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 16:13:03 -0400
+Date: Wed, 31 Oct 2018 17:12:56 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181031201256.GA30771@habkost.net>
+References: <20181030150453.9344-1-marcandre.lureau@redhat.com>
+	<20181030150453.9344-6-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-References: <cover.1540937826.git.alistair.francis@wdc.com>
-	<3f834825634e34ad107fe9e7af1b417cb47fc1f1.camel@redhat.com>
-In-Reply-To: <3f834825634e34ad107fe9e7af1b417cb47fc1f1.camel@redhat.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 31 Oct 2018 13:10:43 -0700
-Message-ID: <CAKmqyKNF+tQFf50BCj91_RypYeHbnoZLvpm8gH71iW1og9uWfA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v6 0/5] Connect a PCIe host and graphics
- support to RISC-V
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20181030150453.9344-6-marcandre.lureau@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 05/10] qom/globals: generalize
+ object_property_set_globals()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,59 +29,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrea Bolognani <abologna@redhat.com>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-riscv@nongnu.org
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Amit Shah <amit@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, dgilbert@redhat.com, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-On Wed, Oct 31, 2018 at 7:51 AM Andrea Bolognani <abologna@redhat.com> wrote:
->
-> On Tue, 2018-10-30 at 22:17 +0000, Alistair Francis wrote:
-> > V6:
-> >  - Fix the interrupt issue for the GPEX device
->
-> I gave this a spin.
->
-> With the pcie.0 <- pcie-root-port <- virtio-net-pci setup I get
->
->   qemu-system-riscv64: -device pcie-root-port,port=0x8,chassis=1,\
->   id=pci.1,bus=pcie.0,multifunction=on,addr=0x1: MSI-X is not \
->   supported by interrupt controller
->
-> just like last time, which as I mentioned is a problem for libvirt
-> because we follow the recommendations outlined in qemu/docs/pcie.txt
-> and never plug devices into pcie.0 directly.
+On Tue, Oct 30, 2018 at 07:04:48PM +0400, Marc-Andr=E9 Lureau wrote:
+> Handle calls of object_property_set_globals() with any object type,
+> but only apply globals to TYPE_DEVICE & TYPE_USER_CREATABLE.
+>=20
+> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  qom/globals.c | 22 ++++++++++++++--------
+>  1 file changed, 14 insertions(+), 8 deletions(-)
+>=20
+> diff --git a/qom/globals.c b/qom/globals.c
+> index 587f4a1b5c..8664baebe0 100644
+> --- a/qom/globals.c
+> +++ b/qom/globals.c
+> @@ -15,22 +15,28 @@ void object_property_register_global(GlobalProperty=
+ *prop)
+> =20
+>  void object_property_set_globals(Object *obj)
+>  {
+> -    DeviceState *dev =3D DEVICE(obj);
+>      GList *l;
+> +    DeviceState *dev =3D (DeviceState *)object_dynamic_cast(obj, TYPE_=
+DEVICE);
+> +
+> +    if (!dev && !IS_USER_CREATABLE(obj)) {
+> +        /* only TYPE_DEVICE and TYPE_USER_CREATABLE support globals */
+> +        return;
+> +    }
 
-At the moment we can't support MSI, the interrupt controller doesn't
-support MSI.
+This is core QOM code, ideally type-specific code doesn't belong
+here.
 
->
-> Even after working around that issue by manually placing the device
-> at 0000:00:01.0, it still doesn't work: I see
->
->   pci 0000:00:01.0: BAR 6: assigned [mem 0x00000000-0x0003ffff pref]
->   pci 0000:00:01.0: BAR 4: assigned [mem 0x00040000-0x00043fff 64bit pref]
->   pci 0000:00:01.0: BAR 0: no space for [io  size 0x0020]
->   pci 0000:00:01.0: BAR 0: failed to assign [io  size 0x0020]
->   ...
->   virtio_net virtio3: virtio: device uses modern interface but does not have VIRTIO_F_VERSION_1
->   virtio_net: probe of virtio3 failed with error -22
+This also duplicates the purpose of the ObjectClass::set_globals
+flag you have added on another patch, doesn't it?  I suggest just
+dropping this hunk, and letting callers decide if it's
+appropriate to call object_property_set_globals() or not.
 
-Yep, someone else pointed out a problem as well. I have made some
-changes [1] but I still can't get the BAR to line up.
+> =20
+>      for (l =3D global_props; l; l =3D l->next) {
+>          GlobalProperty *prop =3D l->data;
+>          Error *err =3D NULL;
+> =20
+> -        if (object_dynamic_cast(OBJECT(dev), prop->driver) =3D=3D NULL=
+) {
+> +        if (object_dynamic_cast(obj, prop->driver) =3D=3D NULL) {
+>              continue;
+>          }
+>          prop->used =3D true;
+> -        object_property_parse(OBJECT(dev), prop->value, prop->property=
+, &err);
+> +        object_property_parse(obj, prop->value, prop->property, &err);
+>          if (err !=3D NULL) {
+>              error_prepend(&err, "can't apply global %s.%s=3D%s: ",
+>                            prop->driver, prop->property, prop->value);
+> -            if (!dev->hotplugged && prop->errp) {
+> +
+> +            if (dev && !dev->hotplugged && prop->errp) {
 
->
-> in dmesg and, while the device shows up in the output of lspci(8),
-> it's nowhere to be seen when running 'ip addr' and friends.
->
-> Let me know if you need me to try anything else :)
+Hmm, more type-specific code.  Can't we get rid of the
+dev->hotplugged check here?
 
-Any ideas on how to debug the confusing memory mappings or
-non-existent interrupts would be helpful :)
+Maybe changing the function signature to:
+  void object_property_set_globals(Object *obj, bool propagate_errors);
+and let the caller decide?
 
-1: https://github.com/alistair23/qemu/tree/mainline/alistair/sifive_pcie.next
+Or we could try to find a way to get rid of prop->errp.  I never
+really liked that hack, anyway.
 
-Alistair
+Anyway, I won't mind keeping this code as-is if the solution is
+too complex.
 
->
-> --
-> Andrea Bolognani / Red Hat / Virtualization
->
+
+>                  error_propagate(prop->errp, err);
+>              } else {
+>                  assert(prop->user_provided);
+> @@ -56,15 +62,15 @@ int object_property_check_globals(void)
+>              continue;
+>          }
+>          oc =3D object_class_by_name(prop->driver);
+> -        oc =3D object_class_dynamic_cast(oc, TYPE_DEVICE);
+> -        if (!oc) {
+> +        dc =3D (DeviceClass *)object_class_dynamic_cast(oc, TYPE_DEVIC=
+E);
+> +        if (!IS_USER_CREATABLE_CLASS(oc) && !dc) {
+
+This could use the ObjectClass::set_globals flag you have added.
+
+>              warn_report("global %s.%s has invalid class name",
+>                          prop->driver, prop->property);
+>              ret =3D 1;
+>              continue;
+>          }
+> -        dc =3D DEVICE_CLASS(oc);
+> -        if (!dc->hotpluggable && !prop->used) {
+> +
+> +        if (dc && !dc->hotpluggable) {
+
+I wonder how we could get rid of this type-specific check.  Maybe
+a ObjectClass::only_init_time_globals flag, automatically
+initialized by TYPE_DEVICE based on DeviceClass::hotpluggable?
+
+In this case, I'm not sure it would be worth the extra
+complexity.  The type-specific code is just for a warning,
+anyway, so it's not a big deal.
+
+
+>              warn_report("global %s.%s=3D%s not used",
+>                          prop->driver, prop->property, prop->value);
+>              ret =3D 1;
+> --=20
+> 2.19.0.271.gfe8321ec05
+>=20
+>=20
+
+--=20
+Eduardo
