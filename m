@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41811)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42862)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <contrib@steffen-goertz.de>) id 1gHeLc-0005Vu-CE
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:27:01 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gHeQF-000251-B2
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:31:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <contrib@steffen-goertz.de>) id 1gHeLb-0000f8-Ja
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:27:00 -0400
-From: =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>
-Date: Tue, 30 Oct 2018 20:25:27 -0400
-Message-Id: <20181031002526.14262-14-contrib@steffen-goertz.de>
-In-Reply-To: <20181031002526.14262-1-contrib@steffen-goertz.de>
-References: <20181031002526.14262-1-contrib@steffen-goertz.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 13/13] arm: Add Clock peripheral stub to
- NRF51 SOC
+	(envelope-from <ehabkost@redhat.com>) id 1gHeQE-0003l9-Bd
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:31:47 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Tue, 30 Oct 2018 21:31:08 -0300
+Message-Id: <20181031003120.26771-4-ehabkost@redhat.com>
+In-Reply-To: <20181031003120.26771-1-ehabkost@redhat.com>
+References: <20181031003120.26771-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PULL 03/15] iotests: Flush in iotests.py's
+ QemuIoInteractive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,77 +20,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>, "open list:NRF51" <qemu-arm@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Cleber Rosa <crosa@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-This stubs enables the microbit-micropython firmware to run
-on the microbit machine.
+From: Max Reitz <mreitz@redhat.com>
 
-Signed-off-by: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
+After issuing a command, flush the pipe.  This does not change anything
+in Python 2, but it makes a difference in Python 3.
+
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Cleber Rosa <crosa@redhat.com>
+Message-Id: <20181022135307.14398-3-mreitz@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/arm/nrf51_soc.c         | 27 +++++++++++++++++++++++++++
- include/hw/arm/nrf51_soc.h |  1 +
- 2 files changed, 28 insertions(+)
+ tests/qemu-iotests/iotests.py | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/arm/nrf51_soc.c b/hw/arm/nrf51_soc.c
-index c29b80c0ca..bccf2b9b2c 100644
---- a/hw/arm/nrf51_soc.c
-+++ b/hw/arm/nrf51_soc.c
-@@ -35,6 +35,26 @@
-=20
- #define BASE_TO_IRQ(base) ((base >> 12) & 0x1F)
-=20
-+static uint64_t clock_read(void *opaque, hwaddr addr, unsigned int size)
-+{
-+    qemu_log_mask(LOG_UNIMP, "%s: 0x%" HWADDR_PRIx " [%u]\n",
-+                  __func__, addr, size);
-+    return 1;
-+}
-+
-+static void clock_write(void *opaque, hwaddr addr, uint64_t data,
-+                        unsigned int size)
-+{
-+    qemu_log_mask(LOG_UNIMP, "%s: 0x%" HWADDR_PRIx " <- 0x%" PRIx64 " [%=
-u]\n",
-+                  __func__, addr, data, size);
-+}
-+
-+static const MemoryRegionOps clock_ops =3D {
-+    .read =3D clock_read,
-+    .write =3D clock_write
-+};
-+
-+
- static void nrf51_soc_realize(DeviceState *dev_soc, Error **errp)
- {
-     NRF51State *s =3D NRF51_SOC(dev_soc);
-@@ -159,6 +179,13 @@ static void nrf51_soc_realize(DeviceState *dev_soc, =
-Error **errp)
-                                             BASE_TO_IRQ(base_addr)));
-     }
-=20
-+    /* STUB Peripherals */
-+    memory_region_init_io(&s->clock, NULL, &clock_ops, NULL,
-+                          "nrf51_soc.clock", 0x1000);
-+    memory_region_add_subregion_overlap(&s->container,
-+                                        NRF51_IOMEM_BASE, &s->clock, -1)=
-;
-+
-+
-=20
-     create_unimplemented_device("nrf51_soc.io", NRF51_IOMEM_BASE,
-                                 NRF51_IOMEM_SIZE);
-diff --git a/include/hw/arm/nrf51_soc.h b/include/hw/arm/nrf51_soc.h
-index 89525dcb39..4610d0c7ae 100644
---- a/include/hw/arm/nrf51_soc.h
-+++ b/include/hw/arm/nrf51_soc.h
-@@ -40,6 +40,7 @@ typedef struct NRF51State {
-     MemoryRegion iomem;
-     MemoryRegion sram;
-     MemoryRegion flash;
-+    MemoryRegion clock;
-=20
-     uint32_t sram_size;
-     uint32_t flash_size;
---=20
-2.19.1
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index 4e67fbbe96..10f2d17419 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -178,6 +178,7 @@ class QemuIoInteractive:
+         cmd = cmd.strip()
+         assert cmd != 'q' and cmd != 'quit'
+         self._p.stdin.write(cmd + '\n')
++        self._p.stdin.flush()
+         return self._read_output()
+ 
+ 
+-- 
+2.18.0.rc1.1.g3f1ff2140
