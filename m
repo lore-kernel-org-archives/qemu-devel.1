@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57723)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57717)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gHyTv-0004bi-S9
+	(envelope-from <kwolf@redhat.com>) id 1gHyTv-0004bb-Rq
 	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 17:56:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gHyTn-0008EE-SI
+	(envelope-from <kwolf@redhat.com>) id 1gHyTm-0008C3-Gs
 	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 17:56:52 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 31 Oct 2018 22:56:17 +0100
-Message-Id: <20181031215622.27690-8-kwolf@redhat.com>
+Date: Wed, 31 Oct 2018 22:56:15 +0100
+Message-Id: <20181031215622.27690-6-kwolf@redhat.com>
 In-Reply-To: <20181031215622.27690-1-kwolf@redhat.com>
 References: <20181031215622.27690-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 07/12] file-posix: Avoid aio_worker() for
- QEMU_AIO_FLUSH
+Subject: [Qemu-devel] [PATCH 05/12] file-posix: Avoid aio_worker() for
+ QEMU_AIO_WRITE_ZEROES
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,62 +34,123 @@ we can keep RawPosixAIOData on the stack.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/file-posix.c | 16 +++++++++++-----
- 1 file changed, 11 insertions(+), 5 deletions(-)
+ block/file-posix.c | 53 +++++++++++++++++++++++++++++-----------------
+ 1 file changed, 34 insertions(+), 19 deletions(-)
 
 diff --git a/block/file-posix.c b/block/file-posix.c
-index 291ffaeded..074848ed1f 100644
+index fe5e95cc0a..3d3bddd511 100644
 --- a/block/file-posix.c
 +++ b/block/file-posix.c
-@@ -1143,8 +1143,9 @@ static ssize_t handle_aiocb_ioctl(RawPosixAIOData *=
-aiocb)
-     return 0;
+@@ -1443,8 +1443,9 @@ static ssize_t handle_aiocb_write_zeroes_block(RawP=
+osixAIOData *aiocb)
+     return ret;
  }
 =20
--static ssize_t handle_aiocb_flush(RawPosixAIOData *aiocb)
-+static int handle_aiocb_flush(void *opaque)
+-static ssize_t handle_aiocb_write_zeroes(RawPosixAIOData *aiocb)
++static int handle_aiocb_write_zeroes(void *opaque)
  {
 +    RawPosixAIOData *aiocb =3D opaque;
+ #if defined(CONFIG_FALLOCATE) || defined(CONFIG_XFS)
      BDRVRawState *s =3D aiocb->bs->opaque;
+ #endif
+@@ -1508,8 +1509,9 @@ static ssize_t handle_aiocb_write_zeroes(RawPosixAI=
+OData *aiocb)
+     return -ENOTSUP;
+ }
+=20
+-static ssize_t handle_aiocb_write_zeroes_unmap(RawPosixAIOData *aiocb)
++static int handle_aiocb_write_zeroes_unmap(void *opaque)
+ {
++    RawPosixAIOData *aiocb =3D opaque;
+     BDRVRawState *s G_GNUC_UNUSED =3D aiocb->bs->opaque;
      int ret;
 =20
-@@ -1777,12 +1778,10 @@ static int aio_worker(void *arg)
-             ret =3D -EINVAL;
-         }
+@@ -1784,11 +1786,7 @@ static int aio_worker(void *arg)
+         ret =3D handle_aiocb_discard(aiocb);
          break;
--    case QEMU_AIO_FLUSH:
--        ret =3D handle_aiocb_flush(aiocb);
--        break;
-     case QEMU_AIO_IOCTL:
-         ret =3D handle_aiocb_ioctl(aiocb);
-         break;
-+    case QEMU_AIO_FLUSH:
-     case QEMU_AIO_DISCARD:
      case QEMU_AIO_WRITE_ZEROES:
+-        ret =3D handle_aiocb_write_zeroes(aiocb);
+-        break;
      case QEMU_AIO_WRITE_ZEROES | QEMU_AIO_DISCARD:
-@@ -1910,6 +1909,7 @@ static void raw_aio_unplug(BlockDriverState *bs)
- static int raw_co_flush_to_disk(BlockDriverState *bs)
+-        ret =3D handle_aiocb_write_zeroes_unmap(aiocb);
+-        break;
+     case QEMU_AIO_COPY_RANGE:
+     case QEMU_AIO_TRUNCATE:
+         g_assert_not_reached();
+@@ -2614,18 +2612,41 @@ raw_co_pdiscard(BlockDriverState *bs, int64_t off=
+set, int bytes)
+     return paio_submit_co(bs, s->fd, offset, NULL, bytes, QEMU_AIO_DISCA=
+RD);
+ }
+=20
+-static int coroutine_fn raw_co_pwrite_zeroes(
+-    BlockDriverState *bs, int64_t offset,
+-    int bytes, BdrvRequestFlags flags)
++static int coroutine_fn
++raw_do_pwrite_zeroes(BlockDriverState *bs, int64_t offset, int bytes,
++                     BdrvRequestFlags flags, bool blkdev)
  {
      BDRVRawState *s =3D bs->opaque;
+-    int operation =3D QEMU_AIO_WRITE_ZEROES;
 +    RawPosixAIOData acb;
-     int ret;
-=20
-     ret =3D fd_open(bs);
-@@ -1917,7 +1917,13 @@ static int raw_co_flush_to_disk(BlockDriverState *=
-bs)
-         return ret;
-     }
-=20
--    return paio_submit_co(bs, s->fd, 0, NULL, 0, QEMU_AIO_FLUSH);
++    ThreadPoolFunc *handler;
++
 +    acb =3D (RawPosixAIOData) {
 +        .bs             =3D bs,
 +        .aio_fildes     =3D s->fd,
-+        .aio_type       =3D QEMU_AIO_FLUSH,
++        .aio_type       =3D QEMU_AIO_WRITE_ZEROES,
++        .aio_offset     =3D offset,
++        .aio_nbytes     =3D bytes,
 +    };
 +
-+    return raw_thread_pool_submit(bs, handle_aiocb_flush, &acb);
++    if (blkdev) {
++        acb.aio_type |=3D QEMU_AIO_BLKDEV;
++    }
+=20
+     if (flags & BDRV_REQ_MAY_UNMAP) {
+-        operation |=3D QEMU_AIO_DISCARD;
++        acb.aio_type |=3D QEMU_AIO_DISCARD;
++        handler =3D handle_aiocb_write_zeroes_unmap;
++    } else {
++        handler =3D handle_aiocb_write_zeroes;
+     }
+=20
+-    return paio_submit_co(bs, s->fd, offset, NULL, bytes, operation);
++    return raw_thread_pool_submit(bs, handler, &acb);
++}
++
++static int coroutine_fn raw_co_pwrite_zeroes(
++    BlockDriverState *bs, int64_t offset,
++    int bytes, BdrvRequestFlags flags)
++{
++    return raw_do_pwrite_zeroes(bs, offset, bytes, flags, false);
  }
 =20
- static void raw_aio_attach_aio_context(BlockDriverState *bs,
+ static int raw_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
+@@ -3130,8 +3151,6 @@ hdev_co_pdiscard(BlockDriverState *bs, int64_t offs=
+et, int bytes)
+ static coroutine_fn int hdev_co_pwrite_zeroes(BlockDriverState *bs,
+     int64_t offset, int bytes, BdrvRequestFlags flags)
+ {
+-    BDRVRawState *s =3D bs->opaque;
+-    int operation =3D QEMU_AIO_WRITE_ZEROES | QEMU_AIO_BLKDEV;
+     int rc;
+=20
+     rc =3D fd_open(bs);
+@@ -3139,11 +3158,7 @@ static coroutine_fn int hdev_co_pwrite_zeroes(Bloc=
+kDriverState *bs,
+         return rc;
+     }
+=20
+-    if (flags & BDRV_REQ_MAY_UNMAP) {
+-        operation |=3D QEMU_AIO_DISCARD;
+-    }
+-
+-    return paio_submit_co(bs, s->fd, offset, NULL, bytes, operation);
++    return raw_do_pwrite_zeroes(bs, offset, bytes, flags, true);
+ }
+=20
+ static int coroutine_fn hdev_co_create_opts(const char *filename, QemuOp=
+ts *opts,
 --=20
 2.19.1
