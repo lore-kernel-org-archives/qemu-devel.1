@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36511)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gHx7D-0002Co-A8
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 16:29:24 -0400
+	(envelope-from <alistair23@gmail.com>) id 1gHx80-0002fx-MA
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 16:30:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gHx78-0001qk-6M
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 16:29:23 -0400
+	(envelope-from <alistair23@gmail.com>) id 1gHx7v-00029x-3t
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 16:30:12 -0400
 References: <20181031132029.4887-1-kbastian@mail.uni-paderborn.de>
-	<20181031132029.4887-7-kbastian@mail.uni-paderborn.de>
+	<20181031132029.4887-8-kbastian@mail.uni-paderborn.de>
 From: Alistair <alistair23@gmail.com>
-Message-ID: <afa85899-90ba-5d0d-80d3-83268e923511@gmail.com>
-Date: Wed, 31 Oct 2018 13:29:12 -0700
+Message-ID: <94f933ad-2cba-c18b-bac1-15349df446cd@gmail.com>
+Date: Wed, 31 Oct 2018 13:30:03 -0700
 MIME-Version: 1.0
-In-Reply-To: <20181031132029.4887-7-kbastian@mail.uni-paderborn.de>
+In-Reply-To: <20181031132029.4887-8-kbastian@mail.uni-paderborn.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 06/35] target/riscv: Convert RVXI
- arithmetic insns to decodetree
+Subject: Re: [Qemu-devel] [PATCH v3 07/35] target/riscv: Convert RVXI fence
+ insns to decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,9 +29,7 @@ To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, mjc@sifive.com, sagark@
 Cc: qemu-riscv@nongnu.org, peer.adelt@hni.uni-paderborn.de, richard.henderson@linaro.org, qemu-devel@nongnu.org
 
 On 10/31/18 6:20 AM, Bastian Koppelmann wrote:
-> we cannot remove the call to gen_arith() in decode_RV32_64G() since it
-> is used to translate multiply instructions.
-> 
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 > Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 > Signed-off-by: Peer Adelt <peer.adelt@hni.uni-paderborn.de>
 
@@ -41,289 +39,76 @@ Alistair
 
 > ---
 > v2 -> v3:
->      - moved 64-bit only insn to insn64.decode
+>      - removed %pred/%succ
 >      - dropped insn argument of trans_foo functions
 > 
->   target/riscv/insn32.decode              |  25 ++++
->   target/riscv/insn64.decode              |  13 ++
->   target/riscv/insn_trans/trans_rvi.inc.c | 168 ++++++++++++++++++++++++
->   target/riscv/translate.c                |   9 --
->   4 files changed, 206 insertions(+), 9 deletions(-)
+>   target/riscv/insn32.decode              |  2 ++
+>   target/riscv/insn_trans/trans_rvi.inc.c | 21 +++++++++++++++++++++
+>   target/riscv/translate.c                | 14 --------------
+>   3 files changed, 23 insertions(+), 14 deletions(-)
 > 
 > diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-> index 076de873c4..4fd88f48d2 100644
+> index 4fd88f48d2..6d750b4c5a 100644
 > --- a/target/riscv/insn32.decode
 > +++ b/target/riscv/insn32.decode
-> @@ -21,6 +21,8 @@
->   %rs1       15:5
->   %rd        7:5
->   
-> +%sh6    20:6
-> +
->   # immediates:
->   %imm_i    20:s12
->   %imm_s    25:s7 7:5
-> @@ -30,14 +32,18 @@
->   
->   # Argument sets:
->   &b    imm rs2 rs1
-> +&shift     shamt rs1 rd
->   
->   # Formats 32:
-> +@r       .......   ..... ..... ... ..... .......                   %rs2 %rs1 %rd
->   @i       ............    ..... ... ..... .......         imm=%imm_i     %rs1 %rd
->   @b       .......   ..... ..... ... ..... ....... &b      imm=%imm_b %rs2 %rs1
->   @s       .......   ..... ..... ... ..... .......         imm=%imm_s %rs2 %rs1
->   @u       ....................      ..... .......         imm=%imm_u          %rd
->   @j       ....................      ..... .......         imm=%imm_j          %rd
->   
-> +@sh6     ......  ...... .....  ... ..... ....... &shift  shamt=%sh6      %rs1 %rd
-> +
->   # *** RV32I Base Instruction Set ***
->   lui      ....................       ..... 0110111 @u
->   auipc    ....................       ..... 0010111 @u
-> @@ -57,3 +63,22 @@ lhu      ............     ..... 101 ..... 0000011 @i
->   sb       .......  .....   ..... 000 ..... 0100011 @s
->   sh       .......  .....   ..... 001 ..... 0100011 @s
->   sw       .......  .....   ..... 010 ..... 0100011 @s
-> +addi     ............     ..... 000 ..... 0010011 @i
-> +slti     ............     ..... 010 ..... 0010011 @i
-> +sltiu    ............     ..... 011 ..... 0010011 @i
-> +xori     ............     ..... 100 ..... 0010011 @i
-> +ori      ............     ..... 110 ..... 0010011 @i
-> +andi     ............     ..... 111 ..... 0010011 @i
-> +slli     000000 ......    ..... 001 ..... 0010011 @sh6
-> +srli     000000 ......    ..... 101 ..... 0010011 @sh6
-> +srai     010000 ......    ..... 101 ..... 0010011 @sh6
-> +add      0000000 .....    ..... 000 ..... 0110011 @r
-> +sub      0100000 .....    ..... 000 ..... 0110011 @r
-> +sll      0000000 .....    ..... 001 ..... 0110011 @r
-> +slt      0000000 .....    ..... 010 ..... 0110011 @r
-> +sltu     0000000 .....    ..... 011 ..... 0110011 @r
-> +xor      0000000 .....    ..... 100 ..... 0110011 @r
-> +srl      0000000 .....    ..... 101 ..... 0110011 @r
-> +sra      0100000 .....    ..... 101 ..... 0110011 @r
-> +or       0000000 .....    ..... 110 ..... 0110011 @r
-> +and      0000000 .....    ..... 111 ..... 0110011 @r
-> diff --git a/target/riscv/insn64.decode b/target/riscv/insn64.decode
-> index 439d4e2c58..9a35f2aa19 100644
-> --- a/target/riscv/insn64.decode
-> +++ b/target/riscv/insn64.decode
-> @@ -19,7 +19,20 @@
->   # This is concatenated with insn32.decode for risc64 targets.
->   # Most of the fields and formats are there.
->   
-> +%sh5    20:5
-> +
-> +@sh5     .......  ..... .....  ... ..... ....... &shift  shamt=%sh5      %rs1 %rd
-> +
->   # *** RV64I Base Instruction Set (in addition to RV32I) ***
->   lwu      ............   ..... 110 ..... 0000011 @i
->   ld       ............   ..... 011 ..... 0000011 @i
->   sd       ....... .....  ..... 011 ..... 0100011 @s
-> +addiw    ............   ..... 000 ..... 0011011 @i
-> +slliw    0000000 .....  ..... 001 ..... 0011011 @sh5
-> +srliw    0000000 .....  ..... 101 ..... 0011011 @sh5
-> +sraiw    0100000 .....  ..... 101 ..... 0011011 @sh5
-> +addw     0000000 .....  ..... 000 ..... 0111011 @r
-> +subw     0100000 .....  ..... 000 ..... 0111011 @r
-> +sllw     0000000 .....  ..... 001 ..... 0111011 @r
-> +srlw     0000000 .....  ..... 101 ..... 0111011 @r
-> +sraw     0100000 .....  ..... 101 ..... 0111011 @r
+> @@ -82,3 +82,5 @@ srl      0000000 .....    ..... 101 ..... 0110011 @r
+>   sra      0100000 .....    ..... 101 ..... 0110011 @r
+>   or       0000000 .....    ..... 110 ..... 0110011 @r
+>   and      0000000 .....    ..... 111 ..... 0110011 @r
+> +fence    ---- pred:4 succ:4 ----- 000 ----- 0001111
+> +fence_i  ---- ----   ----   ----- 001 ----- 0001111
 > diff --git a/target/riscv/insn_trans/trans_rvi.inc.c b/target/riscv/insn_trans/trans_rvi.inc.c
-> index 39a20a70e8..01f751650a 100644
+> index 01f751650a..a149e913b1 100644
 > --- a/target/riscv/insn_trans/trans_rvi.inc.c
 > +++ b/target/riscv/insn_trans/trans_rvi.inc.c
-> @@ -150,3 +150,171 @@ static bool trans_sd(DisasContext *ctx, arg_sd *a)
+> @@ -318,3 +318,24 @@ static bool trans_sraw(DisasContext *ctx, arg_sraw *a)
 >       return true;
 >   }
 >   #endif
 > +
-> +static bool trans_addi(DisasContext *ctx, arg_addi *a)
+> +static bool trans_fence(DisasContext *ctx, arg_fence *a)
 > +{
-> +    gen_arith_imm(ctx, OPC_RISC_ADDI, a->rd, a->rs1, a->imm);
-> +    return true;
-> +}
-> +
-> +static bool trans_slti(DisasContext *ctx, arg_slti *a)
-> +{
-> +    gen_arith_imm(ctx, OPC_RISC_SLTI, a->rd, a->rs1, a->imm);
-> +    return true;
-> +}
-> +
-> +static bool trans_sltiu(DisasContext *ctx, arg_sltiu *a)
-> +{
-> +    gen_arith_imm(ctx, OPC_RISC_SLTIU, a->rd, a->rs1, a->imm);
-> +    return true;
-> +}
-> +
-> +static bool trans_xori(DisasContext *ctx, arg_xori *a)
-> +{
-> +    gen_arith_imm(ctx, OPC_RISC_XORI, a->rd, a->rs1, a->imm);
-> +    return true;
-> +}
-> +static bool trans_ori(DisasContext *ctx, arg_ori *a)
-> +{
-> +    gen_arith_imm(ctx, OPC_RISC_ORI, a->rd, a->rs1, a->imm);
-> +    return true;
-> +}
-> +static bool trans_andi(DisasContext *ctx, arg_andi *a)
-> +{
-> +    gen_arith_imm(ctx, OPC_RISC_ANDI, a->rd, a->rs1, a->imm);
-> +    return true;
-> +}
-> +static bool trans_slli(DisasContext *ctx, arg_slli *a)
-> +{
-> +    gen_arith_imm(ctx, OPC_RISC_SLLI, a->rd, a->rs1, a->shamt);
-> +    return true;
-> +}
-> +
-> +static bool trans_srli(DisasContext *ctx, arg_srli *a)
-> +{
-> +    gen_arith_imm(ctx, OPC_RISC_SHIFT_RIGHT_I, a->rd, a->rs1, a->shamt);
-> +    return true;
-> +}
-> +
-> +static bool trans_srai(DisasContext *ctx, arg_srai *a)
-> +{
-> +    gen_arith_imm(ctx, OPC_RISC_SHIFT_RIGHT_I, a->rd, a->rs1, a->shamt | 0x400);
-> +    return true;
-> +}
-> +
-> +static bool trans_add(DisasContext *ctx, arg_add *a)
-> +{
-> +    gen_arith(ctx, OPC_RISC_ADD, a->rd, a->rs1, a->rs2);
-> +    return true;
-> +}
-> +
-> +static bool trans_sub(DisasContext *ctx, arg_sub *a)
-> +{
-> +    gen_arith(ctx, OPC_RISC_SUB, a->rd, a->rs1, a->rs2);
-> +    return true;
-> +}
-> +
-> +static bool trans_sll(DisasContext *ctx, arg_sll *a)
-> +{
-> +    gen_arith(ctx, OPC_RISC_SLL, a->rd, a->rs1, a->rs2);
-> +    return true;
-> +}
-> +
-> +static bool trans_slt(DisasContext *ctx, arg_slt *a)
-> +{
-> +    gen_arith(ctx, OPC_RISC_SLT, a->rd, a->rs1, a->rs2);
-> +    return true;
-> +}
-> +
-> +static bool trans_sltu(DisasContext *ctx, arg_sltu *a)
-> +{
-> +    gen_arith(ctx, OPC_RISC_SLTU, a->rd, a->rs1, a->rs2);
-> +    return true;
-> +}
-> +
-> +static bool trans_xor(DisasContext *ctx, arg_xor *a)
-> +{
-> +    gen_arith(ctx, OPC_RISC_XOR, a->rd, a->rs1, a->rs2);
-> +    return true;
-> +}
-> +
-> +static bool trans_srl(DisasContext *ctx, arg_srl *a)
-> +{
-> +    gen_arith(ctx, OPC_RISC_SRL, a->rd, a->rs1, a->rs2);
-> +    return true;
-> +}
-> +
-> +static bool trans_sra(DisasContext *ctx, arg_sra *a)
-> +{
-> +    gen_arith(ctx, OPC_RISC_SRA, a->rd, a->rs1, a->rs2);
-> +    return true;
-> +}
-> +
-> +static bool trans_or(DisasContext *ctx, arg_or *a)
-> +{
-> +    gen_arith(ctx, OPC_RISC_OR, a->rd, a->rs1, a->rs2);
-> +    return true;
-> +}
-> +
-> +static bool trans_and(DisasContext *ctx, arg_and *a)
-> +{
-> +    gen_arith(ctx, OPC_RISC_AND, a->rd, a->rs1, a->rs2);
-> +    return true;
-> +}
-> +
-> +#ifdef TARGET_RISCV64
-> +static bool trans_addiw(DisasContext *ctx, arg_addiw *a)
-> +{
-> +    gen_arith_imm(ctx, OPC_RISC_ADDIW, a->rd, a->rs1, a->imm);
-> +    return true;
-> +}
-> +
-> +static bool trans_slliw(DisasContext *ctx, arg_slliw *a)
-> +{
-> +    gen_arith_imm(ctx, OPC_RISC_SLLIW, a->rd, a->rs1, a->shamt);
-> +    return true;
-> +}
-> +
-> +static bool trans_srliw(DisasContext *ctx, arg_srliw *a)
-> +{
-> +    gen_arith_imm(ctx, OPC_RISC_SHIFT_RIGHT_IW, a->rd, a->rs1, a->shamt);
-> +    return true;
-> +}
-> +
-> +static bool trans_sraiw(DisasContext *ctx, arg_sraiw *a)
-> +{
-> +    gen_arith_imm(ctx, OPC_RISC_SHIFT_RIGHT_IW , a->rd, a->rs1,
-> +                  a->shamt | 0x400);
-> +    return true;
-> +}
-> +
-> +static bool trans_addw(DisasContext *ctx, arg_addw *a)
-> +{
-> +    gen_arith(ctx, OPC_RISC_ADDW, a->rd, a->rs1, a->rs2);
-> +    return true;
-> +}
-> +
-> +static bool trans_subw(DisasContext *ctx, arg_subw *a)
-> +{
-> +    gen_arith(ctx, OPC_RISC_SUBW, a->rd, a->rs1, a->rs2);
-> +    return true;
-> +}
-> +
-> +static bool trans_sllw(DisasContext *ctx, arg_sllw *a)
-> +{
-> +    gen_arith(ctx, OPC_RISC_SLLW, a->rd, a->rs1, a->rs2);
-> +    return true;
-> +}
-> +
-> +static bool trans_srlw(DisasContext *ctx, arg_srlw *a)
-> +{
-> +    gen_arith(ctx, OPC_RISC_SRLW, a->rd, a->rs1, a->rs2);
-> +    return true;
-> +}
-> +
-> +static bool trans_sraw(DisasContext *ctx, arg_sraw *a)
-> +{
-> +    gen_arith(ctx, OPC_RISC_SRAW, a->rd, a->rs1, a->rs2);
-> +    return true;
-> +}
+> +#ifndef CONFIG_USER_ONLY
+> +    /* FENCE is a full memory barrier. */
+> +    tcg_gen_mb(TCG_MO_ALL | TCG_BAR_SC);
 > +#endif
+> +    return true;
+> +}
+> +
+> +static bool trans_fence_i(DisasContext *ctx, arg_fence_i *a)
+> +{
+> +#ifndef CONFIG_USER_ONLY
+> +    /* FENCE_I is a no-op in QEMU,
+> +     * however we need to end the translation block */
+> +    tcg_gen_movi_tl(cpu_pc, ctx->pc_succ_insn);
+> +    tcg_gen_exit_tb(NULL, 0);
+> +    ctx->base.is_jmp = DISAS_NORETURN;
+> +#endif
+> +    return true;
+> +}
 > diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-> index 244855c82d..855c241e97 100644
+> index 855c241e97..80f18fb6aa 100644
 > --- a/target/riscv/translate.c
 > +++ b/target/riscv/translate.c
-> @@ -1701,15 +1701,6 @@ static void decode_RV32_64G(CPURISCVState *env, DisasContext *ctx)
->       imm = GET_IMM(ctx->opcode);
->   
->       switch (op) {
-> -    case OPC_RISC_ARITH_IMM:
-> -#if defined(TARGET_RISCV64)
-> -    case OPC_RISC_ARITH_IMM_W:
-> -#endif
-> -        if (rd == 0) {
-> -            break; /* NOP */
+> @@ -1740,20 +1740,6 @@ static void decode_RV32_64G(CPURISCVState *env, DisasContext *ctx)
+>           gen_fp_arith(ctx, MASK_OP_FP_ARITH(ctx->opcode), rd, rs1, rs2,
+>                        GET_RM(ctx->opcode));
+>           break;
+> -    case OPC_RISC_FENCE:
+> -#ifndef CONFIG_USER_ONLY
+> -        if (ctx->opcode & 0x1000) {
+> -            /* FENCE_I is a no-op in QEMU,
+> -             * however we need to end the translation block */
+> -            tcg_gen_movi_tl(cpu_pc, ctx->pc_succ_insn);
+> -            tcg_gen_exit_tb(NULL, 0);
+> -            ctx->base.is_jmp = DISAS_NORETURN;
+> -        } else {
+> -            /* FENCE is a full memory barrier. */
+> -            tcg_gen_mb(TCG_MO_ALL | TCG_BAR_SC);
 > -        }
-> -        gen_arith_imm(ctx, MASK_OP_ARITH_IMM(ctx->opcode), rd, rs1, imm);
+> -#endif
 > -        break;
->       case OPC_RISC_ARITH:
->   #if defined(TARGET_RISCV64)
->       case OPC_RISC_ARITH_W:
+>       case OPC_RISC_SYSTEM:
+>           gen_system(env, ctx, MASK_OP_SYSTEM(ctx->opcode), rd, rs1,
+>                      (ctx->opcode & 0xFFF00000) >> 20);
 > 
