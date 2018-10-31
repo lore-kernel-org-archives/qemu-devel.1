@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47316)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gHeeo-0000mL-An
+	(envelope-from <ehabkost@redhat.com>) id 1gHeeo-0000mF-7T
 	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:46:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gHeej-0006r1-OX
+	(envelope-from <ehabkost@redhat.com>) id 1gHeej-0006qX-9L
 	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:46:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44222)
+Received: from mx1.redhat.com ([209.132.183.28]:33260)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gHeej-0006de-G7
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gHeei-0006jr-US
 	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:46:45 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Tue, 30 Oct 2018 21:45:45 -0300
-Message-Id: <20181031004550.15410-3-ehabkost@redhat.com>
+Date: Tue, 30 Oct 2018 21:45:46 -0300
+Message-Id: <20181031004550.15410-4-ehabkost@redhat.com>
 In-Reply-To: <20181031004550.15410-1-ehabkost@redhat.com>
 References: <20181031004550.15410-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 2/7] target/i386: Remove #ifdeffed-out icebp
- debugging hack
+Subject: [Qemu-devel] [PULL 3/7] kvm: Add support to
+ KVM_GET_MSR_FEATURE_INDEX_LIST and KVM_GET_MSRS system ioctl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,44 +25,145 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Robert Hoo <robert.hu@linux.intel.com>
 
-From: Peter Maydell <peter.maydell@linaro.org>
+From: Robert Hoo <robert.hu@linux.intel.com>
 
-Remove a debugging hack which could be used to cause the
-undocumented 'icebp' instruction to enable QEMU internal
-debug logging. This code has always been #ifdeffed out
-since it was introduced in commit aba9d61e34b9 in 2005;
-judging by the rest of that commit (which is entirely
-unrelated) it may have even been committed by accident.
+Add kvm_get_supported_feature_msrs() to get supported MSR feature index list.
+Add kvm_arch_get_supported_msr_feature() to get each MSR features value.
 
-(Note that WANT_ICEBP is not defined by default anyway.)
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Message-Id: <20181009183314.13416-1-peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
+Message-Id: <1539578845-37944-2-git-send-email-robert.hu@linux.intel.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- target/i386/translate.c | 6 ------
- 1 file changed, 6 deletions(-)
+ include/sysemu/kvm.h |  2 ++
+ target/i386/kvm.c    | 80 ++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 82 insertions(+)
 
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 83c1ebe491..f8bc7680af 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -7028,13 +7028,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
- #ifdef WANT_ICEBP
-     case 0xf1: /* icebp (undocumented, exits to external debugger) */
-         gen_svm_check_intercept(s, pc_start, SVM_EXIT_ICEBP);
--#if 1
-         gen_debug(s, pc_start - s->cs_base);
--#else
--        /* start debug */
--        tb_flush(CPU(x86_env_get_cpu(env)));
--        qemu_set_log(CPU_LOG_INT | CPU_LOG_TB_IN_ASM);
--#endif
-         break;
- #endif
-     case 0xfa: /* cli */
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index 0b64b8e067..97d8d9d0d5 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -463,6 +463,8 @@ int kvm_vm_check_extension(KVMState *s, unsigned int extension);
+ 
+ uint32_t kvm_arch_get_supported_cpuid(KVMState *env, uint32_t function,
+                                       uint32_t index, int reg);
++uint32_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index);
++
+ 
+ void kvm_set_sigmask_len(KVMState *s, unsigned int sigmask_len);
+ 
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 115d8b4c14..161fc38397 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -107,6 +107,7 @@ static int has_pit_state2;
+ static bool has_msr_mcg_ext_ctl;
+ 
+ static struct kvm_cpuid2 *cpuid_cache;
++static struct kvm_msr_list *kvm_feature_msrs;
+ 
+ int kvm_has_pit_state2(void)
+ {
+@@ -420,6 +421,42 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
+     return ret;
+ }
+ 
++uint32_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index)
++{
++    struct {
++        struct kvm_msrs info;
++        struct kvm_msr_entry entries[1];
++    } msr_data;
++    uint32_t ret;
++
++    if (kvm_feature_msrs == NULL) { /* Host doesn't support feature MSRs */
++        return 0;
++    }
++
++    /* Check if requested MSR is supported feature MSR */
++    int i;
++    for (i = 0; i < kvm_feature_msrs->nmsrs; i++)
++        if (kvm_feature_msrs->indices[i] == index) {
++            break;
++        }
++    if (i == kvm_feature_msrs->nmsrs) {
++        return 0; /* if the feature MSR is not supported, simply return 0 */
++    }
++
++    msr_data.info.nmsrs = 1;
++    msr_data.entries[0].index = index;
++
++    ret = kvm_ioctl(s, KVM_GET_MSRS, &msr_data);
++    if (ret != 1) {
++        error_report("KVM get MSR (index=0x%x) feature failed, %s",
++            index, strerror(-ret));
++        exit(1);
++    }
++
++    return msr_data.entries[0].data;
++}
++
++
+ typedef struct HWPoisonPage {
+     ram_addr_t ram_addr;
+     QLIST_ENTRY(HWPoisonPage) list;
+@@ -1286,6 +1323,47 @@ void kvm_arch_do_init_vcpu(X86CPU *cpu)
+     }
+ }
+ 
++static int kvm_get_supported_feature_msrs(KVMState *s)
++{
++    int ret = 0;
++
++    if (kvm_feature_msrs != NULL) {
++        return 0;
++    }
++
++    if (!kvm_check_extension(s, KVM_CAP_GET_MSR_FEATURES)) {
++        return 0;
++    }
++
++    struct kvm_msr_list msr_list;
++
++    msr_list.nmsrs = 0;
++    ret = kvm_ioctl(s, KVM_GET_MSR_FEATURE_INDEX_LIST, &msr_list);
++    if (ret < 0 && ret != -E2BIG) {
++        error_report("Fetch KVM feature MSR list failed: %s",
++            strerror(-ret));
++        return ret;
++    }
++
++    assert(msr_list.nmsrs > 0);
++    kvm_feature_msrs = (struct kvm_msr_list *) \
++        g_malloc0(sizeof(msr_list) +
++                 msr_list.nmsrs * sizeof(msr_list.indices[0]));
++
++    kvm_feature_msrs->nmsrs = msr_list.nmsrs;
++    ret = kvm_ioctl(s, KVM_GET_MSR_FEATURE_INDEX_LIST, kvm_feature_msrs);
++
++    if (ret < 0) {
++        error_report("Fetch KVM feature MSR list failed: %s",
++            strerror(-ret));
++        g_free(kvm_feature_msrs);
++        kvm_feature_msrs = NULL;
++        return ret;
++    }
++
++    return 0;
++}
++
+ static int kvm_get_supported_msrs(KVMState *s)
+ {
+     static int kvm_supported_msrs;
+@@ -1439,6 +1517,8 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+         return ret;
+     }
+ 
++    kvm_get_supported_feature_msrs(s);
++
+     uname(&utsname);
+     lm_capable_kernel = strcmp(utsname.machine, "x86_64") == 0;
+ 
 -- 
 2.18.0.rc1.1.g3f1ff2140
