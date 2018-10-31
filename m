@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38198)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45219)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gHnbE-0002bh-Na
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 06:19:45 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gHnwi-0003Un-9j
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 06:41:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gHnbB-0007El-Kx
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 06:19:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53654)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gHnwd-0001wq-5U
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 06:41:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58500)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gHnbB-0007E8-C3
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 06:19:41 -0400
-References: <20180718104836.18488-1-michael@walle.cc>
-	<20180718104836.18488-2-michael@walle.cc>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <34069906-b8f8-05da-477e-b2b81fc0fd58@redhat.com>
-Date: Wed, 31 Oct 2018 11:19:36 +0100
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1gHnwc-0001u5-Q3
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 06:41:50 -0400
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Wed, 31 Oct 2018 14:41:36 +0400
+Message-Id: <20181031104136.9953-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180718104836.18488-2-michael@walle.cc>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/3] qtest: new functions for pulsed IRQs
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] vhost-user-bridge: fix "unknown type name"
+ compilation error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +26,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Walle <michael@walle.cc>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
+To: qemu-devel@nongnu.org
+Cc: victork@redhat.com, cota@braap.org, pbonzini@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On 18/07/2018 12:48, Michael Walle wrote:
->  /**
-> + * get_irq_latched:
-> + * @num: Interrupt to observe.
-> + *
-> + * Returns: The latched level of the @num interrupt.
-> + */
-> +static inline bool get_irq_latched(int num)
-> +{
-> +    return qtest_get_irq_latched(global_qtest, num);
-> +}
-> +
-> +/**
-> + * clear_irq_latch:
-> + * @num: Interrupt to operate on.
-> + *
-> + * Clears the latch of the @num interrupt.
-> + */
-> +static inline void clear_irq_latch(int num)
-> +{
-> +    return qtest_clear_irq_latch(global_qtest, num);
-> +}
-> +
-> +/**
->   * irq_intercept_in:
->   * @string: QOM path of a device.
->   *
-> 
+osdep.h should be included first:
 
-Just one thing, I think an atomic test-and-clear is a better API.  I
-understand that what you have works, because
-get_irq_latched+clear_irq_latch don't have any intervening access to the
-qtest socket.
+  CC      tests/vhost-user-bridge.o
+In file included from /home/elmarco/src/qemu/tests/vhost-user-bridge.c:32=
+:
+/home/elmarco/src/qemu/include/qemu/atomic.h:480:1: error: unknown type n=
+ame =E2=80=98int64_t=E2=80=99
+ int64_t  atomic_read_i64(const int64_t *ptr);
+ ^~~~~~~
+/home/elmarco/src/qemu/include/qemu/atomic.h:480:32: error: unknown type =
+name =E2=80=98int64_t=E2=80=99
+ int64_t  atomic_read_i64(const int64_t *ptr);
+                                ^~~~~~~
+/home/elmarco/src/qemu/include/qemu/atomic.h:481:1: error: unknown type n=
+ame =E2=80=98uint64_t=E2=80=99
+ uint64_t atomic_read_u64(const uint64_t *ptr);
+ ^~~~~~~~
+/home/elmarco/src/qemu/include/qemu/atomic.h:481:32: error: unknown type =
+name =E2=80=98uint64_t=E2=80=99
+ uint64_t atomic_read_u64(const uint64_t *ptr);
+                                ^~~~~~~~
+/home/elmarco/src/qemu/include/qemu/atomic.h:482:21: error: unknown type =
+name =E2=80=98int64_t=E2=80=99
+ void atomic_set_i64(int64_t *ptr, int64_t val);
+                     ^~~~~~~
+/home/elmarco/src/qemu/include/qemu/atomic.h:482:35: error: unknown type =
+name =E2=80=98int64_t=E2=80=99
+ void atomic_set_i64(int64_t *ptr, int64_t val);
+                                   ^~~~~~~
+/home/elmarco/src/qemu/include/qemu/atomic.h:483:21: error: unknown type =
+name =E2=80=98uint64_t=E2=80=99
+ void atomic_set_u64(uint64_t *ptr, uint64_t val);
+                     ^~~~~~~~
+/home/elmarco/src/qemu/include/qemu/atomic.h:483:36: error: unknown type =
+name =E2=80=98uint64_t=E2=80=99
+ void atomic_set_u64(uint64_t *ptr, uint64_t val);
+                                    ^~~~~~~~
 
-Paolo
+(regression from 782da5b2921c4d18777d5d5bd9385b9f7beae360)
+
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ tests/vhost-user-bridge.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/tests/vhost-user-bridge.c b/tests/vhost-user-bridge.c
+index 0884294141..6e17370397 100644
+--- a/tests/vhost-user-bridge.c
++++ b/tests/vhost-user-bridge.c
+@@ -29,8 +29,9 @@
+=20
+ #define _FILE_OFFSET_BITS 64
+=20
+-#include "qemu/atomic.h"
+ #include "qemu/osdep.h"
++
++#include "qemu/atomic.h"
+ #include "qemu/iov.h"
+ #include "standard-headers/linux/virtio_net.h"
+ #include "contrib/libvhost-user/libvhost-user.h"
+--=20
+2.19.1.708.g4ede3d42df
