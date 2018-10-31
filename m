@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51775)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gHta1-0007j7-Aa
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:42:54 -0400
+	(envelope-from <armbru@redhat.com>) id 1gHtaq-0000Oi-Lq
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:43:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gHta0-0001oF-5c
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:42:53 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45326)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gHtZx-0001Lm-GK
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:42:50 -0400
-Received: by mail-wr1-x443.google.com with SMTP id n5-v6so17208064wrw.12
-	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 09:42:35 -0700 (PDT)
-References: <20181025144644.15464-1-cota@braap.org>
-	<20181025144644.15464-53-cota@braap.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181025144644.15464-53-cota@braap.org>
-Date: Wed, 31 Oct 2018 16:42:32 +0000
-Message-ID: <874ld26paf.fsf@linaro.org>
+	(envelope-from <armbru@redhat.com>) id 1gHtak-0002Co-7l
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:43:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36202)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gHtai-00023k-Ux
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:43:37 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181029145709.26359-1-marcandre.lureau@redhat.com>
+	<87d0rqqh0g.fsf@dusky.pond.sub.org>
+	<CAJ+F1CL3uL-TGqAg8-WcHTNOhvPFZzOdQDS4Pp3VfWN3DDd01A@mail.gmail.com>
+Date: Wed, 31 Oct 2018 17:43:13 +0100
+In-Reply-To: <CAJ+F1CL3uL-TGqAg8-WcHTNOhvPFZzOdQDS4Pp3VfWN3DDd01A@mail.gmail.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Wed, 31 Oct 2018
+	19:31:12 +0400")
+Message-ID: <87wopynk2m.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v4 53/71] sparc: convert to
- cpu_interrupt_request
+Subject: Re: [Qemu-devel] [PATCH] tests: add qmp/missing-any-arg test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,60 +30,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Richard Henderson <richard.henderson@linaro.org>, Artyom Tarasenko <atar4qemu@gmail.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Thomas Huth <thuth@redhat.com>, QEMU <qemu-devel@nongnu.org>
 
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
 
-Emilio G. Cota <cota@braap.org> writes:
-
-> Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Cc: Artyom Tarasenko <atar4qemu@gmail.com>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  hw/sparc64/sparc64.c | 4 ++--
->  target/sparc/cpu.c   | 2 +-
->  2 files changed, 3 insertions(+), 3 deletions(-)
+> Hi
+> On Wed, Oct 31, 2018 at 7:22 PM Markus Armbruster <armbru@redhat.com> wro=
+te:
+>>
+>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>>
+>> > test_qmp_missing_any_arg() is about a bug in infrastructure used by
+>> > the QMP core, fixed in commit c489780203.  We covered the bug in
+>> > infrastructure unit tests (commit bce3035a44).  I wrote that test
+>> > earlier, to cover QMP level as well, the test could go into qmp-test.
+>>
+>> The last sentence is confusing.  What about replacing it by "Let's test
+>> it at the QMP level as well"?
 >
-> diff --git a/hw/sparc64/sparc64.c b/hw/sparc64/sparc64.c
-> index 372bbd4f5b..58faeb111a 100644
-> --- a/hw/sparc64/sparc64.c
-> +++ b/hw/sparc64/sparc64.c
-> @@ -56,7 +56,7 @@ void cpu_check_irqs(CPUSPARCState *env)
->      /* The bit corresponding to psrpil is (1<< psrpil), the next bit
->         is (2 << psrpil). */
->      if (pil < (2 << env->psrpil)) {
-> -        if (cs->interrupt_request & CPU_INTERRUPT_HARD) {
-> +        if (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD) {
->              trace_sparc64_cpu_check_irqs_reset_irq(env->interrupt_index);
->              env->interrupt_index =3D 0;
->              cpu_reset_interrupt(cs, CPU_INTERRUPT_HARD);
-> @@ -87,7 +87,7 @@ void cpu_check_irqs(CPUSPARCState *env)
->                  break;
->              }
->          }
-> -    } else if (cs->interrupt_request & CPU_INTERRUPT_HARD) {
-> +    } else if (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD) {
->          trace_sparc64_cpu_check_irqs_disabled(pil, env->pil_in, env->sof=
-tint,
->                                                env->interrupt_index);
->          env->interrupt_index =3D 0;
-> diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
-> index 0f090ece54..88427283c1 100644
-> --- a/target/sparc/cpu.c
-> +++ b/target/sparc/cpu.c
-> @@ -709,7 +709,7 @@ static bool sparc_cpu_has_work(CPUState *cs)
->      SPARCCPU *cpu =3D SPARC_CPU(cs);
->      CPUSPARCState *env =3D &cpu->env;
->
-> -    return (cs->interrupt_request & CPU_INTERRUPT_HARD) &&
-> +    return (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD) &&
->             cpu_interrupts_enabled(env);
->  }
+> sure, I assume you do that on commit thanks
 
+Can do.
 
---
-Alex Benn=C3=A9e
+Meanwhile,
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
