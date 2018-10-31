@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48981)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gHpVi-0000rR-1n
+	(envelope-from <richard.henderson@linaro.org>) id 1gHpVh-0000qw-Gy
 	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 08:22:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gHpVg-0001wE-Oy
+	(envelope-from <richard.henderson@linaro.org>) id 1gHpVg-0001vn-GL
 	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 08:22:09 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:46760)
+Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:42585)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gHpVg-0001E1-FO
+	id 1gHpVe-0001BG-E7
 	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 08:22:08 -0400
-Received: by mail-wr1-x443.google.com with SMTP id 74-v6so8040162wrb.13
-	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 05:21:28 -0700 (PDT)
+Received: by mail-wr1-x434.google.com with SMTP id y15-v6so16247675wru.9
+	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 05:21:26 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 31 Oct 2018 12:21:17 +0000
-Message-Id: <20181031122119.1669-9-richard.henderson@linaro.org>
+Date: Wed, 31 Oct 2018 12:21:14 +0000
+Message-Id: <20181031122119.1669-6-richard.henderson@linaro.org>
 In-Reply-To: <20181031122119.1669-1-richard.henderson@linaro.org>
 References: <20181031122119.1669-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 08/10] cputlb: Count "partial" and "elided" tlb
- flushes
+Subject: [Qemu-devel] [PULL 05/10] cputlb: Move env->vtlb_index to
+ env->tlb_d.vindex
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,136 +30,69 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Our only statistic so far was "full" tlb flushes, where all mmu_idx
-are flushed at the same time.
-
-Now count "partial" tlb flushes where sets of mmu_idx are flushed,
-but the set is not maximal.  Account one per mmu_idx flushed, as
-that is the unit of work performed.
-
-We don't actually count elided flushes yet, but go ahead and change
-the interface presented to the monitor all at once.
+The rest of the tlb victim cache is per-tlb,
+the next use index should be as well.
 
 Tested-by: Emilio G. Cota <cota@braap.org>
 Reviewed-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/exec/cpu-defs.h   | 12 ++++++++++--
- include/exec/cputlb.h     |  2 +-
- accel/tcg/cputlb.c        | 18 +++++++++++++-----
- accel/tcg/translate-all.c |  8 ++++++--
- 4 files changed, 30 insertions(+), 10 deletions(-)
+ include/exec/cpu-defs.h | 5 +++--
+ accel/tcg/cputlb.c      | 5 ++---
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/include/exec/cpu-defs.h b/include/exec/cpu-defs.h
-index 181c0dbfa4..c7b501d627 100644
+index df8ae18d9d..181c0dbfa4 100644
 --- a/include/exec/cpu-defs.h
 +++ b/include/exec/cpu-defs.h
-@@ -166,6 +166,15 @@ typedef struct CPUTLBCommon {
-      * mmu_idx may be discarded.  Protected by tlb_c.lock.
+@@ -150,6 +150,8 @@ typedef struct CPUTLBDesc {
       */
-     uint16_t pending_flush;
-+
-+    /*
-+     * Statistics.  These are not lock protected, but are read and
-+     * written atomically.  This allows the monitor to print a snapshot
-+     * of the stats without interfering with the cpu.
-+     */
-+    size_t full_flush_count;
-+    size_t part_flush_count;
-+    size_t elide_flush_count;
- } CPUTLBCommon;
+     target_ulong large_page_addr;
+     target_ulong large_page_mask;
++    /* The next index to use in the tlb victim table.  */
++    size_t vindex;
+ } CPUTLBDesc;
  
  /*
-@@ -179,8 +188,7 @@ typedef struct CPUTLBCommon {
-     CPUTLBEntry tlb_table[NB_MMU_MODES][CPU_TLB_SIZE];                  \
+@@ -178,8 +180,7 @@ typedef struct CPUTLBCommon {
      CPUTLBEntry tlb_v_table[NB_MMU_MODES][CPU_VTLB_SIZE];               \
      CPUIOTLBEntry iotlb[NB_MMU_MODES][CPU_TLB_SIZE];                    \
--    CPUIOTLBEntry iotlb_v[NB_MMU_MODES][CPU_VTLB_SIZE];                 \
--    size_t tlb_flush_count;
-+    CPUIOTLBEntry iotlb_v[NB_MMU_MODES][CPU_VTLB_SIZE];
+     CPUIOTLBEntry iotlb_v[NB_MMU_MODES][CPU_VTLB_SIZE];                 \
+-    size_t tlb_flush_count;                                             \
+-    target_ulong vtlb_index;                                            \
++    size_t tlb_flush_count;
  
  #else
  
-diff --git a/include/exec/cputlb.h b/include/exec/cputlb.h
-index c91db211bc..5373188be3 100644
---- a/include/exec/cputlb.h
-+++ b/include/exec/cputlb.h
-@@ -23,6 +23,6 @@
- /* cputlb.c */
- void tlb_protect_code(ram_addr_t ram_addr);
- void tlb_unprotect_code(ram_addr_t ram_addr);
--size_t tlb_flush_count(void);
-+void tlb_flush_counts(size_t *full, size_t *part, size_t *elide);
- #endif
- #endif
 diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index 1f7764de94..e60628c350 100644
+index 8060ec99d7..2cd3886fd6 100644
 --- a/accel/tcg/cputlb.c
 +++ b/accel/tcg/cputlb.c
-@@ -100,17 +100,21 @@ static void flush_all_helper(CPUState *src, run_on_cpu_func fn,
-     }
+@@ -119,6 +119,7 @@ static void tlb_flush_one_mmuidx_locked(CPUArchState *env, int mmu_idx)
+     memset(env->tlb_v_table[mmu_idx], -1, sizeof(env->tlb_v_table[0]));
+     env->tlb_d[mmu_idx].large_page_addr = -1;
+     env->tlb_d[mmu_idx].large_page_mask = -1;
++    env->tlb_d[mmu_idx].vindex = 0;
  }
  
--size_t tlb_flush_count(void)
-+void tlb_flush_counts(size_t *pfull, size_t *ppart, size_t *pelide)
- {
-     CPUState *cpu;
--    size_t count = 0;
-+    size_t full = 0, part = 0, elide = 0;
+ /* This is OK because CPU architectures generally permit an
+@@ -149,8 +150,6 @@ static void tlb_flush_nocheck(CPUState *cpu)
+     qemu_spin_unlock(&env->tlb_c.lock);
  
-     CPU_FOREACH(cpu) {
-         CPUArchState *env = cpu->env_ptr;
- 
--        count += atomic_read(&env->tlb_flush_count);
-+        full += atomic_read(&env->tlb_c.full_flush_count);
-+        part += atomic_read(&env->tlb_c.part_flush_count);
-+        elide += atomic_read(&env->tlb_c.elide_flush_count);
-     }
--    return count;
-+    *pfull = full;
-+    *ppart = part;
-+    *pelide = elide;
- }
- 
- static void tlb_flush_one_mmuidx_locked(CPUArchState *env, int mmu_idx)
-@@ -145,7 +149,11 @@ static void tlb_flush_by_mmuidx_async_work(CPUState *cpu, run_on_cpu_data data)
      cpu_tb_jmp_cache_clear(cpu);
- 
-     if (mmu_idx_bitmask == ALL_MMUIDX_BITS) {
--        atomic_set(&env->tlb_flush_count, env->tlb_flush_count + 1);
-+        atomic_set(&env->tlb_c.full_flush_count,
-+                   env->tlb_c.full_flush_count + 1);
-+    } else {
-+        atomic_set(&env->tlb_c.part_flush_count,
-+                   env->tlb_c.part_flush_count + ctpop16(mmu_idx_bitmask));
-     }
+-
+-    env->vtlb_index = 0;
  }
  
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 356dcd0948..639f0b2728 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -2290,7 +2290,7 @@ void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
- {
-     struct tb_tree_stats tst = {};
-     struct qht_stats hst;
--    size_t nb_tbs;
-+    size_t nb_tbs, flush_full, flush_part, flush_elide;
+ static void tlb_flush_global_async_work(CPUState *cpu, run_on_cpu_data data)
+@@ -667,7 +666,7 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_ulong vaddr,
+      * different page; otherwise just overwrite the stale data.
+      */
+     if (!tlb_hit_page_anyprot(te, vaddr_page)) {
+-        unsigned vidx = env->vtlb_index++ % CPU_VTLB_SIZE;
++        unsigned vidx = env->tlb_d[mmu_idx].vindex++ % CPU_VTLB_SIZE;
+         CPUTLBEntry *tv = &env->tlb_v_table[mmu_idx][vidx];
  
-     tcg_tb_foreach(tb_tree_stats_iter, &tst);
-     nb_tbs = tst.nb_tbs;
-@@ -2326,7 +2326,11 @@ void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
-     cpu_fprintf(f, "TB flush count      %u\n",
-                 atomic_read(&tb_ctx.tb_flush_count));
-     cpu_fprintf(f, "TB invalidate count %zu\n", tcg_tb_phys_invalidate_count());
--    cpu_fprintf(f, "TLB flush count     %zu\n", tlb_flush_count());
-+
-+    tlb_flush_counts(&flush_full, &flush_part, &flush_elide);
-+    cpu_fprintf(f, "TLB full flushes    %zu\n", flush_full);
-+    cpu_fprintf(f, "TLB partial flushes %zu\n", flush_part);
-+    cpu_fprintf(f, "TLB elided flushes  %zu\n", flush_elide);
-     tcg_dump_info(f, cpu_fprintf);
- }
- 
+         /* Evict the old entry into the victim tlb.  */
 -- 
 2.17.2
