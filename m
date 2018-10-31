@@ -1,20 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46235)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50626)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gHrwP-0005uM-L4
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:57:54 -0400
+	(envelope-from <armbru@redhat.com>) id 1gHsCo-0005F9-7x
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 11:14:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gHrwO-0001hQ-Ts
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:57:53 -0400
-References: <20181031053920.7565-1-famz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <1d819a62-3fb0-d039-4cda-0b0a542979e3@redhat.com>
-Date: Wed, 31 Oct 2018 09:57:25 -0500
+	(envelope-from <armbru@redhat.com>) id 1gHsCl-0002zl-Gn
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 11:14:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:31755)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gHsCl-0002zd-A9
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 11:14:47 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7EA3530C13A9
+	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 15:14:46 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181030123526.26415-1-kchamart@redhat.com>
+	<20181030123526.26415-3-kchamart@redhat.com>
+Date: Wed, 31 Oct 2018 16:14:44 +0100
+In-Reply-To: <20181030123526.26415-3-kchamart@redhat.com> (Kashyap Chamarthy's
+	message of "Tue, 30 Oct 2018 13:35:25 +0100")
+Message-ID: <87pnvqqhaz.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20181031053920.7565-1-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] file-posix: Use error API properly
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 2/3] Deprecate HMP `cpu-add`
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,34 +33,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, armbru@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Kashyap Chamarthy <kchamart@redhat.com>
+Cc: qemu-devel@nongnu.org, thuth@redhat.com, ehabkost@redhat.com, armbru@redhat.com, imammedo@redhat.com
 
-On 10/31/18 12:39 AM, Fam Zheng wrote:
-> Use error_report for situations that affect user operation (i.e.  we're
-> actually returning error), and warn_report/warn_report_err when some
-> less critical error happened but the user operation can still carry on.
-> 
-> For raw_normalize_devicepath, add Error parameter to propagate to
-> its callers.
-> 
-> Suggested-by: Markus Armbruster <armbru@redhat.com>
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> 
+Kashyap Chamarthy <kchamart@redhat.com> writes:
 
-> @@ -214,8 +214,7 @@ static int raw_normalize_devicepath(const char **filename)
->       fname = *filename;
->       dp = strrchr(fname, '/');
->       if (lstat(fname, &sb) < 0) {
-> -        fprintf(stderr, "%s: stat failed: %s\n",
-> -            fname, strerror(errno));
-> +        error_setg(errp, "%s: stat failed: %s", fname, strerror(errno));
->           return -errno;
+> Since we're deprecating the QMP `cpu-add`, let's deprecate its HMP
+> equivalent, too.
+>
+> Suggested-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
+> ---
+>  hmp-commands.hx | 6 ++++--
+>  hmp.c           | 2 ++
+>  2 files changed, 6 insertions(+), 2 deletions(-)
+>
+> diff --git a/hmp-commands.hx b/hmp-commands.hx
+> index db0c681f74..ba71558c25 100644
+> --- a/hmp-commands.hx
+> +++ b/hmp-commands.hx
+> @@ -1849,14 +1849,16 @@ ETEXI
+>          .name       = "cpu-add",
+>          .args_type  = "id:i",
+>          .params     = "id",
+> -        .help       = "add cpu",
+> +        .help       = "add cpu (deprecated, use device_add instead)",
+>          .cmd        = hmp_cpu_add,
+>      },
+>  
+>  STEXI
+>  @item cpu-add @var{id}
+>  @findex cpu-add
+> -Add CPU with id @var{id}
+> +Add CPU with id @var{id}.  This command is deprecated, please
+> ++use @code{device_add} instead. For details, refer to
+> +'docs/cpu-hotplug.rst'.
 
-error_setg_errno() is nicer here.  In fact, should we have a Coverity 
-script that looks for error_setg(... strerror())?
+File gets created only in PATCH 3.  Let's apply PATCH 3 before 1 & 2.
+Perhaps the maintainer is willing to do that for you, so you don't have
+to respin.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+>  ETEXI
+>  
+>      {
+> diff --git a/hmp.c b/hmp.c
+> index 4975fa56b0..c3f3db7795 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -2353,6 +2353,8 @@ void hmp_cpu_add(Monitor *mon, const QDict *qdict)
+>      int cpuid;
+>      Error *err = NULL;
+>  
+> +    error_report("cpu_add is deprecated, please use device_add instead");
+> +
+>      cpuid = qdict_get_int(qdict, "id");
+>      qmp_cpu_add(cpuid, &err);
+>      hmp_handle_error(mon, &err);
