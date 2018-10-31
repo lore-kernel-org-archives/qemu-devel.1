@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57837)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57869)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gHyU4-0004il-Ff
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 17:57:05 -0400
+	(envelope-from <kwolf@redhat.com>) id 1gHyU5-0004kC-D6
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 17:57:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gHyTz-0008Lo-6O
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 17:57:01 -0400
+	(envelope-from <kwolf@redhat.com>) id 1gHyU2-0008Py-TV
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 17:57:05 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 31 Oct 2018 22:56:18 +0100
-Message-Id: <20181031215622.27690-9-kwolf@redhat.com>
+Date: Wed, 31 Oct 2018 22:56:21 +0100
+Message-Id: <20181031215622.27690-12-kwolf@redhat.com>
 In-Reply-To: <20181031215622.27690-1-kwolf@redhat.com>
 References: <20181031215622.27690-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 08/12] file-posix: Move read/write operation
- logic out of aio_worker()
+Subject: [Qemu-devel] [PATCH 11/12] file-posix: Switch to .bdrv_co_ioctl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,106 +24,161 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-aio_worker() for reads and writes isn't boring enough yet. It still does
-some postprocessing for handling short reads and turning the result into
-the right return value.
-
-However, there is no reason why handle_aiocb_rw() couldn't do the same,
-and even without duplicating code between the read and write path. So
-move the code there.
+No real reason to keep using the callback based mechanism here when the
+rest of the file-posix driver is coroutine based. Changing it brings
+ioctls more in line with how other request types work.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/file-posix.c | 40 ++++++++++++++++++++--------------------
- 1 file changed, 20 insertions(+), 20 deletions(-)
+ include/scsi/pr-manager.h |  8 +++-----
+ block/file-posix.c        | 21 +++++++++++----------
+ scsi/pr-manager.c         | 21 +++++++++------------
+ scsi/trace-events         |  2 +-
+ 4 files changed, 24 insertions(+), 28 deletions(-)
 
+diff --git a/include/scsi/pr-manager.h b/include/scsi/pr-manager.h
+index 50a77b08fc..6ad5fd1ff7 100644
+--- a/include/scsi/pr-manager.h
++++ b/include/scsi/pr-manager.h
+@@ -5,6 +5,7 @@
+ #include "qapi/visitor.h"
+ #include "qom/object_interfaces.h"
+ #include "block/aio.h"
++#include "qemu/coroutine.h"
+=20
+ #define TYPE_PR_MANAGER "pr-manager"
+=20
+@@ -37,11 +38,8 @@ typedef struct PRManagerClass {
+ } PRManagerClass;
+=20
+ bool pr_manager_is_connected(PRManager *pr_mgr);
+-BlockAIOCB *pr_manager_execute(PRManager *pr_mgr,
+-                               AioContext *ctx, int fd,
+-                               struct sg_io_hdr *hdr,
+-                               BlockCompletionFunc *complete,
+-                               void *opaque);
++int coroutine_fn pr_manager_execute(PRManager *pr_mgr, AioContext *ctx, =
+int fd,
++                                    struct sg_io_hdr *hdr);
+=20
+ PRManager *pr_manager_lookup(const char *id, Error **errp);
+=20
 diff --git a/block/file-posix.c b/block/file-posix.c
-index 074848ed1f..4989208ba3 100644
+index 821743d2b2..9439e8c054 100644
 --- a/block/file-posix.c
 +++ b/block/file-posix.c
-@@ -1290,7 +1290,8 @@ static ssize_t handle_aiocb_rw(RawPosixAIOData *aio=
-cb)
-          * we can just use plain pread/pwrite without any problems.
-          */
-         if (aiocb->io.niov =3D=3D 1) {
--             return handle_aiocb_rw_linear(aiocb, aiocb->io.iov->iov_bas=
-e);
-+             nbytes =3D handle_aiocb_rw_linear(aiocb, aiocb->io.iov->iov=
-_base);
-+             goto out;
-         }
-         /*
-          * We have more than one iovec, and all are properly aligned.
-@@ -1302,7 +1303,7 @@ static ssize_t handle_aiocb_rw(RawPosixAIOData *aio=
-cb)
-             nbytes =3D handle_aiocb_rw_vector(aiocb);
-             if (nbytes =3D=3D aiocb->aio_nbytes ||
-                 (nbytes < 0 && nbytes !=3D -ENOSYS)) {
--                return nbytes;
-+                goto out;
-             }
-             preadv_present =3D false;
-         }
-@@ -1320,7 +1321,8 @@ static ssize_t handle_aiocb_rw(RawPosixAIOData *aio=
-cb)
-      */
-     buf =3D qemu_try_blockalign(aiocb->bs, aiocb->aio_nbytes);
-     if (buf =3D=3D NULL) {
--        return -ENOMEM;
-+        nbytes =3D -ENOMEM;
-+        goto out;
-     }
-=20
-     if (aiocb->aio_type & QEMU_AIO_WRITE) {
-@@ -1354,7 +1356,21 @@ static ssize_t handle_aiocb_rw(RawPosixAIOData *ai=
-ocb)
-     }
-     qemu_vfree(buf);
-=20
--    return nbytes;
-+out:
-+    if (nbytes =3D=3D aiocb->aio_nbytes) {
-+        return 0;
-+    } else if (nbytes >=3D 0 && nbytes < aiocb->aio_nbytes) {
-+        if (aiocb->aio_type & QEMU_AIO_WRITE) {
-+            return -EINVAL;
-+        } else {
-+            iov_memset(aiocb->io.iov, aiocb->io.niov, nbytes,
-+                      0, aiocb->aio_nbytes - nbytes);
-+            return aiocb->aio_nbytes;
-+        }
-+    } else {
-+        assert(nbytes < 0);
-+        return nbytes;
-+    }
+@@ -3092,24 +3092,25 @@ hdev_open_Mac_error:
  }
 =20
- #ifdef CONFIG_XFS
-@@ -1758,25 +1774,9 @@ static int aio_worker(void *arg)
-     switch (aiocb->aio_type & QEMU_AIO_TYPE_MASK) {
-     case QEMU_AIO_READ:
-         ret =3D handle_aiocb_rw(aiocb);
--        if (ret >=3D 0 && ret < aiocb->aio_nbytes) {
--            iov_memset(aiocb->io.iov, aiocb->io.niov, ret,
--                      0, aiocb->aio_nbytes - ret);
+ #if defined(__linux__)
 -
--            ret =3D aiocb->aio_nbytes;
--        }
--        if (ret =3D=3D aiocb->aio_nbytes) {
--            ret =3D 0;
--        } else if (ret >=3D 0 && ret < aiocb->aio_nbytes) {
--            ret =3D -EINVAL;
--        }
-         break;
-     case QEMU_AIO_WRITE:
-         ret =3D handle_aiocb_rw(aiocb);
--        if (ret =3D=3D aiocb->aio_nbytes) {
--            ret =3D 0;
--        } else if (ret >=3D 0 && ret < aiocb->aio_nbytes) {
--            ret =3D -EINVAL;
--        }
-         break;
-     case QEMU_AIO_IOCTL:
-         ret =3D handle_aiocb_ioctl(aiocb);
+-static BlockAIOCB *hdev_aio_ioctl(BlockDriverState *bs,
+-        unsigned long int req, void *buf,
+-        BlockCompletionFunc *cb, void *opaque)
++static int coroutine_fn
++hdev_co_ioctl(BlockDriverState *bs, unsigned long int req, void *buf)
+ {
+     BDRVRawState *s =3D bs->opaque;
+     RawPosixAIOData *acb;
+     ThreadPool *pool;
++    int ret;
+=20
+-    if (fd_open(bs) < 0)
+-        return NULL;
++    ret =3D fd_open(bs);
++    if (ret < 0) {
++        return ret;
++    }
+=20
+     if (req =3D=3D SG_IO && s->pr_mgr) {
+         struct sg_io_hdr *io_hdr =3D buf;
+         if (io_hdr->cmdp[0] =3D=3D PERSISTENT_RESERVE_OUT ||
+             io_hdr->cmdp[0] =3D=3D PERSISTENT_RESERVE_IN) {
+             return pr_manager_execute(s->pr_mgr, bdrv_get_aio_context(bs=
+),
+-                                      s->fd, io_hdr, cb, opaque);
++                                      s->fd, io_hdr);
+         }
+     }
+=20
+@@ -3121,7 +3122,7 @@ static BlockAIOCB *hdev_aio_ioctl(BlockDriverState =
+*bs,
+     acb->ioctl.buf =3D buf;
+     acb->ioctl.cmd =3D req;
+     pool =3D aio_get_thread_pool(bdrv_get_aio_context(bs));
+-    return thread_pool_submit_aio(pool, aio_worker, acb, cb, opaque);
++    return thread_pool_submit_co(pool, aio_worker, acb);
+ }
+ #endif /* linux */
+=20
+@@ -3263,7 +3264,7 @@ static BlockDriver bdrv_host_device =3D {
+=20
+     /* generic scsi device */
+ #ifdef __linux__
+-    .bdrv_aio_ioctl     =3D hdev_aio_ioctl,
++    .bdrv_co_ioctl          =3D hdev_co_ioctl,
+ #endif
+ };
+=20
+@@ -3385,7 +3386,7 @@ static BlockDriver bdrv_host_cdrom =3D {
+     .bdrv_lock_medium   =3D cdrom_lock_medium,
+=20
+     /* generic scsi device */
+-    .bdrv_aio_ioctl     =3D hdev_aio_ioctl,
++    .bdrv_co_ioctl      =3D hdev_co_ioctl,
+ };
+ #endif /* __linux__ */
+=20
+diff --git a/scsi/pr-manager.c b/scsi/pr-manager.c
+index 2a8f300dde..d9f4e8c3ad 100644
+--- a/scsi/pr-manager.c
++++ b/scsi/pr-manager.c
+@@ -48,24 +48,21 @@ static int pr_manager_worker(void *opaque)
+ }
+=20
+=20
+-BlockAIOCB *pr_manager_execute(PRManager *pr_mgr,
+-                               AioContext *ctx, int fd,
+-                               struct sg_io_hdr *hdr,
+-                               BlockCompletionFunc *complete,
+-                               void *opaque)
++int coroutine_fn pr_manager_execute(PRManager *pr_mgr, AioContext *ctx, =
+int fd,
++                                    struct sg_io_hdr *hdr)
+ {
+-    PRManagerData *data =3D g_new(PRManagerData, 1);
+     ThreadPool *pool =3D aio_get_thread_pool(ctx);
++    PRManagerData data =3D {
++        .pr_mgr =3D pr_mgr,
++        .fd     =3D fd,
++        .hdr    =3D hdr,
++    };
+=20
+-    trace_pr_manager_execute(fd, hdr->cmdp[0], hdr->cmdp[1], opaque);
+-    data->pr_mgr =3D pr_mgr;
+-    data->fd =3D fd;
+-    data->hdr =3D hdr;
++    trace_pr_manager_execute(fd, hdr->cmdp[0], hdr->cmdp[1]);
+=20
+     /* The matching object_unref is in pr_manager_worker.  */
+     object_ref(OBJECT(pr_mgr));
+-    return thread_pool_submit_aio(pool, pr_manager_worker,
+-                                  data, complete, opaque);
++    return thread_pool_submit_co(pool, pr_manager_worker, &data);
+ }
+=20
+ bool pr_manager_is_connected(PRManager *pr_mgr)
+diff --git a/scsi/trace-events b/scsi/trace-events
+index 45f5b6e49b..f8a68b11eb 100644
+--- a/scsi/trace-events
++++ b/scsi/trace-events
+@@ -1,3 +1,3 @@
+ # scsi/pr-manager.c
+-pr_manager_execute(int fd, int cmd, int sa, void *opaque) "fd=3D%d cmd=3D=
+0x%02x service action=3D0x%02x opaque=3D%p"
++pr_manager_execute(int fd, int cmd, int sa) "fd=3D%d cmd=3D0x%02x servic=
+e action=3D0x%02x"
+ pr_manager_run(int fd, int cmd, int sa) "fd=3D%d cmd=3D0x%02x service ac=
+tion=3D0x%02x"
 --=20
 2.19.1
