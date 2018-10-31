@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41471)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41506)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <contrib@steffen-goertz.de>) id 1gHeKb-0004mo-Rp
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:25:58 -0400
+	(envelope-from <contrib@steffen-goertz.de>) id 1gHeKe-0004nJ-EL
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:26:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <contrib@steffen-goertz.de>) id 1gHeKZ-00008d-Pr
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:25:57 -0400
-Received: from steffen-goertz.de ([88.198.119.201]:60372)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <contrib@steffen-goertz.de>) id 1gHeKZ-00008K-GC
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:25:55 -0400
+	(envelope-from <contrib@steffen-goertz.de>) id 1gHeKd-0000AP-8c
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:26:00 -0400
 From: =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>
-Date: Tue, 30 Oct 2018 20:25:15 -0400
-Message-Id: <20181031002526.14262-2-contrib@steffen-goertz.de>
+Date: Tue, 30 Oct 2018 20:25:16 -0400
+Message-Id: <20181031002526.14262-3-contrib@steffen-goertz.de>
 In-Reply-To: <20181031002526.14262-1-contrib@steffen-goertz.de>
 References: <20181031002526.14262-1-contrib@steffen-goertz.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 01/13] qtest: Add set_irq_in command to set
- IRQ/GPIO level
+Subject: [Qemu-devel] [PATCH v3 02/13] arm: Add header to host common
+ definition for nRF51 SOC peripherals
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,157 +24,165 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>, "open list:NRF51" <qemu-arm@nongnu.org>
 
-Adds a new qtest command "set_irq_in" which allows
-to set qemu gpio lines to a given level.
-
-Based on https://lists.gnu.org/archive/html/qemu-devel/2012-12/msg02363.h=
-tml
-which never got merged.
+Adds a header that provides definitions that are used
+across nRF51 peripherals
 
 Signed-off-by: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
-Originally-by: Matthew Ogilvie <mmogilvi_qemu@miniinfo.net>
 ---
- qtest.c          | 40 ++++++++++++++++++++++++++++++++++++++++
- tests/libqtest.c | 10 ++++++++++
- tests/libqtest.h | 28 ++++++++++++++++++++++++++++
- 3 files changed, 78 insertions(+)
+ hw/arm/nrf51_soc.c           | 33 ++++++++++-----------------
+ include/hw/arm/nrf51.h       | 44 ++++++++++++++++++++++++++++++++++++
+ include/hw/char/nrf51_uart.h |  1 -
+ 3 files changed, 56 insertions(+), 22 deletions(-)
+ create mode 100644 include/hw/arm/nrf51.h
 
-diff --git a/qtest.c b/qtest.c
-index 69b9e9962b..214f42a6c5 100644
---- a/qtest.c
-+++ b/qtest.c
-@@ -164,6 +164,14 @@ static bool qtest_opened;
-  * where NUM is an IRQ number.  For the PC, interrupts can be intercepte=
-d
-  * simply with "irq_intercept_in ioapic" (note that IRQ0 comes out with
-  * NUM=3D0 even though it is remapped to GSI 2).
-+ *
-+ * Setting interrupt level:
-+ *
-+ *  > set_irq_in QOM-PATH IRQ LEVEL
-+ *  < OK
-+ *
-+ * Forcibly set the given interrupt pin to the given level.
-+ *
+diff --git a/hw/arm/nrf51_soc.c b/hw/arm/nrf51_soc.c
+index b89c1bdea0..55f8eaafcb 100644
+--- a/hw/arm/nrf51_soc.c
++++ b/hw/arm/nrf51_soc.c
+@@ -21,27 +21,16 @@
+ #include "qemu/log.h"
+ #include "cpu.h"
+=20
++#include "hw/arm/nrf51.h"
+ #include "hw/arm/nrf51_soc.h"
+=20
+-#define IOMEM_BASE      0x40000000
+-#define IOMEM_SIZE      0x20000000
+-
+-#define FICR_BASE       0x10000000
+-#define FICR_SIZE       0x000000fc
+-
+-#define FLASH_BASE      0x00000000
+-#define SRAM_BASE       0x20000000
+-
+-#define PRIVATE_BASE    0xF0000000
+-#define PRIVATE_SIZE    0x10000000
+-
+ /*
+  * The size and base is for the NRF51822 part. If other parts
+  * are supported in the future, add a sub-class of NRF51SoC for
+  * the specific variants
   */
+-#define NRF51822_FLASH_SIZE     (256 * 1024)
+-#define NRF51822_SRAM_SIZE      (16 * 1024)
++#define NRF51822_FLASH_SIZE     (256 * NRF51_PAGE_SIZE)
++#define NRF51822_SRAM_SIZE      (16 * NRF51_PAGE_SIZE)
 =20
- static int hex2nib(char ch)
-@@ -326,7 +334,39 @@ static void qtest_process_command(CharBackend *chr, =
-gchar **words)
-         irq_intercept_dev =3D dev;
-         qtest_send_prefix(chr);
-         qtest_send(chr, "OK\n");
-+    } else if (strcmp(words[0], "set_irq_in") =3D=3D 0) {
-+        DeviceState *dev;
-+        qemu_irq irq;
-+        char *name;
-+        int ret;
-+        long num;
-+        long level;
+ #define BASE_TO_IRQ(base) ((base >> 12) & 0x1F)
 =20
-+        g_assert(words[1] && words[2] && words[3] && words[4]);
-+
-+        dev =3D DEVICE(object_resolve_path(words[1], NULL));
-+        if (!dev) {
-+            qtest_send_prefix(chr);
-+            qtest_send(chr, "FAIL Unknown device\n");
-+            return;
-+        }
-+
-+        if (strcmp(words[2], "unnamed-gpio-in") =3D=3D 0) {
-+            name =3D NULL;
-+        } else {
-+            name =3D words[2];
-+        }
-+
-+        ret =3D qemu_strtol(words[3], NULL, 10, &num);
-+        g_assert(!ret);
-+        ret =3D qemu_strtol(words[4], NULL, 10, &level);
-+        g_assert(!ret);
-+
-+        irq =3D qdev_get_gpio_in_named(dev, name, num);
-+
-+        qemu_set_irq(irq, level);
-+        qtest_send_prefix(chr);
-+        qtest_send(chr, "OK\n");
-     } else if (strcmp(words[0], "outb") =3D=3D 0 ||
-                strcmp(words[0], "outw") =3D=3D 0 ||
-                strcmp(words[0], "outl") =3D=3D 0) {
-diff --git a/tests/libqtest.c b/tests/libqtest.c
-index 44ce118cfc..1cbde0d91a 100644
---- a/tests/libqtest.c
-+++ b/tests/libqtest.c
-@@ -732,6 +732,16 @@ void qtest_irq_intercept_in(QTestState *s, const cha=
-r *qom_path)
-     qtest_rsp(s, 0);
+@@ -76,14 +65,14 @@ static void nrf51_soc_realize(DeviceState *dev_soc, E=
+rror **errp)
+         error_propagate(errp, err);
+         return;
+     }
+-    memory_region_add_subregion(&s->container, FLASH_BASE, &s->flash);
++    memory_region_add_subregion(&s->container, NRF51_FLASH_BASE, &s->fla=
+sh);
+=20
+     memory_region_init_ram(&s->sram, NULL, "nrf51.sram", s->sram_size, &=
+err);
+     if (err) {
+         error_propagate(errp, err);
+         return;
+     }
+-    memory_region_add_subregion(&s->container, SRAM_BASE, &s->sram);
++    memory_region_add_subregion(&s->container, NRF51_SRAM_BASE, &s->sram=
+);
+=20
+     /* UART */
+     object_property_set_bool(OBJECT(&s->uart), true, "realized", &err);
+@@ -92,15 +81,17 @@ static void nrf51_soc_realize(DeviceState *dev_soc, E=
+rror **errp)
+         return;
+     }
+     mr =3D sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->uart), 0);
+-    memory_region_add_subregion_overlap(&s->container, UART_BASE, mr, 0)=
+;
++    memory_region_add_subregion_overlap(&s->container, NRF51_UART_BASE, =
+mr, 0);
+     sysbus_connect_irq(SYS_BUS_DEVICE(&s->uart), 0,
+                        qdev_get_gpio_in(DEVICE(&s->cpu),
+-                       BASE_TO_IRQ(UART_BASE)));
++                       BASE_TO_IRQ(NRF51_UART_BASE)));
+=20
+-    create_unimplemented_device("nrf51_soc.io", IOMEM_BASE, IOMEM_SIZE);
+-    create_unimplemented_device("nrf51_soc.ficr", FICR_BASE, FICR_SIZE);
++    create_unimplemented_device("nrf51_soc.io", NRF51_IOMEM_BASE,
++                                NRF51_IOMEM_SIZE);
++    create_unimplemented_device("nrf51_soc.ficr", NRF51_FICR_BASE,
++                                NRF51_FICR_SIZE);
+     create_unimplemented_device("nrf51_soc.private",
+-                                PRIVATE_BASE, PRIVATE_SIZE);
++                                NRF51_PRIVATE_BASE, NRF51_PRIVATE_SIZE);
  }
 =20
-+void qtest_set_irq_in(QTestState *s, const char *qom_path, const char *n=
-ame,
-+                      int num, int level)
-+{
-+    if (!name) {
-+        name =3D "unnamed-gpio-in";
-+    }
-+    qtest_sendf(s, "set_irq_in %s %s %d %d\n", qom_path, name, num, leve=
-l);
-+    qtest_rsp(s, 0);
-+}
-+
- static void qtest_out(QTestState *s, const char *cmd, uint16_t addr, uin=
-t32_t value)
- {
-     qtest_sendf(s, "%s 0x%x 0x%x\n", cmd, addr, value);
-diff --git a/tests/libqtest.h b/tests/libqtest.h
-index ed88ff99d5..65bffa9ace 100644
---- a/tests/libqtest.h
-+++ b/tests/libqtest.h
-@@ -232,6 +232,19 @@ void qtest_irq_intercept_in(QTestState *s, const cha=
-r *string);
-  */
- void qtest_irq_intercept_out(QTestState *s, const char *string);
-=20
-+/**
-+ * qtest_set_irq_in:
-+ * @s: QTestState instance to operate on.
-+ * @string: QOM path of a device
-+ * @name: IRQ name
-+ * @irq: IRQ number
-+ * @level: IRQ level
+ static void nrf51_soc_init(Object *obj)
+diff --git a/include/hw/arm/nrf51.h b/include/hw/arm/nrf51.h
+new file mode 100644
+index 0000000000..a89b6c23f0
+--- /dev/null
++++ b/include/hw/arm/nrf51.h
+@@ -0,0 +1,44 @@
++/*
++ * Nordic Semiconductor nRF51 Series SOC Common Defines
 + *
-+ * Force given device/irq GPIO-in pin to the given level.
-+ */
-+void qtest_set_irq_in(QTestState *s, const char *string, const char *nam=
-e,
-+                      int irq, int level);
-+
- /**
-  * qtest_outb:
-  * @s: #QTestState instance to operate on.
-@@ -678,6 +691,21 @@ static inline void irq_intercept_out(const char *str=
-ing)
-     qtest_irq_intercept_out(global_qtest, string);
- }
-=20
-+/**
-+ * qtest_set_irq_in:
-+ * @string: QOM path of a device
-+ * @name: IRQ name
-+ * @irq: IRQ number
-+ * @level: IRQ level
++ * This file hosts generic defines used in various nRF51 peripheral devi=
+ces.
 + *
-+ * Force given device/IRQ GPIO-in pin to the given level.
++ * Reference Manual: http://infocenter.nordicsemi.com/pdf/nRF51_RM_v3.0.=
+pdf
++ * Product Spec: http://infocenter.nordicsemi.com/pdf/nRF51822_PS_v3.1.p=
+df
++ *
++ * Copyright 2018 Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
++ *
++ * This code is licensed under the GPL version 2 or later.  See
++ * the COPYING file in the top-level directory.
 + */
-+static inline void set_irq_in(const char *string, const char *name,
-+                              int irq, int level)
-+{
-+    qtest_set_irq_in(global_qtest, string, name, irq, level);
-+}
 +
- /**
-  * outb:
-  * @addr: I/O port to write to.
++#ifndef NRF51_H
++#define NRF51_H
++
++#define NRF51_FLASH_BASE      0x00000000
++#define NRF51_FICR_BASE       0x10000000
++#define NRF51_FICR_SIZE       0x00000100
++#define NRF51_UICR_BASE       0x10001000
++#define NRF51_SRAM_BASE       0x20000000
++
++#define NRF51_IOMEM_BASE      0x40000000
++#define NRF51_IOMEM_SIZE      0x20000000
++
++#define NRF51_UART_BASE       0x40002000
++#define NRF51_TIMER_BASE      0x40008000
++#define NRF51_RNG_BASE        0x4000D000
++#define NRF51_NVMC_BASE       0x4001E000
++#define NRF51_GPIO_BASE       0x50000000
++
++#define NRF51_PRIVATE_BASE    0xF0000000
++#define NRF51_PRIVATE_SIZE    0x10000000
++
++#define NRF51_PAGE_SIZE       1024
++
++/* Trigger */
++#define NRF51_TRIGGER_TASK 0x01
++
++/* Events */
++#define NRF51_EVENT_CLEAR  0x00
++
++#endif
+diff --git a/include/hw/char/nrf51_uart.h b/include/hw/char/nrf51_uart.h
+index e3ecb7c81c..eb1c15b490 100644
+--- a/include/hw/char/nrf51_uart.h
++++ b/include/hw/char/nrf51_uart.h
+@@ -16,7 +16,6 @@
+ #include "hw/registerfields.h"
+=20
+ #define UART_FIFO_LENGTH 6
+-#define UART_BASE 0x40002000
+ #define UART_SIZE 0x1000
+=20
+ #define TYPE_NRF51_UART "nrf51_soc.uart"
 --=20
 2.19.1
