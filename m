@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHfVF-0000oO-4A
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 21:41:02 -0400
+	(envelope-from <flukshun@gmail.com>) id 1gHfV9-0000kU-Ts
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 21:41:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHfVA-0002Wr-IE
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 21:41:01 -0400
-Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:41763)
+	(envelope-from <flukshun@gmail.com>) id 1gHfV7-0002TN-UD
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 21:40:55 -0400
+Received: from mail-qk1-x72b.google.com ([2607:f8b0:4864:20::72b]:35556)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHfVA-0002Va-9y
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 21:40:56 -0400
-Received: by mail-qk1-x741.google.com with SMTP id 189so7167050qkj.8
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 18:40:56 -0700 (PDT)
+	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHfV7-0002SZ-Mo
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 21:40:53 -0400
+Received: by mail-qk1-x72b.google.com with SMTP id v68-v6so8591835qka.2
+	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 18:40:53 -0700 (PDT)
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue, 30 Oct 2018 20:38:00 -0500
-Message-Id: <20181031013821.24023-4-mdroth@linux.vnet.ibm.com>
+Date: Tue, 30 Oct 2018 20:37:59 -0500
+Message-Id: <20181031013821.24023-3-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20181031013821.24023-1-mdroth@linux.vnet.ibm.com>
 References: <20181031013821.24023-1-mdroth@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 03/24] qga: ignore non present cpus when
- handling qmp_guest_get_vcpus()
+Subject: [Qemu-devel] [PULL v2 02/24] qga-win: add support for
+ qmp_guest_fsfreeze_freeze_list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,178 +28,306 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Igor Mammedov <imammedo@redhat.com>
+Cc: peter.maydell@linaro.org, Chen Hanxiao <chenhanxiao@gmail.com>
 
-From: Igor Mammedov <imammedo@redhat.com>
+From: Chen Hanxiao <chenhanxiao@gmail.com>
 
-If VM has VCPUs plugged sparselly (for example a VM started with
-3 VCPUs (cpu0, cpu1 and cpu2) and then cpu1 was hotunplugged so
-only cpu0 and cpu2 are present), QGA will rise a error
-  error: internal error: unable to execute QEMU agent command 'guest-get-vcpus':
-  open("/sys/devices/system/cpu/cpu1/"): No such file or directory
-when
-  virsh vcpucount FOO --guest
-is executed.
-Fix it by ignoring non present CPUs when fetching CPUs status from sysfs.
+This patch add support for freeze specified fs.
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+The valid mountpoints list member are [1]:
+
+  The path of a mounted folder, for example, Y:\MountX\
+  A drive letter, for example, D:\
+  A volume GUID path of the form \\?\Volume{GUID}\,
+      where GUID identifies the volume
+  A UNC path that specifies a remote file share,
+      for example, \\Clusterx\Share1\
+
+[1] https://docs.microsoft.com/en-us/windows/desktop/api/vsbackup/nf-vsbackup-ivssbackupcomponents-addtosnapshotset
+
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
+Signed-off-by: Chen Hanxiao <chenhanxiao@gmail.com>
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- qga/commands-posix.c | 115 ++++++++++++++++++++++---------------------
- 1 file changed, 59 insertions(+), 56 deletions(-)
+ qga/commands-win32.c        | 21 ++++-----
+ qga/main.c                  |  2 +-
+ qga/vss-win32.c             |  5 +-
+ qga/vss-win32.h             |  3 +-
+ qga/vss-win32/requester.cpp | 92 ++++++++++++++++++++++++++-----------
+ qga/vss-win32/requester.h   | 13 ++++--
+ 6 files changed, 91 insertions(+), 45 deletions(-)
 
-diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-index 37e8a2d791..42d30f078e 100644
---- a/qga/commands-posix.c
-+++ b/qga/commands-posix.c
-@@ -2035,61 +2035,56 @@ static long sysconf_exact(int name, const char *name_str, Error **errp)
-  * Written members remain unmodified on error.
+diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+index 416343b97b..347577f2a4 100644
+--- a/qga/commands-win32.c
++++ b/qga/commands-win32.c
+@@ -790,6 +790,13 @@ GuestFsfreezeStatus qmp_guest_fsfreeze_status(Error **errp)
+  * The frozen state is limited for up to 10 seconds by VSS.
   */
- static void transfer_vcpu(GuestLogicalProcessor *vcpu, bool sys2vcpu,
--                          Error **errp)
-+                          char *dirpath, Error **errp)
- {
--    char *dirpath;
-+    int fd;
-+    int res;
-     int dirfd;
-+    static const char fn[] = "online";
- 
--    dirpath = g_strdup_printf("/sys/devices/system/cpu/cpu%" PRId64 "/",
--                              vcpu->logical_id);
-     dirfd = open(dirpath, O_RDONLY | O_DIRECTORY);
-     if (dirfd == -1) {
-         error_setg_errno(errp, errno, "open(\"%s\")", dirpath);
--    } else {
--        static const char fn[] = "online";
--        int fd;
--        int res;
--
--        fd = openat(dirfd, fn, sys2vcpu ? O_RDONLY : O_RDWR);
--        if (fd == -1) {
--            if (errno != ENOENT) {
--                error_setg_errno(errp, errno, "open(\"%s/%s\")", dirpath, fn);
--            } else if (sys2vcpu) {
--                vcpu->online = true;
--                vcpu->can_offline = false;
--            } else if (!vcpu->online) {
--                error_setg(errp, "logical processor #%" PRId64 " can't be "
--                           "offlined", vcpu->logical_id);
--            } /* otherwise pretend successful re-onlining */
--        } else {
--            unsigned char status;
--
--            res = pread(fd, &status, 1, 0);
--            if (res == -1) {
--                error_setg_errno(errp, errno, "pread(\"%s/%s\")", dirpath, fn);
--            } else if (res == 0) {
--                error_setg(errp, "pread(\"%s/%s\"): unexpected EOF", dirpath,
--                           fn);
--            } else if (sys2vcpu) {
--                vcpu->online = (status != '0');
--                vcpu->can_offline = true;
--            } else if (vcpu->online != (status != '0')) {
--                status = '0' + vcpu->online;
--                if (pwrite(fd, &status, 1, 0) == -1) {
--                    error_setg_errno(errp, errno, "pwrite(\"%s/%s\")", dirpath,
--                                     fn);
--                }
--            } /* otherwise pretend successful re-(on|off)-lining */
-+        return;
-+    }
- 
--            res = close(fd);
--            g_assert(res == 0);
--        }
-+    fd = openat(dirfd, fn, sys2vcpu ? O_RDONLY : O_RDWR);
-+    if (fd == -1) {
-+        if (errno != ENOENT) {
-+            error_setg_errno(errp, errno, "open(\"%s/%s\")", dirpath, fn);
-+        } else if (sys2vcpu) {
-+            vcpu->online = true;
-+            vcpu->can_offline = false;
-+        } else if (!vcpu->online) {
-+            error_setg(errp, "logical processor #%" PRId64 " can't be "
-+                       "offlined", vcpu->logical_id);
-+        } /* otherwise pretend successful re-onlining */
-+    } else {
-+        unsigned char status;
+ int64_t qmp_guest_fsfreeze_freeze(Error **errp)
++{
++    return qmp_guest_fsfreeze_freeze_list(false, NULL, errp);
++}
 +
-+        res = pread(fd, &status, 1, 0);
-+        if (res == -1) {
-+            error_setg_errno(errp, errno, "pread(\"%s/%s\")", dirpath, fn);
-+        } else if (res == 0) {
-+            error_setg(errp, "pread(\"%s/%s\"): unexpected EOF", dirpath,
-+                       fn);
-+        } else if (sys2vcpu) {
-+            vcpu->online = (status != '0');
-+            vcpu->can_offline = true;
-+        } else if (vcpu->online != (status != '0')) {
-+            status = '0' + vcpu->online;
-+            if (pwrite(fd, &status, 1, 0) == -1) {
-+                error_setg_errno(errp, errno, "pwrite(\"%s/%s\")", dirpath,
-+                                 fn);
-+            }
-+        } /* otherwise pretend successful re-(on|off)-lining */
++int64_t qmp_guest_fsfreeze_freeze_list(bool has_mountpoints,
++                                       strList *mountpoints,
++                                       Error **errp)
+ {
+     int i;
+     Error *local_err = NULL;
+@@ -804,7 +811,7 @@ int64_t qmp_guest_fsfreeze_freeze(Error **errp)
+     /* cannot risk guest agent blocking itself on a write in this state */
+     ga_set_frozen(ga_state);
  
--        res = close(dirfd);
-+        res = close(fd);
-         g_assert(res == 0);
-     }
- 
--    g_free(dirpath);
-+    res = close(dirfd);
-+    g_assert(res == 0);
+-    qga_vss_fsfreeze(&i, true, &local_err);
++    qga_vss_fsfreeze(&i, true, mountpoints, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         goto error;
+@@ -822,15 +829,6 @@ error:
+     return 0;
  }
  
- GuestLogicalProcessorList *qmp_guest_get_vcpus(Error **errp)
-@@ -2107,17 +2102,21 @@ GuestLogicalProcessorList *qmp_guest_get_vcpus(Error **errp)
-     while (local_err == NULL && current < sc_max) {
-         GuestLogicalProcessor *vcpu;
-         GuestLogicalProcessorList *entry;
+-int64_t qmp_guest_fsfreeze_freeze_list(bool has_mountpoints,
+-                                       strList *mountpoints,
+-                                       Error **errp)
+-{
+-    error_setg(errp, QERR_UNSUPPORTED);
 -
--        vcpu = g_malloc0(sizeof *vcpu);
--        vcpu->logical_id = current++;
--        vcpu->has_can_offline = true; /* lolspeak ftw */
--        transfer_vcpu(vcpu, true, &local_err);
+-    return 0;
+-}
 -
--        entry = g_malloc0(sizeof *entry);
--        entry->value = vcpu;
--
--        *link = entry;
--        link = &entry->next;
-+        int64_t id = current++;
-+        char *path = g_strdup_printf("/sys/devices/system/cpu/cpu%" PRId64 "/",
-+                                     id);
-+
-+        if (g_file_test(path, G_FILE_TEST_EXISTS)) {
-+            vcpu = g_malloc0(sizeof *vcpu);
-+            vcpu->logical_id = id;
-+            vcpu->has_can_offline = true; /* lolspeak ftw */
-+            transfer_vcpu(vcpu, true, path, &local_err);
-+            entry = g_malloc0(sizeof *entry);
-+            entry->value = vcpu;
-+            *link = entry;
-+            link = &entry->next;
-+        }
-+        g_free(path);
+ /*
+  * Thaw local file systems using Volume Shadow-copy Service.
+  */
+@@ -843,7 +841,7 @@ int64_t qmp_guest_fsfreeze_thaw(Error **errp)
+         return 0;
      }
  
-     if (local_err == NULL) {
-@@ -2138,7 +2137,11 @@ int64_t qmp_guest_set_vcpus(GuestLogicalProcessorList *vcpus, Error **errp)
+-    qga_vss_fsfreeze(&i, false, errp);
++    qga_vss_fsfreeze(&i, false, NULL, errp);
  
-     processed = 0;
-     while (vcpus != NULL) {
--        transfer_vcpu(vcpus->value, false, &local_err);
-+        char *path = g_strdup_printf("/sys/devices/system/cpu/cpu%" PRId64 "/",
-+                                     vcpus->value->logical_id);
-+
-+        transfer_vcpu(vcpus->value, false, path, &local_err);
-+        g_free(path);
-         if (local_err != NULL) {
-             break;
+     ga_unset_frozen(ga_state);
+     return i;
+@@ -1660,7 +1658,6 @@ GList *ga_command_blacklist_init(GList *blacklist)
+         "guest-set-vcpus",
+         "guest-get-memory-blocks", "guest-set-memory-blocks",
+         "guest-get-memory-block-size",
+-        "guest-fsfreeze-freeze-list",
+         NULL};
+     char **p = (char **)list_unsupported;
+ 
+diff --git a/qga/main.c b/qga/main.c
+index c399320d3c..afcd268ee3 100644
+--- a/qga/main.c
++++ b/qga/main.c
+@@ -151,7 +151,7 @@ static void quit_handler(int sig)
+             WaitForSingleObject(hEventTimeout, 0);
+             CloseHandle(hEventTimeout);
          }
+-        qga_vss_fsfreeze(&i, false, &err);
++        qga_vss_fsfreeze(&i, false, NULL, &err);
+         if (err) {
+             g_debug("Error unfreezing filesystems prior to exiting: %s",
+                 error_get_pretty(err));
+diff --git a/qga/vss-win32.c b/qga/vss-win32.c
+index a541f3ae01..f444a25a70 100644
+--- a/qga/vss-win32.c
++++ b/qga/vss-win32.c
+@@ -147,7 +147,8 @@ void ga_uninstall_vss_provider(void)
+ }
+ 
+ /* Call VSS requester and freeze/thaw filesystems and applications */
+-void qga_vss_fsfreeze(int *nr_volume, bool freeze, Error **errp)
++void qga_vss_fsfreeze(int *nr_volume, bool freeze,
++                      strList *mountpoints, Error **errp)
+ {
+     const char *func_name = freeze ? "requester_freeze" : "requester_thaw";
+     QGAVSSRequesterFunc func;
+@@ -164,5 +165,5 @@ void qga_vss_fsfreeze(int *nr_volume, bool freeze, Error **errp)
+         return;
+     }
+ 
+-    func(nr_volume, &errset);
++    func(nr_volume, mountpoints, &errset);
+ }
+diff --git a/qga/vss-win32.h b/qga/vss-win32.h
+index 4f8e39aa5c..ce2abe5a72 100644
+--- a/qga/vss-win32.h
++++ b/qga/vss-win32.h
+@@ -22,6 +22,7 @@ bool vss_initialized(void);
+ int ga_install_vss_provider(void);
+ void ga_uninstall_vss_provider(void);
+ 
+-void qga_vss_fsfreeze(int *nr_volume, bool freeze, Error **errp);
++void qga_vss_fsfreeze(int *nr_volume, bool freeze,
++                      strList *mountpints, Error **errp);
+ 
+ #endif
+diff --git a/qga/vss-win32/requester.cpp b/qga/vss-win32/requester.cpp
+index 3d9c9716c0..5378c55d23 100644
+--- a/qga/vss-win32/requester.cpp
++++ b/qga/vss-win32/requester.cpp
+@@ -234,7 +234,7 @@ out:
+     }
+ }
+ 
+-void requester_freeze(int *num_vols, ErrorSet *errset)
++void requester_freeze(int *num_vols, void *mountpoints, ErrorSet *errset)
+ {
+     COMPointer<IVssAsync> pAsync;
+     HANDLE volume;
+@@ -246,6 +246,7 @@ void requester_freeze(int *num_vols, ErrorSet *errset)
+     WCHAR short_volume_name[64], *display_name = short_volume_name;
+     DWORD wait_status;
+     int num_fixed_drives = 0, i;
++    int num_mount_points = 0;
+ 
+     if (vss_ctx.pVssbc) { /* already frozen */
+         *num_vols = 0;
+@@ -337,39 +338,73 @@ void requester_freeze(int *num_vols, ErrorSet *errset)
+         goto out;
+     }
+ 
+-    volume = FindFirstVolumeW(short_volume_name, sizeof(short_volume_name));
+-    if (volume == INVALID_HANDLE_VALUE) {
+-        err_set(errset, hr, "failed to find first volume");
+-        goto out;
+-    }
+-    for (;;) {
+-        if (GetDriveTypeW(short_volume_name) == DRIVE_FIXED) {
++    if (mountpoints) {
++        PWCHAR volume_name_wchar;
++        for (volList *list = (volList *)mountpoints; list; list = list->next) {
++            size_t len = strlen(list->value) + 1;
++            size_t converted = 0;
+             VSS_ID pid;
+-            hr = vss_ctx.pVssbc->AddToSnapshotSet(short_volume_name,
++
++            volume_name_wchar = new wchar_t[len];
++            mbstowcs_s(&converted, volume_name_wchar, len,
++                       list->value, _TRUNCATE);
++
++            hr = vss_ctx.pVssbc->AddToSnapshotSet(volume_name_wchar,
+                                                   g_gProviderId, &pid);
+             if (FAILED(hr)) {
+-                WCHAR volume_path_name[PATH_MAX];
+-                if (GetVolumePathNamesForVolumeNameW(
+-                        short_volume_name, volume_path_name,
+-                        sizeof(volume_path_name), NULL) && *volume_path_name) {
+-                    display_name = volume_path_name;
+-                }
+                 err_set(errset, hr, "failed to add %S to snapshot set",
+-                                 display_name);
+-                FindVolumeClose(volume);
++                        volume_name_wchar);
++                delete volume_name_wchar;
+                 goto out;
+             }
+-            num_fixed_drives++;
++            num_mount_points++;
++
++            delete volume_name_wchar;
+         }
+-        if (!FindNextVolumeW(volume, short_volume_name,
+-                             sizeof(short_volume_name))) {
+-            FindVolumeClose(volume);
+-            break;
++
++        if (num_mount_points == 0) {
++            /* If there is no valid mount points, just exit. */
++            goto out;
+         }
+     }
+ 
+-    if (num_fixed_drives == 0) {
+-        goto out; /* If there is no fixed drive, just exit. */
++    if (!mountpoints) {
++        volume = FindFirstVolumeW(short_volume_name, sizeof(short_volume_name));
++        if (volume == INVALID_HANDLE_VALUE) {
++            err_set(errset, hr, "failed to find first volume");
++            goto out;
++        }
++
++        for (;;) {
++            if (GetDriveTypeW(short_volume_name) == DRIVE_FIXED) {
++                VSS_ID pid;
++                hr = vss_ctx.pVssbc->AddToSnapshotSet(short_volume_name,
++                                                      g_gProviderId, &pid);
++                if (FAILED(hr)) {
++                    WCHAR volume_path_name[PATH_MAX];
++                    if (GetVolumePathNamesForVolumeNameW(
++                            short_volume_name, volume_path_name,
++                            sizeof(volume_path_name), NULL) &&
++                            *volume_path_name) {
++                        display_name = volume_path_name;
++                    }
++                    err_set(errset, hr, "failed to add %S to snapshot set",
++                            display_name);
++                    FindVolumeClose(volume);
++                    goto out;
++                }
++                num_fixed_drives++;
++            }
++            if (!FindNextVolumeW(volume, short_volume_name,
++                                 sizeof(short_volume_name))) {
++                FindVolumeClose(volume);
++                break;
++            }
++        }
++
++        if (num_fixed_drives == 0) {
++            goto out; /* If there is no fixed drive, just exit. */
++        }
+     }
+ 
+     hr = vss_ctx.pVssbc->PrepareForBackup(pAsync.replace());
+@@ -435,7 +470,12 @@ void requester_freeze(int *num_vols, ErrorSet *errset)
+         goto out;
+     }
+ 
+-    *num_vols = vss_ctx.cFrozenVols = num_fixed_drives;
++    if (mountpoints) {
++        *num_vols = vss_ctx.cFrozenVols = num_mount_points;
++    } else {
++        *num_vols = vss_ctx.cFrozenVols = num_fixed_drives;
++    }
++
+     return;
+ 
+ out:
+@@ -449,7 +489,7 @@ out1:
+ }
+ 
+ 
+-void requester_thaw(int *num_vols, ErrorSet *errset)
++void requester_thaw(int *num_vols, void *mountpints, ErrorSet *errset)
+ {
+     COMPointer<IVssAsync> pAsync;
+ 
+diff --git a/qga/vss-win32/requester.h b/qga/vss-win32/requester.h
+index 2a39d734a2..5a8e8faf0c 100644
+--- a/qga/vss-win32/requester.h
++++ b/qga/vss-win32/requester.h
+@@ -34,9 +34,16 @@ typedef struct ErrorSet {
+ STDAPI requester_init(void);
+ STDAPI requester_deinit(void);
+ 
+-typedef void (*QGAVSSRequesterFunc)(int *, ErrorSet *);
+-void requester_freeze(int *num_vols, ErrorSet *errset);
+-void requester_thaw(int *num_vols, ErrorSet *errset);
++typedef struct volList volList;
++
++struct volList {
++    volList *next;
++    char *value;
++};
++
++typedef void (*QGAVSSRequesterFunc)(int *, void *, ErrorSet *);
++void requester_freeze(int *num_vols, void *volList, ErrorSet *errset);
++void requester_thaw(int *num_vols, void *volList, ErrorSet *errset);
+ 
+ #ifdef __cplusplus
+ }
 -- 
 2.17.1
