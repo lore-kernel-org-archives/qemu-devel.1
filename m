@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52435)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52613)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gHtbJ-0000uq-FM
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:44:17 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1gHtbp-0001aw-Ut
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:44:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gHtb8-0002SW-MP
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:44:09 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:41692)
+	(envelope-from <alex.bennee@linaro.org>) id 1gHtbl-0002tm-Ro
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:44:45 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37671)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gHtb8-0002Rl-Eu
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:44:02 -0400
-Received: by mail-wr1-x442.google.com with SMTP id x12-v6so17243953wrw.8
-	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 09:44:01 -0700 (PDT)
+	id 1gHtbj-0002o9-Q6
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:44:41 -0400
+Received: by mail-wr1-x441.google.com with SMTP id g9-v6so17238205wrq.4
+	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 09:44:30 -0700 (PDT)
 References: <20181025144644.15464-1-cota@braap.org>
-	<20181025144644.15464-54-cota@braap.org>
+	<20181025144644.15464-56-cota@braap.org>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181025144644.15464-54-cota@braap.org>
-Date: Wed, 31 Oct 2018 16:43:59 +0000
-Message-ID: <8736sm6p80.fsf@linaro.org>
+In-reply-to: <20181025144644.15464-56-cota@braap.org>
+Date: Wed, 31 Oct 2018 16:44:28 +0000
+Message-ID: <87zhuu5amr.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v4 54/71] openrisc: convert to
+Subject: Re: [Qemu-devel] [RFC v4 56/71] microblaze: convert to
  cpu_interrupt_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -32,52 +32,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stafford Horne <shorne@gmail.com>, Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 
 
 Emilio G. Cota <cota@braap.org> writes:
 
-> Cc: Stafford Horne <shorne@gmail.com>
+> Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 > Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 > Signed-off-by: Emilio G. Cota <cota@braap.org>
 
 Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
 > ---
->  hw/openrisc/cputimer.c | 2 +-
->  target/openrisc/cpu.c  | 4 ++--
->  2 files changed, 3 insertions(+), 3 deletions(-)
+>  target/microblaze/cpu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/hw/openrisc/cputimer.c b/hw/openrisc/cputimer.c
-> index 850f88761c..739404e4f5 100644
-> --- a/hw/openrisc/cputimer.c
-> +++ b/hw/openrisc/cputimer.c
-> @@ -102,7 +102,7 @@ static void openrisc_timer_cb(void *opaque)
->          CPUState *cs =3D CPU(cpu);
+> diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
+> index 9b546a2c18..206fdd8651 100644
+> --- a/target/microblaze/cpu.c
+> +++ b/target/microblaze/cpu.c
+> @@ -84,7 +84,7 @@ static void mb_cpu_set_pc(CPUState *cs, vaddr value)
 >
->          cpu->env.ttmr |=3D TTMR_IP;
-> -        cs->interrupt_request |=3D CPU_INTERRUPT_TIMER;
-> +        cpu_interrupt_request_or(cs, CPU_INTERRUPT_TIMER);
->      }
->
->      switch (cpu->env.ttmr & TTMR_M) {
-> diff --git a/target/openrisc/cpu.c b/target/openrisc/cpu.c
-> index fb7cb5c507..cdbc9353b7 100644
-> --- a/target/openrisc/cpu.c
-> +++ b/target/openrisc/cpu.c
-> @@ -32,8 +32,8 @@ static void openrisc_cpu_set_pc(CPUState *cs, vaddr val=
-ue)
->
->  static bool openrisc_cpu_has_work(CPUState *cs)
+>  static bool mb_cpu_has_work(CPUState *cs)
 >  {
-> -    return cs->interrupt_request & (CPU_INTERRUPT_HARD |
-> -                                    CPU_INTERRUPT_TIMER);
-> +    return cpu_interrupt_request(cs) & (CPU_INTERRUPT_HARD |
-> +                                        CPU_INTERRUPT_TIMER);
+> -    return cs->interrupt_request & (CPU_INTERRUPT_HARD | CPU_INTERRUPT_N=
+MI);
+> +    return cpu_interrupt_request(cs) & (CPU_INTERRUPT_HARD | CPU_INTERRU=
+PT_NMI);
 >  }
 >
->  static void openrisc_disas_set_info(CPUState *cpu, disassemble_info *inf=
-o)
+>  #ifndef CONFIG_USER_ONLY
 
 
 --
