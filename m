@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42979)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gHeQJ-00027p-NG
+	(envelope-from <ehabkost@redhat.com>) id 1gHeQJ-00027i-Ly
 	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:31:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gHeQG-0003mc-5C
+	(envelope-from <ehabkost@redhat.com>) id 1gHeQG-0003mU-2y
 	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:31:51 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Tue, 30 Oct 2018 21:31:06 -0300
-Message-Id: <20181031003120.26771-2-ehabkost@redhat.com>
+Date: Tue, 30 Oct 2018 21:31:07 -0300
+Message-Id: <20181031003120.26771-3-ehabkost@redhat.com>
 In-Reply-To: <20181031003120.26771-1-ehabkost@redhat.com>
 References: <20181031003120.26771-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 01/15] scripts/device-crash-test: Remove devices
- that are not user_creatable anymore
+Subject: [Qemu-devel] [PULL 02/15] iotests: Make nbd-fault-injector flush
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,63 +20,90 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Cleber Rosa <crosa@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Thomas Huth <thuth@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Cleber Rosa <crosa@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-From: Thomas Huth <thuth@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
 
-Devices that are derived from TYPE_SYS_BUS_DEVICE are not user_creatable
-anymore by default, and some others have been marked as non-user_creatable
-manually, so we can remove these devices from the "ignore"-list in the
-device-crash-test script.
+When closing a connection, make the nbd-fault-injector flush the socket.
+Without this, the output is a bit unreliable with Python 3.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <1538729067-7944-1-git-send-email-thuth@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Cleber Rosa <crosa@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20181022135307.14398-2-mreitz@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- scripts/device-crash-test | 17 -----------------
- 1 file changed, 17 deletions(-)
+ tests/qemu-iotests/083.out               | 9 +++++++++
+ tests/qemu-iotests/nbd-fault-injector.py | 1 +
+ 2 files changed, 10 insertions(+)
 
-diff --git a/scripts/device-crash-test b/scripts/device-crash-test
-index 930200b034..e93a7c0c84 100755
---- a/scripts/device-crash-test
-+++ b/scripts/device-crash-test
-@@ -72,21 +72,6 @@ ERROR_WHITELIST = [
-     # devices that don't work out of the box because they require extra options to "-device DEV":
-     #            DEVICE                                    | ERROR MESSAGE
-     {'device':'.*-(i386|x86_64)-cpu', 'expected':True},    # CPU socket-id is not set
--    {'device':'ARM,bitband-memory', 'expected':True},      # source-memory property not set
--    {'device':'arm.cortex-a9-global-timer', 'expected':True}, # a9_gtimer_realize: num-cpu must be between 1 and 4
--    {'device':'arm_mptimer', 'expected':True},             # num-cpu must be between 1 and 4
--    {'device':'armv7m', 'expected':True},                  # memory property was not set
--    {'device':'aspeed.scu', 'expected':True},              # Unknown silicon revision: 0x0
--    {'device':'aspeed.sdmc', 'expected':True},             # Unknown silicon revision: 0x0
--    {'device':'bcm2835-dma', 'expected':True},             # bcm2835_dma_realize: required dma-mr link not found: Property '.dma-mr' not found
--    {'device':'bcm2835-fb', 'expected':True},              # bcm2835_fb_realize: required vcram-base property not set
--    {'device':'bcm2835-mbox', 'expected':True},            # bcm2835_mbox_realize: required mbox-mr link not found: Property '.mbox-mr' not found
--    {'device':'bcm2835-peripherals', 'expected':True},     # bcm2835_peripherals_realize: required ram link not found: Property '.ram' not found
--    {'device':'bcm2835-property', 'expected':True},        # bcm2835_property_realize: required fb link not found: Property '.fb' not found
--    {'device':'bcm2835_gpio', 'expected':True},            # bcm2835_gpio_realize: required sdhci link not found: Property '.sdbus-sdhci' not found
--    {'device':'bcm2836', 'expected':True},                 # bcm2836_realize: required ram link not found: Property '.ram' not found
--    {'device':'cfi.pflash01', 'expected':True},            # attribute "sector-length" not specified or zero.
--    {'device':'cfi.pflash02', 'expected':True},            # attribute "sector-length" not specified or zero.
-     {'device':'icp', 'expected':True},                     # icp_realize: required link 'xics' not found: Property '.xics' not found
-     {'device':'ics', 'expected':True},                     # ics_base_realize: required link 'xics' not found: Property '.xics' not found
-     # "-device ide-cd" does work on more recent QEMU versions, so it doesn't have expected=True
-@@ -108,7 +93,6 @@ ERROR_WHITELIST = [
-     {'device':'pc-dimm', 'expected':True},                 # 'memdev' property is not set
-     {'device':'pci-bridge', 'expected':True},              # Bridge chassis not specified. Each bridge is required to be assigned a unique chassis id > 0.
-     {'device':'pci-bridge-seat', 'expected':True},         # Bridge chassis not specified. Each bridge is required to be assigned a unique chassis id > 0.
--    {'device':'pxa2xx-dma', 'expected':True},              # channels value invalid
-     {'device':'pxb', 'expected':True},                     # Bridge chassis not specified. Each bridge is required to be assigned a unique chassis id > 0.
-     {'device':'scsi-block', 'expected':True},              # drive property not set
-     {'device':'scsi-disk', 'expected':True},               # drive property not set
-@@ -145,7 +129,6 @@ ERROR_WHITELIST = [
-     {'device':'virtio-input-host-pci', 'expected':True},   # evdev property is required
-     {'device':'xen-pvdevice', 'expected':True},            # Device ID invalid, it must always be supplied
-     {'device':'vhost-vsock-ccw', 'expected':True},         # guest-cid property must be greater than 2
--    {'device':'ALTR.timer', 'expected':True},              # "clock-frequency" property must be provided
-     {'device':'zpci', 'expected':True},                    # target must be defined
-     {'device':'pnv-(occ|icp|lpc)', 'expected':True},       # required link 'xics' not found: Property '.xics' not found
-     {'device':'powernv-cpu-.*', 'expected':True},          # pnv_core_realize: required link 'xics' not found: Property '.xics' not found
+diff --git a/tests/qemu-iotests/083.out b/tests/qemu-iotests/083.out
+index be6079d27e..f9af8bb691 100644
+--- a/tests/qemu-iotests/083.out
++++ b/tests/qemu-iotests/083.out
+@@ -41,6 +41,7 @@ can't open device nbd+tcp://127.0.0.1:PORT/foo
+ 
+ === Check disconnect after neg2 ===
+ 
++Unable to read from socket: Connection reset by peer
+ Connection closed
+ read failed: Input/output error
+ 
+@@ -54,6 +55,7 @@ can't open device nbd+tcp://127.0.0.1:PORT/foo
+ 
+ === Check disconnect before request ===
+ 
++Unable to read from socket: Connection reset by peer
+ Connection closed
+ read failed: Input/output error
+ 
+@@ -116,6 +118,7 @@ can't open device nbd+tcp://127.0.0.1:PORT/
+ 
+ === Check disconnect after neg-classic ===
+ 
++Unable to read from socket: Connection reset by peer
+ Connection closed
+ read failed: Input/output error
+ 
+@@ -161,6 +164,8 @@ can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
+ 
+ === Check disconnect after neg2 ===
+ 
++Unable to read from socket: Connection reset by peer
++Connection closed
+ read failed: Input/output error
+ 
+ === Check disconnect 8 neg2 ===
+@@ -173,6 +178,8 @@ can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
+ 
+ === Check disconnect before request ===
+ 
++Unable to read from socket: Connection reset by peer
++Connection closed
+ read failed: Input/output error
+ 
+ === Check disconnect after request ===
+@@ -234,6 +241,8 @@ can't open device nbd+unix:///?socket=TEST_DIR/nbd.sock
+ 
+ === Check disconnect after neg-classic ===
+ 
++Unable to read from socket: Connection reset by peer
++Connection closed
+ read failed: Input/output error
+ 
+ *** done
+diff --git a/tests/qemu-iotests/nbd-fault-injector.py b/tests/qemu-iotests/nbd-fault-injector.py
+index f9193c0fae..439a090eb6 100755
+--- a/tests/qemu-iotests/nbd-fault-injector.py
++++ b/tests/qemu-iotests/nbd-fault-injector.py
+@@ -112,6 +112,7 @@ class FaultInjectionSocket(object):
+             if rule.match(event, io):
+                 if rule.when == 0 or bufsize is None:
+                     print('Closing connection on rule match %s' % rule.name)
++                    self.sock.flush()
+                     sys.exit(0)
+                 if rule.when != -1:
+                     return rule.when
 -- 
 2.18.0.rc1.1.g3f1ff2140
