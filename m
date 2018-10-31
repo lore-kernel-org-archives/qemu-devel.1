@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60660)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tgfbeta@icloud.com>) id 1gHjwt-0000Jd-Pf
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 02:25:53 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gHn8E-0001wW-LR
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 05:49:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tgfbeta@icloud.com>) id 1gHjwp-0001rB-VD
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 02:25:51 -0400
-Received: from ms11p00im-qufv17100101.me.com ([17.58.37.19]:47626)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tgfbeta@icloud.com>) id 1gHjwn-0001mO-TA
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 02:25:47 -0400
-Received: from process-dkim-sign-daemon.ms11p00im-qufv17100101.me.com by
-	ms11p00im-qufv17100101.me.com
-	(Oracle Communications Messaging Server 8.0.2.2.20180531 64bit (built
-	May 31 2018)) id <0PHG003009HOT900@ms11p00im-qufv17100101.me.com> for
-	qemu-devel@nongnu.org; Wed, 31 Oct 2018 06:25:29 +0000 (GMT)
-From: Chen Zhang <tgfbeta@icloud.com>
-Date: Wed, 31 Oct 2018 06:24:56 +0000 (GMT)
-Message-id: <bf58421d-e1be-4e42-b155-cb4faa366b98@me.com>
-MIME-version: 1.0
-Content-Type: text/plain;
-    charset=utf-8;
-    format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] =?utf-8?q?=5BPATCH=5D_gtk=3A_Fix_mouse_offset_in_sca?=
- =?utf-8?q?led_gtk-gl_display_for_VFIO/iGVT-g_DMA_Buf_mode?=
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gHn89-0006p0-G7
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 05:49:46 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 31 Oct 2018 09:49:33 +0000
+Message-ID: <35d42adb-ea8e-c34c-7227-777b6659ad69@virtuozzo.com>
+References: <a4205609-576c-49cd-1ef6-650491222ff0@bytedance.com>
+In-Reply-To: <a4205609-576c-49cd-1ef6-650491222ff0@bytedance.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <65C89D4B4BC857418475491A5C386F63@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] blockdev: report error on block latency
+ histogram set error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,66 +25,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: zhenwei pi <pizhenwei@bytedance.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-The issue was reported as in=C2=A0https://bugs.launchpad.net/qemu/+bug/179=
-3859=0A=0AWhen an OpenGL accelerated GTK window is used for iGVT-g DMA Buf=
- device,=0Awindow scaling would cause guest cursor to move in undesirable =
-velocity.=0A=0ATo fix this usability issue, the gtk mouse motion events wa=
-s modified to=0Ascale the position of event to match the coordinates=C2=A0=
-of the scaled GL=0Asurface.=0A=0ASigned-off-by: Chen Zhang <tgfbeta@me.com=
->=0A---=0A=C2=A0ui/gtk-egl.c | 10 +++++++---=0A=C2=A0ui/gtk.c =C2=A0 =C2=A0=
- | 19 +++++++++++++------=0A=C2=A02 files changed, 20 insertions(+), 9 del=
-etions(-)=0A=0Adiff --git a/ui/gtk-egl.c b/ui/gtk-egl.c=0Aindex a77c25b..8=
-24beed 100644=0A--- a/ui/gtk-egl.c=0A+++ b/ui/gtk-egl.c=0A@@ -231,9 +231,1=
-3 @@ void gd_egl_cursor_position(DisplayChangeListener *dcl,=0A=C2=A0=C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 uint32_t pos_x, uint32_t pos_y)=0A=C2=A0{=0A=C2=A0=C2=A0=
- =C2=A0 VirtualConsole *vc =3D container_of(dcl, VirtualConsole, gfx.dcl);=
-=0A-=0A-=C2=A0 =C2=A0 vc->gfx.cursor_x =3D pos_x;=0A-=C2=A0 =C2=A0 vc->gfx=
-.cursor_y =3D pos_y;=0A+=C2=A0 =C2=A0 uint32_t sw =3D surface_width(vc->gf=
-x.ds);=0A+=C2=A0 =C2=A0 uint32_t sh =3D surface_height(vc->gfx.ds);=0A+=C2=
-=A0 =C2=A0 GdkWindow *window =3D gtk_widget_get_window(vc->gfx.drawing_are=
-a);=0A+=C2=A0 =C2=A0 uint32_t ww =3D gdk_window_get_width(window);=0A+=C2=A0=
- =C2=A0 uint32_t wh =3D gdk_window_get_height(window);=0A+=C2=A0 =C2=A0 vc=
-->gfx.cursor_x =3D pos_x * ww / sw;=0A+=C2=A0 =C2=A0 vc->gfx.cursor_y =3D =
-pos_y * wh / sh;=0A=C2=A0}=0A=C2=A0=0A=C2=A0void gd_egl_release_dmabuf(Dis=
-playChangeListener *dcl,=0Adiff --git a/ui/gtk.c b/ui/gtk.c=0Aindex 579990=
-b..41c82e5 100644=0A--- a/ui/gtk.c=0A+++ b/ui/gtk.c=0A@@ -875,20 +875,27 @=
-@ static gboolean gd_motion_event(GtkWidget *widget, GdkEventMotion *motio=
-n,=0A=C2=A0=C2=A0 =C2=A0 x =3D (motion->x - mx) / vc->gfx.scale_x;=0A=C2=A0=
-=C2=A0 =C2=A0 y =3D (motion->y - my) / vc->gfx.scale_y;=0A=C2=A0=0A+=C2=A0=
- =C2=A0 bool scaled =3D display_opengl && !gtk_use_gl_area && s->free_scal=
-e;=0A=C2=A0=C2=A0 =C2=A0 if (qemu_input_is_absolute()) {=0A+=C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 int max_w =3D scaled ? ww : surface_width(vc->gfx.ds);=0A+=C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 int max_h =3D scaled ? wh : surface_height(vc->gf=
-x.ds);=0A=C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (x < 0 || y < 0 ||=0A-=C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 x >=3D surface_width(vc->gfx.ds) ||=0A=
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 y >=3D surface_height(vc->gfx.d=
-s)) {=0A+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 x >=3D max_w ||=0A+=C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 y >=3D max_h) {=0A=C2=A0=C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 return TRUE;=0A=C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0=
- }=0A=C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_input_queue_abs(vc->gfx.dcl.co=
-n, INPUT_AXIS_X, x,=0A- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0, surface_width(vc->gfx.ds)=
-);=0A+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 0, max_w);=0A=C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0=
- qemu_input_queue_abs(vc->gfx.dcl.con, INPUT_AXIS_Y, y,=0A- =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 0, surface_height(vc->gfx.ds));=0A+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0, max_=
-h);=0A=C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_input_event_sync();=0A=C2=A0=C2=
-=A0 =C2=A0 } else if (s->last_set && s->ptr_owner =3D=3D vc) {=0A-=C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 qemu_input_queue_rel(vc->gfx.dcl.con, INPUT_AXIS_X, x - =
-s->last_x);=0A-=C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_input_queue_rel(vc->gfx.dc=
-l.con, INPUT_AXIS_Y, y - s->last_y);=0A+=C2=A0 =C2=A0 =C2=A0 =C2=A0 int di=
-ff_x =3D scaled=0A+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ? (x - s->las=
-t_x) * surface_width(vc->gfx.ds) / ww : (x - s->last_x);=0A+=C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 int diff_y =3D scaled=0A+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 ? (y - s->last_y) * surface_height(vc->gfx.ds) / wh : (y - s->last_=
-y);=0A+=C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_input_queue_rel(vc->gfx.dcl.con, I=
-NPUT_AXIS_X, diff_x);=0A+=C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_input_queue_rel(=
-vc->gfx.dcl.con, INPUT_AXIS_Y, diff_y);=0A=C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0=
- qemu_input_event_sync();=0A=C2=A0=C2=A0 =C2=A0 }=0A=C2=A0=C2=A0 =C2=A0 s-=
->last_x =3D x;=0A--=C2=A0=0A2.7.4
+MTguMTAuMjAxOCAxMzo0MiwgemhlbndlaSBwaSB3cm90ZToNCj4gRnVuY3Rpb24gYmxvY2tfbGF0
+ZW5jeV9oaXN0b2dyYW1fc2V0IG1heSByZXR1cm4gZXJyb3IsIGJ1dCBxYXBpIGlnbm9yZSANCj4g
+dGhpcy4NCj4gVGhpcyBjYW4gYmUgcmVwcm9kdWNlZCBlYXNpbHkgYnkgcW1wIGNvbW1hbmQ6DQo+
+IHZpcnNoIHFlbXUtbW9uaXRvci1jb21tYW5kIElOU1RBTkNFIA0KPiAneyJleGVjdXRlIjoieC1i
+bG9jay1sYXRlbmN5LWhpc3RvZ3JhbS1zZXQiLA0KPiAiYXJndW1lbnRzIjp7ImRldmljZSI6ImRy
+aXZlLXZpcnRpby1kaXNrMSIsImJvdW5kYXJpZXMiOlsxMCwyMDAsNDBdfX0nDQo+IEluIGZhY3Qg
+dGhpcyBjb21tYW5kIGRvZXMgbm90IHdvcmssIGJ1dCB3ZSBzdGlsbCBnZXQgc3VjY2VzcyByZXN1
+bHQuDQo+DQo+IHFtcF94X2Jsb2NrX2xhdGVuY3lfaGlzdG9ncmFtX3NldCBpcyBhIGJhdGNoIHNl
+dHRpbmcgQVBJLCByZXBvcnQgZXJyb3IgDQo+IEFTQVAuDQoNCkdvb2QgY2F0Y2gsIHRoYW5rIHlv
+dSwgaXQncyBteSBmYXVsdCENCg0KVGhlIHByb2JsZW0gb2YgdGhlIHBhdGNoIGlzIHRoYXQgaW4g
+Y2FzZSBvZiBlcnJvciwgYm91bmRhcmllcyBmb3IgcmVhZCANCihvciB3cml0ZSkgbWF5IGJlIHNl
+dCwgd2hlbiBvdGhlcnMgYXJlIG5vdC4NCkJldHRlciB0aGluZyBpcyByZWZhY3RvciBpdCBzb21l
+aG93IHNvIHRoYXQgaW4gY2FzZSBvZiBlcnJvciBub3RoaW5nIA0KY2hhbmdlZCBmaW5hbGx5Lg0K
+DQo+DQo+IFNpZ25lZC1vZmYtYnk6IHpoZW53ZWkgcGkgPHBpemhlbndlaUBieXRlZGFuY2UuY29t
+Pg0KPiAtLS0NCj4gwqBibG9ja2Rldi5jIHwgMTkgKysrKysrKysrKysrKysrKy0tLQ0KPiDCoDEg
+ZmlsZSBjaGFuZ2VkLCAxNiBpbnNlcnRpb25zKCspLCAzIGRlbGV0aW9ucygtKQ0KPg0KPiBkaWZm
+IC0tZ2l0IGEvYmxvY2tkZXYuYyBiL2Jsb2NrZGV2LmMNCj4gaW5kZXggYTg3NTViZC4uMDNiMWFh
+MyAxMDA2NDQNCj4gLS0tIGEvYmxvY2tkZXYuYw0KPiArKysgYi9ibG9ja2Rldi5jDQo+IEBAIC00
+Mzc3LDYgKzQzNzcsNyBAQCB2b2lkIHFtcF94X2Jsb2NrX2xhdGVuY3lfaGlzdG9ncmFtX3NldCgN
+Cj4gwqB7DQo+IMKgwqDCoMKgIEJsb2NrQmFja2VuZCAqYmxrID0gYmxrX2J5X25hbWUoZGV2aWNl
+KTsNCj4gwqDCoMKgwqAgQmxvY2tBY2N0U3RhdHMgKnN0YXRzOw0KPiArwqDCoMKgIGludCByZXQ7
+DQo+DQo+IMKgwqDCoMKgIGlmICghYmxrKSB7DQo+IMKgwqDCoMKgwqDCoMKgwqAgZXJyb3Jfc2V0
+ZyhlcnJwLCAiRGV2aWNlICclcycgbm90IGZvdW5kIiwgZGV2aWNlKTsNCj4gQEAgLTQzOTIsMjEg
+KzQzOTMsMzMgQEAgdm9pZCBxbXBfeF9ibG9ja19sYXRlbmN5X2hpc3RvZ3JhbV9zZXQoDQo+IMKg
+wqDCoMKgIH0NCj4NCj4gwqDCoMKgwqAgaWYgKGhhc19ib3VuZGFyaWVzIHx8IGhhc19ib3VuZGFy
+aWVzX3JlYWQpIHsNCj4gLcKgwqDCoMKgwqDCoMKgIGJsb2NrX2xhdGVuY3lfaGlzdG9ncmFtX3Nl
+dCgNCj4gK8KgwqDCoMKgwqDCoMKgIHJldCA9IGJsb2NrX2xhdGVuY3lfaGlzdG9ncmFtX3NldCgN
+Cj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHN0YXRzLCBCTE9DS19BQ0NUX1JFQUQsDQo+IMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBoYXNfYm91bmRhcmllc19yZWFkID8gYm91bmRhcmllc19y
+ZWFkIDogYm91bmRhcmllcyk7DQo+ICvCoMKgwqDCoMKgwqDCoCBpZiAocmV0KSB7DQo+ICvCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgIGVycm9yX3NldGcoZXJycCwgIkRldmljZSAnJXMnIHNldCByZWFk
+IGJvdW5kYXJpZXMgZmFpbCIsIA0KPiBkZXZpY2UpOw0KPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oCByZXR1cm47DQo+ICvCoMKgwqDCoMKgwqDCoCB9DQo+IMKgwqDCoMKgIH0NCj4NCj4gwqDCoMKg
+wqAgaWYgKGhhc19ib3VuZGFyaWVzIHx8IGhhc19ib3VuZGFyaWVzX3dyaXRlKSB7DQo+IC3CoMKg
+wqDCoMKgwqDCoCBibG9ja19sYXRlbmN5X2hpc3RvZ3JhbV9zZXQoDQo+ICvCoMKgwqDCoMKgwqDC
+oCByZXQgPSBibG9ja19sYXRlbmN5X2hpc3RvZ3JhbV9zZXQoDQo+IMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoCBzdGF0cywgQkxPQ0tfQUNDVF9XUklURSwNCj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgIGhhc19ib3VuZGFyaWVzX3dyaXRlID8gYm91bmRhcmllc193cml0ZSA6IGJvdW5kYXJpZXMp
+Ow0KPiArwqDCoMKgwqDCoMKgwqAgaWYgKHJldCkgew0KPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oCBlcnJvcl9zZXRnKGVycnAsICJEZXZpY2UgJyVzJyBzZXQgd3JpdGUgYm91bmRhcmllcyBmYWls
+IiwgDQo+IGRldmljZSk7DQo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJldHVybjsNCj4gK8Kg
+wqDCoMKgwqDCoMKgIH0NCj4gwqDCoMKgwqAgfQ0KPg0KPiDCoMKgwqDCoCBpZiAoaGFzX2JvdW5k
+YXJpZXMgfHwgaGFzX2JvdW5kYXJpZXNfZmx1c2gpIHsNCj4gLcKgwqDCoMKgwqDCoMKgIGJsb2Nr
+X2xhdGVuY3lfaGlzdG9ncmFtX3NldCgNCj4gK8KgwqDCoMKgwqDCoMKgIHJldCA9IGJsb2NrX2xh
+dGVuY3lfaGlzdG9ncmFtX3NldCgNCj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHN0YXRzLCBC
+TE9DS19BQ0NUX0ZMVVNILA0KPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgaGFzX2JvdW5kYXJp
+ZXNfZmx1c2ggPyBib3VuZGFyaWVzX2ZsdXNoIDogYm91bmRhcmllcyk7DQo+ICvCoMKgwqDCoMKg
+wqDCoCBpZiAocmV0KSB7DQo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGVycm9yX3NldGcoZXJy
+cCwgIkRldmljZSAnJXMnIHNldCBmbHVzaCBib3VuZGFyaWVzIGZhaWwiLCANCj4gZGV2aWNlKTsN
+Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0dXJuOw0KPiArwqDCoMKgwqDCoMKgwqAgfQ0K
+PiDCoMKgwqDCoCB9DQo+IMKgfQ0KPg0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXIN
+Cg0K
