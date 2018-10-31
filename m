@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49735)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gHtTe-0001Xa-Oi
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:36:19 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1gHtU8-0001tC-L5
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:36:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gHtTa-0006Be-Ct
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:36:18 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:55783)
+	(envelope-from <alex.bennee@linaro.org>) id 1gHtU5-0006OX-IE
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:36:48 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:42325)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gHtTX-0006A2-MS
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:36:14 -0400
-Received: by mail-wm1-x342.google.com with SMTP id s10-v6so15767067wmc.5
-	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 09:36:10 -0700 (PDT)
+	id 1gHtU3-0006Mz-Ez
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:36:43 -0400
+Received: by mail-wr1-x441.google.com with SMTP id y15-v6so17217894wru.9
+	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 09:36:42 -0700 (PDT)
 References: <20181025144644.15464-1-cota@braap.org>
-	<20181025144644.15464-43-cota@braap.org>
+	<20181025144644.15464-44-cota@braap.org>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181025144644.15464-43-cota@braap.org>
-Date: Wed, 31 Oct 2018 16:36:08 +0000
-Message-ID: <87k1ly6pl3.fsf@linaro.org>
+In-reply-to: <20181025144644.15464-44-cota@braap.org>
+Date: Wed, 31 Oct 2018 16:36:39 +0000
+Message-ID: <87in1i6pk8.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v4 43/71] sh4: convert to
+Subject: Re: [Qemu-devel] [RFC v4 44/71] cris: convert to
  cpu_interrupt_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -32,49 +32,72 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 
 
 Emilio G. Cota <cota@braap.org> writes:
 
-> Cc: Aurelien Jarno <aurelien@aurel32.net>
+> Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 > Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 > Signed-off-by: Emilio G. Cota <cota@braap.org>
 
 Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
 > ---
->  target/sh4/cpu.c    | 2 +-
->  target/sh4/helper.c | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
+>  target/cris/cpu.c    | 2 +-
+>  target/cris/helper.c | 6 +++---
+>  2 files changed, 4 insertions(+), 4 deletions(-)
 >
-> diff --git a/target/sh4/cpu.c b/target/sh4/cpu.c
-> index b9f393b7c7..58ea212f53 100644
-> --- a/target/sh4/cpu.c
-> +++ b/target/sh4/cpu.c
-> @@ -45,7 +45,7 @@ static void superh_cpu_synchronize_from_tb(CPUState *cs=
-, TranslationBlock *tb)
+> diff --git a/target/cris/cpu.c b/target/cris/cpu.c
+> index a23aba2688..3cdba581e6 100644
+> --- a/target/cris/cpu.c
+> +++ b/target/cris/cpu.c
+> @@ -37,7 +37,7 @@ static void cris_cpu_set_pc(CPUState *cs, vaddr value)
 >
->  static bool superh_cpu_has_work(CPUState *cs)
+>  static bool cris_cpu_has_work(CPUState *cs)
 >  {
-> -    return cs->interrupt_request & CPU_INTERRUPT_HARD;
-> +    return cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD;
+> -    return cs->interrupt_request & (CPU_INTERRUPT_HARD | CPU_INTERRUPT_N=
+MI);
+> +    return cpu_interrupt_request(cs) & (CPU_INTERRUPT_HARD | CPU_INTERRU=
+PT_NMI);
 >  }
 >
 >  /* CPUClass::reset() */
-> diff --git a/target/sh4/helper.c b/target/sh4/helper.c
-> index 2ff0cf4060..8463da5bc8 100644
-> --- a/target/sh4/helper.c
-> +++ b/target/sh4/helper.c
-> @@ -83,7 +83,7 @@ void superh_cpu_do_interrupt(CPUState *cs)
->  {
->      SuperHCPU *cpu =3D SUPERH_CPU(cs);
->      CPUSH4State *env =3D &cpu->env;
-> -    int do_irq =3D cs->interrupt_request & CPU_INTERRUPT_HARD;
-> +    int do_irq =3D cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD;
->      int do_exp, irq_vector =3D cs->exception_index;
+> diff --git a/target/cris/helper.c b/target/cris/helper.c
+> index d2ec349191..e3fa19363f 100644
+> --- a/target/cris/helper.c
+> +++ b/target/cris/helper.c
+> @@ -116,7 +116,7 @@ int cris_cpu_handle_mmu_fault(CPUState *cs, vaddr add=
+ress, int size, int rw,
+>      if (r > 0) {
+>          qemu_log_mask(CPU_LOG_MMU,
+>                  "%s returns %d irqreq=3D%x addr=3D%" VADDR_PRIx " phy=3D=
+%x vec=3D%x"
+> -                " pc=3D%x\n", __func__, r, cs->interrupt_request, addres=
+s,
+> +                " pc=3D%x\n", __func__, r, cpu_interrupt_request(cs), ad=
+dress,
+>                  res.phy, res.bf_vec, env->pc);
+>      }
+>      return r;
+> @@ -130,7 +130,7 @@ void crisv10_cpu_do_interrupt(CPUState *cs)
 >
->      /* prioritize exceptions over interrupts */
+>      D_LOG("exception index=3D%d interrupt_req=3D%d\n",
+>            cs->exception_index,
+> -          cs->interrupt_request);
+> +          cpu_interrupt_request(cs));
+>
+>      if (env->dslot) {
+>          /* CRISv10 never takes interrupts while in a delay-slot.  */
+> @@ -192,7 +192,7 @@ void cris_cpu_do_interrupt(CPUState *cs)
+>
+>      D_LOG("exception index=3D%d interrupt_req=3D%d\n",
+>            cs->exception_index,
+> -          cs->interrupt_request);
+> +          cpu_interrupt_request(cs));
+>
+>      switch (cs->exception_index) {
+>      case EXCP_BREAK:
 
 
 --
