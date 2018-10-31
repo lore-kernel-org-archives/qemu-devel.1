@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40541)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40544)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dcsapak@zita.proxmox.com>) id 1gHp3I-0004Xh-Qy
+	(envelope-from <dcsapak@zita.proxmox.com>) id 1gHp3I-0004Xj-Rt
 	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 07:52:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dcsapak@zita.proxmox.com>) id 1gHp3F-00042U-MX
+	(envelope-from <dcsapak@zita.proxmox.com>) id 1gHp3F-00042J-Hi
 	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 07:52:48 -0400
-Received: from proxmox-new.maurer-it.com ([212.186.127.180]:11378)
+Received: from proxmox-new.maurer-it.com ([212.186.127.180]:18941)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dcsapak@zita.proxmox.com>)
-	id 1gHp3F-00040Z-6f
+	id 1gHp3F-00040J-6e
 	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 07:52:45 -0400
 From: Dominik Csapak <d.csapak@proxmox.com>
-Date: Wed, 31 Oct 2018 12:52:40 +0100
-Message-Id: <20181031115242.6558-2-d.csapak@proxmox.com>
+Date: Wed, 31 Oct 2018 12:52:41 +0100
+Message-Id: <20181031115242.6558-3-d.csapak@proxmox.com>
 In-Reply-To: <20181031115242.6558-1-d.csapak@proxmox.com>
 References: <20181031115242.6558-1-d.csapak@proxmox.com>
-Subject: [Qemu-devel] [PATCH 1/3] qapi: move ShutdownCause to
- qapi/run-state.json
+Subject: [Qemu-devel] [PATCH 2/3] qapi: split host-qmp into quit and
+ system-reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,89 +28,64 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, kwolf@redhat.com, mreitz@redhat.com
 
-this makes it possible to use the reason as return value
-in a QMP event, such as SHUTDOWN
+it is interesting to know whether the shutdown cause was 'quit' or
+'reset', especially when using --no-reboot
 
 Signed-off-by: Dominik Csapak <d.csapak@proxmox.com>
 ---
- include/sysemu/sysemu.h | 20 --------------------
- qapi/run-state.json     | 33 +++++++++++++++++++++++++++++++++
- 2 files changed, 33 insertions(+), 20 deletions(-)
+ qapi/run-state.json | 10 ++++++----
+ qmp.c               |  4 ++--
+ 2 files changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 8d6095d98b..f83522c7e7 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -31,26 +31,6 @@ VMChangeStateEntry *qemu_add_vm_change_state_handler(VMChangeStateHandler *cb,
- void qemu_del_vm_change_state_handler(VMChangeStateEntry *e);
- void vm_state_notify(int running, RunState state);
- 
--/* Enumeration of various causes for shutdown. */
--typedef enum ShutdownCause {
--    SHUTDOWN_CAUSE_NONE,          /* No shutdown request pending */
--    SHUTDOWN_CAUSE_HOST_ERROR,    /* An error prevents further use of guest */
--    SHUTDOWN_CAUSE_HOST_QMP,      /* Reaction to a QMP command, like 'quit' */
--    SHUTDOWN_CAUSE_HOST_SIGNAL,   /* Reaction to a signal, such as SIGINT */
--    SHUTDOWN_CAUSE_HOST_UI,       /* Reaction to UI event, like window close */
--    SHUTDOWN_CAUSE_GUEST_SHUTDOWN,/* Guest shutdown/suspend request, via
--                                     ACPI or other hardware-specific means */
--    SHUTDOWN_CAUSE_GUEST_RESET,   /* Guest reset request, and command line
--                                     turns that into a shutdown */
--    SHUTDOWN_CAUSE_GUEST_PANIC,   /* Guest panicked, and command line turns
--                                     that into a shutdown */
--    SHUTDOWN_CAUSE_SUBSYSTEM_RESET,/* Partial guest reset that does not trigger
--                                      QMP events and ignores --no-reboot. This
--                                      is useful for sanitize hypercalls on s390
--                                      that are used during kexec/kdump/boot */
--    SHUTDOWN_CAUSE__MAX,
--} ShutdownCause;
--
- static inline bool shutdown_caused_by_guest(ShutdownCause cause)
- {
-     return cause >= SHUTDOWN_CAUSE_GUEST_SHUTDOWN;
 diff --git a/qapi/run-state.json b/qapi/run-state.json
-index 332e44897b..883bed167c 100644
+index 883bed167c..c215b6ef83 100644
 --- a/qapi/run-state.json
 +++ b/qapi/run-state.json
-@@ -60,6 +60,39 @@
-             'guest-panicked', 'colo', 'preconfig' ] }
+@@ -68,7 +68,9 @@
+ #
+ # @host-error: An error prevented further use of guest
+ #
+-# @host-qmp: Reaction to a QMP command, like 'quit'
++# @host-qmp-quit: Reaction to the QMP command 'quit'
++#
++# @host-qmp-system-reset: Reaction to the QMP command 'system_reset'
+ #
+ # @host-signal: Reaction to a signal, such as SIGINT
+ #
+@@ -88,9 +90,9 @@
+ #
+ ##
+ { 'enum': 'ShutdownCause',
+-  'data': [ 'none', 'host-error', 'host-qmp', 'host-signal', 'host-ui',
+-            'guest-shutdown', 'guest-reset', 'guest-panic',
+-            'subsystem-reset'] }
++  'data': [ 'none', 'host-error', 'host-qmp-quit', 'host-qmp-system-reset',
++            'host-signal', 'host-ui', 'guest-shutdown', 'guest-reset',
++            'guest-panic', 'subsystem-reset'] }
  
  ##
-+# @ShutdownCause:
-+#
-+# An enumeration of reasons for a Shutdown.
-+#
-+# @none: No shutdown request pending
-+#
-+# @host-error: An error prevented further use of guest
-+#
-+# @host-qmp: Reaction to a QMP command, like 'quit'
-+#
-+# @host-signal: Reaction to a signal, such as SIGINT
-+#
-+# @host-ui: Reaction to a UI event, like window close
-+#
-+# @guest-shutdown: Guest shutdown/suspend request, via ACPI or other
-+#                  hardware-specific means
-+#
-+# @guest-reset: Guest reset request, and command line turns that into
-+#               a shutdown
-+#
-+# @guest-panic: Guest panicked, and command line turns that into a shutdown
-+#
-+# @subsystem-reset: Partial guest reset that does not trigger QMP events and
-+#                  ignores --no-reboot. This is useful for sanitizing
-+#                  hypercalls on s390 that are used during kexec/kdump/boot
-+#
-+##
-+{ 'enum': 'ShutdownCause',
-+  'data': [ 'none', 'host-error', 'host-qmp', 'host-signal', 'host-ui',
-+            'guest-shutdown', 'guest-reset', 'guest-panic',
-+            'subsystem-reset'] }
-+
-+##
  # @StatusInfo:
- #
- # Information about VCPU run state
+diff --git a/qmp.c b/qmp.c
+index e7c0a2fd60..82298f6cb0 100644
+--- a/qmp.c
++++ b/qmp.c
+@@ -88,7 +88,7 @@ UuidInfo *qmp_query_uuid(Error **errp)
+ void qmp_quit(Error **errp)
+ {
+     no_shutdown = 0;
+-    qemu_system_shutdown_request(SHUTDOWN_CAUSE_HOST_QMP);
++    qemu_system_shutdown_request(SHUTDOWN_CAUSE_HOST_QMP_QUIT);
+ }
+ 
+ void qmp_stop(Error **errp)
+@@ -109,7 +109,7 @@ void qmp_stop(Error **errp)
+ 
+ void qmp_system_reset(Error **errp)
+ {
+-    qemu_system_reset_request(SHUTDOWN_CAUSE_HOST_QMP);
++    qemu_system_reset_request(SHUTDOWN_CAUSE_HOST_QMP_SYSTEM_RESET);
+ }
+ 
+ void qmp_system_powerdown(Error **erp)
 -- 
 2.11.0
