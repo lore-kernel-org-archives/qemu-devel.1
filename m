@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37432)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gHqRZ-0004ky-MQ
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gHqRZ-0004kq-LV
 	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 09:22:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gHqRX-00033w-CR
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gHqRX-00033a-7A
 	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 09:21:57 -0400
 From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Date: Wed, 31 Oct 2018 14:20:26 +0100
-Message-Id: <20181031132029.4887-33-kbastian@mail.uni-paderborn.de>
+Date: Wed, 31 Oct 2018 14:20:05 +0100
+Message-Id: <20181031132029.4887-12-kbastian@mail.uni-paderborn.de>
 In-Reply-To: <20181031132029.4887-1-kbastian@mail.uni-paderborn.de>
 References: <20181031132029.4887-1-kbastian@mail.uni-paderborn.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 32/35] target/riscv: Convert @cl_d, @cl_w,
- @cs_d, @cs_w insns
+Subject: [Qemu-devel] [PATCH v3 11/35] target/riscv: Convert RV64A insns to
+ decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,130 +25,263 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: mjc@sifive.com, sagark@eecs.berkeley.edu, palmer@sifive.com, kbastian@mail.uni-paderborn.de, Alistair.Francis@wdc.com
 Cc: richard.henderson@linaro.org, peer.adelt@hni.uni-paderborn.de, qemu-devel@nongnu.org, qemu-riscv@nongnu.org
 
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Signed-off-by: Peer Adelt <peer.adelt@hni.uni-paderborn.de>
 ---
- target/riscv/insn16.decode              | 20 ++++++++++----------
- target/riscv/insn32.decode              |  3 ++-
- target/riscv/insn_trans/trans_rvc.inc.c | 24 ------------------------
- 3 files changed, 12 insertions(+), 35 deletions(-)
+v2 -> v3:
+    - moved 64-bit only insn to insn64.decode
+    - dropped insn argument of trans_foo functions
 
-diff --git a/target/riscv/insn16.decode b/target/riscv/insn16.decode
-index c7a58d80e5..c215867ff9 100644
---- a/target/riscv/insn16.decode
-+++ b/target/riscv/insn16.decode
-@@ -43,14 +43,14 @@
- 
- # Argument sets imported from insn32.decode:
- &r         rd rs1 rs2   !extern
-+&i         imm rs1 rd   !extern
-+&s         imm rs1 rs2  !extern
- 
- # Argument sets:
- &cl               rs1 rd
--&cl_dw     uimm   rs1 rd
- &ci        imm        rd
- &ciw       nzuimm     rd
- &cs               rs1 rs2
--&cs_dw     uimm   rs1 rs2
- &cb        imm    rs1
- &cr               rd  rs2
- &c_j       imm
-@@ -67,13 +67,13 @@
- @cr        ....  ..... .....  .. &cr                      rs2=%rs2_5  %rd
- @ci        ... . ..... .....  .. &ci     imm=%imm_ci                  %rd
- @ciw       ...   ........ ... .. &ciw    nzuimm=%nzuimm_ciw           rd=%rs2_3
--@cl_d      ... ... ... .. ... .. &cl_dw  uimm=%uimm_cl_d  rs1=%rs1_3  rd=%rs2_3
--@cl_w      ... ... ... .. ... .. &cl_dw  uimm=%uimm_cl_w  rs1=%rs1_3  rd=%rs2_3
-+@cl_d      ... ... ... .. ... .. &i  imm=%uimm_cl_d  rs1=%rs1_3  rd=%rs2_3
-+@cl_w      ... ... ... .. ... .. &i  imm=%uimm_cl_w  rs1=%rs1_3  rd=%rs2_3
- @cl        ... ... ... .. ... .. &cl                      rs1=%rs1_3  rd=%rs2_3
- @cs        ... ... ... .. ... .. &cs                      rs1=%rs1_3  rs2=%rs2_3
- @cs_2      ... ... ... .. ... .. &r      rd=%rs1_3 rs1=%rs1_3 rs2=%rs2_3
--@cs_d      ... ... ... .. ... .. &cs_dw  uimm=%uimm_cl_d  rs1=%rs1_3  rs2=%rs2_3
--@cs_w      ... ... ... .. ... .. &cs_dw  uimm=%uimm_cl_w  rs1=%rs1_3  rs2=%rs2_3
-+@cs_d      ... ... ... .. ... .. &s  imm=%uimm_cl_d  rs1=%rs1_3  rs2=%rs2_3
-+@cs_w      ... ... ... .. ... .. &s  imm=%uimm_cl_w  rs1=%rs1_3  rs2=%rs2_3
- @cb        ... ... ... .. ... .. &cb     imm=%imm_cb      rs1=%rs1_3
- @cj        ...    ........... .. &c_j    imm=%imm_cj
- 
-@@ -95,11 +95,11 @@
- 
- # *** RV64C Standard Extension (Quadrant 0) ***
- c_addi4spn        000    ........ ... 00 @ciw
--c_fld             001  ... ... .. ... 00 @cl_d
--c_lw              010  ... ... .. ... 00 @cl_w
-+fld               001  ... ... .. ... 00 @cl_d
-+lw                010  ... ... .. ... 00 @cl_w
- c_flw_ld          011  --- ... -- ... 00 @cl    #Note: Must parse uimm manually
--c_fsd             101  ... ... .. ... 00 @cs_d
--c_sw              110  ... ... .. ... 00 @cs_w
-+fsd               101  ... ... .. ... 00 @cs_d
-+sw                110  ... ... .. ... 00 @cs_w
- c_fsw_sd          111  --- ... -- ... 00 @cs    #Note: Must parse uimm manually
- 
- # *** RV64C Standard Extension (Quadrant 1) ***
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 520954e9c6..9f13fbcab9 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -37,6 +37,7 @@
- &b    imm rs2 rs1
- &i    imm rs1 rd
- &r    rd rs1 rs2
-+&s    imm rs2 rs1
- &shift     shamt rs1 rd
- &atomic    aq rl rs2 rs1 rd
- 
-@@ -44,7 +45,7 @@
- @r       .......   ..... ..... ... ..... ....... &r                %rs2 %rs1 %rd
- @i       ............    ..... ... ..... ....... &i      imm=%imm_i     %rs1 %rd
- @b       .......   ..... ..... ... ..... ....... &b      imm=%imm_b %rs2 %rs1
--@s       .......   ..... ..... ... ..... .......         imm=%imm_s %rs2 %rs1
-+@s       .......   ..... ..... ... ..... ....... &s      imm=%imm_s %rs2 %rs1
- @u       ....................      ..... .......         imm=%imm_u          %rd
- @j       ....................      ..... .......         imm=%imm_j          %rd
- 
-diff --git a/target/riscv/insn_trans/trans_rvc.inc.c b/target/riscv/insn_trans/trans_rvc.inc.c
-index 639c381edf..d932bfd3e0 100644
---- a/target/riscv/insn_trans/trans_rvc.inc.c
-+++ b/target/riscv/insn_trans/trans_rvc.inc.c
-@@ -28,18 +28,6 @@ static bool trans_c_addi4spn(DisasContext *ctx, arg_c_addi4spn *a)
-     return trans_addi(ctx, &arg);
+ target/riscv/insn64.decode              |  13 +++
+ target/riscv/insn_trans/trans_rva.inc.c |  58 ++++++++++
+ target/riscv/translate.c                | 140 ------------------------
+ 3 files changed, 71 insertions(+), 140 deletions(-)
+
+diff --git a/target/riscv/insn64.decode b/target/riscv/insn64.decode
+index 008f100546..0bee95c984 100644
+--- a/target/riscv/insn64.decode
++++ b/target/riscv/insn64.decode
+@@ -43,3 +43,16 @@ divw     0000001 .....  ..... 100 ..... 0111011 @r
+ divuw    0000001 .....  ..... 101 ..... 0111011 @r
+ remw     0000001 .....  ..... 110 ..... 0111011 @r
+ remuw    0000001 .....  ..... 111 ..... 0111011 @r
++
++# *** RV64A Standard Extension (in addition to RV32A) ***
++lr_d       00010 . . 00000 ..... 011 ..... 0101111 @atom_ld
++sc_d       00011 . . ..... ..... 011 ..... 0101111 @atom_st
++amoswap_d  00001 . . ..... ..... 011 ..... 0101111 @atom_st
++amoadd_d   00000 . . ..... ..... 011 ..... 0101111 @atom_st
++amoxor_d   00100 . . ..... ..... 011 ..... 0101111 @atom_st
++amoand_d   01100 . . ..... ..... 011 ..... 0101111 @atom_st
++amoor_d    01000 . . ..... ..... 011 ..... 0101111 @atom_st
++amomin_d   10000 . . ..... ..... 011 ..... 0101111 @atom_st
++amomax_d   10100 . . ..... ..... 011 ..... 0101111 @atom_st
++amominu_d  11000 . . ..... ..... 011 ..... 0101111 @atom_st
++amomaxu_d  11100 . . ..... ..... 011 ..... 0101111 @atom_st
+diff --git a/target/riscv/insn_trans/trans_rva.inc.c b/target/riscv/insn_trans/trans_rva.inc.c
+index d42d36ebf7..fbfca7f835 100644
+--- a/target/riscv/insn_trans/trans_rva.inc.c
++++ b/target/riscv/insn_trans/trans_rva.inc.c
+@@ -143,3 +143,61 @@ static bool trans_amomaxu_w(DisasContext *ctx, arg_amomaxu_w *a)
+ {
+     return gen_amo(ctx, a, &tcg_gen_atomic_fetch_umax_tl, (MO_ALIGN | MO_TESL));
+ }
++
++#ifdef TARGET_RISCV64
++
++static bool trans_lr_d(DisasContext *ctx, arg_lr_d *a)
++{
++    return gen_lr(ctx, a, MO_ALIGN | MO_TEQ);
++}
++
++static bool trans_sc_d(DisasContext *ctx, arg_sc_d *a)
++{
++    return gen_sc(ctx, a, (MO_ALIGN | MO_TEQ));
++}
++
++static bool trans_amoswap_d(DisasContext *ctx, arg_amoswap_d *a)
++{
++    return gen_amo(ctx, a, &tcg_gen_atomic_xchg_tl, (MO_ALIGN | MO_TEQ));
++}
++
++static bool trans_amoadd_d(DisasContext *ctx, arg_amoadd_d *a)
++{
++    return gen_amo(ctx, a, &tcg_gen_atomic_fetch_add_tl, (MO_ALIGN | MO_TEQ));
++}
++
++static bool trans_amoxor_d(DisasContext *ctx, arg_amoxor_d *a)
++{
++    return gen_amo(ctx, a, &tcg_gen_atomic_fetch_xor_tl, (MO_ALIGN | MO_TEQ));
++}
++
++static bool trans_amoand_d(DisasContext *ctx, arg_amoand_d *a)
++{
++    return gen_amo(ctx, a, &tcg_gen_atomic_fetch_and_tl, (MO_ALIGN | MO_TEQ));
++}
++
++static bool trans_amoor_d(DisasContext *ctx, arg_amoor_d *a)
++{
++    return gen_amo(ctx, a, &tcg_gen_atomic_fetch_or_tl, (MO_ALIGN | MO_TEQ));
++}
++
++static bool trans_amomin_d(DisasContext *ctx, arg_amomin_d *a)
++{
++    return gen_amo(ctx, a, &tcg_gen_atomic_fetch_smin_tl, (MO_ALIGN | MO_TEQ));
++}
++
++static bool trans_amomax_d(DisasContext *ctx, arg_amomax_d *a)
++{
++    return gen_amo(ctx, a, &tcg_gen_atomic_fetch_smax_tl, (MO_ALIGN | MO_TEQ));
++}
++
++static bool trans_amominu_d(DisasContext *ctx, arg_amominu_d *a)
++{
++    return gen_amo(ctx, a, &tcg_gen_atomic_fetch_umin_tl, (MO_ALIGN | MO_TEQ));
++}
++
++static bool trans_amomaxu_d(DisasContext *ctx, arg_amomaxu_d *a)
++{
++    return gen_amo(ctx, a, &tcg_gen_atomic_fetch_umax_tl, (MO_ALIGN | MO_TEQ));
++}
++#endif
+diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+index d8fe319f62..a1b949ad0a 100644
+--- a/target/riscv/translate.c
++++ b/target/riscv/translate.c
+@@ -711,143 +711,6 @@ static void gen_fp_store(DisasContext *ctx, uint32_t opc, int rs1,
+     tcg_temp_free(t0);
  }
  
--static bool trans_c_fld(DisasContext *ctx, arg_c_fld *a)
+-static void gen_atomic(DisasContext *ctx, uint32_t opc,
+-                      int rd, int rs1, int rs2)
 -{
--    arg_fld arg = { .rd = a->rd, .rs1 = a->rs1, .imm = a->uimm };
--    return trans_fld(ctx, &arg);
+-    TCGv src1, src2, dat;
+-    TCGLabel *l1, *l2;
+-    TCGMemOp mop;
+-    bool aq, rl;
+-
+-    /* Extract the size of the atomic operation.  */
+-    switch (extract32(opc, 12, 3)) {
+-    case 2: /* 32-bit */
+-        mop = MO_ALIGN | MO_TESL;
+-        break;
+-#if defined(TARGET_RISCV64)
+-    case 3: /* 64-bit */
+-        mop = MO_ALIGN | MO_TEQ;
+-        break;
+-#endif
+-    default:
+-        gen_exception_illegal(ctx);
+-        return;
+-    }
+-    rl = extract32(opc, 25, 1);
+-    aq = extract32(opc, 26, 1);
+-
+-    src1 = tcg_temp_new();
+-    src2 = tcg_temp_new();
+-
+-    switch (MASK_OP_ATOMIC_NO_AQ_RL_SZ(opc)) {
+-    case OPC_RISC_LR:
+-        /* Put addr in load_res, data in load_val.  */
+-        gen_get_gpr(src1, rs1);
+-        if (rl) {
+-            tcg_gen_mb(TCG_MO_ALL | TCG_BAR_STRL);
+-        }
+-        tcg_gen_qemu_ld_tl(load_val, src1, ctx->mem_idx, mop);
+-        if (aq) {
+-            tcg_gen_mb(TCG_MO_ALL | TCG_BAR_LDAQ);
+-        }
+-        tcg_gen_mov_tl(load_res, src1);
+-        gen_set_gpr(rd, load_val);
+-        break;
+-
+-    case OPC_RISC_SC:
+-        l1 = gen_new_label();
+-        l2 = gen_new_label();
+-        dat = tcg_temp_new();
+-
+-        gen_get_gpr(src1, rs1);
+-        tcg_gen_brcond_tl(TCG_COND_NE, load_res, src1, l1);
+-
+-        gen_get_gpr(src2, rs2);
+-        /* Note that the TCG atomic primitives are SC,
+-           so we can ignore AQ/RL along this path.  */
+-        tcg_gen_atomic_cmpxchg_tl(src1, load_res, load_val, src2,
+-                                  ctx->mem_idx, mop);
+-        tcg_gen_setcond_tl(TCG_COND_NE, dat, src1, load_val);
+-        gen_set_gpr(rd, dat);
+-        tcg_gen_br(l2);
+-
+-        gen_set_label(l1);
+-        /* Address comparion failure.  However, we still need to
+-           provide the memory barrier implied by AQ/RL.  */
+-        tcg_gen_mb(TCG_MO_ALL + aq * TCG_BAR_LDAQ + rl * TCG_BAR_STRL);
+-        tcg_gen_movi_tl(dat, 1);
+-        gen_set_gpr(rd, dat);
+-
+-        gen_set_label(l2);
+-        tcg_temp_free(dat);
+-        break;
+-
+-    case OPC_RISC_AMOSWAP:
+-        /* Note that the TCG atomic primitives are SC,
+-           so we can ignore AQ/RL along this path.  */
+-        gen_get_gpr(src1, rs1);
+-        gen_get_gpr(src2, rs2);
+-        tcg_gen_atomic_xchg_tl(src2, src1, src2, ctx->mem_idx, mop);
+-        gen_set_gpr(rd, src2);
+-        break;
+-    case OPC_RISC_AMOADD:
+-        gen_get_gpr(src1, rs1);
+-        gen_get_gpr(src2, rs2);
+-        tcg_gen_atomic_fetch_add_tl(src2, src1, src2, ctx->mem_idx, mop);
+-        gen_set_gpr(rd, src2);
+-        break;
+-    case OPC_RISC_AMOXOR:
+-        gen_get_gpr(src1, rs1);
+-        gen_get_gpr(src2, rs2);
+-        tcg_gen_atomic_fetch_xor_tl(src2, src1, src2, ctx->mem_idx, mop);
+-        gen_set_gpr(rd, src2);
+-        break;
+-    case OPC_RISC_AMOAND:
+-        gen_get_gpr(src1, rs1);
+-        gen_get_gpr(src2, rs2);
+-        tcg_gen_atomic_fetch_and_tl(src2, src1, src2, ctx->mem_idx, mop);
+-        gen_set_gpr(rd, src2);
+-        break;
+-    case OPC_RISC_AMOOR:
+-        gen_get_gpr(src1, rs1);
+-        gen_get_gpr(src2, rs2);
+-        tcg_gen_atomic_fetch_or_tl(src2, src1, src2, ctx->mem_idx, mop);
+-        gen_set_gpr(rd, src2);
+-        break;
+-    case OPC_RISC_AMOMIN:
+-        gen_get_gpr(src1, rs1);
+-        gen_get_gpr(src2, rs2);
+-        tcg_gen_atomic_fetch_smin_tl(src2, src1, src2, ctx->mem_idx, mop);
+-        gen_set_gpr(rd, src2);
+-        break;
+-    case OPC_RISC_AMOMAX:
+-        gen_get_gpr(src1, rs1);
+-        gen_get_gpr(src2, rs2);
+-        tcg_gen_atomic_fetch_smax_tl(src2, src1, src2, ctx->mem_idx, mop);
+-        gen_set_gpr(rd, src2);
+-        break;
+-    case OPC_RISC_AMOMINU:
+-        gen_get_gpr(src1, rs1);
+-        gen_get_gpr(src2, rs2);
+-        tcg_gen_atomic_fetch_umin_tl(src2, src1, src2, ctx->mem_idx, mop);
+-        gen_set_gpr(rd, src2);
+-        break;
+-    case OPC_RISC_AMOMAXU:
+-        gen_get_gpr(src1, rs1);
+-        gen_get_gpr(src2, rs2);
+-        tcg_gen_atomic_fetch_umax_tl(src2, src1, src2, ctx->mem_idx, mop);
+-        gen_set_gpr(rd, src2);
+-        break;
+-
+-    default:
+-        gen_exception_illegal(ctx);
+-        break;
+-    }
+-
+-    tcg_temp_free(src1);
+-    tcg_temp_free(src2);
 -}
 -
--static bool trans_c_lw(DisasContext *ctx, arg_c_lw *a)
--{
--    arg_lw arg = { .rd = a->rd, .rs1 = a->rs1, .imm = a->uimm };
--    return trans_lw(ctx, &arg);
--}
--
- static bool trans_c_flw_ld(DisasContext *ctx, arg_c_flw_ld *a)
+ static void gen_set_rm(DisasContext *ctx, int rm)
  {
- #ifdef TARGET_RISCV32
-@@ -51,18 +39,6 @@ static bool trans_c_flw_ld(DisasContext *ctx, arg_c_flw_ld *a)
- #endif
- }
- 
--static bool trans_c_fsd(DisasContext *ctx, arg_c_fsd *a)
--{
--    arg_fsd arg = { .rs1 = a->rs1, .rs2 = a->rs2, .imm = a->uimm };
--    return trans_fsd(ctx, &arg);
--}
--
--static bool trans_c_sw(DisasContext *ctx, arg_c_sw *a)
--{
--    arg_sw arg = { .rs1 = a->rs1, .rs2 = a->rs2, .imm = a->uimm };
--    return trans_sw(ctx, &arg);
--}
--
- static bool trans_c_fsw_sd(DisasContext *ctx, arg_c_fsw_sd *a)
- {
- #ifdef TARGET_RISCV32
+     TCGv_i32 t0;
+@@ -1669,9 +1532,6 @@ static void decode_RV32_64G(CPURISCVState *env, DisasContext *ctx)
+         gen_fp_store(ctx, MASK_OP_FP_STORE(ctx->opcode), rs1, rs2,
+                      GET_STORE_IMM(ctx->opcode));
+         break;
+-    case OPC_RISC_ATOMIC:
+-        gen_atomic(ctx, MASK_OP_ATOMIC(ctx->opcode), rd, rs1, rs2);
+-        break;
+     case OPC_RISC_FMADD:
+         gen_fp_fmadd(ctx, MASK_OP_FP_FMADD(ctx->opcode), rd, rs1, rs2,
+                      GET_RS3(ctx->opcode), GET_RM(ctx->opcode));
 -- 
 2.19.1
