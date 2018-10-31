@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56220)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <afaerber@suse.de>) id 1gHn28-0007vn-Uf
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 05:43:29 -0400
+	(envelope-from <tgfbeta@icloud.com>) id 1gHjwt-0000Jd-Pf
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 02:25:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <afaerber@suse.de>) id 1gHn20-0000dy-2U
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 05:43:26 -0400
-Received: from mx2.suse.de ([195.135.220.15]:52046 helo=mx1.suse.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <afaerber@suse.de>) id 1gHn1y-0000ZJ-K4
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 05:43:19 -0400
-References: <20180718104836.18488-1-michael@walle.cc>
-	<20180718104836.18488-2-michael@walle.cc>
-	<190b51b02841b1259a3a35b950f01cf3@walle.cc>
-From: =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
-Message-ID: <feb4d8b6-1e10-ffd3-bac8-a09898c845eb@suse.de>
-Date: Wed, 31 Oct 2018 10:43:10 +0100
-MIME-Version: 1.0
-In-Reply-To: <190b51b02841b1259a3a35b950f01cf3@walle.cc>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+	(envelope-from <tgfbeta@icloud.com>) id 1gHjwp-0001rB-VD
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 02:25:51 -0400
+Received: from ms11p00im-qufv17100101.me.com ([17.58.37.19]:47626)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tgfbeta@icloud.com>) id 1gHjwn-0001mO-TA
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 02:25:47 -0400
+Received: from process-dkim-sign-daemon.ms11p00im-qufv17100101.me.com by
+	ms11p00im-qufv17100101.me.com
+	(Oracle Communications Messaging Server 8.0.2.2.20180531 64bit (built
+	May 31 2018)) id <0PHG003009HOT900@ms11p00im-qufv17100101.me.com> for
+	qemu-devel@nongnu.org; Wed, 31 Oct 2018 06:25:29 +0000 (GMT)
+From: Chen Zhang <tgfbeta@icloud.com>
+Date: Wed, 31 Oct 2018 06:24:56 +0000 (GMT)
+Message-id: <bf58421d-e1be-4e42-b155-cb4faa366b98@me.com>
+MIME-version: 1.0
+Content-Type: text/plain;
+    charset=utf-8;
+    format=flowed
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/3] qtest: new functions for pulsed IRQs
+Subject: [Qemu-devel] =?utf-8?q?=5BPATCH=5D_gtk=3A_Fix_mouse_offset_in_sca?=
+ =?utf-8?q?led_gtk-gl_display_for_VFIO/iGVT-g_DMA_Buf_mode?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,161 +32,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Walle <michael@walle.cc>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-Am 31.10.18 um 09:31 schrieb Michael Walle:
-> Am 2018-07-18 12:48, schrieb Michael Walle:
->> It is only possible to retrieve the current state of an interrupt
->> line. But
->> there are devices which just pulses the interrupt line. Introduce a la=
-tch
->> which is set by qtest and which can be cleared by the test case.
->>
->> Signed-off-by: Michael Walle <michael@walle.cc>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Cc: Andreas F=C3=A4rber <afaerber@suse.de>
->=20
-> Hi,
->=20
-> unfortunately, there was never any feedback. Are you ok with this patch
-> in general? There is still one patch for an additional test case in my
-> queue, which depends on this.
-
-No objection from my side, but Paolo may be a better reviewer for irq.
-
-Regards,
-Andreas
-
->=20
-> -michael
->=20
->> ---
->> =C2=A0tests/libqtest.c | 19 +++++++++++++++++++
->> =C2=A0tests/libqtest.h | 40 ++++++++++++++++++++++++++++++++++++++++
->> =C2=A02 files changed, 59 insertions(+)
->>
->> diff --git a/tests/libqtest.c b/tests/libqtest.c
->> index 098af6aec4..85e1f6f92a 100644
->> --- a/tests/libqtest.c
->> +++ b/tests/libqtest.c
->> @@ -40,6 +40,7 @@ struct QTestState
->> =C2=A0=C2=A0=C2=A0=C2=A0 int fd;
->> =C2=A0=C2=A0=C2=A0=C2=A0 int qmp_fd;
->> =C2=A0=C2=A0=C2=A0=C2=A0 bool irq_level[MAX_IRQ];
->> +=C2=A0=C2=A0=C2=A0 bool irq_latch[MAX_IRQ];
->> =C2=A0=C2=A0=C2=A0=C2=A0 GString *rx;
->> =C2=A0=C2=A0=C2=A0=C2=A0 pid_t qemu_pid;=C2=A0 /* our child QEMU proce=
-ss */
->> =C2=A0=C2=A0=C2=A0=C2=A0 bool big_endian;
->> @@ -233,6 +234,7 @@ QTestState *qtest_init_without_qmp_handshake(bool
->> use_oob,
->> =C2=A0=C2=A0=C2=A0=C2=A0 s->rx =3D g_string_new("");
->> =C2=A0=C2=A0=C2=A0=C2=A0 for (i =3D 0; i < MAX_IRQ; i++) {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->irq_level[i] =3D f=
-alse;
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->irq_latch[i] =3D false;
->> =C2=A0=C2=A0=C2=A0=C2=A0 }
->>
->> =C2=A0=C2=A0=C2=A0=C2=A0 if (getenv("QTEST_STOP")) {
->> @@ -386,6 +388,7 @@ redo:
->>
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (strcmp(words[1], =
-"raise") =3D=3D 0) {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- s->irq_level[irq] =3D true;
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s-=
->irq_latch[irq] =3D true;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- s->irq_level[irq] =3D false;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> @@ -678,6 +681,22 @@ bool qtest_get_irq(QTestState *s, int num)
->> =C2=A0=C2=A0=C2=A0=C2=A0 return s->irq_level[num];
->> =C2=A0}
->>
->> +bool qtest_get_irq_latched(QTestState *s, int num)
->> +{
->> +=C2=A0=C2=A0=C2=A0 g_assert_cmpint(num, <, MAX_IRQ);
->> +
->> +=C2=A0=C2=A0=C2=A0 /* dummy operation in order to make sure irq is up=
- to date */
->> +=C2=A0=C2=A0=C2=A0 qtest_inb(s, 0);
->> +
->> +=C2=A0=C2=A0=C2=A0 return s->irq_latch[num];
->> +}
->> +
->> +void qtest_clear_irq_latch(QTestState *s, int num)
->> +{
->> +=C2=A0=C2=A0=C2=A0 g_assert_cmpint(num, <, MAX_IRQ);
->> +=C2=A0=C2=A0=C2=A0 s->irq_latch[num] =3D false;
->> +}
->> +
->> =C2=A0static int64_t qtest_clock_rsp(QTestState *s)
->> =C2=A0{
->> =C2=A0=C2=A0=C2=A0=C2=A0 gchar **words;
->> diff --git a/tests/libqtest.h b/tests/libqtest.h
->> index ac52872cbe..721dd50863 100644
->> --- a/tests/libqtest.h
->> +++ b/tests/libqtest.h
->> @@ -192,6 +192,24 @@ char *qtest_hmpv(QTestState *s, const char *fmt,
->> va_list ap);
->> =C2=A0bool qtest_get_irq(QTestState *s, int num);
->>
->> =C2=A0/**
->> + * qtest_get_irq_latched:
->> + * @s: #QTestState instance to operate on.
->> + * @num: Interrupt to observe.
->> + *
->> + * Returns: The latched state of the @num interrupt.
->> + */
->> +bool qtest_get_irq_latched(QTestState *s, int num);
->> +
->> +/**
->> + * qtest_clear_irq_latch:
->> + * @s: #QTestState instance to operate on.
->> + * @num: Interrupt to operate on.
->> + *
->> + * Clears the latch of the @num interrupt.
->> + */
->> +void qtest_clear_irq_latch(QTestState *s, int num);
->> +
->> +/**
->> =C2=A0 * qtest_irq_intercept_in:
->> =C2=A0 * @s: #QTestState instance to operate on.
->> =C2=A0 * @string: QOM path of a device.
->> @@ -638,6 +656,28 @@ static inline bool get_irq(int num)
->> =C2=A0}
->>
->> =C2=A0/**
->> + * get_irq_latched:
->> + * @num: Interrupt to observe.
->> + *
->> + * Returns: The latched level of the @num interrupt.
->> + */
->> +static inline bool get_irq_latched(int num)
->> +{
->> +=C2=A0=C2=A0=C2=A0 return qtest_get_irq_latched(global_qtest, num);
->> +}
->> +
->> +/**
->> + * clear_irq_latch:
->> + * @num: Interrupt to operate on.
->> + *
->> + * Clears the latch of the @num interrupt.
->> + */
->> +static inline void clear_irq_latch(int num)
->> +{
->> +=C2=A0=C2=A0=C2=A0 return qtest_clear_irq_latch(global_qtest, num);
->> +}
->> +
->> +/**
->> =C2=A0 * irq_intercept_in:
->> =C2=A0 * @string: QOM path of a device.
->> =C2=A0 *
-
-
---=20
-SUSE Linux GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, Germany
-GF: Felix Imend=C3=B6rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N=C3=BCrnberg)
+The issue was reported as in=C2=A0https://bugs.launchpad.net/qemu/+bug/179=
+3859=0A=0AWhen an OpenGL accelerated GTK window is used for iGVT-g DMA Buf=
+ device,=0Awindow scaling would cause guest cursor to move in undesirable =
+velocity.=0A=0ATo fix this usability issue, the gtk mouse motion events wa=
+s modified to=0Ascale the position of event to match the coordinates=C2=A0=
+of the scaled GL=0Asurface.=0A=0ASigned-off-by: Chen Zhang <tgfbeta@me.com=
+>=0A---=0A=C2=A0ui/gtk-egl.c | 10 +++++++---=0A=C2=A0ui/gtk.c =C2=A0 =C2=A0=
+ | 19 +++++++++++++------=0A=C2=A02 files changed, 20 insertions(+), 9 del=
+etions(-)=0A=0Adiff --git a/ui/gtk-egl.c b/ui/gtk-egl.c=0Aindex a77c25b..8=
+24beed 100644=0A--- a/ui/gtk-egl.c=0A+++ b/ui/gtk-egl.c=0A@@ -231,9 +231,1=
+3 @@ void gd_egl_cursor_position(DisplayChangeListener *dcl,=0A=C2=A0=C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 uint32_t pos_x, uint32_t pos_y)=0A=C2=A0{=0A=C2=A0=C2=A0=
+ =C2=A0 VirtualConsole *vc =3D container_of(dcl, VirtualConsole, gfx.dcl);=
+=0A-=0A-=C2=A0 =C2=A0 vc->gfx.cursor_x =3D pos_x;=0A-=C2=A0 =C2=A0 vc->gfx=
+.cursor_y =3D pos_y;=0A+=C2=A0 =C2=A0 uint32_t sw =3D surface_width(vc->gf=
+x.ds);=0A+=C2=A0 =C2=A0 uint32_t sh =3D surface_height(vc->gfx.ds);=0A+=C2=
+=A0 =C2=A0 GdkWindow *window =3D gtk_widget_get_window(vc->gfx.drawing_are=
+a);=0A+=C2=A0 =C2=A0 uint32_t ww =3D gdk_window_get_width(window);=0A+=C2=A0=
+ =C2=A0 uint32_t wh =3D gdk_window_get_height(window);=0A+=C2=A0 =C2=A0 vc=
+->gfx.cursor_x =3D pos_x * ww / sw;=0A+=C2=A0 =C2=A0 vc->gfx.cursor_y =3D =
+pos_y * wh / sh;=0A=C2=A0}=0A=C2=A0=0A=C2=A0void gd_egl_release_dmabuf(Dis=
+playChangeListener *dcl,=0Adiff --git a/ui/gtk.c b/ui/gtk.c=0Aindex 579990=
+b..41c82e5 100644=0A--- a/ui/gtk.c=0A+++ b/ui/gtk.c=0A@@ -875,20 +875,27 @=
+@ static gboolean gd_motion_event(GtkWidget *widget, GdkEventMotion *motio=
+n,=0A=C2=A0=C2=A0 =C2=A0 x =3D (motion->x - mx) / vc->gfx.scale_x;=0A=C2=A0=
+=C2=A0 =C2=A0 y =3D (motion->y - my) / vc->gfx.scale_y;=0A=C2=A0=0A+=C2=A0=
+ =C2=A0 bool scaled =3D display_opengl && !gtk_use_gl_area && s->free_scal=
+e;=0A=C2=A0=C2=A0 =C2=A0 if (qemu_input_is_absolute()) {=0A+=C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 int max_w =3D scaled ? ww : surface_width(vc->gfx.ds);=0A+=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 int max_h =3D scaled ? wh : surface_height(vc->gf=
+x.ds);=0A=C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (x < 0 || y < 0 ||=0A-=C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 x >=3D surface_width(vc->gfx.ds) ||=0A=
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 y >=3D surface_height(vc->gfx.d=
+s)) {=0A+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 x >=3D max_w ||=0A+=C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 y >=3D max_h) {=0A=C2=A0=C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 return TRUE;=0A=C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ }=0A=C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_input_queue_abs(vc->gfx.dcl.co=
+n, INPUT_AXIS_X, x,=0A- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0, surface_width(vc->gfx.ds)=
+);=0A+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 0, max_w);=0A=C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ qemu_input_queue_abs(vc->gfx.dcl.con, INPUT_AXIS_Y, y,=0A- =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 0, surface_height(vc->gfx.ds));=0A+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0, max_=
+h);=0A=C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_input_event_sync();=0A=C2=A0=C2=
+=A0 =C2=A0 } else if (s->last_set && s->ptr_owner =3D=3D vc) {=0A-=C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 qemu_input_queue_rel(vc->gfx.dcl.con, INPUT_AXIS_X, x - =
+s->last_x);=0A-=C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_input_queue_rel(vc->gfx.dc=
+l.con, INPUT_AXIS_Y, y - s->last_y);=0A+=C2=A0 =C2=A0 =C2=A0 =C2=A0 int di=
+ff_x =3D scaled=0A+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ? (x - s->las=
+t_x) * surface_width(vc->gfx.ds) / ww : (x - s->last_x);=0A+=C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 int diff_y =3D scaled=0A+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 ? (y - s->last_y) * surface_height(vc->gfx.ds) / wh : (y - s->last_=
+y);=0A+=C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_input_queue_rel(vc->gfx.dcl.con, I=
+NPUT_AXIS_X, diff_x);=0A+=C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_input_queue_rel(=
+vc->gfx.dcl.con, INPUT_AXIS_Y, diff_y);=0A=C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ qemu_input_event_sync();=0A=C2=A0=C2=A0 =C2=A0 }=0A=C2=A0=C2=A0 =C2=A0 s-=
+>last_x =3D x;=0A--=C2=A0=0A2.7.4
