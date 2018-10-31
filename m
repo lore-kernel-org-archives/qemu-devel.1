@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34606)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34676)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gHom2-0003Lm-Dl
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 07:35:01 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gHom8-0003O7-4w
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 07:35:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gHolw-0001HZ-9K
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 07:34:56 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gHom1-0001NI-US
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 07:35:02 -0400
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Wed, 31 Oct 2018 11:34:48 +0000
-Message-ID: <20181031113418.29796-4-anton.nefedov@virtuozzo.com>
+Date: Wed, 31 Oct 2018 11:34:51 +0000
+Message-ID: <20181031113418.29796-5-anton.nefedov@virtuozzo.com>
 References: <20181031113418.29796-1-anton.nefedov@virtuozzo.com>
 In-Reply-To: <20181031113418.29796-1-anton.nefedov@virtuozzo.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v5 3/9] block: add empty account cookie type
+Subject: [Qemu-devel] [PATCH v5 4/9] ide: account UNMAP (TRIM) operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,62 +26,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "famz@redhat.com" <famz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-This adds some protection from accounting unitialized cookie.
-That is, block_acct_failed/done without previous block_acct_start;
-in that case, cookie probably holds values from previous operation.
-
-(Note: it might also be unitialized holding garbage value and there is
- still "< BLOCK_MAX_IOTYPE" assertion for that.
- So block_acct_failed/done without previous block_acct_start should be used
- with caution.)
-
-Currently this is particularly useful in ide code where it's hard to
-keep track whether the request started accounting or not. For example,
-trim requests do the accounting separately.
-
 Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
 ---
- include/block/accounting.h | 1 +
- block/accounting.c         | 6 ++++++
- 2 files changed, 7 insertions(+)
+ hw/ide/core.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/include/block/accounting.h b/include/block/accounting.h
-index ba8b04d572..878b4c3581 100644
---- a/include/block/accounting.h
-+++ b/include/block/accounting.h
-@@ -33,6 +33,7 @@ typedef struct BlockAcctTimedStats BlockAcctTimedStats;
- typedef struct BlockAcctStats BlockAcctStats;
+diff --git a/hw/ide/core.c b/hw/ide/core.c
+index 04e22e751d..8da77ff3e3 100644
+--- a/hw/ide/core.c
++++ b/hw/ide/core.c
+@@ -441,6 +441,14 @@ static void ide_issue_trim_cb(void *opaque, int ret)
+     TrimAIOCB *iocb =3D opaque;
+     IDEState *s =3D iocb->s;
 =20
- enum BlockAcctType {
-+    BLOCK_ACCT_NONE =3D 0,
-     BLOCK_ACCT_READ,
-     BLOCK_ACCT_WRITE,
-     BLOCK_ACCT_FLUSH,
-diff --git a/block/accounting.c b/block/accounting.c
-index 70a3d9a426..8d41c8a83a 100644
---- a/block/accounting.c
-+++ b/block/accounting.c
-@@ -195,6 +195,10 @@ static void block_account_one_io(BlockAcctStats *stats=
-, BlockAcctCookie *cookie,
-=20
-     assert(cookie->type < BLOCK_MAX_IOTYPE);
-=20
-+    if (cookie->type =3D=3D BLOCK_ACCT_NONE) {
-+        return;
++    if (iocb->i >=3D 0) {
++        if (ret >=3D 0) {
++            block_acct_done(blk_get_stats(s->blk), &s->acct);
++        } else {
++            block_acct_failed(blk_get_stats(s->blk), &s->acct);
++        }
 +    }
 +
-     qemu_mutex_lock(&stats->lock);
+     if (ret >=3D 0) {
+         while (iocb->j < iocb->qiov->niov) {
+             int j =3D iocb->j;
+@@ -458,10 +466,14 @@ static void ide_issue_trim_cb(void *opaque, int ret)
+                 }
 =20
-     if (failed) {
-@@ -217,6 +221,8 @@ static void block_account_one_io(BlockAcctStats *stats,=
- BlockAcctCookie *cookie,
-     }
+                 if (!ide_sect_range_ok(s, sector, count)) {
++                    block_acct_invalid(blk_get_stats(s->blk), BLOCK_ACCT_U=
+NMAP);
+                     iocb->ret =3D -EINVAL;
+                     goto done;
+                 }
 =20
-     qemu_mutex_unlock(&stats->lock);
++                block_acct_start(blk_get_stats(s->blk), &s->acct,
++                                 count << BDRV_SECTOR_BITS, BLOCK_ACCT_UNM=
+AP);
 +
-+    cookie->type =3D BLOCK_ACCT_NONE;
- }
-=20
- void block_acct_done(BlockAcctStats *stats, BlockAcctCookie *cookie)
+                 /* Got an entry! Submit and exit.  */
+                 iocb->aiocb =3D blk_aio_pdiscard(s->blk,
+                                                sector << BDRV_SECTOR_BITS,
 --=20
 2.17.1
