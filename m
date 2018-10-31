@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47078)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gHpPK-0003ah-TT
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 08:15:35 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1gHpOn-00034G-92
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 08:15:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gHpPE-0003SJ-OL
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 08:15:32 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:38712)
+	(envelope-from <richard.henderson@linaro.org>) id 1gHpOj-0002fb-6X
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 08:15:01 -0400
+Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:54403)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gHpPA-00033U-7W
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 08:15:27 -0400
-Received: by mail-wr1-x443.google.com with SMTP id d10-v6so16237366wrs.5
-	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 05:15:20 -0700 (PDT)
-References: <20181025144644.15464-1-cota@braap.org>
-	<20181025144644.15464-16-cota@braap.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181025144644.15464-16-cota@braap.org>
-Date: Wed, 31 Oct 2018 12:15:17 +0000
-Message-ID: <87a7mu8g8a.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v4 16/71] arm: convert to cpu_halted
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gHpOf-0002Pb-Ed
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 08:14:55 -0400
+Received: by mail-wm1-x331.google.com with SMTP id r63-v6so14918818wma.4
+	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 05:14:47 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Wed, 31 Oct 2018 12:14:41 +0000
+Message-Id: <20181031121443.605-2-richard.henderson@linaro.org>
+In-Reply-To: <20181031121443.605-1-richard.henderson@linaro.org>
+References: <20181031121443.605-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH v2 1/3] decodetree: Add !extern flag to
+ argument sets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,132 +27,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: kbastian@mail.uni-paderborn.de
 
+Allow argument sets to be shared between two decoders by avoiding
+a re-declaration error.  Make sure that anonymous argument sets
+and anonymous formats have unique names.
 
-Emilio G. Cota <cota@braap.org> writes:
+Reviewed-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ scripts/decodetree.py | 34 +++++++++++++++++++++++-----------
+ 1 file changed, 23 insertions(+), 11 deletions(-)
 
-> Cc: Andrzej Zaborowski <balrogg@gmail.com>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: qemu-arm@nongnu.org
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  hw/arm/omap1.c            | 4 ++--
->  hw/arm/pxa2xx_gpio.c      | 2 +-
->  hw/arm/pxa2xx_pic.c       | 2 +-
->  target/arm/arm-powerctl.c | 4 ++--
->  target/arm/cpu.c          | 2 +-
->  target/arm/op_helper.c    | 2 +-
->  6 files changed, 8 insertions(+), 8 deletions(-)
->
-> diff --git a/hw/arm/omap1.c b/hw/arm/omap1.c
-> index 539d29ef9c..55a7672976 100644
-> --- a/hw/arm/omap1.c
-> +++ b/hw/arm/omap1.c
-> @@ -1769,7 +1769,7 @@ static uint64_t omap_clkdsp_read(void *opaque, hwad=
-dr addr,
->      case 0x18:	/* DSP_SYSST */
->          cpu =3D CPU(s->cpu);
->          return (s->clkm.clocking_scheme << 11) | s->clkm.cold_start |
-> -                (cpu->halted << 6);      /* Quite useless... */
-> +                (cpu_halted(cpu) << 6);      /* Quite useless... */
->      }
->
->      OMAP_BAD_REG(addr);
-> @@ -3790,7 +3790,7 @@ void omap_mpu_wakeup(void *opaque, int irq, int req)
->      struct omap_mpu_state_s *mpu =3D (struct omap_mpu_state_s *) opaque;
->      CPUState *cpu =3D CPU(mpu->cpu);
->
-> -    if (cpu->halted) {
-> +    if (cpu_halted(cpu)) {
->          cpu_interrupt(cpu, CPU_INTERRUPT_EXITTB);
->      }
->  }
-> diff --git a/hw/arm/pxa2xx_gpio.c b/hw/arm/pxa2xx_gpio.c
-> index e15070188e..5c3fea42e9 100644
-> --- a/hw/arm/pxa2xx_gpio.c
-> +++ b/hw/arm/pxa2xx_gpio.c
-> @@ -128,7 +128,7 @@ static void pxa2xx_gpio_set(void *opaque, int line, i=
-nt level)
->          pxa2xx_gpio_irq_update(s);
->
->      /* Wake-up GPIOs */
-> -    if (cpu->halted && (mask & ~s->dir[bank] & pxa2xx_gpio_wake[bank])) {
-> +    if (cpu_halted(cpu) && (mask & ~s->dir[bank] & pxa2xx_gpio_wake[bank=
-])) {
->          cpu_interrupt(cpu, CPU_INTERRUPT_EXITTB);
->      }
->  }
-> diff --git a/hw/arm/pxa2xx_pic.c b/hw/arm/pxa2xx_pic.c
-> index 61275fa040..46ab4c3fc2 100644
-> --- a/hw/arm/pxa2xx_pic.c
-> +++ b/hw/arm/pxa2xx_pic.c
-> @@ -58,7 +58,7 @@ static void pxa2xx_pic_update(void *opaque)
->      PXA2xxPICState *s =3D (PXA2xxPICState *) opaque;
->      CPUState *cpu =3D CPU(s->cpu);
->
-> -    if (cpu->halted) {
-> +    if (cpu_halted(cpu)) {
->          mask[0] =3D s->int_pending[0] & (s->int_enabled[0] | s->int_idle=
-);
->          mask[1] =3D s->int_pending[1] & (s->int_enabled[1] | s->int_idle=
-);
->          if (mask[0] || mask[1]) {
-> diff --git a/target/arm/arm-powerctl.c b/target/arm/arm-powerctl.c
-> index ce55eeb682..e4477444fc 100644
-> --- a/target/arm/arm-powerctl.c
-> +++ b/target/arm/arm-powerctl.c
-> @@ -64,7 +64,7 @@ static void arm_set_cpu_on_async_work(CPUState *target_=
-cpu_state,
->
->      /* Initialize the cpu we are turning on */
->      cpu_reset(target_cpu_state);
-> -    target_cpu_state->halted =3D 0;
-> +    cpu_halted_set(target_cpu_state, 0);
->
->      if (info->target_aa64) {
->          if ((info->target_el < 3) && arm_feature(&target_cpu->env,
-> @@ -228,7 +228,7 @@ static void arm_set_cpu_off_async_work(CPUState *targ=
-et_cpu_state,
->
->      assert(qemu_mutex_iothread_locked());
->      target_cpu->power_state =3D PSCI_OFF;
-> -    target_cpu_state->halted =3D 1;
-> +    cpu_halted_set(target_cpu_state, 1);
->      target_cpu_state->exception_index =3D EXCP_HLT;
->  }
->
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index b5e61cc177..9c5cda8eb7 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -149,7 +149,7 @@ static void arm_cpu_reset(CPUState *s)
->      env->vfp.xregs[ARM_VFP_MVFR2] =3D cpu->mvfr2;
->
->      cpu->power_state =3D cpu->start_powered_off ? PSCI_OFF : PSCI_ON;
-> -    s->halted =3D cpu->start_powered_off;
-> +    cpu_halted_set(s, cpu->start_powered_off);
->
->      if (arm_feature(env, ARM_FEATURE_IWMMXT)) {
->          env->iwmmxt.cregs[ARM_IWMMXT_wCID] =3D 0x69051000 | 'Q';
-> diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-> index fb15a13e6c..8e393823f8 100644
-> --- a/target/arm/op_helper.c
-> +++ b/target/arm/op_helper.c
-> @@ -465,7 +465,7 @@ void HELPER(wfi)(CPUARMState *env, uint32_t insn_len)
->      }
->
->      cs->exception_index =3D EXCP_HLT;
-> -    cs->halted =3D 1;
-> +    cpu_halted_set(cs, 1);
->      cpu_loop_exit(cs);
->  }
-
-
---
-Alex Benn=C3=A9e
+diff --git a/scripts/decodetree.py b/scripts/decodetree.py
+index 457cffea90..28bbd4e3c1 100755
+--- a/scripts/decodetree.py
++++ b/scripts/decodetree.py
+@@ -63,13 +63,16 @@
+ #
+ # *** Argument set syntax:
+ #
+-# args_def    := '&' identifier ( args_elt )+
++# args_def    := '&' identifier ( args_elt )+ ( !extern )?
+ # args_elt    := identifier
+ #
+ # Each args_elt defines an argument within the argument set.
+ # Each argument set will be rendered as a C structure "arg_$name"
+ # with each of the fields being one of the member arguments.
+ #
++# If !extern is specified, the backing structure is assumed to
++# have been already declared, typically via a second decoder.
++#
+ # Argument set examples:
+ #
+ #   &reg3       ra rb rc
+@@ -167,6 +170,7 @@ input_file = ''
+ output_file = None
+ output_fd = None
+ insntype = 'uint32_t'
++decode_function = 'decode'
+ 
+ re_ident = '[a-zA-Z][a-zA-Z0-9_]*'
+ 
+@@ -392,8 +396,9 @@ class FunctionField:
+ 
+ class Arguments:
+     """Class representing the extracted fields of a format"""
+-    def __init__(self, nm, flds):
++    def __init__(self, nm, flds, extern):
+         self.name = nm
++        self.extern = extern
+         self.fields = sorted(flds)
+ 
+     def __str__(self):
+@@ -403,10 +408,11 @@ class Arguments:
+         return 'arg_' + self.name
+ 
+     def output_def(self):
+-        output('typedef struct {\n')
+-        for n in self.fields:
+-            output('    int ', n, ';\n')
+-        output('} ', self.struct_name(), ';\n\n')
++        if not self.extern:
++            output('typedef struct {\n')
++            for n in self.fields:
++                output('    int ', n, ';\n')
++            output('} ', self.struct_name(), ';\n\n')
+ # end Arguments
+ 
+ 
+@@ -540,7 +546,11 @@ def parse_arguments(lineno, name, toks):
+     global re_ident
+ 
+     flds = []
++    extern = False
+     for t in toks:
++        if re_fullmatch('!extern', t):
++            extern = True
++            continue
+         if not re_fullmatch(re_ident, t):
+             error(lineno, 'invalid argument set token "{0}"'.format(t))
+         if t in flds:
+@@ -549,7 +559,7 @@ def parse_arguments(lineno, name, toks):
+ 
+     if name in arguments:
+         error(lineno, 'duplicate argument set', name)
+-    arguments[name] = Arguments(name, flds)
++    arguments[name] = Arguments(name, flds, extern)
+ # end parse_arguments
+ 
+ 
+@@ -573,13 +583,14 @@ def add_field_byname(lineno, flds, new_name, old_name):
+ 
+ def infer_argument_set(flds):
+     global arguments
++    global decode_function
+ 
+     for arg in arguments.values():
+         if eq_fields_for_args(flds, arg.fields):
+             return arg
+ 
+-    name = str(len(arguments))
+-    arg = Arguments(name, flds.keys())
++    name = decode_function + str(len(arguments))
++    arg = Arguments(name, flds.keys(), False)
+     arguments[name] = arg
+     return arg
+ 
+@@ -587,6 +598,7 @@ def infer_argument_set(flds):
+ def infer_format(arg, fieldmask, flds):
+     global arguments
+     global formats
++    global decode_function
+ 
+     const_flds = {}
+     var_flds = {}
+@@ -606,7 +618,7 @@ def infer_format(arg, fieldmask, flds):
+             continue
+         return (fmt, const_flds)
+ 
+-    name = 'Fmt_' + str(len(formats))
++    name = decode_function + '_Fmt_' + str(len(formats))
+     if not arg:
+         arg = infer_argument_set(flds)
+ 
+@@ -971,8 +983,8 @@ def main():
+     global insnwidth
+     global insntype
+     global insnmask
++    global decode_function
+ 
+-    decode_function = 'decode'
+     decode_scope = 'static '
+ 
+     long_opts = ['decode=', 'translate=', 'output=', 'insnwidth=']
+-- 
+2.17.2
