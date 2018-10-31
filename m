@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gHrjh-0002W2-55
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:44:46 -0400
+	(envelope-from <abologna@redhat.com>) id 1gHrqI-0000mx-MF
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:51:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gHrje-0002lP-PG
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:44:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:18435)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gHrjc-0002hs-O2
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:44:41 -0400
-References: <20180718104836.18488-1-michael@walle.cc>
-	<20180718104836.18488-2-michael@walle.cc>
-	<34069906-b8f8-05da-477e-b2b81fc0fd58@redhat.com>
-	<dcf671031ff70a7a18b65f5f7dd79f64@walle.cc>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <bf798e0a-0031-90ca-216c-c7364745b9bf@redhat.com>
-Date: Wed, 31 Oct 2018 15:44:35 +0100
-MIME-Version: 1.0
-In-Reply-To: <dcf671031ff70a7a18b65f5f7dd79f64@walle.cc>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/3] qtest: new functions for pulsed IRQs
+	(envelope-from <abologna@redhat.com>) id 1gHrqH-0006Lg-Ix
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:51:34 -0400
+Message-ID: <3f834825634e34ad107fe9e7af1b417cb47fc1f1.camel@redhat.com>
+From: Andrea Bolognani <abologna@redhat.com>
+Date: Wed, 31 Oct 2018 15:51:25 +0100
+In-Reply-To: <cover.1540937826.git.alistair.francis@wdc.com>
+References: <cover.1540937826.git.alistair.francis@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 0/5] Connect a PCIe host and graphics
+ support to RISC-V
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,24 +23,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Walle <michael@walle.cc>
-Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
+To: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
+Cc: "alistair23@gmail.com" <alistair23@gmail.com>
 
-On 31/10/2018 15:30, Michael Walle wrote:
->>
->> Just one thing, I think an atomic test-and-clear is a better API.=C2=A0=
- I
->> understand that what you have works, because
->> get_irq_latched+clear_irq_latch don't have any intervening access to t=
-he
->> qtest socket.
->=20
-> Ok thanks, like get_and_clear_irq_latched()? Do you think of we still
-> need the get_irq_latched() to get the state without actually clearing
-> it? I mean my simple test case won't need it, but there might be some
-> cases where you may want peek at the state.
+On Tue, 2018-10-30 at 22:17 +0000, Alistair Francis wrote:
+> V6:
+>  - Fix the interrupt issue for the GPEX device
 
-Maybe - it's easy enough to add it, so if your test doesn't need it you
-can certainly leave it out.
+I gave this a spin.
 
-Paolo
+With the pcie.0 <- pcie-root-port <- virtio-net-pci setup I get
+
+  qemu-system-riscv64: -device pcie-root-port,port=0x8,chassis=1,\
+  id=pci.1,bus=pcie.0,multifunction=on,addr=0x1: MSI-X is not \
+  supported by interrupt controller
+
+just like last time, which as I mentioned is a problem for libvirt
+because we follow the recommendations outlined in qemu/docs/pcie.txt
+and never plug devices into pcie.0 directly.
+
+Even after working around that issue by manually placing the device
+at 0000:00:01.0, it still doesn't work: I see
+
+  pci 0000:00:01.0: BAR 6: assigned [mem 0x00000000-0x0003ffff pref]
+  pci 0000:00:01.0: BAR 4: assigned [mem 0x00040000-0x00043fff 64bit pref]
+  pci 0000:00:01.0: BAR 0: no space for [io  size 0x0020]
+  pci 0000:00:01.0: BAR 0: failed to assign [io  size 0x0020]
+  ...
+  virtio_net virtio3: virtio: device uses modern interface but does not have VIRTIO_F_VERSION_1
+  virtio_net: probe of virtio3 failed with error -22
+
+in dmesg and, while the device shows up in the output of lspci(8),
+it's nowhere to be seen when running 'ip addr' and friends.
+
+Let me know if you need me to try anything else :)
+
+-- 
+Andrea Bolognani / Red Hat / Virtualization
