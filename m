@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49521)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50505)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gHmi9-0000zG-Cg
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 05:22:50 -0400
+	(envelope-from <stefanha@redhat.com>) id 1gHmlN-0003hu-HG
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 05:26:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gHmi8-0003vX-II
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 05:22:49 -0400
-Date: Wed, 31 Oct 2018 10:22:36 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20181031102236.21fd9564.cohuck@redhat.com>
-In-Reply-To: <20181030231545.GY3902@habkost.net>
-References: <20181030111348.14713-1-kraxel@redhat.com>
-	<20181030111348.14713-2-kraxel@redhat.com>
-	<8c224534-c929-7c7f-a126-a9390bbdb77f@redhat.com>
-	<20181030140030.gh5aa7jcgszrfajs@sirius.home.kraxel.org>
-	<6fd9e9f8-838a-a13c-e957-a8e6bcb74c42@redhat.com>
-	<20181030164633.2c8f21d3.cohuck@redhat.com>
-	<74a8ecef-18c0-d55d-4b29-7ed6c6b57537@redhat.com>
-	<20181030231545.GY3902@habkost.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/4] add QemuSupportState
+	(envelope-from <stefanha@redhat.com>) id 1gHmlC-0005sZ-Py
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 05:26:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35962)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gHmlB-0005WE-Uc
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 05:25:58 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Wed, 31 Oct 2018 08:43:09 +0000
+Message-Id: <20181031084309.9227-5-stefanha@redhat.com>
+In-Reply-To: <20181031084309.9227-1-stefanha@redhat.com>
+References: <20181031084309.9227-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PATCH 4/4] gitmodules: use 'https://' instead of
+ 'git://'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,72 +24,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Alexander Graf <agraf@suse.de>, "Michael S.
-	Tsirkin" <mst@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, =?UTF-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
+Cc: Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Daniel Berrange <berrange@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Tue, 30 Oct 2018 20:15:45 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+When you clone the repository without previous commit history, 'git://'
+doesn't protect from man-in-the-middle attacks.  HTTPS is more secure
+since the client verifies the server certificate.
 
-> On Tue, Oct 30, 2018 at 06:37:42PM +0100, Philippe Mathieu-Daud=C3=A9 wro=
-te:
-> > If I understand correctly, we have this 'state machine':
-> >=20
-> >    Supported            Unsupported          Deprecated
-> >=20
-> > (someone to talk)     (nobody to talk)  (scheduled for removal)
-> > +--------------+       +------------+      +--------------+
-> > | S:Maintained |       | S:Unknown  |      |              |
-> > |              |       |            |      |              |
-> > | S:Supported  + <---> | S:Orphan   +----> | S:Deprecated +----> Removed
-> > |              |       |            |      |              |
-> > | S:Odd Fixes  |       | S:Obsolete |      |              |
-> > +------+-------+       +------------+      +--------------+
-> >        |                                           ^
-> >        |                                           |
-> >        +-------------------------------------------+
+Also change git.qemu-project.org to git.qemu.org (we control both domain
+names but qemu.org is used more widely).
 
-I believe we can also take things out of the deprecated state again,
-but I would expect that to be a very rare event.
+Reported-by: Jann Horn <jannh@google.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ .gitmodules | 34 +++++++++++++++++-----------------
+ 1 file changed, 17 insertions(+), 17 deletions(-)
 
-'Obsolete' is probably 'unsupported' in the 'do not use that' sense,
-but there still might be someone to talk to.
-
-Similarly, 'unknown' devices etc. may have someone we can talk to, it's
-just the problem of finding out who that is and getting them to move it
-into the 'supported' state :)
-
-> >=20
-> > So we have 3 distinct states.
-> >=20
-> > Note:
-> > - Maintainers can deprecate stuffs
-
-It's not only maintainers that can do that, but it has to get their
-ack, of course.
-
-> > - Orphan code can become Supported
-> > - Once scheduled for removal, there is no way back
-
-We should not block the way back, or else we cannot adapt to things we
-did not know when we first deprecated it.
-
-> > - 'Unknown' seems pretty similar to 'Orphan'. =20
-
-Not quite. If something is 'orphan', it was explicitly moved to that
-state when a maintainer gave it up. 'Unknown' may also be stuff that
-simply fell through the cracks.
-
->=20
-> I'm still worried that the supported/unsupported distinction may
-> cause unnecessary hassle for every downstream distributor of
-> QEMU.  Do we really have a need to differentiate supported vs
-> unsupported device types at runtime?
->=20
-> I'd prefer to make support/unsupported differentiation to be a
-> build system feature (e.g. a CONFIG_UNSUPPORTED build-time
-> option) instead of a QMP/runtime feature.
-
-I think that makes sense -- we really want to single out
-devices/machines that are deprecated and will go away unless
-something magic happens.
+diff --git a/.gitmodules b/.gitmodules
+index a48d2a764c..6b91176098 100644
+--- a/.gitmodules
++++ b/.gitmodules
+@@ -1,51 +1,51 @@
+ [submodule "roms/seabios"]
+ 	path = roms/seabios
+-	url = git://git.qemu-project.org/seabios.git/
++	url = https://git.qemu.org/git/seabios.git/
+ [submodule "roms/SLOF"]
+ 	path = roms/SLOF
+-	url = git://git.qemu-project.org/SLOF.git
++	url = https://git.qemu.org/git/SLOF.git
+ [submodule "roms/ipxe"]
+ 	path = roms/ipxe
+-	url = git://git.qemu-project.org/ipxe.git
++	url = https://git.qemu.org/git/ipxe.git
+ [submodule "roms/openbios"]
+ 	path = roms/openbios
+-	url = git://git.qemu-project.org/openbios.git
++	url = https://git.qemu.org/git/openbios.git
+ [submodule "roms/openhackware"]
+ 	path = roms/openhackware
+-	url = git://git.qemu-project.org/openhackware.git
++	url = https://git.qemu.org/git/openhackware.git
+ [submodule "roms/qemu-palcode"]
+ 	path = roms/qemu-palcode
+-	url = git://git.qemu.org/qemu-palcode.git
++	url = https://git.qemu.org/git/qemu-palcode.git
+ [submodule "roms/sgabios"]
+ 	path = roms/sgabios
+-	url = git://git.qemu-project.org/sgabios.git
++	url = https://git.qemu.org/git/sgabios.git
+ [submodule "dtc"]
+ 	path = dtc
+-	url = git://git.qemu-project.org/dtc.git
++	url = https://git.qemu.org/git/dtc.git
+ [submodule "roms/u-boot"]
+ 	path = roms/u-boot
+-	url = git://git.qemu-project.org/u-boot.git
++	url = https://git.qemu.org/git/u-boot.git
+ [submodule "roms/skiboot"]
+ 	path = roms/skiboot
+-	url = git://git.qemu.org/skiboot.git
++	url = https://git.qemu.org/git/skiboot.git
+ [submodule "roms/QemuMacDrivers"]
+ 	path = roms/QemuMacDrivers
+-	url = git://git.qemu.org/QemuMacDrivers.git
++	url = https://git.qemu.org/git/QemuMacDrivers.git
+ [submodule "ui/keycodemapdb"]
+ 	path = ui/keycodemapdb
+-	url = git://git.qemu.org/keycodemapdb.git
++	url = https://git.qemu.org/git/keycodemapdb.git
+ [submodule "capstone"]
+ 	path = capstone
+-	url = git://git.qemu.org/capstone.git
++	url = https://git.qemu.org/git/capstone.git
+ [submodule "roms/seabios-hppa"]
+ 	path = roms/seabios-hppa
+-	url = git://github.com/hdeller/seabios-hppa.git
++	url = https://github.com/hdeller/seabios-hppa.git
+ [submodule "roms/u-boot-sam460ex"]
+ 	path = roms/u-boot-sam460ex
+-	url = git://git.qemu.org/u-boot-sam460ex.git
++	url = https://git.qemu.org/git/u-boot-sam460ex.git
+ [submodule "tests/fp/berkeley-testfloat-3"]
+ 	path = tests/fp/berkeley-testfloat-3
+-	url = git://github.com/cota/berkeley-testfloat-3
++	url = https://github.com/cota/berkeley-testfloat-3
+ [submodule "tests/fp/berkeley-softfloat-3"]
+ 	path = tests/fp/berkeley-softfloat-3
+-	url = git://github.com/cota/berkeley-softfloat-3
++	url = https://github.com/cota/berkeley-softfloat-3
+-- 
+2.17.2
