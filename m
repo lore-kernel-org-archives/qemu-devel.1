@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33644)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33690)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHrMx-0001CC-VA
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:21:19 -0400
+	(envelope-from <flukshun@gmail.com>) id 1gHrNM-0001U2-UB
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:21:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHrMs-0007N0-C3
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:21:14 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:39522)
+	(envelope-from <flukshun@gmail.com>) id 1gHrNF-0007Yv-OW
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:21:40 -0400
+Received: from mail-ot1-x330.google.com ([2607:f8b0:4864:20::330]:44769)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHrMs-0007Ly-5c
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:21:10 -0400
-Received: by mail-oi1-x244.google.com with SMTP id e3-v6so13739958oiy.6
-	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 07:21:09 -0700 (PDT)
+	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHrND-0007Tg-9L
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:21:31 -0400
+Received: by mail-ot1-x330.google.com with SMTP id p23so14663960otf.11
+	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 07:21:20 -0700 (PDT)
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Wed, 31 Oct 2018 09:19:04 -0500
-Message-Id: <20181031141925.30026-4-mdroth@linux.vnet.ibm.com>
+Date: Wed, 31 Oct 2018 09:19:09 -0500
+Message-Id: <20181031141925.30026-9-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20181031141925.30026-1-mdroth@linux.vnet.ibm.com>
 References: <20181031141925.30026-1-mdroth@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v3 03/24] qga: ignore non present cpus when
- handling qmp_guest_get_vcpus()
+Subject: [Qemu-devel] [PULL v3 08/24] qga-win: fsinfo: pci-info: allow
+ partial info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,178 +31,139 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Igor Mammedov <imammedo@redhat.com>
+Cc: peter.maydell@linaro.org, Sameeh Jubran <sjubran@redhat.com>, =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
 
-From: Igor Mammedov <imammedo@redhat.com>
+From: Sameeh Jubran <sjubran@redhat.com>
 
-If VM has VCPUs plugged sparselly (for example a VM started with
-3 VCPUs (cpu0, cpu1 and cpu2) and then cpu1 was hotunplugged so
-only cpu0 and cpu2 are present), QGA will rise a error
-  error: internal error: unable to execute QEMU agent command 'guest-get-vcpus':
-  open("/sys/devices/system/cpu/cpu1/"): No such file or directory
-when
-  virsh vcpucount FOO --guest
-is executed.
-Fix it by ignoring non present CPUs when fetching CPUs status from sysfs.
+The call to SetupDiGetDeviceRegistryProperty might fail because the
+value doesn't exist in the registry, in this case we shouldn't exit from
+the loop but instead continue to look for other available values in the
+registry and set this value as unavailable (-1).
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Sameeh Jubran <sjubran@redhat.com>
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
+*squash in fix for when get_pci_info() returns NULL pci_controller field
+*fix handling for error_set() cases in get_pci_info(), not just NULL return
+*force all -1 PCI addr fields if any single one of them isn't found
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- qga/commands-posix.c | 115 ++++++++++++++++++++++---------------------
- 1 file changed, 59 insertions(+), 56 deletions(-)
+ qga/commands-win32.c | 46 +++++++++++++++++++++++++++++++-------------
+ 1 file changed, 33 insertions(+), 13 deletions(-)
 
-diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-index 37e8a2d791..42d30f078e 100644
---- a/qga/commands-posix.c
-+++ b/qga/commands-posix.c
-@@ -2035,61 +2035,56 @@ static long sysconf_exact(int name, const char *name_str, Error **errp)
-  * Written members remain unmodified on error.
-  */
- static void transfer_vcpu(GuestLogicalProcessor *vcpu, bool sys2vcpu,
--                          Error **errp)
-+                          char *dirpath, Error **errp)
- {
--    char *dirpath;
-+    int fd;
-+    int res;
-     int dirfd;
-+    static const char fn[] = "online";
+diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+index f0e6f6128b..4fe1517778 100644
+--- a/qga/commands-win32.c
++++ b/qga/commands-win32.c
+@@ -499,6 +499,7 @@ static GuestPCIAddress *get_pci_info(char *guid, Error **errp)
+     char *buffer = NULL;
+     GuestPCIAddress *pci = NULL;
+     char *name = g_strdup(&guid[4]);
++    bool partial_pci = false;
+     pci = g_malloc0(sizeof(*pci));
+     pci->domain = -1;
+     pci->slot = -1;
+@@ -519,7 +520,8 @@ static GuestPCIAddress *get_pci_info(char *guid, Error **errp)
  
--    dirpath = g_strdup_printf("/sys/devices/system/cpu/cpu%" PRId64 "/",
--                              vcpu->logical_id);
-     dirfd = open(dirpath, O_RDONLY | O_DIRECTORY);
-     if (dirfd == -1) {
-         error_setg_errno(errp, errno, "open(\"%s\")", dirpath);
--    } else {
--        static const char fn[] = "online";
--        int fd;
--        int res;
--
--        fd = openat(dirfd, fn, sys2vcpu ? O_RDONLY : O_RDWR);
--        if (fd == -1) {
--            if (errno != ENOENT) {
--                error_setg_errno(errp, errno, "open(\"%s/%s\")", dirpath, fn);
--            } else if (sys2vcpu) {
--                vcpu->online = true;
--                vcpu->can_offline = false;
--            } else if (!vcpu->online) {
--                error_setg(errp, "logical processor #%" PRId64 " can't be "
--                           "offlined", vcpu->logical_id);
--            } /* otherwise pretend successful re-onlining */
--        } else {
--            unsigned char status;
--
--            res = pread(fd, &status, 1, 0);
--            if (res == -1) {
--                error_setg_errno(errp, errno, "pread(\"%s/%s\")", dirpath, fn);
--            } else if (res == 0) {
--                error_setg(errp, "pread(\"%s/%s\"): unexpected EOF", dirpath,
--                           fn);
--            } else if (sys2vcpu) {
--                vcpu->online = (status != '0');
--                vcpu->can_offline = true;
--            } else if (vcpu->online != (status != '0')) {
--                status = '0' + vcpu->online;
--                if (pwrite(fd, &status, 1, 0) == -1) {
--                    error_setg_errno(errp, errno, "pwrite(\"%s/%s\")", dirpath,
--                                     fn);
--                }
--            } /* otherwise pretend successful re-(on|off)-lining */
-+        return;
-+    }
- 
--            res = close(fd);
--            g_assert(res == 0);
--        }
-+    fd = openat(dirfd, fn, sys2vcpu ? O_RDONLY : O_RDWR);
-+    if (fd == -1) {
-+        if (errno != ENOENT) {
-+            error_setg_errno(errp, errno, "open(\"%s/%s\")", dirpath, fn);
-+        } else if (sys2vcpu) {
-+            vcpu->online = true;
-+            vcpu->can_offline = false;
-+        } else if (!vcpu->online) {
-+            error_setg(errp, "logical processor #%" PRId64 " can't be "
-+                       "offlined", vcpu->logical_id);
-+        } /* otherwise pretend successful re-onlining */
-+    } else {
-+        unsigned char status;
-+
-+        res = pread(fd, &status, 1, 0);
-+        if (res == -1) {
-+            error_setg_errno(errp, errno, "pread(\"%s/%s\")", dirpath, fn);
-+        } else if (res == 0) {
-+            error_setg(errp, "pread(\"%s/%s\"): unexpected EOF", dirpath,
-+                       fn);
-+        } else if (sys2vcpu) {
-+            vcpu->online = (status != '0');
-+            vcpu->can_offline = true;
-+        } else if (vcpu->online != (status != '0')) {
-+            status = '0' + vcpu->online;
-+            if (pwrite(fd, &status, 1, 0) == -1) {
-+                error_setg_errno(errp, errno, "pwrite(\"%s/%s\")", dirpath,
-+                                 fn);
-+            }
-+        } /* otherwise pretend successful re-(on|off)-lining */
- 
--        res = close(dirfd);
-+        res = close(fd);
-         g_assert(res == 0);
-     }
- 
--    g_free(dirpath);
-+    res = close(dirfd);
-+    g_assert(res == 0);
- }
- 
- GuestLogicalProcessorList *qmp_guest_get_vcpus(Error **errp)
-@@ -2107,17 +2102,21 @@ GuestLogicalProcessorList *qmp_guest_get_vcpus(Error **errp)
-     while (local_err == NULL && current < sc_max) {
-         GuestLogicalProcessor *vcpu;
-         GuestLogicalProcessorList *entry;
--
--        vcpu = g_malloc0(sizeof *vcpu);
--        vcpu->logical_id = current++;
--        vcpu->has_can_offline = true; /* lolspeak ftw */
--        transfer_vcpu(vcpu, true, &local_err);
--
--        entry = g_malloc0(sizeof *entry);
--        entry->value = vcpu;
--
--        *link = entry;
--        link = &entry->next;
-+        int64_t id = current++;
-+        char *path = g_strdup_printf("/sys/devices/system/cpu/cpu%" PRId64 "/",
-+                                     id);
-+
-+        if (g_file_test(path, G_FILE_TEST_EXISTS)) {
-+            vcpu = g_malloc0(sizeof *vcpu);
-+            vcpu->logical_id = id;
-+            vcpu->has_can_offline = true; /* lolspeak ftw */
-+            transfer_vcpu(vcpu, true, path, &local_err);
-+            entry = g_malloc0(sizeof *entry);
-+            entry->value = vcpu;
-+            *link = entry;
-+            link = &entry->next;
-+        }
-+        g_free(path);
-     }
- 
-     if (local_err == NULL) {
-@@ -2138,7 +2137,11 @@ int64_t qmp_guest_set_vcpus(GuestLogicalProcessorList *vcpus, Error **errp)
- 
-     processed = 0;
-     while (vcpus != NULL) {
--        transfer_vcpu(vcpus->value, false, &local_err);
-+        char *path = g_strdup_printf("/sys/devices/system/cpu/cpu%" PRId64 "/",
-+                                     vcpus->value->logical_id);
-+
-+        transfer_vcpu(vcpus->value, false, path, &local_err);
-+        g_free(path);
-         if (local_err != NULL) {
-             break;
+     dev_info_data.cbSize = sizeof(SP_DEVINFO_DATA);
+     for (i = 0; SetupDiEnumDeviceInfo(dev_info, i, &dev_info_data); i++) {
+-        DWORD addr, bus, slot, func, dev, data, size2;
++        DWORD addr, bus, slot, data, size2;
++        int func, dev;
+         while (!SetupDiGetDeviceRegistryProperty(dev_info, &dev_info_data,
+                                             SPDRP_PHYSICAL_DEVICE_OBJECT_NAME,
+                                             &data, (PBYTE)buffer, size,
+@@ -549,21 +551,24 @@ static GuestPCIAddress *get_pci_info(char *guid, Error **errp)
+          */
+         if (!SetupDiGetDeviceRegistryProperty(dev_info, &dev_info_data,
+                    SPDRP_BUSNUMBER, &data, (PBYTE)&bus, size, NULL)) {
+-            break;
++            bus = -1;
++            partial_pci = true;
          }
+ 
+         /* The function retrieves the device's address. This value will be
+          * transformed into device function and number */
+         if (!SetupDiGetDeviceRegistryProperty(dev_info, &dev_info_data,
+                    SPDRP_ADDRESS, &data, (PBYTE)&addr, size, NULL)) {
+-            break;
++            addr = -1;
++            partial_pci = true;
+         }
+ 
+         /* This call returns UINumber of DEVICE_CAPABILITIES structure.
+          * This number is typically a user-perceived slot number. */
+         if (!SetupDiGetDeviceRegistryProperty(dev_info, &dev_info_data,
+                    SPDRP_UI_NUMBER, &data, (PBYTE)&slot, size, NULL)) {
+-            break;
++            slot = -1;
++            partial_pci = true;
+         }
+ 
+         /* SetupApi gives us the same information as driver with
+@@ -573,12 +578,19 @@ static GuestPCIAddress *get_pci_info(char *guid, Error **errp)
+          * DeviceNumber = (USHORT)(((propertyAddress) >> 16) & 0x0000FFFF);
+          * SPDRP_ADDRESS is propertyAddress, so we do the same.*/
+ 
+-        func = addr & 0x0000FFFF;
+-        dev = (addr >> 16) & 0x0000FFFF;
+-        pci->domain = dev;
+-        pci->slot = slot;
+-        pci->function = func;
+-        pci->bus = bus;
++        if (partial_pci) {
++            pci->domain = -1;
++            pci->slot = -1;
++            pci->function = -1;
++            pci->bus = -1;
++        } else {
++            func = ((int) addr == -1) ? -1 : addr & 0x0000FFFF;
++            dev = ((int) addr == -1) ? -1 : (addr >> 16) & 0x0000FFFF;
++            pci->domain = dev;
++            pci->slot = (int) slot;
++            pci->function = func;
++            pci->bus = (int) bus;
++        }
+         break;
+     }
+ 
+@@ -622,6 +634,7 @@ static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
+     DWORD len;
+     int bus;
+     HANDLE vol_h;
++    Error *local_err = NULL;
+ 
+     scsi_ad = &addr;
+     char *name = g_strndup(guid, strlen(guid)-1);
+@@ -640,6 +653,16 @@ static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
+ 
+     disk = g_malloc0(sizeof(*disk));
+     disk->bus_type = find_bus_type(bus);
++    /* always set pci_controller as required by schema. get_pci_info() should
++     * report -1 values for non-PCI buses rather than fail. fail the command
++     * if that doesn't hold since that suggests some other unexpected
++     * breakage
++     */
++    disk->pci_controller = get_pci_info(name, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        goto out_close;
++    }
+     if (bus == BusTypeScsi || bus == BusTypeAta || bus == BusTypeRAID
+ #if (_WIN32_WINNT >= 0x0600)
+             /* This bus type is not supported before Windows Server 2003 SP1 */
+@@ -654,12 +677,9 @@ static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
+             disk->unit = addr.Lun;
+             disk->target = addr.TargetId;
+             disk->bus = addr.PathId;
+-            disk->pci_controller = get_pci_info(name, errp);
+         }
+         /* We do not set error in this case, because we still have enough
+          * information about volume. */
+-    } else {
+-         disk->pci_controller = NULL;
+     }
+ 
+     list = g_malloc0(sizeof(*list));
 -- 
 2.17.1
