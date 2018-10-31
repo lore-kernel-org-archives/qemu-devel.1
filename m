@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35948)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gHx2A-0006d7-An
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 16:24:11 -0400
+	(envelope-from <alistair23@gmail.com>) id 1gHx4B-0007p9-Ff
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 16:26:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gHx26-0000Fc-Fh
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 16:24:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34474)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gHx24-0000F5-Dj
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 16:24:04 -0400
-Date: Wed, 31 Oct 2018 17:23:51 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181031202351.GD30771@habkost.net>
-References: <20181030150453.9344-1-marcandre.lureau@redhat.com>
-	<20181030150453.9344-8-marcandre.lureau@redhat.com>
+	(envelope-from <alistair23@gmail.com>) id 1gHx48-0000lZ-6i
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 16:26:15 -0400
+References: <20181031132029.4887-1-kbastian@mail.uni-paderborn.de>
+	<20181031132029.4887-6-kbastian@mail.uni-paderborn.de>
+From: Alistair <alistair23@gmail.com>
+Message-ID: <a9587cb7-3c4f-2d0c-6651-99cd122f4a75@gmail.com>
+Date: Wed, 31 Oct 2018 13:26:07 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20181030150453.9344-8-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 07/10] qom/object: add set_globals flags
+In-Reply-To: <20181031132029.4887-6-kbastian@mail.uni-paderborn.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 05/35] target/riscv: Convert RV64I
+ load/store insns to decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,128 +25,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Amit Shah <amit@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, dgilbert@redhat.com, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, mjc@sifive.com, sagark@eecs.berkeley.edu, palmer@sifive.com, Alistair.Francis@wdc.com
+Cc: qemu-riscv@nongnu.org, peer.adelt@hni.uni-paderborn.de, richard.henderson@linaro.org, qemu-devel@nongnu.org
 
-On Tue, Oct 30, 2018 at 07:04:50PM +0400, Marc-Andr=E9 Lureau wrote:
-> Guard against calling object_property_set_globals() for all objects,
-> check that the class flag set_globals is set before. No need to guard
-> in object_property_set_globals() anymore.
->=20
-> Only QDev & user-creatable objects have set_globals set at this point.
->=20
-> Suggested-by: Igor Mammedov <imammedo@redhat.com>
-> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+On 10/31/18 6:19 AM, Bastian Koppelmann wrote:
+> this splits the 64-bit only instructions into its own decode file such
+> that we generate the decoder for these instructions only for the RISC-V
+> 64 bit target.
+> 
+> Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+> Signed-off-by: Peer Adelt <peer.adelt@hni.uni-paderborn.de>
 
-Should we squash this into patch 06/10?
+Acked-by: Alistair Francis <alistair.francis@wdc.com>
 
-The object_property_set_globals() hunk could be squashed into
-patch 05/10.
+Alistair
 
 > ---
->  include/qom/object.h    | 1 +
->  hw/core/qdev.c          | 1 +
->  qom/globals.c           | 5 -----
->  qom/object.c            | 5 ++++-
->  qom/object_interfaces.c | 7 +++++++
->  5 files changed, 13 insertions(+), 6 deletions(-)
->=20
-> diff --git a/include/qom/object.h b/include/qom/object.h
-> index f0b0bf39cc..205099bc7e 100644
-> --- a/include/qom/object.h
-> +++ b/include/qom/object.h
-> @@ -400,6 +400,7 @@ struct ObjectClass
->      ObjectUnparent *unparent;
-> =20
->      GHashTable *properties;
-> +    bool set_globals;
->  };
-> =20
->  /**
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index 6a25fa027c..78ce9a3095 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -1042,6 +1042,7 @@ static void device_class_init(ObjectClass *class,=
- void *data)
->       */
->      dc->hotpluggable =3D true;
->      dc->user_creatable =3D true;
-> +    class->set_globals =3D true;
->  }
-> =20
->  void device_class_set_parent_reset(DeviceClass *dc,
-> diff --git a/qom/globals.c b/qom/globals.c
-> index 8664baebe0..e94e6f2bf9 100644
-> --- a/qom/globals.c
-> +++ b/qom/globals.c
-> @@ -18,11 +18,6 @@ void object_property_set_globals(Object *obj)
->      GList *l;
->      DeviceState *dev =3D (DeviceState *)object_dynamic_cast(obj, TYPE_=
-DEVICE);
-> =20
-> -    if (!dev && !IS_USER_CREATABLE(obj)) {
-> -        /* only TYPE_DEVICE and TYPE_USER_CREATABLE support globals */
-> -        return;
-> -    }
-> -
->      for (l =3D global_props; l; l =3D l->next) {
->          GlobalProperty *prop =3D l->data;
->          Error *err =3D NULL;
-> diff --git a/qom/object.c b/qom/object.c
-> index 7300878125..c18e630159 100644
-> --- a/qom/object.c
-> +++ b/qom/object.c
-> @@ -259,6 +259,7 @@ static void type_initialize_interface(TypeImpl *ti,=
- TypeImpl *interface_type,
-> =20
->      ti->class->interfaces =3D g_slist_append(ti->class->interfaces,
->                                             iface_impl->class);
-> +    ti->class->set_globals |=3D iface_impl->class->set_globals;
->  }
-> =20
->  static void object_property_free(gpointer data)
-> @@ -391,7 +392,9 @@ static void object_initialize_with_type(void *data,=
- size_t size, TypeImpl *type)
->                                              NULL, object_property_free=
-);
->      object_init_with_type(obj, type);
->      object_post_init_with_type(obj, type);
-> -    object_property_set_globals(obj);
-> +    if (object_get_class(obj)->set_globals) {
-> +        object_property_set_globals(obj);
-> +    }
->  }
-> =20
->  void object_initialize(void *data, size_t size, const char *typename)
-> diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
-> index db85d1eb75..67886845e7 100644
-> --- a/qom/object_interfaces.c
-> +++ b/qom/object_interfaces.c
-> @@ -184,12 +184,19 @@ void user_creatable_cleanup(void)
->      object_unparent(object_get_objects_root());
->  }
-> =20
-> +static void user_creatable_class_init(ObjectClass *klass, void *data)
+>   target/riscv/Makefile.objs              |  8 +++++---
+>   target/riscv/insn64.decode              | 25 +++++++++++++++++++++++++
+>   target/riscv/insn_trans/trans_rvi.inc.c | 20 ++++++++++++++++++++
+>   target/riscv/translate.c                |  7 -------
+>   4 files changed, 50 insertions(+), 10 deletions(-)
+>   create mode 100644 target/riscv/insn64.decode
+> 
+> diff --git a/target/riscv/Makefile.objs b/target/riscv/Makefile.objs
+> index ee995b3fc7..b9b8152cc2 100644
+> --- a/target/riscv/Makefile.objs
+> +++ b/target/riscv/Makefile.objs
+> @@ -2,10 +2,12 @@ obj-y += translate.o op_helper.o cpu_helper.o cpu.o fpu_helper.o gdbstub.o pmp.o
+>   
+>   DECODETREE = $(SRC_PATH)/scripts/decodetree.py
+>   
+> -target/riscv/decode_insn32.inc.c: \
+> -  $(SRC_PATH)/target/riscv/insn32.decode $(DECODETREE)
+> +decode32-y = $(SRC_PATH)/target/riscv/insn32.decode
+> +decode32-$(TARGET_RISCV64) += $(SRC_PATH)/target/riscv/insn64.decode
+> +
+> +target/riscv/decode_insn32.inc.c: $(decode32-y) $(DECODETREE)
+>   	$(call quiet-command, \
+> -	  $(PYTHON) $(DECODETREE) -o $@ --decode decode_insn32 $<, \
+> +	  $(PYTHON) $(DECODETREE) -o $@ --decode decode_insn32 $(decode32-y), \
+>   	  "GEN", $(TARGET_DIR)$@)
+>   
+>   target/riscv/translate.o: target/riscv/decode_insn32.inc.c
+> diff --git a/target/riscv/insn64.decode b/target/riscv/insn64.decode
+> new file mode 100644
+> index 0000000000..439d4e2c58
+> --- /dev/null
+> +++ b/target/riscv/insn64.decode
+> @@ -0,0 +1,25 @@
+> +#
+> +# RISC-V translation routines for the RV Instruction Set.
+> +#
+> +# Copyright (c) 2018 Peer Adelt, peer.adelt@hni.uni-paderborn.de
+> +#                    Bastian Koppelmann, kbastian@mail.uni-paderborn.de
+> +#
+> +# This program is free software; you can redistribute it and/or modify it
+> +# under the terms and conditions of the GNU General Public License,
+> +# version 2 or later, as published by the Free Software Foundation.
+> +#
+> +# This program is distributed in the hope it will be useful, but WITHOUT
+> +# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> +# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+> +# more details.
+> +#
+> +# You should have received a copy of the GNU General Public License along with
+> +# this program.  If not, see <http://www.gnu.org/licenses/>.
+> +
+> +# This is concatenated with insn32.decode for risc64 targets.
+> +# Most of the fields and formats are there.
+> +
+> +# *** RV64I Base Instruction Set (in addition to RV32I) ***
+> +lwu      ............   ..... 110 ..... 0000011 @i
+> +ld       ............   ..... 011 ..... 0000011 @i
+> +sd       ....... .....  ..... 011 ..... 0100011 @s
+> diff --git a/target/riscv/insn_trans/trans_rvi.inc.c b/target/riscv/insn_trans/trans_rvi.inc.c
+> index f3b88ebb69..39a20a70e8 100644
+> --- a/target/riscv/insn_trans/trans_rvi.inc.c
+> +++ b/target/riscv/insn_trans/trans_rvi.inc.c
+> @@ -130,3 +130,23 @@ static bool trans_sw(DisasContext *ctx, arg_sw *a)
+>       gen_store(ctx, OPC_RISC_SW, a->rs1, a->rs2, a->imm);
+>       return true;
+>   }
+> +
+> +#ifdef TARGET_RISCV64
+> +static bool trans_lwu(DisasContext *ctx, arg_lwu *a)
 > +{
-> +    klass->set_globals =3D true;
+> +    gen_load(ctx, OPC_RISC_LWU, a->rd, a->rs1, a->imm);
+> +    return true;
 > +}
 > +
+> +static bool trans_ld(DisasContext *ctx, arg_ld *a)
+> +{
+> +    gen_load(ctx, OPC_RISC_LD, a->rd, a->rs1, a->imm);
+> +    return true;
+> +}
 > +
->  static void register_types(void)
->  {
->      static const TypeInfo uc_interface_info =3D {
->          .name          =3D TYPE_USER_CREATABLE,
->          .parent        =3D TYPE_INTERFACE,
->          .class_size =3D sizeof(UserCreatableClass),
-> +        .class_init =3D user_creatable_class_init,
->      };
-> =20
->      type_register_static(&uc_interface_info);
-> --=20
-> 2.19.0.271.gfe8321ec05
->=20
->=20
-
---=20
-Eduardo
+> +static bool trans_sd(DisasContext *ctx, arg_sd *a)
+> +{
+> +    gen_store(ctx, OPC_RISC_SD, a->rs1, a->rs2, a->imm);
+> +    return true;
+> +}
+> +#endif
+> diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+> index 909f7cd013..244855c82d 100644
+> --- a/target/riscv/translate.c
+> +++ b/target/riscv/translate.c
+> @@ -1701,13 +1701,6 @@ static void decode_RV32_64G(CPURISCVState *env, DisasContext *ctx)
+>       imm = GET_IMM(ctx->opcode);
+>   
+>       switch (op) {
+> -    case OPC_RISC_LOAD:
+> -        gen_load(ctx, MASK_OP_LOAD(ctx->opcode), rd, rs1, imm);
+> -        break;
+> -    case OPC_RISC_STORE:
+> -        gen_store(ctx, MASK_OP_STORE(ctx->opcode), rs1, rs2,
+> -                  GET_STORE_IMM(ctx->opcode));
+> -        break;
+>       case OPC_RISC_ARITH_IMM:
+>   #if defined(TARGET_RISCV64)
+>       case OPC_RISC_ARITH_IMM_W:
+> 
