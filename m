@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gHu5Q-0001gv-1r
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 13:15:22 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1gHu5e-0001v6-Rp
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 13:15:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gHu5K-0006do-KP
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 13:15:17 -0400
-Date: Wed, 31 Oct 2018 18:14:53 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20181031171453.GA4715@localhost.localdomain>
-References: <20181019163013.11787-1-kwolf@redhat.com>
-	<20181019163013.11787-3-kwolf@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1gHu5Z-0006kp-4P
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 13:15:32 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:51961)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gHu5S-0006ee-3X
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 13:15:24 -0400
+Received: by mail-wm1-x344.google.com with SMTP id w7-v6so4848945wmc.1
+	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 10:15:17 -0700 (PDT)
+References: <20181031132029.4887-1-kbastian@mail.uni-paderborn.de>
+	<20181031132029.4887-7-kbastian@mail.uni-paderborn.de>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <fcac4eb9-8389-9c11-b935-d2642e59e207@linaro.org>
+Date: Wed, 31 Oct 2018 17:15:14 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181019163013.11787-3-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 02/11] block: Add auto-read-only option
+In-Reply-To: <20181031132029.4887-7-kbastian@mail.uni-paderborn.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 06/35] target/riscv: Convert RVXI
+ arithmetic insns to decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,67 +32,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: mreitz@redhat.com, eblake@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
+To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, mjc@sifive.com, sagark@eecs.berkeley.edu, palmer@sifive.com, Alistair.Francis@wdc.com
+Cc: peer.adelt@hni.uni-paderborn.de, qemu-devel@nongnu.org, qemu-riscv@nongnu.org
 
-Am 19.10.2018 um 18:30 hat Kevin Wolf geschrieben:
-> If a management application builds the block graph node by node, the
-> protocol layer doesn't inherit its read-only option from the format
-> layer any more, so it must be set explicitly.
+On 10/31/18 1:20 PM, Bastian Koppelmann wrote:
+> we cannot remove the call to gen_arith() in decode_RV32_64G() since it
+> is used to translate multiply instructions.
 > 
-> Backing files should work on read-only storage, but at the same time, a
-> block job like commit should be able to reopen them read-write if they
-> are on read-write storage. However, without option inheritance, reopen
-> only changes the read-only option for the root node (typically the
-> format layer), but not the protocol layer, so reopening fails (the
-> format layer wants to get write permissions, but the protocol layer is
-> still read-only).
+> Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+> Signed-off-by: Peer Adelt <peer.adelt@hni.uni-paderborn.de>
+> ---
+> v2 -> v3:
+>     - moved 64-bit only insn to insn64.decode
+>     - dropped insn argument of trans_foo functions
 > 
-> A simple workaround for the problem in the management tool would be to
-> open the protocol layer always read-write and to make only the format
-> layer read-only for backing files. However, sometimes the file is
-> actually stored on read-only storage and we don't know whether the image
-> can be opened read-write (for example, for NBD it depends on the server
-> we're trying to connect to). This adds an option that makes QEMU try to
-> open the image read-write, but allows it to degrade to a read-only mode
-> without returning an error.
-> 
-> The documentation for this option is consciously phrased in a way that
-> allows QEMU to switch to a better model eventually: Instead of trying
-> when the image is first opened, making the read-only flag dynamic and
-> changing it automatically whenever the first BLK_PERM_WRITE user is
-> attached or the last one is detached would be much more useful
-> behaviour.
-> 
-> Unfortunately, this more useful behaviour is also a lot harder to
-> implement, and libvirt needs a solution now before it can switch to
-> -blockdev, so let's start with this easier approach for now.
-> 
-> Instead of adding a new auto-read-only option, turning the existing
-> read-only into an enum (with a bool alternate for compatibility) was
-> considered, but it complicated the implementation to the point that it
-> didn't seem to be worth it.
-> 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+>  target/riscv/insn32.decode              |  25 ++++
+>  target/riscv/insn64.decode              |  13 ++
+>  target/riscv/insn_trans/trans_rvi.inc.c | 168 ++++++++++++++++++++++++
+>  target/riscv/translate.c                |   9 --
+>  4 files changed, 206 insertions(+), 9 deletions(-)
 
-I'm squashing in the following hunk to fix qemu-iotests 118 (not
-resetting the flag during blockdev-change-medium could result in an
-image opened read-only and then failing when attaching it to a
-read-write device - this was already an error case, but with the fix it
-keeps the nicer error mode that the old image stays inserted instead of
-ejecting it but failing to insert the replacement):
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/blockdev.c b/blockdev.c
-index c30495d035..fc8794862f 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2651,7 +2651,7 @@ void qmp_blockdev_change_medium(bool has_device, const char *device,
 
-     bdrv_flags = blk_get_open_flags_from_root_state(blk);
-     bdrv_flags &= ~(BDRV_O_TEMPORARY | BDRV_O_SNAPSHOT | BDRV_O_NO_BACKING |
--        BDRV_O_PROTOCOL);
-+        BDRV_O_PROTOCOL | BDRV_O_AUTO_RDONLY);
-
-     if (!has_read_only) {
-         read_only = BLOCKDEV_CHANGE_READ_ONLY_MODE_RETAIN;
+r~
