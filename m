@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41107)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gHrjE-0001pp-2o
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:44:16 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1gHrjh-0002W2-55
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:44:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gHrj8-0002Kr-FH
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:44:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33013)
+	(envelope-from <pbonzini@redhat.com>) id 1gHrje-0002lP-PG
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:44:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:18435)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gHrj7-0002En-5X
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:44:10 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181023152306.3123-1-david@redhat.com>
-	<20181023152306.3123-3-david@redhat.com>
-	<87zhuudw4o.fsf@dusky.pond.sub.org>
-Date: Wed, 31 Oct 2018 15:44:06 +0100
-In-Reply-To: <87zhuudw4o.fsf@dusky.pond.sub.org> (Markus Armbruster's message
-	of "Wed, 31 Oct 2018 15:32:55 +0100")
-Message-ID: <87h8h2dvm1.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gHrjc-0002hs-O2
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:44:41 -0400
+References: <20180718104836.18488-1-michael@walle.cc>
+	<20180718104836.18488-2-michael@walle.cc>
+	<34069906-b8f8-05da-477e-b2b81fc0fd58@redhat.com>
+	<dcf671031ff70a7a18b65f5f7dd79f64@walle.cc>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <bf798e0a-0031-90ca-216c-c7364745b9bf@redhat.com>
+Date: Wed, 31 Oct 2018 15:44:35 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 2/7] qapi: correctly parse uint64_t
- values from strings
+In-Reply-To: <dcf671031ff70a7a18b65f5f7dd79f64@walle.cc>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/3] qtest: new functions for pulsed IRQs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +30,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Igor Mammedov <imammedo@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Michael Walle <michael@walle.cc>
+Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
 
-Markus Armbruster <armbru@redhat.com> writes:
+On 31/10/2018 15:30, Michael Walle wrote:
+>>
+>> Just one thing, I think an atomic test-and-clear is a better API.=C2=A0=
+ I
+>> understand that what you have works, because
+>> get_irq_latched+clear_irq_latch don't have any intervening access to t=
+he
+>> qtest socket.
+>=20
+> Ok thanks, like get_and_clear_irq_latched()? Do you think of we still
+> need the get_irq_latched() to get the state without actually clearing
+> it? I mean my simple test case won't need it, but there might be some
+> cases where you may want peek at the state.
 
-> David Hildenbrand <david@redhat.com> writes:
->
->> Right now, we parse uint64_t values just like int64_t values, resulting
->> in negative values getting accepted and certain valid large numbers only
->> being representable as negative numbers. Also, reported errors indicate
->> that an int64_t is expected.
->>
->> Parse uin64_t separately. We don't have to worry about ranges.
->
-> The commit message should mention *why* we don't we have to worry about
-> ranges.
->
->>
->> E.g. we can now also specify
->>     -device nvdimm,memdev=mem1,id=nv1,addr=0xFFFFFFFFC0000000
->> Instead of only going via negative values
->>     -device nvdimm,memdev=mem1,id=nv1,addr=-0x40000000
->>
->> Resulting in the same values
->>
->> (qemu) info memory-devices
->> Memory device [nvdimm]: "nv1"
->>   addr: 0xffffffffc0000000
->>   slot: 0
->>   node: 0
->>
->
-> Suggest to mention this makes the string-input-visitor catch up with the
-> qobject-input-visitor, which got changed similarly in commit
-> 5923f85fb82.
+Maybe - it's easy enough to add it, so if your test doesn't need it you
+can certainly leave it out.
 
-One more thing: the qobject-input-visitor change also updated the
-corresponding output visitor.  Shouldn't we do the same here?
+Paolo
