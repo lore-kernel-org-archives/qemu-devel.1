@@ -1,16 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43208)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gHeQY-0002Kf-4r
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:32:09 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gHeQd-0002OC-Rm
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:32:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gHeQU-00040j-TN
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:32:04 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gHeQc-00048K-MJ
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:32:11 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Tue, 30 Oct 2018 21:31:14 -0300
-Message-Id: <20181031003120.26771-10-ehabkost@redhat.com>
+Date: Tue, 30 Oct 2018 21:31:16 -0300
+Message-Id: <20181031003120.26771-12-ehabkost@redhat.com>
 In-Reply-To: <20181031003120.26771-1-ehabkost@redhat.com>
 References: <20181031003120.26771-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 09/15] iotests: Modify imports for Python 3
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 11/15] Bootstrap Python venv for tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,84 +25,94 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Cleber Rosa <crosa@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-From: Max Reitz <mreitz@redhat.com>
+From: Cleber Rosa <crosa@redhat.com>
 
-There are two imports that need to be modified when running the iotests
-under Python 3: One is StringIO, which no longer exists; instead, the
-StringIO class comes from the io module, so import it from there (and
-use the BytesIO class for Python 2).  The other is the ConfigParser,
-which has just been renamed to configparser.
+A number of QEMU tests are written in Python, and may benefit
+from an untainted Python venv.
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
-Message-Id: <20181022135307.14398-9-mreitz@redhat.com>
+By using make rules, tests that depend on specific Python libs
+can set that rule as a requirement, along with rules that require
+the presence or installation of specific libraries.
+
+The tests/requirements.txt is supposed to contain the Python
+requirements that should be added to the venv created by check-venv.
+
+Signed-off-by: Cleber Rosa <crosa@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+Acked-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Reviewed-by: Caio Carrara <ccarrara@redhat.com>
+Message-Id: <20181018153134.8493-2-crosa@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- tests/qemu-iotests/iotests.py            | 13 +++++++++----
- tests/qemu-iotests/nbd-fault-injector.py |  7 +++++--
- 2 files changed, 14 insertions(+), 6 deletions(-)
+ tests/requirements.txt |  3 +++
+ tests/Makefile.include | 26 ++++++++++++++++++++++++++
+ 2 files changed, 29 insertions(+)
+ create mode 100644 tests/requirements.txt
 
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index 7ca94e9278..a0f35e4b68 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -29,6 +29,7 @@ import json
- import signal
- import logging
- import atexit
-+import io
- 
- sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'scripts'))
- import qtest
-@@ -681,15 +682,19 @@ def main(supported_fmts=[], supported_oses=['linux'], supported_cache_modes=[],
-     verify_platform(supported_oses)
-     verify_cache_mode(supported_cache_modes)
- 
--    # We need to filter out the time taken from the output so that qemu-iotest
--    # can reliably diff the results against master output.
--    import StringIO
-     if debug:
-         output = sys.stdout
-         verbosity = 2
-         sys.argv.remove('-d')
-     else:
--        output = StringIO.StringIO()
-+        # We need to filter out the time taken from the output so that
-+        # qemu-iotest can reliably diff the results against master output.
-+        if sys.version_info.major >= 3:
-+            output = io.StringIO()
-+        else:
-+            # io.StringIO is for unicode strings, which is not what
-+            # 2.x's test runner emits.
-+            output = io.BytesIO()
- 
-     logging.basicConfig(level=(logging.DEBUG if debug else logging.WARN))
- 
-diff --git a/tests/qemu-iotests/nbd-fault-injector.py b/tests/qemu-iotests/nbd-fault-injector.py
-index d45e2e0a6a..6b2d659dee 100755
---- a/tests/qemu-iotests/nbd-fault-injector.py
-+++ b/tests/qemu-iotests/nbd-fault-injector.py
-@@ -48,7 +48,10 @@ import sys
- import socket
- import struct
- import collections
--import ConfigParser
-+if sys.version_info.major >= 3:
-+    import configparser
-+else:
-+    import ConfigParser as configparser
- 
- FAKE_DISK_SIZE = 8 * 1024 * 1024 * 1024 # 8 GB
- 
-@@ -225,7 +228,7 @@ def parse_config(config):
-     return rules
- 
- def load_rules(filename):
--    config = ConfigParser.RawConfigParser()
-+    config = configparser.RawConfigParser()
-     with open(filename, 'rt') as f:
-         config.readfp(f, filename)
-     return parse_config(config)
--- 
+diff --git a/tests/requirements.txt b/tests/requirements.txt
+new file mode 100644
+index 0000000000..d39f9d1576
+--- /dev/null
++++ b/tests/requirements.txt
+@@ -0,0 +1,3 @@
++# Add Python module requirements, one per line, to be installed
++# in the tests/venv Python virtual environment. For more info,
++# refer to: https://pip.pypa.io/en/stable/user_guide/#id1
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index f77a495109..eabc1da2f3 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -12,6 +12,7 @@ check-help:
+ 	@echo " $(MAKE) check-block          Run block tests"
+ 	@echo " $(MAKE) check-tcg            Run TCG tests"
+ 	@echo " $(MAKE) check-report.html    Generates an HTML test report"
++	@echo " $(MAKE) check-venv           Creates a Python venv for tests"
+ 	@echo " $(MAKE) check-clean          Clean the tests"
+ 	@echo
+ 	@echo "Please note that HTML reports do not regenerate if the unit test=
+s"
+@@ -899,6 +900,30 @@ check-decodetree:
+           ./check.sh "$(PYTHON)" "$(SRC_PATH)/scripts/decodetree.py", \
+           TEST, decodetree.py)
+=20
++# Python venv for running tests
++
++.PHONY: check-venv
++
++TESTS_VENV_DIR=3D$(BUILD_DIR)/tests/venv
++TESTS_VENV_REQ=3D$(SRC_PATH)/tests/requirements.txt
++
++$(shell $(PYTHON) -c 'import sys; assert sys.version_info >=3D (3,0)' >/=
+dev/null 2>&1)
++ifeq ($(.SHELLSTATUS),0)
++$(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
++	$(call quiet-command, \
++            $(PYTHON) -m venv --system-site-packages $@, \
++            VENV, $@)
++	$(call quiet-command, \
++            $(TESTS_VENV_DIR)/bin/python -m pip -q install -r $(TESTS_VE=
+NV_REQ), \
++            PIP, $(TESTS_VENV_REQ))
++	$(call quiet-command, touch $@)
++else
++$(TESTS_VENV_DIR):
++	$(error "venv directory for tests requires Python 3")
++endif
++
++check-venv: $(TESTS_VENV_DIR)
++
+ # Consolidated targets
+=20
+ .PHONY: check-qapi-schema check-qtest check-unit check check-clean
+@@ -912,6 +937,7 @@ check-clean:
+ 	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
+ 	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(t=
+arget)-y)) $(check-qtest-generic-y))
+ 	rm -f tests/test-qapi-gen-timestamp
++	rm -rf $(TESTS_VENV_DIR)
+=20
+ clean: check-clean
+=20
+--=20
 2.18.0.rc1.1.g3f1ff2140
