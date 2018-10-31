@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57469)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gHwkC-0000PL-UL
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 16:05:40 -0400
+	(envelope-from <alistair23@gmail.com>) id 1gHwpg-0004ld-5Z
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 16:11:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gHwk5-0005W6-6s
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 16:05:32 -0400
-References: <20181030111348.14713-1-kraxel@redhat.com>
-	<20181030111348.14713-2-kraxel@redhat.com>
-	<8c224534-c929-7c7f-a126-a9390bbdb77f@redhat.com>
-	<75690654-196d-f863-c58e-d23e2b33317a@redhat.com>
-	<20181031180604.GN3902@habkost.net>
-	<4566c66e-0795-32b3-d812-0ec735e06eee@redhat.com>
-	<20181031185811.GU3902@habkost.net>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <54f20817-e5da-02d9-4f75-e17f9e8e65e3@redhat.com>
-Date: Wed, 31 Oct 2018 16:05:01 -0400
+	(envelope-from <alistair23@gmail.com>) id 1gHwpd-0008Vu-S1
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 16:11:15 -0400
 MIME-Version: 1.0
-In-Reply-To: <20181031185811.GU3902@habkost.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/4] add QemuSupportState
+References: <cover.1540937826.git.alistair.francis@wdc.com>
+	<3f834825634e34ad107fe9e7af1b417cb47fc1f1.camel@redhat.com>
+In-Reply-To: <3f834825634e34ad107fe9e7af1b417cb47fc1f1.camel@redhat.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 31 Oct 2018 13:10:43 -0700
+Message-ID: <CAKmqyKNF+tQFf50BCj91_RypYeHbnoZLvpm8gH71iW1og9uWfA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v6 0/5] Connect a PCIe host and graphics
+ support to RISC-V
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,366 +23,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+To: Andrea Bolognani <abologna@redhat.com>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-riscv@nongnu.org
 
+On Wed, Oct 31, 2018 at 7:51 AM Andrea Bolognani <abologna@redhat.com> wrote:
+>
+> On Tue, 2018-10-30 at 22:17 +0000, Alistair Francis wrote:
+> > V6:
+> >  - Fix the interrupt issue for the GPEX device
+>
+> I gave this a spin.
+>
+> With the pcie.0 <- pcie-root-port <- virtio-net-pci setup I get
+>
+>   qemu-system-riscv64: -device pcie-root-port,port=0x8,chassis=1,\
+>   id=pci.1,bus=pcie.0,multifunction=on,addr=0x1: MSI-X is not \
+>   supported by interrupt controller
+>
+> just like last time, which as I mentioned is a problem for libvirt
+> because we follow the recommendations outlined in qemu/docs/pcie.txt
+> and never plug devices into pcie.0 directly.
 
+At the moment we can't support MSI, the interrupt controller doesn't
+support MSI.
 
-On 10/31/2018 02:58 PM, Eduardo Habkost wrote:
-> On Wed, Oct 31, 2018 at 02:37:36PM -0400, John Snow wrote:
->>
->>
->> On 10/31/2018 02:06 PM, Eduardo Habkost wrote:
->>> On Wed, Oct 31, 2018 at 12:04:16PM -0400, John Snow wrote:
->>>>
->>>>
->>>> On 10/30/2018 09:32 AM, Philippe Mathieu-Daud=C3=A9 wrote:
->>>>> Hi Gerd,
->>>>>
->>>>> On 30/10/18 12:13, Gerd Hoffmann wrote:
->>>>>> Indicates support state for somerhing (device, backend, subsystem,=
- ...)
->>>>>
->>>>> "something"
->>>>>
->>>>>> in qemu.=C2=A0 Modeled roughly after the "S:" states we have in MA=
-INTANERS.
->>>>>>
->>>>>> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
->>>>>> ---
->>>>>> =C2=A0 include/qemu/support-state.h | 17 +++++++++++++++++
->>>>>> =C2=A0 util/support-state.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 | 23 +++++++++++++++++++++++
->>>>>> =C2=A0 qapi/common.json=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 16 ++++++++++++++++
->>>>>> =C2=A0 util/Makefile.objs=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 |=C2=A0 1 +
->>>>>> =C2=A0 4 files changed, 57 insertions(+)
->>>>>> =C2=A0 create mode 100644 include/qemu/support-state.h
->>>>>> =C2=A0 create mode 100644 util/support-state.c
->>>>>>
->>>>>> diff --git a/include/qemu/support-state.h b/include/qemu/support-s=
-tate.h
->>>>>> new file mode 100644
->>>>>> index 0000000000..5fd3c83eee
->>>>>> --- /dev/null
->>>>>> +++ b/include/qemu/support-state.h
->>>>>> @@ -0,0 +1,17 @@
->>>>>> +#ifndef QEMU_SUPPORT_STATE_H
->>>>>> +#define QEMU_SUPPORT_STATE_H
->>>>>> +
->>>>>> +#include "qapi/qapi-types-common.h"
->>>>>> +
->>>>>> +typedef struct QemuSupportState {
->>>>>> +=C2=A0=C2=A0=C2=A0 SupportState state;
->>>>>> +=C2=A0=C2=A0=C2=A0 const char *reason;
->>>>>> +} QemuSupportState;
->>>>>> +
->>>>>> +void qemu_warn_support_state(const char *type, const char *name,
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 QemuSupportState *state);
->>>>>> +
->>>>>> +bool qemu_is_deprecated(QemuSupportState *state);
->>>>>> +bool qemu_is_obsolete(QemuSupportState *state);
->>>>>> +
->>>>>> +#endif /* QEMU_SUPPORT_STATE_H */
->>>>>> diff --git a/util/support-state.c b/util/support-state.c
->>>>>> new file mode 100644
->>>>>> index 0000000000..7966fa0fc7
->>>>>> --- /dev/null
->>>>>> +++ b/util/support-state.c
->>>>>> @@ -0,0 +1,23 @@
->>>>>> +#include "qemu/osdep.h"
->>>>>> +#include "qemu/error-report.h"
->>>>>> +#include "qemu/support-state.h"
->>>>>> +
->>>>>> +void qemu_warn_support_state(const char *type, const char *name,
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 QemuSupportState *state)
->>>>>> +{
->>>>>> +=C2=A0=C2=A0=C2=A0 warn_report("%s %s is %s%s%s%s", type, name,
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 SupportState_str(state->state),
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 state->reason ? " ("=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 : "",
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 state->reason ? state->reason : "",
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 state->reason ? ")"=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 : "");
->>>>>> +}
->>>>>> +
->>>>>> +bool qemu_is_deprecated(QemuSupportState *state)
->>>>>> +{
->>>>>> +=C2=A0=C2=A0=C2=A0 return state->state =3D=3D SUPPORT_STATE_DEPRE=
-CATED;
->>>>>> +}
->>>>>> +
->>>>>> +bool qemu_is_obsolete(QemuSupportState *state)
->>>>>> +{
->>>>>> +=C2=A0=C2=A0=C2=A0 return state->state =3D=3D SUPPORT_STATE_OBSOL=
-ETE;
->>>>>> +}
->>>>>> diff --git a/qapi/common.json b/qapi/common.json
->>>>>> index 021174f04e..78176151af 100644
->>>>>> --- a/qapi/common.json
->>>>>> +++ b/qapi/common.json
->>>>>> @@ -151,3 +151,19 @@
->>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 'ppc64', 'riscv32', 'riscv64', 's390x', 'sh4',
->>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 'sh4eb', 'sparc', 'sparc64', 'tricore', 'unicore32',
->>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 'x86_64', 'xtensa', 'xtensaeb' ] }
->>>>>> +
->>>>>> +##
->>>>>> +# @SupportState:
->>>>>> +#
->>>>>> +# Indicate Support level of qemu devices, backends, subsystems, .=
-..
->>>>>> +#
->>>>>> +# Since: 3.2
->>>>>> +##
->>>>>> +{ 'enum': 'SupportState',
->>>>>> +=C2=A0 'data': [ 'unknown',
->>>>>
->>>>> 'unknown' is scary and should be fixed.
->>>>>
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- 'supported',
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- 'maintained',
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- 'odd-fixes',
->>>>>
->>>>> All those fit in 'supported'
->>>>>
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- 'orphan',
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- 'obsolete',
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- 'deprecated' ] }
->>>>>
->>>>> And all those should appear as 'deprecated' IMHO.
->>>>>
->>>>
->>>> You've covered it a bit below, but I think we need more than "suppor=
-ted"
->>>> and "deprecated" -- at *least* a third state "unsupported" is requir=
-ed, IMO:
->>>>
->>>> - Supported: We expect this to work. We test this component. We will
->>>> ship CVE fixes in a timely manner for this component. You are, as a
->>>> user, using something that is cared for and you may rely on us to ca=
-re
->>>> for it.
->>>>
->>>> - Unsupported: We expect this to work, but nobody is tending to it
->>>> actively. It might be perfectly OK, but the tests and support may be
->>>> lacking. Try not to rely on this in an enterprise environment unless=
- you
->>>> have resources to devote to caring for it personally. I'd count thin=
-gs
->>>> like Raspberry Pi boards in this category: they work, usually, but n=
-ot
->>>> fully. Some people are working on them, but they're not ready for pr=
-ime
->>>> time usage.
->>>
->>> I wonder: do we need a distinction between code that's
->>> unsupported and expected to be removed in the next versions of
->>> QEMU, and code that's unsupported but not planned to be removed
->>> yet?
->>>
->>
->> I maybe should not have used the word deprecated, which I think
->> obfuscates the code quality metric we might be trying to convey: even
->> top-notch, first-tier support code can be deprecated in favor of some
->> newer, better model.
->>
->> So let's not use it for these purposes: as you suggest, even deprecate=
-d
->> code should be compiled because it hasn't been removed *yet*, and it
->> serves explicitly as a transitional stage.
->>
->>
->> I just really want to paint a difference between... say,
->>
->> "stuff that maybe works, but isn't tier 1" and
->> "stuff that probably doesn't work without some elbow grease."
->>
->> I'm just having a hard time coming up with a hard metric to
->> differentiate the two, but I can't shake the feeling that "SUPPORTED" =
-vs
->> "UNSUPPORTED" is just simply too strict of a binary.
->>
->> In my mental model, it's three tiers:
->>
->> A: First-class support.
->> B: Proceed with caution.
->> C: Experimental/Development ONLY.
->>
->> As a stoplight, it'd be:
->>
->> GREEN: Expected to work. Well cared for and tested.
->>
->> YELLOW: Some problems, but expected either to transition to green
->> (maintainer willing), OR be deprecated/removed. At a code quality leve=
-l
->> where non-developers should try using it and report bugs. These device=
-s
->> might work well for certain use cases but aren't fully implemented yet
->> and could break.
->>
->> RED: Broken. Kept in the code base for development reasons; e.g. new
->> ARM/SoC models that are in development, but are known to not work yet.
->> People who are not developers should not waste their time trying to us=
-e
->> them to accomplish real work yet.
->>
->>
->> That's kind of the granularity I have in mind, but I don't know if it'=
-s
->> practical to grade everything on so fuzzy a scale to begin with. I'd
->> suggest as a first pass marking everything either as YELLOW or RED to
->> suggest "SUPPORTED" vs "UNSUPPORTED", and then individually making the
->> case for specific components to be promoted to GREEN.
->>
->> --js
->>
->>>>
->>>> - Deprecated: This used to work, or used to be maintained, but has b=
-een
->>>> superseded or is otherwise scheduled to be removed -- the expectatio=
-n is
->>>> that this device will get worse, not better. The device model may be
->>>> known to be incorrect, there may be major bugs, and it receives litt=
-le
->>>> to no care or maintenance. Actively avoid using in an enterprise con=
-text.
->>>>
->>>> The idea being that there is definitely a difference between obvious=
-ly
->>>> and wholly broken components that we're working on replacing or gett=
-ing
->>>> rid of, and components that are "in beta" or partially functional, a=
-nd
->>>> those that are full, "tier 1" supported subsystems.
->>>
->>> I agree there's a difference between unsupported and supported
->>> code.
->>>
->>> But I'd say that making this a build time option is a must (as
->>> many distributions would wish to disable unsupported code at
->>> build time).  Making the information available at runtime is just
->>> nice to have.
->>>
->>
->> Oh, yes, it must absolutely be build-time. In my three-tier example, I
->> would expect downstream distributions like Fedora to compile out the
->> RED/C-TIER immediately. For something like RHEL, they might compile ou=
-t
->> the YELLOW/B-TIER as well.
->>
->> Some use cases might want to compile out RED but leave YELLOW as some
->> run-time warning or run-time error ("please use --use-shoddy-parts if
->> you wish to use %%ramshackle_device%% ...")
->>
->> I think what this buys us is confidence that despite QEMU's very wide
->> scope, we can quickly see both in code and at run-time that we're not
->> using something we shouldn't be, or misunderstanding the relative
->> quality of the parts we're building our virtual machine from.
->>
->> Having conservative green/yellow lists might help reduce the "search
->> space" for documentation and help more users arrive at "good"
->> configurations by default.
->=20
-> Right, I think we are on the same page here.
->=20
-> Now, support/stability status and deprecation/removal status seem
-> to be independent variables.  It's perfectly valid to say "this
-> device is expected to be removed in the future, you need to
-> update your configuration" and "this device is expected to be
-> stable and we support it" at the same time.  Let's not mix up
-> both.
->=20
+>
+> Even after working around that issue by manually placing the device
+> at 0000:00:01.0, it still doesn't work: I see
+>
+>   pci 0000:00:01.0: BAR 6: assigned [mem 0x00000000-0x0003ffff pref]
+>   pci 0000:00:01.0: BAR 4: assigned [mem 0x00040000-0x00043fff 64bit pref]
+>   pci 0000:00:01.0: BAR 0: no space for [io  size 0x0020]
+>   pci 0000:00:01.0: BAR 0: failed to assign [io  size 0x0020]
+>   ...
+>   virtio_net virtio3: virtio: device uses modern interface but does not have VIRTIO_F_VERSION_1
+>   virtio_net: probe of virtio3 failed with error -22
 
-Agree
+Yep, someone else pointed out a problem as well. I have made some
+changes [1] but I still can't get the BAR to line up.
 
-> This also means keeping in mind the different stories we want to
-> address.  The ones I would like to address are:
->=20
-> 1) As a virtualization app user, I want to be warned at runtime
->    in case my VM configuration relies on features that will be
->    removed in future versions of the stack, so I have a chance to
->    update my VM configuration before updating the software.
->=20
+>
+> in dmesg and, while the device shows up in the output of lspci(8),
+> it's nowhere to be seen when running 'ip addr' and friends.
+>
+> Let me know if you need me to try anything else :)
 
-Yes, or as a user, get warned if my configuration is less than optimal.
-Use of a "yellow" or "red" component that I thought was perfectly safe.
-Many people don't realize they're using legacy components until we
-actually nominate them for deprecation. They could have found out much
-sooner.
+Any ideas on how to debug the confusing memory mappings or
+non-existent interrupts would be helpful :)
 
-Part of Nemu's value now is knowing that whatever is left has a much
-higher chance of being something you want, because there's less ways to
-do things.
+1: https://github.com/alistair23/qemu/tree/mainline/alistair/sifive_pcie.next
 
-> 2) As a QEMU distributor, downstream vendor, or developer, I want
->    to:
->    * know which parts of the code are really supported and
->      expected to work without bugs;
->    * disable unsupported/unstable features at build time;
->    * disable test cases for known-broken parts of QEMU;
->    * know if an user is relying on an unsupported or known-broken
->      feature of QEMU.
->=20
+Alistair
 
-Tying components to test cases is compelling.
-
-> Are there any additional use cases I forgot, here?
->=20
-
-Those are the big ones.
-
->=20
->>
->>> Deprecated code, on the other hand, is expected to be enabled at
->>> build time even on enterprise distributions, and will definitely
->>> require a mechanism to generate a warning at runtime.
->>>
->>>
->>>>
->>>> Adding any more nuanced states than this, though, risks making it to=
-o
->>>> difficult to make any informed decisions as a user, I think. This pa=
-tch
->>>> as-is maybe adds too many?
->>>
->>> Agreed.
->>>
->>>>
->>>> --js
->>>>
->>>>>> diff --git a/util/Makefile.objs b/util/Makefile.objs
->>>>>> index 0820923c18..6e5f8faf82 100644
->>>>>> --- a/util/Makefile.objs
->>>>>> +++ b/util/Makefile.objs
->>>>>> @@ -50,5 +50,6 @@ util-obj-y +=3D range.o
->>>>>> =C2=A0 util-obj-y +=3D stats64.o
->>>>>> =C2=A0 util-obj-y +=3D systemd.o
->>>>>> =C2=A0 util-obj-y +=3D iova-tree.o
->>>>>> +util-obj-y +=3D support-state.o
->>>>>> =C2=A0 util-obj-$(CONFIG_LINUX) +=3D vfio-helpers.o
->>>>>> =C2=A0 util-obj-$(CONFIG_OPENGL) +=3D drm.o
->>>>>>
->>>>>
->>>
->=20
-
---=20
-=E2=80=94js
+>
+> --
+> Andrea Bolognani / Red Hat / Virtualization
+>
