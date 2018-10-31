@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43069)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43040)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gHeQP-0002D0-GP
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:32:00 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gHeQM-0002BL-Vq
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:31:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gHeQM-0003uJ-U3
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:31:57 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gHeQJ-0003r7-MW
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:31:54 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Tue, 30 Oct 2018 21:31:12 -0300
-Message-Id: <20181031003120.26771-8-ehabkost@redhat.com>
+Date: Tue, 30 Oct 2018 21:31:11 -0300
+Message-Id: <20181031003120.26771-7-ehabkost@redhat.com>
 In-Reply-To: <20181031003120.26771-1-ehabkost@redhat.com>
 References: <20181031003120.26771-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 07/15] iotests: Explicitly bequeath FDs in Python
+Subject: [Qemu-devel] [PULL 06/15] iotests: Different iterator behavior in
+ Python 3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,117 +25,208 @@ Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, Fam Zheng <fam
 
 From: Max Reitz <mreitz@redhat.com>
 
-Python 3.4 introduced the inheritable attribute for FDs.  At the same
-time, it changed the default so that all FDs are not inheritable by
-default, that only inheritable FDs are inherited to subprocesses, and
-only if close_fds is explicitly set to False.
+In Python 3, several functions now return iterators instead of lists.
+This includes range(), items(), map(), and filter().  This means that if
+we really want a list, we have to wrap those instances with list().  But
+then again, the two instances where this is the case for map() and
+filter(), there are shorter expressions which work without either
+function.
 
-Adhere to this by setting close_fds to False when working with
-subprocesses that may want to inherit FDs, and by trying to
-set_inheritable() on FDs that we do want to bequeath to them.
+On the other hand, sometimes we do just want an iterator, in which case
+we have sometimes used xrange() and iteritems() which no longer exist in
+Python 3.  Just change these calls to be range() and items(), works in
+both Python 2 and 3, and is really what we want in 3 (which is what
+matters).  But because it is so simple to do (and to find and remove
+once we completely switch to Python 3), make range() be an alias for
+xrange() in the two affected tests (044 and 163).
+
+In one instance, we only wanted the first instance of the result of a
+filter() call.  Instead of using next(filter()) which would work only in
+Python 3, or list(filter())[0] which would work everywhere but is a bit
+weird, this instance is changed to use a generator expression with a
+next() wrapped around, which works both in 2.7 and 3.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 Reviewed-by: Cleber Rosa <crosa@redhat.com>
-Message-Id: <20181022135307.14398-7-mreitz@redhat.com>
+Message-Id: <20181022135307.14398-6-mreitz@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- scripts/qemu.py        | 34 +++++++++++++++++++++++++++++-----
- tests/qemu-iotests/045 |  2 +-
- tests/qemu-iotests/147 |  2 +-
- 3 files changed, 31 insertions(+), 7 deletions(-)
+ tests/qemu-iotests/044 | 16 ++++++++++------
+ tests/qemu-iotests/056 |  2 +-
+ tests/qemu-iotests/065 |  4 ++--
+ tests/qemu-iotests/124 |  4 ++--
+ tests/qemu-iotests/139 |  2 +-
+ tests/qemu-iotests/163 | 11 +++++++----
+ 6 files changed, 23 insertions(+), 16 deletions(-)
 
-diff --git a/scripts/qemu.py b/scripts/qemu.py
-index fd4249f7a8..768611f1de 100644
---- a/scripts/qemu.py
-+++ b/scripts/qemu.py
-@@ -148,11 +148,19 @@ class QEMUMachine(object):
-         if opts:
-             options.append(opts)
- 
-+        # This did not exist before 3.4, but since then it is
-+        # mandatory for our purpose
-+        if hasattr(os, 'set_inheritable'):
-+            os.set_inheritable(fd, True)
+diff --git a/tests/qemu-iotests/044 b/tests/qemu-iotests/044
+index 7ef5e46fe9..9ec3dba734 100755
+--- a/tests/qemu-iotests/044
++++ b/tests/qemu-iotests/044
+@@ -26,6 +26,10 @@ import iotests
+ from iotests import qemu_img, qemu_img_verbose, qemu_io
+ import struct
+ import subprocess
++import sys
 +
-         self._args.append('-add-fd')
-         self._args.append(','.join(options))
-         return self
++if sys.version_info.major == 2:
++    range = xrange
  
--    def send_fd_scm(self, fd_file_path):
-+    # Exactly one of fd and file_path must be given.
-+    # (If it is file_path, the helper will open that file and pass its
-+    # own fd)
-+    def send_fd_scm(self, fd=None, file_path=None):
-         # In iotest.py, the qmp should always use unix socket.
-         assert self._qmp.is_scm_available()
-         if self._socket_scm_helper is None:
-@@ -160,12 +168,27 @@ class QEMUMachine(object):
-         if not os.path.exists(self._socket_scm_helper):
-             raise QEMUMachineError("%s does not exist" %
-                                    self._socket_scm_helper)
+ test_img = os.path.join(iotests.test_dir, 'test.img')
+ 
+@@ -52,23 +56,23 @@ class TestRefcountTableGrowth(iotests.QMPTestCase):
+             # Write a refcount table
+             fd.seek(off_reftable)
+ 
+-            for i in xrange(0, h.refcount_table_clusters):
++            for i in range(0, h.refcount_table_clusters):
+                 sector = b''.join(struct.pack('>Q',
+                     off_refblock + i * 64 * 512 + j * 512)
+-                    for j in xrange(0, 64))
++                    for j in range(0, 64))
+                 fd.write(sector)
+ 
+             # Write the refcount blocks
+             assert(fd.tell() == off_refblock)
+             sector = b''.join(struct.pack('>H', 1) for j in range(0, 64 * 256))
+-            for block in xrange(0, h.refcount_table_clusters):
++            for block in range(0, h.refcount_table_clusters):
+                 fd.write(sector)
+ 
+             # Write the L1 table
+             assert(fd.tell() == off_l1)
+             assert(off_l2 + 512 * h.l1_size == off_data)
+             table = b''.join(struct.pack('>Q', (1 << 63) | off_l2 + 512 * j)
+-                for j in xrange(0, h.l1_size))
++                for j in range(0, h.l1_size))
+             fd.write(table)
+ 
+             # Write the L2 tables
+@@ -79,14 +83,14 @@ class TestRefcountTableGrowth(iotests.QMPTestCase):
+             off = off_data
+             while remaining > 1024 * 512:
+                 pytable = list((1 << 63) | off + 512 * j
+-                    for j in xrange(0, 1024))
++                    for j in range(0, 1024))
+                 table = struct.pack('>1024Q', *pytable)
+                 fd.write(table)
+                 remaining = remaining - 1024 * 512
+                 off = off + 1024 * 512
+ 
+             table = b''.join(struct.pack('>Q', (1 << 63) | off + 512 * j)
+-                for j in xrange(0, remaining // 512))
++                for j in range(0, remaining // 512))
+             fd.write(table)
+ 
+ 
+diff --git a/tests/qemu-iotests/056 b/tests/qemu-iotests/056
+index 223292175a..3df323984d 100755
+--- a/tests/qemu-iotests/056
++++ b/tests/qemu-iotests/056
+@@ -32,7 +32,7 @@ target_img = os.path.join(iotests.test_dir, 'target.img')
+ def img_create(img, fmt=iotests.imgfmt, size='64M', **kwargs):
+     fullname = os.path.join(iotests.test_dir, '%s.%s' % (img, fmt))
+     optargs = []
+-    for k,v in kwargs.iteritems():
++    for k,v in kwargs.items():
+         optargs = optargs + ['-o', '%s=%s' % (k,v)]
+     args = ['create', '-f', fmt] + optargs + [fullname, size]
+     iotests.qemu_img(*args)
+diff --git a/tests/qemu-iotests/065 b/tests/qemu-iotests/065
+index 72aa9707c7..8bac383ea7 100755
+--- a/tests/qemu-iotests/065
++++ b/tests/qemu-iotests/065
+@@ -59,7 +59,7 @@ class TestQemuImgInfo(TestImageInfoSpecific):
+                     :data.index('')]
+         for field in data:
+             self.assertTrue(re.match('^ {4}[^ ]', field) is not None)
+-        data = map(lambda line: line.strip(), data)
++        data = [line.strip() for line in data]
+         self.assertEqual(data, self.human_compare)
+ 
+ class TestQMP(TestImageInfoSpecific):
+@@ -80,7 +80,7 @@ class TestQMP(TestImageInfoSpecific):
+ 
+     def test_qmp(self):
+         result = self.vm.qmp('query-block')['return']
+-        drive = filter(lambda drive: drive['device'] == 'drive0', result)[0]
++        drive = next(drive for drive in result if drive['device'] == 'drive0')
+         data = drive['inserted']['image']['format-specific']
+         self.assertEqual(data['type'], iotests.imgfmt)
+         self.assertEqual(data['data'], self.compare)
+diff --git a/tests/qemu-iotests/124 b/tests/qemu-iotests/124
+index 3ea4ac53f5..9f189e3b54 100755
+--- a/tests/qemu-iotests/124
++++ b/tests/qemu-iotests/124
+@@ -39,7 +39,7 @@ def try_remove(img):
+ def transaction_action(action, **kwargs):
+     return {
+         'type': action,
+-        'data': dict((k.replace('_', '-'), v) for k, v in kwargs.iteritems())
++        'data': dict((k.replace('_', '-'), v) for k, v in kwargs.items())
+     }
+ 
+ 
+@@ -134,7 +134,7 @@ class TestIncrementalBackupBase(iotests.QMPTestCase):
+     def img_create(self, img, fmt=iotests.imgfmt, size='64M',
+                    parent=None, parentFormat=None, **kwargs):
+         optargs = []
+-        for k,v in kwargs.iteritems():
++        for k,v in kwargs.items():
+             optargs = optargs + ['-o', '%s=%s' % (k,v)]
+         args = ['create', '-f', fmt] + optargs + [img, size]
+         if parent:
+diff --git a/tests/qemu-iotests/139 b/tests/qemu-iotests/139
+index cc7fe337f3..62402c1c35 100755
+--- a/tests/qemu-iotests/139
++++ b/tests/qemu-iotests/139
+@@ -51,7 +51,7 @@ class TestBlockdevDel(iotests.QMPTestCase):
+     # Check whether a BlockDriverState exists
+     def checkBlockDriverState(self, node, must_exist = True):
+         result = self.vm.qmp('query-named-block-nodes')
+-        nodes = filter(lambda x: x['node-name'] == node, result['return'])
++        nodes = [x for x in result['return'] if x['node-name'] == node]
+         self.assertLessEqual(len(nodes), 1)
+         self.assertEqual(must_exist, len(nodes) == 1)
+ 
+diff --git a/tests/qemu-iotests/163 b/tests/qemu-iotests/163
+index 5fd424761b..158ba5d092 100755
+--- a/tests/qemu-iotests/163
++++ b/tests/qemu-iotests/163
+@@ -18,9 +18,12 @@
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
+ 
+-import os, random, iotests, struct, qcow2
++import os, random, iotests, struct, qcow2, sys
+ from iotests import qemu_img, qemu_io, image_size
+ 
++if sys.version_info.major == 2:
++    range = xrange
 +
-+        # This did not exist before 3.4, but since then it is
-+        # mandatory for our purpose
-+        if hasattr(os, 'set_inheritable'):
-+            os.set_inheritable(self._qmp.get_sock_fd(), True)
-+            if fd is not None:
-+                os.set_inheritable(fd, True)
-+
-         fd_param = ["%s" % self._socket_scm_helper,
--                    "%d" % self._qmp.get_sock_fd(),
--                    "%s" % fd_file_path]
-+                    "%d" % self._qmp.get_sock_fd()]
-+
-+        if file_path is not None:
-+            assert fd is None
-+            fd_param.append(file_path)
-+        else:
-+            assert fd is not None
-+            fd_param.append(str(fd))
-+
-         devnull = open(os.path.devnull, 'rb')
-         proc = subprocess.Popen(fd_param, stdin=devnull, stdout=subprocess.PIPE,
--                                stderr=subprocess.STDOUT)
-+                                stderr=subprocess.STDOUT, close_fds=False)
-         output = proc.communicate()[0]
-         if output:
-             LOG.debug(output)
-@@ -286,7 +309,8 @@ class QEMUMachine(object):
-                                        stdin=devnull,
-                                        stdout=self._qemu_log_file,
-                                        stderr=subprocess.STDOUT,
--                                       shell=False)
-+                                       shell=False,
-+                                       close_fds=False)
-         self._post_launch()
+ test_img = os.path.join(iotests.test_dir, 'test.img')
+ check_img = os.path.join(iotests.test_dir, 'check.img')
  
-     def wait(self):
-diff --git a/tests/qemu-iotests/045 b/tests/qemu-iotests/045
-index 6be8fc4912..55a5d31ca8 100755
---- a/tests/qemu-iotests/045
-+++ b/tests/qemu-iotests/045
-@@ -140,7 +140,7 @@ class TestSCMFd(iotests.QMPTestCase):
-         os.remove(image0)
+@@ -41,7 +44,7 @@ class ShrinkBaseClass(iotests.QMPTestCase):
+         div_roundup = lambda n, d: (n + d - 1) // d
  
-     def _send_fd_by_SCM(self):
--        ret = self.vm.send_fd_scm(image0)
-+        ret = self.vm.send_fd_scm(file_path=image0)
-         self.assertEqual(ret, 0, 'Failed to send fd with UNIX SCM')
+         def split_by_n(data, n):
+-            for x in xrange(0, len(data), n):
++            for x in range(0, len(data), n):
+                 yield struct.unpack('>Q', data[x:x + n])[0] & l1_mask
  
-     def test_add_fd(self):
-diff --git a/tests/qemu-iotests/147 b/tests/qemu-iotests/147
-index d2081df84b..05b374b7d3 100755
---- a/tests/qemu-iotests/147
-+++ b/tests/qemu-iotests/147
-@@ -229,7 +229,7 @@ class BuiltinNBD(NBDBlockdevAddBase):
-         sockfd = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-         sockfd.connect(unix_socket)
+         def check_l1_table(h, l1_data):
+@@ -135,8 +138,8 @@ class ShrinkBaseClass(iotests.QMPTestCase):
+         self.image_verify()
  
--        result = self.vm.send_fd_scm(str(sockfd.fileno()))
-+        result = self.vm.send_fd_scm(fd=sockfd.fileno())
-         self.assertEqual(result, 0, 'Failed to send socket FD')
- 
-         result = self.vm.qmp('getfd', fdname='nbd-fifo')
+     def test_random_write(self):
+-        offs_list = range(0, size_to_int(self.image_len),
+-                          size_to_int(self.chunk_size))
++        offs_list = list(range(0, size_to_int(self.image_len),
++                               size_to_int(self.chunk_size)))
+         random.shuffle(offs_list)
+         for offs in offs_list:
+             qemu_io('-c', 'write -P 0xff %d %s' % (offs, self.chunk_size),
 -- 
 2.18.0.rc1.1.g3f1ff2140
