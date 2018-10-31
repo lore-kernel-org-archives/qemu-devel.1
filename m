@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1gHeii-0005Cn-PV
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:50:53 -0400
+	(envelope-from <sameo@linux.intel.com>) id 1gHeum-0000qD-L7
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 21:03:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1gHeid-0002Vs-Ou
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:50:52 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:34079)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1gHeid-0001tK-H7
-	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:50:47 -0400
-Received: by mail-pf1-x441.google.com with SMTP id f78-v6so6728441pfe.1
-	for <qemu-devel@nongnu.org>; Tue, 30 Oct 2018 17:50:27 -0700 (PDT)
-From: Zhang Chen <zhangckid@gmail.com>
-Date: Wed, 31 Oct 2018 08:50:15 +0800
-Message-Id: <20181031005015.5433-1-zhangckid@gmail.com>
-Subject: [Qemu-devel] [PATCH V2] net/filter-rewriter.c: Fix coverity static
- analysis issue
+	(envelope-from <sameo@linux.intel.com>) id 1gHeue-0003lu-QZ
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 21:03:17 -0400
+Received: from mga07.intel.com ([134.134.136.100]:33250)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sameo@linux.intel.com>)
+	id 1gHeue-0003eN-Bw
+	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 21:03:12 -0400
+Date: Wed, 31 Oct 2018 02:02:18 +0100
+From: Samuel Ortiz <sameo@linux.intel.com>
+Message-ID: <20181031010218.GA4267@caravaggio>
+References: <20181029170159.3801-1-sameo@linux.intel.com>
+	<20181029170159.3801-20-sameo@linux.intel.com>
+	<7023e8f9-a7e3-ae11-e1d7-429434e895d3@redhat.com>
+	<20181030141335.GB5291@caravaggio.home>
+	<1e1bb8a9-6812-5b2f-96bb-8cb85e9c3457@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1e1bb8a9-6812-5b2f-96bb-8cb85e9c3457@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 19/19] hw: i386: Implement the ACPI
+ builder interface for PC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,36 +32,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>
-Cc: Zhang Chen <zhangckid@gmail.com>, Zhang Chen <chen.zhang@intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
 
-The original code just follow the TCP state diagram,
-but in this case, we can skip the TCPS_TIME_WAIT state to simplify
-the implementation.
+On Tue, Oct 30, 2018 at 05:03:28PM +0100, Paolo Bonzini wrote:
+> On 30/10/2018 15:13, Samuel Ortiz wrote:
+> >> Just a quick question before I go and actually apply the patches to look
+> >> at the resulting code: is there any reason why you didn't add the
+> >> MachineState and/or AcpiBuilder to AcpiBuildState, similar to how it was
+> >> in v1?
+> >
+> > With v1 I was not adding MachineState to AcpiBuildState, I may be
+> > missing your point.
+> > Do you mean adding an AcpiBuilder pointer to AcpiConfiguration?
+> 
+> No, what I was remembering is the FirmwareBuildState, which you have
+> removed according to my review.  Sorry, KVM Forum was a bit exhausting. :)
+No worries, it was exhausting indeed :)
 
-Signed-off-by: Zhang Chen <zhangckid@gmail.com>
----
- net/filter-rewriter.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/net/filter-rewriter.c b/net/filter-rewriter.c
-index bb8f4d93b1..2e26839bc2 100644
---- a/net/filter-rewriter.c
-+++ b/net/filter-rewriter.c
-@@ -155,12 +155,13 @@ static int handle_primary_tcp_pkt(RewriterState *rf,
-          * Active close step 2.
-          */
-         if (conn->tcp_state == TCPS_FIN_WAIT_1) {
--            conn->tcp_state = TCPS_TIME_WAIT;
-             /*
-              * For simplify implementation, we needn't wait 2MSL time
-              * in filter rewriter. Because guest kernel will track the
-              * TCP status and wait 2MSL time, if client resend the FIN
-              * packet, guest will apply the last ACK too.
-+             * So, we skip the TCPS_TIME_WAIT state here and go straight
-+             * to TCPS_CLOSED state.
-              */
-             conn->tcp_state = TCPS_CLOSED;
-             g_hash_table_remove(rf->connection_track_table, key);
--- 
-2.17.1
+Cheers,
+Samuel.
