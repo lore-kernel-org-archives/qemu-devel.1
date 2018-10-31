@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43041)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43038)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gHeQM-0002BM-Vs
+	(envelope-from <ehabkost@redhat.com>) id 1gHeQM-0002B8-V9
 	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:31:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gHeQJ-0003rC-Mx
+	(envelope-from <ehabkost@redhat.com>) id 1gHeQK-0003sM-If
 	for qemu-devel@nongnu.org; Tue, 30 Oct 2018 20:31:54 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Tue, 30 Oct 2018 21:31:10 -0300
-Message-Id: <20181031003120.26771-6-ehabkost@redhat.com>
+Date: Tue, 30 Oct 2018 21:31:09 -0300
+Message-Id: <20181031003120.26771-5-ehabkost@redhat.com>
 In-Reply-To: <20181031003120.26771-1-ehabkost@redhat.com>
 References: <20181031003120.26771-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 05/15] iotests: Use // for Python integer
- division
+Subject: [Qemu-devel] [PULL 04/15] iotests: Use Python byte strings where
+ appropriate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,268 +25,246 @@ Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, Fam Zheng <fam
 
 From: Max Reitz <mreitz@redhat.com>
 
-In Python 3, / is always a floating-point division.  We usually do not
-want this, and as Python 2.7 understands // as well, change all integer
-divisions to use that.
+Since byte strings are no longer the default in Python 3, we have to
+explicitly use them where we need to, which is mostly when working with
+structures.  It also means that we need to open a file in binary mode
+when we want to use structures.
+
+On the other hand, we have to accomodate for the fact that some
+functions (still) work with byte strings but we want to use unicode
+strings (in Python 3 at least, and it does not matter in Python 2).
+This includes base64 encoding, but it is most notable when working with
+the subprocess module: Either we set universal_newlines to True so that
+the default streams are opened in text mode (hence this parameter is
+aliased as "text" as of 3.7), or, if that is not possible, we have to
+decode the output to a normal string.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
-Message-Id: <20181022135307.14398-5-mreitz@redhat.com>
+Message-Id: <20181022135307.14398-4-mreitz@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- tests/qemu-iotests/030        |  2 +-
- tests/qemu-iotests/040        |  4 ++--
- tests/qemu-iotests/041        |  4 ++--
- tests/qemu-iotests/044        |  2 +-
- tests/qemu-iotests/093        | 18 +++++++++---------
- tests/qemu-iotests/136        |  2 +-
- tests/qemu-iotests/149        |  6 +++---
- tests/qemu-iotests/151        | 12 ++++++------
- tests/qemu-iotests/163        |  2 +-
- tests/qemu-iotests/iotests.py |  2 +-
- tests/qemu-iotests/qed.py     |  6 +++---
- 11 files changed, 30 insertions(+), 30 deletions(-)
+ scripts/qtest.py                         |  2 +-
+ tests/qemu-iotests/044                   |  8 ++++----
+ tests/qemu-iotests/149                   |  8 +++++---
+ tests/qemu-iotests/207                   |  4 ++--
+ tests/qemu-iotests/iotests.py            | 11 +++++++----
+ tests/qemu-iotests/nbd-fault-injector.py |  4 ++--
+ tests/qemu-iotests/qcow2.py              | 10 +++++-----
+ 7 files changed, 26 insertions(+), 21 deletions(-)
 
-diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
-index 1dbc2ddc49..276e06b5ba 100755
---- a/tests/qemu-iotests/030
-+++ b/tests/qemu-iotests/030
-@@ -521,7 +521,7 @@ new_state = "2"
- state = "2"
- event = "%s"
- new_state = "1"
--''' % (event, errno, self.STREAM_BUFFER_SIZE / 512, event, event))
-+''' % (event, errno, self.STREAM_BUFFER_SIZE // 512, event, event))
-         file.close()
+diff --git a/scripts/qtest.py b/scripts/qtest.py
+index df0daf26ca..adf1fe3f26 100644
+--- a/scripts/qtest.py
++++ b/scripts/qtest.py
+@@ -64,7 +64,7 @@ class QEMUQtestProtocol(object):
  
- class TestEIO(TestErrors):
-diff --git a/tests/qemu-iotests/040 b/tests/qemu-iotests/040
-index 1cb1ceeb33..b81133a474 100755
---- a/tests/qemu-iotests/040
-+++ b/tests/qemu-iotests/040
-@@ -195,7 +195,7 @@ class TestSingleDrive(ImageCommitTestCase):
+         @param qtest_cmd: qtest command text to be sent
+         """
+-        self._sock.sendall(qtest_cmd + "\n")
++        self._sock.sendall((qtest_cmd + "\n").encode('utf-8'))
  
-         self.assert_no_active_block_jobs()
-         result = self.vm.qmp('block-commit', device='drive0', top=mid_img,
--                             base=backing_img, speed=(self.image_len / 4))
-+                             base=backing_img, speed=(self.image_len // 4))
-         self.assert_qmp(result, 'return', {})
-         result = self.vm.qmp('device_del', id='scsi0')
-         self.assert_qmp(result, 'return', {})
-@@ -225,7 +225,7 @@ class TestSingleDrive(ImageCommitTestCase):
- 
-         self.assert_no_active_block_jobs()
-         result = self.vm.qmp('block-commit', device='drive0', top=mid_img,
--                             base=backing_img, speed=(self.image_len / 4))
-+                             base=backing_img, speed=(self.image_len // 4))
-         self.assert_qmp(result, 'return', {})
- 
-         result = self.vm.qmp('query-block')
-diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
-index 9336ab6ff5..3615011d98 100755
---- a/tests/qemu-iotests/041
-+++ b/tests/qemu-iotests/041
-@@ -404,7 +404,7 @@ new_state = "2"
- state = "2"
- event = "%s"
- new_state = "1"
--''' % (event, errno, self.MIRROR_GRANULARITY / 512, event, event))
-+''' % (event, errno, self.MIRROR_GRANULARITY // 512, event, event))
-         file.close()
- 
-     def setUp(self):
-@@ -569,7 +569,7 @@ new_state = "2"
- state = "2"
- event = "%s"
- new_state = "1"
--''' % (event, errno, self.MIRROR_GRANULARITY / 512, event, event))
-+''' % (event, errno, self.MIRROR_GRANULARITY // 512, event, event))
-         file.close()
- 
-     def setUp(self):
+     def close(self):
+         self._sock.close()
 diff --git a/tests/qemu-iotests/044 b/tests/qemu-iotests/044
-index 69e736f687..7ef5e46fe9 100755
+index 11ea0f4d35..69e736f687 100755
 --- a/tests/qemu-iotests/044
 +++ b/tests/qemu-iotests/044
-@@ -86,7 +86,7 @@ class TestRefcountTableGrowth(iotests.QMPTestCase):
-                 off = off + 1024 * 512
+@@ -53,21 +53,21 @@ class TestRefcountTableGrowth(iotests.QMPTestCase):
+             fd.seek(off_reftable)
  
-             table = b''.join(struct.pack('>Q', (1 << 63) | off + 512 * j)
--                for j in xrange(0, remaining / 512))
-+                for j in xrange(0, remaining // 512))
+             for i in xrange(0, h.refcount_table_clusters):
+-                sector = ''.join(struct.pack('>Q',
++                sector = b''.join(struct.pack('>Q',
+                     off_refblock + i * 64 * 512 + j * 512)
+                     for j in xrange(0, 64))
+                 fd.write(sector)
+ 
+             # Write the refcount blocks
+             assert(fd.tell() == off_refblock)
+-            sector = ''.join(struct.pack('>H', 1) for j in xrange(0, 64 * 256))
++            sector = b''.join(struct.pack('>H', 1) for j in range(0, 64 * 256))
+             for block in xrange(0, h.refcount_table_clusters):
+                 fd.write(sector)
+ 
+             # Write the L1 table
+             assert(fd.tell() == off_l1)
+             assert(off_l2 + 512 * h.l1_size == off_data)
+-            table = ''.join(struct.pack('>Q', (1 << 63) | off_l2 + 512 * j)
++            table = b''.join(struct.pack('>Q', (1 << 63) | off_l2 + 512 * j)
+                 for j in xrange(0, h.l1_size))
              fd.write(table)
  
+@@ -85,7 +85,7 @@ class TestRefcountTableGrowth(iotests.QMPTestCase):
+                 remaining = remaining - 1024 * 512
+                 off = off + 1024 * 512
  
-diff --git a/tests/qemu-iotests/093 b/tests/qemu-iotests/093
-index 9d1971a56c..d88fbc182e 100755
---- a/tests/qemu-iotests/093
-+++ b/tests/qemu-iotests/093
-@@ -69,18 +69,18 @@ class ThrottleTestCase(iotests.QMPTestCase):
-         # in. The throttled requests won't be executed until we
-         # advance the virtual clock.
-         rq_size = 512
--        rd_nr = max(params['bps'] / rq_size / 2,
--                    params['bps_rd'] / rq_size,
--                    params['iops'] / 2,
-+        rd_nr = max(params['bps'] // rq_size // 2,
-+                    params['bps_rd'] // rq_size,
-+                    params['iops'] // 2,
-                     params['iops_rd'])
-         rd_nr *= seconds * 2
--        rd_nr /= ndrives
--        wr_nr = max(params['bps'] / rq_size / 2,
--                    params['bps_wr'] / rq_size,
--                    params['iops'] / 2,
-+        rd_nr //= ndrives
-+        wr_nr = max(params['bps'] // rq_size // 2,
-+                    params['bps_wr'] // rq_size,
-+                    params['iops'] // 2,
-                     params['iops_wr'])
-         wr_nr *= seconds * 2
--        wr_nr /= ndrives
-+        wr_nr //= ndrives
+-            table = ''.join(struct.pack('>Q', (1 << 63) | off + 512 * j)
++            table = b''.join(struct.pack('>Q', (1 << 63) | off + 512 * j)
+                 for j in xrange(0, remaining / 512))
+             fd.write(table)
  
-         # Send I/O requests to all drives
-         for i in range(rd_nr):
-@@ -196,7 +196,7 @@ class ThrottleTestCase(iotests.QMPTestCase):
-             self.configure_throttle(ndrives, settings)
- 
-             # Wait for the bucket to empty so we can do bursts
--            wait_ns = nsec_per_sec * burst_length * burst_rate / rate
-+            wait_ns = nsec_per_sec * burst_length * burst_rate // rate
-             self.vm.qtest("clock_step %d" % wait_ns)
- 
-             # Test I/O at the max burst rate
-diff --git a/tests/qemu-iotests/136 b/tests/qemu-iotests/136
-index a154d8ef9d..af7ffa4540 100755
---- a/tests/qemu-iotests/136
-+++ b/tests/qemu-iotests/136
-@@ -24,7 +24,7 @@ import os
- 
- interval_length = 10
- nsec_per_sec = 1000000000
--op_latency = nsec_per_sec / 1000 # See qtest_latency_ns in accounting.c
-+op_latency = nsec_per_sec // 1000 # See qtest_latency_ns in accounting.c
- bad_sector = 8192
- bad_offset = bad_sector * 512
- blkdebug_file = os.path.join(iotests.test_dir, 'blkdebug.conf')
 diff --git a/tests/qemu-iotests/149 b/tests/qemu-iotests/149
-index 1225334cb8..4f363f295f 100755
+index 9e0cad76f9..1225334cb8 100755
 --- a/tests/qemu-iotests/149
 +++ b/tests/qemu-iotests/149
-@@ -314,13 +314,13 @@ def test_once(config, qemu_img=False):
-     image_size = 4 * oneTB
-     if qemu_img:
-         iotests.log("# Create image")
--        qemu_img_create(config, image_size / oneMB)
-+        qemu_img_create(config, image_size // oneMB)
-     else:
-         iotests.log("# Create image")
--        create_image(config, image_size / oneMB)
-+        create_image(config, image_size // oneMB)
+@@ -79,7 +79,7 @@ class LUKSConfig(object):
  
-     lowOffsetMB = 100
--    highOffsetMB = 3 * oneTB / oneMB
-+    highOffsetMB = 3 * oneTB // oneMB
+     def first_password_base64(self):
+         (pw, slot) = self.first_password()
+-        return base64.b64encode(pw)
++        return base64.b64encode(pw.encode('ascii')).decode('ascii')
  
-     try:
-         if not qemu_img:
-diff --git a/tests/qemu-iotests/151 b/tests/qemu-iotests/151
-index fe53b9f446..1bb74d67c4 100755
---- a/tests/qemu-iotests/151
-+++ b/tests/qemu-iotests/151
-@@ -67,9 +67,9 @@ class TestActiveMirror(iotests.QMPTestCase):
-                             'write -P 1 0 %i' % self.image_len);
+     def active_slots(self):
+         slots = []
+@@ -98,7 +98,8 @@ def verify_passwordless_sudo():
+     proc = subprocess.Popen(args,
+                             stdin=subprocess.PIPE,
+                             stdout=subprocess.PIPE,
+-                            stderr=subprocess.STDOUT)
++                            stderr=subprocess.STDOUT,
++                            universal_newlines=True)
  
-         # Start some background requests
--        for offset in range(1 * self.image_len / 8, 3 * self.image_len / 8, 1024 * 1024):
-+        for offset in range(1 * self.image_len // 8, 3 * self.image_len // 8, 1024 * 1024):
-             self.vm.hmp_qemu_io('source', 'aio_write -P 2 %i 1M' % offset)
--        for offset in range(2 * self.image_len / 8, 3 * self.image_len / 8, 1024 * 1024):
-+        for offset in range(2 * self.image_len // 8, 3 * self.image_len // 8, 1024 * 1024):
-             self.vm.hmp_qemu_io('source', 'aio_write -z %i 1M' % offset)
+     msg = proc.communicate()[0]
  
-         # Start the block job
-@@ -83,9 +83,9 @@ class TestActiveMirror(iotests.QMPTestCase):
-         self.assert_qmp(result, 'return', {})
+@@ -116,7 +117,8 @@ def cryptsetup(args, password=None):
+     proc = subprocess.Popen(fullargs,
+                             stdin=subprocess.PIPE,
+                             stdout=subprocess.PIPE,
+-                            stderr=subprocess.STDOUT)
++                            stderr=subprocess.STDOUT,
++                            universal_newlines=True)
  
-         # Start some more requests
--        for offset in range(3 * self.image_len / 8, 5 * self.image_len / 8, 1024 * 1024):
-+        for offset in range(3 * self.image_len // 8, 5 * self.image_len // 8, 1024 * 1024):
-             self.vm.hmp_qemu_io('source', 'aio_write -P 3 %i 1M' % offset)
--        for offset in range(4 * self.image_len / 8, 5 * self.image_len / 8, 1024 * 1024):
-+        for offset in range(4 * self.image_len // 8, 5 * self.image_len // 8, 1024 * 1024):
-             self.vm.hmp_qemu_io('source', 'aio_write -z %i 1M' % offset)
+     msg = proc.communicate(password)[0]
  
-         # Wait for the READY event
-@@ -95,9 +95,9 @@ class TestActiveMirror(iotests.QMPTestCase):
-         # the source) should be settled using the active mechanism.
-         # The mirror code itself asserts that the source BDS's dirty
-         # bitmap will stay clean between READY and COMPLETED.
--        for offset in range(5 * self.image_len / 8, 7 * self.image_len / 8, 1024 * 1024):
-+        for offset in range(5 * self.image_len // 8, 7 * self.image_len // 8, 1024 * 1024):
-             self.vm.hmp_qemu_io('source', 'aio_write -P 3 %i 1M' % offset)
--        for offset in range(6 * self.image_len / 8, 7 * self.image_len / 8, 1024 * 1024):
-+        for offset in range(6 * self.image_len // 8, 7 * self.image_len // 8, 1024 * 1024):
-             self.vm.hmp_qemu_io('source', 'aio_write -z %i 1M' % offset)
+diff --git a/tests/qemu-iotests/207 b/tests/qemu-iotests/207
+index 444ae233ae..2d86a3da37 100755
+--- a/tests/qemu-iotests/207
++++ b/tests/qemu-iotests/207
+@@ -109,7 +109,7 @@ with iotests.FilePath('t.img') as disk_path, \
+     md5_key = subprocess.check_output(
+         'ssh-keyscan -t rsa 127.0.0.1 2>/dev/null | grep -v "\\^#" | ' +
+         'cut -d" " -f3 | base64 -d | md5sum -b | cut -d" " -f1',
+-        shell=True).rstrip()
++        shell=True).rstrip().decode('ascii')
  
-         if sync_source_and_target:
-diff --git a/tests/qemu-iotests/163 b/tests/qemu-iotests/163
-index 403842354e..5fd424761b 100755
---- a/tests/qemu-iotests/163
-+++ b/tests/qemu-iotests/163
-@@ -38,7 +38,7 @@ class ShrinkBaseClass(iotests.QMPTestCase):
-         entry_bits = 3
-         entry_size = 1 << entry_bits
-         l1_mask = 0x00fffffffffffe00
--        div_roundup = lambda n, d: (n + d - 1) / d
-+        div_roundup = lambda n, d: (n + d - 1) // d
+     vm.launch()
+     blockdev_create(vm, { 'driver': 'ssh',
+@@ -147,7 +147,7 @@ with iotests.FilePath('t.img') as disk_path, \
+     sha1_key = subprocess.check_output(
+         'ssh-keyscan -t rsa 127.0.0.1 2>/dev/null | grep -v "\\^#" | ' +
+         'cut -d" " -f3 | base64 -d | sha1sum -b | cut -d" " -f1',
+-        shell=True).rstrip()
++        shell=True).rstrip().decode('ascii')
  
-         def split_by_n(data, n):
-             for x in xrange(0, len(data), n):
+     vm.launch()
+     blockdev_create(vm, { 'driver': 'ssh',
 diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index 7290c0b159..7ca94e9278 100644
+index 10f2d17419..7290c0b159 100644
 --- a/tests/qemu-iotests/iotests.py
 +++ b/tests/qemu-iotests/iotests.py
-@@ -199,7 +199,7 @@ def create_image(name, size):
-     file = open(name, 'wb')
+@@ -104,7 +104,8 @@ def qemu_img_pipe(*args):
+     '''Run qemu-img and return its output'''
+     subp = subprocess.Popen(qemu_img_args + list(args),
+                             stdout=subprocess.PIPE,
+-                            stderr=subprocess.STDOUT)
++                            stderr=subprocess.STDOUT,
++                            universal_newlines=True)
+     exitcode = subp.wait()
+     if exitcode < 0:
+         sys.stderr.write('qemu-img received signal %i: %s\n' % (-exitcode, ' '.join(qemu_img_args + list(args))))
+@@ -128,7 +129,8 @@ def qemu_io(*args):
+     '''Run qemu-io and return the stdout data'''
+     args = qemu_io_args + list(args)
+     subp = subprocess.Popen(args, stdout=subprocess.PIPE,
+-                            stderr=subprocess.STDOUT)
++                            stderr=subprocess.STDOUT,
++                            universal_newlines=True)
+     exitcode = subp.wait()
+     if exitcode < 0:
+         sys.stderr.write('qemu-io received signal %i: %s\n' % (-exitcode, ' '.join(args)))
+@@ -149,7 +151,8 @@ class QemuIoInteractive:
+         self.args = qemu_io_args + list(args)
+         self._p = subprocess.Popen(self.args, stdin=subprocess.PIPE,
+                                    stdout=subprocess.PIPE,
+-                                   stderr=subprocess.STDOUT)
++                                   stderr=subprocess.STDOUT,
++                                   universal_newlines=True)
+         assert self._p.stdout.read(9) == 'qemu-io> '
+ 
+     def close(self):
+@@ -193,7 +196,7 @@ def compare_images(img1, img2, fmt1=imgfmt, fmt2=imgfmt):
+ 
+ def create_image(name, size):
+     '''Create a fully-allocated raw image with sector markers'''
+-    file = open(name, 'w')
++    file = open(name, 'wb')
      i = 0
      while i < size:
--        sector = struct.pack('>l504xl', i / 512, i / 512)
-+        sector = struct.pack('>l504xl', i // 512, i // 512)
-         file.write(sector)
-         i = i + 512
-     file.close()
-diff --git a/tests/qemu-iotests/qed.py b/tests/qemu-iotests/qed.py
-index ea469b9c48..8adaaf46c4 100755
---- a/tests/qemu-iotests/qed.py
-+++ b/tests/qemu-iotests/qed.py
-@@ -80,7 +80,7 @@ class QED(object):
+         sector = struct.pack('>l504xl', i / 512, i / 512)
+diff --git a/tests/qemu-iotests/nbd-fault-injector.py b/tests/qemu-iotests/nbd-fault-injector.py
+index 439a090eb6..d45e2e0a6a 100755
+--- a/tests/qemu-iotests/nbd-fault-injector.py
++++ b/tests/qemu-iotests/nbd-fault-injector.py
+@@ -86,7 +86,7 @@ def recvall(sock, bufsize):
+             raise Exception('unexpected disconnect')
+         chunks.append(chunk)
+         received += len(chunk)
+-    return ''.join(chunks)
++    return b''.join(chunks)
  
-     def load_l1_table(self):
-         self.l1_table = self.read_table(self.header['l1_table_offset'])
--        self.table_nelems = self.header['table_size'] * self.header['cluster_size'] / table_elem_size
-+        self.table_nelems = self.header['table_size'] * self.header['cluster_size'] // table_elem_size
+ class Rule(object):
+     def __init__(self, name, event, io, when):
+@@ -177,7 +177,7 @@ def handle_connection(conn, use_export):
+         req = read_request(conn)
+         if req.type == NBD_CMD_READ:
+             write_reply(conn, 0, req.handle)
+-            conn.send('\0' * req.len, event='data')
++            conn.send(b'\0' * req.len, event='data')
+         elif req.type == NBD_CMD_WRITE:
+             _ = conn.recv(req.len, event='data')
+             write_reply(conn, 0, req.handle)
+diff --git a/tests/qemu-iotests/qcow2.py b/tests/qemu-iotests/qcow2.py
+index b95a837759..b392972d1b 100755
+--- a/tests/qemu-iotests/qcow2.py
++++ b/tests/qemu-iotests/qcow2.py
+@@ -10,7 +10,7 @@ class QcowHeaderExtension:
+     def __init__(self, magic, length, data):
+         if length % 8 != 0:
+             padding = 8 - (length % 8)
+-            data += "\0" * padding
++            data += b"\0" * padding
  
-     def write_table(self, offset, table):
-         s = ''.join(pack_table_elem(x) for x in table)
-@@ -167,14 +167,14 @@ def cmd_zero_cluster(qed, pos, *args):
-         n = int(args[0])
+         self.magic  = magic
+         self.length = length
+@@ -103,7 +103,7 @@ class QcowHeader:
  
-     for i in xrange(n):
--        l1_index = pos / qed.header['cluster_size'] / len(qed.l1_table)
-+        l1_index = pos // qed.header['cluster_size'] // len(qed.l1_table)
-         if qed.l1_table[l1_index] == 0:
-             err('no l2 table allocated')
+         fd.seek(self.header_length)
+         extensions = self.extensions
+-        extensions.append(QcowHeaderExtension(0, 0, ""))
++        extensions.append(QcowHeaderExtension(0, 0, b""))
+         for ex in extensions:
+             buf = struct.pack('>II', ex.magic, ex.length)
+             fd.write(buf)
+@@ -137,8 +137,8 @@ class QcowHeader:
+         for ex in self.extensions:
  
-         l2_offset = qed.l1_table[l1_index]
-         l2_table = qed.read_table(l2_offset)
+             data = ex.data[:ex.length]
+-            if all(c in string.printable for c in data):
+-                data = "'%s'" % data
++            if all(c in string.printable.encode('ascii') for c in data):
++                data = "'%s'" % data.decode('ascii')
+             else:
+                 data = "<binary>"
  
--        l2_index = (pos / qed.header['cluster_size']) % len(qed.l1_table)
-+        l2_index = (pos // qed.header['cluster_size']) % len(qed.l1_table)
-         l2_table[l2_index] = 1 # zero the data cluster
-         qed.write_table(l2_offset, l2_table)
-         pos += qed.header['cluster_size']
+@@ -178,7 +178,7 @@ def cmd_add_header_ext(fd, magic, data):
+         sys.exit(1)
+ 
+     h = QcowHeader(fd)
+-    h.extensions.append(QcowHeaderExtension.create(magic, data))
++    h.extensions.append(QcowHeaderExtension.create(magic, data.encode('ascii')))
+     h.update(fd)
+ 
+ def cmd_add_header_ext_stdio(fd, magic):
 -- 
 2.18.0.rc1.1.g3f1ff2140
