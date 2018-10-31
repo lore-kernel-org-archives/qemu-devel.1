@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32887)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32927)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gHwt4-0008RA-5e
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 16:14:46 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gHwt8-0008Tn-J1
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 16:14:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gHwt3-0002CN-7m
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 16:14:46 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gHwt5-0002DX-Av
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 16:14:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54339)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gHwt5-0002D3-1S
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 16:14:47 -0400
+Date: Wed, 31 Oct 2018 17:14:40 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181031201440.GB30771@habkost.net>
+References: <20181030150453.9344-1-marcandre.lureau@redhat.com>
+	<20181030150453.9344-10-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-References: <20181031132029.4887-1-kbastian@mail.uni-paderborn.de>
-	<20181031132029.4887-2-kbastian@mail.uni-paderborn.de>
-In-Reply-To: <20181031132029.4887-2-kbastian@mail.uni-paderborn.de>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 31 Oct 2018 13:14:02 -0700
-Message-ID: <CAKmqyKMR6brWRrAXw_RwA2avCUp5rL6VmqOKWZPq5bA4xihWEA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 01/35] target/riscv: Move CPURISCVState
- pointer to DisasContext
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20181030150453.9344-10-marcandre.lureau@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 09/10] hw/i386: add pc-i440fx-3.1 &
+ pc-q35-3.1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,78 +29,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Cc: Michael Clark <mjc@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, qemu-riscv@nongnu.org, peer.adelt@hni.uni-paderborn.de, Richard Henderson <richard.henderson@linaro.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Amit Shah <amit@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, dgilbert@redhat.com, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-On Wed, Oct 31, 2018 at 6:27 AM Bastian Koppelmann
-<kbastian@mail.uni-paderborn.de> wrote:
->
-> CPURISCVState is rarely used, so there is no need to pass it to every
-> translate function. This paves the way for decodetree which only passes
-> DisasContext to translate functions.
->
-> Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
-> Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+On Tue, Oct 30, 2018 at 07:04:52PM +0400, Marc-Andr=E9 Lureau wrote:
+> The following patch is going to add compatiblity parameters.
+>=20
+> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 
-Alistair
+I'm really surprised we spent the whole 3.1 development cycle
+without any change that required adding pc-*-3.1 machines.
 
-> ---
->  target/riscv/translate.c | 15 ++++++++-------
->  1 file changed, 8 insertions(+), 7 deletions(-)
->
-> diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-> index 18d7b6d147..e81b9f097e 100644
-> --- a/target/riscv/translate.c
-> +++ b/target/riscv/translate.c
-> @@ -52,6 +52,7 @@ typedef struct DisasContext {
->         to any system register, which includes CSR_FRM, so we do not have
->         to reset this known value.  */
->      int frm;
-> +    CPURISCVState *env;
->  } DisasContext;
->
->  /* convert riscv funct3 to qemu memop for load/store */
-> @@ -1789,19 +1790,19 @@ static void decode_RV32_64G(CPURISCVState *env, DisasContext *ctx)
->      }
->  }
->
-> -static void decode_opc(CPURISCVState *env, DisasContext *ctx)
-> +static void decode_opc(DisasContext *ctx)
->  {
->      /* check for compressed insn */
->      if (extract32(ctx->opcode, 0, 2) != 3) {
-> -        if (!riscv_has_ext(env, RVC)) {
-> +        if (!riscv_has_ext(ctx->env, RVC)) {
->              gen_exception_illegal(ctx);
->          } else {
->              ctx->pc_succ_insn = ctx->base.pc_next + 2;
-> -            decode_RV32_64C(env, ctx);
-> +            decode_RV32_64C(ctx->env, ctx);
->          }
->      } else {
->          ctx->pc_succ_insn = ctx->base.pc_next + 4;
-> -        decode_RV32_64G(env, ctx);
-> +        decode_RV32_64G(ctx->env, ctx);
->      }
->  }
->
-> @@ -1846,10 +1847,10 @@ static bool riscv_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cpu,
->  static void riscv_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
->  {
->      DisasContext *ctx = container_of(dcbase, DisasContext, base);
-> -    CPURISCVState *env = cpu->env_ptr;
-> +    ctx->env = cpu->env_ptr;
->
-> -    ctx->opcode = cpu_ldl_code(env, ctx->base.pc_next);
-> -    decode_opc(env, ctx);
-> +    ctx->opcode = cpu_ldl_code(ctx->env, ctx->base.pc_next);
-> +    decode_opc(ctx);
->      ctx->base.pc_next = ctx->pc_succ_insn;
->
->      if (ctx->base.is_jmp == DISAS_NEXT) {
-> --
-> 2.19.1
->
->
+--=20
+Eduardo
