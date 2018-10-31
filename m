@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38137)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40962)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <michael@walle.cc>) id 1gHluu-0003w0-6I
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 04:31:57 -0400
+	(envelope-from <bounces@canonical.com>) id 1gHmB5-00035f-Nv
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 04:48:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <michael@walle.cc>) id 1gHluq-0004sk-Hz
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 04:31:56 -0400
-Received: from ssl.serverraum.org ([2a01:4f8:151:8464::1:2]:56963)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <michael@walle.cc>) id 1gHluo-0004jI-Lc
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 04:31:51 -0400
+	(envelope-from <bounces@canonical.com>) id 1gHmB2-0005Hy-Gp
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 04:48:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51698)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gHmB2-0005Gx-7r
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 04:48:36 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gHmAs-0002R7-8d
+	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 08:48:28 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 45E7E2E869F
+	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 08:40:51 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Date: Wed, 31 Oct 2018 09:31:34 +0100
-From: Michael Walle <michael@walle.cc>
-In-Reply-To: <20180718104836.18488-2-michael@walle.cc>
-References: <20180718104836.18488-1-michael@walle.cc>
-	<20180718104836.18488-2-michael@walle.cc>
-Message-ID: <190b51b02841b1259a3a35b950f01cf3@walle.cc>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/3] qtest: new functions for pulsed IRQs
+Date: Wed, 31 Oct 2018 08:30:35 -0000
+From: =?utf-8?b?546L55Ge?= <1800786@bugs.launchpad.net>
+Reply-To: Bug 1800786 <1800786@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <154097463545.29353.15792040571614234775.malonedeb@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1800786] [NEW] USB assertion `s->csw.sig ==
+ cpu_to_le32(0x53425355)' failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,141 +37,321 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>
 
-Am 2018-07-18 12:48, schrieb Michael Walle:
-> It is only possible to retrieve the current state of an interrupt line.=
-=20
-> But
-> there are devices which just pulses the interrupt line. Introduce a=20
-> latch
-> which is set by qtest and which can be cleared by the test case.
->=20
-> Signed-off-by: Michael Walle <michael@walle.cc>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Andreas F=C3=A4rber <afaerber@suse.de>
+Public bug reported:
 
-Hi,
+Qemu crashed after starting and stopping VM for many times, and the
+final log shows below.
 
-unfortunately, there was never any feedback. Are you ok with this patch=20
-in general? There is still one patch for an additional test case in my=20
-queue, which depends on this.
+qemu-system-x86_64: hw/usb/dev-storage.c:236: usb_msd_send_status: Assertio=
+n `s->csw.sig =3D=3D cpu_to_le32(0x53425355)' failed.
+2018-10-05 15:33:11.261+0000: shutting down
 
--michael
+I got the back trace in coredump file:
 
-> ---
->  tests/libqtest.c | 19 +++++++++++++++++++
->  tests/libqtest.h | 40 ++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 59 insertions(+)
->=20
-> diff --git a/tests/libqtest.c b/tests/libqtest.c
-> index 098af6aec4..85e1f6f92a 100644
-> --- a/tests/libqtest.c
-> +++ b/tests/libqtest.c
-> @@ -40,6 +40,7 @@ struct QTestState
->      int fd;
->      int qmp_fd;
->      bool irq_level[MAX_IRQ];
-> +    bool irq_latch[MAX_IRQ];
->      GString *rx;
->      pid_t qemu_pid;  /* our child QEMU process */
->      bool big_endian;
-> @@ -233,6 +234,7 @@ QTestState *qtest_init_without_qmp_handshake(bool=20
-> use_oob,
->      s->rx =3D g_string_new("");
->      for (i =3D 0; i < MAX_IRQ; i++) {
->          s->irq_level[i] =3D false;
-> +        s->irq_latch[i] =3D false;
->      }
->=20
->      if (getenv("QTEST_STOP")) {
-> @@ -386,6 +388,7 @@ redo:
->=20
->          if (strcmp(words[1], "raise") =3D=3D 0) {
->              s->irq_level[irq] =3D true;
-> +            s->irq_latch[irq] =3D true;
->          } else {
->              s->irq_level[irq] =3D false;
->          }
-> @@ -678,6 +681,22 @@ bool qtest_get_irq(QTestState *s, int num)
->      return s->irq_level[num];
->  }
->=20
-> +bool qtest_get_irq_latched(QTestState *s, int num)
-> +{
-> +    g_assert_cmpint(num, <, MAX_IRQ);
-> +
-> +    /* dummy operation in order to make sure irq is up to date */
-> +    qtest_inb(s, 0);
-> +
-> +    return s->irq_latch[num];
-> +}
-> +
-> +void qtest_clear_irq_latch(QTestState *s, int num)
-> +{
-> +    g_assert_cmpint(num, <, MAX_IRQ);
-> +    s->irq_latch[num] =3D false;
-> +}
-> +
->  static int64_t qtest_clock_rsp(QTestState *s)
->  {
->      gchar **words;
-> diff --git a/tests/libqtest.h b/tests/libqtest.h
-> index ac52872cbe..721dd50863 100644
-> --- a/tests/libqtest.h
-> +++ b/tests/libqtest.h
-> @@ -192,6 +192,24 @@ char *qtest_hmpv(QTestState *s, const char *fmt,
-> va_list ap);
->  bool qtest_get_irq(QTestState *s, int num);
->=20
->  /**
-> + * qtest_get_irq_latched:
-> + * @s: #QTestState instance to operate on.
-> + * @num: Interrupt to observe.
-> + *
-> + * Returns: The latched state of the @num interrupt.
-> + */
-> +bool qtest_get_irq_latched(QTestState *s, int num);
-> +
-> +/**
-> + * qtest_clear_irq_latch:
-> + * @s: #QTestState instance to operate on.
-> + * @num: Interrupt to operate on.
-> + *
-> + * Clears the latch of the @num interrupt.
-> + */
-> +void qtest_clear_irq_latch(QTestState *s, int num);
-> +
-> +/**
->   * qtest_irq_intercept_in:
->   * @s: #QTestState instance to operate on.
->   * @string: QOM path of a device.
-> @@ -638,6 +656,28 @@ static inline bool get_irq(int num)
->  }
->=20
->  /**
-> + * get_irq_latched:
-> + * @num: Interrupt to observe.
-> + *
-> + * Returns: The latched level of the @num interrupt.
-> + */
-> +static inline bool get_irq_latched(int num)
-> +{
-> +    return qtest_get_irq_latched(global_qtest, num);
-> +}
-> +
-> +/**
-> + * clear_irq_latch:
-> + * @num: Interrupt to operate on.
-> + *
-> + * Clears the latch of the @num interrupt.
-> + */
-> +static inline void clear_irq_latch(int num)
-> +{
-> +    return qtest_clear_irq_latch(global_qtest, num);
-> +}
-> +
-> +/**
->   * irq_intercept_in:
->   * @string: QOM path of a device.
->   *
+-----------------------back trace----------------------------------------
+#0 0x00007fc890e6cff9 in __GI_raise (sig=3Dsig@entry=3D6) =
+
+    at ../nptl/sysdeps/unix/sysv/linux/raise.c:56 =
+
+#1 0x00007fc890e700f8 in __GI_abort () at abort.c:89 =
+
+#2 0x00007fc890e66216 in __assert_fail_base ( =
+
+    fmt=3D0x7fc890f9dfc0 "%s%s%s:%u: %s%sAssertion `%s' failed.\n%n", =
+
+    assertion=3Dassertion@entry=3D0x7fc8957cd460 "s->csw.sig =3D=3D cpu_to_=
+le32(0x53425355)", file=3Dfile@entry=3D0x7fc8957cd2d0 "hw/usb/dev-storage.c=
+", =
+
+    line=3Dline@entry=3D236, =
+
+    function=3Dfunction@entry=3D0x7fc8957cd5e0 <__PRETTY_FUNCTION__.29765> =
+"usb_msd_send_status") at assert.c:92 =
+
+#3 0x00007fc890e662c2 in __GI___assert_fail ( =
+
+    assertion=3Dassertion@entry=3D0x7fc8957cd460 "s->csw.sig =3D=3D cpu_to_=
+le32(0x53425355)", file=3Dfile@entry=3D0x7fc8957cd2d0 "hw/usb/dev-storage.c=
+", =
+
+    line=3Dline@entry=3D236, =
+
+    function=3Dfunction@entry=3D0x7fc8957cd5e0 <__PRETTY_FUNCTION__.29765> =
+"usb_msd_send_status") at assert.c:101 =
+
+#4 0x00007fc8955dee12 in usb_msd_send_status (s=3D0x7fc8961588f0, =
+
+    p=3D<optimized out>) at hw/usb/dev-storage.c:236 =
+
+#5 0x00007fc8955df092 in usb_msd_handle_data (dev=3D0x7fc8961588f0, =
+
+    p=3D0x7fc896105260) at hw/usb/dev-storage.c:507 =
+
+#6 0x00007fc8955d5940 in usb_handle_packet (dev=3D<optimized out>, =
+
+    p=3Dp@entry=3D0x7fc896105260) at hw/usb/core.c:407 =
+
+#7 0x00007fc8955ea8a8 in uhci_handle_td (s=3Ds@entry=3D0x7fc896133080, =
+
+---Type <return> to continue, or q <return> to quit--- =
+
+    q=3D0x7fc896197c90, q@entry=3D0x0, qh_addr=3Dqh_addr@entry=3D253943810, =
+
+    td=3Dtd@entry=3D0x7ffcc646c0e0, td_addr=3D<optimized out>, =
+
+    int_mask=3Dint_mask@entry=3D0x7ffcc646c0cc) at hw/usb/hcd-uhci.c:911 =
+
+#8 0x00007fc8955eada9 in uhci_process_frame (s=3Ds@entry=3D0x7fc896133080) =
+
+    at hw/usb/hcd-uhci.c:1091 =
+
+#9 0x00007fc8955eaff5 in uhci_frame_timer (opaque=3D0x7fc896133080) =
+
+    at hw/usb/hcd-uhci.c:1190 =
+
+#10 0x00007fc895636c69 in timerlist_run_timers (timer_list=3D0x7fc896093af0=
+) =
+
+    at qemu-timer.c:491 =
+
+#11 0x00007fc895636f01 in qemu_clock_run_timers (type=3D<optimized out>) =
+
+    at qemu-timer.c:502 =
+
+#12 qemu_clock_run_all_timers () at qemu-timer.c:608 =
+
+#13 0x00007fc8955f9b0c in main_loop_wait (nonblocking=3D<optimized out>) =
+
+    at main-loop.c:507 =
+
+#14 0x00007fc8954bc750 in main_loop () at vl.c:2021 =
+
+#15 main (argc=3D<optimized out>, argv=3D<optimized out>, envp=3D<optimized=
+ out>) =
+
+    at vl.c:4447 =
+
+---------------------------------------------------------------------------=
+----
+
+QEMU release version: 1.7.2
+
+QEMU command:
+
+qemu-system-x86_64 -enable-kvm -name guest=3Dguest,debug-threads=3Don -S
+-object
+secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-42-=
+guest
+/master-key.aes -machine pc-i440fx-xenial,accel=3Dkvm,usb=3Doff,dump-guest-
+core=3Doff -cpu IvyBridge-
+IBRS,ss=3Don,vmx=3Don,pcid=3Don,hypervisor=3Don,arat=3Don,tsc_adjust=3Don,s=
+sbd=3Don,xsaveopt=3Don
+-m 1024 -realtime mlock=3Doff -smp 1,sockets=3D1,cores=3D1,threads=3D1 -uuid
+f4fdccb5-8c59-441f-9a78-83d23fbc34f6 -no-user-config -nodefaults
+-chardev
+socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-42-guest/monito=
+r.sock,server,nowait
+-mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc
+base=3Dutc,driftfix=3Dslew -global kvm-pit.lost_tick_policy=3Ddelay -no-hpet
+-no-shutdown -global PIIX4_PM.disable_s3=3D1 -global PIIX4_PM.disable_s4=3D1
+-boot menu=3Doff,strict=3Don -kernel /nfsroot/rootfs/root/bzImage -initrd
+/nfsroot/rootfs/root/wrlinux-image-initramfs-x86-64-kvm-guest.cpio.gz
+-device piix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -device
+lsi,id=3Dscsi0,bus=3Dpci.0,addr=3D0x7 -device ahci,id=3Dsata0,bus=3Dpci.0,a=
+ddr=3D0x6
+-device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x5 -drive
+file=3D/nfsroot/rootfs.ovp6/wrlinux-image-ovp-kvm-
+intel-x86-64-20181015084008.rootfs.ext3,format=3Draw,if=3Dnone,id=3Ddrive-u=
+sb-
+disk0 -device usb-storage,bus=3Dusb.0,port=3D1,drive=3Ddrive-usb-disk0,id=
+=3Dusb-
+disk0,bootindex=3D1,removable=3Doff -netdev tap,fd=3D26,id=3Dhostnet0 -devi=
+ce
+e1000,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:93:6b:0c,bus=3Dpci.0,addr=
+=3D0x3
+-chardev pty,id=3Dcharserial0 -device isa-
+serial,chardev=3Dcharserial0,id=3Dserial0 -chardev
+spicevmc,id=3Dcharchannel0,name=3Dvdagent -device virtserialport,bus=3Dvirt=
+io-
+serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dcom.redhat.spi=
+ce.0
+-spice port=3D5900,addr=3D127.0.0.1,disable-ticketing,image-compression=3Do=
+ff
+,seamless-migration=3Don -device qxl-
+vga,id=3Dvideo0,ram_size=3D67108864,vram_size=3D67108864,vram64_size_mb=3D0=
+,vgamem_mb=3D16,max_outputs=3D1,bus=3Dpci.0,addr=3D0x2
+-device intel-hda,id=3Dsound0,bus=3Dpci.0,addr=3D0x4 -device hda-
+duplex,id=3Dsound0-codec0,bus=3Dsound0.0,cad=3D0 -device virtio-balloon-
+pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x8 -msg timestamp=3Don
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+
+** Tags: usb
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1800786
+
+Title:
+  USB assertion `s->csw.sig =3D=3D cpu_to_le32(0x53425355)' failed
+
+Status in QEMU:
+  New
+
+Bug description:
+  Qemu crashed after starting and stopping VM for many times, and the
+  final log shows below.
+
+  qemu-system-x86_64: hw/usb/dev-storage.c:236: usb_msd_send_status: Assert=
+ion `s->csw.sig =3D=3D cpu_to_le32(0x53425355)' failed.
+  2018-10-05 15:33:11.261+0000: shutting down
+
+  I got the back trace in coredump file:
+
+  -----------------------back trace----------------------------------------
+  #0 0x00007fc890e6cff9 in __GI_raise (sig=3Dsig@entry=3D6) =
+
+      at ../nptl/sysdeps/unix/sysv/linux/raise.c:56 =
+
+  #1 0x00007fc890e700f8 in __GI_abort () at abort.c:89 =
+
+  #2 0x00007fc890e66216 in __assert_fail_base ( =
+
+      fmt=3D0x7fc890f9dfc0 "%s%s%s:%u: %s%sAssertion `%s' failed.\n%n", =
+
+      assertion=3Dassertion@entry=3D0x7fc8957cd460 "s->csw.sig =3D=3D cpu_t=
+o_le32(0x53425355)", file=3Dfile@entry=3D0x7fc8957cd2d0 "hw/usb/dev-storage=
+.c", =
+
+      line=3Dline@entry=3D236, =
+
+      function=3Dfunction@entry=3D0x7fc8957cd5e0 <__PRETTY_FUNCTION__.29765=
+> "usb_msd_send_status") at assert.c:92 =
+
+  #3 0x00007fc890e662c2 in __GI___assert_fail ( =
+
+      assertion=3Dassertion@entry=3D0x7fc8957cd460 "s->csw.sig =3D=3D cpu_t=
+o_le32(0x53425355)", file=3Dfile@entry=3D0x7fc8957cd2d0 "hw/usb/dev-storage=
+.c", =
+
+      line=3Dline@entry=3D236, =
+
+      function=3Dfunction@entry=3D0x7fc8957cd5e0 <__PRETTY_FUNCTION__.29765=
+> "usb_msd_send_status") at assert.c:101 =
+
+  #4 0x00007fc8955dee12 in usb_msd_send_status (s=3D0x7fc8961588f0, =
+
+      p=3D<optimized out>) at hw/usb/dev-storage.c:236 =
+
+  #5 0x00007fc8955df092 in usb_msd_handle_data (dev=3D0x7fc8961588f0, =
+
+      p=3D0x7fc896105260) at hw/usb/dev-storage.c:507 =
+
+  #6 0x00007fc8955d5940 in usb_handle_packet (dev=3D<optimized out>, =
+
+      p=3Dp@entry=3D0x7fc896105260) at hw/usb/core.c:407 =
+
+  #7 0x00007fc8955ea8a8 in uhci_handle_td (s=3Ds@entry=3D0x7fc896133080, =
+
+  ---Type <return> to continue, or q <return> to quit--- =
+
+      q=3D0x7fc896197c90, q@entry=3D0x0, qh_addr=3Dqh_addr@entry=3D25394381=
+0, =
+
+      td=3Dtd@entry=3D0x7ffcc646c0e0, td_addr=3D<optimized out>, =
+
+      int_mask=3Dint_mask@entry=3D0x7ffcc646c0cc) at hw/usb/hcd-uhci.c:911 =
+
+  #8 0x00007fc8955eada9 in uhci_process_frame (s=3Ds@entry=3D0x7fc896133080=
+) =
+
+      at hw/usb/hcd-uhci.c:1091 =
+
+  #9 0x00007fc8955eaff5 in uhci_frame_timer (opaque=3D0x7fc896133080) =
+
+      at hw/usb/hcd-uhci.c:1190 =
+
+  #10 0x00007fc895636c69 in timerlist_run_timers (timer_list=3D0x7fc896093a=
+f0) =
+
+      at qemu-timer.c:491 =
+
+  #11 0x00007fc895636f01 in qemu_clock_run_timers (type=3D<optimized out>) =
+
+      at qemu-timer.c:502 =
+
+  #12 qemu_clock_run_all_timers () at qemu-timer.c:608 =
+
+  #13 0x00007fc8955f9b0c in main_loop_wait (nonblocking=3D<optimized out>) =
+
+      at main-loop.c:507 =
+
+  #14 0x00007fc8954bc750 in main_loop () at vl.c:2021 =
+
+  #15 main (argc=3D<optimized out>, argv=3D<optimized out>, envp=3D<optimiz=
+ed out>) =
+
+      at vl.c:4447 =
+
+  -------------------------------------------------------------------------=
+------
+
+  QEMU release version: 1.7.2
+
+  QEMU command:
+
+  qemu-system-x86_64 -enable-kvm -name guest=3Dguest,debug-threads=3Don -S
+  -object
+  secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-4=
+2-guest
+  /master-key.aes -machine pc-i440fx-xenial,accel=3Dkvm,usb=3Doff,dump-
+  guest-core=3Doff -cpu IvyBridge-
+  IBRS,ss=3Don,vmx=3Don,pcid=3Don,hypervisor=3Don,arat=3Don,tsc_adjust=3Don=
+,ssbd=3Don,xsaveopt=3Don
+  -m 1024 -realtime mlock=3Doff -smp 1,sockets=3D1,cores=3D1,threads=3D1 -u=
+uid
+  f4fdccb5-8c59-441f-9a78-83d23fbc34f6 -no-user-config -nodefaults
+  -chardev
+  socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-42-guest/moni=
+tor.sock,server,nowait
+  -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc
+  base=3Dutc,driftfix=3Dslew -global kvm-pit.lost_tick_policy=3Ddelay -no-h=
+pet
+  -no-shutdown -global PIIX4_PM.disable_s3=3D1 -global
+  PIIX4_PM.disable_s4=3D1 -boot menu=3Doff,strict=3Don -kernel
+  /nfsroot/rootfs/root/bzImage -initrd /nfsroot/rootfs/root/wrlinux-
+  image-initramfs-x86-64-kvm-guest.cpio.gz -device piix3-usb-
+  uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -device
+  lsi,id=3Dscsi0,bus=3Dpci.0,addr=3D0x7 -device
+  ahci,id=3Dsata0,bus=3Dpci.0,addr=3D0x6 -device virtio-serial-pci,id=3Dvir=
+tio-
+  serial0,bus=3Dpci.0,addr=3D0x5 -drive file=3D/nfsroot/rootfs.ovp6/wrlinux-
+  image-ovp-kvm-
+  intel-x86-64-20181015084008.rootfs.ext3,format=3Draw,if=3Dnone,id=3Ddrive-
+  usb-disk0 -device usb-storage,bus=3Dusb.0,port=3D1,drive=3Ddrive-usb-
+  disk0,id=3Dusb-disk0,bootindex=3D1,removable=3Doff -netdev
+  tap,fd=3D26,id=3Dhostnet0 -device
+  e1000,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:93:6b:0c,bus=3Dpci.0,add=
+r=3D0x3
+  -chardev pty,id=3Dcharserial0 -device isa-
+  serial,chardev=3Dcharserial0,id=3Dserial0 -chardev
+  spicevmc,id=3Dcharchannel0,name=3Dvdagent -device virtserialport,bus
+  =3Dvirtio-
+  serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dcom.redhat.s=
+pice.0
+  -spice port=3D5900,addr=3D127.0.0.1,disable-ticketing,image-
+  compression=3Doff,seamless-migration=3Don -device qxl-
+  vga,id=3Dvideo0,ram_size=3D67108864,vram_size=3D67108864,vram64_size_mb=
+=3D0,vgamem_mb=3D16,max_outputs=3D1,bus=3Dpci.0,addr=3D0x2
+  -device intel-hda,id=3Dsound0,bus=3Dpci.0,addr=3D0x4 -device hda-
+  duplex,id=3Dsound0-codec0,bus=3Dsound0.0,cad=3D0 -device virtio-balloon-
+  pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x8 -msg timestamp=3Don
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1800786/+subscriptions
