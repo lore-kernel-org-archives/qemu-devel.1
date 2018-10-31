@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33452)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33455)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHrMf-0000vB-7N
+	(envelope-from <flukshun@gmail.com>) id 1gHrMf-0000vC-7d
 	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:21:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gHrMa-0007DW-Hl
+	(envelope-from <flukshun@gmail.com>) id 1gHrMa-0007Cl-7R
 	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:20:55 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:42710)
+Received: from mail-oi1-x235.google.com ([2607:f8b0:4864:20::235]:36642)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHrMa-0006v6-6j
+	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gHrMZ-0007BA-U1
 	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 10:20:52 -0400
-Received: by mail-ot1-x343.google.com with SMTP id j3so8869805otl.9
-	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 07:20:25 -0700 (PDT)
+Received: by mail-oi1-x235.google.com with SMTP id r127-v6so12001987oie.3
+	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 07:20:50 -0700 (PDT)
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Wed, 31 Oct 2018 09:19:10 -0500
-Message-Id: <20181031141925.30026-10-mdroth@linux.vnet.ibm.com>
+Date: Wed, 31 Oct 2018 09:19:20 -0500
+Message-Id: <20181031141925.30026-20-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20181031141925.30026-1-mdroth@linux.vnet.ibm.com>
 References: <20181031141925.30026-1-mdroth@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v3 09/24] build: rename CONFIG_QGA_NTDDDISK to
- CONFIG_QGA_NTDDSCSI
+Subject: [Qemu-devel] [PULL v3 19/24] qga: hang GAConfig/socket_activation
+ off of GAState global
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,42 +28,122 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
+Cc: peter.maydell@linaro.org, Sameeh Jubran <sameeh@daynix.com>
 
-From: Tomáš Golembiovský <tgolembi@redhat.com>
+For w32 services we rely on the global GAState to access resources
+associated with the agent within service_main(). Currently this is
+sufficient for starting the agent since we open the channel once prior
+to calling service_main(), and simply start the GMainLoop to start the
+agent from within service_main().
 
-There was inconsistency between commits:
+Eventually we want to be able to also [re-]open the communication
+channel from within service_main(), which requires access to
+config/socket_activation variables, so we hang them off GAState in
+preparation for that.
 
-  50cbebb9a3 configure: add configure check for ntdddisk.h
-  a3ef3b2272 qga: added bus type and disk location path
-
-The first commit added #define CONFIG_QGA_NTDDDISK but the second commit
-expected the name to be CONFIG_QGA_NTDDSCSI. As a result the code in
-second patch was never used.
-
-Renaming the option to CONFIG_QGA_NTDDSCSI to match the name of header
-file that is being checked for.
-
-Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Sameeh Jubran <sjubran@redhat.com>
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+Signed-off-by: Sameeh Jubran <sameeh@daynix.com>
+*dont move GAConfig struct, just the typedef
+*fix build bisect for w32
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- configure | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ qga/main.c | 24 +++++++++++++++---------
+ 1 file changed, 15 insertions(+), 9 deletions(-)
 
-diff --git a/configure b/configure
-index 61276982c6..95f3d44ecd 100755
---- a/configure
-+++ b/configure
-@@ -6142,7 +6142,7 @@ if test "$mingw32" = "yes" ; then
-     echo "WIN_SDK=\"$win_sdk\"" >> $config_host_mak
-   fi
-   if test "$guest_agent_ntddscsi" = "yes" ; then
--    echo "CONFIG_QGA_NTDDDISK=y" >> $config_host_mak
-+    echo "CONFIG_QGA_NTDDSCSI=y" >> $config_host_mak
-   fi
-   if test "$guest_agent_msi" = "yes"; then
-     echo "QEMU_GA_MSI_ENABLED=yes" >> $config_host_mak
+diff --git a/qga/main.c b/qga/main.c
+index ab3eaa5163..eb31f99b38 100644
+--- a/qga/main.c
++++ b/qga/main.c
+@@ -69,6 +69,8 @@ typedef struct GAPersistentState {
+     int64_t fd_counter;
+ } GAPersistentState;
+ 
++typedef struct GAConfig GAConfig;
++
+ struct GAState {
+     JSONMessageParser parser;
+     GMainLoop *main_loop;
+@@ -94,6 +96,8 @@ struct GAState {
+ #endif
+     gchar *pstate_filepath;
+     GAPersistentState pstate;
++    GAConfig *config;
++    int socket_activation;
+ };
+ 
+ struct GAState *ga_state;
+@@ -905,7 +909,7 @@ static GList *split_list(const gchar *str, const gchar *delim)
+     return list;
+ }
+ 
+-typedef struct GAConfig {
++struct GAConfig {
+     char *channel_path;
+     char *method;
+     char *log_filepath;
+@@ -922,7 +926,7 @@ typedef struct GAConfig {
+     int daemonize;
+     GLogLevelFlags log_level;
+     int dumpconf;
+-} GAConfig;
++};
+ 
+ static void config_load(GAConfig *config)
+ {
+@@ -1211,7 +1215,7 @@ static bool check_is_frozen(GAState *s)
+     return false;
+ }
+ 
+-static GAState *initialize_agent(GAConfig *config)
++static GAState *initialize_agent(GAConfig *config, int socket_activation)
+ {
+     GAState *s = g_new0(GAState, 1);
+ 
+@@ -1304,6 +1308,8 @@ static GAState *initialize_agent(GAConfig *config)
+ 
+     s->main_loop = g_main_loop_new(NULL, false);
+ 
++    s->config = config;
++    s->socket_activation = socket_activation;
+     ga_state = s;
+     return s;
+ }
+@@ -1327,17 +1333,17 @@ static void cleanup_agent(GAState *s)
+     ga_state = NULL;
+ }
+ 
+-static int run_agent(GAState *s, GAConfig *config, int socket_activation)
++static int run_agent(GAState *s)
+ {
+-    if (!channel_init(ga_state, config->method, config->channel_path,
+-                      socket_activation ? FIRST_SOCKET_ACTIVATION_FD : -1)) {
++    if (!channel_init(s, s->config->method, s->config->channel_path,
++                      s->socket_activation ? FIRST_SOCKET_ACTIVATION_FD : -1)) {
+         g_critical("failed to initialize guest agent channel");
+         return EXIT_FAILURE;
+     }
+ #ifndef _WIN32
+     g_main_loop_run(ga_state->main_loop);
+ #else
+-    if (config->daemonize) {
++    if (s->config->daemonize) {
+         SERVICE_TABLE_ENTRY service_table[] = {
+             { (char *)QGA_SERVICE_NAME, service_main }, { NULL, NULL } };
+         StartServiceCtrlDispatcher(service_table);
+@@ -1425,12 +1431,12 @@ int main(int argc, char **argv)
+         goto end;
+     }
+ 
+-    s = initialize_agent(config);
++    s = initialize_agent(config, socket_activation);
+     if (!s) {
+         g_critical("error initializing guest agent");
+         goto end;
+     }
+-    ret = run_agent(s, config, socket_activation);
++    ret = run_agent(s);
+     cleanup_agent(s);
+ 
+ end:
 -- 
 2.17.1
