@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53451)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gHtde-0003vm-Sr
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:46:39 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1gHteD-00059D-Gn
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:47:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gHtdd-000488-Lb
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:46:38 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:37684)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gHtdd-00047I-Bo
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:46:37 -0400
-Received: by mail-wr1-x442.google.com with SMTP id g9-v6so17245835wrq.4
-	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 09:46:36 -0700 (PDT)
-References: <20181025144644.15464-1-cota@braap.org>
-	<20181025144644.15464-57-cota@braap.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181025144644.15464-57-cota@braap.org>
-Date: Wed, 31 Oct 2018 16:46:33 +0000
-Message-ID: <87y3ae5aja.fsf@linaro.org>
+	(envelope-from <dgilbert@redhat.com>) id 1gHte8-0004Md-NV
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:47:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59346)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gHte7-0004M8-Se
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 12:47:08 -0400
+Date: Wed, 31 Oct 2018 16:47:03 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20181031164702.GB2403@work-vm>
+References: <20181024163529.15665-1-zhangckid@gmail.com>
+	<20181030195512.GF2441@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v4 57/71] accel/tcg: convert to
- cpu_interrupt_request
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181030195512.GF2441@work-vm>
+Subject: Re: [Qemu-devel] [PATCH] migration/colo.c: Fix compilation issue
+ when disable replication
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,120 +28,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
+To: Zhang Chen <zhangckid@gmail.com>
+Cc: qemu-devel@nongnu.org, zhanghailiang <zhang.zhanghailiang@huawei.com>, Thomas Huth <thuth@redhat.com>
 
+* Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
+> * Zhang Chen (zhangckid@gmail.com) wrote:
+> > This compilation issue will occur when user use --disable-replication
+> > to config Qemu.
+> > 
+> > Reported-by: Thomas Huth <thuth@redhat.com>
+> > Signed-off-by: Zhang Chen <zhangckid@gmail.com>
+> 
+> Queued.
 
-Emilio G. Cota <cota@braap.org> writes:
+Unqueued; this still isn't building for me with replication disabled;
+I'm hitting one problem where the compiler is complaining that
+colo_send_message_value is unused, and then I'm hitting a bunch of link
+time errors.
 
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
+This needs a few more fixes first.
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Dave
 
-> ---
->  accel/tcg/cpu-exec.c      | 15 ++++++++-------
->  accel/tcg/tcg-all.c       | 12 +++++++++---
->  accel/tcg/translate-all.c |  2 +-
->  3 files changed, 18 insertions(+), 11 deletions(-)
->
-> diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-> index f37c9b1e94..d590f1f6c0 100644
-> --- a/accel/tcg/cpu-exec.c
-> +++ b/accel/tcg/cpu-exec.c
-> @@ -428,7 +428,7 @@ static inline bool cpu_handle_halt_locked(CPUState *c=
-pu)
->
->      if (cpu_halted(cpu)) {
->  #if defined(TARGET_I386) && !defined(CONFIG_USER_ONLY)
-> -        if ((cpu->interrupt_request & CPU_INTERRUPT_POLL)
-> +        if ((cpu_interrupt_request(cpu) & CPU_INTERRUPT_POLL)
->              && replay_interrupt()) {
->              X86CPU *x86_cpu =3D X86_CPU(cpu);
->
-> @@ -540,16 +540,17 @@ static inline bool cpu_handle_interrupt(CPUState *c=
-pu,
->       */
->      atomic_mb_set(&cpu->icount_decr.u16.high, 0);
->
-> -    if (unlikely(atomic_read(&cpu->interrupt_request))) {
-> +    if (unlikely(cpu_interrupt_request(cpu))) {
->          int interrupt_request;
-> +
->          qemu_mutex_lock_iothread();
-> -        interrupt_request =3D cpu->interrupt_request;
-> +        interrupt_request =3D cpu_interrupt_request(cpu);
->          if (unlikely(cpu->singlestep_enabled & SSTEP_NOIRQ)) {
->              /* Mask out external interrupts for this step. */
->              interrupt_request &=3D ~CPU_INTERRUPT_SSTEP_MASK;
->          }
->          if (interrupt_request & CPU_INTERRUPT_DEBUG) {
-> -            cpu->interrupt_request &=3D ~CPU_INTERRUPT_DEBUG;
-> +            cpu_reset_interrupt(cpu, CPU_INTERRUPT_DEBUG);
->              cpu->exception_index =3D EXCP_DEBUG;
->              qemu_mutex_unlock_iothread();
->              return true;
-> @@ -558,7 +559,7 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
->              /* Do nothing */
->          } else if (interrupt_request & CPU_INTERRUPT_HALT) {
->              replay_interrupt();
-> -            cpu->interrupt_request &=3D ~CPU_INTERRUPT_HALT;
-> +            cpu_reset_interrupt(cpu, CPU_INTERRUPT_HALT);
->              cpu_halted_set(cpu, 1);
->              cpu->exception_index =3D EXCP_HLT;
->              qemu_mutex_unlock_iothread();
-> @@ -595,10 +596,10 @@ static inline bool cpu_handle_interrupt(CPUState *c=
-pu,
->              }
->              /* The target hook may have updated the 'cpu->interrupt_requ=
-est';
->               * reload the 'interrupt_request' value */
-> -            interrupt_request =3D cpu->interrupt_request;
-> +            interrupt_request =3D cpu_interrupt_request(cpu);
->          }
->          if (interrupt_request & CPU_INTERRUPT_EXITTB) {
-> -            cpu->interrupt_request &=3D ~CPU_INTERRUPT_EXITTB;
-> +            cpu_reset_interrupt(cpu, CPU_INTERRUPT_EXITTB);
->              /* ensure that no TB jump will be modified as
->                 the program flow was changed */
->              *last_tb =3D NULL;
-> diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
-> index 3d25bdcc17..4e2fe70350 100644
-> --- a/accel/tcg/tcg-all.c
-> +++ b/accel/tcg/tcg-all.c
-> @@ -39,10 +39,16 @@ unsigned long tcg_tb_size;
->  static void tcg_handle_interrupt(CPUState *cpu, int mask)
->  {
->      int old_mask;
-> -    g_assert(qemu_mutex_iothread_locked());
->
-> -    old_mask =3D cpu->interrupt_request;
-> -    cpu->interrupt_request |=3D mask;
-> +    if (!cpu_mutex_locked(cpu)) {
-> +        cpu_mutex_lock(cpu);
-> +        old_mask =3D cpu_interrupt_request(cpu);
-> +        cpu_interrupt_request_or(cpu, mask);
-> +        cpu_mutex_unlock(cpu);
-> +    } else {
-> +        old_mask =3D cpu_interrupt_request(cpu);
-> +        cpu_interrupt_request_or(cpu, mask);
-> +    }
->
->      /*
->       * If called from iothread context, wake the target cpu in
-> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-> index 356dcd0948..038d82fdb5 100644
-> --- a/accel/tcg/translate-all.c
-> +++ b/accel/tcg/translate-all.c
-> @@ -2340,7 +2340,7 @@ void dump_opcount_info(FILE *f, fprintf_function cp=
-u_fprintf)
->  void cpu_interrupt(CPUState *cpu, int mask)
->  {
->      g_assert(qemu_mutex_iothread_locked());
-> -    cpu->interrupt_request |=3D mask;
-> +    cpu_interrupt_request_or(cpu, mask);
->      atomic_set(&cpu->icount_decr.u16.high, -1);
->  }
-
-
+> > ---
+> >  migration/colo.c | 18 +++++++++++++++++-
+> >  1 file changed, 17 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/migration/colo.c b/migration/colo.c
+> > index 956ac236b7..b81e6ec5bb 100644
+> > --- a/migration/colo.c
+> > +++ b/migration/colo.c
+> > @@ -59,6 +59,8 @@ static bool colo_runstate_is_stopped(void)
+> >  
+> >  static void secondary_vm_do_failover(void)
+> >  {
+> > +/* COLO needs enable block-replication */
+> > +#ifdef CONFIG_REPLICATION
+> >      int old_state;
+> >      MigrationIncomingState *mis = migration_incoming_get_current();
+> >      Error *local_err = NULL;
+> > @@ -121,10 +123,14 @@ static void secondary_vm_do_failover(void)
+> >      if (mis->migration_incoming_co) {
+> >          qemu_coroutine_enter(mis->migration_incoming_co);
+> >      }
+> > +#else
+> > +    abort();
+> > +#endif
+> >  }
+> >  
+> >  static void primary_vm_do_failover(void)
+> >  {
+> > +#ifdef CONFIG_REPLICATION
+> >      MigrationState *s = migrate_get_current();
+> >      int old_state;
+> >      Error *local_err = NULL;
+> > @@ -165,6 +171,9 @@ static void primary_vm_do_failover(void)
+> >  
+> >      /* Notify COLO thread that failover work is finished */
+> >      qemu_sem_post(&s->colo_exit_sem);
+> > +#else
+> > +    abort();
+> > +#endif
+> >  }
+> >  
+> >  COLOMode get_colo_mode(void)
+> > @@ -373,6 +382,7 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
+> >                                            QIOChannelBuffer *bioc,
+> >                                            QEMUFile *fb)
+> >  {
+> > +#ifdef CONFIG_REPLICATION
+> >      Error *local_err = NULL;
+> >      int ret = -1;
+> >  
+> > @@ -483,6 +493,9 @@ out:
+> >          error_report_err(local_err);
+> >      }
+> >      return ret;
+> > +#else
+> > +    abort();
+> > +#endif
+> >  }
+> >  
+> >  static void colo_compare_notify_checkpoint(Notifier *notifier, void *data)
+> > @@ -790,13 +803,16 @@ void *colo_process_incoming_thread(void *opaque)
+> >              qemu_mutex_unlock_iothread();
+> >              goto out;
+> >          }
+> > +#ifdef CONFIG_REPLICATION
+> >          /* discard colo disk buffer */
+> >          replication_do_checkpoint_all(&local_err);
+> >          if (local_err) {
+> >              qemu_mutex_unlock_iothread();
+> >              goto out;
+> >          }
+> > -
+> > +#else
+> > +        abort();
+> > +#endif
+> >          /* Notify all filters of all NIC to do checkpoint */
+> >          colo_notify_filters_event(COLO_EVENT_CHECKPOINT, &local_err);
+> >  
+> > -- 
+> > 2.17.GIT
+> > 
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 --
-Alex Benn=C3=A9e
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
