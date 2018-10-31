@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32902)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <th.huth@posteo.de>) id 1gHvVr-0004gJ-Fa
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 14:46:44 -0400
+	(envelope-from <laurent@vivier.eu>) id 1gHvW5-0004mJ-1D
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 14:46:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <th.huth@posteo.de>) id 1gHvVl-0002tC-Pm
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 14:46:43 -0400
-Received: from mout02.posteo.de ([185.67.36.66]:49357)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <th.huth@posteo.de>) id 1gHvVj-0002ou-Sc
-	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 14:46:37 -0400
-Received: from submission (posteo.de [89.146.220.130])
-	by mout02.posteo.de (Postfix) with ESMTPS id 8AAFD2400FB
-	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 19:46:33 +0100 (CET)
-References: <1540548409-22560-1-git-send-email-thuth@redhat.com>
-	<CAFEAcA8EubWya8ey9VxhaCw4m2U=KA+i2C-R9P-p+P6oEBBLew@mail.gmail.com>
-	<7fc49925-36ff-bd9a-0cd7-e5f8d4bb3672@roeck-us.net>
-	<CAFEAcA-UF+SyXvcU+NGZsbqBF2qg+s_x4HPU7yvf7B2G-=HPOg@mail.gmail.com>
-From: Thomas Huth <th.huth@posteo.de>
-Message-ID: <6861d4a0-c48d-9d48-726b-a1801012b757@posteo.de>
-Date: Wed, 31 Oct 2018 18:46:29 +0000
+	(envelope-from <laurent@vivier.eu>) id 1gHvW0-0003Bk-2K
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 14:46:56 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:43865)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1gHvVz-0003AR-P1
+	for qemu-devel@nongnu.org; Wed, 31 Oct 2018 14:46:51 -0400
+References: <20181005180201.11387-1-richard.henderson@linaro.org>
+	<20181005180201.11387-9-richard.henderson@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <e2f0cc3d-ef03-0d03-cef5-d53369e93122@vivier.eu>
+Date: Wed, 31 Oct 2018 19:46:47 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-UF+SyXvcU+NGZsbqBF2qg+s_x4HPU7yvf7B2G-=HPOg@mail.gmail.com>
+In-Reply-To: <20181005180201.11387-9-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/2] Deprecate the "collie" machine and
- Strongarm devices
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULL 8/8] softfloat: Specialize udiv_qrnnd for
+ ppc64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,27 +29,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Guenter Roeck <linux@roeck-us.net>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-On 2018-10-29 13:24, Peter Maydell wrote:
-> On 27 October 2018 at 12:04, Guenter Roeck <linux@roeck-us.net> wrote:
->> On 10/26/18 3:12 AM, Peter Maydell wrote:
->>> Hi Guenter; there's a proposal here to deprecate (and eventually
->>> remove) the 'collie' board (strongarm) from QEMU. Is that one of
->>> the ones you're currently using in your automated testing of Linux
->>> kernels on QEMU?
->>>
->>
->> Yes. I can run the test with older versions of qemu, so it is ok for me
->> if it is removed (as long as that removal is not backported).
+On 05/10/2018 20:02, Richard Henderson wrote:
+> The ISA has a 128/64-bit division instruction, though it assumes the
+> low 64-bits of the numerator are 0, and so requires a bit more fixup
+> than a full 128-bit division insn.
 > 
-> Mmm, but if we have an active user who's testing them then they
-> probably shouldn't be in the frontline of boards to remove.
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  include/fpu/softfloat-macros.h | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
+> 
+> diff --git a/include/fpu/softfloat-macros.h b/include/fpu/softfloat-macros.h
+> index eafc68932b..c86687fa5e 100644
+> --- a/include/fpu/softfloat-macros.h
+> +++ b/include/fpu/softfloat-macros.h
+> @@ -647,6 +647,22 @@ static inline uint64_t udiv_qrnnd(uint64_t *r, uint64_t n1,
+>      asm("dlgr %0, %1" : "+r"(n) : "r"(d));
+>      *r = n >> 64;
+>      return n;
+> +#elif defined(_ARCH_PPC64)
+> +    /* From Power ISA 3.0B, programming note for divdeu.  */
+> +    uint64_t q1, q2, Q, r1, r2, R;
+> +    asm("divdeu %0,%2,%4; divdu %1,%3,%4"
+> +        : "=&r"(q1), "=r"(q2)
+> +        : "r"(n1), "r"(n0), "r"(d));
+> +    r1 = -(q1 * d);         /* low part of (n1<<64) - (q1 * d) */
+> +    r2 = n0 - (q2 * d);
+> +    Q = q1 + q2;
+> +    R = r1 + r2;
+> +    if (R >= d || R < r2) { /* overflow implies R > d */
+> +        Q += 1;
+> +        R -= d;
+> +    }
+> +    *r = R;
+> +    return Q;
+>  #else
+>      uint64_t d0, d1, q0, q1, r1, r0, m;
+>  
+> 
 
-Yes, I agree. I based my patch on the assumption that the board was
-incomplete and not really usable (as mentioned in the patch
-description), but if it is still usable to some degree, then please
-disregard my patch.
+This breaks qemu-s390x (and probably some others) on PPC64.
 
- Thomas
+sudo chroot chroot/s390x/stretch/ apt-get update --yes
+Ign:1 http://ftp.de.debian.org/debian stretch InRelease
+Hit:2 http://ftp.de.debian.org/debian stretch Release
+0% [Working]Illegal instruction
+
+I didn't find any relevant information with "QEMU_STRACE=
+QEMU_SINGLESTEP= QEMU_LOG=in_asm,op,unimp,int"
+
+I will try to add some traces manually.
+
+Thanks,
+Laurent
