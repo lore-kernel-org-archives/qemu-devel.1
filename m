@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43426)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gIE79-00058B-25
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 10:38:30 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gIE7H-000589-Dy
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 10:38:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gIE0s-0002F7-8F
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 10:32:01 -0400
-Received: from mail-wr1-f44.google.com ([209.85.221.44]:34840)
+	(envelope-from <peter.maydell@linaro.org>) id 1gIDzU-0001Lb-12
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 10:30:33 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:37742)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gIE0s-0002Ev-1c
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 10:31:58 -0400
-Received: by mail-wr1-f44.google.com with SMTP id z16-v6so2403207wrv.2
-	for <qemu-devel@nongnu.org>; Thu, 01 Nov 2018 07:31:57 -0700 (PDT)
-References: <BN6PR2201MB125116B5479010DB326DCCFCC6CE0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <51a26700-5da5-0a15-0e0e-6405ce5e65d4@redhat.com>
-Date: Thu, 1 Nov 2018 15:31:54 +0100
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gIDzS-0001HK-Rc
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 10:30:31 -0400
+Received: by mail-ot1-x344.google.com with SMTP id o14so17915011oth.4
+	for <qemu-devel@nongnu.org>; Thu, 01 Nov 2018 07:30:29 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <BN6PR2201MB125116B5479010DB326DCCFCC6CE0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Correction needed for R5900 instruction decoding
+In-Reply-To: <bcf1457b-8f0c-3d02-cb40-529eddb19316@redhat.com>
+References: <20181030001841.1658-1-philmd@redhat.com>
+	<bcf1457b-8f0c-3d02-cb40-529eddb19316@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 1 Nov 2018 14:30:08 +0000
+Message-ID: <CAFEAcA_p9oTtur8T1Zz5J4hzV2Ly7Jd2Y0xHODCZu2vm-QXx4A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] tests/bios-tables-test: Sanitize test
+ verbose output
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +30,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <amarkovic@wavecomp.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Fredrik Noring <noring@nocrew.org>
-Cc: Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Cc'ing Fredrik.
+On 1 November 2018 at 14:26, Eric Blake <eblake@redhat.com> wrote:
+> Umm, this prints a blank line even if I run 'make check V=0' - do we support
+> V=0 as a way to disable verbosity
 
-On 1/11/18 12:06, Aleksandar Markovic wrote:
-> Hi, Fridrik,
-> 
-> I did some closer code inspection of R5900 in last few days, and I noticed some sub-optimal implementation in the area where R5900-specific opcodes overlap with the rest-of-MIPS-CPUs opcodes.
-> 
-> The right implementation should be based on the principle that all such cases are covered with if statements involving INSN_R5900 flag, like this:
-> 
->          if (ctx->insn_flags & INSN_R5900) {
->              <R5900-specific handling>
->          } else {
->              <rest-of-MIPS-handling>
->          }
-> 
-> You followed that principle for OPC_SPECIAL2 and OPC_SPECIAL3, but for some other opcodes not. For example, there are lines:
-> 
->      if (reg == 0 && (opc == OPC_MFHI || opc == TX79_MMI_MFHI1 ||
->                       opc == OPC_MFLO || opc == TX79_MMI_MFLO1)) {
-> 
-> or
-> 
->       switch (opc) {
->       case OPC_MFHI:
->       case TX79_MMI_MFHI1:
-> 
-> Such implementation makes it difficult to discern R5900 and non-R5900 cases. Potentialy allows bugs to sneak in and affect non-R5900 support.
-> 
-> The correction is not that difficult, I gather. Worse comme to worst, you can remove R5900 MFLO1 and MFHI1 altogether, they are not that essential at this moment, but do try correcting the decoding stuff as I described. Can you please make these changes in next few days or so (given that 3.1 release is getting closer and closer), and send them to the list?
-> 
-> It is my bad that I didn't spot this during review, but in any case, I think this should be fixed in 3.1 to make sure that non-R5900 functionalities are intact.
-> 
-> Thanks,
-> Aleksandar
-> 
-> 
+Empirically, we do not. Our rules.make defines
+quiet-command = $(if $(V),$1,$(if $(2),@printf "  %-7s %s\n" $2 $3 && $1, @$1))
+
+which will suppress the verbose printing of command lines
+only if $(V) expands to the empty string, so V=0 will
+print verbosely here too.
+
+thanks
+-- PMM
