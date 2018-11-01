@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39887)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gIDqw-0006LW-D7
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 10:21:43 -0400
+	(envelope-from <cota@braap.org>) id 1gIE6v-000589-T6
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 10:38:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gIDqs-00048D-7Q
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 10:21:42 -0400
-Date: Thu, 1 Nov 2018 15:21:29 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181101152129.02821aae@redhat.com>
-In-Reply-To: <20181024101930.20674-4-david@redhat.com>
-References: <20181024101930.20674-1-david@redhat.com>
-	<20181024101930.20674-4-david@redhat.com>
+	(envelope-from <cota@braap.org>) id 1gIE3z-0005Lm-8W
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 10:35:14 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:49105)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gIE3z-0005LU-23
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 10:35:11 -0400
+Date: Thu, 1 Nov 2018 10:35:09 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20181101143509.GA23431@flamenco>
+References: <BN6PR2201MB125116B5479010DB326DCCFCC6CE0@BN6PR2201MB1251.namprd22.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 3/7] pcihp: route unplug via the hotplug
- handler
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BN6PR2201MB125116B5479010DB326DCCFCC6CE0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+Subject: Re: [Qemu-devel] Correction needed for R5900 instruction decoding
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,103 +26,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-ppc@nongnu.org
+To: Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Fredrik Noring <noring@nocrew.org>
 
-On Wed, 24 Oct 2018 12:19:26 +0200
-David Hildenbrand <david@redhat.com> wrote:
+Cc'ing Fredrik, who I think was the intended recipient of the below.
 
-> Preparation for multi-stage hotplug handlers.
-Commit message should describe what and why the patch does
-for the sake of unaware. (I know 'why' right now but will for
-sure forget all the reasons later)
+		E.
 
-beside of rerouting it also makes likes of
-acpi_pcihp_device_unplug_cb()
-to be called from unplug chain vs current request chain which
-I bet were confusing.
-
-Otherwise patch looks good
-
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  hw/acpi/pcihp.c         | 11 ++++++++++-
->  hw/acpi/piix4.c         |  7 +++++--
->  include/hw/acpi/pcihp.h |  3 +++
->  3 files changed, 18 insertions(+), 3 deletions(-)
+On Thu, Nov 01, 2018 at 11:06:30 +0000, Aleksandar Markovic wrote:
+> Hi, Fridrik,
 > 
-> diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
-> index 647b5e8d82..062f3c9091 100644
-> --- a/hw/acpi/pcihp.c
-> +++ b/hw/acpi/pcihp.c
-> @@ -154,6 +154,7 @@ static bool acpi_pcihp_pc_no_hotplug(AcpiPciHpState *s, PCIDevice *dev)
->  
->  static void acpi_pcihp_eject_slot(AcpiPciHpState *s, unsigned bsel, unsigned slots)
->  {
-> +    HotplugHandler *hotplug_ctrl;
->      BusChild *kid, *next;
->      int slot = ctz32(slots);
->      PCIBus *bus = acpi_pcihp_find_hotplug_bus(s, bsel);
-> @@ -171,7 +172,8 @@ static void acpi_pcihp_eject_slot(AcpiPciHpState *s, unsigned bsel, unsigned slo
->          PCIDevice *dev = PCI_DEVICE(qdev);
->          if (PCI_SLOT(dev->devfn) == slot) {
->              if (!acpi_pcihp_pc_no_hotplug(s, dev)) {
-> -                object_unparent(OBJECT(qdev));
-> +                hotplug_ctrl = qdev_get_hotplug_handler(qdev);
-> +                hotplug_handler_unplug(hotplug_ctrl, qdev, &error_abort);
->              }
->          }
->      }
-> @@ -261,6 +263,13 @@ void acpi_pcihp_device_plug_cb(HotplugHandler *hotplug_dev, AcpiPciHpState *s,
->  
->  void acpi_pcihp_device_unplug_cb(HotplugHandler *hotplug_dev, AcpiPciHpState *s,
->                                   DeviceState *dev, Error **errp)
-> +{
-> +    object_unparent(OBJECT(dev));
-> +}
-> +
-> +void acpi_pcihp_device_unplug_request_cb(HotplugHandler *hotplug_dev,
-> +                                         AcpiPciHpState *s, DeviceState *dev,
-> +                                         Error **errp)
->  {
->      PCIDevice *pdev = PCI_DEVICE(dev);
->      int slot = PCI_SLOT(pdev->devfn);
-> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-> index e611778daf..ba5632becc 100644
-> --- a/hw/acpi/piix4.c
-> +++ b/hw/acpi/piix4.c
-> @@ -418,8 +418,8 @@ static void piix4_device_unplug_request_cb(HotplugHandler *hotplug_dev,
->          acpi_memory_unplug_request_cb(hotplug_dev, &s->acpi_memory_hotplug,
->                                        dev, errp);
->      } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-> -        acpi_pcihp_device_unplug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
-> -                                    errp);
-> +        acpi_pcihp_device_unplug_request_cb(hotplug_dev, &s->acpi_pci_hotplug,
-> +                                            dev, errp);
->      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU) &&
->                 !s->cpu_hotplug_legacy) {
->          acpi_cpu_unplug_request_cb(hotplug_dev, &s->cpuhp_state, dev, errp);
-> @@ -437,6 +437,9 @@ static void piix4_device_unplug_cb(HotplugHandler *hotplug_dev,
->      if (s->acpi_memory_hotplug.is_enabled &&
->          object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
->          acpi_memory_unplug_cb(&s->acpi_memory_hotplug, dev, errp);
-> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-> +        acpi_pcihp_device_unplug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
-> +                                    errp);
->      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU) &&
->                 !s->cpu_hotplug_legacy) {
->          acpi_cpu_unplug_cb(&s->cpuhp_state, dev, errp);
-> diff --git a/include/hw/acpi/pcihp.h b/include/hw/acpi/pcihp.h
-> index ce31625850..8bc4a4c01d 100644
-> --- a/include/hw/acpi/pcihp.h
-> +++ b/include/hw/acpi/pcihp.h
-> @@ -62,6 +62,9 @@ void acpi_pcihp_device_plug_cb(HotplugHandler *hotplug_dev, AcpiPciHpState *s,
->                                 DeviceState *dev, Error **errp);
->  void acpi_pcihp_device_unplug_cb(HotplugHandler *hotplug_dev, AcpiPciHpState *s,
->                                   DeviceState *dev, Error **errp);
-> +void acpi_pcihp_device_unplug_request_cb(HotplugHandler *hotplug_dev,
-> +                                         AcpiPciHpState *s, DeviceState *dev,
-> +                                         Error **errp);
->  
->  /* Called on reset */
->  void acpi_pcihp_reset(AcpiPciHpState *s);
+> I did some closer code inspection of R5900 in last few days, and I noticed some sub-optimal implementation in the area where R5900-specific opcodes overlap with the rest-of-MIPS-CPUs opcodes.
+> 
+> The right implementation should be based on the principle that all such cases are covered with if statements involving INSN_R5900 flag, like this:
+> 
+>         if (ctx->insn_flags & INSN_R5900) {
+>             <R5900-specific handling>
+>         } else {
+>             <rest-of-MIPS-handling>
+>         }
+> 
+> You followed that principle for OPC_SPECIAL2 and OPC_SPECIAL3, but for some other opcodes not. For example, there are lines:
+> 
+>     if (reg == 0 && (opc == OPC_MFHI || opc == TX79_MMI_MFHI1 ||
+>                      opc == OPC_MFLO || opc == TX79_MMI_MFLO1)) {
+> 
+> or
+> 
+>      switch (opc) {
+>      case OPC_MFHI:
+>      case TX79_MMI_MFHI1:
+> 
+> Such implementation makes it difficult to discern R5900 and non-R5900 cases. Potentialy allows bugs to sneak in and affect non-R5900 support.
+> 
+> The correction is not that difficult, I gather. Worse comme to worst, you can remove R5900 MFLO1 and MFHI1 altogether, they are not that essential at this moment, but do try correcting the decoding stuff as I described. Can you please make these changes in next few days or so (given that 3.1 release is getting closer and closer), and send them to the list?
+> 
+> It is my bad that I didn't spot this during review, but in any case, I think this should be fixed in 3.1 to make sure that non-R5900 functionalities are intact.
+> 
+> Thanks,
+> Aleksandar
+> 
+> 
