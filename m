@@ -1,25 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41666)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47944)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gIFNj-0004Fd-Ak
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 11:59:40 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1gIFfe-00076q-DC
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 12:18:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gIFNf-0002FZ-5z
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 11:59:39 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:45755)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gIFNc-0002Dw-1m
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 11:59:32 -0400
-Received: by mail-pf1-x443.google.com with SMTP id v5-v6so4638992pfm.12
-	for <qemu-devel@nongnu.org>; Thu, 01 Nov 2018 08:59:27 -0700 (PDT)
-Date: Thu, 01 Nov 2018 08:59:25 -0700 (PDT)
-In-Reply-To: <8818c4f3-7ff5-44c6-abbe-67489519ccde@linaro.org>
-From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-3a3dd1f0-dbed-4b43-b21f-88ecea6f5fb1@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
+	(envelope-from <pm215@archaic.org.uk>) id 1gIFfd-00024t-Lx
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 12:18:10 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu,  1 Nov 2018 16:17:58 +0000
+Message-Id: <20181101161758.12300-1-peter.maydell@linaro.org>
+MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 26/35] target/riscv: Remove shift and
- slt insn manual decoding
+Subject: [Qemu-devel] [PATCH for-3.1] hw/ppc/mac_newworld: Free openpic_irqs
+ array after use
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,77 +20,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Michael Clark <mjc@sifive.com>, sagark@eecs.berkeley.edu, Alistair Francis <Alistair.Francis@wdc.com>, peer.adelt@hni.uni-paderborn.de, qemu-devel@nongnu.org, qemu-riscv@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On Wed, 31 Oct 2018 15:38:08 PDT (-0700), richard.henderson@linaro.org wrote:
-> On 10/31/18 1:20 PM, Bastian Koppelmann wrote:
->>  static bool trans_slt(DisasContext *ctx, arg_slt *a)
->>  {
->> -    gen_arith(ctx, OPC_RISC_SLT, a->rd, a->rs1, a->rs2);
->> +    TCGv source1 = tcg_temp_new();
->> +    TCGv source2 = tcg_temp_new();
->> +
->> +    gen_get_gpr(source1, a->rs1);
->> +    gen_get_gpr(source2, a->rs2);
->> +
->> +    tcg_gen_setcond_tl(TCG_COND_LT, source1, source1, source2);
->
-> I do wonder about extracting this one line to gen_slt so that you can re-use
-> gen_arith and gen_arithi.
->
->> +    tcg_gen_setcond_tl(TCG_COND_LTU, source1, source1, source2);
->
-> Similarly.
->
->>  static bool trans_sllw(DisasContext *ctx, arg_sllw *a)
->>  {
->> -    gen_arith(ctx, OPC_RISC_SLLW, a->rd, a->rs1, a->rs2);
->> +    TCGv source1 = tcg_temp_new();
->> +    TCGv source2 = tcg_temp_new();
->> +
->> +    gen_get_gpr(source1, a->rs1);
->> +    gen_get_gpr(source2, a->rs2);
->> +
->> +    tcg_gen_andi_tl(source2, source2, 0x1F);
->> +    tcg_gen_shl_tl(source1, source1, source2);
->> +
->> +    gen_set_gpr(a->rd, source1);
->
-> Missing the ext32s after the shift.
->
->>  static bool trans_srlw(DisasContext *ctx, arg_srlw *a)
->>  {
->> -    gen_arith(ctx, OPC_RISC_SRLW, a->rd, a->rs1, a->rs2);
->> +    TCGv source1 = tcg_temp_new();
->> +    TCGv source2 = tcg_temp_new();
->> +
->> +    gen_get_gpr(source1, a->rs1);
->> +    gen_get_gpr(source2, a->rs2);
->> +
->> +    /* clear upper 32 */
->> +    tcg_gen_ext32u_tl(source1, source1);
->> +    tcg_gen_andi_tl(source2, source2, 0x1F);
->> +    tcg_gen_shr_tl(source1, source1, source2);
->
-> Likewise.  (Consider source2 == 0.)
->
->> -    case OPC_RISC_SRL:
->> -        tcg_gen_andi_tl(source2, source2, TARGET_LONG_BITS - 1);
->> -        tcg_gen_shr_tl(source1, source1, source2);
->> -        break;
-> ...
->> -    case OPC_RISC_SRA:
->> -        tcg_gen_andi_tl(source2, source2, TARGET_LONG_BITS - 1);
->> -        tcg_gen_sar_tl(source1, source1, source2);
->> -        break;
->
-> I see that the bugs are in the original though, so fixing them in a separate
-> patch is certainly ok.
+In ppc_core99_init(), we allocate an openpic_irqs array, which
+we then use to collect up the various qemu_irqs which we're
+going to connect to the interrupt controller. Once we've
+called sysbus_connect_irq() to connect them all up, the
+array is no longer required, but we forgot to free it.
 
-Since we're in the soft freeze now, I think it would be great to get the bug 
-fixes broken out as separate patches at the start of this series that we can 
-pick up for this release.  It would be great if the decodetree conversion was a 
-non-functional change, as that will make it easier to review.
+Since board init is only run once at startup, the memory
+leak is not a significant one.
 
-Sorry for adding a bunch of work for you, Bastian :)
+Spotted by Coverity: CID 1192916.
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/ppc/mac_newworld.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+index a630cb81cd8..14273a123e5 100644
+--- a/hw/ppc/mac_newworld.c
++++ b/hw/ppc/mac_newworld.c
+@@ -303,6 +303,7 @@ static void ppc_core99_init(MachineState *machine)
+             sysbus_connect_irq(s, k++, openpic_irqs[i][j]);
+         }
+     }
++    g_free(openpic_irqs);
+ 
+     if (PPC_INPUT(env) == PPC_FLAGS_INPUT_970) {
+         /* 970 gets a U3 bus */
+-- 
+2.19.1
