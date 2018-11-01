@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52520)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55087)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gI58u-00028d-IZ
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 01:03:41 -0400
+	(envelope-from <fli@suse.com>) id 1gI5PY-0000ST-I0
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 01:20:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gI58o-0000jr-Ir
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 01:03:40 -0400
-Resent-Message-Id: <E1gI58o-0000jr-Ir@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21317)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gI58f-0000UF-0b
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 01:03:28 -0400
-Message-ID: <154104856377.11925.13664478914779235639@015909e0f939>
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20181031003120.26771-1-ehabkost@redhat.com>
+	(envelope-from <fli@suse.com>) id 1gI5PV-0002su-Cz
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 01:20:52 -0400
+Received: from mx2.suse.de ([195.135.220.15]:35902 helo=mx1.suse.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <fli@suse.com>) id 1gI5PV-0002qF-0R
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 01:20:49 -0400
+References: <20181029125818.28720-1-fli@suse.com>
+	<20181029125818.28720-7-fli@suse.com> <20181030194923.GD2441@work-vm>
+	<fd8629e3-cb6f-3e86-ba1a-cbda26373847@suse.com>
+	<20181031163040.GA2402@work-vm>
+From: Fei Li <fli@suse.com>
+Message-ID: <33760dbb-77af-d867-dcfa-52a5d452eb8c@suse.com>
+Date: Thu, 1 Nov 2018 13:20:41 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 31 Oct 2018 22:02:45 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL 00/15] Python queue, 2018-10-30
+In-Reply-To: <20181031163040.GA2402@work-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH RFC v6 6/7] migration: fix some error
+ handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,71 +31,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ehabkost@redhat.com
-Cc: famz@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org, kwolf@redhat.comfamz@redhat.com, qemu-block@nongnu.org, f4bug@amsat.org, mreitz@redhat.com, crosa@redhat.com, alex.bennee@linaro.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, famz@redhat.com, peterx@redhat.com, quintela@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgxMDMxMDAzMTIwLjI2NzcxLTEtZWhhYmtvc3RAcmVkaGF0LmNvbQpTdWJq
-ZWN0OiBbUWVtdS1kZXZlbF0gW1BVTEwgMDAvMTVdIFB5dGhvbiBxdWV1ZSwgMjAxOC0xMC0zMAoK
-PT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3Rh
-bD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
-YW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNv
-bW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGlu
-ICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBs
-b2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0
-PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAg
-ICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0
-ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4
-NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0
-JwplY2RlYTdkNTU5IHNjcmlwdHMvcWVtdS5weTogdXNlIGEgbW9yZSBjb25zaXN0ZW50IGRvY3N0
-cmluZyBzdHlsZQo2ZGRjMTQ1MmY3IHNjcmlwdHMvZGVjb2RldHJlZS5weTogZml4IHJlZmVyZW5j
-ZSB0byBhdHRyaWJ1dGVzCjNhZDAyNWU4ZWUgVHJhdmlzIHN1cHBvcnQgZm9yIHRoZSBhY2NlcHRh
-bmNlIHRlc3RzCjFkM2M5ZjI3YzYgQWNjZXB0YW5jZSB0ZXN0czogYWRkIG1ha2UgcnVsZSBmb3Ig
-cnVubmluZyB0aGVtCmMzOTYwODc3YTcgQm9vdHN0cmFwIFB5dGhvbiB2ZW52IGZvciB0ZXN0cwo4
-ODEzZjBjZjQ0IGlvdGVzdHM6IFVuaWZ5IGxvZyBvdXRwdXRzIGJldHdlZW4gUHl0aG9uIDIgYW5k
-IDMKZmNmZWQ4NDc4ZiBpb3Rlc3RzOiBNb2RpZnkgaW1wb3J0cyBmb3IgUHl0aG9uIDMKYzU1YzRj
-NGU3ZiBpb3Rlc3RzOiAnbmV3JyBtb2R1bGUgcmVwbGFjZW1lbnQgaW4gMTY5CmRmMjA4YWI3ZjQg
-aW90ZXN0czogRXhwbGljaXRseSBiZXF1ZWF0aCBGRHMgaW4gUHl0aG9uCmYxYjQ1NmE2MjEgaW90
-ZXN0czogRGlmZmVyZW50IGl0ZXJhdG9yIGJlaGF2aW9yIGluIFB5dGhvbiAzCjY3ZDVmZGJiMzAg
-aW90ZXN0czogVXNlIC8vIGZvciBQeXRob24gaW50ZWdlciBkaXZpc2lvbgo0MjQwZTI0NzkzIGlv
-dGVzdHM6IFVzZSBQeXRob24gYnl0ZSBzdHJpbmdzIHdoZXJlIGFwcHJvcHJpYXRlCmMzZjJmNDYz
-NWQgaW90ZXN0czogRmx1c2ggaW4gaW90ZXN0cy5weSdzIFFlbXVJb0ludGVyYWN0aXZlCjA4ZGJj
-ZmIxNDAgaW90ZXN0czogTWFrZSBuYmQtZmF1bHQtaW5qZWN0b3IgZmx1c2gKOTA0ODRlZjU2NSBz
-Y3JpcHRzL2RldmljZS1jcmFzaC10ZXN0OiBSZW1vdmUgZGV2aWNlcyB0aGF0IGFyZSBub3QgdXNl
-cl9jcmVhdGFibGUgYW55bW9yZQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0gg
-MS8xNTogc2NyaXB0cy9kZXZpY2UtY3Jhc2gtdGVzdDogUmVtb3ZlIGRldmljZXMgdGhhdCBhcmUg
-bm90IHVzZXJfY3JlYXRhYmxlIGFueW1vcmUuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8xNTogaW90ZXN0
-czogTWFrZSBuYmQtZmF1bHQtaW5qZWN0b3IgZmx1c2guLi4KQ2hlY2tpbmcgUEFUQ0ggMy8xNTog
-aW90ZXN0czogRmx1c2ggaW4gaW90ZXN0cy5weSdzIFFlbXVJb0ludGVyYWN0aXZlLi4uCkNoZWNr
-aW5nIFBBVENIIDQvMTU6IGlvdGVzdHM6IFVzZSBQeXRob24gYnl0ZSBzdHJpbmdzIHdoZXJlIGFw
-cHJvcHJpYXRlLi4uCkNoZWNraW5nIFBBVENIIDUvMTU6IGlvdGVzdHM6IFVzZSAvLyBmb3IgUHl0
-aG9uIGludGVnZXIgZGl2aXNpb24uLi4KRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMy
-MzY6IEZJTEU6IHRlc3RzL3FlbXUtaW90ZXN0cy9xZWQucHk6ODM6CisgICAgICAgIHNlbGYudGFi
-bGVfbmVsZW1zID0gc2VsZi5oZWFkZXJbJ3RhYmxlX3NpemUnXSAqIHNlbGYuaGVhZGVyWydjbHVz
-dGVyX3NpemUnXSAvLyB0YWJsZV9lbGVtX3NpemUKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5n
-cywgMTc5IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
-c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
-cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
-Uy4KCkNoZWNraW5nIFBBVENIIDYvMTU6IGlvdGVzdHM6IERpZmZlcmVudCBpdGVyYXRvciBiZWhh
-dmlvciBpbiBQeXRob24gMy4uLgpDaGVja2luZyBQQVRDSCA3LzE1OiBpb3Rlc3RzOiBFeHBsaWNp
-dGx5IGJlcXVlYXRoIEZEcyBpbiBQeXRob24uLi4KQ2hlY2tpbmcgUEFUQ0ggOC8xNTogaW90ZXN0
-czogJ25ldycgbW9kdWxlIHJlcGxhY2VtZW50IGluIDE2OS4uLgpDaGVja2luZyBQQVRDSCA5LzE1
-OiBpb3Rlc3RzOiBNb2RpZnkgaW1wb3J0cyBmb3IgUHl0aG9uIDMuLi4KQ2hlY2tpbmcgUEFUQ0gg
-MTAvMTU6IGlvdGVzdHM6IFVuaWZ5IGxvZyBvdXRwdXRzIGJldHdlZW4gUHl0aG9uIDIgYW5kIDMu
-Li4KQ2hlY2tpbmcgUEFUQ0ggMTEvMTU6IEJvb3RzdHJhcCBQeXRob24gdmVudiBmb3IgdGVzdHMu
-Li4KV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJ
-TkVSUyBuZWVkIHVwZGF0aW5nPwojODA6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAg
-ZXJyb3JzLCAxIHdhcm5pbmdzLCA0NyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHls
-ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
-bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
-Q0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDEyLzE1OiBBY2NlcHRhbmNlIHRlc3Rz
-OiBhZGQgbWFrZSBydWxlIGZvciBydW5uaW5nIHRoZW0uLi4KQ2hlY2tpbmcgUEFUQ0ggMTMvMTU6
-IFRyYXZpcyBzdXBwb3J0IGZvciB0aGUgYWNjZXB0YW5jZSB0ZXN0cy4uLgpDaGVja2luZyBQQVRD
-SCAxNC8xNTogc2NyaXB0cy9kZWNvZGV0cmVlLnB5OiBmaXggcmVmZXJlbmNlIHRvIGF0dHJpYnV0
-ZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTUvMTU6IHNjcmlwdHMvcWVtdS5weTogdXNlIGEgbW9yZSBj
-b25zaXN0ZW50IGRvY3N0cmluZyBzdHlsZS4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29t
-bWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNh
-bGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZl
-ZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+
+
+On 11/01/2018 12:30 AM, Dr. David Alan Gilbert wrote:
+> * Fei Li (fli@suse.com) wrote:
+>>
+>> On 10/31/2018 03:49 AM, Dr. David Alan Gilbert wrote:
+>>> * Fei Li (fli@suse.com) wrote:
+>>>> Add error handling for qemu_ram_foreach_migratable_block() when
+>>>> it fails.
+>>>>
+>>>> Always call migrate_set_error() to set the error state without relying
+>>>> on whether multifd_save_cleanup() succeeds. As the passed &local_err
+>>>> is never used in multifd_save_cleanup(), remove it.
+>>>>
+>>>> Signed-off-by: Fei Li <fli@suse.com>
+>>>> ---
+>>>>    migration/migration.c    | 5 +----
+>>>>    migration/postcopy-ram.c | 3 +++
+>>>>    migration/ram.c          | 7 +++----
+>>>>    migration/ram.h          | 2 +-
+>>>>    4 files changed, 8 insertions(+), 9 deletions(-)
+>>>>
+>>>> diff --git a/migration/migration.c b/migration/migration.c
+>>>> index 87dfc7374f..3b8b7ab4f9 100644
+>>>> --- a/migration/migration.c
+>>>> +++ b/migration/migration.c
+>>>> @@ -1377,7 +1377,6 @@ static void migrate_fd_cleanup(void *opaque)
+>>>>        qemu_savevm_state_cleanup();
+>>>>        if (s->to_dst_file) {
+>>>> -        Error *local_err = NULL;
+>>>>            QEMUFile *tmp;
+>>>>            trace_migrate_fd_cleanup();
+>>>> @@ -1388,9 +1387,7 @@ static void migrate_fd_cleanup(void *opaque)
+>>>>            }
+>>>>            qemu_mutex_lock_iothread();
+>>>> -        if (multifd_save_cleanup(&local_err) != 0) {
+>>>> -            error_report_err(local_err);
+>>>> -        }
+>>>> +        multifd_save_cleanup();
+>>>>            qemu_mutex_lock(&s->qemu_file_lock);
+>>>>            tmp = s->to_dst_file;
+>>>>            s->to_dst_file = NULL;
+>>>> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+>>>> index e5c02a32c5..4ca2bc02b3 100644
+>>>> --- a/migration/postcopy-ram.c
+>>>> +++ b/migration/postcopy-ram.c
+>>>> @@ -1117,6 +1117,9 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
+>>>>        /* Mark so that we get notified of accesses to unwritten areas */
+>>>>        if (qemu_ram_foreach_migratable_block(ram_block_enable_notify, mis)) {
+>>>> +        error_report("ram_block_enable_notify failed");
+>>>> +        close(mis->userfault_event_fd);
+>>>> +        close(mis->userfault_fd);
+>>> I don't think these close() calls are safe.  This code is just after
+>>> starting the fault thread, and the fault thread has a poll() call on
+>>> these fd's, so we can't close them until we've instructed that thread
+>>> to exit.
+>>>
+>>> We should fall out through postcopy_ram_incoming_cleanup, and because
+>>> the thread exists it should do a notify to the thread, a join and then
+>>> only later do the close calls.
+>>>
+>>> Dave
+>> I see the postcopy_ram_incoming_cleanup() already include the
+>> notify & join the fault thread & close these two fds and other more cleanup,
+>> thus that means directly replace the above two close() with
+>> postcopy_ram_incoming_cleanup() is ok, right? :)
+> Yes; I think I'd do that in loadvm_postcopy_handle_listen perhaps.
+> It's a weird case, normally if it fails before 'listen' then we call
+> cleanup in process_incoming_migration_co,  but after listen we call it
+> at the bottom of the listen thread.  Here we've got a half-state where
+> we're trying and failing to enter listen.
+Ok, I will put the cleanup() inside of loadvm_postcopy_handle_liste(), 
+thanks
+for the advise. :)
+>
+>> BTW, does the parameter "&local_err" for multifd_save_cleanup(&local_err) is
+>> reserved for some reason? As I notice no code is using this error parameter,
+>> and if it is reserved for nothing I'd like to delete it just as the second
+>> paragraph
+>> of the commit message said. :)
+> Yes, that's OK; it might be better as a separate patch;  I suspect maybe
+> in an earlier version it had an error case.
+>
+> Dave
+Thanks for the suggestion, will separate into two patches in the next 
+version.
+
+Have a nice day
+Fei
+>
+>> Have a nice day, thanks
+>> Fei
+>>>>            return -1;
+>>>>        }
+>>>> diff --git a/migration/ram.c b/migration/ram.c
+>>>> index 8f03afe228..57cb1bee3d 100644
+>>>> --- a/migration/ram.c
+>>>> +++ b/migration/ram.c
+>>>> @@ -922,7 +922,7 @@ static void multifd_send_terminate_threads(Error *err)
+>>>>        }
+>>>>    }
+>>>> -int multifd_save_cleanup(Error **errp)
+>>>> +int multifd_save_cleanup(void)
+>>>>    {
+>>>>        int i;
+>>>>        int ret = 0;
+>>>> @@ -1082,9 +1082,8 @@ static void multifd_new_send_channel_async(QIOTask *task, gpointer opaque)
+>>>>        if (qio_task_propagate_error(task, &local_err)) {
+>>>>            migrate_set_state(&s->state, s->state, MIGRATION_STATUS_FAILED);
+>>>> -        if (multifd_save_cleanup(&local_err) != 0) {
+>>>> -            migrate_set_error(migrate_get_current(), local_err);
+>>>> -        }
+>>>> +        multifd_save_cleanup();
+>>>> +        migrate_set_error(migrate_get_current(), local_err);
+>>>>        } else {
+>>>>            p->c = QIO_CHANNEL(sioc);
+>>>>            qio_channel_set_delay(p->c, false);
+>>>> diff --git a/migration/ram.h b/migration/ram.h
+>>>> index 046d3074be..0d1215209e 100644
+>>>> --- a/migration/ram.h
+>>>> +++ b/migration/ram.h
+>>>> @@ -43,7 +43,7 @@ uint64_t ram_bytes_remaining(void);
+>>>>    uint64_t ram_bytes_total(void);
+>>>>    int multifd_save_setup(void);
+>>>> -int multifd_save_cleanup(Error **errp);
+>>>> +int multifd_save_cleanup(void);
+>>>>    int multifd_load_setup(void);
+>>>>    int multifd_load_cleanup(Error **errp);
+>>>>    bool multifd_recv_all_channels_created(void);
+>>>> -- 
+>>>> 2.13.7
+>>>>
+>>> --
+>>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
