@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59776)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59817)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gIAAW-0005jA-TT
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 06:25:42 -0400
+	(envelope-from <sameo@linux.intel.com>) id 1gIAAX-0005k5-TB
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 06:25:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gIAAS-0003lh-0Z
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 06:25:40 -0400
+	(envelope-from <sameo@linux.intel.com>) id 1gIAAW-0003yC-K9
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 06:25:41 -0400
 Received: from mga17.intel.com ([192.55.52.151]:61556)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sameo@linux.intel.com>)
-	id 1gIAAN-0003MI-U3
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 06:25:35 -0400
+	id 1gIAAW-0003MI-AZ
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 06:25:40 -0400
 From: Samuel Ortiz <sameo@linux.intel.com>
-Date: Thu,  1 Nov 2018 11:22:58 +0100
-Message-Id: <20181101102303.16439-19-sameo@linux.intel.com>
+Date: Thu,  1 Nov 2018 11:23:00 +0100
+Message-Id: <20181101102303.16439-21-sameo@linux.intel.com>
 In-Reply-To: <20181101102303.16439-1-sameo@linux.intel.com>
 References: <20181101102303.16439-1-sameo@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 18/23] hw: acpi: Retrieve the PCI bus from
- AcpiPciHpState
+Subject: [Qemu-devel] [PATCH v4 20/23] hw: i386: Implement the ACPI builder
+ interface for PC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,126 +29,143 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Sebastien Boeuf <sebastien.boeuf@intel.com>, Jing Liu <jing2.liu@linux.intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-From: Sebastien Boeuf <sebastien.boeuf@intel.com>
-
-Instead of using the machine type specific method find_i440fx() to
-retrieve the PCI bus, this commit aims to rely on the fact that the
-PCI bus is known by the structure AcpiPciHpState.
-
-When the structure is initialized through acpi_pcihp_init() call,
-it saves the PCI bus, which means there is no need to invoke a
-special function later on.
-
-Based on the fact that find_i440fx() was only used there, this
-patch also removes the function find_i440fx() itself from the
-entire codebase.
+All PC machine type derivatives will use the same ACPI table build
+methods. But with that change in place, any new x86 machine type will be
+able to re-use the acpi-build API and customize part of it by defining
+its own ACPI table build methods.
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
-Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
+Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
 ---
- hw/acpi/pcihp.c       | 10 ++++------
- hw/pci-host/piix.c    |  8 --------
- include/hw/i386/pc.h  |  1 -
- stubs/Makefile.objs   |  1 -
- stubs/pci-host-piix.c |  6 ------
- 5 files changed, 4 insertions(+), 22 deletions(-)
- delete mode 100644 stubs/pci-host-piix.c
+ hw/i386/acpi-build.c | 14 +++++++++-----
+ hw/i386/pc.c         | 19 +++++++++++++++++++
+ 2 files changed, 28 insertions(+), 5 deletions(-)
 
-diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
-index 80d42e12ff..254b2e50ab 100644
---- a/hw/acpi/pcihp.c
-+++ b/hw/acpi/pcihp.c
-@@ -93,10 +93,9 @@ static void *acpi_set_bsel(PCIBus *bus, void *opaque)
-     return bsel_alloc;
- }
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index f4afdbcd1a..d403953566 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -34,6 +34,7 @@
+ #include "hw/acpi/acpi-defs.h"
+ #include "hw/acpi/acpi.h"
+ #include "hw/acpi/cpu.h"
++#include "hw/acpi/builder.h"
+ #include "hw/nvram/fw_cfg.h"
+ #include "hw/acpi/bios-linker-loader.h"
+ #include "hw/loader.h"
+@@ -1684,6 +1685,7 @@ void acpi_build(AcpiBuildTables *tables,
+     GArray *tables_blob = tables->table_data;
+     AcpiSlicOem slic_oem = { .id = NULL, .table_id = NULL };
+     Object *vmgenid_dev;
++    AcpiBuilder *ab = ACPI_BUILDER(machine);
  
--static void acpi_set_pci_info(void)
-+static void acpi_set_pci_info(AcpiPciHpState *s)
- {
-     static bool bsel_is_set;
--    PCIBus *bus;
-     unsigned bsel_alloc = ACPI_PCIHP_BSEL_DEFAULT;
+     acpi_get_pm_info(&pm);
+     acpi_get_misc_info(&misc);
+@@ -1733,7 +1735,8 @@ void acpi_build(AcpiBuildTables *tables,
+     aml_len += tables_blob->len - fadt;
  
-     if (bsel_is_set) {
-@@ -104,10 +103,9 @@ static void acpi_set_pci_info(void)
+     acpi_add_table(table_offsets, tables_blob);
+-    build_madt(tables_blob, tables->linker, machine, acpi_conf);
++    acpi_builder_madt(ab, tables_blob, tables->linker,
++                      machine, acpi_conf);
+ 
+     vmgenid_dev = find_vmgenid_dev();
+     if (vmgenid_dev) {
+@@ -1757,15 +1760,16 @@ void acpi_build(AcpiBuildTables *tables,
      }
-     bsel_is_set = true;
+     if (acpi_conf->numa_nodes) {
+         acpi_add_table(table_offsets, tables_blob);
+-        build_srat(tables_blob, tables->linker, machine, acpi_conf);
++        acpi_builder_srat(ab, tables_blob, tables->linker,
++                          machine, acpi_conf);
+         if (have_numa_distance) {
+             acpi_add_table(table_offsets, tables_blob);
+-            build_slit(tables_blob, tables->linker);
++            acpi_builder_slit(ab, tables_blob, tables->linker);
+         }
+     }
+     if (acpi_get_mcfg(&mcfg)) {
+         acpi_add_table(table_offsets, tables_blob);
+-        build_mcfg(tables_blob, tables->linker, &mcfg);
++        acpi_builder_mcfg(ab, tables_blob, tables->linker, &mcfg);
+     }
+     if (x86_iommu_get_default()) {
+         IommuType IOMMUType = x86_iommu_get_type();
+@@ -1796,7 +1800,7 @@ void acpi_build(AcpiBuildTables *tables,
+                slic_oem.id, slic_oem.table_id);
  
--    bus = find_i440fx(); /* TODO: Q35 support */
--    if (bus) {
-+    if (s->root) {
-         /* Scan all PCI buses. Set property to enable acpi based hotplug. */
--        pci_for_each_bus_depth_first(bus, acpi_set_bsel, NULL, &bsel_alloc);
-+        pci_for_each_bus_depth_first(s->root, acpi_set_bsel, NULL, &bsel_alloc);
+     /* RSDP is in FSEG memory, so allocate it separately */
+-    build_rsdp_rsdt(tables->rsdp, tables->linker, rsdt);
++    acpi_builder_rsdp(ab, tables->rsdp, tables->linker, rsdt);
+ 
+     /* We'll expose it all to Guest so we want to reduce
+      * chance of size changes.
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index c9ffc8cff6..53a3036066 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -64,6 +64,7 @@
+ #include "qemu/option.h"
+ #include "hw/acpi/acpi.h"
+ #include "hw/acpi/cpu_hotplug.h"
++#include "hw/acpi/builder.h"
+ #include "hw/boards.h"
+ #include "acpi-build.h"
+ #include "hw/mem/pc-dimm.h"
+@@ -75,6 +76,7 @@
+ #include "hw/nmi.h"
+ #include "hw/i386/intel_iommu.h"
+ #include "hw/net/ne2000-isa.h"
++#include "hw/i386/acpi.h"
+ 
+ /* debug PC/ISA interrupts */
+ //#define DEBUG_IRQ
+@@ -2404,12 +2406,20 @@ static void x86_nmi(NMIState *n, int cpu_index, Error **errp)
      }
  }
  
-@@ -213,7 +211,7 @@ static void acpi_pcihp_update(AcpiPciHpState *s)
- 
- void acpi_pcihp_reset(AcpiPciHpState *s)
++static AcpiConfiguration *pc_acpi_configuration(AcpiBuilder *builder)
++{
++    PCMachineState *pcms = PC_MACHINE(builder);
++
++    return &pcms->acpi_configuration;
++}
++
+ static void pc_machine_class_init(ObjectClass *oc, void *data)
  {
--    acpi_set_pci_info();
-+    acpi_set_pci_info(s);
-     acpi_pcihp_update(s);
- }
+     MachineClass *mc = MACHINE_CLASS(oc);
+     PCMachineClass *pcmc = PC_MACHINE_CLASS(oc);
+     HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(oc);
+     NMIClass *nc = NMI_CLASS(oc);
++    AcpiBuilderMethods *abm = ACPI_BUILDER_METHODS(oc);
  
-diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
-index 47293a3915..658460264b 100644
---- a/hw/pci-host/piix.c
-+++ b/hw/pci-host/piix.c
-@@ -445,14 +445,6 @@ PCIBus *i440fx_init(const char *host_type, const char *pci_type,
-     return b;
- }
+     pcmc->pci_enabled = true;
+     pcmc->has_acpi_build = true;
+@@ -2444,6 +2454,14 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+     nc->nmi_monitor_handler = x86_nmi;
+     mc->default_cpu_type = TARGET_DEFAULT_CPU_TYPE;
  
--PCIBus *find_i440fx(void)
--{
--    PCIHostState *s = OBJECT_CHECK(PCIHostState,
--                                   object_resolve_path("/machine/i440fx", NULL),
--                                   TYPE_PCI_HOST_BRIDGE);
--    return s ? s->bus : NULL;
--}
--
- /* PIIX3 PCI to ISA bridge */
- static void piix3_set_irq_pic(PIIX3State *piix3, int pic_irq)
- {
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 9917ebf1f1..4d5d8d0340 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -255,7 +255,6 @@ PCIBus *i440fx_init(const char *host_type, const char *pci_type,
-                     MemoryRegion *pci_memory,
-                     MemoryRegion *ram_memory);
- 
--PCIBus *find_i440fx(void);
- /* piix4.c */
- extern PCIDevice *piix4_dev;
- int piix4_init(PCIBus *bus, ISABus **isa_bus, int devfn);
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index 5dd0aeeec6..725f78bedc 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -41,6 +41,5 @@ stub-obj-y += pc_madt_cpu_entry.o
- stub-obj-y += vmgenid.o
- stub-obj-y += xen-common.o
- stub-obj-y += xen-hvm.o
--stub-obj-y += pci-host-piix.o
- stub-obj-y += ram-block.o
- stub-obj-y += ramfb.o
-diff --git a/stubs/pci-host-piix.c b/stubs/pci-host-piix.c
-deleted file mode 100644
-index 6ed81b1f21..0000000000
---- a/stubs/pci-host-piix.c
-+++ /dev/null
-@@ -1,6 +0,0 @@
--#include "qemu/osdep.h"
--#include "hw/i386/pc.h"
--PCIBus *find_i440fx(void)
--{
--    return NULL;
--}
++    /* ACPI building methods */
++    abm->madt = build_madt;
++    abm->rsdp = build_rsdp_rsdt;
++    abm->mcfg = build_mcfg;
++    abm->srat = build_srat;
++    abm->slit = build_slit;
++    abm->configuration = pc_acpi_configuration;
++
+     object_class_property_add(oc, MEMORY_DEVICE_REGION_SIZE, "int",
+         pc_machine_get_device_memory_region_size, NULL,
+         NULL, NULL, &error_abort);
+@@ -2495,6 +2513,7 @@ static const TypeInfo pc_machine_info = {
+     .interfaces = (InterfaceInfo[]) {
+          { TYPE_HOTPLUG_HANDLER },
+          { TYPE_NMI },
++         { TYPE_ACPI_BUILDER },
+          { }
+     },
+ };
 -- 
 2.19.1
