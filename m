@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44456)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gIAz4-0007zv-M8
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 07:17:55 -0400
+	(envelope-from <liq3ea@gmail.com>) id 1gIB1G-0003ga-MH
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 07:20:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gIAyz-0004qE-Po
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 07:17:54 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:40282)
+	(envelope-from <liq3ea@gmail.com>) id 1gIB0s-0006LV-UV
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 07:20:10 -0400
+Received: from mail-it1-x12e.google.com ([2607:f8b0:4864:20::12e]:55606)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gIAyx-0004nZ-QR
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 07:17:48 -0400
-Received: by mail-wr1-x443.google.com with SMTP id i17-v6so19639182wre.7
-	for <qemu-devel@nongnu.org>; Thu, 01 Nov 2018 04:17:46 -0700 (PDT)
-Date: Thu, 1 Nov 2018 11:17:43 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20181101111743.GM24946@stefanha-x1.localdomain>
-References: <20181031002526.14262-1-contrib@steffen-goertz.de>
-	<20181031002526.14262-6-contrib@steffen-goertz.de>
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1gIB0s-0006GR-08
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 07:19:46 -0400
+Received: by mail-it1-x12e.google.com with SMTP id b7-v6so675686itd.5
+	for <qemu-devel@nongnu.org>; Thu, 01 Nov 2018 04:19:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="m+utxuhC6KVTvgNz"
-Content-Disposition: inline
-In-Reply-To: <20181031002526.14262-6-contrib@steffen-goertz.de>
-Subject: Re: [Qemu-devel] [PATCH v3 05/13] hw/nvram/nrf51_nvm: Add nRF51
- non-volatile memories
+References: <1540873732-3503-1-git-send-email-liq3ea@gmail.com>
+	<154106589637.13139.2675198363504962560@015909e0f939>
+In-Reply-To: <154106589637.13139.2675198363504962560@015909e0f939>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Thu, 1 Nov 2018 19:19:01 +0800
+Message-ID: <CAKXe6SJomnXXiiA=JAbuOrZ+Neu=kQEEczkF+i6C1UmpNmAseg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] test: fw_cfg: add reboot-timeout
+ test case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,70 +30,2499 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Steffen =?iso-8859-1?Q?G=F6rtz?= <contrib@steffen-goertz.de>
-Cc: qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Peter Maydell <peter.maydell@linaro.org>
+To: Qemu Developers <qemu-devel@nongnu.org>
+Cc: famz@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, thuth@redhat.com, lvivier@redhat.com, philmd@redhat.com
 
+Hello all
 
---m+utxuhC6KVTvgNz
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+ This is cause because the fixed patch here:
+-->https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg00007.html
+ is not merged ATM.
 
-On Tue, Oct 30, 2018 at 08:25:19PM -0400, Steffen G=F6rtz wrote:
-> +static void io_write(void *opaque, hwaddr offset, uint64_t value,
-> +        unsigned int size)
-> +{
-> +    NRF51NVMState *s =3D NRF51_NVM(opaque);
-> +
-> +    switch (offset) {
-> +    case NRF51_NVMC_CONFIG:
-> +        s->config =3D value & NRF51_NVMC_CONFIG_MASK;
-> +        break;
-> +    case NRF51_NVMC_ERASEPCR0:
-> +    case NRF51_NVMC_ERASEPCR1:
-> +        value &=3D ~(NRF51_PAGE_SIZE - 1);
-> +        if (value < (s->code_size * NRF51_PAGE_SIZE)) {
-> +            address_space_write(&s->as, value, MEMTXATTRS_UNSPECIFIED,
-> +                                s->empty_page, NRF51_PAGE_SIZE);
-> +        }
-> +        break;
-> +    case NRF51_NVMC_ERASEALL:
-> +        if (value =3D=3D NRF51_NVMC_ERASE) {
-> +            for (uint32_t i =3D 0; i < s->code_size; i++) {
-> +                address_space_write(&s->as, i * NRF51_PAGE_SIZE,
-> +                MEMTXATTRS_UNSPECIFIED, s->empty_page, NRF51_PAGE_SIZE);
+Thanks,
+Li Qiang
 
-Indentation is off here.  One way of formatting it:
+<no-reply@patchew.org> =E4=BA=8E2018=E5=B9=B411=E6=9C=881=E6=97=A5=E5=91=A8=
+=E5=9B=9B =E4=B8=8B=E5=8D=885:51=E5=86=99=E9=81=93=EF=BC=9A
 
-                address_space_write(&s->as, i * NRF51_PAGE_SIZE,
-                                    MEMTXATTRS_UNSPECIFIED, s->empty_page,
-				    NRF51_PAGE_SIZE);
-
-> +static void nrf51_nvm_reset(DeviceState *dev)
-> +{
-> +    NRF51NVMState *s =3D NRF51_NVM(dev);
-> +
-> +    memset(s->uicr_content, '\0', sizeof(s->uicr_content));
-> +}
-
-We will zero UICR.  Does UICR come zero-initialized on a real micro:bit?
-
-I remember there was an issue with .hex files that set UICR values.
-Will nrf51_nvm_reset() overwrite values from .hex files when the generic
-loader devices is used (-device loader,file=3Dtest.hex)?
-
---m+utxuhC6KVTvgNz
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJb2uDXAAoJEJykq7OBq3PIbzwH/0JD0K9J7WT7ajAEh+DqEa6F
-87uYhLUFTTcJqGsfHfKMzQtPVoG6JCNvhrM9AUcXtkCWHeaWFQzaPYDCJujuqpoG
-xQJkQJaXnOdZuBFaw1N4/eK6IX5gCEm/OMbkDzdT8j7YOXIia/WOhPO/e7hF5ivj
-EirthSmDYH764msiKCQIyXsUfI+hT/n1NSR1V9qLQ3/ussqerjm06eEB68bMupqZ
-M6+YMo3wa3krNff47HecJoj1M2OwDQ1wqBa8LqrlsSf2Vf8vSilFT8gHjgcCPhPo
-0jW19qUuBcUkOmzoEMb+Bphgh+Y+A0eKeE/SPNoQMKYKl4eaOb4Gic61ctFwts4=
-=6Guq
------END PGP SIGNATURE-----
-
---m+utxuhC6KVTvgNz--
+> Hi,
+>
+> This series failed docker-quick@centos7 build test. Please find the
+> testing commands and
+> their output below. If you have Docker installed, you can probably
+> reproduce it
+> locally.
+>
+> Type: series
+> Message-id: 1540873732-3503-1-git-send-email-liq3ea@gmail.com
+> Subject: [Qemu-devel] [PATCH v2 0/2] test: fw_cfg: add reboot-timeout tes=
+t
+> case
+>
+> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
+> #!/bin/bash
+> time make docker-test-quick@centos7 SHOW_ENV=3D1 J=3D8
+> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
+>
+> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+> Switched to a new branch 'test'
+> 26c8c278fd tests: fw_cfg: add reboot_timeout test case
+> bd08775148 tests: fw_cfg: add a function to get the fw_cfg file entry
+>
+> =3D=3D=3D OUTPUT BEGIN =3D=3D=3D
+>   BUILD   centos7
+> make[1]: Entering directory '/var/tmp/patchew-tester-tmp-bmlan9mc/src'
+>   GEN
+>  /var/tmp/patchew-tester-tmp-bmlan9mc/src/docker-src.2018-11-01-05.43.33.=
+2597/qemu.tar
+> Cloning into
+> '/var/tmp/patchew-tester-tmp-bmlan9mc/src/docker-src.2018-11-01-05.43.33.=
+2597/qemu.tar.vroot'...
+> done.
+> Your branch is up-to-date with 'origin/test'.
+> Submodule 'dtc' (git://git.qemu-project.org/dtc.git) registered for path
+> 'dtc'
+> Cloning into
+> '/var/tmp/patchew-tester-tmp-bmlan9mc/src/docker-src.2018-11-01-05.43.33.=
+2597/qemu.tar.vroot/dtc'...
+> Submodule path 'dtc': checked out
+> '88f18909db731a627456f26d779445f84e449536'
+> Submodule 'ui/keycodemapdb' (git://git.qemu.org/keycodemapdb.git)
+> registered for path 'ui/keycodemapdb'
+> Cloning into
+> '/var/tmp/patchew-tester-tmp-bmlan9mc/src/docker-src.2018-11-01-05.43.33.=
+2597/qemu.tar.vroot/ui/keycodemapdb'...
+> Submodule path 'ui/keycodemapdb': checked out
+> '6b3d716e2b6472eb7189d3220552280ef3d832ce'
+>   COPY    RUNNER
+>     RUN test-quick in qemu:centos7
+> Packages installed:
+> SDL-devel-1.2.15-14.el7.x86_64
+> bison-3.0.4-1.el7.x86_64
+> bzip2-1.0.6-13.el7.x86_64
+> bzip2-devel-1.0.6-13.el7.x86_64
+> ccache-3.3.4-1.el7.x86_64
+> csnappy-devel-0-6.20150729gitd7bc683.el7.x86_64
+> flex-2.5.37-3.el7.x86_64
+> gcc-4.8.5-28.el7_5.1.x86_64
+> gettext-0.19.8.1-2.el7.x86_64
+> git-1.8.3.1-14.el7_5.x86_64
+> glib2-devel-2.54.2-2.el7.x86_64
+> libaio-devel-0.3.109-13.el7.x86_64
+> libepoxy-devel-1.3.1-2.el7_5.x86_64
+> libfdt-devel-1.4.6-1.el7.x86_64
+> lzo-devel-2.06-8.el7.x86_64
+> make-3.82-23.el7.x86_64
+> mesa-libEGL-devel-17.2.3-8.20171019.el7.x86_64
+> mesa-libgbm-devel-17.2.3-8.20171019.el7.x86_64
+> nettle-devel-2.7.1-8.el7.x86_64
+> package g++ is not installed
+> package librdmacm-devel is not installed
+> pixman-devel-0.34.0-1.el7.x86_64
+> spice-glib-devel-0.34-3.el7_5.1.x86_64
+> spice-server-devel-0.14.0-2.el7_5.4.x86_64
+> tar-1.26-34.el7.x86_64
+> vte-devel-0.28.2-10.el7.x86_64
+> xen-devel-4.6.6-12.el7.x86_64
+> zlib-devel-1.2.7-17.el7.x86_64
+>
+> Environment variables:
+> PACKAGES=3Dbison     bzip2     bzip2-devel     ccache     csnappy-devel
+>  flex     g++     gcc     gettext     git     glib2-devel     libaio-deve=
+l
+>    libepoxy-devel     libfdt-devel     librdmacm-devel     lzo-devel
+>  make     mesa-libEGL-devel     mesa-libgbm-devel     nettle-devel
+>  pixman-devel     SDL-devel     spice-glib-devel     spice-server-devel
+>  tar     vte-devel     xen-devel     zlib-devel
+> HOSTNAME=3D0c8c8c954653
+> MAKEFLAGS=3D -j8
+> J=3D8
+> CCACHE_DIR=3D/var/tmp/ccache
+> EXTRA_CONFIGURE_OPTS=3D
+> V=3D
+> SHOW_ENV=3D1
+>
+> PATH=3D/usr/lib/ccache:/usr/lib64/ccache:/usr/local/sbin:/usr/local/bin:/=
+usr/sbin:/usr/bin:/sbin:/bin
+> PWD=3D/
+> TARGET_LIST=3D
+> SHLVL=3D1
+> HOME=3D/home/patchew
+> TEST_DIR=3D/tmp/qemu-test
+> FEATURES=3D dtc
+> DEBUG=3D
+> _=3D/usr/bin/env
+>
+> Configure options:
+> --enable-werror --target-list=3Dx86_64-softmmu,aarch64-softmmu
+> --prefix=3D/tmp/qemu-test/install
+> No C++ compiler available; disabling C++ specific optional code
+> Install prefix    /tmp/qemu-test/install
+> BIOS directory    /tmp/qemu-test/install/share/qemu
+> firmware path     /tmp/qemu-test/install/share/qemu-firmware
+> binary directory  /tmp/qemu-test/install/bin
+> library directory /tmp/qemu-test/install/lib
+> module directory  /tmp/qemu-test/install/lib/qemu
+> libexec directory /tmp/qemu-test/install/libexec
+> include directory /tmp/qemu-test/install/include
+> config directory  /tmp/qemu-test/install/etc
+> local state directory   /tmp/qemu-test/install/var
+> Manual directory  /tmp/qemu-test/install/share/man
+> ELF interp prefix /usr/gnemul/qemu-%M
+> Source path       /tmp/qemu-test/src
+> GIT binary        git
+> GIT submodules
+> C compiler        cc
+> Host C compiler   cc
+> C++ compiler
+> Objective-C compiler cc
+> ARFLAGS           rv
+> CFLAGS            -O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3D2 -g
+> QEMU_CFLAGS       -I/usr/include/pixman-1    -Werror -pthread
+> -I/usr/include/glib-2.0 -I/usr/lib64/glib-2.0/include   -fPIE -DPIE -m64
+> -mcx16 -D_GNU_SOURCE -D_FILE_OFFSET_BITS=3D64 -D_LARGEFILE_SOURCE
+> -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings
+> -Wmissing-prototypes -fno-strict-aliasing -fno-common -fwrapv
+> -Wendif-labels -Wno-missing-include-dirs -Wempty-body -Wnested-externs
+> -Wformat-security -Wformat-y2k -Winit-self -Wignored-qualifiers
+> -Wold-style-declaration -Wold-style-definition -Wtype-limits
+> -fstack-protector-strong -Wno-missing-braces   -I/usr/include/libpng15
+>  -pthread -I/usr/include/spice-server -I/usr/include/cacard
+> -I/usr/include/glib-2.0 -I/usr/lib64/glib-2.0/include
+> -I/usr/include/pixman-1 -I/usr/include/nss3 -I/usr/include/nspr4
+> -I/usr/include/spice-1
+> LDFLAGS           -Wl,--warn-common -Wl,-z,relro -Wl,-z,now -pie -m64 -g
+> QEMU_LDFLAGS
+> make              make
+> install           install
+> python            python -B
+> smbd              /usr/sbin/smbd
+> module support    no
+> host CPU          x86_64
+> host big endian   no
+> target list       x86_64-softmmu aarch64-softmmu
+> gprof enabled     no
+> sparse enabled    no
+> strip binaries    yes
+> profiler          no
+> static build      no
+> SDL support       yes (1.2.15)
+> GTK support       no
+> GTK GL support    no
+> VTE support       no
+> TLS priority      NORMAL
+> GNUTLS support    no
+> libgcrypt         no
+> nettle            yes (2.7.1)
+> libtasn1          no
+> curses support    yes
+> virgl support     no
+> curl support      no
+> mingw32 support   no
+> Audio drivers     oss
+> Block whitelist (rw)
+> Block whitelist (ro)
+> VirtFS support    no
+> Multipath support no
+> VNC support       yes
+> VNC SASL support  no
+> VNC JPEG support  no
+> VNC PNG support   yes
+> xen support       yes
+> xen ctrl version  40600
+> pv dom build      no
+> brlapi support    no
+> bluez  support    no
+> Documentation     no
+> PIE               yes
+> vde support       no
+> netmap support    no
+> Linux AIO support yes
+> ATTR/XATTR support yes
+> Install blobs     yes
+> KVM support       yes
+> HAX support       no
+> HVF support       no
+> WHPX support      no
+> TCG support       yes
+> TCG debug enabled no
+> TCG interpreter   no
+> malloc trim support yes
+> RDMA support      yes
+> PVRDMA support    yes
+> fdt support       system
+> membarrier        no
+> preadv support    yes
+> fdatasync         yes
+> madvise           yes
+> posix_madvise     yes
+> posix_memalign    yes
+> libcap-ng support no
+> vhost-net support yes
+> vhost-crypto support yes
+> vhost-scsi support yes
+> vhost-vsock support yes
+> vhost-user support yes
+> Trace backends    log
+> spice support     yes (0.12.13/0.14.0)
+> rbd support       no
+> xfsctl support    no
+> smartcard support yes
+> libusb            no
+> usb net redir     no
+> OpenGL support    yes
+> OpenGL dmabufs    yes
+> libiscsi support  no
+> libnfs support    no
+> build guest agent yes
+> QGA VSS support   no
+> QGA w32 disk info no
+> QGA MSI support   no
+> seccomp support   no
+> coroutine backend ucontext
+> coroutine pool    yes
+> debug stack usage no
+> mutex debugging   no
+> crypto afalg      no
+> GlusterFS support no
+> gcov              gcov
+> gcov enabled      no
+> TPM support       yes
+> libssh2 support   no
+> TPM passthrough   yes
+> TPM emulator      yes
+> QOM debugging     yes
+> Live block migration yes
+> lzo support       yes
+> snappy support    no
+> bzip2 support     yes
+> NUMA host support no
+> libxml2           no
+> tcmalloc support  no
+> jemalloc support  no
+> avx2 optimization yes
+> replication support yes
+> VxHS block device no
+> capstone          no
+> docker            no
+> libpmem support   no
+>
+> WARNING: Use of SDL 1.2 is deprecated and will be removed in
+> WARNING: future releases. Please switch to using SDL 2.0
+>
+> NOTE: cross-compilers enabled:  'cc'
+>   GEN     x86_64-softmmu/config-devices.mak.tmp
+>   GEN     aarch64-softmmu/config-devices.mak.tmp
+>   GEN     qemu-options.def
+>   GEN     config-host.h
+>   GEN     qapi-gen
+>   GEN     trace/generated-tcg-tracers.h
+>   GEN     trace/generated-helpers-wrappers.h
+>   GEN     trace/generated-helpers.h
+>   GEN     trace/generated-helpers.c
+>   GEN     module_block.h
+>   GEN     aarch64-softmmu/config-devices.mak
+>   GEN     x86_64-softmmu/config-devices.mak
+>   GEN     ui/input-keymap-atset1-to-qcode.c
+>   GEN     ui/input-keymap-linux-to-qcode.c
+>   GEN     ui/input-keymap-qcode-to-atset1.c
+>   GEN     ui/input-keymap-qcode-to-atset2.c
+>   GEN     ui/input-keymap-qcode-to-atset3.c
+>   GEN     ui/input-keymap-qcode-to-linux.c
+>   GEN     ui/input-keymap-qcode-to-qnum.c
+>   GEN     ui/input-keymap-qcode-to-sun.c
+>   GEN     ui/input-keymap-qnum-to-qcode.c
+>   GEN     ui/input-keymap-usb-to-qcode.c
+>   GEN     ui/input-keymap-win32-to-qcode.c
+>   GEN     ui/input-keymap-x11-to-qcode.c
+>   GEN     ui/input-keymap-xorgevdev-to-qcode.c
+>   GEN     ui/input-keymap-xorgkbd-to-qcode.c
+>   GEN     ui/input-keymap-xorgxquartz-to-qcode.c
+>   GEN     ui/input-keymap-xorgxwin-to-qcode.c
+>   GEN     ui/input-keymap-osx-to-qcode.c
+>   GEN     tests/test-qapi-gen
+>   GEN     trace-root.h
+>   GEN     accel/kvm/trace.h
+>   GEN     accel/tcg/trace.h
+>   GEN     audio/trace.h
+>   GEN     block/trace.h
+>   GEN     chardev/trace.h
+>   GEN     crypto/trace.h
+>   GEN     hw/9pfs/trace.h
+>   GEN     hw/acpi/trace.h
+>   GEN     hw/alpha/trace.h
+>   GEN     hw/arm/trace.h
+>   GEN     hw/audio/trace.h
+>   GEN     hw/block/trace.h
+>   GEN     hw/block/dataplane/trace.h
+>   GEN     hw/char/trace.h
+>   GEN     hw/display/trace.h
+>   GEN     hw/dma/trace.h
+>   GEN     hw/hppa/trace.h
+>   GEN     hw/i2c/trace.h
+>   GEN     hw/i386/trace.h
+>   GEN     hw/i386/xen/trace.h
+>   GEN     hw/ide/trace.h
+>   GEN     hw/input/trace.h
+>   GEN     hw/intc/trace.h
+>   GEN     hw/isa/trace.h
+>   GEN     hw/mem/trace.h
+>   GEN     hw/misc/trace.h
+>   GEN     hw/misc/macio/trace.h
+>   GEN     hw/net/trace.h
+>   GEN     hw/nvram/trace.h
+>   GEN     hw/pci/trace.h
+>   GEN     hw/pci-host/trace.h
+>   GEN     hw/ppc/trace.h
+>   GEN     hw/rdma/trace.h
+>   GEN     hw/rdma/vmw/trace.h
+>   GEN     hw/s390x/trace.h
+>   GEN     hw/scsi/trace.h
+>   GEN     hw/sd/trace.h
+>   GEN     hw/sparc/trace.h
+>   GEN     hw/sparc64/trace.h
+>   GEN     hw/timer/trace.h
+>   GEN     hw/tpm/trace.h
+>   GEN     hw/usb/trace.h
+>   GEN     hw/vfio/trace.h
+>   GEN     hw/virtio/trace.h
+>   GEN     hw/watchdog/trace.h
+>   GEN     hw/xen/trace.h
+>   GEN     io/trace.h
+>   GEN     linux-user/trace.h
+>   GEN     migration/trace.h
+>   GEN     nbd/trace.h
+>   GEN     net/trace.h
+>   GEN     qapi/trace.h
+>   GEN     qom/trace.h
+>   GEN     scsi/trace.h
+>   GEN     target/arm/trace.h
+>   GEN     target/i386/trace.h
+>   GEN     target/mips/trace.h
+>   GEN     target/ppc/trace.h
+>   GEN     target/s390x/trace.h
+>   GEN     target/sparc/trace.h
+>   GEN     ui/trace.h
+>   GEN     util/trace.h
+>   GEN     trace-root.c
+>   GEN     accel/kvm/trace.c
+>   GEN     accel/tcg/trace.c
+>   GEN     audio/trace.c
+>   GEN     block/trace.c
+>   GEN     chardev/trace.c
+>   GEN     crypto/trace.c
+>   GEN     hw/9pfs/trace.c
+>   GEN     hw/acpi/trace.c
+>   GEN     hw/alpha/trace.c
+>   GEN     hw/arm/trace.c
+>   GEN     hw/audio/trace.c
+>   GEN     hw/block/trace.c
+>   GEN     hw/block/dataplane/trace.c
+>   GEN     hw/char/trace.c
+>   GEN     hw/display/trace.c
+>   GEN     hw/dma/trace.c
+>   GEN     hw/hppa/trace.c
+>   GEN     hw/i2c/trace.c
+>   GEN     hw/i386/trace.c
+>   GEN     hw/i386/xen/trace.c
+>   GEN     hw/ide/trace.c
+>   GEN     hw/input/trace.c
+>   GEN     hw/intc/trace.c
+>   GEN     hw/isa/trace.c
+>   GEN     hw/mem/trace.c
+>   GEN     hw/misc/trace.c
+>   GEN     hw/misc/macio/trace.c
+>   GEN     hw/net/trace.c
+>   GEN     hw/nvram/trace.c
+>   GEN     hw/pci/trace.c
+>   GEN     hw/pci-host/trace.c
+>   GEN     hw/ppc/trace.c
+>   GEN     hw/rdma/trace.c
+>   GEN     hw/rdma/vmw/trace.c
+>   GEN     hw/s390x/trace.c
+>   GEN     hw/scsi/trace.c
+>   GEN     hw/sd/trace.c
+>   GEN     hw/sparc/trace.c
+>   GEN     hw/sparc64/trace.c
+>   GEN     hw/timer/trace.c
+>   GEN     hw/tpm/trace.c
+>   GEN     hw/usb/trace.c
+>   GEN     hw/vfio/trace.c
+>   GEN     hw/virtio/trace.c
+>   GEN     hw/watchdog/trace.c
+>   GEN     hw/xen/trace.c
+>   GEN     io/trace.c
+>   GEN     linux-user/trace.c
+>   GEN     migration/trace.c
+>   GEN     nbd/trace.c
+>   GEN     net/trace.c
+>   GEN     qapi/trace.c
+>   GEN     qom/trace.c
+>   GEN     scsi/trace.c
+>   GEN     target/arm/trace.c
+>   GEN     target/i386/trace.c
+>   GEN     target/mips/trace.c
+>   GEN     target/ppc/trace.c
+>   GEN     target/s390x/trace.c
+>   GEN     target/sparc/trace.c
+>   GEN     ui/trace.c
+>   GEN     util/trace.c
+>   GEN     config-all-devices.mak
+>   CC      tests/qemu-iotests/socket_scm_helper.o
+>   GEN     qga/qapi-generated/qapi-gen
+>   CC      qapi/qapi-builtin-types.o
+>   CC      qapi/qapi-types.o
+>   CC      qapi/qapi-types-char.o
+>   CC      qapi/qapi-types-common.o
+>   CC      qapi/qapi-types-block-core.o
+>   CC      qapi/qapi-types-block.o
+>   CC      qapi/qapi-types-crypto.o
+>   CC      qapi/qapi-types-introspect.o
+>   CC      qapi/qapi-types-job.o
+>   CC      qapi/qapi-types-migration.o
+>   CC      qapi/qapi-types-misc.o
+>   CC      qapi/qapi-types-net.o
+>   CC      qapi/qapi-types-rocker.o
+>   CC      qapi/qapi-types-run-state.o
+>   CC      qapi/qapi-types-sockets.o
+>   CC      qapi/qapi-types-tpm.o
+>   CC      qapi/qapi-types-trace.o
+>   CC      qapi/qapi-types-transaction.o
+>   CC      qapi/qapi-types-ui.o
+>   CC      qapi/qapi-builtin-visit.o
+>   CC      qapi/qapi-visit.o
+>   CC      qapi/qapi-visit-block-core.o
+>   CC      qapi/qapi-visit-block.o
+>   CC      qapi/qapi-visit-char.o
+>   CC      qapi/qapi-visit-common.o
+>   CC      qapi/qapi-visit-crypto.o
+>   CC      qapi/qapi-visit-introspect.o
+>   CC      qapi/qapi-visit-job.o
+>   CC      qapi/qapi-visit-migration.o
+>   CC      qapi/qapi-visit-misc.o
+>   CC      qapi/qapi-visit-net.o
+>   CC      qapi/qapi-visit-rocker.o
+>   CC      qapi/qapi-visit-run-state.o
+>   CC      qapi/qapi-visit-sockets.o
+>   CC      qapi/qapi-visit-tpm.o
+>   CC      qapi/qapi-visit-trace.o
+>   CC      qapi/qapi-visit-transaction.o
+>   CC      qapi/qapi-visit-ui.o
+>   CC      qapi/qapi-events.o
+>   CC      qapi/qapi-events-block-core.o
+>   CC      qapi/qapi-events-block.o
+>   CC      qapi/qapi-events-char.o
+>   CC      qapi/qapi-events-common.o
+>   CC      qapi/qapi-events-crypto.o
+>   CC      qapi/qapi-events-introspect.o
+>   CC      qapi/qapi-events-job.o
+>   CC      qapi/qapi-events-migration.o
+>   CC      qapi/qapi-events-misc.o
+>   CC      qapi/qapi-events-net.o
+>   CC      qapi/qapi-events-rocker.o
+>   CC      qapi/qapi-events-run-state.o
+>   CC      qapi/qapi-events-sockets.o
+>   CC      qapi/qapi-events-tpm.o
+>   CC      qapi/qapi-events-trace.o
+>   CC      qapi/qapi-events-transaction.o
+>   CC      qapi/qapi-events-ui.o
+>   CC      qapi/qapi-introspect.o
+>   CC      qapi/qapi-visit-core.o
+>   CC      qapi/qapi-dealloc-visitor.o
+>   CC      qapi/qobject-input-visitor.o
+>   CC      qapi/qobject-output-visitor.o
+>   CC      qapi/qmp-registry.o
+>   CC      qapi/qmp-dispatch.o
+>   CC      qapi/string-input-visitor.o
+>   CC      qapi/string-output-visitor.o
+>   CC      qapi/opts-visitor.o
+>   CC      qapi/qapi-clone-visitor.o
+>   CC      qapi/qmp-event.o
+>   CC      qapi/qapi-util.o
+>   CC      qobject/qnull.o
+>   CC      qobject/qnum.o
+>   CC      qobject/qstring.o
+>   CC      qobject/qdict.o
+>   CC      qobject/qlist.o
+>   CC      qobject/qbool.o
+>   CC      qobject/qlit.o
+>   CC      qobject/qjson.o
+>   CC      qobject/qobject.o
+>   CC      qobject/json-lexer.o
+>   CC      qobject/json-streamer.o
+>   CC      qobject/json-parser.o
+>   CC      qobject/block-qdict.o
+>   CC      trace/control.o
+>   CC      trace/qmp.o
+>   CC      util/cutils.o
+>   CC      util/osdep.o
+>   CC      util/unicode.o
+>   CC      util/qemu-timer-common.o
+>   CC      util/bufferiszero.o
+>   CC      util/lockcnt.o
+>   CC      util/aiocb.o
+>   CC      util/async.o
+>   CC      util/aio-wait.o
+>   CC      util/thread-pool.o
+>   CC      util/qemu-timer.o
+>   CC      util/main-loop.o
+>   CC      util/iohandler.o
+>   CC      util/aio-posix.o
+>   CC      util/compatfd.o
+>   CC      util/event_notifier-posix.o
+>   CC      util/mmap-alloc.o
+>   CC      util/oslib-posix.o
+>   CC      util/qemu-openpty.o
+>   CC      util/qemu-thread-posix.o
+>   CC      util/memfd.o
+>   CC      util/envlist.o
+>   CC      util/path.o
+>   CC      util/module.o
+>   CC      util/host-utils.o
+>   CC      util/bitmap.o
+>   CC      util/bitops.o
+>   CC      util/hbitmap.o
+>   CC      util/fifo8.o
+>   CC      util/acl.o
+>   CC      util/cacheinfo.o
+>   CC      util/error.o
+>   CC      util/qemu-error.o
+>   CC      util/id.o
+>   CC      util/iov.o
+>   CC      util/qemu-config.o
+>   CC      util/qemu-sockets.o
+>   CC      util/uri.o
+>   CC      util/notify.o
+>   CC      util/qemu-option.o
+>   CC      util/qemu-progress.o
+>   CC      util/keyval.o
+>   CC      util/hexdump.o
+>   CC      util/crc32c.o
+>   CC      util/uuid.o
+>   CC      util/throttle.o
+>   CC      util/getauxval.o
+>   CC      util/readline.o
+>   CC      util/rcu.o
+>   CC      util/qemu-coroutine.o
+>   CC      util/qemu-coroutine-lock.o
+>   CC      util/qemu-coroutine-io.o
+>   CC      util/qemu-coroutine-sleep.o
+>   CC      util/coroutine-ucontext.o
+>   CC      util/buffer.o
+>   CC      util/timed-average.o
+>   CC      util/base64.o
+>   CC      util/log.o
+>   CC      util/pagesize.o
+>   CC      util/qdist.o
+>   CC      util/qht.o
+>   CC      util/qsp.o
+>   CC      util/range.o
+>   CC      util/stats64.o
+>   CC      util/systemd.o
+>   CC      util/iova-tree.o
+>   CC      util/vfio-helpers.o
+>   CC      util/drm.o
+>   CC      trace-root.o
+>   CC      accel/kvm/trace.o
+>   CC      accel/tcg/trace.o
+>   CC      audio/trace.o
+>   CC      block/trace.o
+>   CC      chardev/trace.o
+>   CC      crypto/trace.o
+>   CC      hw/9pfs/trace.o
+>   CC      hw/acpi/trace.o
+>   CC      hw/arm/trace.o
+>   CC      hw/alpha/trace.o
+>   CC      hw/audio/trace.o
+>   CC      hw/block/dataplane/trace.o
+>   CC      hw/block/trace.o
+>   CC      hw/char/trace.o
+>   CC      hw/display/trace.o
+>   CC      hw/dma/trace.o
+>   CC      hw/hppa/trace.o
+>   CC      hw/i2c/trace.o
+>   CC      hw/i386/trace.o
+>   CC      hw/i386/xen/trace.o
+>   CC      hw/ide/trace.o
+>   CC      hw/input/trace.o
+>   CC      hw/intc/trace.o
+>   CC      hw/isa/trace.o
+>   CC      hw/mem/trace.o
+>   CC      hw/misc/trace.o
+>   CC      hw/misc/macio/trace.o
+>   CC      hw/net/trace.o
+>   CC      hw/nvram/trace.o
+>   CC      hw/pci/trace.o
+>   CC      hw/pci-host/trace.o
+>   CC      hw/ppc/trace.o
+>   CC      hw/rdma/trace.o
+>   CC      hw/rdma/vmw/trace.o
+>   CC      hw/s390x/trace.o
+>   CC      hw/scsi/trace.o
+>   CC      hw/sd/trace.o
+>   CC      hw/sparc/trace.o
+>   CC      hw/sparc64/trace.o
+>   CC      hw/timer/trace.o
+>   CC      hw/tpm/trace.o
+>   CC      hw/usb/trace.o
+>   CC      hw/vfio/trace.o
+>   CC      hw/virtio/trace.o
+>   CC      hw/watchdog/trace.o
+>   CC      hw/xen/trace.o
+>   CC      io/trace.o
+>   CC      linux-user/trace.o
+>   CC      migration/trace.o
+>   CC      nbd/trace.o
+>   CC      net/trace.o
+>   CC      qapi/trace.o
+>   CC      qom/trace.o
+>   CC      scsi/trace.o
+>   CC      target/arm/trace.o
+>   CC      target/i386/trace.o
+>   CC      target/mips/trace.o
+>   CC      target/ppc/trace.o
+>   CC      target/s390x/trace.o
+>   CC      target/sparc/trace.o
+>   CC      ui/trace.o
+>   CC      util/trace.o
+>   CC      crypto/pbkdf-stub.o
+>   CC      stubs/arch-query-cpu-def.o
+>   CC      stubs/arch-query-cpu-model-comparison.o
+>   CC      stubs/arch-query-cpu-model-expansion.o
+>   CC      stubs/arch-query-cpu-model-baseline.o
+>   CC      stubs/bdrv-next-monitor-owned.o
+>   CC      stubs/blk-commit-all.o
+>   CC      stubs/blockdev-close-all-bdrv-states.o
+>   CC      stubs/clock-warp.o
+>   CC      stubs/cpu-get-clock.o
+>   CC      stubs/cpu-get-icount.o
+>   CC      stubs/dump.o
+>   CC      stubs/error-printf.o
+>   CC      stubs/fdset.o
+>   CC      stubs/gdbstub.o
+>   CC      stubs/get-vm-name.o
+>   CC      stubs/iothread.o
+>   CC      stubs/is-daemonized.o
+>   CC      stubs/iothread-lock.o
+>   CC      stubs/linux-aio.o
+>   CC      stubs/machine-init-done.o
+>   CC      stubs/migr-blocker.o
+>   CC      stubs/change-state-handler.o
+>   CC      stubs/monitor.o
+>   CC      stubs/notify-event.o
+>   CC      stubs/qtest.o
+>   CC      stubs/replay.o
+>   CC      stubs/runstate-check.o
+>   CC      stubs/set-fd-handler.o
+>   CC      stubs/slirp.o
+>   CC      stubs/sysbus.o
+>   CC      stubs/tpm.o
+>   CC      stubs/trace-control.o
+>   CC      stubs/uuid.o
+>   CC      stubs/vm-stop.o
+>   CC      stubs/vmstate.o
+>   CC      stubs/qmp_memory_device.o
+>   CC      stubs/target-monitor-defs.o
+>   CC      stubs/target-get-monitor-def.o
+>   CC      stubs/pc_madt_cpu_entry.o
+>   CC      stubs/vmgenid.o
+>   CC      stubs/xen-common.o
+>   CC      stubs/xen-hvm.o
+>   CC      stubs/pci-host-piix.o
+>   CC      stubs/ram-block.o
+>   CC      stubs/ramfb.o
+>   CC      contrib/ivshmem-client/ivshmem-client.o
+>   CC      contrib/ivshmem-client/main.o
+>   CC      contrib/ivshmem-server/ivshmem-server.o
+>   CC      contrib/ivshmem-server/main.o
+>   CC      qemu-nbd.o
+>   CC      block.o
+>   CC      blockjob.o
+>   CC      job.o
+>   CC      qemu-io-cmds.o
+>   CC      replication.o
+>   CC      block/raw-format.o
+>   CC      block/qcow.o
+>   CC      block/vdi.o
+>   CC      block/vmdk.o
+>   CC      block/cloop.o
+>   CC      block/bochs.o
+>   CC      block/vpc.o
+>   CC      block/vvfat.o
+>   CC      block/dmg.o
+>   CC      block/qcow2.o
+>   CC      block/qcow2-refcount.o
+>   CC      block/qcow2-cluster.o
+>   CC      block/qcow2-snapshot.o
+>   CC      block/qcow2-cache.o
+>   CC      block/qcow2-bitmap.o
+>   CC      block/qed.o
+>   CC      block/qed-l2-cache.o
+>   CC      block/qed-table.o
+>   CC      block/qed-cluster.o
+>   CC      block/qed-check.o
+>   CC      block/vhdx.o
+>   CC      block/vhdx-endian.o
+>   CC      block/vhdx-log.o
+>   CC      block/quorum.o
+>   CC      block/parallels.o
+>   CC      block/blkdebug.o
+>   CC      block/blkverify.o
+>   CC      block/blkreplay.o
+>   CC      block/blklogwrites.o
+>   CC      block/block-backend.o
+>   CC      block/snapshot.o
+>   CC      block/qapi.o
+>   CC      block/file-posix.o
+>   CC      block/linux-aio.o
+>   CC      block/null.o
+>   CC      block/mirror.o
+>   CC      block/commit.o
+>   CC      block/io.o
+>   CC      block/create.o
+>   CC      block/throttle-groups.o
+>   CC      block/nvme.o
+>   CC      block/nbd.o
+>   CC      block/nbd-client.o
+>   CC      block/sheepdog.o
+>   CC      block/accounting.o
+>   CC      block/dirty-bitmap.o
+>   CC      block/write-threshold.o
+>   CC      block/backup.o
+>   CC      block/replication.o
+>   CC      block/throttle.o
+>   CC      block/copy-on-read.o
+>   CC      block/crypto.o
+>   CC      nbd/server.o
+>   CC      nbd/client.o
+>   CC      nbd/common.o
+>   CC      scsi/utils.o
+>   CC      scsi/pr-manager-helper.o
+>   CC      scsi/pr-manager.o
+>   CC      block/dmg-bz2.o
+>   CC      crypto/init.o
+>   CC      crypto/hash.o
+>   CC      crypto/hash-nettle.o
+>   CC      crypto/hmac.o
+>   CC      crypto/hmac-nettle.o
+>   CC      crypto/aes.o
+>   CC      crypto/desrfb.o
+>   CC      crypto/cipher.o
+>   CC      crypto/tlscreds.o
+>   CC      crypto/tlscredsanon.o
+>   CC      crypto/tlscredspsk.o
+>   CC      crypto/tlscredsx509.o
+>   CC      crypto/tlssession.o
+>   CC      crypto/secret.o
+>   CC      crypto/random-platform.o
+>   CC      crypto/pbkdf.o
+>   CC      crypto/pbkdf-nettle.o
+>   CC      crypto/ivgen.o
+>   CC      crypto/ivgen-essiv.o
+>   CC      crypto/ivgen-plain.o
+>   CC      crypto/ivgen-plain64.o
+>   CC      crypto/afsplit.o
+>   CC      crypto/xts.o
+>   CC      crypto/block.o
+>   CC      crypto/block-qcow.o
+>   CC      crypto/block-luks.o
+>   CC      io/channel.o
+>   CC      io/channel-buffer.o
+>   CC      io/channel-command.o
+>   CC      io/channel-file.o
+>   CC      io/channel-tls.o
+>   CC      io/channel-socket.o
+>   CC      io/channel-watch.o
+>   CC      io/channel-websock.o
+>   CC      io/channel-util.o
+>   CC      io/dns-resolver.o
+>   CC      io/net-listener.o
+>   CC      io/task.o
+>   CC      qom/object.o
+>   CC      qom/container.o
+>   CC      qom/qom-qobject.o
+>   CC      qom/object_interfaces.o
+>   CC      qemu-io.o
+>   GEN     qemu-img-cmds.h
+>   CC      qemu-edid.o
+>   CC      hw/display/edid-generate.o
+>   CC      scsi/qemu-pr-helper.o
+>   CC      qemu-bridge-helper.o
+>   CC      blockdev.o
+>   CC      blockdev-nbd.o
+>   CC      bootdevice.o
+>   CC      iothread.o
+>   CC      job-qmp.o
+>   CC      qdev-monitor.o
+>   CC      device-hotplug.o
+>   CC      os-posix.o
+>   CC      bt-host.o
+>   CC      bt-vhci.o
+>   CC      dma-helpers.o
+>   CC      vl.o
+>   CC      tpm.o
+>   CC      device_tree.o
+>   CC      qapi/qapi-commands.o
+>   CC      qapi/qapi-commands-block-core.o
+>   CC      qapi/qapi-commands-block.o
+>   CC      qapi/qapi-commands-char.o
+>   CC      qapi/qapi-commands-common.o
+>   CC      qapi/qapi-commands-crypto.o
+>   CC      qapi/qapi-commands-introspect.o
+>   CC      qapi/qapi-commands-job.o
+>   CC      qapi/qapi-commands-migration.o
+>   CC      qapi/qapi-commands-misc.o
+>   CC      qapi/qapi-commands-net.o
+>   CC      qapi/qapi-commands-rocker.o
+>   CC      qapi/qapi-commands-run-state.o
+>   CC      qapi/qapi-commands-sockets.o
+>   CC      qapi/qapi-commands-tpm.o
+>   CC      qapi/qapi-commands-trace.o
+>   CC      qapi/qapi-commands-transaction.o
+>   CC      qapi/qapi-commands-ui.o
+>   CC      qmp.o
+>   CC      hmp.o
+>   CC      cpus-common.o
+>   CC      audio/audio.o
+>   CC      audio/noaudio.o
+>   CC      audio/wavaudio.o
+>   CC      audio/mixeng.o
+>   CC      audio/spiceaudio.o
+>   CC      audio/wavcapture.o
+>   CC      backends/rng.o
+>   CC      backends/rng-egd.o
+>   CC      backends/rng-random.o
+>   CC      backends/tpm.o
+>   CC      backends/hostmem.o
+>   CC      backends/hostmem-ram.o
+>   CC      backends/hostmem-file.o
+>   CC      backends/cryptodev.o
+>   CC      backends/cryptodev-builtin.o
+>   CC      backends/cryptodev-vhost.o
+>   CC      backends/cryptodev-vhost-user.o
+>   CC      backends/hostmem-memfd.o
+>   CC      block/stream.o
+>   CC      chardev/msmouse.o
+>   CC      chardev/wctablet.o
+>   CC      chardev/testdev.o
+>   CC      chardev/spice.o
+>   CC      disas/arm.o
+>   CC      disas/i386.o
+>   CC      fsdev/qemu-fsdev-dummy.o
+>   CC      fsdev/qemu-fsdev-opts.o
+>   CC      fsdev/qemu-fsdev-throttle.o
+>   CC      hw/acpi/core.o
+>   CC      hw/acpi/piix4.o
+>   CC      hw/acpi/pcihp.o
+>   CC      hw/acpi/ich9.o
+>   CC      hw/acpi/tco.o
+>   CC      hw/acpi/cpu_hotplug.o
+>   CC      hw/acpi/memory_hotplug.o
+>   CC      hw/acpi/cpu.o
+>   CC      hw/acpi/nvdimm.o
+>   CC      hw/acpi/vmgenid.o
+>   CC      hw/acpi/acpi_interface.o
+>   CC      hw/acpi/bios-linker-loader.o
+>   CC      hw/acpi/aml-build.o
+>   CC      hw/acpi/ipmi.o
+>   CC      hw/acpi/acpi-stub.o
+>   CC      hw/acpi/ipmi-stub.o
+>   CC      hw/audio/sb16.o
+>   CC      hw/audio/es1370.o
+>   CC      hw/audio/ac97.o
+>   CC      hw/audio/fmopl.o
+>   CC      hw/audio/adlib.o
+>   CC      hw/audio/gus.o
+>   CC      hw/audio/gusemu_hal.o
+>   CC      hw/audio/gusemu_mixer.o
+>   CC      hw/audio/cs4231a.o
+>   CC      hw/audio/intel-hda.o
+>   CC      hw/audio/hda-codec.o
+>   CC      hw/audio/pcspk.o
+>   CC      hw/audio/wm8750.o
+>   CC      hw/audio/pl041.o
+>   CC      hw/audio/lm4549.o
+>   CC      hw/audio/marvell_88w8618.o
+>   CC      hw/audio/soundhw.o
+>   CC      hw/block/block.o
+>   CC      hw/block/hd-geometry.o
+>   CC      hw/block/fdc.o
+>   CC      hw/block/m25p80.o
+>   CC      hw/block/cdrom.o
+>   CC      hw/block/nand.o
+>   CC      hw/block/pflash_cfi01.o
+>   CC      hw/block/pflash_cfi02.o
+>   CC      hw/block/xen_disk.o
+>   CC      hw/block/ecc.o
+>   CC      hw/block/onenand.o
+>   CC      hw/block/nvme.o
+>   CC      hw/bt/core.o
+>   CC      hw/bt/l2cap.o
+>   CC      hw/bt/sdp.o
+>   CC      hw/bt/hci.o
+>   CC      hw/bt/hci-csr.o
+>   CC      hw/bt/hid.o
+>   CC      hw/char/ipoctal232.o
+>   CC      hw/char/parallel.o
+>   CC      hw/char/parallel-isa.o
+>   CC      hw/char/pl011.o
+>   CC      hw/char/serial.o
+>   CC      hw/char/serial-isa.o
+>   CC      hw/char/serial-pci.o
+>   CC      hw/char/virtio-console.o
+>   CC      hw/char/xen_console.o
+>   CC      hw/char/cadence_uart.o
+>   CC      hw/char/cmsdk-apb-uart.o
+>   CC      hw/char/debugcon.o
+>   CC      hw/char/imx_serial.o
+>   CC      hw/core/qdev.o
+>   CC      hw/core/qdev-properties.o
+>   CC      hw/core/bus.o
+>   CC      hw/core/reset.o
+>   CC      hw/core/qdev-fw.o
+>   CC      hw/core/fw-path-provider.o
+>   CC      hw/core/irq.o
+>   CC      hw/core/hotplug.o
+>   CC      hw/core/nmi.o
+>   CC      hw/core/stream.o
+>   CC      hw/core/ptimer.o
+>   CC      hw/core/sysbus.o
+>   CC      hw/core/machine.o
+>   CC      hw/core/loader.o
+>   CC      hw/core/qdev-properties-system.o
+>   CC      hw/core/register.o
+>   CC      hw/core/or-irq.o
+>   CC      hw/core/split-irq.o
+>   CC      hw/core/platform-bus.o
+>   CC      hw/core/generic-loader.o
+>   CC      hw/core/null-machine.o
+>   CC      hw/cpu/core.o
+>   CC      hw/display/ramfb.o
+>   CC      hw/display/ramfb-standalone.o
+>   CC      hw/display/ads7846.o
+>   CC      hw/display/cirrus_vga.o
+>   CC      hw/display/cirrus_vga_isa.o
+>   CC      hw/display/pl110.o
+>   CC      hw/display/sii9022.o
+>   CC      hw/display/ssd0303.o
+>   CC      hw/display/ssd0323.o
+>   CC      hw/display/xenfb.o
+>   CC      hw/display/vga-pci.o
+>   CC      hw/display/edid-region.o
+>   CC      hw/display/vga-isa.o
+>   CC      hw/display/vmware_vga.o
+>   CC      hw/display/bochs-display.o
+>   CC      hw/display/blizzard.o
+>   CC      hw/display/exynos4210_fimd.o
+>   CC      hw/display/framebuffer.o
+>   CC      hw/display/tc6393xb.o
+>   CC      hw/display/qxl.o
+>   CC      hw/display/qxl-logger.o
+>   CC      hw/display/qxl-render.o
+>   CC      hw/dma/pl080.o
+>   CC      hw/dma/pl330.o
+>   CC      hw/dma/i8257.o
+>   CC      hw/dma/xilinx_axidma.o
+>   CC      hw/dma/xlnx-zynq-devcfg.o
+>   CC      hw/dma/xlnx-zdma.o
+>   CC      hw/gpio/max7310.o
+>   CC      hw/gpio/pl061.o
+>   CC      hw/gpio/zaurus.o
+>   CC      hw/gpio/gpio_key.o
+>   CC      hw/i2c/core.o
+>   CC      hw/i2c/smbus.o
+>   CC      hw/i2c/smbus_eeprom.o
+>   CC      hw/i2c/i2c-ddc.o
+>   CC      hw/i2c/versatile_i2c.o
+>   CC      hw/i2c/smbus_ich9.o
+>   CC      hw/i2c/pm_smbus.o
+>   CC      hw/i2c/bitbang_i2c.o
+>   CC      hw/i2c/exynos4210_i2c.o
+>   CC      hw/i2c/imx_i2c.o
+>   CC      hw/i2c/aspeed_i2c.o
+>   CC      hw/ide/core.o
+>   CC      hw/ide/atapi.o
+>   CC      hw/ide/qdev.o
+>   CC      hw/ide/pci.o
+>   CC      hw/ide/isa.o
+>   CC      hw/ide/piix.o
+>   CC      hw/ide/microdrive.o
+>   CC      hw/ide/ahci.o
+>   CC      hw/ide/ich.o
+>   CC      hw/ide/ahci-allwinner.o
+>   CC      hw/input/hid.o
+>   CC      hw/input/lm832x.o
+>   CC      hw/input/pckbd.o
+>   CC      hw/input/pl050.o
+>   CC      hw/input/ps2.o
+>   CC      hw/input/stellaris_input.o
+>   CC      hw/input/tsc2005.o
+>   CC      hw/input/virtio-input.o
+>   CC      hw/input/virtio-input-hid.o
+>   CC      hw/input/virtio-input-host.o
+>   CC      hw/intc/i8259_common.o
+>   CC      hw/intc/i8259.o
+>   CC      hw/intc/pl190.o
+>   CC      hw/intc/xlnx-pmu-iomod-intc.o
+>   CC      hw/intc/xlnx-zynqmp-ipi.o
+>   CC      hw/intc/imx_avic.o
+>   CC      hw/intc/imx_gpcv2.o
+>   CC      hw/intc/realview_gic.o
+>   CC      hw/intc/ioapic_common.o
+>   CC      hw/intc/arm_gic.o
+>   CC      hw/intc/arm_gic_common.o
+>   CC      hw/intc/arm_gicv2m.o
+>   CC      hw/intc/arm_gicv3_common.o
+>   CC      hw/intc/arm_gicv3.o
+>   CC      hw/intc/arm_gicv3_dist.o
+>   CC      hw/intc/arm_gicv3_redist.o
+>   CC      hw/intc/arm_gicv3_its_common.o
+>   CC      hw/intc/intc.o
+>   CC      hw/ipack/ipack.o
+>   CC      hw/ipack/tpci200.o
+>   CC      hw/ipmi/ipmi.o
+>   CC      hw/ipmi/ipmi_bmc_sim.o
+>   CC      hw/ipmi/ipmi_bmc_extern.o
+>   CC      hw/ipmi/isa_ipmi_kcs.o
+>   CC      hw/ipmi/isa_ipmi_bt.o
+>   CC      hw/isa/isa-bus.o
+>   CC      hw/isa/isa-superio.o
+>   CC      hw/isa/apm.o
+>   CC      hw/mem/pc-dimm.o
+>   CC      hw/mem/memory-device.o
+>   CC      hw/mem/nvdimm.o
+>   CC      hw/misc/applesmc.o
+>   CC      hw/misc/max111x.o
+>   CC      hw/misc/tmp105.o
+>   CC      hw/misc/tmp421.o
+>   CC      hw/misc/debugexit.o
+>   CC      hw/misc/sga.o
+>   CC      hw/misc/pc-testdev.o
+>   CC      hw/misc/pci-testdev.o
+>   CC      hw/misc/edu.o
+>   CC      hw/misc/pca9552.o
+>   CC      hw/misc/unimp.o
+>   CC      hw/misc/vmcoreinfo.o
+>   CC      hw/misc/arm_l2x0.o
+>   CC      hw/misc/arm_integrator_debug.o
+>   CC      hw/misc/a9scu.o
+>   CC      hw/misc/arm11scu.o
+>   CC      hw/net/xen_nic.o
+>   CC      hw/net/ne2000.o
+>   CC      hw/net/eepro100.o
+>   CC      hw/net/pcnet-pci.o
+>   CC      hw/net/pcnet.o
+>   CC      hw/net/e1000.o
+>   CC      hw/net/e1000x_common.o
+>   CC      hw/net/net_tx_pkt.o
+>   CC      hw/net/net_rx_pkt.o
+>   CC      hw/net/e1000e.o
+>   CC      hw/net/e1000e_core.o
+>   CC      hw/net/rtl8139.o
+>   CC      hw/net/vmxnet3.o
+>   CC      hw/net/smc91c111.o
+>   CC      hw/net/lan9118.o
+>   CC      hw/net/ne2000-isa.o
+>   CC      hw/net/xgmac.o
+>   CC      hw/net/xilinx_axienet.o
+>   CC      hw/net/allwinner_emac.o
+>   CC      hw/net/imx_fec.o
+>   CC      hw/net/cadence_gem.o
+>   CC      hw/net/stellaris_enet.o
+>   CC      hw/net/ftgmac100.o
+>   CC      hw/net/rocker/rocker.o
+>   CC      hw/net/rocker/rocker_fp.o
+>   CC      hw/net/rocker/rocker_desc.o
+>   CC      hw/net/rocker/rocker_world.o
+>   CC      hw/net/rocker/rocker_of_dpa.o
+>   CC      hw/net/can/can_sja1000.o
+>   CC      hw/net/can/can_kvaser_pci.o
+>   CC      hw/net/can/can_pcm3680_pci.o
+>   CC      hw/net/can/can_mioe3680_pci.o
+>   CC      hw/nvram/eeprom93xx.o
+>   CC      hw/nvram/eeprom_at24c.o
+>   CC      hw/nvram/fw_cfg.o
+>   CC      hw/nvram/chrp_nvram.o
+>   CC      hw/pci-bridge/pci_bridge_dev.o
+>   CC      hw/pci-bridge/pcie_root_port.o
+>   CC      hw/pci-bridge/gen_pcie_root_port.o
+>   CC      hw/pci-bridge/pcie_pci_bridge.o
+>   CC      hw/pci-bridge/pci_expander_bridge.o
+>   CC      hw/pci-bridge/xio3130_upstream.o
+>   CC      hw/pci-bridge/xio3130_downstream.o
+>   CC      hw/pci-bridge/ioh3420.o
+>   CC      hw/pci-bridge/i82801b11.o
+>   CC      hw/pci-host/pam.o
+>   CC      hw/pci-host/versatile.o
+>   CC      hw/pci-host/piix.o
+>   CC      hw/pci-host/q35.o
+>   CC      hw/pci-host/gpex.o
+>   CC      hw/pci-host/designware.o
+>   CC      hw/pci/pci.o
+>   CC      hw/pci/pci_bridge.o
+>   CC      hw/pci/msix.o
+>   CC      hw/pci/msi.o
+>   CC      hw/pci/shpc.o
+>   CC      hw/pci/slotid_cap.o
+>   CC      hw/pci/pci_host.o
+>   CC      hw/pci/pcie_host.o
+>   CC      hw/pci/pcie.o
+>   CC      hw/pci/pcie_aer.o
+>   CC      hw/pci/pcie_port.o
+>   CC      hw/pci/pci-stub.o
+>   CC      hw/pcmcia/pcmcia.o
+>   CC      hw/scsi/scsi-disk.o
+>   CC      hw/scsi/scsi-generic.o
+>   CC      hw/scsi/scsi-bus.o
+>   CC      hw/scsi/lsi53c895a.o
+>   CC      hw/scsi/mptsas.o
+>   CC      hw/scsi/mptconfig.o
+>   CC      hw/scsi/mptendian.o
+>   CC      hw/scsi/megasas.o
+>   CC      hw/scsi/vmw_pvscsi.o
+>   CC      hw/scsi/esp.o
+>   CC      hw/scsi/esp-pci.o
+>   CC      hw/sd/pl181.o
+>   CC      hw/sd/ssi-sd.o
+>   CC      hw/sd/sd.o
+>   CC      hw/sd/core.o
+>   CC      hw/sd/sdmmc-internal.o
+>   CC      hw/sd/sdhci.o
+>   CC      hw/smbios/smbios.o
+>   CC      hw/smbios/smbios_type_38.o
+>   CC      hw/smbios/smbios-stub.o
+>   CC      hw/smbios/smbios_type_38-stub.o
+>   CC      hw/ssi/pl022.o
+>   CC      hw/ssi/ssi.o
+>   CC      hw/ssi/xilinx_spips.o
+>   CC      hw/ssi/aspeed_smc.o
+>   CC      hw/ssi/stm32f2xx_spi.o
+>   CC      hw/ssi/mss-spi.o
+>   CC      hw/timer/arm_timer.o
+>   CC      hw/timer/arm_mptimer.o
+>   CC      hw/timer/armv7m_systick.o
+>   CC      hw/timer/a9gtimer.o
+>   CC      hw/timer/cadence_ttc.o
+>   CC      hw/timer/ds1338.o
+>   CC      hw/timer/hpet.o
+>   CC      hw/timer/i8254_common.o
+>   CC      hw/timer/i8254.o
+>   CC      hw/timer/pl031.o
+>   CC      hw/timer/twl92230.o
+>   CC      hw/timer/imx_epit.o
+>   CC      hw/timer/imx_gpt.o
+>   CC      hw/timer/xlnx-zynqmp-rtc.o
+>   CC      hw/timer/stm32f2xx_timer.o
+>   CC      hw/timer/aspeed_timer.o
+>   CC      hw/timer/cmsdk-apb-timer.o
+>   CC      hw/timer/cmsdk-apb-dualtimer.o
+>   CC      hw/timer/mss-timer.o
+>   CC      hw/tpm/tpm_util.o
+>   CC      hw/tpm/tpm_tis.o
+>   CC      hw/tpm/tpm_crb.o
+>   CC      hw/tpm/tpm_passthrough.o
+>   CC      hw/tpm/tpm_emulator.o
+>   CC      hw/usb/core.o
+>   CC      hw/usb/combined-packet.o
+>   CC      hw/usb/bus.o
+>   CC      hw/usb/libhw.o
+>   CC      hw/usb/desc.o
+>   CC      hw/usb/desc-msos.o
+>   CC      hw/usb/hcd-uhci.o
+>   CC      hw/usb/hcd-ohci.o
+>   CC      hw/usb/hcd-ehci.o
+>   CC      hw/usb/hcd-ehci-pci.o
+>   CC      hw/usb/hcd-ehci-sysbus.o
+>   CC      hw/usb/hcd-xhci.o
+>   CC      hw/usb/hcd-xhci-nec.o
+>   CC      hw/usb/hcd-musb.o
+>   CC      hw/usb/dev-hub.o
+>   CC      hw/usb/dev-hid.o
+>   CC      hw/usb/dev-wacom.o
+>   CC      hw/usb/dev-storage.o
+>   CC      hw/usb/dev-uas.o
+>   CC      hw/usb/dev-audio.o
+>   CC      hw/usb/dev-serial.o
+>   CC      hw/usb/dev-network.o
+>   CC      hw/usb/dev-bluetooth.o
+>   CC      hw/usb/dev-smartcard-reader.o
+>   CC      hw/usb/ccid-card-passthru.o
+>   CC      hw/usb/ccid-card-emulated.o
+>   CC      hw/usb/dev-mtp.o
+>   CC      hw/usb/host-stub.o
+>   CC      hw/virtio/virtio-bus.o
+>   CC      hw/virtio/virtio-rng.o
+>   CC      hw/virtio/virtio-pci.o
+>   CC      hw/virtio/virtio-mmio.o
+>   CC      hw/virtio/vhost-stub.o
+>   CC      hw/watchdog/watchdog.o
+>   CC      hw/watchdog/cmsdk-apb-watchdog.o
+>   CC      hw/watchdog/wdt_i6300esb.o
+>   CC      hw/watchdog/wdt_ib700.o
+>   CC      hw/watchdog/wdt_aspeed.o
+>   CC      hw/xen/xen_backend.o
+>   CC      hw/xen/xen_devconfig.o
+>   CC      hw/xen/xen_pvdev.o
+>   CC      hw/xen/xen-common.o
+>   CC      migration/migration.o
+>   CC      migration/socket.o
+>   CC      migration/fd.o
+>   CC      migration/exec.o
+>   CC      migration/tls.o
+>   CC      migration/channel.o
+>   CC      migration/savevm.o
+>   CC      migration/colo-failover.o
+>   CC      migration/colo.o
+>   CC      migration/vmstate.o
+>   CC      migration/vmstate-types.o
+>   CC      migration/page_cache.o
+>   CC      migration/qemu-file.o
+>   CC      migration/global_state.o
+>   CC      migration/qemu-file-channel.o
+>   CC      migration/xbzrle.o
+>   CC      migration/postcopy-ram.o
+>   CC      migration/qjson.o
+>   CC      migration/block-dirty-bitmap.o
+>   CC      migration/rdma.o
+>   CC      migration/block.o
+>   CC      net/net.o
+>   CC      net/queue.o
+>   CC      net/checksum.o
+>   CC      net/util.o
+>   CC      net/hub.o
+>   CC      net/socket.o
+>   CC      net/dump.o
+>   CC      net/eth.o
+>   CC      net/l2tpv3.o
+>   CC      net/vhost-user.o
+>   CC      net/slirp.o
+>   CC      net/filter.o
+>   CC      net/filter-buffer.o
+>   CC      net/filter-mirror.o
+>   CC      net/colo-compare.o
+>   CC      net/colo.o
+>   CC      net/filter-rewriter.o
+>   CC      net/filter-replay.o
+>   CC      net/tap.o
+>   CC      net/tap-linux.o
+>   CC      net/can/can_core.o
+>   CC      net/can/can_host.o
+>   CC      net/can/can_socketcan.o
+>   CC      qom/cpu.o
+>   CC      replay/replay.o
+>   CC      replay/replay-internal.o
+>   CC      replay/replay-events.o
+>   CC      replay/replay-time.o
+>   CC      replay/replay-input.o
+>   CC      replay/replay-char.o
+>   CC      replay/replay-net.o
+>   CC      replay/replay-snapshot.o
+>   CC      replay/replay-audio.o
+>   CC      slirp/cksum.o
+>   CC      slirp/if.o
+>   CC      slirp/ip_icmp.o
+>   CC      slirp/ip6_icmp.o
+>   CC      slirp/ip6_input.o
+>   CC      slirp/ip6_output.o
+>   CC      slirp/ip_input.o
+>   CC      slirp/ip_output.o
+>   CC      slirp/dnssearch.o
+>   CC      slirp/dhcpv6.o
+>   CC      slirp/slirp.o
+>   CC      slirp/mbuf.o
+>   CC      slirp/misc.o
+>   CC      slirp/sbuf.o
+>   CC      slirp/socket.o
+>   CC      slirp/tcp_input.o
+>   CC      slirp/tcp_output.o
+>   CC      slirp/tcp_subr.o
+>   CC      slirp/tcp_timer.o
+>   CC      slirp/udp.o
+>   CC      slirp/udp6.o
+>   CC      slirp/bootp.o
+>   CC      slirp/tftp.o
+>   CC      slirp/arp_table.o
+>   CC      slirp/ndp_table.o
+>   CC      slirp/ncsi.o
+>   CC      ui/keymaps.o
+>   CC      ui/console.o
+>   CC      ui/cursor.o
+>   CC      ui/qemu-pixman.o
+>   CC      ui/input.o
+>   CC      ui/input-keymap.o
+>   CC      ui/input-legacy.o
+>   CC      ui/input-linux.o
+>   CC      ui/spice-core.o
+>   CC      ui/spice-input.o
+>   CC      ui/spice-display.o
+>   CC      ui/vnc.o
+>   CC      ui/vnc-enc-zlib.o
+>   CC      ui/vnc-enc-hextile.o
+>   CC      ui/vnc-enc-tight.o
+>   CC      ui/vnc-palette.o
+>   CC      ui/vnc-enc-zrle.o
+>   CC      ui/vnc-auth-vencrypt.o
+>   CC      ui/vnc-ws.o
+>   CC      ui/vnc-jobs.o
+>   VERT    ui/shader/texture-blit-vert.h
+>   VERT    ui/shader/texture-blit-flip-vert.h
+>   FRAG    ui/shader/texture-blit-frag.h
+>   CC      ui/console-gl.o
+>   CC      ui/egl-helpers.o
+>   CC      ui/egl-context.o
+>   CC      ui/egl-headless.o
+>   CC      audio/ossaudio.o
+>   CC      ui/sdl.o
+>   CC      ui/sdl_zoom.o
+>   CC      ui/x_keymap.o
+>   CC      ui/curses.o
+>   CC      chardev/char.o
+>   CC      chardev/char-fd.o
+>   CC      chardev/char-fe.o
+>   CC      chardev/char-file.o
+>   CC      chardev/char-io.o
+>   CC      chardev/char-mux.o
+>   CC      chardev/char-null.o
+>   CC      chardev/char-parallel.o
+>   CC      chardev/char-pipe.o
+>   CC      chardev/char-pty.o
+>   CC      chardev/char-ringbuf.o
+>   CC      chardev/char-serial.o
+>   CC      chardev/char-socket.o
+>   CC      chardev/char-stdio.o
+>   CC      chardev/char-udp.o
+>   LINK    tests/qemu-iotests/socket_scm_helper
+>   CC      qga/commands.o
+>   CC      qga/guest-agent-command-state.o
+>   CC      qga/main.o
+>   CC      qga/commands-posix.o
+>   AS      optionrom/multiboot.o
+>   AS      optionrom/linuxboot.o
+>   CC      qga/channel-posix.o
+>   CC      qga/qapi-generated/qga-qapi-types.o
+>   CC      optionrom/linuxboot_dma.o
+>   CC      qga/qapi-generated/qga-qapi-visit.o
+>   AS      optionrom/kvmvapic.o
+>   CC      qga/qapi-generated/qga-qapi-commands.o
+>   AR      libqemuutil.a
+>   BUILD   optionrom/multiboot.img
+>   CC      qemu-img.o
+>   BUILD   optionrom/linuxboot.img
+>   BUILD   optionrom/linuxboot_dma.img
+>   BUILD   optionrom/kvmvapic.img
+>   CC      ui/shader.o
+>   BUILD   optionrom/multiboot.raw
+>   BUILD   optionrom/linuxboot.raw
+>   BUILD   optionrom/linuxboot_dma.raw
+>   BUILD   optionrom/kvmvapic.raw
+>   SIGN    optionrom/multiboot.bin
+>   SIGN    optionrom/linuxboot.bin
+>   SIGN    optionrom/linuxboot_dma.bin
+>   SIGN    optionrom/kvmvapic.bin
+>   LINK    qemu-ga
+>   LINK    ivshmem-client
+>   LINK    ivshmem-server
+>   LINK    qemu-nbd
+>   LINK    qemu-io
+>   LINK    qemu-edid
+>   LINK    scsi/qemu-pr-helper
+>   LINK    qemu-bridge-helper
+>   GEN     x86_64-softmmu/hmp-commands.h
+>   GEN     x86_64-softmmu/hmp-commands-info.h
+>   GEN     x86_64-softmmu/config-target.h
+>   GEN     aarch64-softmmu/hmp-commands-info.h
+>   GEN     aarch64-softmmu/hmp-commands.h
+>   GEN     aarch64-softmmu/config-target.h
+>   CC      x86_64-softmmu/exec.o
+>   CC      x86_64-softmmu/tcg/tcg-op.o
+>   CC      x86_64-softmmu/tcg/tcg.o
+>   CC      x86_64-softmmu/tcg/tcg-op-vec.o
+>   CC      x86_64-softmmu/tcg/tcg-common.o
+>   CC      x86_64-softmmu/tcg/tcg-op-gvec.o
+>   CC      aarch64-softmmu/exec.o
+>   CC      aarch64-softmmu/tcg/tcg.o
+>   CC      aarch64-softmmu/tcg/tcg-op.o
+>   CC      aarch64-softmmu/tcg/tcg-op-vec.o
+>   CC      aarch64-softmmu/tcg/tcg-op-gvec.o
+>   CC      aarch64-softmmu/tcg/tcg-common.o
+>   CC      aarch64-softmmu/tcg/optimize.o
+>   CC      aarch64-softmmu/fpu/softfloat.o
+>   CC      aarch64-softmmu/disas.o
+>   GEN     aarch64-softmmu/gdbstub-xml.c
+>   CC      aarch64-softmmu/arch_init.o
+>   CC      aarch64-softmmu/cpus.o
+>   CC      aarch64-softmmu/monitor.o
+>   CC      x86_64-softmmu/tcg/optimize.o
+>   CC      aarch64-softmmu/gdbstub.o
+>   LINK    qemu-img
+>   CC      aarch64-softmmu/balloon.o
+>   CC      aarch64-softmmu/ioport.o
+>   CC      aarch64-softmmu/numa.o
+>   CC      aarch64-softmmu/qtest.o
+>   CC      aarch64-softmmu/memory.o
+>   CC      aarch64-softmmu/memory_mapping.o
+>   CC      aarch64-softmmu/dump.o
+>   CC      aarch64-softmmu/migration/ram.o
+>   CC      aarch64-softmmu/accel/accel.o
+>   CC      aarch64-softmmu/accel/stubs/hax-stub.o
+>   CC      aarch64-softmmu/accel/stubs/hvf-stub.o
+>   CC      x86_64-softmmu/fpu/softfloat.o
+>   CC      aarch64-softmmu/accel/stubs/whpx-stub.o
+>   CC      x86_64-softmmu/disas.o
+>   GEN     x86_64-softmmu/gdbstub-xml.c
+>   CC      aarch64-softmmu/accel/stubs/kvm-stub.o
+>   CC      aarch64-softmmu/accel/tcg/tcg-all.o
+>   CC      aarch64-softmmu/accel/tcg/cputlb.o
+>   CC      x86_64-softmmu/arch_init.o
+>   CC      aarch64-softmmu/accel/tcg/tcg-runtime.o
+>   CC      aarch64-softmmu/accel/tcg/tcg-runtime-gvec.o
+>   CC      aarch64-softmmu/accel/tcg/cpu-exec.o
+>   CC      aarch64-softmmu/accel/tcg/cpu-exec-common.o
+>   CC      aarch64-softmmu/accel/tcg/translate-all.o
+>   CC      aarch64-softmmu/accel/tcg/translator.o
+>   CC      aarch64-softmmu/hw/adc/stm32f2xx_adc.o
+>   CC      x86_64-softmmu/cpus.o
+>   CC      aarch64-softmmu/hw/block/virtio-blk.o
+>   CC      aarch64-softmmu/hw/block/vhost-user-blk.o
+>   CC      x86_64-softmmu/monitor.o
+>   CC      aarch64-softmmu/hw/block/dataplane/virtio-blk.o
+>   CC      x86_64-softmmu/gdbstub.o
+>   CC      aarch64-softmmu/hw/char/exynos4210_uart.o
+>   CC      aarch64-softmmu/hw/char/omap_uart.o
+>   CC      aarch64-softmmu/hw/char/digic-uart.o
+>   CC      aarch64-softmmu/hw/char/stm32f2xx_usart.o
+>   CC      aarch64-softmmu/hw/char/bcm2835_aux.o
+>   CC      aarch64-softmmu/hw/char/virtio-serial-bus.o
+>   CC      aarch64-softmmu/hw/cpu/arm11mpcore.o
+>   CC      x86_64-softmmu/balloon.o
+>   CC      aarch64-softmmu/hw/cpu/realview_mpcore.o
+>   CC      aarch64-softmmu/hw/cpu/a9mpcore.o
+>   CC      x86_64-softmmu/ioport.o
+>   CC      x86_64-softmmu/numa.o
+>   CC      x86_64-softmmu/qtest.o
+>   CC      x86_64-softmmu/memory.o
+>   CC      x86_64-softmmu/memory_mapping.o
+>   CC      x86_64-softmmu/dump.o
+>   CC      aarch64-softmmu/hw/cpu/a15mpcore.o
+>   CC      x86_64-softmmu/win_dump.o
+>   CC      aarch64-softmmu/hw/display/omap_dss.o
+>   CC      aarch64-softmmu/hw/display/omap_lcdc.o
+>   CC      aarch64-softmmu/hw/display/pxa2xx_lcd.o
+>   CC      x86_64-softmmu/migration/ram.o
+>   CC      aarch64-softmmu/hw/display/bcm2835_fb.o
+>   CC      x86_64-softmmu/accel/accel.o
+>   CC      aarch64-softmmu/hw/display/vga.o
+>   CC      aarch64-softmmu/hw/display/virtio-gpu.o
+>   CC      x86_64-softmmu/accel/kvm/kvm-all.o
+>   CC      x86_64-softmmu/accel/stubs/hax-stub.o
+>   CC      x86_64-softmmu/accel/stubs/hvf-stub.o
+>   CC      aarch64-softmmu/hw/display/virtio-gpu-3d.o
+>   CC      aarch64-softmmu/hw/display/virtio-gpu-pci.o
+>   CC      aarch64-softmmu/hw/display/dpcd.o
+>   CC      aarch64-softmmu/hw/display/xlnx_dp.o
+>   CC      aarch64-softmmu/hw/dma/xlnx_dpdma.o
+>   CC      aarch64-softmmu/hw/dma/omap_dma.o
+>   CC      aarch64-softmmu/hw/dma/soc_dma.o
+>   CC      aarch64-softmmu/hw/dma/pxa2xx_dma.o
+>   CC      aarch64-softmmu/hw/dma/bcm2835_dma.o
+>   CC      aarch64-softmmu/hw/gpio/omap_gpio.o
+>   CC      x86_64-softmmu/accel/stubs/whpx-stub.o
+>   CC      aarch64-softmmu/hw/gpio/imx_gpio.o
+>   CC      aarch64-softmmu/hw/gpio/bcm2835_gpio.o
+>   CC      aarch64-softmmu/hw/i2c/omap_i2c.o
+>   CC      x86_64-softmmu/accel/tcg/tcg-all.o
+>   CC      aarch64-softmmu/hw/input/pxa2xx_keypad.o
+>   CC      x86_64-softmmu/accel/tcg/cputlb.o
+>   CC      aarch64-softmmu/hw/input/tsc210x.o
+>   CC      x86_64-softmmu/accel/tcg/tcg-runtime.o
+>   CC      x86_64-softmmu/accel/tcg/tcg-runtime-gvec.o
+>   CC      x86_64-softmmu/accel/tcg/cpu-exec.o
+>   CC      aarch64-softmmu/hw/intc/armv7m_nvic.o
+>   CC      aarch64-softmmu/hw/intc/exynos4210_gic.o
+>   CC      x86_64-softmmu/accel/tcg/cpu-exec-common.o
+>   CC      aarch64-softmmu/hw/intc/exynos4210_combiner.o
+>   CC      aarch64-softmmu/hw/intc/omap_intc.o
+>   CC      aarch64-softmmu/hw/intc/bcm2835_ic.o
+>   CC      aarch64-softmmu/hw/intc/bcm2836_control.o
+>   CC      aarch64-softmmu/hw/intc/allwinner-a10-pic.o
+>   CC      aarch64-softmmu/hw/intc/aspeed_vic.o
+>   CC      aarch64-softmmu/hw/intc/arm_gicv3_cpuif.o
+>   CC      aarch64-softmmu/hw/misc/ivshmem.o
+>   CC      aarch64-softmmu/hw/misc/arm_sysctl.o
+>   CC      aarch64-softmmu/hw/misc/cbus.o
+>   CC      aarch64-softmmu/hw/misc/exynos4210_pmu.o
+>   CC      x86_64-softmmu/accel/tcg/translate-all.o
+>   CC      x86_64-softmmu/accel/tcg/translator.o
+>   CC      x86_64-softmmu/hw/block/virtio-blk.o
+>   CC      x86_64-softmmu/hw/block/vhost-user-blk.o
+>   CC      aarch64-softmmu/hw/misc/exynos4210_clk.o
+>   CC      aarch64-softmmu/hw/misc/exynos4210_rng.o
+>   CC      aarch64-softmmu/hw/misc/imx_ccm.o
+>   CC      x86_64-softmmu/hw/block/dataplane/virtio-blk.o
+>   CC      aarch64-softmmu/hw/misc/imx31_ccm.o
+>   CC      x86_64-softmmu/hw/char/virtio-serial-bus.o
+>   CC      x86_64-softmmu/hw/display/vga.o
+>   CC      aarch64-softmmu/hw/misc/imx25_ccm.o
+>   CC      aarch64-softmmu/hw/misc/imx6_ccm.o
+>   CC      x86_64-softmmu/hw/display/virtio-gpu.o
+>   CC      x86_64-softmmu/hw/display/virtio-gpu-3d.o
+>   CC      x86_64-softmmu/hw/display/virtio-gpu-pci.o
+>   CC      x86_64-softmmu/hw/display/virtio-vga.o
+>   CC      x86_64-softmmu/hw/hyperv/hyperv.o
+>   CC      aarch64-softmmu/hw/misc/imx6ul_ccm.o
+>   CC      x86_64-softmmu/hw/hyperv/hyperv_testdev.o
+>   CC      x86_64-softmmu/hw/intc/apic.o
+>   CC      aarch64-softmmu/hw/misc/imx6_src.o
+>   CC      aarch64-softmmu/hw/misc/imx7_ccm.o
+>   CC      aarch64-softmmu/hw/misc/imx2_wdt.o
+>   CC      x86_64-softmmu/hw/intc/apic_common.o
+>   CC      x86_64-softmmu/hw/intc/ioapic.o
+>   CC      x86_64-softmmu/hw/isa/lpc_ich9.o
+>   CC      aarch64-softmmu/hw/misc/imx7_snvs.o
+>   CC      x86_64-softmmu/hw/misc/ivshmem.o
+>   CC      aarch64-softmmu/hw/misc/imx7_gpr.o
+>   CC      x86_64-softmmu/hw/misc/pvpanic.o
+>   CC      aarch64-softmmu/hw/misc/mst_fpga.o
+>   CC      x86_64-softmmu/hw/net/virtio-net.o
+>   CC      aarch64-softmmu/hw/misc/omap_clk.o
+>   CC      x86_64-softmmu/hw/net/vhost_net.o
+>   CC      aarch64-softmmu/hw/misc/omap_gpmc.o
+>   CC      x86_64-softmmu/hw/rdma/rdma_utils.o
+>   CC      x86_64-softmmu/hw/rdma/rdma_backend.o
+>   CC      aarch64-softmmu/hw/misc/omap_l4.o
+>   CC      x86_64-softmmu/hw/rdma/rdma_rm.o
+>   CC      x86_64-softmmu/hw/rdma/vmw/pvrdma_dev_ring.o
+>   CC      aarch64-softmmu/hw/misc/omap_sdrc.o
+>   CC      aarch64-softmmu/hw/misc/omap_tap.o
+>   CC      x86_64-softmmu/hw/rdma/vmw/pvrdma_cmd.o
+>   CC      aarch64-softmmu/hw/misc/bcm2835_mbox.o
+>   CC      aarch64-softmmu/hw/misc/bcm2835_property.o
+>   CC      aarch64-softmmu/hw/misc/bcm2835_rng.o
+>   CC      x86_64-softmmu/hw/rdma/vmw/pvrdma_qp_ops.o
+>   CC      x86_64-softmmu/hw/rdma/vmw/pvrdma_main.o
+>   CC      x86_64-softmmu/hw/scsi/virtio-scsi.o
+>   CC      aarch64-softmmu/hw/misc/zynq_slcr.o
+>   CC      aarch64-softmmu/hw/misc/zynq-xadc.o
+>   CC      x86_64-softmmu/hw/scsi/virtio-scsi-dataplane.o
+>   CC      x86_64-softmmu/hw/scsi/vhost-scsi-common.o
+>   CC      x86_64-softmmu/hw/scsi/vhost-scsi.o
+>   CC      x86_64-softmmu/hw/scsi/vhost-user-scsi.o
+>   CC      aarch64-softmmu/hw/misc/stm32f2xx_syscfg.o
+>   CC      x86_64-softmmu/hw/timer/mc146818rtc.o
+>   CC      x86_64-softmmu/hw/vfio/common.o
+>   CC      aarch64-softmmu/hw/misc/mps2-fpgaio.o
+>   CC      x86_64-softmmu/hw/vfio/pci.o
+>   CC      aarch64-softmmu/hw/misc/mps2-scc.o
+>   CC      x86_64-softmmu/hw/vfio/pci-quirks.o
+>   CC      x86_64-softmmu/hw/vfio/display.o
+>   CC      aarch64-softmmu/hw/misc/tz-mpc.o
+>   CC      aarch64-softmmu/hw/misc/tz-msc.o
+>   CC      x86_64-softmmu/hw/vfio/platform.o
+>   CC      aarch64-softmmu/hw/misc/tz-ppc.o
+>   CC      aarch64-softmmu/hw/misc/iotkit-secctl.o
+>   CC      aarch64-softmmu/hw/misc/iotkit-sysctl.o
+>   CC      aarch64-softmmu/hw/misc/iotkit-sysinfo.o
+>   CC      x86_64-softmmu/hw/vfio/spapr.o
+>   CC      x86_64-softmmu/hw/virtio/virtio.o
+>   CC      aarch64-softmmu/hw/misc/auxbus.o
+>   CC      aarch64-softmmu/hw/misc/aspeed_scu.o
+>   CC      aarch64-softmmu/hw/misc/aspeed_sdmc.o
+>   CC      aarch64-softmmu/hw/misc/msf2-sysreg.o
+>   CC      x86_64-softmmu/hw/virtio/virtio-balloon.o
+>   CC      x86_64-softmmu/hw/virtio/virtio-crypto.o
+>   CC      x86_64-softmmu/hw/virtio/virtio-crypto-pci.o
+>   CC      aarch64-softmmu/hw/net/virtio-net.o
+>   CC      x86_64-softmmu/hw/virtio/vhost.o
+>   CC      aarch64-softmmu/hw/net/vhost_net.o
+>   CC      aarch64-softmmu/hw/pcmcia/pxa2xx.o
+>   CC      x86_64-softmmu/hw/virtio/vhost-backend.o
+>   CC      x86_64-softmmu/hw/virtio/vhost-user.o
+>   CC      x86_64-softmmu/hw/virtio/vhost-vsock.o
+>   CC      x86_64-softmmu/hw/xen/xen-host-pci-device.o
+>   CC      aarch64-softmmu/hw/rdma/rdma_utils.o
+>   CC      x86_64-softmmu/hw/xen/xen_pt.o
+>   CC      aarch64-softmmu/hw/rdma/rdma_backend.o
+>   CC      x86_64-softmmu/hw/xen/xen_pt_config_init.o
+>   CC      x86_64-softmmu/hw/xen/xen_pt_graphics.o
+>   CC      aarch64-softmmu/hw/rdma/rdma_rm.o
+>   CC      x86_64-softmmu/hw/xen/xen_pt_msi.o
+>   CC      aarch64-softmmu/hw/rdma/vmw/pvrdma_dev_ring.o
+>   CC      aarch64-softmmu/hw/rdma/vmw/pvrdma_cmd.o
+>   CC      aarch64-softmmu/hw/rdma/vmw/pvrdma_qp_ops.o
+>   CC      x86_64-softmmu/hw/xen/xen_pt_load_rom.o
+>   CC      x86_64-softmmu/hw/i386/multiboot.o
+>   CC      aarch64-softmmu/hw/rdma/vmw/pvrdma_main.o
+>   CC      x86_64-softmmu/hw/i386/pc.o
+>   CC      aarch64-softmmu/hw/scsi/virtio-scsi.o
+>   CC      x86_64-softmmu/hw/i386/pc_piix.o
+>   CC      aarch64-softmmu/hw/scsi/virtio-scsi-dataplane.o
+>   CC      x86_64-softmmu/hw/i386/pc_q35.o
+>   CC      aarch64-softmmu/hw/scsi/vhost-scsi-common.o
+>   CC      aarch64-softmmu/hw/scsi/vhost-scsi.o
+>   CC      x86_64-softmmu/hw/i386/pc_sysfw.o
+>   CC      aarch64-softmmu/hw/scsi/vhost-user-scsi.o
+>   CC      aarch64-softmmu/hw/sd/omap_mmc.o
+>   CC      aarch64-softmmu/hw/sd/pxa2xx_mmci.o
+>   CC      aarch64-softmmu/hw/sd/bcm2835_sdhost.o
+>   CC      x86_64-softmmu/hw/i386/x86-iommu.o
+>   CC      x86_64-softmmu/hw/i386/intel_iommu.o
+>   CC      aarch64-softmmu/hw/ssi/omap_spi.o
+>   CC      x86_64-softmmu/hw/i386/amd_iommu.o
+>   CC      aarch64-softmmu/hw/ssi/imx_spi.o
+>   CC      x86_64-softmmu/hw/i386/vmport.o
+>   CC      aarch64-softmmu/hw/timer/exynos4210_mct.o
+>   CC      aarch64-softmmu/hw/timer/exynos4210_pwm.o
+>   CC      x86_64-softmmu/hw/i386/vmmouse.o
+>   CC      aarch64-softmmu/hw/timer/exynos4210_rtc.o
+>   CC      aarch64-softmmu/hw/timer/omap_gptimer.o
+>   CC      x86_64-softmmu/hw/i386/kvmvapic.o
+>   CC      aarch64-softmmu/hw/timer/omap_synctimer.o
+>   CC      aarch64-softmmu/hw/timer/pxa2xx_timer.o
+>   CC      aarch64-softmmu/hw/timer/digic-timer.o
+>   CC      aarch64-softmmu/hw/timer/allwinner-a10-pit.o
+>   CC      aarch64-softmmu/hw/usb/tusb6010.o
+>   CC      x86_64-softmmu/hw/i386/acpi-build.o
+>   CC      x86_64-softmmu/hw/i386/../xenpv/xen_machine_pv.o
+>   CC      aarch64-softmmu/hw/usb/chipidea.o
+>   CC      aarch64-softmmu/hw/vfio/common.o
+>   CC      x86_64-softmmu/hw/i386/kvm/clock.o
+>   CC      aarch64-softmmu/hw/vfio/pci.o
+>   CC      aarch64-softmmu/hw/vfio/pci-quirks.o
+>   CC      aarch64-softmmu/hw/vfio/display.o
+>   CC      x86_64-softmmu/hw/i386/kvm/apic.o
+>   CC      aarch64-softmmu/hw/vfio/platform.o
+>   CC      x86_64-softmmu/hw/i386/kvm/i8259.o
+>   CC      aarch64-softmmu/hw/vfio/calxeda-xgmac.o
+>   CC      x86_64-softmmu/hw/i386/kvm/ioapic.o
+>   CC      aarch64-softmmu/hw/vfio/amd-xgbe.o
+>   CC      x86_64-softmmu/hw/i386/kvm/i8254.o
+>   CC      aarch64-softmmu/hw/vfio/spapr.o
+>   CC      aarch64-softmmu/hw/virtio/virtio.o
+>   CC      x86_64-softmmu/hw/i386/xen/xen_platform.o
+>   CC      x86_64-softmmu/hw/i386/xen/xen_apic.o
+>   CC      aarch64-softmmu/hw/virtio/virtio-balloon.o
+>   CC      aarch64-softmmu/hw/virtio/virtio-crypto.o
+>   CC      aarch64-softmmu/hw/virtio/virtio-crypto-pci.o
+>   CC      x86_64-softmmu/hw/i386/xen/xen_pvdevice.o
+>   CC      x86_64-softmmu/hw/i386/xen/xen-hvm.o
+>   CC      x86_64-softmmu/hw/i386/xen/xen-mapcache.o
+>   CC      aarch64-softmmu/hw/virtio/vhost.o
+>   CC      x86_64-softmmu/target/i386/helper.o
+>   CC      aarch64-softmmu/hw/virtio/vhost-backend.o
+>   CC      aarch64-softmmu/hw/virtio/vhost-user.o
+>   CC      aarch64-softmmu/hw/virtio/vhost-vsock.o
+>   CC      aarch64-softmmu/hw/arm/boot.o
+>   CC      aarch64-softmmu/hw/arm/virt.o
+>   CC      aarch64-softmmu/hw/arm/sysbus-fdt.o
+>   CC      aarch64-softmmu/hw/arm/virt-acpi-build.o
+>   CC      x86_64-softmmu/target/i386/cpu.o
+>   CC      aarch64-softmmu/hw/arm/digic_boards.o
+>   CC      aarch64-softmmu/hw/arm/exynos4_boards.o
+>   CC      x86_64-softmmu/target/i386/gdbstub.o
+>   CC      x86_64-softmmu/target/i386/xsave_helper.o
+>   CC      x86_64-softmmu/target/i386/translate.o
+>   CC      aarch64-softmmu/hw/arm/highbank.o
+>   CC      x86_64-softmmu/target/i386/bpt_helper.o
+>   CC      x86_64-softmmu/target/i386/cc_helper.o
+>   CC      x86_64-softmmu/target/i386/excp_helper.o
+>   CC      aarch64-softmmu/hw/arm/integratorcp.o
+>   CC      x86_64-softmmu/target/i386/fpu_helper.o
+>   CC      aarch64-softmmu/hw/arm/mainstone.o
+>   CC      x86_64-softmmu/target/i386/int_helper.o
+>   CC      x86_64-softmmu/target/i386/mem_helper.o
+>   CC      x86_64-softmmu/target/i386/misc_helper.o
+>   CC      x86_64-softmmu/target/i386/mpx_helper.o
+>   CC      x86_64-softmmu/target/i386/seg_helper.o
+>   CC      aarch64-softmmu/hw/arm/musicpal.o
+>   CC      aarch64-softmmu/hw/arm/netduino2.o
+>   CC      aarch64-softmmu/hw/arm/nseries.o
+>   CC      x86_64-softmmu/target/i386/smm_helper.o
+>   CC      aarch64-softmmu/hw/arm/omap_sx1.o
+>   CC      x86_64-softmmu/target/i386/svm_helper.o
+>   CC      x86_64-softmmu/target/i386/machine.o
+>   CC      x86_64-softmmu/target/i386/arch_memory_mapping.o
+>   CC      x86_64-softmmu/target/i386/arch_dump.o
+>   CC      x86_64-softmmu/target/i386/monitor.o
+>   CC      x86_64-softmmu/target/i386/kvm.o
+>   CC      aarch64-softmmu/hw/arm/palm.o
+>   CC      aarch64-softmmu/hw/arm/gumstix.o
+>   CC      x86_64-softmmu/target/i386/hyperv.o
+>   CC      aarch64-softmmu/hw/arm/spitz.o
+>   CC      x86_64-softmmu/target/i386/sev.o
+>   CC      aarch64-softmmu/hw/arm/tosa.o
+>   CC      aarch64-softmmu/hw/arm/z2.o
+>   GEN     trace/generated-helpers.c
+>   CC      aarch64-softmmu/hw/arm/realview.o
+>   CC      aarch64-softmmu/hw/arm/stellaris.o
+>   CC      aarch64-softmmu/hw/arm/collie.o
+>   CC      aarch64-softmmu/hw/arm/vexpress.o
+>   CC      aarch64-softmmu/hw/arm/versatilepb.o
+>   CC      aarch64-softmmu/hw/arm/xilinx_zynq.o
+>   CC      aarch64-softmmu/hw/arm/armv7m.o
+>   CC      x86_64-softmmu/trace/control-target.o
+>   CC      aarch64-softmmu/hw/arm/exynos4210.o
+>   CC      aarch64-softmmu/hw/arm/pxa2xx.o
+>   CC      aarch64-softmmu/hw/arm/pxa2xx_gpio.o
+>   CC      aarch64-softmmu/hw/arm/pxa2xx_pic.o
+>   CC      aarch64-softmmu/hw/arm/digic.o
+>   CC      aarch64-softmmu/hw/arm/omap1.o
+>   CC      x86_64-softmmu/gdbstub-xml.o
+>   CC      aarch64-softmmu/hw/arm/omap2.o
+>   CC      aarch64-softmmu/hw/arm/strongarm.o
+>   CC      x86_64-softmmu/trace/generated-helpers.o
+>   CC      aarch64-softmmu/hw/arm/allwinner-a10.o
+>   CC      aarch64-softmmu/hw/arm/cubieboard.o
+>   LINK    x86_64-softmmu/qemu-system-x86_64
+>   CC      aarch64-softmmu/hw/arm/bcm2835_peripherals.o
+>   CC      aarch64-softmmu/hw/arm/bcm2836.o
+>   CC      aarch64-softmmu/hw/arm/raspi.o
+>   CC      aarch64-softmmu/hw/arm/stm32f205_soc.o
+>   CC      aarch64-softmmu/hw/arm/xlnx-zynqmp.o
+>   CC      aarch64-softmmu/hw/arm/xlnx-zcu102.o
+>   CC      aarch64-softmmu/hw/arm/fsl-imx25.o
+>   CC      aarch64-softmmu/hw/arm/imx25_pdk.o
+>   CC      aarch64-softmmu/hw/arm/fsl-imx31.o
+>   CC      aarch64-softmmu/hw/arm/kzm.o
+>   CC      aarch64-softmmu/hw/arm/fsl-imx6.o
+>   CC      aarch64-softmmu/hw/arm/sabrelite.o
+>   CC      aarch64-softmmu/hw/arm/aspeed_soc.o
+>   CC      aarch64-softmmu/hw/arm/aspeed.o
+>   CC      aarch64-softmmu/hw/arm/mps2.o
+>   CC      aarch64-softmmu/hw/arm/mps2-tz.o
+>   CC      aarch64-softmmu/hw/arm/msf2-soc.o
+>   CC      aarch64-softmmu/hw/arm/msf2-som.o
+>   CC      aarch64-softmmu/hw/arm/iotkit.o
+>   CC      aarch64-softmmu/hw/arm/fsl-imx7.o
+>   CC      aarch64-softmmu/hw/arm/mcimx7d-sabre.o
+>   CC      aarch64-softmmu/hw/arm/smmu-common.o
+>   CC      aarch64-softmmu/hw/arm/smmuv3.o
+>   CC      aarch64-softmmu/hw/arm/fsl-imx6ul.o
+>   CC      aarch64-softmmu/hw/arm/mcimx6ul-evk.o
+>   CC      aarch64-softmmu/hw/arm/nrf51_soc.o
+>   CC      aarch64-softmmu/hw/arm/microbit.o
+>   CC      aarch64-softmmu/target/arm/arm-semi.o
+>   CC      aarch64-softmmu/target/arm/machine.o
+>   CC      aarch64-softmmu/target/arm/psci.o
+>   CC      aarch64-softmmu/target/arm/arch_dump.o
+>   CC      aarch64-softmmu/target/arm/monitor.o
+>   CC      aarch64-softmmu/target/arm/kvm-stub.o
+>   CC      aarch64-softmmu/target/arm/translate.o
+>   CC      aarch64-softmmu/target/arm/op_helper.o
+>   CC      aarch64-softmmu/target/arm/cpu.o
+>   CC      aarch64-softmmu/target/arm/helper.o
+>   CC      aarch64-softmmu/target/arm/neon_helper.o
+>   CC      aarch64-softmmu/target/arm/iwmmxt_helper.o
+>   CC      aarch64-softmmu/target/arm/vec_helper.o
+>   CC      aarch64-softmmu/target/arm/gdbstub.o
+>   CC      aarch64-softmmu/target/arm/cpu64.o
+>   CC      aarch64-softmmu/target/arm/translate-a64.o
+>   CC      aarch64-softmmu/target/arm/helper-a64.o
+>   CC      aarch64-softmmu/target/arm/gdbstub64.o
+>   CC      aarch64-softmmu/target/arm/crypto_helper.o
+>   CC      aarch64-softmmu/target/arm/arm-powerctl.o
+>   GEN     aarch64-softmmu/target/arm/decode-sve.inc.c
+>   CC      aarch64-softmmu/target/arm/sve_helper.o
+>   GEN     trace/generated-helpers.c
+>   CC      aarch64-softmmu/trace/control-target.o
+>   CC      aarch64-softmmu/gdbstub-xml.o
+>   CC      aarch64-softmmu/trace/generated-helpers.o
+>   CC      aarch64-softmmu/target/arm/translate-sve.o
+>   LINK    aarch64-softmmu/qemu-system-aarch64
+>   TEST    tests/qapi-schema/alternate-any.out
+>   TEST    tests/qapi-schema/alternate-array.out
+>   TEST    tests/qapi-schema/alternate-conflict-dict.out
+>   TEST    tests/qapi-schema/alternate-base.out
+>   TEST    tests/qapi-schema/alternate-conflict-enum-bool.out
+>   TEST    tests/qapi-schema/alternate-conflict-enum-int.out
+>   TEST    tests/qapi-schema/alternate-clash.out
+>   TEST    tests/qapi-schema/alternate-conflict-string.out
+>   TEST    tests/qapi-schema/alternate-conflict-bool-string.out
+>   TEST    tests/qapi-schema/alternate-conflict-num-string.out
+>   TEST    tests/qapi-schema/alternate-empty.out
+>   TEST    tests/qapi-schema/alternate-nested.out
+>   TEST    tests/qapi-schema/alternate-unknown.out
+>   TEST    tests/qapi-schema/args-any.out
+>   TEST    tests/qapi-schema/args-array-empty.out
+>   TEST    tests/qapi-schema/args-alternate.out
+>   TEST    tests/qapi-schema/args-array-unknown.out
+>   TEST    tests/qapi-schema/args-bad-boxed.out
+>   TEST    tests/qapi-schema/args-boxed-anon.out
+>   TEST    tests/qapi-schema/args-boxed-empty.out
+>   TEST    tests/qapi-schema/args-boxed-string.out
+>   TEST    tests/qapi-schema/args-int.out
+>   TEST    tests/qapi-schema/args-invalid.out
+>   TEST    tests/qapi-schema/args-member-array-bad.out
+>   TEST    tests/qapi-schema/args-member-case.out
+>   TEST    tests/qapi-schema/args-member-unknown.out
+>   TEST    tests/qapi-schema/args-name-clash.out
+>   TEST    tests/qapi-schema/args-union.out
+>   TEST    tests/qapi-schema/args-unknown.out
+>   TEST    tests/qapi-schema/bad-base.out
+>   TEST    tests/qapi-schema/bad-data.out
+>   TEST    tests/qapi-schema/bad-ident.out
+>   TEST    tests/qapi-schema/bad-if.out
+>   TEST    tests/qapi-schema/bad-if-empty.out
+>   TEST    tests/qapi-schema/bad-if-empty-list.out
+>   TEST    tests/qapi-schema/bad-if-list.out
+>   TEST    tests/qapi-schema/bad-type-bool.out
+>   TEST    tests/qapi-schema/bad-type-dict.out
+>   TEST    tests/qapi-schema/bad-type-int.out
+>   TEST    tests/qapi-schema/base-cycle-direct.out
+>   TEST    tests/qapi-schema/base-cycle-indirect.out
+>   TEST    tests/qapi-schema/command-int.out
+>   TEST    tests/qapi-schema/comments.out
+>   TEST    tests/qapi-schema/doc-bad-alternate-member.out
+>   TEST    tests/qapi-schema/doc-bad-command-arg.out
+>   TEST    tests/qapi-schema/doc-bad-section.out
+>   TEST    tests/qapi-schema/doc-bad-symbol.out
+>   TEST    tests/qapi-schema/doc-bad-union-member.out
+>   TEST    tests/qapi-schema/doc-before-include.out
+>   TEST    tests/qapi-schema/doc-before-pragma.out
+>   TEST    tests/qapi-schema/doc-duplicated-arg.out
+>   TEST    tests/qapi-schema/doc-duplicated-return.out
+>   TEST    tests/qapi-schema/doc-duplicated-since.out
+>   TEST    tests/qapi-schema/doc-empty-arg.out
+>   TEST    tests/qapi-schema/doc-empty-section.out
+>   TEST    tests/qapi-schema/doc-empty-symbol.out
+>   TEST    tests/qapi-schema/doc-good.out
+>   TEST    tests/qapi-schema/doc-interleaved-section.out
+>   TEST    tests/qapi-schema/doc-invalid-end.out
+>   TEST    tests/qapi-schema/doc-invalid-end2.out
+>   TEST    tests/qapi-schema/doc-invalid-return.out
+>   TEST    tests/qapi-schema/doc-invalid-section.out
+>   TEST    tests/qapi-schema/doc-invalid-start.out
+>   TEST    tests/qapi-schema/doc-missing-colon.out
+>   TEST    tests/qapi-schema/doc-missing-expr.out
+>   TEST    tests/qapi-schema/doc-missing-space.out
+>   TEST    tests/qapi-schema/doc-missing.out
+>   TEST    tests/qapi-schema/doc-no-symbol.out
+>   TEST    tests/qapi-schema/double-data.out
+>   TEST    tests/qapi-schema/double-type.out
+>   TEST    tests/qapi-schema/duplicate-key.out
+>   TEST    tests/qapi-schema/empty.out
+>   TEST    tests/qapi-schema/enum-bad-name.out
+>   TEST    tests/qapi-schema/enum-bad-prefix.out
+>   TEST    tests/qapi-schema/enum-clash-member.out
+>   TEST    tests/qapi-schema/enum-dict-member.out
+>   TEST    tests/qapi-schema/enum-int-member.out
+>   TEST    tests/qapi-schema/enum-member-case.out
+>   TEST    tests/qapi-schema/enum-wrong-data.out
+>   TEST    tests/qapi-schema/enum-missing-data.out
+>   TEST    tests/qapi-schema/escape-too-big.out
+>   TEST    tests/qapi-schema/escape-outside-string.out
+>   TEST    tests/qapi-schema/escape-too-short.out
+>   TEST    tests/qapi-schema/event-boxed-empty.out
+>   TEST    tests/qapi-schema/event-case.out
+>   TEST    tests/qapi-schema/event-nest-struct.out
+>   TEST    tests/qapi-schema/flat-union-array-branch.out
+>   TEST    tests/qapi-schema/flat-union-bad-base.out
+>   TEST    tests/qapi-schema/flat-union-bad-discriminator.out
+>   TEST    tests/qapi-schema/flat-union-base-any.out
+>   TEST    tests/qapi-schema/flat-union-base-union.out
+>   TEST    tests/qapi-schema/flat-union-clash-member.out
+>   TEST    tests/qapi-schema/flat-union-empty.out
+>   TEST    tests/qapi-schema/flat-union-inline.out
+>   TEST    tests/qapi-schema/flat-union-int-branch.out
+>   TEST    tests/qapi-schema/flat-union-invalid-branch-key.out
+>   TEST    tests/qapi-schema/flat-union-invalid-discriminator.out
+>   TEST    tests/qapi-schema/flat-union-no-base.out
+>   TEST    tests/qapi-schema/flat-union-optional-discriminator.out
+>   TEST    tests/qapi-schema/flat-union-string-discriminator.out
+>   TEST    tests/qapi-schema/funny-char.out
+>   TEST    tests/qapi-schema/ident-with-escape.out
+>   TEST    tests/qapi-schema/include-before-err.out
+>   TEST    tests/qapi-schema/include-cycle.out
+>   TEST    tests/qapi-schema/include-extra-junk.out
+>   TEST    tests/qapi-schema/include-format-err.out
+>   TEST    tests/qapi-schema/include-nested-err.out
+>   TEST    tests/qapi-schema/include-no-file.out
+>   TEST    tests/qapi-schema/include-non-file.out
+>   TEST    tests/qapi-schema/include-relpath.out
+>   TEST    tests/qapi-schema/include-repetition.out
+>   TEST    tests/qapi-schema/include-self-cycle.out
+>   TEST    tests/qapi-schema/include-simple.out
+>   TEST    tests/qapi-schema/indented-expr.out
+>   TEST    tests/qapi-schema/leading-comma-list.out
+>   TEST    tests/qapi-schema/leading-comma-object.out
+>   TEST    tests/qapi-schema/missing-colon.out
+>   TEST    tests/qapi-schema/missing-comma-list.out
+>   TEST    tests/qapi-schema/missing-comma-object.out
+>   TEST    tests/qapi-schema/missing-type.out
+>   TEST    tests/qapi-schema/nested-struct-data.out
+>   TEST    tests/qapi-schema/non-objects.out
+>   TEST    tests/qapi-schema/oob-test.out
+>   TEST    tests/qapi-schema/allow-preconfig-test.out
+>   TEST    tests/qapi-schema/pragma-doc-required-crap.out
+>   TEST    tests/qapi-schema/pragma-extra-junk.out
+>   TEST    tests/qapi-schema/pragma-name-case-whitelist-crap.out
+>   TEST    tests/qapi-schema/pragma-non-dict.out
+>   TEST    tests/qapi-schema/pragma-returns-whitelist-crap.out
+>   TEST    tests/qapi-schema/qapi-schema-test.out
+>   TEST    tests/qapi-schema/quoted-structural-chars.out
+>   TEST    tests/qapi-schema/redefined-builtin.out
+>   TEST    tests/qapi-schema/redefined-command.out
+>   TEST    tests/qapi-schema/redefined-event.out
+>   TEST    tests/qapi-schema/redefined-type.out
+>   TEST    tests/qapi-schema/reserved-command-q.out
+>   TEST    tests/qapi-schema/reserved-enum-q.out
+>   TEST    tests/qapi-schema/reserved-member-has.out
+>   TEST    tests/qapi-schema/reserved-member-q.out
+>   TEST    tests/qapi-schema/reserved-member-u.out
+>   TEST    tests/qapi-schema/reserved-member-underscore.out
+>   TEST    tests/qapi-schema/reserved-type-kind.out
+>   TEST    tests/qapi-schema/reserved-type-list.out
+>   TEST    tests/qapi-schema/returns-alternate.out
+>   TEST    tests/qapi-schema/returns-array-bad.out
+>   TEST    tests/qapi-schema/returns-dict.out
+>   TEST    tests/qapi-schema/returns-unknown.out
+>   TEST    tests/qapi-schema/returns-whitelist.out
+>   TEST    tests/qapi-schema/struct-base-clash-deep.out
+>   TEST    tests/qapi-schema/struct-base-clash.out
+>   TEST    tests/qapi-schema/struct-data-invalid.out
+>   TEST    tests/qapi-schema/struct-member-invalid.out
+>   TEST    tests/qapi-schema/trailing-comma-list.out
+>   TEST    tests/qapi-schema/trailing-comma-object.out
+>   TEST    tests/qapi-schema/type-bypass-bad-gen.out
+>   TEST    tests/qapi-schema/unclosed-list.out
+>   TEST    tests/qapi-schema/unclosed-object.out
+>   TEST    tests/qapi-schema/unclosed-string.out
+>   TEST    tests/qapi-schema/unicode-str.out
+>   TEST    tests/qapi-schema/union-base-empty.out
+>   TEST    tests/qapi-schema/union-base-no-discriminator.out
+>   TEST    tests/qapi-schema/union-branch-case.out
+>   TEST    tests/qapi-schema/union-clash-branches.out
+>   TEST    tests/qapi-schema/union-empty.out
+>   TEST    tests/qapi-schema/union-invalid-base.out
+>   TEST    tests/qapi-schema/union-optional-branch.out
+>   TEST    tests/qapi-schema/union-unknown.out
+>   TEST    tests/qapi-schema/unknown-escape.out
+>   TEST    tests/qapi-schema/unknown-expr-key.out
+>   GEN     tests/qapi-schema/doc-good.test.texi
+>   CC      tests/check-qdict.o
+>   CC      tests/check-block-qdict.o
+>   CC      tests/test-char.o
+>   CC      tests/check-qnum.o
+>   CC      tests/check-qstring.o
+>   CC      tests/check-qlist.o
+>   CC      tests/check-qnull.o
+>   CC      tests/check-qobject.o
+>   CC      tests/check-qjson.o
+>   CC      tests/check-qlit.o
+>   CC      tests/test-qobject-output-visitor.o
+>   CC      tests/test-qapi-visit.o
+>   CC      tests/test-qapi-types.o
+>   CC      tests/test-qapi-events.o
+>   CC      tests/test-qapi-introspect.o
+>   CC      tests/test-clone-visitor.o
+>   CC      tests/test-qobject-input-visitor.o
+>   CC      tests/test-qmp-cmds.o
+>   CC      tests/test-qapi-commands.o
+>   CC      tests/test-string-input-visitor.o
+>   CC      tests/test-string-output-visitor.o
+>   CC      tests/test-qmp-event.o
+>   CC      tests/test-opts-visitor.o
+>   CC      tests/test-coroutine.o
+>   CC      tests/iothread.o
+>   CC      tests/test-visitor-serialization.o
+>   CC      tests/test-iov.o
+>   CC      tests/test-aio.o
+>   CC      tests/test-aio-multithread.o
+>   CC      tests/test-throttle.o
+>   CC      tests/test-thread-pool.o
+>   CC      tests/test-hbitmap.o
+>   CC      tests/test-bdrv-drain.o
+>   CC      tests/test-blockjob.o
+>   CC      tests/test-blockjob-txn.o
+>   CC      tests/test-block-backend.o
+>   CC      tests/test-x86-cpuid.o
+>   CC      tests/test-xbzrle.o
+>   CC      tests/test-vmstate.o
+>   CC      tests/test-cutils.o
+>   CC      tests/test-shift128.o
+>   CC      tests/test-mul64.o
+>   CC      tests/test-int128.o
+>   CC      tests/rcutorture.o
+>   CC      tests/test-rcu-list.o
+>   CC      tests/test-rcu-simpleq.o
+>   CC      tests/test-rcu-tailq.o
+>   CC      tests/test-qdist.o
+>   CC      tests/test-qht.o
+>   CC      tests/test-qht-par.o
+>   CC      tests/qht-bench.o
+>   CC      tests/test-bitops.o
+>   CC      tests/test-bitcnt.o
+>   CC      tests/test-qdev-global-props.o
+>   CC      tests/check-qom-interface.o
+>   CC      tests/check-qom-proplist.o
+>   CC      tests/test-qemu-opts.o
+>   CC      tests/test-keyval.o
+>   CC      tests/test-write-threshold.o
+>   CC      tests/test-crypto-hash.o
+>   CC      tests/test-crypto-hmac.o
+>   CC      tests/test-crypto-cipher.o
+>   CC      tests/test-crypto-secret.o
+>   CC      tests/test-qga.o
+>   CC      tests/libqtest.o
+>   CC      tests/test-timed-average.o
+>   CC      tests/test-util-sockets.o
+>   CC      tests/socket-helpers.o
+>   CC      tests/test-io-task.o
+>   CC      tests/test-io-channel-socket.o
+>   CC      tests/io-channel-helpers.o
+>   CC      tests/test-io-channel-file.o
+>   CC      tests/test-io-channel-command.o
+>   CC      tests/test-io-channel-buffer.o
+>   CC      tests/test-base64.o
+>   CC      tests/test-crypto-pbkdf.o
+>   CC      tests/test-crypto-ivgen.o
+>   CC      tests/test-crypto-afsplit.o
+>   CC      tests/test-crypto-xts.o
+>   CC      tests/test-crypto-block.o
+>   CC      tests/test-logging.o
+>   CC      tests/test-replication.o
+>   CC      tests/test-bufferiszero.o
+>   CC      tests/test-uuid.o
+>   CC      tests/ptimer-test.o
+>   CC      tests/ptimer-test-stubs.o
+>   CC      tests/test-qapi-util.o
+>   CC      tests/vhost-user-test.o
+>   CC      tests/libqos/pci.o
+>   CC      tests/libqos/fw_cfg.o
+>   CC      tests/libqos/malloc.o
+>   CC      tests/libqos/i2c.o
+>   CC      tests/libqos/libqos.o
+>   CC      tests/libqos/malloc-spapr.o
+>   CC      tests/libqos/libqos-spapr.o
+>   CC      tests/libqos/rtas.o
+>   CC      tests/libqos/pci-spapr.o
+>   CC      tests/libqos/pci-pc.o
+>   CC      tests/libqos/malloc-pc.o
+>   CC      tests/libqos/libqos-pc.o
+>   CC      tests/libqos/ahci.o
+>   CC      tests/libqos/virtio.o
+>   CC      tests/libqos/virtio-pci.o
+>   CC      tests/libqos/virtio-mmio.o
+>   CC      tests/libqos/malloc-generic.o
+>   CC      tests/endianness-test.o
+>   CC      tests/fdc-test.o
+>   CC      tests/ide-test.o
+>   CC      tests/ahci-test.o
+>   CC      tests/hd-geo-test.o
+>   CC      tests/boot-order-test.o
+>   CC      tests/bios-tables-test.o
+>   CC      tests/boot-sector.o
+>   CC      tests/acpi-utils.o
+>   CC      tests/boot-serial-test.o
+>   CC      tests/pxe-test.o
+>   CC      tests/rtc-test.o
+>   CC      tests/ipmi-kcs-test.o
+>   CC      tests/i440fx-test.o
+>   CC      tests/ipmi-bt-test.o
+>   CC      tests/fw_cfg-test.o
+>   CC      tests/drive_del-test.o
+>   CC      tests/wdt_ib700-test.o
+>   CC      tests/tco-test.o
+>   CC      tests/e1000-test.o
+>   CC      tests/e1000e-test.o
+>   CC      tests/rtl8139-test.o
+>   CC      tests/pcnet-test.o
+>   CC      tests/eepro100-test.o
+>   CC      tests/ne2000-test.o
+>   CC      tests/nvme-test.o
+>   CC      tests/ac97-test.o
+>   CC      tests/es1370-test.o
+>   CC      tests/virtio-net-test.o
+>   CC      tests/virtio-balloon-test.o
+>   CC      tests/virtio-blk-test.o
+>   CC      tests/virtio-rng-test.o
+>   CC      tests/virtio-scsi-test.o
+>   CC      tests/virtio-serial-test.o
+>   CC      tests/virtio-console-test.o
+>   CC      tests/tpci200-test.o
+>   CC      tests/ipoctal232-test.o
+>   CC      tests/display-vga-test.o
+>   CC      tests/intel-hda-test.o
+>   CC      tests/ivshmem-test.o
+>   CC      tests/megasas-test.o
+>   CC      tests/vmxnet3-test.o
+>   CC      tests/pvpanic-test.o
+>   CC      tests/i82801b11-test.o
+>   CC      tests/ioh3420-test.o
+>   CC      tests/usb-hcd-ohci-test.o
+>   CC      tests/libqos/usb.o
+>   CC      tests/usb-hcd-uhci-test.o
+>   CC      tests/usb-hcd-xhci-test.o
+>   CC      tests/cpu-plug-test.o
+>   CC      tests/q35-test.o
+>   CC      tests/vmgenid-test.o
+>   CC      tests/tpm-crb-swtpm-test.o
+>   CC      tests/tpm-util.o
+>   CC      tests/tpm-emu.o
+>   CC      tests/tpm-tests.o
+>   CC      tests/tpm-crb-test.o
+>   CC      tests/tpm-tis-swtpm-test.o
+>   CC      tests/tpm-tis-test.o
+>   CC      tests/test-netfilter.o
+>   CC      tests/test-filter-mirror.o
+>   CC      tests/test-filter-redirector.o
+>   CC      tests/migration-test.o
+>   CC      tests/test-x86-cpuid-compat.o
+>   CC      tests/numa-test.o
+>   CC      tests/sdhci-test.o
+>   CC      tests/qmp-test.o
+>   CC      tests/qmp-cmd-test.o
+>   CC      tests/device-introspect-test.o
+>   CC      tests/cdrom-test.o
+>   CC      tests/machine-none-test.o
+>   CC      tests/qom-test.o
+>   CC      tests/test-hmp.o
+>   TEST    decodetree.py
+>   LINK    tests/check-qdict
+>   LINK    tests/check-block-qdict
+>   LINK    tests/test-char
+>   LINK    tests/check-qnum
+>   LINK    tests/check-qstring
+>   LINK    tests/check-qlist
+>   LINK    tests/check-qnull
+>   LINK    tests/check-qobject
+>   LINK    tests/check-qjson
+>   LINK    tests/check-qlit
+>   LINK    tests/test-qobject-output-visitor
+>   LINK    tests/test-clone-visitor
+>   LINK    tests/test-qobject-input-visitor
+>   LINK    tests/test-qmp-cmds
+>   LINK    tests/test-string-input-visitor
+>   LINK    tests/test-string-output-visitor
+>   LINK    tests/test-qmp-event
+>   LINK    tests/test-opts-visitor
+>   LINK    tests/test-coroutine
+>   LINK    tests/test-visitor-serialization
+>   LINK    tests/test-iov
+>   LINK    tests/test-aio
+>   LINK    tests/test-aio-multithread
+>   LINK    tests/test-throttle
+>   LINK    tests/test-thread-pool
+>   LINK    tests/test-hbitmap
+>   LINK    tests/test-bdrv-drain
+>   LINK    tests/test-blockjob
+>   LINK    tests/test-blockjob-txn
+>   LINK    tests/test-x86-cpuid
+>   LINK    tests/test-block-backend
+>   LINK    tests/test-xbzrle
+>   LINK    tests/test-vmstate
+>   LINK    tests/test-cutils
+>   LINK    tests/test-shift128
+>   LINK    tests/test-mul64
+>   LINK    tests/test-int128
+>   LINK    tests/rcutorture
+>   LINK    tests/test-rcu-list
+>   LINK    tests/test-rcu-simpleq
+>   LINK    tests/test-rcu-tailq
+>   LINK    tests/test-qdist
+>   LINK    tests/test-qht
+>   LINK    tests/qht-bench
+>   LINK    tests/test-bitops
+>   LINK    tests/test-bitcnt
+>   LINK    tests/test-qdev-global-props
+>   LINK    tests/check-qom-interface
+>   LINK    tests/check-qom-proplist
+>   LINK    tests/test-qemu-opts
+>   LINK    tests/test-keyval
+>   LINK    tests/test-write-threshold
+>   LINK    tests/test-crypto-hash
+>   LINK    tests/test-crypto-hmac
+>   LINK    tests/test-crypto-cipher
+>   LINK    tests/test-crypto-secret
+>   LINK    tests/test-qga
+>   LINK    tests/test-timed-average
+>   LINK    tests/test-util-sockets
+>   LINK    tests/test-io-task
+>   LINK    tests/test-io-channel-socket
+>   LINK    tests/test-io-channel-file
+>   LINK    tests/test-io-channel-command
+>   LINK    tests/test-io-channel-buffer
+>   LINK    tests/test-base64
+>   LINK    tests/test-crypto-pbkdf
+>   LINK    tests/test-crypto-ivgen
+>   LINK    tests/test-crypto-afsplit
+>   LINK    tests/test-crypto-xts
+>   LINK    tests/test-crypto-block
+>   LINK    tests/test-logging
+>   LINK    tests/test-replication
+>   LINK    tests/test-bufferiszero
+>   LINK    tests/test-uuid
+>   LINK    tests/ptimer-test
+>   LINK    tests/test-qapi-util
+>   LINK    tests/vhost-user-test
+>   LINK    tests/endianness-test
+>   LINK    tests/fdc-test
+>   LINK    tests/ide-test
+>   LINK    tests/ahci-test
+>   LINK    tests/hd-geo-test
+>   LINK    tests/boot-order-test
+>   LINK    tests/bios-tables-test
+>   LINK    tests/boot-serial-test
+>   LINK    tests/pxe-test
+>   LINK    tests/rtc-test
+>   LINK    tests/ipmi-kcs-test
+>   LINK    tests/ipmi-bt-test
+>   LINK    tests/i440fx-test
+>   LINK    tests/fw_cfg-test
+>   LINK    tests/drive_del-test
+>   LINK    tests/wdt_ib700-test
+>   LINK    tests/tco-test
+>   LINK    tests/e1000-test
+>   LINK    tests/e1000e-test
+>   LINK    tests/rtl8139-test
+>   LINK    tests/pcnet-test
+>   LINK    tests/eepro100-test
+>   LINK    tests/ne2000-test
+>   LINK    tests/nvme-test
+>   LINK    tests/ac97-test
+>   LINK    tests/es1370-test
+>   LINK    tests/virtio-net-test
+>   LINK    tests/virtio-balloon-test
+>   LINK    tests/virtio-blk-test
+>   LINK    tests/virtio-rng-test
+>   LINK    tests/virtio-scsi-test
+>   LINK    tests/virtio-serial-test
+>   LINK    tests/virtio-console-test
+>   LINK    tests/tpci200-test
+>   LINK    tests/ipoctal232-test
+>   LINK    tests/display-vga-test
+>   LINK    tests/intel-hda-test
+>   LINK    tests/ivshmem-test
+>   LINK    tests/megasas-test
+>   LINK    tests/vmxnet3-test
+>   LINK    tests/pvpanic-test
+>   LINK    tests/i82801b11-test
+>   LINK    tests/ioh3420-test
+>   LINK    tests/usb-hcd-ohci-test
+>   LINK    tests/usb-hcd-uhci-test
+>   LINK    tests/usb-hcd-xhci-test
+>   LINK    tests/cpu-plug-test
+>   LINK    tests/q35-test
+>   LINK    tests/vmgenid-test
+>   LINK    tests/tpm-crb-swtpm-test
+>   LINK    tests/tpm-crb-test
+>   LINK    tests/tpm-tis-swtpm-test
+>   LINK    tests/tpm-tis-test
+>   LINK    tests/test-netfilter
+>   LINK    tests/test-filter-mirror
+>   LINK    tests/test-filter-redirector
+>   LINK    tests/migration-test
+>   LINK    tests/test-x86-cpuid-compat
+>   LINK    tests/numa-test
+>   LINK    tests/sdhci-test
+>   LINK    tests/qmp-test
+>   LINK    tests/qmp-cmd-test
+>   LINK    tests/device-introspect-test
+>   LINK    tests/cdrom-test
+>   LINK    tests/machine-none-test
+>   LINK    tests/qom-test
+>   LINK    tests/test-hmp
+>   GTESTER tests/check-qdict
+>   GTESTER tests/check-block-qdict
+>   GTESTER tests/test-char
+>   GTESTER tests/check-qnum
+>   GTESTER tests/check-qstring
+>   GTESTER tests/check-qlist
+>   GTESTER tests/check-qnull
+>   GTESTER tests/check-qjson
+>   GTESTER tests/test-qobject-output-visitor
+>   GTESTER tests/check-qobject
+>   GTESTER tests/check-qlit
+>   GTESTER tests/test-clone-visitor
+>   GTESTER tests/test-qobject-input-visitor
+>   GTESTER tests/test-qmp-cmds
+>   GTESTER tests/test-string-input-visitor
+>   GTESTER tests/test-string-output-visitor
+>   GTESTER tests/test-opts-visitor
+>   GTESTER tests/test-qmp-event
+>   GTESTER tests/test-coroutine
+>   GTESTER tests/test-visitor-serialization
+>   GTESTER tests/test-iov
+>   GTESTER tests/test-aio
+>   GTESTER tests/test-aio-multithread
+>   GTESTER tests/test-throttle
+>   GTESTER tests/test-thread-pool
+>   GTESTER tests/test-hbitmap
+>   GTESTER tests/test-bdrv-drain
+>   GTESTER tests/test-blockjob
+>   GTESTER tests/test-blockjob-txn
+>   GTESTER tests/test-block-backend
+>   GTESTER tests/test-x86-cpuid
+>   GTESTER tests/test-xbzrle
+>   GTESTER tests/test-vmstate
+>   GTESTER tests/test-cutils
+>   GTESTER tests/test-shift128
+>   GTESTER tests/test-mul64
+>   GTESTER tests/test-int128
+>   GTESTER tests/rcutorture
+>   GTESTER tests/test-rcu-list
+>   GTESTER tests/test-rcu-simpleq
+>   GTESTER tests/test-rcu-tailq
+>   GTESTER tests/test-qdist
+>   GTESTER tests/test-qht
+>   LINK    tests/test-qht-par
+>   GTESTER tests/test-bitops
+>   GTESTER tests/test-bitcnt
+>   GTESTER tests/test-qdev-global-props
+>   GTESTER tests/check-qom-interface
+>   GTESTER tests/check-qom-proplist
+>   GTESTER tests/test-qemu-opts
+>   GTESTER tests/test-keyval
+>   GTESTER tests/test-write-threshold
+>   GTESTER tests/test-crypto-hash
+>   GTESTER tests/test-crypto-hmac
+>   GTESTER tests/test-crypto-cipher
+>   GTESTER tests/test-crypto-secret
+>   GTESTER tests/test-qga
+>   GTESTER tests/test-timed-average
+>   GTESTER tests/test-util-sockets
+>   GTESTER tests/test-io-task
+>   GTESTER tests/test-io-channel-socket
+>   GTESTER tests/test-io-channel-file
+>   GTESTER tests/test-io-channel-command
+>   GTESTER tests/test-io-channel-buffer
+>   GTESTER tests/test-base64
+>   GTESTER tests/test-crypto-pbkdf
+>   GTESTER tests/test-crypto-ivgen
+>   GTESTER tests/test-crypto-afsplit
+>   GTESTER tests/test-crypto-xts
+>   GTESTER tests/test-crypto-block
+>   GTESTER tests/test-logging
+>   GTESTER tests/test-bufferiszero
+>   GTESTER tests/test-replication
+>   GTESTER tests/test-uuid
+>   GTESTER tests/ptimer-test
+>   GTESTER tests/test-qapi-util
+>   GTESTER check-qtest-x86_64
+>   GTESTER check-qtest-aarch64
+>   GTESTER tests/test-qht-par
+> Could not access KVM kernel module: No such file or directory
+> qemu-system-x86_64: failed to initialize KVM: No such file or directory
+> qemu-system-x86_64: Back to tcg accelerator
+> Could not access KVM kernel module: No such file or directory
+> qemu-system-x86_64: failed to initialize KVM: No such file or directory
+> qemu-system-x86_64: Back to tcg accelerator
+> Could not access KVM kernel module: No such file or directory
+> qemu-system-x86_64: failed to initialize KVM: No such file or directory
+> qemu-system-x86_64: Back to tcg accelerator
+> Could not access KVM kernel module: No such file or directory
+> qemu-system-x86_64: failed to initialize KVM: No such file or directory
+> qemu-system-x86_64: Back to tcg accelerator
+> Could not access KVM kernel module: No such file or directory
+> qemu-system-x86_64: failed to initialize KVM: No such file or directory
+> qemu-system-x86_64: Back to tcg accelerator
+> Could not access KVM kernel module: No such file or directory
+> qemu-system-x86_64: failed to initialize KVM: No such file or directory
+> qemu-system-x86_64: Back to tcg accelerator
+> Could not access KVM kernel module: No such file or directory
+> qemu-system-x86_64: failed to initialize KVM: No such file or directory
+> qemu-system-x86_64: Back to tcg accelerator
+> Could not access KVM kernel module: No such file or directory
+> qemu-system-x86_64: failed to initialize KVM: No such file or directory
+> qemu-system-x86_64: Back to tcg accelerator
+> Could not access KVM kernel module: No such file or directory
+> qemu-system-x86_64: failed to initialize KVM: No such file or directory
+> qemu-system-x86_64: Back to tcg accelerator
+> Could not access KVM kernel module: No such file or directory
+> qemu-system-x86_64: failed to initialize KVM: No such file or directory
+> qemu-system-x86_64: Back to tcg accelerator
+> Could not access KVM kernel module: No such file or directory
+> qemu-system-x86_64: failed to initialize KVM: No such file or directory
+> qemu-system-x86_64: Back to tcg accelerator
+> Could not access KVM kernel module: No such file or directory
+> qemu-system-x86_64: failed to initialize KVM: No such file or directory
+> qemu-system-x86_64: Back to tcg accelerator
+> Could not access KVM kernel module: No such file or directory
+> qemu-system-x86_64: failed to initialize KVM: No such file or directory
+> qemu-system-x86_64: Back to tcg accelerator
+> Could not access KVM kernel module: No such file or directory
+> qemu-system-x86_64: failed to initialize KVM: No such file or directory
+> qemu-system-x86_64: Back to tcg accelerator
+> Could not access KVM kernel module: No such file or directory
+> qemu-system-x86_64: failed to initialize KVM: No such file or directory
+> qemu-system-x86_64: Back to tcg accelerator
+> Could not access KVM kernel module: No such file or directory
+> qemu-system-x86_64: failed to initialize KVM: No such file or directory
+> qemu-system-x86_64: Back to tcg accelerator
+> Could not access KVM kernel module: No such file or directory
+> qemu-system-x86_64: failed to initialize KVM: No such file or directory
+> qemu-system-x86_64: Back to tcg accelerator
+> Could not access KVM kernel module: No such file or directory
+> qemu-system-x86_64: failed to initialize KVM: No such file or directory
+> qemu-system-x86_64: Back to tcg accelerator
+> **
+> ERROR:/tmp/qemu-test/src/tests/fw_cfg-test.c:108:test_fw_cfg_reboot_timeo=
+ut:
+> assertion failed (reboot_timeout <=3D 65535): (4294967295 <=3D 65535)
+> GTester: last random seed: R02Sba78f3e400af8ea522eaceadffdecfd5
+> Could not access KVM kernel module: No such file or directory
+> qemu-system-x86_64: failed to initialize KVM: No such file or directory
+> qemu-system-x86_64: Back to tcg accelerator
+> Could not access KVM kernel module: No such file or directory
+> qemu-system-x86_64: failed to initialize KVM: No such file or directory
+> qemu-system-x86_64: Back to tcg accelerator
+> Could not access KVM kernel module: No such file or directory
+> qemu-system-x86_64: failed to initialize KVM: No such file or directory
+> qemu-system-x86_64: Back to tcg accelerator
+> Could not access KVM kernel module: No such file or directory
+> qemu-system-x86_64: failed to initialize KVM: No such file or directory
+> qemu-system-x86_64: Back to tcg accelerator
+> Could not access KVM kernel module: No such file or directory
+> qemu-system-x86_64: failed to initialize KVM: No such file or directory
+> qemu-system-x86_64: Back to tcg accelerator
+> Could not access KVM kernel module: No such file or directory
+> qemu-system-x86_64: failed to initialize KVM: No such file or directory
+> qemu-system-x86_64: Back to tcg accelerator
+> Could not access KVM kernel module: No such file or directory
+> qemu-system-x86_64: failed to initialize KVM: No such file or directory
+> qemu-system-x86_64: Back to tcg accelerator
+> make: *** [check-qtest-x86_64] Error 1
+> Traceback (most recent call last):
+>   File "./tests/docker/docker.py", line 563, in <module>
+>     sys.exit(main())
+>   File "./tests/docker/docker.py", line 560, in main
+>     return args.cmdobj.run(args, argv)
+>   File "./tests/docker/docker.py", line 306, in run
+>     return Docker().run(argv, args.keep, quiet=3Dargs.quiet)
+>   File "./tests/docker/docker.py", line 274, in run
+>     quiet=3Dquiet)
+>   File "./tests/docker/docker.py", line 181, in _do_check
+>     return subprocess.check_call(self._command + cmd, **kwargs)
+>   File "/usr/lib64/python2.7/subprocess.py", line 186, in check_call
+>     raise CalledProcessError(retcode, cmd)
+> subprocess.CalledProcessError: Command '['sudo', '-n', 'docker', 'run',
+> '--label', 'com.qemu.instance.uuid=3D9f358456ddba11e8a49d52540069c830', '=
+-u',
+> '1000', '--security-opt', 'seccomp=3Dunconfined', '--rm', '--net=3Dnone',=
+ '-e',
+> 'TARGET_LIST=3D', '-e', 'EXTRA_CONFIGURE_OPTS=3D', '-e', 'V=3D', '-e', 'J=
+=3D8',
+> '-e', 'DEBUG=3D', '-e', 'SHOW_ENV=3D1', '-e', 'CCACHE_DIR=3D/var/tmp/ccac=
+he',
+> '-v', '/home/patchew/.cache/qemu-docker-ccache:/var/tmp/ccache:z', '-v',
+> '/var/tmp/patchew-tester-tmp-bmlan9mc/src/docker-src.2018-11-01-05.43.33.=
+2597:/var/tmp/qemu:z,ro',
+> 'qemu:centos7', '/var/tmp/qemu/run', 'test-quick']' returned non-zero exi=
+t
+> status 2
+> make[1]: *** [tests/docker/Makefile.include:217: docker-run] Error 1
+> make[1]: Leaving directory '/var/tmp/patchew-tester-tmp-bmlan9mc/src'
+> make: *** [tests/docker/Makefile.include:251: docker-run-test-quick@cento=
+s7]
+> Error 2
+>
+> real    8m0.153s
+> user    0m5.165s
+> sys     0m3.923s
+> =3D=3D=3D OUTPUT END =3D=3D=3D
+>
+> Test command exited with code: 2
+>
+>
+> ---
+> Email generated automatically by Patchew [http://patchew.org/].
+> Please send your feedback to patchew-devel@redhat.com
