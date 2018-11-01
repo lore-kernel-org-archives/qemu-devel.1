@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55770)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gIEdd-0005Rm-EN
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 11:12:02 -0400
+	(envelope-from <philmd@redhat.com>) id 1gIEdz-0005d6-QC
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 11:12:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gIEdZ-0005tS-Fo
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 11:12:01 -0400
-Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:40518)
+	(envelope-from <philmd@redhat.com>) id 1gIEdr-00065S-MK
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 11:12:21 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:50976)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <artem.k.pisarenko@gmail.com>)
-	id 1gIEdZ-0005su-6q
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 11:11:57 -0400
-Received: by mail-lf1-x142.google.com with SMTP id n3-v6so14449151lfe.7
-	for <qemu-devel@nongnu.org>; Thu, 01 Nov 2018 08:11:57 -0700 (PDT)
-From: Artem Pisarenko <artem.k.pisarenko@gmail.com>
-Date: Thu,  1 Nov 2018 21:11:42 +0600
-Message-Id: <49e9640f3fc040a9c9ab40f93935a6572b34bdff.1541085026.git.artem.k.pisarenko@gmail.com>
-Subject: [Qemu-devel] [PATCH] virtserialport/virtconsole: fix messy
- opening/closing port
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gIEdr-000643-4K
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 11:12:15 -0400
+Received: by mail-wm1-f67.google.com with SMTP id h2-v6so1691041wmb.0
+	for <qemu-devel@nongnu.org>; Thu, 01 Nov 2018 08:12:13 -0700 (PDT)
+References: <20181101102303.16439-1-sameo@linux.intel.com>
+	<20181101102303.16439-18-sameo@linux.intel.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <68eae1f8-ca6a-d096-c9ac-d492e4523c7c@redhat.com>
+Date: Thu, 1 Nov 2018 16:12:10 +0100
+MIME-Version: 1.0
+In-Reply-To: <20181101102303.16439-18-sameo@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4 17/23] hw: i386: Export the MADT build
+ method
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,153 +31,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Amit Shah <amit@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Artem Pisarenko <artem.k.pisarenko@gmail.com>
+To: Samuel Ortiz <sameo@linux.intel.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, "open list:ARM ACPI Subsystem" <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-This fixes wrong interfacing between virtio serial port and bus
-models, and corresponding chardev backends, caused extra and incorrect
-activity during guest boot process (when virtserialport device used).
+Hi Samuel,
 
-Signed-off-by: Artem Pisarenko <artem.k.pisarenko@gmail.com>
----
+On 1/11/18 11:22, Samuel Ortiz wrote:
+> It is going to be used by the PC machine type as the MADT table builder
+> method and thus needs to be exported outside of acpi-build.c
+> 
+> Also, now that the generic build_madt() API is exported, we have to
+> rename the ARM static one in order to avoid build time conflicts.
+> 
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+> ---
+>   hw/arm/virt-acpi-build.c |  4 ++--
+>   hw/i386/acpi-build.c     |  3 ++-
+>   include/hw/i386/acpi.h   | 27 +++++++++++++++++++++++++++
+>   3 files changed, 31 insertions(+), 3 deletions(-)
+>   create mode 100644 include/hw/i386/acpi.h
+> 
+> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> index f9a60907f1..4a37c5997c 100644
+> --- a/hw/arm/virt-acpi-build.c
+> +++ b/hw/arm/virt-acpi-build.c
+> @@ -565,7 +565,7 @@ build_gtdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>   
+>   /* MADT */
+>   static void
+> -build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+> +virt_build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>   {
+>       VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
+>       int madt_start = table_data->len;
+> @@ -746,7 +746,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+>       build_fadt_rev5(tables_blob, tables->linker, vms, dsdt);
+>   
+>       acpi_add_table(table_offsets, tables_blob);
+> -    build_madt(tables_blob, tables->linker, vms);
+> +    virt_build_madt(tables_blob, tables->linker, vms);
+>   
+>       acpi_add_table(table_offsets, tables_blob);
+>       build_gtdt(tables_blob, tables->linker, vms);
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 6c9b61cea2..f4afdbcd1a 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -60,6 +60,7 @@
+>   #include "qom/qom-qobject.h"
+>   #include "hw/i386/amd_iommu.h"
+>   #include "hw/i386/intel_iommu.h"
+> +#include "hw/i386/acpi.h"
+>   
+>   #include "hw/acpi/ipmi.h"
+>   
+> @@ -279,7 +280,7 @@ void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
+>       }
+>   }
+>   
+> -static void
+> +void
+>   build_madt(GArray *table_data, BIOSLinker *linker,
+>              MachineState *ms, AcpiConfiguration *acpi_conf)
+>   {
+> diff --git a/include/hw/i386/acpi.h b/include/hw/i386/acpi.h
+> new file mode 100644
+> index 0000000000..ee1203914a
+> --- /dev/null
+> +++ b/include/hw/i386/acpi.h
+> @@ -0,0 +1,27 @@
+> +/*
+> + *
+> + * Copyright (c) 2018 Intel Corportation
+> + *
+> + * This program is free software; you can redistribute it and/or modify it
+> + * under the terms and conditions of the GNU General Public License,
+> + * version 2 or later, as published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope it will be useful, but WITHOUT
+> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+> + * more details.
+> + *
+> + * You should have received a copy of the GNU General Public License along with
+> + * this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#ifndef HW_I386_ACPI_H
+> +#define HW_I386_ACPI_H
+> +
+> +#include "hw/acpi/acpi.h"
 
-Notes:
-    Although this doesn't trigger any issue/bug (known to me), this may prevent them in future.
-    Also this patch optimizes emulation performance by avoiding extra activity and fixes a case, when serial port wasn't closed if backend closed while being disabled (even worse - serial port will open again!).
+You forgot the following header:
 
- hw/char/virtio-console.c          | 24 ++++++++++++++++++++----
- hw/char/virtio-serial-bus.c       |  8 +++++++-
- include/hw/virtio/virtio-serial.h |  8 ++++++++
- 3 files changed, 35 insertions(+), 5 deletions(-)
+#include "hw/acpi/bios-linker-loader.h"
 
-diff --git a/hw/char/virtio-console.c b/hw/char/virtio-console.c
-index 2cbe1d4..634e9bf 100644
---- a/hw/char/virtio-console.c
-+++ b/hw/char/virtio-console.c
-@@ -25,6 +25,7 @@
- typedef struct VirtConsole {
-     VirtIOSerialPort parent_obj;
- 
-+    bool backend_active;
-     CharBackend chr;
-     guint watch;
- } VirtConsole;
-@@ -149,6 +150,11 @@ static void chr_event(void *opaque, int event)
-     VirtIOSerialPort *port = VIRTIO_SERIAL_PORT(vcon);
- 
-     trace_virtio_console_chr_event(port->id, event);
-+
-+    if (!vcon->backend_active) {
-+        return;
-+    }
-+
-     switch (event) {
-     case CHR_EVENT_OPENED:
-         virtio_serial_open(port);
-@@ -187,17 +193,24 @@ static int chr_be_change(void *opaque)
-     return 0;
- }
- 
-+static bool virtconsole_is_backend_enabled(VirtIOSerialPort *port)
-+{
-+    VirtConsole *vcon = VIRTIO_CONSOLE(port);
-+
-+    return vcon->backend_active;
-+}
-+
- static void virtconsole_enable_backend(VirtIOSerialPort *port, bool enable)
- {
-     VirtConsole *vcon = VIRTIO_CONSOLE(port);
- 
--    if (!qemu_chr_fe_backend_connected(&vcon->chr)) {
--        return;
--    }
--
-     if (enable) {
-         VirtIOSerialPortClass *k = VIRTIO_SERIAL_PORT_GET_CLASS(port);
- 
-+        if (!k->is_console && virtio_serial_is_opened(port)
-+            && !qemu_chr_fe_backend_open(&vcon->chr)) {
-+            virtio_serial_close(port);
-+        }
-         qemu_chr_fe_set_handlers(&vcon->chr, chr_can_read, chr_read,
-                                  k->is_console ? NULL : chr_event,
-                                  chr_be_change, vcon, NULL, false);
-@@ -205,6 +218,7 @@ static void virtconsole_enable_backend(VirtIOSerialPort *port, bool enable)
-         qemu_chr_fe_set_handlers(&vcon->chr, NULL, NULL, NULL,
-                                  NULL, NULL, NULL, false);
-     }
-+    vcon->backend_active = enable;
- }
- 
- static void virtconsole_realize(DeviceState *dev, Error **errp)
-@@ -220,6 +234,7 @@ static void virtconsole_realize(DeviceState *dev, Error **errp)
-     }
- 
-     if (qemu_chr_fe_backend_connected(&vcon->chr)) {
-+        vcon->backend_active = true;
-         /*
-          * For consoles we don't block guest data transfer just
-          * because nothing is connected - we'll just let it go
-@@ -278,6 +293,7 @@ static void virtserialport_class_init(ObjectClass *klass, void *data)
-     k->unrealize = virtconsole_unrealize;
-     k->have_data = flush_buf;
-     k->set_guest_connected = set_guest_connected;
-+    k->is_backend_enabled = virtconsole_is_backend_enabled;
-     k->enable_backend = virtconsole_enable_backend;
-     k->guest_writable = guest_writable;
-     dc->props = virtserialport_properties;
-diff --git a/hw/char/virtio-serial-bus.c b/hw/char/virtio-serial-bus.c
-index 04e3ebe..d23d99d 100644
---- a/hw/char/virtio-serial-bus.c
-+++ b/hw/char/virtio-serial-bus.c
-@@ -258,6 +258,11 @@ static size_t send_control_event(VirtIOSerial *vser, uint32_t port_id,
- }
- 
- /* Functions for use inside qemu to open and read from/write to ports */
-+bool virtio_serial_is_opened(VirtIOSerialPort *port)
-+{
-+    return port->host_connected;
-+}
-+
- int virtio_serial_open(VirtIOSerialPort *port)
- {
-     /* Don't allow opening an already-open port */
-@@ -643,7 +648,8 @@ static void set_status(VirtIODevice *vdev, uint8_t status)
- 
-     QTAILQ_FOREACH(port, &vser->ports, next) {
-         VirtIOSerialPortClass *vsc = VIRTIO_SERIAL_PORT_GET_CLASS(port);
--        if (vsc->enable_backend) {
-+        if (vsc->is_backend_enabled && vsc->enable_backend
-+            && (vsc->is_backend_enabled(port) != vdev->vm_running)) {
-             vsc->enable_backend(port, vdev->vm_running);
-         }
-     }
-diff --git a/include/hw/virtio/virtio-serial.h b/include/hw/virtio/virtio-serial.h
-index 12657a9..4b72562 100644
---- a/include/hw/virtio/virtio-serial.h
-+++ b/include/hw/virtio/virtio-serial.h
-@@ -58,6 +58,8 @@ typedef struct VirtIOSerialPortClass {
-         /* Guest opened/closed device. */
-     void (*set_guest_connected)(VirtIOSerialPort *port, int guest_connected);
- 
-+    /* Is backend currently enabled for virtio serial port */
-+    bool (*is_backend_enabled)(VirtIOSerialPort *port);
-     /* Enable/disable backend for virtio serial port */
-     void (*enable_backend)(VirtIOSerialPort *port, bool enable);
- 
-@@ -194,6 +196,12 @@ struct VirtIOSerial {
- /* Interface to the virtio-serial bus */
- 
- /*
-+ * Checks status of connection to the port
-+ *   Returns true if connected, false otherwise.
-+ */
-+bool virtio_serial_is_opened(VirtIOSerialPort *port);
-+
-+/*
-  * Open a connection to the port
-  *   Returns 0 on success (always).
-  */
--- 
-2.7.4
+The BIOSLinker is not provided by "acpi/acpi.h", which results in a 
+failure when trying to precompile this header.
+
+> +
+> +/* ACPI MADT (Multiple APIC Description Table) build method */
+> +void build_madt(GArray *table_data, BIOSLinker *linker,
+> +                MachineState *ms, AcpiConfiguration *conf);
+> +
+> +#endif
+> 
