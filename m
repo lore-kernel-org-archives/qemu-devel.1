@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57883)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gIA4n-0000H1-6r
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 06:19:45 -0400
+	(envelope-from <sameo@linux.intel.com>) id 1gIA8w-00044c-R3
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 06:24:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gIA4i-0000fM-7d
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 06:19:45 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:55796)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gIA4g-0000bR-Ka
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 06:19:38 -0400
-Received: by mail-wm1-x341.google.com with SMTP id s10-v6so909107wmc.5
-	for <qemu-devel@nongnu.org>; Thu, 01 Nov 2018 03:19:29 -0700 (PDT)
-Date: Thu, 1 Nov 2018 10:19:25 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20181101101925.GI24946@stefanha-x1.localdomain>
-References: <20181025005052.27661-1-jusual@mail.ru>
-	<CAFEAcA-oZ86C99T8Yutu8L1EsnqM1vNvEK+tEfV7Haw+O5A=7A@mail.gmail.com>
+	(envelope-from <sameo@linux.intel.com>) id 1gIA8t-0002rn-50
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 06:24:02 -0400
+Received: from mga17.intel.com ([192.55.52.151]:61500)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sameo@linux.intel.com>)
+	id 1gIA8s-0002qQ-RZ
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 06:23:59 -0400
+From: Samuel Ortiz <sameo@linux.intel.com>
+Date: Thu,  1 Nov 2018 11:22:42 +0100
+Message-Id: <20181101102303.16439-3-sameo@linux.intel.com>
+In-Reply-To: <20181101102303.16439-1-sameo@linux.intel.com>
+References: <20181101102303.16439-1-sameo@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="BghK6+krpKHjj+jk"
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-oZ86C99T8Yutu8L1EsnqM1vNvEK+tEfV7Haw+O5A=7A@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v3 0/3] arm: Add nRF51 SoC UART support
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v4 02/23] hw: acpi: Export ACPI build alignment
+ API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,67 +28,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Julia Suvorova <jusual@mail.ru>, Jim Mussared <jim@groklearning.com>, Steffen =?iso-8859-1?Q?G=F6rtz?= <mail@steffen-goertz.de>, QEMU Developers <qemu-devel@nongnu.org>, Joel Stanley <joel@jms.id.au>, Stefan Hajnoczi <stefanha@redhat.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
+This is going to be needed by the Hardware-reduced ACPI routines.
 
---BghK6+krpKHjj+jk
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+---
+ hw/acpi/aml-build.c         | 8 ++++++++
+ hw/i386/acpi-build.c        | 8 --------
+ include/hw/acpi/aml-build.h | 2 ++
+ 3 files changed, 10 insertions(+), 8 deletions(-)
 
-On Mon, Oct 29, 2018 at 02:37:42PM +0000, Peter Maydell wrote:
-> On 25 October 2018 at 01:50, Julia Suvorova <jusual@mail.ru> wrote:
-> > This series adds support for the nRF51 SoC UART, that used in
-> > BBC Micro:bit board, and QTest for it.
-> >
-> > v3:
-> >     * serial_hd() moved to the board code
-> >     * sysbus_init_child_obj() used for initialization
-> >     * qemu_chr_fe_accept_input() called after byte popping
-> >
-> > v2:
-> >     * Suspend/Enable functionality added
-> >     * Connection to SoC moved to a separate patch
-> >     * Added QTest for checking reception functionality
-> >     * Mini-kernel test changed to fit current implementation
-> >     * Addressed review comments on R_*, uart_can_receive, VMState,
-> >       uart_transmit
-> >
-> > Julia Suvorova (3):
-> >   hw/char: Implement nRF51 SoC UART
-> >   hw/arm/nrf51_soc: Connect UART to nRF51 SoC
-> >   tests/boot-serial-test: Add microbit board testcase
->=20
-> Applied to target-arm.next, thanks.
->=20
-> What's the current status of the 'microbit' board with these
-> patches? Are we missing anything important? Can we run any
-> interesting guest programs?
-
-qemu.git/master can't run interesting programs yet.  Missing:
-
- * Steffen G=F6rtz's patches (rng, timer, uicr, ficr)
- * Julia's serial qtest (this is a prerequisite for the next item)
- * My -kernel vs -device loader fix (currently qemu.git/master is broken
-   and cannot load any kernel at all!)
-
-But we're getting there step by step :).
-
-Stefan
-
---BghK6+krpKHjj+jk
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJb2tMtAAoJEJykq7OBq3PI6BQH/RITfmUrRCKbpXb6e82Icxx+
-BKUnDvbs8+T3G+W85xY9ysFrgC3Cc/+yqB0x7JyJYr+l2Ld3t+uGetFbLgmi477p
-vbtJsBF/ya6G5j+KwMgEgxUolsd2DjPS4r1go4zMTIKZ6kfJDJsf1fPGwDuoVfH+
-D4foi9LibnU1efj9q+KJKli55ALQ5h0UvzzeubwNL/v2j8sQRrzfNTT6AS95HoBQ
-R4Bzi6lj4jwJhV7eZQIR7SygdPgv8oSrXzQkAjwgbWE+Pj0m9swxbxjIduXCUJlu
-UDg5fRyolVXJj2gY8Ks7n9kFPOW231HrMbZd8AiSd8wMPUn1ojhCp+MUSB7UmAY=
-=rlcM
------END PGP SIGNATURE-----
-
---BghK6+krpKHjj+jk--
+diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+index 1e43cd736d..51b608432f 100644
+--- a/hw/acpi/aml-build.c
++++ b/hw/acpi/aml-build.c
+@@ -1565,6 +1565,14 @@ unsigned acpi_data_len(GArray *table)
+     return table->len;
+ }
+ 
++void acpi_align_size(GArray *blob, unsigned align)
++{
++    /* Align size to multiple of given size. This reduces the chance
++     * we need to change size in the future (breaking cross version migration).
++     */
++    g_array_set_size(blob, ROUND_UP(acpi_data_len(blob), align));
++}
++
+ void acpi_add_table(GArray *table_offsets, GArray *table_data)
+ {
+     uint32_t offset = table_data->len;
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index d0362e1382..81d98fa34f 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -282,14 +282,6 @@ static void acpi_get_pci_holes(Range *hole, Range *hole64)
+                                                NULL));
+ }
+ 
+-static void acpi_align_size(GArray *blob, unsigned align)
+-{
+-    /* Align size to multiple of given size. This reduces the chance
+-     * we need to change size in the future (breaking cross version migration).
+-     */
+-    g_array_set_size(blob, ROUND_UP(acpi_data_len(blob), align));
+-}
+-
+ /* FACS */
+ static void
+ build_facs(GArray *table_data, BIOSLinker *linker)
+diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+index 6c36903c0a..73fc6659f2 100644
+--- a/include/hw/acpi/aml-build.h
++++ b/include/hw/acpi/aml-build.h
+@@ -384,6 +384,8 @@ build_header(BIOSLinker *linker, GArray *table_data,
+              const char *oem_id, const char *oem_table_id);
+ void *acpi_data_push(GArray *table_data, unsigned size);
+ unsigned acpi_data_len(GArray *table);
++/* Align AML blob size to a multiple of 'align' */
++void acpi_align_size(GArray *blob, unsigned align);
+ void acpi_add_table(GArray *table_offsets, GArray *table_data);
+ void acpi_build_tables_init(AcpiBuildTables *tables);
+ void acpi_build_tables_cleanup(AcpiBuildTables *tables, bool mfre);
+-- 
+2.19.1
