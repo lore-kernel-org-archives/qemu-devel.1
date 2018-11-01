@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41927)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44282)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gIAoL-00069k-7W
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 07:06:50 -0400
+	(envelope-from <jusual@mail.ru>) id 1gIAyH-0005IX-Nq
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 07:17:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gIAoE-00043N-UJ
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 07:06:46 -0400
-Received: from mail-eopbgr690117.outbound.protection.outlook.com
-	([40.107.69.117]:11041
-	helo=NAM04-CO1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1gIAoD-0003vy-0t
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 07:06:42 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Thu, 1 Nov 2018 11:06:30 +0000
-Message-ID: <BN6PR2201MB125116B5479010DB326DCCFCC6CE0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <jusual@mail.ru>) id 1gIAyH-0004CP-1U
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 07:17:05 -0400
+References: <20181031002526.14262-1-contrib@steffen-goertz.de>
+	<20181031002526.14262-3-contrib@steffen-goertz.de>
+From: Julia Suvorova <jusual@mail.ru>
+Message-ID: <93e1b8e1-c8f2-6a61-122a-8354b933782c@mail.ru>
+Date: Thu, 1 Nov 2018 11:16:48 +0000
 MIME-Version: 1.0
-Subject: [Qemu-devel] Correction needed for R5900 instruction decoding
+In-Reply-To: <20181031002526.14262-3-contrib@steffen-goertz.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 02/13] arm: Add header to host common
+ definition for nRF51 SOC peripherals
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +25,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Petar Jovanovic <pjovanovic@wavecomp.com>, Stefan Markovic <smarkovic@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>
+To: =?UTF-8?Q?Steffen_G=c3=b6rtz?= <contrib@steffen-goertz.de>, qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Peter Maydell <peter.maydell@linaro.org>, "open list:NRF51" <qemu-arm@nongnu.org>
 
-Hi, Fridrik,
+On 31.10.2018 00:25, Steffen Görtz wrote:
+> Adds a header that provides definitions that are used
+> across nRF51 peripherals
+> 
+> Signed-off-by: Steffen Görtz <contrib@steffen-goertz.de>
+> ---
+>   hw/arm/nrf51_soc.c           | 33 ++++++++++-----------------
+>   include/hw/arm/nrf51.h       | 44 ++++++++++++++++++++++++++++++++++++
+>   include/hw/char/nrf51_uart.h |  1 -
+>   3 files changed, 56 insertions(+), 22 deletions(-)
+>   create mode 100644 include/hw/arm/nrf51.h
 
-I did some closer code inspection of R5900 in last few days, and I noticed =
-some sub-optimal implementation in the area where R5900-specific opcodes ov=
-erlap with the rest-of-MIPS-CPUs opcodes.
 
-The right implementation should be based on the principle that all such cas=
-es are covered with if statements involving INSN_R5900 flag, like this:
+Why do we need an extra file for this? nrf51_soc.h seemed like a good fit.
+What's the purpose of renaming?
 
-        if (ctx->insn_flags & INSN_R5900) {
-            <R5900-specific handling>
-        } else {
-            <rest-of-MIPS-handling>
-        }
-
-You followed that principle for OPC_SPECIAL2 and OPC_SPECIAL3, but for some=
- other opcodes not. For example, there are lines:
-
-    if (reg =3D=3D 0 && (opc =3D=3D OPC_MFHI || opc =3D=3D TX79_MMI_MFHI1 |=
-|
-                     opc =3D=3D OPC_MFLO || opc =3D=3D TX79_MMI_MFLO1)) {
-
-or
-
-     switch (opc) {
-     case OPC_MFHI:
-     case TX79_MMI_MFHI1:
-
-Such implementation makes it difficult to discern R5900 and non-R5900 cases=
-. Potentialy allows bugs to sneak in and affect non-R5900 support.
-
-The correction is not that difficult, I gather. Worse comme to worst, you c=
-an remove R5900 MFLO1 and MFHI1 altogether, they are not that essential at =
-this moment, but do try correcting the decoding stuff as I described. Can y=
-ou please make these changes in next few days or so (given that 3.1 release=
- is getting closer and closer), and send them to the list?
-
-It is my bad that I didn't spot this during review, but in any case, I thin=
-k this should be fixed in 3.1 to make sure that non-R5900 functionalities a=
-re intact.
-
-Thanks,
-Aleksandar
+Best regards, Julia Suvorova.
