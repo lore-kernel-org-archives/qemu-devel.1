@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43421)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gIE7Z-00058A-8I
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 10:38:56 -0400
+	(envelope-from <imammedo@redhat.com>) id 1gIE7c-0005n5-Pb
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 10:38:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gIDvb-0007Ks-QM
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 10:26:35 -0400
-References: <20181030001841.1658-1-philmd@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <bcf1457b-8f0c-3d02-cb40-529eddb19316@redhat.com>
-Date: Thu, 1 Nov 2018 09:26:00 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gIE7b-00084Y-2l
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 10:38:56 -0400
+Date: Thu, 1 Nov 2018 15:38:23 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181101153823.1660c3ff@redhat.com>
+In-Reply-To: <20181024101930.20674-5-david@redhat.com>
+References: <20181024101930.20674-1-david@redhat.com>
+	<20181024101930.20674-5-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181030001841.1658-1-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] tests/bios-tables-test: Sanitize test
- verbose output
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 4/7] pci/pcie: route unplug via the
+ hotplug handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,40 +24,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S
+	. Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, "Dr . David
+	Alan Gilbert" <dgilbert@redhat.com>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On 10/29/18 7:18 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Fix the extraneous extra blank lines in the test output when running wi=
-th V=3D1.
->=20
+On Wed, 24 Oct 2018 12:19:27 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-> +++ b/tests/bios-tables-test.c
-> @@ -371,6 +371,9 @@ static GArray *load_expected_aml(test_data *data)
->       gboolean ret;
->  =20
->       GArray *exp_tables =3D g_array_new(false, true, sizeof(AcpiSdtTab=
-le));
-> +    if (getenv("V")) {
-> +        fputc('\n', stderr);
-> +    }
+> Preparation for multi-stage hotplug handlers.
+commit message needs a rationale shat/why is done here, especially
+if it's preliminary refactoring for some future work
+(which I'd shortly describe here as well).
 
-Umm, this prints a blank line even if I run 'make check V=3D0' - do we=20
-support V=3D0 as a way to disable verbosity, in which case you need to=20
-actually inspect the contents of $V rather than just assuming that if it=20
-is in the environment things are verbose?
+The same applies to patches 5-7.
 
-> @@ -397,7 +400,7 @@ try_again:
->           }
->           g_assert(exp_sdt.aml_file);
->           if (getenv("V")) {
-> -            fprintf(stderr, "\nUsing expected file '%s'\n", aml_file);
-> +            fprintf(stderr, "Using expected file '%s'\n", aml_file);
-
-But that's a pre-existing question, so it doesn't affect this particular=20
-patch.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  hw/pci/pcie.c         | 10 +++++++++-
+>  hw/pci/pcie_port.c    |  1 +
+>  include/hw/pci/pcie.h |  2 ++
+>  3 files changed, 12 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+> index 02a7bf3af5..744727dc0b 100644
+> --- a/hw/pci/pcie.c
+> +++ b/hw/pci/pcie.c
+> @@ -364,11 +364,19 @@ void pcie_cap_slot_hotplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+>      }
+>  }
+>  
+> -static void pcie_unplug_device(PCIBus *bus, PCIDevice *dev, void *opaque)
+> +void pcie_cap_slot_hot_unplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+> +                                 Error **errp)
+>  {
+>      object_unparent(OBJECT(dev));
+>  }
+>  
+> +static void pcie_unplug_device(PCIBus *bus, PCIDevice *dev, void *opaque)
+> +{
+> +    HotplugHandler *hotplug_ctrl = qdev_get_hotplug_handler(DEVICE(dev));
+> +
+> +    hotplug_handler_unplug(hotplug_ctrl, DEVICE(dev), &error_abort);
+> +}
+> +
+>  void pcie_cap_slot_hot_unplug_request_cb(HotplugHandler *hotplug_dev,
+>                                           DeviceState *dev, Error **errp)
+>  {
+> diff --git a/hw/pci/pcie_port.c b/hw/pci/pcie_port.c
+> index 13fe6c6945..6e993da603 100644
+> --- a/hw/pci/pcie_port.c
+> +++ b/hw/pci/pcie_port.c
+> @@ -156,6 +156,7 @@ static void pcie_slot_class_init(ObjectClass *oc, void *data)
+>      dc->props = pcie_slot_props;
+>      hc->pre_plug = pcie_cap_slot_pre_plug_cb;
+>      hc->plug = pcie_cap_slot_hotplug_cb;
+> +    hc->unplug = pcie_cap_slot_hot_unplug_cb;
+>      hc->unplug_request = pcie_cap_slot_hot_unplug_request_cb;
+>  }
+>  
+> diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
+> index 001d230d7d..b6f05a0e43 100644
+> --- a/include/hw/pci/pcie.h
+> +++ b/include/hw/pci/pcie.h
+> @@ -135,6 +135,8 @@ void pcie_cap_slot_pre_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+>                                 Error **errp);
+>  void pcie_cap_slot_hotplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+>                                Error **errp);
+> +void pcie_cap_slot_hot_unplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+> +                                 Error **errp);
+>  void pcie_cap_slot_hot_unplug_request_cb(HotplugHandler *hotplug_dev,
+>                                           DeviceState *dev, Error **errp);
+>  #endif /* QEMU_PCIE_H */
