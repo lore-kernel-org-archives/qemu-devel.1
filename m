@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35481)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36526)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gI63z-0001RQ-0M
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 02:02:39 -0400
+	(envelope-from <liq3ea@gmail.com>) id 1gI6As-0005Or-0l
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 02:09:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gI63u-0007sV-2M
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 02:02:38 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:39874)
+	(envelope-from <liq3ea@gmail.com>) id 1gI6An-0003Qb-1l
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 02:09:45 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:36341)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1gI63t-0007s3-Si
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 02:02:33 -0400
-Received: by mail-pg1-x542.google.com with SMTP id r9-v6so8513387pgv.6
-	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 23:02:33 -0700 (PDT)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1gI6Am-0003QJ-Qv
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 02:09:40 -0400
+Received: by mail-pf1-x444.google.com with SMTP id j22-v6so4986798pfh.3
+	for <qemu-devel@nongnu.org>; Wed, 31 Oct 2018 23:09:40 -0700 (PDT)
 From: Li Qiang <liq3ea@gmail.com>
-Date: Wed, 31 Oct 2018 23:02:28 -0700
-Message-Id: <1541052148-28752-1-git-send-email-liq3ea@gmail.com>
-Subject: [Qemu-devel] [PATCH] hw: fw_cfg: Improve error message when can't
- load splash file
+Date: Wed, 31 Oct 2018 23:09:34 -0700
+Message-Id: <1541052574-29085-1-git-send-email-liq3ea@gmail.com>
+Subject: [Qemu-devel] [PATCH 0/2] fw_cfg reboot_time and splash_time  fix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,41 +23,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, armbru@redhat.com, philmd@redhat.com, lersek@redhat.com
+To: pbonzini@redhat.com, armbru@redhat.com, philmd@redhat.com, lersek@redhat.com, kraxel@redhat.com
 Cc: qemu-devel@nongnu.org, Li Qiang <liq3ea@gmail.com>
 
-read_splashfile() reports "failed to read splash file" without
-further details. Get the details from g_file_get_contents(), and
-include them in the error message. Also remove unnecessary 'res'
-variable.
+The first patch ensure the reboot_time is never negative
+and second change the splash-time and reboot-timeout 
+type to qemu_opt_get_number per Markus's advice:
 
-Signed-off-by: Li Qiang <liq3ea@gmail.com>
----
- hw/nvram/fw_cfg.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg06975.html
 
-diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-index 946f765..3fcfa35 100644
---- a/hw/nvram/fw_cfg.c
-+++ b/hw/nvram/fw_cfg.c
-@@ -68,15 +68,14 @@ static char *read_splashfile(char *filename, gsize *file_sizep,
-                              int *file_typep)
- {
-     GError *err = NULL;
--    gboolean res;
-     gchar *content;
-     int file_type;
-     unsigned int filehead;
-     int bmp_bpp;
- 
--    res = g_file_get_contents(filename, &content, file_sizep, &err);
--    if (res == FALSE) {
--        error_report("failed to read splash file '%s'", filename);
-+    if (!g_file_get_contents(filename, &content, file_sizep, &err)) {
-+        error_report("failed to read splash file '%s': %s",
-+                     filename, err->message);
-         g_error_free(err);
-         return NULL;
-     }
+
+Li Qiang (2):
+  hw: fw_cfg: ensure reboot_time is nonegative
+  hw: fw_cfg: use qemu_opt_get_number to get splash-time and     
+    reboot-timeout
+
+ hw/nvram/fw_cfg.c | 38 +++++++++++++++-----------------------
+ vl.c              |  4 ++--
+ 2 files changed, 17 insertions(+), 25 deletions(-)
+
 -- 
 1.8.3.1
