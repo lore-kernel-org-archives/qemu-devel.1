@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56168)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gIHhz-00042w-BL
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 14:28:44 -0400
+	(envelope-from <groeck7@gmail.com>) id 1gIHpF-0003Kp-2Z
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 14:36:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gIHhx-0008E3-4K
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 14:28:42 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:42763)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gIHhw-0008CZ-Pw
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 14:28:41 -0400
-Received: by mail-oi1-x241.google.com with SMTP id h23-v6so17425419oih.9
-	for <qemu-devel@nongnu.org>; Thu, 01 Nov 2018 11:28:37 -0700 (PDT)
+	(envelope-from <groeck7@gmail.com>) id 1gIHpD-000834-8g
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 14:36:12 -0400
+Sender: Guenter Roeck <groeck7@gmail.com>
+Date: Thu, 1 Nov 2018 11:36:01 -0700
+From: Guenter Roeck <linux@roeck-us.net>
+Message-ID: <20181101183601.GA26023@roeck-us.net>
+References: <20181030193044.25954-1-philmd@redhat.com>
+	<CAFEAcA-r=d-s0SS4_VDX1A=viaZkS0SxJW-3mVn6Brrx8QHCew@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20181031141925.30026-1-mdroth@linux.vnet.ibm.com>
-References: <20181031141925.30026-1-mdroth@linux.vnet.ibm.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 1 Nov 2018 18:28:16 +0000
-Message-ID: <CAFEAcA_MYOUZ5EFMtfasaOzOuWPs+H546BkkXs_sB0eV2nPY=Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v3 00/24] qemu-ga patch queue for soft-freeze
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAFEAcA-r=d-s0SS4_VDX1A=viaZkS0SxJW-3mVn6Brrx8QHCew@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v3] arm: exynos4: Add dma support for
+ smdkc210
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +26,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Alistair Francis <alistair@alistair23.me>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>
 
-On 31 October 2018 at 14:19, Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
-> The following changes since commit a2e002ff7913ce93aa0f7dbedd2123dce5f1a9cd:
->
->   Merge remote-tracking branch 'remotes/vivier2/tags/qemu-trivial-for-3.1-pull-request' into staging (2018-10-30 15:49:55 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/mdroth/qemu.git tags/qga-pull-2018-10-30-v3-tag
->
-> for you to fetch changes up to b70d6afe4d7f252259d3344e12daa2d6baf006e2:
->
->   qga-win: changing --retry-path option behavior (2018-10-31 09:04:20 -0500)
->
-> ----------------------------------------------------------------
-> qemu-ga patch queue for soft-freeze
->
-> * support for --retry-path option for recovering from communication
->   path failures
-> * support for serial/device name in guest-get-fsinfo for linux/w32
-> * support for freezing individual mount points in guest-fsfreeze-*
-> * fixes for unicode paths on w32, not-present vcpus in guest-get-vcpus,
->   buffer overflow in guest-get-fsinfo for w32, and other minor fixes
->
-> v3:
-> * remove redundant check for --static in configure
-> * correct authorship on "qga-win: add debugging information"
->
-> v2:
-> * set libudev=off in configure for static builds
->
+On Thu, Nov 01, 2018 at 05:24:15PM +0000, Peter Maydell wrote:
+> On 30 October 2018 at 19:30, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
+> > From: Guenter Roeck <linux@roeck-us.net>
+> >
+> > QEMU already supports pl330. Instantiate it for smdkc210.
+> 
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> 
+> I don't suppose anybody has the SoC datasheet to crosscheck
+> the irq/address values (and maybe see if it lists any of
+> the other pl330 settings) ?
+> 
 
-Applied, thanks.
+Not me. This was "look into the Linux kernel code and then play
+with parameters until it magically starts working".
 
--- PMM
+Guenter
