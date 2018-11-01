@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59235)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49243)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gILrM-00024p-Or
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 18:54:43 -0400
+	(envelope-from <palmer@sifive.com>) id 1gIMoa-0007Cb-Bo
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 19:55:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gILly-0007ih-4S
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 18:49:08 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:48759)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1gILlx-0007iC-Pi
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 18:49:06 -0400
-References: <20181101202617.6437-1-richard.henderson@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <44220f80-a8a3-78a3-180b-ef7fd7699d3b@vivier.eu>
-Date: Thu, 1 Nov 2018 23:49:01 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181101202617.6437-1-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] softfloat: Don't execute divdeu without
- power7
+	(envelope-from <palmer@sifive.com>) id 1gIMoV-0005DH-SC
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 19:55:52 -0400
+Received: from mail-pl1-x62b.google.com ([2607:f8b0:4864:20::62b]:41363)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gIMoV-0005BY-9J
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 19:55:47 -0400
+Received: by mail-pl1-x62b.google.com with SMTP id p16-v6so105198plr.8
+	for <qemu-devel@nongnu.org>; Thu, 01 Nov 2018 16:55:46 -0700 (PDT)
+Date: Thu,  1 Nov 2018 16:55:22 -0700
+Message-Id: <20181101235525.29042-1-palmer@sifive.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+Subject: [Qemu-devel] [PULL] RISC-V Patches for the 3.1 Soft Freeze, Part 2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +23,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org
 
-On 01/11/2018 21:26, Richard Henderson wrote:
-> The divdeu instruction was added to ISA 2.06 (Power7).
-> Exclude this block from older cpus.
-> 
-> Fixes: 27ae5109a2ba (softfloat: Specialize udiv_qrnnd for ppc64)
-> Reported-by: Laurent Vivier <laurent@vivier.eu>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  include/fpu/softfloat-macros.h | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/fpu/softfloat-macros.h b/include/fpu/softfloat-macros.h
-> index c86687fa5e..b1d772e6d4 100644
-> --- a/include/fpu/softfloat-macros.h
-> +++ b/include/fpu/softfloat-macros.h
-> @@ -647,8 +647,8 @@ static inline uint64_t udiv_qrnnd(uint64_t *r, uint64_t n1,
->      asm("dlgr %0, %1" : "+r"(n) : "r"(d));
->      *r = n >> 64;
->      return n;
-> -#elif defined(_ARCH_PPC64)
-> -    /* From Power ISA 3.0B, programming note for divdeu.  */
-> +#elif defined(_ARCH_PPC64) && defined(_ARCH_PWR7)
-> +    /* From Power ISA 2.06, programming note for divdeu.  */
->      uint64_t q1, q2, Q, r1, r2, R;
->      asm("divdeu %0,%2,%4; divdu %1,%3,%4"
->          : "=&r"(q1), "=r"(q2)
-> 
+The following changes since commit a2e002ff7913ce93aa0f7dbedd2123dce5f1a9cd:
 
-Tested-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+  Merge remote-tracking branch 'remotes/vivier2/tags/qemu-trivial-for-3.1-pull-request' into staging (2018-10-30 15:49:55 +0000)
+
+are available in the Git repository at:
+
+  git://github.com/riscv/riscv-qemu.git tags/riscv-for-master-3.1-sf1
+
+for you to fetch changes up to a094b3544f2855c0489f5df3c938b14b9a5899e5:
+
+  Add qemu-riscv@nongnu.org as the RISC-V list (2018-10-30 11:04:29 -0700)
+
+----------------------------------------------------------------
+RISC-V Patches for the 3.1 Soft Freeze, Part 2
+
+This tag contains a few simple patches that I'd like to target for the
+QEMU soft freeze.  There's only one code change: a fix to our PMP
+implementation that avoids an internal truncation while computing a
+partial PMP read.
+
+I also have two updates to the MAINTAINERS file: one to add Alistair as
+a RISC-V maintainer, and one to add our newly created mailing list.
+
+----------------------------------------------------------------
+Dayeol Lee (1):
+      target/riscv/pmp.c: pmpcfg_csr_read returns bogus value on RV64
+
+Palmer Dabbelt (2):
+      Add Alistair as a RISC-V Maintainer
+      Add qemu-riscv@nongnu.org as the RISC-V list
+
+ MAINTAINERS        | 2 ++
+ target/riscv/pmp.c | 2 +-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
