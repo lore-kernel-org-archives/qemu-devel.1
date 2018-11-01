@@ -1,35 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jmattson@google.com>) id 1gIG6a-00084B-B5
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 12:46:00 -0400
+	(envelope-from <laurent@vivier.eu>) id 1gIGMA-0006Nh-Hv
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 13:02:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jmattson@google.com>) id 1gIG6Z-0006Zn-Gf
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 12:46:00 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:34597)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jmattson@google.com>) id 1gIG6Z-0006ZL-9f
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 12:45:59 -0400
-Received: by mail-ot1-x342.google.com with SMTP id e9so16834222oti.1
-	for <qemu-devel@nongnu.org>; Thu, 01 Nov 2018 09:45:58 -0700 (PDT)
+	(envelope-from <laurent@vivier.eu>) id 1gIGM7-0006J4-AE
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 13:02:06 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:36965)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1gIGM7-0006HA-07
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 13:02:03 -0400
+From: Laurent Vivier <laurent@vivier.eu>
+References: <20181005180201.11387-1-richard.henderson@linaro.org>
+	<20181005180201.11387-9-richard.henderson@linaro.org>
+	<e2f0cc3d-ef03-0d03-cef5-d53369e93122@vivier.eu>
+Message-ID: <ce7d84f9-1560-43f8-0c59-097a4162ec63@vivier.eu>
+Date: Thu, 1 Nov 2018 18:01:56 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181101155610.GD2726@work-vm>
-References: <EFF8C049-EE78-4035-A38E-6A91EA219878@oracle.com>
-	<80DAB33E-A982-4903-AEBA-F71AB2E8AFC3@oracle.com>
-	<5F34DE35-D1EE-441A-87A1-379C7A04AFE7@oracle.com>
-	<20181031181759.GR3902@habkost.net>
-	<a5b6cdf7-6ff9-7bd8-d591-3e2669b4f802@redhat.com>
-	<B34C4E8C-748D-4D78-807F-3F51C80EA5B2@oracle.com>
-	<20181031185930.GC2403@work-vm>
-	<5FA867F7-3520-4903-BC2F-B55227A04FED@oracle.com>
-	<20181101131059.GB2726@work-vm>
-	<F144DC98-45AA-4DD8-8A7E-25B867FE7863@oracle.com>
-	<20181101155610.GD2726@work-vm>
-From: Jim Mattson <jmattson@google.com>
-Date: Thu, 1 Nov 2018 09:45:56 -0700
-Message-ID: <CALMp9eQ5zWxb2N9fyYz=WcQshwk0L6qQ4D6L6+p_dzMo4H=txA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [QEMU PATCH v2 0/2]: KVM: i386: Add support for
- save and restore nested state
+In-Reply-To: <e2f0cc3d-ef03-0d03-cef5-d53369e93122@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULL 8/8] softfloat: Specialize udiv_qrnnd for
+ ppc64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,25 +30,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Liran Alon <liran.alon@oracle.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, kvm list <kvm@vger.kernel.org>, mtosatti@redhat.com, qemu-devel@nongnu.org, rth@twiddle.net
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, David Gibson <david@gibson.dropbear.id.au>
 
-On Thu, Nov 1, 2018 at 8:56 AM, Dr. David Alan Gilbert
-<dgilbert@redhat.com> wrote:
+On 31/10/2018 19:46, Laurent Vivier wrote:
+> On 05/10/2018 20:02, Richard Henderson wrote:
+>> The ISA has a 128/64-bit division instruction, though it assumes the
+>> low 64-bits of the numerator are 0, and so requires a bit more fixup
+>> than a full 128-bit division insn.
+>>
+>> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>  include/fpu/softfloat-macros.h | 16 ++++++++++++++++
+>>  1 file changed, 16 insertions(+)
+>>
+>> diff --git a/include/fpu/softfloat-macros.h b/include/fpu/softfloat-macros.h
+>> index eafc68932b..c86687fa5e 100644
+>> --- a/include/fpu/softfloat-macros.h
+>> +++ b/include/fpu/softfloat-macros.h
+>> @@ -647,6 +647,22 @@ static inline uint64_t udiv_qrnnd(uint64_t *r, uint64_t n1,
+>>      asm("dlgr %0, %1" : "+r"(n) : "r"(d));
+>>      *r = n >> 64;
+>>      return n;
+>> +#elif defined(_ARCH_PPC64)
+>> +    /* From Power ISA 3.0B, programming note for divdeu.  */
 
-> So if I have matching host kernels it should always work?
-> What happens if I upgrade the source kernel to increase it's maximum
-> nested size, can I force it to keep things small for some VMs?
+So it fails because my PowerMac G5 is not Power ISA 3.0B...
 
-Any change to the format of the nested state should be gated by a
-KVM_CAP set by userspace. (Unlike, say, how the
-KVM_VCPUEVENT_VALID_SMM flag was added to the saved VCPU events state
-in commit f077825a8758d.) KVM has traditionally been quite bad about
-maintaining backwards compatibility, but I hope the community is more
-cognizant of the issues now.
+Something like this fixes the problem. I'm not sure it's the cleanest way:
 
-As a cloud provider, one would only enable the new capability from
-userspace once all hosts in the pool have a kernel that supports it.
-During the transition, the capability would not be enabled on the
-hosts with a new kernel, and these hosts would continue to provide
-nested state that could be consumed by hosts running the older kernel.
+diff --git a/include/fpu/softfloat-macros.h b/include/fpu/softfloat-macros.h
+index c86687fa5e..5a724da2ea 100644
+--- a/include/fpu/softfloat-macros.h
++++ b/include/fpu/softfloat-macros.h
+@@ -79,6 +79,10 @@ this code that are retained.
+  * version 2 or later. See the COPYING file in the top-level directory.
+  */
+
++#if defined(_ARCH_PPC64)
++extern bool have_isa_3_00;
++#endif
++
+ /*----------------------------------------------------------------------------
+ | Shifts `a' right by the number of bits given in `count'.  If any nonzero
+ | bits are shifted off, they are ``jammed'' into the least significant
+bit of
+@@ -647,7 +651,9 @@ static inline uint64_t udiv_qrnnd(uint64_t *r,
+uint64_t n1,
+     asm("dlgr %0, %1" : "+r"(n) : "r"(d));
+     *r = n >> 64;
+     return n;
+-#elif defined(_ARCH_PPC64)
++#else
++#if defined(_ARCH_PPC64)
++    if (have_isa_3_00) {
+         /* From Power ISA 3.0B, programming note for divdeu.  */
+         uint64_t q1, q2, Q, r1, r2, R;
+         asm("divdeu %0,%2,%4; divdu %1,%3,%4"
+@@ -663,7 +669,8 @@ static inline uint64_t udiv_qrnnd(uint64_t *r,
+uint64_t n1,
+         }
+         *r = R;
+         return Q;
+-#else
++    }
++#endif
+     uint64_t d0, d1, q0, q1, r1, r0, m;
+
+     d0 = (uint32_t)d;
+
+Thanks,
+Laurent
