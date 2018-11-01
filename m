@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59583)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59595)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gIA9q-000525-4G
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 06:24:59 -0400
+	(envelope-from <sameo@linux.intel.com>) id 1gIA9q-00052T-Fy
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 06:25:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gIA9l-0003GL-1b
+	(envelope-from <sameo@linux.intel.com>) id 1gIA9o-0003Io-Gq
 	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 06:24:58 -0400
-Received: from mga09.intel.com ([134.134.136.24]:64458)
+Received: from mga17.intel.com ([192.55.52.151]:61548)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sameo@linux.intel.com>)
-	id 1gIA9i-0002og-85
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 06:24:52 -0400
+	id 1gIA9o-0003Hf-4k
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 06:24:56 -0400
 From: Samuel Ortiz <sameo@linux.intel.com>
-Date: Thu,  1 Nov 2018 11:22:40 +0100
-Message-Id: <20181101102303.16439-1-sameo@linux.intel.com>
+Date: Thu,  1 Nov 2018 11:22:56 +0100
+Message-Id: <20181101102303.16439-17-sameo@linux.intel.com>
+In-Reply-To: <20181101102303.16439-1-sameo@linux.intel.com>
+References: <20181101102303.16439-1-sameo@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 00/23] ACPI reorganization for
- hardware-reduced support
+Subject: [Qemu-devel] [PATCH v4 16/23] hw: acpi: Export the PCI hotplug API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,115 +28,462 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Sebastien Boeuf <sebastien.boeuf@intel.com>, Jing Liu <jing2.liu@linux.intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-This patch set provides an ACPI code reorganization in preparation for
-adding hardware-reduced support to QEMU.
+From: Sebastien Boeuf <sebastien.boeuf@intel.com>
 
-The changes are coming from the NEMU [1] project where we're defining
-a new x86 machine type: i386/virt. This is an EFI only, ACPI
-hardware-reduced platform and as such we had to implement support
-for the latter.
+The ACPI hotplug support for PCI devices APIs are not x86 or even
+machine type specific. In order for future machine types to be able to
+re-use that code, we export it through the architecture agnostic
+hw/acpi folder.
 
-As a preliminary for adding hardware-reduced support to QEMU, we did
-some ACPI code reorganization with the following goals:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
+Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
+---
+ hw/acpi/aml-build.c         | 194 ++++++++++++++++++++++++++++++++++++
+ hw/i386/acpi-build.c        | 192 +----------------------------------
+ include/hw/acpi/aml-build.h |   3 +
+ 3 files changed, 199 insertions(+), 190 deletions(-)
 
-* Share as much as possible of the current ACPI build APIs between
-  legacy and hardware-reduced ACPI.
-* Share the ACPI build code across machine types and architectures and
-  remove the typical PC machine type dependency.
-  Eventually we hope to see arm/virt also re-use much of that code.
-
-The patches are also available in their own git branch [2].
-
-[1] https://github.com/intel/nemu
-[2] https://github.com/intel/nemu/tree/topic/upstream/acpi
-
-v1 -> v2:
-   * Drop the hardware-reduced implementation for now. Our next patch set
-     will add hardware-reduced and convert arm/virt to it.
-   * Implement the ACPI build methods as a QOM Interface Class and convert
-     the PC machine type to it.
-   * acpi_conf_pc_init() uses a PCMachineState pointer and not a
-     MachineState one as its argument.
-
-v2 -> v3:
-   * Cc all relevant maintainers, no functional changes.
-
-v3 -> v4:
-   * Renamed all AcpiConfiguration pointers from conf to acpi_conf.
-   * Removed the ACPI_BUILD_ALIGN_SIZE export.
-   * Temporarily updated the arm virt build_rsdp() prototype for
-     bisectability purposes.
-   * Removed unneeded pci headers from acpi-build.c.
-   * Refactor the acpi PCI host getter so that it truly is architecture
-     agnostic, by carrying the PCI host pointer through the
-     AcpiConfiguration structure.
-   * Splitted the PCI host AML builder API export patch from the PCI host
-     and holes getter one.
-   * Reduced the build_srat() export scope to hw/i386 instead of the broader
-     hw/acpi. SRAT builders are truly architecture specific and can hardly be
-     generalized.
-   * Completed the ACPI builder documentation.
-
-Samuel Ortiz (15):
-  hw: i386: Decouple the ACPI build from the PC machine type
-  hw: acpi: Export ACPI build alignment API
-  hw: acpi: Export the RSDP build API
-  hw: acpi: Implement XSDT support for RSDP
-  hw: arm: Switch to the AML build RSDP building routine
-  hw: i386: Move PCI host definitions to pci_host.h
-  hw: acpi: Export the PCI host and holes getters
-  hw: acpi: Do not create hotplug method when handler is not defined
-  hw: i386: Make the hotpluggable memory size property more generic
-  hw: i386: Export the i386 ACPI SRAT build method
-  hw: i386: Export the MADT build method
-  hw: acpi: Define ACPI tables builder interface
-  hw: i386: Implement the ACPI builder interface for PC
-  hw: pci-host: piix: Return PCI host pointer instead of PCI bus
-  hw: i386: Set ACPI configuration PCI host pointer
-
-Sebastien Boeuf (2):
-  hw: acpi: Export the PCI hotplug API
-  hw: acpi: Retrieve the PCI bus from AcpiPciHpState
-
-Yang Zhong (6):
-  hw: acpi: Generalize AML build routines
-  hw: acpi: Factorize _OSC AML across architectures
-  hw: acpi: Export and generalize the PCI host AML API
-  hw: acpi: Export the MCFG getter
-  hw: acpi: Fix memory hotplug AML generation error
-  hw: i386: Refactor PCI host getter
-
- hw/acpi/Makefile.objs          |    1 +
- hw/acpi/aml-build.c            |  985 +++++++++++++++++++++++++++++
- hw/acpi/builder.c              |   97 +++
- hw/acpi/cpu.c                  |    8 +-
- hw/acpi/cpu_hotplug.c          |    9 +-
- hw/acpi/memory_hotplug.c       |   21 +-
- hw/acpi/pcihp.c                |   10 +-
- hw/arm/virt-acpi-build.c       |   94 +--
- hw/i386/acpi-build.c           | 1071 +++-----------------------------
- hw/i386/acpi-build.h           |    9 +-
- hw/i386/pc.c                   |  198 +++---
- hw/i386/pc_piix.c              |   36 +-
- hw/i386/pc_q35.c               |   22 +-
- hw/i386/xen/xen-hvm.c          |   19 +-
- hw/pci-host/piix.c             |   32 +-
- include/hw/acpi/acpi-defs.h    |   14 +
- include/hw/acpi/acpi.h         |   44 ++
- include/hw/acpi/aml-build.h    |   47 ++
- include/hw/acpi/builder.h      |  100 +++
- include/hw/i386/acpi.h         |   27 +
- include/hw/i386/pc.h           |   49 +-
- include/hw/mem/memory-device.h |    2 +
- include/hw/pci/pci_host.h      |    6 +
- stubs/Makefile.objs            |    1 -
- stubs/pci-host-piix.c          |    6 -
- 25 files changed, 1648 insertions(+), 1260 deletions(-)
- create mode 100644 hw/acpi/builder.c
- create mode 100644 include/hw/acpi/builder.h
- create mode 100644 include/hw/i386/acpi.h
- delete mode 100644 stubs/pci-host-piix.c
-
+diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+index c5211928da..33db1c1bc8 100644
+--- a/hw/acpi/aml-build.c
++++ b/hw/acpi/aml-build.c
+@@ -34,6 +34,7 @@
+ #include "hw/acpi/tpm.h"
+ #include "qom/qom-qobject.h"
+ #include "qapi/qmp/qnum.h"
++#include "hw/acpi/pcihp.h"
+ 
+ #define PCI_HOST_BRIDGE_CONFIG_ADDR        0xcf8
+ #define PCI_HOST_BRIDGE_IO_0_MIN_ADDR      0x0000
+@@ -2305,6 +2306,199 @@ Aml *build_pci_host_bridge(Aml *table, AcpiPciBus *pci_host)
+     return scope;
+ }
+ 
++void build_acpi_pci_hotplug(Aml *scope)
++{
++    Aml *field;
++    Aml *method;
++
++    aml_append(scope,
++        aml_operation_region("PCST", AML_SYSTEM_IO, aml_int(0xae00), 0x08));
++    field = aml_field("PCST", AML_DWORD_ACC, AML_NOLOCK, AML_WRITE_AS_ZEROS);
++    aml_append(field, aml_named_field("PCIU", 32));
++    aml_append(field, aml_named_field("PCID", 32));
++    aml_append(scope, field);
++
++    aml_append(scope,
++        aml_operation_region("SEJ", AML_SYSTEM_IO, aml_int(0xae08), 0x04));
++    field = aml_field("SEJ", AML_DWORD_ACC, AML_NOLOCK, AML_WRITE_AS_ZEROS);
++    aml_append(field, aml_named_field("B0EJ", 32));
++    aml_append(scope, field);
++
++    aml_append(scope,
++        aml_operation_region("BNMR", AML_SYSTEM_IO, aml_int(0xae10), 0x04));
++    field = aml_field("BNMR", AML_DWORD_ACC, AML_NOLOCK, AML_WRITE_AS_ZEROS);
++    aml_append(field, aml_named_field("BNUM", 32));
++    aml_append(scope, field);
++
++    aml_append(scope, aml_mutex("BLCK", 0));
++
++    method = aml_method("PCEJ", 2, AML_NOTSERIALIZED);
++    aml_append(method, aml_acquire(aml_name("BLCK"), 0xFFFF));
++    aml_append(method, aml_store(aml_arg(0), aml_name("BNUM")));
++    aml_append(method,
++        aml_store(aml_shiftleft(aml_int(1), aml_arg(1)), aml_name("B0EJ")));
++    aml_append(method, aml_release(aml_name("BLCK")));
++    aml_append(method, aml_return(aml_int(0)));
++    aml_append(scope, method);
++}
++
++static void build_append_pcihp_notify_entry(Aml *method, int slot)
++{
++    Aml *if_ctx;
++    int32_t devfn = PCI_DEVFN(slot, 0);
++
++    if_ctx = aml_if(aml_and(aml_arg(0), aml_int(0x1U << slot), NULL));
++    aml_append(if_ctx, aml_notify(aml_name("S%.02X", devfn), aml_arg(1)));
++    aml_append(method, if_ctx);
++}
++
++void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
++                                  bool pcihp_bridge_en)
++{
++    Aml *dev, *notify_method = NULL, *method;
++    QObject *bsel;
++    PCIBus *sec;
++    int i;
++
++    bsel = object_property_get_qobject(OBJECT(bus), ACPI_PCIHP_PROP_BSEL, NULL);
++    if (bsel) {
++        uint64_t bsel_val = qnum_get_uint(qobject_to(QNum, bsel));
++
++        aml_append(parent_scope, aml_name_decl("BSEL", aml_int(bsel_val)));
++        notify_method = aml_method("DVNT", 2, AML_NOTSERIALIZED);
++    }
++
++    for (i = 0; i < ARRAY_SIZE(bus->devices); i += PCI_FUNC_MAX) {
++        DeviceClass *dc;
++        PCIDeviceClass *pc;
++        PCIDevice *pdev = bus->devices[i];
++        int slot = PCI_SLOT(i);
++        bool hotplug_enabled_dev;
++        bool bridge_in_acpi;
++
++        if (!pdev) {
++            if (bsel) { /* add hotplug slots for non present devices */
++                dev = aml_device("S%.02X", PCI_DEVFN(slot, 0));
++                aml_append(dev, aml_name_decl("_SUN", aml_int(slot)));
++                aml_append(dev, aml_name_decl("_ADR", aml_int(slot << 16)));
++                method = aml_method("_EJ0", 1, AML_NOTSERIALIZED);
++                aml_append(method,
++                    aml_call2("PCEJ", aml_name("BSEL"), aml_name("_SUN"))
++                );
++                aml_append(dev, method);
++                aml_append(parent_scope, dev);
++
++                build_append_pcihp_notify_entry(notify_method, slot);
++            }
++            continue;
++        }
++
++        pc = PCI_DEVICE_GET_CLASS(pdev);
++        dc = DEVICE_GET_CLASS(pdev);
++
++        /* When hotplug for bridges is enabled, bridges are
++         * described in ACPI separately (see build_pci_bus_end).
++         * In this case they aren't themselves hot-pluggable.
++         * Hotplugged bridges *are* hot-pluggable.
++         */
++        bridge_in_acpi = pc->is_bridge && pcihp_bridge_en &&
++            !DEVICE(pdev)->hotplugged;
++
++        hotplug_enabled_dev = bsel && dc->hotpluggable && !bridge_in_acpi;
++
++        if (pc->class_id == PCI_CLASS_BRIDGE_ISA) {
++            continue;
++        }
++
++        /* start to compose PCI slot descriptor */
++        dev = aml_device("S%.02X", PCI_DEVFN(slot, 0));
++        aml_append(dev, aml_name_decl("_ADR", aml_int(slot << 16)));
++
++        if (pc->class_id == PCI_CLASS_DISPLAY_VGA) {
++            /* add VGA specific AML methods */
++            int s3d;
++
++            if (object_dynamic_cast(OBJECT(pdev), "qxl-vga")) {
++                s3d = 3;
++            } else {
++                s3d = 0;
++            }
++
++            method = aml_method("_S1D", 0, AML_NOTSERIALIZED);
++            aml_append(method, aml_return(aml_int(0)));
++            aml_append(dev, method);
++
++            method = aml_method("_S2D", 0, AML_NOTSERIALIZED);
++            aml_append(method, aml_return(aml_int(0)));
++            aml_append(dev, method);
++
++            method = aml_method("_S3D", 0, AML_NOTSERIALIZED);
++            aml_append(method, aml_return(aml_int(s3d)));
++            aml_append(dev, method);
++        } else if (hotplug_enabled_dev) {
++            /* add _SUN/_EJ0 to make slot hotpluggable  */
++            aml_append(dev, aml_name_decl("_SUN", aml_int(slot)));
++
++            method = aml_method("_EJ0", 1, AML_NOTSERIALIZED);
++            aml_append(method,
++                aml_call2("PCEJ", aml_name("BSEL"), aml_name("_SUN"))
++            );
++            aml_append(dev, method);
++
++            if (bsel) {
++                build_append_pcihp_notify_entry(notify_method, slot);
++            }
++        } else if (bridge_in_acpi) {
++            /*
++             * device is coldplugged bridge,
++             * add child device descriptions into its scope
++             */
++            PCIBus *sec_bus = pci_bridge_get_sec_bus(PCI_BRIDGE(pdev));
++
++            build_append_pci_bus_devices(dev, sec_bus, pcihp_bridge_en);
++        }
++        /* slot descriptor has been composed, add it into parent context */
++        aml_append(parent_scope, dev);
++    }
++
++    if (bsel) {
++        aml_append(parent_scope, notify_method);
++    }
++
++    /* Append PCNT method to notify about events on local and child buses.
++     * Add unconditionally for root since DSDT expects it.
++     */
++    method = aml_method("PCNT", 0, AML_NOTSERIALIZED);
++
++    /* If bus supports hotplug select it and notify about local events */
++    if (bsel) {
++        uint64_t bsel_val = qnum_get_uint(qobject_to(QNum, bsel));
++
++        aml_append(method, aml_store(aml_int(bsel_val), aml_name("BNUM")));
++        aml_append(method,
++            aml_call2("DVNT", aml_name("PCIU"), aml_int(1) /* Device Check */)
++        );
++        aml_append(method,
++            aml_call2("DVNT", aml_name("PCID"), aml_int(3)/* Eject Request */)
++        );
++    }
++
++    /* Notify about child bus events in any case */
++    if (pcihp_bridge_en) {
++        QLIST_FOREACH(sec, &bus->child, sibling) {
++            int32_t devfn = sec->parent_dev->devfn;
++
++            if (pci_bus_is_root(sec) || pci_bus_is_express(sec)) {
++                continue;
++            }
++
++            aml_append(method, aml_name("^S%.02X.PCNT", devfn));
++        }
++    }
++    aml_append(parent_scope, method);
++    qobject_unref(bsel);
++}
++
+ void acpi_dsdt_add_pci_bus(Aml *dsdt, AcpiPciBus *pci_host)
+ {
+     Aml *dev, *pci_scope;
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 673c5dfafc..6c9b61cea2 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -360,163 +360,6 @@ build_madt(GArray *table_data, BIOSLinker *linker,
+                  table_data->len - madt_start, 1, NULL, NULL);
+ }
+ 
+-static void build_append_pcihp_notify_entry(Aml *method, int slot)
+-{
+-    Aml *if_ctx;
+-    int32_t devfn = PCI_DEVFN(slot, 0);
+-
+-    if_ctx = aml_if(aml_and(aml_arg(0), aml_int(0x1U << slot), NULL));
+-    aml_append(if_ctx, aml_notify(aml_name("S%.02X", devfn), aml_arg(1)));
+-    aml_append(method, if_ctx);
+-}
+-
+-static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
+-                                         bool pcihp_bridge_en)
+-{
+-    Aml *dev, *notify_method = NULL, *method;
+-    QObject *bsel;
+-    PCIBus *sec;
+-    int i;
+-
+-    bsel = object_property_get_qobject(OBJECT(bus), ACPI_PCIHP_PROP_BSEL, NULL);
+-    if (bsel) {
+-        uint64_t bsel_val = qnum_get_uint(qobject_to(QNum, bsel));
+-
+-        aml_append(parent_scope, aml_name_decl("BSEL", aml_int(bsel_val)));
+-        notify_method = aml_method("DVNT", 2, AML_NOTSERIALIZED);
+-    }
+-
+-    for (i = 0; i < ARRAY_SIZE(bus->devices); i += PCI_FUNC_MAX) {
+-        DeviceClass *dc;
+-        PCIDeviceClass *pc;
+-        PCIDevice *pdev = bus->devices[i];
+-        int slot = PCI_SLOT(i);
+-        bool hotplug_enabled_dev;
+-        bool bridge_in_acpi;
+-
+-        if (!pdev) {
+-            if (bsel) { /* add hotplug slots for non present devices */
+-                dev = aml_device("S%.02X", PCI_DEVFN(slot, 0));
+-                aml_append(dev, aml_name_decl("_SUN", aml_int(slot)));
+-                aml_append(dev, aml_name_decl("_ADR", aml_int(slot << 16)));
+-                method = aml_method("_EJ0", 1, AML_NOTSERIALIZED);
+-                aml_append(method,
+-                    aml_call2("PCEJ", aml_name("BSEL"), aml_name("_SUN"))
+-                );
+-                aml_append(dev, method);
+-                aml_append(parent_scope, dev);
+-
+-                build_append_pcihp_notify_entry(notify_method, slot);
+-            }
+-            continue;
+-        }
+-
+-        pc = PCI_DEVICE_GET_CLASS(pdev);
+-        dc = DEVICE_GET_CLASS(pdev);
+-
+-        /* When hotplug for bridges is enabled, bridges are
+-         * described in ACPI separately (see build_pci_bus_end).
+-         * In this case they aren't themselves hot-pluggable.
+-         * Hotplugged bridges *are* hot-pluggable.
+-         */
+-        bridge_in_acpi = pc->is_bridge && pcihp_bridge_en &&
+-            !DEVICE(pdev)->hotplugged;
+-
+-        hotplug_enabled_dev = bsel && dc->hotpluggable && !bridge_in_acpi;
+-
+-        if (pc->class_id == PCI_CLASS_BRIDGE_ISA) {
+-            continue;
+-        }
+-
+-        /* start to compose PCI slot descriptor */
+-        dev = aml_device("S%.02X", PCI_DEVFN(slot, 0));
+-        aml_append(dev, aml_name_decl("_ADR", aml_int(slot << 16)));
+-
+-        if (pc->class_id == PCI_CLASS_DISPLAY_VGA) {
+-            /* add VGA specific AML methods */
+-            int s3d;
+-
+-            if (object_dynamic_cast(OBJECT(pdev), "qxl-vga")) {
+-                s3d = 3;
+-            } else {
+-                s3d = 0;
+-            }
+-
+-            method = aml_method("_S1D", 0, AML_NOTSERIALIZED);
+-            aml_append(method, aml_return(aml_int(0)));
+-            aml_append(dev, method);
+-
+-            method = aml_method("_S2D", 0, AML_NOTSERIALIZED);
+-            aml_append(method, aml_return(aml_int(0)));
+-            aml_append(dev, method);
+-
+-            method = aml_method("_S3D", 0, AML_NOTSERIALIZED);
+-            aml_append(method, aml_return(aml_int(s3d)));
+-            aml_append(dev, method);
+-        } else if (hotplug_enabled_dev) {
+-            /* add _SUN/_EJ0 to make slot hotpluggable  */
+-            aml_append(dev, aml_name_decl("_SUN", aml_int(slot)));
+-
+-            method = aml_method("_EJ0", 1, AML_NOTSERIALIZED);
+-            aml_append(method,
+-                aml_call2("PCEJ", aml_name("BSEL"), aml_name("_SUN"))
+-            );
+-            aml_append(dev, method);
+-
+-            if (bsel) {
+-                build_append_pcihp_notify_entry(notify_method, slot);
+-            }
+-        } else if (bridge_in_acpi) {
+-            /*
+-             * device is coldplugged bridge,
+-             * add child device descriptions into its scope
+-             */
+-            PCIBus *sec_bus = pci_bridge_get_sec_bus(PCI_BRIDGE(pdev));
+-
+-            build_append_pci_bus_devices(dev, sec_bus, pcihp_bridge_en);
+-        }
+-        /* slot descriptor has been composed, add it into parent context */
+-        aml_append(parent_scope, dev);
+-    }
+-
+-    if (bsel) {
+-        aml_append(parent_scope, notify_method);
+-    }
+-
+-    /* Append PCNT method to notify about events on local and child buses.
+-     * Add unconditionally for root since DSDT expects it.
+-     */
+-    method = aml_method("PCNT", 0, AML_NOTSERIALIZED);
+-
+-    /* If bus supports hotplug select it and notify about local events */
+-    if (bsel) {
+-        uint64_t bsel_val = qnum_get_uint(qobject_to(QNum, bsel));
+-
+-        aml_append(method, aml_store(aml_int(bsel_val), aml_name("BNUM")));
+-        aml_append(method,
+-            aml_call2("DVNT", aml_name("PCIU"), aml_int(1) /* Device Check */)
+-        );
+-        aml_append(method,
+-            aml_call2("DVNT", aml_name("PCID"), aml_int(3)/* Eject Request */)
+-        );
+-    }
+-
+-    /* Notify about child bus events in any case */
+-    if (pcihp_bridge_en) {
+-        QLIST_FOREACH(sec, &bus->child, sibling) {
+-            int32_t devfn = sec->parent_dev->devfn;
+-
+-            if (pci_bus_is_root(sec) || pci_bus_is_express(sec)) {
+-                continue;
+-            }
+-
+-            aml_append(method, aml_name("^S%.02X.PCNT", devfn));
+-        }
+-    }
+-    aml_append(parent_scope, method);
+-    qobject_unref(bsel);
+-}
+-
+ static void build_hpet_aml(Aml *table)
+ {
+     Aml *crs;
+@@ -1212,41 +1055,10 @@ static void build_piix4_isa_bridge(Aml *table)
+ static void build_piix4_pci_hotplug(Aml *table)
+ {
+     Aml *scope;
+-    Aml *field;
+-    Aml *method;
+-
+-    scope =  aml_scope("_SB.PCI0");
+-
+-    aml_append(scope,
+-        aml_operation_region("PCST", AML_SYSTEM_IO, aml_int(0xae00), 0x08));
+-    field = aml_field("PCST", AML_DWORD_ACC, AML_NOLOCK, AML_WRITE_AS_ZEROS);
+-    aml_append(field, aml_named_field("PCIU", 32));
+-    aml_append(field, aml_named_field("PCID", 32));
+-    aml_append(scope, field);
+ 
+-    aml_append(scope,
+-        aml_operation_region("SEJ", AML_SYSTEM_IO, aml_int(0xae08), 0x04));
+-    field = aml_field("SEJ", AML_DWORD_ACC, AML_NOLOCK, AML_WRITE_AS_ZEROS);
+-    aml_append(field, aml_named_field("B0EJ", 32));
+-    aml_append(scope, field);
+-
+-    aml_append(scope,
+-        aml_operation_region("BNMR", AML_SYSTEM_IO, aml_int(0xae10), 0x04));
+-    field = aml_field("BNMR", AML_DWORD_ACC, AML_NOLOCK, AML_WRITE_AS_ZEROS);
+-    aml_append(field, aml_named_field("BNUM", 32));
+-    aml_append(scope, field);
+-
+-    aml_append(scope, aml_mutex("BLCK", 0));
+-
+-    method = aml_method("PCEJ", 2, AML_NOTSERIALIZED);
+-    aml_append(method, aml_acquire(aml_name("BLCK"), 0xFFFF));
+-    aml_append(method, aml_store(aml_arg(0), aml_name("BNUM")));
+-    aml_append(method,
+-        aml_store(aml_shiftleft(aml_int(1), aml_arg(1)), aml_name("B0EJ")));
+-    aml_append(method, aml_release(aml_name("BLCK")));
+-    aml_append(method, aml_return(aml_int(0)));
+-    aml_append(scope, method);
++    scope = aml_scope("_SB.PCI0");
+ 
++    build_acpi_pci_hotplug(scope);
+     aml_append(table, scope);
+ }
+ 
+diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+index 64ea371656..2da233a526 100644
+--- a/include/hw/acpi/aml-build.h
++++ b/include/hw/acpi/aml-build.h
+@@ -418,6 +418,9 @@ Aml *build_osc_method(uint32_t value);
+ void build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info);
+ Aml *build_gsi_link_dev(const char *name, uint8_t uid, uint8_t gsi);
+ Aml *build_prt(bool is_pci0_prt);
++void build_acpi_pci_hotplug(Aml *scope);
++void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
++                                  bool pcihp_bridge_en);
+ void acpi_dsdt_add_pci_bus(Aml *dsdt, AcpiPciBus *pci_host);
+ Aml *build_pci_host_bridge(Aml *table, AcpiPciBus *pci_host);
+ void crs_range_set_init(CrsRangeSet *range_set);
 -- 
 2.19.1
