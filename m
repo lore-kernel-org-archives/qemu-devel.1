@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51932)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55053)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gIFu3-0000DF-5O
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 12:33:04 -0400
+	(envelope-from <berto@igalia.com>) id 1gIG0T-0003nX-Qr
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 12:39:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gIFu2-0003b4-6P
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 12:33:03 -0400
-Received: from mail-oi1-x22d.google.com ([2607:f8b0:4864:20::22d]:44375)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gIFu0-0003Zc-I3
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 12:33:00 -0400
-Received: by mail-oi1-x22d.google.com with SMTP id k19-v6so17100954oic.11
-	for <qemu-devel@nongnu.org>; Thu, 01 Nov 2018 09:33:00 -0700 (PDT)
+	(envelope-from <berto@igalia.com>) id 1gIG0N-0000Oc-5a
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 12:39:41 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20181101163037.800-1-peter.maydell@linaro.org>
+References: <20181101163037.800-1-peter.maydell@linaro.org>
+Date: Thu, 01 Nov 2018 17:38:33 +0100
+Message-ID: <w51bm783g8m.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20181031122119.1669-1-richard.henderson@linaro.org>
-References: <20181031122119.1669-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 1 Nov 2018 16:32:39 +0000
-Message-ID: <CAFEAcA-3X46a1NxLwOsLkB1s+qcrsphkjcgvDqwPFKiVy9pFhw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/10] cputlb: track dirty tlbs and general
- cleanup
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-3.1] blockdev:
+ Consistently use snapshot_node_name in external_snapshot_prepare()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +22,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 31 October 2018 at 12:21, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> The following changes since commit a2e002ff7913ce93aa0f7dbedd2123dce5f1a9cd:
+On Thu 01 Nov 2018 05:30:37 PM CET, Peter Maydell wrote:
+> In the function external_snapshot_prepare() we have a
+> BlockdevSnapshotSync struct, which has the usual combination
+> of has_snapshot_node_name and snapshot_node_name fields for an
+> optional field. We set up a local variable
+>         const char *snapshot_node_name =
+>             s->has_snapshot_node_name ? s->snapshot_node_name : NULL;
 >
->   Merge remote-tracking branch 'remotes/vivier2/tags/qemu-trivial-for-3.1-pull-request' into staging (2018-10-30 15:49:55 +0000)
+> and then mostly use "if (!snapshot_node_name)" for checking
+> whether we have a snapshot node name. The exception is that in
+> one place we check s->has_snapshot_node_name instead. This
+> confuses Coverity (CID 1396473), which thinks it might be
+> possible to get here with s->has_snapshot_node_name true but
+> snapshot_node_name NULL, and warns that the call to
+> qdict_put_str() will segfault in that case.
 >
-> are available in the Git repository at:
+> Make the code consistent and unconfuse Coverity by using
+> the same check for this conditional that we do in the rest
+> of the surrounding code.
 >
->   https://github.com/rth7680/qemu.git tags/pull-tcg-20181031
->
-> for you to fetch changes up to ab6511053015b9cc636915e2c2b97305cbf044f0:
->
->   cputlb: Remove tlb_c.pending_flushes (2018-10-31 12:16:39 +0000)
->
-> ----------------------------------------------------------------
-> Track mmu_idx for which the TLB is clean and need not be flushed again.
->
-> ----------------------------------------------------------------
-> Richard Henderson (10):
->       cputlb: Move tlb_lock to CPUTLBCommon
->       cputlb: Remove tcg_enabled hack from tlb_flush_nocheck
->       cputlb: Move cpu->pending_tlb_flush to env->tlb_c.pending_flush
->       cputlb: Split large page tracking per mmu_idx
->       cputlb: Move env->vtlb_index to env->tlb_d.vindex
->       cputlb: Merge tlb_flush_nocheck into tlb_flush_by_mmuidx_async_work
->       cputlb: Merge tlb_flush_page into tlb_flush_page_by_mmuidx
->       cputlb: Count "partial" and "elided" tlb flushes
->       cputlb: Filter flushes on already clean tlbs
->       cputlb: Remove tlb_c.pending_flushes
->
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Applied, thanks.
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 
--- PMM
+Berto
