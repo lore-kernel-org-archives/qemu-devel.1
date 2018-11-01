@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41311)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gIGsv-00039R-9R
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 13:35:58 -0400
+	(envelope-from <noring@nocrew.org>) id 1gIGtA-0003LS-Pa
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 13:36:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gIGsu-0002ET-C7
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 13:35:57 -0400
-Received: from ste-pvt-msa1.bahnhof.se ([213.80.101.70]:63683)
+	(envelope-from <noring@nocrew.org>) id 1gIGt5-0002IW-NO
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 13:36:12 -0400
+Received: from ste-pvt-msa2.bahnhof.se ([213.80.101.71]:5715)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gIGsu-0002DW-4L
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 13:35:56 -0400
-Date: Thu, 1 Nov 2018 18:35:42 +0100
+	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gIGt5-0002IB-EV
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 13:36:07 -0400
+Date: Thu, 1 Nov 2018 18:35:51 +0100
 From: Fredrik Noring <noring@nocrew.org>
-Message-ID: <e6ede37ccc848d3491d63f934358622ed8f099c3.1541093316.git.noring@nocrew.org>
+Message-ID: <eecae865fc8f7934cc2d51b24cba7d8ac3ec37c6.1541093316.git.noring@nocrew.org>
 References: <cover.1541093316.git.noring@nocrew.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <cover.1541093316.git.noring@nocrew.org>
-Subject: [Qemu-devel] [PATCH v2 08/12] tests/tcg/mips: Test R5900
- three-operand MADDU
+Subject: [Qemu-devel] [PATCH v2 09/12] tests/tcg/mips: Test R5900
+ three-operand MADDU1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,38 +32,25 @@ Cc: =?utf-8?Q?J=C3=BCrgen?= Urban <JuergenUrban@gmx.de>, "Maciej W. Rozycki" <ma
 
 Signed-off-by: Fredrik Noring <noring@nocrew.org>
 ---
- tests/tcg/mips/mipsr5900/Makefile |  1 +
- tests/tcg/mips/mipsr5900/maddu.c  | 37 +++++++++++++++++++++++++++++++
- 2 files changed, 38 insertions(+)
- create mode 100644 tests/tcg/mips/mipsr5900/maddu.c
+ tests/tcg/mips/mipsr5900/maddu.c | 37 ++++++++++++++++++++++++++++++--
+ 1 file changed, 35 insertions(+), 2 deletions(-)
 
-diff --git a/tests/tcg/mips/mipsr5900/Makefile b/tests/tcg/mips/mipsr5900/Makefile
-index 97ca2a671c..27ee5d5f54 100644
---- a/tests/tcg/mips/mipsr5900/Makefile
-+++ b/tests/tcg/mips/mipsr5900/Makefile
-@@ -11,6 +11,7 @@ CFLAGS  = -Wall -mabi=32 -march=r5900 -static
- TESTCASES = div1.tst
- TESTCASES += divu1.tst
- TESTCASES += madd.tst
-+TESTCASES += maddu.tst
- TESTCASES += mflohi1.tst
- TESTCASES += mtlohi1.tst
- TESTCASES += mult.tst
 diff --git a/tests/tcg/mips/mipsr5900/maddu.c b/tests/tcg/mips/mipsr5900/maddu.c
-new file mode 100644
-index 0000000000..e4e552102d
---- /dev/null
+index e4e552102d..30936fb2b4 100644
+--- a/tests/tcg/mips/mipsr5900/maddu.c
 +++ b/tests/tcg/mips/mipsr5900/maddu.c
-@@ -0,0 +1,37 @@
-+/*
-+ * Test R5900-specific three-operand MADDU.
-+ */
-+
-+#include <stdio.h>
-+#include <inttypes.h>
-+#include <assert.h>
-+
-+uint64_t maddu(uint64_t a, uint32_t rs, uint32_t rt)
+@@ -1,5 +1,5 @@
+ /*
+- * Test R5900-specific three-operand MADDU.
++ * Test R5900-specific three-operand MADDU and MADDU1.
+  */
+ 
+ #include <stdio.h>
+@@ -29,9 +29,42 @@ uint64_t maddu(uint64_t a, uint32_t rs, uint32_t rt)
+     return r;
+ }
+ 
++uint64_t maddu1(uint64_t a, uint32_t rs, uint32_t rt)
 +{
 +    uint32_t lo = a;
 +    uint32_t hi = a >> 32;
@@ -71,11 +58,11 @@ index 0000000000..e4e552102d
 +    uint64_t r;
 +
 +    __asm__ __volatile__ (
-+            "    mtlo  %5\n"
-+            "    mthi  %6\n"
-+            "    maddu %0, %3, %4\n"
-+            "    mflo  %1\n"
-+            "    mfhi  %2\n"
++            "    mtlo1  %5\n"
++            "    mthi1  %6\n"
++            "    maddu1 %0, %3, %4\n"
++            "    mflo1  %1\n"
++            "    mfhi1  %2\n"
 +            : "=r" (rd), "=r" (lo), "=r" (hi)
 +            : "r" (rs), "r" (rt), "r" (lo), "r" (hi));
 +    r = ((uint64_t)hi << 32) | (uint32_t)lo;
@@ -86,11 +73,22 @@ index 0000000000..e4e552102d
 +    return r;
 +}
 +
-+int main()
++static int64_t maddu_variants(int64_t a, int32_t rs, int32_t rt)
 +{
-+    assert(maddu(13, 17, 19) == 336);
++    int64_t rd  = maddu(a, rs, rt);
++    int64_t rd1 = maddu1(a, rs, rt);
 +
-+    return 0;
++    assert(rd == rd1);
++
++    return rd;
 +}
++
+ int main()
+ {
+-    assert(maddu(13, 17, 19) == 336);
++    assert(maddu_variants(13, 17, 19) == 336);
+ 
+     return 0;
+ }
 -- 
 2.18.1
