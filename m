@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44069)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49690)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gIE7c-0005n5-Pb
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 10:38:57 -0400
+	(envelope-from <imammedo@redhat.com>) id 1gIERs-0003H5-Pb
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 10:59:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gIE7b-00084Y-2l
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 10:38:56 -0400
-Date: Thu, 1 Nov 2018 15:38:23 +0100
+	(envelope-from <imammedo@redhat.com>) id 1gIERn-0005MP-Nz
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 10:59:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:8594)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gIERn-0005Lv-5C
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 10:59:47 -0400
+Date: Thu, 1 Nov 2018 15:59:37 +0100
 From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181101153823.1660c3ff@redhat.com>
-In-Reply-To: <20181024101930.20674-5-david@redhat.com>
-References: <20181024101930.20674-1-david@redhat.com>
-	<20181024101930.20674-5-david@redhat.com>
+Message-ID: <20181101155937.480f4eb4@redhat.com>
+In-Reply-To: <20181030150453.9344-10-marcandre.lureau@redhat.com>
+References: <20181030150453.9344-1-marcandre.lureau@redhat.com>
+	<20181030150453.9344-10-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 4/7] pci/pcie: route unplug via the
- hotplug handler
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 09/10] hw/i386: add pc-i440fx-3.1 &
+ pc-q35-3.1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,76 +28,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S
-	. Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, "Dr . David
-	Alan Gilbert" <dgilbert@redhat.com>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Amit Shah <amit@kernel.org>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, dgilbert@redhat.com, Richard Henderson <rth@twiddle.net>, Andreas =?UTF-8?B?RsOkcmJlcg==?= <afaerber@suse.de>, "Michael S. Tsirkin" <mst@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-On Wed, 24 Oct 2018 12:19:27 +0200
-David Hildenbrand <david@redhat.com> wrote:
+On Tue, 30 Oct 2018 19:04:52 +0400
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
 
-> Preparation for multi-stage hotplug handlers.
-commit message needs a rationale shat/why is done here, especially
-if it's preliminary refactoring for some future work
-(which I'd shortly describe here as well).
+> The following patch is going to add compatiblity parameters.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-The same applies to patches 5-7.
-
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->  hw/pci/pcie.c         | 10 +++++++++-
->  hw/pci/pcie_port.c    |  1 +
->  include/hw/pci/pcie.h |  2 ++
->  3 files changed, 12 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
-> index 02a7bf3af5..744727dc0b 100644
-> --- a/hw/pci/pcie.c
-> +++ b/hw/pci/pcie.c
-> @@ -364,11 +364,19 @@ void pcie_cap_slot_hotplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
->      }
+>  include/hw/i386/pc.h |  2 +-
+>  hw/i386/pc_piix.c    | 15 ++++++++++++---
+>  hw/i386/pc_q35.c     | 13 +++++++++++--
+>  3 files changed, 24 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index dfe6746692..67ff516d61 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -300,7 +300,7 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64=
+_t *);
+>          .driver   =3D TYPE_X86_CPU,\
+>          .property =3D "x-hv-synic-kvm-only",\
+>          .value    =3D "on",\
+> -    }
+> +    },
+> =20
+>  #define PC_COMPAT_2_12 \
+>      HW_COMPAT_2_12 \
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index dc09466b3e..7092d6d13f 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -428,21 +428,30 @@ static void pc_i440fx_machine_options(MachineClass =
+*m)
+>      machine_class_allow_dynamic_sysbus_dev(m, TYPE_RAMFB_DEVICE);
 >  }
->  
-> -static void pcie_unplug_device(PCIBus *bus, PCIDevice *dev, void *opaque)
-> +void pcie_cap_slot_hot_unplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-> +                                 Error **errp)
+> =20
+> -static void pc_i440fx_3_0_machine_options(MachineClass *m)
+> +static void pc_i440fx_3_1_machine_options(MachineClass *m)
 >  {
->      object_unparent(OBJECT(dev));
+>      pc_i440fx_machine_options(m);
+>      m->alias =3D "pc";
+>      m->is_default =3D 1;
 >  }
->  
-> +static void pcie_unplug_device(PCIBus *bus, PCIDevice *dev, void *opaque)
-> +{
-> +    HotplugHandler *hotplug_ctrl = qdev_get_hotplug_handler(DEVICE(dev));
+> =20
+> +DEFINE_I440FX_MACHINE(v3_1, "pc-i440fx-3.1", NULL,
+> +                      pc_i440fx_3_1_machine_options);
 > +
-> +    hotplug_handler_unplug(hotplug_ctrl, DEVICE(dev), &error_abort);
+> +static void pc_i440fx_3_0_machine_options(MachineClass *m)
+> +{
+> +    pc_i440fx_3_1_machine_options(m);
+> +    m->is_default =3D 0;
+> +    m->alias =3D NULL;
+> +    SET_MACHINE_COMPAT(m, PC_COMPAT_3_0);
 > +}
 > +
->  void pcie_cap_slot_hot_unplug_request_cb(HotplugHandler *hotplug_dev,
->                                           DeviceState *dev, Error **errp)
+>  DEFINE_I440FX_MACHINE(v3_0, "pc-i440fx-3.0", NULL,
+>                        pc_i440fx_3_0_machine_options);
+> =20
+>  static void pc_i440fx_2_12_machine_options(MachineClass *m)
 >  {
-> diff --git a/hw/pci/pcie_port.c b/hw/pci/pcie_port.c
-> index 13fe6c6945..6e993da603 100644
-> --- a/hw/pci/pcie_port.c
-> +++ b/hw/pci/pcie_port.c
-> @@ -156,6 +156,7 @@ static void pcie_slot_class_init(ObjectClass *oc, void *data)
->      dc->props = pcie_slot_props;
->      hc->pre_plug = pcie_cap_slot_pre_plug_cb;
->      hc->plug = pcie_cap_slot_hotplug_cb;
-> +    hc->unplug = pcie_cap_slot_hot_unplug_cb;
->      hc->unplug_request = pcie_cap_slot_hot_unplug_request_cb;
+>      pc_i440fx_3_0_machine_options(m);
+> -    m->is_default =3D 0;
+> -    m->alias =3D NULL;
+>      SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
 >  }
->  
-> diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
-> index 001d230d7d..b6f05a0e43 100644
-> --- a/include/hw/pci/pcie.h
-> +++ b/include/hw/pci/pcie.h
-> @@ -135,6 +135,8 @@ void pcie_cap_slot_pre_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
->                                 Error **errp);
->  void pcie_cap_slot_hotplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
->                                Error **errp);
-> +void pcie_cap_slot_hot_unplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-> +                                 Error **errp);
->  void pcie_cap_slot_hot_unplug_request_cb(HotplugHandler *hotplug_dev,
->                                           DeviceState *dev, Error **errp);
->  #endif /* QEMU_PCIE_H */
+> =20
+> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+> index 532241e3f8..4702bb13c4 100644
+> --- a/hw/i386/pc_q35.c
+> +++ b/hw/i386/pc_q35.c
+> @@ -311,19 +311,28 @@ static void pc_q35_machine_options(MachineClass *m)
+>      m->max_cpus =3D 288;
+>  }
+> =20
+> -static void pc_q35_3_0_machine_options(MachineClass *m)
+> +static void pc_q35_3_1_machine_options(MachineClass *m)
+>  {
+>      pc_q35_machine_options(m);
+>      m->alias =3D "q35";
+>  }
+> =20
+> +DEFINE_Q35_MACHINE(v3_1, "pc-q35-3.1", NULL,
+> +                   pc_q35_3_1_machine_options);
+> +
+> +static void pc_q35_3_0_machine_options(MachineClass *m)
+> +{
+> +    pc_q35_3_1_machine_options(m);
+> +    m->alias =3D NULL;
+> +    SET_MACHINE_COMPAT(m, PC_COMPAT_3_0);
+> +}
+> +
+>  DEFINE_Q35_MACHINE(v3_0, "pc-q35-3.0", NULL,
+>                      pc_q35_3_0_machine_options);
+> =20
+>  static void pc_q35_2_12_machine_options(MachineClass *m)
+>  {
+>      pc_q35_3_0_machine_options(m);
+> -    m->alias =3D NULL;
+>      SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
+>  }
+> =20
