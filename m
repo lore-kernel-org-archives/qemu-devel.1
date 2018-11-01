@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39926)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40912)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gIAf0-0001RU-P2
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 06:57:11 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gIAjz-0002u7-Pm
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 07:02:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gIAex-0006gJ-75
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 06:57:10 -0400
-Date: Thu, 1 Nov 2018 10:56:56 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20181101105656.GK24946@stefanha-x1.localdomain>
-References: <20181031002526.14262-1-contrib@steffen-goertz.de>
-	<20181031002526.14262-3-contrib@steffen-goertz.de>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gIAjy-0001Cq-LV
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 07:02:19 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:38529)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1gIAjy-0001CL-Eu
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 07:02:18 -0400
+Received: by mail-wm1-x344.google.com with SMTP id l2-v6so979753wmh.3
+	for <qemu-devel@nongnu.org>; Thu, 01 Nov 2018 04:02:18 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="LQ77YLfPrO/qF/pM"
-Content-Disposition: inline
-In-Reply-To: <20181031002526.14262-3-contrib@steffen-goertz.de>
-Subject: Re: [Qemu-devel] [PATCH v3 02/13] arm: Add header to host common
- definition for nRF51 SOC peripherals
+References: <1541069086-167036-1-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1541069086-167036-1-git-send-email-imammedo@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 1 Nov 2018 15:02:04 +0400
+Message-ID: <CAJ+F1CKE56kB+RokaNBwy1zB=xEeo-UaXgqp2-poMsprzY9Osw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] ivshmem: fix memory backend leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,41 +29,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Steffen =?iso-8859-1?Q?G=F6rtz?= <contrib@steffen-goertz.de>
-Cc: qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Peter Maydell <peter.maydell@linaro.org>, "open list:NRF51" <qemu-arm@nongnu.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
+On Thu, Nov 1, 2018 at 2:53 PM Igor Mammedov <imammedo@redhat.com> wrote:
+>
+> object_new() returns a new backend with refcount =3D=3D 1 and
+> then later object_property_add_child() increases refcount to 2
+> So when ivshmem is desroyed, the backend it has created isn't
+> destroyed along with it as children cleanup will bring
+> backend's refcount only to 1, which leaks backend including
+> resources it is using.
+>
+> Drop the original reference from object_new() once backend
+> is attached to its parent.
+>
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 
---LQ77YLfPrO/qF/pM
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I would rather have the unref in finalize, but that is ok too.
 
-On Tue, Oct 30, 2018 at 08:25:16PM -0400, Steffen G=F6rtz wrote:
-> Adds a header that provides definitions that are used
-> across nRF51 peripherals
->=20
-> Signed-off-by: Steffen G=F6rtz <contrib@steffen-goertz.de>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
 > ---
->  hw/arm/nrf51_soc.c           | 33 ++++++++++-----------------
->  include/hw/arm/nrf51.h       | 44 ++++++++++++++++++++++++++++++++++++
->  include/hw/char/nrf51_uart.h |  1 -
->  3 files changed, 56 insertions(+), 22 deletions(-)
->  create mode 100644 include/hw/arm/nrf51.h
+>  hw/misc/ivshmem.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
+> index f88910e..ecfd10a 100644
+> --- a/hw/misc/ivshmem.c
+> +++ b/hw/misc/ivshmem.c
+> @@ -1279,6 +1279,7 @@ static void desugar_shm(IVShmemState *s)
+>      object_property_set_bool(obj, true, "share", &error_abort);
+>      object_property_add_child(OBJECT(s), "internal-shm-backend", obj,
+>                                &error_abort);
+> +    object_unref(obj);
+>      user_creatable_complete(obj, &error_abort);
+>      s->hostmem =3D MEMORY_BACKEND(obj);
+>  }
+> --
+> 2.7.4
+>
+>
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
---LQ77YLfPrO/qF/pM
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJb2tv4AAoJEJykq7OBq3PIQt0H/0Vpr11KB0rKIKgXmYwtfCGT
-fRDyaMKTSMrw5qbccZMLwWzjicOZ3GziG9NUVOUIbWWUsnlUcaJTSlnwyKMCaVbD
-BPxk6kBNoDCfGPWJO7Chmss1Z9I98CBgaGf6rgE4Is9R4bbCUAlEhSWfAyJRuA4/
-vGYPRacUeOftJgKNZmVkaUJVWKXqcUi9cMYW7SdGOrm3jzn70pfHB8iSVrGs7YtD
-OzHpQp3EULnORtz+c5EeN6Cv4s6oqPCTBfnD/oKWL5zNTP0C8j3wiWTAl9NXf6DY
-4TFhYc670SMRUuimGohMCBsh9QPkM1FsPXlTST+7FXbj3CmxMX2ytryC92dgZzE=
-=bAyz
------END PGP SIGNATURE-----
-
---LQ77YLfPrO/qF/pM--
+--=20
+Marc-Andr=C3=A9 Lureau
