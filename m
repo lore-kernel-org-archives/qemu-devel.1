@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35470)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37048)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Chris.Friesen@windriver.com>) id 1gIKRv-0003RN-Li
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 17:24:22 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1gIKyW-0005u1-94
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 17:58:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Chris.Friesen@windriver.com>) id 1gIKRk-0000t6-V8
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 17:24:17 -0400
-Received: from mail5.windriver.com ([192.103.53.11]:39912 helo=mail5.wrs.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Chris.Friesen@windriver.com>)
-	id 1gIKRk-0000pS-Jh
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 17:24:08 -0400
-Received: from ALA-HCA.corp.ad.wrs.com (ala-hca.corp.ad.wrs.com
-	[147.11.189.40])
-	by mail5.wrs.com (8.15.2/8.15.2) with ESMTPS id wA1LNd5c012760
-	(version=TLSv1 cipher=AES128-SHA bits=128 verify=FAIL)
-	for <qemu-devel@nongnu.org>; Thu, 1 Nov 2018 14:23:54 -0700
-From: Chris Friesen <chris.friesen@windriver.com>
-Message-ID: <d5d6e09a-78ed-41c4-bbb9-260263c05bf2@windriver.com>
-Date: Thu, 1 Nov 2018 15:23:31 -0600
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] strange situation, guest cpu thread spinning at ~100%,
- but display not yet initialized
+	(envelope-from <richard.henderson@linaro.org>) id 1gIKyG-00022X-NS
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 17:57:56 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35633)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gIKyG-00020Z-5x
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 17:57:44 -0400
+Received: by mail-wr1-x442.google.com with SMTP id z16-v6so4744wrv.2
+	for <qemu-devel@nongnu.org>; Thu, 01 Nov 2018 14:57:43 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Thu,  1 Nov 2018 21:57:39 +0000
+Message-Id: <20181101215739.29788-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH] target/arm: Conditionalize arm_div assert on
+ aarch32 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,148 +26,63 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: alex.bennee@linaro.org, peter.maydell@linaro.org
 
-Hi all,
+When populating id registers from kvm, on a host that doesn't support
+aarch32 mode at all, aa32_arm_div will not be supported either.
 
-I have an odd situation which occurs very infrequently and I'm hoping to 
-get some advice on how to debug.  Apologies for the length of this 
-message, I tried to include as much potentially useful information as 
-possible.
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
 
-In the context of an OpenStack compute node I have a qemu guest (with 
-kvm acceleration) that has started up.  The virtual console shows "Guest 
-has not initialized the display (yet)."   I'm trying to figure out 
-what's going on and how we got into this state.  I assume it's some sort 
-of deadlock/livelock, but I can't figure out what's causing it.
-
-I'm using qemu 2.10.0 (qemu-kvm-ev-2.10.0-0), with CentOS 7.4.1708 as 
-the underlying OS.  Kernel is 3.10.0-693.21.1.el7.36.
-
-On the host, the "CPU 0/KVM" thread for this guest is at 99.9% cpu 
-utilization on host cpu 43.  There are two other threads of a separate 
-process which are chewing up host cpus 2 and 3.  Host cpus 0 and 1 (and 
-their HT siblings 36 and 37) are ~90% idle and are used for general host 
-overhead.
-
-The qemu process looks like this:
-
-controller-0:~# ps -ef|grep qemu
-root      48250      1 99 18:16 ?        01:17:35 /usr/libexec/qemu-kvm 
--c 0x00000000000000000000000000000001 -n 4 --proc-type=secondary 
---file-prefix=vs -- -enable-dpdk -name 
-guest=instance-00000001,debug-threads=on -S -object 
-secret,id=masterKey0,format=raw,file=/var/lib/libvirt/qemu/domain-288-instance-00000001/master-key.aes 
--machine pc-i440fx-rhel7.4.0,accel=kvm,usb=off,dump-guest-core=off -m 
-1024 -realtime mlock=off -smp 4,sockets=4,cores=1,threads=1 -object 
-memory-backend-file,id=ram-node0,prealloc=yes,mem-path=/mnt/huge-2048kB/libvirt/qemu/288-instance-00000001,share=yes,size=1073741824,host-nodes=0,policy=bind 
--numa node,nodeid=0,cpus=0-3,memdev=ram-node0 -uuid 
-146389d6-0190-4b41-9fbc-6fc7c957b81a -smbios type=1,manufacturer=Fedora 
-Project,product=OpenStack 
-Nova,version=16.0.2-1.tis.156,serial=d6e1c3bf-126e-4518-a46d-aa33f27ec0ab,uuid=146389d6-0190-4b41-9fbc-6fc7c957b81a,family=Virtual 
-Machine -no-user-config -nodefaults -chardev 
-socket,id=charmonitor,path=/var/lib/libvirt/qemu/domain-288-instance-00000001/monitor.sock,server,nowait 
--mon chardev=charmonitor,id=monitor,mode=control -rtc 
-base=utc,driftfix=slew -global kvm-pit.lost_tick_policy=delay -no-hpet 
--no-shutdown -boot reboot-timeout=5000,strict=on -global 
-i440FX-pcihost.pci-hole64-size=67108864K -device 
-piix3-usb-uhci,id=usb,bus=pci.0,addr=0x1.0x2 -drive 
-file=/etc/nova/instances/146389d6-0190-4b41-9fbc-6fc7c957b81a/disk,format=qcow2,if=none,id=drive-virtio-disk0,cache=none 
--device 
-virtio-blk-pci,scsi=off,bus=pci.0,addr=0x4,drive=drive-virtio-disk0,id=virtio-disk0,bootindex=1 
--chardev 
-socket,id=charnet0,path=/var/run/vswitch/usvhost-a19a0e3b-6c85-4726-918d-572c223bd23c 
--netdev vhost-user,chardev=charnet0,id=hostnet0 -device 
-virtio-net-pci,netdev=hostnet0,id=net0,mac=fa:16:3e:68:4a:a2,bus=pci.0,addr=0x3 
--add-fd set=0,fd=78 -chardev 
-pty,id=charserial0,logfile=/dev/fdset/0,logappend=on -device 
-isa-serial,chardev=charserial0,id=serial0 -device 
-usb-tablet,id=input0,bus=usb.0,port=1 -vnc 0.0.0.0:0 -k en-us -device 
-cirrus-vga,id=video0,bus=pci.0,addr=0x2 -device 
-virtio-balloon-pci,id=balloon0,bus=pci.0,addr=0x5 -msg timestamp=on
+"Tested" on an APM Mustang, which does support AArch32.  I'm not
+sure, off hand, which cpu(s) don't have it, and Alex didn't say
+in his bug report.  Tsk tsk.  ;-)
 
 
-The CPU affinity looks a little odd, since we have a number of host CPUs 
-reserved for other things, and the qemu process is affined to the CPUs 
-of a single host NUMA node.
+r~
 
-controller-0:~# taskset -apc 48250
-pid 48250's current affinity list: 5-17,41-53
-pid 48271's current affinity list: 5-17,41-53
-pid 48272's current affinity list: 5-17,41-53
-pid 48316's current affinity list: 5-17,41-53
-pid 48317's current affinity list: 5-17,41-53
-pid 48318's current affinity list: 5-17,41-53
-pid 48319's current affinity list: 5-17,41-53
-pid 48335's current affinity list: 5-17,41-53
+---
+ target/arm/cpu.h |  5 +++++
+ target/arm/cpu.c | 10 +++++++++-
+ 2 files changed, 14 insertions(+), 1 deletion(-)
 
-
-CPU scheduler policy:
-controller-0:~# chrt -ap 48250
-pid 48250's current scheduling policy: SCHED_OTHER
-pid 48250's current scheduling priority: 0
-pid 48271's current scheduling policy: SCHED_OTHER
-pid 48271's current scheduling priority: 0
-pid 48272's current scheduling policy: SCHED_OTHER
-pid 48272's current scheduling priority: 0
-pid 48316's current scheduling policy: SCHED_OTHER
-pid 48316's current scheduling priority: 0
-pid 48317's current scheduling policy: SCHED_OTHER
-pid 48317's current scheduling priority: 0
-pid 48318's current scheduling policy: SCHED_OTHER
-pid 48318's current scheduling priority: 0
-pid 48319's current scheduling policy: SCHED_OTHER
-pid 48319's current scheduling priority: 0
-pid 48335's current scheduling policy: SCHED_OTHER
-pid 48335's current scheduling priority: 0
-
-
-Kernel stack for the CPU 0/KVM task.  This is kind of strange, because 
-I'd expect it to be in the "ioctl" call in the kernel or somewhere 
-further down the stack.
-controller-0:~# cat /proc/48316/stack
-[<ffffffffffffffff>] 0xffffffffffffffff
-
-
-Strace for the CPU 0/KVM task:
-controller-0:~# strace -s 2000 -ttt -p 48316
-strace: Process 48316 attached
-1541102776.498402 rt_sigtimedwait([USR1], 0x7f6f689fa4c0, {0, 0}, 8) = 
--1 EAGAIN (Resource temporarily unavailable)
-1541102776.498978 rt_sigpending([], 8)  = 0
-1541102776.499053 ioctl(28, KVM_RUN                    #process is stuck 
-here
-
-The output of /proc/sched_debug shows the CPU0/KVM task interrupted 
-primarily by the "watchdog/43" task, with 2 interruptions in 10 seconds.
-
-If I attach gdb to the CPU0/KVM task, running "bt" gives this:
-(gdb) bt
-#0  0x00007f6fb4a8a5d7 in ioctl () from /lib64/libc.so.6
-#1  0x000055886e96b0a4 in kvm_vcpu_ioctl ()
-#2  0x000055886e96b173 in kvm_cpu_exec ()
-#3  0x000055886e94aeca in qemu_kvm_cpu_thread_fn ()
-#4  0x00007f6fb4d69e25 in start_thread () from /lib64/libpthread.so.0
-#5  0x00007f6fb4a93bad in clone () from /lib64/libc.so.6
-
-If I then single-step forward, I get this:
-(gdb) n
-Single stepping until exit from function ioctl,
-which has no line number information.
-0x000055886e96b0a4 in kvm_vcpu_ioctl ()
-(gdb)
-Single stepping until exit from function kvm_vcpu_ioctl,
-which has no line number information.
-0x000055886e96b173 in kvm_cpu_exec ()
-(gdb)
-Single stepping until exit from function kvm_cpu_exec,
-which has no line number information.
-0x000055886e94aeca in qemu_kvm_cpu_thread_fn ()
-(gdb)
-Single stepping until exit from function qemu_kvm_cpu_thread_fn,
-which has no line number information.
-
-At this point gdb appears to be stuck, though the task is still chewing 
-99.9% of host cpu 43.
-
-
-Chris
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 895f9909d8..4521ad5ae8 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -3300,6 +3300,11 @@ static inline bool isar_feature_aa64_fp16(const ARMISARegisters *id)
+     return FIELD_EX64(id->id_aa64pfr0, ID_AA64PFR0, FP) == 1;
+ }
+ 
++static inline bool isar_feature_aa64_a32(const ARMISARegisters *id)
++{
++    return FIELD_EX64(id->id_aa64pfr0, ID_AA64PFR0, EL0) == 2;
++}
++
+ static inline bool isar_feature_aa64_sve(const ARMISARegisters *id)
+ {
+     return FIELD_EX64(id->id_aa64pfr0, ID_AA64PFR0, SVE) != 0;
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index e08a2d2d79..988d97d1f1 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -828,8 +828,16 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+          * include the various other features that V7VE implies.
+          * Presence of EL2 itself is ARM_FEATURE_EL2, and of the
+          * Security Extensions is ARM_FEATURE_EL3.
++         *
++         * V7VE requires ARM division.  However, there exist AArch64 cpus
++         * without AArch32 support.  When KVM queries ID_ISAR0_EL1 on such
++         * a host, the value is UNKNOWN.  Similarly, we cannot check
++         * ID_AA64PFR0 without AArch64 support.  Check everything in order.
+          */
+-        assert(cpu_isar_feature(arm_div, cpu));
++        if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64)
++            && cpu_isar_feature(aa64_a32, cpu)) {
++            assert(cpu_isar_feature(arm_div, cpu));
++        }
+         set_feature(env, ARM_FEATURE_LPAE);
+         set_feature(env, ARM_FEATURE_V7);
+     }
+-- 
+2.17.2
