@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47348)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gIHBf-0005PG-9f
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 13:55:20 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1gIHN8-0004dk-Lc
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 14:07:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gIHBb-0006HF-4p
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 13:55:19 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:33827)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1gIHBa-0006Gk-RN
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 13:55:15 -0400
-References: <20181101173852.27257-1-laurent@vivier.eu>
-	<CAFEAcA9+gSUHW++EKtuqWL4ofWAKqO0H5JUGUoyyAhY7h24o0Q@mail.gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <dcc24ea9-676f-8276-fe54-49bf67f20e56@vivier.eu>
-Date: Thu, 1 Nov 2018 18:54:59 +0100
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9+gSUHW++EKtuqWL4ofWAKqO0H5JUGUoyyAhY7h24o0Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <amarkovic@wavecomp.com>) id 1gIHN5-0003GE-Ef
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 14:07:10 -0400
+Received: from mail-eopbgr680109.outbound.protection.outlook.com
+	([40.107.68.109]:34640
+	helo=NAM04-BN3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1gIHN5-0003Fo-87
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 14:07:07 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Thu, 1 Nov 2018 18:07:03 +0000
+Message-ID: <BN6PR2201MB12511109AD96E8B7E824811EC6CE0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <BN6PR2201MB125116B5479010DB326DCCFCC6CE0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	<51a26700-5da5-0a15-0e0e-6405ce5e65d4@redhat.com>,
+	<20181101172353.GA2316@sx9>
+In-Reply-To: <20181101172353.GA2316@sx9>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] softfloat: don't execute ppc64 ISA 3.0B
- instruction if it is not supported
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] Correction needed for R5900 instruction decoding
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +32,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <richard.henderson@linaro.org>
+To: Fredrik Noring <noring@nocrew.org>, =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>, "Emilio G.
+	Cota" <cota@braap.org>
+Cc: Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, "Maciej W. Rozycki" <macro@linux-mips.org>, =?iso-8859-1?Q?J=FCrgen_Urban?= <JuergenUrban@gmx.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On 01/11/2018 18:49, Peter Maydell wrote:
-> On 1 November 2018 at 17:38, Laurent Vivier <laurent@vivier.eu> wrote:
->> commit 27ae5109a2 has introduced an assembly instruction only supported
->> by ISA 3.0B and it fails to execute on previous versions of the POWER
->> CPU (like PowerPC G5).
->>
->> This patch fixes that by checking the ISA level, and falls back to
->> the default C function if the instruction is not supported.
->>
->> Fixes: 27ae5109a2ba8b6b679cce3e03e16570a34390a0
->>        (softfloat: Specialize udiv_qrnnd for ppc64)
->> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
->> ---
->>  include/fpu/softfloat-macros.h | 39 ++++++++++++++++++++--------------
->>  1 file changed, 23 insertions(+), 16 deletions(-)
->>
->> diff --git a/include/fpu/softfloat-macros.h b/include/fpu/softfloat-macros.h
->> index c86687fa5e..fe98b33df9 100644
->> --- a/include/fpu/softfloat-macros.h
->> +++ b/include/fpu/softfloat-macros.h
->> @@ -78,6 +78,9 @@ this code that are retained.
->>  /* Portions of this work are licensed under the terms of the GNU GPL,
->>   * version 2 or later. See the COPYING file in the top-level directory.
->>   */
->> +#if defined(_ARCH_PPC64)
->> +extern bool have_isa_3_00;
->> +#endif
-> 
-> I was wondering where this bool came from. The answer is
-> that it's defined in tcg/ppc/tcg-target.inc.c. It's ok to
-> use it here because fpu/softfloat.c is only compiled if
-> CONFIG_TCG is true, so the tcg code will be present. The
-> other user of this include file is target/m68k/softfloat.c,
-> which also will only be compiled for a ppc host if CONFIG_TCG.
-> 
-> It's a little awkward to be borrowing this tcg/ppc internal
-> flag into the softfloat code, though.
+Fredrik, please do not include handling of any opcode other than those curr=
+ently in the tree.
 
-I agree, I was hopping Richard can advice another way to do that.
+There are good and bad patterns in the code, and not every pattern is OK to=
+ follow.
 
 Thanks,
-Laurent
+Aleksandar
+
+________________________________________
+From: Fredrik Noring <noring@nocrew.org>
+Sent: Thursday, November 1, 2018 6:23:53 PM
+To: Philippe Mathieu-Daud=E9; Emilio G. Cota; Aleksandar Markovic
+Cc: Stefan Markovic; Petar Jovanovic; Aleksandar Rikalo; Maciej W. Rozycki;=
+ J=FCrgen Urban; qemu-devel@nongnu.org
+Subject: Re: [Qemu-devel] Correction needed for R5900 instruction decoding
+
+[ Philippe and Emilio -- thank you for cc-ing me. Good catch, since I'm
+not subscribed to the QEMU mailing list. Changes to the R5900 emulation
+are certainly of interest. ]
+
+Hi Aleksandar, Philippe,
+
+On Thu, Nov 01, 2018 at 03:31:54PM +0100, Philippe Mathieu-Daud=E9 wrote:
+> Cc'ing Fredrik.
+>
+> On 1/11/18 12:06, Aleksandar Markovic wrote:
+> > Hi, Fridrik,
+> >
+> > I did some closer code inspection of R5900 in last few days, and I
+> > noticed some sub-optimal implementation in the area where R5900-specifi=
+c
+> > opcodes overlap with the rest-of-MIPS-CPUs opcodes.
+> >
+> > The right implementation should be based on the principle that all such
+> > cases are covered with if statements involving INSN_R5900 flag, like
+> > this:
+> >
+> >          if (ctx->insn_flags & INSN_R5900) {
+> >              <R5900-specific handling>
+> >          } else {
+> >              <rest-of-MIPS-handling>
+> >          }
+> >
+> > You followed that principle for OPC_SPECIAL2 and OPC_SPECIAL3, but for
+> > some other opcodes not. For example, there are lines:
+> >
+> >      if (reg =3D=3D 0 && (opc =3D=3D OPC_MFHI || opc =3D=3D TX79_MMI_MF=
+HI1 ||
+> >                       opc =3D=3D OPC_MFLO || opc =3D=3D TX79_MMI_MFLO1)=
+) {
+> >
+> > or
+> >
+> >       switch (opc) {
+> >       case OPC_MFHI:
+> >       case TX79_MMI_MFHI1:
+> >
+> > Such implementation makes it difficult to discern R5900 and non-R5900
+> > cases. Potentialy allows bugs to sneak in and affect non-R5900 support.
+
+MFLO1, MFHI1, MTLO1 and MTHI1 for the TX79 and the R5900 are already
+decoded in the ISA specific decode_tx79_mmi function, and thereby follow
+your first suggested pattern. They do however reuse the gen_HILO function,
+but it is a simpel matter to post a patch to make a new gen_tx79_HILO1
+variant that is almost identical to the original gen_HILO.
+
+The only other case is gen_muldiv that is used for DIV1 and DIVU1. The
+same argument applies and a TX79 specific variant would be similar to the
+original, but I can certainly post a variant for that one too.
+
+> > The correction is not that difficult, I gather. Worse comme to worst,
+> > you can remove R5900 MFLO1 and MFHI1 altogether, they are not that
+> > essential at this moment, but do try correcting the decoding stuff as I
+> > described. Can you please make these changes in next few days or so
+> > (given that 3.1 release is getting closer and closer), and send them to
+> > the list?
+
+MFLO1 and MFHI1 are essential for MULT1, MULTU1, DIV1 and DIVU1 as well as
+MADD1 and MADDU1 in the patch series I posted 25 October "[PATCH 00/11]
+target/mips: Amend R5900 support". I will post updated patches shortly!
+
+> > It is my bad that I didn't spot this during review, but in any case, I
+> > think this should be fixed in 3.1 to make sure that non-R5900
+> > functionalities are intact.
+
+It is a common pattern in target/mips/translate.c to cover several ISAs
+in the same gen_* and decode_* functions, especially when there are only
+minor differences between them.
+
+Fredrik
