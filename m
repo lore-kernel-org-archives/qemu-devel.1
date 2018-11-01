@@ -1,26 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32816)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gIAEr-0003Kf-Rp
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 06:30:10 -0400
+	(envelope-from <lifeng1519@gmail.com>) id 1gIAIQ-0000tP-NA
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 06:33:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gIAEl-0006sO-Tn
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 06:30:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54034)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gIAEj-0006pX-RQ
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 06:30:03 -0400
-References: <20181023152306.3123-1-david@redhat.com>
-	<20181023152306.3123-5-david@redhat.com>
-	<20181101110051.67ffb084@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <47807013-d4f0-7057-b484-329dda514501@redhat.com>
-Date: Thu, 1 Nov 2018 11:29:51 +0100
+	(envelope-from <lifeng1519@gmail.com>) id 1gIAIP-0002SM-NQ
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 06:33:50 -0400
+From: Li Feng <lifeng1519@gmail.com>
+Date: Thu,  1 Nov 2018 18:38:07 +0800
+Message-Id: <20181101103807.25862-1-lifeng1519@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20181101110051.67ffb084@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 4/7] range: add some more functions
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] block/nvme: optimize the performance of nvme
+ driver based on vfio-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,96 +21,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: fengli@smartx.com
+Cc: Li Feng <lifeng1519@gmail.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:NVMe Block Driver" <qemu-block@nongnu.org>, "open list:All patches CC here" <qemu-devel@nongnu.org>
 
-On 01.11.18 11:00, Igor Mammedov wrote:
-> On Tue, 23 Oct 2018 17:23:03 +0200
-> David Hildenbrand <david@redhat.com> wrote:
->=20
->> Add some more functions that will be used in memory-device context.
->>
->> range_init(): Init using lower bound and size, check for validity
->> range_init_nofail(): Init using lower bound and size, validity asserte=
-d
->> range_size(): Extract the size of a range
->> range_overlaps_range(): Check for overlaps of two ranges
->> range_contains_range(): Check if one range is contained in the other
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  include/qemu/range.h | 62 +++++++++++++++++++++++++++++++++++++++++++=
-+
->>  1 file changed, 62 insertions(+)
->>
->> diff --git a/include/qemu/range.h b/include/qemu/range.h
->> index 7e75f4e655..ba606c6bc0 100644
->> --- a/include/qemu/range.h
->> +++ b/include/qemu/range.h
->> @@ -112,6 +112,68 @@ static inline uint64_t range_upb(Range *range)
->>      return range->upb;
->>  }
->> =20
->> +/*
->> + * Initialize @range to span the interval [@lob,@lob + @size - 1].
->> + * @size may be 0. If the range would overflow, returns -ERANGE, othe=
-rwise
->> + * 0.
->> + */
->> +static inline int QEMU_WARN_UNUSED_RESULT range_init(Range *range, ui=
-nt64_t lob,
->> +                                                     uint64_t size)
->> +{
->> +    if (lob + size < lob) {
->> +        return -ERANGE;
->> +    }
->> +    range->lob =3D lob;
->> +    range->upb =3D lob + size - 1;
->> +    range_invariant(range);
->> +    return 0;
->> +}
->> +
->> +/*
->> + * Initialize @range to span the interval [@lob,@lob + @size - 1].
->> + * @size may be 0. Range must not overflow.
->> + */
->> +static inline void range_init_nofail(Range *range, uint64_t lob, uint=
-64_t size)
->> +{
->> +    range->lob =3D lob;
->> +    range->upb =3D lob + size - 1;
->> +    range_invariant(range);
->> +}
->> +
->> +/*
->> + * Get the size of @range.
->> + */
->> +static inline uint64_t range_size(const Range *range)
->> +{
->> +    return range->upb - range->lob + 1;
->> +}
->> +
->> +/*
->> + * Check if @range1 overlaps with @range2. If one of the ranges is em=
-pty,
->> + * the result is always "false".
->> + */
->> +static inline bool range_overlaps_range(const Range *range1,
->> +                                        const Range *range2)
->> +{
->> +    if (range_is_empty(range1) || range_is_empty(range2)) {
-> compilation fails with:
->  "error: passing argument 1 of =E2=80=98range_is_empty=E2=80=99 discard=
-s =E2=80=98const=E2=80=99 qualifier from pointer target type [-Werror]"
->=20
-> the same for range_invariant,
-> following should fix issues:
+When the IO size is larger than 2 pages, we move the the pointer one by
+one in the pagelist, this is inefficient.
 
-I guess you missed patch #3.
+This is a simple benchmark result:
 
+Before:
+$ qemu-io -c 'write 0 1G' nvme://0000:00:04.0/1
 
---=20
+wrote 1073741824/1073741824 bytes at offset 0
+1 GiB, 1 ops; 0:00:02.41 (424.504 MiB/sec and 0.4146 ops/sec)
 
-Thanks,
+ $ qemu-io -c 'read 0 1G' nvme://0000:00:04.0/1
 
-David / dhildenb
+read 1073741824/1073741824 bytes at offset 0
+1 GiB, 1 ops; 0:00:02.03 (503.055 MiB/sec and 0.4913 ops/sec)
+
+After:
+$ qemu-io -c 'write 0 1G' nvme://0000:00:04.0/1
+
+wrote 1073741824/1073741824 bytes at offset 0
+1 GiB, 1 ops; 0:00:02.17 (471.517 MiB/sec and 0.4605 ops/sec)
+
+ $ qemu-io -c 'read 0 1G' nvme://0000:00:04.0/1                                                                                                                                                                                                                                                                      1 ↵
+
+read 1073741824/1073741824 bytes at offset 0
+1 GiB, 1 ops; 0:00:01.94 (526.770 MiB/sec and 0.5144 ops/sec)
+
+Signed-off-by: Li Feng <lifeng1519@gmail.com>
+---
+ block/nvme.c | 16 ++++++----------
+ 1 file changed, 6 insertions(+), 10 deletions(-)
+
+diff --git a/block/nvme.c b/block/nvme.c
+index 29294038fc..982097b5b1 100644
+--- a/block/nvme.c
++++ b/block/nvme.c
+@@ -837,7 +837,7 @@ try_map:
+         }
+ 
+         for (j = 0; j < qiov->iov[i].iov_len / s->page_size; j++) {
+-            pagelist[entries++] = iova + j * s->page_size;
++            pagelist[entries++] = cpu_to_le64(iova + j * s->page_size);
+         }
+         trace_nvme_cmd_map_qiov_iov(s, i, qiov->iov[i].iov_base,
+                                     qiov->iov[i].iov_len / s->page_size);
+@@ -850,20 +850,16 @@ try_map:
+     case 0:
+         abort();
+     case 1:
+-        cmd->prp1 = cpu_to_le64(pagelist[0]);
++        cmd->prp1 = pagelist[0];
+         cmd->prp2 = 0;
+         break;
+     case 2:
+-        cmd->prp1 = cpu_to_le64(pagelist[0]);
+-        cmd->prp2 = cpu_to_le64(pagelist[1]);;
++        cmd->prp1 = pagelist[0];
++        cmd->prp2 = pagelist[1];
+         break;
+     default:
+-        cmd->prp1 = cpu_to_le64(pagelist[0]);
+-        cmd->prp2 = cpu_to_le64(req->prp_list_iova);
+-        for (i = 0; i < entries - 1; ++i) {
+-            pagelist[i] = cpu_to_le64(pagelist[i + 1]);
+-        }
+-        pagelist[entries - 1] = 0;
++        cmd->prp1 = pagelist[0];
++        cmd->prp2 = cpu_to_le64(req->prp_list_iova + sizeof(uint64_t));
+         break;
+     }
+     trace_nvme_cmd_map_qiov(s, cmd, req, qiov, entries);
+-- 
+2.11.0
