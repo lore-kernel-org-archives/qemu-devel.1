@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37768)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gIGhy-0001sL-AO
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 13:24:38 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gIGjn-0002ss-NT
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 13:26:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gIGhx-00025L-Gj
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 13:24:38 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:35692)
+	(envelope-from <peter.maydell@linaro.org>) id 1gIGjl-0004Bl-Nm
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 13:26:31 -0400
+Received: from mail-ot1-x333.google.com ([2607:f8b0:4864:20::333]:38188)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gIGhx-00024f-23
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 13:24:37 -0400
-Received: by mail-oi1-x244.google.com with SMTP id v198-v6so14473798oif.2
-	for <qemu-devel@nongnu.org>; Thu, 01 Nov 2018 10:24:36 -0700 (PDT)
+	id 1gIGjf-00043B-US
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 13:26:26 -0400
+Received: by mail-ot1-x333.google.com with SMTP id f24so12714129otl.5
+	for <qemu-devel@nongnu.org>; Thu, 01 Nov 2018 10:26:18 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20181030193044.25954-1-philmd@redhat.com>
-References: <20181030193044.25954-1-philmd@redhat.com>
+In-Reply-To: <20181031140710.GG3902@habkost.net>
+References: <20181031004550.15410-1-ehabkost@redhat.com>
+	<20181031140710.GG3902@habkost.net>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 1 Nov 2018 17:24:15 +0000
-Message-ID: <CAFEAcA-r=d-s0SS4_VDX1A=viaZkS0SxJW-3mVn6Brrx8QHCew@mail.gmail.com>
+Date: Thu, 1 Nov 2018 17:25:57 +0000
+Message-ID: <CAFEAcA8SDBsigHe6t-fGqfKDCe_WuSrn+S7O4JOpXzzkeamx=g@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] arm: exynos4: Add dma support for
- smdkc210
+Subject: Re: [Qemu-devel] [PULL 0/7] x86 queue, 2018-10-30
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,20 +29,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: Guenter Roeck <linux@roeck-us.net>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Alistair Francis <alistair@alistair23.me>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, kvm-devel <kvm@vger.kernel.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On 30 October 2018 at 19:30, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
-> wrote:
-> From: Guenter Roeck <linux@roeck-us.net>
+On 31 October 2018 at 14:07, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> Peter, my S-o-b line was missing on some commits, I have just pushed a new
+> x86-next-pull-request tag, with exactly the same tree.  Sorry for the noise.
 >
-> QEMU already supports pl330. Instantiate it for smdkc210.
+> Thanks to Eric Blake for reporting the issue.
+>
+> The following changes since commit a2e002ff7913ce93aa0f7dbedd2123dce5f1a9cd:
+>
+>   Merge remote-tracking branch 'remotes/vivier2/tags/qemu-trivial-for-3.1-pull-request' into staging (2018-10-30 15:49:55 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/ehabkost/qemu.git tags/x86-next-pull-request
+>
+> for you to fetch changes up to 09b9ee643f90ef95e30e594df2a3c83ccaf75b1f:
+>
+>   i386: Add PKU on Skylake-Server CPU model (2018-10-30 21:14:43 -0300)
+>
+> ----------------------------------------------------------------
+> x86 queue, 2018-10-30
+>
+> * MSR-based feature support for
+>   MSR_IA32_ARCH_CAPABILITIES bits (Robert Hoo)
+> * Cascadelake-Server CPU model (Tao Xu)
+> * Add PKU on Skylake-Server CPU model (Tao Xu)
+> * Correct cpu_x86_cpuid(0xd) (Sebastian Andrzej Siewior)
+> * Remove dead code (Peter Maydell)
+>
+> ----------------------------------------------------------------
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Applied, thanks.
 
-I don't suppose anybody has the SoC datasheet to crosscheck
-the irq/address values (and maybe see if it lists any of
-the other pl330 settings) ?
-
-thanks
 -- PMM
