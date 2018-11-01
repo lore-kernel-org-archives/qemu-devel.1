@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35798)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gIC9g-00039U-1z
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 08:33:01 -0400
+	(envelope-from <imammedo@redhat.com>) id 1gIC9j-0002UQ-8O
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 08:33:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gIBvR-0007bI-E6
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 08:18:15 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 1 Nov 2018 12:17:46 +0000
-Message-ID: <9aa2ee7b-2dcb-be00-5501-c616f5c5fda0@virtuozzo.com>
-References: <20180807174311.32454-1-vsementsov@virtuozzo.com>
-	<20180807174311.32454-4-vsementsov@virtuozzo.com>
-	<6e19aaeb-8acc-beb9-5ece-9ae6101637a9@redhat.com>
-In-Reply-To: <6e19aaeb-8acc-beb9-5ece-9ae6101637a9@redhat.com>
-Content-Language: en-US
-Content-Type: multipart/mixed;
-	boundary="_004_9aa2ee7b2dcbbe005501c616f5c5fda0virtuozzocom_"
+	(envelope-from <imammedo@redhat.com>) id 1gIBty-0006KT-NE
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 08:16:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:63881)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gIBty-0006KB-Dj
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 08:16:42 -0400
+Date: Thu, 1 Nov 2018 13:16:37 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181101131637.5336779c@redhat.com>
+In-Reply-To: <20181030230717.GX3902@habkost.net>
+References: <20180912125531.32131-1-marcandre.lureau@redhat.com>
+	<20180912125531.32131-2-marcandre.lureau@redhat.com>
+	<20181022153330.6996de15@igors-macbook-pro.local>
+	<20181026151321.GE3902@habkost.net>
+	<20181029105657.5106265f@redhat.com>
+	<20181030013702.GQ3902@habkost.net>
+	<CAMxuvazWr=HB0XSb6u_E21Oq8AH3Jr2jD96_o7nQ4PbtfFQ0QA@mail.gmail.com>
+	<20181030152243.1602e9d2@redhat.com>
+	<20181030230717.GX3902@habkost.net>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 3/7] qcow2: split out reading normal
- clusters from qcow2_co_preadv
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/9] qom/user-creatable: add a few helper
+ macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,227 +35,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, "Bonzini,
+	Paolo" <pbonzini@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Richard Henderson <rth@twiddle.net>, Andreas =?UTF-8?B?RsOkcmJlcg==?= <afaerber@suse.de>, "Michael S . Tsirkin" <mst@redhat.com>, atar4qemu@gmail.com, mark.cave-ayland@ilande.co.uk
 
---_004_9aa2ee7b2dcbbe005501c616f5c5fda0virtuozzocom_
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+On Tue, 30 Oct 2018 20:07:17 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-MjcuMDkuMjAxOCAyMDozNSwgTWF4IFJlaXR6IHdyb3RlOg0KDQpPbiAwNy4wOC4xOCAxOTo0Mywg
-VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCg0KDQpNZW1vcnkgYWxsb2NhdGlv
-biBtYXkgYmVjb21lIGxlc3MgZWZmaWNpZW50IGZvciBlbmNyeXB0ZWQgY2FzZS4gSXQncyBhDQpw
-YXltZW50IGZvciBmdXJ0aGVyIGFzeW5jaHJvbm91cyBzY2hlbWUuDQoNClNpZ25lZC1vZmYtYnk6
-IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT48
-bWFpbHRvOnZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCi0tLQ0KIGJsb2NrL3Fjb3cyLmMgfCAx
-MTQgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLQ0KIDEgZmlsZSBjaGFuZ2VkLCA2NCBpbnNlcnRpb25zKCspLCA1MCBkZWxldGlvbnMoLSkN
-Cg0KZGlmZiAtLWdpdCBhL2Jsb2NrL3Fjb3cyLmMgYi9ibG9jay9xY293Mi5jDQppbmRleCA2NWUz
-Y2EwMGUyLi41ZTdmMmVlMzE4IDEwMDY0NA0KLS0tIGEvYmxvY2svcWNvdzIuYw0KKysrIGIvYmxv
-Y2svcWNvdzIuYw0KQEAgLTE4MDgsNiArMTgwOCw2NyBAQCBvdXQ6DQogICAgIHJldHVybiByZXQ7
-DQogfQ0KDQorc3RhdGljIGNvcm91dGluZV9mbiBpbnQgcWNvdzJfY29fcHJlYWR2X25vcm1hbChC
-bG9ja0RyaXZlclN0YXRlICpicywNCisgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIHVpbnQ2NF90IGZpbGVfY2x1c3Rlcl9vZmZzZXQsDQorICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50NjRfdCBvZmZzZXQsDQorICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50NjRfdCBieXRl
-cywNCisgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFFFTVVJ
-T1ZlY3RvciAqcWlvdiwNCisgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIHVpbnQ2NF90IHFpb3Zfb2Zmc2V0KQ0KK3sNCisgICAgaW50IHJldDsNCisgICAgQkRS
-VlFjb3cyU3RhdGUgKnMgPSBicy0+b3BhcXVlOw0KKyAgICB2b2lkICpjcnlwdF9idWYgPSBOVUxM
-Ow0KKyAgICBRRU1VSU9WZWN0b3IgaGRfcWlvdjsNCisgICAgaW50IG9mZnNldF9pbl9jbHVzdGVy
-ID0gb2Zmc2V0X2ludG9fY2x1c3RlcihzLCBvZmZzZXQpOw0KKw0KKyAgICBpZiAoKGZpbGVfY2x1
-c3Rlcl9vZmZzZXQgJiA1MTEpICE9IDApIHsNCisgICAgICAgIHJldHVybiAtRUlPOw0KKyAgICB9
-DQorDQorICAgIHFlbXVfaW92ZWNfaW5pdCgmaGRfcWlvdiwgcWlvdi0+bmlvdik7DQoNCg0KU28g
-eW91J3JlIG5vdCBqdXN0IHJlLWFsbG9jYXRpbmcgdGhlIGJvdW5jZSBidWZmZXIgZm9yIGV2ZXJ5
-IHNpbmdsZQ0KY2FsbCwgYnV0IGFsc28gdGhpcyBJL08gdmVjdG9yLiAgSG0uDQoNCg0KDQorICAg
-IGlmIChicy0+ZW5jcnlwdGVkKSB7DQorICAgICAgICBhc3NlcnQocy0+Y3J5cHRvKTsNCisgICAg
-ICAgIGFzc2VydChieXRlcyA8PSBRQ09XX01BWF9DUllQVF9DTFVTVEVSUyAqIHMtPmNsdXN0ZXJf
-c2l6ZSk7DQorDQorICAgICAgICBjcnlwdF9idWYgPSBxZW11X3RyeV9ibG9ja2FsaWduKGJzLT5m
-aWxlLT5icywgYnl0ZXMpOw0KDQoNCjEuIFdoeSBkaWQgeW91IHJlbW92ZSB0aGUgY29tbWVudD8N
-Cg0KMi4gVGhlIGNoZWNrIGZvciB3aGV0aGVyIGNyeXB0X2J1ZiB3YXMgc3VjY2Vzc2Z1bGx5IGFs
-bG9jYXRlZCBpcyBtaXNzaW5nLg0KDQozLiBEbyB5b3UgaGF2ZSBhbnkgYmVuY2htYXJrcyBmb3Ig
-ZW5jcnlwdGVkIGltYWdlcz8gIEhhdmluZyB0byBhbGxvY2F0ZQ0KdGhlIGJvdW5jZSBidWZmZXIg
-Zm9yIHBvdGVudGlhbGx5IGV2ZXJ5IHNpbmdsZSBjbHVzdGVyIHNvdW5kcyByYXRoZXIgYmFkDQp0
-byBtZS4NCg0KSG1tLCBhYm91dCB0aGlzLg0KDQpOb3cgd2UgaGF2ZSBjb21wcmVzcyB0aHJlYWRz
-IHRvIGRvIHNldmVyYWwgY29tcHJlc3Mgb3BlcmF0aW9ucyBpbiBwYXJhbGxlbC4gQW5kIEkgcGxh
-biB0byBkbyB0aGUgc2FtZSB0aGluZyBmb3IgZGVjb21wcmVzc2lvbiwgZW5jcnlwdGlvbiBhbmQg
-ZGVjcnlwdGlvbi4gU28sIHdlJ2xsIGRlZmluaXRlbHkgbmVlZCBzZXZlcmFsIGNsdXN0ZXItc2l6
-ZSBidWZmZXJzIHRvIGRvIGFsbCB0aGVzZSBvcGVyYXRpb25zLiBIb3cgbWFueT8gVGhlIGZpcnN0
-IHRob3VnaHQgaXMganVzdCBhcyBtYW55IGFzIG1heGltdW0gbnVtYmVyIG9mIHRocmVhZHMgKG9y
-IHR3aWNlIGFzIG1hbnksIHRvIGhhdmUgaW4gYW5kIG91dCBidWZmZXJzIGZvciBjb21wcmVzc2lv
-bikuIEJ1dCBpdCdzIHdyb25nLCBjb25zaWRlciBmb3IgZXhhbXBsZSBlbmNyeXB0aW9uIG9uIHdy
-aXRlOg0KDQoxLiBnZXQgZnJlZSB0aHJlYWQgZm9yIGVuY3J5cHRpb24gKG1heSBiZSB5aWVsZCBp
-ZiBtYXhpbXVtIHRocmVhZCBudW1iZXIgYWNoaWV2ZWQsIHdhaXRpbmcgdW50aWwgYWxsIHRocmVh
-ZHMgYXJlIGJ1c3kpDQoyLiBnZXQgYnVmZmVyIChwZXIgdGhyZWFkKQ0KMy4gdGhyZWFkIGhhbmRs
-ZXMgZW5jcnlwdGlvbg0KYS4gZnJlZSB0aHJlYWQgaGVyZT8NCjQuIHdyaXRlIGVuY3J5cHRlZCBk
-YXRhIHRvIHVuZGVybHlpbmcgZmlsZQ0KYi4gZnJlZSB0aHJlYWQgaGVyZT8NCg0KT2YgY291cnNl
-LCB3ZSB3YW50IGZyZWUgdGhyZWFkIGFzIHNvb24gYXMgcG9zc2libGUsIGluICJhLiIgbm90IGlu
-ICJiLiIuIEFuZCB0aGlzIG1lYW4sIHRoYXQgd2Ugc2hvdWxkIGZyZWUgYnVmZmVyIGluICJhLiIg
-dG9vLCBzbyB3ZSBzaG91bGQgY29weSBkYXRhIHRvIGxvY2FsbHkgYWxsb2NhdGVkIGJ1ZmZlciwg
-b3IsIGJldHRlciwgd2UganVzdCB1c2UgbG9jYWwgYnVmZmVyIGZyb20gdGhlIGJlZ2lubmluZywg
-YW5kIHRocmVhZCBkb24ndCBvd24gaXQncyBvd24gYnVmZmVyLi4NCg0KU28sIHdoYXQgYXJlIHRo
-ZSBvcHRpb25zIHdlIGhhdmU/DQoNCjEuIHRoZSBtb3N0IHNpbXBsZSB0aGluZzoganVzdCBhbGxv
-Y2F0ZSBidWZmZXJzIGZvciBlYWNoIHJlcXVlc3QgbG9jYWxseSwgbGlrZSBpdCBpcyBhbHJlYWR5
-IGRvbmUgZm9yIGNvbXByZXNzaW9uLg0KcHJvczogc2ltcGxlDQpjb25zOiBhbGxvY2F0ZS9mcmVl
-IGV2ZXJ5IHRpbWUgbWF5IGluZmx1ZW5jZSBwZXJmb3JtYW5jZSwgYXMgeW91IG5vdGljZWQNCg0K
-Mi4ga2VlcCBhIHBvb2wgb2Ygc3VjaCBidWZmZXJzLCBzbyB3aGVuIGJ1ZmZlciBmcmVlZCwgaXQn
-cyBqdXN0IHF1ZXVlZCB0byB0aGUgbGlzdCBvZiBmcmVlIGJ1ZmZlcnMNCnByb3M6DQogICByZWR1
-Y2UgbnVtYmVyIG9mIHJlYWwgYWxsb2MvZnJlZSBjYWxscw0KICAgd2UgY2FuIGxpbWl0IHRoZSBw
-b29sIG1heGltdW0gc2l6ZQ0KICAgd2UgY2FuIGFsbG9jYXRlIG5ldyBidWZmZXJzIG9uIGRlbWFu
-ZCwgbm90IHRoZSB3aG9sZSBwb29sIGF0IHN0YXJ0DQpjb25zOg0KICAgaG1tLCBzbywgaXQgbG9v
-a3MgbGlrZSBjdXN0b20gYWxsb2NhdG9yLiBJcyBpdCByZWFsbHkgbmVlZGVkPyBJcyBpdCByZWFs
-bHkgZmFzdGVyIHRoYW4ganVzdCB1c2Ugc3lzdGVtIGFsbG9jYXRvciBhbmQgY2FsbCBhbGxvYy9m
-cmVlIGV2ZXJ5IHRpbWUgd2UgbmVlZCBhIGJ1ZmZlcj8NCg0KMy4gc2hvdWxkIG5vdCB3ZSB1c2Ug
-Z19zbGljZV9hbGxvYyBpbnN0ZWFkIG9mIGludmVudGluZyBpdCBpbiAiMi4iDQoNClNvLCBJJ3Zl
-IGRlY2lkZWQgdG8gZG8gc29tZSB0ZXN0cywgYW5kIGhlcmUgYXJlIHJlc3VsdHMgKG1lbWNweSBp
-cyBmb3IgMzJLLCBhbGwgb3RoZXIgdGhpbmdzIGFsbG9jYXRlcyA2NEsgaW4gYSBsb29wLCBsaXN0
-X2FsbG9jIGlzIGEgc2ltcGxlIHJlYWxpemF0aW9uIG9mICIyLiI6DQoNCm5vdGhpbmc6IDIwMDAw
-MDAwMCBpdCAvIDAuMzAxMzYxIHNlYyA9IDY2MzY1NTY5Ni4yMDI1MzIgaXQvcw0KbWVtY3B5OiAy
-MDAwMDAwIGl0IC8gMS42MzMwMTUgc2VjID0gMTIyNDcyOC41NTQ5NzAgaXQvcw0KZ19tYWxsb2M6
-IDIwMDAwMDAwMCBpdCAvIDUuMzQ2NzA3IHNlYyA9IDM3NDA2MjAyLjU0MDUzMCBpdC9zDQpnX3Ns
-aWNlX2FsbG9jOiAyMDAwMDAwMDAgaXQgLyA3LjgxMjAzNiBzZWMgPSAyNTYwMTUyMC40MDI3OTIg
-aXQvcw0KbGlzdF9hbGxvYzogMjAwMDAwMDAwIGl0IC8gNS40MzI3NzEgc2VjID0gMzY4MTM2MjYu
-MjY4NjMwIGl0L3MNCnBvc2l4X21lbWFsaWduOiAyMDAwMDAwMCBpdCAvIDEuMDI1NTQzIHNlYyA9
-IDE5NTAxODY0LjM3NjA4NCBpdC9zDQphbGlnbmVkX2FsbG9jOiAyMDAwMDAwMCBpdCAvIDEuMDM1
-NjM5IHNlYyA9IDE5MzExNzUyLjE0OTczOSBpdC9zDQoNClNvLCB5b3Ugc2VlIHRoYXQgeWVzLCBs
-aXN0X2FsbG9jIGlzIHR3aWNlIGFzIGZhc3QgYXMgcG9zaXhfbWVtYWxpZ24sIGJ1dCBvbiB0aGUg
-b3RoZXIgaGFuZCwgc2ltcGxlIG1lbWNweSBpcyBhIGxvdCBzbG93ZXIgKDE2IHRpbWVzIHNsb3dl
-cikgKGFuZCBJIGRvbid0IHNheSBhYm91dCByZWFsIGRpc2sgSU8gd2hpY2ggd2lsbCBiZSBldmVu
-IG1vcmUgc2xvd2VyKSwgc28sIHNob3VsZCB3ZSBjYXJlIGFib3V0IGFsbG9jYXRpb24sIHdoYXQg
-ZG8geW91IHRoaW5nPw0KdGVzdCBpcyBhdHRhY2hlZC4NCg0KDQoNCg0KDQorICAgICAgICBxZW11
-X2lvdmVjX2FkZCgmaGRfcWlvdiwgY3J5cHRfYnVmLCBieXRlcyk7DQorICAgIH0gZWxzZSB7DQor
-ICAgICAgICBxZW11X2lvdmVjX2NvbmNhdCgmaGRfcWlvdiwgcWlvdiwgcWlvdl9vZmZzZXQsIGJ5
-dGVzKTsNCg0KDQpxY293Ml9jb19wcmVhZHYoKSBjb250aW51ZXMgdG8gZG8gdGhpcyBhcyB3ZWxs
-LiAgVGhhdCdzIHN1cGVyZmx1b3VzIG5vdy4NCg0KDQoNCisgICAgfQ0KKw0KKyAgICBCTEtEQkdf
-RVZFTlQoYnMtPmZpbGUsIEJMS0RCR19SRUFEX0FJTyk7DQorICAgIHJldCA9IGJkcnZfY29fcHJl
-YWR2KGJzLT5maWxlLA0KKyAgICAgICAgICAgICAgICAgICAgICAgICBmaWxlX2NsdXN0ZXJfb2Zm
-c2V0ICsgb2Zmc2V0X2luX2NsdXN0ZXIsDQorICAgICAgICAgICAgICAgICAgICAgICAgIGJ5dGVz
-LCAmaGRfcWlvdiwgMCk7DQorICAgIGlmIChyZXQgPCAwKSB7DQorICAgICAgICBnb3RvIG91dDsN
-CisgICAgfQ0KKw0KKyAgICBpZiAoYnMtPmVuY3J5cHRlZCkgew0KKyAgICAgICAgYXNzZXJ0KHMt
-PmNyeXB0byk7DQorICAgICAgICBhc3NlcnQoKG9mZnNldCAmIChCRFJWX1NFQ1RPUl9TSVpFIC0g
-MSkpID09IDApOw0KKyAgICAgICAgYXNzZXJ0KChieXRlcyAmIChCRFJWX1NFQ1RPUl9TSVpFIC0g
-MSkpID09IDApOw0KKyAgICAgICAgaWYgKHFjcnlwdG9fYmxvY2tfZGVjcnlwdChzLT5jcnlwdG8s
-DQorICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIChzLT5jcnlwdF9waHlzaWNhbF9v
-ZmZzZXQgPw0KKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZmlsZV9jbHVzdGVy
-X29mZnNldCArIG9mZnNldF9pbl9jbHVzdGVyIDoNCisgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIG9mZnNldCksDQorICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNy
-eXB0X2J1ZiwNCisgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgYnl0ZXMsDQorICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIE5VTEwpIDwgMCkgew0KDQoNCldoYXQncyB0
-aGUgcmVhc29uIGFnYWluc3QgZGVjcnlwdGluZyB0aGlzIGluLXBsYWNlIGluIHFpb3Ygc28gd2Ug
-Y291bGQNCnNhdmUgdGhlIGJvdW5jZSBidWZmZXI/ICBXZSBhbGxvdyBvZmZzZXRzIGluIGNsdXN0
-ZXJzLCBzbyB3aHkgY2FuJ3Qgd2UNCmp1c3QgY2FsbCB0aGlzIGZ1bmN0aW9uIG9uY2UgcGVyIGlu
-dm9sdmVkIEkvTyB2ZWN0b3IgZW50cnk/DQoNCk1heA0KDQoNCg0KKyAgICAgICAgICAgIHJldCA9
-IC1FSU87DQorICAgICAgICAgICAgZ290byBvdXQ7DQorICAgICAgICB9DQorICAgICAgICBxZW11
-X2lvdmVjX2Zyb21fYnVmKHFpb3YsIHFpb3Zfb2Zmc2V0LCBjcnlwdF9idWYsIGJ5dGVzKTsNCisg
-ICAgfQ0KKw0KK291dDoNCisgICAgcWVtdV92ZnJlZShjcnlwdF9idWYpOw0KKyAgICBxZW11X2lv
-dmVjX2Rlc3Ryb3koJmhkX3Fpb3YpOw0KKw0KKyAgICByZXR1cm4gcmV0Ow0KK30NCisNCiBzdGF0
-aWMgY29yb3V0aW5lX2ZuIGludCBxY293Ml9jb19wcmVhZHYoQmxvY2tEcml2ZXJTdGF0ZSAqYnMs
-IHVpbnQ2NF90IG9mZnNldCwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgdWludDY0X3QgYnl0ZXMsIFFFTVVJT1ZlY3RvciAqcWlvdiwNCiAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgaW50IGZsYWdzKQ0KQEAgLTE4MTksNyArMTg4MCw2IEBA
-IHN0YXRpYyBjb3JvdXRpbmVfZm4gaW50IHFjb3cyX2NvX3ByZWFkdihCbG9ja0RyaXZlclN0YXRl
-ICpicywgdWludDY0X3Qgb2Zmc2V0LA0KICAgICB1aW50NjRfdCBjbHVzdGVyX29mZnNldCA9IDA7
-DQogICAgIHVpbnQ2NF90IGJ5dGVzX2RvbmUgPSAwOw0KICAgICBRRU1VSU9WZWN0b3IgaGRfcWlv
-djsNCi0gICAgdWludDhfdCAqY2x1c3Rlcl9kYXRhID0gTlVMTDsNCg0KICAgICBxZW11X2lvdmVj
-X2luaXQoJmhkX3Fpb3YsIHFpb3YtPm5pb3YpOw0KDQpAQCAtMTg4Miw1NyArMTk0MiwxMiBAQCBz
-dGF0aWMgY29yb3V0aW5lX2ZuIGludCBxY293Ml9jb19wcmVhZHYoQmxvY2tEcml2ZXJTdGF0ZSAq
-YnMsIHVpbnQ2NF90IG9mZnNldCwNCiAgICAgICAgIGNhc2UgUUNPVzJfQ0xVU1RFUl9OT1JNQUw6
-DQogICAgICAgICAgICAgcWVtdV9jb19tdXRleF91bmxvY2soJnMtPmxvY2spOw0KDQotICAgICAg
-ICAgICAgaWYgKChjbHVzdGVyX29mZnNldCAmIDUxMSkgIT0gMCkgew0KLSAgICAgICAgICAgICAg
-ICByZXQgPSAtRUlPOw0KLSAgICAgICAgICAgICAgICBnb3RvIGZhaWxfbm9sb2NrOw0KLSAgICAg
-ICAgICAgIH0NCi0NCi0gICAgICAgICAgICBpZiAoYnMtPmVuY3J5cHRlZCkgew0KLSAgICAgICAg
-ICAgICAgICBhc3NlcnQocy0+Y3J5cHRvKTsNCi0NCi0gICAgICAgICAgICAgICAgLyoNCi0gICAg
-ICAgICAgICAgICAgICogRm9yIGVuY3J5cHRlZCBpbWFnZXMsIHJlYWQgZXZlcnl0aGluZyBpbnRv
-IGEgdGVtcG9yYXJ5DQotICAgICAgICAgICAgICAgICAqIGNvbnRpZ3VvdXMgYnVmZmVyIG9uIHdo
-aWNoIHRoZSBBRVMgZnVuY3Rpb25zIGNhbiB3b3JrLg0KLSAgICAgICAgICAgICAgICAgKi8NCi0g
-ICAgICAgICAgICAgICAgaWYgKCFjbHVzdGVyX2RhdGEpIHsNCi0gICAgICAgICAgICAgICAgICAg
-IGNsdXN0ZXJfZGF0YSA9DQotICAgICAgICAgICAgICAgICAgICAgICAgcWVtdV90cnlfYmxvY2th
-bGlnbihicy0+ZmlsZS0+YnMsDQotICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICBRQ09XX01BWF9DUllQVF9DTFVTVEVSUw0KLSAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgKiBzLT5jbHVzdGVyX3NpemUpOw0KLSAgICAgICAgICAgICAg
-ICAgICAgaWYgKGNsdXN0ZXJfZGF0YSA9PSBOVUxMKSB7DQotICAgICAgICAgICAgICAgICAgICAg
-ICAgcmV0ID0gLUVOT01FTTsNCi0gICAgICAgICAgICAgICAgICAgICAgICBnb3RvIGZhaWxfbm9s
-b2NrOw0KLSAgICAgICAgICAgICAgICAgICAgfQ0KLSAgICAgICAgICAgICAgICB9DQotDQotICAg
-ICAgICAgICAgICAgIGFzc2VydChjdXJfYnl0ZXMgPD0gUUNPV19NQVhfQ1JZUFRfQ0xVU1RFUlMg
-KiBzLT5jbHVzdGVyX3NpemUpOw0KLSAgICAgICAgICAgICAgICBxZW11X2lvdmVjX3Jlc2V0KCZo
-ZF9xaW92KTsNCi0gICAgICAgICAgICAgICAgcWVtdV9pb3ZlY19hZGQoJmhkX3Fpb3YsIGNsdXN0
-ZXJfZGF0YSwgY3VyX2J5dGVzKTsNCi0gICAgICAgICAgICB9DQotDQotICAgICAgICAgICAgQkxL
-REJHX0VWRU5UKGJzLT5maWxlLCBCTEtEQkdfUkVBRF9BSU8pOw0KLSAgICAgICAgICAgIHJldCA9
-IGJkcnZfY29fcHJlYWR2KGJzLT5maWxlLA0KLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIGNsdXN0ZXJfb2Zmc2V0ICsgb2Zmc2V0X2luX2NsdXN0ZXIsDQotICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgY3VyX2J5dGVzLCAmaGRfcWlvdiwgMCk7DQorICAgICAgICAgICAg
-cmV0ID0gcWNvdzJfY29fcHJlYWR2X25vcm1hbChicywgY2x1c3Rlcl9vZmZzZXQsDQorICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBvZmZzZXQsIGN1cl9ieXRlcywgcWlv
-diwgYnl0ZXNfZG9uZSk7DQogICAgICAgICAgICAgaWYgKHJldCA8IDApIHsNCiAgICAgICAgICAg
-ICAgICAgZ290byBmYWlsX25vbG9jazsNCiAgICAgICAgICAgICB9DQotICAgICAgICAgICAgaWYg
-KGJzLT5lbmNyeXB0ZWQpIHsNCi0gICAgICAgICAgICAgICAgYXNzZXJ0KHMtPmNyeXB0byk7DQot
-ICAgICAgICAgICAgICAgIGFzc2VydCgob2Zmc2V0ICYgKEJEUlZfU0VDVE9SX1NJWkUgLSAxKSkg
-PT0gMCk7DQotICAgICAgICAgICAgICAgIGFzc2VydCgoY3VyX2J5dGVzICYgKEJEUlZfU0VDVE9S
-X1NJWkUgLSAxKSkgPT0gMCk7DQotICAgICAgICAgICAgICAgIGlmIChxY3J5cHRvX2Jsb2NrX2Rl
-Y3J5cHQocy0+Y3J5cHRvLA0KLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIChzLT5jcnlwdF9waHlzaWNhbF9vZmZzZXQgPw0KLSAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICBjbHVzdGVyX29mZnNldCArIG9mZnNldF9pbl9jbHVzdGVyIDoN
-Ci0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgb2Zmc2V0KSwNCi0g
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBjbHVzdGVyX2RhdGEsDQot
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY3VyX2J5dGVzLA0KLSAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIE5VTEwpIDwgMCkgew0KLSAg
-ICAgICAgICAgICAgICAgICAgcmV0ID0gLUVJTzsNCi0gICAgICAgICAgICAgICAgICAgIGdvdG8g
-ZmFpbF9ub2xvY2s7DQotICAgICAgICAgICAgICAgIH0NCi0gICAgICAgICAgICAgICAgcWVtdV9p
-b3ZlY19mcm9tX2J1ZihxaW92LCBieXRlc19kb25lLCBjbHVzdGVyX2RhdGEsIGN1cl9ieXRlcyk7
-DQotICAgICAgICAgICAgfQ0KKw0KICAgICAgICAgICAgIHFlbXVfY29fbXV0ZXhfbG9jaygmcy0+
-bG9jayk7DQogICAgICAgICAgICAgYnJlYWs7DQoNCkBAIC0xOTUzLDcgKzE5NjgsNiBAQCBmYWls
-Og0KDQogZmFpbF9ub2xvY2s6DQogICAgIHFlbXVfaW92ZWNfZGVzdHJveSgmaGRfcWlvdik7DQot
-ICAgIHFlbXVfdmZyZWUoY2x1c3Rlcl9kYXRhKTsNCg0KICAgICByZXR1cm4gcmV0Ow0KIH0NCg0K
-DQoNCg0KDQoNCg0KDQotLQ0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+> On Tue, Oct 30, 2018 at 03:22:43PM +0100, Igor Mammedov wrote:
+> > On Tue, 30 Oct 2018 13:26:40 +0400
+> > Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+> >  =20
+> > > Hi
+> > >=20
+> > > On Tue, Oct 30, 2018 at 5:37 AM Eduardo Habkost <ehabkost@redhat.com>=
+ wrote: =20
+> > > >
+> > > > On Mon, Oct 29, 2018 at 10:56:57AM +0100, Igor Mammedov wrote:   =20
+> > > > > On Fri, 26 Oct 2018 12:13:21 -0300
+> > > > > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > > > >   =20
+> > > > > > On Mon, Oct 22, 2018 at 03:33:30PM +0100, Igor Mammedov wrote: =
+  =20
+> > > > > > > On Wed, 12 Sep 2018 16:55:23 +0400
+> > > > > > > Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+> > > > > > >   =20
+> > > > > > > > Improve a bit code readability.
+> > > > > > > >
+> > > > > > > > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@red=
+hat.com>
+> > > > > > > > ---
+> > > > > > > >  include/qom/object_interfaces.h | 4 ++++
+> > > > > > > >  qom/object.c                    | 4 ++--
+> > > > > > > >  qom/object_interfaces.c         | 9 +++------
+> > > > > > > >  3 files changed, 9 insertions(+), 8 deletions(-)
+> > > > > > > >
+> > > > > > > > diff --git a/include/qom/object_interfaces.h b/include/qom/=
+object_interfaces.h
+> > > > > > > > index 4d513fb329..46b0861457 100644
+> > > > > > > > --- a/include/qom/object_interfaces.h
+> > > > > > > > +++ b/include/qom/object_interfaces.h
+> > > > > > > > @@ -9,9 +9,13 @@
+> > > > > > > >  #define USER_CREATABLE_CLASS(klass) \
+> > > > > > > >       OBJECT_CLASS_CHECK(UserCreatableClass, (klass), \
+> > > > > > > >                          TYPE_USER_CREATABLE)
+> > > > > > > > +#define IS_USER_CREATABLE_CLASS(klass) \
+> > > > > > > > +    object_class_dynamic_cast(OBJECT_CLASS(oc), TYPE_USER_=
+CREATABLE)
+> > > > > > > >  #define USER_CREATABLE_GET_CLASS(obj) \
+> > > > > > > >       OBJECT_GET_CLASS(UserCreatableClass, (obj), \
+> > > > > > > >                        TYPE_USER_CREATABLE)
+> > > > > > > > +#define IS_USER_CREATABLE(obj) \
+> > > > > > > > +    object_dynamic_cast(OBJECT(obj), TYPE_USER_CREATABLE)
+> > > > > > > >  #define USER_CREATABLE(obj) \
+> > > > > > > >       INTERFACE_CHECK(UserCreatable, (obj), \
+> > > > > > > >                       TYPE_USER_CREATABLE)
+> > > > > > > > diff --git a/qom/object.c b/qom/object.c
+> > > > > > > > index 75d1d48944..0703e8e4ff 100644
+> > > > > > > > --- a/qom/object.c
+> > > > > > > > +++ b/qom/object.c
+> > > > > > > > @@ -424,7 +424,7 @@ void object_initialize_childv(Object *p=
+arentobj, const char *propname,
+> > > > > > > >          goto out;
+> > > > > > > >      }
+> > > > > > > >
+> > > > > > > > -    if (object_dynamic_cast(obj, TYPE_USER_CREATABLE)) {
+> > > > > > > > +    if (IS_USER_CREATABLE(obj)) {
+> > > > > > > >          user_creatable_complete(obj, &local_err);
+> > > > > > > >          if (local_err) {
+> > > > > > > >              object_unparent(obj);
+> > > > > > > > @@ -605,7 +605,7 @@ Object *object_new_with_propv(const cha=
+r *typename,
+> > > > > > > >          goto error;
+> > > > > > > >      }
+> > > > > > > >
+> > > > > > > > -    if (object_dynamic_cast(obj, TYPE_USER_CREATABLE)) {
+> > > > > > > > +    if (IS_USER_CREATABLE(obj)) {
+> > > > > > > >          user_creatable_complete(obj, &local_err);
+> > > > > > > >          if (local_err) {
+> > > > > > > >              object_unparent(obj);
+> > > > > > > > diff --git a/qom/object_interfaces.c b/qom/object_interface=
+s.c
+> > > > > > > > index 72b97a8bed..e3084bc04a 100644
+> > > > > > > > --- a/qom/object_interfaces.c
+> > > > > > > > +++ b/qom/object_interfaces.c
+> > > > > > > > @@ -10,18 +10,15 @@
+> > > > > > > >
+> > > > > > > >  void user_creatable_complete(Object *obj, Error **errp)
+> > > > > > > >  {
+> > > > > > > > -
+> > > > > > > >      UserCreatableClass *ucc;
+> > > > > > > > -    UserCreatable *uc =3D
+> > > > > > > > -        (UserCreatable *)object_dynamic_cast(obj, TYPE_USE=
+R_CREATABLE);
+> > > > > > > >
+> > > > > > > > -    if (!uc) {
+> > > > > > > > +    if (!IS_USER_CREATABLE(obj)) {
+> > > > > > > >          return;
+> > > > > > > >      }
+> > > > > > > >
+> > > > > > > > -    ucc =3D USER_CREATABLE_GET_CLASS(uc);
+> > > > > > > > +    ucc =3D USER_CREATABLE_GET_CLASS(obj);
+> > > > > > > >      if (ucc->complete) {
+> > > > > > > > -        ucc->complete(uc, errp);
+> > > > > > > > +        ucc->complete(USER_CREATABLE(obj), errp);   =20
+> > > > > > >                          ^^^
+> > > > > > > even though function becomes more concise,
+> > > > > > > this will call expensive dynamic cast 2nd time (IS_USER_CREAT=
+ABLE was the 1st and discarded)
+> > > > > > > so I'm not sure is a good idea to regress startup time for re=
+adability.   =20
+> > >=20
+> > > I hope it's not measurable, unless we create billions of objects. Do
+> > > you want some figures? =20
+> > I recall penalty was big enough for QEMU, that we added qom debug optio=
+n,
+> > in case of -object, the cost could be multiplied by hundreds =20
+>=20
+> This sounds like premature optimization.  Did you measure how
+> many nanoseconds we're saving per -object option?
+it's not optimization, it's about not making code worse and using
+resources reasonably object_dynamic_cast() with IS_USER_CREATABLE().
 
---_004_9aa2ee7b2dcbbe005501c616f5c5fda0virtuozzocom_
-Content-Type: text/x-csrc; name="bench.c"
-Content-Description: bench.c
-Content-Disposition: attachment; filename="bench.c"; size=2279;
-	creation-date="Thu, 01 Nov 2018 12:17:46 GMT";
-	modification-date="Thu, 01 Nov 2018 12:17:46 GMT"
-Content-ID: <1CD80CF39EDA4C48AB6A8A05B3AAB4F9@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
-
-I2luY2x1ZGUgPHN0ZGlvLmg+DQojaW5jbHVkZSA8c3RkbGliLmg+DQojaW5jbHVkZSA8c3RyaW5n
-Lmg+DQojaW5jbHVkZSA8c3lzL3RpbWUuaD4NCiNpbmNsdWRlIDxzeXMvcmVzb3VyY2UuaD4NCg0K
-I2luY2x1ZGUgPGdsaWIuaD4NCiNpbmNsdWRlIDxnbW9kdWxlLmg+DQoNCmRvdWJsZSBnZXRfdGlt
-ZSgpDQp7DQogICAgc3RydWN0IHRpbWV2YWwgdDsNCiAgICBnZXR0aW1lb2ZkYXkoJnQsIE5VTEwp
-Ow0KICAgIHJldHVybiB0LnR2X3NlYyArIHQudHZfdXNlYyoxZS02Ow0KfQ0KDQpkb3VibGUgU1RB
-UlQsIFQ7DQppbnQgQ09VTlQsIENPVU5URVI7DQoNCiNkZWZpbmUgc3RhcnQobmFtZSwgY291bnQp
-IFwNCiAgICBwcmludGYoIiVzOiAlZCBpdCIsIG5hbWUsIGNvdW50KTsgXA0KICAgIGZmbHVzaChz
-dGRvdXQpOyBcDQogICAgU1RBUlQgPSBnZXRfdGltZSgpOyBcDQogICAgQ09VTlQgPSBjb3VudDsg
-XA0KICAgIENPVU5URVIgPSBjb3VudDsgXA0KICAgIHdoaWxlIChDT1VOVEVSLS0pIHsNCg0KI2Rl
-ZmluZSBlbmQoKSBcDQogICAgfSBcDQogICAgVCA9IGdldF90aW1lKCkgLSBTVEFSVDsgXA0KICAg
-IHByaW50ZigiIC8gJWYgc2VjID0gJWYgaXQvc1xuIiwgVCwgQ09VTlQgLyBUKTsNCg0KR1NMaXN0
-ICpmcmVlX2Jsb2NrcyA9IE5VTEw7DQppbnQgYmxvY2tfc2l6ZSA9IDY0ICogMTAyNDsNCg0Kdm9p
-ZCAqbGlzdF9hbGxvYygpIHsNCiAgICB2b2lkICpyZXM7DQoNCiAgICBpZiAoZnJlZV9ibG9ja3Mp
-IHsNCiAgICAgICAgcmVzID0gZnJlZV9ibG9ja3MtPmRhdGE7DQogICAgICAgIGZyZWVfYmxvY2tz
-ID0gZ19zbGlzdF9kZWxldGVfbGluayhmcmVlX2Jsb2NrcywgZnJlZV9ibG9ja3MpOw0KICAgICAg
-ICByZXR1cm4gcmVzOw0KICAgIH0NCg0KICAgIHBvc2l4X21lbWFsaWduKCZyZXMsIDQwOTYsIDY0
-ICogMTAyNCk7DQogICAgcmV0dXJuIHJlczsNCn0NCg0Kdm9pZCBsaXN0X2ZyZWUodm9pZCAqcHRy
-KSB7DQogICAgZnJlZV9ibG9ja3MgPSBnX3NsaXN0X3ByZXBlbmQoZnJlZV9ibG9ja3MsIHB0cik7
-DQp9DQoNCnZvaWQgbGlzdF9maW5hbGl6ZSgpIHsNCiAgICB3aGlsZSAoZnJlZV9ibG9ja3MpIHsN
-CiAgICAgICAgdm9pZCAqcCA9IGZyZWVfYmxvY2tzLT5kYXRhOw0KICAgICAgICBmcmVlX2Jsb2Nr
-cyA9IGdfc2xpc3RfZGVsZXRlX2xpbmsoZnJlZV9ibG9ja3MsIGZyZWVfYmxvY2tzKTsNCiAgICAg
-ICAgZnJlZShwKTsNCiAgICB9DQp9DQoNCmludCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10p
-IHsNCiAgICBpbnQgY291bnQgPSBhdG9pKGFyZ3ZbMV0pOw0KICAgIGludCBsb2NbNjQgKiAxMDI0
-IC8gNF07DQogICAgaW50IGxvYzJbNjQgKiAxMDI0IC8gNF07DQogICAgaW50ICpwOw0KDQogICAg
-c3RhcnQoIm5vdGhpbmciLCBjb3VudCkNCiAgICAgICAgbG9jWzBdID0gMSArIGxvY1sxXTsNCiAg
-ICBlbmQoKQ0KDQogICAgc3RhcnQoIm1lbWNweSIsIGNvdW50IC8gMTAwKQ0KICAgICAgICBsb2Nb
-MF0gPSAxICsgbG9jWzFdOw0KICAgICAgICBtZW1jcHkobG9jLCBsb2MyLCBzaXplb2YobG9jKSAv
-IDIpOw0KICAgIGVuZCgpDQoNCiAgICBzdGFydCgiZ19tYWxsb2MiLCBjb3VudCkNCiAgICAgICAg
-cCA9IGdfbWFsbG9jKDY0ICogMTAyNCk7DQogICAgICAgIHBbMF0gPSAxICsgcFsxXTsNCiAgICAg
-ICAgZ19mcmVlKHApOw0KICAgIGVuZCgpDQoNCiAgICBzdGFydCgiZ19zbGljZV9hbGxvYyIsIGNv
-dW50KQ0KICAgICAgICBwID0gZ19zbGljZV9hbGxvYyg2NCAqIDEwMjQpOw0KICAgICAgICBwWzBd
-ID0gMSArIHBbMV07DQogICAgICAgIGdfc2xpY2VfZnJlZTEoNjQgKiAxMDI0LCBwKTsNCiAgICBl
-bmQoKQ0KDQogICAgc3RhcnQoImxpc3RfYWxsb2MiLCBjb3VudCkNCiAgICAgICAgcCA9IGxpc3Rf
-YWxsb2MoKTsNCiAgICAgICAgcFswXSA9IDEgKyBwWzFdOw0KICAgICAgICBsaXN0X2ZyZWUocCk7
-DQogICAgZW5kKCkNCiAgICBsaXN0X2ZpbmFsaXplKCk7DQoNCiAgICBzdGFydCgicG9zaXhfbWVt
-YWxpZ24iLCBjb3VudCAvIDEwKQ0KICAgICAgICBwb3NpeF9tZW1hbGlnbigmcCwgNDA5NiwgNjQg
-KiAxMDI0KTsNCiAgICAgICAgcFswXSA9IDEgKyBwWzFdOw0KICAgICAgICBmcmVlKHApOw0KICAg
-IGVuZCgpDQoNCiAgICBzdGFydCgiYWxpZ25lZF9hbGxvYyIsIGNvdW50IC8gMTApDQogICAgICAg
-IHAgPSBhbGlnbmVkX2FsbG9jKDQwOTYsIDY0ICogMTAyNCk7DQogICAgICAgIHBbMF0gPSAxICsg
-cFsxXTsNCiAgICAgICAgZnJlZShwKTsNCiAgICBlbmQoKQ0KDQogICAgcmV0dXJuIDA7DQp9DQo=
-
---_004_9aa2ee7b2dcbbe005501c616f5c5fda0virtuozzocom_--
+I'd replace object_dynamic_cast() with IS_FOO() in places where
+we just test but do not use the result for a better readability.
+But is we need the result later I'd keep object_dynamic_cast(),
+it's not much worse but allows us to reuse the result of cast.
+=20
+> > > > > > (INTERFACE_CHECK is a nop if CONFIG_QOM_CAST_DEBUG is not
+> > > > > > enabled, so I don't understand how it would regress startup tim=
+e.   =20
+> > > > > Isn't it enabled by default though?
+> > > > > Maybe we should flip default to disabled then cast should be ok a=
+nd enable it
+> > > > > when generic '--debug' is enabled.   =20
+> > > >
+> > > > This is called only once for each -object option.  Even if QOM
+> > > > debugging is enabled by default I don't see why it wouldn't be OK
+> > > > to call object_dynamic_cast_assert() here.   =20
+> > >=20
+> > > Yes, imho it's very marginal. Thus I would value more readability. =20
+> > Probably not marginal for folks who are trying to reduce every
+> > tiny bit of start up time. =20
+>=20
+> These people should be disabling QOM debugging, then.
+>=20
+> >=20
+> > Considering readablity change here doesn't really make a difference,
+> > I'd pick performance. i.e. do cast and then reuse result later.
+> >   =20
+> > > Alternatively, we can consider replacing
+> > > ucc->complete(USER_CREATABLE(obj), errp); by
+> > > ucc->complete((UserCreatable*)obj, errp); to get back to the same
+> > > number of dynamic_cast calls. =20
+> > Unsafe casts (foo*) typically frowned upon but it should be safe
+> > since one gets here after IS_USER_CREATABLE check, so I don't really
+> > care in this case. But I'd drop user_creatable_complete() hunk,
+> > so that original cast result is being reused. =20
+>=20
+> Please don't do that.  Readability, safety, and consistency are
+> more important.  For the few users where QOM debugging has a
+> measurable performance impact, we already have a mechanism to
+> disable it.
