@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gIFKa-0001Yn-Ux
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 11:56:26 -0400
+	(envelope-from <imammedo@redhat.com>) id 1gIFN4-0003V5-36
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 11:58:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gIFKV-0000Wp-Ob
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 11:56:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57556)
+	(envelope-from <imammedo@redhat.com>) id 1gIFMy-00023n-QV
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 11:58:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49926)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gIFKU-0000WO-L0
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 11:56:19 -0400
-Date: Thu, 1 Nov 2018 15:56:11 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20181101155610.GD2726@work-vm>
-References: <EFF8C049-EE78-4035-A38E-6A91EA219878@oracle.com>
-	<80DAB33E-A982-4903-AEBA-F71AB2E8AFC3@oracle.com>
-	<5F34DE35-D1EE-441A-87A1-379C7A04AFE7@oracle.com>
-	<20181031181759.GR3902@habkost.net>
-	<a5b6cdf7-6ff9-7bd8-d591-3e2669b4f802@redhat.com>
-	<B34C4E8C-748D-4D78-807F-3F51C80EA5B2@oracle.com>
-	<20181031185930.GC2403@work-vm>
-	<5FA867F7-3520-4903-BC2F-B55227A04FED@oracle.com>
-	<20181101131059.GB2726@work-vm>
-	<F144DC98-45AA-4DD8-8A7E-25B867FE7863@oracle.com>
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gIFMv-00022I-Tp
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 11:58:52 -0400
+Date: Thu, 1 Nov 2018 16:58:34 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181101165834.1bdec73e@redhat.com>
+In-Reply-To: <20181101152745.GZ3902@habkost.net>
+References: <20181030150453.9344-1-marcandre.lureau@redhat.com>
+	<20181030150453.9344-6-marcandre.lureau@redhat.com>
+	<20181031201256.GA30771@habkost.net>
+	<20181101111842.4d93b7c7@redhat.com>
+	<20181101152745.GZ3902@habkost.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <F144DC98-45AA-4DD8-8A7E-25B867FE7863@oracle.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [QEMU PATCH v2 0/2]: KVM: i386: Add support for
- save and restore nested state
+Subject: Re: [Qemu-devel] [PATCH v2 05/10] qom/globals: generalize
+ object_property_set_globals()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,176 +31,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Liran Alon <liran.alon@oracle.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org, mtosatti@redhat.com, qemu-devel@nongnu.org, rth@twiddle.net, jmattson@google.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Amit Shah <amit@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, dgilbert@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Andreas =?UTF-8?B?RsOkcmJlcg==?= <afaerber@suse.de>, Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-* Liran Alon (liran.alon@oracle.com) wrote:
->=20
->=20
-> > On 1 Nov 2018, at 15:10, Dr. David Alan Gilbert <dgilbert@redhat.com>=
- wrote:
-> >=20
-> > * Liran Alon (liran.alon@oracle.com) wrote:
-> >>=20
-> >>=20
-> >>> On 31 Oct 2018, at 20:59, Dr. David Alan Gilbert <dgilbert@redhat.c=
-om> wrote:
-> >>>=20
-> >>> * Liran Alon (liran.alon@oracle.com) wrote:
-> >>>>=20
-> >>>>=20
-> >>>>> On 31 Oct 2018, at 20:19, Paolo Bonzini <pbonzini@redhat.com> wro=
-te:
-> >>>>>=20
-> >>>>> On 31/10/2018 19:17, Eduardo Habkost wrote:
-> >>>>>> On Wed, Oct 31, 2018 at 03:03:34AM +0200, Liran Alon wrote:
-> >>>>>>> Ping.
-> >>>>>>> Patch was submitted almost two months ago and I haven=E2=80=99t=
- seen any respond for the v2 of this series.
-> >>>>>> Sorry for the long delay.  This was on my queue of patches to be
-> >>>>>> reviewed, but I'm failing to keep up to the rate of incoming
-> >>>>>> patches.  I will try to review the series next week.
-> >>>>>=20
-> >>>>> I have already reviewed it; unfortunately I have missed the soft =
-freeze
-> >>>>> for posting the version I had also been working on when Liran pos=
-ted
-> >>>>> these patches.
-> >>>>>=20
-> >>>>> Paolo
-> >>>>=20
-> >>>> Paolo, note that this is v2 of this patch series. It=E2=80=99s not=
- the one you have already reviewed.
-> >>>> It now correctly handles the case you mentioned in review of v1 of=
- migrating with various nested_state buffer sizes.
-> >>>> The following scenarios were tested:
-> >>>> (a) src and dest have same nested state size.
-> >>>> 	=3D=3D> Migration succeeds.
-> >>>> (b) src don't have nested state while dest do.
-> >>>> 	=3D=3D> Migration succeed and src don't send it's nested state.
-> >>>> (c) src have nested state while dest don't.
-> >>>> 	=3D=3D> Migration fails as it cannot restore nested state.
-> >>>> (d) dest have bigger max nested state size than src
-> >>>> 	=3D=3D> Migration succeeds.
-> >>>> (e) dest have smaller max nested state size than src but enough to=
- store it's saved nested state
-> >>>> 	=3D=3D> Migration succeeds
-> >>>> (f) dest have smaller max nested state size than src but not enoug=
-h to store it's saved nested state
-> >>>> 	=3D=3D> Migration fails
-> >>>=20
-> >>> Is it possible to tell these limits before the start of the migrati=
-on,
-> >>> or do we only find out that a nested migration won't work by trying=
- it?
-> >>>=20
-> >>> Dave
-> >>=20
-> >> It is possible for the destination host to query what is it=E2=80=99=
-s max nested state size.
-> >> (This is what is returned from "kvm_check_extension(s, KVM_CAP_NESTE=
-D_STATE);=E2=80=9D See kvm_init() code)
-> >=20
-> > Is this max size a function of:
-> >  a) The host CPU
-> >  b) The host kernel
-> >  c) Some configuration
-> >=20
-> > or all of those?
-> >=20
-> > What about the maximum size that will be sent?
->=20
-> The max size is a function of (b). It depends on your KVM capabilities.
-> This size that will be sent is also the max size at source.
+On Thu, 1 Nov 2018 12:27:45 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-So if I have matching host kernels it should always work?
-What happens if I upgrade the source kernel to increase it's maximum
-nested size, can I force it to keep things small for some VMs?
+> On Thu, Nov 01, 2018 at 11:18:42AM +0100, Igor Mammedov wrote:
+> > On Wed, 31 Oct 2018 17:12:56 -0300
+> > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> >  =20
+> > > On Tue, Oct 30, 2018 at 07:04:48PM +0400, Marc-Andr=C3=A9 Lureau wrot=
+e: =20
+> > > > Handle calls of object_property_set_globals() with any object type,
+> > > > but only apply globals to TYPE_DEVICE & TYPE_USER_CREATABLE.
+> > > >=20
+> > > > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > > > ---
+> > > >  qom/globals.c | 22 ++++++++++++++--------
+> > > >  1 file changed, 14 insertions(+), 8 deletions(-)
+> > > >=20
+> > > > diff --git a/qom/globals.c b/qom/globals.c
+> > > > index 587f4a1b5c..8664baebe0 100644
+> > > > --- a/qom/globals.c
+> > > > +++ b/qom/globals.c
+> > > > @@ -15,22 +15,28 @@ void object_property_register_global(GlobalProp=
+erty *prop)
+> > > > =20
+> > > >  void object_property_set_globals(Object *obj)
+> > > >  {
+> > > > -    DeviceState *dev =3D DEVICE(obj);
+> > > >      GList *l;
+> > > > +    DeviceState *dev =3D (DeviceState *)object_dynamic_cast(obj, T=
+YPE_DEVICE);
+> > > > +
+> > > > +    if (!dev && !IS_USER_CREATABLE(obj)) {
+> > > > +        /* only TYPE_DEVICE and TYPE_USER_CREATABLE support global=
+s */
+> > > > +        return;
+> > > > +    }   =20
+> > >=20
+> > > This is core QOM code, ideally type-specific code doesn't belong
+> > > here.
+> > >=20
+> > > This also duplicates the purpose of the ObjectClass::set_globals
+> > > flag you have added on another patch, doesn't it?  I suggest just
+> > > dropping this hunk, and letting callers decide if it's
+> > > appropriate to call object_property_set_globals() or not.
+> > >  =20
+> > > > =20
+> > > >      for (l =3D global_props; l; l =3D l->next) {
+> > > >          GlobalProperty *prop =3D l->data;
+> > > >          Error *err =3D NULL;
+> > > > =20
+> > > > -        if (object_dynamic_cast(OBJECT(dev), prop->driver) =3D=3D =
+NULL) {
+> > > > +        if (object_dynamic_cast(obj, prop->driver) =3D=3D NULL) {
+> > > >              continue;
+> > > >          }
+> > > >          prop->used =3D true;
+> > > > -        object_property_parse(OBJECT(dev), prop->value, prop->prop=
+erty, &err);
+> > > > +        object_property_parse(obj, prop->value, prop->property, &e=
+rr);
+> > > >          if (err !=3D NULL) {
+> > > >              error_prepend(&err, "can't apply global %s.%s=3D%s: ",
+> > > >                            prop->driver, prop->property, prop->valu=
+e);
+> > > > -            if (!dev->hotplugged && prop->errp) {
+> > > > +
+> > > > +            if (dev && !dev->hotplugged && prop->errp) {   =20
+> > >=20
+> > > Hmm, more type-specific code.  Can't we get rid of the
+> > > dev->hotplugged check here?
+> > >=20
+> > > Maybe changing the function signature to:
+> > >   void object_property_set_globals(Object *obj, bool propagate_errors=
+);
+> > > and let the caller decide?
+> > >=20
+> > > Or we could try to find a way to get rid of prop->errp.  I never
+> > > really liked that hack, anyway.
+> > >=20
+> > > Anyway, I won't mind keeping this code as-is if the solution is
+> > > too complex.
+> > >=20
+> > >  =20
+> > > >                  error_propagate(prop->errp, err);
+> > > >              } else {
+> > > >                  assert(prop->user_provided);
+> > > > @@ -56,15 +62,15 @@ int object_property_check_globals(void)
+> > > >              continue;
+> > > >          }
+> > > >          oc =3D object_class_by_name(prop->driver);
+> > > > -        oc =3D object_class_dynamic_cast(oc, TYPE_DEVICE);
+> > > > -        if (!oc) {
+> > > > +        dc =3D (DeviceClass *)object_class_dynamic_cast(oc, TYPE_D=
+EVICE);
+> > > > +        if (!IS_USER_CREATABLE_CLASS(oc) && !dc) {   =20
+> > >=20
+> > > This could use the ObjectClass::set_globals flag you have added.
+> > >  =20
+> > > >              warn_report("global %s.%s has invalid class name",
+> > > >                          prop->driver, prop->property);
+> > > >              ret =3D 1;
+> > > >              continue;
+> > > >          }
+> > > > -        dc =3D DEVICE_CLASS(oc);
+> > > > -        if (!dc->hotpluggable && !prop->used) {
+> > > > +
+> > > > +        if (dc && !dc->hotpluggable) {   =20
+> > >=20
+> > > I wonder how we could get rid of this type-specific check.  Maybe
+> > > a ObjectClass::only_init_time_globals flag, automatically
+> > > initialized by TYPE_DEVICE based on DeviceClass::hotpluggable? =20
+> > in v1, I've suggested to add a hook something like
+> >=20
+> > ObjectClass::set_globals(Object *obj)
+> >=20
+> > that will handle type specific code and probably
+> > drop instance_post_init() hook.
+> >=20
+> > that would be better than adding boolean ObjectClass::set_globals
+> > as it could serve as both a flag and a type specific handler.
+> > So in the end we would end up replacing instance_post_init()
+> > with set_globals() hook. =20
+>=20
+> That could work, but:
+>=20
+> I really have the impression we're overengineering this.  We can
+> get rid of most complexity if we don't try to make -global work
+> with TYPE_USER_CREATABLE too.
+>=20
+> We don't need to support -global for backend objects, and most of
+> the complexity in this code exists only because of -global.
+> There's no reason to make the complexity of -global sneak into
+> the core QOM code.
+>=20
+> It would be much simpler if we just make device_post_init() do:
+>=20
+>     Error *global_errors =3D NULL;
+>     /* machine_register_compat_props() won't exist anymore. */
+>     object_apply_props(current_machine->compat_props, &error_abort);
+>=20
+>     /* accel_register_compat_props() won't exist anymore. */
+>     object_apply_props(current_machine->accel->compat_props, &error_abort=
+);
+>=20
+>     /* This will apply only -global options, _not_ compat props: */
+>     object_apply_props(qdev_global_properties, &global_errors);
+>     if (global_errors) {
+>         //TODO: find a way to report error back to device_add or to main()
+>         warn_report_err(global_errors);
+>     }
+>=20
+> ...and make user_creatable_post_init() just do:
+>=20
+>   /* This will apply only compat_props: */
+>   object_apply_props(current_machine->compat_props, &error_abort);
+>=20
+> ...with no support for -global.
+that's looks promising and may actually be simpler,
+all I need is to allow compat props affect backends for cases where backend=
+ changes affect ABI.
 
-> >=20
-> >> However, I didn=E2=80=99t find any suitable mechanism in QEMU Live-M=
-igration code to negotiate
-> >> this destination host information with source prior to migration. Wh=
-ich kinda makes sense as
-> >> this code is also used to my understanding in standard suspend/resum=
-e flow. In that scenario,
-> >> there is no other side to negotiate with.
-> >=20
-> > At the moment, if the user has appropriately configured their QEMU an=
-d
-> > their are no IO errors, the migration should not fail; and the
-> > management layer can responsible for configuring the QEMU and checkin=
-g
-> > compatibilities -=20
+> This would also let us get rid of GlobalProperty::errp, which is
+> a hack.
 >=20
-> I agree with this. The post_load() checks I have done are extra measure=
-s to prevent a failing migration.
-> Management layer can perform extra work before the migration to make su=
-re that source can actually migrate to destination.
-> Taking the max size of the nested state into account.
+> And it would make the code less sensitive to subtle
+> initialization ordering changes, which is a problem with the
+> current code.
 >=20
-> >=20
-> >> So currently what happens in my patch is that source prepares the ne=
-sted state buffer and sends it to destination as part of VMState,
-> >> and destination attempts to load this nested state in it=E2=80=99s n=
-ested_state_post_load() function.
-> >> If destination kernel cannot handle loading the nested state it has =
-received from source, it fails the migration by returning
-> >> failure from nested_state_post_load().
-> >=20
-> > That's minimally OK, but ideally we'd have a way of knowing before we
-> > start the migration if it was going to work, that way the management
-> > layer can refuse it before it spends ages transferring data and then
-> > trying to switch over - recovery from a failed migration can be a bit
-> > tricky/risky.
-> >=20
-> > I can't see it being much use in a cloud environment if the migration
-> > will sometimes fail without the cloud admin being able to do somethin=
-g
-> > about it.
->=20
-> With current QEMU Live-Migration code, I believe this is in the respons=
-ibility of the Control-Plane.
-> It=E2=80=99s not different from the fact that Control-Plane is also res=
-ponsible for launching the destination QEMU with same vHW configuration
-> as the source QEMU. If there was some kind of negotiation mechanism in =
-QEMU that verifies these vHW configuration matches *before*
-> starting the migration (and not part of Control-Plane), I would have al=
-so added to that negotiation to consider the max size of nested state.
-> But with current mechanisms, this is solely in the responsibility of th=
-e Control-Plane.
+> But, as I said on the reply to 10/10, for QEMU 3.1 I'd prefer to
+> simply add a:
+>    bool MachineClass::canonical_path_for_ramblock_id
+> field, because we're past soft freeze, and deal with
+> global/compat_props cleanups after QEMU 3.1.
+it's not really bug fix, more like a feature to let switching backends
+on destination host i.e. (ram on src and memfd on dst).
+Lets just postpone it for 3.2 instead of adding another hack
 
-Yep, that's fine - all we have to make sure of is that:
-  a) The control plane can somehow find out the maximums (via qemu or
-something else on the host) so it can make that decision.
-  b) Thing about how upgrades will work when one host is newer.
-
-Dave
-
-> >=20
-> >> Do you have a better suggestion?
-> >=20
-> > I'll need to understand a bit more about the nested state.
->=20
-> Feel free to ask more questions about it and I will try to answer.
->=20
-> Thanks,
-> -Liran
->=20
-> >=20
-> > Dave
-> >=20
-> >> -Liran
-> >>=20
-> >>>=20
-> >>>> -Liran
-> >>>>=20
-> >>>>=20
-> >>> --
-> >>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> >>=20
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Mark,
+are you fine with moving it post 3.1 timeframe?
