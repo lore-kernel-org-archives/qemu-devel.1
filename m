@@ -1,35 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59748)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liran.alon@oracle.com>) id 1gIEp3-0007AK-2C
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 11:23:52 -0400
+	(envelope-from <philmd@redhat.com>) id 1gIEq4-0007uQ-4M
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 11:24:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liran.alon@oracle.com>) id 1gIEou-00051k-45
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 11:23:46 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:58410)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liran.alon@oracle.com>)
-	id 1gIEoo-0004t5-M3
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 11:23:38 -0400
-Content-Type: text/plain;
-	charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-From: Liran Alon <liran.alon@oracle.com>
-In-Reply-To: <20181101131059.GB2726@work-vm>
-Date: Thu, 1 Nov 2018 17:23:13 +0200
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <F144DC98-45AA-4DD8-8A7E-25B867FE7863@oracle.com>
-References: <20180916124631.39016-1-liran.alon@oracle.com>
-	<EFF8C049-EE78-4035-A38E-6A91EA219878@oracle.com>
-	<80DAB33E-A982-4903-AEBA-F71AB2E8AFC3@oracle.com>
-	<5F34DE35-D1EE-441A-87A1-379C7A04AFE7@oracle.com>
-	<20181031181759.GR3902@habkost.net>
-	<a5b6cdf7-6ff9-7bd8-d591-3e2669b4f802@redhat.com>
-	<B34C4E8C-748D-4D78-807F-3F51C80EA5B2@oracle.com>
-	<20181031185930.GC2403@work-vm>
-	<5FA867F7-3520-4903-BC2F-B55227A04FED@oracle.com>
-	<20181101131059.GB2726@work-vm>
-Subject: Re: [Qemu-devel] [QEMU PATCH v2 0/2]: KVM: i386: Add support for
- save and restore nested state
+	(envelope-from <philmd@redhat.com>) id 1gIEq0-0005Si-Sg
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 11:24:52 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:38927)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gIEpy-0005Rj-RG
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 11:24:46 -0400
+Received: by mail-wm1-f67.google.com with SMTP id u13-v6so1655297wmc.4
+	for <qemu-devel@nongnu.org>; Thu, 01 Nov 2018 08:24:46 -0700 (PDT)
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+References: <20181101102303.16439-1-sameo@linux.intel.com>
+	<20181101102303.16439-18-sameo@linux.intel.com>
+	<68eae1f8-ca6a-d096-c9ac-d492e4523c7c@redhat.com>
+Message-ID: <a090a6f5-62a9-c187-775b-3b485eaabbc2@redhat.com>
+Date: Thu, 1 Nov 2018 16:24:42 +0100
+MIME-Version: 1.0
+In-Reply-To: <68eae1f8-ca6a-d096-c9ac-d492e4523c7c@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4 17/23] hw: i386: Export the MADT build
+ method
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,159 +32,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org, mtosatti@redhat.com, qemu-devel@nongnu.org, rth@twiddle.net, jmattson@google.com
+To: Samuel Ortiz <sameo@linux.intel.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, "open list:ARM ACPI Subsystem" <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
+On 1/11/18 16:12, Philippe Mathieu-Daudé wrote:
+> Hi Samuel,
+> 
+> On 1/11/18 11:22, Samuel Ortiz wrote:
+>> It is going to be used by the PC machine type as the MADT table builder
+>> method and thus needs to be exported outside of acpi-build.c
+>>
+>> Also, now that the generic build_madt() API is exported, we have to
+>> rename the ARM static one in order to avoid build time conflicts.
+>>
+>> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+>> ---
+>>   hw/arm/virt-acpi-build.c |  4 ++--
+>>   hw/i386/acpi-build.c     |  3 ++-
+>>   include/hw/i386/acpi.h   | 27 +++++++++++++++++++++++++++
+>>   3 files changed, 31 insertions(+), 3 deletions(-)
+>>   create mode 100644 include/hw/i386/acpi.h
+>>
+>> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+>> index f9a60907f1..4a37c5997c 100644
+>> --- a/hw/arm/virt-acpi-build.c
+>> +++ b/hw/arm/virt-acpi-build.c
+>> @@ -565,7 +565,7 @@ build_gtdt(GArray *table_data, BIOSLinker *linker, 
+>> VirtMachineState *vms)
+>>   /* MADT */
+>>   static void
+>> -build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState 
+>> *vms)
+>> +virt_build_madt(GArray *table_data, BIOSLinker *linker, 
+>> VirtMachineState *vms)
+>>   {
+>>       VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
+>>       int madt_start = table_data->len;
+>> @@ -746,7 +746,7 @@ void virt_acpi_build(VirtMachineState *vms, 
+>> AcpiBuildTables *tables)
+>>       build_fadt_rev5(tables_blob, tables->linker, vms, dsdt);
+>>       acpi_add_table(table_offsets, tables_blob);
+>> -    build_madt(tables_blob, tables->linker, vms);
+>> +    virt_build_madt(tables_blob, tables->linker, vms);
+>>       acpi_add_table(table_offsets, tables_blob);
+>>       build_gtdt(tables_blob, tables->linker, vms);
+>> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+>> index 6c9b61cea2..f4afdbcd1a 100644
+>> --- a/hw/i386/acpi-build.c
+>> +++ b/hw/i386/acpi-build.c
+>> @@ -60,6 +60,7 @@
+>>   #include "qom/qom-qobject.h"
+>>   #include "hw/i386/amd_iommu.h"
+>>   #include "hw/i386/intel_iommu.h"
+>> +#include "hw/i386/acpi.h"
+>>   #include "hw/acpi/ipmi.h"
+>> @@ -279,7 +280,7 @@ void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
+>>       }
+>>   }
+>> -static void
+>> +void
+>>   build_madt(GArray *table_data, BIOSLinker *linker,
+>>              MachineState *ms, AcpiConfiguration *acpi_conf)
+>>   {
+>> diff --git a/include/hw/i386/acpi.h b/include/hw/i386/acpi.h
+>> new file mode 100644
+>> index 0000000000..ee1203914a
+>> --- /dev/null
+>> +++ b/include/hw/i386/acpi.h
+>> @@ -0,0 +1,27 @@
+>> +/*
+>> + *
+>> + * Copyright (c) 2018 Intel Corportation
+>> + *
+>> + * This program is free software; you can redistribute it and/or 
+>> modify it
+>> + * under the terms and conditions of the GNU General Public License,
+>> + * version 2 or later, as published by the Free Software Foundation.
+>> + *
+>> + * This program is distributed in the hope it will be useful, but 
+>> WITHOUT
+>> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+>> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public 
+>> License for
+>> + * more details.
+>> + *
+>> + * You should have received a copy of the GNU General Public License 
+>> along with
+>> + * this program.  If not, see <http://www.gnu.org/licenses/>.
+>> + */
+>> +
+>> +#ifndef HW_I386_ACPI_H
+>> +#define HW_I386_ACPI_H
+>> +
+>> +#include "hw/acpi/acpi.h"
+> 
+> You forgot the following header:
+> 
+> #include "hw/acpi/bios-linker-loader.h"
 
+You can also remove it from hw/i386/acpi-build.c.
 
-> On 1 Nov 2018, at 15:10, Dr. David Alan Gilbert <dgilbert@redhat.com> =
-wrote:
->=20
-> * Liran Alon (liran.alon@oracle.com) wrote:
->>=20
->>=20
->>> On 31 Oct 2018, at 20:59, Dr. David Alan Gilbert =
-<dgilbert@redhat.com> wrote:
->>>=20
->>> * Liran Alon (liran.alon@oracle.com) wrote:
->>>>=20
->>>>=20
->>>>> On 31 Oct 2018, at 20:19, Paolo Bonzini <pbonzini@redhat.com> =
-wrote:
->>>>>=20
->>>>> On 31/10/2018 19:17, Eduardo Habkost wrote:
->>>>>> On Wed, Oct 31, 2018 at 03:03:34AM +0200, Liran Alon wrote:
->>>>>>> Ping.
->>>>>>> Patch was submitted almost two months ago and I haven=E2=80=99t =
-seen any respond for the v2 of this series.
->>>>>> Sorry for the long delay.  This was on my queue of patches to be
->>>>>> reviewed, but I'm failing to keep up to the rate of incoming
->>>>>> patches.  I will try to review the series next week.
->>>>>=20
->>>>> I have already reviewed it; unfortunately I have missed the soft =
-freeze
->>>>> for posting the version I had also been working on when Liran =
-posted
->>>>> these patches.
->>>>>=20
->>>>> Paolo
->>>>=20
->>>> Paolo, note that this is v2 of this patch series. It=E2=80=99s not =
-the one you have already reviewed.
->>>> It now correctly handles the case you mentioned in review of v1 of =
-migrating with various nested_state buffer sizes.
->>>> The following scenarios were tested:
->>>> (a) src and dest have same nested state size.
->>>> 	=3D=3D> Migration succeeds.
->>>> (b) src don't have nested state while dest do.
->>>> 	=3D=3D> Migration succeed and src don't send it's nested state.
->>>> (c) src have nested state while dest don't.
->>>> 	=3D=3D> Migration fails as it cannot restore nested state.
->>>> (d) dest have bigger max nested state size than src
->>>> 	=3D=3D> Migration succeeds.
->>>> (e) dest have smaller max nested state size than src but enough to =
-store it's saved nested state
->>>> 	=3D=3D> Migration succeeds
->>>> (f) dest have smaller max nested state size than src but not enough =
-to store it's saved nested state
->>>> 	=3D=3D> Migration fails
->>>=20
->>> Is it possible to tell these limits before the start of the =
-migration,
->>> or do we only find out that a nested migration won't work by trying =
-it?
->>>=20
->>> Dave
->>=20
->> It is possible for the destination host to query what is it=E2=80=99s =
-max nested state size.
->> (This is what is returned from "kvm_check_extension(s, =
-KVM_CAP_NESTED_STATE);=E2=80=9D See kvm_init() code)
->=20
-> Is this max size a function of:
->  a) The host CPU
->  b) The host kernel
->  c) Some configuration
->=20
-> or all of those?
->=20
-> What about the maximum size that will be sent?
-
-The max size is a function of (b). It depends on your KVM capabilities.
-This size that will be sent is also the max size at source.
-
->=20
->> However, I didn=E2=80=99t find any suitable mechanism in QEMU =
-Live-Migration code to negotiate
->> this destination host information with source prior to migration. =
-Which kinda makes sense as
->> this code is also used to my understanding in standard suspend/resume =
-flow. In that scenario,
->> there is no other side to negotiate with.
->=20
-> At the moment, if the user has appropriately configured their QEMU and
-> their are no IO errors, the migration should not fail; and the
-> management layer can responsible for configuring the QEMU and checking
-> compatibilities -=20
-
-I agree with this. The post_load() checks I have done are extra measures =
-to prevent a failing migration.
-Management layer can perform extra work before the migration to make =
-sure that source can actually migrate to destination.
-Taking the max size of the nested state into account.
-
->=20
->> So currently what happens in my patch is that source prepares the =
-nested state buffer and sends it to destination as part of VMState,
->> and destination attempts to load this nested state in it=E2=80=99s =
-nested_state_post_load() function.
->> If destination kernel cannot handle loading the nested state it has =
-received from source, it fails the migration by returning
->> failure from nested_state_post_load().
->=20
-> That's minimally OK, but ideally we'd have a way of knowing before we
-> start the migration if it was going to work, that way the management
-> layer can refuse it before it spends ages transferring data and then
-> trying to switch over - recovery from a failed migration can be a bit
-> tricky/risky.
->=20
-> I can't see it being much use in a cloud environment if the migration
-> will sometimes fail without the cloud admin being able to do something
-> about it.
-
-With current QEMU Live-Migration code, I believe this is in the =
-responsibility of the Control-Plane.
-It=E2=80=99s not different from the fact that Control-Plane is also =
-responsible for launching the destination QEMU with same vHW =
-configuration
-as the source QEMU. If there was some kind of negotiation mechanism in =
-QEMU that verifies these vHW configuration matches *before*
-starting the migration (and not part of Control-Plane), I would have =
-also added to that negotiation to consider the max size of nested state.
-But with current mechanisms, this is solely in the responsibility of the =
-Control-Plane.
-
->=20
->> Do you have a better suggestion?
->=20
-> I'll need to understand a bit more about the nested state.
-
-Feel free to ask more questions about it and I will try to answer.
-
-Thanks,
--Liran
-
->=20
-> Dave
->=20
->> -Liran
->>=20
->>>=20
->>>> -Liran
->>>>=20
->>>>=20
->>> --
->>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->>=20
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
+> The BIOSLinker is not provided by "acpi/acpi.h", which results in a 
+> failure when trying to precompile this header.
+> 
+>> +
+>> +/* ACPI MADT (Multiple APIC Description Table) build method */
+>> +void build_madt(GArray *table_data, BIOSLinker *linker,
+>> +                MachineState *ms, AcpiConfiguration *conf);
+>> +
+>> +#endif
+>>
