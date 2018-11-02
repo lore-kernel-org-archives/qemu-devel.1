@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43150)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gIQCe-0007Kl-Ja
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 23:32:57 -0400
+	(envelope-from <liran.alon@oracle.com>) id 1gIQQO-0005XA-Hb
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 23:47:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gIQCZ-0001Jv-KW
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 23:32:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34380)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gIQCZ-0001J5-An
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 23:32:51 -0400
-Date: Fri, 2 Nov 2018 11:32:41 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20181102033241.GF7804@xz-x1>
-References: <20181101101715.9443-1-fli@suse.com>
-	<20181101101715.9443-6-fli@suse.com> <20181102023738.GD7804@xz-x1>
-	<39af00cd-fb54-de7d-154e-d9047156ab43@suse.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <39af00cd-fb54-de7d-154e-d9047156ab43@suse.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC v7 5/9] migration: fix the multifd code
- when sending less channels
+	(envelope-from <liran.alon@oracle.com>) id 1gIQQK-0001jO-HI
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 23:47:08 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:58510)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <liran.alon@oracle.com>)
+	id 1gIQQK-0001iX-6q
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 23:47:04 -0400
+From: Liran Alon <liran.alon@oracle.com>
+Date: Fri,  2 Nov 2018 05:46:49 +0200
+Message-Id: <20181102034649.43559-1-liran.alon@oracle.com>
+In-Reply-To: <CALMp9eQ5zWxb2N9fyYz=WcQshwk0L6qQ4D6L6+p_dzMo4H=txA@mail.gmail.com>
+References: <CALMp9eQ5zWxb2N9fyYz=WcQshwk0L6qQ4D6L6+p_dzMo4H=txA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [QEMU PATCH v2 0/2]: KVM: i386: Add support for
+ save and restore nested state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,129 +25,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fei Li <fli@suse.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, dgilbert@redhat.com, famz@redhat.com, quintela@redhat.com
+To: jmattson@google.com
+Cc: dgilbert@redhat.com, pbonzini@redhat.com, ehabkost@redhat.com, kvm@vger.kernel.org, mtosatti@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org, Liran Alon <liran.alon@oracle.com>
 
-On Fri, Nov 02, 2018 at 11:00:24AM +0800, Fei Li wrote:
->=20
->=20
-> On 11/02/2018 10:37 AM, Peter Xu wrote:
-> > On Thu, Nov 01, 2018 at 06:17:11PM +0800, Fei Li wrote:
-> > > Set the migration state to "failed" instead of "setup" when failing
-> > > to send packet via some channel.
-> > Could you please provide more information in the commit message?
-> > E.g., what will happen if without this patch?  Will it crash the
-> > source or stall the source migration or others?  Otherwise it's a bit
-> > hard for me to understand what's this patch for.
-> Sorry for the inadequate description , I was intended to say that when
-> failing
-> to do the live migration using multifd, e.g. sending less channels, the=
- src
-> status displays "setup" when running `info migrate`. I assume we should=
- tell
-> users that the "Migration status" is "failed" now (and along with the
-> failure reason).
->=20
-> The current src status when failed inmultifd_new_send_channel_async()=EF=
-=BC=9A
->=20
->=20
-> (qemu) migrate_set_capability x-multifd on
-> (qemu) migrate_set_parameter x-multifd-channels 4
-> (qemu) migrate -d tcp:192.168.190.98:4444
-> (qemu) qemu-system-x86_64: failed in multifd_new_send_channel_async due=
- to
-> ...
-> (qemu) info migrate
-> globals:
-> store-global-state: on
-> only-migratable: off
-> send-configuration: on
-> send-section-footer: on
-> decompress-error-check: on
-> capabilities: xbzrle: off rdma-pin-all: off auto-converge: off zero-blo=
-cks:
-> off compress: off events: off postcopy-ram: off x-colo: off release-ram=
-: off
-> block: off return-path: off pause-before-switchover: off x-multifd: on
-> dirty-bitmaps: off postcopy-blocktime: off late-block-activate: off
-> Migration status: setup
-> total time: 0 milliseconds
+> On Thu, Nov1, 2018 at 09:45 AM, Jim Mattson <jmattson@google.com> wrote:
 
-Thanks for the information.
+>> On Thu, Nov 1, 2018 at 8:56 AM, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
 
-I had a quick look.  For now we do this:
+>> So if I have matching host kernels it should always work?
+>> What happens if I upgrade the source kernel to increase it's maximum
+>> nested size, can I force it to keep things small for some VMs?
 
-        multifd_save_setup (without waiting for channels to be ready)
-        create thread migration_thread
-                (in thread)
-                ram_save_setup
-                        multifd_send_sync_main (wait for the channels)
+> Any change to the format of the nested state should be gated by a
+> KVM_CAP set by userspace. (Unlike, say, how the
+> KVM_VCPUEVENT_VALID_SMM flag was added to the saved VCPU events state
+> in commit f077825a8758d.) KVM has traditionally been quite bad about
+> maintaining backwards compatibility, but I hope the community is more
+> cognizant of the issues now.
 
-The thing is that we didn't get the notification when one of the
-multifd channel is failed.  IMHO instead of setting the global
-migration state in a per-channel function, we should just report the
-error upwards, then the main thread should decide how to change the
-state machine of the migration.
+> As a cloud provider, one would only enable the new capability from
+> userspace once all hosts in the pool have a kernel that supports it.
+> During the transition, the capability would not be enabled on the
+> hosts with a new kernel, and these hosts would continue to provide
+> nested state that could be consumed by hosts running the older kernel.
 
-And we have set it in migrate_set_error() after all so the main thread
-should be able to know somehow (though IMHO I'll even prefer to have a
-per-channel variable to keep the state of the channel, then the
-per-channel functions won't touch any globals which offers better
-isolation).
+Hmm this makes sense.
 
-I'm not sure how Juan thinks about it, but I'd prefer some work to
-provide such isolation and also some mechanism to allow the main
-thread to detect the per-channel errors not only during setup phase
-but also during the migration (e.g., when network is suddenly down).
-Then we don't touch any globals (e.g., we shouldn't call
-migrate_get_current in any per-channel function like
-multifd_new_send_channel_async).
+This means though that the patch I have submitted here isn't good enough.
+My patch currently assumes that when it attempts to get nested state from KVM,
+QEMU should always set nested_state->size to max size supported by KVM as received
+from kvm_check_extension(s, KVM_CAP_NESTED_STATE);
+(See kvm_get_nested_state() introduced on my patch).
+This indeed won't allow migration from host with new KVM to host with old KVM if
+nested_state size was enlarged between these KVM versions.
+Which is obviously an issue.
 
->=20
-> >=20
-> > Normally I would prefer to not touch global states in feature specifi=
-c
-> > code path, but I'd like to know the problem more first...
-> >=20
-> > Thanks,
-> >=20
-> > > Cc: Peter Xu <peterx@redhat.com>
-> > > Signed-off-by: Fei Li <fli@suse.com>
-> > > ---
-> > >   migration/ram.c | 2 ++
-> > >   1 file changed, 2 insertions(+)
-> > >=20
-> > > diff --git a/migration/ram.c b/migration/ram.c
-> > > index 4db3b3e8f4..c84d164fc8 100644
-> > > --- a/migration/ram.c
-> > > +++ b/migration/ram.c
-> > > @@ -1072,6 +1072,7 @@ out:
-> > >   static void multifd_new_send_channel_async(QIOTask *task, gpointe=
-r opaque)
-> > >   {
-> > >       MultiFDSendParams *p =3D opaque;
-> > > +    MigrationState *s =3D migrate_get_current();
-> > >       QIOChannel *sioc =3D QIO_CHANNEL(qio_task_get_source(task));
-> > >       Error *local_err =3D NULL;
-> > > @@ -1083,6 +1084,7 @@ static void multifd_new_send_channel_async(QI=
-OTask *task, gpointer opaque)
-> > >           if (multifd_save_cleanup(&local_err) !=3D 0) {
-> > >               migrate_set_error(migrate_get_current(), local_err);
-> > >           }
-> > > +        migrate_set_state(&s->state, s->state, MIGRATION_STATUS_FA=
-ILED);
-> > >       } else {
-> > >           p->c =3D QIO_CHANNEL(sioc);
-> > >           qio_channel_set_delay(p->c, false);
-> > > --=20
-> > > 2.13.7
-> > >=20
-> > Regards,
-> >=20
->=20
+Jim, I think that my confusion was created from the fact that there is no clear documentation
+on how KVM_{GET,SET}_NESTED_STATE should be changed once we will need to add more state to
+nested_state in future KVM versions. I think it's worth adding that to IOCTLs documentation.
 
-Regards,
+For example, let's assume we have a new KVM_CAP_NESTED_STATE_V2.
+In this scenario, does kvm_check_extension(s, KVM_CAP_NESTED_STATE) still returns the
+size of nested_state v1 and kvm_check_extension(s, KVM_CAP_NESTED_STATE_V2) returns the
+size of the nested_state v2?
 
---=20
-Peter Xu
+Also note that the approach suggested by Jim requires mgmt-layer at dest
+to be able to specify to QEMU which KVM_CAP_NESTED_STATE_V* capabilities it should enable on kvm_init().
+When we know we are migrating from a host which supports v1 to a host which supports v2,
+we should make sure that dest QEMU doesn't enable KVM_CAP_NESTED_STATE_V2.
+However, when we are just launching a new machine on the host which supports v2, we do want
+QEMU to enable KVM_CAP_NESTED_STATE_V2 enabled for that VM.
+
+But on second thought, I'm not sure that this is the right approach as-well.
+We don't really want the used version of nested_state to be determined on kvm_init().
+* On source QEMU, we actually want to determine it when preparing for migration based
+on to the support given by our destination host. If it's an old host, we would like to
+save an old version nested_state and if it's a new host, we will like to save our newest
+supported nested_state.
+* On dest QEMU, we will want to just be able to set received nested_state in KVM.
+
+Therefore, I don't think that we want this versioning to be based on KVM_CAP at all.
+It seems that we would want the process to behave as follows:
+1) Mgmt-layer at dest queries dest host max supported nested_state size.
+   (Which should be returned from kvm_check_extension(KVM_CAP_NESTED_STATE))
+2) Mgmt-layer at source initiate migration to dest with requesting QEMU to send nested_state 
+   matching dest max supported nested_state size.
+   When saving nested state using KVM_GET_NESTED_STATE IOCTL, QEMU will specify in nested_state->size
+   the *requested* size to be saved and KVM should be able to save only the information which matches
+   the version that worked with that size.
+3) After some sanity checks on received migration stream, dest host use KVM_SET_NESTED_STATE IOCTL.
+   This IOCTL should deduce which information it should deploy based on given nested_state->size.
+
+This also makes me wonder if it's not just nicer to use nested_state->flags to specify which
+information is actually present on nested_state instead of managing versioning with nested_state->size.
+
+What are your opinions on this?
+
+-Liran
