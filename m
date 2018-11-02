@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49726)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=8372cde87=Paul.Durrant@citrix.com>)
-	id 1gIXPp-0003IH-K1
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:15:02 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gIXQL-0003hk-VM
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:15:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=8372cde87=Paul.Durrant@citrix.com>)
-	id 1gIXPl-0004YI-IQ
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:15:01 -0400
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Fri, 2 Nov 2018 11:14:54 +0000
-Message-ID: <e840576884aa4d848d0ea4f58ec44ec8@AMSPEX02CL03.citrite.net>
-References: <154115285434.11300.8459925605672823399.stgit@dhcp-3-135.uk.xensource.com>
-	<154115286450.11300.208978412106583040.stgit@dhcp-3-135.uk.xensource.com>
-In-Reply-To: <154115286450.11300.208978412106583040.stgit@dhcp-3-135.uk.xensource.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gIXQL-00052I-1r
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:15:33 -0400
+References: <20181101161758.12300-1-peter.maydell@linaro.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <3f9658de-e86f-9e6a-3f81-64ddbeccc0a7@ilande.co.uk>
+Date: Fri, 2 Nov 2018 11:14:56 +0000
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 2/3] Improve xen_disk response latency
+In-Reply-To: <20181101161758.12300-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-3.1] hw/ppc/mac_newworld: Free
+ openpic_irqs array after use
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,107 +24,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tim Smith <tim.smith@citrix.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Max Reitz <mreitz@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogVGltIFNtaXRoIFttYWls
-dG86dGltLnNtaXRoQGNpdHJpeC5jb21dDQo+IFNlbnQ6IDAyIE5vdmVtYmVyIDIwMTggMTA6MDEN
-Cj4gVG86IHhlbi1kZXZlbEBsaXN0cy54ZW5wcm9qZWN0Lm9yZzsgcWVtdS1kZXZlbEBub25nbnUu
-b3JnOyBxZW11LQ0KPiBibG9ja0Bub25nbnUub3JnDQo+IENjOiBBbnRob255IFBlcmFyZCA8YW50
-aG9ueS5wZXJhcmRAY2l0cml4LmNvbT47IEtldmluIFdvbGYNCj4gPGt3b2xmQHJlZGhhdC5jb20+
-OyBQYXVsIER1cnJhbnQgPFBhdWwuRHVycmFudEBjaXRyaXguY29tPjsgU3RlZmFubw0KPiBTdGFi
-ZWxsaW5pIDxzc3RhYmVsbGluaUBrZXJuZWwub3JnPjsgTWF4IFJlaXR6IDxtcmVpdHpAcmVkaGF0
-LmNvbT4NCj4gU3ViamVjdDogW1BBVENIIDIvM10gSW1wcm92ZSB4ZW5fZGlzayByZXNwb25zZSBs
-YXRlbmN5DQo+IA0KPiBJZiB0aGUgSS9PIHJpbmcgaXMgZnVsbCwgdGhlIGd1ZXN0IGNhbm5vdCBz
-ZW5kIGFueSBtb3JlIHJlcXVlc3RzDQo+IHVudGlsIHNvbWUgcmVzcG9uc2VzIGFyZSBzZW50LiBP
-bmx5IHNlbmRpbmcgYWxsIGF2YWlsYWJsZSByZXNwb25zZXMNCj4ganVzdCBiZWZvcmUgY2hlY2tp
-bmcgZm9yIG5ldyB3b3JrIGRvZXMgbm90IGxlYXZlIG11Y2ggdGltZSBmb3IgdGhlDQo+IGd1ZXN0
-IHRvIHN1cHBseSBuZXcgd29yaywgc28gdGhpcyB3aWxsIGNhdXNlIHN0YWxscyBpZiB0aGUgcmlu
-ZyBnZXRzDQo+IGZ1bGwuIEFsc28sIG5vdCBjb21wbGV0aW5nIHJlYWRzIGFzIHNvb24gYXMgcG9z
-c2libGUgYWRkcyBsYXRlbmN5DQo+IHRvIHRoZSBndWVzdC4NCj4gDQo+IFRvIGFsbGV2aWF0ZSB0
-aGF0LCBjb21wbGV0ZSBJTyByZXF1ZXN0cyBhcyBzb29uIGFzIHRoZXkgY29tZSBiYWNrLg0KPiBi
-bGtfc2VuZF9yZXNwb25zZSgpIGFscmVhZHkgcmV0dXJucyBhIHZhbHVlIGluZGljYXRpbmcgd2hl
-dGhlcg0KPiBhIG5vdGlmeSBzaG91bGQgYmUgc2VudCwgd2hpY2ggaXMgYWxsIHRoZSBiYXRjaGlu
-ZyB3ZSBuZWVkLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogVGltIFNtaXRoIDx0aW0uc21pdGhAY2l0
-cml4LmNvbT4NCg0KUmV2aWV3ZWQtYnk6IFBhdWwgRHVycmFudCA8cGF1bC5kdXJyYW50QGNpdHJp
-eC5jb20+DQoNCj4gLS0tDQo+ICBody9ibG9jay94ZW5fZGlzay5jIHwgICA0MyArKysrKysrKysr
-KystLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+ICAxIGZpbGUgY2hhbmdlZCwgMTIg
-aW5zZXJ0aW9ucygrKSwgMzEgZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvaHcvYmxv
-Y2sveGVuX2Rpc2suYyBiL2h3L2Jsb2NrL3hlbl9kaXNrLmMNCj4gaW5kZXggY2IyODgxYjdlNi4u
-YjUwNmUyMzg2OCAxMDA2NDQNCj4gLS0tIGEvaHcvYmxvY2sveGVuX2Rpc2suYw0KPiArKysgYi9o
-dy9ibG9jay94ZW5fZGlzay5jDQo+IEBAIC04MywxMSArODMsOSBAQCBzdHJ1Y3QgWGVuQmxrRGV2
-IHsNCj4gDQo+ICAgICAgLyogcmVxdWVzdCBsaXN0cyAqLw0KPiAgICAgIFFMSVNUX0hFQUQoaW5m
-bGlnaHRfaGVhZCwgaW9yZXEpIGluZmxpZ2h0Ow0KPiAtICAgIFFMSVNUX0hFQUQoZmluaXNoZWRf
-aGVhZCwgaW9yZXEpIGZpbmlzaGVkOw0KPiAgICAgIFFMSVNUX0hFQUQoZnJlZWxpc3RfaGVhZCwg
-aW9yZXEpIGZyZWVsaXN0Ow0KPiAgICAgIGludCAgICAgICAgICAgICAgICAgcmVxdWVzdHNfdG90
-YWw7DQo+ICAgICAgaW50ICAgICAgICAgICAgICAgICByZXF1ZXN0c19pbmZsaWdodDsNCj4gLSAg
-ICBpbnQgICAgICAgICAgICAgICAgIHJlcXVlc3RzX2ZpbmlzaGVkOw0KPiAgICAgIHVuc2lnbmVk
-IGludCAgICAgICAgbWF4X3JlcXVlc3RzOw0KPiANCj4gICAgICBnYm9vbGVhbiAgICAgICAgICAg
-IGZlYXR1cmVfZGlzY2FyZDsNCj4gQEAgLTEwNCw2ICsxMDIsOSBAQCBzdHJ1Y3QgWGVuQmxrRGV2
-IHsNCj4gIC8qIFRocmVzaG9sZCBvZiBpbi1mbGlnaHQgcmVxdWVzdHMgYWJvdmUgd2hpY2ggd2Ug
-d2lsbCBzdGFydCB1c2luZw0KPiAgICogYmxrX2lvX3BsdWcoKS9ibGtfaW9fdW5wbHVnKCkgdG8g
-YmF0Y2ggcmVxdWVzdHMgKi8NCj4gICNkZWZpbmUgSU9fUExVR19USFJFU0hPTEQgMQ0KPiArDQo+
-ICtzdGF0aWMgaW50IGJsa19zZW5kX3Jlc3BvbnNlKHN0cnVjdCBpb3JlcSAqaW9yZXEpOw0KPiAr
-DQo+ICAvKiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tICovDQo+IA0KPiAgc3RhdGljIHZvaWQgaW9yZXFfcmVzZXQoc3RydWN0IGlv
-cmVxICppb3JlcSkNCj4gQEAgLTE1NSwxMiArMTU2LDEwIEBAIHN0YXRpYyB2b2lkIGlvcmVxX2Zp
-bmlzaChzdHJ1Y3QgaW9yZXEgKmlvcmVxKQ0KPiAgICAgIHN0cnVjdCBYZW5CbGtEZXYgKmJsa2Rl
-diA9IGlvcmVxLT5ibGtkZXY7DQo+IA0KPiAgICAgIFFMSVNUX1JFTU9WRShpb3JlcSwgbGlzdCk7
-DQo+IC0gICAgUUxJU1RfSU5TRVJUX0hFQUQoJmJsa2Rldi0+ZmluaXNoZWQsIGlvcmVxLCBsaXN0
-KTsNCj4gICAgICBibGtkZXYtPnJlcXVlc3RzX2luZmxpZ2h0LS07DQo+IC0gICAgYmxrZGV2LT5y
-ZXF1ZXN0c19maW5pc2hlZCsrOw0KPiAgfQ0KPiANCj4gLXN0YXRpYyB2b2lkIGlvcmVxX3JlbGVh
-c2Uoc3RydWN0IGlvcmVxICppb3JlcSwgYm9vbCBmaW5pc2gpDQo+ICtzdGF0aWMgdm9pZCBpb3Jl
-cV9yZWxlYXNlKHN0cnVjdCBpb3JlcSAqaW9yZXEpDQo+ICB7DQo+ICAgICAgc3RydWN0IFhlbkJs
-a0RldiAqYmxrZGV2ID0gaW9yZXEtPmJsa2RldjsNCj4gDQo+IEBAIC0xNjgsMTEgKzE2Nyw3IEBA
-IHN0YXRpYyB2b2lkIGlvcmVxX3JlbGVhc2Uoc3RydWN0IGlvcmVxICppb3JlcSwgYm9vbA0KPiBm
-aW5pc2gpDQo+ICAgICAgaW9yZXFfcmVzZXQoaW9yZXEpOw0KPiAgICAgIGlvcmVxLT5ibGtkZXYg
-PSBibGtkZXY7DQo+ICAgICAgUUxJU1RfSU5TRVJUX0hFQUQoJmJsa2Rldi0+ZnJlZWxpc3QsIGlv
-cmVxLCBsaXN0KTsNCj4gLSAgICBpZiAoZmluaXNoKSB7DQo+IC0gICAgICAgIGJsa2Rldi0+cmVx
-dWVzdHNfZmluaXNoZWQtLTsNCj4gLSAgICB9IGVsc2Ugew0KPiAtICAgICAgICBibGtkZXYtPnJl
-cXVlc3RzX2luZmxpZ2h0LS07DQo+IC0gICAgfQ0KPiArICAgIGJsa2Rldi0+cmVxdWVzdHNfaW5m
-bGlnaHQtLTsNCj4gIH0NCj4gDQo+ICAvKg0KPiBAQCAtMzUxLDYgKzM0NiwxMCBAQCBzdGF0aWMg
-dm9pZCBxZW11X2Fpb19jb21wbGV0ZSh2b2lkICpvcGFxdWUsIGludCByZXQpDQo+ICAgICAgZGVm
-YXVsdDoNCj4gICAgICAgICAgYnJlYWs7DQo+ICAgICAgfQ0KPiArICAgIGlmIChibGtfc2VuZF9y
-ZXNwb25zZShpb3JlcSkpIHsNCj4gKyAgICAgICAgeGVuX3B2X3NlbmRfbm90aWZ5KCZibGtkZXYt
-PnhlbmRldik7DQo+ICsgICAgfQ0KPiArICAgIGlvcmVxX3JlbGVhc2UoaW9yZXEpOw0KPiAgICAg
-IHFlbXVfYmhfc2NoZWR1bGUoYmxrZGV2LT5iaCk7DQo+IA0KPiAgZG9uZToNCj4gQEAgLTQ1NSw3
-ICs0NTQsNyBAQCBlcnI6DQo+ICAgICAgcmV0dXJuIC0xOw0KPiAgfQ0KPiANCj4gLXN0YXRpYyBp
-bnQgYmxrX3NlbmRfcmVzcG9uc2Vfb25lKHN0cnVjdCBpb3JlcSAqaW9yZXEpDQo+ICtzdGF0aWMg
-aW50IGJsa19zZW5kX3Jlc3BvbnNlKHN0cnVjdCBpb3JlcSAqaW9yZXEpDQo+ICB7DQo+ICAgICAg
-c3RydWN0IFhlbkJsa0RldiAgKmJsa2RldiA9IGlvcmVxLT5ibGtkZXY7DQo+ICAgICAgaW50ICAg
-ICAgICAgICAgICAgc2VuZF9ub3RpZnkgICA9IDA7DQo+IEBAIC01MDQsMjIgKzUwMyw2IEBAIHN0
-YXRpYyBpbnQgYmxrX3NlbmRfcmVzcG9uc2Vfb25lKHN0cnVjdCBpb3JlcSAqaW9yZXEpDQo+ICAg
-ICAgcmV0dXJuIHNlbmRfbm90aWZ5Ow0KPiAgfQ0KPiANCj4gLS8qIHdhbGsgZmluaXNoZWQgbGlz
-dCwgc2VuZCBvdXRzdGFuZGluZyByZXNwb25zZXMsIGZyZWUgcmVxdWVzdHMgKi8NCj4gLXN0YXRp
-YyB2b2lkIGJsa19zZW5kX3Jlc3BvbnNlX2FsbChzdHJ1Y3QgWGVuQmxrRGV2ICpibGtkZXYpDQo+
-IC17DQo+IC0gICAgc3RydWN0IGlvcmVxICppb3JlcTsNCj4gLSAgICBpbnQgc2VuZF9ub3RpZnkg
-PSAwOw0KPiAtDQo+IC0gICAgd2hpbGUgKCFRTElTVF9FTVBUWSgmYmxrZGV2LT5maW5pc2hlZCkp
-IHsNCj4gLSAgICAgICAgaW9yZXEgPSBRTElTVF9GSVJTVCgmYmxrZGV2LT5maW5pc2hlZCk7DQo+
-IC0gICAgICAgIHNlbmRfbm90aWZ5ICs9IGJsa19zZW5kX3Jlc3BvbnNlX29uZShpb3JlcSk7DQo+
-IC0gICAgICAgIGlvcmVxX3JlbGVhc2UoaW9yZXEsIHRydWUpOw0KPiAtICAgIH0NCj4gLSAgICBp
-ZiAoc2VuZF9ub3RpZnkpIHsNCj4gLSAgICAgICAgeGVuX3B2X3NlbmRfbm90aWZ5KCZibGtkZXYt
-PnhlbmRldik7DQo+IC0gICAgfQ0KPiAtfQ0KPiAtDQo+ICBzdGF0aWMgaW50IGJsa19nZXRfcmVx
-dWVzdChzdHJ1Y3QgWGVuQmxrRGV2ICpibGtkZXYsIHN0cnVjdCBpb3JlcSAqaW9yZXEsDQo+IFJJ
-TkdfSURYIHJjKQ0KPiAgew0KPiAgICAgIHN3aXRjaCAoYmxrZGV2LT5wcm90b2NvbCkgew0KPiBA
-QCAtNTU0LDcgKzUzNyw2IEBAIHN0YXRpYyB2b2lkIGJsa19oYW5kbGVfcmVxdWVzdHMoc3RydWN0
-IFhlbkJsa0Rldg0KPiAqYmxrZGV2KQ0KPiAgICAgIHJwID0gYmxrZGV2LT5yaW5ncy5jb21tb24u
-c3JpbmctPnJlcV9wcm9kOw0KPiAgICAgIHhlbl9ybWIoKTsgLyogRW5zdXJlIHdlIHNlZSBxdWV1
-ZWQgcmVxdWVzdHMgdXAgdG8gJ3JwJy4gKi8NCj4gDQo+IC0gICAgYmxrX3NlbmRfcmVzcG9uc2Vf
-YWxsKGJsa2Rldik7DQo+ICAgICAgLyogSWYgdGhlcmUgd2FzIG1vcmUgdGhhbiBJT19QTFVHX1RI
-UkVTSE9MRCBpb3JlcXMgaW4gZmxpZ2h0DQo+ICAgICAgICogd2hlbiB3ZSBnb3QgaGVyZSwgdGhp
-cyBpcyBhbiBpbmRpY2F0aW9uIHRoYXQgdGhlcmUgdGhlIGJvdHRsZW5lY2sNCj4gICAgICAgKiBp
-cyBiZWxvdyB1cywgc28gaXQncyB3b3J0aCBiZWdpbm5pbmcgdG8gYmF0Y2ggdXAgSS9PIHJlcXVl
-c3RzDQo+IEBAIC01OTcsMTAgKzU3OSwxMCBAQCBzdGF0aWMgdm9pZCBibGtfaGFuZGxlX3JlcXVl
-c3RzKHN0cnVjdCBYZW5CbGtEZXYNCj4gKmJsa2RldikNCj4gICAgICAgICAgICAgICAgICBicmVh
-azsNCj4gICAgICAgICAgICAgIH07DQo+IA0KPiAtICAgICAgICAgICAgaWYgKGJsa19zZW5kX3Jl
-c3BvbnNlX29uZShpb3JlcSkpIHsNCj4gKyAgICAgICAgICAgIGlmIChibGtfc2VuZF9yZXNwb25z
-ZShpb3JlcSkpIHsNCj4gICAgICAgICAgICAgICAgICB4ZW5fcHZfc2VuZF9ub3RpZnkoJmJsa2Rl
-di0+eGVuZGV2KTsNCj4gICAgICAgICAgICAgIH0NCj4gLSAgICAgICAgICAgIGlvcmVxX3JlbGVh
-c2UoaW9yZXEsIGZhbHNlKTsNCj4gKyAgICAgICAgICAgIGlvcmVxX3JlbGVhc2UoaW9yZXEpOw0K
-PiAgICAgICAgICAgICAgY29udGludWU7DQo+ICAgICAgICAgIH0NCj4gDQo+IEBAIC02NDYsNyAr
-NjI4LDYgQEAgc3RhdGljIHZvaWQgYmxrX2FsbG9jKHN0cnVjdCBYZW5EZXZpY2UgKnhlbmRldikN
-Cj4gICAgICB0cmFjZV94ZW5fZGlza19hbGxvYyh4ZW5kZXYtPm5hbWUpOw0KPiANCj4gICAgICBR
-TElTVF9JTklUKCZibGtkZXYtPmluZmxpZ2h0KTsNCj4gLSAgICBRTElTVF9JTklUKCZibGtkZXYt
-PmZpbmlzaGVkKTsNCj4gICAgICBRTElTVF9JTklUKCZibGtkZXYtPmZyZWVsaXN0KTsNCj4gDQo+
-ICAgICAgYmxrZGV2LT5pb3RocmVhZCA9IGlvdGhyZWFkX2NyZWF0ZSh4ZW5kZXYtPm5hbWUsICZl
-cnIpOw0KDQo=
+On 01/11/2018 16:17, Peter Maydell wrote:
+
+> In ppc_core99_init(), we allocate an openpic_irqs array, which
+> we then use to collect up the various qemu_irqs which we're
+> going to connect to the interrupt controller. Once we've
+> called sysbus_connect_irq() to connect them all up, the
+> array is no longer required, but we forgot to free it.
+> 
+> Since board init is only run once at startup, the memory
+> leak is not a significant one.
+> 
+> Spotted by Coverity: CID 1192916.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  hw/ppc/mac_newworld.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+> index a630cb81cd8..14273a123e5 100644
+> --- a/hw/ppc/mac_newworld.c
+> +++ b/hw/ppc/mac_newworld.c
+> @@ -303,6 +303,7 @@ static void ppc_core99_init(MachineState *machine)
+>              sysbus_connect_irq(s, k++, openpic_irqs[i][j]);
+>          }
+>      }
+> +    g_free(openpic_irqs);
+>  
+>      if (PPC_INPUT(env) == PPC_FLAGS_INPUT_970) {
+>          /* 970 gets a U3 bus */
+> 
+
+Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+
+I did notice the generation of this 2D array for the OpenPIC controller whilst
+converting the Mac machines over to qdev, but wasn't exactly sure what to do here so
+I left it.
+
+
+ATB,
+
+Mark.
