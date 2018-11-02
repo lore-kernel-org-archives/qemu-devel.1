@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43423)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gIYwX-0005NH-As
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 08:52:58 -0400
+	(envelope-from <david@redhat.com>) id 1gIYxz-0000U0-HJ
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 08:54:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gIYhN-0004hg-6A
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 08:37:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33179)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gIYhJ-0004dL-0H
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 08:37:10 -0400
-Date: Fri, 2 Nov 2018 12:36:37 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20181102123637.GB6551@stefanha-x1.localdomain>
-References: <20181031084309.9227-1-stefanha@redhat.com>
-	<20181031084309.9227-4-stefanha@redhat.com>
-	<6142c381-af70-e0d6-88e6-a2f82943e4ea@redhat.com>
+	(envelope-from <david@redhat.com>) id 1gIYxo-00063D-KW
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 08:54:20 -0400
+References: <1541154621-22423-1-git-send-email-pmorel@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <9d08961f-a29c-67e5-4ed4-3014d603b169@redhat.com>
+Date: Fri, 2 Nov 2018 13:53:52 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="K8nIJk4ghYZn606h"
-Content-Disposition: inline
-In-Reply-To: <6142c381-af70-e0d6-88e6-a2f82943e4ea@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/4] MAINTAINERS: use 'https://' instead of
- 'git://' for GitHub
+In-Reply-To: <1541154621-22423-1-git-send-email-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 0/5] s390x/vfio: VFIO-AP interrupt
+ control interception
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +24,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Pierre Morel <pmorel@linux.ibm.com>, borntraeger@de.ibm.com
+Cc: cohuck@redhat.com, agraf@suse.de, rth@twiddle.net, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, peter.maydell@linaro.org, pbonzini@redhat.com, mst@redhat.com, eric.auger@redhat.com, akrowiak@linux.ibm.com, pasic@linux.ibm.com
 
+On 02.11.18 11:30, Pierre Morel wrote:
+> The S390 APQP/AQIC instruction can be intercepted by the host
+> to configure the AP queues interruption handling for and handle
+> the ISC used by the host and the guest and the indicator address.
+> 
+> This patch series define the AQIC feature in the cpumodel,
+> extend the APDevice type for per queue interrupt handling,
+> intercept the APQP/AQIC instruction, uses the S390 adapter interface
+> to setup the adapter and use a VFIO ioctl to let the VFIO-AP
+> driver handle the host instruction associated with the intercepted
+> guest instruction.
+> 
+> This patch serie can be tested with the Linux/KVM patch series
+> for the VFIO-AP driver: "s390: vfio: ap: Using GISA for AP Interrupt"
+> 
+> Pierre Morel (5):
+>   s390x/vfio: ap: Linux uapi VFIO place holder
+>   s390x/cpumodel: Set up CPU model for AQIC interception
+>   s390x/vfio: ap: Definition for AP Adapter type
+>   s390x/vfio: ap: Intercepting AP Queue Interrupt Control
+>   s390x/vfio: ap: Implementing AP Queue Interrupt Control
+> 
+>  hw/vfio/ap.c                    | 100 ++++++++++++++++++++++++++++++++
+>  include/hw/s390x/ap-device.h    |  55 ++++++++++++++++++
+>  include/hw/s390x/css.h          |   1 +
+>  linux-headers/linux/vfio.h      |  22 +++++++
+>  target/s390x/cpu_features.c     |   1 +
+>  target/s390x/cpu_features_def.h |   1 +
+>  target/s390x/cpu_models.c       |   1 +
+>  target/s390x/kvm.c              |  20 +++++++
+>  8 files changed, 201 insertions(+)
+> 
 
---K8nIJk4ghYZn606h
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I had a very quick high level look at it and it seems to be in general fine.
 
-On Wed, Oct 31, 2018 at 08:31:09AM -0500, Eric Blake wrote:
-> On 10/31/18 3:43 AM, Stefan Hajnoczi wrote:
-> > When you clone the repository without previous commit history, 'git://'
-> > doesn't protect from man-in-the-middle attacks.  HTTPS is more secure
-> > since the client verifies the server certificate.
-> >=20
-> > Reported-by: Jann Horn <jannh@google.com>
-> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > ---
-> >   MAINTAINERS | 74 ++++++++++++++++++++++++++---------------------------
-> >   1 file changed, 37 insertions(+), 37 deletions(-)
->=20
-> We should also do the same for maintainers using git://repo.or.cz:
+-- 
 
-Your wish is my command.  Fixed in v2.
+Thanks,
 
-Stefan
-
---K8nIJk4ghYZn606h
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJb3ETVAAoJEJykq7OBq3PIOQQH/jF502jlC7DEqis2xDfg8Wbd
-LDA/vYAv/OpwYZ8i9NNA7Pg181d3S84aKrpog0NcH1LPrnrSs7TIeuzYnRuXGxyX
-1j7GX61XIBJM70GxBTEggb5QO4/kSGI9AM4lavDTOh05zMdg2lRS6fcfdsZ6LZy8
-5S058ZtioRLUSA2zf1LFfEC59q58Tt8s0Gk93K6xkZtdsG9/TRmpBXLtTutVSuuj
-kbh2IidxWNp9cMVS5Ux69JX7GC+Yz7Hdo0eFeFdxSwJCJdBz41V2J/QaHLz58fws
-2q7wEK0zLbMg2VQPdNuhG1O768Vix6GZMS+qJ6ZIC4pVv1+/Rg1hMLK0BcpxN4w=
-=1fcH
------END PGP SIGNATURE-----
-
---K8nIJk4ghYZn606h--
+David / dhildenb
