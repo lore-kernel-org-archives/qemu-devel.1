@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46994)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <christoffer.dall@arm.com>) id 1gIfEe-0005jy-63
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 15:36:03 -0400
+	(envelope-from <Chris.Friesen@windriver.com>) id 1gIgKc-0005bl-8s
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 16:46:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <christoffer.dall@arm.com>) id 1gIfEX-0003KV-J7
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 15:35:58 -0400
-Date: Fri, 2 Nov 2018 20:35:29 +0100
-From: Christoffer Dall <christoffer.dall@arm.com>
-Message-ID: <20181102193529.GB12057@e113682-lin.lund.arm.com>
-References: <20181102145433.4553-1-richard.henderson@linaro.org>
-	<CAFEAcA_tcR_33Q+2ZFHdzo4_9khXggum=gRfZ8+L49KmP3hHiw@mail.gmail.com>
+	(envelope-from <Chris.Friesen@windriver.com>) id 1gIgKY-0002pI-Gl
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 16:46:13 -0400
+Received: from mail5.windriver.com ([192.103.53.11]:56814 helo=mail5.wrs.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Chris.Friesen@windriver.com>)
+	id 1gIgKX-0002jH-RQ
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 16:46:10 -0400
+References: <d5d6e09a-78ed-41c4-bbb9-260263c05bf2@windriver.com>
+	<87pnvn6hnq.fsf@linaro.org>
+	<b109fe05-1e88-a6e3-34cb-21a4b61e64b3@windriver.com>
+	<87lg6b5shx.fsf@linaro.org>
+	<98428a27-8634-9521-297c-a61c618e867a@windriver.com>
+	<20181102175111.GA2388@work-vm>
+From: Chris Friesen <chris.friesen@windriver.com>
+Message-ID: <54304edc-9de4-a25a-63d0-96518c5d7956@windriver.com>
+Date: Fri, 2 Nov 2018 14:45:05 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_tcR_33Q+2ZFHdzo4_9khXggum=gRfZ8+L49KmP3hHiw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/5] target/arm: KVM vs ARMISARegisters
+In-Reply-To: <20181102175111.GA2388@work-vm>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] strange situation,
+ guest cpu thread spinning at ~100%, but display not yet initialized
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,116 +34,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <Dave.Martin@arm.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, famz@redhat.com
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 
-On Fri, Nov 02, 2018 at 04:36:35PM +0000, Peter Maydell wrote:
-> On 2 November 2018 at 14:54, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
-> > My previous patch set for replacing feature bits with id registers
-> > failed to consider that these id registers are beginning to control
-> > migration, and thus we must fill them in for KVM as well.
-> >
-> > Thus, we want to initialize these values within CPU from the host.
-> >
-> > Finally, re-send the T32EE conversion patch, fixing the build
-> > failure on an arm32 host in kvm32.c.
-> >
-> > Changes, v1->v2:
-> >   * Remove assert that AArch32 sysreg <= UINT32_MAX.
-> >   * Remove unused local variable.
-> >   * Add commentary for AArch32 sysregs vs missing AArch32 support.
-> 
-> As noted on IRC, on my admittedly pretty ancient 4.8.0 kernel some
-> of these ID register reads via KVM_GET_ONE_REG fail ENOENT.
-> strace says:
-> 
-> openat(AT_FDCWD, "/dev/kvm", O_RDWR|O_CLOEXEC) = 18
-> ioctl(18, KVM_CREATE_VM or LOGGER_GET_LOG_BUF_SIZE, 0) = 19
-> ioctl(19, KVM_CREATE_VCPU, 0)           = 20
-> ioctl(19, KVM_ARM_PREFERRED_TARGET, 0xffffcfeb4e88) = 0
-> ioctl(20, KVM_ARM_VCPU_INIT, 0xffffcfeb4e88) = 0
-> ioctl(20, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xffffcfeb4e28)
-> = -1 ENOENT (No such file or directory)
-> ioctl(20, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xffffcfeb4e28)
-> = -1 ENOENT (No such file or directory)
-> ioctl(20, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xffffcfeb4e28)
-> = -1 ENOENT (No such file or directory)
-> ioctl(20, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xffffcfeb4e28)
-> = -1 ENOENT (No such file or directory)
-> ioctl(20, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xffffcfeb4e28) = 0
-> ioctl(20, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xffffcfeb4e28) = 0
-> ioctl(20, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xffffcfeb4e28) = 0
-> ioctl(20, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xffffcfeb4e28) = 0
-> ioctl(20, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xffffcfeb4e28) = 0
-> ioctl(20, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xffffcfeb4e28) = 0
-> ioctl(20, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xffffcfeb4e28)
-> = -1 ENOENT (No such file or directory)
-> ioctl(20, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xffffcfeb4e28)
-> = -1 ENOENT (No such file or directory)
-> ioctl(20, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xffffcfeb4e28)
-> = -1 ENOENT (No such file or directory)
-> ioctl(20, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xffffcfeb4e28)
-> = -1 ENOENT (No such file or directory)
-> 
-> 
-> I added a bit of extra tracing, since strace doesn't
-> print the ID field for the ioctl:
-> 
-> peter.maydell@mustang-maydell:~/qemu$
-> ~/test-images/virtv8-for-nesting/runme-kvm
-> ./build/for-kvm/aarch64-softmmu/qemu-system-aarch64 -enable-kvm -cpu
-> max -machine gic-version=max
-> read_sys_reg64: reading ID 0x603000000013c030...-1
-> read_sys_reg64: reading ID 0x603000000013c031...-1
-> read_sys_reg64: reading ID 0x603000000013c020...-1
-> read_sys_reg64: reading ID 0x603000000013c021...-1
-> read_sys_reg32: reading ID 0x603000000013c010...0
-> read_sys_reg32: reading ID 0x603000000013c011...0
-> read_sys_reg32: reading ID 0x603000000013c012...0
-> read_sys_reg32: reading ID 0x603000000013c013...0
-> read_sys_reg32: reading ID 0x603000000013c014...0
-> read_sys_reg32: reading ID 0x603000000013c015...0
-> read_sys_reg32: reading ID 0x603000000013c017...-1
-> read_sys_reg32: reading ID 0x603000000013c018...-1
-> read_sys_reg32: reading ID 0x603000000013c019...-1
-> read_sys_reg32: reading ID 0x603000000013c01a...-1
-> qemu-system-aarch64: Failed to retrieve host CPU features
-> 
-> It looks like the kernel can handle reads of ID_ISAR0_EL1
-> through ID_ISAR5_EL1, but not ID_ISAR6_EL1, any of the
-> MVFR*_EL1 or ID_AA64_ISAR* or ID_AA64PFR*.
-> 
-> This is probably because the kernel is way too old to be
-> interestingly supportable for KVM, but we did previously
-> manage to boot on this setup.
+On 11/2/2018 11:51 AM, Dr. David Alan Gilbert wrote:
 
-I'm a little confused. v4.8 used to work (although it was perhaps not
-the most stable at that time).  What changed?  Is this attempting to
-restore a VM from a newer kernel, or has QEMU been updated to detect
-this?
+> This is ringing a bell; if it's actually suck in the BIOS, then please:
+>    a) Really make sure all your vCPUs are actually pinned/free on real
+> CPUs
+>    b) I suspect it is
+>     https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg00470.html
 
-> 
-> We should probably at least figure out which version of
-> the kernel fixed this bug and made the ID registers available
-> to userspace... if it's sufficiently ancient we could
-> likely say "not supported", but if it's more recent we
-> need a workaround somehow. I have cc'd a couple of kernel
-> folks who might be able to help with the "which version"
-> question.
-> 
+I'm still working on getting the BIOS logs to be emitted to file before 
+kernel startup (I can see them later on, but not right at boot).
 
-It appears the support for exposing a bunch of ID registers was
-introduced with:
+Will double-check the actual affinity next time I reproduce it (testcase 
+has been going all day with no luck so far).
 
-93390c0a1b20 (arm64: KVM: Hide unsupported AArch64 CPU features from guests, 2017-10-31)
+>     so the fix is Fam's 'aio: Do aio_notify_accept only during blocking
+> aio_poll'.  I see you're running the qemu-kvm-ev from centos, if I read
+> the version tea-leaves right, then I think that patch is in the
+> 2.10.0-21.el7_5.7.1 package I can see.
 
-Which Dave (cc'ed) wrote and which was introduced in v4.15.
-
-As per my question above, I'm not exactly sure what (if anything) we
-need to fix on the kernel side?
-
+It looks like we do not have this fix in our code, will definitely be 
+giving it a try.
 
 Thanks,
-
-    Christoffer
+Chris
