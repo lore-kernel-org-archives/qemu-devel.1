@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57883)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gIN8z-00045B-Qd
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 20:16:58 -0400
+	(envelope-from <viktor.prutyanov@phystech.edu>) id 1gINKU-000636-Hc
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 20:28:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gIN8w-0006lJ-Ks
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 20:16:57 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:33890)
+	(envelope-from <viktor.prutyanov@phystech.edu>) id 1gINKP-0003hh-HA
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 20:28:50 -0400
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:43291)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gIN8w-0006kv-EH
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 20:16:54 -0400
-Received: by mail-wm1-f68.google.com with SMTP id f1-v6so157867wmg.1
-	for <qemu-devel@nongnu.org>; Thu, 01 Nov 2018 17:16:54 -0700 (PDT)
-References: <20181101215739.29788-1-richard.henderson@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <ae4bd424-a8bc-710e-1a70-00b319845f0a@redhat.com>
-Date: Fri, 2 Nov 2018 01:16:50 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181101215739.29788-1-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target/arm: Conditionalize arm_div assert
- on aarch32 support
+	(Exim 4.71) (envelope-from <viktor.prutyanov@phystech.edu>)
+	id 1gINKP-0003gq-0N
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 20:28:45 -0400
+Received: by mail-lj1-x241.google.com with SMTP id g26-v6so220633lja.10
+	for <qemu-devel@nongnu.org>; Thu, 01 Nov 2018 17:28:44 -0700 (PDT)
+From: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
+Date: Fri,  2 Nov 2018 03:28:16 +0300
+Message-Id: <20181102002818.8568-1-viktor.prutyanov@phystech.edu>
+Subject: [Qemu-devel] [PATCH 0/2] contrib/elf2dmp: elf2dmp for Windows hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,67 +24,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
+To: pbonzini@redhat.com, rkagan@virtuozzo.com
+Cc: qemu-devel@nongnu.org, Viktor Prutyanov <viktor.prutyanov@phystech.edu>
 
-On 1/11/18 22:57, Richard Henderson wrote:
-> When populating id registers from kvm, on a host that doesn't support
-> aarch32 mode at all, aa32_arm_div will not be supported either.
-> 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
-> 
-> "Tested" on an APM Mustang, which does support AArch32.  I'm not
-> sure, off hand, which cpu(s) don't have it, and Alex didn't say
-> in his bug report.  Tsk tsk.  ;-)
+In most cases, it is more convenient to convert a dump on the same machine
+on which the analysis is performed. Because of WinDbg, the analysis of guest
+Windows problems needs Windows host anyway, so it is useful to have dump
+convertion tool near the debugger.
+After these patches elf2dmp can be built both for Linux and Windows hosts.
 
-Packet provides access to cavium,thunder-88xx cpus which lack aa32.
+Viktor Prutyanov (2):
+  contrib/elf2dmp: use GLib file mapping
+  contrib/elf2dmp: elf2dmp for Windows hosts
 
-> 
-> 
-> r~
-> 
-> ---
->   target/arm/cpu.h |  5 +++++
->   target/arm/cpu.c | 10 +++++++++-
->   2 files changed, 14 insertions(+), 1 deletion(-)
-> 
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index 895f9909d8..4521ad5ae8 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -3300,6 +3300,11 @@ static inline bool isar_feature_aa64_fp16(const ARMISARegisters *id)
->       return FIELD_EX64(id->id_aa64pfr0, ID_AA64PFR0, FP) == 1;
->   }
->   
-> +static inline bool isar_feature_aa64_a32(const ARMISARegisters *id)
-> +{
-> +    return FIELD_EX64(id->id_aa64pfr0, ID_AA64PFR0, EL0) == 2;
-> +}
-> +
->   static inline bool isar_feature_aa64_sve(const ARMISARegisters *id)
->   {
->       return FIELD_EX64(id->id_aa64pfr0, ID_AA64PFR0, SVE) != 0;
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index e08a2d2d79..988d97d1f1 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -828,8 +828,16 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
->            * include the various other features that V7VE implies.
->            * Presence of EL2 itself is ARM_FEATURE_EL2, and of the
->            * Security Extensions is ARM_FEATURE_EL3.
-> +         *
-> +         * V7VE requires ARM division.  However, there exist AArch64 cpus
-> +         * without AArch32 support.  When KVM queries ID_ISAR0_EL1 on such
-> +         * a host, the value is UNKNOWN.  Similarly, we cannot check
-> +         * ID_AA64PFR0 without AArch64 support.  Check everything in order.
->            */
-> -        assert(cpu_isar_feature(arm_div, cpu));
-> +        if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64)
-> +            && cpu_isar_feature(aa64_a32, cpu)) {
-> +            assert(cpu_isar_feature(arm_div, cpu));
-> +        }
->           set_feature(env, ARM_FEATURE_LPAE);
->           set_feature(env, ARM_FEATURE_V7);
->       }
-> 
+ Makefile                      |  4 ++--
+ contrib/elf2dmp/Makefile.objs |  2 +-
+ contrib/elf2dmp/addrspace.c   |  7 ++++---
+ contrib/elf2dmp/file_map.c    | 30 ++++++++++++++++++++++++++++++
+ contrib/elf2dmp/file_map.h    | 21 +++++++++++++++++++++
+ contrib/elf2dmp/kdbg.h        | 12 ++++++++----
+ contrib/elf2dmp/main.c        | 27 +++++++++++++++------------
+ contrib/elf2dmp/pdb.c         | 32 ++++++++------------------------
+ contrib/elf2dmp/pdb.h         |  7 +++++--
+ contrib/elf2dmp/pe.h          |  6 ++++--
+ contrib/elf2dmp/qemu_elf.c    | 34 ++++++++++++----------------------
+ contrib/elf2dmp/qemu_elf.h    | 15 ++++++++-------
+ 12 files changed, 118 insertions(+), 79 deletions(-)
+ create mode 100644 contrib/elf2dmp/file_map.c
+ create mode 100644 contrib/elf2dmp/file_map.h
+
+-- 
+2.17.2
