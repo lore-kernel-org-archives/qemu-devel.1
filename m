@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51122)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gIXUs-0007sg-11
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:20:14 -0400
+	(envelope-from <laurent@vivier.eu>) id 1gIXaE-00028M-GT
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:25:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gIXUr-0004SS-9c
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:20:13 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:40738)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gIXUo-0004L4-Nd
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:20:11 -0400
-Received: by mail-oi1-x244.google.com with SMTP id u130-v6so1278308oie.7
-	for <qemu-devel@nongnu.org>; Fri, 02 Nov 2018 04:20:09 -0700 (PDT)
+	(envelope-from <laurent@vivier.eu>) id 1gIXaA-00076g-E9
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:25:46 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:55601)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1gIXa4-0006jD-DX
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:25:40 -0400
+References: <20181029134000.11157-1-mark.cave-ayland@ilande.co.uk>
+	<97900b04-28f0-975f-b3c0-2c0aa7039a4f@linaro.org>
+	<5c41b46c-70e3-33a0-76cf-ba2fd8155d33@ilande.co.uk>
+	<393eca98-a092-80aa-2016-f14cd2e02d45@vivier.eu>
+	<3b1f8942-d8c7-04db-45bc-a7c30de9d769@ilande.co.uk>
+	<ad444bbf-0606-2b80-7f7d-389a6df29cfe@vivier.eu>
+	<49e0547c-0112-c610-6755-5d6a82b1e105@posteo.de>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <7787c5d5-598a-65e2-7d40-d580551704ca@vivier.eu>
+Date: Fri, 2 Nov 2018 12:25:16 +0100
 MIME-Version: 1.0
-In-Reply-To: <3f9658de-e86f-9e6a-3f81-64ddbeccc0a7@ilande.co.uk>
-References: <20181101161758.12300-1-peter.maydell@linaro.org>
-	<3f9658de-e86f-9e6a-3f81-64ddbeccc0a7@ilande.co.uk>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 2 Nov 2018 11:19:48 +0000
-Message-ID: <CAFEAcA-f_XgMY=D1udLJtV-j34kqTWK0N+w-8YXeSgPf5SfCSQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-3.1] hw/ppc/mac_newworld: Free
- openpic_irqs array after use
+In-Reply-To: <49e0547c-0112-c610-6755-5d6a82b1e105@posteo.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 00/11] hw/m68k: add Apple Machintosh
+ Quadra 800 machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,54 +34,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
+To: Thomas Huth <th.huth@posteo.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, hpoussin@reactos.org, aurelien@aurel32.net
 
-On 2 November 2018 at 11:14, Mark Cave-Ayland
-<mark.cave-ayland@ilande.co.uk> wrote:
-> On 01/11/2018 16:17, Peter Maydell wrote:
->
->> In ppc_core99_init(), we allocate an openpic_irqs array, which
->> we then use to collect up the various qemu_irqs which we're
->> going to connect to the interrupt controller. Once we've
->> called sysbus_connect_irq() to connect them all up, the
->> array is no longer required, but we forgot to free it.
+On 02/11/2018 01:32, Thomas Huth wrote:
+> On 2018-10-30 13:39, Laurent Vivier wrote:
+>> Le 30/10/2018 à 14:12, Mark Cave-Ayland a écrit :
+>>> On 30/10/2018 12:49, Laurent Vivier wrote:
+>>>
+>>>> Le 30/10/2018 à 12:48, Mark Cave-Ayland a écrit :
+>>>>> On 30/10/2018 08:15, Richard Henderson wrote:
+>>>>>
+>>>>>> On 10/29/18 1:39 PM, Mark Cave-Ayland wrote:
+>>>>>>> You can install your own disk using debian-installer, with:
+>>>>>>>
+>>>>>>>     ...
+>>>>>>>     -M q800 \
+>>>>>>>     -serial none -serial mon:stdio \
+>>>>>>>     -m 1000M -drive file=m68k.qcow2,format=qcow2 \
+>>>>>>>     -net nic,model=dp83932,addr=09:00:07:12:34:57 \
+>>>>>>>     -append "console=ttyS0 vga=off" \
+>>>>>>>     -kernel vmlinux-4.15.0-2-m68k \
+>>>>>>>     -initrd initrd.gz \
+>>>>>>>     -drive file=debian-9.0-m68k-NETINST-1.iso \
+>>>>>>>     -drive file=m68k.qcow2,format=qcow2 \
+>>>>>>>     -nographic
+>>>>>>
+>>>>>> I tried this and got
+>>>>>>
+>>>>>> Trace 0: 0x7f2e886c7140 [00000000/0000d404/0xe000]
+>>>>>> INT      1: Unassigned(0xf4) pc=0000d404 sp=00393e60 sr=2700
+>>>>>> INT      2: Access Fault(0x8) pc=00000000 sp=00393e58 sr=2700
+>>>>>>             ssw:  00000506 ea:   00000000 sfc:  5    dfc: 5
+>>>>>>
+>>>>>> which lead straight to buserr and panic.  This happens way early in boot --
+>>>>>> only 1926 TranslationBlocks generated.
+>>>>>>
+>>>>>> Is there some device missing from the command-line that the kernel is expecting?
+>>>>>
+>>>>> Heh that's annoying. The original branch I forked that Laurent was working on had
+>>>>> some extra patches at the start of the series: some were required for q800 whilst
+>>>>> others were for new development. I thought that all of the patches required for q800
+>>>>> had been applied over the past few months, but sadly that isn't the case :(
+>>>>>
+>>>>> I've pushed an updated branch to https://github.com/mcayland/qemu/tree/q800-test
+>>>>> which contains the patchset plus two extra patches that are still needed to boot to
+>>>>> the debian installer here:
+>>>>>
+>>>>> 9281a5371f "tmp"
+>>>>> 629754d847 "target/m68k: manage FPU exceptions"
+>>>>>
+>>>>> Laurent, are these patches ready for upstream or do they need work in which case we
+>>>>> should leave q800 until the 3.2 cycle?
+>>>>
+>>>> The only needed part is from 9281a5371f.
+>>>
+>>> Yeah I think you're right, sorry about that. I'm sure I tried without 629754d847 and
+>>> I got a premature exit from QEMU but only in graphic mode, but I've just tried again
+>>> and can't seem to recreate it now.
+> [...]
+>>>> Because kernel only manages illegal instruction exception not unsupported.
+>>>>
+>>>> Without the patch, we have:
+>>>>
+>>>> IN:
+>>>> 0x0000d454:  071400
+>>>>
+>>>> INT      1: Unassigned(0xf4) pc=0000d454 sp=00331e60 sr=2700
+>>>>
+>>>> with the patch:
+>>>>
+>>>> IN:
+>>>> 0x0000d454:  071400
+>>>>
+>>>> INT      1: Illegal Instruction(0x10) pc=0000d454 sp=00331e60 sr=2700
+>>>>
+>>>> We have in linux/arch/m68k/kernel/vectors.c:
+>>>>
+>>>> /*
+>>>>  * this must be called very early as the kernel might
+>>>>  * use some instruction that are emulated on the 060
+>>>>  * and so we're prepared for early probe attempts (e.g. nf_init).
+>>>>  */
+>>>> void __init base_trap_init(void)
+>>>> {
+>>>> ...
+>>>>
+>>>>         vectors[VEC_BUSERR] = buserr;
+>>>>         vectors[VEC_ILLEGAL] = trap;
+>>>>         vectors[VEC_SYS] = system_call;
+>>>> }
+>>>>
+>>>> So I think the unsupported vector jumps to an invalid address.
+>>>>
+>>>> This seems triggered by the aranym native feature:
+>>>>
+>>>>     d454:       7300            mvsb %d0,%d1
+>>>>
+>>>> from linux/arch/m68k/emu/natfeat.c
+>>>
+>>> Interesting. So is this an actual bug in QEMU in terms of implementing the processor
+>>> specification, or is it relying on undefined behaviour on real hardware?
 >>
->> Since board init is only run once at startup, the memory
->> leak is not a significant one.
+>> It's a bug in QEMU.
 >>
->> Spotted by Coverity: CID 1192916.
+>> EXCP_UNSUPPORTED is defined to a QEMU specific value (61) that is in the
+>> Unassigned/Reserved range of the vector table.
 >>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
->>  hw/ppc/mac_newworld.c | 1 +
->>  1 file changed, 1 insertion(+)
+>> It is used by QEMU user-mode to trigger illegal instruction, whereas
+>> illegal is also used to do simcalls (some thing like a syscall with an
+>> illegal instruction trap). I think this should be deprecated as no one
+>> is maintaining that and knows how to use that.
 >>
->> diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
->> index a630cb81cd8..14273a123e5 100644
->> --- a/hw/ppc/mac_newworld.c
->> +++ b/hw/ppc/mac_newworld.c
->> @@ -303,6 +303,7 @@ static void ppc_core99_init(MachineState *machine)
->>              sysbus_connect_irq(s, k++, openpic_irqs[i][j]);
->>          }
->>      }
->> +    g_free(openpic_irqs);
->>
->>      if (PPC_INPUT(env) == PPC_FLAGS_INPUT_970) {
->>          /* 970 gets a U3 bus */
->>
->
-> Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->
-> I did notice the generation of this 2D array for the OpenPIC controller whilst
-> converting the Mac machines over to qdev, but wasn't exactly sure what to do here so
-> I left it.
+>> Perhaps Thomas as an idea as it comes with the coldfire implementation?
+>> (e6e5906b6e ColdFire target)
+> 
+> No clue, I've never used those simcalls before.
+> 
+> Maybe we could "fix" it simply by changing the #define in cpu.h like this:
+> 
+> #if defined(CONFIG_USER_ONLY)
+> #define EXCP_UNSUPPORTED    61
+> #else
+> #define EXCP_UNSUPPORTED    EXCP_ILLEGAL
+> #endif
+> 
 
-In some sense the array isn't really necessary at all -- instead
-of "fill in array with things; create PIC; sysbus_connect_irq from array"
-you could just do "create PIC; sysbus_connect_irq to things".
-But for this patch I opted to just free the memory rather than
-attempt more complicated refactoring.
+I've found EXCP_UNSUPPORTED is a valid value to softmmu too, only
+supported by some coldfire version.
 
-thanks
--- PMM
+In fact, we don't need the EXCP_UNSUPPORTED, the EXCP_ILLEGAL is used to
+call the simcall interface. Before the introduction of m680x0 emulation
+, EXCP_ILLEGAL was only used with the "illegal" instruction, other
+unsupported instructions triggered the EXCP_UNSUPPORTED. So only the
+"illegal" instruction was able to enter in the simcall interface.
+As I have changed that, I think it should not work correctly anymore,
+and I have no idea how to test that... and I'm pretty sure no one is
+using that anymore (and if needed could switch to the standard "trap #0"
+linux-user interface)
+
+> 
+> If that does not work, I'm also fine if we simply deprecate the simcalls
+> (if possible).
+
+I have a patch to deprecate the interface. I will send it once the
+release will be done.
+
+Thanks,
+Laurent
