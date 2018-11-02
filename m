@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36628)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=837309f22=marcolso@amazon.com>)
-	id 1gIdg9-0005On-Lf
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 13:56:18 -0400
+	(envelope-from <philmd@redhat.com>) id 1gIdks-0000WP-MF
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 14:01:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=837309f22=marcolso@amazon.com>)
-	id 1gIdg4-0006km-8v
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 13:56:17 -0400
-References: <ae2d0fbd-5198-47e8-9ad2-40a85f0b3576@default>
-	<ad9227ab-bcce-1703-e6aa-a7b14907868b@redhat.com>
-From: Marc Olson <marcolso@amazon.com>
-Message-ID: <e9a68107-ccde-337d-25f2-5636c8a89f19@amazon.com>
-Date: Fri, 2 Nov 2018 10:55:54 -0700
+	(envelope-from <philmd@redhat.com>) id 1gIdkk-00028s-27
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 14:01:08 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:39309)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gIdkg-00026o-Ae
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 14:00:58 -0400
+Received: by mail-wr1-f66.google.com with SMTP id r10-v6so2847032wrv.6
+	for <qemu-devel@nongnu.org>; Fri, 02 Nov 2018 11:00:57 -0700 (PDT)
+References: <20181102115239.22485-1-peter.maydell@linaro.org>
+	<20181102115239.22485-2-peter.maydell@linaro.org>
+	<734a4792-df43-7715-822f-9670de47da19@redhat.com>
+	<CAFEAcA8xKVn8Ga-DS8Waqysnwr1ncmxNW6rCjJSidKqTK82UAQ@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <4b3c9f8c-68fd-8264-37b5-c7d79f475d02@redhat.com>
+Date: Fri, 2 Nov 2018 19:00:54 +0100
 MIME-Version: 1.0
-In-Reply-To: <ad9227ab-bcce-1703-e6aa-a7b14907868b@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <CAFEAcA8xKVn8Ga-DS8Waqysnwr1ncmxNW6rCjJSidKqTK82UAQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Subject: Re: [Qemu-devel] How to emulate block I/O timeout on qemu side?
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 for-3.1 1/4] tests: Move
+ tests/acpi-test-data/ to tests/data/acpi/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,39 +33,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Dongli Zhang <dongli.zhang@oracle.com>, qemu-devel@nongnu.org
-Cc: Qemu-block <qemu-block@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, "patches@linaro.org" <patches@linaro.org>
 
-On 11/2/18 10:49 AM, John Snow wrote:
-> On 11/02/2018 04:11 AM, Dongli Zhang wrote:
->> Hi,
+On 2/11/18 18:42, Peter Maydell wrote:
+> On 2 November 2018 at 17:38, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
+>> Hi Peter,
 >>
->> Is there any way to emulate I/O timeout on qemu side (not fault injection in VM
->> kernel) without modifying qemu source code?
+>> On 2/11/18 12:52, Peter Maydell wrote:
+>>> We can remove entirely the note in rebuild-expected-aml.sh
+>>> about copying any new data files, because now they will
+>>> be in the source directory, not the build directory, and
+>>> no copying is required.
 >>
->> For instance, I would like to observe/study/debug the I/O timeout handling of
->> nvme, scsi, virtio-blk (not supported) of VM kernel.
 >>
->> Is there a way to trigger this on purpose on qemu side?
->>
->> Thank you very much!
->>
->> Dongli Zhang
->>
-> I don't think the blkdebug driver supports arbitrary delays right now.
-> Maybe we could augment it to do so?
->
-> (I thought someone already had, but maybe it wasn't merged?)
->
-> Aha, here:
->
-> https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg05297.html
-> V2: https://lists.gnu.org/archive/html/qemu-devel/2018-09/msg00394.html
->
-> Let's work from there.
+>> This doesn't seem true for out-of-tree builds.
+> 
+> In the old setup, running the rebuild-expected-aml.sh
+> script is done in the build directory, and creates new
+> data files in ./tests/acpi-test-data/, which must then be
+> copied to the source directory.
+> In the new setup, the script is still run in the build
+> directory, but when new data files are created in
+> ./tests/data/acpi/ they don't need to be copied anywhere,
+> because the directory symlink means they're already in
+> tests/data/acpi in the source directory structure.
 
-I've got updates to that patch series that fell on the floor due to 
-other competing things. I'll get some screen time this weekend to work 
-on them and submit v3.
+Oh you are correct...
+My other terminal output was not update and was displaying the inodes 
+from a previous run. No problem then!
 
-/marc
+Thanks,
+
+Phil.
