@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42743)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gIcmg-0000WH-VV
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 12:59:00 -0400
+	(envelope-from <berrange@redhat.com>) id 1gIcmp-0000n9-Bv
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 12:59:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gIcmZ-0007b3-OZ
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 12:58:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54642)
+	(envelope-from <berrange@redhat.com>) id 1gIcmk-0007fo-JG
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 12:59:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51226)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gIcmW-0007XO-6k
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 12:58:49 -0400
-Date: Fri, 2 Nov 2018 16:58:35 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20181102165834.GD2387@work-vm>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gIcmi-0007Mx-JF
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 12:59:00 -0400
+Date: Fri, 2 Nov 2018 16:58:07 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181102165807.GG21191@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <CALMp9eQ5zWxb2N9fyYz=WcQshwk0L6qQ4D6L6+p_dzMo4H=txA@mail.gmail.com>
 	<20181102034649.43559-1-liran.alon@oracle.com>
 	<12c26c34-8dd1-a442-7826-86b93ff978f8@redhat.com>
-	<20181102165409.GF21191@redhat.com>
+	<95850543-FE41-404F-9775-23E792F6428E@oracle.com>
+	<CALMp9eSSe2ZBQrAsyLDfOSiWydXhphcj6xe0x1yZ8Dg_yXnpUQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20181102165409.GF21191@redhat.com>
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CALMp9eSSe2ZBQrAsyLDfOSiWydXhphcj6xe0x1yZ8Dg_yXnpUQ@mail.gmail.com>
 Subject: Re: [Qemu-devel] [QEMU PATCH v2 0/2]: KVM: i386: Add support for
  save and restore nested state
 List-Id: <qemu-devel.nongnu.org>
@@ -31,129 +32,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Liran Alon <liran.alon@oracle.com>, jmattson@google.com, ehabkost@redhat.com, kvm@vger.kernel.org, mtosatti@redhat.com, qemu-devel@nongnu.org, rth@twiddle.net
+To: Jim Mattson <jmattson@google.com>
+Cc: Liran Alon <liran.alon@oracle.com>, Eduardo Habkost <ehabkost@redhat.com>, kvm list <kvm@vger.kernel.org>, mtosatti@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, rth@twiddle.net
 
-* Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
-> On Fri, Nov 02, 2018 at 10:40:35AM +0100, Paolo Bonzini wrote:
-> > On 02/11/2018 04:46, Liran Alon wrote:
-> > >> On Thu, Nov1, 2018 at 09:45 AM, Jim Mattson <jmattson@google.com> =
-wrote:
-> > >=20
-> > >>> On Thu, Nov 1, 2018 at 8:56 AM, Dr. David Alan Gilbert <dgilbert@=
-redhat.com> wrote:
-> > >=20
-> > >>> So if I have matching host kernels it should always work?
-> > >>> What happens if I upgrade the source kernel to increase it's maxi=
-mum
-> > >>> nested size, can I force it to keep things small for some VMs?
-> > >=20
-> > >> Any change to the format of the nested state should be gated by a
-> > >> KVM_CAP set by userspace. (Unlike, say, how the
-> > >> KVM_VCPUEVENT_VALID_SMM flag was added to the saved VCPU events st=
-ate
-> > >> in commit f077825a8758d.) KVM has traditionally been quite bad abo=
-ut
-> > >> maintaining backwards compatibility, but I hope the community is m=
-ore
-> > >> cognizant of the issues now.
-> > >=20
-> > >> As a cloud provider, one would only enable the new capability from
-> > >> userspace once all hosts in the pool have a kernel that supports i=
-t.
-> > >> During the transition, the capability would not be enabled on the
-> > >> hosts with a new kernel, and these hosts would continue to provide
-> > >> nested state that could be consumed by hosts running the older ker=
-nel.
-> > >=20
-> > > Hmm this makes sense.
-> > >=20
-> > > This means though that the patch I have submitted here isn't good e=
-nough.
-> > > My patch currently assumes that when it attempts to get nested stat=
-e from KVM,
-> > > QEMU should always set nested_state->size to max size supported by =
-KVM as received
-> > > from kvm_check_extension(s, KVM_CAP_NESTED_STATE);
-> > > (See kvm_get_nested_state() introduced on my patch).
-> > > This indeed won't allow migration from host with new KVM to host wi=
-th old KVM if
-> > > nested_state size was enlarged between these KVM versions.
-> > > Which is obviously an issue.
-> >=20
-> > Actually I think this is okay, because unlike the "new" capability wa=
-s
-> > enabled, KVM would always reduce nested_state->size to a value that i=
-s
-> > compatible with current kernels.
-> >=20
-> > > But on second thought, I'm not sure that this is the right approach=
- as-well.
-> > > We don't really want the used version of nested_state to be determi=
-ned on kvm_init().
-> > > * On source QEMU, we actually want to determine it when preparing f=
-or migration based
-> > > on to the support given by our destination host. If it's an old hos=
-t, we would like to
-> > > save an old version nested_state and if it's a new host, we will li=
-ke to save our newest
-> > > supported nested_state.
-> >=20
-> > No, that's wrong because it would lead to losing state.  If the sourc=
-e
-> > QEMU supports more state than the destination QEMU, and the current V=
-M
-> > state needs to transmit it for migration to be _correct_, then migrat=
-ion
-> > to that destination QEMU must fail.
-> >=20
-> > In particular, enabling the new KVM capability needs to be gated by a
-> > new machine type and/or -cpu flag, if migration compatibility is need=
-ed.
-> >  (In particular, this is one reason why I haven't considered this ser=
-ies
-> > for 3.1.  Right now, migration of nested hypervisors is completely
-> > busted but if we make it "almost" work, pre-3.1 machine types would n=
-ot
-> > ever be able to add support for KVM_CAP_EXCEPTION_PAYLOAD.  Therefore=
-,
-> > it's better for users if we wait for one release more, and add suppor=
-t
-> > for KVM_CAP_NESTED_STATE and KVM_CAP_EXCEPTION_PAYLOAD at the same ti=
-me).
-> >=20
-> > Personally, I would like to say that, starting from QEMU 3.2, enablin=
-g
-> > nested VMX requires a 4.20 kernel.  It's a bit bold, but I think it's=
- a
-> > good way to keep some sanity.  Any opinions on that?
->=20
-> We have usually followed a rule that new machine types must not
-> affect runability of a VM on a host. IOW new machine types should
-> not introduce dependancies on specific kernels, or hardware features
-> such as CPU flags.
->=20
-> Anything that requires a new kernel feature thus ought to be an
-> opt-in config tunable on the CLI, separate from machine type
-> choice.  Alternatively in this case, it could potentially be a
-> migration parameter settable via QMP. QEMU on each side could
-> advertize whether the migration parameter is available, and
-> the mgmt app (which can see both sides of the migration) can
-> then decide whether to enable it.
+On Fri, Nov 02, 2018 at 09:44:54AM -0700, Jim Mattson via Qemu-devel wrote:
+> On Fri, Nov 2, 2018 at 5:59 AM, Liran Alon <liran.alon@oracle.com> wrote:
+> >
+> 
+> >>> Therefore, I don't think that we want this versioning to be based on KVM_CAP at all.
+> >>> It seems that we would want the process to behave as follows:
+> >>> 1) Mgmt-layer at dest queries dest host max supported nested_state size.
+> >>>   (Which should be returned from kvm_check_extension(KVM_CAP_NESTED_STATE))
+> >>> 2) Mgmt-layer at source initiate migration to dest with requesting QEMU to send nested_state
+> >>>   matching dest max supported nested_state size.
+> >>>   When saving nested state using KVM_GET_NESTED_STATE IOCTL, QEMU will specify in nested_state->size
+> >>>   the *requested* size to be saved and KVM should be able to save only the information which matches
+> >>>   the version that worked with that size.
+> >>> 3) After some sanity checks on received migration stream, dest host use KVM_SET_NESTED_STATE IOCTL.
+> >>>   This IOCTL should deduce which information it should deploy based on given nested_state->size.
+> 
+> I have to object to any proposal which requires the management later
+> to communicate with the source and the destination to determine what
+> should be done.
 
-This is a little odd though since it relates to the
-contents/size/consistency of the guest state directly.
+Can you elaborate on why you object ?
 
-Dave
+There are a bunch of features in QEMU's migration code which require
+the mgmt layer to look at source + dest to determine what should be
+done. Admittedly the cases we have had so far are generic migration
+features (compression, multifd, postcopy, TLS, etc), while this is
+a host kernel feature. I don't think it is that far outside the
+normal practice wrt migration feature usage decision making though.
 
-> Regards,
-> Daniel
-> --=20
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
-ange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange=
-.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
-ange :|
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
