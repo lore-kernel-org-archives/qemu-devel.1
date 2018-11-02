@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51145)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gId6F-0002GR-1E
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 13:19:12 -0400
+	(envelope-from <philmd@redhat.com>) id 1gIdPE-0002K4-CO
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 13:38:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gId6A-0004P5-Qq
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 13:19:10 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:52250)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1gId69-0002Zn-Ry
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 13:19:06 -0400
-Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1gId3r-0003Zc-ES
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 17:16:43 +0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  2 Nov 2018 17:16:30 +0000
-Message-Id: <20181102171638.24069-3-peter.maydell@linaro.org>
-In-Reply-To: <20181102171638.24069-1-peter.maydell@linaro.org>
-References: <20181102171638.24069-1-peter.maydell@linaro.org>
+	(envelope-from <philmd@redhat.com>) id 1gIdPA-0001DN-HE
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 13:38:48 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:34128)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gIdP9-00014x-T8
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 13:38:44 -0400
+Received: by mail-wr1-f66.google.com with SMTP id j26-v6so2808975wre.1
+	for <qemu-devel@nongnu.org>; Fri, 02 Nov 2018 10:38:34 -0700 (PDT)
+References: <20181102115239.22485-1-peter.maydell@linaro.org>
+	<20181102115239.22485-2-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <734a4792-df43-7715-822f-9670de47da19@redhat.com>
+Date: Fri, 2 Nov 2018 18:38:31 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 02/10] hw/char: Implement nRF51 SoC UART
+In-Reply-To: <20181102115239.22485-2-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 for-3.1 1/4] tests: Move
+ tests/acpi-test-data/ to tests/data/acpi/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,466 +31,346 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, patches@linaro.org
 
-From: Julia Suvorova <jusual@mail.ru>
+Hi Peter,
 
-Not implemented: CTS/NCTS, PSEL*.
+On 2/11/18 12:52, Peter Maydell wrote:
+> Currently tests/acpi-test-data contains data files used by the
+> bios-tables-test, and configure individually symlinks those
+> data files into the build directory using a wildcard.
+> 
+> Using a wildcard like this is a bad idea, because if a new
+> data file is added, nothing causes configure to be rerun,
+> and so no symlink is added for the new file. This can cause
+> tests to spuriously fail when they can't find their data.
+> Instead, it's better to symlink an entire directory of
+> data files. We already have such a directory: tests/data.
+> 
+> Move the data files from tests/acpi-test-data/ to
+> tests/data/acpi/, and remove the unnecessary symlinking.
+> 
+> We can remove entirely the note in rebuild-expected-aml.sh
+> about copying any new data files, because now they will
+> be in the source directory, not the build directory, and
+> no copying is required.
 
-Signed-off-by: Julia Suvorova <jusual@mail.ru>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- hw/char/Makefile.objs        |   1 +
- include/hw/char/nrf51_uart.h |  78 +++++++++
- hw/char/nrf51_uart.c         | 330 +++++++++++++++++++++++++++++++++++
- hw/char/trace-events         |   4 +
- 4 files changed, 413 insertions(+)
- create mode 100644 include/hw/char/nrf51_uart.h
- create mode 100644 hw/char/nrf51_uart.c
+This doesn't seem true for out-of-tree builds.
 
-diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
-index b5705312910..c4947d7ae7b 100644
---- a/hw/char/Makefile.objs
-+++ b/hw/char/Makefile.objs
-@@ -1,5 +1,6 @@
- common-obj-$(CONFIG_IPACK) += ipoctal232.o
- common-obj-$(CONFIG_ESCC) += escc.o
-+common-obj-$(CONFIG_NRF51_SOC) += nrf51_uart.o
- common-obj-$(CONFIG_PARALLEL) += parallel.o
- common-obj-$(CONFIG_PARALLEL) += parallel-isa.o
- common-obj-$(CONFIG_PL011) += pl011.o
-diff --git a/include/hw/char/nrf51_uart.h b/include/hw/char/nrf51_uart.h
-new file mode 100644
-index 00000000000..e3ecb7c81c2
---- /dev/null
-+++ b/include/hw/char/nrf51_uart.h
-@@ -0,0 +1,78 @@
-+/*
-+ * nRF51 SoC UART emulation
-+ *
-+ * Copyright (c) 2018 Julia Suvorova <jusual@mail.ru>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 or
-+ * (at your option) any later version.
-+ */
-+
-+#ifndef NRF51_UART_H
-+#define NRF51_UART_H
-+
-+#include "hw/sysbus.h"
-+#include "chardev/char-fe.h"
-+#include "hw/registerfields.h"
-+
-+#define UART_FIFO_LENGTH 6
-+#define UART_BASE 0x40002000
-+#define UART_SIZE 0x1000
-+
-+#define TYPE_NRF51_UART "nrf51_soc.uart"
-+#define NRF51_UART(obj) OBJECT_CHECK(NRF51UARTState, (obj), TYPE_NRF51_UART)
-+
-+REG32(UART_STARTRX, 0x000)
-+REG32(UART_STOPRX, 0x004)
-+REG32(UART_STARTTX, 0x008)
-+REG32(UART_STOPTX, 0x00C)
-+REG32(UART_SUSPEND, 0x01C)
-+
-+REG32(UART_CTS, 0x100)
-+REG32(UART_NCTS, 0x104)
-+REG32(UART_RXDRDY, 0x108)
-+REG32(UART_TXDRDY, 0x11C)
-+REG32(UART_ERROR, 0x124)
-+REG32(UART_RXTO, 0x144)
-+
-+REG32(UART_INTEN, 0x300)
-+    FIELD(UART_INTEN, CTS, 0, 1)
-+    FIELD(UART_INTEN, NCTS, 1, 1)
-+    FIELD(UART_INTEN, RXDRDY, 2, 1)
-+    FIELD(UART_INTEN, TXDRDY, 7, 1)
-+    FIELD(UART_INTEN, ERROR, 9, 1)
-+    FIELD(UART_INTEN, RXTO, 17, 1)
-+REG32(UART_INTENSET, 0x304)
-+REG32(UART_INTENCLR, 0x308)
-+REG32(UART_ERRORSRC, 0x480)
-+REG32(UART_ENABLE, 0x500)
-+REG32(UART_PSELRTS, 0x508)
-+REG32(UART_PSELTXD, 0x50C)
-+REG32(UART_PSELCTS, 0x510)
-+REG32(UART_PSELRXD, 0x514)
-+REG32(UART_RXD, 0x518)
-+REG32(UART_TXD, 0x51C)
-+REG32(UART_BAUDRATE, 0x524)
-+REG32(UART_CONFIG, 0x56C)
-+
-+typedef struct NRF51UARTState {
-+    SysBusDevice parent_obj;
-+
-+    MemoryRegion iomem;
-+    CharBackend chr;
-+    qemu_irq irq;
-+    guint watch_tag;
-+
-+    uint8_t rx_fifo[UART_FIFO_LENGTH];
-+    unsigned int rx_fifo_pos;
-+    unsigned int rx_fifo_len;
-+
-+    uint32_t reg[0x56C];
-+
-+    bool rx_started;
-+    bool tx_started;
-+    bool pending_tx_byte;
-+    bool enabled;
-+} NRF51UARTState;
-+
-+#endif
-diff --git a/hw/char/nrf51_uart.c b/hw/char/nrf51_uart.c
-new file mode 100644
-index 00000000000..2f5fae61671
---- /dev/null
-+++ b/hw/char/nrf51_uart.c
-@@ -0,0 +1,330 @@
-+/*
-+ * nRF51 SoC UART emulation
-+ *
-+ * See nRF51 Series Reference Manual, "29 Universal Asynchronous
-+ * Receiver/Transmitter" for hardware specifications:
-+ * http://infocenter.nordicsemi.com/pdf/nRF51_RM_v3.0.pdf
-+ *
-+ * Copyright (c) 2018 Julia Suvorova <jusual@mail.ru>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 or
-+ * (at your option) any later version.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/log.h"
-+#include "hw/char/nrf51_uart.h"
-+#include "trace.h"
-+
-+static void nrf51_uart_update_irq(NRF51UARTState *s)
-+{
-+    bool irq = false;
-+
-+    irq |= (s->reg[R_UART_RXDRDY] &&
-+            (s->reg[R_UART_INTEN] & R_UART_INTEN_RXDRDY_MASK));
-+    irq |= (s->reg[R_UART_TXDRDY] &&
-+            (s->reg[R_UART_INTEN] & R_UART_INTEN_TXDRDY_MASK));
-+    irq |= (s->reg[R_UART_ERROR]  &&
-+            (s->reg[R_UART_INTEN] & R_UART_INTEN_ERROR_MASK));
-+    irq |= (s->reg[R_UART_RXTO]   &&
-+            (s->reg[R_UART_INTEN] & R_UART_INTEN_RXTO_MASK));
-+
-+    qemu_set_irq(s->irq, irq);
-+}
-+
-+static uint64_t uart_read(void *opaque, hwaddr addr, unsigned int size)
-+{
-+    NRF51UARTState *s = NRF51_UART(opaque);
-+    uint64_t r;
-+
-+    if (!s->enabled) {
-+        return 0;
-+    }
-+
-+    switch (addr) {
-+    case A_UART_RXD:
-+        r = s->rx_fifo[s->rx_fifo_pos];
-+        if (s->rx_started && s->rx_fifo_len) {
-+            s->rx_fifo_pos = (s->rx_fifo_pos + 1) % UART_FIFO_LENGTH;
-+            s->rx_fifo_len--;
-+            if (s->rx_fifo_len) {
-+                s->reg[R_UART_RXDRDY] = 1;
-+                nrf51_uart_update_irq(s);
-+            }
-+            qemu_chr_fe_accept_input(&s->chr);
-+        }
-+        break;
-+    case A_UART_INTENSET:
-+    case A_UART_INTENCLR:
-+    case A_UART_INTEN:
-+        r = s->reg[R_UART_INTEN];
-+        break;
-+    default:
-+        r = s->reg[addr / 4];
-+        break;
-+    }
-+
-+    trace_nrf51_uart_read(addr, r, size);
-+
-+    return r;
-+}
-+
-+static gboolean uart_transmit(GIOChannel *chan, GIOCondition cond, void *opaque)
-+{
-+    NRF51UARTState *s = NRF51_UART(opaque);
-+    int r;
-+    uint8_t c = s->reg[R_UART_TXD];
-+
-+    s->watch_tag = 0;
-+
-+    r = qemu_chr_fe_write(&s->chr, &c, 1);
-+    if (r <= 0) {
-+        s->watch_tag = qemu_chr_fe_add_watch(&s->chr, G_IO_OUT | G_IO_HUP,
-+                                             uart_transmit, s);
-+        if (!s->watch_tag) {
-+            /* The hardware has no transmit error reporting,
-+             * so silently drop the byte
-+             */
-+            goto buffer_drained;
-+        }
-+        return FALSE;
-+    }
-+
-+buffer_drained:
-+    s->reg[R_UART_TXDRDY] = 1;
-+    s->pending_tx_byte = false;
-+    return FALSE;
-+}
-+
-+static void uart_cancel_transmit(NRF51UARTState *s)
-+{
-+    if (s->watch_tag) {
-+        g_source_remove(s->watch_tag);
-+        s->watch_tag = 0;
-+    }
-+}
-+
-+static void uart_write(void *opaque, hwaddr addr,
-+                       uint64_t value, unsigned int size)
-+{
-+    NRF51UARTState *s = NRF51_UART(opaque);
-+
-+    trace_nrf51_uart_write(addr, value, size);
-+
-+    if (!s->enabled && (addr != A_UART_ENABLE)) {
-+        return;
-+    }
-+
-+    switch (addr) {
-+    case A_UART_TXD:
-+        if (!s->pending_tx_byte && s->tx_started) {
-+            s->reg[R_UART_TXD] = value;
-+            s->pending_tx_byte = true;
-+            uart_transmit(NULL, G_IO_OUT, s);
-+        }
-+        break;
-+    case A_UART_INTEN:
-+        s->reg[R_UART_INTEN] = value;
-+        break;
-+    case A_UART_INTENSET:
-+        s->reg[R_UART_INTEN] |= value;
-+        break;
-+    case A_UART_INTENCLR:
-+        s->reg[R_UART_INTEN] &= ~value;
-+        break;
-+    case A_UART_TXDRDY ... A_UART_RXTO:
-+        s->reg[addr / 4] = value;
-+        break;
-+    case A_UART_ERRORSRC:
-+        s->reg[addr / 4] &= ~value;
-+        break;
-+    case A_UART_RXD:
-+        break;
-+    case A_UART_RXDRDY:
-+        if (value == 0) {
-+            s->reg[R_UART_RXDRDY] = 0;
-+        }
-+        break;
-+    case A_UART_STARTTX:
-+        if (value == 1) {
-+            s->tx_started = true;
-+        }
-+        break;
-+    case A_UART_STARTRX:
-+        if (value == 1) {
-+            s->rx_started = true;
-+        }
-+        break;
-+    case A_UART_ENABLE:
-+        if (value) {
-+            if (value == 4) {
-+                s->enabled = true;
-+            }
-+            break;
-+        }
-+        s->enabled = false;
-+        value = 1;
-+        /* fall through */
-+    case A_UART_SUSPEND:
-+    case A_UART_STOPTX:
-+        if (value == 1) {
-+            s->tx_started = false;
-+        }
-+        /* fall through */
-+    case A_UART_STOPRX:
-+        if (addr != A_UART_STOPTX && value == 1) {
-+            s->rx_started = false;
-+            s->reg[R_UART_RXTO] = 1;
-+        }
-+        break;
-+    default:
-+        s->reg[addr / 4] = value;
-+        break;
-+    }
-+    nrf51_uart_update_irq(s);
-+}
-+
-+static const MemoryRegionOps uart_ops = {
-+    .read =  uart_read,
-+    .write = uart_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+};
-+
-+static void nrf51_uart_reset(DeviceState *dev)
-+{
-+    NRF51UARTState *s = NRF51_UART(dev);
-+
-+    s->pending_tx_byte = 0;
-+
-+    uart_cancel_transmit(s);
-+
-+    memset(s->reg, 0, sizeof(s->reg));
-+
-+    s->reg[R_UART_PSELRTS] = 0xFFFFFFFF;
-+    s->reg[R_UART_PSELTXD] = 0xFFFFFFFF;
-+    s->reg[R_UART_PSELCTS] = 0xFFFFFFFF;
-+    s->reg[R_UART_PSELRXD] = 0xFFFFFFFF;
-+    s->reg[R_UART_BAUDRATE] = 0x4000000;
-+
-+    s->rx_fifo_len = 0;
-+    s->rx_fifo_pos = 0;
-+    s->rx_started = false;
-+    s->tx_started = false;
-+    s->enabled = false;
-+}
-+
-+static void uart_receive(void *opaque, const uint8_t *buf, int size)
-+{
-+
-+    NRF51UARTState *s = NRF51_UART(opaque);
-+    int i;
-+
-+    if (size == 0 || s->rx_fifo_len >= UART_FIFO_LENGTH) {
-+        return;
-+    }
-+
-+    for (i = 0; i < size; i++) {
-+        uint32_t pos = (s->rx_fifo_pos + s->rx_fifo_len) % UART_FIFO_LENGTH;
-+        s->rx_fifo[pos] = buf[i];
-+        s->rx_fifo_len++;
-+    }
-+
-+    s->reg[R_UART_RXDRDY] = 1;
-+    nrf51_uart_update_irq(s);
-+}
-+
-+static int uart_can_receive(void *opaque)
-+{
-+    NRF51UARTState *s = NRF51_UART(opaque);
-+
-+    return s->rx_started ? (UART_FIFO_LENGTH - s->rx_fifo_len) : 0;
-+}
-+
-+static void uart_event(void *opaque, int event)
-+{
-+    NRF51UARTState *s = NRF51_UART(opaque);
-+
-+    if (event == CHR_EVENT_BREAK) {
-+        s->reg[R_UART_ERRORSRC] |= 3;
-+        s->reg[R_UART_ERROR] = 1;
-+        nrf51_uart_update_irq(s);
-+    }
-+}
-+
-+static void nrf51_uart_realize(DeviceState *dev, Error **errp)
-+{
-+    NRF51UARTState *s = NRF51_UART(dev);
-+
-+    qemu_chr_fe_set_handlers(&s->chr, uart_can_receive, uart_receive,
-+                             uart_event, NULL, s, NULL, true);
-+}
-+
-+static void nrf51_uart_init(Object *obj)
-+{
-+    NRF51UARTState *s = NRF51_UART(obj);
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+
-+    memory_region_init_io(&s->iomem, obj, &uart_ops, s,
-+                          "nrf51_soc.uart", UART_SIZE);
-+    sysbus_init_mmio(sbd, &s->iomem);
-+    sysbus_init_irq(sbd, &s->irq);
-+}
-+
-+static int nrf51_uart_post_load(void *opaque, int version_id)
-+{
-+    NRF51UARTState *s = NRF51_UART(opaque);
-+
-+    if (s->pending_tx_byte) {
-+        s->watch_tag = qemu_chr_fe_add_watch(&s->chr, G_IO_OUT | G_IO_HUP,
-+                                             uart_transmit, s);
-+    }
-+
-+    return 0;
-+}
-+
-+static const VMStateDescription nrf51_uart_vmstate = {
-+    .name = "nrf51_soc.uart",
-+    .post_load = nrf51_uart_post_load,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32_ARRAY(reg, NRF51UARTState, 0x56C),
-+        VMSTATE_UINT8_ARRAY(rx_fifo, NRF51UARTState, UART_FIFO_LENGTH),
-+        VMSTATE_UINT32(rx_fifo_pos, NRF51UARTState),
-+        VMSTATE_UINT32(rx_fifo_len, NRF51UARTState),
-+        VMSTATE_BOOL(rx_started, NRF51UARTState),
-+        VMSTATE_BOOL(tx_started, NRF51UARTState),
-+        VMSTATE_BOOL(pending_tx_byte, NRF51UARTState),
-+        VMSTATE_BOOL(enabled, NRF51UARTState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static Property nrf51_uart_properties[] = {
-+    DEFINE_PROP_CHR("chardev", NRF51UARTState, chr),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void nrf51_uart_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->reset = nrf51_uart_reset;
-+    dc->realize = nrf51_uart_realize;
-+    dc->props = nrf51_uart_properties;
-+    dc->vmsd = &nrf51_uart_vmstate;
-+}
-+
-+static const TypeInfo nrf51_uart_info = {
-+    .name = TYPE_NRF51_UART,
-+    .parent = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(NRF51UARTState),
-+    .instance_init = nrf51_uart_init,
-+    .class_init = nrf51_uart_class_init
-+};
-+
-+static void nrf51_uart_register_types(void)
-+{
-+    type_register_static(&nrf51_uart_info);
-+}
-+
-+type_init(nrf51_uart_register_types)
-diff --git a/hw/char/trace-events b/hw/char/trace-events
-index b64213d4dd1..de34a74399b 100644
---- a/hw/char/trace-events
-+++ b/hw/char/trace-events
-@@ -73,3 +73,7 @@ cmsdk_apb_uart_receive(uint8_t c) "CMSDK APB UART: got character 0x%x from backe
- cmsdk_apb_uart_tx_pending(void) "CMSDK APB UART: character send to backend pending"
- cmsdk_apb_uart_tx(uint8_t c) "CMSDK APB UART: character 0x%x sent to backend"
- cmsdk_apb_uart_set_params(int speed) "CMSDK APB UART: params set to %d 8N1"
-+
-+# hw/char/nrf51_uart.c
-+nrf51_uart_read(uint64_t addr, uint64_t r, unsigned int size) "addr 0x%" PRIx64 " value 0x%" PRIx64 " size %u"
-+nrf51_uart_write(uint64_t addr, uint64_t value, unsigned int size) "addr 0x%" PRIx64 " value 0x%" PRIx64 " size %u"
--- 
-2.19.1
+> 
+> (We can't just change the existing tests/acpi-test-data/
+> to being a symlinked directory, because if we did that and
+> a developer switched git branches from one after that change
+> to one before it then configure would end up trashing all
+> the test files by making them symlinks to themselves.
+> Changing their path avoids this annoyance.)
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>   configure                                           |   4 ----
+>   tests/bios-tables-test.c                            |   2 +-
+>   tests/{acpi-test-data => data/acpi}/pc/APIC         | Bin
+>   tests/{acpi-test-data => data/acpi}/pc/APIC.cphp    | Bin
+>   tests/{acpi-test-data => data/acpi}/pc/APIC.dimmpxm | Bin
+>   tests/{acpi-test-data => data/acpi}/pc/DSDT         | Bin
+>   tests/{acpi-test-data => data/acpi}/pc/DSDT.bridge  | Bin
+>   tests/{acpi-test-data => data/acpi}/pc/DSDT.cphp    | Bin
+>   tests/{acpi-test-data => data/acpi}/pc/DSDT.dimmpxm | Bin
+>   tests/{acpi-test-data => data/acpi}/pc/DSDT.ipmikcs | Bin
+>   tests/{acpi-test-data => data/acpi}/pc/DSDT.memhp   | Bin
+>   tests/{acpi-test-data => data/acpi}/pc/DSDT.numamem | Bin
+>   tests/{acpi-test-data => data/acpi}/pc/FACP         | Bin
+>   tests/{acpi-test-data => data/acpi}/pc/FACS         | Bin
+>   tests/{acpi-test-data => data/acpi}/pc/HPET         | Bin
+>   tests/{acpi-test-data => data/acpi}/pc/NFIT.dimmpxm | Bin
+>   tests/{acpi-test-data => data/acpi}/pc/SLIT.cphp    | Bin
+>   tests/{acpi-test-data => data/acpi}/pc/SLIT.memhp   | Bin
+>   tests/{acpi-test-data => data/acpi}/pc/SRAT.cphp    | Bin
+>   tests/{acpi-test-data => data/acpi}/pc/SRAT.dimmpxm | Bin
+>   tests/{acpi-test-data => data/acpi}/pc/SRAT.memhp   | Bin
+>   tests/{acpi-test-data => data/acpi}/pc/SRAT.numamem | Bin
+>   tests/{acpi-test-data => data/acpi}/pc/SSDT.dimmpxm | Bin
+>   tests/{acpi-test-data => data/acpi}/q35/APIC        | Bin
+>   tests/{acpi-test-data => data/acpi}/q35/APIC.cphp   | Bin
+>   .../{acpi-test-data => data/acpi}/q35/APIC.dimmpxm  | Bin
+>   tests/{acpi-test-data => data/acpi}/q35/DSDT        | Bin
+>   tests/{acpi-test-data => data/acpi}/q35/DSDT.bridge | Bin
+>   tests/{acpi-test-data => data/acpi}/q35/DSDT.cphp   | Bin
+>   .../{acpi-test-data => data/acpi}/q35/DSDT.dimmpxm  | Bin
+>   tests/{acpi-test-data => data/acpi}/q35/DSDT.ipmibt | Bin
+>   tests/{acpi-test-data => data/acpi}/q35/DSDT.memhp  | Bin
+>   .../{acpi-test-data => data/acpi}/q35/DSDT.numamem  | Bin
+>   tests/{acpi-test-data => data/acpi}/q35/FACP        | Bin
+>   tests/{acpi-test-data => data/acpi}/q35/FACS        | Bin
+>   tests/{acpi-test-data => data/acpi}/q35/HPET        | Bin
+>   tests/{acpi-test-data => data/acpi}/q35/MCFG        | Bin
+>   .../{acpi-test-data => data/acpi}/q35/NFIT.dimmpxm  | Bin
+>   tests/{acpi-test-data => data/acpi}/q35/SLIT.cphp   | Bin
+>   tests/{acpi-test-data => data/acpi}/q35/SLIT.memhp  | Bin
+>   tests/{acpi-test-data => data/acpi}/q35/SRAT.cphp   | Bin
+>   .../{acpi-test-data => data/acpi}/q35/SRAT.dimmpxm  | Bin
+>   tests/{acpi-test-data => data/acpi}/q35/SRAT.memhp  | Bin
+>   .../{acpi-test-data => data/acpi}/q35/SRAT.numamem  | Bin
+>   .../{acpi-test-data => data/acpi}/q35/SSDT.dimmpxm  | Bin
+>   .../acpi}/rebuild-expected-aml.sh                   |   2 --
+>   46 files changed, 1 insertion(+), 7 deletions(-)
+>   rename tests/{acpi-test-data => data/acpi}/pc/APIC (100%)
+>   rename tests/{acpi-test-data => data/acpi}/pc/APIC.cphp (100%)
+>   rename tests/{acpi-test-data => data/acpi}/pc/APIC.dimmpxm (100%)
+>   rename tests/{acpi-test-data => data/acpi}/pc/DSDT (100%)
+>   rename tests/{acpi-test-data => data/acpi}/pc/DSDT.bridge (100%)
+>   rename tests/{acpi-test-data => data/acpi}/pc/DSDT.cphp (100%)
+>   rename tests/{acpi-test-data => data/acpi}/pc/DSDT.dimmpxm (100%)
+>   rename tests/{acpi-test-data => data/acpi}/pc/DSDT.ipmikcs (100%)
+>   rename tests/{acpi-test-data => data/acpi}/pc/DSDT.memhp (100%)
+>   rename tests/{acpi-test-data => data/acpi}/pc/DSDT.numamem (100%)
+>   rename tests/{acpi-test-data => data/acpi}/pc/FACP (100%)
+>   rename tests/{acpi-test-data => data/acpi}/pc/FACS (100%)
+>   rename tests/{acpi-test-data => data/acpi}/pc/HPET (100%)
+>   rename tests/{acpi-test-data => data/acpi}/pc/NFIT.dimmpxm (100%)
+>   rename tests/{acpi-test-data => data/acpi}/pc/SLIT.cphp (100%)
+>   rename tests/{acpi-test-data => data/acpi}/pc/SLIT.memhp (100%)
+>   rename tests/{acpi-test-data => data/acpi}/pc/SRAT.cphp (100%)
+>   rename tests/{acpi-test-data => data/acpi}/pc/SRAT.dimmpxm (100%)
+>   rename tests/{acpi-test-data => data/acpi}/pc/SRAT.memhp (100%)
+>   rename tests/{acpi-test-data => data/acpi}/pc/SRAT.numamem (100%)
+>   rename tests/{acpi-test-data => data/acpi}/pc/SSDT.dimmpxm (100%)
+>   rename tests/{acpi-test-data => data/acpi}/q35/APIC (100%)
+>   rename tests/{acpi-test-data => data/acpi}/q35/APIC.cphp (100%)
+>   rename tests/{acpi-test-data => data/acpi}/q35/APIC.dimmpxm (100%)
+>   rename tests/{acpi-test-data => data/acpi}/q35/DSDT (100%)
+>   rename tests/{acpi-test-data => data/acpi}/q35/DSDT.bridge (100%)
+>   rename tests/{acpi-test-data => data/acpi}/q35/DSDT.cphp (100%)
+>   rename tests/{acpi-test-data => data/acpi}/q35/DSDT.dimmpxm (100%)
+>   rename tests/{acpi-test-data => data/acpi}/q35/DSDT.ipmibt (100%)
+>   rename tests/{acpi-test-data => data/acpi}/q35/DSDT.memhp (100%)
+>   rename tests/{acpi-test-data => data/acpi}/q35/DSDT.numamem (100%)
+>   rename tests/{acpi-test-data => data/acpi}/q35/FACP (100%)
+>   rename tests/{acpi-test-data => data/acpi}/q35/FACS (100%)
+>   rename tests/{acpi-test-data => data/acpi}/q35/HPET (100%)
+>   rename tests/{acpi-test-data => data/acpi}/q35/MCFG (100%)
+>   rename tests/{acpi-test-data => data/acpi}/q35/NFIT.dimmpxm (100%)
+>   rename tests/{acpi-test-data => data/acpi}/q35/SLIT.cphp (100%)
+>   rename tests/{acpi-test-data => data/acpi}/q35/SLIT.memhp (100%)
+>   rename tests/{acpi-test-data => data/acpi}/q35/SRAT.cphp (100%)
+>   rename tests/{acpi-test-data => data/acpi}/q35/SRAT.dimmpxm (100%)
+>   rename tests/{acpi-test-data => data/acpi}/q35/SRAT.memhp (100%)
+>   rename tests/{acpi-test-data => data/acpi}/q35/SRAT.numamem (100%)
+>   rename tests/{acpi-test-data => data/acpi}/q35/SSDT.dimmpxm (100%)
+>   rename tests/{acpi-test-data => data/acpi}/rebuild-expected-aml.sh (86%)
+> 
+> diff --git a/configure b/configure
+> index 46ae1e8c767..895b7483b8a 100755
+> --- a/configure
+> +++ b/configure
+> @@ -7421,10 +7421,6 @@ for bios_file in \
+>   do
+>       FILES="$FILES pc-bios/$(basename $bios_file)"
+>   done
+> -for test_file in $(find $source_path/tests/acpi-test-data -type f)
+> -do
+> -    FILES="$FILES tests/acpi-test-data$(echo $test_file | sed -e 's/.*acpi-test-data//')"
+> -done
+>   for test_file in $(find $source_path/tests/hex-loader-check-data -type f)
+>   do
+>       FILES="$FILES tests/hex-loader-check-data$(echo $test_file | sed -e 's/.*hex-loader-check-data//')"
+> diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+> index 02e77ec811b..b14c8eaa171 100644
+> --- a/tests/bios-tables-test.c
+> +++ b/tests/bios-tables-test.c
+> @@ -42,7 +42,7 @@ typedef struct {
+>   } test_data;
+>   
+>   static char disk[] = "tests/acpi-test-disk-XXXXXX";
+> -static const char *data_dir = "tests/acpi-test-data";
+> +static const char *data_dir = "tests/data/acpi";
+>   #ifdef CONFIG_IASL
+>   static const char *iasl = stringify(CONFIG_IASL);
+>   #else
+> diff --git a/tests/acpi-test-data/pc/APIC b/tests/data/acpi/pc/APIC
+> similarity index 100%
+> rename from tests/acpi-test-data/pc/APIC
+> rename to tests/data/acpi/pc/APIC
+> diff --git a/tests/acpi-test-data/pc/APIC.cphp b/tests/data/acpi/pc/APIC.cphp
+> similarity index 100%
+> rename from tests/acpi-test-data/pc/APIC.cphp
+> rename to tests/data/acpi/pc/APIC.cphp
+> diff --git a/tests/acpi-test-data/pc/APIC.dimmpxm b/tests/data/acpi/pc/APIC.dimmpxm
+> similarity index 100%
+> rename from tests/acpi-test-data/pc/APIC.dimmpxm
+> rename to tests/data/acpi/pc/APIC.dimmpxm
+> diff --git a/tests/acpi-test-data/pc/DSDT b/tests/data/acpi/pc/DSDT
+> similarity index 100%
+> rename from tests/acpi-test-data/pc/DSDT
+> rename to tests/data/acpi/pc/DSDT
+> diff --git a/tests/acpi-test-data/pc/DSDT.bridge b/tests/data/acpi/pc/DSDT.bridge
+> similarity index 100%
+> rename from tests/acpi-test-data/pc/DSDT.bridge
+> rename to tests/data/acpi/pc/DSDT.bridge
+> diff --git a/tests/acpi-test-data/pc/DSDT.cphp b/tests/data/acpi/pc/DSDT.cphp
+> similarity index 100%
+> rename from tests/acpi-test-data/pc/DSDT.cphp
+> rename to tests/data/acpi/pc/DSDT.cphp
+> diff --git a/tests/acpi-test-data/pc/DSDT.dimmpxm b/tests/data/acpi/pc/DSDT.dimmpxm
+> similarity index 100%
+> rename from tests/acpi-test-data/pc/DSDT.dimmpxm
+> rename to tests/data/acpi/pc/DSDT.dimmpxm
+> diff --git a/tests/acpi-test-data/pc/DSDT.ipmikcs b/tests/data/acpi/pc/DSDT.ipmikcs
+> similarity index 100%
+> rename from tests/acpi-test-data/pc/DSDT.ipmikcs
+> rename to tests/data/acpi/pc/DSDT.ipmikcs
+> diff --git a/tests/acpi-test-data/pc/DSDT.memhp b/tests/data/acpi/pc/DSDT.memhp
+> similarity index 100%
+> rename from tests/acpi-test-data/pc/DSDT.memhp
+> rename to tests/data/acpi/pc/DSDT.memhp
+> diff --git a/tests/acpi-test-data/pc/DSDT.numamem b/tests/data/acpi/pc/DSDT.numamem
+> similarity index 100%
+> rename from tests/acpi-test-data/pc/DSDT.numamem
+> rename to tests/data/acpi/pc/DSDT.numamem
+> diff --git a/tests/acpi-test-data/pc/FACP b/tests/data/acpi/pc/FACP
+> similarity index 100%
+> rename from tests/acpi-test-data/pc/FACP
+> rename to tests/data/acpi/pc/FACP
+> diff --git a/tests/acpi-test-data/pc/FACS b/tests/data/acpi/pc/FACS
+> similarity index 100%
+> rename from tests/acpi-test-data/pc/FACS
+> rename to tests/data/acpi/pc/FACS
+> diff --git a/tests/acpi-test-data/pc/HPET b/tests/data/acpi/pc/HPET
+> similarity index 100%
+> rename from tests/acpi-test-data/pc/HPET
+> rename to tests/data/acpi/pc/HPET
+> diff --git a/tests/acpi-test-data/pc/NFIT.dimmpxm b/tests/data/acpi/pc/NFIT.dimmpxm
+> similarity index 100%
+> rename from tests/acpi-test-data/pc/NFIT.dimmpxm
+> rename to tests/data/acpi/pc/NFIT.dimmpxm
+> diff --git a/tests/acpi-test-data/pc/SLIT.cphp b/tests/data/acpi/pc/SLIT.cphp
+> similarity index 100%
+> rename from tests/acpi-test-data/pc/SLIT.cphp
+> rename to tests/data/acpi/pc/SLIT.cphp
+> diff --git a/tests/acpi-test-data/pc/SLIT.memhp b/tests/data/acpi/pc/SLIT.memhp
+> similarity index 100%
+> rename from tests/acpi-test-data/pc/SLIT.memhp
+> rename to tests/data/acpi/pc/SLIT.memhp
+> diff --git a/tests/acpi-test-data/pc/SRAT.cphp b/tests/data/acpi/pc/SRAT.cphp
+> similarity index 100%
+> rename from tests/acpi-test-data/pc/SRAT.cphp
+> rename to tests/data/acpi/pc/SRAT.cphp
+> diff --git a/tests/acpi-test-data/pc/SRAT.dimmpxm b/tests/data/acpi/pc/SRAT.dimmpxm
+> similarity index 100%
+> rename from tests/acpi-test-data/pc/SRAT.dimmpxm
+> rename to tests/data/acpi/pc/SRAT.dimmpxm
+> diff --git a/tests/acpi-test-data/pc/SRAT.memhp b/tests/data/acpi/pc/SRAT.memhp
+> similarity index 100%
+> rename from tests/acpi-test-data/pc/SRAT.memhp
+> rename to tests/data/acpi/pc/SRAT.memhp
+> diff --git a/tests/acpi-test-data/pc/SRAT.numamem b/tests/data/acpi/pc/SRAT.numamem
+> similarity index 100%
+> rename from tests/acpi-test-data/pc/SRAT.numamem
+> rename to tests/data/acpi/pc/SRAT.numamem
+> diff --git a/tests/acpi-test-data/pc/SSDT.dimmpxm b/tests/data/acpi/pc/SSDT.dimmpxm
+> similarity index 100%
+> rename from tests/acpi-test-data/pc/SSDT.dimmpxm
+> rename to tests/data/acpi/pc/SSDT.dimmpxm
+> diff --git a/tests/acpi-test-data/q35/APIC b/tests/data/acpi/q35/APIC
+> similarity index 100%
+> rename from tests/acpi-test-data/q35/APIC
+> rename to tests/data/acpi/q35/APIC
+> diff --git a/tests/acpi-test-data/q35/APIC.cphp b/tests/data/acpi/q35/APIC.cphp
+> similarity index 100%
+> rename from tests/acpi-test-data/q35/APIC.cphp
+> rename to tests/data/acpi/q35/APIC.cphp
+> diff --git a/tests/acpi-test-data/q35/APIC.dimmpxm b/tests/data/acpi/q35/APIC.dimmpxm
+> similarity index 100%
+> rename from tests/acpi-test-data/q35/APIC.dimmpxm
+> rename to tests/data/acpi/q35/APIC.dimmpxm
+> diff --git a/tests/acpi-test-data/q35/DSDT b/tests/data/acpi/q35/DSDT
+> similarity index 100%
+> rename from tests/acpi-test-data/q35/DSDT
+> rename to tests/data/acpi/q35/DSDT
+> diff --git a/tests/acpi-test-data/q35/DSDT.bridge b/tests/data/acpi/q35/DSDT.bridge
+> similarity index 100%
+> rename from tests/acpi-test-data/q35/DSDT.bridge
+> rename to tests/data/acpi/q35/DSDT.bridge
+> diff --git a/tests/acpi-test-data/q35/DSDT.cphp b/tests/data/acpi/q35/DSDT.cphp
+> similarity index 100%
+> rename from tests/acpi-test-data/q35/DSDT.cphp
+> rename to tests/data/acpi/q35/DSDT.cphp
+> diff --git a/tests/acpi-test-data/q35/DSDT.dimmpxm b/tests/data/acpi/q35/DSDT.dimmpxm
+> similarity index 100%
+> rename from tests/acpi-test-data/q35/DSDT.dimmpxm
+> rename to tests/data/acpi/q35/DSDT.dimmpxm
+> diff --git a/tests/acpi-test-data/q35/DSDT.ipmibt b/tests/data/acpi/q35/DSDT.ipmibt
+> similarity index 100%
+> rename from tests/acpi-test-data/q35/DSDT.ipmibt
+> rename to tests/data/acpi/q35/DSDT.ipmibt
+> diff --git a/tests/acpi-test-data/q35/DSDT.memhp b/tests/data/acpi/q35/DSDT.memhp
+> similarity index 100%
+> rename from tests/acpi-test-data/q35/DSDT.memhp
+> rename to tests/data/acpi/q35/DSDT.memhp
+> diff --git a/tests/acpi-test-data/q35/DSDT.numamem b/tests/data/acpi/q35/DSDT.numamem
+> similarity index 100%
+> rename from tests/acpi-test-data/q35/DSDT.numamem
+> rename to tests/data/acpi/q35/DSDT.numamem
+> diff --git a/tests/acpi-test-data/q35/FACP b/tests/data/acpi/q35/FACP
+> similarity index 100%
+> rename from tests/acpi-test-data/q35/FACP
+> rename to tests/data/acpi/q35/FACP
+> diff --git a/tests/acpi-test-data/q35/FACS b/tests/data/acpi/q35/FACS
+> similarity index 100%
+> rename from tests/acpi-test-data/q35/FACS
+> rename to tests/data/acpi/q35/FACS
+> diff --git a/tests/acpi-test-data/q35/HPET b/tests/data/acpi/q35/HPET
+> similarity index 100%
+> rename from tests/acpi-test-data/q35/HPET
+> rename to tests/data/acpi/q35/HPET
+> diff --git a/tests/acpi-test-data/q35/MCFG b/tests/data/acpi/q35/MCFG
+> similarity index 100%
+> rename from tests/acpi-test-data/q35/MCFG
+> rename to tests/data/acpi/q35/MCFG
+> diff --git a/tests/acpi-test-data/q35/NFIT.dimmpxm b/tests/data/acpi/q35/NFIT.dimmpxm
+> similarity index 100%
+> rename from tests/acpi-test-data/q35/NFIT.dimmpxm
+> rename to tests/data/acpi/q35/NFIT.dimmpxm
+> diff --git a/tests/acpi-test-data/q35/SLIT.cphp b/tests/data/acpi/q35/SLIT.cphp
+> similarity index 100%
+> rename from tests/acpi-test-data/q35/SLIT.cphp
+> rename to tests/data/acpi/q35/SLIT.cphp
+> diff --git a/tests/acpi-test-data/q35/SLIT.memhp b/tests/data/acpi/q35/SLIT.memhp
+> similarity index 100%
+> rename from tests/acpi-test-data/q35/SLIT.memhp
+> rename to tests/data/acpi/q35/SLIT.memhp
+> diff --git a/tests/acpi-test-data/q35/SRAT.cphp b/tests/data/acpi/q35/SRAT.cphp
+> similarity index 100%
+> rename from tests/acpi-test-data/q35/SRAT.cphp
+> rename to tests/data/acpi/q35/SRAT.cphp
+> diff --git a/tests/acpi-test-data/q35/SRAT.dimmpxm b/tests/data/acpi/q35/SRAT.dimmpxm
+> similarity index 100%
+> rename from tests/acpi-test-data/q35/SRAT.dimmpxm
+> rename to tests/data/acpi/q35/SRAT.dimmpxm
+> diff --git a/tests/acpi-test-data/q35/SRAT.memhp b/tests/data/acpi/q35/SRAT.memhp
+> similarity index 100%
+> rename from tests/acpi-test-data/q35/SRAT.memhp
+> rename to tests/data/acpi/q35/SRAT.memhp
+> diff --git a/tests/acpi-test-data/q35/SRAT.numamem b/tests/data/acpi/q35/SRAT.numamem
+> similarity index 100%
+> rename from tests/acpi-test-data/q35/SRAT.numamem
+> rename to tests/data/acpi/q35/SRAT.numamem
+> diff --git a/tests/acpi-test-data/q35/SSDT.dimmpxm b/tests/data/acpi/q35/SSDT.dimmpxm
+> similarity index 100%
+> rename from tests/acpi-test-data/q35/SSDT.dimmpxm
+> rename to tests/data/acpi/q35/SSDT.dimmpxm
+> diff --git a/tests/acpi-test-data/rebuild-expected-aml.sh b/tests/data/acpi/rebuild-expected-aml.sh
+> similarity index 86%
+> rename from tests/acpi-test-data/rebuild-expected-aml.sh
+> rename to tests/data/acpi/rebuild-expected-aml.sh
+> index 11bf7439142..bf9ba242add 100755
+> --- a/tests/acpi-test-data/rebuild-expected-aml.sh
+> +++ b/tests/data/acpi/rebuild-expected-aml.sh
+> @@ -32,5 +32,3 @@ fi
+>   TEST_ACPI_REBUILD_AML=y QTEST_QEMU_BINARY=$qemu tests/bios-tables-test
+>   
+>   echo "The files were rebuilt and can be added to git."
+> -echo "However, if new files were created, please copy them manually" \
+> -     "to tests/acpi-test-data/pc/ or tests/acpi-test-data/q35/ ."
+>
