@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46684)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46685)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <contrib@steffen-goertz.de>) id 1gIcvp-0007QM-5g
+	(envelope-from <contrib@steffen-goertz.de>) id 1gIcvp-0007QN-5k
 	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 13:08:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <contrib@steffen-goertz.de>) id 1gIcvi-0004bG-6w
+	(envelope-from <contrib@steffen-goertz.de>) id 1gIcvj-0004bz-7a
 	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 13:08:21 -0400
-Received: from steffen-goertz.de ([88.198.119.201]:33354)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <contrib@steffen-goertz.de>) id 1gIcvf-0004Lb-SG
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 13:08:16 -0400
 From: =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>
-Date: Fri,  2 Nov 2018 13:07:25 -0400
-Message-Id: <20181102170730.12432-9-contrib@steffen-goertz.de>
+Date: Fri,  2 Nov 2018 13:07:19 -0400
+Message-Id: <20181102170730.12432-3-contrib@steffen-goertz.de>
 In-Reply-To: <20181102170730.12432-1-contrib@steffen-goertz.de>
 References: <20181102170730.12432-1-contrib@steffen-goertz.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 08/13] hw/gpio/nrf51_gpio: Add nRF51 GPIO
- peripheral
+Subject: [Qemu-devel] [PATCH v4 02/13] arm: Add header to host common
+ definition for nRF51 SOC peripherals
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,63 +24,113 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>, "open list:NRF51" <qemu-arm@nongnu.org>
 
-This adds a model of the nRF51 GPIO peripheral.
-
-Reference Manual: http://infocenter.nordicsemi.com/pdf/nRF51_RM_v3.0.pdf
-
-The nRF51 series microcontrollers support up to 32 GPIO pins in various c=
-onfigurations.
-The pins can be used as input pins with pull-ups or pull-down.
-Furthermore, three different output driver modes per level are
-available (disconnected, standard, high-current).
-
-The GPIO-Peripheral has a mechanism for detecting level changes which is
-not featured in this model.
+Adds a header that provides definitions that are used
+across nRF51 peripherals
 
 Signed-off-by: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- Makefile.objs                |   1 +
- hw/gpio/Makefile.objs        |   1 +
- hw/gpio/nrf51_gpio.c         | 300 +++++++++++++++++++++++++++++++++++
- hw/gpio/trace-events         |   7 +
- include/hw/gpio/nrf51_gpio.h |  69 ++++++++
- 5 files changed, 378 insertions(+)
- create mode 100644 hw/gpio/nrf51_gpio.c
- create mode 100644 hw/gpio/trace-events
- create mode 100644 include/hw/gpio/nrf51_gpio.h
+ hw/arm/nrf51_soc.c           | 33 ++++++++++----------------
+ include/hw/arm/nrf51.h       | 45 ++++++++++++++++++++++++++++++++++++
+ include/hw/char/nrf51_uart.h |  1 -
+ 3 files changed, 57 insertions(+), 22 deletions(-)
+ create mode 100644 include/hw/arm/nrf51.h
 
-diff --git a/Makefile.objs b/Makefile.objs
-index 1e1ff387d7..fbc3bad1e1 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -243,6 +243,7 @@ trace-events-subdirs +=3D hw/vfio
- trace-events-subdirs +=3D hw/virtio
- trace-events-subdirs +=3D hw/watchdog
- trace-events-subdirs +=3D hw/xen
-+trace-events-subdirs +=3D hw/gpio
- trace-events-subdirs +=3D io
- trace-events-subdirs +=3D linux-user
- trace-events-subdirs +=3D migration
-diff --git a/hw/gpio/Makefile.objs b/hw/gpio/Makefile.objs
-index fa0a72e6d0..e5da0cb54f 100644
---- a/hw/gpio/Makefile.objs
-+++ b/hw/gpio/Makefile.objs
-@@ -8,3 +8,4 @@ common-obj-$(CONFIG_GPIO_KEY) +=3D gpio_key.o
- obj-$(CONFIG_OMAP) +=3D omap_gpio.o
- obj-$(CONFIG_IMX) +=3D imx_gpio.o
- obj-$(CONFIG_RASPI) +=3D bcm2835_gpio.o
-+obj-$(CONFIG_NRF51_SOC) +=3D nrf51_gpio.o
-diff --git a/hw/gpio/nrf51_gpio.c b/hw/gpio/nrf51_gpio.c
+diff --git a/hw/arm/nrf51_soc.c b/hw/arm/nrf51_soc.c
+index b89c1bdea0..55f8eaafcb 100644
+--- a/hw/arm/nrf51_soc.c
++++ b/hw/arm/nrf51_soc.c
+@@ -21,27 +21,16 @@
+ #include "qemu/log.h"
+ #include "cpu.h"
+=20
++#include "hw/arm/nrf51.h"
+ #include "hw/arm/nrf51_soc.h"
+=20
+-#define IOMEM_BASE      0x40000000
+-#define IOMEM_SIZE      0x20000000
+-
+-#define FICR_BASE       0x10000000
+-#define FICR_SIZE       0x000000fc
+-
+-#define FLASH_BASE      0x00000000
+-#define SRAM_BASE       0x20000000
+-
+-#define PRIVATE_BASE    0xF0000000
+-#define PRIVATE_SIZE    0x10000000
+-
+ /*
+  * The size and base is for the NRF51822 part. If other parts
+  * are supported in the future, add a sub-class of NRF51SoC for
+  * the specific variants
+  */
+-#define NRF51822_FLASH_SIZE     (256 * 1024)
+-#define NRF51822_SRAM_SIZE      (16 * 1024)
++#define NRF51822_FLASH_SIZE     (256 * NRF51_PAGE_SIZE)
++#define NRF51822_SRAM_SIZE      (16 * NRF51_PAGE_SIZE)
+=20
+ #define BASE_TO_IRQ(base) ((base >> 12) & 0x1F)
+=20
+@@ -76,14 +65,14 @@ static void nrf51_soc_realize(DeviceState *dev_soc, E=
+rror **errp)
+         error_propagate(errp, err);
+         return;
+     }
+-    memory_region_add_subregion(&s->container, FLASH_BASE, &s->flash);
++    memory_region_add_subregion(&s->container, NRF51_FLASH_BASE, &s->fla=
+sh);
+=20
+     memory_region_init_ram(&s->sram, NULL, "nrf51.sram", s->sram_size, &=
+err);
+     if (err) {
+         error_propagate(errp, err);
+         return;
+     }
+-    memory_region_add_subregion(&s->container, SRAM_BASE, &s->sram);
++    memory_region_add_subregion(&s->container, NRF51_SRAM_BASE, &s->sram=
+);
+=20
+     /* UART */
+     object_property_set_bool(OBJECT(&s->uart), true, "realized", &err);
+@@ -92,15 +81,17 @@ static void nrf51_soc_realize(DeviceState *dev_soc, E=
+rror **errp)
+         return;
+     }
+     mr =3D sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->uart), 0);
+-    memory_region_add_subregion_overlap(&s->container, UART_BASE, mr, 0)=
+;
++    memory_region_add_subregion_overlap(&s->container, NRF51_UART_BASE, =
+mr, 0);
+     sysbus_connect_irq(SYS_BUS_DEVICE(&s->uart), 0,
+                        qdev_get_gpio_in(DEVICE(&s->cpu),
+-                       BASE_TO_IRQ(UART_BASE)));
++                       BASE_TO_IRQ(NRF51_UART_BASE)));
+=20
+-    create_unimplemented_device("nrf51_soc.io", IOMEM_BASE, IOMEM_SIZE);
+-    create_unimplemented_device("nrf51_soc.ficr", FICR_BASE, FICR_SIZE);
++    create_unimplemented_device("nrf51_soc.io", NRF51_IOMEM_BASE,
++                                NRF51_IOMEM_SIZE);
++    create_unimplemented_device("nrf51_soc.ficr", NRF51_FICR_BASE,
++                                NRF51_FICR_SIZE);
+     create_unimplemented_device("nrf51_soc.private",
+-                                PRIVATE_BASE, PRIVATE_SIZE);
++                                NRF51_PRIVATE_BASE, NRF51_PRIVATE_SIZE);
+ }
+=20
+ static void nrf51_soc_init(Object *obj)
+diff --git a/include/hw/arm/nrf51.h b/include/hw/arm/nrf51.h
 new file mode 100644
-index 0000000000..0a378e03ab
+index 0000000000..175bb6c301
 --- /dev/null
-+++ b/hw/gpio/nrf51_gpio.c
-@@ -0,0 +1,300 @@
++++ b/include/hw/arm/nrf51.h
+@@ -0,0 +1,45 @@
 +/*
-+ * nRF51 System-on-Chip general purpose input/output register definition
++ * Nordic Semiconductor nRF51 Series SOC Common Defines
++ *
++ * This file hosts generic defines used in various nRF51 peripheral devi=
+ces.
 + *
 + * Reference Manual: http://infocenter.nordicsemi.com/pdf/nRF51_RM_v3.0.=
 pdf
@@ -97,395 +143,48 @@ df
 + * the COPYING file in the top-level directory.
 + */
 +
-+#include "qemu/osdep.h"
-+#include "qemu/log.h"
-+#include "hw/gpio/nrf51_gpio.h"
-+#include "trace.h"
-+
-+/*
-+ * Check if the output driver is connected to the direction switch
-+ * given the current configuration and logic level.
-+ * It is not differentiated between standard and "high"(-power) drive mo=
-des.
-+ */
-+static bool is_connected(uint32_t config, uint32_t level)
-+{
-+    bool state;
-+    uint32_t drive_config =3D extract32(config, 8, 3);
-+
-+    switch (drive_config) {
-+    case 0 ... 3:
-+        state =3D true;
-+        break;
-+    case 4 ... 5:
-+        state =3D level !=3D 0;
-+        break;
-+    case 6 ... 7:
-+        state =3D level =3D=3D 0;
-+        break;
-+    default:
-+        /* Some compilers can not infer the value range of extract32(..,=
- 3) */
-+        state =3D false;
-+        break;
-+    }
-+
-+    return state;
-+}
-+
-+static void update_output_irq(NRF51GPIOState *s, size_t i,
-+                              bool connected, bool level)
-+{
-+    int64_t irq_level =3D connected ? level : -1;
-+    bool old_connected =3D extract32(s->old_out_connected, i, 1);
-+    bool old_level =3D extract32(s->old_out, i, 1);
-+
-+    if ((old_connected !=3D connected) || (old_level !=3D level)) {
-+        qemu_set_irq(s->output[i], irq_level);
-+        trace_nrf51_gpio_update_output_irq(i, irq_level);
-+    }
-+
-+    s->old_out =3D deposit32(s->old_out, i, 1, level);
-+    s->old_out_connected =3D deposit32(s->old_out_connected, i, 1, conne=
-cted);
-+}
-+
-+static void update_state(NRF51GPIOState *s)
-+{
-+    uint32_t pull;
-+    size_t i;
-+    bool connected_out, dir, connected_in, out, input;
-+
-+    for (i =3D 0; i < NRF51_GPIO_PINS; i++) {
-+        pull =3D extract32(s->cnf[i], 2, 2);
-+        dir =3D extract32(s->cnf[i], 0, 1);
-+        connected_in =3D extract32(s->in_mask, i, 1);
-+        out =3D extract32(s->out, i, 1);
-+        input =3D !extract32(s->cnf[i], 1, 1);
-+        connected_out =3D is_connected(s->cnf[i], out) && dir;
-+
-+        update_output_irq(s, i, connected_out, out);
-+
-+        /* Pin both driven externally and internally */
-+        if (connected_out && connected_in) {
-+            qemu_log_mask(LOG_GUEST_ERROR, "GPIO pin %zu short circuited=
-\n", i);
-+        }
-+
-+        /*
-+         * Input buffer disconnected from internal/external drives, so
-+         * pull-up/pull-down becomes relevant
-+         */
-+        if (!input || (input && !connected_in && !connected_out)) {
-+            if (pull =3D=3D NRF51_GPIO_PULLDOWN) {
-+                s->in =3D deposit32(s->in, i, 1, 0);
-+            } else if (pull =3D=3D NRF51_GPIO_PULLUP) {
-+                s->in =3D deposit32(s->in, i, 1, 1);
-+            }
-+        }
-+
-+        /* Self stimulation through internal output driver */
-+        if (connected_out && !connected_in && input) {
-+            s->in =3D deposit32(s->in, i, 1, out);
-+        }
-+    }
-+
-+}
-+
-+/*
-+ * Direction is exposed in both the DIR register and the DIR bit
-+ * of each PINs CNF configuration register. Reflect bits for pins in DIR
-+ * to individual pin configuration registers.
-+ */
-+static void reflect_dir_bit_in_cnf(NRF51GPIOState *s)
-+{
-+    size_t i;
-+
-+    uint32_t value =3D s->dir;
-+
-+    for (i =3D 0; i < NRF51_GPIO_PINS; i++) {
-+        s->cnf[i] =3D (s->cnf[i] & ~(1UL)) | ((value >> i) & 0x01);
-+    }
-+}
-+
-+static uint64_t nrf51_gpio_read(void *opaque, hwaddr offset, unsigned in=
-t size)
-+{
-+    NRF51GPIOState *s =3D NRF51_GPIO(opaque);
-+    uint64_t r =3D 0;
-+    size_t idx;
-+
-+    switch (offset) {
-+    case NRF51_GPIO_REG_OUT ... NRF51_GPIO_REG_OUTCLR:
-+        r =3D s->out;
-+        break;
-+
-+    case NRF51_GPIO_REG_IN:
-+        r =3D s->in;
-+        break;
-+
-+    case NRF51_GPIO_REG_DIR ... NRF51_GPIO_REG_DIRCLR:
-+        r =3D s->dir;
-+        break;
-+
-+    case NRF51_GPIO_REG_CNF_START ... NRF51_GPIO_REG_CNF_END:
-+        idx =3D (offset - NRF51_GPIO_REG_CNF_START) / 4;
-+        r =3D s->cnf[idx];
-+        break;
-+
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                "%s: bad read offset 0x%" HWADDR_PRIx "\n",
-+                      __func__, offset);
-+    }
-+
-+    trace_nrf51_gpio_read(offset, r);
-+
-+    return r;
-+}
-+
-+static void nrf51_gpio_write(void *opaque, hwaddr offset,
-+                       uint64_t value, unsigned int size)
-+{
-+    NRF51GPIOState *s =3D NRF51_GPIO(opaque);
-+    size_t idx;
-+
-+    trace_nrf51_gpio_write(offset, value);
-+
-+    switch (offset) {
-+    case NRF51_GPIO_REG_OUT:
-+        s->out =3D value;
-+        break;
-+
-+    case NRF51_GPIO_REG_OUTSET:
-+        s->out |=3D value;
-+        break;
-+
-+    case NRF51_GPIO_REG_OUTCLR:
-+        s->out &=3D ~value;
-+        break;
-+
-+    case NRF51_GPIO_REG_DIR:
-+        s->dir =3D value;
-+        reflect_dir_bit_in_cnf(s);
-+        break;
-+
-+    case NRF51_GPIO_REG_DIRSET:
-+        s->dir |=3D value;
-+        reflect_dir_bit_in_cnf(s);
-+        break;
-+
-+    case NRF51_GPIO_REG_DIRCLR:
-+        s->dir &=3D ~value;
-+        reflect_dir_bit_in_cnf(s);
-+        break;
-+
-+    case NRF51_GPIO_REG_CNF_START ... NRF51_GPIO_REG_CNF_END:
-+        idx =3D (offset - NRF51_GPIO_REG_CNF_START) / 4;
-+        s->cnf[idx] =3D value;
-+        /* direction is exposed in both the DIR register and the DIR bit
-+         * of each PINs CNF configuration register. */
-+        s->dir =3D (s->dir & ~(1UL << idx)) | ((value & 0x01) << idx);
-+        break;
-+
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "%s: bad write offset 0x%" HWADDR_PRIx "\n",
-+                      __func__, offset);
-+    }
-+
-+    update_state(s);
-+}
-+
-+static const MemoryRegionOps gpio_ops =3D {
-+    .read =3D  nrf51_gpio_read,
-+    .write =3D nrf51_gpio_write,
-+    .endianness =3D DEVICE_LITTLE_ENDIAN,
-+    .impl.min_access_size =3D 4,
-+    .impl.max_access_size =3D 4,
-+};
-+
-+static void nrf51_gpio_set(void *opaque, int line, int value)
-+{
-+    NRF51GPIOState *s =3D NRF51_GPIO(opaque);
-+
-+    trace_nrf51_gpio_set(line, value);
-+
-+    assert(line >=3D 0 && line < NRF51_GPIO_PINS);
-+
-+    s->in_mask =3D deposit32(s->in_mask, line, 1, value >=3D 0);
-+    if (value >=3D 0) {
-+        s->in =3D deposit32(s->in, line, 1, value !=3D 0);
-+    }
-+
-+    update_state(s);
-+}
-+
-+static void nrf51_gpio_reset(DeviceState *dev)
-+{
-+    NRF51GPIOState *s =3D NRF51_GPIO(dev);
-+    size_t i;
-+
-+    s->out =3D 0;
-+    s->old_out =3D 0;
-+    s->old_out_connected =3D 0;
-+    s->in =3D 0;
-+    s->in_mask =3D 0;
-+    s->dir =3D 0;
-+
-+    for (i =3D 0; i < NRF51_GPIO_PINS; i++) {
-+        s->cnf[i] =3D 0x00000002;
-+    }
-+}
-+
-+static const VMStateDescription vmstate_nrf51_gpio =3D {
-+    .name =3D TYPE_NRF51_GPIO,
-+    .version_id =3D 1,
-+    .minimum_version_id =3D 1,
-+    .minimum_version_id_old =3D 1,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_UINT32(out, NRF51GPIOState),
-+        VMSTATE_UINT32(in, NRF51GPIOState),
-+        VMSTATE_UINT32(in_mask, NRF51GPIOState),
-+        VMSTATE_UINT32(dir, NRF51GPIOState),
-+        VMSTATE_UINT32_ARRAY(cnf, NRF51GPIOState, NRF51_GPIO_PINS),
-+        VMSTATE_UINT32(old_out, NRF51GPIOState),
-+        VMSTATE_UINT32(old_out_connected, NRF51GPIOState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void nrf51_gpio_init(Object *obj)
-+{
-+    NRF51GPIOState *s =3D NRF51_GPIO(obj);
-+
-+    memory_region_init_io(&s->mmio, obj, &gpio_ops, s,
-+            TYPE_NRF51_GPIO, NRF51_GPIO_SIZE);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
-+
-+    qdev_init_gpio_in(DEVICE(s), nrf51_gpio_set, NRF51_GPIO_PINS);
-+    qdev_init_gpio_out(DEVICE(s), s->output, NRF51_GPIO_PINS);
-+}
-+
-+static void nrf51_gpio_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+
-+    dc->vmsd =3D &vmstate_nrf51_gpio;
-+    dc->reset =3D nrf51_gpio_reset;
-+    dc->desc =3D "nRF51 GPIO";
-+}
-+
-+static const TypeInfo nrf51_gpio_info =3D {
-+    .name =3D TYPE_NRF51_GPIO,
-+    .parent =3D TYPE_SYS_BUS_DEVICE,
-+    .instance_size =3D sizeof(NRF51GPIOState),
-+    .instance_init =3D nrf51_gpio_init,
-+    .class_init =3D nrf51_gpio_class_init
-+};
-+
-+static void nrf51_gpio_register_types(void)
-+{
-+    type_register_static(&nrf51_gpio_info);
-+}
-+
-+type_init(nrf51_gpio_register_types)
-diff --git a/hw/gpio/trace-events b/hw/gpio/trace-events
-new file mode 100644
-index 0000000000..cb41a89756
---- /dev/null
-+++ b/hw/gpio/trace-events
-@@ -0,0 +1,7 @@
-+# See docs/devel/tracing.txt for syntax documentation.
-+
-+# hw/gpio/nrf51_gpio.c
-+nrf51_gpio_read(uint64_t offset, uint64_t r) "offset 0x%" PRIx64 " value=
- 0x%" PRIx64
-+nrf51_gpio_write(uint64_t offset, uint64_t value) "offset 0x%" PRIx64 " =
-value 0x%" PRIx64
-+nrf51_gpio_set(int64_t line, int64_t value) "line %" PRIi64 " value %" P=
-RIi64
-+nrf51_gpio_update_output_irq(int64_t line, int64_t value) "line %" PRIi6=
-4 " value %" PRIi64
-\ No newline at end of file
-diff --git a/include/hw/gpio/nrf51_gpio.h b/include/hw/gpio/nrf51_gpio.h
-new file mode 100644
-index 0000000000..337ee534bb
---- /dev/null
-+++ b/include/hw/gpio/nrf51_gpio.h
-@@ -0,0 +1,69 @@
-+/*
-+ * nRF51 System-on-Chip general purpose input/output register definition
-+ *
-+ * QEMU interface:
-+ * + sysbus MMIO regions 0: GPIO registers
-+ * + Unnamed GPIO inputs 0-31: Set tri-state input level for GPIO pin.
-+ *   Level -1: Externally Disconnected/Floating; Pull-up/down will be re=
-garded
-+ *   Level 0: Input externally driven LOW
-+ *   Level 1: Input externally driven HIGH
-+ * + Unnamed GPIO outputs 0-31:
-+ *   Level -1: Disconnected/Floating
-+ *   Level 0: Driven LOW
-+ *   Level 1: Driven HIGH
-+ *
-+ * Accuracy of the peripheral model:
-+ * + The nRF51 GPIO output driver supports two modes, standard and high-=
-current
-+ *   mode. These different drive modes are not modeled and handled the s=
-ame.
-+ * + Pin SENSEing is not modeled/implemented.
-+ *
-+ * Copyright 2018 Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
-+ *
-+ * This code is licensed under the GPL version 2 or later.  See
-+ * the COPYING file in the top-level directory.
-+ *
-+ */
-+#ifndef NRF51_GPIO_H
-+#define NRF51_GPIO_H
-+
-+#include "hw/sysbus.h"
-+#define TYPE_NRF51_GPIO "nrf51_soc.gpio"
-+#define NRF51_GPIO(obj) OBJECT_CHECK(NRF51GPIOState, (obj), TYPE_NRF51_G=
-PIO)
-+
-+#define NRF51_GPIO_PINS 32
-+
-+#define NRF51_GPIO_SIZE 0x1000
-+
-+#define NRF51_GPIO_REG_OUT          0x504
-+#define NRF51_GPIO_REG_OUTSET       0x508
-+#define NRF51_GPIO_REG_OUTCLR       0x50C
-+#define NRF51_GPIO_REG_IN           0x510
-+#define NRF51_GPIO_REG_DIR          0x514
-+#define NRF51_GPIO_REG_DIRSET       0x518
-+#define NRF51_GPIO_REG_DIRCLR       0x51C
-+#define NRF51_GPIO_REG_CNF_START    0x700
-+#define NRF51_GPIO_REG_CNF_END      0x77F
-+
-+#define NRF51_GPIO_PULLDOWN 1
-+#define NRF51_GPIO_PULLUP 3
-+
-+typedef struct NRF51GPIOState {
-+    SysBusDevice parent_obj;
-+
-+    MemoryRegion mmio;
-+    qemu_irq irq;
-+
-+    uint32_t out;
-+    uint32_t in;
-+    uint32_t in_mask;
-+    uint32_t dir;
-+    uint32_t cnf[NRF51_GPIO_PINS];
-+
-+    uint32_t old_out;
-+    uint32_t old_out_connected;
-+
-+    qemu_irq output[NRF51_GPIO_PINS];
-+} NRF51GPIOState;
-+
++#ifndef NRF51_H
++#define NRF51_H
++
++#define NRF51_FLASH_BASE      0x00000000
++#define NRF51_FICR_BASE       0x10000000
++#define NRF51_FICR_SIZE       0x00000100
++#define NRF51_UICR_BASE       0x10001000
++#define NRF51_SRAM_BASE       0x20000000
++
++#define NRF51_IOMEM_BASE      0x40000000
++#define NRF51_IOMEM_SIZE      0x20000000
++
++#define NRF51_UART_BASE       0x40002000
++#define NRF51_TIMER_BASE      0x40008000
++#define NRF51_TIMER_SIZE      0x00001000
++#define NRF51_RNG_BASE        0x4000D000
++#define NRF51_NVMC_BASE       0x4001E000
++#define NRF51_GPIO_BASE       0x50000000
++
++#define NRF51_PRIVATE_BASE    0xF0000000
++#define NRF51_PRIVATE_SIZE    0x10000000
++
++#define NRF51_PAGE_SIZE       1024
++
++/* Trigger */
++#define NRF51_TRIGGER_TASK 0x01
++
++/* Events */
++#define NRF51_EVENT_CLEAR  0x00
 +
 +#endif
+diff --git a/include/hw/char/nrf51_uart.h b/include/hw/char/nrf51_uart.h
+index e3ecb7c81c..eb1c15b490 100644
+--- a/include/hw/char/nrf51_uart.h
++++ b/include/hw/char/nrf51_uart.h
+@@ -16,7 +16,6 @@
+ #include "hw/registerfields.h"
+=20
+ #define UART_FIFO_LENGTH 6
+-#define UART_BASE 0x40002000
+ #define UART_SIZE 0x1000
+=20
+ #define TYPE_NRF51_UART "nrf51_soc.uart"
 --=20
 2.19.1
