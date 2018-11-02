@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49478)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49666)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=8372cde87=Paul.Durrant@citrix.com>)
-	id 1gIXOr-0002oG-Md
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:14:02 -0400
+	id 1gIXPd-0003BP-6t
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:14:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=8372cde87=Paul.Durrant@citrix.com>)
-	id 1gIXOn-00043p-MG
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:14:01 -0400
+	id 1gIXPZ-0004Ry-4A
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:14:49 -0400
 From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Fri, 2 Nov 2018 11:13:48 +0000
-Message-ID: <152b8d37c7d54de687f4ced536ba6a10@AMSPEX02CL03.citrite.net>
+Date: Fri, 2 Nov 2018 11:14:28 +0000
+Message-ID: <98e77c8dca544f50b831175d50b6d641@AMSPEX02CL03.citrite.net>
 References: <154115285434.11300.8459925605672823399.stgit@dhcp-3-135.uk.xensource.com>
-	<20181102110412.GD7521@dhcp-200-186.str.redhat.com>
-In-Reply-To: <20181102110412.GD7521@dhcp-200-186.str.redhat.com>
+	<154115285942.11300.11718576813181760505.stgit@dhcp-3-135.uk.xensource.com>
+In-Reply-To: <154115285942.11300.11718576813181760505.stgit@dhcp-3-135.uk.xensource.com>
 Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] xen_disk qdevification (was: [PATCH 0/3]
- Performance improvements for xen_disk v2)
+Subject: Re: [Qemu-devel] [PATCH 1/3] Improve xen_disk batching behaviour
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,59 +26,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Kevin Wolf' <kwolf@redhat.com>, Tim Smith <tim.smith@citrix.com>
-Cc: "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Anthony Perard <anthony.perard@citrix.com>, Stefano
-	Stabellini <sstabellini@kernel.org>, Max Reitz <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>
+To: Tim Smith <tim.smith@citrix.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: Anthony Perard <anthony.perard@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Max Reitz <mreitz@redhat.com>
 
-> -----Original Message-----
-> From: Kevin Wolf [mailto:kwolf@redhat.com]
-> Sent: 02 November 2018 11:04
-> To: Tim Smith <tim.smith@citrix.com>
-> Cc: xen-devel@lists.xenproject.org; qemu-devel@nongnu.org; qemu-
-> block@nongnu.org; Anthony Perard <anthony.perard@citrix.com>; Paul Durran=
-t
-> <Paul.Durrant@citrix.com>; Stefano Stabellini <sstabellini@kernel.org>;
-> Max Reitz <mreitz@redhat.com>; armbru@redhat.com
-> Subject: xen_disk qdevification (was: [PATCH 0/3] Performance improvement=
-s
-> for xen_disk v2)
->=20
-> Am 02.11.2018 um 11:00 hat Tim Smith geschrieben:
-> > A series of performance improvements for disks using the Xen PV ring.
-> >
-> > These have had fairly extensive testing.
-> >
-> > The batching and latency improvements together boost the throughput
-> > of small reads and writes by two to six percent (measured using fio
-> > in the guest)
-> >
-> > Avoiding repeated calls to posix_memalign() reduced the dirty heap
-> > from 25MB to 5MB in the case of a single datapath process while also
-> > improving performance.
-> >
-> > v2 removes some checkpatch complaints and fixes the CCs
->=20
-> Completely unrelated, but since you're the first person touching
-> xen_disk in a while, you're my victim:
->=20
-> At KVM Forum we discussed sending a patch to deprecate xen_disk because
-> after all those years, it still hasn't been converted to qdev. Markus is
-> currently fixing some other not yet qdevified block device, but after
-> that xen_disk will be the only one left.
->=20
-> A while ago, a downstream patch review found out that there are some QMP
-> commands that would immediately crash if a xen_disk device were present
-> because of the lacking qdevification. This is not the code quality
-> standard I envision for QEMU. It's time for non-qdev devices to go.
->=20
-> So if you guys are still interested in the device, could someone please
-> finally look into converting it?
->=20
-
-I have a patch series to do exactly this. It's somewhat involved as I need =
-to convert the whole PV backend infrastructure. I will try to rebase and cl=
-ean up my series a.s.a.p.
-
-  Paul
-
-> Kevin
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBUaW0gU21pdGggW21haWx0bzp0
+aW0uc21pdGhAY2l0cml4LmNvbV0NCj4gU2VudDogMDIgTm92ZW1iZXIgMjAxOCAxMDowMQ0KPiBU
+bzogeGVuLWRldmVsQGxpc3RzLnhlbnByb2plY3Qub3JnOyBxZW11LWRldmVsQG5vbmdudS5vcmc7
+IHFlbXUtDQo+IGJsb2NrQG5vbmdudS5vcmcNCj4gQ2M6IEFudGhvbnkgUGVyYXJkIDxhbnRob255
+LnBlcmFyZEBjaXRyaXguY29tPjsgS2V2aW4gV29sZg0KPiA8a3dvbGZAcmVkaGF0LmNvbT47IFBh
+dWwgRHVycmFudCA8UGF1bC5EdXJyYW50QGNpdHJpeC5jb20+OyBTdGVmYW5vDQo+IFN0YWJlbGxp
+bmkgPHNzdGFiZWxsaW5pQGtlcm5lbC5vcmc+OyBNYXggUmVpdHogPG1yZWl0ekByZWRoYXQuY29t
+Pg0KPiBTdWJqZWN0OiBbUEFUQ0ggMS8zXSBJbXByb3ZlIHhlbl9kaXNrIGJhdGNoaW5nIGJlaGF2
+aW91cg0KPiANCj4gV2hlbiBJL08gY29uc2lzdHMgb2YgbWFueSBzbWFsbCByZXF1ZXN0cywgcGVy
+Zm9ybWFuY2UgaXMgaW1wcm92ZWQgYnkNCj4gYmF0Y2hpbmcgdGhlbSB0b2dldGhlciBpbiBhIHNp
+bmdsZSBpb19zdWJtaXQoKSBjYWxsLiBXaGVuIHRoZXJlIGFyZQ0KPiByZWxhdGl2ZWx5IGZldyBy
+ZXF1ZXN0cywgdGhlIGV4dHJhIG92ZXJoZWFkIGlzIG5vdCB3b3J0aCBpdC4gVGhpcw0KPiBpbnRy
+b2R1Y2VzIGEgY2hlY2sgdG8gc3RhcnQgYmF0Y2hpbmcgSS9PIHJlcXVlc3RzIHZpYSBibGtfaW9f
+cGx1ZygpLw0KPiBibGtfaW9fdW5wbHVnKCkgaW4gYW4gYW1vdW50IHByb3BvcnRpb25hbCB0byB0
+aGUgbnVtYmVyIHdoaWNoIHdlcmUNCj4gYWxyZWFkeSBpbiBmbGlnaHQgYXQgdGhlIHRpbWUgd2Ug
+c3RhcnRlZCByZWFkaW5nIHRoZSByaW5nLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogVGltIFNtaXRo
+IDx0aW0uc21pdGhAY2l0cml4LmNvbT4NCg0KUmV2aWV3ZWQtYnk6IFBhdWwgRHVycmFudCA8cGF1
+bC5kdXJyYW50QGNpdHJpeC5jb20+DQoNCj4gLS0tDQo+ICBody9ibG9jay94ZW5fZGlzay5jIHwg
+ICAzMCArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4gIDEgZmlsZSBjaGFuZ2VkLCAz
+MCBpbnNlcnRpb25zKCspDQo+IA0KPiBkaWZmIC0tZ2l0IGEvaHcvYmxvY2sveGVuX2Rpc2suYyBi
+L2h3L2Jsb2NrL3hlbl9kaXNrLmMNCj4gaW5kZXggMzZlZmY5NGY4NC4uY2IyODgxYjdlNiAxMDA2
+NDQNCj4gLS0tIGEvaHcvYmxvY2sveGVuX2Rpc2suYw0KPiArKysgYi9ody9ibG9jay94ZW5fZGlz
+ay5jDQo+IEBAIC0xMDEsNiArMTAxLDkgQEAgc3RydWN0IFhlbkJsa0RldiB7DQo+ICAgICAgQWlv
+Q29udGV4dCAgICAgICAgICAqY3R4Ow0KPiAgfTsNCj4gDQo+ICsvKiBUaHJlc2hvbGQgb2YgaW4t
+ZmxpZ2h0IHJlcXVlc3RzIGFib3ZlIHdoaWNoIHdlIHdpbGwgc3RhcnQgdXNpbmcNCj4gKyAqIGJs
+a19pb19wbHVnKCkvYmxrX2lvX3VucGx1ZygpIHRvIGJhdGNoIHJlcXVlc3RzICovDQo+ICsjZGVm
+aW5lIElPX1BMVUdfVEhSRVNIT0xEIDENCj4gIC8qIC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0gKi8NCj4gDQo+ICBzdGF0aWMgdm9p
+ZCBpb3JlcV9yZXNldChzdHJ1Y3QgaW9yZXEgKmlvcmVxKQ0KPiBAQCAtNTQyLDYgKzU0NSw4IEBA
+IHN0YXRpYyB2b2lkIGJsa19oYW5kbGVfcmVxdWVzdHMoc3RydWN0IFhlbkJsa0Rldg0KPiAqYmxr
+ZGV2KQ0KPiAgew0KPiAgICAgIFJJTkdfSURYIHJjLCBycDsNCj4gICAgICBzdHJ1Y3QgaW9yZXEg
+KmlvcmVxOw0KPiArICAgIGludCBpbmZsaWdodF9hdHN0YXJ0ID0gYmxrZGV2LT5yZXF1ZXN0c19p
+bmZsaWdodDsNCj4gKyAgICBpbnQgYmF0Y2hlZCA9IDA7DQo+IA0KPiAgICAgIGJsa2Rldi0+bW9y
+ZV93b3JrID0gMDsNCj4gDQo+IEBAIC01NTAsNiArNTU1LDE2IEBAIHN0YXRpYyB2b2lkIGJsa19o
+YW5kbGVfcmVxdWVzdHMoc3RydWN0IFhlbkJsa0Rldg0KPiAqYmxrZGV2KQ0KPiAgICAgIHhlbl9y
+bWIoKTsgLyogRW5zdXJlIHdlIHNlZSBxdWV1ZWQgcmVxdWVzdHMgdXAgdG8gJ3JwJy4gKi8NCj4g
+DQo+ICAgICAgYmxrX3NlbmRfcmVzcG9uc2VfYWxsKGJsa2Rldik7DQo+ICsgICAgLyogSWYgdGhl
+cmUgd2FzIG1vcmUgdGhhbiBJT19QTFVHX1RIUkVTSE9MRCBpb3JlcXMgaW4gZmxpZ2h0DQo+ICsg
+ICAgICogd2hlbiB3ZSBnb3QgaGVyZSwgdGhpcyBpcyBhbiBpbmRpY2F0aW9uIHRoYXQgdGhlcmUg
+dGhlIGJvdHRsZW5lY2sNCj4gKyAgICAgKiBpcyBiZWxvdyB1cywgc28gaXQncyB3b3J0aCBiZWdp
+bm5pbmcgdG8gYmF0Y2ggdXAgSS9PIHJlcXVlc3RzDQo+ICsgICAgICogcmF0aGVyIHRoYW4gc3Vi
+bWl0dGluZyB0aGVtIGltbWVkaWF0ZWx5LiBUaGUgbWF4aW11bSBudW1iZXINCj4gKyAgICAgKiBv
+ZiByZXF1ZXN0cyB3ZSdyZSB3aWxsaW5nIHRvIGJhdGNoIGlzIHRoZSBudW1iZXIgYWxyZWFkeSBp
+bg0KPiArICAgICAqIGZsaWdodCwgc28gaXQgY2FuIGdyb3cgdXAgdG8gbWF4X3JlcXVlc3RzIHdo
+ZW4gdGhlIGJvdHRsZW5lY2sNCj4gKyAgICAgKiBpcyBiZWxvdyB1cyAqLw0KPiArICAgIGlmIChp
+bmZsaWdodF9hdHN0YXJ0ID4gSU9fUExVR19USFJFU0hPTEQpIHsNCj4gKyAgICAgICAgYmxrX2lv
+X3BsdWcoYmxrZGV2LT5ibGspOw0KPiArICAgIH0NCj4gICAgICB3aGlsZSAocmMgIT0gcnApIHsN
+Cj4gICAgICAgICAgLyogcHVsbCByZXF1ZXN0IGZyb20gcmluZyAqLw0KPiAgICAgICAgICBpZiAo
+UklOR19SRVFVRVNUX0NPTlNfT1ZFUkZMT1coJmJsa2Rldi0+cmluZ3MuY29tbW9uLCByYykpIHsN
+Cj4gQEAgLTU4OSw3ICs2MDQsMjIgQEAgc3RhdGljIHZvaWQgYmxrX2hhbmRsZV9yZXF1ZXN0cyhz
+dHJ1Y3QgWGVuQmxrRGV2DQo+ICpibGtkZXYpDQo+ICAgICAgICAgICAgICBjb250aW51ZTsNCj4g
+ICAgICAgICAgfQ0KPiANCj4gKyAgICAgICAgaWYgKGluZmxpZ2h0X2F0c3RhcnQgPiBJT19QTFVH
+X1RIUkVTSE9MRCAmJg0KPiArICAgICAgICAgICAgYmF0Y2hlZCA+PSBpbmZsaWdodF9hdHN0YXJ0
+KSB7DQo+ICsgICAgICAgICAgICBibGtfaW9fdW5wbHVnKGJsa2Rldi0+YmxrKTsNCj4gKyAgICAg
+ICAgfQ0KPiAgICAgICAgICBpb3JlcV9ydW5pb19xZW11X2Fpbyhpb3JlcSk7DQo+ICsgICAgICAg
+IGlmIChpbmZsaWdodF9hdHN0YXJ0ID4gSU9fUExVR19USFJFU0hPTEQpIHsNCj4gKyAgICAgICAg
+ICAgIGlmIChiYXRjaGVkID49IGluZmxpZ2h0X2F0c3RhcnQpIHsNCj4gKyAgICAgICAgICAgICAg
+ICBibGtfaW9fcGx1ZyhibGtkZXYtPmJsayk7DQo+ICsgICAgICAgICAgICAgICAgYmF0Y2hlZCA9
+IDA7DQo+ICsgICAgICAgICAgICB9IGVsc2Ugew0KPiArICAgICAgICAgICAgICAgIGJhdGNoZWQr
+KzsNCj4gKyAgICAgICAgICAgIH0NCj4gKyAgICAgICAgfQ0KPiArICAgIH0NCj4gKyAgICBpZiAo
+aW5mbGlnaHRfYXRzdGFydCA+IElPX1BMVUdfVEhSRVNIT0xEKSB7DQo+ICsgICAgICAgIGJsa19p
+b191bnBsdWcoYmxrZGV2LT5ibGspOw0KPiAgICAgIH0NCj4gDQo+ICAgICAgaWYgKGJsa2Rldi0+
+bW9yZV93b3JrICYmIGJsa2Rldi0+cmVxdWVzdHNfaW5mbGlnaHQgPCBibGtkZXYtDQo+ID5tYXhf
+cmVxdWVzdHMpIHsNCg0K
