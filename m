@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36388)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36482)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=837fd5125=anthony.perard@citrix.com>)
-	id 1gIZtZ-0008UH-KJ
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 09:53:54 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gIZu9-0000Vm-Vi
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 09:54:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=837fd5125=anthony.perard@citrix.com>)
-	id 1gIZtU-0005We-Or
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 09:53:53 -0400
-Date: Fri, 2 Nov 2018 13:53:40 +0000
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20181102135340.GI6481@perard.uk.xensource.com>
-References: <154115285434.11300.8459925605672823399.stgit@dhcp-3-135.uk.xensource.com>
-	<154115286959.11300.498371710893672725.stgit@dhcp-3-135.uk.xensource.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gIZu2-0005jp-N1
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 09:54:28 -0400
+Received: from mail-ot1-x333.google.com ([2607:f8b0:4864:20::333]:36684)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gIZty-0005iL-Rg
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 09:54:20 -0400
+Received: by mail-ot1-x333.google.com with SMTP id x4so1754692otg.3
+	for <qemu-devel@nongnu.org>; Fri, 02 Nov 2018 06:54:17 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <154115286959.11300.498371710893672725.stgit@dhcp-3-135.uk.xensource.com>
-Subject: Re: [Qemu-devel] [PATCH 3/3] Avoid repeated memory allocation in
- xen_disk
+In-Reply-To: <20181101235525.29042-1-palmer@sifive.com>
+References: <20181101235525.29042-1-palmer@sifive.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 2 Nov 2018 13:53:56 +0000
+Message-ID: <CAFEAcA-h0iQ2RcCkkE66mLxjXZ9YOZG3STAO3Bv5C3rQ7jyhdQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL] RISC-V Patches for the 3.1 Soft Freeze,
+ Part 2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,24 +29,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tim Smith <tim.smith@citrix.com>
-Cc: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Paul Durrant <Paul.Durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Max Reitz <mreitz@redhat.com>
+To: Palmer Dabbelt <palmer@sifive.com>
+Cc: qemu-riscv@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>
 
-On Fri, Nov 02, 2018 at 10:01:09AM +0000, Tim Smith wrote:
-> xen_disk currently allocates memory to hold the data for each ioreq
-> as that ioreq is used, and frees it afterwards. Because it requires
-> page-aligned blocks, this interacts poorly with non-page-aligned
-> allocations and balloons the heap.
-> 
-> Instead, allocate the maximum possible requirement, which is
-> BLKIF_MAX_SEGMENTS_PER_REQUEST pages (currently 11 pages) when
-> the ioreq is created, and keep that allocation until it is destroyed.
-> Since the ioreqs themselves are re-used via a free list, this
-> should actually improve memory usage.
-> 
-> Signed-off-by: Tim Smith <tim.smith@citrix.com>
+On 1 November 2018 at 23:55, Palmer Dabbelt <palmer@sifive.com> wrote:
+> The following changes since commit a2e002ff7913ce93aa0f7dbedd2123dce5f1a9cd:
+>
+>   Merge remote-tracking branch 'remotes/vivier2/tags/qemu-trivial-for-3.1-pull-request' into staging (2018-10-30 15:49:55 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/riscv/riscv-qemu.git tags/riscv-for-master-3.1-sf1
+>
+> for you to fetch changes up to a094b3544f2855c0489f5df3c938b14b9a5899e5:
+>
+>   Add qemu-riscv@nongnu.org as the RISC-V list (2018-10-30 11:04:29 -0700)
+>
+> ----------------------------------------------------------------
+> RISC-V Patches for the 3.1 Soft Freeze, Part 2
+>
+> This tag contains a few simple patches that I'd like to target for the
+> QEMU soft freeze.  There's only one code change: a fix to our PMP
+> implementation that avoids an internal truncation while computing a
+> partial PMP read.
+>
+> I also have two updates to the MAINTAINERS file: one to add Alistair as
+> a RISC-V maintainer, and one to add our newly created mailing list.
+>
 
-Acked-by: Anthony PERARD <anthony.perard@citrix.com>
+Applied, thanks.
 
--- 
-Anthony PERARD
+-- PMM
