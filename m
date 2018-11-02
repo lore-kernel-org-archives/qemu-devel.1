@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46390)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47143)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gIe3y-0003aE-IL
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 14:20:55 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gIe5r-0005HC-T7
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 14:22:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gIe3v-0004Mp-6e
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 14:20:54 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49554)
+	(envelope-from <peter.maydell@linaro.org>) id 1gIe5q-0005Zd-QG
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 14:22:51 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:45562)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gIe3u-0004JN-Tp
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 14:20:51 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gIe3p-00036n-Qu
-	for <qemu-devel@nongnu.org>; Fri, 02 Nov 2018 18:20:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C8D732E80C9
-	for <qemu-devel@nongnu.org>; Fri,  2 Nov 2018 18:20:45 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gIe5q-0005Pv-Gf
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 14:22:50 -0400
+Received: by mail-ot1-x343.google.com with SMTP id g10so2471508otl.12
+	for <qemu-devel@nongnu.org>; Fri, 02 Nov 2018 11:22:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 02 Nov 2018 18:07:09 -0000
-From: John Snow <1800993@bugs.launchpad.net>
-Reply-To: Bug 1800993 <1800993@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154105692385.28446.7851750584865543742.malonedeb@soybean.canonical.com>
-Message-Id: <154118202931.13172.4201937008349332031.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1800993] Re: How to Migration VM Built on Qemu
- Souce Code Installation
+In-Reply-To: <20181102171638.24069-1-peter.maydell@linaro.org>
+References: <20181102171638.24069-1-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 2 Nov 2018 18:22:09 +0000
+Message-ID: <CAFEAcA9kDVH92UQXcrDTu=iNW7tGsYwTpjwoqfBM5UxL27x4zw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v3 00/10] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,43 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: QEMU Developers <qemu-devel@nongnu.org>
 
-Hi, this is the bug tracker and not a support request form, so I'm
-closing this issue.
+On 2 November 2018 at 17:16, Peter Maydell <peter.maydell@linaro.org> wrote:
+> This is a respin of my pull request from earlier this week:
+>  * versal board compile failure fixed
+>  * a few new patches:
+>   - MAINTAINERS file fix
+>   - use ARRAY_SIZE macro in xilinx_zynq
+>   - avoid an array overrun in strongarm GPIO irq handling
+>   - fix an assert running KVM on an aarch64-only host
+>
+> The following changes since commit 69e2d03843412b9c076515b3aa9a71db161b6a1a:
+>
+>   Merge remote-tracking branch 'remotes/riscv/tags/riscv-for-master-3.1-sf1' into staging (2018-11-02 13:16:13 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20181102
+>
+> for you to fetch changes up to 6f16da53ffe4567c0353f85055df04860eb4e6fc:
+>
+>   hw/arm: versal: Add a virtual Xilinx Versal board (2018-11-02 14:11:31 +0000)
+>
+> ----------------------------------------------------------------
+> target-arm queue:
+>  * microbit: Add the UART to our nRF51 SoC model
+>  * Add a virtual Xilinx Versal board "xlnx-versal-virt"
+>  * hw/arm/virt: Set VIRT_COMPAT_3_0 compat
+>  * MAINTAINERS: Remove bouncing email in ARM ACPI
+>  * strongarm: mask off high[31:28] bits from dir and state registers
+>  * target/arm: Conditionalize some asserts on aarch32 support
+>  * hw/arm/xilinx_zynq: Use the ARRAY_SIZE macro
+>
+> ----------------------------------------------------------------
 
-(You've already emailed the mailing list, so you already know where to
-find us!)
+Applied, thanks.
 
-Thanks,
---John
-
-** Changed in: qemu
-       Status: New =3D> Invalid
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1800993
-
-Title:
-  How to Migration VM Built on Qemu Souce Code Installation
-
-Status in QEMU:
-  Invalid
-
-Bug description:
-  Respected all,
-
-  I followed https://wiki.qemu.org/Hosts/Linux to build qemu from source
-  code. Its installed successfully with Ubuntu 16.04 VM created using
-  VNC server.
-
-  Now, Could you please suggest me how to migrate VM from one host to
-  another?.
-
-  Email: adityaform@gmail.com
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1800993/+subscriptions
+-- PMM
