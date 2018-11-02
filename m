@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51960)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52164)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gIc0H-0000ZL-Es
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 12:08:58 -0400
+	(envelope-from <noring@nocrew.org>) id 1gIc0S-0000lm-Mf
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 12:09:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gIc09-00031Y-Ob
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 12:08:55 -0400
-Received: from ste-pvt-msa1.bahnhof.se ([213.80.101.70]:62581)
+	(envelope-from <noring@nocrew.org>) id 1gIc0N-0003Gn-Q1
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 12:09:08 -0400
+Received: from ste-pvt-msa1.bahnhof.se ([213.80.101.70]:13405)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gIc05-0002zD-MT
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 12:08:47 -0400
-Date: Fri, 2 Nov 2018 17:08:27 +0100
+	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gIc0N-0002uK-AX
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 12:09:03 -0400
+Date: Fri, 2 Nov 2018 17:08:17 +0100
 From: Fredrik Noring <noring@nocrew.org>
-Message-ID: <00da443f92be6ccd6b9a890529e68e8239325006.1541174426.git.noring@nocrew.org>
+Message-ID: <fa2941ee17c35fba2512ab530bde3a1807d5769e.1541174426.git.noring@nocrew.org>
 References: <cover.1541174426.git.noring@nocrew.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <cover.1541174426.git.noring@nocrew.org>
-Subject: [Qemu-devel] [PATCH 2/2] target/mips: Fix decoding mechanism of
- R5900 DIV1 and DIVU1
+Subject: [Qemu-devel] [PATCH 1/2] target/mips: Fix decoding mechanism of
+ R5900 MFLO1, MFHI1, MTLO1 and MTHI1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,84 +30,83 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Cc: =?utf-8?Q?J=C3=BCrgen?= Urban <JuergenUrban@gmx.de>, "Maciej W. Rozycki" <macro@linux-mips.org>, qemu-devel@nongnu.org
 
-DIV1 and DIVU1 are generated in gen_div1_tx79 instead of the generic
-gen_muldiv.
+MFLO1, MFHI1, MTLO1 and MTHI1 are generated in gen_HILO1_tx79 instead of
+the generic gen_HILO.
 
 Signed-off-by: Fredrik Noring <noring@nocrew.org>
 ---
- target/mips/translate.c | 65 +++++++++++++++++++++++++++++++++++++----
- 1 file changed, 59 insertions(+), 6 deletions(-)
+ target/mips/translate.c | 67 ++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 56 insertions(+), 11 deletions(-)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index f3993cf7d7..6e5a8a2565 100644
+index 60320cbe69..f3993cf7d7 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -4759,6 +4759,63 @@ static void gen_r6_muldiv(DisasContext *ctx, int opc, int rd, int rs, int rt)
+@@ -4359,24 +4359,72 @@ static void gen_shift(DisasContext *ctx, uint32_t opc,
      tcg_temp_free(t1);
  }
  
-+static void gen_div1_tx79(DisasContext *ctx, uint32_t opc, int rs, int rt)
++/* Move to and from TX79 HI1/LO1 registers. */
++static void gen_HILO1_tx79(DisasContext *ctx, uint32_t opc, int reg)
 +{
-+    TCGv t0, t1;
-+
-+    t0 = tcg_temp_new();
-+    t1 = tcg_temp_new();
-+
-+    gen_load_gpr(t0, rs);
-+    gen_load_gpr(t1, rt);
++    if (reg == 0 && (opc == TX79_MMI_MFHI1 || opc == TX79_MMI_MFLO1)) {
++        /* Treat as NOP. */
++        return;
++    }
 +
 +    switch (opc) {
-+    case TX79_MMI_DIV1:
-+        {
-+            TCGv t2 = tcg_temp_new();
-+            TCGv t3 = tcg_temp_new();
-+            tcg_gen_ext32s_tl(t0, t0);
-+            tcg_gen_ext32s_tl(t1, t1);
-+            tcg_gen_setcondi_tl(TCG_COND_EQ, t2, t0, INT_MIN);
-+            tcg_gen_setcondi_tl(TCG_COND_EQ, t3, t1, -1);
-+            tcg_gen_and_tl(t2, t2, t3);
-+            tcg_gen_setcondi_tl(TCG_COND_EQ, t3, t1, 0);
-+            tcg_gen_or_tl(t2, t2, t3);
-+            tcg_gen_movi_tl(t3, 0);
-+            tcg_gen_movcond_tl(TCG_COND_NE, t1, t2, t3, t2, t1);
-+            tcg_gen_div_tl(cpu_LO[1], t0, t1);
-+            tcg_gen_rem_tl(cpu_HI[1], t0, t1);
-+            tcg_gen_ext32s_tl(cpu_LO[1], cpu_LO[1]);
-+            tcg_gen_ext32s_tl(cpu_HI[1], cpu_HI[1]);
-+            tcg_temp_free(t3);
-+            tcg_temp_free(t2);
++    case TX79_MMI_MFHI1:
++#if defined(TARGET_MIPS64)
++        tcg_gen_ext32s_tl(cpu_gpr[reg], cpu_HI[1]);
++#else
++        tcg_gen_mov_tl(cpu_gpr[reg], cpu_HI[1]);
++#endif
++        break;
++    case TX79_MMI_MFLO1:
++#if defined(TARGET_MIPS64)
++        tcg_gen_ext32s_tl(cpu_gpr[reg], cpu_LO[1]);
++#else
++        tcg_gen_mov_tl(cpu_gpr[reg], cpu_LO[1]);
++#endif
++        break;
++    case TX79_MMI_MTHI1:
++        if (reg != 0) {
++#if defined(TARGET_MIPS64)
++            tcg_gen_ext32s_tl(cpu_HI[1], cpu_gpr[reg]);
++#else
++            tcg_gen_mov_tl(cpu_HI[1], cpu_gpr[reg]);
++#endif
++        } else {
++            tcg_gen_movi_tl(cpu_HI[1], 0);
 +        }
 +        break;
-+    case TX79_MMI_DIVU1:
-+        {
-+            TCGv t2 = tcg_const_tl(0);
-+            TCGv t3 = tcg_const_tl(1);
-+            tcg_gen_ext32u_tl(t0, t0);
-+            tcg_gen_ext32u_tl(t1, t1);
-+            tcg_gen_movcond_tl(TCG_COND_EQ, t1, t1, t2, t3, t1);
-+            tcg_gen_divu_tl(cpu_LO[1], t0, t1);
-+            tcg_gen_remu_tl(cpu_HI[1], t0, t1);
-+            tcg_gen_ext32s_tl(cpu_LO[1], cpu_LO[1]);
-+            tcg_gen_ext32s_tl(cpu_HI[1], cpu_HI[1]);
-+            tcg_temp_free(t3);
-+            tcg_temp_free(t2);
++    case TX79_MMI_MTLO1:
++        if (reg != 0) {
++#if defined(TARGET_MIPS64)
++            tcg_gen_ext32s_tl(cpu_LO[1], cpu_gpr[reg]);
++#else
++            tcg_gen_mov_tl(cpu_LO[1], cpu_gpr[reg]);
++#endif
++        } else {
++            tcg_gen_movi_tl(cpu_LO[1], 0);
 +        }
 +        break;
 +    default:
-+        MIPS_INVAL("div1 TX79");
++        MIPS_INVAL("MFTHILO TX79");
 +        generate_exception_end(ctx, EXCP_RI);
-+        goto out;
++        break;
 +    }
-+ out:
-+    tcg_temp_free(t0);
-+    tcg_temp_free(t1);
 +}
 +
- static void gen_muldiv(DisasContext *ctx, uint32_t opc,
-                        int acc, int rs, int rt)
+ /* Arithmetic on HI/LO registers */
+ static void gen_HILO(DisasContext *ctx, uint32_t opc, int acc, int reg)
  {
-@@ -4771,14 +4828,11 @@ static void gen_muldiv(DisasContext *ctx, uint32_t opc,
-     gen_load_gpr(t1, rt);
+-    if (reg == 0 && (opc == OPC_MFHI || opc == TX79_MMI_MFHI1 ||
+-                     opc == OPC_MFLO || opc == TX79_MMI_MFLO1)) {
++    if (reg == 0 && (opc == OPC_MFHI || opc == OPC_MFLO)) {
+         /* Treat as NOP. */
+         return;
+     }
  
      if (acc != 0) {
 -        if (!(ctx->insn_flags & INSN_R5900)) {
@@ -117,27 +116,48 @@ index f3993cf7d7..6e5a8a2565 100644
      }
  
      switch (opc) {
-     case OPC_DIV:
--    case TX79_MMI_DIV1:
-         {
-             TCGv t2 = tcg_temp_new();
-             TCGv t3 = tcg_temp_new();
-@@ -4800,7 +4854,6 @@ static void gen_muldiv(DisasContext *ctx, uint32_t opc,
+     case OPC_MFHI:
+-    case TX79_MMI_MFHI1:
+ #if defined(TARGET_MIPS64)
+         if (acc != 0) {
+             tcg_gen_ext32s_tl(cpu_gpr[reg], cpu_HI[acc]);
+@@ -4387,7 +4435,6 @@ static void gen_HILO(DisasContext *ctx, uint32_t opc, int acc, int reg)
          }
          break;
-     case OPC_DIVU:
--    case TX79_MMI_DIVU1:
-         {
-             TCGv t2 = tcg_const_tl(0);
-             TCGv t3 = tcg_const_tl(1);
-@@ -26541,7 +26594,7 @@ static void decode_tx79_mmi(CPUMIPSState *env, DisasContext *ctx)
+     case OPC_MFLO:
+-    case TX79_MMI_MFLO1:
+ #if defined(TARGET_MIPS64)
+         if (acc != 0) {
+             tcg_gen_ext32s_tl(cpu_gpr[reg], cpu_LO[acc]);
+@@ -4398,7 +4445,6 @@ static void gen_HILO(DisasContext *ctx, uint32_t opc, int acc, int reg)
+         }
          break;
-     case TX79_MMI_DIV1:
-     case TX79_MMI_DIVU1:
--        gen_muldiv(ctx, opc, 1, rs, rt);
-+        gen_div1_tx79(ctx, opc, rs, rt);
+     case OPC_MTHI:
+-    case TX79_MMI_MTHI1:
+         if (reg != 0) {
+ #if defined(TARGET_MIPS64)
+             if (acc != 0) {
+@@ -4413,7 +4459,6 @@ static void gen_HILO(DisasContext *ctx, uint32_t opc, int acc, int reg)
+         }
+         break;
+     case OPC_MTLO:
+-    case TX79_MMI_MTLO1:
+         if (reg != 0) {
+ #if defined(TARGET_MIPS64)
+             if (acc != 0) {
+@@ -26500,11 +26545,11 @@ static void decode_tx79_mmi(CPUMIPSState *env, DisasContext *ctx)
          break;
      case TX79_MMI_MTLO1:
      case TX79_MMI_MTHI1:
+-        gen_HILO(ctx, opc, 1, rs);
++        gen_HILO1_tx79(ctx, opc, rs);
+         break;
+     case TX79_MMI_MFLO1:
+     case TX79_MMI_MFHI1:
+-        gen_HILO(ctx, opc, 1, rd);
++        gen_HILO1_tx79(ctx, opc, rd);
+         break;
+     case TX79_MMI_MADD:          /* TODO: TX79_MMI_MADD */
+     case TX79_MMI_MADDU:         /* TODO: TX79_MMI_MADDU */
 -- 
 2.18.1
