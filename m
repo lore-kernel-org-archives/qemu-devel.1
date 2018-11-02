@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=837a4a9fa=tim.smith@citrix.com>)
-	id 1gIWH8-0002X8-6s
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 06:02:03 -0400
+	(envelope-from <shannon.zhaosl@gmail.com>) id 1gIWLI-0006lQ-3c
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 06:06:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=837a4a9fa=tim.smith@citrix.com>)
-	id 1gIWH4-0000aL-2E
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 06:01:58 -0400
-From: Tim Smith <tim.smith@citrix.com>
-Date: Fri, 2 Nov 2018 10:00:59 +0000
-Message-ID: <154115285942.11300.11718576813181760505.stgit@dhcp-3-135.uk.xensource.com>
-In-Reply-To: <154115285434.11300.8459925605672823399.stgit@dhcp-3-135.uk.xensource.com>
-References: <154115285434.11300.8459925605672823399.stgit@dhcp-3-135.uk.xensource.com>
+	(envelope-from <shannon.zhaosl@gmail.com>) id 1gIWLA-0004vw-KN
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 06:06:15 -0400
+From: Shannon Zhao <shannon.zhaosl@gmail.com>
+References: <20181101102303.16439-1-sameo@linux.intel.com>
+	<20181101102303.16439-6-sameo@linux.intel.com>
+	<c88b4769-a517-36da-b181-e59a4380bcea@gmail.com>
+Message-ID: <46c01c7d-cab1-8096-821d-dd77c62b240f@gmail.com>
+Date: Fri, 2 Nov 2018 18:05:55 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 1/3] Improve xen_disk batching behaviour
+In-Reply-To: <c88b4769-a517-36da-b181-e59a4380bcea@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4 05/23] hw: arm: Switch to the AML build
+ RSDP building routine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,81 +26,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: Anthony Perard <anthony.perard@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Paul Durrant <Paul.Durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Max Reitz <mreitz@redhat.com>
+To: Samuel Ortiz <sameo@linux.intel.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>, "open list:ARM ACPI Subsystem" <qemu-arm@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 
-When I/O consists of many small requests, performance is improved by
-batching them together in a single io_submit() call. When there are
-relatively few requests, the extra overhead is not worth it. This
-introduces a check to start batching I/O requests via blk_io_plug()/
-blk_io_unplug() in an amount proportional to the number which were
-already in flight at the time we started reading the ring.
 
-Signed-off-by: Tim Smith <tim.smith@citrix.com>
----
- hw/block/xen_disk.c |   30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
 
-diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
-index 36eff94f84..cb2881b7e6 100644
---- a/hw/block/xen_disk.c
-+++ b/hw/block/xen_disk.c
-@@ -101,6 +101,9 @@ struct XenBlkDev {
-     AioContext          *ctx;
- };
- 
-+/* Threshold of in-flight requests above which we will start using
-+ * blk_io_plug()/blk_io_unplug() to batch requests */
-+#define IO_PLUG_THRESHOLD 1
- /* ------------------------------------------------------------- */
- 
- static void ioreq_reset(struct ioreq *ioreq)
-@@ -542,6 +545,8 @@ static void blk_handle_requests(struct XenBlkDev *blkdev)
- {
-     RING_IDX rc, rp;
-     struct ioreq *ioreq;
-+    int inflight_atstart = blkdev->requests_inflight;
-+    int batched = 0;
- 
-     blkdev->more_work = 0;
- 
-@@ -550,6 +555,16 @@ static void blk_handle_requests(struct XenBlkDev *blkdev)
-     xen_rmb(); /* Ensure we see queued requests up to 'rp'. */
- 
-     blk_send_response_all(blkdev);
-+    /* If there was more than IO_PLUG_THRESHOLD ioreqs in flight
-+     * when we got here, this is an indication that there the bottleneck
-+     * is below us, so it's worth beginning to batch up I/O requests
-+     * rather than submitting them immediately. The maximum number
-+     * of requests we're willing to batch is the number already in
-+     * flight, so it can grow up to max_requests when the bottleneck
-+     * is below us */
-+    if (inflight_atstart > IO_PLUG_THRESHOLD) {
-+        blk_io_plug(blkdev->blk);
-+    }
-     while (rc != rp) {
-         /* pull request from ring */
-         if (RING_REQUEST_CONS_OVERFLOW(&blkdev->rings.common, rc)) {
-@@ -589,7 +604,22 @@ static void blk_handle_requests(struct XenBlkDev *blkdev)
-             continue;
-         }
- 
-+        if (inflight_atstart > IO_PLUG_THRESHOLD &&
-+            batched >= inflight_atstart) {
-+            blk_io_unplug(blkdev->blk);
-+        }
-         ioreq_runio_qemu_aio(ioreq);
-+        if (inflight_atstart > IO_PLUG_THRESHOLD) {
-+            if (batched >= inflight_atstart) {
-+                blk_io_plug(blkdev->blk);
-+                batched = 0;
-+            } else {
-+                batched++;
-+            }
-+        }
-+    }
-+    if (inflight_atstart > IO_PLUG_THRESHOLD) {
-+        blk_io_unplug(blkdev->blk);
-     }
- 
-     if (blkdev->more_work && blkdev->requests_inflight < blkdev->max_requests) {
+On 2018/11/2 17:35, Shannon Zhao wrote:
+> 
+> 
+> On 2018/11/1 18:22, Samuel Ortiz wrote:
+>> We make the ARM virt ACPI code use the now shared build_rsdp() API from
+>> aml-build.c. By doing so we fix a bug where the ARM implementation was
+>> missing adding both the legacy and extended checksums, which was
+>> building an invalid RSDP table.
+>>
+>> Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+>> ---
+>>   hw/arm/virt-acpi-build.c | 31 +------------------------------
+>>   1 file changed, 1 insertion(+), 30 deletions(-)
+>>
+>> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+>> index 0ed132b79b..0a6a88380a 100644
+>> --- a/hw/arm/virt-acpi-build.c
+>> +++ b/hw/arm/virt-acpi-build.c
+>> @@ -35,6 +35,7 @@
+>>   #include "target/arm/cpu.h"
+>>   #include "hw/acpi/acpi-defs.h"
+>>   #include "hw/acpi/acpi.h"
+>> +#include "hw/acpi/aml-build.h"
+>>   #include "hw/nvram/fw_cfg.h"
+>>   #include "hw/acpi/bios-linker-loader.h"
+>>   #include "hw/loader.h"
+>> @@ -366,36 +367,6 @@ static void acpi_dsdt_add_power_button(Aml *scope)
+>>       aml_append(scope, dev);
+>>   }
+>> -/* RSDP */
+>> -static void
+>> -build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned 
+>> xsdt_tbl_offset)
+> Note: here we use xsdt table not rsdt for ARM. After your change which 
+> assigns xsdt table address to rsdt_physical_address, it doesn't work.
+> 
+Oops. I didn't notice your patch "[PATCH v4 04/23] hw: acpi: Implement 
+XSDT support for RSDP".
+
+Thanks,
+Shannon
