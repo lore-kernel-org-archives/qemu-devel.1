@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32857)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33394)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1gIW98-0006es-Ms
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 05:53:43 -0400
+	(envelope-from <philmd@redhat.com>) id 1gIWBz-0008Im-CL
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 05:56:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1gIW95-0005WD-BE
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 05:53:42 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35014)
+	(envelope-from <philmd@redhat.com>) id 1gIWBv-0006hP-4Q
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 05:56:39 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:39748)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1gIW93-0005Up-AK
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 05:53:38 -0400
-Received: by mail-wr1-x442.google.com with SMTP id z16-v6so1353801wrv.2
-	for <qemu-devel@nongnu.org>; Fri, 02 Nov 2018 02:53:36 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gIWBr-0006du-03
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 05:56:32 -0400
+Received: by mail-wr1-f67.google.com with SMTP id r10-v6so1340593wrv.6
+	for <qemu-devel@nongnu.org>; Fri, 02 Nov 2018 02:56:22 -0700 (PDT)
+References: <20181101102303.16439-1-sameo@linux.intel.com>
+	<20181101102303.16439-4-sameo@linux.intel.com>
+	<a7c05368-908e-0249-5702-63a844f9dc71@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <0a0f830b-e9a3-8cb4-12f5-d3fc234036cc@redhat.com>
+Date: Fri, 2 Nov 2018 10:56:18 +0100
 MIME-Version: 1.0
-References: <1536163920-2443-1-git-send-email-zhangckid@gmail.com>
-	<CAK3tnvK6T8fxdAmtFuB9o7Gc8oyFYuDEsCn_mv-+V7uyf3cQFw@mail.gmail.com>
-In-Reply-To: <CAK3tnvK6T8fxdAmtFuB9o7Gc8oyFYuDEsCn_mv-+V7uyf3cQFw@mail.gmail.com>
-From: Zhang Chen <zhangckid@gmail.com>
-Date: Fri, 2 Nov 2018 17:53:22 +0800
-Message-ID: <CAK3tnvKtrcMSyYZS_U61XNqq7dKX3bwYkyzY9fGBLQA2p2qrXw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] docs/block-replication.txt: Add more
- detail about replication_do_checkpoint_all
+In-Reply-To: <a7c05368-908e-0249-5702-63a844f9dc71@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4 03/23] hw: acpi: Export the RSDP build
+ API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,60 +32,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Wen Congyang <wencongyang2@huawei.com>, Xie Changlong <xiechanglong.d@gmail.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Shannon Zhao <shannon.zhaosl@gmail.com>, Samuel Ortiz <sameo@linux.intel.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "open list:ARM ACPI Subsystem" <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Hi All,
+Hi,
 
-Maybe we have forgot this patch? Ping again.
+On 2/11/18 10:20, Shannon Zhao wrote:
+> Hi,
+> 
+> On 2018/11/1 18:22, Samuel Ortiz wrote:
+>> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+>> index f28a2faa53..0ed132b79b 100644
+>> --- a/hw/arm/virt-acpi-build.c
+>> +++ b/hw/arm/virt-acpi-build.c
+>> @@ -367,7 +367,7 @@ static void acpi_dsdt_add_power_button(Aml *scope)
+>>   }
+>>   /* RSDP */
+>> -static GArray *
+>> +static void
+>>   build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned 
+>> xsdt_tbl_offset)
+>>   {
+>>       AcpiRsdpDescriptor *rsdp = acpi_data_push(rsdp_table, sizeof 
+>> *rsdp);
+> 
+> Why change this? It's not related to your patch purpose.
 
-Related discussion:
-https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg03352.html
+This patch updates include/hw/acpi/aml-build.h to export the 
+build_rsdp() function.
+Since this file includes this header, the orototype needs to match.
 
-Thanks
-Zhang Chen
+Regards,
 
-On Fri, Sep 14, 2018 at 2:32 PM Zhang Chen <zhangckid@gmail.com> wrote:
+Phil.
 
-> Hi All,
->
-> No news update?
-> Ping...
->
-> Thanks
-> Zhang Chen
->
-> On Thu, Sep 6, 2018 at 12:12 AM Zhang Chen <zhangckid@gmail.com> wrote:
->
->> Add more detail description for COLO checkpoint use case.
->> Suggested by Dr. David Alan Gilbert <dgilbert@redhat.com>
->>
->> Signed-off-by: Zhang Chen <zhangckid@gmail.com>
->> ---
->>  docs/block-replication.txt | 7 ++++---
->>  1 file changed, 4 insertions(+), 3 deletions(-)
->>
->> diff --git a/docs/block-replication.txt b/docs/block-replication.txt
->> index 6bde6737fb..b6c5e94764 100644
->> --- a/docs/block-replication.txt
->> +++ b/docs/block-replication.txt
->> @@ -131,9 +131,10 @@ a. replication_start_all()
->>     thread.
->>  b. replication_do_checkpoint_all()
->>     This interface is called after all VM state is transferred to
->> -   Secondary QEMU. The Disk buffer will be dropped in this interface.
->> -   The caller must hold the I/O mutex lock if it is in
->> migration/checkpoint
->> -   thread.
->> +   secondary node, and in primary node this interface no need to
->> +   called after synchronizing all the states. The Disk buffer will be
->> dropped
->> +   in this interface. The caller must hold the I/O mutex lock if it is
->> +   in migration/checkpoint thread.
->>  c. replication_get_error_all()
->>     This interface is called to check if error happened in replication.
->>     The caller must hold the I/O mutex lock if it is in
->> migration/checkpoint
->> --
->> 2.17.GIT
->>
->>
+> 
+> Thanks,
+> Shannon
+> 
