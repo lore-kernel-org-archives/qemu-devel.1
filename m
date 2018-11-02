@@ -1,14 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51004)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gIOFi-0002Yn-5n
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 21:27:58 -0400
+	(envelope-from <no-reply@patchew.org>) id 1gIOyA-0000ta-2R
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 22:13:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gIOFf-0004tk-1I
-	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 21:27:58 -0400
-From: Li Qiang <liq3ea@gmail.com>
-Date: Thu,  1 Nov 2018 18:22:43 -0700
-Message-Id: <1541121763-3277-1-git-send-email-liq3ea@gmail.com>
-Subject: [Qemu-devel] [PATCH] nvme: fix oob access issue(CVE-2018-16847)
+	(envelope-from <no-reply@patchew.org>) id 1gIOy6-0003i3-PI
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 22:13:54 -0400
+Resent-Message-Id: <E1gIOy6-0003i3-PI@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21314)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gIOy6-0003hW-IH
+	for qemu-devel@nongnu.org; Thu, 01 Nov 2018 22:13:50 -0400
+Message-ID: <154111847784.16088.3803491423325653257@015909e0f939>
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <20181031141925.30026-1-mdroth@linux.vnet.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 1 Nov 2018 17:27:59 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PULL v3 00/24] qemu-ga patch queue for soft-freeze
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,46 +28,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: keith.busch@intel.com, kwolf@redhat.com, mreitz@redhat.com
-Cc: pbonzini@redhat.com, ppandit@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, Li Qiang <liq3ea@gmail.com>
+To: mdroth@linux.vnet.ibm.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-Currently, the nvme_cmb_ops mr doesn't check the addr and size.
-This can lead an oob access issue. This is triggerable in the guest.
-Add check to avoid this issue.
-
-Fixes CVE-2018-16847.
-
-Reported-by: Li Qiang <liq3ea@gmail.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Li Qiang <liq3ea@gmail.com>
----
- hw/block/nvme.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index fc7dacb..d097add 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -1175,6 +1175,10 @@ static void nvme_cmb_write(void *opaque, hwaddr addr, uint64_t data,
-     unsigned size)
- {
-     NvmeCtrl *n = (NvmeCtrl *)opaque;
-+
-+    if (addr + size > NVME_CMBSZ_GETSIZE(n->bar.cmbsz)) {
-+        return;
-+    }
-     memcpy(&n->cmbuf[addr], &data, size);
- }
- 
-@@ -1183,6 +1187,9 @@ static uint64_t nvme_cmb_read(void *opaque, hwaddr addr, unsigned size)
-     uint64_t val;
-     NvmeCtrl *n = (NvmeCtrl *)opaque;
- 
-+    if (addr + size > NVME_CMBSZ_GETSIZE(n->bar.cmbsz)) {
-+        return 0;
-+    }
-     memcpy(&val, &n->cmbuf[addr], size);
-     return val;
- }
--- 
-1.8.3.1
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgxMDMxMTQxOTI1LjMwMDI2LTEtbWRyb3RoQGxpbnV4LnZuZXQuaWJtLmNv
+bQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BVTEwgdjMgMDAvMjRdIHFlbXUtZ2EgcGF0Y2ggcXVl
+dWUgZm9yIHNvZnQtZnJlZXplCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNo
+CgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1s
+KQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29u
+ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxn
+b3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJz
+ZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRD
+SCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEg
+Z2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1h
+aWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBu
+PSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBk
+YXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBz
+Oi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAg
+ICAgICBwYXRjaGV3LzIwMTgxMTAyMDAxMzAzLjMyNjQwLTEtZjRidWdAYW1zYXQub3JnIC0+IHBh
+dGNoZXcvMjAxODExMDIwMDEzMDMuMzI2NDAtMS1mNGJ1Z0BhbXNhdC5vcmcKU3dpdGNoZWQgdG8g
+YSBuZXcgYnJhbmNoICd0ZXN0JwoyOTQ1NjQ4MjQ4IHFnYS13aW46IGNoYW5naW5nIC0tcmV0cnkt
+cGF0aCBvcHRpb24gYmVoYXZpb3IKMWRkNWZmYmFmMiBxZ2Etd2luOiByZXBvcnQgc3BlY2lmaWMg
+ZXJyb3Igd2hlbiBmYWlsaW5nIHRvIG9wZW4gY2hhbm5lbAphNzA5MTJiZDlkIHFnYS13aW46IGlu
+c3RhbGwgc2VydmljZSB3aXRoIC0tcmV0cnktcGF0aCBzZXQgYnkgZGVmYXVsdAphMzAwMTRiODA5
+IHFnYTogYWRkIC0tcmV0cnktcGF0aCBvcHRpb24gZm9yIHJlLWluaXRpYWxpemluZyBjaGFubmVs
+IG9uIGZhaWx1cmUKZmRiN2I3OTU0NCBxZ2E6IG1vdmUgdzMyIHNlcnZpY2UgaGFuZGxpbmcgb3V0
+IG9mIHJ1bl9hZ2VudCgpCmE5NjA5YTU2MDcgcWdhOiBoYW5nIEdBQ29uZmlnL3NvY2tldF9hY3Rp
+dmF0aW9uIG9mZiBvZiBHQVN0YXRlIGdsb2JhbAo4NTQyODNjODFjIHFnYTogZ3JvdXAgYWdlbnQg
+aW5pdC9jbGVhbnVwIGluaXQgc2VwYXJhdGUgcm91dGluZXMKMGI0ODdiMDk4MCBxZ2E6IGZpeCBh
+biBvZmYtYnktb25lIGlzc3VlCjcyOTYyZjVmOTYgcWdhLXdpbjogZGVteXN0aWZ5IG5hbWVzcGFj
+ZSBzdHJpcHBpbmcKMTBiODYwY2M0MiBxZ2Etd2luOiByZXR1cm4gZGlzayBkZXZpY2UgaW4gZ3Vl
+c3QtZ2V0LWZzaW5mbwpjNzZmM2FlMzVjIHFnYS13aW46IGhhbmRsZSBtdWx0aS1kaXNrIHZvbHVt
+ZXMKMmFlMDNmNDlkNyBxZ2Etd2luOiByZWZhY3RvciBkaXNrIGluZm8KYjVkMDJlZjEzZCBxZ2Et
+d2luOiByZXBvcnQgZGlzayBzZXJpYWwgbnVtYmVyCmE0YmQ2NDAzMTEgcWdhLXdpbjogcmVmYWN0
+b3IgZGlzayBwcm9wZXJ0aWVzIChidXMpCjFjZGVjYTVkZjUgcWdhLXdpbjogYWRkIGRlYnVnZ2lu
+ZyBpbmZvcm1hdGlvbgplYTlmZWNmYjFlIGJ1aWxkOiByZW5hbWUgQ09ORklHX1FHQV9OVERERElT
+SyB0byBDT05GSUdfUUdBX05URERTQ1NJCjIwZTIyY2ZiNGYgcWdhLXdpbjogZnNpbmZvOiBwY2kt
+aW5mbzogYWxsb3cgcGFydGlhbCBpbmZvCjdiNWYxZGJiMjAgcWdhLXdpbjogcHJldmVudCBjcmFz
+aCB3aGVuIGV4ZWN1dGluZyBmc2luZm8gY29tbWFuZAowY2VmYWU1ZTVkIHFnYTogbGludXg6IHJl
+dHVybiBkaXNrIGRldmljZSBpbiBndWVzdC1nZXQtZnNpbmZvCjRmMTI3MmYyNTMgcWdhOiBsaW51
+eDogcmVwb3J0IGRpc2sgc2VyaWFsIG51bWJlcgo1NzI5NmI4NmZlIGNvbmZpZ3VyZTogYWRkIHRl
+c3QgZm9yIGxpYnVkZXYKOTUxMGM0ZmM3YyBxZ2E6IGlnbm9yZSBub24gcHJlc2VudCBjcHVzIHdo
+ZW4gaGFuZGxpbmcgcW1wX2d1ZXN0X2dldF92Y3B1cygpCjEzMTM2ZDE2MjQgcWdhLXdpbjogYWRk
+IHN1cHBvcnQgZm9yIHFtcF9ndWVzdF9mc2ZyZWV6ZV9mcmVlemVfbGlzdApiYjdiZTA2ODNhIHFn
+YTogU3VwcG9ydCBVbmljb2RlIHBhdGhzIGluIGd1ZXN0LWZpbGUtb3BlbiBvbiB3aW4zMgoKPT09
+IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8yNDogcWdhOiBTdXBwb3J0IFVuaWNv
+ZGUgcGF0aHMgaW4gZ3Vlc3QtZmlsZS1vcGVuIG9uIHdpbjMyLi4uCkNoZWNraW5nIFBBVENIIDIv
+MjQ6IHFnYS13aW46IGFkZCBzdXBwb3J0IGZvciBxbXBfZ3Vlc3RfZnNmcmVlemVfZnJlZXplX2xp
+c3QuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8yNDogcWdhOiBpZ25vcmUgbm9uIHByZXNlbnQgY3B1cyB3
+aGVuIGhhbmRsaW5nIHFtcF9ndWVzdF9nZXRfdmNwdXMoKS4uLgpDaGVja2luZyBQQVRDSCA0LzI0
+OiBjb25maWd1cmU6IGFkZCB0ZXN0IGZvciBsaWJ1ZGV2Li4uCkNoZWNraW5nIFBBVENIIDUvMjQ6
+IHFnYTogbGludXg6IHJlcG9ydCBkaXNrIHNlcmlhbCBudW1iZXIuLi4KQ2hlY2tpbmcgUEFUQ0gg
+Ni8yNDogcWdhOiBsaW51eDogcmV0dXJuIGRpc2sgZGV2aWNlIGluIGd1ZXN0LWdldC1mc2luZm8u
+Li4KQ2hlY2tpbmcgUEFUQ0ggNy8yNDogcWdhLXdpbjogcHJldmVudCBjcmFzaCB3aGVuIGV4ZWN1
+dGluZyBmc2luZm8gY29tbWFuZC4uLgpDaGVja2luZyBQQVRDSCA4LzI0OiBxZ2Etd2luOiBmc2lu
+Zm86IHBjaS1pbmZvOiBhbGxvdyBwYXJ0aWFsIGluZm8uLi4KQ2hlY2tpbmcgUEFUQ0ggOS8yNDog
+YnVpbGQ6IHJlbmFtZSBDT05GSUdfUUdBX05URERESVNLIHRvIENPTkZJR19RR0FfTlRERFNDU0ku
+Li4KQ2hlY2tpbmcgUEFUQ0ggMTAvMjQ6IHFnYS13aW46IGFkZCBkZWJ1Z2dpbmcgaW5mb3JtYXRp
+b24uLi4KQ2hlY2tpbmcgUEFUQ0ggMTEvMjQ6IHFnYS13aW46IHJlZmFjdG9yIGRpc2sgcHJvcGVy
+dGllcyAoYnVzKS4uLgpDaGVja2luZyBQQVRDSCAxMi8yNDogcWdhLXdpbjogcmVwb3J0IGRpc2sg
+c2VyaWFsIG51bWJlci4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzk6IEZJ
+TEU6IHFnYS9jb21tYW5kcy13aW4zMi5jOjY1MjoKKyAgICAgICAgICAgIGVycm9yX3NldGcoZXJy
+cCwgImZhaWxlZCB0byBnZXQgc2VyaWFsIG51bWJlcjogb2Zmc2V0IG91dHNpZGUgdGhlIGJ1ZmZl
+ciIpOwoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAzNiBsaW5lcyBjaGVja2VkCgpZb3Vy
+IHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
+ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
+ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDEzLzI0OiBx
+Z2Etd2luOiByZWZhY3RvciBkaXNrIGluZm8uLi4KQ2hlY2tpbmcgUEFUQ0ggMTQvMjQ6IHFnYS13
+aW46IGhhbmRsZSBtdWx0aS1kaXNrIHZvbHVtZXMuLi4KRVJST1I6ICJmb28qYmFyIiBzaG91bGQg
+YmUgImZvbyAqYmFyIgojMTQ4OiBGSUxFOiBxZ2EvY29tbWFuZHMtd2luMzIuYzo3ODY6CisgICAg
+ICAgICAgICAgICAgKyBleHRlbnRzLT5OdW1iZXJPZkRpc2tFeHRlbnRzKnNpemVvZihESVNLX0VY
+VEVOVCk7Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDE4NSBsaW5lcyBjaGVja2VkCgpZ
+b3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
+aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
+aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAxNS8y
+NDogcWdhLXdpbjogcmV0dXJuIGRpc2sgZGV2aWNlIGluIGd1ZXN0LWdldC1mc2luZm8uLi4KQ2hl
+Y2tpbmcgUEFUQ0ggMTYvMjQ6IHFnYS13aW46IGRlbXlzdGlmeSBuYW1lc3BhY2Ugc3RyaXBwaW5n
+Li4uCkNoZWNraW5nIFBBVENIIDE3LzI0OiBxZ2E6IGZpeCBhbiBvZmYtYnktb25lIGlzc3VlLi4u
+CkNoZWNraW5nIFBBVENIIDE4LzI0OiBxZ2E6IGdyb3VwIGFnZW50IGluaXQvY2xlYW51cCBpbml0
+IHNlcGFyYXRlIHJvdXRpbmVzLi4uCkNoZWNraW5nIFBBVENIIDE5LzI0OiBxZ2E6IGhhbmcgR0FD
+b25maWcvc29ja2V0X2FjdGl2YXRpb24gb2ZmIG9mIEdBU3RhdGUgZ2xvYmFsLi4uCkNoZWNraW5n
+IFBBVENIIDIwLzI0OiBxZ2E6IG1vdmUgdzMyIHNlcnZpY2UgaGFuZGxpbmcgb3V0IG9mIHJ1bl9h
+Z2VudCgpLi4uCkNoZWNraW5nIFBBVENIIDIxLzI0OiBxZ2E6IGFkZCAtLXJldHJ5LXBhdGggb3B0
+aW9uIGZvciByZS1pbml0aWFsaXppbmcgY2hhbm5lbCBvbiBmYWlsdXJlLi4uCkNoZWNraW5nIFBB
+VENIIDIyLzI0OiBxZ2Etd2luOiBpbnN0YWxsIHNlcnZpY2Ugd2l0aCAtLXJldHJ5LXBhdGggc2V0
+IGJ5IGRlZmF1bHQuLi4KQ2hlY2tpbmcgUEFUQ0ggMjMvMjQ6IHFnYS13aW46IHJlcG9ydCBzcGVj
+aWZpYyBlcnJvciB3aGVuIGZhaWxpbmcgdG8gb3BlbiBjaGFubmVsLi4uCkNoZWNraW5nIFBBVENI
+IDI0LzI0OiBxZ2Etd2luOiBjaGFuZ2luZyAtLXJldHJ5LXBhdGggb3B0aW9uIGJlaGF2aW9yLi4u
+Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgot
+LS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNo
+ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRo
+YXQuY29t
