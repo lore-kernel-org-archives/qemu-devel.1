@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33311)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gIZjg-0000o0-Oq
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 09:43:41 -0400
+	(envelope-from <prvs=837fd5125=anthony.perard@citrix.com>)
+	id 1gIZtK-0008KD-VG
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 09:53:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gIZjb-0008EE-1C
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 09:43:39 -0400
-Received: from mail-sn1nam02on0130.outbound.protection.outlook.com
-	([104.47.36.130]:63675
-	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1gIZjM-00088Z-Fj
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 09:43:27 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Fri, 2 Nov 2018 13:43:09 +0000
-Message-ID: <BN6PR2201MB12512B92322BFB8965848215C6CF0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <BN6PR2201MB125116B5479010DB326DCCFCC6CE0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-	<51a26700-5da5-0a15-0e0e-6405ce5e65d4@redhat.com>,
-	<20181101172353.GA2316@sx9>
-In-Reply-To: <20181101172353.GA2316@sx9>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <prvs=837fd5125=anthony.perard@citrix.com>)
+	id 1gIZtG-0005Oa-1r
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 09:53:38 -0400
+Date: Fri, 2 Nov 2018 13:53:15 +0000
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20181102135315.GG6481@perard.uk.xensource.com>
+References: <154115285434.11300.8459925605672823399.stgit@dhcp-3-135.uk.xensource.com>
+	<154115285942.11300.11718576813181760505.stgit@dhcp-3-135.uk.xensource.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] Correction needed for R5900 instruction decoding
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <154115285942.11300.11718576813181760505.stgit@dhcp-3-135.uk.xensource.com>
+Subject: Re: [Qemu-devel] [PATCH 1/3] Improve xen_disk batching behaviour
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,106 +25,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fredrik Noring <noring@nocrew.org>, =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>, "Emilio G.
-	Cota" <cota@braap.org>
-Cc: Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, "Maciej W. Rozycki" <macro@linux-mips.org>, =?iso-8859-1?Q?J=FCrgen_Urban?= <JuergenUrban@gmx.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Tim Smith <tim.smith@citrix.com>
+Cc: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Paul Durrant <Paul.Durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Max Reitz <mreitz@redhat.com>
 
-> ... in the patch series I posted 25 October "[PATCH 00/11]
-> target/mips: Amend R5900 support". I will post updated patches shortly!
+On Fri, Nov 02, 2018 at 10:00:59AM +0000, Tim Smith wrote:
+> When I/O consists of many small requests, performance is improved by
+> batching them together in a single io_submit() call. When there are
+> relatively few requests, the extra overhead is not worth it. This
+> introduces a check to start batching I/O requests via blk_io_plug()/
+> blk_io_unplug() in an amount proportional to the number which were
+> already in flight at the time we started reading the ring.
+> 
+> Signed-off-by: Tim Smith <tim.smith@citrix.com>
 
-Fridrik,
+Acked-by: Anthony PERARD <anthony.perard@citrix.com>
 
-It is now code freeze before 3.1, the code base is being stabilized, and on=
-ly important fixes are allowed to be integrated - so, in that light, a sepa=
-rate patch, or a small series, that addresses only concerns from the origin=
-al mail of this thread is needed. Such series should not contain any additi=
-onal features (like your v2 of the series "Amend..." does), and its patch t=
-itles should look like "Fix decoding mechanism of ..." or such.
-
-Could you please provide those appropriate changes in that format?
-
-Thanks,
-Aleksandar
-
-________________________________________
-From: Fredrik Noring <noring@nocrew.org>
-Sent: Thursday, November 1, 2018 6:23:53 PM
-To: Philippe Mathieu-Daud=E9; Emilio G. Cota; Aleksandar Markovic
-Cc: Stefan Markovic; Petar Jovanovic; Aleksandar Rikalo; Maciej W. Rozycki;=
- J=FCrgen Urban; qemu-devel@nongnu.org
-Subject: Re: [Qemu-devel] Correction needed for R5900 instruction decoding
-
-[ Philippe and Emilio -- thank you for cc-ing me. Good catch, since I'm
-not subscribed to the QEMU mailing list. Changes to the R5900 emulation
-are certainly of interest. ]
-
-Hi Aleksandar, Philippe,
-
-On Thu, Nov 01, 2018 at 03:31:54PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> Cc'ing Fredrik.
->
-> On 1/11/18 12:06, Aleksandar Markovic wrote:
-> > Hi, Fridrik,
-> >
-> > I did some closer code inspection of R5900 in last few days, and I
-> > noticed some sub-optimal implementation in the area where R5900-specifi=
-c
-> > opcodes overlap with the rest-of-MIPS-CPUs opcodes.
-> >
-> > The right implementation should be based on the principle that all such
-> > cases are covered with if statements involving INSN_R5900 flag, like
-> > this:
-> >
-> >          if (ctx->insn_flags & INSN_R5900) {
-> >              <R5900-specific handling>
-> >          } else {
-> >              <rest-of-MIPS-handling>
-> >          }
-> >
-> > You followed that principle for OPC_SPECIAL2 and OPC_SPECIAL3, but for
-> > some other opcodes not. For example, there are lines:
-> >
-> >      if (reg =3D=3D 0 && (opc =3D=3D OPC_MFHI || opc =3D=3D TX79_MMI_MF=
-HI1 ||
-> >                       opc =3D=3D OPC_MFLO || opc =3D=3D TX79_MMI_MFLO1)=
-) {
-> >
-> > or
-> >
-> >       switch (opc) {
-> >       case OPC_MFHI:
-> >       case TX79_MMI_MFHI1:
-> >
-> > Such implementation makes it difficult to discern R5900 and non-R5900
-> > cases. Potentialy allows bugs to sneak in and affect non-R5900 support.
-
-MFLO1, MFHI1, MTLO1 and MTHI1 for the TX79 and the R5900 are already
-decoded in the ISA specific decode_tx79_mmi function, and thereby follow
-your first suggested pattern. They do however reuse the gen_HILO function,
-but it is a simpel matter to post a patch to make a new gen_tx79_HILO1
-variant that is almost identical to the original gen_HILO.
-
-The only other case is gen_muldiv that is used for DIV1 and DIVU1. The
-same argument applies and a TX79 specific variant would be similar to the
-original, but I can certainly post a variant for that one too.
-
-> > The correction is not that difficult, I gather. Worse comme to worst,
-> > you can remove R5900 MFLO1 and MFHI1 altogether, they are not that
-> > essential at this moment, but do try correcting the decoding stuff as I
-> > described. Can you please make these changes in next few days or so
-> > (given that 3.1 release is getting closer and closer), and send them to
-> > the list?
-
-MFLO1 and MFHI1 are essential for MULT1, MULTU1, DIV1 and DIVU1 as well as
-MADD1 and MADDU1 in the patch series I posted 25 October "[PATCH 00/11]
-target/mips: Amend R5900 support". I will post updated patches shortly!
-
-> > It is my bad that I didn't spot this during review, but in any case, I
-> > think this should be fixed in 3.1 to make sure that non-R5900
-> > functionalities are intact.
-
-It is a common pattern in target/mips/translate.c to cover several ISAs
-in the same gen_* and decode_* functions, especially when there are only
-minor differences between them.
-
-Fredrik
+-- 
+Anthony PERARD
