@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46203)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gIXCd-0003P2-P4
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:01:29 -0400
+	(envelope-from <kwolf@redhat.com>) id 1gIXFu-0005qS-LR
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:04:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gIXCQ-0004wX-5D
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:01:22 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:38030)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1gIXCP-0004wA-QU
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:01:09 -0400
-Received: by mail-pl1-x643.google.com with SMTP id p7-v6so862600plk.5
-	for <qemu-devel@nongnu.org>; Fri, 02 Nov 2018 04:01:09 -0700 (PDT)
-From: Li Qiang <liq3ea@gmail.com>
-Date: Fri,  2 Nov 2018 04:01:03 -0700
-Message-Id: <1541156463-2730-1-git-send-email-liq3ea@gmail.com>
-Subject: [Qemu-devel] [PATCH] qapi: misc: change the 'pc' to unsinged 64 in
- CpuInfo
+	(envelope-from <kwolf@redhat.com>) id 1gIXFq-0006rd-GJ
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:04:46 -0400
+Date: Fri, 2 Nov 2018 12:04:12 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20181102110412.GD7521@dhcp-200-186.str.redhat.com>
+References: <154115285434.11300.8459925605672823399.stgit@dhcp-3-135.uk.xensource.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <154115285434.11300.8459925605672823399.stgit@dhcp-3-135.uk.xensource.com>
+Subject: [Qemu-devel] xen_disk qdevification (was: [PATCH 0/3] Performance
+ improvements for xen_disk v2)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,76 +23,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eblake@redhat.com, armbru@redhat.com
-Cc: qemu-devel@nongnu.org, Li Qiang <liq3ea@gmail.com>
+To: Tim Smith <tim.smith@citrix.com>
+Cc: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, qemu-block@nongnu.org, Anthony Perard <anthony.perard@citrix.com>, Paul Durrant <Paul.Durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Max Reitz <mreitz@redhat.com>, armbru@redhat.com
 
-When trigger a 'query-cpus' qmp, the pc is an signed value like
-following:
-{"arch": "x86", ...  "pc": -1732653994, "halted": true,...}
-It is strange. Change it to uint64_t.
+Am 02.11.2018 um 11:00 hat Tim Smith geschrieben:
+> A series of performance improvements for disks using the Xen PV ring.
+> 
+> These have had fairly extensive testing.
+> 
+> The batching and latency improvements together boost the throughput
+> of small reads and writes by two to six percent (measured using fio
+> in the guest)
+> 
+> Avoiding repeated calls to posix_memalign() reduced the dirty heap
+> from 25MB to 5MB in the case of a single datapath process while also
+> improving performance.
+> 
+> v2 removes some checkpatch complaints and fixes the CCs
 
-Signed-off-by: Li Qiang <liq3ea@gmail.com>
----
- qapi/misc.json | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+Completely unrelated, but since you're the first person touching
+xen_disk in a while, you're my victim:
 
-diff --git a/qapi/misc.json b/qapi/misc.json
-index 6c1c5c0a37..621ec6ce13 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -407,7 +407,7 @@
- #
- # Since: 2.6
- ##
--{ 'struct': 'CpuInfoX86', 'data': { 'pc': 'int' } }
-+{ 'struct': 'CpuInfoX86', 'data': { 'pc': 'uint64' } }
- 
- ##
- # @CpuInfoSPARC:
-@@ -420,7 +420,7 @@
- #
- # Since: 2.6
- ##
--{ 'struct': 'CpuInfoSPARC', 'data': { 'pc': 'int', 'npc': 'int' } }
-+{ 'struct': 'CpuInfoSPARC', 'data': { 'pc': 'uint64', 'npc': 'uint64' } }
- 
- ##
- # @CpuInfoPPC:
-@@ -431,7 +431,7 @@
- #
- # Since: 2.6
- ##
--{ 'struct': 'CpuInfoPPC', 'data': { 'nip': 'int' } }
-+{ 'struct': 'CpuInfoPPC', 'data': { 'nip': 'uint64' } }
- 
- ##
- # @CpuInfoMIPS:
-@@ -442,7 +442,7 @@
- #
- # Since: 2.6
- ##
--{ 'struct': 'CpuInfoMIPS', 'data': { 'PC': 'int' } }
-+{ 'struct': 'CpuInfoMIPS', 'data': { 'PC': 'uint64' } }
- 
- ##
- # @CpuInfoTricore:
-@@ -453,7 +453,7 @@
- #
- # Since: 2.6
- ##
--{ 'struct': 'CpuInfoTricore', 'data': { 'PC': 'int' } }
-+{ 'struct': 'CpuInfoTricore', 'data': { 'PC': 'uint64' } }
- 
- ##
- # @CpuInfoRISCV:
-@@ -464,7 +464,7 @@
- #
- # Since 2.12
- ##
--{ 'struct': 'CpuInfoRISCV', 'data': { 'pc': 'int' } }
-+{ 'struct': 'CpuInfoRISCV', 'data': { 'pc': 'uint64' } }
- 
- ##
- # @CpuS390State:
--- 
-2.11.0
+At KVM Forum we discussed sending a patch to deprecate xen_disk because
+after all those years, it still hasn't been converted to qdev. Markus is
+currently fixing some other not yet qdevified block device, but after
+that xen_disk will be the only one left.
+
+A while ago, a downstream patch review found out that there are some QMP
+commands that would immediately crash if a xen_disk device were present
+because of the lacking qdevification. This is not the code quality
+standard I envision for QEMU. It's time for non-qdev devices to go.
+
+So if you guys are still interested in the device, could someone please
+finally look into converting it?
+
+Kevin
