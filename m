@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46777)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gIZ51-0007tI-SN
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 09:01:41 -0400
+	(envelope-from <eblake@redhat.com>) id 1gIZ9z-0004mB-9x
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 09:06:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gIZ4w-00016B-TK
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 09:01:39 -0400
-Date: Fri, 2 Nov 2018 14:00:32 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181102140032.43f6c93c@redhat.com>
-In-Reply-To: <85802555-0f27-847d-22a9-e87ce2e5df55@redhat.com>
-References: <20181024101930.20674-1-david@redhat.com>
-	<20181024101930.20674-3-david@redhat.com>
-	<20181101151034.4eb1618c@redhat.com>
-	<85802555-0f27-847d-22a9-e87ce2e5df55@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1gIZ9r-0005cI-7N
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 09:06:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57980)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gIZ9o-0005bl-IO
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 09:06:37 -0400
+References: <20181102124220.26558-1-stefanha@redhat.com>
+	<20181102124220.26558-6-stefanha@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e6b7ec5e-5879-c17a-af49-83ba05493f5b@redhat.com>
+Date: Fri, 2 Nov 2018 08:06:09 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20181102124220.26558-6-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 2/7] pcihp: overwrite hotplug handler
- recursively from the start
+Subject: Re: [Qemu-devel] [PATCH v2 5/5] git: use HTTPS git URLs for
+ repo.or.cz
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,56 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-ppc@nongnu.org, Libvirt <libvir-list@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: cohuck@redhat.com, Daniel Berrange <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Fri, 2 Nov 2018 12:43:10 +0100
-David Hildenbrand <david@redhat.com> wrote:
+On 11/2/18 7:42 AM, Stefan Hajnoczi wrote:
+> repo.or.cz supports git smart HTTPS.  Use it in preference to git:// or
+> http:// since it's more secure.
 
-> On 01.11.18 15:10, Igor Mammedov wrote:
-> > On Wed, 24 Oct 2018 12:19:25 +0200
-> > David Hildenbrand <david@redhat.com> wrote:
-> >   
-> >> For now, the hotplug handler is not called for devices that are
-> >> being cold plugged. The hotplug handler is setup when the machine
-> >> initialization is fully done. Only bridges that were cold plugged are
-> >> considered.
-> >>
-> >> Set the hotplug handler for the root piix bus directly when realizing.
-> >> Overwrite the hotplug handler of bridges when hotplugging/coldplugging
-> >> them.
-> >>
-> >> This will now make sure that the ACPI PCI hotplug handler is also called
-> >> for cold-plugged devices (also on bridges) and for bridges that were
-> >> hotplugged.
-> >>
-> >> When trying to hotplug a device to a hotplugged bridge, we now correctly
-> >> get the error message
-> >>  "Unsupported bus. Bus doesn't have property 'acpi-pcihp-bsel' set"
-> >> Insted of going via the standard PCI hotplug handler.  
-> > Erroring out is probably not ok, since it can break existing setups
-> > where SHPC hotplugging to hotplugged bridge was working just fine before.  
-> 
-> The question is if it actually was supposed (and eventually did) work.
-I think it works now, it's QEMU 'ACPI hotplug hack' (which exists for
-the sake of Windows) limitation. We weren't able to dynamically add
-ACPI description for hotplugged bridge, so it was using native hotplug.
-Now theoretically we can load tables dynamically but that, would add
-maintenance nightmare (versioned tables) and would be harder to debug.
-I'd rather not go that direction and keep current limited version,
-suggesting users to use native hotplug if guest is capable.
+Not sure why you didn't copy-paste the commit messages from the other 
+patches, but it doesn't really matter.
 
-> If this was the expected behavior (mixing hotplug types), then the
-> necessary change to this patch would boil down to checking if the bridge
-> it hot or coldplugged.
 > 
-> > 
-> > Marcel/Michael what's your take on this change in behaviour?
-> > CCing libvirt in case they are doing this stuff
-> >   
-> 
-> Indeed, it would be nice to know if this was actually supposed to work
-> like this (coldplugged bridges using ACPI hotplug and hotplugged bridges
-> using SHPC hotplug).
-> 
-> 
+> Suggested-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>   MAINTAINERS    | 14 +++++++-------
+>   pc-bios/README |  2 +-
+>   2 files changed, 8 insertions(+), 8 deletions(-)
+
+> +++ b/pc-bios/README
+> @@ -5,7 +5,7 @@
+>     project (http://www.nongnu.org/vgabios/).
+>   
+>   - The PowerPC Open Hack'Ware Open Firmware Compatible BIOS is
+> -  available at http://repo.or.cz/w/openhackware.git.
+> +  available at https://repo.or.cz/w/openhackware.git.
+
+This one fails. Remove 'w/' and you can have:
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
