@@ -1,16 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35806)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gIbIV-0005Qx-T4
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:23:46 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gIbIY-0005Tz-Ii
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:23:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gIbIT-0000gU-My
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:23:43 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gIbIV-0000hv-IH
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:23:46 -0400
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Fri,  2 Nov 2018 15:22:53 +0000
-Message-Id: <20181102152257.20637-7-mark.cave-ayland@ilande.co.uk>
+Date: Fri,  2 Nov 2018 15:22:51 +0000
+Message-Id: <20181102152257.20637-5-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <20181102152257.20637-1-mark.cave-ayland@ilande.co.uk>
 References: <20181102152257.20637-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH v6 06/10] hw/m68k: add Nubus support
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v6 04/10] hw/m68k: add macfb video card
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,54 +29,57 @@ From: Laurent Vivier <laurent@vivier.eu>
 Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
 ---
- hw/Makefile.objs                    |   1 +
- hw/nubus/Makefile.objs              |   4 +
- hw/nubus/mac-nubus-bridge.c         |  45 ++++++++
- hw/nubus/nubus-bridge.c             |  34 ++++++
- hw/nubus/nubus-bus.c                | 111 +++++++++++++++++++
- hw/nubus/nubus-device.c             | 215 ++++++++++++++++++++++++++++++++++++
- include/hw/nubus/mac-nubus-bridge.h |  24 ++++
- include/hw/nubus/nubus.h            |  69 ++++++++++++
- 8 files changed, 503 insertions(+)
- create mode 100644 hw/nubus/Makefile.objs
- create mode 100644 hw/nubus/mac-nubus-bridge.c
- create mode 100644 hw/nubus/nubus-bridge.c
- create mode 100644 hw/nubus/nubus-bus.c
- create mode 100644 hw/nubus/nubus-device.c
- create mode 100644 include/hw/nubus/mac-nubus-bridge.h
- create mode 100644 include/hw/nubus/nubus.h
+ arch_init.c                |   4 +
+ hw/display/Makefile.objs   |   1 +
+ hw/display/macfb.c         | 419 +++++++++++++++++++++++++++++++++++++++++++++
+ include/hw/display/macfb.h |  43 +++++
+ qemu-options.hx            |   2 +-
+ vl.c                       |   3 +-
+ 6 files changed, 470 insertions(+), 2 deletions(-)
+ create mode 100644 hw/display/macfb.c
+ create mode 100644 include/hw/display/macfb.h
 
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index 39d882af6f..92dc338759 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -36,6 +36,7 @@ devices-dirs-$(CONFIG_SOFTMMU) += watchdog/
- devices-dirs-$(CONFIG_SOFTMMU) += xen/
- devices-dirs-$(CONFIG_MEM_DEVICE) += mem/
- devices-dirs-$(CONFIG_SOFTMMU) += smbios/
-+devices-dirs-$(CONFIG_NUBUS) += nubus/
- devices-dirs-y += core/
- common-obj-y += $(devices-dirs-y)
- obj-y += $(devices-dirs-y)
-diff --git a/hw/nubus/Makefile.objs b/hw/nubus/Makefile.objs
+diff --git a/arch_init.c b/arch_init.c
+index f4f3f610c8..5a71b48dc5 100644
+--- a/arch_init.c
++++ b/arch_init.c
+@@ -39,6 +39,10 @@
+ int graphic_width = 1024;
+ int graphic_height = 768;
+ int graphic_depth = 8;
++#elif defined(TARGET_M68K)
++int graphic_width = 800;
++int graphic_height = 600;
++int graphic_depth = 8;
+ #else
+ int graphic_width = 800;
+ int graphic_height = 600;
+diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
+index 97acd5b6cb..1685492ea0 100644
+--- a/hw/display/Makefile.objs
++++ b/hw/display/Makefile.objs
+@@ -27,6 +27,7 @@ common-obj-$(CONFIG_EXYNOS4) += exynos4210_fimd.o
+ common-obj-$(CONFIG_FRAMEBUFFER) += framebuffer.o
+ common-obj-$(CONFIG_MILKYMIST) += milkymist-vgafb.o
+ common-obj-$(CONFIG_ZAURUS) += tc6393xb.o
++common-obj-$(CONFIG_MACFB) += macfb.o
+ 
+ common-obj-$(CONFIG_MILKYMIST_TMU2) += milkymist-tmu2.o
+ milkymist-tmu2.o-cflags := $(X11_CFLAGS)
+diff --git a/hw/display/macfb.c b/hw/display/macfb.c
 new file mode 100644
-index 0000000000..ebb050a4ad
+index 0000000000..61ba2e9e15
 --- /dev/null
-+++ b/hw/nubus/Makefile.objs
-@@ -0,0 +1,4 @@
-+common-obj-y += nubus-device.o
-+common-obj-y += nubus-bus.o
-+common-obj-y += nubus-bridge.o
-+common-obj-$(CONFIG_MAC) += mac-nubus-bridge.o
-diff --git a/hw/nubus/mac-nubus-bridge.c b/hw/nubus/mac-nubus-bridge.c
-new file mode 100644
-index 0000000000..7c329300b8
---- /dev/null
-+++ b/hw/nubus/mac-nubus-bridge.c
-@@ -0,0 +1,45 @@
++++ b/hw/display/macfb.c
+@@ -0,0 +1,419 @@
 +/*
-+ *  Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
++ * QEMU Motorola 680x0 Macintosh Video Card Emulation
++ *                 Copyright (c) 2012-2018 Laurent Vivier
++ *
++ * some parts from QEMU G364 framebuffer Emulator.
++ *                 Copyright (c) 2007-2011 Herve Poussineau
 + *
 + * This work is licensed under the terms of the GNU GPL, version 2 or later.
 + * See the COPYING file in the top-level directory.
@@ -81,524 +87,487 @@ index 0000000000..7c329300b8
 + */
 +
 +#include "qemu/osdep.h"
++#include "qemu/units.h"
 +#include "hw/sysbus.h"
-+#include "hw/nubus/mac-nubus-bridge.h"
-+
-+
-+static void mac_nubus_bridge_init(Object *obj)
-+{
-+    MacNubusState *s = MAC_NUBUS_BRIDGE(obj);
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+
-+    s->bus = NUBUS_BUS(qbus_create(TYPE_NUBUS_BUS, DEVICE(s), NULL));
-+
-+    sysbus_init_mmio(sbd, &s->bus->super_slot_io);
-+    sysbus_init_mmio(sbd, &s->bus->slot_io);
-+}
-+
-+static void mac_nubus_bridge_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->desc = "Nubus bridge";
-+}
-+
-+static const TypeInfo mac_nubus_bridge_info = {
-+    .name          = TYPE_MAC_NUBUS_BRIDGE,
-+    .parent        = TYPE_NUBUS_BRIDGE,
-+    .instance_init = mac_nubus_bridge_init,
-+    .instance_size = sizeof(MacNubusState),
-+    .class_init    = mac_nubus_bridge_class_init,
-+};
-+
-+static void mac_nubus_bridge_register_types(void)
-+{
-+    type_register_static(&mac_nubus_bridge_info);
-+}
-+
-+type_init(mac_nubus_bridge_register_types)
-diff --git a/hw/nubus/nubus-bridge.c b/hw/nubus/nubus-bridge.c
-new file mode 100644
-index 0000000000..cd8c6a91eb
---- /dev/null
-+++ b/hw/nubus/nubus-bridge.c
-@@ -0,0 +1,34 @@
-+/*
-+ * QEMU Macintosh Nubus
-+ *
-+ * Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/sysbus.h"
-+#include "hw/nubus/nubus.h"
-+
-+static void nubus_bridge_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->fw_name = "nubus";
-+}
-+
-+static const TypeInfo nubus_bridge_info = {
-+    .name          = TYPE_NUBUS_BRIDGE,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(SysBusDevice),
-+    .class_init    = nubus_bridge_class_init,
-+};
-+
-+static void nubus_register_types(void)
-+{
-+    type_register_static(&nubus_bridge_info);
-+}
-+
-+type_init(nubus_register_types)
-diff --git a/hw/nubus/nubus-bus.c b/hw/nubus/nubus-bus.c
-new file mode 100644
-index 0000000000..942a6d5342
---- /dev/null
-+++ b/hw/nubus/nubus-bus.c
-@@ -0,0 +1,111 @@
-+/*
-+ * QEMU Macintosh Nubus
-+ *
-+ * Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/nubus/nubus.h"
-+#include "hw/sysbus.h"
++#include "ui/console.h"
++#include "ui/pixel_ops.h"
++#include "hw/display/macfb.h"
 +#include "qapi/error.h"
 +
++#define VIDEO_BASE 0x00001000
++#define DAFB_BASE  0x00800000
 +
-+static NubusBus *nubus_find(void)
++#define MACFB_PAGE_SIZE 4096
++#define MACFB_VRAM_SIZE (4 * MiB)
++
++#define DAFB_RESET      0x200
++#define DAFB_LUT        0x213
++
++
++typedef void macfb_draw_line_func(MacfbState *s, uint8_t *d, uint32_t addr,
++                                  int width);
++
++static inline uint8_t macfb_read_byte(MacfbState *s, uint32_t addr)
 +{
-+    /* Returns NULL unless there is exactly one nubus device */
-+    return NUBUS_BUS(object_resolve_path_type("", TYPE_NUBUS_BUS, NULL));
++    return s->vram[addr & s->vram_bit_mask];
 +}
 +
-+static void nubus_slot_write(void *opaque, hwaddr addr, uint64_t val,
-+                             unsigned int size)
++/* 1-bit color */
++static void macfb_draw_line1(MacfbState *s, uint8_t *d, uint32_t addr,
++                             int width)
 +{
-+    /* read only */
++    uint8_t r, g, b;
++    int x;
++
++    for (x = 0; x < width; x++) {
++        int bit = x & 7;
++        int idx = (macfb_read_byte(s, addr) >> (7 - bit)) & 1;
++        r = g = b  = ((1 - idx) << 7);
++        addr += (bit == 7);
++
++        *(uint32_t *)d = rgb_to_pixel32(r, g, b);
++        d += 4;
++    }
++}
++
++/* 2-bit color */
++static void macfb_draw_line2(MacfbState *s, uint8_t *d, uint32_t addr,
++                             int width)
++{
++    uint8_t r, g, b;
++    int x;
++
++    for (x = 0; x < width; x++) {
++        int bit = (x & 3);
++        int idx = (macfb_read_byte(s, addr) >> ((3 - bit) << 1)) & 3;
++        r = s->color_palette[idx * 3];
++        g = s->color_palette[idx * 3 + 1];
++        b = s->color_palette[idx * 3 + 2];
++        addr += (bit == 3);
++
++        *(uint32_t *)d = rgb_to_pixel32(r, g, b);
++        d += 4;
++    }
++}
++
++/* 4-bit color */
++static void macfb_draw_line4(MacfbState *s, uint8_t *d, uint32_t addr,
++                             int width)
++{
++    uint8_t r, g, b;
++    int x;
++
++    for (x = 0; x < width; x++) {
++        int bit = x & 1;
++        int idx = (macfb_read_byte(s, addr) >> ((1 - bit) << 2)) & 15;
++        r = s->color_palette[idx * 3];
++        g = s->color_palette[idx * 3 + 1];
++        b = s->color_palette[idx * 3 + 2];
++        addr += (bit == 1);
++
++        *(uint32_t *)d = rgb_to_pixel32(r, g, b);
++        d += 4;
++    }
++}
++
++/* 8-bit color */
++static void macfb_draw_line8(MacfbState *s, uint8_t *d, uint32_t addr,
++                             int width)
++{
++    uint8_t r, g, b;
++    int x;
++
++    for (x = 0; x < width; x++) {
++        r = s->color_palette[macfb_read_byte(s, addr) * 3];
++        g = s->color_palette[macfb_read_byte(s, addr) * 3 + 1];
++        b = s->color_palette[macfb_read_byte(s, addr) * 3 + 2];
++        addr++;
++
++        *(uint32_t *)d = rgb_to_pixel32(r, g, b);
++        d += 4;
++    }
++}
++
++/* 16-bit color */
++static void macfb_draw_line16(MacfbState *s, uint8_t *d, uint32_t addr,
++                              int width)
++{
++    uint8_t r, g, b;
++    int x;
++
++    for (x = 0; x < width; x++) {
++        uint16_t pixel;
++        pixel = (macfb_read_byte(s, addr) << 8) | macfb_read_byte(s, addr + 1);
++        r = ((pixel >> 10) & 0x1f) << 3;
++        g = ((pixel >> 5) & 0x1f) << 3;
++        b = (pixel & 0x1f) << 3;
++        addr += 2;
++
++        *(uint32_t *)d = rgb_to_pixel32(r, g, b);
++        d += 4;
++    }
++}
++
++/* 24-bit color */
++static void macfb_draw_line24(MacfbState *s, uint8_t *d, uint32_t addr,
++                              int width)
++{
++    uint8_t r, g, b;
++    int x;
++
++    for (x = 0; x < width; x++) {
++        r = macfb_read_byte(s, addr);
++        g = macfb_read_byte(s, addr + 1);
++        b = macfb_read_byte(s, addr + 2);
++        addr += 3;
++
++        *(uint32_t *)d = rgb_to_pixel32(r, g, b);
++        d += 4;
++    }
 +}
 +
 +
-+static uint64_t nubus_slot_read(void *opaque, hwaddr addr,
++enum {
++    MACFB_DRAW_LINE1,
++    MACFB_DRAW_LINE2,
++    MACFB_DRAW_LINE4,
++    MACFB_DRAW_LINE8,
++    MACFB_DRAW_LINE16,
++    MACFB_DRAW_LINE24,
++    MACFB_DRAW_LINE_NB,
++};
++
++static macfb_draw_line_func * const
++                              macfb_draw_line_table[MACFB_DRAW_LINE_NB] = {
++    macfb_draw_line1,
++    macfb_draw_line2,
++    macfb_draw_line4,
++    macfb_draw_line8,
++    macfb_draw_line16,
++    macfb_draw_line24,
++};
++
++static int macfb_check_dirty(MacfbState *s, DirtyBitmapSnapshot *snap,
++                             ram_addr_t addr, int len)
++{
++    return memory_region_snapshot_get_dirty(&s->mem_vram, snap, addr, len);
++}
++
++static void macfb_draw_graphic(MacfbState *s)
++{
++    DisplaySurface *surface = qemu_console_surface(s->con);
++    DirtyBitmapSnapshot *snap = NULL;
++    ram_addr_t page;
++    uint32_t v = 0;
++    int y, ymin;
++    int macfb_stride = (s->depth * s->width + 7) / 8;
++    macfb_draw_line_func *macfb_draw_line;
++
++    switch (s->depth) {
++    case 1:
++        v = MACFB_DRAW_LINE1;
++        break;
++    case 2:
++        v = MACFB_DRAW_LINE2;
++        break;
++    case 4:
++        v = MACFB_DRAW_LINE4;
++        break;
++    case 8:
++        v = MACFB_DRAW_LINE8;
++        break;
++    case 16:
++        v = MACFB_DRAW_LINE16;
++        break;
++    case 24:
++        v = MACFB_DRAW_LINE24;
++        break;
++    }
++
++    macfb_draw_line = macfb_draw_line_table[v];
++    assert(macfb_draw_line != NULL);
++
++    snap = memory_region_snapshot_and_clear_dirty(&s->mem_vram, 0x0,
++                                             memory_region_size(&s->mem_vram),
++                                             DIRTY_MEMORY_VGA);
++
++    ymin = -1;
++    page = 0;
++    for (y = 0; y < s->height; y++, page += macfb_stride) {
++        if (macfb_check_dirty(s, snap, page, macfb_stride)) {
++            uint8_t *data_display;
++
++            data_display = surface_data(surface) + y * surface_stride(surface);
++            macfb_draw_line(s, data_display, page, s->width);
++
++            if (ymin < 0) {
++                ymin = y;
++            }
++        } else {
++            if (ymin >= 0) {
++                dpy_gfx_update(s->con, 0, ymin, s->width, y - ymin);
++                ymin = -1;
++            }
++        }
++    }
++
++    if (ymin >= 0) {
++        dpy_gfx_update(s->con, 0, ymin, s->width, y - ymin);
++    }
++
++    g_free(snap);
++}
++
++static void macfb_invalidate_display(void *opaque)
++{
++    MacfbState *s = opaque;
++
++    memory_region_set_dirty(&s->mem_vram, 0, MACFB_VRAM_SIZE);
++}
++
++static void macfb_update_display(void *opaque)
++{
++    MacfbState *s = opaque;
++    DisplaySurface *surface = qemu_console_surface(s->con);
++
++    qemu_flush_coalesced_mmio_buffer();
++
++    if (s->width == 0 || s->height == 0) {
++        return;
++    }
++
++    if (s->width != surface_width(surface) ||
++        s->height != surface_height(surface)) {
++        qemu_console_resize(s->con, s->width, s->height);
++    }
++
++    macfb_draw_graphic(s);
++}
++
++static void macfb_reset(MacfbState *s)
++{
++    int i;
++
++    s->palette_current = 0;
++    for (i = 0; i < 256; i++) {
++        s->color_palette[i * 3] = 255 - i;
++        s->color_palette[i * 3 + 1] = 255 - i;
++        s->color_palette[i * 3 + 2] = 255 - i;
++    }
++    memset(s->vram, 0, MACFB_VRAM_SIZE);
++    macfb_invalidate_display(s);
++}
++
++static uint64_t macfb_ctrl_read(void *opaque,
++                                hwaddr addr,
 +                                unsigned int size)
 +{
 +    return 0;
 +}
 +
-+static const MemoryRegionOps nubus_slot_ops = {
-+    .read  = nubus_slot_read,
-+    .write = nubus_slot_write,
-+    .endianness = DEVICE_BIG_ENDIAN,
-+    .valid = {
-+        .min_access_size = 1,
-+        .max_access_size = 1,
-+    },
-+};
-+
-+static void nubus_super_slot_write(void *opaque, hwaddr addr, uint64_t val,
-+                                   unsigned int size)
++static void macfb_ctrl_write(void *opaque,
++                             hwaddr addr,
++                             uint64_t val,
++                             unsigned int size)
 +{
-+    /* read only */
++    MacfbState *s = opaque;
++    switch (addr) {
++    case DAFB_RESET:
++        s->palette_current = 0;
++        break;
++    case DAFB_LUT:
++        s->color_palette[s->palette_current++] = val;
++        if (s->palette_current % 3) {
++            macfb_invalidate_display(s);
++        }
++        break;
++    }
 +}
 +
-+static uint64_t nubus_super_slot_read(void *opaque, hwaddr addr,
-+                                      unsigned int size)
++static const MemoryRegionOps macfb_ctrl_ops = {
++    .read = macfb_ctrl_read,
++    .write = macfb_ctrl_write,
++    .endianness = DEVICE_BIG_ENDIAN,
++    .impl.min_access_size = 1,
++    .impl.max_access_size = 4,
++};
++
++static int macfb_post_load(void *opaque, int version_id)
 +{
++    macfb_invalidate_display(opaque);
 +    return 0;
 +}
 +
-+static const MemoryRegionOps nubus_super_slot_ops = {
-+    .read  = nubus_super_slot_read,
-+    .write = nubus_super_slot_write,
-+    .endianness = DEVICE_BIG_ENDIAN,
-+    .valid = {
-+        .min_access_size = 1,
-+        .max_access_size = 1,
-+    },
++static const VMStateDescription vmstate_macfb = {
++    .name = "macfb",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .minimum_version_id_old = 1,
++    .post_load = macfb_post_load,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT8_ARRAY(color_palette, MacfbState, 256 * 3),
++        VMSTATE_UINT32(palette_current, MacfbState),
++        VMSTATE_END_OF_LIST()
++    }
 +};
 +
-+static void nubus_realize(BusState *bus, Error **errp)
++static const GraphicHwOps macfb_ops = {
++    .invalidate = macfb_invalidate_display,
++    .gfx_update = macfb_update_display,
++};
++
++static void macfb_common_realize(DeviceState *dev, MacfbState *s, Error **errp)
 +{
-+    if (!nubus_find()) {
-+        error_setg(errp, "at most one %s device is permitted", TYPE_NUBUS_BUS);
++    DisplaySurface *surface;
++
++    if (s->depth != 1 && s->depth != 2 && s->depth != 4 && s->depth != 8 &&
++        s->depth != 16 && s->depth != 24) {
++        error_setg(errp, "unknown guest depth %d", s->depth);
 +        return;
 +    }
++
++    s->con = graphic_console_init(dev, 0, &macfb_ops, s);
++    surface = qemu_console_surface(s->con);
++
++    if (surface_bits_per_pixel(surface) != 32) {
++        error_setg(errp, "unknown host depth %d",
++                   surface_bits_per_pixel(surface));
++        return;
++    }
++
++    memory_region_init_io(&s->mem_ctrl, NULL, &macfb_ctrl_ops, s, "macfb-ctrl",
++                          0x1000);
++
++    memory_region_init_ram_nomigrate(&s->mem_vram, OBJECT(s), "macfb-vram",
++                                     MACFB_VRAM_SIZE, errp);
++    s->vram = memory_region_get_ram_ptr(&s->mem_vram);
++    s->vram_bit_mask = MACFB_VRAM_SIZE - 1;
++    vmstate_register_ram(&s->mem_vram, dev);
++    memory_region_set_coalescing(&s->mem_vram);
 +}
 +
-+static void nubus_init(Object *obj)
++static void macfb_sysbus_realize(DeviceState *dev, Error **errp)
 +{
-+    NubusBus *nubus = NUBUS_BUS(obj);
++    MacfbSysBusState *s = MACFB(dev);
++    MacfbState *ms = &s->macfb;
 +
-+    memory_region_init_io(&nubus->super_slot_io, obj, &nubus_super_slot_ops,
-+                          nubus, "nubus-super-slots",
-+                          NUBUS_SUPER_SLOT_NB * NUBUS_SUPER_SLOT_SIZE);
-+
-+    memory_region_init_io(&nubus->slot_io, obj, &nubus_slot_ops,
-+                          nubus, "nubus-slots",
-+                          NUBUS_SLOT_NB * NUBUS_SLOT_SIZE);
-+
-+    nubus->current_slot = NUBUS_FIRST_SLOT;
++    macfb_common_realize(dev, ms, errp);
++    sysbus_init_mmio(SYS_BUS_DEVICE(s), &ms->mem_ctrl);
++    sysbus_init_mmio(SYS_BUS_DEVICE(s), &ms->mem_vram);
 +}
 +
-+static void nubus_class_init(ObjectClass *oc, void *data)
++static void macfb_sysbus_reset(DeviceState *d)
 +{
-+    BusClass *bc = BUS_CLASS(oc);
-+
-+    bc->realize = nubus_realize;
++    MacfbSysBusState *s = MACFB(d);
++    macfb_reset(&s->macfb);
 +}
 +
-+static const TypeInfo nubus_bus_info = {
-+    .name = TYPE_NUBUS_BUS,
-+    .parent = TYPE_BUS,
-+    .instance_size = sizeof(NubusBus),
-+    .instance_init = nubus_init,
-+    .class_init = nubus_class_init,
++static Property macfb_sysbus_properties[] = {
++    DEFINE_PROP_UINT32("width", MacfbSysBusState, macfb.width, 640),
++    DEFINE_PROP_UINT32("height", MacfbSysBusState, macfb.height, 480),
++    DEFINE_PROP_UINT8("depth", MacfbSysBusState, macfb.depth, 8),
++    DEFINE_PROP_END_OF_LIST(),
 +};
 +
-+static void nubus_register_types(void)
++static void macfb_sysbus_class_init(ObjectClass *klass, void *data)
 +{
-+    type_register_static(&nubus_bus_info);
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->realize = macfb_sysbus_realize;
++    dc->desc = "SysBus Macintosh framebuffer";
++    dc->reset = macfb_sysbus_reset;
++    dc->vmsd = &vmstate_macfb;
++    dc->props = macfb_sysbus_properties;
 +}
 +
-+type_init(nubus_register_types)
-diff --git a/hw/nubus/nubus-device.c b/hw/nubus/nubus-device.c
++static TypeInfo macfb_sysbus_info = {
++    .name          = TYPE_MACFB,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(MacfbSysBusState),
++    .class_init    = macfb_sysbus_class_init,
++};
++
++static void macfb_register_types(void)
++{
++    type_register_static(&macfb_sysbus_info);
++}
++
++type_init(macfb_register_types)
+diff --git a/include/hw/display/macfb.h b/include/hw/display/macfb.h
 new file mode 100644
-index 0000000000..01ccad9e8e
+index 0000000000..3fe2592735
 --- /dev/null
-+++ b/hw/nubus/nubus-device.c
-@@ -0,0 +1,215 @@
++++ b/include/hw/display/macfb.h
+@@ -0,0 +1,43 @@
 +/*
-+ * QEMU Macintosh Nubus
++ * QEMU Motorola 680x0 Macintosh Video Card Emulation
++ *                 Copyright (c) 2012-2018 Laurent Vivier
 + *
-+ * Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
++ * some parts from QEMU G364 framebuffer Emulator.
++ *                 Copyright (c) 2007-2011 Herve Poussineau
 + *
 + * This work is licensed under the terms of the GNU GPL, version 2 or later.
 + * See the COPYING file in the top-level directory.
 + *
 + */
++
++#ifndef MACFB_H
++#define MACFB_H
 +
 +#include "qemu/osdep.h"
-+#include "hw/nubus/nubus.h"
-+#include "qapi/error.h"
++#include "exec/memory.h"
++#include "ui/console.h"
 +
++typedef struct MacfbState {
++    MemoryRegion mem_vram;
++    MemoryRegion mem_ctrl;
++    QemuConsole *con;
 +
-+/* The Format Block Structure */
++    uint8_t *vram;
++    uint32_t vram_bit_mask;
++    uint32_t palette_current;
++    uint8_t color_palette[256 * 3];
++    uint32_t width, height; /* in pixels */
++    uint8_t depth;
++} MacfbState;
 +
-+#define FBLOCK_DIRECTORY_OFFSET 0
-+#define FBLOCK_LENGTH           4
-+#define FBLOCK_CRC              8
-+#define FBLOCK_REVISION_LEVEL   12
-+#define FBLOCK_FORMAT           13
-+#define FBLOCK_TEST_PATTERN     14
-+#define FBLOCK_RESERVED         18
-+#define FBLOCK_BYTE_LANES       19
++#define TYPE_MACFB "sysbus-macfb"
++#define MACFB(obj) \
++    OBJECT_CHECK(MacfbSysBusState, (obj), TYPE_MACFB)
 +
-+#define FBLOCK_SIZE             20
-+#define FBLOCK_PATTERN_VAL      0x5a932bc7
++typedef struct {
++    SysBusDevice busdev;
 +
-+static uint64_t nubus_fblock_read(void *opaque, hwaddr addr, unsigned int size)
-+{
-+    NubusDevice *dev = opaque;
-+    uint64_t val;
-+
-+#define BYTE(v, b) (((v) >> (24 - 8 * (b))) & 0xff)
-+    switch (addr) {
-+    case FBLOCK_BYTE_LANES:
-+        val = dev->byte_lanes;
-+        val |= (val ^ 0xf) << 4;
-+        break;
-+    case FBLOCK_RESERVED:
-+        val = 0x00;
-+        break;
-+    case FBLOCK_TEST_PATTERN...FBLOCK_TEST_PATTERN + 3:
-+        val = BYTE(FBLOCK_PATTERN_VAL, addr - FBLOCK_TEST_PATTERN);
-+        break;
-+    case FBLOCK_FORMAT:
-+        val = dev->rom_format;
-+        break;
-+    case FBLOCK_REVISION_LEVEL:
-+        val = dev->rom_rev;
-+        break;
-+    case FBLOCK_CRC...FBLOCK_CRC + 3:
-+        val = BYTE(dev->rom_crc, addr - FBLOCK_CRC);
-+        break;
-+    case FBLOCK_LENGTH...FBLOCK_LENGTH + 3:
-+        val = BYTE(dev->rom_length, addr - FBLOCK_LENGTH);
-+        break;
-+    case FBLOCK_DIRECTORY_OFFSET...FBLOCK_DIRECTORY_OFFSET + 3:
-+        val = BYTE(dev->directory_offset, addr - FBLOCK_DIRECTORY_OFFSET);
-+        break;
-+    default:
-+        val = 0;
-+        break;
-+    }
-+    return val;
-+}
-+
-+static void nubus_fblock_write(void *opaque, hwaddr addr, uint64_t val,
-+                               unsigned int size)
-+{
-+    /* read only */
-+}
-+
-+static const MemoryRegionOps nubus_format_block_ops = {
-+    .read = nubus_fblock_read,
-+    .write = nubus_fblock_write,
-+    .endianness = DEVICE_BIG_ENDIAN,
-+    .valid = {
-+        .min_access_size = 1,
-+        .max_access_size = 1,
-+    }
-+};
-+
-+static void nubus_register_format_block(NubusDevice *dev)
-+{
-+    char *fblock_name;
-+
-+    fblock_name = g_strdup_printf("nubus-slot-%d-format-block",
-+                                  dev->slot_nb);
-+
-+    hwaddr fblock_offset = memory_region_size(&dev->slot_mem) - FBLOCK_SIZE;
-+    memory_region_init_io(&dev->fblock_io, NULL, &nubus_format_block_ops,
-+                          dev, fblock_name, FBLOCK_SIZE);
-+    memory_region_add_subregion(&dev->slot_mem, fblock_offset,
-+                                &dev->fblock_io);
-+
-+    g_free(fblock_name);
-+}
-+
-+static void mac_nubus_rom_write(void *opaque, hwaddr addr, uint64_t val,
-+                                       unsigned int size)
-+{
-+    /* read only */
-+}
-+
-+static uint64_t mac_nubus_rom_read(void *opaque, hwaddr addr,
-+                                    unsigned int size)
-+{
-+    NubusDevice *dev = opaque;
-+
-+    return dev->rom[addr];
-+}
-+
-+static const MemoryRegionOps mac_nubus_rom_ops = {
-+    .read  = mac_nubus_rom_read,
-+    .write = mac_nubus_rom_write,
-+    .endianness = DEVICE_BIG_ENDIAN,
-+    .valid = {
-+        .min_access_size = 1,
-+        .max_access_size = 1,
-+    },
-+};
-+
-+
-+void nubus_register_rom(NubusDevice *dev, const uint8_t *rom, uint32_t size,
-+                        int revision, int format, uint8_t byte_lanes)
-+{
-+    hwaddr rom_offset;
-+    char *rom_name;
-+
-+    /* FIXME : really compute CRC */
-+    dev->rom_length = 0;
-+    dev->rom_crc = 0;
-+
-+    dev->rom_rev = revision;
-+    dev->rom_format = format;
-+
-+    dev->byte_lanes = byte_lanes;
-+    dev->directory_offset = -size;
-+
-+    /* ROM */
-+
-+    dev->rom = rom;
-+    rom_name = g_strdup_printf("nubus-slot-%d-rom", dev->slot_nb);
-+    memory_region_init_io(&dev->rom_io, NULL, &mac_nubus_rom_ops,
-+                          dev, rom_name, size);
-+    memory_region_set_readonly(&dev->rom_io, true);
-+
-+    rom_offset = memory_region_size(&dev->slot_mem) - FBLOCK_SIZE +
-+                 dev->directory_offset;
-+    memory_region_add_subregion(&dev->slot_mem, rom_offset, &dev->rom_io);
-+
-+    g_free(rom_name);
-+}
-+
-+static void nubus_device_realize(DeviceState *dev, Error **errp)
-+{
-+    NubusBus *nubus = NUBUS_BUS(qdev_get_parent_bus(DEVICE(dev)));
-+    NubusDevice *nd = NUBUS_DEVICE(dev);
-+    char *name;
-+    hwaddr slot_offset;
-+
-+    if (nubus->current_slot < NUBUS_FIRST_SLOT ||
-+            nubus->current_slot > NUBUS_LAST_SLOT) {
-+        error_setg(errp, "Cannot register nubus card, not enough slots");
-+        return;
-+    }
-+
-+    nd->slot_nb = nubus->current_slot++;
-+    name = g_strdup_printf("nubus-slot-%d", nd->slot_nb);
-+
-+    if (nd->slot_nb < NUBUS_FIRST_SLOT) {
-+        /* Super */
-+        slot_offset = (nd->slot_nb - 6) * NUBUS_SUPER_SLOT_SIZE;
-+
-+        memory_region_init(&nd->slot_mem, OBJECT(dev), name,
-+                           NUBUS_SUPER_SLOT_SIZE);
-+        memory_region_add_subregion(&nubus->super_slot_io, slot_offset,
-+                                    &nd->slot_mem);
-+    } else {
-+        /* Normal */
-+        slot_offset = nd->slot_nb * NUBUS_SLOT_SIZE;
-+
-+        memory_region_init(&nd->slot_mem, OBJECT(dev), name, NUBUS_SLOT_SIZE);
-+        memory_region_add_subregion(&nubus->slot_io, slot_offset,
-+                                    &nd->slot_mem);
-+    }
-+
-+    g_free(name);
-+    nubus_register_format_block(nd);
-+}
-+
-+static void nubus_device_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+
-+    dc->realize = nubus_device_realize;
-+    dc->bus_type = TYPE_NUBUS_BUS;
-+}
-+
-+static const TypeInfo nubus_device_type_info = {
-+    .name = TYPE_NUBUS_DEVICE,
-+    .parent = TYPE_DEVICE,
-+    .abstract = true,
-+    .instance_size = sizeof(NubusDevice),
-+    .class_init = nubus_device_class_init,
-+};
-+
-+static void nubus_register_types(void)
-+{
-+    type_register_static(&nubus_device_type_info);
-+}
-+
-+type_init(nubus_register_types)
-diff --git a/include/hw/nubus/mac-nubus-bridge.h b/include/hw/nubus/mac-nubus-bridge.h
-new file mode 100644
-index 0000000000..ce9c789d99
---- /dev/null
-+++ b/include/hw/nubus/mac-nubus-bridge.h
-@@ -0,0 +1,24 @@
-+/*
-+ * Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef HW_NUBUS_MAC_H
-+#define HW_NUBUS_MAC_H
-+
-+#include "hw/nubus/nubus.h"
-+
-+#define TYPE_MAC_NUBUS_BRIDGE "mac-nubus-bridge"
-+#define MAC_NUBUS_BRIDGE(obj) OBJECT_CHECK(MacNubusState, (obj), \
-+                                           TYPE_MAC_NUBUS_BRIDGE)
-+
-+typedef struct MacNubusState {
-+    SysBusDevice sysbus_dev;
-+
-+    NubusBus *bus;
-+} MacNubusState;
++    MacfbState macfb;
++} MacfbSysBusState;
 +
 +#endif
-diff --git a/include/hw/nubus/nubus.h b/include/hw/nubus/nubus.h
-new file mode 100644
-index 0000000000..096bafb322
---- /dev/null
-+++ b/include/hw/nubus/nubus.h
-@@ -0,0 +1,69 @@
-+/*
-+ * Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef HW_NUBUS_NUBUS_H
-+#define HW_NUBUS_NUBUS_H
-+
-+#include "hw/qdev.h"
-+#include "exec/address-spaces.h"
-+
-+#define NUBUS_SUPER_SLOT_SIZE 0x10000000U
-+#define NUBUS_SUPER_SLOT_NB   0x9
-+
-+#define NUBUS_SLOT_SIZE       0x01000000
-+#define NUBUS_SLOT_NB         0xF
-+
-+#define NUBUS_FIRST_SLOT      0x9
-+#define NUBUS_LAST_SLOT       0xF
-+
-+#define TYPE_NUBUS_DEVICE "nubus-device"
-+#define NUBUS_DEVICE(obj) \
-+     OBJECT_CHECK(NubusDevice, (obj), TYPE_NUBUS_DEVICE)
-+
-+#define TYPE_NUBUS_BUS "nubus-bus"
-+#define NUBUS_BUS(obj) OBJECT_CHECK(NubusBus, (obj), TYPE_NUBUS_BUS)
-+
-+#define TYPE_NUBUS_BRIDGE "nubus-bridge"
-+#define NUBUS_BRIDGE(obj) OBJECT_CHECK(NubusBridge, (obj), TYPE_NUBUS_BRIDGE)
-+
-+typedef struct NubusBus {
-+    BusState qbus;
-+
-+    MemoryRegion super_slot_io;
-+    MemoryRegion slot_io;
-+
-+    int current_slot;
-+} NubusBus;
-+
-+typedef struct NubusDevice {
-+    DeviceState qdev;
-+
-+    int slot_nb;
-+    MemoryRegion slot_mem;
-+
-+    /* Format Block */
-+
-+    MemoryRegion fblock_io;
-+
-+    uint32_t rom_length;
-+    uint32_t rom_crc;
-+    uint8_t rom_rev;
-+    uint8_t rom_format;
-+    uint8_t byte_lanes;
-+    int32_t directory_offset;
-+
-+    /* ROM */
-+
-+    MemoryRegion rom_io;
-+    const uint8_t *rom;
-+} NubusDevice;
-+
-+void nubus_register_rom(NubusDevice *dev, const uint8_t *rom, uint32_t size,
-+                        int revision, int format, uint8_t byte_lanes);
-+
-+#endif
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 38c7a978c1..a84a70168a 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -1523,7 +1523,7 @@ ETEXI
+ 
+ DEF("g", 1, QEMU_OPTION_g ,
+     "-g WxH[xDEPTH]  Set the initial graphical resolution and depth\n",
+-    QEMU_ARCH_PPC | QEMU_ARCH_SPARC)
++    QEMU_ARCH_PPC | QEMU_ARCH_SPARC | QEMU_ARCH_M68K)
+ STEXI
+ @item -g @var{width}x@var{height}[x@var{depth}]
+ @findex -g
+diff --git a/vl.c b/vl.c
+index 1fcacc5caa..a84f126417 100644
+--- a/vl.c
++++ b/vl.c
+@@ -3353,7 +3353,8 @@ int main(int argc, char **argv, char **envp)
+                     if (*p == 'x') {
+                         p++;
+                         depth = strtol(p, (char **)&p, 10);
+-                        if (depth != 8 && depth != 15 && depth != 16 &&
++                        if (depth != 1 && depth != 2 && depth != 4 &&
++                            depth != 8 && depth != 15 && depth != 16 &&
+                             depth != 24 && depth != 32)
+                             goto graphic_error;
+                     } else if (*p == '\0') {
 -- 
 2.11.0
