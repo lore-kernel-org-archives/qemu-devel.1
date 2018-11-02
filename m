@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36424)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Chris.Friesen@windriver.com>) id 1gIend-0000jC-Ut
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 15:08:06 -0400
+	(envelope-from <v.mayatskih@gmail.com>) id 1gIevC-0004rd-5M
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 15:15:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Chris.Friesen@windriver.com>) id 1gIenX-000896-5a
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 15:08:03 -0400
-Received: from mail.windriver.com ([147.11.1.11]:44827)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Chris.Friesen@windriver.com>)
-	id 1gIenW-000800-Od
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 15:07:58 -0400
-References: <d5d6e09a-78ed-41c4-bbb9-260263c05bf2@windriver.com>
-	<87pnvn6hnq.fsf@linaro.org>
-From: Chris Friesen <chris.friesen@windriver.com>
-Message-ID: <b109fe05-1e88-a6e3-34cb-21a4b61e64b3@windriver.com>
-Date: Fri, 2 Nov 2018 09:31:19 -0600
-MIME-Version: 1.0
-In-Reply-To: <87pnvn6hnq.fsf@linaro.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] strange situation,
- guest cpu thread spinning at ~100%, but display not yet initialized
+	(envelope-from <v.mayatskih@gmail.com>) id 1gIev8-0005Dz-KF
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 15:15:54 -0400
+Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:42246)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <v.mayatskih@gmail.com>)
+	id 1gIev8-0005Cr-9d
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 15:15:50 -0400
+Received: by mail-qk1-x743.google.com with SMTP id u68so4745924qkg.9
+	for <qemu-devel@nongnu.org>; Fri, 02 Nov 2018 12:15:49 -0700 (PDT)
+From: Vitaly Mayatskikh <v.mayatskih@gmail.com>
+Date: Fri,  2 Nov 2018 19:15:38 +0000
+Message-Id: <20181102191538.7532-1-v.mayatskih@gmail.com>
+Subject: [Qemu-devel] [PATCH 1/1] Add vhost-pci-blk driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +24,211 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Vitaly Mayatskikh <v.mayatskih@gmail.com>
 
-On 11/2/2018 1:51 AM, Alex Benn=C3=A9e wrote:
->=20
-> Chris Friesen <chris.friesen@windriver.com> writes:
->=20
->> Hi all,
->>
->> I have an odd situation which occurs very infrequently and I'm hoping
->> to get some advice on how to debug.  Apologies for the length of this
->> message, I tried to include as much potentially useful information as
->> possible.
->>
->> In the context of an OpenStack compute node I have a qemu guest (with
->> kvm acceleration) that has started up.  The virtual console shows
->> "Guest has not initialized the display (yet)."   I'm trying to figure
->> out what's going on and how we got into this state.  I assume it's
->> some sort of deadlock/livelock, but I can't figure out what's causing
->> it.
+This driver uses the kernel-mode acceleration for virtio-blk and
+allows to get a near bare metal disk performance inside a VM.
 
->> At this point gdb appears to be stuck, though the task is still
->> chewing 99.9% of host cpu 43.
->=20
-> That's because the vcpu_ioctl you just trace through is into the
-> VCPU_RUN, basically when you enter the guest code (assuming the in
-> kernel KVM code isn't spinning).
+Signed-off-by: Vitaly Mayatskikh <v.mayatskih@gmail.com>
+---
+ configure                  | 10 +++++++
+ default-configs/virtio.mak |  1 +
+ hw/block/Makefile.objs     |  1 +
+ hw/virtio/virtio-pci.c     | 60 ++++++++++++++++++++++++++++++++++++++
+ hw/virtio/virtio-pci.h     | 19 ++++++++++++
+ 5 files changed, 91 insertions(+)
 
-That's what I figured, thanks for the confirmation.
-
-> If you want to get an idea why your guest is spinning you probably want
-> to enable the gdb stub and look at what your guest kernel is doing.
-
-Given the "not initialized" message on the console, I wasn't sure=20
-whether the kernel had even started yet.
-
-Chris
+diff --git a/configure b/configure
+index 46ae1e8c76..787bc780da 100755
+--- a/configure
++++ b/configure
+@@ -371,6 +371,7 @@ vhost_crypto="no"
+ vhost_scsi="no"
+ vhost_vsock="no"
+ vhost_user=""
++vhost_blk=""
+ kvm="no"
+ hax="no"
+ hvf="no"
+@@ -869,6 +870,7 @@ Linux)
+   vhost_crypto="yes"
+   vhost_scsi="yes"
+   vhost_vsock="yes"
++  vhost_blk="yes"
+   QEMU_INCLUDES="-I\$(SRC_PATH)/linux-headers -I$(pwd)/linux-headers $QEMU_INCLUDES"
+   supported_os="yes"
+   libudev="yes"
+@@ -1263,6 +1265,10 @@ for opt do
+   ;;
+   --enable-vhost-vsock) vhost_vsock="yes"
+   ;;
++  --disable-vhost-blk) vhost_blk="no"
++  ;;
++  --enable-vhost-blk) vhost_blk="yes"
++  ;;
+   --disable-opengl) opengl="no"
+   ;;
+   --enable-opengl) opengl="yes"
+@@ -6000,6 +6006,7 @@ echo "vhost-crypto support $vhost_crypto"
+ echo "vhost-scsi support $vhost_scsi"
+ echo "vhost-vsock support $vhost_vsock"
+ echo "vhost-user support $vhost_user"
++echo "vhost-blk support $vhost_blk"
+ echo "Trace backends    $trace_backends"
+ if have_backend "simple"; then
+ echo "Trace output file $trace_file-<pid>"
+@@ -6461,6 +6468,9 @@ fi
+ if test "$vhost_user" = "yes" ; then
+   echo "CONFIG_VHOST_USER=y" >> $config_host_mak
+ fi
++if test "$vhost_blk" = "yes" ; then
++  echo "CONFIG_VHOST_BLK=y" >> $config_host_mak
++fi
+ if test "$blobs" = "yes" ; then
+   echo "INSTALL_BLOBS=yes" >> $config_host_mak
+ fi
+diff --git a/default-configs/virtio.mak b/default-configs/virtio.mak
+index 1304849018..765c0a2a04 100644
+--- a/default-configs/virtio.mak
++++ b/default-configs/virtio.mak
+@@ -1,5 +1,6 @@
+ CONFIG_VHOST_USER_SCSI=$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX))
+ CONFIG_VHOST_USER_BLK=$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX))
++CONFIG_VHOST_BLK=$(CONFIG_LINUX)
+ CONFIG_VIRTIO=y
+ CONFIG_VIRTIO_9P=y
+ CONFIG_VIRTIO_BALLOON=y
+diff --git a/hw/block/Makefile.objs b/hw/block/Makefile.objs
+index 53ce5751ae..857ce823fc 100644
+--- a/hw/block/Makefile.objs
++++ b/hw/block/Makefile.objs
+@@ -14,3 +14,4 @@ obj-$(CONFIG_SH4) += tc58128.o
+ obj-$(CONFIG_VIRTIO_BLK) += virtio-blk.o
+ obj-$(CONFIG_VIRTIO_BLK) += dataplane/
+ obj-$(CONFIG_VHOST_USER_BLK) += vhost-user-blk.o
++obj-$(CONFIG_VHOST_BLK) += vhost-blk.o
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index a954799267..ec00b54424 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -2060,6 +2060,63 @@ static const TypeInfo vhost_user_blk_pci_info = {
+ };
+ #endif
+ 
++#ifdef CONFIG_VHOST_BLK
++/* vhost-blk */
++
++static Property vhost_blk_pci_properties[] = {
++    DEFINE_PROP_UINT32("class", VirtIOPCIProxy, class_code, 0),
++    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors,
++                       DEV_NVECTORS_UNSPECIFIED),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void vhost_blk_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
++{
++    VHostBlkPCI *dev = VHOST_BLK_PCI(vpci_dev);
++    DeviceState *vdev = DEVICE(&dev->vdev);
++
++    if (vpci_dev->nvectors == DEV_NVECTORS_UNSPECIFIED) {
++        vpci_dev->nvectors = dev->vdev.num_queues + 1;
++    }
++
++    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
++    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
++}
++
++static void vhost_blk_pci_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
++    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
++
++    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
++    dc->props = vhost_blk_pci_properties;
++    k->realize = vhost_blk_pci_realize;
++    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
++    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_BLOCK;
++    pcidev_k->revision = VIRTIO_PCI_ABI_VERSION;
++    pcidev_k->class_id = PCI_CLASS_STORAGE_SCSI;
++}
++
++static void vhost_blk_pci_instance_init(Object *obj)
++{
++    VHostBlkPCI *dev = VHOST_BLK_PCI(obj);
++
++    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
++                                TYPE_VHOST_BLK);
++    object_property_add_alias(obj, "bootindex", OBJECT(&dev->vdev),
++                              "bootindex", &error_abort);
++}
++
++static const TypeInfo vhost_blk_pci_info = {
++    .name           = TYPE_VHOST_BLK_PCI,
++    .parent         = TYPE_VIRTIO_PCI,
++    .instance_size  = sizeof(VHostBlkPCI),
++    .instance_init  = vhost_blk_pci_instance_init,
++    .class_init     = vhost_blk_pci_class_init,
++};
++#endif
++
+ /* virtio-scsi-pci */
+ 
+ static Property virtio_scsi_pci_properties[] = {
+@@ -2723,6 +2780,9 @@ static void virtio_pci_register_types(void)
+ #ifdef CONFIG_VHOST_VSOCK
+     type_register_static(&vhost_vsock_pci_info);
+ #endif
++#ifdef CONFIG_VHOST_BLK
++    type_register_static(&vhost_blk_pci_info);
++#endif
+ }
+ 
+ type_init(virtio_pci_register_types)
+diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
+index 813082b0d7..4cca04a45a 100644
+--- a/hw/virtio/virtio-pci.h
++++ b/hw/virtio/virtio-pci.h
+@@ -31,6 +31,10 @@
+ #include "hw/virtio/vhost-user-blk.h"
+ #endif
+ 
++#ifdef CONFIG_VHOST_BLK
++#include "hw/virtio/vhost-blk.h"
++#endif
++
+ #ifdef CONFIG_VIRTFS
+ #include "hw/9pfs/virtio-9p.h"
+ #endif
+@@ -50,6 +54,7 @@ typedef struct VirtIONetPCI VirtIONetPCI;
+ typedef struct VHostSCSIPCI VHostSCSIPCI;
+ typedef struct VHostUserSCSIPCI VHostUserSCSIPCI;
+ typedef struct VHostUserBlkPCI VHostUserBlkPCI;
++typedef struct VHostBlkPCI VHostBlkPCI;
+ typedef struct VirtIORngPCI VirtIORngPCI;
+ typedef struct VirtIOInputPCI VirtIOInputPCI;
+ typedef struct VirtIOInputHIDPCI VirtIOInputHIDPCI;
+@@ -262,6 +267,20 @@ struct VHostUserBlkPCI {
+ };
+ #endif
+ 
++#ifdef CONFIG_VHOST_BLK
++/*
++ * vhost-blk-pci: This extends VirtioPCIProxy.
++ */
++#define TYPE_VHOST_BLK_PCI "vhost-blk-pci"
++#define VHOST_BLK_PCI(obj) \
++        OBJECT_CHECK(VHostBlkPCI, (obj), TYPE_VHOST_BLK_PCI)
++
++struct VHostBlkPCI {
++    VirtIOPCIProxy parent_obj;
++    VHostBlk vdev;
++};
++#endif
++
+ /*
+  * virtio-blk-pci: This extends VirtioPCIProxy.
+  */
+-- 
+2.17.1
