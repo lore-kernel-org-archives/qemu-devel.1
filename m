@@ -1,19 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46867)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <contrib@steffen-goertz.de>) id 1gIcw4-0007le-5Q
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 13:08:40 -0400
+	(envelope-from <Chris.Friesen@windriver.com>) id 1gIcwg-0008E7-Ot
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 13:09:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <contrib@steffen-goertz.de>) id 1gIcw2-00055U-TQ
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 13:08:39 -0400
-From: =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>
-Date: Fri,  2 Nov 2018 13:07:29 -0400
-Message-Id: <20181102170730.12432-13-contrib@steffen-goertz.de>
-In-Reply-To: <20181102170730.12432-1-contrib@steffen-goertz.de>
-References: <20181102170730.12432-1-contrib@steffen-goertz.de>
+	(envelope-from <Chris.Friesen@windriver.com>) id 1gIcwa-0005cE-Rw
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 13:09:18 -0400
+Received: from mail5.windriver.com ([192.103.53.11]:53872 helo=mail5.wrs.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Chris.Friesen@windriver.com>)
+	id 1gIcwZ-0005a6-Ua
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 13:09:12 -0400
+References: <d5d6e09a-78ed-41c4-bbb9-260263c05bf2@windriver.com>
+	<87pnvn6hnq.fsf@linaro.org>
+	<b109fe05-1e88-a6e3-34cb-21a4b61e64b3@windriver.com>
+	<87lg6b5shx.fsf@linaro.org>
+From: Chris Friesen <chris.friesen@windriver.com>
+Message-ID: <98428a27-8634-9521-297c-a61c618e867a@windriver.com>
+Date: Fri, 2 Nov 2018 11:08:15 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <87lg6b5shx.fsf@linaro.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 12/13] arm: Instantiate NRF51 Timers
+Subject: Re: [Qemu-devel] strange situation,
+ guest cpu thread spinning at ~100%, but display not yet initialized
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,109 +32,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>, "open list:NRF51" <qemu-arm@nongnu.org>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-Instantiates TIMER0 - TIMER2
+On 11/2/2018 10:55 AM, Alex Benn=C3=A9e wrote:
+>=20
+> Chris Friesen <chris.friesen@windriver.com> writes:
+>> Given the "not initialized" message on the console, I wasn't sure
+>> whether the kernel had even started yet.
+>=20
+> There will be a lot that happens between the kernel decompressing and
+> some sort of video hardware output being started. You didn't say what
+> guest architecture you were booting or what your qemu command line was.
+> You might want to look at enabling the serial console and seeing if you
+> get some clues from that.
 
-Signed-off-by: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- hw/arm/nrf51_soc.c         | 27 +++++++++++++++++++++++++++
- include/hw/arm/nrf51_soc.h |  4 ++++
- 2 files changed, 31 insertions(+)
+The qemu commandline is in the "ps" output in my original message.=20
+Guest arch is x86-64.
 
-diff --git a/hw/arm/nrf51_soc.c b/hw/arm/nrf51_soc.c
-index 2c4e80892b..36dac03896 100644
---- a/hw/arm/nrf51_soc.c
-+++ b/hw/arm/nrf51_soc.c
-@@ -40,6 +40,8 @@ static void nrf51_soc_realize(DeviceState *dev_soc, Err=
-or **errp)
-     NRF51State *s =3D NRF51_SOC(dev_soc);
-     MemoryRegion *mr;
-     Error *err =3D NULL;
-+    uint8_t i =3D 0;
-+    hwaddr base_addr =3D 0;
-=20
-     if (!s->board_memory) {
-         error_setg(errp, "memory property was not set");
-@@ -141,6 +143,22 @@ static void nrf51_soc_realize(DeviceState *dev_soc, =
-Error **errp)
-     /* Pass all GPIOs to the SOC layer so they are available to the boar=
-d */
-     qdev_pass_gpios(DEVICE(&s->gpio), dev_soc, NULL);
-=20
-+    /* TIMER */
-+    for (i =3D 0; i < NRF51_NUM_TIMERS; i++) {
-+        object_property_set_bool(OBJECT(&s->timer[i]), true, "realized",=
- &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-+
-+        base_addr =3D NRF51_TIMER_BASE + i * NRF51_TIMER_SIZE;
-+
-+        sysbus_mmio_map(SYS_BUS_DEVICE(&s->timer[i]), 0, base_addr);
-+        sysbus_connect_irq(SYS_BUS_DEVICE(&s->timer[i]), 0,
-+                           qdev_get_gpio_in(DEVICE(&s->cpu),
-+                                            BASE_TO_IRQ(base_addr)));
-+    }
-+
-=20
-     create_unimplemented_device("nrf51_soc.io", NRF51_IOMEM_BASE,
-                                 NRF51_IOMEM_SIZE);
-@@ -150,6 +168,8 @@ static void nrf51_soc_realize(DeviceState *dev_soc, E=
-rror **errp)
-=20
- static void nrf51_soc_init(Object *obj)
- {
-+    uint8_t i =3D 0;
-+
-     NRF51State *s =3D NRF51_SOC(obj);
-=20
-     memory_region_init(&s->container, obj, "nrf51-container", UINT64_MAX=
-);
-@@ -173,6 +193,13 @@ static void nrf51_soc_init(Object *obj)
-     sysbus_init_child_obj(obj, "gpio", &s->gpio, sizeof(s->gpio),
-                           TYPE_NRF51_GPIO);
-=20
-+    for (i =3D 0; i < NRF51_NUM_TIMERS; i++) {
-+        sysbus_init_child_obj(obj, "timer[*]", &s->timer[i],
-+                              sizeof(s->timer[i]), TYPE_NRF51_TIMER);
-+
-+    }
-+
-+
- }
-=20
- static Property nrf51_soc_properties[] =3D {
-diff --git a/include/hw/arm/nrf51_soc.h b/include/hw/arm/nrf51_soc.h
-index d4a48ccf91..89525dcb39 100644
---- a/include/hw/arm/nrf51_soc.h
-+++ b/include/hw/arm/nrf51_soc.h
-@@ -16,11 +16,14 @@
- #include "hw/misc/nrf51_rng.h"
- #include "hw/nvram/nrf51_nvm.h"
- #include "hw/gpio/nrf51_gpio.h"
-+#include "hw/timer/nrf51_timer.h"
-=20
- #define TYPE_NRF51_SOC "nrf51-soc"
- #define NRF51_SOC(obj) \
-     OBJECT_CHECK(NRF51State, (obj), TYPE_NRF51_SOC)
-=20
-+#define NRF51_NUM_TIMERS 3
-+
- typedef struct NRF51State {
-     /*< private >*/
-     SysBusDevice parent_obj;
-@@ -32,6 +35,7 @@ typedef struct NRF51State {
-     NRF51RNGState rng;
-     NRF51NVMState nvm;
-     NRF51GPIOState gpio;
-+    NRF51TimerState timer[NRF51_NUM_TIMERS];
-=20
-     MemoryRegion iomem;
-     MemoryRegion sram;
---=20
-2.19.1
+The serial console is a good idea, will try that.
+
+Chris
