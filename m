@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35872)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37392)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gIbIY-0005TX-5T
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:23:50 -0400
+	(envelope-from <kwolf@redhat.com>) id 1gIbNF-0003qs-Nt
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:28:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gIbIV-0000iJ-MB
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:23:46 -0400
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Fri,  2 Nov 2018 15:22:56 +0000
-Message-Id: <20181102152257.20637-10-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <20181102152257.20637-1-mark.cave-ayland@ilande.co.uk>
-References: <20181102152257.20637-1-mark.cave-ayland@ilande.co.uk>
+	(envelope-from <kwolf@redhat.com>) id 1gIbN1-0003d0-U9
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:28:31 -0400
+Date: Fri, 2 Nov 2018 16:28:00 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20181102152800.GI7521@dhcp-200-186.str.redhat.com>
+References: <20181102085800.21860-1-philmd@redhat.com>
+	<20181102110734.GE7521@dhcp-200-186.str.redhat.com>
+	<6d96d96b-21f7-d5fc-9313-8ede0f6a745c@redhat.com>
+	<20181102141030.GH7521@dhcp-200-186.str.redhat.com>
+	<0b2d802d-4b58-30de-44a8-9f04dc968b1b@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v6 09/10] dp8393x: manage big endian bus
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <0b2d802d-4b58-30de-44a8-9f04dc968b1b@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] qemu/units: Move out QCow2 specific
+ definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,207 +28,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, jasowang@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, hpoussin@reactos.org, kraxel@redhat.com, pbonzini@redhat.com, aurelien@aurel32.net, laurent@vivier.eu
+To: Eric Blake <eblake@redhat.com>
+Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, Leonid Bloch <lbloch@janustech.com>, Max Reitz <mreitz@redhat.com>
 
-From: Laurent Vivier <laurent@vivier.eu>
+Am 02.11.2018 um 15:52 hat Eric Blake geschrieben:
+> On 11/2/18 9:10 AM, Kevin Wolf wrote:
+> > Am 02.11.2018 um 13:37 hat Philippe Mathieu-Daud=E9 geschrieben:
+> > > Hi Kevin,
+> > >=20
+> > > On 2/11/18 12:07, Kevin Wolf wrote:
+> > > > Am 02.11.2018 um 09:58 hat Philippe Mathieu-Daud=E9 geschrieben:
+> > > > > This definitions are QCow2 specific, there is no need to expose=
+ them
+> > > > > in the global namespace.
+> > > > >=20
+> > > > > This partially reverts commit 540b8492618eb.
+> > > > >=20
+> > > > > Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> > > >=20
+> > > > If we don't want this globally, I think we also don't want it in =
+qcow2.
+>=20
+> Agreed. I didn't want it in the first place, arguing that if we want
+> stringification of defaults, it would be better to have a runtime funct=
+ion
+> do that, rather than adding a set of near-duplicate macro names.
+>=20
+> > >=20
+> > > I only see this definitions used by block/qcow2.h (b6a95c6d1007).
+> > >=20
+> > > Per 540b8492618eb description "This is needed when a size has to be
+> > > stringified" but I can't find other code requiring these definition=
+s in the
+> > > codebase.
+> >=20
+> > I guess the real question is: Is qcow2 the only place that needs
+> > stringification of sizes?
+>=20
+> Probably not. It seems like stringifying a default value is a common de=
+sire.
+>=20
+> >=20
+> > The only value where this actually seems to be used in qcow2 is for
+> > DEFAULT_CLUSTER_SIZE, as the default value for QemuOpts. Other driver=
+s
+> > still use plain numbers, but this is less readable.
+> >=20
+> > Then there is VDI which uses (1 * MiB), but that is compiled out and =
+if
+> > you enable it, it breaks. So it needs the same fix.
+> >=20
+> > Are block drivers the only places where we stringify a size? I imagin=
+e
+> > some device models might use something like it, too?
+>=20
+> Indeed, I would prefer a patch that makes it possible for QemuOpts to
+> pretty-print a default value using a generic runtime stringifier, rathe=
+r
+> than keeping these S_ macros around.
 
-This is needed by Quadra 800, this card can run on little-endian
-or big-endian bus.
+The thing is just, QemuOpts is completetly string based. The default
+value field is const char*. Either we get rid of QemuOpts and switch
+everything to QAPI (nice thought, but a little unrealistic in the short
+term), or we add ways to add non-string values to QemuOpts (would
+require significant development on a piece of code we want to get rid of
+in the long term), or you keep doing stringification at build time
+(which I believe is the only reasonable choice at the moment).
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Tested-by: Hervé Poussineau <hpoussin@reactos.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
----
- hw/net/dp8393x.c | 88 ++++++++++++++++++++++++++++++++++++--------------------
- 1 file changed, 57 insertions(+), 31 deletions(-)
-
-diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
-index b53fcaa8bc..1cf348aea1 100644
---- a/hw/net/dp8393x.c
-+++ b/hw/net/dp8393x.c
-@@ -150,6 +150,7 @@ typedef struct dp8393xState {
- 
-     /* Hardware */
-     uint8_t it_shift;
-+    bool big_endian;
-     qemu_irq irq;
- #ifdef DEBUG_SONIC
-     int irq_level;
-@@ -220,6 +221,29 @@ static uint32_t dp8393x_wt(dp8393xState *s)
-     return s->regs[SONIC_WT1] << 16 | s->regs[SONIC_WT0];
- }
- 
-+static uint16_t dp8393x_get(dp8393xState *s, int width, uint16_t *base,
-+                            int offset)
-+{
-+    uint16_t val;
-+
-+    if (s->big_endian) {
-+        val = be16_to_cpu(base[offset * width + width - 1]);
-+    } else {
-+        val = le16_to_cpu(base[offset * width]);
-+    }
-+    return val;
-+}
-+
-+static void dp8393x_put(dp8393xState *s, int width, uint16_t *base, int offset,
-+                        uint16_t val)
-+{
-+    if (s->big_endian) {
-+        base[offset * width + width - 1] = cpu_to_be16(val);
-+    } else {
-+        base[offset * width] = cpu_to_le16(val);
-+    }
-+}
-+
- static void dp8393x_update_irq(dp8393xState *s)
- {
-     int level = (s->regs[SONIC_IMR] & s->regs[SONIC_ISR]) ? 1 : 0;
-@@ -251,12 +275,12 @@ static void dp8393x_do_load_cam(dp8393xState *s)
-         /* Fill current entry */
-         address_space_rw(&s->as, dp8393x_cdp(s),
-             MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
--        s->cam[index][0] = data[1 * width] & 0xff;
--        s->cam[index][1] = data[1 * width] >> 8;
--        s->cam[index][2] = data[2 * width] & 0xff;
--        s->cam[index][3] = data[2 * width] >> 8;
--        s->cam[index][4] = data[3 * width] & 0xff;
--        s->cam[index][5] = data[3 * width] >> 8;
-+        s->cam[index][0] = dp8393x_get(s, width, data, 1) & 0xff;
-+        s->cam[index][1] = dp8393x_get(s, width, data, 1) >> 8;
-+        s->cam[index][2] = dp8393x_get(s, width, data, 2) & 0xff;
-+        s->cam[index][3] = dp8393x_get(s, width, data, 2) >> 8;
-+        s->cam[index][4] = dp8393x_get(s, width, data, 3) & 0xff;
-+        s->cam[index][5] = dp8393x_get(s, width, data, 3) >> 8;
-         DPRINTF("load cam[%d] with %02x%02x%02x%02x%02x%02x\n", index,
-             s->cam[index][0], s->cam[index][1], s->cam[index][2],
-             s->cam[index][3], s->cam[index][4], s->cam[index][5]);
-@@ -269,7 +293,7 @@ static void dp8393x_do_load_cam(dp8393xState *s)
-     /* Read CAM enable */
-     address_space_rw(&s->as, dp8393x_cdp(s),
-         MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
--    s->regs[SONIC_CE] = data[0 * width];
-+    s->regs[SONIC_CE] = dp8393x_get(s, width, data, 0);
-     DPRINTF("load cam done. cam enable mask 0x%04x\n", s->regs[SONIC_CE]);
- 
-     /* Done */
-@@ -290,10 +314,10 @@ static void dp8393x_do_read_rra(dp8393xState *s)
-         MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
- 
-     /* Update SONIC registers */
--    s->regs[SONIC_CRBA0] = data[0 * width];
--    s->regs[SONIC_CRBA1] = data[1 * width];
--    s->regs[SONIC_RBWC0] = data[2 * width];
--    s->regs[SONIC_RBWC1] = data[3 * width];
-+    s->regs[SONIC_CRBA0] = dp8393x_get(s, width, data, 0);
-+    s->regs[SONIC_CRBA1] = dp8393x_get(s, width, data, 1);
-+    s->regs[SONIC_RBWC0] = dp8393x_get(s, width, data, 2);
-+    s->regs[SONIC_RBWC1] = dp8393x_get(s, width, data, 3);
-     DPRINTF("CRBA0/1: 0x%04x/0x%04x, RBWC0/1: 0x%04x/0x%04x\n",
-         s->regs[SONIC_CRBA0], s->regs[SONIC_CRBA1],
-         s->regs[SONIC_RBWC0], s->regs[SONIC_RBWC1]);
-@@ -408,12 +432,12 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
-         tx_len = 0;
- 
-         /* Update registers */
--        s->regs[SONIC_TCR] = data[0 * width] & 0xf000;
--        s->regs[SONIC_TPS] = data[1 * width];
--        s->regs[SONIC_TFC] = data[2 * width];
--        s->regs[SONIC_TSA0] = data[3 * width];
--        s->regs[SONIC_TSA1] = data[4 * width];
--        s->regs[SONIC_TFS] = data[5 * width];
-+        s->regs[SONIC_TCR] = dp8393x_get(s, width, data, 0) & 0xf000;
-+        s->regs[SONIC_TPS] = dp8393x_get(s, width, data, 1);
-+        s->regs[SONIC_TFC] = dp8393x_get(s, width, data, 2);
-+        s->regs[SONIC_TSA0] = dp8393x_get(s, width, data, 3);
-+        s->regs[SONIC_TSA1] = dp8393x_get(s, width, data, 4);
-+        s->regs[SONIC_TFS] = dp8393x_get(s, width, data, 5);
- 
-         /* Handle programmable interrupt */
-         if (s->regs[SONIC_TCR] & SONIC_TCR_PINT) {
-@@ -439,9 +463,9 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
-                 address_space_rw(&s->as,
-                     dp8393x_ttda(s) + sizeof(uint16_t) * (4 + 3 * i) * width,
-                     MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
--                s->regs[SONIC_TSA0] = data[0 * width];
--                s->regs[SONIC_TSA1] = data[1 * width];
--                s->regs[SONIC_TFS] = data[2 * width];
-+                s->regs[SONIC_TSA0] = dp8393x_get(s, width, data, 0);
-+                s->regs[SONIC_TSA1] = dp8393x_get(s, width, data, 1);
-+                s->regs[SONIC_TFS] = dp8393x_get(s, width, data, 2);
-             }
-         }
- 
-@@ -468,7 +492,8 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
-         s->regs[SONIC_TCR] |= SONIC_TCR_PTX;
- 
-         /* Write status */
--        data[0 * width] = s->regs[SONIC_TCR] & 0x0fff; /* status */
-+        dp8393x_put(s, width, data, 0,
-+                    s->regs[SONIC_TCR] & 0x0fff); /* status */
-         size = sizeof(uint16_t) * width;
-         address_space_rw(&s->as,
-             dp8393x_ttda(s),
-@@ -482,8 +507,8 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
-                              sizeof(uint16_t) *
-                              (4 + 3 * s->regs[SONIC_TFC]) * width,
-                 MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
--            s->regs[SONIC_CTDA] = data[0 * width] & ~0x1;
--            if (data[0 * width] & 0x1) {
-+            s->regs[SONIC_CTDA] = dp8393x_get(s, width, data, 0) & ~0x1;
-+            if (dp8393x_get(s, width, data, 0) & 0x1) {
-                 /* EOL detected */
-                 break;
-             }
-@@ -746,7 +771,7 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
-         address = dp8393x_crda(s) + sizeof(uint16_t) * 5 * width;
-         address_space_rw(&s->as, address, MEMTXATTRS_UNSPECIFIED,
-                          (uint8_t *)data, size, 0);
--        if (data[0 * width] & 0x1) {
-+        if (dp8393x_get(s, width, data, 0) & 0x1) {
-             /* Still EOL ; stop reception */
-             return -1;
-         } else {
-@@ -790,11 +815,11 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
- 
-     /* Write status to memory */
-     DPRINTF("Write status at %08x\n", dp8393x_crda(s));
--    data[0 * width] = s->regs[SONIC_RCR]; /* status */
--    data[1 * width] = rx_len; /* byte count */
--    data[2 * width] = s->regs[SONIC_TRBA0]; /* pkt_ptr0 */
--    data[3 * width] = s->regs[SONIC_TRBA1]; /* pkt_ptr1 */
--    data[4 * width] = s->regs[SONIC_RSC]; /* seq_no */
-+    dp8393x_put(s, width, data, 0, s->regs[SONIC_RCR]); /* status */
-+    dp8393x_put(s, width, data, 1, rx_len); /* byte count */
-+    dp8393x_put(s, width, data, 2, s->regs[SONIC_TRBA0]); /* pkt_ptr0 */
-+    dp8393x_put(s, width, data, 3, s->regs[SONIC_TRBA1]); /* pkt_ptr1 */
-+    dp8393x_put(s, width, data, 4, s->regs[SONIC_RSC]); /* seq_no */
-     size = sizeof(uint16_t) * 5 * width;
-     address_space_rw(&s->as, dp8393x_crda(s),
-         MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 1);
-@@ -803,12 +828,12 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
-     size = sizeof(uint16_t) * width;
-     address_space_rw(&s->as, dp8393x_crda(s) + sizeof(uint16_t) * 5 * width,
-         MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
--    s->regs[SONIC_LLFA] = data[0 * width];
-+    s->regs[SONIC_LLFA] = dp8393x_get(s, width, data, 0);
-     if (s->regs[SONIC_LLFA] & 0x1) {
-         /* EOL detected */
-         s->regs[SONIC_ISR] |= SONIC_ISR_RDE;
-     } else {
--        data[0 * width] = 0; /* in_use */
-+        dp8393x_put(s, width, data, 0, 0); /* in_use */
-         address_space_rw(&s->as, dp8393x_crda(s) + sizeof(uint16_t) * 6 * width,
-             MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, sizeof(uint16_t), 1);
-         s->regs[SONIC_CRDA] = s->regs[SONIC_LLFA];
-@@ -921,6 +946,7 @@ static Property dp8393x_properties[] = {
-     DEFINE_NIC_PROPERTIES(dp8393xState, conf),
-     DEFINE_PROP_PTR("dma_mr", dp8393xState, dma_mr),
-     DEFINE_PROP_UINT8("it_shift", dp8393xState, it_shift, 0),
-+    DEFINE_PROP_BOOL("big_endian", dp8393xState, big_endian, false),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
--- 
-2.11.0
+Kevin
