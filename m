@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60361)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60618)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gIW5I-00048B-2r
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 05:49:47 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1gIW6J-0004og-LQ
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 05:50:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gIW5G-0001Xs-H4
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 05:49:43 -0400
-Received: from mail-ot1-x32e.google.com ([2607:f8b0:4864:20::32e]:37350)
+	(envelope-from <richard.henderson@linaro.org>) id 1gIW6H-0002bG-0f
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 05:50:47 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:52321)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gIW5G-0001XC-8r
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 05:49:42 -0400
-Received: by mail-ot1-x32e.google.com with SMTP id 40so956006oth.4
-	for <qemu-devel@nongnu.org>; Fri, 02 Nov 2018 02:49:42 -0700 (PDT)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gIW69-0002Qr-7E
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 05:50:39 -0400
+Received: by mail-wm1-x342.google.com with SMTP id q19-v6so1412505wmc.2
+	for <qemu-devel@nongnu.org>; Fri, 02 Nov 2018 02:50:32 -0700 (PDT)
+References: <20181101215739.29788-1-richard.henderson@linaro.org>
+	<CAFEAcA_HrcAfHaLW+hT0btN6C=GZv7VYWmhz3ri-QSL9ySZ0qg@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <72f81077-d400-31b5-0e6f-fb59a4bbae53@linaro.org>
+Date: Fri, 2 Nov 2018 09:50:28 +0000
 MIME-Version: 1.0
-In-Reply-To: <20181031165321.4422-1-richard.henderson@linaro.org>
-References: <20181031165321.4422-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 2 Nov 2018 09:49:21 +0000
-Message-ID: <CAFEAcA95y2S2Y=VSEQu-bJ=EJwNtPEoh3SByHWneNDQ90m+04Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/3] decodetree improvements
+In-Reply-To: <CAFEAcA_HrcAfHaLW+hT0btN6C=GZv7VYWmhz3ri-QSL9ySZ0qg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] target/arm: Conditionalize arm_div assert
+ on aarch32 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +32,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-On 31 October 2018 at 16:53, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> The following changes since commit a2e002ff7913ce93aa0f7dbedd2123dce5f1a9cd:
->
->   Merge remote-tracking branch 'remotes/vivier2/tags/qemu-trivial-for-3.1-pull-request' into staging (2018-10-30 15:49:55 +0000)
->
-> are available in the Git repository at:
->
->   https://github.com/rth7680/qemu.git tags/pull-dt-20181031
->
-> for you to fetch changes up to 6699ae6a8e74381583622502db8bd47fac381c9e:
->
->   decodetree: Allow multiple input files (2018-10-31 16:48:58 +0000)
->
-> ----------------------------------------------------------------
-> Updates to decodetree.py for risc-v.
->
-> ----------------------------------------------------------------
-> Richard Henderson (3):
->       decodetree: Add !extern flag to argument sets
->       decodetree: Remove "insn" argument from trans_* expanders
->       decodetree: Allow multiple input files
+On 11/2/18 9:48 AM, Peter Maydell wrote:
+>> +static inline bool isar_feature_aa64_a32(const ARMISARegisters *id)
+>> +{
+>> +    return FIELD_EX64(id->id_aa64pfr0, ID_AA64PFR0, EL0) == 2;
+>> +}
+>> +
+> 
+> Doesn't the stuff in the Arm ARM's "Principles of the ID
+> scheme for fields in ID registers" about signed and unsigned
+> values for ID register fields strictly mean you want to be
+> testing (unsigned) >= 2 here rather than strict equality?
 
-Applied, thanks.
+Yes.  Will fix.
 
--- PMM
+
+r~
