@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gIYcV-0003jZ-7M
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 08:32:14 -0400
+	(envelope-from <no-reply@patchew.org>) id 1gIYfL-0006EH-VJ
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 08:35:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gIYcR-0002CB-Uu
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 08:32:11 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:34774)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gIYcR-0002Bu-HU
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 08:32:07 -0400
-Received: by mail-wm1-x343.google.com with SMTP id f1-v6so1159746wmg.1
-	for <qemu-devel@nongnu.org>; Fri, 02 Nov 2018 05:32:07 -0700 (PDT)
-References: <20181102102025.3546-1-richard.henderson@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181102102025.3546-1-richard.henderson@linaro.org>
-Date: Fri, 02 Nov 2018 12:32:04 +0000
-Message-ID: <87muqr64or.fsf@linaro.org>
+	(envelope-from <no-reply@patchew.org>) id 1gIYfK-0003bu-0Y
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 08:35:07 -0400
+Resent-Message-Id: <E1gIYfK-0003bu-0Y@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21309)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gIYfH-0003Yn-8H
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 08:35:04 -0400
+Message-ID: <154116207343.19190.9179618779318540443@015909e0f939>
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <20181031215622.27690-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] target/arm: Conditionalize some asserts
- on aarch32 support
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 2 Nov 2018 05:34:34 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 00/12] file-posix: Simplify delegation to
+ worker thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,105 +29,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: kwolf@redhat.com
+Cc: famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-
-Richard Henderson <richard.henderson@linaro.org> writes:
-
-> When populating id registers from kvm, on a host that doesn't support
-> aarch32 mode at all, neither arm_div nor jazelle will be supported either.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->
-> v2: Test aa64pfr.el0 >=3D 2; rename to isar_feature_aa64_aa32.
->     Pull out realizefn test to no_aa32 bool; use it for jazelle as well.
->
-> Alex, can you give this a test please?
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-
->
->
-> r~
->
-> ---
->  target/arm/cpu.h |  5 +++++
->  target/arm/cpu.c | 15 +++++++++++++--
->  2 files changed, 18 insertions(+), 2 deletions(-)
->
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index 895f9909d8..5c2c77c31d 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -3300,6 +3300,11 @@ static inline bool isar_feature_aa64_fp16(const AR=
-MISARegisters *id)
->      return FIELD_EX64(id->id_aa64pfr0, ID_AA64PFR0, FP) =3D=3D 1;
->  }
->
-> +static inline bool isar_feature_aa64_aa32(const ARMISARegisters *id)
-> +{
-> +    return FIELD_EX64(id->id_aa64pfr0, ID_AA64PFR0, EL0) >=3D 2;
-> +}
-> +
->  static inline bool isar_feature_aa64_sve(const ARMISARegisters *id)
->  {
->      return FIELD_EX64(id->id_aa64pfr0, ID_AA64PFR0, SVE) !=3D 0;
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index e08a2d2d79..d4dc0bc225 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -774,6 +774,7 @@ static void arm_cpu_realizefn(DeviceState *dev, Error=
- **errp)
->      CPUARMState *env =3D &cpu->env;
->      int pagebits;
->      Error *local_err =3D NULL;
-> +    bool no_aa32 =3D false;
->
->      /* If we needed to query the host kernel for the CPU features
->       * then it's possible that might have failed in the initfn, but
-> @@ -820,6 +821,16 @@ static void arm_cpu_realizefn(DeviceState *dev, Erro=
-r **errp)
->              set_feature(env, ARM_FEATURE_V7VE);
->          }
->      }
-> +
-> +    /*
-> +     * There exist AArch64 cpus without AArch32 support.  When KVM
-> +     * queries ID_ISAR0_EL1 on such a host, the value is UNKNOWN.
-> +     * Similarly, we cannot check ID_AA64PFR0 without AArch64 support.
-> +     */
-> +    if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
-> +        no_aa32 =3D !cpu_isar_feature(aa64_aa32, cpu);
-> +    }
-> +
->      if (arm_feature(env, ARM_FEATURE_V7VE)) {
->          /* v7 Virtualization Extensions. In real hardware this implies
->           * EL2 and also the presence of the Security Extensions.
-> @@ -829,7 +840,7 @@ static void arm_cpu_realizefn(DeviceState *dev, Error=
- **errp)
->           * Presence of EL2 itself is ARM_FEATURE_EL2, and of the
->           * Security Extensions is ARM_FEATURE_EL3.
->           */
-> -        assert(cpu_isar_feature(arm_div, cpu));
-> +        assert(no_aa32 || cpu_isar_feature(arm_div, cpu));
->          set_feature(env, ARM_FEATURE_LPAE);
->          set_feature(env, ARM_FEATURE_V7);
->      }
-> @@ -855,7 +866,7 @@ static void arm_cpu_realizefn(DeviceState *dev, Error=
- **errp)
->      if (arm_feature(env, ARM_FEATURE_V6)) {
->          set_feature(env, ARM_FEATURE_V5);
->          if (!arm_feature(env, ARM_FEATURE_M)) {
-> -            assert(cpu_isar_feature(jazelle, cpu));
-> +            assert(no_aa32 || cpu_isar_feature(jazelle, cpu));
->              set_feature(env, ARM_FEATURE_AUXCR);
->          }
->      }
-
-
---
-Alex Benn=C3=A9e
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgxMDMxMjE1NjIyLjI3NjkwLTEta3dvbGZAcmVkaGF0LmNvbQpTdWJqZWN0
+OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAwLzEyXSBmaWxlLXBvc2l4OiBTaW1wbGlmeSBkZWxlZ2F0
+aW9uIHRvIHdvcmtlciB0aHJlYWQKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jh
+c2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2Mg
+LWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBj
+b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5h
+bGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZl
+cnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBB
+VENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYg
+ISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0t
+bWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAg
+IG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpV
+cGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVk
+IHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZjNkMjRmMjU5ZCBmaWxlLXBvc2l4OiBBdm9pZCBhaW9f
+d29ya2VyKCkgZm9yIFFFTVVfQUlPX0lPQ1RMCmEyMGFmNWU3ZDUgZmlsZS1wb3NpeDogU3dpdGNo
+IHRvIC5iZHJ2X2NvX2lvY3RsCjg2YzhjZDBjYTkgZmlsZS1wb3NpeDogUmVtb3ZlIHBhaW9fc3Vi
+bWl0X2NvKCkKYTY3OThkZTg3OSBmaWxlLXBvc2l4OiBBdm9pZCBhaW9fd29ya2VyKCkgZm9yIFFF
+TVVfQUlPX1JFQUQvV1JJVEUKZjY2N2M4M2U3MCBmaWxlLXBvc2l4OiBNb3ZlIHJlYWQvd3JpdGUg
+b3BlcmF0aW9uIGxvZ2ljIG91dCBvZiBhaW9fd29ya2VyKCkKMDI4ZmE0NWIzNiBmaWxlLXBvc2l4
+OiBBdm9pZCBhaW9fd29ya2VyKCkgZm9yIFFFTVVfQUlPX0ZMVVNICjk5MjA2MGI5MmMgZmlsZS1w
+b3NpeDogQXZvaWQgYWlvX3dvcmtlcigpIGZvciBRRU1VX0FJT19ESVNDQVJECmIyNzMwNmMzOGYg
+ZmlsZS1wb3NpeDogQXZvaWQgYWlvX3dvcmtlcigpIGZvciBRRU1VX0FJT19XUklURV9aRVJPRVMK
+OTM0MTk0Zjc1MyBmaWxlLXBvc2l4OiBBdm9pZCBhaW9fd29ya2VyKCkgZm9yIFFFTVVfQUlPX0NP
+UFlfUkFOR0UKYWIzNDc5YWE5ZSBmaWxlLXBvc2l4OiBBdm9pZCBhaW9fd29ya2VyKCkgZm9yIFFF
+TVVfQUlPX1RSVU5DQVRFCjA1NWNlYTI0YTQgZmlsZS1wb3NpeDogRmFjdG9yIG91dCByYXdfdGhy
+ZWFkX3Bvb2xfc3VibWl0KCkKOTE4MzRiM2ZiOCBmaWxlLXBvc2l4OiBSZW9yZ2FuaXNlIFJhd1Bv
+c2l4QUlPRGF0YQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xMjogZmls
+ZS1wb3NpeDogUmVvcmdhbmlzZSBSYXdQb3NpeEFJT0RhdGEuLi4KRVJST1I6IHN1c3BlY3QgY29k
+ZSBpbmRlbnQgZm9yIGNvbmRpdGlvbmFsIHN0YXRlbWVudHMgKDgsIDEzKQojOTY6IEZJTEU6IGJs
+b2NrL2ZpbGUtcG9zaXguYzoxMjc4OgorICAgICAgICBpZiAoYWlvY2ItPmlvLm5pb3YgPT0gMSkg
+eworICAgICAgICAgICAgIHJldHVybiBoYW5kbGVfYWlvY2JfcndfbGluZWFyKGFpb2NiLCBhaW9j
+Yi0+aW8uaW92LT5pb3ZfYmFzZSk7Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDIwMyBs
+aW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
+dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
+bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVj
+a2luZyBQQVRDSCAyLzEyOiBmaWxlLXBvc2l4OiBGYWN0b3Igb3V0IHJhd190aHJlYWRfcG9vbF9z
+dWJtaXQoKS4uLgpDaGVja2luZyBQQVRDSCAzLzEyOiBmaWxlLXBvc2l4OiBBdm9pZCBhaW9fd29y
+a2VyKCkgZm9yIFFFTVVfQUlPX1RSVU5DQVRFLi4uCkNoZWNraW5nIFBBVENIIDQvMTI6IGZpbGUt
+cG9zaXg6IEF2b2lkIGFpb193b3JrZXIoKSBmb3IgUUVNVV9BSU9fQ09QWV9SQU5HRS4uLgpDaGVj
+a2luZyBQQVRDSCA1LzEyOiBmaWxlLXBvc2l4OiBBdm9pZCBhaW9fd29ya2VyKCkgZm9yIFFFTVVf
+QUlPX1dSSVRFX1pFUk9FUy4uLgpDaGVja2luZyBQQVRDSCA2LzEyOiBmaWxlLXBvc2l4OiBBdm9p
+ZCBhaW9fd29ya2VyKCkgZm9yIFFFTVVfQUlPX0RJU0NBUkQuLi4KQ2hlY2tpbmcgUEFUQ0ggNy8x
+MjogZmlsZS1wb3NpeDogQXZvaWQgYWlvX3dvcmtlcigpIGZvciBRRU1VX0FJT19GTFVTSC4uLgpD
+aGVja2luZyBQQVRDSCA4LzEyOiBmaWxlLXBvc2l4OiBNb3ZlIHJlYWQvd3JpdGUgb3BlcmF0aW9u
+IGxvZ2ljIG91dCBvZiBhaW9fd29ya2VyKCkuLi4KRVJST1I6IHN1c3BlY3QgY29kZSBpbmRlbnQg
+Zm9yIGNvbmRpdGlvbmFsIHN0YXRlbWVudHMgKDgsIDEzKQojMjU6IEZJTEU6IGJsb2NrL2ZpbGUt
+cG9zaXguYzoxMjc5OgogICAgICAgICBpZiAoYWlvY2ItPmlvLm5pb3YgPT0gMSkgeworICAgICAg
+ICAgICAgIG5ieXRlcyA9IGhhbmRsZV9haW9jYl9yd19saW5lYXIoYWlvY2IsIGFpb2NiLT5pby5p
+b3YtPmlvdl9iYXNlKTsKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgNzMgbGluZXMgY2hl
+Y2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
+bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
+IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFU
+Q0ggOS8xMjogZmlsZS1wb3NpeDogQXZvaWQgYWlvX3dvcmtlcigpIGZvciBRRU1VX0FJT19SRUFE
+L1dSSVRFLi4uCkNoZWNraW5nIFBBVENIIDEwLzEyOiBmaWxlLXBvc2l4OiBSZW1vdmUgcGFpb19z
+dWJtaXRfY28oKS4uLgpDaGVja2luZyBQQVRDSCAxMS8xMjogZmlsZS1wb3NpeDogU3dpdGNoIHRv
+IC5iZHJ2X2NvX2lvY3RsLi4uCkNoZWNraW5nIFBBVENIIDEyLzEyOiBmaWxlLXBvc2l4OiBBdm9p
+ZCBhaW9fd29ya2VyKCkgZm9yIFFFTVVfQUlPX0lPQ1RMLi4uCj09PSBPVVRQVVQgRU5EID09PQoK
+VGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1
+dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
+IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
