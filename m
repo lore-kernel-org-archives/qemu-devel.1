@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34558)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36586)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gIdbk-0002Ct-Io
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 13:51:45 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gIdg7-0005Ob-LR
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 13:56:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gIdbj-0003JA-CX
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 13:51:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54488)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gIdbi-00030U-RX
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 13:51:43 -0400
-Date: Fri, 2 Nov 2018 17:51:11 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20181102175111.GA2388@work-vm>
-References: <d5d6e09a-78ed-41c4-bbb9-260263c05bf2@windriver.com>
-	<87pnvn6hnq.fsf@linaro.org>
-	<b109fe05-1e88-a6e3-34cb-21a4b61e64b3@windriver.com>
-	<87lg6b5shx.fsf@linaro.org>
-	<98428a27-8634-9521-297c-a61c618e867a@windriver.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gIdg4-0006lM-L4
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 13:56:13 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:42576)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gIdg3-0006Rd-Jc
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 13:56:12 -0400
+Received: by mail-oi1-x244.google.com with SMTP id h23-v6so2257180oih.9
+	for <qemu-devel@nongnu.org>; Fri, 02 Nov 2018 10:55:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <98428a27-8634-9521-297c-a61c618e867a@windriver.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] strange situation,
- guest cpu thread spinning at ~100%, but display not yet initialized
+In-Reply-To: <20181016093703.10637-1-peter.maydell@linaro.org>
+References: <20181016093703.10637-1-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 2 Nov 2018 17:55:26 +0000
+Message-ID: <CAFEAcA-sh3mb3prsrvd8J1sVDsmJN7wbsoQtn1CdniRMfzvr4Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 0/2] target/arm: fix some ATS*
+ bugs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,46 +29,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Chris Friesen <chris.friesen@windriver.com>, famz@redhat.com
-Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+To: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: "patches@linaro.org" <patches@linaro.org>
 
-* Chris Friesen (chris.friesen@windriver.com) wrote:
-> On 11/2/2018 10:55 AM, Alex Benn=E9e wrote:
-> >=20
-> > Chris Friesen <chris.friesen@windriver.com> writes:
-> > > Given the "not initialized" message on the console, I wasn't sure
-> > > whether the kernel had even started yet.
-> >=20
-> > There will be a lot that happens between the kernel decompressing and
-> > some sort of video hardware output being started. You didn't say what
-> > guest architecture you were booting or what your qemu command line wa=
-s.
-> > You might want to look at enabling the serial console and seeing if y=
-ou
-> > get some clues from that.
->=20
-> The qemu commandline is in the "ps" output in my original message. Gues=
-t
-> arch is x86-64.
->=20
-> The serial console is a good idea, will try that.
+Ping for code review, please?
 
-This is ringing a bell; if it's actually suck in the BIOS, then please:
-  a) Really make sure all your vCPUs are actually pinned/free on real
-CPUs
-  b) I suspect it is
-   https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg00470.html
+thanks
+-- PMM
 
-
-   so the fix is Fam's 'aio: Do aio_notify_accept only during blocking
-aio_poll'.  I see you're running the qemu-kvm-ev from centos, if I read
-the version tea-leaves right, then I think that patch is in the
-2.10.0-21.el7_5.7.1 package I can see.
-
-Dave
-
-
-> Chris
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+On 16 October 2018 at 10:37, Peter Maydell <peter.maydell@linaro.org> wrote:
+> This small patchset fixes a couple of bugs in our ATS insn
+> handling:
+>  * for faults reported to the 64-bit PAR we were not
+>    setting the S and PTW bits to indicate stage 2
+>    fault information
+>    (NB: stage 2 faults aren't reported with 32-bit
+>    PAR formats so there's no need to change the 32-bit
+>    code path)
+>  * ATS1Hx were implementing the wrong thing (doing a
+>    stage 2 lookup rather than an EL2 stage 1 lookup)
+>
+> The major missing bit of ATS at the moment is that a stage
+> 2 fault during execution of an NS-EL1 ATS insn that asks
+> for a stage 1 lookup should cause a trap to EL2. I started
+> to sketch out some code to do that, but I realised by
+> putting an assert() in it that I didn't have any guests
+> that actually hit the problem, so put it on the back burner.
+> If anybody does hit that missing feature, feel free to send
+> me a test case :-)
+>
+> Based-on: <20181012144235.19646-1-peter.maydell@linaro.org>
+> ("[PATCH 00/10] target/arm: more HCR bits, improve syndrome reporting")
+> but only to avoid a textual conflict in the patch context.
+>
+> thanks
+> -- PMM
+>
+> Peter Maydell (2):
+>   target/arm: Set S and PTW in 64-bit PAR format
+>   target/arm: Fix ATS1Hx instructions
+>
+>  target/arm/helper.c | 14 ++++++++------
+>  1 file changed, 8 insertions(+), 6 deletions(-)
