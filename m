@@ -1,22 +1,22 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:38516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gIWhB-0007xf-PI
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 06:28:56 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1gIWhK-0007xf-Hw
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 06:29:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gIWcO-0008Q6-Me
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 06:23:58 -0400
-Date: Fri, 2 Nov 2018 11:23:47 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181102112347.7af1cdc5@redhat.com>
-In-Reply-To: <c88b4769-a517-36da-b181-e59a4380bcea@gmail.com>
-References: <20181101102303.16439-1-sameo@linux.intel.com>
-	<20181101102303.16439-6-sameo@linux.intel.com>
-	<c88b4769-a517-36da-b181-e59a4380bcea@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 05/23] hw: arm: Switch to the AML build
- RSDP building routine
+	(envelope-from <richard.henderson@linaro.org>) id 1gIWZ6-0006qz-Cn
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 06:20:33 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38370)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gIWZ4-0006o3-DX
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 06:20:32 -0400
+Received: by mail-wr1-x444.google.com with SMTP id d10-v6so1424598wrs.5
+	for <qemu-devel@nongnu.org>; Fri, 02 Nov 2018 03:20:28 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Fri,  2 Nov 2018 10:20:25 +0000
+Message-Id: <20181102102025.3546-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH v2] target/arm: Conditionalize some asserts on
+ aarch32 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,89 +25,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shannon Zhao <shannon.zhaosl@gmail.com>
-Cc: Samuel Ortiz <sameo@linux.intel.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM ACPI Subsystem" <qemu-arm@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: alex.bennee@linaro.org, peter.maydell@linaro.org
 
-On Fri, 2 Nov 2018 17:35:06 +0800
-Shannon Zhao <shannon.zhaosl@gmail.com> wrote:
+When populating id registers from kvm, on a host that doesn't support
+aarch32 mode at all, neither arm_div nor jazelle will be supported either.
 
-> On 2018/11/1 18:22, Samuel Ortiz wrote:
-> > We make the ARM virt ACPI code use the now shared build_rsdp() API from
-> > aml-build.c. By doing so we fix a bug where the ARM implementation was
-> > missing adding both the legacy and extended checksums, which was
-> > building an invalid RSDP table.
-> > 
-> > Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
-> > ---
-> >   hw/arm/virt-acpi-build.c | 31 +------------------------------
-> >   1 file changed, 1 insertion(+), 30 deletions(-)
-> > 
-> > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> > index 0ed132b79b..0a6a88380a 100644
-> > --- a/hw/arm/virt-acpi-build.c
-> > +++ b/hw/arm/virt-acpi-build.c
-> > @@ -35,6 +35,7 @@
-> >   #include "target/arm/cpu.h"
-> >   #include "hw/acpi/acpi-defs.h"
-> >   #include "hw/acpi/acpi.h"
-> > +#include "hw/acpi/aml-build.h"
-> >   #include "hw/nvram/fw_cfg.h"
-> >   #include "hw/acpi/bios-linker-loader.h"
-> >   #include "hw/loader.h"
-> > @@ -366,36 +367,6 @@ static void acpi_dsdt_add_power_button(Aml *scope)
-> >       aml_append(scope, dev);
-> >   }
-> >   
-> > -/* RSDP */
-> > -static void
-> > -build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)  
-> Note: here we use xsdt table not rsdt for ARM. After your change which 
-> assigns xsdt table address to rsdt_physical_address, it doesn't work.
-Hi Shannon,
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
 
-I do not really like how this series organized/split and doing refactoring
-backwards but that's another story and I'll do suggestions how to make it
-better on per patch review later.
+v2: Test aa64pfr.el0 >= 2; rename to isar_feature_aa64_aa32.
+    Pull out realizefn test to no_aa32 bool; use it for jazelle as well.
 
-But as far as I see this change should only add legacy checksum over
-the current rsdp, which is bug fix and makes table spec compliant.
-
-Could you point out why it doesn't work and what exactly breaks?
+Alex, can you give this a test please?
 
 
-> IIRC, we discussed this before that ARM virt uses xsdt while pc/q35 uses 
-> rsdt. So this patch is not necessary I think.
-> 
-> Thanks,
-> Shannon
-> > -{
-> > -    AcpiRsdpDescriptor *rsdp = acpi_data_push(rsdp_table, sizeof *rsdp);
-> > -    unsigned xsdt_pa_size = sizeof(rsdp->xsdt_physical_address);
-> > -    unsigned xsdt_pa_offset =
-> > -        (char *)&rsdp->xsdt_physical_address - rsdp_table->data;
-> > -
-> > -    bios_linker_loader_alloc(linker, ACPI_BUILD_RSDP_FILE, rsdp_table, 16,
-> > -                             true /* fseg memory */);
-> > -
-> > -    memcpy(&rsdp->signature, "RSD PTR ", sizeof(rsdp->signature));
-> > -    memcpy(rsdp->oem_id, ACPI_BUILD_APPNAME6, sizeof(rsdp->oem_id));
-> > -    rsdp->length = cpu_to_le32(sizeof(*rsdp));
-> > -    rsdp->revision = 0x02;
-> > -
-> > -    /* Address to be filled by Guest linker */
-> > -    bios_linker_loader_add_pointer(linker,
-> > -        ACPI_BUILD_RSDP_FILE, xsdt_pa_offset, xsdt_pa_size,
-> > -        ACPI_BUILD_TABLE_FILE, xsdt_tbl_offset);
-> > -
-> > -    /* Checksum to be filled by Guest linker */
-> > -    bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
-> > -        (char *)rsdp - rsdp_table->data, sizeof *rsdp,
-> > -        (char *)&rsdp->checksum - rsdp_table->data);
-> > -
-> > -    return rsdp_table;
-> > -}
-> > -
-> >   static void
-> >   build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-> >   {
-> >   
+r~
+
+---
+ target/arm/cpu.h |  5 +++++
+ target/arm/cpu.c | 15 +++++++++++++--
+ 2 files changed, 18 insertions(+), 2 deletions(-)
+
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 895f9909d8..5c2c77c31d 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -3300,6 +3300,11 @@ static inline bool isar_feature_aa64_fp16(const ARMISARegisters *id)
+     return FIELD_EX64(id->id_aa64pfr0, ID_AA64PFR0, FP) == 1;
+ }
+ 
++static inline bool isar_feature_aa64_aa32(const ARMISARegisters *id)
++{
++    return FIELD_EX64(id->id_aa64pfr0, ID_AA64PFR0, EL0) >= 2;
++}
++
+ static inline bool isar_feature_aa64_sve(const ARMISARegisters *id)
+ {
+     return FIELD_EX64(id->id_aa64pfr0, ID_AA64PFR0, SVE) != 0;
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index e08a2d2d79..d4dc0bc225 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -774,6 +774,7 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+     CPUARMState *env = &cpu->env;
+     int pagebits;
+     Error *local_err = NULL;
++    bool no_aa32 = false;
+ 
+     /* If we needed to query the host kernel for the CPU features
+      * then it's possible that might have failed in the initfn, but
+@@ -820,6 +821,16 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+             set_feature(env, ARM_FEATURE_V7VE);
+         }
+     }
++
++    /*
++     * There exist AArch64 cpus without AArch32 support.  When KVM
++     * queries ID_ISAR0_EL1 on such a host, the value is UNKNOWN.
++     * Similarly, we cannot check ID_AA64PFR0 without AArch64 support.
++     */
++    if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
++        no_aa32 = !cpu_isar_feature(aa64_aa32, cpu);
++    }
++
+     if (arm_feature(env, ARM_FEATURE_V7VE)) {
+         /* v7 Virtualization Extensions. In real hardware this implies
+          * EL2 and also the presence of the Security Extensions.
+@@ -829,7 +840,7 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+          * Presence of EL2 itself is ARM_FEATURE_EL2, and of the
+          * Security Extensions is ARM_FEATURE_EL3.
+          */
+-        assert(cpu_isar_feature(arm_div, cpu));
++        assert(no_aa32 || cpu_isar_feature(arm_div, cpu));
+         set_feature(env, ARM_FEATURE_LPAE);
+         set_feature(env, ARM_FEATURE_V7);
+     }
+@@ -855,7 +866,7 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+     if (arm_feature(env, ARM_FEATURE_V6)) {
+         set_feature(env, ARM_FEATURE_V5);
+         if (!arm_feature(env, ARM_FEATURE_M)) {
+-            assert(cpu_isar_feature(jazelle, cpu));
++            assert(no_aa32 || cpu_isar_feature(jazelle, cpu));
+             set_feature(env, ARM_FEATURE_AUXCR);
+         }
+     }
+-- 
+2.17.2
