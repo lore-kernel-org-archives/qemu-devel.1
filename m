@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43423)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gIYw7-0005NH-Sk
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 08:52:32 -0400
+	(envelope-from <philmd@redhat.com>) id 1gIYwV-0005QI-7V
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 08:52:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gIYk3-00062I-BD
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 08:40:00 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 2 Nov 2018 12:39:51 +0000
-Message-ID: <3f0e8ed0-9271-3de4-e15b-658ea0bea6cb@virtuozzo.com>
-References: <20180731173033.75467-1-vsementsov@virtuozzo.com>
-	<20180731173033.75467-10-vsementsov@virtuozzo.com>
-In-Reply-To: <20180731173033.75467-10-vsementsov@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <EB298A9F32E57847856F2388F28F205F@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <philmd@redhat.com>) id 1gIYht-00050a-3v
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 08:37:49 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:39240)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gIYhs-0004u6-Qv
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 08:37:45 -0400
+Received: by mail-wr1-f67.google.com with SMTP id r10-v6so1833075wrv.6
+	for <qemu-devel@nongnu.org>; Fri, 02 Nov 2018 05:37:39 -0700 (PDT)
+References: <20181102085800.21860-1-philmd@redhat.com>
+	<20181102110734.GE7521@dhcp-200-186.str.redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <6d96d96b-21f7-d5fc-9313-8ede0f6a745c@redhat.com>
+Date: Fri, 2 Nov 2018 13:37:36 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4 09/10] block/nbd-client: nbd reconnect
+In-Reply-To: <20181102110734.GE7521@dhcp-200-186.str.redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] qemu/units: Move out QCow2 specific
+ definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,86 +31,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "armbru@redhat.com" <armbru@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, Leonid Bloch <lbloch@janustech.com>, Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
-MzEuMDcuMjAxOCAyMDozMCwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4g
-SW1wbGVtZW50IHJlY29ubmVjdC4gVG8gYWNoaWV2ZSB0aGlzOg0KPg0KPiAxLiBhZGQgbmV3IG1v
-ZGVzOg0KPiAgICAgY29ubmVjdGluZy13YWl0OiBtZWFucywgdGhhdCByZWNvbm5lY3RpbmcgaXMg
-aW4gcHJvZ3Jlc3MsIGFuZCB0aGVyZQ0KPiAgICAgICB3ZXJlIHNtYWxsIG51bWJlciBvZiByZWNv
-bm5lY3QgYXR0ZW1wdHMsIHNvIGFsbCByZXF1ZXN0cyBhcmUNCj4gICAgICAgd2FpdGluZyBmb3Ig
-dGhlIGNvbm5lY3Rpb24uDQo+ICAgICBjb25uZWN0aW5nLW5vd2FpdDogcmVjb25uZWN0aW5nIGlz
-IGluIHByb2dyZXNzLCB0aGVyZSB3ZXJlIGEgbG90IG9mDQo+ICAgICAgIGF0dGVtcHRzIG9mIHJl
-Y29ubmVjdCwgYWxsIHJlcXVlc3RzIHdpbGwgcmV0dXJuIGVycm9ycy4NCj4NCj4gICAgIHR3byBv
-bGQgbW9kZXMgYXJlIHVzZWQgdG9vOg0KPiAgICAgY29ubmVjdGVkOiBub3JtYWwgc3RhdGUNCj4g
-ICAgIHF1aXQ6IGV4aXRpbmcgYWZ0ZXIgZmF0YWwgZXJyb3Igb3Igb24gY2xvc2UNCj4NCj4gUG9z
-c2libGUgdHJhbnNpdGlvbnMgYXJlOg0KPg0KPiAgICAgKiAtPiBxdWl0DQo+ICAgICBjb25uZWN0
-aW5nLSogLT4gY29ubmVjdGVkDQo+ICAgICBjb25uZWN0aW5nLXdhaXQgLT4gY29ubmVjdGluZy1u
-b3dhaXQgKHRyYW5zaXRpb24gaXMgZG9uZSBhZnRlcg0KPiAgICAgICAgICAgICAgICAgICAgICAg
-IHJlY29ubmVjdC1kZWxheSBzZWNvbmRzIGluIGNvbm5lY3Rpbmctd2FpdCBtb2RlKQ0KPiAgICAg
-Y29ubmVjdGVkIC0+IGNvbm5lY3Rpbmctd2FpdA0KPg0KPiAyLiBJbXBsZW1lbnQgcmVjb25uZWN0
-IGluIGNvbm5lY3Rpb25fY28uIFNvLCBpbiBjb25uZWN0aW5nLSogbW9kZSwNCj4gICAgICBjb25u
-ZWN0aW9uX2NvLCB0cmllcyB0byByZWNvbm5lY3QgdW5saW1pdGVkIHRpbWVzLg0KPg0KPiAzLiBS
-ZXRyeSBuYmQgcXVlcmllcyBvbiBjaGFubmVsIGVycm9yLCBpZiB3ZSBhcmUgaW4gY29ubmVjdGlu
-Zy13YWl0DQo+ICAgICAgc3RhdGUuDQo+DQo+IFNpZ25lZC1vZmYtYnk6IFZsYWRpbWlyIFNlbWVu
-dHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCj4gLS0tDQo+ICAgYmxv
-Y2svbmJkLWNsaWVudC5oIHwgICA0ICsNCj4gICBibG9jay9uYmQtY2xpZW50LmMgfCAzMDQgKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0NCj4gICAy
-IGZpbGVzIGNoYW5nZWQsIDI1NSBpbnNlcnRpb25zKCspLCA1MyBkZWxldGlvbnMoLSkNCj4NCj4g
-ZGlmZiAtLWdpdCBhL2Jsb2NrL25iZC1jbGllbnQuaCBiL2Jsb2NrL25iZC1jbGllbnQuaA0KPiBp
-bmRleCBlZjhhNmE5MjM5Li41MmU0ZWM2NmJlIDEwMDY0NA0KPiAtLS0gYS9ibG9jay9uYmQtY2xp
-ZW50LmgNCj4gKysrIGIvYmxvY2svbmJkLWNsaWVudC5oDQo+IEBAIC00MCw2ICs0MCwxMCBAQCB0
-eXBlZGVmIHN0cnVjdCBOQkRDbGllbnRTZXNzaW9uIHsNCj4gICAgICAgQ29yb3V0aW5lICpjb25u
-ZWN0aW9uX2NvOw0KPiAgICAgICBpbnQgaW5fZmxpZ2h0Ow0KPiAgICAgICBOQkRDbGllbnRTdGF0
-ZSBzdGF0ZTsNCj4gKyAgICBib29sIHJlY2VpdmluZzsNCj4gKyAgICBpbnQgY29ubmVjdF9zdGF0
-dXM7DQo+ICsgICAgRXJyb3IgKmNvbm5lY3RfZXJyOw0KPiArICAgIGJvb2wgd2FpdF9pbl9mbGln
-aHQ7DQo+ICAgDQo+ICAgICAgIE5CRENsaWVudFJlcXVlc3QgcmVxdWVzdHNbTUFYX05CRF9SRVFV
-RVNUU107DQo+ICAgICAgIE5CRFJlcGx5IHJlcGx5Ow0KPiBkaWZmIC0tZ2l0IGEvYmxvY2svbmJk
-LWNsaWVudC5jIGIvYmxvY2svbmJkLWNsaWVudC5jDQo+IGluZGV4IDQxZTZlNmU3MDIuLmIwOTkw
-NzA5NmQgMTAwNjQ0DQo+IC0tLSBhL2Jsb2NrL25iZC1jbGllbnQuYw0KPiArKysgYi9ibG9jay9u
-YmQtY2xpZW50LmMNCj4gQEAgLTM0LDEwICszNCwyNiBAQA0KPiAgICNkZWZpbmUgSEFORExFX1RP
-X0lOREVYKGJzLCBoYW5kbGUpICgoaGFuZGxlKSBeICh1aW50NjRfdCkoaW50cHRyX3QpKGJzKSkN
-Cj4gICAjZGVmaW5lIElOREVYX1RPX0hBTkRMRShicywgaW5kZXgpICAoKGluZGV4KSAgXiAodWlu
-dDY0X3QpKGludHB0cl90KShicykpDQoNClsuLi5dDQoNCj4gK3N0YXRpYyBjb3JvdXRpbmVfZm4g
-dm9pZCBuYmRfcmVjb25uZWN0X2F0dGVtcHQoTkJEQ29ubmVjdGlvbiAqY29uKQ0KPiArew0KPiAr
-ICAgIE5CRENsaWVudFNlc3Npb24gKnMgPSBuYmRfZ2V0X2NsaWVudF9zZXNzaW9uKGNvbi0+YnMp
-Ow0KPiArICAgIEVycm9yICpsb2NhbF9lcnIgPSBOVUxMOw0KPiArDQo+ICsgICAgYXNzZXJ0KG5i
-ZF9jbGllbnRfY29ubmVjdGluZyhzKSk7DQo+ICsNCj4gKyAgICAvKiBXYWl0IGNvbXBsZXRpb24g
-b2YgYWxsIGluLWZsaWdodCByZXF1ZXN0cyAqLw0KPiArDQo+ICsgICAgcWVtdV9jb19tdXRleF9s
-b2NrKCZzLT5zZW5kX211dGV4KTsNCj4gKw0KPiArICAgIHdoaWxlIChzLT5pbl9mbGlnaHQgPiAw
-KSB7DQo+ICsgICAgICAgIHFlbXVfY29fbXV0ZXhfdW5sb2NrKCZzLT5zZW5kX211dGV4KTsNCj4g
-KyAgICAgICAgbmJkX3JlY3ZfY29yb3V0aW5lc193YWtlX2FsbChzKTsNCj4gKyAgICAgICAgcy0+
-d2FpdF9pbl9mbGlnaHQgPSB0cnVlOw0KPiArICAgICAgICBxZW11X2Nvcm91dGluZV95aWVsZCgp
-Ow0KPiArICAgICAgICBzLT53YWl0X2luX2ZsaWdodCA9IGZhbHNlOw0KPiArICAgICAgICBxZW11
-X2NvX211dGV4X2xvY2soJnMtPnNlbmRfbXV0ZXgpOw0KPiArICAgIH0NCj4gKw0KPiArICAgIHFl
-bXVfY29fbXV0ZXhfdW5sb2NrKCZzLT5zZW5kX211dGV4KTsNCj4gKw0KPiArICAgIC8qIE5vdyB3
-ZSBhcmUgc3VyZSwgdGhhdCBub2JvZHkgYWNjZXNzaW5nIHRoZSBjaGFubmVsIG5vdyBhbmQgbm9i
-b2R5DQo+ICsgICAgICogd2lsbCB0cnkgdG8gYWNjZXNzIHRoZSBjaGFubmVsLCB1bnRpbCB3ZSBz
-ZXQgc3RhdGUgdG8gQ09OTkVDVEVEDQo+ICsgICAgICovDQo+ICsNCj4gKyAgICAvKiBGaW5hbGl6
-ZSBwcmV2aW91cyBjb25uZWN0aW9uIGlmIGFueSAqLw0KPiArICAgIGlmIChzLT5pb2MpIHsNCj4g
-KyAgICAgICAgbmJkX2NsaWVudF9kZXRhY2hfYWlvX2NvbnRleHQoY29uLT5icyk7DQo+ICsgICAg
-ICAgIG9iamVjdF91bnJlZihPQkpFQ1Qocy0+c2lvYykpOw0KPiArICAgICAgICBzLT5zaW9jID0g
-TlVMTDsNCj4gKyAgICAgICAgb2JqZWN0X3VucmVmKE9CSkVDVChzLT5pb2MpKTsNCj4gKyAgICAg
-ICAgcy0+aW9jID0gTlVMTDsNCj4gKyAgICB9DQo+ICsNCj4gKyAgICBzLT5jb25uZWN0X3N0YXR1
-cyA9IG5iZF9jbGllbnRfY29ubmVjdChjb24tPmJzLCBjb24tPnNhZGRyLA0KPiArICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNvbi0+ZXhwb3J0LCBjb24tPnRsc2Ny
-ZWRzLA0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNvbi0+
-aG9zdG5hbWUsIGNvbi0+eF9kaXJ0eV9iaXRtYXAsDQo+ICsgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgJmxvY2FsX2Vycik7DQo+ICsgICAgZXJyb3JfZnJlZShzLT5j
-b25uZWN0X2Vycik7DQo+ICsgICAgcy0+Y29ubmVjdF9lcnIgPSBOVUxMOw0KPiArICAgIGVycm9y
-X3Byb3BhZ2F0ZSgmcy0+Y29ubmVjdF9lcnIsIGxvY2FsX2Vycik7DQo+ICsgICAgbG9jYWxfZXJy
-ID0gTlVMTDsNCj4gICANCj4gLSAgICBuYmRfY2xpZW50X2RldGFjaF9haW9fY29udGV4dChicyk7
-DQo+IC0gICAgb2JqZWN0X3VucmVmKE9CSkVDVChjbGllbnQtPnNpb2MpKTsNCj4gLSAgICBjbGll
-bnQtPnNpb2MgPSBOVUxMOw0KPiAtICAgIG9iamVjdF91bnJlZihPQkpFQ1QoY2xpZW50LT5pb2Mp
-KTsNCj4gLSAgICBjbGllbnQtPmlvYyA9IE5VTEw7DQo+ICsgICAgaWYgKHMtPmNvbm5lY3Rfc3Rh
-dHVzID09IC1FSU5WQUwpIHsNCj4gKyAgICAgICAgLyogUHJvdG9jb2wgZXJyb3Igb3Igc29tZXRo
-aW5nIGxpa2UgdGhpcywgZ28gdG8gTkJEX0NMSUVOVF9RVUlUICovDQo+ICsgICAgICAgIG5iZF9j
-aGFubmVsX2Vycm9yKHMsIHMtPmNvbm5lY3Rfc3RhdHVzKTsNCj4gKyAgICAgICAgcmV0dXJuOw0K
-DQpVbmZvcnR1bmF0ZWx5LCBuYmRfY2xpZW50X2Nvbm5lY3QgcmV0dXJucyAtRUlOVkFMIGZvciBp
-byBlcnJvcnMgaW5zdGVhZCANCm9mIC1FSU8uIEFuZCBpdCBpcyBub3QgdHJpdmlhbCB0byBmaXgg
-aXQuIFNvLCB0aGlzIGlme30gc2hvdWxkIGJlIHJlbW92ZWQuDQoNCj4gKyAgICB9DQo+ICsNCj4g
-KyAgICBpZiAocy0+Y29ubmVjdF9zdGF0dXMgPCAwKSB7DQo+ICsgICAgICAgIC8qIGZhaWxlZCBh
-dHRlbXB0ICovDQo+ICsgICAgICAgIHJldHVybjsNCj4gKyAgICB9DQo+ICsNCj4gKyAgICAvKiBz
-dWNjZXNzZnVsbHkgY29ubmVjdGVkICovDQo+ICsgICAgcy0+c3RhdGUgPSBOQkRfQ0xJRU5UX0NP
-Tk5FQ1RFRDsNCj4gKyAgICBxZW11X2NvX3F1ZXVlX3Jlc3RhcnRfYWxsKCZzLT5mcmVlX3NlbWEp
-Ow0KPiArfQ0KPiArDQoNCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQoNCg==
+Hi Kevin,
+
+On 2/11/18 12:07, Kevin Wolf wrote:
+> Am 02.11.2018 um 09:58 hat Philippe Mathieu-Daudé geschrieben:
+>> This definitions are QCow2 specific, there is no need to expose them
+>> in the global namespace.
+>>
+>> This partially reverts commit 540b8492618eb.
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> 
+> If we don't want this globally, I think we also don't want it in qcow2.
+
+I only see this definitions used by block/qcow2.h (b6a95c6d1007).
+
+Per 540b8492618eb description "This is needed when a size has to be 
+stringified" but I can't find other code requiring these definitions in 
+the codebase.
+
+> Or at least reduce it to only those constants that qcow2 actually uses.
+
+Fine by me, I'll let Leonid opine first.
+
+Regards,
+
+Phil.
