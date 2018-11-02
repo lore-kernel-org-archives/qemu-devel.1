@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54627)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56325)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1gIXiv-0007Qw-Tx
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:34:49 -0400
+	(envelope-from <david@redhat.com>) id 1gIXrG-0002Ms-9O
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:43:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1gIXit-00034Y-Ah
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:34:45 -0400
-Date: Fri, 2 Nov 2018 12:33:56 +0100
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-Message-ID: <20181102113356.GB866@toto>
-References: <20181022173559.17111-1-edgar.iglesias@gmail.com>
-	<20181022173559.17111-5-edgar.iglesias@gmail.com>
-	<CAFEAcA_BGhqMiQGgF3TSXBXHacQf31emVTZv2tcr0Qo77bKcvA@mail.gmail.com>
+	(envelope-from <david@redhat.com>) id 1gIXrB-0006xP-Ve
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:43:21 -0400
+References: <20181024101930.20674-1-david@redhat.com>
+	<20181024101930.20674-3-david@redhat.com>
+	<20181101151034.4eb1618c@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <85802555-0f27-847d-22a9-e87ce2e5df55@redhat.com>
+Date: Fri, 2 Nov 2018 12:43:10 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_BGhqMiQGgF3TSXBXHacQf31emVTZv2tcr0Qo77bKcvA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v4 4/4] hw/arm: versal: Add a virtual
- Xilinx Versal board
+In-Reply-To: <20181101151034.4eb1618c@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 2/7] pcihp: overwrite hotplug handler
+ recursively from the start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,69 +26,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, KONRAD Frederic <frederic.konrad@adacore.com>, Alistair Francis <alistair@alistair23.me>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Francisco Iglesias <frasse.iglesias@gmail.com>, figlesia@xilinx.com, Stefano Stabellini <sstabellini@kernel.org>, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-ppc@nongnu.org, Libvirt <libvir-list@redhat.com>
 
-On Tue, Oct 30, 2018 at 01:31:44PM +0000, Peter Maydell wrote:
-> On 22 October 2018 at 18:35, Edgar E. Iglesias <edgar.iglesias@gmail.com> wrote:
-> > From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-> >
-> > Add a virtual Xilinx Versal board.
-> >
-> > This board is based on the Xilinx Versal SoC. The exact
-> > details of what peripherals are attached to this board
-> > will remain in control of QEMU. QEMU will generate an
-> > FDT on the fly for Linux and other software to auto-discover
-> > peripherals.
-> >
-> > Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+On 01.11.18 15:10, Igor Mammedov wrote:
+> On Wed, 24 Oct 2018 12:19:25 +0200
+> David Hildenbrand <david@redhat.com> wrote:
 > 
-> > +static void fdt_add_fixed_link_nodes(VersalVirt *s, char *gemname,
-> > +                                     uint32_t phandle)
-> > +{
-> > +    char *name = g_strdup_printf("%s/fixed-link", gemname);
-> > +
-> > +    qemu_fdt_add_subnode(s->fdt, name);
-> > +    qemu_fdt_setprop_cell(s->fdt, name, "phandle", phandle);
-> > +    qemu_fdt_setprop_cells(s->fdt, name, "full-duplex");
-> 
-> Hi. This fails to compile in a non-debug build:
-> 
-> In file included from /home/peter.maydell/qemu/hw/arm/xlnx-versal-virt.c:16:0:
-> /home/peter.maydell/qemu/hw/arm/xlnx-versal-virt.c: In function
-> 'fdt_add_fixed_link_nodes':
-> /home/peter.maydell/qemu/include/sysemu/device_tree.h:110:23: error:
-> comparison of unsigned expression < 0 is always false
-> [-Werror=type-limits]
->          for (i = 0; i < ARRAY_SIZE(qdt_tmp); i++) {                           \
->                        ^
-> /home/peter.maydell/qemu/hw/arm/xlnx-versal-virt.c:191:5: note: in
-> expansion of macro 'qemu_fdt_setprop_cells'
->      qemu_fdt_setprop_cells(s->fdt, name, "full-duplex");
->      ^
-> 
-> because qemu_fdt_setprop_cells() requires you to provide
-> at least one cell value for the property being set.
-> What was the intention here ?
+>> For now, the hotplug handler is not called for devices that are
+>> being cold plugged. The hotplug handler is setup when the machine
+>> initialization is fully done. Only bridges that were cold plugged are
+>> considered.
+>>
+>> Set the hotplug handler for the root piix bus directly when realizing.
+>> Overwrite the hotplug handler of bridges when hotplugging/coldplugging
+>> them.
+>>
+>> This will now make sure that the ACPI PCI hotplug handler is also called
+>> for cold-plugged devices (also on bridges) and for bridges that were
+>> hotplugged.
+>>
+>> When trying to hotplug a device to a hotplugged bridge, we now correctly
+>> get the error message
+>>  "Unsupported bus. Bus doesn't have property 'acpi-pcihp-bsel' set"
+>> Insted of going via the standard PCI hotplug handler.
+> Erroring out is probably not ok, since it can break existing setups
+> where SHPC hotplugging to hotplugged bridge was working just fine before.
 
-Hi Peter,
+The question is if it actually was supposed (and eventually did) work.
 
-The intent was to set a boolean property without a value.
-I'll fix this with the following and send a new version:
-    qemu_fdt_setprop(s->fdt, name, "full-duplex", NULL, 0);
-
-Cheers,
-Edgar
-
+If this was the expected behavior (mixing hotplug types), then the
+necessary change to this patch would boil down to checking if the bridge
+it hot or coldplugged.
 
 > 
+> Marcel/Michael what's your take on this change in behaviour?
+> CCing libvirt in case they are doing this stuff
 > 
-> > +    qemu_fdt_setprop_cell(s->fdt, name, "speed", 1000);
-> > +    g_free(name);
-> > +}
-> 
-> In the meantime, I'm dropping the versal patches from
-> target-arm.next.
-> 
-> thanks
-> -- PMM
+
+Indeed, it would be nice to know if this was actually supposed to work
+like this (coldplugged bridges using ACPI hotplug and hotplugged bridges
+using SHPC hotplug).
+
+
+-- 
+
+Thanks,
+
+David / dhildenb
