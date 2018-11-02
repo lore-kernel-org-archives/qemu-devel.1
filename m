@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gIaNO-0008J2-Lw
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 10:24:43 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gIaTd-0002KW-Sl
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 10:31:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gIaNN-0008ID-Rr
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 10:24:42 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:35099)
+	(envelope-from <peter.maydell@linaro.org>) id 1gIaTS-0006zM-Bu
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 10:31:09 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:40938)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gIaNN-0008Gh-Dj
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 10:24:41 -0400
-Received: by mail-oi1-x243.google.com with SMTP id v198-v6so1732502oif.2
-	for <qemu-devel@nongnu.org>; Fri, 02 Nov 2018 07:24:40 -0700 (PDT)
+	id 1gIaTR-0006w8-Ol
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 10:30:58 -0400
+Received: by mail-oi1-x243.google.com with SMTP id u130-v6so1726140oie.7
+	for <qemu-devel@nongnu.org>; Fri, 02 Nov 2018 07:30:54 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20181024113709.16599-2-richard.henderson@linaro.org>
+In-Reply-To: <20181024113709.16599-4-richard.henderson@linaro.org>
 References: <20181024113709.16599-1-richard.henderson@linaro.org>
-	<20181024113709.16599-2-richard.henderson@linaro.org>
+	<20181024113709.16599-4-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 2 Nov 2018 14:24:18 +0000
-Message-ID: <CAFEAcA_7axj1ETq4bA8FJQ9xZQ9Fjyy9sZEuttzrjUXjEqAEag@mail.gmail.com>
+Date: Fri, 2 Nov 2018 14:30:32 +0000
+Message-ID: <CAFEAcA8gf_qTB554MAzJf1nKv7UK_7_+vdbm=C+9erwyk9XOTQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 1/5] target/arm: Install ARMISARegisters
- from kvm host
+Subject: Re: [Qemu-devel] [PATCH 3/5] target/arm: Introduce read_sys_reg32
+ for kvm32
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,41 +35,54 @@ Cc: QEMU Developers <qemu-devel@nongnu.org>
 
 On 24 October 2018 at 12:37, Richard Henderson
 <richard.henderson@linaro.org> wrote:
-> The ID registers are replacing (some of) the feature bits.
-> We need (some of) these values to determine the set of data
-> to be handled during migration.
+> Assert that the value to be written is the correct size.
+> No change in functionality here, just mirroring the same
+> function from kvm64.
 >
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  target/arm/kvm_arm.h | 1 +
->  target/arm/kvm.c     | 1 +
->  2 files changed, 2 insertions(+)
+>  target/arm/kvm32.c | 41 ++++++++++++++++-------------------------
+>  1 file changed, 16 insertions(+), 25 deletions(-)
+
+> -    struct kvm_one_reg idregs[] = {
+> -        {
+> -            .id = KVM_REG_ARM | KVM_REG_SIZE_U32
+> -            | ENCODE_CP_REG(15, 0, 0, 0, 0, 0, 0),
+> -            .addr = (uintptr_t)&midr,
+> -        },
+> -        {
+> -            .id = KVM_REG_ARM | KVM_REG_SIZE_U32
+> -            | ENCODE_CP_REG(15, 0, 0, 0, 1, 0, 0),
+> -            .addr = (uintptr_t)&id_pfr0,
+> -        },
+> -        {
+> -            .id = KVM_REG_ARM | KVM_REG_SIZE_U32
+> -            | KVM_REG_ARM_VFP | KVM_REG_ARM_VFP_MVFR1,
+> -            .addr = (uintptr_t)&mvfr1,
+> -        },
+> -    };
 >
-> diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-> index 21c0129da2..6393455b1d 100644
-> --- a/target/arm/kvm_arm.h
-> +++ b/target/arm/kvm_arm.h
-> @@ -183,6 +183,7 @@ void kvm_arm_destroy_scratch_host_vcpu(int *fdarray);
->   * by asking the host kernel)
->   */
->  typedef struct ARMHostCPUFeatures {
-> +    ARMISARegisters isar;
->      uint64_t features;
->      uint32_t target;
->      const char *dtb_compatible;
-> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-> index 09a86e2820..44dd0ce6ce 100644
-> --- a/target/arm/kvm.c
-> +++ b/target/arm/kvm.c
-> @@ -158,6 +158,7 @@ void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
+>      if (!kvm_arm_create_scratch_host_vcpu(cpus_to_try, fdarray, &init)) {
+>          return false;
+> @@ -77,16 +69,15 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+>       */
+>      ahcf->dtb_compatible = "arm,arm-v7";
 >
->      cpu->kvm_target = arm_host_cpu_features.target;
->      cpu->dtb_compatible = arm_host_cpu_features.dtb_compatible;
-> +    cpu->isar = arm_host_cpu_features.isar;
->      env->features = arm_host_cpu_features.features;
->  }
+> -    for (i = 0; i < ARRAY_SIZE(idregs); i++) {
+> -        ret = ioctl(fdarray[2], KVM_GET_ONE_REG, &idregs[i]);
+> -        if (ret) {
+> -            break;
+> -        }
+> -    }
+> +    err |= read_sys_reg32(fdarray[2], &midr, ARM_CP15_REG32(0, 0, 0, 0));
+> +    err |= read_sys_reg32(fdarray[2], &id_pfr0, ARM_CP15_REG32(0, 0, 1, 0));
+
 
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+with the declaration of 'i' removed.
+
+(Confusingly, ENCODE_CP_REG and ARM_CP15_REG32 take the
+op1/crn/crm/op2 arguments in different orders.)
 
 thanks
 -- PMM
