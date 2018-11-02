@@ -1,19 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43120)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45590)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <keith.busch@intel.com>) id 1gIbb1-0006Gr-6K
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:42:54 -0400
+	(envelope-from <noring@nocrew.org>) id 1gIbhd-0008At-9v
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:49:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <keith.busch@intel.com>) id 1gIbav-000323-C7
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:42:51 -0400
-Date: Fri, 2 Nov 2018 09:40:20 -0600
-From: Keith Busch <keith.busch@intel.com>
-Message-ID: <20181102154019.GB26292@localhost.localdomain>
-References: <1541121763-3277-1-git-send-email-liq3ea@gmail.com>
+	(envelope-from <noring@nocrew.org>) id 1gIbhU-0006hO-V7
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:49:36 -0400
+Received: from pio-pvt-msa3.bahnhof.se ([79.136.2.42]:37688)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gIbhP-0006gV-Q8
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:49:30 -0400
+Date: Fri, 2 Nov 2018 16:49:23 +0100
+From: Fredrik Noring <noring@nocrew.org>
+Message-ID: <20181102154923.GB2274@sx9>
+References: <BN6PR2201MB125116B5479010DB326DCCFCC6CE0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	<51a26700-5da5-0a15-0e0e-6405ce5e65d4@redhat.com>
+	<20181101172353.GA2316@sx9>
+	<BN6PR2201MB12512B92322BFB8965848215C6CF0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	<20181102143119.GA2274@sx9>
+	<BN6PR2201MB12515D71ED36B637045DA6D2C6CF0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	<CAFEAcA9KJn++ASQ+xzEAs+pi0xkZG7i3aPUZEQZXwRfYJy6jbw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1541121763-3277-1-git-send-email-liq3ea@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] nvme: fix oob access issue(CVE-2018-16847)
+In-Reply-To: <CAFEAcA9KJn++ASQ+xzEAs+pi0xkZG7i3aPUZEQZXwRfYJy6jbw@mail.gmail.com>
+Subject: Re: [Qemu-devel] Correction needed for R5900 instruction decoding
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,41 +32,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@gmail.com>
-Cc: kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, ppandit@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Aleksandar Markovic <amarkovic@wavecomp.com>, Stefan Markovic <smarkovic@wavecomp.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Aleksandar Rikalo <arikalo@wavecomp.com>, "Emilio G. Cota" <cota@braap.org>, "Maciej W. Rozycki" <macro@linux-mips.org>, =?utf-8?Q?J=C3=BCrgen?= Urban <JuergenUrban@gmx.de>, Petar Jovanovic <pjovanovic@wavecomp.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-On Thu, Nov 01, 2018 at 06:22:43PM -0700, Li Qiang wrote:
-> Currently, the nvme_cmb_ops mr doesn't check the addr and size.
-> This can lead an oob access issue. This is triggerable in the guest.
-> Add check to avoid this issue.
-> 
-> Fixes CVE-2018-16847.
-> 
-> Reported-by: Li Qiang <liq3ea@gmail.com>
-> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Li Qiang <liq3ea@gmail.com>
+Hi Peter,
 
-Hey, so why is this memory region access even considered valid if the
-request is out of range from what NVMe had registered for its
-MemoryRegion? Wouldn't it be better to not call the mr->ops->read/write
-if it's out of bounds? Otherwise every MemoryRegion needs to duplicate
-the same check, right?
+> From the other side of things, as a submaintainer around release
+> time there's often a lot of work to do and it's easy to confuse
+> different patchsets or forget the status of them, so it's useful
+> to have a patch series which is exactly the set of patches that
+> the submitter thinks are suitable to go into the release, and it's
+> less work to apply those than to fish out a subset of patches
+> from a series.
 
-Would something like the following work (minimally tested)?
+Understood. Aleksandar previously indicated that he wanted an amendment
+series with changes ordered by importance, which is why the two patches
+were part of that series (as the first ones).
 
----
-diff --git a/memory.c b/memory.c
-index 9b73892768..883fd818e6 100644
---- a/memory.c
-+++ b/memory.c
-@@ -1369,6 +1369,9 @@ bool memory_region_access_valid(MemoryRegion *mr,
-         access_size_max = 4;
-     }
- 
-+    if (addr + size > mr->size)
-+        return false;
-+
-     access_size = MAX(MIN(size, access_size_max), access_size_min);
-     for (i = 0; i < size; i += access_size) {
-         if (!mr->ops->valid.accepts(mr->opaque, addr + i, access_size,
---
+> So overall, I think my suggestion would be that the best move
+> from here would be for Fred to send a patchset with the changes
+> for 3.1 and only those changes. Could you do that, please?
+
+Yes, I will post a separate series for review immediately.
+
+Fredrik
