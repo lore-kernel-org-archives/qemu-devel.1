@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50903)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gId66-00023O-8H
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 13:19:03 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1gId67-0002Bs-TT
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 13:19:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gId64-0004Hs-EI
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 13:19:01 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1gId66-0004K8-CO
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 13:19:03 -0400
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:52250)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1gId63-0002Zn-Qf
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 13:19:00 -0400
+	id 1gId65-0002Zn-Nt
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 13:19:02 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1gId3u-0003aI-5e
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 17:16:46 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1gId3t-0003a4-90
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 17:16:45 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  2 Nov 2018 17:16:33 +0000
-Message-Id: <20181102171638.24069-6-peter.maydell@linaro.org>
+Date: Fri,  2 Nov 2018 17:16:32 +0000
+Message-Id: <20181102171638.24069-5-peter.maydell@linaro.org>
 In-Reply-To: <20181102171638.24069-1-peter.maydell@linaro.org>
 References: <20181102171638.24069-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 05/10] MAINTAINERS: Remove bouncing email in ARM
- ACPI
+Subject: [Qemu-devel] [PULL 04/10] tests/boot-serial-test: Add microbit
+ board testcase
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,35 +32,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+From: Julia Suvorova <jusual@mail.ru>
 
-Shannon Zhao's email at Huawei is bouncing: remove it.
+New mini-kernel test for nRF51 SoC UART.
 
-    X-Failed-Recipients: zhaoshenglong@huawei.com
-    ** Address not found **
-    Your message wasn't delivered to zhaoshenglong@huawei.com because the address couldn't be found, or is unable to receive mail.
-
-Note that the section still contains his personal email (see e59f13d76bb).
-
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Acked-by: Shannon Zhao <shannon.zhaosl@gmail.com>
-Message-id: 20181029195931.8747-1-philmd@redhat.com
+Signed-off-by: Julia Suvorova <jusual@mail.ru>
+Acked-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- MAINTAINERS | 1 -
- 1 file changed, 1 deletion(-)
+ tests/boot-serial-test.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 85f19f569ff..98a1856afc0 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -627,7 +627,6 @@ F: hw/*/xlnx*.c
- F: include/hw/*/xlnx*.h
+diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
+index f865822e32f..8ec6aed35d2 100644
+--- a/tests/boot-serial-test.c
++++ b/tests/boot-serial-test.c
+@@ -62,6 +62,24 @@ static const uint8_t kernel_aarch64[] = {
+     0xfd, 0xff, 0xff, 0x17,                 /* b       -12 (loop) */
+ };
  
- ARM ACPI Subsystem
--M: Shannon Zhao <zhaoshenglong@huawei.com>
- M: Shannon Zhao <shannon.zhaosl@gmail.com>
- L: qemu-arm@nongnu.org
- S: Maintained
++static const uint8_t kernel_nrf51[] = {
++    0x00, 0x00, 0x00, 0x00,                 /* Stack top address */
++    0x09, 0x00, 0x00, 0x00,                 /* Reset handler address */
++    0x04, 0x4a,                             /* ldr  r2, [pc, #16] Get ENABLE */
++    0x04, 0x21,                             /* movs r1, #4 */
++    0x11, 0x60,                             /* str  r1, [r2] */
++    0x04, 0x4a,                             /* ldr  r2, [pc, #16] Get STARTTX */
++    0x01, 0x21,                             /* movs r1, #1 */
++    0x11, 0x60,                             /* str  r1, [r2] */
++    0x03, 0x4a,                             /* ldr  r2, [pc, #12] Get TXD */
++    0x54, 0x21,                             /* movs r1, 'T' */
++    0x11, 0x60,                             /* str  r1, [r2] */
++    0xfe, 0xe7,                             /* b    . */
++    0x00, 0x25, 0x00, 0x40,                 /* 0x40002500 = UART ENABLE */
++    0x08, 0x20, 0x00, 0x40,                 /* 0x40002008 = UART STARTTX */
++    0x1c, 0x25, 0x00, 0x40                  /* 0x4000251c = UART TXD */
++};
++
+ typedef struct testdef {
+     const char *arch;       /* Target architecture */
+     const char *machine;    /* Name of the machine */
+@@ -105,6 +123,7 @@ static testdef_t tests[] = {
+     { "hppa", "hppa", "", "SeaBIOS wants SYSTEM HALT" },
+     { "aarch64", "virt", "-cpu cortex-a57", "TT", sizeof(kernel_aarch64),
+       kernel_aarch64 },
++    { "arm", "microbit", "", "T", sizeof(kernel_nrf51), kernel_nrf51 },
+ 
+     { NULL }
+ };
 -- 
 2.19.1
