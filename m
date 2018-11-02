@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55334)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1gITG9-0004He-IJ
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 02:48:48 -0400
+	(envelope-from <fli@suse.com>) id 1gITeC-0000qI-4T
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 03:13:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1gITG3-0003Dn-7U
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 02:48:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52534)
+	(envelope-from <fli@suse.com>) id 1gITe2-0000yF-27
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 03:13:32 -0400
+Received: from mx2.suse.de ([195.135.220.15]:36942 helo=mx1.suse.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1gITG1-0003Bo-8t
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 02:48:37 -0400
-Date: Fri, 2 Nov 2018 14:48:29 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20181102064829.GB21032@magic>
-References: <20181101183705.5422-1-philmd@redhat.com>
+	(Exim 4.71) (envelope-from <fli@suse.com>) id 1gITdt-0000re-EU
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 03:13:20 -0400
+References: <20181101101715.9443-1-fli@suse.com>
+	<20181101101715.9443-6-fli@suse.com> <20181102023738.GD7804@xz-x1>
+	<39af00cd-fb54-de7d-154e-d9047156ab43@suse.com>
+	<20181102033241.GF7804@xz-x1>
+From: Fei Li <fli@suse.com>
+Message-ID: <6d613886-1b35-53b4-86f8-443679e535be@suse.com>
+Date: Fri, 2 Nov 2018 15:13:05 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20181101183705.5422-1-philmd@redhat.com>
+In-Reply-To: <20181102033241.GF7804@xz-x1>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] docker: Use a stable snapshot for Debian
- Sid
+Subject: Re: [Qemu-devel] [PATCH RFC v7 5/9] migration: fix the multifd code
+ when sending less channels
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,68 +31,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, dgilbert@redhat.com, famz@redhat.com, quintela@redhat.com
 
-On Thu, 11/01 19:37, Philippe Mathieu-Daud=E9 wrote:
-> The Debian Sid repository is not garanteed to be stable, as his
-> 'unstable' name suggest :)
-> To allow quick testing, packages are pushed various time a day,
-> which my be annoying when trying to use it for stable development
-> (which is not recommended, but Sid provides edge packages we use
-> for testing).
->=20
-> Debian provides repositories snapshots which are suitable for our
-> use. Pick a recent date that works. When required, update to newer
-> releases will be easy.
->=20
-> This fixes current issues with this image:
->=20
->   $ make docker-image-debian-sid
->   [...]
->   The following packages have unmet dependencies:
->    build-essential : Depends: dpkg-dev (>=3D 1.17.11) but it is not goi=
-ng to be installed
->    git : Depends: perl but it is not going to be installed
->          Depends: liberror-perl but it is not going to be installed
->    pkg-config : Depends: libdpkg-perl but it is not going to be install=
-ed
->    texinfo : Depends: perl (>=3D 5.26.2-6) but it is not going to be in=
-stalled
->              Depends: libtext-unidecode-perl but it is not going to be =
-installed
->              Depends: libxml-libxml-perl but it is not going to be inst=
-alled
->   E: Unable to correct problems, you have held broken packages.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> ---
->  tests/docker/dockerfiles/debian-sid.docker | 4 ++++
->  1 file changed, 4 insertions(+)
->=20
-> diff --git a/tests/docker/dockerfiles/debian-sid.docker b/tests/docker/=
-dockerfiles/debian-sid.docker
-> index 9a3d168705..4e4cda0ba5 100644
-> --- a/tests/docker/dockerfiles/debian-sid.docker
-> +++ b/tests/docker/dockerfiles/debian-sid.docker
-> @@ -13,6 +13,10 @@
-> =20
->  FROM debian:sid-slim
-> =20
-> +# Use a snapshot known to work (see http://snapshot.debian.org/#Usage)
-> +ENV DEBIAN_SNAPSHOT_DATE "20181030"
-> +RUN sed -i "s%^deb \(https\?://\)deb.debian.org/debian/\? \(.*\)%deb [=
-check-valid-until=3Dno] \1snapshot.debian.org/archive/debian/${DEBIAN_SNA=
-PSHOT_DATE} \2%" /etc/apt/sources.list
-> +
->  # Duplicate deb line as deb-src
->  RUN cat /etc/apt/sources.list | sed "s/^deb\ /deb-src /" >> /etc/apt/s=
-ources.list
-> =20
-> --=20
-> 2.17.2
->=20
 
-Queued, thanks!
 
-Fam
+On 11/02/2018 11:32 AM, Peter Xu wrote:
+> On Fri, Nov 02, 2018 at 11:00:24AM +0800, Fei Li wrote:
+>>
+>> On 11/02/2018 10:37 AM, Peter Xu wrote:
+>>> On Thu, Nov 01, 2018 at 06:17:11PM +0800, Fei Li wrote:
+>>>> Set the migration state to "failed" instead of "setup" when failing
+>>>> to send packet via some channel.
+>>> Could you please provide more information in the commit message?
+>>> E.g., what will happen if without this patch?  Will it crash the
+>>> source or stall the source migration or others?  Otherwise it's a bit
+>>> hard for me to understand what's this patch for.
+>> Sorry for the inadequate description , I was intended to say that when
+>> failing
+>> to do the live migration using multifd, e.g. sending less channels, th=
+e src
+>> status displays "setup" when running `info migrate`. I assume we shoul=
+d tell
+>> users that the "Migration status" is "failed" now (and along with the
+>> failure reason).
+>>
+>> The current src status when failed inmultifd_new_send_channel_async()=EF=
+=BC=9A
+>>
+>>
+>> (qemu) migrate_set_capability x-multifd on
+>> (qemu) migrate_set_parameter x-multifd-channels 4
+>> (qemu) migrate -d tcp:192.168.190.98:4444
+>> (qemu) qemu-system-x86_64: failed in multifd_new_send_channel_async du=
+e to
+>> ...
+>> (qemu) info migrate
+>> globals:
+>> store-global-state: on
+>> only-migratable: off
+>> send-configuration: on
+>> send-section-footer: on
+>> decompress-error-check: on
+>> capabilities: xbzrle: off rdma-pin-all: off auto-converge: off zero-bl=
+ocks:
+>> off compress: off events: off postcopy-ram: off x-colo: off release-ra=
+m: off
+>> block: off return-path: off pause-before-switchover: off x-multifd: on
+>> dirty-bitmaps: off postcopy-blocktime: off late-block-activate: off
+>> Migration status: setup
+>> total time: 0 milliseconds
+> Thanks for the information.
+>
+> I had a quick look.  For now we do this:
+>
+>          multifd_save_setup (without waiting for channels to be ready)
+>          create thread migration_thread
+>                  (in thread)
+>                  ram_save_setup
+>                          multifd_send_sync_main (wait for the channels)
+>
+> The thing is that we didn't get the notification when one of the
+> multifd channel is failed.  IMHO instead of setting the global
+> migration state in a per-channel function, we should just report the
+> error upwards, then the main thread should decide how to change the
+> state machine of the migration.
+Thanks for the detail explanation, do agree with reporting and letting
+the main thread handle this. :)
+But one thing to note is that during my previous debugging, I remember
+sometimes the main thread: migration_thread() is called earlier than
+the first channel is ready in multifd_new_send_channel_async(). Thus
+we should be careful about where/when to check the state of the channel.
+> And we have set it in migrate_set_error() after all so the main thread
+> should be able to know somehow
+But in our current code, the main thread has not utilized the s->error
+to know whether the migration state, right? As I checked the code,
+the s->error is only used
+- in qmp query: copy s->error to info->error_desc when detecting the=20
+migrate status is failed;
+- in migrate_fd_cleanup() when migrate_fd_connect() fails: print the erro=
+r
+Or the s->error is just used in this way?
+>   (though IMHO I'll even prefer to have a
+> per-channel variable to keep the state of the channel, then the
+> per-channel functions won't touch any globals which offers better
+> isolation).
+>
+> I'm not sure how Juan thinks about it, but I'd prefer some work to
+> provide such isolation and also some mechanism to allow the main
+> thread to detect the per-channel errors not only during setup phase
+> but also during the migration (e.g., when network is suddenly down).
+> Then we don't touch any globals (e.g., we shouldn't call
+> migrate_get_current in any per-channel function like
+> multifd_new_send_channel_async).
+Ok, wait for Juan's comment. :)
+
+Have a nice day, and thanks again for the detail explanation.
+Fei
+>>> Normally I would prefer to not touch global states in feature specifi=
+c
+>>> code path, but I'd like to know the problem more first...
+>>>
+>>> Thanks,
+>>>
+>>>> Cc: Peter Xu <peterx@redhat.com>
+>>>> Signed-off-by: Fei Li <fli@suse.com>
+>>>> ---
+>>>>    migration/ram.c | 2 ++
+>>>>    1 file changed, 2 insertions(+)
+>>>>
+>>>> diff --git a/migration/ram.c b/migration/ram.c
+>>>> index 4db3b3e8f4..c84d164fc8 100644
+>>>> --- a/migration/ram.c
+>>>> +++ b/migration/ram.c
+>>>> @@ -1072,6 +1072,7 @@ out:
+>>>>    static void multifd_new_send_channel_async(QIOTask *task, gpointe=
+r opaque)
+>>>>    {
+>>>>        MultiFDSendParams *p =3D opaque;
+>>>> +    MigrationState *s =3D migrate_get_current();
+>>>>        QIOChannel *sioc =3D QIO_CHANNEL(qio_task_get_source(task));
+>>>>        Error *local_err =3D NULL;
+>>>> @@ -1083,6 +1084,7 @@ static void multifd_new_send_channel_async(QIO=
+Task *task, gpointer opaque)
+>>>>            if (multifd_save_cleanup(&local_err) !=3D 0) {
+>>>>                migrate_set_error(migrate_get_current(), local_err);
+>>>>            }
+>>>> +        migrate_set_state(&s->state, s->state, MIGRATION_STATUS_FAI=
+LED);
+>>>>        } else {
+>>>>            p->c =3D QIO_CHANNEL(sioc);
+>>>>            qio_channel_set_delay(p->c, false);
+>>>> --=20
+>>>> 2.13.7
+>>>>
+>>> Regards,
+>>>
+> Regards,
+>
