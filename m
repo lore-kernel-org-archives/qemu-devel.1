@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56325)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58524)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gIXrG-0002Ms-9O
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:43:23 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1gIY0P-0007PC-MY
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:52:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gIXrB-0006xP-Ve
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:43:21 -0400
-References: <20181024101930.20674-1-david@redhat.com>
-	<20181024101930.20674-3-david@redhat.com>
-	<20181101151034.4eb1618c@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <85802555-0f27-847d-22a9-e87ce2e5df55@redhat.com>
-Date: Fri, 2 Nov 2018 12:43:10 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1gIY0O-0004Hn-Oz
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:52:49 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:52226)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1gIY0O-0004HS-Gs
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:52:48 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri,  2 Nov 2018 11:52:39 +0000
+Message-Id: <20181102115239.22485-5-peter.maydell@linaro.org>
+In-Reply-To: <20181102115239.22485-1-peter.maydell@linaro.org>
+References: <20181102115239.22485-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20181101151034.4eb1618c@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 2/7] pcihp: overwrite hotplug handler
- recursively from the start
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 for-3.1 4/4] configure: Use LINKS loop for
+ all build tree symlinks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,51 +27,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-ppc@nongnu.org, Libvirt <libvir-list@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-On 01.11.18 15:10, Igor Mammedov wrote:
-> On Wed, 24 Oct 2018 12:19:25 +0200
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->> For now, the hotplug handler is not called for devices that are
->> being cold plugged. The hotplug handler is setup when the machine
->> initialization is fully done. Only bridges that were cold plugged are
->> considered.
->>
->> Set the hotplug handler for the root piix bus directly when realizing.
->> Overwrite the hotplug handler of bridges when hotplugging/coldplugging
->> them.
->>
->> This will now make sure that the ACPI PCI hotplug handler is also called
->> for cold-plugged devices (also on bridges) and for bridges that were
->> hotplugged.
->>
->> When trying to hotplug a device to a hotplugged bridge, we now correctly
->> get the error message
->>  "Unsupported bus. Bus doesn't have property 'acpi-pcihp-bsel' set"
->> Insted of going via the standard PCI hotplug handler.
-> Erroring out is probably not ok, since it can break existing setups
-> where SHPC hotplugging to hotplugged bridge was working just fine before.
+A few places in configure were doing ad-hoc calls to
+the symlink function to set up symlinks from the build tree
+back to the source tree. We have a loop that does this
+already for all files and directories listed in the LINKS
+environment variable; use that instead.
 
-The question is if it actually was supposed (and eventually did) work.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ configure | 14 ++------------
+ 1 file changed, 2 insertions(+), 12 deletions(-)
 
-If this was the expected behavior (mixing hotplug types), then the
-necessary change to this patch would boil down to checking if the bridge
-it hot or coldplugged.
-
-> 
-> Marcel/Michael what's your take on this change in behaviour?
-> CCing libvirt in case they are doing this stuff
-> 
-
-Indeed, it would be nice to know if this was actually supposed to work
-like this (coldplugged bridges using ACPI hotplug and hotplugged bridges
-using SHPC hotplug).
-
-
+diff --git a/configure b/configure
+index 52408ed3076..74e313a8101 100755
+--- a/configure
++++ b/configure
+@@ -7417,6 +7417,8 @@ LINKS="$LINKS pc-bios/s390-ccw/Makefile"
+ LINKS="$LINKS roms/seabios/Makefile roms/vgabios/Makefile"
+ LINKS="$LINKS pc-bios/qemu-icon.bmp"
+ LINKS="$LINKS .gdbinit scripts" # scripts needed by relative path in .gdbinit
++LINKS="$LINKS tests/acceptance tests/data"
++LINKS="$LINKS tests/qemu-iotests/check"
+ for bios_file in \
+     $source_path/pc-bios/*.bin \
+     $source_path/pc-bios/*.lid \
+@@ -7453,25 +7455,13 @@ for rom in seabios vgabios ; do
+     echo "RANLIB=$ranlib" >> $config_mak
+ done
+ 
+-# set up tests data directory
+-for tests_subdir in acceptance data; do
+-    if [ ! -e tests/$tests_subdir ]; then
+-        symlink "$source_path/tests/$tests_subdir" tests/$tests_subdir
+-    fi
+-done
+-
+ # set up qemu-iotests in this build directory
+ iotests_common_env="tests/qemu-iotests/common.env"
+-iotests_check="tests/qemu-iotests/check"
+ 
+ echo "# Automatically generated by configure - do not modify" > "$iotests_common_env"
+ echo >> "$iotests_common_env"
+ echo "export PYTHON='$python'" >> "$iotests_common_env"
+ 
+-if [ ! -e "$iotests_check" ]; then
+-    symlink "$source_path/$iotests_check" "$iotests_check"
+-fi
+-
+ # Save the configure command line for later reuse.
+ cat <<EOD >config.status
+ #!/bin/sh
 -- 
-
-Thanks,
-
-David / dhildenb
+2.19.1
