@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gIZdC-0003nM-FY
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 09:37:02 -0400
+	(envelope-from <bounces@canonical.com>) id 1gIZdC-0003nN-FW
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 09:37:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gIZd6-0004P1-Ih
+	(envelope-from <bounces@canonical.com>) id 1gIZd6-0004P7-JU
 	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 09:36:56 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42378)
+Received: from indium.canonical.com ([91.189.90.7]:42456)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gIZd4-0004Mx-Gy
+	id 1gIZd4-0004NU-Hg
 	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 09:36:52 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gIZcz-0005hP-Ii
-	for <qemu-devel@nongnu.org>; Fri, 02 Nov 2018 13:36:45 +0000
+	id 1gIZd1-0005hA-1M
+	for <qemu-devel@nongnu.org>; Fri, 02 Nov 2018 13:36:47 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 222A72E826E
+	by loganberry.canonical.com (Postfix) with ESMTP id E3BD72E8279
 	for <qemu-devel@nongnu.org>; Fri,  2 Nov 2018 13:30:42 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 02 Nov 2018 13:20:54 -0000
+Date: Fri, 02 Nov 2018 13:21:55 -0000
 From: Richard Jones <rjones@redhat.com>
 Reply-To: Bug 1740364 <1740364@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <151444692163.26459.1330629893044006612.malonedeb@gac.canonical.com>
-Message-Id: <154116485444.20302.18249230941288435544.malone@gac.canonical.com>
+Message-Id: <154116491598.29353.15518175016223039256.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1740364] Re: qemu-img: fails to get shared
  'write' lock
@@ -39,14 +39,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Fixed upstream in
-https://github.com/libguestfs/libguestfs/commit/f00f920ad3b15ab8e9e8f201c16=
-e7628b6b7b109
-
-The fix should appear in libguestfs 1.40.
-
-** Changed in: qemu
-       Status: New =3D> Fix Committed
+Sorry I noticed this bug is filed against qemu.  The fix was done in
+libguestfs, it's not a bug in qemu as far as I know.
 
 -- =
 
