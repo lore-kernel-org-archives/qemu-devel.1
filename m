@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60605)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gIRG9-0008Cn-9Z
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 00:40:38 -0400
+	(envelope-from <fli@suse.com>) id 1gISYn-0005P4-1m
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 02:03:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gIRG3-0007hM-Ek
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 00:40:35 -0400
-Resent-Message-Id: <E1gIRG3-0007hM-Ek@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21303)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gIRFr-0007NG-8q
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 00:40:21 -0400
-Message-ID: <154113357875.17212.15355010465912008159@015909e0f939>
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20181031121443.605-1-richard.henderson@linaro.org>
+	(envelope-from <fli@suse.com>) id 1gISYj-0008JO-Lr
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 02:03:56 -0400
+Received: from mx2.suse.de ([195.135.220.15]:57614 helo=mx1.suse.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <fli@suse.com>) id 1gISYj-0008Ih-Am
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 02:03:53 -0400
+References: <20181101101715.9443-1-fli@suse.com>
+	<20181101101715.9443-5-fli@suse.com> <20181102023158.GC7804@xz-x1>
+From: Fei Li <fli@suse.com>
+Message-ID: <80eb6add-711d-c3d8-795d-afecc63727f7@suse.com>
+Date: Fri, 2 Nov 2018 14:03:43 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 1 Nov 2018 21:39:39 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] decodetree improvments
+In-Reply-To: <20181102023158.GC7804@xz-x1>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH RFC v7 4/9] migration: fix some
+ segmentation faults when using multifd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,75 +29,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, kbastian@mail.uni-paderborn.de
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, dgilbert@redhat.com, famz@redhat.com, quintela@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgxMDMxMTIxNDQzLjYwNS0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5v
-cmcKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAwLzNdIGRlY29kZXRyZWUgaW1wcm92
-bWVudHMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpu
-PTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9n
-cmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpm
-b3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDog
-JChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAt
-LWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhl
-bgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9u
-ZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVh
-OWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5j
-aCAndGVzdCcKMzcwYTUzZjcxNCBkZWNvZGV0cmVlOiBBbGxvdyBtdWx0aXBsZSBpbnB1dCBmaWxl
-cwpiNjk4YmQzNGY1IGRlY29kZXRyZWU6IFJlbW92ZSAiaW5zbiIgYXJndW1lbnQgZnJvbSB0cmFu
-c18qIGV4cGFuZGVycwplYzc2MDBjNTFhIGRlY29kZXRyZWU6IEFkZCAhZXh0ZXJuIGZsYWcgdG8g
-YXJndW1lbnQgc2V0cwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8zOiBk
-ZWNvZGV0cmVlOiBBZGQgIWV4dGVybiBmbGFnIHRvIGFyZ3VtZW50IHNldHMuLi4KQ2hlY2tpbmcg
-UEFUQ0ggMi8zOiBkZWNvZGV0cmVlOiBSZW1vdmUgImluc24iIGFyZ3VtZW50IGZyb20gdHJhbnNf
-KiBleHBhbmRlcnMuLi4KRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0
-eDpXeFYpCiMxMjI6IEZJTEU6IHRhcmdldC9hcm0vdHJhbnNsYXRlLXN2ZS5jOjM3MjoKK3N0YXRp
-YyBib29sIHRyYW5zXyMjTkFNRSMjX3pwenooRGlzYXNDb250ZXh0ICpzLCBhcmdfcnBycl9lc3og
-KmEpICAgICAgICAgXAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0
-ICcqJyAoY3R4Old4VikKIzEzMTogRklMRTogdGFyZ2V0L2FybS90cmFuc2xhdGUtc3ZlLmM6NDA0
-Ogorc3RhdGljIGJvb2wgdHJhbnNfU0RJVl96cHp6KERpc2FzQ29udGV4dCAqcywgYXJnX3JwcnJf
-ZXN6ICphKQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6
-V3hWKQojMTU4OiBGSUxFOiB0YXJnZXQvYXJtL3RyYW5zbGF0ZS1zdmUuYzo0NTA6CitzdGF0aWMg
-Ym9vbCB0cmFuc18jI05BTUUoRGlzYXNDb250ZXh0ICpzLCBhcmdfcnByX2VzeiAqYSkgICAgICAg
-ICAgIFwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6V3hWKQoj
-MTY3OiBGSUxFOiB0YXJnZXQvYXJtL3RyYW5zbGF0ZS1zdmUuYzo0Njc6CitzdGF0aWMgYm9vbCB0
-cmFuc19GQUJTKERpc2FzQ29udGV4dCAqcywgYXJnX3Jwcl9lc3ogKmEpCiAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyBy
-ZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpXeFYpCiMzMzE6IEZJTEU6IHRhcmdldC9hcm0v
-dHJhbnNsYXRlLXN2ZS5jOjg1MToKK3N0YXRpYyBib29sIHRyYW5zXyMjTkFNRShEaXNhc0NvbnRl
-eHQgKnMsIGFyZ19ycHJycl9lc3ogKmEpICAgICAgICAgIFwKICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1
-aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpXeFYpCiMxNDQyOiBGSUxFOiB0YXJnZXQvYXJtL3Ry
-YW5zbGF0ZS1zdmUuYzozOTgxOgorc3RhdGljIGJvb2wgdHJhbnNfIyNOQU1FKERpc2FzQ29udGV4
-dCAqcywgYXJnX3JwcnJyX2VzeiAqYSkgICAgICAgICAgXAogICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVp
-cmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4Old4VikKIzE5NTA6IEZJTEU6IHRhcmdldC9vcGVucmlz
-Yy9kaXNhcy5jOjU1Ogorc3RhdGljIGJvb2wgdHJhbnNfbF8jI29wY29kZShkaXNhc3NlbWJsZV9p
-bmZvICppbmZvLCBhcmdfbF8jI29wY29kZSAqYSkgXAogICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRo
-YXQgJyonIChjdHg6V3hWKQojMTk1MDogRklMRTogdGFyZ2V0L29wZW5yaXNjL2Rpc2FzLmM6NTU6
-CitzdGF0aWMgYm9vbCB0cmFuc19sXyMjb3Bjb2RlKGRpc2Fzc2VtYmxlX2luZm8gKmluZm8sIGFy
-Z19sXyMjb3Bjb2RlICphKSBcCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQg
-YXJvdW5kIHRoYXQgJyonIChjdHg6V3hWKQojMTk2ODogRklMRTogdGFyZ2V0L29wZW5yaXNjL2Rp
-c2FzLmM6MTQ5Ogorc3RhdGljIGJvb2wgdHJhbnNfbGZfIyNvcGNvZGUjI18jI3N1ZmZpeChkaXNh
-c3NlbWJsZV9pbmZvICppbmZvLCAgICAgICAgXAogICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQg
-YXJvdW5kIHRoYXQgJyonIChjdHg6V3hWKQojMTk2OTogRklMRTogdGFyZ2V0L29wZW5yaXNjL2Rp
-c2FzLmM6MTUwOgorICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBhcmdf
-bGZfIyNvcGNvZGUjI18jI3N1ZmZpeCAqYSkgXAogICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMTAgZXJy
-b3JzLCAwIHdhcm5pbmdzLCAyNTM5IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxl
-IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
-c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
-SCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDMvMzogZGVjb2RldHJlZTogQWxsb3cg
-bXVsdGlwbGUgaW5wdXQgZmlsZXMuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQg
-ZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBi
-eSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFj
-ayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+
+
+On 11/02/2018 10:31 AM, Peter Xu wrote:
+> On Thu, Nov 01, 2018 at 06:17:10PM +0800, Fei Li wrote:
+>> When multifd is used during migration, a segmentaion fault will
+>> occur in the source when multifd_save_cleanup() is called again if
+>> the multifd_send_state has been freed in earlier error handling. This
+>> can happen when migrate_fd_connect() fails and multifd_fd_cleanup()
+>> is called, and then multifd_new_send_channel_async() fails and
+>> multifd_save_cleanup() is called again.
+>>
+>> If the QIOChannel *c of multifd_recv_state->params[i] (p->c) is not
+>> initialized, there is no need to close the channel. Or else a
+>> segmentation fault will occur in multifd_recv_terminate_threads()
+>> when multifd_recv_initial_packet() fails.
+> It's a bit odd to me when I see that multifd_send_thread() calls
+> multifd_send_terminate_threads().  Is that the reason that you
+> encountered the problem?
+Yes, this is one of the reason. Actually this problem almost does not occur
+before this patch series, but as this patch series is trying to make 
+qemu_thread_create()
+be more robust, I find this problem during the debugging. ;)
+
+The second situation is when using multifd (in this way 
+multifd_new_send_channel_asyn()[1]
+is called several times) and once one channel fails in [1], the later 
+channels
+will encounter the segmentation fault problem when enters [1] again.
+And the third is after applying the last patch, I mean after 
+multifd_save_setup=>
+socket_send_channel_create(multifd_new_send_channel_async, p) successfully,
+but then qemu_thread_create(migration_thread) fails, I assume here we 
+need to
+do some migration cleanup, like migrate_fd_cleanup() or something 
+similar like
+the vm_start() in migration_iteration_finish()?
+The fourth is when multifd_new_send_channel_async()[1] fails and 
+multifd_save_cleanup()
+is called, then multifd_send_sync_main <= qemu_savevm_state_setup <= 
+migration_thread[2]
+is called. (BTW, I find that sometimes [2] is called earlier than [1], 
+but sometimes
+later the first channel)
+> Instead of checking all these null pointers, IMHO we should just let
+> multifd_send_terminate_threads() be called only in the main thread...
+Ok, from your reply in patch5/9, I know we should offer better isolation and
+just let the main thread handle these cleanup.:)
+>> Signed-off-by: Fei Li <fli@suse.com>
+>> ---
+>>   migration/ram.c | 28 +++++++++++++++++++++-------
+>>   1 file changed, 21 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/migration/ram.c b/migration/ram.c
+>> index 7e7deec4d8..4db3b3e8f4 100644
+>> --- a/migration/ram.c
+>> +++ b/migration/ram.c
+>> @@ -907,6 +907,11 @@ static void multifd_send_terminate_threads(Error *err)
+>>           }
+>>       }
+>>   
+>> +    /* in case multifd_send_state has been freed earlier */
+>> +    if (!multifd_send_state) {
+>> +        return;
+>> +    }
+>> +
+>>       for (i = 0; i < migrate_multifd_channels(); i++) {
+>>           MultiFDSendParams *p = &multifd_send_state->params[i];
+The above one is the first case.
+>>   
+>> @@ -922,7 +927,7 @@ int multifd_save_cleanup(Error **errp)
+>>       int i;
+>>       int ret = 0;
+>>   
+>> -    if (!migrate_use_multifd()) {
+>> +    if (!migrate_use_multifd() || !multifd_send_state) {
+>>           return 0;
+>>       }
+>>       multifd_send_terminate_threads(NULL);
+The above one is the third case.
+>> @@ -960,7 +965,7 @@ static void multifd_send_sync_main(void)
+>>   {
+>>       int i;
+>>   
+>> -    if (!migrate_use_multifd()) {
+>> +    if (!migrate_use_multifd() || !multifd_send_state) {
+>>           return;
+>>       }
+>>       if (multifd_send_state->pages->used) {
+The above one is the fourth case.
+>> @@ -1070,6 +1075,10 @@ static void multifd_new_send_channel_async(QIOTask *task, gpointer opaque)
+>>       QIOChannel *sioc = QIO_CHANNEL(qio_task_get_source(task));
+>>       Error *local_err = NULL;
+>>   
+>> +    if (!multifd_send_state) {
+>> +        return;
+>> +    }
+>> +
+>>       if (qio_task_propagate_error(task, &local_err)) {
+>>           if (multifd_save_cleanup(&local_err) != 0) {
+>>               migrate_set_error(migrate_get_current(), local_err);
+The above one is the second case.
+>> @@ -1131,7 +1140,7 @@ struct {
+>>       uint64_t packet_num;
+>>   } *multifd_recv_state;
+Below is to fix the second paragraph (p->c) in the commit message. :)
+>>   
+>> -static void multifd_recv_terminate_threads(Error *err)
+>> +static void multifd_recv_terminate_threads(Error *err, bool channel)
+>>   {
+>>       int i;
+>>   
+>> @@ -1145,6 +1154,11 @@ static void multifd_recv_terminate_threads(Error *err)
+>>           }
+>>       }
+>>   
+>> +    /* in case p->c is not initialized */
+>> +    if (!channel) {
+>> +        return;
+>> +    }
+>> +
+>>       for (i = 0; i < migrate_multifd_channels(); i++) {
+>>           MultiFDRecvParams *p = &multifd_recv_state->params[i];
+>>   
+>> @@ -1166,7 +1180,7 @@ int multifd_load_cleanup(Error **errp)
+>>       if (!migrate_use_multifd()) {
+>>           return 0;
+>>       }
+>> -    multifd_recv_terminate_threads(NULL);
+>> +    multifd_recv_terminate_threads(NULL, true);
+>>       for (i = 0; i < migrate_multifd_channels(); i++) {
+>>           MultiFDRecvParams *p = &multifd_recv_state->params[i];
+>>   
+>> @@ -1269,7 +1283,7 @@ static void *multifd_recv_thread(void *opaque)
+>>       }
+>>   
+>>       if (local_err) {
+>> -        multifd_recv_terminate_threads(local_err);
+>> +        multifd_recv_terminate_threads(local_err, true);
+>>       }
+>>       qemu_mutex_lock(&p->mutex);
+>>       p->running = false;
+>> @@ -1331,7 +1345,7 @@ bool multifd_recv_new_channel(QIOChannel *ioc)
+>>   
+>>       id = multifd_recv_initial_packet(ioc, &local_err);
+>>       if (id < 0) {
+>> -        multifd_recv_terminate_threads(local_err);
+>> +        multifd_recv_terminate_threads(local_err, false);
+>>           return false;
+>>       }
+>>   
+>> @@ -1339,7 +1353,7 @@ bool multifd_recv_new_channel(QIOChannel *ioc)
+>>       if (p->c != NULL) {
+>>           error_setg(&local_err, "multifd: received id '%d' already setup'",
+>>                      id);
+>> -        multifd_recv_terminate_threads(local_err);
+>> +        multifd_recv_terminate_threads(local_err, true);
+>>           return false;
+>>       }
+>>       p->c = ioc;
+>> -- 
+>> 2.13.7
+>>
+> Regards,
+>
+Have a nice day, thanks for the comment. :)
+Fei
