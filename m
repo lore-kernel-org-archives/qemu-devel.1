@@ -1,25 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51212)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52555)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gIZJR-0006NN-12
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 09:16:33 -0400
+	(envelope-from <edgari@xilinx.com>) id 1gIZMt-0000Qy-6t
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 09:20:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gIZJP-0001PJ-3H
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 09:16:32 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:46643)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gIZJN-0001JT-9c
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 09:16:29 -0400
-Received: by mail-oi1-x243.google.com with SMTP id k64-v6so1506569oia.13
-	for <qemu-devel@nongnu.org>; Fri, 02 Nov 2018 06:16:20 -0700 (PDT)
+	(envelope-from <edgari@xilinx.com>) id 1gIZMp-0003AJ-IR
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 09:20:06 -0400
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Date: Fri, 2 Nov 2018 14:19:11 +0100
+Message-ID: <20181102131913.1535-1-edgar.iglesias@xilinx.com>
 MIME-Version: 1.0
-In-Reply-To: <20181101113711.28074-1-laurent@vivier.eu>
-References: <20181101113711.28074-1-laurent@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 2 Nov 2018 13:15:59 +0000
-Message-ID: <CAFEAcA_xnCxFJ0FOOuG+bbkvjnGx=j5_M19KbqZZ5ZmubLJcbg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/1] M68k for 3.1 patches
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v5 0/2] arm: Add first models of Xilinx Versal
+ SoC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +20,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, frederic.konrad@adacore.com, alistair@alistair23.me, philmd@redhat.com, frasse.iglesias@gmail.com, figlesia@xilinx.com, sstabellini@kernel.org, sai.pavan.boddu@xilinx.com, edgar.iglesias@xilinx.com
 
-On 1 November 2018 at 11:37, Laurent Vivier <laurent@vivier.eu> wrote:
-> The following changes since commit 7d51a855cd568ec3399a1834ada4023cfa12f231:
->
->   Merge remote-tracking branch 'remotes/xtensa/tags/20181030-xtensa' into staging (2018-10-31 16:11:43 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/vivier/qemu-m68k.git tags/m68k-for-3.1-pull-request
->
-> for you to fetch changes up to b9f8e55bf7e994e192ab7360830731580384b813:
->
->   target/m68k: use EXCP_ILLEGAL instead of EXCP_UNSUPPORTED (2018-11-01 12:12:24 +0100)
->
-> ----------------------------------------------------------------
-> Fix illegal instruction exception number
->
-> ----------------------------------------------------------------
->
-> Laurent Vivier (1):
->   target/m68k: use EXCP_ILLEGAL instead of EXCP_UNSUPPORTED
->
->  linux-user/m68k/cpu_loop.c | 1 -
->  target/m68k/cpu.h          | 1 -
->  target/m68k/translate.c    | 6 +++---
->  3 files changed, 3 insertions(+), 5 deletions(-)
->
+This patch series adds initial support for Xilinx's Versal SoC.
+Xilinx is introducing Versal, an adaptive compute acceleration platform
+(ACAP), built on 7nm FinFET process technology. Versal ACAPs combine Scalar
+Processing Engines, Adaptable Hardware Engines, and Intelligent Engines with
+leading-edge memory and interfacing technologies to deliver powerful
+heterogeneous acceleration for any application. The Versal AI Core series has
+five devices, offering 128 to 400 AI Engines. The series includes dual-core Arm
+Cortex-A72 application processors, dual-core Arm Cortex-R5 real-time
+processors, 256KB of on-chip memory with ECC, more than 1,900 DSP engines
+optimized for high-precision floating point with low latency.
 
-Applied, thanks.
+More info can be found here:
+https://www.xilinx.com/news/press/2018/xilinx-unveils-versal-the-first-in-a-new-category-of-platforms-delivering-rapid-innovation-with-software-programmability-and-scalable-ai-inference.html
 
--- PMM
+
+In QEMU we'd like to have a virtual developer board with the Versal SoC
+and a selected set of peripherals under the control of QEMU.
+We'd like to gradually extend this board as QEMU gains more support
+for Versal hardware components. QEMU will generate a device-tree
+describing only the components it supports and includes in the virtual
+dev board.
+
+Before adding Versal support, this series starts with a few fixes to the
+GEM that I ran into when running recent kernels on the Versal and ZynqMP
+models.
+
+I also noticed a problem with HVC insns not being enabled when using
+QEMU's PSCI implementation on CPU's with EL2 and EL3 enabled. This causes
+problems for Linux/KVM guests, also fixed in this series.
+
+Best regards,
+Edgar
+
+ChangeLog:
+v4 -> v5:
+* Correct setting of boolean full-duplex fdt property
+
+v3 -> v4:
+* Improve error handling for CPU and GIC creation
+* Remove KVM checks in GIC creation
+
+v2 -> v3:
+* Fix DESCONF6 queue mask generation for GEMs with only one queue.
+
+v1 -> v2:
+* Spell out OCM as On Chip Memory
+* apperture -> aperture
+* Remove copy+pasted virt board comment
+* Remove VMSD for Versal SoC (with a comment on why it's not needed)
+* Embedd AddressSpace dma object in GEM
+* Remove debug left-overs in arm-powerctl
+* Enable PMU in Cortex-A72
+* Rename cortex_a57_a53_cp_reginfo -> cortex_a72_a57_a53_cp_reginfo
+
+
+Edgar E. Iglesias (2):
+  hw/arm: versal: Add a model of Xilinx Versal SoC
+  hw/arm: versal: Add a virtual Xilinx Versal board
+
+ default-configs/aarch64-softmmu.mak |   1 +
+ hw/arm/Makefile.objs                |   1 +
+ hw/arm/xlnx-versal-virt.c           | 494 ++++++++++++++++++++++++++++
+ hw/arm/xlnx-versal.c                | 323 ++++++++++++++++++
+ include/hw/arm/xlnx-versal.h        | 122 +++++++
+ 5 files changed, 941 insertions(+)
+ create mode 100644 hw/arm/xlnx-versal-virt.c
+ create mode 100644 hw/arm/xlnx-versal.c
+ create mode 100644 include/hw/arm/xlnx-versal.h
+
+-- 
+2.17.1
