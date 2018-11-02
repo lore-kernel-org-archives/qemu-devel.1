@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60787)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33311)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gIZhp-0007C5-AD
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 09:41:46 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1gIZjg-0000o0-Oq
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 09:43:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gIZhn-0007PG-9H
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 09:41:45 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:54611)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gIZhl-0007Bp-Nh
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 09:41:43 -0400
-Received: by mail-wm1-x343.google.com with SMTP id r63-v6so2031566wma.4
-	for <qemu-devel@nongnu.org>; Fri, 02 Nov 2018 06:41:22 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri,  2 Nov 2018 13:41:11 +0000
-Message-Id: <20181102134112.26370-4-richard.henderson@linaro.org>
-In-Reply-To: <20181102134112.26370-1-richard.henderson@linaro.org>
-References: <20181102134112.26370-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH for-4.0 3/4] target/arm: Implement the
- ARMv8.1-HPD extension
+	(envelope-from <amarkovic@wavecomp.com>) id 1gIZjb-0008EE-1C
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 09:43:39 -0400
+Received: from mail-sn1nam02on0130.outbound.protection.outlook.com
+	([104.47.36.130]:63675
+	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1gIZjM-00088Z-Fj
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 09:43:27 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Fri, 2 Nov 2018 13:43:09 +0000
+Message-ID: <BN6PR2201MB12512B92322BFB8965848215C6CF0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <BN6PR2201MB125116B5479010DB326DCCFCC6CE0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	<51a26700-5da5-0a15-0e0e-6405ce5e65d4@redhat.com>,
+	<20181101172353.GA2316@sx9>
+In-Reply-To: <20181101172353.GA2316@sx9>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] Correction needed for R5900 instruction decoding
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,99 +32,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org
+To: Fredrik Noring <noring@nocrew.org>, =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>, "Emilio G.
+	Cota" <cota@braap.org>
+Cc: Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, "Maciej W. Rozycki" <macro@linux-mips.org>, =?iso-8859-1?Q?J=FCrgen_Urban?= <JuergenUrban@gmx.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Since the TCR_*.HPD bits were RES0 in ARMv8.0, we can simply
-interpret the bits as if ARMv8.1-HPD is present without checking.
-We will need a slightly different check for hpd for aarch32.
+> ... in the patch series I posted 25 October "[PATCH 00/11]
+> target/mips: Amend R5900 support". I will post updated patches shortly!
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/cpu64.c  |  1 +
- target/arm/helper.c | 29 +++++++++++++++++++++--------
- 2 files changed, 22 insertions(+), 8 deletions(-)
+Fridrik,
 
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index aac6283018..1d57be0c91 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -325,6 +325,7 @@ static void aarch64_max_initfn(Object *obj)
-         cpu->isar.id_aa64pfr0 = t;
- 
-         t = cpu->isar.id_aa64mmfr1;
-+        t = FIELD_DP64(t, ID_AA64MMFR1, HPDS, 1); /* HPD */
-         t = FIELD_DP64(t, ID_AA64MMFR1, LO, 1);
-         cpu->isar.id_aa64mmfr1 = t;
- 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 758ddac5e9..312d3e6f02 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -9682,6 +9682,7 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
-     bool ttbr1_valid = true;
-     uint64_t descaddrmask;
-     bool aarch64 = arm_el_is_aa64(env, el);
-+    bool hpd = false;
- 
-     /* TODO:
-      * This code does not handle the different format TCR for VTCR_EL2.
-@@ -9796,6 +9797,13 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
-         if (tg == 2) { /* 16KB pages */
-             stride = 11;
-         }
-+        if (aarch64) {
-+            if (el > 1) {
-+                hpd = extract64(tcr->raw_tcr, 24, 1);
-+            } else {
-+                hpd = extract64(tcr->raw_tcr, 41, 1);
-+            }
-+        }
-     } else {
-         /* We should only be here if TTBR1 is valid */
-         assert(ttbr1_valid);
-@@ -9811,6 +9819,9 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
-         if (tg == 1) { /* 16KB pages */
-             stride = 11;
-         }
-+        if (aarch64) {
-+            hpd = extract64(tcr->raw_tcr, 42, 1);
-+        }
-     }
- 
-     /* Here we should have set up all the parameters for the translation:
-@@ -9904,7 +9915,7 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
-         descaddr = descriptor & descaddrmask;
- 
-         if ((descriptor & 2) && (level < 3)) {
--            /* Table entry. The top five bits are attributes which  may
-+            /* Table entry. The top five bits are attributes which may
-              * propagate down through lower levels of the table (and
-              * which are all arranged so that 0 means "no effect", so
-              * we can gather them up by ORing in the bits at each level).
-@@ -9928,14 +9939,16 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
-             /* Stage 2 table descriptors do not include any attribute fields */
-             break;
-         }
--        /* Merge in attributes from table descriptors */
--        attrs |= extract32(tableattrs, 0, 2) << 11; /* XN, PXN */
--        attrs |= extract32(tableattrs, 3, 1) << 5; /* APTable[1] => AP[2] */
--        /* The sense of AP[1] vs APTable[0] is reversed, as APTable[0] == 1
--         * means "force PL1 access only", which means forcing AP[1] to 0.
-+        /*
-+         * Merge in attributes from table descriptors, if the
-+         * Hierarchical Permission Disable bit is not set.
-          */
--        if (extract32(tableattrs, 2, 1)) {
--            attrs &= ~(1 << 4);
-+        if (!hpd) {
-+            attrs |= extract32(tableattrs, 0, 2) << 11; /* XN, PXN */
-+            /* !APTable[0] => AP[1].  */
-+            attrs &= ~(extract32(tableattrs, 2, 1) << 4);
-+            /* APTable[1] => AP[2] */
-+            attrs |= extract32(tableattrs, 3, 1) << 5;
-         }
-         attrs |= nstable << 3; /* NS */
-         break;
--- 
-2.17.2
+It is now code freeze before 3.1, the code base is being stabilized, and on=
+ly important fixes are allowed to be integrated - so, in that light, a sepa=
+rate patch, or a small series, that addresses only concerns from the origin=
+al mail of this thread is needed. Such series should not contain any additi=
+onal features (like your v2 of the series "Amend..." does), and its patch t=
+itles should look like "Fix decoding mechanism of ..." or such.
+
+Could you please provide those appropriate changes in that format?
+
+Thanks,
+Aleksandar
+
+________________________________________
+From: Fredrik Noring <noring@nocrew.org>
+Sent: Thursday, November 1, 2018 6:23:53 PM
+To: Philippe Mathieu-Daud=E9; Emilio G. Cota; Aleksandar Markovic
+Cc: Stefan Markovic; Petar Jovanovic; Aleksandar Rikalo; Maciej W. Rozycki;=
+ J=FCrgen Urban; qemu-devel@nongnu.org
+Subject: Re: [Qemu-devel] Correction needed for R5900 instruction decoding
+
+[ Philippe and Emilio -- thank you for cc-ing me. Good catch, since I'm
+not subscribed to the QEMU mailing list. Changes to the R5900 emulation
+are certainly of interest. ]
+
+Hi Aleksandar, Philippe,
+
+On Thu, Nov 01, 2018 at 03:31:54PM +0100, Philippe Mathieu-Daud=E9 wrote:
+> Cc'ing Fredrik.
+>
+> On 1/11/18 12:06, Aleksandar Markovic wrote:
+> > Hi, Fridrik,
+> >
+> > I did some closer code inspection of R5900 in last few days, and I
+> > noticed some sub-optimal implementation in the area where R5900-specifi=
+c
+> > opcodes overlap with the rest-of-MIPS-CPUs opcodes.
+> >
+> > The right implementation should be based on the principle that all such
+> > cases are covered with if statements involving INSN_R5900 flag, like
+> > this:
+> >
+> >          if (ctx->insn_flags & INSN_R5900) {
+> >              <R5900-specific handling>
+> >          } else {
+> >              <rest-of-MIPS-handling>
+> >          }
+> >
+> > You followed that principle for OPC_SPECIAL2 and OPC_SPECIAL3, but for
+> > some other opcodes not. For example, there are lines:
+> >
+> >      if (reg =3D=3D 0 && (opc =3D=3D OPC_MFHI || opc =3D=3D TX79_MMI_MF=
+HI1 ||
+> >                       opc =3D=3D OPC_MFLO || opc =3D=3D TX79_MMI_MFLO1)=
+) {
+> >
+> > or
+> >
+> >       switch (opc) {
+> >       case OPC_MFHI:
+> >       case TX79_MMI_MFHI1:
+> >
+> > Such implementation makes it difficult to discern R5900 and non-R5900
+> > cases. Potentialy allows bugs to sneak in and affect non-R5900 support.
+
+MFLO1, MFHI1, MTLO1 and MTHI1 for the TX79 and the R5900 are already
+decoded in the ISA specific decode_tx79_mmi function, and thereby follow
+your first suggested pattern. They do however reuse the gen_HILO function,
+but it is a simpel matter to post a patch to make a new gen_tx79_HILO1
+variant that is almost identical to the original gen_HILO.
+
+The only other case is gen_muldiv that is used for DIV1 and DIVU1. The
+same argument applies and a TX79 specific variant would be similar to the
+original, but I can certainly post a variant for that one too.
+
+> > The correction is not that difficult, I gather. Worse comme to worst,
+> > you can remove R5900 MFLO1 and MFHI1 altogether, they are not that
+> > essential at this moment, but do try correcting the decoding stuff as I
+> > described. Can you please make these changes in next few days or so
+> > (given that 3.1 release is getting closer and closer), and send them to
+> > the list?
+
+MFLO1 and MFHI1 are essential for MULT1, MULTU1, DIV1 and DIVU1 as well as
+MADD1 and MADDU1 in the patch series I posted 25 October "[PATCH 00/11]
+target/mips: Amend R5900 support". I will post updated patches shortly!
+
+> > It is my bad that I didn't spot this during review, but in any case, I
+> > think this should be fixed in 3.1 to make sure that non-R5900
+> > functionalities are intact.
+
+It is a common pattern in target/mips/translate.c to cover several ISAs
+in the same gen_* and decode_* functions, especially when there are only
+minor differences between them.
+
+Fredrik
