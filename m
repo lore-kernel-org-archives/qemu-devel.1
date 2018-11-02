@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49914)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=8372cde87=Paul.Durrant@citrix.com>)
-	id 1gIXQP-0003lD-UF
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:15:40 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gIXUs-0007sg-11
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:20:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=8372cde87=Paul.Durrant@citrix.com>)
-	id 1gIXQL-00052l-Cu
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:15:37 -0400
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Fri, 2 Nov 2018 11:15:24 +0000
-Message-ID: <a04865aa2fb94f51b526d12cd07819e2@AMSPEX02CL03.citrite.net>
-References: <154115285434.11300.8459925605672823399.stgit@dhcp-3-135.uk.xensource.com>
-	<154115286959.11300.498371710893672725.stgit@dhcp-3-135.uk.xensource.com>
-In-Reply-To: <154115286959.11300.498371710893672725.stgit@dhcp-3-135.uk.xensource.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <peter.maydell@linaro.org>) id 1gIXUr-0004SS-9c
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:20:13 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:40738)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gIXUo-0004L4-Nd
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:20:11 -0400
+Received: by mail-oi1-x244.google.com with SMTP id u130-v6so1278308oie.7
+	for <qemu-devel@nongnu.org>; Fri, 02 Nov 2018 04:20:09 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 3/3] Avoid repeated memory allocation in
- xen_disk
+In-Reply-To: <3f9658de-e86f-9e6a-3f81-64ddbeccc0a7@ilande.co.uk>
+References: <20181101161758.12300-1-peter.maydell@linaro.org>
+	<3f9658de-e86f-9e6a-3f81-64ddbeccc0a7@ilande.co.uk>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 2 Nov 2018 11:19:48 +0000
+Message-ID: <CAFEAcA-f_XgMY=D1udLJtV-j34kqTWK0N+w-8YXeSgPf5SfCSQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for-3.1] hw/ppc/mac_newworld: Free
+ openpic_irqs array after use
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,68 +30,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tim Smith <tim.smith@citrix.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Max Reitz <mreitz@redhat.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBUaW0gU21pdGggW21haWx0bzp0
-aW0uc21pdGhAY2l0cml4LmNvbV0NCj4gU2VudDogMDIgTm92ZW1iZXIgMjAxOCAxMDowMQ0KPiBU
-bzogeGVuLWRldmVsQGxpc3RzLnhlbnByb2plY3Qub3JnOyBxZW11LWRldmVsQG5vbmdudS5vcmc7
-IHFlbXUtDQo+IGJsb2NrQG5vbmdudS5vcmcNCj4gQ2M6IEFudGhvbnkgUGVyYXJkIDxhbnRob255
-LnBlcmFyZEBjaXRyaXguY29tPjsgS2V2aW4gV29sZg0KPiA8a3dvbGZAcmVkaGF0LmNvbT47IFBh
-dWwgRHVycmFudCA8UGF1bC5EdXJyYW50QGNpdHJpeC5jb20+OyBTdGVmYW5vDQo+IFN0YWJlbGxp
-bmkgPHNzdGFiZWxsaW5pQGtlcm5lbC5vcmc+OyBNYXggUmVpdHogPG1yZWl0ekByZWRoYXQuY29t
-Pg0KPiBTdWJqZWN0OiBbUEFUQ0ggMy8zXSBBdm9pZCByZXBlYXRlZCBtZW1vcnkgYWxsb2NhdGlv
-biBpbiB4ZW5fZGlzaw0KPiANCj4geGVuX2Rpc2sgY3VycmVudGx5IGFsbG9jYXRlcyBtZW1vcnkg
-dG8gaG9sZCB0aGUgZGF0YSBmb3IgZWFjaCBpb3JlcQ0KPiBhcyB0aGF0IGlvcmVxIGlzIHVzZWQs
-IGFuZCBmcmVlcyBpdCBhZnRlcndhcmRzLiBCZWNhdXNlIGl0IHJlcXVpcmVzDQo+IHBhZ2UtYWxp
-Z25lZCBibG9ja3MsIHRoaXMgaW50ZXJhY3RzIHBvb3JseSB3aXRoIG5vbi1wYWdlLWFsaWduZWQN
-Cj4gYWxsb2NhdGlvbnMgYW5kIGJhbGxvb25zIHRoZSBoZWFwLg0KPiANCj4gSW5zdGVhZCwgYWxs
-b2NhdGUgdGhlIG1heGltdW0gcG9zc2libGUgcmVxdWlyZW1lbnQsIHdoaWNoIGlzDQo+IEJMS0lG
-X01BWF9TRUdNRU5UU19QRVJfUkVRVUVTVCBwYWdlcyAoY3VycmVudGx5IDExIHBhZ2VzKSB3aGVu
-DQo+IHRoZSBpb3JlcSBpcyBjcmVhdGVkLCBhbmQga2VlcCB0aGF0IGFsbG9jYXRpb24gdW50aWwg
-aXQgaXMgZGVzdHJveWVkLg0KPiBTaW5jZSB0aGUgaW9yZXFzIHRoZW1zZWx2ZXMgYXJlIHJlLXVz
-ZWQgdmlhIGEgZnJlZSBsaXN0LCB0aGlzDQo+IHNob3VsZCBhY3R1YWxseSBpbXByb3ZlIG1lbW9y
-eSB1c2FnZS4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IFRpbSBTbWl0aCA8dGltLnNtaXRoQGNpdHJp
-eC5jb20+DQoNClJldmlld2VkLWJ5OiBQYXVsIER1cnJhbnQgPHBhdWwuZHVycmFudEBjaXRyaXgu
-Y29tPg0KDQo+IC0tLQ0KPiAgaHcvYmxvY2sveGVuX2Rpc2suYyB8ICAgMTEgKysrKysrLS0tLS0N
-Cj4gIDEgZmlsZSBjaGFuZ2VkLCA2IGluc2VydGlvbnMoKyksIDUgZGVsZXRpb25zKC0pDQo+IA0K
-PiBkaWZmIC0tZ2l0IGEvaHcvYmxvY2sveGVuX2Rpc2suYyBiL2h3L2Jsb2NrL3hlbl9kaXNrLmMN
-Cj4gaW5kZXggYjUwNmUyMzg2OC4uZmFhZWVmYmEyOSAxMDA2NDQNCj4gLS0tIGEvaHcvYmxvY2sv
-eGVuX2Rpc2suYw0KPiArKysgYi9ody9ibG9jay94ZW5fZGlzay5jDQo+IEBAIC0xMTIsNyArMTEy
-LDYgQEAgc3RhdGljIHZvaWQgaW9yZXFfcmVzZXQoc3RydWN0IGlvcmVxICppb3JlcSkNCj4gICAg
-ICBtZW1zZXQoJmlvcmVxLT5yZXEsIDAsIHNpemVvZihpb3JlcS0+cmVxKSk7DQo+ICAgICAgaW9y
-ZXEtPnN0YXR1cyA9IDA7DQo+ICAgICAgaW9yZXEtPnN0YXJ0ID0gMDsNCj4gLSAgICBpb3JlcS0+
-YnVmID0gTlVMTDsNCj4gICAgICBpb3JlcS0+c2l6ZSA9IDA7DQo+ICAgICAgaW9yZXEtPnByZXN5
-bmMgPSAwOw0KPiANCj4gQEAgLTEzNyw2ICsxMzYsMTEgQEAgc3RhdGljIHN0cnVjdCBpb3JlcSAq
-aW9yZXFfc3RhcnQoc3RydWN0IFhlbkJsa0Rldg0KPiAqYmxrZGV2KQ0KPiAgICAgICAgICAvKiBh
-bGxvY2F0ZSBuZXcgc3RydWN0ICovDQo+ICAgICAgICAgIGlvcmVxID0gZ19tYWxsb2MwKHNpemVv
-ZigqaW9yZXEpKTsNCj4gICAgICAgICAgaW9yZXEtPmJsa2RldiA9IGJsa2RldjsNCj4gKyAgICAg
-ICAgLyogV2UgY2Fubm90IG5lZWQgbW9yZSBwYWdlcyBwZXIgaW9yZXEgdGhhbiB0aGlzLCBhbmQg
-d2UgZG8gcmUtDQo+IHVzZQ0KPiArICAgICAgICAgKiBpb3JlcXMsIHNvIGFsbG9jYXRlIHRoZSBt
-ZW1vcnkgb25jZSBoZXJlLCB0byBiZSBmcmVlZCBpbg0KPiArICAgICAgICAgKiBibGtfZnJlZSgp
-IHdoZW4gdGhlIGlvcmVxIGlzIGZyZWVkLiAqLw0KPiArICAgICAgICBpb3JlcS0+YnVmID0gcWVt
-dV9tZW1hbGlnbihYQ19QQUdFX1NJWkUsDQo+IEJMS0lGX01BWF9TRUdNRU5UU19QRVJfUkVRVUVT
-VA0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAqIFhDX1BBR0VfU0laRSk7
-DQo+ICAgICAgICAgIGJsa2Rldi0+cmVxdWVzdHNfdG90YWwrKzsNCj4gICAgICAgICAgcWVtdV9p
-b3ZlY19pbml0KCZpb3JlcS0+diwgMSk7DQo+ICAgICAgfSBlbHNlIHsNCj4gQEAgLTMxMywxNCAr
-MzE3LDEyIEBAIHN0YXRpYyB2b2lkIHFlbXVfYWlvX2NvbXBsZXRlKHZvaWQgKm9wYXF1ZSwgaW50
-IHJldCkNCj4gICAgICAgICAgaWYgKHJldCA9PSAwKSB7DQo+ICAgICAgICAgICAgICBpb3JlcV9n
-cmFudF9jb3B5KGlvcmVxKTsNCj4gICAgICAgICAgfQ0KPiAtICAgICAgICBxZW11X3ZmcmVlKGlv
-cmVxLT5idWYpOw0KPiAgICAgICAgICBicmVhazsNCj4gICAgICBjYXNlIEJMS0lGX09QX1dSSVRF
-Og0KPiAgICAgIGNhc2UgQkxLSUZfT1BfRkxVU0hfRElTS0NBQ0hFOg0KPiAgICAgICAgICBpZiAo
-IWlvcmVxLT5yZXEubnJfc2VnbWVudHMpIHsNCj4gICAgICAgICAgICAgIGJyZWFrOw0KPiAgICAg
-ICAgICB9DQo+IC0gICAgICAgIHFlbXVfdmZyZWUoaW9yZXEtPmJ1Zik7DQo+ICAgICAgICAgIGJy
-ZWFrOw0KPiAgICAgIGRlZmF1bHQ6DQo+ICAgICAgICAgIGJyZWFrOw0KPiBAQCAtMzkyLDEyICsz
-OTQsMTAgQEAgc3RhdGljIGludCBpb3JlcV9ydW5pb19xZW11X2FpbyhzdHJ1Y3QgaW9yZXEgKmlv
-cmVxKQ0KPiAgew0KPiAgICAgIHN0cnVjdCBYZW5CbGtEZXYgKmJsa2RldiA9IGlvcmVxLT5ibGtk
-ZXY7DQo+IA0KPiAtICAgIGlvcmVxLT5idWYgPSBxZW11X21lbWFsaWduKFhDX1BBR0VfU0laRSwg
-aW9yZXEtPnNpemUpOw0KPiAgICAgIGlmIChpb3JlcS0+cmVxLm5yX3NlZ21lbnRzICYmDQo+ICAg
-ICAgICAgIChpb3JlcS0+cmVxLm9wZXJhdGlvbiA9PSBCTEtJRl9PUF9XUklURSB8fA0KPiAgICAg
-ICAgICAgaW9yZXEtPnJlcS5vcGVyYXRpb24gPT0gQkxLSUZfT1BfRkxVU0hfRElTS0NBQ0hFKSAm
-Jg0KPiAgICAgICAgICBpb3JlcV9ncmFudF9jb3B5KGlvcmVxKSkgew0KPiAtICAgICAgICBxZW11
-X3ZmcmVlKGlvcmVxLT5idWYpOw0KPiAgICAgICAgICBnb3RvIGVycjsNCj4gICAgICB9DQo+IA0K
-PiBAQCAtOTkwLDYgKzk5MCw3IEBAIHN0YXRpYyBpbnQgYmxrX2ZyZWUoc3RydWN0IFhlbkRldmlj
-ZSAqeGVuZGV2KQ0KPiAgICAgICAgICBpb3JlcSA9IFFMSVNUX0ZJUlNUKCZibGtkZXYtPmZyZWVs
-aXN0KTsNCj4gICAgICAgICAgUUxJU1RfUkVNT1ZFKGlvcmVxLCBsaXN0KTsNCj4gICAgICAgICAg
-cWVtdV9pb3ZlY19kZXN0cm95KCZpb3JlcS0+dik7DQo+ICsgICAgICAgIHFlbXVfdmZyZWUoaW9y
-ZXEtPmJ1Zik7DQo+ICAgICAgICAgIGdfZnJlZShpb3JlcSk7DQo+ICAgICAgfQ0KPiANCg0K
+On 2 November 2018 at 11:14, Mark Cave-Ayland
+<mark.cave-ayland@ilande.co.uk> wrote:
+> On 01/11/2018 16:17, Peter Maydell wrote:
+>
+>> In ppc_core99_init(), we allocate an openpic_irqs array, which
+>> we then use to collect up the various qemu_irqs which we're
+>> going to connect to the interrupt controller. Once we've
+>> called sysbus_connect_irq() to connect them all up, the
+>> array is no longer required, but we forgot to free it.
+>>
+>> Since board init is only run once at startup, the memory
+>> leak is not a significant one.
+>>
+>> Spotted by Coverity: CID 1192916.
+>>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> ---
+>>  hw/ppc/mac_newworld.c | 1 +
+>>  1 file changed, 1 insertion(+)
+>>
+>> diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+>> index a630cb81cd8..14273a123e5 100644
+>> --- a/hw/ppc/mac_newworld.c
+>> +++ b/hw/ppc/mac_newworld.c
+>> @@ -303,6 +303,7 @@ static void ppc_core99_init(MachineState *machine)
+>>              sysbus_connect_irq(s, k++, openpic_irqs[i][j]);
+>>          }
+>>      }
+>> +    g_free(openpic_irqs);
+>>
+>>      if (PPC_INPUT(env) == PPC_FLAGS_INPUT_970) {
+>>          /* 970 gets a U3 bus */
+>>
+>
+> Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>
+> I did notice the generation of this 2D array for the OpenPIC controller whilst
+> converting the Mac machines over to qdev, but wasn't exactly sure what to do here so
+> I left it.
+
+In some sense the array isn't really necessary at all -- instead
+of "fill in array with things; create PIC; sysbus_connect_irq from array"
+you could just do "create PIC; sysbus_connect_irq to things".
+But for this patch I opted to just free the memory rather than
+attempt more complicated refactoring.
+
+thanks
+-- PMM
