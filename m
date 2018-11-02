@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52164)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58445)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gIc0S-0000lm-Mf
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 12:09:09 -0400
+	(envelope-from <mst@redhat.com>) id 1gIcJe-0003oH-5S
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 12:29:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gIc0N-0003Gn-Q1
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 12:09:08 -0400
-Received: from ste-pvt-msa1.bahnhof.se ([213.80.101.70]:13405)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gIc0N-0002uK-AX
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 12:09:03 -0400
-Date: Fri, 2 Nov 2018 17:08:17 +0100
-From: Fredrik Noring <noring@nocrew.org>
-Message-ID: <fa2941ee17c35fba2512ab530bde3a1807d5769e.1541174426.git.noring@nocrew.org>
-References: <cover.1541174426.git.noring@nocrew.org>
+	(envelope-from <mst@redhat.com>) id 1gIcJT-0004ny-E4
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 12:28:52 -0400
+Date: Fri, 2 Nov 2018 12:28:31 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181102122231-mutt-send-email-mst@kernel.org>
+References: <20181024101930.20674-1-david@redhat.com>
+	<20181024101930.20674-3-david@redhat.com>
+	<20181101151034.4eb1618c@redhat.com>
+	<85802555-0f27-847d-22a9-e87ce2e5df55@redhat.com>
+	<20181102140032.43f6c93c@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cover.1541174426.git.noring@nocrew.org>
-Subject: [Qemu-devel] [PATCH 1/2] target/mips: Fix decoding mechanism of
- R5900 MFLO1, MFHI1, MTLO1 and MTHI1
+In-Reply-To: <20181102140032.43f6c93c@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v1 2/7] pcihp: overwrite hotplug handler
+ recursively from the start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,137 +27,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: =?utf-8?Q?J=C3=BCrgen?= Urban <JuergenUrban@gmx.de>, "Maciej W. Rozycki" <macro@linux-mips.org>, qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-ppc@nongnu.org, Libvirt <libvir-list@redhat.com>
 
-MFLO1, MFHI1, MTLO1 and MTHI1 are generated in gen_HILO1_tx79 instead of
-the generic gen_HILO.
+On Fri, Nov 02, 2018 at 02:00:32PM +0100, Igor Mammedov wrote:
+> On Fri, 2 Nov 2018 12:43:10 +0100
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+> > On 01.11.18 15:10, Igor Mammedov wrote:
+> > > On Wed, 24 Oct 2018 12:19:25 +0200
+> > > David Hildenbrand <david@redhat.com> wrote:
+> > >   
+> > >> For now, the hotplug handler is not called for devices that are
+> > >> being cold plugged. The hotplug handler is setup when the machine
+> > >> initialization is fully done. Only bridges that were cold plugged are
+> > >> considered.
+> > >>
+> > >> Set the hotplug handler for the root piix bus directly when realizing.
+> > >> Overwrite the hotplug handler of bridges when hotplugging/coldplugging
+> > >> them.
+> > >>
+> > >> This will now make sure that the ACPI PCI hotplug handler is also called
+> > >> for cold-plugged devices (also on bridges) and for bridges that were
+> > >> hotplugged.
+> > >>
+> > >> When trying to hotplug a device to a hotplugged bridge, we now correctly
+> > >> get the error message
+> > >>  "Unsupported bus. Bus doesn't have property 'acpi-pcihp-bsel' set"
+> > >> Insted of going via the standard PCI hotplug handler.  
+> > > Erroring out is probably not ok, since it can break existing setups
+> > > where SHPC hotplugging to hotplugged bridge was working just fine before.  
+> > 
+> > The question is if it actually was supposed (and eventually did) work.
+> I think it works now, it's QEMU 'ACPI hotplug hack' (which exists for
+> the sake of Windows) limitation. We weren't able to dynamically add
+> ACPI description for hotplugged bridge, so it was using native hotplug.
+> Now theoretically we can load tables dynamically but that, would add
+> maintenance nightmare (versioned tables) and would be harder to debug.
+> I'd rather not go that direction and keep current limited version,
+> suggesting users to use native hotplug if guest is capable.
 
-Signed-off-by: Fredrik Noring <noring@nocrew.org>
----
- target/mips/translate.c | 67 ++++++++++++++++++++++++++++++++++-------
- 1 file changed, 56 insertions(+), 11 deletions(-)
+Well a bunch of tables need to be dynamic, and generating them from ACPI
+isn't a significant step up from generating them in the BIOS which did
+create huge headaches, for many reasons but in particular because we
+need to add custom interfaces for every little thing we are adding.
+By comparison dynamic loading is a single interface and we can
+ship any AML code we want across it.
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 60320cbe69..f3993cf7d7 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -4359,24 +4359,72 @@ static void gen_shift(DisasContext *ctx, uint32_t opc,
-     tcg_temp_free(t1);
- }
- 
-+/* Move to and from TX79 HI1/LO1 registers. */
-+static void gen_HILO1_tx79(DisasContext *ctx, uint32_t opc, int reg)
-+{
-+    if (reg == 0 && (opc == TX79_MMI_MFHI1 || opc == TX79_MMI_MFLO1)) {
-+        /* Treat as NOP. */
-+        return;
-+    }
-+
-+    switch (opc) {
-+    case TX79_MMI_MFHI1:
-+#if defined(TARGET_MIPS64)
-+        tcg_gen_ext32s_tl(cpu_gpr[reg], cpu_HI[1]);
-+#else
-+        tcg_gen_mov_tl(cpu_gpr[reg], cpu_HI[1]);
-+#endif
-+        break;
-+    case TX79_MMI_MFLO1:
-+#if defined(TARGET_MIPS64)
-+        tcg_gen_ext32s_tl(cpu_gpr[reg], cpu_LO[1]);
-+#else
-+        tcg_gen_mov_tl(cpu_gpr[reg], cpu_LO[1]);
-+#endif
-+        break;
-+    case TX79_MMI_MTHI1:
-+        if (reg != 0) {
-+#if defined(TARGET_MIPS64)
-+            tcg_gen_ext32s_tl(cpu_HI[1], cpu_gpr[reg]);
-+#else
-+            tcg_gen_mov_tl(cpu_HI[1], cpu_gpr[reg]);
-+#endif
-+        } else {
-+            tcg_gen_movi_tl(cpu_HI[1], 0);
-+        }
-+        break;
-+    case TX79_MMI_MTLO1:
-+        if (reg != 0) {
-+#if defined(TARGET_MIPS64)
-+            tcg_gen_ext32s_tl(cpu_LO[1], cpu_gpr[reg]);
-+#else
-+            tcg_gen_mov_tl(cpu_LO[1], cpu_gpr[reg]);
-+#endif
-+        } else {
-+            tcg_gen_movi_tl(cpu_LO[1], 0);
-+        }
-+        break;
-+    default:
-+        MIPS_INVAL("MFTHILO TX79");
-+        generate_exception_end(ctx, EXCP_RI);
-+        break;
-+    }
-+}
-+
- /* Arithmetic on HI/LO registers */
- static void gen_HILO(DisasContext *ctx, uint32_t opc, int acc, int reg)
- {
--    if (reg == 0 && (opc == OPC_MFHI || opc == TX79_MMI_MFHI1 ||
--                     opc == OPC_MFLO || opc == TX79_MMI_MFLO1)) {
-+    if (reg == 0 && (opc == OPC_MFHI || opc == OPC_MFLO)) {
-         /* Treat as NOP. */
-         return;
-     }
- 
-     if (acc != 0) {
--        if (!(ctx->insn_flags & INSN_R5900)) {
--            check_dsp(ctx);
--        }
-+        check_dsp(ctx);
-     }
- 
-     switch (opc) {
-     case OPC_MFHI:
--    case TX79_MMI_MFHI1:
- #if defined(TARGET_MIPS64)
-         if (acc != 0) {
-             tcg_gen_ext32s_tl(cpu_gpr[reg], cpu_HI[acc]);
-@@ -4387,7 +4435,6 @@ static void gen_HILO(DisasContext *ctx, uint32_t opc, int acc, int reg)
-         }
-         break;
-     case OPC_MFLO:
--    case TX79_MMI_MFLO1:
- #if defined(TARGET_MIPS64)
-         if (acc != 0) {
-             tcg_gen_ext32s_tl(cpu_gpr[reg], cpu_LO[acc]);
-@@ -4398,7 +4445,6 @@ static void gen_HILO(DisasContext *ctx, uint32_t opc, int acc, int reg)
-         }
-         break;
-     case OPC_MTHI:
--    case TX79_MMI_MTHI1:
-         if (reg != 0) {
- #if defined(TARGET_MIPS64)
-             if (acc != 0) {
-@@ -4413,7 +4459,6 @@ static void gen_HILO(DisasContext *ctx, uint32_t opc, int acc, int reg)
-         }
-         break;
-     case OPC_MTLO:
--    case TX79_MMI_MTLO1:
-         if (reg != 0) {
- #if defined(TARGET_MIPS64)
-             if (acc != 0) {
-@@ -26500,11 +26545,11 @@ static void decode_tx79_mmi(CPUMIPSState *env, DisasContext *ctx)
-         break;
-     case TX79_MMI_MTLO1:
-     case TX79_MMI_MTHI1:
--        gen_HILO(ctx, opc, 1, rs);
-+        gen_HILO1_tx79(ctx, opc, rs);
-         break;
-     case TX79_MMI_MFLO1:
-     case TX79_MMI_MFHI1:
--        gen_HILO(ctx, opc, 1, rd);
-+        gen_HILO1_tx79(ctx, opc, rd);
-         break;
-     case TX79_MMI_MADD:          /* TODO: TX79_MMI_MADD */
-     case TX79_MMI_MADDU:         /* TODO: TX79_MMI_MADDU */
--- 
-2.18.1
+So I'm working on a limited form of dynamic loading with versioning and
+I don't necessarily agree it has to be a nightmare, but yes it does need
+to be limited very carefully. Implementing bridge hotplug there
+isn't in scope for me at this point.
+
+> > If this was the expected behavior (mixing hotplug types), then the
+> > necessary change to this patch would boil down to checking if the bridge
+> > it hot or coldplugged.
+> > 
+> > > 
+> > > Marcel/Michael what's your take on this change in behaviour?
+> > > CCing libvirt in case they are doing this stuff
+> > >   
+> > 
+> > Indeed, it would be nice to know if this was actually supposed to work
+> > like this (coldplugged bridges using ACPI hotplug and hotplugged bridges
+> > using SHPC hotplug).
+> > 
+> > 
