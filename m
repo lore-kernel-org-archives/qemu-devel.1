@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45296)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46390)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gIe0f-00011P-Fz
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 14:17:30 -0400
+	(envelope-from <bounces@canonical.com>) id 1gIe3y-0003aE-IL
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 14:20:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gIe0e-0002eN-EZ
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 14:17:29 -0400
-References: <ae2d0fbd-5198-47e8-9ad2-40a85f0b3576@default>
-	<ad9227ab-bcce-1703-e6aa-a7b14907868b@redhat.com>
-	<e9a68107-ccde-337d-25f2-5636c8a89f19@amazon.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <156d16ca-1e89-1b00-cba4-bfcfc100f9c4@redhat.com>
-Date: Fri, 2 Nov 2018 14:17:10 -0400
+	(envelope-from <bounces@canonical.com>) id 1gIe3v-0004Mp-6e
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 14:20:54 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49554)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gIe3u-0004JN-Tp
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 14:20:51 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gIe3p-00036n-Qu
+	for <qemu-devel@nongnu.org>; Fri, 02 Nov 2018 18:20:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C8D732E80C9
+	for <qemu-devel@nongnu.org>; Fri,  2 Nov 2018 18:20:45 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <e9a68107-ccde-337d-25f2-5636c8a89f19@amazon.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] How to emulate block I/O timeout on qemu side?
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 02 Nov 2018 18:07:09 -0000
+From: John Snow <1800993@bugs.launchpad.net>
+Reply-To: Bug 1800993 <1800993@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154105692385.28446.7851750584865543742.malonedeb@soybean.canonical.com>
+Message-Id: <154118202931.13172.4201937008349332031.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1800993] Re: How to Migration VM Built on Qemu
+ Souce Code Installation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,53 +37,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marc Olson <marcolso@amazon.com>, Dongli Zhang <dongli.zhang@oracle.com>, qemu-devel@nongnu.org
-Cc: Qemu-block <qemu-block@nongnu.org>
+To: qemu-devel@nongnu.org
 
+Hi, this is the bug tracker and not a support request form, so I'm
+closing this issue.
 
+(You've already emailed the mailing list, so you already know where to
+find us!)
 
-On 11/02/2018 01:55 PM, Marc Olson wrote:
-> On 11/2/18 10:49 AM, John Snow wrote:
->> On 11/02/2018 04:11 AM, Dongli Zhang wrote:
->>> Hi,
->>>
->>> Is there any way to emulate I/O timeout on qemu side (not fault
->>> injection in VM
->>> kernel) without modifying qemu source code?
->>>
->>> For instance, I would like to observe/study/debug the I/O timeout
->>> handling of
->>> nvme, scsi, virtio-blk (not supported) of VM kernel.
->>>
->>> Is there a way to trigger this on purpose on qemu side?
->>>
->>> Thank you very much!
->>>
->>> Dongli Zhang
->>>
->> I don't think the blkdebug driver supports arbitrary delays right now.
->> Maybe we could augment it to do so?
->>
->> (I thought someone already had, but maybe it wasn't merged?)
->>
->> Aha, here:
->>
->> https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg05297.html
->> V2: https://lists.gnu.org/archive/html/qemu-devel/2018-09/msg00394.html
->>
->> Let's work from there.
-> 
-> I've got updates to that patch series that fell on the floor due to
-> other competing things. I'll get some screen time this weekend to work
-> on them and submit v3.
-> 
-> /marc
-> 
+Thanks,
+--John
 
-Great! Please CC the usual maintainers, but also include me.
+** Changed in: qemu
+       Status: New =3D> Invalid
 
-In the meantime, Dongli Zhang, why don't you try the v2 patch and see if
-that helps you out for your use case? Report back if it works for you or
-not.
+-- =
 
---js
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1800993
+
+Title:
+  How to Migration VM Built on Qemu Souce Code Installation
+
+Status in QEMU:
+  Invalid
+
+Bug description:
+  Respected all,
+
+  I followed https://wiki.qemu.org/Hosts/Linux to build qemu from source
+  code. Its installed successfully with Ubuntu 16.04 VM created using
+  VNC server.
+
+  Now, Could you please suggest me how to migrate VM from one host to
+  another?.
+
+  Email: adityaform@gmail.com
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1800993/+subscriptions
