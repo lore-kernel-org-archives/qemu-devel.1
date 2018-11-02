@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32859)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gIb7C-0004b5-Tf
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gIb7C-0004b4-Td
 	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:12:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gIb78-0003JS-6z
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gIb77-0003JB-TK
 	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:12:02 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri,  2 Nov 2018 18:11:51 +0300
-Message-Id: <20181102151152.288399-3-vsementsov@virtuozzo.com>
+Date: Fri,  2 Nov 2018 18:11:50 +0300
+Message-Id: <20181102151152.288399-2-vsementsov@virtuozzo.com>
 In-Reply-To: <20181102151152.288399-1-vsementsov@virtuozzo.com>
 References: <20181102151152.288399-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 2/3] nbd: publish _lookup functions
+Subject: [Qemu-devel] [PATCH 1/3] error: add error_get_hint
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,48 +22,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: mdroth@linux.vnet.ibm.com, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, eblake@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-These functions are used for formatting pretty trace points. We are
-going to add some in block/nbd-client, so, let's publish all these
-functions at once. Note, that nbd_reply_type_lookup is already
-published, and constants, "named" by these functions live in
-include/block/nbd.h too.
+Add a function to export error hint - a pair to error_get_pretty. It's
+needed to handle errors by hand, where we can't just report it or
+propagate.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- include/block/nbd.h | 5 +++++
- nbd/nbd-internal.h  | 5 -----
- 2 files changed, 5 insertions(+), 5 deletions(-)
+ include/qapi/error.h | 5 +++++
+ util/error.c         | 5 +++++
+ 2 files changed, 10 insertions(+)
 
-diff --git a/include/block/nbd.h b/include/block/nbd.h
-index 6a5bfe5d55..65402d3396 100644
---- a/include/block/nbd.h
-+++ b/include/block/nbd.h
-@@ -343,5 +343,10 @@ static inline bool nbd_reply_is_structured(NBDReply *reply)
+diff --git a/include/qapi/error.h b/include/qapi/error.h
+index 51b63dd4b5..ff2f61b877 100644
+--- a/include/qapi/error.h
++++ b/include/qapi/error.h
+@@ -139,6 +139,11 @@ typedef enum ErrorClass {
+  */
+ const char *error_get_pretty(const Error *err);
+ 
++/*
++ * Get @err's hint if any. Otherwise return NULL.
++ */
++const char *error_get_hint(const Error *err);
++
+ /*
+  * Get @err's error class.
+  * Note: use of error classes other than ERROR_CLASS_GENERIC_ERROR is
+diff --git a/util/error.c b/util/error.c
+index b5ccbd8eac..e7cedd5c4a 100644
+--- a/util/error.c
++++ b/util/error.c
+@@ -223,6 +223,11 @@ const char *error_get_pretty(const Error *err)
+     return err->msg;
  }
  
- const char *nbd_reply_type_lookup(uint16_t type);
-+const char *nbd_opt_lookup(uint32_t opt);
-+const char *nbd_rep_lookup(uint32_t rep);
-+const char *nbd_info_lookup(uint16_t info);
-+const char *nbd_cmd_lookup(uint16_t info);
-+const char *nbd_err_lookup(int err);
- 
- #endif
-diff --git a/nbd/nbd-internal.h b/nbd/nbd-internal.h
-index eeff78d3c9..f38be9ebaa 100644
---- a/nbd/nbd-internal.h
-+++ b/nbd/nbd-internal.h
-@@ -100,11 +100,6 @@ struct NBDTLSHandshakeData {
- 
- void nbd_tls_handshake(QIOTask *task,
-                        void *opaque);
--const char *nbd_opt_lookup(uint32_t opt);
--const char *nbd_rep_lookup(uint32_t rep);
--const char *nbd_info_lookup(uint16_t info);
--const char *nbd_cmd_lookup(uint16_t info);
--const char *nbd_err_lookup(int err);
- 
- int nbd_drop(QIOChannel *ioc, size_t size, Error **errp);
- 
++const char *error_get_hint(const Error *err)
++{
++    return err->hint ? err->hint->str : NULL;
++}
++
+ void error_report_err(Error *err)
+ {
+     error_report("%s", error_get_pretty(err));
 -- 
 2.18.0
