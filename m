@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41926)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42948)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mail@steffen-goertz.de>) id 1gIbY7-0005DX-QB
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:39:52 -0400
+	(envelope-from <kwolf@redhat.com>) id 1gIbal-00065f-Mx
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:42:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mail@steffen-goertz.de>) id 1gIbY3-0001Hb-W6
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:39:49 -0400
-References: <20181031002526.14262-1-contrib@steffen-goertz.de>
-	<20181031002526.14262-3-contrib@steffen-goertz.de>
-	<93e1b8e1-c8f2-6a61-122a-8354b933782c@mail.ru>
-From: =?UTF-8?Q?Steffen_G=c3=b6rtz?= <mail@steffen-goertz.de>
-Message-ID: <a9a9af81-dbbd-0145-a245-e3c2f50e964c@steffen-goertz.de>
-Date: Fri, 2 Nov 2018 11:39:09 -0400
+	(envelope-from <kwolf@redhat.com>) id 1gIbak-0002uG-M8
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:42:35 -0400
+Date: Fri, 2 Nov 2018 16:42:17 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20181102154217.GJ7521@dhcp-200-186.str.redhat.com>
+References: <1541121763-3277-1-git-send-email-liq3ea@gmail.com>
+	<20181102105421.GC7521@dhcp-200-186.str.redhat.com>
+	<CAKXe6SK6bqfFeRd=DdbVXZ8PAijewoLv-jDhbt2_jmDaTFRv7w@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <93e1b8e1-c8f2-6a61-122a-8354b933782c@mail.ru>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 02/13] arm: Add header to host common
- definition for nRF51 SOC peripherals
+Content-Disposition: inline
+In-Reply-To: <CAKXe6SK6bqfFeRd=DdbVXZ8PAijewoLv-jDhbt2_jmDaTFRv7w@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] nvme: fix oob access issue(CVE-2018-16847)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,18 +25,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Julia Suvorova <jusual@mail.ru>, =?UTF-8?Q?Steffen_G=c3=b6rtz?= <contrib@steffen-goertz.de>, qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Peter Maydell <peter.maydell@linaro.org>, "open list:NRF51" <qemu-arm@nongnu.org>
+To: Li Qiang <liq3ea@gmail.com>
+Cc: keith.busch@intel.com, mreitz@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, P J P <ppandit@redhat.com>, qemu-block@nongnu.org, Qemu Developers <qemu-devel@nongnu.org>
 
-Hi Julia,
+Am 02.11.2018 um 16:22 hat Li Qiang geschrieben:
+> Hello Kevin,
+>=20
+> Kevin Wolf <kwolf@redhat.com> =E4=BA=8E2018=E5=B9=B411=E6=9C=882=E6=97=A5=
+=E5=91=A8=E4=BA=94 =E4=B8=8B=E5=8D=886:54=E5=86=99=E9=81=93=EF=BC=9A
+>=20
+> > Am 02.11.2018 um 02:22 hat Li Qiang geschrieben:
+> > > Currently, the nvme_cmb_ops mr doesn't check the addr and size.
+> > > This can lead an oob access issue. This is triggerable in the guest=
+.
+> > > Add check to avoid this issue.
+> > >
+> > > Fixes CVE-2018-16847.
+> > >
+> > > Reported-by: Li Qiang <liq3ea@gmail.com>
+> > > Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> > > Signed-off-by: Li Qiang <liq3ea@gmail.com>
+> > > ---
+> > >  hw/block/nvme.c | 7 +++++++
+> > >  1 file changed, 7 insertions(+)
+> > >
+> > > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> > > index fc7dacb..d097add 100644
+> > > --- a/hw/block/nvme.c
+> > > +++ b/hw/block/nvme.c
+> > > @@ -1175,6 +1175,10 @@ static void nvme_cmb_write(void *opaque, hwa=
+ddr
+> > addr, uint64_t data,
+> > >      unsigned size)
+> > >  {
+> > >      NvmeCtrl *n =3D (NvmeCtrl *)opaque;
+> > > +
+> > > +    if (addr + size > NVME_CMBSZ_GETSIZE(n->bar.cmbsz)) {
+> >
+> > What prevents a guest from moving the device to the end of the addres=
+s
+> > space and causing an integer overflow in addr + size?
+> >
+> >
+> This can't happen as the addr can't be any value, it just can be in the
+> Memory Region n->ctrl_mem defines.
 
-> Why do we need an extra file for this? nrf51_soc.h seemed like a good fit.
+Yes, but can't the guest map that memory region whereever it wants?
 
-nrf51_soc.h is not included in the peripheral devices. It would be possible to put the definitions into nrf51_soc.h but i just did not want to mix up the dependency directions. 
+(As Keith confirmed, the integer overflow doesn't seem to have any bad
+consequences here, but anyway.)
 
-> What's the purpose of renaming?
-
-To avoid name conflicts down the road.
-
-Cheers,
-Steffen
+Kevin
