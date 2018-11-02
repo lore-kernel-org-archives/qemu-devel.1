@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55075)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1gITFT-0003SK-MB
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 02:48:05 -0400
+	(envelope-from <famz@redhat.com>) id 1gITG9-0004He-IJ
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 02:48:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1gITFR-0002s0-OJ
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 02:48:03 -0400
-Date: Fri, 2 Nov 2018 14:47:47 +0800
+	(envelope-from <famz@redhat.com>) id 1gITG3-0003Dn-7U
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 02:48:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52534)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1gITG1-0003Bo-8t
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 02:48:37 -0400
+Date: Fri, 2 Nov 2018 14:48:29 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20181102064747.GA21032@magic>
-References: <20181101103807.25862-1-lifeng1519@gmail.com>
+Message-ID: <20181102064829.GB21032@magic>
+References: <20181101183705.5422-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20181101103807.25862-1-lifeng1519@gmail.com>
+In-Reply-To: <20181101183705.5422-1-philmd@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] block/nvme: optimize the performance of
- nvme driver based on vfio-pci
+Subject: Re: [Qemu-devel] [PATCH] docker: Use a stable snapshot for Debian
+ Sid
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,92 +28,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Feng <lifeng1519@gmail.com>
-Cc: fengli@smartx.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:NVMe Block Driver" <qemu-block@nongnu.org>, "open list:All patches CC here" <qemu-devel@nongnu.org>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
 
-On Thu, 11/01 18:38, Li Feng wrote:
-> When the IO size is larger than 2 pages, we move the the pointer one by
-> one in the pagelist, this is inefficient.
+On Thu, 11/01 19:37, Philippe Mathieu-Daud=E9 wrote:
+> The Debian Sid repository is not garanteed to be stable, as his
+> 'unstable' name suggest :)
+> To allow quick testing, packages are pushed various time a day,
+> which my be annoying when trying to use it for stable development
+> (which is not recommended, but Sid provides edge packages we use
+> for testing).
 >=20
-> This is a simple benchmark result:
+> Debian provides repositories snapshots which are suitable for our
+> use. Pick a recent date that works. When required, update to newer
+> releases will be easy.
 >=20
-> Before:
-> $ qemu-io -c 'write 0 1G' nvme://0000:00:04.0/1
+> This fixes current issues with this image:
 >=20
-> wrote 1073741824/1073741824 bytes at offset 0
-> 1 GiB, 1 ops; 0:00:02.41 (424.504 MiB/sec and 0.4146 ops/sec)
+>   $ make docker-image-debian-sid
+>   [...]
+>   The following packages have unmet dependencies:
+>    build-essential : Depends: dpkg-dev (>=3D 1.17.11) but it is not goi=
+ng to be installed
+>    git : Depends: perl but it is not going to be installed
+>          Depends: liberror-perl but it is not going to be installed
+>    pkg-config : Depends: libdpkg-perl but it is not going to be install=
+ed
+>    texinfo : Depends: perl (>=3D 5.26.2-6) but it is not going to be in=
+stalled
+>              Depends: libtext-unidecode-perl but it is not going to be =
+installed
+>              Depends: libxml-libxml-perl but it is not going to be inst=
+alled
+>   E: Unable to correct problems, you have held broken packages.
 >=20
->  $ qemu-io -c 'read 0 1G' nvme://0000:00:04.0/1
->=20
-> read 1073741824/1073741824 bytes at offset 0
-> 1 GiB, 1 ops; 0:00:02.03 (503.055 MiB/sec and 0.4913 ops/sec)
->=20
-> After:
-> $ qemu-io -c 'write 0 1G' nvme://0000:00:04.0/1
->=20
-> wrote 1073741824/1073741824 bytes at offset 0
-> 1 GiB, 1 ops; 0:00:02.17 (471.517 MiB/sec and 0.4605 ops/sec)
->=20
->  $ qemu-io -c 'read 0 1G' nvme://0000:00:04.0/1                        =
-                                                                         =
-                                                                         =
-                                                                         =
-                   1 =E2=86=B5
->=20
-> read 1073741824/1073741824 bytes at offset 0
-> 1 GiB, 1 ops; 0:00:01.94 (526.770 MiB/sec and 0.5144 ops/sec)
->=20
-> Signed-off-by: Li Feng <lifeng1519@gmail.com>
+> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 > ---
->  block/nvme.c | 16 ++++++----------
->  1 file changed, 6 insertions(+), 10 deletions(-)
+>  tests/docker/dockerfiles/debian-sid.docker | 4 ++++
+>  1 file changed, 4 insertions(+)
 >=20
-> diff --git a/block/nvme.c b/block/nvme.c
-> index 29294038fc..982097b5b1 100644
-> --- a/block/nvme.c
-> +++ b/block/nvme.c
-> @@ -837,7 +837,7 @@ try_map:
->          }
+> diff --git a/tests/docker/dockerfiles/debian-sid.docker b/tests/docker/=
+dockerfiles/debian-sid.docker
+> index 9a3d168705..4e4cda0ba5 100644
+> --- a/tests/docker/dockerfiles/debian-sid.docker
+> +++ b/tests/docker/dockerfiles/debian-sid.docker
+> @@ -13,6 +13,10 @@
 > =20
->          for (j =3D 0; j < qiov->iov[i].iov_len / s->page_size; j++) {
-> -            pagelist[entries++] =3D iova + j * s->page_size;
-> +            pagelist[entries++] =3D cpu_to_le64(iova + j * s->page_siz=
-e);
->          }
->          trace_nvme_cmd_map_qiov_iov(s, i, qiov->iov[i].iov_base,
->                                      qiov->iov[i].iov_len / s->page_siz=
-e);
-> @@ -850,20 +850,16 @@ try_map:
->      case 0:
->          abort();
->      case 1:
-> -        cmd->prp1 =3D cpu_to_le64(pagelist[0]);
-> +        cmd->prp1 =3D pagelist[0];
->          cmd->prp2 =3D 0;
->          break;
->      case 2:
-> -        cmd->prp1 =3D cpu_to_le64(pagelist[0]);
-> -        cmd->prp2 =3D cpu_to_le64(pagelist[1]);;
-> +        cmd->prp1 =3D pagelist[0];
-> +        cmd->prp2 =3D pagelist[1];
->          break;
->      default:
-> -        cmd->prp1 =3D cpu_to_le64(pagelist[0]);
-> -        cmd->prp2 =3D cpu_to_le64(req->prp_list_iova);
-> -        for (i =3D 0; i < entries - 1; ++i) {
-> -            pagelist[i] =3D cpu_to_le64(pagelist[i + 1]);
-> -        }
-> -        pagelist[entries - 1] =3D 0;
-> +        cmd->prp1 =3D pagelist[0];
-> +        cmd->prp2 =3D cpu_to_le64(req->prp_list_iova + sizeof(uint64_t=
-));
->          break;
->      }
->      trace_nvme_cmd_map_qiov(s, cmd, req, qiov, entries);
+>  FROM debian:sid-slim
+> =20
+> +# Use a snapshot known to work (see http://snapshot.debian.org/#Usage)
+> +ENV DEBIAN_SNAPSHOT_DATE "20181030"
+> +RUN sed -i "s%^deb \(https\?://\)deb.debian.org/debian/\? \(.*\)%deb [=
+check-valid-until=3Dno] \1snapshot.debian.org/archive/debian/${DEBIAN_SNA=
+PSHOT_DATE} \2%" /etc/apt/sources.list
+> +
+>  # Duplicate deb line as deb-src
+>  RUN cat /etc/apt/sources.list | sed "s/^deb\ /deb-src /" >> /etc/apt/s=
+ources.list
+> =20
 > --=20
-> 2.11.0
+> 2.17.2
 >=20
 
-Nice! Thanks. I've queued the patch.
+Queued, thanks!
 
 Fam
