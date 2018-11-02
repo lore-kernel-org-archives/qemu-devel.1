@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60618)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gIW6J-0004og-LQ
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 05:50:48 -0400
+	(envelope-from <zhangckid@gmail.com>) id 1gIW98-0006es-Ms
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 05:53:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gIW6H-0002bG-0f
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 05:50:47 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:52321)
+	(envelope-from <zhangckid@gmail.com>) id 1gIW95-0005WD-BE
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 05:53:42 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35014)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gIW69-0002Qr-7E
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 05:50:39 -0400
-Received: by mail-wm1-x342.google.com with SMTP id q19-v6so1412505wmc.2
-	for <qemu-devel@nongnu.org>; Fri, 02 Nov 2018 02:50:32 -0700 (PDT)
-References: <20181101215739.29788-1-richard.henderson@linaro.org>
-	<CAFEAcA_HrcAfHaLW+hT0btN6C=GZv7VYWmhz3ri-QSL9ySZ0qg@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <72f81077-d400-31b5-0e6f-fb59a4bbae53@linaro.org>
-Date: Fri, 2 Nov 2018 09:50:28 +0000
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1gIW93-0005Up-AK
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 05:53:38 -0400
+Received: by mail-wr1-x442.google.com with SMTP id z16-v6so1353801wrv.2
+	for <qemu-devel@nongnu.org>; Fri, 02 Nov 2018 02:53:36 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_HrcAfHaLW+hT0btN6C=GZv7VYWmhz3ri-QSL9ySZ0qg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target/arm: Conditionalize arm_div assert
- on aarch32 support
+References: <1536163920-2443-1-git-send-email-zhangckid@gmail.com>
+	<CAK3tnvK6T8fxdAmtFuB9o7Gc8oyFYuDEsCn_mv-+V7uyf3cQFw@mail.gmail.com>
+In-Reply-To: <CAK3tnvK6T8fxdAmtFuB9o7Gc8oyFYuDEsCn_mv-+V7uyf3cQFw@mail.gmail.com>
+From: Zhang Chen <zhangckid@gmail.com>
+Date: Fri, 2 Nov 2018 17:53:22 +0800
+Message-ID: <CAK3tnvKtrcMSyYZS_U61XNqq7dKX3bwYkyzY9fGBLQA2p2qrXw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] docs/block-replication.txt: Add more
+ detail about replication_do_checkpoint_all
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,22 +29,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org, Wen Congyang <wencongyang2@huawei.com>, Xie Changlong <xiechanglong.d@gmail.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On 11/2/18 9:48 AM, Peter Maydell wrote:
->> +static inline bool isar_feature_aa64_a32(const ARMISARegisters *id)
->> +{
->> +    return FIELD_EX64(id->id_aa64pfr0, ID_AA64PFR0, EL0) == 2;
->> +}
->> +
-> 
-> Doesn't the stuff in the Arm ARM's "Principles of the ID
-> scheme for fields in ID registers" about signed and unsigned
-> values for ID register fields strictly mean you want to be
-> testing (unsigned) >= 2 here rather than strict equality?
+Hi All,
 
-Yes.  Will fix.
+Maybe we have forgot this patch? Ping again.
 
+Related discussion:
+https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg03352.html
 
-r~
+Thanks
+Zhang Chen
+
+On Fri, Sep 14, 2018 at 2:32 PM Zhang Chen <zhangckid@gmail.com> wrote:
+
+> Hi All,
+>
+> No news update?
+> Ping...
+>
+> Thanks
+> Zhang Chen
+>
+> On Thu, Sep 6, 2018 at 12:12 AM Zhang Chen <zhangckid@gmail.com> wrote:
+>
+>> Add more detail description for COLO checkpoint use case.
+>> Suggested by Dr. David Alan Gilbert <dgilbert@redhat.com>
+>>
+>> Signed-off-by: Zhang Chen <zhangckid@gmail.com>
+>> ---
+>>  docs/block-replication.txt | 7 ++++---
+>>  1 file changed, 4 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/docs/block-replication.txt b/docs/block-replication.txt
+>> index 6bde6737fb..b6c5e94764 100644
+>> --- a/docs/block-replication.txt
+>> +++ b/docs/block-replication.txt
+>> @@ -131,9 +131,10 @@ a. replication_start_all()
+>>     thread.
+>>  b. replication_do_checkpoint_all()
+>>     This interface is called after all VM state is transferred to
+>> -   Secondary QEMU. The Disk buffer will be dropped in this interface.
+>> -   The caller must hold the I/O mutex lock if it is in
+>> migration/checkpoint
+>> -   thread.
+>> +   secondary node, and in primary node this interface no need to
+>> +   called after synchronizing all the states. The Disk buffer will be
+>> dropped
+>> +   in this interface. The caller must hold the I/O mutex lock if it is
+>> +   in migration/checkpoint thread.
+>>  c. replication_get_error_all()
+>>     This interface is called to check if error happened in replication.
+>>     The caller must hold the I/O mutex lock if it is in
+>> migration/checkpoint
+>> --
+>> 2.17.GIT
+>>
+>>
