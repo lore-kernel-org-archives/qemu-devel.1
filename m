@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59134)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59244)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gIayR-0008S3-18
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:02:59 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1gIazF-0000jv-HG
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:03:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gIayQ-0006rS-1z
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:02:58 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:45088)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gIayP-0006rF-SS
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:02:57 -0400
-Received: by mail-oi1-x242.google.com with SMTP id p144-v6so1791077oic.12
-	for <qemu-devel@nongnu.org>; Fri, 02 Nov 2018 08:02:57 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20181031002526.14262-9-contrib@steffen-goertz.de>
-References: <20181031002526.14262-1-contrib@steffen-goertz.de>
-	<20181031002526.14262-9-contrib@steffen-goertz.de>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 2 Nov 2018 15:02:36 +0000
-Message-ID: <CAFEAcA_0GzLviMx_ExqwFUkW5PPFvOCTbZhw4tOJKU4pU1qMSg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	(envelope-from <amarkovic@wavecomp.com>) id 1gIazB-00075A-Gk
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:03:49 -0400
+Received: from mail-co1nam04on0725.outbound.protection.outlook.com
+	([2a01:111:f400:fe4d::725]:19166
+	helo=NAM04-CO1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1gIaz1-00070d-9Y
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:03:38 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Fri, 2 Nov 2018 15:03:23 +0000
+Message-ID: <BN6PR2201MB12515D71ED36B637045DA6D2C6CF0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <BN6PR2201MB125116B5479010DB326DCCFCC6CE0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	<51a26700-5da5-0a15-0e0e-6405ce5e65d4@redhat.com>
+	<20181101172353.GA2316@sx9>
+	<BN6PR2201MB12512B92322BFB8965848215C6CF0@BN6PR2201MB1251.namprd22.prod.outlook.com>,
+	<20181102143119.GA2274@sx9>
+In-Reply-To: <20181102143119.GA2274@sx9>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 08/13] hw/gpio/nrf51_gpio: Add nRF51
- GPIO peripheral
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] Correction needed for R5900 instruction decoding
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,55 +34,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Steffen_G=C3=B6rtz?= <contrib@steffen-goertz.de>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>
+To: Fredrik Noring <noring@nocrew.org>
+Cc: =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>, "Emilio G.
+	Cota" <cota@braap.org>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, "Maciej W. Rozycki" <macro@linux-mips.org>, =?iso-8859-1?Q?J=FCrgen_Urban?= <JuergenUrban@gmx.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On 31 October 2018 at 00:25, Steffen G=C3=B6rtz <contrib@steffen-goertz.de>=
- wrote:
-> This adds a model of the nRF51 GPIO peripheral.
->
-> Reference Manual: http://infocenter.nordicsemi.com/pdf/nRF51_RM_v3.0.pdf
->
-> The nRF51 series microcontrollers support up to 32 GPIO pins in various c=
-onfigurations.
-> The pins can be used as input pins with pull-ups or pull-down.
-> Furthermore, three different output driver modes per level are
-> available (disconnected, standard, high-current).
->
-> The GPIO-Peripheral has a mechanism for detecting level changes which is
-> not featured in this model.
->
-> Signed-off-by: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
+Hi, Fredrik.
 
-> +
-> +static void update_state(NRF51GPIOState *s)
-> +{
-> +    uint32_t pull;
-> +    bool connected_out, dir, connected_in, out, input;
-> +
-> +    for (size_t i =3D 0; i < NRF51_GPIO_PINS; i++) {
+> From: Fredrik Noring <noring@nocrew.org>
+> Subject: Re: [Qemu-devel] Correction needed for R5900 instruction decodin=
+g
+>=20
+> Hi Aleksandar,
+>=20
+> > It is now code freeze before 3.1, the code base is being stabilized, an=
+d
+> > only important fixes are allowed to be integrated - so, in that light, =
+a
+> > separate patch, or a small series, that addresses only concerns from th=
+e
+> > original mail of this thread is needed. Such series should not contain =
+any
+> > additional features (like your v2 of the series "Amend..." does), and i=
+ts
+> > patch titles should look like "Fix decoding mechanism of ..." or such.
+> >
+> > Could you please provide those appropriate changes in that format?
+>=20
+> I certainly could, but why not simply apply patch 1 and 2 in the posted
+> v2 series and leave the rest for later?
 
-Hi. This style of declaring the loop variable inside the for()
-is not supported by all our compilers, and it's generating
-compile warnings (you can see that patchew is mailing you the
-logs for these as followups to your cover letter):
+How do you know patches 1 and 2 will and should be applied? You jump to con=
+clusions. Also, a basic rule while analyzing problems and their solutions i=
+s to avoid and omit irrelevant parts.
 
-/tmp/qemu-test/src/hw/gpio/nrf51_gpio.c:64:5: error: 'for' loop
-initial declarations are only allowed in C99 mode
-     for (size_t i =3D 0; i < NRF51_GPIO_PINS; i++) {
-     ^
+> The only difference in a repost would be the cover letter.
 
+Not true, I asked for different titles, and I may ask for something else - =
+a lot of things can change. For example, I think a separate decode_opc_spec=
+ial_legacy() for R5900 is needed, I don't see that in your series.
 
-> +static void reflect_dir_bit_in_cnf(NRF51GPIOState *s)
-> +{
-> +    uint32_t value =3D s->dir;
-> +    for (size_t i =3D 0; i < NRF51_GPIO_PINS; i++) {
+Thanks,
+Aleksandar
 
-Similarly here, and I think I saw another use somewhere else
-in this patchset too.
-
-
-thanks
--- PMM
+> The two patches would be identical reposts that apply since yesterday.
+>=20
+> The patch series is ordered with "crucial patches as the first ones",
+> as you wanted it according to:
+>=20
+> http://lists.nongnu.org/archive/html/qemu-devel/2018-10/msg04946.html
+>=20
+> Fredrik
