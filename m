@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56714)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gIaqX-0002Ft-Ap
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 10:54:50 -0400
+	(envelope-from <keith.busch@intel.com>) id 1gIayC-0008Ls-89
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:02:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gIaqW-0003Ip-0G
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 10:54:49 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53716)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gIaqV-0003F2-NT
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 10:54:47 -0400
-Received: by mail-wm1-x341.google.com with SMTP id v24-v6so2237479wmh.3
-	for <qemu-devel@nongnu.org>; Fri, 02 Nov 2018 07:54:41 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri,  2 Nov 2018 14:54:30 +0000
-Message-Id: <20181102145433.4553-3-richard.henderson@linaro.org>
-In-Reply-To: <20181102145433.4553-1-richard.henderson@linaro.org>
-References: <20181102145433.4553-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 2/5] target/arm: Fill in ARMISARegisters for
- kvm64
+	(envelope-from <keith.busch@intel.com>) id 1gIayB-0006mo-BS
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:02:44 -0400
+Date: Fri, 2 Nov 2018 09:00:04 -0600
+From: Keith Busch <keith.busch@intel.com>
+Message-ID: <20181102150004.GD24372@localhost.localdomain>
+References: <1541121763-3277-1-git-send-email-liq3ea@gmail.com>
+	<20181102105421.GC7521@dhcp-200-186.str.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181102105421.GC7521@dhcp-200-186.str.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] nvme: fix oob access issue(CVE-2018-16847)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,111 +23,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Li Qiang <liq3ea@gmail.com>, mreitz@redhat.com, pbonzini@redhat.com, ppandit@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/kvm64.c | 69 ++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 67 insertions(+), 2 deletions(-)
+On Fri, Nov 02, 2018 at 11:54:21AM +0100, Kevin Wolf wrote:
+> Am 02.11.2018 um 02:22 hat Li Qiang geschrieben:
+> > Currently, the nvme_cmb_ops mr doesn't check the addr and size.
+> > This can lead an oob access issue. This is triggerable in the guest.
+> > Add check to avoid this issue.
+> > 
+> > Fixes CVE-2018-16847.
+> > 
+> > Reported-by: Li Qiang <liq3ea@gmail.com>
+> > Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> > Signed-off-by: Li Qiang <liq3ea@gmail.com>
+> > ---
+> >  hw/block/nvme.c | 7 +++++++
+> >  1 file changed, 7 insertions(+)
+> > 
+> > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> > index fc7dacb..d097add 100644
+> > --- a/hw/block/nvme.c
+> > +++ b/hw/block/nvme.c
+> > @@ -1175,6 +1175,10 @@ static void nvme_cmb_write(void *opaque, hwaddr addr, uint64_t data,
+> >      unsigned size)
+> >  {
+> >      NvmeCtrl *n = (NvmeCtrl *)opaque;
+> > +
+> > +    if (addr + size > NVME_CMBSZ_GETSIZE(n->bar.cmbsz)) {
+> 
+> What prevents a guest from moving the device to the end of the address
+> space and causing an integer overflow in addr + size?
+> 
+> If this happens, we still have .max_access_size = 8. The next question is
+> then, is NVME_CMBSZ_GETSIZE guaranteed to be at least 8? I suppose yes,
+> but do we want to rely on this for security?
+> 
+> Kevin
 
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index 5de8ff0ac5..d4d4e63140 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -443,17 +443,40 @@ static inline void unset_feature(uint64_t *features, int feature)
-     *features &= ~(1ULL << feature);
- }
- 
-+static int read_sys_reg32(int fd, uint32_t *pret, uint64_t id)
-+{
-+    uint64_t ret;
-+    struct kvm_one_reg idreg = { .id = id, .addr = (uintptr_t)&ret };
-+    int err;
-+
-+    assert((id & KVM_REG_SIZE_MASK) == KVM_REG_SIZE_U64);
-+    err = ioctl(fd, KVM_GET_ONE_REG, &idreg);
-+    if (err < 0) {
-+        return -1;
-+    }
-+    *pret = ret;
-+    return 0;
-+}
-+
-+static int read_sys_reg64(int fd, uint64_t *pret, uint64_t id)
-+{
-+    struct kvm_one_reg idreg = { .id = id, .addr = (uintptr_t)pret };
-+
-+    assert((id & KVM_REG_SIZE_MASK) == KVM_REG_SIZE_U64);
-+    return ioctl(fd, KVM_GET_ONE_REG, &idreg);
-+}
-+
- bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
- {
-     /* Identify the feature bits corresponding to the host CPU, and
-      * fill out the ARMHostCPUClass fields accordingly. To do this
-      * we have to create a scratch VM, create a single CPU inside it,
-      * and then query that CPU for the relevant ID registers.
--     * For AArch64 we currently don't care about ID registers at
--     * all; we just want to know the CPU type.
-      */
-     int fdarray[3];
-     uint64_t features = 0;
-+    int err = 0;
-+
-     /* Old kernels may not know about the PREFERRED_TARGET ioctl: however
-      * we know these will only support creating one kind of guest CPU,
-      * which is its preferred CPU type. Fortunately these old kernels
-@@ -474,8 +497,50 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
-     ahcf->target = init.target;
-     ahcf->dtb_compatible = "arm,arm-v8";
- 
-+    err |= read_sys_reg64(fdarray[2], &ahcf->isar.id_aa64isar0,
-+                          ARM64_SYS_REG(3, 0, 0, 6, 0));
-+    err |= read_sys_reg64(fdarray[2], &ahcf->isar.id_aa64isar1,
-+                          ARM64_SYS_REG(3, 0, 0, 6, 1));
-+    err |= read_sys_reg64(fdarray[2], &ahcf->isar.id_aa64pfr0,
-+                          ARM64_SYS_REG(3, 0, 0, 4, 0));
-+    err |= read_sys_reg64(fdarray[2], &ahcf->isar.id_aa64pfr1,
-+                          ARM64_SYS_REG(3, 0, 0, 4, 1));
-+
-+    /*
-+     * Note that if AArch32 support is not present in the host,
-+     * the AArch32 sysregs are present to be read, but will
-+     * return UNKNOWN values.  This is neither better nor worse
-+     * than skipping the reads and leaving 0, as we must avoid
-+     * considering the values in every case.
-+     */
-+    err |= read_sys_reg32(fdarray[2], &ahcf->isar.id_isar0,
-+                          ARM64_SYS_REG(3, 0, 0, 2, 0));
-+    err |= read_sys_reg32(fdarray[2], &ahcf->isar.id_isar1,
-+                          ARM64_SYS_REG(3, 0, 0, 2, 1));
-+    err |= read_sys_reg32(fdarray[2], &ahcf->isar.id_isar2,
-+                          ARM64_SYS_REG(3, 0, 0, 2, 2));
-+    err |= read_sys_reg32(fdarray[2], &ahcf->isar.id_isar3,
-+                          ARM64_SYS_REG(3, 0, 0, 2, 3));
-+    err |= read_sys_reg32(fdarray[2], &ahcf->isar.id_isar4,
-+                          ARM64_SYS_REG(3, 0, 0, 2, 4));
-+    err |= read_sys_reg32(fdarray[2], &ahcf->isar.id_isar5,
-+                          ARM64_SYS_REG(3, 0, 0, 2, 5));
-+    err |= read_sys_reg32(fdarray[2], &ahcf->isar.id_isar6,
-+                          ARM64_SYS_REG(3, 0, 0, 2, 7));
-+
-+    err |= read_sys_reg32(fdarray[2], &ahcf->isar.mvfr0,
-+                          ARM64_SYS_REG(3, 0, 0, 3, 0));
-+    err |= read_sys_reg32(fdarray[2], &ahcf->isar.mvfr1,
-+                          ARM64_SYS_REG(3, 0, 0, 3, 1));
-+    err |= read_sys_reg32(fdarray[2], &ahcf->isar.mvfr2,
-+                          ARM64_SYS_REG(3, 0, 0, 3, 2));
-+
-     kvm_arm_destroy_scratch_host_vcpu(fdarray);
- 
-+    if (err < 0) {
-+        return false;
-+    }
-+
-    /* We can assume any KVM supporting CPU is at least a v8
-      * with VFPv4+Neon; this in turn implies most of the other
-      * feature bits.
--- 
-2.17.2
+The nvme spec at least doesn't allow a way to express a CMB that isn't
+at a minimum 4k aligned and sized, so 8 byte access should always be
+within the boundary.
