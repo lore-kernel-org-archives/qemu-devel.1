@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35722)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gIbIR-0005OK-EM
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gIbIS-0005PV-V0
 	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:23:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gIbIK-0000ct-NI
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:23:35 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gIbIO-0000eR-Qu
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:23:40 -0400
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Fri,  2 Nov 2018 15:22:49 +0000
-Message-Id: <20181102152257.20637-3-mark.cave-ayland@ilande.co.uk>
+Date: Fri,  2 Nov 2018 15:22:50 +0000
+Message-Id: <20181102152257.20637-4-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <20181102152257.20637-1-mark.cave-ayland@ilande.co.uk>
 References: <20181102152257.20637-1-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v6 02/10] hw/m68k: implement ADB bus support
- for via
+Subject: [Qemu-devel] [PATCH v6 03/10] escc: introduce a selector for the
+ register bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,265 +27,113 @@ To: qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.
 
 From: Laurent Vivier <laurent@vivier.eu>
 
-Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+On Sparc and PowerMac, the bit 0 of the address
+selects the register type (control or data) and
+bit 1 selects the channel (B or A).
+
+On m68k Macintosh, the bit 0 selects the channel and
+bit 1 the register type.
+
+This patch introduces a new parameter (bit_swap) to
+the device interface to indicate bits usage must
+be swapped between registers and channels.
+
+For the moment all the machines use the bit 0,
+but this change will be needed to emulate Quadra 800.
+
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
 ---
- hw/misc/mac_via.c         | 190 ++++++++++++++++++++++++++++++++++++++++++++++
- include/hw/misc/mac_via.h |   7 ++
- 2 files changed, 197 insertions(+)
+ hw/char/escc.c         | 30 ++++++++++++++++++++++++------
+ include/hw/char/escc.h |  1 +
+ 2 files changed, 25 insertions(+), 6 deletions(-)
 
-diff --git a/hw/misc/mac_via.c b/hw/misc/mac_via.c
-index d6d6b86e1a..0fc8d0a038 100644
---- a/hw/misc/mac_via.c
-+++ b/hw/misc/mac_via.c
-@@ -237,10 +237,16 @@
-  * Table 19-10 ADB transaction states
+diff --git a/hw/char/escc.c b/hw/char/escc.c
+index 628f5f81f7..cec75b06f9 100644
+--- a/hw/char/escc.c
++++ b/hw/char/escc.c
+@@ -42,14 +42,21 @@
+  * mouse and keyboard ports don't implement all functions and they are
+  * only asynchronous. There is no DMA.
+  *
+- * Z85C30 is also used on PowerMacs. There are some small differences
+- * between Sparc version (sunzilog) and PowerMac (pmac):
++ * Z85C30 is also used on PowerMacs and m68k Macs.
++ *
++ * There are some small differences between Sparc version (sunzilog)
++ * and PowerMac (pmac):
+  *  Offset between control and data registers
+  *  There is some kind of lockup bug, but we can ignore it
+  *  CTS is inverted
+  *  DMA on pmac using DBDMA chip
+  *  pmac can do IRDA and faster rates, sunzilog can only do 38400
+  *  pmac baud rate generator clock is 3.6864 MHz, sunzilog 4.9152 MHz
++ *
++ * Linux driver for m68k Macs is the same as for PowerMac (pmac_zilog),
++ * but registers are grouped by type and not by channel:
++ * channel is selected by bit 0 of the address (instead of bit 1)
++ * and register is selected by bit 1 of the address (instead of bit 0).
   */
  
-+#define ADB_STATE_NEW       0
-+#define ADB_STATE_EVEN      1
-+#define ADB_STATE_ODD       2
-+#define ADB_STATE_IDLE      3
-+
- #define VIA1B_vADB_StateMask    (VIA1B_vADBS1 | VIA1B_vADBS2)
- #define VIA1B_vADB_StateShift   4
+ /*
+@@ -169,6 +176,16 @@ static void handle_kbd_command(ESCCChannelState *s, int val);
+ static int serial_can_receive(void *opaque);
+ static void serial_receive_byte(ESCCChannelState *s, int ch);
  
- #define VIA_TIMER_FREQ (783360)
-+#define VIA_ADB_POLL_FREQ 50 /* XXX: not real */
- 
- /* VIA returns time offset from Jan 1, 1904, not 1970 */
- #define RTC_OFFSET 2082844800
-@@ -422,6 +428,181 @@ static void via1_rtc_update(MacVIAState *m)
-     }
- }
- 
-+static int adb_via_poll(MacVIAState *s, int state, uint8_t *data)
++static int reg_shift(ESCCState *s)
 +{
-+    if (state != ADB_STATE_IDLE) {
-+        return 0;
-+    }
-+
-+    if (s->adb_data_in_size < s->adb_data_in_index) {
-+        return 0;
-+    }
-+
-+    if (s->adb_data_out_index != 0) {
-+        return 0;
-+    }
-+
-+    s->adb_data_in_index = 0;
-+    s->adb_data_out_index = 0;
-+    s->adb_data_in_size = adb_poll(&s->adb_bus, s->adb_data_in, 0xffff);
-+
-+    if (s->adb_data_in_size) {
-+        *data = s->adb_data_in[s->adb_data_in_index++];
-+        qemu_irq_raise(s->adb_data_ready);
-+    }
-+
-+    return s->adb_data_in_size;
++    return s->bit_swap ? s->it_shift + 1 : s->it_shift;
 +}
 +
-+static int adb_via_send(MacVIAState *s, int state, uint8_t data)
++static int chn_shift(ESCCState *s)
 +{
-+    switch (state) {
-+    case ADB_STATE_NEW:
-+        s->adb_data_out_index = 0;
-+        break;
-+    case ADB_STATE_EVEN:
-+        if ((s->adb_data_out_index & 1) == 0) {
-+            return 0;
-+        }
-+        break;
-+    case ADB_STATE_ODD:
-+        if (s->adb_data_out_index & 1) {
-+            return 0;
-+        }
-+        break;
-+    case ADB_STATE_IDLE:
-+        return 0;
-+    }
-+
-+    assert(s->adb_data_out_index < sizeof(s->adb_data_out) - 1);
-+
-+    s->adb_data_out[s->adb_data_out_index++] = data;
-+    qemu_irq_raise(s->adb_data_ready);
-+    return 1;
++    return s->bit_swap ? s->it_shift : s->it_shift + 1;
 +}
 +
-+static int adb_via_receive(MacVIAState *s, int state, uint8_t *data)
-+{
-+    switch (state) {
-+    case ADB_STATE_NEW:
-+        return 0;
-+
-+    case ADB_STATE_EVEN:
-+        if (s->adb_data_in_size <= 0) {
-+            qemu_irq_raise(s->adb_data_ready);
-+            return 0;
-+        }
-+
-+        if (s->adb_data_in_index >= s->adb_data_in_size) {
-+            *data = 0;
-+            qemu_irq_raise(s->adb_data_ready);
-+            return 1;
-+        }
-+
-+        if ((s->adb_data_in_index & 1) == 0) {
-+            return 0;
-+        }
-+
-+        break;
-+
-+    case ADB_STATE_ODD:
-+        if (s->adb_data_in_size <= 0) {
-+            qemu_irq_raise(s->adb_data_ready);
-+            return 0;
-+        }
-+
-+        if (s->adb_data_in_index >= s->adb_data_in_size) {
-+            *data = 0;
-+            qemu_irq_raise(s->adb_data_ready);
-+            return 1;
-+        }
-+
-+        if (s->adb_data_in_index & 1) {
-+            return 0;
-+        }
-+
-+        break;
-+
-+    case ADB_STATE_IDLE:
-+        if (s->adb_data_out_index == 0) {
-+            return 0;
-+        }
-+
-+        s->adb_data_in_size = adb_request(&s->adb_bus, s->adb_data_in,
-+                                          s->adb_data_out,
-+                                          s->adb_data_out_index);
-+        s->adb_data_out_index = 0;
-+        s->adb_data_in_index = 0;
-+        if (s->adb_data_in_size < 0) {
-+            *data = 0xff;
-+            qemu_irq_raise(s->adb_data_ready);
-+            return -1;
-+        }
-+
-+        if (s->adb_data_in_size == 0) {
-+            return 0;
-+        }
-+
-+        break;
-+    }
-+
-+    assert(s->adb_data_in_index < sizeof(s->adb_data_in) - 1);
-+
-+    *data = s->adb_data_in[s->adb_data_in_index++];
-+    qemu_irq_raise(s->adb_data_ready);
-+    if (*data == 0xff || *data == 0) {
-+        return 0;
-+    }
-+    return 1;
-+}
-+
-+static void via1_adb_update(MacVIAState *m)
-+{
-+    MOS6522Q800VIA1State *v1s = MOS6522_Q800_VIA1(&m->mos6522_via1);
-+    MOS6522State *s = MOS6522(v1s);
-+    int state;
-+    int ret;
-+
-+    state = (s->b & VIA1B_vADB_StateMask) >> VIA1B_vADB_StateShift;
-+
-+    if (s->acr & VIA1ACR_vShiftOut) {
-+        /* output mode */
-+        ret = adb_via_send(m, state, s->sr);
-+        if (ret > 0) {
-+            s->b &= ~VIA1B_vADBInt;
-+        } else {
-+            s->b |= VIA1B_vADBInt;
-+        }
-+    } else {
-+        /* input mode */
-+        ret = adb_via_receive(m, state, &s->sr);
-+        if (ret > 0 && s->sr != 0xff) {
-+            s->b &= ~VIA1B_vADBInt;
-+        } else {
-+            s->b |= VIA1B_vADBInt;
-+        }
-+    }
-+}
-+
-+static void via_adb_poll(void *opaque)
-+{
-+    MacVIAState *m = opaque;
-+    MOS6522Q800VIA1State *v1s = MOS6522_Q800_VIA1(&m->mos6522_via1);
-+    MOS6522State *s = MOS6522(v1s);
-+    int state;
-+
-+    if (s->b & VIA1B_vADBInt) {
-+        state = (s->b & VIA1B_vADB_StateMask) >> VIA1B_vADB_StateShift;
-+        if (adb_via_poll(m, state, &s->sr)) {
-+            s->b &= ~VIA1B_vADBInt;
-+        }
-+    }
-+
-+    timer_mod(m->adb_poll_timer,
-+              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
-+              (NANOSECONDS_PER_SECOND / VIA_ADB_POLL_FREQ));
-+}
-+
- static uint64_t mos6522_q800_via1_read(void *opaque, hwaddr addr, unsigned size)
+ static void clear_queue(void *opaque)
  {
-     MOS6522Q800VIA1State *s = MOS6522_Q800_VIA1(opaque);
-@@ -484,6 +665,10 @@ static void mac_via_reset(DeviceState *dev)
- {
-     MacVIAState *m = MAC_VIA(dev);
+     ESCCChannelState *s = opaque;
+@@ -433,8 +450,8 @@ static void escc_mem_write(void *opaque, hwaddr addr,
+     int newreg, channel;
  
-+    timer_mod(m->adb_poll_timer,
-+              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
-+              (NANOSECONDS_PER_SECOND / VIA_ADB_POLL_FREQ));
-+
-     timer_mod(m->VBL_timer, (qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 16630)
-               / 16630 * 16630);
+     val &= 0xff;
+-    saddr = (addr >> serial->it_shift) & 1;
+-    channel = (addr >> (serial->it_shift + 1)) & 1;
++    saddr = (addr >> reg_shift(serial)) & 1;
++    channel = (addr >> chn_shift(serial)) & 1;
+     s = &serial->chn[channel];
+     switch (saddr) {
+     case SERIAL_CTRL:
+@@ -537,8 +554,8 @@ static uint64_t escc_mem_read(void *opaque, hwaddr addr,
+     uint32_t ret;
+     int channel;
  
-@@ -522,6 +707,10 @@ static void mac_via_realize(DeviceState *dev, Error **errp)
+-    saddr = (addr >> serial->it_shift) & 1;
+-    channel = (addr >> (serial->it_shift + 1)) & 1;
++    saddr = (addr >> reg_shift(serial)) & 1;
++    channel = (addr >> chn_shift(serial)) & 1;
+     s = &serial->chn[channel];
+     switch (saddr) {
+     case SERIAL_CTRL:
+@@ -822,6 +839,7 @@ static void escc_realize(DeviceState *dev, Error **errp)
+ static Property escc_properties[] = {
+     DEFINE_PROP_UINT32("frequency", ESCCState, frequency,   0),
+     DEFINE_PROP_UINT32("it_shift",  ESCCState, it_shift,    0),
++    DEFINE_PROP_BOOL("bit_swap",    ESCCState, bit_swap,    false),
+     DEFINE_PROP_UINT32("disabled",  ESCCState, disabled,    0),
+     DEFINE_PROP_UINT32("chnBtype",  ESCCState, chn[0].type, 0),
+     DEFINE_PROP_UINT32("chnAtype",  ESCCState, chn[1].type, 0),
+diff --git a/include/hw/char/escc.h b/include/hw/char/escc.h
+index 42aca83611..8762f61c14 100644
+--- a/include/hw/char/escc.h
++++ b/include/hw/char/escc.h
+@@ -50,6 +50,7 @@ typedef struct ESCCState {
  
-     qemu_get_timedate(&tm, 0);
-     m->tick_offset = (uint32_t)mktimegm(&tm) + RTC_OFFSET;
-+
-+    m->adb_poll_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, via_adb_poll, m);
-+    m->adb_data_ready = qdev_get_gpio_in_named(dev, "via1-irq",
-+                                               VIA1_IRQ_ADB_READY_BIT);
- }
- 
- static void mac_via_init(Object *obj)
-@@ -570,6 +759,7 @@ static void mos6522_q800_via1_portB_write(MOS6522State *s)
-     MacVIAState *m = container_of(v1s, MacVIAState, mos6522_via1);
- 
-     via1_rtc_update(m);
-+    via1_adb_update(m);
- 
-     v1s->last_b = s->b;
- }
-diff --git a/include/hw/misc/mac_via.h b/include/hw/misc/mac_via.h
-index 69bdecabb0..2181140293 100644
---- a/include/hw/misc/mac_via.h
-+++ b/include/hw/misc/mac_via.h
-@@ -97,6 +97,13 @@ typedef struct MacVIAState {
- 
-     /* ADB */
-     ADBBusState adb_bus;
-+    QEMUTimer *adb_poll_timer;
-+    qemu_irq adb_data_ready;
-+    int adb_data_in_size;
-+    int adb_data_in_index;
-+    int adb_data_out_index;
-+    uint8_t adb_data_in[128];
-+    uint8_t adb_data_out[16];
- 
-     /* external timers */
-     QEMUTimer *one_second_timer;
+     struct ESCCChannelState chn[2];
+     uint32_t it_shift;
++    bool bit_swap;
+     MemoryRegion mmio;
+     uint32_t disabled;
+     uint32_t frequency;
 -- 
 2.11.0
