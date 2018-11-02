@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48351)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mail@steffen-goertz.de>) id 1gIbrL-0007Ol-Uy
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:59:47 -0400
+	(envelope-from <noring@nocrew.org>) id 1gIbz7-0007qf-Di
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 12:07:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mail@steffen-goertz.de>) id 1gIbrD-0005S5-Og
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:59:40 -0400
-Received: from steffen-goertz.de ([88.198.119.201]:33118)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mail@steffen-goertz.de>) id 1gIbr0-0005KN-Ix
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:59:26 -0400
-References: <20181031002526.14262-1-contrib@steffen-goertz.de>
-	<20181031002526.14262-6-contrib@steffen-goertz.de>
-	<20181101122548.GN24946@stefanha-x1.localdomain>
-From: =?UTF-8?Q?Steffen_G=c3=b6rtz?= <mail@steffen-goertz.de>
-Message-ID: <5c0d1267-17fc-10ed-0359-f6ecd955ee43@steffen-goertz.de>
-Date: Fri, 2 Nov 2018 11:59:20 -0400
+	(envelope-from <noring@nocrew.org>) id 1gIbz1-0001fb-Nc
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 12:07:45 -0400
+Received: from ste-pvt-msa2.bahnhof.se ([213.80.101.71]:3133)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gIbz1-0001Yg-CV
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 12:07:39 -0400
+Date: Fri, 2 Nov 2018 17:07:31 +0100
+From: Fredrik Noring <noring@nocrew.org>
+Message-ID: <cover.1541174426.git.noring@nocrew.org>
 MIME-Version: 1.0
-In-Reply-To: <20181101122548.GN24946@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 05/13] hw/nvram/nrf51_nvm: Add nRF51
- non-volatile memories
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Subject: [Qemu-devel] [PATCH 0/2] target/mips: Fix decoding mechanisms of
+ R5900 M{F, T}{HI, LO}1 and DIV[U]1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,15 +25,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>, =?UTF-8?Q?Steffen_G=c3=b6rtz?= <contrib@steffen-goertz.de>
-Cc: qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Peter Maydell <peter.maydell@linaro.org>
+To: Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: =?utf-8?Q?J=C3=BCrgen?= Urban <JuergenUrban@gmx.de>, "Maciej W. Rozycki" <macro@linux-mips.org>, qemu-devel@nongnu.org
 
-Hi Stefan,
+This series amends the R5900 support with the following changes:
 
-> I'm a fan of '-' instead of '_' in qdev property names.  There are more
-> instances of '-' than '_', but it's up to you.
+- MFLO1, MFHI1, MTLO1 and MTHI1 are generated in gen_HILO1_tx79 instead
+  of the generic gen_HILO.
 
-Agree. Changed.
+- DIV1 and DIVU1 are generated in gen_div1_tx79 instead of the generic
+  gen_muldiv.
 
-Best,
-Steffen
+Fredrik Noring (2):
+  target/mips: Fix decoding mechanism of R5900 MFLO1, MFHI1, MTLO1 and MTHI1
+  target/mips: Fix decoding mechanism of R5900 DIV1 and DIVU1
+
+ target/mips/translate.c | 132 ++++++++++++++++++++++++++++++++++------
+ 1 file changed, 115 insertions(+), 17 deletions(-)
+
+-- 
+2.18.1
