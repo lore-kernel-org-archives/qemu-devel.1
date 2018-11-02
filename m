@@ -1,27 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40492)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42736)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gIULq-0008O4-C4
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 03:58:43 -0400
+	(envelope-from <dongli.zhang@oracle.com>) id 1gIUYZ-0004hW-0K
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 04:11:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gIULn-0008VV-4U
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 03:58:42 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:33570)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gIULg-0008Rx-4j
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 03:58:34 -0400
-Received: by mail-wm1-x344.google.com with SMTP id f19-v6so689469wmb.0
-	for <qemu-devel@nongnu.org>; Fri, 02 Nov 2018 00:58:26 -0700 (PDT)
-References: <20181101215739.29788-1-richard.henderson@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181101215739.29788-1-richard.henderson@linaro.org>
-Date: Fri, 02 Nov 2018 07:58:23 +0000
-Message-ID: <87o9b76hcw.fsf@linaro.org>
+	(envelope-from <dongli.zhang@oracle.com>) id 1gIUYT-0008SK-BK
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 04:11:50 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:43482)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dongli.zhang@oracle.com>)
+	id 1gIUYM-0008My-HZ
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 04:11:41 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+	by userp2120.oracle.com (8.16.0.22/8.16.0.22) with SMTP id
+	wA288xUZ052893
+	for <qemu-devel@nongnu.org>; Fri, 2 Nov 2018 08:11:33 GMT
+Received: from aserv0022.oracle.com (aserv0022.oracle.com [141.146.126.234])
+	by userp2120.oracle.com with ESMTP id 2ncgnrd2kr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
+	for <qemu-devel@nongnu.org>; Fri, 02 Nov 2018 08:11:33 +0000
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+	by aserv0022.oracle.com (8.14.4/8.14.4) with ESMTP id wA28BWbj028172
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK) for <qemu-devel@nongnu.org>; Fri, 2 Nov 2018 08:11:32 GMT
+Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
+	by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id wA28BWiI006229
+	for <qemu-devel@nongnu.org>; Fri, 2 Nov 2018 08:11:32 GMT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Message-ID: <ae2d0fbd-5198-47e8-9ad2-40a85f0b3576@default>
+Date: Fri, 2 Nov 2018 01:11:32 -0700 (PDT)
+From: Dongli Zhang <dongli.zhang@oracle.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] target/arm: Conditionalize arm_div assert
- on aarch32 support
+Content-Disposition: inline
+Subject: [Qemu-devel] How to emulate block I/O timeout on qemu side?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,88 +41,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: qemu-devel@nongnu.org
 
+Hi,
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+Is there any way to emulate I/O timeout on qemu side (not fault injection i=
+n VM
+kernel) without modifying qemu source code?
 
-> When populating id registers from kvm, on a host that doesn't support
-> aarch32 mode at all, aa32_arm_div will not be supported either.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->
-> "Tested" on an APM Mustang, which does support AArch32.  I'm not
-> sure, off hand, which cpu(s) don't have it, and Alex didn't say
-> in his bug report.  Tsk tsk.  ;-)
+For instance, I would like to observe/study/debug the I/O timeout handling =
+of
+nvme, scsi, virtio-blk (not supported) of VM kernel.
 
-It's qemu-test - which I think is a ThunderX. Unfortunately I think we
-need the same treatment for the Jazelle test:
+Is there a way to trigger this on purpose on qemu side?
 
-  ./aarch64-softmmu/qemu-system-aarch64 -machine virt,gic-version=3D3 -acce=
-l kvm -cpu host -serial mon:stdio -nic user,model=3Dvirtio-net-pci,hostfwd=
-=3Dtcp::2222-:22 -device virtio-scsi-pci -kernel ../linux.git/arch/arm64/bo=
-ot/Image -append "console=3DttyAMA0 panic=3D-1" -display none -m 4096 --no-=
-reboot
-  qemu-system-aarch64: /home/alex/lsrc/qemu.git/target/arm/cpu.c:866: arm_c=
-pu_realizefn: Assertion `cpu_isar_feature(jazelle, cpu)' failed.
-  fish: =E2=80=9C./aarch64-softmmu/qemu-system-a=E2=80=A6=E2=80=9D terminat=
-ed by signal SIGABRT (Abort)
+Thank you very much!
 
-
->
->
-> r~
->
-> ---
->  target/arm/cpu.h |  5 +++++
->  target/arm/cpu.c | 10 +++++++++-
->  2 files changed, 14 insertions(+), 1 deletion(-)
->
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index 895f9909d8..4521ad5ae8 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -3300,6 +3300,11 @@ static inline bool isar_feature_aa64_fp16(const AR=
-MISARegisters *id)
->      return FIELD_EX64(id->id_aa64pfr0, ID_AA64PFR0, FP) =3D=3D 1;
->  }
->
-> +static inline bool isar_feature_aa64_a32(const ARMISARegisters *id)
-> +{
-> +    return FIELD_EX64(id->id_aa64pfr0, ID_AA64PFR0, EL0) =3D=3D 2;
-> +}
-> +
->  static inline bool isar_feature_aa64_sve(const ARMISARegisters *id)
->  {
->      return FIELD_EX64(id->id_aa64pfr0, ID_AA64PFR0, SVE) !=3D 0;
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index e08a2d2d79..988d97d1f1 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -828,8 +828,16 @@ static void arm_cpu_realizefn(DeviceState *dev, Erro=
-r **errp)
->           * include the various other features that V7VE implies.
->           * Presence of EL2 itself is ARM_FEATURE_EL2, and of the
->           * Security Extensions is ARM_FEATURE_EL3.
-> +         *
-> +         * V7VE requires ARM division.  However, there exist AArch64 cpus
-> +         * without AArch32 support.  When KVM queries ID_ISAR0_EL1 on su=
-ch
-> +         * a host, the value is UNKNOWN.  Similarly, we cannot check
-> +         * ID_AA64PFR0 without AArch64 support.  Check everything in ord=
-er.
->           */
-> -        assert(cpu_isar_feature(arm_div, cpu));
-> +        if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64)
-> +            && cpu_isar_feature(aa64_a32, cpu)) {
-> +            assert(cpu_isar_feature(arm_div, cpu));
-> +        }
->          set_feature(env, ARM_FEATURE_LPAE);
->          set_feature(env, ARM_FEATURE_V7);
->      }
-
-
---
-Alex Benn=C3=A9e
+Dongli Zhang
