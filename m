@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35790)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gIY61-0004Gk-Cb
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:58:38 -0400
+	(envelope-from <kwolf@redhat.com>) id 1gIYLh-00045Y-4P
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 08:14:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gIY5x-0007P6-FF
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:58:37 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:52232)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1gIY5x-0007Or-5A
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 07:58:33 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  2 Nov 2018 11:52:37 +0000
-Message-Id: <20181102115239.22485-3-peter.maydell@linaro.org>
-In-Reply-To: <20181102115239.22485-1-peter.maydell@linaro.org>
-References: <20181102115239.22485-1-peter.maydell@linaro.org>
+	(envelope-from <kwolf@redhat.com>) id 1gIYLg-00010j-8D
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 08:14:49 -0400
+Date: Fri, 2 Nov 2018 13:14:30 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20181102121430.GF7521@dhcp-200-186.str.redhat.com>
+References: <154115285434.11300.8459925605672823399.stgit@dhcp-3-135.uk.xensource.com>
+	<20181102110412.GD7521@dhcp-200-186.str.redhat.com>
+	<152b8d37c7d54de687f4ced536ba6a10@AMSPEX02CL03.citrite.net>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 for-3.1 2/4] tests: Move
- tests/hex-loader-check-data/ to tests/data/hex-loader/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <152b8d37c7d54de687f4ced536ba6a10@AMSPEX02CL03.citrite.net>
+Subject: Re: [Qemu-devel] xen_disk qdevification (was: [PATCH 0/3]
+ Performance improvements for xen_disk v2)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,76 +25,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: Paul Durrant <Paul.Durrant@citrix.com>
+Cc: Tim Smith <tim.smith@citrix.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Anthony Perard <anthony.perard@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Max Reitz <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>
 
-Currently tests/hex-loader-check-data contains data files used
-by the hexloader-test, and configure individually symlinks those
-data files into the build directory using a wildcard.
+Am 02.11.2018 um 12:13 hat Paul Durrant geschrieben:
+> > -----Original Message-----
+> > From: Kevin Wolf [mailto:kwolf@redhat.com]
+> > Sent: 02 November 2018 11:04
+> > To: Tim Smith <tim.smith@citrix.com>
+> > Cc: xen-devel@lists.xenproject.org; qemu-devel@nongnu.org; qemu-
+> > block@nongnu.org; Anthony Perard <anthony.perard@citrix.com>; Paul Durrant
+> > <Paul.Durrant@citrix.com>; Stefano Stabellini <sstabellini@kernel.org>;
+> > Max Reitz <mreitz@redhat.com>; armbru@redhat.com
+> > Subject: xen_disk qdevification (was: [PATCH 0/3] Performance improvements
+> > for xen_disk v2)
+> > 
+> > Am 02.11.2018 um 11:00 hat Tim Smith geschrieben:
+> > > A series of performance improvements for disks using the Xen PV ring.
+> > >
+> > > These have had fairly extensive testing.
+> > >
+> > > The batching and latency improvements together boost the throughput
+> > > of small reads and writes by two to six percent (measured using fio
+> > > in the guest)
+> > >
+> > > Avoiding repeated calls to posix_memalign() reduced the dirty heap
+> > > from 25MB to 5MB in the case of a single datapath process while also
+> > > improving performance.
+> > >
+> > > v2 removes some checkpatch complaints and fixes the CCs
+> > 
+> > Completely unrelated, but since you're the first person touching
+> > xen_disk in a while, you're my victim:
+> > 
+> > At KVM Forum we discussed sending a patch to deprecate xen_disk because
+> > after all those years, it still hasn't been converted to qdev. Markus is
+> > currently fixing some other not yet qdevified block device, but after
+> > that xen_disk will be the only one left.
+> > 
+> > A while ago, a downstream patch review found out that there are some QMP
+> > commands that would immediately crash if a xen_disk device were present
+> > because of the lacking qdevification. This is not the code quality
+> > standard I envision for QEMU. It's time for non-qdev devices to go.
+> > 
+> > So if you guys are still interested in the device, could someone please
+> > finally look into converting it?
+> 
+> I have a patch series to do exactly this. It's somewhat involved as I
+> need to convert the whole PV backend infrastructure. I will try to
+> rebase and clean up my series a.s.a.p.
 
-Using a wildcard like this is a bad idea, because if a new
-data file is added, nothing causes configure to be rerun,
-and so no symlink is added for the new file. This can cause
-tests to spuriously fail when they can't find their data.
-Instead, it's better to symlink an entire directory of
-data files. We already have such a directory: tests/data.
+Thanks a lot, Paul! This is good news.
 
-Move the data files from tests/hex-loader-check-data/ to
-tests/data/hex-loader/, and remove the unnecessary symlinking.
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- configure                                                 | 4 ----
- tests/hexloader-test.c                                    | 2 +-
- MAINTAINERS                                               | 2 +-
- tests/{hex-loader-check-data => data/hex-loader}/test.hex | 0
- 4 files changed, 2 insertions(+), 6 deletions(-)
- rename tests/{hex-loader-check-data => data/hex-loader}/test.hex (100%)
-
-diff --git a/configure b/configure
-index 895b7483b8a..bfdca8b814e 100755
---- a/configure
-+++ b/configure
-@@ -7421,10 +7421,6 @@ for bios_file in \
- do
-     FILES="$FILES pc-bios/$(basename $bios_file)"
- done
--for test_file in $(find $source_path/tests/hex-loader-check-data -type f)
--do
--    FILES="$FILES tests/hex-loader-check-data$(echo $test_file | sed -e 's/.*hex-loader-check-data//')"
--done
- mkdir -p $DIRS
- for f in $FILES ; do
-     if [ -e "$source_path/$f" ] && [ "$pwd_is_source_path" != "y" ]; then
-diff --git a/tests/hexloader-test.c b/tests/hexloader-test.c
-index b653d44ba10..834ed52c22b 100644
---- a/tests/hexloader-test.c
-+++ b/tests/hexloader-test.c
-@@ -23,7 +23,7 @@ static void hex_loader_test(void)
-     const unsigned int base_addr = 0x00010000;
- 
-     QTestState *s = qtest_initf(
--        "-M vexpress-a9 -nographic -device loader,file=tests/hex-loader-check-data/test.hex");
-+        "-M vexpress-a9 -nographic -device loader,file=tests/data/hex-loader/test.hex");
- 
-     for (i = 0; i < 256; ++i) {
-         uint8_t val = qtest_readb(s, base_addr + i);
-diff --git a/MAINTAINERS b/MAINTAINERS
-index f2360efe3ed..5c342a670f5 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1369,7 +1369,7 @@ Intel Hexadecimal Object File Loader
- M: Su Hang <suhang16@mails.ucas.ac.cn>
- S: Maintained
- F: tests/hexloader-test.c
--F: tests/hex-loader-check-data/test.hex
-+F: tests/data/hex-loader/test.hex
- 
- CHRP NVRAM
- M: Thomas Huth <thuth@redhat.com>
-diff --git a/tests/hex-loader-check-data/test.hex b/tests/data/hex-loader/test.hex
-similarity index 100%
-rename from tests/hex-loader-check-data/test.hex
-rename to tests/data/hex-loader/test.hex
--- 
-2.19.1
+Kevin
