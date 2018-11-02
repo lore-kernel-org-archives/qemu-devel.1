@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45590)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gIbhd-0008At-9v
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:49:41 -0400
+	(envelope-from <mail@steffen-goertz.de>) id 1gIbpj-00062e-5J
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:58:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gIbhU-0006hO-V7
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:49:36 -0400
-Received: from pio-pvt-msa3.bahnhof.se ([79.136.2.42]:37688)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gIbhP-0006gV-Q8
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:49:30 -0400
-Date: Fri, 2 Nov 2018 16:49:23 +0100
-From: Fredrik Noring <noring@nocrew.org>
-Message-ID: <20181102154923.GB2274@sx9>
-References: <BN6PR2201MB125116B5479010DB326DCCFCC6CE0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-	<51a26700-5da5-0a15-0e0e-6405ce5e65d4@redhat.com>
-	<20181101172353.GA2316@sx9>
-	<BN6PR2201MB12512B92322BFB8965848215C6CF0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-	<20181102143119.GA2274@sx9>
-	<BN6PR2201MB12515D71ED36B637045DA6D2C6CF0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-	<CAFEAcA9KJn++ASQ+xzEAs+pi0xkZG7i3aPUZEQZXwRfYJy6jbw@mail.gmail.com>
+	(envelope-from <mail@steffen-goertz.de>) id 1gIbpi-000312-6b
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 11:58:03 -0400
+References: <20181031002526.14262-1-contrib@steffen-goertz.de>
+	<20181031002526.14262-13-contrib@steffen-goertz.de>
+From: =?UTF-8?Q?Steffen_G=c3=b6rtz?= <mail@steffen-goertz.de>
+Message-ID: <bdcf79c4-d5af-0e03-0963-78603b268467@steffen-goertz.de>
+Date: Fri, 2 Nov 2018 11:57:54 -0400
 MIME-Version: 1.0
+In-Reply-To: <20181031002526.14262-13-contrib@steffen-goertz.de>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9KJn++ASQ+xzEAs+pi0xkZG7i3aPUZEQZXwRfYJy6jbw@mail.gmail.com>
-Subject: Re: [Qemu-devel] Correction needed for R5900 instruction decoding
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 12/13] arm: Instantiate NRF51 Timers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,27 +24,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Aleksandar Markovic <amarkovic@wavecomp.com>, Stefan Markovic <smarkovic@wavecomp.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Aleksandar Rikalo <arikalo@wavecomp.com>, "Emilio G. Cota" <cota@braap.org>, "Maciej W. Rozycki" <macro@linux-mips.org>, =?utf-8?Q?J=C3=BCrgen?= Urban <JuergenUrban@gmx.de>, Petar Jovanovic <pjovanovic@wavecomp.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: =?UTF-8?Q?Steffen_G=c3=b6rtz?= <contrib@steffen-goertz.de>, qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Peter Maydell <peter.maydell@linaro.org>, "open list:NRF51" <qemu-arm@nongnu.org>
 
-Hi Peter,
+Hi Stefan,
+> 
+> Indentation is off here.  One way of formatting it:
+> 
+>                 address_space_write(&s->as, i * NRF51_PAGE_SIZE,
+>                                     MEMTXATTRS_UNSPECIFIED, s->empty_page,
+> 				    NRF51_PAGE_SIZE);
 
-> From the other side of things, as a submaintainer around release
-> time there's often a lot of work to do and it's easy to confuse
-> different patchsets or forget the status of them, so it's useful
-> to have a patch series which is exactly the set of patches that
-> the submitter thinks are suitable to go into the release, and it's
-> less work to apply those than to fish out a subset of patches
-> from a series.
+Good catch.
 
-Understood. Aleksandar previously indicated that he wanted an amendment
-series with changes ordered by importance, which is why the two patches
-were part of that series (as the first ones).
+>> +static void nrf51_nvm_reset(DeviceState *dev)
+>> +{
+>> +    NRF51NVMState *s = NRF51_NVM(dev);
+>> +
+>> +    memset(s->uicr_content, '\0', sizeof(s->uicr_content));
+>> +}
+> 
+> We will zero UICR.  Does UICR come zero-initialized on a real micro:bit?
+> 
+> I remember there was an issue with .hex files that set UICR values.
+> Will nrf51_nvm_reset() overwrite values from .hex files when the generic
+> loader devices is used (-device loader,file=test.hex)?
+> 
+UICR comes 0xFF initialized ([1] 8.1) and yes we had a conflict with the js-runtime.
+I now moved the memset to init just before mapping the region:
 
-> So overall, I think my suggestion would be that the best move
-> from here would be for Fred to send a patchset with the changes
-> for 3.1 and only those changes. Could you do that, please?
+memset(s->uicr_content, 0xFF, sizeof(s->uicr_content));
+memory_region_init_io(&s->uicr, NULL, &uicr_ops, s, "nrf51_soc.uicr",
+                      sizeof(s->uicr_content));
+ysbus_init_mmio(sbd, &s->uicr);
 
-Yes, I will post a separate series for review immediately.
+That should do the trick.
+A reset without loading of a new firmware blob will not change the (flash) user memory any longer, which should match the real device.
 
-Fredrik
+Best,
+Steffen
+
+
+[1] http://infocenter.nordicsemi.com/pdf/nRF51_RM_v3.0.pdf
