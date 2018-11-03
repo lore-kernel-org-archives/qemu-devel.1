@@ -1,22 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58914)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gIvYv-00058a-KX
-	for qemu-devel@nongnu.org; Sat, 03 Nov 2018 09:02:02 -0400
+	(envelope-from <liq3ea@163.com>) id 1gIy3F-0007p9-51
+	for qemu-devel@nongnu.org; Sat, 03 Nov 2018 11:41:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gIvYq-0006ZH-K5
-	for qemu-devel@nongnu.org; Sat, 03 Nov 2018 09:02:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41834)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gIvYq-0006Ug-DW
-	for qemu-devel@nongnu.org; Sat, 03 Nov 2018 09:01:56 -0400
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Sat,  3 Nov 2018 17:01:43 +0400
-Message-Id: <20181103130143.7179-1-marcandre.lureau@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] qga-win: fix leaks of build_guest_disk_info()
+	(envelope-from <liq3ea@163.com>) id 1gIy39-0001iK-CU
+	for qemu-devel@nongnu.org; Sat, 03 Nov 2018 11:41:27 -0400
+Received: from m12-11.163.com ([220.181.12.11]:47946)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <liq3ea@163.com>) id 1gIy35-0001Fv-UL
+	for qemu-devel@nongnu.org; Sat, 03 Nov 2018 11:41:21 -0400
+From: Li Qiang <liq3ea@163.com>
+Date: Sat,  3 Nov 2018 08:41:04 -0700
+Message-Id: <20181103154104.69228-1-liq3ea@163.com>
+Subject: [Qemu-devel] [PATCH] hw: virtio-pci: drop DO_UPCAST
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,43 +21,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: tgolembi@redhat.com, mdroth@linux.vnet.ibm.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: mst@redhat.com
+Cc: qemu-devel@nongnu.org, Li Qiang <liq3ea@163.com>
 
-Introduced in commit b1ba8890e63ce9432c41c5c3fc229f54c87c9c99, vol_h
-handle should be closed, and "out" cleanup should be done after
-DeviceIoControl() fails.
+Use VIRTIO_PCI MACRO instead.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Li Qiang <liq3ea@163.com>
 ---
- qga/commands-win32.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ hw/virtio/virtio-pci.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-index ef1d7d48d2..62e1b51dfe 100644
---- a/qga/commands-win32.c
-+++ b/qga/commands-win32.c
-@@ -797,7 +797,7 @@ static GuestDiskAddressList *build_guest_disk_info(ch=
-ar *guid, Error **errp)
-                     0, extents, size, NULL, NULL)) {
-                 error_setg_win32(errp, GetLastError(),
-                     "failed to get disk extents");
--                return NULL;
-+                goto out;
-             }
-         } else if (last_err =3D=3D ERROR_INVALID_FUNCTION) {
-             /* Possibly CD-ROM or a shared drive. Try to pass the volume=
- */
-@@ -855,6 +855,9 @@ static GuestDiskAddressList *build_guest_disk_info(ch=
-ar *guid, Error **errp)
-=20
-=20
- out:
-+    if (vol_h !=3D INVALID_HANDLE_VALUE) {
-+        CloseHandle(vol_h);
-+    }
-     qapi_free_GuestDiskAddress(disk);
-     g_free(extents);
-     g_free(name);
---=20
-2.19.1.708.g4ede3d42df
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index a954799267..277dc20c81 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -597,7 +597,7 @@ virtio_address_space_read(VirtIOPCIProxy *proxy, hwaddr addr,
+ static void virtio_write_config(PCIDevice *pci_dev, uint32_t address,
+                                 uint32_t val, int len)
+ {
+-    VirtIOPCIProxy *proxy = DO_UPCAST(VirtIOPCIProxy, pci_dev, pci_dev);
++    VirtIOPCIProxy *proxy = VIRTIO_PCI(pci_dev);
+     VirtIODevice *vdev = virtio_bus_get_device(&proxy->bus);
+     struct virtio_pci_cfg_cap *cfg;
+ 
+@@ -630,7 +630,7 @@ static void virtio_write_config(PCIDevice *pci_dev, uint32_t address,
+ static uint32_t virtio_read_config(PCIDevice *pci_dev,
+                                    uint32_t address, int len)
+ {
+-    VirtIOPCIProxy *proxy = DO_UPCAST(VirtIOPCIProxy, pci_dev, pci_dev);
++    VirtIOPCIProxy *proxy = VIRTIO_PCI(pci_dev);
+     struct virtio_pci_cfg_cap *cfg;
+ 
+     if (proxy->config_cap &&
+-- 
+2.17.1
