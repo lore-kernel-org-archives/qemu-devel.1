@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41999)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gJ91J-0007B9-6Y
-	for qemu-devel@nongnu.org; Sat, 03 Nov 2018 23:24:13 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1gJ91M-0007C1-Dk
+	for qemu-devel@nongnu.org; Sat, 03 Nov 2018 23:24:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gJ91I-0002kF-8k
-	for qemu-devel@nongnu.org; Sat, 03 Nov 2018 23:24:13 -0400
-Date: Sat, 3 Nov 2018 12:59:03 +0000
+	(envelope-from <dgibson@ozlabs.org>) id 1gJ91I-0002kA-8p
+	for qemu-devel@nongnu.org; Sat, 03 Nov 2018 23:24:16 -0400
+Received: from ozlabs.org ([203.11.71.1]:49299)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1gJ91H-0002bU-7f
+	for qemu-devel@nongnu.org; Sat, 03 Nov 2018 23:24:11 -0400
+Date: Sat, 3 Nov 2018 12:57:13 +0000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181103125903.GC24365@umbus.hotspot.internet-for-guests.com>
-References: <20181101161758.12300-1-peter.maydell@linaro.org>
+Message-ID: <20181103125713.GB24365@umbus.hotspot.internet-for-guests.com>
+References: <20181101173852.27257-1-laurent@vivier.eu>
+	<CAFEAcA9+gSUHW++EKtuqWL4ofWAKqO0H5JUGUoyyAhY7h24o0Q@mail.gmail.com>
+	<dcc24ea9-676f-8276-fe54-49bf67f20e56@vivier.eu>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Y5rl02BVI9TCfPar"
+	protocol="application/pgp-signature"; boundary="gatW/ieO32f1wygP"
 Content-Disposition: inline
-In-Reply-To: <20181101161758.12300-1-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH for-3.1] hw/ppc/mac_newworld: Free
- openpic_irqs array after use
+In-Reply-To: <dcc24ea9-676f-8276-fe54-49bf67f20e56@vivier.eu>
+Subject: Re: [Qemu-devel] [PATCH] softfloat: don't execute ppc64 ISA 3.0B
+ instruction if it is not supported
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,47 +30,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <richard.henderson@linaro.org>
 
 
---Y5rl02BVI9TCfPar
+--gatW/ieO32f1wygP
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 01, 2018 at 04:17:58PM +0000, Peter Maydell wrote:
-> In ppc_core99_init(), we allocate an openpic_irqs array, which
-> we then use to collect up the various qemu_irqs which we're
-> going to connect to the interrupt controller. Once we've
-> called sysbus_connect_irq() to connect them all up, the
-> array is no longer required, but we forgot to free it.
+On Thu, Nov 01, 2018 at 06:54:59PM +0100, Laurent Vivier wrote:
+> On 01/11/2018 18:49, Peter Maydell wrote:
+> > On 1 November 2018 at 17:38, Laurent Vivier <laurent@vivier.eu> wrote:
+> >> commit 27ae5109a2 has introduced an assembly instruction only supported
+> >> by ISA 3.0B and it fails to execute on previous versions of the POWER
+> >> CPU (like PowerPC G5).
+> >>
+> >> This patch fixes that by checking the ISA level, and falls back to
+> >> the default C function if the instruction is not supported.
+> >>
+> >> Fixes: 27ae5109a2ba8b6b679cce3e03e16570a34390a0
+> >>        (softfloat: Specialize udiv_qrnnd for ppc64)
+> >> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> >> ---
+> >>  include/fpu/softfloat-macros.h | 39 ++++++++++++++++++++--------------
+> >>  1 file changed, 23 insertions(+), 16 deletions(-)
+> >>
+> >> diff --git a/include/fpu/softfloat-macros.h b/include/fpu/softfloat-ma=
+cros.h
+> >> index c86687fa5e..fe98b33df9 100644
+> >> --- a/include/fpu/softfloat-macros.h
+> >> +++ b/include/fpu/softfloat-macros.h
+> >> @@ -78,6 +78,9 @@ this code that are retained.
+> >>  /* Portions of this work are licensed under the terms of the GNU GPL,
+> >>   * version 2 or later. See the COPYING file in the top-level director=
+y.
+> >>   */
+> >> +#if defined(_ARCH_PPC64)
+> >> +extern bool have_isa_3_00;
+> >> +#endif
+> >=20
+> > I was wondering where this bool came from. The answer is
+> > that it's defined in tcg/ppc/tcg-target.inc.c. It's ok to
+> > use it here because fpu/softfloat.c is only compiled if
+> > CONFIG_TCG is true, so the tcg code will be present. The
+> > other user of this include file is target/m68k/softfloat.c,
+> > which also will only be compiled for a ppc host if CONFIG_TCG.
+> >=20
+> > It's a little awkward to be borrowing this tcg/ppc internal
+> > flag into the softfloat code, though.
 >=20
-> Since board init is only run once at startup, the memory
-> leak is not a significant one.
->=20
-> Spotted by Coverity: CID 1192916.
->=20
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> I agree, I was hopping Richard can advice another way to do that.
 
-Applied, thanks.
-
-> ---
->  hw/ppc/mac_newworld.c | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-> index a630cb81cd8..14273a123e5 100644
-> --- a/hw/ppc/mac_newworld.c
-> +++ b/hw/ppc/mac_newworld.c
-> @@ -303,6 +303,7 @@ static void ppc_core99_init(MachineState *machine)
->              sysbus_connect_irq(s, k++, openpic_irqs[i][j]);
->          }
->      }
-> +    g_free(openpic_irqs);
-> =20
->      if (PPC_INPUT(env) =3D=3D PPC_FLAGS_INPUT_970) {
->          /* 970 gets a U3 bus */
+We already have ISA version flags in insns_flags & insns_flags2, so
+I'm hoping we can use those rather than introduce a new bool.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -72,24 +91,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---Y5rl02BVI9TCfPar
+--gatW/ieO32f1wygP
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlvdm5cACgkQbDjKyiDZ
-s5Iq2RAAxFeIlbBgigT8K6GB4tvwsZOgEDhFn3fm4T2QsL8Rw0E5VbkWHVww/VpP
-gKnqzqvg75fnKhklupO2S4llXW5tSSjm5wZuRDWpef1kGCSXsgdAtKAONGgllFUi
-zwIwr9hCWlNKG9Z1lM5Xf9C2Cs1lBdbC3EZmgZT5obHv277iV6vuyXS6LQ8jDpS1
-N3P+nD/js5OH4Of2UxjyDDPjP4m01F9nV6caHiLDDtZYkG/fq56AnRyZkuvIiaBj
-jtgX34sz5ggsG91UYDQIdbffbGYob3HoTZWsBMAzErYUo+NsITyF+jOUk+jcLhQP
-cNb4sumIPO/CTqhTxBBclq6Ngep/XlePsHqx6lwZ1ar/vygjBwg5cIln6Ow+1Fo8
-E/WkjUg2ofCLN9MqqQ0amlL+BCQnD+OsY/tEgji0eSgpuNheRfTw7g5X4aI+M/R5
-6KQh1+1CBmgtEvT2BQvApevqcUzkjStKwr1zdLNUdTSjchRPIELXdUN+F5HLqMGy
-m5BxViCYxGXUEDn30kSc5CoX1ufqZhAllVUtmXT4uzC8kRyRK5ViBgxDSai6CAHr
-A0BLYQrrwz4GPG+9HLHltKVyO/Nkcn0bcJ6fagT5Q5gV1/eKhko/JeLO6u3uoxQc
-os5Vy0iat6wIc2WApQsPPYPAOUMk8VUD3R/GbwqQ96zMqeLESeg=
-=6FtW
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlvdmycACgkQbDjKyiDZ
+s5K+/BAAvCgoxBSupd4axmc0Cx7cg0HPEK95yUaP8vGzD5erTJAcHD4hwx+jcBqj
+hePan42kwFkEXb27Y/WO0LuEXkpRNHMhD91KGzzx3a6MtnHII0GCPqoCZ0So9MGM
+Q9gucFwM7ZlXuAv4i4LACwMNhvi8thJkaw8LVSQOUSvZP70fyNBS6gHnmbL1OwYF
+BADUrLwM3wMg9LwYPhQnXjyqRbr+T5WFo1QtrXMrLY7iHbOljsG3JkXobY12L+kf
+xjEiww6FBkDnQ9zH7GxYFJTNJZXwkHM83ohsm5OuevEVPpelsoRmzrLeSuucI8pW
+7ZbXBktAFMqWHpsr3IjDRYj3FTqhl4c4cq/N3WtWUy0aGxWbUjlLWr176nLazJs7
+WbJWoSpzJqy0JFKvxQStPDU384Y8bDSYsGzAED3xQa7qo1j61RjcyJsTIRp+7lf1
+yAMa5fen7ZV0DtGWFEo9s1lBFoc/6G9MIjvxM3dsYF9f24aRNKWKWw/MUhiCA3zO
+0q2U5rKFBVMr0bl0EbERinrBBW8LmL/nAbqTqDUdw96MIs6rFY5dWfO2Lr0sV+7f
+kMdECnuX0+/QxuPX2j0yqsTID3753aSOaxEohZf7XmNbxV7LigBhCQ804YZcxCKB
+79CTwlSciZdl6D5Gx9tOUUJRrUYjbH1T5z8CDjJwvHaYmMn2uJU=
+=1mYg
 -----END PGP SIGNATURE-----
 
---Y5rl02BVI9TCfPar--
+--gatW/ieO32f1wygP--
