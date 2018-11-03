@@ -1,27 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47178)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1gIjp0-0005bh-P1
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 20:29:53 -0400
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gIkOD-0005PY-Ha
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 21:06:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1gIjox-00083Q-GV
-	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 20:29:50 -0400
-From: Leonid Bloch <lbloch@janustech.com>
-Date: Sat, 3 Nov 2018 00:29:33 +0000
-Message-ID: <66efaf0d-1e29-4583-f6d4-674d12a978a7@janustech.com>
-References: <20181102085800.21860-1-philmd@redhat.com>
-	<20181102110734.GE7521@dhcp-200-186.str.redhat.com>
-	<6d96d96b-21f7-d5fc-9313-8ede0f6a745c@redhat.com>
-	<20181102141030.GH7521@dhcp-200-186.str.redhat.com>
-	<0b2d802d-4b58-30de-44a8-9f04dc968b1b@redhat.com>
-	<20181102152800.GI7521@dhcp-200-186.str.redhat.com>
-In-Reply-To: <20181102152800.GI7521@dhcp-200-186.str.redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <DA0F9BF52B80634D8541ECFE709919B2@namprd07.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] qemu/units: Move out QCow2 specific
- definitions
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gIkOB-0000gu-U7
+	for qemu-devel@nongnu.org; Fri, 02 Nov 2018 21:06:13 -0400
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Fri,  2 Nov 2018 18:05:56 -0700
+Message-Id: <20181103010556.7030-1-jcmvbkbc@gmail.com>
+Subject: [Qemu-devel] [PATCH v2] target/xtensa: drop num_[core_]regs from
+ dc232b/dc233c configs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,31 +18,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, Alberto Garcia <berto@igalia.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Markus Armbruster <armbru@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Max Filippov <jcmvbkbc@gmail.com>, qemu-stable@nongnu.org
 
-SGksDQoNCk9uIDExLzIvMTggNToyOCBQTSwgS2V2aW4gV29sZiB3cm90ZToNCj4gQW0gMDIuMTEu
-MjAxOCB1bSAxNTo1MiBoYXQgRXJpYyBCbGFrZSBnZXNjaHJpZWJlbjoNCj4+IE9uIDExLzIvMTgg
-OToxMCBBTSwgS2V2aW4gV29sZiB3cm90ZToNCj4+PiBBbSAwMi4xMS4yMDE4IHVtIDEzOjM3IGhh
-dCBQaGlsaXBwZSBNYXRoaWV1LURhdWTDqSBnZXNjaHJpZWJlbjoNCj4+Pj4gSGkgS2V2aW4sDQo+
-Pj4+DQo+Pj4+IE9uIDIvMTEvMTggMTI6MDcsIEtldmluIFdvbGYgd3JvdGU6DQo+Pj4+PiBBbSAw
-Mi4xMS4yMDE4IHVtIDA5OjU4IGhhdCBQaGlsaXBwZSBNYXRoaWV1LURhdWTDqSBnZXNjaHJpZWJl
-bjoNCj4+Pj4+PiBUaGlzIGRlZmluaXRpb25zIGFyZSBRQ293MiBzcGVjaWZpYywgdGhlcmUgaXMg
-bm8gbmVlZCB0byBleHBvc2UgdGhlbQ0KPj4+Pj4+IGluIHRoZSBnbG9iYWwgbmFtZXNwYWNlLg0K
-DQpUaGVzZSBhcmUgbm90IFFDT1cyIHNwZWNpZmljLiBJIHdyb3RlIHRoZXNlIGZvciBjb252ZW5p
-ZW5jZSBpbiBRQ09XMiwgDQpidXQgdGhlcmUgYXJlIG1hbnkgb3RoZXIgcGxhY2VzIHdoZXJlIHRo
-ZXNlIGNhbiBiZSB1c2VkIChtYW55IA0KcHJlLWRlZmluZWQgc2l6ZXMgYXJlIHBvd2VycyBvZiB0
-d28pLCBhbmQgdGhlcmUgYXJlIGZldyBwbGFjZXMgd2hlcmUgDQp0aGV5IG11c3QgcmVwbGFjZSB0
-aGUgY3VycmVudCBub3RhdGlvbiwgbGlrZSBpbiBibG9jay92ZGkuYyB3aXRoIA0KREVGQVVMVF9D
-TFVTVEVSX1NJWkUgKHVubGVzcyBhbiBleHBsaWNpdCB2YWx1ZSBpbiBieXRlcyB3aWxsIGJlIGRl
-ZmluZWQgDQppbnN0ZWFkKS4NCg0KPj4NCj4+IEFncmVlZC4gSSBkaWRuJ3Qgd2FudCBpdCBpbiB0
-aGUgZmlyc3QgcGxhY2UsIGFyZ3VpbmcgdGhhdCBpZiB3ZSB3YW50DQo+PiBzdHJpbmdpZmljYXRp
-b24gb2YgZGVmYXVsdHMsIGl0IHdvdWxkIGJlIGJldHRlciB0byBoYXZlIGEgcnVudGltZSBmdW5j
-dGlvbg0KPj4gZG8gdGhhdCwgcmF0aGVyIHRoYW4gYWRkaW5nIGEgc2V0IG9mIG5lYXItZHVwbGlj
-YXRlIG1hY3JvIG5hbWVzLg0KDQpBIHJ1bnRpbWUgZnVuY3Rpb24gd2lsbCBub3QgaGVscCBoZXJl
-LCBhcyB0aGVzZSBhcmUgdXNlZCBpbiBjb21waWxlIA0KdGltZS4gVGhlc2UgcmVzdWx0IGluIHN0
-cmluZ3MgdGhhdCBhcmUgYWN0dWFsbHkgY29tcGlsZWQgaW50byB0aGUgYmluYXJpZXMuDQoNCj4+
-Pg0KPj4+IFRoZW4gdGhlcmUgaXMgVkRJIHdoaWNoIHVzZXMgKDEgKiBNaUIpLCBidXQgdGhhdCBp
-cyBjb21waWxlZCBvdXQgYW5kIGlmDQo+Pj4geW91IGVuYWJsZSBpdCwgaXQgYnJlYWtzLiBTbyBp
-dCBuZWVkcyB0aGUgc2FtZSBmaXguDQoNClllYWgsIEkgbmVlZCB0byBmaXggdGhhdCBhcyBwcm9t
-aXNlZC4gV2lsbCBkbyBzaG9ydGx5LiA6KQ0KDQpMZW9uaWQuDQo=
+gdb_regmap::num_core_regs field is initialized incorrectly in the dc232b
+and dc233c configurations. As a result the following message is
+displayed when attaching to an xtensa linux-user process:
+
+  "Register 105 is not available",
+
+and gdb is unable to control the inferior.
+
+Now that xtensa_count_regs does the right thing, remove manual
+initialization of these fields from the affected configurations and let
+xtensa_finalize_config initialize them. Add XTREG_END to terminate
+register lists.
+
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+---
+Changes v1->v2:
+- add XTREG_END terminators to the register lists
+
+ target/xtensa/core-dc232b.c                | 2 --
+ target/xtensa/core-dc232b/gdb-config.inc.c | 1 +
+ target/xtensa/core-dc233c.c                | 2 --
+ target/xtensa/core-dc233c/gdb-config.inc.c | 1 +
+ 4 files changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/target/xtensa/core-dc232b.c b/target/xtensa/core-dc232b.c
+index 71313378409e..7851bcb63687 100644
+--- a/target/xtensa/core-dc232b.c
++++ b/target/xtensa/core-dc232b.c
+@@ -40,8 +40,6 @@
+ static XtensaConfig dc232b __attribute__((unused)) = {
+     .name = "dc232b",
+     .gdb_regmap = {
+-        .num_regs = 120,
+-        .num_core_regs = 52,
+         .reg = {
+ #include "core-dc232b/gdb-config.inc.c"
+         }
+diff --git a/target/xtensa/core-dc232b/gdb-config.inc.c b/target/xtensa/core-dc232b/gdb-config.inc.c
+index 13aba5edecd6..d87168628be8 100644
+--- a/target/xtensa/core-dc232b/gdb-config.inc.c
++++ b/target/xtensa/core-dc232b/gdb-config.inc.c
+@@ -259,3 +259,4 @@
+           0, 0, 0, 0, 0, 0)
+   XTREG(119, 476, 32, 4, 4, 0x000f, 0x0006, -2, 8, 0x0100, a15,
+           0, 0, 0, 0, 0, 0)
++  XTREG_END
+diff --git a/target/xtensa/core-dc233c.c b/target/xtensa/core-dc233c.c
+index d701e3f5de07..8853bfd4d08f 100644
+--- a/target/xtensa/core-dc233c.c
++++ b/target/xtensa/core-dc233c.c
+@@ -40,8 +40,6 @@
+ static XtensaConfig dc233c __attribute__((unused)) = {
+     .name = "dc233c",
+     .gdb_regmap = {
+-        .num_regs = 121,
+-        .num_core_regs = 52,
+         .reg = {
+ #include "core-dc233c/gdb-config.inc.c"
+         }
+diff --git a/target/xtensa/core-dc233c/gdb-config.inc.c b/target/xtensa/core-dc233c/gdb-config.inc.c
+index b632341b28ec..7e8963227fc0 100644
+--- a/target/xtensa/core-dc233c/gdb-config.inc.c
++++ b/target/xtensa/core-dc233c/gdb-config.inc.c
+@@ -143,3 +143,4 @@ XTREG(117, 468, 32, 4, 4, 0x000c, 0x0006, -2, 8, 0x0100, a12,         0, 0, 0, 0
+ XTREG(118, 472, 32, 4, 4, 0x000d, 0x0006, -2, 8, 0x0100, a13,         0, 0, 0, 0, 0, 0)
+ XTREG(119, 476, 32, 4, 4, 0x000e, 0x0006, -2, 8, 0x0100, a14,         0, 0, 0, 0, 0, 0)
+ XTREG(120, 480, 32, 4, 4, 0x000f, 0x0006, -2, 8, 0x0100, a15,         0, 0, 0, 0, 0, 0)
++XTREG_END
+-- 
+2.11.0
