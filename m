@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41799)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gJGhq-0007WH-Tq
+	(envelope-from <stefanha@redhat.com>) id 1gJGhq-0007WG-Tj
 	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 06:36:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gJGhe-0002gm-S3
+	(envelope-from <stefanha@redhat.com>) id 1gJGhc-0002ek-98
 	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 06:36:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49352)
+Received: from mx1.redhat.com ([209.132.183.28]:60992)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gJGhe-0002f3-1M
-	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 06:36:26 -0500
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gJGhb-0002dd-Q4
+	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 06:36:24 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Sun,  4 Nov 2018 11:24:21 +0000
-Message-Id: <20181104112424.18663-6-stefanha@redhat.com>
+Date: Sun,  4 Nov 2018 11:24:20 +0000
+Message-Id: <20181104112424.18663-5-stefanha@redhat.com>
 In-Reply-To: <20181104112424.18663-1-stefanha@redhat.com>
 References: <20181104112424.18663-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 5/8] git: use HTTPS git URLs for repo.or.cz
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 4/8] gitmodules: use 'https://' instead of
+ 'git://'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,91 +34,88 @@ When you clone the repository without previous commit history, 'git://'
 doesn't protect from man-in-the-middle attacks.  HTTPS is more secure
 since the client verifies the server certificate.
 
-Suggested-by: Eric Blake <eblake@redhat.com>
+Also change git.qemu-project.org to git.qemu.org (we control both domain
+names but qemu.org is used more widely).
+
+Reported-by: Jann Horn <jannh@google.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- MAINTAINERS    | 14 +++++++-------
- pc-bios/README |  2 +-
- 2 files changed, 8 insertions(+), 8 deletions(-)
+ .gitmodules | 34 +++++++++++++++++-----------------
+ 1 file changed, 17 insertions(+), 17 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 5cca097c49..a0576aa68a 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1455,7 +1455,7 @@ F: tests/qemu-iotests/
- F: util/qemu-progress.c
- F: qobject/block-qdict.c
- F: tests/check-block-qdict.c
--T: git git://repo.or.cz/qemu/kevin.git block
-+T: git https://repo.or.cz/qemu/kevin.git block
- 
- Block I/O path
- M: Stefan Hajnoczi <stefanha@redhat.com>
-@@ -1502,7 +1502,7 @@ F: blockdev.c
- F: block/qapi.c
- F: qapi/block*.json
- F: qapi/transaction.json
--T: git git://repo.or.cz/qemu/armbru.git block-next
-+T: git https://repo.or.cz/qemu/armbru.git block-next
- 
- Dirty Bitmaps
- M: Fam Zheng <famz@redhat.com>
-@@ -1697,14 +1697,14 @@ F: tests/test-visitor-serialization.c
- F: scripts/qapi-gen.py
- F: scripts/qapi/*
- F: docs/devel/qapi*
--T: git git://repo.or.cz/qemu/armbru.git qapi-next
-+T: git https://repo.or.cz/qemu/armbru.git qapi-next
- 
- QAPI Schema
- M: Eric Blake <eblake@redhat.com>
- M: Markus Armbruster <armbru@redhat.com>
- S: Supported
- F: qapi/*.json
--T: git git://repo.or.cz/qemu/armbru.git qapi-next
-+T: git https://repo.or.cz/qemu/armbru.git qapi-next
- 
- QObject
- M: Markus Armbruster <armbru@redhat.com>
-@@ -1718,7 +1718,7 @@ F: tests/check-qnum.c
- F: tests/check-qjson.c
- F: tests/check-qlist.c
- F: tests/check-qstring.c
--T: git git://repo.or.cz/qemu/armbru.git qapi-next
-+T: git https://repo.or.cz/qemu/armbru.git qapi-next
- 
- QEMU Guest Agent
- M: Michael Roth <mdroth@linux.vnet.ibm.com>
-@@ -1750,7 +1750,7 @@ F: docs/devel/*qmp-*
- F: scripts/qmp/
- F: tests/qmp-test.c
- F: tests/qmp-cmd-test.c
--T: git git://repo.or.cz/qemu/armbru.git qapi-next
-+T: git https://repo.or.cz/qemu/armbru.git qapi-next
- 
- qtest
- M: Paolo Bonzini <pbonzini@redhat.com>
-@@ -2065,7 +2065,7 @@ F: include/block/nbd*
- F: qemu-nbd.*
- F: blockdev-nbd.c
- F: docs/interop/nbd.txt
--T: git git://repo.or.cz/qemu/ericb.git nbd
-+T: git https://repo.or.cz/qemu/ericb.git nbd
- 
- NFS
- M: Jeff Cody <jcody@redhat.com>
-diff --git a/pc-bios/README b/pc-bios/README
-index b572e9eb00..8f98c07a74 100644
---- a/pc-bios/README
-+++ b/pc-bios/README
-@@ -5,7 +5,7 @@
-   project (http://www.nongnu.org/vgabios/).
- 
- - The PowerPC Open Hack'Ware Open Firmware Compatible BIOS is
--  available at http://repo.or.cz/w/openhackware.git.
-+  available at https://repo.or.cz/openhackware.git.
- 
- - OpenBIOS (http://www.openbios.org/) is a free (GPL v2) portable
-   firmware implementation. The goal is to implement a 100% IEEE
--- 
+diff --git a/.gitmodules b/.gitmodules
+index a48d2a764c..6b91176098 100644
+--- a/.gitmodules
++++ b/.gitmodules
+@@ -1,51 +1,51 @@
+ [submodule "roms/seabios"]
+ 	path =3D roms/seabios
+-	url =3D git://git.qemu-project.org/seabios.git/
++	url =3D https://git.qemu.org/git/seabios.git/
+ [submodule "roms/SLOF"]
+ 	path =3D roms/SLOF
+-	url =3D git://git.qemu-project.org/SLOF.git
++	url =3D https://git.qemu.org/git/SLOF.git
+ [submodule "roms/ipxe"]
+ 	path =3D roms/ipxe
+-	url =3D git://git.qemu-project.org/ipxe.git
++	url =3D https://git.qemu.org/git/ipxe.git
+ [submodule "roms/openbios"]
+ 	path =3D roms/openbios
+-	url =3D git://git.qemu-project.org/openbios.git
++	url =3D https://git.qemu.org/git/openbios.git
+ [submodule "roms/openhackware"]
+ 	path =3D roms/openhackware
+-	url =3D git://git.qemu-project.org/openhackware.git
++	url =3D https://git.qemu.org/git/openhackware.git
+ [submodule "roms/qemu-palcode"]
+ 	path =3D roms/qemu-palcode
+-	url =3D git://git.qemu.org/qemu-palcode.git
++	url =3D https://git.qemu.org/git/qemu-palcode.git
+ [submodule "roms/sgabios"]
+ 	path =3D roms/sgabios
+-	url =3D git://git.qemu-project.org/sgabios.git
++	url =3D https://git.qemu.org/git/sgabios.git
+ [submodule "dtc"]
+ 	path =3D dtc
+-	url =3D git://git.qemu-project.org/dtc.git
++	url =3D https://git.qemu.org/git/dtc.git
+ [submodule "roms/u-boot"]
+ 	path =3D roms/u-boot
+-	url =3D git://git.qemu-project.org/u-boot.git
++	url =3D https://git.qemu.org/git/u-boot.git
+ [submodule "roms/skiboot"]
+ 	path =3D roms/skiboot
+-	url =3D git://git.qemu.org/skiboot.git
++	url =3D https://git.qemu.org/git/skiboot.git
+ [submodule "roms/QemuMacDrivers"]
+ 	path =3D roms/QemuMacDrivers
+-	url =3D git://git.qemu.org/QemuMacDrivers.git
++	url =3D https://git.qemu.org/git/QemuMacDrivers.git
+ [submodule "ui/keycodemapdb"]
+ 	path =3D ui/keycodemapdb
+-	url =3D git://git.qemu.org/keycodemapdb.git
++	url =3D https://git.qemu.org/git/keycodemapdb.git
+ [submodule "capstone"]
+ 	path =3D capstone
+-	url =3D git://git.qemu.org/capstone.git
++	url =3D https://git.qemu.org/git/capstone.git
+ [submodule "roms/seabios-hppa"]
+ 	path =3D roms/seabios-hppa
+-	url =3D git://github.com/hdeller/seabios-hppa.git
++	url =3D https://github.com/hdeller/seabios-hppa.git
+ [submodule "roms/u-boot-sam460ex"]
+ 	path =3D roms/u-boot-sam460ex
+-	url =3D git://git.qemu.org/u-boot-sam460ex.git
++	url =3D https://git.qemu.org/git/u-boot-sam460ex.git
+ [submodule "tests/fp/berkeley-testfloat-3"]
+ 	path =3D tests/fp/berkeley-testfloat-3
+-	url =3D git://github.com/cota/berkeley-testfloat-3
++	url =3D https://github.com/cota/berkeley-testfloat-3
+ [submodule "tests/fp/berkeley-softfloat-3"]
+ 	path =3D tests/fp/berkeley-softfloat-3
+-	url =3D git://github.com/cota/berkeley-softfloat-3
++	url =3D https://github.com/cota/berkeley-softfloat-3
+--=20
 2.17.2
