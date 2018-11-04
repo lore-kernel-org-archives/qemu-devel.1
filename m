@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41962)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gJGiA-0007jl-9A
-	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 06:36:59 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gJHAW-0007o2-GG
+	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 07:06:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gJGi8-0002uL-8j
-	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 06:36:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56054)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gJGi8-0002su-1i
-	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 06:36:56 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Sun,  4 Nov 2018 11:24:24 +0000
-Message-Id: <20181104112424.18663-9-stefanha@redhat.com>
-In-Reply-To: <20181104112424.18663-1-stefanha@redhat.com>
-References: <20181104112424.18663-1-stefanha@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1gJHAN-0002p9-2d
+	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 07:06:12 -0500
+Resent-Message-Id: <E1gJHAN-0002p9-2d@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21449)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gJHAF-0001DO-Dw
+	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 07:06:01 -0500
+Message-ID: <154133034538.29281.12913763593296801710@015909e0f939>
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <20181103015821.30074-1-lbloch@janustech.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 8/8] docker: use HTTPS git URL for
- virglrenderer
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 4 Nov 2018 03:19:07 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] include: Add a comment to explain the
+ origin of sizes' lookup table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,36 +29,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: eblake@redhat.com, cohuck@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Jeff Cody <jcody@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Daniel Berrange <berrange@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: lbloch@janustech.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, philmd@redhat.com, kwolf@redhat.com, berto@igalia.com, qemu-block@nongnu.org, armbru@redhat.com, mreitz@redhat.com
 
-When you clone the repository without previous commit history, 'git://'
-doesn't protect from man-in-the-middle attacks.  HTTPS is more secure
-since the client verifies the server certificate.
-
-Cc: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Suggested-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- tests/docker/dockerfiles/debian-amd64.docker | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tests/docker/dockerfiles/debian-amd64.docker b/tests/docker/=
-dockerfiles/debian-amd64.docker
-index eb13f06ed1..24b113b76f 100644
---- a/tests/docker/dockerfiles/debian-amd64.docker
-+++ b/tests/docker/dockerfiles/debian-amd64.docker
-@@ -24,7 +24,7 @@ RUN DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
-         libegl1-mesa-dev \
-         libepoxy-dev \
-         libgbm-dev
--RUN git clone git://anongit.freedesktop.org/virglrenderer /usr/src/virgl=
-renderer
-+RUN git clone https://anongit.freedesktop.org/git/virglrenderer.git /usr=
-/src/virglrenderer
- RUN cd /usr/src/virglrenderer && ./autogen.sh && ./configure --with-glx =
---disable-tests && make install
-=20
- # netmap
---=20
-2.17.2
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgxMTAzMDE1ODIxLjMwMDc0LTEtbGJsb2NoQGphbnVzdGVjaC5jb20KU3Vi
+amVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSF0gaW5jbHVkZTogQWRkIGEgY29tbWVudCB0byBleHBs
+YWluIHRoZSBvcmlnaW4gb2Ygc2l6ZXMnIGxvb2t1cCB0YWJsZQoKPT09IFRFU1QgU0NSSVBUIEJF
+R0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVs
+aW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
+bmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25m
+aWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAt
+LWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAg
+ZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0l
+cyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRz
+L2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAg
+ICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1Qg
+U0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4
+ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwplZDMzODY3NzBjIGluY2x1
+ZGU6IEFkZCBhIGNvbW1lbnQgdG8gZXhwbGFpbiB0aGUgb3JpZ2luIG9mIHNpemVzJyBsb29rdXAg
+dGFibGUKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTogaW5jbHVkZTog
+QWRkIGEgY29tbWVudCB0byBleHBsYWluIHRoZSBvcmlnaW4gb2Ygc2l6ZXMnIGxvb2t1cCB0YWJs
+ZS4uLgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM0MjogRklMRTog
+aW5jbHVkZS9xZW11L3VuaXRzLmg6Mjc6CisgKiAgXklzdWZmaXg9IktNR1RQRSI7JAoKRVJST1I6
+IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNDM6IEZJTEU6IGluY2x1ZGUvcWVt
+dS91bml0cy5oOjI4OgorICogIF5JZm9yKGk9MTA7IGk8NjQ7IGkrKykgeyQKCkVSUk9SOiBjb2Rl
+IGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzQ0OiBGSUxFOiBpbmNsdWRlL3FlbXUvdW5p
+dHMuaDoyOToKKyAqICBeSV5JdmFsPTIqKmk7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBu
+ZXZlciB1c2UgdGFicwojNDU6IEZJTEU6IGluY2x1ZGUvcWVtdS91bml0cy5oOjMwOgorICogIF5J
+XklzPXN1YnN0cihzdWZmaXgsIGludChpLzEwKSwgMSk7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNo
+b3VsZCBuZXZlciB1c2UgdGFicwojNDY6IEZJTEU6IGluY2x1ZGUvcWVtdS91bml0cy5oOjMxOgor
+ICogIF5JXkluPTIqKihpJTEwKTskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVz
+ZSB0YWJzCiM0NzogRklMRTogaW5jbHVkZS9xZW11L3VuaXRzLmg6MzI6CisgKiAgXkleSXBhZD0y
+MS1pbnQobG9nKG4pL2xvZygxMCkpOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIg
+dXNlIHRhYnMKIzQ4OiBGSUxFOiBpbmNsdWRlL3FlbXUvdW5pdHMuaDozMzoKKyAqICBeSV5JcHJp
+bnRmKCIjZGVmaW5lIFNfJWQlc2lCICUqZFxuIiwgbiwgcywgcGFkLCB2YWwpOyQKCkVSUk9SOiBj
+b2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzQ5OiBGSUxFOiBpbmNsdWRlL3FlbXUv
+dW5pdHMuaDozNDoKKyAqICBeSX0kCgp0b3RhbDogOCBlcnJvcnMsIDAgd2FybmluZ3MsIDI0IGxp
+bmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
+LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
+IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBP
+VVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1h
+aWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3Jn
+L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
