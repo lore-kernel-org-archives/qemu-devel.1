@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37748)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gJQoD-0003n2-R2
-	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 17:23:54 -0500
+	(envelope-from <philmd@redhat.com>) id 1gJQv8-0008JO-Dk
+	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 17:31:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gJQoD-0003JB-2F
-	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 17:23:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53490)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gJQoC-0003HS-ND
-	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 17:23:52 -0500
-References: <20181104112424.18663-1-stefanha@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a68e6cad-ef57-a704-7574-b99e3f46482b@redhat.com>
-Date: Sun, 4 Nov 2018 23:23:34 +0100
+	(envelope-from <philmd@redhat.com>) id 1gJQv5-0005PA-A6
+	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 17:31:02 -0500
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:53403)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gJQv5-0005MI-3o
+	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 17:30:59 -0500
+Received: by mail-wm1-f67.google.com with SMTP id v24-v6so6484614wmh.3
+	for <qemu-devel@nongnu.org>; Sun, 04 Nov 2018 14:30:58 -0800 (PST)
+References: <20181103130143.7179-1-marcandre.lureau@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <d00e5a0e-a30e-69a6-d8fd-c748977c9191@redhat.com>
+Date: Sun, 4 Nov 2018 23:30:55 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181104112424.18663-1-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20181103130143.7179-1-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 0/8] Use 'https://' instead of 'git://'
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] qga-win: fix leaks of
+ build_guest_disk_info()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,53 +30,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: eblake@redhat.com, cohuck@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Jeff Cody <jcody@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Daniel Berrange <berrange@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: tgolembi@redhat.com, mdroth@linux.vnet.ibm.com
 
-On 04/11/2018 12:24, Stefan Hajnoczi wrote:
-> v3:
->  * Fix broken openhackware URL [Eric]
->  * Convert a few remaining URLs [Eric]
-> v2:
->  * Use HTTPS for repo.or.cz [Eric]
+On 3/11/18 14:01, Marc-André Lureau wrote:
+> Introduced in commit b1ba8890e63ce9432c41c5c3fc229f54c87c9c99, vol_h
+> handle should be closed, and "out" cleanup should be done after
+> DeviceIoControl() fails.
 > 
-> Jeff Cody has enabled git smart HTTP support on qemu.org.  From now on HTTPS is
-> the preferred protocol because it adds some protection against
-> man-in-the-middle when cloning a repo.
-> 
-> This patch series updates git:// URLs and changes them to https://.  The https:// URL format is:
-> 
->   https://git.qemu.org/git/<project>.git
-> 
-> The old git:// URL format was:
-> 
->   git://git.qemu.org/<project>.git
-> 
-> I have also updated git://github.com/ and repo.or.cz URLs because they offer HTTPS.
-> 
-> I have tested that submodules continue to work after the change to .gitmodules.
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-Thanks!  I've send a similar patch for qemu-web.git.
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Paolo
-
+> ---
+>   qga/commands-win32.c | 5 ++++-
+>   1 file changed, 4 insertions(+), 1 deletion(-)
 > 
-> Stefan Hajnoczi (8):
->   README: use 'https://' instead of 'git://'
->   get_maintainer: use 'https://' instead of 'git://'
->   MAINTAINERS: use 'https://' instead of 'git://' for GitHub
->   gitmodules: use 'https://' instead of 'git://'
->   git: use HTTPS git URLs for repo.or.cz
->   pc-testdev: use HTTPS git URL
->   target-alpha: use HTTPS git URL for palcode
->   docker: use HTTPS git URL for virglrenderer
-> 
->  MAINTAINERS                                  | 88 ++++++++++----------
->  hw/misc/pc-testdev.c                         |  2 +-
->  .gitmodules                                  | 34 ++++----
->  README                                       |  4 +-
->  pc-bios/README                               |  8 +-
->  scripts/get_maintainer.pl                    |  2 +-
->  tests/docker/dockerfiles/debian-amd64.docker |  2 +-
->  7 files changed, 70 insertions(+), 70 deletions(-)
+> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+> index ef1d7d48d2..62e1b51dfe 100644
+> --- a/qga/commands-win32.c
+> +++ b/qga/commands-win32.c
+> @@ -797,7 +797,7 @@ static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
+>                       0, extents, size, NULL, NULL)) {
+>                   error_setg_win32(errp, GetLastError(),
+>                       "failed to get disk extents");
+> -                return NULL;
+> +                goto out;
+>               }
+>           } else if (last_err == ERROR_INVALID_FUNCTION) {
+>               /* Possibly CD-ROM or a shared drive. Try to pass the volume */
+> @@ -855,6 +855,9 @@ static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
+>   
+>   
+>   out:
+> +    if (vol_h != INVALID_HANDLE_VALUE) {
+> +        CloseHandle(vol_h);
+> +    }
+>       qapi_free_GuestDiskAddress(disk);
+>       g_free(extents);
+>       g_free(name);
 > 
