@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38642)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41592)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gJIfH-0005FI-I6
-	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 08:42:08 -0500
+	(envelope-from <mlureau@redhat.com>) id 1gJIx9-0005UF-86
+	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 09:00:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gJIfG-0004Xx-IS
-	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 08:42:07 -0500
-References: <154131440495.28728.6130104691310518850@015909e0f939>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <9c68f3df-4a21-4434-6217-519d5fa2230f@ilande.co.uk>
-Date: Sun, 4 Nov 2018 13:41:18 +0000
+	(envelope-from <mlureau@redhat.com>) id 1gJIx4-0004VJ-4d
+	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 09:00:35 -0500
+Received: from mail-qk1-f194.google.com ([209.85.222.194]:46570)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gJIx2-0004Km-9K
+	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 09:00:29 -0500
+Received: by mail-qk1-f194.google.com with SMTP id q1so10504515qkf.13
+	for <qemu-devel@nongnu.org>; Sun, 04 Nov 2018 06:00:23 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <154131440495.28728.6130104691310518850@015909e0f939>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 00/10] hw/m68k: add Apple Machintosh
- Quadra 800 machine
+References: <0084f7223c080cdbdfc2c5a2d132f8d6c0eff866.1541083966.git.artem.k.pisarenko@gmail.com>
+In-Reply-To: <0084f7223c080cdbdfc2c5a2d132f8d6c0eff866.1541083966.git.artem.k.pisarenko@gmail.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Sun, 4 Nov 2018 18:00:11 +0400
+Message-ID: <CAMxuvazxmYdvn_0aTH0ETt_Eeo7rxCLXvZ_oANfcKhgGW92+ng@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] chardev: fix mess in OPENED/CLOSED events
+ when muxed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,127 +29,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, no-reply@patchew.org
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, jasowang@redhat.com, dgilbert@redhat.com, hpoussin@reactos.org, kraxel@redhat.com, pbonzini@redhat.com, mreitz@redhat.com, aurelien@aurel32.net, laurent@vivier.eu
+To: artem.k.pisarenko@gmail.com
+Cc: qemu-devel <qemu-devel@nongnu.org>, "Bonzini, Paolo" <pbonzini@redhat.com>
 
-On 04/11/2018 06:53, no-reply@patchew.org wrote:
+Hi
+On Thu, Nov 1, 2018 at 6:55 PM Artem Pisarenko
+<artem.k.pisarenko@gmail.com> wrote:
+>
+> When chardev is multiplexed (mux=3Don) there are a lot of cases, when
+> CHR_EVENT_OPENED/CHR_EVENT_CLOSED events pairing (expected from
+> frontend side) is broken. There are either generation of multiple
+> repeated or extra CHR_EVENT_OPENED events, or CHR_EVENT_CLOSED just
+> isn't generated at all (when it does with mux=3Doff).
+> Fix that.
+>
+> Signed-off-by: Artem Pisarenko <artem.k.pisarenko@gmail.com>
+> ---
+>
+> Notes:
+>     This issue actually more complex. Idea of generating events from insi=
+de function called '*_set_handlers' isn't good, at least its implicit natur=
+e, and especially a fact, that function decides about open state (see 'fe_o=
+pen' variable), but generates event only in one direction. Combined with 'm=
+ux_chr_set_handlers()' hack this makes things even worse.
+>     Better solution is to change fe interface and rewrite all frontends c=
+ode (a lot of stuff in hw/char/* and somewhere else).
+>     Although this patch doesn't fix any issue/bug (known to me), it preve=
+nts them in future. Also it optimizes emulation performance by avoiding ext=
+ra activity.
+>     I did several trivial tests on x86_64 target and seems like nothing b=
+roken.
 
-> Hi,
-> 
-> This series seems to have some coding style problems. See output below for
-> more information:
-> 
-> Type: series
-> Message-id: 20181102152257.20637-1-mark.cave-ayland@ilande.co.uk
-> Subject: [Qemu-devel] [PATCH v6 00/10] hw/m68k: add Apple Machintosh Quadra 800 machine
-> 
-> === TEST SCRIPT BEGIN ===
-> #!/bin/bash
-> 
-> BASE=base
-> n=1
-> total=$(git log --oneline $BASE.. | wc -l)
-> failed=0
-> 
-> git config --local diff.renamelimit 0
-> git config --local diff.renames True
-> git config --local diff.algorithm histogram
-> 
-> commits="$(git log --format=%H --reverse $BASE..)"
-> for c in $commits; do
->     echo "Checking PATCH $n/$total: $(git log -n 1 --format=%s $c)..."
->     if ! git show $c --format=email | ./scripts/checkpatch.pl --mailback -; then
->         failed=1
->         echo
->     fi
->     n=$((n+1))
-> done
-> 
-> exit $failed
-> === TEST SCRIPT END ===
-> 
-> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
-> Switched to a new branch 'test'
-> 9245542a6d hw/m68k: define Macintosh Quadra 800
-> 4b2499b92a dp8393x: manage big endian bus
-> 9a13b06b9f hw/m68k: add a dummy SWIM floppy controller
-> bdf5c3725c hw/m68k: add Nubus support for macfb video card
-> 6feff81d33 hw/m68k: add Nubus support
-> b24a39f653 esp: add pseudo-DMA as used by Macintosh
-> 970394cb59 hw/m68k: add macfb video card
-> 30013c1b4b escc: introduce a selector for the register bit
-> 3274bd6559 hw/m68k: implement ADB bus support for via
-> b78fd7f12a hw/m68k: add via support
-> 
-> === OUTPUT BEGIN ===
-> Checking PATCH 1/10: hw/m68k: add via support...
-> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-> #26: 
-> new file mode 100644
-> 
-> ERROR: space prohibited after that '&&' (ctx:WxW)
-> #348: FILE: hw/misc/mac_via.c:318:
-> +        if (!(v1s->last_b & VIA1B_vRTCClk) && (s->b & VIA1B_vRTCClk)) {
->                                             ^
+I am a bit reluctant to take patches that don't actually "fix" things.
 
-False positive from checkpatch?
-
-> total: 1 errors, 1 warnings, 778 lines checked
-> 
-> Your patch has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> 
-> Checking PATCH 2/10: hw/m68k: implement ADB bus support for via...
-> Checking PATCH 3/10: escc: introduce a selector for the register bit...
-> Checking PATCH 4/10: hw/m68k: add macfb video card...
-> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-> #43: 
-> new file mode 100644
-> 
-> total: 0 errors, 1 warnings, 496 lines checked
-> 
-> Your patch has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> Checking PATCH 5/10: esp: add pseudo-DMA as used by Macintosh...
-> Checking PATCH 6/10: hw/m68k: add Nubus support...
-> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-> #24: 
-> new file mode 100644
-> 
-> total: 0 errors, 1 warnings, 509 lines checked
-> 
-> Your patch has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> Checking PATCH 7/10: hw/m68k: add Nubus support for macfb video card...
-> Checking PATCH 8/10: hw/m68k: add a dummy SWIM floppy controller...
-> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-> #28: 
-> new file mode 100644
-> 
-> total: 0 errors, 1 warnings, 498 lines checked
-> 
-> Your patch has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> Checking PATCH 9/10: dp8393x: manage big endian bus...
-> Checking PATCH 10/10: hw/m68k: define Macintosh Quadra 800...
-> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-> #90: 
-> new file mode 100644
-> 
-> total: 0 errors, 1 warnings, 605 lines checked
-> 
-> Your patch has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> === OUTPUT END ===
-> 
-> Test command exited with code: 1
+Could you add some tests to demonstrate the problems?
 
 
-ATB,
 
-Mark.
+>
+>  chardev/char-fe.c          |  9 ++++++---
+>  chardev/char-mux.c         | 13 ++++++++-----
+>  include/chardev/char-mux.h |  2 +-
+>  3 files changed, 15 insertions(+), 9 deletions(-)
+>
+> diff --git a/chardev/char-fe.c b/chardev/char-fe.c
+> index a8931f7..31cf7f0 100644
+> --- a/chardev/char-fe.c
+> +++ b/chardev/char-fe.c
+> @@ -257,6 +257,7 @@ void qemu_chr_fe_set_handlers(CharBackend *b,
+>  {
+>      Chardev *s;
+>      int fe_open;
+> +    static __thread bool mux_reentered;
+
+Not very elegant. Maybe mux_chr_set_handlers() could call a refactored
+internal chr_fe_set_handlers() with an extra arg "no_open_event" ?
+
+>
+>      s =3D b->chr;
+>      if (!s) {
+> @@ -284,14 +285,16 @@ void qemu_chr_fe_set_handlers(CharBackend *b,
+>      if (fe_open) {
+>          qemu_chr_fe_take_focus(b);
+>          /* We're connecting to an already opened device, so let's make s=
+ure we
+> -           also get the open event */
+> -        if (s->be_open) {
+> +           also get the open event (hack: except when chardev is muxed) =
+*/
+> +        if (s->be_open && !mux_reentered) {
+>              qemu_chr_be_event(s, CHR_EVENT_OPENED);
+>          }
+>      }
+>
+>      if (CHARDEV_IS_MUX(s)) {
+> -        mux_chr_set_handlers(s, context);
+> +        mux_reentered =3D true;
+> +        mux_chr_set_handlers(s, fe_open, context);
+> +        mux_reentered =3D false;
+>      }
+>  }
+>
+> diff --git a/chardev/char-mux.c b/chardev/char-mux.c
+> index 6055e76..9244802 100644
+> --- a/chardev/char-mux.c
+> +++ b/chardev/char-mux.c
+> @@ -272,21 +272,24 @@ static void char_mux_finalize(Object *obj)
+>      for (i =3D 0; i < d->mux_cnt; i++) {
+>          CharBackend *be =3D d->backends[i];
+>          if (be) {
+> +            if (be->chr && be->chr->be_open) {
+> +                qemu_chr_be_event(be->chr, CHR_EVENT_CLOSED);
+> +            }
+
+It looks like this could be a seperate patch, with a seperate test.
+
+>              be->chr =3D NULL;
+>          }
+>      }
+>      qemu_chr_fe_deinit(&d->chr, false);
+>  }
+>
+> -void mux_chr_set_handlers(Chardev *chr, GMainContext *context)
+> +void mux_chr_set_handlers(Chardev *chr, bool is_open, GMainContext *cont=
+ext)
+>  {
+>      MuxChardev *d =3D MUX_CHARDEV(chr);
+>
+>      /* Fix up the real driver with mux routines */
+>      qemu_chr_fe_set_handlers(&d->chr,
+> -                             mux_chr_can_read,
+> -                             mux_chr_read,
+> -                             mux_chr_event,
+> +                             is_open ? mux_chr_can_read : NULL,
+> +                             is_open ? mux_chr_read : NULL,
+> +                             is_open ? mux_chr_event : NULL,
+
+same
+
+>                               NULL,
+>                               chr,
+>                               context, true);
+> @@ -367,7 +370,7 @@ static int open_muxes(Chardev *chr)
+>       * mark mux as OPENED so any new FEs will immediately receive
+>       * OPENED event
+>       */
+> -    qemu_chr_be_event(chr, CHR_EVENT_OPENED);
+> +    chr->be_open =3D 1;
+>
+>      return 0;
+>  }
+> diff --git a/include/chardev/char-mux.h b/include/chardev/char-mux.h
+> index 1e13187..4b4df6e 100644
+> --- a/include/chardev/char-mux.h
+> +++ b/include/chardev/char-mux.h
+> @@ -55,7 +55,7 @@ typedef struct MuxChardev {
+>  #define CHARDEV_IS_MUX(chr)                             \
+>      object_dynamic_cast(OBJECT(chr), TYPE_CHARDEV_MUX)
+>
+> -void mux_chr_set_handlers(Chardev *chr, GMainContext *context);
+> +void mux_chr_set_handlers(Chardev *chr, bool is_open, GMainContext *cont=
+ext);
+>  void mux_set_focus(Chardev *chr, int focus);
+>  void mux_chr_send_all_event(Chardev *chr, int event);
+>
+> --
+> 2.7.4
+
+thanks!
