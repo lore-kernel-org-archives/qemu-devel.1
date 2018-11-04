@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42240)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gJR2j-0006xe-RX
-	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 17:38:54 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gJS0c-0000EU-Q2
+	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 18:40:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gJR2e-0008WC-3k
-	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 17:38:51 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:33917)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gJR2d-0008Qx-Rc
-	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 17:38:48 -0500
-Received: by mail-wr1-f66.google.com with SMTP id j26-v6so7460994wre.1
-	for <qemu-devel@nongnu.org>; Sun, 04 Nov 2018 14:38:38 -0800 (PST)
-References: <20181104112424.18663-1-stefanha@redhat.com>
-	<20181104112424.18663-2-stefanha@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <870a4d46-0044-bab9-38a6-a65714803d2e@redhat.com>
-Date: Sun, 4 Nov 2018 23:38:35 +0100
+	(envelope-from <mreitz@redhat.com>) id 1gJS0b-0008Bl-Q3
+	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 18:40:46 -0500
+References: <20181019113424.25727-1-armbru@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <d370d182-01c8-f4ab-ed63-207a9dc4c4d6@redhat.com>
+Date: Mon, 5 Nov 2018 00:40:20 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181104112424.18663-2-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/8] README: use 'https://' instead of
- 'git://'
+In-Reply-To: <20181019113424.25727-1-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="89E3jVpF678JxOnCaKX6VlcFbReT4ibTP"
+Subject: Re: [Qemu-devel] [PATCH] block: Make more block drivers
+ compile-time configurable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,68 +24,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jeff Cody <jcody@redhat.com>, cohuck@redhat.com, Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: jeff@codyprime.org, kwolf@redhat.com, qemu-block@nongnu.org
 
-On 4/11/18 12:24, Stefan Hajnoczi wrote:
-> When you clone the repository without previous commit history, 'git://'
-> doesn't protect from man-in-the-middle attacks.  HTTPS is more secure
-> since the client verifies the server certificate.
-> 
-> Reported-by: Jann Horn <jannh@google.com>
-> Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--89E3jVpF678JxOnCaKX6VlcFbReT4ibTP
+From: Max Reitz <mreitz@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: jeff@codyprime.org, kwolf@redhat.com, qemu-block@nongnu.org
+Message-ID: <d370d182-01c8-f4ab-ed63-207a9dc4c4d6@redhat.com>
+Subject: Re: [PATCH] block: Make more block drivers compile-time configurable
+References: <20181019113424.25727-1-armbru@redhat.com>
+In-Reply-To: <20181019113424.25727-1-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
+On 19.10.18 13:34, Markus Armbruster wrote:
+> From: Jeff Cody <jcody@redhat.com>
+>=20
+> This adds configure options to control the following block drivers:
+>=20
+> * Bochs
+> * Cloop
+> * Dmg
+> * Qcow (V1)
+> * Vdi
+> * Vvfat
+> * qed
+> * parallels
+> * sheepdog
+>=20
+> Each of these defaults to being enabled.
+>=20
+> Signed-off-by: Jeff Cody <jcody@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->   README         | 4 ++--
->   pc-bios/README | 4 ++--
->   2 files changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/README b/README
-> index 49a9fd09cd..441c33eb2f 100644
-> --- a/README
-> +++ b/README
-> @@ -54,7 +54,7 @@ Submitting patches
->   
->   The QEMU source code is maintained under the GIT version control system.
->   
-> -   git clone git://git.qemu.org/qemu.git
-> +   git clone https://git.qemu.org/git/qemu.git
->   
->   When submitting patches, one common approach is to use 'git
->   format-patch' and/or 'git send-email' to format & send the mail to the
-> @@ -70,7 +70,7 @@ the QEMU website
->   
->   The QEMU website is also maintained under source control.
->   
-> -  git clone git://git.qemu.org/qemu-web.git
-> +  git clone https://git.qemu.org/git/qemu-web.git
->     https://www.qemu.org/2017/02/04/the-new-qemu-website-is-up/
->   
->   A 'git-publish' utility was created to make above process less
-> diff --git a/pc-bios/README b/pc-bios/README
-> index 90f0fa7aa7..b572e9eb00 100644
-> --- a/pc-bios/README
-> +++ b/pc-bios/README
-> @@ -23,7 +23,7 @@
->     legacy x86 software to communicate with an attached serial console as
->     if a video card were attached.  The master sources reside in a subversion
->     repository at http://sgabios.googlecode.com/svn/trunk.  A git mirror is
-> -  available at git://git.qemu.org/sgabios.git.
-> +  available at https://git.qemu.org/git/sgabios.git.
->   
->   - The PXE roms come from the iPXE project. Built with BANNER_TIME 0.
->     Sources available at http://ipxe.org.  Vendor:Device ID -> ROM mapping:
-> @@ -40,7 +40,7 @@
->   
->   - The u-boot binary for e500 comes from the upstream denx u-boot project where
->     it was compiled using the qemu-ppce500 target.
-> -  A git mirror is available at: git://git.qemu.org/u-boot.git
-> +  A git mirror is available at: https://git.qemu.org/git/u-boot.git
->     The hash used to compile the current version is: 2072e72
->   
->   - Skiboot (https://github.com/open-power/skiboot/) is an OPAL
-> 
+>=20
+> Hmm, we got quite a few --enable-BLOCK-DRIVER now.  Perhaps a single
+> list-valued option similar --target-list would be better.  Could be
+> done on top.
+>=20
+>  block/Makefile.objs | 22 ++++++++---
+>  configure           | 91 +++++++++++++++++++++++++++++++++++++++++++++=
+
+>  2 files changed, 107 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/block/Makefile.objs b/block/Makefile.objs
+> index c8337bf186..1cad9fc4f1 100644
+> --- a/block/Makefile.objs
+> +++ b/block/Makefile.objs
+
+[...]
+
+> @@ -45,7 +54,8 @@ gluster.o-libs     :=3D $(GLUSTERFS_LIBS)
+>  vxhs.o-libs        :=3D $(VXHS_LIBS)
+>  ssh.o-cflags       :=3D $(LIBSSH2_CFLAGS)
+>  ssh.o-libs         :=3D $(LIBSSH2_LIBS)
+> -block-obj-$(if $(CONFIG_BZIP2),m,n) +=3D dmg-bz2.o
+> +block-obj-dmg-bz2$(if $(CONFIG_BZIP2),m,n) +=3D dmg-bz2.o
+> +block-obj-$(CONFIG_DMG) +=3D $(block-obj-dmg-bz2-y)
+
+This defines "block-obj-dmg-bz2m" or "block-obj-dmg-bz2n", so
+"block-obj-dmg-bz2-y" is never defined (note both the missing hyphen and
+the "m" vs. "y").
+
+How about:
+
+block-obj-dmg-bz2-$(CONFIG_BZIP2) +=3D dmg-bz2.o
+block-obj-$(if $(CONFIG_DMG),m,n) +=3D $(block-obj-dmg-bz2-y)
+
+Bonus point: The "+=3D" are naturally aligned!
+
+(Fun fact on the side: I tried downloading some dmg image, but qemu
+refused to open that.  ("sector count 409600 for chunk 4 is larger than
+max (131072)" -- yeah, yeah, I know that I'm not the largest guy) -- but
+you can test it just by replacing "dmg-bz2.o" by "does-not-exist.o", and
+then make complains normally, but stops complaining with --disable-dmg
+or --disable-bzip2.)
+
+Max
+
+>  dmg-bz2.o-libs     :=3D $(BZIP2_LIBS)
+>  qcow.o-libs        :=3D -lz
+>  linux-aio.o-libs   :=3D -laio
+
+
+--89E3jVpF678JxOnCaKX6VlcFbReT4ibTP
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlvfg2QACgkQ9AfbAGHV
+z0CE7Qf/cWL4QBo7BocvbUSpM4MmAR00opyit6O9redTShm0vYfqE8QBNX6dy4Ii
+nL87W0f0D6ysftqHmd0c1MUBLB60HE3LRtwwH3523aYo7z+mUcIlDiXp6n3JO49y
+0YA5MMEYh8GpiYesOoPb/WOAJj6uQb8BTuqew5VizwFQxt5zzji5AjYW3kXazRji
+/dAWUPwT8KkhwoMC3I+mUOUjUf7exbGHMdAzEK7BHrxlgnpo+odgVnElYTHp3Bqt
+HrTVF4zUQCB7qUuQDV2P6M1OzcKVsyLMZWL5BDNwR0gzkD6uoT1pl/MuDRxfADIC
+zQphEsOOTP6JcrZyMoYvW5M9nrQWCw==
+=JSFK
+-----END PGP SIGNATURE-----
+
+--89E3jVpF678JxOnCaKX6VlcFbReT4ibTP--
