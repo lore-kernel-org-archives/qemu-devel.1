@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35987)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35872)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gJQkZ-0007uS-3M
-	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 17:20:07 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gJQkn-0007qL-To
+	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 17:20:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gJQkW-00040j-07
-	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 17:20:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:3798)
+	(envelope-from <pbonzini@redhat.com>) id 1gJQdW-0002QH-NC
+	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 17:12:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34420)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gJQkV-0003zP-OI
-	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 17:20:03 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gJQdW-0002N1-Dn
+	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 17:12:50 -0500
 References: <CALMp9eQ5zWxb2N9fyYz=WcQshwk0L6qQ4D6L6+p_dzMo4H=txA@mail.gmail.com>
 	<20181102034649.43559-1-liran.alon@oracle.com>
 	<12c26c34-8dd1-a442-7826-86b93ff978f8@redhat.com>
-	<20181102165409.GF21191@redhat.com>
+	<20181102123504.GA2387@work-vm>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f58da4e8-aa40-2659-8db6-42c2b47f5b2f@redhat.com>
-Date: Sun, 4 Nov 2018 23:19:57 +0100
+Message-ID: <8f689c05-350b-b9b3-2c62-e7a54c85af7d@redhat.com>
+Date: Sun, 4 Nov 2018 23:12:43 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181102165409.GF21191@redhat.com>
+In-Reply-To: <20181102123504.GA2387@work-vm>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [QEMU PATCH v2 0/2]: KVM: i386: Add support for
  save and restore nested state
 List-Id: <qemu-devel.nongnu.org>
@@ -31,34 +31,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc: Liran Alon <liran.alon@oracle.com>, jmattson@google.com, ehabkost@redhat.com, kvm@vger.kernel.org, mtosatti@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, rth@twiddle.net
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Liran Alon <liran.alon@oracle.com>, jmattson@google.com, ehabkost@redhat.com, kvm@vger.kernel.org, mtosatti@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org
 
-On 02/11/2018 17:54, Daniel P. Berrang=C3=A9 wrote:
-> We have usually followed a rule that new machine types must not
-> affect runability of a VM on a host. IOW new machine types should
-> not introduce dependancies on specific kernels, or hardware features
-> such as CPU flags.
+On 02/11/2018 13:35, Dr. David Alan Gilbert wrote:
+>>
+>> Personally, I would like to say that, starting from QEMU 3.2, enabling
+>> nested VMX requires a 4.20 kernel.  It's a bit bold, but I think it's a
+>> good way to keep some sanity.  Any opinions on that?
+> That seems a bit mean; there's a lot of people already using nested.
 
-> Anything that requires a new kernel feature thus ought to be an
-> opt-in config tunable on the CLI, separate from machine type
-> choice.
-
-Unless someone tinkered with the module parameters, they could not even
-use nested virtualization before 4.20.  So for everyone else, "-cpu
-...,+vmx" does count as an "opt-in config tunable on the CLI" that
-requires 4.20.
-
-For those that did tinker with module parameters, we can grandfather in
-the old machine types, so that they can use nested virtualization with
-no live migration support.  For those that did not, however, I don't
-think it makes sense to say "oh by the way I really want to be able to
-migrate this VM" on the command line, or even worse on the monitor.
+True.  However, a more complete version of the "plan" is that they could
+continue using it, but only with a pre-3.2 machine type.
 
 Paolo
-
-> Alternatively in this case, it could potentially be a
-> migration parameter settable via QMP. QEMU on each side could
-> advertize whether the migration parameter is available, and
-> the mgmt app (which can see both sides of the migration) can
-> then decide whether to enable it.
