@@ -1,18 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33886)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gMpPh-0002Rr-1e
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 02:16:40 -0500
+	(envelope-from <skintigh@gmail.com>) id 1gMmyh-0005u1-PW
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 23:40:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gMpPX-0001JX-VR
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 02:16:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45268)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gMpPV-0001Gw-9X
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 02:16:26 -0500
-From: Peter Xu <peterx@redhat.com>
-Date: Wed, 14 Nov 2018 15:16:11 +0800
-Message-Id: <20181114071611.5352-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH] replication: Make --disable-replication compile
+	(envelope-from <skintigh@gmail.com>) id 1gMmyg-0007Iy-Ef
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 23:40:35 -0500
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:37781)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <skintigh@gmail.com>) id 1gMmyg-00079T-6w
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 23:40:34 -0500
+Received: by mail-oi1-x242.google.com with SMTP id y23so3381458oia.4
+	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 20:40:18 -0800 (PST)
+MIME-Version: 1.0
+From: Seth K <skintigh@gmail.com>
+Date: Sun, 4 Nov 2018 02:42:38 -0500
+Message-ID: <CAErn8fSCPZ1YKnf0OWq98S3-GFK9-3=uWgwfMO5Hut7PiDpcrw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] [PATCH] Corrected memory regions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,134 +25,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peterx@redhat.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Yanan Fu <yfu@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Alistair Francis <alistair@alistair23.me>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-We've fixed it before like 38bb54f323 ("replication: Make
---disable-replication compile again", 2017-04-28) but it's failing
-again.  So fix it again.
-
-There could be even cleaner way to fix this but current way is the
-simplest.  Let's start from simple.
-
-CC: zhanghailiang <zhang.zhanghailiang@huawei.com>
-CC: Juan Quintela <quintela@redhat.com>
-CC: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-CC: Peter Maydell <peter.maydell@linaro.org>
-CC: Yanan Fu <yfu@redhat.com>
-CC: Markus Armbruster <armbru@redhat.com>
-Reported-by: Yanan Fu <yfu@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
+I corrected these 2 memory regions based on specifications from the chip
+manufacturer. The existing ranges seem to overlap and and cause odd
+behavior and/or crashes when trying to set up multiple UARTs,
+I also played with changing MAX_SERIAL_PORTS to 8 to match the hardware,
+but I did not include that in this patch as I never fully tested its
+effects.
+This is my first patch, I hope I did it correctly,
+Seth Kintigh
 ---
- migration/colo.c | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+ hw/char/stm32f2xx_usart.c  | 2 +-
+ hw/timer/stm32f2xx_timer.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/migration/colo.c b/migration/colo.c
-index 956ac236b7..78b64ef0cb 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -33,8 +33,10 @@
- #include "sysemu/cpus.h"
- #include "net/filter.h"
- 
-+#ifdef CONFIG_REPLICATION
- static bool vmstate_loading;
- static Notifier packets_compare_notifier;
-+#endif
- 
- #define COLO_BUFFER_BASE_SIZE (4 * 1024 * 1024)
- 
-@@ -59,6 +61,7 @@ static bool colo_runstate_is_stopped(void)
- 
- static void secondary_vm_do_failover(void)
- {
-+#ifdef CONFIG_REPLICATION
-     int old_state;
-     MigrationIncomingState *mis = migration_incoming_get_current();
-     Error *local_err = NULL;
-@@ -121,10 +124,14 @@ static void secondary_vm_do_failover(void)
-     if (mis->migration_incoming_co) {
-         qemu_coroutine_enter(mis->migration_incoming_co);
-     }
-+#else
-+    abort();
-+#endif
+diff --git a/hw/char/stm32f2xx_usart.c b/hw/char/stm32f2xx_usart.c
+index 032b5fda13..f3363a2952 100644
+--- a/hw/char/stm32f2xx_usart.c
++++ b/hw/char/stm32f2xx_usart.c
+@@ -202,7 +202,7 @@ static void stm32f2xx_usart_init(Object *obj)
+     sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->irq);
+
+     memory_region_init_io(&s->mmio, obj, &stm32f2xx_usart_ops, s,
+-                          TYPE_STM32F2XX_USART, 0x2000);
++                          TYPE_STM32F2XX_USART, 0x400);
+     sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
  }
- 
- static void primary_vm_do_failover(void)
- {
-+#ifdef CONFIG_REPLICATION
-     MigrationState *s = migrate_get_current();
-     int old_state;
-     Error *local_err = NULL;
-@@ -165,6 +172,9 @@ static void primary_vm_do_failover(void)
- 
-     /* Notify COLO thread that failover work is finished */
-     qemu_sem_post(&s->colo_exit_sem);
-+#else
-+    abort();
-+#endif
- }
- 
- COLOMode get_colo_mode(void)
-@@ -271,6 +281,8 @@ COLOStatus *qmp_query_colo_status(Error **errp)
-     return s;
- }
- 
-+#ifdef CONFIG_REPLICATION
-+
- static void colo_send_message(QEMUFile *f, COLOMessage msg,
-                               Error **errp)
- {
-@@ -489,9 +501,11 @@ static void colo_compare_notify_checkpoint(Notifier *notifier, void *data)
- {
-     colo_checkpoint_notify(data);
- }
-+#endif
- 
- static void colo_process_checkpoint(MigrationState *s)
- {
-+#ifdef CONFIG_REPLICATION
-     QIOChannelBuffer *bioc;
-     QEMUFile *fb = NULL;
-     int64_t current_time = qemu_clock_get_ms(QEMU_CLOCK_HOST);
-@@ -603,6 +617,9 @@ out:
-     if (s->rp_state.from_dst_file) {
-         qemu_fclose(s->rp_state.from_dst_file);
-     }
-+#else
-+    abort();
-+#endif
- }
- 
- void colo_checkpoint_notify(void *opaque)
-@@ -631,6 +648,7 @@ void migrate_start_colo_process(MigrationState *s)
-     qemu_mutex_lock_iothread();
- }
- 
-+#ifdef CONFIG_REPLICATION
- static void colo_wait_handle_message(QEMUFile *f, int *checkpoint_request,
-                                      Error **errp)
- {
-@@ -653,9 +671,11 @@ static void colo_wait_handle_message(QEMUFile *f, int *checkpoint_request,
-         break;
-     }
- }
-+#endif
- 
- void *colo_process_incoming_thread(void *opaque)
- {
-+#ifdef CONFIG_REPLICATION
-     MigrationIncomingState *mis = opaque;
-     QEMUFile *fb = NULL;
-     QIOChannelBuffer *bioc = NULL; /* Cache incoming device state */
-@@ -859,4 +879,7 @@ out:
- 
-     rcu_unregister_thread();
-     return NULL;
-+#else
-+    abort();
-+#endif
- }
+
+diff --git a/hw/timer/stm32f2xx_timer.c b/hw/timer/stm32f2xx_timer.c
+index 58fc7b1188..ae744d1642 100644
+--- a/hw/timer/stm32f2xx_timer.c
++++ b/hw/timer/stm32f2xx_timer.c
+@@ -308,7 +308,7 @@ static void stm32f2xx_timer_init(Object *obj)
+     sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->irq);
+
+     memory_region_init_io(&s->iomem, obj, &stm32f2xx_timer_ops, s,
+-                          "stm32f2xx_timer", 0x4000);
++                          "stm32f2xx_timer", 0x400);
+     sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->iomem);
+
+     s->timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, stm32f2xx_timer_interrupt,
+s);
 -- 
-2.17.1
+2.11.0
