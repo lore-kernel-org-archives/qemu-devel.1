@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34483)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gJiP4-0004Rf-Rz
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 12:11:10 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gJiPF-000500-4s
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 12:11:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gJiEs-0000qZ-Mn
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 12:00:40 -0500
-References: <mhng-3a3dd1f0-dbed-4b43-b21f-88ecea6f5fb1@palmer-si-x1c4>
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Message-ID: <8cede3dd-e348-639e-b528-3aa87abf1aae@mail.uni-paderborn.de>
-Date: Mon, 5 Nov 2018 18:00:10 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1gJiBm-0003Bk-Nv
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:57:29 -0500
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:44860)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gJiBh-0002wW-4L
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:57:18 -0500
+Received: by mail-oi1-x242.google.com with SMTP id k19-v6so8053693oic.11
+	for <qemu-devel@nongnu.org>; Mon, 05 Nov 2018 08:57:15 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <mhng-3a3dd1f0-dbed-4b43-b21f-88ecea6f5fb1@palmer-si-x1c4>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US-large
-Subject: Re: [Qemu-devel] [PATCH v3 26/35] target/riscv: Remove shift and
- slt insn manual decoding
+In-Reply-To: <20181102170730.12432-13-contrib@steffen-goertz.de>
+References: <20181102170730.12432-1-contrib@steffen-goertz.de>
+	<20181102170730.12432-13-contrib@steffen-goertz.de>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 5 Nov 2018 16:56:54 +0000
+Message-ID: <CAFEAcA8mW6PehY7NVDJ0G+B6aU2ChpmijgAfmvo6j+YiLhnj5g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 12/13] arm: Instantiate NRF51 Timers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,90 +30,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Palmer Dabbelt <palmer@sifive.com>, richard.henderson@linaro.org
-Cc: qemu-riscv@nongnu.org, sagark@eecs.berkeley.edu, qemu-devel@nongnu.org, peer.adelt@hni.uni-paderborn.de, Alistair Francis <Alistair.Francis@wdc.com>, Michael Clark <mjc@sifive.com>
+To: =?UTF-8?Q?Steffen_G=C3=B6rtz?= <contrib@steffen-goertz.de>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, "open list:NRF51" <qemu-arm@nongnu.org>
 
-
-On 11/1/18 4:59 PM, Palmer Dabbelt wrote:
-> On Wed, 31 Oct 2018 15:38:08 PDT (-0700), richard.henderson@linaro.org 
-> wrote:
->> On 10/31/18 1:20 PM, Bastian Koppelmann wrote:
->>>  static bool trans_slt(DisasContext *ctx, arg_slt *a)
->>>  {
->>> -    gen_arith(ctx, OPC_RISC_SLT, a->rd, a->rs1, a->rs2);
->>> +    TCGv source1 = tcg_temp_new();
->>> +    TCGv source2 = tcg_temp_new();
->>> +
->>> +    gen_get_gpr(source1, a->rs1);
->>> +    gen_get_gpr(source2, a->rs2);
->>> +
->>> +    tcg_gen_setcond_tl(TCG_COND_LT, source1, source1, source2);
->>
->> I do wonder about extracting this one line to gen_slt so that you can 
->> re-use
->> gen_arith and gen_arithi.
->>
->>> +    tcg_gen_setcond_tl(TCG_COND_LTU, source1, source1, source2);
->>
->> Similarly.
->>
->>>  static bool trans_sllw(DisasContext *ctx, arg_sllw *a)
->>>  {
->>> -    gen_arith(ctx, OPC_RISC_SLLW, a->rd, a->rs1, a->rs2);
->>> +    TCGv source1 = tcg_temp_new();
->>> +    TCGv source2 = tcg_temp_new();
->>> +
->>> +    gen_get_gpr(source1, a->rs1);
->>> +    gen_get_gpr(source2, a->rs2);
->>> +
->>> +    tcg_gen_andi_tl(source2, source2, 0x1F);
->>> +    tcg_gen_shl_tl(source1, source1, source2);
->>> +
->>> +    gen_set_gpr(a->rd, source1);
->>
->> Missing the ext32s after the shift.
->>
->>>  static bool trans_srlw(DisasContext *ctx, arg_srlw *a)
->>>  {
->>> -    gen_arith(ctx, OPC_RISC_SRLW, a->rd, a->rs1, a->rs2);
->>> +    TCGv source1 = tcg_temp_new();
->>> +    TCGv source2 = tcg_temp_new();
->>> +
->>> +    gen_get_gpr(source1, a->rs1);
->>> +    gen_get_gpr(source2, a->rs2);
->>> +
->>> +    /* clear upper 32 */
->>> +    tcg_gen_ext32u_tl(source1, source1);
->>> +    tcg_gen_andi_tl(source2, source2, 0x1F);
->>> +    tcg_gen_shr_tl(source1, source1, source2);
->>
->> Likewise.  (Consider source2 == 0.)
->>
->>> -    case OPC_RISC_SRL:
->>> -        tcg_gen_andi_tl(source2, source2, TARGET_LONG_BITS - 1);
->>> -        tcg_gen_shr_tl(source1, source1, source2);
->>> -        break;
->> ...
->>> -    case OPC_RISC_SRA:
->>> -        tcg_gen_andi_tl(source2, source2, TARGET_LONG_BITS - 1);
->>> -        tcg_gen_sar_tl(source1, source1, source2);
->>> -        break;
->>
->> I see that the bugs are in the original though, so fixing them in a 
->> separate
->> patch is certainly ok.
+On 2 November 2018 at 17:07, Steffen G=C3=B6rtz <contrib@steffen-goertz.de>=
+ wrote:
+> Instantiates TIMER0 - TIMER2
 >
-> Since we're in the soft freeze now, I think it would be great to get 
-> the bug fixes broken out as separate patches at the start of this 
-> series that we can pick up for this release.  It would be great if the 
-> decodetree conversion was a non-functional change, as that will make 
-> it easier to review.
+> Signed-off-by: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  hw/arm/nrf51_soc.c         | 27 +++++++++++++++++++++++++++
+>  include/hw/arm/nrf51_soc.h |  4 ++++
+>  2 files changed, 31 insertions(+)
 
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-Sounds good. Unfortunately, I don't have much time right now. I try at 
-least to extract the bugfixes, such that they make it for this release.
-
-
-Cheers,
-
-Bastian
+thanks
+-- PMM
