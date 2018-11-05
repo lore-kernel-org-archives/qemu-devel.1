@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60494)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60626)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gJjQg-0007tJ-4r
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:16:54 -0500
+	(envelope-from <mst@redhat.com>) id 1gJjQn-0007zu-Uj
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:16:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gJjQd-00036Y-G5
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:16:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42202)
+	(envelope-from <mst@redhat.com>) id 1gJjQm-0003Ho-JX
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:16:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36206)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gJjQc-0002te-Sy
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:16:47 -0500
-Date: Mon, 5 Nov 2018 13:16:31 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gJjQm-0003HD-9m
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:16:56 -0500
+Date: Mon, 5 Nov 2018 13:16:54 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181105181353.39804-16-mst@redhat.com>
+Message-ID: <20181105181353.39804-25-mst@redhat.com>
 References: <20181105181353.39804-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20181105181353.39804-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 15/33] x86_iommu/amd: Prepare for interrupt
- remap support
+Subject: [Qemu-devel] [PULL 24/33] bios-tables-test: prepare expected files
+ for mmio64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,226 +28,102 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Singh, Brijesh" <brijesh.singh@amd.com>, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Tom Lendacky <Thomas.Lendacky@amd.com>, Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-From: "Singh, Brijesh" <brijesh.singh@amd.com>
+test will be added by follow-up patch.
 
-Register the interrupt remapping callback and read/write ops for the
-amd-iommu-ir memory region.
-
-amd-iommu-ir is set to higher priority to ensure that this region won't
-be masked out by other memory regions.
-
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-Cc: Peter Xu <peterx@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: Tom Lendacky <Thomas.Lendacky@amd.com>
-Cc: Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/i386/amd_iommu.h  |  14 +++++-
- hw/i386/amd_iommu.c  | 106 +++++++++++++++++++++++++++++++++++++++++++
- hw/i386/trace-events |   5 ++
- 3 files changed, 123 insertions(+), 2 deletions(-)
+ tests/data/acpi/q35/DSDT.mmio64 | Bin 0 -> 8947 bytes
+ tests/data/acpi/q35/SRAT.mmio64 | Bin 0 -> 224 bytes
+ 2 files changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 tests/data/acpi/q35/DSDT.mmio64
+ create mode 100644 tests/data/acpi/q35/SRAT.mmio64
 
-diff --git a/hw/i386/amd_iommu.h b/hw/i386/amd_iommu.h
-index 874030582d..4e7cc271c4 100644
---- a/hw/i386/amd_iommu.h
-+++ b/hw/i386/amd_iommu.h
-@@ -206,8 +206,18 @@
- 
- #define AMDVI_COMMAND_SIZE   16
- 
--#define AMDVI_INT_ADDR_FIRST 0xfee00000
--#define AMDVI_INT_ADDR_LAST  0xfeefffff
-+#define AMDVI_INT_ADDR_FIRST    0xfee00000
-+#define AMDVI_INT_ADDR_LAST     0xfeefffff
-+#define AMDVI_INT_ADDR_SIZE     (AMDVI_INT_ADDR_LAST - AMDVI_INT_ADDR_FIRST + 1)
-+#define AMDVI_MSI_ADDR_HI_MASK  (0xffffffff00000000ULL)
-+#define AMDVI_MSI_ADDR_LO_MASK  (0x00000000ffffffffULL)
-+
-+/* SB IOAPIC is always on this device in AMD systems */
-+#define AMDVI_IOAPIC_SB_DEVID   PCI_BUILD_BDF(0, PCI_DEVFN(0x14, 0))
-+
-+/* Interrupt remapping errors */
-+#define AMDVI_IR_ERR            0x1
-+
- 
- #define TYPE_AMD_IOMMU_DEVICE "amd-iommu"
- #define AMD_IOMMU_DEVICE(obj)\
-diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
-index 4bec1c6688..9118a75530 100644
---- a/hw/i386/amd_iommu.c
-+++ b/hw/i386/amd_iommu.c
-@@ -26,6 +26,7 @@
- #include "amd_iommu.h"
- #include "qapi/error.h"
- #include "qemu/error-report.h"
-+#include "hw/i386/apic_internal.h"
- #include "trace.h"
- 
- /* used AMD-Vi MMIO registers */
-@@ -1031,6 +1032,99 @@ static IOMMUTLBEntry amdvi_translate(IOMMUMemoryRegion *iommu, hwaddr addr,
-     return ret;
- }
- 
-+/* Interrupt remapping for MSI/MSI-X entry */
-+static int amdvi_int_remap_msi(AMDVIState *iommu,
-+                               MSIMessage *origin,
-+                               MSIMessage *translated,
-+                               uint16_t sid)
-+{
-+    assert(origin && translated);
-+
-+    trace_amdvi_ir_remap_msi_req(origin->address, origin->data, sid);
-+
-+    if (!iommu || !X86_IOMMU_DEVICE(iommu)->intr_supported) {
-+        memcpy(translated, origin, sizeof(*origin));
-+        goto out;
-+    }
-+
-+    if (origin->address & AMDVI_MSI_ADDR_HI_MASK) {
-+        trace_amdvi_err("MSI address high 32 bits non-zero when "
-+                        "Interrupt Remapping enabled.");
-+        return -AMDVI_IR_ERR;
-+    }
-+
-+    if ((origin->address & AMDVI_MSI_ADDR_LO_MASK) != APIC_DEFAULT_ADDRESS) {
-+        trace_amdvi_err("MSI is not from IOAPIC.");
-+        return -AMDVI_IR_ERR;
-+    }
-+
-+out:
-+    trace_amdvi_ir_remap_msi(origin->address, origin->data,
-+                             translated->address, translated->data);
-+    return 0;
-+}
-+
-+static int amdvi_int_remap(X86IOMMUState *iommu,
-+                           MSIMessage *origin,
-+                           MSIMessage *translated,
-+                           uint16_t sid)
-+{
-+    return amdvi_int_remap_msi(AMD_IOMMU_DEVICE(iommu), origin,
-+                               translated, sid);
-+}
-+
-+static MemTxResult amdvi_mem_ir_write(void *opaque, hwaddr addr,
-+                                      uint64_t value, unsigned size,
-+                                      MemTxAttrs attrs)
-+{
-+    int ret;
-+    MSIMessage from = { 0, 0 }, to = { 0, 0 };
-+    uint16_t sid = AMDVI_IOAPIC_SB_DEVID;
-+
-+    from.address = (uint64_t) addr + AMDVI_INT_ADDR_FIRST;
-+    from.data = (uint32_t) value;
-+
-+    trace_amdvi_mem_ir_write_req(addr, value, size);
-+
-+    if (!attrs.unspecified) {
-+        /* We have explicit Source ID */
-+        sid = attrs.requester_id;
-+    }
-+
-+    ret = amdvi_int_remap_msi(opaque, &from, &to, sid);
-+    if (ret < 0) {
-+        /* TODO: log the event using IOMMU log event interface */
-+        error_report_once("failed to remap interrupt from devid 0x%x", sid);
-+        return MEMTX_ERROR;
-+    }
-+
-+    apic_get_class()->send_msi(&to);
-+
-+    trace_amdvi_mem_ir_write(to.address, to.data);
-+    return MEMTX_OK;
-+}
-+
-+static MemTxResult amdvi_mem_ir_read(void *opaque, hwaddr addr,
-+                                     uint64_t *data, unsigned size,
-+                                     MemTxAttrs attrs)
-+{
-+    return MEMTX_OK;
-+}
-+
-+static const MemoryRegionOps amdvi_ir_ops = {
-+    .read_with_attrs = amdvi_mem_ir_read,
-+    .write_with_attrs = amdvi_mem_ir_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+    .impl = {
-+        .min_access_size = 4,
-+        .max_access_size = 4,
-+    },
-+    .valid = {
-+        .min_access_size = 4,
-+        .max_access_size = 4,
-+    }
-+};
-+
- static AddressSpace *amdvi_host_dma_iommu(PCIBus *bus, void *opaque, int devfn)
- {
-     char name[128];
-@@ -1066,6 +1160,7 @@ static AddressSpace *amdvi_host_dma_iommu(PCIBus *bus, void *opaque, int devfn)
-          * |-----------------+-------------------+----------+
-          * | amdvi_root      | 00000000-ffffffff |        0 |
-          * |  amdvi_iommu    | 00000000-ffffffff |        1 |
-+         * |  amdvi_iommu_ir | fee00000-feefffff |       64 |
-          * |-----------------+-------------------+----------|
-          */
-         memory_region_init_iommu(&amdvi_dev_as->iommu,
-@@ -1076,6 +1171,13 @@ static AddressSpace *amdvi_host_dma_iommu(PCIBus *bus, void *opaque, int devfn)
-         memory_region_init(&amdvi_dev_as->root, OBJECT(s),
-                            "amdvi_root", UINT64_MAX);
-         address_space_init(&amdvi_dev_as->as, &amdvi_dev_as->root, name);
-+        memory_region_init_io(&amdvi_dev_as->iommu_ir, OBJECT(s),
-+                              &amdvi_ir_ops, s, "amd_iommu_ir",
-+                              AMDVI_INT_ADDR_SIZE);
-+        memory_region_add_subregion_overlap(&amdvi_dev_as->root,
-+                                            AMDVI_INT_ADDR_FIRST,
-+                                            &amdvi_dev_as->iommu_ir,
-+                                            64);
-         memory_region_add_subregion_overlap(&amdvi_dev_as->root, 0,
-                                             MEMORY_REGION(&amdvi_dev_as->iommu),
-                                             1);
-@@ -1196,6 +1298,9 @@ static void amdvi_realize(DeviceState *dev, Error **err)
-         return;
-     }
- 
-+    /* Pseudo address space under root PCI bus. */
-+    pcms->ioapic_as = amdvi_host_dma_iommu(bus, s, AMDVI_IOAPIC_SB_DEVID);
-+
-     /* set up MMIO */
-     memory_region_init_io(&s->mmio, OBJECT(s), &mmio_mem_ops, s, "amdvi-mmio",
-                           AMDVI_MMIO_SIZE);
-@@ -1229,6 +1334,7 @@ static void amdvi_class_init(ObjectClass *klass, void* data)
-     dc->vmsd = &vmstate_amdvi;
-     dc->hotpluggable = false;
-     dc_class->realize = amdvi_realize;
-+    dc_class->int_remap = amdvi_int_remap;
-     /* Supported by the pc-q35-* machine types */
-     dc->user_creatable = true;
- }
-diff --git a/hw/i386/trace-events b/hw/i386/trace-events
-index 9e6fc4dca9..41d533c250 100644
---- a/hw/i386/trace-events
-+++ b/hw/i386/trace-events
-@@ -101,6 +101,11 @@ amdvi_mode_invalid(uint8_t level, uint64_t addr)"error: translation level 0x%"PR
- amdvi_page_fault(uint64_t addr) "error: page fault accessing guest physical address 0x%"PRIx64
- amdvi_iotlb_hit(uint8_t bus, uint8_t slot, uint8_t func, uint64_t addr, uint64_t txaddr) "hit iotlb devid %02x:%02x.%x gpa 0x%"PRIx64" hpa 0x%"PRIx64
- amdvi_translation_result(uint8_t bus, uint8_t slot, uint8_t func, uint64_t addr, uint64_t txaddr) "devid: %02x:%02x.%x gpa 0x%"PRIx64" hpa 0x%"PRIx64
-+amdvi_mem_ir_write_req(uint64_t addr, uint64_t val, uint32_t size) "addr 0x%"PRIx64" data 0x%"PRIx64" size 0x%"PRIx32
-+amdvi_mem_ir_write(uint64_t addr, uint64_t val) "addr 0x%"PRIx64" data 0x%"PRIx64
-+amdvi_ir_remap_msi_req(uint64_t addr, uint64_t data, uint8_t devid) "addr 0x%"PRIx64" data 0x%"PRIx64" devid 0x%"PRIx8
-+amdvi_ir_remap_msi(uint64_t addr, uint64_t data, uint64_t addr2, uint64_t data2) "(addr 0x%"PRIx64", data 0x%"PRIx64") -> (addr 0x%"PRIx64", data 0x%"PRIx64")"
-+amdvi_err(const char *str) "%s"
- 
- # hw/i386/vmport.c
- vmport_register(unsigned char command, void *func, void *opaque) "command: 0x%02x func: %p opaque: %p"
+diff --git a/tests/data/acpi/q35/DSDT.mmio64 b/tests/data/acpi/q35/DSDT.mmio64
+new file mode 100644
+index 0000000000000000000000000000000000000000..a058ff2ee31a22a55b5b198bc1531c7f20b243f6
+GIT binary patch
+literal 8947
+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
+
+literal 0
+HcmV?d00001
+
+diff --git a/tests/data/acpi/q35/SRAT.mmio64 b/tests/data/acpi/q35/SRAT.mmio64
+new file mode 100644
+index 0000000000000000000000000000000000000000..ac35f3dac4f47b86e41c7f35ee40bac14174b37e
+GIT binary patch
+literal 224
+zcmWFzatwLEz`($0?d0$55v<@85#SsQ6k`O6f!H7#gyBE{mCvXFmw__4-~!0{5bA&i
+cfWZfLm_qF8V6xb0gn4lH?0~6chB1IN0P8^t0RR91
+
+literal 0
+HcmV?d00001
+
 -- 
 MST
