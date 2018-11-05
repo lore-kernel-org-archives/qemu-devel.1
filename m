@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53638)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gJhzn-0008Oe-1x
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:45:00 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gJhzm-0008Nz-Uj
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:44:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gJhzl-0001ik-Jx
+	(envelope-from <cohuck@redhat.com>) id 1gJhzl-0001iS-Dv
 	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:44:58 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Mon,  5 Nov 2018 17:43:35 +0100
-Message-Id: <20181105164340.20707-2-cohuck@redhat.com>
+Date: Mon,  5 Nov 2018 17:43:38 +0100
+Message-Id: <20181105164340.20707-5-cohuck@redhat.com>
 In-Reply-To: <20181105164340.20707-1-cohuck@redhat.com>
 References: <20181105164340.20707-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 1/6] s390x/vfio-ap: report correct error
+Subject: [Qemu-devel] [PULL 4/6] MAINTAINERS: s390/pci: add Collin Walling
+ as maintainer for zpci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,32 +23,35 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, Collin Walling <walling@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
 
-If ioctl(..., VFIO_DEVICE_RESET) fails, we want to report errno
-instead of ret (which is always -1 on error).
+From: Christian Borntraeger <borntraeger@de.ibm.com>
 
-Fixes Coverity issue CID 1396176.
+Collin will take over the maintainership from Yi Min. Let us add a
+separate s390 pci section.
 
-Reported-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Tony Krowiak <akrowiak@linux.ibm.com>
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Message-Id: <1540827745-20795-4-git-send-email-borntraeger@de.ibm.com>
+Acked-by: Collin Walling <walling@linux.ibm.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/vfio/ap.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ MAINTAINERS | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
-index 3962bb74e5..65de952f44 100644
---- a/hw/vfio/ap.c
-+++ b/hw/vfio/ap.c
-@@ -142,7 +142,7 @@ static void vfio_ap_reset(DeviceState *dev)
-     ret = ioctl(vapdev->vdev.fd, VFIO_DEVICE_RESET);
-     if (ret) {
-         error_report("%s: failed to reset %s device: %s", __func__,
--                     vapdev->vdev.name, strerror(ret));
-+                     vapdev->vdev.name, strerror(errno));
-     }
- }
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 5b6f4a2f3f..15709e099b 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -956,6 +956,12 @@ F: pc-bios/s390-ccw.img
+ T: git git://github.com/borntraeger/qemu.git s390-next
+ L: qemu-s390x@nongnu.org
  
++S390 PCI
++M: Collin Walling <walling@linux.ibm.com>
++S: Supported
++F: hw/s390x/s390-pci*
++L: qemu-s390x@nongnu.org
++
+ UniCore32 Machines
+ -------------
+ PKUnity-3 SoC initramfs-with-busybox
 -- 
 2.14.5
