@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49389)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1gJhs3-00063Q-K5
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:37:00 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gJht5-0006l8-Cw
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:38:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1gJhry-0000Iy-Ez
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:36:59 -0500
-Received: from smtp21.mail.ru ([94.100.179.250]:60558)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1gJhrx-0007SV-Rw
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:36:54 -0500
-References: <20181105104524.933-1-jusual@mail.ru>
-	<df0c970c-4180-a9ae-6bb6-5149e93883ae@redhat.com>
-From: Julia Suvorova <jusual@mail.ru>
-Message-ID: <3cb6fc98-eb70-b601-3fbc-d807282e377c@mail.ru>
-Date: Mon, 5 Nov 2018 19:36:04 +0300
+	(envelope-from <kwolf@redhat.com>) id 1gJht3-0002jj-Gr
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:38:03 -0500
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Mon,  5 Nov 2018 17:37:10 +0100
+Message-Id: <20181105163744.25139-3-kwolf@redhat.com>
+In-Reply-To: <20181105163744.25139-1-kwolf@redhat.com>
+References: <20181105163744.25139-1-kwolf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <df0c970c-4180-a9ae-6bb6-5149e93883ae@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3] tests/microbit-test: Check nRF51 UART
- functionality
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 02/36] block: replace "discard" literal with
+ BDRV_OPT_DISCARD macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +22,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=c3=b6rtz?= <mail@steffen-goertz.de>, Thomas Huth <thuth@redhat.com>, Joel Stanley <joel@jms.id.au>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-On 05.11.2018 19:16, Philippe Mathieu-Daudé wrote:
-> Hi Julia,
-> 
-> On 5/11/18 11:45, Julia Suvorova via Qemu-devel wrote:
->> Some functional tests for:
->>      Basic reception/transmittion
->>      Suspending
->>      INTEN* registers
->>
->> Based-on: <20181031002526.14262-1-contrib@steffen-goertz.de>
->> Signed-off-by: Julia Suvorova <jusual@mail.ru>
->> ---
-> 
-> Lines below '---' are not included in the git history.
-> 
-> The Based-on: tag is temporary and not relevant to the history, you should insert it here, so it will be automatically 
-> dropped once your patch get applied.
+From: Alberto Garcia <berto@igalia.com>
 
-Seems reasonable. I'll do it in the next revision, since I have to
-rebase it anyway as soon as Steffen patches will be merged.
-BTW, you can find a couple of Based-on in git history :)
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ block.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Best regards, Julia Suvorova.
+diff --git a/block.c b/block.c
+index 95d8635aa1..9d2adf7962 100644
+--- a/block.c
++++ b/block.c
+@@ -1327,7 +1327,7 @@ QemuOptsList bdrv_runtime_opts =3D {
+             .help =3D "try to optimize zero writes (off, on, unmap)",
+         },
+         {
+-            .name =3D "discard",
++            .name =3D BDRV_OPT_DISCARD,
+             .type =3D QEMU_OPT_STRING,
+             .help =3D "discard operation (ignore/off, unmap/on)",
+         },
+@@ -1432,7 +1432,7 @@ static int bdrv_open_common(BlockDriverState *bs, B=
+lockBackend *file,
+         }
+     }
+=20
+-    discard =3D qemu_opt_get(opts, "discard");
++    discard =3D qemu_opt_get(opts, BDRV_OPT_DISCARD);
+     if (discard !=3D NULL) {
+         if (bdrv_parse_discard_flags(discard, &bs->open_flags) !=3D 0) {
+             error_setg(errp, "Invalid discard option");
+@@ -3186,7 +3186,7 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_sta=
+te, BlockReopenQueue *queue,
+=20
+     update_flags_from_options(&reopen_state->flags, opts);
+=20
+-    discard =3D qemu_opt_get_del(opts, "discard");
++    discard =3D qemu_opt_get_del(opts, BDRV_OPT_DISCARD);
+     if (discard !=3D NULL) {
+         if (bdrv_parse_discard_flags(discard, &reopen_state->flags) !=3D=
+ 0) {
+             error_setg(errp, "Invalid discard option");
+--=20
+2.19.1
