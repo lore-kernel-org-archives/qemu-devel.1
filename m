@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gJf8s-0005xt-HQ
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 08:42:11 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gJf9O-000677-K6
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 08:42:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gJezw-0007ic-Ih
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 08:32:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35750)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1gJezw-0007ZS-3a
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 08:32:56 -0500
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20181101101715.9443-2-fli@suse.com> (Fei Li's message of "Thu, 1
-	Nov 2018 18:17:07 +0800")
-References: <20181101101715.9443-1-fli@suse.com>
-	<20181101101715.9443-2-fli@suse.com>
-Reply-To: quintela@redhat.com
-Date: Mon, 05 Nov 2018 14:32:42 +0100
-Message-ID: <87h8gvvedh.fsf@trasno.org>
+	(envelope-from <eric.auger@redhat.com>) id 1gJev1-0004al-Q6
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 08:27:52 -0500
+References: <20181018143042.29588-1-eric.auger@redhat.com>
+	<20181018143042.29588-13-eric.auger@redhat.com>
+	<20181022144026.3171d287@igors-macbook-pro.local>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <249aec02-24a7-a401-8236-638f54352fc2@redhat.com>
+Date: Mon, 5 Nov 2018 14:27:40 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH RFC v7 1/9] Fix segmentation fault when
- qemu_signal_init fails
+In-Reply-To: <20181022144026.3171d287@igors-macbook-pro.local>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v4 12/16] hw/arm/virt-acpi-build: Add PC-DIMM
+ in SRAT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +26,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fei Li <fli@suse.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, dgilbert@redhat.com, famz@redhat.com, peterx@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: peter.maydell@linaro.org, drjones@redhat.com, david@redhat.com, Suzuki.Poulose@arm.com, qemu-devel@nongnu.org, shameerali.kolothum.thodi@huawei.com, dgilbert@redhat.com, qemu-arm@nongnu.org, kwangwoo.lee@sk.com, eric.auger.pro@gmail.com
 
-Fei Li <fli@suse.com> wrote:
-> When qemu_signal_init() fails in qemu_init_main_loop(), we return
-> without setting an error.  Its callers crash then when they try to
-> report the error with error_report_err().
->
-> To avoid such segmentation fault, add a new Error parameter to make
-> the call trace to propagate the err to the final caller.
+Hi Igor,
 
-Hi
+On 10/22/18 3:40 PM, Igor Mammedov wrote:
+> On Thu, 18 Oct 2018 16:30:38 +0200
+> Eric Auger <eric.auger@redhat.com> wrote:
+> 
+>> From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+>>
+>> Generate Memory Affinity Structures for PC-DIMM ranges.
+>>
+>> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>> v3 -> v4:
+>> - do not use vms->bootinfo.device_memory_start/device_memory_size anymore
+>>
+>> v1 -> v2:
+>> - build_srat_hotpluggable_memory movedc to aml-build
+>> ---
+>>  hw/arm/virt-acpi-build.c | 4 ++++
+>>  1 file changed, 4 insertions(+)
+>>
+>> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+>> index 5785fb697c..8818bbf5ec 100644
+>> --- a/hw/arm/virt-acpi-build.c
+>> +++ b/hw/arm/virt-acpi-build.c
+>> @@ -545,6 +545,7 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>>      int i, srat_start;
+>>      uint64_t mem_base;
+>>      MachineClass *mc = MACHINE_GET_CLASS(vms);
+>> +    MachineState *ms = MACHINE(vms);
+>>      const CPUArchIdList *cpu_list = mc->possible_cpu_arch_ids(MACHINE(vms));
+>>  
+>>      srat_start = table_data->len;
+>> @@ -570,6 +571,9 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>>          }
+>>      }
+>>  
+>> +    build_srat_hotpluggable_memory(table_data, ms->device_memory->base,
+>> +                                   ms->device_memory->mr.size, 0);
+> on x86, we use the last node here to make windows happy. I'd use the same value here.
+OK thank you for the information.
 
-I agree that there is a bug that exist here.  But I think that the patch
-is not 100% correct.  What is the warrantee that when we call
-qemu_signal_init() errp is not *already* assigned.
+Regards
 
-I think that we need to use here the same code that in the call to
-aio_context_new() ...
-
-i.e.
-
-
-intsead of this
-
->      init_clocks(qemu_timer_notify_cb);
->  
-> -    ret = qemu_signal_init();
-> +    ret = qemu_signal_init(errp);
->      if (ret) {
->          return ret;
->      }
-
-    init_clocks(qemu_timer_notify_cb);
-
-    ret = qemu_signal_init();
-    ret = qemu_signal_init(&local_error);
-    if (ret) {
-         error_propagate(errp, local_error);
-         return ret;
-    }
-
-This way it works correctly if errp is NULL, errp is already assigned,
-etc, etc,
-
-Or I am missing something?
-
-Later, Juan.
+Eric
+> 
+>> +
+>>      build_header(linker, table_data, (void *)(table_data->data + srat_start),
+>>                   "SRAT", table_data->len - srat_start, 3, NULL, NULL);
+>>  }
+> 
+> 
