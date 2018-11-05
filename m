@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48188)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49194)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcfaracco@gmail.com>) id 1gJgUg-0005n9-3x
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:08:47 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1gJgXf-0007xp-HE
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:11:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcfaracco@gmail.com>) id 1gJgUe-00035V-OH
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:08:45 -0500
-From: Julio Faracco <jcfaracco@gmail.com>
-Date: Mon,  5 Nov 2018 13:08:06 -0200
-Message-Id: <20181105150806.13649-5-jcfaracco@gmail.com>
-In-Reply-To: <20181105150806.13649-1-jcfaracco@gmail.com>
-References: <20181105150806.13649-1-jcfaracco@gmail.com>
-Subject: [Qemu-devel] [PATCH v3 4/4] dmg: exchanging hardcoded dmg UDIF
- block types to enum.
+	(envelope-from <pm215@archaic.org.uk>) id 1gJgXX-00072O-9k
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:11:49 -0500
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon,  5 Nov 2018 15:11:32 +0000
+Message-Id: <20181105151132.13884-1-peter.maydell@linaro.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH for-3.1] hw/arm/exynos4210: Zero memory
+ allocated for Exynos4210State
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,126 +20,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Igor Mitsyanko <i.mitsyanko@gmail.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-This change is better to understand what kind of block type is being
-handled by the code. Using a syntax similar to the DMG documentation is
-easier than tracking all hex values assigned to a block type.
+In exynos4210_init() we allocate memory for an Exynos4210State
+struct. Generally devices can assume that the memory allocated
+for their state struct is zero-initialized; we broke that
+assumption here by using g_new(). Use g_new0() instead.
+(In particular, some code assumes that the various irq arrays
+in the Exynos4210Irq sub-struct are zero-initialized.)
 
-Signed-off-by: Julio Faracco <jcfaracco@gmail.com>
+In the longer term, this code should be QOMified, and then
+the struct memory will be allocated elsewhere and by functions
+which always zero-initalize it; but for 3.1 this is a
+simple fix.
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- block/dmg.c | 43 ++++++++++++++++++++++++++++---------------
- 1 file changed, 28 insertions(+), 15 deletions(-)
+I suggested this fix the other day:
+https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg00135.html
+so here it is as an actual patch.
 
-diff --git a/block/dmg.c b/block/dmg.c
-index 615f818c5a..6d055594df 100644
---- a/block/dmg.c
-+++ b/block/dmg.c
-@@ -44,6 +44,19 @@ enum {
-     DMG_SECTORCOUNTS_MAX = DMG_LENGTHS_MAX / 512,
- };
+Probably we should go through other uses of g_new() in
+board/device code at some point.
+
+ hw/arm/exynos4210.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hw/arm/exynos4210.c b/hw/arm/exynos4210.c
+index 827318a0036..af82e955421 100644
+--- a/hw/arm/exynos4210.c
++++ b/hw/arm/exynos4210.c
+@@ -162,7 +162,7 @@ static uint64_t exynos4210_calc_affinity(int cpu)
  
-+enum {
-+    /* DMG Block Type */
-+    UDZE = 0, /* Zeroes */
-+    UDRW,     /* RAW type */
-+    UDIG,     /* Ignore */
-+    UDCO = 0x80000004,
-+    UDZO,
-+    UDBZ,
-+    ULFO,
-+    UDCM = 0x7ffffffe, /* Comments */
-+    UDLE               /* Last Entry */
-+};
-+
- static int dmg_probe(const uint8_t *buf, int buf_size, const char *filename)
+ Exynos4210State *exynos4210_init(MemoryRegion *system_mem)
  {
-     int len;
-@@ -108,16 +121,16 @@ static void update_max_chunk_size(BDRVDMGState *s, uint32_t chunk,
-     uint32_t uncompressed_sectors = 0;
- 
-     switch (s->types[chunk]) {
--    case 0x80000005: /* zlib compressed */
--    case 0x80000006: /* bzip2 compressed */
--    case 0x80000007: /* lzfse compressed */
-+    case UDZO: /* zlib compressed */
-+    case UDBZ: /* bzip2 compressed */
-+    case ULFO: /* lzfse compressed */
-         compressed_size = s->lengths[chunk];
-         uncompressed_sectors = s->sectorcounts[chunk];
-         break;
--    case 1: /* copy */
-+    case UDRW: /* copy */
-         uncompressed_sectors = DIV_ROUND_UP(s->lengths[chunk], 512);
-         break;
--    case 2: /* zero */
-+    case UDIG: /* zero */
-         /* as the all-zeroes block may be large, it is treated specially: the
-          * sector is not copied from a large buffer, a simple memset is used
-          * instead. Therefore uncompressed_sectors does not need to be set. */
-@@ -186,13 +199,13 @@ typedef struct DmgHeaderState {
- static bool dmg_is_known_block_type(uint32_t entry_type)
- {
-     switch (entry_type) {
--    case 0x00000001:    /* uncompressed */
--    case 0x00000002:    /* zeroes */
--    case 0x80000005:    /* zlib */
-+    case UDRW:    /* uncompressed */
-+    case UDIG:    /* zeroes */
-+    case UDZO:    /* zlib */
-         return true;
--    case 0x80000006:    /* bzip2 */
-+    case UDBZ:    /* bzip2 */
-         return !!dmg_uncompress_bz2;
--    case 0x80000007:    /* lzfse */
-+    case ULFO:    /* lzfse */
-         return !!dmg_uncompress_lzfse;
-     default:
-         return false;
-@@ -592,7 +605,7 @@ static inline int dmg_read_chunk(BlockDriverState *bs, uint64_t sector_num)
- 
-         s->current_chunk = s->n_chunks;
-         switch (s->types[chunk]) { /* block entry type */
--        case 0x80000005: { /* zlib compressed */
-+        case UDZO: { /* zlib compressed */
-             /* we need to buffer, because only the chunk as whole can be
-              * inflated. */
-             ret = bdrv_pread(bs->file, s->offsets[chunk],
-@@ -615,7 +628,7 @@ static inline int dmg_read_chunk(BlockDriverState *bs, uint64_t sector_num)
-                 return -1;
-             }
-             break; }
--        case 0x80000006: /* bzip2 compressed */
-+        case UDBZ: /* bzip2 compressed */
-             if (!dmg_uncompress_bz2) {
-                 break;
-             }
-@@ -636,7 +649,7 @@ static inline int dmg_read_chunk(BlockDriverState *bs, uint64_t sector_num)
-                 return ret;
-             }
-             break;
--        case 0x80000007:
-+        case ULFO:
-             if (!dmg_uncompress_lzfse) {
-                 break;
-             }
-@@ -657,14 +670,14 @@ static inline int dmg_read_chunk(BlockDriverState *bs, uint64_t sector_num)
-                 return ret;
-             }
-             break;
--        case 1: /* copy */
-+        case UDRW: /* copy */
-             ret = bdrv_pread(bs->file, s->offsets[chunk],
-                              s->uncompressed_chunk, s->lengths[chunk]);
-             if (ret != s->lengths[chunk]) {
-                 return -1;
-             }
-             break;
--        case 2: /* zero */
-+        case UDIG: /* zero */
-             /* see dmg_read, it is treated specially. No buffer needs to be
-              * pre-filled, the zeroes can be set directly. */
-             break;
+-    Exynos4210State *s = g_new(Exynos4210State, 1);
++    Exynos4210State *s = g_new0(Exynos4210State, 1);
+     qemu_irq gate_irq[EXYNOS4210_NCPUS][EXYNOS4210_IRQ_GATE_NINPUTS];
+     SysBusDevice *busdev;
+     DeviceState *dev;
 -- 
-2.17.1
+2.19.1
