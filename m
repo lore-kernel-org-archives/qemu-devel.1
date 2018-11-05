@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51501)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gJggG-0006LT-5B
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:20:44 -0500
+	(envelope-from <edgar.iglesias@gmail.com>) id 1gJgjJ-0007RW-D4
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:23:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gJggD-0001iM-2T
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:20:42 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:37844)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gJgg6-0001Yu-Kl
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:20:35 -0500
-Received: by mail-ot1-x344.google.com with SMTP id 40so8055949oth.4
-	for <qemu-devel@nongnu.org>; Mon, 05 Nov 2018 07:20:34 -0800 (PST)
+	(envelope-from <edgar.iglesias@gmail.com>) id 1gJgjH-0004ET-1l
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:23:53 -0500
+Date: Mon, 5 Nov 2018 16:23:00 +0100
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Message-ID: <20181105152300.GA1148@toto>
+References: <20181016093703.10637-1-peter.maydell@linaro.org>
+	<20181016093703.10637-2-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20181102001303.32640-1-f4bug@amsat.org>
-References: <20181102001303.32640-1-f4bug@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 5 Nov 2018 15:20:12 +0000
-Message-ID: <CAFEAcA8kho6tBJMB6qXgKEq_tt5GQm1wHE96mqoM_vx95x44Pw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for 3.2 v2 0/7] hw/arm/bcm2835: Add basic
- support for cprman (clock subsystem)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181016093703.10637-2-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 1/2] target/arm: Set S and PTW
+ in 64-bit PAR format
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,30 +24,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Guenter Roeck <linux@roeck-us.net>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org
 
-On 2 November 2018 at 00:12, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
-wrote:
-> Hi,
->
-> This series is a mix of a previous work I had for the raspi, and a patch =
-from
-> Guenter: https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg03153.h=
-tml
->
-> The final patch keep Guenter ideas and comments, but is mostly a rewrite.
-> I dropped the A2W code from this work, it doesn't seems unuseful to me.
->
-> Guenter can you test this series?
->
-> I kept Guenter S-o-b and (C), is that OK? (Guenter?, Peter?)
+On Tue, Oct 16, 2018 at 10:37:02AM +0100, Peter Maydell wrote:
+> In do_ats_write() we construct a PAR value based on the result
+> of the translation.  A comment says "S2WLK and FSTAGE are always
+> zero, because we don't implement virtualization".
+> Since we do in fact now implement virtualization, add the missing
+> code that sets these bits based on the reported ARMMMUFaultInfo.
+> 
+> (These bits are named PTW and S in ARMv8, so we follow that
+> convention in the new comments in this patch.)
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Yes, that's the general approach the project takes. If you've
-made changes to the patches yourself you should note those with
-something like
-[me: changed foo, bar, baz]
-after Guenter's signoff and before your own.
 
-thanks
--- PMM
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+
+
+> ---
+>  target/arm/helper.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
+> 
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index 43afdd082e1..dc849b09893 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -2344,10 +2344,12 @@ static uint64_t do_ats_write(CPUARMState *env, uint64_t value,
+>  
+>              par64 |= 1; /* F */
+>              par64 |= (fsr & 0x3f) << 1; /* FS */
+> -            /* Note that S2WLK and FSTAGE are always zero, because we don't
+> -             * implement virtualization and therefore there can't be a stage 2
+> -             * fault.
+> -             */
+> +            if (fi.stage2) {
+> +                par64 |= (1 << 9); /* S */
+> +            }
+> +            if (fi.s1ptw) {
+> +                par64 |= (1 << 8); /* PTW */
+> +            }
+>          }
+>      } else {
+>          /* fsr is a DFSR/IFSR value for the short descriptor
+> -- 
+> 2.19.0
+> 
+> 
