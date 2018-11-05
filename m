@@ -1,35 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58384)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35438)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gJcDj-0001y3-K4
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 05:35:00 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gJcZD-00070U-1w
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 05:57:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gJcDi-0006VE-JI
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 05:34:59 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:42559)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gJcDh-0005yf-L9
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 05:34:58 -0500
-Received: by mail-oi1-x244.google.com with SMTP id x63-v6so3272306oix.9
-	for <qemu-devel@nongnu.org>; Mon, 05 Nov 2018 02:34:56 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <f5c4263e-658a-8742-6536-da0a74f353f7@redhat.com>
-References: <20181005143802.18412-1-peter.maydell@linaro.org>
-	<CAFEAcA8-FvVG7XBLrd7NQfRcKrvo6GtPEjfqJzkjd68iP9=TeQ@mail.gmail.com>
-	<20181005161739.GC4606@localhost.localdomain>
-	<CAFEAcA-SWRHwnwsa+QiHXfdBRB6u2u0paV9HsEqfjR6nZvAHSg@mail.gmail.com>
-	<20181005180901.GA32677@localhost.localdomain>
-	<CAFEAcA80cys-98QwJgAk_2LXfAeMHgCUS2L3Z+NgY4ZsCFhSPw@mail.gmail.com>
-	<CAFEAcA8gYwFZynMyiEHf+VPbaBerA9JTUPAHsipEvOqkBjHxMQ@mail.gmail.com>
-	<20181008164026.GD4604@localhost.localdomain>
-	<e2efa1f8-7ada-d5c4-9719-491d9b5f477b@redhat.com>
-	<CAFEAcA8eB8zZnS1G1FHWo=ix4uoO_-NCh3qfkkNLtyMDpTOPsg@mail.gmail.com>
-	<f5c4263e-658a-8742-6536-da0a74f353f7@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 5 Nov 2018 10:34:35 +0000
-Message-ID: <CAFEAcA-D9HWCQg27aRjuh9yoGeJRwDigowrkitm+EU1ZvYcoZw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] tests: Disable test-bdrv-drain
+	(envelope-from <eric.auger@redhat.com>) id 1gJcUj-0002aO-6Y
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 05:52:37 -0500
+From: Eric Auger <eric.auger@redhat.com>
+Date: Mon,  5 Nov 2018 11:51:48 +0100
+Message-Id: <20181105105148.15833-1-eric.auger@redhat.com>
+Subject: [Qemu-devel] [PATCH] hw/arm/sysbus-fdt: Only call match_fn callback
+ if the type matches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,30 +18,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, geert+renesas@glider.be, alex.williamson@redhat.com, thuth@redhat.com
 
-On 4 November 2018 at 22:03, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> On 02/11/2018 14:33, Peter Maydell wrote:
->> On 9 October 2018 at 12:16, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>> Yup, we have to stop using pthread_key_create.  Luckily, these days
->>> there is always qemu_thread_start that wraps the thread, so we can call
->>> qemu_thread_atexit_run from there, and change exit_key to a thread-local
->>> NotifierList.
->>
->> We would also need to catch exits via qemu_thread_exit(), right?
->> We probably also need to handle the main thread specially, via
->> atexit(). This seems to be pretty much what we already do in
->> util/qemu-thread-win32.c...
->
-> There's only one caller of qemu_thread_exit and it can be removed easily.
->
-> However, an improvement on the idea is to use pthread_cleanup_push/pop
-> in qemu_thread_start.  This does handle qemu_thread_exit.
+Commit af7d64ede0b9 (hw/arm/sysbus-fdt: Allow device matching with DT
+compatible value) introduced a match_fn callback which gets called
+for each registered combo to check whether a sysbus device can be
+dynamically instantiated. However the callback gets called even if
+the device type does not match the binding combo typename field.
 
-Interesting. (I have a patch I put together on Friday and haven't
-tested yet that just uses the win32-style "explicitly run notifiers
-in exit and at end of thread_start".)
+Let's change the add_fdt_node() logic so that we first check the
+type and if the match_fn callback is defined, then we also call it.
 
-thanks
--- PMM
+Binding combos only requesting a type check do not define the
+match_fn callback.
+
+Fixes: af7d64ede0b9 (hw/arm/sysbus-fdt: Allow device matching with
+DT compatible value)
+
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reported-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/arm/sysbus-fdt.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
+
+diff --git a/hw/arm/sysbus-fdt.c b/hw/arm/sysbus-fdt.c
+index 0e24c803a1..a44cf7f255 100644
+--- a/hw/arm/sysbus-fdt.c
++++ b/hw/arm/sysbus-fdt.c
+@@ -449,7 +449,7 @@ static bool type_match(SysBusDevice *sbdev, const BindingEntry *entry)
+     return !strcmp(object_get_typename(OBJECT(sbdev)), entry->typename);
+ }
+ 
+-#define TYPE_BINDING(type, add_fn) {(type), NULL, (add_fn), type_match}
++#define TYPE_BINDING(type, add_fn) {(type), NULL, (add_fn), NULL}
+ 
+ /* list of supported dynamic sysbus bindings */
+ static const BindingEntry bindings[] = {
+@@ -481,10 +481,18 @@ static void add_fdt_node(SysBusDevice *sbdev, void *opaque)
+     for (i = 0; i < ARRAY_SIZE(bindings); i++) {
+         const BindingEntry *iter = &bindings[i];
+ 
+-        if (iter->match_fn(sbdev, iter)) {
+-            ret = iter->add_fn(sbdev, opaque);
+-            assert(!ret);
+-            return;
++        if (type_match(sbdev, iter)) {
++            if (iter->match_fn) {
++                if (iter->match_fn(sbdev, iter)) {
++                    ret = iter->add_fn(sbdev, opaque);
++                    assert(!ret);
++                    return;
++                }
++            } else {
++                ret = iter->add_fn(sbdev, opaque);
++                assert(!ret);
++                return;
++            }
+         }
+     }
+     error_report("Device %s can not be dynamically instantiated",
+-- 
+2.17.2
