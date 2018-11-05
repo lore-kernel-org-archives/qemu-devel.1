@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50363)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gJhtJ-0006wm-13
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:38:21 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gJhtJ-0006wx-5J
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:38:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gJhtH-0003V2-9z
+	(envelope-from <kwolf@redhat.com>) id 1gJhtH-0003VC-A5
 	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:38:16 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon,  5 Nov 2018 17:37:13 +0100
-Message-Id: <20181105163744.25139-6-kwolf@redhat.com>
+Date: Mon,  5 Nov 2018 17:37:14 +0100
+Message-Id: <20181105163744.25139-7-kwolf@redhat.com>
 In-Reply-To: <20181105163744.25139-1-kwolf@redhat.com>
 References: <20181105163744.25139-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 05/36] block/qcow: Don't take address of fields
- in packed structs
+Subject: [Qemu-devel] [PULL 06/36] block/qcow2-bitmap: Don't take address of
+ fields in packed structs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,47 +76,66 @@ Tested-by: John Snow <jsnow@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/qcow.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ block/qcow2-bitmap.c | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/block/qcow.c b/block/qcow.c
-index 385d935258..4518cb4c35 100644
---- a/block/qcow.c
-+++ b/block/qcow.c
-@@ -140,14 +140,14 @@ static int qcow_open(BlockDriverState *bs, QDict *o=
-ptions, int flags,
-     if (ret < 0) {
-         goto fail;
+diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+index b5f1b3563d..accebef4cf 100644
+--- a/block/qcow2-bitmap.c
++++ b/block/qcow2-bitmap.c
+@@ -118,7 +118,7 @@ static inline void bitmap_table_to_be(uint64_t *bitma=
+p_table, size_t size)
+     size_t i;
+=20
+     for (i =3D 0; i < size; ++i) {
+-        cpu_to_be64s(&bitmap_table[i]);
++        bitmap_table[i] =3D cpu_to_be64(bitmap_table[i]);
      }
--    be32_to_cpus(&header.magic);
--    be32_to_cpus(&header.version);
--    be64_to_cpus(&header.backing_file_offset);
--    be32_to_cpus(&header.backing_file_size);
--    be32_to_cpus(&header.mtime);
--    be64_to_cpus(&header.size);
--    be32_to_cpus(&header.crypt_method);
--    be64_to_cpus(&header.l1_table_offset);
-+    header.magic =3D be32_to_cpu(header.magic);
-+    header.version =3D be32_to_cpu(header.version);
-+    header.backing_file_offset =3D be64_to_cpu(header.backing_file_offse=
+ }
+=20
+@@ -231,7 +231,7 @@ static int bitmap_table_load(BlockDriverState *bs, Qc=
+ow2BitmapTable *tb,
+     }
+=20
+     for (i =3D 0; i < tb->size; ++i) {
+-        be64_to_cpus(&table[i]);
++        table[i] =3D be64_to_cpu(table[i]);
+         ret =3D check_table_entry(table[i], s->cluster_size);
+         if (ret < 0) {
+             goto fail;
+@@ -394,20 +394,20 @@ fail:
+=20
+ static inline void bitmap_dir_entry_to_cpu(Qcow2BitmapDirEntry *entry)
+ {
+-    be64_to_cpus(&entry->bitmap_table_offset);
+-    be32_to_cpus(&entry->bitmap_table_size);
+-    be32_to_cpus(&entry->flags);
+-    be16_to_cpus(&entry->name_size);
+-    be32_to_cpus(&entry->extra_data_size);
++    entry->bitmap_table_offset =3D be64_to_cpu(entry->bitmap_table_offse=
 t);
-+    header.backing_file_size =3D be32_to_cpu(header.backing_file_size);
-+    header.mtime =3D be32_to_cpu(header.mtime);
-+    header.size =3D be64_to_cpu(header.size);
-+    header.crypt_method =3D be32_to_cpu(header.crypt_method);
-+    header.l1_table_offset =3D be64_to_cpu(header.l1_table_offset);
++    entry->bitmap_table_size =3D be32_to_cpu(entry->bitmap_table_size);
++    entry->flags =3D be32_to_cpu(entry->flags);
++    entry->name_size =3D be16_to_cpu(entry->name_size);
++    entry->extra_data_size =3D be32_to_cpu(entry->extra_data_size);
+ }
 =20
-     if (header.magic !=3D QCOW_MAGIC) {
-         error_setg(errp, "Image not in qcow format");
-@@ -270,7 +270,7 @@ static int qcow_open(BlockDriverState *bs, QDict *opt=
-ions, int flags,
-     }
+ static inline void bitmap_dir_entry_to_be(Qcow2BitmapDirEntry *entry)
+ {
+-    cpu_to_be64s(&entry->bitmap_table_offset);
+-    cpu_to_be32s(&entry->bitmap_table_size);
+-    cpu_to_be32s(&entry->flags);
+-    cpu_to_be16s(&entry->name_size);
+-    cpu_to_be32s(&entry->extra_data_size);
++    entry->bitmap_table_offset =3D cpu_to_be64(entry->bitmap_table_offse=
+t);
++    entry->bitmap_table_size =3D cpu_to_be32(entry->bitmap_table_size);
++    entry->flags =3D cpu_to_be32(entry->flags);
++    entry->name_size =3D cpu_to_be16(entry->name_size);
++    entry->extra_data_size =3D cpu_to_be32(entry->extra_data_size);
+ }
 =20
-     for(i =3D 0;i < s->l1_size; i++) {
--        be64_to_cpus(&s->l1_table[i]);
-+        s->l1_table[i] =3D be64_to_cpu(s->l1_table[i]);
-     }
-=20
-     /* alloc L2 cache (max. 64k * 16 * 8 =3D 8 MB) */
+ static inline int calc_dir_entry_size(size_t name_size, size_t extra_dat=
+a_size)
 --=20
 2.19.1
