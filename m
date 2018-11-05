@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57291)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gJh6I-0004HB-Dj
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:47:39 -0500
+	(envelope-from <armbru@redhat.com>) id 1gJh9s-0001yF-I5
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:51:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gJgt9-00029y-4B
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:34:03 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:34741)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gJgt8-00029G-Hk
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:34:03 -0500
-Received: by mail-oi1-x244.google.com with SMTP id i138-v6so4802226oib.1
-	for <qemu-devel@nongnu.org>; Mon, 05 Nov 2018 07:34:02 -0800 (PST)
+	(envelope-from <armbru@redhat.com>) id 1gJh9e-0000zB-To
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:51:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57870)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gJh9Z-0000o4-0q
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:51:02 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1541052594-29132-1-git-send-email-liq3ea@gmail.com>
+	<20181105082622.yzxz3dis77knkpoa@sirius.home.kraxel.org>
+Date: Mon, 05 Nov 2018 16:50:29 +0100
+In-Reply-To: <20181105082622.yzxz3dis77knkpoa@sirius.home.kraxel.org> (Gerd
+	Hoffmann's message of "Mon, 5 Nov 2018 09:26:22 +0100")
+Message-ID: <87bm735xru.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20181102001303.32640-3-f4bug@amsat.org>
-References: <20181102001303.32640-1-f4bug@amsat.org>
-	<20181102001303.32640-3-f4bug@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 5 Nov 2018 15:33:40 +0000
-Message-ID: <CAFEAcA_MCTODEZg0Ak841iaJRBJ43Feh4cw_UmLaxk7-thb1og@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for 3.2 v2 2/7] hw/misc/bcm2835_property:
- Handle the 'domain state' property
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 1/2] hw: fw_cfg: ensure reboot_time is
+ nonegative
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,39 +28,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Guenter Roeck <linux@roeck-us.net>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Li Qiang <liq3ea@gmail.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, philmd@redhat.com, lersek@redhat.com
 
-On 2 November 2018 at 00:12, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
-wrote:
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  hw/misc/bcm2835_property.c | 6 ++++++
->  1 file changed, 6 insertions(+)
+Gerd Hoffmann <kraxel@redhat.com> writes:
+
+>> -    /* validate the input */
+>> -    if (reboot_timeout > 0xffff) {
+>> -        error_report("reboot timeout is larger than 65535, force it to 65535.");
+>> -        reboot_timeout = 0xffff;
+>> +
+>> +    if (reboot_timeout >= 0) {
+>> +        /* validate the input */
+>> +        if (reboot_timeout > 0xffff) {
+>> +            error_report("reboot timeout is larger than 65535,"
+>> +                         "force it to 65535.");
+>> +            reboot_timeout = 0xffff;
+>> +        }
+>> +        fw_cfg_add_file(s, "etc/boot-fail-wait",
+>> +                        g_memdup(&reboot_timeout, 4), 4);
+>>      }
 >
-> diff --git a/hw/misc/bcm2835_property.c b/hw/misc/bcm2835_property.c
-> index 145427ae0f..5d332324bd 100644
-> --- a/hw/misc/bcm2835_property.c
-> +++ b/hw/misc/bcm2835_property.c
-> @@ -121,6 +121,12 @@ static void bcm2835_property_mbox_push(BCM2835Proper=
-tyState *s, uint32_t value)
->              resplen =3D 8;
->              break;
->
-> +        case 0x00030030: /* domain state */
-> +            qemu_log_mask(LOG_UNIMP,
-> +                          "bcm2835_property: %x get domain state NYI\n",=
- tag);
-> +            resplen =3D 8;
-> +            break;
-> +
+> Hmm, values > 0xffff are reported and values < 0 are silently ignored.
+> I think we should be consistent here.
+> I'd suggest report and exit in both cases,
 
-Our handling of "Set power state" has a slightly more sophisticated
-"always say yes" implementation, but we have other properties which
-we handle unimplemented like this, so if the kernel is happy with
-this we don't need to do anything more sophisticated.
+Agreed.  If the user specifies a value outside acceptable limits,
+rejecting it is simpler than "correcting" it.  "Corrections" may look
+convenient, but they're not worth the additional interface complexity.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> i.e. use error_setg(..., &error_fatal);
 
-thanks
--- PMM
+In case you mean something like
+
+    error_setg(&error_fatal, "reboot timeout is larger than 65535");
+
+I'd like to point to error.h:
+
+ * Please don't error_setg(&error_fatal, ...), use error_report() and
+ * exit(), because that's more obvious.
