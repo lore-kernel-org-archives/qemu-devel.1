@@ -1,20 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52946)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53743)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gJj2t-0005o7-D1
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 12:52:18 -0500
+	(envelope-from <alistair23@gmail.com>) id 1gJj5N-0000B9-KX
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 12:54:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gJj2q-0008UH-0n
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 12:52:15 -0500
-References: <20181105135400.18366-1-marcandre.lureau@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <2ba4d06d-9255-ffde-620b-e80d1331a5a2@vivier.eu>
-Date: Mon, 5 Nov 2018 18:52:04 +0100
+	(envelope-from <alistair23@gmail.com>) id 1gJj5M-00040n-Lt
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 12:54:49 -0500
 MIME-Version: 1.0
-In-Reply-To: <20181105135400.18366-1-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] misc: fix spelling
+References: <CAFEAcA_mT2FT=t+Fw7=7aUgDkX1b64oqFS99_jFN7_12MRCx+g@mail.gmail.com>
+In-Reply-To: <CAFEAcA_mT2FT=t+Fw7=7aUgDkX1b64oqFS99_jFN7_12MRCx+g@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 5 Nov 2018 09:54:02 -0800
+Message-ID: <CAKmqyKPuKUUkXuFW9v6Zo+Yid_U9ye_Dx5Nai5273NYSD7B+2A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] coverity-spotted memory leak in hw/riscv/spike.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,28 +21,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-riscv@nongnu.org
 
-On 05/11/2018 14:54, Marc-André Lureau wrote:
-> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-> ---
->  target/i386/cpu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index af7e9f09cc..4d2e2d9902 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -4065,7 +4065,7 @@ arch_query_cpu_model_expansion(CpuModelExpansionType type,
->          x86_cpu_to_dict_full(xc, props);
->      break;
->      default:
-> -        error_setg(&err, "Unsupportted expansion type");
-> +        error_setg(&err, "Unsupported expansion type");
->          goto out;
->      }
->  
-> 
+On Mon, Nov 5, 2018 at 5:42 AM Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> Hi; Coverity has noticed a memory leak in hw/riscv/spike.c:
+> it malloc()s memory into config_string(), but never frees it.
+> (CID 1391015). This isn't a very serious leak since the function
+> only ever runs once, but it would be nice to fix this for 3.1
+> (it is the only coverity error in the riscv code, and one of
+> just 8 unaddressed for QEMU as a whole).
+>
+> Incidentally, "malloc and then snprintf" would be better
+> done using g_strdup_printf(), which automatically allocates
+> sufficient memory for the string, avoiding the need to
+> try to pre-calculate the right size.
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+I can check this out today. Thanks for pointing it out.
+
+Alistair
+
+>
+> thanks
+> -- PMM
+>
