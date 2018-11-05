@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50694)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gJhuG-0007wP-Sj
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:39:18 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gJhuj-0008WJ-Ak
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:39:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gJhuB-0005T6-Jx
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:39:16 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gJhuc-0006ub-ES
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:39:45 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon,  5 Nov 2018 17:37:20 +0100
-Message-Id: <20181105163744.25139-13-kwolf@redhat.com>
+Date: Mon,  5 Nov 2018 17:37:30 +0100
+Message-Id: <20181105163744.25139-23-kwolf@redhat.com>
 In-Reply-To: <20181105163744.25139-1-kwolf@redhat.com>
 References: <20181105163744.25139-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 12/36] block/vhdx: Don't take address of fields
- in packed structs
+Subject: [Qemu-devel] [PULL 22/36] block: Require auto-read-only for
+ existing fallbacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,379 +25,279 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Peter Maydell <peter.maydell@linaro.org>
+Some block drivers have traditionally changed their node to read-only
+mode without asking the user. This behaviour has been marked deprecated
+since 2.11, expecting users to provide an explicit read-only=3Don option.
 
-Taking the address of a field in a packed struct is a bad idea, because
-it might not be actually aligned enough for that pointer type (and
-thus cause a crash on dereference on some host architectures). Newer
-versions of clang warn about this. Avoid the bug by not using the
-"modify in place" byte swapping functions.
+Now that we have auto-read-only=3Don, enable these drivers to make use of
+the option.
 
-There are a few places where the in-place swap function is
-used on something other than a packed struct field; we convert
-those anyway, for consistency.
+This is the only use of bdrv_set_read_only(), so we can make it a bit
+more specific and turn it into a bdrv_apply_auto_read_only() that is
+more convenient for drivers to use.
 
-Patch produced with scripts/coccinelle/inplace-byteswaps.cocci.
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block/vhdx.h        |  12 ++---
- block/vhdx-endian.c | 118 ++++++++++++++++++++++----------------------
- block/vhdx-log.c    |   4 +-
- block/vhdx.c        |  18 +++----
- 4 files changed, 76 insertions(+), 76 deletions(-)
+ include/block/block.h |  3 ++-
+ block.c               | 42 +++++++++++++++++++++++++++---------------
+ block/bochs.c         | 17 ++++++-----------
+ block/cloop.c         | 16 +++++-----------
+ block/dmg.c           | 16 +++++-----------
+ block/rbd.c           | 15 ++++-----------
+ block/vvfat.c         | 10 ++--------
+ 7 files changed, 51 insertions(+), 68 deletions(-)
 
-diff --git a/block/vhdx.h b/block/vhdx.h
-index 7003ab7a79..3a5f5293ad 100644
---- a/block/vhdx.h
-+++ b/block/vhdx.h
-@@ -420,16 +420,16 @@ int vhdx_log_write_and_flush(BlockDriverState *bs, =
-BDRVVHDXState *s,
+diff --git a/include/block/block.h b/include/block/block.h
+index 580b3716c3..7f5453b45b 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -438,7 +438,8 @@ int bdrv_is_allocated_above(BlockDriverState *top, Bl=
+ockDriverState *base,
+ bool bdrv_is_read_only(BlockDriverState *bs);
+ int bdrv_can_set_read_only(BlockDriverState *bs, bool read_only,
+                            bool ignore_allow_rdw, Error **errp);
+-int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **err=
+p);
++int bdrv_apply_auto_read_only(BlockDriverState *bs, const char *errmsg,
++                              Error **errp);
+ bool bdrv_is_writable(BlockDriverState *bs);
+ bool bdrv_is_sg(BlockDriverState *bs);
+ bool bdrv_is_inserted(BlockDriverState *bs);
+diff --git a/block.c b/block.c
+index 96090c3b9a..fd67e14dfa 100644
+--- a/block.c
++++ b/block.c
+@@ -266,29 +266,41 @@ int bdrv_can_set_read_only(BlockDriverState *bs, bo=
+ol read_only,
+     return 0;
+ }
 =20
- static inline void leguid_to_cpus(MSGUID *guid)
+-/* TODO Remove (deprecated since 2.11)
+- * Block drivers are not supposed to automatically change bs->read_only.
+- * Instead, they should just check whether they can provide what the use=
+r
+- * explicitly requested and error out if read-write is requested, but th=
+ey can
+- * only provide read-only access. */
+-int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **err=
+p)
++/*
++ * Called by a driver that can only provide a read-only image.
++ *
++ * Returns 0 if the node is already read-only or it could switch the nod=
+e to
++ * read-only because BDRV_O_AUTO_RDONLY is set.
++ *
++ * Returns -EACCES if the node is read-write and BDRV_O_AUTO_RDONLY is n=
+ot set
++ * or bdrv_can_set_read_only() forbids making the node read-only. If @er=
+rmsg
++ * is not NULL, it is used as the error message for the Error object.
++ */
++int bdrv_apply_auto_read_only(BlockDriverState *bs, const char *errmsg,
++                              Error **errp)
  {
--    le32_to_cpus(&guid->data1);
--    le16_to_cpus(&guid->data2);
--    le16_to_cpus(&guid->data3);
-+    guid->data1 =3D le32_to_cpu(guid->data1);
-+    guid->data2 =3D le16_to_cpu(guid->data2);
-+    guid->data3 =3D le16_to_cpu(guid->data3);
- }
+     int ret =3D 0;
 =20
- static inline void cpu_to_leguids(MSGUID *guid)
- {
--    cpu_to_le32s(&guid->data1);
--    cpu_to_le16s(&guid->data2);
--    cpu_to_le16s(&guid->data3);
-+    guid->data1 =3D cpu_to_le32(guid->data1);
-+    guid->data2 =3D cpu_to_le16(guid->data2);
-+    guid->data3 =3D cpu_to_le16(guid->data3);
- }
-=20
- void vhdx_header_le_import(VHDXHeader *h);
-diff --git a/block/vhdx-endian.c b/block/vhdx-endian.c
-index 41fbdd2b8f..ebfa33cb8a 100644
---- a/block/vhdx-endian.c
-+++ b/block/vhdx-endian.c
-@@ -35,18 +35,18 @@ void vhdx_header_le_import(VHDXHeader *h)
- {
-     assert(h !=3D NULL);
-=20
--    le32_to_cpus(&h->signature);
--    le32_to_cpus(&h->checksum);
--    le64_to_cpus(&h->sequence_number);
-+    h->signature =3D le32_to_cpu(h->signature);
-+    h->checksum =3D le32_to_cpu(h->checksum);
-+    h->sequence_number =3D le64_to_cpu(h->sequence_number);
-=20
-     leguid_to_cpus(&h->file_write_guid);
-     leguid_to_cpus(&h->data_write_guid);
-     leguid_to_cpus(&h->log_guid);
-=20
--    le16_to_cpus(&h->log_version);
--    le16_to_cpus(&h->version);
--    le32_to_cpus(&h->log_length);
--    le64_to_cpus(&h->log_offset);
-+    h->log_version =3D le16_to_cpu(h->log_version);
-+    h->version =3D le16_to_cpu(h->version);
-+    h->log_length =3D le32_to_cpu(h->log_length);
-+    h->log_offset =3D le64_to_cpu(h->log_offset);
- }
-=20
- void vhdx_header_le_export(VHDXHeader *orig_h, VHDXHeader *new_h)
-@@ -80,68 +80,68 @@ void vhdx_log_desc_le_import(VHDXLogDescriptor *d)
- {
-     assert(d !=3D NULL);
-=20
--    le32_to_cpus(&d->signature);
--    le64_to_cpus(&d->file_offset);
--    le64_to_cpus(&d->sequence_number);
-+    d->signature =3D le32_to_cpu(d->signature);
-+    d->file_offset =3D le64_to_cpu(d->file_offset);
-+    d->sequence_number =3D le64_to_cpu(d->sequence_number);
- }
-=20
- void vhdx_log_desc_le_export(VHDXLogDescriptor *d)
- {
-     assert(d !=3D NULL);
-=20
--    cpu_to_le32s(&d->signature);
--    cpu_to_le32s(&d->trailing_bytes);
--    cpu_to_le64s(&d->leading_bytes);
--    cpu_to_le64s(&d->file_offset);
--    cpu_to_le64s(&d->sequence_number);
-+    d->signature =3D cpu_to_le32(d->signature);
-+    d->trailing_bytes =3D cpu_to_le32(d->trailing_bytes);
-+    d->leading_bytes =3D cpu_to_le64(d->leading_bytes);
-+    d->file_offset =3D cpu_to_le64(d->file_offset);
-+    d->sequence_number =3D cpu_to_le64(d->sequence_number);
- }
-=20
- void vhdx_log_data_le_import(VHDXLogDataSector *d)
- {
-     assert(d !=3D NULL);
-=20
--    le32_to_cpus(&d->data_signature);
--    le32_to_cpus(&d->sequence_high);
--    le32_to_cpus(&d->sequence_low);
-+    d->data_signature =3D le32_to_cpu(d->data_signature);
-+    d->sequence_high =3D le32_to_cpu(d->sequence_high);
-+    d->sequence_low =3D le32_to_cpu(d->sequence_low);
- }
-=20
- void vhdx_log_data_le_export(VHDXLogDataSector *d)
- {
-     assert(d !=3D NULL);
-=20
--    cpu_to_le32s(&d->data_signature);
--    cpu_to_le32s(&d->sequence_high);
--    cpu_to_le32s(&d->sequence_low);
-+    d->data_signature =3D cpu_to_le32(d->data_signature);
-+    d->sequence_high =3D cpu_to_le32(d->sequence_high);
-+    d->sequence_low =3D cpu_to_le32(d->sequence_low);
- }
-=20
- void vhdx_log_entry_hdr_le_import(VHDXLogEntryHeader *hdr)
- {
-     assert(hdr !=3D NULL);
-=20
--    le32_to_cpus(&hdr->signature);
--    le32_to_cpus(&hdr->checksum);
--    le32_to_cpus(&hdr->entry_length);
--    le32_to_cpus(&hdr->tail);
--    le64_to_cpus(&hdr->sequence_number);
--    le32_to_cpus(&hdr->descriptor_count);
-+    hdr->signature =3D le32_to_cpu(hdr->signature);
-+    hdr->checksum =3D le32_to_cpu(hdr->checksum);
-+    hdr->entry_length =3D le32_to_cpu(hdr->entry_length);
-+    hdr->tail =3D le32_to_cpu(hdr->tail);
-+    hdr->sequence_number =3D le64_to_cpu(hdr->sequence_number);
-+    hdr->descriptor_count =3D le32_to_cpu(hdr->descriptor_count);
-     leguid_to_cpus(&hdr->log_guid);
--    le64_to_cpus(&hdr->flushed_file_offset);
--    le64_to_cpus(&hdr->last_file_offset);
-+    hdr->flushed_file_offset =3D le64_to_cpu(hdr->flushed_file_offset);
-+    hdr->last_file_offset =3D le64_to_cpu(hdr->last_file_offset);
- }
-=20
- void vhdx_log_entry_hdr_le_export(VHDXLogEntryHeader *hdr)
- {
-     assert(hdr !=3D NULL);
-=20
--    cpu_to_le32s(&hdr->signature);
--    cpu_to_le32s(&hdr->checksum);
--    cpu_to_le32s(&hdr->entry_length);
--    cpu_to_le32s(&hdr->tail);
--    cpu_to_le64s(&hdr->sequence_number);
--    cpu_to_le32s(&hdr->descriptor_count);
-+    hdr->signature =3D cpu_to_le32(hdr->signature);
-+    hdr->checksum =3D cpu_to_le32(hdr->checksum);
-+    hdr->entry_length =3D cpu_to_le32(hdr->entry_length);
-+    hdr->tail =3D cpu_to_le32(hdr->tail);
-+    hdr->sequence_number =3D cpu_to_le64(hdr->sequence_number);
-+    hdr->descriptor_count =3D cpu_to_le32(hdr->descriptor_count);
-     cpu_to_leguids(&hdr->log_guid);
--    cpu_to_le64s(&hdr->flushed_file_offset);
--    cpu_to_le64s(&hdr->last_file_offset);
-+    hdr->flushed_file_offset =3D cpu_to_le64(hdr->flushed_file_offset);
-+    hdr->last_file_offset =3D cpu_to_le64(hdr->last_file_offset);
- }
-=20
-=20
-@@ -150,18 +150,18 @@ void vhdx_region_header_le_import(VHDXRegionTableHe=
-ader *hdr)
- {
-     assert(hdr !=3D NULL);
-=20
--    le32_to_cpus(&hdr->signature);
--    le32_to_cpus(&hdr->checksum);
--    le32_to_cpus(&hdr->entry_count);
-+    hdr->signature =3D le32_to_cpu(hdr->signature);
-+    hdr->checksum =3D le32_to_cpu(hdr->checksum);
-+    hdr->entry_count =3D le32_to_cpu(hdr->entry_count);
- }
-=20
- void vhdx_region_header_le_export(VHDXRegionTableHeader *hdr)
- {
-     assert(hdr !=3D NULL);
-=20
--    cpu_to_le32s(&hdr->signature);
--    cpu_to_le32s(&hdr->checksum);
--    cpu_to_le32s(&hdr->entry_count);
-+    hdr->signature =3D cpu_to_le32(hdr->signature);
-+    hdr->checksum =3D cpu_to_le32(hdr->checksum);
-+    hdr->entry_count =3D cpu_to_le32(hdr->entry_count);
- }
-=20
- void vhdx_region_entry_le_import(VHDXRegionTableEntry *e)
-@@ -169,9 +169,9 @@ void vhdx_region_entry_le_import(VHDXRegionTableEntry=
- *e)
-     assert(e !=3D NULL);
-=20
-     leguid_to_cpus(&e->guid);
--    le64_to_cpus(&e->file_offset);
--    le32_to_cpus(&e->length);
--    le32_to_cpus(&e->data_bits);
-+    e->file_offset =3D le64_to_cpu(e->file_offset);
-+    e->length =3D le32_to_cpu(e->length);
-+    e->data_bits =3D le32_to_cpu(e->data_bits);
- }
-=20
- void vhdx_region_entry_le_export(VHDXRegionTableEntry *e)
-@@ -179,9 +179,9 @@ void vhdx_region_entry_le_export(VHDXRegionTableEntry=
- *e)
-     assert(e !=3D NULL);
-=20
-     cpu_to_leguids(&e->guid);
--    cpu_to_le64s(&e->file_offset);
--    cpu_to_le32s(&e->length);
--    cpu_to_le32s(&e->data_bits);
-+    e->file_offset =3D cpu_to_le64(e->file_offset);
-+    e->length =3D cpu_to_le32(e->length);
-+    e->data_bits =3D cpu_to_le32(e->data_bits);
- }
-=20
-=20
-@@ -190,16 +190,16 @@ void vhdx_metadata_header_le_import(VHDXMetadataTab=
-leHeader *hdr)
- {
-     assert(hdr !=3D NULL);
-=20
--    le64_to_cpus(&hdr->signature);
--    le16_to_cpus(&hdr->entry_count);
-+    hdr->signature =3D le64_to_cpu(hdr->signature);
-+    hdr->entry_count =3D le16_to_cpu(hdr->entry_count);
- }
-=20
- void vhdx_metadata_header_le_export(VHDXMetadataTableHeader *hdr)
- {
-     assert(hdr !=3D NULL);
-=20
--    cpu_to_le64s(&hdr->signature);
--    cpu_to_le16s(&hdr->entry_count);
-+    hdr->signature =3D cpu_to_le64(hdr->signature);
-+    hdr->entry_count =3D cpu_to_le16(hdr->entry_count);
- }
-=20
- void vhdx_metadata_entry_le_import(VHDXMetadataTableEntry *e)
-@@ -207,16 +207,16 @@ void vhdx_metadata_entry_le_import(VHDXMetadataTabl=
-eEntry *e)
-     assert(e !=3D NULL);
-=20
-     leguid_to_cpus(&e->item_id);
--    le32_to_cpus(&e->offset);
--    le32_to_cpus(&e->length);
--    le32_to_cpus(&e->data_bits);
-+    e->offset =3D le32_to_cpu(e->offset);
-+    e->length =3D le32_to_cpu(e->length);
-+    e->data_bits =3D le32_to_cpu(e->data_bits);
- }
- void vhdx_metadata_entry_le_export(VHDXMetadataTableEntry *e)
- {
-     assert(e !=3D NULL);
-=20
-     cpu_to_leguids(&e->item_id);
--    cpu_to_le32s(&e->offset);
--    cpu_to_le32s(&e->length);
--    cpu_to_le32s(&e->data_bits);
-+    e->offset =3D cpu_to_le32(e->offset);
-+    e->length =3D cpu_to_le32(e->length);
-+    e->data_bits =3D cpu_to_le32(e->data_bits);
- }
-diff --git a/block/vhdx-log.c b/block/vhdx-log.c
-index d2f1b98199..ecd64266c5 100644
---- a/block/vhdx-log.c
-+++ b/block/vhdx-log.c
-@@ -835,11 +835,11 @@ static void vhdx_log_raw_to_le_sector(VHDXLogDescri=
-ptor *desc,
-     /* 8 + 4084 + 4 =3D 4096, 1 log sector */
-     memcpy(&desc->leading_bytes, data, 8);
-     data +=3D 8;
--    cpu_to_le64s(&desc->leading_bytes);
-+    desc->leading_bytes =3D cpu_to_le64(desc->leading_bytes);
-     memcpy(sector->data, data, 4084);
-     data +=3D 4084;
-     memcpy(&desc->trailing_bytes, data, 4);
--    cpu_to_le32s(&desc->trailing_bytes);
-+    desc->trailing_bytes =3D cpu_to_le32(desc->trailing_bytes);
-     data +=3D 4;
-=20
-     sector->sequence_high  =3D (uint32_t) (seq >> 32);
-diff --git a/block/vhdx.c b/block/vhdx.c
-index 0795ca1985..b785aef4b7 100644
---- a/block/vhdx.c
-+++ b/block/vhdx.c
-@@ -156,7 +156,7 @@ uint32_t vhdx_update_checksum(uint8_t *buf, size_t si=
-ze, int crc_offset)
-=20
-     memset(buf + crc_offset, 0, sizeof(crc));
-     crc =3D  crc32c(0xffffffff, buf, size);
--    cpu_to_le32s(&crc);
-+    crc =3D cpu_to_le32(crc);
-     memcpy(buf + crc_offset, &crc, sizeof(crc));
-=20
-     return crc;
-@@ -753,8 +753,8 @@ static int vhdx_parse_metadata(BlockDriverState *bs, =
-BDRVVHDXState *s)
-         goto exit;
+-    ret =3D bdrv_can_set_read_only(bs, read_only, false, errp);
+-    if (ret < 0) {
+-        return ret;
++    if (!(bs->open_flags & BDRV_O_RDWR)) {
++        return 0;
++    }
++    if (!(bs->open_flags & BDRV_O_AUTO_RDONLY)) {
++        goto fail;
      }
 =20
--    le32_to_cpus(&s->params.block_size);
--    le32_to_cpus(&s->params.data_bits);
-+    s->params.block_size =3D le32_to_cpu(s->params.block_size);
-+    s->params.data_bits =3D le32_to_cpu(s->params.data_bits);
-=20
-=20
-     /* We now have the file parameters, so we can tell if this is a
-@@ -803,9 +803,9 @@ static int vhdx_parse_metadata(BlockDriverState *bs, =
-BDRVVHDXState *s)
-         goto exit;
+-    bs->read_only =3D read_only;
+-
+-    if (read_only) {
+-        bs->open_flags &=3D ~BDRV_O_RDWR;
+-    } else {
+-        bs->open_flags |=3D BDRV_O_RDWR;
++    ret =3D bdrv_can_set_read_only(bs, true, false, NULL);
++    if (ret < 0) {
++        goto fail;
      }
 =20
--    le64_to_cpus(&s->virtual_disk_size);
--    le32_to_cpus(&s->logical_sector_size);
--    le32_to_cpus(&s->physical_sector_size);
-+    s->virtual_disk_size =3D le64_to_cpu(s->virtual_disk_size);
-+    s->logical_sector_size =3D le32_to_cpu(s->logical_sector_size);
-+    s->physical_sector_size =3D le32_to_cpu(s->physical_sector_size);
++    bs->read_only =3D true;
++    bs->open_flags &=3D ~BDRV_O_RDWR;
++
+     return 0;
++
++fail:
++    error_setg(errp, "%s", errmsg ?: "Image is read-only");
++    return -EACCES;
+ }
 =20
-     if (s->params.block_size < VHDX_BLOCK_SIZE_MIN ||
-         s->params.block_size > VHDX_BLOCK_SIZE_MAX) {
-@@ -985,7 +985,7 @@ static int vhdx_open(BlockDriverState *bs, QDict *opt=
-ions, int flags,
-     /* endian convert, and verify populated BAT field file offsets again=
-st
-      * region table and log entries */
-     for (i =3D 0; i < s->bat_entries; i++) {
--        le64_to_cpus(&s->bat[i]);
-+        s->bat[i] =3D le64_to_cpu(s->bat[i]);
-         if (payblocks--) {
-             /* payload bat entries */
-             if ((s->bat[i] & VHDX_BAT_STATE_BIT_MASK) =3D=3D
-@@ -1509,7 +1509,7 @@ static int vhdx_create_new_metadata(BlockBackend *b=
-lk,
-     mt_file_params->block_size =3D cpu_to_le32(block_size);
-     if (type =3D=3D VHDX_TYPE_FIXED) {
-         mt_file_params->data_bits |=3D VHDX_PARAMS_LEAVE_BLOCKS_ALLOCED;
--        cpu_to_le32s(&mt_file_params->data_bits);
-+        mt_file_params->data_bits =3D cpu_to_le32(mt_file_params->data_b=
-its);
+ void bdrv_get_full_backing_filename_from_filename(const char *backed,
+diff --git a/block/bochs.c b/block/bochs.c
+index 50c630047b..22e7d44211 100644
+--- a/block/bochs.c
++++ b/block/bochs.c
+@@ -105,23 +105,18 @@ static int bochs_open(BlockDriverState *bs, QDict *=
+options, int flags,
+     struct bochs_header bochs;
+     int ret;
+=20
++    /* No write support yet */
++    ret =3D bdrv_apply_auto_read_only(bs, NULL, errp);
++    if (ret < 0) {
++        return ret;
++    }
++
+     bs->file =3D bdrv_open_child(NULL, options, "file", bs, &child_file,
+                                false, errp);
+     if (!bs->file) {
+         return -EINVAL;
      }
 =20
-     vhdx_guid_generate(&mt_page83->page_83_data);
-@@ -1656,7 +1656,7 @@ static int vhdx_create_bat(BlockBackend *blk, BDRVV=
-HDXState *s,
-             sinfo.file_offset =3D ROUND_UP(sinfo.file_offset, MiB);
-             vhdx_update_bat_table_entry(blk_bs(blk), s, &sinfo, &unused,=
- &unused,
-                                         block_state);
--            cpu_to_le64s(&s->bat[sinfo.bat_idx]);
-+            s->bat[sinfo.bat_idx] =3D cpu_to_le64(s->bat[sinfo.bat_idx])=
-;
-             sector_num +=3D s->sectors_per_block;
+-    if (!bdrv_is_read_only(bs)) {
+-        error_report("Opening bochs images without an explicit read-only=
+=3Don "
+-                     "option is deprecated. Future versions will refuse =
+to "
+-                     "open the image instead of automatically marking th=
+e "
+-                     "image read-only.");
+-        ret =3D bdrv_set_read_only(bs, true, errp); /* no write support =
+yet */
+-        if (ret < 0) {
+-            return ret;
+-        }
+-    }
+-
+     ret =3D bdrv_pread(bs->file, 0, &bochs, sizeof(bochs));
+     if (ret < 0) {
+         return ret;
+diff --git a/block/cloop.c b/block/cloop.c
+index 2be68987bd..df2b85f723 100644
+--- a/block/cloop.c
++++ b/block/cloop.c
+@@ -67,23 +67,17 @@ static int cloop_open(BlockDriverState *bs, QDict *op=
+tions, int flags,
+     uint32_t offsets_size, max_compressed_block_size =3D 1, i;
+     int ret;
+=20
++    ret =3D bdrv_apply_auto_read_only(bs, NULL, errp);
++    if (ret < 0) {
++        return ret;
++    }
++
+     bs->file =3D bdrv_open_child(NULL, options, "file", bs, &child_file,
+                                false, errp);
+     if (!bs->file) {
+         return -EINVAL;
+     }
+=20
+-    if (!bdrv_is_read_only(bs)) {
+-        error_report("Opening cloop images without an explicit read-only=
+=3Don "
+-                     "option is deprecated. Future versions will refuse =
+to "
+-                     "open the image instead of automatically marking th=
+e "
+-                     "image read-only.");
+-        ret =3D bdrv_set_read_only(bs, true, errp);
+-        if (ret < 0) {
+-            return ret;
+-        }
+-    }
+-
+     /* read header */
+     ret =3D bdrv_pread(bs->file, 128, &s->block_size, 4);
+     if (ret < 0) {
+diff --git a/block/dmg.c b/block/dmg.c
+index c9b3c519c4..1d9283ba2f 100644
+--- a/block/dmg.c
++++ b/block/dmg.c
+@@ -413,23 +413,17 @@ static int dmg_open(BlockDriverState *bs, QDict *op=
+tions, int flags,
+     int64_t offset;
+     int ret;
+=20
++    ret =3D bdrv_apply_auto_read_only(bs, NULL, errp);
++    if (ret < 0) {
++        return ret;
++    }
++
+     bs->file =3D bdrv_open_child(NULL, options, "file", bs, &child_file,
+                                false, errp);
+     if (!bs->file) {
+         return -EINVAL;
+     }
+=20
+-    if (!bdrv_is_read_only(bs)) {
+-        error_report("Opening dmg images without an explicit read-only=3D=
+on "
+-                     "option is deprecated. Future versions will refuse =
+to "
+-                     "open the image instead of automatically marking th=
+e "
+-                     "image read-only.");
+-        ret =3D bdrv_set_read_only(bs, true, errp);
+-        if (ret < 0) {
+-            return ret;
+-        }
+-    }
+-
+     block_module_load_one("dmg-bz2");
+=20
+     s->n_chunks =3D 0;
+diff --git a/block/rbd.c b/block/rbd.c
+index 1e9819a50f..8a1a9f4b6e 100644
+--- a/block/rbd.c
++++ b/block/rbd.c
+@@ -780,17 +780,10 @@ static int qemu_rbd_open(BlockDriverState *bs, QDic=
+t *options, int flags,
+     /* If we are using an rbd snapshot, we must be r/o, otherwise
+      * leave as-is */
+     if (s->snap !=3D NULL) {
+-        if (!bdrv_is_read_only(bs)) {
+-            error_report("Opening rbd snapshots without an explicit "
+-                         "read-only=3Don option is deprecated. Future ve=
+rsions "
+-                         "will refuse to open the image instead of "
+-                         "automatically marking the image read-only.");
+-            r =3D bdrv_set_read_only(bs, true, &local_err);
+-            if (r < 0) {
+-                rbd_close(s->image);
+-                error_propagate(errp, local_err);
+-                goto failed_open;
+-            }
++        r =3D bdrv_apply_auto_read_only(bs, "rbd snapshots are read-only=
+", errp);
++        if (r < 0) {
++            rbd_close(s->image);
++            goto failed_open;
          }
-         ret =3D blk_pwrite(blk, file_offset, s->bat, length, 0);
+     }
+=20
+diff --git a/block/vvfat.c b/block/vvfat.c
+index 98ba5e2bac..e4df255d58 100644
+--- a/block/vvfat.c
++++ b/block/vvfat.c
+@@ -1262,15 +1262,9 @@ static int vvfat_open(BlockDriverState *bs, QDict =
+*options, int flags,
+                        "Unable to set VVFAT to 'rw' when drive is read-o=
+nly");
+             goto fail;
+         }
+-    } else  if (!bdrv_is_read_only(bs)) {
+-        error_report("Opening non-rw vvfat images without an explicit "
+-                     "read-only=3Don option is deprecated. Future versio=
+ns "
+-                     "will refuse to open the image instead of "
+-                     "automatically marking the image read-only.");
+-        /* read only is the default for safety */
+-        ret =3D bdrv_set_read_only(bs, true, &local_err);
++    } else {
++        ret =3D bdrv_apply_auto_read_only(bs, NULL, errp);
+         if (ret < 0) {
+-            error_propagate(errp, local_err);
+             goto fail;
+         }
+     }
 --=20
 2.19.1
