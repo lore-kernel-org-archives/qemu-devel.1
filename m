@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45514)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gJhi2-0004R6-PB
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:26:39 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gJhm9-0000lN-9X
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:30:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gJhhk-0008QN-Qi
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:26:32 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:34095)
+	(envelope-from <peter.maydell@linaro.org>) id 1gJhm7-0007zb-Nk
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:30:53 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:39530)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gJhhg-0008LU-SN
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:26:19 -0500
-Received: by mail-oi1-x242.google.com with SMTP id i138-v6so4978108oib.1
-	for <qemu-devel@nongnu.org>; Mon, 05 Nov 2018 08:26:14 -0800 (PST)
+	id 1gJhm7-0007qs-82
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:30:51 -0500
+Received: by mail-ot1-x342.google.com with SMTP id g27so8529043oth.6
+	for <qemu-devel@nongnu.org>; Mon, 05 Nov 2018 08:30:46 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <87tvkvebmd.fsf@linaro.org>
-References: <20181016093703.10637-1-peter.maydell@linaro.org>
-	<20181016093703.10637-2-peter.maydell@linaro.org>
-	<87tvkvebmd.fsf@linaro.org>
+In-Reply-To: <20181029155339.15280-1-richard.henderson@linaro.org>
+References: <20181029155339.15280-1-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 5 Nov 2018 16:25:53 +0000
-Message-ID: <CAFEAcA8tPHFHFHeB5ty2x6GGgTs6aQG3ckD6NkzOR7OgAX-f9Q@mail.gmail.com>
+Date: Mon, 5 Nov 2018 16:30:25 +0000
+Message-ID: <CAFEAcA9=a_V+NCeN63sXMX++oyApEArRRrQV1LBpP3J4BFBQSg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 1/2] target/arm: Set S and PTW
- in 64-bit PAR format
+Subject: Re: [Qemu-devel] [PATCH 0/4] target/arm: Minimize TLB flushing for
+ ASID changes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,63 +29,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 5 November 2018 at 16:24, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
-e:
+On 29 October 2018 at 15:53, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> In http://lists.nongnu.org/archive/html/qemu-devel/2018-10/msg04181.html
+> (already upstream) I added a check for ASID changes without realizing
+> that TTBCR_EL1 has the A1 bit, controlling which register actually
+> contains the active ASID.
 >
-> Peter Maydell <peter.maydell@linaro.org> writes:
+> In http://lists.nongnu.org/archive/html/qemu-devel/2018-10/msg04182.html
+> I suggested a set of mmu_idx to flush when the ASID does change.  In
+> follow-up, Peter suggested more.
 >
->> In do_ats_write() we construct a PAR value based on the result
->> of the translation.  A comment says "S2WLK and FSTAGE are always
->> zero, because we don't implement virtualization".
->> Since we do in fact now implement virtualization, add the missing
->> code that sets these bits based on the reported ARMMMUFaultInfo.
->>
->> (These bits are named PTW and S in ARMv8, so we follow that
->> convention in the new comments in this patch.)
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
->>  target/arm/helper.c | 10 ++++++----
->>  1 file changed, 6 insertions(+), 4 deletions(-)
->>
->> diff --git a/target/arm/helper.c b/target/arm/helper.c
->> index 43afdd082e1..dc849b09893 100644
->> --- a/target/arm/helper.c
->> +++ b/target/arm/helper.c
->> @@ -2344,10 +2344,12 @@ static uint64_t do_ats_write(CPUARMState *env, u=
-int64_t value,
->>
->>              par64 |=3D 1; /* F */
+> I now choose secure vs non-secure mmu_idx based on which register is being
+> modified, not the current state of the cpu.  Unless I am mistaken, secure
+> state can write to the non-secure registers.  Which means that the current
+> state of the cpu is irrelevant and only the register matters.
 >
-> To aid readability, mainly for those not familiar like me, maybe:
+> Peter suggested flushing S1E3 when changing ttbr0_s.  I can see how this
+> is overlapped onto the EL3 (Secure Monitor) state, but I cannot see how
+> the ASID is used from EL3.  The best evidence I can find for this is that
+> there is no TLBIASID* register that is applicable to flushing EL3; that's
+> not conclusive proof though.  So while I'm not sure it's necessary, I'm
+> also not sure it isn't necessary, and so I've included S1E3 in the flush.
 >
->   par64 |=3D 1; /* PAR_EL1.F =3D=3D 1, failed translation */
+> I now also use the VMID to conditionally invalidate the stage 2 translation
+> state.  This shows how I anticipaged @depmap to be used in patch 1.
 
-That's in the existing code...
-
->>              par64 |=3D (fsr & 0x3f) << 1; /* FS */
->> -            /* Note that S2WLK and FSTAGE are always zero, because we d=
-on't
->> -             * implement virtualization and therefore there can't be a =
-stage 2
->> -             * fault.
->> -             */
->> +            if (fi.stage2) {
->> +                par64 |=3D (1 << 9); /* S */
->> +            }
->> +            if (fi.s1ptw) {
->> +                par64 |=3D (1 << 8); /* PTW */
->> +            }
->>          }
->>      } else {
->>          /* fsr is a DFSR/IFSR value for the short descriptor
->
-> Anyway:
->
-> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Hi; just a note that I'm deferring this series to 4.0, so may
+not get to reviewing it for a bit.
 
 thanks
 -- PMM
