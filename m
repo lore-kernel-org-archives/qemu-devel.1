@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57164)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57131)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gJh5e-00045J-18
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:46:59 -0500
+	(envelope-from <eblake@redhat.com>) id 1gJh5i-00040O-A2
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:47:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gJh4h-0000Xu-8Y
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:46:02 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20181101182738.70462-4-vsementsov@virtuozzo.com>
-References: <20181101182738.70462-1-vsementsov@virtuozzo.com>
-	<20181101182738.70462-4-vsementsov@virtuozzo.com>
-Date: Mon, 05 Nov 2018 16:45:57 +0100
-Message-ID: <w51muqnil3e.fsf@maestria.local.igalia.com>
+	(envelope-from <eblake@redhat.com>) id 1gJh4X-00009G-0f
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:45:49 -0500
+References: <20181103015821.30074-1-lbloch@janustech.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <4d264678-088e-76d6-fa37-3613c89bbd86@redhat.com>
+Date: Mon, 5 Nov 2018 09:45:11 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 3/7] qcow2: move decompression
- from qcow2-cluster.c to qcow2.c
+In-Reply-To: <20181103015821.30074-1-lbloch@janustech.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] include: Add a comment to explain the
+ origin of sizes' lookup table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,18 +24,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, den@openvz.org, mreitz@redhat.com
+To: Leonid Bloch <lbloch@janustech.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Thu 01 Nov 2018 07:27:34 PM CET, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
-> Compression is done in threads in qcow2.c. We want to do decompression
-> in the same way, so, firstly, move it to the same file.
->
-> The only change is braces around if-body in decompress_buffer, to
-> satisfy checkpatch.
->
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On 11/2/18 8:58 PM, Leonid Bloch wrote:
+> The lookup table for power-of-two sizes was added in commit 540b8492618eb
+> for the purpose of having convenient shortcuts for these sizes in cases
+> when the literal number has to be present at compile time, and
+> expressions as '(1 * KiB)' can not be used. One such case is the
+> stringification of sizes. Beyond that, it is convenient to use these
+> shortcuts for all power-of-two sizes, even if they don't have to be
+> literal numbers.
+> 
+> Despite its convenience, this table introduced 55 lines of "dumb" code,
+> the purpose and origin of which are obscure without reading the message
+> of the commit which introduced it. This patch fixes that by adding a
+> comment to the code itself with a brief explanation for the reasoning
+> behind this table. This comment includes the short AWK script that
+> generated the table, so that anyone who's interested could make sure
+> that the values in it are correct (otherwise these values look as if
+> they were typed manually).
+> 
+> Signed-off-by: Leonid Bloch <lbloch@janustech.com>
+> ---
+>   include/qemu/units.h | 18 ++++++++++++++++++
+>   1 file changed, 18 insertions(+)
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+I'm still not completely sold that we can't come up with a more elegant 
+runtime solution that avoids the need for hard-coding stringified 
+defaults at compile time; but if we keep these S_* constants, this 
+comment definitely helps.
 
-Berto
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
