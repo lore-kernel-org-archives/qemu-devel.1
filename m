@@ -1,17 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48111)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48131)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcfaracco@gmail.com>) id 1gJgUb-0005lK-Cs
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:08:42 -0500
+	(envelope-from <jcfaracco@gmail.com>) id 1gJgUc-0005lQ-OC
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:08:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcfaracco@gmail.com>) id 1gJgUa-0002Jz-8U
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:08:41 -0500
+	(envelope-from <jcfaracco@gmail.com>) id 1gJgUY-00023p-OF
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:08:42 -0500
 From: Julio Faracco <jcfaracco@gmail.com>
-Date: Mon,  5 Nov 2018 13:08:04 -0200
-Message-Id: <20181105150806.13649-3-jcfaracco@gmail.com>
-In-Reply-To: <20181105150806.13649-1-jcfaracco@gmail.com>
-References: <20181105150806.13649-1-jcfaracco@gmail.com>
-Subject: [Qemu-devel] [PATCH v3 2/4] configure: adding support to lzfse
- library.
+Date: Mon,  5 Nov 2018 13:08:02 -0200
+Message-Id: <20181105150806.13649-1-jcfaracco@gmail.com>
+Subject: [Qemu-devel] [PATCH v3 0/4] Adding LZFSE compression support for
+ DMG block driver.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,105 +21,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org
 
-This commit includes the support to lzfse opensource library. With this
-library dmg block driver can decompress images with this type of
-compression inside.
+Since Mac OS X El Capitain (v10.11), Apple uses LZFSE compression to 
+generate compressed DMGs as an alternative to BZIP2. Possible, Apple
+want to keep this algorithm as default in long term. Some years ago, 
+Apple opened the LZFSE algorithm to opensource and the main source (or 
+the most active repo), can be found at: https://github.com/lzfse/lzfse
 
-Signed-off-by: Julio Faracco <jcfaracco@gmail.com>
----
+v1-v2: Fixing some error handlings from dmg-lzfse.c
+v2-v3: Master rebasing suggestion from Stefan.
+
+Julio Faracco (4):
+  block: adding lzfse decompressing support as a module.
+  configure: adding support to lzfse library.
+  dmg: including dmg-lzfse module inside dmg block driver.
+  dmg: exchanging hardcoded dmg UDIF block types to enum.
+
  block/Makefile.objs |  2 ++
- configure           | 31 +++++++++++++++++++++++++++++++
- 2 files changed, 33 insertions(+)
+ block/dmg-lzfse.c   | 49 ++++++++++++++++++++++++++++++++++
+ block/dmg.c         | 65 ++++++++++++++++++++++++++++++++++++---------
+ block/dmg.h         |  3 +++
+ configure           | 31 +++++++++++++++++++++
+ 5 files changed, 138 insertions(+), 12 deletions(-)
+ create mode 100644 block/dmg-lzfse.c
 
-diff --git a/block/Makefile.objs b/block/Makefile.objs
-index c8337bf186..f4ddbb9c7b 100644
---- a/block/Makefile.objs
-+++ b/block/Makefile.objs
-@@ -47,6 +47,8 @@ ssh.o-cflags       := $(LIBSSH2_CFLAGS)
- ssh.o-libs         := $(LIBSSH2_LIBS)
- block-obj-$(if $(CONFIG_BZIP2),m,n) += dmg-bz2.o
- dmg-bz2.o-libs     := $(BZIP2_LIBS)
-+block-obj-$(if $(CONFIG_LZFSE),m,n) += dmg-lzfse.o
-+dmg-lzfse.o-libs   := $(LZFSE_LIBS)
- qcow.o-libs        := -lz
- linux-aio.o-libs   := -laio
- parallels.o-cflags := $(LIBXML2_CFLAGS)
-diff --git a/configure b/configure
-index 46ae1e8c76..56b26f0579 100755
---- a/configure
-+++ b/configure
-@@ -434,6 +434,7 @@ capstone=""
- lzo=""
- snappy=""
- bzip2=""
-+lzfse=""
- guest_agent=""
- guest_agent_with_vss="no"
- guest_agent_ntddscsi="no"
-@@ -1301,6 +1302,10 @@ for opt do
-   ;;
-   --enable-bzip2) bzip2="yes"
-   ;;
-+  --enable-lzfse) lzfse="yes"
-+  ;;
-+  --disable-lzfse) lzfse="no"
-+  ;;
-   --enable-guest-agent) guest_agent="yes"
-   ;;
-   --disable-guest-agent) guest_agent="no"
-@@ -1700,6 +1705,8 @@ disabled with --disable-FEATURE, default is enabled if available:
-   snappy          support of snappy compression library
-   bzip2           support of bzip2 compression library
-                   (for reading bzip2-compressed dmg images)
-+  lzfse           support of lzfse compression library
-+                  (for reading lzfse-compressed dmg images)
-   seccomp         seccomp support
-   coroutine-pool  coroutine freelist (better performance)
-   glusterfs       GlusterFS backend
-@@ -2209,6 +2216,24 @@ EOF
-     fi
- fi
- 
-+##########################################
-+# lzfse check
-+
-+if test "$lzfse" != "no" ; then
-+    cat > $TMPC << EOF
-+#include <lzfse.h>
-+int main(void) { lzfse_decode_scratch_size(); return 0; }
-+EOF
-+    if compile_prog "" "-llzfse" ; then
-+        lzfse="yes"
-+    else
-+        if test "$lzfse" = "yes"; then
-+            feature_not_found "lzfse" "Install lzfse devel"
-+        fi
-+        lzfse="no"
-+    fi
-+fi
-+
- ##########################################
- # libseccomp check
- 
-@@ -6036,6 +6061,7 @@ echo "Live block migration $live_block_migration"
- echo "lzo support       $lzo"
- echo "snappy support    $snappy"
- echo "bzip2 support     $bzip2"
-+echo "lzfse support     $lzfse"
- echo "NUMA host support $numa"
- echo "libxml2           $libxml2"
- echo "tcmalloc support  $tcmalloc"
-@@ -6549,6 +6575,11 @@ if test "$bzip2" = "yes" ; then
-   echo "BZIP2_LIBS=-lbz2" >> $config_host_mak
- fi
- 
-+if test "$lzfse" = "yes" ; then
-+  echo "CONFIG_LZFSE=y" >> $config_host_mak
-+  echo "LZFSE_LIBS=-llzfse" >> $config_host_mak
-+fi
-+
- if test "$libiscsi" = "yes" ; then
-   echo "CONFIG_LIBISCSI=m" >> $config_host_mak
-   echo "LIBISCSI_CFLAGS=$libiscsi_cflags" >> $config_host_mak
 -- 
 2.17.1
