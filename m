@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aaron@os.amperecomputing.com>) id 1gJjyn-0004a0-6q
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:52:09 -0500
+	(envelope-from <aaron@os.amperecomputing.com>) id 1gJjyo-0004c5-Vk
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:52:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aaron@os.amperecomputing.com>) id 1gJjyl-0000Wl-EC
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:52:05 -0500
+	(envelope-from <aaron@os.amperecomputing.com>) id 1gJjyn-0000Xe-48
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:52:06 -0500
 From: Aaron Lindsay <aaron@os.amperecomputing.com>
-Date: Mon, 5 Nov 2018 18:51:50 +0000
-Message-ID: <20181105185046.2802-2-aaron@os.amperecomputing.com>
+Date: Mon, 5 Nov 2018 18:51:55 +0000
+Message-ID: <20181105185046.2802-6-aaron@os.amperecomputing.com>
 References: <20181105185046.2802-1-aaron@os.amperecomputing.com>
 In-Reply-To: <20181105185046.2802-1-aaron@os.amperecomputing.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v7 01/12] migration: Add post_save function to
- VMStateDescription
+Subject: [Qemu-devel] [PATCH v7 05/12] target/arm: Allow AArch32 access for
+ PMCCFILTR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,86 +25,72 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <richard.henderson@linaro.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>, Aaron Lindsay <aaron@os.amperecomputing.com>, Aaron Lindsay <aclindsa@gmail.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>, Aaron Lindsay <aaron@os.amperecomputing.com>, Aaron Lindsay <alindsay@codeaurora.org>
 
-In some cases it may be helpful to modify state before saving it for
-migration, and then modify the state back after it has been saved. The
-existing pre_save function provides half of this functionality. This
-patch adds a post_save function to provide the second half.
-
-Signed-off-by: Aaron Lindsay <aclindsa@gmail.com>
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- docs/devel/migration.rst    |  9 +++++++--
- include/migration/vmstate.h |  1 +
- migration/vmstate.c         | 13 ++++++++++++-
- 3 files changed, 20 insertions(+), 3 deletions(-)
+ target/arm/helper.c | 27 ++++++++++++++++++++++++++-
+ 1 file changed, 26 insertions(+), 1 deletion(-)
 
-diff --git a/docs/devel/migration.rst b/docs/devel/migration.rst
-index 687570754d..92fb521ad2 100644
---- a/docs/devel/migration.rst
-+++ b/docs/devel/migration.rst
-@@ -419,8 +419,13 @@ The functions to do that are inside a vmstate definiti=
-on, and are called:
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 63d4e993f4..0522a606a4 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -994,6 +994,10 @@ static const ARMCPRegInfo v6_cp_reginfo[] =3D {
+                                PMXEVTYPER_M | PMXEVTYPER_MT | \
+                                PMXEVTYPER_EVTCOUNT)
 =20
-   This function is called before we save the state of one device.
-=20
--Example: You can look at hpet.c, that uses the three function to
--massage the state that is transferred.
-+- ``int (*post_save)(void *opaque);``
++#define PMCCFILTR             0xf8000000
++#define PMCCFILTR_M           PMXEVTYPER_M
++#define PMCCFILTR_EL0         (PMCCFILTR | PMCCFILTR_M)
 +
-+  This function is called after we save the state of one device
-+  (even upon failure, unless the call to pre_save returned an error).
+ static inline uint32_t pmu_num_counters(CPUARMState *env)
+ {
+   return (env->cp15.c9_pmcr & PMCRN_MASK) >> PMCRN_SHIFT;
+@@ -1297,10 +1301,26 @@ static void pmccfiltr_write(CPUARMState *env, const=
+ ARMCPRegInfo *ri,
+                             uint64_t value)
+ {
+     pmccntr_op_start(env);
+-    env->cp15.pmccfiltr_el0 =3D value & 0xfc000000;
++    env->cp15.pmccfiltr_el0 =3D value & PMCCFILTR_EL0;
++    pmccntr_op_finish(env);
++}
 +
-+Example: You can look at hpet.c, that uses the first three functions
-+to massage the state that is transferred.
-=20
- The ``VMSTATE_WITH_TMP`` macro may be useful when the migration
- data doesn't match the stored device data well; it allows an
-diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-index 2b501d0466..9355d83056 100644
---- a/include/migration/vmstate.h
-+++ b/include/migration/vmstate.h
-@@ -185,6 +185,7 @@ struct VMStateDescription {
-     int (*pre_load)(void *opaque);
-     int (*post_load)(void *opaque, int version_id);
-     int (*pre_save)(void *opaque);
-+    int (*post_save)(void *opaque);
-     bool (*needed)(void *opaque);
-     VMStateField *fields;
-     const VMStateDescription **subsections;
-diff --git a/migration/vmstate.c b/migration/vmstate.c
-index 0bc240a317..c15d75260a 100644
---- a/migration/vmstate.c
-+++ b/migration/vmstate.c
-@@ -387,6 +387,9 @@ int vmstate_save_state_v(QEMUFile *f, const VMStateDesc=
-ription *vmsd,
-                 if (ret) {
-                     error_report("Save of field %s/%s failed",
-                                  vmsd->name, field->name);
-+                    if (vmsd->post_save) {
-+                        vmsd->post_save(opaque);
-+                    }
-                     return ret;
-                 }
-=20
-@@ -412,7 +415,15 @@ int vmstate_save_state_v(QEMUFile *f, const VMStateDes=
-cription *vmsd,
-         json_end_array(vmdesc);
-     }
-=20
--    return vmstate_subsection_save(f, vmsd, opaque, vmdesc);
-+    ret =3D vmstate_subsection_save(f, vmsd, opaque, vmdesc);
-+
-+    if (vmsd->post_save) {
-+        int ps_ret =3D vmsd->post_save(opaque);
-+        if (!ret) {
-+            ret =3D ps_ret;
-+        }
-+    }
-+    return ret;
++static void pmccfiltr_write_a32(CPUARMState *env, const ARMCPRegInfo *ri,
++                            uint64_t value)
++{
++    pmccntr_op_start(env);
++    /* M is not accessible from AArch32 */
++    env->cp15.pmccfiltr_el0 =3D (env->cp15.pmccfiltr_el0 & PMCCFILTR_M) |
++        (value & PMCCFILTR);
+     pmccntr_op_finish(env);
  }
 =20
- static const VMStateDescription *
++static uint64_t pmccfiltr_read_a32(CPUARMState *env, const ARMCPRegInfo *r=
+i)
++{
++    /* M is not visible in AArch32 */
++    return env->cp15.pmccfiltr_el0 & PMCCFILTR;
++}
++
+ static void pmcntenset_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                             uint64_t value)
+ {
+@@ -1536,6 +1556,11 @@ static const ARMCPRegInfo v7_cp_reginfo[] =3D {
+       .readfn =3D pmccntr_read, .writefn =3D pmccntr_write,
+       .raw_readfn =3D raw_read, .raw_writefn =3D raw_write, },
+ #endif
++    { .name =3D "PMCCFILTR", .cp =3D 15, .opc1 =3D 0, .crn =3D 14, .crm =
+=3D 15, .opc2 =3D 7,
++      .writefn =3D pmccfiltr_write_a32, .readfn =3D pmccfiltr_read_a32,
++      .access =3D PL0_RW, .accessfn =3D pmreg_access,
++      .type =3D ARM_CP_ALIAS | ARM_CP_IO,
++      .resetvalue =3D 0, },
+     { .name =3D "PMCCFILTR_EL0", .state =3D ARM_CP_STATE_AA64,
+       .opc0 =3D 3, .opc1 =3D 3, .crn =3D 14, .crm =3D 15, .opc2 =3D 7,
+       .writefn =3D pmccfiltr_write, .raw_writefn =3D raw_write,
 --=20
 2.19.1
