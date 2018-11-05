@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53182)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gJfGg-0005fR-JT
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 08:50:15 -0500
+	(envelope-from <quintela@redhat.com>) id 1gJfJw-0008Pt-TB
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 08:53:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gJfGb-0005q9-Ca
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 08:50:14 -0500
-Date: Mon, 5 Nov 2018 11:49:40 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181105134940.GB12503@habkost.net>
-References: <20181030111348.14713-1-kraxel@redhat.com>
-	<20181030111348.14713-2-kraxel@redhat.com>
-	<8c224534-c929-7c7f-a126-a9390bbdb77f@redhat.com>
-	<20181030140030.gh5aa7jcgszrfajs@sirius.home.kraxel.org>
-	<6fd9e9f8-838a-a13c-e957-a8e6bcb74c42@redhat.com>
-	<20181030164633.2c8f21d3.cohuck@redhat.com>
-	<74a8ecef-18c0-d55d-4b29-7ed6c6b57537@redhat.com>
-	<20181030231545.GY3902@habkost.net>
-	<20181105073028.uauojn2lv2rvkotk@sirius.home.kraxel.org>
+	(envelope-from <quintela@redhat.com>) id 1gJfJp-0003Ph-Dh
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 08:53:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38576)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1gJfJk-0003Hf-9u
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 08:53:28 -0500
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20181101101715.9443-10-fli@suse.com> (Fei Li's message of "Thu,
+	1 Nov 2018 18:17:15 +0800")
+References: <20181101101715.9443-1-fli@suse.com>
+	<20181101101715.9443-10-fli@suse.com>
+Reply-To: quintela@redhat.com
+Date: Mon, 05 Nov 2018 14:53:12 +0100
+Message-ID: <877ehrvdfb.fsf@trasno.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181105073028.uauojn2lv2rvkotk@sirius.home.kraxel.org>
-Subject: Re: [Qemu-devel] [PATCH 1/4] add QemuSupportState
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH RFC v7 9/9] qemu_thread_create: propagate
+ the error to callers to handle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,77 +29,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>
+To: Fei Li <fli@suse.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, dgilbert@redhat.com, famz@redhat.com, peterx@redhat.com
 
-On Mon, Nov 05, 2018 at 08:30:28AM +0100, Gerd Hoffmann wrote:
->   Hi,
-> 
-> > > - Maintainers can deprecate stuffs
-> > > - Orphan code can become Supported
-> > > - Once scheduled for removal, there is no way back
-> > > - 'Unknown' seems pretty similar to 'Orphan'.
-> > 
-> > I'm still worried that the supported/unsupported distinction may
-> > cause unnecessary hassle for every downstream distributor of
-> > QEMU.  Do we really have a need to differentiate supported vs
-> > unsupported device types at runtime?
-> 
-> How do you suggest to handle cirrus then?
-> 
-> Trying to deprecate it outright didn't work very well, kind of
-> understandable given that it has been the default for a long time.
-> 
-> So I think we have to mark cirrus as "obsolete", printing a message for
-> the users that they should switch to another display device (stdvga for
-> example), but keep it working for a while.
-> 
-> There are also a bunch of devices where I suspect they are not used much
-> if at all.  All those isa sound cards for example.  Playing old DOS
-> games is pretty much the only use case I can think of.  But I'm
-> wondering whenever people actually use qemu for that.  There are
-> alternatives which probably handle that use case better, i.e. dosbox.
-> 
-> Simliar case is bluetooth emulation.  I can't remember having seen any
-> message or patch for years.
-> 
-> Tagging such devices as "obsolete", with a message asking people to
-> report their use cases, might help figuring if and why those devices are
-> used in the wild.
+Fei Li <fli@suse.com> wrote:
+> Make qemu_thread_create() return a Boolean to indicate if it succeeds
+> rather than failing with an error. And add an Error parameter to hold
+> the error message and let the callers handle it.
 
-Thanks for the more detailed description of the use case you have
-in mind.  It makes sense to me.
-
-Now, I have two questions:
-
-1) What's more important: telling the user they are relying on an
-   obsolete feature, or that they are relying on an unsupported
-   feature?  What exactly is the difference?
-
-2) Do we really need to differentiate between "obsolete" and
-   "deprecated" features?  What exactly is the difference?
+Nice work, thanks.
 
 
-In either case, I believe a simple supported/obsolete (or
-supported/unsupported) distinction is probably going to be more
-useful than a detailed
-supported/maintained/odd-fixes/orphan/obsolete model.
+> Signed-off-by: Fei Li <fli@suse.com>
+> ---
+>  cpus.c                      | 45 ++++++++++++++++++++++++-------------
+>  dump.c                      |  6 +++--
+>  hw/misc/edu.c               |  6 +++--
+>  hw/ppc/spapr_hcall.c        | 10 +++++++--
+>  hw/rdma/rdma_backend.c      |  4 +++-
+>  hw/usb/ccid-card-emulated.c | 15 +++++++++----
+>  include/qemu/thread.h       |  4 ++--
+>  io/task.c                   |  3 ++-
+>  iothread.c                  | 16 +++++++++-----
+>  migration/migration.c       | 54 +++++++++++++++++++++++++++++----------------
+>  migration/postcopy-ram.c    | 14 ++++++++++--
+>  migration/ram.c             | 41 +++++++++++++++++++++++++---------
+>  migration/savevm.c          | 11 ++++++---
+>  tests/atomic_add-bench.c    |  3 ++-
+>  tests/iothread.c            |  2 +-
+>  tests/qht-bench.c           |  3 ++-
+>  tests/rcutorture.c          |  3 ++-
+>  tests/test-aio.c            |  2 +-
+>  tests/test-rcu-list.c       |  3 ++-
+>  ui/vnc-jobs.c               | 17 +++++++++-----
+>  ui/vnc-jobs.h               |  2 +-
+>  ui/vnc.c                    |  4 +++-
+>  util/compatfd.c             | 12 ++++++++--
+>  util/oslib-posix.c          | 17 ++++++++++----
+>  util/qemu-thread-posix.c    | 24 +++++++++++++-------
+>  util/qemu-thread-win32.c    | 16 ++++++++++----
+>  util/rcu.c                  |  3 ++-
+>  util/thread-pool.c          |  4 +++-
+>  28 files changed, 243 insertions(+), 101 deletions(-)
+>
+> diff --git a/cpus.c b/cpus.c
+> index ed71618e1f..0510f90e06 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -1949,15 +1949,20 @@ static void qemu_tcg_init_vcpu(CPUState *cpu, Error **errp)
+>              snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/TCG",
+>                   cpu->cpu_index);
+>  
+> -            qemu_thread_create(cpu->thread, thread_name, qemu_tcg_cpu_thread_fn,
+> -                               cpu, QEMU_THREAD_JOINABLE);
+> +            if (!qemu_thread_create(cpu->thread, thread_name,
+> +                                    qemu_tcg_cpu_thread_fn, cpu,
+> +                                    QEMU_THREAD_JOINABLE, errp)) {
 
-Reviewing a list of obsolete devices downstream (to decide if
-they should be still compiled in downstream) sounds doable.
-Fixing up detailed supported/maintained/odd-fixes/orphan data
-downstream sounds like unnecessary extra work.
+I think that in this cases where you are not handling the error, you
+should use an exit() here.  We can't continue.
 
+I am not saying that you need to fix all the places that call
+qmeu_thread_create() to handle the error gracefully, but in the places
+where you don't do, you should just exit.
 
-> 
-> > I'd prefer to make support/unsupported differentiation to be a
-> > build system feature (e.g. a CONFIG_UNSUPPORTED build-time
-> > option) instead of a QMP/runtime feature.
-> 
-> That would be nice too, but I think we need kbuild first, otherwise
-> it'll be pretty messy.
+I.e. this patch should be split in something that does:
 
-Agreed.
+-   qemu_thread_create(...., errp);
++   if (!qemu_thread_create(..., errp))  {
++      error_report_err(errp);
++      exit(1);
++   }
 
--- 
-Eduardo
+So, we can fix any caller independtly from here.
+Otherwise, we are ignoring an important error.
+
+What do you think?
+
+Later, Juan.
