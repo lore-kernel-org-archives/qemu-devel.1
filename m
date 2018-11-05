@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43500)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gJbM6-0001i4-Qb
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 04:39:35 -0500
+	(envelope-from <lhrazky@redhat.com>) id 1gJbT9-0005Gx-0i
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 04:46:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gJbM1-0007fk-9m
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 04:39:34 -0500
-References: <20180927115454.31471-1-geert+renesas@glider.be>
-	<20180927115454.31471-3-geert+renesas@glider.be>
-	<2f7f45ec-c689-2cd4-e44f-90c82b47d151@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <634eb7a6-5eca-37b8-bcb3-70677ebc2e99@redhat.com>
-Date: Mon, 5 Nov 2018 10:39:01 +0100
-MIME-Version: 1.0
-In-Reply-To: <2f7f45ec-c689-2cd4-e44f-90c82b47d151@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+	(envelope-from <lhrazky@redhat.com>) id 1gJbT3-0002mg-Gg
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 04:46:50 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:52430)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lhrazky@redhat.com>) id 1gJbSz-0007s4-6R
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 04:46:43 -0500
+Received: by mail-wm1-f68.google.com with SMTP id l66-v6so1429339wml.2
+	for <qemu-devel@nongnu.org>; Mon, 05 Nov 2018 01:46:33 -0800 (PST)
+Message-ID: <1541411191.16655.479.camel@redhat.com>
+From: =?UTF-8?Q?Luk=C3=A1=C5=A1_Hr=C3=A1zk=C3=BD?= <lhrazky@redhat.com>
+Date: Mon, 05 Nov 2018 10:46:31 +0100
+In-Reply-To: <300817282.40470623.1541407597782.JavaMail.zimbra@redhat.com>
+References: <20181017143604.5194-1-lhrazky@redhat.com>
+	<20181017143604.5194-2-lhrazky@redhat.com>
+	<1506037511.34884353.1539846969311.JavaMail.zimbra@redhat.com>
+	<1540208764.16655.240.camel@redhat.com>
+	<1541087251.16655.419.camel@redhat.com>
+	<20181105065258.4mpdv5w4rp3eui5p@sirius.home.kraxel.org>
+	<300817282.40470623.1541407597782.JavaMail.zimbra@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] New crash
+Subject: Re: [Qemu-devel] [RFC PATCH spice v2 1/2] QXL interface: add
+ functions to identify monitors in the guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,62 +35,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Geert Uytterhoeven <geert+renesas@glider.be>, Peter Maydell <peter.maydell@linaro.org>, Alex Williamson <alex.williamson@redhat.com>
-Cc: Laurent Pinchart <laurent.pinchart+renesas@ideasonboard.com>, Eduardo Habkost <ehabkost@redhat.com>, Magnus Damm <damm+renesas@opensource.se>, qemu-devel@nongnu.org, linux-renesas-soc@vger.kernel.org, Wolfram Sang <wsa+renesas@sang-engineering.com>, Kieran Bingham <kieran.bingham+renesas@ideasonboard.com>, qemu-arm@nongnu.org
+To: Frediano Ziglio <fziglio@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: spice-devel@lists.freedesktop.org, qemu-devel@nongnu.org
 
-Hi Thomas,
-
-On 11/5/18 10:17 AM, Thomas Huth wrote:
-> On 2018-09-27 13:54, Geert Uytterhoeven wrote:
->> From: Auger Eric <eric.auger@redhat.com>
->>
->> Up to now we have relied on the device type to identify a device tree
->> node creation function.  Since we would like the vfio-platform device to
->> be instantiable with different compatible strings we introduce the
->> capability to specialize the node creation depending on actual
->> compatible value.
->>
->> NodeCreationPair is renamed into BindingEntry. The struct is enhanced
->> with compat and match_fn() fields.  We introduce a new matching function
->> adapted to the vfio-platform generic device.
->>
->> Soon, the AMD XGBE can be instantiated with either manner, i.e.:
->>
->>     -device vfio-amd-xgbe,host=e0900000.xgmac
->>
->> or using the new option line:
->>
->>     -device vfio-platform,host=e0900000.xgmac
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> [geert: Match using compatible values in sysfs instead of user-supplied
->> 	manufacturer/model options, reword]
->> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
->> Reviewed-by: Eric Auger <eric.auger@redhat.com>
->> Tested-by: Eric Auger <eric.auger@redhat.com>
+On Mon, 2018-11-05 at 03:46 -0500, Frediano Ziglio wrote:
+> > 
+> > > 2. Have a single function as follows:
+> > > 
+> > > void spice_qxl_set_device_info(QXLInstance *instance,
+> > >                                const char *device_address,
+> > >                                uint32_t device_display_id_start,
+> > >                                uint32_t device_display_id_count);
+> > 
+> > How about:
+> > 
+> > void spice_qxl_set_device_info(QXLInstance *instance,
+> >                                const char *device_address,
+> >                                uint32_t device_display_id);
+> > 
+> > I don't think we need start+count:
+> > 
+> >  * For single-head devices device_display_id will be zero.
+> >  * For one-channel-per-head multihead devices (i.e. virtio-gpu)
+> >    device_display_id will enumerate the heads (so everybody can figure
+> >    which channel is which head).
+> >  * For one-channel-per-device multihead devices (i.e. qxl/linux)
+> >    device_display_id will be zero too.  Number of heads is set via
+> >    spice_qxl_set_max_monitors().
+> > 
+> > cheers,
+> >   Gerd
+> > 
 > 
-> scripts/device-crash-test reports a new "crash" with current QEMU master
-> branch, where QEMU aborts like this:
-> 
-> aarch64-softmmu/qemu-system-aarch64 -S -machine virt-2.9,accel=tcg
-> -device ramfb
-> hw/arm/sysbus-fdt.c:422:vfio_platform_match: Object 0x564cf9ae8f80 is
-> not an instance of type vfio-platform
-> Aborted (core dumped)
-> 
-> I think it is likely due to this patch here ... any chance that you
-> could make this a little bit more user friendly instead of aborting the
-> hard way here?
+> What about "Console VNC" case? Passing a dummy (like -1) value for device_display_id ?
+> Kind of "I don't know which output is."
 
-thank you for spotting the bug. We should use object_dynamic_cast() to
-test if the device is a VFIO_PLATFORM one.
+I'm not sure -1 will be practically helpful for anything? What will
+happen if we use 0 for it? We still aren't sure how we want to handle
+the VNC console anyway, should we wait untill we know?
 
-I will prepare a patch.
+Maybe I should use int32_t instead of uint32_t to have the option to
+use -1 if we need it later?
 
-Thanks
+Cheers,
+Lukas
 
-Eric
-> 
->  Thanks,
->   Thomas
-> 
+> Frediano
