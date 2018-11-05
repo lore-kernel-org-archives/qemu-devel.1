@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60134)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gJjOz-0006P3-VX
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:15:06 -0500
+	(envelope-from <mst@redhat.com>) id 1gJjPf-00073w-Iy
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:15:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gJjOx-0001GK-72
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:15:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:3104)
+	(envelope-from <mst@redhat.com>) id 1gJjPZ-0001vc-Ce
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:15:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34026)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gJjOw-0001Fz-W7
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:15:03 -0500
-Date: Mon, 5 Nov 2018 13:14:42 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gJjPY-0001sv-Vh
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:15:41 -0500
+Date: Mon, 5 Nov 2018 13:15:35 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181105181353.39804-5-mst@redhat.com>
+Message-ID: <20181105181353.39804-7-mst@redhat.com>
 References: <20181105181353.39804-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20181105181353.39804-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 04/33] configure: Use LINKS loop for all build
- tree symlinks
+Subject: [Qemu-devel] [PULL 06/33] intel_iommu: introduce vtd_reset_caches()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,59 +27,52 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Xu <peterx@redhat.com>, Eric Auger <eric.auger@redhat.com>, Jason Wang <jasowang@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-From: Peter Maydell <peter.maydell@linaro.org>
+From: Peter Xu <peterx@redhat.com>
 
-A few places in configure were doing ad-hoc calls to
-the symlink function to set up symlinks from the build tree
-back to the source tree. We have a loop that does this
-already for all files and directories listed in the LINKS
-environment variable; use that instead.
+Provide the function and use it in vtd_init().  Used to reset both
+context entry cache and iotlb cache for the whole IOMMU unit.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Jason Wang <jasowang@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- configure | 14 ++------------
- 1 file changed, 2 insertions(+), 12 deletions(-)
+ hw/i386/intel_iommu.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
-diff --git a/configure b/configure
-index 52408ed307..74e313a810 100755
---- a/configure
-+++ b/configure
-@@ -7417,6 +7417,8 @@ LINKS="$LINKS pc-bios/s390-ccw/Makefile"
- LINKS="$LINKS roms/seabios/Makefile roms/vgabios/Makefile"
- LINKS="$LINKS pc-bios/qemu-icon.bmp"
- LINKS="$LINKS .gdbinit scripts" # scripts needed by relative path in .gdbinit
-+LINKS="$LINKS tests/acceptance tests/data"
-+LINKS="$LINKS tests/qemu-iotests/check"
- for bios_file in \
-     $source_path/pc-bios/*.bin \
-     $source_path/pc-bios/*.lid \
-@@ -7453,25 +7455,13 @@ for rom in seabios vgabios ; do
-     echo "RANLIB=$ranlib" >> $config_mak
- done
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index 3dfada19a6..1137861a9d 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -227,6 +227,14 @@ static void vtd_reset_iotlb(IntelIOMMUState *s)
+     vtd_iommu_unlock(s);
+ }
  
--# set up tests data directory
--for tests_subdir in acceptance data; do
--    if [ ! -e tests/$tests_subdir ]; then
--        symlink "$source_path/tests/$tests_subdir" tests/$tests_subdir
--    fi
--done
--
- # set up qemu-iotests in this build directory
- iotests_common_env="tests/qemu-iotests/common.env"
--iotests_check="tests/qemu-iotests/check"
++static void vtd_reset_caches(IntelIOMMUState *s)
++{
++    vtd_iommu_lock(s);
++    vtd_reset_iotlb_locked(s);
++    vtd_reset_context_cache_locked(s);
++    vtd_iommu_unlock(s);
++}
++
+ static uint64_t vtd_get_iotlb_key(uint64_t gfn, uint16_t source_id,
+                                   uint32_t level)
+ {
+@@ -3160,10 +3168,7 @@ static void vtd_init(IntelIOMMUState *s)
+         s->cap |= VTD_CAP_CM;
+     }
  
- echo "# Automatically generated by configure - do not modify" > "$iotests_common_env"
- echo >> "$iotests_common_env"
- echo "export PYTHON='$python'" >> "$iotests_common_env"
+-    vtd_iommu_lock(s);
+-    vtd_reset_context_cache_locked(s);
+-    vtd_reset_iotlb_locked(s);
+-    vtd_iommu_unlock(s);
++    vtd_reset_caches(s);
  
--if [ ! -e "$iotests_check" ]; then
--    symlink "$source_path/$iotests_check" "$iotests_check"
--fi
--
- # Save the configure command line for later reuse.
- cat <<EOD >config.status
- #!/bin/sh
+     /* Define registers with default values and bit semantics */
+     vtd_define_long(s, DMAR_VER_REG, 0x10UL, 0, 0);
 -- 
 MST
