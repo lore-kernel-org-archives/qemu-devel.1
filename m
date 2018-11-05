@@ -1,18 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47620)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48833)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gJTvp-000147-Iy
-	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 20:44:00 -0500
+	(envelope-from <liq3ea@gmail.com>) id 1gJU1Z-0006uW-2t
+	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 20:49:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gJTvj-000415-Dr
-	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 20:43:55 -0500
-From: Samuel Ortiz <sameo@linux.intel.com>
-Date: Mon,  5 Nov 2018 02:40:47 +0100
-Message-Id: <20181105014047.26447-25-sameo@linux.intel.com>
-In-Reply-To: <20181105014047.26447-1-sameo@linux.intel.com>
-References: <20181105014047.26447-1-sameo@linux.intel.com>
+	(envelope-from <liq3ea@gmail.com>) id 1gJU1Y-0003E6-5r
+	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 20:49:53 -0500
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 24/24] hw: i386: Refactor PCI host getter
+References: <1541121763-3277-1-git-send-email-liq3ea@gmail.com>
+	<20181102105421.GC7521@dhcp-200-186.str.redhat.com>
+	<CAKXe6SK6bqfFeRd=DdbVXZ8PAijewoLv-jDhbt2_jmDaTFRv7w@mail.gmail.com>
+	<20181102154217.GJ7521@dhcp-200-186.str.redhat.com>
+In-Reply-To: <20181102154217.GJ7521@dhcp-200-186.str.redhat.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Mon, 5 Nov 2018 09:49:12 +0800
+Message-ID: <CAKXe6SKpLnbWXLQrPNxNehZPYSNV_89JkznPvyX2z8wjFG7LEQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] nvme: fix oob access issue(CVE-2018-16847)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,63 +25,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Shannon Zhao <shannon.zhaosl@gmail.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Richard Henderson <rth@twiddle.net>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, xen-devel@lists.xenproject.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Yang Zhong <yang.zhong@intel.com>
+To: kwolf@redhat.com
+Cc: keith.busch@intel.com, mreitz@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, P J P <ppandit@redhat.com>, qemu-block@nongnu.org, Qemu Developers <qemu-devel@nongnu.org>
 
-From: Yang Zhong <yang.zhong@intel.com>
+Kevin Wolf <kwolf@redhat.com> =E4=BA=8E2018=E5=B9=B411=E6=9C=882=E6=97=A5=
+=E5=91=A8=E4=BA=94 =E4=B8=8B=E5=8D=8811:42=E5=86=99=E9=81=93=EF=BC=9A
 
-Now that the ACPI builder methods are added, we can reach the ACPI
-configuration pointer from the MachineState pointer. From there we can
-get to the PCI host pointer and return it.
+> Am 02.11.2018 um 16:22 hat Li Qiang geschrieben:
+> > Hello Kevin,
+> >
+> > Kevin Wolf <kwolf@redhat.com> =E4=BA=8E2018=E5=B9=B411=E6=9C=882=E6=97=
+=A5=E5=91=A8=E4=BA=94 =E4=B8=8B=E5=8D=886:54=E5=86=99=E9=81=93=EF=BC=9A
+> >
+> > > Am 02.11.2018 um 02:22 hat Li Qiang geschrieben:
+> > > > Currently, the nvme_cmb_ops mr doesn't check the addr and size.
+> > > > This can lead an oob access issue. This is triggerable in the guest=
+.
+> > > > Add check to avoid this issue.
+> > > >
+> > > > Fixes CVE-2018-16847.
+> > > >
+> > > > Reported-by: Li Qiang <liq3ea@gmail.com>
+> > > > Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> > > > Signed-off-by: Li Qiang <liq3ea@gmail.com>
+> > > > ---
+> > > >  hw/block/nvme.c | 7 +++++++
+> > > >  1 file changed, 7 insertions(+)
+> > > >
+> > > > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> > > > index fc7dacb..d097add 100644
+> > > > --- a/hw/block/nvme.c
+> > > > +++ b/hw/block/nvme.c
+> > > > @@ -1175,6 +1175,10 @@ static void nvme_cmb_write(void *opaque,
+> hwaddr
+> > > addr, uint64_t data,
+> > > >      unsigned size)
+> > > >  {
+> > > >      NvmeCtrl *n =3D (NvmeCtrl *)opaque;
+> > > > +
+> > > > +    if (addr + size > NVME_CMBSZ_GETSIZE(n->bar.cmbsz)) {
+> > >
+> > > What prevents a guest from moving the device to the end of the addres=
+s
+> > > space and causing an integer overflow in addr + size?
+> > >
+> > >
+> > This can't happen as the addr can't be any value, it just can be in the
+> > Memory Region n->ctrl_mem defines.
+>
+> Yes, but can't the guest map that memory region whereever it wants?
+>
+>
+I think it can't happen, as the 'addr' here is the relative offset in the
+MR.
+As we don't (can't) register such a MMIO region(the end of this region is
+very big to
+make addr+size overflow, size here can only be 1,2, 4, 8,). So the 'addr'
+here can't be that large.
 
-This makes the PCI host getter an ACPI, architecture agnostic function.
+Thanks,
+Li Qiang
 
-Signed-off-by: Yang Zhong <yang.zhong@intel.com>
----
- hw/acpi/aml-build.c | 20 +++++++-------------
- 1 file changed, 7 insertions(+), 13 deletions(-)
 
-diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-index 6112cc2149..b532817fb5 100644
---- a/hw/acpi/aml-build.c
-+++ b/hw/acpi/aml-build.c
-@@ -22,6 +22,8 @@
- #include "qemu/osdep.h"
- #include <glib/gprintf.h>
- #include "hw/acpi/aml-build.h"
-+#include "hw/acpi/builder.h"
-+#include "hw/mem/memory-device.h"
- #include "qemu/bswap.h"
- #include "qemu/bitops.h"
- #include "sysemu/numa.h"
-@@ -1617,23 +1619,15 @@ void acpi_build_tables_cleanup(AcpiBuildTables *tables, bool mfre)
-     g_array_free(tables->vmgenid, mfre);
- }
- 
--/*
-- * Because of the PXB hosts we cannot simply query TYPE_PCI_HOST_BRIDGE.
-- */
- Object *acpi_get_pci_host(void)
- {
--    PCIHostState *host;
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+    AcpiBuilder *ab = ACPI_BUILDER(ms);
-+    AcpiConfiguration *acpi_conf;
- 
--    host = OBJECT_CHECK(PCIHostState,
--                        object_resolve_path("/machine/i440fx", NULL),
--                        TYPE_PCI_HOST_BRIDGE);
--    if (!host) {
--        host = OBJECT_CHECK(PCIHostState,
--                            object_resolve_path("/machine/q35", NULL),
--                            TYPE_PCI_HOST_BRIDGE);
--    }
-+    acpi_conf = acpi_builder_configuration(ab);
- 
--    return OBJECT(host);
-+    return OBJECT(acpi_conf->pci_host);
- }
- 
- 
--- 
-2.19.1
+> (As Keith confirmed, the integer overflow doesn't seem to have any bad
+> consequences here, but anyway.)
+>
+> Kevin
+>
