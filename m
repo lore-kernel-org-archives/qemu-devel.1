@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44425)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gJd14-0002re-SV
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 06:26:00 -0500
+	(envelope-from <david@redhat.com>) id 1gJdCY-0007t8-BB
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 06:37:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gJd0x-0000ru-RB
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 06:25:58 -0500
+	(envelope-from <david@redhat.com>) id 1gJdCU-0006YG-DI
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 06:37:50 -0500
 References: <20181105110313.29312-1-david@redhat.com>
-	<20181105110313.29312-2-david@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <669f2ac9-e2ff-2ebe-e9f6-7201e4de6446@redhat.com>
-Date: Mon, 5 Nov 2018 12:25:26 +0100
+	<20181105110313.29312-3-david@redhat.com>
+	<20181105122148.2eae5288.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <3ba91b23-fbea-edce-3f2e-d3405cb3b4f7@redhat.com>
+Date: Mon, 5 Nov 2018 12:37:36 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181105110313.29312-2-david@redhat.com>
+In-Reply-To: <20181105122148.2eae5288.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 1/4] s390x/zpci: drop msix.available
+Subject: Re: [Qemu-devel] [PATCH v1 2/4] s390x/zpci: use hotplug_dev instead
+ of looking up the host bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,55 +26,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, =Collin Walling <walling@linux.ibm.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, =Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>
 
-On 2018-11-05 12:03, David Hildenbrand wrote:
-> I fail to see why this is useful as we require MSIX always and
-> completely fail adding a device.
+On 05.11.18 12:21, Cornelia Huck wrote:
+> On Mon,  5 Nov 2018 12:03:11 +0100
+> David Hildenbrand <david@redhat.com> wrote:
 > 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  hw/s390x/s390-pci-bus.c | 2 --
->  hw/s390x/s390-pci-bus.h | 1 -
->  2 files changed, 3 deletions(-)
+>> We directly have it in our hands.
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  hw/s390x/s390-pci-bus.c | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+>> index 1eaae3aca6..68660eac74 100644
+>> --- a/hw/s390x/s390-pci-bus.c
+>> +++ b/hw/s390x/s390-pci-bus.c
+>> @@ -814,9 +814,9 @@ static bool s390_pci_alloc_idx(S390pciState *s, S390PCIBusDevice *pbdev)
+>>  static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>>                                Error **errp)
+>>  {
+>> +    S390pciState *s = S390_PCI_HOST_BRIDGE(hotplug_dev);
+>>      PCIDevice *pdev = NULL;
+>>      S390PCIBusDevice *pbdev = NULL;
+>> -    S390pciState *s = s390_get_phb();
+>>  
+>>      if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_BRIDGE)) {
+>>          BusState *bus;
+>> @@ -924,11 +924,11 @@ static void s390_pcihost_timer_cb(void *opaque)
+>>  static void s390_pcihost_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>>                                  Error **errp)
+>>  {
+>> +    S390pciState *s = S390_PCI_HOST_BRIDGE(hotplug_dev);
+>>      PCIDevice *pci_dev = NULL;
+>>      PCIBus *bus;
+>>      int32_t devfn;
+>>      S390PCIBusDevice *pbdev = NULL;
+>> -    S390pciState *s = s390_get_phb();
+>>  
+>>      if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_BRIDGE)) {
+>>          error_setg(errp, "PCI bridge hot unplug currently not supported");
 > 
-> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> index e1b14b131b..1eaae3aca6 100644
-> --- a/hw/s390x/s390-pci-bus.c
-> +++ b/hw/s390x/s390-pci-bus.c
-> @@ -745,7 +745,6 @@ static int s390_pci_msix_init(S390PCIBusDevice *pbdev)
->  
->      pos = pci_find_capability(pbdev->pdev, PCI_CAP_ID_MSIX);
->      if (!pos) {
-> -        pbdev->msix.available = false;
->          return -1;
->      }
->  
-> @@ -761,7 +760,6 @@ static int s390_pci_msix_init(S390PCIBusDevice *pbdev)
->      pbdev->msix.pba_bar = pba & PCI_MSIX_FLAGS_BIRMASK;
->      pbdev->msix.pba_offset = pba & ~PCI_MSIX_FLAGS_BIRMASK;
->      pbdev->msix.entries = (ctrl & PCI_MSIX_FLAGS_QSIZE) + 1;
-> -    pbdev->msix.available = true;
->  
->      name = g_strdup_printf("msix-s390-%04x", pbdev->uid);
->      memory_region_init_io(&pbdev->msix_notify_mr, OBJECT(pbdev),
-> diff --git a/hw/s390x/s390-pci-bus.h b/hw/s390x/s390-pci-bus.h
-> index 1f7f9b5814..f47a0f2da5 100644
-> --- a/hw/s390x/s390-pci-bus.h
-> +++ b/hw/s390x/s390-pci-bus.h
-> @@ -252,7 +252,6 @@ typedef struct ChscSeiNt2Res {
->  } QEMU_PACKED ChscSeiNt2Res;
->  
->  typedef struct S390MsixInfo {
-> -    bool available;
->      uint8_t table_bar;
->      uint8_t pba_bar;
->      uint16_t entries;
+> Not sure whether that is an improvement (s390_get_phb() caches the
+> value, and is called from multiple other places as well.)
 > 
 
-Seems like the code that used this variable has been removed with commit
-ID 4f6482bfe3da1e6b51ad4722a0c22f22f0d54a3b.
+Looking up a variable that is directly passed as an argument doesn't
+look clean to me.
 
-Fixes: 4f6482bfe3da1e6b51ad4722a0c22f22f0d54a3b
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+-- 
+
+Thanks,
+
+David / dhildenb
