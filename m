@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51815)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gJWY5-0006Ua-E0
-	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 23:31:38 -0500
+	(envelope-from <bounces@canonical.com>) id 1gJWYA-0006UU-H4
+	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 23:31:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gJWXK-0008Ul-V2
+	(envelope-from <bounces@canonical.com>) id 1gJWXJ-0008Sw-HE
 	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 23:30:54 -0500
-Received: from indium.canonical.com ([91.189.90.7]:39674)
+Received: from indium.canonical.com ([91.189.90.7]:39760)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gJWXK-0007ch-LO
-	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 23:30:50 -0500
+	id 1gJWXJ-0007dk-41
+	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 23:30:49 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gJWWr-0001wv-Ta
-	for <qemu-devel@nongnu.org>; Mon, 05 Nov 2018 04:30:21 +0000
+	id 1gJWWu-0001xf-Aj
+	for <qemu-devel@nongnu.org>; Mon, 05 Nov 2018 04:30:24 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D7DFF2E805B
-	for <qemu-devel@nongnu.org>; Mon,  5 Nov 2018 04:30:21 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 4F9A02E805B
+	for <qemu-devel@nongnu.org>; Mon,  5 Nov 2018 04:30:24 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 05 Nov 2018 04:17:16 -0000
-From: Launchpad Bug Tracker <1497479@bugs.launchpad.net>
-Reply-To: Bug 1497479 <1497479@bugs.launchpad.net>
+Date: Mon, 05 Nov 2018 04:17:19 -0000
+From: Launchpad Bug Tracker <1496384@bugs.launchpad.net>
+Reply-To: Bug 1496384 <1496384@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20150918235853.1773.80469.malonedeb@gac.canonical.com>
-Message-Id: <154139143815.4655.3153797710824720473.malone@loganberry.canonical.com>
+References: <20150916130241.19267.23402.malonedeb@soybean.canonical.com>
+Message-Id: <154139143998.4655.2787568680500582705.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1497479] Re: memory corruption with
- migrate/savevm in TCG mode
+Subject: [Qemu-devel] [Bug 1496384] Re: Error 0x5D in Qemu for Windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,46 +47,33 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1497479
+https://bugs.launchpad.net/bugs/1496384
 
 Title:
-  memory corruption with migrate/savevm in TCG mode
+  Error 0x5D in Qemu for Windows
 
 Status in QEMU:
   Expired
 
 Bug description:
-  [ISSUE]
+  The reason to use qemu for Windows is that the mouse in emulated Windows =
+works well while it is unusable in  qemu at Ubuntu. =
 
-  QEMU releases 2.3.1 and lower are forgetting to flush TLBs before
-  enabling the global dirty pages log and entering the final stage of
-  saving the VM.
+  Alternative solution/bug is mouse usability in qemu for Linux.
+  Well-known issue of error 0x5D when booting Win 7 x64 on qemu without kvm=
+, marked as resolved at Linux.
 
-  [DESCRIPTION]
+  Used qemu for Windows downloaded from http://qemu.weilnetz.de/
+  Tested on  qemu 2.3.94 64-bit and  qemu 2.4.0 32-bit.
 
-  The situation is the following:
-  1. TLB misses is the only way for page dirtying in the TCG mode.
-  2. If TLB is always hit by a running VM code during the execution of the =
-`ram_save_iterate' by migration thread then these pages are missing in the =
-dirty log. The TLB is always hit for instance when the VM is mostly idling =
-and the Kernel only handles APIC timer interrupts.
-  3. These pages are then missed during `ram_save_complete' stage.
-  4. This makes memory content in a saved VM state differ from the actual V=
-M memory.
-  5. If the affected memory pages contain some Kernel data structures these=
- can be corrupted by this memory inconsistency, causing Kernel to Oops afte=
-r loading the saved state.
+  Options :
+  qemu-system-x86_64.exe  -m 1536 -cpu qemu64,+nx,+pae,+mce,+cx8,+apic,+sep=
+,+mtrr,+pge,+mca,+cmov,+pat,+pse36,+clflush,+acpi,+mmx,+fxsr,+sse,+sse2,+ss=
+,+fxsr,+sse,+sse2,+ss,+de,+mtrr,+mca,+clflush
+   win_7_work.qcow2
 
-  [SOLUTION]
-
-  A proposed solution is to flush TLB when `log_global_start' is called.
-  Here is the patch: https://bugs.launchpad.net/ubuntu/+source/qemu/+bug/14=
-93049/+attachment/4459905/+files/tcg-commit-on-log-global-start.patch
-
-  [LINKS]
-
-  Ubuntu bug:
-  https://bugs.launchpad.net/ubuntu/+source/qemu/+bug/1493049
+  On qemu at Ubuntu with kvm Win7 x64 works ,but mouse is unusable as
+  mentioned above.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1497479/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1496384/+subscriptions
