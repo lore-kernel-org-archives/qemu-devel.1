@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51822)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gJhwh-0002uW-PH
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:41:49 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gJhwg-0002tr-U2
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:41:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gJhwX-00049Y-4T
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:41:44 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gJhwX-00049F-3a
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:41:43 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon,  5 Nov 2018 17:37:40 +0100
-Message-Id: <20181105163744.25139-33-kwolf@redhat.com>
+Date: Mon,  5 Nov 2018 17:37:43 +0100
+Message-Id: <20181105163744.25139-36-kwolf@redhat.com>
 In-Reply-To: <20181105163744.25139-1-kwolf@redhat.com>
 References: <20181105163744.25139-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 32/36] qdev-monitor: Make device options help
- nicer
+Subject: [Qemu-devel] [PULL 35/36] vdi: Use a literal number of bytes for
+ DEFAULT_CLUSTER_SIZE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,50 +25,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Max Reitz <mreitz@redhat.com>
+From: Leonid Bloch <lbloch@janustech.com>
 
-Just like in qemu_opts_print_help(), print the device name as a caption
-instead of on every single line, indent all options, add angle brackets
-around types, and align the descriptions after 24 characters.  Also,
-separate the descriptions with " - " instead of putting them in
-parentheses, because that is what we do everywhere else.  This does look
-a bit funny here because basically all bits have the description
-"on/off", but funny does not mean it is less readable.
+If an expression is used to define DEFAULT_CLUSTER_SIZE, when compiled,
+it will be embedded as a literal expression in the binary (as the
+default value) because it is stringified to mark the size of the default
+value. Now this is fixed by using a defined number to define this value.
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Leonid Bloch <lbloch@janustech.com>
+Reviewed-by: Stefan Weil <sw@weilnetz.de>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qdev-monitor.c | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+ block/vdi.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/qdev-monitor.c b/qdev-monitor.c
-index 802c18a74e..07147c63bf 100644
---- a/qdev-monitor.c
-+++ b/qdev-monitor.c
-@@ -285,10 +285,19 @@ int qdev_device_help(QemuOpts *opts)
-         goto error;
-     }
+diff --git a/block/vdi.c b/block/vdi.c
+index 0ff1ead736..2380daa583 100644
+--- a/block/vdi.c
++++ b/block/vdi.c
+@@ -85,7 +85,7 @@
+ #define BLOCK_OPT_STATIC "static"
 =20
-+    if (prop_list) {
-+        out_printf("%s options:\n", driver);
-+    } else {
-+        out_printf("There are no options for %s.\n", driver);
-+    }
-     for (prop =3D prop_list; prop; prop =3D prop->next) {
--        out_printf("%s.%s=3D%s", driver, prop->value->name, prop->value-=
->type);
-+        int len;
-+        out_printf("  %s=3D<%s>%n", prop->value->name, prop->value->type=
-, &len);
-         if (prop->value->has_description) {
--            out_printf(" (%s)\n", prop->value->description);
-+            if (len < 24) {
-+                out_printf("%*s", 24 - len, "");
-+            }
-+            out_printf(" - %s\n", prop->value->description);
-         } else {
-             out_printf("\n");
-         }
+ #define SECTOR_SIZE 512
+-#define DEFAULT_CLUSTER_SIZE (1 * MiB)
++#define DEFAULT_CLUSTER_SIZE S_1MiB
+=20
+ #if defined(CONFIG_VDI_DEBUG)
+ #define VDI_DEBUG 1
+@@ -432,7 +432,7 @@ static int vdi_open(BlockDriverState *bs, QDict *opti=
+ons, int flags,
+         goto fail;
+     } else if (header.block_size !=3D DEFAULT_CLUSTER_SIZE) {
+         error_setg(errp, "unsupported VDI image (block size %" PRIu32
+-                         " is not %" PRIu64 ")",
++                         " is not %" PRIu32 ")",
+                    header.block_size, DEFAULT_CLUSTER_SIZE);
+         ret =3D -ENOTSUP;
+         goto fail;
 --=20
 2.19.1
