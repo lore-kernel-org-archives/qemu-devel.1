@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57221)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gJh5p-0004EX-PP
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:47:13 -0500
+	(envelope-from <noring@nocrew.org>) id 1gJh5t-0004Sf-Gj
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:47:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gJh1a-0005rT-9K
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:42:47 -0500
-References: <20181102085800.21860-1-philmd@redhat.com>
-	<20181102110734.GE7521@dhcp-200-186.str.redhat.com>
-	<6d96d96b-21f7-d5fc-9313-8ede0f6a745c@redhat.com>
-	<20181102141030.GH7521@dhcp-200-186.str.redhat.com>
-	<0b2d802d-4b58-30de-44a8-9f04dc968b1b@redhat.com>
-	<20181102152800.GI7521@dhcp-200-186.str.redhat.com>
-	<66efaf0d-1e29-4583-f6d4-674d12a978a7@janustech.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <97109c81-447a-0fb6-4b14-634df4ebd93e@redhat.com>
-Date: Mon, 5 Nov 2018 09:42:37 -0600
+	(envelope-from <noring@nocrew.org>) id 1gJgzn-0006Lt-44
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:40:58 -0500
+Received: from ste-pvt-msa2.bahnhof.se ([213.80.101.71]:64501)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gJgzm-000665-RZ
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:40:55 -0500
+Date: Mon, 5 Nov 2018 16:40:46 +0100
+From: Fredrik Noring <noring@nocrew.org>
+Message-ID: <20181105154046.GA2383@sx9>
+References: <cover.1541174426.git.noring@nocrew.org>
+	<fa2941ee17c35fba2512ab530bde3a1807d5769e.1541174426.git.noring@nocrew.org>
+	<1001e61e-b6c0-1a41-9e9f-e2fd5a51f7b5@linaro.org>
+	<20181104131236.GA30862@sx9>
+	<alpine.LFD.2.21.1811041503590.20378@eddie.linux-mips.org>
 MIME-Version: 1.0
-In-Reply-To: <66efaf0d-1e29-4583-f6d4-674d12a978a7@janustech.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] qemu/units: Move out QCow2 specific
- definitions
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <alpine.LFD.2.21.1811041503590.20378@eddie.linux-mips.org>
+Subject: Re: [Qemu-devel] [PATCH 1/2] target/mips: Fix decoding mechanism of
+ R5900 MFLO1, MFHI1, MTLO1 and MTHI1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,29 +31,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Leonid Bloch <lbloch@janustech.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Alberto Garcia <berto@igalia.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Markus Armbruster <armbru@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: "Maciej W. Rozycki" <macro@linux-mips.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, =?utf-8?Q?J=C3=BCrgen?= Urban <JuergenUrban@gmx.de>, Jia Liu <proljc@gmail.com>, qemu-devel@nongnu.org
 
-On 11/2/18 7:29 PM, Leonid Bloch wrote:
->>> Agreed. I didn't want it in the first place, arguing that if we want
->>> stringification of defaults, it would be better to have a runtime function
->>> do that, rather than adding a set of near-duplicate macro names.
-> 
-> A runtime function will not help here, as these are used in compile
-> time. These result in strings that are actually compiled into the binaries.
+Thanks for checking this, Maciej,
 
-Well, my point is that right now, QemuOpts outputs a hard-coded string 
-(with no alternative), which does mean that things are compiled in.  Is 
-it worth exploring an enhancement to QemuOpts that lets it decide 
-between either a const char * hardcoded string, or a runtime formatter 
-callback function, and convert all existing hardcoded strings with 
-awkward contents to instead use a new runtime formatter?
+[ Cc-ing Jia Liu, who added MIPS ASE DSP support in commit 4133498f8e532f
+"Use correct acc value to index cpu_HI/cpu_LO rather than using a fix
+number", in case there are known ISA deviations. ]
 
-Or is that just putting lipstick on a pig, since we are already trying 
-to move away from QemuOpts into a more structured command line 
-introspection?
+>  However `gen_HILO' looks wrong to me as it'll truncate the values of 
+> $acc3-$acc1 with the 64-bit DSP ASE.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+I can post a patch to fix gen_HILO. The best reference I have found so far
+is "MIPS Architecture for Programmers Volume IV-e: MIPS DSP Module for
+microMIPS64 Architecture"
+
+https://s3-eu-west-1.amazonaws.com/downloads-mips/documents/MD00765-2B-microMIPS64DSP-AFP-03.02.pdf
+
+that says
+
+	MFHI: GPR[rds]63..0 <- HI[ac]63..0
+	MFLO: GPR[rdt]63..0 <- LO[ac]63..0
+	MTHI: HI[ac]63..0 <- GPR[rs]63..0
+	MTLO: LO[ac]63..0 <- GPR[rs]63..0
+
+where ac can range from 0 to 3. Do you have a link to a better reference,
+by chance, that isn't tied to microMIPS?
+
+Fredrik
