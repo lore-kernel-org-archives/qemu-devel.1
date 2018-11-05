@@ -1,32 +1,33 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:40775)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <macro@linux-mips.org>) id 1gJhal-0004ho-9h
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:19:11 -0500
+	(envelope-from <lhrazky@redhat.com>) id 1gJhaw-0004ho-VY
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:19:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <macro@linux-mips.org>) id 1gJhP0-0001zt-In
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:07:09 -0500
-Received: from eddie.linux-mips.org ([148.251.95.138]:33936
-	helo=cvs.linux-mips.org) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <macro@linux-mips.org>) id 1gJhP0-0001VT-7e
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:06:58 -0500
-Received: (from localhost user: 'macro', uid#1010) by eddie.linux-mips.org
-	with ESMTP id S23990901AbeKEQG2HaLf- (ORCPT
-	<rfc822;qemu-devel@nongnu.org>); Mon, 5 Nov 2018 17:06:28 +0100
-Date: Mon, 5 Nov 2018 16:06:28 +0000 (GMT)
-Sender: "Maciej W. Rozycki" <macro@linux-mips.org>
-From: "Maciej W. Rozycki" <macro@linux-mips.org>
-In-Reply-To: <20181105154046.GA2383@sx9>
-Message-ID: <alpine.LFD.2.21.1811051604490.20378@eddie.linux-mips.org>
-References: <cover.1541174426.git.noring@nocrew.org>
-	<fa2941ee17c35fba2512ab530bde3a1807d5769e.1541174426.git.noring@nocrew.org>
-	<1001e61e-b6c0-1a41-9e9f-e2fd5a51f7b5@linaro.org>
-	<20181104131236.GA30862@sx9>
-	<alpine.LFD.2.21.1811041503590.20378@eddie.linux-mips.org>
-	<20181105154046.GA2383@sx9>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH 1/2] target/mips: Fix decoding mechanism of
- R5900 MFLO1, MFHI1, MTLO1 and MTHI1
+	(envelope-from <lhrazky@redhat.com>) id 1gJhLP-0003jN-4C
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:03:22 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:38720)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lhrazky@redhat.com>) id 1gJhLO-0003gg-QP
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:03:15 -0500
+Received: by mail-wr1-f66.google.com with SMTP id d10-v6so10117599wrs.5
+	for <qemu-devel@nongnu.org>; Mon, 05 Nov 2018 08:03:14 -0800 (PST)
+Message-ID: <1541433791.16655.503.camel@redhat.com>
+From: =?UTF-8?Q?Luk=C3=A1=C5=A1_Hr=C3=A1zk=C3=BD?= <lhrazky@redhat.com>
+Date: Mon, 05 Nov 2018 17:03:11 +0100
+In-Reply-To: <20181105130808.qwrb6gm2l3jqiu2z@sirius.home.kraxel.org>
+References: <20181017143604.5194-1-lhrazky@redhat.com>
+	<20181017143604.5194-2-lhrazky@redhat.com>
+	<1506037511.34884353.1539846969311.JavaMail.zimbra@redhat.com>
+	<1540208764.16655.240.camel@redhat.com>
+	<1541087251.16655.419.camel@redhat.com>
+	<20181105065258.4mpdv5w4rp3eui5p@sirius.home.kraxel.org>
+	<1541420337.16655.496.camel@redhat.com>
+	<20181105130808.qwrb6gm2l3jqiu2z@sirius.home.kraxel.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH spice v2 1/2] QXL interface: add
+ functions to identify monitors in the guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,17 +36,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fredrik Noring <noring@nocrew.org>
-Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?Q?J=C3=BCrgen_Urban?= <JuergenUrban@gmx.de>, Jia Liu <proljc@gmail.com>, qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: spice-devel@lists.freedesktop.org, qemu-devel@nongnu.org, Frediano Ziglio <fziglio@redhat.com>
 
-On Mon, 5 Nov 2018, Fredrik Noring wrote:
+On Mon, 2018-11-05 at 14:08 +0100, Gerd Hoffmann wrote:
+> On Mon, Nov 05, 2018 at 01:18:57PM +0100, Lukáš Hrázký wrote:
+> > On Mon, 2018-11-05 at 07:52 +0100, Gerd Hoffmann wrote:
+> > > > 2. Have a single function as follows:
+> > > > 
+> > > > void spice_qxl_set_device_info(QXLInstance *instance,
+> > > >                                const char *device_address,
+> > > >                                uint32_t device_display_id_start,
+> > > >                                uint32_t device_display_id_count);
+> > > 
+> > > How about:
+> > > 
+> > > void spice_qxl_set_device_info(QXLInstance *instance,
+> > >                                const char *device_address,
+> > >                                uint32_t device_display_id);
+> > > 
+> > > I don't think we need start+count:
+> > > 
+> > >  * For single-head devices device_display_id will be zero.
+> > >  * For one-channel-per-head multihead devices (i.e. virtio-gpu)
+> > >    device_display_id will enumerate the heads (so everybody can figure
+> > >    which channel is which head).
+> > >  * For one-channel-per-device multihead devices (i.e. qxl/linux)
+> > >    device_display_id will be zero too.  Number of heads is set via
+> > >    spice_qxl_set_max_monitors().
+> > 
+> > That requires nontrivial and unexpected logic for the one-channel-per-
+> > device multihead devices case. The API should be doing what it says and
+> >  the dumber the better, this seems too smart to me...
+> 
+> Well, the device_display_id_count argument is redundant with
+> spice_qxl_set_max_monitors().  That isn't a great API either.
+> 
+> I can see that it simplifies the logic in spice-server if we have a
+> single function call instead of two.  So we could deprecate
+> spice_qxl_set_max_monitors() in favour of your
+> spice_qxl_set_device_info() variant.
+> 
+> spice_qxl_set_max_monitors() would then basically do this:
+> 
+>     spice_qxl_set_max_monitors(qxl, max)
+>     {
+>         spice_qxl_set_device_info(qxl, NULL, 0, max);
+>     }
 
-> where ac can range from 0 to 3. Do you have a link to a better reference,
-> by chance, that isn't tied to microMIPS?
+I can't actually do this, it does the wrong thing for the one-channel-
+per-head (virtio-gpu) case. For that case it would send all
+device_display_ids to 0 on all interfaces, but they need to be
+different numbers.
 
- Here: <https://www.mips.com/downloads/> you'll find everything you need I 
-believe.
+For backwards compatibility when spice_qxl_set_device_info() is not
+called I think we need to fallback to the old behaviour, as we are
+missing the necessary information.
 
- HTH,
+I'll send v3 with a single function using start + count and deprecate
+the set_max_monitors one.
 
-  Maciej
+Cheers,
+Lukas
+
+> cheers,
+>   Gerd
+> 
