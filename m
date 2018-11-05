@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34446)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gJhGF-0003EM-I7
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:57:56 -0500
+	(envelope-from <philmd@redhat.com>) id 1gJhGo-0004TO-NO
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:58:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gJhGE-0006bh-2z
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:57:55 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <154115285434.11300.8459925605672823399.stgit@dhcp-3-135.uk.xensource.com>
-	<20181102110412.GD7521@dhcp-200-186.str.redhat.com>
-	<152b8d37c7d54de687f4ced536ba6a10@AMSPEX02CL03.citrite.net>
-Date: Mon, 05 Nov 2018 16:57:31 +0100
-In-Reply-To: <152b8d37c7d54de687f4ced536ba6a10@AMSPEX02CL03.citrite.net> (Paul
-	Durrant's message of "Fri, 2 Nov 2018 11:13:48 +0000")
-Message-ID: <871s7z5xg4.fsf@dusky.pond.sub.org>
+	(envelope-from <philmd@redhat.com>) id 1gJhGW-0007HO-Jf
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:58:22 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:38084)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gJhGW-0007Dp-01
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:58:12 -0500
+Received: by mail-wm1-f68.google.com with SMTP id l2-v6so8591139wmh.3
+	for <qemu-devel@nongnu.org>; Mon, 05 Nov 2018 07:58:11 -0800 (PST)
+References: <20181104180657.7471-1-lbloch@janustech.com>
+	<20181104180657.7471-2-lbloch@janustech.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <4b53c025-cee0-9f3d-428a-375698a9ac7e@redhat.com>
+Date: Mon, 5 Nov 2018 16:58:08 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] xen_disk qdevification
+In-Reply-To: <20181104180657.7471-2-lbloch@janustech.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] include: Add a comment to explain
+ the origin of sizes' lookup table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,57 +31,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <Paul.Durrant@citrix.com>
-Cc: 'Kevin Wolf' <kwolf@redhat.com>, Tim Smith <tim.smith@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
+To: Leonid Bloch <lbloch@janustech.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, Markus Armbruster <armbru@redhat.com>
 
-Paul Durrant <Paul.Durrant@citrix.com> writes:
+Hi Leonid,
 
->> -----Original Message-----
->> From: Kevin Wolf [mailto:kwolf@redhat.com]
->> Sent: 02 November 2018 11:04
->> To: Tim Smith <tim.smith@citrix.com>
->> Cc: xen-devel@lists.xenproject.org; qemu-devel@nongnu.org; qemu-
->> block@nongnu.org; Anthony Perard <anthony.perard@citrix.com>; Paul Durrant
->> <Paul.Durrant@citrix.com>; Stefano Stabellini <sstabellini@kernel.org>;
->> Max Reitz <mreitz@redhat.com>; armbru@redhat.com
->> Subject: xen_disk qdevification (was: [PATCH 0/3] Performance improvements
->> for xen_disk v2)
->> 
->> Am 02.11.2018 um 11:00 hat Tim Smith geschrieben:
->> > A series of performance improvements for disks using the Xen PV ring.
->> >
->> > These have had fairly extensive testing.
->> >
->> > The batching and latency improvements together boost the throughput
->> > of small reads and writes by two to six percent (measured using fio
->> > in the guest)
->> >
->> > Avoiding repeated calls to posix_memalign() reduced the dirty heap
->> > from 25MB to 5MB in the case of a single datapath process while also
->> > improving performance.
->> >
->> > v2 removes some checkpatch complaints and fixes the CCs
->> 
->> Completely unrelated, but since you're the first person touching
->> xen_disk in a while, you're my victim:
->> 
->> At KVM Forum we discussed sending a patch to deprecate xen_disk because
->> after all those years, it still hasn't been converted to qdev. Markus is
->> currently fixing some other not yet qdevified block device, but after
->> that xen_disk will be the only one left.
->> 
->> A while ago, a downstream patch review found out that there are some QMP
->> commands that would immediately crash if a xen_disk device were present
->> because of the lacking qdevification. This is not the code quality
->> standard I envision for QEMU. It's time for non-qdev devices to go.
->> 
->> So if you guys are still interested in the device, could someone please
->> finally look into converting it?
->> 
->
-> I have a patch series to do exactly this. It's somewhat involved as I
-> need to convert the whole PV backend infrastructure. I will try to
-> rebase and clean up my series a.s.a.p.
+On 4/11/18 19:07, Leonid Bloch wrote:
+> The lookup table for power-of-two sizes was added in commit 540b8492618eb
+> for the purpose of having convenient shortcuts for these sizes in cases
+> when the literal number has to be present at compile time, and
+> expressions as '(1 * KiB)' can not be used. One such case is the
+> stringification of sizes. Beyond that, it is convenient to use these
+> shortcuts for all power-of-two sizes, even if they don't have to be
+> literal numbers.
+> 
+> Despite its convenience, this table introduced 55 lines of "dumb" code,
+> the purpose and origin of which are obscure without reading the message
+> of the commit which introduced it. This patch fixes that by adding a
+> comment to the code itself with a brief explanation for the reasoning
+> behind this table. This comment includes the short AWK script that
+> generated the table, so that anyone who's interested could make sure
+> that the values in it are correct (otherwise these values look as if
+> they were typed manually).
+> 
+> Signed-off-by: Leonid Bloch <lbloch@janustech.com>
+> ---
+>   include/qemu/units.h | 18 ++++++++++++++++++
+>   1 file changed, 18 insertions(+)
+> 
+> diff --git a/include/qemu/units.h b/include/qemu/units.h
+> index 68a7758650..1c959d182e 100644
+> --- a/include/qemu/units.h
+> +++ b/include/qemu/units.h
+> @@ -17,6 +17,24 @@
+>   #define PiB     (INT64_C(1) << 50)
+>   #define EiB     (INT64_C(1) << 60)
+>   
+> +/*
+> + * The following lookup table is intended to be used when a literal string of
+> + * the number of bytes is required (for example if it needs to be stringified).
+> + * It can also be used for generic shortcuts of power-of-two sizes.
 
-Awesome!  Please coordinate with Anthony Prerard to avoid duplicating
-work if you haven't done so already.
+^ ok
+
+v this part is not useful in the tree IMHO.
+
+> + * This table is generated using the AWK script below:
+> + *
+> + *  BEGIN {
+> + *      suffix="KMGTPE";
+> + *      for(i=10; i<64; i++) {
+> + *          val=2**i;
+> + *          s=substr(suffix, int(i/10), 1);
+> + *          n=2**(i%10);
+> + *          pad=21-int(log(n)/log(10));
+> + *          printf("#define S_%d%siB %*d\n", n, s, pad, val);
+> + *      }
+> + *  }
+> + */
+
+If it is generated and the stringified are also generated, why not 
+generate this once via the ./configure, since it is used by machines and 
+not by humans?
+
+> +
+>   #define S_1KiB                  1024
+>   #define S_2KiB                  2048
+>   #define S_4KiB                  4096
+> 
+
+Thanks,
+
+Phil.
