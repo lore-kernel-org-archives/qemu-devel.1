@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52740)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gJglO-0008ET-Gv
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:26:03 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gJgla-0000IN-D0
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:26:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gJglN-0006vJ-HJ
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:26:02 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181019113424.25727-1-armbru@redhat.com>
-	<d370d182-01c8-f4ab-ed63-207a9dc4c4d6@redhat.com>
-Date: Mon, 05 Nov 2018 16:25:53 +0100
-In-Reply-To: <d370d182-01c8-f4ab-ed63-207a9dc4c4d6@redhat.com> (Max Reitz's
-	message of "Mon, 5 Nov 2018 00:40:20 +0100")
-Message-ID: <87r2fz5ywu.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1gJglZ-0007iv-Bu
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:26:14 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:35256)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gJglZ-0007YH-1X
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:26:13 -0500
+Received: by mail-ot1-x344.google.com with SMTP id 81so8324664otj.2
+	for <qemu-devel@nongnu.org>; Mon, 05 Nov 2018 07:26:11 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] block: Make more block drivers
- compile-time configurable
+In-Reply-To: <20181102001303.32640-2-f4bug@amsat.org>
+References: <20181102001303.32640-1-f4bug@amsat.org>
+	<20181102001303.32640-2-f4bug@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 5 Nov 2018 15:25:49 +0000
+Message-ID: <CAFEAcA-DZMivo-epUmM6NxPzCUbGCfSU+SxEjszTNLdVaB8UxQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for 3.1 v2 1/7] MAINTAINERS: Add an entry
+ for the Raspberry Pi machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,97 +31,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jeff@codyprime.org, qemu-block@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>
+Cc: Guenter Roeck <linux@roeck-us.net>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-Max Reitz <mreitz@redhat.com> writes:
-
-> On 19.10.18 13:34, Markus Armbruster wrote:
->> From: Jeff Cody <jcody@redhat.com>
->> 
->> This adds configure options to control the following block drivers:
->> 
->> * Bochs
->> * Cloop
->> * Dmg
->> * Qcow (V1)
->> * Vdi
->> * Vvfat
->> * qed
->> * parallels
->> * sheepdog
->> 
->> Each of these defaults to being enabled.
->> 
->> Signed-off-by: Jeff Cody <jcody@redhat.com>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->> 
->> Hmm, we got quite a few --enable-BLOCK-DRIVER now.  Perhaps a single
->> list-valued option similar --target-list would be better.  Could be
->> done on top.
->> 
->>  block/Makefile.objs | 22 ++++++++---
->>  configure           | 91 +++++++++++++++++++++++++++++++++++++++++++++
->>  2 files changed, 107 insertions(+), 6 deletions(-)
->> 
->> diff --git a/block/Makefile.objs b/block/Makefile.objs
->> index c8337bf186..1cad9fc4f1 100644
->> --- a/block/Makefile.objs
->> +++ b/block/Makefile.objs
-   @@ -1,10 +1,18 @@
-   -block-obj-y += raw-format.o qcow.o vdi.o vmdk.o cloop.o bochs.o vpc.o vvfat.o dmg.o
-   +block-obj-y += raw-format.o vmdk.o vpc.o
-   +block-obj-$(CONFIG_QCOW1) += qcow.o
-   +block-obj-$(CONFIG_VDI) += vdi.o
-   +block-obj-$(CONFIG_CLOOP) += cloop.o
-   +block-obj-$(CONFIG_BOCHS) += bochs.o
-   +block-obj-$(CONFIG_VVFAT) += vvfat.o
-   +block-obj-$(CONFIG_DMG) += dmg.o
-   +
-    block-obj-y += qcow2.o qcow2-refcount.o qcow2-cluster.o qcow2-snapshot.o qcow2-cache.o qcow2-bitmap.o
+On 2 November 2018 at 00:12, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
+wrote:
+> So far the Raspi machines use the BCM2836 SoC which includes
+> a BCM2835 for the peripherals.
 >
-> [...]
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  MAINTAINERS | 6 ++++++
+>  1 file changed, 6 insertions(+)
 >
->> @@ -45,7 +54,8 @@ gluster.o-libs     := $(GLUSTERFS_LIBS)
->>  vxhs.o-libs        := $(VXHS_LIBS)
->>  ssh.o-cflags       := $(LIBSSH2_CFLAGS)
->>  ssh.o-libs         := $(LIBSSH2_LIBS)
->> -block-obj-$(if $(CONFIG_BZIP2),m,n) += dmg-bz2.o
->> +block-obj-dmg-bz2$(if $(CONFIG_BZIP2),m,n) += dmg-bz2.o
->> +block-obj-$(CONFIG_DMG) += $(block-obj-dmg-bz2-y)
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index f2360efe3e..c41ea5ed3f 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -683,6 +683,12 @@ F: hw/arm/nrf51_soc.c
+>  F: hw/arm/microbit.c
+>  F: include/hw/arm/nrf51_soc.h
 >
-> This defines "block-obj-dmg-bz2m" or "block-obj-dmg-bz2n", so
-> "block-obj-dmg-bz2-y" is never defined (note both the missing hyphen and
-> the "m" vs. "y").
->
-> How about:
->
-> block-obj-dmg-bz2-$(CONFIG_BZIP2) += dmg-bz2.o
+> +Raspberry Pi
+> +L: qemu-arm@nongnu.org
+> +S: Odd Fixes
+> +F: hw/*/bcm283*
+> +F: include/hw/*/bcm283*
+> +
 
-As far as I can tell, CONFIG_BZIP2 is either undefined or "y".  Thus,
-block-obj-dmg-bz2-y is either left undefined or set to dmg-bz2.o.
+We should also have F:hw/arm/raspi.c
 
-Perhaps the '+=' be ':=', but we seem to use '+=' pretty
-indiscriminately.
+Andrew, as the original submitter of the Raspberry Pi code
+would you like to be listed as a maintainer for it?
 
-> block-obj-$(if $(CONFIG_DMG),m,n) += $(block-obj-dmg-bz2-y)
-
-As far as I can tell, CONFIG_DMG is also either undefined or "y".  So,
-this adds dmg-bz2.o to block-obj-m if both CONFIG_BZIP2 and CONFIG_DMG
-are enabled.
-
-Shouldn't it be added to block-obj-y, like dmg.o, or am I confused?
-
-> Bonus point: The "+=" are naturally aligned!
-
-Woot!
-
-> (Fun fact on the side: I tried downloading some dmg image, but qemu
-> refused to open that.  ("sector count 409600 for chunk 4 is larger than
-> max (131072)" -- yeah, yeah, I know that I'm not the largest guy) -- but
-> you can test it just by replacing "dmg-bz2.o" by "does-not-exist.o", and
-> then make complains normally, but stops complaining with --disable-dmg
-> or --disable-bzip2.)
-
-Thanks!
+thanks
+-- PMM
