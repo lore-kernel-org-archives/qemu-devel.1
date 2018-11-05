@@ -1,17 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49194)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gJgXf-0007xp-HE
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:11:52 -0500
+	(envelope-from <lersek@redhat.com>) id 1gJgcy-0003Td-QH
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:17:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gJgXX-00072O-9k
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:11:49 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  5 Nov 2018 15:11:32 +0000
-Message-Id: <20181105151132.13884-1-peter.maydell@linaro.org>
+	(envelope-from <lersek@redhat.com>) id 1gJgct-0004Jm-E8
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:17:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36090)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gJgct-0004GK-0p
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:17:15 -0500
+References: <20181003114454.5662-1-marcandre.lureau@redhat.com>
+	<20181003114454.5662-4-marcandre.lureau@redhat.com>
+	<f4e920ad-e51a-6783-0522-6ed5f0351ca0@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <34ec2775-bd4e-e7ee-db25-26973f2412b2@redhat.com>
+Date: Mon, 5 Nov 2018 16:17:09 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH for-3.1] hw/arm/exynos4210: Zero memory
- allocated for Exynos4210State
+In-Reply-To: <f4e920ad-e51a-6783-0522-6ed5f0351ca0@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/3] memory-mapping: skip non-volatile
+ memory regions in GuestPhysBlockList
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,45 +30,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Igor Mitsyanko <i.mitsyanko@gmail.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: Igor Mammedov <imammedo@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Juan Quintela <quintela@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-In exynos4210_init() we allocate memory for an Exynos4210State
-struct. Generally devices can assume that the memory allocated
-for their state struct is zero-initialized; we broke that
-assumption here by using g_new(). Use g_new0() instead.
-(In particular, some code assumes that the various irq arrays
-in the Exynos4210Irq sub-struct are zero-initialized.)
+On 10/29/18 10:50, Paolo Bonzini wrote:
+> On 03/10/2018 13:44, Marc-Andr=C3=A9 Lureau wrote:
+>> diff --git a/memory_mapping.c b/memory_mapping.c
+>> index 775466f3a8..724dd0b417 100644
+>> --- a/memory_mapping.c
+>> +++ b/memory_mapping.c
+>> @@ -206,7 +206,8 @@ static void guest_phys_blocks_region_add(MemoryLis=
+tener *listener,
+>> =20
+>>      /* we only care about RAM */
+>>      if (!memory_region_is_ram(section->mr) ||
+>> -        memory_region_is_ram_device(section->mr)) {
+>> +        memory_region_is_ram_device(section->mr) ||
+>> +        memory_region_is_nonvolatile(section->mr)) {
+>>          return;
+>>      }
+>> =20
+>=20
+> We should also have
+>=20
+> diff --git a/scripts/dump-guest-memory.py b/scripts/dump-guest-memory.p=
+y
+> index 5a857cebcf..dd180b531c 100644
+> --- a/scripts/dump-guest-memory.py
+> +++ b/scripts/dump-guest-memory.py
+> @@ -417,7 +417,9 @@ def get_guest_phys_blocks():
+>          memory_region =3D flat_range["mr"].dereference()
+>=20
+>          # we only care about RAM
+> -        if not memory_region["ram"]:
+> +        if not memory_region["ram"] \
+> +           or memory_region["ram_device"] \
+> +           or memory_region["nonvolatile"]:
+>              continue
+>=20
+>          section_size =3D int128_get64(flat_range["addr"]["size"])
+>=20
+> here.  I queued the patches and will post this soon as a separate patch=
+.
 
-In the longer term, this code should be QOMified, and then
-the struct memory will be allocated elsewhere and by functions
-which always zero-initalize it; but for 3.1 this is a
-simple fix.
+Thanks. I keep forgetting that this logic is duplicated.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-I suggested this fix the other day:
-https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg00135.html
-so here it is as an actual patch.
-
-Probably we should go through other uses of g_new() in
-board/device code at some point.
-
- hw/arm/exynos4210.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/hw/arm/exynos4210.c b/hw/arm/exynos4210.c
-index 827318a0036..af82e955421 100644
---- a/hw/arm/exynos4210.c
-+++ b/hw/arm/exynos4210.c
-@@ -162,7 +162,7 @@ static uint64_t exynos4210_calc_affinity(int cpu)
- 
- Exynos4210State *exynos4210_init(MemoryRegion *system_mem)
- {
--    Exynos4210State *s = g_new(Exynos4210State, 1);
-+    Exynos4210State *s = g_new0(Exynos4210State, 1);
-     qemu_irq gate_irq[EXYNOS4210_NCPUS][EXYNOS4210_IRQ_GATE_NINPUTS];
-     SysBusDevice *busdev;
-     DeviceState *dev;
--- 
-2.19.1
+Laszlo
