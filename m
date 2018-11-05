@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gJgcy-0003Td-QH
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:17:21 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gJggG-0006LT-5B
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:20:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gJgct-0004Jm-E8
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:17:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36090)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gJgct-0004GK-0p
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:17:15 -0500
-References: <20181003114454.5662-1-marcandre.lureau@redhat.com>
-	<20181003114454.5662-4-marcandre.lureau@redhat.com>
-	<f4e920ad-e51a-6783-0522-6ed5f0351ca0@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <34ec2775-bd4e-e7ee-db25-26973f2412b2@redhat.com>
-Date: Mon, 5 Nov 2018 16:17:09 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1gJggD-0001iM-2T
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:20:42 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:37844)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gJgg6-0001Yu-Kl
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:20:35 -0500
+Received: by mail-ot1-x344.google.com with SMTP id 40so8055949oth.4
+	for <qemu-devel@nongnu.org>; Mon, 05 Nov 2018 07:20:34 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <f4e920ad-e51a-6783-0522-6ed5f0351ca0@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20181102001303.32640-1-f4bug@amsat.org>
+References: <20181102001303.32640-1-f4bug@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 5 Nov 2018 15:20:12 +0000
+Message-ID: <CAFEAcA8kho6tBJMB6qXgKEq_tt5GQm1wHE96mqoM_vx95x44Pw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/3] memory-mapping: skip non-volatile
- memory regions in GuestPhysBlockList
+Subject: Re: [Qemu-devel] [PATCH for 3.2 v2 0/7] hw/arm/bcm2835: Add basic
+ support for cprman (clock subsystem)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +30,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: Igor Mammedov <imammedo@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Juan Quintela <quintela@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Guenter Roeck <linux@roeck-us.net>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On 10/29/18 10:50, Paolo Bonzini wrote:
-> On 03/10/2018 13:44, Marc-Andr=C3=A9 Lureau wrote:
->> diff --git a/memory_mapping.c b/memory_mapping.c
->> index 775466f3a8..724dd0b417 100644
->> --- a/memory_mapping.c
->> +++ b/memory_mapping.c
->> @@ -206,7 +206,8 @@ static void guest_phys_blocks_region_add(MemoryLis=
-tener *listener,
->> =20
->>      /* we only care about RAM */
->>      if (!memory_region_is_ram(section->mr) ||
->> -        memory_region_is_ram_device(section->mr)) {
->> +        memory_region_is_ram_device(section->mr) ||
->> +        memory_region_is_nonvolatile(section->mr)) {
->>          return;
->>      }
->> =20
->=20
-> We should also have
->=20
-> diff --git a/scripts/dump-guest-memory.py b/scripts/dump-guest-memory.p=
-y
-> index 5a857cebcf..dd180b531c 100644
-> --- a/scripts/dump-guest-memory.py
-> +++ b/scripts/dump-guest-memory.py
-> @@ -417,7 +417,9 @@ def get_guest_phys_blocks():
->          memory_region =3D flat_range["mr"].dereference()
->=20
->          # we only care about RAM
-> -        if not memory_region["ram"]:
-> +        if not memory_region["ram"] \
-> +           or memory_region["ram_device"] \
-> +           or memory_region["nonvolatile"]:
->              continue
->=20
->          section_size =3D int128_get64(flat_range["addr"]["size"])
->=20
-> here.  I queued the patches and will post this soon as a separate patch=
-.
+On 2 November 2018 at 00:12, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
+wrote:
+> Hi,
+>
+> This series is a mix of a previous work I had for the raspi, and a patch =
+from
+> Guenter: https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg03153.h=
+tml
+>
+> The final patch keep Guenter ideas and comments, but is mostly a rewrite.
+> I dropped the A2W code from this work, it doesn't seems unuseful to me.
+>
+> Guenter can you test this series?
+>
+> I kept Guenter S-o-b and (C), is that OK? (Guenter?, Peter?)
 
-Thanks. I keep forgetting that this logic is duplicated.
+Yes, that's the general approach the project takes. If you've
+made changes to the patches yourself you should note those with
+something like
+[me: changed foo, bar, baz]
+after Guenter's signoff and before your own.
 
-Laszlo
+thanks
+-- PMM
