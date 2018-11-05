@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59834)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gJjOe-00065B-Kk
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:14:45 -0500
+	(envelope-from <mst@redhat.com>) id 1gJjOz-0006P3-VX
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:15:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gJjOd-0000xH-7R
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:14:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35322)
+	(envelope-from <mst@redhat.com>) id 1gJjOx-0001GK-72
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:15:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:3104)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gJjOc-0000ws-U9
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:14:43 -0500
-Date: Mon, 5 Nov 2018 13:14:34 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gJjOw-0001Fz-W7
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:15:03 -0500
+Date: Mon, 5 Nov 2018 13:14:42 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181105181353.39804-4-mst@redhat.com>
+Message-ID: <20181105181353.39804-5-mst@redhat.com>
 References: <20181105181353.39804-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20181105181353.39804-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 03/33] configure: Rename FILES variable to LINKS
+Subject: [Qemu-devel] [PULL 04/33] configure: Use LINKS loop for all build
+ tree symlinks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,79 +32,55 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com
 
 From: Peter Maydell <peter.maydell@linaro.org>
 
-The FILES variable is used to accumulate a list of things to symlink
-from the source tree into the build tree.  These don't have to be
-individual files; symlinking an entire directory of data files is
-also fine.  Rename it to something less confusing before we add a few
-directories to it.
-
-Improve the comment to clarify what DIRS and LINKS do and why
-it's not a good idea to add things to LINKS with wildcarding.
+A few places in configure were doing ad-hoc calls to
+the symlink function to set up symlinks from the build tree
+back to the source tree. We have a loop that does this
+already for all files and directories listed in the LINKS
+environment variable; use that instead.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- configure | 35 ++++++++++++++++++++++-------------
- 1 file changed, 22 insertions(+), 13 deletions(-)
+ configure | 14 ++------------
+ 1 file changed, 2 insertions(+), 12 deletions(-)
 
 diff --git a/configure b/configure
-index bfdca8b814..52408ed307 100755
+index 52408ed307..74e313a810 100755
 --- a/configure
 +++ b/configure
-@@ -7392,22 +7392,31 @@ if test "$ccache_cpp2" = "yes"; then
-   echo "export CCACHE_CPP2=y" >> $config_host_mak
- fi
- 
--# build tree in object directory in case the source is not in the current directory
-+# If we're using a separate build tree, set it up now.
-+# DIRS are directories which we simply mkdir in the build tree;
-+# LINKS are things to symlink back into the source tree
-+# (these can be both files and directories).
-+# Caution: do not add files or directories here using wildcards. This
-+# will result in problems later if a new file matching the wildcard is
-+# added to the source tree -- nothing will cause configure to be rerun
-+# so the build tree will be missing the link back to the new file, and
-+# tests might fail. Prefer to keep the relevant files in their own
-+# directory and symlink the directory instead.
- DIRS="tests tests/tcg tests/tcg/cris tests/tcg/lm32 tests/libqos tests/qapi-schema tests/tcg/xtensa tests/qemu-iotests tests/vm"
- DIRS="$DIRS tests/fp"
- DIRS="$DIRS docs docs/interop fsdev scsi"
- DIRS="$DIRS pc-bios/optionrom pc-bios/spapr-rtas pc-bios/s390-ccw"
- DIRS="$DIRS roms/seabios roms/vgabios"
--FILES="Makefile tests/tcg/Makefile qdict-test-data.txt"
--FILES="$FILES tests/tcg/cris/Makefile tests/tcg/cris/.gdbinit"
--FILES="$FILES tests/tcg/lm32/Makefile tests/tcg/xtensa/Makefile po/Makefile"
--FILES="$FILES tests/fp/Makefile"
--FILES="$FILES pc-bios/optionrom/Makefile pc-bios/keymaps"
--FILES="$FILES pc-bios/spapr-rtas/Makefile"
--FILES="$FILES pc-bios/s390-ccw/Makefile"
--FILES="$FILES roms/seabios/Makefile roms/vgabios/Makefile"
--FILES="$FILES pc-bios/qemu-icon.bmp"
--FILES="$FILES .gdbinit scripts" # scripts needed by relative path in .gdbinit
-+LINKS="Makefile tests/tcg/Makefile qdict-test-data.txt"
-+LINKS="$LINKS tests/tcg/cris/Makefile tests/tcg/cris/.gdbinit"
-+LINKS="$LINKS tests/tcg/lm32/Makefile tests/tcg/xtensa/Makefile po/Makefile"
-+LINKS="$LINKS tests/fp/Makefile"
-+LINKS="$LINKS pc-bios/optionrom/Makefile pc-bios/keymaps"
-+LINKS="$LINKS pc-bios/spapr-rtas/Makefile"
-+LINKS="$LINKS pc-bios/s390-ccw/Makefile"
-+LINKS="$LINKS roms/seabios/Makefile roms/vgabios/Makefile"
-+LINKS="$LINKS pc-bios/qemu-icon.bmp"
-+LINKS="$LINKS .gdbinit scripts" # scripts needed by relative path in .gdbinit
+@@ -7417,6 +7417,8 @@ LINKS="$LINKS pc-bios/s390-ccw/Makefile"
+ LINKS="$LINKS roms/seabios/Makefile roms/vgabios/Makefile"
+ LINKS="$LINKS pc-bios/qemu-icon.bmp"
+ LINKS="$LINKS .gdbinit scripts" # scripts needed by relative path in .gdbinit
++LINKS="$LINKS tests/acceptance tests/data"
++LINKS="$LINKS tests/qemu-iotests/check"
  for bios_file in \
      $source_path/pc-bios/*.bin \
      $source_path/pc-bios/*.lid \
-@@ -7419,10 +7428,10 @@ for bios_file in \
-     $source_path/pc-bios/u-boot.* \
-     $source_path/pc-bios/palcode-*
- do
--    FILES="$FILES pc-bios/$(basename $bios_file)"
-+    LINKS="$LINKS pc-bios/$(basename $bios_file)"
+@@ -7453,25 +7455,13 @@ for rom in seabios vgabios ; do
+     echo "RANLIB=$ranlib" >> $config_mak
  done
- mkdir -p $DIRS
--for f in $FILES ; do
-+for f in $LINKS ; do
-     if [ -e "$source_path/$f" ] && [ "$pwd_is_source_path" != "y" ]; then
-         symlink "$source_path/$f" "$f"
-     fi
+ 
+-# set up tests data directory
+-for tests_subdir in acceptance data; do
+-    if [ ! -e tests/$tests_subdir ]; then
+-        symlink "$source_path/tests/$tests_subdir" tests/$tests_subdir
+-    fi
+-done
+-
+ # set up qemu-iotests in this build directory
+ iotests_common_env="tests/qemu-iotests/common.env"
+-iotests_check="tests/qemu-iotests/check"
+ 
+ echo "# Automatically generated by configure - do not modify" > "$iotests_common_env"
+ echo >> "$iotests_common_env"
+ echo "export PYTHON='$python'" >> "$iotests_common_env"
+ 
+-if [ ! -e "$iotests_check" ]; then
+-    symlink "$source_path/$iotests_check" "$iotests_check"
+-fi
+-
+ # Save the configure command line for later reuse.
+ cat <<EOD >config.status
+ #!/bin/sh
 -- 
 MST
