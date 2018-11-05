@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53771)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59736)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gJnis-0007bB-8r
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 17:51:58 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gJo2P-00020m-12
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 18:12:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gJnZ0-00070D-JH
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 17:41:44 -0500
-References: <20181009132330.7549-1-berrange@redhat.com>
-	<20181009132330.7549-2-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <1baede2d-7113-be2c-62dd-9f5ce6425bb1@redhat.com>
-Date: Mon, 5 Nov 2018 16:41:09 -0600
+	(envelope-from <no-reply@patchew.org>) id 1gJnwh-0004rb-45
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 18:06:15 -0500
+Resent-Message-Id: <E1gJnwh-0004rb-45@eggs.gnu.org>
+Message-ID: <154145910588.2890.5863979626872743184@015909e0f939>
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <20181103015821.30074-1-lbloch@janustech.com>
 MIME-Version: 1.0
-In-Reply-To: <20181009132330.7549-2-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 1/6] qemu-nbd: add support for
- authorization of TLS clients
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 5 Nov 2018 15:05:07 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] include: Add a comment to explain the
+ origin of sizes' lookup table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,79 +24,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, libvir-list@redhat.com, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Juan Quintela <quintela@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: lbloch@janustech.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, philmd@redhat.com, kwolf@redhat.com, berto@igalia.com, qemu-block@nongnu.org, armbru@redhat.com, mreitz@redhat.com
 
-On 10/9/18 8:23 AM, Daniel P. Berrang=C3=A9 wrote:
-> From: "Daniel P. Berrange" <berrange@redhat.com>
->=20
-> Currently any client which can complete the TLS handshake is able to us=
-e
-> the NBD server. The server admin can turn on the 'verify-peer' option
-> for the x509 creds to require the client to provide a x509 certificate.
-> This means the client will have to acquire a certificate from the CA
-> before they are permitted to use the NBD server. This is still a fairly
-> low bar to cross.
->=20
-> This adds a '--tls-authz OBJECT-ID' option to the qemu-nbd command whic=
-h
-> takes the ID of a previously added 'QAuthZ' object instance. This will
-> be used to validate the client's x509 distinguished name. Clients
-> failing the authorization check will not be permitted to use the NBD
-> server.
->=20
-> For example to setup authorization that only allows connection from a c=
-lient
-> whose x509 certificate distinguished name is
->=20
->     CN=3Dlaptop.example.com,O=3DExample Org,L=3DLondon,ST=3DLondon,C=3D=
-GB
->=20
-> use:
->=20
->    qemu-nbd --object tls-creds-x509,id=3Dtls0,dir=3D/home/berrange/qemu=
-tls,\
->                      endpoint=3Dserver,verify-peer=3Dyes \
->             --object authz-simple,id=3Dauth0,identity=3DCN=3Dlaptop.exa=
-mple.com,,\
->                      O=3DExample Org,,L=3DLondon,,ST=3DLondon,,C=3DGB \
-
-Missing shell quoting around the space in 'Example Org'. It's also=20
-fairly obvious that actual shell commands can't have leading space=20
-between \-newline line continuations.
-
->             --tls-creds tls0 \
->             --tls-authz authz0
-> 	   ....other qemu-nbd args...
->=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->   include/block/nbd.h |  2 +-
->   nbd/server.c        | 10 +++++-----
->   qemu-nbd.c          | 13 ++++++++++++-
->   qemu-nbd.texi       |  4 ++++
->   4 files changed, 22 insertions(+), 7 deletions(-)
->=20
-
-> +++ b/qemu-nbd.c
-> @@ -52,6 +52,7 @@
->   #define QEMU_NBD_OPT_TLSCREDS      261
->   #define QEMU_NBD_OPT_IMAGE_OPTS    262
->   #define QEMU_NBD_OPT_FORK          263
-> +#define QEMU_NBD_OPT_TLSAUTHZ      264
->  =20
-
-> @@ -532,6 +534,7 @@ int main(int argc, char **argv)
->           { "image-opts", no_argument, NULL, QEMU_NBD_OPT_IMAGE_OPTS },
->           { "trace", required_argument, NULL, 'T' },
->           { "fork", no_argument, NULL, QEMU_NBD_OPT_FORK },
-> +        { "tls-authz", no_argument, NULL, QEMU_NBD_OPT_TLSAUTHZ },
->           { NULL, 0, NULL, 0 }
->       };
-
-Missing a change to qemu-nbd --help to describe the new option.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgxMTAzMDE1ODIxLjMwMDc0LTEtbGJsb2NoQGphbnVzdGVjaC5jb20KU3Vi
+amVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSF0gaW5jbHVkZTogQWRkIGEgY29tbWVudCB0byBleHBs
+YWluIHRoZSBvcmlnaW4gb2Ygc2l6ZXMnIGxvb2t1cCB0YWJsZQoKPT09IFRFU1QgU0NSSVBUIEJF
+R0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVs
+aW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
+bmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25m
+aWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAt
+LWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAg
+ZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0l
+cyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRz
+L2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAg
+ICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1Qg
+U0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4
+ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo0Yjc4NmQ0Y2Q2IGluY2x1
+ZGU6IEFkZCBhIGNvbW1lbnQgdG8gZXhwbGFpbiB0aGUgb3JpZ2luIG9mIHNpemVzJyBsb29rdXAg
+dGFibGUKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTogaW5jbHVkZTog
+QWRkIGEgY29tbWVudCB0byBleHBsYWluIHRoZSBvcmlnaW4gb2Ygc2l6ZXMnIGxvb2t1cCB0YWJs
+ZS4uLgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM0MzogRklMRTog
+aW5jbHVkZS9xZW11L3VuaXRzLmg6Mjc6CisgKiAgXklzdWZmaXg9IktNR1RQRSI7JAoKRVJST1I6
+IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNDQ6IEZJTEU6IGluY2x1ZGUvcWVt
+dS91bml0cy5oOjI4OgorICogIF5JZm9yKGk9MTA7IGk8NjQ7IGkrKykgeyQKCkVSUk9SOiBjb2Rl
+IGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzQ1OiBGSUxFOiBpbmNsdWRlL3FlbXUvdW5p
+dHMuaDoyOToKKyAqICBeSV5JdmFsPTIqKmk7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBu
+ZXZlciB1c2UgdGFicwojNDY6IEZJTEU6IGluY2x1ZGUvcWVtdS91bml0cy5oOjMwOgorICogIF5J
+XklzPXN1YnN0cihzdWZmaXgsIGludChpLzEwKSwgMSk7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNo
+b3VsZCBuZXZlciB1c2UgdGFicwojNDc6IEZJTEU6IGluY2x1ZGUvcWVtdS91bml0cy5oOjMxOgor
+ICogIF5JXkluPTIqKihpJTEwKTskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVz
+ZSB0YWJzCiM0ODogRklMRTogaW5jbHVkZS9xZW11L3VuaXRzLmg6MzI6CisgKiAgXkleSXBhZD0y
+MS1pbnQobG9nKG4pL2xvZygxMCkpOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIg
+dXNlIHRhYnMKIzQ5OiBGSUxFOiBpbmNsdWRlL3FlbXUvdW5pdHMuaDozMzoKKyAqICBeSV5JcHJp
+bnRmKCIjZGVmaW5lIFNfJWQlc2lCICUqZFxuIiwgbiwgcywgcGFkLCB2YWwpOyQKCkVSUk9SOiBj
+b2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzUwOiBGSUxFOiBpbmNsdWRlL3FlbXUv
+dW5pdHMuaDozNDoKKyAqICBeSX0kCgp0b3RhbDogOCBlcnJvcnMsIDAgd2FybmluZ3MsIDI0IGxp
+bmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
+LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
+IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBP
+VVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1h
+aWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3Jn
+L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
