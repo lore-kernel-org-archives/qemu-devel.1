@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55408)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gJi4O-0005aS-5D
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:49:44 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gJi4u-0005yg-OD
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:50:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gJi4M-0007Qt-0v
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:49:43 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:38664)
+	(envelope-from <alex.bennee@linaro.org>) id 1gJi4k-0008WU-Gz
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:50:13 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:38637)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gJi4H-0006us-FG
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:49:38 -0500
-Received: by mail-ot1-x343.google.com with SMTP id f24so8596563otl.5
-	for <qemu-devel@nongnu.org>; Mon, 05 Nov 2018 08:49:28 -0800 (PST)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gJi4i-0008Rz-M0
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:50:05 -0500
+Received: by mail-wm1-x341.google.com with SMTP id l2-v6so8771484wmh.3
+	for <qemu-devel@nongnu.org>; Mon, 05 Nov 2018 08:50:04 -0800 (PST)
+References: <20181016093703.10637-1-peter.maydell@linaro.org>
+	<20181016093703.10637-2-peter.maydell@linaro.org>
+	<87tvkvebmd.fsf@linaro.org>
+	<CAFEAcA8tPHFHFHeB5ty2x6GGgTs6aQG3ckD6NkzOR7OgAX-f9Q@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAFEAcA8tPHFHFHeB5ty2x6GGgTs6aQG3ckD6NkzOR7OgAX-f9Q@mail.gmail.com>
+Date: Mon, 05 Nov 2018 16:50:01 +0000
+Message-ID: <87r2fzeafa.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20181102170730.12432-5-contrib@steffen-goertz.de>
-References: <20181102170730.12432-1-contrib@steffen-goertz.de>
-	<20181102170730.12432-5-contrib@steffen-goertz.de>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 5 Nov 2018 16:49:07 +0000
-Message-ID: <CAFEAcA9U7iXyVxyAXAaErswuj+G6dPUqu4j_8AfBFjua0xShNQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 04/13] arm: Instantiate NRF51 random
- number generator
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 1/2] target/arm: Set S and PTW
+ in 64-bit PAR format
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,21 +33,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Steffen_G=C3=B6rtz?= <contrib@steffen-goertz.de>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, "open list:NRF51" <qemu-arm@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
-On 2 November 2018 at 17:07, Steffen G=C3=B6rtz <contrib@steffen-goertz.de>=
- wrote:
-> Use RNG in SOC.
->
-> Signed-off-by: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  hw/arm/nrf51_soc.c         | 16 ++++++++++++++++
->  include/hw/arm/nrf51_soc.h |  2 ++
->  2 files changed, 18 insertions(+)
->
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-thanks
--- PMM
+Peter Maydell <peter.maydell@linaro.org> writes:
+
+> On 5 November 2018 at 16:24, Alex Benn=C3=A9e <alex.bennee@linaro.org> wr=
+ote:
+>>
+>> Peter Maydell <peter.maydell@linaro.org> writes:
+>>
+>>> In do_ats_write() we construct a PAR value based on the result
+>>> of the translation.  A comment says "S2WLK and FSTAGE are always
+>>> zero, because we don't implement virtualization".
+>>> Since we do in fact now implement virtualization, add the missing
+>>> code that sets these bits based on the reported ARMMMUFaultInfo.
+>>>
+>>> (These bits are named PTW and S in ARMv8, so we follow that
+>>> convention in the new comments in this patch.)
+>>>
+>>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>>> ---
+>>>  target/arm/helper.c | 10 ++++++----
+>>>  1 file changed, 6 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/target/arm/helper.c b/target/arm/helper.c
+>>> index 43afdd082e1..dc849b09893 100644
+>>> --- a/target/arm/helper.c
+>>> +++ b/target/arm/helper.c
+>>> @@ -2344,10 +2344,12 @@ static uint64_t do_ats_write(CPUARMState *env, =
+uint64_t value,
+>>>
+>>>              par64 |=3D 1; /* F */
+>>
+>> To aid readability, mainly for those not familiar like me, maybe:
+>>
+>>   par64 |=3D 1; /* PAR_EL1.F =3D=3D 1, failed translation */
+>
+> That's in the existing code...
+
+I know, it was just a suggestion to help make it clearer there are two
+forms when you are reading the register definition.
+
+--
+Alex Benn=C3=A9e
