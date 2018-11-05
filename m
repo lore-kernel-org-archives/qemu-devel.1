@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55107)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55087)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gJi3W-0004yA-EH
+	(envelope-from <eblake@redhat.com>) id 1gJi3U-0004xm-FW
 	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:48:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gJi3R-0005q2-71
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:48:50 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46137)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gJi3Q-0005ou-Ie
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:48:45 -0500
-Received: by mail-wr1-x444.google.com with SMTP id 74-v6so10273541wrb.13
-	for <qemu-devel@nongnu.org>; Mon, 05 Nov 2018 08:48:42 -0800 (PST)
-References: <20181016093703.10637-1-peter.maydell@linaro.org>
-	<20181016093703.10637-3-peter.maydell@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181016093703.10637-3-peter.maydell@linaro.org>
-Date: Mon, 05 Nov 2018 16:48:39 +0000
-Message-ID: <87sh0feahk.fsf@linaro.org>
+	(envelope-from <eblake@redhat.com>) id 1gJi3P-0005pO-PB
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:48:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41254)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gJi3O-0005jg-El
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:48:42 -0500
+References: <20181023152306.3123-1-david@redhat.com>
+	<20181023152306.3123-2-david@redhat.com>
+	<87pnvqdvsj.fsf@dusky.pond.sub.org>
+	<e8fe86a1-d075-2ea8-d1f4-e08e5dceee07@redhat.com>
+	<875zxingqn.fsf@dusky.pond.sub.org>
+	<440eb166-73d1-77b6-5dd9-66a0abd7d665@redhat.com>
+	<87muqn5ydc.fsf@dusky.pond.sub.org>
+	<1ec41fe2-d4b4-fce2-9381-818ee3356409@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e953e363-dfc3-ef93-3b38-b285f8a9b034@redhat.com>
+Date: Mon, 5 Nov 2018 10:48:11 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 2/2] target/arm: Fix ATS1Hx
- instructions
+In-Reply-To: <1ec41fe2-d4b4-fce2-9381-818ee3356409@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/7] qapi: use qemu_strtoi64() in
+ parse_str
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,59 +35,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org
-Cc: qemu-devel@nongnu.org, patches@linaro.org
+To: David Hildenbrand <david@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
+On 11/5/18 9:53 AM, David Hildenbrand wrote:
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+>> When I first looked at the ranges stuff in the string input visitor, I
+>> felt the urge to clean it up, then sat on my hands until it passed.
+>>
+>> The rest is reasonable once you understand how it works.  The learning
+>> curve is less than pleasant, though.
+>>
+> 
+> Maybe I'll pick this up again when I have more time to invest.
+> 
+> The general concept
+> 
+> 1. of having an input visitor that is able to parse different types
+> (expected by e.g. a property) sounds sane to me.
+> 
+> 2. of having a list of *something*, assuming it is int64_t, and assuming
+> it is to be parsed into a list of ranges sounds completely broken to me.
+> 
+> I was not even able to find an example QEMU comand line for 2. Is this
+> maybe some very old code that nobody actually uses anymore? (who uses
+> list of ranges?)
 
-> ATS1HR and ATS1HW (which allow AArch32 EL2 to do address translations
-> on the EL2 translation regime) were implemented in commit 14db7fe09a2c8.
-> However, we got them wrong: these should do stage 1 address translations
-> as defined for NS-EL2, which is ARMMMUIdx_S1E2. We were incorrectly
-> making them perform stage 2 translations.
->
-> A few years later in commit 1313e2d7e2cd we forgot entirely that
-> we'd implemented ATS1Hx, and added a comment that ATS1Hx were
-> "not supported yet". Remove the comment; there is no extra code
-> needed to handle these operations in do_ats_write(), because
-> arm_s1_regime_using_lpae_format() returns true for ARMMMUIdx_S1E2,
-> which forces 64-bit PAR format.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+I believe that the -numa node,cpus=first-last code is an example use of 
+a list of ranges.  At any rate, tests/test-string-input-visitor.c has 
+test_visitor_in_intList() to ensure we don't break back-compat with the 
+existing clients that use ranges, as awkward as they may be.
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  target/arm/helper.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index dc849b09893..903a832f1fa 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -2316,7 +2316,7 @@ static uint64_t do_ats_write(CPUARMState *env, uint=
-64_t value,
->           *
->           * (Note that HCR.DC makes HCR.VM behave as if it is 1.)
->           *
-> -         * ATS1Hx always uses the 64bit format (not supported yet).
-> +         * ATS1Hx always uses the 64bit format.
->           */
->          format64 =3D arm_s1_regime_using_lpae_format(env, mmu_idx);
->
-> @@ -2441,7 +2441,7 @@ static void ats1h_write(CPUARMState *env, const ARM=
-CPRegInfo *ri,
->      MMUAccessType access_type =3D ri->opc2 & 1 ? MMU_DATA_STORE : MMU_DA=
-TA_LOAD;
->      uint64_t par64;
->
-> -    par64 =3D do_ats_write(env, value, access_type, ARMMMUIdx_S2NS);
-> +    par64 =3D do_ats_write(env, value, access_type, ARMMMUIdx_S1E2);
->
->      A32_BANKED_CURRENT_REG_SET(env, par, par64);
->  }
-
-
---
-Alex Benn=C3=A9e
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
