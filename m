@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53657)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fziglio@redhat.com>) id 1gJc56-0007Wj-0I
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 05:26:08 -0500
+	(envelope-from <david@redhat.com>) id 1gJcAI-00068P-Tt
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 05:31:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fziglio@redhat.com>) id 1gJbqW-0007wt-O3
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 05:11:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36156)
+	(envelope-from <david@redhat.com>) id 1gJcAC-00038d-Ll
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 05:31:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35360)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <fziglio@redhat.com>) id 1gJbqW-0007mu-6h
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 05:11:00 -0500
-Date: Mon, 5 Nov 2018 05:10:58 -0500 (EST)
-From: Frediano Ziglio <fziglio@redhat.com>
-Message-ID: <516990483.40490676.1541412658356.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20181105084351.sfokm7j2ho5npaz2@sirius.home.kraxel.org>
-References: <20181029124703.11123-1-kraxel@redhat.com>
-	<20181029124703.11123-2-kraxel@redhat.com>
-	<317924534.39835893.1541149813210.JavaMail.zimbra@redhat.com>
-	<20181105084351.sfokm7j2ho5npaz2@sirius.home.kraxel.org>
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gJcAB-0007X8-VI
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 05:31:20 -0500
+References: <20181023152306.3123-1-david@redhat.com>
+	<20181023152306.3123-5-david@redhat.com>
+	<20181101110051.67ffb084@redhat.com>
+	<47807013-d4f0-7057-b484-329dda514501@redhat.com>
+	<20181101120536.53191c84@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <887adb8e-24e6-e6ab-7c3f-010f2acf97c8@redhat.com>
+Date: Mon, 5 Nov 2018 11:30:57 +0100
 MIME-Version: 1.0
+In-Reply-To: <20181101120536.53191c84@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 1/2] qxl: store channel id in qxl->id
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 4/7] range: add some more functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,80 +31,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: spice-devel@lists.freedesktop.org, qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-> Hi,
-> 
-> > >      vga->con = graphic_console_init(DEVICE(dev), 0, &qxl_ops, qxl);
-> > > +    qxl->id = qemu_console_get_index(vga->con); /* == channel_id */
-> > > +    if (qxl->id != 0) {
-> > > +        error_setg(errp, "primary qxl-vga device must be console 0 "
-> > > +                   "(first display device on the command line)");
-> > > +        return;
-> > > +    }
-> > 
-> > In the comment this seems no more required so why testing it?
-> 
-> I'd expect it'll confuse guests.
-> 
-> If you are sure this is not the case feel free to send a patch dropping
-> this check.
-> 
+On 01.11.18 12:05, Igor Mammedov wrote:
+> On Thu, 1 Nov 2018 11:29:51 +0100
+> David Hildenbrand <david@redhat.com> wrote:
+>=20
+>> On 01.11.18 11:00, Igor Mammedov wrote:
+>>> On Tue, 23 Oct 2018 17:23:03 +0200
+>>> David Hildenbrand <david@redhat.com> wrote:
+>>>  =20
+>>>> Add some more functions that will be used in memory-device context.
+>>>>
+>>>> range_init(): Init using lower bound and size, check for validity
+>>>> range_init_nofail(): Init using lower bound and size, validity asser=
+ted
+>>>> range_size(): Extract the size of a range
+>>>> range_overlaps_range(): Check for overlaps of two ranges
+>>>> range_contains_range(): Check if one range is contained in the other
+>>>>
+>>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>>> ---
+>>>>  include/qemu/range.h | 62 +++++++++++++++++++++++++++++++++++++++++=
++++
+>>>>  1 file changed, 62 insertions(+)
+>>>>
+>>>> diff --git a/include/qemu/range.h b/include/qemu/range.h
+>>>> index 7e75f4e655..ba606c6bc0 100644
+>>>> --- a/include/qemu/range.h
+>>>> +++ b/include/qemu/range.h
+>>>> @@ -112,6 +112,68 @@ static inline uint64_t range_upb(Range *range)
+>>>>      return range->upb;
+>>>>  }
+>>>> =20
+>>>> +/*
+>>>> + * Initialize @range to span the interval [@lob,@lob + @size - 1].
+>>>> + * @size may be 0. If the range would overflow, returns -ERANGE, ot=
+herwise
+>>>> + * 0.
+>>>> + */
+>>>> +static inline int QEMU_WARN_UNUSED_RESULT range_init(Range *range, =
+uint64_t lob,
+>>>> +                                                     uint64_t size)
+>>>> +{
+>>>> +    if (lob + size < lob) {
+>>>> +        return -ERANGE;
+>>>> +    }
+>>>> +    range->lob =3D lob;
+>>>> +    range->upb =3D lob + size - 1;
+>>>> +    range_invariant(range);
+>>>> +    return 0;
+>>>> +}
+>>>> +
+>>>> +/*
+>>>> + * Initialize @range to span the interval [@lob,@lob + @size - 1].
+>>>> + * @size may be 0. Range must not overflow.
+>>>> + */
+>>>> +static inline void range_init_nofail(Range *range, uint64_t lob, ui=
+nt64_t size)
+>>>> +{
+>>>> +    range->lob =3D lob;
+>>>> +    range->upb =3D lob + size - 1;
+>>>> +    range_invariant(range);
+>>>> +}
+>>>> +
+>>>> +/*
+>>>> + * Get the size of @range.
+>>>> + */
+>>>> +static inline uint64_t range_size(const Range *range)
+>>>> +{
+>>>> +    return range->upb - range->lob + 1;
+>>>> +}
+>>>> +
+>>>> +/*
+>>>> + * Check if @range1 overlaps with @range2. If one of the ranges is =
+empty,
+>>>> + * the result is always "false".
+>>>> + */
+>>>> +static inline bool range_overlaps_range(const Range *range1,
+>>>> +                                        const Range *range2)
+>>>> +{
+>>>> +    if (range_is_empty(range1) || range_is_empty(range2)) { =20
+>>> compilation fails with:
+>>>  "error: passing argument 1 of =E2=80=98range_is_empty=E2=80=99 disca=
+rds =E2=80=98const=E2=80=99 qualifier from pointer target type [-Werror]"
+>>>
+>>> the same for range_invariant,
+>>> following should fix issues: =20
+>>
+>> I guess you missed patch #3.
+> Yep, I was applying it randomly. I'd squash 3 and 4 but considering 3
+> it already queued  there is no point in doing so.
+>=20
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+>=20
 
-Had a look more deep into Qemu code. Both qxl_realize_primary and
-qxl_realize_secondary calls qxl_realize_common which calls 
-qemu_spice_add_display_interface to register the interface to spice.
-Both qxl_realize_primary and qxl_realize_secondary set qxl->id
-(first with 0 second from 1 as code below was doing).
-There are 2 fields "id": PCIQXLDevice->id and PCIQXLDevice->ssd.qxl.id,
-having PCIQXLDevice->ssd.qxl.id == qemu_console_get_index(PCIQXLDevice->vga->con)
-== channel_id (PCIQXLDevice->ssd.qxl.id is set in qemu_spice_add_display_interface).
-Looks like PCIQXLDevice->id, beside to distinguish if primary or not is
-only used for tracing. Would not be better to remove PCIQXLDevice->id
-at all after adding the have_vga flag?
+Thanks Igor, would be great if you (or one of the other CC people) could
+have a look at the remaining patch #7. Thanks!
 
-> > >  static void qxl_realize_secondary(PCIDevice *dev, Error **errp)
-> > >  {
-> > > -    static int device_id = 1;
-> > >      PCIQXLDevice *qxl = PCI_QXL(dev);
-> > >  
-> > > -    qxl->id = device_id++;
-> > >      qxl_init_ramsize(qxl);
-> > >      memory_region_init_ram(&qxl->vga.vram, OBJECT(dev), "qxl.vgavram",
-> > >                             qxl->vga.vram_size, &error_fatal);
-> > >      qxl->vga.vram_ptr = memory_region_get_ram_ptr(&qxl->vga.vram);
-> > >      qxl->vga.con = graphic_console_init(DEVICE(dev), 0, &qxl_ops, qxl);
-> > > +    qxl->id = qemu_console_get_index(qxl->vga.con); /* == channel_id */
-> > >  
-> > 
-> > As these IDs must be contiguous this means that there must be the
-> > requirement
-> > that if there is a qxl interface only qxl interfaces are used and no other
-> > console which seems to me wrong.
-> 
-> Hmm.  Didn't know this is a requirement.  But as far I know qxl->id is
-> also expected to be the channel_id.  So with qxl and non-qxl mixed we
-> are in trouble no matter what:
-> 
->   * with the patch we break the contiguous id requirement.
+--=20
 
-PCIQXLDevice->id? No reason actually to be contiguous.
-PCIQXLDevice->ssd.qxl.id is already qemu_console_get_index so potentially
-not contiguous.
+Thanks,
 
->   * without the patch we break the qxl->id == channel_id requirement.
-
-Yes, can be broken although I suspect for other reasons this is true.
-
-> 
-> So, what now?
-> 
-> cheers,
->   Gerd
-> 
-
-I would personally add the "have_vga" field and use a single id field,
-this will make sure to have the same consistent value.
-
-Frediano
+David / dhildenb
