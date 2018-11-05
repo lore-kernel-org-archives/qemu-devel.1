@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53657)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53541)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gJc4f-0007Wj-Gu
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 05:25:40 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gJc4m-0007VX-AK
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 05:25:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gJc0O-0007su-QI
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 05:21:17 -0500
-From: David Hildenbrand <david@redhat.com>
-Date: Mon,  5 Nov 2018 11:20:36 +0100
-Message-Id: <20181105102044.20547-3-david@redhat.com>
-In-Reply-To: <20181105102044.20547-1-david@redhat.com>
-References: <20181105102044.20547-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 02/10] pci/shpc: rename hotplug handler
- callbacks
+	(envelope-from <pbonzini@redhat.com>) id 1gJbw0-0007iB-R0
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 05:16:45 -0500
+References: <1541139396-4727-1-git-send-email-dongli.zhang@oracle.com>
+	<1b8261f5-ddc8-7863-7a0a-0177c022787f@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <85a4ce76-e558-7743-eb16-9e3b1eaed5e5@redhat.com>
+Date: Mon, 5 Nov 2018 11:16:08 +0100
+MIME-Version: 1.0
+In-Reply-To: <1b8261f5-ddc8-7863-7a0a-0177c022787f@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH 1/1] virtio: pass argument
+ by value for virtqueue_map_iovec()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,196 +25,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, David Hildenbrand <david@redhat.com>
+To: Laurent Vivier <lvivier@redhat.com>, Dongli Zhang <dongli.zhang@oracle.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, mst@redhat.com
 
-The callbacks are also called for cold plugged devices. Drop the "hot"
-to better match the actual callback names.
+On 05/11/2018 09:40, Laurent Vivier wrote:
+> CC: Paolo as the use of modified num_sg has been removed by his patch:
+> 
+>   3b3b062821 virtio: slim down allocation of VirtQueueElements
 
-While at it, also rename shpc_device_hotplug_common() to
-shpc_device_plug_common().
+Indeed, virtqueue_map and virtqueue_map_iovec are only used on migration
+now, and that path does not need to modify *num_sg.  After my patch
+virtqueue_pop calls virtqueue_map_desc instead of virtqueue_map (and
+virtqueue_map_desc does need an in-out argument).
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- hw/pci-bridge/pci_bridge_dev.c  | 17 ++++++++---------
- hw/pci-bridge/pcie_pci_bridge.c | 17 ++++++++---------
- hw/pci/shpc.c                   | 14 +++++++-------
- include/hw/pci/shpc.h           |  8 ++++----
- 4 files changed, 27 insertions(+), 29 deletions(-)
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 
-diff --git a/hw/pci-bridge/pci_bridge_dev.c b/hw/pci-bridge/pci_bridge_dev.c
-index 97a8e8b6a4..e1df9a52ac 100644
---- a/hw/pci-bridge/pci_bridge_dev.c
-+++ b/hw/pci-bridge/pci_bridge_dev.c
-@@ -206,8 +206,8 @@ static const VMStateDescription pci_bridge_dev_vmstate = {
-     }
- };
- 
--static void pci_bridge_dev_hotplug_cb(HotplugHandler *hotplug_dev,
--                                      DeviceState *dev, Error **errp)
-+static void pci_bridge_dev_plug_cb(HotplugHandler *hotplug_dev,
-+                                   DeviceState *dev, Error **errp)
- {
-     PCIDevice *pci_hotplug_dev = PCI_DEVICE(hotplug_dev);
- 
-@@ -216,12 +216,11 @@ static void pci_bridge_dev_hotplug_cb(HotplugHandler *hotplug_dev,
-                    "this %s", TYPE_PCI_BRIDGE_DEV);
-         return;
-     }
--    shpc_device_hotplug_cb(hotplug_dev, dev, errp);
-+    shpc_device_plug_cb(hotplug_dev, dev, errp);
- }
- 
--static void pci_bridge_dev_hot_unplug_request_cb(HotplugHandler *hotplug_dev,
--                                                 DeviceState *dev,
--                                                 Error **errp)
-+static void pci_bridge_dev_unplug_request_cb(HotplugHandler *hotplug_dev,
-+                                             DeviceState *dev, Error **errp)
- {
-     PCIDevice *pci_hotplug_dev = PCI_DEVICE(hotplug_dev);
- 
-@@ -230,7 +229,7 @@ static void pci_bridge_dev_hot_unplug_request_cb(HotplugHandler *hotplug_dev,
-                    "this %s", TYPE_PCI_BRIDGE_DEV);
-         return;
-     }
--    shpc_device_hot_unplug_request_cb(hotplug_dev, dev, errp);
-+    shpc_device_unplug_request_cb(hotplug_dev, dev, errp);
- }
- 
- static void pci_bridge_dev_class_init(ObjectClass *klass, void *data)
-@@ -251,8 +250,8 @@ static void pci_bridge_dev_class_init(ObjectClass *klass, void *data)
-     dc->props = pci_bridge_dev_properties;
-     dc->vmsd = &pci_bridge_dev_vmstate;
-     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
--    hc->plug = pci_bridge_dev_hotplug_cb;
--    hc->unplug_request = pci_bridge_dev_hot_unplug_request_cb;
-+    hc->plug = pci_bridge_dev_plug_cb;
-+    hc->unplug_request = pci_bridge_dev_unplug_request_cb;
- }
- 
- static const TypeInfo pci_bridge_dev_info = {
-diff --git a/hw/pci-bridge/pcie_pci_bridge.c b/hw/pci-bridge/pcie_pci_bridge.c
-index 04cf5a6a92..c634353b06 100644
---- a/hw/pci-bridge/pcie_pci_bridge.c
-+++ b/hw/pci-bridge/pcie_pci_bridge.c
-@@ -137,8 +137,8 @@ static const VMStateDescription pcie_pci_bridge_dev_vmstate = {
-         }
- };
- 
--static void pcie_pci_bridge_hotplug_cb(HotplugHandler *hotplug_dev,
--                                      DeviceState *dev, Error **errp)
-+static void pcie_pci_bridge_plug_cb(HotplugHandler *hotplug_dev,
-+                                    DeviceState *dev, Error **errp)
- {
-     PCIDevice *pci_hotplug_dev = PCI_DEVICE(hotplug_dev);
- 
-@@ -147,12 +147,11 @@ static void pcie_pci_bridge_hotplug_cb(HotplugHandler *hotplug_dev,
-                    "this %s", TYPE_PCIE_PCI_BRIDGE_DEV);
-         return;
-     }
--    shpc_device_hotplug_cb(hotplug_dev, dev, errp);
-+    shpc_device_plug_cb(hotplug_dev, dev, errp);
- }
- 
--static void pcie_pci_bridge_hot_unplug_request_cb(HotplugHandler *hotplug_dev,
--                                                 DeviceState *dev,
--                                                 Error **errp)
-+static void pcie_pci_bridge_unplug_request_cb(HotplugHandler *hotplug_dev,
-+                                              DeviceState *dev, Error **errp)
- {
-     PCIDevice *pci_hotplug_dev = PCI_DEVICE(hotplug_dev);
- 
-@@ -161,7 +160,7 @@ static void pcie_pci_bridge_hot_unplug_request_cb(HotplugHandler *hotplug_dev,
-                    "this %s", TYPE_PCIE_PCI_BRIDGE_DEV);
-         return;
-     }
--    shpc_device_hot_unplug_request_cb(hotplug_dev, dev, errp);
-+    shpc_device_unplug_request_cb(hotplug_dev, dev, errp);
- }
- 
- static void pcie_pci_bridge_class_init(ObjectClass *klass, void *data)
-@@ -180,8 +179,8 @@ static void pcie_pci_bridge_class_init(ObjectClass *klass, void *data)
-     dc->props = pcie_pci_bridge_dev_properties;
-     dc->reset = &pcie_pci_bridge_reset;
-     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
--    hc->plug = pcie_pci_bridge_hotplug_cb;
--    hc->unplug_request = pcie_pci_bridge_hot_unplug_request_cb;
-+    hc->plug = pcie_pci_bridge_plug_cb;
-+    hc->unplug_request = pcie_pci_bridge_unplug_request_cb;
- }
- 
- static const TypeInfo pcie_pci_bridge_info = {
-diff --git a/hw/pci/shpc.c b/hw/pci/shpc.c
-index a8462d48bb..098ffaef1d 100644
---- a/hw/pci/shpc.c
-+++ b/hw/pci/shpc.c
-@@ -482,8 +482,8 @@ static const MemoryRegionOps shpc_mmio_ops = {
-         .max_access_size = 4,
-     },
- };
--static void shpc_device_hotplug_common(PCIDevice *affected_dev, int *slot,
--                                       SHPCDevice *shpc, Error **errp)
-+static void shpc_device_plug_common(PCIDevice *affected_dev, int *slot,
-+                                    SHPCDevice *shpc, Error **errp)
- {
-     int pci_slot = PCI_SLOT(affected_dev->devfn);
-     *slot = SHPC_PCI_TO_IDX(pci_slot);
-@@ -497,7 +497,7 @@ static void shpc_device_hotplug_common(PCIDevice *affected_dev, int *slot,
-     }
- }
- 
--void shpc_device_hotplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-+void shpc_device_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-                             Error **errp)
- {
-     Error *local_err = NULL;
-@@ -505,7 +505,7 @@ void shpc_device_hotplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-     SHPCDevice *shpc = pci_hotplug_dev->shpc;
-     int slot;
- 
--    shpc_device_hotplug_common(PCI_DEVICE(dev), &slot, shpc, &local_err);
-+    shpc_device_plug_common(PCI_DEVICE(dev), &slot, shpc, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         return;
-@@ -540,8 +540,8 @@ void shpc_device_hotplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-     shpc_interrupt_update(pci_hotplug_dev);
- }
- 
--void shpc_device_hot_unplug_request_cb(HotplugHandler *hotplug_dev,
--                                       DeviceState *dev, Error **errp)
-+void shpc_device_unplug_request_cb(HotplugHandler *hotplug_dev,
-+                                   DeviceState *dev, Error **errp)
- {
-     Error *local_err = NULL;
-     PCIDevice *pci_hotplug_dev = PCI_DEVICE(hotplug_dev);
-@@ -550,7 +550,7 @@ void shpc_device_hot_unplug_request_cb(HotplugHandler *hotplug_dev,
-     uint8_t led;
-     int slot;
- 
--    shpc_device_hotplug_common(PCI_DEVICE(dev), &slot, shpc, &local_err);
-+    shpc_device_plug_common(PCI_DEVICE(dev), &slot, shpc, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         return;
-diff --git a/include/hw/pci/shpc.h b/include/hw/pci/shpc.h
-index ee19fecf61..71293aca58 100644
---- a/include/hw/pci/shpc.h
-+++ b/include/hw/pci/shpc.h
-@@ -45,10 +45,10 @@ void shpc_free(PCIDevice *dev);
- void shpc_cap_write_config(PCIDevice *d, uint32_t addr, uint32_t val, int len);
- 
- 
--void shpc_device_hotplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
--                            Error **errp);
--void shpc_device_hot_unplug_request_cb(HotplugHandler *hotplug_dev,
--                                       DeviceState *dev, Error **errp);
-+void shpc_device_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-+                         Error **errp);
-+void shpc_device_unplug_request_cb(HotplugHandler *hotplug_dev,
-+                                   DeviceState *dev, Error **errp);
- 
- extern VMStateInfo shpc_vmstate_info;
- #define SHPC_VMSTATE(_field, _type,  _test) \
--- 
-2.17.2
+Paolo
+
+> On 02/11/2018 07:16, Dongli Zhang wrote:
+>> Pass num_sg by value instead of by pointer, as num_sg is never modified in
+>> virtqueue_map_iovec().
+>>
+>> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+>> ---
+>>  hw/virtio/virtio.c | 8 ++++----
+>>  1 file changed, 4 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+>> index 4136d23..a5cb4e6 100644
+>> --- a/hw/virtio/virtio.c
+>> +++ b/hw/virtio/virtio.c
+>> @@ -796,13 +796,13 @@ static void virtqueue_undo_map_desc(unsigned int out_num, unsigned int in_num,
+>>  }
+>>  
+>>  static void virtqueue_map_iovec(VirtIODevice *vdev, struct iovec *sg,
+>> -                                hwaddr *addr, unsigned int *num_sg,
+>> +                                hwaddr *addr, unsigned int num_sg,
+>>                                  int is_write)
+>>  {
+>>      unsigned int i;
+>>      hwaddr len;
+>>  
+>> -    for (i = 0; i < *num_sg; i++) {
+>> +    for (i = 0; i < num_sg; i++) {
+>>          len = sg[i].iov_len;
+>>          sg[i].iov_base = dma_memory_map(vdev->dma_as,
+>>                                          addr[i], &len, is_write ?
+>> @@ -821,8 +821,8 @@ static void virtqueue_map_iovec(VirtIODevice *vdev, struct iovec *sg,
+>>  
+>>  void virtqueue_map(VirtIODevice *vdev, VirtQueueElement *elem)
+>>  {
+>> -    virtqueue_map_iovec(vdev, elem->in_sg, elem->in_addr, &elem->in_num, 1);
+>> -    virtqueue_map_iovec(vdev, elem->out_sg, elem->out_addr, &elem->out_num, 0);
+>> +    virtqueue_map_iovec(vdev, elem->in_sg, elem->in_addr, elem->in_num, 1);
+>> +    virtqueue_map_iovec(vdev, elem->out_sg, elem->out_addr, elem->out_num, 0);
+>>  }
+>>  
+>>  static void *virtqueue_alloc_element(size_t sz, unsigned out_num, unsigned in_num)
+>>
+> 
