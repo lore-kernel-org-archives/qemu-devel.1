@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58932)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gJjMm-0003Vz-Tp
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:12:49 -0500
+	(envelope-from <mst@redhat.com>) id 1gJjOW-0005x8-3o
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:14:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gJjMk-0006tP-7N
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:12:48 -0500
-Received: from pio-pvt-msa3.bahnhof.se ([79.136.2.42]:33442)
+	(envelope-from <mst@redhat.com>) id 1gJjOS-0000cB-Go
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:14:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36394)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gJjMj-0006sa-R7
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:12:46 -0500
-Date: Mon, 5 Nov 2018 19:12:42 +0100
-From: Fredrik Noring <noring@nocrew.org>
-Message-ID: <20181105181242.GB2383@sx9>
-References: <cover.1541174426.git.noring@nocrew.org>
-	<BN6PR2201MB1251AFA493032E33B49A5376C6CA0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gJjOS-0000ae-53
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:14:32 -0500
+Date: Mon, 5 Nov 2018 13:14:30 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181105181353.39804-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <BN6PR2201MB1251AFA493032E33B49A5376C6CA0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-Subject: Re: [Qemu-devel] [PATCH 0/2] target/mips: Fix decoding mechanisms
- of R5900 M{F, T}{HI, LO}1 and DIV[U]1
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 00/33] pci, pc, virtio: fixes, features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,87 +25,218 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <amarkovic@wavecomp.com>
-Cc: Aurelien Jarno <aurelien@aurel32.net>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?utf-8?Q?J=C3=BCrgen?= Urban <JuergenUrban@gmx.de>, "Maciej W. Rozycki" <macro@linux-mips.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-Thank you for your review, Aleksandar,
+The following changes since commit b2f7a038bb4c4fc5ce6b8486e8513dfd97665e=
+2a:
 
-> For LL, SC, LLD and SCD instructions, there is a need to properly insulate
-> their R5900 versions too, similar to this:
-> 
->     case OPC_SC:
->         if(ctx->insn_flags & INSN_R5900) {
->              check_insn_opc_user_only(ctx, INSN_R5900);
->         } else {
->             check_insn(ctx, ISA_MIPS2);
->         }
->         gen_st_cond(ctx, op, rt, rs, imm);
->         break;
+  Merge remote-tracking branch 'remotes/rth/tags/pull-softfloat-20181104'=
+ into staging (2018-11-05 10:32:49 +0000)
 
-Would you accept the simplification to omit the else clause? Like this:
+are available in the Git repository at:
 
-    case OPC_SC:
-        if (ctx->insn_flags & INSN_R5900) {
-            check_insn_opc_user_only(ctx, INSN_R5900);
-        }
-        check_insn(ctx, ISA_MIPS2);
-        check_insn_opc_removed(ctx, ISA_MIPS32R6);
-        gen_st_cond(ctx, op, rt, rs, imm);
-        break;
+  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
 
-The code will, of course, expand into a double-check of INSN_R5900:
+for you to fetch changes up to 6196df5c8e6688c1c3f06f73442820066335337c:
 
-        if (ctx->insn_flags & INSN_R5900) {
-#ifndef CONFIG_USER_ONLY
-            if (unlikely(ctx->insn_flags & INSN_R5900)) {
-                generate_exception_end(ctx, EXCP_RI);
-            }
-#endif
-        }
+  vhost-scsi: prevent using uninitialized vqs (2018-11-05 12:59:35 -0500)
 
-> (the code above is just a form of pseudocode illustrating the idea; I
-> don't guarantee the correctness for build purposes, or if this is the best
-> code organization)
-> 
-> Non-R5900 code (for the time being) should never invoke
-> check_insn_opc_user_only(). *The only way* of distinguishing R5900 code
-> paths from the other CPUs code paths should be by using
-> "if(ctx->insn_flags & INSN_R5900)"!
+----------------------------------------------------------------
+pci, pc, virtio: fixes, features
 
-OK.
+AMD IOMMU VAPIC support + fixes all over the place.
 
-> For changes in decode_opc_special_legacy(), there shouldn't be there, but
-> there should be a separate function decode_opc_special_tx59() or so.
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
-Sure, I will copy the 82 line function then, and patch the following:
+----------------------------------------------------------------
+Gerd Hoffmann (1):
+      pci-testdev: add optional memory bar
 
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -23904,7 +23904,7 @@ static void decode_opc_special_legacy(CPUMIPSState *env, DisasContext *ctx)
-     case OPC_MOVN:         /* Conditional move */
-     case OPC_MOVZ:
-         check_insn(ctx, ISA_MIPS4 | ISA_MIPS32 |
--                   INSN_LOONGSON2E | INSN_LOONGSON2F | INSN_R5900);
-+                   INSN_LOONGSON2E | INSN_LOONGSON2F);
-         gen_cond_move(ctx, op1, rd, rs, rt);
-         break;
-     case OPC_MFHI:          /* Move from HI/LO */
-@@ -23931,8 +23931,6 @@ static void decode_opc_special_legacy(CPUMIPSState *env, DisasContext *ctx)
-             check_insn(ctx, INSN_VR54XX);
-             op1 = MASK_MUL_VR54XX(ctx->opcode);
-             gen_mul_vr54xx(ctx, op1, rd, rs, rt);
--        } else if (ctx->insn_flags & INSN_R5900) {
--            gen_mul_txx9(ctx, op1, rd, rs, rt);
-         } else {
-             gen_muldiv(ctx, op1, rd & 3, rs, rt);
-         }
-@@ -23947,7 +23945,6 @@ static void decode_opc_special_legacy(CPUMIPSState *env, DisasContext *ctx)
-     case OPC_DDIV:
-     case OPC_DDIVU:
-         check_insn(ctx, ISA_MIPS3);
--        check_insn_opc_user_only(ctx, INSN_R5900);
-         check_mips_64(ctx);
-         gen_muldiv(ctx, op1, 0, rs, rt);
-         break;
+Laszlo Ersek (4):
+      MAINTAINERS: list "tests/acpi-test-data" files in ACPI/SMBIOS secti=
+on
+      hw/pci-host/x86: extract get_pci_hole64_start_value() helpers
+      hw/pci-host/x86: extend the 64-bit PCI hole relative to the fw-assi=
+gned base
+      tests/bios-tables-test: add 64-bit PCI MMIO aperture round-up test =
+on Q35
 
-Fredrik
+Li Qiang (3):
+      i440fx: use ARRAY_SIZE for pam_regions
+      piix: use TYPE_FOO constants than string constats
+      piix_pci: fix i440fx data sheet link
+
+Mao Zhongyi (1):
+      pci_bridge: fix typo in comment
+
+Michael S. Tsirkin (1):
+      bios-tables-test: prepare expected files for mmio64
+
+Peter Maydell (4):
+      tests: Move tests/acpi-test-data/ to tests/data/acpi/
+      tests: Move tests/hex-loader-check-data/ to tests/data/hex-loader/
+      configure: Rename FILES variable to LINKS
+      configure: Use LINKS loop for all build tree symlinks
+
+Peter Xu (4):
+      intel_iommu: introduce vtd_reset_caches()
+      intel_iommu: better handling of dmar state switch
+      intel_iommu: move ce fetching out when sync shadow
+      intel_iommu: handle invalid ce for shadow sync
+
+Philippe Mathieu-Daud=C3=A9 (3):
+      hw/pci-bridge/xio3130: Remove unused functions
+      hw/pci-bridge/ioh3420: Remove unuseful header
+      hw/pci: Add missing include
+
+Singh, Brijesh (9):
+      x86_iommu: move the kernel-irqchip check in common code
+      x86_iommu: move vtd_generate_msi_message in common file
+      x86_iommu/amd: remove V=3D1 check from amdvi_validate_dte()
+      x86_iommu/amd: make the address space naming consistent with intel-=
+iommu
+      x86_iommu/amd: Prepare for interrupt remap support
+      x86_iommu/amd: Add interrupt remap support when VAPIC is not enable=
+d
+      i386: acpi: add IVHD device entry for IOAPIC
+      x86_iommu/amd: Add interrupt remap support when VAPIC is enabled
+      x86_iommu/amd: Enable Guest virtual APIC support
+
+Yaowei Bai (1):
+      virtio-blk: fix comment for virtio_blk_rw_complete
+
+Yongji Xie (1):
+      vhost-user-blk: start vhost when guest kicks
+
+yuchenlin (1):
+      vhost-scsi: prevent using uninitialized vqs
+
+ docs/specs/pci-testdev.txt                         |  15 +-
+ configure                                          |  57 ++-
+ hw/i386/amd_iommu.h                                |  96 ++++-
+ hw/pci-bridge/ioh3420.h                            |   6 -
+ hw/pci-bridge/xio3130_downstream.h                 |  11 -
+ hw/pci-bridge/xio3130_upstream.h                   |  10 -
+ include/hw/i386/intel_iommu.h                      |  59 ---
+ include/hw/i386/x86-iommu.h                        |  66 ++++
+ include/hw/pci/pci_bus.h                           |   2 +
+ hw/block/vhost-user-blk.c                          |  25 ++
+ hw/block/virtio-blk.c                              |   4 +-
+ hw/i386/acpi-build.c                               |  31 +-
+ hw/i386/amd_iommu.c                                | 414 +++++++++++++++=
++++++-
+ hw/i386/intel_iommu.c                              | 131 +++----
+ hw/i386/x86-iommu.c                                |  33 ++
+ hw/misc/pci-testdev.c                              |  19 +
+ hw/pci-bridge/ioh3420.c                            |   2 +-
+ hw/pci-bridge/xio3130_downstream.c                 |  28 +-
+ hw/pci-bridge/xio3130_upstream.c                   |  24 +-
+ hw/pci-host/piix.c                                 |  34 +-
+ hw/pci-host/q35.c                                  |  17 +-
+ hw/pci/pci_bridge.c                                |   2 +-
+ hw/scsi/vhost-scsi.c                               |   2 +-
+ tests/bios-tables-test.c                           |  18 +-
+ tests/hexloader-test.c                             |   2 +-
+ MAINTAINERS                                        |   4 +-
+ hw/i386/trace-events                               |  14 +
+ tests/{acpi-test-data =3D> data/acpi}/pc/APIC        | Bin
+ tests/{acpi-test-data =3D> data/acpi}/pc/APIC.cphp   | Bin
+ .../{acpi-test-data =3D> data/acpi}/pc/APIC.dimmpxm  | Bin
+ tests/{acpi-test-data =3D> data/acpi}/pc/DSDT        | Bin
+ tests/{acpi-test-data =3D> data/acpi}/pc/DSDT.bridge | Bin
+ tests/{acpi-test-data =3D> data/acpi}/pc/DSDT.cphp   | Bin
+ .../{acpi-test-data =3D> data/acpi}/pc/DSDT.dimmpxm  | Bin
+ .../{acpi-test-data =3D> data/acpi}/pc/DSDT.ipmikcs  | Bin
+ tests/{acpi-test-data =3D> data/acpi}/pc/DSDT.memhp  | Bin
+ .../{acpi-test-data =3D> data/acpi}/pc/DSDT.numamem  | Bin
+ tests/{acpi-test-data =3D> data/acpi}/pc/FACP        | Bin
+ tests/{acpi-test-data =3D> data/acpi}/pc/FACS        | Bin
+ tests/{acpi-test-data =3D> data/acpi}/pc/HPET        | Bin
+ .../{acpi-test-data =3D> data/acpi}/pc/NFIT.dimmpxm  | Bin
+ tests/{acpi-test-data =3D> data/acpi}/pc/SLIT.cphp   | Bin
+ tests/{acpi-test-data =3D> data/acpi}/pc/SLIT.memhp  | Bin
+ tests/{acpi-test-data =3D> data/acpi}/pc/SRAT.cphp   | Bin
+ .../{acpi-test-data =3D> data/acpi}/pc/SRAT.dimmpxm  | Bin
+ tests/{acpi-test-data =3D> data/acpi}/pc/SRAT.memhp  | Bin
+ .../{acpi-test-data =3D> data/acpi}/pc/SRAT.numamem  | Bin
+ .../{acpi-test-data =3D> data/acpi}/pc/SSDT.dimmpxm  | Bin
+ tests/{acpi-test-data =3D> data/acpi}/q35/APIC       | Bin
+ tests/{acpi-test-data =3D> data/acpi}/q35/APIC.cphp  | Bin
+ .../{acpi-test-data =3D> data/acpi}/q35/APIC.dimmpxm | Bin
+ tests/{acpi-test-data =3D> data/acpi}/q35/DSDT       | Bin
+ .../{acpi-test-data =3D> data/acpi}/q35/DSDT.bridge  | Bin
+ tests/{acpi-test-data =3D> data/acpi}/q35/DSDT.cphp  | Bin
+ .../{acpi-test-data =3D> data/acpi}/q35/DSDT.dimmpxm | Bin
+ .../{acpi-test-data =3D> data/acpi}/q35/DSDT.ipmibt  | Bin
+ tests/{acpi-test-data =3D> data/acpi}/q35/DSDT.memhp | Bin
+ tests/data/acpi/q35/DSDT.mmio64                    | Bin 0 -> 8947 bytes
+ .../{acpi-test-data =3D> data/acpi}/q35/DSDT.numamem | Bin
+ tests/{acpi-test-data =3D> data/acpi}/q35/FACP       | Bin
+ tests/{acpi-test-data =3D> data/acpi}/q35/FACS       | Bin
+ tests/{acpi-test-data =3D> data/acpi}/q35/HPET       | Bin
+ tests/{acpi-test-data =3D> data/acpi}/q35/MCFG       | Bin
+ .../{acpi-test-data =3D> data/acpi}/q35/NFIT.dimmpxm | Bin
+ tests/{acpi-test-data =3D> data/acpi}/q35/SLIT.cphp  | Bin
+ tests/{acpi-test-data =3D> data/acpi}/q35/SLIT.memhp | Bin
+ tests/{acpi-test-data =3D> data/acpi}/q35/SRAT.cphp  | Bin
+ .../{acpi-test-data =3D> data/acpi}/q35/SRAT.dimmpxm | Bin
+ tests/{acpi-test-data =3D> data/acpi}/q35/SRAT.memhp | Bin
+ tests/data/acpi/q35/SRAT.mmio64                    | Bin 0 -> 224 bytes
+ .../{acpi-test-data =3D> data/acpi}/q35/SRAT.numamem | Bin
+ .../{acpi-test-data =3D> data/acpi}/q35/SSDT.dimmpxm | Bin
+ .../acpi}/rebuild-expected-aml.sh                  |   2 -
+ .../hex-loader}/test.hex                           |   0
+ 74 files changed, 838 insertions(+), 290 deletions(-)
+ delete mode 100644 hw/pci-bridge/ioh3420.h
+ delete mode 100644 hw/pci-bridge/xio3130_downstream.h
+ delete mode 100644 hw/pci-bridge/xio3130_upstream.h
+ rename tests/{acpi-test-data =3D> data/acpi}/pc/APIC (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/pc/APIC.cphp (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/pc/APIC.dimmpxm (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/pc/DSDT (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/pc/DSDT.bridge (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/pc/DSDT.cphp (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/pc/DSDT.dimmpxm (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/pc/DSDT.ipmikcs (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/pc/DSDT.memhp (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/pc/DSDT.numamem (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/pc/FACP (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/pc/FACS (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/pc/HPET (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/pc/NFIT.dimmpxm (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/pc/SLIT.cphp (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/pc/SLIT.memhp (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/pc/SRAT.cphp (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/pc/SRAT.dimmpxm (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/pc/SRAT.memhp (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/pc/SRAT.numamem (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/pc/SSDT.dimmpxm (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/q35/APIC (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/q35/APIC.cphp (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/q35/APIC.dimmpxm (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/q35/DSDT (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/q35/DSDT.bridge (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/q35/DSDT.cphp (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/q35/DSDT.dimmpxm (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/q35/DSDT.ipmibt (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/q35/DSDT.memhp (100%)
+ create mode 100644 tests/data/acpi/q35/DSDT.mmio64
+ rename tests/{acpi-test-data =3D> data/acpi}/q35/DSDT.numamem (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/q35/FACP (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/q35/FACS (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/q35/HPET (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/q35/MCFG (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/q35/NFIT.dimmpxm (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/q35/SLIT.cphp (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/q35/SLIT.memhp (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/q35/SRAT.cphp (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/q35/SRAT.dimmpxm (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/q35/SRAT.memhp (100%)
+ create mode 100644 tests/data/acpi/q35/SRAT.mmio64
+ rename tests/{acpi-test-data =3D> data/acpi}/q35/SRAT.numamem (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/q35/SSDT.dimmpxm (100%)
+ rename tests/{acpi-test-data =3D> data/acpi}/rebuild-expected-aml.sh (86=
+%)
+ rename tests/{hex-loader-check-data =3D> data/hex-loader}/test.hex (100%=
+)
