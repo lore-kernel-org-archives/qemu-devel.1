@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39665)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43772)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gJa4I-00077m-IY
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 03:17:07 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gJaE4-0006Q9-6T
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 03:27:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gJa4H-0008Q5-H7
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 03:17:06 -0500
-Date: Mon, 5 Nov 2018 09:16:56 +0100
+	(envelope-from <kraxel@redhat.com>) id 1gJaDZ-0001kU-KS
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 03:27:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46580)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gJaDY-0000Go-N3
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 03:26:40 -0500
+Date: Mon, 5 Nov 2018 09:26:22 +0100
 From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20181105081656.3u5vankppvabxmlg@sirius.home.kraxel.org>
-References: <20181029223207.31878-1-philmd@redhat.com>
-	<20181029223207.31878-4-philmd@redhat.com>
-	<20181030063830.edjacusffvgwvnt2@sirius.home.kraxel.org>
-	<fc4b00b2-dda0-a0fb-e7b8-487065dbf6cc@redhat.com>
+Message-ID: <20181105082622.yzxz3dis77knkpoa@sirius.home.kraxel.org>
+References: <1541052594-29132-1-git-send-email-liq3ea@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <fc4b00b2-dda0-a0fb-e7b8-487065dbf6cc@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/3] arm: allwinner: Enable USB EHCI
+In-Reply-To: <1541052594-29132-1-git-send-email-liq3ea@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] hw: fw_cfg: ensure reboot_time is
+ nonegative
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,45 +27,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Icenowy Zheng <icenowy@aosc.xyz>, Guenter Roeck <linux@roeck-us.net>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Beniamino Galvani <b.galvani@gmail.com>
+To: Li Qiang <liq3ea@gmail.com>
+Cc: pbonzini@redhat.com, armbru@redhat.com, philmd@redhat.com, lersek@redhat.com, qemu-devel@nongnu.org
 
-> > > @@ -116,6 +116,8 @@ static void aw_a10_realize(DeviceState *dev, Error **errp)
-> > >       if (machine_usb(current_machine)) {
-> > >           sysbus_create_simple("sysbus-ohci", 0x01c14400, s->irq[64]);
-> > >           sysbus_create_simple("sysbus-ohci", 0x01c1c400, s->irq[65]);
-> > > +        sysbus_create_simple(TYPE_AW_A10_EHCI, 0x01c14000, s->irq[39]);
-> > > +        sysbus_create_simple(TYPE_AW_A10_EHCI, 0x01c1c000, s->irq[40]);
-> > 
-> > Hmm, is this a companion controller setup?  If so, then this is a bit
-> > more complicated  (see ehci_create_ich9_with_companions()).
-> 
-> I don't have enough USB knowledge. Can we have companion setup without PCI?
-> 
-> Per the datashit [1] p. 215 "21. USB Host Controller", each controller share
-> the same PHY. There is no mention of companion setup:
-> 
->   The USB host controller includes the following features:
->   ..
->   - Complies with EHCI Specification, Version 1.0,
->   - and  the OHCI Specification, Version 1.0a.
->   ..
->   - Support only 1 USB Root Port shared between EHCI and OHCI.
+> -    /* validate the input */
+> -    if (reboot_timeout > 0xffff) {
+> -        error_report("reboot timeout is larger than 65535, force it to 65535.");
+> -        reboot_timeout = 0xffff;
+> +
+> +    if (reboot_timeout >= 0) {
+> +        /* validate the input */
+> +        if (reboot_timeout > 0xffff) {
+> +            error_report("reboot timeout is larger than 65535,"
+> +                         "force it to 65535.");
+> +            reboot_timeout = 0xffff;
+> +        }
+> +        fw_cfg_add_file(s, "etc/boot-fail-wait",
+> +                        g_memdup(&reboot_timeout, 4), 4);
+>      }
 
-Looks like a companion setup.  Short introduction:
+Hmm, values > 0xffff are reported and values < 0 are silently ignored.
+I think we should be consistent here.
+I'd suggest report and exit in both cases,
+i.e. use error_setg(..., &error_fatal);
 
-The port is shared, and ehci controls whenever the port is assigned to
-ehci or the companion (ohci in this case).  Typically the ehci driver
-sets the bit depending on usb device speed, i.e. usb2 devices are
-handled by ehci and usb1 devices are handled by ohci.
-
-By default ohci owns the devices, so in case the OS has no ehci driver
-ohci can be used to handle usb2 devices in usb1 compat mode.  Pretty
-much moot these days.
-
-On the qemu side you basically have to initialize ehci first (so the usb
-bus exists), then set the masterbus property to the ehci usb-bus for the
-ohci controller.
-
-HTH,
+cheers,
   Gerd
