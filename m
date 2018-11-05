@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53633)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53673)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gJhzm-0008Nz-Uj
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:44:59 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gJhzn-0008VG-Ox
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:45:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gJhzl-0001iS-Dv
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:44:58 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gJhzm-0001kE-Sr
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:44:59 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Mon,  5 Nov 2018 17:43:38 +0100
-Message-Id: <20181105164340.20707-5-cohuck@redhat.com>
+Date: Mon,  5 Nov 2018 17:43:40 +0100
+Message-Id: <20181105164340.20707-7-cohuck@redhat.com>
 In-Reply-To: <20181105164340.20707-1-cohuck@redhat.com>
 References: <20181105164340.20707-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 4/6] MAINTAINERS: s390/pci: add Collin Walling
- as maintainer for zpci
+Subject: [Qemu-devel] [PULL 6/6] MAINTAINERS: s390/boot: the ipl code and
+ the bios belong together
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,33 +25,33 @@ Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.d
 
 From: Christian Borntraeger <borntraeger@de.ibm.com>
 
-Collin will take over the maintainership from Yi Min. Let us add a
-separate s390 pci section.
+The s390-ccw bios and the ipl code do work in lock-step. Let us merge
+them in the maintainer file.
 
 Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Message-Id: <1540827745-20795-4-git-send-email-borntraeger@de.ibm.com>
-Acked-by: Collin Walling <walling@linux.ibm.com>
+Message-Id: <1540827745-20795-5-git-send-email-borntraeger@de.ibm.com>
+Acked-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- MAINTAINERS | 6 ++++++
- 1 file changed, 6 insertions(+)
+ MAINTAINERS | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 5b6f4a2f3f..15709e099b 100644
+index e0e8b5fb9e..8ec2281a7e 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -956,6 +956,12 @@ F: pc-bios/s390-ccw.img
+@@ -944,10 +944,11 @@ T: git git://github.com/cohuck/qemu.git s390-next
  T: git git://github.com/borntraeger/qemu.git s390-next
  L: qemu-s390x@nongnu.org
  
-+S390 PCI
-+M: Collin Walling <walling@linux.ibm.com>
-+S: Supported
-+F: hw/s390x/s390-pci*
-+L: qemu-s390x@nongnu.org
-+
- UniCore32 Machines
- -------------
- PKUnity-3 SoC initramfs-with-busybox
+-S390-ccw Bios
++S390-ccw boot
+ M: Christian Borntraeger <borntraeger@de.ibm.com>
+ M: Thomas Huth <thuth@redhat.com>
+ S: Supported
++F: hw/s390x/ipl.*
+ F: pc-bios/s390-ccw/
+ F: pc-bios/s390-ccw.img
+ T: git git://github.com/borntraeger/qemu.git s390-next
 -- 
 2.14.5
