@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51246)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51434)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gJdPK-0000ga-Mf
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 06:51:04 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gJdQD-0001HX-Kb
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 06:51:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gJdPH-0005p1-BC
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 06:51:02 -0500
-References: <20181105110313.29312-1-david@redhat.com>
-	<20181105110313.29312-4-david@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <228ec0b2-cd30-b33b-8120-bb28e3f83e66@redhat.com>
-Date: Mon, 5 Nov 2018 12:50:52 +0100
+	(envelope-from <alex.bennee@linaro.org>) id 1gJdQA-0007sX-80
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 06:51:57 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:33799)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gJdQ9-000563-Gf
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 06:51:54 -0500
+Received: by mail-wr1-x443.google.com with SMTP id j26-v6so9204747wre.1
+	for <qemu-devel@nongnu.org>; Mon, 05 Nov 2018 03:51:40 -0800 (PST)
+References: <20181104112424.18663-1-stefanha@redhat.com>
+	<20181104112424.18663-2-stefanha@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20181104112424.18663-2-stefanha@redhat.com>
+Date: Mon, 05 Nov 2018 11:51:36 +0000
+Message-ID: <87zhuneo8n.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20181105110313.29312-4-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 3/4] s390x/zpci: move some hotplug
- checks to the pre_plug handler
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 1/8] README: use 'https://' instead of
+ 'git://'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,125 +31,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, =Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, eblake@redhat.com, cohuck@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Jeff Cody <jcody@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Daniel Berrange <berrange@redhat.com>, "Michael S.
+	Tsirkin" <mst@redhat.com>
 
-On 05.11.18 12:03, David Hildenbrand wrote:
-> Let's move most of the checks to the new pre_plug handler. As a PCI
-> bridge is just a PCI device, we can simplify the code.
-> 
-> Notes: We cannot yet move the MSIX check or device ID creation +
-> zPCI device creation to the pre_plug handler as both parts are not
-> fixed before actual device realization (and therefore after pre_plug and
-> before plug). Once that part is factored out, we can move these parts to
-> the pre_plug handler, too and therefore remove all possible errors from
-> the plug handler.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+
+Stefan Hajnoczi <stefanha@redhat.com> writes:
+
+> When you clone the repository without previous commit history, 'git://'
+> doesn't protect from man-in-the-middle attacks.  HTTPS is more secure
+> since the client verifies the server certificate.
+>
+> Reported-by: Jann Horn <jannh@google.com>
+> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
 > ---
->  hw/s390x/s390-pci-bus.c | 43 +++++++++++++++++++++++++----------------
->  1 file changed, 26 insertions(+), 17 deletions(-)
-> 
-> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> index 68660eac74..1849f9d334 100644
-> --- a/hw/s390x/s390-pci-bus.c
-> +++ b/hw/s390x/s390-pci-bus.c
-> @@ -806,11 +806,31 @@ static bool s390_pci_alloc_idx(S390pciState *s, S390PCIBusDevice *pbdev)
->      }
->  
->      pbdev->idx = idx;
-> -    s->next_idx = (idx + 1) & FH_MASK_INDEX;
-> -
->      return true;
->  }
->  
-> +static void s390_pcihost_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-> +                                   Error **errp)
-> +{
-> +    S390pciState *s = S390_PCI_HOST_BRIDGE(hotplug_dev);
-> +
-> +    if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-> +        PCIDevice *pdev = PCI_DEVICE(dev);
-> +
-> +        if (pdev->cap_present & QEMU_PCI_CAP_MULTIFUNCTION) {
-> +            error_setg(errp, "multifunction not supported in s390");
-> +            return;
-> +        }
-> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_S390_PCI_DEVICE)) {
-> +        S390PCIBusDevice *pbdev = S390_PCI_DEVICE(dev);
-> +
-> +        if (!s390_pci_alloc_idx(s, pbdev)) {
-> +            error_setg(errp, "no slot for plugging zpci device");
-> +            return;
-> +        }
-> +    }
-> +}
-> +
->  static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->                                Error **errp)
->  {
-> @@ -823,11 +843,6 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->          PCIBridge *pb = PCI_BRIDGE(dev);
->          PCIDevice *pdev = PCI_DEVICE(dev);
->  
-> -        if (pdev->cap_present & QEMU_PCI_CAP_MULTIFUNCTION) {
-> -            error_setg(errp, "multifunction not supported in s390");
-> -            return;
-> -        }
-> -
->          pci_bridge_map_irq(pb, dev->id, s390_pci_map_irq);
->          pci_setup_iommu(&pb->sec_bus, s390_pci_dma_iommu, s);
->  
-> @@ -847,11 +862,6 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->      } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
->          pdev = PCI_DEVICE(dev);
->  
-> -        if (pdev->cap_present & QEMU_PCI_CAP_MULTIFUNCTION) {
-> -            error_setg(errp, "multifunction not supported in s390");
-> -            return;
-> -        }
-> -
->          if (!dev->id) {
->              /* In the case the PCI device does not define an id */
->              /* we generate one based on the PCI address         */
-> @@ -883,7 +893,7 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->  
->          if (s390_pci_msix_init(pbdev)) {
->              error_setg(errp, "MSI-X support is mandatory "
-> -                       "in the S390 architecture");
-> +                             "in the S390 architecture");
-
-I will drop this unrelated change.
-
->              return;
->          }
->  
-> @@ -894,10 +904,8 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->      } else if (object_dynamic_cast(OBJECT(dev), TYPE_S390_PCI_DEVICE)) {
->          pbdev = S390_PCI_DEVICE(dev);
->  
-> -        if (!s390_pci_alloc_idx(s, pbdev)) {
-> -            error_setg(errp, "no slot for plugging zpci device");
-> -            return;
-> -        }
-> +        /* the allocated idx is actually getting used */
-> +        s->next_idx = (pbdev->idx + 1) & FH_MASK_INDEX;
->          pbdev->fh = pbdev->idx;
->          QTAILQ_INSERT_TAIL(&s->zpci_devs, pbdev, link);
->          g_hash_table_insert(s->zpci_table, &pbdev->idx, pbdev);
-> @@ -1030,6 +1038,7 @@ static void s390_pcihost_class_init(ObjectClass *klass, void *data)
->  
->      dc->reset = s390_pcihost_reset;
->      dc->realize = s390_pcihost_realize;
-> +    hc->pre_plug = s390_pcihost_pre_plug;
->      hc->plug = s390_pcihost_plug;
->      hc->unplug = s390_pcihost_unplug;
->      msi_nonbroken = true;
-> 
+>  README         | 4 ++--
+>  pc-bios/README | 4 ++--
+>  2 files changed, 4 insertions(+), 4 deletions(-)
+>
+> diff --git a/README b/README
+> index 49a9fd09cd..441c33eb2f 100644
+> --- a/README
+> +++ b/README
+> @@ -54,7 +54,7 @@ Submitting patches
+>=20=20
+>  The QEMU source code is maintained under the GIT version control system.
+>=20=20
+> -   git clone git://git.qemu.org/qemu.git
+> +   git clone https://git.qemu.org/git/qemu.git
+>=20=20
+>  When submitting patches, one common approach is to use 'git
+>  format-patch' and/or 'git send-email' to format & send the mail to the
+> @@ -70,7 +70,7 @@ the QEMU website
+>=20=20
+>  The QEMU website is also maintained under source control.
+>=20=20
+> -  git clone git://git.qemu.org/qemu-web.git
+> +  git clone https://git.qemu.org/git/qemu-web.git
+>    https://www.qemu.org/2017/02/04/the-new-qemu-website-is-up/
+>=20=20
+>  A 'git-publish' utility was created to make above process less
+> diff --git a/pc-bios/README b/pc-bios/README
+> index 90f0fa7aa7..b572e9eb00 100644
+> --- a/pc-bios/README
+> +++ b/pc-bios/README
+> @@ -23,7 +23,7 @@
+>    legacy x86 software to communicate with an attached serial console as
+>    if a video card were attached.  The master sources reside in a subvers=
+ion
+>    repository at http://sgabios.googlecode.com/svn/trunk.  A git mirror is
+> -  available at git://git.qemu.org/sgabios.git.
+> +  available at https://git.qemu.org/git/sgabios.git.
+>=20=20
+>  - The PXE roms come from the iPXE project. Built with BANNER_TIME 0.
+>    Sources available at http://ipxe.org.  Vendor:Device ID -> ROM mapping:
+> @@ -40,7 +40,7 @@
+>=20=20
+>  - The u-boot binary for e500 comes from the upstream denx u-boot project=
+ where
+>    it was compiled using the qemu-ppce500 target.
+> -  A git mirror is available at: git://git.qemu.org/u-boot.git
+> +  A git mirror is available at: https://git.qemu.org/git/u-boot.git
+>    The hash used to compile the current version is: 2072e72
+>=20=20
+>  - Skiboot (https://github.com/open-power/skiboot/) is an OPAL
 
 
--- 
-
-Thanks,
-
-David / dhildenb
+--=20
+Alex Benn=C3=A9e
