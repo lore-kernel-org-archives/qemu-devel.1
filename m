@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47533)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gJTvi-0000xe-FS
-	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 20:43:51 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gJTvd-0003os-5F
+	(envelope-from <sameo@linux.intel.com>) id 1gJTvh-0000wr-WE
 	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 20:43:50 -0500
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <sameo@linux.intel.com>) id 1gJTvd-0003ok-4I
+	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 20:43:49 -0500
 From: Samuel Ortiz <sameo@linux.intel.com>
-Date: Mon,  5 Nov 2018 02:40:45 +0100
-Message-Id: <20181105014047.26447-23-sameo@linux.intel.com>
+Date: Mon,  5 Nov 2018 02:40:46 +0100
+Message-Id: <20181105014047.26447-24-sameo@linux.intel.com>
 In-Reply-To: <20181105014047.26447-1-sameo@linux.intel.com>
 References: <20181105014047.26447-1-sameo@linux.intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 22/24] hw: pci-host: piix: Return PCI host
- pointer instead of PCI bus
+Subject: [Qemu-devel] [PATCH v5 23/24] hw: i386: Set ACPI configuration PCI
+ host pointer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,136 +25,38 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Shannon Zhao <shannon.zhaosl@gmail.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Richard Henderson <rth@twiddle.net>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, xen-devel@lists.xenproject.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>
 
-For building the MCFG table, we need to track a given machine
-type PCI host pointer, and we can't get it from the bus pointer alone.
-As piix returns a PCI bus pointer, we simply modify its builder to
-return a PCI host pointer instead.
+For both PC and Q35 machine types, we can set it at the PCI host
+bridge creation time.
 
 Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
 ---
- include/hw/i386/pc.h | 21 +++++++++++----------
- hw/i386/pc_piix.c    | 18 +++++++++++-------
- hw/pci-host/piix.c   | 24 ++++++++++++------------
- 3 files changed, 34 insertions(+), 29 deletions(-)
+ hw/i386/pc_piix.c | 1 +
+ hw/i386/pc_q35.c  | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 8e5f1464eb..b6b79e146d 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -244,16 +244,17 @@ typedef struct PCII440FXState PCII440FXState;
-  */
- #define RCR_IOPORT 0xcf9
- 
--PCIBus *i440fx_init(const char *host_type, const char *pci_type,
--                    PCII440FXState **pi440fx_state, int *piix_devfn,
--                    ISABus **isa_bus, qemu_irq *pic,
--                    MemoryRegion *address_space_mem,
--                    MemoryRegion *address_space_io,
--                    ram_addr_t ram_size,
--                    ram_addr_t below_4g_mem_size,
--                    ram_addr_t above_4g_mem_size,
--                    MemoryRegion *pci_memory,
--                    MemoryRegion *ram_memory);
-+struct PCIHostState *i440fx_init(const char *host_type, const char *pci_type,
-+                                 PCII440FXState **pi440fx_state,
-+                                 int *piix_devfn,
-+                                 ISABus **isa_bus, qemu_irq *pic,
-+                                 MemoryRegion *address_space_mem,
-+                                 MemoryRegion *address_space_io,
-+                                 ram_addr_t ram_size,
-+                                 ram_addr_t below_4g_mem_size,
-+                                 ram_addr_t above_4g_mem_size,
-+                                 MemoryRegion *pci_memory,
-+                                 MemoryRegion *ram_memory);
- 
- /* piix4.c */
- extern PCIDevice *piix4_dev;
 diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 0620d10715..f5b139a3eb 100644
+index f5b139a3eb..f1f0de3585 100644
 --- a/hw/i386/pc_piix.c
 +++ b/hw/i386/pc_piix.c
-@@ -32,6 +32,7 @@
- #include "hw/display/ramfb.h"
- #include "hw/smbios/smbios.h"
- #include "hw/pci/pci.h"
-+#include "hw/pci/pci_host.h"
- #include "hw/pci/pci_ids.h"
- #include "hw/usb.h"
- #include "net/net.h"
-@@ -75,6 +76,7 @@ static void pc_init1(MachineState *machine,
-     MemoryRegion *system_memory = get_system_memory();
-     MemoryRegion *system_io = get_system_io();
-     int i;
-+    struct PCIHostState *pci_host;
-     PCIBus *pci_bus;
-     ISABus *isa_bus;
-     PCII440FXState *i440fx_state;
-@@ -196,15 +198,17 @@ static void pc_init1(MachineState *machine,
+@@ -216,6 +216,7 @@ static void pc_init1(MachineState *machine,
+         no_hpet = 1;
      }
+     isa_bus_irqs(isa_bus, pcms->gsi);
++    acpi_conf->pci_host = pci_host;
  
-     if (pcmc->pci_enabled) {
--        pci_bus = i440fx_init(host_type,
--                              pci_type,
--                              &i440fx_state, &piix3_devfn, &isa_bus, pcms->gsi,
--                              system_memory, system_io, machine->ram_size,
--                              acpi_conf->below_4g_mem_size,
--                              acpi_conf->above_4g_mem_size,
--                              pci_memory, ram_memory);
-+        pci_host = i440fx_init(host_type,
-+                               pci_type,
-+                               &i440fx_state, &piix3_devfn, &isa_bus, pcms->gsi,
-+                               system_memory, system_io, machine->ram_size,
-+                               acpi_conf->below_4g_mem_size,
-+                               acpi_conf->above_4g_mem_size,
-+                               pci_memory, ram_memory);
-+        pci_bus = pci_host->bus;
-         pcms->bus = pci_bus;
-     } else {
-+        pci_host = NULL;
-         pci_bus = NULL;
-         i440fx_state = NULL;
-         isa_bus = isa_bus_new(NULL, get_system_memory(), system_io,
-diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
-index 658460264b..4a412db44c 100644
---- a/hw/pci-host/piix.c
-+++ b/hw/pci-host/piix.c
-@@ -342,17 +342,17 @@ static void i440fx_realize(PCIDevice *dev, Error **errp)
-     }
- }
- 
--PCIBus *i440fx_init(const char *host_type, const char *pci_type,
--                    PCII440FXState **pi440fx_state,
--                    int *piix3_devfn,
--                    ISABus **isa_bus, qemu_irq *pic,
--                    MemoryRegion *address_space_mem,
--                    MemoryRegion *address_space_io,
--                    ram_addr_t ram_size,
--                    ram_addr_t below_4g_mem_size,
--                    ram_addr_t above_4g_mem_size,
--                    MemoryRegion *pci_address_space,
--                    MemoryRegion *ram_memory)
-+struct PCIHostState *i440fx_init(const char *host_type, const char *pci_type,
-+                                 PCII440FXState **pi440fx_state,
-+                                 int *piix3_devfn,
-+                                 ISABus **isa_bus, qemu_irq *pic,
-+                                 MemoryRegion *address_space_mem,
-+                                 MemoryRegion *address_space_io,
-+                                 ram_addr_t ram_size,
-+                                 ram_addr_t below_4g_mem_size,
-+                                 ram_addr_t above_4g_mem_size,
-+                                 MemoryRegion *pci_address_space,
-+                                 MemoryRegion *ram_memory)
- {
-     DeviceState *dev;
-     PCIBus *b;
-@@ -442,7 +442,7 @@ PCIBus *i440fx_init(const char *host_type, const char *pci_type,
- 
-     i440fx_update_memory_mappings(f);
- 
--    return b;
-+    return s;
- }
- 
- /* PIIX3 PCI to ISA bridge */
+     if (kvm_pic_in_kernel()) {
+         i8259 = kvm_i8259_init(isa_bus);
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index cdde4a4beb..a8772e29a5 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -188,6 +188,7 @@ static void pc_q35_init(MachineState *machine)
+     qdev_init_nofail(DEVICE(q35_host));
+     phb = PCI_HOST_BRIDGE(q35_host);
+     host_bus = phb->bus;
++    acpi_conf->pci_host = phb;
+     /* create ISA bus */
+     lpc = pci_create_simple_multifunction(host_bus, PCI_DEVFN(ICH9_LPC_DEV,
+                                           ICH9_LPC_FUNC), true,
 -- 
 2.19.1
