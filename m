@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35381)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gJeGD-0006oH-Kx
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 07:45:44 -0500
+	(envelope-from <david@redhat.com>) id 1gJeHD-0007T3-8H
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 07:46:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gJeG9-0000tN-N5
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 07:45:39 -0500
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:38335)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <artem.k.pisarenko@gmail.com>)
-	id 1gJeG6-0000Dj-16
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 07:45:35 -0500
-Received: by mail-lj1-x242.google.com with SMTP id q186-v6so7872471ljb.5
-	for <qemu-devel@nongnu.org>; Mon, 05 Nov 2018 04:45:21 -0800 (PST)
-From: Artem Pisarenko <artem.k.pisarenko@gmail.com>
-Date: Mon,  5 Nov 2018 18:45:10 +0600
-Message-Id: <ae16b7e9df62708e0556a13a1efa8aa2628c1c56.1541421653.git.artem.k.pisarenko@gmail.com>
-In-Reply-To: <cover.1541421653.git.artem.k.pisarenko@gmail.com>
-References: <cover.1541421653.git.artem.k.pisarenko@gmail.com>
-In-Reply-To: <cover.1541421653.git.artem.k.pisarenko@gmail.com>
-References: <cover.1541421653.git.artem.k.pisarenko@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 2/2] tests/test-char: add muxed chardev
- testing for open/close
+	(envelope-from <david@redhat.com>) id 1gJeGu-0002UM-EW
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 07:46:29 -0500
+References: <20181105110313.29312-1-david@redhat.com>
+	<20181105110313.29312-5-david@redhat.com>
+	<b114a7d0-1e56-2294-484c-f4143cfd989e@redhat.com>
+	<20181105134118.01fef179.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <b38c2f96-46ed-db0f-86b7-dc458ac80ee8@redhat.com>
+Date: Mon, 5 Nov 2018 13:46:10 +0100
+MIME-Version: 1.0
+In-Reply-To: <20181105134118.01fef179.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 4/4] s390x/zpci: properly fail if the
+ zPCI device cannot be created
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,131 +27,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Artem Pisarenko <artem.k.pisarenko@gmail.com>
+To: Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, =Collin Walling <walling@linux.ibm.com>
 
-Validate that frontend callbacks for CHR_EVENT_OPENED/CHR_EVENT_CLOSED
-events are being issued when expected and in strictly pairing order.
+On 05.11.18 13:41, Cornelia Huck wrote:
+> On Mon, 5 Nov 2018 13:04:04 +0100
+> Thomas Huth <thuth@redhat.com> wrote:
+> 
+>> On 2018-11-05 12:03, David Hildenbrand wrote:
+>>> Right now, errors during realize()/pre_plug/plug of the zPCI device
+>>> would result in QEMU crashing instead of failing nicely when creating
+>>> a zPCI device for a PCI device.
+> 
+> Yeah, failing instead of crashing is better :)
+> 
+> Is there any way we can trigger this problem for testing?
 
-Signed-off-by: Artem Pisarenko <artem.k.pisarenko@gmail.com>
----
- tests/test-char.c | 80 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 78 insertions(+), 2 deletions(-)
+I guess trying to add more PCI devices (with implicit zPCI devices
+getting created) than we have zPCI slots should be enough. So making
+e.g. s390_pci_alloc_idx() fail.
 
-diff --git a/tests/test-char.c b/tests/test-char.c
-index 831e37f..657cb4c 100644
---- a/tests/test-char.c
-+++ b/tests/test-char.c
-@@ -16,6 +16,9 @@ static bool quit;
- 
- typedef struct FeHandler {
-     int read_count;
-+    bool is_open;
-+    int openclose_count;
-+    bool openclose_mismatch;
-     int last_event;
-     char read_buf[128];
- } FeHandler;
-@@ -49,10 +52,24 @@ static void fe_read(void *opaque, const uint8_t *buf, int size)
- static void fe_event(void *opaque, int event)
- {
-     FeHandler *h = opaque;
-+    bool new_open_state;
- 
-     h->last_event = event;
--    if (event != CHR_EVENT_BREAK) {
-+    switch (event) {
-+    case CHR_EVENT_BREAK:
-+        break;
-+    case CHR_EVENT_OPENED:
-+    case CHR_EVENT_CLOSED:
-+        h->openclose_count++;
-+        new_open_state = (event == CHR_EVENT_OPENED);
-+        if (h->is_open == new_open_state) {
-+            h->openclose_mismatch = true;
-+        }
-+        h->is_open = new_open_state;
-+        /* no break */
-+    default:
-         quit = true;
-+        break;
-     }
- }
- 
-@@ -161,7 +178,7 @@ static void char_mux_test(void)
-     QemuOpts *opts;
-     Chardev *chr, *base;
-     char *data;
--    FeHandler h1 = { 0, }, h2 = { 0, };
-+    FeHandler h1 = { 0, false, 0, false, }, h2 = { 0, false, 0, false, };
-     CharBackend chr_be1, chr_be2;
- 
-     opts = qemu_opts_create(qemu_find_opts("chardev"), "mux-label",
-@@ -233,6 +250,65 @@ static void char_mux_test(void)
-     g_assert_cmpint(h1.last_event, ==, CHR_EVENT_BREAK);
-     g_assert_cmpint(h2.last_event, ==, CHR_EVENT_MUX_OUT);
- 
-+    /* open/close state and corresponding events */
-+    g_assert_true(qemu_chr_fe_backend_open(&chr_be1));
-+    g_assert_true(qemu_chr_fe_backend_open(&chr_be2));
-+    g_assert_true(h1.is_open);
-+    g_assert_false(h1.openclose_mismatch);
-+    g_assert_true(h2.is_open);
-+    g_assert_false(h2.openclose_mismatch);
-+
-+    h1.openclose_count = h2.openclose_count = 0;
-+
-+    qemu_chr_fe_set_handlers(&chr_be1, NULL, NULL, NULL, NULL,
-+                             NULL, NULL, false);
-+    qemu_chr_fe_set_handlers(&chr_be2, NULL, NULL, NULL, NULL,
-+                             NULL, NULL, false);
-+    g_assert_cmpint(h1.openclose_count, ==, 0);
-+    g_assert_cmpint(h2.openclose_count, ==, 0);
-+
-+    h1.is_open = h2.is_open = false;
-+    qemu_chr_fe_set_handlers(&chr_be1,
-+                             NULL,
-+                             NULL,
-+                             fe_event,
-+                             NULL,
-+                             &h1,
-+                             NULL, false);
-+    qemu_chr_fe_set_handlers(&chr_be2,
-+                             NULL,
-+                             NULL,
-+                             fe_event,
-+                             NULL,
-+                             &h2,
-+                             NULL, false);
-+    g_assert_cmpint(h1.openclose_count, ==, 1);
-+    g_assert_false(h1.openclose_mismatch);
-+    g_assert_cmpint(h2.openclose_count, ==, 1);
-+    g_assert_false(h2.openclose_mismatch);
-+
-+    qemu_chr_be_event(base, CHR_EVENT_CLOSED);
-+    qemu_chr_be_event(base, CHR_EVENT_OPENED);
-+    g_assert_cmpint(h1.openclose_count, ==, 3);
-+    g_assert_false(h1.openclose_mismatch);
-+    g_assert_cmpint(h2.openclose_count, ==, 3);
-+    g_assert_false(h2.openclose_mismatch);
-+
-+    qemu_chr_fe_set_handlers(&chr_be2,
-+                             fe_can_read,
-+                             fe_read,
-+                             fe_event,
-+                             NULL,
-+                             &h2,
-+                             NULL, false);
-+    qemu_chr_fe_set_handlers(&chr_be1,
-+                             fe_can_read,
-+                             fe_read,
-+                             fe_event,
-+                             NULL,
-+                             &h1,
-+                             NULL, false);
-+
-     /* remove first handler */
-     qemu_chr_fe_set_handlers(&chr_be1, NULL, NULL, NULL, NULL,
-                              NULL, NULL, true);
+(FH_MASK_INDEX = 0x0000ffff implies 65536 devices, which is not really
+easy to test ;) )
+
+Same would happen when running out of uids ... more unlikely to happen ;)
+
+> 
+>>>
+>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>> ---
+>>>  hw/s390x/s390-pci-bus.c | 25 +++++++++++++++++++------
+>>>  1 file changed, 19 insertions(+), 6 deletions(-)
+>>>
+>>> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+>>> index 1849f9d334..4939490c7c 100644
+>>> --- a/hw/s390x/s390-pci-bus.c
+>>> +++ b/hw/s390x/s390-pci-bus.c
+>>> @@ -778,17 +778,31 @@ static void s390_pci_msix_free(S390PCIBusDevice *pbdev)
+>>>  }
+>>>  
+>>>  static S390PCIBusDevice *s390_pci_device_new(S390pciState *s,
+>>> -                                             const char *target)
+>>> +                                             const char *target, Error **errp)
+>>>  {
+>>> -    DeviceState *dev = NULL;
+>>> +    Error *local_err = NULL;
+>>> +    DeviceState *dev;
+>>>  
+>>>      dev = qdev_try_create(BUS(s->bus), TYPE_S390_PCI_DEVICE);
+>>>      if (!dev) {
+>>> +        error_setg(errp, "zPCI device could not be created");
+>>>          return NULL;
+>>>      }
+>>>  
+>>> -    qdev_prop_set_string(dev, "target", target);
+>>> -    qdev_init_nofail(dev);
+>>> +    object_property_set_str(OBJECT(dev), "target", target, &local_err);
+>>> +    if (local_err) {
+>>> +        object_unparent(OBJECT(dev));
+>>> +        error_propagate_prepend(errp, local_err,
+>>> +                                "zPCI device could not be created: ");
+>>> +        return NULL;
+>>> +    }
+>>> +    object_property_set_bool(OBJECT(dev), true, "realized", &local_err);
+>>> +    if (local_err) {
+>>> +        object_unparent(OBJECT(dev));
+>>> +        error_propagate_prepend(errp, local_err,
+>>> +                                "zPCI device could not be created: ");
+>>> +        return NULL;
+>>> +    }
+>>>  
+>>>      return S390_PCI_DEVICE(dev);
+>>>  }
+>>> @@ -873,9 +887,8 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>>>  
+>>>          pbdev = s390_pci_find_dev_by_target(s, dev->id);
+>>>          if (!pbdev) {
+>>> -            pbdev = s390_pci_device_new(s, dev->id);
+>>> +            pbdev = s390_pci_device_new(s, dev->id, errp);
+>>>              if (!pbdev) {
+>>> -                error_setg(errp, "create zpci device failed");
+>>>                  return;
+>>>              }
+>>>          }
+>>>   
+>>
+>> Looks right to me, I think this is even suitable for v3.1.
+> 
+> I can consider this for 3.1. Is this patch standalone?
+
+Yes I think so.
+
+> 
+>>
+>> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>>
+>>
+> 
+
+
 -- 
-2.7.4
+
+Thanks,
+
+David / dhildenb
