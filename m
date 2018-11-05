@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53923)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brad@comstyle.com>) id 1gJniK-0007ct-W4
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 17:51:28 -0500
+	(envelope-from <eblake@redhat.com>) id 1gJnis-0007bB-8r
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 17:51:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brad@comstyle.com>) id 1gJnc9-0004se-LJ
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 17:45:02 -0500
-Received: from speedy.comstyle.com ([206.51.28.2]:42911 helo=mail.comstyle.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <brad@comstyle.com>) id 1gJnc9-0004H7-Ap
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 17:44:57 -0500
-Received: from mail.comstyle.com (localhost [127.0.0.1])
-	by mail.comstyle.com (Postfix) with ESMTP id 42pnmS1fSNz4glt
-	for <qemu-devel@nongnu.org>; Mon,  5 Nov 2018 17:44:24 -0500 (EST)
-Received: from [192.168.180.2] (toroon0812w-lp140-01-64-229-15-172.dsl.bell.ca
-	[64.229.15.172])
-	(using TLSv1.2 with cipher AES128-SHA (128/128 bits))
-	(No client certificate requested) (Authenticated sender: brad)
-	by mail.comstyle.com (Postfix) with ESMTPSA id 42pnmS0hQ2z4gls
-	for <qemu-devel@nongnu.org>; Mon,  5 Nov 2018 17:44:24 -0500 (EST)
-From: Brad Smith <brad@comstyle.com>
-References: <20181019125239.GA13884@humpty.home.comstyle.com>
-Message-ID: <1aee9b00-dd53-4e10-e56d-dc0c5628edec@comstyle.com>
-Date: Mon, 5 Nov 2018 17:44:33 -0500
+	(envelope-from <eblake@redhat.com>) id 1gJnZ0-00070D-JH
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 17:41:44 -0500
+References: <20181009132330.7549-1-berrange@redhat.com>
+	<20181009132330.7549-2-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <1baede2d-7113-be2c-62dd-9f5ce6425bb1@redhat.com>
+Date: Mon, 5 Nov 2018 16:41:09 -0600
 MIME-Version: 1.0
-In-Reply-To: <20181019125239.GA13884@humpty.home.comstyle.com>
+In-Reply-To: <20181009132330.7549-2-berrange@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v3] oslib-posix: Use MAP_STACK in
- qemu_alloc_stack() on OpenBSD
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 1/6] qemu-nbd: add support for
+ authorization of TLS clients
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,63 +25,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, libvir-list@redhat.com, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Juan Quintela <quintela@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-ping.
+On 10/9/18 8:23 AM, Daniel P. Berrang=C3=A9 wrote:
+> From: "Daniel P. Berrange" <berrange@redhat.com>
+>=20
+> Currently any client which can complete the TLS handshake is able to us=
+e
+> the NBD server. The server admin can turn on the 'verify-peer' option
+> for the x509 creds to require the client to provide a x509 certificate.
+> This means the client will have to acquire a certificate from the CA
+> before they are permitted to use the NBD server. This is still a fairly
+> low bar to cross.
+>=20
+> This adds a '--tls-authz OBJECT-ID' option to the qemu-nbd command whic=
+h
+> takes the ID of a previously added 'QAuthZ' object instance. This will
+> be used to validate the client's x509 distinguished name. Clients
+> failing the authorization check will not be permitted to use the NBD
+> server.
+>=20
+> For example to setup authorization that only allows connection from a c=
+lient
+> whose x509 certificate distinguished name is
+>=20
+>     CN=3Dlaptop.example.com,O=3DExample Org,L=3DLondon,ST=3DLondon,C=3D=
+GB
+>=20
+> use:
+>=20
+>    qemu-nbd --object tls-creds-x509,id=3Dtls0,dir=3D/home/berrange/qemu=
+tls,\
+>                      endpoint=3Dserver,verify-peer=3Dyes \
+>             --object authz-simple,id=3Dauth0,identity=3DCN=3Dlaptop.exa=
+mple.com,,\
+>                      O=3DExample Org,,L=3DLondon,,ST=3DLondon,,C=3DGB \
 
-On 10/19/2018 8:52 AM, Brad Smith wrote:
-> Use MAP_STACK in qemu_alloc_stack() on OpenBSD.
->
-> Added to our 6.4 release.
->
-> MAP_STACK      Indicate that the mapping is used as a stack.  This
->                 flag must be used in combination with MAP_ANON and
->                 MAP_PRIVATE.
->
-> Implement MAP_STACK option for mmap().  Synchronous faults (pagefault and
-> syscall) confirm the stack register points at MAP_STACK memory, otherwise
-> SIGSEGV is delivered. sigaltstack() and pthread_attr_setstack() are modified
-> to create a MAP_STACK sub-region which satisfies alignment requirements.
-> Observe that MAP_STACK can only be set/cleared by mmap(), which zeroes the
-> contents of the region -- there is no mprotect() equivalent operation, so
-> there is no MAP_STACK-adding gadget.
->
->
-> Signed-off-by: Brad Smith <brad@comstyle.com>
-> Reviewed-by: Kamil Rytarowski <n54@gmx.com>
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
->
-> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-> index fbd0dc8c57..c1bee2a581 100644
-> --- a/util/oslib-posix.c
-> +++ b/util/oslib-posix.c
-> @@ -596,6 +596,7 @@ pid_t qemu_fork(Error **errp)
->   void *qemu_alloc_stack(size_t *sz)
->   {
->       void *ptr, *guardpage;
-> +    int flags;
->   #ifdef CONFIG_DEBUG_STACK_USAGE
->       void *ptr2;
->   #endif
-> @@ -610,8 +611,18 @@ void *qemu_alloc_stack(size_t *sz)
->       /* allocate one extra page for the guard page */
->       *sz += pagesz;
->   
-> -    ptr = mmap(NULL, *sz, PROT_READ | PROT_WRITE,
-> -               MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-> +    flags = MAP_PRIVATE | MAP_ANONYMOUS;
-> +#if defined(MAP_STACK) && defined(__OpenBSD__)
-> +    /* Only enable MAP_STACK on OpenBSD. Other OS's such as
-> +     * Linux/FreeBSD/NetBSD have a flag with the same name
-> +     * but have differing functionality. OpenBSD will SEGV
-> +     * if it spots execution with a stack pointer pointing
-> +     * at memory that was not allocated with MAP_STACK.
-> +     */
-> +    flags |= MAP_STACK;
-> +#endif
-> +
-> +    ptr = mmap(NULL, *sz, PROT_READ | PROT_WRITE, flags, -1, 0);
->       if (ptr == MAP_FAILED) {
->           perror("failed to allocate memory for stack");
->           abort();
->
+Missing shell quoting around the space in 'Example Org'. It's also=20
+fairly obvious that actual shell commands can't have leading space=20
+between \-newline line continuations.
+
+>             --tls-creds tls0 \
+>             --tls-authz authz0
+> 	   ....other qemu-nbd args...
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>   include/block/nbd.h |  2 +-
+>   nbd/server.c        | 10 +++++-----
+>   qemu-nbd.c          | 13 ++++++++++++-
+>   qemu-nbd.texi       |  4 ++++
+>   4 files changed, 22 insertions(+), 7 deletions(-)
+>=20
+
+> +++ b/qemu-nbd.c
+> @@ -52,6 +52,7 @@
+>   #define QEMU_NBD_OPT_TLSCREDS      261
+>   #define QEMU_NBD_OPT_IMAGE_OPTS    262
+>   #define QEMU_NBD_OPT_FORK          263
+> +#define QEMU_NBD_OPT_TLSAUTHZ      264
+>  =20
+
+> @@ -532,6 +534,7 @@ int main(int argc, char **argv)
+>           { "image-opts", no_argument, NULL, QEMU_NBD_OPT_IMAGE_OPTS },
+>           { "trace", required_argument, NULL, 'T' },
+>           { "fork", no_argument, NULL, QEMU_NBD_OPT_FORK },
+> +        { "tls-authz", no_argument, NULL, QEMU_NBD_OPT_TLSAUTHZ },
+>           { NULL, 0, NULL, 0 }
+>       };
+
+Missing a change to qemu-nbd --help to describe the new option.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
