@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34498)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gJeCV-0003e0-Q9
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 07:41:52 -0500
+	(envelope-from <fziglio@redhat.com>) id 1gJeCs-0003od-VF
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 07:42:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gJeCS-0002un-KO
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 07:41:51 -0500
-Date: Mon, 5 Nov 2018 13:41:18 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20181105134118.01fef179.cohuck@redhat.com>
-In-Reply-To: <b114a7d0-1e56-2294-484c-f4143cfd989e@redhat.com>
-References: <20181105110313.29312-1-david@redhat.com>
-	<20181105110313.29312-5-david@redhat.com>
-	<b114a7d0-1e56-2294-484c-f4143cfd989e@redhat.com>
+	(envelope-from <fziglio@redhat.com>) id 1gJeCp-0003iX-JX
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 07:42:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49758)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <fziglio@redhat.com>) id 1gJeCp-0003fY-A5
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 07:42:11 -0500
+Date: Mon, 5 Nov 2018 07:42:09 -0500 (EST)
+From: Frediano Ziglio <fziglio@redhat.com>
+Message-ID: <1678079774.40522989.1541421729839.JavaMail.zimbra@redhat.com>
+In-Reply-To: <1541420337.16655.496.camel@redhat.com>
+References: <20181017143604.5194-1-lhrazky@redhat.com>
+	<20181017143604.5194-2-lhrazky@redhat.com>
+	<1506037511.34884353.1539846969311.JavaMail.zimbra@redhat.com>
+	<1540208764.16655.240.camel@redhat.com>
+	<1541087251.16655.419.camel@redhat.com>
+	<20181105065258.4mpdv5w4rp3eui5p@sirius.home.kraxel.org>
+	<1541420337.16655.496.camel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 4/4] s390x/zpci: properly fail if the
- zPCI device cannot be created
+Subject: Re: [Qemu-devel] [RFC PATCH spice v2 1/2] QXL interface: add
+ functions to identify monitors in the guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,86 +33,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, "Michael S
-	. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, =Collin Walling <walling@linux.ibm.com>
+To: =?utf-8?B?THVrw6HFoSBIcsOhemvDvQ==?= <lhrazky@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, spice-devel@lists.freedesktop.org, qemu-devel@nongnu.org
 
-On Mon, 5 Nov 2018 13:04:04 +0100
-Thomas Huth <thuth@redhat.com> wrote:
-
-> On 2018-11-05 12:03, David Hildenbrand wrote:
-> > Right now, errors during realize()/pre_plug/plug of the zPCI device
-> > would result in QEMU crashing instead of failing nicely when creating
-> > a zPCI device for a PCI device.
-
-Yeah, failing instead of crashing is better :)
-
-Is there any way we can trigger this problem for testing?
-
+> On Mon, 2018-11-05 at 07:52 +0100, Gerd Hoffmann wrote:
+> > > 2. Have a single function as follows:
+> > > 
+> > > void spice_qxl_set_device_info(QXLInstance *instance,
+> > >                                const char *device_address,
+> > >                                uint32_t device_display_id_start,
+> > >                                uint32_t device_display_id_count);
 > > 
-> > Signed-off-by: David Hildenbrand <david@redhat.com>
-> > ---
-> >  hw/s390x/s390-pci-bus.c | 25 +++++++++++++++++++------
-> >  1 file changed, 19 insertions(+), 6 deletions(-)
+> > How about:
 > > 
-> > diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> > index 1849f9d334..4939490c7c 100644
-> > --- a/hw/s390x/s390-pci-bus.c
-> > +++ b/hw/s390x/s390-pci-bus.c
-> > @@ -778,17 +778,31 @@ static void s390_pci_msix_free(S390PCIBusDevice *pbdev)
-> >  }
-> >  
-> >  static S390PCIBusDevice *s390_pci_device_new(S390pciState *s,
-> > -                                             const char *target)
-> > +                                             const char *target, Error **errp)
-> >  {
-> > -    DeviceState *dev = NULL;
-> > +    Error *local_err = NULL;
-> > +    DeviceState *dev;
-> >  
-> >      dev = qdev_try_create(BUS(s->bus), TYPE_S390_PCI_DEVICE);
-> >      if (!dev) {
-> > +        error_setg(errp, "zPCI device could not be created");
-> >          return NULL;
-> >      }
-> >  
-> > -    qdev_prop_set_string(dev, "target", target);
-> > -    qdev_init_nofail(dev);
-> > +    object_property_set_str(OBJECT(dev), "target", target, &local_err);
-> > +    if (local_err) {
-> > +        object_unparent(OBJECT(dev));
-> > +        error_propagate_prepend(errp, local_err,
-> > +                                "zPCI device could not be created: ");
-> > +        return NULL;
-> > +    }
-> > +    object_property_set_bool(OBJECT(dev), true, "realized", &local_err);
-> > +    if (local_err) {
-> > +        object_unparent(OBJECT(dev));
-> > +        error_propagate_prepend(errp, local_err,
-> > +                                "zPCI device could not be created: ");
-> > +        return NULL;
-> > +    }
-> >  
-> >      return S390_PCI_DEVICE(dev);
-> >  }
-> > @@ -873,9 +887,8 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-> >  
-> >          pbdev = s390_pci_find_dev_by_target(s, dev->id);
-> >          if (!pbdev) {
-> > -            pbdev = s390_pci_device_new(s, dev->id);
-> > +            pbdev = s390_pci_device_new(s, dev->id, errp);
-> >              if (!pbdev) {
-> > -                error_setg(errp, "create zpci device failed");
-> >                  return;
-> >              }
-> >          }
-> >   
+> > void spice_qxl_set_device_info(QXLInstance *instance,
+> >                                const char *device_address,
+> >                                uint32_t device_display_id);
+> > 
+> > I don't think we need start+count:
+> > 
+> >  * For single-head devices device_display_id will be zero.
+> >  * For one-channel-per-head multihead devices (i.e. virtio-gpu)
+> >    device_display_id will enumerate the heads (so everybody can figure
+> >    which channel is which head).
+> >  * For one-channel-per-device multihead devices (i.e. qxl/linux)
+> >    device_display_id will be zero too.  Number of heads is set via
+> >    spice_qxl_set_max_monitors().
 > 
-> Looks right to me, I think this is even suitable for v3.1.
+> That requires nontrivial and unexpected logic for the one-channel-per-
+> device multihead devices case. The API should be doing what it says and
+>  the dumber the better, this seems too smart to me...
+> 
+> That said, I don't find it significantly worse than the other options
+> (none of which seems great), so I'd just like we reached some consesus
+> and be done with it...
+> 
+> Cheers,
+> Lukas
+> 
+> > cheers,
+> >   Gerd
+> > 
 
-I can consider this for 3.1. Is this patch standalone?
+Personally I prefer the single function API, either with or without count.
 
-> 
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> 
-> 
+About the not trivial for compatibility you'll have to support Qemu versions
+that either:
+- does not call new APIs or spice_qxl_set_max_monitors. A QXL card will have
+  the maximum possible number of monitors in the guest;
+- does not call new APIs but call spice_qxl_set_max_monitors. A QXL card will
+  have a maximum of monitor specified by spice_qxl_set_max_monitors in the
+  guest;
+- call new APIs (the choice in this case to call spice_qxl_set_max_monitors
+  or not is yours).
+
+Frediano
