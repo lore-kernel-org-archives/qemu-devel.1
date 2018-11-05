@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36165)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Liam.Merwick@oracle.com>) id 1gJmaL-0007ES-1q
+	(envelope-from <Liam.Merwick@oracle.com>) id 1gJmaL-0007ER-0o
 	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 16:39:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Liam.Merwick@oracle.com>) id 1gJmaH-0003Ac-AS
+	(envelope-from <Liam.Merwick@oracle.com>) id 1gJmaH-0003Ae-AL
 	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 16:39:00 -0500
 From: Liam Merwick <Liam.Merwick@oracle.com>
-Date: Mon,  5 Nov 2018 21:38:39 +0000
-Message-Id: <1541453919-25973-6-git-send-email-Liam.Merwick@oracle.com>
+Date: Mon,  5 Nov 2018 21:38:35 +0000
+Message-Id: <1541453919-25973-2-git-send-email-Liam.Merwick@oracle.com>
 In-Reply-To: <1541453919-25973-1-git-send-email-Liam.Merwick@oracle.com>
 References: <1541453919-25973-1-git-send-email-Liam.Merwick@oracle.com>
-Subject: [Qemu-devel] [PATCH v5 5/5] qcow2: Read outside array bounds in
- qcow2_pre_write_overlap_check()
+Subject: [Qemu-devel] [PATCH v5 1/5] job: Fix off-by-one assert checks for
+ JobSTT and JobVerbTable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,50 +23,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, jsnow@redhat.com, berrange@redhat.com, mreitz@redhat.com
 
-The commit for 0e4e4318eaa5 increments QCOW2_OL_MAX_BITNR but does not
-add an array entry for QCOW2_OL_BITMAP_DIRECTORY_BITNR to metadata_ol_names[].
-As a result, an array dereference of metadata_ol_names[8] in
-qcow2_pre_write_overlap_check() could result in a read outside of the array bounds.
+In the assert checking the array dereference of JobVerbTable[verb]
+in job_apply_verb() the check of the index, verb, allows an overrun
+because an index equal to the array size is permitted.
 
-Fixes: 0e4e4318eaa5 ('qcow2: add overlap check for bitmap directory')
+Similarly, in the assert check of JobSTT[s0][s1] with index s1
+in job_state_transition(), an off-by-one overrun is not flagged
+either.
 
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+This is not a run-time issue as there are no callers actually
+passing in the max value.
+
 Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
+Reviewed-by: Darren Kenny <Darren.Kenny@oracle.com>
+Reviewed-by: Mark Kanda <Mark.Kanda@oracle.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- block/qcow2-refcount.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
+ job.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index 3c539f02e5ec..46082aeac1d6 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -2719,15 +2719,17 @@ int qcow2_check_metadata_overlap(BlockDriverState *bs, int ign, int64_t offset,
- }
- 
- static const char *metadata_ol_names[] = {
--    [QCOW2_OL_MAIN_HEADER_BITNR]    = "qcow2_header",
--    [QCOW2_OL_ACTIVE_L1_BITNR]      = "active L1 table",
--    [QCOW2_OL_ACTIVE_L2_BITNR]      = "active L2 table",
--    [QCOW2_OL_REFCOUNT_TABLE_BITNR] = "refcount table",
--    [QCOW2_OL_REFCOUNT_BLOCK_BITNR] = "refcount block",
--    [QCOW2_OL_SNAPSHOT_TABLE_BITNR] = "snapshot table",
--    [QCOW2_OL_INACTIVE_L1_BITNR]    = "inactive L1 table",
--    [QCOW2_OL_INACTIVE_L2_BITNR]    = "inactive L2 table",
-+    [QCOW2_OL_MAIN_HEADER_BITNR]        = "qcow2_header",
-+    [QCOW2_OL_ACTIVE_L1_BITNR]          = "active L1 table",
-+    [QCOW2_OL_ACTIVE_L2_BITNR]          = "active L2 table",
-+    [QCOW2_OL_REFCOUNT_TABLE_BITNR]     = "refcount table",
-+    [QCOW2_OL_REFCOUNT_BLOCK_BITNR]     = "refcount block",
-+    [QCOW2_OL_SNAPSHOT_TABLE_BITNR]     = "snapshot table",
-+    [QCOW2_OL_INACTIVE_L1_BITNR]        = "inactive L1 table",
-+    [QCOW2_OL_INACTIVE_L2_BITNR]        = "inactive L2 table",
-+    [QCOW2_OL_BITMAP_DIRECTORY_BITNR]   = "bitmap directory",
- };
-+QEMU_BUILD_BUG_ON(QCOW2_OL_MAX_BITNR != ARRAY_SIZE(metadata_ol_names));
- 
- /*
-  * First performs a check for metadata overlaps (through
+diff --git a/job.c b/job.c
+index c65e01bbfa34..da8e4b7bf2f3 100644
+--- a/job.c
++++ b/job.c
+@@ -159,7 +159,7 @@ bool job_is_internal(Job *job)
+ static void job_state_transition(Job *job, JobStatus s1)
+ {
+     JobStatus s0 = job->status;
+-    assert(s1 >= 0 && s1 <= JOB_STATUS__MAX);
++    assert(s1 >= 0 && s1 < JOB_STATUS__MAX);
+     trace_job_state_transition(job, job->ret,
+                                JobSTT[s0][s1] ? "allowed" : "disallowed",
+                                JobStatus_str(s0), JobStatus_str(s1));
+@@ -174,7 +174,7 @@ static void job_state_transition(Job *job, JobStatus s1)
+ int job_apply_verb(Job *job, JobVerb verb, Error **errp)
+ {
+     JobStatus s0 = job->status;
+-    assert(verb >= 0 && verb <= JOB_VERB__MAX);
++    assert(verb >= 0 && verb < JOB_VERB__MAX);
+     trace_job_apply_verb(job, JobStatus_str(s0), JobVerb_str(verb),
+                          JobVerbTable[verb][s0] ? "allowed" : "prohibited");
+     if (JobVerbTable[verb][s0]) {
 -- 
 1.8.3.1
