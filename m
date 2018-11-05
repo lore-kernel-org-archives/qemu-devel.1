@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46642)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gJSuL-000165-MK
-	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 19:38:27 -0500
+	(envelope-from <sameo@linux.intel.com>) id 1gJTtf-0005zV-TM
+	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 20:41:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gJSiE-0002Vh-Ox
-	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 19:25:51 -0500
-References: <20181019164929.18404-1-mreitz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <4f706491-2583-d74a-14e8-6d55bffd6b94@redhat.com>
-Date: Mon, 5 Nov 2018 01:25:39 +0100
+	(envelope-from <sameo@linux.intel.com>) id 1gJTta-0000nY-U8
+	for qemu-devel@nongnu.org; Sun, 04 Nov 2018 20:41:43 -0500
+From: Samuel Ortiz <sameo@linux.intel.com>
+Date: Mon,  5 Nov 2018 02:40:23 +0100
+Message-Id: <20181105014047.26447-1-sameo@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20181019164929.18404-1-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="vmSE3lASOvoktWUQ1y3zi4RiNufGR2jLk"
-Subject: Re: [Qemu-devel] [PATCH v2 0/5] Various option help readability
- improvement suggestions
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v5 00/24] ACPI reorganization for
+ hardware-reduced API addition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,189 +21,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Shannon Zhao <shannon.zhaosl@gmail.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Richard Henderson <rth@twiddle.net>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, xen-devel@lists.xenproject.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---vmSE3lASOvoktWUQ1y3zi4RiNufGR2jLk
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?=
- <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>
-Message-ID: <4f706491-2583-d74a-14e8-6d55bffd6b94@redhat.com>
-Subject: Re: [PATCH v2 0/5] Various option help readability improvement
- suggestions
-References: <20181019164929.18404-1-mreitz@redhat.com>
-In-Reply-To: <20181019164929.18404-1-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+This patch set provides an ACPI code reorganization in preparation for
+adding a shared hardware-reduced ACPI API to QEMU.
 
-Ping.  I don't quite want the help output to change in 3.1 only to
-change it to something else in 3.2.
+The changes are coming from the NEMU [1] project where we're defining
+a new x86 machine type: i386/virt. This is an EFI only, ACPI
+hardware-reduced platform that is built on top of a generic
+hardware-reduced ACPI API [2]. This API was initially based off the
+generic parts of the arm/virt-acpi-build.c implementation, and the goal
+is for both i386/virt and arm/virt to duplicate as little code as
+possible by using this new, shared API.
 
-(And at some point into freeze we have to consider just merging one of
-the many simple 082 reference output "fixes", which I really don't want,
-because I still consider the test "broken for a reason"(tm).)
+As a preliminary for adding this hardware-reduced ACPI API to QEMU, we did
+some ACPI code reorganization with the following goals:
 
-Max
+* Share as much as possible of the current ACPI build APIs between
+  legacy and hardware-reduced ACPI.
+* Share the ACPI build code across machine types and architectures and
+  remove the typical PC machine type dependency.
 
+The patches are also available in their own git branch [3].
 
-On 19.10.18 18:49, Max Reitz wrote:
-> I noticed that with the (more or less) recent series from Marc-Andr=C3=A9=
- the
-> output of qemu-img amend -f qcow2 -o help changed to this:
->=20
-> $ ./qemu-img amend -f qcow2 -o help
-> Creation options for 'qcow2':
-> qcow2-create-opts.backing_file=3Dstr - File name of a base image
-> qcow2-create-opts.backing_fmt=3Dstr - Image format of the base image
-> qcow2-create-opts.cluster_size=3Dsize - qcow2 cluster size
-> qcow2-create-opts.compat=3Dstr - Compatibility level (0.10 or 1.1)
-> [...]
->=20
-> The types are a nice addition, but I didn't like having the list name
-> printed in every single line (in fact, the list name does not make any
-> sense here at all, because there already is a caption which reads
-> "Creation options for 'qcow2'"), and I did not like the use of '=3D' fo=
-r
-> types.
->=20
-> In general, I don't like the robot-y appearance, which is even worse in=
+[1] https://github.com/intel/nemu
+[2] https://github.com/intel/nemu/blob/topic/virt-x86/hw/acpi/reduced.c
+[3] https://github.com/intel/nemu/tree/topic/upstream/acpi
 
-> things like -device virtio-blk,help, which gives you this (among
-> other lines):
->=20
->> virtio-blk-pci.iothread=3Dlink<iothread>
->=20
-> Sadly, there isn't much we can do about the "link<iothread>", so this
-> series doesn't improve on that point.
->=20
-> What this series does do, however, is it changes these lists not to
-> print the list name on every single line, but only as a caption (and fo=
-r
-> option lists, this caption is option, because the caller may want to
-> print a custom caption that is more expressive -- as is the case for
-> qemu-img amend -o help).
->=20
-> Consequentially, all list items are indented by two spaces to make clea=
-r
-> they belong to the caption.  I can already see that some people might
-> disagree on having this indentation, but I like it, so I have it in thi=
-s
-> series.
->=20
-> Furthermore, types are now enclosed by angle brackets, and the alignmen=
-t
-> we originally had for descriptions is restored (although now after 24
-> instead of 16 characters, because every option name is now accompanied
-> by indentation and a type).
->=20
->=20
-> Thus, after this series, the amend output looks like this:
->=20
-> $ ./qemu-img amend -f qcow2 -o help
-> Creation options for 'qcow2':
->   backing_file=3D<str>     - File name of a base image
->   backing_fmt=3D<str>      - Image format of the base image
->   cluster_size=3D<size>    - qcow2 cluster size
->   compat=3D<str>           - Compatibility level (0.10 or 1.1)
-> [...]
->=20
->=20
-> virtio-blk's list presents itself like so:
->=20
-> $ x86_64-softmmu/qemu-system-x86_64 -device virtio-blk,help
-> virtio-blk-pci options:
->   iothread=3D<link<iothread>>
->   request-merging=3D<bool> - on/off
->   secs=3D<uint32>
-> [...]
->=20
->=20
-> And now we even print something when there are no options:
->=20
-> $ x86_64-softmmu/qemu-system-x86_64 -object can-bus,help
-> There are no options for can-bus.
->=20
-> (Before this series, there just is no output.)
->=20
->=20
-> As a side effect, patch 1 fixes iotest 082.
->=20
->=20
-> v2:
-> - Patch 1:
->   - Abandon the "$name: $type" formatting in favor of "$name=3D<$type>"=
+v1 -> v2:
+   * Drop the hardware-reduced implementation for now. Our next patch
+   * set
+     will add hardware-reduced and convert arm/virt to it.
+   * Implement the ACPI build methods as a QOM Interface Class and
+   * convert
+     the PC machine type to it.
+   * acpi_conf_pc_init() uses a PCMachineState pointer and not a
+     MachineState one as its argument.
 
->     [Marc-Andr=C3=A9, at least the "abandon" part]
->   - Restore description alignment [Kevin]
->   - Do the alignment when generating each line's GString instead of whe=
-n
->     printing them.  This results in less lines modified and allows the
->     compiler to optimize the printf("%s\n", x) to puts(x).
-> - Patch 3:
->   - Same changes as above, with the addition of also separating the
->     description with " - " instead of enclosing it in parentheses (to
->     match the other places)
->   - Also, we never did align the descriptions here, so this is not
->     "restore" but "introduce description alignment".
-> - Patch 4:
->   - Same as patch 1, but again with the catch of s/restore/introduce/.
->=20
->=20
-> git-backport-diff against v1:
->=20
-> Key:
-> [----] : patches are identical
-> [####] : number of functional differences between upstream/downstream p=
-atch
-> [down] : patch is downstream-only
-> The flags [FC] indicate (F)unctional and (C)ontextual differences, resp=
-ectively
->=20
-> 001/5:[0963] [FC] 'option: Make option help nicer to read'
-> 002/5:[----] [--] 'chardev: Indent list of chardevs'
-> 003/5:[0008] [FC] 'qdev-monitor: Make device options help nicer'
-> 004/5:[0007] [FC] 'object: Make option help nicer to read'
-> 005/5:[----] [--] 'fw_cfg: Drop newline in @file description'
->=20
->=20
-> Max Reitz (5):
->   option: Make option help nicer to read
->   chardev: Indent list of chardevs
->   qdev-monitor: Make device options help nicer
->   object: Make option help nicer to read
->   fw_cfg: Drop newline in @file description
->=20
->  include/qemu/option.h      |   2 +-
->  chardev/char.c             |   2 +-
->  qdev-monitor.c             |  13 +-
->  qemu-img.c                 |   4 +-
->  util/qemu-option.c         |  32 +-
->  vl.c                       |  15 +-
->  tests/qemu-iotests/082.out | 956 ++++++++++++++++++-------------------=
+v2 -> v3:
+   * Cc all relevant maintainers, no functional changes.
 
->  7 files changed, 530 insertions(+), 494 deletions(-)
->=20
+v3 -> v4:
+   * Renamed all AcpiConfiguration pointers from conf to acpi_conf.
+   * Removed the ACPI_BUILD_ALIGN_SIZE export.
+   * Temporarily updated the arm virt build_rsdp() prototype for
+     bisectability purposes.
+   * Removed unneeded pci headers from acpi-build.c.
+   * Refactor the acpi PCI host getter so that it truly is architecture
+     agnostic, by carrying the PCI host pointer through the
+     AcpiConfiguration structure.
+   * Splitted the PCI host AML builder API export patch from the PCI
+     host and holes getter one.
+   * Reduced the build_srat() export scope to hw/i386 instead of the
+     broader hw/acpi. SRAT builders are truly architecture specific
+     and can hardly be generalized.
+   * Completed the ACPI builder documentation.
 
+v4 -> v5:
+   * Reorganize the ACPI RSDP export and XSDT implementation into 3
+     patches.
+   * Fix the hw/i386/acpi header inclusions.
 
+Samuel Ortiz (16):
+  hw: i386: Decouple the ACPI build from the PC machine type
+  hw: acpi: Export ACPI build alignment API
+  hw: acpi: The RSDP build API can return void
+  hw: acpi: Export the RSDP build API
+  hw: acpi: Implement XSDT support for RSDP
+  hw: acpi: Factorize the RSDP build API implementation
+  hw: i386: Move PCI host definitions to pci_host.h
+  hw: acpi: Export the PCI host and holes getters
+  hw: acpi: Do not create hotplug method when handler is not defined
+  hw: i386: Make the hotpluggable memory size property more generic
+  hw: i386: Export the i386 ACPI SRAT build method
+  hw: i386: Export the MADT build method
+  hw: acpi: Define ACPI tables builder interface
+  hw: i386: Implement the ACPI builder interface for PC
+  hw: pci-host: piix: Return PCI host pointer instead of PCI bus
+  hw: i386: Set ACPI configuration PCI host pointer
 
---vmSE3lASOvoktWUQ1y3zi4RiNufGR2jLk
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Sebastien Boeuf (2):
+  hw: acpi: Export the PCI hotplug API
+  hw: acpi: Retrieve the PCI bus from AcpiPciHpState
 
------BEGIN PGP SIGNATURE-----
+Yang Zhong (6):
+  hw: acpi: Generalize AML build routines
+  hw: acpi: Factorize _OSC AML across architectures
+  hw: acpi: Export and generalize the PCI host AML API
+  hw: acpi: Export the MCFG getter
+  hw: acpi: Fix memory hotplug AML generation error
+  hw: i386: Refactor PCI host getter
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlvfjgMACgkQ9AfbAGHV
-z0DXFwf+IjDh0fnnDv5KBkqiy6Q9MpPfZLI96Mwj8Yo99OkjqjYi3ZScXjpunr7i
-NHWtw1pQOYruwAfvDq+xTEoGIpubwoYkmYZN+eY8xu07gZy4inuRhZifONLhV7Oh
-4Hp1H8RZCdrdxh+8NRQYVFtJcuWIZPXobC1+6hQZ5gj2Wr1a2Fu0WAFb42zp5jUO
-TX/6leO65NZsHSwIqgxuJtAgYh1zAGvM+63kkIi/6WoOXMtKyJC3ZwgF3c2tIaeT
-ATZskhrr7nDpUhihAL4UQMoO3QqK//pTeqVZWiKReAB2yeKo9fbFrec+WCFxEQHt
-1fnsXca7JsvJPFBhCVvapfZHayYozw==
-=a139
------END PGP SIGNATURE-----
+ hw/i386/acpi-build.h           |    9 +-
+ include/hw/acpi/acpi-defs.h    |   14 +
+ include/hw/acpi/acpi.h         |   44 ++
+ include/hw/acpi/aml-build.h    |   47 ++
+ include/hw/acpi/builder.h      |  100 +++
+ include/hw/i386/acpi.h         |   28 +
+ include/hw/i386/pc.h           |   49 +-
+ include/hw/mem/memory-device.h |    2 +
+ include/hw/pci/pci_host.h      |    6 +
+ hw/acpi/aml-build.c            |  981 +++++++++++++++++++++++++++++
+ hw/acpi/builder.c              |   97 +++
+ hw/acpi/cpu.c                  |    8 +-
+ hw/acpi/cpu_hotplug.c          |    9 +-
+ hw/acpi/memory_hotplug.c       |   21 +-
+ hw/acpi/pcihp.c                |   10 +-
+ hw/arm/virt-acpi-build.c       |   93 +--
+ hw/i386/acpi-build.c           | 1072 +++-----------------------------
+ hw/i386/pc.c                   |  198 +++---
+ hw/i386/pc_piix.c              |   36 +-
+ hw/i386/pc_q35.c               |   22 +-
+ hw/i386/xen/xen-hvm.c          |   19 +-
+ hw/pci-host/piix.c             |   32 +-
+ stubs/pci-host-piix.c          |    6 -
+ hw/acpi/Makefile.objs          |    1 +
+ stubs/Makefile.objs            |    1 -
+ 25 files changed, 1644 insertions(+), 1261 deletions(-)
+ create mode 100644 include/hw/acpi/builder.h
+ create mode 100644 include/hw/i386/acpi.h
+ create mode 100644 hw/acpi/builder.c
+ delete mode 100644 stubs/pci-host-piix.c
 
---vmSE3lASOvoktWUQ1y3zi4RiNufGR2jLk--
+-- 
+2.19.1
