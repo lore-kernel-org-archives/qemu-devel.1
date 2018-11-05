@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53673)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gJhzn-0008VG-Ox
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:45:00 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gJhzp-0000Ig-4t
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:45:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gJhzm-0001kE-Sr
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:44:59 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gJhzo-0001mv-A6
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:45:00 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Mon,  5 Nov 2018 17:43:40 +0100
-Message-Id: <20181105164340.20707-7-cohuck@redhat.com>
+Date: Mon,  5 Nov 2018 17:43:37 +0100
+Message-Id: <20181105164340.20707-4-cohuck@redhat.com>
 In-Reply-To: <20181105164340.20707-1-cohuck@redhat.com>
 References: <20181105164340.20707-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 6/6] MAINTAINERS: s390/boot: the ipl code and
- the bios belong together
+Subject: [Qemu-devel] [PULL 3/6] MAINTAINERS: s390/virtio-ccw: drop
+ Christian, add Halil
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,33 +25,28 @@ Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.d
 
 From: Christian Borntraeger <borntraeger@de.ibm.com>
 
-The s390-ccw bios and the ipl code do work in lock-step. Let us merge
-them in the maintainer file.
+Halil does all the work anyway.
 
 Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Message-Id: <1540827745-20795-5-git-send-email-borntraeger@de.ibm.com>
-Acked-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <1540827745-20795-3-git-send-email-borntraeger@de.ibm.com>
+Acked-by: Halil Pasic <pasic@linux.ibm.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- MAINTAINERS | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ MAINTAINERS | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index e0e8b5fb9e..8ec2281a7e 100644
+index 2909cd05b3..5b6f4a2f3f 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -944,10 +944,11 @@ T: git git://github.com/cohuck/qemu.git s390-next
- T: git git://github.com/borntraeger/qemu.git s390-next
- L: qemu-s390x@nongnu.org
+@@ -1263,7 +1263,7 @@ T: git git://github.com/stefanha/qemu.git block
  
--S390-ccw Bios
-+S390-ccw boot
- M: Christian Borntraeger <borntraeger@de.ibm.com>
- M: Thomas Huth <thuth@redhat.com>
+ virtio-ccw
+ M: Cornelia Huck <cohuck@redhat.com>
+-M: Christian Borntraeger <borntraeger@de.ibm.com>
++M: Halil Pasic <pasic@linux.ibm.com>
  S: Supported
-+F: hw/s390x/ipl.*
- F: pc-bios/s390-ccw/
- F: pc-bios/s390-ccw.img
- T: git git://github.com/borntraeger/qemu.git s390-next
+ F: hw/s390x/virtio-ccw*.[hc]
+ F: hw/s390x/vhost-vsock-ccw.c
 -- 
 2.14.5
