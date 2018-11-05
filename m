@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52798)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53394)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gJgla-0000IN-D0
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:26:15 -0500
+	(envelope-from <philmd@redhat.com>) id 1gJgoQ-0004fi-Mn
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:29:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gJglZ-0007iv-Bu
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:26:14 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:35256)
+	(envelope-from <philmd@redhat.com>) id 1gJgoN-0003dO-Ha
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:29:10 -0500
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:51164)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gJglZ-0007YH-1X
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:26:13 -0500
-Received: by mail-ot1-x344.google.com with SMTP id 81so8324664otj.2
-	for <qemu-devel@nongnu.org>; Mon, 05 Nov 2018 07:26:11 -0800 (PST)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gJgoN-0003ai-9H
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:29:07 -0500
+Received: by mail-wm1-f67.google.com with SMTP id 124-v6so3869143wmw.0
+	for <qemu-devel@nongnu.org>; Mon, 05 Nov 2018 07:29:07 -0800 (PST)
+References: <20181105151132.13884-1-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <1ff507fd-fb35-50d5-ae45-cf96d077e0b3@redhat.com>
+Date: Mon, 5 Nov 2018 16:29:03 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181102001303.32640-2-f4bug@amsat.org>
-References: <20181102001303.32640-1-f4bug@amsat.org>
-	<20181102001303.32640-2-f4bug@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 5 Nov 2018 15:25:49 +0000
-Message-ID: <CAFEAcA-DZMivo-epUmM6NxPzCUbGCfSU+SxEjszTNLdVaB8UxQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for 3.1 v2 1/7] MAINTAINERS: Add an entry
- for the Raspberry Pi machines
+In-Reply-To: <20181105151132.13884-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-3.1] hw/arm/exynos4210: Zero memory
+ allocated for Exynos4210State
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,38 +30,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>
-Cc: Guenter Roeck <linux@roeck-us.net>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Igor Mitsyanko <i.mitsyanko@gmail.com>
 
-On 2 November 2018 at 00:12, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
-wrote:
-> So far the Raspi machines use the BCM2836 SoC which includes
-> a BCM2835 for the peripherals.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Hi Peter,
+
+On 5/11/18 16:11, Peter Maydell wrote:
+> In exynos4210_init() we allocate memory for an Exynos4210State
+> struct. Generally devices can assume that the memory allocated
+> for their state struct is zero-initialized; we broke that
+> assumption here by using g_new(). Use g_new0() instead.
+> (In particular, some code assumes that the various irq arrays
+> in the Exynos4210Irq sub-struct are zero-initialized.)
+> 
+> In the longer term, this code should be QOMified, and then
+> the struct memory will be allocated elsewhere and by functions
+> which always zero-initalize it; but for 3.1 this is a
+> simple fix.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  MAINTAINERS | 6 ++++++
->  1 file changed, 6 insertions(+)
->
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index f2360efe3e..c41ea5ed3f 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -683,6 +683,12 @@ F: hw/arm/nrf51_soc.c
->  F: hw/arm/microbit.c
->  F: include/hw/arm/nrf51_soc.h
->
-> +Raspberry Pi
-> +L: qemu-arm@nongnu.org
-> +S: Odd Fixes
-> +F: hw/*/bcm283*
-> +F: include/hw/*/bcm283*
-> +
+> I suggested this fix the other day:
+> https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg00135.html
+> so here it is as an actual patch.
 
-We should also have F:hw/arm/raspi.c
+I did the same patch as you suggested but continued more soft-freeze 
+testing and planed to send it today, sorry.
 
-Andrew, as the original submitter of the Raspberry Pi code
-would you like to be listed as a maintainer for it?
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-thanks
--- PMM
+> 
+> Probably we should go through other uses of g_new() in
+> board/device code at some point.
+> 
+>   hw/arm/exynos4210.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/arm/exynos4210.c b/hw/arm/exynos4210.c
+> index 827318a0036..af82e955421 100644
+> --- a/hw/arm/exynos4210.c
+> +++ b/hw/arm/exynos4210.c
+> @@ -162,7 +162,7 @@ static uint64_t exynos4210_calc_affinity(int cpu)
+>   
+>   Exynos4210State *exynos4210_init(MemoryRegion *system_mem)
+>   {
+> -    Exynos4210State *s = g_new(Exynos4210State, 1);
+> +    Exynos4210State *s = g_new0(Exynos4210State, 1);
+>       qemu_irq gate_irq[EXYNOS4210_NCPUS][EXYNOS4210_IRQ_GATE_NINPUTS];
+>       SysBusDevice *busdev;
+>       DeviceState *dev;
+> 
