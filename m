@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gJjXk-0006RK-4U
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:24:09 -0500
+	(envelope-from <aaron@os.amperecomputing.com>) id 1gJjyW-0004QH-ES
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:51:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gJjXg-0007bK-Tz
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:24:08 -0500
-Resent-Message-Id: <E1gJjXg-0007bK-Tz@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21342)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gJjXg-0007Xa-KK
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:24:04 -0500
-Message-ID: <154144223071.2187.1520205394502769214@015909e0f939>
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20181105140327.8363-1-v.mayatskih@gmail.com>
+	(envelope-from <aaron@os.amperecomputing.com>) id 1gJjyU-0000GS-2C
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:51:48 -0500
+From: Aaron Lindsay <aaron@os.amperecomputing.com>
+Date: Mon, 5 Nov 2018 18:51:25 +0000
+Message-ID: <20181105185046.2802-1-aaron@os.amperecomputing.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 5 Nov 2018 10:23:52 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 0/1 resend] Add vhost-pci-blk driver
+Subject: [Qemu-devel] [PATCH v7 00/12] More fully implement ARM PMUv3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,79 +21,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: v.mayatskih@gmail.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, mlevitsk@redhat.com, mst@redhat.com
+To: "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <richard.henderson@linaro.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>, Aaron Lindsay <aaron@os.amperecomputing.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgxMTA1MTQwMzI3LjgzNjMtMS12Lm1heWF0c2tpaEBnbWFpbC5jb20KU3Vi
-amVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwLzEgcmVzZW5kXSBBZGQgdmhvc3QtcGNpLWJsayBk
-cml2ZXIKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpu
-PTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9n
-cmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpm
-b3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDog
-JChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAt
-LWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhl
-bgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9u
-ZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVh
-OWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5j
-aCAndGVzdCcKMTk4MDNjYzRhZSBBZGQgdmhvc3QtcGNpLWJsayBkcml2ZXIKCj09PSBPVVRQVVQg
-QkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTogQWRkIHZob3N0LXBjaS1ibGsgZHJpdmVyLi4u
-CldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5F
-UlMgbmVlZCB1cGRhdGluZz8KIzgyOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9SOiBFcnJv
-ciBtZXNzYWdlcyBzaG91bGQgbm90IGNvbnRhaW4gbmV3bGluZXMKIzIyOTogRklMRTogaHcvYmxv
-Y2svdmhvc3QtYmxrLmM6MTQzOgorICAgICAgICBlcnJvcl9yZXBvcnQoIkVycm9yIG9wZW5pbmcg
-YmFja2luZyBzdG9yZTogJWRcbiIsIC1lcnJubyk7CgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNl
-c3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMyNDE6IEZJTEU6IGh3L2Jsb2Nr
-L3Zob3N0LWJsay5jOjE1NToKKyAgICBpZiAocy0+YnNfZmQgPiAwKQpbLi4uXQoKRVJST1I6IHNw
-YWNlIHByb2hpYml0ZWQgYWZ0ZXIgdGhhdCAnLScgKGN0eDpXeFcpCiMzMjc6IEZJTEU6IGh3L2Js
-b2NrL3Zob3N0LWJsay5jOjI0MToKKyAgICBpbnQgZmQgPSAtIDE7CiAgICAgICAgICAgICAgXgoK
-V0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzMzMTogRklMRTogaHcvYmxvY2svdmhv
-c3QtYmxrLmM6MjQ1OgorCSAgICBlcnJvcl9yZXBvcnQoIkNhbid0IG9wZW4gZGV2aWNlICVzOiAl
-ZFxuIiwgYmxrX2JzKHMtPmJsayktPmZpbGVuYW1lLCBlcnJubyk7CgpFUlJPUjogY29kZSBpbmRl
-bnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMzMzE6IEZJTEU6IGh3L2Jsb2NrL3Zob3N0LWJsay5j
-OjI0NToKK15JICAgIGVycm9yX3JlcG9ydCgiQ2FuJ3Qgb3BlbiBkZXZpY2UgJXM6ICVkXG4iLCBi
-bGtfYnMocy0+YmxrKS0+ZmlsZW5hbWUsIGVycm5vKTskCgpFUlJPUjogRXJyb3IgbWVzc2FnZXMg
-c2hvdWxkIG5vdCBjb250YWluIG5ld2xpbmVzCiMzMzE6IEZJTEU6IGh3L2Jsb2NrL3Zob3N0LWJs
-ay5jOjI0NToKKwkgICAgZXJyb3JfcmVwb3J0KCJDYW4ndCBvcGVuIGRldmljZSAlczogJWRcbiIs
-IGJsa19icyhzLT5ibGspLT5maWxlbmFtZSwgZXJybm8pOwoKRVJST1I6IGNvZGUgaW5kZW50IHNo
-b3VsZCBuZXZlciB1c2UgdGFicwojMzMyOiBGSUxFOiBody9ibG9jay92aG9zdC1ibGsuYzoyNDY6
-CiteSSAgICBnb3RvIG91dDskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0
-YWJzCiMzMzY6IEZJTEU6IGh3L2Jsb2NrL3Zob3N0LWJsay5jOjI1MDoKK15JICAgIHJldCA9IGlv
-Y3RsKGZkLCBCTEtHRVRTSVpFLCAmdmFyKTskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5l
-dmVyIHVzZSB0YWJzCiMzMzc6IEZJTEU6IGh3L2Jsb2NrL3Zob3N0LWJsay5jOjI1MToKK15JICAg
-IHZhcjY0ID0gdmFyOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMK
-IzM0MDogRklMRTogaHcvYmxvY2svdmhvc3QtYmxrLmM6MjU0OgorXkkgICAgZXJyb3JfcmVwb3J0
-KCJDYW4ndCBnZXQgZHJpdmUgc2l6ZTogJWRcbiIsIGVycm5vKTskCgpFUlJPUjogRXJyb3IgbWVz
-c2FnZXMgc2hvdWxkIG5vdCBjb250YWluIG5ld2xpbmVzCiMzNDA6IEZJTEU6IGh3L2Jsb2NrL3Zo
-b3N0LWJsay5jOjI1NDoKKwkgICAgZXJyb3JfcmVwb3J0KCJDYW4ndCBnZXQgZHJpdmUgc2l6ZTog
-JWRcbiIsIGVycm5vKTsKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMK
-IzM0MTogRklMRTogaHcvYmxvY2svdmhvc3QtYmxrLmM6MjU1OgorXkkgICAgZ290byBvdXQ7JAoK
-RVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMzNDc6IEZJTEU6IGh3L2Jsb2NrL3Zob3N0
-LWJsay5jOjI2MToKKwkgICAgZXJyb3JfcmVwb3J0KCJDYW4ndCBnZXQgZHJpdmUgbG9naWNhbCBz
-ZWN0b3Igc2l6ZSwgYXNzdW1pbmcgNTEyOiAlZFxuIiwgZXJybm8pOwoKRVJST1I6IGNvZGUgaW5k
-ZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMzQ3OiBGSUxFOiBody9ibG9jay92aG9zdC1ibGsu
-YzoyNjE6CiteSSAgICBlcnJvcl9yZXBvcnQoIkNhbid0IGdldCBkcml2ZSBsb2dpY2FsIHNlY3Rv
-ciBzaXplLCBhc3N1bWluZyA1MTI6ICVkXG4iLCBlcnJubyk7JAoKRVJST1I6IEVycm9yIG1lc3Nh
-Z2VzIHNob3VsZCBub3QgY29udGFpbiBuZXdsaW5lcwojMzQ3OiBGSUxFOiBody9ibG9jay92aG9z
-dC1ibGsuYzoyNjE6CisJICAgIGVycm9yX3JlcG9ydCgiQ2FuJ3QgZ2V0IGRyaXZlIGxvZ2ljYWwg
-c2VjdG9yIHNpemUsIGFzc3VtaW5nIDUxMjogJWRcbiIsIGVycm5vKTsKCkVSUk9SOiBjb2RlIGlu
-ZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzM0ODogRklMRTogaHcvYmxvY2svdmhvc3QtYmxr
-LmM6MjYyOgorXkkgICAgdmFyID0gNTEyOyQKCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2Fy
-eSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzM2MDogRklMRTogaHcvYmxvY2svdmhv
-c3QtYmxrLmM6Mjc0OgorICAgIGlmIChmZCA+IDApClsuLi5dCgpFUlJPUjogY29kZSBpbmRlbnQg
-c2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMzNjE6IEZJTEU6IGh3L2Jsb2NrL3Zob3N0LWJsay5jOjI3
-NToKK15JICAgIGNsb3NlKGZkKTskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVz
-ZSB0YWJzCiM0MTA6IEZJTEU6IGh3L2Jsb2NrL3Zob3N0LWJsay5jOjMyNDoKK15JZ290byB2aXJ0
-aW9fZXJyOyQKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNDEzOiBGSUxFOiBody9i
-bG9jay92aG9zdC1ibGsuYzozMjc6CisgICAgcmV0ID0gdmhvc3RfZGV2X2luaXQoJnMtPmRldiwg
-KHZvaWQgKikodWludHB0cl90KXMtPnZob3N0ZmQsIFZIT1NUX0JBQ0tFTkRfVFlQRV9LRVJORUws
-IDApOwoKdG90YWw6IDE5IGVycm9ycywgMiB3YXJuaW5ncywgNjEzIGxpbmVzIGNoZWNrZWQKCllv
-dXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
-ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
-bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoK
-VGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1
-dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
-IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+The ARM PMU implementation currently contains a basic cycle counter, but
+it is often useful to gather counts of other events, filter them based
+on execution mode, and/or be notified on counter overflow. These patches
+flesh out the implementations of various PMU registers including
+PM[X]EVCNTR and PM[X]EVTYPER, add a struct definition to represent
+arbitrary counter types, implement mode filtering, send interrupts on
+counter overflow, and add instruction, cycle, and software increment
+events.
+
+Since v6 [1] I have made the following changes:
+* Use cpu_get_host_ticks() for the cycle counter value for user mode
+* Re-staged "PMU: Set PMCR.N to 4" so that the value of the pmcrn local
+  variable matches the architectural value of PMCR.N
+* Re-ordered "Reorganize PMCCNTR accesses" to come first to eliminate
+  the churn of *_op_start/finish function names and definitions
+* Use extract64 and ARRAY_SIZE macros where applicable
+* Add a return value to the post_save migration function
+
+[1] - https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg02036.html
+
+Aaron Lindsay (12):
+  migration: Add post_save function to VMStateDescription
+  target/arm: Reorganize PMCCNTR accesses
+  target/arm: Swap PMU values before/after migrations
+  target/arm: Filter cycle counter based on PMCCFILTR_EL0
+  target/arm: Allow AArch32 access for PMCCFILTR
+  target/arm: Implement PMOVSSET
+  target/arm: Add array for supported PMU events, generate PMCEID[01]
+  target/arm: Finish implementation of PM[X]EVCNTR and PM[X]EVTYPER
+  target/arm: PMU: Add instruction and cycle events
+  target/arm: PMU: Set PMCR.N to 4
+  target/arm: Implement PMSWINC
+  target/arm: Send interrupts on PMU counter overflow
+
+ docs/devel/migration.rst    |   9 +-
+ include/migration/vmstate.h |   1 +
+ migration/vmstate.c         |  13 +-
+ target/arm/cpu.c            |  28 +-
+ target/arm/cpu.h            |  68 +++-
+ target/arm/cpu64.c          |   4 -
+ target/arm/helper.c         | 774 ++++++++++++++++++++++++++++++++----
+ target/arm/machine.c        |  20 +
+ 8 files changed, 816 insertions(+), 101 deletions(-)
+
+--=20
+2.19.1
