@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52439)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gJhxk-0004N5-Ol
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:42:53 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gJhxm-0004Pf-Pv
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:42:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gJhxj-00079O-Dt
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:42:52 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gJhxl-0007Do-Fq
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:42:54 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon,  5 Nov 2018 17:37:34 +0100
-Message-Id: <20181105163744.25139-27-kwolf@redhat.com>
+Date: Mon,  5 Nov 2018 17:37:44 +0100
+Message-Id: <20181105163744.25139-37-kwolf@redhat.com>
 In-Reply-To: <20181105163744.25139-1-kwolf@redhat.com>
 References: <20181105163744.25139-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 26/36] gluster: Support auto-read-only option
+Subject: [Qemu-devel] [PULL 36/36] include: Add a comment to explain the
+ origin of sizes' lookup table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,40 +25,61 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-If read-only=3Doff, but auto-read-only=3Don is given, open the file
-read-write if we have the permissions, but instead of erroring out for
-read-only files, just degrade to read-only.
+From: Leonid Bloch <lbloch@janustech.com>
 
+The lookup table for power-of-two sizes was added in commit 540b8492618eb
+for the purpose of having convenient shortcuts for these sizes in cases
+when the literal number has to be present at compile time, and
+expressions as '(1 * KiB)' can not be used. One such case is the
+stringification of sizes. Beyond that, it is convenient to use these
+shortcuts for all power-of-two sizes, even if they don't have to be
+literal numbers.
+
+Despite its convenience, this table introduced 55 lines of "dumb" code,
+the purpose and origin of which are obscure without reading the message
+of the commit which introduced it. This patch fixes that by adding a
+comment to the code itself with a brief explanation for the reasoning
+behind this table. This comment includes the short AWK script that
+generated the table, so that anyone who's interested could make sure
+that the values in it are correct (otherwise these values look as if
+they were typed manually).
+
+Signed-off-by: Leonid Bloch <lbloch@janustech.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Niels de Vos <ndevos@redhat.com>
 ---
- block/gluster.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ include/qemu/units.h | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/block/gluster.c b/block/gluster.c
-index 4fd55a9cc5..5e300c96c8 100644
---- a/block/gluster.c
-+++ b/block/gluster.c
-@@ -849,8 +849,16 @@ static int qemu_gluster_open(BlockDriverState *bs,  =
-QDict *options,
-     qemu_gluster_parse_flags(bdrv_flags, &open_flags);
+diff --git a/include/qemu/units.h b/include/qemu/units.h
+index 68a7758650..1c959d182e 100644
+--- a/include/qemu/units.h
++++ b/include/qemu/units.h
+@@ -17,6 +17,24 @@
+ #define PiB     (INT64_C(1) << 50)
+ #define EiB     (INT64_C(1) << 60)
 =20
-     s->fd =3D glfs_open(s->glfs, gconf->path, open_flags);
--    if (!s->fd) {
--        ret =3D -errno;
-+    ret =3D s->fd ? 0 : -errno;
++/*
++ * The following lookup table is intended to be used when a literal stri=
+ng of
++ * the number of bytes is required (for example if it needs to be string=
+ified).
++ * It can also be used for generic shortcuts of power-of-two sizes.
++ * This table is generated using the AWK script below:
++ *
++ *  BEGIN {
++ *      suffix=3D"KMGTPE";
++ *      for(i=3D10; i<64; i++) {
++ *          val=3D2**i;
++ *          s=3Dsubstr(suffix, int(i/10), 1);
++ *          n=3D2**(i%10);
++ *          pad=3D21-int(log(n)/log(10));
++ *          printf("#define S_%d%siB %*d\n", n, s, pad, val);
++ *      }
++ *  }
++ */
 +
-+    if (ret =3D=3D -EACCES || ret =3D=3D -EROFS) {
-+        /* Try to degrade to read-only, but if it doesn't work, still us=
-e the
-+         * normal error message. */
-+        if (bdrv_apply_auto_read_only(bs, NULL, NULL) =3D=3D 0) {
-+            open_flags =3D (open_flags & ~O_RDWR) | O_RDONLY;
-+            s->fd =3D glfs_open(s->glfs, gconf->path, open_flags);
-+            ret =3D s->fd ? 0 : -errno;
-+        }
-     }
-=20
-     s->supports_seek_data =3D qemu_gluster_test_seek(s->fd);
+ #define S_1KiB                  1024
+ #define S_2KiB                  2048
+ #define S_4KiB                  4096
 --=20
 2.19.1
