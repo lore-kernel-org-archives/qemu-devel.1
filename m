@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34943)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1gJkaC-0003GZ-2t
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 14:30:44 -0500
+	(envelope-from <prvs=840391f99=Alistair.Francis@wdc.com>)
+	id 1gJknr-00035w-05
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 14:44:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1gJka4-0002a6-En
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 14:30:41 -0500
-Date: Mon, 5 Nov 2018 20:30:12 +0100
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Message-ID: <20181105193012.GB1148@toto>
-References: <20181016093703.10637-1-peter.maydell@linaro.org>
-	<20181016093703.10637-3-peter.maydell@linaro.org>
+	(envelope-from <prvs=840391f99=Alistair.Francis@wdc.com>)
+	id 1gJknm-0008SX-Sx
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 14:44:50 -0500
+From: Alistair Francis <Alistair.Francis@wdc.com>
+Date: Mon, 5 Nov 2018 19:44:41 +0000
+Message-ID: <3988cd7b9d292017537f75c2eed70295a3a84718.1541447021.git.alistair.francis@wdc.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181016093703.10637-3-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 2/2] target/arm: Fix ATS1Hx
- instructions
+Subject: [Qemu-devel] [PATCH v1 1/1] riscv: spike: Fix memory leak in the
+ board init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,57 +24,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistair23@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>
 
-On Tue, Oct 16, 2018 at 10:37:03AM +0100, Peter Maydell wrote:
-> ATS1HR and ATS1HW (which allow AArch32 EL2 to do address translations
-> on the EL2 translation regime) were implemented in commit 14db7fe09a2c8.
-> However, we got them wrong: these should do stage 1 address translations
-> as defined for NS-EL2, which is ARMMMUIdx_S1E2. We were incorrectly
-> making them perform stage 2 translations.
-> 
-> A few years later in commit 1313e2d7e2cd we forgot entirely that
-> we'd implemented ATS1Hx, and added a comment that ATS1Hx were
-> "not supported yet". Remove the comment; there is no extra code
-> needed to handle these operations in do_ats_write(), because
-> arm_s1_regime_using_lpae_format() returns true for ARMMMUIdx_S1E2,
-> which forces 64-bit PAR format.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Coverity caught a malloc() call that was never freed. This patch ensures
+that we free the memory but also updates the allocation to use
+g_strdup_printf() instead of malloc().
 
-Oops, yes:
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/riscv/spike.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-
-
-> ---
->  target/arm/helper.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index dc849b09893..903a832f1fa 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -2316,7 +2316,7 @@ static uint64_t do_ats_write(CPUARMState *env, uint64_t value,
->           *
->           * (Note that HCR.DC makes HCR.VM behave as if it is 1.)
->           *
-> -         * ATS1Hx always uses the 64bit format (not supported yet).
-> +         * ATS1Hx always uses the 64bit format.
->           */
->          format64 = arm_s1_regime_using_lpae_format(env, mmu_idx);
->  
-> @@ -2441,7 +2441,7 @@ static void ats1h_write(CPUARMState *env, const ARMCPRegInfo *ri,
->      MMUAccessType access_type = ri->opc2 & 1 ? MMU_DATA_STORE : MMU_DATA_LOAD;
->      uint64_t par64;
->  
-> -    par64 = do_ats_write(env, value, access_type, ARMMMUIdx_S2NS);
-> +    par64 = do_ats_write(env, value, access_type, ARMMMUIdx_S1E2);
->  
->      A32_BANKED_CURRENT_REG_SET(env, par, par64);
->  }
-> -- 
-> 2.19.0
-> 
-> 
+diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
+index 8a712ed490..268df04c3c 100644
+--- a/hw/riscv/spike.c
++++ b/hw/riscv/spike.c
+@@ -316,9 +316,7 @@ static void spike_v1_09_1_board_init(MachineState *mach=
+ine)
+=20
+     /* build config string with supplied memory size */
+     char *isa =3D riscv_isa_string(&s->soc.harts[0]);
+-    size_t config_string_size =3D strlen(config_string_tmpl) + 48;
+-    char *config_string =3D malloc(config_string_size);
+-    snprintf(config_string, config_string_size, config_string_tmpl,
++    char *config_string =3D g_strdup_printf(config_string_tmpl,
+         (uint64_t)memmap[SPIKE_CLINT].base + SIFIVE_TIME_BASE,
+         (uint64_t)memmap[SPIKE_DRAM].base,
+         (uint64_t)ram_size, isa,
+@@ -345,6 +343,8 @@ static void spike_v1_09_1_board_init(MachineState *mach=
+ine)
+     /* Core Local Interruptor (timer and IPI) */
+     sifive_clint_create(memmap[SPIKE_CLINT].base, memmap[SPIKE_CLINT].size=
+,
+         smp_cpus, SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE);
++
++    g_free(config_string);
+ }
+=20
+ static void spike_v1_09_1_machine_init(MachineClass *mc)
+--=20
+2.19.1
