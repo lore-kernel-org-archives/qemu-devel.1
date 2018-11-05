@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60652)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gJjQq-000820-41
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:17:01 -0500
+	(envelope-from <mst@redhat.com>) id 1gJjQt-00085z-4N
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:17:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gJjQp-0003LR-49
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:17:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56876)
+	(envelope-from <mst@redhat.com>) id 1gJjQs-0003Nj-8t
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:17:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47888)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gJjQo-0003Jx-QK
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:16:59 -0500
-Date: Mon, 5 Nov 2018 13:16:55 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gJjQs-0003N3-20
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:17:02 -0500
+Date: Mon, 5 Nov 2018 13:17:00 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181105181353.39804-26-mst@redhat.com>
+Message-ID: <20181105181353.39804-29-mst@redhat.com>
 References: <20181105181353.39804-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <20181105181353.39804-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 25/33] tests/bios-tables-test: add 64-bit PCI
- MMIO aperture round-up test on Q35
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 28/33] hw/pci: Add missing include
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,117 +28,61 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Laszlo Ersek <lersek@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-From: Laszlo Ersek <lersek@redhat.com>
+From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-In commit 9fa99d2519cb ("hw/pci-host: Fix x86 Host Bridges 64bit PCI
-hole", 2017-11-16), we meant to expose such a 64-bit PCI MMIO aperture in
-the ACPI DSDT that would be at least as large as the new "pci-hole64-size"
-property (2GB on i440fx, 32GB on q35). The goal was to offer "enough"
-64-bit MMIO aperture to the guest OS for hotplug purposes.
+Noted while refactoring:
 
-Previous patch fixed the issue that the aperture is extended relative to
-a possibly incorrect base.  This may result in an aperture size that is
-smaller than the intent of commit 9fa99d2519cb.
+      CC      mips-softmmu/hw/mips/gt64xxx_pci.o
+    In file included from include/hw/pci-host/gt64xxx.h:2,
+                     from hw/mips/gt64xxx_pci.c:30:
+    include/hw/pci/pci_bus.h:23:5: error: unknown type name =E2=80=98PCII=
+OMMUFunc=E2=80=99
+         PCIIOMMUFunc iommu_fn;
+         ^~~~~~~~~~~~
+    include/hw/pci/pci_bus.h:27:5: error: unknown type name =E2=80=98pci_=
+set_irq_fn=E2=80=99
+         pci_set_irq_fn set_irq;
+         ^~~~~~~~~~~~~~
+    include/hw/pci/pci_bus.h:28:5: error: unknown type name =E2=80=98pci_=
+map_irq_fn=E2=80=99
+         pci_map_irq_fn map_irq;
+         ^~~~~~~~~~~~~~
+    include/hw/pci/pci_bus.h:29:5: error: unknown type name =E2=80=98pci_=
+route_irq_fn=E2=80=99
+         pci_route_irq_fn route_intx_to_irq;
+         ^~~~~~~~~~~~~~~~
+    include/hw/pci/pci_bus.h:31:24: error: =E2=80=98PCI_SLOT_MAX=E2=80=99=
+ undeclared here (not in a function)
+         PCIDevice *devices[PCI_SLOT_MAX * PCI_FUNC_MAX];
+                            ^~~~~~~~~~~~
+    include/hw/pci/pci_bus.h:31:39: error: =E2=80=98PCI_FUNC_MAX=E2=80=99=
+ undeclared here (not in a function)
+         PCIDevice *devices[PCI_SLOT_MAX * PCI_FUNC_MAX];
+                                           ^~~~~~~~~~~~
+    make[1]: *** [rules.mak:69: hw/mips/gt64xxx_pci.o] Error 1
+    make: *** [Makefile:482: subdir-mips-softmmu] Error 2
 
-This patch adds a test to make sure it won't happen again.
-
-In the test case being added:
-- use 128 MB initial RAM size,
-- ask for one DIMM hotplug slot,
-- ask for 2 GB maximum RAM size,
-- use a pci-testdev with a 64-bit BAR of 2 GB size.
-
-Consequences:
-
-(1) In pc_memory_init() [hw/i386/pc.c], the DIMM hotplug area size is
-    initially set to 2048-128 = 1920 MB. (Maximum RAM size minus initial
-    RAM size.)
-
-(2) The DIMM area base is set to 4096 MB (because the initial RAM is only
-    128 MB -- there is no initial "high RAM").
-
-(3) Due to commit 085f8e88ba73 ("pc: count in 1Gb hugepage alignment when
-    sizing hotplug-memory container", 2014-11-24), we add 1 GB for the one
-    DIMM hotplug slot that was specified. This sets the DIMM area size to
-    1920+1024 = 2944 MB.
-
-(4) The reserved-memory-end address (exclusive) is set to 4096 + 2944 =
-    7040 MB (DIMM area base plus DIMM area size).
-
-(5) The reserved-memory-end address is rounded up to GB alignment,
-    yielding 7 GB (7168 MB).
-
-(6) Given the 2 GB BAR size of pci-testdev, SeaBIOS allocates said 64-bit
-    BAR in 64-bit address space.
-
-(7) Because reserved-memory-end is at 7 GB, it is unaligned for the 2 GB
-    BAR. Therefore SeaBIOS allocates the BAR at 8 GB. QEMU then
-    (correctly) assigns the root bridge aperture base this BAR address, to
-    be exposed in \_SB.PCI0._CRS.
-
-(8) The intent of commit 9fa99d2519cb dictates that QEMU extend the
-    aperture size to 32 GB, implying a 40 GB end address. However, QEMU
-    performs the extension relative to reserved-memory-end (7 GB), not
-    relative to the bridge aperture base that was correctly deduced from
-    SeaBIOS's BAR programming (8 GB). Therefore we see 39 GB as the
-    aperture end address in \_SB.PCI0._CRS:
-
-> QWordMemory (ResourceProducer, PosDecode, MinFixed, MaxFixed, Cacheable, ReadWrite,
->     0x0000000000000000, // Granularity
->     0x0000000200000000, // Range Minimum
->     0x00000009BFFFFFFF, // Range Maximum
->     0x0000000000000000, // Translation Offset
->     0x00000007C0000000, // Length
->     ,, , AddressRangeMemory, TypeStatic)
-
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Signed-off-by: Laszlo Ersek <lersek@redhat.com>
-Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- tests/bios-tables-test.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ include/hw/pci/pci_bus.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index b14c8eaa17..d661d9be62 100644
---- a/tests/bios-tables-test.c
-+++ b/tests/bios-tables-test.c
-@@ -708,6 +708,21 @@ static void test_acpi_q35_tcg_bridge(void)
-     free_test_data(&data);
- }
- 
-+static void test_acpi_q35_tcg_mmio64(void)
-+{
-+    test_data data = {
-+        .machine = MACHINE_Q35,
-+        .variant = ".mmio64",
-+        .required_struct_types = base_required_struct_types,
-+        .required_struct_types_len = ARRAY_SIZE(base_required_struct_types)
-+    };
+diff --git a/include/hw/pci/pci_bus.h b/include/hw/pci/pci_bus.h
+index b7da8f555b..dfb75752cb 100644
+--- a/include/hw/pci/pci_bus.h
++++ b/include/hw/pci/pci_bus.h
+@@ -1,6 +1,8 @@
+ #ifndef QEMU_PCI_BUS_H
+ #define QEMU_PCI_BUS_H
+=20
++#include "hw/pci/pci.h"
 +
-+    test_acpi_one("-m 128M,slots=1,maxmem=2G "
-+                  "-device pci-testdev,membar=2G",
-+                  &data);
-+    free_test_data(&data);
-+}
-+
- static void test_acpi_piix4_tcg_cphp(void)
- {
-     test_data data;
-@@ -875,6 +890,7 @@ int main(int argc, char *argv[])
-         qtest_add_func("acpi/piix4/bridge", test_acpi_piix4_tcg_bridge);
-         qtest_add_func("acpi/q35", test_acpi_q35_tcg);
-         qtest_add_func("acpi/q35/bridge", test_acpi_q35_tcg_bridge);
-+        qtest_add_func("acpi/q35/mmio64", test_acpi_q35_tcg_mmio64);
-         qtest_add_func("acpi/piix4/ipmi", test_acpi_piix4_tcg_ipmi);
-         qtest_add_func("acpi/q35/ipmi", test_acpi_q35_tcg_ipmi);
-         qtest_add_func("acpi/piix4/cpuhp", test_acpi_piix4_tcg_cphp);
--- 
+ /*
+  * PCI Bus datastructures.
+  *
+--=20
 MST
