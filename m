@@ -1,19 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46562)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bmeng.cn@gmail.com>) id 1gJerS-0005oC-87
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 08:24:11 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gJf8l-00064a-5I
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 08:42:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bmeng.cn@gmail.com>) id 1gJerR-0005it-2j
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 08:24:10 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gJf2u-0003Hh-O5
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 08:36:02 -0500
+Received: from mail-ot1-x334.google.com ([2607:f8b0:4864:20::334]:46931)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gJf2u-0003FS-E9
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 08:36:00 -0500
+Received: by mail-ot1-x334.google.com with SMTP id q5so7890647otl.13
+	for <qemu-devel@nongnu.org>; Mon, 05 Nov 2018 05:35:58 -0800 (PST)
 MIME-Version: 1.0
-References: <cover.1540937826.git.alistair.francis@wdc.com>
-	<546aa18b75a04a281e82706ea41ee9a4a9f3e2bc.1540937826.git.alistair.francis@wdc.com>
-In-Reply-To: <546aa18b75a04a281e82706ea41ee9a4a9f3e2bc.1540937826.git.alistair.francis@wdc.com>
-From: Bin Meng <bmeng.cn@gmail.com>
-Date: Mon, 5 Nov 2018 21:23:55 +0800
-Message-ID: <CAEUhbmVsCMLAJK3tyhuo0UGocfYOHLb-+v0z4FYyXSQi7SLsYg@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 5 Nov 2018 13:35:36 +0000
+Message-ID: <CAFEAcA_mT2FT=t+Fw7=7aUgDkX1b64oqFS99_jFN7_12MRCx+g@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v6 2/5] hw/riscv/virt: Connect the gpex PCIe
+Subject: [Qemu-devel] coverity-spotted memory leak in hw/riscv/spike.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,165 +26,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair.Francis@wdc.com
-Cc: qemu-devel@nongnu.org, qemu-riscv@nongnu.org, alistair23@gmail.com
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-riscv@nongnu.org
 
-Hi,
+Hi; Coverity has noticed a memory leak in hw/riscv/spike.c:
+it malloc()s memory into config_string(), but never frees it.
+(CID 1391015). This isn't a very serious leak since the function
+only ever runs once, but it would be nice to fix this for 3.1
+(it is the only coverity error in the riscv code, and one of
+just 8 unaddressed for QEMU as a whole).
 
-On Wed, Oct 31, 2018 at 6:22 AM Alistair Francis
-<Alistair.Francis@wdc.com> wrote:
->
-> Connect the gpex PCIe device based on the device tree included in the
-> HiFive Unleashed ROM.
->
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> ---
->  default-configs/riscv32-softmmu.mak |   6 +-
->  default-configs/riscv64-softmmu.mak |   6 +-
->  hw/riscv/virt.c                     | 111 ++++++++++++++++++++++++++++
->  include/hw/riscv/virt.h             |   8 +-
->  4 files changed, 127 insertions(+), 4 deletions(-)
->
-> diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv32-softmmu.mak
-> index 7937c69e22..3e3d195f37 100644
-> --- a/default-configs/riscv32-softmmu.mak
-> +++ b/default-configs/riscv32-softmmu.mak
-> @@ -1,7 +1,11 @@
->  # Default configuration for riscv-softmmu
->
-> +include pci.mak
-> +
->  CONFIG_SERIAL=y
->  CONFIG_VIRTIO_MMIO=y
-> -include virtio.mak
->
->  CONFIG_CADENCE=y
-> +
-> +CONFIG_PCI_GENERIC=y
-> +CONFIG_PCI_XILINX=y
-> diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/riscv64-softmmu.mak
-> index 7937c69e22..3e3d195f37 100644
-> --- a/default-configs/riscv64-softmmu.mak
-> +++ b/default-configs/riscv64-softmmu.mak
-> @@ -1,7 +1,11 @@
->  # Default configuration for riscv-softmmu
->
-> +include pci.mak
-> +
->  CONFIG_SERIAL=y
->  CONFIG_VIRTIO_MMIO=y
-> -include virtio.mak
->
->  CONFIG_CADENCE=y
-> +
-> +CONFIG_PCI_GENERIC=y
-> +CONFIG_PCI_XILINX=y
-> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-> index 4a137a503c..2fbe58ba4b 100644
-> --- a/hw/riscv/virt.c
-> +++ b/hw/riscv/virt.c
-> @@ -39,6 +39,8 @@
->  #include "sysemu/arch_init.h"
->  #include "sysemu/device_tree.h"
->  #include "exec/address-spaces.h"
-> +#include "hw/pci/pci.h"
-> +#include "hw/pci-host/gpex.h"
->  #include "elf.h"
->
->  #include <libfdt.h>
-> @@ -55,6 +57,10 @@ static const struct MemmapEntry {
->      [VIRT_UART0] =    { 0x10000000,      0x100 },
->      [VIRT_VIRTIO] =   { 0x10001000,     0x1000 },
->      [VIRT_DRAM] =     { 0x80000000,        0x0 },
-> +    [VIRT_PCIE_MMIO] = { 0x2000000000, 0x4000000 },
+Incidentally, "malloc and then snprintf" would be better
+done using g_strdup_printf(), which automatically allocates
+sufficient memory for the string, avoiding the need to
+try to pre-calculate the right size.
 
-Does this work with RV32?
-
-> +    [VIRT_PCIE_PIO] = { 0x2010000, 0x40000000 },
-> +    [VIRT_PCIE_ECAM] = { 0x40000000, 0x20000000 },
-> +
->  };
->
->  static uint64_t load_kernel(const char *kernel_filename)
-> @@ -98,6 +104,37 @@ static hwaddr load_initrd(const char *filename, uint64_t mem_size,
->      return *start + size;
->  }
->
-> +#define INTERREUPT_MAP_WIDTH 7
-> +
-> +static void create_pcie_irq_map(void *fdt, char *nodename,
-> +                                uint32_t plic_phandle)
-> +{
-> +    int pin;
-> +    uint32_t full_irq_map[GPEX_NUM_IRQS * INTERREUPT_MAP_WIDTH] = { 0 };
-> +    uint32_t *irq_map = full_irq_map;
-> +
-> +        for (pin = 0; pin < GPEX_NUM_IRQS; pin++) {
-> +            int irq_nr = PCIE_IRQ + (pin % PCI_NUM_PINS);
-> +            int i;
-> +
-> +            uint32_t map[] = {
-> +                0, 0, 0,
-> +                pin + 1, plic_phandle, 0, irq_nr};
-> +
-> +            /* Convert map to big endian */
-> +            for (i = 0; i < INTERREUPT_MAP_WIDTH; i++) {
-> +                irq_map[i] = cpu_to_be32(map[i]);
-> +            }
-> +            irq_map += INTERREUPT_MAP_WIDTH;
-> +        }
-> +
-> +    qemu_fdt_setprop(fdt, nodename, "interrupt-map",
-> +                     full_irq_map, sizeof(full_irq_map));
-> +
-> +    qemu_fdt_setprop_cells(fdt, nodename, "interrupt-map-mask",
-> +                           0, 0, 0, 0x7);
-> +}
-> +
->  static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
->      uint64_t mem_size, const char *cmdline)
->  {
-> @@ -233,6 +270,31 @@ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
->          g_free(nodename);
->      }
->
-> +    nodename = g_strdup_printf("/pci@%lx",
-> +        (long) memmap[VIRT_PCIE_MMIO].base);
-> +    qemu_fdt_add_subnode(fdt, nodename);
-> +    qemu_fdt_setprop_cells(fdt, nodename, "#address-cells", 0x3);
-> +    qemu_fdt_setprop_cells(fdt, nodename, "#interrupt-cells", 0x1);
-> +    qemu_fdt_setprop_cells(fdt, nodename, "#size-cells", 0x2);
-> +    qemu_fdt_setprop_string(fdt, nodename, "compatible",
-> +                            "pci-host-ecam-generic");
-> +    qemu_fdt_setprop_string(fdt, nodename, "device_type", "pci");
-> +    qemu_fdt_setprop_cell(fdt, nodename, "linux,pci-domain", 0);
-> +    qemu_fdt_setprop_cells(fdt, nodename, "bus-range", 0,
-> +                           memmap[VIRT_PCIE_ECAM].base /
-> +                               PCIE_MMCFG_SIZE_MIN - 1);
-> +    qemu_fdt_setprop(fdt, nodename, "dma-coherent", NULL, 0);
-> +    qemu_fdt_setprop_cells(fdt, nodename, "reg", 0x20, 0,
-> +                           0, memmap[VIRT_PCIE_ECAM].size);
-> +    qemu_fdt_setprop_cells(fdt, nodename, "ranges",
-> +                           memmap[VIRT_PCIE_PIO].base,
-> +                               0, memmap[VIRT_PCIE_PIO].size,
-> +                           0, memmap[VIRT_PCIE_MMIO].base,
-> +                               0, memmap[VIRT_PCIE_MMIO].size);
-
-This does not conform with the PCI bus ranges encoding.
-
-> +    qemu_fdt_setprop_cells(fdt, nodename, "interrupt-parent", plic_phandle);
-> +    qemu_fdt_setprop_cells(fdt, nodename, "interrupts", PCIE_IRQ);
-> +    create_pcie_irq_map(fdt, nodename, plic_phandle);
-> +
->      nodename = g_strdup_printf("/test@%lx",
->          (long)memmap[VIRT_TEST].base);
->      qemu_fdt_add_subnode(fdt, nodename);
-> @@ -262,6 +324,47 @@ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
->      return fdt;
->  }
->
-
-[snip]
-
-Regards,
-Bin
+thanks
+-- PMM
