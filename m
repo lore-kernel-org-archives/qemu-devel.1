@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54551)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55188)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gJZHV-0003is-IT
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 02:26:42 -0500
+	(envelope-from <mlureau@redhat.com>) id 1gJZKQ-0006dA-TU
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 02:29:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gJZHR-0002lz-AE
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 02:26:41 -0500
-References: <1540827745-20795-1-git-send-email-borntraeger@de.ibm.com>
-	<1540827745-20795-5-git-send-email-borntraeger@de.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <2616fc3e-5ee1-cc8d-7a25-e664637f5a3f@redhat.com>
-Date: Mon, 5 Nov 2018 08:26:29 +0100
+	(envelope-from <mlureau@redhat.com>) id 1gJZKM-0007s8-40
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 02:29:42 -0500
+Received: from mail-qk1-f194.google.com ([209.85.222.194]:38581)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gJZK8-0007RA-4b
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 02:29:29 -0500
+Received: by mail-qk1-f194.google.com with SMTP id d19so13064287qkg.5
+	for <qemu-devel@nongnu.org>; Sun, 04 Nov 2018 23:29:22 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1540827745-20795-5-git-send-email-borntraeger@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/4] MAINTAINERS: s390/boot: the ipl code
- and the bios belong together
+References: <0084f7223c080cdbdfc2c5a2d132f8d6c0eff866.1541083966.git.artem.k.pisarenko@gmail.com>
+	<CAMxuvazxmYdvn_0aTH0ETt_Eeo7rxCLXvZ_oANfcKhgGW92+ng@mail.gmail.com>
+	<CANzW0mspj-xxYw5qXLvnQp-uNdLwJ+ztU2Ho-fR10_VXKQVkjw@mail.gmail.com>
+In-Reply-To: <CANzW0mspj-xxYw5qXLvnQp-uNdLwJ+ztU2Ho-fR10_VXKQVkjw@mail.gmail.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Mon, 5 Nov 2018 11:29:10 +0400
+Message-ID: <CAMxuvaz7bQBqRZGkHsYB1hRhWn5mZ5KNuHRRnESbni36On=B6A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] chardev: fix mess in OPENED/CLOSED events
+ when muxed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,35 +30,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, David Hildenbrand <david@redhat.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Janosch Frank <frankja@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Collin Walling <walling@linux.ibm.com>
+To: artem.k.pisarenko@gmail.com
+Cc: qemu-devel <qemu-devel@nongnu.org>, "Bonzini, Paolo" <pbonzini@redhat.com>
 
-On 2018-10-29 16:42, Christian Borntraeger wrote:
-> The s390-ccw bios and the ipl code do work in lock-step. Let us merge
-> them in the maintainer file.
-> 
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->  MAINTAINERS | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index e63cfa2..8ce223d 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -946,10 +946,11 @@ T: git git://github.com/cohuck/qemu.git s390-next
->  T: git git://github.com/borntraeger/qemu.git s390-next
->  L: qemu-s390x@nongnu.org
->  
-> -S390-ccw Bios
-> +S390-ccw boot
->  M: Christian Borntraeger <borntraeger@de.ibm.com>
->  M: Thomas Huth <thuth@redhat.com>
->  S: Supported
-> +F: hw/s390x/ipl.*
->  F: pc-bios/s390-ccw/
->  F: pc-bios/s390-ccw.img
->  T: git git://github.com/borntraeger/qemu.git s390-next
-> 
+Hi
+On Mon, Nov 5, 2018 at 11:22 AM Artem Pisarenko
+<artem.k.pisarenko@gmail.com> wrote:
+>
+> Sorry, I forgot to check unit tests. Although, it's very strange that this specific test failed while things work functionally...
+>
+> > I am a bit reluctant to take patches that don't actually "fix" things.
+> >
+> > Could you add some tests to demonstrate the problems?
+>
+> Ok
+>
+> >> @@ -257,6 +257,7 @@ void qemu_chr_fe_set_handlers(CharBackend *b,
+> >>  {
+> >>      Chardev *s;
+> >>      int fe_open;
+> >> +    static __thread bool mux_reentered;
+> >
+> > Not very elegant. Maybe mux_chr_set_handlers() could call a refactored
+> > internal chr_fe_set_handlers() with an extra arg "no_open_event" ?
+>
+> Agree. It would make this hack more elegant. Although, it may become irrelevant as soon as I'll find soultion for failed docker test...
+>
+> >> @@ -272,21 +272,24 @@ static void char_mux_finalize(Object *obj)
+> >>      for (i = 0; i < d->mux_cnt; i++) {
+> >>          CharBackend *be = d->backends[i];
+> >>          if (be) {
+> >> +            if (be->chr && be->chr->be_open) {
+> >> +                qemu_chr_be_event(be->chr, CHR_EVENT_CLOSED);
+> >> +            }
+> >
+> > It looks like this could be a seperate patch, with a seperate test.
+>
+> Why this should be separate ? Do you mean that overall "opened/closed" pairing fix should be separated to "opened" fix+test and "closed" fix+test ?
+>
+> Since in next version it cannot be single patch anymore, how should I proceed with it ? Should I publish it as patch series with same subject marked as V2 or start new patch series?
 
-Acked-by: Thomas Huth <thuth@redhat.com>
+A patch series would be great. You can keep the subject and make it v2.
+
+thanks
