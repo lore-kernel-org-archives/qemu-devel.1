@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54808)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gJdbf-0001Hj-AJ
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 07:03:50 -0500
+	(envelope-from <thuth@redhat.com>) id 1gJdc9-0001Wf-AQ
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 07:04:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gJdbT-00069p-TR
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 07:03:41 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:53576)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gJdbM-0001pm-My
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 07:03:34 -0500
-Received: by mail-wm1-x342.google.com with SMTP id v24-v6so8069991wmh.3
-	for <qemu-devel@nongnu.org>; Mon, 05 Nov 2018 04:03:15 -0800 (PST)
-References: <20181104112424.18663-1-stefanha@redhat.com>
-	<20181104112424.18663-9-stefanha@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181104112424.18663-9-stefanha@redhat.com>
-Date: Mon, 05 Nov 2018 12:03:12 +0000
-Message-ID: <87y3a7enpb.fsf@linaro.org>
+	(envelope-from <thuth@redhat.com>) id 1gJdc5-0004lh-UA
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 07:04:17 -0500
+References: <20181105110313.29312-1-david@redhat.com>
+	<20181105110313.29312-5-david@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <b114a7d0-1e56-2294-484c-f4143cfd989e@redhat.com>
+Date: Mon, 5 Nov 2018 13:04:04 +0100
 MIME-Version: 1.0
+In-Reply-To: <20181105110313.29312-5-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 8/8] docker: use HTTPS git URL for
- virglrenderer
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 4/4] s390x/zpci: properly fail if the
+ zPCI device cannot be created
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,46 +25,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, eblake@redhat.com, cohuck@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Jeff Cody <jcody@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Daniel Berrange <berrange@redhat.com>, "Michael S.
-	Tsirkin" <mst@redhat.com>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, =Collin Walling <walling@linux.ibm.com>
 
-
-Stefan Hajnoczi <stefanha@redhat.com> writes:
-
-> When you clone the repository without previous commit history, 'git://'
-> doesn't protect from man-in-the-middle attacks.  HTTPS is more secure
-> since the client verifies the server certificate.
->
-> Cc: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Suggested-by: Eric Blake <eblake@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
+On 2018-11-05 12:03, David Hildenbrand wrote:
+> Right now, errors during realize()/pre_plug/plug of the zPCI device
+> would result in QEMU crashing instead of failing nicely when creating
+> a zPCI device for a PCI device.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->  tests/docker/dockerfiles/debian-amd64.docker | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/tests/docker/dockerfiles/debian-amd64.docker b/tests/docker/=
-dockerfiles/debian-amd64.docker
-> index eb13f06ed1..24b113b76f 100644
-> --- a/tests/docker/dockerfiles/debian-amd64.docker
-> +++ b/tests/docker/dockerfiles/debian-amd64.docker
-> @@ -24,7 +24,7 @@ RUN DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
->          libegl1-mesa-dev \
->          libepoxy-dev \
->          libgbm-dev
-> -RUN git clone git://anongit.freedesktop.org/virglrenderer /usr/src/virgl=
-renderer
-> +RUN git clone https://anongit.freedesktop.org/git/virglrenderer.git /usr=
-/src/virglrenderer
->  RUN cd /usr/src/virglrenderer && ./autogen.sh && ./configure --with-glx =
---disable-tests && make install
->
->  # netmap
+>  hw/s390x/s390-pci-bus.c | 25 +++++++++++++++++++------
+>  1 file changed, 19 insertions(+), 6 deletions(-)
+> 
+> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+> index 1849f9d334..4939490c7c 100644
+> --- a/hw/s390x/s390-pci-bus.c
+> +++ b/hw/s390x/s390-pci-bus.c
+> @@ -778,17 +778,31 @@ static void s390_pci_msix_free(S390PCIBusDevice *pbdev)
+>  }
+>  
+>  static S390PCIBusDevice *s390_pci_device_new(S390pciState *s,
+> -                                             const char *target)
+> +                                             const char *target, Error **errp)
+>  {
+> -    DeviceState *dev = NULL;
+> +    Error *local_err = NULL;
+> +    DeviceState *dev;
+>  
+>      dev = qdev_try_create(BUS(s->bus), TYPE_S390_PCI_DEVICE);
+>      if (!dev) {
+> +        error_setg(errp, "zPCI device could not be created");
+>          return NULL;
+>      }
+>  
+> -    qdev_prop_set_string(dev, "target", target);
+> -    qdev_init_nofail(dev);
+> +    object_property_set_str(OBJECT(dev), "target", target, &local_err);
+> +    if (local_err) {
+> +        object_unparent(OBJECT(dev));
+> +        error_propagate_prepend(errp, local_err,
+> +                                "zPCI device could not be created: ");
+> +        return NULL;
+> +    }
+> +    object_property_set_bool(OBJECT(dev), true, "realized", &local_err);
+> +    if (local_err) {
+> +        object_unparent(OBJECT(dev));
+> +        error_propagate_prepend(errp, local_err,
+> +                                "zPCI device could not be created: ");
+> +        return NULL;
+> +    }
+>  
+>      return S390_PCI_DEVICE(dev);
+>  }
+> @@ -873,9 +887,8 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>  
+>          pbdev = s390_pci_find_dev_by_target(s, dev->id);
+>          if (!pbdev) {
+> -            pbdev = s390_pci_device_new(s, dev->id);
+> +            pbdev = s390_pci_device_new(s, dev->id, errp);
+>              if (!pbdev) {
+> -                error_setg(errp, "create zpci device failed");
+>                  return;
+>              }
+>          }
+> 
 
+Looks right to me, I think this is even suitable for v3.1.
 
---
-Alex Benn=C3=A9e
+Reviewed-by: Thomas Huth <thuth@redhat.com>
