@@ -1,29 +1,15 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:57221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gJh64-0004EX-Fg
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:47:27 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gJh6E-0004EX-KI
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:47:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gJgwj-0007B3-CD
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:37:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34218)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gJgwj-00073R-0i
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:37:45 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181023152306.3123-1-david@redhat.com>
-	<20181023152306.3123-2-david@redhat.com>
-	<87pnvqdvsj.fsf@dusky.pond.sub.org>
-	<e8fe86a1-d075-2ea8-d1f4-e08e5dceee07@redhat.com>
-	<875zxingqn.fsf@dusky.pond.sub.org>
-	<440eb166-73d1-77b6-5dd9-66a0abd7d665@redhat.com>
-Date: Mon, 05 Nov 2018 16:37:35 +0100
-In-Reply-To: <440eb166-73d1-77b6-5dd9-66a0abd7d665@redhat.com> (David
-	Hildenbrand's message of "Wed, 31 Oct 2018 19:01:46 +0100")
-Message-ID: <87muqn5ydc.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 1/7] qapi: use qemu_strtoi64() in
- parse_str
+	(envelope-from <eric.auger@redhat.com>) id 1gJgut-0004fW-0l
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:35:51 -0500
+From: Eric Auger <eric.auger@redhat.com>
+Date: Mon,  5 Nov 2018 16:35:20 +0100
+Message-Id: <20181105153520.18528-1-eric.auger@redhat.com>
+Subject: [Qemu-devel] [RESEND PATCH for-3.1] hw/arm/sysbus-fdt: Only call
+ match_fn callback if the type matches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,96 +18,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, geert+renesas@glider.be, alex.williamson@redhat.com, thuth@redhat.com
 
-David Hildenbrand <david@redhat.com> writes:
+Commit af7d64ede0b9 (hw/arm/sysbus-fdt: Allow device matching with DT
+compatible value) introduced a match_fn callback which gets called
+for each registered combo to check whether a sysbus device can be
+dynamically instantiated. However the callback gets called even if
+the device type does not match the binding combo typename field.
 
-> On 31.10.18 18:55, Markus Armbruster wrote:
->> David Hildenbrand <david@redhat.com> writes:
->> 
->>> On 31.10.18 15:40, Markus Armbruster wrote:
->>>> David Hildenbrand <david@redhat.com> writes:
->>>>
->>>>> The qemu api claims to be easier to use, and the resulting code seems to
->>>>> agree.
->> [...]
->>>>> @@ -60,9 +61,7 @@ static int parse_str(StringInputVisitor *siv, const char *name, Error **errp)
->>>>>      }
->>>>>  
->>>>>      do {
->>>>> -        errno = 0;
->>>>> -        start = strtoll(str, &endptr, 0);
->>>>> -        if (errno == 0 && endptr > str) {
->>>>> +        if (!qemu_strtoi64(str, &endptr, 0, &start)) {
->>>>>              if (*endptr == '\0') {
->>>>>                  cur = g_malloc0(sizeof(*cur));
->>>>>                  range_set_bounds(cur, start, start);
->>>>> @@ -71,11 +70,7 @@ static int parse_str(StringInputVisitor *siv, const char *name, Error **errp)
->>>>>                  str = NULL;
->>>>>              } else if (*endptr == '-') {
->>>>>                  str = endptr + 1;
->>>>> -                errno = 0;
->>>>> -                end = strtoll(str, &endptr, 0);
->>>>> -                if (errno == 0 && endptr > str && start <= end &&
->>>>> -                    (start > INT64_MAX - 65536 ||
->>>>> -                     end < start + 65536)) {
->>>>> +                if (!qemu_strtoi64(str, &endptr, 0, &end) && start < end) {
->>>>
->>>> You deleted (start > INT64_MAX - 65536 || end < start + 65536).  Can you
->>>> explain that to me?  I'm feeling particularly dense today...
->>>
->>> qemu_strtoi64 performs all different kinds of error handling completely
->>> internally. This old code here was an attempt to filter out -EWHATEVER
->>> from the response. No longer needed as errors and the actual value are
->>> reported via different ways.
->> 
->> I understand why errno == 0 && endptr > str go away.  They also do in
->> the previous hunk.
->> 
->> The deletion of (start > INT64_MAX - 65536 || end < start + 65536) is
->> unobvious.  What does it do before the patch?
->> 
->> The condition goes back to commit 659268ffbff, which predates my watch
->> as maintainer.  Its commit message is of no particular help.  Its code
->> is... allright, the less I say about that, the better.
->> 
->> We're parsing a range here.  We already parsed its lower bound into
->> @start (and guarded against errors), and its upper bound into @end (and
->> guarded against errors).
->> 
->> If the condition you delete is false, we goto error.  So the condition
->> is about range validity.  I figure it's an attempt to require valid
->> ranges to be no "wider" than 65535.  The second part end < start + 65536
->> checks exactly that, except shit happens when start + 65536 overflows.
->> The first part attempts to guard against that, but
->> 
->> (1) INT64_MAX is *wrong*, because we compute in long long, and
->> 
->> (2) it rejects even small ranges like INT64_MAX - 2 .. INT64_MAX - 1.
->> 
->> WTF?!?
->> 
->> Unless I'm mistaken, the condition is not about handling any of the
->> errors that qemu_strtoi64() handles for us.
->> 
->> The easiest way for you out of this morass is probably to keep the
->> condition exactly as it was, then use the "my patch doesn't make things
->> any worse" get-out-of-jail-free card.
->> 
->
-> Looking at the code in qapi/string-output-visitor.c related to range and
-> list handling I feel like using the get-out-of-jail-free card to get out
-> of qapi code now :) Too much magic in that code and too little time for
-> me to understand it all.
->
-> Thanks for your time and review anyway. My time is better invested in
-> other parts of QEMU. I will drop both patches from this series.
+Let's change the add_fdt_node() logic so that we first check the
+type and if the match_fn callback is defined, then we also call it.
 
-Understand.
+Binding combos only requesting a type check do not define the
+match_fn callback.
 
-When I first looked at the ranges stuff in the string input visitor, I
-felt the urge to clean it up, then sat on my hands until it passed.
+Fixes: af7d64ede0b9 (hw/arm/sysbus-fdt: Allow device matching with
+DT compatible value)
 
-The rest is reasonable once you understand how it works.  The learning
-curve is less than pleasant, though.
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reported-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/arm/sysbus-fdt.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
+
+diff --git a/hw/arm/sysbus-fdt.c b/hw/arm/sysbus-fdt.c
+index 0e24c803a1..a44cf7f255 100644
+--- a/hw/arm/sysbus-fdt.c
++++ b/hw/arm/sysbus-fdt.c
+@@ -449,7 +449,7 @@ static bool type_match(SysBusDevice *sbdev, const BindingEntry *entry)
+     return !strcmp(object_get_typename(OBJECT(sbdev)), entry->typename);
+ }
+ 
+-#define TYPE_BINDING(type, add_fn) {(type), NULL, (add_fn), type_match}
++#define TYPE_BINDING(type, add_fn) {(type), NULL, (add_fn), NULL}
+ 
+ /* list of supported dynamic sysbus bindings */
+ static const BindingEntry bindings[] = {
+@@ -481,10 +481,18 @@ static void add_fdt_node(SysBusDevice *sbdev, void *opaque)
+     for (i = 0; i < ARRAY_SIZE(bindings); i++) {
+         const BindingEntry *iter = &bindings[i];
+ 
+-        if (iter->match_fn(sbdev, iter)) {
+-            ret = iter->add_fn(sbdev, opaque);
+-            assert(!ret);
+-            return;
++        if (type_match(sbdev, iter)) {
++            if (iter->match_fn) {
++                if (iter->match_fn(sbdev, iter)) {
++                    ret = iter->add_fn(sbdev, opaque);
++                    assert(!ret);
++                    return;
++                }
++            } else {
++                ret = iter->add_fn(sbdev, opaque);
++                assert(!ret);
++                return;
++            }
+         }
+     }
+     error_report("Device %s can not be dynamically instantiated",
+-- 
+2.17.2
