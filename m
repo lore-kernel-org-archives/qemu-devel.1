@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57528)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gJh62-0004ZJ-GU
+	(envelope-from <armbru@redhat.com>) id 1gJh64-0004EX-Fg
 	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:47:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gJgwq-0007IO-0U
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:37:55 -0500
-Received: from mga01.intel.com ([192.55.52.88]:60257)
+	(envelope-from <armbru@redhat.com>) id 1gJgwj-0007B3-CD
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:37:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34218)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sameo@linux.intel.com>)
-	id 1gJgwo-0007FU-3u
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:37:51 -0500
-Date: Mon, 5 Nov 2018 16:37:09 +0100
-From: Samuel Ortiz <sameo@linux.intel.com>
-Message-ID: <20181105153708.GA26338@caravaggio>
-References: <20181101102303.16439-1-sameo@linux.intel.com>
-	<20181102132925.365e1881@redhat.com>
-	<20181105021028.GA6380@caravaggio>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gJgwj-00073R-0i
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:37:45 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181023152306.3123-1-david@redhat.com>
+	<20181023152306.3123-2-david@redhat.com>
+	<87pnvqdvsj.fsf@dusky.pond.sub.org>
+	<e8fe86a1-d075-2ea8-d1f4-e08e5dceee07@redhat.com>
+	<875zxingqn.fsf@dusky.pond.sub.org>
+	<440eb166-73d1-77b6-5dd9-66a0abd7d665@redhat.com>
+Date: Mon, 05 Nov 2018 16:37:35 +0100
+In-Reply-To: <440eb166-73d1-77b6-5dd9-66a0abd7d665@redhat.com> (David
+	Hildenbrand's message of "Wed, 31 Oct 2018 19:01:46 +0100")
+Message-ID: <87muqn5ydc.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181105021028.GA6380@caravaggio>
-Subject: Re: [Qemu-devel] [PATCH v4 00/23] ACPI reorganization for
- hardware-reduced support
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 1/7] qapi: use qemu_strtoi64() in
+ parse_str
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,21 +32,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-Igor,
+David Hildenbrand <david@redhat.com> writes:
 
-On Mon, Nov 05, 2018 at 03:10:28AM +0100, Samuel Ortiz wrote:
-> > QEMU already has hw reduced implementation, specifically in arm/virt board
-> Back in May, I tried booting a virt machine type with "acpi=force" with
-> no success, and today's HEAD still fails. With "acpi=on":
-> 
-> [    0.000000] ACPI: Early table checksum verification disabled
-> [    0.000000] ACPI: Failed to init ACPI tables
-My bad, I was using the wrong firmware/pflash options. With the right
-ones, I can boot with an edk2 firmware and an EFI variable space. Thanks
-Philippe and Eric for the help.
+> On 31.10.18 18:55, Markus Armbruster wrote:
+>> David Hildenbrand <david@redhat.com> writes:
+>> 
+>>> On 31.10.18 15:40, Markus Armbruster wrote:
+>>>> David Hildenbrand <david@redhat.com> writes:
+>>>>
+>>>>> The qemu api claims to be easier to use, and the resulting code seems to
+>>>>> agree.
+>> [...]
+>>>>> @@ -60,9 +61,7 @@ static int parse_str(StringInputVisitor *siv, const char *name, Error **errp)
+>>>>>      }
+>>>>>  
+>>>>>      do {
+>>>>> -        errno = 0;
+>>>>> -        start = strtoll(str, &endptr, 0);
+>>>>> -        if (errno == 0 && endptr > str) {
+>>>>> +        if (!qemu_strtoi64(str, &endptr, 0, &start)) {
+>>>>>              if (*endptr == '\0') {
+>>>>>                  cur = g_malloc0(sizeof(*cur));
+>>>>>                  range_set_bounds(cur, start, start);
+>>>>> @@ -71,11 +70,7 @@ static int parse_str(StringInputVisitor *siv, const char *name, Error **errp)
+>>>>>                  str = NULL;
+>>>>>              } else if (*endptr == '-') {
+>>>>>                  str = endptr + 1;
+>>>>> -                errno = 0;
+>>>>> -                end = strtoll(str, &endptr, 0);
+>>>>> -                if (errno == 0 && endptr > str && start <= end &&
+>>>>> -                    (start > INT64_MAX - 65536 ||
+>>>>> -                     end < start + 65536)) {
+>>>>> +                if (!qemu_strtoi64(str, &endptr, 0, &end) && start < end) {
+>>>>
+>>>> You deleted (start > INT64_MAX - 65536 || end < start + 65536).  Can you
+>>>> explain that to me?  I'm feeling particularly dense today...
+>>>
+>>> qemu_strtoi64 performs all different kinds of error handling completely
+>>> internally. This old code here was an attempt to filter out -EWHATEVER
+>>> from the response. No longer needed as errors and the actual value are
+>>> reported via different ways.
+>> 
+>> I understand why errno == 0 && endptr > str go away.  They also do in
+>> the previous hunk.
+>> 
+>> The deletion of (start > INT64_MAX - 65536 || end < start + 65536) is
+>> unobvious.  What does it do before the patch?
+>> 
+>> The condition goes back to commit 659268ffbff, which predates my watch
+>> as maintainer.  Its commit message is of no particular help.  Its code
+>> is... allright, the less I say about that, the better.
+>> 
+>> We're parsing a range here.  We already parsed its lower bound into
+>> @start (and guarded against errors), and its upper bound into @end (and
+>> guarded against errors).
+>> 
+>> If the condition you delete is false, we goto error.  So the condition
+>> is about range validity.  I figure it's an attempt to require valid
+>> ranges to be no "wider" than 65535.  The second part end < start + 65536
+>> checks exactly that, except shit happens when start + 65536 overflows.
+>> The first part attempts to guard against that, but
+>> 
+>> (1) INT64_MAX is *wrong*, because we compute in long long, and
+>> 
+>> (2) it rejects even small ranges like INT64_MAX - 2 .. INT64_MAX - 1.
+>> 
+>> WTF?!?
+>> 
+>> Unless I'm mistaken, the condition is not about handling any of the
+>> errors that qemu_strtoi64() handles for us.
+>> 
+>> The easiest way for you out of this morass is probably to keep the
+>> condition exactly as it was, then use the "my patch doesn't make things
+>> any worse" get-out-of-jail-free card.
+>> 
+>
+> Looking at the code in qapi/string-output-visitor.c related to range and
+> list handling I feel like using the get-out-of-jail-free card to get out
+> of qapi code now :) Too much magic in that code and too little time for
+> me to understand it all.
+>
+> Thanks for your time and review anyway. My time is better invested in
+> other parts of QEMU. I will drop both patches from this series.
 
-Cheers,
-Samuel.
+Understand.
+
+When I first looked at the ranges stuff in the string input visitor, I
+felt the urge to clean it up, then sat on my hands until it passed.
+
+The rest is reasonable once you understand how it works.  The learning
+curve is less than pleasant, though.
