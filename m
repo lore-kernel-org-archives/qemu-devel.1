@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55165)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Andrew.Baumann@microsoft.com>) id 1gJjAI-0004wT-MI
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 12:59:55 -0500
+	(envelope-from <noring@nocrew.org>) id 1gJjMm-0003Vz-Tp
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:12:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Andrew.Baumann@microsoft.com>) id 1gJjAF-00040a-9d
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 12:59:54 -0500
-From: Andrew Baumann <Andrew.Baumann@microsoft.com>
-Date: Mon, 5 Nov 2018 17:59:48 +0000
-Message-ID: <MWHPR21MB0189B958EA566F8418FBC44B9ECA0@MWHPR21MB0189.namprd21.prod.outlook.com>
-References: <20181102001303.32640-1-f4bug@amsat.org>
-	<20181102001303.32640-2-f4bug@amsat.org>
-	<CAFEAcA-DZMivo-epUmM6NxPzCUbGCfSU+SxEjszTNLdVaB8UxQ@mail.gmail.com>
-	<MWHPR21MB018970A4F8FA0E42B5DD48229ECA0@MWHPR21MB0189.namprd21.prod.outlook.com>
-	<CAFEAcA-=Y80ZgFOJfVzCxqjaJvG1yO5aBR7efX4OGtOKSXeq2w@mail.gmail.com>
-In-Reply-To: <CAFEAcA-=Y80ZgFOJfVzCxqjaJvG1yO5aBR7efX4OGtOKSXeq2w@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <noring@nocrew.org>) id 1gJjMk-0006tP-7N
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:12:48 -0500
+Received: from pio-pvt-msa3.bahnhof.se ([79.136.2.42]:33442)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gJjMj-0006sa-R7
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 13:12:46 -0500
+Date: Mon, 5 Nov 2018 19:12:42 +0100
+From: Fredrik Noring <noring@nocrew.org>
+Message-ID: <20181105181242.GB2383@sx9>
+References: <cover.1541174426.git.noring@nocrew.org>
+	<BN6PR2201MB1251AFA493032E33B49A5376C6CA0@BN6PR2201MB1251.namprd22.prod.outlook.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH for 3.1 v2 1/7] MAINTAINERS: Add an entry
- for the Raspberry Pi machines
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <BN6PR2201MB1251AFA493032E33B49A5376C6CA0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+Subject: Re: [Qemu-devel] [PATCH 0/2] target/mips: Fix decoding mechanisms
+ of R5900 M{F, T}{HI, LO}1 and DIV[U]1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,20 +28,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>, Guenter Roeck <linux@roeck-us.net>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: Aurelien Jarno <aurelien@aurel32.net>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?utf-8?Q?J=C3=BCrgen?= Urban <JuergenUrban@gmx.de>, "Maciej W. Rozycki" <macro@linux-mips.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-PiBGcm9tOiBQZXRlciBNYXlkZWxsIDxwZXRlci5tYXlkZWxsQGxpbmFyby5vcmc+DQo+IFNlbnQ6
-IE1vbmRheSwgNSBOb3ZlbWJlciAyMDE4IDA5OjU4DQo+IA0KPiBPbiA1IE5vdmVtYmVyIDIwMTgg
-YXQgMTc6MDYsIEFuZHJldyBCYXVtYW5uDQo+IDxBbmRyZXcuQmF1bWFubkBtaWNyb3NvZnQuY29t
-PiB3cm90ZToNCj4gPiBGcm9tOiBQZXRlciBNYXlkZWxsIDxwZXRlci5tYXlkZWxsQGxpbmFyby5v
-cmc+DQo+ID4+IEFuZHJldywgYXMgdGhlIG9yaWdpbmFsIHN1Ym1pdHRlciBvZiB0aGUgUmFzcGJl
-cnJ5IFBpIGNvZGUgd291bGQgeW91DQo+ID4+IGxpa2UgdG8gYmUgbGlzdGVkIGFzIGEgbWFpbnRh
-aW5lciBmb3IgaXQ/DQo+ID4NCj4gPiBUaGFua3MgZm9yIGFza2luZzsgcHJvYmFibHkgbm90IC0t
-IEknbSBoYXBweSB0byByZXZpZXcgdGhlIG9kZCBwYXRjaA0KPiA+IGlmIG15IGlucHV0IHdvdWxk
-IGJlIGhlbHBmdWwsIGJ1dCBJIGhhdmVuJ3Qgd29ya2VkIG9uIGl0IGZvciB5ZWFycywNCj4gPiBh
-bmQgSSBkb24ndCBoYXZlIHNwYXJlIGN5Y2xlcywgc28gSSdkIGp1c3QgYmUgYSBib3R0bGVuZWNr
-Lg0KPiANCj4gU3VyZSwgbm8gcHJvYmxlbS4gV291bGQgeW91IGxpa2UgdG8gYmUgbGlzdGVkIGFz
-IGEgInJldmlld2VyIg0KPiAobWVhbnMgcGVvcGxlIHdpbGwgQ0MgeW91IG9uIHBhdGNoZXMsIGJh
-c2ljYWxseSksIG9yIG5vdCBhdCBhbGw/DQoNClN1cmUsIHJldmlld2VyIGlzIGZpbmUgd2l0aCBt
-ZS4NCg0KQW5kcmV3DQo=
+Thank you for your review, Aleksandar,
+
+> For LL, SC, LLD and SCD instructions, there is a need to properly insulate
+> their R5900 versions too, similar to this:
+> 
+>     case OPC_SC:
+>         if(ctx->insn_flags & INSN_R5900) {
+>              check_insn_opc_user_only(ctx, INSN_R5900);
+>         } else {
+>             check_insn(ctx, ISA_MIPS2);
+>         }
+>         gen_st_cond(ctx, op, rt, rs, imm);
+>         break;
+
+Would you accept the simplification to omit the else clause? Like this:
+
+    case OPC_SC:
+        if (ctx->insn_flags & INSN_R5900) {
+            check_insn_opc_user_only(ctx, INSN_R5900);
+        }
+        check_insn(ctx, ISA_MIPS2);
+        check_insn_opc_removed(ctx, ISA_MIPS32R6);
+        gen_st_cond(ctx, op, rt, rs, imm);
+        break;
+
+The code will, of course, expand into a double-check of INSN_R5900:
+
+        if (ctx->insn_flags & INSN_R5900) {
+#ifndef CONFIG_USER_ONLY
+            if (unlikely(ctx->insn_flags & INSN_R5900)) {
+                generate_exception_end(ctx, EXCP_RI);
+            }
+#endif
+        }
+
+> (the code above is just a form of pseudocode illustrating the idea; I
+> don't guarantee the correctness for build purposes, or if this is the best
+> code organization)
+> 
+> Non-R5900 code (for the time being) should never invoke
+> check_insn_opc_user_only(). *The only way* of distinguishing R5900 code
+> paths from the other CPUs code paths should be by using
+> "if(ctx->insn_flags & INSN_R5900)"!
+
+OK.
+
+> For changes in decode_opc_special_legacy(), there shouldn't be there, but
+> there should be a separate function decode_opc_special_tx59() or so.
+
+Sure, I will copy the 82 line function then, and patch the following:
+
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -23904,7 +23904,7 @@ static void decode_opc_special_legacy(CPUMIPSState *env, DisasContext *ctx)
+     case OPC_MOVN:         /* Conditional move */
+     case OPC_MOVZ:
+         check_insn(ctx, ISA_MIPS4 | ISA_MIPS32 |
+-                   INSN_LOONGSON2E | INSN_LOONGSON2F | INSN_R5900);
++                   INSN_LOONGSON2E | INSN_LOONGSON2F);
+         gen_cond_move(ctx, op1, rd, rs, rt);
+         break;
+     case OPC_MFHI:          /* Move from HI/LO */
+@@ -23931,8 +23931,6 @@ static void decode_opc_special_legacy(CPUMIPSState *env, DisasContext *ctx)
+             check_insn(ctx, INSN_VR54XX);
+             op1 = MASK_MUL_VR54XX(ctx->opcode);
+             gen_mul_vr54xx(ctx, op1, rd, rs, rt);
+-        } else if (ctx->insn_flags & INSN_R5900) {
+-            gen_mul_txx9(ctx, op1, rd, rs, rt);
+         } else {
+             gen_muldiv(ctx, op1, rd & 3, rs, rt);
+         }
+@@ -23947,7 +23945,6 @@ static void decode_opc_special_legacy(CPUMIPSState *env, DisasContext *ctx)
+     case OPC_DDIV:
+     case OPC_DDIVU:
+         check_insn(ctx, ISA_MIPS3);
+-        check_insn_opc_user_only(ctx, INSN_R5900);
+         check_mips_64(ctx);
+         gen_muldiv(ctx, op1, 0, rs, rt);
+         break;
+
+Fredrik
