@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Andrew.Baumann@microsoft.com>) id 1gJiOc-00047P-VT
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 12:10:40 -0500
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gJiP4-0004Rf-Rz
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 12:11:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Andrew.Baumann@microsoft.com>) id 1gJiKu-0005ue-HZ
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 12:06:51 -0500
-From: Andrew Baumann <Andrew.Baumann@microsoft.com>
-Date: Mon, 5 Nov 2018 17:06:45 +0000
-Message-ID: <MWHPR21MB018970A4F8FA0E42B5DD48229ECA0@MWHPR21MB0189.namprd21.prod.outlook.com>
-References: <20181102001303.32640-1-f4bug@amsat.org>
-	<20181102001303.32640-2-f4bug@amsat.org>
-	<CAFEAcA-DZMivo-epUmM6NxPzCUbGCfSU+SxEjszTNLdVaB8UxQ@mail.gmail.com>
-In-Reply-To: <CAFEAcA-DZMivo-epUmM6NxPzCUbGCfSU+SxEjszTNLdVaB8UxQ@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gJiEs-0000qZ-Mn
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 12:00:40 -0500
+References: <mhng-3a3dd1f0-dbed-4b43-b21f-88ecea6f5fb1@palmer-si-x1c4>
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Message-ID: <8cede3dd-e348-639e-b528-3aa87abf1aae@mail.uni-paderborn.de>
+Date: Mon, 5 Nov 2018 18:00:10 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH for 3.1 v2 1/7] MAINTAINERS: Add an entry
- for the Raspberry Pi machines
+In-Reply-To: <mhng-3a3dd1f0-dbed-4b43-b21f-88ecea6f5fb1@palmer-si-x1c4>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US-large
+Subject: Re: [Qemu-devel] [PATCH v3 26/35] target/riscv: Remove shift and
+ slt insn manual decoding
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,27 +24,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
-Cc: Guenter Roeck <linux@roeck-us.net>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Palmer Dabbelt <palmer@sifive.com>, richard.henderson@linaro.org
+Cc: qemu-riscv@nongnu.org, sagark@eecs.berkeley.edu, qemu-devel@nongnu.org, peer.adelt@hni.uni-paderborn.de, Alistair Francis <Alistair.Francis@wdc.com>, Michael Clark <mjc@sifive.com>
 
-PiBGcm9tOiBQZXRlciBNYXlkZWxsIDxwZXRlci5tYXlkZWxsQGxpbmFyby5vcmc+DQo+IFNlbnQ6
-IE1vbmRheSwgNSBOb3ZlbWJlciAyMDE4IDA3OjI2DQo+IA0KPiBPbiAyIE5vdmVtYmVyIDIwMTgg
-YXQgMDA6MTIsIFBoaWxpcHBlIE1hdGhpZXUtRGF1ZMOpIDxmNGJ1Z0BhbXNhdC5vcmc+DQo+IHdy
-b3RlOg0KPiA+IFNvIGZhciB0aGUgUmFzcGkgbWFjaGluZXMgdXNlIHRoZSBCQ00yODM2IFNvQyB3
-aGljaCBpbmNsdWRlcyBhIEJDTTI4MzUNCj4gPiBmb3IgdGhlIHBlcmlwaGVyYWxzLg0KPiA+DQo+
-ID4gU2lnbmVkLW9mZi1ieTogUGhpbGlwcGUgTWF0aGlldS1EYXVkw6kgPGY0YnVnQGFtc2F0Lm9y
-Zz4NCj4gPiAtLS0NCj4gPiAgTUFJTlRBSU5FUlMgfCA2ICsrKysrKw0KPiA+ICAxIGZpbGUgY2hh
-bmdlZCwgNiBpbnNlcnRpb25zKCspDQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEvTUFJTlRBSU5FUlMg
-Yi9NQUlOVEFJTkVSUyBpbmRleCBmMjM2MGVmZTNlLi5jNDFlYTVlZDNmDQo+ID4gMTAwNjQ0DQo+
-ID4gLS0tIGEvTUFJTlRBSU5FUlMNCj4gPiArKysgYi9NQUlOVEFJTkVSUw0KPiA+IEBAIC02ODMs
-NiArNjgzLDEyIEBAIEY6IGh3L2FybS9ucmY1MV9zb2MuYw0KPiA+ICBGOiBody9hcm0vbWljcm9i
-aXQuYw0KPiA+ICBGOiBpbmNsdWRlL2h3L2FybS9ucmY1MV9zb2MuaA0KPiA+DQo+ID4gK1Jhc3Bi
-ZXJyeSBQaQ0KPiA+ICtMOiBxZW11LWFybUBub25nbnUub3JnDQo+ID4gK1M6IE9kZCBGaXhlcw0K
-PiA+ICtGOiBody8qL2JjbTI4MyoNCj4gPiArRjogaW5jbHVkZS9ody8qL2JjbTI4MyoNCj4gPiAr
-DQo+IA0KPiBXZSBzaG91bGQgYWxzbyBoYXZlIEY6aHcvYXJtL3Jhc3BpLmMNCj4gDQo+IEFuZHJl
-dywgYXMgdGhlIG9yaWdpbmFsIHN1Ym1pdHRlciBvZiB0aGUgUmFzcGJlcnJ5IFBpIGNvZGUgd291
-bGQgeW91IGxpa2UgdG8NCj4gYmUgbGlzdGVkIGFzIGEgbWFpbnRhaW5lciBmb3IgaXQ/DQoNClRo
-YW5rcyBmb3IgYXNraW5nOyBwcm9iYWJseSBub3QgLS0gSSdtIGhhcHB5IHRvIHJldmlldyB0aGUg
-b2RkIHBhdGNoIGlmIG15IGlucHV0IHdvdWxkIGJlIGhlbHBmdWwsIGJ1dCBJIGhhdmVuJ3Qgd29y
-a2VkIG9uIGl0IGZvciB5ZWFycywgYW5kIEkgZG9uJ3QgaGF2ZSBzcGFyZSBjeWNsZXMsIHNvIEkn
-ZCBqdXN0IGJlIGEgYm90dGxlbmVjay4NCg0KQW5kcmV3DQo=
+
+On 11/1/18 4:59 PM, Palmer Dabbelt wrote:
+> On Wed, 31 Oct 2018 15:38:08 PDT (-0700), richard.henderson@linaro.org 
+> wrote:
+>> On 10/31/18 1:20 PM, Bastian Koppelmann wrote:
+>>>  static bool trans_slt(DisasContext *ctx, arg_slt *a)
+>>>  {
+>>> -    gen_arith(ctx, OPC_RISC_SLT, a->rd, a->rs1, a->rs2);
+>>> +    TCGv source1 = tcg_temp_new();
+>>> +    TCGv source2 = tcg_temp_new();
+>>> +
+>>> +    gen_get_gpr(source1, a->rs1);
+>>> +    gen_get_gpr(source2, a->rs2);
+>>> +
+>>> +    tcg_gen_setcond_tl(TCG_COND_LT, source1, source1, source2);
+>>
+>> I do wonder about extracting this one line to gen_slt so that you can 
+>> re-use
+>> gen_arith and gen_arithi.
+>>
+>>> +    tcg_gen_setcond_tl(TCG_COND_LTU, source1, source1, source2);
+>>
+>> Similarly.
+>>
+>>>  static bool trans_sllw(DisasContext *ctx, arg_sllw *a)
+>>>  {
+>>> -    gen_arith(ctx, OPC_RISC_SLLW, a->rd, a->rs1, a->rs2);
+>>> +    TCGv source1 = tcg_temp_new();
+>>> +    TCGv source2 = tcg_temp_new();
+>>> +
+>>> +    gen_get_gpr(source1, a->rs1);
+>>> +    gen_get_gpr(source2, a->rs2);
+>>> +
+>>> +    tcg_gen_andi_tl(source2, source2, 0x1F);
+>>> +    tcg_gen_shl_tl(source1, source1, source2);
+>>> +
+>>> +    gen_set_gpr(a->rd, source1);
+>>
+>> Missing the ext32s after the shift.
+>>
+>>>  static bool trans_srlw(DisasContext *ctx, arg_srlw *a)
+>>>  {
+>>> -    gen_arith(ctx, OPC_RISC_SRLW, a->rd, a->rs1, a->rs2);
+>>> +    TCGv source1 = tcg_temp_new();
+>>> +    TCGv source2 = tcg_temp_new();
+>>> +
+>>> +    gen_get_gpr(source1, a->rs1);
+>>> +    gen_get_gpr(source2, a->rs2);
+>>> +
+>>> +    /* clear upper 32 */
+>>> +    tcg_gen_ext32u_tl(source1, source1);
+>>> +    tcg_gen_andi_tl(source2, source2, 0x1F);
+>>> +    tcg_gen_shr_tl(source1, source1, source2);
+>>
+>> Likewise.  (Consider source2 == 0.)
+>>
+>>> -    case OPC_RISC_SRL:
+>>> -        tcg_gen_andi_tl(source2, source2, TARGET_LONG_BITS - 1);
+>>> -        tcg_gen_shr_tl(source1, source1, source2);
+>>> -        break;
+>> ...
+>>> -    case OPC_RISC_SRA:
+>>> -        tcg_gen_andi_tl(source2, source2, TARGET_LONG_BITS - 1);
+>>> -        tcg_gen_sar_tl(source1, source1, source2);
+>>> -        break;
+>>
+>> I see that the bugs are in the original though, so fixing them in a 
+>> separate
+>> patch is certainly ok.
+>
+> Since we're in the soft freeze now, I think it would be great to get 
+> the bug fixes broken out as separate patches at the start of this 
+> series that we can pick up for this release.  It would be great if the 
+> decodetree conversion was a non-functional change, as that will make 
+> it easier to review.
+
+
+Sounds good. Unfortunately, I don't have much time right now. I try at 
+least to extract the bugfixes, such that they make it for this release.
+
+
+Cheers,
+
+Bastian
