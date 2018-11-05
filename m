@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32925)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34446)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gJhEK-0000RB-Cv
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:56:01 -0500
+	(envelope-from <armbru@redhat.com>) id 1gJhGF-0003EM-I7
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:57:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gJhEJ-0000sa-F7
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:55:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38426)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gJhEJ-0000nj-69
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:55:55 -0500
+	(envelope-from <armbru@redhat.com>) id 1gJhGE-0006bh-2z
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:57:55 -0500
 From: Markus Armbruster <armbru@redhat.com>
-References: <1541069086-167036-1-git-send-email-imammedo@redhat.com>
-	<CAJ+F1CKE56kB+RokaNBwy1zB=xEeo-UaXgqp2-poMsprzY9Osw@mail.gmail.com>
-	<20181101133313.533f7834@redhat.com>
-Date: Mon, 05 Nov 2018 16:55:50 +0100
-In-Reply-To: <20181101133313.533f7834@redhat.com> (Igor Mammedov's message of
-	"Thu, 1 Nov 2018 13:33:13 +0100")
-Message-ID: <875zxb5xix.fsf@dusky.pond.sub.org>
+References: <154115285434.11300.8459925605672823399.stgit@dhcp-3-135.uk.xensource.com>
+	<20181102110412.GD7521@dhcp-200-186.str.redhat.com>
+	<152b8d37c7d54de687f4ced536ba6a10@AMSPEX02CL03.citrite.net>
+Date: Mon, 05 Nov 2018 16:57:31 +0100
+In-Reply-To: <152b8d37c7d54de687f4ced536ba6a10@AMSPEX02CL03.citrite.net> (Paul
+	Durrant's message of "Fri, 2 Nov 2018 11:13:48 +0000")
+Message-ID: <871s7z5xg4.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] ivshmem: fix memory backend leak
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] xen_disk qdevification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +24,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>
+To: Paul Durrant <Paul.Durrant@citrix.com>
+Cc: 'Kevin Wolf' <kwolf@redhat.com>, Tim Smith <tim.smith@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
 
-Igor Mammedov <imammedo@redhat.com> writes:
+Paul Durrant <Paul.Durrant@citrix.com> writes:
 
-> On Thu, 1 Nov 2018 15:02:04 +0400
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
+>> -----Original Message-----
+>> From: Kevin Wolf [mailto:kwolf@redhat.com]
+>> Sent: 02 November 2018 11:04
+>> To: Tim Smith <tim.smith@citrix.com>
+>> Cc: xen-devel@lists.xenproject.org; qemu-devel@nongnu.org; qemu-
+>> block@nongnu.org; Anthony Perard <anthony.perard@citrix.com>; Paul Durrant
+>> <Paul.Durrant@citrix.com>; Stefano Stabellini <sstabellini@kernel.org>;
+>> Max Reitz <mreitz@redhat.com>; armbru@redhat.com
+>> Subject: xen_disk qdevification (was: [PATCH 0/3] Performance improvements
+>> for xen_disk v2)
+>> 
+>> Am 02.11.2018 um 11:00 hat Tim Smith geschrieben:
+>> > A series of performance improvements for disks using the Xen PV ring.
+>> >
+>> > These have had fairly extensive testing.
+>> >
+>> > The batching and latency improvements together boost the throughput
+>> > of small reads and writes by two to six percent (measured using fio
+>> > in the guest)
+>> >
+>> > Avoiding repeated calls to posix_memalign() reduced the dirty heap
+>> > from 25MB to 5MB in the case of a single datapath process while also
+>> > improving performance.
+>> >
+>> > v2 removes some checkpatch complaints and fixes the CCs
+>> 
+>> Completely unrelated, but since you're the first person touching
+>> xen_disk in a while, you're my victim:
+>> 
+>> At KVM Forum we discussed sending a patch to deprecate xen_disk because
+>> after all those years, it still hasn't been converted to qdev. Markus is
+>> currently fixing some other not yet qdevified block device, but after
+>> that xen_disk will be the only one left.
+>> 
+>> A while ago, a downstream patch review found out that there are some QMP
+>> commands that would immediately crash if a xen_disk device were present
+>> because of the lacking qdevification. This is not the code quality
+>> standard I envision for QEMU. It's time for non-qdev devices to go.
+>> 
+>> So if you guys are still interested in the device, could someone please
+>> finally look into converting it?
+>> 
 >
->> On Thu, Nov 1, 2018 at 2:53 PM Igor Mammedov <imammedo@redhat.com> wrote:
->> >
->> > object_new() returns a new backend with refcount =3D=3D 1 and
->> > then later object_property_add_child() increases refcount to 2
->> > So when ivshmem is desroyed, the backend it has created isn't
->> > destroyed along with it as children cleanup will bring
->> > backend's refcount only to 1, which leaks backend including
->> > resources it is using.
->> >
->> > Drop the original reference from object_new() once backend
->> > is attached to its parent.
->> >
+> I have a patch series to do exactly this. It's somewhat involved as I
+> need to convert the whole PV backend infrastructure. I will try to
+> rebase and clean up my series a.s.a.p.
 
-I believe
-Fixes: 5503e285041979dd29698ecb41729b3b22622e8d
-
->> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>=20=20
->>=20
->> I would rather have the unref in finalize, but that is ok too.
-> I followed the pattern we use else where, i.e. drop reference
-> as soon as we set the parent (virtio-rng/cpus) within the same
-> scope as object_new().
->
-> There is no point in keeping reference until finalize time since
-> backend is kept alive as child and is destroyed well after all
-> nonexistent ivshmem::unrealize/finilize() are finished when generic
-> Object is being destroyed.
-
-Concur.
-
->>  Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-With Philippe's spelling fix:
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Awesome!  Please coordinate with Anthony Prerard to avoid duplicating
+work if you haven't done so already.
