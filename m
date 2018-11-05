@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48154)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcfaracco@gmail.com>) id 1gJgUd-0005la-Ta
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:08:45 -0500
+	(envelope-from <jcfaracco@gmail.com>) id 1gJgUb-0005lL-DK
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:08:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcfaracco@gmail.com>) id 1gJgUc-0002jv-Gw
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:08:43 -0500
+	(envelope-from <jcfaracco@gmail.com>) id 1gJgUZ-00025v-1C
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 10:08:41 -0500
 From: Julio Faracco <jcfaracco@gmail.com>
-Date: Mon,  5 Nov 2018 13:08:05 -0200
-Message-Id: <20181105150806.13649-4-jcfaracco@gmail.com>
+Date: Mon,  5 Nov 2018 13:08:03 -0200
+Message-Id: <20181105150806.13649-2-jcfaracco@gmail.com>
 In-Reply-To: <20181105150806.13649-1-jcfaracco@gmail.com>
 References: <20181105150806.13649-1-jcfaracco@gmail.com>
-Subject: [Qemu-devel] [PATCH v3 3/4] dmg: including dmg-lzfse module inside
- dmg block driver.
+Subject: [Qemu-devel] [PATCH v3 1/4] block: adding lzfse decompressing
+ support as a module.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,93 +23,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org
 
-This commit includes the support to new module dmg-lzfse into dmg block
-driver. It includes the support for block type ULFO (0x80000007).
+QEMU dmg support includes zlib and bzip2, but it does not contains lzfse
+support. This commit adds the source file to extend compression support
+for new DMGs.
 
 Signed-off-by: Julio Faracco <jcfaracco@gmail.com>
 ---
- block/dmg.c | 28 ++++++++++++++++++++++++++++
- block/dmg.h |  3 +++
- 2 files changed, 31 insertions(+)
+ block/dmg-lzfse.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 49 insertions(+)
+ create mode 100644 block/dmg-lzfse.c
 
-diff --git a/block/dmg.c b/block/dmg.c
-index c9b3c519c4..615f818c5a 100644
---- a/block/dmg.c
-+++ b/block/dmg.c
-@@ -33,6 +33,9 @@
- int (*dmg_uncompress_bz2)(char *next_in, unsigned int avail_in,
-                           char *next_out, unsigned int avail_out);
- 
-+int (*dmg_uncompress_lzfse)(char *next_in, unsigned int avail_in,
-+                            char *next_out, unsigned int avail_out);
+diff --git a/block/dmg-lzfse.c b/block/dmg-lzfse.c
+new file mode 100644
+index 0000000000..19d25bc646
+--- /dev/null
++++ b/block/dmg-lzfse.c
+@@ -0,0 +1,49 @@
++/*
++ * DMG lzfse uncompression
++ *
++ * Copyright (c) 2018 Julio Cesar Faracco
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "dmg.h"
++#include <lzfse.h>
 +
- enum {
-     /* Limit chunk sizes to prevent unreasonable amounts of memory being used
-      * or truncating when converting to 32-bit types
-@@ -107,6 +110,7 @@ static void update_max_chunk_size(BDRVDMGState *s, uint32_t chunk,
-     switch (s->types[chunk]) {
-     case 0x80000005: /* zlib compressed */
-     case 0x80000006: /* bzip2 compressed */
-+    case 0x80000007: /* lzfse compressed */
-         compressed_size = s->lengths[chunk];
-         uncompressed_sectors = s->sectorcounts[chunk];
-         break;
-@@ -188,6 +192,8 @@ static bool dmg_is_known_block_type(uint32_t entry_type)
-         return true;
-     case 0x80000006:    /* bzip2 */
-         return !!dmg_uncompress_bz2;
-+    case 0x80000007:    /* lzfse */
-+        return !!dmg_uncompress_lzfse;
-     default:
-         return false;
-     }
-@@ -431,6 +437,7 @@ static int dmg_open(BlockDriverState *bs, QDict *options, int flags,
-     }
- 
-     block_module_load_one("dmg-bz2");
-+    block_module_load_one("dmg-lzfse");
- 
-     s->n_chunks = 0;
-     s->offsets = s->lengths = s->sectors = s->sectorcounts = NULL;
-@@ -629,6 +636,27 @@ static inline int dmg_read_chunk(BlockDriverState *bs, uint64_t sector_num)
-                 return ret;
-             }
-             break;
-+        case 0x80000007:
-+            if (!dmg_uncompress_lzfse) {
-+                break;
-+            }
-+            /* we need to buffer, because only the chunk as whole can be
-+             * inflated. */
-+            ret = bdrv_pread(bs->file, s->offsets[chunk],
-+                             s->compressed_chunk, s->lengths[chunk]);
-+            if (ret != s->lengths[chunk]) {
-+                return -1;
-+            }
++static int dmg_uncompress_lzfse_do(char *next_in, unsigned int avail_in,
++                                   char *next_out, unsigned int avail_out)
++{
++    size_t out_size = lzfse_decode_buffer((uint8_t *) next_out, avail_out,
++                                          (uint8_t *) next_in, avail_in,
++                                          NULL);
 +
-+            ret = dmg_uncompress_lzfse((char *)s->compressed_chunk,
-+                                       (unsigned int) s->lengths[chunk],
-+                                       (char *)s->uncompressed_chunk,
-+                                       (unsigned int)
-+                                           (512 * s->sectorcounts[chunk]));
-+            if (ret < 0) {
-+                return ret;
-+            }
-+            break;
-         case 1: /* copy */
-             ret = bdrv_pread(bs->file, s->offsets[chunk],
-                              s->uncompressed_chunk, s->lengths[chunk]);
-diff --git a/block/dmg.h b/block/dmg.h
-index 2ecf239ba5..f28929998f 100644
---- a/block/dmg.h
-+++ b/block/dmg.h
-@@ -55,4 +55,7 @@ typedef struct BDRVDMGState {
- extern int (*dmg_uncompress_bz2)(char *next_in, unsigned int avail_in,
-                                  char *next_out, unsigned int avail_out);
- 
-+extern int (*dmg_uncompress_lzfse)(char *next_in, unsigned int avail_in,
-+                                   char *next_out, unsigned int avail_out);
++    /* We need to decode the single chunk only. */
++    /* So, out_size == avail_out is not an error here. */
++    if (out_size > 0) {
++        return out_size;
++    }
++    return -1;
++}
 +
- #endif
++__attribute__((constructor))
++static void dmg_lzfse_init(void)
++{
++    assert(!dmg_uncompress_lzfse);
++    dmg_uncompress_lzfse = dmg_uncompress_lzfse_do;
++}
 -- 
 2.17.1
