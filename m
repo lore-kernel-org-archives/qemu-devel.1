@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55188)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55441)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gJZKQ-0006dA-TU
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 02:29:43 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gJZLO-00079Z-Si
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 02:30:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gJZKM-0007s8-40
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 02:29:42 -0500
-Received: from mail-qk1-f194.google.com ([209.85.222.194]:38581)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gJZK8-0007RA-4b
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 02:29:29 -0500
-Received: by mail-qk1-f194.google.com with SMTP id d19so13064287qkg.5
-	for <qemu-devel@nongnu.org>; Sun, 04 Nov 2018 23:29:22 -0800 (PST)
+	(envelope-from <kraxel@redhat.com>) id 1gJZLK-0005Wq-QQ
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 02:30:42 -0500
+Date: Mon, 5 Nov 2018 08:30:28 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20181105073028.uauojn2lv2rvkotk@sirius.home.kraxel.org>
+References: <20181030111348.14713-1-kraxel@redhat.com>
+	<20181030111348.14713-2-kraxel@redhat.com>
+	<8c224534-c929-7c7f-a126-a9390bbdb77f@redhat.com>
+	<20181030140030.gh5aa7jcgszrfajs@sirius.home.kraxel.org>
+	<6fd9e9f8-838a-a13c-e957-a8e6bcb74c42@redhat.com>
+	<20181030164633.2c8f21d3.cohuck@redhat.com>
+	<74a8ecef-18c0-d55d-4b29-7ed6c6b57537@redhat.com>
+	<20181030231545.GY3902@habkost.net>
 MIME-Version: 1.0
-References: <0084f7223c080cdbdfc2c5a2d132f8d6c0eff866.1541083966.git.artem.k.pisarenko@gmail.com>
-	<CAMxuvazxmYdvn_0aTH0ETt_Eeo7rxCLXvZ_oANfcKhgGW92+ng@mail.gmail.com>
-	<CANzW0mspj-xxYw5qXLvnQp-uNdLwJ+ztU2Ho-fR10_VXKQVkjw@mail.gmail.com>
-In-Reply-To: <CANzW0mspj-xxYw5qXLvnQp-uNdLwJ+ztU2Ho-fR10_VXKQVkjw@mail.gmail.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Mon, 5 Nov 2018 11:29:10 +0400
-Message-ID: <CAMxuvaz7bQBqRZGkHsYB1hRhWn5mZ5KNuHRRnESbni36On=B6A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] chardev: fix mess in OPENED/CLOSED events
- when muxed
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181030231545.GY3902@habkost.net>
+Subject: Re: [Qemu-devel] [PATCH 1/4] add QemuSupportState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,46 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: artem.k.pisarenko@gmail.com
-Cc: qemu-devel <qemu-devel@nongnu.org>, "Bonzini, Paolo" <pbonzini@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, =?utf-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>
 
-Hi
-On Mon, Nov 5, 2018 at 11:22 AM Artem Pisarenko
-<artem.k.pisarenko@gmail.com> wrote:
->
-> Sorry, I forgot to check unit tests. Although, it's very strange that this specific test failed while things work functionally...
->
-> > I am a bit reluctant to take patches that don't actually "fix" things.
-> >
-> > Could you add some tests to demonstrate the problems?
->
-> Ok
->
-> >> @@ -257,6 +257,7 @@ void qemu_chr_fe_set_handlers(CharBackend *b,
-> >>  {
-> >>      Chardev *s;
-> >>      int fe_open;
-> >> +    static __thread bool mux_reentered;
-> >
-> > Not very elegant. Maybe mux_chr_set_handlers() could call a refactored
-> > internal chr_fe_set_handlers() with an extra arg "no_open_event" ?
->
-> Agree. It would make this hack more elegant. Although, it may become irrelevant as soon as I'll find soultion for failed docker test...
->
-> >> @@ -272,21 +272,24 @@ static void char_mux_finalize(Object *obj)
-> >>      for (i = 0; i < d->mux_cnt; i++) {
-> >>          CharBackend *be = d->backends[i];
-> >>          if (be) {
-> >> +            if (be->chr && be->chr->be_open) {
-> >> +                qemu_chr_be_event(be->chr, CHR_EVENT_CLOSED);
-> >> +            }
-> >
-> > It looks like this could be a seperate patch, with a seperate test.
->
-> Why this should be separate ? Do you mean that overall "opened/closed" pairing fix should be separated to "opened" fix+test and "closed" fix+test ?
->
-> Since in next version it cannot be single patch anymore, how should I proceed with it ? Should I publish it as patch series with same subject marked as V2 or start new patch series?
+  Hi,
 
-A patch series would be great. You can keep the subject and make it v2.
+> > - Maintainers can deprecate stuffs
+> > - Orphan code can become Supported
+> > - Once scheduled for removal, there is no way back
+> > - 'Unknown' seems pretty similar to 'Orphan'.
+> 
+> I'm still worried that the supported/unsupported distinction may
+> cause unnecessary hassle for every downstream distributor of
+> QEMU.  Do we really have a need to differentiate supported vs
+> unsupported device types at runtime?
 
-thanks
+How do you suggest to handle cirrus then?
+
+Trying to deprecate it outright didn't work very well, kind of
+understandable given that it has been the default for a long time.
+
+So I think we have to mark cirrus as "obsolete", printing a message for
+the users that they should switch to another display device (stdvga for
+example), but keep it working for a while.
+
+There are also a bunch of devices where I suspect they are not used much
+if at all.  All those isa sound cards for example.  Playing old DOS
+games is pretty much the only use case I can think of.  But I'm
+wondering whenever people actually use qemu for that.  There are
+alternatives which probably handle that use case better, i.e. dosbox.
+
+Simliar case is bluetooth emulation.  I can't remember having seen any
+message or patch for years.
+
+Tagging such devices as "obsolete", with a message asking people to
+report their use cases, might help figuring if and why those devices are
+used in the wild.
+
+> I'd prefer to make support/unsupported differentiation to be a
+> build system feature (e.g. a CONFIG_UNSUPPORTED build-time
+> option) instead of a QMP/runtime feature.
+
+That would be nice too, but I think we need kbuild first, otherwise
+it'll be pretty messy.
+
+cheers,
+  Gerd
