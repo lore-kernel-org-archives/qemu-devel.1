@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43120)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gJecB-0005AR-Vy
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 08:08:27 -0500
+	(envelope-from <amarkovic@wavecomp.com>) id 1gJemU-0002CZ-5j
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 08:19:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gJebz-0005F2-NE
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 08:08:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52636)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gJebz-0005Cd-FC
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 08:08:11 -0500
-Date: Mon, 5 Nov 2018 14:08:08 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20181105130808.qwrb6gm2l3jqiu2z@sirius.home.kraxel.org>
-References: <20181017143604.5194-1-lhrazky@redhat.com>
-	<20181017143604.5194-2-lhrazky@redhat.com>
-	<1506037511.34884353.1539846969311.JavaMail.zimbra@redhat.com>
-	<1540208764.16655.240.camel@redhat.com>
-	<1541087251.16655.419.camel@redhat.com>
-	<20181105065258.4mpdv5w4rp3eui5p@sirius.home.kraxel.org>
-	<1541420337.16655.496.camel@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1541420337.16655.496.camel@redhat.com>
+	(envelope-from <amarkovic@wavecomp.com>) id 1gJemR-0005rt-2S
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 08:19:02 -0500
+Received: from mail-eopbgr700135.outbound.protection.outlook.com
+	([40.107.70.135]:54496
+	helo=NAM04-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1gJemQ-0005pu-RP
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 08:18:59 -0500
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Mon, 5 Nov 2018 13:18:53 +0000
+Message-ID: <BN6PR2201MB1251AFA493032E33B49A5376C6CA0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <cover.1541174426.git.noring@nocrew.org>
+In-Reply-To: <cover.1541174426.git.noring@nocrew.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH spice v2 1/2] QXL interface: add
- functions to identify monitors in the guest
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 0/2] target/mips: Fix decoding mechanisms
+ of R5900 M{F, T}{HI, LO}1 and DIV[U]1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,54 +31,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?THVrw6HFoSBIcsOhemvDvQ==?= <lhrazky@redhat.com>
-Cc: spice-devel@lists.freedesktop.org, qemu-devel@nongnu.org, Frediano Ziglio <fziglio@redhat.com>
+To: Fredrik Noring <noring@nocrew.org>, Aurelien Jarno <aurelien@aurel32.net>, =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: =?iso-8859-1?Q?J=FCrgen_Urban?= <JuergenUrban@gmx.de>, "Maciej W. Rozycki" <macro@linux-mips.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Mon, Nov 05, 2018 at 01:18:57PM +0100, Luk=C3=A1=C5=A1 Hr=C3=A1zk=C3=BD=
- wrote:
-> On Mon, 2018-11-05 at 07:52 +0100, Gerd Hoffmann wrote:
-> > > 2. Have a single function as follows:
-> > >=20
-> > > void spice_qxl_set_device_info(QXLInstance *instance,
-> > >                                const char *device_address,
-> > >                                uint32_t device_display_id_start,
-> > >                                uint32_t device_display_id_count);
-> >=20
-> > How about:
-> >=20
-> > void spice_qxl_set_device_info(QXLInstance *instance,
-> >                                const char *device_address,
-> >                                uint32_t device_display_id);
-> >=20
-> > I don't think we need start+count:
-> >=20
-> >  * For single-head devices device_display_id will be zero.
-> >  * For one-channel-per-head multihead devices (i.e. virtio-gpu)
-> >    device_display_id will enumerate the heads (so everybody can figur=
-e
-> >    which channel is which head).
-> >  * For one-channel-per-device multihead devices (i.e. qxl/linux)
-> >    device_display_id will be zero too.  Number of heads is set via
-> >    spice_qxl_set_max_monitors().
+> From: Fredrik Noring <noring@nocrew.org>
+>
+> Subject: [PATCH 0/2] target/mips: Fix decoding mechanisms of R5900 M{F,T}=
+{HI,LO}1 and DIV[U]1
 >=20
-> That requires nontrivial and unexpected logic for the one-channel-per-
-> device multihead devices case. The API should be doing what it says and
->  the dumber the better, this seems too smart to me...
+> This series amends the R5900 support with the following changes:
+>
+> ...
 
-Well, the device_display_id_count argument is redundant with
-spice_qxl_set_max_monitors().  That isn't a great API either.
+Hi, Fridrek,
 
-I can see that it simplifies the logic in spice-server if we have a
-single function call instead of two.  So we could deprecate
-spice_qxl_set_max_monitors() in favour of your
-spice_qxl_set_device_info() variant.
+The two patches look very good. Yes, there will be some code duplication no=
+w, but the overall MIPS code is safer, R5900 code better encapsulated - and=
+ you have more flexibility to tweak R5900 functionality.
 
-spice_qxl_set_max_monitors() would then basically do this:
+For LL, SC, LLD and SCD instructions, there is a need to properly insulate =
+their R5900 versions too, similar to this:
 
-    spice_qxl_set_max_monitors(qxl, max)
-    {
-        spice_qxl_set_device_info(qxl, NULL, 0, max);
-    }
+    case OPC_SC:
+        if(ctx->insn_flags & INSN_R5900) {
+             check_insn_opc_user_only(ctx, INSN_R5900);
+        } else {
+            check_insn(ctx, ISA_MIPS2);
+        }
+        gen_st_cond(ctx, op, rt, rs, imm);
+        break;
 
-cheers,
-  Gerd
+(the code above is just a form of pseudocode illustrating the idea; I don't=
+ guarantee the correctness for build purposes, or if this is the best code =
+organization)
+
+Non-R5900 code (for the time being) should never invoke check_insn_opc_user=
+_only(). *The only way* of distinguishing R5900 code paths from the other C=
+PUs code paths should be by using  "if(ctx->insn_flags & INSN_R5900)"!
+
+For changes in decode_opc_special_legacy(), there shouldn't be there, but t=
+here should be a separate function decode_opc_special_tx59() or so.
+
+Thanks,
+Aleksandar
