@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gJj0t-00051N-4d
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 12:50:11 -0500
+	(envelope-from <laurent@vivier.eu>) id 1gJj2t-0005o7-D1
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 12:52:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gJj0m-0005Gy-Um
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 12:50:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52766)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gJj0k-0005Bm-SC
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 12:50:04 -0500
-References: <ae2d0fbd-5198-47e8-9ad2-40a85f0b3576@default>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <bd913c1b-fcbe-b198-3955-4b4b2e33757a@redhat.com>
-Date: Mon, 5 Nov 2018 11:49:55 -0600
+	(envelope-from <laurent@vivier.eu>) id 1gJj2q-0008UH-0n
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 12:52:15 -0500
+References: <20181105135400.18366-1-marcandre.lureau@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <2ba4d06d-9255-ffde-620b-e80d1331a5a2@vivier.eu>
+Date: Mon, 5 Nov 2018 18:52:04 +0100
 MIME-Version: 1.0
-In-Reply-To: <ae2d0fbd-5198-47e8-9ad2-40a85f0b3576@default>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20181105135400.18366-1-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] How to emulate block I/O timeout on qemu side?
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] misc: fix spelling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,33 +23,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dongli Zhang <dongli.zhang@oracle.com>, qemu-devel@nongnu.org, libguestfs <libguestfs@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org
 
-On 11/2/18 3:11 AM, Dongli Zhang wrote:
-> Hi,
+On 05/11/2018 14:54, Marc-André Lureau wrote:
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+> ---
+>  target/i386/cpu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> Is there any way to emulate I/O timeout on qemu side (not fault injection in VM
-> kernel) without modifying qemu source code?
-
-You may be interested in Rich's work on nbdkit.  If you don't mind the 
-overhead of the host connecting through NBD, then you can use nbdkit's 
-delay and fault-injection filters for inserting delays or even 
-run-time-controllable failures to investigate how the guest reacts to 
-those situations
-
-> 
-> For instance, I would like to observe/study/debug the I/O timeout handling of
-> nvme, scsi, virtio-blk (not supported) of VM kernel.
-> 
-> Is there a way to trigger this on purpose on qemu side?
-> 
-> Thank you very much!
-> 
-> Dongli Zhang
-> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index af7e9f09cc..4d2e2d9902 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -4065,7 +4065,7 @@ arch_query_cpu_model_expansion(CpuModelExpansionType type,
+>          x86_cpu_to_dict_full(xc, props);
+>      break;
+>      default:
+> -        error_setg(&err, "Unsupportted expansion type");
+> +        error_setg(&err, "Unsupported expansion type");
+>          goto out;
+>      }
+>  
 > 
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
