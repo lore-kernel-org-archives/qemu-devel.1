@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40662)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40775)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gJhao-0003Ql-9T
+	(envelope-from <macro@linux-mips.org>) id 1gJhal-0004ho-9h
 	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:19:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gJhNE-0008MG-JH
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:05:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50778)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gJhNA-00085t-JV
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:05:06 -0500
-References: <20181105135538.28025-1-peter.maydell@linaro.org>
-	<20181105135538.28025-2-peter.maydell@linaro.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <2660bcda-2812-fea4-4f5c-3d096d8fe686@redhat.com>
-Date: Mon, 5 Nov 2018 10:04:57 -0600
+	(envelope-from <macro@linux-mips.org>) id 1gJhP0-0001zt-In
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:07:09 -0500
+Received: from eddie.linux-mips.org ([148.251.95.138]:33936
+	helo=cvs.linux-mips.org) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <macro@linux-mips.org>) id 1gJhP0-0001VT-7e
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 11:06:58 -0500
+Received: (from localhost user: 'macro', uid#1010) by eddie.linux-mips.org
+	with ESMTP id S23990901AbeKEQG2HaLf- (ORCPT
+	<rfc822;qemu-devel@nongnu.org>); Mon, 5 Nov 2018 17:06:28 +0100
+Date: Mon, 5 Nov 2018 16:06:28 +0000 (GMT)
+Sender: "Maciej W. Rozycki" <macro@linux-mips.org>
+From: "Maciej W. Rozycki" <macro@linux-mips.org>
+In-Reply-To: <20181105154046.GA2383@sx9>
+Message-ID: <alpine.LFD.2.21.1811051604490.20378@eddie.linux-mips.org>
+References: <cover.1541174426.git.noring@nocrew.org>
+	<fa2941ee17c35fba2512ab530bde3a1807d5769e.1541174426.git.noring@nocrew.org>
+	<1001e61e-b6c0-1a41-9e9f-e2fd5a51f7b5@linaro.org>
+	<20181104131236.GA30862@sx9>
+	<alpine.LFD.2.21.1811041503590.20378@eddie.linux-mips.org>
+	<20181105154046.GA2383@sx9>
 MIME-Version: 1.0
-In-Reply-To: <20181105135538.28025-2-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-3.1 1/2] include/qemu/thread.h:
- Document qemu_thread_atexit* API
+Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH 1/2] target/mips: Fix decoding mechanism of
+ R5900 MFLO1, MFHI1, MTLO1 and MTHI1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +35,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, patches@linaro.org
+To: Fredrik Noring <noring@nocrew.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?Q?J=C3=BCrgen_Urban?= <JuergenUrban@gmx.de>, Jia Liu <proljc@gmail.com>, qemu-devel@nongnu.org
 
-On 11/5/18 7:55 AM, Peter Maydell wrote:
-> Add documentation for the qemu_thread_atexit_add() and
-> qemu_thread_atexit_remove() functions.
-> 
-> We include a (previously undocumented) constraint that notifiers
-> may not be called if a thread is exiting because the entire
-> process is exiting. This is fine for our current use because
-> the callers use it only for cleaning up resources which go away
-> on process exit (memory, Win32 fibers), and we will need the
-> flexibility for the new posix implementation.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->   include/qemu/thread.h | 22 ++++++++++++++++++++++
->   1 file changed, 22 insertions(+)
-> 
+On Mon, 5 Nov 2018, Fredrik Noring wrote:
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+> where ac can range from 0 to 3. Do you have a link to a better reference,
+> by chance, that isn't tied to microMIPS?
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+ Here: <https://www.mips.com/downloads/> you'll find everything you need I 
+believe.
+
+ HTH,
+
+  Maciej
