@@ -1,20 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48879)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gJzBf-0006KO-7y
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 06:06:29 -0500
+	(envelope-from <luc.michel@greensocs.com>) id 1gJzBk-0006QM-VP
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 06:06:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gJzBa-0000tY-KM
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 06:06:22 -0500
+	(envelope-from <luc.michel@greensocs.com>) id 1gJzBg-0000xp-7S
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 06:06:28 -0500
 From: Luc Michel <luc.michel@greensocs.com>
-Date: Tue,  6 Nov 2018 12:05:39 +0100
-Message-Id: <20181106110548.4209-8-luc.michel@greensocs.com>
-In-Reply-To: <20181106110548.4209-1-luc.michel@greensocs.com>
-References: <20181106110548.4209-1-luc.michel@greensocs.com>
+Date: Tue,  6 Nov 2018 12:05:32 +0100
+Message-Id: <20181106110548.4209-1-luc.michel@greensocs.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 07/16] gdbstub: add multiprocess support to
- (f|s)ThreadInfo and ThreadExtraInfo
+Subject: [Qemu-devel] [PATCH v4 00/16] gdbstub: support for the multiprocess
+ extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,93 +24,123 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Luc Michel <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, alistair@alistair23.me, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, mark.burton@greensocs.com, Eduardo Habkost <ehabkost@redhat.com>
 
-Change the thread info related packets handling to support multiprocess
-extension.
+changes since v3:
+  - patch 1    cpu_cluster.h: remove QEMU_ from the multiple includes
+               guard #ifdef/#define [Alistair]
 
-Add the CPUs class name in the extra info to help differentiate
-them in multiprocess mode.
+  - patch 1    cpu_cluster.c: include osdep.h first [Alistair]
 
-Signed-off-by: Luc Michel <luc.michel@greensocs.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- gdbstub.c | 35 +++++++++++++++++++++++++----------
- 1 file changed, 25 insertions(+), 10 deletions(-)
+  - patch 1    use uint64_t for cluster ID for prosperity :) [Philippe]
 
-diff --git a/gdbstub.c b/gdbstub.c
-index 9be83486f5..43c9211bfa 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -1260,11 +1260,10 @@ out:
- static int gdb_handle_packet(GDBState *s, const char *line_buf)
- {
-     CPUState *cpu;
-     CPUClass *cc;
-     const char *p;
--    uint32_t thread;
-     uint32_t pid, tid;
-     int ch, reg_size, type, res;
-     uint8_t mem_buf[MAX_PACKET_LENGTH];
-     char buf[sizeof(mem_buf) + 1 /* trailing NUL */];
-     char thread_id[16];
-@@ -1556,30 +1555,46 @@ static int gdb_handle_packet(GDBState *s, const c=
-har *line_buf)
-             snprintf(buf, sizeof(buf), "QC%s",
-                      gdb_fmt_thread_id(s, cpu, thread_id, sizeof(thread_=
-id)));
-             put_packet(s, buf);
-             break;
-         } else if (strcmp(p,"fThreadInfo") =3D=3D 0) {
--            s->query_cpu =3D first_cpu;
-+            s->query_cpu =3D gdb_first_cpu(s);
-             goto report_cpuinfo;
-         } else if (strcmp(p,"sThreadInfo") =3D=3D 0) {
-         report_cpuinfo:
-             if (s->query_cpu) {
--                snprintf(buf, sizeof(buf), "m%x", cpu_gdb_index(s->query=
-_cpu));
-+                snprintf(buf, sizeof(buf), "m%s",
-+                         gdb_fmt_thread_id(s, s->query_cpu,
-+                                       thread_id, sizeof(thread_id)));
-                 put_packet(s, buf);
--                s->query_cpu =3D CPU_NEXT(s->query_cpu);
-+                s->query_cpu =3D gdb_next_cpu(s, s->query_cpu);
-             } else
-                 put_packet(s, "l");
-             break;
-         } else if (strncmp(p,"ThreadExtraInfo,", 16) =3D=3D 0) {
--            thread =3D strtoull(p+16, (char **)&p, 16);
--            cpu =3D find_cpu(thread);
-+            if (read_thread_id(p + 16, &p, &pid, &tid) =3D=3D GDB_READ_T=
-HREAD_ERR) {
-+                put_packet(s, "E22");
-+                break;
-+            }
-+            cpu =3D gdb_get_cpu(s, pid, tid);
-             if (cpu !=3D NULL) {
-                 cpu_synchronize_state(cpu);
--                /* memtohex() doubles the required space */
--                len =3D snprintf((char *)mem_buf, sizeof(buf) / 2,
--                               "CPU#%d [%s]", cpu->cpu_index,
--                               cpu->halted ? "halted " : "running");
-+
-+                if (s->multiprocess && (s->process_num > 1)) {
-+                    /* Print the CPU model in multiprocess mode */
-+                    ObjectClass *oc =3D object_get_class(OBJECT(cpu));
-+                    const char *cpu_model =3D object_class_get_name(oc);
-+                    len =3D snprintf((char *)mem_buf, sizeof(buf) / 2,
-+                                   "CPU#%d %s [%s]", cpu->cpu_index,
-+                                   cpu_model,
-+                                   cpu->halted ? "halted " : "running");
-+                } else {
-+                    /* memtohex() doubles the required space */
-+                    len =3D snprintf((char *)mem_buf, sizeof(buf) / 2,
-+                                   "CPU#%d [%s]", cpu->cpu_index,
-+                                   cpu->halted ? "halted " : "running");
-+                }
-                 trace_gdbstub_op_extra_info((char *)mem_buf);
-                 memtohex(buf, mem_buf, len);
-                 put_packet(s, buf);
-             }
-             break;
+  - patch 1    auto-assign a cluster ID to newly created clusters [Philip=
+pe]
+
+  - patch 2    fix mid-code variable declaration [Alistair]
+
+  - patch 3    add a comment in gdb_get_cpu_pid() when retrieving CPU
+               parent canonical path [Alistair]
+
+  - patch 14   fix a typo in the commit message [Alistair]
+
+changes since v2:
+  - patch 1    introducing the cpu-cluster type. I didn't opt for an
+               Interface, but I can add one if you think it's necessary.
+               For now this class inherits from Device and has a
+               cluster-id property, used by the GDB stub to compute a
+               PID.
+
+  - patch 2    removed GDB group related code as it has been replaced
+               with CPU clusters
+
+  - patch 2/8  moved GDBProcess target_xml field introduction into patch
+               8 [Philippe]
+
+  - patch 3    gdb_get_cpu_pid() now search for CPU being a child of a
+               cpu-cluster object. Use the cluster-id to compute the PID.
+
+  - patch 4    gdb_get_process() does not rely on s->processes array
+               indices anymore as PIDs can now be sparse. Instead, iterat=
+e
+               over the array to find the process.
+
+  - patch 3/4  removed Reviewed-by tags because of substantial changes.
+
+  - patch 4/7  read_thread_id() hardening [Philippe]
+
+  - patch 12   safer vAttach packet parsing [Phillipe]
+
+  - patch 16   put APUs and RPUs in different clusters instead of GDB
+               groups
+
+changes since v1:
+  - rename qemu_get_thread_id() to gdb_fmt_thread_id() [Philippe]
+  - check qemu_strtoul() return value for 'D' packets [Philippe]
+
+
+This series adds support for the multiprocess extension of the GDB
+remote protocol in the QEMU GDB stub.
+
+This extension is useful to split QEMU emulated CPUs in different
+processes from the point of view of the GDB client. It adds the
+possibility to debug different kind of processors (e.g. an AArch64 and
+an ARMv7 CPU) at the same time (it is not possible otherwise since GDB
+expects an SMP view at the thread granularity.
+
+CPUs are grouped using specially named QOM containers. CPUs that are
+children of such a container are grouped under the same GDB process.
+
+The last patch groups the CPUs of different model in the zynqmp machines
+into separate processes.
+
+To test this patchset, you can use the following commands:
+
+(Note that this requires a recent enough GDB, I think GDB 7.2 is OK.
+Also, it must be compiled to support both ARM and AArch64 architectures)
+
+Run QEMU: (-smp 6 in xlnx-zcu102 enables both cortex-a53 and cortex-r5
+CPUs)
+
+qemu-system-aarch64 -M xlnx-zcu102 -gdb tcp::1234 -S -smp 6
+
+Run the following commands in GDB:
+
+target extended :1234
+add-inferior
+inferior 2
+attach 2
+info threads
+
+I want to thanks the Xilinx's QEMU team who sponsored this work for
+their collaboration and their prototype implementation.
+
+Luc Michel (16):
+  hw/cpu: introduce CPU clusters
+  gdbstub: introduce GDB processes
+  gdbstub: add multiprocess support to '?' packets
+  gdbstub: add multiprocess support to 'H' and 'T' packets
+  gdbstub: add multiprocess support to vCont packets
+  gdbstub: add multiprocess support to 'sC' packets
+  gdbstub: add multiprocess support to (f|s)ThreadInfo and
+    ThreadExtraInfo
+  gdbstub: add multiprocess support to Xfer:features:read:
+  gdbstub: add multiprocess support to gdb_vm_state_change()
+  gdbstub: add multiprocess support to 'D' packets
+  gdbstub: add support for extended mode packet
+  gdbstub: add support for vAttach packets
+  gdbstub: processes initialization on new peer connection
+  gdbstub: gdb_set_stop_cpu: ignore request when process is not attached
+  gdbstub: add multiprocess extension support
+  arm/xlnx-zynqmp: put APUs and RPUs in separate CPU clusters
+
+ include/hw/arm/xlnx-zynqmp.h |   3 +
+ include/hw/cpu/cluster.h     |  38 +++
+ gdbstub.c                    | 632 ++++++++++++++++++++++++++++++-----
+ hw/arm/xlnx-zynqmp.c         |  21 +-
+ hw/cpu/cluster.c             |  59 ++++
+ hw/cpu/Makefile.objs         |   2 +-
+ 6 files changed, 674 insertions(+), 81 deletions(-)
+ create mode 100644 include/hw/cpu/cluster.h
+ create mode 100644 hw/cpu/cluster.c
+
 --=20
 2.19.1
