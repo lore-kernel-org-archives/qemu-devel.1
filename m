@@ -1,22 +1,16 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:39559)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gJykD-0005qX-LS
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 05:38:09 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gJykL-0005qX-O0
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 05:38:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gJyWT-0005Nf-GT
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 05:23:51 -0500
-References: <20181105014047.26447-1-sameo@linux.intel.com>
-	<20181105014047.26447-4-sameo@linux.intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <591c453a-977c-98a5-a23e-bd04b6dc9533@redhat.com>
-Date: Tue, 6 Nov 2018 11:23:39 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181105014047.26447-4-sameo@linux.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 03/24] hw: acpi: The RSDP build API can
- return void
+	(envelope-from <kraxel@redhat.com>) id 1gJyWO-0005Ev-L9
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 05:23:48 -0500
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue,  6 Nov 2018 11:23:34 +0100
+Message-Id: <20181106102335.20027-6-kraxel@redhat.com>
+In-Reply-To: <20181106102335.20027-1-kraxel@redhat.com>
+References: <20181106102335.20027-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 5/6] tag cirrus as obsolete
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,25 +19,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Ortiz <sameo@linux.intel.com>, qemu-devel@nongnu.org
-Cc: Shannon Zhao <shannon.zhaosl@gmail.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Richard Henderson <rth@twiddle.net>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, xen-devel@lists.xenproject.org, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
 
-On 05/11/2018 02:40, Samuel Ortiz wrote:
->  /* RSDP */
-> -static GArray *
-> +static void
->  build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
->  {
->      AcpiRsdpDescriptor *rsdp = acpi_data_push(rsdp_table, sizeof *rsdp);
-> @@ -392,8 +392,6 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
->      bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
->          (char *)rsdp - rsdp_table->data, sizeof *rsdp,
->          (char *)&rsdp->checksum - rsdp_table->data);
-> -
-> -    return rsdp_table;
->  }
->  
+Standard VGA should be used instead.
 
-Better than v4. :)
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/display/cirrus_vga.c     | 3 +++
+ hw/display/cirrus_vga_isa.c | 3 +++
+ 2 files changed, 6 insertions(+)
 
-Paolo
+diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
+index d9b854d74d..8474415687 100644
+--- a/hw/display/cirrus_vga.c
++++ b/hw/display/cirrus_vga.c
+@@ -3024,6 +3024,9 @@ static void cirrus_vga_class_init(ObjectClass *klass, void *data)
+     dc->vmsd = &vmstate_pci_cirrus_vga;
+     dc->props = pci_vga_cirrus_properties;
+     dc->hotpluggable = false;
++    klass->supported.state = SUPPORT_STATE_OBSOLETE;
++    klass->supported.help = "use \"-vga std\" instead, see "
++        "https://www.kraxel.org/blog/2014/10/qemu-using-cirrus-considered-harmful/";
+ }
+ 
+ static const TypeInfo cirrus_vga_info = {
+diff --git a/hw/display/cirrus_vga_isa.c b/hw/display/cirrus_vga_isa.c
+index fa10b74230..6bc83f7509 100644
+--- a/hw/display/cirrus_vga_isa.c
++++ b/hw/display/cirrus_vga_isa.c
+@@ -81,6 +81,9 @@ static void isa_cirrus_vga_class_init(ObjectClass *klass, void *data)
+     dc->realize = isa_cirrus_vga_realizefn;
+     dc->props = isa_cirrus_vga_properties;
+     set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
++    klass->supported.state = SUPPORT_STATE_OBSOLETE;
++    klass->supported.help = "use \"-vga std\" instead, see "
++        "https://www.kraxel.org/blog/2014/10/qemu-using-cirrus-considered-harmful/";
+ }
+ 
+ static const TypeInfo isa_cirrus_vga_info = {
+-- 
+2.9.3
