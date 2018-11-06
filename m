@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47759)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48872)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb413@gmail.com>) id 1gK3gH-0008AW-D5
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:54:18 -0500
+	(envelope-from <armbru@redhat.com>) id 1gK3it-0001UP-Tn
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:57:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb413@gmail.com>) id 1gK3gG-0008Mu-HR
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:54:17 -0500
-Received: from mail-qt1-x841.google.com ([2607:f8b0:4864:20::841]:36010)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <danielhb413@gmail.com>)
-	id 1gK3gG-0008Lo-CF
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:54:16 -0500
-Received: by mail-qt1-x841.google.com with SMTP id u34-v6so3120216qth.3
-	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 07:54:16 -0800 (PST)
-References: <20181029173437.32559-1-pbonzini@redhat.com>
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
-Message-ID: <fa37541c-a2a8-8bbc-6114-e15b650da020@gmail.com>
-Date: Tue, 6 Nov 2018 13:54:12 -0200
+	(envelope-from <armbru@redhat.com>) id 1gK3io-0002FN-UO
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:56:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45648)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gK3io-0002EB-Os
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:56:54 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181030191620.32168-1-armbru@redhat.com>
+	<CAFEAcA8RdNrbCLL7tXY=e95N2Y0LcZdCPr3EuQo1_hu08qJuaQ@mail.gmail.com>
+Date: Tue, 06 Nov 2018 16:56:51 +0100
+In-Reply-To: <CAFEAcA8RdNrbCLL7tXY=e95N2Y0LcZdCPr3EuQo1_hu08qJuaQ@mail.gmail.com>
+	(Peter Maydell's message of "Thu, 1 Nov 2018 11:50:59 +0000")
+Message-ID: <87sh0eyzb0.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20181029173437.32559-1-pbonzini@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 0/4] scsi-generic: fixes for Block Limits
- emulation
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PULL 0/8] Monitor patches for 2018-10-30
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,45 +27,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: mreitz@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>
 
-Hi,
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-How did you find all those issues, Max? First patch is something that
-I missed out from the SCSI spec (ordering of the VPD pages)
-and could have been detected by code inspection,  but I am curious about
-the other fixes.
-
-
-Thanks,
-
-
-Daniel
-
-On 10/29/18 2:34 PM, Paolo Bonzini wrote:
-> scsi-generic (pass through) devices are able to inject an artificial Block
-> Limits VPD page in order to communicate host HBA limits to the guest.
-> However, Max Reitz found a few issues with the implementation of this
-> feature; this series should fix them all.
+> On 30 October 2018 at 19:16, Markus Armbruster <armbru@redhat.com> wrote:
+>> The following changes since commit 3f3285491dd52014852a56135c90e428c8b507ea:
+>>
+>>   Merge remote-tracking branch 'remotes/jnsnow/tags/bitmaps-pull-request' into staging (2018-10-30 14:09:25 +0000)
+>>
+>> are available in the Git repository at:
+>>
+>>   git://repo.or.cz/qemu/armbru.git tags/pull-monitor-2018-10-30
+>>
+>> for you to fetch changes up to 1a8de278dd3c93a7aa40f88486509fe0e2de04da:
+>>
+>>   vl: Avoid crash when -mon is underspecified (2018-10-30 20:13:52 +0100)
+>>
+>> ----------------------------------------------------------------
+>> Monitor patches for 2018-10-30
+>>
+>> * Fix crash on shutdown with --daemonize
+>> * Change out-of-band execution to stop reading instead of dropping
+>>   commands
+>> * Enable out-of-band execution by default
+>> * Avoid crash when -mon lacks chardev=...
+>>
+>> ----------------------------------------------------------------
 >
-> Paolo
+> Hi; I get test failures on FreeBSD host:
 >
-> Paolo Bonzini (4):
->    scsi-generic: keep VPD page list sorted
->    scsi-generic: avoid out-of-bounds access to VPD page list
->    scsi-generic: avoid invalid access to struct when emulating block
->      limits
->    scsi-generic: do not do VPD emulation for sense other than
->      ILLEGAL_REQUEST
+> TEST: tests/qmp-test... (pid=18305)
+>   /sparc64/qmp/protocol:                                               OK
+>   /sparc64/qmp/oob:                                                    FAIL
+> GTester: last random seed: R02Se36038cab4c051a2cd47374ec9718e98
+> (pid=18337)
+>   /sparc64/qmp/preconfig:                                              OK
+> FAIL: tests/qmp-test
 >
->   hw/scsi/Makefile.objs       |  2 +-
->   hw/scsi/emulation.c         | 42 +++++++++++++++++
->   hw/scsi/scsi-disk.c         | 92 ++++++++-----------------------------
->   hw/scsi/scsi-generic.c      | 51 +++++++++++++++-----
->   include/hw/scsi/emulation.h | 16 +++++++
->   include/hw/scsi/scsi.h      |  1 -
->   6 files changed, 119 insertions(+), 85 deletions(-)
->   create mode 100644 hw/scsi/emulation.c
->   create mode 100644 include/hw/scsi/emulation.h
+> ERROR:tests/qmp-test.c:211:recv_cmd_id: assertion failed
+> (qdict_get_try_str(resp, "id") == id): ("oob-1" == "queue-blocks-1")
+> gmake: *** [/var/tmp/qemu-test.2n2tBU/tests/Makefile.include:805:
+> check-qtest-sparc] Error 1
 >
+> and similarly with i386/qmp/oob and sparc/qmp/oob.
+
+I haven't been able to reproduce, yet.  I'm going to respin with fewer
+patches, to get the other stuff in while I debug.
