@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gJzC5-0006jn-U5
+	(envelope-from <luc.michel@greensocs.com>) id 1gJzC9-0006mj-KK
 	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 06:06:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gJzC0-0001cM-59
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 06:06:49 -0500
+	(envelope-from <luc.michel@greensocs.com>) id 1gJzC4-0001u0-Is
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 06:06:53 -0500
 From: Luc Michel <luc.michel@greensocs.com>
-Date: Tue,  6 Nov 2018 12:05:45 +0100
-Message-Id: <20181106110548.4209-14-luc.michel@greensocs.com>
+Date: Tue,  6 Nov 2018 12:05:46 +0100
+Message-Id: <20181106110548.4209-15-luc.michel@greensocs.com>
 In-Reply-To: <20181106110548.4209-1-luc.michel@greensocs.com>
 References: <20181106110548.4209-1-luc.michel@greensocs.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 13/16] gdbstub: processes initialization on
- new peer connection
+Subject: [Qemu-devel] [PATCH v4 14/16] gdbstub: gdb_set_stop_cpu: ignore
+ request when process is not attached
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,83 +25,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Luc Michel <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, alistair@alistair23.me, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, mark.burton@greensocs.com, Eduardo Habkost <ehabkost@redhat.com>
 
-When a new connection is established, we set the first process to be
-attached, and the others detached. The first CPU of the first process
-is selected as the current CPU.
+When gdb_set_stop_cpu() is called with a CPU associated to a process
+currently not attached by the GDB client, return without modifying the
+stop CPU. Otherwise, GDB gets confused if it receives packets with a
+thread-id it does not know about.
 
 Signed-off-by: Luc Michel <luc.michel@greensocs.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Acked-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- gdbstub.c | 20 +++++++++++++++-----
- 1 file changed, 15 insertions(+), 5 deletions(-)
+ gdbstub.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index ba365808db..1a3353ff3c 100644
+index 1a3353ff3c..c662ada6ff 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -2245,13 +2245,14 @@ static bool gdb_accept(void)
-         close(fd);
-         return false;
-     }
-=20
-     s =3D g_malloc0(sizeof(GDBState));
--    s->c_cpu =3D first_cpu;
--    s->g_cpu =3D first_cpu;
-     create_unique_process(s);
-+    s->processes[0].attached =3D true;
-+    s->c_cpu =3D gdb_first_cpu(s);
-+    s->g_cpu =3D s->c_cpu;
-     s->fd =3D fd;
-     gdb_has_xml =3D false;
-=20
-     gdbserver_state =3D s;
-     return true;
-@@ -2333,12 +2334,23 @@ static void gdb_chr_receive(void *opaque, const u=
-int8_t *buf, int size)
-     }
+@@ -1787,10 +1787,19 @@ static int gdb_handle_packet(GDBState *s, const c=
+har *line_buf)
+     return RS_IDLE;
  }
 =20
- static void gdb_chr_event(void *opaque, int event)
+ void gdb_set_stop_cpu(CPUState *cpu)
  {
-+    int i;
-+    GDBState *s =3D (GDBState *) opaque;
++    GDBProcess *p =3D gdb_get_cpu_process(gdbserver_state, cpu);
 +
-     switch (event) {
-     case CHR_EVENT_OPENED:
-+        /* Start with first process attached, others detached */
-+        for (i =3D 0; i < s->process_num; i++) {
-+            s->processes[i].attached =3D !i;
-+        }
++    if (!p->attached) {
++        /* Having a stop CPU corresponding to a process that is not atta=
+ched
++         * confuses GDB. So we ignore the request.
++         */
++        return;
++    }
 +
-+        s->c_cpu =3D gdb_first_cpu(s);
-+        s->g_cpu =3D s->c_cpu;
-+
-         vm_stop(RUN_STATE_PAUSED);
-         gdb_has_xml =3D false;
-         break;
-     default:
-         break;
-@@ -2513,19 +2525,17 @@ int gdbserver_start(const char *device)
-         mon_chr =3D s->mon_chr;
-         cleanup_processes(s);
-         memset(s, 0, sizeof(GDBState));
-         s->mon_chr =3D mon_chr;
-     }
--    s->c_cpu =3D first_cpu;
--    s->g_cpu =3D first_cpu;
+     gdbserver_state->c_cpu =3D cpu;
+     gdbserver_state->g_cpu =3D cpu;
+ }
 =20
-     create_processes(s);
-=20
-     if (chr) {
-         qemu_chr_fe_init(&s->chr, chr, &error_abort);
-         qemu_chr_fe_set_handlers(&s->chr, gdb_chr_can_receive, gdb_chr_r=
-eceive,
--                                 gdb_chr_event, NULL, NULL, NULL, true);
-+                                 gdb_chr_event, NULL, s, NULL, true);
-     }
-     s->state =3D chr ? RS_IDLE : RS_INACTIVE;
-     s->mon_chr =3D mon_chr;
-     s->current_syscall_cb =3D NULL;
-=20
+ #ifndef CONFIG_USER_ONLY
 --=20
 2.19.1
