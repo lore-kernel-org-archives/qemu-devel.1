@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41195)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gK3Kt-0004Z9-Q5
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:32:16 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1gK3NF-0006gS-W9
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:34:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gK3Kq-0001RR-9U
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:32:11 -0500
-Resent-Message-Id: <E1gK3Kq-0001RR-9U@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21470)
+	(envelope-from <pm215@archaic.org.uk>) id 1gK3NB-0003c8-4s
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:34:37 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:52370)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gK3Kp-0001Ns-RI
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:32:08 -0500
-Message-ID: <154151830825.5755.10112797070378873017@015909e0f939>
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20181029173437.32559-1-pbonzini@redhat.com>
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1gK3NA-0002YT-U4
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:34:33 -0500
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue,  6 Nov 2018 15:33:30 +0000
+Message-Id: <20181106153330.5139-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 6 Nov 2018 07:31:49 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 0/4] scsi-generic: fixes for Block Limits
- emulation
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH for-3.1] replay: Exit on errors reading from
+ replay log
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +25,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, danielhb413@gmail.com, mreitz@redhat.com
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgxMDI5MTczNDM3LjMyNTU5LTEtcGJvbnppbmlAcmVkaGF0LmNvbQpTdWJq
-ZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvNF0gc2NzaS1nZW5lcmljOiBmaXhlcyBmb3IgQmxv
-Y2sgTGltaXRzIGVtdWxhdGlvbgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFz
-aAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAt
-bCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNv
-bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFs
-Z29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVy
-c2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFU
-Q0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAh
-IGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1t
-YWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAg
-bj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVw
-ZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQg
-dG8gYSBuZXcgYnJhbmNoICd0ZXN0JwozYTY5OTc1NTZmIHNjc2ktZ2VuZXJpYzogZG8gbm90IGRv
-IFZQRCBlbXVsYXRpb24gZm9yIHNlbnNlIG90aGVyIHRoYW4gSUxMRUdBTF9SRVFVRVNUCjFiMzZk
-MDgyNjEgc2NzaS1nZW5lcmljOiBhdm9pZCBpbnZhbGlkIGFjY2VzcyB0byBzdHJ1Y3Qgd2hlbiBl
-bXVsYXRpbmcgYmxvY2sgbGltaXRzCjFhZDFkZjk0YTcgc2NzaS1nZW5lcmljOiBhdm9pZCBvdXQt
-b2YtYm91bmRzIGFjY2VzcyB0byBWUEQgcGFnZSBsaXN0CmI4MGQxYjViOWEgc2NzaS1nZW5lcmlj
-OiBrZWVwIFZQRCBwYWdlIGxpc3Qgc29ydGVkCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2lu
-ZyBQQVRDSCAxLzQ6IHNjc2ktZ2VuZXJpYzoga2VlcCBWUEQgcGFnZSBsaXN0IHNvcnRlZC4uLgpD
-aGVja2luZyBQQVRDSCAyLzQ6IHNjc2ktZ2VuZXJpYzogYXZvaWQgb3V0LW9mLWJvdW5kcyBhY2Nl
-c3MgdG8gVlBEIHBhZ2UgbGlzdC4uLgpDaGVja2luZyBQQVRDSCAzLzQ6IHNjc2ktZ2VuZXJpYzog
-YXZvaWQgaW52YWxpZCBhY2Nlc3MgdG8gc3RydWN0IHdoZW4gZW11bGF0aW5nIGJsb2NrIGxpbWl0
-cy4uLgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5U
-QUlORVJTIG5lZWQgdXBkYXRpbmc/CiMzMjogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDog
-MCBlcnJvcnMsIDEgd2FybmluZ3MsIDIzMyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBz
-dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
-IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
-UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDQvNDogc2NzaS1nZW5lcmljOiBk
-byBub3QgZG8gVlBEIGVtdWxhdGlvbiBmb3Igc2Vuc2Ugb3RoZXIgdGhhbiBJTExFR0FMX1JFUVVF
-U1QuLi4KRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMzNDogRklMRTogaHcvc2NzaS9z
-Y3NpLWdlbmVyaWMuYzoyNzM6CisgICAgICAgIHNjc2lfcGFyc2Vfc2Vuc2VfYnVmKHItPnJlcS5z
-ZW5zZSwgci0+aW9faGVhZGVyLnNiX2xlbl93cikua2V5ID09IElMTEVHQUxfUkVRVUVTVCAmJgoK
-dG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyNCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNo
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29t
-bWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNh
-bGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZl
-ZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+Currently replay_get_byte() does not check for an error
+from getc(). Coverity points out (CID 1390622) that this
+could result in unexpected behaviour (such as looping
+forever, if we use the replay_get_dword() return value
+for a loop count). We don't expect reads from the replay
+log to fail, and if they do there is no way we can
+continue. So make them fatal errors.
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+Disclaimer: checked only with "make check".
+
+ replay/replay-internal.c | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
+
+diff --git a/replay/replay-internal.c b/replay/replay-internal.c
+index 1cea1d4dc91..8f87e9b957e 100644
+--- a/replay/replay-internal.c
++++ b/replay/replay-internal.c
+@@ -35,6 +35,12 @@ static void replay_write_error(void)
+     }
+ }
+ 
++static void replay_read_error(void)
++{
++    error_report("error reading the replay data");
++    exit(1);
++}
++
+ void replay_put_byte(uint8_t byte)
+ {
+     if (replay_file) {
+@@ -83,7 +89,11 @@ uint8_t replay_get_byte(void)
+ {
+     uint8_t byte = 0;
+     if (replay_file) {
+-        byte = getc(replay_file);
++        int r = getc(replay_file);
++        if (r == EOF) {
++            replay_read_error();
++        }
++        byte = r;
+     }
+     return byte;
+ }
+@@ -126,7 +136,7 @@ void replay_get_array(uint8_t *buf, size_t *size)
+     if (replay_file) {
+         *size = replay_get_dword();
+         if (fread(buf, 1, *size, replay_file) != *size) {
+-            error_report("replay read error");
++            replay_read_error();
+         }
+     }
+ }
+@@ -137,7 +147,7 @@ void replay_get_array_alloc(uint8_t **buf, size_t *size)
+         *size = replay_get_dword();
+         *buf = g_malloc(*size);
+         if (fread(*buf, 1, *size, replay_file) != *size) {
+-            error_report("replay read error");
++            replay_read_error();
+         }
+     }
+ }
+-- 
+2.19.1
