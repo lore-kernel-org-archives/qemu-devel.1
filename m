@@ -1,15 +1,25 @@
-Received: from eggs.gnu.org ([208.118.235.92]:54377)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gK5y0-0002NZ-7u
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 13:20:47 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gK68r-0000gB-Ej
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 13:31:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gK5vL-0005TZ-Vp
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 13:18:04 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Tue,  6 Nov 2018 19:17:10 +0100
-Message-Id: <1541528230-31817-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] MAINTAINERS: Add an entry for the 'collie'
- machine
+	(envelope-from <peter.maydell@linaro.org>) id 1gK64J-0005c2-5g
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 13:27:17 -0500
+Received: from mail-ot1-x32d.google.com ([2607:f8b0:4864:20::32d]:41766)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gK64B-000593-UB
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 13:27:09 -0500
+Received: by mail-ot1-x32d.google.com with SMTP id c32so12343253otb.8
+	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 10:27:03 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20181106173941.9449-1-armbru@redhat.com>
+References: <20181106173941.9449-1-armbru@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 6 Nov 2018 18:26:42 +0000
+Message-ID: <CAFEAcA9BZvKTkwq2dgXJO_410ey_pvZDu7_wSvuUAdp76dhhig@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v2 0/3] Monitor patches for 2018-10-30
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,34 +28,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-There is no active maintainer, but since Peter is picking up
-patches via qemu-arm@nongnu.org, I think we could at least use
-"Odd Fixes" as status here.
+On 6 November 2018 at 17:39, Markus Armbruster <armbru@redhat.com> wrote:
+> The following changes since commit 0ca70f19c010ccf0b10cf7cc1d2b9a87193fe787:
+>
+>   tests: Fix Python 3 detection on older GNU make versions (2018-11-06 14:58:13 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/armbru.git tags/pull-monitor-2018-10-30-v2
+>
+> for you to fetch changes up to 0c57893d62596d1d91779452be3b38b4b72ecd04:
+>
+>   vl: Avoid crash when -mon is underspecified (2018-11-06 17:03:29 +0100)
+>
+> ----------------------------------------------------------------
+> Monitor patches for 2018-10-30
+>
+> * Fix crash on shutdown with --daemonize
+> * Avoid crash when -mon lacks chardev=...
+>
+> ----------------------------------------------------------------
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- MAINTAINERS | 6 ++++++
- 1 file changed, 6 insertions(+)
+Applied, thanks.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 0499e11..471cf72 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -592,6 +592,12 @@ F: hw/*/pxa2xx*
- F: hw/misc/mst_fpga.c
- F: include/hw/arm/pxa.h
- 
-+Sharp SL-5500 (Collie) PDA
-+L: qemu-arm@nongnu.org
-+S: Odd Fixes
-+F: hw/arm/collie.c
-+F: hw/arm/strongarm*
-+
- Stellaris
- M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
--- 
-1.8.3.1
+-- PMM
