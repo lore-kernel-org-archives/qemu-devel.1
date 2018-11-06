@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52701)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gK5Ki-0005pC-34
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 12:40:16 -0500
+	(envelope-from <armbru@redhat.com>) id 1gK5L6-0006CQ-AL
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 12:40:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gK5Kd-00086k-ME
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 12:40:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39288)
+	(envelope-from <armbru@redhat.com>) id 1gK5Kg-0008HR-MX
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 12:40:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57548)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gK5Kc-0007IE-TE
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 12:40:03 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2D3F9356CD
-	for <qemu-devel@nongnu.org>; Tue,  6 Nov 2018 17:39:43 +0000 (UTC)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gK5Ke-0007Ie-Gc
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 12:40:05 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue,  6 Nov 2018 18:39:41 +0100
-Message-Id: <20181106173941.9449-4-armbru@redhat.com>
+Date: Tue,  6 Nov 2018 18:39:40 +0100
+Message-Id: <20181106173941.9449-3-armbru@redhat.com>
 In-Reply-To: <20181106173941.9449-1-armbru@redhat.com>
 References: <20181106173941.9449-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 3/3] vl: Avoid crash when -mon is
- underspecified
+Subject: [Qemu-devel] [PULL v2 2/3] monitor: delay monitor iothread creation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,55 +24,110 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Wolfgang Bumiller <w.bumiller@proxmox.com>
 
-From: Eric Blake <eblake@redhat.com>
+From: Wolfgang Bumiller <w.bumiller@proxmox.com>
 
-A quick coredump on an incomplete command line:
-./x86_64-softmmu/qemu-system-x86_64 -mon mode=3Dcontrol,pretty=3Don
+Commit d32749deb615 moved the call to monitor_init_globals()
+to before os_daemonize(), making it an unsuitable place to
+spawn the monitor iothread as it won't be inherited over the
+fork() in os_daemonize().
 
- #0  0x00007ffff723d9e4 in g_str_hash () at /lib64/libglib-2.0.so.0
- #1  0x00007ffff723ce38 in g_hash_table_lookup () at /lib64/libglib-2.0.s=
-o.0
- #2  0x0000555555cc0073 in object_class_property_find (klass=3D0x5555566a=
-94b0, name=3D0x0, errp=3D0x0) at qom/object.c:1135
- #3  0x0000555555cc004b in object_class_property_find (klass=3D0x5555566a=
-9440, name=3D0x0, errp=3D0x0) at qom/object.c:1129
- #4  0x0000555555cbfe6e in object_property_find (obj=3D0x5555568348c0, na=
-me=3D0x0, errp=3D0x0) at qom/object.c:1080
- #5  0x0000555555cc183d in object_resolve_path_component (parent=3D0x5555=
-568348c0, part=3D0x0) at qom/object.c:1762
- #6  0x0000555555d82071 in qemu_chr_find (name=3D0x0) at chardev/char.c:8=
-02
- #7  0x00005555559d77cb in mon_init_func (opaque=3D0x0, opts=3D0x5555566b=
-65a0, errp=3D0x0) at vl.c:2291
+We now spawn the thread the first time we instantiate a
+monitor which actually has use_io_thread == true.
+Instantiation of monitors happens only after os_daemonize().
+We still need to create the qmp_dispatcher_bh when not using
+iothreads, so this now still happens in
+monitor_init_globals().
 
-Fix it to instead fail gracefully.
-
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20181023213600.364086-1-eblake@redhat.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Wolfgang Bumiller <w.bumiller@proxmox.com>
+Fixes: d32749deb615 ("monitor: move init global earlier")
+Message-Id: <20180925081507.11873-3-w.bumiller@proxmox.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Peter Xu <peterx@redhat.com>
+Tested-by: Peter Xu <peterx@redhat.com>
+[This fixes a crash on shutdown with --daemonize]
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- vl.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ monitor.c | 35 +++++++++++++++++++++--------------
+ 1 file changed, 21 insertions(+), 14 deletions(-)
 
-diff --git a/vl.c b/vl.c
-index 03ed215d7b..55bab005b6 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2323,6 +2323,10 @@ static int mon_init_func(void *opaque, QemuOpts *o=
-pts, Error **errp)
-     }
-=20
-     chardev =3D qemu_opt_get(opts, "chardev");
-+    if (!chardev) {
-+        error_report("chardev is required");
-+        exit(1);
+diff --git a/monitor.c b/monitor.c
+index 66f149c1dc..d39390c2f2 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -708,9 +708,14 @@ static void monitor_qapi_event_init(void)
+ 
+ static void handle_hmp_command(Monitor *mon, const char *cmdline);
+ 
++static void monitor_iothread_init(void);
++
+ static void monitor_data_init(Monitor *mon, bool skip_flush,
+                               bool use_io_thread)
+ {
++    if (use_io_thread && !mon_iothread) {
++        monitor_iothread_init();
 +    }
-     chr =3D qemu_chr_find(chardev);
-     if (chr =3D=3D NULL) {
-         error_setg(errp, "chardev \"%s\" not found", chardev);
---=20
+     memset(mon, 0, sizeof(Monitor));
+     qemu_mutex_init(&mon->mon_lock);
+     qemu_mutex_init(&mon->qmp.qmp_queue_lock);
+@@ -4461,15 +4466,6 @@ static AioContext *monitor_get_aio_context(void)
+ static void monitor_iothread_init(void)
+ {
+     mon_iothread = iothread_create("mon_iothread", &error_abort);
+-
+-    /*
+-     * The dispatcher BH must run in the main loop thread, since we
+-     * have commands assuming that context.  It would be nice to get
+-     * rid of those assumptions.
+-     */
+-    qmp_dispatcher_bh = aio_bh_new(iohandler_get_aio_context(),
+-                                   monitor_qmp_bh_dispatcher,
+-                                   NULL);
+ }
+ 
+ void monitor_init_globals(void)
+@@ -4479,7 +4475,15 @@ void monitor_init_globals(void)
+     sortcmdlist();
+     qemu_mutex_init(&monitor_lock);
+     qemu_mutex_init(&mon_fdsets_lock);
+-    monitor_iothread_init();
++
++    /*
++     * The dispatcher BH must run in the main loop thread, since we
++     * have commands assuming that context.  It would be nice to get
++     * rid of those assumptions.
++     */
++    qmp_dispatcher_bh = aio_bh_new(iohandler_get_aio_context(),
++                                   monitor_qmp_bh_dispatcher,
++                                   NULL);
+ }
+ 
+ /* These functions just adapt the readline interface in a typesafe way.  We
+@@ -4624,7 +4628,9 @@ void monitor_cleanup(void)
+      * we need to unregister from chardev below in
+      * monitor_data_destroy(), and chardev is not thread-safe yet
+      */
+-    iothread_stop(mon_iothread);
++    if (mon_iothread) {
++        iothread_stop(mon_iothread);
++    }
+ 
+     /* Flush output buffers and destroy monitors */
+     qemu_mutex_lock(&monitor_lock);
+@@ -4639,9 +4645,10 @@ void monitor_cleanup(void)
+     /* QEMUBHs needs to be deleted before destroying the I/O thread */
+     qemu_bh_delete(qmp_dispatcher_bh);
+     qmp_dispatcher_bh = NULL;
+-
+-    iothread_destroy(mon_iothread);
+-    mon_iothread = NULL;
++    if (mon_iothread) {
++        iothread_destroy(mon_iothread);
++        mon_iothread = NULL;
++    }
+ }
+ 
+ QemuOptsList qemu_mon_opts = {
+-- 
 2.17.2
