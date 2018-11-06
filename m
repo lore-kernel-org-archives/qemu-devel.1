@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37637)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gK6ZL-0005uA-HB
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 13:59:20 -0500
+	(envelope-from <george.kennedy@oracle.com>) id 1gK6nU-0007bQ-S3
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 14:13:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gK6ZD-0002sX-Rz
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 13:59:13 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:43854)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gK6ZB-00025C-BL
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 13:59:10 -0500
-Received: by mail-oi1-x241.google.com with SMTP id j202-v6so11659332oih.10
-	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 10:59:05 -0800 (PST)
+	(envelope-from <george.kennedy@oracle.com>) id 1gK6nP-0006eD-5Z
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 14:13:56 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:47948)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <george.kennedy@oracle.com>)
+	id 1gK6nN-0006BM-0w
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 14:13:49 -0500
+Message-ID: <5BE1E7D7.7020006@oracle.com>
+Date: Tue, 06 Nov 2018 14:13:27 -0500
+From: george kennedy <george.kennedy@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <12974ebb-09de-c6e9-1dd7-5199a8ae6b05@redhat.com>
-References: <1541528230-31817-1-git-send-email-thuth@redhat.com>
-	<c0febf9a-f098-112d-9c8d-c320cc66b04a@redhat.com>
-	<12974ebb-09de-c6e9-1dd7-5199a8ae6b05@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 6 Nov 2018 18:58:44 +0000
-Message-ID: <CAFEAcA-B74FQgj3COyGZ_SAAvSUA6=OaLdy5--NoAgHgEGZkpg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Add an entry for the 'collie'
- machine
+References: <1541019806-17696-1-git-send-email-george.kennedy@oracle.com>
+	<a02c97ee-964b-45da-e585-ed1d190ed591@redhat.com>
+In-Reply-To: <a02c97ee-964b-45da-e585-ed1d190ed591@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4] lsi_scsi: Reselection needed to remove
+ pending commands from queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,37 +29,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: famz@redhat.com, qemu-devel@nongnu.org, boris.ostrovsky@oracle.com
 
-On 6 November 2018 at 18:52, Thomas Huth <thuth@redhat.com> wrote:
-> On 2018-11-06 19:49, Philippe Mathieu-Daud=C3=A9 wrote:
->> On 6/11/18 19:17, Thomas Huth wrote:
->>> There is no active maintainer, but since Peter is picking up
->>> patches via qemu-arm@nongnu.org, I think we could at least use
->>> "Odd Fixes" as status here.
->>
->> This looks more as "Orphan" to me...
+
+On 11/6/2018 1:58 PM, Paolo Bonzini wrote:
+> On 31/10/2018 22:03, George Kennedy wrote:
+>> +#define SCRIPTS_LOAD_AND_STORE  0xe2340004
+> I'm very confused.  Why did this constant reappear?
+
+Ok. Me too.
+
+What are you proposing instead and I'll change it to that?
+
+Did I have what you're after in a prior patch? If so, can you point to 
+that clip?
+
+Thank you,
+George
+
 >
-> I'll leave it up to Peter for the final decision...
-
-I think we're not very consistent[*] in our usage of the various
-statuses in the MAINTAINERS file. I guess "Odd Fixes" makes
-sense in that, well, if you send a patch to this
-code and cc me I'll review it and put it in the tree. (This
-is true of any of the arm boards we have.)
-
-[*] We have one thing tagged Orphan, which is bsd-user/,
-and some things tagged Odd Fixes with no listed maintainer,
-and some things tagged Odd Fixes which are in practice more
-like Orphan (for instance sh4), and we list "fpu/" as
-Odd Fixes despite having given it a pretty thorough
-overhaul very recently, and so on...
-
-If you wanted a mechanizable rule, you could try something
-like "every file which is in status Odd Fixes or better
-must list with M: at least one named individual who has
-submitted a pull request in the last nine months" :-)
-
-thanks
--- PMM
+> Paolo
+>
+>
