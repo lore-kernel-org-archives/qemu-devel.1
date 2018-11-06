@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34237)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39424)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gKARb-00034f-QC
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 18:07:36 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gKAgh-0005Vf-NF
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 18:23:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gKARX-00036Z-Pb
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 18:07:35 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:38400)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gKARX-0002yX-4K
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 18:07:31 -0500
-Date: Wed, 7 Nov 2018 00:07:27 +0100
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20181106230727.vyqnwt6xsgtjg5gm@function>
-References: <20181106151323.16154-1-peter.maydell@linaro.org>
-	<20181106151323.16154-3-peter.maydell@linaro.org>
+	(envelope-from <pbonzini@redhat.com>) id 1gKAXm-0000iI-Tn
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 18:14:02 -0500
+References: <20181106102335.20027-1-kraxel@redhat.com>
+	<20181106102335.20027-3-kraxel@redhat.com>
+	<20181106142611.GQ12503@habkost.net>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d21f46f3-0cb3-bb4f-2e4b-48752dff440a@redhat.com>
+Date: Wed, 7 Nov 2018 00:12:49 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181106151323.16154-3-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH for-3.1 2/4] slirp: Use g_new() to allocate
- sockets in socreate()
+In-Reply-To: <20181106142611.GQ12503@habkost.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/6] add QemuSupportState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,25 +25,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, Jan Kiszka <jan.kiszka@siemens.com>, patches@linaro.org
+To: Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
 
-Peter Maydell, le mar. 06 nov. 2018 15:13:21 +0000, a ecrit:
-> The slirp socreate() function can only fail if the attempt
-> to malloc() the struct socket fails. Switch to using
-> g_new() instead, which will allow us to remove the
-> error-handling code from its callers.
+On 06/11/2018 15:26, Eduardo Habkost wrote:
+> On Tue, Nov 06, 2018 at 11:23:31AM +0100, Gerd Hoffmann wrote:
+>> Indicates support state for something (device, backend, subsystem, ...)
+>> in qemu.  Add QemuSupportState field to ObjectClass.  Add some support
+>> code.
+>>
+>> TODO: wire up to qom-list-types
+>>
+>> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+>> ---
+> [...]
+>> +##
+>> +# @SupportState:
+>> +#
+>> +# Indicate Support level of qemu devices, backends, subsystems, ...
+>> +#
+>> +# @unspecified: not specified (zero-initialized).
+>> +#
+>> +# @experimental: in development, can be unstable or incomplete.
 > 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
-> We already use g_new/g_malloc in slirp, including for
-> mbuf buffers which are larger than these socket structs.
-> The motivation here is that we can render moot a Coverity
-> complaint about an issue in an error-handling path.
+> People reading this document would ask: what would appear on
+> MAINTAINERS if SupportState is `experimental`?
+
+Probably Maintained.  It's something that is on its way towards becoming
+"supported", but still too immature ("unstable or incomplete").
+
+>> +#
+>> +# @supported: works stable and is fully supported.
+>> +#             (supported + maintained in MAINTAINERS).
+>> +#
+>> +# @unsupported: should work, support is weak or not present.
+>> +#               (odd-fixes + orphan in MAINTAINERS).
 > 
-> As usual, indenting in slirp code is a bit of a mess;
-> I've opted for "keep checkpatch happy".
+> What's the difference in practice between unsupported and
+> experimental?
+> 
+>> +#
+>> +# @obsolete: is obsolete, still present for compatibility reasons,
+>> +#            will likely be removed at some point in the future.
 
-Applied, thanks!
+I am not sure this is necessarily true.  I don't see Cirrus or adlib or
+pcnet disappearing anytime soon.
 
-Samuel
+Paolo
+
+>> +#            Not deprecated (yet).
+>> +#            (obsolete in MAINTAINERS).
+>> +#
+>> +# @deprecated: is deprecated, according to qemu deprecation policy.
+> 
+> I believe we want to differentiate "deprecated, but still safe to
+> use in production if you have a migration plan" from "deprecated,
+> and also unstable and unsafe for production".
+> 
+> I expect enterprise distributions to have a strict policy of not
+> allowing unsupported and experimental devices to be enabled, but
+> still allow deprecated devices to be enabled (but only if they
+> are stable/supported).
+> 
