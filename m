@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40874)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gKAid-0007OE-Dc
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 18:25:13 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gKB5m-0007PQ-Ky
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 18:49:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gKAiW-0002cR-0j
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 18:25:09 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:40600)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gKAiU-0002Lp-TB
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 18:25:03 -0500
-Received: by mail-wm1-f66.google.com with SMTP id b203-v6so14047927wme.5
-	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 15:25:02 -0800 (PST)
-References: <20181031003120.26771-1-ehabkost@redhat.com>
-	<20181031003120.26771-13-ehabkost@redhat.com>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gKAxn-0005uK-Gq
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 18:40:52 -0500
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <20181101182738.70462-1-vsementsov@virtuozzo.com>
+	<20181101182738.70462-8-vsementsov@virtuozzo.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <824abd40-2e3b-f40d-d995-394d84d8d20c@redhat.com>
-Date: Wed, 7 Nov 2018 00:24:55 +0100
+Message-ID: <e13e3b16-7efc-6560-41f6-10e54e2b27da@redhat.com>
+Date: Wed, 7 Nov 2018 00:40:31 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181031003120.26771-13-ehabkost@redhat.com>
+In-Reply-To: <20181101182738.70462-8-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 12/15] Acceptance tests: add make rule for
- running them
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 7/7] qcow2: do decompression in threads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,178 +25,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Max Reitz <mreitz@redhat.com>, Cleber Rosa <crosa@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org, mreitz@redhat.com
 
-On 31/10/2018 01:31, Eduardo Habkost wrote:
-> From: Cleber Rosa <crosa@redhat.com>
-> 
-> The acceptance (aka functional, aka Avocado-based) tests are
-> Python files located in "tests/acceptance" that need to be run
-> with the Avocado libs and test runner.
-> 
-> Let's provide a convenient way for QEMU developers to run them,
-> by making use of the tests-venv with the required setup.
-> 
-> Also, while the Avocado test runner will take care of creating a
-> location to save test results to, it was understood that it's better
-> if the results are kept within the build tree.
-> 
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Acked-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-> Reviewed-by: Caio Carrara <ccarrara@redhat.com>
-> Message-Id: <20181018153134.8493-3-crosa@redhat.com>
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  docs/devel/testing.rst | 43 +++++++++++++++++++++++++++++++++++++-----
->  tests/requirements.txt |  1 +
->  tests/Makefile.include | 21 +++++++++++++++++++--
->  3 files changed, 58 insertions(+), 7 deletions(-)
-> 
-> diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
-> index a227754f86..18e2c0868a 100644
-> --- a/docs/devel/testing.rst
-> +++ b/docs/devel/testing.rst
-> @@ -545,10 +545,39 @@ Tests based on ``avocado_qemu.Test`` can easily:
->     - http://avocado-framework.readthedocs.io/en/latest/api/test/avocado.html#avocado.Test
->     - http://avocado-framework.readthedocs.io/en/latest/api/utils/avocado.utils.html
+On 01/11/2018 19:27, Vladimir Sementsov-Ogievskiy wrote:
+> -/* See qcow2_compress definition for parameters description */
+> -static ssize_t qcow2_co_compress(BlockDriverState *bs,
+> -                                 void *dest, size_t dest_size,
+> -                                 const void *src, size_t src_size)
+> +static ssize_t qcow2_co_do_compress(BlockDriverState *bs,
+> +                                    void *dest, size_t dest_size,
+> +                                    const void *src, size_t src_size,
+> +                                    Qcow2CompressFunc func)
+>  {
+>      BDRVQcow2State *s = bs->opaque;
+>      BlockAIOCB *acb;
+> @@ -3838,6 +3842,7 @@ static ssize_t qcow2_co_compress(BlockDriverState *bs,
+>          .dest_size = dest_size,
+>          .src = src,
+>          .src_size = src_size,
+> +        .func = func,
+>      };
 >  
-> -Installation
-> -------------
-> +Running tests
-> +-------------
-> +
-> +You can run the acceptance tests simply by executing:
-> +
-> +.. code::
-> +
-> +  make check-acceptance
-> +
-> +This involves the automatic creation of Python virtual environment
-> +within the build tree (at ``tests/venv``) which will have all the
-> +right dependencies, and will save tests results also within the
-> +build tree (at ``tests/results``).
+>      while (s->nb_compress_threads >= MAX_COMPRESS_THREADS) {
+> @@ -3860,6 +3865,22 @@ static ssize_t qcow2_co_compress(BlockDriverState *bs,
+>      return arg.ret;
+>  }
 >  
-> -To install Avocado and its dependencies, run:
-> +Note: the build environment must be using a Python 3 stack, and have
-> +the ``venv`` and ``pip`` packages installed.  If necessary, make sure
-> +``configure`` is called with ``--python=`` and that those modules are
-> +available.  On Debian and Ubuntu based systems, depending on the
-> +specific version, they may be on packages named ``python3-venv`` and
-> +``python3-pip``.
-> +
-> +The scripts installed inside the virtual environment may be used
-> +without an "activation".  For instance, the Avocado test runner
-> +may be invoked by running:
-> +
-> + .. code::
-> +
-> +  tests/venv/bin/avocado run $OPTION1 $OPTION2 tests/acceptance/
-> +
-> +Manual Installation
-> +-------------------
-> +
-> +To manually install Avocado and its dependencies, run:
->  
->  .. code::
->  
-> @@ -689,11 +718,15 @@ The exact QEMU binary to be used on QEMUMachine.
->  Uninstalling Avocado
->  --------------------
->  
-> -If you've followed the installation instructions above, you can easily
-> -uninstall Avocado.  Start by listing the packages you have installed::
-> +If you've followed the manual installation instructions above, you can
-> +easily uninstall Avocado.  Start by listing the packages you have
-> +installed::
->  
->    pip list --user
->  
->  And remove any package you want with::
->  
->    pip uninstall <package_name>
-> +
-> +If you've used ``make check-acceptance``, the Python virtual environment where
-> +Avocado is installed will be cleaned up as part of ``make check-clean``.
-> diff --git a/tests/requirements.txt b/tests/requirements.txt
-> index d39f9d1576..64c6e27a94 100644
-> --- a/tests/requirements.txt
-> +++ b/tests/requirements.txt
-> @@ -1,3 +1,4 @@
->  # Add Python module requirements, one per line, to be installed
->  # in the tests/venv Python virtual environment. For more info,
->  # refer to: https://pip.pypa.io/en/stable/user_guide/#id1
-> +avocado-framework==65.0
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index eabc1da2f3..d2e577eabb 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -11,6 +11,7 @@ check-help:
->  	@echo " $(MAKE) check-qapi-schema    Run QAPI schema tests"
->  	@echo " $(MAKE) check-block          Run block tests"
->  	@echo " $(MAKE) check-tcg            Run TCG tests"
-> +	@echo " $(MAKE) check-acceptance     Run all acceptance (functional) tests"
->  	@echo " $(MAKE) check-report.html    Generates an HTML test report"
->  	@echo " $(MAKE) check-venv           Creates a Python venv for tests"
->  	@echo " $(MAKE) check-clean          Clean the tests"
-> @@ -902,10 +903,15 @@ check-decodetree:
->  
->  # Python venv for running tests
->  
-> -.PHONY: check-venv
-> +.PHONY: check-venv check-acceptance
->  
->  TESTS_VENV_DIR=$(BUILD_DIR)/tests/venv
->  TESTS_VENV_REQ=$(SRC_PATH)/tests/requirements.txt
-> +TESTS_RESULTS_DIR=$(BUILD_DIR)/tests/results
-> +# Controls the output generated by Avocado when running tests.
-> +# Any number of command separated loggers are accepted.  For more
-> +# information please refer to "avocado --help".
-> +AVOCADO_SHOW=none
->  
->  $(shell $(PYTHON) -c 'import sys; assert sys.version_info >= (3,0)' >/dev/null 2>&1)
->  ifeq ($(.SHELLSTATUS),0)
-> @@ -922,8 +928,19 @@ $(TESTS_VENV_DIR):
->  	$(error "venv directory for tests requires Python 3")
->  endif
->  
-> +$(TESTS_RESULTS_DIR):
-> +	$(call quiet-command, mkdir -p $@, \
-> +            MKDIR, $@)
-> +
->  check-venv: $(TESTS_VENV_DIR)
->  
-> +check-acceptance: check-venv $(TESTS_RESULTS_DIR)
-> +	$(call quiet-command, \
-> +            $(TESTS_VENV_DIR)/bin/python -m avocado \
-> +            --show=$(AVOCADO_SHOW) run --job-results-dir=$(TESTS_RESULTS_DIR) \
-> +            --failfast=on $(SRC_PATH)/tests/acceptance, \
-> +            "AVOCADO", "tests/acceptance")
 
-Right now it seems like anything that is target-dependent should be
-developed under qtest, rather than as an acceptance test.  On the other
-hand this results in qtests that actually do not use the qtest protocol
-at all---only the libqtest function to interact with QMP etc.---and as
-such would look like a perfect match for "make check-acceptance".
-drive_del-test is already an example of this.
-
-How hard would it be to make it run tests for all supported targets,
-rather than just the host architecture?  Perhaps using a tag such as
-"all-targets".
+Not a blocker for this patch, but I'll note that qcow2_co_do_compress
+could use thread_pool_submit_co.  Also, qcow2_co_do_compress should be a
+"coroutine_fn".
 
 Paolo
-
->  # Consolidated targets
->  
->  .PHONY: check-qapi-schema check-qtest check-unit check check-clean
-> @@ -937,7 +954,7 @@ check-clean:
->  	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
->  	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y)) $(check-qtest-generic-y))
->  	rm -f tests/test-qapi-gen-timestamp
-> -	rm -rf $(TESTS_VENV_DIR)
-> +	rm -rf $(TESTS_VENV_DIR) $(TESTS_RESULTS_DIR)
->  
->  clean: check-clean
->  
-> 
