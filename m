@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36466)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gK4fv-0007G1-94
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 11:58:00 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gK4gx-0007Fy-FY
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 11:59:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gK4et-0003EJ-Ky
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 11:56:57 -0500
-Date: Tue, 6 Nov 2018 17:54:27 +0100
+	(envelope-from <kwolf@redhat.com>) id 1gK4aO-0003BY-Vd
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 11:52:17 -0500
+Date: Tue, 6 Nov 2018 17:52:00 +0100
 From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20181106165427.GE4758@linux.fritz.box>
-References: <20181101163037.800-1-peter.maydell@linaro.org>
+Message-ID: <20181106165200.GD4758@linux.fritz.box>
+References: <1541387096-19513-1-git-send-email-pizhenwei@bytedance.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181101163037.800-1-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH for-3.1] blockdev: Consistently use
- snapshot_node_name in external_snapshot_prepare()
+In-Reply-To: <1541387096-19513-1-git-send-email-pizhenwei@bytedance.com>
+Subject: Re: [Qemu-devel] [PATCH] blockdev: handle error on block latency
+ histogram set error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,30 +23,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: zhenwei pi <pizhenwei@bytedance.com>
+Cc: armbru@redhat.com, mreitz@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-Am 01.11.2018 um 17:30 hat Peter Maydell geschrieben:
-> In the function external_snapshot_prepare() we have a
-> BlockdevSnapshotSync struct, which has the usual combination
-> of has_snapshot_node_name and snapshot_node_name fields for an
-> optional field. We set up a local variable
->         const char *snapshot_node_name =
->             s->has_snapshot_node_name ? s->snapshot_node_name : NULL;
+Am 05.11.2018 um 04:04 hat zhenwei pi geschrieben:
+> Function block_latency_histogram_set may return error, but qapi ignore this.
+> This can be reproduced easily by qmp command:
+> virsh qemu-monitor-command INSTANCE '{"execute":"x-block-latency-histogram-set",
+> "arguments":{"device":"drive-virtio-disk1","boundaries":[10,200,40]}}'
+> In fact this command does not work, but we still get success result.
 > 
-> and then mostly use "if (!snapshot_node_name)" for checking
-> whether we have a snapshot node name. The exception is that in
-> one place we check s->has_snapshot_node_name instead. This
-> confuses Coverity (CID 1396473), which thinks it might be
-> possible to get here with s->has_snapshot_node_name true but
-> snapshot_node_name NULL, and warns that the call to
-> qdict_put_str() will segfault in that case.
+> qmp_x_block_latency_histogram_set is a batch setting API, report error ASAP.
 > 
-> Make the code consistent and unconfuse Coverity by using
-> the same check for this conditional that we do in the rest
-> of the surrounding code.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
 
 Thanks, applied to the block branch.
 
