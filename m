@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48127)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33347)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gK9xa-00026w-2l
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 17:36:36 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gKAQ3-000299-W8
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 18:06:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gK9xY-0003nd-E0
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 17:36:33 -0500
-References: <20181015160633.63130-1-vsementsov@virtuozzo.com>
-	<6e80686e-00a1-64d9-dba5-49e2709ca8f2@virtuozzo.com>
-	<20181106172115.GG4758@linux.fritz.box>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <e2bfebf0-d05a-9e2c-ba04-1d6289709983@redhat.com>
-Date: Tue, 6 Nov 2018 17:35:45 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gKAQ0-0004ki-0O
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 18:05:59 -0500
+Received: from hera.aquilenet.fr ([185.233.100.1]:38374)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1gKAPw-00046Q-Ss
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 18:05:55 -0500
+Date: Wed, 7 Nov 2018 00:05:44 +0100
+From: Samuel Thibault <samuel.thibault@gnu.org>
+Message-ID: <20181106230544.el2smjqvmqlkezmb@function>
+References: <20181106151323.16154-1-peter.maydell@linaro.org>
+	<20181106151323.16154-2-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20181106172115.GG4758@linux.fritz.box>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] ping Re: [PATCH v4 00/11] backup-top
- filter driver for backup
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181106151323.16154-2-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH for-3.1 1/4] slirp: Don't pass possibly -1
+ fd to send()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,45 +29,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: "famz@redhat.com" <famz@redhat.com>, Denis Lunev <den@virtuozzo.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "jcody@redhat.com" <jcody@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, Jan Kiszka <jan.kiszka@siemens.com>, patches@linaro.org
 
-
-
-On 11/06/2018 12:21 PM, Kevin Wolf wrote:
-> Am 02.11.2018 um 17:41 hat Vladimir Sementsov-Ogievskiy geschrieben:
->> ping
->>
->> 15.10.2018 19:06, Vladimir Sementsov-Ogievskiy wrote:
->>> Hi all!
->>>
->>> These series introduce backup-top driver. It's a filter-node, which
->>> do copy-before-write operation. Mirror uses filter-node for handling
->>> guest writes, let's move to filter-node (from write-notifiers) for
->>> backup too (patch 16)
->>>
->>> v4:
->>> fixes, rewrite driver to be implicit, drop new interfaces and
->>> don't move to BdrvDirtyBitmap for now, as it's not obvious will
->>> it be really needed and don't relate to these series more.
->>>
->>> v3 was "[PATCH v3 00/18] fleecing-hook driver for backup"
->>>
->>> v2 was "[RFC v2] new, node-graph-based fleecing and backup"
->>>
->>> These series are based on
->>>   [PATCH v4 0/8] dirty-bitmap: rewrite bdrv_dirty_iter_next_area
->>> and
->>>   [PATCH 0/2] replication: drop extra sync
+Peter Maydell, le mar. 06 nov. 2018 15:13:20 +0000, a ecrit:
+> Coverity complains (CID 1005726) that we might pass -1 as the fd
+> argument to send() in slirp_send(), because we previously checked for
+> "so->s == -1 && so->extra".  The case of "so->s == -1 but so->extra
+> NULL" should not in theory happen, but it is hard to guarantee
+> because various places in the code do so->s = qemu_socket(...) and so
+> will end up with so->s == -1 on failure, and not all the paths which
+> call that always throw away the socket in that case (eg
+> tcp_fconnect()).  So just check specifically for the condition and
+> fail slirp_send().
 > 
-> Before we can move forward here, we need to deal with the dependencies.
-> I merged the second one now (because there wasn't any feedback from the
-> replication maintainers), but the first one looks like it was going
-> through John's or Eric's tree?
-> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> This is to some extent just placating Coverity.
 
-I was expecting it to go through Eric's because it was predicated on NBD
-patches that he was staging.
-
-Is that no longer true?
---js
+Applied, thanks!
