@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43710)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43743)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gK3Sw-00053w-SU
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:40:31 -0500
+	(envelope-from <danielhb413@gmail.com>) id 1gK3T0-00057r-Rs
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:40:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gK3Sw-00026p-3N
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:40:30 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:46840)
+	(envelope-from <danielhb413@gmail.com>) id 1gK3T0-0002Cu-4v
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:40:34 -0500
+Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:43977)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gK3St-00023t-QN
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:40:29 -0500
-Received: by mail-oi1-x243.google.com with SMTP id k64-v6so11032395oia.13
-	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 07:40:27 -0800 (PST)
+	(Exim 4.71) (envelope-from <danielhb413@gmail.com>)
+	id 1gK3Sz-0002Br-Vt
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:40:34 -0500
+Received: by mail-qt1-x844.google.com with SMTP id i7so3054953qtj.10
+	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 07:40:33 -0800 (PST)
+References: <20181029173437.32559-1-pbonzini@redhat.com>
+	<20181029173437.32559-3-pbonzini@redhat.com>
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
+Message-ID: <c2aeac3a-07c9-f5ef-16e5-48e384f50a72@gmail.com>
+Date: Tue, 6 Nov 2018 13:40:30 -0200
 MIME-Version: 1.0
-In-Reply-To: <20181106141302.GP12503@habkost.net>
-References: <20181031003120.26771-1-ehabkost@redhat.com>
-	<20181031003120.26771-12-ehabkost@redhat.com>
-	<CAFEAcA_ScL828ya7P_5=HMx=vbxo=jK4047nAbmb9Ep=6r=2og@mail.gmail.com>
-	<f1bd429f-198a-ee27-9184-636692332816@redhat.com>
-	<20181106141302.GP12503@habkost.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 6 Nov 2018 15:40:06 +0000
-Message-ID: <CAFEAcA_Ncdf9z121=xgH2UE3u_g_Zax73AOfqBzhL1LfZMEwyg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] tests: Fix Python 3 detection on older GNU
- make versions
+In-Reply-To: <20181029173437.32559-3-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 2/4] scsi-generic: avoid out-of-bounds
+ access to VPD page list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,42 +32,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Cleber Rosa <crosa@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com
 
-On 6 November 2018 at 14:13, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> The $(SHELLSTATUS) variable requires GNU make >= 4.2, but Travis
-> seems to provide an older version.  Change the existing rules to
-> use command output instead of exit code, to make it compatible
-> with older GNU make versions.
+
+
+On 10/29/18 2:34 PM, Paolo Bonzini wrote:
+> A device can report an excessive number of VPD pages when asked for a
+> list; this can cause an out-of-bounds access to buf in
+> scsi_generic_set_vpd_bl_emulation.  It should not happen, but
+> it is technically not incorrect so handle it: do not check any byte
+> past the allocation length that was sent to the INQUIRY command.
 >
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> Reported-by: Max Reitz <mreitz@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
-> I think that's the cause of the Travis failures.  I have
-> submitted a test job right now, at:
->   https://travis-ci.org/ehabkost/qemu-hacks/jobs/451387962
-> Let's see if it fixes the issue.
-> ---
->  tests/Makefile.include | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index d2e577eabb..074eece558 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -913,8 +913,8 @@ TESTS_RESULTS_DIR=$(BUILD_DIR)/tests/results
->  # information please refer to "avocado --help".
->  AVOCADO_SHOW=none
->
-> -$(shell $(PYTHON) -c 'import sys; assert sys.version_info >= (3,0)' >/dev/null 2>&1)
-> -ifeq ($(.SHELLSTATUS),0)
-> +PYTHON3 = $(shell $(PYTHON) -c 'import sys; print(1 if sys.version_info >= (3, 0) else 0)')
-> +ifeq ($(PYTHON3), 1)
->  $(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
->         $(call quiet-command, \
->              $(PYTHON) -m venv --system-site-packages $@, \
-> --
 
-Thanks, applied to master as a build fix.
+Reviewed-by: Daniel Henrique Barboza <danielhb413@gmail.com>
 
--- PMM
+>   hw/scsi/scsi-generic.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
+> index aebb7cdd82..c5497bbea8 100644
+> --- a/hw/scsi/scsi-generic.c
+> +++ b/hw/scsi/scsi-generic.c
+> @@ -538,7 +538,7 @@ static void scsi_generic_set_vpd_bl_emulation(SCSIDevice *s)
+>       }
+>   
+>       page_len = buf[3];
+> -    for (i = 4; i < page_len + 4; i++) {
+> +    for (i = 4; i < MIN(sizeof(buf), page_len + 4); i++) {
+>           if (buf[i] == 0xb0) {
+>               s->needs_vpd_bl_emulation = false;
+>               return;
