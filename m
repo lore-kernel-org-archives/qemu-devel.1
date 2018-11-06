@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60228)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gJzgy-0008Hr-P3
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 06:38:45 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1gJzh0-0008IZ-TI
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 06:38:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gJzgw-0004Ma-Ah
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 06:38:44 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1gJzgz-0004OG-NE
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 06:38:46 -0500
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:52310)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1gJzgq-00049H-KG
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 06:38:36 -0500
+	id 1gJzgz-00049H-GJ
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 06:38:45 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1gJzgj-0007cN-Ea
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 11:38:29 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1gJzgm-0007dI-WF
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 11:38:33 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue,  6 Nov 2018 11:38:21 +0000
-Message-Id: <20181106113826.25810-1-peter.maydell@linaro.org>
+Date: Tue,  6 Nov 2018 11:38:25 +0000
+Message-Id: <20181106113826.25810-5-peter.maydell@linaro.org>
+In-Reply-To: <20181106113826.25810-1-peter.maydell@linaro.org>
+References: <20181106113826.25810-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 0/5] target-arm queue
+Subject: [Qemu-devel] [PULL 4/5] target/arm: Set S and PTW in 64-bit PAR
+ format
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +33,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Handful of bugfix patches for arm for rc0; also
-one milkymist patch, thrown in since I was putting
-the pullreq together anyway.
+In do_ats_write() we construct a PAR value based on the result
+of the translation.  A comment says "S2WLK and FSTAGE are always
+zero, because we don't implement virtualization".
+Since we do in fact now implement virtualization, add the missing
+code that sets these bits based on the reported ARMMMUFaultInfo.
 
-thanks
--- PMM
+(These bits are named PTW and S in ARMv8, so we follow that
+convention in the new comments in this patch.)
 
-The following changes since commit 03c1ca1c51783603d42eb0f91d35961f0f4b4947:
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Message-id: 20181016093703.10637-2-peter.maydell@linaro.org
+---
+ target/arm/helper.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-  Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20181105' into staging (2018-11-06 09:10:46 +0000)
-
-are available in the Git repository at:
-
-  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20181106
-
-for you to fetch changes up to 23463e0e4aeb2f0a9c60549a2c163f4adc0b8512:
-
-  target/arm: Fix ATS1Hx instructions (2018-11-06 11:32:14 +0000)
-
-----------------------------------------------------------------
-target-arm queue:
- * Remove can't-happen if() from handle_vec_simd_shli()
- * hw/arm/exynos4210: Zero memory allocated for Exynos4210State
- * Set S and PTW in 64-bit PAR format
- * Fix ATS1Hx instructions
- * milkymist: Check for failure trying to load BIOS image
-
-----------------------------------------------------------------
-Peter Maydell (5):
-      target/arm: Remove can't-happen if() from handle_vec_simd_shli()
-      milkymist: Check for failure trying to load BIOS image
-      hw/arm/exynos4210: Zero memory allocated for Exynos4210State
-      target/arm: Set S and PTW in 64-bit PAR format
-      target/arm: Fix ATS1Hx instructions
-
- hw/arm/exynos4210.c        |  2 +-
- hw/lm32/milkymist.c        |  5 ++++-
- target/arm/helper.c        | 14 ++++++++------
- target/arm/translate-a64.c |  8 +++-----
- 4 files changed, 16 insertions(+), 13 deletions(-)
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 0ea95b08151..69f684abd89 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -2347,10 +2347,12 @@ static uint64_t do_ats_write(CPUARMState *env, uint64_t value,
+ 
+             par64 |= 1; /* F */
+             par64 |= (fsr & 0x3f) << 1; /* FS */
+-            /* Note that S2WLK and FSTAGE are always zero, because we don't
+-             * implement virtualization and therefore there can't be a stage 2
+-             * fault.
+-             */
++            if (fi.stage2) {
++                par64 |= (1 << 9); /* S */
++            }
++            if (fi.s1ptw) {
++                par64 |= (1 << 8); /* PTW */
++            }
+         }
+     } else {
+         /* fsr is a DFSR/IFSR value for the short descriptor
+-- 
+2.19.1
