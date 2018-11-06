@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55690)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56939)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gJuZh-0002gV-Cj
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 01:10:55 -0500
+	(envelope-from <dongli.zhang@oracle.com>) id 1gJueg-0005uf-Ks
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 01:16:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gJuZc-0004dE-4E
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 01:10:53 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:39868)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gJuZb-0004TV-RY
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 01:10:48 -0500
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20181030093031.10131.17221.stgit@pasha-VirtualBox>
-	<20181103132509.GF24365@umbus.hotspot.internet-for-guests.com>
-In-Reply-To: <20181103132509.GF24365@umbus.hotspot.internet-for-guests.com>
-Date: Tue, 6 Nov 2018 09:10:45 +0300
-Message-ID: <003301d47597$749c0340$5dd409c0$@ru>
+	(envelope-from <dongli.zhang@oracle.com>) id 1gJueb-0001dw-N8
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 01:16:02 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:33942)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dongli.zhang@oracle.com>)
+	id 1gJueb-0001dc-F2
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 01:15:57 -0500
+References: <ae2d0fbd-5198-47e8-9ad2-40a85f0b3576@default>
+	<bd913c1b-fcbe-b198-3955-4b4b2e33757a@redhat.com>
+From: Dongli Zhang <dongli.zhang@oracle.com>
+Message-ID: <fef3b167-0d69-d61d-418b-535fb6d36dfc@oracle.com>
+Date: Tue, 6 Nov 2018 14:17:46 +0800
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
+In-Reply-To: <bd913c1b-fcbe-b198-3955-4b4b2e33757a@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [PATCH] target/ppc: fix mtmsr instruction for
- icount
+Subject: Re: [Qemu-devel] How to emulate block I/O timeout on qemu side?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,24 +28,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'David Gibson' <david@gibson.dropbear.id.au>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>
-Cc: qemu-devel@nongnu.org, maria.klimushenkova@ispras.ru, agraf@suse.de
+To: Eric Blake <eblake@redhat.com>, jsnow@redhat.com
+Cc: qemu-devel@nongnu.org, libguestfs <libguestfs@redhat.com>
 
-> From: David Gibson [mailto:david@gibson.dropbear.id.au]
-> On Tue, Oct 30, 2018 at 12:30:31PM +0300, Pavel Dovgalyuk wrote:
-> > This patch fixes processing of mtmsr instructions in icount mode.
-> > In this mode writing to interrupt/peripheral state is controlled
-> > by can_do_io flag. This flag must be set explicitly before helper
-> > function invocation.
-> >
-> > Signed-off-by: Maria Klimushenkova <maria.klimushenkova@ispras.ru>
-> > Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+
+
+On 11/06/2018 01:49 AM, Eric Blake wrote:
+> On 11/2/18 3:11 AM, Dongli Zhang wrote:
+>> Hi,
+>>
+>> Is there any way to emulate I/O timeout on qemu side (not fault injection in VM
+>> kernel) without modifying qemu source code?
 > 
-> Applied to ppc-for-3.1, thanks.
+> You may be interested in Rich's work on nbdkit.  If you don't mind the overhead
+> of the host connecting through NBD, then you can use nbdkit's delay and
+> fault-injection filters for inserting delays or even run-time-controllable
+> failures to investigate how the guest reacts to those situations
 
-Thanks. What about this one
-https://patchew.org/QEMU/20181030122134.11055.15711.stgit@pasha-VirtualBox/
-There is a mess with the subject, but the code is ok :)
+Thank you all very much for the suggestions. I will take a look on nbdkit.
 
+So far I am reproducing the issue with NFS (by shutdown the link to NFS where
+the image is placed on purpose) but it did not work well.
 
-Pavel Dovgalyuk
+> 
+>>
+>> For instance, I would like to observe/study/debug the I/O timeout handling of
+>> nvme, scsi, virtio-blk (not supported) of VM kernel.
+>>
+>> Is there a way to trigger this on purpose on qemu side?
+>>
+>> Thank you very much!
+>>
+>> Dongli Zhang
+>>
+>>
+> 
+
+Dongli Zhang
