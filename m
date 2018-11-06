@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33885)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34463)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hongbo.zhang@linaro.org>) id 1gJyPJ-0001zC-2j
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 05:16:25 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gJyR7-0003KB-78
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 05:18:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hongbo.zhang@linaro.org>) id 1gJyPG-0003v5-Us
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 05:16:25 -0500
-Received: from mail-yb1-xb42.google.com ([2607:f8b0:4864:20::b42]:45355)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <hongbo.zhang@linaro.org>)
-	id 1gJyPF-0003Zg-5V
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 05:16:22 -0500
-Received: by mail-yb1-xb42.google.com with SMTP id 131-v6so5060253ybe.12
-	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 02:16:20 -0800 (PST)
+	(envelope-from <pbonzini@redhat.com>) id 1gJyQz-00046n-2g
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 05:18:17 -0500
+References: <20181101102303.16439-1-sameo@linux.intel.com>
+	<20181101102303.16439-4-sameo@linux.intel.com>
+	<a7c05368-908e-0249-5702-63a844f9dc71@gmail.com>
+	<0a0f830b-e9a3-8cb4-12f5-d3fc234036cc@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <26bc6ef8-f9c4-b75b-4157-62f81d972340@redhat.com>
+Date: Tue, 6 Nov 2018 11:17:42 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8hB=+YKNc8WSxrdmqigtErOsPJSAhYnq0Ha8_Ey=NaMg@mail.gmail.com>
-References: <1539939312-19713-1-git-send-email-hongbo.zhang@linaro.org>
-	<CAFEAcA8hB=+YKNc8WSxrdmqigtErOsPJSAhYnq0Ha8_Ey=NaMg@mail.gmail.com>
-From: Hongbo Zhang <hongbo.zhang@linaro.org>
-Date: Tue, 6 Nov 2018 18:16:19 +0800
-Message-ID: <CAHmQWvBOo=g_ZB0RMxuL-fBRzxPZ89u9cmtTLgx_CdnqZgjQUg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4] Add arm SBSA reference machine
+In-Reply-To: <0a0f830b-e9a3-8cb4-12f5-d3fc234036cc@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 03/23] hw: acpi: Export the RSDP build
+ API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +27,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Leif Lindholm <leif.lindholm@linaro.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, Samuel Ortiz <sameo@linux.intel.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "open list:ARM ACPI Subsystem" <qemu-arm@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 6 November 2018 at 00:31, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 19 October 2018 at 09:55, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
->> For the Aarch64, there is one machine 'virt', it is primarily meant to
->> run on KVM and execute virtualization workloads, but we need an
->> environment as faithful as possible to physical hardware,  to support
->> firmware and OS development for pysical Aarch64 machines.
+On 02/11/2018 10:56, Philippe Mathieu-Daud=C3=A9 wrote:
+>>>
+>>> =C2=A0 }
+>>> =C2=A0 /* RSDP */
+>>> -static GArray *
+>>> +static void
+>>> =C2=A0 build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned
+>>> xsdt_tbl_offset)
+>>> =C2=A0 {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 AcpiRsdpDescriptor *rsdp =3D acpi_data=
+_push(rsdp_table, sizeof
+>>> *rsdp);
 >>
->> See the patch commit comments for the features description.
->>
->> V4 changes:
->>  - rebased to v3.0.0
->>  - removed timer, uart, rtc, *hci device tree nodes
->>    (others were removerd in v3)
->>  - other minore codes clean up, mainly unsed header files, comments etc.
->>
->> V3 changes:
->>  - rename the platform 'sbsa-ref'
->>  - move all the codes to a separate file sbsa-ref.c
->>  - remove paravirtualized fw_cfg device
->>  - do not supply ACPI tables, since firmware will do it
->>  - supply only necessary DT nodes
->>  - and other minor code clean up
->
-> Hi; just a note that this series isn't going to make it into
-> the 3.1 release. It is still on my to-review queue for 4.0,
-> but I may not get to reviewing it for a little bit while I
-> deal with for-3.1 work.
->
-Get it, thanks.
+>> Why change this? It's not related to your patch purpose.
+>=20
+> This patch updates include/hw/acpi/aml-build.h to export the
+> build_rsdp() function.
+> Since this file includes this header, the orototype needs to match.
 
-> thanks
-> -- PMM
+But then it should also remove the "return".  I think something is
+broken for bisectability between this patch and patch 4.
+
+Perhaps this patch should already rename the function to
+build_rsdp_rsdt, and patch 4 should move build_rsdp from hw/arm to hw/acp=
+i?
+
+Paolo
