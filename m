@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53039)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gK5L6-0006CQ-AL
+	(envelope-from <armbru@redhat.com>) id 1gK5L6-0006CI-6m
 	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 12:40:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gK5Kg-0008HR-MX
+	(envelope-from <armbru@redhat.com>) id 1gK5Kk-0008Na-5j
 	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 12:40:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57548)
+Received: from mx1.redhat.com ([209.132.183.28]:34192)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gK5Ke-0007Ie-Gc
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 12:40:05 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gK5Kh-0007IN-UH
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 12:40:08 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue,  6 Nov 2018 18:39:40 +0100
-Message-Id: <20181106173941.9449-3-armbru@redhat.com>
+Date: Tue,  6 Nov 2018 18:39:39 +0100
+Message-Id: <20181106173941.9449-2-armbru@redhat.com>
 In-Reply-To: <20181106173941.9449-1-armbru@redhat.com>
 References: <20181106173941.9449-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL v2 2/3] monitor: delay monitor iothread creation
+Subject: [Qemu-devel] [PULL v2 1/3] monitor: guard iothread access by
+ mon->use_io_thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,106 +29,33 @@ Cc: Wolfgang Bumiller <w.bumiller@proxmox.com>
 
 From: Wolfgang Bumiller <w.bumiller@proxmox.com>
 
-Commit d32749deb615 moved the call to monitor_init_globals()
-to before os_daemonize(), making it an unsuitable place to
-spawn the monitor iothread as it won't be inherited over the
-fork() in os_daemonize().
-
-We now spawn the thread the first time we instantiate a
-monitor which actually has use_io_thread == true.
-Instantiation of monitors happens only after os_daemonize().
-We still need to create the qmp_dispatcher_bh when not using
-iothreads, so this now still happens in
-monitor_init_globals().
+monitor_resume() and monitor_suspend() both want to
+"kick" the I/O thread if it is there, but in
+monitor_suspend() lacked the use_io_thread flag condition.
+This is required when we later only spawn the thread on
+first use.
 
 Signed-off-by: Wolfgang Bumiller <w.bumiller@proxmox.com>
-Fixes: d32749deb615 ("monitor: move init global earlier")
-Message-Id: <20180925081507.11873-3-w.bumiller@proxmox.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Peter Xu <peterx@redhat.com>
-Tested-by: Peter Xu <peterx@redhat.com>
-[This fixes a crash on shutdown with --daemonize]
+Message-Id: <20180925081507.11873-2-w.bumiller@proxmox.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- monitor.c | 35 +++++++++++++++++++++--------------
- 1 file changed, 21 insertions(+), 14 deletions(-)
+ monitor.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/monitor.c b/monitor.c
-index 66f149c1dc..d39390c2f2 100644
+index 823b5a1099..66f149c1dc 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -708,9 +708,14 @@ static void monitor_qapi_event_init(void)
+@@ -4292,7 +4292,7 @@ int monitor_suspend(Monitor *mon)
  
- static void handle_hmp_command(Monitor *mon, const char *cmdline);
+     atomic_inc(&mon->suspend_cnt);
  
-+static void monitor_iothread_init(void);
-+
- static void monitor_data_init(Monitor *mon, bool skip_flush,
-                               bool use_io_thread)
- {
-+    if (use_io_thread && !mon_iothread) {
-+        monitor_iothread_init();
-+    }
-     memset(mon, 0, sizeof(Monitor));
-     qemu_mutex_init(&mon->mon_lock);
-     qemu_mutex_init(&mon->qmp.qmp_queue_lock);
-@@ -4461,15 +4466,6 @@ static AioContext *monitor_get_aio_context(void)
- static void monitor_iothread_init(void)
- {
-     mon_iothread = iothread_create("mon_iothread", &error_abort);
--
--    /*
--     * The dispatcher BH must run in the main loop thread, since we
--     * have commands assuming that context.  It would be nice to get
--     * rid of those assumptions.
--     */
--    qmp_dispatcher_bh = aio_bh_new(iohandler_get_aio_context(),
--                                   monitor_qmp_bh_dispatcher,
--                                   NULL);
- }
- 
- void monitor_init_globals(void)
-@@ -4479,7 +4475,15 @@ void monitor_init_globals(void)
-     sortcmdlist();
-     qemu_mutex_init(&monitor_lock);
-     qemu_mutex_init(&mon_fdsets_lock);
--    monitor_iothread_init();
-+
-+    /*
-+     * The dispatcher BH must run in the main loop thread, since we
-+     * have commands assuming that context.  It would be nice to get
-+     * rid of those assumptions.
-+     */
-+    qmp_dispatcher_bh = aio_bh_new(iohandler_get_aio_context(),
-+                                   monitor_qmp_bh_dispatcher,
-+                                   NULL);
- }
- 
- /* These functions just adapt the readline interface in a typesafe way.  We
-@@ -4624,7 +4628,9 @@ void monitor_cleanup(void)
-      * we need to unregister from chardev below in
-      * monitor_data_destroy(), and chardev is not thread-safe yet
-      */
--    iothread_stop(mon_iothread);
-+    if (mon_iothread) {
-+        iothread_stop(mon_iothread);
-+    }
- 
-     /* Flush output buffers and destroy monitors */
-     qemu_mutex_lock(&monitor_lock);
-@@ -4639,9 +4645,10 @@ void monitor_cleanup(void)
-     /* QEMUBHs needs to be deleted before destroying the I/O thread */
-     qemu_bh_delete(qmp_dispatcher_bh);
-     qmp_dispatcher_bh = NULL;
--
--    iothread_destroy(mon_iothread);
--    mon_iothread = NULL;
-+    if (mon_iothread) {
-+        iothread_destroy(mon_iothread);
-+        mon_iothread = NULL;
-+    }
- }
- 
- QemuOptsList qemu_mon_opts = {
+-    if (monitor_is_qmp(mon)) {
++    if (monitor_is_qmp(mon) && mon->use_io_thread) {
+         /*
+          * Kick I/O thread to make sure this takes effect.  It'll be
+          * evaluated again in prepare() of the watch object.
 -- 
 2.17.2
