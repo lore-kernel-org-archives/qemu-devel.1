@@ -1,20 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57812)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1gJyAK-0007d3-4v
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 05:00:57 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gJyE9-0003G5-Ir
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 05:04:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1gJyAG-00082V-NN
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 05:00:56 -0500
-Date: Tue, 6 Nov 2018 18:00:24 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20181106100024.GB10330@lemon.usersys.redhat.com>
-References: <20181016093703.10637-1-peter.maydell@linaro.org>
-	<154149783586.4748.1822263784766763922@015909e0f939>
+	(envelope-from <pbonzini@redhat.com>) id 1gJyE6-0003tb-Cy
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 05:04:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38316)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gJyE6-0003sm-5V
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 05:04:50 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1B61FC049585
+	for <qemu-devel@nongnu.org>; Tue,  6 Nov 2018 10:04:49 +0000 (UTC)
+References: <1540929011-19894-1-git-send-email-pbonzini@redhat.com>
+	<1540929011-19894-9-git-send-email-pbonzini@redhat.com>
+	<4a977f62-40aa-0620-5698-42bf3afaa869@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1c161e1f-e62a-8138-f613-815783ca0e1f@redhat.com>
+Date: Tue, 6 Nov 2018 11:04:43 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <154149783586.4748.1822263784766763922@015909e0f939>
-Subject: Re: [Qemu-devel] [PATCH 0/2] target/arm: fix some ATS* bugs
+In-Reply-To: <4a977f62-40aa-0620-5698-42bf3afaa869@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 08/10] memory-mapping: skip non-volatile
+ memory regions in GuestPhysBlockList
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,89 +36,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, patches@linaro.org
+To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
-On Tue, 11/06 01:50, no-reply@patchew.org wrote:
-> ERROR: unknown option --with-gtkabi=3.0
+On 05/11/2018 16:37, Laszlo Ersek wrote:
+> On 10/30/18 20:50, Paolo Bonzini wrote:
+>> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>
+>> GuestPhysBlockList is currently used to produce dumps. Given the size
+>> and the typical usage of NVDIMM for storage, they are not a good idea
+>> to have in the dumps. We may want to have an extra dump option to
+>> include them. For now, skip non-volatile regions.
+>>
+>> The TCG memory clear function is going to use the GuestPhysBlockList
+>> as well, and will thus skip NVDIMM for similar reasons.
+>>
+>> Cc: lersek@redhat.com
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> Message-Id: <20181003114454.5662-4-marcandre.lureau@redhat.com>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> ---
+>>  memory_mapping.c | 3 ++-
+>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/memory_mapping.c b/memory_mapping.c
+>> index 775466f..724dd0b 100644
+>> --- a/memory_mapping.c
+>> +++ b/memory_mapping.c
+>> @@ -206,7 +206,8 @@ static void guest_phys_blocks_region_add(MemoryLis=
+tener *listener,
+>> =20
+>>      /* we only care about RAM */
+>>      if (!memory_region_is_ram(section->mr) ||
+>> -        memory_region_is_ram_device(section->mr)) {
+>> +        memory_region_is_ram_device(section->mr) ||
+>> +        memory_region_is_nonvolatile(section->mr)) {
+>>          return;
+>>      }
+>> =20
+>>
+>=20
+> This patch misses my R-b, and (in chronological order) DavidH's, from:
+>=20
+> http://mid.mail-archive.com/9fa8a684-8d5d-1644-3aee-86a196d31f8d@redhat=
+.com
+> http://mid.mail-archive.com/79e58e5c-4d78-e93d-ebe8-4b1bb65752fe@redhat=
+.com
 
-Patchew is testing old series branches of which are heavily lagging behind. This
-configure option in the mingw docker testing is recently dropped, so it's a
-false positive.
+Fixed, thanks.
 
-Fam
-
-
-> Try '/tmp/qemu-test/src/configure --help' for more information
-> # QEMU configure log Tue Nov  6 09:50:16 UTC 2018
-> # Configured with: '/tmp/qemu-test/src/configure' '--enable-werror' '--target-list=x86_64-softmmu,aarch64-softmmu' '--prefix=/tmp/qemu-test/install' '--python=/usr/bin/python3' '--cross-prefix=x86_64-w64-mingw32-' '--enable-trace-backends=simple' '--enable-gnutls' '--enable-nettle' '--enable-curl' '--enable-vnc' '--enable-bzip2' '--enable-guest-agent' '--with-sdlabi=2.0' '--with-gtkabi=3.0'
-> #
-> 
-> funcs: do_compiler do_cc compile_object check_define main
-> lines: 92 119 608 625 0
-> x86_64-w64-mingw32-gcc -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common -fwrapv -c -o config-temp/qemu-conf.o config-temp/qemu-conf.c
-> config-temp/qemu-conf.c:2:2: error: #error __linux__ not defined
->  #error __linux__ not defined
->   ^~~~~
-> 
-> funcs: do_compiler do_cc compile_object check_define main
-> lines: 92 119 608 627 0
-> x86_64-w64-mingw32-gcc -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common -fwrapv -c -o config-temp/qemu-conf.o config-temp/qemu-conf.c
-> 
-> funcs: do_compiler do_cc compile_object check_define main
-> lines: 92 119 608 677 0
-> x86_64-w64-mingw32-gcc -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common -fwrapv -c -o config-temp/qemu-conf.o config-temp/qemu-conf.c
-> config-temp/qemu-conf.c:2:2: error: #error __i386__ not defined
->  #error __i386__ not defined
->   ^~~~~
-> 
-> funcs: do_compiler do_cc compile_object check_define main
-> lines: 92 119 608 679 0
-> x86_64-w64-mingw32-gcc -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common -fwrapv -c -o config-temp/qemu-conf.o config-temp/qemu-conf.c
-> 
-> funcs: do_compiler do_cc compile_object check_define main
-> lines: 92 119 608 680 0
-> x86_64-w64-mingw32-gcc -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common -fwrapv -c -o config-temp/qemu-conf.o config-temp/qemu-conf.c
-> config-temp/qemu-conf.c:2:2: error: #error __ILP32__ not defined
->  #error __ILP32__ not defined
->   ^~~~~
-> 
-> funcs: do_compiler do_cc compile_object check_include main
-> lines: 92 119 616 771 0
-> x86_64-w64-mingw32-gcc -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common -fwrapv -c -o config-temp/qemu-conf.o config-temp/qemu-conf.c
-> 
-> funcs: do_compiler do_cc compile_prog main
-> lines: 92 125 907 0
-> x86_64-w64-mingw32-gcc -mthreads -D__USE_MINGW_ANSI_STDIO=1 -DWIN32_LEAN_AND_MEAN -DWINVER=0x501 -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common -fwrapv -o config-temp/qemu-conf.exe config-temp/qemu-conf.c -g -liberty
-> /usr/lib/gcc/x86_64-w64-mingw32/7.3.0/../../../../x86_64-w64-mingw32/bin/ld: cannot find -liberty
-> collect2: error: ld returned 1 exit status
-> Failed to run 'configure'
-> Traceback (most recent call last):
->   File "./tests/docker/docker.py", line 563, in <module>
->     sys.exit(main())
->   File "./tests/docker/docker.py", line 560, in main
->     return args.cmdobj.run(args, argv)
->   File "./tests/docker/docker.py", line 306, in run
->     return Docker().run(argv, args.keep, quiet=args.quiet)
->   File "./tests/docker/docker.py", line 274, in run
->     quiet=quiet)
->   File "./tests/docker/docker.py", line 181, in _do_check
->     return subprocess.check_call(self._command + cmd, **kwargs)
->   File "/usr/lib64/python2.7/subprocess.py", line 186, in check_call
->     raise CalledProcessError(retcode, cmd)
-> subprocess.CalledProcessError: Command '['sudo', '-n', 'docker', 'run', '--label', 'com.qemu.instance.uuid=5bcf7f1ce1a911e88b3152540069c830', '-u', '1000', '--security-opt', 'seccomp=unconfined', '--rm', '--net=none', '-e', 'TARGET_LIST=', '-e', 'EXTRA_CONFIGURE_OPTS=', '-e', 'V=', '-e', 'J=8', '-e', 'DEBUG=', '-e', 'SHOW_ENV=1', '-e', 'CCACHE_DIR=/var/tmp/ccache', '-v', '/home/patchew/.cache/qemu-docker-ccache:/var/tmp/ccache:z', '-v', '/var/tmp/patchew-tester-tmp-j_cwgv70/src/docker-src.2018-11-06-04.49.59.28947:/var/tmp/qemu:z,ro', 'qemu:fedora', '/var/tmp/qemu/run', 'test-mingw']' returned non-zero exit status 1
-> make[1]: *** [tests/docker/Makefile.include:217: docker-run] Error 1
-> make[1]: Leaving directory '/var/tmp/patchew-tester-tmp-j_cwgv70/src'
-> make: *** [tests/docker/Makefile.include:251: docker-run-test-mingw@fedora] Error 2
-> 
-> real	0m37.093s
-> user	0m5.048s
-> sys	0m3.799s
-> === OUTPUT END ===
-> 
-> Test command exited with code: 2
-> 
-> 
-> ---
-> Email generated automatically by Patchew [http://patchew.org/].
-> Please send your feedback to patchew-devel@redhat.com
+Paolo
