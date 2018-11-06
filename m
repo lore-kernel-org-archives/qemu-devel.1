@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49499)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gK0kq-0004uJ-S4
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:46:53 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gK0l0-0004l4-LO
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:46:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gK0fL-00012e-94
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:41:11 -0500
-Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:46190)
+	(envelope-from <peter.maydell@linaro.org>) id 1gK0dx-00079O-S6
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:39:42 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:33870)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <artem.k.pisarenko@gmail.com>)
-	id 1gK0fJ-0000ih-HZ
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:41:07 -0500
-Received: by mail-lf1-x143.google.com with SMTP id f23so4166460lfc.13
-	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 04:41:01 -0800 (PST)
-From: Artem Pisarenko <artem.k.pisarenko@gmail.com>
-Date: Tue,  6 Nov 2018 18:40:51 +0600
-Message-Id: <7dde6abbd21682857f8294644013173c0b9949b3.1541507990.git.artem.k.pisarenko@gmail.com>
-In-Reply-To: <cover.1541507990.git.artem.k.pisarenko@gmail.com>
-References: <cover.1541507990.git.artem.k.pisarenko@gmail.com>
-In-Reply-To: <cover.1541507990.git.artem.k.pisarenko@gmail.com>
-References: <cover.1541507990.git.artem.k.pisarenko@gmail.com>
-Subject: [Qemu-devel] [PATCH v3 1/2] chardev: fix mess in OPENED/CLOSED
- events when muxed
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gK0dx-000799-LK
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:39:41 -0500
+Received: by mail-ot1-x341.google.com with SMTP id t5so7620772otk.1
+	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 04:39:41 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA9k544ZduSLR2iFk2AXwWoXC3rQMpdhX28wq_U4C=yZjw@mail.gmail.com>
+References: <20181105181353.39804-1-mst@redhat.com>
+	<a4e0dd6a-a1d5-10a1-a9e0-d01ca8d88d84@redhat.com>
+	<20181106060647-mutt-send-email-mst@kernel.org>
+	<CAFEAcA9k544ZduSLR2iFk2AXwWoXC3rQMpdhX28wq_U4C=yZjw@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 6 Nov 2018 12:39:20 +0000
+Message-ID: <CAFEAcA-eULHQn9qdnNNXsu9rFLa8Q9bGUtqw6HmFtaX=+bOuUQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/33] pci, pc, virtio: fixes, features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,174 +31,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Artem Pisarenko <artem.k.pisarenko@gmail.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Laszlo Ersek <lersek@redhat.com>
 
-When chardev is multiplexed (mux=on) there are a lot of cases where
-CHR_EVENT_OPENED/CHR_EVENT_CLOSED events pairing (expected from
-frontend side) is broken. There are either generation of multiple
-repeated or extra CHR_EVENT_OPENED events, or CHR_EVENT_CLOSED just
-isn't generated at all.
-This is mostly because 'qemu_chr_fe_set_handlers()' function makes its
-own (and often wrong) implicit decision on updated frontend state and
-invokes 'fd_event' callback with 'CHR_EVENT_OPENED'. And even worse,
-it doesn't do symmetric action in opposite direction, as someone may
-expect (i.e. it doesn't invoke previously set 'fd_event' with
-'CHR_EVENT_CLOSED'). Muxed chardev uses trick by calling this function
-again to replace callback handlers with its own ones, but it doesn't
-account for such side effect.
-Fix that using extended version of this function with added argument
-for disabling side effect and keep original function for compatibility
-with lots of frontends already using this interface and being
-"tolerant" to its side effects.
-One more source of event duplication is just line of code in
-char-mux.c, which does far more than comment above says (obvious fix).
+On 6 November 2018 at 11:20, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 6 November 2018 at 11:07, Michael S. Tsirkin <mst@redhat.com> wrote:
+>> On Tue, Nov 06, 2018 at 09:18:49AM +0100, Thomas Huth wrote:
+>>> On 2018-11-05 19:14, Michael S. Tsirkin wrote:
+>>> > The following changes since commit b2f7a038bb4c4fc5ce6b8486e8513dfd97665e2a:
+>>> >
+>>> >   Merge remote-tracking branch 'remotes/rth/tags/pull-softfloat-20181104' into staging (2018-11-05 10:32:49 +0000)
+>>> >
+>>> > are available in the Git repository at:
+>>> >
+>>> >   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+>>> >
+>>> > for you to fetch changes up to 6196df5c8e6688c1c3f06f73442820066335337c:
+>>> >
+>>> >   vhost-scsi: prevent using uninitialized vqs (2018-11-05 12:59:35 -0500)
+>>> >
+>>> > ----------------------------------------------------------------
+>>> > pci, pc, virtio: fixes, features
+>>> >
+>>> > AMD IOMMU VAPIC support + fixes all over the place.
+>>> >
+>>> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>>> >
+>>> > ----------------------------------------------------------------
+>>> > Gerd Hoffmann (1):
+>>> >       pci-testdev: add optional memory bar
+>>> >
+>>> > Laszlo Ersek (4):
+>>> >       MAINTAINERS: list "tests/acpi-test-data" files in ACPI/SMBIOS section
+>>> [...]
+>>> >  tests/{acpi-test-data => data/acpi}/pc/APIC        | Bin
+>>> >  tests/{acpi-test-data => data/acpi}/pc/APIC.cphp   | Bin
+>>> >  .../{acpi-test-data => data/acpi}/pc/APIC.dimmpxm  | Bin
+>>> >  tests/{acpi-test-data => data/acpi}/pc/DSDT        | Bin
+>>>
+>>> So patch 1 moves tests/acpi-test-data/ to tests/data/acpi/ and patch 20
+>>> adds an entry for tests/acpi-test-data/ ? Does not make much sense to me
+>>> ... I think patch 20 needs to be adapted now.
+>>>
+>>>  Thomas
+>>
+>> Oh right, MAINTAINERS needs to be fixed. Can be done with a patch on top
+>> though.
+>
+> Yeah, given the timing for rc0 I'll just apply this version of
+> the pullreq, and we can fix up MAINTAINERS afterwards.
 
-Signed-off-by: Artem Pisarenko <artem.k.pisarenko@gmail.com>
----
+...applied.
 
-Notes:
-    v3:
-     - extended and improved commit message with 'why' and 'how' explanation
-
- chardev/char-fe.c         | 33 ++++++++++++++++++++++++---------
- chardev/char-mux.c        | 16 ++++++++--------
- include/chardev/char-fe.h | 18 +++++++++++++++++-
- 3 files changed, 49 insertions(+), 18 deletions(-)
-
-diff --git a/chardev/char-fe.c b/chardev/char-fe.c
-index a8931f7..b7bcbd5 100644
---- a/chardev/char-fe.c
-+++ b/chardev/char-fe.c
-@@ -246,14 +246,15 @@ void qemu_chr_fe_deinit(CharBackend *b, bool del)
-     }
- }
- 
--void qemu_chr_fe_set_handlers(CharBackend *b,
--                              IOCanReadHandler *fd_can_read,
--                              IOReadHandler *fd_read,
--                              IOEventHandler *fd_event,
--                              BackendChangeHandler *be_change,
--                              void *opaque,
--                              GMainContext *context,
--                              bool set_open)
-+void qemu_chr_fe_set_handlers_full(CharBackend *b,
-+                                   IOCanReadHandler *fd_can_read,
-+                                   IOReadHandler *fd_read,
-+                                   IOEventHandler *fd_event,
-+                                   BackendChangeHandler *be_change,
-+                                   void *opaque,
-+                                   GMainContext *context,
-+                                   bool set_open,
-+                                   bool sync_state)
- {
-     Chardev *s;
-     int fe_open;
-@@ -285,7 +286,7 @@ void qemu_chr_fe_set_handlers(CharBackend *b,
-         qemu_chr_fe_take_focus(b);
-         /* We're connecting to an already opened device, so let's make sure we
-            also get the open event */
--        if (s->be_open) {
-+        if (sync_state && s->be_open) {
-             qemu_chr_be_event(s, CHR_EVENT_OPENED);
-         }
-     }
-@@ -295,6 +296,20 @@ void qemu_chr_fe_set_handlers(CharBackend *b,
-     }
- }
- 
-+void qemu_chr_fe_set_handlers(CharBackend *b,
-+                              IOCanReadHandler *fd_can_read,
-+                              IOReadHandler *fd_read,
-+                              IOEventHandler *fd_event,
-+                              BackendChangeHandler *be_change,
-+                              void *opaque,
-+                              GMainContext *context,
-+                              bool set_open)
-+{
-+    qemu_chr_fe_set_handlers_full(b, fd_can_read, fd_read, fd_event, be_change,
-+                                  opaque, context, set_open,
-+                                  true);
-+}
-+
- void qemu_chr_fe_take_focus(CharBackend *b)
- {
-     if (!b->chr) {
-diff --git a/chardev/char-mux.c b/chardev/char-mux.c
-index 6055e76..1199d32 100644
---- a/chardev/char-mux.c
-+++ b/chardev/char-mux.c
-@@ -283,13 +283,13 @@ void mux_chr_set_handlers(Chardev *chr, GMainContext *context)
-     MuxChardev *d = MUX_CHARDEV(chr);
- 
-     /* Fix up the real driver with mux routines */
--    qemu_chr_fe_set_handlers(&d->chr,
--                             mux_chr_can_read,
--                             mux_chr_read,
--                             mux_chr_event,
--                             NULL,
--                             chr,
--                             context, true);
-+    qemu_chr_fe_set_handlers_full(&d->chr,
-+                                  mux_chr_can_read,
-+                                  mux_chr_read,
-+                                  mux_chr_event,
-+                                  NULL,
-+                                  chr,
-+                                  context, true, false);
- }
- 
- void mux_set_focus(Chardev *chr, int focus)
-@@ -367,7 +367,7 @@ static int open_muxes(Chardev *chr)
-      * mark mux as OPENED so any new FEs will immediately receive
-      * OPENED event
-      */
--    qemu_chr_be_event(chr, CHR_EVENT_OPENED);
-+    chr->be_open = 1;
- 
-     return 0;
- }
-diff --git a/include/chardev/char-fe.h b/include/chardev/char-fe.h
-index 46c997d..c1b7fd9 100644
---- a/include/chardev/char-fe.h
-+++ b/include/chardev/char-fe.h
-@@ -67,7 +67,7 @@ bool qemu_chr_fe_backend_connected(CharBackend *be);
- bool qemu_chr_fe_backend_open(CharBackend *be);
- 
- /**
-- * qemu_chr_fe_set_handlers:
-+ * qemu_chr_fe_set_handlers_full:
-  * @b: a CharBackend
-  * @fd_can_read: callback to get the amount of data the frontend may
-  *               receive
-@@ -79,12 +79,28 @@ bool qemu_chr_fe_backend_open(CharBackend *be);
-  * @context: a main loop context or NULL for the default
-  * @set_open: whether to call qemu_chr_fe_set_open() implicitely when
-  * any of the handler is non-NULL
-+ * @sync_state: whether to issue event callback with updated state
-  *
-  * Set the front end char handlers. The front end takes the focus if
-  * any of the handler is non-NULL.
-  *
-  * Without associated Chardev, nothing is changed.
-  */
-+void qemu_chr_fe_set_handlers_full(CharBackend *b,
-+                                   IOCanReadHandler *fd_can_read,
-+                                   IOReadHandler *fd_read,
-+                                   IOEventHandler *fd_event,
-+                                   BackendChangeHandler *be_change,
-+                                   void *opaque,
-+                                   GMainContext *context,
-+                                   bool set_open,
-+                                   bool sync_state);
-+
-+/**
-+ * qemu_chr_fe_set_handlers:
-+ *
-+ * Version of qemu_chr_fe_set_handlers_full() with sync_state = true.
-+ */
- void qemu_chr_fe_set_handlers(CharBackend *b,
-                               IOCanReadHandler *fd_can_read,
-                               IOReadHandler *fd_read,
--- 
-2.7.4
+thanks
+-- PMM
