@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@outlook.com>) id 1gK0SO-00026c-7e
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:27:45 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gK0Tc-0004im-LK
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:29:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@outlook.com>) id 1gK0SM-000184-VX
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:27:44 -0500
-Received: from mail-bn3nam04olkn0830.outbound.protection.outlook.com
-	([2a01:111:f400:fe4e::830]:22240
-	helo=NAM04-BN3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liq3ea@outlook.com>) id 1gK0SD-00010v-Sf
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:27:37 -0500
-From: li qiang <liq3ea@outlook.com>
-Date: Tue, 6 Nov 2018 12:27:27 +0000
-Message-ID: <BN6PR18MB122007CFC965C45DF2CA20BB9FCB0@BN6PR18MB1220.namprd18.prod.outlook.com>
+	(envelope-from <pbonzini@redhat.com>) id 1gK0TZ-0002h5-FX
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:29:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51718)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gK0TY-0002bv-TW
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:28:57 -0500
 References: <20181106115351.9422-1-ppandit@redhat.com>
 	<CAFEAcA880MNu+_C1ySic7ASsQNMth1FCGSjHJg_N7Ud+s4G_PA@mail.gmail.com>
-In-Reply-To: <CAFEAcA880MNu+_C1ySic7ASsQNMth1FCGSjHJg_N7Ud+s4G_PA@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <52A3ABDD46A68A4DB17AD7E10B221CBD@namprd18.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	<BN6PR18MB122007CFC965C45DF2CA20BB9FCB0@BN6PR18MB1220.namprd18.prod.outlook.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5127334b-e3c3-cf08-6855-8b6fd871cb5f@redhat.com>
+Date: Tue, 6 Nov 2018 13:28:48 +0100
 MIME-Version: 1.0
+In-Reply-To: <BN6PR18MB122007CFC965C45DF2CA20BB9FCB0@BN6PR18MB1220.namprd18.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH] lsi53c895a: check script ram address value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -31,58 +29,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, P J P <ppandit@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Qemu
-	Developers <qemu-devel@nongnu.org>, Prasad J Pandit <pjp@fedoraproject.org>
+To: li qiang <liq3ea@outlook.com>, Peter Maydell <peter.maydell@linaro.org>, P J P <ppandit@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, Prasad J Pandit <pjp@fedoraproject.org>
 
-DQrlnKggMjAxOC8xMS82IDIwOjAzLCBQZXRlciBNYXlkZWxsIOWGmemBkzoNCj4gT24gNiBOb3Zl
-bWJlciAyMDE4IGF0IDExOjUzLCBQIEogUCA8cHBhbmRpdEByZWRoYXQuY29tPiB3cm90ZToNCj4+
-IEZyb206IFByYXNhZCBKIFBhbmRpdCA8cGpwQGZlZG9yYXByb2plY3Qub3JnPg0KPj4NCj4+IFdo
-aWxlIGFjY2Vzc2luZyBzY3JpcHQgcmFtWzIwNDhdIHZpYSAnbHNpX3JhbV9yZWFkL3dyaXRlJyBy
-b3V0aW5lcywNCj4+ICdhZGRyJyBjb3VsZCBleGNlZWQgdGhlIHJhbSByYW5nZS4gTWFzayBoaWdo
-IG9yZGVyIGJpdHMgdG8gYXZvaWQNCj4+IE9PQiBhY2Nlc3MuDQo+Pg0KPj4gUmVwb3J0ZWQtYnk6
-IE1hcmsgS2FuZGEgPG1hcmsua2FuZGFAb3JhY2xlLmNvbT4NCj4+IFNpZ25lZC1vZmYtYnk6IFBy
-YXNhZCBKIFBhbmRpdCA8cGpwQGZlZG9yYXByb2plY3Qub3JnPg0KPj4gLS0tDQo+PiAgIGh3L3Nj
-c2kvbHNpNTNjODk1YS5jIHwgMiArKw0KPj4gICAxIGZpbGUgY2hhbmdlZCwgMiBpbnNlcnRpb25z
-KCspDQo+Pg0KPj4gZGlmZiAtLWdpdCBhL2h3L3Njc2kvbHNpNTNjODk1YS5jIGIvaHcvc2NzaS9s
-c2k1M2M4OTVhLmMNCj4+IGluZGV4IDNmMjA3ZjYwN2MuLjA4MDBkZjQxNmUgMTAwNjQ0DQo+PiAt
-LS0gYS9ody9zY3NpL2xzaTUzYzg5NWEuYw0KPj4gKysrIGIvaHcvc2NzaS9sc2k1M2M4OTVhLmMN
-Cj4+IEBAIC0yMDM1LDYgKzIwMzUsNyBAQCBzdGF0aWMgdm9pZCBsc2lfcmFtX3dyaXRlKHZvaWQg
-Km9wYXF1ZSwgaHdhZGRyIGFkZHIsDQo+PiAgICAgICB1aW50MzJfdCBtYXNrOw0KPj4gICAgICAg
-aW50IHNoaWZ0Ow0KPj4NCj4+ICsgICAgYWRkciAmPSAweDAxRkZGOw0KPj4gICAgICAgbmV3dmFs
-ID0gcy0+c2NyaXB0X3JhbVthZGRyID4+IDJdOw0KPj4gICAgICAgc2hpZnQgPSAoYWRkciAmIDMp
-ICogODsNCj4+ICAgICAgIG1hc2sgPSAoKHVpbnQ2NF90KTEgPDwgKHNpemUgKiA4KSkgLSAxOw0K
-Pj4gQEAgLTIwNTAsNiArMjA1MSw3IEBAIHN0YXRpYyB1aW50NjRfdCBsc2lfcmFtX3JlYWQodm9p
-ZCAqb3BhcXVlLCBod2FkZHIgYWRkciwNCj4+ICAgICAgIHVpbnQzMl90IHZhbDsNCj4+ICAgICAg
-IHVpbnQzMl90IG1hc2s7DQo+Pg0KPj4gKyAgICBhZGRyICY9IDB4MDFGRkY7DQo+PiAgICAgICB2
-YWwgPSBzLT5zY3JpcHRfcmFtW2FkZHIgPj4gMl07DQo+PiAgICAgICBtYXNrID0gKCh1aW50NjRf
-dCkxIDw8IChzaXplICogOCkpIC0gMTsNCj4+ICAgICAgIHZhbCA+Pj0gKGFkZHIgJiAzKSAqIDg7
-DQo+PiAtLQ0KPiBXaGVuIGNhbiB0aGlzIG1hc2tpbmcgaGF2ZSBhbnkgZWZmZWN0PyBUaGVzZSBm
-dW5jdGlvbnMgYXJlDQo+IHRoZSByZWFkIGFuZCB3cml0ZSBvcHMgZm9yIGxzaV9yYW1fb3BzLCB3
-aGljaCB3ZSByZWdpc3RlciB3aXRoDQo+ICAgICAgbWVtb3J5X3JlZ2lvbl9pbml0X2lvKCZzLT5y
-YW1faW8sIE9CSkVDVChzKSwgJmxzaV9yYW1fb3BzLCBzLA0KPiAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAibHNpLXJhbSIsIDB4MjAwMCk7DQo+IHdoaWNoIHNwZWNpZmllcyBhIG1lbW9yeSBy
-ZWdpb24gc2l6ZSBvZiAweDIwMDAuIFNvIHRoZSBpbnB1dA0KPiBhZGRyIG11c3QgYmUgaW4gdGhl
-IDAuLjB4MWZmZiByYW5nZSBhbHJlYWR5IC0tIG9yIGhhdmUgSSBtaXNzZWQNCj4gc29tZXRoaW5n
-ID8NCg0KDQpIZWxsbyBQZXRlciwNCg0KVGhlcmUgaXMgYSBvb2IgYWNjZXNzIGluZGVlZCwNCg0K
-VGhlIGFkZHIgaXMgMH4weDFmZmYsIGJ1dCB3aGVuIGFkZHIgaXMgYXQgdGhlIG5lYXIgdGhlIGVu
-ZCAsZm9yIGV4YW1wbGUgDQoweDFmZmZlLCB0aGUgYWRkPj4yIGNhbiBiZSAyMDQ3DQoNCmFuZCBh
-cyBzY3JpcHRfcmFtIGlzIGEgdWludDMyX3QgYW5kIHNvIHMtPnNjcmlwdF9yYW1bYWRkciA+PiAy
-XSBjYW4gcmVhZCANCm91dCBvZiB0aGUgc2NyaXB0X3JhbS4NCg0KU29tZSBvZiB0aGUgZGVidWcg
-ZGF0YS4NCg0KVGhyZWFkIDUgInFlbXUtc3lzdGVtLXg4NiIgaGl0IEJyZWFrcG9pbnQgMSwgbHNp
-X3JhbV9yZWFkIA0KKG9wYXF1ZT0weDYyNjAwMDAwZjEwMCwgYWRkcj04MTg4LCBzaXplPTQpIGF0
-IGh3L3Njc2kvbHNpNTNjODk1YS5jOjIwNDYNCjIwNDbCoMKgwqAgwqDCoMKgIExTSVN0YXRlICpz
-ID0gb3BhcXVlOw0KKGdkYikgcCAveCBhZGRyDQokMTIgPSAweDFmZmMNCihnZGIpIHAgYWRkcg0K
-JDEzID0gODE4OA0KKGdkYikgbg0KLi4uDQoyMDUwwqDCoMKgIMKgwqDCoCB2YWwgPSBzLT5zY3Jp
-cHRfcmFtW2FkZHIgPj4gMl07DQooZ2RiKSBwIGFkZHINCiQxNCA9IDgxODgNCihnZGIpIHAgYWRk
-ciA+PjINCiQxNSA9IDIwNDcNCihnZGIpIG4NCjIwNTHCoMKgwqAgwqDCoMKgIG1hc2sgPSAoKHVp
-bnQ2NF90KTEgPDwgKHNpemUgKiA4KSkgLSAxOw0KKGdkYikgcCAveCB2YWwNCiQxNiA9IDB4MA0K
-KGdkYikgbg0KMjA1MsKgwqDCoCDCoMKgwqAgdmFsID4+PSAoYWRkciAmIDMpICogODsNCihnZGIp
-IG4NCjIwNTPCoMKgwqAgwqDCoMKgIHJldHVybiB2YWwgJiBtYXNrOw0KKGdkYikgcCAveCBtYXNr
-DQokMTcgPSAweGZmZmZmZmZmDQooZ2RiKSBwIC9zIHNpemUNCiQxOCA9IDQNCg0KQnV0IGFzIHlv
-dSBwb2ludCBQcmFzYWQncyBwYXRjaCBkb2VzIG5vdGhpbmcuDQoNCkhlbGxvIFByYXNhZCwNCg0K
-SSB0aGluayB5b3Ugc2hvdWxkIGNoZWNrIHRoZSBhZGRyIHdpdGggc2l6ZSB0byBlbnN1cmUgdGhl
-IGFjY2Vzcw0KDQpkb2Vzbid0IGV4Y2VlZCBzY3JpcHRfcmFtLg0KDQoNClRoYW5rcywNCg0KTGkg
-UWlhbmcNCg0KDQo+IEl0IHdvdWxkIHByb2JhYmx5IGJlIGhlbHBmdWwgKGZvciByZWFkZXJzIGFu
-ZCBzdGF0aWMgYW5hbHlzZXJzKQ0KPiB0byBhc3NlcnQoKSB0aGF0IGFkZHIgaXMgPCAweDIwMDAs
-IHRob3VnaC4NCj4NCj4gdGhhbmtzDQo+IC0tIFBNTQ0KPg0K
+On 06/11/2018 13:27, li qiang wrote:
+> The addr is 0~0x1fff, but when addr is at the near the end ,for example 
+> 0x1fffe, the add>>2 can be 2047
+> 
+> and as script_ram is a uint32_t and so s->script_ram[addr >> 2] can read 
+> out of the script_ram.
+
+How so?  s->script_ram has size 2048, it's okay to access it at 2047.
+
+Paolo
