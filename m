@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43239)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gK9DG-0006Xt-8I
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gK9DG-0002l5-KG
 	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 16:48:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gK93S-0001BX-Te
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gK93S-0001Ad-Le
 	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 16:38:36 -0500
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:46349)
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:53654)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gK93S-00008s-8S
+	id 1gK93S-0000Fw-2f
 	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 16:38:34 -0500
-Received: by mail-wr1-x436.google.com with SMTP id 74-v6so15189692wrb.13
-	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 13:38:13 -0800 (PST)
+Received: by mail-wm1-x343.google.com with SMTP id f10-v6so85575wme.3
+	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 13:38:16 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  6 Nov 2018 22:37:52 +0100
-Message-Id: <1541540283-45699-7-git-send-email-pbonzini@redhat.com>
+Date: Tue,  6 Nov 2018 22:37:54 +0100
+Message-Id: <1541540283-45699-9-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1541540283-45699-1-git-send-email-pbonzini@redhat.com>
 References: <1541540283-45699-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 06/17] target/i386: Clear RF on SYSCALL
- instruction
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 08/17] nvdimm: set non-volatile on the memory
+ region
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +32,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Rudolf Marek <rudolf.marek@sysgo.com>, Roman Kapl <rka@sysgo.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-From: Rudolf Marek <rudolf.marek@sysgo.com>
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-Fix the SYSCALL instruction in 64-bit (long mode). The RF flag
-should be cleared in R11 as well as in the RFLAGS. Intel
-and AMD CPUs behave same. AMD has this documented in the
-APM vol 3.
+qemu-system-x86_64 -machine pc,nvdimm -m 2G,slots=4,maxmem=16G -enable-kvm -monitor stdio -object memory-backend-file,id=mem1,share=on,mem-path=/tmp/foo,size=1G -device nvdimm,id=nvdimm1,memdev=mem1
 
-Signed-off-by: Roman Kapl <rka@sysgo.com>
-Signed-off-by: Rudolf Marek <rudolf.marek@sysgo.com>
-Message-Id: <20181019122449.26387-1-rka@sysgo.com>
+HMP info mtree command reflects the flag with "nv-" prefix on memory type:
+
+(qemu) info mtree
+0000000100000000-000000013fffffff (prio 0, nv-i/o): alias nvdimm-memory @/objects/mem1 0000000000000000-000000003fffffff
+
+(qemu) info mtree -f
+0000000100000000-000000013fffffff (prio 0, nv-ram): /objects/mem1
+
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20181003114454.5662-3-marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/seg_helper.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/mem/nvdimm.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/target/i386/seg_helper.c b/target/i386/seg_helper.c
-index 33714bc..63e265c 100644
---- a/target/i386/seg_helper.c
-+++ b/target/i386/seg_helper.c
-@@ -991,11 +991,11 @@ void helper_syscall(CPUX86State *env, int next_eip_addend)
-         int code64;
+diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
+index 49324f3..bf2adf5 100644
+--- a/hw/mem/nvdimm.c
++++ b/hw/mem/nvdimm.c
+@@ -116,6 +116,7 @@ static void nvdimm_prepare_memory_region(NVDIMMDevice *nvdimm, Error **errp)
+     nvdimm->nvdimm_mr = g_new(MemoryRegion, 1);
+     memory_region_init_alias(nvdimm->nvdimm_mr, OBJECT(dimm),
+                              "nvdimm-memory", mr, 0, pmem_size);
++    memory_region_set_nonvolatile(nvdimm->nvdimm_mr, true);
+     nvdimm->nvdimm_mr->align = align;
+ }
  
-         env->regs[R_ECX] = env->eip + next_eip_addend;
--        env->regs[11] = cpu_compute_eflags(env);
-+        env->regs[11] = cpu_compute_eflags(env) & ~RF_MASK;
- 
-         code64 = env->hflags & HF_CS64_MASK;
- 
--        env->eflags &= ~env->fmask;
-+        env->eflags &= ~(env->fmask | RF_MASK);
-         cpu_load_eflags(env, env->eflags, 0);
-         cpu_x86_load_seg_cache(env, R_CS, selector & 0xfffc,
-                            0, 0xffffffff,
 -- 
 1.8.3.1
