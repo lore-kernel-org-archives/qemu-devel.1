@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37613)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39230)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gJx5l-000331-Cd
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 03:52:13 -0500
+	(envelope-from <bounces@canonical.com>) id 1gJx8Y-0007F8-31
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 03:55:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gJwxh-0004qY-NG
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 03:43:53 -0500
-References: <20181105102044.20547-1-david@redhat.com>
-	<20181105102044.20547-2-david@redhat.com>
-	<20181106060306.GB3539@umbus.fritz.box>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <b48f862e-e4d0-29ca-5cfe-4e444f37e6da@redhat.com>
-Date: Tue, 6 Nov 2018 09:43:36 +0100
+	(envelope-from <bounces@canonical.com>) id 1gJx8U-0006sj-RS
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 03:55:02 -0500
+Received: from indium.canonical.com ([91.189.90.7]:37884)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gJx8U-0006s2-ML
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 03:54:58 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gJx8T-0007Dr-5j
+	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 08:54:57 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 1D3422E80D0
+	for <qemu-devel@nongnu.org>; Tue,  6 Nov 2018 08:54:57 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20181106060306.GB3539@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 01/10] pci/pcie: rename hotplug handler
- callbacks
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 06 Nov 2018 08:38:52 -0000
+From: Thomas Huth <1017793@bugs.launchpad.net>
+Reply-To: Bug 1017793 <1017793@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20120626033602.30040.2545.malonedeb@gac.canonical.com>
+Message-Id: <154149353265.13020.15516264054413221133.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1017793] Re: S3 Trio64V+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,36 +36,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org
+To: qemu-devel@nongnu.org
 
-On 06.11.18 07:03, David Gibson wrote:
-> On Mon, Nov 05, 2018 at 11:20:35AM +0100, David Hildenbrand wrote:
->> The callbacks are also called for cold plugged devices. Drop the "hot"
->> to better match the actual callback names.
->>
->> While at it, also rename  pcie_cap_slot_hotplug_common() to
->> pcie_cap_slot_check_common().
-> 
-> Uh.. this part of the message doesn't appear to be accurate any more.
-> 
+Sorry, seems like nobody got interested in adding S3 emulation to QEMU
+within the last 6 years, so this is very unlikely going to happen. Thus
+I'm closing this bug ticket now.
 
-Indeed, after renaming it 10 times I think I forgot to update the
-description :)
+** Changed in: qemu
+       Status: New =3D> Won't Fix
 
-Thanks!
+-- =
 
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
-> 
-> Apart from that,
-> 
-> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1017793
 
+Title:
+  S3 Trio64V+ support
 
--- 
+Status in QEMU:
+  Won't Fix
 
-Thanks,
+Bug description:
+  Is it possible to add S3 Trio emulation to QEMU at all? Since 0.12.3
+  the Cirrus Logic seems no longer working properly (bad font
+  render/corrupted video). Also, S3 is a widely supported device on many
+  OSes and architectures, which will give more compatibility for QEMU.
 
-David / dhildenb
+  Thanks!
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1017793/+subscriptions
