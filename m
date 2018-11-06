@@ -1,28 +1,27 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:49329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gK0l0-0004l4-LO
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:46:59 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gK0l1-0004l4-TP
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:47:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gK0dx-00079O-S6
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:39:42 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:33870)
+	(envelope-from <peter.maydell@linaro.org>) id 1gK0cJ-00061q-9B
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:38:00 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:34055)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gK0dx-000799-LK
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:39:41 -0500
-Received: by mail-ot1-x341.google.com with SMTP id t5so7620772otk.1
-	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 04:39:41 -0800 (PST)
+	id 1gK0cH-0005yu-DU
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:37:57 -0500
+Received: by mail-oi1-x244.google.com with SMTP id i138-v6so7553016oib.1
+	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 04:37:56 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9k544ZduSLR2iFk2AXwWoXC3rQMpdhX28wq_U4C=yZjw@mail.gmail.com>
-References: <20181105181353.39804-1-mst@redhat.com>
-	<a4e0dd6a-a1d5-10a1-a9e0-d01ca8d88d84@redhat.com>
-	<20181106060647-mutt-send-email-mst@kernel.org>
-	<CAFEAcA9k544ZduSLR2iFk2AXwWoXC3rQMpdhX28wq_U4C=yZjw@mail.gmail.com>
+In-Reply-To: <BN6PR18MB122007CFC965C45DF2CA20BB9FCB0@BN6PR18MB1220.namprd18.prod.outlook.com>
+References: <20181106115351.9422-1-ppandit@redhat.com>
+	<CAFEAcA880MNu+_C1ySic7ASsQNMth1FCGSjHJg_N7Ud+s4G_PA@mail.gmail.com>
+	<BN6PR18MB122007CFC965C45DF2CA20BB9FCB0@BN6PR18MB1220.namprd18.prod.outlook.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 6 Nov 2018 12:39:20 +0000
-Message-ID: <CAFEAcA-eULHQn9qdnNNXsu9rFLa8Q9bGUtqw6HmFtaX=+bOuUQ@mail.gmail.com>
+Date: Tue, 6 Nov 2018 12:37:34 +0000
+Message-ID: <CAFEAcA9Q6-xw+GQLFUbGp6tfGMEg9_usx18AYbPdd4tiz7KSKg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/33] pci, pc, virtio: fixes, features
+Subject: Re: [Qemu-devel] [PATCH] lsi53c895a: check script ram address value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,57 +30,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Laszlo Ersek <lersek@redhat.com>
+To: li qiang <liq3ea@outlook.com>
+Cc: P J P <ppandit@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, Prasad J Pandit <pjp@fedoraproject.org>
 
-On 6 November 2018 at 11:20, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 6 November 2018 at 11:07, Michael S. Tsirkin <mst@redhat.com> wrote:
->> On Tue, Nov 06, 2018 at 09:18:49AM +0100, Thomas Huth wrote:
->>> On 2018-11-05 19:14, Michael S. Tsirkin wrote:
->>> > The following changes since commit b2f7a038bb4c4fc5ce6b8486e8513dfd97665e2a:
->>> >
->>> >   Merge remote-tracking branch 'remotes/rth/tags/pull-softfloat-20181104' into staging (2018-11-05 10:32:49 +0000)
->>> >
->>> > are available in the Git repository at:
->>> >
->>> >   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
->>> >
->>> > for you to fetch changes up to 6196df5c8e6688c1c3f06f73442820066335337c:
->>> >
->>> >   vhost-scsi: prevent using uninitialized vqs (2018-11-05 12:59:35 -0500)
->>> >
->>> > ----------------------------------------------------------------
->>> > pci, pc, virtio: fixes, features
->>> >
->>> > AMD IOMMU VAPIC support + fixes all over the place.
->>> >
->>> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->>> >
->>> > ----------------------------------------------------------------
->>> > Gerd Hoffmann (1):
->>> >       pci-testdev: add optional memory bar
->>> >
->>> > Laszlo Ersek (4):
->>> >       MAINTAINERS: list "tests/acpi-test-data" files in ACPI/SMBIOS section
->>> [...]
->>> >  tests/{acpi-test-data => data/acpi}/pc/APIC        | Bin
->>> >  tests/{acpi-test-data => data/acpi}/pc/APIC.cphp   | Bin
->>> >  .../{acpi-test-data => data/acpi}/pc/APIC.dimmpxm  | Bin
->>> >  tests/{acpi-test-data => data/acpi}/pc/DSDT        | Bin
->>>
->>> So patch 1 moves tests/acpi-test-data/ to tests/data/acpi/ and patch 20
->>> adds an entry for tests/acpi-test-data/ ? Does not make much sense to me
->>> ... I think patch 20 needs to be adapted now.
->>>
->>>  Thomas
->>
->> Oh right, MAINTAINERS needs to be fixed. Can be done with a patch on top
->> though.
+On 6 November 2018 at 12:27, li qiang <liq3ea@outlook.com> wrote:
+> The addr is 0~0x1fff, but when addr is at the near the end ,for example
+> 0x1fffe, the add>>2 can be 2047
 >
-> Yeah, given the timing for rc0 I'll just apply this version of
-> the pullreq, and we can fix up MAINTAINERS afterwards.
+> and as script_ram is a uint32_t and so s->script_ram[addr >> 2] can read
+> out of the script_ram.
 
-...applied.
+But script_ram is declared as
+  uint32_t script_ram[2048];
+so if addr >> 2 == 2047, that's still in-bounds, isn't it?
 
 thanks
 -- PMM
