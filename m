@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43319)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43318)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1gK0LZ-0002mR-4Z
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:20:42 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1gK0LV-0001c1-Dj
+	(envelope-from <guangrong.xiao@gmail.com>) id 1gK0LZ-0002mQ-4H
 	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:20:41 -0500
-Received: from mail-pl1-x62a.google.com ([2607:f8b0:4864:20::62a]:36290)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <guangrong.xiao@gmail.com>) id 1gK0LX-0001fE-88
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:20:41 -0500
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:43086)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1gK0LT-0001XW-MH
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:20:36 -0500
-Received: by mail-pl1-x62a.google.com with SMTP id w24-v6so6133996plq.3
-	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 04:20:34 -0800 (PST)
+	id 1gK0LW-0001cT-3U
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:20:38 -0500
+Received: by mail-pf1-x444.google.com with SMTP id g7-v6so3773271pfo.10
+	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 04:20:37 -0800 (PST)
 From: guangrong.xiao@gmail.com
-Date: Tue,  6 Nov 2018 20:20:20 +0800
-Message-Id: <20181106122025.3487-1-xiaoguangrong@tencent.com>
-Subject: [Qemu-devel] [PATCH v2 0/5] migration: improve multithreads
+Date: Tue,  6 Nov 2018 20:20:21 +0800
+Message-Id: <20181106122025.3487-2-xiaoguangrong@tencent.com>
+In-Reply-To: <20181106122025.3487-1-xiaoguangrong@tencent.com>
+References: <20181106122025.3487-1-xiaoguangrong@tencent.com>
+Subject: [Qemu-devel] [PATCH v2 1/5] bitops: introduce change_bit_atomic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,60 +31,36 @@ Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redh
 
 From: Xiao Guangrong <xiaoguangrong@tencent.com>
 
-Changelog in v2:
-These changes are based on Paolo's suggestion:
-1) rename the lockless multithreads model to threaded workqueue
-2) hugely improve the internal design, that make all the request be
-   a large array, properly partition it, assign requests to threads
-   respectively and use bitmaps to sync up threads and the submitter,
-   after that ptr_ring and spinlock are dropped
-3) introduce event wait for the submitter
+It will be used by threaded workqueue
 
-These changes are based on Emilio's review:
-4) make more detailed description for threaded workqueue
-5) add a benchmark for threaded workqueue
+Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+---
+ include/qemu/bitops.h | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-The previous version can be found at
-	https://marc.info/?l=kvm&m=153968821910007&w=2
-
-There's the simple performance measurement comparing these two versions,
-the environment is the same as we listed in the previous version.
-
-Use 8 threads to compress the data in the source QEMU
-- with compress-wait-thread = off
-
-
-      total time        busy-ratio
---------------------------------------------------
-v1    125066            0.38
-v2    120444            0.35
-
-- with compress-wait-thread = on
-         total time    busy-ratio
---------------------------------------------------
-v1    164426            0
-v2    142609            0
-
-The v2 win slightly.
-
-Xiao Guangrong (5):
-  bitops: introduce change_bit_atomic
-  util: introduce threaded workqueue
-  migration: use threaded workqueue for compression
-  migration: use threaded workqueue for decompression
-  tests: add threaded-workqueue-bench
-
- include/qemu/bitops.h             |  13 +
- include/qemu/threaded-workqueue.h |  94 +++++++
- migration/ram.c                   | 538 ++++++++++++++------------------------
- tests/Makefile.include            |   5 +-
- tests/threaded-workqueue-bench.c  | 256 ++++++++++++++++++
- util/Makefile.objs                |   1 +
- util/threaded-workqueue.c         | 466 +++++++++++++++++++++++++++++++++
- 7 files changed, 1030 insertions(+), 343 deletions(-)
- create mode 100644 include/qemu/threaded-workqueue.h
- create mode 100644 tests/threaded-workqueue-bench.c
- create mode 100644 util/threaded-workqueue.c
-
+diff --git a/include/qemu/bitops.h b/include/qemu/bitops.h
+index 3f0926cf40..c522958852 100644
+--- a/include/qemu/bitops.h
++++ b/include/qemu/bitops.h
+@@ -79,6 +79,19 @@ static inline void change_bit(long nr, unsigned long *addr)
+     *p ^= mask;
+ }
+ 
++/**
++ * change_bit_atomic - Toggle a bit in memory atomically
++ * @nr: Bit to change
++ * @addr: Address to start counting from
++ */
++static inline void change_bit_atomic(long nr, unsigned long *addr)
++{
++    unsigned long mask = BIT_MASK(nr);
++    unsigned long *p = addr + BIT_WORD(nr);
++
++    atomic_xor(p, mask);
++}
++
+ /**
+  * test_and_set_bit - Set a bit and return its old value
+  * @nr: Bit to set
 -- 
 2.14.5
