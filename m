@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39708)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39769)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gK3HL-00022q-B8
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:28:32 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1gK3HZ-0002CL-6C
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:28:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gK3HK-0006xI-CH
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:28:31 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1gK3HV-00073n-FB
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:28:43 -0500
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:52368)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1gK3HK-0006vv-40
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:28:30 -0500
+	id 1gK3HM-0006vv-7C
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:28:35 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue,  6 Nov 2018 15:13:23 +0000
-Message-Id: <20181106151323.16154-5-peter.maydell@linaro.org>
+Date: Tue,  6 Nov 2018 15:13:21 +0000
+Message-Id: <20181106151323.16154-3-peter.maydell@linaro.org>
 In-Reply-To: <20181106151323.16154-1-peter.maydell@linaro.org>
 References: <20181106151323.16154-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH for-3.1 4/4] slirp: fork_exec(): create and
- connect child socket before fork()
+Subject: [Qemu-devel] [PATCH for-3.1 2/4] slirp: Use g_new() to allocate
+ sockets in socreate()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,116 +30,98 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: patches@linaro.org, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jan Kiszka <jan.kiszka@siemens.com>
 
-Currently fork_exec() fork()s, and then creates and connects the
-child socket which it uses for communication with the parent in
-the child process. This is awkward because the child has no
-mechanism to report failure back to the parent, which might end
-up blocked forever in accept(). The child code also has an issue
-pointed out by Coverity (CID 1005727), where if the qemu_socket()
-call fails it will pass -1 as a file descriptor to connect().
-
-Fix these issues by moving the creation of the child's end of
-the socket to before the fork(), where we are in a position to
-handle a possible failure.
+The slirp socreate() function can only fail if the attempt
+to malloc() the struct socket fails. Switch to using
+g_new() instead, which will allow us to remove the
+error-handling code from its callers.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- slirp/misc.c | 55 ++++++++++++++++++++++++++++++++--------------------
- 1 file changed, 34 insertions(+), 21 deletions(-)
+We already use g_new/g_malloc in slirp, including for
+mbuf buffers which are larger than these socket structs.
+The motivation here is that we can render moot a Coverity
+complaint about an issue in an error-handling path.
 
-diff --git a/slirp/misc.c b/slirp/misc.c
-index 260187b6b62..57bdd808e2d 100644
---- a/slirp/misc.c
-+++ b/slirp/misc.c
-@@ -85,9 +85,10 @@ fork_exec(struct socket *so, const char *ex, int do_pty)
- int
- fork_exec(struct socket *so, const char *ex, int do_pty)
+As usual, indenting in slirp code is a bit of a mess;
+I've opted for "keep checkpatch happy".
+---
+ slirp/socket.c    | 14 ++++++--------
+ slirp/tcp_input.c |  4 ++--
+ slirp/tcp_subr.c  |  2 +-
+ 3 files changed, 9 insertions(+), 11 deletions(-)
+
+diff --git a/slirp/socket.c b/slirp/socket.c
+index 322383a1f9f..35a9a145659 100644
+--- a/slirp/socket.c
++++ b/slirp/socket.c
+@@ -46,17 +46,15 @@ struct socket *solookup(struct socket **last, struct socket *head,
+ struct socket *
+ socreate(Slirp *slirp)
  {
--	int s;
--	struct sockaddr_in addr;
-+        int s, cs;
-+        struct sockaddr_in addr, csaddr;
- 	socklen_t addrlen = sizeof(addr);
-+        socklen_t csaddrlen = sizeof(csaddr);
- 	int opt;
- 	const char *argv[256];
- 	/* don't want to clobber the original */
-@@ -120,10 +121,35 @@ fork_exec(struct socket *so, const char *ex, int do_pty)
- 		}
- 	}
+-  struct socket *so;
++    struct socket *so = g_new(struct socket, 1);
  
-+        if (getsockname(s, (struct sockaddr *)&csaddr, &csaddrlen) < 0) {
-+            closesocket(s);
-+            return 0;
-+        }
-+        cs = qemu_socket(AF_INET, SOCK_STREAM, 0);
-+        if (cs < 0) {
-+            closesocket(s);
-+            return 0;
-+        }
-+        csaddr.sin_addr = loopback_addr;
-+        /*
-+         * This connect won't block because we've already listen()ed on
-+         * the server end (even though we won't accept() the connection
-+         * until later on).
-+         */
-+        do {
-+            ret = connect(cs, (struct sockaddr *)&csaddr, csaddrlen);
-+        } while (ret < 0 && errno == EINTR);
-+        if (ret < 0) {
-+            closesocket(s);
-+            closesocket(cs);
-+            return 0;
-+        }
+-  so = (struct socket *)malloc(sizeof(struct socket));
+-  if(so) {
+     memset(so, 0, sizeof(struct socket));
+     so->so_state = SS_NOFDREF;
+     so->s = -1;
+     so->slirp = slirp;
+     so->pollfds_idx = -1;
+-  }
+-  return(so);
 +
- 	pid = fork();
- 	switch(pid) {
- 	 case -1:
- 		error_report("Error: fork failed: %s", strerror(errno));
-+                closesocket(cs);
- 		close(s);
- 		return 0;
++    return so;
+ }
  
-@@ -131,21 +157,10 @@ fork_exec(struct socket *so, const char *ex, int do_pty)
-                 setsid();
+ /*
+@@ -110,7 +108,7 @@ sofree(struct socket *so)
+   if (so->so_tcpcb) {
+       free(so->so_tcpcb);
+   }
+-  free(so);
++  g_free(so);
+ }
  
- 		/* Set the DISPLAY */
--                getsockname(s, (struct sockaddr *)&addr, &addrlen);
-                 close(s);
--                /*
--                 * Connect to the socket
--                 * XXX If any of these fail, we're in trouble!
--                 */
--                s = qemu_socket(AF_INET, SOCK_STREAM, 0);
--                addr.sin_addr = loopback_addr;
--                do {
--                    ret = connect(s, (struct sockaddr *)&addr, addrlen);
--                } while (ret < 0 && errno == EINTR);
--
--		dup2(s, 0);
--		dup2(s, 1);
--		dup2(s, 2);
-+                dup2(cs, 0);
-+                dup2(cs, 1);
-+                dup2(cs, 2);
- 		for (s = getdtablesize() - 1; s >= 3; s--)
- 		   close(s);
+ size_t sopreprbuf(struct socket *so, struct iovec *iov, int *np)
+@@ -721,8 +719,8 @@ tcp_listen(Slirp *slirp, uint32_t haddr, u_int hport, uint32_t laddr,
  
-@@ -178,12 +193,10 @@ fork_exec(struct socket *so, const char *ex, int do_pty)
+ 	/* Don't tcp_attach... we don't need so_snd nor so_rcv */
+ 	if ((so->so_tcpcb = tcp_newtcpcb(so)) == NULL) {
+-		free(so);
+-		return NULL;
++            g_free(so);
++            return NULL;
+ 	}
+ 	insque(so, &slirp->tcb);
  
- 	 default:
- 		qemu_add_child_watch(pid);
-+                closesocket(cs);
-                 /*
--                 * XXX this could block us...
--                 * XXX Should set a timer here, and if accept() doesn't
--                 * return after X seconds, declare it a failure
--                 * The only reason this will block forever is if socket()
--                 * of connect() fail in the child process
-+                 * This should never block, because we already connect()ed
-+                 * on the child end before we forked.
-                  */
-                 do {
-                     so->s = accept(s, (struct sockaddr *)&addr, &addrlen);
+diff --git a/slirp/tcp_input.c b/slirp/tcp_input.c
+index 07bcbdb2ddd..4f79c95fdb4 100644
+--- a/slirp/tcp_input.c
++++ b/slirp/tcp_input.c
+@@ -432,8 +432,8 @@ findso:
+ 	  if ((so = socreate(slirp)) == NULL)
+ 	    goto dropwithreset;
+ 	  if (tcp_attach(so) < 0) {
+-	    free(so); /* Not sofree (if it failed, it's not insqued) */
+-	    goto dropwithreset;
++            g_free(so); /* Not sofree (if it failed, it's not insqued) */
++            goto dropwithreset;
+ 	  }
+ 
+ 	  sbreserve(&so->so_snd, TCP_SNDSPACE);
+diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
+index 8d0f94b75fc..0270c89ae3a 100644
+--- a/slirp/tcp_subr.c
++++ b/slirp/tcp_subr.c
+@@ -475,7 +475,7 @@ void tcp_connect(struct socket *inso)
+             return;
+         }
+         if (tcp_attach(so) < 0) {
+-            free(so); /* NOT sofree */
++            g_free(so); /* NOT sofree */
+             return;
+         }
+         so->lhost = inso->lhost;
 -- 
 2.19.1
