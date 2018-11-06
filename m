@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57401)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60651)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gK6KL-00028B-Cv
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 13:43:50 -0500
+	(envelope-from <philmd@redhat.com>) id 1gK6QA-0006Jz-34
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 13:49:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gK6KJ-0005Zo-Qm
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 13:43:49 -0500
-Received: from mail-oi1-x22e.google.com ([2607:f8b0:4864:20::22e]:42162)
+	(envelope-from <philmd@redhat.com>) id 1gK6Q6-0001Uo-Nt
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 13:49:49 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:36715)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gK6KJ-0004yA-4U
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 13:43:47 -0500
-Received: by mail-oi1-x22e.google.com with SMTP id x63-v6so7917279oix.9
-	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 10:43:38 -0800 (PST)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gK6Q6-0001Ee-Ds
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 13:49:46 -0500
+Received: by mail-wm1-f68.google.com with SMTP id a8-v6so13227763wmf.1
+	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 10:49:35 -0800 (PST)
+References: <1541528230-31817-1-git-send-email-thuth@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <c0febf9a-f098-112d-9c8d-c320cc66b04a@redhat.com>
+Date: Tue, 6 Nov 2018 19:49:32 +0100
 MIME-Version: 1.0
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 6 Nov 2018 18:43:17 +0000
-Message-ID: <CAFEAcA9pvsNML+=2jwygO4ciJWr0GmWHznJ-Lb1bcOsWhYjo4A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] List of files containing devices which have not been
- QOMified
+In-Reply-To: <1541528230-31817-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Add an entry for the 'collie'
+ machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,86 +30,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+Cc: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>, qemu-devel@nongnu.org
 
-I had an idea for how to get a rough list of source files
-containing devices that haven't been QOMified. The theory
-is that a pre-QOM device generally has an "init" function
-which allocates memory for the device struct. So looking in
-hw/ for files which call g_new*() or g_malloc*() should get
-us all the non-QOM devices (as well as a pile of false
-positives, of course). The following link is the result of
-doing that and then eyeballing the results for false positives
-and throwing those out. It might have missed one or two
-files or included one or two by mistake. But I think it's
-pretty close, and it seems to have caught all the obvious
-ones I knew about. There are 61 files on this list.
+On 6/11/18 19:17, Thomas Huth wrote:
+> There is no active maintainer, but since Peter is picking up
+> patches via qemu-arm@nongnu.org, I think we could at least use
+> "Odd Fixes" as status here.
 
-I am also suspicious about hw/bt/ but don't know enough
-about that subsystem to say if it could benefit from
-using QOM objects more.
+This looks more as "Orphan" to me...
 
-hw/arm/exynos4210.c
-hw/arm/nseries.c
-hw/arm/omap1.c
-hw/arm/omap2.c
-hw/arm/pxa2xx.c
-hw/arm/stellaris.c
-hw/arm/strongarm.c
-hw/char/omap_uart.c
-hw/char/parallel.c
-hw/char/serial.c
-hw/char/sh_serial.c
-hw/core/ptimer.c
-hw/cris/axis_dev88.c
-hw/display/blizzard.c
-hw/display/omap_dss.c
-hw/display/omap_lcdc.c
-hw/display/pxa2xx_lcd.c
-hw/display/tc6393xb.c
-hw/display/vga-isa-mm.c
-hw/dma/etraxfs_dma.c
-hw/dma/omap_dma.c
-hw/dma/rc4030.c
-hw/dma/soc_dma.c
-hw/i2c/bitbang_i2c.c
-hw/ide/ahci.c
-hw/input/pckbd.c
-hw/input/ps2.c
-hw/input/pxa2xx_keypad.c
-hw/input/stellaris_input.c
-hw/input/tsc2005.c
-hw/input/tsc210x.c
-hw/m68k/mcf5206.c
-hw/m68k/mcf5208.c
-hw/mips/mips_malta.c
-hw/misc/cbus.c
-hw/misc/omap_clk.c
-hw/misc/omap_gpmc.c
-hw/misc/omap_l4.c
-hw/misc/omap_sdrc.c
-hw/openrisc/cputimer.c
-hw/pci/shpc.c ?
-hw/ppc/ppc405_boards.c
-hw/ppc/ppc405_uc.c
-hw/ppc/ppc440_uc.c
-hw/ppc/ppc4xx_devs.c
-hw/ppc/ppc_booke.c
-hw/ppc/prep.c
-hw/riscv/riscv_htif.c
-hw/riscv/sifive_uart.c
-hw/sd/omap_mmc.c
-hw/sh4/r2d.c
-hw/sh4/sh7750.c
-hw/sparc64/sparc64.c
-hw/ssi/omap_spi.c
-hw/timer/arm_timer.c
-hw/timer/mips_gictimer.c
-hw/timer/omap_gptimer.c
-hw/timer/omap_synctimer.c
-hw/timer/sh_timer.c
-hw/usb/hcd-musb.c
-hw/xtensa/xtfpga.c
+Regardless the one choosed:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-thanks
--- PMM
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>   MAINTAINERS | 6 ++++++
+>   1 file changed, 6 insertions(+)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 0499e11..471cf72 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -592,6 +592,12 @@ F: hw/*/pxa2xx*
+>   F: hw/misc/mst_fpga.c
+>   F: include/hw/arm/pxa.h
+>   
+> +Sharp SL-5500 (Collie) PDA
+> +L: qemu-arm@nongnu.org
+> +S: Odd Fixes
+> +F: hw/arm/collie.c
+> +F: hw/arm/strongarm*
+> +
+>   Stellaris
+>   M: Peter Maydell <peter.maydell@linaro.org>
+>   L: qemu-arm@nongnu.org
+> 
