@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gK3Kb-0004OS-Uf
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:32:03 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gK3Kt-0004Z9-Q5
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:32:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gK3KY-0001GF-Uc
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:31:53 -0500
-Received: from mail-ot1-x332.google.com ([2607:f8b0:4864:20::332]:43676)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gK3KV-0000zy-0Q
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:31:50 -0500
-Received: by mail-ot1-x332.google.com with SMTP id k9so11733720otl.10
-	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 07:31:30 -0800 (PST)
+	(envelope-from <no-reply@patchew.org>) id 1gK3Kq-0001RR-9U
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:32:11 -0500
+Resent-Message-Id: <E1gK3Kq-0001RR-9U@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21470)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gK3Kp-0001Ns-RI
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:32:08 -0500
+Message-ID: <154151830825.5755.10112797070378873017@015909e0f939>
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <20181029173437.32559-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <4b68930c-1fc3-9462-8f9e-671b414e712d@redhat.com>
-References: <20181105181353.39804-1-mst@redhat.com>
-	<20181105181353.39804-3-mst@redhat.com>
-	<a21e8e21-d056-1e9a-3726-54f8ce24a162@redhat.com>
-	<20181106091147-mutt-send-email-mst@kernel.org>
-	<4b68930c-1fc3-9462-8f9e-671b414e712d@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 6 Nov 2018 15:31:08 +0000
-Message-ID: <CAFEAcA9R9kTfznkvdFf9Eqtp80NFAt3Gd1cjooRpr2bZ6TsJiQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 02/33] tests: Move
- tests/hex-loader-check-data/ to tests/data/hex-loader/
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 6 Nov 2018 07:31:49 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 0/4] scsi-generic: fixes for Block Limits
+ emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,31 +29,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, Su Hang <suhang16@mails.ucas.ac.cn>, Paolo Bonzini <pbonzini@redhat.com>
+To: pbonzini@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, danielhb413@gmail.com, mreitz@redhat.com
 
-On 6 November 2018 at 15:15, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
-> wrote:
-> No worry, I'm not mad at all, but there might be an issue in your git PR
-> workflow, this series also missed your maintainer S-o-b.
->
-> Peter: Can you add a such check in your scripts? (during next merge windo=
-w,
-> no hurry).
->
-> Rather than your scripts, this should be in scripts a maintainer can run
-> locally, such ./scripts/checkpatch.pl --maintainer or
-> ./scripts/checkseries.xx.
-
-I have such a check in my own make-pullreq script which I use
-for arm pull requests:
-https://git.linaro.org/people/peter.maydell/misc-scripts.git/tree/make-pull=
-req#n98
-
-I can't do much about other submaintainers' workflows
-(and the block tree's "sub-submaintainers" setup means
-"check all commits have a signoff from the same person as
-the merge commit did" won't work either.)
-
-thanks
--- PMM
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgxMDI5MTczNDM3LjMyNTU5LTEtcGJvbnppbmlAcmVkaGF0LmNvbQpTdWJq
+ZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvNF0gc2NzaS1nZW5lcmljOiBmaXhlcyBmb3IgQmxv
+Y2sgTGltaXRzIGVtdWxhdGlvbgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFz
+aAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAt
+bCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNv
+bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFs
+Z29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVy
+c2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFU
+Q0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAh
+IGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1t
+YWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAg
+bj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVw
+ZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQg
+dG8gYSBuZXcgYnJhbmNoICd0ZXN0JwozYTY5OTc1NTZmIHNjc2ktZ2VuZXJpYzogZG8gbm90IGRv
+IFZQRCBlbXVsYXRpb24gZm9yIHNlbnNlIG90aGVyIHRoYW4gSUxMRUdBTF9SRVFVRVNUCjFiMzZk
+MDgyNjEgc2NzaS1nZW5lcmljOiBhdm9pZCBpbnZhbGlkIGFjY2VzcyB0byBzdHJ1Y3Qgd2hlbiBl
+bXVsYXRpbmcgYmxvY2sgbGltaXRzCjFhZDFkZjk0YTcgc2NzaS1nZW5lcmljOiBhdm9pZCBvdXQt
+b2YtYm91bmRzIGFjY2VzcyB0byBWUEQgcGFnZSBsaXN0CmI4MGQxYjViOWEgc2NzaS1nZW5lcmlj
+OiBrZWVwIFZQRCBwYWdlIGxpc3Qgc29ydGVkCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2lu
+ZyBQQVRDSCAxLzQ6IHNjc2ktZ2VuZXJpYzoga2VlcCBWUEQgcGFnZSBsaXN0IHNvcnRlZC4uLgpD
+aGVja2luZyBQQVRDSCAyLzQ6IHNjc2ktZ2VuZXJpYzogYXZvaWQgb3V0LW9mLWJvdW5kcyBhY2Nl
+c3MgdG8gVlBEIHBhZ2UgbGlzdC4uLgpDaGVja2luZyBQQVRDSCAzLzQ6IHNjc2ktZ2VuZXJpYzog
+YXZvaWQgaW52YWxpZCBhY2Nlc3MgdG8gc3RydWN0IHdoZW4gZW11bGF0aW5nIGJsb2NrIGxpbWl0
+cy4uLgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5U
+QUlORVJTIG5lZWQgdXBkYXRpbmc/CiMzMjogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDog
+MCBlcnJvcnMsIDEgd2FybmluZ3MsIDIzMyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBz
+dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
+IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
+UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDQvNDogc2NzaS1nZW5lcmljOiBk
+byBub3QgZG8gVlBEIGVtdWxhdGlvbiBmb3Igc2Vuc2Ugb3RoZXIgdGhhbiBJTExFR0FMX1JFUVVF
+U1QuLi4KRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMzNDogRklMRTogaHcvc2NzaS9z
+Y3NpLWdlbmVyaWMuYzoyNzM6CisgICAgICAgIHNjc2lfcGFyc2Vfc2Vuc2VfYnVmKHItPnJlcS5z
+ZW5zZSwgci0+aW9faGVhZGVyLnNiX2xlbl93cikua2V5ID09IElMTEVHQUxfUkVRVUVTVCAmJgoK
+dG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyNCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNo
+IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
+cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
+CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29t
+bWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNh
+bGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZl
+ZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
