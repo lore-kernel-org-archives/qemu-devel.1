@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34389)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34817)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gK1Ph-0001jA-QH
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 08:29:06 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gK1QW-0002Iz-V8
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 08:29:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gK1Ny-0003yG-ML
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 08:27:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46432)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gK1Ny-0003x0-FY
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 08:27:14 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C1FFF30BCCD5
-	for <qemu-devel@nongnu.org>; Tue,  6 Nov 2018 13:27:13 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-Date: Tue,  6 Nov 2018 14:27:06 +0100
-Message-Id: <1541510826-21031-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] scripts/device-crash-test: Remove known crashes
+	(envelope-from <peter.maydell@linaro.org>) id 1gK1Ad-0001k0-7p
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 08:13:31 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:36950)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gK1Aa-0001Lf-Uq
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 08:13:27 -0500
+Received: by mail-ot1-x341.google.com with SMTP id 40so11106902oth.4
+	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 05:13:16 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20181106113826.25810-1-peter.maydell@linaro.org>
+References: <20181106113826.25810-1-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 6 Nov 2018 13:12:55 +0000
+Message-ID: <CAFEAcA_rOsBGCWQLEGWAVTb7U_Bie3fOojDKfar7fsAd1oy_FQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/5] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,58 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: QEMU Developers <qemu-devel@nongnu.org>
 
-Looks like we've fixed them all already in the past months, e.g. with:
+On 6 November 2018 at 11:38, Peter Maydell <peter.maydell@linaro.org> wrote:
+> Handful of bugfix patches for arm for rc0; also
+> one milkymist patch, thrown in since I was putting
+> the pullreq together anyway.
+>
+> thanks
+> -- PMM
+>
+> The following changes since commit 03c1ca1c51783603d42eb0f91d35961f0f4b4947:
+>
+>   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20181105' into staging (2018-11-06 09:10:46 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20181106
+>
+> for you to fetch changes up to 23463e0e4aeb2f0a9c60549a2c163f4adc0b8512:
+>
+>   target/arm: Fix ATS1Hx instructions (2018-11-06 11:32:14 +0000)
+>
+> ----------------------------------------------------------------
+> target-arm queue:
+>  * Remove can't-happen if() from handle_vec_simd_shli()
+>  * hw/arm/exynos4210: Zero memory allocated for Exynos4210State
+>  * Set S and PTW in 64-bit PAR format
+>  * Fix ATS1Hx instructions
+>  * milkymist: Check for failure trying to load BIOS image
+>
 
- f7d6bfcdc0fe49040aac3ac131a319cb5427957e
- spapr_pci: fail gracefully with non-pseries machine types
+Applied, thanks.
 
- 2363d5ee231bf047479422d56d3b85b7d37a7c23
- hw/ppc/spapr_cpu_core: Add a proper check for spapr machine
-
- ef0e8fc768a561dd13a86420b3268f6f3d5d0621
- iommu: Don't crash if machine is not PC_MACHINE
-
- 8929fc3a55f33a103adddf9cfd010bcf2b255c7d
- hw/block/pflash_cfi*.c: fix confusing assert fail message
-
-... so we can remove these entries from the ERROR_WHITELIST now.
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- At least I was not able to reproduce these crashes with the script
- anymore... but please double-check whether I'm right.
-
- scripts/device-crash-test | 15 ---------------
- 1 file changed, 15 deletions(-)
-
-diff --git a/scripts/device-crash-test b/scripts/device-crash-test
-index e93a7c0..549162a 100755
---- a/scripts/device-crash-test
-+++ b/scripts/device-crash-test
-@@ -182,21 +182,6 @@ ERROR_WHITELIST = [
-     # other exitcode=1 failures not listed above will just generate INFO messages:
-     {'exitcode':1, 'loglevel':logging.INFO},
- 
--    # KNOWN CRASHES:
--    # Known crashes will generate error messages, but won't be fatal.
--    # Those entries must be removed once we fix the crashes.
--    {'exitcode':-6, 'log':r"Device 'serial0' is in use", 'loglevel':logging.ERROR},
--    {'exitcode':-6, 'log':r"qemu_net_client_setup: Assertion `!peer->peer' failed", 'loglevel':logging.ERROR},
--    {'exitcode':-6, 'log':r'RAMBlock "[\w.-]+" already registered', 'loglevel':logging.ERROR},
--    {'exitcode':-6, 'log':r"find_ram_offset: Assertion `size != 0' failed.", 'loglevel':logging.ERROR},
--    {'exitcode':-6, 'log':r"add_cpreg_to_hashtable: code should not be reached", 'loglevel':logging.ERROR},
--    {'exitcode':-6, 'log':r"qemu_alloc_display: Assertion `surface->image != NULL' failed", 'loglevel':logging.ERROR},
--    {'exitcode':-6, 'log':r"Unexpected error in error_set_from_qdev_prop_error", 'loglevel':logging.ERROR},
--    {'exitcode':-6, 'log':r"Object .* is not an instance of type spapr-machine", 'loglevel':logging.ERROR},
--    {'exitcode':-6, 'log':r"Object .* is not an instance of type generic-pc-machine", 'loglevel':logging.ERROR},
--    {'exitcode':-6, 'log':r"Object .* is not an instance of type e500-ccsr", 'loglevel':logging.ERROR},
--    {'exitcode':-6, 'log':r"vmstate_register_with_alias_id: Assertion `!se->compat \|\| se->instance_id == 0' failed", 'loglevel':logging.ERROR},
--
-     # everything else (including SIGABRT and SIGSEGV) will be a fatal error:
-     {'exitcode':None, 'fatal':True, 'loglevel':logging.FATAL},
- ]
--- 
-1.8.3.1
+-- PMM
