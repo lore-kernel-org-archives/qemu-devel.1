@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41678)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43476)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gK3NF-0006gS-W9
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:34:42 -0500
+	(envelope-from <danielhb413@gmail.com>) id 1gK3SJ-0004gQ-SS
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:39:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gK3NB-0003c8-4s
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:34:37 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:52370)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1gK3NA-0002YT-U4
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:34:33 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue,  6 Nov 2018 15:33:30 +0000
-Message-Id: <20181106153330.5139-1-peter.maydell@linaro.org>
+	(envelope-from <danielhb413@gmail.com>) id 1gK3SI-0001SM-1Y
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:39:51 -0500
+Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:45261)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <danielhb413@gmail.com>)
+	id 1gK3SG-00016z-0E
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:39:49 -0500
+Received: by mail-qt1-x844.google.com with SMTP id l9-v6so3061415qtj.12
+	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 07:39:28 -0800 (PST)
+References: <20181029173437.32559-1-pbonzini@redhat.com>
+	<20181029173437.32559-2-pbonzini@redhat.com>
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
+Message-ID: <288c938a-af29-8820-3606-cc2667a51f3f@gmail.com>
+Date: Tue, 6 Nov 2018 13:39:24 -0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH for-3.1] replay: Exit on errors reading from
- replay log
+In-Reply-To: <20181029173437.32559-2-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 1/4] scsi-generic: keep VPD page list sorted
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,71 +31,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com
 
-Currently replay_get_byte() does not check for an error
-from getc(). Coverity points out (CID 1390622) that this
-could result in unexpected behaviour (such as looping
-forever, if we use the replay_get_dword() return value
-for a loop count). We don't expect reads from the replay
-log to fail, and if they do there is no way we can
-continue. So make them fatal errors.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-Disclaimer: checked only with "make check".
 
- replay/replay-internal.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
+On 10/29/18 2:34 PM, Paolo Bonzini wrote:
+> Block limits emulation is just placing 0xb0 as the final byte of the
+> VPD pages list.  However, VPD page numbers must be sorted, so change
+> that to an in-place insert.  Since I couldn't find any disk that triggered
+> the loop more than once, this was tested by adding manually 0xb1
+> at the end of the list and checking that 0xb0 was added before.
+>
+> Reported-by: Max Reitz <mreitz@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
 
-diff --git a/replay/replay-internal.c b/replay/replay-internal.c
-index 1cea1d4dc91..8f87e9b957e 100644
---- a/replay/replay-internal.c
-+++ b/replay/replay-internal.c
-@@ -35,6 +35,12 @@ static void replay_write_error(void)
-     }
- }
- 
-+static void replay_read_error(void)
-+{
-+    error_report("error reading the replay data");
-+    exit(1);
-+}
-+
- void replay_put_byte(uint8_t byte)
- {
-     if (replay_file) {
-@@ -83,7 +89,11 @@ uint8_t replay_get_byte(void)
- {
-     uint8_t byte = 0;
-     if (replay_file) {
--        byte = getc(replay_file);
-+        int r = getc(replay_file);
-+        if (r == EOF) {
-+            replay_read_error();
-+        }
-+        byte = r;
-     }
-     return byte;
- }
-@@ -126,7 +136,7 @@ void replay_get_array(uint8_t *buf, size_t *size)
-     if (replay_file) {
-         *size = replay_get_dword();
-         if (fread(buf, 1, *size, replay_file) != *size) {
--            error_report("replay read error");
-+            replay_read_error();
-         }
-     }
- }
-@@ -137,7 +147,7 @@ void replay_get_array_alloc(uint8_t **buf, size_t *size)
-         *size = replay_get_dword();
-         *buf = g_malloc(*size);
-         if (fread(*buf, 1, *size, replay_file) != *size) {
--            error_report("replay read error");
-+            replay_read_error();
-         }
-     }
- }
--- 
-2.19.1
+Reviewed-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+
+
+Out of curiosity: how did you hit an issue with the ordering?
+
+>   hw/scsi/scsi-generic.c | 19 +++++++++++++++----
+>   1 file changed, 15 insertions(+), 4 deletions(-)
+>
+> diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
+> index d60c4d0fcf..aebb7cdd82 100644
+> --- a/hw/scsi/scsi-generic.c
+> +++ b/hw/scsi/scsi-generic.c
+> @@ -144,7 +144,7 @@ static int execute_command(BlockBackend *blk,
+>   
+>   static void scsi_handle_inquiry_reply(SCSIGenericReq *r, SCSIDevice *s)
+>   {
+> -    uint8_t page, page_len;
+> +    uint8_t page, page_idx;
+>   
+>       /*
+>        *  EVPD set to zero returns the standard INQUIRY data.
+> @@ -190,10 +190,21 @@ static void scsi_handle_inquiry_reply(SCSIGenericReq *r, SCSIDevice *s)
+>                *
+>                * This way, the guest kernel will be aware of the support
+>                * and will use it to proper setup the SCSI device.
+> +             *
+> +             * VPD page numbers must be sorted, so insert 0xb0 at the
+> +             * right place with an in-place insert.  After the initialization
+> +             * part of the for loop is executed, the device response is
+> +             * at r[0] to r[page_idx - 1].
+>                */
+> -            page_len = r->buf[3];
+> -            r->buf[page_len + 4] = 0xb0;
+> -            r->buf[3] = ++page_len;
+> +            for (page_idx = lduw_be_p(r->buf + 2) + 4;
+> +                 page_idx > 4 && r->buf[page_idx - 1] >= 0xb0;
+> +                 page_idx--) {
+> +                if (page_idx < r->buflen) {
+> +                    r->buf[page_idx] = r->buf[page_idx - 1];
+> +                }
+> +            }
+> +            r->buf[page_idx] = 0xb0;
+> +            stw_be_p(r->buf + 2, lduw_be_p(r->buf + 2) + 1);
+>           }
+>       }
+>   }
