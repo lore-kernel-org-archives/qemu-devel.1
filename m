@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48997)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49139)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gJzBp-0006Ur-0x
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 06:06:41 -0500
+	(envelope-from <luc.michel@greensocs.com>) id 1gJzC1-0006gR-SC
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 06:06:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gJzBj-00010z-0A
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 06:06:32 -0500
+	(envelope-from <luc.michel@greensocs.com>) id 1gJzC0-0001f7-UX
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 06:06:45 -0500
 From: Luc Michel <luc.michel@greensocs.com>
-Date: Tue,  6 Nov 2018 12:05:38 +0100
-Message-Id: <20181106110548.4209-7-luc.michel@greensocs.com>
+Date: Tue,  6 Nov 2018 12:05:48 +0100
+Message-Id: <20181106110548.4209-17-luc.michel@greensocs.com>
 In-Reply-To: <20181106110548.4209-1-luc.michel@greensocs.com>
 References: <20181106110548.4209-1-luc.michel@greensocs.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 06/16] gdbstub: add multiprocess support to
- 'sC' packets
+Subject: [Qemu-devel] [PATCH v4 16/16] arm/xlnx-zynqmp: put APUs and RPUs in
+ separate CPU clusters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,48 +25,115 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Luc Michel <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, alistair@alistair23.me, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, mark.burton@greensocs.com, Eduardo Habkost <ehabkost@redhat.com>
 
-Change the sC packet handling to support the multiprocess extension.
-Instead of returning the first thread, we return the first thread of the
-current process.
+Create two separate CPU clusters for APUs and RPUs.
 
 Signed-off-by: Luc Michel <luc.michel@greensocs.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- gdbstub.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ include/hw/arm/xlnx-zynqmp.h |  3 +++
+ hw/arm/xlnx-zynqmp.c         | 21 +++++++++++++++++----
+ 2 files changed, 20 insertions(+), 4 deletions(-)
 
-diff --git a/gdbstub.c b/gdbstub.c
-index ba8b1a3413..9be83486f5 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -1546,13 +1546,18 @@ static int gdb_handle_packet(GDBState *s, const c=
-har *line_buf)
-             type =3D strtoul(p, (char **)&p, 16);
-             sstep_flags =3D type;
-             put_packet(s, "OK");
-             break;
-         } else if (strcmp(p,"C") =3D=3D 0) {
--            /* "Current thread" remains vague in the spec, so always ret=
-urn
--             *  the first CPU (gdb returns the first thread). */
--            put_packet(s, "QC1");
-+            /* "Current thread" remains vague in the spec, so always ret=
-urn the
-+             * first thread of the current process (gdb returns the firs=
-t
-+             * thread).
-+             */
-+            cpu =3D get_first_cpu_in_process(s, gdb_get_cpu_process(s, s=
-->g_cpu));
-+            snprintf(buf, sizeof(buf), "QC%s",
-+                     gdb_fmt_thread_id(s, cpu, thread_id, sizeof(thread_=
-id)));
-+            put_packet(s, buf);
-             break;
-         } else if (strcmp(p,"fThreadInfo") =3D=3D 0) {
-             s->query_cpu =3D first_cpu;
-             goto report_cpuinfo;
-         } else if (strcmp(p,"sThreadInfo") =3D=3D 0) {
+diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
+index 98f925ab84..591515c760 100644
+--- a/include/hw/arm/xlnx-zynqmp.h
++++ b/include/hw/arm/xlnx-zynqmp.h
+@@ -29,10 +29,11 @@
+ #include "hw/dma/xlnx_dpdma.h"
+ #include "hw/dma/xlnx-zdma.h"
+ #include "hw/display/xlnx_dp.h"
+ #include "hw/intc/xlnx-zynqmp-ipi.h"
+ #include "hw/timer/xlnx-zynqmp-rtc.h"
++#include "hw/cpu/cluster.h"
+=20
+ #define TYPE_XLNX_ZYNQMP "xlnx,zynqmp"
+ #define XLNX_ZYNQMP(obj) OBJECT_CHECK(XlnxZynqMPState, (obj), \
+                                        TYPE_XLNX_ZYNQMP)
+=20
+@@ -75,10 +76,12 @@
+ typedef struct XlnxZynqMPState {
+     /*< private >*/
+     DeviceState parent_obj;
+=20
+     /*< public >*/
++    CPUClusterState apu_cluster;
++    CPUClusterState rpu_cluster;
+     ARMCPU apu_cpu[XLNX_ZYNQMP_NUM_APU_CPUS];
+     ARMCPU rpu_cpu[XLNX_ZYNQMP_NUM_RPU_CPUS];
+     GICState gic;
+     MemoryRegion gic_mr[XLNX_ZYNQMP_GIC_REGIONS][XLNX_ZYNQMP_GIC_ALIASES=
+];
+=20
+diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+index c195040350..42a138074c 100644
+--- a/hw/arm/xlnx-zynqmp.c
++++ b/hw/arm/xlnx-zynqmp.c
+@@ -176,16 +176,22 @@ static void xlnx_zynqmp_create_rpu(XlnxZynqMPState =
+*s, const char *boot_cpu,
+ {
+     Error *err =3D NULL;
+     int i;
+     int num_rpus =3D MIN(smp_cpus - XLNX_ZYNQMP_NUM_APU_CPUS, XLNX_ZYNQM=
+P_NUM_RPU_CPUS);
+=20
++    object_initialize_child(OBJECT(s), "rpu-cluster", &s->rpu_cluster,
++                            sizeof(s->rpu_cluster), TYPE_CPU_CLUSTER,
++                            &error_abort, NULL);
++
++    qdev_init_nofail(DEVICE(&s->rpu_cluster));
++
+     for (i =3D 0; i < num_rpus; i++) {
+         char *name;
+=20
+         object_initialize(&s->rpu_cpu[i], sizeof(s->rpu_cpu[i]),
+                           "cortex-r5f-" TYPE_ARM_CPU);
+-        object_property_add_child(OBJECT(s), "rpu-cpu[*]",
++        object_property_add_child(OBJECT(&s->rpu_cluster), "rpu-cpu[*]",
+                                   OBJECT(&s->rpu_cpu[i]), &error_abort);
+=20
+         name =3D object_get_canonical_path_component(OBJECT(&s->rpu_cpu[=
+i]));
+         if (strcmp(name, boot_cpu)) {
+             /* Secondary CPUs start in PSCI powered-down state */
+@@ -211,14 +217,19 @@ static void xlnx_zynqmp_init(Object *obj)
+ {
+     XlnxZynqMPState *s =3D XLNX_ZYNQMP(obj);
+     int i;
+     int num_apus =3D MIN(smp_cpus, XLNX_ZYNQMP_NUM_APU_CPUS);
+=20
++    object_initialize_child(obj, "apu-cluster", &s->apu_cluster,
++                            sizeof(s->apu_cluster), TYPE_CPU_CLUSTER,
++                            &error_abort, NULL);
++
+     for (i =3D 0; i < num_apus; i++) {
+-        object_initialize_child(obj, "apu-cpu[*]", &s->apu_cpu[i],
+-                                sizeof(s->apu_cpu[i]),
+-                                "cortex-a53-" TYPE_ARM_CPU, &error_abort=
+, NULL);
++        object_initialize_child(OBJECT(&s->apu_cluster), "apu-cpu[*]",
++                                &s->apu_cpu[i], sizeof(s->apu_cpu[i]),
++                                "cortex-a53-" TYPE_ARM_CPU, &error_abort=
+,
++                                NULL);
+     }
+=20
+     sysbus_init_child_obj(obj, "gic", &s->gic, sizeof(s->gic),
+                           gic_class_name());
+=20
+@@ -331,10 +342,12 @@ static void xlnx_zynqmp_realize(DeviceState *dev, E=
+rror **errp)
+     qdev_prop_set_uint32(DEVICE(&s->gic), "num-cpu", num_apus);
+     qdev_prop_set_bit(DEVICE(&s->gic), "has-security-extensions", s->sec=
+ure);
+     qdev_prop_set_bit(DEVICE(&s->gic),
+                       "has-virtualization-extensions", s->virt);
+=20
++    qdev_init_nofail(DEVICE(&s->apu_cluster));
++
+     /* Realize APUs before realizing the GIC. KVM requires this.  */
+     for (i =3D 0; i < num_apus; i++) {
+         char *name;
+=20
+         object_property_set_int(OBJECT(&s->apu_cpu[i]), QEMU_PSCI_CONDUI=
+T_SMC,
 --=20
 2.19.1
