@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33868)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34985)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gK6TC-0008SS-SU
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 13:53:02 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gK6Ux-0001vI-PT
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 13:54:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gK6T8-00072K-L6
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 13:52:58 -0500
-References: <1541528230-31817-1-git-send-email-thuth@redhat.com>
-	<c0febf9a-f098-112d-9c8d-c320cc66b04a@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <12974ebb-09de-c6e9-1dd7-5199a8ae6b05@redhat.com>
-Date: Tue, 6 Nov 2018 19:52:30 +0100
+	(envelope-from <pbonzini@redhat.com>) id 1gK6Uw-0004jY-9X
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 13:54:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33886)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gK6Ut-0004ZU-Ff
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 13:54:43 -0500
+References: <20181029173437.32559-1-pbonzini@redhat.com>
+	<fa37541c-a2a8-8bbc-6114-e15b650da020@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0eb17372-e87f-0875-fac0-7cc26235b6d9@redhat.com>
+Date: Tue, 6 Nov 2018 19:54:39 +0100
 MIME-Version: 1.0
-In-Reply-To: <c0febf9a-f098-112d-9c8d-c320cc66b04a@redhat.com>
+In-Reply-To: <fa37541c-a2a8-8bbc-6114-e15b650da020@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Add an entry for the 'collie'
- machine
+Subject: Re: [Qemu-devel] [PATCH 0/4] scsi-generic: fixes for Block Limits
+ emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,21 +29,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
-Cc: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>, qemu-devel@nongnu.org
+To: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com
 
-On 2018-11-06 19:49, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 6/11/18 19:17, Thomas Huth wrote:
->> There is no active maintainer, but since Peter is picking up
->> patches via qemu-arm@nongnu.org, I think we could at least use
->> "Odd Fixes" as status here.
+On 06/11/2018 16:54, Daniel Henrique Barboza wrote:
+> Hi,
 >=20
-> This looks more as "Orphan" to me...
+> How did you find all those issues, Max? First patch is something that
+> I missed out from the SCSI spec (ordering of the VPD pages)
+> and could have been detected by code inspection,=C2=A0 but I am curious=
+ about
+> the other fixes.
 
-I'll leave it up to Peter for the final decision...
+It was found just by code inspection.
 
-> Regardless the one choosed:
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
- Thanks,
-  Thomas
+Paolo
