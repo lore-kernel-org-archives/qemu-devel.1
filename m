@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39518)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39739)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gJx9I-0007s6-S7
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 03:55:49 -0500
+	(envelope-from <lbloch@janustech.com>) id 1gJx9l-0008C2-Pl
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 03:56:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gJx9F-0007RO-3X
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 03:55:48 -0500
-Received: from indium.canonical.com ([91.189.90.7]:38328)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gJx9E-0007Ps-FY
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 03:55:45 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gJx9C-0007HY-OR
-	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 08:55:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 835C92E80CC
-	for <qemu-devel@nongnu.org>; Tue,  6 Nov 2018 08:55:42 +0000 (UTC)
-MIME-Version: 1.0
+	(envelope-from <lbloch@janustech.com>) id 1gJx9k-0008A7-SA
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 03:56:17 -0500
+From: Leonid Bloch <lbloch@janustech.com>
+Date: Tue, 6 Nov 2018 08:56:08 +0000
+Message-ID: <1ac3ce83-a12c-afd7-9015-01a99589ca7e@janustech.com>
+References: <20181104180657.7471-1-lbloch@janustech.com>
+	<20181104180657.7471-2-lbloch@janustech.com>
+	<4b53c025-cee0-9f3d-428a-375698a9ac7e@redhat.com>
+In-Reply-To: <4b53c025-cee0-9f3d-428a-375698a9ac7e@redhat.com>
+Content-Language: en-US
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 06 Nov 2018 08:45:34 -0000
-From: Chen Zhang <1793859@bugs.launchpad.net>
-Reply-To: Bug 1793859 <1793859@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153760092554.29759.17075669747500120723.malonedeb@soybean.canonical.com>
-Message-Id: <154149393498.24086.7488974211805016141.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1793859] Re: GTK display and mouse input area
- scaling fails when using vfio-pci device
+Content-ID: <D757886F8C65784D83D328FEE07803DD@namprd07.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] include: Add a comment to explain
+ the origin of sizes' lookup table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,52 +27,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, Eric Blake <eblake@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, Markus Armbruster <armbru@redhat.com>
 
-Hi there,
-
-Would anyone be so kind to review my patch?
-
-Thanks.
-
-
-https://lists.nongnu.org/archive/html/qemu-devel/2018-10/msg06806.html
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1793859
-
-Title:
-  GTK display and mouse input area scaling fails when using vfio-pci
-  device
-
-Status in QEMU:
-  New
-
-Bug description:
-  Version qemu 3.0.0-1 running on Arch. Found on Windows 8.1 and Windows
-  10 VM's when using Intel gvt-g device.
-
-  While in fullscreen the GTK display is scaled larger than the x11
-  screen or virtual machine resolution. Without choosing zoom-to-fit
-  portions of the VM display are not shown on x11 screen regardless of
-  the VM resolution. When zoom-to-fit is done the mouse that's shown on
-  screen and actual input are off sync. The mouse can wander off screen
-  when going left and down.
-
-  This message is shown when changing from gxl-vga to vfio-pci in view menu=
-. =
-
-  (qemu-system-x86_64:6472): Gtk-WARNING **: 09:50:06.663: drawing failure =
-for widget 'GtkDrawingArea': NULL pointer
-  (qemu-system-x86_64:6472): Gtk-WARNING **: 09:50:06.664: drawing failure =
-for widget 'GtkNotebook': NULL pointer
-  (qemu-system-x86_64:6472): Gtk-WARNING **: 09:50:06.664: drawing failure =
-for widget 'GtkBox': NULL pointer
-  (qemu-system-x86_64:6472): Gtk-WARNING **: 09:50:06.664: drawing failure =
-for widget 'GtkWindow': NULL pointer
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1793859/+subscriptions
+SGkgUGhpbCwgSGkgRXJpYywNCg0KKEVyaWMsIGZvciBzb21lIHJlYXNvbiB5b3Ugd2VyZW4ndCBD
+QydkIHRvIHRoaXMgdGhyZWFkIC0gc29ycnkuKQ0KDQpPbiAxMS81LzE4IDU6NTggUE0sIFBoaWxp
+cHBlIE1hdGhpZXUtRGF1ZMOpIHdyb3RlOg0KPiBIaSBMZW9uaWQsDQo+IA0KPiBPbiA0LzExLzE4
+IDE5OjA3LCBMZW9uaWQgQmxvY2ggd3JvdGU6DQo+PiBUaGUgbG9va3VwIHRhYmxlIGZvciBwb3dl
+ci1vZi10d28gc2l6ZXMgd2FzIGFkZGVkIGluIGNvbW1pdCA1NDBiODQ5MjYxOGViDQo+PiBmb3Ig
+dGhlIHB1cnBvc2Ugb2YgaGF2aW5nIGNvbnZlbmllbnQgc2hvcnRjdXRzIGZvciB0aGVzZSBzaXpl
+cyBpbiBjYXNlcw0KPj4gd2hlbiB0aGUgbGl0ZXJhbCBudW1iZXIgaGFzIHRvIGJlIHByZXNlbnQg
+YXQgY29tcGlsZSB0aW1lLCBhbmQNCj4+IGV4cHJlc3Npb25zIGFzICcoMSAqIEtpQiknIGNhbiBu
+b3QgYmUgdXNlZC4gT25lIHN1Y2ggY2FzZSBpcyB0aGUNCj4+IHN0cmluZ2lmaWNhdGlvbiBvZiBz
+aXplcy4gQmV5b25kIHRoYXQsIGl0IGlzIGNvbnZlbmllbnQgdG8gdXNlIHRoZXNlDQo+PiBzaG9y
+dGN1dHMgZm9yIGFsbCBwb3dlci1vZi10d28gc2l6ZXMsIGV2ZW4gaWYgdGhleSBkb24ndCBoYXZl
+IHRvIGJlDQo+PiBsaXRlcmFsIG51bWJlcnMuDQo+Pg0KPj4gRGVzcGl0ZSBpdHMgY29udmVuaWVu
+Y2UsIHRoaXMgdGFibGUgaW50cm9kdWNlZCA1NSBsaW5lcyBvZiAiZHVtYiIgY29kZSwNCj4+IHRo
+ZSBwdXJwb3NlIGFuZCBvcmlnaW4gb2Ygd2hpY2ggYXJlIG9ic2N1cmUgd2l0aG91dCByZWFkaW5n
+IHRoZSBtZXNzYWdlDQo+PiBvZiB0aGUgY29tbWl0IHdoaWNoIGludHJvZHVjZWQgaXQuIFRoaXMg
+cGF0Y2ggZml4ZXMgdGhhdCBieSBhZGRpbmcgYQ0KPj4gY29tbWVudCB0byB0aGUgY29kZSBpdHNl
+bGYgd2l0aCBhIGJyaWVmIGV4cGxhbmF0aW9uIGZvciB0aGUgcmVhc29uaW5nDQo+PiBiZWhpbmQg
+dGhpcyB0YWJsZS4gVGhpcyBjb21tZW50IGluY2x1ZGVzIHRoZSBzaG9ydCBBV0sgc2NyaXB0IHRo
+YXQNCj4+IGdlbmVyYXRlZCB0aGUgdGFibGUsIHNvIHRoYXQgYW55b25lIHdobydzIGludGVyZXN0
+ZWQgY291bGQgbWFrZSBzdXJlDQo+PiB0aGF0IHRoZSB2YWx1ZXMgaW4gaXQgYXJlIGNvcnJlY3Qg
+KG90aGVyd2lzZSB0aGVzZSB2YWx1ZXMgbG9vayBhcyBpZg0KPj4gdGhleSB3ZXJlIHR5cGVkIG1h
+bnVhbGx5KS4NCj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBMZW9uaWQgQmxvY2ggPGxibG9jaEBqYW51
+c3RlY2guY29tPg0KPj4gLS0tDQo+PiDCoCBpbmNsdWRlL3FlbXUvdW5pdHMuaCB8IDE4ICsrKysr
+KysrKysrKysrKysrKw0KPj4gwqAgMSBmaWxlIGNoYW5nZWQsIDE4IGluc2VydGlvbnMoKykNCj4+
+DQo+PiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9xZW11L3VuaXRzLmggYi9pbmNsdWRlL3FlbXUvdW5p
+dHMuaA0KPj4gaW5kZXggNjhhNzc1ODY1MC4uMWM5NTlkMTgyZSAxMDA2NDQNCj4+IC0tLSBhL2lu
+Y2x1ZGUvcWVtdS91bml0cy5oDQo+PiArKysgYi9pbmNsdWRlL3FlbXUvdW5pdHMuaA0KPj4gQEAg
+LTE3LDYgKzE3LDI0IEBADQo+PiDCoCAjZGVmaW5lIFBpQsKgwqDCoMKgIChJTlQ2NF9DKDEpIDw8
+IDUwKQ0KPj4gwqAgI2RlZmluZSBFaULCoMKgwqDCoCAoSU5UNjRfQygxKSA8PCA2MCkNCj4+ICsv
+Kg0KPj4gKyAqIFRoZSBmb2xsb3dpbmcgbG9va3VwIHRhYmxlIGlzIGludGVuZGVkIHRvIGJlIHVz
+ZWQgd2hlbiBhIGxpdGVyYWwgDQo+PiBzdHJpbmcgb2YNCj4+ICsgKiB0aGUgbnVtYmVyIG9mIGJ5
+dGVzIGlzIHJlcXVpcmVkIChmb3IgZXhhbXBsZSBpZiBpdCBuZWVkcyB0byBiZSANCj4+IHN0cmlu
+Z2lmaWVkKS4NCj4+ICsgKiBJdCBjYW4gYWxzbyBiZSB1c2VkIGZvciBnZW5lcmljIHNob3J0Y3V0
+cyBvZiBwb3dlci1vZi10d28gc2l6ZXMuDQo+IA0KPiBeIG9rDQo+IA0KPiB2IHRoaXMgcGFydCBp
+cyBub3QgdXNlZnVsIGluIHRoZSB0cmVlIElNSE8uDQo+IA0KPj4gKyAqIFRoaXMgdGFibGUgaXMg
+Z2VuZXJhdGVkIHVzaW5nIHRoZSBBV0sgc2NyaXB0IGJlbG93Og0KPj4gKyAqDQo+PiArICrCoCBC
+RUdJTiB7DQo+PiArICrCoMKgwqDCoMKgIHN1ZmZpeD0iS01HVFBFIjsNCj4+ICsgKsKgwqDCoMKg
+wqAgZm9yKGk9MTA7IGk8NjQ7IGkrKykgew0KPj4gKyAqwqDCoMKgwqDCoMKgwqDCoMKgIHZhbD0y
+KippOw0KPj4gKyAqwqDCoMKgwqDCoMKgwqDCoMKgIHM9c3Vic3RyKHN1ZmZpeCwgaW50KGkvMTAp
+LCAxKTsNCj4+ICsgKsKgwqDCoMKgwqDCoMKgwqDCoCBuPTIqKihpJTEwKTsNCj4+ICsgKsKgwqDC
+oMKgwqDCoMKgwqDCoCBwYWQ9MjEtaW50KGxvZyhuKS9sb2coMTApKTsNCj4+ICsgKsKgwqDCoMKg
+wqDCoMKgwqDCoCBwcmludGYoIiNkZWZpbmUgU18lZCVzaUIgJSpkXG4iLCBuLCBzLCBwYWQsIHZh
+bCk7DQo+PiArICrCoMKgwqDCoMKgIH0NCj4+ICsgKsKgIH0NCj4+ICsgKi8NCj4gDQo+IElmIGl0
+IGlzIGdlbmVyYXRlZCBhbmQgdGhlIHN0cmluZ2lmaWVkIGFyZSBhbHNvIGdlbmVyYXRlZCwgd2h5
+IG5vdCANCj4gZ2VuZXJhdGUgdGhpcyBvbmNlIHZpYSB0aGUgLi9jb25maWd1cmUsIHNpbmNlIGl0
+IGlzIHVzZWQgYnkgbWFjaGluZXMgYW5kIA0KPiBub3QgYnkgaHVtYW5zPw0KDQpZb3UgYmVhdCBt
+ZSB0byBpdCEgSSB3YXMganVzdCB0aGlua2luZyBhYm91dCB0aGF0IGxhc3QgZXZlbmluZy4gSW5k
+ZWVkIA0KaXQncyBub3Qgc28gZWxlZ2FudCB0byBwdXQgZ2VuZXJhdGVkIGNvZGUgaW4gYSBmaWxl
+IHRoYXQgaXMgaW50ZW5kZWQgZm9yIA0KaHVtYW4gaGFuZGxpbmcuIEdlbmVyYXRpbmcgYnkgLi9j
+b25maWd1cmUgd291bGQgYmUgcHJldHRpZXIuDQpBIHJ1bnRpbWUgc29sdXRpb24gdGhhdCBpbnRl
+cnByZXRzIGhhcmQtY29kZWQgZXhwcmVzc2lvbiBzdHJpbmdzLCBsaWtlIA0KRXJpYyBzdWdnZXN0
+ZWQsIGNhbiBhbHNvIGJlIGEgcG9zc2liaWxpdHksIGJ1dCBpdCBzZWVtcyBtb3JlIGNvbXBsaWNh
+dGVkIA0KdGhhbiBqdXN0IGdlbmVyYXRpbmcgdGhlc2UgYXQgdGhlIGNvbmZpZ3VyYXRpb24gc3Rh
+Z2UuIFBsdXMgb25lIGdldHMgdGhlIA0KU18qIGNvbnN0YW50cyB0aGF0IGNhbiBiZSB1c2VkIGlu
+IG1hbnkgcGxhY2VzLCBub3Qgb25seSB3aGVyZSBhbiANCmV4cGxpY2l0IG51bWJlciBpcyBuZWVk
+ZWQuIFdoYXQgZG8geW91IHRoaW5rPw0KDQpBIHF1ZXN0aW9uIHRob3VnaDogaWYgaXQgdG8gYmUg
+Z2VuZXJhdGVkIGJ5IC4vY29uZmlndXJlLCB3aGVyZSBkbyB5b3UgDQpzdWdnZXN0IHRvIHB1dCB0
+aGUgZ2VuZXJhdGVkIHZhbHVlcz8gQW5kIGFsc286IGlzIGl0IE9LIHRvIGFzc3VtZSANCnRoZXJl
+J3MgQVdLIChvciBhbm90aGVyIHNjcmlwdGluZyBsYW5ndWFnZSkgb24gdGhlIHN5c3RlbSBmb3Ig
+Z2VuZXJhdGluZyANCnRoZXNlPw0KDQpUaGFua3MsDQoNCkxlb25pZC4NCg==
