@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35600)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1gK32Z-0001Mx-CP
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:13:19 -0500
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1gK33H-00049s-TU
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:14:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1gK2tn-0001ss-BO
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:04:13 -0500
-References: <20181102152257.20637-1-mark.cave-ayland@ilande.co.uk>
-	<20181102152257.20637-5-mark.cave-ayland@ilande.co.uk>
-From: Thomas Huth <huth@tuxfamily.org>
-Message-ID: <b77a47ba-d94f-a1d5-4fce-254ed7742970@tuxfamily.org>
-Date: Tue, 6 Nov 2018 16:03:59 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181102152257.20637-5-mark.cave-ayland@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v6 04/10] hw/m68k: add macfb video card
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1gK33D-0004lL-GB
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:13:59 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53162
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1gK33D-0004jm-7O
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:13:55 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wA6F5Efi077806
+	for <qemu-devel@nongnu.org>; Tue, 6 Nov 2018 10:13:53 -0500
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2nkaek0ux2-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 10:13:53 -0500
+Received: from localhost
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Tue, 6 Nov 2018 15:13:52 -0000
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Tue,  6 Nov 2018 10:13:46 -0500
+Message-Id: <20181106151346.2728687-1-stefanb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH] tests: tpm: Use g_test_message rather than
+ fprintf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,26 +37,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, jasowang@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, hpoussin@reactos.org, kraxel@redhat.com, pbonzini@redhat.com, aurelien@aurel32.net, laurent@vivier.eu
+To: thuth@redhat.com, marcandre.lureau@redhat.com
+Cc: qemu-devel@nongnu.org, Stefan Berger <stefanb@linux.vnet.ibm.com>, Stefan Berger <stefanb@linux.ibm.com>
 
-On 2018-11-02 16:22, Mark Cave-Ayland wrote:
-> From: Laurent Vivier <laurent@vivier.eu>
-> 
-> Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
-> ---
->  arch_init.c                |   4 +
->  hw/display/Makefile.objs   |   1 +
->  hw/display/macfb.c         | 419 +++++++++++++++++++++++++++++++++++++++++++++
->  include/hw/display/macfb.h |  43 +++++
->  qemu-options.hx            |   2 +-
->  vl.c                       |   3 +-
->  6 files changed, 470 insertions(+), 2 deletions(-)
->  create mode 100644 hw/display/macfb.c
->  create mode 100644 include/hw/display/macfb.h
+Display a message during the test using g_test_message rather
+than fprintf.
 
-Again, due to lack of knowledge about the Mac hardware, just a weak:
+Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+---
+ tests/tpm-tests.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Reviewed-by: Thomas Huth <huth@tuxfamily.org>
+diff --git a/tests/tpm-tests.c b/tests/tpm-tests.c
+index 93a5beba01..5f217a2d92 100644
+--- a/tests/tpm-tests.c
++++ b/tests/tpm-tests.c
+@@ -22,7 +22,7 @@ static bool
+ tpm_test_swtpm_skip(void)
+ {
+     if (!tpm_util_swtpm_has_tpm2()) {
+-        fprintf(stderr, "swtpm not in PATH or missing --tpm2 support; ");
++        g_test_message("swtpm not in PATH or missing --tpm2 support; ");
+         return true;
+     }
+ 
+-- 
+2.17.1
