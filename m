@@ -1,15 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34569)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dongli.zhang@oracle.com>) id 1gJtLE-0007te-GR
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 23:51:55 -0500
+	(envelope-from <fli@suse.com>) id 1gJtLR-0007zK-Mm
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 23:52:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dongli.zhang@oracle.com>) id 1gJtKF-0001wj-Ic
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 23:50:52 -0500
-From: Dongli Zhang <dongli.zhang@oracle.com>
-Date: Tue,  6 Nov 2018 12:52:32 +0800
-Message-Id: <1541479952-32355-1-git-send-email-dongli.zhang@oracle.com>
-Subject: [Qemu-devel] [PATCH 1/1] virtio-blk: fix comment for
- virtio_blk_rw_complete as nalloc is initially -1
+	(envelope-from <fli@suse.com>) id 1gJtLO-00031E-Fx
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 23:52:05 -0500
+Received: from mx2.suse.de ([195.135.220.15]:41516 helo=mx1.suse.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <fli@suse.com>) id 1gJtLO-00030s-AH
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 23:52:02 -0500
+References: <20181101101715.9443-1-fli@suse.com>
+	<20181101101715.9443-8-fli@suse.com> <8736sfvd5m.fsf@trasno.org>
+From: Fei Li <fli@suse.com>
+Message-ID: <06ce487b-1887-4dc5-89f5-ce9a46fd50ea@suse.com>
+Date: Tue, 6 Nov 2018 12:51:54 +0800
+MIME-Version: 1.0
+In-Reply-To: <8736sfvd5m.fsf@trasno.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH RFC v7 7/9] migration: remove unused
+ &local_err parameter in migrate_set_error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,30 +29,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org, mst@redhat.com
-Cc: qemu-trivial@nongnu.org, stefanha@redhat.com, kwolf@redhat.com, mreitz@redhat.com
+To: quintela@redhat.com
+Cc: peterx@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, armbru@redhat.com
 
-The initial value of nalloc is -1, but not 1.
 
-Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
----
-This is based on git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
 
- hw/block/virtio-blk.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index 83cf5c0..30999c3 100644
---- a/hw/block/virtio-blk.c
-+++ b/hw/block/virtio-blk.c
-@@ -96,7 +96,7 @@ static void virtio_blk_rw_complete(void *opaque, int ret)
-         trace_virtio_blk_rw_complete(vdev, req, ret);
- 
-         if (req->qiov.nalloc != -1) {
--            /* If nalloc is != 1 req->qiov is a local copy of the original
-+            /* If nalloc is != -1 req->qiov is a local copy of the original
-              * external iovec. It was allocated in submit_requests to be
-              * able to merge requests. */
-             qemu_iovec_destroy(&req->qiov);
--- 
-2.7.4
+On 11/05/2018 09:59 PM, Juan Quintela wrote:
+> Fei Li <fli@suse.com> wrote:
+>> Always call migrate_set_error() to set the error state without relying
+>> on whether multifd_save_cleanup() succeeds. As the passed &local_err
+>> is never used in multifd_save_cleanup(), remove it.
+> Error is not used, you are right.
+>
+> But then just change the prototype to:
+>
+> void multifd_save_cleanup(void);
+>
+> ??
+>
+> With that change,
+>
+> Reviewed-by: Juan Quintela <quintela@redhat.com>
+Thanks for the review!
+Have changed that function to be void, besides, correct the previous 
+erroneous
+function name in the patch title:
+s/migratr_set_error/multifd_save_cleanup/g.
