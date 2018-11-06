@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39570)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gKAh9-00063U-IN
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 18:23:40 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gKAhE-0004Fs-Qs
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 18:23:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gKASs-0000yQ-8g
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 18:08:56 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:45390)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gKASs-0000v9-0X
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 18:08:54 -0500
-Received: by mail-ot1-x344.google.com with SMTP id g10so13097772otl.12
-	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 15:08:53 -0800 (PST)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gKASr-0000vh-Of
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 18:08:59 -0500
+Received: from hera.aquilenet.fr ([185.233.100.1]:38416)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1gKASr-0000mg-6m
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 18:08:53 -0500
+Date: Wed, 7 Nov 2018 00:08:50 +0100
+From: Samuel Thibault <samuel.thibault@gnu.org>
+Message-ID: <20181106230850.66lufoxqwckxrzgt@function>
+References: <20181106151323.16154-1-peter.maydell@linaro.org>
+	<20181106151323.16154-4-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1541540283-45699-1-git-send-email-pbonzini@redhat.com>
-References: <1541540283-45699-1-git-send-email-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 6 Nov 2018 23:08:32 +0000
-Message-ID: <CAFEAcA9HrVVopiT0Crw=BkV+_4_cArt_k5SkMOG5phZh0tFCxQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/17] Misc patches for QEMU 3.1 hard freeze
- (?)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181106151323.16154-4-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH for-3.1 3/4] slirp: Remove code that
+ handles socreate() failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,28 +29,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, Jan Kiszka <jan.kiszka@siemens.com>, patches@linaro.org
 
-On 6 November 2018 at 21:37, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> The following changes since commit fc3d1bad1edf08871275cf469a64e12dae4eba96:
->
->   oslib-posix: Use MAP_STACK in qemu_alloc_stack() on OpenBSD (2018-11-06 10:52:23 +0000)
->
-> are available in the git repository at:
->
->   git://github.com/bonzini/qemu.git tags/for-upstream
->
-> for you to fetch changes up to a458774ad711bceabefbf01e8f0b91d86ec72e0c:
->
->   util/qemu-thread-posix: Fix qemu_thread_atexit* for OSX (2018-11-06 21:35:06 +0100)
->
-> Vitaly's patch is a bit late; unfortunately I couldn't resend the pull
-> request yesterday because of a long weekend.  On the other hand this
-> meant I could include three more bugfix series, and also fix some nits
-> pointed out by Laszlo who just came back from his own vacation.
+Peter Maydell, le mar. 06 nov. 2018 15:13:22 +0000, a ecrit:
+> Now that socreate() can never fail, we can remove the code
+> that was trying to handle that situation.
+> 
+> In particular this removes code in tcp_connect() that
+> provoked Coverity to complain (CID 1005724): in
+>  closesocket(accept(inso->s, (struct sockaddr *)&addr, &addrlen));
+> if the accept() call fails then we pass closesocket() -1
+> instead of a valid file descriptor.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Missed rc0 by four hours or so, but never mind -- it'll go into rc1.
-
-thanks
--- PMM
+Applied, thanks!
