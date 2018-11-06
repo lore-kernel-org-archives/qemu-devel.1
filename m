@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37992)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gK9gs-0000do-58
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 17:19:19 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gK9xa-00026w-2l
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 17:36:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gK9gn-0005i6-DG
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 17:19:17 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34888)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gK9gm-0005Zo-K9
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 17:19:12 -0500
-References: <20181106153330.5139-1-peter.maydell@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5786633e-6edf-50c3-59e8-967db6c10dd7@redhat.com>
-Date: Tue, 6 Nov 2018 23:19:07 +0100
+	(envelope-from <jsnow@redhat.com>) id 1gK9xY-0003nd-E0
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 17:36:33 -0500
+References: <20181015160633.63130-1-vsementsov@virtuozzo.com>
+	<6e80686e-00a1-64d9-dba5-49e2709ca8f2@virtuozzo.com>
+	<20181106172115.GG4758@linux.fritz.box>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <e2bfebf0-d05a-9e2c-ba04-1d6289709983@redhat.com>
+Date: Tue, 6 Nov 2018 17:35:45 -0500
 MIME-Version: 1.0
-In-Reply-To: <20181106153330.5139-1-peter.maydell@linaro.org>
+In-Reply-To: <20181106172115.GG4758@linux.fritz.box>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-3.1] replay: Exit on errors reading
- from replay log
+Subject: Re: [Qemu-devel] [Qemu-block] ping Re: [PATCH v4 00/11] backup-top
+ filter driver for backup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,78 +26,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+To: Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: "famz@redhat.com" <famz@redhat.com>, Denis Lunev <den@virtuozzo.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "jcody@redhat.com" <jcody@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>
 
-On 06/11/2018 16:33, Peter Maydell wrote:
-> Currently replay_get_byte() does not check for an error
-> from getc(). Coverity points out (CID 1390622) that this
-> could result in unexpected behaviour (such as looping
-> forever, if we use the replay_get_dword() return value
-> for a loop count). We don't expect reads from the replay
-> log to fail, and if they do there is no way we can
-> continue. So make them fatal errors.
+
+
+On 11/06/2018 12:21 PM, Kevin Wolf wrote:
+> Am 02.11.2018 um 17:41 hat Vladimir Sementsov-Ogievskiy geschrieben:
+>> ping
+>>
+>> 15.10.2018 19:06, Vladimir Sementsov-Ogievskiy wrote:
+>>> Hi all!
+>>>
+>>> These series introduce backup-top driver. It's a filter-node, which
+>>> do copy-before-write operation. Mirror uses filter-node for handling
+>>> guest writes, let's move to filter-node (from write-notifiers) for
+>>> backup too (patch 16)
+>>>
+>>> v4:
+>>> fixes, rewrite driver to be implicit, drop new interfaces and
+>>> don't move to BdrvDirtyBitmap for now, as it's not obvious will
+>>> it be really needed and don't relate to these series more.
+>>>
+>>> v3 was "[PATCH v3 00/18] fleecing-hook driver for backup"
+>>>
+>>> v2 was "[RFC v2] new, node-graph-based fleecing and backup"
+>>>
+>>> These series are based on
+>>>   [PATCH v4 0/8] dirty-bitmap: rewrite bdrv_dirty_iter_next_area
+>>> and
+>>>   [PATCH 0/2] replication: drop extra sync
 > 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
-> Disclaimer: checked only with "make check".
-> 
->  replay/replay-internal.c | 16 +++++++++++++---
->  1 file changed, 13 insertions(+), 3 deletions(-)
-> 
-> diff --git a/replay/replay-internal.c b/replay/replay-internal.c
-> index 1cea1d4dc91..8f87e9b957e 100644
-> --- a/replay/replay-internal.c
-> +++ b/replay/replay-internal.c
-> @@ -35,6 +35,12 @@ static void replay_write_error(void)
->      }
->  }
->  
-> +static void replay_read_error(void)
-> +{
-> +    error_report("error reading the replay data");
-> +    exit(1);
-> +}
-> +
->  void replay_put_byte(uint8_t byte)
->  {
->      if (replay_file) {
-> @@ -83,7 +89,11 @@ uint8_t replay_get_byte(void)
->  {
->      uint8_t byte = 0;
->      if (replay_file) {
-> -        byte = getc(replay_file);
-> +        int r = getc(replay_file);
-> +        if (r == EOF) {
-> +            replay_read_error();
-> +        }
-> +        byte = r;
->      }
->      return byte;
->  }
-> @@ -126,7 +136,7 @@ void replay_get_array(uint8_t *buf, size_t *size)
->      if (replay_file) {
->          *size = replay_get_dword();
->          if (fread(buf, 1, *size, replay_file) != *size) {
-> -            error_report("replay read error");
-> +            replay_read_error();
->          }
->      }
->  }
-> @@ -137,7 +147,7 @@ void replay_get_array_alloc(uint8_t **buf, size_t *size)
->          *size = replay_get_dword();
->          *buf = g_malloc(*size);
->          if (fread(*buf, 1, *size, replay_file) != *size) {
-> -            error_report("replay read error");
-> +            replay_read_error();
->          }
->      }
->  }
+> Before we can move forward here, we need to deal with the dependencies.
+> I merged the second one now (because there wasn't any feedback from the
+> replication maintainers), but the first one looks like it was going
+> through John's or Eric's tree?
 > 
 
-Makes sense, can you apply it directly to qemu.git as soon as Pavel
-reviews it (or in some time if he doesn't)?
+I was expecting it to go through Eric's because it was predicated on NBD
+patches that he was staging.
 
-Thanks,
-
-Paolo
+Is that no longer true?
+--js
