@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49573)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gK0l1-0004l4-TP
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:47:00 -0500
+	(envelope-from <liq3ea@outlook.com>) id 1gK0l0-0004yE-PH
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:47:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gK0cJ-00061q-9B
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:38:00 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:34055)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gK0cH-0005yu-DU
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:37:57 -0500
-Received: by mail-oi1-x244.google.com with SMTP id i138-v6so7553016oib.1
-	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 04:37:56 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <BN6PR18MB122007CFC965C45DF2CA20BB9FCB0@BN6PR18MB1220.namprd18.prod.outlook.com>
+	(envelope-from <liq3ea@outlook.com>) id 1gK0dF-0006iF-Tq
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:39:02 -0500
+Received: from mail-oln040092014014.outbound.protection.outlook.com
+	([40.92.14.14]:63821
+	helo=NAM05-DM3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <liq3ea@outlook.com>) id 1gK0dD-0006Wl-AW
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:38:56 -0500
+From: li qiang <liq3ea@outlook.com>
+Date: Tue, 6 Nov 2018 12:38:35 +0000
+Message-ID: <BN6PR18MB122013B6029A135A5B6ADD079FCB0@BN6PR18MB1220.namprd18.prod.outlook.com>
 References: <20181106115351.9422-1-ppandit@redhat.com>
 	<CAFEAcA880MNu+_C1ySic7ASsQNMth1FCGSjHJg_N7Ud+s4G_PA@mail.gmail.com>
 	<BN6PR18MB122007CFC965C45DF2CA20BB9FCB0@BN6PR18MB1220.namprd18.prod.outlook.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 6 Nov 2018 12:37:34 +0000
-Message-ID: <CAFEAcA9Q6-xw+GQLFUbGp6tfGMEg9_usx18AYbPdd4tiz7KSKg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	<5127334b-e3c3-cf08-6855-8b6fd871cb5f@redhat.com>
+In-Reply-To: <5127334b-e3c3-cf08-6855-8b6fd871cb5f@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <B8F6BA3B1953BE4BAF5ADA78223EC548@namprd18.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Subject: Re: [Qemu-devel] [PATCH] lsi53c895a: check script ram address value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -30,19 +33,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: li qiang <liq3ea@outlook.com>
-Cc: P J P <ppandit@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, Prasad J Pandit <pjp@fedoraproject.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, P J P <ppandit@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, Prasad J Pandit <pjp@fedoraproject.org>
 
-On 6 November 2018 at 12:27, li qiang <liq3ea@outlook.com> wrote:
-> The addr is 0~0x1fff, but when addr is at the near the end ,for example
-> 0x1fffe, the add>>2 can be 2047
->
-> and as script_ram is a uint32_t and so s->script_ram[addr >> 2] can read
-> out of the script_ram.
-
-But script_ram is declared as
-  uint32_t script_ram[2048];
-so if addr >> 2 == 2047, that's still in-bounds, isn't it?
-
-thanks
--- PMM
+DQrlnKggMjAxOC8xMS82IDIwOjI4LCBQYW9sbyBCb256aW5pIOWGmemBkzoNCj4gT24gMDYvMTEv
+MjAxOCAxMzoyNywgbGkgcWlhbmcgd3JvdGU6DQo+PiBUaGUgYWRkciBpcyAwfjB4MWZmZiwgYnV0
+IHdoZW4gYWRkciBpcyBhdCB0aGUgbmVhciB0aGUgZW5kICxmb3IgZXhhbXBsZQ0KPj4gMHgxZmZm
+ZSwgdGhlIGFkZD4+MiBjYW4gYmUgMjA0Nw0KPj4NCj4+IGFuZCBhcyBzY3JpcHRfcmFtIGlzIGEg
+dWludDMyX3QgYW5kIHNvIHMtPnNjcmlwdF9yYW1bYWRkciA+PiAyXSBjYW4gcmVhZA0KPj4gb3V0
+IG9mIHRoZSBzY3JpcHRfcmFtLg0KPiBIb3cgc28/ICBzLT5zY3JpcHRfcmFtIGhhcyBzaXplIDIw
+NDgsIGl0J3Mgb2theSB0byBhY2Nlc3MgaXQgYXQgMjA0Ny4NCg0KT2gsIHJpZ2h0Lg0KDQogwqBJ
+J20gY29uZnVzZWQgYnkgdGhlIHNjcmlwdF9yYW0sIGl0J3Mgbm90IGJ5dGUgYXJyYXkuDQoNCg0K
+DQoNCj4gUGFvbG8NCg==
