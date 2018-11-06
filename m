@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33501)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34116)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gKAQD-0002Cv-23
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 18:06:09 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gKAR9-0002j3-Kr
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 18:07:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gKAQB-0005qu-NE
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 18:06:08 -0500
-Received: from mail-oi1-x232.google.com ([2607:f8b0:4864:20::232]:46502)
+	(envelope-from <peter.maydell@linaro.org>) id 1gKAR7-0001a9-M9
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 18:07:06 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:40167)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gKAQB-0002n3-2n
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 18:06:07 -0500
-Received: by mail-oi1-x232.google.com with SMTP id k64-v6so12251808oia.13
-	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 15:05:33 -0800 (PST)
+	id 1gKAR7-0001Wb-FB
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 18:07:05 -0500
+Received: by mail-oi1-x244.google.com with SMTP id u130-v6so12281320oie.7
+	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 15:07:05 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <f5712b07-05a1-650c-332a-a24462fed977@redhat.com>
+In-Reply-To: <30bb371d-4183-dd25-3413-08fd60a9eeea@redhat.com>
 References: <CAFEAcA9pvsNML+=2jwygO4ciJWr0GmWHznJ-Lb1bcOsWhYjo4A@mail.gmail.com>
-	<f5712b07-05a1-650c-332a-a24462fed977@redhat.com>
+	<30bb371d-4183-dd25-3413-08fd60a9eeea@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 6 Nov 2018 23:05:12 +0000
-Message-ID: <CAFEAcA-Wkk9wLOfSYs2_R_2WwSe59egU4dwRBpdALDaA7642mQ@mail.gmail.com>
+Date: Tue, 6 Nov 2018 23:06:44 +0000
+Message-ID: <CAFEAcA_2MqRX2j1pabqbfNdrexpCfNS=xJn=TCaPrkpnD2Bvcw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] List of files containing devices which have not
  been QOMified
 List-Id: <qemu-devel.nongnu.org>
@@ -30,49 +31,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 6 November 2018 at 19:46, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> On 06/11/2018 19:43, Peter Maydell wrote:
->> hw/core/ptimer.c
+On 6 November 2018 at 19:16, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
+> wrote:
+> On 6/11/18 19:43, Peter Maydell wrote:
+>>
+>> I had an idea for how to get a rough list of source files
+>> containing devices that haven't been QOMified. The theory
+>> is that a pre-QOM device generally has an "init" function
+>> which allocates memory for the device struct. So looking in
+>> hw/ for files which call g_new*() or g_malloc*() should get
+>> us all the non-QOM devices (as well as a pile of false
+>> positives, of course). The following link is the result of
+>> doing that and then eyeballing the results for false positives
+>> and throwing those out. It might have missed one or two
+>> files or included one or two by mistake. But I think it's
+>> pretty close, and it seems to have caught all the obvious
+>> ones I knew about. There are 61 files on this list.
+>>
+>> I am also suspicious about hw/bt/ but don't know enough
+>> about that subsystem to say if it could benefit from
+>> using QOM objects more.
+>>
 >
-> Not a device.
-
-Indeed not, but it could be a QOM object I guess (would
-that gain us anything?)
-
->> hw/i2c/bitbang_i2c.c
+>> hw/arm/exynos4210.c
 >
-> TYPE_GPIO_I2C?
-
-That part is, but bitbang_i2c_init() creates an object
-which isn't a QOM object and is used by some other i2c devices.
-
->> hw/ide/ahci.c
+> I already did this one.
 >
-> Even though AHCIState is not a QOM object, all of its users are
-> (TYPE_SYSBUS_AHCI is in this file, TYPE_ICH9_AHCI is in hw/ide/ich.c)
+>> hw/sd/omap_mmc.c
+> I will do this one.
 
-Mmm, this is one of those which I was unsure about so
-put on the list anyway.
-
-Overall something that occurs to me is that I'm not sure
-what exactly (other than tidiness) we gain from converting
-remaining non-QOM devices. In some of the other cases I've
-looked at (like sysbus init methods or old_mmio users) we
-get to complete an API transition and remove the old code.
-For a non-QOM device, how much does it hurt us that they're
-lying around in the codebase? We might do better to
-specifically target APIs we'd like to deal with (like
-direct uses of vmstate_register, maybe?).
-
-Some bits I would definitely like to see cleaned up are
-the things like the mmio version of the 16550 UART code
-in hw/char/serial.c -- that not being QOMified has
-knock-on effects in making other devices that would
-like to basically just be 16550-wrappers harder to
-write in a clean way.
+I have some out-of-tree stuff that deals with this device
+(part of the omap3 patchset tries to do some QOMification,
+but it was a bit tangled with adding omap3 features),
+so if you could hold off on working on the various omap
+devices in this set that might be better, til I see
+whether any of the out-of-tree code is usefully salvageable.
 
 thanks
 -- PMM
