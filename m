@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40803)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gK3KU-0004Kc-VS
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:31:52 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gK3Kb-0004OS-Uf
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:32:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gK3KF-000115-4L
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:31:39 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <e1d4fa92-9f84-080c-04e3-4fc9b683c11d@virtuozzo.com>
-References: <20181101182738.70462-1-vsementsov@virtuozzo.com>
-	<20181101182738.70462-7-vsementsov@virtuozzo.com>
-	<w514lcudz3y.fsf@maestria.local.igalia.com>
-	<e1d4fa92-9f84-080c-04e3-4fc9b683c11d@virtuozzo.com>
-Date: Tue, 06 Nov 2018 16:30:40 +0100
-Message-ID: <w511s7ydxzz.fsf@maestria.local.igalia.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gK3KY-0001GF-Uc
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:31:53 -0500
+Received: from mail-ot1-x332.google.com ([2607:f8b0:4864:20::332]:43676)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gK3KV-0000zy-0Q
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:31:50 -0500
+Received: by mail-ot1-x332.google.com with SMTP id k9so11733720otl.10
+	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 07:31:30 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 6/7] qcow2: aio support for
- compressed cluster read
+In-Reply-To: <4b68930c-1fc3-9462-8f9e-671b414e712d@redhat.com>
+References: <20181105181353.39804-1-mst@redhat.com>
+	<20181105181353.39804-3-mst@redhat.com>
+	<a21e8e21-d056-1e9a-3726-54f8ce24a162@redhat.com>
+	<20181106091147-mutt-send-email-mst@kernel.org>
+	<4b68930c-1fc3-9462-8f9e-671b414e712d@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 6 Nov 2018 15:31:08 +0000
+Message-ID: <CAFEAcA9R9kTfznkvdFf9Eqtp80NFAt3Gd1cjooRpr2bZ6TsJiQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 02/33] tests: Move
+ tests/hex-loader-check-data/ to tests/data/hex-loader/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,32 +34,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>, "mreitz@redhat.com" <mreitz@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, Su Hang <suhang16@mails.ucas.ac.cn>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Tue 06 Nov 2018 04:13:58 PM CET, Vladimir Sementsov-Ogievskiy wrote:
-> 06.11.2018 18:06, Alberto Garcia wrote:
->> On Thu 01 Nov 2018 07:27:37 PM CET, Vladimir Sementsov-Ogievskiy wrote:
->>
->>> +    buf = g_try_malloc(csize);
->>> +    if (!buf) {
->>> +        return -ENOMEM;
->>> +    }
->>> +    iov.iov_base = buf;
->>> +    iov.iov_len = csize;
->>> +    qemu_iovec_init_external(&local_qiov, &iov, 1);
->>>   
->>> -        iov.iov_base = s->cluster_data;
->>> -        iov.iov_len = csize;
->>> -        qemu_iovec_init_external(&local_qiov, &iov, 1);
->>> +    out_buf = qemu_blockalign(bs, s->cluster_size);
->> You should also check whether out_buf is NULL, shouldn't you?
+On 6 November 2018 at 15:15, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
+> wrote:
+> No worry, I'm not mad at all, but there might be an issue in your git PR
+> workflow, this series also missed your maintainer S-o-b.
 >
-> No, it will abort on fail. qemu_try_blockalign result should be
-> checked.
+> Peter: Can you add a such check in your scripts? (during next merge windo=
+w,
+> no hurry).
+>
+> Rather than your scripts, this should be in scripts a maintainer can run
+> locally, such ./scripts/checkpatch.pl --maintainer or
+> ./scripts/checkseries.xx.
 
-Is there any reason why some parts of the QEMU code use qemu_blockalign
-and others qemu_try_blockalign() ? From what I can see it seems to be up
-to whoever wrote it...
+I have such a check in my own make-pullreq script which I use
+for arm pull requests:
+https://git.linaro.org/people/peter.maydell/misc-scripts.git/tree/make-pull=
+req#n98
 
-Berto
+I can't do much about other submaintainers' workflows
+(and the block tree's "sub-submaintainers" setup means
+"check all commits have a signoff from the same person as
+the merge commit did" won't work either.)
+
+thanks
+-- PMM
