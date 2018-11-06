@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46572)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gJxXw-0008PE-HX
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 04:21:17 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gJy41-0000p2-Vh
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 04:54:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gJxXu-0001cP-LC
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 04:21:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44470)
+	(envelope-from <pbonzini@redhat.com>) id 1gJy2z-0004qF-Mr
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 04:53:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51222)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gJxXs-0001XJ-LB
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 04:21:14 -0500
-References: <20181023152306.3123-1-david@redhat.com>
-	<20181023152306.3123-2-david@redhat.com>
-	<87pnvqdvsj.fsf@dusky.pond.sub.org>
-	<e8fe86a1-d075-2ea8-d1f4-e08e5dceee07@redhat.com>
-	<875zxingqn.fsf@dusky.pond.sub.org>
-	<440eb166-73d1-77b6-5dd9-66a0abd7d665@redhat.com>
-	<87muqn5ydc.fsf@dusky.pond.sub.org>
-	<1ec41fe2-d4b4-fce2-9381-818ee3356409@redhat.com>
-	<e953e363-dfc3-ef93-3b38-b285f8a9b034@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <312d808f-ffcf-982b-a099-523243e88ae0@redhat.com>
-Date: Tue, 6 Nov 2018 10:20:56 +0100
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gJy2z-0004nz-F0
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 04:53:21 -0500
+References: <20181105135538.28025-1-peter.maydell@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <cec657a3-4152-c951-5165-74604d9d9da5@redhat.com>
+Date: Tue, 6 Nov 2018 10:53:16 +0100
 MIME-Version: 1.0
-In-Reply-To: <e953e363-dfc3-ef93-3b38-b285f8a9b034@redhat.com>
+In-Reply-To: <20181105135538.28025-1-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/7] qapi: use qemu_strtoi64() in
- parse_str
+Subject: Re: [Qemu-devel] [PATCH for-3.1 0/2] Fix qemu_thread_atexit* for OSX
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,44 +27,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Kevin Wolf <kwolf@redhat.com>
 
-On 05.11.18 17:48, Eric Blake wrote:
-> On 11/5/18 9:53 AM, David Hildenbrand wrote:
+On 05/11/2018 14:55, Peter Maydell wrote:
+> Our current implementation of qemu_thread_atexit* is broken on OSX.
+> This is because it works by cerating a piece of thread-specific
+> data with pthread_key_create() and using the destructor function
+> for that data to run the notifier function passed to it by
+> the caller of qemu_thread_atexit_add(). The expected use case
+> is that the caller uses a __thread variable as the notifier,
+> and uses the callback to clean up information that it is
+> keeping per-thread in __thread variables.
 > 
->>> When I first looked at the ranges stuff in the string input visitor, I
->>> felt the urge to clean it up, then sat on my hands until it passed.
->>>
->>> The rest is reasonable once you understand how it works.  The learning
->>> curve is less than pleasant, though.
->>>
->>
->> Maybe I'll pick this up again when I have more time to invest.
->>
->> The general concept
->>
->> 1. of having an input visitor that is able to parse different types
->> (expected by e.g. a property) sounds sane to me.
->>
->> 2. of having a list of *something*, assuming it is int64_t, and assuming
->> it is to be parsed into a list of ranges sounds completely broken to me.
->>
->> I was not even able to find an example QEMU comand line for 2. Is this
->> maybe some very old code that nobody actually uses anymore? (who uses
->> list of ranges?)
+> Unfortunately, on OSX this does not work, because on OSX
+> a __thread variable may be destroyed (freed) before the
+> pthread_key_create() destructor runs. (POSIX imposes no
+> ordering constraint here; the OSX implementation happens
+> to implement __thread variables in terms of pthread_key_create((),
+> whereas Linux uses different mechanisms that mean the __thread
+> variables will still be present when the pthread_key_create()
+> destructor is run.)
 > 
-> I believe that the -numa node,cpus=first-last code is an example use of 
-> a list of ranges.  At any rate, tests/test-string-input-visitor.c has 
-> test_visitor_in_intList() to ensure we don't break back-compat with the 
-> existing clients that use ranges, as awkward as they may be.
+> Fix this by switching to a scheme similar to the one qemu-thread-win32
+> uses for qemu_thread_atexit: keep the thread's notifiers on a
+> __thread variable, and run the notifiers on calls to
+> qemu_thread_exit() and on return from the start routine passed
+> to qemu_thread_start(). We do this with the pthread_cleanup_push()
+> API. (This approach was suggested by Paolo.)
 > 
+> There is a slightly awkward corner here for the main thread,
+> which isn't started via qemu_thread_start() and so can exit
+> without passing through the cleanup handler. qemu-thread-win32.c
+> tries to handle the main thread using an atexit() handler to
+> run its notifiers. I don't think this will work because the atexit
+> handler may not run on the main thread, in which case notify
+> callback functions which refer to __thread variables will get
+> the wrong ones. So instead I have documented that the API
+> leaves it unspecified whether notifiers are run for thread
+> exits that happen when the entire process is exiting. This
+> is OK for our current users (who only use the callbacks to
+> clean up memory or win32 Fibers which are deleted on process
+> exit anyway), and means we don't need to worry about running
+> callbacks on main thread exit (which always causes the whole
+> process to exit).
+> 
+> In particular, this fixes the ASAN errors and lockups we
+> currently see on OSX hosts when running test-bdrv-drain.
 
-Indeed, thanks for the pointer. Ranges should indeed be supported. But
-maybe we can refactor this ugly "pre parse all uint64_t ranges" thingy.
+Queued, thanks.  As an extra cleanup we can remove
+qemu_thread_atexit_remove (it is unused, and a simple notifier_remove
+now works), and also remove the atexit from Win32 so we can document
+that the notifier does _not_ run for the main thread.
 
--- 
-
-Thanks,
-
-David / dhildenb
+Paolo
