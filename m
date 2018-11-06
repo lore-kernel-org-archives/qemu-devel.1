@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49333)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gK0l6-0004l5-K0
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:47:08 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gK0lC-0004nZ-BE
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:47:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gK0b8-0004Np-9t
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:36:48 -0500
-Received: from ozlabs.org ([203.11.71.1]:42903)
+	(envelope-from <pbonzini@redhat.com>) id 1gK0Yb-0008VS-Dx
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:34:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35462)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1gK0b7-000499-Ii
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:36:46 -0500
-Date: Tue, 6 Nov 2018 23:20:36 +1100
-From: 'David Gibson' <david@gibson.dropbear.id.au>
-Message-ID: <20181106122036.GA24589@umbus.fritz.box>
-References: <20181030093031.10131.17221.stgit@pasha-VirtualBox>
-	<20181103132509.GF24365@umbus.hotspot.internet-for-guests.com>
-	<003301d47597$749c0340$5dd409c0$@ru>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gK0Yb-0008Sm-6o
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:34:09 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5D6243097026
+	for <qemu-devel@nongnu.org>; Tue,  6 Nov 2018 12:34:08 +0000 (UTC)
+References: <1541069086-167036-1-git-send-email-imammedo@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <41c364e0-879d-bf6a-1df6-b95912c891a5@redhat.com>
+Date: Tue, 6 Nov 2018 13:34:02 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="zYM0uCDKw75PZbzx"
-Content-Disposition: inline
-In-Reply-To: <003301d47597$749c0340$5dd409c0$@ru>
-Subject: Re: [Qemu-devel] [PATCH] target/ppc: fix mtmsr instruction for
- icount
+In-Reply-To: <1541069086-167036-1-git-send-email-imammedo@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] ivshmem: fix memory backend leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,61 +33,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Cc: 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, maria.klimushenkova@ispras.ru, agraf@suse.de
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, armbru@redhat.com
 
+On 01/11/2018 11:44, Igor Mammedov wrote:
+> object_new() returns a new backend with refcount == 1 and
+> then later object_property_add_child() increases refcount to 2
+> So when ivshmem is desroyed, the backend it has created isn't
+> destroyed along with it as children cleanup will bring
+> backend's refcount only to 1, which leaks backend including
+> resources it is using.
+> 
+> Drop the original reference from object_new() once backend
+> is attached to its parent.
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+>  hw/misc/ivshmem.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
+> index f88910e..ecfd10a 100644
+> --- a/hw/misc/ivshmem.c
+> +++ b/hw/misc/ivshmem.c
+> @@ -1279,6 +1279,7 @@ static void desugar_shm(IVShmemState *s)
+>      object_property_set_bool(obj, true, "share", &error_abort);
+>      object_property_add_child(OBJECT(s), "internal-shm-backend", obj,
+>                                &error_abort);
+> +    object_unref(obj);
+>      user_creatable_complete(obj, &error_abort);
+>      s->hostmem = MEMORY_BACKEND(obj);
+>  }
+> 
 
---zYM0uCDKw75PZbzx
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Queued, thanks.
 
-On Tue, Nov 06, 2018 at 09:10:45AM +0300, Pavel Dovgalyuk wrote:
-> > From: David Gibson [mailto:david@gibson.dropbear.id.au]
-> > On Tue, Oct 30, 2018 at 12:30:31PM +0300, Pavel Dovgalyuk wrote:
-> > > This patch fixes processing of mtmsr instructions in icount mode.
-> > > In this mode writing to interrupt/peripheral state is controlled
-> > > by can_do_io flag. This flag must be set explicitly before helper
-> > > function invocation.
-> > >
-> > > Signed-off-by: Maria Klimushenkova <maria.klimushenkova@ispras.ru>
-> > > Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-> >=20
-> > Applied to ppc-for-3.1, thanks.
->=20
-> Thanks. What about this one
-> https://patchew.org/QEMU/20181030122134.11055.15711.stgit@pasha-VirtualBo=
-x/
-> There is a mess with the subject, but the code is ok :)
-
-I've been procrastinating on that because I don't understand icount
-well enough to review it easily, and no-one has replied with
-Reviewed-by or Tested-by.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---zYM0uCDKw75PZbzx
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlvhhxQACgkQbDjKyiDZ
-s5JAoA//Ta3MYeGjF5KeiaRMv//W9XNXs7WnspCDT/YTyODm49ypmMvDeCAk5afR
-nNfoKajGZBpRfMDKlbXsUNlvbxWRYSEMiR59ebxn2BFY7/cz3lw4s4wKwP7WCsEF
-l7a3ib3PMpodburtq3PCm+W2ZkaIomQSDu35SnV/LQs+hssXpiig27ztEld8eFj2
-rpc6RK5PVvHx5LaLDtz23FklZmmSjcfFgxFWYdtU2mUtnXH68JMXvu0IPgRxPLJK
-6pLn9M5D87TXlvaDzOtoNCQ3fEi8mMtt9eOAyyjod05evNZMDI0OW1N8YoBfMPgP
-Ff+tPCQtigBoYdskTH/W07Gi6cm52+ExMcnncePGqxOSZbcunGCsT23Bzyzpr99z
-w3ER4Y/Usdbhsy3uX5iaDMr//gG0QaWqTyWnJhoAOy5/TZvoW7aJQjMq36wtKqcL
-L4CXjlUwREGs235bXeCyGbMeEld1tcgwkYRSyLgGPGTPWcrJO6wu1uUvJmk2Ixy3
-H6FDnhB85SiQJCJ+S/XzCDz2bXHZGGsTcyjF7QuRSZLkjFyT1W9ZrGHa6nJNX7Gh
-8+lInDkrR1UQR08GpntVj2U4tuKicnCN6LikU4Fh8SABA2ukk4UTFK1AuxmezsKr
-KCpG2YSV6X+yHpRKbs9Cj3SoPUJ7rQ1B5LQOFnvkxdKud7gsSOc=
-=byHL
------END PGP SIGNATURE-----
-
---zYM0uCDKw75PZbzx--
+Paolo
