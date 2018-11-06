@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47431)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1gK3f5-0005gz-Vk
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:53:04 -0500
+	(envelope-from <danielhb413@gmail.com>) id 1gK3gH-0008AW-D5
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:54:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1gK3f2-0006yU-Dr
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:53:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45198)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1gK3f2-0006sM-6N
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:53:00 -0500
-Date: Tue, 6 Nov 2018 15:52:57 +0000
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20181106155257.GB14842@redhat.com>
-References: <ae2d0fbd-5198-47e8-9ad2-40a85f0b3576@default>
-	<bd913c1b-fcbe-b198-3955-4b4b2e33757a@redhat.com>
-	<fef3b167-0d69-d61d-418b-535fb6d36dfc@oracle.com>
-	<20181106091457.GC4080@redhat.com>
-	<20181106094306.GA14842@redhat.com>
+	(envelope-from <danielhb413@gmail.com>) id 1gK3gG-0008Mu-HR
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:54:17 -0500
+Received: from mail-qt1-x841.google.com ([2607:f8b0:4864:20::841]:36010)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <danielhb413@gmail.com>)
+	id 1gK3gG-0008Lo-CF
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:54:16 -0500
+Received: by mail-qt1-x841.google.com with SMTP id u34-v6so3120216qth.3
+	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 07:54:16 -0800 (PST)
+References: <20181029173437.32559-1-pbonzini@redhat.com>
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
+Message-ID: <fa37541c-a2a8-8bbc-6114-e15b650da020@gmail.com>
+Date: Tue, 6 Nov 2018 13:54:12 -0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181106094306.GA14842@redhat.com>
-Subject: Re: [Qemu-devel] [Libguestfs] How to emulate block I/O timeout on
- qemu side?
+In-Reply-To: <20181029173437.32559-1-pbonzini@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 0/4] scsi-generic: fixes for Block Limits
+ emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,26 +31,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dongli Zhang <dongli.zhang@oracle.com>
-Cc: jsnow@redhat.com, qemu-devel@nongnu.org, libguestfs <libguestfs@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com
 
-On Tue, Nov 06, 2018 at 09:43:06AM +0000, Richard W.M. Jones wrote:
-> On Tue, Nov 06, 2018 at 09:14:57AM +0000, Richard W.M. Jones wrote:
-> > This link shows how to combine delay and error filters together:
-> > 
-> >   https://rwmj.wordpress.com/2018/11/04/nbd-graphical-viewer/
-> 
-> Oops, that's in a forthcoming blog post not this one.  Not enough
-> caffeine this morning.
+Hi,
 
-Up now:
+How did you find all those issues, Max? First patch is something that
+I missed out from the SCSI spec (ordering of the VPD pages)
+and could have been detected by code inspection,  but I am curious about
+the other fixes.
 
-https://rwmj.wordpress.com/2018/11/06/nbd-graphical-viewer-raid-5-edition/
 
-Rich.
+Thanks,
 
--- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-libguestfs lets you edit virtual machines.  Supports shell scripting,
-bindings from many languages.  http://libguestfs.org
+
+Daniel
+
+On 10/29/18 2:34 PM, Paolo Bonzini wrote:
+> scsi-generic (pass through) devices are able to inject an artificial Block
+> Limits VPD page in order to communicate host HBA limits to the guest.
+> However, Max Reitz found a few issues with the implementation of this
+> feature; this series should fix them all.
+>
+> Paolo
+>
+> Paolo Bonzini (4):
+>    scsi-generic: keep VPD page list sorted
+>    scsi-generic: avoid out-of-bounds access to VPD page list
+>    scsi-generic: avoid invalid access to struct when emulating block
+>      limits
+>    scsi-generic: do not do VPD emulation for sense other than
+>      ILLEGAL_REQUEST
+>
+>   hw/scsi/Makefile.objs       |  2 +-
+>   hw/scsi/emulation.c         | 42 +++++++++++++++++
+>   hw/scsi/scsi-disk.c         | 92 ++++++++-----------------------------
+>   hw/scsi/scsi-generic.c      | 51 +++++++++++++++-----
+>   include/hw/scsi/emulation.h | 16 +++++++
+>   include/hw/scsi/scsi.h      |  1 -
+>   6 files changed, 119 insertions(+), 85 deletions(-)
+>   create mode 100644 hw/scsi/emulation.c
+>   create mode 100644 include/hw/scsi/emulation.h
+>
