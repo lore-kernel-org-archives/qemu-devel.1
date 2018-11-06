@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45697)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46056)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gK6pA-0008Ln-UT
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 14:15:44 -0500
+	(envelope-from <philmd@redhat.com>) id 1gK6pj-00007G-Pv
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 14:16:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gK6ov-0003Ly-1z
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 14:15:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43932)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gK6os-000349-9I
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 14:15:23 -0500
-References: <1541019806-17696-1-git-send-email-george.kennedy@oracle.com>
-	<a02c97ee-964b-45da-e585-ed1d190ed591@redhat.com>
-	<5BE1E7D7.7020006@oracle.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <13433232-aa9b-2bf3-a60c-a589f7e83682@redhat.com>
-Date: Tue, 6 Nov 2018 20:15:12 +0100
+	(envelope-from <philmd@redhat.com>) id 1gK6pe-000594-F6
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 14:16:15 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:45202)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gK6pc-00053g-C6
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 14:16:10 -0500
+Received: by mail-wr1-f67.google.com with SMTP id k15-v6so11843756wre.12
+	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 11:16:06 -0800 (PST)
+References: <CAFEAcA9pvsNML+=2jwygO4ciJWr0GmWHznJ-Lb1bcOsWhYjo4A@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <30bb371d-4183-dd25-3413-08fd60a9eeea@redhat.com>
+Date: Tue, 6 Nov 2018 20:16:04 +0100
 MIME-Version: 1.0
-In-Reply-To: <5BE1E7D7.7020006@oracle.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CAFEAcA9pvsNML+=2jwygO4ciJWr0GmWHznJ-Lb1bcOsWhYjo4A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4] lsi_scsi: Reselection needed to remove
- pending commands from queue
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] List of files containing devices which have not
+ been QOMified
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,25 +30,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: george kennedy <george.kennedy@oracle.com>
-Cc: famz@redhat.com, qemu-devel@nongnu.org, boris.ostrovsky@oracle.com
+To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 06/11/2018 20:13, george kennedy wrote:
->=20
-> On 11/6/2018 1:58 PM, Paolo Bonzini wrote:
->> On 31/10/2018 22:03, George Kennedy wrote:
->>> +#define SCRIPTS_LOAD_AND_STORE=C2=A0 0xe2340004
->> I'm very confused.=C2=A0 Why did this constant reappear?
->=20
-> Ok. Me too.
->=20
-> What are you proposing instead and I'll change it to that?
->=20
-> Did I have what you're after in a prior patch? If so, can you point to
-> that clip?
+On 6/11/18 19:43, Peter Maydell wrote:
+> I had an idea for how to get a rough list of source files
+> containing devices that haven't been QOMified. The theory
+> is that a pre-QOM device generally has an "init" function
+> which allocates memory for the device struct. So looking in
+> hw/ for files which call g_new*() or g_malloc*() should get
+> us all the non-QOM devices (as well as a pile of false
+> positives, of course). The following link is the result of
+> doing that and then eyeballing the results for false positives
+> and throwing those out. It might have missed one or two
+> files or included one or two by mistake. But I think it's
+> pretty close, and it seems to have caught all the obvious
+> ones I knew about. There are 61 files on this list.
+> 
+> I am also suspicious about hw/bt/ but don't know enough
+> about that subsystem to say if it could benefit from
+> using QOM objects more.
+> 
 
-No.  You need to do what you're doing here after the WAIT DISCONNECT
-command (which, as far as I can see, comes before the LOAD AND STORE
-you're looking for).  I wrote that in the reply to v3 I think.
+> hw/arm/exynos4210.c
+I already did this one.
 
-Paolo
+ > hw/sd/omap_mmc.c
+I will do this one.
+
+ > hw/mips/mips_malta.c
+ > hw/timer/mips_gictimer.c
+I'm interested in doing those two.
+
+> hw/char/parallel.c
+> hw/char/serial.c
+> hw/display/vga-isa-mm.c
+> hw/input/pckbd.c
+> hw/input/ps2.c
+I can do those too when QOM'ifying the Malta.
+
+> hw/char/sh_serial.c
+> hw/sh4/r2d.c
+> hw/sh4/sh7750.c
+ > hw/timer/sh_timer.c
+If nobody volonteers, I can take those.
+
+Regards,
+
+Phil.
