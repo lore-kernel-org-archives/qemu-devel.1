@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36126)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37040)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gK34V-00058q-Uo
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:15:16 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gK37f-000109-Nt
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:18:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gK34R-0006Rz-Ls
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:15:15 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:38160)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gK34R-0006QN-FF
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:15:11 -0500
-Received: by mail-wm1-f65.google.com with SMTP id l2-v6so12366145wmh.3
-	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 07:15:11 -0800 (PST)
-References: <20181105181353.39804-1-mst@redhat.com>
-	<20181105181353.39804-3-mst@redhat.com>
-	<a21e8e21-d056-1e9a-3726-54f8ce24a162@redhat.com>
-	<20181106091147-mutt-send-email-mst@kernel.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <4b68930c-1fc3-9462-8f9e-671b414e712d@redhat.com>
-Date: Tue, 6 Nov 2018 16:15:03 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181106091147-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gK37R-0002OD-Sf
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 10:18:25 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 6 Nov 2018 15:18:08 +0000
+Message-ID: <e4d6f89f-5d27-7456-1f4c-adf8ec377faf@virtuozzo.com>
+References: <20181101182738.70462-1-vsementsov@virtuozzo.com>
+	<20181101182738.70462-6-vsementsov@virtuozzo.com>
+	<w51a7mme2im.fsf@maestria.local.igalia.com>
+In-Reply-To: <w51a7mme2im.fsf@maestria.local.igalia.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL 02/33] tests: Move
- tests/hex-loader-check-data/ to tests/data/hex-loader/
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <61B374E08B82DE40BE656E3214E63E8C@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 5/7] qcow2: use byte-based
+ read in qcow2_decompress_cluster
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,97 +27,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Su Hang <suhang16@mails.ucas.ac.cn>, Paolo Bonzini <pbonzini@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>, "mreitz@redhat.com" <mreitz@redhat.com>
 
-On 6/11/18 15:13, Michael S. Tsirkin wrote:
-> On Tue, Nov 06, 2018 at 02:27:18PM +0100, Philippe Mathieu-Daudé wrote:
->> On 5/11/18 19:14, Michael S. Tsirkin wrote:
->>> From: Peter Maydell <peter.maydell@linaro.org>
->>>
->>> Currently tests/hex-loader-check-data contains data files used
->>> by the hexloader-test, and configure individually symlinks those
->>> data files into the build directory using a wildcard.
->>>
->>> Using a wildcard like this is a bad idea, because if a new
->>> data file is added, nothing causes configure to be rerun,
->>> and so no symlink is added for the new file. This can cause
->>> tests to spuriously fail when they can't find their data.
->>> Instead, it's better to symlink an entire directory of
->>> data files. We already have such a directory: tests/data.
->>>
->>> Move the data files from tests/hex-loader-check-data/ to
->>> tests/data/hex-loader/, and remove the unnecessary symlinking.
->>>
->>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->>
->> I reviewed/tested this patch too.
-> 
-> 
-> Thanks a lot Philippe!
-> It is unfortunately too late to update this patch info in git
-> commit history, however your help is still greatly appreciated!
-
-No worry, I'm not mad at all, but there might be an issue in your git PR 
-workflow, this series also missed your maintainer S-o-b.
-
-Peter: Can you add a such check in your scripts? (during next merge 
-window, no hurry).
-
-Rather than your scripts, this should be in scripts a maintainer can run 
-locally, such ./scripts/checkpatch.pl --maintainer or 
-./scripts/checkseries.xx.
-
-> 
-> 
->>> ---
->>>    configure                                                 | 4 ----
->>>    tests/hexloader-test.c                                    | 2 +-
->>>    MAINTAINERS                                               | 2 +-
->>>    tests/{hex-loader-check-data => data/hex-loader}/test.hex | 0
->>>    4 files changed, 2 insertions(+), 6 deletions(-)
->>>    rename tests/{hex-loader-check-data => data/hex-loader}/test.hex (100%)
->>>
->>> diff --git a/configure b/configure
->>> index 895b7483b8..bfdca8b814 100755
->>> --- a/configure
->>> +++ b/configure
->>> @@ -7421,10 +7421,6 @@ for bios_file in \
->>>    do
->>>        FILES="$FILES pc-bios/$(basename $bios_file)"
->>>    done
->>> -for test_file in $(find $source_path/tests/hex-loader-check-data -type f)
->>> -do
->>> -    FILES="$FILES tests/hex-loader-check-data$(echo $test_file | sed -e 's/.*hex-loader-check-data//')"
->>> -done
->>>    mkdir -p $DIRS
->>>    for f in $FILES ; do
->>>        if [ -e "$source_path/$f" ] && [ "$pwd_is_source_path" != "y" ]; then
->>> diff --git a/tests/hexloader-test.c b/tests/hexloader-test.c
->>> index b653d44ba1..834ed52c22 100644
->>> --- a/tests/hexloader-test.c
->>> +++ b/tests/hexloader-test.c
->>> @@ -23,7 +23,7 @@ static void hex_loader_test(void)
->>>        const unsigned int base_addr = 0x00010000;
->>>        QTestState *s = qtest_initf(
->>> -        "-M vexpress-a9 -nographic -device loader,file=tests/hex-loader-check-data/test.hex");
->>> +        "-M vexpress-a9 -nographic -device loader,file=tests/data/hex-loader/test.hex");
->>>        for (i = 0; i < 256; ++i) {
->>>            uint8_t val = qtest_readb(s, base_addr + i);
->>> diff --git a/MAINTAINERS b/MAINTAINERS
->>> index 98a1856afc..cfabc14b59 100644
->>> --- a/MAINTAINERS
->>> +++ b/MAINTAINERS
->>> @@ -1370,7 +1370,7 @@ Intel Hexadecimal Object File Loader
->>>    M: Su Hang <suhang16@mails.ucas.ac.cn>
->>>    S: Maintained
->>>    F: tests/hexloader-test.c
->>> -F: tests/hex-loader-check-data/test.hex
->>> +F: tests/data/hex-loader/test.hex
->>>    CHRP NVRAM
->>>    M: Thomas Huth <thuth@redhat.com>
->>> diff --git a/tests/hex-loader-check-data/test.hex b/tests/data/hex-loader/test.hex
->>> similarity index 100%
->>> rename from tests/hex-loader-check-data/test.hex
->>> rename to tests/data/hex-loader/test.hex
->>>
+MDYuMTEuMjAxOCAxNjo1MywgQWxiZXJ0byBHYXJjaWEgd3JvdGU6DQo+IE9uIFRodSAwMSBOb3Yg
+MjAxOCAwNzoyNzozNiBQTSBDRVQsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6
+DQo+DQo+PiBkaWZmIC0tZ2l0IGEvYmxvY2svcWNvdzIuYyBiL2Jsb2NrL3Fjb3cyLmMNCj4+IGlu
+ZGV4IGU5ZDI0YjgwMWUuLjk1MGI5ZjdlYzYgMTAwNjQ0DQo+PiAtLS0gYS9ibG9jay9xY293Mi5j
+DQo+PiArKysgYi9ibG9jay9xY293Mi5jDQo+PiBAQCAtMzk1NiwxNCArMzk1NiwxNSBAQCBmYWls
+Og0KPj4gICBpbnQgcWNvdzJfZGVjb21wcmVzc19jbHVzdGVyKEJsb2NrRHJpdmVyU3RhdGUgKmJz
+LCB1aW50NjRfdCBjbHVzdGVyX29mZnNldCkNCj4+ICAgew0KPj4gICAgICAgQkRSVlFjb3cyU3Rh
+dGUgKnMgPSBicy0+b3BhcXVlOw0KPj4gLSAgICBpbnQgcmV0LCBjc2l6ZSwgbmJfY3NlY3RvcnMs
+IHNlY3Rvcl9vZmZzZXQ7DQo+PiArICAgIGludCByZXQsIGNzaXplLCBuYl9jc2VjdG9yczsNCj4+
+ICAgICAgIHVpbnQ2NF90IGNvZmZzZXQ7DQo+PiArICAgIHN0cnVjdCBpb3ZlYyBpb3Y7DQo+PiAr
+ICAgIFFFTVVJT1ZlY3RvciBsb2NhbF9xaW92Ow0KPj4gICANCj4+ICAgICAgIGNvZmZzZXQgPSBj
+bHVzdGVyX29mZnNldCAmIHMtPmNsdXN0ZXJfb2Zmc2V0X21hc2s7DQo+PiAgICAgICBpZiAocy0+
+Y2x1c3Rlcl9jYWNoZV9vZmZzZXQgIT0gY29mZnNldCkgew0KPj4gICAgICAgICAgIG5iX2NzZWN0
+b3JzID0gKChjbHVzdGVyX29mZnNldCA+PiBzLT5jc2l6ZV9zaGlmdCkgJiBzLT5jc2l6ZV9tYXNr
+KSArIDE7DQo+PiAtICAgICAgICBzZWN0b3Jfb2Zmc2V0ID0gY29mZnNldCAmIDUxMTsNCj4+IC0g
+ICAgICAgIGNzaXplID0gbmJfY3NlY3RvcnMgKiA1MTIgLSBzZWN0b3Jfb2Zmc2V0Ow0KPj4gKyAg
+ICAgICAgY3NpemUgPSBuYl9jc2VjdG9ycyAqIDUxMiAtIChjb2Zmc2V0ICYgNTExKTsNCj4+ICAg
+DQo+PiAgICAgICAgICAgLyogQWxsb2NhdGUgYnVmZmVycyBvbiBmaXJzdCBkZWNvbXByZXNzIG9w
+ZXJhdGlvbiwgbW9zdCBpbWFnZXMgYXJlDQo+PiAgICAgICAgICAgICogdW5jb21wcmVzc2VkIGFu
+ZCB0aGUgbWVtb3J5IG92ZXJoZWFkIGNhbiBiZSBhdm9pZGVkLiAgVGhlIGJ1ZmZlcnMNCj4+IEBA
+IC0zOTgxLDE0ICszOTgyLDE3IEBAIGludCBxY293Ml9kZWNvbXByZXNzX2NsdXN0ZXIoQmxvY2tE
+cml2ZXJTdGF0ZSAqYnMsIHVpbnQ2NF90IGNsdXN0ZXJfb2Zmc2V0KQ0KPj4gICAgICAgICAgICAg
+ICBzLT5jbHVzdGVyX2NhY2hlID0gZ19tYWxsb2Mocy0+Y2x1c3Rlcl9zaXplKTsNCj4+ICAgICAg
+ICAgICB9DQo+PiAgIA0KPj4gKyAgICAgICAgaW92Lmlvdl9iYXNlID0gcy0+Y2x1c3Rlcl9kYXRh
+Ow0KPj4gKyAgICAgICAgaW92Lmlvdl9sZW4gPSBjc2l6ZTsNCj4+ICsgICAgICAgIHFlbXVfaW92
+ZWNfaW5pdF9leHRlcm5hbCgmbG9jYWxfcWlvdiwgJmlvdiwgMSk7DQo+PiArDQo+PiAgICAgICAg
+ICAgQkxLREJHX0VWRU5UKGJzLT5maWxlLCBCTEtEQkdfUkVBRF9DT01QUkVTU0VEKTsNCj4+IC0g
+ICAgICAgIHJldCA9IGJkcnZfcmVhZChicy0+ZmlsZSwgY29mZnNldCA+PiA5LCBzLT5jbHVzdGVy
+X2RhdGEsDQo+PiAtICAgICAgICAgICAgICAgICAgICAgICAgbmJfY3NlY3RvcnMpOw0KPj4gKyAg
+ICAgICAgcmV0ID0gYmRydl9jb19wcmVhZHYoYnMtPmZpbGUsIGNvZmZzZXQsIGNzaXplLCAmbG9j
+YWxfcWlvdiwNCj4+IDApOw0KPiBJIHRoaW5rIHlvdSBzaG91bGQgYW5ub3RhdGUgdGhlIGZ1bmN0
+aW9uIHdpdGggY29yb3V0aW5lX2ZuIG9yIHVzZQ0KPiBiZHJ2X3ByZWFkKCkgaW5zdGVhZC4NCj4N
+Cj4gQmVydG8NCg0KaXQgaXMgY2FsbGVkIG9ubHkgZnJvbSBxY293Ml9jb19wcmVhZHYsIHNvIGl0
+J3Mgb2sgdG8gbW92ZSB0byANCmFscmVhZHktaW4tY29yb3V0aW5lIGJlaGF2aW91ci4gSSdsbCBh
+ZGQgY29yb3V0aW5lX2ZuIGlmIG5ldyB2ZXJzaW9uIGlzIA0KbmVlZGVkLCBvciBpdCBjYW4gYmUg
+YWRkZWQgaW5mbGlnaHQuDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg0K
