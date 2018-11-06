@@ -1,30 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50678)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gK3o5-0005m8-2S
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 11:02:26 -0500
+	(envelope-from <dongli.zhang@oracle.com>) id 1gK3tQ-0002Bu-ET
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 11:07:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gK3nx-0000rm-E7
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 11:02:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47134)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gK3nw-0000nV-G4
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 11:02:12 -0500
-Date: Tue, 6 Nov 2018 11:02:04 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181106105759-mutt-send-email-mst@kernel.org>
-References: <20181105181353.39804-1-mst@redhat.com>
-	<20181105181353.39804-3-mst@redhat.com>
-	<a21e8e21-d056-1e9a-3726-54f8ce24a162@redhat.com>
-	<20181106091147-mutt-send-email-mst@kernel.org>
-	<4b68930c-1fc3-9462-8f9e-671b414e712d@redhat.com>
-	<CAFEAcA9R9kTfznkvdFf9Eqtp80NFAt3Gd1cjooRpr2bZ6TsJiQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9R9kTfznkvdFf9Eqtp80NFAt3Gd1cjooRpr2bZ6TsJiQ@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 02/33] tests: Move
- tests/hex-loader-check-data/ to tests/data/hex-loader/
+	(envelope-from <dongli.zhang@oracle.com>) id 1gK3tO-0007zl-MQ
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 11:07:52 -0500
+From: Dongli Zhang <dongli.zhang@oracle.com>
+Date: Wed,  7 Nov 2018 00:09:16 +0800
+Message-Id: <1541520556-8334-1-git-send-email-dongli.zhang@oracle.com>
+Subject: [Qemu-devel] [PATCH 1/1] virtio-blk: rename iov to out_iov in
+ virtio_blk_handle_request()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,37 +18,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Su Hang <suhang16@mails.ucas.ac.cn>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com, mst@redhat.com, kwolf@redhat.com, mreitz@redhat.com
 
-On Tue, Nov 06, 2018 at 03:31:08PM +0000, Peter Maydell wrote:
-> On 6 November 2018 at 15:15, Philippe Mathieu-Daud=E9 <philmd@redhat.co=
-m> wrote:
-> > No worry, I'm not mad at all, but there might be an issue in your git=
- PR
-> > workflow, this series also missed your maintainer S-o-b.
-> >
-> > Peter: Can you add a such check in your scripts? (during next merge w=
-indow,
-> > no hurry).
-> >
-> > Rather than your scripts, this should be in scripts a maintainer can =
-run
-> > locally, such ./scripts/checkpatch.pl --maintainer or
-> > ./scripts/checkseries.xx.
->=20
-> I have such a check in my own make-pullreq script which I use
-> for arm pull requests:
-> https://git.linaro.org/people/peter.maydell/misc-scripts.git/tree/make-=
-pullreq#n98
->=20
-> I can't do much about other submaintainers' workflows
-> (and the block tree's "sub-submaintainers" setup means
-> "check all commits have a signoff from the same person as
-> the merge commit did" won't work either.)
->=20
-> thanks
-> -- PMM
+In virtio_blk_handle_request(), in_iov is used for input header while iov
+is used for output header. Rename iov to out_iov to pair output header's
+name with in_iov to avoid confusing people when reading source code.
 
-I don't have anything validating that but I agree it's a good idea.
-Will add, thanks!
+Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+---
+ hw/block/virtio-blk.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+index 83cf5c0..fb0d74d 100644
+--- a/hw/block/virtio-blk.c
++++ b/hw/block/virtio-blk.c
+@@ -482,7 +482,7 @@ static int virtio_blk_handle_request(VirtIOBlockReq *req, MultiReqBuffer *mrb)
+ {
+     uint32_t type;
+     struct iovec *in_iov = req->elem.in_sg;
+-    struct iovec *iov = req->elem.out_sg;
++    struct iovec *out_iov = req->elem.out_sg;
+     unsigned in_num = req->elem.in_num;
+     unsigned out_num = req->elem.out_num;
+     VirtIOBlock *s = req->dev;
+@@ -493,13 +493,13 @@ static int virtio_blk_handle_request(VirtIOBlockReq *req, MultiReqBuffer *mrb)
+         return -1;
+     }
+ 
+-    if (unlikely(iov_to_buf(iov, out_num, 0, &req->out,
++    if (unlikely(iov_to_buf(out_iov, out_num, 0, &req->out,
+                             sizeof(req->out)) != sizeof(req->out))) {
+         virtio_error(vdev, "virtio-blk request outhdr too short");
+         return -1;
+     }
+ 
+-    iov_discard_front(&iov, &out_num, sizeof(req->out));
++    iov_discard_front(&out_iov, &out_num, sizeof(req->out));
+ 
+     if (in_iov[in_num - 1].iov_len < sizeof(struct virtio_blk_inhdr)) {
+         virtio_error(vdev, "virtio-blk request inhdr too short");
+@@ -526,7 +526,7 @@ static int virtio_blk_handle_request(VirtIOBlockReq *req, MultiReqBuffer *mrb)
+                                        &req->out.sector);
+ 
+         if (is_write) {
+-            qemu_iovec_init_external(&req->qiov, iov, out_num);
++            qemu_iovec_init_external(&req->qiov, out_iov, out_num);
+             trace_virtio_blk_handle_write(vdev, req, req->sector_num,
+                                           req->qiov.size / BDRV_SECTOR_SIZE);
+         } else {
+-- 
+2.7.4
