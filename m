@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48883)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gJzBf-0006KP-8t
+	(envelope-from <luc.michel@greensocs.com>) id 1gJzBf-0006KT-9u
 	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 06:06:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gJzBb-0000ty-3E
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 06:06:22 -0500
+	(envelope-from <luc.michel@greensocs.com>) id 1gJzBe-0000vR-9D
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 06:06:23 -0500
 From: Luc Michel <luc.michel@greensocs.com>
-Date: Tue,  6 Nov 2018 12:05:37 +0100
-Message-Id: <20181106110548.4209-6-luc.michel@greensocs.com>
+Date: Tue,  6 Nov 2018 12:05:41 +0100
+Message-Id: <20181106110548.4209-10-luc.michel@greensocs.com>
 In-Reply-To: <20181106110548.4209-1-luc.michel@greensocs.com>
 References: <20181106110548.4209-1-luc.michel@greensocs.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 05/16] gdbstub: add multiprocess support to
- vCont packets
+Subject: [Qemu-devel] [PATCH v4 09/16] gdbstub: add multiprocess support to
+ gdb_vm_state_change()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,213 +26,82 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Luc Michel <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, alistair@alistair23.me, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, mark.burton@greensocs.com, Eduardo Habkost <ehabkost@redhat.com>
 
-Add the gdb_first_cpu() and gdb_next_cpu() to iterate over all
-the CPUs in currently attached processes.
-
-Add the gdb_first_cpu_in_process() and gdb_next_cpu_in_process() to
-iterate over CPUs of a given process.
-
-Use them to add multiprocess extension support to vCont packets.
+Add support for multiprocess extension in gdb_vm_state_change()
+function.
 
 Signed-off-by: Luc Michel <luc.michel@greensocs.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- gdbstub.c | 117 +++++++++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 102 insertions(+), 15 deletions(-)
+ gdbstub.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index 598a89b3ba..ba8b1a3413 100644
+index aae3cce01a..decf56c610 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -716,10 +716,40 @@ static CPUState *find_cpu(uint32_t thread_id)
-     }
-=20
-     return NULL;
- }
-=20
-+static CPUState *get_first_cpu_in_process(const GDBState *s,
-+                                          GDBProcess *process)
-+{
-+    CPUState *cpu;
-+
-+    CPU_FOREACH(cpu) {
-+        if (gdb_get_cpu_pid(s, cpu) =3D=3D process->pid) {
-+            return cpu;
-+        }
-+    }
-+
-+    return NULL;
-+}
-+
-+static CPUState *gdb_next_cpu_in_process(const GDBState *s, CPUState *cp=
-u)
-+{
-+    uint32_t pid =3D gdb_get_cpu_pid(s, cpu);
-+    cpu =3D CPU_NEXT(cpu);
-+
-+    while (cpu) {
-+        if (gdb_get_cpu_pid(s, cpu) =3D=3D pid) {
-+            break;
-+        }
-+
-+        cpu =3D CPU_NEXT(cpu);
-+    }
-+
-+    return cpu;
-+}
-+
- static CPUState *gdb_get_cpu(const GDBState *s, uint32_t pid, uint32_t t=
-id)
+@@ -1713,10 +1713,11 @@ void gdb_set_stop_cpu(CPUState *cpu)
+ static void gdb_vm_state_change(void *opaque, int running, RunState stat=
+e)
  {
-     GDBProcess *process;
-     CPUState *cpu =3D find_cpu(tid);
+     GDBState *s =3D gdbserver_state;
+     CPUState *cpu =3D s->c_cpu;
+     char buf[256];
++    char thread_id[16];
+     const char *type;
+     int ret;
 =20
-@@ -743,10 +773,41 @@ static CPUState *gdb_get_cpu(const GDBState *s, uin=
-t32_t pid, uint32_t tid)
+     if (running || s->state =3D=3D RS_INACTIVE) {
+         return;
+@@ -1724,10 +1725,18 @@ static void gdb_vm_state_change(void *opaque, int=
+ running, RunState state)
+     /* Is there a GDB syscall waiting to be sent?  */
+     if (s->current_syscall_cb) {
+         put_packet(s, s->syscall_buf);
+         return;
      }
-=20
-     return cpu;
- }
-=20
-+/* Return the cpu following @cpu, while ignoring
-+ * unattached processes.
-+ */
-+static CPUState *gdb_next_cpu(const GDBState *s, CPUState *cpu)
-+{
-+    cpu =3D CPU_NEXT(cpu);
 +
-+    while (cpu) {
-+        if (gdb_get_cpu_process(s, cpu)->attached) {
-+            break;
-+        }
-+
-+        cpu =3D CPU_NEXT(cpu);
++    if (cpu =3D=3D NULL) {
++        /* No process attached */
++        return;
 +    }
 +
-+    return cpu;
-+}
++    gdb_fmt_thread_id(s, cpu, thread_id, sizeof(thread_id));
 +
-+/* Return the first attached cpu */
-+static CPUState *gdb_first_cpu(const GDBState *s)
-+{
-+    CPUState *cpu =3D first_cpu;
-+    GDBProcess *process =3D gdb_get_cpu_process(s, cpu);
-+
-+    if (!process->attached) {
-+        return gdb_next_cpu(s, cpu);
-+    }
-+
-+    return cpu;
-+}
-+
- static const char *get_feature_xml(const char *p, const char **newp,
-                                    CPUClass *cc)
- {
-     size_t len;
-     int i;
-@@ -1081,14 +1142,16 @@ static int is_query_packet(const char *p, const c=
-har *query, char separator)
-  * returns -ENOTSUP if a command is unsupported, -EINVAL or -ERANGE if t=
-here is
-  *         a format error, 0 on success.
-  */
- static int gdb_handle_vcont(GDBState *s, const char *p)
- {
--    int res, idx, signal =3D 0;
-+    int res, signal =3D 0;
-     char cur_action;
-     char *newstates;
-     unsigned long tmp;
-+    uint32_t pid, tid;
-+    GDBProcess *process;
-     CPUState *cpu;
- #ifdef CONFIG_USER_ONLY
-     int max_cpus =3D 1; /* global variable max_cpus exists only in syste=
-m mode */
-=20
-     CPU_FOREACH(cpu) {
-@@ -1127,29 +1190,52 @@ static int gdb_handle_vcont(GDBState *s, const ch=
-ar *p)
-         } else if (cur_action !=3D 'c' && cur_action !=3D 's') {
-             /* unknown/invalid/unsupported command */
-             res =3D -ENOTSUP;
-             goto out;
-         }
--        /* thread specification. special values: (none), -1 =3D all; 0 =3D=
- any */
--        if ((p[0] =3D=3D ':' && p[1] =3D=3D '-' && p[2] =3D=3D '1') || (=
-p[0] !=3D ':')) {
--            if (*p =3D=3D ':') {
--                p +=3D 3;
--            }
--            for (idx =3D 0; idx < max_cpus; idx++) {
--                if (newstates[idx] =3D=3D 1) {
--                    newstates[idx] =3D cur_action;
-+
-+        if (*p++ !=3D ':') {
-+            res =3D -ENOTSUP;
-+            goto out;
-+        }
-+
-+        switch (read_thread_id(p, &p, &pid, &tid)) {
-+        case GDB_READ_THREAD_ERR:
-+            res =3D -EINVAL;
-+            goto out;
-+
-+        case GDB_ALL_PROCESSES:
-+            cpu =3D gdb_first_cpu(s);
-+            while (cpu) {
-+                if (newstates[cpu->cpu_index] =3D=3D 1) {
-+                    newstates[cpu->cpu_index] =3D cur_action;
-                 }
-+
-+                cpu =3D gdb_next_cpu(s, cpu);
+     switch (state) {
+     case RUN_STATE_DEBUG:
+         if (cpu->watchpoint_hit) {
+             switch (cpu->watchpoint_hit->flags & BP_MEM_ACCESS) {
+             case BP_MEM_READ:
+@@ -1741,12 +1750,12 @@ static void gdb_vm_state_change(void *opaque, int=
+ running, RunState state)
+                 break;
              }
--        } else if (*p =3D=3D ':') {
--            p++;
--            res =3D qemu_strtoul(p, &p, 16, &tmp);
--            if (res) {
-+            break;
-+
-+        case GDB_ALL_THREADS:
-+            process =3D gdb_get_process(s, pid);
-+
-+            if (!process->attached) {
-+                res =3D -EINVAL;
-                 goto out;
-             }
-=20
--            /* 0 means any thread, so we pick the first valid CPU */
--            cpu =3D tmp ? find_cpu(tmp) : first_cpu;
-+            cpu =3D get_first_cpu_in_process(s, process);
-+            while (cpu) {
-+                if (newstates[cpu->cpu_index] =3D=3D 1) {
-+                    newstates[cpu->cpu_index] =3D cur_action;
-+                }
-+
-+                cpu =3D gdb_next_cpu_in_process(s, cpu);
-+            }
-+            break;
-+
-+        case GDB_ONE_THREAD:
-+            cpu =3D gdb_get_cpu(s, pid, tid);
-=20
-             /* invalid CPU/thread specified */
-             if (!cpu) {
-                 res =3D -EINVAL;
-                 goto out;
-@@ -1157,10 +1243,11 @@ static int gdb_handle_vcont(GDBState *s, const ch=
-ar *p)
-=20
-             /* only use if no previous match occourred */
-             if (newstates[cpu->cpu_index] =3D=3D 1) {
-                 newstates[cpu->cpu_index] =3D cur_action;
-             }
-+            break;
-         }
+             trace_gdbstub_hit_watchpoint(type, cpu_gdb_index(cpu),
+                     (target_ulong)cpu->watchpoint_hit->vaddr);
+             snprintf(buf, sizeof(buf),
+-                     "T%02xthread:%02x;%swatch:" TARGET_FMT_lx ";",
+-                     GDB_SIGNAL_TRAP, cpu_gdb_index(cpu), type,
++                     "T%02xthread:%s;%swatch:" TARGET_FMT_lx ";",
++                     GDB_SIGNAL_TRAP, thread_id, type,
+                      (target_ulong)cpu->watchpoint_hit->vaddr);
+             cpu->watchpoint_hit =3D NULL;
+             goto send_packet;
+         } else {
+             trace_gdbstub_hit_break();
+@@ -1784,11 +1793,11 @@ static void gdb_vm_state_change(void *opaque, int=
+ running, RunState state)
+         trace_gdbstub_hit_unknown(state);
+         ret =3D GDB_SIGNAL_UNKNOWN;
+         break;
      }
-     s->signal =3D signal;
-     gdb_continue_partial(s, newstates);
+     gdb_set_stop_cpu(cpu);
+-    snprintf(buf, sizeof(buf), "T%02xthread:%02x;", ret, cpu_gdb_index(c=
+pu));
++    snprintf(buf, sizeof(buf), "T%02xthread:%s;", ret, thread_id);
 =20
+ send_packet:
+     put_packet(s, buf);
+=20
+     /* disable single step if it was enabled */
 --=20
 2.19.1
