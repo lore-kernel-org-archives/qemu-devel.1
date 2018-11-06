@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45755)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gK9Eb-0007up-0d
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 16:50:10 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gK9gs-0000do-58
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 17:19:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gK9EQ-0005e3-Nr
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 16:50:04 -0500
-Resent-Message-Id: <E1gK9EQ-0005e3-Nr@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21366)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gK9EP-0005OW-9k
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 16:49:54 -0500
-Message-ID: <154154005249.6914.4470910235129449867@015909e0f939>
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20181106110548.4209-1-luc.michel@greensocs.com>
+	(envelope-from <pbonzini@redhat.com>) id 1gK9gn-0005i6-DG
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 17:19:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34888)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gK9gm-0005Zo-K9
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 17:19:12 -0500
+References: <20181106153330.5139-1-peter.maydell@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5786633e-6edf-50c3-59e8-967db6c10dd7@redhat.com>
+Date: Tue, 6 Nov 2018 23:19:07 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 6 Nov 2018 13:34:14 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v4 00/16] gdbstub: support for the
- multiprocess extension
+In-Reply-To: <20181106153330.5139-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-3.1] replay: Exit on errors reading
+ from replay log
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,72 +28,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: luc.michel@greensocs.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, ehabkost@redhat.com, alistair@alistair23.me, mark.burton@greensocs.com, f4bug@amsat.org, saipava@xilinx.com, edgari@xilinx.com, qemu-arm@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgxMTA2MTEwNTQ4LjQyMDktMS1sdWMubWljaGVsQGdyZWVuc29jcy5jb20K
-U3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2NCAwMC8xNl0gZ2Ric3R1Yjogc3VwcG9ydCBm
-b3IgdGhlIG11bHRpcHJvY2VzcyBleHRlbnNpb24KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0K
-IyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFT
-RS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
-dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9
-JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNo
-ZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4u
-IgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3Bh
-dGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwog
-ICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBF
-TkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0
-ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNWIzN2QzNjI3MCBhcm0veGxueC16eW5x
-bXA6IHB1dCBBUFVzIGFuZCBSUFVzIGluIHNlcGFyYXRlIENQVSBjbHVzdGVycwo5Y2Q2YmE2YzBj
-IGdkYnN0dWI6IGFkZCBtdWx0aXByb2Nlc3MgZXh0ZW5zaW9uIHN1cHBvcnQKOTNkMTRiMzI1NCBn
-ZGJzdHViOiBnZGJfc2V0X3N0b3BfY3B1OiBpZ25vcmUgcmVxdWVzdCB3aGVuIHByb2Nlc3MgaXMg
-bm90IGF0dGFjaGVkCjIyMTI2Y2RhMTggZ2Ric3R1YjogcHJvY2Vzc2VzIGluaXRpYWxpemF0aW9u
-IG9uIG5ldyBwZWVyIGNvbm5lY3Rpb24KOTMxZTZjY2UzNiBnZGJzdHViOiBhZGQgc3VwcG9ydCBm
-b3IgdkF0dGFjaCBwYWNrZXRzCjZjYWZkMzkxZDEgZ2Ric3R1YjogYWRkIHN1cHBvcnQgZm9yIGV4
-dGVuZGVkIG1vZGUgcGFja2V0CmRlMzg1YTU3M2QgZ2Ric3R1YjogYWRkIG11bHRpcHJvY2VzcyBz
-dXBwb3J0IHRvICdEJyBwYWNrZXRzCjEyNDkxZTg4ZGEgZ2Ric3R1YjogYWRkIG11bHRpcHJvY2Vz
-cyBzdXBwb3J0IHRvIGdkYl92bV9zdGF0ZV9jaGFuZ2UoKQoxZThiODZlMDNhIGdkYnN0dWI6IGFk
-ZCBtdWx0aXByb2Nlc3Mgc3VwcG9ydCB0byBYZmVyOmZlYXR1cmVzOnJlYWQ6CmUzN2Y1YzlmM2Mg
-Z2Ric3R1YjogYWRkIG11bHRpcHJvY2VzcyBzdXBwb3J0IHRvIChmfHMpVGhyZWFkSW5mbyBhbmQg
-VGhyZWFkRXh0cmFJbmZvCjM0NGViM2UyZjEgZ2Ric3R1YjogYWRkIG11bHRpcHJvY2VzcyBzdXBw
-b3J0IHRvICdzQycgcGFja2V0cwpmZjk1YmNhYzExIGdkYnN0dWI6IGFkZCBtdWx0aXByb2Nlc3Mg
-c3VwcG9ydCB0byB2Q29udCBwYWNrZXRzCjUzMjBiMjIxYTMgZ2Ric3R1YjogYWRkIG11bHRpcHJv
-Y2VzcyBzdXBwb3J0IHRvICdIJyBhbmQgJ1QnIHBhY2tldHMKMTk5ODBmMjk5NyBnZGJzdHViOiBh
-ZGQgbXVsdGlwcm9jZXNzIHN1cHBvcnQgdG8gJz8nIHBhY2tldHMKZGM2NGE2Yzk5NyBnZGJzdHVi
-OiBpbnRyb2R1Y2UgR0RCIHByb2Nlc3NlcwoyZTJhNjBjYzUxIGh3L2NwdTogaW50cm9kdWNlIENQ
-VSBjbHVzdGVycwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xNjogaHcv
-Y3B1OiBpbnRyb2R1Y2UgQ1BVIGNsdXN0ZXJzLi4uCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBk
-ZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzI2OiAKbmV3
-IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9SOiBkbyBub3QgaW5pdGlhbGlzZSBzdGF0aWNzIHRvIDAg
-b3IgTlVMTAojNTg6IEZJTEU6IGh3L2NwdS9jbHVzdGVyLmM6Mjg6CisgICAgc3RhdGljIHVpbnQ2
-NF90IGNsdXN0ZXJfaWRfYXV0b19pbmNyZW1lbnQgPSAwOwoKdG90YWw6IDEgZXJyb3JzLCAxIHdh
-cm5pbmdzLCAxMDIgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMs
-IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
-ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
-QUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMi8xNjogZ2Ric3R1YjogaW50cm9kdWNlIEdEQiBwcm9j
-ZXNzZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8xNjogZ2Ric3R1YjogYWRkIG11bHRpcHJvY2VzcyBz
-dXBwb3J0IHRvICc/JyBwYWNrZXRzLi4uCkNoZWNraW5nIFBBVENIIDQvMTY6IGdkYnN0dWI6IGFk
-ZCBtdWx0aXByb2Nlc3Mgc3VwcG9ydCB0byAnSCcgYW5kICdUJyBwYWNrZXRzLi4uCkNoZWNraW5n
-IFBBVENIIDUvMTY6IGdkYnN0dWI6IGFkZCBtdWx0aXByb2Nlc3Mgc3VwcG9ydCB0byB2Q29udCBw
-YWNrZXRzLi4uCkNoZWNraW5nIFBBVENIIDYvMTY6IGdkYnN0dWI6IGFkZCBtdWx0aXByb2Nlc3Mg
-c3VwcG9ydCB0byAnc0MnIHBhY2tldHMuLi4KQ2hlY2tpbmcgUEFUQ0ggNy8xNjogZ2Ric3R1Yjog
-YWRkIG11bHRpcHJvY2VzcyBzdXBwb3J0IHRvIChmfHMpVGhyZWFkSW5mbyBhbmQgVGhyZWFkRXh0
-cmFJbmZvLi4uCkNoZWNraW5nIFBBVENIIDgvMTY6IGdkYnN0dWI6IGFkZCBtdWx0aXByb2Nlc3Mg
-c3VwcG9ydCB0byBYZmVyOmZlYXR1cmVzOnJlYWQ6Li4uCkNoZWNraW5nIFBBVENIIDkvMTY6IGdk
-YnN0dWI6IGFkZCBtdWx0aXByb2Nlc3Mgc3VwcG9ydCB0byBnZGJfdm1fc3RhdGVfY2hhbmdlKCku
-Li4KQ2hlY2tpbmcgUEFUQ0ggMTAvMTY6IGdkYnN0dWI6IGFkZCBtdWx0aXByb2Nlc3Mgc3VwcG9y
-dCB0byAnRCcgcGFja2V0cy4uLgpDaGVja2luZyBQQVRDSCAxMS8xNjogZ2Ric3R1YjogYWRkIHN1
-cHBvcnQgZm9yIGV4dGVuZGVkIG1vZGUgcGFja2V0Li4uCkNoZWNraW5nIFBBVENIIDEyLzE2OiBn
-ZGJzdHViOiBhZGQgc3VwcG9ydCBmb3IgdkF0dGFjaCBwYWNrZXRzLi4uCkNoZWNraW5nIFBBVENI
-IDEzLzE2OiBnZGJzdHViOiBwcm9jZXNzZXMgaW5pdGlhbGl6YXRpb24gb24gbmV3IHBlZXIgY29u
-bmVjdGlvbi4uLgpDaGVja2luZyBQQVRDSCAxNC8xNjogZ2Ric3R1YjogZ2RiX3NldF9zdG9wX2Nw
-dTogaWdub3JlIHJlcXVlc3Qgd2hlbiBwcm9jZXNzIGlzIG5vdCBhdHRhY2hlZC4uLgpDaGVja2lu
-ZyBQQVRDSCAxNS8xNjogZ2Ric3R1YjogYWRkIG11bHRpcHJvY2VzcyBleHRlbnNpb24gc3VwcG9y
-dC4uLgpDaGVja2luZyBQQVRDSCAxNi8xNjogYXJtL3hsbngtenlucW1wOiBwdXQgQVBVcyBhbmQg
-UlBVcyBpbiBzZXBhcmF0ZSBDUFUgY2x1c3RlcnMuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0
-IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
-dGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
-ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On 06/11/2018 16:33, Peter Maydell wrote:
+> Currently replay_get_byte() does not check for an error
+> from getc(). Coverity points out (CID 1390622) that this
+> could result in unexpected behaviour (such as looping
+> forever, if we use the replay_get_dword() return value
+> for a loop count). We don't expect reads from the replay
+> log to fail, and if they do there is no way we can
+> continue. So make them fatal errors.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> Disclaimer: checked only with "make check".
+> 
+>  replay/replay-internal.c | 16 +++++++++++++---
+>  1 file changed, 13 insertions(+), 3 deletions(-)
+> 
+> diff --git a/replay/replay-internal.c b/replay/replay-internal.c
+> index 1cea1d4dc91..8f87e9b957e 100644
+> --- a/replay/replay-internal.c
+> +++ b/replay/replay-internal.c
+> @@ -35,6 +35,12 @@ static void replay_write_error(void)
+>      }
+>  }
+>  
+> +static void replay_read_error(void)
+> +{
+> +    error_report("error reading the replay data");
+> +    exit(1);
+> +}
+> +
+>  void replay_put_byte(uint8_t byte)
+>  {
+>      if (replay_file) {
+> @@ -83,7 +89,11 @@ uint8_t replay_get_byte(void)
+>  {
+>      uint8_t byte = 0;
+>      if (replay_file) {
+> -        byte = getc(replay_file);
+> +        int r = getc(replay_file);
+> +        if (r == EOF) {
+> +            replay_read_error();
+> +        }
+> +        byte = r;
+>      }
+>      return byte;
+>  }
+> @@ -126,7 +136,7 @@ void replay_get_array(uint8_t *buf, size_t *size)
+>      if (replay_file) {
+>          *size = replay_get_dword();
+>          if (fread(buf, 1, *size, replay_file) != *size) {
+> -            error_report("replay read error");
+> +            replay_read_error();
+>          }
+>      }
+>  }
+> @@ -137,7 +147,7 @@ void replay_get_array_alloc(uint8_t **buf, size_t *size)
+>          *size = replay_get_dword();
+>          *buf = g_malloc(*size);
+>          if (fread(*buf, 1, *size, replay_file) != *size) {
+> -            error_report("replay read error");
+> +            replay_read_error();
+>          }
+>      }
+>  }
+> 
+
+Makes sense, can you apply it directly to qemu.git as soon as Pavel
+reviews it (or in some time if he doesn't)?
+
+Thanks,
+
+Paolo
