@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43401)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1gK0Lk-0002uy-3q
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:20:53 -0500
+	(envelope-from <guangrong.xiao@gmail.com>) id 1gK0Lo-0002xW-80
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:20:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1gK0Li-0001vu-Oq
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:20:52 -0500
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:33374)
+	(envelope-from <guangrong.xiao@gmail.com>) id 1gK0Lm-00020l-Vx
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:20:56 -0500
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:41243)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1gK0Li-0001tj-Gm
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:20:50 -0500
-Received: by mail-pf1-x444.google.com with SMTP id v68-v6so2453476pfk.0
-	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 04:20:50 -0800 (PST)
+	id 1gK0Lm-0001za-Ny
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:20:54 -0500
+Received: by mail-pf1-x442.google.com with SMTP id e22-v6so6035325pfn.8
+	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 04:20:54 -0800 (PST)
 From: guangrong.xiao@gmail.com
-Date: Tue,  6 Nov 2018 20:20:24 +0800
-Message-Id: <20181106122025.3487-5-xiaoguangrong@tencent.com>
+Date: Tue,  6 Nov 2018 20:20:25 +0800
+Message-Id: <20181106122025.3487-6-xiaoguangrong@tencent.com>
 In-Reply-To: <20181106122025.3487-1-xiaoguangrong@tencent.com>
 References: <20181106122025.3487-1-xiaoguangrong@tencent.com>
-Subject: [Qemu-devel] [PATCH v2 4/5] migration: use threaded workqueue for
- decompression
+Subject: [Qemu-devel] [PATCH v2 5/5] tests: add threaded-workqueue-bench
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,321 +31,300 @@ Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redh
 
 From: Xiao Guangrong <xiaoguangrong@tencent.com>
 
-Adapt the compression code to the threaded workqueue
+It's the benhcmark of threaded-workqueue, also it's a good
+example to show how threaded-workqueue is used
 
 Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
 ---
- migration/ram.c | 225 ++++++++++++++++++++------------------------------------
- 1 file changed, 81 insertions(+), 144 deletions(-)
+ tests/Makefile.include           |   5 +-
+ tests/threaded-workqueue-bench.c | 256 +++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 260 insertions(+), 1 deletion(-)
+ create mode 100644 tests/threaded-workqueue-bench.c
 
-diff --git a/migration/ram.c b/migration/ram.c
-index acca842aff..834198f11c 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -350,25 +350,9 @@ typedef struct PageSearchStatus PageSearchStatus;
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index d2e577eabb..a4deb210ab 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -499,7 +499,8 @@ test-obj-y = tests/check-qnum.o tests/check-qstring.o tests/check-qdict.o \
+ 	tests/test-rcu-tailq.o \
+ 	tests/test-qdist.o tests/test-shift128.o \
+ 	tests/test-qht.o tests/qht-bench.o tests/test-qht-par.o \
+-	tests/atomic_add-bench.o tests/atomic64-bench.o
++	tests/atomic_add-bench.o tests/atomic64-bench.o \
++	tests/threaded-workqueue-bench.o
  
- CompressionStats compression_counters;
+ $(test-obj-y): QEMU_INCLUDES += -Itests
+ QEMU_CFLAGS += -I$(SRC_PATH)/tests
+@@ -555,6 +556,8 @@ tests/qht-bench$(EXESUF): tests/qht-bench.o $(test-util-obj-y)
+ tests/test-bufferiszero$(EXESUF): tests/test-bufferiszero.o $(test-util-obj-y)
+ tests/atomic_add-bench$(EXESUF): tests/atomic_add-bench.o $(test-util-obj-y)
+ tests/atomic64-bench$(EXESUF): tests/atomic64-bench.o $(test-util-obj-y)
++tests/threaded-workqueue-bench$(EXESUF): tests/threaded-workqueue-bench.o migration/qemu-file.o \
++	$(test-util-obj-y)
  
--struct DecompressParam {
--    bool done;
--    bool quit;
--    QemuMutex mutex;
--    QemuCond cond;
--    void *des;
--    uint8_t *compbuf;
--    int len;
--    z_stream stream;
--};
--typedef struct DecompressParam DecompressParam;
--
- static const QEMUFileOps empty_ops = { };
- 
- static QEMUFile *decomp_file;
--static DecompressParam *decomp_param;
--static QemuThread *decompress_threads;
--static QemuMutex decomp_done_lock;
--static QemuCond decomp_done_cond;
- 
- /* Multiple fd's */
- 
-@@ -3404,6 +3388,7 @@ void ram_handle_compressed(void *host, uint8_t ch, uint64_t size)
-     }
- }
- 
+ tests/fp/%:
+ 	$(MAKE) -C $(dir $@) $(notdir $@)
+diff --git a/tests/threaded-workqueue-bench.c b/tests/threaded-workqueue-bench.c
+new file mode 100644
+index 0000000000..88026f1a8f
+--- /dev/null
++++ b/tests/threaded-workqueue-bench.c
+@@ -0,0 +1,256 @@
++/*
++ * Threaded Workqueue Benchmark
++ *
++ * Author:
++ *   Xiao Guangrong <xiaoguangrong@tencent.com>
++ *
++ * Copyright(C) 2018 Tencent Corporation.
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
++ * See the COPYING.LIB file in the top-level directory.
++ */
++#include <zlib.h>
 +
- /* return the size after decompression, or negative value on error */
- static int
- qemu_uncompress_data(z_stream *stream, uint8_t *dest, size_t dest_len,
-@@ -3429,166 +3414,118 @@ qemu_uncompress_data(z_stream *stream, uint8_t *dest, size_t dest_len,
-     return stream->total_out;
- }
- 
--static void *do_data_decompress(void *opaque)
-+struct DecompressData {
-+    /* filled by migration thread.*/
-+    void *des;
-+    uint8_t *compbuf;
-+    size_t len;
++#include "qemu/osdep.h"
++#include "exec/cpu-common.h"
++#include "qemu/error-report.h"
++#include "migration/qemu-file.h"
++#include "qemu/threaded-workqueue.h"
 +
++#define PAGE_SHIFT              12
++#define PAGE_SIZE               (1 << PAGE_SHIFT)
++#define DEFAULT_THREAD_NR       2
++#define DEFAULT_MEM_SIZE        1
++#define DEFAULT_REPEATED_COUNT  3
++
++static ssize_t test_writev_buffer(void *opaque, struct iovec *iov, int iovcnt,
++                                   int64_t pos)
++{
++    int i, size = 0;
++
++    for (i = 0; i < iovcnt; i++) {
++        size += iov[i].iov_len;
++    }
++    return size;
++}
++
++static int test_fclose(void *opaque)
++{
++    return 0;
++}
++
++static const QEMUFileOps test_write_ops = {
++    .writev_buffer  = test_writev_buffer,
++    .close          = test_fclose
++};
++
++static QEMUFile *dest_file;
++
++static const QEMUFileOps empty_ops = { };
++
++struct CompressData {
++    uint8_t *ram_addr;
++    QEMUFile *file;
 +    z_stream stream;
 +};
-+typedef struct DecompressData DecompressData;
++typedef struct CompressData CompressData;
 +
-+static Threads *decompress_threads;
-+
-+static int decompress_thread_get_data_size(void)
- {
--    DecompressParam *param = opaque;
--    unsigned long pagesize;
--    uint8_t *des;
--    int len, ret;
--
--    qemu_mutex_lock(&param->mutex);
--    while (!param->quit) {
--        if (param->des) {
--            des = param->des;
--            len = param->len;
--            param->des = 0;
--            qemu_mutex_unlock(&param->mutex);
--
--            pagesize = TARGET_PAGE_SIZE;
--
--            ret = qemu_uncompress_data(&param->stream, des, pagesize,
--                                       param->compbuf, len);
--            if (ret < 0 && migrate_get_current()->decompress_error_check) {
--                error_report("decompress data failed");
--                qemu_file_set_error(decomp_file, ret);
--            }
-+    return sizeof(DecompressData);
-+}
- 
--            qemu_mutex_lock(&decomp_done_lock);
--            param->done = true;
--            qemu_cond_signal(&decomp_done_cond);
--            qemu_mutex_unlock(&decomp_done_lock);
-+static int decompress_thread_data_init(void *request)
++static int compress_request_size(void)
 +{
-+    DecompressData *dd = request;
- 
--            qemu_mutex_lock(&param->mutex);
--        } else {
--            qemu_cond_wait(&param->cond, &param->mutex);
--        }
-+    if (inflateInit(&dd->stream) != Z_OK) {
++    return sizeof(CompressData);
++}
++
++static int compress_request_init(void *request)
++{
++    CompressData *cd = request;
++
++    if (deflateInit(&cd->stream, 1) != Z_OK) {
 +        return -1;
-     }
--    qemu_mutex_unlock(&param->mutex);
- 
--    return NULL;
-+    dd->compbuf = g_malloc0(compressBound(TARGET_PAGE_SIZE));
++    }
++    cd->file = qemu_fopen_ops(NULL, &empty_ops);
 +    return 0;
- }
- 
--static int wait_for_decompress_done(void)
-+static void decompress_thread_data_fini(void *request)
- {
--    int idx, thread_count;
-+    DecompressData *dd = request;
- 
--    if (!migrate_use_compression()) {
--        return 0;
--    }
-+    inflateEnd(&dd->stream);
-+    g_free(dd->compbuf);
 +}
- 
--    thread_count = migrate_decompress_threads();
--    qemu_mutex_lock(&decomp_done_lock);
--    for (idx = 0; idx < thread_count; idx++) {
--        while (!decomp_param[idx].done) {
--            qemu_cond_wait(&decomp_done_cond, &decomp_done_lock);
--        }
-+static void decompress_thread_data_handler(void *request)
++
++static void compress_request_uninit(void *request)
 +{
-+    DecompressData *dd = request;
-+    unsigned long pagesize = TARGET_PAGE_SIZE;
-+    int ret;
++    CompressData *cd = request;
 +
-+    ret = qemu_uncompress_data(&dd->stream, dd->des, pagesize,
-+                               dd->compbuf, dd->len);
-+    if (ret < 0 && migrate_get_current()->decompress_error_check) {
-+        error_report("decompress data failed");
-+        qemu_file_set_error(decomp_file, ret);
-     }
--    qemu_mutex_unlock(&decomp_done_lock);
--    return qemu_file_get_error(decomp_file);
- }
- 
--static void compress_threads_load_cleanup(void)
-+static void decompress_thread_data_done(void *request)
- {
--    int i, thread_count;
++    qemu_fclose(cd->file);
++    deflateEnd(&cd->stream);
 +}
 +
-+static ThreadedWorkqueueOps decompress_ops = {
-+    .thread_get_request_size = decompress_thread_get_data_size,
-+    .thread_request_init = decompress_thread_data_init,
-+    .thread_request_uninit = decompress_thread_data_fini,
-+    .thread_request_handler = decompress_thread_data_handler,
-+    .thread_request_done = decompress_thread_data_done,
++static void compress_thread_data_handler(void *request)
++{
++    CompressData *cd = request;
++    int blen;
++
++    blen = qemu_put_compression_data(cd->file, &cd->stream, cd->ram_addr,
++                                     PAGE_SIZE);
++    if (blen < 0) {
++        error_report("compressed data failed!");
++        qemu_file_set_error(dest_file, blen);
++    }
++}
++
++struct CompressStats {
++    unsigned long pages;
++    unsigned long compressed_size;
 +};
- 
-+static int decompress_init(QEMUFile *f)
++typedef struct CompressStats CompressStats;
++
++static CompressStats comp_stats;
++
++static void compress_thread_data_done(void *request)
 +{
-     if (!migrate_use_compression()) {
--        return;
-+        return 0;
-     }
--    thread_count = migrate_decompress_threads();
--    for (i = 0; i < thread_count; i++) {
--        /*
--         * we use it as a indicator which shows if the thread is
--         * properly init'd or not
--         */
--        if (!decomp_param[i].compbuf) {
--            break;
--        }
- 
--        qemu_mutex_lock(&decomp_param[i].mutex);
--        decomp_param[i].quit = true;
--        qemu_cond_signal(&decomp_param[i].cond);
--        qemu_mutex_unlock(&decomp_param[i].mutex);
--    }
--    for (i = 0; i < thread_count; i++) {
--        if (!decomp_param[i].compbuf) {
--            break;
--        }
-+    decomp_file = f;
-+    decompress_threads = threaded_workqueue_create("decompress",
-+                                migrate_decompress_threads(),
-+                                DEFAULT_THREAD_REQUEST_NR, &decompress_ops);
-+    return decompress_threads ? 0 : -1;
++    CompressData *cd = request;
++    int bytes_xmit;
++
++    bytes_xmit = qemu_put_qemu_file(dest_file, cd->file);
++
++    comp_stats.pages++;
++    comp_stats.compressed_size += bytes_xmit;
 +}
- 
--        qemu_thread_join(decompress_threads + i);
--        qemu_mutex_destroy(&decomp_param[i].mutex);
--        qemu_cond_destroy(&decomp_param[i].cond);
--        inflateEnd(&decomp_param[i].stream);
--        g_free(decomp_param[i].compbuf);
--        decomp_param[i].compbuf = NULL;
-+static void decompress_fini(void)
++
++static ThreadedWorkqueueOps ops = {
++    .thread_get_request_size = compress_request_size,
++    .thread_request_init = compress_request_init,
++    .thread_request_uninit = compress_request_uninit,
++    .thread_request_handler = compress_thread_data_handler,
++    .thread_request_done = compress_thread_data_done,
++};
++
++static void compress_threads_save_cleanup(Threads *threads)
 +{
-+    if (!decompress_threads) {
-+        return;
-     }
--    g_free(decompress_threads);
--    g_free(decomp_param);
++    threaded_workqueue_destroy(threads);
++    qemu_fclose(dest_file);
++}
 +
-+    threaded_workqueue_destroy(decompress_threads);
-     decompress_threads = NULL;
--    decomp_param = NULL;
-     decomp_file = NULL;
- }
- 
--static int compress_threads_load_setup(QEMUFile *f)
-+static int flush_decompressed_data(void)
- {
--    int i, thread_count;
--
-     if (!migrate_use_compression()) {
-         return 0;
-     }
- 
--    thread_count = migrate_decompress_threads();
--    decompress_threads = g_new0(QemuThread, thread_count);
--    decomp_param = g_new0(DecompressParam, thread_count);
--    qemu_mutex_init(&decomp_done_lock);
--    qemu_cond_init(&decomp_done_cond);
--    decomp_file = f;
--    for (i = 0; i < thread_count; i++) {
--        if (inflateInit(&decomp_param[i].stream) != Z_OK) {
--            goto exit;
--        }
--
--        decomp_param[i].compbuf = g_malloc0(compressBound(TARGET_PAGE_SIZE));
--        qemu_mutex_init(&decomp_param[i].mutex);
--        qemu_cond_init(&decomp_param[i].cond);
--        decomp_param[i].done = true;
--        decomp_param[i].quit = false;
--        qemu_thread_create(decompress_threads + i, "decompress",
--                           do_data_decompress, decomp_param + i,
--                           QEMU_THREAD_JOINABLE);
--    }
--    return 0;
--exit:
--    compress_threads_load_cleanup();
--    return -1;
-+    threaded_workqueue_wait_for_requests(decompress_threads);
-+    return qemu_file_get_error(decomp_file);
- }
- 
- static void decompress_data_with_multi_threads(QEMUFile *f,
--                                               void *host, int len)
-+                                               void *host, size_t len)
- {
--    int idx, thread_count;
-+    DecompressData *dd;
- 
--    thread_count = migrate_decompress_threads();
--    qemu_mutex_lock(&decomp_done_lock);
--    while (true) {
--        for (idx = 0; idx < thread_count; idx++) {
--            if (decomp_param[idx].done) {
--                decomp_param[idx].done = false;
--                qemu_mutex_lock(&decomp_param[idx].mutex);
--                qemu_get_buffer(f, decomp_param[idx].compbuf, len);
--                decomp_param[idx].des = host;
--                decomp_param[idx].len = len;
--                qemu_cond_signal(&decomp_param[idx].cond);
--                qemu_mutex_unlock(&decomp_param[idx].mutex);
--                break;
--            }
--        }
--        if (idx < thread_count) {
--            break;
--        } else {
--            qemu_cond_wait(&decomp_done_cond, &decomp_done_lock);
--        }
++static Threads *compress_threads_save_setup(int threads_nr, int requests_nr)
++{
++    Threads *compress_threads;
++
++    dest_file = qemu_fopen_ops(NULL, &test_write_ops);
++    compress_threads = threaded_workqueue_create("compress", threads_nr,
++                                                 requests_nr, &ops);
++    assert(compress_threads);
++    return compress_threads;
++}
++
++static void compress_page_with_multi_thread(Threads *threads, uint8_t *addr)
++{
++    CompressData *cd;
++
 +retry:
-+    dd = threaded_workqueue_get_request(decompress_threads);
-+    if (!dd) {
++    cd = threaded_workqueue_get_request(threads);
++    if (!cd) {
 +        goto retry;
-     }
--    qemu_mutex_unlock(&decomp_done_lock);
++    }
 +
-+    dd->des = host;
-+    dd->len = len;
-+    qemu_get_buffer(f, dd->compbuf, len);
-+    threaded_workqueue_submit_request(decompress_threads, dd);
- }
- 
- /*
-@@ -3683,7 +3620,7 @@ void colo_release_ram_cache(void)
-  */
- static int ram_load_setup(QEMUFile *f, void *opaque)
- {
--    if (compress_threads_load_setup(f)) {
-+    if (decompress_init(f)) {
-         return -1;
-     }
- 
-@@ -3704,7 +3641,7 @@ static int ram_load_cleanup(void *opaque)
-     }
- 
-     xbzrle_load_cleanup();
--    compress_threads_load_cleanup();
-+    decompress_fini();
- 
-     RAMBLOCK_FOREACH_MIGRATABLE(rb) {
-         g_free(rb->receivedmap);
-@@ -4106,7 +4043,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-         }
-     }
- 
--    ret |= wait_for_decompress_done();
-+    ret |= flush_decompressed_data();
-     rcu_read_unlock();
-     trace_ram_load_complete(ret, seq_iter);
- 
++    cd->ram_addr = addr;
++    threaded_workqueue_submit_request(threads, cd);
++}
++
++static void run(Threads *threads, uint8_t *mem, unsigned long mem_size,
++                int repeated_count)
++{
++    uint8_t *ptr = mem, *end = mem + mem_size;
++    uint64_t start_ts, spend, total_ts = 0, pages = mem_size >> PAGE_SHIFT;
++    double rate;
++    int i;
++
++    for (i = 0; i < repeated_count; i++) {
++        ptr = mem;
++        memset(&comp_stats, 0, sizeof(comp_stats));
++
++        start_ts = g_get_monotonic_time();
++        for (ptr = mem; ptr < end; ptr += PAGE_SIZE) {
++            *ptr = 0x10;
++            compress_page_with_multi_thread(threads, ptr);
++        }
++        threaded_workqueue_wait_for_requests(threads);
++        spend = g_get_monotonic_time() - start_ts;
++        total_ts += spend;
++
++        if (comp_stats.pages != pages) {
++            printf("ERROR: pages are compressed %ld, expect %ld.\n",
++                   comp_stats.pages, pages);
++            exit(-1);
++        }
++
++        rate = (double)(comp_stats.pages * PAGE_SIZE) /
++                        comp_stats.compressed_size;
++        printf("RUN %d: Request # %ld Cost %ld, Compression Rate %f.\n", i,
++               comp_stats.pages, spend, rate);
++    }
++
++    printf("AVG: Time Cost %ld.\n", total_ts / repeated_count);
++}
++
++static void usage(const char *arg0)
++{
++    printf("\nThreaded Workqueue Benchmark.\n");
++    printf("Usage:\n");
++    printf("  %s [OPTIONS]\n", arg0);
++    printf("Options:\n");
++    printf("   -t        the number of threads (default %d).\n",
++            DEFAULT_THREAD_NR);
++    printf("   -r:       the number of requests handled by each thread (default %d).\n",
++            DEFAULT_THREAD_REQUEST_NR);
++    printf("   -m:       the size of the memory (G) used to test (default %dG).\n",
++            DEFAULT_MEM_SIZE);
++    printf("   -c:       the repeated count (default %d).\n",
++            DEFAULT_REPEATED_COUNT);
++    printf("   -h        show this help info.\n");
++}
++
++int main(int argc, char *argv[])
++{
++    int c, threads_nr, requests_nr, repeated_count;
++    unsigned long mem_size;
++    uint8_t *mem;
++    Threads *threads;
++
++    threads_nr = DEFAULT_THREAD_NR;
++    requests_nr = DEFAULT_THREAD_REQUEST_NR;
++    mem_size = DEFAULT_MEM_SIZE;
++    repeated_count = DEFAULT_REPEATED_COUNT;
++
++    for (;;) {
++        c = getopt(argc, argv, "t:r:m:c:h");
++        if (c < 0) {
++            break;
++        }
++
++        switch (c) {
++        case 't':
++            threads_nr = atoi(optarg);
++            break;
++        case 'r':
++            requests_nr = atoi(optarg);
++            break;
++        case 'm':
++            mem_size = atol(optarg);
++            break;
++        case 'c':
++            repeated_count = atoi(optarg);
++            break;
++        default:
++            printf("Unkown option: %c.\n", c);
++        case 'h':
++            usage(argv[0]);
++            return -1;
++        }
++    }
++
++    printf("Run the benchmark: threads %d requests-per-thread: %d memory %ldG repeat %d.\n",
++            threads_nr, requests_nr, mem_size, repeated_count);
++
++    mem_size = mem_size << 30;
++    mem = qemu_memalign(PAGE_SIZE, mem_size);
++    memset(mem, 0, mem_size);
++
++    threads = compress_threads_save_setup(threads_nr, requests_nr);
++    run(threads, mem, mem_size, repeated_count);
++    compress_threads_save_cleanup(threads);
++    return 0;
++}
 -- 
 2.14.5
