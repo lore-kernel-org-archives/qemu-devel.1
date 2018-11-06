@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54164)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56618)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gJzRJ-0008S2-IB
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 06:22:35 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gJzXN-00061a-PS
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 06:28:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gJzRH-0006QG-GI
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 06:22:33 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54898)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1gJzRH-0006Gw-7n
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 06:22:31 -0500
-Received: by mail-wm1-x342.google.com with SMTP id r63-v6so11092428wma.4
-	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 03:22:25 -0800 (PST)
+	(envelope-from <kraxel@redhat.com>) id 1gJzXJ-0007pV-W9
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 06:28:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47282)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gJzXI-0007fL-2n
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 06:28:44 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3A4303081252
+	for <qemu-devel@nongnu.org>; Tue,  6 Nov 2018 11:28:34 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue,  6 Nov 2018 12:28:28 +0100
+Message-Id: <20181106112829.1948-1-kraxel@redhat.com>
 MIME-Version: 1.0
-References: <cover.1541421653.git.artem.k.pisarenko@gmail.com>
-	<ae16b7e9df62708e0556a13a1efa8aa2628c1c56.1541421653.git.artem.k.pisarenko@gmail.com>
-In-Reply-To: <ae16b7e9df62708e0556a13a1efa8aa2628c1c56.1541421653.git.artem.k.pisarenko@gmail.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 6 Nov 2018 15:22:11 +0400
-Message-ID: <CAJ+F1C+B4swAvyEYvvaeBX=bjtDoPgGPOHq46md7WgSmWGuuhg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] tests/test-char: add muxed chardev
- testing for open/close
+Subject: [Qemu-devel] [PULL 0/1] Seabios 20181106 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,153 +30,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: artem.k.pisarenko@gmail.com
-Cc: QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-Hi
+The following changes since commit 7d56239f159afc2e7bd42623947e56ba48f378=
+36:
 
-On Mon, Nov 5, 2018 at 4:47 PM Artem Pisarenko
-<artem.k.pisarenko@gmail.com> wrote:
->
-> Validate that frontend callbacks for CHR_EVENT_OPENED/CHR_EVENT_CLOSED
-> events are being issued when expected and in strictly pairing order.
->
-> Signed-off-by: Artem Pisarenko <artem.k.pisarenko@gmail.com>
-> ---
->  tests/test-char.c | 80 +++++++++++++++++++++++++++++++++++++++++++++++++=
-++++--
->  1 file changed, 78 insertions(+), 2 deletions(-)
->
-> diff --git a/tests/test-char.c b/tests/test-char.c
-> index 831e37f..657cb4c 100644
-> --- a/tests/test-char.c
-> +++ b/tests/test-char.c
-> @@ -16,6 +16,9 @@ static bool quit;
->
->  typedef struct FeHandler {
->      int read_count;
-> +    bool is_open;
-> +    int openclose_count;
-> +    bool openclose_mismatch;
->      int last_event;
->      char read_buf[128];
->  } FeHandler;
-> @@ -49,10 +52,24 @@ static void fe_read(void *opaque, const uint8_t *buf,=
- int size)
->  static void fe_event(void *opaque, int event)
->  {
->      FeHandler *h =3D opaque;
-> +    bool new_open_state;
->
->      h->last_event =3D event;
-> -    if (event !=3D CHR_EVENT_BREAK) {
-> +    switch (event) {
-> +    case CHR_EVENT_BREAK:
-> +        break;
-> +    case CHR_EVENT_OPENED:
-> +    case CHR_EVENT_CLOSED:
-> +        h->openclose_count++;
-> +        new_open_state =3D (event =3D=3D CHR_EVENT_OPENED);
-> +        if (h->is_open =3D=3D new_open_state) {
-> +            h->openclose_mismatch =3D true;
-> +        }
-> +        h->is_open =3D new_open_state;
-> +        /* no break */
-> +    default:
->          quit =3D true;
-> +        break;
->      }
->  }
->
-> @@ -161,7 +178,7 @@ static void char_mux_test(void)
->      QemuOpts *opts;
->      Chardev *chr, *base;
->      char *data;
-> -    FeHandler h1 =3D { 0, }, h2 =3D { 0, };
-> +    FeHandler h1 =3D { 0, false, 0, false, }, h2 =3D { 0, false, 0, fals=
-e, };
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-201=
+81102' into staging (2018-11-02 17:17:12 +0000)
 
-this is unnecessary change, I can drop on commit
+are available in the git repository at:
 
->      CharBackend chr_be1, chr_be2;
->
->      opts =3D qemu_opts_create(qemu_find_opts("chardev"), "mux-label",
-> @@ -233,6 +250,65 @@ static void char_mux_test(void)
->      g_assert_cmpint(h1.last_event, =3D=3D, CHR_EVENT_BREAK);
->      g_assert_cmpint(h2.last_event, =3D=3D, CHR_EVENT_MUX_OUT);
->
-> +    /* open/close state and corresponding events */
-> +    g_assert_true(qemu_chr_fe_backend_open(&chr_be1));
-> +    g_assert_true(qemu_chr_fe_backend_open(&chr_be2));
-> +    g_assert_true(h1.is_open);
-> +    g_assert_false(h1.openclose_mismatch);
-> +    g_assert_true(h2.is_open);
-> +    g_assert_false(h2.openclose_mismatch);
-> +
-> +    h1.openclose_count =3D h2.openclose_count =3D 0;
-> +
-> +    qemu_chr_fe_set_handlers(&chr_be1, NULL, NULL, NULL, NULL,
-> +                             NULL, NULL, false);
-> +    qemu_chr_fe_set_handlers(&chr_be2, NULL, NULL, NULL, NULL,
-> +                             NULL, NULL, false);
-> +    g_assert_cmpint(h1.openclose_count, =3D=3D, 0);
-> +    g_assert_cmpint(h2.openclose_count, =3D=3D, 0);
-> +
-> +    h1.is_open =3D h2.is_open =3D false;
-> +    qemu_chr_fe_set_handlers(&chr_be1,
-> +                             NULL,
-> +                             NULL,
-> +                             fe_event,
-> +                             NULL,
-> +                             &h1,
-> +                             NULL, false);
-> +    qemu_chr_fe_set_handlers(&chr_be2,
-> +                             NULL,
-> +                             NULL,
-> +                             fe_event,
-> +                             NULL,
-> +                             &h2,
-> +                             NULL, false);
-> +    g_assert_cmpint(h1.openclose_count, =3D=3D, 1);
-> +    g_assert_false(h1.openclose_mismatch);
-> +    g_assert_cmpint(h2.openclose_count, =3D=3D, 1);
-> +    g_assert_false(h2.openclose_mismatch);
-> +
-> +    qemu_chr_be_event(base, CHR_EVENT_CLOSED);
-> +    qemu_chr_be_event(base, CHR_EVENT_OPENED);
-> +    g_assert_cmpint(h1.openclose_count, =3D=3D, 3);
-> +    g_assert_false(h1.openclose_mismatch);
-> +    g_assert_cmpint(h2.openclose_count, =3D=3D, 3);
-> +    g_assert_false(h2.openclose_mismatch);
-> +
-> +    qemu_chr_fe_set_handlers(&chr_be2,
-> +                             fe_can_read,
-> +                             fe_read,
-> +                             fe_event,
-> +                             NULL,
-> +                             &h2,
-> +                             NULL, false);
-> +    qemu_chr_fe_set_handlers(&chr_be1,
-> +                             fe_can_read,
-> +                             fe_read,
-> +                             fe_event,
-> +                             NULL,
-> +                             &h1,
-> +                             NULL, false);
-> +
+  git://git.kraxel.org/qemu tags/seabios-20181106-pull-request
 
-otherwise, looks good to me
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+for you to fetch changes up to 0b8f74488e50f98b04e63157f85fde8a13f8d6aa:
 
+  update seabios to master snapshot (2018-11-06 12:23:58 +0100)
 
->      /* remove first handler */
->      qemu_chr_fe_set_handlers(&chr_be1, NULL, NULL, NULL, NULL,
->                               NULL, NULL, true);
-> --
-> 2.7.4
->
->
+----------------------------------------------------------------
+seabios update for 3.1
 
+----------------------------------------------------------------
+
+Gerd Hoffmann (1):
+  update seabios to master snapshot
+
+ pc-bios/bios-256k.bin             | Bin 262144 -> 262144 bytes
+ pc-bios/bios.bin                  | Bin 131072 -> 131072 bytes
+ pc-bios/vgabios-bochs-display.bin | Bin 27648 -> 27648 bytes
+ pc-bios/vgabios-cirrus.bin        | Bin 38400 -> 38400 bytes
+ pc-bios/vgabios-qxl.bin           | Bin 38912 -> 38912 bytes
+ pc-bios/vgabios-ramfb.bin         | Bin 28160 -> 28160 bytes
+ pc-bios/vgabios-stdvga.bin        | Bin 38912 -> 38912 bytes
+ pc-bios/vgabios-virtio.bin        | Bin 38912 -> 38912 bytes
+ pc-bios/vgabios-vmware.bin        | Bin 38912 -> 38912 bytes
+ pc-bios/vgabios.bin               | Bin 38400 -> 38400 bytes
+ roms/seabios                      |   2 +-
+ 11 files changed, 1 insertion(+), 1 deletion(-)
 
 --=20
-Marc-Andr=C3=A9 Lureau
+2.9.3
