@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43415)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1gK0Lo-0002xW-80
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:20:59 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gK0Ne-00058w-RH
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:22:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1gK0Lm-00020l-Vx
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:20:56 -0500
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:41243)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1gK0Lm-0001za-Ny
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:20:54 -0500
-Received: by mail-pf1-x442.google.com with SMTP id e22-v6so6035325pfn.8
-	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 04:20:54 -0800 (PST)
-From: guangrong.xiao@gmail.com
-Date: Tue,  6 Nov 2018 20:20:25 +0800
-Message-Id: <20181106122025.3487-6-xiaoguangrong@tencent.com>
-In-Reply-To: <20181106122025.3487-1-xiaoguangrong@tencent.com>
-References: <20181106122025.3487-1-xiaoguangrong@tencent.com>
-Subject: [Qemu-devel] [PATCH v2 5/5] tests: add threaded-workqueue-bench
+	(envelope-from <kraxel@redhat.com>) id 1gK0Nb-0004f7-Gm
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:22:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46004)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gK0Nb-0004eL-8c
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 07:22:47 -0500
+Date: Tue, 6 Nov 2018 13:22:44 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20181106122244.24zi7f23uvn7t6sf@sirius.home.kraxel.org>
+References: <bf58421d-e1be-4e42-b155-cb4faa366b98@me.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <bf58421d-e1be-4e42-b155-cb4faa366b98@me.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] gtk: Fix mouse offset in scaled gtk-gl
+ display for VFIO/iGVT-g DMA Buf mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,305 +28,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, quintela@redhat.com, cota@braap.org, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: Chen Zhang <tgfbeta@icloud.com>
+Cc: qemu-devel@nongnu.org
 
-From: Xiao Guangrong <xiaoguangrong@tencent.com>
+On Wed, Oct 31, 2018 at 06:24:56AM +0000, Chen Zhang wrote:
+> The issue was reported as in=A0https://bugs.launchpad.net/qemu/+bug/179=
+3859
+>=20
+> When an OpenGL accelerated GTK window is used for iGVT-g DMA Buf device=
+,
+> window scaling would cause guest cursor to move in undesirable velocity=
+.
+>=20
+> To fix this usability issue, the gtk mouse motion events was modified t=
+o
+> scale the position of event to match the coordinates=A0of the scaled GL
+> surface.
 
-It's the benhcmark of threaded-workqueue, also it's a good
-example to show how threaded-workqueue is used
+Hmm, we already have logic in place to deal with that.  I suspect the
+root cause is simply that the scale_{x,y} variables are not set properly
+in egl mode.  Can you try the patch below?
 
-Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+thanks,
+  Gerd
+
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D [ cut here ] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D
+>From ebecaab0102aca37a3101131c20f45576835b6b3 Mon Sep 17 00:00:00 2001
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue, 6 Nov 2018 13:18:39 +0100
+Subject: [PATCH] try fix gtk egl cursor
+
 ---
- tests/Makefile.include           |   5 +-
- tests/threaded-workqueue-bench.c | 256 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 260 insertions(+), 1 deletion(-)
- create mode 100644 tests/threaded-workqueue-bench.c
+ ui/gtk-egl.c | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index d2e577eabb..a4deb210ab 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -499,7 +499,8 @@ test-obj-y = tests/check-qnum.o tests/check-qstring.o tests/check-qdict.o \
- 	tests/test-rcu-tailq.o \
- 	tests/test-qdist.o tests/test-shift128.o \
- 	tests/test-qht.o tests/qht-bench.o tests/test-qht-par.o \
--	tests/atomic_add-bench.o tests/atomic64-bench.o
-+	tests/atomic_add-bench.o tests/atomic64-bench.o \
-+	tests/threaded-workqueue-bench.o
- 
- $(test-obj-y): QEMU_INCLUDES += -Itests
- QEMU_CFLAGS += -I$(SRC_PATH)/tests
-@@ -555,6 +556,8 @@ tests/qht-bench$(EXESUF): tests/qht-bench.o $(test-util-obj-y)
- tests/test-bufferiszero$(EXESUF): tests/test-bufferiszero.o $(test-util-obj-y)
- tests/atomic_add-bench$(EXESUF): tests/atomic_add-bench.o $(test-util-obj-y)
- tests/atomic64-bench$(EXESUF): tests/atomic64-bench.o $(test-util-obj-y)
-+tests/threaded-workqueue-bench$(EXESUF): tests/threaded-workqueue-bench.o migration/qemu-file.o \
-+	$(test-util-obj-y)
- 
- tests/fp/%:
- 	$(MAKE) -C $(dir $@) $(notdir $@)
-diff --git a/tests/threaded-workqueue-bench.c b/tests/threaded-workqueue-bench.c
-new file mode 100644
-index 0000000000..88026f1a8f
---- /dev/null
-+++ b/tests/threaded-workqueue-bench.c
-@@ -0,0 +1,256 @@
-+/*
-+ * Threaded Workqueue Benchmark
-+ *
-+ * Author:
-+ *   Xiao Guangrong <xiaoguangrong@tencent.com>
-+ *
-+ * Copyright(C) 2018 Tencent Corporation.
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
-+ * See the COPYING.LIB file in the top-level directory.
-+ */
-+#include <zlib.h>
+diff --git a/ui/gtk-egl.c b/ui/gtk-egl.c
+index a77c25b490..5420c2362b 100644
+--- a/ui/gtk-egl.c
++++ b/ui/gtk-egl.c
+@@ -68,8 +68,15 @@ void gd_egl_draw(VirtualConsole *vc)
+         return;
+     }
+=20
++    window =3D gtk_widget_get_window(vc->gfx.drawing_area);
++    ww =3D gdk_window_get_width(window);
++    wh =3D gdk_window_get_height(window);
 +
-+#include "qemu/osdep.h"
-+#include "exec/cpu-common.h"
-+#include "qemu/error-report.h"
-+#include "migration/qemu-file.h"
-+#include "qemu/threaded-workqueue.h"
+     if (vc->gfx.scanout_mode) {
+         gd_egl_scanout_flush(&vc->gfx.dcl, 0, 0, vc->gfx.w, vc->gfx.h);
 +
-+#define PAGE_SHIFT              12
-+#define PAGE_SIZE               (1 << PAGE_SHIFT)
-+#define DEFAULT_THREAD_NR       2
-+#define DEFAULT_MEM_SIZE        1
-+#define DEFAULT_REPEATED_COUNT  3
++        vc->gfx.scale_x =3D (double)ww / vc->gfx.w;
++        vc->gfx.scale_y =3D (double)wh / vc->gfx.h;
+     } else {
+         if (!vc->gfx.ds) {
+             return;
+@@ -77,13 +84,13 @@ void gd_egl_draw(VirtualConsole *vc)
+         eglMakeCurrent(qemu_egl_display, vc->gfx.esurface,
+                        vc->gfx.esurface, vc->gfx.ectx);
+=20
+-        window =3D gtk_widget_get_window(vc->gfx.drawing_area);
+-        ww =3D gdk_window_get_width(window);
+-        wh =3D gdk_window_get_height(window);
+         surface_gl_setup_viewport(vc->gfx.gls, vc->gfx.ds, ww, wh);
+         surface_gl_render_texture(vc->gfx.gls, vc->gfx.ds);
+=20
+         eglSwapBuffers(qemu_egl_display, vc->gfx.esurface);
 +
-+static ssize_t test_writev_buffer(void *opaque, struct iovec *iov, int iovcnt,
-+                                   int64_t pos)
-+{
-+    int i, size = 0;
-+
-+    for (i = 0; i < iovcnt; i++) {
-+        size += iov[i].iov_len;
-+    }
-+    return size;
-+}
-+
-+static int test_fclose(void *opaque)
-+{
-+    return 0;
-+}
-+
-+static const QEMUFileOps test_write_ops = {
-+    .writev_buffer  = test_writev_buffer,
-+    .close          = test_fclose
-+};
-+
-+static QEMUFile *dest_file;
-+
-+static const QEMUFileOps empty_ops = { };
-+
-+struct CompressData {
-+    uint8_t *ram_addr;
-+    QEMUFile *file;
-+    z_stream stream;
-+};
-+typedef struct CompressData CompressData;
-+
-+static int compress_request_size(void)
-+{
-+    return sizeof(CompressData);
-+}
-+
-+static int compress_request_init(void *request)
-+{
-+    CompressData *cd = request;
-+
-+    if (deflateInit(&cd->stream, 1) != Z_OK) {
-+        return -1;
-+    }
-+    cd->file = qemu_fopen_ops(NULL, &empty_ops);
-+    return 0;
-+}
-+
-+static void compress_request_uninit(void *request)
-+{
-+    CompressData *cd = request;
-+
-+    qemu_fclose(cd->file);
-+    deflateEnd(&cd->stream);
-+}
-+
-+static void compress_thread_data_handler(void *request)
-+{
-+    CompressData *cd = request;
-+    int blen;
-+
-+    blen = qemu_put_compression_data(cd->file, &cd->stream, cd->ram_addr,
-+                                     PAGE_SIZE);
-+    if (blen < 0) {
-+        error_report("compressed data failed!");
-+        qemu_file_set_error(dest_file, blen);
-+    }
-+}
-+
-+struct CompressStats {
-+    unsigned long pages;
-+    unsigned long compressed_size;
-+};
-+typedef struct CompressStats CompressStats;
-+
-+static CompressStats comp_stats;
-+
-+static void compress_thread_data_done(void *request)
-+{
-+    CompressData *cd = request;
-+    int bytes_xmit;
-+
-+    bytes_xmit = qemu_put_qemu_file(dest_file, cd->file);
-+
-+    comp_stats.pages++;
-+    comp_stats.compressed_size += bytes_xmit;
-+}
-+
-+static ThreadedWorkqueueOps ops = {
-+    .thread_get_request_size = compress_request_size,
-+    .thread_request_init = compress_request_init,
-+    .thread_request_uninit = compress_request_uninit,
-+    .thread_request_handler = compress_thread_data_handler,
-+    .thread_request_done = compress_thread_data_done,
-+};
-+
-+static void compress_threads_save_cleanup(Threads *threads)
-+{
-+    threaded_workqueue_destroy(threads);
-+    qemu_fclose(dest_file);
-+}
-+
-+static Threads *compress_threads_save_setup(int threads_nr, int requests_nr)
-+{
-+    Threads *compress_threads;
-+
-+    dest_file = qemu_fopen_ops(NULL, &test_write_ops);
-+    compress_threads = threaded_workqueue_create("compress", threads_nr,
-+                                                 requests_nr, &ops);
-+    assert(compress_threads);
-+    return compress_threads;
-+}
-+
-+static void compress_page_with_multi_thread(Threads *threads, uint8_t *addr)
-+{
-+    CompressData *cd;
-+
-+retry:
-+    cd = threaded_workqueue_get_request(threads);
-+    if (!cd) {
-+        goto retry;
-+    }
-+
-+    cd->ram_addr = addr;
-+    threaded_workqueue_submit_request(threads, cd);
-+}
-+
-+static void run(Threads *threads, uint8_t *mem, unsigned long mem_size,
-+                int repeated_count)
-+{
-+    uint8_t *ptr = mem, *end = mem + mem_size;
-+    uint64_t start_ts, spend, total_ts = 0, pages = mem_size >> PAGE_SHIFT;
-+    double rate;
-+    int i;
-+
-+    for (i = 0; i < repeated_count; i++) {
-+        ptr = mem;
-+        memset(&comp_stats, 0, sizeof(comp_stats));
-+
-+        start_ts = g_get_monotonic_time();
-+        for (ptr = mem; ptr < end; ptr += PAGE_SIZE) {
-+            *ptr = 0x10;
-+            compress_page_with_multi_thread(threads, ptr);
-+        }
-+        threaded_workqueue_wait_for_requests(threads);
-+        spend = g_get_monotonic_time() - start_ts;
-+        total_ts += spend;
-+
-+        if (comp_stats.pages != pages) {
-+            printf("ERROR: pages are compressed %ld, expect %ld.\n",
-+                   comp_stats.pages, pages);
-+            exit(-1);
-+        }
-+
-+        rate = (double)(comp_stats.pages * PAGE_SIZE) /
-+                        comp_stats.compressed_size;
-+        printf("RUN %d: Request # %ld Cost %ld, Compression Rate %f.\n", i,
-+               comp_stats.pages, spend, rate);
-+    }
-+
-+    printf("AVG: Time Cost %ld.\n", total_ts / repeated_count);
-+}
-+
-+static void usage(const char *arg0)
-+{
-+    printf("\nThreaded Workqueue Benchmark.\n");
-+    printf("Usage:\n");
-+    printf("  %s [OPTIONS]\n", arg0);
-+    printf("Options:\n");
-+    printf("   -t        the number of threads (default %d).\n",
-+            DEFAULT_THREAD_NR);
-+    printf("   -r:       the number of requests handled by each thread (default %d).\n",
-+            DEFAULT_THREAD_REQUEST_NR);
-+    printf("   -m:       the size of the memory (G) used to test (default %dG).\n",
-+            DEFAULT_MEM_SIZE);
-+    printf("   -c:       the repeated count (default %d).\n",
-+            DEFAULT_REPEATED_COUNT);
-+    printf("   -h        show this help info.\n");
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+    int c, threads_nr, requests_nr, repeated_count;
-+    unsigned long mem_size;
-+    uint8_t *mem;
-+    Threads *threads;
-+
-+    threads_nr = DEFAULT_THREAD_NR;
-+    requests_nr = DEFAULT_THREAD_REQUEST_NR;
-+    mem_size = DEFAULT_MEM_SIZE;
-+    repeated_count = DEFAULT_REPEATED_COUNT;
-+
-+    for (;;) {
-+        c = getopt(argc, argv, "t:r:m:c:h");
-+        if (c < 0) {
-+            break;
-+        }
-+
-+        switch (c) {
-+        case 't':
-+            threads_nr = atoi(optarg);
-+            break;
-+        case 'r':
-+            requests_nr = atoi(optarg);
-+            break;
-+        case 'm':
-+            mem_size = atol(optarg);
-+            break;
-+        case 'c':
-+            repeated_count = atoi(optarg);
-+            break;
-+        default:
-+            printf("Unkown option: %c.\n", c);
-+        case 'h':
-+            usage(argv[0]);
-+            return -1;
-+        }
-+    }
-+
-+    printf("Run the benchmark: threads %d requests-per-thread: %d memory %ldG repeat %d.\n",
-+            threads_nr, requests_nr, mem_size, repeated_count);
-+
-+    mem_size = mem_size << 30;
-+    mem = qemu_memalign(PAGE_SIZE, mem_size);
-+    memset(mem, 0, mem_size);
-+
-+    threads = compress_threads_save_setup(threads_nr, requests_nr);
-+    run(threads, mem, mem_size, repeated_count);
-+    compress_threads_save_cleanup(threads);
-+    return 0;
-+}
--- 
-2.14.5
++        vc->gfx.scale_x =3D (double)ww / surface_width(vc->gfx.ds);
++        vc->gfx.scale_y =3D (double)wh / surface_height(vc->gfx.ds);
+     }
+ }
+=20
+@@ -232,8 +239,8 @@ void gd_egl_cursor_position(DisplayChangeListener *dc=
+l,
+ {
+     VirtualConsole *vc =3D container_of(dcl, VirtualConsole, gfx.dcl);
+=20
+-    vc->gfx.cursor_x =3D pos_x;
+-    vc->gfx.cursor_y =3D pos_y;
++    vc->gfx.cursor_x =3D pos_x * vc->gfx.scale_x;
++    vc->gfx.cursor_y =3D pos_y * vc->gfx.scale_y;
+ }
+=20
+ void gd_egl_release_dmabuf(DisplayChangeListener *dcl,
+--=20
+2.9.3
