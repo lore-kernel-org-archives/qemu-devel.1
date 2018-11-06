@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([208.118.235.92]:40300)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gJpSB-0002WZ-4f
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 19:42:51 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gJpdC-0001yn-AU
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 19:54:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gJpLO-0003xL-EB
-	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 19:35:47 -0500
-References: <20181019164929.18404-1-mreitz@redhat.com>
-	<20181105141838.GC10880@linux.fritz.box>
+	(envelope-from <mreitz@redhat.com>) id 1gJpdB-0002sa-C7
+	for qemu-devel@nongnu.org; Mon, 05 Nov 2018 19:54:10 -0500
+References: <20181019113424.25727-1-armbru@redhat.com>
+	<d370d182-01c8-f4ab-ed63-207a9dc4c4d6@redhat.com>
+	<87r2fz5ywu.fsf@dusky.pond.sub.org>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <7a4c9df3-4713-1e8b-2fa8-873aa6017cf5@redhat.com>
-Date: Tue, 6 Nov 2018 01:35:30 +0100
+Message-ID: <3b245d71-abe1-9ae2-1671-7d29a1676d70@redhat.com>
+Date: Tue, 6 Nov 2018 01:54:00 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181105141838.GC10880@linux.fritz.box>
+In-Reply-To: <87r2fz5ywu.fsf@dusky.pond.sub.org>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="wYqTCOpdBuTXfuI4pJqxfWZh08GuIdBxp"
-Subject: Re: [Qemu-devel] [PATCH v2 0/5] Various option help readability
- improvement suggestions
+	boundary="J2yFul0tjXWA87RPly1p2oICQbOAL3vnX"
+Subject: Re: [Qemu-devel] [PATCH] block: Make more block drivers
+ compile-time configurable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,132 +26,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jeff@codyprime.org, qemu-block@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wYqTCOpdBuTXfuI4pJqxfWZh08GuIdBxp
+--J2yFul0tjXWA87RPly1p2oICQbOAL3vnX
 From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
-Message-ID: <7a4c9df3-4713-1e8b-2fa8-873aa6017cf5@redhat.com>
-Subject: Re: [PATCH v2 0/5] Various option help readability improvement
- suggestions
-References: <20181019164929.18404-1-mreitz@redhat.com>
- <20181105141838.GC10880@linux.fritz.box>
-In-Reply-To: <20181105141838.GC10880@linux.fritz.box>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jeff@codyprime.org,
+ qemu-block@nongnu.org
+Message-ID: <3b245d71-abe1-9ae2-1671-7d29a1676d70@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] block: Make more block drivers compile-time
+ configurable
+References: <20181019113424.25727-1-armbru@redhat.com>
+ <d370d182-01c8-f4ab-ed63-207a9dc4c4d6@redhat.com>
+ <87r2fz5ywu.fsf@dusky.pond.sub.org>
+In-Reply-To: <87r2fz5ywu.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 05.11.18 15:18, Kevin Wolf wrote:
-> Am 19.10.2018 um 18:49 hat Max Reitz geschrieben:
->> I noticed that with the (more or less) recent series from Marc-Andr=C3=
-=A9 the
->> output of qemu-img amend -f qcow2 -o help changed to this:
->>
->> $ ./qemu-img amend -f qcow2 -o help
->> Creation options for 'qcow2':
->> qcow2-create-opts.backing_file=3Dstr - File name of a base image
->> qcow2-create-opts.backing_fmt=3Dstr - Image format of the base image
->> qcow2-create-opts.cluster_size=3Dsize - qcow2 cluster size
->> qcow2-create-opts.compat=3Dstr - Compatibility level (0.10 or 1.1)
->> [...]
->>
->> The types are a nice addition, but I didn't like having the list name
->> printed in every single line (in fact, the list name does not make any=
-
->> sense here at all, because there already is a caption which reads
->> "Creation options for 'qcow2'"), and I did not like the use of '=3D' f=
-or
->> types.
->>
->> In general, I don't like the robot-y appearance, which is even worse i=
-n
->> things like -device virtio-blk,help, which gives you this (among
->> other lines):
->>
->>> virtio-blk-pci.iothread=3Dlink<iothread>
->>
->> Sadly, there isn't much we can do about the "link<iothread>", so this
->> series doesn't improve on that point.
->>
->> What this series does do, however, is it changes these lists not to
->> print the list name on every single line, but only as a caption (and f=
-or
->> option lists, this caption is option, because the caller may want to
->> print a custom caption that is more expressive -- as is the case for
->> qemu-img amend -o help).
->>
->> Consequentially, all list items are indented by two spaces to make cle=
-ar
->> they belong to the caption.  I can already see that some people might
->> disagree on having this indentation, but I like it, so I have it in th=
-is
->> series.
->>
->> Furthermore, types are now enclosed by angle brackets, and the alignme=
-nt
->> we originally had for descriptions is restored (although now after 24
->> instead of 16 characters, because every option name is now accompanied=
-
->> by indentation and a type).
->>
->>
->> Thus, after this series, the amend output looks like this:
->>
->> $ ./qemu-img amend -f qcow2 -o help
->> Creation options for 'qcow2':
->>   backing_file=3D<str>     - File name of a base image
->>   backing_fmt=3D<str>      - Image format of the base image
->>   cluster_size=3D<size>    - qcow2 cluster size
->>   compat=3D<str>           - Compatibility level (0.10 or 1.1)
->> [...]
->>
->>
->> virtio-blk's list presents itself like so:
->>
->> $ x86_64-softmmu/qemu-system-x86_64 -device virtio-blk,help
->> virtio-blk-pci options:
->>   iothread=3D<link<iothread>>
->>   request-merging=3D<bool> - on/off
->>   secs=3D<uint32>
->> [...]
->>
->>
->> And now we even print something when there are no options:
->>
->> $ x86_64-softmmu/qemu-system-x86_64 -object can-bus,help
->> There are no options for can-bus.
->>
->> (Before this series, there just is no output.)
->>
->>
->> As a side effect, patch 1 fixes iotest 082.
+On 05.11.18 16:25, Markus Armbruster wrote:
+> Max Reitz <mreitz@redhat.com> writes:
 >=20
-> Thanks, applied to the block branch.
+>> On 19.10.18 13:34, Markus Armbruster wrote:
+>>> From: Jeff Cody <jcody@redhat.com>
+>>>
+>>> This adds configure options to control the following block drivers:
+>>>
+>>> * Bochs
+>>> * Cloop
+>>> * Dmg
+>>> * Qcow (V1)
+>>> * Vdi
+>>> * Vvfat
+>>> * qed
+>>> * parallels
+>>> * sheepdog
+>>>
+>>> Each of these defaults to being enabled.
+>>>
+>>> Signed-off-by: Jeff Cody <jcody@redhat.com>
+>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>>> ---
+>>>
+>>> Hmm, we got quite a few --enable-BLOCK-DRIVER now.  Perhaps a single
+>>> list-valued option similar --target-list would be better.  Could be
+>>> done on top.
+>>>
+>>>  block/Makefile.objs | 22 ++++++++---
+>>>  configure           | 91 +++++++++++++++++++++++++++++++++++++++++++=
+++
+>>>  2 files changed, 107 insertions(+), 6 deletions(-)
+>>>
+>>> diff --git a/block/Makefile.objs b/block/Makefile.objs
+>>> index c8337bf186..1cad9fc4f1 100644
+>>> --- a/block/Makefile.objs
+>>> +++ b/block/Makefile.objs
+>    @@ -1,10 +1,18 @@
+>    -block-obj-y +=3D raw-format.o qcow.o vdi.o vmdk.o cloop.o bochs.o v=
+pc.o vvfat.o dmg.o
+>    +block-obj-y +=3D raw-format.o vmdk.o vpc.o
+>    +block-obj-$(CONFIG_QCOW1) +=3D qcow.o
+>    +block-obj-$(CONFIG_VDI) +=3D vdi.o
+>    +block-obj-$(CONFIG_CLOOP) +=3D cloop.o
+>    +block-obj-$(CONFIG_BOCHS) +=3D bochs.o
+>    +block-obj-$(CONFIG_VVFAT) +=3D vvfat.o
+>    +block-obj-$(CONFIG_DMG) +=3D dmg.o
+>    +
+>     block-obj-y +=3D qcow2.o qcow2-refcount.o qcow2-cluster.o qcow2-sna=
+pshot.o qcow2-cache.o qcow2-bitmap.o
+>>
+>> [...]
+>>
+>>> @@ -45,7 +54,8 @@ gluster.o-libs     :=3D $(GLUSTERFS_LIBS)
+>>>  vxhs.o-libs        :=3D $(VXHS_LIBS)
+>>>  ssh.o-cflags       :=3D $(LIBSSH2_CFLAGS)
+>>>  ssh.o-libs         :=3D $(LIBSSH2_LIBS)
+>>> -block-obj-$(if $(CONFIG_BZIP2),m,n) +=3D dmg-bz2.o
+>>> +block-obj-dmg-bz2$(if $(CONFIG_BZIP2),m,n) +=3D dmg-bz2.o
+>>> +block-obj-$(CONFIG_DMG) +=3D $(block-obj-dmg-bz2-y)
+>>
+>> This defines "block-obj-dmg-bz2m" or "block-obj-dmg-bz2n", so
+>> "block-obj-dmg-bz2-y" is never defined (note both the missing hyphen a=
+nd
+>> the "m" vs. "y").
+>>
+>> How about:
+>>
+>> block-obj-dmg-bz2-$(CONFIG_BZIP2) +=3D dmg-bz2.o
+>=20
+> As far as I can tell, CONFIG_BZIP2 is either undefined or "y".  Thus,
+> block-obj-dmg-bz2-y is either left undefined or set to dmg-bz2.o.
 
-Thank you both for the quick pong. :-)
+Yes.
+
+> Perhaps the '+=3D' be ':=3D', but we seem to use '+=3D' pretty
+> indiscriminately.
+
+Yep.  I don't know.  Whatever works, and both do, so...
+
+>> block-obj-$(if $(CONFIG_DMG),m,n) +=3D $(block-obj-dmg-bz2-y)
+>=20
+> As far as I can tell, CONFIG_DMG is also either undefined or "y".  So,
+> this adds dmg-bz2.o to block-obj-m if both CONFIG_BZIP2 and CONFIG_DMG
+> are enabled.
+
+Yes.
+
+> Shouldn't it be added to block-obj-y, like dmg.o, or am I confused?
+
+The behavior before this patch was to add it to block-obj-m.
+27685a8dd08c051fa6d641fe46106fc0dfa51073 has the explanation: We want
+the bz2 part to be a module so you can launch qemu even without libbz2
+around.  Only when you use dmg will it load that module.
+
+(And if you dig deeper, it was 88d88798b7efe that (intentionally) broke
+ that intended behavior, until it was restored by the above commit.)
+
+>> Bonus point: The "+=3D" are naturally aligned!
+>=20
+> Woot!
+
+:-)
 
 Max
 
+>> (Fun fact on the side: I tried downloading some dmg image, but qemu
+>> refused to open that.  ("sector count 409600 for chunk 4 is larger tha=
+n
+>> max (131072)" -- yeah, yeah, I know that I'm not the largest guy) -- b=
+ut
+>> you can test it just by replacing "dmg-bz2.o" by "does-not-exist.o", a=
+nd
+>> then make complains normally, but stops complaining with --disable-dmg=
 
---wYqTCOpdBuTXfuI4pJqxfWZh08GuIdBxp
+>> or --disable-bzip2.)
+>=20
+> Thanks!
+>=20
+
+
+
+--J2yFul0tjXWA87RPly1p2oICQbOAL3vnX
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlvg4dIACgkQ9AfbAGHV
-z0DT8Af9GDe/TSEN7bl7V8wPhPfgeNOoGQK1sK+8g1/0QKWhz08tbyidXmc8wd6J
-mVkBtFUIEBkFezuU0ZhzAohMen382LNutW/rYSMg4udLGA4sFZ1rVrkx8tSsPmQN
-Qjuinc51dBE11+o5k8elRt5Dham6UvGzf/bbA6clZat1LTf8BJi3gvsk6wEcpPga
-vziQzifHZ1J2JqmhkTWC0m9/A9qOOpP2Ilr17/0RORU/c7v5XesJpCbk9nD0Hec4
-0Ko2kcfXSZWxriUUUCNdoC6CrNLFHmlujjxkCxRRORg4lX0O0nf/3HgWEF9LWVz+
-O/DemVGZWfBFFEB6twZG1KxVSeGGkA==
-=NNKD
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlvg5igACgkQ9AfbAGHV
+z0DF6Af+MCzvjkQHOvQy7VWAWbdNbhvFkOyPIKWSuF+LvXMr+QBCN4PJ5MuH9gHf
+I//9pNQ4Dm3Uuw3W992sZypdBp5qLQm90ZyxGSQl5H9VfffZNWpLAPB9HW4Y1bv8
+F6rW075HRJEwpypeDi85RdXe1QtzJHmou4WeYveEHOp5qQpTpfXIBefxsROYuKCV
+Lm4Mg5yNMPWVR1BWzbXsR1AJnrV8uP8c5/R7iTPGCvBvUFrN9zngcZaYOz0FtmWP
+3VsSLhuKVoqP1XiJtbNDi5pMqJe7MMoLiqzMT3D3XlDsZQvoM/vZz29lVRjnyULV
+a9qmmacakrjROANGUtHDZfZWYszLcA==
+=G+8T
 -----END PGP SIGNATURE-----
 
---wYqTCOpdBuTXfuI4pJqxfWZh08GuIdBxp--
+--J2yFul0tjXWA87RPly1p2oICQbOAL3vnX--
