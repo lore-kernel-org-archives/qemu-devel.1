@@ -1,31 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52246)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gK2Ke-00054m-89
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 09:27:55 -0500
+	(envelope-from <stefanb@linux.ibm.com>) id 1gK2LQ-0006ne-GZ
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 09:28:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gK2Ka-0001Hj-6K
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 09:27:52 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:46720)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gK2KZ-0000rd-VK
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 09:27:48 -0500
-Received: by mail-wr1-f68.google.com with SMTP id 74-v6so13710634wrb.13
-	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 06:27:29 -0800 (PST)
-References: <20181031003120.26771-1-ehabkost@redhat.com>
-	<20181031003120.26771-12-ehabkost@redhat.com>
-	<CAFEAcA_ScL828ya7P_5=HMx=vbxo=jK4047nAbmb9Ep=6r=2og@mail.gmail.com>
-	<f1bd429f-198a-ee27-9184-636692332816@redhat.com>
-	<20181106141302.GP12503@habkost.net>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <5586b504-2111-d3af-e0e1-ee590ef40f5d@redhat.com>
-Date: Tue, 6 Nov 2018 15:27:25 +0100
+	(envelope-from <stefanb@linux.ibm.com>) id 1gK2LM-00023W-1v
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 09:28:40 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42744
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.ibm.com>)
+	id 1gK2LK-0001zU-5W
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 09:28:34 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wA6ELAjO002193
+	for <qemu-devel@nongnu.org>; Tue, 6 Nov 2018 09:28:32 -0500
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2nkbudav3f-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 09:28:32 -0500
+Received: from localhost
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.ibm.com>;
+	Tue, 6 Nov 2018 14:28:31 -0000
+References: <20181106052144.31841-1-ppandit@redhat.com>
+	<20181106052144.31841-2-ppandit@redhat.com>
+	<CAJ+F1C+EdebPX5jo0k7hh4nw1vL2hT9TOec3_b6AvizNQyfZ0g@mail.gmail.com>
+From: Stefan Berger <stefanb@linux.ibm.com>
+Date: Tue, 6 Nov 2018 09:28:27 -0500
 MIME-Version: 1.0
-In-Reply-To: <20181106141302.GP12503@habkost.net>
+In-Reply-To: <CAJ+F1C+EdebPX5jo0k7hh4nw1vL2hT9TOec3_b6AvizNQyfZ0g@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] tests: Fix Python 3 detection on older GNU
- make versions
+Content-Language: en-MW
+Message-Id: <2c3e5be5-c01e-5c04-b978-069eb55ca83c@linux.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/2] tpm: use loop iterator to set sts data
+ field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,95 +45,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Cleber Rosa <crosa@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, P J P <ppandit@redhat.com>
+Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>, QEMU <qemu-devel@nongnu.org>, Prasad J Pandit <pjp@fedoraproject.org>
 
-On 6/11/18 15:13, Eduardo Habkost wrote:
-> The $(SHELLSTATUS) variable requires GNU make >= 4.2, but Travis
-> seems to provide an older version.  Change the existing rules to
-> use command output instead of exit code, to make it compatible
-> with older GNU make versions.
+On 11/6/18 3:13 AM, Marc-Andr=C3=A9 Lureau wrote:
+> Hi
+>
+> On Tue, Nov 6, 2018 at 9:24 AM P J P <ppandit@redhat.com> wrote:
+>> From: Prasad J Pandit <pjp@fedoraproject.org>
+>>
+>> When TIS request is done, set 'sts' data field across all localities.
+> The code certainly meant to set the field across all localities.
+> However I don't see in the "TCG PC Client Specific TPM Interface
+> Specification (TIS)" where it states that the field should be set
+> across all localities. Could you quote the relevant part?
 
-You were quicker, I just found out :)
+I don't see it explicitly mentioned but would interpret it as being a=20
+flag across all localities.
 
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
-> I think that's the cause of the Travis failures.  I have
-> submitted a test job right now, at:
->    https://travis-ci.org/ehabkost/qemu-hacks/jobs/451387962
-> Let's see if it fixes the issue.
 
-You can run it locally:
+ =C2=A0=C2=A0=C2=A0 Stefan
 
-$ make docker-image-travis
-...
-$ docker run --rm -it -v $(pwd):$(pwd) -w $(pwd) \
-     -u 0 --entrypoint=/bin/bash qemu:travis
-root@ede09efe22fd:qemu# cd build/docker_travis/
-root@ede09efe22fd:qemu/build/docker_travis# make AVOCADO_SHOW=app 
-check-acceptance
-   VENV    qemu/build/docker_travis/tests/venv
-The virtual environment was not created successfully because ensurepip 
-is not
-available.  On Debian/Ubuntu systems, you need to install the python3-venv
-package using the following command.
 
-     apt-get install python3-venv
-
-You may need to use sudo with that command.  After installing the 
-python3-venv
-package, recreate your virtual environment.
-
-root@ede09efe22fd:qemu/build/docker_travis# apt install python3-pip 
-python3.4-venv
-root@ede09efe22fd:qemu/build/docker_travis# make AVOCADO_SHOW=app 
-check-acceptance
-   VENV    qemu/build/docker_travis/tests/venv
-   PIP     qemu/tests/requirements.txt
-   AVOCADO tests/acceptance
-JOB ID     : 5e5529e79456c388e80323acdc71f3887341a498
-JOB LOG    : 
-qemu/build/docker_travis/tests/results/job-2018-11-06T14.26-5e5529e/job.log
-  (1/6) 
-qemu/tests/acceptance/boot_linux_console.py:BootLinuxConsole.test: 
-CANCEL: No QEMU binary defined or found in the source tree (0.01 s)
-  (2/6) 
-qemu/tests/acceptance/version.py:Version.test_qmp_human_info_version: 
-CANCEL: No QEMU binary defined or found in the source tree (0.01 s)
-  (3/6) qemu/tests/acceptance/vnc.py:Vnc.test_no_vnc: CANCEL: No QEMU 
-binary defined or found in the source tree (0.00 s)
-  (4/6) qemu/tests/acceptance/vnc.py:Vnc.test_no_vnc_change_password: 
-CANCEL: No QEMU binary defined or found in the source tree (0.00 s)
-  (5/6) 
-qemu/tests/acceptance/vnc.py:Vnc.test_vnc_change_password_requires_a_password: 
-CANCEL: No QEMU binary defined or found in the source tree (0.00 s)
-  (6/6) qemu/tests/acceptance/vnc.py:Vnc.test_vnc_change_password: 
-CANCEL: No QEMU binary defined or found in the source tree (0.00 s)
-RESULTS    : PASS 0 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | 
-CANCEL 6
-JOB TIME   : 0.45 s
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> ---
->   tests/Makefile.include | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index d2e577eabb..074eece558 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -913,8 +913,8 @@ TESTS_RESULTS_DIR=$(BUILD_DIR)/tests/results
->   # information please refer to "avocado --help".
->   AVOCADO_SHOW=none
->   
-> -$(shell $(PYTHON) -c 'import sys; assert sys.version_info >= (3,0)' >/dev/null 2>&1)
-> -ifeq ($(.SHELLSTATUS),0)
-> +PYTHON3 = $(shell $(PYTHON) -c 'import sys; print(1 if sys.version_info >= (3, 0) else 0)')
-> +ifeq ($(PYTHON3), 1)
->   $(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
->   	$(call quiet-command, \
->               $(PYTHON) -m venv --system-site-packages $@, \
-> 
+>
+> thanks
+>
+>> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+>> ---
+>>   hw/tpm/tpm_tis.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+>> index 20126dd838..58d90645bc 100644
+>> --- a/hw/tpm/tpm_tis.c
+>> +++ b/hw/tpm/tpm_tis.c
+>> @@ -299,7 +299,7 @@ static void tpm_tis_request_completed(TPMIf *ti, i=
+nt ret)
+>>
+>>       if (s->cmd.selftest_done) {
+>>           for (l =3D 0; l < TPM_TIS_NUM_LOCALITIES; l++) {
+>> -            s->loc[locty].sts |=3D TPM_TIS_STS_SELFTEST_DONE;
+>> +            s->loc[l].sts |=3D TPM_TIS_STS_SELFTEST_DONE;
+>>           }
+>>       }
+>>
+>> --
+>> 2.17.2
+>>
+>>
+>
