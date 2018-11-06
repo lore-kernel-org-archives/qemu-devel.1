@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51641)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52246)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gK2JH-0002yC-0f
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 09:26:28 -0500
+	(envelope-from <philmd@redhat.com>) id 1gK2Ke-00054m-89
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 09:27:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gK2JA-0008LD-Ux
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 09:26:26 -0500
-Date: Tue, 6 Nov 2018 12:26:11 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181106142611.GQ12503@habkost.net>
-References: <20181106102335.20027-1-kraxel@redhat.com>
-	<20181106102335.20027-3-kraxel@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1gK2Ka-0001Hj-6K
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 09:27:52 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:46720)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gK2KZ-0000rd-VK
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 09:27:48 -0500
+Received: by mail-wr1-f68.google.com with SMTP id 74-v6so13710634wrb.13
+	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 06:27:29 -0800 (PST)
+References: <20181031003120.26771-1-ehabkost@redhat.com>
+	<20181031003120.26771-12-ehabkost@redhat.com>
+	<CAFEAcA_ScL828ya7P_5=HMx=vbxo=jK4047nAbmb9Ep=6r=2og@mail.gmail.com>
+	<f1bd429f-198a-ee27-9184-636692332816@redhat.com>
+	<20181106141302.GP12503@habkost.net>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <5586b504-2111-d3af-e0e1-ee590ef40f5d@redhat.com>
+Date: Tue, 6 Nov 2018 15:27:25 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181106102335.20027-3-kraxel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/6] add QemuSupportState
+In-Reply-To: <20181106141302.GP12503@habkost.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] tests: Fix Python 3 detection on older GNU
+ make versions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,57 +34,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, Markus Armbruster <armbru@redhat.com>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>
+To: Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Cleber Rosa <crosa@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-On Tue, Nov 06, 2018 at 11:23:31AM +0100, Gerd Hoffmann wrote:
-> Indicates support state for something (device, backend, subsystem, ...)
-> in qemu.  Add QemuSupportState field to ObjectClass.  Add some support
-> code.
+On 6/11/18 15:13, Eduardo Habkost wrote:
+> The $(SHELLSTATUS) variable requires GNU make >= 4.2, but Travis
+> seems to provide an older version.  Change the existing rules to
+> use command output instead of exit code, to make it compatible
+> with older GNU make versions.
+
+You were quicker, I just found out :)
+
 > 
-> TODO: wire up to qom-list-types
-> 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 > ---
-[...]
-> +##
-> +# @SupportState:
-> +#
-> +# Indicate Support level of qemu devices, backends, subsystems, ...
-> +#
-> +# @unspecified: not specified (zero-initialized).
-> +#
-> +# @experimental: in development, can be unstable or incomplete.
+> I think that's the cause of the Travis failures.  I have
+> submitted a test job right now, at:
+>    https://travis-ci.org/ehabkost/qemu-hacks/jobs/451387962
+> Let's see if it fixes the issue.
 
-People reading this document would ask: what would appear on
-MAINTAINERS if SupportState is `experimental`?
+You can run it locally:
 
-> +#
-> +# @supported: works stable and is fully supported.
-> +#             (supported + maintained in MAINTAINERS).
-> +#
-> +# @unsupported: should work, support is weak or not present.
-> +#               (odd-fixes + orphan in MAINTAINERS).
+$ make docker-image-travis
+...
+$ docker run --rm -it -v $(pwd):$(pwd) -w $(pwd) \
+     -u 0 --entrypoint=/bin/bash qemu:travis
+root@ede09efe22fd:qemu# cd build/docker_travis/
+root@ede09efe22fd:qemu/build/docker_travis# make AVOCADO_SHOW=app 
+check-acceptance
+   VENV    qemu/build/docker_travis/tests/venv
+The virtual environment was not created successfully because ensurepip 
+is not
+available.  On Debian/Ubuntu systems, you need to install the python3-venv
+package using the following command.
 
-What's the difference in practice between unsupported and
-experimental?
+     apt-get install python3-venv
 
-> +#
-> +# @obsolete: is obsolete, still present for compatibility reasons,
-> +#            will likely be removed at some point in the future.
-> +#            Not deprecated (yet).
-> +#            (obsolete in MAINTAINERS).
-> +#
-> +# @deprecated: is deprecated, according to qemu deprecation policy.
+You may need to use sudo with that command.  After installing the 
+python3-venv
+package, recreate your virtual environment.
 
-I believe we want to differentiate "deprecated, but still safe to
-use in production if you have a migration plan" from "deprecated,
-and also unstable and unsafe for production".
+root@ede09efe22fd:qemu/build/docker_travis# apt install python3-pip 
+python3.4-venv
+root@ede09efe22fd:qemu/build/docker_travis# make AVOCADO_SHOW=app 
+check-acceptance
+   VENV    qemu/build/docker_travis/tests/venv
+   PIP     qemu/tests/requirements.txt
+   AVOCADO tests/acceptance
+JOB ID     : 5e5529e79456c388e80323acdc71f3887341a498
+JOB LOG    : 
+qemu/build/docker_travis/tests/results/job-2018-11-06T14.26-5e5529e/job.log
+  (1/6) 
+qemu/tests/acceptance/boot_linux_console.py:BootLinuxConsole.test: 
+CANCEL: No QEMU binary defined or found in the source tree (0.01 s)
+  (2/6) 
+qemu/tests/acceptance/version.py:Version.test_qmp_human_info_version: 
+CANCEL: No QEMU binary defined or found in the source tree (0.01 s)
+  (3/6) qemu/tests/acceptance/vnc.py:Vnc.test_no_vnc: CANCEL: No QEMU 
+binary defined or found in the source tree (0.00 s)
+  (4/6) qemu/tests/acceptance/vnc.py:Vnc.test_no_vnc_change_password: 
+CANCEL: No QEMU binary defined or found in the source tree (0.00 s)
+  (5/6) 
+qemu/tests/acceptance/vnc.py:Vnc.test_vnc_change_password_requires_a_password: 
+CANCEL: No QEMU binary defined or found in the source tree (0.00 s)
+  (6/6) qemu/tests/acceptance/vnc.py:Vnc.test_vnc_change_password: 
+CANCEL: No QEMU binary defined or found in the source tree (0.00 s)
+RESULTS    : PASS 0 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | 
+CANCEL 6
+JOB TIME   : 0.45 s
 
-I expect enterprise distributions to have a strict policy of not
-allowing unsupported and experimental devices to be enabled, but
-still allow deprecated devices to be enabled (but only if they
-are stable/supported).
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
--- 
-Eduardo
+> ---
+>   tests/Makefile.include | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index d2e577eabb..074eece558 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -913,8 +913,8 @@ TESTS_RESULTS_DIR=$(BUILD_DIR)/tests/results
+>   # information please refer to "avocado --help".
+>   AVOCADO_SHOW=none
+>   
+> -$(shell $(PYTHON) -c 'import sys; assert sys.version_info >= (3,0)' >/dev/null 2>&1)
+> -ifeq ($(.SHELLSTATUS),0)
+> +PYTHON3 = $(shell $(PYTHON) -c 'import sys; print(1 if sys.version_info >= (3, 0) else 0)')
+> +ifeq ($(PYTHON3), 1)
+>   $(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
+>   	$(call quiet-command, \
+>               $(PYTHON) -m venv --system-site-packages $@, \
+> 
