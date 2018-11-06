@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39255)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gKAhE-0004w7-EL
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 18:23:48 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gKAhM-0005br-Ol
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 18:23:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gKATr-0004Lt-LB
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 18:10:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34552)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gKATU-0002pq-6Z
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 18:09:37 -0500
-References: <CAFEAcA9pvsNML+=2jwygO4ciJWr0GmWHznJ-Lb1bcOsWhYjo4A@mail.gmail.com>
-	<f5712b07-05a1-650c-332a-a24462fed977@redhat.com>
-	<CAFEAcA-Wkk9wLOfSYs2_R_2WwSe59egU4dwRBpdALDaA7642mQ@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ce8c76ea-2e3a-b049-d515-c52f004bfec6@redhat.com>
-Date: Wed, 7 Nov 2018 00:09:23 +0100
+	(envelope-from <dgibson@ozlabs.org>) id 1gKASV-0007dM-BH
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 18:08:33 -0500
+Date: Wed, 7 Nov 2018 09:45:34 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20181106224534.GB24589@umbus.fritz.box>
+References: <20181106102335.20027-1-kraxel@redhat.com>
+	<20181106102335.20027-2-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-Wkk9wLOfSYs2_R_2WwSe59egU4dwRBpdALDaA7642mQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] List of files containing devices which have not
- been QOMified
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="p4qYPpj5QlsIQJ0K"
+Content-Disposition: inline
+In-Reply-To: <20181106102335.20027-2-kraxel@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/6] move ObjectClass to typedefs.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,58 +24,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, Markus Armbruster <armbru@redhat.com>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>
 
-On 07/11/2018 00:05, Peter Maydell wrote:
-> On 6 November 2018 at 19:46, Paolo Bonzini <pbonzini@redhat.com> wrote:
->> On 06/11/2018 19:43, Peter Maydell wrote:
->>> hw/core/ptimer.c
->>
->> Not a device.
-> 
-> Indeed not, but it could be a QOM object I guess (would
-> that gain us anything?)
 
-I don't know, it seems to me more like a generic high-level abstraction
-around QEMUTimer.
+--p4qYPpj5QlsIQJ0K
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->>> hw/i2c/bitbang_i2c.c
->>
->> TYPE_GPIO_I2C?
-> 
-> That part is, but bitbang_i2c_init() creates an object
-> which isn't a QOM object and is used by some other i2c devices.
+On Tue, Nov 06, 2018 at 11:23:30AM +0100, Gerd Hoffmann wrote:
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 
-Ah, I see.  Then I think it is in the same family as AHCIState.
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
->>> hw/ide/ahci.c
->>
->> Even though AHCIState is not a QOM object, all of its users are
->> (TYPE_SYSBUS_AHCI is in this file, TYPE_ICH9_AHCI is in hw/ide/ich.c)
-> 
-> Mmm, this is one of those which I was unsure about so
-> put on the list anyway.
-> 
-> Overall something that occurs to me is that I'm not sure
-> what exactly (other than tidiness) we gain from converting
-> remaining non-QOM devices. In some of the other cases I've
-> looked at (like sysbus init methods or old_mmio users) we
-> get to complete an API transition and remove the old code.
-> For a non-QOM device, how much does it hurt us that they're
-> lying around in the codebase? We might do better to
-> specifically target APIs we'd like to deal with (like
-> direct uses of vmstate_register, maybe?).
+> ---
+>  include/qemu/typedefs.h | 1 +
+>  include/qom/object.h    | 1 -
+>  2 files changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+> index 3ec0e13a96..fed53f6de2 100644
+> --- a/include/qemu/typedefs.h
+> +++ b/include/qemu/typedefs.h
+> @@ -62,6 +62,7 @@ typedef struct NetClientState NetClientState;
+>  typedef struct NetFilterState NetFilterState;
+>  typedef struct NICInfo NICInfo;
+>  typedef struct NumaNodeMem NumaNodeMem;
+> +typedef struct ObjectClass ObjectClass;
+>  typedef struct PCIBridge PCIBridge;
+>  typedef struct PCIBus PCIBus;
+>  typedef struct PCIDevice PCIDevice;
+> diff --git a/include/qom/object.h b/include/qom/object.h
+> index f0b0bf39cc..499e1fd8b7 100644
+> --- a/include/qom/object.h
+> +++ b/include/qom/object.h
+> @@ -20,7 +20,6 @@
+>  struct TypeImpl;
+>  typedef struct TypeImpl *Type;
+> =20
+> -typedef struct ObjectClass ObjectClass;
+>  typedef struct Object Object;
+> =20
+>  typedef struct TypeInfo TypeInfo;
 
-Yes, those are ugly and are definitely a sign of a legacy device
-(non-qdev even before QOM).  serial_mm_init is the main example as you
-point out below.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Paolo
+--p4qYPpj5QlsIQJ0K
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> Some bits I would definitely like to see cleaned up are
-> the things like the mmio version of the 16550 UART code
-> in hw/char/serial.c -- that not being QOMified has
-> knock-on effects in making other devices that would
-> like to basically just be 16550-wrappers harder to
-> write in a clean way.
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlviGY4ACgkQbDjKyiDZ
+s5LDfhAAj5f0ofUO3QoH2yIbChg34BvY9Asz/NOkbPcBTwfiF0qqHutfyqcYa9tU
+GebYaGwoAnGPuxX8+cJPZFxK+K77nTMQisfLXodAgZO9zt2+kydFTb6VxTPLcRuL
+h3IOrb9YJBWg+mlo10hjpaj8SgK2dl3IoKImeA4w49zNA7unO6tuwvPvEP+fGKJ8
+/T5uvJwQR7bTNW9I54z/wHXdeQNQjNfYOXx1BRf2TegBoDZw8C20G/EDphIgBuBi
+8OHmFFhQcKAehGcE+NZdwFz2iY3sIji6CLimIPnyHBFi+3x6M4vLm/hZCo802W3A
+3MNdO+NQqfqd2Pr7XKJx+/lIDdtFJbDVVPR3x8lmNrmt9+dxoQu/OtVa4BDMr95N
+SURvRcc9Zob769gqlNzOZ1MytbOucDiKOYvbE5VxG4Ged3OP149qx9ArW/OULyuE
+KfVjUnnplEEJM5b+SyHkAP/PVlDMrQlJw6EM9CuOZfgkQFYZ7mx7l71wSPCs7F2W
+7cYEzVg3b+tVxhE84HZOVK/SeiF9lURCMquZxe0yL1Em4vGM1TK0IMT9LCPGpTbY
+Uk7s+iCsA25CemdsBPugJq6yqU3kn0Sgip5jSenZ/kthIdnjGcTKIN8vU9frUhaC
+NLb+WbLb9+1zIzf7imCfDNpJ6rS1RIyOpyOfurYKAdvVMOrgJf8=
+=4qm6
+-----END PGP SIGNATURE-----
+
+--p4qYPpj5QlsIQJ0K--
