@@ -1,21 +1,27 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:49702)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gK5IA-0001cW-0s
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 12:37:34 -0500
+	(envelope-from <philmd@redhat.com>) id 1gK5Io-0001cW-HP
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 12:38:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gK5HP-0002tS-Pn
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 12:36:49 -0500
-Date: Tue, 6 Nov 2018 18:35:59 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20181106173559.GH4758@linux.fritz.box>
-References: <20181015160633.63130-1-vsementsov@virtuozzo.com>
-	<20181015160633.63130-12-vsementsov@virtuozzo.com>
+	(envelope-from <philmd@redhat.com>) id 1gK5CA-000279-6n
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 12:31:32 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:35258)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gK5C4-0000NP-H2
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 12:31:13 -0500
+Received: by mail-wr1-f68.google.com with SMTP id z16-v6so14491178wrv.2
+	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 09:30:01 -0800 (PST)
+References: <20181106163801.14474-1-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <e2d9d1f7-4310-d8a6-f50f-c4fd833e166e@redhat.com>
+Date: Tue, 6 Nov 2018 18:29:59 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181015160633.63130-12-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v4 11/11] block/backup: use backup-top
- instead of write notifiers
+In-Reply-To: <20181106163801.14474-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-3.1] target/arm: Remove workaround for
+ small SAU regions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,65 +30,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, famz@redhat.com, stefanha@redhat.com, jcody@redhat.com, mreitz@redhat.com, den@openvz.org, eblake@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-Am 15.10.2018 um 18:06 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> Drop write notifiers and use filter node instead. Changes:
+On 6/11/18 17:38, Peter Maydell wrote:
+> Before we supported direct execution from MMIO regions, we
+> implemented workarounds in commit 720424359917887c926a33d2
+> which let us avoid doing so, even if the SAU or MPU region
+> was less than page-sized.
 > 
-> 1. copy-before-writes now handled by filter node, so, drop all
->    is_write_notifier arguments.
+> Once we implemented execute-from-MMIO, we removed part
+> of those workarounds in commit d4b6275df320cee76; but
+> we forgot the one in get_phys_addr_pmsav8() which
+> suppressed use of small SAU regions in executable regions.
+> Remove that workaround now.
 > 
-> 2. we don't have intersecting requests, so their handling is dropped.
-> Instead, synchronization works as follows:
-> when backup or backup-top starts copying of some area it firstly
-> clears copy-bitmap bits, and nobody touches areas, not marked with
-> dirty bits in copy-bitmap, so there is no intersection. Also, backup
-> job copy operations are surrounded by bdrv region lock, which is
-> actually serializing request, to not interfer with guest writes and
-> not read changed data from source (before reading we clear
-> corresponding bit in copy-bitmap, so, this area is not more handled by
-> backup-top).
-> 
-> 3. To sync with in-flight requests we now just drain hook node, we
-> don't need rw-lock.
-> 
-> 4. After the whole backup loop (top, full, incremental modes), we need
-> to check for not copied clusters, which were under backup-top operation
-> and we skipped them, but backup-top operation failed, error returned to
-> the guest and dirty bits set back.
-> 
-> 5. Don't create additional blk, use backup-top children for copy
-> operations.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Haven't reviewed it yet, but gcc complains correctly here:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-block/backup.c: In function 'backup_job_create':
-block/backup.c:717:9: error: 'backup_top' may be used uninitialized in this function [-Werror=maybe-uninitialized]
-         bdrv_backup_top_drop(backup_top);
-         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-cc1: all warnings being treated as errors
-
-> @@ -653,24 +648,29 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
->  
->      copy_bitmap = hbitmap_alloc(len, ctz32(cluster_size));
->  
-> +    /* bdrv_get_device_name will not help to find device name starting from
-> +     * @bs after backup-top append, so let's calculate job_id before. Do
-> +     * it in the same way like block_job_create
-> +     */
-> +    if (job_id == NULL && !(creation_flags & JOB_INTERNAL)) {
-> +        job_id = bdrv_get_device_name(bs);
-> +    }
-> +
-> +    backup_top = bdrv_backup_top_append(bs, target, copy_bitmap, errp);
-> +    if (!backup_top) {
-> +        return NULL;
-
-This needs to be goto error, just like in the bdrv_getlength() failure a
-few lines above (which is where the uninitialised backup_top warning
-comes from).
-
-Kevin
+> ---
+>   target/arm/helper.c | 12 ------------
+>   1 file changed, 12 deletions(-)
+> 
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index 96301930cc8..ec56becc394 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -10560,18 +10560,6 @@ static bool get_phys_addr_pmsav8(CPUARMState *env, uint32_t address,
+>   
+>       ret = pmsav8_mpu_lookup(env, address, access_type, mmu_idx, phys_ptr,
+>                               txattrs, prot, &mpu_is_subpage, fi, NULL);
+> -    /*
+> -     * TODO: this is a temporary hack to ignore the fact that the SAU region
+> -     * is smaller than a page if this is an executable region. We never
+> -     * supported small MPU regions, but we did (accidentally) allow small
+> -     * SAU regions, and if we now made small SAU regions not be executable
+> -     * then this would break previously working guest code. We can't
+> -     * remove this until/unless we implement support for execution from
+> -     * small regions.
+> -     */
+> -    if (*prot & PAGE_EXEC) {
+> -        sattrs.subpage = false;
+> -    }
+>       *page_size = sattrs.subpage || mpu_is_subpage ? 1 : TARGET_PAGE_SIZE;
+>       return ret;
+>   }
+> 
