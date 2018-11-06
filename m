@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33317)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gJzh1-0008Id-BQ
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 06:38:48 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gJzlM-0003fC-Sg
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 06:43:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gJzh0-0004Ol-JL
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 06:38:47 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:52310)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1gJzh0-00049H-D9
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 06:38:46 -0500
-Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1gJzgm-0007d4-41
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 11:38:32 +0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue,  6 Nov 2018 11:38:24 +0000
-Message-Id: <20181106113826.25810-4-peter.maydell@linaro.org>
-In-Reply-To: <20181106113826.25810-1-peter.maydell@linaro.org>
-References: <20181106113826.25810-1-peter.maydell@linaro.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1gJzlL-0002Vt-2g
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 06:43:15 -0500
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:40824)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gJzlK-0002UG-Ga
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 06:43:15 -0500
+Received: by mail-oi1-x242.google.com with SMTP id u130-v6so10412631oie.7
+	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 03:43:14 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 3/5] hw/arm/exynos4210: Zero memory allocated
- for Exynos4210State
+In-Reply-To: <1aee9b00-dd53-4e10-e56d-dc0c5628edec@comstyle.com>
+References: <20181019125239.GA13884@humpty.home.comstyle.com>
+	<1aee9b00-dd53-4e10-e56d-dc0c5628edec@comstyle.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 6 Nov 2018 11:42:53 +0000
+Message-ID: <CAFEAcA-zFw4h7cd9BSd_mZ0Kp8RStJy0ZbNAOv2MmRxUuMB6=Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3] oslib-posix: Use MAP_STACK in
+ qemu_alloc_stack() on OpenBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,40 +30,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Brad Smith <brad@comstyle.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-In exynos4210_init() we allocate memory for an Exynos4210State
-struct. Generally devices can assume that the memory allocated
-for their state struct is zero-initialized; we broke that
-assumption here by using g_new(). Use g_new0() instead.
-(In particular, some code assumes that the various irq arrays
-in the Exynos4210Irq sub-struct are zero-initialized.)
+On 5 November 2018 at 22:44, Brad Smith <brad@comstyle.com> wrote:
+> ping.
+>
 
-In the longer term, this code should be QOMified, and then
-the struct memory will be allocated elsewhere and by functions
-which always zero-initalize it; but for 3.1 this is a
-simple fix.
+Thanks for the ping, applied to master for rc0.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-id: 20181105151132.13884-1-peter.maydell@linaro.org
----
- hw/arm/exynos4210.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/hw/arm/exynos4210.c b/hw/arm/exynos4210.c
-index 827318a0036..af82e955421 100644
---- a/hw/arm/exynos4210.c
-+++ b/hw/arm/exynos4210.c
-@@ -162,7 +162,7 @@ static uint64_t exynos4210_calc_affinity(int cpu)
- 
- Exynos4210State *exynos4210_init(MemoryRegion *system_mem)
- {
--    Exynos4210State *s = g_new(Exynos4210State, 1);
-+    Exynos4210State *s = g_new0(Exynos4210State, 1);
-     qemu_irq gate_irq[EXYNOS4210_NCPUS][EXYNOS4210_IRQ_GATE_NINPUTS];
-     SysBusDevice *busdev;
-     DeviceState *dev;
--- 
-2.19.1
+-- PMM
