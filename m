@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34497)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34389)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gK1Pp-0001lw-0O
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 08:29:09 -0500
+	(envelope-from <thuth@redhat.com>) id 1gK1Ph-0001jA-QH
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 08:29:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gK1N2-0002hf-0I
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 08:26:17 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:36395)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gK1N1-0002gJ-Ny
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 08:26:15 -0500
-Received: by mail-ot1-x343.google.com with SMTP id k98so1151801otk.3
-	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 05:26:14 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <3988cd7b9d292017537f75c2eed70295a3a84718.1541447021.git.alistair.francis@wdc.com>
-References: <3988cd7b9d292017537f75c2eed70295a3a84718.1541447021.git.alistair.francis@wdc.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 6 Nov 2018 13:25:53 +0000
-Message-ID: <CAFEAcA8wLiNgW43tasbZHfjmOxQ209UdpHqCMHNcyQ25G9XcTw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] riscv: spike: Fix memory leak in
- the board init
+	(envelope-from <thuth@redhat.com>) id 1gK1Ny-0003yG-ML
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 08:27:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46432)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gK1Ny-0003x0-FY
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 08:27:14 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C1FFF30BCCD5
+	for <qemu-devel@nongnu.org>; Tue,  6 Nov 2018 13:27:13 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+Date: Tue,  6 Nov 2018 14:27:06 +0100
+Message-Id: <1541510826-21031-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] scripts/device-crash-test: Remove known crashes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,18 +27,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <Alistair.Francis@wdc.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>, "alistair23@gmail.com" <alistair23@gmail.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 5 November 2018 at 19:44, Alistair Francis <Alistair.Francis@wdc.com> wrote:
-> Coverity caught a malloc() call that was never freed. This patch ensures
-> that we free the memory but also updates the allocation to use
-> g_strdup_printf() instead of malloc().
->
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+Looks like we've fixed them all already in the past months, e.g. with:
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+ f7d6bfcdc0fe49040aac3ac131a319cb5427957e
+ spapr_pci: fail gracefully with non-pseries machine types
 
-thanks
--- PMM
+ 2363d5ee231bf047479422d56d3b85b7d37a7c23
+ hw/ppc/spapr_cpu_core: Add a proper check for spapr machine
+
+ ef0e8fc768a561dd13a86420b3268f6f3d5d0621
+ iommu: Don't crash if machine is not PC_MACHINE
+
+ 8929fc3a55f33a103adddf9cfd010bcf2b255c7d
+ hw/block/pflash_cfi*.c: fix confusing assert fail message
+
+... so we can remove these entries from the ERROR_WHITELIST now.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ At least I was not able to reproduce these crashes with the script
+ anymore... but please double-check whether I'm right.
+
+ scripts/device-crash-test | 15 ---------------
+ 1 file changed, 15 deletions(-)
+
+diff --git a/scripts/device-crash-test b/scripts/device-crash-test
+index e93a7c0..549162a 100755
+--- a/scripts/device-crash-test
++++ b/scripts/device-crash-test
+@@ -182,21 +182,6 @@ ERROR_WHITELIST = [
+     # other exitcode=1 failures not listed above will just generate INFO messages:
+     {'exitcode':1, 'loglevel':logging.INFO},
+ 
+-    # KNOWN CRASHES:
+-    # Known crashes will generate error messages, but won't be fatal.
+-    # Those entries must be removed once we fix the crashes.
+-    {'exitcode':-6, 'log':r"Device 'serial0' is in use", 'loglevel':logging.ERROR},
+-    {'exitcode':-6, 'log':r"qemu_net_client_setup: Assertion `!peer->peer' failed", 'loglevel':logging.ERROR},
+-    {'exitcode':-6, 'log':r'RAMBlock "[\w.-]+" already registered', 'loglevel':logging.ERROR},
+-    {'exitcode':-6, 'log':r"find_ram_offset: Assertion `size != 0' failed.", 'loglevel':logging.ERROR},
+-    {'exitcode':-6, 'log':r"add_cpreg_to_hashtable: code should not be reached", 'loglevel':logging.ERROR},
+-    {'exitcode':-6, 'log':r"qemu_alloc_display: Assertion `surface->image != NULL' failed", 'loglevel':logging.ERROR},
+-    {'exitcode':-6, 'log':r"Unexpected error in error_set_from_qdev_prop_error", 'loglevel':logging.ERROR},
+-    {'exitcode':-6, 'log':r"Object .* is not an instance of type spapr-machine", 'loglevel':logging.ERROR},
+-    {'exitcode':-6, 'log':r"Object .* is not an instance of type generic-pc-machine", 'loglevel':logging.ERROR},
+-    {'exitcode':-6, 'log':r"Object .* is not an instance of type e500-ccsr", 'loglevel':logging.ERROR},
+-    {'exitcode':-6, 'log':r"vmstate_register_with_alias_id: Assertion `!se->compat \|\| se->instance_id == 0' failed", 'loglevel':logging.ERROR},
+-
+     # everything else (including SIGABRT and SIGSEGV) will be a fatal error:
+     {'exitcode':None, 'fatal':True, 'loglevel':logging.FATAL},
+ ]
+-- 
+1.8.3.1
