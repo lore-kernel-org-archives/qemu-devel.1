@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54447)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56743)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gK42E-0007r0-NS
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 11:16:59 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gK49v-0005N1-Cb
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 11:24:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gK42A-0002jx-Ls
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 11:16:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36093)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1gK428-0002Zh-Q0
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 11:16:54 -0500
-References: <20181105181353.39804-1-mst@redhat.com>
-	<20181105181353.39804-3-mst@redhat.com>
-	<a21e8e21-d056-1e9a-3726-54f8ce24a162@redhat.com>
-	<20181106091147-mutt-send-email-mst@kernel.org>
-	<4b68930c-1fc3-9462-8f9e-671b414e712d@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <2913be5b-f03e-b42c-1128-8f73ae7054f7@redhat.com>
-Date: Tue, 6 Nov 2018 17:16:14 +0100
-MIME-Version: 1.0
-In-Reply-To: <4b68930c-1fc3-9462-8f9e-671b414e712d@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gK49q-00079y-Om
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 11:24:55 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 6 Nov 2018 16:24:36 +0000
+Message-ID: <fc16b42c-5825-b9f8-5127-4c8a6d8b173b@virtuozzo.com>
+References: <20181101182738.70462-1-vsementsov@virtuozzo.com>
+	<20181101182738.70462-7-vsementsov@virtuozzo.com>
+	<w514lcudz3y.fsf@maestria.local.igalia.com>
+	<e1d4fa92-9f84-080c-04e3-4fc9b683c11d@virtuozzo.com>
+	<w511s7ydxzz.fsf@maestria.local.igalia.com>
+In-Reply-To: <w511s7ydxzz.fsf@maestria.local.igalia.com>
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 02/33] tests: Move
- tests/hex-loader-check-data/ to tests/data/hex-loader/
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <30F03B2E8B99C84985CB6E70F7C7BECB@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 6/7] qcow2: aio support for
+ compressed cluster read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,53 +29,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Su Hang <suhang16@mails.ucas.ac.cn>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>, "mreitz@redhat.com" <mreitz@redhat.com>
 
-On 06/11/2018 16:15, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 6/11/18 15:13, Michael S. Tsirkin wrote:
->> On Tue, Nov 06, 2018 at 02:27:18PM +0100, Philippe Mathieu-Daud=C3=A9 =
-wrote:
->>> On 5/11/18 19:14, Michael S. Tsirkin wrote:
->>>> From: Peter Maydell <peter.maydell@linaro.org>
->>>>
->>>> Currently tests/hex-loader-check-data contains data files used
->>>> by the hexloader-test, and configure individually symlinks those
->>>> data files into the build directory using a wildcard.
->>>>
->>>> Using a wildcard like this is a bad idea, because if a new
->>>> data file is added, nothing causes configure to be rerun,
->>>> and so no symlink is added for the new file. This can cause
->>>> tests to spuriously fail when they can't find their data.
->>>> Instead, it's better to symlink an entire directory of
->>>> data files. We already have such a directory: tests/data.
->>>>
->>>> Move the data files from tests/hex-loader-check-data/ to
->>>> tests/data/hex-loader/, and remove the unnecessary symlinking.
->>>>
->>>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->>>
->>> I reviewed/tested this patch too.
->>
->>
->> Thanks a lot Philippe!
->> It is unfortunately too late to update this patch info in git
->> commit history, however your help is still greatly appreciated!
->=20
-> No worry, I'm not mad at all, but there might be an issue in your git P=
-R
-> workflow, this series also missed your maintainer S-o-b.
->=20
-> Peter: Can you add a such check in your scripts? (during next merge
-> window, no hurry).
->=20
-> Rather than your scripts, this should be in scripts a maintainer can ru=
-n
-> locally, such ./scripts/checkpatch.pl --maintainer or
-> ./scripts/checkseries.xx.
-
-I think such tool already exists: with git-publish you can configure a
-"pre-publish-send-email" hook, and check your S-o-B is present.
-
-Thanks,
-Laurent
+MDYuMTEuMjAxOCAxODozMCwgQWxiZXJ0byBHYXJjaWEgd3JvdGU6DQo+IE9uIFR1ZSAwNiBOb3Yg
+MjAxOCAwNDoxMzo1OCBQTSBDRVQsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6
+DQo+PiAwNi4xMS4yMDE4IDE4OjA2LCBBbGJlcnRvIEdhcmNpYSB3cm90ZToNCj4+PiBPbiBUaHUg
+MDEgTm92IDIwMTggMDc6Mjc6MzcgUE0gQ0VULCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5
+IHdyb3RlOg0KPj4+DQo+Pj4+ICsgICAgYnVmID0gZ190cnlfbWFsbG9jKGNzaXplKTsNCj4+Pj4g
+KyAgICBpZiAoIWJ1Zikgew0KPj4+PiArICAgICAgICByZXR1cm4gLUVOT01FTTsNCj4+Pj4gKyAg
+ICB9DQo+Pj4+ICsgICAgaW92Lmlvdl9iYXNlID0gYnVmOw0KPj4+PiArICAgIGlvdi5pb3ZfbGVu
+ID0gY3NpemU7DQo+Pj4+ICsgICAgcWVtdV9pb3ZlY19pbml0X2V4dGVybmFsKCZsb2NhbF9xaW92
+LCAmaW92LCAxKTsNCj4+Pj4gICAgDQo+Pj4+IC0gICAgICAgIGlvdi5pb3ZfYmFzZSA9IHMtPmNs
+dXN0ZXJfZGF0YTsNCj4+Pj4gLSAgICAgICAgaW92Lmlvdl9sZW4gPSBjc2l6ZTsNCj4+Pj4gLSAg
+ICAgICAgcWVtdV9pb3ZlY19pbml0X2V4dGVybmFsKCZsb2NhbF9xaW92LCAmaW92LCAxKTsNCj4+
+Pj4gKyAgICBvdXRfYnVmID0gcWVtdV9ibG9ja2FsaWduKGJzLCBzLT5jbHVzdGVyX3NpemUpOw0K
+Pj4+IFlvdSBzaG91bGQgYWxzbyBjaGVjayB3aGV0aGVyIG91dF9idWYgaXMgTlVMTCwgc2hvdWxk
+bid0IHlvdT8NCj4+IE5vLCBpdCB3aWxsIGFib3J0IG9uIGZhaWwuIHFlbXVfdHJ5X2Jsb2NrYWxp
+Z24gcmVzdWx0IHNob3VsZCBiZQ0KPj4gY2hlY2tlZC4NCj4gSXMgdGhlcmUgYW55IHJlYXNvbiB3
+aHkgc29tZSBwYXJ0cyBvZiB0aGUgUUVNVSBjb2RlIHVzZSBxZW11X2Jsb2NrYWxpZ24NCj4gYW5k
+IG90aGVycyBxZW11X3RyeV9ibG9ja2FsaWduKCkgPyBGcm9tIHdoYXQgSSBjYW4gc2VlIGl0IHNl
+ZW1zIHRvIGJlIHVwDQo+IHRvIHdob2V2ZXIgd3JvdGUgaXQuLi4NCj4NCj4gQmVydG8NCg0KQXMg
+SSB1bmRlcnN0YW5kLCB0aGUgZ29vZCByZWFzb24gdG8gdXNlIF90cnlfIHZlcnNpb25zLCBpcyB3
+aGVuIHdlIGFyZSANCmFsbG9jYXRpbmcgc29tZSBzaXplLCB0YWtlbiBmcm9tIHVzZXIgaW5wdXQs
+IHNvIGl0IG1heSBiZSB1bnByZWRpY3RhYmxlIA0KbGFyZ2UgKGhtLCBvciBqdXN0IGFueSByZWFs
+bHkgbGFyZ2UgYWxsb2NhdGlvbiksIHNvLCBJIHVzZSB0cnlfbWFsbG9jIA0KZm9yIGNvbXByZXNz
+ZWQgc2l6ZSwgd2hpY2ggbWF5IGJlIHZlcnkgbGFyZ2UgaW4gc29tZWhvdyBjb3JydXB0ZWQgaW1h
+Z2UuIA0KQW5kIGl0IGxvb2tzIGEgY29tbW9uIHByYWN0aWNlIHRvIHVzZSBub3QtZmFpbGluZyAo
+YWJvcnRpbmcpIGFsbG9jYXRpb24gDQpmdW5jdGlvbnMgZm9yIGNsdXN0ZXJfc2l6ZSBhbGxvY2F0
+aW9ucyBpbiBxY293Mi5jDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg0K
