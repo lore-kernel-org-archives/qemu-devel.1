@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39471)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gKAhM-0005br-Ol
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 18:23:57 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gKAid-0007OE-Dc
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 18:25:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gKASV-0007dM-BH
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 18:08:33 -0500
-Date: Wed, 7 Nov 2018 09:45:34 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181106224534.GB24589@umbus.fritz.box>
-References: <20181106102335.20027-1-kraxel@redhat.com>
-	<20181106102335.20027-2-kraxel@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1gKAiW-0002cR-0j
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 18:25:09 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:40600)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gKAiU-0002Lp-TB
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 18:25:03 -0500
+Received: by mail-wm1-f66.google.com with SMTP id b203-v6so14047927wme.5
+	for <qemu-devel@nongnu.org>; Tue, 06 Nov 2018 15:25:02 -0800 (PST)
+References: <20181031003120.26771-1-ehabkost@redhat.com>
+	<20181031003120.26771-13-ehabkost@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <824abd40-2e3b-f40d-d995-394d84d8d20c@redhat.com>
+Date: Wed, 7 Nov 2018 00:24:55 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="p4qYPpj5QlsIQJ0K"
-Content-Disposition: inline
-In-Reply-To: <20181106102335.20027-2-kraxel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/6] move ObjectClass to typedefs.h
+In-Reply-To: <20181031003120.26771-13-ehabkost@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 12/15] Acceptance tests: add make rule for
+ running them
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,74 +31,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, Markus Armbruster <armbru@redhat.com>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>
+To: Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Max Reitz <mreitz@redhat.com>, Cleber Rosa <crosa@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-
---p4qYPpj5QlsIQJ0K
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Nov 06, 2018 at 11:23:30AM +0100, Gerd Hoffmann wrote:
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-
+On 31/10/2018 01:31, Eduardo Habkost wrote:
+> From: Cleber Rosa <crosa@redhat.com>
+> 
+> The acceptance (aka functional, aka Avocado-based) tests are
+> Python files located in "tests/acceptance" that need to be run
+> with the Avocado libs and test runner.
+> 
+> Let's provide a convenient way for QEMU developers to run them,
+> by making use of the tests-venv with the required setup.
+> 
+> Also, while the Avocado test runner will take care of creating a
+> location to save test results to, it was understood that it's better
+> if the results are kept within the build tree.
+> 
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Acked-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+> Reviewed-by: Caio Carrara <ccarrara@redhat.com>
+> Message-Id: <20181018153134.8493-3-crosa@redhat.com>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 > ---
->  include/qemu/typedefs.h | 1 +
->  include/qom/object.h    | 1 -
->  2 files changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-> index 3ec0e13a96..fed53f6de2 100644
-> --- a/include/qemu/typedefs.h
-> +++ b/include/qemu/typedefs.h
-> @@ -62,6 +62,7 @@ typedef struct NetClientState NetClientState;
->  typedef struct NetFilterState NetFilterState;
->  typedef struct NICInfo NICInfo;
->  typedef struct NumaNodeMem NumaNodeMem;
-> +typedef struct ObjectClass ObjectClass;
->  typedef struct PCIBridge PCIBridge;
->  typedef struct PCIBus PCIBus;
->  typedef struct PCIDevice PCIDevice;
-> diff --git a/include/qom/object.h b/include/qom/object.h
-> index f0b0bf39cc..499e1fd8b7 100644
-> --- a/include/qom/object.h
-> +++ b/include/qom/object.h
-> @@ -20,7 +20,6 @@
->  struct TypeImpl;
->  typedef struct TypeImpl *Type;
-> =20
-> -typedef struct ObjectClass ObjectClass;
->  typedef struct Object Object;
-> =20
->  typedef struct TypeInfo TypeInfo;
+>  docs/devel/testing.rst | 43 +++++++++++++++++++++++++++++++++++++-----
+>  tests/requirements.txt |  1 +
+>  tests/Makefile.include | 21 +++++++++++++++++++--
+>  3 files changed, 58 insertions(+), 7 deletions(-)
+> 
+> diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
+> index a227754f86..18e2c0868a 100644
+> --- a/docs/devel/testing.rst
+> +++ b/docs/devel/testing.rst
+> @@ -545,10 +545,39 @@ Tests based on ``avocado_qemu.Test`` can easily:
+>     - http://avocado-framework.readthedocs.io/en/latest/api/test/avocado.html#avocado.Test
+>     - http://avocado-framework.readthedocs.io/en/latest/api/utils/avocado.utils.html
+>  
+> -Installation
+> -------------
+> +Running tests
+> +-------------
+> +
+> +You can run the acceptance tests simply by executing:
+> +
+> +.. code::
+> +
+> +  make check-acceptance
+> +
+> +This involves the automatic creation of Python virtual environment
+> +within the build tree (at ``tests/venv``) which will have all the
+> +right dependencies, and will save tests results also within the
+> +build tree (at ``tests/results``).
+>  
+> -To install Avocado and its dependencies, run:
+> +Note: the build environment must be using a Python 3 stack, and have
+> +the ``venv`` and ``pip`` packages installed.  If necessary, make sure
+> +``configure`` is called with ``--python=`` and that those modules are
+> +available.  On Debian and Ubuntu based systems, depending on the
+> +specific version, they may be on packages named ``python3-venv`` and
+> +``python3-pip``.
+> +
+> +The scripts installed inside the virtual environment may be used
+> +without an "activation".  For instance, the Avocado test runner
+> +may be invoked by running:
+> +
+> + .. code::
+> +
+> +  tests/venv/bin/avocado run $OPTION1 $OPTION2 tests/acceptance/
+> +
+> +Manual Installation
+> +-------------------
+> +
+> +To manually install Avocado and its dependencies, run:
+>  
+>  .. code::
+>  
+> @@ -689,11 +718,15 @@ The exact QEMU binary to be used on QEMUMachine.
+>  Uninstalling Avocado
+>  --------------------
+>  
+> -If you've followed the installation instructions above, you can easily
+> -uninstall Avocado.  Start by listing the packages you have installed::
+> +If you've followed the manual installation instructions above, you can
+> +easily uninstall Avocado.  Start by listing the packages you have
+> +installed::
+>  
+>    pip list --user
+>  
+>  And remove any package you want with::
+>  
+>    pip uninstall <package_name>
+> +
+> +If you've used ``make check-acceptance``, the Python virtual environment where
+> +Avocado is installed will be cleaned up as part of ``make check-clean``.
+> diff --git a/tests/requirements.txt b/tests/requirements.txt
+> index d39f9d1576..64c6e27a94 100644
+> --- a/tests/requirements.txt
+> +++ b/tests/requirements.txt
+> @@ -1,3 +1,4 @@
+>  # Add Python module requirements, one per line, to be installed
+>  # in the tests/venv Python virtual environment. For more info,
+>  # refer to: https://pip.pypa.io/en/stable/user_guide/#id1
+> +avocado-framework==65.0
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index eabc1da2f3..d2e577eabb 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -11,6 +11,7 @@ check-help:
+>  	@echo " $(MAKE) check-qapi-schema    Run QAPI schema tests"
+>  	@echo " $(MAKE) check-block          Run block tests"
+>  	@echo " $(MAKE) check-tcg            Run TCG tests"
+> +	@echo " $(MAKE) check-acceptance     Run all acceptance (functional) tests"
+>  	@echo " $(MAKE) check-report.html    Generates an HTML test report"
+>  	@echo " $(MAKE) check-venv           Creates a Python venv for tests"
+>  	@echo " $(MAKE) check-clean          Clean the tests"
+> @@ -902,10 +903,15 @@ check-decodetree:
+>  
+>  # Python venv for running tests
+>  
+> -.PHONY: check-venv
+> +.PHONY: check-venv check-acceptance
+>  
+>  TESTS_VENV_DIR=$(BUILD_DIR)/tests/venv
+>  TESTS_VENV_REQ=$(SRC_PATH)/tests/requirements.txt
+> +TESTS_RESULTS_DIR=$(BUILD_DIR)/tests/results
+> +# Controls the output generated by Avocado when running tests.
+> +# Any number of command separated loggers are accepted.  For more
+> +# information please refer to "avocado --help".
+> +AVOCADO_SHOW=none
+>  
+>  $(shell $(PYTHON) -c 'import sys; assert sys.version_info >= (3,0)' >/dev/null 2>&1)
+>  ifeq ($(.SHELLSTATUS),0)
+> @@ -922,8 +928,19 @@ $(TESTS_VENV_DIR):
+>  	$(error "venv directory for tests requires Python 3")
+>  endif
+>  
+> +$(TESTS_RESULTS_DIR):
+> +	$(call quiet-command, mkdir -p $@, \
+> +            MKDIR, $@)
+> +
+>  check-venv: $(TESTS_VENV_DIR)
+>  
+> +check-acceptance: check-venv $(TESTS_RESULTS_DIR)
+> +	$(call quiet-command, \
+> +            $(TESTS_VENV_DIR)/bin/python -m avocado \
+> +            --show=$(AVOCADO_SHOW) run --job-results-dir=$(TESTS_RESULTS_DIR) \
+> +            --failfast=on $(SRC_PATH)/tests/acceptance, \
+> +            "AVOCADO", "tests/acceptance")
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Right now it seems like anything that is target-dependent should be
+developed under qtest, rather than as an acceptance test.  On the other
+hand this results in qtests that actually do not use the qtest protocol
+at all---only the libqtest function to interact with QMP etc.---and as
+such would look like a perfect match for "make check-acceptance".
+drive_del-test is already an example of this.
 
---p4qYPpj5QlsIQJ0K
-Content-Type: application/pgp-signature; name="signature.asc"
+How hard would it be to make it run tests for all supported targets,
+rather than just the host architecture?  Perhaps using a tag such as
+"all-targets".
 
------BEGIN PGP SIGNATURE-----
+Paolo
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlviGY4ACgkQbDjKyiDZ
-s5LDfhAAj5f0ofUO3QoH2yIbChg34BvY9Asz/NOkbPcBTwfiF0qqHutfyqcYa9tU
-GebYaGwoAnGPuxX8+cJPZFxK+K77nTMQisfLXodAgZO9zt2+kydFTb6VxTPLcRuL
-h3IOrb9YJBWg+mlo10hjpaj8SgK2dl3IoKImeA4w49zNA7unO6tuwvPvEP+fGKJ8
-/T5uvJwQR7bTNW9I54z/wHXdeQNQjNfYOXx1BRf2TegBoDZw8C20G/EDphIgBuBi
-8OHmFFhQcKAehGcE+NZdwFz2iY3sIji6CLimIPnyHBFi+3x6M4vLm/hZCo802W3A
-3MNdO+NQqfqd2Pr7XKJx+/lIDdtFJbDVVPR3x8lmNrmt9+dxoQu/OtVa4BDMr95N
-SURvRcc9Zob769gqlNzOZ1MytbOucDiKOYvbE5VxG4Ged3OP149qx9ArW/OULyuE
-KfVjUnnplEEJM5b+SyHkAP/PVlDMrQlJw6EM9CuOZfgkQFYZ7mx7l71wSPCs7F2W
-7cYEzVg3b+tVxhE84HZOVK/SeiF9lURCMquZxe0yL1Em4vGM1TK0IMT9LCPGpTbY
-Uk7s+iCsA25CemdsBPugJq6yqU3kn0Sgip5jSenZ/kthIdnjGcTKIN8vU9frUhaC
-NLb+WbLb9+1zIzf7imCfDNpJ6rS1RIyOpyOfurYKAdvVMOrgJf8=
-=4qm6
------END PGP SIGNATURE-----
-
---p4qYPpj5QlsIQJ0K--
+>  # Consolidated targets
+>  
+>  .PHONY: check-qapi-schema check-qtest check-unit check check-clean
+> @@ -937,7 +954,7 @@ check-clean:
+>  	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
+>  	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y)) $(check-qtest-generic-y))
+>  	rm -f tests/test-qapi-gen-timestamp
+> -	rm -rf $(TESTS_VENV_DIR)
+> +	rm -rf $(TESTS_VENV_DIR) $(TESTS_RESULTS_DIR)
+>  
+>  clean: check-clean
+>  
+> 
