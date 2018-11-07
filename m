@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gKM9L-0000dx-Qb
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 06:37:35 -0500
+	(envelope-from <rjones@redhat.com>) id 1gKMjF-0006fR-Gk
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 07:14:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gKM99-0007Am-Cd
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 06:37:25 -0500
-Resent-Message-Id: <E1gKM99-0007Am-Cd@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21366)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gKM92-00076R-GB
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 06:37:14 -0500
-Message-ID: <154159061411.9512.2024756994048066214@015909e0f939>
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20181029173437.32559-1-pbonzini@redhat.com>
+	(envelope-from <rjones@redhat.com>) id 1gKMiz-0004ig-7j
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 07:14:30 -0500
+Date: Wed, 7 Nov 2018 12:13:19 +0000
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20181107121319.GC14842@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 7 Nov 2018 03:36:55 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 0/4] scsi-generic: fixes for Block Limits
- emulation
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] Change in qemu 2.12 causes qemu-img convert to NBD to
+ write more data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +22,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, danielhb413@gmail.com, mreitz@redhat.com
+To: qemu-devel@nongnu.org, eblake@redhat.com, qemu-block@nongnu.org, Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
+Cc: nsoffer@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgxMDI5MTczNDM3LjMyNTU5LTEtcGJvbnppbmlAcmVkaGF0LmNvbQpTdWJq
-ZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvNF0gc2NzaS1nZW5lcmljOiBmaXhlcyBmb3IgQmxv
-Y2sgTGltaXRzIGVtdWxhdGlvbgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFz
-aAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAt
-bCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNv
-bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFs
-Z29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVy
-c2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFU
-Q0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAh
-IGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1t
-YWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAg
-bj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVw
-ZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQg
-dG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo4NDA4YmQzZDYwIHNjc2ktZ2VuZXJpYzogZG8gbm90IGRv
-IFZQRCBlbXVsYXRpb24gZm9yIHNlbnNlIG90aGVyIHRoYW4gSUxMRUdBTF9SRVFVRVNUCjNhYTg2
-OWU4OTEgc2NzaS1nZW5lcmljOiBhdm9pZCBpbnZhbGlkIGFjY2VzcyB0byBzdHJ1Y3Qgd2hlbiBl
-bXVsYXRpbmcgYmxvY2sgbGltaXRzCjE5ZWU0YzBjMmYgc2NzaS1nZW5lcmljOiBhdm9pZCBvdXQt
-b2YtYm91bmRzIGFjY2VzcyB0byBWUEQgcGFnZSBsaXN0CjZkNzA5NDI4YmIgc2NzaS1nZW5lcmlj
-OiBrZWVwIFZQRCBwYWdlIGxpc3Qgc29ydGVkCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2lu
-ZyBQQVRDSCAxLzQ6IHNjc2ktZ2VuZXJpYzoga2VlcCBWUEQgcGFnZSBsaXN0IHNvcnRlZC4uLgpD
-aGVja2luZyBQQVRDSCAyLzQ6IHNjc2ktZ2VuZXJpYzogYXZvaWQgb3V0LW9mLWJvdW5kcyBhY2Nl
-c3MgdG8gVlBEIHBhZ2UgbGlzdC4uLgpDaGVja2luZyBQQVRDSCAzLzQ6IHNjc2ktZ2VuZXJpYzog
-YXZvaWQgaW52YWxpZCBhY2Nlc3MgdG8gc3RydWN0IHdoZW4gZW11bGF0aW5nIGJsb2NrIGxpbWl0
-cy4uLgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5U
-QUlORVJTIG5lZWQgdXBkYXRpbmc/CiMzMjogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDog
-MCBlcnJvcnMsIDEgd2FybmluZ3MsIDIzMyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBz
-dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
-IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
-UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDQvNDogc2NzaS1nZW5lcmljOiBk
-byBub3QgZG8gVlBEIGVtdWxhdGlvbiBmb3Igc2Vuc2Ugb3RoZXIgdGhhbiBJTExFR0FMX1JFUVVF
-U1QuLi4KRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMzNDogRklMRTogaHcvc2NzaS9z
-Y3NpLWdlbmVyaWMuYzoyNzM6CisgICAgICAgIHNjc2lfcGFyc2Vfc2Vuc2VfYnVmKHItPnJlcS5z
-ZW5zZSwgci0+aW9faGVhZGVyLnNiX2xlbl93cikua2V5ID09IElMTEVHQUxfUkVRVUVTVCAmJgoK
-dG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyNCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNo
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29t
-bWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNh
-bGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZl
-ZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+(I'm not going to claim this is a bug, but it causes a large, easily
+measurable performance regression in virt-v2v).
+
+In qemu 2.10, when you do =E2=80=98qemu-img convert=E2=80=99 to an NBD ta=
+rget, qemu
+interleaves write and zero requests.  We can observe this as follows:
+
+  $ virt-builder fedora-28
+  $ nbdkit --filter=3Dlog memory size=3D6G logfile=3D/tmp/log \
+      --run './qemu-img convert ./fedora-28.img -n $nbd'
+  $ grep '\.\.\.$' /tmp/log | sed 's/.*\([A-Z][a-z]*\).*/\1/' | uniq -c
+      1 Write
+      2 Zero
+      1 Write
+      3 Zero
+      1 Write
+      1 Zero
+      1 Write
+    [etc for over 1000 lines]
+
+Looking at the log file in detail we can see it is writing serially
+from the beginning to the end of the disk.
+
+In qemu 2.12 this behaviour changed:
+
+  $ nbdkit --filter=3Dlog memory size=3D6G logfile=3D/tmp/log \
+      --run './qemu-img convert ./fedora-28.img -n $nbd'
+  $ grep '\.\.\.$' /tmp/log | sed 's/.*\([A-Z][a-z]*\).*/\1/' | uniq -c
+      193 Zero
+     1246 Write
+
+It now zeroes the whole disk up front and then writes data over the
+top of the zeroed blocks.
+
+The reason for the performance regression is that in the first case we
+write 6G in total.  In the second case we write 6G of zeroes up front,
+followed by the amount of data in the disk image (in this case the
+test disk image contains 1G of non-sparse data, so we write about 7G
+in total).
+
+In real world cases this makes a great difference: we might have 100s
+of G of data in the disk.  The ultimate backend storage (a Linux block
+device) doesn't support efficient BLKZEROOUT so zeroing is pretty slow
+too.
+
+I bisected the change to the commit shown at the end of this email.
+
+Any suggestions how to fix or work around this problem welcome.
+
+Rich.
+
+
+commit 9776f0db6a19a0510e89b7aae38190b4811c95ba
+Author: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
+Date:   Thu Jan 18 14:51:58 2018 +0300
+
+    nbd: implement bdrv_get_info callback
+   =20
+    Since mirror job supports efficient zero out target mechanism (see
+    in mirror_dirty_init()), implement bdrv_get_info to make it work
+    over NBD. Such improvement will allow using the largest chunk possibl=
+e
+    and will decrease the number of NBD_CMD_WRITE_ZEROES requests on the =
+wire.
+   =20
+    Signed-off-by: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
+    Message-Id: <20180118115158.17219-1-edgar.kaziakhmedov@virtuozzo.com>
+    Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+    Signed-off-by: Eric Blake <eblake@redhat.com>
+
+
+--=20
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rj=
+ones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+virt-df lists disk usage of guests without needing to install any
+software inside the virtual machine.  Supports Linux and Windows.
+http://people.redhat.com/~rjones/virt-df/
