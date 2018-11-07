@@ -1,35 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50565)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gKU2F-0006Hr-2p
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 15:02:44 -0500
+	(envelope-from <walling@linux.ibm.com>) id 1gKUEu-0005mC-8y
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 15:15:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gKU28-0008M6-Ng
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 15:02:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54198)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gKU26-0008Av-Ic
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 15:02:34 -0500
-References: <20181023152306.3123-1-david@redhat.com>
-	<20181023152306.3123-2-david@redhat.com>
-	<87pnvqdvsj.fsf@dusky.pond.sub.org>
-	<e8fe86a1-d075-2ea8-d1f4-e08e5dceee07@redhat.com>
-	<875zxingqn.fsf@dusky.pond.sub.org>
-	<440eb166-73d1-77b6-5dd9-66a0abd7d665@redhat.com>
-	<87muqn5ydc.fsf@dusky.pond.sub.org>
-	<1ec41fe2-d4b4-fce2-9381-818ee3356409@redhat.com>
-	<87tvkv2r2b.fsf@dusky.pond.sub.org>
-	<64720ade-c69d-40a4-5359-2132711c01cd@redhat.com>
-	<87d0rgvrbk.fsf@dusky.pond.sub.org>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <fcbd588d-f51c-4ab4-fa45-ad5360aff5b1@redhat.com>
-Date: Wed, 7 Nov 2018 21:02:22 +0100
+	(envelope-from <walling@linux.ibm.com>) id 1gKUEq-0007s1-Q1
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 15:15:48 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58076
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
+	id 1gKUEq-0007q0-CC
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 15:15:44 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wA7KERGO009102
+	for <qemu-devel@nongnu.org>; Wed, 7 Nov 2018 15:15:42 -0500
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2nm4a7xrwn-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 07 Nov 2018 15:15:42 -0500
+Received: from localhost
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
+	Wed, 7 Nov 2018 20:15:41 -0000
+References: <20181105110313.29312-1-david@redhat.com>
+	<20181105110313.29312-5-david@redhat.com>
+From: Collin Walling <walling@linux.ibm.com>
+Date: Wed, 7 Nov 2018 15:15:36 -0500
 MIME-Version: 1.0
-In-Reply-To: <87d0rgvrbk.fsf@dusky.pond.sub.org>
+In-Reply-To: <20181105110313.29312-5-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 1/7] qapi: use qemu_strtoi64() in
- parse_str
+Content-Transfer-Encoding: 7bit
+Message-Id: <a24b8619-da35-47fa-7fcc-bb610177265d@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v1 4/4] s390x/zpci: properly fail if the
+ zPCI device cannot be created
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,254 +44,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 07.11.18 16:29, Markus Armbruster wrote:
-> David Hildenbrand <david@redhat.com> writes:
->=20
->> On 05.11.18 21:43, Markus Armbruster wrote:
->>> David Hildenbrand <david@redhat.com> writes:
->>>
->>>> On 05.11.18 16:37, Markus Armbruster wrote:
->>>>> David Hildenbrand <david@redhat.com> writes:
->>>>>
->>>>>> On 31.10.18 18:55, Markus Armbruster wrote:
->>>>>>> David Hildenbrand <david@redhat.com> writes:
->>>>>>>
->>>>>>>> On 31.10.18 15:40, Markus Armbruster wrote:
->>>>>>>>> David Hildenbrand <david@redhat.com> writes:
->>>>>>>>>
->>>>>>>>>> The qemu api claims to be easier to use, and the resulting cod=
-e seems to
->>>>>>>>>> agree.
->>>>>>> [...]
->>>>>>>>>> @@ -60,9 +61,7 @@ static int parse_str(StringInputVisitor *siv=
-, const char *name, Error **errp)
->>>>>>>>>>      }
->>>>>>>>>> =20
->>>>>>>>>>      do {
->>>>>>>>>> -        errno =3D 0;
->>>>>>>>>> -        start =3D strtoll(str, &endptr, 0);
->>>>>>>>>> -        if (errno =3D=3D 0 && endptr > str) {
->>>>>>>>>> +        if (!qemu_strtoi64(str, &endptr, 0, &start)) {
->>>>>>>>>>              if (*endptr =3D=3D '\0') {
->>>>>>>>>>                  cur =3D g_malloc0(sizeof(*cur));
->>>>>>>>>>                  range_set_bounds(cur, start, start);
->>>>>>>>>> @@ -71,11 +70,7 @@ static int parse_str(StringInputVisitor *si=
-v, const char *name, Error **errp)
->>>>>>>>>>                  str =3D NULL;
->>>>>>>>>>              } else if (*endptr =3D=3D '-') {
->>>>>>>>>>                  str =3D endptr + 1;
->>>>>>>>>> -                errno =3D 0;
->>>>>>>>>> -                end =3D strtoll(str, &endptr, 0);
->>>>>>>>>> -                if (errno =3D=3D 0 && endptr > str && start <=
-=3D end &&
->>>>>>>>>> -                    (start > INT64_MAX - 65536 ||
->>>>>>>>>> -                     end < start + 65536)) {
->>>>>>>>>> +                if (!qemu_strtoi64(str, &endptr, 0, &end) && =
-start < end) {
->>>>>>>>>
->>>>>>>>> You deleted (start > INT64_MAX - 65536 || end < start + 65536).=
-  Can you
->>>>>>>>> explain that to me?  I'm feeling particularly dense today...
->>>>>>>>
->>>>>>>> qemu_strtoi64 performs all different kinds of error handling com=
-pletely
->>>>>>>> internally. This old code here was an attempt to filter out -EWH=
-ATEVER
->>>>>>>> from the response. No longer needed as errors and the actual val=
-ue are
->>>>>>>> reported via different ways.
->>>>>>>
->>>>>>> I understand why errno =3D=3D 0 && endptr > str go away.  They al=
-so do in
->>>>>>> the previous hunk.
->>>>>>>
->>>>>>> The deletion of (start > INT64_MAX - 65536 || end < start + 65536=
-) is
->>>>>>> unobvious.  What does it do before the patch?
->>>>>>>
->>>>>>> The condition goes back to commit 659268ffbff, which predates my =
-watch
->>>>>>> as maintainer.  Its commit message is of no particular help.  Its=
- code
->>>>>>> is... allright, the less I say about that, the better.
->>>>>>>
->>>>>>> We're parsing a range here.  We already parsed its lower bound in=
-to
->>>>>>> @start (and guarded against errors), and its upper bound into @en=
-d (and
->>>>>>> guarded against errors).
->>>>>>>
->>>>>>> If the condition you delete is false, we goto error.  So the cond=
-ition
->>>>>>> is about range validity.  I figure it's an attempt to require val=
-id
->>>>>>> ranges to be no "wider" than 65535.  The second part end < start =
-+ 65536
->>>>>>> checks exactly that, except shit happens when start + 65536 overf=
-lows.
->>>>>>> The first part attempts to guard against that, but
->>>>>>>
->>>>>>> (1) INT64_MAX is *wrong*, because we compute in long long, and
->>>>>>>
->>>>>>> (2) it rejects even small ranges like INT64_MAX - 2 .. INT64_MAX =
-- 1.
->>>>>>>
->>>>>>> WTF?!?
->>>>>>>
->>>>>>> Unless I'm mistaken, the condition is not about handling any of t=
-he
->>>>>>> errors that qemu_strtoi64() handles for us.
->>>>>>>
->>>>>>> The easiest way for you out of this morass is probably to keep th=
-e
->>>>>>> condition exactly as it was, then use the "my patch doesn't make =
-things
->>>>>>> any worse" get-out-of-jail-free card.
->>>>>>>
->>>>>>
->>>>>> Looking at the code in qapi/string-output-visitor.c related to ran=
-ge and
->>>>>> list handling I feel like using the get-out-of-jail-free card to g=
-et out
->>>>>> of qapi code now :) Too much magic in that code and too little tim=
-e for
->>>>>> me to understand it all.
->>>>>>
->>>>>> Thanks for your time and review anyway. My time is better invested=
- in
->>>>>> other parts of QEMU. I will drop both patches from this series.
->>>>>
->>>>> Understand.
->>>>>
->>>>> When I first looked at the ranges stuff in the string input visitor=
-, I
->>>>> felt the urge to clean it up, then sat on my hands until it passed.
->>>>>
->>>>> The rest is reasonable once you understand how it works.  The learn=
-ing
->>>>> curve is less than pleasant, though.
->>>>>
->>>>
->>>> Maybe I'll pick this up again when I have more time to invest.
->>>>
->>>> The general concept
->>>>
->>>> 1. of having an input visitor that is able to parse different types
->>>> (expected by e.g. a property) sounds sane to me.
->>>>
->>>> 2. of having a list of *something*, assuming it is int64_t, and assu=
-ming
->>>> it is to be parsed into a list of ranges sounds completely broken to=
- me.
->>>
->>> Starting point: the string visitors can only do scalars.  We have a n=
-eed
->>> for lists of integers (see below).  The general solution would be
->>> generalizing these visitors to lists (and maybe objects while we're a=
-t
->>> it).  YAGNI.  So we put in a quick hack that can do just lists of
->>> integers.
->>>
->>> Except applying YAGNI to stable interfaces is *bonkers*.
->>>
->>>> I was not even able to find an example QEMU comand line for 2. Is th=
-is
->>>> maybe some very old code that nobody actually uses anymore? (who use=
-s
->>>> list of ranges?)
->>>
->>> The one I remember offhand is -numa node,cpus=3D..., but that one's
->>> actually parsed with the options visitor.  Which is even hairier, but=
- at
->>> least competently coded.
->>>
->>> To find uses, we need to follow the uses of the string visitors.
->>>
->>> Of the callers of string_input_visitor_new(),
->>> object_property_get_uint16List() is the only one that deals with list=
-s.
->>> It's used by query_memdev() for property host-nodes.
->>>
->>> The callers of string_output_visitor_new() lead to MigrationInfo memb=
-er
->>> postcopy-vcpu-blocktime, and Memdev member host-nodes again.
->>>
->>> Searching the QAPI schema for lists of integers coughs up a few more
->>> candidates: NumaNodeOptions member cpus (covered above), RxFilterInfo
->>> member vlan-table (unrelated, as far as I can tell), RockerOfDpaGroup
->>> (likewise), block latency histogram stuff (likewise).
->>>
->>
->> As Eric pointed out, tests/test-string-input-visitor.c actually tests
->> for range support in test_visitor_in_intList.
->>
->> I might be completely wrong, but actually the string input visitor
->> should not pre-parse stuff into a list of ranges, but instead parse on
->> request (parse_type_...) and advance in the logical list on "next_list=
-".
->> And we should parse ranges *only* if we are expecting a list. Because =
-a
->> range is simply a short variant of a list. A straight parse_type_uint6=
-4
->> should bail out if we haven't started a list.
->=20
-> Yes, parse_type_int64() & friends should simply parse the appropriate
-> integer, *except* when we're working on a list.  Then they should retur=
-n
-> the next integer, which may or may not require parsing.
->=20
-> Say, input is "1-3,5", and the visitor is called like
->=20
->     visit_start_list()
->     visit_next_list()   more input, returns "there's more"
->     visit_type_int()    parses "1-3,", buffers 2-3, returns 1
->     visit_next_list()   buffer not empty, returns "there's more"
->     visit_type_int()    unbuffers and returns 2
->     visit_next_list()   buffer not empty, returns "there's more"
->     visit_type_int()    unbuffers and returns 3=20
->     visit_next_list()   more input, returns "there's more"
->     visit_type_int()    parses "5", returns 5
->     visit_next_list()   buffer empty and no more input, returns "done"
->     visit_end_list()  =20
->=20
+On 11/5/18 6:03 AM, David Hildenbrand wrote:
+> Right now, errors during realize()/pre_plug/plug of the zPCI device
+> would result in QEMU crashing instead of failing nicely when creating
+> a zPCI device for a PCI device.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  hw/s390x/s390-pci-bus.c | 25 +++++++++++++++++++------
+>  1 file changed, 19 insertions(+), 6 deletions(-)
+> 
+> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+> index 1849f9d334..4939490c7c 100644
+> --- a/hw/s390x/s390-pci-bus.c
+> +++ b/hw/s390x/s390-pci-bus.c
+> @@ -778,17 +778,31 @@ static void s390_pci_msix_free(S390PCIBusDevice *pbdev)
+>  }
+>  
+>  static S390PCIBusDevice *s390_pci_device_new(S390pciState *s,
+> -                                             const char *target)
+> +                                             const char *target, Error **errp)
+>  {
+> -    DeviceState *dev = NULL;
+> +    Error *local_err = NULL;
+> +    DeviceState *dev;
+>  
+>      dev = qdev_try_create(BUS(s->bus), TYPE_S390_PCI_DEVICE);
+>      if (!dev) {
+> +        error_setg(errp, "zPCI device could not be created");
+>          return NULL;
+>      }
+>  
+> -    qdev_prop_set_string(dev, "target", target);
+> -    qdev_init_nofail(dev);
+> +    object_property_set_str(OBJECT(dev), "target", target, &local_err);
+> +    if (local_err) {
+> +        object_unparent(OBJECT(dev));
+> +        error_propagate_prepend(errp, local_err,
+> +                                "zPCI device could not be created: ");
+> +        return NULL;
+> +    }
+> +    object_property_set_bool(OBJECT(dev), true, "realized", &local_err);
+> +    if (local_err) {
+> +        object_unparent(OBJECT(dev));
+> +        error_propagate_prepend(errp, local_err,
+> +                                "zPCI device could not be created: ");
+> +        return NULL;
+> +    }
+>  
+>      return S390_PCI_DEVICE(dev);
+>  }
+> @@ -873,9 +887,8 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>  
+>          pbdev = s390_pci_find_dev_by_target(s, dev->id);
+>          if (!pbdev) {
+> -            pbdev = s390_pci_device_new(s, dev->id);
+> +            pbdev = s390_pci_device_new(s, dev->id, errp);
+>              if (!pbdev) {
+> -                error_setg(errp, "create zpci device failed");
+>                  return;
+>              }
+>          }
+> 
 
-Would it be valid to do something like this (skipping elements without a
-proper visit_type_int)
+LGTM
 
-visit_start_list();
-visit_next_list();  more input, returns "there's more"
-visit_next_list();  parses "1-3,", buffers 2-3, skips over 1
-visit_type_int();   returns 2
-...
+Reviewed-by: Collin Walling <walling@linux.ibm.com>
 
-Or mixing types
-
-visit_start_list();
-visit_next_list();
-visit_type_int64();
-visit_next_list();
-visit_type_uint64();
-
-IOW, can I assume that after every visit_next_list(), visit_type_X is
-called, and that X remains the same for one pass over the list?
-
-Also, I assume it is supposed to work like this
-
-visit_start_list();
-visit_next_list();  more input, returns "there's more"
-visit_type_int();   returns 1 (parses 1-3, buffers 1-3)
-visit_type_int();   returns 1
-visit_type_int();   returns 1
-visit_next_list();  more input, unbuffers 1
-visit_type_int();   returns 2
-
-So unbuffering actually happens on visit_next_list()?
-
---=20
-
-Thanks,
-
-David / dhildenb
+-- 
+Respectfully,
+- Collin Walling
