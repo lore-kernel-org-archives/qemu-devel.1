@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56898)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59038)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1gKPM4-000618-PG
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 10:02:54 -0500
+	(envelope-from <cunming.liang@intel.com>) id 1gKPRm-0001ez-I4
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 10:08:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1gKPM0-0006vq-Tt
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 10:02:50 -0500
-Date: Wed, 7 Nov 2018 15:02:19 +0000
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20181107150219.GC27120@redhat.com>
-References: <20181107121319.GC14842@redhat.com>
-	<20181107143628.GG8125@redhat.com>
-	<CAMRbyyuFGVtNWF9LKoi0n6_r5Gr4j8LetbAMd0L_5cKMif9LjQ@mail.gmail.com>
+	(envelope-from <cunming.liang@intel.com>) id 1gKPRj-0005Kw-4L
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 10:08:46 -0500
+Received: from mga07.intel.com ([134.134.136.100]:33692)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cunming.liang@intel.com>)
+	id 1gKPRi-0005IM-R0
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 10:08:43 -0500
+From: "Liang, Cunming" <cunming.liang@intel.com>
+Date: Wed, 7 Nov 2018 15:08:36 +0000
+Message-ID: <D0158A423229094DA7ABF71CF2FA0DA34EBC98A4@SHSMSX104.ccr.corp.intel.com>
+References: <20181016132327.121839-1-xiao.w.wang@intel.com>
+	<2e010e02-f7a2-d009-ac7a-fdc266f99254@redhat.com>
+	<D0158A423229094DA7ABF71CF2FA0DA34EBC9415@SHSMSX104.ccr.corp.intel.com>
+	<e516b798-ecf3-030c-621b-468250bcc7d3@redhat.com>
+In-Reply-To: <e516b798-ecf3-030c-621b-468250bcc7d3@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMRbyyuFGVtNWF9LKoi0n6_r5Gr4j8LetbAMd0L_5cKMif9LjQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] Change in qemu 2.12 causes qemu-img convert to NBD
- to write more data
+Subject: Re: [Qemu-devel] [RFC 0/2] vhost-vfio: introduce mdev based HW
+ vhost backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,42 +32,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nir Soffer <nsoffer@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, qemu-block <qemu-block@nongnu.org>, edgar.kaziakhmedov@virtuozzo.com
+To: Jason Wang <jasowang@redhat.com>, "Wang, Xiao W" <xiao.w.wang@intel.com>, "mst@redhat.com" <mst@redhat.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Bie, Tiwei" <tiwei.bie@intel.com>, "Ye, Xiaolong" <xiaolong.ye@intel.com>, "Wang,
+	Zhihong" <zhihong.wang@intel.com>, "Daly, Dan" <dan.daly@intel.com>
 
-On Wed, Nov 07, 2018 at 04:56:48PM +0200, Nir Soffer wrote:
-> Wed, Nov 7, 2018 at 4:36 PM Richard W.M. Jones <rjones@redhat.com> wrote:
-> 
-> > Another thing I tried was to change the NBD server (nbdkit) so that it
-> > doesn't advertise zero support to the client:
-> >
-> >   $ nbdkit --filter=log --filter=nozero memory size=6G logfile=/tmp/log \
-> >       --run './qemu-img convert ./fedora-28.img -n $nbd'
-> >   $ grep '\.\.\.$' /tmp/log | sed 's/.*\([A-Z][a-z]*\).*/\1/' | uniq -c
-> >    2154 Write
-> >
-> > Not surprisingly no zero commands are issued.  The size of the write
-> > commands is very uneven -- it appears to be send one command per block
-> > of zeroes or data.
-> >
-> > Nir: If we could get information from imageio about whether zeroing is
-> > implemented efficiently or not by the backend, we could change
-> > virt-v2v / nbdkit to advertise this back to qemu.
-> >
-> 
-> There is no way to detect the capability, ioctl(BLKZEROOUT) always
-> succeeds, falling back to manual zeroing in the kernel silently
-> 
-> Even if we could, sending zero on the wire from qemu may be even
-> slower,
-
-Yes this is a very good point.  Sending zeroes would be terrible.
-
-Rich.
-
--- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-df lists disk usage of guests without needing to install any
-software inside the virtual machine.  Supports Linux and Windows.
-http://people.redhat.com/~rjones/virt-df/
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogSmFzb24gV2FuZyBbbWFp
+bHRvOmphc293YW5nQHJlZGhhdC5jb21dDQo+IFNlbnQ6IFdlZG5lc2RheSwgTm92ZW1iZXIgNywg
+MjAxOCAyOjM4IFBNDQo+IFRvOiBMaWFuZywgQ3VubWluZyA8Y3VubWluZy5saWFuZ0BpbnRlbC5j
+b20+OyBXYW5nLCBYaWFvIFcNCj4gPHhpYW8udy53YW5nQGludGVsLmNvbT47IG1zdEByZWRoYXQu
+Y29tOyBhbGV4LndpbGxpYW1zb25AcmVkaGF0LmNvbQ0KPiBDYzogcWVtdS1kZXZlbEBub25nbnUu
+b3JnOyBCaWUsIFRpd2VpIDx0aXdlaS5iaWVAaW50ZWwuY29tPjsgWWUsIFhpYW9sb25nDQo+IDx4
+aWFvbG9uZy55ZUBpbnRlbC5jb20+OyBXYW5nLCBaaGlob25nIDx6aGlob25nLndhbmdAaW50ZWwu
+Y29tPjsgRGFseSwgRGFuDQo+IDxkYW4uZGFseUBpbnRlbC5jb20+DQo+IFN1YmplY3Q6IFJlOiBb
+UkZDIDAvMl0gdmhvc3QtdmZpbzogaW50cm9kdWNlIG1kZXYgYmFzZWQgSFcgdmhvc3QgYmFja2Vu
+ZA0KPiANCj4gDQo+IE9uIDIwMTgvMTEvNyDkuIvljYg4OjI2LCBMaWFuZywgQ3VubWluZyB3cm90
+ZToNCj4gPg0KPiA+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+PiBGcm9tOiBKYXNv
+biBXYW5nIFttYWlsdG86amFzb3dhbmdAcmVkaGF0LmNvbV0NCj4gPj4gU2VudDogVHVlc2RheSwg
+Tm92ZW1iZXIgNiwgMjAxOCA0OjE4IEFNDQo+ID4+IFRvOiBXYW5nLCBYaWFvIFcgPHhpYW8udy53
+YW5nQGludGVsLmNvbT47IG1zdEByZWRoYXQuY29tOw0KPiA+PiBhbGV4LndpbGxpYW1zb25AcmVk
+aGF0LmNvbQ0KPiA+PiBDYzogcWVtdS1kZXZlbEBub25nbnUub3JnOyBCaWUsIFRpd2VpIDx0aXdl
+aS5iaWVAaW50ZWwuY29tPjsgTGlhbmcsDQo+ID4+IEN1bm1pbmcgPGN1bm1pbmcubGlhbmdAaW50
+ZWwuY29tPjsgWWUsIFhpYW9sb25nDQo+ID4+IDx4aWFvbG9uZy55ZUBpbnRlbC5jb20+OyBXYW5n
+LCBaaGlob25nIDx6aGlob25nLndhbmdAaW50ZWwuY29tPjsNCj4gPj4gRGFseSwgRGFuIDxkYW4u
+ZGFseUBpbnRlbC5jb20+DQo+ID4+IFN1YmplY3Q6IFJlOiBbUkZDIDAvMl0gdmhvc3QtdmZpbzog
+aW50cm9kdWNlIG1kZXYgYmFzZWQgSFcgdmhvc3QNCj4gPj4gYmFja2VuZA0KPiA+Pg0KPiA+Pg0K
+PiA+PiBPbiAyMDE4LzEwLzE2IOS4i+WNiDk6MjMsIFhpYW8gV2FuZyB3cm90ZToNCj4gPj4+IFdo
+YXQncyB0aGlzDQo+ID4+PiA9PT09PT09PT09PQ0KPiA+Pj4gRm9sbG93aW5nIHRoZSBwYXRjaCAo
+dmhvc3Q6IGludHJvZHVjZSBtZGV2IGJhc2VkIGhhcmR3YXJlIHZob3N0DQo+ID4+PiBiYWNrZW5k
+KSBodHRwczovL2x3bi5uZXQvQXJ0aWNsZXMvNzUwNzcwLywgd2hpY2ggZGVmaW5lcyBhIGdlbmVy
+aWMNCj4gPj4+IG1kZXYgZGV2aWNlIGZvciB2aG9zdCBkYXRhIHBhdGggYWNjZWxlcmF0aW9uIChh
+bGlhc2VkIGFzIHZEUEEgbWRldg0KPiA+Pj4gYmVsb3cpLCB0aGlzIHBhdGNoIHNldCBpbnRyb2R1
+Y2VzIGEgbmV3IG5ldCBjbGllbnQgdHlwZTogdmhvc3QtdmZpby4NCj4gPj4NCj4gPj4gVGhhbmtz
+IGEgbG90IGZvciBhIHN1Y2ggaW50ZXJlc3Rpbmcgc2VyaWVzLiBTb21lIGdlbmVyaWMgcXVlc3Rp
+b25zOg0KPiA+Pg0KPiA+Pg0KPiA+PiBJZiB3ZSBjb25zaWRlciB0byB1c2Ugc29mdHdhcmUgYmFj
+a2VuZCAoZS5nIHZob3N0LWtlcm5lbCBvciBhIHJlbHkgb2YNCj4gPj4gdmlyaXRvLXZob3N0LSB1
+c2VyIG9yIG90aGVyIGNhc2VzKSBhcyB3ZWxsIGluIHRoZSBmdXR1cmUsIG1heWJlDQo+ID4+IHZo
+b3N0LW1kZXYgaXMgYmV0dGVyIHdoaWNoIG1lYW4gaXQgZG9lcyBub3QgdGllIHRvIFZGSU8gYW55
+d2F5Lg0KPiA+IFtMQ10gVGhlIGluaXRpYWwgdGhvdWdodCBvZiB1c2luZyB0ZXJtIG9mICctdmZp
+bycgZHVlIHRvIHRoZSBWRklPIFVBUEkgYmVpbmcgdXNlZCBhcw0KPiBpbnRlcmZhY2UsIHdoaWNo
+IGlzIHRoZSBvbmx5IGF2YWlsYWJsZSBtZGV2IGJ1cyBkcml2ZXIuIEl0IGNhdXNlcyB0byB1c2Ug
+dGhlIHRlcm0gb2YNCj4gJ3Zob3N0LXZmaW8nIGluIHFlbXUsIHdoaWxlIHVzaW5nIHRlcm0gb2Yg
+J3Zob3N0LW1kZXYnIHdoaWNoIHJlcHJlc2VudHMgYSBoZWxwZXIgaW4NCj4ga2VybmVsIGZvciB2
+aG9zdCBtZXNzYWdlcyB2aWEgbWRldi4NCj4gPg0KPiA+Pg0KPiA+Pj4gQ3VycmVudGx5IHdlIGhh
+dmUgMiB0eXBlcyBvZiB2aG9zdCBiYWNrZW5kcyBpbiBRRU1VOiB2aG9zdCBrZXJuZWwNCj4gPj4+
+ICh0YXApIGFuZCB2aG9zdC11c2VyIChlLmcuIERQREsgdmhvc3QpLCBpbiBvcmRlciB0byBoYXZl
+IGEga2VybmVsDQo+ID4+PiBzcGFjZSBIVyB2aG9zdCBhY2NlbGVyYXRpb24gZnJhbWV3b3JrLCB0
+aGUgdkRQQSBtZGV2IGRldmljZSB3b3JrcyBhcw0KPiA+Pj4gYSBnZW5lcmljIGNvbmZpZ3VyaW5n
+IGNoYW5uZWwuDQo+ID4+DQo+ID4+IERvZXMgImdlbmVyaWMiIGNvbmZpZ3VyaW5nIGNoYW5uZWwg
+bWVhbnMgZHBkayB3aWxsIGFsc28gZ28gZm9yIHRoaXMgd2F5Pw0KPiA+PiBFLmcgaXQgd2lsbCBo
+YXZlIGEgdmhvc3QgbWRldiBwbWQ/DQo+ID4gW0xDXSBXZSBkb24ndCBwbGFuIHRvIGhhdmUgYSB2
+aG9zdC1tZGV2IHBtZCwgYnV0IHRoaW5raW5nIHRvIGhhdmUgY29uc2lzdGVudA0KPiB2aXJ0aW8g
+UE1EIHJ1bm5pbmcgb24gdG9wIG9mIHZob3N0LW1kZXYuICBWaXJ0aW8gUE1EIHN1cHBvcnRzIHBj
+aSBidXMgYW5kIHZkZXYgKGJ5DQo+IHZpcnRpby11c2VyKSBidXMgdG9kYXkuIFZob3N0LW1kZXYg
+bW9zdCBsaWtlbHkgd291bGQgYmUgaW50cm9kdWNlZCBhcyBhbm90aGVyIGJ1cw0KPiAobWRldiBi
+dXMpIHByb3ZpZGVyLg0KPiANCj4gDQo+IFRoaXMgc2VlbXMgY291bGQgYmUgZWxpbWluYXRlZCBp
+ZiB5b3Uga2VlcCB1c2UgdGhlIHZob3N0LWtlcm5lbCBpb2N0bCBBUEkuIFRoZW4geW91DQo+IGNh
+biB1c2UgdmlydGlvLXVzZXIuDQpbTENdIFRoYXQncyB0cnVlLg0KDQo+IA0KPiANCj4gPiAgIG1k
+ZXYgYnVzIERQREsgc3VwcG9ydCBpcyBpbiBiYWNrbG9nLg0KPiA+DQo+ID4+DQo+ID4+PiAgICBJ
+dCBleHBvc2VzIHRvIHVzZXIgc3BhY2UgYSBub24tdmVuZG9yLXNwZWNpZmljIGNvbmZpZ3VyYXRp
+b24NCj4gPj4+IGludGVyZmFjZSBmb3Igc2V0dGluZyB1cCBhIHZob3N0IEhXIGFjY2VsZXJhdG9y
+LA0KPiA+Pg0KPiA+PiBPciBldmVuIGEgc29mdHdhcmUgdHJhbnNsYXRpb24gbGF5ZXIgb24gdG9w
+IG9mIGV4aXN0IGhhcmR3YXJlLg0KPiA+Pg0KPiA+Pg0KPiA+Pj4gYmFzZWQgb24gdGhpcywgdGhp
+cyBwYXRjaA0KPiA+Pj4gc2V0IGludHJvZHVjZXMgYSB0aGlyZCB2aG9zdCBiYWNrZW5kIGNhbGxl
+ZCB2aG9zdC12ZmlvLg0KPiA+Pj4NCj4gPj4+IEhvdyBkb2VzIGl0IHdvcmsNCj4gPj4+ID09PT09
+PT09PT09PT09PT0NCj4gPj4+IFRoZSB2RFBBIG1kZXYgZGVmaW5lcyAyIEJBUiByZWdpb25zLCBC
+QVIwIGFuZCBCQVIxLiBCQVIwIGlzIHRoZSBtYWluDQo+ID4+PiBkZXZpY2UgaW50ZXJmYWNlLCB2
+aG9zdCBtZXNzYWdlcyBjYW4gYmUgd3JpdHRlbiB0byBvciByZWFkIGZyb20gdGhpcw0KPiA+Pj4g
+cmVnaW9uIGZvbGxvd2luZyBiZWxvdyBmb3JtYXQuIEFsbCB0aGUgcmVndWxhciB2aG9zdCBtZXNz
+YWdlcyBhYm91dA0KPiA+Pj4gdnJpbmcgYWRkciwgbmVnb3RpYXRlZCBmZWF0dXJlcywgZXRjLiwg
+YXJlIHdyaXR0ZW4gdG8gdGhpcyByZWdpb24gZGlyZWN0bHkuDQo+ID4+DQo+ID4+IElmIEkgdW5k
+ZXJzdGFuZCB0aGlzIGNvcnJlY3RseSwgdGhlIG1kZXYgd2FzIG5vdCB1c2VkIGZvciBwYXNzZWQg
+dGhyb3VnaCB0byBndWVzdA0KPiA+PiBkaXJlY3RseS4gU28gd2hhdCdzIHRoZSByZWFzb24gb2Yg
+aW52ZW50aW5nIGEgUENJIGxpa2UgZGV2aWNlIGhlcmU/IEknbSBhc2tpbmcgc2luY2U6DQo+ID4g
+W0xDXSBtZGV2IHVzZXMgbWFuZGF0b3J5IGF0dHJpYnV0ZSBvZiAnZGV2aWNlX2FwaScgdG8gaWRl
+bnRpZnkgdGhlIGxheW91dC4gV2UgcGljaw0KPiB1cCBvbmUgYXZhaWxhYmxlIGZyb20gcGNpLCBw
+bGF0Zm9ybSwgYW1iYSBhbmQgY2N3LiBJdCB3b3JrcyBpZiBkZWZpbmluZyBhIG5ldyBvbmUNCj4g
+Zm9yIHRoaXMgdHJhbnNwb3J0Lg0KPiA+DQo+ID4+IC0gdmhvc3QgcHJvdG9jb2wgaXMgdHJhbnNw
+b3J0IGluZGVwZWRlbnQsIHdlIHNob3VsZCBjb25zaWRlciB0byBzdXBwb3J0IHRyYW5zcG9ydA0K
+PiA+PiBvdGhlciB0aGFuIFBDSS4gSSBrbm93IHdlIGNhbiBldmVuIGRvIGl0IHdpdGggdGhlIGV4
+aXN0IGRlc2lnbiBidXQgaXQgbG9va3MgcmF0aGVyDQo+IG9kZA0KPiA+PiBpZiB3ZSBkbyBlLmcg
+Y2N3IGRldmljZSB3aXRoIGEgUENJIGxpa2UgbWVkaWF0ZWQgZGV2aWNlLg0KPiA+Pg0KPiA+PiAt
+IGNhbiB3ZSB0cnkgdG8gcmV1c2Ugdmhvc3Qta2VybmVsIGlvY3RsPyBMZXNzIEFQSSBtZWFucyBs
+ZXNzIGJ1Z3MgYW5kIGNvZGUNCj4gcmV1c2luZy4NCj4gPj4gRS5nIHZpcnRpby11c2VyIGNhbiBi
+ZW5lZml0IGZyb20gdGhlIHZob3N0IGtlcm5lbCBpb2N0bCBBUEkgYWxtb3N0IHdpdGggbm8gY2hh
+bmdlcw0KPiBJDQo+ID4+IGJlbGlldmUuDQo+ID4gW0xDXSBBZ3JlZWQsIHNvIGl0IHJldXNlcyBD
+TUQgZGVmaW5lZCBieSB2aG9zdC1rZXJuZWwgaW9jdGwuIEJ1dCBWRklPIHByb3ZpZGVzDQo+IGRl
+dmljZSBzcGVjaWZpYyB0aGluZ3MgKGUuZy4gRE1BUiwgSU5UUiBhbmQgZXRjLikgd2hpY2ggaXMg
+dGhlIGV4dHJhIEFQSXMgYmVpbmcNCj4gaW50cm9kdWNlZCBieSB0aGlzIHRyYW5zcG9ydC4NCj4g
+DQo+IA0KPiBJJ20gbm90IHF1aXRlIHN1cmUgSSB1bmRlcnN0YW5kIGhlcmUuIEkgdGhpbmsgaGF2
+aW5nIHZob3N0LWtlcm5lbA0KPiBjb21wYXRpYmxlIGlvY3RsIGRvZXMgbm90IGNvbmZsaWN0IG9m
+IHVzaW5nIFZGSU8gaW9jdGwgbGlrZSBETUEgb3IgSU5UUj8NCj4gDQo+IEJ0dywgVkZJTyBETUEg
+aW9jdGwgaXMgZXZlbiBub3QgYSBtdXN0IGZyb20gbXkgcG9pbnQgb2Ygdmlldywgdmhvc3QtbWRl
+dg0KPiBjYW4gZm9yd2FyZCB0aGUgbWVtIHRhYmxlIGluZm9ybWF0aW9uIHRvIGRldmljZSBkcml2
+ZXIgYW5kIGxldCBpdCBjYWxsDQo+IERNQSBBUEkgdG8gbWFwL3VtYXAgcGFnZXMuDQpbTENdIElm
+IG5vdCByZWdhcmRpbmcgdmhvc3QtbWRldiBhcyBhIGRldmljZSwgdGhlbiBmb3J3YXJkIG1lbSB0
+YWJsZSB3b24ndCBiZSBhIGNvbmNlcm4uDQpJZiBpbnRyb2R1Y2luZyBhIG5ldyBtZGV2IGJ1cyBk
+cml2ZXIgKHZob3N0LW1kZXYpIHdoaWNoIGFsbG93cyBtZGV2IGluc3RhbmNlIHRvIGJlIGEgbmV3
+IHR5cGUgb2YgcHJvdmlkZXIgZm9yIHZob3N0LWtlcm5lbC4gSXQgYmVjb21lcyBhIHByZXR0eSBn
+b29kIGFsdGVybmF0aXZlIHRvIGZ1bGx5IGxldmVyYWdlIHZob3N0LWtlcm5lbCBpb2N0bC4NCkkn
+bSBub3Qgc3VyZSBpdCdzIHRoZSBzYW1lIHZpZXcgYXMgeW91cnMgd2hlbiB5b3Ugc2F5cyByZXVz
+aW5nIHZob3N0LWtlcm5lbCBpb2N0bC4NCg0KPiANCj4gVGhhbmtzDQoNCg==
