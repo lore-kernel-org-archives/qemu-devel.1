@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50967)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gKFQM-0007kD-1a
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 23:26:38 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gKFkG-0002Ky-Mi
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 23:47:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gKFQK-0005Hd-33
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 23:26:37 -0500
-Date: Wed, 7 Nov 2018 15:25:21 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gKFk8-0007BU-Bi
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 23:47:08 -0500
+Date: Wed, 7 Nov 2018 15:46:35 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181107042520.GC5575@umbus.fritz.box>
-References: <20181030093531.18587-1-agraf@suse.de>
-	<655b9090-bb99-2255-5020-d2da2a404bfc@ilande.co.uk>
+Message-ID: <20181107044635.GE5575@umbus.fritz.box>
+References: <153933509870.3834759.13291133122604475240.stgit@bahia.lan>
+	<153933511983.3834759.10815543413375425072.stgit@bahia.lan>
+	<e77c6869-d89e-c5df-c43f-a2b5df3fbf59@ozlabs.ru>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="eRtJSFbw+EEWtPj3"
+	protocol="application/pgp-signature"; boundary="sfyO1m2EN8ZOtJL6"
 Content-Disposition: inline
-In-Reply-To: <655b9090-bb99-2255-5020-d2da2a404bfc@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: PPC: Remove myself
+In-Reply-To: <e77c6869-d89e-c5df-c43f-a2b5df3fbf59@ozlabs.ru>
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] spapr_pci: rename some structured
+ types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,94 +26,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
 
 
---eRtJSFbw+EEWtPj3
+--sfyO1m2EN8ZOtJL6
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 30, 2018 at 02:34:46PM +0000, Mark Cave-Ayland wrote:
-> On 30/10/2018 09:35, Alexander Graf wrote:
+On Mon, Oct 15, 2018 at 12:49:53PM +1100, Alexey Kardashevskiy wrote:
 >=20
-> > I haven't really been maintaining any PowerPC code for quite a while no=
-w,
-> > so let's reflect reality: David does all the work and embedded PPC is in
-> > "Odd Fixes" state rather than supported now.
 >=20
-> It was a pleasure working with you, but of course life moves
-> on... :)
+> On 12/10/2018 20:05, Greg Kurz wrote:
+> > According to CODING_STYLE, structured types names are expected to be
+> > in CamelCase but we have:
+> >=20
+> > typedef struct spapr_pci_msi {
+> >     uint32_t first_irq;
+> >     uint32_t num;
+> > } spapr_pci_msi;
+> >=20
+> > typedef struct spapr_pci_msi_mig {
+> >     uint32_t key;
+> >     spapr_pci_msi value;
+> > } spapr_pci_msi_mig;
+> >=20
+> > Acronyms are often written in upper-case, but here we would en up with
+> > a lot of upper-case letters in a row (ie, sPAPRPCIMSI) which defeats the
+> > purpose of CamelCase. It even displays "RPC" which looks awkward.
+>=20
+> Yet more common than this. I vote for sPAPRPCIMSI as PCI is an acronym.
+> "pci" is small letters hurts my eyes :)
 
-[snip]
-> >  New World
-> > -M: Alexander Graf <agraf@suse.de>
-> > +M: David Gibson <david@gibson.dropbear.id.au>
-> >  L: qemu-ppc@nongnu.org
-> > -S: Maintained
-> > +S: Odd Fixes
->=20
-> There was actually a patch floating around to add myself to MAINTAINERS f=
-or the New
-> World and Old World machines, but I think it got lost when trying to set =
-up a
-> sub-maintainer queue with David. I'm happy to look after these
-> machines for now.
+Hrm.  So, yes, I know I kind of started it, but these various
+compromises about how to captialize things means this patch is now
+"change from non-camelcase to.. something that's also not really
+camelcase".
 
-Yeah, it did.  Still need to sort that out...
+At which point I'm not particularly convinced it's worth the bother.
 
->=20
-> >  F: hw/ppc/mac_newworld.c
-> >  F: hw/pci-host/uninorth.c
-> >  F: hw/pci-bridge/dec.[hc]
-> > @@ -823,9 +822,9 @@ F: include/hw/misc/mos6522.h
-> >  F: include/hw/ppc/mac_dbdma.h
-> > =20
-> >  Old World
-> > -M: Alexander Graf <agraf@suse.de>
-> > +M: David Gibson <david@gibson.dropbear.id.au>
-> >  L: qemu-ppc@nongnu.org
-> > -S: Maintained
-> > +S: Odd Fixes
-> >  F: hw/ppc/mac_oldworld.c
-> >  F: hw/pci-host/grackle.c
-> >  F: hw/misc/macio/
-> > @@ -850,7 +849,6 @@ F: pc-bios/ppc_rom.bin
-> > =20
-> >  sPAPR
-> >  M: David Gibson <david@gibson.dropbear.id.au>
-> > -M: Alexander Graf <agraf@suse.de>
-> >  L: qemu-ppc@nongnu.org
-> >  S: Supported
-> >  F: hw/*/spapr*
-> > @@ -1117,7 +1115,7 @@ F: tests/bios-tables-test.c
-> >  F: tests/acpi-utils.[hc]
-> > =20
-> >  ppc4xx
-> > -M: Alexander Graf <agraf@suse.de>
-> > +M: David Gibson <david@gibson.dropbear.id.au>
-> >  L: qemu-ppc@nongnu.org
-> >  S: Odd Fixes
-> >  F: hw/ppc/ppc4*.c
-> > @@ -1126,9 +1124,9 @@ F: include/hw/ppc/ppc4xx.h
-> >  F: include/hw/i2c/ppc4xx_i2c.h
-> > =20
-> >  ppce500
-> > -M: Alexander Graf <agraf@suse.de>
-> > +M: David Gibson <david@gibson.dropbear.id.au>
-> >  L: qemu-ppc@nongnu.org
-> > -S: Supported
-> > +S: Odd Fixes
-> >  F: hw/ppc/e500*
-> >  F: hw/pci-host/ppce500.c
-> >  F: hw/net/fsl_etsec/
->=20
->=20
-> ATB,
->=20
-> Mark.
->=20
+If we really want to go ahead with CamelCasing this, I think we'd need
+to start by fixing up the existing sorta-camelcase-but-not-really
+stuff to actual camelcase.  Which would mean the slightly odd reading
+"Spapr" and "Pci" and "Msi" and so forth, but it might be worth it for
+consistency.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -119,24 +78,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---eRtJSFbw+EEWtPj3
+--sfyO1m2EN8ZOtJL6
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlviaTAACgkQbDjKyiDZ
-s5IZQA//atU1lTJM/c8IlQE1IC5/UUuZe1cOoTIt1tMP2TScGOT9ylfOFCe6sMaU
-kVLx2ixZexFFSPmj0Y+aTqaTDlwq+KqwhDKLUYU3puhVdD7kj865+qKg92owv74k
-30Qv+0L1hiooQXG6zztPD+9whchfAFEyEOC7zCVMYm+ltZehCS+i4NQVZDjIz+ZU
-SMRUhoqMyOJ7OlXNN+Kot9MXVqAPCd9/vpDwQna64RYBrUhbuAPXaPB2hbQqGl5D
-CMkhhYOJz8qReXS/G0fc0fIKOE5uzVn6kBST8jvM1f4S9j/Y0ru0/nTh3YDj9X6c
-OHU3CvW9WpZ2gyEF1pYBRInOox6hx0GvgaN7KrXlVxthcCEXlnSXUXmWdhurcGAJ
-XtQwWhcKos7YBO/3Kb6DLeOq/WHT0d7vYw/AYfk9ay8kgb1rj7Rj26X5rhJi1FQk
-VR2yILEXRLGy9MxW4WLJZS9wdGzCS6IKUIlM92LiESmWMEeLs2IZPE4deQogafcg
-kSedhbe53zr5DOMvqNycNZPab5+8kx86dhv0Ts/yZZF+d+JSIEiBaitAn11iXnM+
-L0M0i4EAoqJW6/tB4cNcdKleIeD6K/T6wwK5W61Zp+yBJO/dSPe1KH+0Si81Fobu
-TgY8euqkBQt7Mu/62NPWQvWWbgfNIGZZ2ueOXHnXsin9wxWiuHg=
-=dM7M
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlvibioACgkQbDjKyiDZ
+s5KY/BAAktrzJIRvnQRTKKq9J0tT3rMQ0Slb8FRvBEXQ4AmGhcCn4Mz1WG7e8sgk
+PC/GMPdem9iJf4AIUiJ+2J/MCpZ18JIf2rgiSudB3ItMnIppBUZG4mmCIPSsrKcL
+e5A3Ps0DSV84vncywRp8KYP7eBKv4Jb3j7PTLej2CigdxSCTpfs7YK1g15XzE42B
++njgWo7EWPF4ij6dmK5TkDscFPhJtqkx5i6p16RjQJWkU1tK8wItTd3r0Q2CC7DH
+Zidgp8M1kUDJ/AxaCQffR2f7A5eZhskqirh0VjD+0pcf3xeyZ7c/hx/bcCMxV63a
+7LatJkZb8Dv9kuBNTHsTJGzCk87feVkgTVTWWF1Z5207y8Xm9f0ratsJTeuHd4MU
+iyrmx4GLQ5rp1JTWcqhgPjWt31PE16suQiSsa5q0kApRXOepS6q/YrTqoTixSBMq
+brS4eoknUPEhNgrVRrJ9YhIPI1nRUFA4LsYNfxPe/Ko7ED/QqX2EGZoYEOB6WcqB
+PLq/PYMoZYVIqbujx91XSvBKVHnchkF/9AWt6N6ZHyvrskR6VLdUFRh2aWnvI9ox
+z9uFPbpr+5TIl/s8cf/4mWR996Tgs72U/0yrDLSX+xCVI38FAD0iNw0z2E89gbhh
+jwa3ZTJmEs9RJmqPL8VYMfnv05wo1llHNk07IJ1zeJqDREcY4Ko=
+=O9Rf
 -----END PGP SIGNATURE-----
 
---eRtJSFbw+EEWtPj3--
+--sfyO1m2EN8ZOtJL6--
