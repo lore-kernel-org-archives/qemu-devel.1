@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46819)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gKNSU-0003xh-4T
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 08:01:31 -0500
+	(envelope-from <berto@igalia.com>) id 1gKNSZ-00040c-6B
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 08:01:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gKNSB-0002Hr-Gk
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 08:01:13 -0500
+	(envelope-from <berto@igalia.com>) id 1gKNSC-0002JJ-8r
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 08:01:22 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Wed,  7 Nov 2018 14:59:47 +0200
-Message-Id: <e368367b646dd2a48434d50286b64e8321edf096.1541595424.git.berto@igalia.com>
+Date: Wed,  7 Nov 2018 14:59:46 +0200
+Message-Id: <37b20c1e4ca5ef29ec7fbba2fa62dbf7acc292a5.1541595424.git.berto@igalia.com>
 In-Reply-To: <cover.1541595424.git.berto@igalia.com>
 References: <cover.1541595424.git.berto@igalia.com>
 In-Reply-To: <cover.1541595424.git.berto@igalia.com>
 References: <cover.1541595424.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v4 12/15] block: Remove flags parameter from
- bdrv_reopen_queue()
+Subject: [Qemu-devel] [PATCH v4 11/15] block: Clean up reopen_backing_file()
+ in block/replication.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,94 +25,116 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Now that all callers are passing all flag changes as QDict options,
-the flags parameter is no longer necessary, so we can get rid of it.
+This function is used to put the hidden and secondary disks in
+read-write mode before launching the backup job, and back in read-only
+mode afterwards.
+
+This patch does the following changes:
+
+  - Use an options QDict with the "read-only" option instead of
+    passing the changes as flags only.
+
+  - Simplify the code (it was unnecessarily complicated and verbose).
+
+  - Fix a bug due to which the secondary disk was not being put back
+    in read-only mode when writable=false (because in this case
+    orig_secondary_flags always had the BDRV_O_RDWR flag set).
+
+  - Stop clearing the BDRV_O_INACTIVE flag.
+
+The flags parameter to bdrv_reopen_queue() becomes redundant and we'll
+be able to get rid of it in a subsequent patch.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block.c               | 5 +++--
- block/replication.c   | 6 ++----
- include/block/block.h | 3 +--
- qemu-io-cmds.c        | 2 +-
- 4 files changed, 7 insertions(+), 9 deletions(-)
+ block/replication.c | 45 +++++++++++++++++++++------------------------
+ 1 file changed, 21 insertions(+), 24 deletions(-)
 
-diff --git a/block.c b/block.c
-index 31de7b2299..8b401e1cf4 100644
---- a/block.c
-+++ b/block.c
-@@ -3041,8 +3041,9 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
- 
- BlockReopenQueue *bdrv_reopen_queue(BlockReopenQueue *bs_queue,
-                                     BlockDriverState *bs,
--                                    QDict *options, int flags)
-+                                    QDict *options)
- {
-+    int flags = bdrv_get_flags(bs);
-     return bdrv_reopen_queue_child(bs_queue, bs, options, flags,
-                                    NULL, NULL, 0);
- }
-@@ -3116,7 +3117,7 @@ int bdrv_reopen_set_read_only(BlockDriverState *bs, bool read_only,
-     qdict_put_bool(opts, BDRV_OPT_READ_ONLY, read_only);
- 
-     bdrv_subtree_drained_begin(bs);
--    queue = bdrv_reopen_queue(NULL, bs, opts, bdrv_get_flags(bs));
-+    queue = bdrv_reopen_queue(NULL, bs, opts);
-     ret = bdrv_reopen_multiple(bdrv_get_aio_context(bs), queue, errp);
-     bdrv_subtree_drained_end(bs);
- 
 diff --git a/block/replication.c b/block/replication.c
-index 481a225924..fdbfe47fa4 100644
+index 6349d6958e..481a225924 100644
 --- a/block/replication.c
 +++ b/block/replication.c
-@@ -393,19 +393,17 @@ static void reopen_backing_file(BlockDriverState *bs, bool writable,
-     bdrv_subtree_drained_begin(s->secondary_disk->bs);
+@@ -20,6 +20,7 @@
+ #include "block/block_backup.h"
+ #include "sysemu/block-backend.h"
+ #include "qapi/error.h"
++#include "qapi/qmp/qdict.h"
+ #include "replication.h"
  
-     if (s->orig_hidden_read_only) {
--        int flags = bdrv_get_flags(s->hidden_disk->bs);
-         QDict *opts = qdict_new();
-         qdict_put_bool(opts, BDRV_OPT_READ_ONLY, !writable);
-         reopen_queue = bdrv_reopen_queue(reopen_queue, s->hidden_disk->bs,
--                                         opts, flags);
-+                                         opts);
+ typedef enum {
+@@ -39,8 +40,8 @@ typedef struct BDRVReplicationState {
+     char *top_id;
+     ReplicationState *rs;
+     Error *blocker;
+-    int orig_hidden_flags;
+-    int orig_secondary_flags;
++    bool orig_hidden_read_only;
++    bool orig_secondary_read_only;
+     int error;
+ } BDRVReplicationState;
+ 
+@@ -371,44 +372,40 @@ static void secondary_do_checkpoint(BDRVReplicationState *s, Error **errp)
+     }
+ }
+ 
++/* This function is supposed to be called twice:
++ * first with writable = true, then with writable = false.
++ * The first call puts s->hidden_disk and s->secondary_disk in
++ * r/w mode, and the second puts them back in their original state.
++ */
+ static void reopen_backing_file(BlockDriverState *bs, bool writable,
+                                 Error **errp)
+ {
+     BDRVReplicationState *s = bs->opaque;
+     BlockReopenQueue *reopen_queue = NULL;
+-    int orig_hidden_flags, orig_secondary_flags;
+-    int new_hidden_flags, new_secondary_flags;
+     Error *local_err = NULL;
+ 
+     if (writable) {
+-        orig_hidden_flags = s->orig_hidden_flags =
+-                                bdrv_get_flags(s->hidden_disk->bs);
+-        new_hidden_flags = (orig_hidden_flags | BDRV_O_RDWR) &
+-                                                    ~BDRV_O_INACTIVE;
+-        orig_secondary_flags = s->orig_secondary_flags =
+-                                bdrv_get_flags(s->secondary_disk->bs);
+-        new_secondary_flags = (orig_secondary_flags | BDRV_O_RDWR) &
+-                                                     ~BDRV_O_INACTIVE;
+-    } else {
+-        orig_hidden_flags = (s->orig_hidden_flags | BDRV_O_RDWR) &
+-                                                    ~BDRV_O_INACTIVE;
+-        new_hidden_flags = s->orig_hidden_flags;
+-        orig_secondary_flags = (s->orig_secondary_flags | BDRV_O_RDWR) &
+-                                                    ~BDRV_O_INACTIVE;
+-        new_secondary_flags = s->orig_secondary_flags;
++        s->orig_hidden_read_only = bdrv_is_read_only(s->hidden_disk->bs);
++        s->orig_secondary_read_only = bdrv_is_read_only(s->secondary_disk->bs);
      }
  
-     if (s->orig_secondary_read_only) {
--        int flags = bdrv_get_flags(s->secondary_disk->bs);
-         QDict *opts = qdict_new();
-         qdict_put_bool(opts, BDRV_OPT_READ_ONLY, !writable);
+     bdrv_subtree_drained_begin(s->hidden_disk->bs);
+     bdrv_subtree_drained_begin(s->secondary_disk->bs);
+ 
+-    if (orig_hidden_flags != new_hidden_flags) {
+-        reopen_queue = bdrv_reopen_queue(reopen_queue, s->hidden_disk->bs, NULL,
+-                                         new_hidden_flags);
++    if (s->orig_hidden_read_only) {
++        int flags = bdrv_get_flags(s->hidden_disk->bs);
++        QDict *opts = qdict_new();
++        qdict_put_bool(opts, BDRV_OPT_READ_ONLY, !writable);
++        reopen_queue = bdrv_reopen_queue(reopen_queue, s->hidden_disk->bs,
++                                         opts, flags);
+     }
+ 
+-    if (!(orig_secondary_flags & BDRV_O_RDWR)) {
++    if (s->orig_secondary_read_only) {
++        int flags = bdrv_get_flags(s->secondary_disk->bs);
++        QDict *opts = qdict_new();
++        qdict_put_bool(opts, BDRV_OPT_READ_ONLY, !writable);
          reopen_queue = bdrv_reopen_queue(reopen_queue, s->secondary_disk->bs,
--                                         opts, flags);
-+                                         opts);
+-                                         NULL, new_secondary_flags);
++                                         opts, flags);
      }
  
      if (reopen_queue) {
-diff --git a/include/block/block.h b/include/block/block.h
-index de72c7a093..f70a843b72 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -299,8 +299,7 @@ BlockDriverState *bdrv_open(const char *filename, const char *reference,
- BlockDriverState *bdrv_new_open_driver(BlockDriver *drv, const char *node_name,
-                                        int flags, Error **errp);
- BlockReopenQueue *bdrv_reopen_queue(BlockReopenQueue *bs_queue,
--                                    BlockDriverState *bs,
--                                    QDict *options, int flags);
-+                                    BlockDriverState *bs, QDict *options);
- int bdrv_reopen_multiple(AioContext *ctx, BlockReopenQueue *bs_queue, Error **errp);
- int bdrv_reopen_set_read_only(BlockDriverState *bs, bool read_only,
-                               Error **errp);
-diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-index c9ae09d574..2c39124036 100644
---- a/qemu-io-cmds.c
-+++ b/qemu-io-cmds.c
-@@ -2075,7 +2075,7 @@ static int reopen_f(BlockBackend *blk, int argc, char **argv)
-     }
- 
-     bdrv_subtree_drained_begin(bs);
--    brq = bdrv_reopen_queue(NULL, bs, opts, flags);
-+    brq = bdrv_reopen_queue(NULL, bs, opts);
-     bdrv_reopen_multiple(bdrv_get_aio_context(bs), brq, &local_err);
-     bdrv_subtree_drained_end(bs);
- 
 -- 
 2.11.0
