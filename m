@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46497)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gKM1O-0002yE-IV
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 06:29:19 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gKM9L-0000dx-Qb
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 06:37:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gKM1L-0005ov-UD
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 06:29:18 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:45439)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gKM1L-0005j2-EP
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 06:29:15 -0500
-Received: by mail-ot1-x341.google.com with SMTP id g10so14414882otl.12
-	for <qemu-devel@nongnu.org>; Wed, 07 Nov 2018 03:29:15 -0800 (PST)
+	(envelope-from <no-reply@patchew.org>) id 1gKM99-0007Am-Cd
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 06:37:25 -0500
+Resent-Message-Id: <E1gKM99-0007Am-Cd@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21366)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gKM92-00076R-GB
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 06:37:14 -0500
+Message-ID: <154159061411.9512.2024756994048066214@015909e0f939>
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <20181029173437.32559-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1e2ba070.db56.166ed56f891.Coremail.wj193102@163.com>
-References: <1e2ba070.db56.166ed56f891.Coremail.wj193102@163.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 7 Nov 2018 11:28:53 +0000
-Message-ID: <CAFEAcA8cahw3r8LVEk=o9DWpBLyoy7VSBvEKC0Rq-+oR94VpHw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] The error from compiling QEMU statically
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 7 Nov 2018 03:36:55 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 0/4] scsi-generic: fixes for Block Limits
+ emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +29,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: wj193102 <wj193102@163.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: pbonzini@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, danielhb413@gmail.com, mreitz@redhat.com
 
-On 7 November 2018 at 08:43, wj193102 <wj193102@163.com> wrote:
-> Hi, everybody.
-> I want to compile QEMU statically. But when I make the soure files, I get the error messages. Please help me to resolve them.
-> Now I will tell you the steps what I do.
-> (1)$ cd qemu-3.0.0
-> (2)$ ./configure --prefix=/usr --static
-
-Note that static compilation is only really supported for
-building the linux-user emulators, not for the system
-emulators. So it's best to pass configure options to tell
-it to only build the linux-user emulators, like
---disable-system --disable-tools
-
-(1)/block/file-posix.c:1945: Error: There is an unknown field
-'prealloc' in the initializer;
-(2)/block/file-posix.c:1946: Error: There is an unknown field 'errp'
-in the initializer.
-
-Which compiler is this? Google provides no hits for
-this error message, which suggests you're using something
-weird, rather than gcc or clang.
-
-thanks
--- PMM
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgxMDI5MTczNDM3LjMyNTU5LTEtcGJvbnppbmlAcmVkaGF0LmNvbQpTdWJq
+ZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvNF0gc2NzaS1nZW5lcmljOiBmaXhlcyBmb3IgQmxv
+Y2sgTGltaXRzIGVtdWxhdGlvbgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFz
+aAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAt
+bCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNv
+bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFs
+Z29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVy
+c2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFU
+Q0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAh
+IGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1t
+YWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAg
+bj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVw
+ZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQg
+dG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo4NDA4YmQzZDYwIHNjc2ktZ2VuZXJpYzogZG8gbm90IGRv
+IFZQRCBlbXVsYXRpb24gZm9yIHNlbnNlIG90aGVyIHRoYW4gSUxMRUdBTF9SRVFVRVNUCjNhYTg2
+OWU4OTEgc2NzaS1nZW5lcmljOiBhdm9pZCBpbnZhbGlkIGFjY2VzcyB0byBzdHJ1Y3Qgd2hlbiBl
+bXVsYXRpbmcgYmxvY2sgbGltaXRzCjE5ZWU0YzBjMmYgc2NzaS1nZW5lcmljOiBhdm9pZCBvdXQt
+b2YtYm91bmRzIGFjY2VzcyB0byBWUEQgcGFnZSBsaXN0CjZkNzA5NDI4YmIgc2NzaS1nZW5lcmlj
+OiBrZWVwIFZQRCBwYWdlIGxpc3Qgc29ydGVkCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2lu
+ZyBQQVRDSCAxLzQ6IHNjc2ktZ2VuZXJpYzoga2VlcCBWUEQgcGFnZSBsaXN0IHNvcnRlZC4uLgpD
+aGVja2luZyBQQVRDSCAyLzQ6IHNjc2ktZ2VuZXJpYzogYXZvaWQgb3V0LW9mLWJvdW5kcyBhY2Nl
+c3MgdG8gVlBEIHBhZ2UgbGlzdC4uLgpDaGVja2luZyBQQVRDSCAzLzQ6IHNjc2ktZ2VuZXJpYzog
+YXZvaWQgaW52YWxpZCBhY2Nlc3MgdG8gc3RydWN0IHdoZW4gZW11bGF0aW5nIGJsb2NrIGxpbWl0
+cy4uLgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5U
+QUlORVJTIG5lZWQgdXBkYXRpbmc/CiMzMjogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDog
+MCBlcnJvcnMsIDEgd2FybmluZ3MsIDIzMyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBz
+dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
+IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
+UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDQvNDogc2NzaS1nZW5lcmljOiBk
+byBub3QgZG8gVlBEIGVtdWxhdGlvbiBmb3Igc2Vuc2Ugb3RoZXIgdGhhbiBJTExFR0FMX1JFUVVF
+U1QuLi4KRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMzNDogRklMRTogaHcvc2NzaS9z
+Y3NpLWdlbmVyaWMuYzoyNzM6CisgICAgICAgIHNjc2lfcGFyc2Vfc2Vuc2VfYnVmKHItPnJlcS5z
+ZW5zZSwgci0+aW9faGVhZGVyLnNiX2xlbl93cikua2V5ID09IElMTEVHQUxfUkVRVUVTVCAmJgoK
+dG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyNCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNo
+IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
+cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
+CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29t
+bWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNh
+bGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZl
+ZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
