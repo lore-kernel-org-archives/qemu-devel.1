@@ -1,23 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gKHYu-0006ST-6b
+	(envelope-from <armbru@redhat.com>) id 1gKHYv-0005xJ-4Y
 	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 01:43:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gKHTK-0004dW-W7
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 01:37:51 -0500
+	(envelope-from <armbru@redhat.com>) id 1gKHSV-00045U-E0
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 01:37:02 -0500
 From: Markus Armbruster <armbru@redhat.com>
-References: <20181019113424.25727-1-armbru@redhat.com>
-	<d370d182-01c8-f4ab-ed63-207a9dc4c4d6@redhat.com>
-	<87r2fz5ywu.fsf@dusky.pond.sub.org>
-	<3b245d71-abe1-9ae2-1671-7d29a1676d70@redhat.com>
-Date: Wed, 07 Nov 2018 07:37:45 +0100
-In-Reply-To: <3b245d71-abe1-9ae2-1671-7d29a1676d70@redhat.com> (Max Reitz's
-	message of "Tue, 6 Nov 2018 01:54:00 +0100")
-Message-ID: <877ehpxuiu.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] block: Make more block drivers
- compile-time configurable
+Date: Wed,  7 Nov 2018 07:36:44 +0100
+Message-Id: <20181107063644.2254-1-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] block: Make more block drivers compile-time
+ configurable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,103 +18,210 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, jeff@codyprime.org
+To: qemu-devel@nongnu.org
+Cc: jeff@codyprime.org, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
 
-Max Reitz <mreitz@redhat.com> writes:
+From: Jeff Cody <jcody@redhat.com>
 
-> On 05.11.18 16:25, Markus Armbruster wrote:
->> Max Reitz <mreitz@redhat.com> writes:
->> 
->>> On 19.10.18 13:34, Markus Armbruster wrote:
->>>> From: Jeff Cody <jcody@redhat.com>
->>>>
->>>> This adds configure options to control the following block drivers:
->>>>
->>>> * Bochs
->>>> * Cloop
->>>> * Dmg
->>>> * Qcow (V1)
->>>> * Vdi
->>>> * Vvfat
->>>> * qed
->>>> * parallels
->>>> * sheepdog
->>>>
->>>> Each of these defaults to being enabled.
->>>>
->>>> Signed-off-by: Jeff Cody <jcody@redhat.com>
->>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->>>> ---
->>>>
->>>> Hmm, we got quite a few --enable-BLOCK-DRIVER now.  Perhaps a single
->>>> list-valued option similar --target-list would be better.  Could be
->>>> done on top.
->>>>
->>>>  block/Makefile.objs | 22 ++++++++---
->>>>  configure           | 91 +++++++++++++++++++++++++++++++++++++++++++++
->>>>  2 files changed, 107 insertions(+), 6 deletions(-)
->>>>
->>>> diff --git a/block/Makefile.objs b/block/Makefile.objs
->>>> index c8337bf186..1cad9fc4f1 100644
->>>> --- a/block/Makefile.objs
->>>> +++ b/block/Makefile.objs
->>    @@ -1,10 +1,18 @@
->>    -block-obj-y += raw-format.o qcow.o vdi.o vmdk.o cloop.o bochs.o vpc.o vvfat.o dmg.o
->>    +block-obj-y += raw-format.o vmdk.o vpc.o
->>    +block-obj-$(CONFIG_QCOW1) += qcow.o
->>    +block-obj-$(CONFIG_VDI) += vdi.o
->>    +block-obj-$(CONFIG_CLOOP) += cloop.o
->>    +block-obj-$(CONFIG_BOCHS) += bochs.o
->>    +block-obj-$(CONFIG_VVFAT) += vvfat.o
->>    +block-obj-$(CONFIG_DMG) += dmg.o
->>    +
->>     block-obj-y += qcow2.o qcow2-refcount.o qcow2-cluster.o qcow2-snapshot.o qcow2-cache.o qcow2-bitmap.o
->>>
->>> [...]
->>>
->>>> @@ -45,7 +54,8 @@ gluster.o-libs     := $(GLUSTERFS_LIBS)
->>>>  vxhs.o-libs        := $(VXHS_LIBS)
->>>>  ssh.o-cflags       := $(LIBSSH2_CFLAGS)
->>>>  ssh.o-libs         := $(LIBSSH2_LIBS)
->>>> -block-obj-$(if $(CONFIG_BZIP2),m,n) += dmg-bz2.o
->>>> +block-obj-dmg-bz2$(if $(CONFIG_BZIP2),m,n) += dmg-bz2.o
->>>> +block-obj-$(CONFIG_DMG) += $(block-obj-dmg-bz2-y)
->>>
->>> This defines "block-obj-dmg-bz2m" or "block-obj-dmg-bz2n", so
->>> "block-obj-dmg-bz2-y" is never defined (note both the missing hyphen and
->>> the "m" vs. "y").
->>>
->>> How about:
->>>
->>> block-obj-dmg-bz2-$(CONFIG_BZIP2) += dmg-bz2.o
->> 
->> As far as I can tell, CONFIG_BZIP2 is either undefined or "y".  Thus,
->> block-obj-dmg-bz2-y is either left undefined or set to dmg-bz2.o.
->
-> Yes.
->
->> Perhaps the '+=' be ':=', but we seem to use '+=' pretty
->> indiscriminately.
->
-> Yep.  I don't know.  Whatever works, and both do, so...
->
->>> block-obj-$(if $(CONFIG_DMG),m,n) += $(block-obj-dmg-bz2-y)
->> 
->> As far as I can tell, CONFIG_DMG is also either undefined or "y".  So,
->> this adds dmg-bz2.o to block-obj-m if both CONFIG_BZIP2 and CONFIG_DMG
->> are enabled.
->
-> Yes.
->
->> Shouldn't it be added to block-obj-y, like dmg.o, or am I confused?
->
-> The behavior before this patch was to add it to block-obj-m.
-> 27685a8dd08c051fa6d641fe46106fc0dfa51073 has the explanation: We want
-> the bz2 part to be a module so you can launch qemu even without libbz2
-> around.  Only when you use dmg will it load that module.
->
-> (And if you dig deeper, it was 88d88798b7efe that (intentionally) broke
->  that intended behavior, until it was restored by the above commit.)
+This adds configure options to control the following block drivers:
 
-Thanks, v2 sent with your fix.
+* Bochs
+* Cloop
+* Dmg
+* Qcow (V1)
+* Vdi
+* Vvfat
+* qed
+* parallels
+* sheepdog
+
+Each of these defaults to being enabled.
+
+Signed-off-by: Jeff Cody <jcody@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+v2: Fix handling of dmg-bz2.o [Max]
+
+ block/Makefile.objs | 22 ++++++++---
+ configure           | 91 +++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 107 insertions(+), 6 deletions(-)
+
+diff --git a/block/Makefile.objs b/block/Makefile.objs
+index c8337bf186..46d585cfd0 100644
+--- a/block/Makefile.objs
++++ b/block/Makefile.objs
+@@ -1,10 +1,18 @@
+-block-obj-y += raw-format.o qcow.o vdi.o vmdk.o cloop.o bochs.o vpc.o vvfat.o dmg.o
++block-obj-y += raw-format.o vmdk.o vpc.o
++block-obj-$(CONFIG_QCOW1) += qcow.o
++block-obj-$(CONFIG_VDI) += vdi.o
++block-obj-$(CONFIG_CLOOP) += cloop.o
++block-obj-$(CONFIG_BOCHS) += bochs.o
++block-obj-$(CONFIG_VVFAT) += vvfat.o
++block-obj-$(CONFIG_DMG) += dmg.o
++
+ block-obj-y += qcow2.o qcow2-refcount.o qcow2-cluster.o qcow2-snapshot.o qcow2-cache.o qcow2-bitmap.o
+-block-obj-y += qed.o qed-l2-cache.o qed-table.o qed-cluster.o
+-block-obj-y += qed-check.o
++block-obj-$(CONFIG_QED) += qed.o qed-l2-cache.o qed-table.o qed-cluster.o
++block-obj-$(CONFIG_QED) += qed-check.o
+ block-obj-y += vhdx.o vhdx-endian.o vhdx-log.o
+ block-obj-y += quorum.o
+-block-obj-y += parallels.o blkdebug.o blkverify.o blkreplay.o
++block-obj-y += blkdebug.o blkverify.o blkreplay.o
++block-obj-$(CONFIG_PARALLELS) += parallels.o
+ block-obj-y += blklogwrites.o
+ block-obj-y += block-backend.o snapshot.o qapi.o
+ block-obj-$(CONFIG_WIN32) += file-win32.o win32-aio.o
+@@ -14,7 +22,8 @@ block-obj-y += null.o mirror.o commit.o io.o create.o
+ block-obj-y += throttle-groups.o
+ block-obj-$(CONFIG_LINUX) += nvme.o
+ 
+-block-obj-y += nbd.o nbd-client.o sheepdog.o
++block-obj-y += nbd.o nbd-client.o
++block-obj-$(CONFIG_SHEEPDOG) += sheepdog.o
+ block-obj-$(CONFIG_LIBISCSI) += iscsi.o
+ block-obj-$(if $(CONFIG_LIBISCSI),y,n) += iscsi-opts.o
+ block-obj-$(CONFIG_LIBNFS) += nfs.o
+@@ -45,7 +54,8 @@ gluster.o-libs     := $(GLUSTERFS_LIBS)
+ vxhs.o-libs        := $(VXHS_LIBS)
+ ssh.o-cflags       := $(LIBSSH2_CFLAGS)
+ ssh.o-libs         := $(LIBSSH2_LIBS)
+-block-obj-$(if $(CONFIG_BZIP2),m,n) += dmg-bz2.o
++block-obj-dmg-bz2-$(CONFIG_BZIP2) += dmg-bz2.o
++block-obj-$(if $(CONFIG_DMG),m,n) += $(block-obj-dmg-bz2-y)
+ dmg-bz2.o-libs     := $(BZIP2_LIBS)
+ qcow.o-libs        := -lz
+ linux-aio.o-libs   := -laio
+diff --git a/configure b/configure
+index 74e313a810..5b1d83ea26 100755
+--- a/configure
++++ b/configure
+@@ -470,6 +470,15 @@ tcmalloc="no"
+ jemalloc="no"
+ replication="yes"
+ vxhs=""
++bochs="yes"
++cloop="yes"
++dmg="yes"
++qcow1="yes"
++vdi="yes"
++vvfat="yes"
++qed="yes"
++parallels="yes"
++sheepdog="yes"
+ libxml2=""
+ docker="no"
+ debug_mutex="no"
+@@ -1416,6 +1425,42 @@ for opt do
+   ;;
+   --enable-vxhs) vxhs="yes"
+   ;;
++  --disable-bochs) bochs="no"
++  ;;
++  --enable-bochs) bochs="yes"
++  ;;
++  --disable-cloop) cloop="no"
++  ;;
++  --enable-cloop) cloop="yes"
++  ;;
++  --disable-dmg) dmg="no"
++  ;;
++  --enable-dmg) dmg="yes"
++  ;;
++  --disable-qcow1) qcow1="no"
++  ;;
++  --enable-qcow1) qcow1="yes"
++  ;;
++  --disable-vdi) vdi="no"
++  ;;
++  --enable-vdi) vdi="yes"
++  ;;
++  --disable-vvfat) vvfat="no"
++  ;;
++  --enable-vvfat) vvfat="yes"
++  ;;
++  --disable-qed) qed="no"
++  ;;
++  --enable-qed) qed="yes"
++  ;;
++  --disable-parallels) parallels="no"
++  ;;
++  --enable-parallels) parallels="yes"
++  ;;
++  --disable-sheepdog) sheepdog="no"
++  ;;
++  --enable-sheepdog) sheepdog="yes"
++  ;;
+   --disable-vhost-user) vhost_user="no"
+   ;;
+   --enable-vhost-user)
+@@ -1718,6 +1763,15 @@ disabled with --disable-FEATURE, default is enabled if available:
+   qom-cast-debug  cast debugging support
+   tools           build qemu-io, qemu-nbd and qemu-image tools
+   vxhs            Veritas HyperScale vDisk backend support
++  bochs           bochs image format support
++  cloop           cloop image format support
++  dmg             dmg image format support
++  qcow1           qcow v1 image format support
++  vdi             vdi image format support
++  vvfat           vvfat image format support
++  qed             qed image format support
++  parallels       parallels image format support
++  sheepdog        sheepdog block driver support
+   crypto-afalg    Linux AF_ALG crypto backend driver
+   vhost-user      vhost-user support
+   capstone        capstone disassembler support
+@@ -6043,6 +6097,15 @@ echo "jemalloc support  $jemalloc"
+ echo "avx2 optimization $avx2_opt"
+ echo "replication support $replication"
+ echo "VxHS block device $vxhs"
++echo "bochs support     $bochs"
++echo "cloop support     $cloop"
++echo "dmg support       $dmg"
++echo "qcow v1 support   $qcow1"
++echo "vdi support       $vdi"
++echo "vvfat support     $vvfat"
++echo "qed support       $qed"
++echo "parallels support $parallels"
++echo "sheepdog support  $sheepdog"
+ echo "capstone          $capstone"
+ echo "docker            $docker"
+ echo "libpmem support   $libpmem"
+@@ -6799,6 +6862,34 @@ if test "$libpmem" = "yes" ; then
+   echo "CONFIG_LIBPMEM=y" >> $config_host_mak
+ fi
+ 
++if test "$bochs" = "yes" ; then
++  echo "CONFIG_BOCHS=y" >> $config_host_mak
++fi
++if test "$cloop" = "yes" ; then
++  echo "CONFIG_CLOOP=y" >> $config_host_mak
++fi
++if test "$dmg" = "yes" ; then
++  echo "CONFIG_DMG=y" >> $config_host_mak
++fi
++if test "$qcow1" = "yes" ; then
++  echo "CONFIG_QCOW1=y" >> $config_host_mak
++fi
++if test "$vdi" = "yes" ; then
++  echo "CONFIG_VDI=y" >> $config_host_mak
++fi
++if test "$vvfat" = "yes" ; then
++  echo "CONFIG_VVFAT=y" >> $config_host_mak
++fi
++if test "$qed" = "yes" ; then
++  echo "CONFIG_QED=y" >> $config_host_mak
++fi
++if test "$parallels" = "yes" ; then
++  echo "CONFIG_PARALLELS=y" >> $config_host_mak
++fi
++if test "$sheepdog" = "yes" ; then
++  echo "CONFIG_SHEEPDOG=y" >> $config_host_mak
++fi
++
+ if test "$tcg_interpreter" = "yes"; then
+   QEMU_INCLUDES="-iquote \$(SRC_PATH)/tcg/tci $QEMU_INCLUDES"
+ elif test "$ARCH" = "sparc64" ; then
+-- 
+2.17.2
