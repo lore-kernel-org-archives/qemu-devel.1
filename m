@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56994)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58558)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gKRyZ-0007dg-GF
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 12:50:48 -0500
+	(envelope-from <nsoffer@redhat.com>) id 1gKS39-0002yf-Ej
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 12:55:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gKRyY-0002v6-P1
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 12:50:47 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:35939)
+	(envelope-from <nsoffer@redhat.com>) id 1gKS36-0001wY-Eq
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 12:55:31 -0500
+Received: from mail-ua1-f43.google.com ([209.85.222.43]:38529)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gKRyY-0002jx-D3
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 12:50:46 -0500
-Received: by mail-ot1-x343.google.com with SMTP id k98so5350202otk.3
-	for <qemu-devel@nongnu.org>; Wed, 07 Nov 2018 09:50:34 -0800 (PST)
+	(Exim 4.71) (envelope-from <nsoffer@redhat.com>) id 1gKS34-0001mQ-QH
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 12:55:27 -0500
+Received: by mail-ua1-f43.google.com with SMTP id p9so2185072uaa.5
+	for <qemu-devel@nongnu.org>; Wed, 07 Nov 2018 09:55:22 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <154161094050.29232.7509981504999944905.malone@soybean.canonical.com>
-References: <152204272199.688.3778854075369133494.malonedeb@wampee.canonical.com>
-	<154161094050.29232.7509981504999944905.malone@soybean.canonical.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 7 Nov 2018 17:50:11 +0000
-Message-ID: <CAFEAcA9DZ1W682=zEnHsR6xj1vXDOs1wHXSsDE7C_K19OaorEw@mail.gmail.com>
+References: <20181107121319.GC14842@redhat.com>
+	<20181107143628.GG8125@redhat.com>
+	<CAMRbyyuFGVtNWF9LKoi0n6_r5Gr4j8LetbAMd0L_5cKMif9LjQ@mail.gmail.com>
+	<20181107172737.GB4721@linux.fritz.box>
+In-Reply-To: <20181107172737.GB4721@linux.fritz.box>
+From: Nir Soffer <nsoffer@redhat.com>
+Date: Wed, 7 Nov 2018 19:55:10 +0200
+Message-ID: <CAMRbyys2XVgjPx9HteGP8c6R5rPM=n86m30kfEG6a0+c-jLZ4g@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Bug 1758819] Re: HVF Illegal instruction: 4,
- High Sierra, v2.12-rc0
+Subject: Re: [Qemu-devel] [Qemu-block] Change in qemu 2.12 causes qemu-img
+ convert to NBD to write more data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,44 +31,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Sergio_Andr=C3=A9s_G=C3=B3mez_Del_Real?= <sergio.g.delreal@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: "Richard W.M. Jones" <rjones@redhat.com>, edgar.kaziakhmedov@virtuozzo.com, QEMU Developers <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>
 
-On 7 November 2018 at 17:15, Nathan Wallace <1758819@bugs.launchpad.net> wrote:
-> I am also able to reproduce this bug. The problem is that when hvf is
-> enabled, qemu will attempt to execute the xgetbv instruction, which
-> isn't supported on my processor (Intel Xeon X5670).
+On Wed, Nov 7, 2018 at 7:27 PM Kevin Wolf <kwolf@redhat.com> wrote:
+
+> Am 07.11.2018 um 15:56 hat Nir Soffer geschrieben:
+> > Wed, Nov 7, 2018 at 4:36 PM Richard W.M. Jones <rjones@redhat.com>
+> wrote:
+> >
+> > > Another thing I tried was to change the NBD server (nbdkit) so that it
+> > > doesn't advertise zero support to the client:
+> > >
+> > >   $ nbdkit --filter=log --filter=nozero memory size=6G
+> logfile=/tmp/log \
+> > >       --run './qemu-img convert ./fedora-28.img -n $nbd'
+> > >   $ grep '\.\.\.$' /tmp/log | sed 's/.*\([A-Z][a-z]*\).*/\1/' | uniq -c
+> > >    2154 Write
+> > >
+> > > Not surprisingly no zero commands are issued.  The size of the write
+> > > commands is very uneven -- it appears to be send one command per block
+> > > of zeroes or data.
+> > >
+> > > Nir: If we could get information from imageio about whether zeroing is
+> > > implemented efficiently or not by the backend, we could change
+> > > virt-v2v / nbdkit to advertise this back to qemu.
+> >
+> > There is no way to detect the capability, ioctl(BLKZEROOUT) always
+> > succeeds, falling back to manual zeroing in the kernel silently
+> >
+> > Even if we could, sending zero on the wire from qemu may be even
+> > slower, and it looks like qemu send even more requests in this case
+> > (2154 vs ~1300).
+> >
+> > Looks like this optimization in qemu side leads to worse performance,
+> > so it should not be enabled by default.
 >
-> Here is a stack trace from lldb; the behavior is 100% reproducible for
-> me.
+> Well, that's overgeneralising your case a bit. If the backend does
+> support efficient zero writes (which file systems, the most common case,
+> generally do), doing one big write_zeroes request at the start can
+> improve performance quite a bit.
 >
-> nathan@Nathans-Mac-Pro:~/src/qemu/qemu-3.0.0/x86_64-softmmu
-> $ lldb -- qemu-system-x86_64 --accel hvf
-> (lldb) target create "qemu-system-x86_64"
-> runCurrent executable set to 'qemu-system-x86_64' (x86_64).
-> (lldb) settings set -- target.run-args  "--accel" "hvf"
-> (lldb) run
-> Process 27479 launched: '/Users/nathan/src/qemu/qemu-3.0.0/x86_64-softmmu/qemu-system-x86_64' (x86_64)
-> Process 27479 stopped
-> * thread #1, queue = 'com.apple.main-thread', stop reason = EXC_BAD_INSTRUCTION (code=EXC_I386_INVOP, subcode=0x0)
->     frame #0: 0x00000001001bca3a qemu-system-x86_64`xgetbv(xcr=0) at x86_cpuid.c:34
->    31   {
->    32       uint32_t eax, edx;
->    33
-> -> 34       __asm__ volatile ("xgetbv"
->    35                         : "=a" (eax), "=d" (edx)
->    36                         : "c" (xcr));
->    37
-> Target 0: (qemu-system-x86_64) stopped.
+> It seems the problem is that we can't really know whether the operation
+> will be efficient because the backends generally don't tell us. Maybe
+> NBD could introduce a flag for this, but in the general case it appears
+> to me that we'll have to have a command line option.
+>
+> However, I'm curious what your exact use case and the backend used in it
+> is? Can something be improved there to actually get efficient zero
+> writes and get even better performance than by just disabling the big
+> zero write?
 
-Sergio -- looks like this is the result of your code
-in hvf-utils/x86_cpuid.c, which assumes xgetbv is
-present on the host CPU.
 
-It looks like tcg/i386/tcg-target.inc.c has some code
-which uses xgetbv but has some better guards on
-it to avoid the undef -- looks like there's a bit
-you need to check in another cpuid field...
+The backend is some NetApp storage connected via FC. I don't have
+more info on this. We get zero rate of about 1G/s on this storage, which
+is quite slow compared with other storage we tested.
 
-thanks
--- PMM
+One option we check now is if this is the kernel silent fallback to manual
+zeroing when the server advertise wrong value of write_same_max_bytes.
+
+Having a command line option to control this behavior sounds good. I don't
+have enough data to tell what should be the default, but I think the safe
+way would be to keep old behavior.
+
+Nir
