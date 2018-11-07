@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52120)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gKCD3-0007In-4J
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 20:00:43 -0500
+	(envelope-from <tgfbeta@icloud.com>) id 1gKClC-0001AX-OQ
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 20:36:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gKCD0-00071E-93
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 20:00:40 -0500
-Date: Wed, 7 Nov 2018 11:59:58 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181107005958.GB1754@umbus.fritz.box>
-References: <20181105102044.20547-1-david@redhat.com>
-	<20181105102044.20547-10-david@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="/NkBOFFp2J2Af1nK"
-Content-Disposition: inline
-In-Reply-To: <20181105102044.20547-10-david@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 09/10] pci/shpc: perform unplug via the
- hotplug handler
+	(envelope-from <tgfbeta@icloud.com>) id 1gKCkz-0001Kl-MF
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 20:35:51 -0500
+Received: from pv33p00im-asmtp002.me.com ([17.142.194.251]:37143)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tgfbeta@icloud.com>) id 1gKCkz-0000Rr-2A
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 20:35:45 -0500
+Received: from process-dkim-sign-daemon.pv33p00im-asmtp002.me.com by
+	pv33p00im-asmtp002.me.com
+	(Oracle Communications Messaging Server 8.0.2.2.20180531 64bit (built
+	May 31 2018)) id <0PHS00J00TTL4600@pv33p00im-asmtp002.me.com> for
+	qemu-devel@nongnu.org; Wed, 07 Nov 2018 01:35:32 +0000 (GMT)
+From: Chen Zhang <tgfbeta@icloud.com>
+Date: Wed, 07 Nov 2018 01:35:30 +0000 (GMT)
+Message-id: <9a5fadaf-d74a-4201-80db-2bed26647587@me.com>
+MIME-version: 1.0
+Content-Type: text/plain;
+    charset=utf-8;
+    format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel]
+ =?utf-8?q?=5BPATCH=5D_gtk=3A_Fix_mouse_offset_in_sc?=
+ =?utf-8?q?aled_gtk-gl_display_for_VFIO/iGVT-g_DMA_Buf_mode?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,191 +33,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-
---/NkBOFFp2J2Af1nK
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Nov 05, 2018 at 11:20:43AM +0100, David Hildenbrand wrote:
-> Introduce and use the "unplug" callback.
->=20
-> This is a preparation for multi-stage hotplug handlers, whereby the bus
-> hotplug handler is overwritten by the machine hotplug handler. This handl=
-er
-> will then pass control to the bus hotplug handler. So to get this running
-> cleanly, we also have to make sure to go via the hotplug handler chain wh=
-en
-> actually unplugging a device after an unplug request. Lookup the hotplug
-> handler and call "unplug".
->=20
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-
-> ---
->  hw/pci-bridge/pci_bridge_dev.c  | 14 ++++++++++++++
->  hw/pci-bridge/pcie_pci_bridge.c | 14 ++++++++++++++
->  hw/pci/shpc.c                   | 11 ++++++++++-
->  include/hw/pci/shpc.h           |  2 ++
->  4 files changed, 40 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hw/pci-bridge/pci_bridge_dev.c b/hw/pci-bridge/pci_bridge_de=
-v.c
-> index e1df9a52ac..91415f114c 100644
-> --- a/hw/pci-bridge/pci_bridge_dev.c
-> +++ b/hw/pci-bridge/pci_bridge_dev.c
-> @@ -219,6 +219,19 @@ static void pci_bridge_dev_plug_cb(HotplugHandler *h=
-otplug_dev,
->      shpc_device_plug_cb(hotplug_dev, dev, errp);
->  }
-> =20
-> +static void pci_bridge_dev_unplug_cb(HotplugHandler *hotplug_dev,
-> +                                     DeviceState *dev, Error **errp)
-> +{
-> +    PCIDevice *pci_hotplug_dev =3D PCI_DEVICE(hotplug_dev);
-> +
-> +    if (!shpc_present(pci_hotplug_dev)) {
-> +        error_setg(errp, "standard hotplug controller has been disabled =
-for "
-> +                   "this %s", TYPE_PCI_BRIDGE_DEV);
-> +        return;
-> +    }
-> +    shpc_device_unplug_cb(hotplug_dev, dev, errp);
-> +}
-> +
->  static void pci_bridge_dev_unplug_request_cb(HotplugHandler *hotplug_dev,
->                                               DeviceState *dev, Error **e=
-rrp)
->  {
-> @@ -251,6 +264,7 @@ static void pci_bridge_dev_class_init(ObjectClass *kl=
-ass, void *data)
->      dc->vmsd =3D &pci_bridge_dev_vmstate;
->      set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
->      hc->plug =3D pci_bridge_dev_plug_cb;
-> +    hc->unplug =3D pci_bridge_dev_unplug_cb;
->      hc->unplug_request =3D pci_bridge_dev_unplug_request_cb;
->  }
-> =20
-> diff --git a/hw/pci-bridge/pcie_pci_bridge.c b/hw/pci-bridge/pcie_pci_bri=
-dge.c
-> index c634353b06..7c667bc97c 100644
-> --- a/hw/pci-bridge/pcie_pci_bridge.c
-> +++ b/hw/pci-bridge/pcie_pci_bridge.c
-> @@ -150,6 +150,19 @@ static void pcie_pci_bridge_plug_cb(HotplugHandler *=
-hotplug_dev,
->      shpc_device_plug_cb(hotplug_dev, dev, errp);
->  }
-> =20
-> +static void pcie_pci_bridge_unplug_cb(HotplugHandler *hotplug_dev,
-> +                                      DeviceState *dev, Error **errp)
-> +{
-> +    PCIDevice *pci_hotplug_dev =3D PCI_DEVICE(hotplug_dev);
-> +
-> +    if (!shpc_present(pci_hotplug_dev)) {
-> +        error_setg(errp, "standard hotplug controller has been disabled =
-for "
-> +                   "this %s", TYPE_PCIE_PCI_BRIDGE_DEV);
-> +        return;
-> +    }
-> +    shpc_device_unplug_cb(hotplug_dev, dev, errp);
-> +}
-> +
->  static void pcie_pci_bridge_unplug_request_cb(HotplugHandler *hotplug_de=
-v,
->                                                DeviceState *dev, Error **=
-errp)
->  {
-> @@ -180,6 +193,7 @@ static void pcie_pci_bridge_class_init(ObjectClass *k=
-lass, void *data)
->      dc->reset =3D &pcie_pci_bridge_reset;
->      set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
->      hc->plug =3D pcie_pci_bridge_plug_cb;
-> +    hc->unplug =3D pcie_pci_bridge_unplug_cb;
->      hc->unplug_request =3D pcie_pci_bridge_unplug_request_cb;
->  }
-> =20
-> diff --git a/hw/pci/shpc.c b/hw/pci/shpc.c
-> index 098ffaef1d..5de905cb56 100644
-> --- a/hw/pci/shpc.c
-> +++ b/hw/pci/shpc.c
-> @@ -238,6 +238,7 @@ static void shpc_invalid_command(SHPCDevice *shpc)
-> =20
->  static void shpc_free_devices_in_slot(SHPCDevice *shpc, int slot)
->  {
-> +    HotplugHandler *hotplug_ctrl;
->      int devfn;
->      int pci_slot =3D SHPC_IDX_TO_PCI(slot);
->      for (devfn =3D PCI_DEVFN(pci_slot, 0);
-> @@ -245,7 +246,9 @@ static void shpc_free_devices_in_slot(SHPCDevice *shp=
-c, int slot)
->           ++devfn) {
->          PCIDevice *affected_dev =3D shpc->sec_bus->devices[devfn];
->          if (affected_dev) {
-> -            object_unparent(OBJECT(affected_dev));
-> +            hotplug_ctrl =3D qdev_get_hotplug_handler(DEVICE(affected_de=
-v));
-> +            hotplug_handler_unplug(hotplug_ctrl, DEVICE(affected_dev),
-> +                                   &error_abort);
->          }
->      }
->  }
-> @@ -540,6 +543,12 @@ void shpc_device_plug_cb(HotplugHandler *hotplug_dev=
-, DeviceState *dev,
->      shpc_interrupt_update(pci_hotplug_dev);
->  }
-> =20
-> +void shpc_device_unplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-> +                           Error **errp)
-> +{
-> +    object_unparent(OBJECT(dev));
-> +}
-> +
->  void shpc_device_unplug_request_cb(HotplugHandler *hotplug_dev,
->                                     DeviceState *dev, Error **errp)
->  {
-> diff --git a/include/hw/pci/shpc.h b/include/hw/pci/shpc.h
-> index 71293aca58..18f6ec1cd5 100644
-> --- a/include/hw/pci/shpc.h
-> +++ b/include/hw/pci/shpc.h
-> @@ -47,6 +47,8 @@ void shpc_cap_write_config(PCIDevice *d, uint32_t addr,=
- uint32_t val, int len);
-> =20
->  void shpc_device_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
->                           Error **errp);
-> +void shpc_device_unplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-> +                           Error **errp);
->  void shpc_device_unplug_request_cb(HotplugHandler *hotplug_dev,
->                                     DeviceState *dev, Error **errp);
-> =20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---/NkBOFFp2J2Af1nK
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlviOQ4ACgkQbDjKyiDZ
-s5KGjg//VxUZhbGGbO969WFkjognUeDpeKNULkh+yYs8Q3CvRGt+oBP/CXROucmn
-q/pZjfq3hJ3quj/KY/479/8bh3Zbfc3T2K2UKKlQAs6oCiF/koEkAMaerVK1wu7W
-VC1NQMr96sKFDmMZ5tCe3gtm4DOz1MkHC3CIkjcwjKuuea+IB/NoKnPMRfryRHPJ
-Sgf/OpXV5GPy8Tesn5fFDKbHud1ipB6jfhABLchU0udtOFyawuFr+bUzNDsujGCu
-oCXOeLWmcUi3KbKDxtb1YNMC+sWKa8/128sFPS2gSTCuUyiTVYtD0OkNAipyMrjm
-dDS32tMy5RECtK4grmogP3rDswSlo4bbemEv3MN5V0gBnkHK1lQgaAZLf+GsW+CY
-v5VSHKsjXQGDN+5FP5hYQZIew9dmF9OlrcuJoL9j5Gn/SkFsrK7MSbCIDLzynAxY
-WuFQ8Gj5XwYpqZHERazaz14mutAKR+DvAb1f8eW6MRlj7BZrbwbCcuYcR9ejH/FD
-vpikXriAhe0cbWz3hWwgRXaDKFQwAAGXrVB09iBLKWS0Gy9cf5PAqFvHgL95qHcv
-zmzYHkQbHcWHRe1Oi6Fxv96rkUV5ylzzeqiZJPRddjVxqdYM4IVCNxp1TkgXZl25
-cz8NfgMrAGwPOX1yeJnUbv8PoujHTD9DUirFAml0gZ03gZ537Kk=
-=A1Zv
------END PGP SIGNATURE-----
-
---/NkBOFFp2J2Af1nK--
+Yes, this patch just works.=0A=0AThank you.=0A=0ABest regards=0A=0AOn Nov =
+06, 2018, at 08:22 PM, Gerd Hoffmann <kraxel@redhat.com> wrote:=0A=0AOn We=
+d, Oct 31, 2018 at 06:24:56AM +0000, Chen Zhang wrote:=0AThe issue was rep=
+orted as in=C2=A0https://bugs.launchpad.net/qemu/+bug/1793859=0A=0AWhen an=
+ OpenGL accelerated GTK window is used for iGVT-g DMA Buf device,=0Awindow=
+ scaling would cause guest cursor to move in undesirable velocity.=0A=0ATo=
+ fix this usability issue, the gtk mouse motion events was modified to=0As=
+cale the position of event to match the coordinates=C2=A0of the scaled GL=0A=
+surface.=0A=0AHmm, we already have logic in place to deal with that. I sus=
+pect the=0Aroot cause is simply that the scale_{x,y} variables are not set=
+ properly=0Ain egl mode. Can you try the patch below?=0A=0Athanks,=0AGerd=0A=
+=0A=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D [ cut here ] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=0AFrom ebecaab0102aca37a3101131c20f45576835b6b=
+3 Mon Sep 17 00:00:00 2001=0AFrom: Gerd Hoffmann <kraxel@redhat.com>=0ADat=
+e: Tue, 6 Nov 2018 13:18:39 +0100=0ASubject: [PATCH] try fix gtk egl curso=
+r=0A=0A---=0Aui/gtk-egl.c | 17 ++++++++++++-----=0A1 file changed, 12 inse=
+rtions(+), 5 deletions(-)=0A=0Adiff --git a/ui/gtk-egl.c b/ui/gtk-egl.c=0A=
+index a77c25b490..5420c2362b 100644=0A--- a/ui/gtk-egl.c=0A+++ b/ui/gtk-eg=
+l.c=0A@@ -68,8 +68,15 @@ void gd_egl_draw(VirtualConsole *vc)=0Areturn;=0A=
+}=0A=0A+ window =3D gtk_widget_get_window(vc->gfx.drawing_area);=0A+ ww =3D=
+ gdk_window_get_width(window);=0A+ wh =3D gdk_window_get_height(window);=0A=
++=0Aif (vc->gfx.scanout_mode) {=0Agd_egl_scanout_flush(&vc->gfx.dcl, 0, 0,=
+ vc->gfx.w, vc->gfx.h);=0A+=0A+ vc->gfx.scale_x =3D (double)ww / vc->gfx.w=
+;=0A+ vc->gfx.scale_y =3D (double)wh / vc->gfx.h;=0A} else {=0Aif (!vc->gf=
+x.ds) {=0Areturn;=0A@@ -77,13 +84,13 @@ void gd_egl_draw(VirtualConsole *v=
+c)=0AeglMakeCurrent(qemu_egl_display, vc->gfx.esurface,=0Avc->gfx.esurface=
+, vc->gfx.ectx);=0A=0A- window =3D gtk_widget_get_window(vc->gfx.drawing_a=
+rea);=0A- ww =3D gdk_window_get_width(window);=0A- wh =3D gdk_window_get_h=
+eight(window);=0Asurface_gl_setup_viewport(vc->gfx.gls, vc->gfx.ds, ww, wh=
+);=0Asurface_gl_render_texture(vc->gfx.gls, vc->gfx.ds);=0A=0AeglSwapBuffe=
+rs(qemu_egl_display, vc->gfx.esurface);=0A+=0A+ vc->gfx.scale_x =3D (doubl=
+e)ww / surface_width(vc->gfx.ds);=0A+ vc->gfx.scale_y =3D (double)wh / sur=
+face_height(vc->gfx.ds);=0A}=0A}=0A=0A@@ -232,8 +239,8 @@ void gd_egl_curs=
+or_position(DisplayChangeListener *dcl,=0A{=0AVirtualConsole *vc =3D conta=
+iner_of(dcl, VirtualConsole, gfx.dcl);=0A=0A- vc->gfx.cursor_x =3D pos_x;=0A=
+- vc->gfx.cursor_y =3D pos_y;=0A+ vc->gfx.cursor_x =3D pos_x * vc->gfx.sca=
+le_x;=0A+ vc->gfx.cursor_y =3D pos_y * vc->gfx.scale_y;=0A}=0A=0Avoid gd_e=
+gl_release_dmabuf(DisplayChangeListener *dcl,=0A-- =0A2.9.3=0A
