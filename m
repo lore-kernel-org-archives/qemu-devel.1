@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56405)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gKTM1-0006Jj-P1
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 14:19:08 -0500
+	(envelope-from <noring@nocrew.org>) id 1gKTMe-0006mc-R2
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 14:19:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gKTLy-0004zQ-N6
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 14:19:05 -0500
-Received: from pio-pvt-msa2.bahnhof.se ([79.136.2.41]:50445)
+	(envelope-from <noring@nocrew.org>) id 1gKTMV-0005Bb-GZ
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 14:19:40 -0500
+Received: from ste-pvt-msa2.bahnhof.se ([213.80.101.71]:1368)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gKTLy-0004yP-7G
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 14:19:02 -0500
-Date: Wed, 7 Nov 2018 20:18:55 +0100
+	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gKTMO-000594-8G
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 14:19:29 -0500
+Date: Wed, 7 Nov 2018 20:19:14 +0100
 From: Fredrik Noring <noring@nocrew.org>
-Message-ID: <b7502a7707b8b75d500c96e81a76b03fdd67865c.1541616663.git.noring@nocrew.org>
+Message-ID: <e8e6bfd053f051d5195ec030f06749b24f867b13.1541616663.git.noring@nocrew.org>
 References: <cover.1541616663.git.noring@nocrew.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <cover.1541616663.git.noring@nocrew.org>
-Subject: [Qemu-devel] [PATCH v2 3/6] target/mips: Fix HI[ac] and LO[ac]
- 32-bit truncation with MIPS64 DSP ASE
+Subject: [Qemu-devel] [PATCH v2 4/6] target/mips: Fix decoding mechanism of
+ special R5900 opcodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,85 +27,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>
-Cc: =?utf-8?Q?J=C3=BCrgen?= Urban <JuergenUrban@gmx.de>, "Maciej W. Rozycki" <macro@linux-mips.org>, Jia Liu <proljc@gmail.com>, qemu-devel@nongnu.org
+To: Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: =?utf-8?Q?J=C3=BCrgen?= Urban <JuergenUrban@gmx.de>, "Maciej W. Rozycki" <macro@linux-mips.org>, qemu-devel@nongnu.org
 
-This change removes the 32-bit truncation of the HI[ac] and LO[ac]
-special purpose registers when ac range from 1 to 3 for the instructions
-MFHI, MFLO, MTHI and MTLO. The "MIPS Architecture for Programmers Volume
-IV-e: MIPS DSP Module for MIPS64 Architecture" manual specifies that all
-64 bits are copied in all cases:
+MOVN, MOVZ, MFHI, MFLO, MTHI, MTLO, MULT, MULTU, DIV, DIVU, DMULT,
+DMULTU, DDIV, DDIVU and JR are decoded in decode_opc_special_tx79
+instead of the generic decode_opc_special_legacy.
 
-   MFHI: GPR[rd]63..0 <- HI[ac]63..0
-   MFLO: GPR[rd]63..0 <- LO[ac]63..0
-   MTHI: HI[ac]63..0 <- GPR[rs]63..0
-   MTLO: LO[ac]63..0 <- GPR[rs]63..0
-
-Fixes: 4133498f8e53 ("Use correct acc value to index cpu_HI/cpu_LO rather than using a fix number")
-Cc: Jia Liu <proljc@gmail.com>
-Reported-by: Maciej W. Rozycki <macro@linux-mips.org>
 Signed-off-by: Fredrik Noring <noring@nocrew.org>
 ---
- target/mips/translate.c | 36 ++++--------------------------------
- 1 file changed, 4 insertions(+), 32 deletions(-)
+ target/mips/translate.c | 54 ++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 50 insertions(+), 4 deletions(-)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 3ddd70043a..19ae7d2f1c 100644
+index 19ae7d2f1c..45ad70c097 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -4409,49 +4409,21 @@ static void gen_HILO(DisasContext *ctx, uint32_t opc, int acc, int reg)
+@@ -23835,6 +23835,53 @@ static void decode_opc_special_r6(CPUMIPSState *env, DisasContext *ctx)
+     }
+ }
  
-     switch (opc) {
-     case OPC_MFHI:
--#if defined(TARGET_MIPS64)
--        if (acc != 0) {
--            tcg_gen_ext32s_tl(cpu_gpr[reg], cpu_HI[acc]);
--        } else
--#endif
--        {
--            tcg_gen_mov_tl(cpu_gpr[reg], cpu_HI[acc]);
--        }
-+        tcg_gen_mov_tl(cpu_gpr[reg], cpu_HI[acc]);
++static void decode_opc_special_tx79(CPUMIPSState *env, DisasContext *ctx)
++{
++    int rs = extract32(ctx->opcode, 21, 5);
++    int rt = extract32(ctx->opcode, 16, 5);
++    int rd = extract32(ctx->opcode, 11, 5);
++    uint32_t op1 = MASK_SPECIAL(ctx->opcode);
++
++    switch (op1) {
++    case OPC_MOVN:         /* Conditional move */
++    case OPC_MOVZ:
++        gen_cond_move(ctx, op1, rd, rs, rt);
++        break;
++    case OPC_MFHI:          /* Move from HI/LO */
++    case OPC_MFLO:
++        gen_HILO(ctx, op1, 0, rd);
++        break;
++    case OPC_MTHI:
++    case OPC_MTLO:          /* Move to HI/LO */
++        gen_HILO(ctx, op1, 0, rs);
++        break;
++    case OPC_MULT:
++    case OPC_MULTU:
++        gen_mul_txx9(ctx, op1, rd, rs, rt);
++        break;
++    case OPC_DIV:
++    case OPC_DIVU:
++        gen_muldiv(ctx, op1, 0, rs, rt);
++        break;
++#if defined(TARGET_MIPS64)
++    case OPC_DMULT:
++    case OPC_DMULTU:
++    case OPC_DDIV:
++    case OPC_DDIVU:
++        check_insn_opc_user_only(ctx, INSN_R5900);
++        gen_muldiv(ctx, op1, 0, rs, rt);
++        break;
++#endif
++    case OPC_JR:
++        gen_compute_branch(ctx, op1, 4, rs, 0, 0, 4);
++        break;
++    default:            /* Invalid */
++        MIPS_INVAL("special_tx79");
++        generate_exception_end(ctx, EXCP_RI);
++        break;
++    }
++}
++
+ static void decode_opc_special_legacy(CPUMIPSState *env, DisasContext *ctx)
+ {
+     int rs, rt, rd, sa;
+@@ -23850,7 +23897,7 @@ static void decode_opc_special_legacy(CPUMIPSState *env, DisasContext *ctx)
+     case OPC_MOVN:         /* Conditional move */
+     case OPC_MOVZ:
+         check_insn(ctx, ISA_MIPS4 | ISA_MIPS32 |
+-                   INSN_LOONGSON2E | INSN_LOONGSON2F | INSN_R5900);
++                   INSN_LOONGSON2E | INSN_LOONGSON2F);
+         gen_cond_move(ctx, op1, rd, rs, rt);
          break;
-     case OPC_MFLO:
--#if defined(TARGET_MIPS64)
--        if (acc != 0) {
--            tcg_gen_ext32s_tl(cpu_gpr[reg], cpu_LO[acc]);
--        } else
--#endif
--        {
--            tcg_gen_mov_tl(cpu_gpr[reg], cpu_LO[acc]);
--        }
-+        tcg_gen_mov_tl(cpu_gpr[reg], cpu_LO[acc]);
-         break;
-     case OPC_MTHI:
-         if (reg != 0) {
--#if defined(TARGET_MIPS64)
--            if (acc != 0) {
--                tcg_gen_ext32s_tl(cpu_HI[acc], cpu_gpr[reg]);
--            } else
--#endif
--            {
--                tcg_gen_mov_tl(cpu_HI[acc], cpu_gpr[reg]);
--            }
-+            tcg_gen_mov_tl(cpu_HI[acc], cpu_gpr[reg]);
+     case OPC_MFHI:          /* Move from HI/LO */
+@@ -23877,8 +23924,6 @@ static void decode_opc_special_legacy(CPUMIPSState *env, DisasContext *ctx)
+             check_insn(ctx, INSN_VR54XX);
+             op1 = MASK_MUL_VR54XX(ctx->opcode);
+             gen_mul_vr54xx(ctx, op1, rd, rs, rt);
+-        } else if (ctx->insn_flags & INSN_R5900) {
+-            gen_mul_txx9(ctx, op1, rd, rs, rt);
          } else {
-             tcg_gen_movi_tl(cpu_HI[acc], 0);
+             gen_muldiv(ctx, op1, rd & 3, rs, rt);
          }
+@@ -23893,7 +23938,6 @@ static void decode_opc_special_legacy(CPUMIPSState *env, DisasContext *ctx)
+     case OPC_DDIV:
+     case OPC_DDIVU:
+         check_insn(ctx, ISA_MIPS3);
+-        check_insn_opc_user_only(ctx, INSN_R5900);
+         check_mips_64(ctx);
+         gen_muldiv(ctx, op1, 0, rs, rt);
          break;
-     case OPC_MTLO:
-         if (reg != 0) {
--#if defined(TARGET_MIPS64)
--            if (acc != 0) {
--                tcg_gen_ext32s_tl(cpu_LO[acc], cpu_gpr[reg]);
--            } else
--#endif
--            {
--                tcg_gen_mov_tl(cpu_LO[acc], cpu_gpr[reg]);
--            }
-+            tcg_gen_mov_tl(cpu_LO[acc], cpu_gpr[reg]);
+@@ -24120,6 +24164,8 @@ static void decode_opc_special(CPUMIPSState *env, DisasContext *ctx)
+     default:
+         if (ctx->insn_flags & ISA_MIPS32R6) {
+             decode_opc_special_r6(env, ctx);
++        } else if (ctx->insn_flags & INSN_R5900) {
++            decode_opc_special_tx79(env, ctx);
          } else {
-             tcg_gen_movi_tl(cpu_LO[acc], 0);
+             decode_opc_special_legacy(env, ctx);
          }
 -- 
 2.18.1
