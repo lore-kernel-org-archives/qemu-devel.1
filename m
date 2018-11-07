@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41903)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43155)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gKDyZ-0000CP-Vh
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 21:53:55 -0500
+	(envelope-from <peterx@redhat.com>) id 1gKE1S-0000zM-AZ
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 21:56:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gKDyQ-0002AB-35
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 21:53:48 -0500
-Resent-Message-Id: <E1gKDyQ-0002AB-35@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21315)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gKDyO-0001sM-Hx
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 21:53:41 -0500
-Message-ID: <154155914934.7921.2503764178388127461@015909e0f939>
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20181106122025.3487-1-xiaoguangrong@tencent.com>
+	(envelope-from <peterx@redhat.com>) id 1gKE1O-0004Jd-VL
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 21:56:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50306)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gKE1O-0004BM-H2
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 21:56:46 -0500
+Date: Wed, 7 Nov 2018 10:56:28 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20181107025628.GB17134@xz-x1>
+References: <20181030191620.32168-1-armbru@redhat.com>
+	<CAFEAcA8RdNrbCLL7tXY=e95N2Y0LcZdCPr3EuQo1_hu08qJuaQ@mail.gmail.com>
+	<87sh0eyzb0.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 6 Nov 2018 18:52:31 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 0/5] migration: improve multithreads
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87sh0eyzb0.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PULL 0/8] Monitor patches for 2018-10-30
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +28,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: guangrong.xiao@gmail.com
-Cc: famz@redhat.com, pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, kvm@vger.kernel.org, quintela@redhat.com, xiaoguangrong@tencent.com, qemu-devel@nongnu.org, peterx@redhat.com, dgilbert@redhat.com, wei.w.wang@intel.com, cota@braap.org, jiang.biao2@zte.com.cn
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgxMTA2MTIyMDI1LjM0ODctMS14aWFvZ3Vhbmdyb25nQHRlbmNlbnQuY29t
-ClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMC81XSBtaWdyYXRpb246IGltcHJvdmUg
-bXVsdGl0aHJlYWRzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNF
-PWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWls
-ZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0t
-bG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGht
-IGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFT
-RS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8k
-dG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNo
-b3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNr
-IC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4r
-MSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcg
-M2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5l
-dyBicmFuY2ggJ3Rlc3QnCjY0YWFiZDExYmUgdGVzdHM6IGFkZCB0aHJlYWRlZC13b3JrcXVldWUt
-YmVuY2gKZTllZmM3MGVkZCBtaWdyYXRpb246IHVzZSB0aHJlYWRlZCB3b3JrcXVldWUgZm9yIGRl
-Y29tcHJlc3Npb24KNzc1M2E4NDZhZCBtaWdyYXRpb246IHVzZSB0aHJlYWRlZCB3b3JrcXVldWUg
-Zm9yIGNvbXByZXNzaW9uCmY2OTMzYjUxMzIgdXRpbDogaW50cm9kdWNlIHRocmVhZGVkIHdvcmtx
-dWV1ZQo4MTBjYWFhNTY2IGJpdG9wczogaW50cm9kdWNlIGNoYW5nZV9iaXRfYXRvbWljCgo9PT0g
-T1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzU6IGJpdG9wczogaW50cm9kdWNlIGNo
-YW5nZV9iaXRfYXRvbWljLi4uCkNoZWNraW5nIFBBVENIIDIvNTogdXRpbDogaW50cm9kdWNlIHRo
-cmVhZGVkIHdvcmtxdWV1ZS4uLgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxl
-KHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM0MTogCm5ldyBmaWxlIG1vZGUg
-MTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDU2NiBsaW5lcyBjaGVja2VkCgpZ
-b3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
-aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
-aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDMvNTog
-bWlncmF0aW9uOiB1c2UgdGhyZWFkZWQgd29ya3F1ZXVlIGZvciBjb21wcmVzc2lvbi4uLgpDaGVj
-a2luZyBQQVRDSCA0LzU6IG1pZ3JhdGlvbjogdXNlIHRocmVhZGVkIHdvcmtxdWV1ZSBmb3IgZGVj
-b21wcmVzc2lvbi4uLgpDaGVja2luZyBQQVRDSCA1LzU6IHRlc3RzOiBhZGQgdGhyZWFkZWQtd29y
-a3F1ZXVlLWJlbmNoLi4uCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyks
-IGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzM2OiAKbmV3IGZpbGUgbW9kZSAxMDA2
-NDQKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyMzc6IEZJTEU6IHRlc3RzL3Ro
-cmVhZGVkLXdvcmtxdWV1ZS1iZW5jaC5jOjE5NzoKKyAgICBwcmludGYoIiAgIC1yOiAgICAgICB0
-aGUgbnVtYmVyIG9mIHJlcXVlc3RzIGhhbmRsZWQgYnkgZWFjaCB0aHJlYWQgKGRlZmF1bHQgJWQp
-LlxuIiwKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyMzk6IEZJTEU6IHRlc3Rz
-L3RocmVhZGVkLXdvcmtxdWV1ZS1iZW5jaC5jOjE5OToKKyAgICBwcmludGYoIiAgIC1tOiAgICAg
-ICB0aGUgc2l6ZSBvZiB0aGUgbWVtb3J5IChHKSB1c2VkIHRvIHRlc3QgKGRlZmF1bHQgJWRHKS5c
-biIsCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzI4NTogRklMRTogdGVzdHMvdGhy
-ZWFkZWQtd29ya3F1ZXVlLWJlbmNoLmM6MjQ1OgorICAgIHByaW50ZigiUnVuIHRoZSBiZW5jaG1h
-cms6IHRocmVhZHMgJWQgcmVxdWVzdHMtcGVyLXRocmVhZDogJWQgbWVtb3J5ICVsZEcgcmVwZWF0
-ICVkLlxuIiwKCnRvdGFsOiAxIGVycm9ycywgMyB3YXJuaW5ncywgMjczIGxpbmVzIGNoZWNrZWQK
-CllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
-IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
-dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09
-PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVk
-IGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBz
-ZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On Tue, Nov 06, 2018 at 04:56:51PM +0100, Markus Armbruster wrote:
+> Peter Maydell <peter.maydell@linaro.org> writes:
+> 
+> > On 30 October 2018 at 19:16, Markus Armbruster <armbru@redhat.com> wrote:
+> >> The following changes since commit 3f3285491dd52014852a56135c90e428c8b507ea:
+> >>
+> >>   Merge remote-tracking branch 'remotes/jnsnow/tags/bitmaps-pull-request' into staging (2018-10-30 14:09:25 +0000)
+> >>
+> >> are available in the Git repository at:
+> >>
+> >>   git://repo.or.cz/qemu/armbru.git tags/pull-monitor-2018-10-30
+> >>
+> >> for you to fetch changes up to 1a8de278dd3c93a7aa40f88486509fe0e2de04da:
+> >>
+> >>   vl: Avoid crash when -mon is underspecified (2018-10-30 20:13:52 +0100)
+> >>
+> >> ----------------------------------------------------------------
+> >> Monitor patches for 2018-10-30
+> >>
+> >> * Fix crash on shutdown with --daemonize
+> >> * Change out-of-band execution to stop reading instead of dropping
+> >>   commands
+> >> * Enable out-of-band execution by default
+> >> * Avoid crash when -mon lacks chardev=...
+> >>
+> >> ----------------------------------------------------------------
+> >
+> > Hi; I get test failures on FreeBSD host:
+> >
+> > TEST: tests/qmp-test... (pid=18305)
+> >   /sparc64/qmp/protocol:                                               OK
+> >   /sparc64/qmp/oob:                                                    FAIL
+> > GTester: last random seed: R02Se36038cab4c051a2cd47374ec9718e98
+> > (pid=18337)
+> >   /sparc64/qmp/preconfig:                                              OK
+> > FAIL: tests/qmp-test
+> >
+> > ERROR:tests/qmp-test.c:211:recv_cmd_id: assertion failed
+> > (qdict_get_try_str(resp, "id") == id): ("oob-1" == "queue-blocks-1")
+> > gmake: *** [/var/tmp/qemu-test.2n2tBU/tests/Makefile.include:805:
+> > check-qtest-sparc] Error 1
+> >
+> > and similarly with i386/qmp/oob and sparc/qmp/oob.
+> 
+> I haven't been able to reproduce, yet.  I'm going to respin with fewer
+> patches, to get the other stuff in while I debug.
+
+Strange, "make check -j8" failed on my hosts (I tried two) with either
+Markus's pull tree or qemu master:
+
+hw/core/ptimer.o: In function `timer_new_tl':
+/home/xz/git/qemu/include/qemu/timer.h:536: undefined reference to `timer_init_tl'
+collect2: error: ld returned 1 exit status
+make: *** [/home/xz/git/qemu/rules.mak:124: tests/ptimer-test] Error 1
+
+Is that only happening on my hosts?
+
+And I can't reproduce the error too by only running the standalone
+qmp-test.
+
+Regaring to the test failure reported - when I saw that I thought
+about the patch "monitor: resume the monitor earlier if needed" in my
+series since that seems to have the possibility to bring such an
+uncertainty, though I noticed that Markus has already removed that
+patch from the pull.
+
+-- 
+Peter Xu
