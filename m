@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54367)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=842139a6e=Alistair.Francis@wdc.com>)
-	id 1gKVkC-00071y-6p
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 16:52:12 -0500
+	(envelope-from <george.kennedy@oracle.com>) id 1gKW00-0004ov-6x
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 17:08:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=842139a6e=Alistair.Francis@wdc.com>)
-	id 1gKVk7-0004NE-88
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 16:52:12 -0500
-From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Wed, 7 Nov 2018 21:51:45 +0000
-Message-ID: <1793576616012e06e68cd9e0215eb907ff2ef12b.1541627403.git.alistair.francis@wdc.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH for 3.1 v1 1/1] hw/riscv/virt: Free the test
- device tree node name
+	(envelope-from <george.kennedy@oracle.com>) id 1gKVzt-0006sB-B5
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 17:08:29 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:50240)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <george.kennedy@oracle.com>)
+	id 1gKVzs-0006dd-MN
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 17:08:25 -0500
+From: George Kennedy <george.kennedy@oracle.com>
+Date: Wed,  7 Nov 2018 17:04:47 -0500
+Message-Id: <1541628287-11627-1-git-send-email-george.kennedy@oracle.com>
+Subject: [Qemu-devel] [PATCH v6] lsi: Reselection needed to remove pending
+ commands from queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,26 +23,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>, "palmer@sifive.com" <palmer@sifive.com>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistair23@gmail.com>
+To: pbonzini@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, boris.ostrovsky@oracle.com
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Under heavy IO (e.g. fio) the queue is not checked frequently enough for
+pending commands. As a result some pending commands are timed out by the
+linux sym53c8xx driver, which sends SCSI Abort messages for the timed out
+commands. The SCSI Abort messages result in linux errors, which show up
+on the console and in /var/log/messages.
+
+e.g.
+sd 0:0:3:0: [sdd] tag#33 ABORT operation started
+scsi target0:0:3: control msgout:
+80 20 47 d
+sd 0:0:3:0: ABORT operation complete.
+scsi target0:0:4: message d sent on bad reselection
+
+When the current command completes, check if there is a pending command
+on the queue and if a pending command exists, set a flag indicating
+that a call to lsi_wait_reselect() is needed to handle a queued pending
+command. The flag is checked following a WAIT DISCONNECT Script
+instruction and if set, lsi_wait_reselect() is called to handle a
+queued pending command.
+
+Signed-off-by: George Kennedy <george.kennedy@oracle.com>
 ---
- hw/riscv/virt.c | 1 +
- 1 file changed, 1 insertion(+)
+Thanks Paolo,
 
-diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index 4a137a503c..2b38f89070 100644
---- a/hw/riscv/virt.c
-+++ b/hw/riscv/virt.c
-@@ -240,6 +240,7 @@ static void *create_fdt(RISCVVirtState *s, const struct=
- MemmapEntry *memmap,
-     qemu_fdt_setprop_cells(fdt, nodename, "reg",
-         0x0, memmap[VIRT_TEST].base,
-         0x0, memmap[VIRT_TEST].size);
-+    g_free(nodename);
-=20
-     nodename =3D g_strdup_printf("/uart@%lx",
-         (long)memmap[VIRT_UART0].base);
---=20
-2.19.1
+Your latest suggestion was the "missing link". Calling lsi_wait_reselect()
+after a WAIT DISCONNECT Script instruction when there are commands on 
+the pending queue is all the is needed. The patch has been greatly
+reduced in size and complexity.
+
+ hw/scsi/lsi53c895a.c | 43 ++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 32 insertions(+), 11 deletions(-)
+
+diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
+index d1e6534..7f9ed2f 100644
+--- a/hw/scsi/lsi53c895a.c
++++ b/hw/scsi/lsi53c895a.c
+@@ -219,6 +219,7 @@ typedef struct {
+     int command_complete;
+     QTAILQ_HEAD(, lsi_request) queue;
+     lsi_request *current;
++    bool handle_pending;    /* handle queued pending commands */
+ 
+     uint32_t dsa;
+     uint32_t temp;
+@@ -298,6 +299,18 @@ static inline int lsi_irq_on_rsl(LSIState *s)
+     return (s->sien0 & LSI_SIST0_RSL) && (s->scid & LSI_SCID_RRE);
+ }
+ 
++static lsi_request *get_pending_req(LSIState *s)
++{
++    lsi_request *p;
++
++    QTAILQ_FOREACH(p, &s->queue, next) {
++        if (p->pending) {
++            return p;
++        }
++    }
++    return NULL;
++}
++
+ static void lsi_soft_reset(LSIState *s)
+ {
+     trace_lsi_reset();
+@@ -446,7 +459,6 @@ static void lsi_update_irq(LSIState *s)
+ {
+     int level;
+     static int last_level;
+-    lsi_request *p;
+ 
+     /* It's unclear whether the DIP/SIP bits should be cleared when the
+        Interrupt Status Registers are cleared or when istat0 is read.
+@@ -477,12 +489,12 @@ static void lsi_update_irq(LSIState *s)
+     lsi_set_irq(s, level);
+ 
+     if (!level && lsi_irq_on_rsl(s) && !(s->scntl1 & LSI_SCNTL1_CON)) {
++        lsi_request *p;
++
+         trace_lsi_update_irq_disconnected();
+-        QTAILQ_FOREACH(p, &s->queue, next) {
+-            if (p->pending) {
+-                lsi_reselect(s, p);
+-                break;
+-            }
++        p = get_pending_req(s);
++        if (p) {
++            lsi_reselect(s, p);
+         }
+     }
+ }
+@@ -759,6 +771,8 @@ static void lsi_command_complete(SCSIRequest *req, uint32_t status, size_t resid
+         lsi_request_free(s, s->current);
+         scsi_req_unref(req);
+     }
++    s->handle_pending = get_pending_req(s) ? true : false;
++
+     lsi_resume_script(s);
+ }
+ 
+@@ -1064,11 +1078,15 @@ static void lsi_wait_reselect(LSIState *s)
+ 
+     trace_lsi_wait_reselect();
+ 
+-    QTAILQ_FOREACH(p, &s->queue, next) {
+-        if (p->pending) {
+-            lsi_reselect(s, p);
+-            break;
+-        }
++    s->handle_pending = false;
++
++    if (s->current) {
++        return;
++    }
++
++    p = get_pending_req(s);
++    if (p) {
++        lsi_reselect(s, p);
+     }
+     if (s->current == NULL) {
+         s->waiting = 1;
+@@ -1258,6 +1276,9 @@ again:
+             case 1: /* Disconnect */
+                 trace_lsi_execute_script_io_disconnect();
+                 s->scntl1 &= ~LSI_SCNTL1_CON;
++                if (s->handle_pending) {
++                    lsi_wait_reselect(s);
++                }
+                 break;
+             case 2: /* Wait Reselect */
+                 if (!lsi_irq_on_rsl(s)) {
+-- 
+1.8.3.1
