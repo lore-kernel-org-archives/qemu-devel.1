@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46819)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46743)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gKNSZ-00040c-6B
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 08:01:32 -0500
+	(envelope-from <berto@igalia.com>) id 1gKNSU-0003xi-4Z
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 08:01:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gKNSC-0002JJ-8r
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 08:01:22 -0500
+	(envelope-from <berto@igalia.com>) id 1gKNSB-0002I4-L6
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 08:01:13 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Wed,  7 Nov 2018 14:59:46 +0200
-Message-Id: <37b20c1e4ca5ef29ec7fbba2fa62dbf7acc292a5.1541595424.git.berto@igalia.com>
+Date: Wed,  7 Nov 2018 14:59:45 +0200
+Message-Id: <9f849af9a99edbe97e449843bb8c20f6aab8f6fe.1541595424.git.berto@igalia.com>
 In-Reply-To: <cover.1541595424.git.berto@igalia.com>
 References: <cover.1541595424.git.berto@igalia.com>
 In-Reply-To: <cover.1541595424.git.berto@igalia.com>
 References: <cover.1541595424.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v4 11/15] block: Clean up reopen_backing_file()
- in block/replication.c
+Subject: [Qemu-devel] [PATCH v4 10/15] qemu-io: Put flag changes in the
+ options QDict in reopen_f()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,116 +25,118 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-This function is used to put the hidden and secondary disks in
-read-write mode before launching the backup job, and back in read-only
-mode afterwards.
+When reopen_f() puts a block device in the reopen queue, some of the
+new options are passed using a QDict, but others ("read-only" and the
+cache options) are passed as flags.
 
-This patch does the following changes:
-
-  - Use an options QDict with the "read-only" option instead of
-    passing the changes as flags only.
-
-  - Simplify the code (it was unnecessarily complicated and verbose).
-
-  - Fix a bug due to which the secondary disk was not being put back
-    in read-only mode when writable=false (because in this case
-    orig_secondary_flags always had the BDRV_O_RDWR flag set).
-
-  - Stop clearing the BDRV_O_INACTIVE flag.
-
-The flags parameter to bdrv_reopen_queue() becomes redundant and we'll
-be able to get rid of it in a subsequent patch.
+This patch puts those flags in the QDict. This way the flags parameter
+becomes redundant and we'll be able to get rid of it in a subsequent
+patch.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- block/replication.c | 45 +++++++++++++++++++++------------------------
- 1 file changed, 21 insertions(+), 24 deletions(-)
+ qemu-io-cmds.c             | 27 ++++++++++++++++++++++++++-
+ tests/qemu-iotests/133     |  9 +++++++++
+ tests/qemu-iotests/133.out |  8 ++++++++
+ 3 files changed, 43 insertions(+), 1 deletion(-)
 
-diff --git a/block/replication.c b/block/replication.c
-index 6349d6958e..481a225924 100644
---- a/block/replication.c
-+++ b/block/replication.c
-@@ -20,6 +20,7 @@
- #include "block/block_backup.h"
- #include "sysemu/block-backend.h"
+diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
+index 5363482213..c9ae09d574 100644
+--- a/qemu-io-cmds.c
++++ b/qemu-io-cmds.c
+@@ -10,6 +10,7 @@
+ 
+ #include "qemu/osdep.h"
  #include "qapi/error.h"
 +#include "qapi/qmp/qdict.h"
- #include "replication.h"
+ #include "qemu-io.h"
+ #include "sysemu/block-backend.h"
+ #include "block/block.h"
+@@ -1978,6 +1979,7 @@ static int reopen_f(BlockBackend *blk, int argc, char **argv)
+     int flags = bs->open_flags;
+     bool writethrough = !blk_enable_write_cache(blk);
+     bool has_rw_option = false;
++    bool has_cache_option = false;
  
- typedef enum {
-@@ -39,8 +40,8 @@ typedef struct BDRVReplicationState {
-     char *top_id;
-     ReplicationState *rs;
-     Error *blocker;
--    int orig_hidden_flags;
--    int orig_secondary_flags;
-+    bool orig_hidden_read_only;
-+    bool orig_secondary_read_only;
-     int error;
- } BDRVReplicationState;
- 
-@@ -371,44 +372,40 @@ static void secondary_do_checkpoint(BDRVReplicationState *s, Error **errp)
-     }
- }
- 
-+/* This function is supposed to be called twice:
-+ * first with writable = true, then with writable = false.
-+ * The first call puts s->hidden_disk and s->secondary_disk in
-+ * r/w mode, and the second puts them back in their original state.
-+ */
- static void reopen_backing_file(BlockDriverState *bs, bool writable,
-                                 Error **errp)
- {
-     BDRVReplicationState *s = bs->opaque;
-     BlockReopenQueue *reopen_queue = NULL;
--    int orig_hidden_flags, orig_secondary_flags;
--    int new_hidden_flags, new_secondary_flags;
+     BlockReopenQueue *brq;
      Error *local_err = NULL;
- 
-     if (writable) {
--        orig_hidden_flags = s->orig_hidden_flags =
--                                bdrv_get_flags(s->hidden_disk->bs);
--        new_hidden_flags = (orig_hidden_flags | BDRV_O_RDWR) &
--                                                    ~BDRV_O_INACTIVE;
--        orig_secondary_flags = s->orig_secondary_flags =
--                                bdrv_get_flags(s->secondary_disk->bs);
--        new_secondary_flags = (orig_secondary_flags | BDRV_O_RDWR) &
--                                                     ~BDRV_O_INACTIVE;
--    } else {
--        orig_hidden_flags = (s->orig_hidden_flags | BDRV_O_RDWR) &
--                                                    ~BDRV_O_INACTIVE;
--        new_hidden_flags = s->orig_hidden_flags;
--        orig_secondary_flags = (s->orig_secondary_flags | BDRV_O_RDWR) &
--                                                    ~BDRV_O_INACTIVE;
--        new_secondary_flags = s->orig_secondary_flags;
-+        s->orig_hidden_read_only = bdrv_is_read_only(s->hidden_disk->bs);
-+        s->orig_secondary_read_only = bdrv_is_read_only(s->secondary_disk->bs);
+@@ -1989,6 +1991,7 @@ static int reopen_f(BlockBackend *blk, int argc, char **argv)
+                 error_report("Invalid cache option: %s", optarg);
+                 return -EINVAL;
+             }
++            has_cache_option = true;
+             break;
+         case 'o':
+             if (!qemu_opts_parse_noisily(&reopen_opts, optarg, 0)) {
+@@ -2046,9 +2049,31 @@ static int reopen_f(BlockBackend *blk, int argc, char **argv)
      }
  
-     bdrv_subtree_drained_begin(s->hidden_disk->bs);
-     bdrv_subtree_drained_begin(s->secondary_disk->bs);
+     qopts = qemu_opts_find(&reopen_opts, NULL);
+-    opts = qopts ? qemu_opts_to_qdict(qopts, NULL) : NULL;
++    opts = qopts ? qemu_opts_to_qdict(qopts, NULL) : qdict_new();
+     qemu_opts_reset(&reopen_opts);
  
--    if (orig_hidden_flags != new_hidden_flags) {
--        reopen_queue = bdrv_reopen_queue(reopen_queue, s->hidden_disk->bs, NULL,
--                                         new_hidden_flags);
-+    if (s->orig_hidden_read_only) {
-+        int flags = bdrv_get_flags(s->hidden_disk->bs);
-+        QDict *opts = qdict_new();
-+        qdict_put_bool(opts, BDRV_OPT_READ_ONLY, !writable);
-+        reopen_queue = bdrv_reopen_queue(reopen_queue, s->hidden_disk->bs,
-+                                         opts, flags);
-     }
++    if (qdict_haskey(opts, BDRV_OPT_READ_ONLY)) {
++        if (has_rw_option) {
++            error_report("Cannot set both -r/-w and '" BDRV_OPT_READ_ONLY "'");
++            qobject_unref(opts);
++            return -EINVAL;
++        }
++    } else {
++        qdict_put_bool(opts, BDRV_OPT_READ_ONLY, !(flags & BDRV_O_RDWR));
++    }
++
++    if (qdict_haskey(opts, BDRV_OPT_CACHE_DIRECT) ||
++        qdict_haskey(opts, BDRV_OPT_CACHE_NO_FLUSH)) {
++        if (has_cache_option) {
++            error_report("Cannot set both -c and the cache options");
++            qobject_unref(opts);
++            return -EINVAL;
++        }
++    } else {
++        qdict_put_bool(opts, BDRV_OPT_CACHE_DIRECT, flags & BDRV_O_NOCACHE);
++        qdict_put_bool(opts, BDRV_OPT_CACHE_NO_FLUSH, flags & BDRV_O_NO_FLUSH);
++    }
++
+     bdrv_subtree_drained_begin(bs);
+     brq = bdrv_reopen_queue(NULL, bs, opts, flags);
+     bdrv_reopen_multiple(bdrv_get_aio_context(bs), brq, &local_err);
+diff --git a/tests/qemu-iotests/133 b/tests/qemu-iotests/133
+index af6b3e1dd4..14e6b3b972 100755
+--- a/tests/qemu-iotests/133
++++ b/tests/qemu-iotests/133
+@@ -92,6 +92,15 @@ echo
+ IMGOPTSSYNTAX=false $QEMU_IO -f null-co -c 'reopen' -c 'info' \
+     "json:{'driver': 'null-co', 'size': 65536}"
  
--    if (!(orig_secondary_flags & BDRV_O_RDWR)) {
-+    if (s->orig_secondary_read_only) {
-+        int flags = bdrv_get_flags(s->secondary_disk->bs);
-+        QDict *opts = qdict_new();
-+        qdict_put_bool(opts, BDRV_OPT_READ_ONLY, !writable);
-         reopen_queue = bdrv_reopen_queue(reopen_queue, s->secondary_disk->bs,
--                                         NULL, new_secondary_flags);
-+                                         opts, flags);
-     }
++echo
++echo "=== Check that mixing -c/-r/-w and their corresponding options is forbidden ==="
++echo
++
++$QEMU_IO -c 'reopen -r -o read-only=on' $TEST_IMG
++$QEMU_IO -c 'reopen -w -o read-only=on' $TEST_IMG
++$QEMU_IO -c 'reopen -c none -o cache.direct=on' $TEST_IMG
++$QEMU_IO -c 'reopen -c writeback -o cache.direct=on' $TEST_IMG
++$QEMU_IO -c 'reopen -c directsync -o cache.no-flush=on' $TEST_IMG
+ # success, all done
+ echo "*** done"
+ rm -f $seq.full
+diff --git a/tests/qemu-iotests/133.out b/tests/qemu-iotests/133.out
+index f4a85aeb63..48a9d087f0 100644
+--- a/tests/qemu-iotests/133.out
++++ b/tests/qemu-iotests/133.out
+@@ -24,4 +24,12 @@ Cannot change the option 'driver'
  
-     if (reopen_queue) {
+ format name: null-co
+ format name: null-co
++
++=== Check that mixing -c/-r/-w and their corresponding options is forbidden ===
++
++Cannot set both -r/-w and 'read-only'
++Cannot set both -r/-w and 'read-only'
++Cannot set both -c and the cache options
++Cannot set both -c and the cache options
++Cannot set both -c and the cache options
+ *** done
 -- 
 2.11.0
