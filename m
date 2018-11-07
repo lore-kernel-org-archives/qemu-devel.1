@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56429)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gKIbJ-00038M-0f
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 02:50:10 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1gKIbo-0003Q6-Is
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 02:50:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gKIbE-0006Ds-H7
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 02:50:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37486)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gKIbD-00065V-HY
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 02:50:04 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A826D308A963
-	for <qemu-devel@nongnu.org>; Wed,  7 Nov 2018 07:49:59 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed,  7 Nov 2018 08:49:49 +0100
-Message-Id: <20181107074949.13805-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH] ui/gtk: fix cursor in egl mode
+	(envelope-from <dovgaluk@ispras.ru>) id 1gKIbX-0006jp-3j
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 02:50:31 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:41546)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1gKIbT-0006eG-Nk
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 02:50:20 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20181106153330.5139-1-peter.maydell@linaro.org>
+In-Reply-To: <20181106153330.5139-1-peter.maydell@linaro.org>
+Date: Wed, 7 Nov 2018 10:50:17 +0300
+Message-ID: <000901d4766e$86a6b760$93f42620$@ru>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PATCH for-3.1] replay: Exit on errors reading
+ from replay log
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,68 +29,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: 'Peter Maydell' <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org, 'Paolo Bonzini' <pbonzini@redhat.com>, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>
 
-In egl mode the scale_x and scale_y variables are not set, so the
-scaling logic in the mouse motion event handler does not work.
+> From: Peter Maydell [mailto:peter.maydell@linaro.org]
+> Currently replay_get_byte() does not check for an error
+> from getc(). Coverity points out (CID 1390622) that this
+> could result in unexpected behaviour (such as looping
+> forever, if we use the replay_get_dword() return value
+> for a loop count). We don't expect reads from the replay
+> log to fail, and if they do there is no way we can
+> continue. So make them fatal errors.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Fix that.  Also scale the cursor position in gd_egl_cursor_position().
+Reviewed-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
-Reported-by: Chen Zhang <tgfbeta@icloud.com>
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Tested-by: Chen Zhang <tgfbeta@icloud.com>
----
- ui/gtk-egl.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+> ---
+> Disclaimer: checked only with "make check".
+> 
+>  replay/replay-internal.c | 16 +++++++++++++---
+>  1 file changed, 13 insertions(+), 3 deletions(-)
+> 
+> diff --git a/replay/replay-internal.c b/replay/replay-internal.c
+> index 1cea1d4dc91..8f87e9b957e 100644
+> --- a/replay/replay-internal.c
+> +++ b/replay/replay-internal.c
+> @@ -35,6 +35,12 @@ static void replay_write_error(void)
+>      }
+>  }
+> 
+> +static void replay_read_error(void)
+> +{
+> +    error_report("error reading the replay data");
+> +    exit(1);
+> +}
+> +
+>  void replay_put_byte(uint8_t byte)
+>  {
+>      if (replay_file) {
+> @@ -83,7 +89,11 @@ uint8_t replay_get_byte(void)
+>  {
+>      uint8_t byte = 0;
+>      if (replay_file) {
+> -        byte = getc(replay_file);
+> +        int r = getc(replay_file);
+> +        if (r == EOF) {
+> +            replay_read_error();
+> +        }
+> +        byte = r;
+>      }
+>      return byte;
+>  }
+> @@ -126,7 +136,7 @@ void replay_get_array(uint8_t *buf, size_t *size)
+>      if (replay_file) {
+>          *size = replay_get_dword();
+>          if (fread(buf, 1, *size, replay_file) != *size) {
+> -            error_report("replay read error");
+> +            replay_read_error();
+>          }
+>      }
+>  }
+> @@ -137,7 +147,7 @@ void replay_get_array_alloc(uint8_t **buf, size_t *size)
+>          *size = replay_get_dword();
+>          *buf = g_malloc(*size);
+>          if (fread(*buf, 1, *size, replay_file) != *size) {
+> -            error_report("replay read error");
+> +            replay_read_error();
+>          }
+>      }
+>  }
+> --
+> 2.19.1
 
-diff --git a/ui/gtk-egl.c b/ui/gtk-egl.c
-index a77c25b490..5420c2362b 100644
---- a/ui/gtk-egl.c
-+++ b/ui/gtk-egl.c
-@@ -68,8 +68,15 @@ void gd_egl_draw(VirtualConsole *vc)
-         return;
-     }
- 
-+    window = gtk_widget_get_window(vc->gfx.drawing_area);
-+    ww = gdk_window_get_width(window);
-+    wh = gdk_window_get_height(window);
-+
-     if (vc->gfx.scanout_mode) {
-         gd_egl_scanout_flush(&vc->gfx.dcl, 0, 0, vc->gfx.w, vc->gfx.h);
-+
-+        vc->gfx.scale_x = (double)ww / vc->gfx.w;
-+        vc->gfx.scale_y = (double)wh / vc->gfx.h;
-     } else {
-         if (!vc->gfx.ds) {
-             return;
-@@ -77,13 +84,13 @@ void gd_egl_draw(VirtualConsole *vc)
-         eglMakeCurrent(qemu_egl_display, vc->gfx.esurface,
-                        vc->gfx.esurface, vc->gfx.ectx);
- 
--        window = gtk_widget_get_window(vc->gfx.drawing_area);
--        ww = gdk_window_get_width(window);
--        wh = gdk_window_get_height(window);
-         surface_gl_setup_viewport(vc->gfx.gls, vc->gfx.ds, ww, wh);
-         surface_gl_render_texture(vc->gfx.gls, vc->gfx.ds);
- 
-         eglSwapBuffers(qemu_egl_display, vc->gfx.esurface);
-+
-+        vc->gfx.scale_x = (double)ww / surface_width(vc->gfx.ds);
-+        vc->gfx.scale_y = (double)wh / surface_height(vc->gfx.ds);
-     }
- }
- 
-@@ -232,8 +239,8 @@ void gd_egl_cursor_position(DisplayChangeListener *dcl,
- {
-     VirtualConsole *vc = container_of(dcl, VirtualConsole, gfx.dcl);
- 
--    vc->gfx.cursor_x = pos_x;
--    vc->gfx.cursor_y = pos_y;
-+    vc->gfx.cursor_x = pos_x * vc->gfx.scale_x;
-+    vc->gfx.cursor_y = pos_y * vc->gfx.scale_y;
- }
- 
- void gd_egl_release_dmabuf(DisplayChangeListener *dcl,
--- 
-2.9.3
+Pavel Dovgalyuk
