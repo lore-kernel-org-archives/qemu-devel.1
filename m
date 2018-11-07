@@ -1,42 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52977)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1gKQfb-0003V4-Ij
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 11:27:08 -0500
+	(envelope-from <george.kennedy@oracle.com>) id 1gKQfb-0003OL-Et
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 11:27:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1gKQfT-0005IC-FA
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 11:27:07 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36836
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <george.kennedy@oracle.com>) id 1gKQcQ-00037H-2U
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 11:23:55 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:35842)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
-	id 1gKQfT-0005H2-1F
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 11:26:59 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wA7GIeXU000619
-	for <qemu-devel@nongnu.org>; Wed, 7 Nov 2018 11:26:57 -0500
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2nm1vqw7t0-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 07 Nov 2018 11:26:56 -0500
-Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
-	Wed, 7 Nov 2018 16:26:55 -0000
-References: <20181105110313.29312-1-david@redhat.com>
-	<20181105110313.29312-2-david@redhat.com>
-	<20181105121936.243260a6.cohuck@redhat.com>
-From: Collin Walling <walling@linux.ibm.com>
-Date: Wed, 7 Nov 2018 11:26:50 -0500
-MIME-Version: 1.0
-In-Reply-To: <20181105121936.243260a6.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <63c85f6b-2a3f-941b-cac3-4ec0cf6a01d3@linux.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1 1/4] s390x/zpci: drop
- msix.available
+	(Exim 4.71) (envelope-from <george.kennedy@oracle.com>)
+	id 1gKQcO-00034J-4k
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 11:23:48 -0500
+From: George Kennedy <george.kennedy@oracle.com>
+Date: Wed,  7 Nov 2018 11:19:45 -0500
+Message-Id: <1541607585-15570-1-git-send-email-george.kennedy@oracle.com>
+Subject: [Qemu-devel] [PATCH v5] lsi: Reselection needed to remove pending
+ commands from queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,71 +23,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: pbonzini@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, boris.ostrovsky@oracle.com
 
-On 11/5/18 6:19 AM, Cornelia Huck wrote:
-> On Mon,  5 Nov 2018 12:03:10 +0100
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->> I fail to see why this is useful as we require MSIX always and
->> completely fail adding a device.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  hw/s390x/s390-pci-bus.c | 2 --
->>  hw/s390x/s390-pci-bus.h | 1 -
->>  2 files changed, 3 deletions(-)
->>
->> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
->> index e1b14b131b..1eaae3aca6 100644
->> --- a/hw/s390x/s390-pci-bus.c
->> +++ b/hw/s390x/s390-pci-bus.c
->> @@ -745,7 +745,6 @@ static int s390_pci_msix_init(S390PCIBusDevice *pbdev)
->>  
->>      pos = pci_find_capability(pbdev->pdev, PCI_CAP_ID_MSIX);
->>      if (!pos) {
->> -        pbdev->msix.available = false;
->>          return -1;
->>      }
->>  
->> @@ -761,7 +760,6 @@ static int s390_pci_msix_init(S390PCIBusDevice *pbdev)
->>      pbdev->msix.pba_bar = pba & PCI_MSIX_FLAGS_BIRMASK;
->>      pbdev->msix.pba_offset = pba & ~PCI_MSIX_FLAGS_BIRMASK;
->>      pbdev->msix.entries = (ctrl & PCI_MSIX_FLAGS_QSIZE) + 1;
->> -    pbdev->msix.available = true;
->>  
->>      name = g_strdup_printf("msix-s390-%04x", pbdev->uid);
->>      memory_region_init_io(&pbdev->msix_notify_mr, OBJECT(pbdev),
->> diff --git a/hw/s390x/s390-pci-bus.h b/hw/s390x/s390-pci-bus.h
->> index 1f7f9b5814..f47a0f2da5 100644
->> --- a/hw/s390x/s390-pci-bus.h
->> +++ b/hw/s390x/s390-pci-bus.h
->> @@ -252,7 +252,6 @@ typedef struct ChscSeiNt2Res {
->>  } QEMU_PACKED ChscSeiNt2Res;
->>  
->>  typedef struct S390MsixInfo {
->> -    bool available;
->>      uint8_t table_bar;
->>      uint8_t pba_bar;
->>      uint16_t entries;
-> 
-> OK, so that was a write-only variable? :)
-> 
-> Question for the IBMers: is there any change we might have a different
-> implementation not relying on msi-x in the future?
-> 
+Under heavy IO (e.g. fio) the queue is not checked frequently enough for
+pending commands. As a result some pending commands are timed out by the
+linux sym53c8xx driver, which sends SCSI Abort messages for the timed out
+commands. The SCSI Abort messages result in linux errors, which show up
+on the console and in /var/log/messages.
 
-@Conny
-Currently, the plan would be to stick with a hard requirement for MSIX unless someone 
-strongly supports the legacy alternatives. I'm certainly open to discuss that. Maybe it 
-would make sense to fallback to MSI for devices that don't support MSIX?
+e.g.
+sd 0:0:3:0: [sdd] tag#33 ABORT operation started
+scsi target0:0:3: control msgout:
+80 20 47 d
+sd 0:0:3:0: ABORT operation complete.
+scsi target0:0:4: message d sent on bad reselection
 
-@David
-Thanks for the cleanup.
+When the current command completes, check if there is a pending command
+on the queue and if a pending command exists, set a flag indicating
+that a WAIT RESELECT command is needed to handle a queued pending command.
 
-Reviewed-by: Collin Walling <walling@linux.ibm.com>
+When a WAIT RESELECT is needed, intercept and save the current DMA Scripts
+Ptr (DSP) contents following a WAIT DISCONNECT Script instruction and load
+the DSP instead with the pointer to the Reselection Scripts.  When
+Reselection has completed, restore the original DSP contents.
 
+Signed-off-by: George Kennedy <george.kennedy@oracle.com>
+---
+
+Thanks Paolo,
+
+Sorry for missing your suggested fix. I believe the Script intercept is now
+being done as you had suggested.
+
+ hw/scsi/lsi53c895a.c | 52 +++++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 41 insertions(+), 11 deletions(-)
+
+diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
+index d1e6534..7fb8ddc 100644
+--- a/hw/scsi/lsi53c895a.c
++++ b/hw/scsi/lsi53c895a.c
+@@ -219,6 +219,8 @@ typedef struct {
+     int command_complete;
+     QTAILQ_HEAD(, lsi_request) queue;
+     lsi_request *current;
++    bool want_resel;    /* need resel to handle queued completed cmds */
++    uint32_t resel_dsp; /* DMA Scripts Ptr (DSP) of reselection scsi scripts */
+ 
+     uint32_t dsa;
+     uint32_t temp;
+@@ -298,6 +300,18 @@ static inline int lsi_irq_on_rsl(LSIState *s)
+     return (s->sien0 & LSI_SIST0_RSL) && (s->scid & LSI_SCID_RRE);
+ }
+ 
++static lsi_request *get_pending_req(LSIState *s)
++{
++    lsi_request *p;
++
++    QTAILQ_FOREACH(p, &s->queue, next) {
++        if (p->pending) {
++            return p;
++        }
++    }
++    return NULL;
++}
++
+ static void lsi_soft_reset(LSIState *s)
+ {
+     trace_lsi_reset();
+@@ -446,7 +460,6 @@ static void lsi_update_irq(LSIState *s)
+ {
+     int level;
+     static int last_level;
+-    lsi_request *p;
+ 
+     /* It's unclear whether the DIP/SIP bits should be cleared when the
+        Interrupt Status Registers are cleared or when istat0 is read.
+@@ -477,12 +490,12 @@ static void lsi_update_irq(LSIState *s)
+     lsi_set_irq(s, level);
+ 
+     if (!level && lsi_irq_on_rsl(s) && !(s->scntl1 & LSI_SCNTL1_CON)) {
++        lsi_request *p;
++
+         trace_lsi_update_irq_disconnected();
+-        QTAILQ_FOREACH(p, &s->queue, next) {
+-            if (p->pending) {
+-                lsi_reselect(s, p);
+-                break;
+-            }
++        p = get_pending_req(s);
++        if (p) {
++            lsi_reselect(s, p);
+         }
+     }
+ }
+@@ -759,6 +772,8 @@ static void lsi_command_complete(SCSIRequest *req, uint32_t status, size_t resid
+         lsi_request_free(s, s->current);
+         scsi_req_unref(req);
+     }
++    s->want_resel = get_pending_req(s) ? true : false;
++
+     lsi_resume_script(s);
+ }
+ 
+@@ -1064,11 +1079,13 @@ static void lsi_wait_reselect(LSIState *s)
+ 
+     trace_lsi_wait_reselect();
+ 
+-    QTAILQ_FOREACH(p, &s->queue, next) {
+-        if (p->pending) {
+-            lsi_reselect(s, p);
+-            break;
+-        }
++    if (s->current) {
++        return;
++    }
++
++    p = get_pending_req(s);
++    if (p) {
++        lsi_reselect(s, p);
+     }
+     if (s->current == NULL) {
+         s->waiting = 1;
+@@ -1082,6 +1099,7 @@ static void lsi_execute_script(LSIState *s)
+     uint32_t addr, addr_high;
+     int opcode;
+     int insn_processed = 0;
++    uint32_t save_dsp = 0;
+ 
+     s->istat1 |= LSI_ISTAT1_SRUN;
+ again:
+@@ -1258,9 +1276,21 @@ again:
+             case 1: /* Disconnect */
+                 trace_lsi_execute_script_io_disconnect();
+                 s->scntl1 &= ~LSI_SCNTL1_CON;
++                if (s->want_resel && s->resel_dsp) {
++                    save_dsp = s->dsp;
++                    s->dsp = s->resel_dsp;
++                    s->want_resel = false;
++                }
+                 break;
+             case 2: /* Wait Reselect */
++                if (!s->resel_dsp) {
++                    s->resel_dsp = s->dsp - 8;
++                }
+                 if (!lsi_irq_on_rsl(s)) {
++                    if (save_dsp) {
++                        s->dsp = save_dsp;
++                        save_dsp = 0;
++                    }
+                     lsi_wait_reselect(s);
+                 }
+                 break;
 -- 
-Respectfully,
-- Collin Walling
+1.8.3.1
