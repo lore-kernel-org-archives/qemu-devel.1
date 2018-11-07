@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52150)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gKKAx-0006r3-99
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 04:31:05 -0500
+	(envelope-from <philmd@redhat.com>) id 1gKKQ6-0005SB-2S
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 04:46:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gKKAu-0005Y9-6q
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 04:31:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44810)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gKKAt-0005VO-Od
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 04:31:00 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 14F49C049AFE
-	for <qemu-devel@nongnu.org>; Wed,  7 Nov 2018 09:30:58 +0000 (UTC)
-References: <20181030123526.26415-1-kchamart@redhat.com>
-	<20181030123526.26415-3-kchamart@redhat.com>
-	<10e3b401-92fc-f096-9e7e-b08223408ce9@redhat.com>
-	<20181107084931.GB19617@paraplu>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <f84608d0-7080-d476-e1d6-36c9643493bd@redhat.com>
-Date: Wed, 7 Nov 2018 10:30:54 +0100
+	(envelope-from <philmd@redhat.com>) id 1gKKPo-0003LS-H4
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 04:46:36 -0500
+Received: from mail-wr1-f49.google.com ([209.85.221.49]:36642)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gKKPh-0003Fe-9v
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 04:46:18 -0500
+Received: by mail-wr1-f49.google.com with SMTP id z13-v6so14267814wrs.3
+	for <qemu-devel@nongnu.org>; Wed, 07 Nov 2018 01:46:14 -0800 (PST)
+References: <1e2ba070.db56.166ed56f891.Coremail.wj193102@163.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <43dd7761-47ef-bbf5-ad6b-e7db5da3c91b@redhat.com>
+Date: Wed, 7 Nov 2018 10:46:10 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181107084931.GB19617@paraplu>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1e2ba070.db56.166ed56f891.Coremail.wj193102@163.com>
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/3] Deprecate HMP `cpu-add`
+Subject: Re: [Qemu-devel] The error from compiling QEMU statically
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,46 +29,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kashyap Chamarthy <kchamart@redhat.com>
-Cc: qemu-devel@nongnu.org, eblake@redhat.com, armbru@redhat.com, ehabkost@redhat.com, imammedo@redhat.com
+To: wj193102 <wj193102@163.com>, qemu-devel@nongnu.org
 
-On 2018-11-07 09:49, Kashyap Chamarthy wrote:
-> On Mon, Nov 05, 2018 at 12:20:05PM +0100, Thomas Huth wrote:
->> On 2018-10-30 13:35, Kashyap Chamarthy wrote:
->>> Since we're deprecating the QMP `cpu-add`, let's deprecate its HMP
->>> equivalent, too.
->>>
->>> Suggested-by: Thomas Huth <thuth@redhat.com>
->>> Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
-> 
-> [...]
-> 
->>> diff --git a/hmp.c b/hmp.c
->>> index 4975fa56b0..c3f3db7795 100644
->>> --- a/hmp.c
->>> +++ b/hmp.c
->>> @@ -2353,6 +2353,8 @@ void hmp_cpu_add(Monitor *mon, const QDict *qdict)
->>>      int cpuid;
->>>      Error *err = NULL;
->>>  
->>> +    error_report("cpu_add is deprecated, please use device_add instead");
->>> +
->>>      cpuid = qdict_get_int(qdict, "id");
->>>      qmp_cpu_add(cpuid, &err);
->>>      hmp_handle_error(mon, &err);
->>>
->>
->> I think you should also mention this explicitly in qemu-deprecated.texi,
->> too.
-> 
-> I think you mean I should explicitly mention that the HMP equivalent is
-> also deprecated -- currently I only call out the QMP command:
-> 'qemu-deprecated.texi'.
-> 
-> I saw that Eduardo already queued this series; maybe I can add a
-> follow-up if it can't be tweaked before submitting a pull request.
+Hi,
 
-Yes, a follow-up patch is perfectly fine for this.
+On 7/11/18 9:43, wj193102 wrote:
+> Hi, everybody.
+> I want to compile QEMU statically. But when I make the soure files, I get the error messages. Please help me to resolve them.
+> Now I will tell you the steps what I do.
+> (1)$ cd qemu-3.0.0
+> (2)$ ./configure --prefix=/usr --static
 
- Thanks,
-  Thomas
+Can you share the output of the configure script?
+
+> (3)$ make
+> When I input the "make" command, and  run it, then I get the error messages.
+> (1)/block/file-posix.c:1945: Error: There is an unknown field 'prealloc' in the initializer;
+> (2)/block/file-posix.c:1946: Error: There is an unknown field 'errp' in the initializer.
+> How to resolve these problems, please help me, thanks.
+
+What is your distribution?
+
+I can not reproduce your problem (using Fedora).
+
+Regards,
+
+Phil.
