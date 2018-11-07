@@ -1,33 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41741)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gKI9D-0003Nm-P5
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 02:21:08 -0500
+	(envelope-from <nicholas.a.hudson@gmail.com>) id 1gKNk8-0001Kb-La
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 08:19:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gKI9A-0002qW-AB
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 02:21:07 -0500
-Received: from indium.canonical.com ([91.189.90.7]:55950)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gKI99-0002Tr-Qc
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 02:21:04 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gKI92-0004n0-IX
-	for <qemu-devel@nongnu.org>; Wed, 07 Nov 2018 07:20:56 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9D6862E80CF
-	for <qemu-devel@nongnu.org>; Wed,  7 Nov 2018 07:20:55 +0000 (UTC)
+	(envelope-from <nicholas.a.hudson@gmail.com>) id 1gKNk2-0002Xr-VS
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 08:19:36 -0500
+From: Nick Hudson <nicholas.a.hudson@gmail.com>
+Message-ID: <d9876015-2126-79fe-415f-ca7427ab3059@gmail.com>
+Date: Wed, 7 Nov 2018 13:19:00 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 07 Nov 2018 07:06:15 -0000
-From: Berg Lloyd-Haig <berglh@gmail.com>
-Reply-To: Bug 1794939 <1794939@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153812537329.31017.17111716065357847976.malonedeb@chaenomeles.canonical.com>
-Message-Id: <154157437566.20032.7015190072098086241.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1794939] Re: QEMU does not build with vte v2.91
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-GB
+Subject: [Qemu-devel] [PATCH] Support u-boot noload images for arm as used
+ by NetBSD/evbarm GENERIC kernel.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,50 +23,89 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-Hi Bastian,
+noload kernels are loaded with the u-boot image header and as a result
+the header size needs adding to the entry point.  Fake up a hdr so the
+kernel image is loaded at the right address and the entry point is
+adjusted appropriately
 
-I got past this error by installing libvte-dev instead of
-libvte-2.91-dev.
+Signed-off-by: Nick Hudson <skrll@netbsd.org>
+---
+  hw/arm/boot.c         |  8 +++++---
+  hw/core/loader.c      | 12 +++++++++---
+  hw/core/uboot_image.h |  1 +
+  3 files changed, 15 insertions(+), 6 deletions(-)
 
-I'm not sure if it actually works however.
+diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+index 586baa9b64..450267566a 100644
+--- a/hw/arm/boot.c
++++ b/hw/arm/boot.c
+@@ -30,8 +30,9 @@
+   * Documentation/arm/Booting and Documentation/arm64/booting.txt
+   * They have different preferred image load offsets from system RAM base.
+   */
+-#define KERNEL_ARGS_ADDR 0x100
+-#define KERNEL_LOAD_ADDR 0x00010000
++#define KERNEL_ARGS_ADDR   0x100
++#define KERNEL_NOLOAD_ADDR 0x00000000
++#define KERNEL_LOAD_ADDR   0x00010000
+  #define KERNEL64_LOAD_ADDR 0x00080000
 
-Cheers,
-Berg
+  #define ARM64_TEXT_OFFSET_OFFSET    8
+@@ -1078,7 +1079,8 @@ void arm_load_kernel(ARMCPU *cpu, struct 
+arm_boot_info *info)
+      }
+      entry = elf_entry;
+      if (kernel_size < 0) {
+-        kernel_size = load_uimage_as(info->kernel_filename, &entry, NULL,
++        uint64_t loadaddr = info->loader_start + KERNEL_NOLOAD_ADDR;
++        kernel_size = load_uimage_as(info->kernel_filename, &entry, 
+&loadaddr,
+                                       &is_linux, NULL, NULL, as);
+      }
+      if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64) && kernel_size < 0) {
+diff --git a/hw/core/loader.c b/hw/core/loader.c
+index aa0b3fc867..952562c2da 100644
+--- a/hw/core/loader.c
++++ b/hw/core/loader.c
+@@ -638,13 +638,19 @@ static int load_uboot_image(const char *filename, 
+hwaddr *ep, hwaddr *loadaddr,
+          goto out;
 
--- =
+      if (hdr->ih_type != image_type) {
+-        fprintf(stderr, "Wrong image type %d, expected %d\n", hdr->ih_type,
+-                image_type);
+-        goto out;
++        if (image_type != IH_TYPE_KERNEL && hdr->ih_type != 
+IH_TYPE_KERNEL_NOLOAD) {
++            fprintf(stderr, "Wrong image type %d, expected %d\n", 
+hdr->ih_type,
++                    image_type);
++            goto out;
++        }
+      }
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1794939
+      /* TODO: Implement other image types.  */
+      switch (hdr->ih_type) {
++    case IH_TYPE_KERNEL_NOLOAD:
++        hdr->ih_load = *loadaddr + sizeof(*hdr);
++        hdr->ih_ep += hdr->ih_load;
++
+      case IH_TYPE_KERNEL:
+          address = hdr->ih_load;
+          if (translate_fn) {
+diff --git a/hw/core/uboot_image.h b/hw/core/uboot_image.h
+index 34c11a70a6..608022de6e 100644
+--- a/hw/core/uboot_image.h
++++ b/hw/core/uboot_image.h
+@@ -124,6 +124,7 @@
+  #define IH_TYPE_SCRIPT        6    /* Script file            */
+  #define IH_TYPE_FILESYSTEM    7    /* Filesystem Image (any type)    */
+  #define IH_TYPE_FLATDT        8    /* Binary Flat Device Tree Blob    */
++#define IH_TYPE_KERNEL_NOLOAD  14    /* OS Kernel Image (noload)    */
 
-Title:
-  QEMU does not build with vte v2.91
-
-Status in QEMU:
-  New
-
-Bug description:
-  when I build qemu with vte support and vte-2.91 installed I get the
-  following deprecation warning:
-
-  error: =E2=80=98vte_terminal_set_encoding=E2=80=99 is deprecated [-Werror=
-=3Ddeprecated-declarations]
-       vte_terminal_set_encoding(VTE_TERMINAL(vc->vte.terminal), "UTF-8", N=
-ULL);
-       ^~~~~~~~~~~~~~~~~~~~~~~~~
-  In file included from /usr/include/vte-2.91/vte/vte.h:35
-
-  I looked for the commit in vte that deprecated the offending function
-  (a17e714d), which led me to the thread:
-
-  https://gitlab.gnome.org/GNOME/vte/issues/3
-
-  It looks like from this version forward vte forces us to use utf-8,
-  such that this function call becomes unnecessary in QEMU.
-
-  Cheers,
-  Bastian
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1794939/+subscriptions
+  /*
+   * Compression Types
+-- 
+2.17.1
