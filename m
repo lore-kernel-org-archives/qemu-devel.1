@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35254)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gKPfZ-0003Dp-R3
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 10:23:02 -0500
+	(envelope-from <tcminyard@gmail.com>) id 1gKPhH-0004pp-F2
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 10:24:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gKPfW-0002pP-Ld
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 10:23:01 -0500
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:39115)
+	(envelope-from <tcminyard@gmail.com>) id 1gKPhD-0004Zv-77
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 10:24:47 -0500
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:43525)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gKPfV-0002gR-U5
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 10:22:58 -0500
-Received: by mail-ed1-f66.google.com with SMTP id w25so7824306edx.6
-	for <qemu-devel@nongnu.org>; Wed, 07 Nov 2018 07:22:51 -0800 (PST)
-References: <CAFEAcA9pvsNML+=2jwygO4ciJWr0GmWHznJ-Lb1bcOsWhYjo4A@mail.gmail.com>
-	<30bb371d-4183-dd25-3413-08fd60a9eeea@redhat.com>
-	<CAFEAcA_2MqRX2j1pabqbfNdrexpCfNS=xJn=TCaPrkpnD2Bvcw@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <500cfa7d-7cae-a7e7-7a9e-741648806f69@redhat.com>
-Date: Wed, 7 Nov 2018 16:22:44 +0100
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_2MqRX2j1pabqbfNdrexpCfNS=xJn=TCaPrkpnD2Bvcw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] List of files containing devices which have not
- been QOMified
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gKPhC-0004Vt-5K
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 10:24:42 -0500
+Received: by mail-oi1-x242.google.com with SMTP id j202-v6so14089030oih.10
+	for <qemu-devel@nongnu.org>; Wed, 07 Nov 2018 07:24:41 -0800 (PST)
+Sender: Corey Minyard <tcminyard@gmail.com>
+From: minyard@acm.org
+Date: Wed,  7 Nov 2018 09:24:34 -0600
+Message-Id: <20181107152434.22219-1-minyard@acm.org>
+Subject: [Qemu-devel] [PATCH] i386: Rename bools in PCMachineState to end in
+ _enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,47 +25,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Corey Minyard <cminyard@mvista.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-On 7/11/18 0:06, Peter Maydell wrote:
-> On 6 November 2018 at 19:16, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
->> On 6/11/18 19:43, Peter Maydell wrote:
->>>
->>> I had an idea for how to get a rough list of source files
->>> containing devices that haven't been QOMified. The theory
->>> is that a pre-QOM device generally has an "init" function
->>> which allocates memory for the device struct. So looking in
->>> hw/ for files which call g_new*() or g_malloc*() should get
->>> us all the non-QOM devices (as well as a pile of false
->>> positives, of course). The following link is the result of
->>> doing that and then eyeballing the results for false positives
->>> and throwing those out. It might have missed one or two
->>> files or included one or two by mistake. But I think it's
->>> pretty close, and it seems to have caught all the obvious
->>> ones I knew about. There are 61 files on this list.
->>>
->>> I am also suspicious about hw/bt/ but don't know enough
->>> about that subsystem to say if it could benefit from
->>> using QOM objects more.
->>>
->>
->>> hw/arm/exynos4210.c
->>
->> I already did this one.
->>
->>> hw/sd/omap_mmc.c
->> I will do this one.
-> 
-> I have some out-of-tree stuff that deals with this device
-> (part of the omap3 patchset tries to do some QOMification,
-> but it was a bit tangled with adding omap3 features),
-> so if you could hold off on working on the various omap
-> devices in this set that might be better, til I see
-> whether any of the out-of-tree code is usefully salvageable.
+From: Corey Minyard <cminyard@mvista.com>
 
-Sure, go ahead with OMAP, this is the last thing I want to touch.
+This makes their function more clear and prevents conflicts when adding
+the actual devices to the machine state, if necessary.
 
-I wondered if there is sens to work on the OMAP devices then read your 
-thought "I'm not sure what exactly (other than tidiness) we gain from 
-converting remaining non-QOM devices."
+Signed-off-by: Corey Minyard <cminyard@mvista.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+---
+ hw/i386/pc.c         | 18 +++++++++---------
+ hw/i386/pc_piix.c    |  3 ++-
+ hw/i386/pc_q35.c     |  6 +++---
+ include/hw/i386/pc.h |  6 +++---
+ 4 files changed, 17 insertions(+), 16 deletions(-)
+
+I have this change in my tree because I have SMBus ACPI support
+for an SMBus IPMI device.  Thus I need to add the smbus to the
+PC machine state and it seems better to have the device named
+"smbus" and the enable named "smbus_enabled".
+
+However, I think this change makes the code more consistent and
+clear.  Thus I am sending it separately.
+
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index f095725dba..4cd2fbca4d 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -2222,42 +2222,42 @@ static bool pc_machine_get_smbus(Object *obj, Error **errp)
+ {
+     PCMachineState *pcms = PC_MACHINE(obj);
+ 
+-    return pcms->smbus;
++    return pcms->smbus_enabled;
+ }
+ 
+ static void pc_machine_set_smbus(Object *obj, bool value, Error **errp)
+ {
+     PCMachineState *pcms = PC_MACHINE(obj);
+ 
+-    pcms->smbus = value;
++    pcms->smbus_enabled = value;
+ }
+ 
+ static bool pc_machine_get_sata(Object *obj, Error **errp)
+ {
+     PCMachineState *pcms = PC_MACHINE(obj);
+ 
+-    return pcms->sata;
++    return pcms->sata_enabled;
+ }
+ 
+ static void pc_machine_set_sata(Object *obj, bool value, Error **errp)
+ {
+     PCMachineState *pcms = PC_MACHINE(obj);
+ 
+-    pcms->sata = value;
++    pcms->sata_enabled = value;
+ }
+ 
+ static bool pc_machine_get_pit(Object *obj, Error **errp)
+ {
+     PCMachineState *pcms = PC_MACHINE(obj);
+ 
+-    return pcms->pit;
++    return pcms->pit_enabled;
+ }
+ 
+ static void pc_machine_set_pit(Object *obj, bool value, Error **errp)
+ {
+     PCMachineState *pcms = PC_MACHINE(obj);
+ 
+-    pcms->pit = value;
++    pcms->pit_enabled = value;
+ }
+ 
+ static void pc_machine_initfn(Object *obj)
+@@ -2271,9 +2271,9 @@ static void pc_machine_initfn(Object *obj)
+     pcms->acpi_nvdimm_state.is_enabled = false;
+     /* acpi build is enabled by default if machine supports it */
+     pcms->acpi_build_enabled = PC_MACHINE_GET_CLASS(pcms)->has_acpi_build;
+-    pcms->smbus = true;
+-    pcms->sata = true;
+-    pcms->pit = true;
++    pcms->smbus_enabled = true;
++    pcms->sata_enabled = true;
++    pcms->pit_enabled = true;
+ }
+ 
+ static void pc_machine_reset(void)
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index dc09466b3e..dc7a0d3fa1 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -239,7 +239,8 @@ static void pc_init1(MachineState *machine,
+ 
+     /* init basic PC hardware */
+     pc_basic_device_init(isa_bus, pcms->gsi, &rtc_state, true,
+-                         (pcms->vmport != ON_OFF_AUTO_ON), pcms->pit, 0x4);
++                         (pcms->vmport != ON_OFF_AUTO_ON), pcms->pit_enabled,
++                         0x4);
+ 
+     pc_nic_init(pcmc, isa_bus, pci_bus);
+ 
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index 532241e3f8..0b65887bbf 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -236,13 +236,13 @@ static void pc_q35_init(MachineState *machine)
+ 
+     /* init basic PC hardware */
+     pc_basic_device_init(isa_bus, pcms->gsi, &rtc_state, !mc->no_floppy,
+-                         (pcms->vmport != ON_OFF_AUTO_ON), pcms->pit,
++                         (pcms->vmport != ON_OFF_AUTO_ON), pcms->pit_enabled,
+                          0xff0104);
+ 
+     /* connect pm stuff to lpc */
+     ich9_lpc_pm_init(lpc, pc_machine_is_smm_enabled(pcms));
+ 
+-    if (pcms->sata) {
++    if (pcms->sata_enabled) {
+         /* ahci and SATA device, for q35 1 ahci controller is built-in */
+         ahci = pci_create_simple_multifunction(host_bus,
+                                                PCI_DEVFN(ICH9_SATA1_DEV,
+@@ -262,7 +262,7 @@ static void pc_q35_init(MachineState *machine)
+         ehci_create_ich9_with_companions(host_bus, 0x1d);
+     }
+ 
+-    if (pcms->smbus) {
++    if (pcms->smbus_enabled) {
+         /* TODO: Populate SPD eeprom data.  */
+         smbus_eeprom_init(ich9_smb_init(host_bus,
+                                         PCI_DEVFN(ICH9_SMB_DEV, ICH9_SMB_FUNC),
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index 136fe497b6..7bb52b4762 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -49,9 +49,9 @@ struct PCMachineState {
+     AcpiNVDIMMState acpi_nvdimm_state;
+ 
+     bool acpi_build_enabled;
+-    bool smbus;
+-    bool sata;
+-    bool pit;
++    bool smbus_enabled;
++    bool sata_enabled;
++    bool pit_enabled;
+ 
+     /* RAM information (sizes, addresses, configuration): */
+     ram_addr_t below_4g_mem_size, above_4g_mem_size;
+-- 
+2.17.1
