@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53292)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59025)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nicholas.a.hudson@gmail.com>) id 1gKNk8-0001Kb-La
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 08:19:37 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gKNzx-0000cm-TP
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 08:35:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nicholas.a.hudson@gmail.com>) id 1gKNk2-0002Xr-VS
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 08:19:36 -0500
-From: Nick Hudson <nicholas.a.hudson@gmail.com>
-Message-ID: <d9876015-2126-79fe-415f-ca7427ab3059@gmail.com>
-Date: Wed, 7 Nov 2018 13:19:00 +0000
+	(envelope-from <mreitz@redhat.com>) id 1gKNzw-0005X3-V7
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 08:35:57 -0500
+References: <20181107063644.2254-1-armbru@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <10dd2dbc-716e-4b97-1de7-6556ec026e59@redhat.com>
+Date: Wed, 7 Nov 2018 14:35:46 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-GB
-Subject: [Qemu-devel] [PATCH] Support u-boot noload images for arm as used
- by NetBSD/evbarm GENERIC kernel.
+In-Reply-To: <20181107063644.2254-1-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="4dtu8Vi9rGfDYYveHwaWx17xRn4dO8JcW"
+Subject: Re: [Qemu-devel] [PATCH v2] block: Make more block drivers
+ compile-time configurable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,90 +24,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: jeff@codyprime.org, kwolf@redhat.com, qemu-block@nongnu.org
 
-noload kernels are loaded with the u-boot image header and as a result
-the header size needs adding to the entry point.  Fake up a hdr so the
-kernel image is loaded at the right address and the entry point is
-adjusted appropriately
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--4dtu8Vi9rGfDYYveHwaWx17xRn4dO8JcW
+From: Max Reitz <mreitz@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: jeff@codyprime.org, kwolf@redhat.com, qemu-block@nongnu.org
+Message-ID: <10dd2dbc-716e-4b97-1de7-6556ec026e59@redhat.com>
+Subject: Re: [PATCH v2] block: Make more block drivers compile-time
+ configurable
+References: <20181107063644.2254-1-armbru@redhat.com>
+In-Reply-To: <20181107063644.2254-1-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Nick Hudson <skrll@netbsd.org>
----
-  hw/arm/boot.c         |  8 +++++---
-  hw/core/loader.c      | 12 +++++++++---
-  hw/core/uboot_image.h |  1 +
-  3 files changed, 15 insertions(+), 6 deletions(-)
+On 07.11.18 07:36, Markus Armbruster wrote:
+> From: Jeff Cody <jcody@redhat.com>
+>=20
+> This adds configure options to control the following block drivers:
+>=20
+> * Bochs
+> * Cloop
+> * Dmg
+> * Qcow (V1)
+> * Vdi
+> * Vvfat
+> * qed
+> * parallels
+> * sheepdog
+>=20
+> Each of these defaults to being enabled.
+>=20
+> Signed-off-by: Jeff Cody <jcody@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+> v2: Fix handling of dmg-bz2.o [Max]
+>=20
+>  block/Makefile.objs | 22 ++++++++---
+>  configure           | 91 +++++++++++++++++++++++++++++++++++++++++++++=
 
-diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-index 586baa9b64..450267566a 100644
---- a/hw/arm/boot.c
-+++ b/hw/arm/boot.c
-@@ -30,8 +30,9 @@
-   * Documentation/arm/Booting and Documentation/arm64/booting.txt
-   * They have different preferred image load offsets from system RAM base.
-   */
--#define KERNEL_ARGS_ADDR 0x100
--#define KERNEL_LOAD_ADDR 0x00010000
-+#define KERNEL_ARGS_ADDR   0x100
-+#define KERNEL_NOLOAD_ADDR 0x00000000
-+#define KERNEL_LOAD_ADDR   0x00010000
-  #define KERNEL64_LOAD_ADDR 0x00080000
+>  2 files changed, 107 insertions(+), 6 deletions(-)
 
-  #define ARM64_TEXT_OFFSET_OFFSET    8
-@@ -1078,7 +1079,8 @@ void arm_load_kernel(ARMCPU *cpu, struct 
-arm_boot_info *info)
-      }
-      entry = elf_entry;
-      if (kernel_size < 0) {
--        kernel_size = load_uimage_as(info->kernel_filename, &entry, NULL,
-+        uint64_t loadaddr = info->loader_start + KERNEL_NOLOAD_ADDR;
-+        kernel_size = load_uimage_as(info->kernel_filename, &entry, 
-&loadaddr,
-                                       &is_linux, NULL, NULL, as);
-      }
-      if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64) && kernel_size < 0) {
-diff --git a/hw/core/loader.c b/hw/core/loader.c
-index aa0b3fc867..952562c2da 100644
---- a/hw/core/loader.c
-+++ b/hw/core/loader.c
-@@ -638,13 +638,19 @@ static int load_uboot_image(const char *filename, 
-hwaddr *ep, hwaddr *loadaddr,
-          goto out;
+Thanks, applied to my block branch:
 
-      if (hdr->ih_type != image_type) {
--        fprintf(stderr, "Wrong image type %d, expected %d\n", hdr->ih_type,
--                image_type);
--        goto out;
-+        if (image_type != IH_TYPE_KERNEL && hdr->ih_type != 
-IH_TYPE_KERNEL_NOLOAD) {
-+            fprintf(stderr, "Wrong image type %d, expected %d\n", 
-hdr->ih_type,
-+                    image_type);
-+            goto out;
-+        }
-      }
+https://git.xanclic.moe/XanClic/qemu/commits/branch/block
 
-      /* TODO: Implement other image types.  */
-      switch (hdr->ih_type) {
-+    case IH_TYPE_KERNEL_NOLOAD:
-+        hdr->ih_load = *loadaddr + sizeof(*hdr);
-+        hdr->ih_ep += hdr->ih_load;
-+
-      case IH_TYPE_KERNEL:
-          address = hdr->ih_load;
-          if (translate_fn) {
-diff --git a/hw/core/uboot_image.h b/hw/core/uboot_image.h
-index 34c11a70a6..608022de6e 100644
---- a/hw/core/uboot_image.h
-+++ b/hw/core/uboot_image.h
-@@ -124,6 +124,7 @@
-  #define IH_TYPE_SCRIPT        6    /* Script file            */
-  #define IH_TYPE_FILESYSTEM    7    /* Filesystem Image (any type)    */
-  #define IH_TYPE_FLATDT        8    /* Binary Flat Device Tree Blob    */
-+#define IH_TYPE_KERNEL_NOLOAD  14    /* OS Kernel Image (noload)    */
+Max
 
-  /*
-   * Compression Types
--- 
-2.17.1
+
+--4dtu8Vi9rGfDYYveHwaWx17xRn4dO8JcW
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlvi6jIACgkQ9AfbAGHV
+z0C5KAgAuDrOuDo7mQEAYz7CMriGOMUgSCHjZ5JdF9qTU0aC+J9yKMqOxlZbXJdA
+JaHooosY3b0qS7p3Nd0wNylfSJxYh3yOk4pxIkYL9iHHqkXHU1xLQ3bQUMbk71d9
+Npd++Tl8+lBzCiDW9Wo0nUWyWe41VmxJLDr49bGvQckFalnAHx33X8eMpCFFk+tc
+7QwI1Ih8GNuJeBScbiW/JPvWy1PRSsL/qtwhjBqJrnRdsjASmsT2tmf+RqZ01uty
+1wlJLKwV018iyUoEjaEejVBAmq3omMOKlxZuq7ZI0fpXtucw6iVuMDFKB988+TFS
+zplWEnB1DDzj9Y59kC5t4kiBG8Gguw==
+=+u2T
+-----END PGP SIGNATURE-----
+
+--4dtu8Vi9rGfDYYveHwaWx17xRn4dO8JcW--
