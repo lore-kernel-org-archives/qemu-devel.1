@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46842)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gKNSa-000425-Cg
+	(envelope-from <berto@igalia.com>) id 1gKNSY-0003zi-Aj
 	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 08:01:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gKNSC-0002Kp-W8
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 08:01:22 -0500
+	(envelope-from <berto@igalia.com>) id 1gKNSB-0002IO-U2
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 08:01:17 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Wed,  7 Nov 2018 14:59:37 +0200
-Message-Id: <4874ec8fdd2859f1d1c9787a7b7ed2ba876a467d.1541595424.git.berto@igalia.com>
+Date: Wed,  7 Nov 2018 14:59:41 +0200
+Message-Id: <534597ffc4007b2f5f3ccb1929dd52b36b036b24.1541595424.git.berto@igalia.com>
 In-Reply-To: <cover.1541595424.git.berto@igalia.com>
 References: <cover.1541595424.git.berto@igalia.com>
 In-Reply-To: <cover.1541595424.git.berto@igalia.com>
 References: <cover.1541595424.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v4 02/15] block: Use
- bdrv_reopen_set_read_only() in bdrv_backing_update_filename()
+Subject: [Qemu-devel] [PATCH v4 06/15] block: Use
+ bdrv_reopen_set_read_only() in qmp_change_backing_file()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,38 +31,44 @@ BDRV_O_RDWR flag with the new bdrv_reopen_set_read_only() function.
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ blockdev.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-diff --git a/block.c b/block.c
-index 4e82c71ba4..cfa53f7114 100644
---- a/block.c
-+++ b/block.c
-@@ -1079,11 +1079,11 @@ static int bdrv_backing_update_filename(BdrvChild *c, BlockDriverState *base,
-                                         const char *filename, Error **errp)
- {
-     BlockDriverState *parent = c->opaque;
--    int orig_flags = bdrv_get_flags(parent);
-+    bool read_only = bdrv_is_read_only(parent);
+diff --git a/blockdev.c b/blockdev.c
+index e5b5eb46e2..20d1d84bab 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -4100,7 +4100,6 @@ void qmp_change_backing_file(const char *device,
+     BlockDriverState *image_bs = NULL;
+     Error *local_err = NULL;
+     bool ro;
+-    int open_flags;
      int ret;
  
--    if (!(orig_flags & BDRV_O_RDWR)) {
--        ret = bdrv_reopen(parent, orig_flags | BDRV_O_RDWR, errp);
-+    if (read_only) {
-+        ret = bdrv_reopen_set_read_only(parent, false, errp);
-         if (ret < 0) {
-             return ret;
+     bs = qmp_get_root_bs(device, errp);
+@@ -4142,13 +4141,10 @@ void qmp_change_backing_file(const char *device,
+     }
+ 
+     /* if not r/w, reopen to make r/w */
+-    open_flags = image_bs->open_flags;
+     ro = bdrv_is_read_only(image_bs);
+ 
+     if (ro) {
+-        bdrv_reopen(image_bs, open_flags | BDRV_O_RDWR, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        if (bdrv_reopen_set_read_only(image_bs, false, errp) != 0) {
+             goto out;
          }
-@@ -1095,8 +1095,8 @@ static int bdrv_backing_update_filename(BdrvChild *c, BlockDriverState *base,
-         error_setg_errno(errp, -ret, "Could not update backing file link");
+     }
+@@ -4164,7 +4160,7 @@ void qmp_change_backing_file(const char *device,
      }
  
--    if (!(orig_flags & BDRV_O_RDWR)) {
--        bdrv_reopen(parent, orig_flags, NULL);
-+    if (read_only) {
-+        bdrv_reopen_set_read_only(parent, true, NULL);
+     if (ro) {
+-        bdrv_reopen(image_bs, open_flags, &local_err);
++        bdrv_reopen_set_read_only(image_bs, true, &local_err);
+         error_propagate(errp, local_err);
      }
  
-     return ret;
 -- 
 2.11.0
