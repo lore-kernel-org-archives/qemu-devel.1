@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38446)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gKTdN-0004Km-VK
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 14:37:04 -0500
+	(envelope-from <thuth@redhat.com>) id 1gKTgL-0007Dn-SE
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 14:40:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gKTdJ-0005hU-Ka
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 14:37:00 -0500
-References: <20181105110313.29312-1-david@redhat.com>
-	<20181105110313.29312-4-david@redhat.com>
-	<228ec0b2-cd30-b33b-8120-bb28e3f83e66@redhat.com>
-	<723f6454-8cac-08ed-bdb6-afddc4ed7ad1@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <c6623c2e-415b-0951-cfa6-4d83a42b81d4@redhat.com>
-Date: Wed, 7 Nov 2018 20:36:30 +0100
+	(envelope-from <thuth@redhat.com>) id 1gKTgK-0008RA-71
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 14:40:05 -0500
+References: <1541528230-31817-1-git-send-email-thuth@redhat.com>
+	<c0febf9a-f098-112d-9c8d-c320cc66b04a@redhat.com>
+	<12974ebb-09de-c6e9-1dd7-5199a8ae6b05@redhat.com>
+	<CAFEAcA-B74FQgj3COyGZ_SAAvSUA6=OaLdy5--NoAgHgEGZkpg@mail.gmail.com>
+	<87k1louaze.fsf@dusky.pond.sub.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <4b0e9b3f-5d88-9ef2-d0c5-f241067001d0@redhat.com>
+Date: Wed, 7 Nov 2018 20:39:16 +0100
 MIME-Version: 1.0
-In-Reply-To: <723f6454-8cac-08ed-bdb6-afddc4ed7ad1@linux.ibm.com>
+In-Reply-To: <87k1louaze.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1 3/4] s390x/zpci: move some
- hotplug checks to the pre_plug handler
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Add an entry for the 'collie'
+ machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,29 +28,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-> 
-> When did these function names drop the *_hot_plug postfix? Latest master does not reflect this change for me.
-> Just figured I'd mention it now in case merging becomes a pain later ;)
-> 
-
-Mentioned it in the cover letter, part of another series
-(also CC'ed to qemu-s390x@nongnu.org, so maybe easier to find for you).
-
+On 2018-11-07 17:08, Markus Armbruster wrote:
+> Peter Maydell <peter.maydell@linaro.org> writes:
+>=20
+>> On 6 November 2018 at 18:52, Thomas Huth <thuth@redhat.com> wrote:
+>>> On 2018-11-06 19:49, Philippe Mathieu-Daud=C3=A9 wrote:
+>>>> On 6/11/18 19:17, Thomas Huth wrote:
+>>>>> There is no active maintainer, but since Peter is picking up
+>>>>> patches via qemu-arm@nongnu.org, I think we could at least use
+>>>>> "Odd Fixes" as status here.
+>>>>
+>>>> This looks more as "Orphan" to me...
+>>>
+>>> I'll leave it up to Peter for the final decision...
 >>
+>> I think we're not very consistent[*] in our usage of the various
+>> statuses in the MAINTAINERS file. I guess "Odd Fixes" makes
+>> sense in that, well, if you send a patch to this
+>> code and cc me I'll review it and put it in the tree. (This
+>> is true of any of the arm boards we have.)
 >>
-> 
-> The above concerns do not relate to any functionality of the code, so with them addressed, then:
-> 
-> Reviewed-by: Collin Walling <walling@linux.ibm.com>
-> 
+>> [*] We have one thing tagged Orphan, which is bsd-user/,
+>> and some things tagged Odd Fixes with no listed maintainer,
+>> and some things tagged Odd Fixes which are in practice more
+>> like Orphan (for instance sh4), and we list "fpu/" as
+>> Odd Fixes despite having given it a pretty thorough
+>> overhaul very recently, and so on...
+>>
+>> If you wanted a mechanizable rule, you could try something
+>> like "every file which is in status Odd Fixes or better
+>> must list with M: at least one named individual who has
+>> submitted a pull request in the last nine months" :-)
+>=20
+> Sounds like an excellent idea to me!
 
-Thanks!
+Well, for me "odd fixes" means that there is someone around who might
+pick up the patch and throw it into a PULL request. "Orphan" means it's
+mostly in vain to send patches for this subsystem, since there is nobody
+going to pick up your patch. So for the ARM boards, I'd say that "odd
+fixes" is a better choice, since Peter still picks up most of the
+patches via the "L: qemu-arm@nongnu.org" (big thanks for this, by the way=
+!).
 
--- 
-
-Thanks,
-
-David / dhildenb
+ Thomas
