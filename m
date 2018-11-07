@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51709)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gKKtB-000173-He
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 05:16:46 -0500
+	(envelope-from <lhrazky@redhat.com>) id 1gKLP6-00030Z-7e
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 05:49:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gKKt8-00049X-4z
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 05:16:45 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 7 Nov 2018 10:16:18 +0000
-Message-ID: <c8370981-aecb-ff0e-fbe6-fcd57d697f4b@virtuozzo.com>
-References: <20181015160633.63130-1-vsementsov@virtuozzo.com>
-	<6e80686e-00a1-64d9-dba5-49e2709ca8f2@virtuozzo.com>
-	<20181106172115.GG4758@linux.fritz.box>
-	<e2bfebf0-d05a-9e2c-ba04-1d6289709983@redhat.com>
-In-Reply-To: <e2bfebf0-d05a-9e2c-ba04-1d6289709983@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <595EDAAA6C6DE64CBD465590C6836C0B@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <lhrazky@redhat.com>) id 1gKLOz-0001TM-M1
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 05:49:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45554)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lhrazky@redhat.com>) id 1gKLOx-0000dl-H7
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 05:49:37 -0500
+From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Hr=C3=A1zk=C3=BD?= <lhrazky@redhat.com>
+Date: Wed,  7 Nov 2018 11:49:20 +0100
+Message-Id: <20181107104921.20536-3-lhrazky@redhat.com>
+In-Reply-To: <20181107104921.20536-1-lhrazky@redhat.com>
+References: <20181107104921.20536-1-lhrazky@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Qemu-block] ping Re: [PATCH v4 00/11] backup-top
- filter driver for backup
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [RFC PATCH spice v3 2/3] QXL interface: deprecate
+ spice_qxl_set_max_monitors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +27,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: "famz@redhat.com" <famz@redhat.com>, Denis Lunev <den@virtuozzo.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "jcody@redhat.com" <jcody@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>
+To: spice-devel@lists.freedesktop.org, qemu-devel@nongnu.org
+Cc: kraxel@redhat.com
 
-MDcuMTEuMjAxOCAwMTozNSwgSm9obiBTbm93IHdyb3RlOg0KPg0KPiBPbiAxMS8wNi8yMDE4IDEy
-OjIxIFBNLCBLZXZpbiBXb2xmIHdyb3RlOg0KPj4gQW0gMDIuMTEuMjAxOCB1bSAxNzo0MSBoYXQg
-VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+PiBwaW5nDQo+Pj4N
-Cj4+PiAxNS4xMC4yMDE4IDE5OjA2LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3Rl
-Og0KPj4+PiBIaSBhbGwhDQo+Pj4+DQo+Pj4+IFRoZXNlIHNlcmllcyBpbnRyb2R1Y2UgYmFja3Vw
-LXRvcCBkcml2ZXIuIEl0J3MgYSBmaWx0ZXItbm9kZSwgd2hpY2gNCj4+Pj4gZG8gY29weS1iZWZv
-cmUtd3JpdGUgb3BlcmF0aW9uLiBNaXJyb3IgdXNlcyBmaWx0ZXItbm9kZSBmb3IgaGFuZGxpbmcN
-Cj4+Pj4gZ3Vlc3Qgd3JpdGVzLCBsZXQncyBtb3ZlIHRvIGZpbHRlci1ub2RlIChmcm9tIHdyaXRl
-LW5vdGlmaWVycykgZm9yDQo+Pj4+IGJhY2t1cCB0b28gKHBhdGNoIDE2KQ0KPj4+Pg0KPj4+PiB2
-NDoNCj4+Pj4gZml4ZXMsIHJld3JpdGUgZHJpdmVyIHRvIGJlIGltcGxpY2l0LCBkcm9wIG5ldyBp
-bnRlcmZhY2VzIGFuZA0KPj4+PiBkb24ndCBtb3ZlIHRvIEJkcnZEaXJ0eUJpdG1hcCBmb3Igbm93
-LCBhcyBpdCdzIG5vdCBvYnZpb3VzIHdpbGwNCj4+Pj4gaXQgYmUgcmVhbGx5IG5lZWRlZCBhbmQg
-ZG9uJ3QgcmVsYXRlIHRvIHRoZXNlIHNlcmllcyBtb3JlLg0KPj4+Pg0KPj4+PiB2MyB3YXMgIltQ
-QVRDSCB2MyAwMC8xOF0gZmxlZWNpbmctaG9vayBkcml2ZXIgZm9yIGJhY2t1cCINCj4+Pj4NCj4+
-Pj4gdjIgd2FzICJbUkZDIHYyXSBuZXcsIG5vZGUtZ3JhcGgtYmFzZWQgZmxlZWNpbmcgYW5kIGJh
-Y2t1cCINCj4+Pj4NCj4+Pj4gVGhlc2Ugc2VyaWVzIGFyZSBiYXNlZCBvbg0KPj4+PiAgICBbUEFU
-Q0ggdjQgMC84XSBkaXJ0eS1iaXRtYXA6IHJld3JpdGUgYmRydl9kaXJ0eV9pdGVyX25leHRfYXJl
-YQ0KPj4+PiBhbmQNCj4+Pj4gICAgW1BBVENIIDAvMl0gcmVwbGljYXRpb246IGRyb3AgZXh0cmEg
-c3luYw0KPj4gQmVmb3JlIHdlIGNhbiBtb3ZlIGZvcndhcmQgaGVyZSwgd2UgbmVlZCB0byBkZWFs
-IHdpdGggdGhlIGRlcGVuZGVuY2llcy4NCj4+IEkgbWVyZ2VkIHRoZSBzZWNvbmQgb25lIG5vdyAo
-YmVjYXVzZSB0aGVyZSB3YXNuJ3QgYW55IGZlZWRiYWNrIGZyb20gdGhlDQo+PiByZXBsaWNhdGlv
-biBtYWludGFpbmVycyksIGJ1dCB0aGUgZmlyc3Qgb25lIGxvb2tzIGxpa2UgaXQgd2FzIGdvaW5n
-DQo+PiB0aHJvdWdoIEpvaG4ncyBvciBFcmljJ3MgdHJlZT8NCj4+DQo+IEkgd2FzIGV4cGVjdGlu
-ZyBpdCB0byBnbyB0aHJvdWdoIEVyaWMncyBiZWNhdXNlIGl0IHdhcyBwcmVkaWNhdGVkIG9uIE5C
-RA0KPiBwYXRjaGVzIHRoYXQgaGUgd2FzIHN0YWdpbmcuDQo+DQo+IElzIHRoYXQgbm8gbG9uZ2Vy
-IHRydWU/DQoNCnllcywgaXQncyBtZXJnZWQgdG8gbWFzdGVyLg0KDQo+IC0tanMNCg0KDQotLSAN
-CkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQoNCg==
+Replace it by spice_qxl_set_device_info. Note we can't use
+monitors_count for what's stored in max_monitors, because monitors_count
+denotes the length of the device_display_ids array, which
+spice_qxl_set_max_monitors doesn't touch.
+
+Signed-off-by: Luk=C3=A1=C5=A1 Hr=C3=A1zk=C3=BD <lhrazky@redhat.com>
+---
+ server/red-qxl.c   | 1 +
+ server/spice-qxl.h | 4 ++--
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/server/red-qxl.c b/server/red-qxl.c
+index 0ea424cd..6ffd8286 100644
+--- a/server/red-qxl.c
++++ b/server/red-qxl.c
+@@ -888,6 +888,7 @@ void spice_qxl_set_device_info(QXLInstance *instance,
+     }
+=20
+     instance->st->monitors_count =3D device_display_id_count;
++    instance->st->max_monitors =3D device_display_id_count;
+ }
+=20
+ void red_qxl_init(RedsState *reds, QXLInstance *qxl)
+diff --git a/server/spice-qxl.h b/server/spice-qxl.h
+index 547d3d93..e7af5e5e 100644
+--- a/server/spice-qxl.h
++++ b/server/spice-qxl.h
+@@ -101,9 +101,9 @@ void spice_qxl_monitors_config_async(QXLInstance *ins=
+tance, QXLPHYSICAL monitors
+                                      int group_id, uint64_t cookie);
+ /* since spice 0.12.3 */
+ void spice_qxl_driver_unload(QXLInstance *instance);
+-/* since spice 0.12.6 */
++/* since spice 0.12.6, deprecated since 0.14.2, spice_qxl_set_device_inf=
+o replaces it */
+ void spice_qxl_set_max_monitors(QXLInstance *instance,
+-                                unsigned int max_monitors);
++                                unsigned int max_monitors) SPICE_GNUC_DE=
+PRECATED;
+ /* since spice 0.13.1 */
+ void spice_qxl_gl_scanout(QXLInstance *instance,
+                           int fd,
+--=20
+2.19.1
