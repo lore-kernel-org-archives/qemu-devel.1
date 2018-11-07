@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48104)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41903)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gKDK5-0002mH-TE
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 21:12:03 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gKDyZ-0000CP-Vh
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 21:53:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gKDK1-0004Kz-R2
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 21:12:01 -0500
-Date: Wed, 7 Nov 2018 13:05:59 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181107020559.GC1754@umbus.fritz.box>
-References: <20181030093531.18587-1-agraf@suse.de>
+	(envelope-from <no-reply@patchew.org>) id 1gKDyQ-0002AB-35
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 21:53:48 -0500
+Resent-Message-Id: <E1gKDyQ-0002AB-35@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21315)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gKDyO-0001sM-Hx
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 21:53:41 -0500
+Message-ID: <154155914934.7921.2503764178388127461@015909e0f939>
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <20181106122025.3487-1-xiaoguangrong@tencent.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="3siQDZowHQqNOShm"
-Content-Disposition: inline
-In-Reply-To: <20181030093531.18587-1-agraf@suse.de>
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: PPC: Remove myself
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 6 Nov 2018 18:52:31 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v2 0/5] migration: improve multithreads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,162 +28,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Graf <agraf@suse.de>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: guangrong.xiao@gmail.com
+Cc: famz@redhat.com, pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, kvm@vger.kernel.org, quintela@redhat.com, xiaoguangrong@tencent.com, qemu-devel@nongnu.org, peterx@redhat.com, dgilbert@redhat.com, wei.w.wang@intel.com, cota@braap.org, jiang.biao2@zte.com.cn
 
-
---3siQDZowHQqNOShm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Oct 30, 2018 at 10:35:31AM +0100, Alexander Graf wrote:
-> I haven't really been maintaining any PowerPC code for quite a while now,
-> so let's reflect reality: David does all the work and embedded PPC is in
-> "Odd Fixes" state rather than supported now.
->=20
-> Signed-off-by: Alexander Graf <agraf@suse.de>
-
-Applied to ppc-for-3.1.
-
-> ---
->  MAINTAINERS | 30 ++++++++++++++----------------
->  1 file changed, 14 insertions(+), 16 deletions(-)
->=20
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index d794bd7a66..d1a6d3c740 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -230,7 +230,6 @@ F: tests/tcg/openrisc/
-> =20
->  PowerPC
->  M: David Gibson <david@gibson.dropbear.id.au>
-> -M: Alexander Graf <agraf@suse.de>
->  L: qemu-ppc@nongnu.org
->  S: Maintained
->  F: target/ppc/
-> @@ -340,7 +339,7 @@ S: Maintained
->  F: target/mips/kvm.c
-> =20
->  PPC
-> -M: Alexander Graf <agraf@suse.de>
-> +M: David Gibson <david@gibson.dropbear.id.au>
->  S: Maintained
->  F: target/ppc/kvm.c
-> =20
-> @@ -780,21 +779,21 @@ F: hw/openrisc/openrisc_sim.c
->  PowerPC Machines
->  ----------------
->  405
-> -M: Alexander Graf <agraf@suse.de>
-> +M: David Gibson <david@gibson.dropbear.id.au>
->  L: qemu-ppc@nongnu.org
->  S: Odd Fixes
->  F: hw/ppc/ppc405_boards.c
-> =20
->  Bamboo
-> -M: Alexander Graf <agraf@suse.de>
-> +M: David Gibson <david@gibson.dropbear.id.au>
->  L: qemu-ppc@nongnu.org
->  S: Odd Fixes
->  F: hw/ppc/ppc440_bamboo.c
-> =20
->  e500
-> -M: Alexander Graf <agraf@suse.de>
-> +M: David Gibson <david@gibson.dropbear.id.au>
->  L: qemu-ppc@nongnu.org
-> -S: Supported
-> +S: Odd Fixes
->  F: hw/ppc/e500.[hc]
->  F: hw/ppc/e500plat.c
->  F: include/hw/ppc/ppc_e500.h
-> @@ -802,16 +801,16 @@ F: include/hw/pci-host/ppce500.h
->  F: pc-bios/u-boot.e500
-> =20
->  mpc8544ds
-> -M: Alexander Graf <agraf@suse.de>
-> +M: David Gibson <david@gibson.dropbear.id.au>
->  L: qemu-ppc@nongnu.org
-> -S: Supported
-> +S: Odd Fixes
->  F: hw/ppc/mpc8544ds.c
->  F: hw/ppc/mpc8544_guts.c
-> =20
->  New World
-> -M: Alexander Graf <agraf@suse.de>
-> +M: David Gibson <david@gibson.dropbear.id.au>
->  L: qemu-ppc@nongnu.org
-> -S: Maintained
-> +S: Odd Fixes
->  F: hw/ppc/mac_newworld.c
->  F: hw/pci-host/uninorth.c
->  F: hw/pci-bridge/dec.[hc]
-> @@ -823,9 +822,9 @@ F: include/hw/misc/mos6522.h
->  F: include/hw/ppc/mac_dbdma.h
-> =20
->  Old World
-> -M: Alexander Graf <agraf@suse.de>
-> +M: David Gibson <david@gibson.dropbear.id.au>
->  L: qemu-ppc@nongnu.org
-> -S: Maintained
-> +S: Odd Fixes
->  F: hw/ppc/mac_oldworld.c
->  F: hw/pci-host/grackle.c
->  F: hw/misc/macio/
-> @@ -850,7 +849,6 @@ F: pc-bios/ppc_rom.bin
-> =20
->  sPAPR
->  M: David Gibson <david@gibson.dropbear.id.au>
-> -M: Alexander Graf <agraf@suse.de>
->  L: qemu-ppc@nongnu.org
->  S: Supported
->  F: hw/*/spapr*
-> @@ -1117,7 +1115,7 @@ F: tests/bios-tables-test.c
->  F: tests/acpi-utils.[hc]
-> =20
->  ppc4xx
-> -M: Alexander Graf <agraf@suse.de>
-> +M: David Gibson <david@gibson.dropbear.id.au>
->  L: qemu-ppc@nongnu.org
->  S: Odd Fixes
->  F: hw/ppc/ppc4*.c
-> @@ -1126,9 +1124,9 @@ F: include/hw/ppc/ppc4xx.h
->  F: include/hw/i2c/ppc4xx_i2c.h
-> =20
->  ppce500
-> -M: Alexander Graf <agraf@suse.de>
-> +M: David Gibson <david@gibson.dropbear.id.au>
->  L: qemu-ppc@nongnu.org
-> -S: Supported
-> +S: Odd Fixes
->  F: hw/ppc/e500*
->  F: hw/pci-host/ppce500.c
->  F: hw/net/fsl_etsec/
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---3siQDZowHQqNOShm
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlviSIQACgkQbDjKyiDZ
-s5L5ww/8DuPKb8vYwRSRcXACg90YfJFR56CYcIWbIRWVoitqm7IExwuZlr8TjPQx
-Ouk4aWU8McoMw4d5/F3FrpjIlvSKDGjbhkWB88TgRjpP7LslF5ias79fqWDTYdde
-f4a2ElRUrCk41NfzZzISPsy9SaVl4H5VERND3RPstTAucpY0UcLg/X3DcHOhyF5G
-kprHK2/ZNMkMWOJcNo7RmHkrLepwiSKs+okUgV1Bq2R3YDR2NvWdYR6dmh/PzYyi
-sBX/8S63zaXQIWBJKqzdskQWCM0UfWrlSLUoaAFbLzOujBTIeetZj4kee89i3A5p
-dkwC/QFDzoccFknd8Njn7kpWTQ5ietM0J3oyOXll0RKrFnNJpYPG0b7svleIJJwH
-BM/7LajdvdaGWZ0h2C1xjxECFN3vzcw6IaCcLRBLkSFkA/BvI6DYWC5afHRUnYkT
-5bG7tFWCzCKTbieAkHMAlXVytnR0BbthLf7p4O/ee+A9HhD/2lqWmJwYX5BSRwDP
-MVftKY/CN97NiIybuXETIam3222GZJ7x5kobGUVBaL3XDQFSFBNtXSpGNFRRoWRe
-6oZI+bF91wJzTaGQMbHXWTo3Vj6zkt9an9CJYZpxCvs47oGKASG/EgnrDbATiUR8
-u/+LTlhd9+4xz3YRXv4dtY1RluwXuMJT7QHoiLCaaSUR/5rSNQ4=
-=W6mO
------END PGP SIGNATURE-----
-
---3siQDZowHQqNOShm--
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgxMTA2MTIyMDI1LjM0ODctMS14aWFvZ3Vhbmdyb25nQHRlbmNlbnQuY29t
+ClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMC81XSBtaWdyYXRpb246IGltcHJvdmUg
+bXVsdGl0aHJlYWRzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNF
+PWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWls
+ZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0t
+bG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGht
+IGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFT
+RS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8k
+dG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNo
+b3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNr
+IC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4r
+MSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcg
+M2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5l
+dyBicmFuY2ggJ3Rlc3QnCjY0YWFiZDExYmUgdGVzdHM6IGFkZCB0aHJlYWRlZC13b3JrcXVldWUt
+YmVuY2gKZTllZmM3MGVkZCBtaWdyYXRpb246IHVzZSB0aHJlYWRlZCB3b3JrcXVldWUgZm9yIGRl
+Y29tcHJlc3Npb24KNzc1M2E4NDZhZCBtaWdyYXRpb246IHVzZSB0aHJlYWRlZCB3b3JrcXVldWUg
+Zm9yIGNvbXByZXNzaW9uCmY2OTMzYjUxMzIgdXRpbDogaW50cm9kdWNlIHRocmVhZGVkIHdvcmtx
+dWV1ZQo4MTBjYWFhNTY2IGJpdG9wczogaW50cm9kdWNlIGNoYW5nZV9iaXRfYXRvbWljCgo9PT0g
+T1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzU6IGJpdG9wczogaW50cm9kdWNlIGNo
+YW5nZV9iaXRfYXRvbWljLi4uCkNoZWNraW5nIFBBVENIIDIvNTogdXRpbDogaW50cm9kdWNlIHRo
+cmVhZGVkIHdvcmtxdWV1ZS4uLgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxl
+KHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM0MTogCm5ldyBmaWxlIG1vZGUg
+MTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDU2NiBsaW5lcyBjaGVja2VkCgpZ
+b3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
+aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
+aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDMvNTog
+bWlncmF0aW9uOiB1c2UgdGhyZWFkZWQgd29ya3F1ZXVlIGZvciBjb21wcmVzc2lvbi4uLgpDaGVj
+a2luZyBQQVRDSCA0LzU6IG1pZ3JhdGlvbjogdXNlIHRocmVhZGVkIHdvcmtxdWV1ZSBmb3IgZGVj
+b21wcmVzc2lvbi4uLgpDaGVja2luZyBQQVRDSCA1LzU6IHRlc3RzOiBhZGQgdGhyZWFkZWQtd29y
+a3F1ZXVlLWJlbmNoLi4uCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyks
+IGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzM2OiAKbmV3IGZpbGUgbW9kZSAxMDA2
+NDQKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyMzc6IEZJTEU6IHRlc3RzL3Ro
+cmVhZGVkLXdvcmtxdWV1ZS1iZW5jaC5jOjE5NzoKKyAgICBwcmludGYoIiAgIC1yOiAgICAgICB0
+aGUgbnVtYmVyIG9mIHJlcXVlc3RzIGhhbmRsZWQgYnkgZWFjaCB0aHJlYWQgKGRlZmF1bHQgJWQp
+LlxuIiwKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyMzk6IEZJTEU6IHRlc3Rz
+L3RocmVhZGVkLXdvcmtxdWV1ZS1iZW5jaC5jOjE5OToKKyAgICBwcmludGYoIiAgIC1tOiAgICAg
+ICB0aGUgc2l6ZSBvZiB0aGUgbWVtb3J5IChHKSB1c2VkIHRvIHRlc3QgKGRlZmF1bHQgJWRHKS5c
+biIsCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzI4NTogRklMRTogdGVzdHMvdGhy
+ZWFkZWQtd29ya3F1ZXVlLWJlbmNoLmM6MjQ1OgorICAgIHByaW50ZigiUnVuIHRoZSBiZW5jaG1h
+cms6IHRocmVhZHMgJWQgcmVxdWVzdHMtcGVyLXRocmVhZDogJWQgbWVtb3J5ICVsZEcgcmVwZWF0
+ICVkLlxuIiwKCnRvdGFsOiAxIGVycm9ycywgMyB3YXJuaW5ncywgMjczIGxpbmVzIGNoZWNrZWQK
+CllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
+IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
+dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09
+PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVk
+IGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBz
+ZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
