@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60473)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gKFmF-0005HO-91
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 23:49:16 -0500
+	(envelope-from <armbru@redhat.com>) id 1gKGyK-00034M-C1
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 01:05:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gKFmB-0007PV-Vw
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 23:49:15 -0500
-Date: Wed, 7 Nov 2018 15:48:59 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181107044859.GF5575@umbus.fritz.box>
-References: <20181011061609.11423-1-sjitindarsingh@gmail.com>
+	(envelope-from <armbru@redhat.com>) id 1gKGyJ-00050J-CD
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 01:05:48 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181031003120.26771-1-ehabkost@redhat.com>
+	<20181031003120.26771-12-ehabkost@redhat.com>
+	<CAFEAcA_ScL828ya7P_5=HMx=vbxo=jK4047nAbmb9Ep=6r=2og@mail.gmail.com>
+	<f1bd429f-198a-ee27-9184-636692332816@redhat.com>
+	<20181106141302.GP12503@habkost.net>
+Date: Wed, 07 Nov 2018 07:05:03 +0100
+In-Reply-To: <20181106141302.GP12503@habkost.net> (Eduardo Habkost's message
+	of "Tue, 6 Nov 2018 12:13:02 -0200")
+Message-ID: <87efbxxw1c.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="QXO0/MSS4VvK6f+D"
-Content-Disposition: inline
-In-Reply-To: <20181011061609.11423-1-sjitindarsingh@gmail.com>
-Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH V3 0/3] ppc/spapr: Add support
- for nested kvm-hv
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] tests: Fix Python 3 detection
+ on older GNU make versions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,82 +27,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, paulus@ozlabs.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Cleber Rosa <crosa@redhat.com>, Max Reitz <mreitz@redhat.com>, Philippe =?utf-8?Q?M?= =?utf-8?Q?athieu-Daud=C3=A9?= <philmd@redhat.com>
 
+Eduardo Habkost <ehabkost@redhat.com> writes:
 
---QXO0/MSS4VvK6f+D
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> The $(SHELLSTATUS) variable requires GNU make >= 4.2, but Travis
+> seems to provide an older version.  Change the existing rules to
+> use command output instead of exit code, to make it compatible
+> with older GNU make versions.
+>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+> I think that's the cause of the Travis failures.  I have
+> submitted a test job right now, at:
+>   https://travis-ci.org/ehabkost/qemu-hacks/jobs/451387962
+> Let's see if it fixes the issue.
+> ---
+>  tests/Makefile.include | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index d2e577eabb..074eece558 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -913,8 +913,8 @@ TESTS_RESULTS_DIR=$(BUILD_DIR)/tests/results
+>  # information please refer to "avocado --help".
+>  AVOCADO_SHOW=none
+>  
+> -$(shell $(PYTHON) -c 'import sys; assert sys.version_info >= (3,0)' >/dev/null 2>&1)
+> -ifeq ($(.SHELLSTATUS),0)
+> +PYTHON3 = $(shell $(PYTHON) -c 'import sys; print(1 if sys.version_info >= (3, 0) else 0)')
+> +ifeq ($(PYTHON3), 1)
+>  $(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
+>  	$(call quiet-command, \
+>              $(PYTHON) -m venv --system-site-packages $@, \
 
-On Thu, Oct 11, 2018 at 05:16:06PM +1100, Suraj Jitindar Singh wrote:
-> This patch series adds the qemu support for running nested kvm-hv on a
-> POWER9 platform with appropriate hypervisor support and migration of
-> these guests.
-> That is, the ability to run kvm-hv guests as guests of an operating system
-> which is itself a kvm-hv guest.
->=20
-> The host (L0 hypervisor) and level 1 guest (L1 guest hypervisor) require
-> the following patch series:
-> KVM: PPC: Book3S HV: Nested HV virtualization
->=20
-> And this patch series in the qemu instance running on the L0 hypervisor.
->=20
-> Patch series based on: ppc-for-3.1
->=20
-> The cap number is now in Paolo's tree so hopefully we can rely on it not
-> changing.
+PEP 394 recommends software distributions install Python 3 into the
+default path as python3, and users use that instead of python, except
+for programs that are source compatible with both 2 and 3.  So, is
+finding out whether python is a Python 3 really appropriate?  Why can't
+we just use python3 and be done with it?
 
-Now that the kernel changes are in upstream master, can you resend a
-final version of this?
-
->=20
-> V2 -> V3:
-> - The enable cap ioctl no longer takes an enable field to indicate
->   disable/enable, but just enables the cap. So update to match this
->   kernel change. (The cap starts out disable by default)
->=20
-> Suraj Jitindar Singh (3):
->   target/ppc: Update linux-headers for v4.19-rc7
->   target/ppc: Add one reg id for ptcr
->   ppc/spapr_caps: Add SPAPR_CAP_NESTED_KVM_HV
->=20
->  hw/ppc/spapr.c                  |  2 ++
->  hw/ppc/spapr_caps.c             | 32 ++++++++++++++++++++++++++++++++
->  include/hw/ppc/spapr.h          |  5 ++++-
->  linux-headers/asm-powerpc/kvm.h |  1 +
->  linux-headers/linux/kvm.h       |  1 +
->  target/ppc/kvm.c                | 12 ++++++++++++
->  target/ppc/kvm_ppc.h            | 12 ++++++++++++
->  target/ppc/translate_init.inc.c | 10 +++++-----
->  8 files changed, 69 insertions(+), 6 deletions(-)
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---QXO0/MSS4VvK6f+D
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlvibrsACgkQbDjKyiDZ
-s5IxoA//Z9vkQ7sv9+mDmn6s52lCq1LCQVq645BKu0EB5Yd50W+VpMEjT5DhlFh6
-NgYroVGe2+abNaxzM23SElSEEc7mhrQT3CT25o0AjrCQI79Lx4f4aosFFCTtdUlG
-nZho1ZERyShwsD3ECQUOdk+XaHDYMU7dN9hs8CCivqsf8ImKiskLKs2gNWitEmfn
-aCTI6AuZrccKToqf3+1TdiA9T9Bfhc5Me+vrzx7uEEOWYQvTWrcLnL5VvrBqVRLo
-25e5RR6GfQZOPNr/bdY66dC4ewE+6OY0dKAdeagb4nIqOn2KugbJ3dk1auF83116
-WE4ZzD8/vtZhJv178T23gpemWaLzNMaEhIEn9Ln5rvQHD9XJRw5WiJcwt6rN13IV
-V339wLMbd7owyK5wYuy9COK+2ThzOl3+5Ag/9XsDuGYd/0o1ubP+C0ROFuN5I7p4
-nmHau/6OKvs3JqxaYCkEyZflmdpnZrb42MZVj6tdDkAYHtHEsk72ecfsIdfSlEzo
-aVeHzw2Qf5Nhc5h2Wu7/R4X2WZbDgtnkfn5JsspY393bomJqCbCUmUzQ39j0+YBf
-o+yLM5bQG2B5Yd5M7FqygEcBAXkmjKxQHNaSmy0QreLjNpxZMqa8Ge/S4s93fIV2
-uPAPmjjViiiwoJszxRy0mFOcjch0bI/8y0PNWjoJec9w6XR+YWM=
-=XzI3
------END PGP SIGNATURE-----
-
---QXO0/MSS4VvK6f+D--
+If we can't: isn't this a configure problem?
