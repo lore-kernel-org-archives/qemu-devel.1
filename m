@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41444)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gKWEo-0006B3-Nc
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 17:23:53 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gKWF2-0006GI-ON
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 17:24:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gKWEm-0001iC-EE
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 17:23:50 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34507)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gKWF0-0001r3-Ie
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 17:24:04 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:34714)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1gKWEm-0001hs-3B
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 17:23:48 -0500
-Received: by mail-wr1-x444.google.com with SMTP id j26-v6so19121020wre.1
-	for <qemu-devel@nongnu.org>; Wed, 07 Nov 2018 14:23:48 -0800 (PST)
+	id 1gKWF0-0001qH-5j
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 17:24:02 -0500
+Received: by mail-wm1-x344.google.com with SMTP id f1-v6so208599wmg.1
+	for <qemu-devel@nongnu.org>; Wed, 07 Nov 2018 14:24:02 -0800 (PST)
 MIME-Version: 1.0
 References: <20181019133835.16494-1-berrange@redhat.com>
-	<20181019133835.16494-10-berrange@redhat.com>
-In-Reply-To: <20181019133835.16494-10-berrange@redhat.com>
+	<20181019133835.16494-8-berrange@redhat.com>
+In-Reply-To: <20181019133835.16494-8-berrange@redhat.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 8 Nov 2018 02:23:34 +0400
-Message-ID: <CAJ+F1CKVJphrzaxsYpZCYOey-3uhW1Pn=QNOpNQRE0ZR5wHPhQ@mail.gmail.com>
+Date: Thu, 8 Nov 2018 02:23:48 +0400
+Message-ID: <CAJ+F1CLMtVnKjDJhm29Jx56FLVjeacvjA=8CvteimiYFg05SvA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 09/11] authz: add QAuthZListFile object
- type for a file access control list
+Subject: Re: [Qemu-devel] [PATCH v6 07/11] authz: add QAuthZSimple object
+ type for easy whitelist auth checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,76 +34,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "Daniel P. Berrange" <berrange@redhat.com>
 Cc: QEMU <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, philmd@redhat.com
 
-On Fri, Oct 19, 2018 at 5:42 PM Daniel P. Berrang=C3=A9 <berrange@redhat.co=
+On Fri, Oct 19, 2018 at 5:49 PM Daniel P. Berrang=C3=A9 <berrange@redhat.co=
 m> wrote:
 >
-> Add a QAuthZListFile object type that implements the QAuthZ interface. Th=
-is
-> built-in implementation is a proxy around the QAtuhZList object type,
-> initializing it from an external file, and optionally, automatically
-> reloading it whenever it changes.
+> In many cases a single VM will just need to whilelist a single identity
+> as the allowed user of network services. This is especially the case for
+> TLS live migration (optionally with NBD storage) where we just need to
+> whitelist the x509 certificate distinguished name of the source QEMU
+> host.
 >
-> To create an instance of this object via the QMP monitor, the syntax
-> used would be:
+> Via QMP this can be configured with:
 >
->       {
->         "execute": "object-add",
->         "arguments": {
->           "qom-type": "authz-list-file",
->           "id": "authz0",
->           "parameters": {
->             "filename": "/etc/qemu/vnc.acl",
->             "refresh": "yes"
->           }
->         }
+>   {
+>     "execute": "object-add",
+>     "arguments": {
+>       "qom-type": "authz-simple",
+>       "id": "authz0",
+>       "parameters": {
+>         "identity": "fred"
 >       }
->
-> If "refresh" is "yes", inotify is used to monitor the file,
-> automatically reloading changes. If an error occurs during reloading,
-> all authorizations will fail until the file is next successfully
-> loaded.
->
-> The /etc/qemu/vnc.acl file would contain a JSON representation of a
-> QAuthZList object
->
->     {
->       "rules": [
->          { "match": "fred", "policy": "allow", "format": "exact" },
->          { "match": "bob", "policy": "allow", "format": "exact" },
->          { "match": "danb", "policy": "deny", "format": "glob" },
->          { "match": "dan*", "policy": "allow", "format": "exact" },
->       ],
->       "policy": "deny"
 >     }
+>   }
 >
-> This sets up an authorization rule that allows 'fred', 'bob' and anyone
-> whose name starts with 'dan', except for 'danb'. Everyone unmatched is
-> denied.
+> Or via the command line
 >
-> The object can be loaded on the comand line using
+>   -object authz-simple,id=3Dauthz0,identity=3Dfred
 >
->    -object authz-list-file,id=3Dauthz0,filename=3D/etc/qemu/vnc.acl,refre=
-sh=3Dyes
->
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+(a test would be trivial)
+
 > ---
->  include/authz/listfile.h | 110 +++++++++++++++
->  authz/listfile.c         | 286 +++++++++++++++++++++++++++++++++++++++
->  authz/Makefile.objs      |   1 +
->  authz/trace-events       |   4 +
->  qemu-options.hx          |  46 +++++++
->  5 files changed, 447 insertions(+)
->  create mode 100644 include/authz/listfile.h
->  create mode 100644 authz/listfile.c
+>  include/authz/simple.h |  84 ++++++++++++++++++++++++++++++
+>  authz/simple.c         | 115 +++++++++++++++++++++++++++++++++++++++++
+>  authz/Makefile.objs    |   1 +
+>  authz/trace-events     |   3 ++
+>  qemu-options.hx        |  24 +++++++++
+>  5 files changed, 227 insertions(+)
+>  create mode 100644 include/authz/simple.h
+>  create mode 100644 authz/simple.c
 >
-> diff --git a/include/authz/listfile.h b/include/authz/listfile.h
+> diff --git a/include/authz/simple.h b/include/authz/simple.h
 > new file mode 100644
-> index 0000000000..244aadc064
+> index 0000000000..4686e7676d
 > --- /dev/null
-> +++ b/include/authz/listfile.h
-> @@ -0,0 +1,110 @@
+> +++ b/include/authz/simple.h
+> @@ -0,0 +1,84 @@
 > +/*
-> + * QEMU list file authorization driver
+> + * QEMU simple authorization driver
 > + *
 > + * Copyright (c) 2018 Red Hat, Inc.
 > + *
@@ -123,104 +103,78 @@ nses/>.
 > + *
 > + */
 > +
-> +#ifndef QAUTHZ_LIST_FILE_H__
-> +#define QAUTHZ_LIST_FILE_H__
+> +#ifndef QAUTHZ_SIMPLE_H__
+> +#define QAUTHZ_SIMPLE_H__
 > +
-> +#include "authz/list.h"
-> +#include "qapi/qapi-types-authz.h"
-> +#include "qemu/filemonitor.h"
+> +#include "authz/base.h"
 > +
-> +#define TYPE_QAUTHZ_LIST_FILE "authz-list-file"
+> +#define TYPE_QAUTHZ_SIMPLE "authz-simple"
 > +
-> +#define QAUTHZ_LIST_FILE_CLASS(klass)                        \
-> +    OBJECT_CLASS_CHECK(QAuthZListFileClass, (klass),        \
-> +                       TYPE_QAUTHZ_LIST_FILE)
-> +#define QAUTHZ_LIST_FILE_GET_CLASS(obj)              \
-> +    OBJECT_GET_CLASS(QAuthZListFileClass, (obj),    \
-> +                      TYPE_QAUTHZ_LIST_FILE)
-> +#define QAUTHZ_LIST_FILE(obj) \
-> +    INTERFACE_CHECK(QAuthZListFile, (obj),          \
-> +                    TYPE_QAUTHZ_LIST_FILE)
+> +#define QAUTHZ_SIMPLE_CLASS(klass)                        \
+> +    OBJECT_CLASS_CHECK(QAuthZSimpleClass, (klass),        \
+> +                       TYPE_QAUTHZ_SIMPLE)
+> +#define QAUTHZ_SIMPLE_GET_CLASS(obj)              \
+> +    OBJECT_GET_CLASS(QAuthZSimpleClass, (obj),    \
+> +                      TYPE_QAUTHZ_SIMPLE)
+> +#define QAUTHZ_SIMPLE(obj) \
+> +    INTERFACE_CHECK(QAuthZSimple, (obj),          \
+> +                    TYPE_QAUTHZ_SIMPLE)
 > +
-> +typedef struct QAuthZListFile QAuthZListFile;
-> +typedef struct QAuthZListFileClass QAuthZListFileClass;
+> +typedef struct QAuthZSimple QAuthZSimple;
+> +typedef struct QAuthZSimpleClass QAuthZSimpleClass;
 > +
 > +
 > +/**
-> + * QAuthZListFile:
+> + * QAuthZSimple:
 > + *
-> + * This authorization driver provides a file mechanism
-> + * for granting access by matching user names against a
-> + * file of globs. Each match rule has an associated policy
-> + * and a catch all policy applies if no rule matches
+> + * This authorization driver provides a simple mechanism
+> + * for granting access based on an exact matched username.
 > + *
 > + * To create an instance of this class via QMP:
 > + *
 > + *  {
 > + *    "execute": "object-add",
 > + *    "arguments": {
-> + *      "qom-type": "authz-list-file",
+> + *      "qom-type": "authz-simple",
 > + *      "id": "authz0",
 > + *      "parameters": {
-> + *        "filename": "/etc/qemu/myvm-vnc.acl",
-> + *        "refresh": "yes"
+> + *        "identity": "fred"
 > + *      }
 > + *    }
 > + *  }
 > + *
-> + * If 'refresh' is 'yes', inotify is used to monitor for changes
-> + * to the file and auto-reload the rules.
+> + * Or via the command line
 > + *
-> + * The myvm-vnc.acl file should contain the parameters for
-> + * the QAuthZList object in JSON format:
-> + *
-> + *      {
-> + *        "rules": [
-> + *           { "match": "fred", "policy": "allow", "format": "exact" },
-> + *           { "match": "bob", "policy": "allow", "format": "exact" },
-> + *           { "match": "danb", "policy": "deny", "format": "exact" },
-> + *           { "match": "dan*", "policy": "allow", "format": "glob" }
-> + *        ],
-> + *        "policy": "deny"
-> + *      }
-> + *
-> + * The object can be created on the command line using
-> + *
-> + *   -object authz-list-file,id=3Dauthz0,\
-> + *           filename=3D/etc/qemu/myvm-vnc.acl,refresh=3Dyes
+> + *   -object authz-simple,id=3Dauthz0,identity=3Dfred
 > + *
 > + */
-> +struct QAuthZListFile {
+> +struct QAuthZSimple {
 > +    QAuthZ parent_obj;
 > +
-> +    QAuthZ *list;
-> +    char *filename;
-> +    bool refresh;
-> +    QFileMonitor *file_monitor;
-> +    int file_watch;
+> +    char *identity;
 > +};
 > +
 > +
-> +struct QAuthZListFileClass {
+> +struct QAuthZSimpleClass {
 > +    QAuthZClass parent_class;
 > +};
 > +
 > +
-> +QAuthZListFile *qauthz_list_file_new(const char *id,
-> +                                     const char *filename,
-> +                                     Error **errp);
+> +QAuthZSimple *qauthz_simple_new(const char *id,
+> +                                const char *identity,
+> +                                Error **errp);
 > +
 > +
-> +#endif /* QAUTHZ_LIST_FILE_H__ */
+> +#endif /* QAUTHZ_SIMPLE_H__ */
 > +
-> diff --git a/authz/listfile.c b/authz/listfile.c
+> diff --git a/authz/simple.c b/authz/simple.c
 > new file mode 100644
-> index 0000000000..784bec2b1d
+> index 0000000000..8ab718803e
 > --- /dev/null
-> +++ b/authz/listfile.c
-> @@ -0,0 +1,286 @@
+> +++ b/authz/simple.c
+> @@ -0,0 +1,115 @@
 > +/*
-> + * QEMU access control list file authorization driver
+> + * QEMU simple authorization driver
 > + *
 > + * Copyright (c) 2018 Red Hat, Inc.
 > + *
@@ -241,264 +195,85 @@ nses/>.
 > + */
 > +
 > +#include "qemu/osdep.h"
-> +#include "authz/listfile.h"
+> +#include "authz/simple.h"
 > +#include "authz/trace.h"
-> +#include "qemu/error-report.h"
-> +#include "qemu/main-loop.h"
-> +#include "qemu/sockets.h"
-> +#include "qemu/filemonitor.h"
 > +#include "qom/object_interfaces.h"
-> +#include "qapi/qapi-visit-authz.h"
-> +#include "qapi/qmp/qjson.h"
-> +#include "qapi/qmp/qobject.h"
-> +#include "qapi/qmp/qerror.h"
-> +#include "qapi/qobject-input-visitor.h"
 > +
-> +
-> +static bool
-> +qauthz_list_file_is_allowed(QAuthZ *authz,
-> +                            const char *identity,
-> +                            Error **errp)
+> +static bool qauthz_simple_is_allowed(QAuthZ *authz,
+> +                                     const char *identity,
+> +                                     Error **errp)
 > +{
-> +    QAuthZListFile *fauthz =3D QAUTHZ_LIST_FILE(authz);
-> +    if (fauthz->list) {
-> +        return qauthz_is_allowed(fauthz->list, identity, errp);
-> +    }
+> +    QAuthZSimple *sauthz =3D QAUTHZ_SIMPLE(authz);
 > +
-> +    return false;
-> +}
-> +
-> +
-> +static QAuthZ *
-> +qauthz_list_file_load(QAuthZListFile *fauthz, Error **errp)
-> +{
-> +    GError *err =3D NULL;
-> +    gchar *content =3D NULL;
-> +    gsize len;
-> +    QObject *obj =3D NULL;
-> +    QDict *pdict;
-> +    Visitor *v =3D NULL;
-> +    QAuthZ *ret =3D NULL;
-> +
-> +    trace_qauthz_list_file_load(fauthz, fauthz->filename);
-> +    if (!g_file_get_contents(fauthz->filename, &content, &len, &err)) {
-> +        error_setg(errp, "Unable to read '%s': %s",
-> +                   fauthz->filename, err->message);
-> +        goto cleanup;
-> +    }
-> +
-> +    obj =3D qobject_from_json(content, errp);
-> +    if (!obj) {
-> +        goto cleanup;
-> +    }
-> +
-> +    pdict =3D qobject_to(QDict, obj);
-> +    if (!pdict) {
-> +        error_setg(errp, QERR_INVALID_PARAMETER_TYPE, "obj", "dict");
-> +        goto cleanup;
-> +    }
-> +
-> +    v =3D qobject_input_visitor_new(obj);
-> +
-> +    ret =3D (QAuthZ *)user_creatable_add_type(TYPE_QAUTHZ_LIST,
-> +                                            NULL, pdict, v, errp);
-> +
-> + cleanup:
-> +    visit_free(v);
-> +    qobject_unref(obj);
-> +    if (err) {
-> +        g_error_free(err);
-> +    }
-> +    g_free(content);
-> +    return ret;
-> +}
-> +
-> +
-> +static void
-> +qauthz_list_file_event(int wd G_GNUC_UNUSED,
-> +                       QFileMonitorEvent ev G_GNUC_UNUSED,
-> +                       const char *name G_GNUC_UNUSED,
-> +                       void *opaque)
-> +{
-> +    QAuthZListFile *fauthz =3D opaque;
-> +    Error *err =3D NULL;
-> +
-> +    if (ev !=3D QFILE_MONITOR_EVENT_MODIFIED &&
-> +        ev !=3D QFILE_MONITOR_EVENT_CREATED) {
-> +        return;
-> +    }
-> +
-> +    object_unref(OBJECT(fauthz->list));
-> +    fauthz->list =3D qauthz_list_file_load(fauthz, &err);
-> +    trace_qauthz_list_file_refresh(fauthz,
-> +                                   fauthz->filename, fauthz->list ? 1 : =
-0);
-> +    if (!fauthz->list) {
-> +        error_report_err(err);
-> +    }
+> +    trace_qauthz_simple_is_allowed(authz, sauthz->identity, identity);
+> +    return g_str_equal(identity, sauthz->identity);
 > +}
 > +
 > +static void
-> +qauthz_list_file_complete(UserCreatable *uc, Error **errp)
+> +qauthz_simple_prop_set_identity(Object *obj,
+> +                                const char *value,
+> +                                Error **errp G_GNUC_UNUSED)
 > +{
-> +    QAuthZListFile *fauthz =3D QAUTHZ_LIST_FILE(uc);
-> +    gchar *dir =3D NULL, *file =3D NULL;
+> +    QAuthZSimple *sauthz =3D QAUTHZ_SIMPLE(obj);
 > +
-> +    fauthz->list =3D qauthz_list_file_load(fauthz, errp);
-> +
-> +    if (!fauthz->refresh) {
-> +        return;
-> +    }
-> +
-> +    fauthz->file_monitor =3D qemu_file_monitor_get_instance(errp);
-> +    if (!fauthz->file_monitor) {
-> +        return;
-> +    }
-> +
-> +    dir =3D g_path_get_dirname(fauthz->filename);
-> +    if (g_str_equal(dir, ".")) {
-> +        error_setg(errp, "Filename must be an absolute path");
-> +        goto cleanup;
-> +    }
-> +    file =3D g_path_get_basename(fauthz->filename);
-> +    if (g_str_equal(file, ".")) {
-> +        error_setg(errp, "Path has no trailing filename component");
-> +        goto cleanup;
-> +    }
-> +
-> +    fauthz->file_watch =3D qemu_file_monitor_add_watch(
-> +        fauthz->file_monitor, dir, file,
-> +        qauthz_list_file_event, fauthz, errp);
-> +    if (fauthz->file_watch < 0) {
-> +        goto cleanup;
-> +    }
-> +
-> + cleanup:
-> +    g_free(file);
-> +    g_free(dir);
-> +}
-> +
-> +
-> +static void
-> +qauthz_list_file_prop_set_filename(Object *obj,
-> +                                   const char *value,
-> +                                   Error **errp G_GNUC_UNUSED)
-> +{
-> +    QAuthZListFile *fauthz =3D QAUTHZ_LIST_FILE(obj);
-> +
-> +    fauthz->filename =3D g_strdup(value);
-
-Either prevent from modifying the filename, or free the exisiting value.
-
-other than that (and the lack of test)
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-
+> +    g_free(sauthz->identity);
+> +    sauthz->identity =3D g_strdup(value);
 > +}
 > +
 > +
 > +static char *
-> +qauthz_list_file_prop_get_filename(Object *obj,
-> +                                   Error **errp G_GNUC_UNUSED)
+> +qauthz_simple_prop_get_identity(Object *obj,
+> +                                Error **errp G_GNUC_UNUSED)
 > +{
-> +    QAuthZListFile *fauthz =3D QAUTHZ_LIST_FILE(obj);
+> +    QAuthZSimple *sauthz =3D QAUTHZ_SIMPLE(obj);
 > +
-> +    return g_strdup(fauthz->filename);
+> +    return g_strdup(sauthz->identity);
 > +}
 > +
 > +
 > +static void
-> +qauthz_list_file_prop_set_refresh(Object *obj,
-> +                                  bool value,
-> +                                  Error **errp G_GNUC_UNUSED)
+> +qauthz_simple_finalize(Object *obj)
 > +{
-> +    QAuthZListFile *fauthz =3D QAUTHZ_LIST_FILE(obj);
+> +    QAuthZSimple *sauthz =3D QAUTHZ_SIMPLE(obj);
 > +
-> +    fauthz->refresh =3D value;
-> +}
-> +
-> +
-> +static bool
-> +qauthz_list_file_prop_get_refresh(Object *obj,
-> +                                  Error **errp G_GNUC_UNUSED)
-> +{
-> +    QAuthZListFile *fauthz =3D QAUTHZ_LIST_FILE(obj);
-> +
-> +    return fauthz->refresh;
+> +    g_free(sauthz->identity);
 > +}
 > +
 > +
 > +static void
-> +qauthz_list_file_finalize(Object *obj)
+> +qauthz_simple_class_init(ObjectClass *oc, void *data)
 > +{
-> +    QAuthZListFile *fauthz =3D QAUTHZ_LIST_FILE(obj);
-> +
-> +    if (fauthz->file_watch !=3D -1 && fauthz->file_monitor) {
-> +        gchar *dir =3D g_path_get_dirname(fauthz->filename);
-> +        qemu_file_monitor_remove_watch(fauthz->file_monitor,
-> +                                       dir,
-> +                                       fauthz->file_watch);
-> +        g_free(dir);
-> +    }
-> +    object_unref(OBJECT(fauthz->list));
-> +    g_free(fauthz->filename);
-> +}
-> +
-> +
-> +static void
-> +qauthz_list_file_class_init(ObjectClass *oc, void *data)
-> +{
-> +    UserCreatableClass *ucc =3D USER_CREATABLE_CLASS(oc);
 > +    QAuthZClass *authz =3D QAUTHZ_CLASS(oc);
 > +
-> +    ucc->complete =3D qauthz_list_file_complete;
+> +    authz->is_allowed =3D qauthz_simple_is_allowed;
 > +
-> +    object_class_property_add_str(oc, "filename",
-> +                                  qauthz_list_file_prop_get_filename,
-> +                                  qauthz_list_file_prop_set_filename,
+> +    object_class_property_add_str(oc, "identity",
+> +                                  qauthz_simple_prop_get_identity,
+> +                                  qauthz_simple_prop_set_identity,
 > +                                  NULL);
-> +    object_class_property_add_bool(oc, "refresh",
-> +                                   qauthz_list_file_prop_get_refresh,
-> +                                   qauthz_list_file_prop_set_refresh,
-> +                                   NULL);
-> +
-> +    authz->is_allowed =3D qauthz_list_file_is_allowed;
 > +}
 > +
 > +
-> +static void
-> +qauthz_list_file_init(Object *obj)
+> +QAuthZSimple *qauthz_simple_new(const char *id,
+> +                                const char *identity,
+> +                                Error **errp)
 > +{
-> +    QAuthZListFile *authz =3D QAUTHZ_LIST_FILE(obj);
-> +
-> +    authz->file_watch =3D -1;
-> +#ifdef CONFIG_INOTIFY1
-> +    authz->refresh =3D TRUE;
-> +#endif
-> +}
-> +
-> +
-> +QAuthZListFile *qauthz_list_file_new(const char *id,
-> +                                     const char *filename,
-> +                                     Error **errp)
-> +{
-> +    return QAUTHZ_LIST_FILE(
-> +        object_new_with_props(TYPE_QAUTHZ_LIST_FILE,
+> +    return QAUTHZ_SIMPLE(
+> +        object_new_with_props(TYPE_QAUTHZ_SIMPLE,
 > +                              object_get_objects_root(),
 > +                              id, errp,
-> +                              "filename", filename,
+> +                              "identity", identity,
 > +                              NULL));
 > +}
 > +
 > +
-> +static const TypeInfo qauthz_list_file_info =3D {
-> +    .parent =3D TYPE_QAUTHZ_LIST,
-> +    .name =3D TYPE_QAUTHZ_LIST_FILE,
-> +    .instance_init =3D qauthz_list_file_init,
-> +    .instance_size =3D sizeof(QAuthZListFile),
-> +    .instance_finalize =3D qauthz_list_file_finalize,
-> +    .class_size =3D sizeof(QAuthZListFileClass),
-> +    .class_init =3D qauthz_list_file_class_init,
+> +static const TypeInfo qauthz_simple_info =3D {
+> +    .parent =3D TYPE_QAUTHZ,
+> +    .name =3D TYPE_QAUTHZ_SIMPLE,
+> +    .instance_size =3D sizeof(QAuthZSimple),
+> +    .instance_finalize =3D qauthz_simple_finalize,
+> +    .class_size =3D sizeof(QAuthZSimpleClass),
+> +    .class_init =3D qauthz_simple_class_init,
 > +    .interfaces =3D (InterfaceInfo[]) {
 > +        { TYPE_USER_CREATABLE },
 > +        { }
@@ -507,96 +282,67 @@ Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > +
 > +
 > +static void
-> +qauthz_list_file_register_types(void)
+> +qauthz_simple_register_types(void)
 > +{
-> +    type_register_static(&qauthz_list_file_info);
+> +    type_register_static(&qauthz_simple_info);
 > +}
 > +
 > +
-> +type_init(qauthz_list_file_register_types);
+> +type_init(qauthz_simple_register_types);
 > diff --git a/authz/Makefile.objs b/authz/Makefile.objs
-> index 921fa624d7..8351bf181d 100644
+> index 12597c9528..2a75d53840 100644
 > --- a/authz/Makefile.objs
 > +++ b/authz/Makefile.objs
-> @@ -1,3 +1,4 @@
+> @@ -1 +1,2 @@
 >  authz-obj-y +=3D base.o
->  authz-obj-y +=3D simple.o
->  authz-obj-y +=3D list.o
-> +authz-obj-y +=3D listfile.o
+> +authz-obj-y +=3D simple.o
 > diff --git a/authz/trace-events b/authz/trace-events
-> index a896d876e8..fb65349a90 100644
+> index 481c90f511..1ef796c1e1 100644
 > --- a/authz/trace-events
 > +++ b/authz/trace-events
-> @@ -9,3 +9,7 @@ qauthz_simple_is_allowed(void *authz, const char *wantide=
-ntity, const char *goti
->  # auth/list.c
->  qauthz_list_check_rule(void *authz, const char *identity, const char *ru=
-le, int format, int policy) "AuthZ list %p check rule=3D%s identity=3D%s fo=
-rmat=3D%d policy=3D%d"
->  qauthz_list_default_policy(void *authz, const char *identity, int policy=
-) "AuthZ list %p default identity=3D%s policy=3D%d"
+> @@ -2,3 +2,6 @@
+>
+>  # authz/base.c
+>  qauthz_is_allowed(void *authz, const char *identity, bool allowed) "Auth=
+Z %p check identity=3D%s allowed=3D%d"
 > +
-> +# auth/listfile.c
-> +qauthz_list_file_load(void *authz, const char *filename) "AuthZ file %p =
-load filename=3D%s"
-> +qauthz_list_file_refresh(void *authz, const char *filename, int success)=
- "AuthZ file %p load filename=3D%s success=3D%d"
+> +# auth/simple.c
+> +qauthz_simple_is_allowed(void *authz, const char *wantidentity, const ch=
+ar *gotidentity) "AuthZ simple %p check want identity=3D%s got identity=3D%=
+s"
 > diff --git a/qemu-options.hx b/qemu-options.hx
-> index 68eaf39cc4..a1c3e0e59c 100644
+> index f139459e80..68eaf39cc4 100644
 > --- a/qemu-options.hx
 > +++ b/qemu-options.hx
-> @@ -4401,6 +4401,52 @@ would look like:
->  Note the use of quotes due to the x509 distinguished name containing
->  whitespace, and escaping of ','.
+> @@ -4377,6 +4377,30 @@ e.g to launch a SEV guest
+>       .....
 >
-> +@item -object authz-listfile,id=3D@var{id},filename=3D@var{path},refresh=
-=3D@var{yes|no}
+>  @end example
+> +
+> +
+> +@item -object authz-simple,id=3D@var{id},identity=3D@var{string}
 > +
 > +Create an authorization object that will control access to network servi=
 ces.
 > +
-> +The @option{filename} parameter is the fully qualified path to a file
-> +containing the access control list rules in JSON format.
+> +The @option{identity} parameter is identifies the user and its format
+> +depends on the network service that authorization object is associated
+> +with. For authorizing based on TLS x509 certificates, the identity must
+> +be the x509 distinguished name. Note that care must be taken to escape
+> +any commas in the distinguished name.
 > +
-> +An example set of rules that match against SASL usernames might look
-> +like:
-> +
-> +@example
-> +  @{
-> +    "rules": [
-> +       @{ "match": "fred", "policy": "allow", "format": "exact" @},
-> +       @{ "match": "bob", "policy": "allow", "format": "exact" @},
-> +       @{ "match": "danb", "policy": "deny", "format": "glob" @},
-> +       @{ "match": "dan*", "policy": "allow", "format": "exact" @},
-> +    ],
-> +    "policy": "deny"
-> +  @}
-> +@end example
-> +
-> +When checking access the object will iterate over all the rules and
-> +the first rule to match will have its @option{policy} value returned
-> +as the result. If no rules match, then the default @option{policy}
-> +value is returned.
-> +
-> +The rules can either be an exact string match, or they can use the
-> +simple UNIX glob pattern matching to allow wildcards to be used.
-> +
-> +If @option{refresh} is set to true the file will be monitored
-> +and automatically reloaded whenever its content changes.
-> +
-> +As with the @code{authz-simple} object, the format of the identity
-> +strings being matched depends on the network service, but is usually
-> +a TLS x509 distinguished name, or a SASL username.
-> +
-> +An example authorization object to validate a SASL username
+> +An example authorization object to validate a x509 distinguished name
 > +would look like:
 > +@example
 > + # $QEMU \
 > +     ...
-> +     -object authz-simple,id=3Dauth0,filename=3D/etc/qemu/vnc-sasl.acl,r=
-efresh=3Dyes
+> +     -object 'authz-simple,id=3Dauth0,identity=3DCN=3Dlaptop.example.com=
+,,O=3DExample Org,,L=3DLondon,,ST=3DLondon,,C=3DGB' \
 > +     ...
 > +@end example
+> +
+> +Note the use of quotes due to the x509 distinguished name containing
+> +whitespace, and escaping of ','.
 > +
 >  @end table
 >
