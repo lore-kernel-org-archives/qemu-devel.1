@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54055)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59988)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gKQgS-000528-12
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 11:28:04 -0500
+	(envelope-from <eblake@redhat.com>) id 1gKQv7-0001Gd-6l
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 11:43:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gKQgN-00060D-RX
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 11:27:58 -0500
-Date: Wed, 7 Nov 2018 09:27:21 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20181107092721.6c01f09e@w520.home>
-In-Reply-To: <20181106184212.29377-1-eric.auger@redhat.com>
-References: <20181106184212.29377-1-eric.auger@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1gKQv5-0005eV-Qn
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 11:43:09 -0500
+References: <20181107121319.GC14842@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d797ae29-97ba-9c18-68ec-a2943bdf7728@redhat.com>
+Date: Wed, 7 Nov 2018 10:42:24 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20181107121319.GC14842@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 for-3.1] hw/arm/sysbus-fdt: Only call
- match_fn callback if the type matches
+Subject: Re: [Qemu-devel] Change in qemu 2.12 causes qemu-img convert to NBD
+ to write more data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,78 +24,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, geert+renesas@glider.be, thuth@redhat.com, kraxel@redhat.com
+To: "Richard W.M. Jones" <rjones@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
+Cc: nsoffer@redhat.com
 
-On Tue,  6 Nov 2018 19:42:12 +0100
-Eric Auger <eric.auger@redhat.com> wrote:
+On 11/7/18 6:13 AM, Richard W.M. Jones wrote:
+> (I'm not going to claim this is a bug, but it causes a large, easily
+> measurable performance regression in virt-v2v).
 
-> Commit af7d64ede0b9 (hw/arm/sysbus-fdt: Allow device matching with DT
-> compatible value) introduced a match_fn callback which gets called
-> for each registered combo to check whether a sysbus device can be
-> dynamically instantiated. However the callback gets called even if
-> the device type does not match the binding combo typename field.
-> This causes an assert when passing "-device ramfb" to the qemu
-> command line as vfio_platform_match() gets called on a non
-> vfio-platform device.
-> 
-> To fix this regression, let's change the add_fdt_node() logic so
-> that we first check the type and if the match_fn callback is defined,
-> then we also call it.
-> 
-> Binding combos only requesting a type check do not define the
-> match_fn callback.
-> 
-> Fixes: af7d64ede0b9 (hw/arm/sysbus-fdt: Allow device matching with
-> DT compatible value)
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Reported-by: Thomas Huth <thuth@redhat.com>
+I haven't closely looked at at this email thread yet, but a quick first 
+impression:
 
-The commit this fixes went through the vfio tree, but since the fix
-itself only lives in arm code, I'll leave it to arm maintainers to
-shepherd this fix and offer:
 
-Reviewed-by: Alex Williamson <alex.williamson@redhat.com>
+> In qemu 2.12 this behaviour changed:
+> 
+>    $ nbdkit --filter=log memory size=6G logfile=/tmp/log \
+>        --run './qemu-img convert ./fedora-28.img -n $nbd'
+>    $ grep '\.\.\.$' /tmp/log | sed 's/.*\([A-Z][a-z]*\).*/\1/' | uniq -c
+>        193 Zero
+>       1246 Write
+> 
+> It now zeroes the whole disk up front and then writes data over the
+> top of the zeroed blocks.
+> 
+> The reason for the performance regression is that in the first case we
+> write 6G in total.  In the second case we write 6G of zeroes up front,
+> followed by the amount of data in the disk image (in this case the
+> test disk image contains 1G of non-sparse data, so we write about 7G
+> in total).
 
-> ---
-> 
-> v1 -> v2:
-> - use "if (!iter->match_fn || iter->match_fn(sbdev, iter)) {"
->   as suggested by Peter to avoid code duplication
-> - mention the ramfb regression fixed by this patch in the
->   commit message.
-> ---
->  hw/arm/sysbus-fdt.c | 12 +++++++-----
->  1 file changed, 7 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/arm/sysbus-fdt.c b/hw/arm/sysbus-fdt.c
-> index 0e24c803a1..ad698d4832 100644
-> --- a/hw/arm/sysbus-fdt.c
-> +++ b/hw/arm/sysbus-fdt.c
-> @@ -449,7 +449,7 @@ static bool type_match(SysBusDevice *sbdev, const BindingEntry *entry)
->      return !strcmp(object_get_typename(OBJECT(sbdev)), entry->typename);
->  }
->  
-> -#define TYPE_BINDING(type, add_fn) {(type), NULL, (add_fn), type_match}
-> +#define TYPE_BINDING(type, add_fn) {(type), NULL, (add_fn), NULL}
->  
->  /* list of supported dynamic sysbus bindings */
->  static const BindingEntry bindings[] = {
-> @@ -481,10 +481,12 @@ static void add_fdt_node(SysBusDevice *sbdev, void *opaque)
->      for (i = 0; i < ARRAY_SIZE(bindings); i++) {
->          const BindingEntry *iter = &bindings[i];
->  
-> -        if (iter->match_fn(sbdev, iter)) {
-> -            ret = iter->add_fn(sbdev, opaque);
-> -            assert(!ret);
-> -            return;
-> +        if (type_match(sbdev, iter)) {
-> +            if (!iter->match_fn || iter->match_fn(sbdev, iter)) {
-> +                ret = iter->add_fn(sbdev, opaque);
-> +                assert(!ret);
-> +                return;
-> +            }
->          }
->      }
->      error_report("Device %s can not be dynamically instantiated",
+There was talk on the NBD list a while ago about the idea of letting the 
+server advertise to the client when the image is known to start in an 
+all-zero state, so that the client doesn't have to waste time writing 
+zeroes (or relying on repeated NBD_CMD_BLOCK_STATUS calls to learn the 
+same).  This may be justification for reviving that topic.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
