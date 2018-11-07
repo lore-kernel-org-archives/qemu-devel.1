@@ -1,25 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42122)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gKNHD-0003rQ-7x
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 07:49:44 -0500
+	(envelope-from <berto@igalia.com>) id 1gKNRy-0003eW-FY
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 08:00:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gKNHB-0008Sw-VK
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 07:49:42 -0500
-Date: Wed, 7 Nov 2018 10:49:10 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181107124910.GX12503@habkost.net>
-References: <20181031003120.26771-1-ehabkost@redhat.com>
-	<20181031003120.26771-12-ehabkost@redhat.com>
-	<CAFEAcA_ScL828ya7P_5=HMx=vbxo=jK4047nAbmb9Ep=6r=2og@mail.gmail.com>
-	<f1bd429f-198a-ee27-9184-636692332816@redhat.com>
-	<20181106141302.GP12503@habkost.net>
-	<87efbxxw1c.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87efbxxw1c.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] tests: Fix Python 3 detection
- on older GNU make versions
+	(envelope-from <berto@igalia.com>) id 1gKNRm-0001kv-GI
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 08:00:46 -0500
+From: Alberto Garcia <berto@igalia.com>
+Date: Wed,  7 Nov 2018 14:59:35 +0200
+Message-Id: <cover.1541595424.git.berto@igalia.com>
+Subject: [Qemu-devel] [PATCH v4 00/15] Don't pass flags to
+ bdrv_reopen_queue()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,66 +18,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Cleber Rosa <crosa@redhat.com>, Max Reitz <mreitz@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Wed, Nov 07, 2018 at 07:05:03AM +0100, Markus Armbruster wrote:
-> Eduardo Habkost <ehabkost@redhat.com> writes:
-> 
-> > The $(SHELLSTATUS) variable requires GNU make >= 4.2, but Travis
-> > seems to provide an older version.  Change the existing rules to
-> > use command output instead of exit code, to make it compatible
-> > with older GNU make versions.
-> >
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > ---
-> > I think that's the cause of the Travis failures.  I have
-> > submitted a test job right now, at:
-> >   https://travis-ci.org/ehabkost/qemu-hacks/jobs/451387962
-> > Let's see if it fixes the issue.
-> > ---
-> >  tests/Makefile.include | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/tests/Makefile.include b/tests/Makefile.include
-> > index d2e577eabb..074eece558 100644
-> > --- a/tests/Makefile.include
-> > +++ b/tests/Makefile.include
-> > @@ -913,8 +913,8 @@ TESTS_RESULTS_DIR=$(BUILD_DIR)/tests/results
-> >  # information please refer to "avocado --help".
-> >  AVOCADO_SHOW=none
-> >  
-> > -$(shell $(PYTHON) -c 'import sys; assert sys.version_info >= (3,0)' >/dev/null 2>&1)
-> > -ifeq ($(.SHELLSTATUS),0)
-> > +PYTHON3 = $(shell $(PYTHON) -c 'import sys; print(1 if sys.version_info >= (3, 0) else 0)')
-> > +ifeq ($(PYTHON3), 1)
-> >  $(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
-> >  	$(call quiet-command, \
-> >              $(PYTHON) -m venv --system-site-packages $@, \
-> 
-> PEP 394 recommends software distributions install Python 3 into the
-> default path as python3, and users use that instead of python, except
-> for programs that are source compatible with both 2 and 3.  So, is
-> finding out whether python is a Python 3 really appropriate?  Why can't
-> we just use python3 and be done with it?
+Hi all,
 
-Because './configure --with-python=...' exists, and I didn't want
-to break it.
+when reopening a BlockDriverState using bdrv_reopen() and friends the
+new options can be specified either with a QDict or with flags. Both
+methods overlap and that makes the semantics and the implementation
+unnecessarily complicated.
 
-Now, why do we need --with-python, and why do we need to use
-$(PYTHON) when running tests?  If somebody wants to use a
-different Python binary when running tests, they can already use
-$PATH for that.
+This series removes the 'flags' parameter from these functions, so
+from now on all option changes must be specified using a QDict. Apart
+from simplifying the API, a few bugs are fixed along the way. See the
+individual patches for more details.
 
-(That's the same argument I used for iotests a while ago:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg566631.html)
+This was tested with the current master (4de6bb0c02ad3f0ec48f0f84ba1).
 
-> 
-> If we can't: isn't this a configure problem?
+Regards,
 
-It is, and I think Cleber mentioned that he planned to do it in
-./configure, a while ago.  But just using the python3 binary from
-$PATH would be even better.
+Berto
+
+v4:
+- Patch 14: Don't assert if BDRV_OPT_AUTO_READ_ONLY is missing, e.g.
+  qemu-io -c 'reopen -o auto-read-only=foo' -f raw null-co://
+
+v3: https://lists.gnu.org/archive/html/qemu-block/2018-10/msg00648.html
+- Patch 1 [from v2] has been removed and all other patch numbers are
+  shifted.
+- Patches 10 and 13: Fixed rebase conflicts after the patch removal.
+- Patch 14: Replacement for the removed patch using a different approach.
+- Patch 15: Document a non-obvious call to update_flags_from_options()
+
+v2: https://lists.gnu.org/archive/html/qemu-block/2018-10/msg00534.html
+- Patches 4 and 9: Fixed trivial rebase conflict
+- Patch 11: Update messages [Max]
+- Patch 12: Add comment and use bdrv_is_read_only() instead of
+            using the flags directly [Max]
+- Patch 14: Remove inner block and move all variable declarations to
+            the beginning of the function [Max]
+
+v1: https://lists.gnu.org/archive/html/qemu-block/2018-09/msg00483.html
+- Initial version
+
+Output of backport-diff against v3:
+
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream patch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
+
+001/15:[----] [--] 'block: Add bdrv_reopen_set_read_only()'
+002/15:[----] [--] 'block: Use bdrv_reopen_set_read_only() in bdrv_backing_update_filename()'
+003/15:[----] [--] 'block: Use bdrv_reopen_set_read_only() in commit_start/complete()'
+004/15:[----] [--] 'block: Use bdrv_reopen_set_read_only() in bdrv_commit()'
+005/15:[----] [--] 'block: Use bdrv_reopen_set_read_only() in stream_start/complete()'
+006/15:[----] [--] 'block: Use bdrv_reopen_set_read_only() in qmp_change_backing_file()'
+007/15:[----] [--] 'block: Use bdrv_reopen_set_read_only() in external_snapshot_commit()'
+008/15:[----] [--] 'block: Use bdrv_reopen_set_read_only() in the mirror driver'
+009/15:[----] [--] 'block: Drop bdrv_reopen()'
+010/15:[----] [--] 'qemu-io: Put flag changes in the options QDict in reopen_f()'
+011/15:[----] [--] 'block: Clean up reopen_backing_file() in block/replication.c'
+012/15:[----] [--] 'block: Remove flags parameter from bdrv_reopen_queue()'
+013/15:[----] [--] 'block: Stop passing flags to bdrv_reopen_queue_child()'
+014/15:[0001] [FC] 'block: Remove assertions from update_flags_from_options()'
+015/15:[----] [-C] 'block: Assert that flags are up-to-date in bdrv_reopen_prepare()'
+
+Alberto Garcia (15):
+  block: Add bdrv_reopen_set_read_only()
+  block: Use bdrv_reopen_set_read_only() in
+    bdrv_backing_update_filename()
+  block: Use bdrv_reopen_set_read_only() in commit_start/complete()
+  block: Use bdrv_reopen_set_read_only() in bdrv_commit()
+  block: Use bdrv_reopen_set_read_only() in stream_start/complete()
+  block: Use bdrv_reopen_set_read_only() in qmp_change_backing_file()
+  block: Use bdrv_reopen_set_read_only() in external_snapshot_commit()
+  block: Use bdrv_reopen_set_read_only() in the mirror driver
+  block: Drop bdrv_reopen()
+  qemu-io: Put flag changes in the options QDict in reopen_f()
+  block: Clean up reopen_backing_file() in block/replication.c
+  block: Remove flags parameter from bdrv_reopen_queue()
+  block: Stop passing flags to bdrv_reopen_queue_child()
+  block: Remove assertions from update_flags_from_options()
+  block: Assert that flags are up-to-date in bdrv_reopen_prepare()
+
+ block.c                    | 89 ++++++++++++++++++++--------------------------
+ block/commit.c             | 23 +++++-------
+ block/mirror.c             | 19 ++++++----
+ block/replication.c        | 43 ++++++++++------------
+ block/stream.c             | 20 +++++------
+ blockdev.c                 | 11 ++----
+ include/block/block.h      |  6 ++--
+ qemu-io-cmds.c             | 29 +++++++++++++--
+ tests/qemu-iotests/133     | 17 +++++++++
+ tests/qemu-iotests/133.out | 14 ++++++++
+ 10 files changed, 153 insertions(+), 118 deletions(-)
 
 -- 
-Eduardo
+2.11.0
