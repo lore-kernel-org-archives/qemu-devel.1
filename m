@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46485)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gKSwv-0001y4-G2
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 13:53:10 -0500
+	(envelope-from <bounces@canonical.com>) id 1gKSSe-0001tA-GF
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 13:21:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gKSwr-0002p6-37
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 13:53:09 -0500
-Received: from mail-pl1-x62a.google.com ([2607:f8b0:4864:20::62a]:41788)
+	(envelope-from <bounces@canonical.com>) id 1gKSMg-0001js-AH
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 13:15:47 -0500
+Received: from indium.canonical.com ([91.189.90.7]:44400)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gKSwq-0002oa-MD
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 13:53:05 -0500
-Received: by mail-pl1-x62a.google.com with SMTP id p16-v6so8265504plr.8
-	for <qemu-devel@nongnu.org>; Wed, 07 Nov 2018 10:53:04 -0800 (PST)
-Date: Wed, 07 Nov 2018 10:53:02 -0800 (PST)
-In-Reply-To: <CAFEAcA9pvsNML+=2jwygO4ciJWr0GmWHznJ-Lb1bcOsWhYjo4A@mail.gmail.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-7f896ae0-6a2e-4a51-a80c-f7e594224624@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] List of files containing devices which have not
- been QOMified
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gKSMe-0001h6-Hs
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 13:15:40 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gKSMc-0005Bj-G1
+	for <qemu-devel@nongnu.org>; Wed, 07 Nov 2018 18:15:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 5A7F92E80CD
+	for <qemu-devel@nongnu.org>; Wed,  7 Nov 2018 18:15:38 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 07 Nov 2018 18:06:55 -0000
+From: Dan Midthun <dan.midthun@gmail.com>
+Reply-To: Bug 1802150 <1802150@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <154161401577.19796.10798182190360171804.malonedeb@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1802150] [NEW] Guest undefined when destroyed on
+ host after migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +36,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On Tue, 06 Nov 2018 10:43:17 PST (-0800), Peter Maydell wrote:
-> I had an idea for how to get a rough list of source files
-> containing devices that haven't been QOMified. The theory
-> is that a pre-QOM device generally has an "init" function
-> which allocates memory for the device struct. So looking in
-> hw/ for files which call g_new*() or g_malloc*() should get
-> us all the non-QOM devices (as well as a pile of false
-> positives, of course). The following link is the result of
-> doing that and then eyeballing the results for false positives
-> and throwing those out. It might have missed one or two
-> files or included one or two by mistake. But I think it's
-> pretty close, and it seems to have caught all the obvious
-> ones I knew about. There are 61 files on this list.
->
-> I am also suspicious about hw/bt/ but don't know enough
-> about that subsystem to say if it could benefit from
-> using QOM objects more.
->
-> [...]
->
-> hw/riscv/riscv_htif.c
-> hw/riscv/sifive_uart.c
+Public bug reported:
 
-I poked around at it looks like both of these are valid targets for a QOM 
-conversion, and I think the UART in particular would be meaningfully more 
-useful with a conversion.  I'll add it to my TODO list, but I'm not sure how 
-long it'll take to get around to it -- sorry!
+After a live migration, guest VMs are being undefined from the host they
+were migrated to after shutdown. I have experienced this at two (2)
+separate locations on more than one hardware configuration.  This
+happens when utilizing virt-manager to view current allocations on
+hosts, and virsh on the CLI to migrate guests.  When the guest is
+migrated from one host to another, no errors are thrown, and only lose 1
+packet from infinite ping. Shutting guest down *from* the guest OS
+results in the Guest VM being undefined on the residing host, and XML
+config lost.  If needed, I can provide a recorded session of this
+happening.
 
-Thanks for pointing this out!
+Thanks,
+  Dan
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1802150
+
+Title:
+  Guest undefined when destroyed on host after migration
+
+Status in QEMU:
+  New
+
+Bug description:
+  After a live migration, guest VMs are being undefined from the host
+  they were migrated to after shutdown. I have experienced this at two
+  (2) separate locations on more than one hardware configuration.  This
+  happens when utilizing virt-manager to view current allocations on
+  hosts, and virsh on the CLI to migrate guests.  When the guest is
+  migrated from one host to another, no errors are thrown, and only lose
+  1 packet from infinite ping. Shutting guest down *from* the guest OS
+  results in the Guest VM being undefined on the residing host, and XML
+  config lost.  If needed, I can provide a recorded session of this
+  happening.
+
+  Thanks,
+    Dan
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1802150/+subscriptions
