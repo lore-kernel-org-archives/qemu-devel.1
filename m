@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50460)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb413@gmail.com>) id 1gKNbh-0006t3-7H
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 08:10:54 -0500
+	(envelope-from <bounces@canonical.com>) id 1gKI9D-0003Nm-P5
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 02:21:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb413@gmail.com>) id 1gKNbb-0002uu-9I
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 08:10:49 -0500
-Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:40382)
+	(envelope-from <bounces@canonical.com>) id 1gKI9A-0002qW-AB
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 02:21:07 -0500
+Received: from indium.canonical.com ([91.189.90.7]:55950)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <danielhb413@gmail.com>)
-	id 1gKNba-0002Hr-TN
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 08:10:47 -0500
-Received: by mail-qk1-x743.google.com with SMTP id y16so19417748qki.7
-	for <qemu-devel@nongnu.org>; Wed, 07 Nov 2018 05:10:29 -0800 (PST)
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
-Date: Wed,  7 Nov 2018 11:10:00 -0200
-Message-Id: <20181107131000.27744-4-danielhb413@gmail.com>
-In-Reply-To: <20181107131000.27744-1-danielhb413@gmail.com>
-References: <20181107131000.27744-1-danielhb413@gmail.com>
-Subject: [Qemu-devel] [PATCH for-3.2 v3 3/3] qcow2-snapshot: remove
- redundant find_snapshot_by_id_and_name call
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gKI99-0002Tr-Qc
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 02:21:04 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gKI92-0004n0-IX
+	for <qemu-devel@nongnu.org>; Wed, 07 Nov 2018 07:20:56 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 9D6862E80CF
+	for <qemu-devel@nongnu.org>; Wed,  7 Nov 2018 07:20:55 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 07 Nov 2018 07:06:15 -0000
+From: Berg Lloyd-Haig <berglh@gmail.com>
+Reply-To: Bug 1794939 <1794939@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153812537329.31017.17111716065357847976.malonedeb@chaenomeles.canonical.com>
+Message-Id: <154157437566.20032.7015190072098086241.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1794939] Re: QEMU does not build with vte v2.91
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,82 +37,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, Daniel Henrique Barboza <danielhb413@gmail.com>
 
-In qcow2_snapshot_create there is the following code block:
+Hi Bastian,
 
-    /* Generate an ID */
-    find_new_snapshot_id(bs, sn_info->id_str, sizeof(sn_info->id_str));
+I got past this error by installing libvte-dev instead of
+libvte-2.91-dev.
 
-    /* Check that the ID is unique */
-    if (find_snapshot_by_id_and_name(bs, sn_info->id_str, NULL) >= 0) {
-        return -EEXIST;
-    }
+I'm not sure if it actually works however.
 
-find_new_snapshot_id cycles through all snapshots, getting the id_str
-as an unsigned long int, calculating the max id_max value of all the
-existing id_strs and writing in the id_str pointer id_max + 1:
+Cheers,
+Berg
 
-    for(i = 0; i < s->nb_snapshots; i++) {
-        sn = s->snapshots + i;
-        id = strtoul(sn->id_str, NULL, 10);
-        if (id > id_max)
-            id_max = id;
-    }
-    snprintf(id_str, id_str_size, "%lu", id_max + 1);
+-- =
 
-Here, sn_info->id_str will have the unique value id_max + 1. Right
-after that, find_snapshot_by_id_and_name is called with
-id = sn_info->id_str and name = NULL. This will cause the function
-to execute the following:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1794939
 
-    } else if (id) {
-        for (i = 0; i < s->nb_snapshots; i++) {
-            if (!strcmp(s->snapshots[i].id_str, id)) {
-                return i;
-            }
-        }
-    }
+Title:
+  QEMU does not build with vte v2.91
 
-In short, we're searching the existing snapshots to see if sn_info->id_str
-matches any existing id, right after we set in the previous line a
-sn_info->id_str value that is already unique.
+Status in QEMU:
+  New
 
-The first code block goes way back to commit 585f8587ad, a 2006 commit from
-Fabrice Bellard that simply says "new qcow2 disk image format". No more
-info is provided about this logic in any subsequent commits that moved
-this code block around.
+Bug description:
+  when I build qemu with vte support and vte-2.91 installed I get the
+  following deprecation warning:
 
-I can't say about the original design, but the current logic is redundant.
-bdrv_snapshot_create is called in aio_context lock, forbidding any
-concurrent call to accidentally create a new snapshot between
-the find_new_snapshot_id and find_snapshot_by_id_and_name calls. What
-we're ending up doing is to cycle through the snapshots two times
-for no viable reason.
+  error: =E2=80=98vte_terminal_set_encoding=E2=80=99 is deprecated [-Werror=
+=3Ddeprecated-declarations]
+       vte_terminal_set_encoding(VTE_TERMINAL(vc->vte.terminal), "UTF-8", N=
+ULL);
+       ^~~~~~~~~~~~~~~~~~~~~~~~~
+  In file included from /usr/include/vte-2.91/vte/vte.h:35
 
-This patch eliminates the redundancy by removing the 'id is unique'
-check that calls find_snapshot_by_id_and_name.
+  I looked for the commit in vte that deprecated the offending function
+  (a17e714d), which led me to the thread:
 
-Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
----
- block/qcow2-snapshot.c | 5 -----
- 1 file changed, 5 deletions(-)
+  https://gitlab.gnome.org/GNOME/vte/issues/3
 
-diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
-index bb6a5b7516..20e8472191 100644
---- a/block/qcow2-snapshot.c
-+++ b/block/qcow2-snapshot.c
-@@ -358,11 +358,6 @@ int qcow2_snapshot_create(BlockDriverState *bs, QEMUSnapshotInfo *sn_info)
-     /* Generate an ID */
-     find_new_snapshot_id(bs, sn_info->id_str, sizeof(sn_info->id_str));
- 
--    /* Check that the ID is unique */
--    if (find_snapshot_by_id_and_name(bs, sn_info->id_str, NULL) >= 0) {
--        return -EEXIST;
--    }
--
-     /* Populate sn with passed data */
-     sn->id_str = g_strdup(sn_info->id_str);
-     sn->name = g_strdup(sn_info->name);
--- 
-2.17.2
+  It looks like from this version forward vte forces us to use utf-8,
+  such that this function call becomes unnecessary in QEMU.
+
+  Cheers,
+  Bastian
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1794939/+subscriptions
