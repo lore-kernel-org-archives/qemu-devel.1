@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59383)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gKFkG-0002Ky-Mi
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 23:47:13 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gKFmF-0005HO-91
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 23:49:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gKFk8-0007BU-Bi
-	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 23:47:08 -0500
-Date: Wed, 7 Nov 2018 15:46:35 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gKFmB-0007PV-Vw
+	for qemu-devel@nongnu.org; Tue, 06 Nov 2018 23:49:15 -0500
+Date: Wed, 7 Nov 2018 15:48:59 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181107044635.GE5575@umbus.fritz.box>
-References: <153933509870.3834759.13291133122604475240.stgit@bahia.lan>
-	<153933511983.3834759.10815543413375425072.stgit@bahia.lan>
-	<e77c6869-d89e-c5df-c43f-a2b5df3fbf59@ozlabs.ru>
+Message-ID: <20181107044859.GF5575@umbus.fritz.box>
+References: <20181011061609.11423-1-sjitindarsingh@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="sfyO1m2EN8ZOtJL6"
+	protocol="application/pgp-signature"; boundary="QXO0/MSS4VvK6f+D"
 Content-Disposition: inline
-In-Reply-To: <e77c6869-d89e-c5df-c43f-a2b5df3fbf59@ozlabs.ru>
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] spapr_pci: rename some structured
- types
+In-Reply-To: <20181011061609.11423-1-sjitindarsingh@gmail.com>
+Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH V3 0/3] ppc/spapr: Add support
+ for nested kvm-hv
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,51 +24,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, paulus@ozlabs.org
 
 
---sfyO1m2EN8ZOtJL6
+--QXO0/MSS4VvK6f+D
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 15, 2018 at 12:49:53PM +1100, Alexey Kardashevskiy wrote:
+On Thu, Oct 11, 2018 at 05:16:06PM +1100, Suraj Jitindar Singh wrote:
+> This patch series adds the qemu support for running nested kvm-hv on a
+> POWER9 platform with appropriate hypervisor support and migration of
+> these guests.
+> That is, the ability to run kvm-hv guests as guests of an operating system
+> which is itself a kvm-hv guest.
 >=20
+> The host (L0 hypervisor) and level 1 guest (L1 guest hypervisor) require
+> the following patch series:
+> KVM: PPC: Book3S HV: Nested HV virtualization
 >=20
-> On 12/10/2018 20:05, Greg Kurz wrote:
-> > According to CODING_STYLE, structured types names are expected to be
-> > in CamelCase but we have:
-> >=20
-> > typedef struct spapr_pci_msi {
-> >     uint32_t first_irq;
-> >     uint32_t num;
-> > } spapr_pci_msi;
-> >=20
-> > typedef struct spapr_pci_msi_mig {
-> >     uint32_t key;
-> >     spapr_pci_msi value;
-> > } spapr_pci_msi_mig;
-> >=20
-> > Acronyms are often written in upper-case, but here we would en up with
-> > a lot of upper-case letters in a row (ie, sPAPRPCIMSI) which defeats the
-> > purpose of CamelCase. It even displays "RPC" which looks awkward.
+> And this patch series in the qemu instance running on the L0 hypervisor.
 >=20
-> Yet more common than this. I vote for sPAPRPCIMSI as PCI is an acronym.
-> "pci" is small letters hurts my eyes :)
+> Patch series based on: ppc-for-3.1
+>=20
+> The cap number is now in Paolo's tree so hopefully we can rely on it not
+> changing.
 
-Hrm.  So, yes, I know I kind of started it, but these various
-compromises about how to captialize things means this patch is now
-"change from non-camelcase to.. something that's also not really
-camelcase".
+Now that the kernel changes are in upstream master, can you resend a
+final version of this?
 
-At which point I'm not particularly convinced it's worth the bother.
-
-If we really want to go ahead with CamelCasing this, I think we'd need
-to start by fixing up the existing sorta-camelcase-but-not-really
-stuff to actual camelcase.  Which would mean the slightly odd reading
-"Spapr" and "Pci" and "Msi" and so forth, but it might be worth it for
-consistency.
+>=20
+> V2 -> V3:
+> - The enable cap ioctl no longer takes an enable field to indicate
+>   disable/enable, but just enables the cap. So update to match this
+>   kernel change. (The cap starts out disable by default)
+>=20
+> Suraj Jitindar Singh (3):
+>   target/ppc: Update linux-headers for v4.19-rc7
+>   target/ppc: Add one reg id for ptcr
+>   ppc/spapr_caps: Add SPAPR_CAP_NESTED_KVM_HV
+>=20
+>  hw/ppc/spapr.c                  |  2 ++
+>  hw/ppc/spapr_caps.c             | 32 ++++++++++++++++++++++++++++++++
+>  include/hw/ppc/spapr.h          |  5 ++++-
+>  linux-headers/asm-powerpc/kvm.h |  1 +
+>  linux-headers/linux/kvm.h       |  1 +
+>  target/ppc/kvm.c                | 12 ++++++++++++
+>  target/ppc/kvm_ppc.h            | 12 ++++++++++++
+>  target/ppc/translate_init.inc.c | 10 +++++-----
+>  8 files changed, 69 insertions(+), 6 deletions(-)
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -78,24 +82,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---sfyO1m2EN8ZOtJL6
+--QXO0/MSS4VvK6f+D
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlvibioACgkQbDjKyiDZ
-s5KY/BAAktrzJIRvnQRTKKq9J0tT3rMQ0Slb8FRvBEXQ4AmGhcCn4Mz1WG7e8sgk
-PC/GMPdem9iJf4AIUiJ+2J/MCpZ18JIf2rgiSudB3ItMnIppBUZG4mmCIPSsrKcL
-e5A3Ps0DSV84vncywRp8KYP7eBKv4Jb3j7PTLej2CigdxSCTpfs7YK1g15XzE42B
-+njgWo7EWPF4ij6dmK5TkDscFPhJtqkx5i6p16RjQJWkU1tK8wItTd3r0Q2CC7DH
-Zidgp8M1kUDJ/AxaCQffR2f7A5eZhskqirh0VjD+0pcf3xeyZ7c/hx/bcCMxV63a
-7LatJkZb8Dv9kuBNTHsTJGzCk87feVkgTVTWWF1Z5207y8Xm9f0ratsJTeuHd4MU
-iyrmx4GLQ5rp1JTWcqhgPjWt31PE16suQiSsa5q0kApRXOepS6q/YrTqoTixSBMq
-brS4eoknUPEhNgrVRrJ9YhIPI1nRUFA4LsYNfxPe/Ko7ED/QqX2EGZoYEOB6WcqB
-PLq/PYMoZYVIqbujx91XSvBKVHnchkF/9AWt6N6ZHyvrskR6VLdUFRh2aWnvI9ox
-z9uFPbpr+5TIl/s8cf/4mWR996Tgs72U/0yrDLSX+xCVI38FAD0iNw0z2E89gbhh
-jwa3ZTJmEs9RJmqPL8VYMfnv05wo1llHNk07IJ1zeJqDREcY4Ko=
-=O9Rf
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlvibrsACgkQbDjKyiDZ
+s5IxoA//Z9vkQ7sv9+mDmn6s52lCq1LCQVq645BKu0EB5Yd50W+VpMEjT5DhlFh6
+NgYroVGe2+abNaxzM23SElSEEc7mhrQT3CT25o0AjrCQI79Lx4f4aosFFCTtdUlG
+nZho1ZERyShwsD3ECQUOdk+XaHDYMU7dN9hs8CCivqsf8ImKiskLKs2gNWitEmfn
+aCTI6AuZrccKToqf3+1TdiA9T9Bfhc5Me+vrzx7uEEOWYQvTWrcLnL5VvrBqVRLo
+25e5RR6GfQZOPNr/bdY66dC4ewE+6OY0dKAdeagb4nIqOn2KugbJ3dk1auF83116
+WE4ZzD8/vtZhJv178T23gpemWaLzNMaEhIEn9Ln5rvQHD9XJRw5WiJcwt6rN13IV
+V339wLMbd7owyK5wYuy9COK+2ThzOl3+5Ag/9XsDuGYd/0o1ubP+C0ROFuN5I7p4
+nmHau/6OKvs3JqxaYCkEyZflmdpnZrb42MZVj6tdDkAYHtHEsk72ecfsIdfSlEzo
+aVeHzw2Qf5Nhc5h2Wu7/R4X2WZbDgtnkfn5JsspY393bomJqCbCUmUzQ39j0+YBf
+o+yLM5bQG2B5Yd5M7FqygEcBAXkmjKxQHNaSmy0QreLjNpxZMqa8Ge/S4s93fIV2
+uPAPmjjViiiwoJszxRy0mFOcjch0bI/8y0PNWjoJec9w6XR+YWM=
+=XzI3
 -----END PGP SIGNATURE-----
 
---sfyO1m2EN8ZOtJL6--
+--QXO0/MSS4VvK6f+D--
