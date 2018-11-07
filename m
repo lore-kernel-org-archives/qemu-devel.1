@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35501)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41225)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <george.kennedy@oracle.com>) id 1gKW00-0004ov-6x
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 17:08:33 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gKWEh-00068k-DG
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 17:23:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <george.kennedy@oracle.com>) id 1gKVzt-0006sB-B5
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 17:08:29 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:50240)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <george.kennedy@oracle.com>)
-	id 1gKVzs-0006dd-MN
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 17:08:25 -0500
-From: George Kennedy <george.kennedy@oracle.com>
-Date: Wed,  7 Nov 2018 17:04:47 -0500
-Message-Id: <1541628287-11627-1-git-send-email-george.kennedy@oracle.com>
-Subject: [Qemu-devel] [PATCH v6] lsi: Reselection needed to remove pending
- commands from queue
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gKWEd-0001ch-TI
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 17:23:43 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51254)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1gKWEd-0001YR-F0
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 17:23:39 -0500
+Received: by mail-wm1-x343.google.com with SMTP id w7-v6so15563949wmc.1
+	for <qemu-devel@nongnu.org>; Wed, 07 Nov 2018 14:23:32 -0800 (PST)
+MIME-Version: 1.0
+References: <20181019133835.16494-1-berrange@redhat.com>
+	<20181019133835.16494-11-berrange@redhat.com>
+In-Reply-To: <20181019133835.16494-11-berrange@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 8 Nov 2018 02:23:18 +0400
+Message-ID: <CAJ+F1CKVcjqTahNUW144Uhnh48=yAghdhBscFWh_f3HQWThWRg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 10/11] authz: add QAuthZPAM object type
+ for authorizing using PAM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,136 +31,511 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, boris.ostrovsky@oracle.com
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, philmd@redhat.com
 
-Under heavy IO (e.g. fio) the queue is not checked frequently enough for
-pending commands. As a result some pending commands are timed out by the
-linux sym53c8xx driver, which sends SCSI Abort messages for the timed out
-commands. The SCSI Abort messages result in linux errors, which show up
-on the console and in /var/log/messages.
+Hi
 
-e.g.
-sd 0:0:3:0: [sdd] tag#33 ABORT operation started
-scsi target0:0:3: control msgout:
-80 20 47 d
-sd 0:0:3:0: ABORT operation complete.
-scsi target0:0:4: message d sent on bad reselection
+On Fri, Oct 19, 2018 at 5:47 PM Daniel P. Berrang=C3=A9 <berrange@redhat.co=
+m> wrote:
+>
+> From: "Daniel P. Berrange" <berrange@redhat.com>
+>
+> Add an authorization backend that talks to PAM to check whether the user
+> identity is allowed. This only uses the PAM account validation facility,
+> which is essentially just a check to see if the provided username is perm=
+itted
+> access. It doesn't use the authentication or session parts of PAM, since
+> that's dealt with by the relevant part of QEMU (eg VNC server).
+>
+> Consider starting QEMU with a VNC server and telling it to use TLS with
+> x509 client certificates and configuring it to use an PAM to validate
+> the x509 distinguished name. In this example we're telling it to use PAM
+> for the QAuthZ impl with a service name of "qemu-vnc"
+>
+>  $ qemu-system-x86_64 \
+>      -object tls-creds-x509,id=3Dtls0,dir=3D/home/berrange/security/qemut=
+ls,\
+>              endpoint=3Dserver,verify-peer=3Dyes \
+>      -object authz-pam,id=3Dauthz0,service=3Dqemu-vnc \
+>      -vnc :1,tls-creds=3Dtls0,tls-authz=3Dauthz0
+>
+> This requires an /etc/pam/qemu-vnc file to be created with the auth
+> rules. A very simple file based whitelist can be setup using
+>
+>   $ cat > /etc/pam/qemu-vnc <<EOF
+>   account         requisite       pam_listfile.so item=3Duser sense=3Dall=
+ow file=3D/etc/qemu/vnc.allow
+>   EOF
+>
+> The /etc/qemu/vnc.allow file simply contains one username per line. Any
+> username not in the file is denied. The usernames in this example are
+> the x509 distinguished name from the client's x509 cert.
+>
+>   $ cat > /etc/qemu/vnc.allow <<EOF
+>   CN=3Dlaptop.berrange.com,O=3DBerrange Home,L=3DLondon,ST=3DLondon,C=3DG=
+B
+>   EOF
+>
+> More interesting would be to configure PAM to use an LDAP backend, so
+> that the QEMU authorization check data can be centralized instead of
+> requiring each compute host to have file maintained.
+>
+> The main limitation with this PAM module is that the rules apply to all
+> QEMU instances on the host. Setting up different rules per VM, would
+> require creating a separate PAM service name & config file for every
+> guest. An alternative approach for the future might be to not pass in
+> the plain username to PAM, but instead combine the VM name or UUID with
+> the username. This requires further consideration though.
+>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  configure               |  37 ++++++++++
+>  include/authz/pamacct.h | 100 +++++++++++++++++++++++++++
+>  authz/pamacct.c         | 149 ++++++++++++++++++++++++++++++++++++++++
+>  authz/Makefile.objs     |   3 +
+>  authz/trace-events      |   3 +
+>  qemu-options.hx         |  35 ++++++++++
+>  6 files changed, 327 insertions(+)
+>  create mode 100644 include/authz/pamacct.h
+>  create mode 100644 authz/pamacct.c
+>
+> diff --git a/configure b/configure
+> index 9138af37f8..db35d52e12 100755
+> --- a/configure
+> +++ b/configure
+> @@ -463,6 +463,7 @@ nettle_kdf=3D"no"
+>  gcrypt=3D""
+>  gcrypt_hmac=3D"no"
+>  gcrypt_kdf=3D"no"
+> +auth_pam=3D""
+>  vte=3D""
+>  virglrenderer=3D""
+>  tpm=3D"yes"
+> @@ -1361,6 +1362,10 @@ for opt do
+>    ;;
+>    --enable-gcrypt) gcrypt=3D"yes"
+>    ;;
+> +  --disable-auth-pam) auth_pam=3D"no"
+> +  ;;
+> +  --enable-auth-pam) auth_pam=3D"yes"
+> +  ;;
+>    --enable-rdma) rdma=3D"yes"
+>    ;;
+>    --disable-rdma) rdma=3D"no"
+> @@ -1653,6 +1658,7 @@ disabled with --disable-FEATURE, default is enabled=
+ if available:
+>    gnutls          GNUTLS cryptography support
+>    nettle          nettle cryptography support
+>    gcrypt          libgcrypt cryptography support
+> +  auth-pam        PAM access control
+>    sdl             SDL UI
+>    --with-sdlabi     select preferred SDL ABI 1.2 or 2.0
+>    gtk             gtk UI
+> @@ -2876,6 +2882,33 @@ else
+>  fi
+>
+>
+> +##########################################
+> +# PAM probe
+> +
+> +if test "x$auth_pam" !=3D "no"; then
+> +    cat > $TMPC <<EOF
+> +#include <security/pam_appl.h>
+> +#include <stdio.h>
+> +int main(void) {
+> +   const char *service_name =3D "qemu";
+> +   const char *user =3D "frank";
+> +   const struct pam_conv *pam_conv =3D NULL;
+> +   pam_handle_t *pamh =3D NULL;
+> +   pam_start(service_name, user, pam_conv, &pamh);
+> +   return 0;
+> +}
+> +EOF
+> +    if compile_prog "" "-lpam" ; then
+> +       auth_pam=3Dyes
+> +    else
+> +       if test "$auth_pam" =3D "yes"; then
+> +           feature_not_found "PAM" "Install PAM development package"
+> +       else
+> +           auth_pam=3Dno
+> +       fi
+> +    fi
+> +fi
+> +
+>  ##########################################
+>  # getifaddrs (for tests/test-io-channel-socket )
+>
+> @@ -5967,6 +6000,7 @@ echo "libgcrypt kdf     $gcrypt_kdf"
+>  echo "nettle            $nettle $(echo_version $nettle $nettle_version)"
+>  echo "nettle kdf        $nettle_kdf"
+>  echo "libtasn1          $tasn1"
+> +echo "PAM               $auth_pam"
+>  echo "curses support    $curses"
+>  echo "virgl support     $virglrenderer $(echo_version $virglrenderer $vi=
+rgl_version)"
+>  echo "curl support      $curl"
+> @@ -6423,6 +6457,9 @@ fi
+>  if test "$tasn1" =3D "yes" ; then
+>    echo "CONFIG_TASN1=3Dy" >> $config_host_mak
+>  fi
+> +if test "$auth_pam" =3D "yes" ; then
+> +    echo "CONFIG_AUTH_PAM=3Dy" >> $config_host_mak
+> +fi
+>  if test "$have_ifaddrs_h" =3D "yes" ; then
+>      echo "HAVE_IFADDRS_H=3Dy" >> $config_host_mak
+>  fi
+> diff --git a/include/authz/pamacct.h b/include/authz/pamacct.h
+> new file mode 100644
+> index 0000000000..d2c0149153
+> --- /dev/null
+> +++ b/include/authz/pamacct.h
+> @@ -0,0 +1,100 @@
+> +/*
+> + * QEMU PAM authorization driver
+> + *
+> + * Copyright (c) 2018 Red Hat, Inc.
+> + *
+> + * This library is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU Lesser General Public
+> + * License as published by the Free Software Foundation; either
+> + * version 2 of the License, or (at your option) any later version.
+> + *
+> + * This library is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + * Lesser General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU Lesser General Public
+> + * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>.
+> + *
+> + */
+> +
+> +#ifndef QAUTHZ_PAM_H__
+> +#define QAUTHZ_PAM_H__
+> +
+> +#include "authz/base.h"
+> +
+> +
+> +#define TYPE_QAUTHZ_PAM "authz-pam"
+> +
+> +#define QAUTHZ_PAM_CLASS(klass) \
+> +     OBJECT_CLASS_CHECK(QAuthZPamClass, (klass), \
+> +                        TYPE_QAUTHZ_PAM)
+> +#define QAUTHZ_PAM_GET_CLASS(obj) \
+> +     OBJECT_GET_CLASS(QAuthZPamClass, (obj), \
+> +                      TYPE_QAUTHZ_PAM)
+> +#define QAUTHZ_PAM(obj) \
+> +     INTERFACE_CHECK(QAuthZPam, (obj), \
+> +                     TYPE_QAUTHZ_PAM)
+> +
+> +typedef struct QAuthZPam QAuthZPam;
+> +typedef struct QAuthZPamClass QAuthZPamClass;
+> +
+> +
+> +/**
+> + * QAuthZPam:
+> + *
+> + * This authorization driver provides a PAM mechanism
+> + * for granting access by matching user names against a
+> + * list of globs. Each match rule has an associated policy
+> + * and a catch all policy applies if no rule matches
+> + *
+> + * To create an instance of this class via QMP:
+> + *
+> + *  {
+> + *    "execute": "object-add",
+> + *    "arguments": {
+> + *      "qom-type": "authz-pam",
+> + *      "id": "authz0",
+> + *      "parameters": {
+> + *        "service": "qemu-vnc-tls"
+> + *      }
+> + *    }
+> + *  }
+> + *
+> + * The driver only uses the PAM "account" verification
+> + * subsystem. The above config would require a config
+> + * file /etc/pam.d/qemu-vnc-tls. For a simple file
+> + * lookup it would contain
+> + *
+> + *   account requisite  pam_listfile.so item=3Duser sense=3Dallow \
+> + *           file=3D/etc/qemu/vnc.allow
+> + *
+> + * The external file would then contain a list of usernames.
+> + * If x509 cert was being used as the username, a suitable
+> + * entry would match the distinguish name:
+> + *
+> + *  CN=3Dlaptop.berrange.com,O=3DBerrange Home,L=3DLondon,ST=3DLondon,C=
+=3DGB
+> + *
+> + * On the command line it can be created using
+> + *
+> + *   -object authz-pam,id=3Dauthz0,service=3Dqemu-vnc-tls
+> + *
+> + */
+> +struct QAuthZPam {
+> +    QAuthZ parent_obj;
+> +
+> +    char *service;
+> +};
+> +
+> +
+> +struct QAuthZPamClass {
+> +    QAuthZClass parent_class;
+> +};
+> +
+> +
+> +QAuthZPam *qauthz_pam_new(const char *id,
+> +                          const char *service,
+> +                          Error **errp);
+> +
+> +
+> +#endif /* QAUTHZ_PAM_H__ */
+> diff --git a/authz/pamacct.c b/authz/pamacct.c
+> new file mode 100644
+> index 0000000000..a070dda217
+> --- /dev/null
+> +++ b/authz/pamacct.c
+> @@ -0,0 +1,149 @@
+> +/*
+> + * QEMU PAM authorization driver
+> + *
+> + * Copyright (c) 2018 Red Hat, Inc.
+> + *
+> + * This library is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU Lesser General Public
+> + * License as published by the Free Software Foundation; either
+> + * version 2 of the License, or (at your option) any later version.
+> + *
+> + * This library is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + * Lesser General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU Lesser General Public
+> + * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>.
+> + *
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "authz/pamacct.h"
+> +#include "authz/trace.h"
+> +#include "qom/object_interfaces.h"
+> +
+> +#include <security/pam_appl.h>
+> +
+> +
+> +static bool qauthz_pam_is_allowed(QAuthZ *authz,
+> +                                  const char *identity,
+> +                                  Error **errp)
+> +{
+> +    QAuthZPam *pauthz =3D QAUTHZ_PAM(authz);
+> +    const struct pam_conv pam_conversation =3D { 0 };
+> +    pam_handle_t *pamh =3D NULL;
+> +    int ret;
+> +
+> +    trace_qauthz_pam_check(authz, identity, pauthz->service);
+> +    ret =3D pam_start(pauthz->service,
+> +                    identity,
+> +                    &pam_conversation,
+> +                    &pamh);
+> +    if (ret !=3D PAM_SUCCESS) {
+> +        error_setg(errp, "Unable to start PAM transaction: %s",
+> +                   pam_strerror(NULL, ret));
+> +        return false;
+> +    }
+> +
+> +    ret =3D pam_acct_mgmt(pamh, PAM_SILENT);
+> +    if (ret !=3D PAM_SUCCESS) {
+> +        error_setg(errp, "Unable to authorize user '%s': %s",
+> +                   identity, pam_strerror(pamh, ret));
+> +        goto cleanup;
+> +    }
+> +
+> + cleanup:
+> +    pam_end(pamh, ret);
+> +    return ret =3D=3D PAM_SUCCESS;
+> +}
+> +
+> +
+> +static void
+> +qauthz_pam_prop_set_service(Object *obj,
+> +                            const char *service,
+> +                            Error **errp G_GNUC_UNUSED)
+> +{
+> +    QAuthZPam *pauthz =3D QAUTHZ_PAM(obj);
+> +
+> +    g_free(pauthz->service);
+> +    pauthz->service =3D g_strdup(service);
+> +}
+> +
+> +
+> +static char *
+> +qauthz_pam_prop_get_service(Object *obj,
+> +                            Error **errp G_GNUC_UNUSED)
+> +{
+> +    QAuthZPam *pauthz =3D QAUTHZ_PAM(obj);
+> +
+> +    return g_strdup(pauthz->service);
+> +}
+> +
+> +
+> +static void
+> +qauthz_pam_complete(UserCreatable *uc, Error **errp)
+> +{
+> +}
+> +
+> +
+> +static void
+> +qauthz_pam_finalize(Object *obj)
+> +{
+> +    QAuthZPam *pauthz =3D QAUTHZ_PAM(obj);
+> +
+> +    g_free(pauthz->service);
+> +}
+> +
+> +
+> +static void
+> +qauthz_pam_class_init(ObjectClass *oc, void *data)
+> +{
+> +    UserCreatableClass *ucc =3D USER_CREATABLE_CLASS(oc);
+> +    QAuthZClass *authz =3D QAUTHZ_CLASS(oc);
+> +
+> +    ucc->complete =3D qauthz_pam_complete;
+> +    authz->is_allowed =3D qauthz_pam_is_allowed;
+> +
+> +    object_class_property_add_str(oc, "service",
+> +                                  qauthz_pam_prop_get_service,
+> +                                  qauthz_pam_prop_set_service,
+> +                                  NULL);
+> +}
+> +
+> +
+> +QAuthZPam *qauthz_pam_new(const char *id,
+> +                          const char *service,
+> +                          Error **errp)
+> +{
+> +    return QAUTHZ_PAM(
+> +        object_new_with_props(TYPE_QAUTHZ_PAM,
+> +                              object_get_objects_root(),
+> +                              id, errp,
+> +                              "service", service,
+> +                              NULL));
+> +}
+> +
+> +
+> +static const TypeInfo qauthz_pam_info =3D {
+> +    .parent =3D TYPE_QAUTHZ,
+> +    .name =3D TYPE_QAUTHZ_PAM,
+> +    .instance_size =3D sizeof(QAuthZPam),
+> +    .instance_finalize =3D qauthz_pam_finalize,
+> +    .class_size =3D sizeof(QAuthZPamClass),
+> +    .class_init =3D qauthz_pam_class_init,
+> +    .interfaces =3D (InterfaceInfo[]) {
+> +        { TYPE_USER_CREATABLE },
+> +        { }
+> +    }
+> +};
+> +
+> +
+> +static void
+> +qauthz_pam_register_types(void)
+> +{
+> +    type_register_static(&qauthz_pam_info);
+> +}
+> +
+> +
+> +type_init(qauthz_pam_register_types);
+> diff --git a/authz/Makefile.objs b/authz/Makefile.objs
+> index 8351bf181d..ed7b273596 100644
+> --- a/authz/Makefile.objs
+> +++ b/authz/Makefile.objs
+> @@ -2,3 +2,6 @@ authz-obj-y +=3D base.o
+>  authz-obj-y +=3D simple.o
+>  authz-obj-y +=3D list.o
+>  authz-obj-y +=3D listfile.o
+> +authz-obj-$(CONFIG_AUTH_PAM) +=3D pamacct.o
+> +
+> +pamacct.o-libs =3D -lpam
+> diff --git a/authz/trace-events b/authz/trace-events
+> index fb65349a90..72c411927d 100644
+> --- a/authz/trace-events
+> +++ b/authz/trace-events
+> @@ -13,3 +13,6 @@ qauthz_list_default_policy(void *authz, const char *ide=
+ntity, int policy) "AuthZ
+>  # auth/listfile.c
+>  qauthz_list_file_load(void *authz, const char *filename) "AuthZ file %p =
+load filename=3D%s"
+>  qauthz_list_file_refresh(void *authz, const char *filename, int success)=
+ "AuthZ file %p load filename=3D%s success=3D%d"
+> +
+> +# auth/pam.c
+> +qauthz_pam_check(void *authz, const char *identity, const char *service)=
+ "AuthZ PAM %p identity=3D%s service=3D%s"
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index a1c3e0e59c..a9654b8115 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -4447,6 +4447,41 @@ would look like:
+>       ...
+>  @end example
+>
+> +@item -object authz-pam,id=3D@var{id},service=3D@var{string}
+> +
+> +Create an authorization object that will control access to network servi=
+ces.
+> +
+> +The @option{service} parameter provides the name of a PAM service to use
+> +for authorization. It requires that a file @code{/etc/pam.d/@var{service=
+}}
+> +exist to provide the configuration for the @code{account} subsystem.
+> +
+> +An example authorization object to validate a TLS x509 distinguished
+> +name would look like:
+> +
+> +@example
+> + # $QEMU \
+> +     ...
+> +     -object authz-simple,id=3Dauth0,service=3Dqemu-vnc
 
-When the current command completes, check if there is a pending command
-on the queue and if a pending command exists, set a flag indicating
-that a call to lsi_wait_reselect() is needed to handle a queued pending
-command. The flag is checked following a WAIT DISCONNECT Script
-instruction and if set, lsi_wait_reselect() is called to handle a
-queued pending command.
+oops, wrong example,
 
-Signed-off-by: George Kennedy <george.kennedy@oracle.com>
----
-Thanks Paolo,
+other than that,
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Your latest suggestion was the "missing link". Calling lsi_wait_reselect()
-after a WAIT DISCONNECT Script instruction when there are commands on 
-the pending queue is all the is needed. The patch has been greatly
-reduced in size and complexity.
+> +     ...
+> +@end example
+> +
+> +There would then be a corresponding config file for PAM at
+> +@code{/etc/pam.d/qemu-vnc} that contains:
+> +
+> +@example
+> +account requisite  pam_listfile.so item=3Duser sense=3Dallow \
+> +           file=3D/etc/qemu/vnc.allow
+> +@end example
+> +
+> +Finally the @code{/etc/qemu/vnc.allow} file would contain
+> +the list of x509 distingished names that are permitted
+> +access
+> +
+> +@example
+> +CN=3Dlaptop.example.com,O=3DExample Home,L=3DLondon,ST=3DLondon,C=3DGB
+> +@end example
+> +
+> +
+>  @end table
+>
+>  ETEXI
+> --
+> 2.17.2
+>
+>
 
- hw/scsi/lsi53c895a.c | 43 ++++++++++++++++++++++++++++++++-----------
- 1 file changed, 32 insertions(+), 11 deletions(-)
 
-diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
-index d1e6534..7f9ed2f 100644
---- a/hw/scsi/lsi53c895a.c
-+++ b/hw/scsi/lsi53c895a.c
-@@ -219,6 +219,7 @@ typedef struct {
-     int command_complete;
-     QTAILQ_HEAD(, lsi_request) queue;
-     lsi_request *current;
-+    bool handle_pending;    /* handle queued pending commands */
- 
-     uint32_t dsa;
-     uint32_t temp;
-@@ -298,6 +299,18 @@ static inline int lsi_irq_on_rsl(LSIState *s)
-     return (s->sien0 & LSI_SIST0_RSL) && (s->scid & LSI_SCID_RRE);
- }
- 
-+static lsi_request *get_pending_req(LSIState *s)
-+{
-+    lsi_request *p;
-+
-+    QTAILQ_FOREACH(p, &s->queue, next) {
-+        if (p->pending) {
-+            return p;
-+        }
-+    }
-+    return NULL;
-+}
-+
- static void lsi_soft_reset(LSIState *s)
- {
-     trace_lsi_reset();
-@@ -446,7 +459,6 @@ static void lsi_update_irq(LSIState *s)
- {
-     int level;
-     static int last_level;
--    lsi_request *p;
- 
-     /* It's unclear whether the DIP/SIP bits should be cleared when the
-        Interrupt Status Registers are cleared or when istat0 is read.
-@@ -477,12 +489,12 @@ static void lsi_update_irq(LSIState *s)
-     lsi_set_irq(s, level);
- 
-     if (!level && lsi_irq_on_rsl(s) && !(s->scntl1 & LSI_SCNTL1_CON)) {
-+        lsi_request *p;
-+
-         trace_lsi_update_irq_disconnected();
--        QTAILQ_FOREACH(p, &s->queue, next) {
--            if (p->pending) {
--                lsi_reselect(s, p);
--                break;
--            }
-+        p = get_pending_req(s);
-+        if (p) {
-+            lsi_reselect(s, p);
-         }
-     }
- }
-@@ -759,6 +771,8 @@ static void lsi_command_complete(SCSIRequest *req, uint32_t status, size_t resid
-         lsi_request_free(s, s->current);
-         scsi_req_unref(req);
-     }
-+    s->handle_pending = get_pending_req(s) ? true : false;
-+
-     lsi_resume_script(s);
- }
- 
-@@ -1064,11 +1078,15 @@ static void lsi_wait_reselect(LSIState *s)
- 
-     trace_lsi_wait_reselect();
- 
--    QTAILQ_FOREACH(p, &s->queue, next) {
--        if (p->pending) {
--            lsi_reselect(s, p);
--            break;
--        }
-+    s->handle_pending = false;
-+
-+    if (s->current) {
-+        return;
-+    }
-+
-+    p = get_pending_req(s);
-+    if (p) {
-+        lsi_reselect(s, p);
-     }
-     if (s->current == NULL) {
-         s->waiting = 1;
-@@ -1258,6 +1276,9 @@ again:
-             case 1: /* Disconnect */
-                 trace_lsi_execute_script_io_disconnect();
-                 s->scntl1 &= ~LSI_SCNTL1_CON;
-+                if (s->handle_pending) {
-+                    lsi_wait_reselect(s);
-+                }
-                 break;
-             case 2: /* Wait Reselect */
-                 if (!lsi_irq_on_rsl(s)) {
--- 
-1.8.3.1
+--
+Marc-Andr=C3=A9 Lureau
