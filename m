@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50898)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gKRmC-0003VL-GF
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 12:38:02 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gKRmG-0003W4-25
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 12:38:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gKRm9-0004qz-0r
+	(envelope-from <pbonzini@redhat.com>) id 1gKRmC-0004vZ-6b
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 12:38:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38372)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gKRmB-0004st-SB
 	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 12:38:00 -0500
-Resent-Message-Id: <E1gKRm9-0004qz-0r@eggs.gnu.org>
-Message-ID: <154161225223.11185.1218108893457672817@015909e0f939>
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20181106110548.4209-1-luc.michel@greensocs.com>
+References: <1541607585-15570-1-git-send-email-george.kennedy@oracle.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <cd38afdb-2f45-3f87-90c5-8a8b08fa5354@redhat.com>
+Date: Wed, 7 Nov 2018 18:37:52 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 7 Nov 2018 09:37:34 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v4 00/16] gdbstub: support for the
- multiprocess extension
+In-Reply-To: <1541607585-15570-1-git-send-email-george.kennedy@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5] lsi: Reselection needed to remove
+ pending commands from queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,72 +28,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: luc.michel@greensocs.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, ehabkost@redhat.com, alistair@alistair23.me, mark.burton@greensocs.com, f4bug@amsat.org, saipava@xilinx.com, edgari@xilinx.com, qemu-arm@nongnu.org
+To: George Kennedy <george.kennedy@oracle.com>, famz@redhat.com, qemu-devel@nongnu.org, boris.ostrovsky@oracle.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgxMTA2MTEwNTQ4LjQyMDktMS1sdWMubWljaGVsQGdyZWVuc29jcy5jb20K
-U3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2NCAwMC8xNl0gZ2Ric3R1Yjogc3VwcG9ydCBm
-b3IgdGhlIG11bHRpcHJvY2VzcyBleHRlbnNpb24KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0K
-IyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFT
-RS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
-dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9
-JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNo
-ZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4u
-IgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3Bh
-dGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwog
-ICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBF
-TkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0
-ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMWNmMGY2NmJkYSBhcm0veGxueC16eW5x
-bXA6IHB1dCBBUFVzIGFuZCBSUFVzIGluIHNlcGFyYXRlIENQVSBjbHVzdGVycwo2ZjBjYjJkYTkz
-IGdkYnN0dWI6IGFkZCBtdWx0aXByb2Nlc3MgZXh0ZW5zaW9uIHN1cHBvcnQKODc5NjdkNTA0OSBn
-ZGJzdHViOiBnZGJfc2V0X3N0b3BfY3B1OiBpZ25vcmUgcmVxdWVzdCB3aGVuIHByb2Nlc3MgaXMg
-bm90IGF0dGFjaGVkCjdjZGJhMDI1NGMgZ2Ric3R1YjogcHJvY2Vzc2VzIGluaXRpYWxpemF0aW9u
-IG9uIG5ldyBwZWVyIGNvbm5lY3Rpb24KZWJhY2E2NTYyMyBnZGJzdHViOiBhZGQgc3VwcG9ydCBm
-b3IgdkF0dGFjaCBwYWNrZXRzCjE3NTlkMmMzNjUgZ2Ric3R1YjogYWRkIHN1cHBvcnQgZm9yIGV4
-dGVuZGVkIG1vZGUgcGFja2V0CmZiNGNhZDYzOWUgZ2Ric3R1YjogYWRkIG11bHRpcHJvY2VzcyBz
-dXBwb3J0IHRvICdEJyBwYWNrZXRzCjNhMjIxODBlYjYgZ2Ric3R1YjogYWRkIG11bHRpcHJvY2Vz
-cyBzdXBwb3J0IHRvIGdkYl92bV9zdGF0ZV9jaGFuZ2UoKQo2NzAyNTQyMjBmIGdkYnN0dWI6IGFk
-ZCBtdWx0aXByb2Nlc3Mgc3VwcG9ydCB0byBYZmVyOmZlYXR1cmVzOnJlYWQ6CjIwNTI5Yzc0YjYg
-Z2Ric3R1YjogYWRkIG11bHRpcHJvY2VzcyBzdXBwb3J0IHRvIChmfHMpVGhyZWFkSW5mbyBhbmQg
-VGhyZWFkRXh0cmFJbmZvCjg5ZDUyYWZmYTAgZ2Ric3R1YjogYWRkIG11bHRpcHJvY2VzcyBzdXBw
-b3J0IHRvICdzQycgcGFja2V0cwo0NmZlZmU1MzJmIGdkYnN0dWI6IGFkZCBtdWx0aXByb2Nlc3Mg
-c3VwcG9ydCB0byB2Q29udCBwYWNrZXRzCjM5YjBhNTg4MDQgZ2Ric3R1YjogYWRkIG11bHRpcHJv
-Y2VzcyBzdXBwb3J0IHRvICdIJyBhbmQgJ1QnIHBhY2tldHMKY2EwMzlkOTUwZSBnZGJzdHViOiBh
-ZGQgbXVsdGlwcm9jZXNzIHN1cHBvcnQgdG8gJz8nIHBhY2tldHMKZjk0ZmM2NmQzMCBnZGJzdHVi
-OiBpbnRyb2R1Y2UgR0RCIHByb2Nlc3NlcwpmNmFhNDczNGViIGh3L2NwdTogaW50cm9kdWNlIENQ
-VSBjbHVzdGVycwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xNjogaHcv
-Y3B1OiBpbnRyb2R1Y2UgQ1BVIGNsdXN0ZXJzLi4uCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBk
-ZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzI2OiAKbmV3
-IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9SOiBkbyBub3QgaW5pdGlhbGlzZSBzdGF0aWNzIHRvIDAg
-b3IgTlVMTAojNTg6IEZJTEU6IGh3L2NwdS9jbHVzdGVyLmM6Mjg6CisgICAgc3RhdGljIHVpbnQ2
-NF90IGNsdXN0ZXJfaWRfYXV0b19pbmNyZW1lbnQgPSAwOwoKdG90YWw6IDEgZXJyb3JzLCAxIHdh
-cm5pbmdzLCAxMDIgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMs
-IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
-ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
-QUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMi8xNjogZ2Ric3R1YjogaW50cm9kdWNlIEdEQiBwcm9j
-ZXNzZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8xNjogZ2Ric3R1YjogYWRkIG11bHRpcHJvY2VzcyBz
-dXBwb3J0IHRvICc/JyBwYWNrZXRzLi4uCkNoZWNraW5nIFBBVENIIDQvMTY6IGdkYnN0dWI6IGFk
-ZCBtdWx0aXByb2Nlc3Mgc3VwcG9ydCB0byAnSCcgYW5kICdUJyBwYWNrZXRzLi4uCkNoZWNraW5n
-IFBBVENIIDUvMTY6IGdkYnN0dWI6IGFkZCBtdWx0aXByb2Nlc3Mgc3VwcG9ydCB0byB2Q29udCBw
-YWNrZXRzLi4uCkNoZWNraW5nIFBBVENIIDYvMTY6IGdkYnN0dWI6IGFkZCBtdWx0aXByb2Nlc3Mg
-c3VwcG9ydCB0byAnc0MnIHBhY2tldHMuLi4KQ2hlY2tpbmcgUEFUQ0ggNy8xNjogZ2Ric3R1Yjog
-YWRkIG11bHRpcHJvY2VzcyBzdXBwb3J0IHRvIChmfHMpVGhyZWFkSW5mbyBhbmQgVGhyZWFkRXh0
-cmFJbmZvLi4uCkNoZWNraW5nIFBBVENIIDgvMTY6IGdkYnN0dWI6IGFkZCBtdWx0aXByb2Nlc3Mg
-c3VwcG9ydCB0byBYZmVyOmZlYXR1cmVzOnJlYWQ6Li4uCkNoZWNraW5nIFBBVENIIDkvMTY6IGdk
-YnN0dWI6IGFkZCBtdWx0aXByb2Nlc3Mgc3VwcG9ydCB0byBnZGJfdm1fc3RhdGVfY2hhbmdlKCku
-Li4KQ2hlY2tpbmcgUEFUQ0ggMTAvMTY6IGdkYnN0dWI6IGFkZCBtdWx0aXByb2Nlc3Mgc3VwcG9y
-dCB0byAnRCcgcGFja2V0cy4uLgpDaGVja2luZyBQQVRDSCAxMS8xNjogZ2Ric3R1YjogYWRkIHN1
-cHBvcnQgZm9yIGV4dGVuZGVkIG1vZGUgcGFja2V0Li4uCkNoZWNraW5nIFBBVENIIDEyLzE2OiBn
-ZGJzdHViOiBhZGQgc3VwcG9ydCBmb3IgdkF0dGFjaCBwYWNrZXRzLi4uCkNoZWNraW5nIFBBVENI
-IDEzLzE2OiBnZGJzdHViOiBwcm9jZXNzZXMgaW5pdGlhbGl6YXRpb24gb24gbmV3IHBlZXIgY29u
-bmVjdGlvbi4uLgpDaGVja2luZyBQQVRDSCAxNC8xNjogZ2Ric3R1YjogZ2RiX3NldF9zdG9wX2Nw
-dTogaWdub3JlIHJlcXVlc3Qgd2hlbiBwcm9jZXNzIGlzIG5vdCBhdHRhY2hlZC4uLgpDaGVja2lu
-ZyBQQVRDSCAxNS8xNjogZ2Ric3R1YjogYWRkIG11bHRpcHJvY2VzcyBleHRlbnNpb24gc3VwcG9y
-dC4uLgpDaGVja2luZyBQQVRDSCAxNi8xNjogYXJtL3hsbngtenlucW1wOiBwdXQgQVBVcyBhbmQg
-UlBVcyBpbiBzZXBhcmF0ZSBDUFUgY2x1c3RlcnMuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0
-IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
-dGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
-ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On 07/11/2018 17:19, George Kennedy wrote:
+> +                if (s->want_resel && s->resel_dsp) {
+> +                    save_dsp = s->dsp;
+> +                    s->dsp = s->resel_dsp;
+> +                    s->want_resel = false;
+> +                }
+>                  break;
+
+Almost... this should be in lsi_reselect, and should be replaced by a
+call to lsi_reselect.
+
+Paolo
