@@ -1,24 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47730)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gKQNd-0002w5-PS
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 11:08:39 -0500
+	(envelope-from <walling@linux.ibm.com>) id 1gKQfb-0003V4-Ij
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 11:27:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gKQNV-00065t-TL
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 11:08:28 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1541528230-31817-1-git-send-email-thuth@redhat.com>
-	<c0febf9a-f098-112d-9c8d-c320cc66b04a@redhat.com>
-	<12974ebb-09de-c6e9-1dd7-5199a8ae6b05@redhat.com>
-	<CAFEAcA-B74FQgj3COyGZ_SAAvSUA6=OaLdy5--NoAgHgEGZkpg@mail.gmail.com>
-Date: Wed, 07 Nov 2018 17:08:05 +0100
-In-Reply-To: <CAFEAcA-B74FQgj3COyGZ_SAAvSUA6=OaLdy5--NoAgHgEGZkpg@mail.gmail.com>
-	(Peter Maydell's message of "Tue, 6 Nov 2018 18:58:44 +0000")
-Message-ID: <87k1louaze.fsf@dusky.pond.sub.org>
+	(envelope-from <walling@linux.ibm.com>) id 1gKQfT-0005IC-FA
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 11:27:07 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36836
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
+	id 1gKQfT-0005H2-1F
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 11:26:59 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wA7GIeXU000619
+	for <qemu-devel@nongnu.org>; Wed, 7 Nov 2018 11:26:57 -0500
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2nm1vqw7t0-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 07 Nov 2018 11:26:56 -0500
+Received: from localhost
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
+	Wed, 7 Nov 2018 16:26:55 -0000
+References: <20181105110313.29312-1-david@redhat.com>
+	<20181105110313.29312-2-david@redhat.com>
+	<20181105121936.243260a6.cohuck@redhat.com>
+From: Collin Walling <walling@linux.ibm.com>
+Date: Wed, 7 Nov 2018 11:26:50 -0500
 MIME-Version: 1.0
+In-Reply-To: <20181105121936.243260a6.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Add an entry for the 'collie'
- machine
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <63c85f6b-2a3f-941b-cac3-4ec0cf6a01d3@linux.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1 1/4] s390x/zpci: drop
+ msix.available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,38 +45,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Thomas Huth <thuth@redhat.com>, Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> On 6 November 2018 at 18:52, Thomas Huth <thuth@redhat.com> wrote:
->> On 2018-11-06 19:49, Philippe Mathieu-Daud=C3=A9 wrote:
->>> On 6/11/18 19:17, Thomas Huth wrote:
->>>> There is no active maintainer, but since Peter is picking up
->>>> patches via qemu-arm@nongnu.org, I think we could at least use
->>>> "Odd Fixes" as status here.
->>>
->>> This looks more as "Orphan" to me...
+On 11/5/18 6:19 AM, Cornelia Huck wrote:
+> On Mon,  5 Nov 2018 12:03:10 +0100
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+>> I fail to see why this is useful as we require MSIX always and
+>> completely fail adding a device.
 >>
->> I'll leave it up to Peter for the final decision...
->
-> I think we're not very consistent[*] in our usage of the various
-> statuses in the MAINTAINERS file. I guess "Odd Fixes" makes
-> sense in that, well, if you send a patch to this
-> code and cc me I'll review it and put it in the tree. (This
-> is true of any of the arm boards we have.)
->
-> [*] We have one thing tagged Orphan, which is bsd-user/,
-> and some things tagged Odd Fixes with no listed maintainer,
-> and some things tagged Odd Fixes which are in practice more
-> like Orphan (for instance sh4), and we list "fpu/" as
-> Odd Fixes despite having given it a pretty thorough
-> overhaul very recently, and so on...
->
-> If you wanted a mechanizable rule, you could try something
-> like "every file which is in status Odd Fixes or better
-> must list with M: at least one named individual who has
-> submitted a pull request in the last nine months" :-)
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  hw/s390x/s390-pci-bus.c | 2 --
+>>  hw/s390x/s390-pci-bus.h | 1 -
+>>  2 files changed, 3 deletions(-)
+>>
+>> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+>> index e1b14b131b..1eaae3aca6 100644
+>> --- a/hw/s390x/s390-pci-bus.c
+>> +++ b/hw/s390x/s390-pci-bus.c
+>> @@ -745,7 +745,6 @@ static int s390_pci_msix_init(S390PCIBusDevice *pbdev)
+>>  
+>>      pos = pci_find_capability(pbdev->pdev, PCI_CAP_ID_MSIX);
+>>      if (!pos) {
+>> -        pbdev->msix.available = false;
+>>          return -1;
+>>      }
+>>  
+>> @@ -761,7 +760,6 @@ static int s390_pci_msix_init(S390PCIBusDevice *pbdev)
+>>      pbdev->msix.pba_bar = pba & PCI_MSIX_FLAGS_BIRMASK;
+>>      pbdev->msix.pba_offset = pba & ~PCI_MSIX_FLAGS_BIRMASK;
+>>      pbdev->msix.entries = (ctrl & PCI_MSIX_FLAGS_QSIZE) + 1;
+>> -    pbdev->msix.available = true;
+>>  
+>>      name = g_strdup_printf("msix-s390-%04x", pbdev->uid);
+>>      memory_region_init_io(&pbdev->msix_notify_mr, OBJECT(pbdev),
+>> diff --git a/hw/s390x/s390-pci-bus.h b/hw/s390x/s390-pci-bus.h
+>> index 1f7f9b5814..f47a0f2da5 100644
+>> --- a/hw/s390x/s390-pci-bus.h
+>> +++ b/hw/s390x/s390-pci-bus.h
+>> @@ -252,7 +252,6 @@ typedef struct ChscSeiNt2Res {
+>>  } QEMU_PACKED ChscSeiNt2Res;
+>>  
+>>  typedef struct S390MsixInfo {
+>> -    bool available;
+>>      uint8_t table_bar;
+>>      uint8_t pba_bar;
+>>      uint16_t entries;
+> 
+> OK, so that was a write-only variable? :)
+> 
+> Question for the IBMers: is there any change we might have a different
+> implementation not relying on msi-x in the future?
+> 
 
-Sounds like an excellent idea to me!
+@Conny
+Currently, the plan would be to stick with a hard requirement for MSIX unless someone 
+strongly supports the legacy alternatives. I'm certainly open to discuss that. Maybe it 
+would make sense to fallback to MSI for devices that don't support MSIX?
+
+@David
+Thanks for the cleanup.
+
+Reviewed-by: Collin Walling <walling@linux.ibm.com>
+
+-- 
+Respectfully,
+- Collin Walling
