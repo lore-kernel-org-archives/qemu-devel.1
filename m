@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58558)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nsoffer@redhat.com>) id 1gKS39-0002yf-Ej
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 12:55:32 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gKSSS-0001st-U0
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 13:21:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nsoffer@redhat.com>) id 1gKS36-0001wY-Eq
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 12:55:31 -0500
-Received: from mail-ua1-f43.google.com ([209.85.222.43]:38529)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <nsoffer@redhat.com>) id 1gKS34-0001mQ-QH
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 12:55:27 -0500
-Received: by mail-ua1-f43.google.com with SMTP id p9so2185072uaa.5
-	for <qemu-devel@nongnu.org>; Wed, 07 Nov 2018 09:55:22 -0800 (PST)
+	(envelope-from <kwolf@redhat.com>) id 1gKSNh-0002Qy-1l
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 13:16:45 -0500
+Date: Wed, 7 Nov 2018 19:16:31 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20181107181631.GC4721@linux.fritz.box>
+References: <20180807174311.32454-1-vsementsov@virtuozzo.com>
+	<20180807174311.32454-4-vsementsov@virtuozzo.com>
+	<6e19aaeb-8acc-beb9-5ece-9ae6101637a9@redhat.com>
+	<9aa2ee7b-2dcb-be00-5501-c616f5c5fda0@virtuozzo.com>
 MIME-Version: 1.0
-References: <20181107121319.GC14842@redhat.com>
-	<20181107143628.GG8125@redhat.com>
-	<CAMRbyyuFGVtNWF9LKoi0n6_r5Gr4j8LetbAMd0L_5cKMif9LjQ@mail.gmail.com>
-	<20181107172737.GB4721@linux.fritz.box>
-In-Reply-To: <20181107172737.GB4721@linux.fritz.box>
-From: Nir Soffer <nsoffer@redhat.com>
-Date: Wed, 7 Nov 2018 19:55:10 +0200
-Message-ID: <CAMRbyys2XVgjPx9HteGP8c6R5rPM=n86m30kfEG6a0+c-jLZ4g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-block] Change in qemu 2.12 causes qemu-img
- convert to NBD to write more data
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9aa2ee7b-2dcb-be00-5501-c616f5c5fda0@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH 3/7] qcow2: split out reading normal
+ clusters from qcow2_co_preadv
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,67 +26,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: "Richard W.M. Jones" <rjones@redhat.com>, edgar.kaziakhmedov@virtuozzo.com, QEMU Developers <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: Max Reitz <mreitz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Denis Lunev <den@virtuozzo.com>
 
-On Wed, Nov 7, 2018 at 7:27 PM Kevin Wolf <kwolf@redhat.com> wrote:
+(Broken quoting in text/plain again)
 
-> Am 07.11.2018 um 15:56 hat Nir Soffer geschrieben:
-> > Wed, Nov 7, 2018 at 4:36 PM Richard W.M. Jones <rjones@redhat.com>
-> wrote:
-> >
-> > > Another thing I tried was to change the NBD server (nbdkit) so that it
-> > > doesn't advertise zero support to the client:
-> > >
-> > >   $ nbdkit --filter=log --filter=nozero memory size=6G
-> logfile=/tmp/log \
-> > >       --run './qemu-img convert ./fedora-28.img -n $nbd'
-> > >   $ grep '\.\.\.$' /tmp/log | sed 's/.*\([A-Z][a-z]*\).*/\1/' | uniq -c
-> > >    2154 Write
-> > >
-> > > Not surprisingly no zero commands are issued.  The size of the write
-> > > commands is very uneven -- it appears to be send one command per block
-> > > of zeroes or data.
-> > >
-> > > Nir: If we could get information from imageio about whether zeroing is
-> > > implemented efficiently or not by the backend, we could change
-> > > virt-v2v / nbdkit to advertise this back to qemu.
-> >
-> > There is no way to detect the capability, ioctl(BLKZEROOUT) always
-> > succeeds, falling back to manual zeroing in the kernel silently
-> >
-> > Even if we could, sending zero on the wire from qemu may be even
-> > slower, and it looks like qemu send even more requests in this case
-> > (2154 vs ~1300).
-> >
-> > Looks like this optimization in qemu side leads to worse performance,
-> > so it should not be enabled by default.
->
-> Well, that's overgeneralising your case a bit. If the backend does
-> support efficient zero writes (which file systems, the most common case,
-> generally do), doing one big write_zeroes request at the start can
-> improve performance quite a bit.
->
-> It seems the problem is that we can't really know whether the operation
-> will be efficient because the backends generally don't tell us. Maybe
-> NBD could introduce a flag for this, but in the general case it appears
-> to me that we'll have to have a command line option.
->
-> However, I'm curious what your exact use case and the backend used in it
-> is? Can something be improved there to actually get efficient zero
-> writes and get even better performance than by just disabling the big
-> zero write?
+Am 01.11.2018 um 13:17 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> 27.09.2018 20:35, Max Reitz wrote:
+> 
+>     On 07.08.18 19:43, Vladimir Sementsov-Ogievskiy wrote:
+> 
+>         Memory allocation may become less efficient for encrypted case. It's a
+>         payment for further asynchronous scheme.
+> 
+>         Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>         ---
+>          block/qcow2.c | 114 ++++++++++++++++++++++++++++++++--------------------------
+>          1 file changed, 64 insertions(+), 50 deletions(-)
+> 
+>         diff --git a/block/qcow2.c b/block/qcow2.c
+>         index 65e3ca00e2..5e7f2ee318 100644
+>         --- a/block/qcow2.c
+>         +++ b/block/qcow2.c
+>         @@ -1808,6 +1808,67 @@ out:
+>              return ret;
+>          }
+> 
+>         +static coroutine_fn int qcow2_co_preadv_normal(BlockDriverState *bs,
+>         +                                               uint64_t file_cluster_offset,
+>         +                                               uint64_t offset,
+>         +                                               uint64_t bytes,
+>         +                                               QEMUIOVector *qiov,
+>         +                                               uint64_t qiov_offset)
+>         +{
+>         +    int ret;
+>         +    BDRVQcow2State *s = bs->opaque;
+>         +    void *crypt_buf = NULL;
+>         +    QEMUIOVector hd_qiov;
+>         +    int offset_in_cluster = offset_into_cluster(s, offset);
+>         +
+>         +    if ((file_cluster_offset & 511) != 0) {
+>         +        return -EIO;
+>         +    }
+>         +
+>         +    qemu_iovec_init(&hd_qiov, qiov->niov);
+> 
+>     So you're not just re-allocating the bounce buffer for every single
+>     call, but also this I/O vector.  Hm.
 
+And this one is actually at least a little more serious, I think.
 
-The backend is some NetApp storage connected via FC. I don't have
-more info on this. We get zero rate of about 1G/s on this storage, which
-is quite slow compared with other storage we tested.
+Decryption and decompression (including copying between the original
+qiov and the bounce buffer) are already very slow, so allocating a
+bounce buffer or not shouldn't make any noticable difference.
 
-One option we check now is if this is the kernel silent fallback to manual
-zeroing when the server advertise wrong value of write_same_max_bytes.
+But I'd like to keep allocations out of the fast path as much as we can.
 
-Having a command line option to control this behavior sounds good. I don't
-have enough data to tell what should be the default, but I think the safe
-way would be to keep old behavior.
+>         +    if (bs->encrypted) {
+>         +        assert(s->crypto);
+>         +        assert(bytes <= QCOW_MAX_CRYPT_CLUSTERS * s->cluster_size);
+>         +
+>         +        crypt_buf = qemu_try_blockalign(bs->file->bs, bytes);
+> 
+>     1. Why did you remove the comment?
+> 
+>     2. The check for whether crypt_buf was successfully allocated is missing.
+> 
+>     3. Do you have any benchmarks for encrypted images?  Having to allocate
+>     the bounce buffer for potentially every single cluster sounds rather bad
+>     to me.
 
-Nir
+Actually, benchmarks for normal, fully allocated images would be a
+little more interesting. Though I'm not sure if qcow2 actually performs
+well enough that we'll see any difference even there (when we measured
+memory allocation overhead etc. for raw images in the context of
+comparing coroutines to AIO callback styes, the difference was already
+hard to see).
+
+Kevin
