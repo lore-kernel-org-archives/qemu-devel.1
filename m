@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55681)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gKTKB-00035x-HI
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 14:17:13 -0500
+	(envelope-from <noring@nocrew.org>) id 1gKTKj-0003vs-PV
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 14:17:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gKTK8-0003uH-Mx
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 14:17:11 -0500
-Received: from pio-pvt-msa1.bahnhof.se ([79.136.2.40]:60462)
+	(envelope-from <noring@nocrew.org>) id 1gKTKg-00046j-V1
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 14:17:45 -0500
+Received: from pio-pvt-msa1.bahnhof.se ([79.136.2.40]:60491)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gKTK8-0003tV-Ez
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 14:17:08 -0500
-Date: Wed, 7 Nov 2018 20:17:05 +0100
+	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gKTKg-00045e-MU
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 14:17:42 -0500
+Date: Wed, 7 Nov 2018 20:17:35 +0100
 From: Fredrik Noring <noring@nocrew.org>
-Message-ID: <20181107191705.GB31580@sx9>
-References: <cover.1541174426.git.noring@nocrew.org>
-	<BN6PR2201MB1251AFA493032E33B49A5376C6CA0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-	<20181105181242.GB2383@sx9>
-	<BN6PR2201MB12516F764B497EEF0C81DF9FC6CA0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+Message-ID: <cover.1541616663.git.noring@nocrew.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <BN6PR2201MB12516F764B497EEF0C81DF9FC6CA0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-Subject: Re: [Qemu-devel] [PATCH 0/2] target/mips: Fix decoding mechanisms
- of R5900 M{F, T}{HI, LO}1 and DIV[U]1
+Subject: [Qemu-devel] [PATCH v2 0/6] Fix decoding mechanisms of the R5900
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,44 +24,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <amarkovic@wavecomp.com>
-Cc: Aurelien Jarno <aurelien@aurel32.net>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?utf-8?Q?J=C3=BCrgen?= Urban <JuergenUrban@gmx.de>, "Maciej W. Rozycki" <macro@linux-mips.org>, qemu-devel@nongnu.org
+To: Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: =?utf-8?Q?J=C3=BCrgen?= Urban <JuergenUrban@gmx.de>, "Maciej W. Rozycki" <macro@linux-mips.org>, qemu-devel@nongnu.org
 
-Hi Aleksandar,
+This series amends the R5900 support with the following changes:
 
-> I think the following code would be even better:
-> 
->     case OPC_SC:
->         check_insn(ctx, ISA_MIPS2);
->         check_insn_opc_removed(ctx, ISA_MIPS32R6);
->         if (ctx->insn_flags & INSN_R5900) {
->             check_insn_opc_user_only(ctx, INSN_R5900);
->         }
->         gen_st_cond(ctx, op, rt, rs, imm);
->         break;
+- MFLO1, MFHI1, MTLO1 and MTHI1 are generated in gen_HILO1_tx79 instead
+  of the generic gen_HILO.
 
-Done.
+- DIV1 and DIVU1 are generated in gen_div1_tx79 instead of the generic
+  gen_muldiv.
 
-> I don't mind. Later on, we can drop the second argument of
-> check_insn_opc_user_only() altogether, and the code would expand to the
-> minimal and clear:
-> 
->         if (ctx->insn_flags & INSN_R5900) {
-> #ifndef CONFIG_USER_ONLY
->             generate_exception_end(ctx, EXCP_RI);
-> #endif
->         }
-> 
-> but at this moment this is not a source of concern to me at all.
+- MOVN, MOVZ, MFHI, MFLO, MTHI, MTLO, MULT, MULTU, DIV, DIVU, DMULT,
+  DMULTU, DDIV, DDIVU and JR are decoded in decode_opc_special_tx79
+  instead of the generic decode_opc_special_legacy.
 
-OK.
+- Guard check_insn_opc_user_only with INSN_R5900 check.
 
-> No, no, you don't need to copy 82 lines. First, you can assume that you
-> are already in INSN_R5900 case - no need for frequent check_insn()s.
-> Further, you can omit everything that is not needed for R5900 (for
-> example, entire OPC_MOVCI case).
+- Guard check_insn with INSN_R5900 check.
 
-Yes, of course. I've made some general updates as well, for example
-making use of extract32. I will post v2 in a moment.
+- Fix HI[ac] and LO[ac] 32-bit truncation with the MIPS64 DSP ASE.
 
-Fredrik
+This series has been successfully built with the 8 different build
+configurations
+
+    {gcc,clang} x -m64 x mips{,64}el-{linux-user,softmmu}
+
+in addition successfully completing the R5900 test suite
+
+    cd tests/tcg/mips/mipsr5900 && make check
+
+Changes in v2:
+- Fix HI and LO 32-bit truncation with the MIPS64 DSP ASE
+- Decode special R5900 opcodes in decode_opc_special_tx79
+- Guard check_insn_opc_user_only with INSN_R5900 check
+- Guard check_insn with INSN_R5900 check
+
+Fredrik Noring (6):
+  target/mips: Fix decoding mechanism of R5900 MFLO1, MFHI1, MTLO1 and MTHI1
+  target/mips: Fix decoding mechanism of R5900 DIV1 and DIVU1
+  target/mips: Fix HI[ac] and LO[ac] 32-bit truncation with MIPS64 DSP ASE
+  target/mips: Fix decoding mechanism of special R5900 opcodes
+  target/mips: Guard check_insn_opc_user_only with INSN_R5900 check
+  target/mips: Guard check_insn with INSN_R5900 check
+
+ target/mips/translate.c | 229 +++++++++++++++++++++++++++++-----------
+ 1 file changed, 170 insertions(+), 59 deletions(-)
+
+-- 
+2.18.1
