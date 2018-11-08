@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53487)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53593)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gKi9g-0003uX-T9
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 06:07:21 -0500
+	(envelope-from <sameo@linux.intel.com>) id 1gKiA8-0004Cy-20
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 06:07:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gKi9g-00014b-5x
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 06:07:20 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:45472)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gKi9d-000105-Tr
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 06:07:19 -0500
-Received: by mail-oi1-x241.google.com with SMTP id p144-v6so16532409oic.12
-	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 03:07:17 -0800 (PST)
+	(envelope-from <sameo@linux.intel.com>) id 1gKiA3-0001bg-5e
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 06:07:48 -0500
+Received: from mga06.intel.com ([134.134.136.31]:33430)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sameo@linux.intel.com>)
+	id 1gKiA1-0001Dv-UI
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 06:07:42 -0500
+Date: Thu, 8 Nov 2018 12:06:50 +0100
+From: Samuel Ortiz <sameo@linux.intel.com>
+Message-ID: <20181108110650.GB32519@caravaggio>
+References: <20180924092120.GA30163@caravaggio>
+	<7c2b477e-bdac-c887-2510-82fe04acdcfe@redhat.com>
+	<87b22690-e39c-3b46-dcb4-f6abc3213142@redhat.com>
+	<CAFEAcA8yHb4MdtsJuXcswQp93DN5tSeN9dn8AWWL9se0DKvdcg@mail.gmail.com>
+	<41ceda53-467e-32a1-8fa6-13f0f9c08ad1@redhat.com>
+	<CAFEAcA9oCs+Y1fnY8dOR16n_Hn7PaHziL7K0HZK6=BAd_Gyecg@mail.gmail.com>
+	<e496287e-f8ba-3608-42e1-efb697cfc784@redhat.com>
+	<20181107154114.GC27585@caravaggio>
+	<dd68d3e8-6448-3a67-3212-fd3d3bfba2e2@redhat.com>
+	<20181107192414.GH12503@habkost.net>
 MIME-Version: 1.0
-In-Reply-To: <1541674784-25936-2-git-send-email-lizhijian@cn.fujitsu.com>
-References: <1541674784-25936-1-git-send-email-lizhijian@cn.fujitsu.com>
-	<1541674784-25936-2-git-send-email-lizhijian@cn.fujitsu.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 8 Nov 2018 11:06:56 +0000
-Message-ID: <CAFEAcA_47wyar3WNhuBmNPdr02RHx-wn_TeyFaajpjzvzG8j5Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC/PoC PATCH 1/3] i386: set initrd_max to 4G - 1
- to allow up to 4G initrd
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181107192414.GH12503@habkost.net>
+Subject: Re: [Qemu-devel] QEMU and Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,54 +36,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Zhijian <lizhijian@cn.fujitsu.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Philip Li <philip.li@intel.com>, zhijianx.li@intel.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Zhong, Yang" <yang.zhong@intel.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 8 November 2018 at 10:59, Li Zhijian <lizhijian@cn.fujitsu.com> wrote:
-> x86/x86_64 has alredy supported 4G initrd.
->
-> linux/arch/x86/boot/header.S:
->  # (Header version 0x0203 or later) the highest safe address for the contents
->  # of an initrd. The current kernel allows up to 4 GB, but leave it at 2 GB to
->  # avoid possible bootloader bugs.
->
-> CC: Philip Li <philip.li@intel.com>
-> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
-> ---
->  hw/i386/pc.c | 6 ++++++
->  1 file changed, 6 insertions(+)
->
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index cd5029c..e1b910f 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -913,6 +913,12 @@ static void load_linux(PCMachineState *pcms,
->      /* highest address for loading the initrd */
->      if (protocol >= 0x203) {
->          initrd_max = ldl_p(header+0x22c);
-> +        if (initrd_max == 0x7fffffff) {
-> +            /* for some reasons, initrd_max is hard code with 0x7fffffff
-> +             * hard code to 4G - 1 to allow 4G initrd
-> +             */
-> +            initrd_max = UINT32_MAX - 1;
-> +        }
+On Wed, Nov 07, 2018 at 05:24:14PM -0200, Eduardo Habkost wrote:
+> On Wed, Nov 07, 2018 at 06:39:54PM +0100, Paolo Bonzini wrote:
+> > On 07/11/2018 16:41, Samuel Ortiz wrote:
+> > > - The Kconfig parser would be used to generate the equivalent of what we
+> > >   currently have under default-configs/
+> > 
+> > It would be used to generate config-devices.mak, instead of
+> > scripts/make_device_config.sh.  My branch already had some Makefile
+> > integration.
+> > 
+> > > - From a user's build perspective, there would be no noticeable
+> > >   difference, ./configure && make. Internally, both steps will consume
+> > >   the *.mak files generated by minikconf.
+> > 
+> > Right.  The only difference is that a user could do "./configure && make
+> > randconfig && make" and similar.
+> 
+> Also, I would like to eventually replace many ./configure options
+> with options read from a build configuration file.
+> 
+> Distributions often have huge ./configure command lines in their
+> QEMU packages, and they could be replaced by simple build
+> configuration files.
+> 
+> Having a mode that requires all build options to be specified
+> explicitly (instead of silently picking a default)
+I agree. This has been a problem for us several times, we saw build
+errors because on some host build options were silently selected while
+on others they were not.
+But to emphasize on what Paolo said, I think using kconfig for
+describing the target/device/platform dependencies is almost orthogonal
+to improving the configuration step.
 
-I don't understand this. If the header of the file we're using
-says "this is the maximum", then we should trust the header to
-in fact not be lying to us, shouldn't we ?
-
-If the kernel initrd creation process creates an initrd which
-is larger than 2GB and also claims that it can't be placed
-with any part of it above 2GB, then that sounds like a bug
-in the initrd creation process...
-
->      } else {
->          initrd_max = 0x37ffffff;
->      }
-
-This patch should come last in the series: only after we have fixed all
-of QEMU's internal plumbing to handle larger initrd sizes should we
-enable it.
-
-thanks
--- PMM
+Cheers,
+Samuel.
