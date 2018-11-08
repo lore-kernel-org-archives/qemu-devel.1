@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43868)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1gKhcS-0003GX-Dw
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:33:01 -0500
+	(envelope-from <gengdongjiu@huawei.com>) id 1gKhcV-0003PQ-QO
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:33:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1gKhcR-0000Rk-7G
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:33:00 -0500
+	(envelope-from <gengdongjiu@huawei.com>) id 1gKhcP-0000Qw-S1
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:33:03 -0500
 From: Dongjiu Geng <gengdongjiu@huawei.com>
-Date: Thu, 8 Nov 2018 02:29:46 -0800
-Message-ID: <1541672989-15967-8-git-send-email-gengdongjiu@huawei.com>
+Date: Thu, 8 Nov 2018 02:29:45 -0800
+Message-ID: <1541672989-15967-7-git-send-email-gengdongjiu@huawei.com>
 In-Reply-To: <1541672989-15967-1-git-send-email-gengdongjiu@huawei.com>
 References: <1541672989-15967-1-git-send-email-gengdongjiu@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH RESEND v15 07/10] KVM: Move related hwpoison
- page functions to accel/kvm/ folder
+Subject: [Qemu-devel] [PATCH RESEND v15 06/10] docs: APEI GHES generation
+ and CPER record description
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,129 +24,118 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: imammedo@redhat.com, mst@redhat.com, peter.maydell@linaro.org, lersek@redhat.com, marc.zyngier@arm.com, james.morse@arm.com, pbonzini@redhat.com, mtosatti@redhat.com, rth@twiddle.net, zhengxiang9@huawei.com, ehabkost@redhat.com, kvm@vger.kernel.org, shannon.zhaosl@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, gengdongjiu@huawei.com
 
-kvm_hwpoison_page_add() and kvm_unpoison_all() will be used both
-by X86 and ARM platforms, so move these functions to a common
-accel/kvm/ folder to avoid duplicate code.
+Add APEI/GHES detailed design document
 
 Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 ---
-Address Peter's comments to move related hwpoison page function to
-accel/kvm folder in [1]
-Address Paolo's comments to move HWPoisonPage definition back to
-accel/kvm/kvm-all.c
-
-[1]:
-https://lists.gnu.org/archive/html/qemu-arm/2017-09/msg00077.html
-https://lists.gnu.org/archive/html/qemu-arm/2017-09/msg00152.html
+Address Igor's comments to add a doc
 ---
- accel/kvm/kvm-all.c     | 33 +++++++++++++++++++++++++++++++++
- include/exec/ram_addr.h |  5 +++++
- target/i386/kvm.c       | 33 ---------------------------------
- 3 files changed, 38 insertions(+), 33 deletions(-)
+ docs/specs/acpi_hest_ghes.txt | 97 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 97 insertions(+)
+ create mode 100644 docs/specs/acpi_hest_ghes.txt
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 4880a05..003deac 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -625,6 +625,39 @@ int kvm_vm_check_extension(KVMState *s, unsigned int extension)
-     return ret;
- }
- 
-+typedef struct HWPoisonPage {
-+    ram_addr_t ram_addr;
-+    QLIST_ENTRY(HWPoisonPage) list;
-+} HWPoisonPage;
+diff --git a/docs/specs/acpi_hest_ghes.txt b/docs/specs/acpi_hest_ghes.txt
+new file mode 100644
+index 0000000..fbfc787
+--- /dev/null
++++ b/docs/specs/acpi_hest_ghes.txt
+@@ -0,0 +1,97 @@
++APEI tables generating and CPER record
++=============================
 +
-+static QLIST_HEAD(, HWPoisonPage) hwpoison_page_list =
-+    QLIST_HEAD_INITIALIZER(hwpoison_page_list);
++Copyright (C) 2017 HuaWei Corporation.
 +
-+void kvm_unpoison_all(void *param)
-+{
-+    HWPoisonPage *page, *next_page;
++Design Details:
++-------------------
 +
-+    QLIST_FOREACH_SAFE(page, &hwpoison_page_list, list, next_page) {
-+        QLIST_REMOVE(page, list);
-+        qemu_ram_remap(page->ram_addr, TARGET_PAGE_SIZE);
-+        g_free(page);
-+    }
-+}
++       etc/acpi/tables                                 etc/hardware_errors
++    ====================                      ==========================================
+++ +--------------------------+            +-----------------------+
++| | HEST                     |            |    address            |            +--------------+
++| +--------------------------+            |    registers          |            | Error Status |
++| | GHES1                    |            | +---------------------+            | Data Block 1 |
++| +--------------------------+ +--------->| |error_block_address1 |----------->| +------------+
++| | .................        | |          | +---------------------+            | |  CPER      |
++| | error_status_address-----+-+ +------->| |error_block_address2 |--------+   | |  CPER      |
++| | .................        |   |        | +---------------------+        |   | |  ....      |
++| | read_ack_register--------+-+ |        | |    ..............   |        |   | |  CPER      |
++| | read_ack_preserve        | | |        +-----------------------+        |   | +------------+
++| | read_ack_write           | | | +----->| |error_block_addressN |------+ |   | Error Status |
+++ +--------------------------+ | | |      | +---------------------+      | |   | Data Block 2 |
++| | GHES2                    | +-+-+----->| |read_ack_register1   |      | +-->| +------------+
+++ +--------------------------+   | |      | +---------------------+      |     | |  CPER      |
++| | .................        |   | | +--->| |read_ack_register2   |      |     | |  CPER      |
++| | error_status_address-----+---+ | |    | +---------------------+      |     | |  ....      |
++| | .................        |     | |    | |  .............      |      |     | |  CPER      |
++| | read_ack_register--------+-----+-+    | +---------------------+      |     +-+------------+
++| | read_ack_preserve        |     |   +->| |read_ack_registerN   |      |     | |..........  |
++| | read_ack_write           |     |   |  | +---------------------+      |     | +------------+
+++ +--------------------------|     |   |                                 |     | Error Status |
++| | ...............          |     |   |                                 |     | Data Block N |
+++ +--------------------------+     |   |                                 +---->| +------------+
++| | GHESN                    |     |   |                                       | |  CPER      |
+++ +--------------------------+     |   |                                       | |  CPER      |
++| | .................        |     |   |                                       | |  ....      |
++| | error_status_address-----+-----+   |                                       | |  CPER      |
++| | .................        |         |                                       +-+------------+
++| | read_ack_register--------+---------+
++| | read_ack_preserve        |
++| | read_ack_write           |
+++ +--------------------------+
 +
-+void kvm_hwpoison_page_add(ram_addr_t ram_addr)
-+{
-+    HWPoisonPage *page;
++(1) QEMU generates the ACPI HEST table. This table goes in the current
++    "etc/acpi/tables" fw_cfg blob. Each error source has different
++    notification type.
 +
-+    QLIST_FOREACH(page, &hwpoison_page_list, list) {
-+        if (page->ram_addr == ram_addr) {
-+            return;
-+        }
-+    }
-+    page = g_new(HWPoisonPage, 1);
-+    page->ram_addr = ram_addr;
-+    QLIST_INSERT_HEAD(&hwpoison_page_list, page, list);
-+}
++(2) A new fw_cfg blob called "etc/hardware_errors" is introduced. QEMU
++    also need to populate this blob. The "etc/hardwre_errors" fw_cfg blob
++    contains one address registers table and one Error Status Data Block
++    table, all of which are pre-allocated.
 +
- static uint32_t adjust_ioeventfd_endianness(uint32_t val, uint32_t size)
- {
- #if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN)
-diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-index 9ecd911..1e02fb9 100644
---- a/include/exec/ram_addr.h
-+++ b/include/exec/ram_addr.h
-@@ -115,6 +115,11 @@ void qemu_ram_free(RAMBlock *block);
- 
- int qemu_ram_resize(RAMBlock *block, ram_addr_t newsize, Error **errp);
- 
-+/* Add a poisoned page to the list */
-+void kvm_hwpoison_page_add(ram_addr_t ram_addr);
-+/* Free and remove all the poisoned pages in the list */
-+void kvm_unpoison_all(void *param);
++(3) The address registers table contains N Error Block Address entries
++    and N Read Ack Address entries, the size for each entry is 8-byte.
++    The Error Status Data Block table contains N Error Status Data Block
++    entries, the size for each entry is 4096(0x1000) bytes. The total size
++    for "etc/hardware_errors" fw_cfg blob is (N * 8 * 2 + N * 4096) bytes.
 +
- #define DIRTY_CLIENTS_ALL     ((1 << DIRTY_MEMORY_NUM) - 1)
- #define DIRTY_CLIENTS_NOCODE  (DIRTY_CLIENTS_ALL & ~(1 << DIRTY_MEMORY_CODE))
- 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 796a049..08b3feb 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -457,39 +457,6 @@ uint32_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index)
- }
- 
- 
--typedef struct HWPoisonPage {
--    ram_addr_t ram_addr;
--    QLIST_ENTRY(HWPoisonPage) list;
--} HWPoisonPage;
--
--static QLIST_HEAD(, HWPoisonPage) hwpoison_page_list =
--    QLIST_HEAD_INITIALIZER(hwpoison_page_list);
--
--static void kvm_unpoison_all(void *param)
--{
--    HWPoisonPage *page, *next_page;
--
--    QLIST_FOREACH_SAFE(page, &hwpoison_page_list, list, next_page) {
--        QLIST_REMOVE(page, list);
--        qemu_ram_remap(page->ram_addr, TARGET_PAGE_SIZE);
--        g_free(page);
--    }
--}
--
--static void kvm_hwpoison_page_add(ram_addr_t ram_addr)
--{
--    HWPoisonPage *page;
--
--    QLIST_FOREACH(page, &hwpoison_page_list, list) {
--        if (page->ram_addr == ram_addr) {
--            return;
--        }
--    }
--    page = g_new(HWPoisonPage, 1);
--    page->ram_addr = ram_addr;
--    QLIST_INSERT_HEAD(&hwpoison_page_list, page, list);
--}
--
- static int kvm_get_mce_cap_supported(KVMState *s, uint64_t *mce_cap,
-                                      int *max_banks)
- {
++(4) QEMU generates the ACPI linker/loader script for the firmware
++
++(4a) The HEST table is part of "etc/acpi/tables", the firmware already
++    allocates the memory for it, because QEMU already generates an ALLOCATE
++    linker/loader command for it
++
++(4b) QEMU creates another ALLOCATE command for the "etc/hardware_errors"
++    blob. The firmware allocates memory for this blob and downloads it.
++
++(5) QEMU generates N ADD_POINTER commands, which patch address in the
++    "error_status_address" fields of the HEST table with a pointer to the
++    corresponding "address registers" in the downloaded "etc/hardware_errors"
++    blob.
++
++(6) QEMU generates N ADD_POINTER commands, which patch address in the
++    "read_ack_register" fields of the HEST table with a pointer to the
++    corresponding "address registers" in the downloaded "etc/hardware_errors" blob.
++
++(7) QEMU generates N ADD_POINTER commands for the firmware, which patch
++    address in the " error_block_address" fields with a pointer to the
++    respective "Error Status Data Block" in the downloaded "etc/hardware_errors"
++    blob.
++
++(8) QEMU Defines a third and write-only fw_cfg blob which is called
++    "etc/hardware_errors_addr". Through that blob, the firmware can send back
++    the guest-side allocation addresses to QEMU. The "etc/hardware_errors_addr"
++    blob contains a 8-byte entry. QEMU generates a single WRITE_POINTER commands
++    for the firmware, the firmware will write back the start address of
++    "etc/hardware_errors" blob to fw_cfg file "etc/hardware_errors_addr". Then
++    Qemu will know the Error Status Data Block for every error source. Each of
++    Error Status Data Block has fixed size which is 4096(0x1000).
++
++(9) When QEMU gets SIGBUS from the kernel, QEMU formats the CPER right into
++    guest memory, and then injects whatever interrupt (or assert whatever GPIO line)
++    as a notification which is necessary for notifying the guest.
++
++(10) This notification (in virtual hardware) will be handled by guest kernel,
++    guest APEI driver will read the CPER which is recorded by QEMU and do the
++    recovery.
 -- 
 1.8.3.1
