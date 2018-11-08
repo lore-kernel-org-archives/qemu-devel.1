@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <macro@linux-mips.org>) id 1gKsQg-0003fl-Rx
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 17:05:37 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gKsx4-0004P1-Bd
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 17:39:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <macro@linux-mips.org>) id 1gKsMM-0006eZ-Bz
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 17:01:09 -0500
-Received: from eddie.linux-mips.org ([148.251.95.138]:59658
-	helo=cvs.linux-mips.org) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <macro@linux-mips.org>) id 1gKsML-0006cL-26
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 17:01:06 -0500
-Received: (from localhost user: 'macro', uid#1010) by eddie.linux-mips.org
-	with ESMTP id S23992971AbeKHWA6Zi0Xj (ORCPT
-	<rfc822;qemu-devel@nongnu.org>); Thu, 8 Nov 2018 23:00:58 +0100
-Date: Thu, 8 Nov 2018 22:00:58 +0000 (GMT)
-Sender: "Maciej W. Rozycki" <macro@linux-mips.org>
-From: "Maciej W. Rozycki" <macro@linux-mips.org>
-In-Reply-To: <20181108185058.GA21067@sx9>
-Message-ID: <alpine.LFD.2.21.1811082136330.7359@eddie.linux-mips.org>
-References: <cover.1541616663.git.noring@nocrew.org>
-	<e8e6bfd053f051d5195ec030f06749b24f867b13.1541616663.git.noring@nocrew.org>
-	<BN6PR2201MB12512C561DAD7AE29946682CC6C50@BN6PR2201MB1251.namprd22.prod.outlook.com>
-	<20181108185058.GA21067@sx9>
+	(envelope-from <no-reply@patchew.org>) id 1gKskI-0006KK-5m
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 17:25:54 -0500
+Resent-Message-Id: <E1gKskI-0006KK-5m@eggs.gnu.org>
+Message-ID: <154171591271.27100.7446935735361339278@015909e0f939>
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <1541672153-15529-1-git-send-email-gengdongjiu@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH v2 4/6] target/mips: Fix decoding mechanism
- of special R5900 opcodes
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 8 Nov 2018 14:25:14 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v15 00/10] Add ARMv8 RAS virtualization
+ support in QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,34 +24,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fredrik Noring <noring@nocrew.org>
-Cc: Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?Q?J=C3=BCrgen_Urban?= <JuergenUrban@gmx.de>, qemu-devel@nongnu.org
+To: gengdongjiu@huawei.com
+Cc: famz@redhat.com, imammedo@redhat.com, mst@redhat.com, peter.maydell@linaro.org, pbonzini@redhat.com, mtosatti@redhat.com, rth@twiddle.net, ehabkost@redhat.com, kvm@vger.kernel.org, shannon.zhaosl@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org
 
-On Thu, 8 Nov 2018, Fredrik Noring wrote:
-
-> > Fredrik, do you know by any chance if a document exists that would justify
-> > inclusion of non-R5900 DMULT, DMULTU, DDIV, DDIVU in R5900 executables by
-> > gcc for R5900? Is it included by cross-gcc or by native gcc, or by both?
-> > 
-> > I think gcc folks must have had a good reason for that, some kind of
-> > design - it can't be 'I really like/miss this instruction, let's include
-> > it...'
-> 
-> The R5900 reports itself as MIPS III and DMULT, DMULTU, DDIV and DDIVU
-> are part of the MIPS III ISA. They are emulated in user mode to support
-> generic MIPS III programs.
-
- FAOD, GCC does not emit these instructions if the R5900 architecture has 
-been selected for compilation, e.g.:
-
-/* ISA supports instructions DMULT and DMULTU. */
-#define ISA_HAS_DMULT		(TARGET_64BIT				\
-				 && !TARGET_MIPS5900			\
-				 && mips_isa_rev <= 5)
-
-however they are a part of the base 64-bit MIPS Linux user psABI, which is 
-the whole of the MIPS III ISA, so the runtime has to support them one way 
-or another (just like LL, SC and SYNC are a part of the 32-bit MIPS Linux 
-user psABI even though they are not supported by MIPS I hardware).
-
-  Maciej
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1NDE2NzIxNTMtMTU1MjktMS1naXQtc2VuZC1lbWFpbC1nZW5nZG9uZ2ppdUBo
+dWF3ZWkuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjE1IDAwLzEwXSBBZGQgQVJN
+djggUkFTIHZpcnR1YWxpemF0aW9uIHN1cHBvcnQgaW4gUUVNVQoKPT09IFRFU1QgU0NSSVBUIEJF
+R0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVs
+aW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
+bmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25m
+aWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAt
+LWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAg
+ZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0l
+cyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRz
+L2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAg
+ICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1Qg
+U0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4
+ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwplYTZmNTU5ZWJiIHRhcmdl
+dC1hcm06IGt2bTY0OiBoYW5kbGUgU0lHQlVTIHNpZ25hbCBmcm9tIGtlcm5lbCBvciBLVk0KZjc1
+NTlmZGQ1ZSBody9hcm0vdmlydDogQWRkIFJBUyBwbGF0Zm9ybSB2ZXJzaW9uIGZvciBtaWdyYXRp
+b24KNWQ1Y2U3Njk0ZiB0YXJnZXQtYXJtOiBrdm02NDogaW5qZWN0IHN5bmNocm9ub3VzIEV4dGVy
+bmFsIEFib3J0CjVkNGE1ZjFlOGUgS1ZNOiBNb3ZlIHJlbGF0ZWQgaHdwb2lzb24gcGFnZSBmdW5j
+dGlvbnMgdG8gYWNjZWwva3ZtLyBmb2xkZXIKY2ZlODA0MWMwNSBkb2NzOiBBUEVJIEdIRVMgZ2Vu
+ZXJhdGlvbiBhbmQgQ1BFUiByZWNvcmQgZGVzY3JpcHRpb24KOWNiZTNhMTYyNSBBQ1BJOiBBZGQg
+QVBFSSBHSEVTIHRhYmxlIGdlbmVyYXRpb24gYW5kIENQRVIgcmVjb3JkIHN1cHBvcnQKZjUwYmFl
+MGM5MiBhY3BpOiBhZGQgYnVpbGRfYXBwZW5kX2doZXNfZ2VuZXJpY19zdGF0dXMoKSBoZWxwZXIg
+Zm9yIEdlbmVyaWMgRXJyb3IgU3RhdHVzIEJsb2NrCjUyMDJjNzgxMGMgYWNwaTogYWRkIGJ1aWxk
+X2FwcGVuZF9naGVzX2dlbmVyaWNfZGF0YSgpIGhlbHBlciBmb3IgR2VuZXJpYyBFcnJvciBEYXRh
+IEVudHJ5CmQ1NjY2MDc3NGIgYWNwaTogYWRkIGJ1aWxkX2FwcGVuZF9naGVzX25vdGlmeSgpIGhl
+bHBlciBmb3IgSGFyZHdhcmUgRXJyb3IgTm90aWZpY2F0aW9uCmY2MjU4NDUyMmEgQUNQSTogYWRk
+IHNvbWUgR0hFUyBzdHJ1Y3R1cmVzIGFuZCBtYWNyb3MgZGVmaW5pdGlvbgoKPT09IE9VVFBVVCBC
+RUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xMDogQUNQSTogYWRkIHNvbWUgR0hFUyBzdHJ1Y3R1
+cmVzIGFuZCBtYWNyb3MgZGVmaW5pdGlvbi4uLgpDaGVja2luZyBQQVRDSCAyLzEwOiBhY3BpOiBh
+ZGQgYnVpbGRfYXBwZW5kX2doZXNfbm90aWZ5KCkgaGVscGVyIGZvciBIYXJkd2FyZSBFcnJvciBO
+b3RpZmljYXRpb24uLi4KQ2hlY2tpbmcgUEFUQ0ggMy8xMDogYWNwaTogYWRkIGJ1aWxkX2FwcGVu
+ZF9naGVzX2dlbmVyaWNfZGF0YSgpIGhlbHBlciBmb3IgR2VuZXJpYyBFcnJvciBEYXRhIEVudHJ5
+Li4uCkNoZWNraW5nIFBBVENIIDQvMTA6IGFjcGk6IGFkZCBidWlsZF9hcHBlbmRfZ2hlc19nZW5l
+cmljX3N0YXR1cygpIGhlbHBlciBmb3IgR2VuZXJpYyBFcnJvciBTdGF0dXMgQmxvY2suLi4KQ2hl
+Y2tpbmcgUEFUQ0ggNS8xMDogQUNQSTogQWRkIEFQRUkgR0hFUyB0YWJsZSBnZW5lcmF0aW9uIGFu
+ZCBDUEVSIHJlY29yZCBzdXBwb3J0Li4uCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVk
+IGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzQ2OiAKbmV3IGZpbGUg
+bW9kZSAxMDA2NDQKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxMDY6IEZJTEU6
+IGh3L2FjcGkvYWNwaV9naGVzLmM6NTY6CisgICAgICAgIGJ1aWxkX2FwcGVuZF9pbnRfbm9wcmVm
+aXgoKHZvaWQgKiloYXJkd2FyZV9lcnJvcnMsIDEsIEdIRVNfQUREUkVTU19TSVpFKTsKCldBUk5J
+Tkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxMzQ6IEZJTEU6IGh3L2FjcGkvYWNwaV9naGVz
+LmM6ODQ6CisgICAgICAgIGJ1aWxkX2FwcGVuZF9pbnRfbm9wcmVmaXgodGFibGVfZGF0YSwgY3B1
+X3RvX2xlMTYoaSksIDIpOyAvKiBzb3VyY2UgaWQgKi8KCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBj
+aGFyYWN0ZXJzCiMxMzU6IEZJTEU6IGh3L2FjcGkvYWNwaV9naGVzLmM6ODU6CisgICAgICAgIGJ1
+aWxkX2FwcGVuZF9pbnRfbm9wcmVmaXgodGFibGVfZGF0YSwgMHhmZmZmLCAyKTsgLyogcmVsYXRl
+ZCBzb3VyY2UgaWQgKi8KCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxNDg6IEZJ
+TEU6IGh3L2FjcGkvYWNwaV9naGVzLmM6OTg6CisgICAgICAgIGJ1aWxkX2FwcGVuZF9nYXModGFi
+bGVfZGF0YSwgQU1MX1NZU1RFTV9NRU1PUlksIDB4NDAsIDAsIDQgLyogUVdvcmQgYWNjZXNzICov
+LCAwKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxNzI6IEZJTEU6IGh3L2Fj
+cGkvYWNwaV9naGVzLmM6MTIyOgorICAgICAgICBidWlsZF9hcHBlbmRfZ2FzKHRhYmxlX2RhdGEs
+IEFNTF9TWVNURU1fTUVNT1JZLCAweDQwLCAwLCA0IC8qIFFXb3JkIGFjY2VzcyAqLywgMCk7CgpF
+UlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzMwOTogRklMRTogaW5jbHVkZS9ody9hY3Bp
+L2FjcGlfZ2hlcy5oOjI5OgorLyogVGhlIHNpemUgb2YgQWRkcmVzcyBmaWVsZCBpbiBHZW5lcmlj
+IEFkZHJlc3MgU3RydWN0dXJlLCBBQ1BJIDIuMC8zLjA6IDUuMi4zLjEgR2VuZXJpYyBBZGRyZXNz
+Cgp0b3RhbDogMSBlcnJvcnMsIDYgd2FybmluZ3MsIDMxMSBsaW5lcyBjaGVja2VkCgpZb3VyIHBh
+dGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
+cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
+c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA2LzEwOiBkb2Nz
+OiBBUEVJIEdIRVMgZ2VuZXJhdGlvbiBhbmQgQ1BFUiByZWNvcmQgZGVzY3JpcHRpb24uLi4KV0FS
+TklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBu
+ZWVkIHVwZGF0aW5nPwojMTQ6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3Jz
+LCAxIHdhcm5pbmdzLCA5NyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9i
+bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
+c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
+TUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDcvMTA6IEtWTTogTW92ZSByZWxhdGVkIGh3cG9p
+c29uIHBhZ2UgZnVuY3Rpb25zIHRvIGFjY2VsL2t2bS8gZm9sZGVyLi4uCkNoZWNraW5nIFBBVENI
+IDgvMTA6IHRhcmdldC1hcm06IGt2bTY0OiBpbmplY3Qgc3luY2hyb25vdXMgRXh0ZXJuYWwgQWJv
+cnQuLi4KQ2hlY2tpbmcgUEFUQ0ggOS8xMDogaHcvYXJtL3ZpcnQ6IEFkZCBSQVMgcGxhdGZvcm0g
+dmVyc2lvbiBmb3IgbWlncmF0aW9uLi4uCkNoZWNraW5nIFBBVENIIDEwLzEwOiB0YXJnZXQtYXJt
+OiBrdm02NDogaGFuZGxlIFNJR0JVUyBzaWduYWwgZnJvbSBrZXJuZWwgb3IgS1ZNLi4uCldBUk5J
+Tkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM4MDogRklMRTogaHcvYWNwaS9hY3BpX2doZXMu
+Yzo2ODoKKyAgICBjdXJyZW50X2Jsb2NrX2xlbmd0aCA9IHNpemVvZihBY3BpR2VuZXJpY0Vycm9y
+U3RhdHVzKSArIGxlMzJfdG9fY3B1KGRhdGFfbGVuZ3RoKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4
+MCBjaGFyYWN0ZXJzCiM4OTogRklMRTogaHcvYWNwaS9hY3BpX2doZXMuYzo3NzoKKyAgICBpZiAo
+KGRhdGFfbGVuZ3RoICsgc2l6ZW9mKEFjcGlHZW5lcmljRXJyb3JTdGF0dXMpKSA+IEdIRVNfTUFY
+X1JBV19EQVRBX0xFTkdUSCkgewoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzk0
+OiBGSUxFOiBody9hY3BpL2FjcGlfZ2hlcy5jOjgyOgorICAgIGJ1aWxkX2FwcGVuZF9naGVzX2dl
+bmVyaWNfc3RhdHVzKGJsb2NrLCBjcHVfdG9fbGUzMihBQ1BJX0dFQlNfVU5DT1JSRUNUQUJMRSks
+IDAsIDAsCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTA2OiBGSUxFOiBody9h
+Y3BpL2FjcGlfZ2hlcy5jOjk0OgorICAgICAgICAgICAgICAgICAgICBjcHVfdG9fbGUzMihBQ1BJ
+X0NQRVJfU0VWX1JFQ09WRVJBQkxFKSwgY3B1X3RvX2xlMzIoMHgzMDApLCAwLCAwLAoKV0FSTklO
+RzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzEwNzogRklMRTogaHcvYWNwaS9hY3BpX2doZXMu
+Yzo5NToKKyAgICAgICAgICAgICAgICAgICAgY3B1X3RvX2xlMzIoODApLyogdGhlIHRvdGFsIHNp
+emUgb2YgTWVtb3J5IEVycm9yIFJlY29yZCAqLywgZnJ1X2lkLAoKdG90YWw6IDAgZXJyb3JzLCA1
+IHdhcm5pbmdzLCAyNTYgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxl
+bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
+dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
+SU5UQUlORVJTLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBj
+b2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0
+dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXct
+ZGV2ZWxAcmVkaGF0LmNvbQ==
