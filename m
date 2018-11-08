@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39020)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39214)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gKkZ9-0006ea-Kt
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 08:41:49 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gKkZr-0006za-1T
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 08:42:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gKkZ8-0007On-9t
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 08:41:47 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:52428)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1gKkZ8-0007JN-01
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 08:41:46 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu,  8 Nov 2018 13:41:39 +0000
-Message-Id: <20181108134139.31666-1-peter.maydell@linaro.org>
+	(envelope-from <pbonzini@redhat.com>) id 1gKkZl-0007im-Ke
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 08:42:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46798)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gKkZl-0007hh-6Z
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 08:42:25 -0500
+References: <87b22690-e39c-3b46-dcb4-f6abc3213142@redhat.com>
+	<CAFEAcA8yHb4MdtsJuXcswQp93DN5tSeN9dn8AWWL9se0DKvdcg@mail.gmail.com>
+	<41ceda53-467e-32a1-8fa6-13f0f9c08ad1@redhat.com>
+	<CAFEAcA9oCs+Y1fnY8dOR16n_Hn7PaHziL7K0HZK6=BAd_Gyecg@mail.gmail.com>
+	<e496287e-f8ba-3608-42e1-efb697cfc784@redhat.com>
+	<20181107154114.GC27585@caravaggio>
+	<dd68d3e8-6448-3a67-3212-fd3d3bfba2e2@redhat.com>
+	<20181107192414.GH12503@habkost.net>
+	<c6bbfeb8-53c5-0e0c-cf36-14e586cfb581@redhat.com>
+	<a0decaa7-d83b-b0ad-60ea-aa0890feb905@redhat.com>
+	<20181108130648.GJ12503@habkost.net>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <95a93d53-f87d-bd96-9363-582c4eae4160@redhat.com>
+Date: Thu, 8 Nov 2018 14:42:19 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] MAINTAINERS: list myself as maintainer for
- various Arm boards
+In-Reply-To: <20181108130648.GJ12503@habkost.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] QEMU and Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,202 +37,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Markus Armbruster <armbru@redhat.com>, patches@linaro.org, Beniamino Galvani <b.galvani@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Rob Herring <robh@kernel.org>, Antony Pavlov <antonynpavlov@gmail.com>, Jan Kiszka <jan.kiszka@web.de>, Andrzej Zaborowski <balrogg@gmail.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, "Zhong, Yang" <yang.zhong@intel.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-In practice for most of the more-or-less orphan Arm board models,
-I will review patches and put them in via the target-arm tree.
-So list myself as an "Odd Fixes" status maintainer for them.
+On 08/11/2018 14:06, Eduardo Habkost wrote:
+> On Thu, Nov 08, 2018 at 10:55:21AM +0100, Paolo Bonzini wrote:
+>> On 07/11/2018 20:30, Thomas Huth wrote:
+>>> On 2018-11-07 20:24, Eduardo Habkost wrote:
+>>>> On Wed, Nov 07, 2018 at 06:39:54PM +0100, Paolo Bonzini wrote:
+>>>>> On 07/11/2018 16:41, Samuel Ortiz wrote:
+>>>>>> - The Kconfig parser would be used to generate the equivalent of w=
+hat we
+>>>>>>   currently have under default-configs/
+>>>
+>>> I think we would still have something like default-configs - but ther=
+e
+>>> would only be the bare minimum config switches in there, the rest wou=
+ld
+>>> be pulled in by dependencies.
+>>
+>> Yes, in theory default-configs would end up empty, except for possibly
+>> some commented lines to show the "default y" symbols for the target.
+>>
+>>> We could then also even have multiple config directories:
+>>>
+>>> ./configs
+>>>  +-------/default-softmmu
+>>>  +-------/default-linux-user
+>>>  +-------/nemu (or lean-kvm or something similar)
+>>>  +...
+>>>
+>>> ... just my 0.02 =E2=82=AC, feel free to ignore that idea ;-)
+>>
+>> Yup, one can also think of a configure option like "./configure
+>> --with-device-config=3Dconfigs/nemu/" to pick up the alternative
+>> configurations.
+>>
+>>>> Also, I would like to eventually replace many ./configure options
+>>>> with options read from a build configuration file.
+>>>>
+>>>> Distributions often have huge ./configure command lines in their
+>>>> QEMU packages, and they could be replaced by simple build
+>>>> configuration files.
+>>>>
+>>>> Having a mode that requires all build options to be specified
+>>>> explicitly (instead of silently picking a default) would be
+>>>> useful for distributions, too.
+>>>
+>>> I think we should maybe not mix host configuration (via ./configure) =
+and
+>>> the target configuration (via kconfig), should we?
+>>
+>> Yeah, the configure command line is a different story.  If there are
+>> suggestion on how to improve it, great, but let's not conflate it with
+>> Kconfig.
+>=20
+> I believe we have many ./configure options that are supposed to
+> be target configuration.  e.g.: --enable-slirp, --eanble-kvm,
+> --enable-xen, etc.
 
-This commit downgrades these boards to "Odd Fixes":
- * Allwinner-A10
- * Exynos
- * Calxeda Highbank
- * Canon DIGIC
- * Musicpal
- * nSeries
- * Palm
- * PXA2xx
+SLIRP is not a target configuration, it's a backend like most other
+configure command line options.  The accelerators are but (except for
+TCG of course) they also depend on the host OS and architecture, which
+makes them a bit more complicated than default-configs/ symbols.  There
+are also things like --enable-vhost-user which affect the creation of
+both devices (e.g. vhost-user-scsi-pci) and backends (e.g. the
+vhost-user-net backend, which uses a "regular" virtio-net-pci device).
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-Thomas Huth sent a patch which only addressed collie, but
-let's be consistent.
+It would surely be possible for configure to call into minikconf to
+parse a configuration file and apply dependencies (do we actually have
+dependencies across configure options?) or something like that, but
+let's not put the cart before the horse...
 
-The set of downgrades to odd-fixes is based mostly on my
-subjective impression of whether anybody has made any changes
-to the board models over the last year or so, so it's quite
-possible I've forgotten that one of them is in better shape
-maintainer-activity-wise. If the maintainers for those boards
-disagree (cc'd) I'm happy to re-upgrade them to Maintained.
-
-Arguably it would be nice to have a letter prefix for "this
-is the person who will deal with getting the patch into the
-tree, but somebody else will be the primary maintainer for
-patch review" -- that's the situation for the maintained/
-active boards like ASpeed.
----
- MAINTAINERS | 36 +++++++++++++++++++++++++++---------
- 1 file changed, 27 insertions(+), 9 deletions(-)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 0d68e4bc5eb..4443105686d 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -436,8 +436,9 @@ ARM Machines
- ------------
- Allwinner-a10
- M: Beniamino Galvani <b.galvani@gmail.com>
-+M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
--S: Maintained
-+S: Odd Fixes
- F: hw/*/allwinner*
- F: include/hw/*/allwinner*
- F: hw/arm/cubieboard.c
-@@ -496,27 +497,31 @@ F: tests/test-arm-mptimer.c
- 
- Exynos
- M: Igor Mitsyanko <i.mitsyanko@gmail.com>
-+M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
--S: Maintained
-+S: Odd Fixes
- F: hw/*/exynos*
- F: include/hw/arm/exynos4210.h
- 
- Calxeda Highbank
- M: Rob Herring <robh@kernel.org>
-+M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
--S: Maintained
-+S: Odd Fixes
- F: hw/arm/highbank.c
- F: hw/net/xgmac.c
- 
- Canon DIGIC
- M: Antony Pavlov <antonynpavlov@gmail.com>
-+M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
--S: Maintained
-+S: Odd Fixes
- F: include/hw/arm/digic.h
- F: hw/*/digic*
- 
- Gumstix
- M: Philippe Mathieu-Daudé <f4bug@amsat.org>
-+M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-devel@nongnu.org
- L: qemu-arm@nongnu.org
- S: Odd Fixes
-@@ -524,8 +529,9 @@ F: hw/arm/gumstix.c
- 
- i.MX31
- M: Peter Chubb <peter.chubb@nicta.com.au>
-+M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
--S: Odd fixes
-+S: Odd Fixes
- F: hw/*/imx*
- F: include/hw/*/imx*
- F: hw/arm/kzm.c
-@@ -555,20 +561,23 @@ F: include/hw/misc/iotkit-sysinfo.h
- 
- Musicpal
- M: Jan Kiszka <jan.kiszka@web.de>
-+M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
--S: Maintained
-+S: Odd Fixes
- F: hw/arm/musicpal.c
- 
- nSeries
- M: Andrzej Zaborowski <balrogg@gmail.com>
-+M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
--S: Maintained
-+S: Odd Fixes
- F: hw/arm/nseries.c
- 
- Palm
- M: Andrzej Zaborowski <balrogg@gmail.com>
-+M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
--S: Maintained
-+S: Odd Fixes
- F: hw/arm/palm.c
- 
- Real View
-@@ -582,8 +591,9 @@ F: include/hw/intc/realview_gic.h
- 
- PXA2XX
- M: Andrzej Zaborowski <balrogg@gmail.com>
-+M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
--S: Maintained
-+S: Odd Fixes
- F: hw/arm/mainstone.c
- F: hw/arm/spitz.c
- F: hw/arm/tosa.c
-@@ -608,6 +618,7 @@ F: hw/misc/arm_sysctl.c
- Xilinx Zynq
- M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
- M: Alistair Francis <alistair@alistair23.me>
-+M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
- S: Maintained
- F: hw/*/xilinx_*
-@@ -619,6 +630,7 @@ X: hw/ssi/xilinx_*
- Xilinx ZynqMP
- M: Alistair Francis <alistair@alistair23.me>
- M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
-+M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
- S: Maintained
- F: hw/*/xlnx*.c
-@@ -632,6 +644,7 @@ F: hw/arm/virt-acpi-build.c
- 
- STM32F205
- M: Alistair Francis <alistair@alistair23.me>
-+M: Peter Maydell <peter.maydell@linaro.org>
- S: Maintained
- F: hw/arm/stm32f205_soc.c
- F: hw/misc/stm32f2xx_syscfg.c
-@@ -643,11 +656,13 @@ F: include/hw/*/stm32*.h
- 
- Netduino 2
- M: Alistair Francis <alistair@alistair23.me>
-+M: Peter Maydell <peter.maydell@linaro.org>
- S: Maintained
- F: hw/arm/netduino2.c
- 
- SmartFusion2
- M: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-+M: Peter Maydell <peter.maydell@linaro.org>
- S: Maintained
- F: hw/arm/msf2-soc.c
- F: hw/misc/msf2-sysreg.c
-@@ -660,11 +675,13 @@ F: include/hw/ssi/mss-spi.h
- 
- Emcraft M2S-FG484
- M: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-+M: Peter Maydell <peter.maydell@linaro.org>
- S: Maintained
- F: hw/arm/msf2-som.c
- 
- ASPEED BMCs
- M: Cédric Le Goater <clg@kaod.org>
-+M: Peter Maydell <peter.maydell@linaro.org>
- R: Andrew Jeffery <andrew@aj.id.au>
- R: Joel Stanley <joel@jms.id.au>
- L: qemu-arm@nongnu.org
-@@ -676,6 +693,7 @@ F: include/hw/net/ftgmac100.h
- 
- NRF51
- M: Joel Stanley <joel@jms.id.au>
-+M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
- S: Maintained
- F: hw/arm/nrf51_soc.c
--- 
-2.19.1
+Paolo
