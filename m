@@ -1,18 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56813)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gKpFZ-0002cO-Hf
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 13:41:54 -0500
+	(envelope-from <liran.alon@oracle.com>) id 1gKpG9-0002tw-Cx
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 13:42:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gKpFY-0000iI-8o
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 13:41:53 -0500
-MIME-Version: 1.0
-References: <20181108183306.4361-1-palmer@sifive.com>
-In-Reply-To: <20181108183306.4361-1-palmer@sifive.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 8 Nov 2018 10:38:51 -0800
-Message-ID: <CAKmqyKPHDx7iTQRaY7+5v13oE-ARzpqFDOo4e98Y4bHGH7s+Ww@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL] A Single RISC-V Patch for 3.1-rc1
+	(envelope-from <liran.alon@oracle.com>) id 1gKpFq-0000wg-Or
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 13:42:20 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:55648)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <liran.alon@oracle.com>)
+	id 1gKpFq-0000lV-9Z
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 13:42:10 -0500
+Content-Type: text/plain;
+	charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+From: Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <d29d27ba-f34e-6dd6-4eec-8e75971269e3@redhat.com>
+Date: Thu, 8 Nov 2018 20:41:41 +0200
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <59EE7141-6771-47E2-8473-C1429676AD7B@oracle.com>
+References: <CALMp9eQ5zWxb2N9fyYz=WcQshwk0L6qQ4D6L6+p_dzMo4H=txA@mail.gmail.com>
+	<20181102034649.43559-1-liran.alon@oracle.com>
+	<CALMp9eRk=a1FEyr78NRGBBZ2iFCo5s2n5N=bM4zR=YF56oob3A@mail.gmail.com>
+	<1C803EF0-9E1B-4E1B-A4DD-4BE788A7A1FF@oracle.com>
+	<DF5EC0F1-BA8D-4B85-BB1A-B22234235FBA@oracle.com>
+	<CALMp9eQSptO+S1NZjQQUa=HQCXFOevHwTDS9i0KXHCGSfKzEkA@mail.gmail.com>
+	<a567de11-a106-fd6d-7998-1a18ba17eaaa@redhat.com>
+	<939A6255-306C-431C-8799-0D56A30A3BD5@oracle.com>
+	<d29d27ba-f34e-6dd6-4eec-8e75971269e3@redhat.com>
+Subject: Re: [Qemu-devel] [QEMU PATCH v2 0/2]: KVM: i386: Add support for
+ save and restore nested state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,53 +37,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Palmer Dabbelt <palmer@sifive.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-riscv@nongnu.org, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Jim Mattson <jmattson@google.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, kvm list <kvm@vger.kernel.org>, mtosatti@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org
 
-On Thu, Nov 8, 2018 at 10:35 AM Palmer Dabbelt <palmer@sifive.com> wrote:
->
-> The following changes since commit a7ce790a029bd94eb320d8c69f38900f5233997e:
->
->   tcg/tcg-op.h: Add multiple include guard (2018-11-08 15:15:32 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/riscv/riscv-qemu.git tags/riscv-for-master-3.1-rc1
->
-> for you to fetch changes up to 00a014ac01feac875468d38c376f7e06f050f992:
->
->   riscv: spike: Fix memory leak in the board init (2018-11-08 08:41:06 -0800)
->
-> ----------------------------------------------------------------
-> A Single RISC-V Patch for 3.1-rc1
->
-> This tag contains a single patch that I'd like to target for rc1: a fix
-> for a memory leak that was detected by static code analysis.
->
-> There are still three patch sets that I'd like to try to get up for 3.1:
->
-> * The patch set Basian just published that contains fixes for a pair of
->   issues he found when converting our port to decodetree.
-> * An as-of-yet-unwritten fix to the third issue that Basian pointed out.
-> * A fix to our fflags bug, which is currently coupled to some CSR
->   refactoring that I don't think is OK for 3.1.
 
-There is one more patch fixing a memory leak in the virt board as well.
 
->
-> I'm at Plumbers next week (and I think Alistair is there too?), but I'll
-> try to find a way to squeeze in as much as possible.
+> On 8 Nov 2018, at 19:02, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>=20
+> On 08/11/2018 10:57, Liran Alon wrote:
+>>=20
+>>=20
+>>> On 8 Nov 2018, at 11:50, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>>=20
+>>> On 08/11/2018 01:45, Jim Mattson wrote:
+>>>> I have no attachments to the current design. I had used a data[] =
+blob,
+>>>> because I didn't think userspace would have any need to know what =
+was
+>>>> in there. However, I am now seeing the error of my ways. For =
+example,
+>>>> the userspace instruction emulator needs to know the contents of =
+the
+>>>> vmcs12 to emulate instructions when in guest mode.
+>>>=20
+>>> Yeah, we're probably going to have to document the KVM vmcs12 =
+structure,
+>>> possibly moving it to uapi.  But that's a different thing from
+>>> save/restore state, which can use the 4K or 8K data[] blob.
+>>>=20
+>>> Paolo
+>>=20
+>> But regardless of if we document vmcs12 or not, the current blob we
+>> have today should be separated to well-defined blobs/structs =
+(cached_vmcs12
+>> and cached_shadow_vmcs12) and each blob should have a relevant flag =
+that specifies
+>> it is valid (saved by kernel or requested to be restored by =
+userspace).
+>> Additional future nested-state should be added as additional
+>> well-defined blobs/structs with appropriate flags.
+>=20
+> We are somewhat limited by the ABI of the released kernel versions, =
+and
+> it's unlikely that the structure will change in the short term.  So I
+> think it's okay if we just define that the first 4K of data are the =
+VMCS
+> and the second 8K are the shadow VMCS, whenever format=3D0 in the
+> kvm_nested_state struct.
+>=20
+> Paolo
 
-Yep! I'll be there.
+So what I plan to do is indeed to define first 4K of data as vmcs12 and =
+next 4K as shadow_vmcs12.
+I will also define each of them in a separate VMState subsection that =
+each will have it=E2=80=99s own .needed()
+method that will decide if it=E2=80=99s relevant to send it based on =
+kvm_state.size.
+vmcs12 and shadow_vmcs12 will be put in a struct which is unioned with a =
+struct
+of 2 pages buffer to clearly indicate that one well-defined struct is =
+used for VMX and the other for SVM.
+(based on kvm_state.format)
 
-Alistair
+In addition, I will change KVM_{GET,SET}_NESTED_STATE documentation to =
+indicate that
+future nested state fields should be added at the end of struct and =
+weather they are valid should
+be determined by a flag in kvm_state.flags.
+QEMU will handle these new states in the future by adding more VMState =
+subsections that have
+.needed() method based on appropriate flag in kvm_state.flags.
+The struct itself that userspace use against it=E2=80=99s local kernel =
+will be determined based on KVM_CAPs.
 
->
-> ----------------------------------------------------------------
-> Alistair Francis (1):
->       riscv: spike: Fix memory leak in the board init
->
->  hw/riscv/spike.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->
->
+If there are no objections, I will write the needed patches for QEMU =
+(and the documentation patch for KVM).
+(And throw away the current VMState technique I used in this version of =
+the patch :P)
+
+-Liran
+
+>=20
+>> Then, in QEMU, each such well-defined blob/struct should have it=E2=80=99=
+s own subsection with a relevant .needed() method.
+>> This will allow us to preserve required backwards compatibility.
+>>=20
+>> Agreed?
+>>=20
+>> -Liran
+>>=20
+>=20
