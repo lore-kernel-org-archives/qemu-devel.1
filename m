@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51025)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51273)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gKhxn-0003xb-LS
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:55:04 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gKhyL-0004N3-7N
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:55:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gKhxj-00015W-1h
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:55:03 -0500
-Date: Thu, 8 Nov 2018 11:54:26 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20181108115426.10efcf21.cohuck@redhat.com>
-In-Reply-To: <63c85f6b-2a3f-941b-cac3-4ec0cf6a01d3@linux.ibm.com>
-References: <20181105110313.29312-1-david@redhat.com>
-	<20181105110313.29312-2-david@redhat.com>
-	<20181105121936.243260a6.cohuck@redhat.com>
-	<63c85f6b-2a3f-941b-cac3-4ec0cf6a01d3@linux.ibm.com>
+	(envelope-from <stefanha@redhat.com>) id 1gKhyH-0001RJ-Og
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:55:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37504)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gKhyH-0001Ju-96
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:55:33 -0500
+Date: Thu, 8 Nov 2018 10:55:08 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20181108105508.GH17083@stefanha-x1.localdomain>
+References: <20181104112424.18663-1-stefanha@redhat.com>
+	<20181104112424.18663-3-stefanha@redhat.com>
+	<510dfe45-427f-6ae1-d546-a035776a4c2e@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1 1/4] s390x/zpci: drop
- msix.available
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Hlh2aiwFLCZwGcpw"
+Content-Disposition: inline
+In-Reply-To: <510dfe45-427f-6ae1-d546-a035776a4c2e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 2/8] get_maintainer: use 'https://'
+ instead of 'git://'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,75 +30,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Collin Walling <walling@linux.ibm.com>
-Cc: David Hildenbrand <david@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jeff Cody <jcody@redhat.com>, cohuck@redhat.com, Markus Armbruster <armbru@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Paolo Bonzini <pbonzini@redhat.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 
-On Wed, 7 Nov 2018 11:26:50 -0500
-Collin Walling <walling@linux.ibm.com> wrote:
 
-> On 11/5/18 6:19 AM, Cornelia Huck wrote:
-> > On Mon,  5 Nov 2018 12:03:10 +0100
-> > David Hildenbrand <david@redhat.com> wrote:
-> >   
-> >> I fail to see why this is useful as we require MSIX always and
-> >> completely fail adding a device.
-> >>
-> >> Signed-off-by: David Hildenbrand <david@redhat.com>
-> >> ---
-> >>  hw/s390x/s390-pci-bus.c | 2 --
-> >>  hw/s390x/s390-pci-bus.h | 1 -
-> >>  2 files changed, 3 deletions(-)
-> >>
-> >> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> >> index e1b14b131b..1eaae3aca6 100644
-> >> --- a/hw/s390x/s390-pci-bus.c
-> >> +++ b/hw/s390x/s390-pci-bus.c
-> >> @@ -745,7 +745,6 @@ static int s390_pci_msix_init(S390PCIBusDevice *pbdev)
-> >>  
-> >>      pos = pci_find_capability(pbdev->pdev, PCI_CAP_ID_MSIX);
-> >>      if (!pos) {
-> >> -        pbdev->msix.available = false;
-> >>          return -1;
-> >>      }
-> >>  
-> >> @@ -761,7 +760,6 @@ static int s390_pci_msix_init(S390PCIBusDevice *pbdev)
-> >>      pbdev->msix.pba_bar = pba & PCI_MSIX_FLAGS_BIRMASK;
-> >>      pbdev->msix.pba_offset = pba & ~PCI_MSIX_FLAGS_BIRMASK;
-> >>      pbdev->msix.entries = (ctrl & PCI_MSIX_FLAGS_QSIZE) + 1;
-> >> -    pbdev->msix.available = true;
-> >>  
-> >>      name = g_strdup_printf("msix-s390-%04x", pbdev->uid);
-> >>      memory_region_init_io(&pbdev->msix_notify_mr, OBJECT(pbdev),
-> >> diff --git a/hw/s390x/s390-pci-bus.h b/hw/s390x/s390-pci-bus.h
-> >> index 1f7f9b5814..f47a0f2da5 100644
-> >> --- a/hw/s390x/s390-pci-bus.h
-> >> +++ b/hw/s390x/s390-pci-bus.h
-> >> @@ -252,7 +252,6 @@ typedef struct ChscSeiNt2Res {
-> >>  } QEMU_PACKED ChscSeiNt2Res;
-> >>  
-> >>  typedef struct S390MsixInfo {
-> >> -    bool available;
-> >>      uint8_t table_bar;
-> >>      uint8_t pba_bar;
-> >>      uint16_t entries;  
-> > 
-> > OK, so that was a write-only variable? :)
-> > 
-> > Question for the IBMers: is there any change we might have a different
-> > implementation not relying on msi-x in the future?
-> >   
-> 
-> @Conny
-> Currently, the plan would be to stick with a hard requirement for MSIX unless someone 
-> strongly supports the legacy alternatives. I'm certainly open to discuss that. Maybe it 
-> would make sense to fallback to MSI for devices that don't support MSIX?
+--Hlh2aiwFLCZwGcpw
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I'm not sure whether that would be very useful. My question was more
-along the lines of "ok, so now that available flag is gone for good?" :)
+On Sun, Nov 04, 2018 at 11:37:21PM +0100, Philippe Mathieu-Daud=E9 wrote:
+> Hi Stefan,
+>=20
+> On 4/11/18 12:24, Stefan Hajnoczi wrote:
+> > When you clone the repository without previous commit history, 'git://'
+> > doesn't protect from man-in-the-middle attacks.  HTTPS is more secure
+> > since the client verifies the server certificate.
+> >=20
+> > Reported-by: Jann Horn <jannh@google.com>
+> > Reviewed-by: Daniel P. Berrang=E9 <berrange@redhat.com>
+> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > ---
+> >   scripts/get_maintainer.pl | 2 +-
+> >   1 file changed, 1 insertion(+), 1 deletion(-)
+> >=20
+> > diff --git a/scripts/get_maintainer.pl b/scripts/get_maintainer.pl
+> > index 43fb5f512f..fc7275b9e2 100755
+> > --- a/scripts/get_maintainer.pl
+> > +++ b/scripts/get_maintainer.pl
+> > @@ -1376,7 +1376,7 @@ sub vcs_exists {
+> >   	warn("$P: No supported VCS found.  Add --nogit to options?\n");
+> >   	warn("Using a git repository produces better results.\n");
+> >   	warn("Try latest git repository using:\n");
+> > -	warn("git clone git://git.qemu.org/qemu.git\n");
+> > +	warn("git clone https//git.qemu.org/git/qemu.git\n");
+>=20
+> You missed the ':' in the scheme. Once fixed:
 
-> 
-> @David
-> Thanks for the cleanup.
-> 
-> Reviewed-by: Collin Walling <walling@linux.ibm.com>
-> 
+Gah!  Thank you!
+
+> Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> Tested-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+>=20
+> >   	$printed_novcs =3D 1;
+> >       }
+> >       return 0;
+> >=20
+
+--Hlh2aiwFLCZwGcpw
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJb5BYMAAoJEJykq7OBq3PIl9kH/1FCWXG+mXDS2geU0Q1k9Nxw
+V13M0eu/QRkHw45Y+7iZtzo0pq7zrQH96npW0smaZdZMQY6rTUT4gu6+1VFfprM1
+8SEbf2x2w2K2WzdOrmYxaAK5FBvaWkFuHR0DoP6NSc6BnLpOnHCoxq4aRN3OnEfA
+Y9cG6vQNWHD3B0qdPQ02OZScH5zge7fUoa/SnWgBAHSvBTuRt5i6U8hsm+gFjFgJ
+U8tfgnDfKHHghZxJbbNjbwcxm/UtoLXpQ0VpwwVMbm6XAS2GDA4J+bZQ6KYmzMZy
+kYVUHWYPq/lcNAGxkQ0RjFtOeUr9DmEllEd/orZyiywQsTTV2INimveWfBrBYbU=
+=McRO
+-----END PGP SIGNATURE-----
+
+--Hlh2aiwFLCZwGcpw--
