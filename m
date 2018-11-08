@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40587)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gKe8e-0002wg-F8
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 01:50:01 -0500
+	(envelope-from <armbru@redhat.com>) id 1gKeMz-0002h1-Tt
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 02:04:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gKe8a-0006yy-Am
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 01:50:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49916)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gKe8Y-00067d-9v
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 01:49:56 -0500
-Date: Thu, 8 Nov 2018 07:49:27 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20181108064927.i6llxv4kgcrdon7n@sirius.home.kraxel.org>
-References: <20181107104921.20536-1-lhrazky@redhat.com>
-	<20181107104921.20536-2-lhrazky@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1gKeMy-0000Fo-Ui
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 02:04:49 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1541528230-31817-1-git-send-email-thuth@redhat.com>
+	<c0febf9a-f098-112d-9c8d-c320cc66b04a@redhat.com>
+	<12974ebb-09de-c6e9-1dd7-5199a8ae6b05@redhat.com>
+	<CAFEAcA-B74FQgj3COyGZ_SAAvSUA6=OaLdy5--NoAgHgEGZkpg@mail.gmail.com>
+	<87k1louaze.fsf@dusky.pond.sub.org>
+	<4b0e9b3f-5d88-9ef2-d0c5-f241067001d0@redhat.com>
+	<CAFEAcA_N7zeuMGGvUBC6xu-AK2gH0n+aNwJOkhs7yWFx_3DbsQ@mail.gmail.com>
+Date: Thu, 08 Nov 2018 08:04:25 +0100
+In-Reply-To: <CAFEAcA_N7zeuMGGvUBC6xu-AK2gH0n+aNwJOkhs7yWFx_3DbsQ@mail.gmail.com>
+	(Peter Maydell's message of "Wed, 7 Nov 2018 19:42:11 +0000")
+Message-ID: <87in18qccm.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181107104921.20536-2-lhrazky@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH spice v3 1/3] QXL interface: add a
- function to identify monitors in the guest
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Add an entry for the 'collie'
+ machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,26 +30,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?THVrw6HFoSBIcsOhemvDvQ==?= <lhrazky@redhat.com>
-Cc: spice-devel@lists.freedesktop.org, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Thomas Huth <thuth@redhat.com>, Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-  Hi,
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-> + * The device_display_id_{start,count} denotes the sequence of device display
-> + * IDs that map to the zero-based sequence of monitor IDs provided by monitors
-> + * config on this interface. For example with device_display_id_start = 2 and
-> + * device_display_id_count = 3 you get the following mapping:
-> + * monitor_id  ->  device_display_id
-> + *          0  ->  2
-> + *          1  ->  3
-> + *          2  ->  4
-> + *
-> + * Note this example is unsupported in practice. The only supported cases are
-> + * either a single device display ID (count = 1) or multiple device display IDs
-> + * in a sequence starting from 0.
+> On 7 November 2018 at 19:39, Thomas Huth <thuth@redhat.com> wrote:
+>> On 2018-11-07 17:08, Markus Armbruster wrote:
+>>> Peter Maydell <peter.maydell@linaro.org> writes:
+>>>
+>>>> On 6 November 2018 at 18:52, Thomas Huth <thuth@redhat.com> wrote:
+>>>>> On 2018-11-06 19:49, Philippe Mathieu-Daud=C3=A9 wrote:
+>>>>>> On 6/11/18 19:17, Thomas Huth wrote:
+>>>>>>> There is no active maintainer, but since Peter is picking up
+>>>>>>> patches via qemu-arm@nongnu.org, I think we could at least use
+>>>>>>> "Odd Fixes" as status here.
+>>>>>>
+>>>>>> This looks more as "Orphan" to me...
+>>>>>
+>>>>> I'll leave it up to Peter for the final decision...
+>>>>
+>>>> I think we're not very consistent[*] in our usage of the various
+>>>> statuses in the MAINTAINERS file. I guess "Odd Fixes" makes
+>>>> sense in that, well, if you send a patch to this
+>>>> code and cc me I'll review it and put it in the tree. (This
+>>>> is true of any of the arm boards we have.)
+>>>>
+>>>> [*] We have one thing tagged Orphan, which is bsd-user/,
+>>>> and some things tagged Odd Fixes with no listed maintainer,
+>>>> and some things tagged Odd Fixes which are in practice more
+>>>> like Orphan (for instance sh4), and we list "fpu/" as
+>>>> Odd Fixes despite having given it a pretty thorough
+>>>> overhaul very recently, and so on...
+>>>>
+>>>> If you wanted a mechanizable rule, you could try something
+>>>> like "every file which is in status Odd Fixes or better
+>>>> must list with M: at least one named individual who has
+>>>> submitted a pull request in the last nine months" :-)
+>>>
+>>> Sounds like an excellent idea to me!
+>>
+>> Well, for me "odd fixes" means that there is someone around who might
+>> pick up the patch and throw it into a PULL request.
 
-This is confusing.  The usage of this api in the qemu counterpart looks
-sane though.
+That someone should be listed with M:.
 
-cheers,
-  Gerd
+>>                                                     "Orphan" means it's
+>> mostly in vain to send patches for this subsystem, since there is nobody
+>> going to pick up your patch. So for the ARM boards, I'd say that "odd
+>> fixes" is a better choice, since Peter still picks up most of the
+>> patches via the "L: qemu-arm@nongnu.org" (big thanks for this, by the wa=
+y!).
+>
+> I think there should be a named person, though. A list
+> isn't a maintainer (at least not for the big whole
+> subsystem lists we have).
+
+Agree.
