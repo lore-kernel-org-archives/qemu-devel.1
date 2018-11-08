@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40745)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gKn8R-00006N-5E
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:26:23 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gKnFf-00083G-ET
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:33:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gKn8H-0001ch-5E
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:26:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51965)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1gKn8G-0001YF-Sq
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:26:13 -0500
-Date: Thu, 8 Nov 2018 17:26:06 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20181108172606.38672769.cohuck@redhat.com>
-In-Reply-To: <20181108160818.5485-20-yuval.shaia@oracle.com>
-References: <20181108160818.5485-1-yuval.shaia@oracle.com>
-	<20181108160818.5485-20-yuval.shaia@oracle.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1gKnFe-0004uA-24
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:33:51 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:42021)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gKnFd-0004hq-HZ
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:33:49 -0500
+Received: by mail-wr1-x441.google.com with SMTP id y15-v6so21922421wru.9
+	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 08:33:35 -0800 (PST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Thu,  8 Nov 2018 16:33:26 +0000
+Message-Id: <20181108163329.19940-4-alex.bennee@linaro.org>
+In-Reply-To: <20181108163329.19940-1-alex.bennee@linaro.org>
+References: <20181108163329.19940-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 19/22] vl: Introduce shutdown_notifiers
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 3/6] target/arm64: kvm debug set target_el
+ when passing exception to guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,62 +30,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yuval Shaia <yuval.shaia@oracle.com>
-Cc: marcel.apfelbaum@gmail.com, dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com
+To: qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On Thu,  8 Nov 2018 18:08:15 +0200
-Yuval Shaia <yuval.shaia@oracle.com> wrote:
+When we are debugging the guest all exceptions come our way but might
+be for the guest's own debug exceptions. We use the ->do_interrupt()
+infrastructure to inject the exception into the guest. However, we are
+missing a full setup of the exception structure, causing an assert
+later down the line.
 
-> Notifier will be used for signaling shutdown event to inform system is
-> shutdown. This will allow devices and other component to run some
-> cleanup code needed before VM is shutdown.
-> 
-> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-> ---
->  include/sysemu/sysemu.h |  1 +
->  vl.c                    | 15 ++++++++++++++-
->  2 files changed, 15 insertions(+), 1 deletion(-)
-> 
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-> @@ -1809,6 +1811,12 @@ static void qemu_system_powerdown(void)
->      notifier_list_notify(&powerdown_notifiers, NULL);
->  }
->  
-> +static void qemu_system_shutdown(bool by_guest)
+---
+v2
+  - tweak commit msg for grammar
+---
+ target/arm/kvm64.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-I would pass the shutdown reason here directly (instead of only whether
-this was triggered by the guest or not)...
-
-> +{
-> +    qapi_event_send_shutdown(by_guest);
-> +    notifier_list_notify(&shutdown_notifiers, NULL);
-
-...and also pass it to the notifiers here. If we have the info anyway,
-why not simply pass it along.
-
-> +}
-> +
->  void qemu_system_powerdown_request(void)
->  {
->      trace_qemu_system_powerdown_request();
-> @@ -1821,6 +1829,11 @@ void qemu_register_powerdown_notifier(Notifier *notifier)
->      notifier_list_add(&powerdown_notifiers, notifier);
->  }
->  
-> +void qemu_register_shutdown_notifier(Notifier *notifier)
-> +{
-> +    notifier_list_add(&shutdown_notifiers, notifier);
-> +}
-> +
->  void qemu_system_debug_request(void)
->  {
->      debug_requested = 1;
-> @@ -1848,7 +1861,7 @@ static bool main_loop_should_exit(void)
->      request = qemu_shutdown_requested();
->      if (request) {
->          qemu_kill_report();
-> -        qapi_event_send_shutdown(shutdown_caused_by_guest(request));
-> +        qemu_system_shutdown(shutdown_caused_by_guest(request));
->          if (no_shutdown) {
->              vm_stop(RUN_STATE_SHUTDOWN);
->          } else {
+diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+index 03b0f78831..bf7824d862 100644
+--- a/target/arm/kvm64.c
++++ b/target/arm/kvm64.c
+@@ -1000,6 +1000,7 @@ bool kvm_arm_handle_debug(CPUState *cs, struct kvm_debug_exit_arch *debug_exit)
+     cs->exception_index = EXCP_BKPT;
+     env->exception.syndrome = debug_exit->hsr;
+     env->exception.vaddress = debug_exit->far;
++    env->exception.target_el = 1;
+     qemu_mutex_lock_iothread();
+     cc->do_interrupt(cs);
+     qemu_mutex_unlock_iothread();
+-- 
+2.17.1
