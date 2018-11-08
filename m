@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49622)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50243)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gKnbm-00047N-At
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:56:43 -0500
+	(envelope-from <prvs=8435f2cfc=Paul.Durrant@citrix.com>)
+	id 1gKndn-0007s6-DY
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:58:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gKnbi-0008Jd-Sq
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:56:42 -0500
-Received: from indium.canonical.com ([91.189.90.7]:60142)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gKnbi-0008IM-IP
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:56:38 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gKnbg-0000Tz-43
-	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 16:56:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 122A62E80CF
-	for <qemu-devel@nongnu.org>; Thu,  8 Nov 2018 16:56:35 +0000 (UTC)
-MIME-Version: 1.0
+	(envelope-from <prvs=8435f2cfc=Paul.Durrant@citrix.com>)
+	id 1gKndl-0002GQ-9z
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:58:47 -0500
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Thu, 8 Nov 2018 16:44:06 +0000
+Message-ID: <fca4277b6a1c4f5292f96c65eb94170a@AMSPEX02CL03.citrite.net>
+References: <154115285434.11300.8459925605672823399.stgit@dhcp-3-135.uk.xensource.com>
+	<20181102110412.GD7521@dhcp-200-186.str.redhat.com>
+	<152b8d37c7d54de687f4ced536ba6a10@AMSPEX02CL03.citrite.net>
+	<871s7z5xg4.fsf@dusky.pond.sub.org>
+	<24d1c322d3ac4ee2af32efacb486e608@AMSPEX02CL03.citrite.net>
+	<20181108152120.GE6006@linux.fritz.box>
+	<62f26685d02344f98c296981038c988b@AMSPEX02CL03.citrite.net>
+In-Reply-To: <62f26685d02344f98c296981038c988b@AMSPEX02CL03.citrite.net>
+Content-Language: en-US
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 08 Nov 2018 16:49:16 -0000
-From: tlloss <1795527@bugs.launchpad.net>
-Reply-To: Bug 1795527 <1795527@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153843648798.30392.6657333416089253911.malonedeb@soybean.canonical.com>
-Message-Id: <154169575669.2247.7625964128413382023.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1795527] Re: Malformed audio and video output
- stuttering after upgrade to QEMU 3.0
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] xen_disk qdevification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,168 +31,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paul Durrant <Paul.Durrant@citrix.com>, 'Kevin Wolf' <kwolf@redhat.com>
+Cc: Stefano Stabellini <sstabellini@kernel.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Tim Smith <tim.smith@citrix.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, 'Markus Armbruster' <armbru@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Max Reitz <mreitz@redhat.com>
 
-Oh and yeah, I just kind of realized that the original issue simply appears=
- after the new timers are being activated by default.
-Well, that should have been pretty obvious.
-I'll try to actuvate them at compile time and see where this path leads to.
-
-And sorry for misclicking on the information type settings.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1795527
-
-Title:
-  Malformed audio and video output stuttering after upgrade to QEMU 3.0
-
-Status in QEMU:
-  New
-
-Bug description:
-  My host is an x86_64 Arch Linux OS with a recompiled 4.18.10 hardened
-  kernel, running a few KVM guests with varying OSes and configurations
-  managed through a Libvirt stack.
-
-  Among these guests I have two Windows 10 VMs with VGA passthrough and
-  PulseAudio-backed virtual audio devices.
-
-  After upgrading to QEMU 3.0.0, both of the Win10 guests started
-  showing corrupted audio output in the form of unnatural reproduction
-  speed and occasional but consistently misplaced audio fragments
-  originating from what seems to be a circular buffer wrapping over
-  itself (misbehaviour detected by starting some games with known OSTs
-  and dialogues: soundtracks sound accelerated and past dialogue lines
-  start replaying middle-sentence until the next line starts playing).
-
-  In addition, the video output of the malfunctioning VMs regularly
-  stutters roughly twice a second for a fraction of a second (sync'ed
-  with the suspected buffer wrapping and especially pronounced during
-  not-pre-rendered cutscenes), toghether with mouse freezes that look
-  like actual input misses more than simple lack of screen refreshes.
-
-  =
-
-  The issue was succesfully reproduced without the managing stack, directly=
- with the following command line, on the most capable Windows guest:
-
-   QEMU_AUDIO_DRV=3Dpa
-   QEMU_PA_SERVER=3D127.0.0.1
-   /usr/bin/qemu-system-x86_64 -name guest=3Dwin10_gms,debug-threads=3Don \
-   -machine pc-i440fx-3.0,accel=3Dkvm,usb=3Doff,vmport=3Doff,dump-guest-cor=
-e=3Doff \                                                                  =
-                                                                         =
-
-   -cpu host,hv_time,hv_relaxed,hv_vapic,hv_spinlocks=3D0x1fff,hv_vendor_id=
-=3D123456789abc,kvm=3Doff \          =
-
-   -drive file=3D/usr/share/ovmf/x64/OVMF_CODE.fd,if=3Dpflash,format=3Draw,=
-unit=3D0,readonly=3Don \       =
-
-   -drive file=3D/var/lib/libvirt/qemu/nvram/win10_gms_VARS.fd,if=3Dpflash,=
-format=3Draw,unit=3D1 \
-   -m 5120 \                                                               =
-               =
-
-   -realtime mlock=3Doff \
-   -smp 3,sockets=3D1,cores=3D3,threads=3D1 \
-   -uuid 39b56ee2-6bae-4009-9108-7be26d5d63ac \
-   -display none \                             =
-
-   -no-user-config \
-   -nodefaults \    =
-
-   -rtc base=3Dlocaltime,driftfix=3Dslew \                                 =
-                                                                           =
-                                                                     =
-
-   -global kvm-pit.lost_tick_policy=3Ddelay \                              =
-                                    =
-
-   -no-hpet \                              =
-
-   -no-shutdown \
-   -global PIIX4_PM.disable_s3=3D1 \
-   -global PIIX4_PM.disable_s4=3D1 \
-   -boot strict=3Don \              =
-
-   -device ich9-usb-ehci1,id=3Dusb,bus=3Dpci.0,addr=3D0x4.0x7 \
-   -device ich9-usb-uhci1,masterbus=3Dusb.0,firstport=3D0,bus=3Dpci.0,multi=
-function=3Don,addr=3D0x4 \
-   -device ich9-usb-uhci2,masterbus=3Dusb.0,firstport=3D2,bus=3Dpci.0,addr=
-=3D0x4.0x1 \             =
-
-   -device ich9-usb-uhci3,masterbus=3Dusb.0,firstport=3D4,bus=3Dpci.0,addr=
-=3D0x4.0x2 \
-   -device ahci,id=3Dsata0,bus=3Dpci.0,addr=3D0x9 \                        =
-         =
-
-   -drive file=3D/dev/vms/win10_gaming,format=3Draw,if=3Dnone,id=3Ddrive-vi=
-rtio-disk0,cache=3Dnone,aio=3Dnative \
-   -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x5,drive=3Ddrive-v=
-irtio-disk0,id=3Dvirtio-disk0,bootindex=3D1,write-cache=3Don \
-   -drive file=3D/dev/sr0,format=3Draw,if=3Dnone,id=3Ddrive-sata0-0-0,media=
-=3Dcdrom,readonly=3Don \                                    =
-
-   -device ide-cd,bus=3Dsata0.0,drive=3Ddrive-sata0-0-0,id=3Dsata0-0-0 \   =
-                  =
-
-   -device intel-hda,id=3Dsound0,bus=3Dpci.0,addr=3D0x3 \                  =
-                                                                           =
-                                                                       =
-
-   -device hda-duplex,id=3Dsound0-codec0,bus=3Dsound0.0,cad=3D0 \          =
-                                   =
-
-   -device usb-host,hostbus=3D2,hostaddr=3D3,id=3Dhostdev0,bus=3Dusb.0,port=
-=3D1 \
-   -device vfio-pci,host=3D01:00.0,id=3Dhostdev1,bus=3Dpci.0,addr=3D0x6 \  =
-    =
-
-   -device vfio-pci,host=3D01:00.1,id=3Dhostdev2,bus=3Dpci.0,addr=3D0x7 \
-   -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x8 \   =
-
-   -sandbox on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resour=
-cecontrol=3Ddeny \
-   -msg timestamp=3Don
-
-  =
-
-  By "purposedly misconfiguring" the codepaths and replacing "pc-i440fx-3.0=
-" with "pc-i440fx-2.11" (basically reverting the config changes I needed to=
- do in order to update the domain definitions), the stuttering seems to dis=
-appear (or at least becomes negligible) and the audio output, despite becom=
-ing incredibly distorted, is consistent in every other way, with in-order d=
-ialogues and (perceived) correct tempo.
-
-  =
-
-  In order to exclude eventual misconfigurations in the host's audio proces=
-sing pipeline, I proceeded to update the domain definition's codepath of an=
-other guest running Ubuntu 18.04 with a completely different hardware confi=
-guration (no video card passthrough and no PulseAudio backconnection, just =
-a plain emulated VirtIO display and Spice audio device).
-
-  The audio issue presented itself again in the form of slightly sped up au=
-dio playback from Internet videos interleaved with occasional "quenches" of=
- playing speed.
-  Stutters are difficult to detect because of the poor refresh rate of the =
-emulated VGA adapter, but I wouldn't be surprised to find them here too (ac=
-tually, I *think* I sensed them, but I'm not sure enough to assess their ex=
-istence).
-
-  Once again, by reverting to the old 2.11 directive everything is back
-  to normal.
-
-
-  Given the fact that no official upgrade directives regarding required sam=
-pling rate, period or sheduling adjustments were stated or handed-out to ad=
-ministrators, I decided to report this behaviour as a bug.
-  I hope this is the appropriate channel and that I didn't annoy anyone (th=
-is is my first proper bug report, please forgive me for any innaccuracy).
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1795527/+subscriptions
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBYZW4tZGV2ZWwgW21haWx0bzp4
+ZW4tZGV2ZWwtYm91bmNlc0BsaXN0cy54ZW5wcm9qZWN0Lm9yZ10gT24gQmVoYWxmDQo+IE9mIFBh
+dWwgRHVycmFudA0KPiBTZW50OiAwOCBOb3ZlbWJlciAyMDE4IDE1OjQ0DQo+IFRvOiAnS2V2aW4g
+V29sZicgPGt3b2xmQHJlZGhhdC5jb20+DQo+IENjOiBTdGVmYW5vIFN0YWJlbGxpbmkgPHNzdGFi
+ZWxsaW5pQGtlcm5lbC5vcmc+OyBxZW11LWJsb2NrQG5vbmdudS5vcmc7DQo+IFRpbSBTbWl0aCA8
+dGltLnNtaXRoQGNpdHJpeC5jb20+OyBxZW11LWRldmVsQG5vbmdudS5vcmc7ICdNYXJrdXMNCj4g
+QXJtYnJ1c3RlcicgPGFybWJydUByZWRoYXQuY29tPjsgQW50aG9ueSBQZXJhcmQNCj4gPGFudGhv
+bnkucGVyYXJkQGNpdHJpeC5jb20+OyB4ZW4tZGV2ZWxAbGlzdHMueGVucHJvamVjdC5vcmc7IE1h
+eCBSZWl0eg0KPiA8bXJlaXR6QHJlZGhhdC5jb20+DQo+IFN1YmplY3Q6IFJlOiBbWGVuLWRldmVs
+XSBbUWVtdS1kZXZlbF0geGVuX2Rpc2sgcWRldmlmaWNhdGlvbg0KPiANCj4gPiAtLS0tLU9yaWdp
+bmFsIE1lc3NhZ2UtLS0tLQ0KPiA+IEZyb206IEtldmluIFdvbGYgW21haWx0bzprd29sZkByZWRo
+YXQuY29tXQ0KPiA+IFNlbnQ6IDA4IE5vdmVtYmVyIDIwMTggMTU6MjENCj4gPiBUbzogUGF1bCBE
+dXJyYW50IDxQYXVsLkR1cnJhbnRAY2l0cml4LmNvbT4NCj4gPiBDYzogJ01hcmt1cyBBcm1icnVz
+dGVyJyA8YXJtYnJ1QHJlZGhhdC5jb20+OyBBbnRob255IFBlcmFyZA0KPiA+IDxhbnRob255LnBl
+cmFyZEBjaXRyaXguY29tPjsgVGltIFNtaXRoIDx0aW0uc21pdGhAY2l0cml4LmNvbT47IFN0ZWZh
+bm8NCj4gPiBTdGFiZWxsaW5pIDxzc3RhYmVsbGluaUBrZXJuZWwub3JnPjsgcWVtdS1ibG9ja0Bu
+b25nbnUub3JnOyBxZW11LQ0KPiA+IGRldmVsQG5vbmdudS5vcmc7IE1heCBSZWl0eiA8bXJlaXR6
+QHJlZGhhdC5jb20+OyB4ZW4tDQo+ID4gZGV2ZWxAbGlzdHMueGVucHJvamVjdC5vcmcNCj4gPiBT
+dWJqZWN0OiBSZTogW1FlbXUtZGV2ZWxdIHhlbl9kaXNrIHFkZXZpZmljYXRpb24NCj4gPg0KPiA+
+IEFtIDA4LjExLjIwMTggdW0gMTU6MDAgaGF0IFBhdWwgRHVycmFudCBnZXNjaHJpZWJlbjoNCj4g
+PiA+ID4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gPiA+ID4gRnJvbTogTWFya3VzIEFy
+bWJydXN0ZXIgW21haWx0bzphcm1icnVAcmVkaGF0LmNvbV0NCj4gPiA+ID4gU2VudDogMDUgTm92
+ZW1iZXIgMjAxOCAxNTo1OA0KPiA+ID4gPiBUbzogUGF1bCBEdXJyYW50IDxQYXVsLkR1cnJhbnRA
+Y2l0cml4LmNvbT4NCj4gPiA+ID4gQ2M6ICdLZXZpbiBXb2xmJyA8a3dvbGZAcmVkaGF0LmNvbT47
+IFRpbSBTbWl0aA0KPiA8dGltLnNtaXRoQGNpdHJpeC5jb20+Ow0KPiA+ID4gPiBTdGVmYW5vIFN0
+YWJlbGxpbmkgPHNzdGFiZWxsaW5pQGtlcm5lbC5vcmc+OyBxZW11LWJsb2NrQG5vbmdudS5vcmc7
+DQo+ID4gcWVtdS0NCj4gPiA+ID4gZGV2ZWxAbm9uZ251Lm9yZzsgTWF4IFJlaXR6IDxtcmVpdHpA
+cmVkaGF0LmNvbT47IEFudGhvbnkgUGVyYXJkDQo+ID4gPiA+IDxhbnRob255LnBlcmFyZEBjaXRy
+aXguY29tPjsgeGVuLWRldmVsQGxpc3RzLnhlbnByb2plY3Qub3JnDQo+ID4gPiA+IFN1YmplY3Q6
+IFJlOiBbUWVtdS1kZXZlbF0geGVuX2Rpc2sgcWRldmlmaWNhdGlvbg0KPiA+ID4gPg0KPiA+ID4g
+PiBQYXVsIER1cnJhbnQgPFBhdWwuRHVycmFudEBjaXRyaXguY29tPiB3cml0ZXM6DQo+ID4gPiA+
+DQo+ID4gPiA+ID4+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+ID4gPiA+ID4+IEZyb206
+IEtldmluIFdvbGYgW21haWx0bzprd29sZkByZWRoYXQuY29tXQ0KPiA+ID4gPiA+PiBTZW50OiAw
+MiBOb3ZlbWJlciAyMDE4IDExOjA0DQo+ID4gPiA+ID4+IFRvOiBUaW0gU21pdGggPHRpbS5zbWl0
+aEBjaXRyaXguY29tPg0KPiA+ID4gPiA+PiBDYzogeGVuLWRldmVsQGxpc3RzLnhlbnByb2plY3Qu
+b3JnOyBxZW11LWRldmVsQG5vbmdudS5vcmc7IHFlbXUtDQo+ID4gPiA+ID4+IGJsb2NrQG5vbmdu
+dS5vcmc7IEFudGhvbnkgUGVyYXJkIDxhbnRob255LnBlcmFyZEBjaXRyaXguY29tPjsNCj4gUGF1
+bA0KPiA+ID4gPiBEdXJyYW50DQo+ID4gPiA+ID4+IDxQYXVsLkR1cnJhbnRAY2l0cml4LmNvbT47
+IFN0ZWZhbm8gU3RhYmVsbGluaQ0KPiA+IDxzc3RhYmVsbGluaUBrZXJuZWwub3JnPjsNCj4gPiA+
+ID4gPj4gTWF4IFJlaXR6IDxtcmVpdHpAcmVkaGF0LmNvbT47IGFybWJydUByZWRoYXQuY29tDQo+
+ID4gPiA+ID4+IFN1YmplY3Q6IHhlbl9kaXNrIHFkZXZpZmljYXRpb24gKHdhczogW1BBVENIIDAv
+M10gUGVyZm9ybWFuY2UNCj4gPiA+ID4gaW1wcm92ZW1lbnRzDQo+ID4gPiA+ID4+IGZvciB4ZW5f
+ZGlzayB2MikNCj4gPiA+ID4gPj4NCj4gPiA+ID4gPj4gQW0gMDIuMTEuMjAxOCB1bSAxMTowMCBo
+YXQgVGltIFNtaXRoIGdlc2NocmllYmVuOg0KPiA+ID4gPiA+PiA+IEEgc2VyaWVzIG9mIHBlcmZv
+cm1hbmNlIGltcHJvdmVtZW50cyBmb3IgZGlza3MgdXNpbmcgdGhlIFhlbiBQVg0KPiA+IHJpbmcu
+DQo+ID4gPiA+ID4+ID4NCj4gPiA+ID4gPj4gPiBUaGVzZSBoYXZlIGhhZCBmYWlybHkgZXh0ZW5z
+aXZlIHRlc3RpbmcuDQo+ID4gPiA+ID4+ID4NCj4gPiA+ID4gPj4gPiBUaGUgYmF0Y2hpbmcgYW5k
+IGxhdGVuY3kgaW1wcm92ZW1lbnRzIHRvZ2V0aGVyIGJvb3N0IHRoZQ0KPiA+IHRocm91Z2hwdXQN
+Cj4gPiA+ID4gPj4gPiBvZiBzbWFsbCByZWFkcyBhbmQgd3JpdGVzIGJ5IHR3byB0byBzaXggcGVy
+Y2VudCAobWVhc3VyZWQgdXNpbmcNCj4gPiBmaW8NCj4gPiA+ID4gPj4gPiBpbiB0aGUgZ3Vlc3Qp
+DQo+ID4gPiA+ID4+ID4NCj4gPiA+ID4gPj4gPiBBdm9pZGluZyByZXBlYXRlZCBjYWxscyB0byBw
+b3NpeF9tZW1hbGlnbigpIHJlZHVjZWQgdGhlIGRpcnR5DQo+ID4gaGVhcA0KPiA+ID4gPiA+PiA+
+IGZyb20gMjVNQiB0byA1TUIgaW4gdGhlIGNhc2Ugb2YgYSBzaW5nbGUgZGF0YXBhdGggcHJvY2Vz
+cyB3aGlsZQ0KPiA+IGFsc28NCj4gPiA+ID4gPj4gPiBpbXByb3ZpbmcgcGVyZm9ybWFuY2UuDQo+
+ID4gPiA+ID4+ID4NCj4gPiA+ID4gPj4gPiB2MiByZW1vdmVzIHNvbWUgY2hlY2twYXRjaCBjb21w
+bGFpbnRzIGFuZCBmaXhlcyB0aGUgQ0NzDQo+ID4gPiA+ID4+DQo+ID4gPiA+ID4+IENvbXBsZXRl
+bHkgdW5yZWxhdGVkLCBidXQgc2luY2UgeW91J3JlIHRoZSBmaXJzdCBwZXJzb24gdG91Y2hpbmcN
+Cj4gPiA+ID4gPj4geGVuX2Rpc2sgaW4gYSB3aGlsZSwgeW91J3JlIG15IHZpY3RpbToNCj4gPiA+
+ID4gPj4NCj4gPiA+ID4gPj4gQXQgS1ZNIEZvcnVtIHdlIGRpc2N1c3NlZCBzZW5kaW5nIGEgcGF0
+Y2ggdG8gZGVwcmVjYXRlIHhlbl9kaXNrDQo+ID4gYmVjYXVzZQ0KPiA+ID4gPiA+PiBhZnRlciBh
+bGwgdGhvc2UgeWVhcnMsIGl0IHN0aWxsIGhhc24ndCBiZWVuIGNvbnZlcnRlZCB0byBxZGV2Lg0K
+PiA+IE1hcmt1cw0KPiA+ID4gPiBpcw0KPiA+ID4gPiA+PiBjdXJyZW50bHkgZml4aW5nIHNvbWUg
+b3RoZXIgbm90IHlldCBxZGV2aWZpZWQgYmxvY2sgZGV2aWNlLCBidXQNCj4gPiBhZnRlcg0KPiA+
+ID4gPiA+PiB0aGF0IHhlbl9kaXNrIHdpbGwgYmUgdGhlIG9ubHkgb25lIGxlZnQuDQo+ID4gPiA+
+ID4+DQo+ID4gPiA+ID4+IEEgd2hpbGUgYWdvLCBhIGRvd25zdHJlYW0gcGF0Y2ggcmV2aWV3IGZv
+dW5kIG91dCB0aGF0IHRoZXJlIGFyZQ0KPiA+IHNvbWUNCj4gPiA+ID4gUU1QDQo+ID4gPiA+ID4+
+IGNvbW1hbmRzIHRoYXQgd291bGQgaW1tZWRpYXRlbHkgY3Jhc2ggaWYgYSB4ZW5fZGlzayBkZXZp
+Y2Ugd2VyZQ0KPiA+IHByZXNlbnQNCj4gPiA+ID4gPj4gYmVjYXVzZSBvZiB0aGUgbGFja2luZyBx
+ZGV2aWZpY2F0aW9uLiBUaGlzIGlzIG5vdCB0aGUgY29kZQ0KPiBxdWFsaXR5DQo+ID4gPiA+ID4+
+IHN0YW5kYXJkIEkgZW52aXNpb24gZm9yIFFFTVUuIEl0J3MgdGltZSBmb3Igbm9uLXFkZXYgZGV2
+aWNlcyB0bw0KPiBnby4NCj4gPiA+ID4gPj4NCj4gPiA+ID4gPj4gU28gaWYgeW91IGd1eXMgYXJl
+IHN0aWxsIGludGVyZXN0ZWQgaW4gdGhlIGRldmljZSwgY291bGQgc29tZW9uZQ0KPiA+IHBsZWFz
+ZQ0KPiA+ID4gPiA+PiBmaW5hbGx5IGxvb2sgaW50byBjb252ZXJ0aW5nIGl0Pw0KPiA+ID4gPiA+
+Pg0KPiA+ID4gPiA+DQo+ID4gPiA+ID4gSSBoYXZlIGEgcGF0Y2ggc2VyaWVzIHRvIGRvIGV4YWN0
+bHkgdGhpcy4gSXQncyBzb21ld2hhdCBpbnZvbHZlZA0KPiBhcw0KPiA+IEkNCj4gPiA+ID4gPiBu
+ZWVkIHRvIGNvbnZlcnQgdGhlIHdob2xlIFBWIGJhY2tlbmQgaW5mcmFzdHJ1Y3R1cmUuIEkgd2ls
+bCB0cnkgdG8NCj4gPiA+ID4gPiByZWJhc2UgYW5kIGNsZWFuIHVwIG15IHNlcmllcyBhLnMuYS5w
+Lg0KPiA+ID4gPg0KPiA+ID4gPiBBd2Vzb21lISAgUGxlYXNlIGNvb3JkaW5hdGUgd2l0aCBBbnRo
+b255IFByZXJhcmQgdG8gYXZvaWQNCj4gZHVwbGljYXRpbmcNCj4gPiA+ID4gd29yayBpZiB5b3Ug
+aGF2ZW4ndCBkb25lIHNvIGFscmVhZHkuDQo+ID4gPg0KPiA+ID4gSSd2ZSBjb21lIGFjcm9zcyBh
+IGJpdCBvZiBhIHByb2JsZW0gdGhhdCBJJ20gbm90IHN1cmUgaG93IGJlc3QgdG8gZGVhbA0KPiA+
+ID4gd2l0aCBhbmQgc28gYW0gbG9va2luZyBmb3Igc29tZSBhZHZpY2UuDQo+ID4gPg0KPiA+ID4g
+SSBub3cgaGF2ZSBhIHFkZXZpZmllZCBQViBkaXNrIGJhY2tlbmQgYnV0IEkgY2FuJ3QgYnJpbmcg
+aXQgdXAgYmVjYXVzZQ0KPiA+ID4gaXQgZmFpbHMgdG8gYWNxdWlyZSBhIHdyaXRlIGxvY2sgb24g
+dGhlIHFjb3cyIGl0IGlzIHBvaW50aW5nIGF0LiBUaGlzDQo+ID4gPiBpcyBiZWNhdXNlIHRoZXJl
+IGlzIGFsc28gYW4gZW11bGF0ZWQgSURFIGRyaXZlIHVzaW5nIHRoZSBzYW1lIHFjb3cyLg0KPiA+
+ID4gVGhpcyBkb2VzIG5vdCBhcHBlYXIgdG8gYmUgYSBwcm9ibGVtIGZvciB0aGUgbm9uLXFkZXYg
+eGVuLWRpc2ssDQo+ID4gPiBwcmVzdW1hYmx5IGJlY2F1c2UgaXQgaXMgbm90IG9wZW5pbmcgdGhl
+IHFjb3cyIHVudGlsIHRoZSBlbXVsYXRlZA0KPiA+ID4gZGV2aWNlIGlzIHVucGx1Z2dlZCBhbmQg
+SSBkb24ndCByZWFsbHkgd2FudCB0byBpbnRyb2R1Y2Ugc2ltaWxhcg0KPiA+ID4gaGFja2VyeSBp
+biBteSBuZXcgYmFja2VuZCAoaS5lLiBJIHdhbnQgaXQgdG8gYXR0YWNoIHRvIGl0cyBkcml2ZSwg
+YW5kDQo+ID4gPiBoZW5jZSBvcGVuIHRoZSBxY293MiwgZHVyaW5nIHJlYWxpemUpLg0KPiA+ID4N
+Cj4gPiA+IFNvLCBJJ20gbm90IHN1cmUgd2hhdCB0byBkby4uLiBJdCBpcyBub3QgYSBwcm9ibGVt
+IHRoYXQgYm90aCBhIFBWDQo+ID4gPiBiYWNrZW5kIGFuZCBhbiBlbXVsYXRlZCBkZXZpY2UgYXJl
+IHVzaW5nIHRoZSBzYW1lIHFjb3cyIGJlY2F1c2UgdGhleQ0KPiA+ID4gd2lsbCBuZXZlciBhY3R1
+YWxseSBvcGVyYXRlIHNpbXVsdGFuZW91c2x5IHNvIGlzIHRoZXJlIGFueSB3YXkgSSBjYW4NCj4g
+PiA+IGJ5cGFzcyB0aGUgcWNvdzIgbG9jayBjaGVjayB3aGVuIEkgY3JlYXRlIHRoZSBkcml2ZSBm
+b3IgbXkgUFYgYmFja2VuZD8NCj4gPiA+IChCVFcgSSB0cmllZCByZS11c2luZyB0aGUgZHJpdmUg
+Y3JlYXRlZCBmb3IgdGhlIGVtdWxhdGVkIGRldmljZSwgYnV0DQo+ID4gPiB0aGF0IGRvZXNuJ3Qg
+d29yayBiZWNhdXNlIHRoZXJlIGlzIGEgY2hlY2sgaWYgYSBkcml2ZSBpcyBhbHJlYWR5DQo+ID4g
+PiBhdHRhY2hlZCB0byBzb21ldGhpbmcpLg0KPiA+ID4NCj4gPiA+IEFueSBpZGVhcz8NCj4gPg0K
+PiA+IEkgdGhpbmsgdGhlIGNsZWFuIHNvbHV0aW9uIGlzIHRvIGtlZXAgdGhlIEJsb2NrQmFja2Vu
+ZCBvcGVuIGluIHhlbi1kaXNrDQo+ID4gZnJvbSB0aGUgYmVnaW5uaW5nLCBidXQgbm90IHJlcXVl
+c3Rpbmcgd3JpdGUgcGVybWlzc2lvbnMgeWV0Lg0KPiA+DQo+ID4gVGhlIEJsb2NrQmFja2VuZCBp
+cyBjcmVhdGVkIGluIHBhcnNlX2RyaXZlKCksIHdoZW4gcWRldiBwYXJzZXMgdGhlDQo+ID4gLWRl
+dmljZSBkcml2ZT0uLi4gb3B0aW9uLiBBdCB0aGlzIHBvaW50LCBubyBwZXJtaXNzaW9ucyBhcmUg
+cmVxdWVzdGVkDQo+ID4geWV0LiBUaGF0IGlzIGRvbmUgaW4gYmxrY29uZl9hcHBseV9iYWNrZW5k
+X29wdGlvbnMoKSwgd2hpY2ggaXMgbWFudWFsbHkNCj4gPiBjYWxsZWQgZnJvbSB0aGUgZGV2aWNl
+czsgc3BlY2lmaWNhbGx5IGZyb20gaWRlX2Rldl9pbml0Zm4oKSBpbiBJREUsIGFuZA0KPiA+IEkg
+YXNzdW1lIHlvdSBjYWxsIHRoZSBmdW5jdGlvbiBmcm9tIHhlbi1kaXNrIGFzIHdlbGwuDQo+IA0K
+PiBZZXMsIEkgY2FsbCBpdCBkdXJpbmcgcmVhbGl6ZS4NCj4gDQo+ID4NCj4gPiB4ZW4tZGlzayBz
+aG91bGQgdGhlbiBjYWxsIHRoaXMgZnVuY3Rpb24gd2l0aCByZWFkb25seT10cnVlLCBhbmQgYXQg
+dGhlDQo+ID4gcG9pbnQgb2YgdGhlIGhhbmRvdmVyICh3aGVuIHRoZSBJREUgZGV2aWNlIGlzIGFs
+cmVhZHkgZ29uZSkgaXQgY2FuIGNhbGwNCj4gPiBibGtfc2V0X3Blcm0oKSB0byByZXF1ZXN0IEJM
+S19QRVJNX1dSSVRFIGluIGFkZGl0aW9uIHRvIHRoZSBwZXJtaXNzaW9ucw0KPiA+IGl0IGFscmVh
+ZHkgaG9sZHMuDQo+ID4NCj4gDQo+IEkgdHJpZWQgdGhhdCBhbmQgaXQgd29ya3MgZmluZSA6LSkN
+Cg0KVW5mb3J0dW5hdGVseSBJIHNwb2tlIHRvbyBzb29uLi4uIEkgc3RpbGwgaGFkIGEgcGF0Y2gg
+aW4gcGxhY2UgdG8gZGlzYWJsZSBsb2NraW5nIGNoZWNrcyA6LSgNCg0KV2hhdCBJJ20gdHJ5aW5n
+IHRvIGRvIHRvIG1haW50YWluIGNvbXBhdGliaWxpdHkgd2l0aCB0aGUgZXhpc3RpbmcgWGVuIHRv
+b2xzdGFjayAod2hpY2ggSSB0aGluayBpcyB0aGUgb25seSBmZWFzaWJsZSB3YXkgdG8gbWFrZSB0
+aGUgY2hhbmdlIGF2b2lkaW5nIGNoaWNrZW4gYW5kIGVnZyBwcm9ibGVtcykgaXMgdG8gdXNlIGEg
+J2NvbXBhdCcgZnVuY3Rpb24gdGhhdCBjcmVhdGVzIGEgZHJpdmUgYmFzZWQgb24gdGhlIGluZm9y
+bWF0aW9uIHRoYXQgdGhlIFhlbiB0b29sc3RhY2sgd3JpdGVzIGludG8geGVuc3RvcmUuIEknbSB1
+c2luZyBkcml2ZV9uZXcoKSB0byBkbyB0aGlzIGFuZCBpdCBpcyB0aGlzIHRoYXQgZmFpbHMuDQoN
+ClNvLCBJIGhhdmUgdHJpZWQgc2V0dGluZyBCRFJWX09QVF9SRUFEX09OTFkgYW5kIEJEUlZfT1BU
+X0ZPUkNFX1NIQVJFLiBUaGlzIGFsbG93cyBtZSB0byBnZXQgdGhyb3VnaCBkcml2ZV9uZXcoKSBi
+dXQgbGF0ZXIgSSBmYWlsIHRvIHNldCB0aGUgd3JpdGUgcGVybWlzc2lvbiB3aXRoIGVycm9yICJC
+bG9jayBub2RlIGlzIHJlYWQtb25seSIuDQoNCj4gDQo+ID4NCj4gPiBUaGUgb3RoZXIgb3B0aW9u
+IEkgc2VlIHdvdWxkIGJlIHRoYXQgeW91IHNpbXBseSBjcmVhdGUgYm90aCBkZXZpY2VzIHdpdGgN
+Cj4gPiBzaGFyZS1ydz1vbiAod2hpY2ggcmVzdWx0cyBpbiBjb25mLT5zaGFyZV9ydyA9PSB0cnVl
+IGFuZCB0aGVyZWZvcmUNCj4gPiBzaGFyZWQgQkxLX1BFUk1fV1JJVEUgaW4gYmxrY29uZl9hcHBs
+eV9iYWNrZW5kX29wdGlvbnMoKSksIGJ1dCB0aGF0DQo+ID4gZmVlbHMgbGlrZSBhIGhhY2sgYmVj
+YXVzZSB5b3UgZG9uJ3QgYWN0dWFsbHkgd2FudCB0byBoYXZlIHR3byB3cml0ZXJzIGF0DQo+ID4g
+dGhlIHNhbWUgdGltZS4NCj4gPg0KPiANCj4gWWVzLCB0aGF0IGRvZXMgaW5kZWVkIHNlZW0gbGlr
+ZSBtb3JlIG9mIGEgaGFjay4gVGhlIGZpcnN0IG9wdGlvbiB3b3JrcyBzbw0KPiBJJ2xsIGdvIHdp
+dGggdGhhdC4NCj4gDQoNCkknbGwgbm93IHNlZSB3aGF0IEkgY2FuIGRvIHdpdGggdGhpcyBpZGVh
+Lg0KDQogUGF1bA0KDQo=
