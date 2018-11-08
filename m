@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56041)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gKiIE-00052s-5F
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 06:16:11 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gKiIv-0005ZS-Sb
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 06:16:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gKiIA-0004Lc-7v
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 06:16:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47320)
+	(envelope-from <stefanha@redhat.com>) id 1gKiIq-000858-RL
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 06:16:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36882)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gKiI9-0004Bv-T0
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 06:16:06 -0500
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gKiIq-0007w5-K4
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 06:16:48 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Thu,  8 Nov 2018 11:15:24 +0000
-Message-Id: <20181108111531.30671-2-stefanha@redhat.com>
+Date: Thu,  8 Nov 2018 11:15:25 +0000
+Message-Id: <20181108111531.30671-3-stefanha@redhat.com>
 In-Reply-To: <20181108111531.30671-1-stefanha@redhat.com>
 References: <20181108111531.30671-1-stefanha@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 1/8] README: use 'https://' instead of
- 'git://'
+Subject: [Qemu-devel] [PATCH v4 2/8] get_maintainer: use 'https://' instead
+ of 'git://'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,60 +38,23 @@ Reported-by: Jann Horn <jannh@google.com>
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- README         | 4 ++--
- pc-bios/README | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ scripts/get_maintainer.pl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/README b/README
-index 49a9fd09cd..441c33eb2f 100644
---- a/README
-+++ b/README
-@@ -54,7 +54,7 @@ Submitting patches
-=20
- The QEMU source code is maintained under the GIT version control system.
-=20
--   git clone git://git.qemu.org/qemu.git
-+   git clone https://git.qemu.org/git/qemu.git
-=20
- When submitting patches, one common approach is to use 'git
- format-patch' and/or 'git send-email' to format & send the mail to the
-@@ -70,7 +70,7 @@ the QEMU website
-=20
- The QEMU website is also maintained under source control.
-=20
--  git clone git://git.qemu.org/qemu-web.git
-+  git clone https://git.qemu.org/git/qemu-web.git
-   https://www.qemu.org/2017/02/04/the-new-qemu-website-is-up/
-=20
- A 'git-publish' utility was created to make above process less
-diff --git a/pc-bios/README b/pc-bios/README
-index 90f0fa7aa7..b572e9eb00 100644
---- a/pc-bios/README
-+++ b/pc-bios/README
-@@ -23,7 +23,7 @@
-   legacy x86 software to communicate with an attached serial console as
-   if a video card were attached.  The master sources reside in a subvers=
-ion
-   repository at http://sgabios.googlecode.com/svn/trunk.  A git mirror i=
-s
--  available at git://git.qemu.org/sgabios.git.
-+  available at https://git.qemu.org/git/sgabios.git.
-=20
- - The PXE roms come from the iPXE project. Built with BANNER_TIME 0.
-   Sources available at http://ipxe.org.  Vendor:Device ID -> ROM mapping=
-:
-@@ -40,7 +40,7 @@
-=20
- - The u-boot binary for e500 comes from the upstream denx u-boot project=
- where
-   it was compiled using the qemu-ppce500 target.
--  A git mirror is available at: git://git.qemu.org/u-boot.git
-+  A git mirror is available at: https://git.qemu.org/git/u-boot.git
-   The hash used to compile the current version is: 2072e72
-=20
- - Skiboot (https://github.com/open-power/skiboot/) is an OPAL
+diff --git a/scripts/get_maintainer.pl b/scripts/get_maintainer.pl
+index 43fb5f512f..71415e3c70 100755
+--- a/scripts/get_maintainer.pl
++++ b/scripts/get_maintainer.pl
+@@ -1376,7 +1376,7 @@ sub vcs_exists {
+ 	warn("$P: No supported VCS found.  Add --nogit to options?\n");
+ 	warn("Using a git repository produces better results.\n");
+ 	warn("Try latest git repository using:\n");
+-	warn("git clone git://git.qemu.org/qemu.git\n");
++	warn("git clone https://git.qemu.org/git/qemu.git\n");
+ 	$printed_novcs =3D 1;
+     }
+     return 0;
 --=20
 2.19.1
