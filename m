@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gKpIc-0006ye-Hx
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 13:45:08 -0500
+	(envelope-from <pmathieu@redhat.com>) id 1gKpMW-0002t3-7q
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 13:49:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gKpIW-0003B6-Cy
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 13:45:02 -0500
-Received: from ste-pvt-msa1.bahnhof.se ([213.80.101.70]:30573)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gKpIV-0002PI-R6
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 13:44:56 -0500
-Date: Thu, 8 Nov 2018 19:43:40 +0100
-From: Fredrik Noring <noring@nocrew.org>
-Message-ID: <b04427024562b10c852a5519b57033e094fcdc3b.1541701393.git.noring@nocrew.org>
-References: <cover.1541701393.git.noring@nocrew.org>
+	(envelope-from <pmathieu@redhat.com>) id 1gKpMN-0006Ow-JQ
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 13:49:00 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:44192)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pmathieu@redhat.com>) id 1gKpMN-00060j-8C
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 13:48:55 -0500
+Received: by mail-wr1-f65.google.com with SMTP id j17-v6so17248805wrq.11
+	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 10:48:42 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <cover.1541701393.git.noring@nocrew.org>
-Subject: [Qemu-devel] [PATCH 2/2] tests/tcg/mips: Test user mode DMULT for
- the R5900
+References: <20181108143422.15955-1-philmd@redhat.com>
+	<20181108171716.GN12503@habkost.net>
+	<CAFEAcA-t5qOHngv9ciTkuakmT84N7QV4c0=TYMD-NUgh5uT_DA@mail.gmail.com>
+	<CAP+75-WTmYUAWgOZ7cf2jsaqvQVv+atBzatUgDOhudz1kqPg4g@mail.gmail.com>
+	<CAFEAcA8XK51Uun6MUQDSOMAN7aCQ0TtKzQBWtVXtBx9=A5yECw@mail.gmail.com>
+	<5f495bd7-8489-4e8f-8fd5-d0bb28787fa4@redhat.com>
+	<CAFEAcA-CtBWk-JYBw=Jk3Pqp_U1e_aA9Rcvs=mtwOqjZK0AX=g@mail.gmail.com>
+	<87o9azjtqm.fsf@dusky.pond.sub.org>
+In-Reply-To: <87o9azjtqm.fsf@dusky.pond.sub.org>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Date: Thu, 8 Nov 2018 19:48:29 +0100
+Message-ID: <CAP+75-XEqaD84ej0c0wKg_a861RP7hqUspgonL10UjxOeb2gtw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] scripts: Remove unused python imports
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,97 +35,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: =?utf-8?Q?J=C3=BCrgen?= Urban <JuergenUrban@gmx.de>, "Maciej W. Rozycki" <macro@linux-mips.org>, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-The R5900 reports itself as MIPS III but does not implement DMULT.
-Verify that DMULT is emulated properly in user mode by multiplying
-two 64-bit numbers to produce a 128-bit number.
+On Thu, Nov 8, 2018 at 7:43 PM Markus Armbruster <armbru@redhat.com> wrote:
+> Peter Maydell <peter.maydell@linaro.org> writes:
+> > On 8 November 2018 at 18:08, Philippe Mathieu-Daud=C3=A9 <philmd@redhat=
+.com> wrote:
+> >> Anyway there are no information about merge window in the wiki.
+> >> When I started it was not easy to understand it and why patches sent w=
+hen
+> >> 'merge window is close' fall under the crap and are unnoticed, thus it=
+ is
+> >> better to wait before to send, or resend them.
+> >
+> > The intention (not always something we succeed at) is that
+> > maintainers should respond to patches, do review, etc, at
+> > any point in our release cycle. During a release they might
+> > reply to say "I won't get to reviewing this for a little while"
+> > or "I'll take this patch once the trunk reopens for releases",
+>
+> In both cases, the maintainer remains responsible for tracking the
+> patches.
+>
+> I believe the sane thing to do is to review patches as usual, and to
+> queue the ones that are ready to go into the next release on a separate
+> branch.
+>
+> > but they shouldn't just leave patch submitters with no response
+> > at all...
+>
+> Yes, that's rude.
 
-Signed-off-by: Fredrik Noring <noring@nocrew.org>
----
- tests/tcg/mips/mipsn32r5900/Makefile | 25 +++++++++++++++++
- tests/tcg/mips/mipsn32r5900/dmult.c  | 40 ++++++++++++++++++++++++++++
- 2 files changed, 65 insertions(+)
- create mode 100644 tests/tcg/mips/mipsn32r5900/Makefile
- create mode 100644 tests/tcg/mips/mipsn32r5900/dmult.c
+Thanks both to clarify your maintainer view.
+I added this thread to my TODO and if nobody write about this in the
+wiki I'll, but later.
 
-diff --git a/tests/tcg/mips/mipsn32r5900/Makefile b/tests/tcg/mips/mipsn32r5900/Makefile
-new file mode 100644
-index 0000000000..7dd16723fe
---- /dev/null
-+++ b/tests/tcg/mips/mipsn32r5900/Makefile
-@@ -0,0 +1,25 @@
-+-include ../../config-host.mak
-+
-+CROSS=mips64r5900el-unknown-linux-gnu-
-+
-+SIM=qemu-mipsn32el
-+SIM_FLAGS=-cpu R5900
-+
-+CC      = $(CROSS)gcc
-+CFLAGS  = -Wall -mabi=n32 -march=r5900 -static
-+
-+TESTCASES = dmult.tst
-+
-+all: $(TESTCASES)
-+
-+%.tst: %.c
-+	$(CC) $(CFLAGS) $< -o $@
-+
-+check: $(TESTCASES)
-+	@for case in $(TESTCASES); do \
-+        echo $(SIM) $(SIM_FLAGS) ./$$case;\
-+        $(SIM) $(SIM_FLAGS) ./$$case; \
-+	done
-+
-+clean:
-+	$(RM) -rf $(TESTCASES)
-diff --git a/tests/tcg/mips/mipsn32r5900/dmult.c b/tests/tcg/mips/mipsn32r5900/dmult.c
-new file mode 100644
-index 0000000000..2827ab5358
---- /dev/null
-+++ b/tests/tcg/mips/mipsn32r5900/dmult.c
-@@ -0,0 +1,40 @@
-+/*
-+ * Test DMULT.
-+ */
-+
-+#include <stdio.h>
-+#include <inttypes.h>
-+#include <assert.h>
-+
-+struct hi_lo { int64_t hi; uint64_t lo; };
-+
-+static struct hi_lo dmult(int64_t rs, int64_t rt)
-+{
-+    int64_t hi;
-+    uint64_t lo;
-+
-+    /*
-+     * The R5900 reports itself as MIPS III but does not implement DMULT.
-+     * Verify that DMULT is emulated properly in user mode.
-+     */
-+    __asm__ __volatile__ (
-+            "    .set  mips3\n"
-+            "    dmult %2, %3\n"
-+            "    mfhi  %0\n"
-+            "    mflo  %1\n"
-+            : "=r" (hi), "=r" (lo)
-+            : "r" (rs), "r" (rt));
-+
-+    return (struct hi_lo) { .hi = hi, .lo = lo };
-+}
-+
-+int main()
-+{
-+    /* Verify that multiplying two 64-bit numbers yields a 128-bit number. */
-+    struct hi_lo r = dmult(2760727302517, 5665449960167);
-+
-+    assert(r.hi == 847887);
-+    assert(r.lo == 7893651516417804947);
-+
-+    return 0;
-+}
--- 
-2.18.1
+Phil.
