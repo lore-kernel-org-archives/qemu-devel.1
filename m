@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43888)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43862)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1gKhcU-0003Ol-Ql
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:33:08 -0500
+	(envelope-from <gengdongjiu@huawei.com>) id 1gKhcS-0003Fm-68
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:33:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1gKhcQ-0000RT-NG
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:33:02 -0500
+	(envelope-from <gengdongjiu@huawei.com>) id 1gKhcQ-0000RE-B3
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:33:00 -0500
 From: Dongjiu Geng <gengdongjiu@huawei.com>
-Date: Thu, 8 Nov 2018 02:29:39 -0800
-Message-ID: <1541672989-15967-1-git-send-email-gengdongjiu@huawei.com>
+Date: Thu, 8 Nov 2018 02:29:49 -0800
+Message-ID: <1541672989-15967-11-git-send-email-gengdongjiu@huawei.com>
+In-Reply-To: <1541672989-15967-1-git-send-email-gengdongjiu@huawei.com>
+References: <1541672989-15967-1-git-send-email-gengdongjiu@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH RESEND v15 00/10] Add ARMv8 RAS virtualization
- support in QEMU
+Subject: [Qemu-devel] [PATCH RESEND v15 10/10] target-arm: kvm64: handle
+ SIGBUS signal from kernel or KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,240 +24,323 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: imammedo@redhat.com, mst@redhat.com, peter.maydell@linaro.org, lersek@redhat.com, marc.zyngier@arm.com, james.morse@arm.com, pbonzini@redhat.com, mtosatti@redhat.com, rth@twiddle.net, zhengxiang9@huawei.com, ehabkost@redhat.com, kvm@vger.kernel.org, shannon.zhaosl@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, gengdongjiu@huawei.com
 
-In the ARMv8 platform, the CPU error type are synchronous external
-abort(SEA) and SError Interrupt (SEI). If exception happens to guest,
-sometimes  guest itself do the recovery is better, because host 
-does not know guest's detailed information. For example, if a guest
-user-space application happen exception, host doe not which application
-encounter errors.
+Add SIGBUS signal handler. In this handler, it checks the SIGBUS type,
+translates the host VA delivered by host to guest PA, then fill this PA
+to guest APEI GHES memory, then notify guest according to the SIGBUS type.
+There are two kinds of SIGBUS that QEMU needs to handle, which are
+BUS_MCEERR_AO and BUS_MCEERR_AR.
 
-For the ARMv8 SEA/SEI, KVM or host kernel will deliver SIGBUS or
-use other interface to notify user space. After user space gets 
-the notification, it will record the CPER to guest GHES buffer
-for guest and inject a exception or IRQ to KVM.
+If guest accesses the poisoned memory, it generates Synchronous External
+Abort(SEA). Then host kernel gets an APEI notification and call memory_failure()
+to unmapped the affected page from the guest's stage 2, finally return
+to guest.
 
-In the current implement, if the SIGBUS is BUS_MCEERR_AR, we will
-treat it as synchronous exception, and use ARMv8 SEA notification type
-to notify guest after recording CPER for guest;
+Guest continues to access PG_hwpoison page, it will trap to KVM as stage2 fault,
+then a SIGBUS_MCEERR_AR synchronous signal is delivered to Qemu, Qemu record this
+error into guest APEI GHES memory and notify guest using Synchronous-External-Abort(SEA).
 
-This series patches are based on Qemu 2.12, which have two parts:
-1. Generate APEI/GHES table and record CPER for guest in runtime.
-2. Handle the SIGBUS signal, record the CPER and fill into guest memory,
-   then according to SIGBUS type(BUS_MCEERR_AR or BUS_MCEERR_AO), using
-   different ACPI notification type to notify guest.
-
-Whole solution was suggested by James(james.morse@arm.com); APEI part solution is suggested by
-Laszlo(lersek@redhat.com). Shown some discussion in [1].
-
-
-This series patches have already tested on ARM64 platform with RAS feature enabled:
-Show the APEI part verification result in [2]
-Show the BUS_MCEERR_AR SIGBUS handling verification result in [3]
-
+Suggested-by: James Morse <james.morse@arm.com>
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 ---
-Change since v14:
-1. Remove the BUS_MCEERR_AO handling logic because this asynchronous signal was masked by main thread 
-2. Address some Igor Mammedov's comments(ACPI part)
-   1) change the comments for the enum AcpiHestNotifyType definition and remove ditto in patch 1
-   2) change some patch commit messages and separate "APEI GHES table generation" patch to more patches.
-3. Address some peter's comments(arm64 Synchronous External Abort injection)
-   1) change some code notes
-   2) using arm_current_el() for current EL
-   2) use the helper functions for those (syn_data_abort_*).
+Address James's comments to record CPER and notify guest for SIGBUS signal handling.
+Shown some discussion in [1].
 
-Change since v13:
-1. Move the patches that set guest ESR and inject virtual SError out of this series
-2. Clean and optimize the APEI part patches 
-3. Update the commit messages and add some comments for the code
-
-Change since v12:
-1. Address Paolo's comments to move HWPoisonPage definition to accel/kvm/kvm-all.c
-2. Only call kvm_cpu_synchronize_state() when get the BUS_MCEERR_AR signal
-3. Only add and enable GPIO-Signal and ARMv8 SEA two hardware error sources
-4. Address Michael's comments to not sync SPDX from Linux kernel header file 
-
-Change since v11:
-Address James's comments(james.morse@arm.com)
-1. Check whether KVM has the capability to to set ESR instead of detecting host CPU RAS capability
-2. For SIGBUS_MCEERR_AR SIGBUS, use Synchronous-External-Abort(SEA) notification type
-   for SIGBUS_MCEERR_AO SIGBUS, use GPIO-Signal notification
-
-
-Address Shannon's comments(for ACPI part):
-1. Unify hest_ghes.c and hest_ghes.h license declaration
-2. Remove unnecessary including "qmp-commands.h" in hest_ghes.c
-3. Unconditionally add guest APEI table based on James's comments(james.morse@arm.com) 
-4. Add a option to virt machine for migration compatibility. On new virt machine it's on
-   by default while off for old ones, we enabled it since 2.12
-5. Refer to the ACPI spec version which introduces Hardware Error Notification first time
-6. Add ACPI_HEST_NOTIFY_RESERVED notification type
-
-Address Igor's comments(for ACPI part):
-1. Add doc patch first which will describe how it's supposed to work between QEMU/firmware/guest
-   OS with expected flows.
-2. Move APEI diagrams into doc/spec patch
-3. Remove redundant g_malloc in ghes_record_cper()
-4. Use build_append_int_noprefix() API to compose whole error status block and whole APEI table, 
-   and try to get rid of most structures in patch 1, as they will be left unused after that
-5. Reuse something like https://github.com/imammedo/qemu/commit/3d2fd6d13a3ea298d2ee814835495ce6241d085c
-   to build GAS
-6. Remove much offsetof() in the function
-7. Build independent tables first and only then build dependent tables passing to it pointers
-   to previously build table if necessary.
-8. Redefine macro GHES_ACPI_HEST_NOTIFY_RESERVED to ACPI_HEST_ERROR_SOURCE_COUNT to avoid confusion
-
-
-Address Peter Maydell's comments
-1. linux-headers is done as a patch of their own created using scripts/update-linux-headers.sh run against a
-   mainline kernel tree 
-2. Tested whether this patchset builds OK on aarch32  
-3. Abstract Hwpoison page adding code  out properly into a cpu-independent source file from target/i386/kvm.c,
-   such as kvm-all.c
-4. Add doc-comment formatted documentation comment for new globally-visible function prototype in a header
-
----
 [1]:
 https://lkml.org/lkml/2017/2/27/246
-https://patchwork.kernel.org/patch/9633105/
-https://patchwork.kernel.org/patch/9925227/
+https://lkml.org/lkml/2017/9/14/241
+https://lkml.org/lkml/2017/9/22/499
+---
+ hw/acpi/acpi_ghes.c         | 164 ++++++++++++++++++++++++++++++++++++++++++++
+ include/hw/acpi/acpi_ghes.h |   4 ++
+ include/sysemu/kvm.h        |   2 +-
+ target/arm/kvm.c            |   3 +
+ target/arm/kvm64.c          |  34 +++++++++
+ 5 files changed, 206 insertions(+), 1 deletion(-)
 
-[2]:
-Note: the UEFI(QEMU_EFI.fd) is needed if guest want to use ACPI table.
-
-After guest boot up, dump the APEI table, then can see the initialized table
-(1) # iasl -p ./HEST -d /sys/firmware/acpi/tables/HEST
-(2) # cat HEST.dsl
-    /*
-     * Intel ACPI Component Architecture
-     * AML/ASL+ Disassembler version 20170728 (64-bit version)
-     * Copyright (c) 2000 - 2017 Intel Corporation
-     *
-     * Disassembly of /sys/firmware/acpi/tables/HEST, Mon Sep  5 07:59:17 2016
-     *
-     * ACPI Data Table [HEST]
-     *
-     * Format: [HexOffset DecimalOffset ByteLength]  FieldName : FieldValue
-     */
-
-    ..................................................................................
-    [308h 0776   2]                Subtable Type : 000A [Generic Hardware Error Source V2]
-    [30Ah 0778   2]                    Source Id : 0001
-    [30Ch 0780   2]            Related Source Id : FFFF
-    [30Eh 0782   1]                     Reserved : 00
-    [30Fh 0783   1]                      Enabled : 01
-    [310h 0784   4]       Records To Preallocate : 00000001
-    [314h 0788   4]      Max Sections Per Record : 00000001
-    [318h 0792   4]          Max Raw Data Length : 00001000
-
-    [31Ch 0796  12]         Error Status Address : [Generic Address Structure]
-    [31Ch 0796   1]                     Space ID : 00 [SystemMemory]
-    [31Dh 0797   1]                    Bit Width : 40
-    [31Eh 0798   1]                   Bit Offset : 00
-    [31Fh 0799   1]         Encoded Access Width : 04 [QWord Access:64]
-    [320h 0800   8]                      Address : 00000000785D0040
-
-    [328h 0808  28]                       Notify : [Hardware Error Notification Structure]
-    [328h 0808   1]                  Notify Type : 08 [SEA]
-    [329h 0809   1]                Notify Length : 1C
-    [32Ah 0810   2]   Configuration Write Enable : 0000
-    [32Ch 0812   4]                 PollInterval : 00000000
-    [330h 0816   4]                       Vector : 00000000
-    [334h 0820   4]      Polling Threshold Value : 00000000
-    [338h 0824   4]     Polling Threshold Window : 00000000
-    [33Ch 0828   4]        Error Threshold Value : 00000000
-    [340h 0832   4]       Error Threshold Window : 00000000
-
-    [344h 0836   4]    Error Status Block Length : 00001000
-    [348h 0840  12]            Read Ack Register : [Generic Address Structure]
-    [348h 0840   1]                     Space ID : 00 [SystemMemory]
-    [349h 0841   1]                    Bit Width : 40
-    [34Ah 0842   1]                   Bit Offset : 00
-    [34Bh 0843   1]         Encoded Access Width : 04 [QWord Access:64]
-    [34Ch 0844   8]                      Address : 00000000785D0098
-
-    [354h 0852   8]            Read Ack Preserve : 00000000FFFFFFFE
-    [35Ch 0860   8]               Read Ack Write : 0000000000000001
-
-    .....................................................................................
-
-(3) After a synchronous external abort(SEA) happen, Qemu receive a SIGBUS and 
-    filled the CPER into guest GHES memory.  For example, according to above table,
-    the address that contains the physical address of a block of memory that holds
-    the error status data for this abort is 0x00000000785D0040
-(4) the address for SEA notification error source is 0x785d80b0
-    (qemu) xp /1 0x00000000785D0040
-    00000000785d0040: 0x785d80b0
-
-(5) check the content of generic error status block and generic error data entry
-    (qemu) xp /100x 0x785d80b0
-    00000000785d80b0: 0x00000001 0x00000000 0x00000000 0x00000098
-    00000000785d80c0: 0x00000000 0xa5bc1114 0x4ede6f64 0x833e63b8
-    00000000785d80d0: 0xb1837ced 0x00000000 0x00000300 0x00000050
-    00000000785d80e0: 0x00000000 0x00000000 0x00000000 0x00000000
-    00000000785d80f0: 0x00000000 0x00000000 0x00000000 0x00000000
-    00000000785d8100: 0x00000000 0x00000000 0x00000000 0x00004002
-(6) check the OSPM's ACK value(for example SEA)
-    /* Before OSPM acknowledges the error, check the ACK value */
-    (qemu) xp /1 0x00000000785D0098
-    00000000785d00f0: 0x00000000
-
-    /* After OSPM acknowledges the error, check the ACK value, it change to 1 from 0 */
-    (qemu) xp /1 0x00000000785D0098
-    00000000785d00f0: 0x00000001
-
-[3]: KVM deliver "BUS_MCEERR_AR" to Qemu, Qemu record the guest CPER and inject
-    synchronous external abort to notify guest, then guest do the recovery.
-
-[ 1552.516170] Synchronous External Abort: synchronous external abort (0x92000410) at 0x000000003751c6b4
-[ 1553.074073] {1}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 8
-[ 1553.081654] {1}[Hardware Error]: event severity: recoverable
-[ 1554.034191] {1}[Hardware Error]:  Error 0, type: recoverable
-[ 1554.037934] {1}[Hardware Error]:   section_type: memory error
-[ 1554.513261] {1}[Hardware Error]:   physical_address: 0x0000000040fa6000
-[ 1554.513944] {1}[Hardware Error]:   error_type: 0, unknown
-[ 1555.041451] Memory failure: 0x40fa6: Killing mca-recover:1296 due to hardware memory corruption
-[ 1555.373116] Memory failure: 0x40fa6: recovery action for dirty LRU page: Recovered
-
-Dongjiu Geng (10):
-  ACPI: add some GHES structures and macros definition
-  acpi: add build_append_ghes_notify() helper for Hardware Error
-    Notification
-  acpi: add build_append_ghes_generic_data() helper for Generic Error
-    Data Entry
-  acpi: add build_append_ghes_generic_status() helper for Generic Error
-    Status Block
-  ACPI: Add APEI GHES table generation and CPER record support
-  docs: APEI GHES generation and CPER record description
-  KVM: Move related hwpoison page functions to accel/kvm/ folder
-  target-arm: kvm64: inject synchronous External Abort
-  hw/arm/virt: Add RAS platform version for migration
-  target-arm: kvm64: handle SIGBUS signal from kernel or KVM
-
- accel/kvm/kvm-all.c             |  33 ++++
- default-configs/arm-softmmu.mak |   1 +
- docs/specs/acpi_hest_ghes.txt   |  97 ++++++++++++
- hw/acpi/Makefile.objs           |   1 +
- hw/acpi/acpi_ghes.c             | 335 ++++++++++++++++++++++++++++++++++++++++
- hw/acpi/aml-build.c             |  70 +++++++++
- hw/arm/virt-acpi-build.c        |  12 ++
- hw/arm/virt.c                   |   4 +
- include/exec/ram_addr.h         |   5 +
- include/hw/acpi/acpi-defs.h     |  52 +++++++
- include/hw/acpi/acpi_ghes.h     |  86 +++++++++++
- include/hw/acpi/aml-build.h     |  21 +++
- include/hw/arm/virt.h           |   1 +
- include/sysemu/kvm.h            |   2 +-
- target/arm/cpu.h                |   2 +
- target/arm/helper.c             |  23 +++
- target/arm/internals.h          |   5 +-
- target/arm/kvm.c                |   3 +
- target/arm/kvm64.c              |  73 +++++++++
- target/arm/op_helper.c          |   2 +-
- target/i386/kvm.c               |  33 ----
- 21 files changed, 824 insertions(+), 37 deletions(-)
- create mode 100644 docs/specs/acpi_hest_ghes.txt
- create mode 100644 hw/acpi/acpi_ghes.c
- create mode 100644 include/hw/acpi/acpi_ghes.h
-
+diff --git a/hw/acpi/acpi_ghes.c b/hw/acpi/acpi_ghes.c
+index d03e797..ef83c05 100644
+--- a/hw/acpi/acpi_ghes.c
++++ b/hw/acpi/acpi_ghes.c
+@@ -26,6 +26,87 @@
+ #include "sysemu/sysemu.h"
+ #include "qemu/error-report.h"
+ 
++/* UEFI 2.6: N.2.5 Memory Error Section */
++static void build_append_mem_cper(GArray *table, uint64_t error_physical_addr)
++{
++    /*
++     * Memory Error Record
++     */
++    build_append_int_noprefix(table,
++                 (1UL << 14) | /* Type Valid */
++                 (1UL << 1) /* Physical Address Valid */,
++                 8);
++    /* Memory error status information */
++    build_append_int_noprefix(table, 0, 8);
++    /* The physical address at which the memory error occurred */
++    build_append_int_noprefix(table, error_physical_addr, 8);
++    build_append_int_noprefix(table, 0, 48);
++    build_append_int_noprefix(table, 0 /* Unknown error */, 1);
++    build_append_int_noprefix(table, 0, 7);
++}
++
++static int ghes_record_mem_error(uint64_t error_block_address,
++                                    uint64_t error_physical_addr)
++{
++    GArray *block;
++    uint64_t current_block_length;
++    uint32_t data_length;
++    /* Memory section */
++    char mem_section_id_le[] = {0x14, 0x11, 0xBC, 0xA5, 0x64, 0x6F, 0xDE,
++                                0x4E, 0xB8, 0x63, 0x3E, 0x83, 0xED, 0x7C,
++                                0x83, 0xB1};
++    uint8_t fru_id[16] = {0};
++    uint8_t fru_text[20] = {0};
++
++    block = g_array_new(false, true /* clear */, 1);
++
++    /* Read the current length in bytes of the generic error data */
++    cpu_physical_memory_read(error_block_address +
++        offsetof(AcpiGenericErrorStatus, data_length), &data_length, 4);
++
++    /* The current whole length in bytes of the generic error status block */
++    current_block_length = sizeof(AcpiGenericErrorStatus) + le32_to_cpu(data_length);
++
++    /* Add a new generic error data entry*/
++    data_length += GHES_DATA_LENGTH;
++    data_length += GHES_CPER_LENGTH;
++
++    /* Check whether it will run out of the preallocated memory if adding a new
++     * generic error data entry
++     */
++    if ((data_length + sizeof(AcpiGenericErrorStatus)) > GHES_MAX_RAW_DATA_LENGTH) {
++        error_report("Record CPER out of boundary!!!");
++        return GHES_CPER_FAIL;
++    }
++    /* Build the new generic error status block header */
++    build_append_ghes_generic_status(block, cpu_to_le32(ACPI_GEBS_UNCORRECTABLE), 0, 0,
++        cpu_to_le32(data_length), cpu_to_le32(ACPI_CPER_SEV_RECOVERABLE));
++
++    /* Write back above generic error status block header to guest memory */
++    cpu_physical_memory_write(error_block_address, block->data,
++                              block->len);
++
++    /* Build the generic error data entries */
++
++    data_length = block->len;
++    /* Build the new generic error data entry header */
++    build_append_ghes_generic_data(block, mem_section_id_le,
++                    cpu_to_le32(ACPI_CPER_SEV_RECOVERABLE), cpu_to_le32(0x300), 0, 0,
++                    cpu_to_le32(80)/* the total size of Memory Error Record */, fru_id,
++                    fru_text, 0);
++
++    /* Build the memory section CPER */
++    build_append_mem_cper(block, error_physical_addr);
++
++    /* Write back above whole new generic error data entry to guest memory */
++    cpu_physical_memory_write(error_block_address + current_block_length,
++                    block->data + data_length, block->len - data_length);
++
++    g_array_free(block, true);
++
++    return GHES_CPER_OK;
++}
++
+ /* Build table for the hardware error fw_cfg blob */
+ void build_hardware_error_table(GArray *hardware_errors, BIOSLinker *linker)
+ {
+@@ -169,3 +250,86 @@ void ghes_add_fw_cfg(FWCfgState *s, GArray *hardware_error)
+     fw_cfg_add_file_callback(s, GHES_DATA_ADDR_FW_CFG_FILE, NULL, NULL, NULL,
+         &ges.ghes_addr_le, sizeof(ges.ghes_addr_le), false);
+ }
++
++bool ghes_record_errors(uint32_t notify, uint64_t physical_address)
++{
++    uint64_t error_block_addr, read_ack_register_addr;
++    int read_ack_register = 0, loop = 0;
++    uint64_t start_addr = le32_to_cpu(ges.ghes_addr_le);
++    bool ret = GHES_CPER_FAIL;
++    const uint8_t error_source_id[] = { 0xff, 0xff, 0xff, 0xff,
++                                        0xff, 0xff, 0xff, 0, 1};
++
++    /*
++     * | +---------------------+ ges.ghes_addr_le
++     * | |error_block_address0|
++     * | +---------------------+
++     * | |error_block_address1|
++     * | +---------------------+ --+--
++     * | |    .............    | GHES_ADDRESS_SIZE
++     * | +---------------------+ --+--
++     * | |error_block_addressN|
++     * | +---------------------+
++     * | | read_ack_register0  |
++     * | +---------------------+ --+--
++     * | | read_ack_register1  | GHES_ADDRESS_SIZE
++     * | +---------------------+ --+--
++     * | |   .............     |
++     * | +---------------------+
++     * | | read_ack_registerN  |
++     * | +---------------------+ --+--
++     * | |      CPER           |   |
++     * | |      ....           | GHES_MAX_RAW_DATA_LENGT
++     * | |      CPER           |   |
++     * | +---------------------+ --+--
++     * | |    ..........       |
++     * | +---------------------+
++     * | |      CPER           |
++     * | |      ....           |
++     * | |      CPER           |
++     * | +---------------------+
++     */
++    if (physical_address && notify < ACPI_HEST_NOTIFY_RESERVED) {
++        /* Find and check the source id for this new CPER */
++        if (error_source_id[notify] != 0xff) {
++            start_addr += error_source_id[notify] * GHES_ADDRESS_SIZE;
++        } else {
++            goto out;
++        }
++
++        cpu_physical_memory_read(start_addr, &error_block_addr,
++                                    GHES_ADDRESS_SIZE);
++
++        read_ack_register_addr = start_addr +
++                        ACPI_HEST_ERROR_SOURCE_COUNT * GHES_ADDRESS_SIZE;
++retry:
++        cpu_physical_memory_read(read_ack_register_addr,
++                                 &read_ack_register, GHES_ADDRESS_SIZE);
++
++        /* zero means OSPM does not acknowledge the error */
++        if (!read_ack_register) {
++            if (loop < 3) {
++                usleep(100 * 1000);
++                loop++;
++                goto retry;
++            } else {
++                error_report("Last time OSPM does not acknowledge the error,"
++                    " record CPER failed this time, set the ack value to"
++                    " avoid blocking next time CPER record! exit");
++                read_ack_register = 1;
++                cpu_physical_memory_write(read_ack_register_addr,
++                    &read_ack_register, GHES_ADDRESS_SIZE);
++            }
++        } else {
++            if (error_block_addr) {
++                read_ack_register = 0;
++                cpu_physical_memory_write(read_ack_register_addr,
++                    &read_ack_register, GHES_ADDRESS_SIZE);
++                ret = ghes_record_mem_error(error_block_addr, physical_address);
++            }
++        }
++    }
++
++out:
++    return ret;
++}
+diff --git a/include/hw/acpi/acpi_ghes.h b/include/hw/acpi/acpi_ghes.h
+index 0a7c6c2..95d22ef 100644
+--- a/include/hw/acpi/acpi_ghes.h
++++ b/include/hw/acpi/acpi_ghes.h
+@@ -40,6 +40,9 @@
+ #define GHES_CPER_OK                1
+ #define GHES_CPER_FAIL              0
+ 
++#define GHES_CPER_OK                1
++#define GHES_CPER_FAIL              0
++
+ /* The max size in bytes for one error block */
+ #define GHES_MAX_RAW_DATA_LENGTH        0x1000
+ /* Now only have GPIO-Signal and ARMv8 SEA notification types error sources
+@@ -79,4 +82,5 @@ void build_apei_hest(GArray *table_data, GArray *hardware_error,
+ 
+ void build_hardware_error_table(GArray *hardware_errors, BIOSLinker *linker);
+ void ghes_add_fw_cfg(FWCfgState *s, GArray *hardware_errors);
++bool ghes_record_errors(uint32_t notify, uint64_t error_physical_addr);
+ #endif
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index 97d8d9d..fd07d62 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -377,7 +377,7 @@ bool kvm_vcpu_id_is_valid(int vcpu_id);
+ /* Returns VCPU ID to be used on KVM_CREATE_VCPU ioctl() */
+ unsigned long kvm_arch_vcpu_id(CPUState *cpu);
+ 
+-#ifdef TARGET_I386
++#if defined(TARGET_I386) || defined(TARGET_AARCH64)
+ #define KVM_HAVE_MCE_INJECTION 1
+ void kvm_arch_on_sigbus_vcpu(CPUState *cpu, int code, void *addr);
+ #endif
+diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+index 09a86e2..f22dc4e 100644
+--- a/target/arm/kvm.c
++++ b/target/arm/kvm.c
+@@ -28,6 +28,7 @@
+ #include "exec/address-spaces.h"
+ #include "hw/boards.h"
+ #include "qemu/log.h"
++#include "exec/ram_addr.h"
+ 
+ const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
+     KVM_CAP_LAST_INFO
+@@ -176,6 +177,8 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+ 
+     cap_has_mp_state = kvm_check_extension(s, KVM_CAP_MP_STATE);
+ 
++    qemu_register_reset(kvm_unpoison_all, NULL);
++
+     return 0;
+ }
+ 
+diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+index 0ca2b29..913e707 100644
+--- a/target/arm/kvm64.c
++++ b/target/arm/kvm64.c
+@@ -27,6 +27,9 @@
+ #include "kvm_arm.h"
+ #include "internals.h"
+ #include "hw/arm/arm.h"
++#include "exec/ram_addr.h"
++#include "hw/acpi/acpi-defs.h"
++#include "hw/acpi/acpi_ghes.h"
+ 
+ static bool have_guest_debug;
+ 
+@@ -929,6 +932,37 @@ int kvm_arch_get_registers(CPUState *cs)
+     return ret;
+ }
+ 
++void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
++{
++    ram_addr_t ram_addr;
++    hwaddr paddr;
++
++    assert(code == BUS_MCEERR_AR || code == BUS_MCEERR_AO);
++    if (addr) {
++        ram_addr = qemu_ram_addr_from_host(addr);
++        if (ram_addr != RAM_ADDR_INVALID &&
++            kvm_physical_memory_addr_from_host(c->kvm_state, addr, &paddr)) {
++            kvm_hwpoison_page_add(ram_addr);
++            if (code == BUS_MCEERR_AR) {
++                kvm_cpu_synchronize_state(c);
++                if (ghes_record_errors(ACPI_HEST_NOTIFY_SEA, paddr)) {
++                    kvm_inject_arm_sea(c);
++                } else {
++                    fprintf(stderr, "failed to record the error\n");
++                }
++            }
++            return;
++        }
++        fprintf(stderr, "Hardware memory error for memory used by "
++                "QEMU itself instead of guest system!\n");
++    }
++
++    if (code == BUS_MCEERR_AR) {
++        fprintf(stderr, "Hardware memory error!\n");
++        exit(1);
++    }
++}
++
+ /* C6.6.29 BRK instruction */
+ static const uint32_t brk_insn = 0xd4200000;
+ 
 -- 
 1.8.3.1
