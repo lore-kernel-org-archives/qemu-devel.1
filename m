@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60476)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gKkC2-0005o5-Sx
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 08:17:55 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gKkT8-0002bz-6H
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 08:35:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gKkBz-000066-Ii
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 08:17:54 -0500
-Received: from 14.mo6.mail-out.ovh.net ([46.105.56.113]:50712)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gKkBz-0008O8-8m
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 08:17:51 -0500
-Received: from player788.ha.ovh.net (unknown [10.109.143.183])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 4F0611970B3
-	for <qemu-devel@nongnu.org>; Thu,  8 Nov 2018 14:17:45 +0100 (CET)
-Date: Thu, 8 Nov 2018 14:17:33 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20181108141733.5ee0e7be@bahia.lan>
-In-Reply-To: <20181108121646.26173-21-david@gibson.dropbear.id.au>
-References: <20181108121646.26173-1-david@gibson.dropbear.id.au>
-	<20181108121646.26173-21-david@gibson.dropbear.id.au>
+	(envelope-from <cohuck@redhat.com>) id 1gKkT2-0007hq-Vs
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 08:35:32 -0500
+Date: Thu, 8 Nov 2018 14:35:01 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181108143501.0f2427d2.cohuck@redhat.com>
+In-Reply-To: <20181105110313.29312-5-david@redhat.com>
+References: <20181105110313.29312-1-david@redhat.com>
+	<20181105110313.29312-5-david@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 20/22] This patch fixes processing of rfi
- instructions in icount mode.
+Subject: Re: [Qemu-devel] [PATCH v1 4/4] s390x/zpci: properly fail if the
+ zPCI device cannot be created
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,67 +24,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: peter.maydell@linaro.org, lvivier@redhat.com, agraf@suse.de, qemu-devel@nongnu.org, Maria Klimushenkova <maria.klimushenkova@ispras.ru>, qemu-ppc@nongnu.org, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, =Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>
 
-On Thu,  8 Nov 2018 23:16:44 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
+On Mon,  5 Nov 2018 12:03:13 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
-> From: Maria Klimushenkova <maria.klimushenkova@ispras.ru>
+> Right now, errors during realize()/pre_plug/plug of the zPCI device
+> would result in QEMU crashing instead of failing nicely when creating
+> a zPCI device for a PCI device.
 > 
-> In this mode writing to interrupt/peripheral state is controlled
-> by can_do_io flag. This flag must be set explicitly before helper
-> function invocation.
-> 
-> Signed-off-by: Maria Klimushenkova <maria.klimushenkova@ispras.ru>
-> Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-> Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
+>  hw/s390x/s390-pci-bus.c | 25 +++++++++++++++++++------
+>  1 file changed, 19 insertions(+), 6 deletions(-)
 
-The 'This patch fixes ...' wording in the commit title looks weird, and
-it doesn't even mention the target/ppc subsystem...
+Unfortunately, this patch applied as-is on top of master breaks zpci
+device autogeneration:
 
-What about this ?
+-device zpci,target=pcidev -device virtio-net-pci,id=pcidev works
 
-target/ppc: fix processing of rfi instructions in icount mode
+-device virtio-net-pci fails with
 
->  target/ppc/translate.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
+qemu-system-s390x: -device virtio-net-pci: zPCI device could not be created: Property '.auto_00:00.0' not found
+
+Any idea?
+
+[insert my usual rants about the zpci architecture here]
+
 > 
-> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> index fb18cedcf0..2b37910248 100644
-> --- a/target/ppc/translate.c
-> +++ b/target/ppc/translate.c
-> @@ -3919,9 +3919,15 @@ static void gen_rfi(DisasContext *ctx)
+> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+> index 1849f9d334..4939490c7c 100644
+> --- a/hw/s390x/s390-pci-bus.c
+> +++ b/hw/s390x/s390-pci-bus.c
+> @@ -778,17 +778,31 @@ static void s390_pci_msix_free(S390PCIBusDevice *pbdev)
+>  }
+>  
+>  static S390PCIBusDevice *s390_pci_device_new(S390pciState *s,
+> -                                             const char *target)
+> +                                             const char *target, Error **errp)
+>  {
+> -    DeviceState *dev = NULL;
+> +    Error *local_err = NULL;
+> +    DeviceState *dev;
+>  
+>      dev = qdev_try_create(BUS(s->bus), TYPE_S390_PCI_DEVICE);
+>      if (!dev) {
+> +        error_setg(errp, "zPCI device could not be created");
+>          return NULL;
 >      }
->      /* Restore CPU state */
->      CHK_SV;
-> +    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-> +        gen_io_start();
-> +    }
->      gen_update_cfar(ctx, ctx->base.pc_next - 4);
->      gen_helper_rfi(cpu_env);
->      gen_sync_exception(ctx);
-> +    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-> +        gen_io_end();
-> +    }
->  #endif
->  }
 >  
-> @@ -3933,9 +3939,15 @@ static void gen_rfid(DisasContext *ctx)
->  #else
->      /* Restore CPU state */
->      CHK_SV;
-> +    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-> +        gen_io_start();
+> -    qdev_prop_set_string(dev, "target", target);
+> -    qdev_init_nofail(dev);
+> +    object_property_set_str(OBJECT(dev), "target", target, &local_err);
+> +    if (local_err) {
+> +        object_unparent(OBJECT(dev));
+> +        error_propagate_prepend(errp, local_err,
+> +                                "zPCI device could not be created: ");
+> +        return NULL;
 > +    }
->      gen_update_cfar(ctx, ctx->base.pc_next - 4);
->      gen_helper_rfid(cpu_env);
->      gen_sync_exception(ctx);
-> +    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-> +        gen_io_end();
+> +    object_property_set_bool(OBJECT(dev), true, "realized", &local_err);
+> +    if (local_err) {
+> +        object_unparent(OBJECT(dev));
+> +        error_propagate_prepend(errp, local_err,
+> +                                "zPCI device could not be created: ");
+> +        return NULL;
 > +    }
->  #endif
->  }
 >  
+>      return S390_PCI_DEVICE(dev);
+>  }
+> @@ -873,9 +887,8 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>  
+>          pbdev = s390_pci_find_dev_by_target(s, dev->id);
+>          if (!pbdev) {
+> -            pbdev = s390_pci_device_new(s, dev->id);
+> +            pbdev = s390_pci_device_new(s, dev->id, errp);
+>              if (!pbdev) {
+> -                error_setg(errp, "create zpci device failed");
+>                  return;
+>              }
+>          }
