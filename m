@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43833)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1gKhcR-0003B5-6r
+	(envelope-from <gengdongjiu@huawei.com>) id 1gKhcR-0003DJ-L5
 	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:33:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1gKhcO-0000Pu-Fn
+	(envelope-from <gengdongjiu@huawei.com>) id 1gKhcQ-0000R2-3g
 	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:32:59 -0500
 From: Dongjiu Geng <gengdongjiu@huawei.com>
-Date: Thu, 8 Nov 2018 02:29:40 -0800
-Message-ID: <1541672989-15967-2-git-send-email-gengdongjiu@huawei.com>
+Date: Thu, 8 Nov 2018 02:29:47 -0800
+Message-ID: <1541672989-15967-9-git-send-email-gengdongjiu@huawei.com>
 In-Reply-To: <1541672989-15967-1-git-send-email-gengdongjiu@huawei.com>
 References: <1541672989-15967-1-git-send-email-gengdongjiu@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH RESEND v15 01/10] ACPI: add some GHES
- structures and macros definition
+Subject: [Qemu-devel] [PATCH RESEND v15 08/10] target-arm: kvm64: inject
+ synchronous External Abort
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,99 +24,193 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: imammedo@redhat.com, mst@redhat.com, peter.maydell@linaro.org, lersek@redhat.com, marc.zyngier@arm.com, james.morse@arm.com, pbonzini@redhat.com, mtosatti@redhat.com, rth@twiddle.net, zhengxiang9@huawei.com, ehabkost@redhat.com, kvm@vger.kernel.org, shannon.zhaosl@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, gengdongjiu@huawei.com
 
-Add Generic Error Status Block structures and some macros
-definitions, which is referred to the ACPI 4.0 or ACPI 6.2. The
-HEST table generation and CPER record will use them.
+Add synchronous external abort injection logic, setup
+exception type and syndrome value. When switch to guest,
+guest will jump to the synchronous external abort vector
+table entry.
+
+The ESR_ELx.DFSC is set to synchronous external abort(0x10),
+and ESR_ELx.FnV is set to not valid(0x1), which will tell
+guest that FAR is not valid and holds an UNKNOWN value.
+These value will be set to KVM register structures through
+KVM_SET_ONE_REG IOCTL.
 
 Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 ---
-Change since v14:
-Thanks Igor's review and comments
-1. Update spec comment for AcpiHestNotifyType
-2. drop () for the macro definition
+Marc is against that KVM inject the synchronous external abort(SEA) in [1],
+so user space how to inject it. The test result that injection SEA to guest by Qemu
+is shown in [2].
 
-Change since v13:
-1. Clean the new added structures and macros definition
-
-Change since v12:
-1. Address Igor's comments to to get rid of most structures and use
-build_append_int_noprefix() API to compose whole error status block
-and APEI table in [1]
-
-[1]: https://lkml.org/lkml/2017/8/29/187
+[1]: https://lkml.org/lkml/2017/3/2/110
+[2]:
+Taking exception 4 [Data Abort]
+...from EL0 to EL1
+...with ESR 0x24/0x92000410
+...with FAR 0x0
+...with ELR 0x40cf04
+...to EL1 PC 0xffffffc000084c00 PSTATE 0x3c5
+after kvm_inject_arm_sea
+Unhandled fault: synchronous external abort (0x92000410) at 0x0000007fa234c12c
+CPU: 0 PID: 536 Comm: devmem Not tainted 4.1.0+ #20
+Hardware name: linux,dummy-virt (DT)
+task: ffffffc019ab2b00 ti: ffffffc008134000 task.ti: ffffffc008134000
+PC is at 0x40cf04
+LR is at 0x40cdec
+pc : [<000000000040cf04>] lr : [<000000000040cdec>] pstate: 60000000
+sp : 0000007ff7b24130
+x29: 0000007ff7b24260 x28: 0000000000000000
+x27: 00000000000000ad x26: 000000000049c000
+x25: 000000000048904b x24: 000000000049c000
+x23: 0000000040600000 x22: 0000007ff7b243a0
+x21: 0000000000000002 x20: 0000000000000000
+x19: 0000000000000020 x18: 0000000000000000
+x17: 000000000049c6d0 x16: 0000007fa22c85c0
+x15: 0000000000005798 x14: 0000007fa2205f1c
+x13: 0000007fa241ccb0 x12: 0000000000000137
+x11: 0000000000000000 x10: 0000000000000000
+x9 : 0000000000000000 x8 : 00000000000000de
+x7 : 0000000000000000 x6 : 0000000000002000
+x5 : 0000000040600000 x4 : 0000000000000003
+x3 : 0000000000000001 x2 : 0000000000000000
+x1 : 0000000000000000 x0 : 0000007fa2418000
 ---
- include/hw/acpi/acpi-defs.h | 52 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 52 insertions(+)
+ target/arm/cpu.h       |  2 ++
+ target/arm/helper.c    | 23 +++++++++++++++++++++++
+ target/arm/internals.h |  5 +++--
+ target/arm/kvm64.c     | 39 +++++++++++++++++++++++++++++++++++++++
+ target/arm/op_helper.c |  2 +-
+ 5 files changed, 68 insertions(+), 3 deletions(-)
 
-diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-index af8e023..f85cf98 100644
---- a/include/hw/acpi/acpi-defs.h
-+++ b/include/hw/acpi/acpi-defs.h
-@@ -226,6 +226,25 @@ typedef struct AcpiMultipleApicTable AcpiMultipleApicTable;
- #define ACPI_APIC_RESERVED              16   /* 16 and greater are reserved */
- 
- /*
-+ * Values for Hardware Error Notification Type field
-+ */
-+enum AcpiHestNotifyType {
-+    ACPI_HEST_NOTIFY_POLLED = 0,
-+    ACPI_HEST_NOTIFY_EXTERNAL = 1,
-+    ACPI_HEST_NOTIFY_LOCAL = 2,
-+    ACPI_HEST_NOTIFY_SCI = 3,
-+    ACPI_HEST_NOTIFY_NMI = 4,
-+    ACPI_HEST_NOTIFY_CMCI = 5,  /* ACPI 5.0: 18.3.2.7, Table 18-290 */
-+    ACPI_HEST_NOTIFY_MCE = 6,   /* ACPI 5.0: 18.3.2.7, Table 18-290 */
-+    ACPI_HEST_NOTIFY_GPIO = 7,  /* ACPI 6.0: 18.3.2.7, Table 18-332 */
-+    ACPI_HEST_NOTIFY_SEA = 8,   /* ACPI 6.1: 18.3.2.9, Table 18-345 */
-+    ACPI_HEST_NOTIFY_SEI = 9,   /* ACPI 6.1: 18.3.2.9, Table 18-345 */
-+    ACPI_HEST_NOTIFY_GSIV = 10, /* ACPI 6.1: 18.3.2.9, Table 18-345 */
-+    ACPI_HEST_NOTIFY_SDEI = 11, /* ACPI 6.2: 18.3.2.9, Table 18-383 */
-+    ACPI_HEST_NOTIFY_RESERVED = 12 /* 12 and greater are reserved */
-+};
-+
-+/*
-  * MADT sub-structures (Follow MULTIPLE_APIC_DESCRIPTION_TABLE)
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index b5eff79..502507d 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -2331,6 +2331,8 @@ bool write_list_to_cpustate(ARMCPU *cpu);
   */
- #define ACPI_SUB_HEADER_DEF   /* Common ACPI sub-structure header */\
-@@ -402,6 +421,39 @@ struct AcpiSystemResourceAffinityTable {
- } QEMU_PACKED;
- typedef struct AcpiSystemResourceAffinityTable AcpiSystemResourceAffinityTable;
+ bool write_cpustate_to_list(ARMCPU *cpu);
  
-+/*
-+ * Generic Error Status Block
-+ */
-+struct AcpiGenericErrorStatus {
-+    /* It is a bitmask composed of ACPI_GEBS_xxx macros */
-+    uint32_t block_status;
-+    uint32_t raw_data_offset;
-+    uint32_t raw_data_length;
-+    uint32_t data_length;
-+    uint32_t error_severity;
-+} QEMU_PACKED;
-+typedef struct AcpiGenericErrorStatus AcpiGenericErrorStatus;
++bool write_part_cpustate_to_list(ARMCPU *cpu, ptrdiff_t fieldoffset);
 +
-+/*
-+ * Masks for block_status flags above
-+ */
-+#define ACPI_GEBS_UNCORRECTABLE         1
+ #define ARM_CPUID_TI915T      0x54029152
+ #define ARM_CPUID_TI925T      0x54029252
+ 
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 9630193..df078ff 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -263,6 +263,29 @@ static bool raw_accessors_invalid(const ARMCPRegInfo *ri)
+     return true;
+ }
+ 
++bool write_part_cpustate_to_list(ARMCPU *cpu, ptrdiff_t fieldoffset)
++{
++    const ARMCPRegInfo *ri;
++    uint32_t regidx, i;
 +
-+/*
-+ * Values for error_severity field above
-+ */
-+enum AcpiGenericErrorSeverity {
-+    ACPI_CPER_SEV_RECOVERABLE,
-+    ACPI_CPER_SEV_FATAL,
-+    ACPI_CPER_SEV_CORRECTED,
-+    ACPI_CPER_SEV_NONE,
-+};
++    for (i = 0; i < cpu->cpreg_array_len; i++) {
++        regidx = kvm_to_cpreg_id(cpu->cpreg_indexes[i]);
++        ri = get_arm_cp_reginfo(cpu->cp_regs, regidx);
++        if (!ri) {
++            continue;
++        }
 +
-+/*
-+ * Generic Hardware Error Source version 2
-+ */
-+#define ACPI_HEST_SOURCE_GENERIC_ERROR_V2    10
++        if (ri->type & ARM_CP_NO_RAW) {
++            continue;
++        }
++        if (ri->fieldoffset == fieldoffset) {
++            cpu->cpreg_values[i] = read_raw_cp_reg(&cpu->env, ri);
++            return true;
++        }
++    }
++    return false;
++}
 +
- #define ACPI_SRAT_PROCESSOR_APIC     0
- #define ACPI_SRAT_MEMORY             1
- #define ACPI_SRAT_PROCESSOR_x2APIC   2
+ bool write_cpustate_to_list(ARMCPU *cpu)
+ {
+     /* Write the coprocessor state from cpu->env to the (index,value) list. */
+diff --git a/target/arm/internals.h b/target/arm/internals.h
+index 6c2bb2d..04ea074 100644
+--- a/target/arm/internals.h
++++ b/target/arm/internals.h
+@@ -415,13 +415,14 @@ static inline uint32_t syn_insn_abort(int same_el, int ea, int s1ptw, int fsc)
+         | ARM_EL_IL | (ea << 9) | (s1ptw << 7) | fsc;
+ }
+ 
+-static inline uint32_t syn_data_abort_no_iss(int same_el,
++static inline uint32_t syn_data_abort_no_iss(int same_el, int fnv,
+                                              int ea, int cm, int s1ptw,
+                                              int wnr, int fsc)
+ {
+     return (EC_DATAABORT << ARM_EL_EC_SHIFT) | (same_el << ARM_EL_EC_SHIFT)
+            | ARM_EL_IL
+-           | (ea << 9) | (cm << 8) | (s1ptw << 7) | (wnr << 6) | fsc;
++           | (fnv << 10) | (ea << 9) | (cm << 8) | (s1ptw << 7)
++           | (wnr << 6) | fsc;
+ }
+ 
+ static inline uint32_t syn_data_abort_with_iss(int same_el,
+diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+index 5de8ff0..0ca2b29 100644
+--- a/target/arm/kvm64.c
++++ b/target/arm/kvm64.c
+@@ -594,6 +594,45 @@ int kvm_arm_cpreg_level(uint64_t regidx)
+     return KVM_PUT_RUNTIME_STATE;
+ }
+ 
++/* Inject synchronous external abort */
++static void kvm_inject_arm_sea(CPUState *c)
++{
++    ARMCPU *cpu = ARM_CPU(c);
++    CPUARMState *env = &cpu->env;
++    CPUClass *cc = CPU_GET_CLASS(c);
++    uint32_t esr;
++    int ret;
++
++    /* This exception is synchronous data abort */
++    c->exception_index = EXCP_DATA_ABORT;
++    /* Inject the exception to guest EL1 */
++    env->exception.target_el = 1;
++
++    /* Set the DFSC to synchronous external abort and set FnV to not valid,
++     * this will tell guest the FAR_ELx is UNKNOWN for this abort.
++     */
++
++    /* This exception comes from lower or current exception level. */
++    if (arm_current_el(env) == PSTATE_MODE_EL0t) {
++        esr = syn_data_abort_no_iss(0, 1, 0, 0, 0, 0, 0x10);
++    } else {
++        esr = syn_data_abort_no_iss(1, 1, 0, 0, 0, 0, 0x10);
++    }
++
++    env->exception.syndrome = esr;
++
++    cc->do_interrupt(c);
++    if (kvm_enabled()) {
++        /* write ESR_EL1 from cpustate to list*/
++        ret = write_part_cpustate_to_list(cpu,
++                    offsetof(CPUARMState, cp15.esr_el[1]));
++        if (!ret) {
++            fprintf(stderr, "<%s> failed to set esr_el1\n", __func__);
++            abort();
++        }
++    }
++}
++
+ #define AARCH64_CORE_REG(x)   (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
+                  KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
+ 
+diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+index 90741f6..3f1d656 100644
+--- a/target/arm/op_helper.c
++++ b/target/arm/op_helper.c
+@@ -109,7 +109,7 @@ static inline uint32_t merge_syn_data_abort(uint32_t template_syn,
+      * ISV field.
+      */
+     if (!(template_syn & ARM_EL_ISV) || target_el != 2 || s1ptw) {
+-        syn = syn_data_abort_no_iss(same_el,
++        syn = syn_data_abort_no_iss(same_el, 0,
+                                     ea, 0, s1ptw, is_write, fsc);
+     } else {
+         /* Fields: IL, ISV, SAS, SSE, SRT, SF and AR come from the template
 -- 
 1.8.3.1
