@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47977)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1gKagC-00020Y-5l
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 22:08:24 -0500
+	(envelope-from <flukshun@gmail.com>) id 1gKagH-00021n-Ui
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 22:08:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1gKag9-0000uE-2I
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 22:08:24 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2569 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <gengdongjiu@huawei.com>)
-	id 1gKag7-0000dP-3q
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 22:08:20 -0500
-References: <20181105102044.20547-1-david@redhat.com>
-	<20181105102044.20547-11-david@redhat.com>
-	<20181107042212.GA5575@umbus.fritz.box>
-From: gengdongjiu <gengdongjiu@huawei.com>
-Message-ID: <edcb0c5b-ce63-fc09-5b61-5d966840d70d@huawei.com>
-Date: Thu, 8 Nov 2018 11:08:00 +0800
+	(envelope-from <flukshun@gmail.com>) id 1gKagD-00015B-Fa
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 22:08:29 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:36406)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gKagD-00013l-A7
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 22:08:25 -0500
+Received: by mail-oi1-x243.google.com with SMTP id r127-v6so15773878oie.3
+	for <qemu-devel@nongnu.org>; Wed, 07 Nov 2018 19:08:24 -0800 (PST)
+Sender: fluxion <flukshun@gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20181107042212.GA5575@umbus.fritz.box>
-Content-Type: text/plain; charset="windows-1252"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] QEMU bootup hang in tcg model using mainline QEMU code
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+Message-ID: <154164648801.32258.12956280739901066542@sif>
+Date: Wed, 07 Nov 2018 21:08:08 -0600
+Subject: [Qemu-devel] [ANNOUNCE] QEMU 3.1.0-rc0 is now available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,13 +28,29 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>
+Cc: peter.maydell@linaro.org
 
-Hi All
-  using mainline QEMU code and below boot up commands, the QEMU will be hang when do bootup, if I add the "-enable-kvm" parameter, it can boot up successfully,  do you know the reason about it?
-I also try the "remotes/origin/stable-2.12" branch code using below same boot up commands, it does not have this hang issue. it seems the mainline code has some issue.
+Hello,
 
+On behalf of the QEMU Team, I'd like to announce the availability of the
+first release candidate for the QEMU 3.1 release.  This release is meant
+for testing purposes and should not be used in a production environment.
 
-./qemu-system-aarch64  -m 1024 -cpu cortex-a57 -machine virt,gic-version=3 \
-  -smp 4 -nographic -kernel Image -append "root=/dev/sda1 console=ttyAMA0 sched_debug ignore_loglevel" \
-  -device virtio-scsi-device,id=scsi -drive file=./linaro.img,id=rootimg,cache=unsafe,if=none -device scsi-hd,drive=rootimg
+  http://download.qemu-project.org/qemu-3.1.0-rc0.tar.xz
+  http://download.qemu-project.org/qemu-3.1.0-rc0.tar.xz.sig
+
+You can help improve the quality of the QEMU 3.1 release by testing this
+release and reporting bugs on Launchpad:
+
+  https://bugs.launchpad.net/qemu/
+
+The release plan, as well a documented known issues for release
+candidates, are available at:
+
+  http://wiki.qemu.org/Planning/3.1
+
+Please add entries to the ChangeLog for the 3.1 release below:
+
+  http://wiki.qemu.org/ChangeLog/3.1
+
+Thank you to everyone involved!
