@@ -1,40 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50856)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51025)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gKhx4-0003Za-Qk
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:54:19 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gKhxn-0003xb-LS
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:55:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gKhx0-0000kE-0x
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:54:17 -0500
-Received: from mail-yw1-f53.google.com ([209.85.161.53]:44607)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gKhwz-0000jt-SQ
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:54:13 -0500
-Received: by mail-yw1-f53.google.com with SMTP id k6-v6so7812855ywa.11
-	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 02:54:13 -0800 (PST)
+	(envelope-from <cohuck@redhat.com>) id 1gKhxj-00015W-1h
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:55:03 -0500
+Date: Thu, 8 Nov 2018 11:54:26 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181108115426.10efcf21.cohuck@redhat.com>
+In-Reply-To: <63c85f6b-2a3f-941b-cac3-4ec0cf6a01d3@linux.ibm.com>
+References: <20181105110313.29312-1-david@redhat.com>
+	<20181105110313.29312-2-david@redhat.com>
+	<20181105121936.243260a6.cohuck@redhat.com>
+	<63c85f6b-2a3f-941b-cac3-4ec0cf6a01d3@linux.ibm.com>
 MIME-Version: 1.0
-References: <20180924092120.GA30163@caravaggio>
-	<7c2b477e-bdac-c887-2510-82fe04acdcfe@redhat.com>
-	<87b22690-e39c-3b46-dcb4-f6abc3213142@redhat.com>
-	<CAFEAcA8yHb4MdtsJuXcswQp93DN5tSeN9dn8AWWL9se0DKvdcg@mail.gmail.com>
-	<41ceda53-467e-32a1-8fa6-13f0f9c08ad1@redhat.com>
-	<CAFEAcA9oCs+Y1fnY8dOR16n_Hn7PaHziL7K0HZK6=BAd_Gyecg@mail.gmail.com>
-	<e496287e-f8ba-3608-42e1-efb697cfc784@redhat.com>
-	<20181107154114.GC27585@caravaggio>
-	<dd68d3e8-6448-3a67-3212-fd3d3bfba2e2@redhat.com>
-	<20181107192414.GH12503@habkost.net>
-	<c6bbfeb8-53c5-0e0c-cf36-14e586cfb581@redhat.com>
-	<a0decaa7-d83b-b0ad-60ea-aa0890feb905@redhat.com>
-	<28af4bea-e017-cdab-e5e4-a9809cb2e409@redhat.com>
-In-Reply-To: <28af4bea-e017-cdab-e5e4-a9809cb2e409@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 8 Nov 2018 11:53:08 +0100
-Message-ID: <CAAdtpL4kzCkJ7MSCyXMwaBoiVfg1XVJH49bucQ-t5Mks85murw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] QEMU and Kconfig
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1 1/4] s390x/zpci: drop
+ msix.available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,51 +26,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Zhong, Yang" <yang.zhong@intel.com>, Peter Maydell <peter.maydell@linaro.org>, Samuel Ortiz <sameo@linux.intel.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Collin Walling <walling@linux.ibm.com>
+Cc: David Hildenbrand <david@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Le jeu. 8 nov. 2018 11:30, Thomas Huth <thuth@redhat.com> a =C3=A9crit :
+On Wed, 7 Nov 2018 11:26:50 -0500
+Collin Walling <walling@linux.ibm.com> wrote:
 
-> On 2018-11-08 10:55, Paolo Bonzini wrote:
-> > On 07/11/2018 20:30, Thomas Huth wrote:
-> >> On 2018-11-07 20:24, Eduardo Habkost wrote:
-> >>> On Wed, Nov 07, 2018 at 06:39:54PM +0100, Paolo Bonzini wrote:
-> >>>> On 07/11/2018 16:41, Samuel Ortiz wrote:
-> >>>>> - The Kconfig parser would be used to generate the equivalent of
-> what we
-> >>>>>   currently have under default-configs/
+> On 11/5/18 6:19 AM, Cornelia Huck wrote:
+> > On Mon,  5 Nov 2018 12:03:10 +0100
+> > David Hildenbrand <david@redhat.com> wrote:
+> >   
+> >> I fail to see why this is useful as we require MSIX always and
+> >> completely fail adding a device.
 > >>
-> >> I think we would still have something like default-configs - but there
-> >> would only be the bare minimum config switches in there, the rest woul=
-d
-> >> be pulled in by dependencies.
-> >
-> > Yes, in theory default-configs would end up empty, except for possibly
-> > some commented lines to show the "default y" symbols for the target.
->
-> I think we should enable the machines in the default configs (and maybe
-> optional devices that are not automatically selected by machines), e.g.:
->
-> CONFIG_I440FX=3Dy
-> CONFIG_Q35=3Dy
-> CONFIG_VIRTPC=3Dy
-> CONFIG_ISAPC=3Dy
-> CONFIG_VIRTIO=3Dy
-> CONFIG_PARALLEL=3Dy
->
-> In configs/nemu (or configs/lean-kvm or however we'll call it), you will
-> then only have:
->
-> CONFIG_Q35=3Dy
-> CONFIG_VIRTPC=3Dy
->
+> >> Signed-off-by: David Hildenbrand <david@redhat.com>
+> >> ---
+> >>  hw/s390x/s390-pci-bus.c | 2 --
+> >>  hw/s390x/s390-pci-bus.h | 1 -
+> >>  2 files changed, 3 deletions(-)
+> >>
+> >> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+> >> index e1b14b131b..1eaae3aca6 100644
+> >> --- a/hw/s390x/s390-pci-bus.c
+> >> +++ b/hw/s390x/s390-pci-bus.c
+> >> @@ -745,7 +745,6 @@ static int s390_pci_msix_init(S390PCIBusDevice *pbdev)
+> >>  
+> >>      pos = pci_find_capability(pbdev->pdev, PCI_CAP_ID_MSIX);
+> >>      if (!pos) {
+> >> -        pbdev->msix.available = false;
+> >>          return -1;
+> >>      }
+> >>  
+> >> @@ -761,7 +760,6 @@ static int s390_pci_msix_init(S390PCIBusDevice *pbdev)
+> >>      pbdev->msix.pba_bar = pba & PCI_MSIX_FLAGS_BIRMASK;
+> >>      pbdev->msix.pba_offset = pba & ~PCI_MSIX_FLAGS_BIRMASK;
+> >>      pbdev->msix.entries = (ctrl & PCI_MSIX_FLAGS_QSIZE) + 1;
+> >> -    pbdev->msix.available = true;
+> >>  
+> >>      name = g_strdup_printf("msix-s390-%04x", pbdev->uid);
+> >>      memory_region_init_io(&pbdev->msix_notify_mr, OBJECT(pbdev),
+> >> diff --git a/hw/s390x/s390-pci-bus.h b/hw/s390x/s390-pci-bus.h
+> >> index 1f7f9b5814..f47a0f2da5 100644
+> >> --- a/hw/s390x/s390-pci-bus.h
+> >> +++ b/hw/s390x/s390-pci-bus.h
+> >> @@ -252,7 +252,6 @@ typedef struct ChscSeiNt2Res {
+> >>  } QEMU_PACKED ChscSeiNt2Res;
+> >>  
+> >>  typedef struct S390MsixInfo {
+> >> -    bool available;
+> >>      uint8_t table_bar;
+> >>      uint8_t pba_bar;
+> >>      uint16_t entries;  
+> > 
+> > OK, so that was a write-only variable? :)
+> > 
+> > Question for the IBMers: is there any change we might have a different
+> > implementation not relying on msi-x in the future?
+> >   
+> 
+> @Conny
+> Currently, the plan would be to stick with a hard requirement for MSIX unless someone 
+> strongly supports the legacy alternatives. I'm certainly open to discuss that. Maybe it 
+> would make sense to fallback to MSI for devices that don't support MSIX?
 
-CONFIG_VIRTX86 seems more XXI century.
+I'm not sure whether that would be very useful. My question was more
+along the lines of "ok, so now that available flag is gone for good?" :)
 
-CONFIG_VIRTIO=3Dy
->
-> Would that make sense?
->
->  Thomas
->
->
+> 
+> @David
+> Thanks for the cleanup.
+> 
+> Reviewed-by: Collin Walling <walling@linux.ibm.com>
+> 
