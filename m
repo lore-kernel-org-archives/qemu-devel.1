@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32929)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33519)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gKh34-0000vk-39
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 04:56:26 -0500
+	(envelope-from <liran.alon@oracle.com>) id 1gKh4b-0002kH-7d
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 04:58:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gKh2z-0002pR-0L
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 04:56:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49040)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gKh2v-0002ZY-37
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 04:56:17 -0500
-References: <20180924092120.GA30163@caravaggio>
-	<7c2b477e-bdac-c887-2510-82fe04acdcfe@redhat.com>
-	<87b22690-e39c-3b46-dcb4-f6abc3213142@redhat.com>
-	<CAFEAcA8yHb4MdtsJuXcswQp93DN5tSeN9dn8AWWL9se0DKvdcg@mail.gmail.com>
-	<41ceda53-467e-32a1-8fa6-13f0f9c08ad1@redhat.com>
-	<20180926141518.GB9073@caravaggio>
-	<3743752b-2670-1d89-2088-1e67122f5dcd@redhat.com>
-	<CAAdtpL5WwF0x_cJt3=20WiJ5E2LJ-XfDCB8EOuzhEJkZsXszsw@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9832950d-52e7-da47-d466-98746d3f7a83@redhat.com>
-Date: Thu, 8 Nov 2018 10:56:09 +0100
-MIME-Version: 1.0
-In-Reply-To: <CAAdtpL5WwF0x_cJt3=20WiJ5E2LJ-XfDCB8EOuzhEJkZsXszsw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+	(envelope-from <liran.alon@oracle.com>) id 1gKh4Y-0004wv-0x
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 04:58:01 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:33118)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <liran.alon@oracle.com>)
+	id 1gKh4X-0004uR-Ha
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 04:57:57 -0500
+Content-Type: text/plain;
+	charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+From: Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <a567de11-a106-fd6d-7998-1a18ba17eaaa@redhat.com>
+Date: Thu, 8 Nov 2018 11:57:46 +0200
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] QEMU and Kconfig
+Message-Id: <939A6255-306C-431C-8799-0D56A30A3BD5@oracle.com>
+References: <CALMp9eQ5zWxb2N9fyYz=WcQshwk0L6qQ4D6L6+p_dzMo4H=txA@mail.gmail.com>
+	<20181102034649.43559-1-liran.alon@oracle.com>
+	<CALMp9eRk=a1FEyr78NRGBBZ2iFCo5s2n5N=bM4zR=YF56oob3A@mail.gmail.com>
+	<1C803EF0-9E1B-4E1B-A4DD-4BE788A7A1FF@oracle.com>
+	<DF5EC0F1-BA8D-4B85-BB1A-B22234235FBA@oracle.com>
+	<CALMp9eQSptO+S1NZjQQUa=HQCXFOevHwTDS9i0KXHCGSfKzEkA@mail.gmail.com>
+	<a567de11-a106-fd6d-7998-1a18ba17eaaa@redhat.com>
+Subject: Re: [Qemu-devel] [QEMU PATCH v2 0/2]: KVM: i386: Add support for
+ save and restore nested state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,28 +35,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Cc: Samuel Ortiz <sameo@linux.intel.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Jim Mattson <jmattson@google.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, kvm list <kvm@vger.kernel.org>, mtosatti@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org
 
-On 08/11/2018 09:46, Philippe Mathieu-Daud=C3=A9 wrote:
->=20
->     Almost; if there's a conflict between the decision from "depends on=
-" and
->     "select" says, it's an error.=C2=A0 (Likewise if there's a conflict=
- between
->     default-configs/ on one side, and "depends on"/"select" on the othe=
-r).
->=20
->     This is different between kernel Kconfig and minikconf in my git re=
-po.
->     The difference is because the Kconfig documentation warns against t=
-he
->     surprising effects of "select" blindly enabling the target symbol;
->     making minikconf stricter avoids those surprises.
->=20
->=20
-> So can we rename your tool Qconfig?
 
-Haha, that's up to whoever finishes the work. :)
 
-Paolo
+> On 8 Nov 2018, at 11:50, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>=20
+> On 08/11/2018 01:45, Jim Mattson wrote:
+>> I have no attachments to the current design. I had used a data[] =
+blob,
+>> because I didn't think userspace would have any need to know what was
+>> in there. However, I am now seeing the error of my ways. For example,
+>> the userspace instruction emulator needs to know the contents of the
+>> vmcs12 to emulate instructions when in guest mode.
+>=20
+> Yeah, we're probably going to have to document the KVM vmcs12 =
+structure,
+> possibly moving it to uapi.  But that's a different thing from
+> save/restore state, which can use the 4K or 8K data[] blob.
+>=20
+> Paolo
+
+But regardless of if we document vmcs12 or not, the current blob we have =
+today
+should be separated to well-defined blobs/structs (cached_vmcs12 and =
+cached_shadow_vmcs12)
+and each blob should have a relevant flag that specifies it is valid =
+(saved by kernel or requested to be restored by userspace).
+Additional future nested-state should be added as additional =
+well-defined blobs/structs with appropriate flags.
+
+Then, in QEMU, each such well-defined blob/struct should have it=E2=80=99s=
+ own subsection with a relevant .needed() method.
+This will allow us to preserve required backwards compatibility.
+
+Agreed?
+
+-Liran
