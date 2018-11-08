@@ -1,20 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43575)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gKjFQ-0005K9-OK
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:17:22 -0500
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gKjJg-0000g9-Mp
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:21:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gKjFN-0003zx-3u
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:17:20 -0500
-From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu,  8 Nov 2018 23:16:41 +1100
-Message-Id: <20181108121646.26173-18-david@gibson.dropbear.id.au>
-In-Reply-To: <20181108121646.26173-1-david@gibson.dropbear.id.au>
-References: <20181108121646.26173-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 17/22] ppc/pnv: check size before data buffer
- access
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gKjJa-0006iO-5c
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:21:43 -0500
+Received: from cmccmta2.chinamobile.com ([221.176.66.80]:55549)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gKjJU-0006cK-UL
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:21:33 -0500
+From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+Date: Thu,  8 Nov 2018 20:21:02 +0800
+Message-Id: <20181108122102.9915-1-maozhongyi@cmss.chinamobile.com>
+Subject: [Qemu-devel] [PATCH] pci_bridge: fix a typo in comment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,45 +21,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, agraf@suse.de, lvivier@redhat.com, Prasad J Pandit <pjp@fedoraproject.org>, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
+Cc: marcel.apfelbaum@gmail.com, mst@redhat.com, Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 
-From: Prasad J Pandit <pjp@fedoraproject.org>
-
-While performing PowerNV memory r/w operations, the access length
-'sz' could exceed the data[4] buffer size. Add check to avoid OOB
-access.
-
-Reported-by: Moguofang <moguofang@huawei.com>
-Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 ---
- hw/ppc/pnv_lpc.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ hw/pci/pci_bridge.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
-index d7721320a2..172a915cfc 100644
---- a/hw/ppc/pnv_lpc.c
-+++ b/hw/ppc/pnv_lpc.c
-@@ -155,9 +155,15 @@ static void pnv_lpc_do_eccb(PnvLpcController *lpc, u=
-int64_t cmd)
-     /* XXX Check for magic bits at the top, addr size etc... */
-     unsigned int sz =3D (cmd & ECCB_CTL_SZ_MASK) >> ECCB_CTL_SZ_LSH;
-     uint32_t opb_addr =3D cmd & ECCB_CTL_ADDR_MASK;
--    uint8_t data[4];
-+    uint8_t data[8];
-     bool success;
-=20
-+    if (sz > sizeof(data)) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+            "ECCB: invalid operation at @0x%08x size %d\n", opb_addr, sz=
-);
-+        return;
-+    }
-+
-     if (cmd & ECCB_CTL_READ) {
-         success =3D opb_read(lpc, opb_addr, data, sz);
-         if (success) {
---=20
-2.19.1
+diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
+index ee9dff2d3a..da8daa3ff2 100644
+--- a/hw/pci/pci_bridge.c
++++ b/hw/pci/pci_bridge.c
+@@ -310,7 +310,7 @@ void pci_bridge_reset(DeviceState *qdev)
+ 
+     /*
+      * the default values for base/limit registers aren't specified
+-     * in the PCI-to-PCI-bridge spec. So we don't thouch them here.
++     * in the PCI-to-PCI-bridge spec. So we don't touch them here.
+      * Each implementation can override it.
+      * typical implementation does
+      * zero base/limit registers or
+-- 
+2.17.1
