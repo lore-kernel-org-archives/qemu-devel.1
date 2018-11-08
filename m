@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41516)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44102)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gKkhY-0005qd-5X
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 08:50:29 -0500
+	(envelope-from <david@redhat.com>) id 1gKkpf-0003RQ-HO
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 08:58:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gKkhX-000702-7G
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 08:50:28 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:33058)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gKkhV-0006x3-DE
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 08:50:27 -0500
-Received: by mail-oi1-x241.google.com with SMTP id x204-v6so1474542oia.0
-	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 05:50:17 -0800 (PST)
+	(envelope-from <david@redhat.com>) id 1gKkpb-0003fE-D6
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 08:58:51 -0500
+References: <20181105110313.29312-1-david@redhat.com>
+	<20181105110313.29312-5-david@redhat.com>
+	<20181108143501.0f2427d2.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <2ad6cec1-3963-7585-1ce2-4d60e43e5c00@redhat.com>
+Date: Thu, 8 Nov 2018 14:58:26 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181107092721.6c01f09e@w520.home>
-References: <20181106184212.29377-1-eric.auger@redhat.com>
-	<20181107092721.6c01f09e@w520.home>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 8 Nov 2018 13:49:55 +0000
-Message-ID: <CAFEAcA_da2B6xQOF8CdZPvNb2WiBOdiUAZ+3h5-=ntNRL0EDLg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 for-3.1] hw/arm/sysbus-fdt: Only call
- match_fn callback if the type matches
+In-Reply-To: <20181108143501.0f2427d2.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 4/4] s390x/zpci: properly fail if the
+ zPCI device cannot be created
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,41 +26,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Eric Auger <eric.auger@redhat.com>, Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Geert Uytterhoeven <geert+renesas@glider.be>, Thomas Huth <thuth@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, =Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>
 
-On 7 November 2018 at 16:27, Alex Williamson <alex.williamson@redhat.com> wrote:
-> On Tue,  6 Nov 2018 19:42:12 +0100
-> Eric Auger <eric.auger@redhat.com> wrote:
->
->> Commit af7d64ede0b9 (hw/arm/sysbus-fdt: Allow device matching with DT
->> compatible value) introduced a match_fn callback which gets called
->> for each registered combo to check whether a sysbus device can be
->> dynamically instantiated. However the callback gets called even if
->> the device type does not match the binding combo typename field.
->> This causes an assert when passing "-device ramfb" to the qemu
->> command line as vfio_platform_match() gets called on a non
->> vfio-platform device.
+On 08.11.18 14:35, Cornelia Huck wrote:
+> On Mon,  5 Nov 2018 12:03:13 +0100
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+>> Right now, errors during realize()/pre_plug/plug of the zPCI device
+>> would result in QEMU crashing instead of failing nicely when creating
+>> a zPCI device for a PCI device.
 >>
->> To fix this regression, let's change the add_fdt_node() logic so
->> that we first check the type and if the match_fn callback is defined,
->> then we also call it.
->>
->> Binding combos only requesting a type check do not define the
->> match_fn callback.
->>
->> Fixes: af7d64ede0b9 (hw/arm/sysbus-fdt: Allow device matching with
->> DT compatible value)
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> Reported-by: Thomas Huth <thuth@redhat.com>
->
-> The commit this fixes went through the vfio tree, but since the fix
-> itself only lives in arm code, I'll leave it to arm maintainers to
-> shepherd this fix and offer:
->
-> Reviewed-by: Alex Williamson <alex.williamson@redhat.com>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  hw/s390x/s390-pci-bus.c | 25 +++++++++++++++++++------
+>>  1 file changed, 19 insertions(+), 6 deletions(-)
+> 
+> Unfortunately, this patch applied as-is on top of master breaks zpci
+> device autogeneration:
+> 
+> -device zpci,target=pcidev -device virtio-net-pci,id=pcidev works
+> 
+> -device virtio-net-pci fails with
+> 
+> qemu-system-s390x: -device virtio-net-pci: zPCI device could not be created: Property '.auto_00:00.0' not found
+> 
+> Any idea?
 
-Applied to target-arm.next, thanks.
+Yes, the "target" and target have to be inverted.
 
--- PMM
+Thanks for testing. Will resend.
+
+> 
+> [insert my usual rants about the zpci architecture here]
+> 
+>>
+>> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+>> index 1849f9d334..4939490c7c 100644
+>> --- a/hw/s390x/s390-pci-bus.c
+>> +++ b/hw/s390x/s390-pci-bus.c
+>> @@ -778,17 +778,31 @@ static void s390_pci_msix_free(S390PCIBusDevice *pbdev)
+>>  }
+>>  
+>>  static S390PCIBusDevice *s390_pci_device_new(S390pciState *s,
+>> -                                             const char *target)
+>> +                                             const char *target, Error **errp)
+>>  {
+>> -    DeviceState *dev = NULL;
+>> +    Error *local_err = NULL;
+>> +    DeviceState *dev;
+>>  
+>>      dev = qdev_try_create(BUS(s->bus), TYPE_S390_PCI_DEVICE);
+>>      if (!dev) {
+>> +        error_setg(errp, "zPCI device could not be created");
+>>          return NULL;
+>>      }
+>>  
+>> -    qdev_prop_set_string(dev, "target", target);
+>> -    qdev_init_nofail(dev);
+>> +    object_property_set_str(OBJECT(dev), "target", target, &local_err);
+>> +    if (local_err) {
+>> +        object_unparent(OBJECT(dev));
+>> +        error_propagate_prepend(errp, local_err,
+>> +                                "zPCI device could not be created: ");
+>> +        return NULL;
+>> +    }
+>> +    object_property_set_bool(OBJECT(dev), true, "realized", &local_err);
+>> +    if (local_err) {
+>> +        object_unparent(OBJECT(dev));
+>> +        error_propagate_prepend(errp, local_err,
+>> +                                "zPCI device could not be created: ");
+>> +        return NULL;
+>> +    }
+>>  
+>>      return S390_PCI_DEVICE(dev);
+>>  }
+>> @@ -873,9 +887,8 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>>  
+>>          pbdev = s390_pci_find_dev_by_target(s, dev->id);
+>>          if (!pbdev) {
+>> -            pbdev = s390_pci_device_new(s, dev->id);
+>> +            pbdev = s390_pci_device_new(s, dev->id, errp);
+>>              if (!pbdev) {
+>> -                error_setg(errp, "create zpci device failed");
+>>                  return;
+>>              }
+>>          }
+> 
+
+
+-- 
+
+Thanks,
+
+David / dhildenb
