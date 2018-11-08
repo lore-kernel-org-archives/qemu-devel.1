@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43374)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gKjFP-0005K7-LB
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:17:23 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gKjFI-0005Gd-M8
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:17:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gKjFN-00040P-Dg
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:17:19 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gKjFF-0003j1-Vd
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:17:12 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu,  8 Nov 2018 23:16:46 +1100
-Message-Id: <20181108121646.26173-23-david@gibson.dropbear.id.au>
+Date: Thu,  8 Nov 2018 23:16:33 +1100
+Message-Id: <20181108121646.26173-10-david@gibson.dropbear.id.au>
 In-Reply-To: <20181108121646.26173-1-david@gibson.dropbear.id.au>
 References: <20181108121646.26173-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 22/22] ppc/spapr_caps: Add
- SPAPR_CAP_NESTED_KVM_HV
+Subject: [Qemu-devel] [PULL 09/22] target/ppc: Split out
+ float_invalid_op_addsub
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,208 +23,145 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, agraf@suse.de, lvivier@redhat.com, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, agraf@suse.de, lvivier@redhat.com, Richard Henderson <richard.henderson@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Add the spapr cap SPAPR_CAP_NESTED_KVM_HV to be used to control the
-availability of nested kvm-hv to the level 1 (L1) guest.
-
-Assuming a hypervisor with support enabled an L1 guest can be allowed to
-use the kvm-hv module (and thus run it's own kvm-hv guests) by setting:
--machine pseries,cap-nested-hv=3Dtrue
-or disabled with:
--machine pseries,cap-nested-hv=3Dfalse
-
-Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c         |  2 ++
- hw/ppc/spapr_caps.c    | 32 ++++++++++++++++++++++++++++++++
- include/hw/ppc/spapr.h |  5 ++++-
- target/ppc/kvm.c       | 12 ++++++++++++
- target/ppc/kvm_ppc.h   | 12 ++++++++++++
- 5 files changed, 62 insertions(+), 1 deletion(-)
+ target/ppc/fpu_helper.c | 60 ++++++++++++++++++-----------------------
+ 1 file changed, 26 insertions(+), 34 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index e47b004b61..7afd1a175b 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1938,6 +1938,7 @@ static const VMStateDescription vmstate_spapr =3D {
-         &vmstate_spapr_cap_sbbc,
-         &vmstate_spapr_cap_ibs,
-         &vmstate_spapr_irq_map,
-+        &vmstate_spapr_cap_nested_kvm_hv,
-         NULL
+diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
+index 9ae55b1e93..111ce12a37 100644
+--- a/target/ppc/fpu_helper.c
++++ b/target/ppc/fpu_helper.c
+@@ -648,6 +648,17 @@ void helper_reset_fpstatus(CPUPPCState *env)
+     set_float_exception_flags(0, &env->fp_status);
+ }
+=20
++static void float_invalid_op_addsub(CPUPPCState *env, bool set_fpcc,
++                                    uintptr_t retaddr, int classes)
++{
++    if ((classes & ~is_neg) =3D=3D is_inf) {
++        /* Magnitude subtraction of infinities */
++        float_invalid_op_vxisi(env, set_fpcc, retaddr);
++    } else if (classes & is_snan) {
++        float_invalid_op_vxsnan(env, retaddr);
++    }
++}
++
+ /* fadd - fadd. */
+ float64 helper_fadd(CPUPPCState *env, float64 arg1, float64 arg2)
+ {
+@@ -655,14 +666,9 @@ float64 helper_fadd(CPUPPCState *env, float64 arg1, =
+float64 arg2)
+     int status =3D get_float_exception_flags(&env->fp_status);
+=20
+     if (unlikely(status & float_flag_invalid)) {
+-        if (float64_is_infinity(arg1) && float64_is_infinity(arg2)) {
+-            /* Magnitude subtraction of infinities */
+-            float_invalid_op_vxisi(env, 1, GETPC());
+-        } else if (float64_is_signaling_nan(arg1, &env->fp_status) ||
+-                   float64_is_signaling_nan(arg2, &env->fp_status)) {
+-            /* sNaN addition */
+-            float_invalid_op_vxsnan(env, GETPC());
+-        }
++        float_invalid_op_addsub(env, 1, GETPC(),
++                                float64_classify(arg1) |
++                                float64_classify(arg2));
      }
- };
-@@ -3902,6 +3903,7 @@ static void spapr_machine_class_init(ObjectClass *o=
-c, void *data)
-     smc->default_caps.caps[SPAPR_CAP_SBBC] =3D SPAPR_CAP_BROKEN;
-     smc->default_caps.caps[SPAPR_CAP_IBS] =3D SPAPR_CAP_BROKEN;
-     smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] =3D 16; /* 64kiB *=
-/
-+    smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] =3D SPAPR_CAP_OFF;
-     spapr_caps_add_properties(smc, &error_abort);
-     smc->irq =3D &spapr_irq_xics;
- }
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index aa605cea91..64f98ae68d 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -368,6 +368,28 @@ static void cap_hpt_maxpagesize_cpu_apply(sPAPRMachi=
-neState *spapr,
-     ppc_hash64_filter_pagesizes(cpu, spapr_pagesize_cb, &maxshift);
- }
 =20
-+static void cap_nested_kvm_hv_apply(sPAPRMachineState *spapr,
-+                                    uint8_t val, Error **errp)
-+{
-+    if (!val) {
-+        /* capability disabled by default */
-+        return;
-+    }
-+
-+    if (tcg_enabled()) {
-+        error_setg(errp,
-+                   "No Nested KVM-HV support in tcg, try cap-nested-hv=3D=
-off");
-+    } else if (kvm_enabled()) {
-+        if (!kvmppc_has_cap_nested_kvm_hv()) {
-+            error_setg(errp,
-+"KVM implementation does not support Nested KVM-HV, try cap-nested-hv=3D=
-off");
-+        } else if (kvmppc_set_cap_nested_kvm_hv(val) < 0) {
-+                error_setg(errp,
-+"Error enabling cap-nested-hv with KVM, try cap-nested-hv=3Doff");
-+        }
-+    }
-+}
-+
- sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] =3D {
-     [SPAPR_CAP_HTM] =3D {
-         .name =3D "htm",
-@@ -437,6 +459,15 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] =
-=3D {
-         .apply =3D cap_hpt_maxpagesize_apply,
-         .cpu_apply =3D cap_hpt_maxpagesize_cpu_apply,
-     },
-+    [SPAPR_CAP_NESTED_KVM_HV] =3D {
-+        .name =3D "nested-hv",
-+        .description =3D "Allow Nested KVM-HV",
-+        .index =3D SPAPR_CAP_NESTED_KVM_HV,
-+        .get =3D spapr_cap_get_bool,
-+        .set =3D spapr_cap_set_bool,
-+        .type =3D "bool",
-+        .apply =3D cap_nested_kvm_hv_apply,
-+    },
- };
+     return ret;
+@@ -675,14 +681,9 @@ float64 helper_fsub(CPUPPCState *env, float64 arg1, =
+float64 arg2)
+     int status =3D get_float_exception_flags(&env->fp_status);
 =20
- static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
-@@ -564,6 +595,7 @@ SPAPR_CAP_MIG_STATE(dfp, SPAPR_CAP_DFP);
- SPAPR_CAP_MIG_STATE(cfpc, SPAPR_CAP_CFPC);
- SPAPR_CAP_MIG_STATE(sbbc, SPAPR_CAP_SBBC);
- SPAPR_CAP_MIG_STATE(ibs, SPAPR_CAP_IBS);
-+SPAPR_CAP_MIG_STATE(nested_kvm_hv, SPAPR_CAP_NESTED_KVM_HV);
+     if (unlikely(status & float_flag_invalid)) {
+-        if (float64_is_infinity(arg1) && float64_is_infinity(arg2)) {
+-            /* Magnitude subtraction of infinities */
+-            float_invalid_op_vxisi(env, 1, GETPC());
+-        } else if (float64_is_signaling_nan(arg1, &env->fp_status) ||
+-                   float64_is_signaling_nan(arg2, &env->fp_status)) {
+-            /* sNaN addition */
+-            float_invalid_op_vxsnan(env, GETPC());
+-        }
++        float_invalid_op_addsub(env, 1, GETPC(),
++                                float64_classify(arg1) |
++                                float64_classify(arg2));
+     }
 =20
- void spapr_caps_init(sPAPRMachineState *spapr)
- {
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 0805ad85a1..6279711fe8 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -70,8 +70,10 @@ typedef enum {
- #define SPAPR_CAP_IBS                   0x05
- /* HPT Maximum Page Size (encoded as a shift) */
- #define SPAPR_CAP_HPT_MAXPAGESIZE       0x06
-+/* Nested KVM-HV */
-+#define SPAPR_CAP_NESTED_KVM_HV         0x07
- /* Num Caps */
--#define SPAPR_CAP_NUM                   (SPAPR_CAP_HPT_MAXPAGESIZE + 1)
-+#define SPAPR_CAP_NUM                   (SPAPR_CAP_NESTED_KVM_HV + 1)
+     return ret;
+@@ -1803,12 +1804,9 @@ void helper_##name(CPUPPCState *env, uint32_t opco=
+de)                        \
+         env->fp_status.float_exception_flags |=3D tstat.float_exception_=
+flags; \
+                                                                         =
+     \
+         if (unlikely(tstat.float_exception_flags & float_flag_invalid)) =
+{    \
+-            if (tp##_is_infinity(xa.fld) && tp##_is_infinity(xb.fld)) { =
+     \
+-                float_invalid_op_vxisi(env, sfprf, GETPC());            =
+     \
+-            } else if (tp##_is_signaling_nan(xa.fld, &tstat) ||         =
+     \
+-                       tp##_is_signaling_nan(xb.fld, &tstat)) {         =
+     \
+-                float_invalid_op_vxsnan(env, GETPC());                  =
+     \
+-            }                                                           =
+     \
++            float_invalid_op_addsub(env, sfprf, GETPC(),                =
+     \
++                                    tp##_classify(xa.fld) |             =
+     \
++                                    tp##_classify(xb.fld));             =
+     \
+         }                                                               =
+     \
+                                                                         =
+     \
+         if (r2sp) {                                                     =
+     \
+@@ -1852,12 +1850,9 @@ void helper_xsaddqp(CPUPPCState *env, uint32_t opc=
+ode)
+     env->fp_status.float_exception_flags |=3D tstat.float_exception_flag=
+s;
 =20
- /*
-  * Capability Values
-@@ -791,6 +793,7 @@ extern const VMStateDescription vmstate_spapr_cap_dfp=
-;
- extern const VMStateDescription vmstate_spapr_cap_cfpc;
- extern const VMStateDescription vmstate_spapr_cap_sbbc;
- extern const VMStateDescription vmstate_spapr_cap_ibs;
-+extern const VMStateDescription vmstate_spapr_cap_nested_kvm_hv;
+     if (unlikely(tstat.float_exception_flags & float_flag_invalid)) {
+-        if (float128_is_infinity(xa.f128) && float128_is_infinity(xb.f12=
+8)) {
+-            float_invalid_op_vxisi(env, 1, GETPC());
+-        } else if (float128_is_signaling_nan(xa.f128, &tstat) ||
+-                   float128_is_signaling_nan(xb.f128, &tstat)) {
+-            float_invalid_op_vxsnan(env, GETPC());
+-        }
++        float_invalid_op_addsub(env, 1, GETPC(),
++                                float128_classify(xa.f128) |
++                                float128_classify(xb.f128));
+     }
 =20
- static inline uint8_t spapr_get_cap(sPAPRMachineState *spapr, int cap)
- {
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 30aeafa7de..f81327d6cd 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -91,6 +91,7 @@ static int cap_ppc_pvr_compat;
- static int cap_ppc_safe_cache;
- static int cap_ppc_safe_bounds_check;
- static int cap_ppc_safe_indirect_branch;
-+static int cap_ppc_nested_kvm_hv;
+     helper_compute_fprf_float128(env, xt.f128);
+@@ -3518,12 +3513,9 @@ void helper_xssubqp(CPUPPCState *env, uint32_t opc=
+ode)
+     env->fp_status.float_exception_flags |=3D tstat.float_exception_flag=
+s;
 =20
- static uint32_t debug_inst_opcode;
+     if (unlikely(tstat.float_exception_flags & float_flag_invalid)) {
+-        if (float128_is_infinity(xa.f128) && float128_is_infinity(xb.f12=
+8)) {
+-            float_invalid_op_vxisi(env, 1, GETPC());
+-        } else if (float128_is_signaling_nan(xa.f128, &tstat) ||
+-                   float128_is_signaling_nan(xb.f128, &tstat)) {
+-            float_invalid_op_vxsnan(env, GETPC());
+-        }
++        float_invalid_op_addsub(env, 1, GETPC(),
++                                float128_classify(xa.f128) |
++                                float128_classify(xb.f128));
+     }
 =20
-@@ -150,6 +151,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-     cap_mmu_hash_v3 =3D kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_HASH_V=
-3);
-     cap_resize_hpt =3D kvm_vm_check_extension(s, KVM_CAP_SPAPR_RESIZE_HP=
-T);
-     kvmppc_get_cpu_characteristics(s);
-+    cap_ppc_nested_kvm_hv =3D kvm_vm_check_extension(s, KVM_CAP_PPC_NEST=
-ED_HV);
-     /*
-      * Note: setting it to false because there is not such capability
-      * in KVM at this moment.
-@@ -2422,6 +2424,16 @@ int kvmppc_get_cap_safe_indirect_branch(void)
-     return cap_ppc_safe_indirect_branch;
- }
-=20
-+bool kvmppc_has_cap_nested_kvm_hv(void)
-+{
-+    return !!cap_ppc_nested_kvm_hv;
-+}
-+
-+int kvmppc_set_cap_nested_kvm_hv(int enable)
-+{
-+    return kvm_vm_enable_cap(kvm_state, KVM_CAP_PPC_NESTED_HV, 0, enable=
-);
-+}
-+
- bool kvmppc_has_cap_spapr_vfio(void)
- {
-     return cap_spapr_vfio;
-diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index f696c6e498..bdfaa4e70a 100644
---- a/target/ppc/kvm_ppc.h
-+++ b/target/ppc/kvm_ppc.h
-@@ -62,6 +62,8 @@ bool kvmppc_has_cap_mmu_hash_v3(void);
- int kvmppc_get_cap_safe_cache(void);
- int kvmppc_get_cap_safe_bounds_check(void);
- int kvmppc_get_cap_safe_indirect_branch(void);
-+bool kvmppc_has_cap_nested_kvm_hv(void);
-+int kvmppc_set_cap_nested_kvm_hv(int enable);
- int kvmppc_enable_hwrng(void);
- int kvmppc_put_books_sregs(PowerPCCPU *cpu);
- PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
-@@ -320,6 +322,16 @@ static inline int kvmppc_get_cap_safe_indirect_branc=
-h(void)
-     return 0;
- }
-=20
-+static inline bool kvmppc_has_cap_nested_kvm_hv(void)
-+{
-+    return false;
-+}
-+
-+static inline int kvmppc_set_cap_nested_kvm_hv(int enable)
-+{
-+    return -1;
-+}
-+
- static inline int kvmppc_enable_hwrng(void)
- {
-     return -1;
+     helper_compute_fprf_float128(env, xt.f128);
 --=20
 2.19.1
