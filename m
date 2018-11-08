@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55656)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55667)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gKiH5-0004EN-Hn
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 06:15:00 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gKiH6-0004ET-Jy
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 06:15:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gKiH4-0000tl-Rn
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 06:14:59 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:39716)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gKiH4-0000tY-Lj
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 06:14:58 -0500
-Received: by mail-oi1-x242.google.com with SMTP id 192-v6so15817902oii.6
-	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 03:14:58 -0800 (PST)
+	(envelope-from <cohuck@redhat.com>) id 1gKiH2-0000sR-Kj
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 06:15:00 -0500
+Date: Thu, 8 Nov 2018 12:14:46 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181108121446.4f1d09dc.cohuck@redhat.com>
+In-Reply-To: <b38c2f96-46ed-db0f-86b7-dc458ac80ee8@redhat.com>
+References: <20181105110313.29312-1-david@redhat.com>
+	<20181105110313.29312-5-david@redhat.com>
+	<b114a7d0-1e56-2294-484c-f4143cfd989e@redhat.com>
+	<20181105134118.01fef179.cohuck@redhat.com>
+	<b38c2f96-46ed-db0f-86b7-dc458ac80ee8@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1541674784-25936-4-git-send-email-lizhijian@cn.fujitsu.com>
-References: <1541674784-25936-1-git-send-email-lizhijian@cn.fujitsu.com>
-	<1541674784-25936-2-git-send-email-lizhijian@cn.fujitsu.com>
-	<1541674784-25936-3-git-send-email-lizhijian@cn.fujitsu.com>
-	<1541674784-25936-4-git-send-email-lizhijian@cn.fujitsu.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 8 Nov 2018 11:14:37 +0000
-Message-ID: <CAFEAcA_sQOcDm8kyfRE7p4p7gdpGHf0HNhKY8K+npiOByG2ErQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 3/3] change int len to uin32_t len
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 4/4] s390x/zpci: properly fail if the
+ zPCI device cannot be created
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,39 +27,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Zhijian <lizhijian@cn.fujitsu.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Philip Li <philip.li@intel.com>, zhijianx.li@intel.com, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: David Hildenbrand <david@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, "Michael S .
+	Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, =Collin Walling <walling@linux.ibm.com>
 
-On 8 November 2018 at 10:59, Li Zhijian <lizhijian@cn.fujitsu.com> wrote:
-> In order to support >= 2G initrd, we need to change len type from int to
-> uin32_t.
->
-> Below is the flow sample to show how qemu copy initrd from qemu
-> side to VM when using optionroms bootlinux_dma.bin:
-> dma_memory_read(uint32_t len)
->   -> dma_memory_rw(uint32_t len)
->     -> dma_memory_rw_relaxed(uint32_t len)
->       -> address_space_rw(int len) # len overflow
->         -> address_space_read_full(int len)
->
-> CC: Paolo Bonzini <pbonzini@redhat.com>
-> CC: Peter Crosthwaite <crosthwaite.peter@gmail.com>
-> CC: Richard Henderson <rth@twiddle.net>
-> CC: Philip Li <philip.li@intel.com>
-> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+On Mon, 5 Nov 2018 13:46:10 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
-If we change this, then "uint32_t" is not the right type. If we
-want to allow writes of large chunks of memory through this API
-then the right type for the length of a chunk of guest memory
-is "hwaddr".
+> On 05.11.18 13:41, Cornelia Huck wrote:
+> > On Mon, 5 Nov 2018 13:04:04 +0100
+> > Thomas Huth <thuth@redhat.com> wrote:
+> >   
+> >> On 2018-11-05 12:03, David Hildenbrand wrote:  
+> >>> Right now, errors during realize()/pre_plug/plug of the zPCI device
+> >>> would result in QEMU crashing instead of failing nicely when creating
+> >>> a zPCI device for a PCI device.  
+> > 
+> > Yeah, failing instead of crashing is better :)
+> > 
+> > Is there any way we can trigger this problem for testing?  
+> 
+> I guess trying to add more PCI devices (with implicit zPCI devices
+> getting created) than we have zPCI slots should be enough. So making
+> e.g. s390_pci_alloc_idx() fail.
+> 
+> (FH_MASK_INDEX = 0x0000ffff implies 65536 devices, which is not really
+> easy to test ;) )
+> 
 
-The other way to approach this would be to say that devices
-doing DMA mustn't try to do it in enormous chunks like this,
-but need to split it up. If we had a coherent story for how
-to avoid dma-engine device emulations from sitting in a loop
-forever doing guest-requested DMA this would probably tie in
-with that, as part of saying "don't do more than X amount of
-work at a time without yielding control back to QEMU".
-
-thanks
--- PMM
+I was hoping for an easy test. Oh well :)
