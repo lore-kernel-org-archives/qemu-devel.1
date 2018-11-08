@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59525)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gKmsR-0005Ua-Fz
+	(envelope-from <yuval.shaia@oracle.com>) id 1gKmsQ-0005Tx-U3
 	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:09:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gKmsP-0000vk-3p
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:09:51 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:54988)
+	(envelope-from <yuval.shaia@oracle.com>) id 1gKmsN-0000to-H6
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:09:50 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:54702)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gKmsO-0000tF-L2
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:09:48 -0500
+	id 1gKmsL-0000lD-E3
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:09:47 -0500
 From: Yuval Shaia <yuval.shaia@oracle.com>
-Date: Thu,  8 Nov 2018 18:08:16 +0200
-Message-Id: <20181108160818.5485-21-yuval.shaia@oracle.com>
+Date: Thu,  8 Nov 2018 18:08:10 +0200
+Message-Id: <20181108160818.5485-15-yuval.shaia@oracle.com>
 In-Reply-To: <20181108160818.5485-1-yuval.shaia@oracle.com>
 References: <20181108160818.5485-1-yuval.shaia@oracle.com>
-Subject: [Qemu-devel] [PATCH v2 20/22] hw/pvrdma: Clean device's resource
- when system is shutdown
+Subject: [Qemu-devel] [PATCH v2 14/22] hw/rdma: Initialize node_guid from
+ vmxnet3 mac address
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,71 +27,82 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com
 
-In order to clean some external resources such as GIDs, QPs etc,
-register to receive notification when VM is shutdown.
+node_guid should be set once device is load.
+Make node_guid be GID format (32 bit) of PCI function 0 vmxnet3 device's
+MAC.
+
+A new function was added to do the conversion.
+So for example the MAC 56:b6:44:e9:62:dc will be converted to GID
+54b6:44ff:fee9:62dc.
 
 Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
 ---
- hw/rdma/vmw/pvrdma.h      |  2 ++
- hw/rdma/vmw/pvrdma_main.c | 12 ++++++++++++
- 2 files changed, 14 insertions(+)
+ hw/rdma/rdma_utils.h      |  9 +++++++++
+ hw/rdma/vmw/pvrdma_cmd.c  | 10 ----------
+ hw/rdma/vmw/pvrdma_main.c |  5 ++++-
+ 3 files changed, 13 insertions(+), 11 deletions(-)
 
-diff --git a/hw/rdma/vmw/pvrdma.h b/hw/rdma/vmw/pvrdma.h
-index 10a3c4fb7c..ffae36986e 100644
---- a/hw/rdma/vmw/pvrdma.h
-+++ b/hw/rdma/vmw/pvrdma.h
-@@ -17,6 +17,7 @@
- #define PVRDMA_PVRDMA_H
+diff --git a/hw/rdma/rdma_utils.h b/hw/rdma/rdma_utils.h
+index 989db249ef..202abb3366 100644
+--- a/hw/rdma/rdma_utils.h
++++ b/hw/rdma/rdma_utils.h
+@@ -63,4 +63,13 @@ extern unsigned long pr_dbg_cnt;
+ void *rdma_pci_dma_map(PCIDevice *dev, dma_addr_t addr, dma_addr_t plen);
+ void rdma_pci_dma_unmap(PCIDevice *dev, void *buffer, dma_addr_t len);
  
- #include "qemu/units.h"
-+#include "qemu/notify.h"
- #include "hw/pci/pci.h"
- #include "hw/pci/msix.h"
- #include "chardev/char-fe.h"
-@@ -87,6 +88,7 @@ typedef struct PVRDMADev {
-     RdmaDeviceResources rdma_dev_res;
-     CharBackend mad_chr;
-     VMXNET3State *func0;
-+    Notifier shutdown_notifier;
- } PVRDMADev;
- #define PVRDMA_DEV(dev) OBJECT_CHECK(PVRDMADev, (dev), PVRDMA_HW_NAME)
++static inline void addrconf_addr_eui48(uint8_t *eui, const char *addr)
++{
++    memcpy(eui, addr, 3);
++    eui[3] = 0xFF;
++    eui[4] = 0xFE;
++    memcpy(eui + 5, addr + 3, 3);
++    eui[0] ^= 2;
++}
++
+ #endif
+diff --git a/hw/rdma/vmw/pvrdma_cmd.c b/hw/rdma/vmw/pvrdma_cmd.c
+index a334f6205e..2979582fac 100644
+--- a/hw/rdma/vmw/pvrdma_cmd.c
++++ b/hw/rdma/vmw/pvrdma_cmd.c
+@@ -592,16 +592,6 @@ static int create_bind(PVRDMADev *dev, union pvrdma_cmd_req *req,
+         return -EINVAL;
+     }
  
-diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
-index 95e9322b7c..45a59cddf9 100644
---- a/hw/rdma/vmw/pvrdma_main.c
-+++ b/hw/rdma/vmw/pvrdma_main.c
-@@ -24,6 +24,7 @@
- #include "hw/qdev-properties.h"
- #include "cpu.h"
- #include "trace.h"
-+#include "sysemu/sysemu.h"
- 
- #include "../rdma_rm.h"
- #include "../rdma_backend.h"
-@@ -559,6 +560,14 @@ static int pvrdma_check_ram_shared(Object *obj, void *opaque)
+-    /* TODO: Since drivers stores node_guid at load_dsr phase then this
+-     * assignment is not relevant, i need to figure out a way how to
+-     * retrieve MAC of our netdev */
+-    if (!cmd->index) {
+-        dev->node_guid =
+-            dev->rdma_dev_res.ports[0].gid_tbl[0].gid.global.interface_id;
+-        pr_dbg("dev->node_guid=0x%llx\n",
+-               (long long unsigned int)be64_to_cpu(dev->node_guid));
+-    }
+-
      return 0;
  }
  
-+static void pvrdma_shutdown_notifier(Notifier *n, void *opaque)
-+{
-+    PVRDMADev *dev = container_of(n, PVRDMADev, shutdown_notifier);
-+    PCIDevice *pci_dev = PCI_DEVICE(dev);
-+
-+    pvrdma_fini(pci_dev);
-+}
-+
- static void pvrdma_realize(PCIDevice *pdev, Error **errp)
- {
-     int rc;
-@@ -623,6 +632,9 @@ static void pvrdma_realize(PCIDevice *pdev, Error **errp)
-         goto out;
-     }
+diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
+index fa6468d221..95e9322b7c 100644
+--- a/hw/rdma/vmw/pvrdma_main.c
++++ b/hw/rdma/vmw/pvrdma_main.c
+@@ -264,7 +264,7 @@ static void init_dsr_dev_caps(PVRDMADev *dev)
+     dsr->caps.sys_image_guid = 0;
+     pr_dbg("sys_image_guid=%" PRIx64 "\n", dsr->caps.sys_image_guid);
  
-+    dev->shutdown_notifier.notify = pvrdma_shutdown_notifier;
-+    qemu_register_shutdown_notifier(&dev->shutdown_notifier);
+-    dsr->caps.node_guid = cpu_to_be64(dev->node_guid);
++    dsr->caps.node_guid = dev->node_guid;
+     pr_dbg("node_guid=%" PRIx64 "\n", be64_to_cpu(dsr->caps.node_guid));
+ 
+     dsr->caps.phys_port_cnt = MAX_PORTS;
+@@ -579,6 +579,9 @@ static void pvrdma_realize(PCIDevice *pdev, Error **errp)
+     /* Break if not vmxnet3 device in slot 0 */
+     dev->func0 = VMXNET3(pci_get_function_0(pdev));
+ 
++    addrconf_addr_eui48((unsigned char *)&dev->node_guid,
++                        (const char *)&dev->func0->conf.macaddr.a);
 +
- out:
-     if (rc) {
-         error_append_hint(errp, "Device fail to load\n");
+     memdev_root = object_resolve_path("/objects", NULL);
+     if (memdev_root) {
+         object_child_foreach(memdev_root, pvrdma_check_ram_shared, &ram_shared);
 -- 
 2.17.2
