@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48376)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48489)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gKgL5-0007EI-KF
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 04:11:03 -0500
+	(envelope-from <drjones@redhat.com>) id 1gKgLC-0007HD-R7
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 04:11:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gKgL1-0005zw-9L
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 04:10:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34030)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1gKgL0-0005dQ-NJ
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 04:10:55 -0500
-References: <20181026123358.2554-1-ppandit@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <12cdcb7d-9566-4eb6-52b3-94dc97ea408c@redhat.com>
-Date: Thu, 8 Nov 2018 10:10:25 +0100
+	(envelope-from <drjones@redhat.com>) id 1gKgL9-0006M8-OY
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 04:11:06 -0500
+Date: Thu, 8 Nov 2018 10:10:05 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20181108091005.4rovcyb7sdvfxz6g@kamzik.brq.redhat.com>
+References: <1540663650-106694-1-git-send-email-peng.hao2@zte.com.cn>
+	<1540663650-106694-5-git-send-email-peng.hao2@zte.com.cn>
 MIME-Version: 1.0
-In-Reply-To: <20181026123358.2554-1-ppandit@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] ppc/pnv: check size before data buffer
- access
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1540663650-106694-5-git-send-email-peng.hao2@zte.com.cn>
+Subject: Re: [Qemu-devel] [PATCH V5 4/5] hw/arm/virt: Use the pvpanic device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +23,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
-Cc: Prasad J Pandit <pjp@fedoraproject.org>, Alexander Graf <agraf@suse.de>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Moguofang <moguofang@huawei.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Peng Hao <peng.hao2@zte.com.cn>
+Cc: peter.maydell@linaro.org, philmd@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
-On 26/10/2018 14:33, P J P wrote:
-> From: Prasad J Pandit <pjp@fedoraproject.org>
-> 
-> While performing PowerNV memory r/w operations, the access length
-> 'sz' could exceed the data[4] buffer size. Add check to avoid OOB
-> access.
-> 
-> Reported-by: Moguofang <moguofang@huawei.com>
-> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
-> ---
->  hw/ppc/pnv_lpc.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
-> 
-> Update v2: add error log message
->   -> https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg05750.html
-> 
-> diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
-> index d7721320a2..172a915cfc 100644
-> --- a/hw/ppc/pnv_lpc.c
-> +++ b/hw/ppc/pnv_lpc.c
-> @@ -155,9 +155,15 @@ static void pnv_lpc_do_eccb(PnvLpcController *lpc, uint64_t cmd)
->      /* XXX Check for magic bits at the top, addr size etc... */
->      unsigned int sz = (cmd & ECCB_CTL_SZ_MASK) >> ECCB_CTL_SZ_LSH;
->      uint32_t opb_addr = cmd & ECCB_CTL_ADDR_MASK;
-> -    uint8_t data[4];
-> +    uint8_t data[8];
->      bool success;
+On Sun, Oct 28, 2018 at 02:07:29AM +0800, Peng Hao wrote:
+> add pvpanic device in aarch64 virt machine.
 
-I'm not sure 8 is enough.
-
-ECCB_CTL_SZ_MASK is PPC_BITMASK(4, 7), and ECCB_CTL_SZ_LSH is (63 - 7).
-So the bitmask is 4 bits wide, and thus sz can be 0 to 15.
-
-I think data[] size should be 16.
+Why only aarch64 and not also arm?
 
 Thanks,
-Laurent
+drew
