@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34739)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35546)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gKh9E-00087F-CC
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:02:54 -0500
+	(envelope-from <lhrazky@redhat.com>) id 1gKhBt-0004E3-P2
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:05:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gKh99-0003H1-6B
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:02:46 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 8 Nov 2018 10:02:13 +0000
-Message-ID: <df8e5a97-c79c-c8c2-6dd4-7373239d6601@virtuozzo.com>
-References: <20180807174311.32454-1-vsementsov@virtuozzo.com>
-	<20180807174311.32454-4-vsementsov@virtuozzo.com>
-	<6e19aaeb-8acc-beb9-5ece-9ae6101637a9@redhat.com>
-	<9aa2ee7b-2dcb-be00-5501-c616f5c5fda0@virtuozzo.com>
-	<20181107181631.GC4721@linux.fritz.box>
-In-Reply-To: <20181107181631.GC4721@linux.fritz.box>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <6C46D56C3D2C5940994C1E0DA90EFA9F@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 3/7] qcow2: split out reading normal
- clusters from qcow2_co_preadv
+	(envelope-from <lhrazky@redhat.com>) id 1gKhBf-0007Lr-5q
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:05:24 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:36850)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lhrazky@redhat.com>) id 1gKhBc-0007EP-Iw
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:05:17 -0500
+Received: by mail-wr1-f66.google.com with SMTP id z13-v6so18181996wrs.3
+	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 02:05:13 -0800 (PST)
+Message-ID: <1541671510.16655.506.camel@redhat.com>
+From: =?UTF-8?Q?Luk=C3=A1=C5=A1_Hr=C3=A1zk=C3=BD?= <lhrazky@redhat.com>
+Date: Thu, 08 Nov 2018 11:05:10 +0100
+In-Reply-To: <20181108064927.i6llxv4kgcrdon7n@sirius.home.kraxel.org>
+References: <20181107104921.20536-1-lhrazky@redhat.com>
+	<20181107104921.20536-2-lhrazky@redhat.com>
+	<20181108064927.i6llxv4kgcrdon7n@sirius.home.kraxel.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH spice v3 1/3] QXL interface: add a
+ function to identify monitors in the guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,77 +31,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Denis Lunev <den@virtuozzo.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: spice-devel@lists.freedesktop.org, qemu-devel@nongnu.org
 
-MDcuMTEuMjAxOCAyMToxNiwgS2V2aW4gV29sZiB3cm90ZToNCj4gKEJyb2tlbiBxdW90aW5nIGlu
-IHRleHQvcGxhaW4gYWdhaW4pDQo+DQo+IEFtIDAxLjExLjIwMTggdW0gMTM6MTcgaGF0IFZsYWRp
-bWlyIFNlbWVudHNvdi1PZ2lldnNraXkgZ2VzY2hyaWViZW46DQo+PiAyNy4wOS4yMDE4IDIwOjM1
-LCBNYXggUmVpdHogd3JvdGU6DQo+Pg0KPj4gICAgICBPbiAwNy4wOC4xOCAxOTo0MywgVmxhZGlt
-aXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+DQo+PiAgICAgICAgICBNZW1vcnkgYWxs
-b2NhdGlvbiBtYXkgYmVjb21lIGxlc3MgZWZmaWNpZW50IGZvciBlbmNyeXB0ZWQgY2FzZS4gSXQn
-cyBhDQo+PiAgICAgICAgICBwYXltZW50IGZvciBmdXJ0aGVyIGFzeW5jaHJvbm91cyBzY2hlbWUu
-DQo+Pg0KPj4gICAgICAgICAgU2lnbmVkLW9mZi1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2
-c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KPj4gICAgICAgICAgLS0tDQo+PiAgICAg
-ICAgICAgYmxvY2svcWNvdzIuYyB8IDExNCArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-Ky0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+PiAgICAgICAgICAgMSBmaWxlIGNoYW5nZWQs
-IDY0IGluc2VydGlvbnMoKyksIDUwIGRlbGV0aW9ucygtKQ0KPj4NCj4+ICAgICAgICAgIGRpZmYg
-LS1naXQgYS9ibG9jay9xY293Mi5jIGIvYmxvY2svcWNvdzIuYw0KPj4gICAgICAgICAgaW5kZXgg
-NjVlM2NhMDBlMi4uNWU3ZjJlZTMxOCAxMDA2NDQNCj4+ICAgICAgICAgIC0tLSBhL2Jsb2NrL3Fj
-b3cyLmMNCj4+ICAgICAgICAgICsrKyBiL2Jsb2NrL3Fjb3cyLmMNCj4+ICAgICAgICAgIEBAIC0x
-ODA4LDYgKzE4MDgsNjcgQEAgb3V0Og0KPj4gICAgICAgICAgICAgICByZXR1cm4gcmV0Ow0KPj4g
-ICAgICAgICAgIH0NCj4+DQo+PiAgICAgICAgICArc3RhdGljIGNvcm91dGluZV9mbiBpbnQgcWNv
-dzJfY29fcHJlYWR2X25vcm1hbChCbG9ja0RyaXZlclN0YXRlICpicywNCj4+ICAgICAgICAgICsg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHVpbnQ2NF90IGZp
-bGVfY2x1c3Rlcl9vZmZzZXQsDQo+PiAgICAgICAgICArICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICB1aW50NjRfdCBvZmZzZXQsDQo+PiAgICAgICAgICArICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50NjRfdCBieXRl
-cywNCj4+ICAgICAgICAgICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIFFFTVVJT1ZlY3RvciAqcWlvdiwNCj4+ICAgICAgICAgICsgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHVpbnQ2NF90IHFpb3Zfb2Zmc2V0KQ0KPj4g
-ICAgICAgICAgK3sNCj4+ICAgICAgICAgICsgICAgaW50IHJldDsNCj4+ICAgICAgICAgICsgICAg
-QkRSVlFjb3cyU3RhdGUgKnMgPSBicy0+b3BhcXVlOw0KPj4gICAgICAgICAgKyAgICB2b2lkICpj
-cnlwdF9idWYgPSBOVUxMOw0KPj4gICAgICAgICAgKyAgICBRRU1VSU9WZWN0b3IgaGRfcWlvdjsN
-Cj4+ICAgICAgICAgICsgICAgaW50IG9mZnNldF9pbl9jbHVzdGVyID0gb2Zmc2V0X2ludG9fY2x1
-c3RlcihzLCBvZmZzZXQpOw0KPj4gICAgICAgICAgKw0KPj4gICAgICAgICAgKyAgICBpZiAoKGZp
-bGVfY2x1c3Rlcl9vZmZzZXQgJiA1MTEpICE9IDApIHsNCj4+ICAgICAgICAgICsgICAgICAgIHJl
-dHVybiAtRUlPOw0KPj4gICAgICAgICAgKyAgICB9DQo+PiAgICAgICAgICArDQo+PiAgICAgICAg
-ICArICAgIHFlbXVfaW92ZWNfaW5pdCgmaGRfcWlvdiwgcWlvdi0+bmlvdik7DQo+Pg0KPj4gICAg
-ICBTbyB5b3UncmUgbm90IGp1c3QgcmUtYWxsb2NhdGluZyB0aGUgYm91bmNlIGJ1ZmZlciBmb3Ig
-ZXZlcnkgc2luZ2xlDQo+PiAgICAgIGNhbGwsIGJ1dCBhbHNvIHRoaXMgSS9PIHZlY3Rvci4gIEht
-Lg0KPiBBbmQgdGhpcyBvbmUgaXMgYWN0dWFsbHkgYXQgbGVhc3QgYSBsaXR0bGUgbW9yZSBzZXJp
-b3VzLCBJIHRoaW5rLg0KPg0KPiBEZWNyeXB0aW9uIGFuZCBkZWNvbXByZXNzaW9uIChpbmNsdWRp
-bmcgY29weWluZyBiZXR3ZWVuIHRoZSBvcmlnaW5hbA0KPiBxaW92IGFuZCB0aGUgYm91bmNlIGJ1
-ZmZlcikgYXJlIGFscmVhZHkgdmVyeSBzbG93LCBzbyBhbGxvY2F0aW5nIGENCj4gYm91bmNlIGJ1
-ZmZlciBvciBub3Qgc2hvdWxkbid0IG1ha2UgYW55IG5vdGljYWJsZSBkaWZmZXJlbmNlLg0KPg0K
-PiBCdXQgSSdkIGxpa2UgdG8ga2VlcCBhbGxvY2F0aW9ucyBvdXQgb2YgdGhlIGZhc3QgcGF0aCBh
-cyBtdWNoIGFzIHdlIGNhbi4NCj4NCj4+ICAgICAgICAgICsgICAgaWYgKGJzLT5lbmNyeXB0ZWQp
-IHsNCj4+ICAgICAgICAgICsgICAgICAgIGFzc2VydChzLT5jcnlwdG8pOw0KPj4gICAgICAgICAg
-KyAgICAgICAgYXNzZXJ0KGJ5dGVzIDw9IFFDT1dfTUFYX0NSWVBUX0NMVVNURVJTICogcy0+Y2x1
-c3Rlcl9zaXplKTsNCj4+ICAgICAgICAgICsNCj4+ICAgICAgICAgICsgICAgICAgIGNyeXB0X2J1
-ZiA9IHFlbXVfdHJ5X2Jsb2NrYWxpZ24oYnMtPmZpbGUtPmJzLCBieXRlcyk7DQo+Pg0KPj4gICAg
-ICAxLiBXaHkgZGlkIHlvdSByZW1vdmUgdGhlIGNvbW1lbnQ/DQo+Pg0KPj4gICAgICAyLiBUaGUg
-Y2hlY2sgZm9yIHdoZXRoZXIgY3J5cHRfYnVmIHdhcyBzdWNjZXNzZnVsbHkgYWxsb2NhdGVkIGlz
-IG1pc3NpbmcuDQo+Pg0KPj4gICAgICAzLiBEbyB5b3UgaGF2ZSBhbnkgYmVuY2htYXJrcyBmb3Ig
-ZW5jcnlwdGVkIGltYWdlcz8gIEhhdmluZyB0byBhbGxvY2F0ZQ0KPj4gICAgICB0aGUgYm91bmNl
-IGJ1ZmZlciBmb3IgcG90ZW50aWFsbHkgZXZlcnkgc2luZ2xlIGNsdXN0ZXIgc291bmRzIHJhdGhl
-ciBiYWQNCj4+ICAgICAgdG8gbWUuDQo+IEFjdHVhbGx5LCBiZW5jaG1hcmtzIGZvciBub3JtYWws
-IGZ1bGx5IGFsbG9jYXRlZCBpbWFnZXMgd291bGQgYmUgYQ0KPiBsaXR0bGUgbW9yZSBpbnRlcmVz
-dGluZy4gVGhvdWdoIEknbSBub3Qgc3VyZSBpZiBxY293MiBhY3R1YWxseSBwZXJmb3Jtcw0KPiB3
-ZWxsIGVub3VnaCB0aGF0IHdlJ2xsIHNlZSBhbnkgZGlmZmVyZW5jZSBldmVuIHRoZXJlICh3aGVu
-IHdlIG1lYXN1cmVkDQo+IG1lbW9yeSBhbGxvY2F0aW9uIG92ZXJoZWFkIGV0Yy4gZm9yIHJhdyBp
-bWFnZXMgaW4gdGhlIGNvbnRleHQgb2YNCj4gY29tcGFyaW5nIGNvcm91dGluZXMgdG8gQUlPIGNh
-bGxiYWNrIHN0eWVzLCB0aGUgZGlmZmVyZW5jZSB3YXMgYWxyZWFkeQ0KPiBoYXJkIHRvIHNlZSku
-DQoNCk9rLCBJJ2xsIGJlbmNobWFyayBpdCBhbmQvb3IgaW1wcm92ZSBmYXN0IHBhdGggKHlvdSBt
-ZWFuIGNvZGUgcGF0aCwgDQp3aGVyZSB3ZSBza2lwIGNvcm91dGluZXMgY3JlYXRpb24sIHRvIGhh
-bmRsZSB0aGUgd2hvbGUgcmVxdWVzdCBhdCBvbmNlLCANCnllcz8pLg0KDQpIbW0sIGFsbCB0aGlz
-IHN0YWZmIHdpdGggaGRfcWlvdidzIGluIG1hbnkgcGxhY2VzIGlzIGR1ZSB0byB3ZSBkb24ndCAN
-CmhhdmUgcWlvdl9vZmZzZXQgcGFyYW1ldGVyIGluIC5iZHJ2X2NvX3ByZWFkdi4uIElzIGl0IGEg
-YmFkIGlkZWEgdG8gYWRkIGl0Pw0KDQpBbnl3YXksIEkgbm93IHRoaW5rLCBpdCdzIGJldHRlciB0
-byBzdGFydCB3aXRoIGRlY29tcHJlc3MtdGhyZWFkcyANCnNlcmllcywgYXMgY29tcHJlc3MtdGhy
-ZWFkcyBhcmUgYWxyZWFkeSBtZXJnZWQsIHRoZW4gYnJpbmcgZW5jcnlwdGlvbiB0byANCnRocmVh
-ZHMgdG9vLCBhbmQgdGhlbiByZXR1cm4gdG8gdGhlc2Ugc2VyaWVzLiBUaGlzIHdheSB3aWxsIHJl
-bW92ZSBzb21lIA0KcXVlc3Rpb25zIGFib3V0IGFsbG9jYXRpb24sIGFuZCBtYXkgYmUgaXQgd291
-bGQgYmUgc2ltcGxlciBhbmQgbW9yZSANCmNvbnNpc3RlbnQgdG8gYnJpbmcgbW9yZSB0aGluZ3Mg
-dG8gY29yb3V0aW5lcywgbm90IG9ubHkgbm9ybWFsIGNsdXN0ZXJzLg0KDQo+DQo+IEtldmluDQoN
-Cg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0KDQo=
+Hello,
+
+On Thu, 2018-11-08 at 07:49 +0100, Gerd Hoffmann wrote:
+>   Hi,
+> 
+> > + * The device_display_id_{start,count} denotes the sequence of device display
+> > + * IDs that map to the zero-based sequence of monitor IDs provided by monitors
+> > + * config on this interface. For example with device_display_id_start = 2 and
+> > + * device_display_id_count = 3 you get the following mapping:
+> > + * monitor_id  ->  device_display_id
+> > + *          0  ->  2
+> > + *          1  ->  3
+> > + *          2  ->  4
+> > + *
+> > + * Note this example is unsupported in practice. The only supported cases are
+> > + * either a single device display ID (count = 1) or multiple device display IDs
+> > + * in a sequence starting from 0.
+> 
+> This is confusing.  The usage of this api in the qemu counterpart looks
+> sane though.
+
+Not sure what you find confusing in particular... The example? Using an
+example and then saying it's not supported? (I wated to use a
+nontrivial example that will show the concept...) Suggestions for
+improvement?
+
+Thanks,
+Lukas
+
+> cheers,
+>   Gerd
+> 
