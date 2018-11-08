@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43887)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gKojd-000778-6L
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 13:08:54 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gKopP-0001j3-Re
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 13:14:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gKojZ-0005cT-76
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 13:08:53 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:43320)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gKojY-0005Km-Vh
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 13:08:49 -0500
-Received: by mail-wr1-f65.google.com with SMTP id y3-v6so21955398wrh.10
-	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 10:08:37 -0800 (PST)
-References: <20181108143422.15955-1-philmd@redhat.com>
-	<20181108171716.GN12503@habkost.net>
-	<CAFEAcA-t5qOHngv9ciTkuakmT84N7QV4c0=TYMD-NUgh5uT_DA@mail.gmail.com>
-	<CAP+75-WTmYUAWgOZ7cf2jsaqvQVv+atBzatUgDOhudz1kqPg4g@mail.gmail.com>
-	<CAFEAcA8XK51Uun6MUQDSOMAN7aCQ0TtKzQBWtVXtBx9=A5yECw@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <5f495bd7-8489-4e8f-8fd5-d0bb28787fa4@redhat.com>
-Date: Thu, 8 Nov 2018 19:08:34 +0100
+	(envelope-from <pbonzini@redhat.com>) id 1gKopL-0003RP-HL
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 13:14:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35868)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gKopL-0003Ek-3f
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 13:14:47 -0500
+References: <1541628287-11627-1-git-send-email-george.kennedy@oracle.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <94be96e7-cee8-a8d6-6dc5-61535461f3f8@redhat.com>
+Date: Thu, 8 Nov 2018 19:14:11 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8XK51Uun6MUQDSOMAN7aCQ0TtKzQBWtVXtBx9=A5yECw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1541628287-11627-1-git-send-email-george.kennedy@oracle.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] scripts: Remove unused python imports
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6] lsi: Reselection needed to remove
+ pending commands from queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,40 +28,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: George Kennedy <george.kennedy@oracle.com>, famz@redhat.com, qemu-devel@nongnu.org, boris.ostrovsky@oracle.com
 
-On 8/11/18 19:00, Peter Maydell wrote:
-> On 8 November 2018 at 17:41, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
->> On Thu, Nov 8, 2018 at 6:25 PM Peter Maydell <peter.maydell@linaro.org> wrote:
->>> On 8 November 2018 at 17:17, Eduardo Habkost <ehabkost@redhat.com> wrote:
->>>> On Thu, Nov 08, 2018 at 03:34:22PM +0100, Philippe Mathieu-Daudé wrote:
->>>>> Reported-by: LGTM code review
->>>>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->>>>
->>>> Queueing for 3.2, thanks.
->>>
->>> Next release after 3.1 will be 4.0, by the way -- we're moving
->>> to "bump major version every year".
->>
->> So major versions help to remember the 12th anniversary of QEMU?
->>
->> Why not start at 19.0?
-> 
-> We had this discussion when we agreed on the new version policy;
-> I don't want to reopen it.
+On 07/11/2018 23:04, George Kennedy wrote:
+> Your latest suggestion was the "missing link". Calling lsi_wait_reselec=
+t()
+> after a WAIT DISCONNECT Script instruction when there are commands on=20
+> the pending queue is all the is needed. The patch has been greatly
+> reduced in size and complexity.
 
-Sorry I missed it, I'll look in the archives.
+Yeah, it's mixing initiator and target in slightly unhealthy ways, but
+it's not something that you introduced.
 
-Anyway there are no information about merge window in the wiki.
-When I started it was not easy to understand it and why patches sent 
-when 'merge window is close' fall under the crap and are unnoticed, thus 
-it is better to wait before to send, or resend them.
-I'd appreciate if someone add this (Contribute/SubmitAPatch is probably 
-the page to modify), also describing than some maintainers agree to take 
-patches in their -next queue, even when merge window is closed
-Also you could add the expected dates for the next releases there.
+(Can you also send, perhaps offlist, the other patch you were working on
+which tried to introduce the right sequence of disconnect/reselect
+before disk accesses and DMA respectively?  I'd like to keep it for
+reference).
 
-Regards,
+>  hw/scsi/lsi53c895a.c | 43 ++++++++++++++++++++++++++++++++-----------
+>  1 file changed, 32 insertions(+), 11 deletions(-)
+>=20
+> diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
+> index d1e6534..7f9ed2f 100644
+> --- a/hw/scsi/lsi53c895a.c
+> +++ b/hw/scsi/lsi53c895a.c
+> @@ -219,6 +219,7 @@ typedef struct {
+>      int command_complete;
+>      QTAILQ_HEAD(, lsi_request) queue;
+>      lsi_request *current;
+> +    bool handle_pending;    /* handle queued pending commands */
+> =20
+>      uint32_t dsa;
+>      uint32_t temp;
+> @@ -298,6 +299,18 @@ static inline int lsi_irq_on_rsl(LSIState *s)
+>      return (s->sien0 & LSI_SIST0_RSL) && (s->scid & LSI_SCID_RRE);
+>  }
+> =20
+> +static lsi_request *get_pending_req(LSIState *s)
+> +{
+> +    lsi_request *p;
+> +
+> +    QTAILQ_FOREACH(p, &s->queue, next) {
+> +        if (p->pending) {
+> +            return p;
+> +        }
+> +    }
+> +    return NULL;
+> +}
+> +
+>  static void lsi_soft_reset(LSIState *s)
+>  {
+>      trace_lsi_reset();
+> @@ -446,7 +459,6 @@ static void lsi_update_irq(LSIState *s)
+>  {
+>      int level;
+>      static int last_level;
+> -    lsi_request *p;
+> =20
+>      /* It's unclear whether the DIP/SIP bits should be cleared when th=
+e
+>         Interrupt Status Registers are cleared or when istat0 is read.
+> @@ -477,12 +489,12 @@ static void lsi_update_irq(LSIState *s)
+>      lsi_set_irq(s, level);
+> =20
+>      if (!level && lsi_irq_on_rsl(s) && !(s->scntl1 & LSI_SCNTL1_CON)) =
+{
+> +        lsi_request *p;
+> +
+>          trace_lsi_update_irq_disconnected();
+> -        QTAILQ_FOREACH(p, &s->queue, next) {
+> -            if (p->pending) {
+> -                lsi_reselect(s, p);
+> -                break;
+> -            }
+> +        p =3D get_pending_req(s);
+> +        if (p) {
+> +            lsi_reselect(s, p);
+>          }
+>      }
+>  }
+> @@ -759,6 +771,8 @@ static void lsi_command_complete(SCSIRequest *req, =
+uint32_t status, size_t resid
+>          lsi_request_free(s, s->current);
+>          scsi_req_unref(req);
+>      }
+> +    s->handle_pending =3D get_pending_req(s) ? true : false;
+> +
+>      lsi_resume_script(s);
+>  }
+> =20
+> @@ -1064,11 +1078,15 @@ static void lsi_wait_reselect(LSIState *s)
+> =20
+>      trace_lsi_wait_reselect();
+> =20
+> -    QTAILQ_FOREACH(p, &s->queue, next) {
+> -        if (p->pending) {
+> -            lsi_reselect(s, p);
+> -            break;
+> -        }
+> +    s->handle_pending =3D false;
+> +
+> +    if (s->current) {
+> +        return;
+> +    }
+> +
+> +    p =3D get_pending_req(s);
+> +    if (p) {
+> +        lsi_reselect(s, p);
+>      }
+>      if (s->current =3D=3D NULL) {
+>          s->waiting =3D 1;
+> @@ -1258,6 +1276,9 @@ again:
+>              case 1: /* Disconnect */
+>                  trace_lsi_execute_script_io_disconnect();
+>                  s->scntl1 &=3D ~LSI_SCNTL1_CON;
+> +                if (s->handle_pending) {
 
-Phil.
+Can you explain the if?  Is it to avoid that "s->waiting =3D 1" assignmen=
+t?
+
+Also, could the disconnect case check get_pending_req directly, and call
+lsi_reselect?  That is, replacing this "if" with
+
+	if (!s->current) {
+	    p =3D get_pending_req(s);
+	    if (p) {
+	        lsi_reselect(s, p);
+	    }
+	}
+
+instead of calling lsi_wait_reselect?
+
+Thanks,
+
+Paolo
+
+> +                    lsi_wait_reselect(s);
+> +                }
+>                  break;
+>              case 2: /* Wait Reselect */
+>                  if (!lsi_irq_on_rsl(s)) {
+>=20
