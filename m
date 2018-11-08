@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43542)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gKjFP-0005K6-8P
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:17:22 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gKjFI-0005Ga-IM
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:17:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gKjFN-00040D-BJ
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:17:19 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gKjFB-0003e2-4r
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:17:09 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu,  8 Nov 2018 23:16:42 +1100
-Message-Id: <20181108121646.26173-19-david@gibson.dropbear.id.au>
+Date: Thu,  8 Nov 2018 23:16:28 +1100
+Message-Id: <20181108121646.26173-5-david@gibson.dropbear.id.au>
 In-Reply-To: <20181108121646.26173-1-david@gibson.dropbear.id.au>
 References: <20181108121646.26173-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 18/22] MAINTAINERS: PPC: Remove myself
+Subject: [Qemu-devel] [PULL 04/22] PPC: e500: convert SysBus init method to
+ a realize method
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,128 +24,79 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, agraf@suse.de, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, agraf@suse.de, lvivier@redhat.com, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Alexander Graf <agraf@suse.de>
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-I haven't really been maintaining any PowerPC code for quite a while now,
-so let's reflect reality: David does all the work and embedded PPC is in
-"Odd Fixes" state rather than supported now.
-
-Signed-off-by: Alexander Graf <agraf@suse.de>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- MAINTAINERS | 30 ++++++++++++++----------------
- 1 file changed, 14 insertions(+), 16 deletions(-)
+ hw/pci-host/ppce500.c | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 0499e11593..46772bc0b0 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -230,7 +230,6 @@ F: tests/tcg/openrisc/
+diff --git a/hw/pci-host/ppce500.c b/hw/pci-host/ppce500.c
+index eb75e080fc..b8f8c112e6 100644
+--- a/hw/pci-host/ppce500.c
++++ b/hw/pci-host/ppce500.c
+@@ -436,8 +436,9 @@ static AddressSpace *e500_pcihost_set_iommu(PCIBus *b=
+us, void *opaque,
+     return &s->bm_as;
+ }
 =20
- PowerPC
- M: David Gibson <david@gibson.dropbear.id.au>
--M: Alexander Graf <agraf@suse.de>
- L: qemu-ppc@nongnu.org
- S: Maintained
- F: target/ppc/
-@@ -341,7 +340,7 @@ S: Maintained
- F: target/mips/kvm.c
+-static int e500_pcihost_initfn(SysBusDevice *dev)
++static void e500_pcihost_realize(DeviceState *dev, Error **errp)
+ {
++    SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
+     PCIHostState *h;
+     PPCE500PCIState *s;
+     PCIBus *b;
+@@ -447,7 +448,7 @@ static int e500_pcihost_initfn(SysBusDevice *dev)
+     s =3D PPC_E500_PCI_HOST_BRIDGE(dev);
 =20
- PPC
--M: Alexander Graf <agraf@suse.de>
-+M: David Gibson <david@gibson.dropbear.id.au>
- S: Maintained
- F: target/ppc/kvm.c
+     for (i =3D 0; i < ARRAY_SIZE(s->irq); i++) {
+-        sysbus_init_irq(dev, &s->irq[i]);
++        sysbus_init_irq(sbd, &s->irq[i]);
+     }
 =20
-@@ -779,21 +778,21 @@ F: hw/openrisc/openrisc_sim.c
- PowerPC Machines
- ----------------
- 405
--M: Alexander Graf <agraf@suse.de>
-+M: David Gibson <david@gibson.dropbear.id.au>
- L: qemu-ppc@nongnu.org
- S: Odd Fixes
- F: hw/ppc/ppc405_boards.c
+     for (i =3D 0; i < PCI_NUM_PINS; i++) {
+@@ -460,7 +461,7 @@ static int e500_pcihost_initfn(SysBusDevice *dev)
+     /* PIO lives at the bottom of our bus space */
+     memory_region_add_subregion_overlap(&s->busmem, 0, &s->pio, -2);
 =20
- Bamboo
--M: Alexander Graf <agraf@suse.de>
-+M: David Gibson <david@gibson.dropbear.id.au>
- L: qemu-ppc@nongnu.org
- S: Odd Fixes
- F: hw/ppc/ppc440_bamboo.c
+-    b =3D pci_register_root_bus(DEVICE(dev), NULL, mpc85xx_pci_set_irq,
++    b =3D pci_register_root_bus(dev, NULL, mpc85xx_pci_set_irq,
+                               mpc85xx_pci_map_irq, s, &s->busmem, &s->pi=
+o,
+                               PCI_DEVFN(s->first_slot, 0), 4, TYPE_PCI_B=
+US);
+     h->bus =3D b;
+@@ -483,10 +484,8 @@ static int e500_pcihost_initfn(SysBusDevice *dev)
+     memory_region_add_subregion(&s->container, PCIE500_CFGADDR, &h->conf=
+_mem);
+     memory_region_add_subregion(&s->container, PCIE500_CFGDATA, &h->data=
+_mem);
+     memory_region_add_subregion(&s->container, PCIE500_REG_BASE, &s->iom=
+em);
+-    sysbus_init_mmio(dev, &s->container);
++    sysbus_init_mmio(sbd, &s->container);
+     pci_bus_set_route_irq_fn(b, e500_route_intx_pin_to_irq);
+-
+-    return 0;
+ }
 =20
- e500
--M: Alexander Graf <agraf@suse.de>
-+M: David Gibson <david@gibson.dropbear.id.au>
- L: qemu-ppc@nongnu.org
--S: Supported
-+S: Odd Fixes
- F: hw/ppc/e500.[hc]
- F: hw/ppc/e500plat.c
- F: include/hw/ppc/ppc_e500.h
-@@ -801,16 +800,16 @@ F: include/hw/pci-host/ppce500.h
- F: pc-bios/u-boot.e500
+ static void e500_host_bridge_class_init(ObjectClass *klass, void *data)
+@@ -526,9 +525,8 @@ static Property pcihost_properties[] =3D {
+ static void e500_pcihost_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+-    SysBusDeviceClass *k =3D SYS_BUS_DEVICE_CLASS(klass);
 =20
- mpc8544ds
--M: Alexander Graf <agraf@suse.de>
-+M: David Gibson <david@gibson.dropbear.id.au>
- L: qemu-ppc@nongnu.org
--S: Supported
-+S: Odd Fixes
- F: hw/ppc/mpc8544ds.c
- F: hw/ppc/mpc8544_guts.c
-=20
- New World
--M: Alexander Graf <agraf@suse.de>
-+M: David Gibson <david@gibson.dropbear.id.au>
- L: qemu-ppc@nongnu.org
--S: Maintained
-+S: Odd Fixes
- F: hw/ppc/mac_newworld.c
- F: hw/pci-host/uninorth.c
- F: hw/pci-bridge/dec.[hc]
-@@ -822,9 +821,9 @@ F: include/hw/misc/mos6522.h
- F: include/hw/ppc/mac_dbdma.h
-=20
- Old World
--M: Alexander Graf <agraf@suse.de>
-+M: David Gibson <david@gibson.dropbear.id.au>
- L: qemu-ppc@nongnu.org
--S: Maintained
-+S: Odd Fixes
- F: hw/ppc/mac_oldworld.c
- F: hw/pci-host/grackle.c
- F: hw/misc/macio/
-@@ -849,7 +848,6 @@ F: pc-bios/ppc_rom.bin
-=20
- sPAPR
- M: David Gibson <david@gibson.dropbear.id.au>
--M: Alexander Graf <agraf@suse.de>
- L: qemu-ppc@nongnu.org
- S: Supported
- F: hw/*/spapr*
-@@ -1124,7 +1122,7 @@ F: tests/acpi-test-data/*
- F: tests/acpi-test-data/*/*
-=20
- ppc4xx
--M: Alexander Graf <agraf@suse.de>
-+M: David Gibson <david@gibson.dropbear.id.au>
- L: qemu-ppc@nongnu.org
- S: Odd Fixes
- F: hw/ppc/ppc4*.c
-@@ -1133,9 +1131,9 @@ F: include/hw/ppc/ppc4xx.h
- F: include/hw/i2c/ppc4xx_i2c.h
-=20
- ppce500
--M: Alexander Graf <agraf@suse.de>
-+M: David Gibson <david@gibson.dropbear.id.au>
- L: qemu-ppc@nongnu.org
--S: Supported
-+S: Odd Fixes
- F: hw/ppc/e500*
- F: hw/pci-host/ppce500.c
- F: hw/net/fsl_etsec/
+-    k->init =3D e500_pcihost_initfn;
++    dc->realize =3D e500_pcihost_realize;
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+     dc->props =3D pcihost_properties;
+     dc->vmsd =3D &vmstate_ppce500_pci;
 --=20
 2.19.1
