@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40808)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gKnFg-00083q-Dp
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:33:53 -0500
+	(envelope-from <jjongsma@redhat.com>) id 1gKnGi-00015O-49
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:34:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gKnFe-0004uS-Ce
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:33:52 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:55672)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gKnFe-0004au-4W
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:33:50 -0500
-Received: by mail-wm1-x344.google.com with SMTP id s10-v6so1908673wmc.5
-	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 08:33:33 -0800 (PST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu,  8 Nov 2018 16:33:24 +0000
-Message-Id: <20181108163329.19940-2-alex.bennee@linaro.org>
-In-Reply-To: <20181108163329.19940-1-alex.bennee@linaro.org>
-References: <20181108163329.19940-1-alex.bennee@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 1/6] target/arm64: properly handle DBGVR
- RESS bits
+	(envelope-from <jjongsma@redhat.com>) id 1gKnGd-0005db-TQ
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:34:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58662)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jjongsma@redhat.com>) id 1gKnGd-0005Uo-L6
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:34:51 -0500
+Message-ID: <6e8c0068efa0fe492ac7473307f14681b7323b73.camel@redhat.com>
+From: Jonathon Jongsma <jjongsma@redhat.com>
+Date: Thu, 08 Nov 2018 10:34:21 -0600
+In-Reply-To: <1541671510.16655.506.camel@redhat.com>
+References: <20181107104921.20536-1-lhrazky@redhat.com>
+	<20181107104921.20536-2-lhrazky@redhat.com>
+	<20181108064927.i6llxv4kgcrdon7n@sirius.home.kraxel.org>
+	<1541671510.16655.506.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Spice-devel] [RFC PATCH spice v3 1/3] QXL
+ interface: add a function to identify monitors in the guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,63 +30,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: =?UTF-8?Q?Luk=C3=A1=C5=A1_Hr=C3=A1zk=C3=BD?= <lhrazky@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: spice-devel@lists.freedesktop.org, qemu-devel@nongnu.org
 
-This only fails with some (broken) versions of gdb but we should
-treat the top bits of DBGBVR as RESS. Properly sign extend QEMU's
-reference copy of dbgbvr and also update the register descriptions in
-the comment.
+On Thu, 2018-11-08 at 11:05 +0100, Luk=C3=A1=C5=A1 Hr=C3=A1zk=C3=BD wrote=
+:
+> Hello,
+>=20
+> On Thu, 2018-11-08 at 07:49 +0100, Gerd Hoffmann wrote:
+> >   Hi,
+> >=20
+> > > + * The device_display_id_{start,count} denotes the sequence of
+> > > device display
+> > > + * IDs that map to the zero-based sequence of monitor IDs
+> > > provided by monitors
+> > > + * config on this interface. For example with
+> > > device_display_id_start =3D 2 and
+> > > + * device_display_id_count =3D 3 you get the following mapping:
+> > > + * monitor_id  ->  device_display_id
+> > > + *          0  ->  2
+> > > + *          1  ->  3
+> > > + *          2  ->  4
+> > > + *
+> > > + * Note this example is unsupported in practice. The only
+> > > supported cases are
+> > > + * either a single device display ID (count =3D 1) or multiple
+> > > device display IDs
+> > > + * in a sequence starting from 0.
+> >=20
+> > This is confusing.  The usage of this api in the qemu counterpart
+> > looks
+> > sane though.
+>=20
+> Not sure what you find confusing in particular... The example? Using
+> an
+> example and then saying it's not supported? (I wated to use a
+> nontrivial example that will show the concept...) Suggestions for
+> improvement?
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+It is funny that you chose an unsupported example for demonstration,
+but I can't think of a better option. The supported scenarios don't
+demonstrate the full behavior very well...
 
----
-v2
-  - sanitise register on insertion
-  - update reference description
----
- target/arm/kvm64.c | 17 +++++++++++++++--
- 1 file changed, 15 insertions(+), 2 deletions(-)
 
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index 5de8ff0ac5..b92ce3437f 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -103,7 +103,7 @@ static void kvm_arm_init_debug(CPUState *cs)
-  * capable of fancier matching but that will require exposing that
-  * fanciness to GDB's interface
-  *
-- * D7.3.2 DBGBCR<n>_EL1, Debug Breakpoint Control Registers
-+ * DBGBCR<n>_EL1, Debug Breakpoint Control Registers
-  *
-  *  31  24 23  20 19   16 15 14  13  12   9 8   5 4    3 2   1  0
-  * +------+------+-------+-----+----+------+-----+------+-----+---+
-@@ -115,12 +115,25 @@ static void kvm_arm_init_debug(CPUState *cs)
-  * SSC/HMC/PMC: Security, Higher and Priv access control (Table D-12)
-  * BAS: Byte Address Select (RES1 for AArch64)
-  * E: Enable bit
-+ *
-+ * DBGBVR<n>_EL1, Debug Breakpoint Value Registers
-+ *
-+ *  63  53 52       49 48       2  1 0
-+ * +------+-----------+----------+-----+
-+ * | RESS | VA[52:49] | VA[48:2] | 0 0 |
-+ * +------+-----------+----------+-----+
-+ *
-+ * Depending on the addressing mode bits the top bits of the register
-+ * are a sign extension of the highest applicable VA bit. Some
-+ * versions of GDB don't do it correctly so we ensure they are correct
-+ * here so future PC comparisons will work properly.
-  */
-+
- static int insert_hw_breakpoint(target_ulong addr)
- {
-     HWBreakpoint brk = {
-         .bcr = 0x1,                             /* BCR E=1, enable */
--        .bvr = addr
-+        .bvr = sextract64(addr, 52, 53)
-     };
- 
-     if (cur_hw_bps >= max_hw_bps) {
--- 
-2.17.1
+>=20
+> Thanks,
+> Lukas
+>=20
+> > cheers,
+> >   Gerd
+> >=20
+>=20
+> _______________________________________________
+> Spice-devel mailing list
+> Spice-devel@lists.freedesktop.org
+> https://lists.freedesktop.org/mailman/listinfo/spice-devel
