@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42183)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gKm13-0005tm-Vp
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 10:14:43 -0500
+	(envelope-from <pmathieu@redhat.com>) id 1gKm2C-0006ps-5w
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 10:15:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gKm12-0000ZT-6n
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 10:14:41 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:43945)
+	(envelope-from <pmathieu@redhat.com>) id 1gKm28-0002Up-WD
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 10:15:52 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:34820)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gKm11-0000VU-Ui
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 10:14:40 -0500
-Received: by mail-oi1-x242.google.com with SMTP id j202-v6so17166026oih.10
-	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 07:14:33 -0800 (PST)
+	(Exim 4.71) (envelope-from <pmathieu@redhat.com>) id 1gKm28-0002OM-LU
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 10:15:48 -0500
+Received: by mail-wr1-f66.google.com with SMTP id z16-v6so21656784wrv.2
+	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 07:15:47 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <b123d5e2-7262-a695-a53c-8fce888a7ce0@redhat.com>
-References: <20181108121646.26173-1-david@gibson.dropbear.id.au>
-	<b123d5e2-7262-a695-a53c-8fce888a7ce0@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 8 Nov 2018 15:14:12 +0000
-Message-ID: <CAFEAcA_B6E=h8i4UAGrVRKhYrX1STSM3Gr2pZsVsQtE25xUwfw@mail.gmail.com>
+References: <20181105181353.39804-1-mst@redhat.com>
+	<20181105181353.39804-3-mst@redhat.com>
+	<a21e8e21-d056-1e9a-3726-54f8ce24a162@redhat.com>
+	<20181106091147-mutt-send-email-mst@kernel.org>
+	<4b68930c-1fc3-9462-8f9e-671b414e712d@redhat.com>
+	<2913be5b-f03e-b42c-1128-8f73ae7054f7@redhat.com>
+	<20181108102418.GE17083@stefanha-x1.localdomain>
+	<33d7fb66-7fb5-e386-a786-1d0db89bae71@redhat.com>
+In-Reply-To: <33d7fb66-7fb5-e386-a786-1d0db89bae71@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Date: Thu, 8 Nov 2018 16:15:35 +0100
+Message-ID: <CAP+75-WCFOucJ1J87kAMKbUS2tRbN=_RXWOh8MGxKTwOwPT6Qw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/22] ppc-for-3.1 queue 20181108
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 02/33] tests: Move
+ tests/hex-loader-check-data/ to tests/data/hex-loader/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,27 +36,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>, qemu-ppc <qemu-ppc@nongnu.org>
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Su Hang <suhang16@mails.ucas.ac.cn>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 8 November 2018 at 14:45, Eric Blake <eblake@redhat.com> wrote:
-> On 11/8/18 6:16 AM, David Gibson wrote:
->>
->> The following changes since commit
->> 4de6bb0c02ad3f0ec48f0f84ba1a65ab06e81b86:
->>
->>    Update version for v3.1.0-rc0 release (2018-11-06 18:27:35 +0000)
->>
+On Thu, Nov 8, 2018 at 3:30 PM Laurent Vivier <lvivier@redhat.com> wrote:
+> On 08/11/2018 11:24, Stefan Hajnoczi wrote:
+> > On Tue, Nov 06, 2018 at 05:16:14PM +0100, Laurent Vivier wrote:
+> >> On 06/11/2018 16:15, Philippe Mathieu-Daud=C3=A9 wrote:
+> >>> On 6/11/18 15:13, Michael S. Tsirkin wrote:
+> >>>> On Tue, Nov 06, 2018 at 02:27:18PM +0100, Philippe Mathieu-Daud=C3=
+=A9 wrote:
+> >>>>> On 5/11/18 19:14, Michael S. Tsirkin wrote:
+> >>>>>> From: Peter Maydell <peter.maydell@linaro.org>
+> >>>>>>
+> >>>>>> Currently tests/hex-loader-check-data contains data files used
+> >>>>>> by the hexloader-test, and configure individually symlinks those
+> >>>>>> data files into the build directory using a wildcard.
+> >>>>>>
+> >>>>>> Using a wildcard like this is a bad idea, because if a new
+> >>>>>> data file is added, nothing causes configure to be rerun,
+> >>>>>> and so no symlink is added for the new file. This can cause
+> >>>>>> tests to spuriously fail when they can't find their data.
+> >>>>>> Instead, it's better to symlink an entire directory of
+> >>>>>> data files. We already have such a directory: tests/data.
+> >>>>>>
+> >>>>>> Move the data files from tests/hex-loader-check-data/ to
+> >>>>>> tests/data/hex-loader/, and remove the unnecessary symlinking.
+> >>>>>>
+> >>>>>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> >>>>>
+> >>>>> I reviewed/tested this patch too.
+> >>>>
+> >>>>
+> >>>> Thanks a lot Philippe!
+> >>>> It is unfortunately too late to update this patch info in git
+> >>>> commit history, however your help is still greatly appreciated!
+> >>>
+> >>> No worry, I'm not mad at all, but there might be an issue in your git=
+ PR
+> >>> workflow, this series also missed your maintainer S-o-b.
+> >>>
+> >>> Peter: Can you add a such check in your scripts? (during next merge
+> >>> window, no hurry).
+> >>>
+> >>> Rather than your scripts, this should be in scripts a maintainer can =
+run
+> >>> locally, such ./scripts/checkpatch.pl --maintainer or
+> >>> ./scripts/checkseries.xx.
+> >>
+> >> I think such tool already exists: with git-publish you can configure a
+> >> "pre-publish-send-email" hook, and check your S-o-B is present.
+> >
+> > For making my own commits .git/hooks/pre-commit is useful:
+> > http://blog.vmsplice.net/2011/03/how-to-automatically-run-checkpatchpl.=
+html
+> >
+> > For sending patch series, git-publish is useful:
+> > https://github.com/stefanha/git-publish/blob/master/hooks/pre-publish-s=
+end-email.example
+> > https://github.com/stefanha/git-publish/
 >
->>
->> Maria Klimushenkova (1):
->>        This patch fixes processing of rfi instructions in icount mode.
+> A pre-publish-send-email like this should do the trick:
 >
+> #!/bin/bash
 >
-> Repeating the comment on 20/22 here, in case David wants to send a v2 respin
-> of the PR before Peter applies this subject line as-is.
+> NAME=3D$(git config --get user.name)
+> EMAIL=3D$(git config --get user.email)
+>
+> for PATCH in $1/*.patch; do
+>     if [ $(basename $PATCH) =3D "0000-cover-letter.patch" ]; then
+>         continue
+>     fi
 
-...sorry, already pushed to master before I saw this.
+Maybe easier (to handle series versions > 1):
 
-thanks
--- PMM
+    case ${PATCH} in
+    *-cover-letter.patch)
+        continue
+        ;;
+    *)
+    ...
+
+>     if ! grep -q "^Signed-off-by: $NAME <$EMAIL>" $PATCH; then
+>         echo "Error: Missing sender S-o-B in $PATCH"
+>         exit 1
+>     fi
+> done
+> exit 0
+>
+>
