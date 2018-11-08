@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47650)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gKnWk-0000YX-K1
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:51:31 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gKnXA-0000mT-1V
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:51:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gKnWb-0000oN-Vq
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:51:25 -0500
-Received: from 8.mo5.mail-out.ovh.net ([178.32.116.78]:33928)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gKnWb-0000nK-MN
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:51:21 -0500
-Received: from player738.ha.ovh.net (unknown [10.109.160.40])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 243F22033B5
-	for <qemu-devel@nongnu.org>; Thu,  8 Nov 2018 17:51:18 +0100 (CET)
-References: <20181026123358.2554-1-ppandit@redhat.com>
-	<12cdcb7d-9566-4eb6-52b3-94dc97ea408c@redhat.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <21ed9d28-9153-266c-5190-8c17aadff78e@kaod.org>
-Date: Thu, 8 Nov 2018 17:51:09 +0100
+	(envelope-from <ehabkost@redhat.com>) id 1gKnX8-0001K5-SI
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:51:55 -0500
+Date: Thu, 8 Nov 2018 14:51:36 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181108165136.GK12503@habkost.net>
+References: <20181031003120.26771-1-ehabkost@redhat.com>
+	<20181031003120.26771-12-ehabkost@redhat.com>
+	<CAFEAcA_ScL828ya7P_5=HMx=vbxo=jK4047nAbmb9Ep=6r=2og@mail.gmail.com>
+	<f1bd429f-198a-ee27-9184-636692332816@redhat.com>
+	<20181106141302.GP12503@habkost.net>
+	<87efbxxw1c.fsf@dusky.pond.sub.org>
+	<8ecdbb0e-aaf8-ddc5-6442-87977585d9d8@redhat.com>
+	<87y3a4ot3g.fsf@dusky.pond.sub.org>
+	<f69012ad-af21-783c-d378-acd3131451e4@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <12cdcb7d-9566-4eb6-52b3-94dc97ea408c@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] ppc/pnv: check size before data buffer
- access
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f69012ad-af21-783c-d378-acd3131451e4@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] tests: Fix Python 3 detection
+ on older GNU make versions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,52 +31,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>, P J P <ppandit@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
-Cc: Prasad J Pandit <pjp@fedoraproject.org>, Alexander Graf <agraf@suse.de>, Moguofang <moguofang@huawei.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Cleber Rosa <crosa@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 
-Hello Laurent,
-
-On 11/8/18 10:10 AM, Laurent Vivier wrote:
-> On 26/10/2018 14:33, P J P wrote:
->> From: Prasad J Pandit <pjp@fedoraproject.org>
->>
->> While performing PowerNV memory r/w operations, the access length
->> 'sz' could exceed the data[4] buffer size. Add check to avoid OOB
->> access.
->>
->> Reported-by: Moguofang <moguofang@huawei.com>
->> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
->> ---
->>  hw/ppc/pnv_lpc.c | 8 +++++++-
->>  1 file changed, 7 insertions(+), 1 deletion(-)
->>
->> Update v2: add error log message
->>   -> https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg05750.html
->>
->> diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
->> index d7721320a2..172a915cfc 100644
->> --- a/hw/ppc/pnv_lpc.c
->> +++ b/hw/ppc/pnv_lpc.c
->> @@ -155,9 +155,15 @@ static void pnv_lpc_do_eccb(PnvLpcController *lpc, uint64_t cmd)
->>      /* XXX Check for magic bits at the top, addr size etc... */
->>      unsigned int sz = (cmd & ECCB_CTL_SZ_MASK) >> ECCB_CTL_SZ_LSH;
->>      uint32_t opb_addr = cmd & ECCB_CTL_ADDR_MASK;
->> -    uint8_t data[4];
->> +    uint8_t data[8];
->>      bool success;
+On Thu, Nov 08, 2018 at 11:06:45AM -0500, Cleber Rosa wrote:
 > 
-> I'm not sure 8 is enough.
 > 
-> ECCB_CTL_SZ_MASK is PPC_BITMASK(4, 7), and ECCB_CTL_SZ_LSH is (63 - 7).
-> So the bitmask is 4 bits wide, and thus sz can be 0 to 15.
-> I think data[] size should be 16.
-
-The bitmask allows more that 8 but the specs says that 1, 2, 4, 8 are the 
-possible value size. So We should be fine.
-
-C.  
-
+> On 11/8/18 3:45 AM, Markus Armbruster wrote:
+> > Cleber Rosa <crosa@redhat.com> writes:
+> > 
+> >> On 11/7/18 1:05 AM, Markus Armbruster wrote:
+> >>> Eduardo Habkost <ehabkost@redhat.com> writes:
+> >>>
+> >>>> The $(SHELLSTATUS) variable requires GNU make >= 4.2, but Travis
+> >>>> seems to provide an older version.  Change the existing rules to
+> >>>> use command output instead of exit code, to make it compatible
+> >>>> with older GNU make versions.
+> >>>>
+> >>>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> >>>> ---
+> >>>> I think that's the cause of the Travis failures.  I have
+> >>>> submitted a test job right now, at:
+> >>>>   https://travis-ci.org/ehabkost/qemu-hacks/jobs/451387962
+> >>>> Let's see if it fixes the issue.
+> >>>> ---
+> >>>>  tests/Makefile.include | 4 ++--
+> >>>>  1 file changed, 2 insertions(+), 2 deletions(-)
+> >>>>
+> >>>> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> >>>> index d2e577eabb..074eece558 100644
+> >>>> --- a/tests/Makefile.include
+> >>>> +++ b/tests/Makefile.include
+> >>>> @@ -913,8 +913,8 @@ TESTS_RESULTS_DIR=$(BUILD_DIR)/tests/results
+> >>>>  # information please refer to "avocado --help".
+> >>>>  AVOCADO_SHOW=none
+> >>>>  
+> >>>> -$(shell $(PYTHON) -c 'import sys; assert sys.version_info >= (3,0)' >/dev/null 2>&1)
+> >>>> -ifeq ($(.SHELLSTATUS),0)
+> >>>> +PYTHON3 = $(shell $(PYTHON) -c 'import sys; print(1 if sys.version_info >= (3, 0) else 0)')
+> >>>> +ifeq ($(PYTHON3), 1)
+> >>>>  $(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
+> >>>>  	$(call quiet-command, \
+> >>>>              $(PYTHON) -m venv --system-site-packages $@, \
+> >>>
+> >>> PEP 394 recommends software distributions install Python 3 into the
+> >>> default path as python3, and users use that instead of python, except
+> >>> for programs that are source compatible with both 2 and 3.  So, is
+> >>> finding out whether python is a Python 3 really appropriate?  Why can't
+> >>> we just use python3 and be done with it?
+> >>>
+> >>
+> >> I mentioned that before, when you pointed out the issue you fix here,
+> >> that configure may be the best place to get the Python version (not only
+> >> the major version) and make it available elsewhere.  Even if not used
+> >> for other purposes, it is IMO important information to show on the
+> >> resulting "configure" output.
+> >>
+> >> I'm sending patches to do that in a few.
+> >>
+> >>> If we can't: isn't this a configure problem?
+> >>>
+> >>
+> >> I believe adhering to PEP394 is a good thing, but even that document
+> >> recognizes that the real world is not a perfect place: "however, end
+> >> users should be aware that python refers to python3 on at least Arch
+> >> Linux".  And it only covers *nix systems, so if we hope to care for
+> >> non-*nix systems, we have to check the Python version manually.
+> >>
+> >> So, I guess the safest approach from QEMU's side is to check for the
+> >> version indeed.
+> > 
+> > If somebody can point to a system people still use where python3 doesn't
+> > get you a Python 3, but python does, catering for such (crappy) systems
+> > in configure makes sense.  Until then, it's a waste of brain waves and
+> > configure run time.
+> > 
+> > PEP 394 mentions Arch Linux.  It's been seven years.  What's the most
+> > recent version of Arch Linux that's still crappy in this regard?
+> > 
 > 
-> Thanks,
-> Laurent
+> I'm not taking the mission of looking for those odd distros, I agree
+> it's not productive.  My point is that the Python version is an
+> important thing to keep track of, specially with the advent of running
+> Python dependent tests on environments we don't fully control.
 > 
+> Supposing the Python version is captured and tracked by configure, then
+> the "python" binary name becomes a non-issue.
+
+I'm not sure I agree with the "is an important thing to keep
+track of" part.  I don't think we'll have any need to keep track
+of the Python version in shell script or makefiles after we start
+requiring Python 3.
+
+Extra cleanups (like moving version checks to ./configure) are
+still welcome, but keep in mind that this will probably be thrown
+away once we drop Python 2 support.
+
+-- 
+Eduardo
