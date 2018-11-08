@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49848)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gKjaV-0007cs-SS
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:39:08 -0500
+	(envelope-from <armbru@redhat.com>) id 1gKjew-00024N-7M
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:43:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gKjaR-0001Ft-Iq
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:39:07 -0500
-Date: Thu, 8 Nov 2018 13:38:50 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20181108133850.4a2de972.cohuck@redhat.com>
-In-Reply-To: <20181105102044.20547-4-david@redhat.com>
-References: <20181105102044.20547-1-david@redhat.com>
-	<20181105102044.20547-4-david@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1gKjev-0007G0-7W
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:43:42 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181031003120.26771-1-ehabkost@redhat.com>
+	<20181031003120.26771-12-ehabkost@redhat.com>
+	<CAFEAcA_ScL828ya7P_5=HMx=vbxo=jK4047nAbmb9Ep=6r=2og@mail.gmail.com>
+	<f1bd429f-198a-ee27-9184-636692332816@redhat.com>
+	<20181106141302.GP12503@habkost.net>
+	<87efbxxw1c.fsf@dusky.pond.sub.org>
+	<8ecdbb0e-aaf8-ddc5-6442-87977585d9d8@redhat.com>
+	<87y3a4ot3g.fsf@dusky.pond.sub.org>
+	<CAAdtpL7Z3EpyD33t0rXS=UGUS2kCnC_f4EzQyOOt9CR_VHOSsg@mail.gmail.com>
+Date: Thu, 08 Nov 2018 13:43:28 +0100
+In-Reply-To: <CAAdtpL7Z3EpyD33t0rXS=UGUS2kCnC_f4EzQyOOt9CR_VHOSsg@mail.gmail.com>
+	("Philippe =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Thu,
+	8 Nov 2018 10:11:38 +0100")
+Message-ID: <8736sboi33.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 03/10] s390x/pci: rename hotplug handler
- callbacks
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] tests: Fix Python 3 detection
+ on older GNU make versions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,21 +33,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>, "Dr .
-	David Alan Gilbert" <dgilbert@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Cleber Rosa <crosa@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-On Mon,  5 Nov 2018 11:20:37 +0100
-David Hildenbrand <david@redhat.com> wrote:
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
-> The callbacks are also called for cold plugged devices. Drop the "hot"
-> to better match the actual callback names.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  hw/s390x/s390-pci-bus.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
+> Hi Markus,
+>
+>
+> Le jeu. 8 nov. 2018 09:46, Markus Armbruster <armbru@redhat.com> a =C3=A9=
+crit :
+>
+>> Cleber Rosa <crosa@redhat.com> writes:
+>>
+>> > On 11/7/18 1:05 AM, Markus Armbruster wrote:
+[...]
+>> >> PEP 394 recommends software distributions install Python 3 into the
+>> >> default path as python3, and users use that instead of python, except
+>> >> for programs that are source compatible with both 2 and 3.  So, is
+>> >> finding out whether python is a Python 3 really appropriate?  Why can=
+'t
+>> >> we just use python3 and be done with it?
+>> >>
+>> >
+>> > I mentioned that before, when you pointed out the issue you fix here,
+>> > that configure may be the best place to get the Python version (not on=
+ly
+>> > the major version) and make it available elsewhere.  Even if not used
+>> > for other purposes, it is IMO important information to show on the
+>> > resulting "configure" output.
+>> >
+>> > I'm sending patches to do that in a few.
+>> >
+>> >> If we can't: isn't this a configure problem?
+>> >>
+>> >
+>> > I believe adhering to PEP394 is a good thing, but even that document
+>> > recognizes that the real world is not a perfect place: "however, end
+>> > users should be aware that python refers to python3 on at least Arch
+>> > Linux".  And it only covers *nix systems, so if we hope to care for
+>> > non-*nix systems, we have to check the Python version manually.
+>> >
+>> > So, I guess the safest approach from QEMU's side is to check for the
+>> > version indeed.
+>>
+>> If somebody can point to a system people still use where python3 doesn't
+>> get you a Python 3, but python does, catering for such (crappy) systems
+>> in configure makes sense.  Until then, it's a waste of brain waves and
+>> configure run time.
+>>
+>> PEP 394 mentions Arch Linux.  It's been seven years.  What's the most
+>> recent version of Arch Linux that's still crappy in this regard?
+>>
+>
+> Arch doesn't provide python2 by default, thus python points to python3.
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+That's non-crappy as long as python3 also exists, as PEP 394 recommends.
+Does it?
 
-[I assume this series will go through the pci tree?]
+> I think what's crappy is scripts expecting python to be python2.
+
+No argument.
