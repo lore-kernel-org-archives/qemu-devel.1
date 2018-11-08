@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58230)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gKk6A-0006Jh-CH
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 08:11:51 -0500
+	(envelope-from <philmd@redhat.com>) id 1gKk76-0008Js-T4
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 08:12:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gKjsD-0006Bn-2u
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:57:25 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:51839)
+	(envelope-from <philmd@redhat.com>) id 1gKk72-00049q-IM
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 08:12:48 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:39870)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1gKjsC-0006BJ-SM
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:57:25 -0500
-Received: by mail-wm1-x344.google.com with SMTP id w7-v6so1162817wmc.1
-	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 04:57:24 -0800 (PST)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gKk71-0003o2-TG
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 08:12:44 -0500
+Received: by mail-wr1-f67.google.com with SMTP id r10-v6so21190493wrv.6
+	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 05:12:39 -0800 (PST)
+References: <20181108122102.9915-1-maozhongyi@cmss.chinamobile.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <1898dc23-c512-88bd-cb73-5a2cffccd176@redhat.com>
+Date: Thu, 8 Nov 2018 14:12:33 +0100
 MIME-Version: 1.0
-References: <20181108125223.30804-1-peter.maydell@linaro.org>
-In-Reply-To: <20181108125223.30804-1-peter.maydell@linaro.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 8 Nov 2018 16:57:11 +0400
-Message-ID: <CAJ+F1CJoi8C+KfhE-0JdZBO9myj9E0922Arv2GNG4yECCbHhkQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] qga: Add multiple include guard to
- guest-agent-core.h
+In-Reply-To: <20181108122102.9915-1-maozhongyi@cmss.chinamobile.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] pci_bridge: fix a typo in comment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,55 +29,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, patches@linaro.org
+To: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com, "qemu-trivial@nongnu.org >> QEMU Trivial" <qemu-trivial@nongnu.org>
 
-Hi
+Cc'ing qemu-trivial@
 
-On Thu, Nov 8, 2018 at 4:52 PM Peter Maydell <peter.maydell@linaro.org> wro=
-te:
->
-> The guest-agent-core.h header was missing the usual guards
-> against multiple inclusion; add them.
->
-> (Spotted by lgtm.com's static analyzer.)
+On 8/11/18 13:21, Mao Zhongyi wrote:
+> Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 
-neat,
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  qga/guest-agent-core.h | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/qga/guest-agent-core.h b/qga/guest-agent-core.h
-> index 6f4d214cb9f..60eae16f27a 100644
-> --- a/qga/guest-agent-core.h
-> +++ b/qga/guest-agent-core.h
-> @@ -10,6 +10,9 @@
->   * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
->   * See the COPYING file in the top-level directory.
->   */
-> +#ifndef GUEST_AGENT_CORE_H
-> +#define GUEST_AGENT_CORE_H
-> +
->  #include "qapi/qmp/dispatch.h"
->  #include "qemu-common.h"
->  #include "qga-qapi-types.h"
-> @@ -46,3 +49,5 @@ int ga_parse_whence(GuestFileWhence *whence, Error **er=
-rp);
->  #ifndef _WIN32
->  void reopen_fd_to_null(int fd);
->  #endif
-> +
-> +#endif /* GUEST_AGENT_CORE_H */
-> --
-> 2.19.1
->
->
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+>   hw/pci/pci_bridge.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
+> index ee9dff2d3a..da8daa3ff2 100644
+> --- a/hw/pci/pci_bridge.c
+> +++ b/hw/pci/pci_bridge.c
+> @@ -310,7 +310,7 @@ void pci_bridge_reset(DeviceState *qdev)
+>   
+>       /*
+>        * the default values for base/limit registers aren't specified
+> -     * in the PCI-to-PCI-bridge spec. So we don't thouch them here.
+> +     * in the PCI-to-PCI-bridge spec. So we don't touch them here.
+>        * Each implementation can override it.
+>        * typical implementation does
+>        * zero base/limit registers or
+> 
