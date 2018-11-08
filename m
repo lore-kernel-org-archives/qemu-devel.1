@@ -1,26 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50856)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gKhtu-0008Ma-Ew
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:51:03 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gKhx4-0003Za-Qk
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:54:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gKhts-0007JM-9I
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:51:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37508)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gKhtr-0007Ii-Sq
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:51:00 -0500
-Date: Thu, 8 Nov 2018 10:50:57 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20181108105057.GG17083@stefanha-x1.localdomain>
-References: <20181105104524.933-1-jusual@mail.ru>
-	<CAFEAcA9fy0xJM18+ktEpvAfZdXpkDLrjy6i1+Y0X1WNkN_jATg@mail.gmail.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gKhx0-0000kE-0x
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:54:17 -0500
+Received: from mail-yw1-f53.google.com ([209.85.161.53]:44607)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gKhwz-0000jt-SQ
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:54:13 -0500
+Received: by mail-yw1-f53.google.com with SMTP id k6-v6so7812855ywa.11
+	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 02:54:13 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Fnm8lRGFTVS/3GuM"
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9fy0xJM18+ktEpvAfZdXpkDLrjy6i1+Y0X1WNkN_jATg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v3] tests/microbit-test: Check nRF51 UART
- functionality
+References: <20180924092120.GA30163@caravaggio>
+	<7c2b477e-bdac-c887-2510-82fe04acdcfe@redhat.com>
+	<87b22690-e39c-3b46-dcb4-f6abc3213142@redhat.com>
+	<CAFEAcA8yHb4MdtsJuXcswQp93DN5tSeN9dn8AWWL9se0DKvdcg@mail.gmail.com>
+	<41ceda53-467e-32a1-8fa6-13f0f9c08ad1@redhat.com>
+	<CAFEAcA9oCs+Y1fnY8dOR16n_Hn7PaHziL7K0HZK6=BAd_Gyecg@mail.gmail.com>
+	<e496287e-f8ba-3608-42e1-efb697cfc784@redhat.com>
+	<20181107154114.GC27585@caravaggio>
+	<dd68d3e8-6448-3a67-3212-fd3d3bfba2e2@redhat.com>
+	<20181107192414.GH12503@habkost.net>
+	<c6bbfeb8-53c5-0e0c-cf36-14e586cfb581@redhat.com>
+	<a0decaa7-d83b-b0ad-60ea-aa0890feb905@redhat.com>
+	<28af4bea-e017-cdab-e5e4-a9809cb2e409@redhat.com>
+In-Reply-To: <28af4bea-e017-cdab-e5e4-a9809cb2e409@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Thu, 8 Nov 2018 11:53:08 +0100
+Message-ID: <CAAdtpL4kzCkJ7MSCyXMwaBoiVfg1XVJH49bucQ-t5Mks85murw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] QEMU and Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,90 +43,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Julia Suvorova <jusual@mail.ru>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Steffen =?iso-8859-1?Q?G=F6rtz?= <mail@steffen-goertz.de>, Thomas Huth <thuth@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Zhong, Yang" <yang.zhong@intel.com>, Peter Maydell <peter.maydell@linaro.org>, Samuel Ortiz <sameo@linux.intel.com>, QEMU Developers <qemu-devel@nongnu.org>
 
+Le jeu. 8 nov. 2018 11:30, Thomas Huth <thuth@redhat.com> a =C3=A9crit :
 
---Fnm8lRGFTVS/3GuM
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Nov 05, 2018 at 05:54:25PM +0000, Peter Maydell wrote:
-> On 5 November 2018 at 10:45, Julia Suvorova <jusual@mail.ru> wrote:
-> > Some functional tests for:
-> >     Basic reception/transmittion
-> >     Suspending
-> >     INTEN* registers
+> On 2018-11-08 10:55, Paolo Bonzini wrote:
+> > On 07/11/2018 20:30, Thomas Huth wrote:
+> >> On 2018-11-07 20:24, Eduardo Habkost wrote:
+> >>> On Wed, Nov 07, 2018 at 06:39:54PM +0100, Paolo Bonzini wrote:
+> >>>> On 07/11/2018 16:41, Samuel Ortiz wrote:
+> >>>>> - The Kconfig parser would be used to generate the equivalent of
+> what we
+> >>>>>   currently have under default-configs/
+> >>
+> >> I think we would still have something like default-configs - but there
+> >> would only be the bare minimum config switches in there, the rest woul=
+d
+> >> be pulled in by dependencies.
 > >
-> > Based-on: <20181031002526.14262-1-contrib@steffen-goertz.de>
-> > Signed-off-by: Julia Suvorova <jusual@mail.ru>
-> > ---
-> > This patch was part of nRF51 UART patchset, but wasn't included in the =
-latest
-> > revision. Due to upcoming loader fixes, we need this test instead of
-> > boot-serial-test, which doesn't support -device loader.
-> >
-> > v3:
-> >     * Fix directory leak [Stefan]
-> >
-> >  tests/microbit-test.c | 109 +++++++++++++++++++++++++++++++++++++++++-
-> >  1 file changed, 107 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/tests/microbit-test.c b/tests/microbit-test.c
-> > index ab319eb466..23d343cfdd 100644
-> > --- a/tests/microbit-test.c
-> > +++ b/tests/microbit-test.c
-> > @@ -21,9 +21,87 @@
-> >  #include "hw/arm/nrf51.h"
-> >  #include "hw/nvram/nrf51_nvm.h"
-> >  #include "hw/gpio/nrf51_gpio.h"
-> > +#include "hw/char/nrf51_uart.h"
-> > +
-> > +#include <sys/socket.h>
-> > +#include <sys/un.h>
-> >
-> >  #define FLASH_SIZE          (256 * NRF51_PAGE_SIZE)
-> >
-> > +static bool wait_for_event(uint32_t event_addr)
-> > +{
-> > +    int i;
-> > +
-> > +    for (i =3D 0; i < 1000; i++) {
-> > +        if (readl(event_addr) =3D=3D 1) {
-> > +            writel(event_addr, 0x00);
-> > +            return true;
-> > +        }
-> > +        g_usleep(10000);
->=20
-> Hmm, is this the right way to wait for a device model?
-> I thought there was a qtest thing to say "advance the
-> time in the QEMU under test" and otherwise its internal
-> clock won't tick.
+> > Yes, in theory default-configs would end up empty, except for possibly
+> > some commented lines to show the "default y" symbols for the target.
+>
+> I think we should enable the machines in the default configs (and maybe
+> optional devices that are not automatically selected by machines), e.g.:
+>
+> CONFIG_I440FX=3Dy
+> CONFIG_Q35=3Dy
+> CONFIG_VIRTPC=3Dy
+> CONFIG_ISAPC=3Dy
+> CONFIG_VIRTIO=3Dy
+> CONFIG_PARALLEL=3Dy
+>
+> In configs/nemu (or configs/lean-kvm or however we'll call it), you will
+> then only have:
+>
+> CONFIG_Q35=3Dy
+> CONFIG_VIRTPC=3Dy
+>
 
-This function is used to wait for QEMU device emulation to report events
-triggered by external I/O (the UNIX domain socket).  I think vm_clock is
-unrelated to this.
+CONFIG_VIRTX86 seems more XXI century.
 
-We could rely on the fact that qtest runs in the main loop where the
-UNIX domain socket is also processed.  In other words, it shouldn't take
-more than a small constant N of event loop iterations (i.e. qtest
-commands) before the UNIX domain socket has been processed and the UART
-updates its event registers.  g_usleep() seems nicer than making that
-assumption though...
-
---Fnm8lRGFTVS/3GuM
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJb5BURAAoJEJykq7OBq3PIX48H/1e7FvJEAHkhaLUwK/dIffdS
-S6Cucx6dFMHyol7QQ856GPauPWHhCylldb/pYa3IJUZwLLEMbSytELXaeydIfdAa
-6B8o5CWG7qi+JRcNKigRBg8U5NLJJAHzQiPqIOqVafemO2HCbWsmegaFTbPze/3Y
-pegKCjgGuYPLIrlxtLDoWGvmYh0sqk7WDYeKc70+xz9kON53zSIVzDQKcdfRcohD
-HYRIeV64rOELLONtNAPsJEaotHCmIJLYUpTUCYal/A2pGOMssCmK6CMvT0153DyD
-ojJoQ28hesvAtzcyUXZDQLw1AZEiBJJRYQ5/2Bw7VCO1TDcDWKqR+BRCoF0Jc28=
-=9vBe
------END PGP SIGNATURE-----
-
---Fnm8lRGFTVS/3GuM--
+CONFIG_VIRTIO=3Dy
+>
+> Would that make sense?
+>
+>  Thomas
+>
+>
