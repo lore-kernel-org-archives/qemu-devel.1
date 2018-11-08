@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51354)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gKYrR-000795-I7
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 20:11:54 -0500
+	(envelope-from <crosa@redhat.com>) id 1gKYtJ-0001pC-9H
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 20:13:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gKYrQ-0002lW-Dy
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 20:11:53 -0500
-Received: from ozlabs.org ([2401:3900:2:1::2]:54161)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1gKYrP-0002id-H0
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 20:11:52 -0500
-Date: Thu, 8 Nov 2018 12:09:51 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181108010951.GK5575@umbus.fritz.box>
-References: <20181030122134.11055.15711.stgit@pasha-VirtualBox>
-	<2024ff61-7744-3ea5-f017-a48340fd5c36@ilande.co.uk>
+	(envelope-from <crosa@redhat.com>) id 1gKYtB-00049x-Uj
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 20:13:46 -0500
+References: <20181031003120.26771-1-ehabkost@redhat.com>
+	<20181031003120.26771-12-ehabkost@redhat.com>
+	<CAFEAcA_ScL828ya7P_5=HMx=vbxo=jK4047nAbmb9Ep=6r=2og@mail.gmail.com>
+	<f1bd429f-198a-ee27-9184-636692332816@redhat.com>
+	<20181106141302.GP12503@habkost.net>
+	<87efbxxw1c.fsf@dusky.pond.sub.org>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <8ecdbb0e-aaf8-ddc5-6442-87977585d9d8@redhat.com>
+Date: Wed, 7 Nov 2018 20:13:19 -0500
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="mGCtrYeZ202LI9ZG"
-Content-Disposition: inline
-In-Reply-To: <2024ff61-7744-3ea5-f017-a48340fd5c36@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCH] This patch fixes processing of rfi
- instructions in icount mode.
+In-Reply-To: <87efbxxw1c.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] tests: Fix Python 3 detection
+ on older GNU make versions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,98 +29,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, agraf@suse.de
+To: Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 
 
---mGCtrYeZ202LI9ZG
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 07, 2018 at 06:25:19PM +0000, Mark Cave-Ayland wrote:
-> On 30/10/2018 12:21, Pavel Dovgalyuk wrote:
->=20
-> > From: Maria Klimushenkova <maria.klimushenkova@ispras.ru>
-> >=20
-> > In this mode writing to interrupt/peripheral state is controlled
-> > by can_do_io flag. This flag must be set explicitly before helper
-> > function invocation.
-> >=20
-> > Signed-off-by: Maria Klimushenkova <maria.klimushenkova@ispras.ru>
-> > Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-> > ---
-> >  target/ppc/translate.c |   12 ++++++++++++
-> >  1 file changed, 12 insertions(+)
-> >=20
-> > diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> > index 987ce6e..980862c 100644
-> > --- a/target/ppc/translate.c
-> > +++ b/target/ppc/translate.c
-> > @@ -3878,9 +3878,15 @@ static void gen_rfi(DisasContext *ctx)
-> >      }
-> >      /* Restore CPU state */
-> >      CHK_SV;
-> > +    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-> > +        gen_io_start();
-> > +    }
-> >      gen_update_cfar(ctx, ctx->base.pc_next - 4);
-> >      gen_helper_rfi(cpu_env);
-> >      gen_sync_exception(ctx);
-> > +    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-> > +        gen_io_end();
-> > +    }
-> >  #endif
-> >  }
-> > =20
-> > @@ -3892,9 +3898,15 @@ static void gen_rfid(DisasContext *ctx)
-> >  #else
-> >      /* Restore CPU state */
-> >      CHK_SV;
-> > +    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-> > +        gen_io_start();
-> > +    }
-> >      gen_update_cfar(ctx, ctx->base.pc_next - 4);
-> >      gen_helper_rfid(cpu_env);
-> >      gen_sync_exception(ctx);
-> > +    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-> > +        gen_io_end();
-> > +    }
-> >  #endif
-> >  }
->=20
-> I've given this patch a spin on top of ppc-for-3.1 and it allows my test =
-images to
-> boot with icount enabled without asserting, so:
->=20
-> Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+On 11/7/18 1:05 AM, Markus Armbruster wrote:
+> Eduardo Habkost <ehabkost@redhat.com> writes:
+> 
+>> The $(SHELLSTATUS) variable requires GNU make >= 4.2, but Travis
+>> seems to provide an older version.  Change the existing rules to
+>> use command output instead of exit code, to make it compatible
+>> with older GNU make versions.
+>>
+>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+>> ---
+>> I think that's the cause of the Travis failures.  I have
+>> submitted a test job right now, at:
+>>   https://travis-ci.org/ehabkost/qemu-hacks/jobs/451387962
+>> Let's see if it fixes the issue.
+>> ---
+>>  tests/Makefile.include | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/tests/Makefile.include b/tests/Makefile.include
+>> index d2e577eabb..074eece558 100644
+>> --- a/tests/Makefile.include
+>> +++ b/tests/Makefile.include
+>> @@ -913,8 +913,8 @@ TESTS_RESULTS_DIR=$(BUILD_DIR)/tests/results
+>>  # information please refer to "avocado --help".
+>>  AVOCADO_SHOW=none
+>>  
+>> -$(shell $(PYTHON) -c 'import sys; assert sys.version_info >= (3,0)' >/dev/null 2>&1)
+>> -ifeq ($(.SHELLSTATUS),0)
+>> +PYTHON3 = $(shell $(PYTHON) -c 'import sys; print(1 if sys.version_info >= (3, 0) else 0)')
+>> +ifeq ($(PYTHON3), 1)
+>>  $(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
+>>  	$(call quiet-command, \
+>>              $(PYTHON) -m venv --system-site-packages $@, \
+> 
+> PEP 394 recommends software distributions install Python 3 into the
+> default path as python3, and users use that instead of python, except
+> for programs that are source compatible with both 2 and 3.  So, is
+> finding out whether python is a Python 3 really appropriate?  Why can't
+> we just use python3 and be done with it?
+> 
 
-Good enough for me.  Applied to ppc-for-3.1.
+I mentioned that before, when you pointed out the issue you fix here,
+that configure may be the best place to get the Python version (not only
+the major version) and make it available elsewhere.  Even if not used
+for other purposes, it is IMO important information to show on the
+resulting "configure" output.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+I'm sending patches to do that in a few.
 
---mGCtrYeZ202LI9ZG
-Content-Type: application/pgp-signature; name="signature.asc"
+> If we can't: isn't this a configure problem?
+> 
 
------BEGIN PGP SIGNATURE-----
+I believe adhering to PEP394 is a good thing, but even that document
+recognizes that the real world is not a perfect place: "however, end
+users should be aware that python refers to python3 on at least Arch
+Linux".  And it only covers *nix systems, so if we hope to care for
+non-*nix systems, we have to check the Python version manually.
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlvjjN8ACgkQbDjKyiDZ
-s5JA2xAAgP2BleAgMa5KRvELmt7aZdUc0lvjwgImb4EHuzq0/NlZHcRAB3vLhGy2
-SHNcrkJlvPwl+DLiulzL2IvZslBL6QpRfbjb9EVdkk5LX3SuuzFQU0HFxBtrfvEX
-nEIwP2QQrTocUP55F3YPd0cjny9rvlfhPh/1l4T58BWU5clRyoJYzfcYZBIaoNuy
-E+BA+BlOzm152w1VyArrkZQdYN9w8IsO5QOC0Zh5bqCI2Ziu0rWXeJjLvX8a46rk
-SrK3LxSla6FHdJKF41nNMlgtFqaOe1sNKDTx6lQNNK+a5VpQBXq3wJdMQj2gyR9M
-cvUFtREkP5l2iLBKpSP5gb5jEyMptTza5DMls/BLtiQZR15ledgKmJCl87A8SuRa
-/TAQDab9DV/uWxJO6+YeIJY53YIa3RIHXCxn65Czd+2sg4zcuhg2UjZ6b1C0YLse
-BPqIrfeYFCjNO/P//4Jiu0w4TKcdQeHjEpjuDfeyvtAxkBb0yAekTTkgI2YDE3hs
-B+IVAvCUJmnoJD2L1iVPhMfWax7tTFicB+Yq3uBkul2McGTYHer59+KKOFhlH/6f
-sObnUhwePVcVTkAkFtSFofKOwLv/eNcxn/CroWq2qkVDZKHbq63Uli1manSSjUpW
-/fg4wtP3l9SaTl8mTrPLoZAcIe/wo6h6/VhM44a9u3jRxfmKI3g=
-=IwD9
------END PGP SIGNATURE-----
+So, I guess the safest approach from QEMU's side is to check for the
+version indeed.
 
---mGCtrYeZ202LI9ZG--
+- Cleber.
