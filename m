@@ -1,43 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57986)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1gKWqb-0005h2-Pj
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 18:02:54 -0500
+	(envelope-from <liran.alon@oracle.com>) id 1gKXxI-0007QX-F4
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 19:13:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1gKWqW-0001eB-1H
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 18:02:51 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43768
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <liran.alon@oracle.com>) id 1gKXxA-0005YK-CC
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 19:13:49 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:54974)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
-	id 1gKWqV-0001O9-NX
-	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 18:02:47 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wA7MsVb0042937
-	for <qemu-devel@nongnu.org>; Wed, 7 Nov 2018 18:02:23 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2nm8gqsse3-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 07 Nov 2018 18:02:22 -0500
-Received: from localhost
-	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
-	Wed, 7 Nov 2018 23:02:21 -0000
-Reply-To: pmorel@linux.ibm.com
-References: <1541154621-22423-1-git-send-email-pmorel@linux.ibm.com>
-	<1541154621-22423-6-git-send-email-pmorel@linux.ibm.com>
-	<20181107143944.69cad7ef.cohuck@redhat.com>
-From: Pierre Morel <pmorel@linux.ibm.com>
-Date: Thu, 8 Nov 2018 00:02:13 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181107143944.69cad7ef.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <29a2919c-908c-0ef8-9e04-63d9e9284700@linux.ibm.com>
+	(Exim 4.71) (envelope-from <liran.alon@oracle.com>)
+	id 1gKXxA-0005W8-0i
+	for qemu-devel@nongnu.org; Wed, 07 Nov 2018 19:13:44 -0500
+Content-Type: text/plain;
+	charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+From: Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <1C803EF0-9E1B-4E1B-A4DD-4BE788A7A1FF@oracle.com>
+Date: Thu, 8 Nov 2018 02:13:31 +0200
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 5/5] s390x/vfio: ap: Implementing AP
- Queue Interrupt Control
+Message-Id: <DF5EC0F1-BA8D-4B85-BB1A-B22234235FBA@oracle.com>
+References: <CALMp9eQ5zWxb2N9fyYz=WcQshwk0L6qQ4D6L6+p_dzMo4H=txA@mail.gmail.com>
+	<20181102034649.43559-1-liran.alon@oracle.com>
+	<CALMp9eRk=a1FEyr78NRGBBZ2iFCo5s2n5N=bM4zR=YF56oob3A@mail.gmail.com>
+	<1C803EF0-9E1B-4E1B-A4DD-4BE788A7A1FF@oracle.com>
+Subject: Re: [Qemu-devel] [QEMU PATCH v2 0/2]: KVM: i386: Add support for
+ save and restore nested state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,316 +32,192 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: borntraeger@de.ibm.com, agraf@suse.de, rth@twiddle.net, david@redhat.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, peter.maydell@linaro.org, pbonzini@redhat.com, mst@redhat.com, eric.auger@redhat.com, akrowiak@linux.ibm.com, pasic@linux.ibm.com
+To: Jim Mattson <jmattson@google.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, kvm list <kvm@vger.kernel.org>, mtosatti@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org
 
-On 07/11/2018 14:39, Cornelia Huck wrote:
-> On Fri,  2 Nov 2018 11:30:21 +0100
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
->=20
->> We intercept the PQAP(AQIC) instruction and transform
->> the guest's AQIC command parameters for the host AQIC
->> parameters.
->>
->> Doing this we use the standard adapter interface to provide
->> the adapter NIB, indicator and ISC.
->>
->> We define a new structure, APQueue to keep track of
->> the route and indicator address and we add an array of
->> AP Queues in the VFIOAPDevice.
->>
->> We call the VFIO ioctl to set or clear the interruption
->> according to the "i" bit of the parameter.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   hw/vfio/ap.c                 | 92 ++++++++++++++++++++++++++++++++++=
-+-
->>   include/hw/s390x/ap-device.h | 46 ++++++++++++++++++
->>   2 files changed, 137 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
->> index d8d9cadc46..67a46e163e 100644
->> --- a/hw/vfio/ap.c
->> +++ b/hw/vfio/ap.c
->> @@ -27,17 +27,90 @@
->>   #include "sysemu/sysemu.h"
->>   #include "hw/s390x/ap-bridge.h"
->>   #include "exec/address-spaces.h"
->> +#include "hw/s390x/s390_flic.h"
->> +#include "hw/s390x/css.h"
->>  =20
->>   #define VFIO_AP_DEVICE_TYPE      "vfio-ap"
->>  =20
->>   typedef struct VFIOAPDevice {
->>       APDevice apdev;
->>       VFIODevice vdev;
->> +    QTAILQ_ENTRY(VFIOAPDevice) sibling;
->> +    APQueue apq[MAX_AP][MAX_DOMAIN];
->>   } VFIOAPDevice;
->>  =20
->>   #define VFIO_AP_DEVICE(obj) \
->>           OBJECT_CHECK(VFIOAPDevice, (obj), VFIO_AP_DEVICE_TYPE)
->>  =20
->> +VFIOAPDevice *vfio_apdev;
->> +static APDevice *matrix;
->=20
-> Why do you need those variables? Can't you get the target device in a
-> different way?
->=20
->> +
->> +static int ap_aqic(CPUS390XState *env)
->=20
-> <bikeshed>I think ap_pqap_aqic would be slightly better.</bikeshed>
-
-agreed.
-
->=20
->> +{
->> +    struct pqap_cmd cmd =3D reg2cmd(env->regs[0]);
->> +    struct ap_status status =3D reg2status(env->regs[1]);
->=20
-> I don't really like those reg2<whatever> helpers; they obfuscate things
-> IMO.
->=20
-
-I agree, I will use masks and uint64_t/uint32_t.
-
-
-> Also: These are internal structs and not copied from Linux, right? Then
-> they should be CamelCase.
->=20
->> +    uint64_t guest_nib =3D env->regs[2];
->=20
-> Another point: What about endianness? Even though this is kvm-only, I
-> would like an emulation of an instruction to be endian-clean. (Maybe it
-> also needs a different split?)
-
-OK, I will look at this
-
->=20
->> +    struct vfio_ap_aqic param =3D {};
->> +    int retval;
->> +    VFIODevice *vdev;
->> +    VFIOAPDevice *ap_vdev;
->> +    APQueue *apq;
->> +
->> +    ap_vdev =3D DO_UPCAST(VFIOAPDevice, apdev, matrix);
->> +    apq =3D &ap_vdev->apq[cmd.apid][cmd.apqi];
->> +    vdev =3D &ap_vdev->vdev;
->> +
->> +    if (status.irq) {
->> +        if (apq->nib) {
->> +            status.rc =3D AP_RC_BAD_STATE;
->> +            goto error;
->> +        }
->> +    } else {
->> +        if (!apq->nib) {
->> +            status.rc =3D AP_RC_BAD_STATE;
->> +            goto error;
->> +        }
->> +    }
->=20
-> Maybe
->      if (!!status.irq =3D=3D !!apq->nib) {
->          status.rc =3D AP_RC_BAD_STATE;
->          goto error;
->      }
-> ?
-
-:)
-
->=20
->> +    if (!guest_nib) {
->> +        status.rc =3D AP_RC_INVALID_ADDR;
->> +        goto error;
->> +    }
->> +
->> +    apq->routes.adapter.adapter_id =3D css_get_adapter_id(
->> +                                       CSS_IO_ADAPTER_AP, status.isc)=
-;
->> +
->> +    apq->nib =3D get_indicator(ldq_p(&guest_nib), 8);
->> +
->> +    retval =3D map_indicator(&apq->routes.adapter, apq->nib);
->> +    if (retval) {
->> +        status.rc =3D AP_RC_INVALID_ADDR;
->> +        env->regs[1] =3D status2reg(status);
->=20
-> I do not like the backwards conversion macros, either :(
->=20
->> +        goto error;
->> +    }
->> +
->> +    param.cmd =3D env->regs[0];
->> +    param.status =3D env->regs[1];
->> +    param.nib =3D env->regs[2];
->> +    param.adapter_id =3D apq->routes.adapter.adapter_id;
->> +    param.argsz =3D sizeof(param);
->> +
->> +    retval =3D ioctl(vdev->fd, VFIO_AP_SET_IRQ, &param);
->> +    status =3D reg2status(param.status);
->> +    if (retval) {
->> +        goto err_ioctl;
->> +    }
->> +
->> +    env->regs[1] =3D param.status;
->> +
->> +    return 0;
->> +err_ioctl:
->> +    release_indicator(&apq->routes.adapter, apq->nib);
->> +    apq->nib =3D NULL;
->> +error:
->> +    env->regs[1] =3D status2reg(status);
->> +    return 0;
->> +}
->> +
->>   /*
->>    * ap_pqap
->>    * @env: environment pointing to registers
->> @@ -45,7 +118,20 @@ typedef struct VFIOAPDevice {
->>    */
->>   int ap_pqap(CPUS390XState *env)
->>   {
->> -    return -PGM_OPERATION;
->> +    struct pqap_cmd cmd =3D reg2cmd(env->regs[0]);
->=20
-> Dito on the macro.
->=20
->> +    int cc =3D 0;
->> +
->> +    switch (cmd.fc) {
->=20
-> This probably needs some endian handling as well.
->=20
->> +    case AQIC:
->=20
-> What about calling this PQAP_AQCI?
-
-I can use it , however the function itself is called ap_pqap()
-so we already know it is about PQAP...
-
-
->=20
->> +        if (!s390_has_feat(S390_FEAT_AP_QUEUE_INTERRUPT_CONTROL)) {
->> +            return -PGM_OPERATION;
->> +        }
->> +        cc =3D ap_aqic(env);
->> +        break;
->> +    default:
->> +        return -PGM_OPERATION;
->> +    }
->> +    return cc;
->>   }
->>  =20
->>   static void vfio_ap_compute_needs_reset(VFIODevice *vdev)
->> @@ -119,6 +205,9 @@ static void vfio_ap_realize(DeviceState *dev, Erro=
-r **errp)
->>           goto out_get_dev_err;
->>       }
->>  =20
->> +    matrix =3D apdev;
->=20
-> Huh?
-
-OK, sorry, I can do better. (I hope)
-
->=20
->> +    css_register_io_adapters(CSS_IO_ADAPTER_AP, true, false,
->> +                             0, &error_abort);
->>       return;
->>  =20
->>   out_get_dev_err:
->> @@ -135,6 +224,7 @@ static void vfio_ap_unrealize(DeviceState *dev, Er=
-ror **errp)
->>       VFIOGroup *group =3D vapdev->vdev.group;
->>  =20
->>       vfio_ap_put_device(vapdev);
->> +    matrix =3D NULL;
->>       vfio_put_group(group);
->>   }
->>  =20
->> diff --git a/include/hw/s390x/ap-device.h b/include/hw/s390x/ap-device=
-.h
->> index a83ea096c7..bc2b7bcd8e 100644
->> --- a/include/hw/s390x/ap-device.h
->> +++ b/include/hw/s390x/ap-device.h
->> @@ -28,4 +28,50 @@ typedef struct APDevice {
->>   #include "cpu.h"
->>   int ap_pqap(CPUS390XState *env);
->>  =20
->> +#define MAX_AP 256
->> +#define MAX_DOMAIN 256
->> +
->> +#include "hw/s390x/s390_flic.h"
->> +#include "hw/s390x/css.h"
->> +typedef struct APQueue {
->> +    uint32_t apid;
->> +    uint32_t apqi;
->> +    AdapterRoutes routes;
->> +    IndAddr *nib;
->> +} APQueue;
->> +
->> +/* AP PQAP commands definitions */
->> +#define AQIC 0x03
->> +
->> +struct pqap_cmd {
->> +    uint32_t unused;
->> +    uint8_t fc;
->> +    unsigned t:1;
->> +    unsigned reserved:7;
->=20
-> It is better to make this an uint8_t and define an accessor for the 't'
-> bit.
-
-OK
-
->=20
->> +    uint8_t apid;
->> +    uint8_t apqi;
->> +};
->=20
-> Also, please use typedef and CamelCase :)
-
-right, more camels
-
->=20
->> +/* AP status returned by the AP PQAP commands */
->> +#define AP_RC_APQN_INVALID 0x01
->> +#define AP_RC_INVALID_ADDR 0x06
->> +#define AP_RC_BAD_STATE    0x07
->> +
->> +struct ap_status {
->> +    uint16_t pad;
->> +    unsigned irq:1;
->> +    unsigned pad2:15;
->> +    unsigned e:1;
->> +    unsigned r:1;
->> +    unsigned f:1;
->> +    unsigned unused:4;
->> +    unsigned i:1;
->> +    unsigned char rc;
->> +    unsigned reserved:13;
->> +    unsigned isc:3;
->> +};
->=20
-> Dito on bitfields and CamelCase :)
-
-OK again, even more Camels
+Ping on my last reply.
+I would like to reach to an agreement on how v3 should look like before =
+just implementing what I think is right.
 
 Thanks,
-Pierre
+-Liran
 
+> On 3 Nov 2018, at 4:02, Liran Alon <liran.alon@oracle.com> wrote:
 >=20
->> +
->> +#define reg2cmd(reg) (*(struct pqap_cmd *)&(reg))
->> +#define status2reg(status) (*((uint64_t *)&status))
->> +#define reg2status(reg) (*(struct ap_status *)&(reg))
->> +
->>   #endif /* HW_S390X_AP_DEVICE_H */
 >=20
-
-
---=20
-Pierre Morel
-Linux/KVM/QEMU in B=C3=B6blingen - Germany
+>=20
+>> On 2 Nov 2018, at 18:39, Jim Mattson <jmattson@google.com> wrote:
+>>=20
+>> On Thu, Nov 1, 2018 at 8:46 PM, Liran Alon <liran.alon@oracle.com> =
+wrote:
+>>=20
+>>> Hmm this makes sense.
+>>>=20
+>>> This means though that the patch I have submitted here isn't good =
+enough.
+>>> My patch currently assumes that when it attempts to get nested state =
+from KVM,
+>>> QEMU should always set nested_state->size to max size supported by =
+KVM as received
+>>> from kvm_check_extension(s, KVM_CAP_NESTED_STATE);
+>>> (See kvm_get_nested_state() introduced on my patch).
+>>> This indeed won't allow migration from host with new KVM to host =
+with old KVM if
+>>> nested_state size was enlarged between these KVM versions.
+>>> Which is obviously an issue.
+>>>=20
+>>> Jim, I think that my confusion was created from the fact that there =
+is no clear documentation
+>>> on how KVM_{GET,SET}_NESTED_STATE should be changed once we will =
+need to add more state to
+>>> nested_state in future KVM versions. I think it's worth adding that =
+to IOCTLs documentation.
+>>=20
+>> The nested state IOCTLs aren't unique in this respect. Any changes to
+>> the state saved by any of this whole family of state-saving ioctls
+>> require opt-in from userspace.
+>>=20
+>>> For example, let's assume we have a new KVM_CAP_NESTED_STATE_V2.
+>>> In this scenario, does kvm_check_extension(s, KVM_CAP_NESTED_STATE) =
+still returns the
+>>> size of nested_state v1 and kvm_check_extension(s, =
+KVM_CAP_NESTED_STATE_V2) returns the
+>>> size of the nested_state v2?
+>>=20
+>> Hmm...I don't recall kvm_check_extension(s, KVM_CAP_NESTED_STATE)
+>> being part of my original design. The way I had envisioned it,
+>> the set of capabilities enabled by userspace would be sufficient to
+>> infer the maximum data size.
+>=20
+> If the set of capabilities should be sufficient to infer the max size =
+of nested_state,
+> why did we code kvm_vm_ioctl_check_extension() such that on =
+KVM_CAP_NESTED_STATE
+> it returns the max size of nested_state?
+>=20
+>>=20
+>> If, for example, we add a field to stash the time remaining for the
+>> VMCS12 VMX preemption timer, then presumably, userspace will enable =
+it
+>> by enabling KVM_CAP_SAVE_VMX_PREEMPTION_TIMER (or something like
+>> that), and then userspace will know that the maximum nested state =
+data
+>> is 4 bytes larger.
+>=20
+> In that case, why did we defined struct kvm_nested_state to hold a =
+blob of data[] instead
+> of separating the blob into well defined blobs? (e.g. Currently one =
+blob for vmcs12 and another one for shadow vmcs12).
+> Then when we add a new component which is opt-in by a new KVM_CAP, we =
+will add another well defined blob
+> to struct kvm_nested_state.
+>=20
+> I think this is important because it allows us to specify in =
+nested_state->flags which components are saved
+> and create multiple VMState subsections with needed() methods for the =
+various saved components.
+>=20
+> Thus allowing for example to easily still migrate from a new QEMU =
+which does stash the time remaining for the VMCS12 VMX preemption timer
+> to an old QEMU which doesn=E2=80=99t stash it in case =
+nested_state->flags specify that this component is not saved (Because L1 =
+don=E2=80=99t use VMX preemption timer for example).
+>=20
+> This seems to behave more nicely with how QEMU migration mechanism is =
+defined and the purpose of VMState subsections.
+>=20
+> In addition, if we will define struct kvm_nested_state like this, we =
+will also not need the =E2=80=9Csize=E2=80=9D field which needs to be =
+carefully handled to avoid buffer overflows.
+> (We will just define large enough buffers (with padding) for each =
+opaque component such as vmcs12 and shadow vmcs12).
+>=20
+>>=20
+>>> Also note that the approach suggested by Jim requires mgmt-layer at =
+dest
+>>> to be able to specify to QEMU which KVM_CAP_NESTED_STATE_V* =
+capabilities it should enable on kvm_init().
+>>> When we know we are migrating from a host which supports v1 to a =
+host which supports v2,
+>>> we should make sure that dest QEMU doesn't enable =
+KVM_CAP_NESTED_STATE_V2.
+>>> However, when we are just launching a new machine on the host which =
+supports v2, we do want
+>>> QEMU to enable KVM_CAP_NESTED_STATE_V2 enabled for that VM.
+>>=20
+>> No, no, no. Even when launching a new VM on a host that supports v2,
+>> you cannot enable v2 until you have passed rollback horizon. Should
+>> you decide to roll back the kernel with v2 support, you must be able
+>> to move that new VM to a host with an old kernel.
+>=20
+> If we use VMState subsections as I described above, QEMU should be =
+able to know which components of nested_state are
+> actively saved by KVM and therefore are *required* to be restored on =
+dest host in order to migrate without guest issues after it is resumed =
+on dest.
+> Therefore, still allowing migration from new hosts to old hosts in =
+case guest didn=E2=80=99t enter a state which makes new saved state =
+required in order
+> for migration to succeed.
+>=20
+> If the mechanism will work like this, nested_state KVM_CAPs enabled on =
+QEMU launch are only used to inform KVM which
+> struct kvm_nested_state is used by userspace. Not what is actually =
+sent as part of migration stream.
+>=20
+> What are your thoughts on this?
+>=20
+> -Liran
+>=20
+>>=20
+>>> But on second thought, I'm not sure that this is the right approach =
+as-well.
+>>> We don't really want the used version of nested_state to be =
+determined on kvm_init().
+>>> * On source QEMU, we actually want to determine it when preparing =
+for migration based
+>>> on to the support given by our destination host. If it's an old =
+host, we would like to
+>>> save an old version nested_state and if it's a new host, we will =
+like to save our newest
+>>> supported nested_state.
+>>> * On dest QEMU, we will want to just be able to set received =
+nested_state in KVM.
+>>>=20
+>>> Therefore, I don't think that we want this versioning to be based on =
+KVM_CAP at all.
+>>> It seems that we would want the process to behave as follows:
+>>> 1) Mgmt-layer at dest queries dest host max supported nested_state =
+size.
+>>>  (Which should be returned from =
+kvm_check_extension(KVM_CAP_NESTED_STATE))
+>>> 2) Mgmt-layer at source initiate migration to dest with requesting =
+QEMU to send nested_state
+>>>  matching dest max supported nested_state size.
+>>>  When saving nested state using KVM_GET_NESTED_STATE IOCTL, QEMU =
+will specify in nested_state->size
+>>>  the *requested* size to be saved and KVM should be able to save =
+only the information which matches
+>>>  the version that worked with that size.
+>>> 3) After some sanity checks on received migration stream, dest host =
+use KVM_SET_NESTED_STATE IOCTL.
+>>>  This IOCTL should deduce which information it should deploy based =
+on given nested_state->size.
+>>>=20
+>>> This also makes me wonder if it's not just nicer to use =
+nested_state->flags to specify which
+>>> information is actually present on nested_state instead of managing =
+versioning with nested_state->size.
+>>=20
+>> Yes, you can use nested_state->flags to determine what the data
+>> payload is, but you cannot enable new flags unless userspace opts in.
+>> This is just like KVM_CAP_EXCEPTION_PAYLOAD for kvm_vcpu_events. The
+>> flag, KVM_VCPUEVENT_VALID_PAYLOAD, can only be set on the saved vcpu
+>> events if userspace has opted-in with KVM_CAP_EXCEPTION_PAYLOAD. This
+>> is because older kernels will reject kvm_vcpu_events that have the
+>> KVM_VCPUEVENT_VALID_PAYLOAD flag set.
+>>=20
+>> You don't need a new KVM_CAP_NESTED_STATE_V2 ioctl. You just need
+>> buy-in from userspace for any new data payload. Explicitly =
+enumerating
+>> the payload components in the flags field makes perfect sense.
