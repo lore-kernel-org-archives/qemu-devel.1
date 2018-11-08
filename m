@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45909)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gKnRX-0004Ct-Di
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:46:08 -0500
+	(envelope-from <bounces@canonical.com>) id 1gKnRX-0004Cu-Dk
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:46:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gKnRT-00068t-Vq
+	(envelope-from <bounces@canonical.com>) id 1gKnRU-000695-6y
 	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:46:07 -0500
-Received: from indium.canonical.com ([91.189.90.7]:54572)
+Received: from indium.canonical.com ([91.189.90.7]:54570)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gKnRT-000649-JG
+	id 1gKnRT-000648-Kt
 	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:46:03 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gKnRL-0006FU-Up
-	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 16:45:56 +0000
+	id 1gKnRL-0006Fw-MT
+	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 16:45:55 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 69CCA2E80D9
-	for <qemu-devel@nongnu.org>; Thu,  8 Nov 2018 16:45:55 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id DAB202E80CF
+	for <qemu-devel@nongnu.org>; Thu,  8 Nov 2018 16:45:54 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 08 Nov 2018 16:30:19 -0000
+Date: Thu, 08 Nov 2018 16:29:21 -0000
 From: tlloss <1795527@bugs.launchpad.net>
 Reply-To: Bug 1795527 <1795527@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <153843648798.30392.6657333416089253911.malonedeb@soybean.canonical.com>
-Message-Id: <154169461992.24870.5840266451167954711.malone@chaenomeles.canonical.com>
+Message-Id: <154169456138.25418.3840731863975105383.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1795527] Re: Malformed audio and video output
  stuttering after upgrade to QEMU 3.0
@@ -39,9 +39,116 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Attachment added: "[ORIGINAL ISSUE LOG]"
-   https://bugs.launchpad.net/qemu/+bug/1795527/+attachment/5210397/+files/=
-qemu_bisect_original_issue.txt
+GIT BISECT RESULTS
+
+So, I managed to run the git bisection and ended up having to do it
+twice: once looking for the first commit that broke audio (turns out a
+major total breakage occurs before the original diagnosed issue
+appeared), then to spot the origin of the main issue (I ignored the
+other form of malfunctioning, marking it as 'good').
+
+---AUDIO BREAKAGE BISECT LOG---
+
+git bisect start
+# bad: [53a19a9a5f9811a911e9b69ef36afb0d66b5d85c] s390x/tcg: always enable =
+AFP for linux-user
+git bisect bad 53a19a9a5f9811a911e9b69ef36afb0d66b5d85c
+# good: [4743c23509a51bd4ee85cc272287a41917d1be35] Update version for v2.12=
+.0 release
+git bisect good 4743c23509a51bd4ee85cc272287a41917d1be35
+# bad: [7f9ddf64d5fe5bfaa91ae0ec52217d86f4d86452] target/arm: Implement SVE=
+ Floating Point Accumulating Reduction Group
+git bisect bad 7f9ddf64d5fe5bfaa91ae0ec52217d86f4d86452
+# good: [cc9743c236cce8a35449e3ef67140287b68bb705] iscsi: Query and save de=
+vice designator when opening
+git bisect good cc9743c236cce8a35449e3ef67140287b68bb705
+# good: [1e05197f24c49d52f339de9053bb1d17082f1be3] translate-all: iterate o=
+ver TBs in a page with PAGE_FOR_EACH_TB
+git bisect good 1e05197f24c49d52f339de9053bb1d17082f1be3
+# good: [2aeba0d007d33efa12a6339bb140aa634e0d52eb] target/arm: Strict align=
+ment for ARMv6-M and ARMv8-M Baseline
+git bisect good 2aeba0d007d33efa12a6339bb140aa634e0d52eb
+# bad: [00928a421d47f49691cace1207481b7aad31b1f1] Merge remote-tracking bra=
+nch 'remotes/pmaydell/tags/pull-target-arm-20180626' into staging
+git bisect bad 00928a421d47f49691cace1207481b7aad31b1f1
+# bad: [35e238c9330669882487f9929e0aa97900431853] Merge remote-tracking bra=
+nch 'remotes/kraxel/tags/audio-20180625-pull-request' into staging
+git bisect bad 35e238c9330669882487f9929e0aa97900431853
+# good: [c52e53f429aa562539f5da2e7c21c66c6f9a8a16] Merge remote-tracking br=
+anch 'remotes/dgibson/tags/ppc-for-3.0-20180622' into staging
+git bisect good c52e53f429aa562539f5da2e7c21c66c6f9a8a16
+# good: [be25fcc4d2faeb3ffa8db813272963bae659c4c2] MAINTAINERS: Update QAPI=
+ stanza for commit fb0bc835e56
+git bisect good be25fcc4d2faeb3ffa8db813272963bae659c4c2
+# good: [518d23a976b7dad77cfef3e41c3531ac89229b00] Merge remote-tracking br=
+anch 'remotes/ehabkost/tags/python-next-pull-request' into staging
+git bisect good 518d23a976b7dad77cfef3e41c3531ac89229b00
+# bad: [8ced0669237b2bbedac3e4ce6fcf7aaaafaae663] audio/hda: tweak timer ad=
+just logic
+git bisect bad 8ced0669237b2bbedac3e4ce6fcf7aaaafaae663
+# bad: [0a373bb310c1533e24aa5e3edbf206507fb342ea] audio/hda: turn some dpri=
+ntfs into trace points
+git bisect bad 0a373bb310c1533e24aa5e3edbf206507fb342ea
+# bad: [280c1e1cdb24d80ecdfcdfc679ccc5e8ed7af45d] audio/hda: create millise=
+cond timers that handle IO
+git bisect bad 280c1e1cdb24d80ecdfcdfc679ccc5e8ed7af45d
+# first bad commit: [280c1e1cdb24d80ecdfcdfc679ccc5e8ed7af45d] audio/hda: c=
+reate millisecond timers that handle IO
+
+---END---
+
+
+---ORIGINAL ISSUE BISECT LOG---
+
+git bisect start
+# bad: [35e238c9330669882487f9929e0aa97900431853] Merge remote-tracking bra=
+nch 'remotes/kraxel/tags/audio-20180625-pull-request' into staging
+git bisect bad 35e238c9330669882487f9929e0aa97900431853
+# good: [c52e53f429aa562539f5da2e7c21c66c6f9a8a16] Merge remote-tracking br=
+anch 'remotes/dgibson/tags/ppc-for-3.0-20180622' into staging
+git bisect good c52e53f429aa562539f5da2e7c21c66c6f9a8a16
+# good: [cc2ae7c9de14efd72c6205825eb7cd980ac09c11] target/arm: Introduce AR=
+M_FEATURE_M_MAIN
+git bisect good cc2ae7c9de14efd72c6205825eb7cd980ac09c11
+# good: [be25fcc4d2faeb3ffa8db813272963bae659c4c2] MAINTAINERS: Update QAPI=
+ stanza for commit fb0bc835e56
+git bisect good be25fcc4d2faeb3ffa8db813272963bae659c4c2
+# good: [518d23a976b7dad77cfef3e41c3531ac89229b00] Merge remote-tracking br=
+anch 'remotes/ehabkost/tags/python-next-pull-request' into staging
+git bisect good 518d23a976b7dad77cfef3e41c3531ac89229b00
+# good: [8ced0669237b2bbedac3e4ce6fcf7aaaafaae663] audio/hda: tweak timer a=
+djust logic
+git bisect good 8ced0669237b2bbedac3e4ce6fcf7aaaafaae663
+# bad: [bc753dc09ff33d99bc9004d7286c50de1d5bece6] audio/hda: enable new tim=
+er code by default.
+git bisect bad bc753dc09ff33d99bc9004d7286c50de1d5bece6
+# good: [4501ee16c76e89e0a2b2beb95f3b93f965997391] audio/hda: detect output=
+ buffer overruns
+git bisect good 4501ee16c76e89e0a2b2beb95f3b93f965997391
+# first bad commit: [bc753dc09ff33d99bc9004d7286c50de1d5bece6] audio/hda: e=
+nable new timer code by default.
+
+---END---
+
+
+I'm attaching both of them, just in case someone wants to replay them.
+
+One thing that I'd like to point out is that the thing I called "total brea=
+kage" looks extremely similar to what happens when I set a 2.12 machine on =
+a 3.0 QEMU: complete distortion.
+Do I have to study it more in order to see if it really produces the same e=
+ffect?
+
+
+Anyway, I'm sorry if such a simple matter took this long but, during one of=
+ the initial bisections, an accidental misconfiguration in the testing envi=
+ronment completely wasted the guest I was using (permanent Windows startup =
+failure-level of wasted...).
+I had to recover a few things and reinstall as many.
+
+** Attachment added: "[AUDIO BREAKAGE LOG]"
+   https://bugs.launchpad.net/qemu/+bug/1795527/+attachment/5210396/+files/=
+qemu_bisect_total_audio_breakage.txt
 
 -- =
 
