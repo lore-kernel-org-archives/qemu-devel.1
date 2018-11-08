@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43575)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gKjFQ-0005KA-Og
+	(envelope-from <dgibson@ozlabs.org>) id 1gKjFQ-0005K9-OK
 	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:17:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gKjFM-0003zL-Or
+	(envelope-from <dgibson@ozlabs.org>) id 1gKjFN-0003zx-3u
 	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:17:20 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu,  8 Nov 2018 23:16:37 +1100
-Message-Id: <20181108121646.26173-14-david@gibson.dropbear.id.au>
+Date: Thu,  8 Nov 2018 23:16:41 +1100
+Message-Id: <20181108121646.26173-18-david@gibson.dropbear.id.au>
 In-Reply-To: <20181108121646.26173-1-david@gibson.dropbear.id.au>
 References: <20181108121646.26173-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 13/22] spapr_pci: convert g_malloc() to g_new()
+Subject: [Qemu-devel] [PULL 17/22] ppc/pnv: check size before data buffer
+ access
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,36 +24,44 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, agraf@suse.de, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, agraf@suse.de, lvivier@redhat.com, Prasad J Pandit <pjp@fedoraproject.org>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Greg Kurz <groug@kaod.org>
+From: Prasad J Pandit <pjp@fedoraproject.org>
 
-When allocating an array, it is a recommended coding practice to call
-g_new(FooType, n) instead of g_malloc(n * sizeof(FooType)) because
-it takes care to avoid overflow when calculating the size of the
-allocated block and it returns FooType *, which allows the compiler
-to perform type checking.
+While performing PowerNV memory r/w operations, the access length
+'sz' could exceed the data[4] buffer size. Add check to avoid OOB
+access.
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reported-by: Moguofang <moguofang@huawei.com>
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_pci.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/ppc/pnv_lpc.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index 58afa46204..2374d55fc1 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -1882,7 +1882,7 @@ static int spapr_pci_pre_save(void *opaque)
-     if (!sphb->msi_devs_num) {
-         return 0;
-     }
--    sphb->msi_devs =3D g_malloc(sphb->msi_devs_num * sizeof(spapr_pci_ms=
-i_mig));
-+    sphb->msi_devs =3D g_new(spapr_pci_msi_mig, sphb->msi_devs_num);
+diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
+index d7721320a2..172a915cfc 100644
+--- a/hw/ppc/pnv_lpc.c
++++ b/hw/ppc/pnv_lpc.c
+@@ -155,9 +155,15 @@ static void pnv_lpc_do_eccb(PnvLpcController *lpc, u=
+int64_t cmd)
+     /* XXX Check for magic bits at the top, addr size etc... */
+     unsigned int sz =3D (cmd & ECCB_CTL_SZ_MASK) >> ECCB_CTL_SZ_LSH;
+     uint32_t opb_addr =3D cmd & ECCB_CTL_ADDR_MASK;
+-    uint8_t data[4];
++    uint8_t data[8];
+     bool success;
 =20
-     g_hash_table_iter_init(&iter, sphb->msi);
-     for (i =3D 0; g_hash_table_iter_next(&iter, &key, &value); ++i) {
++    if (sz > sizeof(data)) {
++        qemu_log_mask(LOG_GUEST_ERROR,
++            "ECCB: invalid operation at @0x%08x size %d\n", opb_addr, sz=
+);
++        return;
++    }
++
+     if (cmd & ECCB_CTL_READ) {
+         success =3D opb_read(lpc, opb_addr, data, sz);
+         if (success) {
 --=20
 2.19.1
