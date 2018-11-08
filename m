@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44894)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=8435f2cfc=Paul.Durrant@citrix.com>)
-	id 1gKksJ-0004vw-T0
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 09:01:36 -0500
+	(envelope-from <asanchez@kryptoslogic.com>) id 1gKiE5-0000yz-Lk
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 06:11:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=8435f2cfc=Paul.Durrant@citrix.com>)
-	id 1gKksG-0005Nu-EG
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 09:01:35 -0500
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Thu, 8 Nov 2018 14:00:31 +0000
-Message-ID: <24d1c322d3ac4ee2af32efacb486e608@AMSPEX02CL03.citrite.net>
-References: <154115285434.11300.8459925605672823399.stgit@dhcp-3-135.uk.xensource.com>
-	<20181102110412.GD7521@dhcp-200-186.str.redhat.com>
-	<152b8d37c7d54de687f4ced536ba6a10@AMSPEX02CL03.citrite.net>
-	<871s7z5xg4.fsf@dusky.pond.sub.org>
-In-Reply-To: <871s7z5xg4.fsf@dusky.pond.sub.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <asanchez@kryptoslogic.com>) id 1gKiE0-0007Ea-Nn
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 06:11:53 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42006)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <asanchez@kryptoslogic.com>)
+	id 1gKiDy-0007Ci-Mx
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 06:11:48 -0500
+Received: by mail-wr1-x444.google.com with SMTP id y15-v6so20778993wru.9
+	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 03:11:45 -0800 (PST)
+From: Alexandro Sanchez Bach <asanchez@kryptoslogic.com>
+Date: Thu,  8 Nov 2018 03:11:24 -0800
+Message-Id: <20181108111124.5851-1-asanchez@kryptoslogic.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] xen_disk qdevification
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] hax: Support for Linux hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,98 +26,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Markus Armbruster' <armbru@redhat.com>, 'Kevin Wolf' <kwolf@redhat.com>, Anthony Perard <anthony.perard@citrix.com>
-Cc: Tim Smith <tim.smith@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
+To: qemu-devel@nongnu.org
+Cc: yu.ning@intel.com, Alexandro Sanchez Bach <asanchez@kryptoslogic.com>
 
-> -----Original Message-----
-> From: Markus Armbruster [mailto:armbru@redhat.com]
-> Sent: 05 November 2018 15:58
-> To: Paul Durrant <Paul.Durrant@citrix.com>
-> Cc: 'Kevin Wolf' <kwolf@redhat.com>; Tim Smith <tim.smith@citrix.com>;
-> Stefano Stabellini <sstabellini@kernel.org>; qemu-block@nongnu.org; qemu-
-> devel@nongnu.org; Max Reitz <mreitz@redhat.com>; Anthony Perard
-> <anthony.perard@citrix.com>; xen-devel@lists.xenproject.org
-> Subject: Re: [Qemu-devel] xen_disk qdevification
->=20
-> Paul Durrant <Paul.Durrant@citrix.com> writes:
->=20
-> >> -----Original Message-----
-> >> From: Kevin Wolf [mailto:kwolf@redhat.com]
-> >> Sent: 02 November 2018 11:04
-> >> To: Tim Smith <tim.smith@citrix.com>
-> >> Cc: xen-devel@lists.xenproject.org; qemu-devel@nongnu.org; qemu-
-> >> block@nongnu.org; Anthony Perard <anthony.perard@citrix.com>; Paul
-> Durrant
-> >> <Paul.Durrant@citrix.com>; Stefano Stabellini <sstabellini@kernel.org>=
-;
-> >> Max Reitz <mreitz@redhat.com>; armbru@redhat.com
-> >> Subject: xen_disk qdevification (was: [PATCH 0/3] Performance
-> improvements
-> >> for xen_disk v2)
-> >>
-> >> Am 02.11.2018 um 11:00 hat Tim Smith geschrieben:
-> >> > A series of performance improvements for disks using the Xen PV ring=
-.
-> >> >
-> >> > These have had fairly extensive testing.
-> >> >
-> >> > The batching and latency improvements together boost the throughput
-> >> > of small reads and writes by two to six percent (measured using fio
-> >> > in the guest)
-> >> >
-> >> > Avoiding repeated calls to posix_memalign() reduced the dirty heap
-> >> > from 25MB to 5MB in the case of a single datapath process while also
-> >> > improving performance.
-> >> >
-> >> > v2 removes some checkpatch complaints and fixes the CCs
-> >>
-> >> Completely unrelated, but since you're the first person touching
-> >> xen_disk in a while, you're my victim:
-> >>
-> >> At KVM Forum we discussed sending a patch to deprecate xen_disk becaus=
-e
-> >> after all those years, it still hasn't been converted to qdev. Markus
-> is
-> >> currently fixing some other not yet qdevified block device, but after
-> >> that xen_disk will be the only one left.
-> >>
-> >> A while ago, a downstream patch review found out that there are some
-> QMP
-> >> commands that would immediately crash if a xen_disk device were presen=
-t
-> >> because of the lacking qdevification. This is not the code quality
-> >> standard I envision for QEMU. It's time for non-qdev devices to go.
-> >>
-> >> So if you guys are still interested in the device, could someone pleas=
-e
-> >> finally look into converting it?
-> >>
-> >
-> > I have a patch series to do exactly this. It's somewhat involved as I
-> > need to convert the whole PV backend infrastructure. I will try to
-> > rebase and clean up my series a.s.a.p.
->=20
-> Awesome!  Please coordinate with Anthony Prerard to avoid duplicating
-> work if you haven't done so already.
+Signed-off-by: Alexandro Sanchez Bach <asanchez@kryptoslogic.com>
+---
+ target/i386/Makefile.objs                 |  5 ++++-
+ target/i386/hax-i386.h                    | 10 +++++++++-
+ target/i386/{hax-darwin.c => hax-posix.c} |  0
+ target/i386/{hax-darwin.h => hax-posix.h} |  0
+ 4 files changed, 13 insertions(+), 2 deletions(-)
+ rename target/i386/{hax-darwin.c => hax-posix.c} (100%)
+ rename target/i386/{hax-darwin.h => hax-posix.h} (100%)
 
-I've come across a bit of a problem that I'm not sure how best to deal with=
- and so am looking for some advice.
-
-I now have a qdevified PV disk backend but I can't bring it up because it f=
-ails to acquire a write lock on the qcow2 it is pointing at. This is becaus=
-e there is also an emulated IDE drive using the same qcow2. This does not a=
-ppear to be a problem for the non-qdev xen-disk, presumably because it is n=
-ot opening the qcow2 until the emulated device is unplugged and I don't rea=
-lly want to introduce similar hackery in my new backend (i.e. I want it to =
-attach to its drive, and hence open the qcow2, during realize).
-
-So, I'm not sure what to do... It is not a problem that both a PV backend a=
-nd an emulated device are using the same qcow2 because they will never actu=
-ally operate simultaneously so is there any way I can bypass the qcow2 lock=
- check when I create the drive for my PV backend? (BTW I tried re-using the=
- drive created for the emulated device, but that doesn't work because there=
- is a check if a drive is already attached to something).
-
-Any ideas?
-
-  Paul
+diff --git a/target/i386/Makefile.objs b/target/i386/Makefile.objs
+index 04678f5503..be36d31d23 100644
+--- a/target/i386/Makefile.objs
++++ b/target/i386/Makefile.objs
+@@ -12,8 +12,11 @@ obj-$(call lnot,$(CONFIG_SEV)) += sev-stub.o
+ ifdef CONFIG_WIN32
+ obj-$(CONFIG_HAX) += hax-all.o hax-mem.o hax-windows.o
+ endif
++ifdef CONFIG_LINUX
++obj-$(CONFIG_HAX) += hax-all.o hax-mem.o hax-posix.o
++endif
+ ifdef CONFIG_DARWIN
+-obj-$(CONFIG_HAX) += hax-all.o hax-mem.o hax-darwin.o
++obj-$(CONFIG_HAX) += hax-all.o hax-mem.o hax-posix.o
+ obj-$(CONFIG_HVF) += hvf/
+ endif
+ obj-$(CONFIG_WHPX) += whpx-all.o
+diff --git a/target/i386/hax-i386.h b/target/i386/hax-i386.h
+index 6abc156f88..f87a64c9df 100644
+--- a/target/i386/hax-i386.h
++++ b/target/i386/hax-i386.h
+@@ -20,6 +20,10 @@
+ typedef int hax_fd;
+ #endif
+ 
++#ifdef CONFIG_LINUX
++typedef int hax_fd;
++#endif
++
+ #ifdef CONFIG_WIN32
+ typedef HANDLE hax_fd;
+ #endif
+@@ -83,7 +87,11 @@ void hax_memory_init(void);
+ 
+ 
+ #ifdef CONFIG_DARWIN
+-#include "target/i386/hax-darwin.h"
++#include "target/i386/hax-posix.h"
++#endif
++
++#ifdef CONFIG_LINUX
++#include "target/i386/hax-posix.h"
+ #endif
+ 
+ #ifdef CONFIG_WIN32
+diff --git a/target/i386/hax-darwin.c b/target/i386/hax-posix.c
+similarity index 100%
+rename from target/i386/hax-darwin.c
+rename to target/i386/hax-posix.c
+diff --git a/target/i386/hax-darwin.h b/target/i386/hax-posix.h
+similarity index 100%
+rename from target/i386/hax-darwin.h
+rename to target/i386/hax-posix.h
+-- 
+2.19.1
