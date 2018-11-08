@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53461)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gKnm0-0006nH-Qa
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 12:07:19 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gKnof-00021U-8m
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 12:10:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gKnlu-00051X-Cr
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 12:07:13 -0500
-Received: from indium.canonical.com ([91.189.90.7]:39964)
+	(envelope-from <richard.henderson@linaro.org>) id 1gKnoc-0007Nq-J6
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 12:10:01 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:34412)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gKnls-0004yD-Sl
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 12:07:09 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gKnlo-0004Jo-5L
-	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 17:07:04 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BEDB32E80CE
-	for <qemu-devel@nongnu.org>; Thu,  8 Nov 2018 17:07:03 +0000 (UTC)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gKnoa-0007KM-Js
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 12:09:57 -0500
+Received: by mail-wm1-x341.google.com with SMTP id f1-v6so1992556wmg.1
+	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 09:09:50 -0800 (PST)
+References: <20181108163329.19940-1-alex.bennee@linaro.org>
+	<20181108163329.19940-2-alex.bennee@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <3027e46a-42b2-4c5c-eaec-ce9caa64ecc0@linaro.org>
+Date: Thu, 8 Nov 2018 18:09:46 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 08 Nov 2018 16:50:50 -0000
-From: Thomas Huth <1734810@bugs.launchpad.net>
-Reply-To: Bug 1734810 <1734810@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151184788907.20350.3674834740850334109.malonedeb@chaenomeles.canonical.com>
-Message-Id: <154169585102.24447.3807402176416309095.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1734810] Re: Windows guest virtual PC running
- abnormally slow
+In-Reply-To: <20181108163329.19940-2-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/6] target/arm64: properly handle DBGVR
+ RESS bits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,57 +32,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 
-And for the CLI parameters, you could run this in a console window for
-example, after starting your guest:
+On 11/8/18 5:33 PM, Alex Bennée wrote:
+> -        .bvr = addr
+> +        .bvr = sextract64(addr, 52, 53)
 
-ps aux | grep qemu
+I think you meant sextract64(addr, 0, 53).
+What you wrote *should* have asserted, since 52+53 > 64.
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1734810
-
-Title:
-  Windows guest virtual PC running abnormally slow
-
-Status in Boxes:
-  New
-Status in KVM:
-  New
-Status in libvirt:
-  New
-Status in QEMU:
-  Invalid
-Status in spice related packages:
-  Confirmed
-Status in gnome-boxes package in Ubuntu:
-  Confirmed
-
-Bug description:
-  Guest systems running Windows 10 in a virtualized environment run
-  unacceptably slow, with no option in Boxes to offer the virtual
-  machine more (or less) cores from my physical CPU.
-
-  ProblemType: Bug
-  DistroRelease: Ubuntu 17.10
-  Package: gnome-boxes 3.26.1-1
-  ProcVersionSignature: Ubuntu 4.13.0-17.20-lowlatency 4.13.8
-  Uname: Linux 4.13.0-17-lowlatency x86_64
-  ApportVersion: 2.20.7-0ubuntu3.5
-  Architecture: amd64
-  CurrentDesktop: ubuntu:GNOME
-  Date: Tue Nov 28 00:37:11 2017
-  ProcEnviron:
-   TERM=3Dxterm-256color
-   PATH=3D(custom, no user)
-   XDG_RUNTIME_DIR=3D<set>
-   LANG=3Den_US.UTF-8
-   SHELL=3D/bin/bash
-  SourcePackage: gnome-boxes
-  UpgradeStatus: No upgrade log present (probably fresh install)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/gnome-boxes/+bug/1734810/+subscriptions
+r~
