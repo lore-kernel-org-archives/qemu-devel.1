@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39715)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39616)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1gKhRA-0004Tw-EN
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:21:21 -0500
+	(envelope-from <gengdongjiu@huawei.com>) id 1gKhRB-0004BB-79
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:21:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1gKhOo-000232-RK
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:18:56 -0500
+	(envelope-from <gengdongjiu@huawei.com>) id 1gKhOo-00022Z-Ld
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:18:55 -0500
 From: Dongjiu Geng <gengdongjiu@huawei.com>
-Date: Thu, 8 Nov 2018 02:15:44 -0800
-Message-ID: <1541672153-15529-2-git-send-email-gengdongjiu@huawei.com>
+Date: Thu, 8 Nov 2018 02:15:45 -0800
+Message-ID: <1541672153-15529-3-git-send-email-gengdongjiu@huawei.com>
 In-Reply-To: <1541672153-15529-1-git-send-email-gengdongjiu@huawei.com>
 References: <1541672153-15529-1-git-send-email-gengdongjiu@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v15 01/10] ACPI: add some GHES structures and
- macros definition
+Subject: [Qemu-devel] [PATCH v15 02/10] acpi: add build_append_ghes_notify()
+ helper for Hardware Error Notification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,99 +24,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: imammedo@redhat.com, mst@redhat.com, peter.maydell@linaro.org, pbonzini@redhat.com, mtosatti@redhat.com, rth@twiddle.net, ehabkost@redhat.com, kvm@vger.kernel.org, shannon.zhaosl@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, gengdongjiu@huawei.com
 
-Add Generic Error Status Block structures and some macros
-definitions, which is referred to the ACPI 4.0 or ACPI 6.2. The
-HEST table generation and CPER record will use them.
+It will help to add Hardware Error Notification to ACPI tables
+without using packed C structures and avoid endianness
+issues as API doesn't need explicit conversion.
 
 Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-
-Change since v14:
-Thanks Igor's review and comments
-1. Update spec comment for AcpiHestNotifyType
-2. drop () for the macro definition
-
-Change since v13:
-1. Clean the new added structures and macros definition
-
-Change since v12:
-1. Address Igor's comments to to get rid of most structures and use
-build_append_int_noprefix() API to compose whole error status block
-and APEI table in [1]
-
-[1]: https://lkml.org/lkml/2017/8/29/187
 ---
- include/hw/acpi/acpi-defs.h | 52 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 52 insertions(+)
+ hw/acpi/aml-build.c         | 22 ++++++++++++++++++++++
+ include/hw/acpi/aml-build.h |  8 ++++++++
+ 2 files changed, 30 insertions(+)
 
-diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-index af8e023..f85cf98 100644
---- a/include/hw/acpi/acpi-defs.h
-+++ b/include/hw/acpi/acpi-defs.h
-@@ -226,6 +226,25 @@ typedef struct AcpiMultipleApicTable AcpiMultipleApicTable;
- #define ACPI_APIC_RESERVED              16   /* 16 and greater are reserved */
+diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+index 1e43cd7..4210c36 100644
+--- a/hw/acpi/aml-build.c
++++ b/hw/acpi/aml-build.c
+@@ -274,6 +274,28 @@ void build_append_gas(GArray *table, AmlAddressSpace as,
+     build_append_int_noprefix(table, address, 8);
+ }
  
++/* Hardware Error Notification
++ * ACPI 4.0: 17.3.2.7 Hardware Error Notification
++ */
++void build_append_ghes_notify(GArray *table, const uint8_t type,
++                              uint8_t length, uint16_t config_write_enable,
++                              uint32_t poll_interval, uint32_t vector,
++                              uint32_t polling_threshold_value,
++                              uint32_t polling_threshold_window,
++                              uint32_t error_threshold_value,
++                              uint32_t error_threshold_window)
++{
++        build_append_int_noprefix(table, type, 1); /* type */
++        build_append_int_noprefix(table, length, 1);
++        build_append_int_noprefix(table, config_write_enable, 2);
++        build_append_int_noprefix(table, poll_interval, 4);
++        build_append_int_noprefix(table, vector, 4);
++        build_append_int_noprefix(table, polling_threshold_value, 4);
++        build_append_int_noprefix(table, polling_threshold_window, 4);
++        build_append_int_noprefix(table, error_threshold_value, 4);
++        build_append_int_noprefix(table, error_threshold_window, 4);
++}
++
  /*
-+ * Values for Hardware Error Notification Type field
-+ */
-+enum AcpiHestNotifyType {
-+    ACPI_HEST_NOTIFY_POLLED = 0,
-+    ACPI_HEST_NOTIFY_EXTERNAL = 1,
-+    ACPI_HEST_NOTIFY_LOCAL = 2,
-+    ACPI_HEST_NOTIFY_SCI = 3,
-+    ACPI_HEST_NOTIFY_NMI = 4,
-+    ACPI_HEST_NOTIFY_CMCI = 5,  /* ACPI 5.0: 18.3.2.7, Table 18-290 */
-+    ACPI_HEST_NOTIFY_MCE = 6,   /* ACPI 5.0: 18.3.2.7, Table 18-290 */
-+    ACPI_HEST_NOTIFY_GPIO = 7,  /* ACPI 6.0: 18.3.2.7, Table 18-332 */
-+    ACPI_HEST_NOTIFY_SEA = 8,   /* ACPI 6.1: 18.3.2.9, Table 18-345 */
-+    ACPI_HEST_NOTIFY_SEI = 9,   /* ACPI 6.1: 18.3.2.9, Table 18-345 */
-+    ACPI_HEST_NOTIFY_GSIV = 10, /* ACPI 6.1: 18.3.2.9, Table 18-345 */
-+    ACPI_HEST_NOTIFY_SDEI = 11, /* ACPI 6.2: 18.3.2.9, Table 18-383 */
-+    ACPI_HEST_NOTIFY_RESERVED = 12 /* 12 and greater are reserved */
-+};
-+
-+/*
-  * MADT sub-structures (Follow MULTIPLE_APIC_DESCRIPTION_TABLE)
-  */
- #define ACPI_SUB_HEADER_DEF   /* Common ACPI sub-structure header */\
-@@ -402,6 +421,39 @@ struct AcpiSystemResourceAffinityTable {
- } QEMU_PACKED;
- typedef struct AcpiSystemResourceAffinityTable AcpiSystemResourceAffinityTable;
+  * Build NAME(XXXX, 0x00000000) where 0x00000000 is encoded as a dword,
+  * and return the offset to 0x00000000 for runtime patching.
+diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+index 6c36903..a005052 100644
+--- a/include/hw/acpi/aml-build.h
++++ b/include/hw/acpi/aml-build.h
+@@ -409,6 +409,14 @@ build_append_gas_from_struct(GArray *table, const struct AcpiGenericAddress *s)
+                      s->access_width, s->address);
+ }
  
-+/*
-+ * Generic Error Status Block
-+ */
-+struct AcpiGenericErrorStatus {
-+    /* It is a bitmask composed of ACPI_GEBS_xxx macros */
-+    uint32_t block_status;
-+    uint32_t raw_data_offset;
-+    uint32_t raw_data_length;
-+    uint32_t data_length;
-+    uint32_t error_severity;
-+} QEMU_PACKED;
-+typedef struct AcpiGenericErrorStatus AcpiGenericErrorStatus;
++void build_append_ghes_notify(GArray *table, const uint8_t type,
++                              uint8_t length, uint16_t config_write_enable,
++                              uint32_t poll_interval, uint32_t vector,
++                              uint32_t polling_threshold_value,
++                              uint32_t polling_threshold_window,
++                              uint32_t error_threshold_value,
++                              uint32_t error_threshold_window);
 +
-+/*
-+ * Masks for block_status flags above
-+ */
-+#define ACPI_GEBS_UNCORRECTABLE         1
-+
-+/*
-+ * Values for error_severity field above
-+ */
-+enum AcpiGenericErrorSeverity {
-+    ACPI_CPER_SEV_RECOVERABLE,
-+    ACPI_CPER_SEV_FATAL,
-+    ACPI_CPER_SEV_CORRECTED,
-+    ACPI_CPER_SEV_NONE,
-+};
-+
-+/*
-+ * Generic Hardware Error Source version 2
-+ */
-+#define ACPI_HEST_SOURCE_GENERIC_ERROR_V2    10
-+
- #define ACPI_SRAT_PROCESSOR_APIC     0
- #define ACPI_SRAT_MEMORY             1
- #define ACPI_SRAT_PROCESSOR_x2APIC   2
+ void build_srat_memory(AcpiSratMemoryAffinity *numamem, uint64_t base,
+                        uint64_t len, int node, MemoryAffinityFlags flags);
+ 
 -- 
 1.8.3.1
