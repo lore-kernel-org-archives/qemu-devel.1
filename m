@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59571)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gKlWZ-00045c-71
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 09:43:16 -0500
+	(envelope-from <thuth@redhat.com>) id 1gKlXX-0005yM-0z
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 09:44:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gKlWY-0003on-E5
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 09:43:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:8261)
+	(envelope-from <thuth@redhat.com>) id 1gKlXQ-0004bV-TI
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 09:44:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58668)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1gKlWY-0003jy-1b
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 09:43:10 -0500
-References: <20181108143306.20187-1-liq3ea@163.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <39d3e8a4-4166-996a-8f62-89dc0dcebe6c@redhat.com>
-Date: Thu, 8 Nov 2018 15:43:06 +0100
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gKlXM-0004Xy-ML
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 09:44:02 -0500
+References: <20181108134139.31666-1-peter.maydell@linaro.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <e261d51b-1dc7-95d1-c056-a7961048a2ac@redhat.com>
+Date: Thu, 8 Nov 2018 15:43:54 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181108143306.20187-1-liq3ea@163.com>
+In-Reply-To: <20181108134139.31666-1-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw: set_netdev: make peers an empty
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: list myself as maintainer for
+ various Arm boards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,38 +28,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@163.com>, stefanha@redhat.com, marcandre.lureau@redhat.com
-Cc: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Markus Armbruster <armbru@redhat.com>, patches@linaro.org, Beniamino Galvani <b.galvani@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Rob Herring <robh@kernel.org>, Antony Pavlov <antonynpavlov@gmail.com>, Jan Kiszka <jan.kiszka@web.de>, Andrzej Zaborowski <balrogg@gmail.com>
 
-On 08/11/2018 15:33, Li Qiang wrote:
-> Though there is no inconsistency between 'queues'
-> and 'peers[i]' currently, this makes the 'peers[i] == NULL'
-> meaningful.
-> 
-> Signed-off-by: Li Qiang <liq3ea@163.com>
+On 2018-11-08 14:41, Peter Maydell wrote:
+> In practice for most of the more-or-less orphan Arm board models,
+> I will review patches and put them in via the target-arm tree.
+> So list myself as an "Odd Fixes" status maintainer for them.
+>=20
+> This commit downgrades these boards to "Odd Fixes":
+>  * Allwinner-A10
+>  * Exynos
+>  * Calxeda Highbank
+>  * Canon DIGIC
+>  * Musicpal
+>  * nSeries
+>  * Palm
+>  * PXA2xx
+>=20
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  hw/core/qdev-properties-system.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-system.c
-> index 8b22fb51c9..74004a2f33 100644
-> --- a/hw/core/qdev-properties-system.c
-> +++ b/hw/core/qdev-properties-system.c
-> @@ -257,7 +257,7 @@ static void set_netdev(Object *obj, Visitor *v, const char *name,
->      Property *prop = opaque;
->      NICPeers *peers_ptr = qdev_get_prop_ptr(dev, prop);
->      NetClientState **ncs = peers_ptr->ncs;
-> -    NetClientState *peers[MAX_QUEUE_NUM];
-> +    NetClientState *peers[MAX_QUEUE_NUM] = {NULL};
->      Error *local_err = NULL;
->      int queues, err = 0, i = 0;
->      char *str;
-> 
 
-peers[] is initialized by qemu_find_net_clients_excep() until "queues"
-entries. So between 0 and "queues" peers[] cannot be NULL.
+FWIW:
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-IMHO, you should remove the "if (peers[i] == NULL)" block instead.
+While you're at it, could you maybe also add an entry for the
+"mcimx6ul-evk", "mcimx7d-sabre", "raspi2", "raspi3", "sabrelite",
+"vexpress-a15", "vexpress-a9" and "virt" boards? Or shall I assemble a
+patch?
 
-Thanks,
-Laurent
+ Thomas
