@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41503)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gKoce-0008C6-W5
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 13:01:41 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gKoec-0001G2-4D
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 13:03:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gKocP-0007DJ-F8
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 13:01:32 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:40547)
+	(envelope-from <peter.maydell@linaro.org>) id 1gKoeY-0001Zy-36
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 13:03:40 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:44599)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gKocL-00070W-Nn
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 13:01:23 -0500
-Received: by mail-ot1-x343.google.com with SMTP id s5so5025113oth.7
-	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 10:01:16 -0800 (PST)
+	id 1gKoeX-0001Y5-LG
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 13:03:37 -0500
+Received: by mail-ot1-x341.google.com with SMTP id z33so18861375otz.11
+	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 10:03:34 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAP+75-WTmYUAWgOZ7cf2jsaqvQVv+atBzatUgDOhudz1kqPg4g@mail.gmail.com>
-References: <20181108143422.15955-1-philmd@redhat.com>
-	<20181108171716.GN12503@habkost.net>
-	<CAFEAcA-t5qOHngv9ciTkuakmT84N7QV4c0=TYMD-NUgh5uT_DA@mail.gmail.com>
-	<CAP+75-WTmYUAWgOZ7cf2jsaqvQVv+atBzatUgDOhudz1kqPg4g@mail.gmail.com>
+In-Reply-To: <25d95354-e536-dff6-0936-7e8d951108a5@mvista.com>
+References: <20181107155405.24013-1-minyard@acm.org>
+	<20181107155405.24013-4-minyard@acm.org>
+	<CAFEAcA9hp0VzN484uugfc4kzh3pSDMn3PU+ozfc_XPT5P-QsBw@mail.gmail.com>
+	<25d95354-e536-dff6-0936-7e8d951108a5@mvista.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 8 Nov 2018 18:00:54 +0000
-Message-ID: <CAFEAcA8XK51Uun6MUQDSOMAN7aCQ0TtKzQBWtVXtBx9=A5yECw@mail.gmail.com>
+Date: Thu, 8 Nov 2018 18:03:13 +0000
+Message-ID: <CAFEAcA9D4=KgmGqJbUceD_bxO11CBTDH7G3-54kn25nfi1XPJA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] scripts: Remove unused python imports
+Subject: Re: [Qemu-devel] [PATCH 3/3] i2c: Add vmstate handling to the smbus
+ eeprom
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,31 +32,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: Corey Minyard <cminyard@mvista.com>
+Cc: Corey Minyard <minyard@acm.org>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
 
-On 8 November 2018 at 17:41, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
-> wrote:
-> On Thu, Nov 8, 2018 at 6:25 PM Peter Maydell <peter.maydell@linaro.org> w=
-rote:
->> On 8 November 2018 at 17:17, Eduardo Habkost <ehabkost@redhat.com> wrote=
-:
->> > On Thu, Nov 08, 2018 at 03:34:22PM +0100, Philippe Mathieu-Daud=C3=A9 =
-wrote:
->> >> Reported-by: LGTM code review
->> >> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->> >
->> > Queueing for 3.2, thanks.
+On 8 November 2018 at 17:58, Corey Minyard <cminyard@mvista.com> wrote:
+> On 11/8/18 8:08 AM, Peter Maydell wrote:
+>> This doesn't do anything for migration of the actual data contents.
+>> The current users of this device (hw/arm/aspeed.c and the
+>> smbus_eeprom_init() function) doesn't do anything
+>> to migrate the contents. For that matter, "user of the device
+>> passes a pointer to a random lump of memory via a device property"
+>> is a bit funky as an interface. The device should allocate its
+>> own memory and migrate it, and the user should just pass the
+>> initial required contents (default being "zero-initialize",
+>> which is what everybody except the mips_fulong2e, mips_malta
+>> and sam460ex want).
+
+> I debated on this, and it depends on what the eeprom is used for.  If
+> it's a DRAM eeprom, it shouldn't need to be transferred.
+
+It's guest-visible data; the guest can write it and read it back.
+So it needs to be migrated. Otherwise behaviour after migration
+will not be the same as if the guest had never migrated.
+
+>> Does this also break migration from an old QEMU to a new one?
+>> (For Aspeed that's probably ok, but we should flag it up in the
+>> commit message if so. x86 uses need care...)
 >>
->> Next release after 3.1 will be 4.0, by the way -- we're moving
->> to "bump major version every year".
->
-> So major versions help to remember the 12th anniversary of QEMU?
->
-> Why not start at 19.0?
+> There is no transfer before, so I don't see why it would break anything.
+> Am I missing something?
 
-We had this discussion when we agreed on the new version policy;
-I don't want to reopen it.
+I forget what the behaviour is where the source QEMU didn't
+have a vmstate at all but the destination QEMU does expect
+one. David can remind me...
 
 thanks
--- PMM
+- PMM
