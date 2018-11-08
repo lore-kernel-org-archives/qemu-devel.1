@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34955)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34749)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gKrWk-0005Ox-Ig
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 16:07:50 -0500
+	(envelope-from <macro@linux-mips.org>) id 1gKsQg-0003fl-Rx
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 17:05:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gKrQ4-0004JT-FW
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 16:00:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58212)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gKrQ3-0004HO-UZ
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 16:00:52 -0500
-Date: Thu, 8 Nov 2018 19:00:47 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181108210047.GU12503@habkost.net>
-References: <dd68d3e8-6448-3a67-3212-fd3d3bfba2e2@redhat.com>
-	<20181107192414.GH12503@habkost.net>
-	<c6bbfeb8-53c5-0e0c-cf36-14e586cfb581@redhat.com>
-	<a0decaa7-d83b-b0ad-60ea-aa0890feb905@redhat.com>
-	<20181108130648.GJ12503@habkost.net>
-	<95a93d53-f87d-bd96-9363-582c4eae4160@redhat.com>
-	<20181108171437.GM12503@habkost.net>
-	<dda55f75-58d3-111c-4f43-99a9f686981e@redhat.com>
-	<20181108184242.GQ12503@habkost.net>
-	<2f4793c3-5509-1def-3157-02bc0d9bbe26@redhat.com>
+	(envelope-from <macro@linux-mips.org>) id 1gKsMM-0006eZ-Bz
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 17:01:09 -0500
+Received: from eddie.linux-mips.org ([148.251.95.138]:59658
+	helo=cvs.linux-mips.org) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <macro@linux-mips.org>) id 1gKsML-0006cL-26
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 17:01:06 -0500
+Received: (from localhost user: 'macro', uid#1010) by eddie.linux-mips.org
+	with ESMTP id S23992971AbeKHWA6Zi0Xj (ORCPT
+	<rfc822;qemu-devel@nongnu.org>); Thu, 8 Nov 2018 23:00:58 +0100
+Date: Thu, 8 Nov 2018 22:00:58 +0000 (GMT)
+Sender: "Maciej W. Rozycki" <macro@linux-mips.org>
+From: "Maciej W. Rozycki" <macro@linux-mips.org>
+In-Reply-To: <20181108185058.GA21067@sx9>
+Message-ID: <alpine.LFD.2.21.1811082136330.7359@eddie.linux-mips.org>
+References: <cover.1541616663.git.noring@nocrew.org>
+	<e8e6bfd053f051d5195ec030f06749b24f867b13.1541616663.git.noring@nocrew.org>
+	<BN6PR2201MB12512C561DAD7AE29946682CC6C50@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	<20181108185058.GA21067@sx9>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2f4793c3-5509-1def-3157-02bc0d9bbe26@redhat.com>
-Subject: Re: [Qemu-devel] QEMU and Kconfig
+Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH v2 4/6] target/mips: Fix decoding mechanism
+ of special R5900 opcodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,36 +33,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, "Zhong, Yang" <yang.zhong@intel.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Fredrik Noring <noring@nocrew.org>
+Cc: Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?Q?J=C3=BCrgen_Urban?= <JuergenUrban@gmx.de>, qemu-devel@nongnu.org
 
-On Thu, Nov 08, 2018 at 09:28:06PM +0100, Paolo Bonzini wrote:
-> Oops. :)
+On Thu, 8 Nov 2018, Fredrik Noring wrote:
+
+> > Fredrik, do you know by any chance if a document exists that would justify
+> > inclusion of non-R5900 DMULT, DMULTU, DDIV, DDIVU in R5900 executables by
+> > gcc for R5900? Is it included by cross-gcc or by native gcc, or by both?
+> > 
+> > I think gcc folks must have had a good reason for that, some kind of
+> > design - it can't be 'I really like/miss this instruction, let's include
+> > it...'
 > 
-> On 08/11/2018 19:42, Eduardo Habkost wrote:
-> >>> Keeping in mind that I might be talking about extra challenges we
-> >>> won't address right now (no cart before the horse), I have new
-> >>> questions:
-> >>>
-> >>> Why you say backends are not a target configuration and
-> >>> accelerators are?  What's the definition of "target
-> >>> configuration"?
-> 
-> Something that affects the hardware seen by the guest is target
-> configuration.
-> 
-> Backends do not affect what hardware the guest sees.  Boards and devices
-> do; accelerators do, but that's more of a side-effect than something
-> intended.
+> The R5900 reports itself as MIPS III and DMULT, DMULTU, DDIV and DDIVU
+> are part of the MIPS III ISA. They are emulated in user mode to support
+> generic MIPS III programs.
 
-Understood.  My interpretation of "target" was just "a QEMU
-binary".  In other words, I thought we were talking about
-anything that could be compiled in/out from a specific QEMU
-binary.
+ FAOD, GCC does not emit these instructions if the R5900 architecture has 
+been selected for compilation, e.g.:
 
-Do you have a specific reason to restrict the scope to only
-guest-visible effects?  Is this just a way to reduce the effort
-required for the task, or there are other caveats I'm missing?
+/* ISA supports instructions DMULT and DMULTU. */
+#define ISA_HAS_DMULT		(TARGET_64BIT				\
+				 && !TARGET_MIPS5900			\
+				 && mips_isa_rev <= 5)
 
--- 
-Eduardo
+however they are a part of the base 64-bit MIPS Linux user psABI, which is 
+the whole of the MIPS III ISA, so the runtime has to support them one way 
+or another (just like LL, SC and SYNC are a part of the 32-bit MIPS Linux 
+user psABI even though they are not supported by MIPS I hardware).
+
+  Maciej
