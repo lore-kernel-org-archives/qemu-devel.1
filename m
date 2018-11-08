@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43285)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43283)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gKjF8-00058p-Tq
+	(envelope-from <dgibson@ozlabs.org>) id 1gKjF8-00058n-T3
 	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:17:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gKjF3-0003ac-EA
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:17:02 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gKjF2-0003aP-Vw
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:17:01 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu,  8 Nov 2018 23:16:30 +1100
-Message-Id: <20181108121646.26173-7-david@gibson.dropbear.id.au>
+Date: Thu,  8 Nov 2018 23:16:25 +1100
+Message-Id: <20181108121646.26173-2-david@gibson.dropbear.id.au>
 In-Reply-To: <20181108121646.26173-1-david@gibson.dropbear.id.au>
 References: <20181108121646.26173-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 06/22] target/ppc: Split up float_invalid_op_excp
+Subject: [Qemu-devel] [PULL 01/22] target/ppc: add external PID support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,1070 +22,946 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, agraf@suse.de, lvivier@redhat.com, Richard Henderson <richard.henderson@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, agraf@suse.de, lvivier@redhat.com, Roman Kapl <rka@sysgo.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Roman Kapl <rka@sysgo.com>
 
-The always_inline trick only works if the function is always
-called from the outer-most helper.  But it isn't, so pass in
-the outer-most return address.  There's no need for a switch
-statement whose argument is always a constant.  Unravel the
-switch and goto via more helpers.
+External PID is a mechanism present on BookE 2.06 that enables applicatio=
+n to
+store/load data from different address spaces. There are special version =
+of some
+instructions, which operate on alternate address space, which is specifie=
+d in
+the EPLC/EPSC regiser.
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+This implementation uses two additional MMU modes (mmu_idx) to provide th=
+e
+address space for the load and store instructions. The QEMU TLB fill code=
+ was
+modified to recognize these MMU modes and use the values in EPLC/EPSC to =
+find
+the proper entry in he PPC TLB. These two QEMU TLBs are also flushed on e=
+ach
+write to EPLC/EPSC.
+
+Following instructions are implemented: dcbfep dcbstep dcbtep dcbtstep dc=
+bzep
+dcbzlep icbiep lbepx ldepx lfdepx lhepx lwepx stbepx stdepx stfdepx sthep=
+x
+stwepx.
+
+Following vector instructions are not: evlddepx evstddepx lvepx lvepxl st=
+vepx
+stvepxl.
+
+Signed-off-by: Roman Kapl <rka@sysgo.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/fpu_helper.c | 344 +++++++++++++++++++++-------------------
- 1 file changed, 181 insertions(+), 163 deletions(-)
+ target/ppc/cpu.h                   |  24 +++-
+ target/ppc/helper.h                |   4 +
+ target/ppc/mem_helper.c            |  34 +++++-
+ target/ppc/mmu_helper.c            | 172 ++++++++++++++++++++++-------
+ target/ppc/translate.c             | 141 +++++++++++++++++++++++
+ target/ppc/translate/fp-impl.inc.c |  34 ++++++
+ target/ppc/translate/fp-ops.inc.c  |   2 +
+ target/ppc/translate_init.inc.c    |  21 +++-
+ 8 files changed, 387 insertions(+), 45 deletions(-)
 
-diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-index b9bb1b856e..6ec5227dd5 100644
---- a/target/ppc/fpu_helper.c
-+++ b/target/ppc/fpu_helper.c
-@@ -170,96 +170,120 @@ COMPUTE_FPRF(float64)
- COMPUTE_FPRF(float128)
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index b5b8f6f440..ab68abe8a2 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -918,6 +918,19 @@ enum {
+ /* number of possible TLBs */
+ #define BOOKE206_MAX_TLBN      4
 =20
- /* Floating-point invalid operations exception */
--static inline __attribute__((__always_inline__))
--uint64_t float_invalid_op_excp(CPUPPCState *env, int op, int set_fpcc)
-+static void finish_invalid_op_excp(CPUPPCState *env, int op, uintptr_t r=
-etaddr)
++#define EPID_EPID_SHIFT 0x0
++#define EPID_EPID 0xFF
++#define EPID_ELPID_SHIFT 0x10
++#define EPID_ELPID 0x3F0000
++#define EPID_EGS 0x20000000
++#define EPID_EGS_SHIFT 29
++#define EPID_EAS 0x40000000
++#define EPID_EAS_SHIFT 30
++#define EPID_EPR 0x80000000
++#define EPID_EPR_SHIFT 31
++/* We don't support EGS and ELPID */
++#define EPID_MASK (EPID_EPID | EPID_EAS | EPID_EPR)
++
+ /***********************************************************************=
+******/
+ /* Server and Embedded Processor Control */
+=20
+@@ -947,7 +960,16 @@ struct ppc_radix_page_info {
+=20
+ /***********************************************************************=
+******/
+ /* The whole PowerPC CPU context */
+-#define NB_MMU_MODES    8
++
++/* PowerPC needs eight modes for different hypervisor/supervisor/guest +
++ * real/paged mode combinations. The other two modes are for external PI=
+D
++ * load/store.
++ */
++#define NB_MMU_MODES    10
++#define MMU_MODE8_SUFFIX _epl
++#define MMU_MODE9_SUFFIX _eps
++#define PPC_TLB_EPID_LOAD 8
++#define PPC_TLB_EPID_STORE 9
+=20
+ #define PPC_CPU_OPCODES_LEN          0x40
+ #define PPC_CPU_INDIRECT_OPCODES_LEN 0x20
+diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+index 7a1481fd0b..c7de04e068 100644
+--- a/target/ppc/helper.h
++++ b/target/ppc/helper.h
+@@ -29,7 +29,9 @@ DEF_HELPER_4(lsw, void, env, tl, i32, i32)
+ DEF_HELPER_5(lswx, void, env, tl, i32, i32, i32)
+ DEF_HELPER_FLAGS_4(stsw, TCG_CALL_NO_WG, void, env, tl, i32, i32)
+ DEF_HELPER_FLAGS_3(dcbz, TCG_CALL_NO_WG, void, env, tl, i32)
++DEF_HELPER_FLAGS_3(dcbzep, TCG_CALL_NO_WG, void, env, tl, i32)
+ DEF_HELPER_FLAGS_2(icbi, TCG_CALL_NO_WG, void, env, tl)
++DEF_HELPER_FLAGS_2(icbiep, TCG_CALL_NO_WG, void, env, tl)
+ DEF_HELPER_5(lscbx, tl, env, tl, i32, i32, i32)
+=20
+ #if defined(TARGET_PPC64)
+@@ -658,6 +660,8 @@ DEF_HELPER_2(booke206_tlbilx1, void, env, tl)
+ DEF_HELPER_2(booke206_tlbilx3, void, env, tl)
+ DEF_HELPER_2(booke206_tlbflush, void, env, tl)
+ DEF_HELPER_3(booke_setpid, void, env, i32, tl)
++DEF_HELPER_2(booke_set_eplc, void, env, tl)
++DEF_HELPER_2(booke_set_epsc, void, env, tl)
+ DEF_HELPER_2(6xx_tlbd, void, env, tl)
+ DEF_HELPER_2(6xx_tlbi, void, env, tl)
+ DEF_HELPER_2(74xx_tlbd, void, env, tl)
+diff --git a/target/ppc/mem_helper.c b/target/ppc/mem_helper.c
+index a1485fad9b..9c5a68579e 100644
+--- a/target/ppc/mem_helper.c
++++ b/target/ppc/mem_helper.c
+@@ -142,11 +142,13 @@ void helper_stsw(CPUPPCState *env, target_ulong add=
+r, uint32_t nb,
+     }
+ }
+=20
+-void helper_dcbz(CPUPPCState *env, target_ulong addr, uint32_t opcode)
++static void dcbz_common(CPUPPCState *env, target_ulong addr,
++                        uint32_t opcode, bool epid, uintptr_t retaddr)
  {
--    CPUState *cs =3D CPU(ppc_env_get_cpu(env));
--    uint64_t ret =3D 0;
--    int ve;
-+    /* Update the floating-point invalid operation summary */
-+    env->fpscr |=3D 1 << FPSCR_VX;
-+    /* Update the floating-point exception summary */
-+    env->fpscr |=3D FP_FX;
-+    if (fpscr_ve !=3D 0) {
-+        /* Update the floating-point enabled exception summary */
-+        env->fpscr |=3D 1 << FPSCR_FEX;
-+        if (fp_exceptions_enabled(env)) {
-+            raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM,
-+                                   POWERPC_EXCP_FP | op, retaddr);
-+        }
-+    }
-+}
+     target_ulong mask, dcbz_size =3D env->dcache_line_size;
+     uint32_t i;
+     void *haddr;
++    int mmu_idx =3D epid ? PPC_TLB_EPID_STORE : env->dmmu_idx;
 =20
--    ve =3D fpscr_ve;
--    switch (op) {
--    case POWERPC_EXCP_FP_VXSNAN:
--        env->fpscr |=3D 1 << FPSCR_VXSNAN;
--        break;
--    case POWERPC_EXCP_FP_VXSOFT:
--        env->fpscr |=3D 1 << FPSCR_VXSOFT;
--        break;
--    case POWERPC_EXCP_FP_VXISI:
--        /* Magnitude subtraction of infinities */
--        env->fpscr |=3D 1 << FPSCR_VXISI;
--        goto update_arith;
--    case POWERPC_EXCP_FP_VXIDI:
--        /* Division of infinity by infinity */
--        env->fpscr |=3D 1 << FPSCR_VXIDI;
--        goto update_arith;
--    case POWERPC_EXCP_FP_VXZDZ:
--        /* Division of zero by zero */
--        env->fpscr |=3D 1 << FPSCR_VXZDZ;
--        goto update_arith;
--    case POWERPC_EXCP_FP_VXIMZ:
--        /* Multiplication of zero by infinity */
--        env->fpscr |=3D 1 << FPSCR_VXIMZ;
--        goto update_arith;
--    case POWERPC_EXCP_FP_VXVC:
--        /* Ordered comparison of NaN */
--        env->fpscr |=3D 1 << FPSCR_VXVC;
-+static void finish_invalid_op_arith(CPUPPCState *env, int op,
-+                                    bool set_fpcc, uintptr_t retaddr)
-+{
-+    env->fpscr &=3D ~((1 << FPSCR_FR) | (1 << FPSCR_FI));
-+    if (fpscr_ve =3D=3D 0) {
-         if (set_fpcc) {
-             env->fpscr &=3D ~(0xF << FPSCR_FPCC);
-             env->fpscr |=3D 0x11 << FPSCR_FPCC;
-         }
--        /* We must update the target FPR before raising the exception */
--        if (ve !=3D 0) {
--            cs->exception_index =3D POWERPC_EXCP_PROGRAM;
--            env->error_code =3D POWERPC_EXCP_FP | POWERPC_EXCP_FP_VXVC;
--            /* Update the floating-point enabled exception summary */
--            env->fpscr |=3D 1 << FPSCR_FEX;
--            /* Exception is differed */
--            ve =3D 0;
--        }
--        break;
--    case POWERPC_EXCP_FP_VXSQRT:
--        /* Square root of a negative number */
--        env->fpscr |=3D 1 << FPSCR_VXSQRT;
--    update_arith:
--        env->fpscr &=3D ~((1 << FPSCR_FR) | (1 << FPSCR_FI));
--        if (ve =3D=3D 0) {
--            /* Set the result to quiet NaN */
--            ret =3D 0x7FF8000000000000ULL;
--            if (set_fpcc) {
--                env->fpscr &=3D ~(0xF << FPSCR_FPCC);
--                env->fpscr |=3D 0x11 << FPSCR_FPCC;
--            }
--        }
--        break;
--    case POWERPC_EXCP_FP_VXCVI:
--        /* Invalid conversion */
--        env->fpscr |=3D 1 << FPSCR_VXCVI;
--        env->fpscr &=3D ~((1 << FPSCR_FR) | (1 << FPSCR_FI));
--        if (ve =3D=3D 0) {
--            /* Set the result to quiet NaN */
--            ret =3D 0x7FF8000000000000ULL;
--            if (set_fpcc) {
--                env->fpscr &=3D ~(0xF << FPSCR_FPCC);
--                env->fpscr |=3D 0x11 << FPSCR_FPCC;
--            }
--        }
--        break;
-+    }
-+    finish_invalid_op_excp(env, op, retaddr);
-+}
-+
-+/* Signalling NaN */
-+static void float_invalid_op_vxsnan(CPUPPCState *env, uintptr_t retaddr)
-+{
-+    env->fpscr |=3D 1 << FPSCR_VXSNAN;
-+    finish_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, retaddr);
-+}
-+
-+/* Magnitude subtraction of infinities */
-+static void float_invalid_op_vxisi(CPUPPCState *env, bool set_fpcc,
-+                                   uintptr_t retaddr)
-+{
-+    env->fpscr |=3D 1 << FPSCR_VXISI;
-+    finish_invalid_op_arith(env, POWERPC_EXCP_FP_VXISI, set_fpcc, retadd=
-r);
-+}
-+
-+/* Division of infinity by infinity */
-+static void float_invalid_op_vxidi(CPUPPCState *env, bool set_fpcc,
-+                                   uintptr_t retaddr)
-+{
-+    env->fpscr |=3D 1 << FPSCR_VXIDI;
-+    finish_invalid_op_arith(env, POWERPC_EXCP_FP_VXIDI, set_fpcc, retadd=
-r);
-+}
-+
-+/* Division of zero by zero */
-+static void float_invalid_op_vxzdz(CPUPPCState *env, bool set_fpcc,
-+                                   uintptr_t retaddr)
-+{
-+    env->fpscr |=3D 1 << FPSCR_VXZDZ;
-+    finish_invalid_op_arith(env, POWERPC_EXCP_FP_VXZDZ, set_fpcc, retadd=
-r);
-+}
-+
-+/* Multiplication of zero by infinity */
-+static void float_invalid_op_vximz(CPUPPCState *env, bool set_fpcc,
-+                                   uintptr_t retaddr)
-+{
-+    env->fpscr |=3D 1 << FPSCR_VXIMZ;
-+    finish_invalid_op_arith(env, POWERPC_EXCP_FP_VXIMZ, set_fpcc, retadd=
-r);
-+}
-+
-+/* Square root of a negative number */
-+static void float_invalid_op_vxsqrt(CPUPPCState *env, bool set_fpcc,
-+                                    uintptr_t retaddr)
-+{
-+    env->fpscr |=3D 1 << FPSCR_VXSQRT;
-+    finish_invalid_op_arith(env, POWERPC_EXCP_FP_VXSQRT, set_fpcc, retad=
-dr);
-+}
-+
-+/* Ordered comparison of NaN */
-+static void float_invalid_op_vxvc(CPUPPCState *env, bool set_fpcc,
-+                                  uintptr_t retaddr)
-+{
-+    env->fpscr |=3D 1 << FPSCR_VXVC;
-+    if (set_fpcc) {
-+        env->fpscr &=3D ~(0xF << FPSCR_FPCC);
-+        env->fpscr |=3D 0x11 << FPSCR_FPCC;
-     }
-     /* Update the floating-point invalid operation summary */
-     env->fpscr |=3D 1 << FPSCR_VX;
-     /* Update the floating-point exception summary */
-     env->fpscr |=3D FP_FX;
--    if (ve !=3D 0) {
-+    /* We must update the target FPR before raising the exception */
-+    if (fpscr_ve !=3D 0) {
-+        CPUState *cs =3D CPU(ppc_env_get_cpu(env));
-+
-+        cs->exception_index =3D POWERPC_EXCP_PROGRAM;
-+        env->error_code =3D POWERPC_EXCP_FP | POWERPC_EXCP_FP_VXVC;
-         /* Update the floating-point enabled exception summary */
-         env->fpscr |=3D 1 << FPSCR_FEX;
--        if (fp_exceptions_enabled(env)) {
--            /* GETPC() works here because this is inline */
--            raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM,
--                                   POWERPC_EXCP_FP | op, GETPC());
-+        /* Exception is differed */
-+    }
-+}
-+
-+/* Invalid conversion */
-+static void float_invalid_op_vxcvi(CPUPPCState *env, bool set_fpcc,
-+                                   uintptr_t retaddr)
-+{
-+    env->fpscr |=3D 1 << FPSCR_VXCVI;
-+    env->fpscr &=3D ~((1 << FPSCR_FR) | (1 << FPSCR_FI));
-+    if (fpscr_ve =3D=3D 0) {
-+        if (set_fpcc) {
-+            env->fpscr &=3D ~(0xF << FPSCR_FPCC);
-+            env->fpscr |=3D 0x11 << FPSCR_FPCC;
-         }
-     }
--    return ret;
-+    finish_invalid_op_excp(env, POWERPC_EXCP_FP_VXCVI, retaddr);
- }
-=20
- static inline void float_zero_divide_excp(CPUPPCState *env, uintptr_t ra=
-ddr)
-@@ -632,11 +656,11 @@ float64 helper_fadd(CPUPPCState *env, float64 arg1,=
- float64 arg2)
-     if (unlikely(status & float_flag_invalid)) {
-         if (float64_is_infinity(arg1) && float64_is_infinity(arg2)) {
-             /* Magnitude subtraction of infinities */
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXISI, 1);
-+            float_invalid_op_vxisi(env, 1, GETPC());
-         } else if (float64_is_signaling_nan(arg1, &env->fp_status) ||
-                    float64_is_signaling_nan(arg2, &env->fp_status)) {
-             /* sNaN addition */
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);
-+            float_invalid_op_vxsnan(env, GETPC());
-         }
+ #if defined(TARGET_PPC64)
+     /* Check for dcbz vs dcbzl on 970 */
+@@ -166,17 +168,34 @@ void helper_dcbz(CPUPPCState *env, target_ulong add=
+r, uint32_t opcode)
      }
 =20
-@@ -652,11 +676,11 @@ float64 helper_fsub(CPUPPCState *env, float64 arg1,=
- float64 arg2)
-     if (unlikely(status & float_flag_invalid)) {
-         if (float64_is_infinity(arg1) && float64_is_infinity(arg2)) {
-             /* Magnitude subtraction of infinities */
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXISI, 1);
-+            float_invalid_op_vxisi(env, 1, GETPC());
-         } else if (float64_is_signaling_nan(arg1, &env->fp_status) ||
-                    float64_is_signaling_nan(arg2, &env->fp_status)) {
-             /* sNaN addition */
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);
-+            float_invalid_op_vxsnan(env, GETPC());
-         }
-     }
-=20
-@@ -673,11 +697,11 @@ float64 helper_fmul(CPUPPCState *env, float64 arg1,=
- float64 arg2)
-         if ((float64_is_infinity(arg1) && float64_is_zero(arg2)) ||
-             (float64_is_zero(arg1) && float64_is_infinity(arg2))) {
-             /* Multiplication of zero by infinity */
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXIMZ, 1);
-+            float_invalid_op_vximz(env, 1, GETPC());
-         } else if (float64_is_signaling_nan(arg1, &env->fp_status) ||
-                    float64_is_signaling_nan(arg2, &env->fp_status)) {
-             /* sNaN multiplication */
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);
-+            float_invalid_op_vxsnan(env, GETPC());
-         }
-     }
-=20
-@@ -695,14 +719,14 @@ float64 helper_fdiv(CPUPPCState *env, float64 arg1,=
- float64 arg2)
-             /* Determine what kind of invalid operation was seen.  */
-             if (float64_is_infinity(arg1) && float64_is_infinity(arg2)) =
-{
-                 /* Division of infinity by infinity */
--                float_invalid_op_excp(env, POWERPC_EXCP_FP_VXIDI, 1);
-+                float_invalid_op_vxidi(env, 1, GETPC());
-             } else if (float64_is_zero(arg1) && float64_is_zero(arg2)) {
-                 /* Division of zero by zero */
--                float_invalid_op_excp(env, POWERPC_EXCP_FP_VXZDZ, 1);
-+                float_invalid_op_vxzdz(env, 1, GETPC());
-             } else if (float64_is_signaling_nan(arg1, &env->fp_status) |=
-|
-                        float64_is_signaling_nan(arg2, &env->fp_status)) =
-{
-                 /* sNaN division */
--                float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);
-+                float_invalid_op_vxsnan(env, GETPC());
-             }
-         }
-         if (status & float_flag_divbyzero) {
-@@ -724,14 +748,14 @@ uint64_t helper_##op(CPUPPCState *env, uint64_t arg=
-)                   \
-                                                                        \
-     if (unlikely(env->fp_status.float_exception_flags)) {              \
-         if (float64_is_any_nan(arg)) {                                 \
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXCVI, 1);      \
-+            float_invalid_op_vxcvi(env, 1, GETPC());                   \
-             if (float64_is_signaling_nan(arg, &env->fp_status)) {      \
--                float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1); \
-+                float_invalid_op_vxsnan(env, GETPC());                 \
-             }                                                          \
-             farg.ll =3D nanval;                                         =
- \
-         } else if (env->fp_status.float_exception_flags &              \
-                    float_flag_invalid) {                               \
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXCVI, 1);      \
-+            float_invalid_op_vxcvi(env, 1, GETPC());                   \
-         }                                                              \
-         float_check_status(env);                                       \
-     }                                                                  \
-@@ -776,7 +800,7 @@ static inline uint64_t do_fri(CPUPPCState *env, uint6=
-4_t arg,
-=20
-     if (unlikely(float64_is_signaling_nan(farg.d, &env->fp_status))) {
-         /* sNaN round */
--        float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);
-+        float_invalid_op_vxsnan(env, GETPC());
-         farg.ll =3D arg | 0x0008000000000000ULL;
+     /* Try fast path translate */
+-    haddr =3D tlb_vaddr_to_host(env, addr, MMU_DATA_STORE, env->dmmu_idx=
+);
++    haddr =3D tlb_vaddr_to_host(env, addr, MMU_DATA_STORE, mmu_idx);
+     if (haddr) {
+         memset(haddr, 0, dcbz_size);
      } else {
-         int inexact =3D get_float_exception_flags(&env->fp_status) &
-@@ -817,18 +841,18 @@ uint64_t helper_frim(CPUPPCState *env, uint64_t arg=
+         /* Slow path */
+         for (i =3D 0; i < dcbz_size; i +=3D 8) {
+-            cpu_stq_data_ra(env, addr + i, 0, GETPC());
++            if (epid) {
++#if !defined(CONFIG_USER_ONLY)
++                /* Does not make sense on USER_ONLY config */
++                cpu_stq_eps_ra(env, addr + i, 0, retaddr);
++#endif
++            } else {
++                cpu_stq_data_ra(env, addr + i, 0, retaddr);
++            }
+         }
+     }
+ }
+=20
++void helper_dcbz(CPUPPCState *env, target_ulong addr, uint32_t opcode)
++{
++    dcbz_common(env, addr, opcode, false, GETPC());
++}
++
++void helper_dcbzep(CPUPPCState *env, target_ulong addr, uint32_t opcode)
++{
++    dcbz_common(env, addr, opcode, true, GETPC());
++}
++
+ void helper_icbi(CPUPPCState *env, target_ulong addr)
+ {
+     addr &=3D ~(env->dcache_line_size - 1);
+@@ -188,6 +207,15 @@ void helper_icbi(CPUPPCState *env, target_ulong addr=
 )
-=20
- #define FPU_MADDSUB_UPDATE(NAME, TP)                                    =
-\
- static void NAME(CPUPPCState *env, TP arg1, TP arg2, TP arg3,           =
-\
--                 unsigned int madd_flags)                               =
-\
-+                 unsigned int madd_flags, uintptr_t retaddr)            =
-\
- {                                                                       =
-\
-     if (TP##_is_signaling_nan(arg1, &env->fp_status) ||                 =
-\
-         TP##_is_signaling_nan(arg2, &env->fp_status) ||                 =
-\
-         TP##_is_signaling_nan(arg3, &env->fp_status)) {                 =
-\
-         /* sNaN operation */                                            =
-\
--        float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);          =
-\
-+        float_invalid_op_vxsnan(env, retaddr);                          =
-\
-     }                                                                   =
-\
-     if ((TP##_is_infinity(arg1) && TP##_is_zero(arg2)) ||               =
-\
-         (TP##_is_zero(arg1) && TP##_is_infinity(arg2))) {               =
-\
-         /* Multiplication of zero by infinity */                        =
-\
--        float_invalid_op_excp(env, POWERPC_EXCP_FP_VXIMZ, 1);           =
-\
-+        float_invalid_op_vximz(env, 1, retaddr);                        =
-\
-     }                                                                   =
-\
-     if ((TP##_is_infinity(arg1) || TP##_is_infinity(arg2)) &&           =
-\
-         TP##_is_infinity(arg3)) {                                       =
-\
-@@ -841,7 +865,7 @@ static void NAME(CPUPPCState *env, TP arg1, TP arg2, =
-TP arg3,           \
-             cSign ^=3D 1;                                               =
-  \
-         }                                                               =
-\
-         if (aSign ^ bSign ^ cSign) {                                    =
-\
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXISI, 1);       =
-\
-+            float_invalid_op_vxisi(env, 1, retaddr);                    =
-\
-         }                                                               =
-\
-     }                                                                   =
-\
- }
-@@ -859,7 +883,7 @@ uint64_t helper_##op(CPUPPCState *env, uint64_t arg1,=
-                   \
-     if (flags) {                                                        =
-\
-         if (flags & float_flag_invalid) {                               =
-\
-             float64_maddsub_update_excp(env, arg1, arg2, arg3,          =
-\
--                                        madd_flags);                    =
-\
-+                                        madd_flags, GETPC());           =
-\
-         }                                                               =
-\
-         float_check_status(env);                                        =
-\
-     }                                                                   =
-\
-@@ -885,8 +909,7 @@ uint64_t helper_frsp(CPUPPCState *env, uint64_t arg)
-     farg.ll =3D arg;
-=20
-     if (unlikely(float64_is_signaling_nan(farg.d, &env->fp_status))) {
--        /* sNaN square root */
--        float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);
-+        float_invalid_op_vxsnan(env, GETPC());
-     }
-     f32 =3D float64_to_float32(farg.d, &env->fp_status);
-     farg.d =3D float32_to_float64(f32, &env->fp_status);
-@@ -904,11 +927,11 @@ float64 helper_fsqrt(CPUPPCState *env, float64 arg)
-         if (unlikely(float64_is_any_nan(arg))) {
-             if (unlikely(float64_is_signaling_nan(arg, &env->fp_status))=
-) {
-                 /* sNaN square root */
--                float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);
-+                float_invalid_op_vxsnan(env, GETPC());
-             }
-         } else {
-             /* Square root of a negative nonzero number */
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSQRT, 1);
-+            float_invalid_op_vxsqrt(env, 1, GETPC());
-         }
-     }
-=20
-@@ -926,7 +949,7 @@ float64 helper_fre(CPUPPCState *env, float64 arg)
-         if (status & float_flag_invalid) {
-             if (float64_is_signaling_nan(arg, &env->fp_status)) {
-                 /* sNaN reciprocal */
--                float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);
-+                float_invalid_op_vxsnan(env, GETPC());
-             }
-         }
-         if (status & float_flag_divbyzero) {
-@@ -949,7 +972,7 @@ uint64_t helper_fres(CPUPPCState *env, uint64_t arg)
-=20
-     if (unlikely(float64_is_signaling_nan(farg.d, &env->fp_status))) {
-         /* sNaN reciprocal */
--        float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);
-+        float_invalid_op_vxsnan(env, GETPC());
-     }
-     farg.d =3D float64_div(float64_one, farg.d, &env->fp_status);
-     f32 =3D float64_to_float32(farg.d, &env->fp_status);
-@@ -970,10 +993,10 @@ float64 helper_frsqrte(CPUPPCState *env, float64 ar=
-g)
-         if (status & float_flag_invalid) {
-             if (float64_is_signaling_nan(arg, &env->fp_status)) {
-                 /* sNaN reciprocal */
--                float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);
-+                float_invalid_op_vxsnan(env, GETPC());
-             } else {
-                 /* Square root of a negative nonzero number */
--                float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSQRT, 1);
-+                float_invalid_op_vxsqrt(env, 1, GETPC());
-             }
-         }
-         if (status & float_flag_divbyzero) {
-@@ -1095,7 +1118,7 @@ void helper_fcmpu(CPUPPCState *env, uint64_t arg1, =
-uint64_t arg2,
-                  && (float64_is_signaling_nan(farg1.d, &env->fp_status) =
-||
-                      float64_is_signaling_nan(farg2.d, &env->fp_status))=
-)) {
-         /* sNaN comparison */
--        float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);
-+        float_invalid_op_vxsnan(env, GETPC());
-     }
+     cpu_ldl_data_ra(env, addr, GETPC());
  }
 =20
-@@ -1123,14 +1146,11 @@ void helper_fcmpo(CPUPPCState *env, uint64_t arg1=
-, uint64_t arg2,
-     env->fpscr |=3D ret << FPSCR_FPRF;
-     env->crf[crfD] =3D ret;
-     if (unlikely(ret =3D=3D 0x01UL)) {
-+        float_invalid_op_vxvc(env, 1, GETPC());
-         if (float64_is_signaling_nan(farg1.d, &env->fp_status) ||
-             float64_is_signaling_nan(farg2.d, &env->fp_status)) {
-             /* sNaN comparison */
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN |
--                                  POWERPC_EXCP_FP_VXVC, 1);
--        } else {
--            /* qNaN comparison */
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXVC, 1);
-+            float_invalid_op_vxsnan(env, GETPC());
-         }
-     }
++void helper_icbiep(CPUPPCState *env, target_ulong addr)
++{
++#if !defined(CONFIG_USER_ONLY)
++    /* See comments above */
++    addr &=3D ~(env->dcache_line_size - 1);
++    cpu_ldl_epl_ra(env, addr, GETPC());
++#endif
++}
++
+ /* XXX: to be tested */
+ target_ulong helper_lscbx(CPUPPCState *env, target_ulong addr, uint32_t =
+reg,
+                           uint32_t ra, uint32_t rb)
+diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
+index 04f8317ea1..cefed34da4 100644
+--- a/target/ppc/mmu_helper.c
++++ b/target/ppc/mmu_helper.c
+@@ -924,29 +924,84 @@ static int ppcmas_tlb_check(CPUPPCState *env, ppcma=
+s_tlb_t *tlb,
+     return 0;
  }
-@@ -1783,10 +1803,10 @@ void helper_##name(CPUPPCState *env, uint32_t opc=
-ode)                        \
-                                                                         =
-     \
-         if (unlikely(tstat.float_exception_flags & float_flag_invalid)) =
-{    \
-             if (tp##_is_infinity(xa.fld) && tp##_is_infinity(xb.fld)) { =
-     \
--                float_invalid_op_excp(env, POWERPC_EXCP_FP_VXISI, sfprf)=
-;    \
-+                float_invalid_op_vxisi(env, sfprf, GETPC());            =
-     \
-             } else if (tp##_is_signaling_nan(xa.fld, &tstat) ||         =
-     \
-                        tp##_is_signaling_nan(xb.fld, &tstat)) {         =
-     \
--                float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, sfprf=
-);   \
-+                float_invalid_op_vxsnan(env, GETPC());                  =
-     \
-             }                                                           =
-     \
-         }                                                               =
-     \
-                                                                         =
-     \
-@@ -1832,10 +1852,10 @@ void helper_xsaddqp(CPUPPCState *env, uint32_t op=
-code)
 =20
-     if (unlikely(tstat.float_exception_flags & float_flag_invalid)) {
-         if (float128_is_infinity(xa.f128) && float128_is_infinity(xb.f12=
-8)) {
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXISI, 1);
-+            float_invalid_op_vxisi(env, 1, GETPC());
-         } else if (float128_is_signaling_nan(xa.f128, &tstat) ||
-                    float128_is_signaling_nan(xb.f128, &tstat)) {
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);
-+            float_invalid_op_vxsnan(env, GETPC());
-         }
++static bool is_epid_mmu(int mmu_idx)
++{
++    return mmu_idx =3D=3D PPC_TLB_EPID_STORE || mmu_idx =3D=3D PPC_TLB_E=
+PID_LOAD;
++}
++
++static uint32_t mmubooke206_esr(int mmu_idx, bool rw)
++{
++    uint32_t esr =3D 0;
++    if (rw) {
++        esr |=3D ESR_ST;
++    }
++    if (is_epid_mmu(mmu_idx)) {
++        esr |=3D ESR_EPID;
++    }
++    return esr;
++}
++
++/* Get EPID register given the mmu_idx. If this is regular load,
++ * construct the EPID access bits from current processor state  */
++
++/* Get the effective AS and PR bits and the PID. The PID is returned onl=
+y if
++ * EPID load is requested, otherwise the caller must detect the correct =
+EPID.
++ * Return true if valid EPID is returned. */
++static bool mmubooke206_get_as(CPUPPCState *env,
++                               int mmu_idx, uint32_t *epid_out,
++                               bool *as_out, bool *pr_out)
++{
++    if (is_epid_mmu(mmu_idx)) {
++        uint32_t epidr;
++        if (mmu_idx =3D=3D PPC_TLB_EPID_STORE) {
++            epidr =3D env->spr[SPR_BOOKE_EPSC];
++        } else {
++            epidr =3D env->spr[SPR_BOOKE_EPLC];
++        }
++        *epid_out =3D (epidr & EPID_EPID) >> EPID_EPID_SHIFT;
++        *as_out =3D !!(epidr & EPID_EAS);
++        *pr_out =3D !!(epidr & EPID_EPR);
++        return true;
++    } else {
++        *as_out =3D msr_ds;
++        *pr_out =3D msr_pr;
++        return false;
++    }
++}
++
++/* Check if the tlb found by hashing really matches */
+ static int mmubooke206_check_tlb(CPUPPCState *env, ppcmas_tlb_t *tlb,
+                                  hwaddr *raddr, int *prot,
+                                  target_ulong address, int rw,
+-                                 int access_type)
++                                 int access_type, int mmu_idx)
+ {
+     int ret;
+     int prot2 =3D 0;
++    uint32_t epid;
++    bool as, pr;
++    bool use_epid =3D mmubooke206_get_as(env, mmu_idx, &epid, &as, &pr);
+=20
+-    if (ppcmas_tlb_check(env, tlb, raddr, address,
+-                         env->spr[SPR_BOOKE_PID]) >=3D 0) {
+-        goto found_tlb;
+-    }
++    if (!use_epid) {
++        if (ppcmas_tlb_check(env, tlb, raddr, address,
++                             env->spr[SPR_BOOKE_PID]) >=3D 0) {
++            goto found_tlb;
++        }
+=20
+-    if (env->spr[SPR_BOOKE_PID1] &&
+-        ppcmas_tlb_check(env, tlb, raddr, address,
+-                         env->spr[SPR_BOOKE_PID1]) >=3D 0) {
+-        goto found_tlb;
+-    }
++        if (env->spr[SPR_BOOKE_PID1] &&
++            ppcmas_tlb_check(env, tlb, raddr, address,
++                             env->spr[SPR_BOOKE_PID1]) >=3D 0) {
++            goto found_tlb;
++        }
+=20
+-    if (env->spr[SPR_BOOKE_PID2] &&
+-        ppcmas_tlb_check(env, tlb, raddr, address,
+-                         env->spr[SPR_BOOKE_PID2]) >=3D 0) {
+-        goto found_tlb;
++        if (env->spr[SPR_BOOKE_PID2] &&
++            ppcmas_tlb_check(env, tlb, raddr, address,
++                             env->spr[SPR_BOOKE_PID2]) >=3D 0) {
++            goto found_tlb;
++        }
++    } else {
++        if (ppcmas_tlb_check(env, tlb, raddr, address, epid) >=3D 0) {
++            goto found_tlb;
++        }
      }
 =20
-@@ -1872,10 +1892,10 @@ void helper_##op(CPUPPCState *env, uint32_t opcod=
-e)                          \
-         if (unlikely(tstat.float_exception_flags & float_flag_invalid)) =
-{    \
-             if ((tp##_is_infinity(xa.fld) && tp##_is_zero(xb.fld)) ||   =
-     \
-                 (tp##_is_infinity(xb.fld) && tp##_is_zero(xa.fld))) {   =
-     \
--                float_invalid_op_excp(env, POWERPC_EXCP_FP_VXIMZ, sfprf)=
-;    \
-+                float_invalid_op_vximz(env, sfprf, GETPC());            =
-     \
-             } else if (tp##_is_signaling_nan(xa.fld, &tstat) ||         =
-     \
-                        tp##_is_signaling_nan(xb.fld, &tstat)) {         =
-     \
--                float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, sfprf=
-);   \
-+                float_invalid_op_vxsnan(env, GETPC());                  =
-     \
-             }                                                           =
-     \
-         }                                                               =
-     \
-                                                                         =
-     \
-@@ -1919,10 +1939,10 @@ void helper_xsmulqp(CPUPPCState *env, uint32_t op=
-code)
-     if (unlikely(tstat.float_exception_flags & float_flag_invalid)) {
-         if ((float128_is_infinity(xa.f128) && float128_is_zero(xb.f128))=
- ||
-             (float128_is_infinity(xb.f128) && float128_is_zero(xa.f128))=
-) {
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXIMZ, 1);
-+            float_invalid_op_vximz(env, 1, GETPC());
-         } else if (float128_is_signaling_nan(xa.f128, &tstat) ||
-                    float128_is_signaling_nan(xb.f128, &tstat)) {
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);
-+            float_invalid_op_vxsnan(env, GETPC());
-         }
-     }
-     helper_compute_fprf_float128(env, xt.f128);
-@@ -1957,13 +1977,12 @@ void helper_##op(CPUPPCState *env, uint32_t opcod=
-e)                           \
-                                                                         =
-      \
-         if (unlikely(tstat.float_exception_flags & float_flag_invalid)) =
-{     \
-             if (tp##_is_infinity(xa.fld) && tp##_is_infinity(xb.fld)) { =
-      \
--                float_invalid_op_excp(env, POWERPC_EXCP_FP_VXIDI, sfprf)=
-;     \
--            } else if (tp##_is_zero(xa.fld) &&                          =
-      \
--                tp##_is_zero(xb.fld)) {                                 =
-      \
--                float_invalid_op_excp(env, POWERPC_EXCP_FP_VXZDZ, sfprf)=
-;     \
-+                float_invalid_op_vxidi(env, sfprf, GETPC());            =
-      \
-+            } else if (tp##_is_zero(xa.fld) && tp##_is_zero(xb.fld)) {  =
-      \
-+                float_invalid_op_vxzdz(env, sfprf, GETPC());            =
-      \
-             } else if (tp##_is_signaling_nan(xa.fld, &tstat) ||         =
-      \
--                tp##_is_signaling_nan(xb.fld, &tstat)) {                =
-      \
--                float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, sfprf=
-);    \
-+                       tp##_is_signaling_nan(xb.fld, &tstat)) {         =
-      \
-+                float_invalid_op_vxsnan(env, GETPC());                  =
-      \
-             }                                                           =
-      \
-         }                                                               =
-      \
-         if (unlikely(tstat.float_exception_flags & float_flag_divbyzero)=
-) {   \
-@@ -2009,13 +2028,12 @@ void helper_xsdivqp(CPUPPCState *env, uint32_t op=
-code)
+     LOG_SWTLB("%s: TLB entry not found\n", __func__);
+@@ -954,7 +1009,7 @@ static int mmubooke206_check_tlb(CPUPPCState *env, p=
+pcmas_tlb_t *tlb,
 =20
-     if (unlikely(tstat.float_exception_flags & float_flag_invalid)) {
-         if (float128_is_infinity(xa.f128) && float128_is_infinity(xb.f12=
-8)) {
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXIDI, 1);
--        } else if (float128_is_zero(xa.f128) &&
--            float128_is_zero(xb.f128)) {
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXZDZ, 1);
-+            float_invalid_op_vxidi(env, 1, GETPC());
-+        } else if (float128_is_zero(xa.f128) && float128_is_zero(xb.f128=
-)) {
-+            float_invalid_op_vxzdz(env, 1, GETPC());
-         } else if (float128_is_signaling_nan(xa.f128, &tstat) ||
--            float128_is_signaling_nan(xb.f128, &tstat)) {
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);
-+                   float128_is_signaling_nan(xb.f128, &tstat)) {
-+            float_invalid_op_vxsnan(env, GETPC());
+ found_tlb:
+=20
+-    if (msr_pr !=3D 0) {
++    if (pr) {
+         if (tlb->mas7_3 & MAS3_UR) {
+             prot2 |=3D PAGE_READ;
          }
+@@ -978,6 +1033,8 @@ found_tlb:
+=20
+     /* Check the address space and permissions */
+     if (access_type =3D=3D ACCESS_CODE) {
++        /* There is no way to fetch code using epid load */
++        assert(!use_epid);
+         if (msr_ir !=3D ((tlb->mas1 & MAS1_TS) >> MAS1_TS_SHIFT)) {
+             LOG_SWTLB("%s: AS doesn't match\n", __func__);
+             return -1;
+@@ -992,7 +1049,7 @@ found_tlb:
+         LOG_SWTLB("%s: no PAGE_EXEC: %x\n", __func__, prot2);
+         ret =3D -3;
+     } else {
+-        if (msr_dr !=3D ((tlb->mas1 & MAS1_TS) >> MAS1_TS_SHIFT)) {
++        if (as !=3D ((tlb->mas1 & MAS1_TS) >> MAS1_TS_SHIFT)) {
+             LOG_SWTLB("%s: AS doesn't match\n", __func__);
+             return -1;
+         }
+@@ -1012,7 +1069,7 @@ found_tlb:
+=20
+ static int mmubooke206_get_physical_address(CPUPPCState *env, mmu_ctx_t =
+*ctx,
+                                             target_ulong address, int rw=
+,
+-                                            int access_type)
++                                            int access_type, int mmu_idx=
+)
+ {
+     ppcmas_tlb_t *tlb;
+     hwaddr raddr;
+@@ -1030,7 +1087,7 @@ static int mmubooke206_get_physical_address(CPUPPCS=
+tate *env, mmu_ctx_t *ctx,
+                 continue;
+             }
+             ret =3D mmubooke206_check_tlb(env, tlb, &raddr, &ctx->prot, =
+address,
+-                                        rw, access_type);
++                                        rw, access_type, mmu_idx);
+             if (ret !=3D -1) {
+                 goto found_tlb;
+             }
+@@ -1348,8 +1405,10 @@ static inline int check_physical(CPUPPCState *env,=
+ mmu_ctx_t *ctx,
+     return ret;
+ }
+=20
+-static int get_physical_address(CPUPPCState *env, mmu_ctx_t *ctx,
+-                                target_ulong eaddr, int rw, int access_t=
+ype)
++static int get_physical_address_wtlb(
++    CPUPPCState *env, mmu_ctx_t *ctx,
++    target_ulong eaddr, int rw, int access_type,
++    int mmu_idx)
+ {
+     PowerPCCPU *cpu =3D ppc_env_get_cpu(env);
+     int ret =3D -1;
+@@ -1392,7 +1451,7 @@ static int get_physical_address(CPUPPCState *env, m=
+mu_ctx_t *ctx,
+         break;
+     case POWERPC_MMU_BOOKE206:
+         ret =3D mmubooke206_get_physical_address(env, ctx, eaddr, rw,
+-                                               access_type);
++                                               access_type, mmu_idx);
+         break;
+     case POWERPC_MMU_MPC8xx:
+         /* XXX: TODO */
+@@ -1417,6 +1476,13 @@ static int get_physical_address(CPUPPCState *env, =
+mmu_ctx_t *ctx,
+     return ret;
+ }
+=20
++static int get_physical_address(
++    CPUPPCState *env, mmu_ctx_t *ctx,
++    target_ulong eaddr, int rw, int access_type)
++{
++    return get_physical_address_wtlb(env, ctx, eaddr, rw, access_type, 0=
+);
++}
++
+ hwaddr ppc_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+ {
+     PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+@@ -1463,8 +1529,15 @@ hwaddr ppc_cpu_get_phys_page_debug(CPUState *cs, v=
+addr addr)
+ }
+=20
+ static void booke206_update_mas_tlb_miss(CPUPPCState *env, target_ulong =
+address,
+-                                     int rw)
++                                     int rw, int mmu_idx)
+ {
++    uint32_t epid;
++    bool as, pr;
++    uint32_t missed_tid =3D 0;
++    bool use_epid =3D mmubooke206_get_as(env, mmu_idx, &epid, &as, &pr);
++    if (rw =3D=3D 2) {
++        as =3D msr_ir;
++    }
+     env->spr[SPR_BOOKE_MAS0] =3D env->spr[SPR_BOOKE_MAS4] & MAS4_TLBSELD=
+_MASK;
+     env->spr[SPR_BOOKE_MAS1] =3D env->spr[SPR_BOOKE_MAS4] & MAS4_TSIZED_=
+MASK;
+     env->spr[SPR_BOOKE_MAS2] =3D env->spr[SPR_BOOKE_MAS4] & MAS4_WIMGED_=
+MASK;
+@@ -1473,7 +1546,7 @@ static void booke206_update_mas_tlb_miss(CPUPPCStat=
+e *env, target_ulong address,
+     env->spr[SPR_BOOKE_MAS7] =3D 0;
+=20
+     /* AS */
+-    if (((rw =3D=3D 2) && msr_ir) || ((rw !=3D 2) && msr_dr)) {
++    if (as) {
+         env->spr[SPR_BOOKE_MAS1] |=3D MAS1_TS;
+         env->spr[SPR_BOOKE_MAS6] |=3D MAS6_SAS;
      }
-     if (unlikely(tstat.float_exception_flags & float_flag_divbyzero)) {
-@@ -2046,7 +2064,7 @@ void helper_##op(CPUPPCState *env, uint32_t opcode)=
-                           \
-                                                                         =
+@@ -1481,19 +1554,25 @@ static void booke206_update_mas_tlb_miss(CPUPPCSt=
+ate *env, target_ulong address,
+     env->spr[SPR_BOOKE_MAS1] |=3D MAS1_VALID;
+     env->spr[SPR_BOOKE_MAS2] |=3D address & MAS2_EPN_MASK;
+=20
+-    switch (env->spr[SPR_BOOKE_MAS4] & MAS4_TIDSELD_PIDZ) {
+-    case MAS4_TIDSELD_PID0:
+-        env->spr[SPR_BOOKE_MAS1] |=3D env->spr[SPR_BOOKE_PID] << MAS1_TI=
+D_SHIFT;
+-        break;
+-    case MAS4_TIDSELD_PID1:
+-        env->spr[SPR_BOOKE_MAS1] |=3D env->spr[SPR_BOOKE_PID1] << MAS1_T=
+ID_SHIFT;
+-        break;
+-    case MAS4_TIDSELD_PID2:
+-        env->spr[SPR_BOOKE_MAS1] |=3D env->spr[SPR_BOOKE_PID2] << MAS1_T=
+ID_SHIFT;
+-        break;
++    if (!use_epid) {
++        switch (env->spr[SPR_BOOKE_MAS4] & MAS4_TIDSELD_PIDZ) {
++        case MAS4_TIDSELD_PID0:
++            missed_tid =3D env->spr[SPR_BOOKE_PID];
++            break;
++        case MAS4_TIDSELD_PID1:
++            missed_tid =3D env->spr[SPR_BOOKE_PID1];
++            break;
++        case MAS4_TIDSELD_PID2:
++            missed_tid =3D env->spr[SPR_BOOKE_PID2];
++            break;
++        }
++        env->spr[SPR_BOOKE_MAS6] |=3D env->spr[SPR_BOOKE_PID] << 16;
++    } else {
++        missed_tid =3D epid;
++        env->spr[SPR_BOOKE_MAS6] |=3D missed_tid << 16;
+     }
++    env->spr[SPR_BOOKE_MAS1] |=3D (missed_tid << MAS1_TID_SHIFT);
+=20
+-    env->spr[SPR_BOOKE_MAS6] |=3D env->spr[SPR_BOOKE_PID] << 16;
+=20
+     /* next victim logic */
+     env->spr[SPR_BOOKE_MAS0] |=3D env->last_way << MAS0_ESEL_SHIFT;
+@@ -1520,7 +1599,8 @@ static int cpu_ppc_handle_mmu_fault(CPUPPCState *en=
+v, target_ulong address,
+         /* data access */
+         access_type =3D env->access_type;
+     }
+-    ret =3D get_physical_address(env, &ctx, address, rw, access_type);
++    ret =3D get_physical_address_wtlb(env, &ctx, address, rw,
++                                    access_type, mmu_idx);
+     if (ret =3D=3D 0) {
+         tlb_set_page(cs, address & TARGET_PAGE_MASK,
+                      ctx.raddr & TARGET_PAGE_MASK, ctx.prot,
+@@ -1550,12 +1630,13 @@ static int cpu_ppc_handle_mmu_fault(CPUPPCState *=
+env, target_ulong address,
+                     env->spr[SPR_40x_ESR] =3D 0x00000000;
+                     break;
+                 case POWERPC_MMU_BOOKE206:
+-                    booke206_update_mas_tlb_miss(env, address, 2);
++                    booke206_update_mas_tlb_miss(env, address, 2, mmu_id=
+x);
+                     /* fall through */
+                 case POWERPC_MMU_BOOKE:
+                     cs->exception_index =3D POWERPC_EXCP_ITLB;
+                     env->error_code =3D 0;
+                     env->spr[SPR_BOOKE_DEAR] =3D address;
++                    env->spr[SPR_BOOKE_ESR] =3D mmubooke206_esr(mmu_idx,=
+ 0);
+                     return -1;
+                 case POWERPC_MMU_MPC8xx:
+                     /* XXX: TODO */
+@@ -1642,13 +1723,13 @@ static int cpu_ppc_handle_mmu_fault(CPUPPCState *=
+env, target_ulong address,
+                     cpu_abort(cs, "MPC8xx MMU model is not implemented\n=
+");
+                     break;
+                 case POWERPC_MMU_BOOKE206:
+-                    booke206_update_mas_tlb_miss(env, address, rw);
++                    booke206_update_mas_tlb_miss(env, address, rw, mmu_i=
+dx);
+                     /* fall through */
+                 case POWERPC_MMU_BOOKE:
+                     cs->exception_index =3D POWERPC_EXCP_DTLB;
+                     env->error_code =3D 0;
+                     env->spr[SPR_BOOKE_DEAR] =3D address;
+-                    env->spr[SPR_BOOKE_ESR] =3D rw ? ESR_ST : 0;
++                    env->spr[SPR_BOOKE_ESR] =3D mmubooke206_esr(mmu_idx,=
+ rw);
+                     return -1;
+                 case POWERPC_MMU_REAL:
+                     cpu_abort(cs, "PowerPC in real mode should never rai=
+se "
+@@ -1672,7 +1753,7 @@ static int cpu_ppc_handle_mmu_fault(CPUPPCState *en=
+v, target_ulong address,
+                 } else if ((env->mmu_model =3D=3D POWERPC_MMU_BOOKE) ||
+                            (env->mmu_model =3D=3D POWERPC_MMU_BOOKE206))=
+ {
+                     env->spr[SPR_BOOKE_DEAR] =3D address;
+-                    env->spr[SPR_BOOKE_ESR] =3D rw ? ESR_ST : 0;
++                    env->spr[SPR_BOOKE_ESR] =3D mmubooke206_esr(mmu_idx,=
+ rw);
+                 } else {
+                     env->spr[SPR_DAR] =3D address;
+                     if (rw =3D=3D 1) {
+@@ -2598,6 +2679,19 @@ void helper_booke_setpid(CPUPPCState *env, uint32_=
+t pidn, target_ulong pid)
+     tlb_flush(CPU(cpu));
+ }
+=20
++void helper_booke_set_eplc(CPUPPCState *env, target_ulong val)
++{
++    PowerPCCPU *cpu =3D ppc_env_get_cpu(env);
++    env->spr[SPR_BOOKE_EPLC] =3D val & EPID_MASK;
++    tlb_flush_by_mmuidx(CPU(cpu), 1 << PPC_TLB_EPID_LOAD);
++}
++void helper_booke_set_epsc(CPUPPCState *env, target_ulong val)
++{
++    PowerPCCPU *cpu =3D ppc_env_get_cpu(env);
++    env->spr[SPR_BOOKE_EPSC] =3D val & EPID_MASK;
++    tlb_flush_by_mmuidx(CPU(cpu), 1 << PPC_TLB_EPID_STORE);
++}
++
+ static inline void flush_page(CPUPPCState *env, ppcmas_tlb_t *tlb)
+ {
+     PowerPCCPU *cpu =3D ppc_env_get_cpu(env);
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 4e59dd5f42..c999832426 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -2579,6 +2579,26 @@ GEN_LDS(lha, ld16s, 0x0A, PPC_INTEGER);
+ GEN_LDS(lhz, ld16u, 0x08, PPC_INTEGER);
+ /* lwz lwzu lwzux lwzx */
+ GEN_LDS(lwz, ld32u, 0x00, PPC_INTEGER);
++
++#define GEN_LDEPX(name, ldop, opc2, opc3)                               =
       \
-     for (i =3D 0; i < nels; i++) {                                      =
++static void glue(gen_, name##epx)(DisasContext *ctx)                    =
+      \
++{                                                                       =
+      \
++    TCGv EA;                                                            =
+      \
++    CHK_SV;                                                             =
+      \
++    gen_set_access_type(ctx, ACCESS_INT);                               =
+      \
++    EA =3D tcg_temp_new();                                              =
         \
-         if (unlikely(tp##_is_signaling_nan(xb.fld, &env->fp_status))) { =
++    gen_addr_reg_index(ctx, EA);                                        =
       \
--                float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, sfprf=
-);    \
-+            float_invalid_op_vxsnan(env, GETPC());                      =
++    tcg_gen_qemu_ld_tl(cpu_gpr[rD(ctx->opcode)], EA, PPC_TLB_EPID_LOAD, =
+ldop);\
++    tcg_temp_free(EA);                                                  =
       \
-         }                                                               =
++}
++
++GEN_LDEPX(lb, DEF_MEMOP(MO_UB), 0x1F, 0x02)
++GEN_LDEPX(lh, DEF_MEMOP(MO_UW), 0x1F, 0x08)
++GEN_LDEPX(lw, DEF_MEMOP(MO_UL), 0x1F, 0x00)
++#if defined(TARGET_PPC64)
++GEN_LDEPX(ld, DEF_MEMOP(MO_Q), 0x1D, 0x00)
++#endif
++
+ #if defined(TARGET_PPC64)
+ /* lwaux */
+ GEN_LDUX(lwa, ld32s, 0x15, 0x0B, PPC_64B);
+@@ -2760,6 +2780,27 @@ GEN_STS(stb, st8, 0x06, PPC_INTEGER);
+ GEN_STS(sth, st16, 0x0C, PPC_INTEGER);
+ /* stw stwu stwux stwx */
+ GEN_STS(stw, st32, 0x04, PPC_INTEGER);
++
++#define GEN_STEPX(name, stop, opc2, opc3)                               =
       \
-         xt.fld =3D tp##_div(tp##_one, xb.fld, &env->fp_status);         =
++static void glue(gen_, name##epx)(DisasContext *ctx)                    =
+      \
++{                                                                       =
+      \
++    TCGv EA;                                                            =
+      \
++    CHK_SV;                                                             =
+      \
++    gen_set_access_type(ctx, ACCESS_INT);                               =
+      \
++    EA =3D tcg_temp_new();                                              =
         \
-                                                                         =
++    gen_addr_reg_index(ctx, EA);                                        =
       \
-@@ -2093,9 +2111,9 @@ void helper_##op(CPUPPCState *env, uint32_t opcode)=
-                          \
-                                                                         =
-     \
-         if (unlikely(tstat.float_exception_flags & float_flag_invalid)) =
-{    \
-             if (tp##_is_neg(xb.fld) && !tp##_is_zero(xb.fld)) {         =
-     \
--                float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSQRT, sfprf=
-);   \
-+                float_invalid_op_vxsqrt(env, sfprf, GETPC());           =
-     \
-             } else if (tp##_is_signaling_nan(xb.fld, &tstat)) {         =
-     \
--                float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, sfprf=
-);   \
-+                float_invalid_op_vxsnan(env, GETPC());                  =
-     \
-             }                                                           =
-     \
-         }                                                               =
-     \
-                                                                         =
-     \
-@@ -2143,9 +2161,9 @@ void helper_##op(CPUPPCState *env, uint32_t opcode)=
-                          \
-                                                                         =
-     \
-         if (unlikely(tstat.float_exception_flags & float_flag_invalid)) =
-{    \
-             if (tp##_is_neg(xb.fld) && !tp##_is_zero(xb.fld)) {         =
-     \
--                float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSQRT, sfprf=
-);   \
-+                float_invalid_op_vxsqrt(env, sfprf, GETPC());           =
-     \
-             } else if (tp##_is_signaling_nan(xb.fld, &tstat)) {         =
-     \
--                float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, sfprf=
-);   \
-+                float_invalid_op_vxsnan(env, GETPC());                  =
-     \
-             }                                                           =
-     \
-         }                                                               =
-     \
-                                                                         =
-     \
-@@ -2329,7 +2347,8 @@ void helper_##op(CPUPPCState *env, uint32_t opcode)=
-                           \
-         env->fp_status.float_exception_flags |=3D tstat.float_exception_=
-flags;  \
-                                                                         =
++    tcg_gen_qemu_st_tl(                                                 =
       \
-         if (unlikely(tstat.float_exception_flags & float_flag_invalid)) =
-{     \
--            tp##_maddsub_update_excp(env, xa.fld, b->fld, c->fld, maddfl=
-gs);  \
-+            tp##_maddsub_update_excp(env, xa.fld, b->fld,               =
++        cpu_gpr[rD(ctx->opcode)], EA, PPC_TLB_EPID_STORE, stop);        =
       \
-+                                     c->fld, maddflgs, GETPC());        =
++    tcg_temp_free(EA);                                                  =
       \
-         }                                                               =
-      \
-                                                                         =
-      \
-         if (r2sp) {                                                     =
-      \
-@@ -2407,10 +2426,10 @@ void helper_##op(CPUPPCState *env, uint32_t opcod=
-e)                           \
-             float64_is_quiet_nan(xb.VsrD(0), &env->fp_status);          =
-      \
-     }                                                                   =
-      \
-     if (vxsnan_flag) {                                                  =
-      \
--        float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 0);          =
-      \
-+        float_invalid_op_vxsnan(env, GETPC());                          =
-      \
-     }                                                                   =
-      \
-     if (vxvc_flag) {                                                    =
-      \
--        float_invalid_op_excp(env, POWERPC_EXCP_FP_VXVC, 0);            =
-      \
-+        float_invalid_op_vxvc(env, 0, GETPC());                         =
-      \
-     }                                                                   =
-      \
-     vex_flag =3D fpscr_ve && (vxvc_flag || vxsnan_flag);                =
-        \
-                                                                         =
-      \
-@@ -2522,10 +2541,10 @@ void helper_##op(CPUPPCState *env, uint32_t opcod=
-e)                      \
-         }                                                               =
- \
-     }                                                                   =
- \
-     if (vxsnan_flag) {                                                  =
- \
--        float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 0);          =
- \
-+        float_invalid_op_vxsnan(env, GETPC());                          =
- \
-     }                                                                   =
- \
-     if (vxvc_flag) {                                                    =
- \
--        float_invalid_op_excp(env, POWERPC_EXCP_FP_VXVC, 0);            =
- \
-+        float_invalid_op_vxvc(env, 0, GETPC());                         =
- \
-     }                                                                   =
- \
-                                                                         =
- \
-     if (float64_lt(xa.VsrD(0), xb.VsrD(0), &env->fp_status)) {          =
- \
-@@ -2572,10 +2591,10 @@ void helper_##op(CPUPPCState *env, uint32_t opcod=
-e)                     \
-         }                                                               =
-\
-     }                                                                   =
-\
-     if (vxsnan_flag) {                                                  =
-\
--        float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 0);          =
-\
-+        float_invalid_op_vxsnan(env, GETPC());                          =
-\
-     }                                                                   =
-\
-     if (vxvc_flag) {                                                    =
-\
--        float_invalid_op_excp(env, POWERPC_EXCP_FP_VXVC, 0);            =
-\
-+        float_invalid_op_vxvc(env, 0, GETPC());                         =
-\
-     }                                                                   =
-\
-                                                                         =
-\
-     if (float128_lt(xa.f128, xb.f128, &env->fp_status)) {               =
-\
-@@ -2617,7 +2636,7 @@ void helper_##name(CPUPPCState *env, uint32_t opcod=
-e)                         \
-         xt.fld =3D tp##_##op(xa.fld, xb.fld, &env->fp_status);          =
-        \
-         if (unlikely(tp##_is_signaling_nan(xa.fld, &env->fp_status) ||  =
-      \
-                      tp##_is_signaling_nan(xb.fld, &env->fp_status))) { =
-      \
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 0);      =
-      \
-+            float_invalid_op_vxsnan(env, GETPC());                      =
-      \
-         }                                                               =
-      \
-     }                                                                   =
-      \
-                                                                         =
-      \
-@@ -2660,7 +2679,7 @@ void helper_##name(CPUPPCState *env, uint32_t opcod=
-e)                         \
-                                                                         =
-      \
-     vex_flag =3D fpscr_ve & vxsnan_flag;                                =
-        \
-     if (vxsnan_flag) {                                                  =
-      \
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 0);      =
-      \
-+        float_invalid_op_vxsnan(env, GETPC());                          =
-      \
-     }                                                                   =
-      \
-     if (!vex_flag) {                                                    =
-      \
-         putVSR(rD(opcode) + 32, &xt, env);                              =
-      \
-@@ -2715,7 +2734,7 @@ void helper_##name(CPUPPCState *env, uint32_t opcod=
-e)                         \
-                                                                         =
-      \
-     vex_flag =3D fpscr_ve & vxsnan_flag;                                =
-        \
-     if (vxsnan_flag) {                                                  =
-      \
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 0);      =
-      \
-+        float_invalid_op_vxsnan(env, GETPC());                          =
-      \
-     }                                                                   =
-      \
-     if (!vex_flag) {                                                    =
-      \
-         putVSR(rD(opcode) + 32, &xt, env);                              =
-      \
-@@ -2751,10 +2770,10 @@ void helper_##op(CPUPPCState *env, uint32_t opcod=
-e)                       \
-                      tp##_is_any_nan(xb.fld))) {                        =
-  \
-             if (tp##_is_signaling_nan(xa.fld, &env->fp_status) ||       =
-  \
-                 tp##_is_signaling_nan(xb.fld, &env->fp_status)) {       =
-  \
--                float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 0);  =
-  \
-+                float_invalid_op_vxsnan(env, GETPC());                  =
-  \
-             }                                                           =
-  \
-             if (svxvc) {                                                =
-  \
--                float_invalid_op_excp(env, POWERPC_EXCP_FP_VXVC, 0);    =
-  \
-+                float_invalid_op_vxvc(env, 0, GETPC());                 =
-  \
-             }                                                           =
-  \
-             xt.fld =3D 0;                                               =
-    \
-             all_true =3D 0;                                             =
-    \
-@@ -2807,7 +2826,7 @@ void helper_##op(CPUPPCState *env, uint32_t opcode)=
-                \
-         xt.tfld =3D stp##_to_##ttp(xb.sfld, &env->fp_status);        \
-         if (unlikely(stp##_is_signaling_nan(xb.sfld,               \
-                                             &env->fp_status))) {   \
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 0); \
-+            float_invalid_op_vxsnan(env, GETPC());                 \
-             xt.tfld =3D ttp##_snan_to_qnan(xt.tfld);                 \
-         }                                                          \
-         if (sfprf) {                                               \
-@@ -2846,7 +2865,7 @@ void helper_##op(CPUPPCState *env, uint32_t opcode)=
-                       \
-         xt.tfld =3D stp##_to_##ttp(xb.sfld, &env->fp_status);           =
-  \
-         if (unlikely(stp##_is_signaling_nan(xb.sfld,                    =
-\
-                                             &env->fp_status))) {        =
-\
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 0);      =
-\
-+            float_invalid_op_vxsnan(env, GETPC());                      =
-\
-             xt.tfld =3D ttp##_snan_to_qnan(xt.tfld);                    =
-  \
-         }                                                               =
-\
-         if (sfprf) {                                                    =
-\
-@@ -2883,7 +2902,7 @@ void helper_##op(CPUPPCState *env, uint32_t opcode)=
-                \
-         xt.tfld =3D stp##_to_##ttp(xb.sfld, 1, &env->fp_status);     \
-         if (unlikely(stp##_is_signaling_nan(xb.sfld,               \
-                                             &env->fp_status))) {   \
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 0); \
-+            float_invalid_op_vxsnan(env, GETPC());                 \
-             xt.tfld =3D ttp##_snan_to_qnan(xt.tfld);                 \
-         }                                                          \
-         if (sfprf) {                                               \
-@@ -2919,9 +2938,8 @@ void helper_xscvqpdp(CPUPPCState *env, uint32_t opc=
-ode)
++}
++
++GEN_STEPX(stb, DEF_MEMOP(MO_UB), 0x1F, 0x06)
++GEN_STEPX(sth, DEF_MEMOP(MO_UW), 0x1F, 0x0C)
++GEN_STEPX(stw, DEF_MEMOP(MO_UL), 0x1F, 0x04)
++#if defined(TARGET_PPC64)
++GEN_STEPX(std, DEF_MEMOP(MO_Q), 0x1d, 0x04)
++#endif
++
+ #if defined(TARGET_PPC64)
+ GEN_STUX(std, st64_i64, 0x15, 0x05, PPC_64B);
+ GEN_STX(std, st64_i64, 0x15, 0x04, PPC_64B);
+@@ -4392,6 +4433,19 @@ static void gen_dcbf(DisasContext *ctx)
+     tcg_temp_free(t0);
+ }
 =20
-     xt.VsrD(0) =3D float128_to_float64(xb.f128, &tstat);
-     env->fp_status.float_exception_flags |=3D tstat.float_exception_flag=
-s;
--    if (unlikely(float128_is_signaling_nan(xb.f128,
--                                           &tstat))) {
--        float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 0);
-+    if (unlikely(float128_is_signaling_nan(xb.f128, &tstat))) {
-+        float_invalid_op_vxsnan(env, GETPC());
-         xt.VsrD(0) =3D float64_snan_to_qnan(xt.VsrD(0));
++/* dcbfep (external PID dcbf) */
++static void gen_dcbfep(DisasContext *ctx)
++{
++    /* XXX: specification says this is treated as a load by the MMU */
++    TCGv t0;
++    CHK_SV;
++    gen_set_access_type(ctx, ACCESS_CACHE);
++    t0 =3D tcg_temp_new();
++    gen_addr_reg_index(ctx, t0);
++    tcg_gen_qemu_ld_tl(t0, t0, PPC_TLB_EPID_LOAD, DEF_MEMOP(MO_UB));
++    tcg_temp_free(t0);
++}
++
+ /* dcbi (Supervisor only) */
+ static void gen_dcbi(DisasContext *ctx)
+ {
+@@ -4425,6 +4479,18 @@ static void gen_dcbst(DisasContext *ctx)
+     tcg_temp_free(t0);
+ }
+=20
++/* dcbstep (dcbstep External PID version) */
++static void gen_dcbstep(DisasContext *ctx)
++{
++    /* XXX: specification say this is treated as a load by the MMU */
++    TCGv t0;
++    gen_set_access_type(ctx, ACCESS_CACHE);
++    t0 =3D tcg_temp_new();
++    gen_addr_reg_index(ctx, t0);
++    tcg_gen_qemu_ld_tl(t0, t0, PPC_TLB_EPID_LOAD, DEF_MEMOP(MO_UB));
++    tcg_temp_free(t0);
++}
++
+ /* dcbt */
+ static void gen_dcbt(DisasContext *ctx)
+ {
+@@ -4434,6 +4500,15 @@ static void gen_dcbt(DisasContext *ctx)
+      */
+ }
+=20
++/* dcbtep */
++static void gen_dcbtep(DisasContext *ctx)
++{
++    /* interpreted as no-op */
++    /* XXX: specification say this is treated as a load by the MMU
++     *      but does not generate any exception
++     */
++}
++
+ /* dcbtst */
+ static void gen_dcbtst(DisasContext *ctx)
+ {
+@@ -4443,6 +4518,15 @@ static void gen_dcbtst(DisasContext *ctx)
+      */
+ }
+=20
++/* dcbtstep */
++static void gen_dcbtstep(DisasContext *ctx)
++{
++    /* interpreted as no-op */
++    /* XXX: specification say this is treated as a load by the MMU
++     *      but does not generate any exception
++     */
++}
++
+ /* dcbtls */
+ static void gen_dcbtls(DisasContext *ctx)
+ {
+@@ -4469,6 +4553,21 @@ static void gen_dcbz(DisasContext *ctx)
+     tcg_temp_free_i32(tcgv_op);
+ }
+=20
++/* dcbzep */
++static void gen_dcbzep(DisasContext *ctx)
++{
++    TCGv tcgv_addr;
++    TCGv_i32 tcgv_op;
++
++    gen_set_access_type(ctx, ACCESS_CACHE);
++    tcgv_addr =3D tcg_temp_new();
++    tcgv_op =3D tcg_const_i32(ctx->opcode & 0x03FF000);
++    gen_addr_reg_index(ctx, tcgv_addr);
++    gen_helper_dcbzep(cpu_env, tcgv_addr, tcgv_op);
++    tcg_temp_free(tcgv_addr);
++    tcg_temp_free_i32(tcgv_op);
++}
++
+ /* dst / dstt */
+ static void gen_dst(DisasContext *ctx)
+ {
+@@ -4507,6 +4606,17 @@ static void gen_icbi(DisasContext *ctx)
+     tcg_temp_free(t0);
+ }
+=20
++/* icbiep */
++static void gen_icbiep(DisasContext *ctx)
++{
++    TCGv t0;
++    gen_set_access_type(ctx, ACCESS_CACHE);
++    t0 =3D tcg_temp_new();
++    gen_addr_reg_index(ctx, t0);
++    gen_helper_icbiep(cpu_env, t0);
++    tcg_temp_free(t0);
++}
++
+ /* Optional: */
+ /* dcba */
+ static void gen_dcba(DisasContext *ctx)
+@@ -6774,16 +6884,22 @@ GEN_HANDLER_E(mcrxrx, 0x1F, 0x00, 0x12, 0x007FF80=
+1, PPC_NONE, PPC2_ISA300),
+ GEN_HANDLER(mtmsr, 0x1F, 0x12, 0x04, 0x001EF801, PPC_MISC),
+ GEN_HANDLER(mtspr, 0x1F, 0x13, 0x0E, 0x00000000, PPC_MISC),
+ GEN_HANDLER(dcbf, 0x1F, 0x16, 0x02, 0x03C00001, PPC_CACHE),
++GEN_HANDLER_E(dcbfep, 0x1F, 0x1F, 0x03, 0x03C00001, PPC_NONE, PPC2_BOOKE=
+206),
+ GEN_HANDLER(dcbi, 0x1F, 0x16, 0x0E, 0x03E00001, PPC_CACHE),
+ GEN_HANDLER(dcbst, 0x1F, 0x16, 0x01, 0x03E00001, PPC_CACHE),
++GEN_HANDLER_E(dcbstep, 0x1F, 0x1F, 0x01, 0x03E00001, PPC_NONE, PPC2_BOOK=
+E206),
+ GEN_HANDLER(dcbt, 0x1F, 0x16, 0x08, 0x00000001, PPC_CACHE),
++GEN_HANDLER_E(dcbtep, 0x1F, 0x1F, 0x09, 0x00000001, PPC_NONE, PPC2_BOOKE=
+206),
+ GEN_HANDLER(dcbtst, 0x1F, 0x16, 0x07, 0x00000001, PPC_CACHE),
++GEN_HANDLER_E(dcbtstep, 0x1F, 0x1F, 0x07, 0x00000001, PPC_NONE, PPC2_BOO=
+KE206),
+ GEN_HANDLER_E(dcbtls, 0x1F, 0x06, 0x05, 0x02000001, PPC_BOOKE, PPC2_BOOK=
+E206),
+ GEN_HANDLER(dcbz, 0x1F, 0x16, 0x1F, 0x03C00001, PPC_CACHE_DCBZ),
++GEN_HANDLER_E(dcbzep, 0x1F, 0x1F, 0x1F, 0x03C00001, PPC_NONE, PPC2_BOOKE=
+206),
+ GEN_HANDLER(dst, 0x1F, 0x16, 0x0A, 0x01800001, PPC_ALTIVEC),
+ GEN_HANDLER(dstst, 0x1F, 0x16, 0x0B, 0x01800001, PPC_ALTIVEC),
+ GEN_HANDLER(dss, 0x1F, 0x16, 0x19, 0x019FF801, PPC_ALTIVEC),
+ GEN_HANDLER(icbi, 0x1F, 0x16, 0x1E, 0x03E00001, PPC_CACHE_ICBI),
++GEN_HANDLER_E(icbiep, 0x1F, 0x1F, 0x1E, 0x03E00001, PPC_NONE, PPC2_BOOKE=
+206),
+ GEN_HANDLER(dcba, 0x1F, 0x16, 0x17, 0x03E00001, PPC_CACHE_DCBA),
+ GEN_HANDLER(mfsr, 0x1F, 0x13, 0x12, 0x0010F801, PPC_SEGMENT),
+ GEN_HANDLER(mfsrin, 0x1F, 0x13, 0x14, 0x001F0001, PPC_SEGMENT),
+@@ -7086,6 +7202,19 @@ GEN_LDX_HVRM(lbzcix, ld8u, 0x15, 0x1a, PPC_CILDST)
+ GEN_LDX(lhbr, ld16ur, 0x16, 0x18, PPC_INTEGER)
+ GEN_LDX(lwbr, ld32ur, 0x16, 0x10, PPC_INTEGER)
+=20
++/* External PID based load */
++#undef GEN_LDEPX
++#define GEN_LDEPX(name, ldop, opc2, opc3)                               =
+      \
++GEN_HANDLER_E(name##epx, 0x1F, opc2, opc3,                              =
+      \
++              0x00000001, PPC_NONE, PPC2_BOOKE206),
++
++GEN_LDEPX(lb, DEF_MEMOP(MO_UB), 0x1F, 0x02)
++GEN_LDEPX(lh, DEF_MEMOP(MO_UW), 0x1F, 0x08)
++GEN_LDEPX(lw, DEF_MEMOP(MO_UL), 0x1F, 0x00)
++#if defined(TARGET_PPC64)
++GEN_LDEPX(ld, DEF_MEMOP(MO_Q), 0x1D, 0x00)
++#endif
++
+ #undef GEN_ST
+ #undef GEN_STU
+ #undef GEN_STUX
+@@ -7120,6 +7249,18 @@ GEN_STX_HVRM(stbcix, st8, 0x15, 0x1e, PPC_CILDST)
+ GEN_STX(sthbr, st16r, 0x16, 0x1C, PPC_INTEGER)
+ GEN_STX(stwbr, st32r, 0x16, 0x14, PPC_INTEGER)
+=20
++#undef GEN_STEPX
++#define GEN_STEPX(name, ldop, opc2, opc3)                               =
+      \
++GEN_HANDLER_E(name##epx, 0x1F, opc2, opc3,                              =
+      \
++              0x00000001, PPC_NONE, PPC2_BOOKE206),
++
++GEN_STEPX(stb, DEF_MEMOP(MO_UB), 0x1F, 0x06)
++GEN_STEPX(sth, DEF_MEMOP(MO_UW), 0x1F, 0x0C)
++GEN_STEPX(stw, DEF_MEMOP(MO_UL), 0x1F, 0x04)
++#if defined(TARGET_PPC64)
++GEN_STEPX(std, DEF_MEMOP(MO_Q), 0x1D, 0x04)
++#endif
++
+ #undef GEN_CRLOGIC
+ #define GEN_CRLOGIC(name, tcg_op, opc)                                  =
+      \
+ GEN_HANDLER(name, 0x13, 0x01, opc, 0x00000001, PPC_INTEGER)
+diff --git a/target/ppc/translate/fp-impl.inc.c b/target/ppc/translate/fp=
+-impl.inc.c
+index a6f522b85c..08770ba9f5 100644
+--- a/target/ppc/translate/fp-impl.inc.c
++++ b/target/ppc/translate/fp-impl.inc.c
+@@ -673,6 +673,23 @@ GEN_LDFS(lfd, ld64_i64, 0x12, PPC_FLOAT);
+  /* lfs lfsu lfsux lfsx */
+ GEN_LDFS(lfs, ld32fs, 0x10, PPC_FLOAT);
+=20
++/* lfdepx (external PID lfdx) */
++static void gen_lfdepx(DisasContext *ctx)
++{
++    TCGv EA;
++    CHK_SV;
++    if (unlikely(!ctx->fpu_enabled)) {
++        gen_exception(ctx, POWERPC_EXCP_FPU);
++        return;
++    }
++    gen_set_access_type(ctx, ACCESS_FLOAT);
++    EA =3D tcg_temp_new();
++    gen_addr_reg_index(ctx, EA);
++    tcg_gen_qemu_ld_i64(cpu_fpr[rD(ctx->opcode)], EA, PPC_TLB_EPID_LOAD,
++        DEF_MEMOP(MO_Q));
++    tcg_temp_free(EA);
++}
++
+ /* lfdp */
+ static void gen_lfdp(DisasContext *ctx)
+ {
+@@ -846,6 +863,23 @@ GEN_STFS(stfd, st64_i64, 0x16, PPC_FLOAT);
+ /* stfs stfsu stfsux stfsx */
+ GEN_STFS(stfs, st32fs, 0x14, PPC_FLOAT);
+=20
++/* stfdepx (external PID lfdx) */
++static void gen_stfdepx(DisasContext *ctx)
++{
++    TCGv EA;
++    CHK_SV;
++    if (unlikely(!ctx->fpu_enabled)) {
++        gen_exception(ctx, POWERPC_EXCP_FPU);
++        return;
++    }
++    gen_set_access_type(ctx, ACCESS_FLOAT);
++    EA =3D tcg_temp_new();
++    gen_addr_reg_index(ctx, EA);
++    tcg_gen_qemu_st_i64(cpu_fpr[rD(ctx->opcode)], EA, PPC_TLB_EPID_STORE=
+,
++                       DEF_MEMOP(MO_Q));
++    tcg_temp_free(EA);
++}
++
+ /* stfdp */
+ static void gen_stfdp(DisasContext *ctx)
+ {
+diff --git a/target/ppc/translate/fp-ops.inc.c b/target/ppc/translate/fp-=
+ops.inc.c
+index 3c6d05a074..621f6bfe0c 100644
+--- a/target/ppc/translate/fp-ops.inc.c
++++ b/target/ppc/translate/fp-ops.inc.c
+@@ -66,6 +66,7 @@ GEN_LDXF(name, ldop, 0x17, op | 0x00, type)
+=20
+ GEN_LDFS(lfd, ld64, 0x12, PPC_FLOAT)
+ GEN_LDFS(lfs, ld32fs, 0x10, PPC_FLOAT)
++GEN_HANDLER_E(lfdepx, 0x1F, 0x1F, 0x12, 0x00000001, PPC_NONE, PPC2_BOOKE=
+206),
+ GEN_HANDLER_E(lfiwax, 0x1f, 0x17, 0x1a, 0x00000001, PPC_NONE, PPC2_ISA20=
+5),
+ GEN_HANDLER_E(lfiwzx, 0x1f, 0x17, 0x1b, 0x1, PPC_NONE, PPC2_FP_CVT_ISA20=
+6),
+ GEN_HANDLER_E(lfdpx, 0x1F, 0x17, 0x18, 0x00200001, PPC_NONE, PPC2_ISA205=
+),
+@@ -87,6 +88,7 @@ GEN_STXF(name, stop, 0x17, op | 0x00, type)
+ GEN_STFS(stfd, st64_i64, 0x16, PPC_FLOAT)
+ GEN_STFS(stfs, st32fs, 0x14, PPC_FLOAT)
+ GEN_STXF(stfiw, st32fiw, 0x17, 0x1E, PPC_FLOAT_STFIWX)
++GEN_HANDLER_E(stfdepx, 0x1F, 0x1F, 0x16, 0x00000001, PPC_NONE, PPC2_BOOK=
+E206),
+ GEN_HANDLER_E(stfdpx, 0x1F, 0x17, 0x1C, 0x00200001, PPC_NONE, PPC2_ISA20=
+5),
+=20
+ GEN_HANDLER(frsqrtes, 0x3B, 0x1A, 0xFF, 0x001F07C0, PPC_FLOAT_FRSQRTES),
+diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
+inc.c
+index ee9432eb15..9a2d4a9835 100644
+--- a/target/ppc/translate_init.inc.c
++++ b/target/ppc/translate_init.inc.c
+@@ -1653,6 +1653,15 @@ static void spr_write_booke_pid(DisasContext *ctx,=
+ int sprn, int gprn)
+     gen_helper_booke_setpid(cpu_env, t0, cpu_gpr[gprn]);
+     tcg_temp_free_i32(t0);
+ }
++static void spr_write_eplc(DisasContext *ctx, int sprn, int gprn)
++{
++    gen_helper_booke_set_eplc(cpu_env, cpu_gpr[gprn]);
++}
++static void spr_write_epsc(DisasContext *ctx, int sprn, int gprn)
++{
++    gen_helper_booke_set_epsc(cpu_env, cpu_gpr[gprn]);
++}
++
+ #endif
+=20
+ static void gen_spr_usprg3(CPUPPCState *env)
+@@ -1912,6 +1921,16 @@ static void gen_spr_BookE206(CPUPPCState *env, uin=
+t32_t mas_mask,
+                      &spr_read_generic, &spr_write_booke_pid,
+                      0x00000000);
      }
-     helper_compute_fprf_float64(env, xt.VsrD(0));
-@@ -2967,15 +2985,15 @@ void helper_##op(CPUPPCState *env, uint32_t opcod=
-e)                          \
-     for (i =3D 0; i < nels; i++) {                                      =
-       \
-         if (unlikely(stp##_is_any_nan(xb.sfld))) {                      =
-     \
-             if (stp##_is_signaling_nan(xb.sfld, &env->fp_status)) {     =
-     \
--                float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 0);  =
-     \
-+                float_invalid_op_vxsnan(env, GETPC());                  =
-     \
-             }                                                           =
-     \
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXCVI, 0);       =
-     \
-+            float_invalid_op_vxcvi(env, 0, GETPC());                    =
-     \
-             xt.tfld =3D rnan;                                           =
-       \
-         } else {                                                        =
-     \
-             xt.tfld =3D stp##_to_##ttp##_round_to_zero(xb.sfld,         =
-       \
-                           &env->fp_status);                             =
-     \
-             if (env->fp_status.float_exception_flags & float_flag_invali=
-d) { \
--                float_invalid_op_excp(env, POWERPC_EXCP_FP_VXCVI, 0);   =
-     \
-+                float_invalid_op_vxcvi(env, 0, GETPC());                =
-     \
-             }                                                           =
-     \
-         }                                                               =
-     \
-     }                                                                   =
-     \
-@@ -3020,15 +3038,15 @@ void helper_##op(CPUPPCState *env, uint32_t opcod=
-e)                          \
-                                                                         =
-     \
-     if (unlikely(stp##_is_any_nan(xb.sfld))) {                          =
-     \
-         if (stp##_is_signaling_nan(xb.sfld, &env->fp_status)) {         =
-     \
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 0);      =
-     \
-+            float_invalid_op_vxsnan(env, GETPC());                      =
-     \
-         }                                                               =
-     \
--        float_invalid_op_excp(env, POWERPC_EXCP_FP_VXCVI, 0);           =
-     \
-+        float_invalid_op_vxcvi(env, 0, GETPC());                        =
-     \
-         xt.tfld =3D rnan;                                               =
-       \
-     } else {                                                            =
-     \
-         xt.tfld =3D stp##_to_##ttp##_round_to_zero(xb.sfld,             =
-       \
-                       &env->fp_status);                                 =
-     \
-         if (env->fp_status.float_exception_flags & float_flag_invalid) {=
-     \
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXCVI, 0);       =
-     \
-+            float_invalid_op_vxcvi(env, 0, GETPC());                    =
-     \
-         }                                                               =
-     \
-     }                                                                   =
-     \
-                                                                         =
-     \
-@@ -3144,7 +3162,7 @@ void helper_##op(CPUPPCState *env, uint32_t opcode)=
-                    \
-     for (i =3D 0; i < nels; i++) {                                      =
- \
-         if (unlikely(tp##_is_signaling_nan(xb.fld,                     \
-                                            &env->fp_status))) {        \
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 0);     \
-+            float_invalid_op_vxsnan(env, GETPC());                     \
-             xt.fld =3D tp##_snan_to_qnan(xb.fld);                       =
- \
-         } else {                                                       \
-             xt.fld =3D tp##_round_to_int(xb.fld, &env->fp_status);      =
- \
-@@ -3373,7 +3391,7 @@ void helper_xsrqpi(CPUPPCState *env, uint32_t opcod=
-e)
-=20
-     if (unlikely(tstat.float_exception_flags & float_flag_invalid)) {
-         if (float128_is_signaling_nan(xb.f128, &tstat)) {
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 0);
-+            float_invalid_op_vxsnan(env, GETPC());
-             xt.f128 =3D float128_snan_to_qnan(xt.f128);
-         }
-     }
-@@ -3433,7 +3451,7 @@ void helper_xsrqpxp(CPUPPCState *env, uint32_t opco=
-de)
-=20
-     if (unlikely(tstat.float_exception_flags & float_flag_invalid)) {
-         if (float128_is_signaling_nan(xb.f128, &tstat)) {
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 0);
-+            float_invalid_op_vxsnan(env, GETPC());
-             xt.f128 =3D float128_snan_to_qnan(xt.f128);
-         }
-     }
-@@ -3464,12 +3482,12 @@ void helper_xssqrtqp(CPUPPCState *env, uint32_t o=
-pcode)
-=20
-     if (unlikely(tstat.float_exception_flags & float_flag_invalid)) {
-         if (float128_is_signaling_nan(xb.f128, &tstat)) {
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);
-+            float_invalid_op_vxsnan(env, GETPC());
-             xt.f128 =3D float128_snan_to_qnan(xb.f128);
-         } else if  (float128_is_quiet_nan(xb.f128, &tstat)) {
-             xt.f128 =3D xb.f128;
-         } else if (float128_is_neg(xb.f128) && !float128_is_zero(xb.f128=
-)) {
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSQRT, 1);
-+            float_invalid_op_vxsqrt(env, 1, GETPC());
-             xt.f128 =3D float128_default_nan(&env->fp_status);
-         }
-     }
-@@ -3500,10 +3518,10 @@ void helper_xssubqp(CPUPPCState *env, uint32_t op=
-code)
-=20
-     if (unlikely(tstat.float_exception_flags & float_flag_invalid)) {
-         if (float128_is_infinity(xa.f128) && float128_is_infinity(xb.f12=
-8)) {
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXISI, 1);
-+            float_invalid_op_vxisi(env, 1, GETPC());
-         } else if (float128_is_signaling_nan(xa.f128, &tstat) ||
-                    float128_is_signaling_nan(xb.f128, &tstat)) {
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);
-+            float_invalid_op_vxsnan(env, GETPC());
-         }
-     }
-=20
++
++    spr_register(env, SPR_BOOKE_EPLC, "EPLC",
++                 SPR_NOACCESS, SPR_NOACCESS,
++                 &spr_read_generic, &spr_write_eplc,
++                 0x00000000);
++    spr_register(env, SPR_BOOKE_EPSC, "EPSC",
++                 SPR_NOACCESS, SPR_NOACCESS,
++                 &spr_read_generic, &spr_write_epsc,
++                 0x00000000);
++
+     /* XXX : not implemented */
+     spr_register(env, SPR_MMUCFG, "MMUCFG",
+                  SPR_NOACCESS, SPR_NOACCESS,
+@@ -2797,8 +2816,6 @@ static void gen_spr_8xx(CPUPPCState *env)
+  * perf    =3D> 768-783 (Power 2.04)
+  * perf    =3D> 784-799 (Power 2.04)
+  * PPR     =3D> SPR 896 (Power 2.04)
+- * EPLC    =3D> SPR 947 (Power 2.04 emb)
+- * EPSC    =3D> SPR 948 (Power 2.04 emb)
+  * DABRX   =3D> 1015    (Power 2.04 hypv)
+  * FPECR   =3D> SPR 1022 (?)
+  * ... and more (thermal management, performance counters, ...)
 --=20
 2.19.1
