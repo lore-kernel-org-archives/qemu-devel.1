@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39500)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41659)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gKpaw-0004ks-NZ
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 14:03:59 -0500
+	(envelope-from <palmer@sifive.com>) id 1gKpir-00089M-6L
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 14:12:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gKpas-0002BJ-6X
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 14:03:58 -0500
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:45055)
+	(envelope-from <palmer@sifive.com>) id 1gKpin-0000RB-QI
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 14:12:09 -0500
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:44356)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gKpar-00027v-L6
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 14:03:54 -0500
-Received: by mail-pl1-x643.google.com with SMTP id s5-v6so9948091plq.11
-	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 11:03:53 -0800 (PST)
-MIME-Version: 1.0
-Date: Thu, 8 Nov 2018 10:58:05 -0800
-References: <1793576616012e06e68cd9e0215eb907ff2ef12b.1541627403.git.alistair.francis@wdc.com>
-In-Reply-To: <1793576616012e06e68cd9e0215eb907ff2ef12b.1541627403.git.alistair.francis@wdc.com>
-Message-ID: <CANs6eMmcgZMoNbv83idynU_qt6GKrGNMu0GkbpxDidw_=QNNOw@mail.gmail.com>
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gKpin-0000O6-2m
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 14:12:05 -0500
+Received: by mail-pf1-x442.google.com with SMTP id j13-v6so9717744pff.11
+	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 11:12:02 -0800 (PST)
+Date: Thu, 08 Nov 2018 11:12:00 -0800 (PST)
+In-Reply-To: <d6ec0bb8-1ea6-c032-5643-2248ce7647a6@mail.uni-paderborn.de>
 From: Palmer Dabbelt <palmer@sifive.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for 3.1 v1 1/1] hw/riscv/virt: Free the
- test device tree node name
+Message-ID: <mhng-133c83c5-d4e7-402a-935f-3ed9ca6b44b3@palmer-si-x1c4>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 0/2] target/riscv: Bugfixes found in
+ decodetree conversion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +28,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <Alistair.Francis@wdc.com>
-Cc: qemu-devel@nongnu.org, qemu-riscv@nongnu.org, alistair23@gmail.com
+To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: richard.henderson@linaro.org, Michael Clark <mjc@sifive.com>, sagark@eecs.berkeley.edu, Alistair Francis <Alistair.Francis@wdc.com>, qemu-riscv@nongnu.org, qemu-devel@nongnu.org
 
-On Wed, Nov 7, 2018 at 1:52 PM Alistair Francis <Alistair.Francis@wdc.com> 
-wrote:
+On Thu, 08 Nov 2018 09:29:26 PST (-0800), Bastian Koppelmann wrote:
+>
+> On 11/8/18 4:53 PM, Richard Henderson wrote:
+>> On 11/8/18 1:06 PM, Bastian Koppelmann wrote:
+>>> while going through the reviews of the riscv-decodetree patches, two bugs came
+>>> up that I fix here. There is one more problem [1] mentioned by Richard but
+>>> I don't have the time to investigate it further.
+>>>
+>>> [1] https://patchwork.kernel.org/patch/10650293/
+>> That one's not a bug, but an optimization.
+>>
+>> The other bug mentioned is shrw and shaw not sign-extending the result.
+>
+>
+> That was a bug I introduced during the conversion to decodetree.
 
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> ---
->  hw/riscv/virt.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-> index 4a137a503c..2b38f89070 100644
-> --- a/hw/riscv/virt.c
-> +++ b/hw/riscv/virt.c
-> @@ -240,6 +240,7 @@ static void *create_fdt(RISCVVirtState *s, const 
-> struct MemmapEntry *memmap,
->      qemu_fdt_setprop_cells(fdt, nodename, "reg",
->          0x0, memmap[VIRT_TEST].base,
->          0x0, memmap[VIRT_TEST].size);
-> +    g_free(nodename);
->
->      nodename = g_strdup_printf("/uart@%lx",
->          (long)memmap[VIRT_UART0].base);
-> -- 
-> 2.19.1
->
+My understand of that patch feedback is that there are two issues:
 
-Reviewed-by: Palmer Dabbelt <palmer@sifive.com> 
+* We don't take advantage of the ordering bits on fences, which could allow us 
+  to emit less conservative fences.  This would presumably increase 
+  performance.
+* We treat fences as NOPs under "#ifndef CONFIG_USER_ONLY", which is a bug.
+
+Am I wrong about that second one?  I think the fix should look something like 
+this, which I haven't even tried to compile
+
+diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+index 18d7b6d1471d..624d1c679a84 100644
+--- a/target/riscv/translate.c
++++ b/target/riscv/translate.c
+@@ -1766,7 +1766,6 @@ static void decode_RV32_64G(CPURISCVState *env, DisasContext *ctx)
+                      GET_RM(ctx->opcode));
+         break;
+     case OPC_RISC_FENCE:
+-#ifndef CONFIG_USER_ONLY
+         if (ctx->opcode & 0x1000) {
+             /* FENCE_I is a no-op in QEMU,
+              * however we need to end the translation block */
+@@ -1777,7 +1776,6 @@ static void decode_RV32_64G(CPURISCVState *env, DisasContext *ctx)
+             /* FENCE is a full memory barrier. */
+             tcg_gen_mb(TCG_MO_ALL | TCG_BAR_SC);
+         }
+-#endif
+         break;
+     case OPC_RISC_SYSTEM:
+         gen_system(env, ctx, MASK_OP_SYSTEM(ctx->opcode), rd, rs1,
