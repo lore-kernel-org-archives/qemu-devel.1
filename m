@@ -1,29 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42318)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gKhXY-0004t2-Ji
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:27:57 -0500
+	(envelope-from <gengdongjiu@huawei.com>) id 1gKhcO-0002wy-5i
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:32:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gKhXT-00040W-HI
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:27:56 -0500
-Received: from mail-eopbgr700139.outbound.protection.outlook.com
-	([40.107.70.139]:43271
-	helo=NAM04-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1gKhXT-0003zx-9m
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:27:51 -0500
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Thu, 8 Nov 2018 10:27:48 +0000
-Message-ID: <BN6PR2201MB12512C561DAD7AE29946682CC6C50@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <cover.1541616663.git.noring@nocrew.org>,
-	<e8e6bfd053f051d5195ec030f06749b24f867b13.1541616663.git.noring@nocrew.org>
-In-Reply-To: <e8e6bfd053f051d5195ec030f06749b24f867b13.1541616663.git.noring@nocrew.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <gengdongjiu@huawei.com>) id 1gKhcN-0000Oj-53
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:32:56 -0500
+From: Dongjiu Geng <gengdongjiu@huawei.com>
+Date: Thu, 8 Nov 2018 02:29:43 -0800
+Message-ID: <1541672989-15967-5-git-send-email-gengdongjiu@huawei.com>
+In-Reply-To: <1541672989-15967-1-git-send-email-gengdongjiu@huawei.com>
+References: <1541672989-15967-1-git-send-email-gengdongjiu@huawei.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 4/6] target/mips: Fix decoding mechanism
- of special R5900 opcodes
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH RESEND v15 04/10] acpi: add
+ build_append_ghes_generic_status() helper for Generic Error Status Block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,40 +22,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fredrik Noring <noring@nocrew.org>, Aurelien Jarno <aurelien@aurel32.net>, =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: =?iso-8859-1?Q?J=FCrgen_Urban?= <JuergenUrban@gmx.de>, "Maciej W. Rozycki" <macro@linux-mips.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: imammedo@redhat.com, mst@redhat.com, peter.maydell@linaro.org, lersek@redhat.com, marc.zyngier@arm.com, james.morse@arm.com, pbonzini@redhat.com, mtosatti@redhat.com, rth@twiddle.net, zhengxiang9@huawei.com, ehabkost@redhat.com, kvm@vger.kernel.org, shannon.zhaosl@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, gengdongjiu@huawei.com
 
->=20
-> From: Fredrik Noring <noring@nocrew.org>
-> Subject: [PATCH v2 4/6] target/mips: Fix decoding mechanism of special R5=
-900 opcodes
->=20
-> MOVN, MOVZ, MFHI, MFLO, MTHI, MTLO, MULT, MULTU, DIV, DIVU, DMULT,
-> DMULTU, DDIV, DDIVU and JR are decoded in decode_opc_special_tx79
-> instead of the generic decode_opc_special_legacy.
->=20
-> Signed-off-by: Fredrik Noring <noring@nocrew.org>
-> ---
->  target/mips/translate.c | 54 ++++++++++++++++++++++++++++++++++++++---
->  1 file changed, 50 insertions(+), 4 deletions(-)
->=20
+It will help to add Generic Error Status Block to ACPI tables
+without using packed C structures and avoid endianness
+issues as API doesn't need explicit conversion.
 
-> +#if defined(TARGET_MIPS64)
-> +    case OPC_DMULT:
-> +    case OPC_DMULTU:
-> +    case OPC_DDIV:
-> +    case OPC_DDIVU:
-> +        check_insn_opc_user_only(ctx, INSN_R5900);
-> +        gen_muldiv(ctx, op1, 0, rs, rt);
-> +        break;
-> +#endif
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+---
+ hw/acpi/aml-build.c         | 14 ++++++++++++++
+ include/hw/acpi/aml-build.h |  6 ++++++
+ 2 files changed, 20 insertions(+)
 
-Fredrik, do you know by any chance if a document exists that would justify =
-inclusion of non-R5900 DMULT, DMULTU, DDIV, DDIVU in R5900 executables by g=
-cc for R5900? Is it included by cross-gcc or by native gcc, or by both?
-
-I think gcc folks must have had a good reason for that, some kind of design=
- - it can't be 'I really like/miss this instruction, let's include it...'
-
-Thanks,
-Aleksandar
+diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+index 00b166e..5923248 100644
+--- a/hw/acpi/aml-build.c
++++ b/hw/acpi/aml-build.c
+@@ -296,6 +296,20 @@ void build_append_ghes_notify(GArray *table, const uint8_t type,
+         build_append_int_noprefix(table, error_threshold_window, 4);
+ }
+ 
++/* Generic Error Status Block
++ * ACPI 4.0: 17.3.2.6.1 Generic Error Data
++ */
++void build_append_ghes_generic_status(GArray *table, uint32_t block_status,
++                      uint32_t raw_data_offset, uint32_t raw_data_length,
++                      uint32_t data_length, uint32_t error_severity)
++{
++    build_append_int_noprefix(table, block_status, 4);
++    build_append_int_noprefix(table, raw_data_offset, 4);
++    build_append_int_noprefix(table, raw_data_length, 4);
++    build_append_int_noprefix(table, data_length, 4);
++    build_append_int_noprefix(table, error_severity, 4);
++}
++
+ /* Generic Error Data Entry
+  * ACPI 4.0: 17.3.2.6.1 Generic Error Data
+  */
+diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+index 147eb38..657a0d5 100644
+--- a/include/hw/acpi/aml-build.h
++++ b/include/hw/acpi/aml-build.h
+@@ -423,6 +423,12 @@ void build_append_ghes_generic_data(GArray *table, const char *section_type,
+                                     uint32_t error_data_length, uint8_t *fru_id,
+                                     uint8_t *fru_text, uint64_t time_stamp);
+ 
++void
++build_append_ghes_generic_status(GArray *table, uint32_t block_status,
++                                 uint32_t raw_data_offset,
++                                 uint32_t raw_data_length,
++                                 uint32_t data_length, uint32_t error_severity);
++
+ void build_srat_memory(AcpiSratMemoryAffinity *numamem, uint64_t base,
+                        uint64_t len, int node, MemoryAffinityFlags flags);
+ 
+-- 
+1.8.3.1
