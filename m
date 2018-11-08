@@ -1,41 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33620)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34466)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gKlcX-0003TE-7q
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 09:49:22 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gKleR-0004xL-Oe
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 09:51:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gKlcS-0003md-OT
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 09:49:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45762)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gKlcS-0003ld-F7
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 09:49:16 -0500
-References: <20181023152306.3123-1-david@redhat.com>
-	<20181023152306.3123-2-david@redhat.com>
-	<87pnvqdvsj.fsf@dusky.pond.sub.org>
-	<e8fe86a1-d075-2ea8-d1f4-e08e5dceee07@redhat.com>
-	<875zxingqn.fsf@dusky.pond.sub.org>
-	<440eb166-73d1-77b6-5dd9-66a0abd7d665@redhat.com>
-	<87muqn5ydc.fsf@dusky.pond.sub.org>
-	<1ec41fe2-d4b4-fce2-9381-818ee3356409@redhat.com>
-	<87tvkv2r2b.fsf@dusky.pond.sub.org>
-	<64720ade-c69d-40a4-5359-2132711c01cd@redhat.com>
-	<87d0rgvrbk.fsf@dusky.pond.sub.org>
-	<fcbd588d-f51c-4ab4-fa45-ad5360aff5b1@redhat.com>
-	<8736scq7y9.fsf@dusky.pond.sub.org>
-	<bfebc5b0-cebd-8a83-3106-effba5332094@redhat.com>
-	<878t24ort1.fsf@dusky.pond.sub.org>
-	<50328c72-ec11-6158-bd44-018f7454de18@redhat.com>
-	<ddc8fe1d-96d5-b20c-90ce-260e61335087@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <d26f72d6-16c2-07d1-1ded-eb2322080290@redhat.com>
-Date: Thu, 8 Nov 2018 15:49:07 +0100
+	(envelope-from <kwolf@redhat.com>) id 1gKleP-0000jx-M5
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 09:51:19 -0500
+Date: Thu, 8 Nov 2018 15:50:58 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20181108145058.GD6006@linux.fritz.box>
+References: <20181105205641.17862-1-v.mayatskih@gmail.com>
+	<20181105205641.17862-2-v.mayatskih@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <ddc8fe1d-96d5-b20c-90ce-260e61335087@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/7] qapi: use qemu_strtoi64() in
- parse_str
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181105205641.17862-2-v.mayatskih@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 1/1 V2] Add vhost-pci-blk driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,52 +23,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Vitaly Mayatskikh <v.mayatskih@gmail.com>
+Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
 
-On 08.11.18 15:42, Eric Blake wrote:
-> On 11/8/18 7:05 AM, David Hildenbrand wrote:
+Am 05.11.2018 um 21:56 hat Vitaly Mayatskikh geschrieben:
+> This driver uses the kernel-mode acceleration for virtio-blk and
+> allows to get a near bare metal disk performance inside a VM.
 > 
->>>> Thanks for the excessive answer! I think that should be enough to come
->>>> up with a RFC of a *rewrite* of the string input visitor :)
->>>
->>> You're welcome!  I love great questions, they make me *think*.
->>>
->>> Besides, if something's worth doing, it's probably worth overdoing ;)
->>>
->>
->> I found some more ugliness, looking at the tests. I am not sure the test
->> is correct here.
->>
->> test_visitor_in_intList():
->>
->> v = visitor_input_test_init(data, "1,2,0,2-4,20,5-9,1-8");
->>
->> -> we expect { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 20 }, implying that the
->> visitor actually does sorting + duplicate elimination. Now I consider
->> this is wrong. We are parsing a list of integers, not an ordered set.
->>
->> What's your take on this?
+> Signed-off-by: Vitaly Mayatskikh <v.mayatskih@gmail.com>
+> ---
+>  configure                     |  10 +
+>  default-configs/virtio.mak    |   1 +
+>  hw/block/Makefile.objs        |   1 +
+>  hw/block/vhost-blk.c          | 429 ++++++++++++++++++++++++++++++++++
+>  hw/virtio/virtio-pci.c        |  60 +++++
+>  hw/virtio/virtio-pci.h        |  19 ++
+>  include/hw/virtio/vhost-blk.h |  43 ++++
+>  7 files changed, 563 insertions(+)
+>  create mode 100644 hw/block/vhost-blk.c
+>  create mode 100644 include/hw/virtio/vhost-blk.h
 > 
-> The test matches the current reality (yes, the string input visitor 
-> currently sorts and deduplicates) - but you are also right that in 
-> general JSON [] lists are supposed to preserve order. I suspect our use 
-> of -numa parsing relies on the result being sorted - but I would not be 
-> opposed to a rewrite that dumbs down the string visitor to provide an 
-> unsorted list, and move the sorting into a post-pass belonging to the 
-> -numa code.  Updating the tests to match as part of a rewrite is thus 
-> okay, if we have the justification that we audited all other users to 
-> see that they either don't care or that we can move the sorting out of 
-> the list walker and into the callers that do care.
-> 
+> diff --git a/configure b/configure
+> index 46ae1e8c76..787bc780da 100755
+> --- a/configure
+> +++ b/configure
+> @@ -371,6 +371,7 @@ vhost_crypto="no"
+>  vhost_scsi="no"
+>  vhost_vsock="no"
+>  vhost_user=""
+> +vhost_blk=""
+>  kvm="no"
+>  hax="no"
+>  hvf="no"
+> @@ -869,6 +870,7 @@ Linux)
+>    vhost_crypto="yes"
+>    vhost_scsi="yes"
+>    vhost_vsock="yes"
+> +  vhost_blk="yes"
+>    QEMU_INCLUDES="-I\$(SRC_PATH)/linux-headers -I$(pwd)/linux-headers $QEMU_INCLUDES"
+>    supported_os="yes"
+>    libudev="yes"
+> @@ -1263,6 +1265,10 @@ for opt do
+>    ;;
+>    --enable-vhost-vsock) vhost_vsock="yes"
+>    ;;
+> +  --disable-vhost-blk) vhost_blk="no"
+> +  ;;
+> +  --enable-vhost-blk) vhost_blk="yes"
+> +  ;;
+>    --disable-opengl) opengl="no"
+>    ;;
+>    --enable-opengl) opengl="yes"
+> @@ -6000,6 +6006,7 @@ echo "vhost-crypto support $vhost_crypto"
+>  echo "vhost-scsi support $vhost_scsi"
+>  echo "vhost-vsock support $vhost_vsock"
+>  echo "vhost-user support $vhost_user"
+> +echo "vhost-blk support $vhost_blk"
+>  echo "Trace backends    $trace_backends"
+>  if have_backend "simple"; then
+>  echo "Trace output file $trace_file-<pid>"
+> @@ -6461,6 +6468,9 @@ fi
+>  if test "$vhost_user" = "yes" ; then
+>    echo "CONFIG_VHOST_USER=y" >> $config_host_mak
+>  fi
+> +if test "$vhost_blk" = "yes" ; then
+> +  echo "CONFIG_VHOST_BLK=y" >> $config_host_mak
+> +fi
+>  if test "$blobs" = "yes" ; then
+>    echo "INSTALL_BLOBS=yes" >> $config_host_mak
+>  fi
+> diff --git a/default-configs/virtio.mak b/default-configs/virtio.mak
+> index 1304849018..765c0a2a04 100644
+> --- a/default-configs/virtio.mak
+> +++ b/default-configs/virtio.mak
+> @@ -1,5 +1,6 @@
+>  CONFIG_VHOST_USER_SCSI=$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX))
+>  CONFIG_VHOST_USER_BLK=$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX))
+> +CONFIG_VHOST_BLK=$(CONFIG_LINUX)
+>  CONFIG_VIRTIO=y
+>  CONFIG_VIRTIO_9P=y
+>  CONFIG_VIRTIO_BALLOON=y
+> diff --git a/hw/block/Makefile.objs b/hw/block/Makefile.objs
+> index 53ce5751ae..857ce823fc 100644
+> --- a/hw/block/Makefile.objs
+> +++ b/hw/block/Makefile.objs
+> @@ -14,3 +14,4 @@ obj-$(CONFIG_SH4) += tc58128.o
+>  obj-$(CONFIG_VIRTIO_BLK) += virtio-blk.o
+>  obj-$(CONFIG_VIRTIO_BLK) += dataplane/
+>  obj-$(CONFIG_VHOST_USER_BLK) += vhost-user-blk.o
+> +obj-$(CONFIG_VHOST_BLK) += vhost-blk.o
+> diff --git a/hw/block/vhost-blk.c b/hw/block/vhost-blk.c
+> new file mode 100644
+> index 0000000000..4ca8040ee7
+> --- /dev/null
+> +++ b/hw/block/vhost-blk.c
+> @@ -0,0 +1,429 @@
+> +/*
+> + * vhost-blk host device
+> + *
+> + * Copyright(C) 2018 IBM Corporation
+> + *
+> + * Authors:
+> + *  Vitaly Mayatskikh <v.mayatskih@gmail.com>
+> + *
+> + * Largely based on the "vhost-user-blk.c" implemented by:
+> + * Changpeng Liu <changpeng.liu@intel.com>
 
--numa is parsed via the object parser and not the string input parser as
-far as I understood Markus. I think only "host-nodes" for memdev would
-be relevant right now, and as far as I can see, that shouldn't break
-(have to take a closer look).
+You mean contrib/vhost-user-blk/vhost-user-blk.c in the QEMU tree? That
+one has the following license:
 
--- 
+ * This work is licensed under the terms of the GNU GPL, version 2 only.
+ * See the COPYING file in the top-level directory.
 
-Thanks,
+You have this on the other hand:
 
-David / dhildenb
+> + * This work is licensed under the terms of the GNU LGPL, version 2 or later.
+> + * See the COPYING.LIB file in the top-level directory.
+
+I think you need to get rid of any vhost-user-blk.c parts before you can
+make it LGPL2+.
+
+Kevin
