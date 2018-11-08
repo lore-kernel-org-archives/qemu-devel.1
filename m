@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43018)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43116)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gKg1r-0007jl-Eu
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 03:51:12 -0500
+	(envelope-from <armbru@redhat.com>) id 1gKg21-0007no-38
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 03:51:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gKfxr-0002mK-KX
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 03:47:02 -0500
-Received: from mail-yw1-f45.google.com ([209.85.161.45]:34613)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gKfxr-0002lj-Dr
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 03:46:59 -0500
-Received: by mail-yw1-f45.google.com with SMTP id v199-v6so7729207ywg.1
-	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 00:46:58 -0800 (PST)
+	(envelope-from <armbru@redhat.com>) id 1gKfwp-0001lD-2r
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 03:45:56 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181031003120.26771-1-ehabkost@redhat.com>
+	<20181031003120.26771-12-ehabkost@redhat.com>
+	<CAFEAcA_ScL828ya7P_5=HMx=vbxo=jK4047nAbmb9Ep=6r=2og@mail.gmail.com>
+	<f1bd429f-198a-ee27-9184-636692332816@redhat.com>
+	<20181106141302.GP12503@habkost.net>
+	<87efbxxw1c.fsf@dusky.pond.sub.org>
+	<8ecdbb0e-aaf8-ddc5-6442-87977585d9d8@redhat.com>
+Date: Thu, 08 Nov 2018 09:45:39 +0100
+In-Reply-To: <8ecdbb0e-aaf8-ddc5-6442-87977585d9d8@redhat.com> (Cleber Rosa's
+	message of "Wed, 7 Nov 2018 20:13:19 -0500")
+Message-ID: <87y3a4ot3g.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <20180924092120.GA30163@caravaggio>
-	<7c2b477e-bdac-c887-2510-82fe04acdcfe@redhat.com>
-	<87b22690-e39c-3b46-dcb4-f6abc3213142@redhat.com>
-	<CAFEAcA8yHb4MdtsJuXcswQp93DN5tSeN9dn8AWWL9se0DKvdcg@mail.gmail.com>
-	<41ceda53-467e-32a1-8fa6-13f0f9c08ad1@redhat.com>
-	<20180926141518.GB9073@caravaggio>
-	<3743752b-2670-1d89-2088-1e67122f5dcd@redhat.com>
-In-Reply-To: <3743752b-2670-1d89-2088-1e67122f5dcd@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 8 Nov 2018 09:46:44 +0100
-Message-ID: <CAAdtpL5WwF0x_cJt3=20WiJ5E2LJ-XfDCB8EOuzhEJkZsXszsw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] QEMU and Kconfig
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] tests: Fix Python 3 detection
+ on older GNU make versions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,68 +29,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Samuel Ortiz <sameo@linux.intel.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Cleber Rosa <crosa@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Philippe =?utf-8?Q?Mathieu-Daud?= =?utf-8?Q?=C3=A9?= <philmd@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud?= =?utf-8?Q?=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Le 26 sept. 2018 6:58 PM, "Paolo Bonzini" <pbonzini@redhat.com> a =C3=A9cri=
-t :
+Cleber Rosa <crosa@redhat.com> writes:
 
-On 26/09/2018 16:15, Samuel Ortiz wrote:
-> On Wed, Sep 26, 2018 at 03:36:07PM +0200, Paolo Bonzini wrote:
->> On 26/09/2018 10:32, Peter Maydell wrote:
->>> On 25 September 2018 at 10:26, Paolo Bonzini <pbonzini@redhat.com>
-wrote:
->>>> However, the Kconfig language is a good idea.  The idea is that
->>>> dependencies can be expressed:
->>>>
->>>> - as "select" whenever a board requires a device, or whenever a device
->>>> requires generic subsystem code in order to implement a controller for
->>>> that subsystem (e.g.: PC selects MC146818RTC, VIRTIO_SCSI selects SCSI=
-)
->>>>
->>>> - as "depends on" whenever a device requires a bus (e.g.: SERIAL_PCI
->>>> depends on ISA)
->>>>
->>>> Putting the two things together, AHCI depends on PCI but it selects
-IDE.
+> On 11/7/18 1:05 AM, Markus Armbruster wrote:
+>> Eduardo Habkost <ehabkost@redhat.com> writes:
+>> 
+>>> The $(SHELLSTATUS) variable requires GNU make >= 4.2, but Travis
+>>> seems to provide an older version.  Change the existing rules to
+>>> use command output instead of exit code, to make it compatible
+>>> with older GNU make versions.
 >>>
->>> Could you clarify the distinction you're making here between
->>> these two kinds of dependency and what the top level user
->>> interface would be? I'm getting confused about why we need
->>> two -- I have a vague impression it depends on what the
->>> top level thing the user is selecting enablement of is,
->>> but maybe not ?
->>
->> Yes, exactly.  The user selects enablement of 1) boards 2) non-embedded
->> devices.  This mimics the level at which configuration is done today in
->> default-configs (it worked like this in 2013 during GSoC, and it is
->> still pretty much the same).  The idea is that everything else is
->> selected automatically by the configuration tool, but two different
->> paths are available depending on the desired defaults:
->>
->> - users of something (that is often "default n") use "select" to force
->> that configuration symbol to y
->>
->> - "depends on" is used for something that is (usually) default y, but
->> becomes n if the dependencies are missing
->>
+>>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+>>> ---
+>>> I think that's the cause of the Travis failures.  I have
+>>> submitted a test job right now, at:
+>>>   https://travis-ci.org/ehabkost/qemu-hacks/jobs/451387962
+>>> Let's see if it fixes the issue.
+>>> ---
+>>>  tests/Makefile.include | 4 ++--
+>>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/tests/Makefile.include b/tests/Makefile.include
+>>> index d2e577eabb..074eece558 100644
+>>> --- a/tests/Makefile.include
+>>> +++ b/tests/Makefile.include
+>>> @@ -913,8 +913,8 @@ TESTS_RESULTS_DIR=$(BUILD_DIR)/tests/results
+>>>  # information please refer to "avocado --help".
+>>>  AVOCADO_SHOW=none
+>>>  
+>>> -$(shell $(PYTHON) -c 'import sys; assert sys.version_info >= (3,0)' >/dev/null 2>&1)
+>>> -ifeq ($(.SHELLSTATUS),0)
+>>> +PYTHON3 = $(shell $(PYTHON) -c 'import sys; print(1 if sys.version_info >= (3, 0) else 0)')
+>>> +ifeq ($(PYTHON3), 1)
+>>>  $(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
+>>>  	$(call quiet-command, \
+>>>              $(PYTHON) -m venv --system-site-packages $@, \
+>> 
+>> PEP 394 recommends software distributions install Python 3 into the
+>> default path as python3, and users use that instead of python, except
+>> for programs that are source compatible with both 2 and 3.  So, is
+>> finding out whether python is a Python 3 really appropriate?  Why can't
+>> we just use python3 and be done with it?
+>> 
 >
-> So "depends on" will go through the dependency graph and turn the config
-> off if they're not entirely filled. But "select" just turns the config on
-> regardless of the dependencies. Is that correct?
+> I mentioned that before, when you pointed out the issue you fix here,
+> that configure may be the best place to get the Python version (not only
+> the major version) and make it available elsewhere.  Even if not used
+> for other purposes, it is IMO important information to show on the
+> resulting "configure" output.
+>
+> I'm sending patches to do that in a few.
+>
+>> If we can't: isn't this a configure problem?
+>> 
+>
+> I believe adhering to PEP394 is a good thing, but even that document
+> recognizes that the real world is not a perfect place: "however, end
+> users should be aware that python refers to python3 on at least Arch
+> Linux".  And it only covers *nix systems, so if we hope to care for
+> non-*nix systems, we have to check the Python version manually.
+>
+> So, I guess the safest approach from QEMU's side is to check for the
+> version indeed.
 
-Almost; if there's a conflict between the decision from "depends on" and
-"select" says, it's an error.  (Likewise if there's a conflict between
-default-configs/ on one side, and "depends on"/"select" on the other).
+If somebody can point to a system people still use where python3 doesn't
+get you a Python 3, but python does, catering for such (crappy) systems
+in configure makes sense.  Until then, it's a waste of brain waves and
+configure run time.
 
-This is different between kernel Kconfig and minikconf in my git repo.
-The difference is because the Kconfig documentation warns against the
-surprising effects of "select" blindly enabling the target symbol;
-making minikconf stricter avoids those surprises.
-
-
-So can we rename your tool Qconfig?
-
-
-
-Paolo
+PEP 394 mentions Arch Linux.  It's been seven years.  What's the most
+recent version of Arch Linux that's still crappy in this regard?
