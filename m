@@ -1,26 +1,31 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:53562)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gKrCf-0001Bm-Eo
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 15:47:02 -0500
+	(envelope-from <groug@kaod.org>) id 1gKrDC-0001Bm-Ov
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 15:47:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gKrCa-0006Fu-6E
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 15:47:01 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:44648)
+	(envelope-from <groug@kaod.org>) id 1gKr7c-0001eb-3X
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 15:41:51 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49442)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gKrCW-0006CQ-Gc
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 15:46:54 -0500
-Date: Thu, 8 Nov 2018 22:45:31 +0200
-From: Yuval Shaia <yuval.shaia@oracle.com>
-Message-ID: <20181108204530.GA2768@lap1>
-References: <20181108160818.5485-1-yuval.shaia@oracle.com>
-	<20181108160818.5485-20-yuval.shaia@oracle.com>
-	<20181108172606.38672769.cohuck@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181108172606.38672769.cohuck@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 19/22] vl: Introduce shutdown_notifiers
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gKr7b-0001MA-IS
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 15:41:47 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wA8KcxDX056932
+	for <qemu-devel@nongnu.org>; Thu, 8 Nov 2018 15:41:25 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2nmtxtutja-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 15:41:25 -0500
+Received: from localhost
+	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+	Thu, 8 Nov 2018 20:41:22 -0000
+From: Greg Kurz <groug@kaod.org>
+Date: Thu,  8 Nov 2018 21:41:09 +0100
+Message-Id: <20181108204111.786455-1-groug@kaod.org>
+Subject: [Qemu-devel] [PULL 0/1] 9p fixes for v3.1.0-rc1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,67 +34,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: marcel.apfelbaum@gmail.com, dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>
 
-On Thu, Nov 08, 2018 at 05:26:06PM +0100, Cornelia Huck wrote:
-> On Thu,  8 Nov 2018 18:08:15 +0200
-> Yuval Shaia <yuval.shaia@oracle.com> wrote:
-> 
-> > Notifier will be used for signaling shutdown event to inform system is
-> > shutdown. This will allow devices and other component to run some
-> > cleanup code needed before VM is shutdown.
-> > 
-> > Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-> > ---
-> >  include/sysemu/sysemu.h |  1 +
-> >  vl.c                    | 15 ++++++++++++++-
-> >  2 files changed, 15 insertions(+), 1 deletion(-)
-> > 
-> 
-> > @@ -1809,6 +1811,12 @@ static void qemu_system_powerdown(void)
-> >      notifier_list_notify(&powerdown_notifiers, NULL);
-> >  }
-> >  
-> > +static void qemu_system_shutdown(bool by_guest)
-> 
-> I would pass the shutdown reason here directly (instead of only whether
-> this was triggered by the guest or not)...
-> 
-> > +{
-> > +    qapi_event_send_shutdown(by_guest);
-> > +    notifier_list_notify(&shutdown_notifiers, NULL);
-> 
-> ...and also pass it to the notifiers here. If we have the info anyway,
-> why not simply pass it along.
+The following changes since commit a7ce790a029bd94eb320d8c69f38900f5233997e:
 
-Agree, make sense.
+  tcg/tcg-op.h: Add multiple include guard (2018-11-08 15:15:32 +0000)
 
-> 
-> > +}
-> > +
-> >  void qemu_system_powerdown_request(void)
-> >  {
-> >      trace_qemu_system_powerdown_request();
-> > @@ -1821,6 +1829,11 @@ void qemu_register_powerdown_notifier(Notifier *notifier)
-> >      notifier_list_add(&powerdown_notifiers, notifier);
-> >  }
-> >  
-> > +void qemu_register_shutdown_notifier(Notifier *notifier)
-> > +{
-> > +    notifier_list_add(&shutdown_notifiers, notifier);
-> > +}
-> > +
-> >  void qemu_system_debug_request(void)
-> >  {
-> >      debug_requested = 1;
-> > @@ -1848,7 +1861,7 @@ static bool main_loop_should_exit(void)
-> >      request = qemu_shutdown_requested();
-> >      if (request) {
-> >          qemu_kill_report();
-> > -        qapi_event_send_shutdown(shutdown_caused_by_guest(request));
-> > +        qemu_system_shutdown(shutdown_caused_by_guest(request));
-> >          if (no_shutdown) {
-> >              vm_stop(RUN_STATE_SHUTDOWN);
-> >          } else {
-> 
+are available in the Git repository at:
+
+  https://github.com/gkurz/qemu.git tags/for-upstream
+
+for you to fetch changes up to 5b76ef50f62079a2389ba28cacaf6cce68b1a0ed:
+
+  9p: write lock path in v9fs_co_open2() (2018-11-08 21:19:05 +0100)
+
+----------------------------------------------------------------
+Fixes a potential use-after-free issue that could be triggered by a
+misbehaving guest.
+
+----------------------------------------------------------------
+Greg Kurz (1):
+      9p: write lock path in v9fs_co_open2()
+
+ hw/9pfs/cofile.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+-- 
+2.17.2
