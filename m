@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59505)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59530)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gKmsQ-0005Tv-SM
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:09:52 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gKmsR-0005Ue-IJ
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:09:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gKmsO-0000uf-5p
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:09:50 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:54924)
+	(envelope-from <yuval.shaia@oracle.com>) id 1gKmsO-0000v8-MN
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:09:51 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:49092)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gKmsN-0000qZ-Mg
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:09:47 -0500
+	id 1gKmsO-0000l6-6u
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:09:48 -0500
 From: Yuval Shaia <yuval.shaia@oracle.com>
-Date: Thu,  8 Nov 2018 18:08:13 +0200
-Message-Id: <20181108160818.5485-18-yuval.shaia@oracle.com>
+Date: Thu,  8 Nov 2018 18:08:08 +0200
+Message-Id: <20181108160818.5485-13-yuval.shaia@oracle.com>
 In-Reply-To: <20181108160818.5485-1-yuval.shaia@oracle.com>
 References: <20181108160818.5485-1-yuval.shaia@oracle.com>
-Subject: [Qemu-devel] [PATCH v2 17/22] hw/pvrdma: Fill error code in
- command's response
+Subject: [Qemu-devel] [PATCH v2 12/22] vmxnet3: Move some definitions to
+ header file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,197 +27,314 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com
 
-Driver checks error code let's set it.
+pvrdma setup requires vmxnet3 device on PCI function 0 and PVRDMA device
+on PCI function 1.
+pvrdma device needs to access vmxnet3 device object for several reasons:
+1. Make sure PCI function 0 is vmxnet3.
+2. To monitor vmxnet3 device state.
+3. To configure node_guid accoring to vmxnet3 device's MAC address.
+
+To be able to access vmxnet3 device the definition of VMXNET3State is
+moved to a new header file.
 
 Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
 ---
- hw/rdma/vmw/pvrdma_cmd.c | 67 ++++++++++++++++++++++++++++------------
- 1 file changed, 48 insertions(+), 19 deletions(-)
+ hw/net/vmxnet3.c      | 116 +-----------------------------------
+ hw/net/vmxnet3_defs.h | 133 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 134 insertions(+), 115 deletions(-)
+ create mode 100644 hw/net/vmxnet3_defs.h
 
-diff --git a/hw/rdma/vmw/pvrdma_cmd.c b/hw/rdma/vmw/pvrdma_cmd.c
-index 0d3c818c20..a326c5d470 100644
---- a/hw/rdma/vmw/pvrdma_cmd.c
-+++ b/hw/rdma/vmw/pvrdma_cmd.c
-@@ -131,7 +131,8 @@ static int query_port(PVRDMADev *dev, union pvrdma_cmd_req *req,
+diff --git a/hw/net/vmxnet3.c b/hw/net/vmxnet3.c
+index 3648630386..54746a4030 100644
+--- a/hw/net/vmxnet3.c
++++ b/hw/net/vmxnet3.c
+@@ -18,7 +18,6 @@
+ #include "qemu/osdep.h"
+ #include "hw/hw.h"
+ #include "hw/pci/pci.h"
+-#include "net/net.h"
+ #include "net/tap.h"
+ #include "net/checksum.h"
+ #include "sysemu/sysemu.h"
+@@ -29,6 +28,7 @@
+ #include "migration/register.h"
  
-     if (rdma_backend_query_port(&dev->backend_dev,
-                                 (struct ibv_port_attr *)&attrs)) {
--        return -ENOMEM;
-+        resp->hdr.err = -ENOMEM;
-+        goto out;
-     }
+ #include "vmxnet3.h"
++#include "vmxnet3_defs.h"
+ #include "vmxnet_debug.h"
+ #include "vmware_utils.h"
+ #include "net_tx_pkt.h"
+@@ -131,23 +131,11 @@ typedef struct VMXNET3Class {
+     DeviceRealize parent_dc_realize;
+ } VMXNET3Class;
  
-     memset(resp, 0, sizeof(*resp));
-@@ -150,7 +151,9 @@ static int query_port(PVRDMADev *dev, union pvrdma_cmd_req *req,
-     resp->attrs.active_width = 1;
-     resp->attrs.active_speed = 1;
- 
--    return 0;
-+out:
-+    pr_dbg("ret=%d\n", resp->hdr.err);
-+    return resp->hdr.err;
- }
- 
- static int query_pkey(PVRDMADev *dev, union pvrdma_cmd_req *req,
-@@ -170,7 +173,7 @@ static int query_pkey(PVRDMADev *dev, union pvrdma_cmd_req *req,
-     resp->pkey = PVRDMA_PKEY;
-     pr_dbg("pkey=0x%x\n", resp->pkey);
- 
--    return 0;
-+    return resp->hdr.err;
- }
- 
- static int create_pd(PVRDMADev *dev, union pvrdma_cmd_req *req,
-@@ -200,7 +203,9 @@ static int destroy_pd(PVRDMADev *dev, union pvrdma_cmd_req *req,
- 
-     rdma_rm_dealloc_pd(&dev->rdma_dev_res, cmd->pd_handle);
- 
--    return 0;
-+    rsp->hdr.err = 0;
-+
-+    return rsp->hdr.err;
- }
- 
- static int create_mr(PVRDMADev *dev, union pvrdma_cmd_req *req,
-@@ -251,7 +256,9 @@ static int destroy_mr(PVRDMADev *dev, union pvrdma_cmd_req *req,
- 
-     rdma_rm_dealloc_mr(&dev->rdma_dev_res, cmd->mr_handle);
- 
--    return 0;
-+    rsp->hdr.err = 0;
-+
-+    return rsp->hdr.err;
- }
- 
- static int create_cq_ring(PCIDevice *pci_dev , PvrdmaRing **ring,
-@@ -353,7 +360,8 @@ static int destroy_cq(PVRDMADev *dev, union pvrdma_cmd_req *req,
-     cq = rdma_rm_get_cq(&dev->rdma_dev_res, cmd->cq_handle);
-     if (!cq) {
-         pr_dbg("Invalid CQ handle\n");
--        return -EINVAL;
-+        rsp->hdr.err = -EINVAL;
-+        goto out;
-     }
- 
-     ring = (PvrdmaRing *)cq->opaque;
-@@ -364,7 +372,11 @@ static int destroy_cq(PVRDMADev *dev, union pvrdma_cmd_req *req,
- 
-     rdma_rm_dealloc_cq(&dev->rdma_dev_res, cmd->cq_handle);
- 
--    return 0;
-+    rsp->hdr.err = 0;
-+
-+out:
-+    pr_dbg("ret=%d\n", rsp->hdr.err);
-+    return rsp->hdr.err;
- }
- 
- static int create_qp_rings(PCIDevice *pci_dev, uint64_t pdir_dma,
-@@ -553,7 +565,8 @@ static int destroy_qp(PVRDMADev *dev, union pvrdma_cmd_req *req,
-     qp = rdma_rm_get_qp(&dev->rdma_dev_res, cmd->qp_handle);
-     if (!qp) {
-         pr_dbg("Invalid QP handle\n");
--        return -EINVAL;
-+        rsp->hdr.err = -EINVAL;
-+        goto out;
-     }
- 
-     rdma_rm_dealloc_qp(&dev->rdma_dev_res, cmd->qp_handle);
-@@ -567,7 +580,11 @@ static int destroy_qp(PVRDMADev *dev, union pvrdma_cmd_req *req,
-     rdma_pci_dma_unmap(PCI_DEVICE(dev), ring->ring_state, TARGET_PAGE_SIZE);
-     g_free(ring);
- 
--    return 0;
-+    rsp->hdr.err = 0;
-+
-+out:
-+    pr_dbg("ret=%d\n", rsp->hdr.err);
-+    return rsp->hdr.err;
- }
- 
- static int create_bind(PVRDMADev *dev, union pvrdma_cmd_req *req,
-@@ -580,7 +597,8 @@ static int create_bind(PVRDMADev *dev, union pvrdma_cmd_req *req,
-     pr_dbg("index=%d\n", cmd->index);
- 
-     if (cmd->index >= MAX_PORT_GIDS) {
--        return -EINVAL;
-+        rsp->hdr.err = -EINVAL;
-+        goto out;
-     }
- 
-     pr_dbg("gid[%d]=0x%llx,0x%llx\n", cmd->index,
-@@ -590,10 +608,15 @@ static int create_bind(PVRDMADev *dev, union pvrdma_cmd_req *req,
-     rc = rdma_rm_add_gid(&dev->rdma_dev_res, &dev->backend_dev,
-                          dev->backend_eth_device_name, gid, cmd->index);
-     if (rc < 0) {
--        return -EINVAL;
-+        rsp->hdr.err = rc;
-+        goto out;
-     }
- 
--    return 0;
-+    rsp->hdr.err = 0;
-+
-+out:
-+    pr_dbg("ret=%d\n", rsp->hdr.err);
-+    return rsp->hdr.err;
- }
- 
- static int destroy_bind(PVRDMADev *dev, union pvrdma_cmd_req *req,
-@@ -606,7 +629,8 @@ static int destroy_bind(PVRDMADev *dev, union pvrdma_cmd_req *req,
-     pr_dbg("index=%d\n", cmd->index);
- 
-     if (cmd->index >= MAX_PORT_GIDS) {
--        return -EINVAL;
-+        rsp->hdr.err = -EINVAL;
-+        goto out;
-     }
- 
-     rc = rdma_rm_del_gid(&dev->rdma_dev_res, &dev->backend_dev,
-@@ -617,7 +641,11 @@ static int destroy_bind(PVRDMADev *dev, union pvrdma_cmd_req *req,
-         goto out;
-     }
- 
--    return 0;
-+    rsp->hdr.err = 0;
-+
-+out:
-+    pr_dbg("ret=%d\n", rsp->hdr.err);
-+    return rsp->hdr.err;
- }
- 
- static int create_uc(PVRDMADev *dev, union pvrdma_cmd_req *req,
-@@ -634,9 +662,8 @@ static int create_uc(PVRDMADev *dev, union pvrdma_cmd_req *req,
-     resp->hdr.err = rdma_rm_alloc_uc(&dev->rdma_dev_res, cmd->pfn,
-                                      &resp->ctx_handle);
- 
--    pr_dbg("ret=%d\n", resp->hdr.err);
+-#define TYPE_VMXNET3 "vmxnet3"
+-#define VMXNET3(obj) OBJECT_CHECK(VMXNET3State, (obj), TYPE_VMXNET3)
 -
--    return 0;
-+    pr_dbg("ret=%d\n", rsp->hdr.err);
-+    return rsp->hdr.err;
+ #define VMXNET3_DEVICE_CLASS(klass) \
+     OBJECT_CLASS_CHECK(VMXNET3Class, (klass), TYPE_VMXNET3)
+ #define VMXNET3_DEVICE_GET_CLASS(obj) \
+     OBJECT_GET_CLASS(VMXNET3Class, (obj), TYPE_VMXNET3)
+ 
+-/* Cyclic ring abstraction */
+-typedef struct {
+-    hwaddr pa;
+-    uint32_t size;
+-    uint32_t cell_size;
+-    uint32_t next;
+-    uint8_t gen;
+-} Vmxnet3Ring;
+-
+ static inline void vmxnet3_ring_init(PCIDevice *d,
+ 				     Vmxnet3Ring *ring,
+                                      hwaddr pa,
+@@ -245,108 +233,6 @@ vmxnet3_dump_rx_descr(struct Vmxnet3_RxDesc *descr)
+               descr->rsvd, descr->dtype, descr->ext1, descr->btype);
  }
  
- static int destroy_uc(PVRDMADev *dev, union pvrdma_cmd_req *req,
-@@ -648,7 +675,9 @@ static int destroy_uc(PVRDMADev *dev, union pvrdma_cmd_req *req,
+-/* Device state and helper functions */
+-#define VMXNET3_RX_RINGS_PER_QUEUE (2)
+-
+-typedef struct {
+-    Vmxnet3Ring tx_ring;
+-    Vmxnet3Ring comp_ring;
+-
+-    uint8_t intr_idx;
+-    hwaddr tx_stats_pa;
+-    struct UPT1_TxStats txq_stats;
+-} Vmxnet3TxqDescr;
+-
+-typedef struct {
+-    Vmxnet3Ring rx_ring[VMXNET3_RX_RINGS_PER_QUEUE];
+-    Vmxnet3Ring comp_ring;
+-    uint8_t intr_idx;
+-    hwaddr rx_stats_pa;
+-    struct UPT1_RxStats rxq_stats;
+-} Vmxnet3RxqDescr;
+-
+-typedef struct {
+-    bool is_masked;
+-    bool is_pending;
+-    bool is_asserted;
+-} Vmxnet3IntState;
+-
+-typedef struct {
+-        PCIDevice parent_obj;
+-        NICState *nic;
+-        NICConf conf;
+-        MemoryRegion bar0;
+-        MemoryRegion bar1;
+-        MemoryRegion msix_bar;
+-
+-        Vmxnet3RxqDescr rxq_descr[VMXNET3_DEVICE_MAX_RX_QUEUES];
+-        Vmxnet3TxqDescr txq_descr[VMXNET3_DEVICE_MAX_TX_QUEUES];
+-
+-        /* Whether MSI-X support was installed successfully */
+-        bool msix_used;
+-        hwaddr drv_shmem;
+-        hwaddr temp_shared_guest_driver_memory;
+-
+-        uint8_t txq_num;
+-
+-        /* This boolean tells whether RX packet being indicated has to */
+-        /* be split into head and body chunks from different RX rings  */
+-        bool rx_packets_compound;
+-
+-        bool rx_vlan_stripping;
+-        bool lro_supported;
+-
+-        uint8_t rxq_num;
+-
+-        /* Network MTU */
+-        uint32_t mtu;
+-
+-        /* Maximum number of fragments for indicated TX packets */
+-        uint32_t max_tx_frags;
+-
+-        /* Maximum number of fragments for indicated RX packets */
+-        uint16_t max_rx_frags;
+-
+-        /* Index for events interrupt */
+-        uint8_t event_int_idx;
+-
+-        /* Whether automatic interrupts masking enabled */
+-        bool auto_int_masking;
+-
+-        bool peer_has_vhdr;
+-
+-        /* TX packets to QEMU interface */
+-        struct NetTxPkt *tx_pkt;
+-        uint32_t offload_mode;
+-        uint32_t cso_or_gso_size;
+-        uint16_t tci;
+-        bool needs_vlan;
+-
+-        struct NetRxPkt *rx_pkt;
+-
+-        bool tx_sop;
+-        bool skip_current_tx_pkt;
+-
+-        uint32_t device_active;
+-        uint32_t last_command;
+-
+-        uint32_t link_status_and_speed;
+-
+-        Vmxnet3IntState interrupt_states[VMXNET3_MAX_INTRS];
+-
+-        uint32_t temp_mac;   /* To store the low part first */
+-
+-        MACAddr perm_mac;
+-        uint32_t vlan_table[VMXNET3_VFT_SIZE];
+-        uint32_t rx_mode;
+-        MACAddr *mcast_list;
+-        uint32_t mcast_list_len;
+-        uint32_t mcast_list_buff_size; /* needed for live migration. */
+-
+-        /* Compatibility flags for migration */
+-        uint32_t compat_flags;
+-} VMXNET3State;
+-
+ /* Interrupt management */
  
-     rdma_rm_dealloc_uc(&dev->rdma_dev_res, cmd->ctx_handle);
- 
--    return 0;
-+    rsp->hdr.err = 0;
+ /*
+diff --git a/hw/net/vmxnet3_defs.h b/hw/net/vmxnet3_defs.h
+new file mode 100644
+index 0000000000..6c19d29b12
+--- /dev/null
++++ b/hw/net/vmxnet3_defs.h
+@@ -0,0 +1,133 @@
++/*
++ * QEMU VMWARE VMXNET3 paravirtual NIC
++ *
++ * Copyright (c) 2012 Ravello Systems LTD (http://ravellosystems.com)
++ *
++ * Developed by Daynix Computing LTD (http://www.daynix.com)
++ *
++ * Authors:
++ * Dmitry Fleytman <dmitry@daynix.com>
++ * Tamir Shomer <tamirs@daynix.com>
++ * Yan Vugenfirer <yan@daynix.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.
++ * See the COPYING file in the top-level directory.
++ *
++ */
 +
-+    return rsp->hdr.err;
- }
- struct cmd_handler {
-     uint32_t cmd;
-@@ -696,7 +725,7 @@ int execute_command(PVRDMADev *dev)
-     }
- 
-     err = cmd_handlers[dsr_info->req->hdr.cmd].exec(dev, dsr_info->req,
--                            dsr_info->rsp);
-+                                                    dsr_info->rsp);
- out:
-     set_reg_val(dev, PVRDMA_REG_ERR, err);
-     post_interrupt(dev, INTR_VEC_CMD_RING);
++#include "net/net.h"
++#include "hw/net/vmxnet3.h"
++
++#define TYPE_VMXNET3 "vmxnet3"
++#define VMXNET3(obj) OBJECT_CHECK(VMXNET3State, (obj), TYPE_VMXNET3)
++
++/* Device state and helper functions */
++#define VMXNET3_RX_RINGS_PER_QUEUE (2)
++
++/* Cyclic ring abstraction */
++typedef struct {
++    hwaddr pa;
++    uint32_t size;
++    uint32_t cell_size;
++    uint32_t next;
++    uint8_t gen;
++} Vmxnet3Ring;
++
++typedef struct {
++    Vmxnet3Ring tx_ring;
++    Vmxnet3Ring comp_ring;
++
++    uint8_t intr_idx;
++    hwaddr tx_stats_pa;
++    struct UPT1_TxStats txq_stats;
++} Vmxnet3TxqDescr;
++
++typedef struct {
++    Vmxnet3Ring rx_ring[VMXNET3_RX_RINGS_PER_QUEUE];
++    Vmxnet3Ring comp_ring;
++    uint8_t intr_idx;
++    hwaddr rx_stats_pa;
++    struct UPT1_RxStats rxq_stats;
++} Vmxnet3RxqDescr;
++
++typedef struct {
++    bool is_masked;
++    bool is_pending;
++    bool is_asserted;
++} Vmxnet3IntState;
++
++typedef struct {
++        PCIDevice parent_obj;
++        NICState *nic;
++        NICConf conf;
++        MemoryRegion bar0;
++        MemoryRegion bar1;
++        MemoryRegion msix_bar;
++
++        Vmxnet3RxqDescr rxq_descr[VMXNET3_DEVICE_MAX_RX_QUEUES];
++        Vmxnet3TxqDescr txq_descr[VMXNET3_DEVICE_MAX_TX_QUEUES];
++
++        /* Whether MSI-X support was installed successfully */
++        bool msix_used;
++        hwaddr drv_shmem;
++        hwaddr temp_shared_guest_driver_memory;
++
++        uint8_t txq_num;
++
++        /* This boolean tells whether RX packet being indicated has to */
++        /* be split into head and body chunks from different RX rings  */
++        bool rx_packets_compound;
++
++        bool rx_vlan_stripping;
++        bool lro_supported;
++
++        uint8_t rxq_num;
++
++        /* Network MTU */
++        uint32_t mtu;
++
++        /* Maximum number of fragments for indicated TX packets */
++        uint32_t max_tx_frags;
++
++        /* Maximum number of fragments for indicated RX packets */
++        uint16_t max_rx_frags;
++
++        /* Index for events interrupt */
++        uint8_t event_int_idx;
++
++        /* Whether automatic interrupts masking enabled */
++        bool auto_int_masking;
++
++        bool peer_has_vhdr;
++
++        /* TX packets to QEMU interface */
++        struct NetTxPkt *tx_pkt;
++        uint32_t offload_mode;
++        uint32_t cso_or_gso_size;
++        uint16_t tci;
++        bool needs_vlan;
++
++        struct NetRxPkt *rx_pkt;
++
++        bool tx_sop;
++        bool skip_current_tx_pkt;
++
++        uint32_t device_active;
++        uint32_t last_command;
++
++        uint32_t link_status_and_speed;
++
++        Vmxnet3IntState interrupt_states[VMXNET3_MAX_INTRS];
++
++        uint32_t temp_mac;   /* To store the low part first */
++
++        MACAddr perm_mac;
++        uint32_t vlan_table[VMXNET3_VFT_SIZE];
++        uint32_t rx_mode;
++        MACAddr *mcast_list;
++        uint32_t mcast_list_len;
++        uint32_t mcast_list_buff_size; /* needed for live migration. */
++
++        /* Compatibility flags for migration */
++        uint32_t compat_flags;
++} VMXNET3State;
 -- 
 2.17.2
