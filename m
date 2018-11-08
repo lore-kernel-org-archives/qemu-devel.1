@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47410)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gKkze-0001NB-64
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 09:09:12 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gKkza-0001LK-Nk
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 09:09:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gKkzY-00040M-6p
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 09:09:10 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:51228)
+	(envelope-from <peter.maydell@linaro.org>) id 1gKkzN-0003qD-2Z
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 09:09:06 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:45609)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gKkzX-0003zE-Um
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 09:09:04 -0500
-Received: by mail-wm1-f66.google.com with SMTP id w7-v6so1399093wmc.1
-	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 06:09:03 -0800 (PST)
-References: <20181108125256.30986-1-peter.maydell@linaro.org>
-	<7a7929a8-74d3-ed14-b284-f420afe824ea@redhat.com>
-	<CAFEAcA9NSzcDP6UwLYRfOSq=NZE3+4+vF6wNCXjJ7LQ9mMZLwQ@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <5b61339a-2dd5-5d08-c5b1-ac305662a0aa@redhat.com>
-Date: Thu, 8 Nov 2018 15:08:59 +0100
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gKkzM-0003pj-SW
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 09:08:52 -0500
+Received: by mail-ot1-x343.google.com with SMTP id g10so18187508otl.12
+	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 06:08:52 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9NSzcDP6UwLYRfOSq=NZE3+4+vF6wNCXjJ7LQ9mMZLwQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] tcg/tcg-op.h: Add multiple include guard
+In-Reply-To: <20181107155405.24013-4-minyard@acm.org>
+References: <20181107155405.24013-1-minyard@acm.org>
+	<20181107155405.24013-4-minyard@acm.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 8 Nov 2018 14:08:31 +0000
+Message-ID: <CAFEAcA9hp0VzN484uugfc4kzh3pSDMn3PU+ozfc_XPT5P-QsBw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 3/3] i2c: Add vmstate handling to the smbus
+ eeprom
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,46 +30,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, "patches@linaro.org" <patches@linaro.org>
+To: Corey Minyard <minyard@acm.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Corey Minyard <cminyard@mvista.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
 
-On 8/11/18 14:17, Peter Maydell wrote:
-> On 8 November 2018 at 13:08, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
->> On 8/11/18 13:52, Peter Maydell wrote:
->>>
->>> The tcg-op.h header was missing the usual guard against multiple
->>> inclusion; add it.
->>>
->>> (Spotted by lgtm.com's static analyzer.)
->>
->>
->> I'm pretty sure there are more occurences.
-> 
-> The only other ones the analyzer spotted all seemed to be
-> "deliberately multiply included" (like
-> include/exec/memory_ldst_phys.inc.h), though we don't in
-> all cases use the ".inc.h" convention that sort-of
-> indicates that).
-> 
-> https://lgtm.com/projects/g/qemu/qemu/alerts/?mode=tree
-> is probably the most convenient url if you want to
-> go looking for other stuff. Some of its issues are
-> definitely false-positives, but there may be some other
-> easy to fix things in there (eg the "local variable
-> hides global variable" ones -- though if we care about
-> these we should enable -Wshadow and fix the compile
-> failures).
-> 
-> Notably, lgtm does checks on python, which Coverity does not,
-> so that is more likely to be a source of real issues to fix,
-> I think.
+On 7 November 2018 at 15:54,  <minyard@acm.org> wrote:
+> From: Corey Minyard <cminyard@mvista.com>
+>
+> This was if the eeprom is accessed during a state transfer, the
+> transfer will be reliable.
+>
+> Signed-off-by: Corey Minyard <cminyard@mvista.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  hw/i2c/smbus_eeprom.c | 16 +++++++++++++++-
+>  1 file changed, 15 insertions(+), 1 deletion(-)
+>
+> diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
+> index f18aa3de35..d4430b0c5d 100644
+> --- a/hw/i2c/smbus_eeprom.c
+> +++ b/hw/i2c/smbus_eeprom.c
+> @@ -29,6 +29,8 @@
+>
+>  //#define DEBUG
+>
+> +#define TYPE_SMBUS_EEPROM_DEVICE "smbus-eeprom"
 
-Thanks for the pointer.
+The part of this patch which is adding the usual QOM
+macros is good, but we should provide also the
+cast-macro (the one that's an OBJECT_CHECK(...)).
+And this should be separate from adding the vmstate.
 
-This stats are funny^H^H^H^Hscary:
-https://lgtm.com/blog/best_email_domain#What%20about%20the%20free%20email%20providers?
+> +
+>  typedef struct SMBusEEPROMDevice {
+>      SMBusDevice smbusdev;
+>      void *data;
+> @@ -97,6 +99,17 @@ static uint8_t eeprom_read_data(SMBusDevice *dev, uint8_t cmd, int n)
+>      return eeprom_receive_byte(dev);
+>  }
+>
+> +static const VMStateDescription vmstate_smbus_eeprom = {
+> +    .name = TYPE_SMBUS_EEPROM_DEVICE,
 
-> 
-> thanks
-> -- PMM
-> 
+Generally we don't use the TYPE_FOO constant for the vmstate
+name, because we can usually freely change the TYPE_FOO string without
+breaking back-compat, but we can't change the vmstate name.
+So we decouple them to make it more obvious when a change might
+be changing the migration on-the-wire format.
+
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields      = (VMStateField[]) {
+> +        VMSTATE_SMBUS_DEVICE(smbusdev, SMBusEEPROMDevice),
+> +        VMSTATE_UINT8(offset, SMBusEEPROMDevice),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+
+This doesn't do anything for migration of the actual data contents.
+The current users of this device (hw/arm/aspeed.c and the
+smbus_eeprom_init() function) doesn't do anything
+to migrate the contents. For that matter, "user of the device
+passes a pointer to a random lump of memory via a device property"
+is a bit funky as an interface. The device should allocate its
+own memory and migrate it, and the user should just pass the
+initial required contents (default being "zero-initialize",
+which is what everybody except the mips_fulong2e, mips_malta
+and sam460ex want).
+
+Does this also break migration from an old QEMU to a new one?
+(For Aspeed that's probably ok, but we should flag it up in the
+commit message if so. x86 uses need care...)
+
+> +
+>  static void smbus_eeprom_realize(DeviceState *dev, Error **errp)
+>  {
+>      SMBusEEPROMDevice *eeprom = (SMBusEEPROMDevice *)dev;
+> @@ -121,12 +134,13 @@ static void smbus_eeprom_class_initfn(ObjectClass *klass, void *data)
+>      sc->write_data = eeprom_write_data;
+>      sc->read_data = eeprom_read_data;
+>      dc->props = smbus_eeprom_properties;
+> +    dc->vmsd = &vmstate_smbus_eeprom;
+>      /* Reason: pointer property "data" */
+>      dc->user_creatable = false;
+>  }
+>
+>  static const TypeInfo smbus_eeprom_info = {
+> -    .name          = "smbus-eeprom",
+> +    .name          = TYPE_SMBUS_EEPROM_DEVICE,
+>      .parent        = TYPE_SMBUS_DEVICE,
+>      .instance_size = sizeof(SMBusEEPROMDevice),
+>      .class_init    = smbus_eeprom_class_initfn,
+> --
+> 2.17.1
+
+thanks
+-- PMM
