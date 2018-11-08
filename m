@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41040)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41055)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gKj5g-0005lD-JA
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:07:22 -0500
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gKj5k-0005lg-3a
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:07:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gKj5X-0003L8-Ua
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:07:14 -0500
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gKj5e-0003O7-Ak
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:07:19 -0500
 From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Date: Thu,  8 Nov 2018 13:06:27 +0100
-Message-Id: <20181108120628.29926-2-kbastian@mail.uni-paderborn.de>
+Date: Thu,  8 Nov 2018 13:06:28 +0100
+Message-Id: <20181108120628.29926-3-kbastian@mail.uni-paderborn.de>
 In-Reply-To: <20181108120628.29926-1-kbastian@mail.uni-paderborn.de>
 References: <20181108120628.29926-1-kbastian@mail.uni-paderborn.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 1/2] target/riscv: Fix FCLASS_D being treated
- as RV64 only
+Subject: [Qemu-devel] [PATCH 2/2] target/riscv: Fix sfence.vm/a both
+ available in any priv version
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,38 +25,49 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: kbastian@mail.uni-paderborn.de, mjc@sifive.com, sagark@eecs.berkeley.edu, palmer@sifive.com, Alistair.Francis@wdc.com
 Cc: qemu-devel@nongnu.org, qemu-riscv@nongnu.org
 
+sfence.vm has been replaced in priv v1.10 spec by sfence.vma.
+
+Reported-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 ---
- target/riscv/translate.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ target/riscv/translate.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
 
 diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-index 18d7b6d147..5359088e24 100644
+index 5359088e24..f44eb9c41b 100644
 --- a/target/riscv/translate.c
 +++ b/target/riscv/translate.c
-@@ -1237,13 +1237,14 @@ static void gen_fp_arith(DisasContext *ctx, uint32_t opc, int rd,
-         tcg_temp_free(t0);
-         break;
+@@ -1292,10 +1292,14 @@ static void gen_system(CPURISCVState *env, DisasContext *ctx, uint32_t opc,
+ #ifndef CONFIG_USER_ONLY
+     /* Extract funct7 value and check whether it matches SFENCE.VMA */
+     if ((opc == OPC_RISC_ECALL) && ((csr >> 5) == 9)) {
+-        /* sfence.vma */
+-        /* TODO: handle ASID specific fences */
+-        gen_helper_tlb_flush(cpu_env);
+-        return;
++        if (env->priv_ver == PRIV_VERSION_1_10_0) {
++            /* sfence.vma */
++            /* TODO: handle ASID specific fences */
++            gen_helper_tlb_flush(cpu_env);
++            return;
++        } else {
++            gen_exception_illegal(ctx);
++        }
+     }
+ #endif
  
--#if defined(TARGET_RISCV64)
-     case OPC_RISC_FMV_X_D:
-         /* also OPC_RISC_FCLASS_D */
-         switch (rm) {
-+#if defined(TARGET_RISCV64)
-         case 0: /* FMV */
-             gen_set_gpr(rd, cpu_fpr[rs1]);
+@@ -1342,7 +1346,11 @@ static void gen_system(CPURISCVState *env, DisasContext *ctx, uint32_t opc,
+             gen_helper_wfi(cpu_env);
              break;
-+#endif
-         case 1:
-             t0 = tcg_temp_new();
-             gen_helper_fclass_d(t0, cpu_fpr[rs1]);
-@@ -1255,6 +1256,7 @@ static void gen_fp_arith(DisasContext *ctx, uint32_t opc, int rd,
-         }
-         break;
- 
-+#if defined(TARGET_RISCV64)
-     case OPC_RISC_FMV_D_X:
-         t0 = tcg_temp_new();
-         gen_get_gpr(t0, rs1);
+         case 0x104: /* SFENCE.VM */
+-            gen_helper_tlb_flush(cpu_env);
++            if (env->priv_ver <= PRIV_VERSION_1_09_1) {
++                gen_helper_tlb_flush(cpu_env);
++            } else {
++                gen_exception_illegal(ctx);
++            }
+             break;
+ #endif
+         default:
 -- 
 2.19.1
