@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60456)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60476)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gKkC1-0005nF-J7
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 08:17:54 -0500
+	(envelope-from <groug@kaod.org>) id 1gKkC2-0005o5-Sx
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 08:17:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gKkBz-00005c-HC
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 08:17:53 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:41311)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gKkBw-0008KQ-Dw
+	(envelope-from <groug@kaod.org>) id 1gKkBz-000066-Ii
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 08:17:54 -0500
+Received: from 14.mo6.mail-out.ovh.net ([46.105.56.113]:50712)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gKkBz-0008O8-8m
 	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 08:17:51 -0500
-Received: by mail-oi1-x243.google.com with SMTP id g188-v6so10890581oif.8
-	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 05:17:39 -0800 (PST)
+Received: from player788.ha.ovh.net (unknown [10.109.143.183])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 4F0611970B3
+	for <qemu-devel@nongnu.org>; Thu,  8 Nov 2018 14:17:45 +0100 (CET)
+Date: Thu, 8 Nov 2018 14:17:33 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20181108141733.5ee0e7be@bahia.lan>
+In-Reply-To: <20181108121646.26173-21-david@gibson.dropbear.id.au>
+References: <20181108121646.26173-1-david@gibson.dropbear.id.au>
+	<20181108121646.26173-21-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-In-Reply-To: <7a7929a8-74d3-ed14-b284-f420afe824ea@redhat.com>
-References: <20181108125256.30986-1-peter.maydell@linaro.org>
-	<7a7929a8-74d3-ed14-b284-f420afe824ea@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 8 Nov 2018 13:17:18 +0000
-Message-ID: <CAFEAcA9NSzcDP6UwLYRfOSq=NZE3+4+vF6wNCXjJ7LQ9mMZLwQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] tcg/tcg-op.h: Add multiple include guard
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 20/22] This patch fixes processing of rfi
+ instructions in icount mode.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,39 +31,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, "patches@linaro.org" <patches@linaro.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: peter.maydell@linaro.org, lvivier@redhat.com, agraf@suse.de, qemu-devel@nongnu.org, Maria Klimushenkova <maria.klimushenkova@ispras.ru>, qemu-ppc@nongnu.org, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
-On 8 November 2018 at 13:08, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
-> wrote:
-> On 8/11/18 13:52, Peter Maydell wrote:
->>
->> The tcg-op.h header was missing the usual guard against multiple
->> inclusion; add it.
->>
->> (Spotted by lgtm.com's static analyzer.)
->
->
-> I'm pretty sure there are more occurences.
+On Thu,  8 Nov 2018 23:16:44 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-The only other ones the analyzer spotted all seemed to be
-"deliberately multiply included" (like
-include/exec/memory_ldst_phys.inc.h), though we don't in
-all cases use the ".inc.h" convention that sort-of
-indicates that).
+> From: Maria Klimushenkova <maria.klimushenkova@ispras.ru>
+> 
+> In this mode writing to interrupt/peripheral state is controlled
+> by can_do_io flag. This flag must be set explicitly before helper
+> function invocation.
+> 
+> Signed-off-by: Maria Klimushenkova <maria.klimushenkova@ispras.ru>
+> Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+> Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
 
-https://lgtm.com/projects/g/qemu/qemu/alerts/?mode=3Dtree
-is probably the most convenient url if you want to
-go looking for other stuff. Some of its issues are
-definitely false-positives, but there may be some other
-easy to fix things in there (eg the "local variable
-hides global variable" ones -- though if we care about
-these we should enable -Wshadow and fix the compile
-failures).
+The 'This patch fixes ...' wording in the commit title looks weird, and
+it doesn't even mention the target/ppc subsystem...
 
-Notably, lgtm does checks on python, which Coverity does not,
-so that is more likely to be a source of real issues to fix,
-I think.
+What about this ?
 
-thanks
--- PMM
+target/ppc: fix processing of rfi instructions in icount mode
+
+>  target/ppc/translate.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+> 
+> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+> index fb18cedcf0..2b37910248 100644
+> --- a/target/ppc/translate.c
+> +++ b/target/ppc/translate.c
+> @@ -3919,9 +3919,15 @@ static void gen_rfi(DisasContext *ctx)
+>      }
+>      /* Restore CPU state */
+>      CHK_SV;
+> +    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
+> +        gen_io_start();
+> +    }
+>      gen_update_cfar(ctx, ctx->base.pc_next - 4);
+>      gen_helper_rfi(cpu_env);
+>      gen_sync_exception(ctx);
+> +    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
+> +        gen_io_end();
+> +    }
+>  #endif
+>  }
+>  
+> @@ -3933,9 +3939,15 @@ static void gen_rfid(DisasContext *ctx)
+>  #else
+>      /* Restore CPU state */
+>      CHK_SV;
+> +    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
+> +        gen_io_start();
+> +    }
+>      gen_update_cfar(ctx, ctx->base.pc_next - 4);
+>      gen_helper_rfid(cpu_env);
+>      gen_sync_exception(ctx);
+> +    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
+> +        gen_io_end();
+> +    }
+>  #endif
+>  }
+>  
