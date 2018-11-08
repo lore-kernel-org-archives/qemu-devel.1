@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51173)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53683)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gKp1S-000104-93
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 13:27:21 -0500
+	(envelope-from <palmer@sifive.com>) id 1gKp7n-0006KB-H2
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 13:33:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gKp1N-0005AT-7y
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 13:27:14 -0500
-Date: Thu, 8 Nov 2018 16:26:44 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181108182644.GP12503@habkost.net>
-References: <20181031003120.26771-12-ehabkost@redhat.com>
-	<CAFEAcA_ScL828ya7P_5=HMx=vbxo=jK4047nAbmb9Ep=6r=2og@mail.gmail.com>
-	<f1bd429f-198a-ee27-9184-636692332816@redhat.com>
-	<20181106141302.GP12503@habkost.net>
-	<87efbxxw1c.fsf@dusky.pond.sub.org>
-	<8ecdbb0e-aaf8-ddc5-6442-87977585d9d8@redhat.com>
-	<87y3a4ot3g.fsf@dusky.pond.sub.org>
-	<f69012ad-af21-783c-d378-acd3131451e4@redhat.com>
-	<20181108165136.GK12503@habkost.net>
-	<d8782551-ca89-c70c-a2b9-0ba665171c63@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d8782551-ca89-c70c-a2b9-0ba665171c63@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] tests: Fix Python 3 detection
- on older GNU make versions
+	(envelope-from <palmer@sifive.com>) id 1gKp7j-0002fe-5K
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 13:33:51 -0500
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:46863)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gKp7i-0002Jp-Gf
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 13:33:46 -0500
+Received: by mail-pf1-x444.google.com with SMTP id s9-v6so2328107pfm.13
+	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 10:33:22 -0800 (PST)
+Date: Thu,  8 Nov 2018 10:33:06 -0800
+Message-Id: <20181108183306.4361-2-palmer@sifive.com>
+In-Reply-To: <20181108183306.4361-1-palmer@sifive.com>
+References: <20181108183306.4361-1-palmer@sifive.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+Subject: [Qemu-devel] [PULL] riscv: spike: Fix memory leak in the board init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,59 +25,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-riscv@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>, Alistair Francis <alistair.francis@wdc.com>, Palmer Dabbelt <palmer@sifive.com>
 
-On Thu, Nov 08, 2018 at 12:36:37PM -0500, Cleber Rosa wrote:
-> 
-> 
-> On 11/8/18 11:51 AM, Eduardo Habkost wrote:
-> 
-> > I'm not sure I agree with the "is an important thing to keep
-> > track of" part.  I don't think we'll have any need to keep track
-> > of the Python version in shell script or makefiles after we start
-> > requiring Python 3.
-> > 
-> 
-> Well, "Python 3" is not a uniform thing.  There are many changes across
-> the 3.x spectrum that can bite you.  I'm speaking out of the experience
-> with Avocado, that supports Python 3.4, 3.5 and 3.6 (and that reminds me
-> we should add tests for 3.7).
+From: Alistair Francis <Alistair.Francis@wdc.com>
 
-Do you expect us to need to keep track of the exact Python
-version before running the Python interpreter?  Code written in
-Python doesn't count, because it can simply use sys.version_info.
+Coverity caught a malloc() call that was never freed. This patch ensures
+that we free the memory but also updates the allocation to use
+g_strdup_printf() instead of malloc().
 
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
+Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+---
+ hw/riscv/spike.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-> 
-> > Extra cleanups (like moving version checks to ./configure) are
-> > still welcome, but keep in mind that this will probably be thrown
-> > away once we drop Python 2 support.
-> > 
-> 
-> I don't think it should.  Let me give the example of a "Python 3.0" job
-> on Travis, related to the following snippet:
-> 
->     # Python builds
->     - env: CONFIG="--target-list=x86_64-softmmu"
->       python:
->         - "3.0"
-> 
-> If you look at https://travis-ci.org/clebergnu/qemu/jobs/452033247#L983
-> you'll see that the intended goal was missed.  That has to do with how
-> Travis makes the requested Python version available, and it was only
-> obvious because this branch prints the Python version used.
-> 
-> Developers writing Python code, for instance tests, may assume a given
-> API that doesn't exist or behave like they expect, and not knowing the
-> Python version used on a remote environment makes debugging extra hard.
-
-I'm not sure I get your point.  We can surely add diagnostic
-messages to show the Python version, and we can make ./configure
-fail if Python 3 is unavailable.  I'm talking about adding code
-to ./configure to save Python version info for makefile rules and
-shell scripts.  I expect the extra code to be unnecessary in the
-future.
-
+diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
+index 8a712ed49026..268df04c3c7d 100644
+--- a/hw/riscv/spike.c
++++ b/hw/riscv/spike.c
+@@ -316,9 +316,7 @@ static void spike_v1_09_1_board_init(MachineState *machine)
+ 
+     /* build config string with supplied memory size */
+     char *isa = riscv_isa_string(&s->soc.harts[0]);
+-    size_t config_string_size = strlen(config_string_tmpl) + 48;
+-    char *config_string = malloc(config_string_size);
+-    snprintf(config_string, config_string_size, config_string_tmpl,
++    char *config_string = g_strdup_printf(config_string_tmpl,
+         (uint64_t)memmap[SPIKE_CLINT].base + SIFIVE_TIME_BASE,
+         (uint64_t)memmap[SPIKE_DRAM].base,
+         (uint64_t)ram_size, isa,
+@@ -345,6 +343,8 @@ static void spike_v1_09_1_board_init(MachineState *machine)
+     /* Core Local Interruptor (timer and IPI) */
+     sifive_clint_create(memmap[SPIKE_CLINT].base, memmap[SPIKE_CLINT].size,
+         smp_cpus, SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE);
++
++    g_free(config_string);
+ }
+ 
+ static void spike_v1_09_1_machine_init(MachineClass *mc)
 -- 
-Eduardo
+2.18.1
