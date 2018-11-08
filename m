@@ -1,29 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33461)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33620)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gKlcH-0003Ja-BO
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 09:49:07 -0500
+	(envelope-from <david@redhat.com>) id 1gKlcX-0003TE-7q
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 09:49:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gKlcB-0002kb-P8
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 09:49:04 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:52646)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gKlc9-0002fM-L1
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 09:48:59 -0500
-Received: by mail-wm1-f66.google.com with SMTP id r11-v6so1537984wmb.2
-	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 06:48:56 -0800 (PST)
-References: <20181107155405.24013-1-minyard@acm.org>
-	<20181107155405.24013-3-minyard@acm.org>
-	<98b1f2e3-bf71-24a2-f339-9fd63b40d26f@redhat.com>
-	<CAFEAcA85HTT-yTmL8Fu1uxbtWLdHVZiQS2PcJim45s65GPob5g@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <0c98444f-b42e-938c-f30b-f701f84f0da7@redhat.com>
-Date: Thu, 8 Nov 2018 15:48:53 +0100
+	(envelope-from <david@redhat.com>) id 1gKlcS-0003md-OT
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 09:49:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45762)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gKlcS-0003ld-F7
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 09:49:16 -0500
+References: <20181023152306.3123-1-david@redhat.com>
+	<20181023152306.3123-2-david@redhat.com>
+	<87pnvqdvsj.fsf@dusky.pond.sub.org>
+	<e8fe86a1-d075-2ea8-d1f4-e08e5dceee07@redhat.com>
+	<875zxingqn.fsf@dusky.pond.sub.org>
+	<440eb166-73d1-77b6-5dd9-66a0abd7d665@redhat.com>
+	<87muqn5ydc.fsf@dusky.pond.sub.org>
+	<1ec41fe2-d4b4-fce2-9381-818ee3356409@redhat.com>
+	<87tvkv2r2b.fsf@dusky.pond.sub.org>
+	<64720ade-c69d-40a4-5359-2132711c01cd@redhat.com>
+	<87d0rgvrbk.fsf@dusky.pond.sub.org>
+	<fcbd588d-f51c-4ab4-fa45-ad5360aff5b1@redhat.com>
+	<8736scq7y9.fsf@dusky.pond.sub.org>
+	<bfebc5b0-cebd-8a83-3106-effba5332094@redhat.com>
+	<878t24ort1.fsf@dusky.pond.sub.org>
+	<50328c72-ec11-6158-bd44-018f7454de18@redhat.com>
+	<ddc8fe1d-96d5-b20c-90ce-260e61335087@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <d26f72d6-16c2-07d1-1ded-eb2322080290@redhat.com>
+Date: Thu, 8 Nov 2018 15:49:07 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA85HTT-yTmL8Fu1uxbtWLdHVZiQS2PcJim45s65GPob5g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <ddc8fe1d-96d5-b20c-90ce-260e61335087@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/3] i2c: Add an SMBus vmstate structure
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/7] qapi: use qemu_strtoi64() in
+ parse_str
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,86 +44,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Corey Minyard <minyard@acm.org>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Corey Minyard <cminyard@mvista.com>
+To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On 8/11/18 15:40, Peter Maydell wrote:
-> On 8 November 2018 at 14:23, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
->> Hi Corey,
->>
->>
->> On 7/11/18 16:54, minyard@acm.org wrote:
->>>
->>> From: Corey Minyard <cminyard@mvista.com>
->>>
->>> There is no vmstate handling for SMBus, so no device sitting on SMBus
->>> can have a state transfer that works reliable.  So add it.
->>>
->>> Signed-off-by: Corey Minyard <cminyard@mvista.com>
->>> Cc: Paolo Bonzini <pbonzini@redhat.com>
->>> Cc: Michael S. Tsirkin <mst@redhat.com>
->>> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
->>> ---
->>>    hw/i2c/smbus.c         | 14 ++++++++++++++
->>>    include/hw/i2c/smbus.h | 18 +++++++++++++++---
->>>    2 files changed, 29 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/hw/i2c/smbus.c b/hw/i2c/smbus.c
->>> index 6ff77c582f..b0774d7683 100644
->>> --- a/hw/i2c/smbus.c
->>> +++ b/hw/i2c/smbus.c
->>> @@ -349,6 +349,20 @@ int smbus_write_block(I2CBus *bus, uint8_t addr,
->>> uint8_t command, uint8_t *data,
->>>        return 0;
->>>    }
->>>    +const VMStateDescription vmstate_smbus_device = {
->>> +    .name = TYPE_SMBUS_DEVICE,
->>> +    .version_id = 1,
->>> +    .minimum_version_id = 1,
->>> +    .fields      = (VMStateField[]) {
->>> +        VMSTATE_I2C_SLAVE(i2c, SMBusDevice),
->>> +        VMSTATE_INT32(mode, SMBusDevice),
->>> +        VMSTATE_INT32(data_len, SMBusDevice),
->>> +        VMSTATE_UINT8_ARRAY(data_buf, SMBusDevice, SMBUS_DATA_MAX_LEN),
->>> +        VMSTATE_UINT8(command, SMBusDevice),
->>> +        VMSTATE_END_OF_LIST()
->>> +    }
->>> +};
->>> +
->>>    static void smbus_device_class_init(ObjectClass *klass, void *data)
->>>    {
->>>        I2CSlaveClass *sc = I2C_SLAVE_CLASS(klass);
->>> diff --git a/include/hw/i2c/smbus.h b/include/hw/i2c/smbus.h
->>> index d8b1b9ee81..7b52020121 100644
->>> --- a/include/hw/i2c/smbus.h
->>> +++ b/include/hw/i2c/smbus.h
->>> @@ -53,14 +53,16 @@ typedef struct SMBusDeviceClass
->>>        uint8_t (*read_data)(SMBusDevice *dev, uint8_t cmd, int n);
->>>    } SMBusDeviceClass;
->>>    +#define SMBUS_DATA_MAX_LEN 34  /* command + len + 32 bytes of data.  */
->>> +
->>>    struct SMBusDevice {
->>>        /* The SMBus protocol is implemented on top of I2C.  */
->>>        I2CSlave i2c;
->>>          /* Remaining fields for internal use only.  */
->>> -    int mode;
->>> -    int data_len;
->>> -    uint8_t data_buf[34]; /* command + len + 32 bytes of data.  */
->>> +    int32_t mode;
->>> +    int32_t data_len;
->>> +    uint8_t data_buf[SMBUS_DATA_MAX_LEN];
->>
->>
->> Those changes are not in your commit description.
->> Can you include them in a separate patch?
+On 08.11.18 15:42, Eric Blake wrote:
+> On 11/8/18 7:05 AM, David Hildenbrand wrote:
 > 
-> These are just the standard "promote types in the state struct
-> to fixed-width ones required by the VMSTATE macros", aren't
-> they? I think they're fine as part of the vmstate conversion.
+>>>> Thanks for the excessive answer! I think that should be enough to come
+>>>> up with a RFC of a *rewrite* of the string input visitor :)
+>>>
+>>> You're welcome!  I love great questions, they make me *think*.
+>>>
+>>> Besides, if something's worth doing, it's probably worth overdoing ;)
+>>>
+>>
+>> I found some more ugliness, looking at the tests. I am not sure the test
+>> is correct here.
+>>
+>> test_visitor_in_intList():
+>>
+>> v = visitor_input_test_init(data, "1,2,0,2-4,20,5-9,1-8");
+>>
+>> -> we expect { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 20 }, implying that the
+>> visitor actually does sorting + duplicate elimination. Now I consider
+>> this is wrong. We are parsing a list of integers, not an ordered set.
+>>
+>> What's your take on this?
+> 
+> The test matches the current reality (yes, the string input visitor 
+> currently sorts and deduplicates) - but you are also right that in 
+> general JSON [] lists are supposed to preserve order. I suspect our use 
+> of -numa parsing relies on the result being sorted - but I would not be 
+> opposed to a rewrite that dumbs down the string visitor to provide an 
+> unsorted list, and move the sorting into a post-pass belonging to the 
+> -numa code.  Updating the tests to match as part of a rewrite is thus 
+> okay, if we have the justification that we audited all other users to 
+> see that they either don't care or that we can move the sorting out of 
+> the list walker and into the callers that do care.
+> 
 
-Fine then!
+-numa is parsed via the object parser and not the string input parser as
+far as I understood Markus. I think only "host-nodes" for memdev would
+be relevant right now, and as far as I can see, that shouldn't break
+(have to take a closer look).
 
-> 
-> thanks
-> -- PMM
-> 
+-- 
+
+Thanks,
+
+David / dhildenb
