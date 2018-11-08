@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35546)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39616)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lhrazky@redhat.com>) id 1gKhBt-0004E3-P2
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:05:36 -0500
+	(envelope-from <joel.stan@gmail.com>) id 1gKhQs-0004BB-5H
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:21:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lhrazky@redhat.com>) id 1gKhBf-0007Lr-5q
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:05:24 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:36850)
+	(envelope-from <joel.stan@gmail.com>) id 1gKhQd-0004qy-Lp
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:20:49 -0500
+Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:33136)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lhrazky@redhat.com>) id 1gKhBc-0007EP-Iw
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:05:17 -0500
-Received: by mail-wr1-f66.google.com with SMTP id z13-v6so18181996wrs.3
-	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 02:05:13 -0800 (PST)
-Message-ID: <1541671510.16655.506.camel@redhat.com>
-From: =?UTF-8?Q?Luk=C3=A1=C5=A1_Hr=C3=A1zk=C3=BD?= <lhrazky@redhat.com>
-Date: Thu, 08 Nov 2018 11:05:10 +0100
-In-Reply-To: <20181108064927.i6llxv4kgcrdon7n@sirius.home.kraxel.org>
-References: <20181107104921.20536-1-lhrazky@redhat.com>
-	<20181107104921.20536-2-lhrazky@redhat.com>
-	<20181108064927.i6llxv4kgcrdon7n@sirius.home.kraxel.org>
+	(Exim 4.71) (envelope-from <joel.stan@gmail.com>) id 1gKhQd-0004El-7U
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:20:47 -0500
+Received: by mail-qk1-x742.google.com with SMTP id o89so25578030qko.0
+	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 02:20:35 -0800 (PST)
+MIME-Version: 1.0
+References: <20181102170730.12432-1-contrib@steffen-goertz.de>
+	<20181108093208.GC17083@stefanha-x1.localdomain>
+	<CAFEAcA-xkbne9faGg4qqKPWbOm5U1cVBF3Y1t2CuxozRDAa1Tw@mail.gmail.com>
+In-Reply-To: <CAFEAcA-xkbne9faGg4qqKPWbOm5U1cVBF3Y1t2CuxozRDAa1Tw@mail.gmail.com>
+From: Joel Stanley <joel@jms.id.au>
+Date: Thu, 8 Nov 2018 20:50:23 +1030
+Message-ID: <CACPK8XcoDhwkcpjtjxYr2kGBs8kj4FgyJW7hTkaq9NzB6NgoEg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH spice v3 1/3] QXL interface: add a
- function to identify monitors in the guest
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 00/13] arm: nRF51 Devices and Microbit
+ Support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,38 +31,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: spice-devel@lists.freedesktop.org, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, =?UTF-8?Q?Steffen_G=C3=B6rtz?= <contrib@steffen-goertz.de>, QEMU Developers <qemu-devel@nongnu.org>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>
 
-Hello,
+On Thu, 8 Nov 2018 at 20:12, Peter Maydell <peter.maydell@linaro.org> wrote=
+:
+>
+> On 8 November 2018 at 09:32, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+> > On Fri, Nov 02, 2018 at 01:07:17PM -0400, Steffen G=C3=B6rtz wrote:
+> >
+> > Thank you, Steffen!  I have posted my Reviewed-by on all patches.
+> >
+> > Joel: Will you send pull requests for the microbit machine types or do
+> > you want Peter to merge this?
+>
+> I had some code review comments (mostly minor, but there's
+> a definite bug in the timer code) that need addressing
+> before this series can be merged. It's pretty close, though.
 
-On Thu, 2018-11-08 at 07:49 +0100, Gerd Hoffmann wrote:
->   Hi,
-> 
-> > + * The device_display_id_{start,count} denotes the sequence of device display
-> > + * IDs that map to the zero-based sequence of monitor IDs provided by monitors
-> > + * config on this interface. For example with device_display_id_start = 2 and
-> > + * device_display_id_count = 3 you get the following mapping:
-> > + * monitor_id  ->  device_display_id
-> > + *          0  ->  2
-> > + *          1  ->  3
-> > + *          2  ->  4
-> > + *
-> > + * Note this example is unsupported in practice. The only supported cases are
-> > + * either a single device display ID (count = 1) or multiple device display IDs
-> > + * in a sequence starting from 0.
-> 
-> This is confusing.  The usage of this api in the qemu counterpart looks
-> sane though.
+I'm not fussed if I send the request or Peter does. For the aspeed
+work I've done in the past Peter has rolled the patches into his ARM
+pull requests.
 
-Not sure what you find confusing in particular... The example? Using an
-example and then saying it's not supported? (I wated to use a
-nontrivial example that will show the concept...) Suggestions for
-improvement?
+Peter, once the patches are good to go, what would you prefer?
 
-Thanks,
-Lukas
+Cheers,
 
-> cheers,
->   Gerd
-> 
+Joel
